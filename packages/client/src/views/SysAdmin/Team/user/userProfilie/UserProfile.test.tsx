@@ -10,7 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { AppStore } from '@client/store'
-import { createTestComponent, createTestStore } from '@client/tests/util'
+import {
+  createTestComponent,
+  createTestStore,
+  flushPromises
+} from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
@@ -21,8 +25,10 @@ import {
 } from '@client/user/queries'
 import { UserProfile } from '@client/views/SysAdmin/Team/user/userProfilie/UserProfile'
 import { USER_PROFILE } from '@client/navigation/routes'
+import { userMutations } from '@client/user/mutations'
 
 describe('User audit list tests', () => {
+  userMutations.resendSMSInvite = jest.fn()
   let component: ReactWrapper<{}, {}>
   let store: AppStore
   let history: History<any>
@@ -200,7 +206,10 @@ describe('User audit list tests', () => {
     })
     expect(history.location.pathname).toBe('/team/users')
   })
-  it('opens deactivation modal on clicking deactivate menu option', async () => {
+  it('sends invite on clicking resend sms invite menu option', async () => {
+    ;(userMutations.resendSMSInvite as jest.Mock).mockResolvedValueOnce({
+      data: { resendSMSInvite: 'true' }
+    })
     const menuLink = await waitForElement(
       component,
       '#sub-page-header-munu-buttonToggleButton'
@@ -210,6 +219,51 @@ describe('User audit list tests', () => {
     const deactivationLink = await waitForElement(
       component,
       '#sub-page-header-munu-buttonItem1'
+    )
+    deactivationLink.hostNodes().simulate('click')
+
+    await flushPromises()
+
+    component.update()
+
+    expect(
+      await waitForElement(component, '#resend_invite_success')
+    ).toBeDefined()
+  })
+  it('shows error on clicking resend sms invite menu option if there is any', async () => {
+    ;(userMutations.resendSMSInvite as jest.Mock).mockRejectedValueOnce(
+      new Error('Something went wrong')
+    )
+    const menuLink = await waitForElement(
+      component,
+      '#sub-page-header-munu-buttonToggleButton'
+    )
+    menuLink.hostNodes().simulate('click')
+
+    const deactivationLink = await waitForElement(
+      component,
+      '#sub-page-header-munu-buttonItem1'
+    )
+    deactivationLink.hostNodes().simulate('click')
+
+    await flushPromises()
+
+    component.update()
+
+    expect(
+      await waitForElement(component, '#resend_invite_error')
+    ).toBeDefined()
+  })
+  it('opens deactivation modal on clicking deactivate menu option', async () => {
+    const menuLink = await waitForElement(
+      component,
+      '#sub-page-header-munu-buttonToggleButton'
+    )
+    menuLink.hostNodes().simulate('click')
+
+    const deactivationLink = await waitForElement(
+      component,
+      '#sub-page-header-munu-buttonItem2'
     )
     deactivationLink.hostNodes().simulate('click')
 

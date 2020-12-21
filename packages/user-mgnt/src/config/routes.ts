@@ -38,6 +38,10 @@ import verifyPassHandler, {
   requestSchema as reqAuthSchema,
   responseSchema as resAuthSchema
 } from '@user-mgnt/features/verifyPassword/handler'
+import verifyPassByIdHandler, {
+  requestSchema as verifyPassByIdRequestSchema,
+  responseSchema as verifyPassByIdResponseSchema
+} from '@user-mgnt/features/verifyPasswordById/handler'
 import verifySecurityAnswer, {
   verifySecurityRequestSchema,
   verifySecurityResponseSchema
@@ -60,6 +64,9 @@ import verifyUserHandler, {
   requestSchema as reqVerifyUserSchema,
   responseSchema as resVerifyUserSchema
 } from '@user-mgnt/features/verifyUser/handler'
+import resendSMSInviteHandler, {
+  requestSchema as resendSMSRequestSchema
+} from '@user-mgnt/features/resendSMSInvite/handler'
 import * as Hapi from 'hapi'
 
 const enum RouteScope {
@@ -103,6 +110,23 @@ export const getRoutes = () => {
         },
         response: {
           schema: resAuthSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/verifyPasswordById',
+      handler: verifyPassByIdHandler,
+      config: {
+        auth: false,
+        tags: ['api'],
+        description: 'Verify user password',
+        notes: 'Verify account exist by id and password is correct',
+        validate: {
+          payload: verifyPassByIdRequestSchema
+        },
+        response: {
+          schema: verifyPassByIdResponseSchema
         }
       }
     },
@@ -330,6 +354,21 @@ export const getRoutes = () => {
           payload: userAuditSchema
         },
         tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/resendSMSInvite',
+      handler: resendSMSInviteHandler,
+      config: {
+        auth: {
+          scope: [RouteScope.SYSADMIN]
+        },
+        validate: {
+          payload: resendSMSRequestSchema
+        },
+        description:
+          'Resend sms for given mobile number and make the corresponding user pending'
       }
     },
     {

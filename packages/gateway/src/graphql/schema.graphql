@@ -54,6 +54,7 @@ type Query {
     skip: Int
     sort: String
   ): SearchFieldAgentResult
+  verifyPasswordById(id: String!, password: String!): VerifyPasswordResult
   fetchRegistrationMetrics(
     timeStart: String!
     timeEnd: String!
@@ -167,6 +168,7 @@ type Mutation {
     reason: String!
     comment: String
   ): String
+  resendSMSInvite(userId: String!): String
 }
 
 type Dummy {
@@ -308,6 +310,14 @@ type SearchUserResult {
 type SearchFieldAgentResult {
   results: [SearchFieldAgentResponse]
   totalItems: Int
+}
+
+type VerifyPasswordResult {
+  mobile: String
+  scrope: [String]
+  status: String
+  username: String
+  id: String
 }
 
 type RegistrationMetrics {
@@ -720,6 +730,7 @@ type EventProgressSet {
   dateOfEvent: Date
   registration: RegistrationSearchSet
   startedBy: User
+  startedByFacility: String
   startedAt: Date
   progressReport: EventProgressData
 }

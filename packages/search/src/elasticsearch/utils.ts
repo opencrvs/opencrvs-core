@@ -30,6 +30,13 @@ export const enum EVENT {
 }
 
 export const IN_PROGRESS_STATUS = 'IN_PROGRESS'
+const DECLARED_STATUS = 'DECLARED'
+const REJECTED_STATUS = 'REJECTED'
+const VALIDATED_STATUS = 'VALIDATED'
+const WAITING_VALIDATION_STATUS = 'WAITING_VALIDATION'
+const REGISTERED_STATUS = 'REGISTERED'
+const CERTIFIED_STATUS = 'CERTIFIED'
+
 export const NOTIFICATION_TYPES = ['birth-notification', 'death-notification']
 export const NAME_EN = 'en'
 
@@ -160,6 +167,10 @@ export const createStatusHistory = async (
   task: fhir.Task | undefined,
   authHeader: string
 ) => {
+  if (!isValidOperationHistory(body)) {
+    return
+  }
+
   const user: IUserModelData = await getUser(body.updatedBy || '', authHeader)
   const operatorName = user && findName(NAME_EN, user.name)
   const operatorNameLocale = user && findNameLocale(user.name)
@@ -361,4 +372,55 @@ export async function getUser(practitionerId: string, authHeader: any) {
     }
   })
   return await res.json()
+}
+
+function getPreviousStatus(body: IBirthCompositionBody) {
+  if (body.operationHistories && body.operationHistories.length > 0) {
+    return body.operationHistories[body.operationHistories.length - 1]
+      .operationType
+  }
+
+  return null
+}
+
+export function isValidOperationHistory(body: IBirthCompositionBody) {
+  const validStatusMapping = {
+    [IN_PROGRESS_STATUS]: [null],
+    [DECLARED_STATUS]: [null],
+    [REJECTED_STATUS]: [DECLARED_STATUS, IN_PROGRESS_STATUS, VALIDATED_STATUS],
+    [VALIDATED_STATUS]: [
+      DECLARED_STATUS,
+      IN_PROGRESS_STATUS,
+      REJECTED_STATUS,
+      null
+    ],
+    [WAITING_VALIDATION_STATUS]: [
+      null,
+      DECLARED_STATUS,
+      IN_PROGRESS_STATUS,
+      REJECTED_STATUS,
+      VALIDATED_STATUS
+    ],
+    [REGISTERED_STATUS]: [
+      null,
+      DECLARED_STATUS,
+      IN_PROGRESS_STATUS,
+      REJECTED_STATUS,
+      VALIDATED_STATUS,
+      WAITING_VALIDATION_STATUS
+    ],
+    [CERTIFIED_STATUS]: [REGISTERED_STATUS, CERTIFIED_STATUS]
+  }
+
+  const previousStatus = getPreviousStatus(body)
+  const currentStatus = body.type
+
+  if (
+    currentStatus &&
+    !validStatusMapping[currentStatus].includes(previousStatus)
+  ) {
+    return false
+  }
+
+  return true
 }

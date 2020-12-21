@@ -29,6 +29,7 @@ export interface GQLQuery {
   getUser?: GQLUser
   searchUsers?: GQLSearchUserResult
   searchFieldAgents?: GQLSearchFieldAgentResult
+  verifyPasswordById?: GQLVerifyPasswordResult
   fetchRegistrationMetrics?: GQLRegistrationMetrics
   getEventEstimationMetrics?: GQLEventEstimationMetrics
   getApplicationsStartedMetrics?: GQLApplicationsStartedMetrics
@@ -583,6 +584,14 @@ export interface GQLSearchFieldAgentResult {
   totalItems?: number
 }
 
+export interface GQLVerifyPasswordResult {
+  mobile?: string
+  scrope?: string[]
+  status?: string
+  username?: string
+  id?: string
+}
+
 export interface GQLTimeLoggedMetricsResultSet {
   results?: Array<GQLTimeLoggedMetrics | null>
   totalItems?: number
@@ -812,6 +821,7 @@ export interface GQLEventProgressSet {
   dateOfEvent?: GQLDate
   registration?: GQLRegistrationSearchSet
   startedBy?: GQLUser
+  startedByFacility?: string
   startedAt?: GQLDate
   progressReport?: GQLEventProgressData
 }
@@ -1229,6 +1239,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   getUser?: QueryToGetUserResolver<TParent>
   searchUsers?: QueryToSearchUsersResolver<TParent>
   searchFieldAgents?: QueryToSearchFieldAgentsResolver<TParent>
+  verifyPasswordById?: QueryToVerifyPasswordResolver<TParent>
   fetchRegistrationMetrics?: QueryToFetchRegistrationMetricsResolver<TParent>
   getEventEstimationMetrics?: QueryToGetEventEstimationMetricsResolver<TParent>
   getApplicationsStartedMetrics?: QueryToGetApplicationsStartedMetricsResolver<
@@ -1538,6 +1549,19 @@ export interface QueryToSearchFieldAgentsResolver<
   ): TResult
 }
 
+export interface QueryToVerifyPasswordArgs {
+  id: string
+  password: string
+}
+
+export interface QueryToVerifyPasswordResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: QueryToVerifyPasswordArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
 export interface QueryToFetchRegistrationMetricsArgs {
   timeStart: string
   timeEnd: string
@@ -4074,6 +4098,7 @@ export interface GQLEventProgressSetTypeResolver<TParent = any> {
   dateOfEvent?: EventProgressSetToDateOfEventResolver<TParent>
   registration?: EventProgressSetToRegistrationResolver<TParent>
   startedBy?: EventProgressSetToStartedByResolver<TParent>
+  startedByFacility?: EventProgressSetToStartedByFacilityResolver<TParent>
   startedAt?: EventProgressSetToDateOfEventResolver<TParent>
   progressReport?: EventProgressSetToProgressReportResolver<TParent>
 }
@@ -4105,6 +4130,13 @@ export interface EventProgressSetToRegistrationResolver<
 }
 
 export interface EventProgressSetToStartedByResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventProgressSetToStartedByFacilityResolver<
   TParent = any,
   TResult = any
 > {
@@ -4226,6 +4258,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   activateUser?: MutationToActivateUserResolver<TParent>
   changePassword?: MutationToChangePasswordResolver<TParent>
   auditUser?: MutationToAuditUserResolver<TParent>
+  resendSMSInvite?: MutationToResendSMSInviteResolver<TParent>
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -4534,6 +4567,21 @@ export interface MutationToAuditUserResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: MutationToAuditUserArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToResendSMSInviteArgs {
+  userId: string
+}
+export interface MutationToResendSMSInviteResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToResendSMSInviteArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult

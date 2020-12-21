@@ -29,8 +29,10 @@ import * as ReactDOM from 'react-dom'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import zambiaBackground from './background-zmb.jpg'
+import { Button } from '@opencrvs/components/lib/buttons'
+import { buttonMessages } from '@client/i18n/messages'
 
-const PageWrapper = styled.div`
+export const PageWrapper = styled.div`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
   ${({ theme }) => theme.gradients.gradientNightshade};
   ${window.config.COUNTRY === 'zmb'
@@ -59,7 +61,7 @@ const StyledLogo = styled(Logo)`
   margin-top: -80px;
 `
 
-const LogoutHeader = styled.a`
+export const LogoutHeader = styled.a`
   float: right;
   color: ${({ theme }) => theme.colors.white};
   display: flex;
@@ -76,7 +78,11 @@ const Container = styled.div`
 const Name = styled.p`
   color: ${({ theme }) => theme.colors.white};
 `
-
+const ForgottenPinLink = styled(Button)`
+  ${({ theme }) => theme.fonts.buttonStyle};
+  color: ${({ theme }) => theme.colors.white};
+  text-transform: none;
+`
 interface IState {
   pin: string
   resetKey: number
@@ -95,6 +101,7 @@ type Props = {
 type IFullProps = Props &
   IntlShapeProps & {
     onCorrectPinMatch: () => void
+    onForgetPin: () => void
   }
 
 const MAX_LOCK_TIME = 1
@@ -260,7 +267,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
     ) : (
       <PageWrapper id="unlockPage">
         <LogoutHeader onClick={this.logout} id="logout">
-          <span>Logout</span>
+          <span>{this.props.intl.formatMessage(buttonMessages.logout)}</span>
           <Logout />
         </LogoutHeader>
         <Container onClick={this.focusKeypad}>
@@ -269,6 +276,14 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
 
           {this.showErrorMessage()}
           <PINKeypad
+            forgotPinComponent={
+              <ForgottenPinLink
+                id="forgotten_pin"
+                onClick={this.props.onForgetPin}
+              >
+                {this.props.intl.formatMessage(buttonMessages.forgottenPIN)}
+              </ForgottenPinLink>
+            }
             ref={(elem: any) => (this.pinKeyRef = elem)}
             onComplete={this.onPinProvided}
             pin={this.state.pin}

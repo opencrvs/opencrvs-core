@@ -32,6 +32,7 @@ const clearPassword = (component: ReactWrapper) => {
 
 describe('Unlock page loads Properly', () => {
   let testComponent: { component: ReactWrapper }
+  let onForgetPinMock: jest.Mock = jest.fn()
   beforeEach(async () => {
     await flushPromises()
 
@@ -64,7 +65,7 @@ describe('Unlock page loads Properly', () => {
 
     const { store } = createStore()
     testComponent = await createTestComponent(
-      <Unlock onCorrectPinMatch={() => null} />,
+      <Unlock onCorrectPinMatch={() => null} onForgetPin={onForgetPinMock} />,
       store
     )
   })
@@ -88,16 +89,24 @@ describe('Unlock page loads Properly', () => {
       0
     )
   })
+
+  it('Should trigger onForgetPin when click on forgotten pin link', () => {
+    const forgottenPinElement = testComponent.component.find('#forgotten_pin')
+    forgottenPinElement.hostNodes().simulate('click')
+    expect(onForgetPinMock).toBeCalledTimes(1)
+  })
 })
 
 describe('For wrong inputs', () => {
   let testComponent: { component: ReactWrapper }
+  let onForgetPinMock: jest.Mock = jest.fn()
+
   beforeEach(async () => {
     await flushPromises()
     jest.clearAllMocks()
     const { store } = createStore()
     testComponent = await createTestComponent(
-      <Unlock onCorrectPinMatch={() => null} />,
+      <Unlock onCorrectPinMatch={() => null} onForgetPin={onForgetPinMock} />,
       store
     )
 
@@ -137,6 +146,7 @@ describe('For wrong inputs', () => {
 
 describe('Pin locked session', () => {
   let testComponent: { component: ReactWrapper }
+  let onForgetPinMock: jest.Mock = jest.fn()
   beforeEach(async () => {
     await flushPromises()
     jest.clearAllMocks()
@@ -171,7 +181,7 @@ describe('Pin locked session', () => {
 
     const { store } = createStore()
     testComponent = await createTestComponent(
-      <Unlock onCorrectPinMatch={() => null} />,
+      <Unlock onCorrectPinMatch={() => null} onForgetPin={onForgetPinMock} />,
       store
     )
   })
@@ -197,11 +207,16 @@ describe('Pin locked session', () => {
 })
 
 describe('Logout Sequence', () => {
+  let onForgetPinMock: jest.Mock = jest.fn()
+
   it('should clear lock-related indexeddb entries upon logout', async () => {
     const { store } = createStore()
     const redirect = jest.fn()
     const testComponent = await createTestComponent(
-      <Unlock onCorrectPinMatch={() => redirect} />,
+      <Unlock
+        onCorrectPinMatch={() => redirect}
+        onForgetPin={onForgetPinMock}
+      />,
       store
     )
     const indexeddb = {

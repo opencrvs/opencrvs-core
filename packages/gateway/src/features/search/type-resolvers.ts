@@ -252,6 +252,15 @@ export const searchTypeResolvers: GQLResolver = {
         authHeader
       )
     },
+    startedByFacility(searchData: ISearchEventDataTemplate) {
+      let facilityName = null
+      if (searchData._source.operationHistories) {
+        facilityName = (searchData._source
+          .operationHistories as GQLOperationHistorySearchSet[])[0]
+          .notificationFacilityName
+      }
+      return facilityName
+    },
     progressReport: async (
       searchData: ISearchEventDataTemplate,
       _,
