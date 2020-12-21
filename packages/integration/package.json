@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/integration",
-  "version": "1.0.0-alpha.2.0",
+  "version": "1.0.0-alpha.3.0",
   "description": "A set of integration and performance tests for OpenCRVS",
   "license": "MPL-2.0",
   "private": true,
