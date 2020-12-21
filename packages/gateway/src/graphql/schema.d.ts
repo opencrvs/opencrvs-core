@@ -4235,6 +4235,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   activateUser?: MutationToActivateUserResolver<TParent>
   changePassword?: MutationToChangePasswordResolver<TParent>
   auditUser?: MutationToAuditUserResolver<TParent>
+  resendSMSInvite?: MutationToResendSMSInviteResolver<TParent>
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -4543,6 +4544,21 @@ export interface MutationToAuditUserResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: MutationToAuditUserArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToResendSMSInviteArgs {
+  userId: string
+}
+export interface MutationToResendSMSInviteResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToResendSMSInviteArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult

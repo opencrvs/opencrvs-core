@@ -36,6 +36,9 @@ interface ISysAdminMessages {
   reactivateUserSubtitle: MessageDescriptor
   reactivateReasonReturnedToRole: MessageDescriptor
   reactivateReasonNoLongerInvestigated: MessageDescriptor
+  resendSMS: MessageDescriptor
+  resendSMSSuccess: MessageDescriptor
+  resendSMSError: MessageDescriptor
 }
 
 const messagesToDefine: ISysAdminMessages = {
@@ -163,6 +166,21 @@ const messagesToDefine: ISysAdminMessages = {
     description: 'The label for radio option no longer investigated',
     id:
       'register.sysAdminHome.user.audit.reactivation.reasonNoLongerInvestigated'
+  },
+  resendSMS: {
+    defaultMessage: 'Resend SMS invite',
+    description: 'The label for menu option resend SMS',
+    id: 'register.sysAdminHome.user.resendSMS'
+  },
+  resendSMSSuccess: {
+    defaultMessage: 'Invite sent',
+    description: 'The label for success notification of resend sms invite',
+    id: 'register.sysAdminHome.user.resendSMSSuccess'
+  },
+  resendSMSError: {
+    defaultMessage: 'Invite could not be sent',
+    description: 'The label for error notification of resend sms invite',
+    id: 'register.sysAdminHome.user.resendSMSError'
   }
 }
 

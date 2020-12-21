@@ -142,4 +142,5 @@ type Mutation {
     reason: String!
     comment: String
   ): String
+  resendSMSInvite(userId: String!): String
 }
