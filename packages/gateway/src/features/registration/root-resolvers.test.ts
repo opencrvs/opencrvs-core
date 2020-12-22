@@ -705,8 +705,9 @@ describe('Registration root resolvers', () => {
         authHeaderRegCert
       )
       const postData = JSON.parse(fetch.mock.calls[1][1].body)
+      expect(postData.entry[0].resource.reason.text).toBe('Misspelling')
       expect(postData.entry[0].resource.note[1].text).toBe(
-        'reason=Misspelling&comment=Family name misspelled'
+        'Family name misspelled'
       )
       expect(result).toBe('ba0412c6-5125-4447-bd32-fb5cf336ddbc')
     })
