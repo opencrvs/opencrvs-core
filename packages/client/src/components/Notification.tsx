@@ -170,7 +170,7 @@ class Component extends React.Component<
             type={NOTIFICATION_TYPE.SUCCESS}
             callback={this.props.hidePINUpdateSuccessToast}
           >
-            Your pin has been successfully updated
+            {intl.formatMessage(messages.updatePINSuccess)}
           </FloatingNotification>
         )}
         {/* More notification types can be added here */}
