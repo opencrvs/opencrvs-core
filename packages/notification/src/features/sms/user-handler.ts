@@ -11,9 +11,14 @@
  */
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
-import { HapiRequest, ISMSPayload } from '@notification/features/sms/handler'
-import { buildAndSendSMS } from '@notification/features/sms/utils'
+import {
+  buildAndSendSMS,
+  getTranslations,
+  ISMSPayload
+} from '@notification/features/sms/utils'
 import { logger } from '@notification/logger'
+import { getDefaultLanguage } from '@notification/i18n/utils'
+import { messageKeys } from '@notification/i18n/messages'
 
 interface ICredentialsPayload extends ISMSPayload {
   username: string
@@ -29,68 +34,88 @@ interface IUserAuthCodePayload extends ISMSPayload {
 }
 
 export async function sendUserCredentials(
-  request: HapiRequest,
+  request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as ICredentialsPayload
   logger.info(`Username: ${payload.username}`)
   logger.info(`Password: ${payload.password}`)
-
-  await buildAndSendSMS(
-    request,
-    payload.msisdn,
-    'userCredentialsNotification',
+  const authHeader = {
+    Authorization: request.headers.authorization
+  }
+  const message = await getTranslations(
+    authHeader,
+    messageKeys.userCredentialsNotification,
     {
       username: payload.username,
       password: payload.password
-    }
+    },
+    getDefaultLanguage()
   )
+  await buildAndSendSMS(request, payload.msisdn, message)
   return h.response().code(200)
 }
 
 export async function retrieveUserName(
-  request: HapiRequest,
+  request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IRetrieveUserNamePayload
   logger.info(`Username: ${payload.username}`)
-  await buildAndSendSMS(
-    request,
-    payload.msisdn,
-    'retieveUserNameNotification',
+  const authHeader = {
+    Authorization: request.headers.authorization
+  }
+  const message = await getTranslations(
+    authHeader,
+    messageKeys.retieveUserNameNotification,
     {
       username: payload.username
-    }
+    },
+    getDefaultLanguage()
   )
+  await buildAndSendSMS(request, payload.msisdn, message)
   return h.response().code(200)
 }
 
 export async function sendUserAuthenticationCode(
-  request: HapiRequest,
+  request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IUserAuthCodePayload
   logger.info(`Authentication Code: ${payload.code}`)
-  await buildAndSendSMS(
-    request,
-    payload.msisdn,
-    'authenticationCodeNotification',
+  const authHeader = {
+    Authorization: request.headers.authorization
+  }
+  const message = await getTranslations(
+    authHeader,
+    messageKeys.authenticationCodeNotification,
     {
       authCode: payload.code
-    }
+    },
+    getDefaultLanguage()
   )
+  await buildAndSendSMS(request, payload.msisdn, message)
   return h.response().code(200)
 }
 
 export async function updateUserName(
-  request: HapiRequest,
+  request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IRetrieveUserNamePayload
   logger.info(`Username: ${payload.username}`)
-  await buildAndSendSMS(request, payload.msisdn, 'updateUserNameNotification', {
-    username: payload.username
-  })
+  const authHeader = {
+    Authorization: request.headers.authorization
+  }
+  const message = await getTranslations(
+    authHeader,
+    messageKeys.updateUserNameNotification,
+    {
+      username: payload.username
+    },
+    getDefaultLanguage()
+  )
+  await buildAndSendSMS(request, payload.msisdn, message)
   return h.response().code(200)
 }
 

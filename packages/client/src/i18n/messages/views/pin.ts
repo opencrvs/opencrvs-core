@@ -43,38 +43,38 @@ const messagesToDefine: IPinMessages = {
     description: 'The title displayed while creating a PIN'
   },
   createTitle: {
-    id: 'createPIN.createTitle',
+    id: 'misc.createTitle',
     defaultMessage: 'Create a PIN',
     description: 'The title displayed while creating a PIN'
   },
   createDescription: {
-    id: 'createPIN.createDescription',
+    id: 'misc.createDescription',
     defaultMessage:
       "Choose a PIN that doesn't have 4 repeating digits or sequential numbers.",
     description: 'The description displayed while creating a PIN'
   },
   pinSameDigitsError: {
-    id: 'createPIN.pinSameDigitsError',
+    id: 'misc.pinSameDigitsError',
     defaultMessage: 'PIN cannot have same 4 digits',
     description: 'The error displayed if PIN contains 4 same digits.'
   },
   pinSequentialDigitsError: {
-    id: 'createPIN.pinSeqDigitsError',
+    id: 'misc.pinSeqDigitsError',
     defaultMessage: 'PIN cannot contain sequential digits',
     description: 'The error displayed if PIN contains sequential digits.'
   },
   pinMatchError: {
-    id: 'createPIN.pinMatchError',
+    id: 'misc.pinMatchError',
     defaultMessage: 'PIN code did not match. Please try again.',
     description: "The error displayed if PINs don't match"
   },
   reEnterTitle: {
-    id: 'createPIN.reEnterTitle',
+    id: 'misc.reEnterTitle',
     defaultMessage: 'Re-enter your new PIN',
     description: 'The title displayed while creating a PIN'
   },
   reEnterDescription: {
-    id: 'createPIN.reEnterDescription',
+    id: 'misc.reEnterDescription',
     defaultMessage: "Let's make sure we collected your PIN correctly.",
     description: ''
   }

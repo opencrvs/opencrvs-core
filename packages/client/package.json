@@ -1,12 +1,12 @@
 {
   "name": "@opencrvs/client",
-  "version": "1.0.0-alpha.2.0",
+  "version": "1.0.0-alpha.3.0",
   "description": "OpenCRVS client application",
   "license": "MPL-2.0",
   "private": true,
   "dependencies": {
     "@craco/craco": "^5.2.1",
-    "@opencrvs/components": "^1.0.0-alpha.2.0",
+    "@opencrvs/components": "^1.0.0-alpha.3.0",
     "@sentry/browser": "^4.6.3",
     "@types/bcryptjs": "^2.4.2",
     "@types/history": "^4.6.2",
@@ -84,7 +84,7 @@
     "lint:ts": "eslint --fix './src/**/*.{ts,tsx}'",
     "start:prod": "yarn build && yarn serve -s -l 3000 build",
     "test:compilation": "tsc --noEmit",
-    "extract:translations": "ts-node -O '{\"module\": \"commonjs\"}' -r tsconfig-paths/register src/extract-translations.ts",
+    "extract:translations": "bash extract-translations.sh",
     "graphql:codegen": "graphql-codegen --config codegen.yml",
     "build:clean": "rm -rf build",
     "serve": "node serve-static.js"

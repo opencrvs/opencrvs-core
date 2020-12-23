@@ -17,7 +17,7 @@ interface ISessionMessages {
 
 const messagesToDefine: ISessionMessages = {
   sessionExpireTxt: {
-    id: 'login.session.expired',
+    id: 'misc.session.expired',
     defaultMessage: 'Your session has expired. Please login again.',
     description: 'SessionExpire modal confirmation text'
   }

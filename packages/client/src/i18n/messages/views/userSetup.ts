@@ -74,18 +74,18 @@ const messagesToDefine: IUserSetupMessages = {
   header: {
     defaultMessage: 'Choose a new password',
     description: 'New Password header',
-    id: 'newPassword.header'
+    id: 'misc.newPass.header'
   },
   instruction: {
     defaultMessage:
       'We recommend you create a unique password - one that you don’t use for another website or app. Note. You can’t reuse your old password once you change it.',
     description: 'New Password instruction',
-    id: 'newPassword.instruction'
+    id: 'misc.newPass.instruction'
   },
   labelAssignedOffice: {
     defaultMessage: 'Assigned office',
     description: 'Assigned office',
-    id: 'label.assignedOffice'
+    id: 'settings.user.label.assignedOffice'
   },
   labelBanglaName: {
     defaultMessage: 'Bengali name',
@@ -151,7 +151,7 @@ const messagesToDefine: IUserSetupMessages = {
     defaultMessage:
       'Check the details below to confirm your account details are correct. and make annecessary changes to confirm your account details are correct.',
     description: 'User setup review page instruction',
-    id: 'userSetupReview.instruction'
+    id: 'userSetup.instruction'
   },
   userSetupWelcomeTitle: {
     defaultMessage: 'Welcome to OpenCRVS',
@@ -167,7 +167,7 @@ const messagesToDefine: IUserSetupMessages = {
     defaultMessage: 'Setting up your account',
     description:
       'The message that displays when the user is waiting for the account to be created',
-    id: 'user.setup.waiting'
+    id: 'userSetup.waiting'
   },
   assignedOffice: {
     defaultMessage: 'Assigned office',
