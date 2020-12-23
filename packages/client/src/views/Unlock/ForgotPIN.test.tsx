@@ -161,7 +161,7 @@ describe('ForgotPIN tests', () => {
     const formError = await waitForElement(component, '#form_error')
     expect(formError.hostNodes()).toHaveLength(1)
     expect(formError.hostNodes().text()).toBe(
-      'Sorry that password did not work'
+      'The password you entered was incorrect'
     )
   })
 
