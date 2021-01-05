@@ -13,7 +13,7 @@
     "@types/redux-sentry-middleware": "^0.0.1",
     "@typescript-eslint/eslint-plugin": "^1.9.0",
     "@typescript-eslint/parser": "^1.9.0",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "country-data": "^0.0.31",
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^4.3.0",
