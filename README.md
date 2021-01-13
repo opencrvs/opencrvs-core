@@ -316,7 +316,11 @@ Client Application: Internationalisation and languages can be configured in [cli
 
 SMS Notifications: Internationalisation and languages can be configured in [notification.json](https://github.com/opencrvs/opencrvs-zambia/blob/master/src/zmb/features/languages/generated/notification/notification.json).
 
-However currently we only have Bengali and English translations. If you are planning to introduce a new language, please talk to us on [Gitter](https://gitter.im/opencrvs/community#) and submit a new translation file. We can easily enable the new language string in a PR.
+We have provided some handy tools in the test "resources" module for [Zambia](https://github.com/opencrvs/opencrvs-zambia) to help you load your languages into a content management system such as [Contentful](https://www.contentful.com/).
+
+OpenCRVS currently supports the standard Roman and Latin character set and Bengali. In OpenCRVS Alpha, we will need to assist you to configure core to support a new language in the language select in a pull request. We will gladly provide support to you if you want to provide translations and hugely welcome all localisation efforts.
+
+Currently we only have Bengali and English translations. If you are planning to introduce a new language, please talk to us on [Gitter](https://gitter.im/opencrvs/community#) and submit a new translation file. We can easily enable the new language string in a PR.
 
 Currently the supported language strings can be set to either:
 
