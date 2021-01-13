@@ -56,7 +56,7 @@ async function extractMessages() {
   )
 
   const englishTranslations = notification.data.find(
-    (obj: ILanguage) => obj.lang === 'en-US'
+    (obj: ILanguage) => obj.lang === 'en'
   ).messages
   try {
     // tslint:disable-next-line:no-console
