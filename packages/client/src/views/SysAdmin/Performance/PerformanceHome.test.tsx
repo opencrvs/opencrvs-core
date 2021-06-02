@@ -20,7 +20,7 @@ import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import * as React from 'react'
 import { PerformanceHome } from './PerformanceHome'
-import { stringify } from 'query-string'
+import { parse } from 'query-string'
 
 describe('Performance home test', () => {
   describe('Performance home without location in props', () => {
@@ -75,7 +75,7 @@ describe('Performance home test', () => {
       app.update()
       flushPromises()
 
-      expect(querystring.parse(history.location.search)).toEqual({
+      expect(parse(history.location.search)).toEqual({
         sectionId: 'OPERATIONAL',
         locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
         timeEnd: '2016-02-14T12:51:48.000Z',

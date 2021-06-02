@@ -65,7 +65,7 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema'
 import { ApolloError } from 'apollo-client'
 import moment from 'moment'
-import { stringify } from 'query-string'
+import { parse } from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -205,7 +205,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
     const {
       location: { search }
     } = props
-    const { timeStart, timeEnd, locationId, sectionId } = (querystring.parse(
+    const { timeStart, timeEnd, locationId, sectionId } = (parse(
       search
     ) as unknown) as ISearchParams
     const searchableLocations = generateLocations(props.offlineLocations)

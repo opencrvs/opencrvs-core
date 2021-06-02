@@ -53,7 +53,7 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema'
 import { orderBy } from 'lodash'
 import moment from 'moment'
-import { stringify } from 'query-string'
+import { parse } from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -122,7 +122,7 @@ interface WorkflowStatusProps
     WrappedComponentProps {}
 function WorkflowStatusComponent(props: WorkflowStatusProps) {
   const { intl } = props
-  const { locationId, status, event } = (querystring.parse(
+  const { locationId, status, event } = (parse(
     props.location.search
   ) as unknown) as ISearchParams
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)

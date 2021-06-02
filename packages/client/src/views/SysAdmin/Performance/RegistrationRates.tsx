@@ -36,7 +36,7 @@ import {
   GQLMonthWise45DayEstimation,
   GQLMonthWiseEstimationMetrics
 } from '@opencrvs/gateway/src/graphql/schema'
-import { stringify } from 'query-string'
+import { parse } from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -119,7 +119,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
     },
     goToOperationalReport
   } = props
-  const { locationId, timeStart, timeEnd, title } = (querystring.parse(
+  const { locationId, timeStart, timeEnd, title } = (parse(
     search
   ) as unknown) as ISearchParams
 

@@ -40,7 +40,7 @@ import {
 import { GQLSearchFieldAgentResult } from '@opencrvs/gateway/src/graphql/schema'
 import { orderBy } from 'lodash'
 import moment from 'moment'
-import { stringify } from 'query-string'
+import { parse } from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -136,7 +136,7 @@ function FieldAgentListComponent(props: IProps) {
     locations,
     offices
   } = props
-  const { locationId, timeStart, timeEnd } = (querystring.parse(
+  const { locationId, timeStart, timeEnd } = (parse(
     search
   ) as unknown) as ISearchParams
   const [status, setStatus] = useState<STATUS_OPTIONS>(STATUS_OPTIONS.ACTIVE)
