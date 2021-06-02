@@ -37,7 +37,11 @@ import {
   exportHandler,
   monthlyExportHandler
 } from '@metrics/features/export/handler'
-import { generateLegacyMetricsHandler } from '@metrics/features/legacy/handler'
+import {
+  generateLegacyMetricsHandler,
+  generateLegacyEventDurationHandler
+} from '@metrics/features/legacy/handler'
+import { getEventDurationHandler } from '@metrics/features/getEventDuration/handler'
 
 export const getRoutes = () => {
   const routes = [
@@ -302,6 +306,20 @@ export const getRoutes = () => {
         tags: ['api']
       }
     },
+    // event duration query by application id
+    {
+      method: 'GET',
+      path: '/eventDuration',
+      handler: getEventDurationHandler,
+      config: {
+        validate: {
+          query: Joi.object({
+            compositionId: Joi.string().required()
+          })
+        },
+        tags: ['api']
+      }
+    },
     // Time logged query by application status API
     {
       method: 'GET',
@@ -391,6 +409,17 @@ export const getRoutes = () => {
         tags: ['api']
       }
     },
+
+    // Generate metrics from legacy data
+    {
+      method: 'GET',
+      path: '/generateEventDurationMetrics',
+      handler: generateLegacyEventDurationHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+
     // used for tests to check JWT auth
     {
       method: 'GET',

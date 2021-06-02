@@ -29,6 +29,9 @@ const HeaderContainer = styled.div`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 2;
   ${({ theme }) => theme.gradients.gradientNightshade};
 `
 const HeaderLeft = styled.div`

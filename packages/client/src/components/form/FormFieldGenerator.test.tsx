@@ -10,7 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { createTestComponent, selectOption } from '@client/tests/util'
+import {
+  createTestComponent,
+  selectOption,
+  flushPromises,
+  resizeWindow
+} from '@client/tests/util'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { ReactWrapper } from 'enzyme'
 import { createApplication, storeApplication } from '@client/applications'
@@ -22,14 +27,16 @@ import {
   Event,
   BIG_NUMBER,
   RADIO_GROUP_WITH_NESTED_FIELDS,
-  LOCATION_SEARCH_INPUT
+  LOCATION_SEARCH_INPUT,
+  DATE,
+  NUMBER
 } from '@client/forms'
 import { countries } from '@client/forms/countries'
 import { OFFLINE_LOCATIONS_KEY, LocationType } from '@client/offline/reducer'
 
 import { formMessages } from '@client/i18n/messages'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { phoneNumberFormat } from '@client/utils/validate'
+import { phoneNumberFormat, dateNotInFuture } from '@client/utils/validate'
 
 export interface IMotherSectionFormData {
   firstName: string
@@ -391,5 +398,178 @@ describe('when field definition has nested fields', () => {
         .find('input[name="applicant.nestedFields.applicantPhoneMother"]')
         .props().value
     ).toEqual('')
+  })
+})
+
+describe('when field definition has date field', () => {
+  let component: ReactWrapper<{}, {}>
+  const modifyDraft = jest.fn()
+  const FUTURE_DATE = new Date(2020, 11, 7)
+
+  async function updateDateField(
+    wrapper: ReactWrapper,
+    id: string,
+    dateValue: Date
+  ) {
+    const dayInput = wrapper.find(`input#${id}-dd`).hostNodes()
+    const monthInput = wrapper.find(`input#${id}-mm`).hostNodes()
+    const yearInput = wrapper.find(`input#${id}-yyyy`).hostNodes()
+
+    dayInput.simulate('focus')
+    dayInput.simulate('change', {
+      target: { id: `${id}-dd`, value: dateValue.getDay().toString() }
+    })
+    dayInput.simulate('blur')
+
+    monthInput.simulate('focus')
+    monthInput.simulate('change', {
+      target: { id: `${id}-mm`, value: (dateValue.getMonth() + 1).toString() }
+    })
+    monthInput.simulate('blur')
+
+    yearInput.simulate('focus')
+    yearInput.simulate('change', {
+      target: { id: `${id}-yyyy`, value: dateValue.getFullYear().toString() }
+    })
+    yearInput.simulate('blur')
+
+    await flushPromises()
+    component.update()
+  }
+
+  beforeAll(() => {
+    Date.now = jest.fn(() => 1603367390211)
+  })
+
+  describe('in case of static date field', () => {
+    beforeEach(async () => {
+      const { store } = createStore()
+      const testComponent = await createTestComponent(
+        <FormFieldGenerator
+          id="locationForm"
+          setAllFieldsDirty={false}
+          onChange={modifyDraft}
+          fields={[
+            {
+              name: 'childDateOfBirth',
+              type: DATE,
+              required: true,
+              validate: [dateNotInFuture()],
+              label: formMessages.childDateOfBirth,
+              initialValue: ''
+            }
+          ]}
+        />,
+        store
+      )
+
+      component = testComponent.component
+    })
+
+    it('shows validation errors for invalid date', async () => {
+      await updateDateField(component, 'childDateOfBirth', FUTURE_DATE)
+
+      expect(
+        component.find('#childDateOfBirth_error').hostNodes()
+      ).toHaveLength(1)
+    })
+  })
+})
+
+describe('when field definition has number field', () => {
+  let component: ReactWrapper<{}, {}>
+  const modifyDraftMock = jest.fn()
+
+  beforeEach(async () => {
+    const { store } = createStore()
+    const testComponent = await createTestComponent(
+      <FormFieldGenerator
+        id="numberForm"
+        setAllFieldsDirty={false}
+        onChange={modifyDraftMock}
+        fields={[
+          {
+            name: 'multipleBirth',
+            type: NUMBER,
+            required: true,
+            validate: [],
+            label: formMessages.multipleBirth,
+            initialValue: ''
+          }
+        ]}
+      />,
+      store
+    )
+
+    component = testComponent.component
+  })
+
+  it('field does not take input of non numeric characters', async () => {
+    const eventPreventDefaultMock = jest.fn()
+    const numberInputElement = await waitForElement(
+      component,
+      'input#multipleBirth'
+    )
+    numberInputElement.hostNodes().simulate('keypress', {
+      key: 'e',
+      preventDefault: eventPreventDefaultMock
+    })
+
+    expect(eventPreventDefaultMock).toBeCalledTimes(1)
+  })
+})
+
+describe('when field definition has select field on mobile device', () => {
+  let component: ReactWrapper<{}, {}>
+  const modifyDraftMock = jest.fn()
+  const scrollMock = jest.fn()
+
+  beforeAll(async () => {
+    resizeWindow(412, 755)
+  })
+
+  beforeEach(async () => {
+    window.HTMLElement.prototype.scrollIntoView = scrollMock
+    const { store } = createStore()
+    const testComponent = await createTestComponent(
+      <FormFieldGenerator
+        id="numberForm"
+        setAllFieldsDirty={false}
+        onChange={modifyDraftMock}
+        fields={[
+          {
+            name: 'countryPermanent',
+            type: SELECT_WITH_OPTIONS,
+            label: formMessages.country,
+            required: true,
+            initialValue: window.config.COUNTRY.toUpperCase(),
+            validate: [],
+            options: countries
+          }
+        ]}
+      />,
+      store,
+      null,
+      { attachTo: document.body }
+    )
+
+    component = testComponent.component
+  })
+
+  it('triggers scroll up when focus so that soft keyboard does not block options', async () => {
+    const input = component.find('#countryPermanent').hostNodes()
+
+    input
+      .find('input')
+      .simulate('focus')
+      .update()
+
+    input
+      .find('.react-select__control')
+      .simulate('mousedown')
+      .update()
+    await flushPromises()
+    component.update()
+    expect(scrollMock).toBeCalled()
   })
 })

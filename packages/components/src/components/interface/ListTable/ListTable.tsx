@@ -167,8 +167,11 @@ export const LoadingGrey = styled.span<{
   height: 24px;
   width: ${({ width }) => (width ? `${width}%` : '100%')};
 `
-const TableScrollerHorizontal = styled.div`
-  overflow: auto;
+const TableScrollerHorizontal = styled.div<{
+  disableScrollOnOverflow?: boolean
+}>`
+  ${({ disableScrollOnOverflow }) =>
+    !disableScrollOnOverflow && `overflow: auto`};
   padding-bottom: 8px;
   padding-right: 10px;
 
@@ -186,11 +189,16 @@ const TableScroller = styled.div<{
   height?: number
   totalWidth: number
   isFullPage?: boolean
+  offsetTop: number
   fixedWidth: number | undefined
 }>`
   display: block;
-  max-height: ${({ height, isFullPage }) =>
-    isFullPage ? '65vh' : height ? `${height}px` : 'auto'};
+  max-height: ${({ height, isFullPage, offsetTop }) =>
+    isFullPage
+      ? `calc(100vh - ${offsetTop}px - 180px)`
+      : height
+      ? `${height}px`
+      : 'auto'};
 
   ${({ fixedWidth, totalWidth }) =>
     fixedWidth
@@ -233,6 +241,7 @@ interface IListTableProps {
   noResultText: string
   tableHeight?: number
   onPageChange?: (currentPage: number) => void
+  disableScrollOnOverflow?: boolean
   pageSize?: number
   totalItems?: number
   currentPage?: number
@@ -249,15 +258,18 @@ interface IListTableProps {
 interface IListTableState {
   sortIconInverted: boolean
   sortKey: string | null
+  tableOffsetTop: number
 }
 
 export class ListTable extends React.Component<
   IListTableProps,
   IListTableState
 > {
+  tableRef = React.createRef<HTMLDivElement>()
   state = {
     sortIconInverted: false,
-    sortKey: null
+    sortKey: null,
+    tableOffsetTop: 0
   }
 
   onPageChange = (currentPage: number) => {
@@ -294,6 +306,17 @@ export class ListTable extends React.Component<
     return true
   }
 
+  componentDidUpdate(prevProps: IListTableProps) {
+    if (prevProps.isLoading && !this.props.isLoading) {
+      this.setState({
+        tableOffsetTop:
+          (this.tableRef.current &&
+            this.tableRef.current.getBoundingClientRect().top) ||
+          0
+      })
+    }
+  }
+
   render() {
     const {
       id,
@@ -324,10 +347,13 @@ export class ListTable extends React.Component<
             hideBoxShadow={hideBoxShadow}
             isFullPage={isFullPage}
             fixedWidth={fixedWidth}
+            ref={this.tableRef}
           >
             {tableTitle && <H3>{tableTitle}</H3>}
 
-            <TableScrollerHorizontal>
+            <TableScrollerHorizontal
+              disableScrollOnOverflow={this.props.disableScrollOnOverflow}
+            >
               {!hideTableHeader && content.length > 0 && (
                 <TableHeaderWrapper>
                   <TableHeader totalWidth={totalWidth} fixedWidth={fixedWidth}>
@@ -367,6 +393,7 @@ export class ListTable extends React.Component<
                 isFullPage={isFullPage}
                 totalWidth={totalWidth}
                 fixedWidth={fixedWidth}
+                offsetTop={this.state.tableOffsetTop}
               >
                 <TableBody
                   footerColumns={

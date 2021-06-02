@@ -9,11 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { NON_UNICODED_LANGUAGES } from '@notification/constants'
-import { HapiRequest } from '@notification/features/sms/handler'
+import { NON_UNICODED_LANGUAGES, RESOURCES_URL } from '@notification/constants'
 import { internal } from '@hapi/boom'
 import { sendSMS } from '@notification/features/sms/service'
-
+import fetch from 'node-fetch'
+import * as Handlebars from 'handlebars'
+import * as Hapi from 'hapi'
+import { getDefaultLanguage } from '@notification/i18n/utils'
 interface ISendSMSPayload {
   name?: string
   authCode?: string
@@ -24,18 +26,66 @@ interface ISendSMSPayload {
   registrationNumber?: string
 }
 
-export async function buildAndSendSMS(
-  request: HapiRequest,
-  msisdn: string,
+interface IMessageIdentifier {
+  [key: string]: string
+}
+export interface ILanguage {
+  lang: string
+  displayName: string
+  messages: IMessageIdentifier
+}
+
+interface ITranslationsResponse {
+  languages: ILanguage[]
+}
+
+export interface ISMSPayload {
+  msisdn: string
+}
+
+export interface IAuthHeader {
+  Authorization: string
+}
+
+export async function getTranslations(
+  authHeader: IAuthHeader,
   messageKey: string,
-  messagePayload: ISendSMSPayload
+  messagePayload: ISendSMSPayload,
+  locale: string
+): Promise<string> {
+  const url = `${RESOURCES_URL}/definitions/notification`
+  const res: ITranslationsResponse = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    }
+  })
+    .then(response => {
+      return response.json()
+    })
+    .catch(error => {
+      return Promise.reject(new Error(` request failed: ${error.message}`))
+    })
+
+  const language: ILanguage = res.languages.filter(obj => {
+    return obj.lang === locale
+  })[0]
+  const template = Handlebars.compile(language.messages[messageKey])
+  return template(messagePayload)
+}
+
+export async function buildAndSendSMS(
+  request: Hapi.Request,
+  msisdn: string,
+  message: string
 ) {
   try {
     return await sendSMS(
       msisdn,
-      request.i18n.__(messageKey, messagePayload),
+      message,
       /* send unicoded sms if provided local is not in non unicoded set */
-      NON_UNICODED_LANGUAGES.indexOf(request.i18n.getLocale()) < 0
+      NON_UNICODED_LANGUAGES.indexOf(getDefaultLanguage()) < 0
     )
   } catch (err) {
     return internal(err)

@@ -101,7 +101,8 @@ export async function sendSMS(
   message: string,
   convertUnicode?: boolean
 ) {
-  logger.info('Using the following provider', SMS_PROVIDER)
+  logger.info('Using the following provider: ', SMS_PROVIDER)
+  logger.info('Sending the following message: ', message)
   switch (SMS_PROVIDER) {
     case 'clickatell':
       return sendSMSClickatell(msisdn, message, convertUnicode)

@@ -24,7 +24,7 @@ export const removeDuplicate = async (bundle: fhir.Bundle) => {
     throw new Error('No Composition ID found')
   }
   const composition = await searchByCompositionId(compositionId)
-  const body = get(composition, 'hits.hits[0]._source') as ICompositionBody
+  const body = get(composition, 'body.hits.hits[0]._source') as ICompositionBody
   body.relatesTo = extractRelatesToIDs(bundle)
   await updateComposition(compositionId, body)
 }

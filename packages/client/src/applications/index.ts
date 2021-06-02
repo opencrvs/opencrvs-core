@@ -266,6 +266,7 @@ export interface IWriteApplicationAction {
   type: typeof WRITE_APPLICATION
   payload: {
     application: IApplication | IPrintableApplication
+    callback?: () => void
   }
 }
 
@@ -273,11 +274,14 @@ interface ISetInitialApplicationsAction {
   type: typeof SET_INITIAL_APPLICATION
 }
 
+type OnSuccessDeleteApplicationOptions = Partial<{
+  shouldUpdateFieldAgentHome: boolean
+}>
 interface IDeleteApplicationAction {
   type: typeof DELETE_APPLICATION
   payload: {
     application: IApplication | IPrintableApplication
-  }
+  } & OnSuccessDeleteApplicationOptions
 }
 
 interface IGetStorageApplicationsSuccessAction {
@@ -391,6 +395,7 @@ export interface IApplicationsState {
   userID: string
   applications: IApplication[]
   initialApplicationsLoaded: boolean
+  isWritingDraft: boolean
 }
 
 export interface WorkqueueState {
@@ -414,10 +419,11 @@ const workqueueInitialState = {
   }
 }
 
-const initialState = {
+const initialState: IApplicationsState = {
   userID: '',
   applications: [],
-  initialApplicationsLoaded: false
+  initialApplicationsLoaded: false,
+  isWritingDraft: false
 }
 
 export function createApplication(event: Event, initialData?: IFormData) {
@@ -498,15 +504,17 @@ export const getStorageApplicationsFailed = (): IGetStorageApplicationsFailedAct
 })
 
 export function deleteApplication(
-  application: IApplication | IPrintableApplication
+  application: IApplication | IPrintableApplication,
+  options?: OnSuccessDeleteApplicationOptions
 ): IDeleteApplicationAction {
-  return { type: DELETE_APPLICATION, payload: { application } }
+  return { type: DELETE_APPLICATION, payload: { application, ...options } }
 }
 
 export function writeApplication(
-  application: IApplication | IPrintableApplication
+  application: IApplication | IPrintableApplication,
+  callback?: () => void
 ): IWriteApplicationAction {
-  return { type: WRITE_APPLICATION, payload: { application } }
+  return { type: WRITE_APPLICATION, payload: { application, callback } }
 }
 
 export async function getCurrentUserID(): Promise<string> {
@@ -586,6 +594,7 @@ async function updateFieldAgentDeclaredApplicationsByUser(
   ) {
     return Promise.reject('Remote declared application merging not applicable')
   }
+
   const userDetails =
     getUserDetails(state) ||
     (JSON.parse(await storage.getItem('USER_DETAILS')) as IUserDetails)
@@ -608,9 +617,11 @@ async function updateFieldAgentDeclaredApplicationsByUser(
     currentUserData.applications,
     declaredApplications.results
   )
-  storage.setItem('USER_DATA', JSON.stringify(allUserData))
 
-  return JSON.stringify(currentUserData)
+  return Promise.all([
+    storage.setItem('USER_DATA', JSON.stringify(allUserData)),
+    JSON.stringify(currentUserData)
+  ]).then(([_, currentUserData]) => currentUserData)
 }
 
 export async function getApplicationsOfCurrentUser(): Promise<string> {
@@ -732,49 +743,58 @@ export async function writeApplicationByUser(
       currentUserData.workqueue
     )
   }
-  storage.setItem('USER_DATA', JSON.stringify(allUserData))
 
-  return JSON.stringify(currentUserData)
+  if (
+    application.registrationStatus &&
+    application.registrationStatus === 'DECLARED'
+  ) {
+    updateWorkqueueData(
+      getState(),
+      application,
+      'reviewTab',
+      currentUserData.workqueue
+    )
+  }
+
+  return Promise.all([
+    storage.setItem('USER_DATA', JSON.stringify(allUserData)),
+    JSON.stringify(currentUserData)
+  ]).then(([_, currentUserData]) => currentUserData)
 }
 
 function mergeWorkQueueData(
+  state: IStoreState,
   workQueueIds: (keyof IQueryData)[],
-  sourceWorkQueue: IWorkqueue | undefined,
+  currentApplicatons: IApplication[] | undefined,
   destinationWorkQueue: IWorkqueue
 ) {
-  if (!sourceWorkQueue || !sourceWorkQueue.data) {
+  if (!currentApplicatons) {
     return destinationWorkQueue
   }
   workQueueIds.forEach(workQueueId => {
-    if (
-      !sourceWorkQueue.data[workQueueId].results ||
-      !destinationWorkQueue.data[workQueueId].results
-    ) {
+    if (!destinationWorkQueue.data[workQueueId].results) {
       return
     }
-    ;(sourceWorkQueue.data[workQueueId].results as GQLEventSearchSet[]).forEach(
-      application => {
-        if (application == null) {
-          return
-        }
-        const applicationIndex = (destinationWorkQueue.data[workQueueId]
-          .results as GQLEventSearchSet[]).findIndex(
-          app => app && app.id === application.id
-        )
-        if (applicationIndex >= 0) {
-          ;(destinationWorkQueue.data[workQueueId]
-            .results as GQLEventSearchSet[]).splice(
-            applicationIndex,
-            1,
-            application
-          )
-        }
+    ;(destinationWorkQueue.data[workQueueId]
+      .results as GQLEventSearchSet[]).forEach(application => {
+      if (application == null) {
+        return
       }
-    )
+      const applicationIndex = currentApplicatons.findIndex(
+        app => app && app.id === application.id
+      )
+      if (applicationIndex >= 0) {
+        updateWorkqueueData(
+          state,
+          currentApplicatons[applicationIndex],
+          workQueueId,
+          destinationWorkQueue
+        )
+      }
+    })
   })
   return destinationWorkQueue
 }
-
 async function getWorkqueueData(
   state: IStoreState,
   userDetails: IUserDetails,
@@ -840,10 +860,13 @@ async function getWorkqueueData(
       initialSyncDone: false
     }
   }
-
+  const { currentUserData } = await getUserData(
+    userDetails.userMgntUserID || ''
+  )
   return mergeWorkQueueData(
+    state,
     ['inProgressTab', 'notificationTab'],
-    currentWorkqueue,
+    currentUserData && currentUserData.applications,
     workqueue
   )
 }
@@ -875,9 +898,10 @@ export async function writeRegistrarWorkqueueByUser(
     }
     allUserData.push(currentUserData)
   }
-  storage.setItem('USER_DATA', JSON.stringify(allUserData))
-
-  return JSON.stringify(currentUserData.workqueue)
+  return Promise.all([
+    storage.setItem('USER_DATA', JSON.stringify(allUserData)),
+    JSON.stringify(currentUserData.workqueue)
+  ]).then(([_, currentUserWorkqueueData]) => currentUserWorkqueueData)
 }
 
 export async function deleteApplicationByUser(
@@ -1095,7 +1119,9 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
           ...state
         },
         Cmd.run(deleteApplicationByUser, {
-          successActionCreator: getStorageApplicationsSuccess,
+          successActionCreator: action.payload.shouldUpdateFieldAgentHome
+            ? updateFieldAgentDeclaredApplications
+            : getStorageApplicationsSuccess,
           failActionCreator: getStorageApplicationsFailed,
           args: [state.userID, action.payload.application]
         })
@@ -1113,10 +1139,16 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
     case WRITE_APPLICATION:
       return loop(
         {
-          ...state
+          ...state,
+          isWritingDraft: true
         },
         Cmd.run(writeApplicationByUser, {
-          successActionCreator: getStorageApplicationsSuccess,
+          successActionCreator: (response: string) => {
+            if (action.payload.callback) {
+              action.payload.callback()
+            }
+            return getStorageApplicationsSuccess(response)
+          },
           failActionCreator: getStorageApplicationsFailed,
           args: [Cmd.getState, state.userID, action.payload.application]
         })
@@ -1142,7 +1174,8 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
           ...state,
           userID: userData.userID,
           applications: userData.applications,
-          initialApplicationsLoaded: true
+          initialApplicationsLoaded: true,
+          isWritingDraft: false
         }
       }
       return {

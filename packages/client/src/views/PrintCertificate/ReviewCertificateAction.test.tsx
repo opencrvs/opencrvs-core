@@ -17,7 +17,8 @@ import {
   mockApplicationData,
   mockUserResponse,
   mockDeathApplicationData,
-  validToken
+  validToken,
+  flushPromises
 } from '@client/tests/util'
 import { ReviewCertificateAction } from './ReviewCertificateAction'
 import { ReactWrapper } from 'enzyme'
@@ -167,5 +168,92 @@ describe('when user wants to review birth certificate', () => {
       .length
 
     expect(modalIsClosed).toBe(false)
+  })
+})
+
+describe('back button behavior tests of review certificate action', () => {
+  let component: ReactWrapper
+  const { store, history } = createStore()
+
+  beforeEach(() => {
+    store.dispatch(checkAuth({ '?token': validToken }))
+    const mockBirthApplicationData = cloneDeep(mockApplicationData)
+    mockBirthApplicationData.registration.certificates[0] = {
+      collector: {
+        type: 'PRINT_IN_ADVANCE'
+      }
+    }
+    store.dispatch(
+      storeApplication(({
+        id: 'asdhdqe2472487jsdfsdf',
+        data: mockBirthApplicationData,
+        event: Event.BIRTH
+      } as unknown) as IApplication)
+    )
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('takes user history back when navigated from inside app', async () => {
+    history.push(history.location.pathname, { isNavigatedInsideApp: true })
+    history.goBack = jest.fn()
+    const testComponent = await createTestComponent(
+      <ReviewCertificateAction
+        location={history.location}
+        history={history}
+        match={{
+          params: {
+            registrationId: 'asdhdqe2472487jsdfsdf',
+            eventType: Event.BIRTH
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store
+    )
+
+    testComponent.component.update()
+    component = testComponent.component
+
+    component
+      .find('#action_page_back_button')
+      .hostNodes()
+      .simulate('click')
+    expect(history.goBack).toBeCalledTimes(1)
+  })
+
+  it('takes user to registration home when navigated from external link', async () => {
+    history.push(history.location.pathname)
+    history.push = jest.fn()
+    const testComponent = await createTestComponent(
+      <ReviewCertificateAction
+        location={history.location}
+        history={history}
+        match={{
+          params: {
+            registrationId: 'asdhdqe2472487jsdfsdf',
+            eventType: Event.BIRTH
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store
+    )
+
+    testComponent.component.update()
+    component = testComponent.component
+
+    component
+      .find('#action_page_back_button')
+      .hostNodes()
+      .simulate('click')
+    await flushPromises()
+    expect(history.push).toBeCalledWith('/registration-home/print/')
   })
 })

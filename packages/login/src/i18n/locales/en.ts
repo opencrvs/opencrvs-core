@@ -79,8 +79,8 @@ export const ENGLISH_STATE = {
       '{forgottenItem, select, username {Username reminder sent} password {Password reset successful}}',
     'resetCredentials.success.page.subtitle':
       '{forgottenItem, select, username {Check your phone for a reminder of your username} password {You can now login with your new password}}',
-    'newPassword.header': 'Choose a new password',
-    'newPassword.instruction':
+    'misc.newPass.header': 'Choose a new password',
+    'misc.newPass.instruction':
       'We recommend you create a unique password - one that you don’t use for another website or app. Note. You can’t reuse your old password once you change it.',
     'password.label.confirm': 'Confirm password',
     'password.label.new': 'New password',

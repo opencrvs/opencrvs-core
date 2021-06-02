@@ -356,6 +356,20 @@ export const resolvers: GQLResolver = {
           'GET'
         )
         removeDuplicatesFromComposition(composition, id, duplicateId)
+
+        await fetch(`${SEARCH_URL}/events/not-duplicate`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/fhir+json',
+            ...authHeader
+          },
+          body: JSON.stringify(composition)
+        }).catch(error => {
+          return Promise.reject(
+            new Error(`Search request failed: ${error.message}`)
+          )
+        })
+
         await fetch(`${FHIR_URL}/Composition/${id}`, {
           method: 'PUT',
           headers: {
@@ -368,6 +382,7 @@ export const resolvers: GQLResolver = {
             new Error(`FHIR request failed: ${error.message}`)
           )
         })
+
         return composition.id
       } else {
         return await Promise.reject(

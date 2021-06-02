@@ -1,0 +1,310 @@
+{
+  "resourceType": "Bundle",
+  "type": "document",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:e5a2b531-adf0-4c87-89e7-7da2712a4d5b",
+      "resource": {
+        "identifier": {
+          "system": "urn:ietf:rfc:3986",
+          "value": "e5a2b531-adf0-4c87-89e7-7da2712a4d5b"
+        },
+        "resourceType": "Composition",
+        "status": "preliminary",
+        "type": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/doc-types",
+              "code": "birth-application"
+            }
+          ],
+          "text": "Birth Application"
+        },
+        "class": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/doc-classes",
+              "code": "crvs-document"
+            }
+          ],
+          "text": "CRVS Document"
+        },
+        "title": "Birth Declaration",
+        "section": [
+          {
+            "title": "Birth encounter",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://opencrvs.org/specs/sections",
+                  "code": "birth-encounter"
+                }
+              ],
+              "text": "Birth encounter"
+            },
+            "entry": [
+              { "reference": "urn:uuid:5483efd3-552b-4667-94bb-1d2faea435c8" }
+            ]
+          },
+          {
+            "title": "Child details",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://opencrvs.org/doc-sections",
+                  "code": "child-details"
+                }
+              ],
+              "text": "Child details"
+            },
+            "entry": [
+              { "reference": "urn:uuid:f947d11d-d18f-40f3-860f-7dcccf4ce436" }
+            ]
+          },
+          {
+            "title": "Mother's details",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://opencrvs.org/doc-sections",
+                  "code": "mother-details"
+                }
+              ],
+              "text": "Mother's details"
+            },
+            "entry": [
+              { "reference": "urn:uuid:d293ef40-654b-4170-9fe0-0754826344d9" }
+            ]
+          }
+        ],
+        "subject": {},
+        "date": "2019-10-08T06:42:07.273Z",
+        "author": [],
+        "id": "80433e78-7042-4837-b888-a79c0181bf4e"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:5483efd3-552b-4667-94bb-1d2faea435c8",
+      "resource": {
+        "resourceType": "Encounter",
+        "status": "finished",
+        "id": "0e73c1ef-b014-497a-a41a-844390031b51",
+        "location": [
+          {
+            "location": {
+              "reference": "urn:uuid:5c2ae105-c266-4ab4-84d0-359b54af9ba8"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:cb96ffdd-9ccb-4276-a9a0-caa51e66155c",
+      "resource": {
+        "resourceType": "Observation",
+        "status": "final",
+        "context": {
+          "reference": "urn:uuid:5483efd3-552b-4667-94bb-1d2faea435c8"
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/observation-category",
+                "code": "procedure",
+                "display": "Procedure"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "present-at-birth-reg",
+              "display": "Present at birth registration"
+            }
+          ]
+        },
+        "id": "f74e8618-0bc0-421b-9900-ffe1b748ebdd",
+        "valueString": "MOTHER"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:761b5e5b-8a8a-492d-b26c-8f9ca88b4b13",
+      "resource": {
+        "resourceType": "Task",
+        "status": "requested",
+        "code": {
+          "coding": [
+            { "system": "http://opencrvs.org/specs/types", "code": "BIRTH" }
+          ]
+        },
+        "focus": {
+          "reference": "urn:uuid:e5a2b531-adf0-4c87-89e7-7da2712a4d5b"
+        },
+        "id": "18ea2464-f843-45e2-93b1-8b026e0d93a4",
+        "identifier": [
+          {
+            "system": "http://opencrvs.org/specs/id/birth-tracking-id",
+            "value": "BALYJMQ"
+          },
+          {
+            "system": "http://opencrvs.org/specs/id/birth-registration-number",
+            "value": "2019333494BALYJMQ8"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://opencrvs.org/specs/extension/contact-person",
+            "valueString": "MOTHER"
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/contact-person-phone-number",
+            "valueString": "01700000001"
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastLocation",
+            "valueReference": {
+              "reference": "Location/fb5b7377-0c00-407d-97a1-0a7f08ed727b"
+            }
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastOffice",
+            "valueReference": {
+              "reference": "Location/fb5b7377-0c00-407d-97a1-0a7f08ed727b"
+            }
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastUser",
+            "valueReference": {
+              "reference": "Practitioner/70cf7c52-2cc5-41fa-a5f4-6dea9af29bd3"
+            }
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/timeLoggedMS",
+            "valueInteger": 1234
+          }
+        ],
+        "lastModified": "2019-10-08T06:42:07.666Z",
+        "businessStatus": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/specs/reg-status",
+              "code": "VALIDATED"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:f947d11d-d18f-40f3-860f-7dcccf4ce436",
+      "resource": {
+        "resourceType": "Patient",
+        "active": true,
+        "id": "12d6a7f4-b425-4389-b05c-27d3a9ac7e03",
+        "name": [
+          { "use": "bn", "family": ["করুন"] },
+          { "use": "en", "family": ["sdfffaaffdfsdf"] }
+        ],
+        "gender": "female",
+        "birthDate": "1994-11-11"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:d293ef40-654b-4170-9fe0-0754826344d9",
+      "resource": {
+        "resourceType": "Patient",
+        "active": true,
+        "id": "45fcf422-cb79-4dfd-a625-04ee8e50fe68",
+        "identifier": [{ "value": "1111111111111", "type": "NATIONAL_ID" }],
+        "name": [
+          { "use": "bn", "family": ["করুন"] },
+          { "use": "en", "family": ["sdffsdsfs"] }
+        ],
+        "maritalStatus": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/StructureDefinition/marital-status",
+              "code": "M"
+            }
+          ],
+          "text": "MARRIED"
+        },
+        "multipleBirthInteger": 1,
+        "address": [
+          {
+            "type": "PERMANENT",
+            "line": [
+              "",
+              "",
+              "",
+              "",
+              "",
+              "8004d522-25ae-4722-82d4-9a435955723d"
+            ],
+            "district": "90912e31-b426-494e-b464-aac82ebbf7a2",
+            "state": "eeec6d9c-8de3-4fab-a9c5-094d624b3cd2",
+            "country": "BGD"
+          },
+          {
+            "type": "CURRENT",
+            "line": [
+              "",
+              "",
+              "",
+              "",
+              "",
+              "8004d522-25ae-4722-82d4-9a435955723d"
+            ],
+            "district": "90912e31-b426-494e-b464-aac82ebbf7a2",
+            "state": "eeec6d9c-8de3-4fab-a9c5-094d624b3cd2",
+            "country": "BGD"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/patient-nationality",
+            "extension": [
+              {
+                "url": "code",
+                "valueCodeableConcept": {
+                  "coding": [
+                    { "system": "urn:iso:std:iso:3166", "code": "BGD" }
+                  ]
+                }
+              },
+              { "url": "period", "valuePeriod": { "start": "", "end": "" } }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:5c2ae105-c266-4ab4-84d0-359b54af9ba8",
+      "resource": {
+        "resourceType": "Location",
+        "mode": "instance",
+        "partOf": {
+          "reference": "Location/d8d736fd-1480-4dd6-bfe5-9f2389f9160e"
+        },
+        "type": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/specs/location-type",
+              "code": "PRIVATE_HOME"
+            }
+          ]
+        },
+        "address": {
+          "line": ["", "", "", "", "", "d8d736fd-1480-4dd6-bfe5-9f2389f9160e"],
+          "district": "af707770-4a89-46bd-8030-692059cd919b",
+          "state": "7dfc8cda-7eb7-4625-acfa-6c7408e5653d",
+          "postalCode": "",
+          "country": "BGD"
+        }
+      }
+    }
+  ],
+  "meta": { "lastUpdated": "2019-10-08T06:42:07.273Z" }
+}

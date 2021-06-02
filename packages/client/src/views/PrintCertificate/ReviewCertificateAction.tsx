@@ -29,7 +29,10 @@ import { Action, Event, IForm } from '@client/forms'
 import { constantsMessages } from '@client/i18n/messages'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
-import { goToRegistrarHomeTab as goToRegistrarHomeTabAction } from '@client/navigation'
+import {
+  goToRegistrarHomeTab as goToRegistrarHomeTabAction,
+  goBack
+} from '@client/navigation'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { TAB_ID } from '@client/views/RegistrationHome/tabs/inProgress/inProgressTab'
@@ -121,6 +124,7 @@ type IProps = {
   countries: IAvailableCountries[]
   registerForm: IForm
   resources: IOfflineData
+  goBack: typeof goBack
   modifyApplication: typeof modifyApplication
   writeApplication: typeof writeApplication
   goToRegistrarHomeTabAction: typeof goToRegistrarHomeTabAction
@@ -239,8 +243,20 @@ class ReviewCertificateActionComponent extends React.Component<
     }
   }
 
+  goBack = () => {
+    const naviagatedFromInsideApp = Boolean(
+      this.props.location.state &&
+        this.props.location.state.isNavigatedInsideApp
+    )
+    if (naviagatedFromInsideApp) {
+      this.props.goBack()
+    } else {
+      this.props.goToRegistrarHomeTabAction(TAB_ID.readyForPrint)
+    }
+  }
+
   render = () => {
-    const { goToRegistrarHomeTabAction, intl } = this.props
+    const { intl } = this.props
 
     return (
       <ActionPageLight
@@ -248,9 +264,7 @@ class ReviewCertificateActionComponent extends React.Component<
         title={intl.formatHTMLMessage(
           certificateMessages.certificateCollectionTitle
         )}
-        goBack={() => {
-          goToRegistrarHomeTabAction(TAB_ID.readyForPrint)
-        }}
+        goBack={this.goBack}
       >
         <Title>{this.getTitle()}</Title>
         <Info>
@@ -346,7 +360,8 @@ const mapDispatchToProps = {
   modifyApplication,
   writeApplication,
   goToRegistrarHomeTabAction,
-  storeApplication
+  storeApplication,
+  goBack
 }
 export const ReviewCertificateAction = connect(
   mapStatetoProps,

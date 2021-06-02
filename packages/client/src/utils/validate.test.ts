@@ -34,7 +34,8 @@ import {
   dateFormatIsCorrect,
   dateInPast,
   validLength,
-  isDateAfter
+  isDateAfter,
+  notGreaterThan
 } from '@client/utils/validate'
 import { validationMessages as messages } from '@client/i18n/messages'
 
@@ -478,6 +479,18 @@ describe('validate', () => {
       })
     })
 
+    it('should error when input a date after birth event', () => {
+      const drafts = {
+        child: {
+          childBirthDate: '1992-08-18'
+        }
+      }
+      const invalidDate = '1994-10-22'
+      expect(isValidBirthDate(invalidDate, drafts)).toEqual({
+        message: messages.isValidBirthDate
+      })
+    })
+
     it('should pass when supplied a valid birth date with single digit', () => {
       const validDate = '2011-8-12'
       const response = undefined
@@ -554,6 +567,47 @@ describe('validate', () => {
       const goodValue = 'আব্দুল-জলিল'
       expect(bengaliOnlyNameFormat(goodValue)).toBeUndefined()
     })
+    describe('when name has brackets', () => {
+      it('should pass when entire name enclosed with bracket', () => {
+        const goodValue = '(আব্দুল-জলিল)'
+        expect(bengaliOnlyNameFormat(goodValue)).toBeUndefined()
+      })
+
+      it('should pass when brackets are with first part', () => {
+        const goodValue = '(আব্দুল) জলিল'
+        expect(bengaliOnlyNameFormat(goodValue)).toBeUndefined()
+      })
+
+      it('should pass when brackets are with middle part', () => {
+        const goodValue = 'আব্দুল (জলিল) জন'
+        expect(bengaliOnlyNameFormat(goodValue)).toBeUndefined()
+      })
+
+      it('should pass when brackets are with last part', () => {
+        const goodValue = 'আব্দুল (জলিল)'
+        expect(bengaliOnlyNameFormat(goodValue)).toBeUndefined()
+      })
+
+      it('should error when brackets are wrongly used', () => {
+        const badValue1 = 'আব্দুল জলিল()'
+        const badValue2 = 'আব্দুল (জলিল'
+        const badValue3 = '()'
+        const badValue4 = 'আব্দুল (জলিল))'
+
+        expect(bengaliOnlyNameFormat(badValue1)).toEqual({
+          message: messages.bengaliOnlyNameFormat
+        })
+        expect(bengaliOnlyNameFormat(badValue2)).toEqual({
+          message: messages.bengaliOnlyNameFormat
+        })
+        expect(bengaliOnlyNameFormat(badValue3)).toEqual({
+          message: messages.bengaliOnlyNameFormat
+        })
+        expect(bengaliOnlyNameFormat(badValue4)).toEqual({
+          message: messages.bengaliOnlyNameFormat
+        })
+      })
+    })
   })
 
   describe('englishOnlyNameFormat. Checks a value is a valid English name', () => {
@@ -586,6 +640,47 @@ describe('validate', () => {
     it('should pass when a hyphenated English name is given', () => {
       const goodValue = 'Anne-Marie'
       expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
+    })
+    describe('when name has brackets', () => {
+      it('should pass when entire name enclosed with bracket', () => {
+        const goodValue = '(John-Doe)'
+        expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
+      })
+
+      it('should pass when brackets are with first part', () => {
+        const goodValue = '(John) Doe'
+        expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
+      })
+
+      it('should pass when brackets are with middle part', () => {
+        const goodValue = 'John (Denver) Doe'
+        expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
+      })
+
+      it('should pass when brackets are with last part', () => {
+        const goodValue = 'John (Doe)'
+        expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
+      })
+
+      it('should error when brackets are wrongly used', () => {
+        const badValue1 = 'John Doe()'
+        const badValue2 = 'John (Doe'
+        const badValue3 = '()'
+        const badValue4 = 'John (Doe))'
+
+        expect(englishOnlyNameFormat(badValue1)).toEqual({
+          message: messages.englishOnlyNameFormat
+        })
+        expect(englishOnlyNameFormat(badValue2)).toEqual({
+          message: messages.englishOnlyNameFormat
+        })
+        expect(englishOnlyNameFormat(badValue3)).toEqual({
+          message: messages.englishOnlyNameFormat
+        })
+        expect(englishOnlyNameFormat(badValue4)).toEqual({
+          message: messages.englishOnlyNameFormat
+        })
+      })
     })
   })
 
@@ -890,6 +985,32 @@ describe('validate', () => {
       const factory = validLength(5)
       const result = factory(99999)
       expect(!!result).toBe(false)
+    })
+  })
+
+  describe('notGreaterThan. Checks if a number value not greater than a given number', () => {
+    it('should pass if the value is not greater than the given number', () => {
+      const goodValue = '13'
+      const maxValue = 15
+      const response = undefined
+      expect(notGreaterThan(maxValue)(goodValue)).toBe(response)
+    })
+
+    it('should error if the value is greater than the given number', () => {
+      const badValue = '37'
+      const maxValue = 15
+      const response = {
+        message: {
+          defaultMessage: 'Must not be more than {maxValue}',
+          description:
+            'The error message that appears on numeric fields that exceed a limit',
+          id: 'validations.notGreaterThan'
+        },
+        props: {
+          maxValue
+        }
+      }
+      expect(notGreaterThan(maxValue)(badValue)).toEqual(response)
     })
   })
 })

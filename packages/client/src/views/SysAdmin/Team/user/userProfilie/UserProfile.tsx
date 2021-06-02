@@ -37,7 +37,9 @@ import { LANG_EN } from '@client/utils/constants'
 import {
   ISearchLocation,
   ToggleMenu,
-  LoadingGrey
+  LoadingGrey,
+  FloatingNotification,
+  NOTIFICATION_TYPE as FLOATING_NOTIFICATION_TYPE
 } from '@opencrvs/components/lib/interface'
 
 import { Status } from '@client/views/SysAdmin/Team/user/UserList'
@@ -51,6 +53,9 @@ import {
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { UserAuditList } from '@client/views/SysAdmin/Team/user/userProfilie/UserAuditList'
+import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
+import { IUserDetails } from '@client/utils/userUtils'
+import { userMutations } from '@client/user/mutations'
 
 const ContentWrapper = styled.div`
   margin: 40px auto 0;
@@ -140,6 +145,8 @@ type Props = WrappedComponentProps &
 type State = {
   modalVisible: boolean
   viewportWidth: number
+  showResendSMSSuccess: boolean
+  showResendSMSError: boolean
 }
 
 export interface IUserData {
@@ -163,7 +170,9 @@ class UserProfileComponent extends React.Component<Props, State> {
     moment.locale(props.intl.locale)
     this.state = {
       modalVisible: false,
-      viewportWidth: 0
+      viewportWidth: 0,
+      showResendSMSSuccess: false,
+      showResendSMSError: false
     }
     this.updateViewPort = this.updateViewPort.bind(this)
   }
@@ -185,13 +194,41 @@ class UserProfileComponent extends React.Component<Props, State> {
     this.setState({ modalVisible: !this.state.modalVisible })
   }
 
+  async resendSMS(userId: string) {
+    try {
+      const res = await userMutations.resendSMSInvite(userId, [
+        {
+          query: GET_USER,
+          variables: {
+            userId: this.props.match.params.userId
+          }
+        }
+      ])
+      if (res && res.data && res.data.resendSMSInvite) {
+        this.setState({ showResendSMSSuccess: true })
+      }
+    } catch (err) {
+      this.setState({ showResendSMSError: true })
+    }
+  }
+
   getMenuItems(userId: string, status: string) {
     const menuItems: { label: string; handler: () => void }[] = [
       {
-        label: this.props.intl.formatMessage(sysMessages.menuOptionEditDetails),
+        label: this.props.intl.formatMessage(sysMessages.editUserDetailsTitle),
         handler: () => this.props.goToReviewUserDetails(userId)
       }
     ]
+
+    if (status !== 'deactivated' && status !== 'disabled') {
+      menuItems.push({
+        label: this.props.intl.formatMessage(sysMessages.resendSMS),
+        handler: () => {
+          this.resendSMS(userId)
+        }
+      })
+    }
+
     if (status === 'active') {
       menuItems.push({
         label: this.props.intl.formatMessage(sysMessages.deactivate),
@@ -212,6 +249,7 @@ class UserProfileComponent extends React.Component<Props, State> {
     if (!userData) {
       return {}
     }
+
     const locale = this.props.intl.locale
     return {
       id: userData.id,
@@ -236,9 +274,7 @@ class UserProfileComponent extends React.Component<Props, State> {
       username: userData.username,
       practitionerId: userData.practitionerId,
       locationId:
-        (userData.catchmentArea &&
-          userData.catchmentArea[0] &&
-          userData.catchmentArea[0].id) ||
+        getJurisdictionLocationIdFromUserDetails(userData as IUserDetails) ||
         '0',
       startDate:
         (userData.creationDate &&
@@ -288,6 +324,7 @@ class UserProfileComponent extends React.Component<Props, State> {
 
   render() {
     const { intl, viewOnlyMode, match, theme } = this.props
+    const { showResendSMSSuccess, showResendSMSError } = this.state
     return (
       <>
         <Query
@@ -390,6 +427,30 @@ class UserProfileComponent extends React.Component<Props, State> {
                         }
                       ]}
                     />
+                    {showResendSMSSuccess && (
+                      <FloatingNotification
+                        id="resend_invite_success"
+                        type={FLOATING_NOTIFICATION_TYPE.SUCCESS}
+                        show={showResendSMSSuccess}
+                        callback={() =>
+                          this.setState({ showResendSMSSuccess: false })
+                        }
+                      >
+                        {intl.formatMessage(sysMessages.resendSMSSuccess)}
+                      </FloatingNotification>
+                    )}
+                    {showResendSMSError && (
+                      <FloatingNotification
+                        id="resend_invite_error"
+                        type={FLOATING_NOTIFICATION_TYPE.ERROR}
+                        show={showResendSMSError}
+                        callback={() =>
+                          this.setState({ showResendSMSError: false })
+                        }
+                      >
+                        {intl.formatMessage(sysMessages.resendSMSError)}
+                      </FloatingNotification>
+                    )}
                     <UserAuditList user={user} />
                   </ContentWrapper>
                 </SysAdminContentWrapper>

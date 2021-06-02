@@ -13,15 +13,20 @@ import * as Hapi from '@hapi/hapi'
 import {
   fetchAllFromSearch,
   fetchParentLocationByLocationID,
-  fetchPractitionerRole
+  fetchPractitionerRole,
+  fetchTaskIdByCompositionID
 } from '@metrics/api'
 import {
   IAuthHeader,
   IApplicationsStartedFields,
   IApplicationsStartedPoints,
-  IPointLocation
+  IPointLocation,
+  IDurationPoints,
+  IDurationFields,
+  IDurationTags
 } from '@metrics/features/registration'
 import { writePoints, query } from '@metrics/influxdb/client'
+import * as moment from 'moment'
 
 interface ISearchResult {
   _index: string
@@ -173,4 +178,80 @@ export async function generateApplicationStartedPoint(
     fields,
     timestamp: `${parseInt(searchResult._source.createdAt, 10) * 1000000}`
   }
+}
+
+export async function generateLegacyEventDurationHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  let result: any
+  const authHeader = {
+    Authorization: request.headers.authorization
+  }
+  try {
+    await query('DROP MEASUREMENT application_event_duration')
+  } catch (err) {
+    throw new Error('Could not clear influx')
+  }
+  try {
+    result = await fetchAllFromSearch(authHeader)
+  } catch (err) {
+    throw new Error('Could not resolve values from search')
+  }
+  let totalPoints: IDurationPoints[] = []
+  if (result.body.hits.total !== result.body.hits.hits.length) {
+    throw new Error(
+      'Not all results returned in search results.  Need to implement Elastic pagination for more than 10,000 records'
+    )
+  }
+  const searchResults: ISearchResult[] = result.body.hits.hits
+  for (const searchResult of searchResults) {
+    const points: IDurationPoints[] = await generateEventDurationPoint(
+      searchResult,
+      authHeader
+    )
+    totalPoints = totalPoints.concat(points)
+  }
+  await writePoints(totalPoints)
+  return h.response({ totalRecords: searchResults.length }).code(200)
+}
+
+async function generateEventDurationPoint(
+  searchResult: ISearchResult,
+  authHeader: IAuthHeader
+): Promise<any> {
+  const taskId = await fetchTaskIdByCompositionID(searchResult._id, authHeader)
+  return (
+    (searchResult._source &&
+      searchResult._source.operationHistories &&
+      searchResult._source.operationHistories
+        .filter((history, index) => index !== 0)
+        .map((history, index) => {
+          const previousHistory = searchResult._source.operationHistories[index]
+          const fields: IDurationFields = {
+            durationInSeconds: moment(new Date(history.operatedOn)).diff(
+              moment(new Date(previousHistory.operatedOn)),
+              'seconds'
+            ),
+            compositionId: searchResult._id,
+            currentTaskId: taskId,
+            previousTaskId: taskId
+          }
+
+          const tags: IDurationTags = {
+            eventType: searchResult._source.event.toUpperCase(),
+            currentStatus: history.operationType,
+            previousStatus: previousHistory.operationType
+          }
+
+          return {
+            measurement: 'application_event_duration',
+            tags,
+            fields,
+            timestamp: `${parseInt(searchResult._source.createdAt, 10) *
+              1000000}`
+          }
+        })) ||
+    []
+  )
 }

@@ -194,7 +194,8 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
                 <DateRangePicker
                   startDate={dateStart}
                   endDate={dateEnd}
-                  onDatesChange={({ startDate, endDate }) =>
+                  onDatesChange={({ startDate, endDate }) => {
+                    startDate.setDate(startDate.getDate() + 1)
                     props.goToRegistrationRates(
                       eventType as Event,
                       title,
@@ -202,7 +203,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
                       startDate,
                       endDate
                     )
-                  }
+                  }}
                 />
               </FilterContainer>
             )

@@ -37,6 +37,15 @@ export async function waitingValidationHandler(
         Authorization: request.headers.authorization
       })
     )
+    points.push(
+      await generateEventDurationPoint(
+        request.payload as fhir.Bundle,
+        ['IN_PROGRESS', 'DECLARED', 'VALIDATED'],
+        {
+          Authorization: request.headers.authorization
+        }
+      )
+    )
     await writePoints(points)
   } catch (err) {
     return internal(err)
@@ -182,6 +191,16 @@ export async function markRejectedHandler(
         true
       )
     )
+    points.push(
+      await generateEventDurationPoint(
+        request.payload as fhir.Bundle,
+        ['IN_PROGRESS', 'DECLARED', 'VALIDATED'],
+        {
+          Authorization: request.headers.authorization
+        },
+        true
+      )
+    )
     await writePoints(points)
   } catch (err) {
     return internal(err)
@@ -229,7 +248,7 @@ export async function markBirthRegisteredHandler(
     const points = await Promise.all([
       generateEventDurationPoint(
         bundle,
-        ['DECLARED', 'VALIDATED', 'WAITING_VALIDATION'],
+        ['IN_PROGRESS', 'DECLARED', 'VALIDATED', 'WAITING_VALIDATION'],
         {
           Authorization: request.headers.authorization
         }
@@ -287,7 +306,7 @@ export async function markDeathRegisteredHandler(
     const points = await Promise.all([
       generateEventDurationPoint(
         bundle,
-        ['DECLARED', 'VALIDATED', 'WAITING_VALIDATION'],
+        ['IN_PROGRESS', 'DECLARED', 'VALIDATED', 'WAITING_VALIDATION'],
         {
           Authorization: request.headers.authorization
         }
@@ -340,9 +359,13 @@ export async function markValidatedHandler(
 ) {
   try {
     const points = await Promise.all([
-      generateEventDurationPoint(request.payload as fhir.Bundle, ['DECLARED'], {
-        Authorization: request.headers.authorization
-      }),
+      generateEventDurationPoint(
+        request.payload as fhir.Bundle,
+        ['IN_PROGRESS', 'DECLARED'],
+        {
+          Authorization: request.headers.authorization
+        }
+      ),
       generateTimeLoggedPoint(request.payload as fhir.Bundle, {
         Authorization: request.headers.authorization
       })

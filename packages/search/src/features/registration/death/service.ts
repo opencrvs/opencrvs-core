@@ -139,7 +139,7 @@ async function createIndexBody(
   authHeader: string,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  createDeceasedIndex(body, composition, bundleEntries)
+  await createDeceasedIndex(body, composition, bundleEntries)
   createFatherIndex(body, composition, bundleEntries)
   createMotherIndex(body, composition, bundleEntries)
   createSpouseIndex(body, composition, bundleEntries)
@@ -149,7 +149,7 @@ async function createIndexBody(
   await createStatusHistory(body, task, authHeader)
 }
 
-function createDeceasedIndex(
+async function createDeceasedIndex(
   body: IDeathCompositionBody,
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
@@ -160,10 +160,11 @@ function createDeceasedIndex(
     bundleEntries
   ) as fhir.Patient
 
-  const deathLocation = findEventLocation(
+  const deathLocation = (await findEventLocation(
     DEATH_ENCOUNTER_CODE,
-    composition
-  ) as fhir.Location
+    composition,
+    bundleEntries
+  )) as fhir.Location
 
   const deceasedName = deceased && findName(NAME_EN, deceased.name)
   const deceasedNameLocal = deceased && findNameLocale(deceased.name)

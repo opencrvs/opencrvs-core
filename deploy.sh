@@ -111,13 +111,13 @@ ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/setup-deploy-config.sh '$HO
 if [[ "$ENV" = "development" ]]; then
     ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && HOSTNAME='$HOST' VERSION='$VERSION' PAPERTRAIL='$PAPERTRAIL' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.resources.deploy.yml --with-registry-auth opencrvs'
 elif [[ "$ENV" = "qa" ]]; then
-    ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && HOSTNAME='$HOST' VERSION='$VERSION' PAPERTRAIL='$PAPERTRAIL' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.qa-deploy.yml -c docker-compose.resources.deploy.yml --with-registry-auth opencrvs'
+    ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && HOSTNAME='$HOST' VERSION='$VERSION' PAPERTRAIL='$PAPERTRAIL' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.qa-deploy.yml -c docker-compose.resources.deploy.yml -c docker-compose.resources.qa-deploy.yml --with-registry-auth opencrvs'
 else
     ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && HOSTNAME='$HOST' VERSION='$VERSION' PAPERTRAIL='$PAPERTRAIL' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.prod-deploy.yml -c docker-compose.resources.deploy.yml --with-registry-auth opencrvs'
 fi
 
 if [ $1 == "--clear-data=yes" ] || [ $2 == "--restore-metadata=yes" ] || [ $3 == "--update-metadata=yes" ] ; then
-    echo 
+    echo
     echo "Waiting 2 mins for stack to deploy before working with data..."
     echo
     sleep 120

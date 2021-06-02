@@ -151,20 +151,20 @@ const messagesToDefine: ICertificateMessages = {
     defaultMessage: 'Cancel',
     description:
       'The for the dialog when details of the collector not verified',
-    id: 'print.certificate.collector.idCheckDialog.actions.cancel'
+    id: 'print.cert.coll.id.actions.cancel'
   },
   idCheckDialogConfirm: {
     defaultMessage: 'SEND',
     description:
       'The for the dialog when details of the collector not verified',
-    id: 'print.certificate.collector.idCheckDialog.actions.send'
+    id: 'print.cert.coll.id.actions.send'
   },
   idCheckDialogDescription: {
     defaultMessage:
       'Please be aware that if you proceed, you will be responsible for issuing a certificate without the necessary proof of ID from the collector',
     description:
       'The description for the dialog when details of the collector not verified',
-    id: 'print.certificate.collector.idCheckDialog.description'
+    id: 'print.cert.coll.id.description'
   },
   idCheckDialogTitle: {
     defaultMessage: 'Continue without proof of ID?',
@@ -180,13 +180,13 @@ const messagesToDefine: ICertificateMessages = {
   idCheckVerify: {
     defaultMessage: 'Yes',
     description: 'The label for id check component action when verify details',
-    id: 'print.certificate.collector.idCheck.actions.verify'
+    id: 'print.cert.coll.idCheck.actions.ver'
   },
   idCheckWithoutVerify: {
     defaultMessage: 'No',
     description:
       'The label for id check component action when does not verify details',
-    id: 'print.certificate.collector.idCheck.actions.withoutVerify'
+    id: 'print.cert.coll.idCheck.actions.noVer'
   },
   informant: {
     defaultMessage: 'Informant',
@@ -386,42 +386,42 @@ const messagesToDefine: ICertificateMessages = {
   certificateOtherCollectorAffidavitFormTitle: {
     defaultMessage: 'Attach a signed affidavit',
     description: 'Form title for other collector affidavit form',
-    id: 'print.certificate.collector.other.affidavit.form.title'
+    id: 'print.cert.coll.other.aff.form.title'
   },
   certificateOtherCollectorAffidavitError: {
     defaultMessage:
       'Attach a signed affidavit or click the checkbox if they do not have one.',
     description: 'Form level error for other collector affidavit form',
-    id: 'print.certificate.collector.other.affidavit.form.error'
+    id: 'print.cert.coll.other.aff.error'
   },
   certificateOtherCollectorAffidavitFormParagraph: {
     defaultMessage:
       'This document should clearly prove that the individual has the authority to collect the certificate',
     description: 'Form paragraph for other collector affidavit form',
-    id: 'print.certificate.collector.other.affidavit.form.paragraph'
+    id: 'print.cert.coll.other.aff.paragraph'
   },
   noSignedAffidavitAvailable: {
     defaultMessage: "They don't have a signed affidavit",
     description: 'Label for no affidavit checkbox',
-    id: 'print.certificate.collector.other.affidavit.form.checkbox'
+    id: 'print.cert.coll.other.aff.check'
   },
   noAffidavitModalTitle: {
     defaultMessage: 'Continue without signed affidavit?',
     description:
       'Modal title for other coller form submission without signed affidavit',
-    id: 'print.certificate.collector.other.affidavit.form.modal.title'
+    id: 'print.cert.coll.other.aff.title'
   },
   noAffidavitModalDescription: {
     defaultMessage:
       'Please be aware that if you proceed, you will be responsible for issuing a certificate without necessary evidence from the collector',
     description:
       'Modal description for other coller form submission without signed affidavit',
-    id: 'print.certificate.collector.other.affidavit.form.modal.description'
+    id: 'print.cert.coll.other.aff.description'
   },
   signedAffidavitFileLabel: {
     defaultMessage: 'Signed affidavit',
     description: 'File label for signed affidavit',
-    id: 'print.certificate.collector.other.affidavit.form.file.label'
+    id: 'print.cert.coll.other.aff.label'
   }
 }
 

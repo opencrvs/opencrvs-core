@@ -16,6 +16,7 @@ import { Backspace } from '../icons/Backspace'
 interface IProps {
   id?: string
   onComplete: (pin: string) => void
+  forgotPinComponent?: React.ReactNode
   pin?: string
   ref?: any
 }
@@ -142,12 +143,15 @@ export class PINKeypad extends React.Component<IProps, IState> {
         {...this.props}
       >
         <div>
-          {new Array(pin.length).fill('').map((e, i) => (
-            <DotFilled key={`dot-filled-${i}`} />
-          ))}
-          {new Array(4 - pin.length).fill('').map((e, i) => (
-            <DotUnfilled key={`dot-unfilled-${i}`} />
-          ))}
+          <div>
+            {new Array(pin.length).fill('').map((e, i) => (
+              <DotFilled key={`dot-filled-${i}`} />
+            ))}
+            {new Array(4 - pin.length).fill('').map((e, i) => (
+              <DotUnfilled key={`dot-unfilled-${i}`} />
+            ))}
+          </div>
+          {this.props.forgotPinComponent}
         </div>
         <NumberContainer>
           <Key

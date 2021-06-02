@@ -135,3 +135,4 @@ services:
       - COUNTRY=${COUNTRY:-bgd}
       - HOST=0.0.0.0
       - CHECK_INVALID_TOKEN=true
+      - RESOURCES_URL=http://resources:3040

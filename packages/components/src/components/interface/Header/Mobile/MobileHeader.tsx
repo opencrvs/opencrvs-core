@@ -31,6 +31,9 @@ const HeaderContainer = styled.div`
   align-items: center;
   ${({ theme }) => theme.gradients.gradientNightshade};
   box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
+  position: sticky;
+  top: 0;
+  z-index: 2;
 `
 
 const Title = styled.span`

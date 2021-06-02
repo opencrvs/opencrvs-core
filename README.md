@@ -283,22 +283,46 @@ Now that you have a good backround in the OpenCRVS core, it is time to set up a 
 
    - [Docker For Mac](https://docs.docker.com/docker-for-mac/)
 
-2) Next, clone this repo! :)
+2. Next, clone this repo! :)
    `git clone https://github.com/opencrvs/opencrvs-core.git`
 
-3) `cd` into the repo and run `chmod 775 data/elasticsearch` from root of the project to allow ElasticSearch access
+3. `cd` into the repo and run `chmod 775 data/elasticsearch` from root of the project to allow ElasticSearch access
 
-4) Run `yarn` to install deps
+4. Run `yarn` to install deps
 
-5) Run `docker swarm init` - your localhost has to be a Docker swarm manager in order to use the "overlay" network.
+5. Run `docker swarm init` - your localhost has to be a Docker swarm manager in order to use the "overlay" network.
 
-6) You need to pass a comma delimited string of supported languages to the `yarn dev` command in order to start the stack.
+6. Next, OpenCRVS depends upon your own country specific "resources" module of reference data (addresses, employees, offices, facilities), custom configuration of vital event registration forms and your own integrations.
 
-OpenCRVS has the capability to be fully multi-lingual and languages can be configured in [register.json](https://github.com/opencrvs/opencrvs-zambia/blob/master/src/zmb/features/languages/generated/register.json) following the [FormatJS React Intl package](https://github.com/formatjs/react-intl) approach.
+A test "resources" module for [Zambia](https://github.com/opencrvs/opencrvs-zambia) is released for free.
 
-However currently we only have Bengali and English translations. If you are planning to introduce a new language, please talk to us on [Gitter](https://gitter.im/opencrvs/community#) and submit a new translation file. We can easily enable the new language string in a PR.
+`cd ../` back up and clone this example [Zambia](https://github.com/opencrvs/opencrvs-zambia) resources module. You can iterate upon it for your needs.
 
-Currently the supported language straings can be set to either:
+`git clone https://github.com/opencrvs/opencrvs-zambia.git`
+
+7. Set the following environment variables locally. The first is the path locally to where you just cloned the resources module:
+
+`export RESOURCES_PATH=<path to your resources module>`
+
+The second is the country code you are using in the resources module, eg: **zmb**
+
+`export COUNTRY_CODE=zmb`
+
+You need to pass a comma delimited string of supported languages to the `yarn dev` command in order to start the stack.
+
+OpenCRVS has the capability to be fully multi-lingual and languages can be configured.
+
+Client Application: Internationalisation and languages can be configured in [client.json](https://github.com/opencrvs/opencrvs-zambia/blob/master/src/zmb/features/languages/generated/client/client.json).
+
+SMS Notifications: Internationalisation and languages can be configured in [notification.json](https://github.com/opencrvs/opencrvs-zambia/blob/master/src/zmb/features/languages/generated/notification/notification.json).
+
+We have provided some handy tools in the test "resources" module for [Zambia](https://github.com/opencrvs/opencrvs-zambia) to help you load your languages into a content management system such as [Contentful](https://www.contentful.com/).
+
+OpenCRVS currently supports the standard Roman and Latin character set and Bengali. In OpenCRVS Alpha, we will need to assist you to configure core to support a new language in the language select in a pull request. We will gladly provide support to you if you want to provide translations and hugely welcome all localisation efforts.
+
+Currently we only have Bengali and English translations. If you are planning to introduce a new language, please talk to us on [Gitter](https://gitter.im/opencrvs/community#) and submit a new translation file. We can easily enable the new language string in a PR.
+
+Currently the supported language strings can be set to either:
 
 **Bengali and English**
 
@@ -308,21 +332,15 @@ Currently the supported language straings can be set to either:
 
 "en"
 
+In the [Zambia](https://github.com/opencrvs/opencrvs-zambia) resources package you can see how to set up OpenCRVS with a Content Management System.
+
 Run `yarn dev <supported-languages>` to up the OpenCRVS core dev environment (frontend and backend services in this repo start as local dev servers that will autoreload and dependencies are started via docker-compose) OR alternatively you may run the dependencies and the services in this repo separated in two diffrent terminal with `yarn compose:deps` (dependencies) and `yarn start` manually setting the supported languages string in a .env file. We also provide [tmux](https://github.com/tmuxinator/tmuxinator) commands.
 
 **If you are using OSX:**
 
 Docker For Mac can affect OpenCRVS ability to find containers on localhost. Find your local IP address and start the dev environment, replacing the IP address with yours, like this: `LOCAL_IP=192.168.0.5 yarn dev <supported-languages>`
 
-7. Next, OpenCRVS depends upon your own country specific "resources" module of reference data (addresses, employees, offices, facilities), custom configuration of vital event registration forms and your own integrations.
-
-A test "resources" module for [Zambia](https://github.com/opencrvs/opencrvs-zambia) is released for free.
-
-`cd ../` back up and clone this example [Zambia](https://github.com/opencrvs/opencrvs-zambia) resources module. You can iterate upon it for your needs.
-
-`git clone https://github.com/opencrvs/opencrvs-zambia.git`
-
-8. `cd opencrvs-zambia` into the resources repo and run `yarn` to install deps
+8. `cd opencrvs-zambia` into the resources repo you previously installed and run `yarn` to install deps
 
 9. Run `CERT_PUBLIC_KEY_PATH=<where your core repo is>/.secrets/public-key.pem yarn start` to run the resources module
 
@@ -524,7 +542,7 @@ So you have contributed to core and want to make a new release as an OpenCRVS co
 
 3. Run `yarn test` and ensure all passed.
 
-4. Run `git tag v<version_number>` e.g. `git tag v1.0.0-alpha.2.0`
+4. Run `git tag v<version_number>` e.g. `git tag v1.0.0-alpha.3.0`
 
 5. Run `git push origin v<version_number>`
 

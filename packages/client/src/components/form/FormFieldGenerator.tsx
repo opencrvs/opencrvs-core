@@ -114,16 +114,32 @@ import { getOfflineData } from '@client/offline/selectors'
 import { connect } from 'react-redux'
 import { dynamicDispatch } from '@client/applications'
 import { LocationSearch } from '@opencrvs/components/lib/interface'
+import { REGEXP_NUMBER_INPUT_NON_NUMERIC } from '@client/utils/constants'
+import { isMobileDevice } from '@client/utils/commonUtils'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
   to { opacity: 1; }
 `
 
-const FormItem = styled.div<{ ignoreBottomMargin?: boolean }>`
+const FormItem = styled.div<{
+  ignoreBottomMargin?: boolean
+  hideFakeMarginTop?: boolean
+}>`
   animation: ${fadeIn} 500ms;
   margin-bottom: ${({ ignoreBottomMargin }) =>
     ignoreBottomMargin ? '0px' : '32px'};
+
+  ${({ hideFakeMarginTop }) =>
+    !hideFakeMarginTop &&
+    `& > div::before {
+    content: ' ';
+    height: 80px;
+    margin-top: -80px;
+    display: block;
+    visibility: hidden;
+    pointer-events: none;
+  }`}
 `
 const LinkFormField = styled(Link)`
   ${({ theme }) => theme.fonts.bodyStyle};
@@ -143,6 +159,20 @@ const LocationSearchFormField = styled(LocationSearch)`
     border-radius: 0;
   }
 `
+
+function handleSelectFocus(id: string, isSearchable: boolean) {
+  if (isMobileDevice() && isSearchable) {
+    setTimeout(() => {
+      const inputElement = document.getElementById(`${id}-form-input`)
+
+      if (inputElement) {
+        inputElement.scrollIntoView({
+          behavior: 'smooth'
+        })
+      }
+    }, 20)
+  }
+}
 
 type GeneratedInputFieldProps = {
   fieldDefinition: Ii18nFormField
@@ -213,6 +243,12 @@ function GeneratedInputField({
             resetDependentSelectValues(fieldDefinition.name)
             onSetFieldValue(fieldDefinition.name, val)
           }}
+          onFocus={() =>
+            handleSelectFocus(
+              fieldDefinition.name,
+              fieldDefinition.options.length > 10
+            )
+          }
           options={fieldDefinition.options}
         />
       </InputField>
@@ -388,7 +424,13 @@ function GeneratedInputField({
         <TextInput
           type="number"
           step={fieldDefinition.step}
+          max={fieldDefinition.max}
           {...inputProps}
+          onKeyPress={e => {
+            if (e.key.match(REGEXP_NUMBER_INPUT_NON_NUMERIC)) {
+              e.preventDefault()
+            }
+          }}
           value={inputProps.value as string}
           onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
             event.currentTarget.blur()
@@ -714,9 +756,13 @@ class FormSectionComponent extends React.Component<Props> {
           }
 
           const isFieldDisabled = conditionalActions.includes('disable')
+          const isDateField =
+            field.type === DATE ||
+            (field.type === FIELD_WITH_DYNAMIC_DEFINITIONS &&
+              getFieldType(field as IDynamicFormField, values) === DATE)
 
           if (
-            field.type === DATE &&
+            isDateField &&
             touched[`${field.name}-dd`] !== undefined &&
             touched[`${field.name}-mm`] !== undefined &&
             touched[`${field.name}-yyyy`] !== undefined
@@ -876,6 +922,7 @@ class FormSectionComponent extends React.Component<Props> {
                     <FormItem
                       key={nestedFieldName}
                       ignoreBottomMargin={field.ignoreBottomMargin}
+                      hideFakeMarginTop
                     >
                       <FastField name={nestedFieldName}>
                         {(formikFieldProps: FieldProps<any>) => (

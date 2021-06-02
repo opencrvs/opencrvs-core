@@ -190,12 +190,7 @@ class ReviewTabComponent extends React.Component<
             moment(reg.dateOfEvent.toString(), 'YYYY-MM-DD').fromNow()) ||
           '',
         applicationTimeElapsed:
-          (reg.modifiedAt &&
-            moment(
-              moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
-              'YYYY-MM-DD HH:mm:ss'
-            ).fromNow()) ||
-          '',
+          (reg.createdAt && moment(reg.createdAt).fromNow()) || '',
         actions,
         icon,
         rowClickHandler: [
@@ -239,6 +234,7 @@ class ReviewTabComponent extends React.Component<
           isIconColumn: true
         },
         {
+          label: this.props.intl.formatMessage(messages.listItemAction),
           width: 20,
           key: 'actions',
           isActionColumn: true,

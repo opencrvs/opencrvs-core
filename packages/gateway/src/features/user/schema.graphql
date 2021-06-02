@@ -98,6 +98,14 @@ type SearchFieldAgentResponse {
   averageTimeForDeclaredApplications: Int
 }
 
+type VerifyPasswordResult {
+  mobile: String
+  scrope: [String]
+  status: String
+  username: String
+  id: String
+}
+
 type Query {
   getUser(userId: String): User
   searchUsers(
@@ -122,6 +130,7 @@ type Query {
     skip: Int
     sort: String
   ): SearchFieldAgentResult
+  verifyPasswordById(id: String!, password: String!): VerifyPasswordResult
 }
 
 type Mutation {
@@ -142,4 +151,5 @@ type Mutation {
     reason: String!
     comment: String
   ): String
+  resendSMSInvite(userId: String!): String
 }

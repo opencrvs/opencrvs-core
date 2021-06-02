@@ -607,6 +607,7 @@ export class InProgressTabComponent extends React.Component<
           key: 'trackingId'
         },
         {
+          label: this.props.intl.formatMessage(messages.listItemAction),
           width: 20,
           key: 'actions',
           isActionColumn: true,

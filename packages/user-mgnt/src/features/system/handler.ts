@@ -294,6 +294,7 @@ export async function getSystemHandler(
     client_id: system.client_id,
     username: system.username,
     status: system.status,
+    scope: system.scope,
     sha_secret: system.sha_secret,
     practitionerId: system.practitionerId
   }
@@ -308,6 +309,7 @@ export const getSystemResponseSchema = Joi.object({
   username: Joi.string(),
   client_id: Joi.string(),
   status: Joi.string(),
+  scope: Joi.array().items(Joi.string()),
   sha_secret: Joi.string(),
   practitionerId: Joi.string()
 })

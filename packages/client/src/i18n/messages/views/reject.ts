@@ -62,7 +62,7 @@ const messagesToDefine: IRejectMessages = {
     description: 'Label for rejection option misspelling'
   },
   rejectionReasonMissingSupportingDoc: {
-    id: 'review.rejection.form.reasons.missingSupportingDoc',
+    id: 'review.rej.form.reasons.missSupDoc',
     defaultMessage: 'Missing supporting documents',
     description: 'Label for rejection option missing supporting doc'
   },

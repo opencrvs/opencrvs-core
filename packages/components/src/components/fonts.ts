@@ -28,6 +28,7 @@ export interface IFonts {
   buttonStyle: string
   smallButtonStyle: string
   smallButtonStyleNoCapitalize: string
+  chartLegendStyle: string
 }
 
 // TODO: we need a way to load fonts for other languages without recompiling
@@ -123,6 +124,10 @@ export const fonts = (language: string): IFonts => {
     smallButtonStyleNoCapitalize: `font-family: ${semiBoldFont};
         font-size: 14px;
         font-weight: 600;
-        line-height: 150%;`
+        line-height: 150%;`,
+    chartLegendStyle: `font-family: ${regularFont};
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 21px;`
   }
 }

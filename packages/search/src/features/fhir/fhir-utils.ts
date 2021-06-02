@@ -80,20 +80,24 @@ export function findEntry(
 
 export async function findEventLocation(
   code: string,
-  composition: fhir.Composition
+  composition: fhir.Composition,
+  bundleEntries?: fhir.BundleEntry[]
 ) {
-  const encounterSection = findCompositionSection(code, composition)
-  if (!encounterSection || !encounterSection.entry) {
-    return undefined
+  let data
+  if (bundleEntries) {
+    data = findEntry(code, composition, bundleEntries)
+  } else {
+    const encounterSection = findCompositionSection(code, composition)
+    if (!encounterSection || !encounterSection.entry) {
+      return undefined
+    }
+    data = await getFromFhir(
+      `/Encounter/${encounterSection.entry[0].reference}`
+    )
   }
-  const data = await getFromFhir(
-    `/Encounter/${encounterSection.entry[0].reference}`
-  )
-
   if (!data || !data.location || !data.location[0].location) {
     return null
   }
-
   return await getFromFhir(`/${data.location[0].location.reference}`)
 }
 

@@ -106,6 +106,10 @@ function LocationPickerComponent(props: LocationPickerProps) {
       const body = document.querySelector('body') as HTMLBodyElement
       if (modalVisible) {
         body.style.overflow = 'hidden'
+        const searchInput = document.getElementById('locationSearchInput')
+        if (searchInput) {
+          searchInput.focus()
+        }
       } else {
         body.style.removeProperty('overflow')
       }

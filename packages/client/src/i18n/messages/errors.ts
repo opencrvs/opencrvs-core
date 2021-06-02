@@ -30,6 +30,7 @@ interface IErrorMessages {
   noApplication: MessageDescriptor
   waitingForConnection: MessageDescriptor
   pageLoadFailed: MessageDescriptor
+  passwordSubmissionError: MessageDescriptor
 }
 
 const messagesToDefine: IErrorMessages = {
@@ -125,6 +126,11 @@ const messagesToDefine: IErrorMessages = {
     defaultMessage: "Sorry, we couldn't laod the content for this page",
     description: 'Error message when page failed to load',
     id: 'error.page.load.failed'
+  },
+  passwordSubmissionError: {
+    defaultMessage: 'Sorry that password did not work',
+    description: 'Error message when password verification fails',
+    id: 'error.passwordSubmissionError'
   }
 }
 

@@ -138,7 +138,9 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
             new Date(application.modifiedOn).toISOString().split('T')[0]
           ) > APPLICATIONS_DAY_LIMIT
       )
-      .forEach(this.props.deleteApplication)
+      .forEach(application => {
+        this.props.deleteApplication(application)
+      })
   }
 
   transformApplicationsReadyToSend = () => {

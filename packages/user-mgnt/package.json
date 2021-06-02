@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/user-mgnt",
-  "version": "1.0.0-alpha.2.0",
+  "version": "1.0.0-alpha.3.0",
   "description": "OpenCRVS user management service",
   "license": "MPL-2.0",
   "private": true,
@@ -17,7 +17,7 @@
     "build:clean": "rm -rf build"
   },
   "dependencies": {
-    "@opencrvs/commons": "^1.0.0-alpha.2.0",
+    "@opencrvs/commons": "^1.0.0-alpha.3.0",
     "@types/hapi-pino": "^6.3.0",
     "@types/pino": "^5.14.0",
     "app-module-path": "^2.2.0",

@@ -24,12 +24,12 @@ import { IApplication, SUBMISSION_STATUS } from '@client/applications'
 
 const messages = defineMessages({
   processingText: {
-    id: 'notification.processingText',
+    id: 'misc.notif.processingText',
     defaultMessage: '{num} application processing...',
     description: 'Application processing text'
   },
   outboxText: {
-    id: 'notification.outboxText',
+    id: 'misc.notif.outboxText',
     defaultMessage: 'Outbox({num})',
     description: 'Application outbox text'
   }
@@ -39,6 +39,7 @@ const ExpandableNotificationContainer = styled.div`
   bottom: 0;
   position: fixed;
   width: 100%;
+  z-index: 3;
   flex-direction: column;
 `
 

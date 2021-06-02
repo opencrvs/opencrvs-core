@@ -58,8 +58,8 @@ export async function getTimeLoggedHandler(
       )
     }
   } else if (status) {
-    return getTimeLoggedByStatus(compositionId, status.toUpperCase())
+    return await getTimeLoggedByStatus(compositionId, status.toUpperCase())
   } else {
-    return getTimeLogged(compositionId)
+    return await getTimeLogged(compositionId)
   }
 }

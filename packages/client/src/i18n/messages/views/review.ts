@@ -41,7 +41,6 @@ interface IReviewMessages {
   validateConfirmationTitle: MessageDescriptor
   valueApprove: MessageDescriptor
   zeroDocumentsText: MessageDescriptor
-  createAndValidateApplicationActionDescription: MessageDescriptor
   validateCompleteApplicationActionTitle: MessageDescriptor
   validateCompleteApplicationActionDescription: MessageDescriptor
   validateApplicationActionModalTitle: MessageDescriptor
@@ -68,11 +67,6 @@ const messagesToDefine: IReviewMessages = {
     id: 'validate.application.action.modal.description',
     defaultMessage:
       'This application will be sent to the registrar from them to register'
-  },
-  createAndValidateApplicationActionDescription: {
-    id: 'create.validate.application.action.decription',
-    defaultMessage:
-      '{completeApplication, select, true {By sending for approval you confirm that the information has been reviewed by the applicant and that it is ready to register.} false {Mandatory information is missing. Please add this information so that you can send to register.}}'
   },
   additionalComments: {
     defaultMessage: 'Any additional comments?',
@@ -136,12 +130,12 @@ const messagesToDefine: IReviewMessages = {
   registerActionDescriptionComplete: {
     defaultMessage:
       'By clicking register, you confirm that the information is correct and has been reviewed by the applicant. The applicant understands that it will be used to register the birth and for planning purposes.\n\nBy registering this birth, a birth certificate will be generated with your signature for issuance.',
-    id: 'review.actions.description.registerConfirmComplete'
+    id: 'review.actions.desc.regConfComp'
   },
   registerActionDescriptionIncomplete: {
     defaultMessage:
       'Mandatory information is missing. Please add this information so that you can complete the registration process.',
-    id: 'review.actions.description.registerConfirmInComplete'
+    id: 'review.actions.desc.regConfInComp'
   },
   registerActionTitle: {
     defaultMessage: 'Ready to register?',
@@ -157,18 +151,18 @@ const messagesToDefine: IReviewMessages = {
       'By sending for approval you confirm that the application is ready for approval.',
     description:
       'Description for review action component when complete application',
-    id: 'approval.actions.description.Complete'
+    id: 'misc.description.Complete'
   },
   approvalActionDescriptionIncomplete: {
     defaultMessage:
       'Mandatory information is missing. Please add this information so that you can send for approval.',
-    id: 'approval.actions.description.inComplete'
+    id: 'misc.description.inComplete'
   },
   approvalActionTitle: {
     defaultMessage:
       'Send for {draftStatus, select, true {approval} false {approval or reject}}?',
     description: 'Title for review action component',
-    id: 'approval.actions.title.applicationStatus'
+    id: 'misc.title.applicationStatus'
   },
   reviewActionDescriptionComplete: {
     defaultMessage:

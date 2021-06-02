@@ -15,8 +15,8 @@ import {
   GQLOperationHistorySearchSet
 } from '@gateway/graphql/schema'
 import {
-  getTimeLoggedFromMetrics,
-  ITimeLoggedResponse
+  getEventDurationsFromMetrics,
+  IEventDurationResponse
 } from '@gateway/features/fhir/utils'
 import { getUser } from '@gateway/features/user/utils'
 
@@ -44,7 +44,7 @@ export interface ISearchCriteria {
 }
 
 const getTimeLoggedDataByStatus = (
-  timeLoggedData: ITimeLoggedResponse[],
+  timeLoggedData: IEventDurationResponse[],
   status: string
 ) => {
   return (
@@ -52,7 +52,7 @@ const getTimeLoggedDataByStatus = (
       timeLoggedData.find(
         timeLoggedByStatus =>
           timeLoggedByStatus.status && timeLoggedByStatus.status === status
-      )?.timeSpentEditing) ||
+      )?.durationInSeconds) ||
     null
   )
 }
@@ -252,34 +252,43 @@ export const searchTypeResolvers: GQLResolver = {
         authHeader
       )
     },
+    startedByFacility(searchData: ISearchEventDataTemplate) {
+      let facilityName = null
+      if (searchData._source.operationHistories) {
+        facilityName = (searchData._source
+          .operationHistories as GQLOperationHistorySearchSet[])[0]
+          .notificationFacilityName
+      }
+      return facilityName
+    },
     progressReport: async (
       searchData: ISearchEventDataTemplate,
       _,
       authHeader
     ) => {
-      return await getTimeLoggedFromMetrics(authHeader, searchData._id)
+      return await getEventDurationsFromMetrics(authHeader, searchData._id)
     }
   },
   EventProgressData: {
-    timeInProgress(timeLoggedResponse: ITimeLoggedResponse[]) {
+    timeInProgress(timeLoggedResponse: IEventDurationResponse[]) {
       return getTimeLoggedDataByStatus(timeLoggedResponse, 'IN_PROGRESS')
     },
-    timeInReadyForReview(timeLoggedResponse: ITimeLoggedResponse[]) {
+    timeInReadyForReview(timeLoggedResponse: IEventDurationResponse[]) {
       return getTimeLoggedDataByStatus(timeLoggedResponse, 'DECLARED')
     },
-    timeInRequiresUpdates(timeLoggedResponse: ITimeLoggedResponse[]) {
+    timeInRequiresUpdates(timeLoggedResponse: IEventDurationResponse[]) {
       return getTimeLoggedDataByStatus(timeLoggedResponse, 'REJECTED')
     },
-    timeInWaitingForApproval(timeLoggedResponse: ITimeLoggedResponse[]) {
+    timeInWaitingForApproval(timeLoggedResponse: IEventDurationResponse[]) {
       return getTimeLoggedDataByStatus(timeLoggedResponse, 'VALIDATED')
     },
-    timeInWaitingForBRIS(timeLoggedResponse: ITimeLoggedResponse[]) {
+    timeInWaitingForBRIS(timeLoggedResponse: IEventDurationResponse[]) {
       return getTimeLoggedDataByStatus(
         timeLoggedResponse,
         'WAITING_FOR_VALIDATION'
       )
     },
-    timeInReadyToPrint(timeLoggedResponse: ITimeLoggedResponse[]) {
+    timeInReadyToPrint(timeLoggedResponse: IEventDurationResponse[]) {
       return getTimeLoggedDataByStatus(timeLoggedResponse, 'REGISTERED')
     }
   }

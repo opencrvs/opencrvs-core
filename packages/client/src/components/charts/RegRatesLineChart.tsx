@@ -29,7 +29,8 @@ interface IActiveState {
   stroke: string
 }
 interface IState {
-  marginLeft: number
+  legendMarginTop: number
+  legendMarginLeft: number
   chartTop: number
   chartRight: number
   chartBottom: number
@@ -44,9 +45,10 @@ interface IState {
 
 const CustomLegendContainer = styled.div<{
   marginLeft: number
+  marginTop: number
 }>`
-  margin-bottom: 8px;
-  margin-left: ${({ marginLeft }) => `${marginLeft}px`};
+  margin: ${({ marginTop, marginLeft }) =>
+    `${marginTop}px 40px 8px ${marginLeft}px`};
   color: ${({ theme }) => theme.colors.copy};
 `
 
@@ -54,7 +56,7 @@ const LegendHeader = styled.div`
   padding-bottom: 8px;
   margin-bottom: 8px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.silverSand};
-  ${({ theme }) => theme.fonts.subtitleStyle};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
 `
 
 const LegendDetails = styled.div`
@@ -63,14 +65,14 @@ const LegendDetails = styled.div`
 `
 
 const LegendDataLabel = styled.span`
-  ${({ theme }) => theme.fonts.captionStyle}
+  ${({ theme }) => theme.fonts.chartLegendStyle}
 `
 const LegendDataValue = styled.span`
   ${({ theme }) => theme.fonts.bigBodyBoldStyle}
 `
 
 const LegendData = styled.div`
-  padding: 0 4px;
+  padding: 0 8px;
   width: 100%;
   ${({ theme }) => theme.fonts.captionStyle};
 `
@@ -146,8 +148,9 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
 
   getStatePropertiesForSmallWindowChart = () => {
     return {
-      marginLeft: 0,
-      chartTop: 40,
+      legendMarginTop: -16,
+      legendMarginLeft: 0,
+      chartTop: 32,
       chartRight: 40,
       chartBottom: 40,
       chartLeft: 40,
@@ -157,8 +160,9 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
   }
   getStatePropertiesForLargeWindowChart = () => {
     return {
-      marginLeft: 8,
-      chartTop: 40,
+      legendMarginTop: -16,
+      legendMarginLeft: 54,
+      chartTop: 32,
       chartRight: 80,
       chartBottom: 40,
       chartLeft: 10,
@@ -209,7 +213,10 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
     } = this.state.activeLabel ? this.state : this.getLatestData()
     const { intl, eventType } = this.props
     return (
-      <CustomLegendContainer marginLeft={this.state.marginLeft}>
+      <CustomLegendContainer
+        marginLeft={this.state.legendMarginLeft}
+        marginTop={this.state.legendMarginTop}
+      >
         <LegendHeader>{activeLabel}</LegendHeader>
         <LegendDetails>
           <div>
@@ -293,7 +300,10 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
     return (
       <LoadingIndicator id="reg-rates-line-chart-loader" flexDirection="column">
         <LegendLoadingIndicator>
-          <CustomLegendContainer marginLeft={this.state.marginLeft}>
+          <CustomLegendContainer
+            marginLeft={this.state.legendMarginLeft}
+            marginTop={this.state.legendMarginTop}
+          >
             <LegendHeader>
               <LoaderBox width={40} />
             </LegendHeader>
@@ -346,7 +356,10 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
       <LoadingIndicator id="reg-rates-line-chart-loader" flexDirection="row">
         <DesktopChartLoadingIndicator />
         <LegendLoadingIndicator>
-          <CustomLegendContainer marginLeft={this.state.marginLeft}>
+          <CustomLegendContainer
+            marginLeft={this.state.legendMarginLeft}
+            marginTop={this.state.legendMarginTop}
+          >
             <LegendHeader>
               <LoaderBox width={60} />
             </LegendHeader>

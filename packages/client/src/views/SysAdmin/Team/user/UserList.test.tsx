@@ -22,6 +22,7 @@ import { History } from 'history'
 import querystring from 'query-string'
 import * as React from 'react'
 import { UserList } from './UserList'
+import { userMutations } from '@client/user/mutations'
 
 describe('User list tests', () => {
   let store: AppStore
@@ -513,6 +514,7 @@ describe('User list tests', () => {
     })
 
     describe('when there is a result from query', () => {
+      userMutations.resendSMSInvite = jest.fn()
       let component: ReactWrapper<{}, {}>
       const userListMock = [
         {
@@ -667,7 +669,10 @@ describe('User list tests', () => {
         expect(history.location.pathname).toMatch(/.user\/(\w)+\/preview\/*/)
       })
 
-      it('clicking on menu options deactivate to user pops up audit action modal', async () => {
+      it('clicking on menu options Resend SMS invite sends invite', async () => {
+        ;(userMutations.resendSMSInvite as jest.Mock).mockResolvedValueOnce({
+          data: { resendSMSInvite: 'true' }
+        })
         const toggleButtonElement = await waitForElement(
           component,
           '#user-item-1-menuToggleButton'
@@ -677,6 +682,51 @@ describe('User list tests', () => {
         const menuOptionButton = await waitForElement(
           component,
           '#user-item-1-menuItem1'
+        )
+        expect(menuOptionButton.hostNodes().text()).toBe('Resend SMS invite')
+        menuOptionButton.hostNodes().simulate('click')
+        await flushPromises()
+        component.update()
+        const successToast = await waitForElement(
+          component,
+          '#resend_invite_success'
+        )
+      })
+
+      it('clicking on menu options Resend SMS invite shows error if any submission error', async () => {
+        ;(userMutations.resendSMSInvite as jest.Mock).mockRejectedValueOnce(
+          new Error('Something went wrong')
+        )
+        const toggleButtonElement = await waitForElement(
+          component,
+          '#user-item-1-menuToggleButton'
+        )
+
+        toggleButtonElement.hostNodes().simulate('click')
+        const menuOptionButton = await waitForElement(
+          component,
+          '#user-item-1-menuItem1'
+        )
+        expect(menuOptionButton.hostNodes().text()).toBe('Resend SMS invite')
+        menuOptionButton.hostNodes().simulate('click')
+        await flushPromises()
+        component.update()
+        const errorToast = await waitForElement(
+          component,
+          '#resend_invite_error'
+        )
+      })
+
+      it('clicking on menu options deactivate to user pops up audit action modal', async () => {
+        const toggleButtonElement = await waitForElement(
+          component,
+          '#user-item-1-menuToggleButton'
+        )
+
+        toggleButtonElement.hostNodes().simulate('click')
+        const menuOptionButton = await waitForElement(
+          component,
+          '#user-item-1-menuItem2'
         )
         expect(menuOptionButton.hostNodes().text()).toBe('Deactivate')
         menuOptionButton.hostNodes().simulate('click')

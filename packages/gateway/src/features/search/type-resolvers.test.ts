@@ -678,13 +678,13 @@ describe('Search type resolvers', () => {
           {
             time: '123',
             status: 'dummy_status_1',
-            timeSpentEditing: '50'
+            durationInSeconds: '50'
           },
 
           {
             time: '456',
             status: 'dummy_status_2',
-            timeSpentEditing: '100'
+            durationInSeconds: '100'
           }
         ])
       )
@@ -701,13 +701,13 @@ describe('Search type resolvers', () => {
         {
           time: '123',
           status: 'dummy_status_1',
-          timeSpentEditing: '50'
+          durationInSeconds: '50'
         },
 
         {
           time: '456',
           status: 'dummy_status_2',
-          timeSpentEditing: '100'
+          durationInSeconds: '100'
         }
       ])
     })
@@ -717,33 +717,33 @@ describe('Search type resolvers', () => {
       {
         time: 1,
         status: 'IN_PROGRESS',
-        timeSpentEditing: 50
+        durationInSeconds: 50
       },
 
       {
         time: 2,
         status: 'DECLARED',
-        timeSpentEditing: 100
+        durationInSeconds: 100
       },
       {
         time: 3,
         status: 'REJECTED',
-        timeSpentEditing: 150
+        durationInSeconds: 150
       },
       {
         time: 4,
         status: 'VALIDATED',
-        timeSpentEditing: 200
+        durationInSeconds: 200
       },
       {
         time: 5,
         status: 'WAITING_FOR_VALIDATION',
-        timeSpentEditing: 250
+        durationInSeconds: 250
       },
       {
         time: 6,
         status: 'REGISTERED',
-        timeSpentEditing: 300
+        durationInSeconds: 300
       }
     ]
     it('return time in progress', () => {

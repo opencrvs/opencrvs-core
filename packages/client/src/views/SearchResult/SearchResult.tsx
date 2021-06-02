@@ -213,6 +213,9 @@ export class SearchResultView extends React.Component<
           isIconColumns: true
         },
         {
+          label: this.props.intl.formatMessage(
+            registrarHomeMessages.listItemAction
+          ),
           width: 18,
           key: 'actions',
           isActionColumn: true,
@@ -371,7 +374,7 @@ export class SearchResultView extends React.Component<
       }
 
       let icon: JSX.Element = <div />
-      if (isDuplicate) {
+      if (isDuplicate && !applicationIsRegistered && !applicationIsCertified) {
         icon = <Duplicate />
       } else if (applicationIsValidated) {
         icon = <Validate data-tip data-for="validateTooltip" />

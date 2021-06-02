@@ -220,13 +220,20 @@ export const dateFormat: Validation = (value: IFormFieldValue) => {
 }
 
 export const isDateNotInFuture = (date: string) => {
-  return new Date(date) <= new Date(new Date())
+  return new Date(date) <= new Date(Date.now())
 }
 
 export const isDateNotBeforeBirth = (date: string, drafts: IFormData) => {
   const birthDate = drafts.deceased && drafts.deceased.birthDate
   return birthDate
     ? new Date(date) >= new Date(JSON.stringify(birthDate))
+    : true
+}
+
+export const isDateNotAfterBirthEvent = (date: string, drafts?: IFormData) => {
+  const dateOfBirth = drafts && drafts.child && drafts.child.childBirthDate
+  return dateOfBirth
+    ? new Date(date) <= new Date(JSON.stringify(dateOfBirth))
     : true
 }
 
@@ -261,7 +268,10 @@ export const isValidBirthDate: Validation = (
   const cast = value as string
   return !cast
     ? { message: messages.required }
-    : cast && isDateNotInFuture(cast) && isAValidDateFormat(cast)
+    : cast &&
+      isDateNotInFuture(cast) &&
+      isAValidDateFormat(cast) &&
+      isDateNotAfterBirthEvent(cast, drafts as IFormData)
     ? isDateNotAfterDeath(cast, drafts as IFormData)
       ? undefined
       : {
@@ -442,8 +452,12 @@ export const dateFormatIsCorrect = (): Validation => (value: IFormFieldValue) =>
 // Each character has to be a part of the Unicode Bengali script or the hyphen.
 
 export const isValidBengaliWord = (value: string): boolean => {
-  const bengaliRe = XRegExp.cache('^[\\p{Bengali}-.]+$')
-  const lettersRe = XRegExp.cache('^[\\pL\\pM-.]+$')
+  const bengaliRe = XRegExp.cache(
+    '(^[\\p{Bengali}.-]*\\([\\p{Bengali}.-]+\\)[\\p{Bengali}.-]*$)|(^[\\p{Bengali}.-]+$)'
+  )
+  const lettersRe = XRegExp.cache(
+    '(^[\\pL\\pM.-]*\\([\\pL\\pM.-]+\\)[\\pL\\pM.-]*$)|(^[\\pL\\pM.-]+$)'
+  )
 
   return bengaliRe.test(value) && lettersRe.test(value)
 }
@@ -453,7 +467,9 @@ export const isValidBengaliWord = (value: string): boolean => {
 //
 export const isValidEnglishWord = (value: string): boolean => {
   // Still using XRegExp for its caching ability
-  const englishRe = XRegExp.cache('^[\\p{Latin}-.]+$')
+  const englishRe = XRegExp.cache(
+    '(^[\\p{Latin}.-]*\\([\\p{Latin}.-]+\\)[\\p{Latin}.-]*$)|(^[\\p{Latin}.-]+$)'
+  )
 
   return englishRe.test(value)
 }
@@ -608,4 +624,13 @@ export const greaterThanZero: Validation = (value: IFormFieldValue) => {
     : value && Number(value) > 0
     ? undefined
     : { message: messages.greaterThanZero }
+}
+
+export const notGreaterThan = (maxValue: number): Validation => (
+  value: IFormFieldValue
+) => {
+  const numericValue = Number.parseInt(value as string)
+  return value && !Number.isNaN(numericValue) && numericValue <= maxValue
+    ? undefined
+    : { message: messages.notGreaterThan, props: { maxValue } }
 }

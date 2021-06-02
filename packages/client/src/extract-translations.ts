@@ -14,49 +14,33 @@ import * as fs from 'fs'
 import glob from 'glob'
 import main, { Message } from 'typescript-react-intl'
 import chalk from 'chalk'
-import { Parser } from 'json2csv'
 import { ILanguage } from '@client/i18n/reducer'
 
-interface ITranslationCSVItem {
-  Translation_Key: string
-  Value: string
-  Description: string
-}
-
-interface IMessages {
+interface IReactIntlDescriptions {
   [key: string]: string
 }
 
-interface IReactIntlSource {
-  [key: string]: {
-    defaultMessage: string
-    description: string
+function existsInContentful(obj: any, value: string): boolean {
+  if (Object.values(obj).indexOf(value) > -1) {
+    return true
   }
-}
-
-function buildTranslationsCSVData(
-  translations: IMessages,
-  source: IReactIntlSource
-): ITranslationCSVItem[] {
-  const data: ITranslationCSVItem[] = []
-  Object.keys(source).forEach(key => {
-    const translation: ITranslationCSVItem = {
-      // eslint-disable-next-line @typescript-eslint/camelcase
-      Translation_Key: key,
-      Value: translations[key],
-      // eslint-disable-line no-string-literal
-      Description: source[key]['description']
-    }
-    data.push(translation)
-  })
-  return data
+  return false
 }
 
 async function extractMessages() {
-  const register = JSON.parse(
+  const RESOURCES_PATH = process.argv[2]
+  const COUNTRY_CODE = process.argv[3]
+  const client = JSON.parse(
     fs
       .readFileSync(
-        '../resources/src/bgd/features/languages/generated/register.json'
+        `${RESOURCES_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/client.json`
+      )
+      .toString()
+  )
+  const contentfulIds = JSON.parse(
+    fs
+      .readFileSync(
+        `${RESOURCES_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/contentful-ids.json`
       )
       .toString()
   )
@@ -75,47 +59,47 @@ async function extractMessages() {
         var res = main(contents)
         results = results.concat(res)
       })
-      const reactIntlSource: IReactIntlSource = {}
+      const reactIntlDescriptions: IReactIntlDescriptions = {}
       results.forEach(r => {
-        reactIntlSource[r.id] = {
-          defaultMessage: r.defaultMessage,
-          description: r.description
-        }
+        reactIntlDescriptions[r.id] = r.description
       })
-      const englishTranslations = register.data.find(
-        (obj: ILanguage) => obj.lang === 'en'
-      ).messages
-      const bengaliTranslations = register.data.find(
-        (obj: ILanguage) => obj.lang === 'bn'
+      const contentfulKeysToMigrate: string[] = []
+      const englishTranslations = client.data.find(
+        (obj: ILanguage) => obj.lang === 'en-US'
       ).messages
       let missingKeys = false
 
-      Object.keys(reactIntlSource).forEach(key => {
+      Object.keys(reactIntlDescriptions).forEach(key => {
         if (!englishTranslations.hasOwnProperty(key)) {
           missingKeys = true
           // eslint-disable-line no-console
           console.log(
             `${chalk.red(
-              `No English translation key exists for message id: ${chalk.white(
+              `No English translation key exists for message id.  Remeber to translate and add for all locales!!!: ${chalk.white(
                 key
               )} in ${chalk.white(
-                'resources/src/bgd/features/languages/generated/register.json'
+                `${RESOURCES_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/client.json`
               )}`
             )}`
           )
         }
-        if (!bengaliTranslations.hasOwnProperty(key)) {
-          missingKeys = true
-          // eslint-disable-line no-console
+
+        if (contentfulIds && !existsInContentful(contentfulIds, key)) {
           console.log(
-            `${chalk.redBright(
-              `No Bengali translation key exists for message id: ${chalk.white(
+            `${chalk.red(
+              `You have set up a Contentful Content Management System.  OpenCRVS core has created this new key in this version: ${chalk.white(
                 key
-              )} in ${chalk.yellow(
-                `resources/src/bgd/features/languages/generated/register.json`
-              )}`
+              )} in ${chalk.white(`${key}`)}`
             )}`
           )
+          console.log(
+            `${chalk.yellow(
+              'This key must be migrated into your Contentful CMS.  Saving to ...'
+            )} in ${chalk.white(
+              `${RESOURCES_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/contentful-keys-to-migrate.json`
+            )}`
+          )
+          contentfulKeysToMigrate.push(key)
         }
       })
 
@@ -130,22 +114,13 @@ async function extractMessages() {
         return
       }
 
-      const fields = ['Translation_Key', 'Value', 'Description']
-
-      const json2csvParser = new Parser({ fields })
-      const bengaliLanguageCSV = json2csvParser.parse(
-        buildTranslationsCSVData(bengaliTranslations, reactIntlSource)
+      fs.writeFileSync(
+        `${RESOURCES_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/descriptions.json`,
+        JSON.stringify({ data: reactIntlDescriptions }, null, 2)
       )
       fs.writeFileSync(
-        `../resources/src/bgd/features/languages/generated/bn.csv`,
-        bengaliLanguageCSV
-      )
-      const englishLanguageCSV = json2csvParser.parse(
-        buildTranslationsCSVData(englishTranslations, reactIntlSource)
-      )
-      fs.writeFileSync(
-        `../resources/src/bgd/features/languages/generated/en.csv`,
-        englishLanguageCSV
+        `${RESOURCES_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/contentful-keys-to-migrate.json`,
+        JSON.stringify(contentfulKeysToMigrate, null, 2)
       )
     })
   } catch (err) {

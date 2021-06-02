@@ -2036,6 +2036,24 @@ describe('Registration root resolvers', () => {
         ],
         [
           JSON.stringify({
+            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
+            resourceType: 'Composition',
+            identifier: {
+              system: 'urn:ietf:rfc:3986',
+              value: 'DewpkiM'
+            },
+            relatesTo: [
+              {
+                code: 'duplicate',
+                targetReference: {
+                  reference: 'Composition/5e3815d1-d039-4399-b47d-af9a9f51993b'
+                }
+              }
+            ]
+          })
+        ],
+        [
+          JSON.stringify({
             resourceType: 'Bundle',
             entry: [
               {
@@ -2062,6 +2080,58 @@ describe('Registration root resolvers', () => {
 
       expect(result).toBeDefined()
       expect(result).toBe('1648b1fb-bad4-4b98-b8a3-bd7ceee496b6')
+    })
+
+    it('throws error from fhir', async () => {
+      fetch.mockResponses([
+        () => Promise.reject(new Error('Some error in fhir'))
+      ])
+
+      await expect(
+        resolvers.Mutation.notADuplicate(
+          {},
+          {
+            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
+            duplicateId: '5e3815d1-d039-4399-b47d-af9a9f51993b'
+          },
+          authHeaderRegCert
+        )
+      ).rejects.toThrowError('FHIR request failed: Some error')
+    })
+
+    it('throws error from search', async () => {
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
+            resourceType: 'Composition',
+            identifier: {
+              system: 'urn:ietf:rfc:3986',
+              value: 'DewpkiM'
+            },
+            relatesTo: [
+              {
+                code: 'duplicate',
+                targetReference: {
+                  reference: 'Composition/5e3815d1-d039-4399-b47d-af9a9f51993b'
+                }
+              }
+            ]
+          })
+        ],
+        [() => Promise.reject(new Error('Some error from search'))]
+      )
+
+      await expect(
+        resolvers.Mutation.notADuplicate(
+          {},
+          {
+            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
+            duplicateId: '5e3815d1-d039-4399-b47d-af9a9f51993b'
+          },
+          authHeaderRegCert
+        )
+      ).rejects.toThrowError('Search request failed: Some error from search')
     })
 
     it("throws an error when the user doesn't have register scope", async () => {

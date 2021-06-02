@@ -111,8 +111,12 @@ async function updateEvent(task: fhir.Task, authHeader: string) {
     task.businessStatus.coding &&
     task.businessStatus.coding[0].code
   body.modifiedAt = Date.now().toString()
-  const nodeText =
-    task && task.note && task.note[0].text && task.note[0].text.split('&')
+  const rejectAnnotation: fhir.Annotation = (task &&
+    task.note &&
+    task.note.find(({ text }) =>
+      /^reason=\S+(&comment=[\w\s]+)?$/.test(text)
+    )) || { text: '' }
+  const nodeText = rejectAnnotation.text.split('&')
   body.rejectReason = nodeText && nodeText[0] && nodeText[0].split('=')[1]
   body.rejectComment = nodeText && nodeText[1] && nodeText[1].split('=')[1]
   body.updatedBy =

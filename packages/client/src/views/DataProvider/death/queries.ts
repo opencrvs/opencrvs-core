@@ -239,12 +239,6 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         contact
         contactRelationship
         contactPhoneNumber
-        attachments {
-          data
-          type
-          contentType
-          subject
-        }
         status {
           comments {
             comment

@@ -15,20 +15,35 @@ import { ExpansionButton } from './ExpansionButton'
 import { ArrowExpansionButton } from './ArrowExpansionButton'
 import { IAction, IActionComponent } from '../interface/ListItem'
 import { PrimaryButton } from './PrimaryButton'
+import { ColumnContentAlignment } from '../interface'
 
 const Container = styled.div`
   background: ${({ theme }) => theme.colors.white};
   display: flex;
   flex-direction: row;
-  justify-content: flex-end;
   align-items: center;
   margin-left: 1px;
-  padding-left: 8px;
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin-left: 0px;
     padding-left: 0px;
   }
+`
+
+const ListItemActionsContainer = styled.div<{
+  alignment?: ColumnContentAlignment
+}>`
+  display: flex;
+  flex: 1;
+  justify-content: ${({ alignment }) => {
+    if (alignment === ColumnContentAlignment.LEFT) {
+      return 'flex-start'
+    } else if (alignment === ColumnContentAlignment.CENTER) {
+      return alignment
+    } else {
+      return 'flex-end'
+    }
+  }};
 `
 const ListItemSingleAction = styled(PrimaryButton)<{
   isFullHeight?: boolean
@@ -54,6 +69,7 @@ interface IListItemActionProps {
   arrowExpansion?: boolean
   isFullHeight?: boolean
   onExpand?: () => void
+  alignment?: ColumnContentAlignment
 }
 
 function isActionComponent(action: IAction): action is IActionComponent {
@@ -67,26 +83,29 @@ export function ListItemAction(props: IListItemActionProps) {
     arrowExpansion,
     onExpand,
     id,
-    isFullHeight
+    isFullHeight,
+    alignment
   } = props
   return (
     <Container id={id}>
-      {actions &&
-        actions.map((action: IAction) =>
-          isActionComponent(action) ? (
-            React.cloneElement(action.actionComponent, { id })
-          ) : (
-            <ListItemSingleAction
-              isFullHeight={isFullHeight}
-              key={action.label as string}
-              id={`${id}-${action.label as string}`}
-              onClick={action.handler}
-              icon={action.icon}
-            >
-              {action.label}
-            </ListItemSingleAction>
-          )
-        )}
+      <ListItemActionsContainer alignment={alignment}>
+        {actions &&
+          actions.map((action: IAction) =>
+            isActionComponent(action) ? (
+              React.cloneElement(action.actionComponent, { id })
+            ) : (
+              <ListItemSingleAction
+                isFullHeight={isFullHeight}
+                key={action.label as string}
+                id={`${id}-${action.label as string}`}
+                onClick={action.handler}
+                icon={action.icon}
+              >
+                {action.label}
+              </ListItemSingleAction>
+            )
+          )}
+      </ListItemActionsContainer>
       {onExpand &&
         ((arrowExpansion && (
           <ArrowExpansionSecion

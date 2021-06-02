@@ -26,6 +26,7 @@ interface IValidationMessages {
   isDateNotBeforeBirth: MessageDescriptor
   maxLength: MessageDescriptor
   minLength: MessageDescriptor
+  notGreaterThan: MessageDescriptor
   numberRequired: MessageDescriptor
   phoneNumberFormat: MessageDescriptor
   range: MessageDescriptor
@@ -129,6 +130,12 @@ const messagesToDefine: IValidationMessages = {
     description:
       'The error message that appears on fields with a minimum length',
     id: 'validations.minLength'
+  },
+  notGreaterThan: {
+    defaultMessage: 'Must not be more than {maxValue}',
+    description:
+      'The error message that appears on numeric fields that exceed a limit',
+    id: 'validations.notGreaterThan'
   },
   numberRequired: {
     defaultMessage: 'Must be a number',
