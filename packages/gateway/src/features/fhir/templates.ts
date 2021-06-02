@@ -211,8 +211,16 @@ export function updateTaskTemplate(
   }
   task.businessStatus.coding[0].code = status
   if (comment || reason) {
+    if (!task.reason) {
+      task.reason = {
+        text: ''
+      }
+    }
+
+    task.reason.text = reason || ''
+
     const newNote: fhir.Annotation = {
-      text: `reason=${reason ? reason : ''}&comment=${comment ? comment : ''}`,
+      text: comment ? comment : '',
       time: new Date().toUTCString(),
       authorString: ''
     }

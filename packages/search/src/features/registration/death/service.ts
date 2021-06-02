@@ -21,7 +21,8 @@ import {
   ICompositionBody,
   IDeathCompositionBody,
   IOperationHistory,
-  NAME_EN
+  NAME_EN,
+  REJECTED_STATUS
 } from '@search/elasticsearch/utils'
 import {
   findEntry,
@@ -102,9 +103,19 @@ async function updateEvent(task: fhir.Task, authHeader: string) {
     task.businessStatus.coding[0].code
   body.modifiedAt = Date.now().toString()
   const nodeText =
-    task && task.note && task.note[0].text && task.note[0].text.split('&')
-  body.rejectReason = nodeText && nodeText[0] && nodeText[0].split('=')[1]
-  body.rejectComment = nodeText && nodeText[1] && nodeText[1].split('=')[1]
+    (body.type === REJECTED_STATUS &&
+      task &&
+      task.note &&
+      task.note[0].text &&
+      task.note[0].text) ||
+    ''
+  body.rejectReason =
+    (body.type === REJECTED_STATUS &&
+      task &&
+      task.reason &&
+      task.reason.text) ||
+    ''
+  body.rejectComment = nodeText
   body.updatedBy =
     regLastUserIdentifier &&
     regLastUserIdentifier.valueReference &&

@@ -217,6 +217,7 @@ input RegWorkflowInput {
   type: RegStatus
   user: UserInput
   timestamp: Date
+  reason: String
   comments: [CommentInput]
   location: LocationInput
   timeLoggedMS: Int
@@ -228,6 +229,7 @@ type RegWorkflow { # Task
   user: User # -> extension(url='http://opencrvs.org/specs/extension/regLastUser').valueReference
   timestamp: Date # -> lastModified
   comments: [Comment] # -> .note
+  reason: String # -> .reason.text
   location: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastLocation').valueReference
   office: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastOffice').valueReference
   timeLogged: Int # -> from metrics

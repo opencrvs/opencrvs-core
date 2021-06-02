@@ -22,7 +22,8 @@ import {
   IBirthCompositionBody,
   ICompositionBody,
   NAME_EN,
-  IOperationHistory
+  IOperationHistory,
+  REJECTED_STATUS
 } from '@search/elasticsearch/utils'
 import {
   addDuplicatesToComposition,
@@ -111,14 +112,20 @@ async function updateEvent(task: fhir.Task, authHeader: string) {
     task.businessStatus.coding &&
     task.businessStatus.coding[0].code
   body.modifiedAt = Date.now().toString()
-  const rejectAnnotation: fhir.Annotation = (task &&
+  const rejectAnnotation: fhir.Annotation = (body.type === REJECTED_STATUS &&
+    task &&
     task.note &&
-    task.note.find(({ text }) =>
-      /^reason=\S+(&comment=[\w\s]+)?$/.test(text)
-    )) || { text: '' }
-  const nodeText = rejectAnnotation.text.split('&')
-  body.rejectReason = nodeText && nodeText[0] && nodeText[0].split('=')[1]
-  body.rejectComment = nodeText && nodeText[1] && nodeText[1].split('=')[1]
+    Array.isArray(task.note) &&
+    task.note.length > 0 &&
+    task.note[task.note.length - 1]) || { text: '' }
+  const nodeText = rejectAnnotation.text
+  body.rejectReason =
+    (body.type === REJECTED_STATUS &&
+      task &&
+      task.reason &&
+      task.reason.text) ||
+    ''
+  body.rejectComment = nodeText
   body.updatedBy =
     regLastUserIdentifier &&
     regLastUserIdentifier.valueReference &&

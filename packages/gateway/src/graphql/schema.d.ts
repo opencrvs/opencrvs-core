@@ -1006,6 +1006,7 @@ export interface GQLRegWorkflowInput {
   type?: GQLRegStatus
   user?: GQLUserInput
   timestamp?: GQLDate
+  reason?: string | null
   comments?: Array<GQLCommentInput | null>
   location?: GQLLocationInput
   timeLoggedMS?: number
@@ -2459,6 +2460,7 @@ export interface GQLRegWorkflowTypeResolver<TParent = any> {
   type?: RegWorkflowToTypeResolver<TParent>
   user?: RegWorkflowToUserResolver<TParent>
   timestamp?: RegWorkflowToTimestampResolver<TParent>
+  reason?: RegWorkflowToStringResolver<TParent>
   comments?: RegWorkflowToCommentsResolver<TParent>
   location?: RegWorkflowToLocationResolver<TParent>
   office?: RegWorkflowToOfficeResolver<TParent>
@@ -2478,6 +2480,10 @@ export interface RegWorkflowToUserResolver<TParent = any, TResult = any> {
 }
 
 export interface RegWorkflowToTimestampResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegWorkflowToStringResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

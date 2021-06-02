@@ -835,6 +835,7 @@ type RegWorkflow {
   user: User
   timestamp: Date
   comments: [Comment]
+  reason: String
   location: Location
   office: Location
   timeLogged: Int
@@ -1138,6 +1139,7 @@ input RegWorkflowInput {
   type: RegStatus
   user: UserInput
   timestamp: Date
+  reason: String
   comments: [CommentInput]
   location: LocationInput
   timeLoggedMS: Int
