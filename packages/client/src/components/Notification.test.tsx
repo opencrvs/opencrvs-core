@@ -16,6 +16,7 @@ import * as actions from '@client/notification/actions'
 import * as i18nActions from '@client/i18n/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
 import { AUDIT_ACTION } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
+import { waitForElement } from '@client/tests/wait-for-element'
 
 describe('when app notifies the user', () => {
   let app: ReactWrapper
@@ -163,6 +164,25 @@ describe('when app notifies the user', () => {
           store.getState().notification.userAuditSuccessToast.visible
         ).toBe(false)
       })
+    })
+  })
+
+  describe('when user successfully updates PIN', () => {
+    beforeEach(() => {
+      store.dispatch(actions.showPINUpdateSuccessToast())
+    })
+    it('shows PIN update success notification', async () => {
+      expect(await waitForElement(app, '#PINUpdateSuccessToast')).toBeDefined()
+    })
+
+    it('clicking cancel button hides PIN update success notification', async () => {
+      const cancelButtonElement = await waitForElement(
+        app,
+        '#PINUpdateSuccessToastCancel'
+      )
+      cancelButtonElement.hostNodes().simulate('click')
+      app.update()
+      expect(app.find('#PINUpdateSuccessToast').hostNodes().length).toBe(0)
     })
   })
 })

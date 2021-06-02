@@ -27,7 +27,8 @@ import {
   toggleDraftSavedNotification,
   hideSubmitFormSuccessToast,
   hideSubmitFormErrorToast,
-  hideUserAuditSuccessToast
+  hideUserAuditSuccessToast,
+  hidePINUpdateSuccessToast
 } from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
 import { NotificationState } from '@client/notification/reducer'
@@ -40,6 +41,7 @@ type NotificationProps = {
   submitFormSuccessToast: string | null
   submitFormErrorToast: string | null
   userAuditSuccessToast: NotificationState['userAuditSuccessToast']
+  showPINUpdateSuccess: boolean
 }
 
 type DispatchProps = {
@@ -49,6 +51,7 @@ type DispatchProps = {
   hideSubmitFormErrorToast: typeof hideSubmitFormErrorToast
   toggleDraftSavedNotification: typeof toggleDraftSavedNotification
   hideUserAuditSuccessToast: typeof hideUserAuditSuccessToast
+  hidePINUpdateSuccessToast: typeof hidePINUpdateSuccessToast
 }
 
 class Component extends React.Component<
@@ -87,7 +90,8 @@ class Component extends React.Component<
       saveDraftClicked,
       submitFormSuccessToast,
       submitFormErrorToast,
-      userAuditSuccessToast
+      userAuditSuccessToast,
+      showPINUpdateSuccess
     } = this.props
 
     return (
@@ -159,6 +163,16 @@ class Component extends React.Component<
             })}
           </FloatingNotification>
         )}
+        {showPINUpdateSuccess && (
+          <FloatingNotification
+            id="PINUpdateSuccessToast"
+            show={showPINUpdateSuccess}
+            type={NOTIFICATION_TYPE.SUCCESS}
+            callback={this.props.hidePINUpdateSuccessToast}
+          >
+            {intl.formatMessage(messages.updatePINSuccess)}
+          </FloatingNotification>
+        )}
         {/* More notification types can be added here */}
       </div>
     )
@@ -174,7 +188,8 @@ const mapStateToProps = (store: IStoreState) => {
     saveDraftClicked: store.notification.saveDraftClicked,
     submitFormSuccessToast: store.notification.submitFormSuccessToast,
     submitFormErrorToast: store.notification.submitFormErrorToast,
-    userAuditSuccessToast: store.notification.userAuditSuccessToast
+    userAuditSuccessToast: store.notification.userAuditSuccessToast,
+    showPINUpdateSuccess: store.notification.showPINUpdateSuccess
   }
 }
 
@@ -187,7 +202,8 @@ export const NotificationComponent = withRouter(
       hideSubmitFormSuccessToast,
       hideSubmitFormErrorToast,
       toggleDraftSavedNotification,
-      hideUserAuditSuccessToast
+      hideUserAuditSuccessToast,
+      hidePINUpdateSuccessToast
     }
   )(injectIntl(Component))
 )

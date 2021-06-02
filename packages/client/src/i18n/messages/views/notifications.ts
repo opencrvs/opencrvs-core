@@ -15,6 +15,7 @@ interface INotificationsMessages {
   declarationsSynced: MessageDescriptor
   draftsSaved: MessageDescriptor
   outboxText: MessageDescriptor
+  updatePINSuccess: MessageDescriptor
   processingText: MessageDescriptor
   statusRegistering: MessageDescriptor
   statusRejecting: MessageDescriptor
@@ -47,6 +48,11 @@ const messagesToDefine: INotificationsMessages = {
     defaultMessage: 'Outbox({num})',
     description: 'Application outbox text',
     id: 'misc.notif.outboxText'
+  },
+  updatePINSuccess: {
+    defaultMessage: 'Your pin has been successfully updated',
+    description: 'Label for update PIN success notification toast',
+    id: 'misc.notif.updatePINSuccess'
   },
   processingText: {
     defaultMessage: '{num} application processing...',
