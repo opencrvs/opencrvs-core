@@ -20,7 +20,7 @@ import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import * as React from 'react'
 import { PerformanceHome } from './PerformanceHome'
-import querystring from 'query-string'
+import { stringify } from 'query-string'
 
 describe('Performance home test', () => {
   describe('Performance home without location in props', () => {
@@ -28,10 +28,9 @@ describe('Performance home test', () => {
     let app: ReactWrapper
 
     beforeAll(async () => {
-      app = (await createTestComponent(
-        <PerformanceHome history={history} />,
-        store
-      )).component
+      app = (
+        await createTestComponent(<PerformanceHome history={history} />, store)
+      ).component
       app.update()
     })
 

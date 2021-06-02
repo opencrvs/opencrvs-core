@@ -374,11 +374,13 @@ describe('SearchResult tests', () => {
     ).toBe('An error occurred while searching')
   })
   it('renders empty search page with a header in small devices', async () => {
-    const testSearchResultComponent = (await createTestComponent(
-      // @ts-ignore
-      <SearchResult match={{ params: {} }} />,
-      store
-    )).component
+    const testSearchResultComponent = (
+      await createTestComponent(
+        // @ts-ignore
+        <SearchResult match={{ params: {} }} />,
+        store
+      )
+    ).component
 
     Object.defineProperty(window, 'innerWidth', {
       writable: true,

@@ -19,7 +19,7 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { SEARCH_USERS } from '@client/user/queries'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
-import querystring from 'query-string'
+import { stringify } from 'query-string'
 import * as React from 'react'
 import { UserList } from './UserList'
 import { userMutations } from '@client/user/mutations'
@@ -60,7 +60,7 @@ describe('User list tests', () => {
         <UserList
           // @ts-ignore
           location={{
-            search: querystring.stringify({
+            search: stringify({
               locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
             })
           }}
@@ -107,7 +107,7 @@ describe('User list tests', () => {
         <UserList
           // @ts-ignore
           location={{
-            search: querystring.stringify({
+            search: stringify({
               locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
               viewOnly: true
             })
@@ -143,7 +143,7 @@ describe('User list tests', () => {
         <UserList
           // @ts-ignore
           location={{
-            search: querystring.stringify({
+            search: stringify({
               locationId: '0d8474da-0361-4d32-979e-af91f012340a'
             })
           }}
@@ -184,7 +184,7 @@ describe('User list tests', () => {
         <UserList
           // @ts-ignore
           location={{
-            search: querystring.stringify({
+            search: stringify({
               locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
             })
           }}
@@ -229,7 +229,7 @@ describe('User list tests', () => {
         <UserList
           // @ts-ignore
           location={{
-            search: querystring.stringify({
+            search: stringify({
               locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
             })
           }}
@@ -358,7 +358,7 @@ describe('User list tests', () => {
           <UserList
             // @ts-ignore
             location={{
-              search: querystring.stringify({
+              search: stringify({
                 locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
               })
             }}
@@ -401,7 +401,7 @@ describe('User list tests', () => {
           <UserList
             // @ts-ignore
             location={{
-              search: querystring.stringify({
+              search: stringify({
                 locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
               })
             }}
@@ -431,7 +431,7 @@ describe('User list tests', () => {
           <UserList
             // @ts-ignore
             location={{
-              search: querystring.stringify({
+              search: stringify({
                 locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
               })
             }}
@@ -461,7 +461,7 @@ describe('User list tests', () => {
           <UserList
             // @ts-ignore
             location={{
-              search: querystring.stringify({
+              search: stringify({
                 locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
                 viewOnly: true
               })
@@ -492,7 +492,7 @@ describe('User list tests', () => {
           <UserList
             // @ts-ignore
             location={{
-              search: querystring.stringify({
+              search: stringify({
                 locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
               })
             }}
@@ -617,7 +617,7 @@ describe('User list tests', () => {
           <UserList
             // @ts-ignore
             location={{
-              search: querystring.stringify({
+              search: stringify({
                 locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
               })
             }}
@@ -871,7 +871,7 @@ describe('User list tests', () => {
         <UserList
           // @ts-ignore
           location={{
-            search: querystring.stringify({
+            search: stringify({
               locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
             })
           }}
@@ -1064,7 +1064,7 @@ describe('User list tests', () => {
         <UserList
           // @ts-ignore
           location={{
-            search: querystring.stringify({
+            search: stringify({
               locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
             })
           }}
@@ -1490,7 +1490,7 @@ describe('User list tests', () => {
         <UserList
           // @ts-ignore
           location={{
-            search: querystring.stringify({
+            search: stringify({
               locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
             })
           }}

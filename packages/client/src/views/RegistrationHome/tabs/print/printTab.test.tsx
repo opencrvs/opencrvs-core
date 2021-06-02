@@ -421,10 +421,9 @@ describe('RegistrarHome ready to print tab related tests', () => {
         store
       )
 
-      const instance = (await waitForElement(
-        testComponent.component,
-        GridTable
-      )).instance() as any
+      const instance = (
+        await waitForElement(testComponent.component, GridTable)
+      ).instance() as any
 
       instance.toggleExpanded('956281c9-1f47-4c26-948a-970dd23c4094')
 

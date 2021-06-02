@@ -128,7 +128,7 @@ const messagesToDefine: IErrorMessages = {
     id: 'error.page.load.failed'
   },
   passwordSubmissionError: {
-    defaultMessage: 'Sorry that password did not work',
+    defaultMessage: 'The password you entered was incorrect',
     description: 'Error message when password verification fails',
     id: 'error.passwordSubmissionError'
   }

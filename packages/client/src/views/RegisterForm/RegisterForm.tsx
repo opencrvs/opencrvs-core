@@ -962,16 +962,13 @@ export const RegisterForm = connect<
   DispatchProps,
   FullProps,
   IStoreState
->(
-  mapStateToProps,
-  {
-    writeApplication,
-    modifyApplication,
-    deleteApplication,
-    goToPageGroup: goToPageGroupAction,
-    goBack: goBackAction,
-    goToHome,
-    goToHomeTab,
-    toggleDraftSavedNotification
-  }
-)(injectIntl<'intl', FullProps>(RegisterFormView))
+>(mapStateToProps, {
+  writeApplication,
+  modifyApplication,
+  deleteApplication,
+  goToPageGroup: goToPageGroupAction,
+  goBack: goBackAction,
+  goToHome,
+  goToHomeTab,
+  toggleDraftSavedNotification
+})(injectIntl<'intl', FullProps>(RegisterFormView))

@@ -145,9 +145,6 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const PerformanceHome = connect(
-  mapStateToProps,
-  {
-    goToOperationalReport
-  }
-)(injectIntl(PerformanceHomeComponent))
+export const PerformanceHome = connect(mapStateToProps, {
+  goToOperationalReport
+})(injectIntl(PerformanceHomeComponent))

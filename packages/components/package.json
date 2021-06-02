@@ -33,7 +33,7 @@
     "rc-menu": "^7.4.13",
     "rc-progress": "^2.5.2",
     "react": "^16.10.1",
-    "react-dev-utils": "^5.0.1",
+    "react-dev-utils": "^11.0.4",
     "react-docgen-typescript": "^1.7.0",
     "react-dom": "^16.10.1",
     "react-intl": "^3.1.13",

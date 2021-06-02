@@ -26,6 +26,9 @@ export const HIDE_SUBMIT_FORM_ERROR_TOAST = 'HIDE_SUBMIT_FORM_ERROR_TOAST '
 export const SHOW_USER_AUDIT_SUCCESS_TOAST = 'SHOW_USER_AUDIT_SUCCESS_TOAST'
 export const HIDE_USER_AUDIT_SUCCESS_TOAST = 'HIDE_USER_AUDIT_SUCCESS_TOAST'
 
+export const SHOW_PIN_UPDATE_SUCCESS = 'SHOW_PIN_UPDATE_SUCCESS'
+export const HIDE_PIN_UPDATE_SUCCESS = 'HIDE_PIN_UPDATE_SUCCESS'
+
 export type ShowConfigurationErrorAction = {
   type: typeof SHOW_CONFIG_ERROR
 }
@@ -145,6 +148,21 @@ export const hideUserAuditSuccessToast = (): HideUserAuditSuccessToast => ({
   type: HIDE_USER_AUDIT_SUCCESS_TOAST
 })
 
+export type ShowPINUpdateSuccessAction = {
+  type: typeof SHOW_PIN_UPDATE_SUCCESS
+}
+
+export type HidePINUpdateSuccessAction = {
+  type: typeof HIDE_PIN_UPDATE_SUCCESS
+}
+export const showPINUpdateSuccessToast = (): ShowPINUpdateSuccessAction => ({
+  type: SHOW_PIN_UPDATE_SUCCESS
+})
+
+export const hidePINUpdateSuccessToast = (): HidePINUpdateSuccessAction => ({
+  type: HIDE_PIN_UPDATE_SUCCESS
+})
+
 export type Action =
   | ShowBackgroundSyncedAction
   | HideBackgroundSyncedAction
@@ -158,3 +176,5 @@ export type Action =
   | HideSubmitFormErrorToast
   | ShowUserAuditSuccessToast
   | HideUserAuditSuccessToast
+  | ShowPINUpdateSuccessAction
+  | HidePINUpdateSuccessAction

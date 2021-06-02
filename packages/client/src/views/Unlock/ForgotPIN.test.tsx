@@ -94,10 +94,15 @@ describe('ForgotPIN tests', () => {
   })
 
   beforeEach(async () => {
-    component = (await createTestComponent(
-      <ForgotPIN goBack={goBackMock} onVerifyPassword={onVerifyPasswordMock} />,
-      store
-    )).component
+    component = (
+      await createTestComponent(
+        <ForgotPIN
+          goBack={goBackMock}
+          onVerifyPassword={onVerifyPasswordMock}
+        />,
+        store
+      )
+    ).component
 
     // wait for mocked data to load mockedProvider
     await new Promise(resolve => {
@@ -161,7 +166,7 @@ describe('ForgotPIN tests', () => {
     const formError = await waitForElement(component, '#form_error')
     expect(formError.hostNodes()).toHaveLength(1)
     expect(formError.hostNodes().text()).toBe(
-      'Sorry that password did not work'
+      'The password you entered was incorrect'
     )
   })
 

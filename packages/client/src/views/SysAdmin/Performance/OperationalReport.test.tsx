@@ -21,7 +21,7 @@ import {
   OPERATIONAL_REPORT_SECTION
 } from './OperationalReport'
 import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
-import querystring from 'query-string'
+import { stringify } from 'query-string'
 import { OPERATIONAL_REPORTS_METRICS } from './metricsQuery'
 import { GraphQLError } from 'graphql'
 
@@ -89,7 +89,7 @@ describe('OperationalReport tests', () => {
       <OperationalReport
         // @ts-ignore
         location={{
-          search: querystring.stringify({
+          search: stringify({
             locationId: LOCATION_DHAKA_DIVISION.id,
             sectionId: OPERATIONAL_REPORT_SECTION.OPERATIONAL,
             timeEnd: new Date(1487076708000).toISOString(),
@@ -280,7 +280,7 @@ describe('OperationalReport reports tests', () => {
       <OperationalReport
         // @ts-ignore
         location={{
-          search: querystring.stringify({
+          search: stringify({
             locationId: LOCATION_DHAKA_DIVISION.id,
             sectionId: OPERATIONAL_REPORT_SECTION.REPORTS,
             timeEnd: new Date(1487076708000).toISOString(),
@@ -336,7 +336,7 @@ describe('Test error toast notification', () => {
       <OperationalReport
         // @ts-ignore
         location={{
-          search: querystring.stringify({
+          search: stringify({
             locationId: LOCATION_DHAKA_DIVISION.id,
             sectionId: OPERATIONAL_REPORT_SECTION.OPERATIONAL,
             timeEnd: new Date(1487076708000).toISOString(),

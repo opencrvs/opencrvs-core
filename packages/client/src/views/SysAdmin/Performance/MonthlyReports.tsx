@@ -217,9 +217,6 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const MonthlyReports = connect(
-  mapStateToProps,
-  {
-    goToPerformanceReport
-  }
-)(injectIntl(MonthlyReportsComponent))
+export const MonthlyReports = connect(mapStateToProps, {
+  goToPerformanceReport
+})(injectIntl(MonthlyReportsComponent))

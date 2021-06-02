@@ -15,7 +15,7 @@ import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatu
 import { AppStore } from '@client/store'
 import { History } from 'history'
 import { ReactWrapper } from 'enzyme'
-import queryString from 'query-string'
+import { stringify } from 'query-string'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
 import { OPERATIONAL_REPORT_SECTION } from './OperationalReport'
@@ -205,7 +205,7 @@ describe('Workflow status tests', () => {
         <WorkflowStatus
           // @ts-ignore
           location={{
-            search: queryString.stringify({
+            search: stringify({
               locationId,
               event: 'BIRTH',
               status: 'REGISTERED'
@@ -366,7 +366,7 @@ describe('Workflow status tests', () => {
         <WorkflowStatus
           // @ts-ignore
           location={{
-            search: queryString.stringify({
+            search: stringify({
               locationId
             }),
             state: {

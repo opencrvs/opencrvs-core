@@ -15,7 +15,7 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA } from '@client/views/SysAdmin/Performance/queries'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
-import querystring from 'query-string'
+import {stringify}  from 'query-string'
 import * as React from 'react'
 import { FieldAgentList } from './FieldAgentList'
 
@@ -85,7 +85,7 @@ describe('Field agent list tests', () => {
       <FieldAgentList
         // @ts-ignore
         location={{
-          search: querystring.stringify({
+          search: stringify({
             locationId: 'bfe8306c-0910-48fe-8bf5-0db906cf3155',
             timeEnd: new Date(1487076708000).toISOString(),
             timeStart: new Date(1455454308000).toISOString()
@@ -156,7 +156,7 @@ describe('Field agent list tests', () => {
       <FieldAgentList
         // @ts-ignore
         location={{
-          search: querystring.stringify({
+          search: stringify({
             locationId: 'bfe8306c-0910-48fe-8bf5-0db906cf3155',
             timeEnd: new Date(1487076708000).toISOString(),
             timeStart: new Date(1455454308000).toISOString()

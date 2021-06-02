@@ -265,8 +265,10 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
         rec.registration.status &&
         rec.registration.status[index] &&
         (rec.registration.status[index] as GQLRegWorkflow).user
-          ? createNamesMap(((rec.registration.status[index] as GQLRegWorkflow)
-              .user as GQLUser).name as GQLHumanName[])
+          ? createNamesMap(
+              ((rec.registration.status[index] as GQLRegWorkflow)
+                .user as GQLUser).name as GQLHumanName[]
+            )
           : {}
 
       return {

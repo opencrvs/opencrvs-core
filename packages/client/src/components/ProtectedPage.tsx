@@ -29,6 +29,7 @@ import { PropsWithChildren } from 'react'
 import styled from 'styled-components'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { ForgotPIN } from '@client/views/Unlock/ForgotPIN'
+import { showPINUpdateSuccessToast } from '@client/notification/actions'
 export const SCREEN_LOCK = 'screenLock'
 
 type OwnProps = PropsWithChildren<{
@@ -37,6 +38,7 @@ type OwnProps = PropsWithChildren<{
 
 type DispatchProps = {
   onNumPadVisible: () => void
+  showPINUpdateSuccessToast: typeof showPINUpdateSuccessToast
 }
 interface IProtectPageState {
   loading: boolean
@@ -217,7 +219,12 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     if (!pinExists || passwordVerified) {
       return (
         <SecureAccount
-          onComplete={this.markAsSecured}
+          onComplete={() => {
+            if (passwordVerified) {
+              this.props.showPINUpdateSuccessToast()
+            }
+            this.markAsSecured()
+          }}
           collectPin={passwordVerified}
         />
       )
@@ -240,9 +247,7 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     )
   }
 }
-export const ProtectedPage = connect<{}, DispatchProps, OwnProps>(
-  null,
-  {
-    onNumPadVisible: refreshOfflineData
-  }
-)(withRouter(ProtectedPageComponent))
+export const ProtectedPage = connect<{}, DispatchProps, OwnProps>(null, {
+  onNumPadVisible: refreshOfflineData,
+  showPINUpdateSuccessToast
+})(withRouter(ProtectedPageComponent))

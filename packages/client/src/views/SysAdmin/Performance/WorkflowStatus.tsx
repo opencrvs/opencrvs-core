@@ -53,7 +53,7 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema'
 import { orderBy } from 'lodash'
 import moment from 'moment'
-import querystring from 'query-string'
+import { stringify } from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -627,7 +627,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
   )
 }
 
-export const WorkflowStatus = connect(
-  null,
-  { goToOperationalReport, goToWorkflowStatus }
-)(injectIntl(WorkflowStatusComponent))
+export const WorkflowStatus = connect(null, {
+  goToOperationalReport,
+  goToWorkflowStatus
+})(injectIntl(WorkflowStatusComponent))

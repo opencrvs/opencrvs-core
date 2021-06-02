@@ -32,6 +32,7 @@ export type NotificationState = {
   submitFormSuccessToast: string | null
   submitFormErrorToast: string | null
   userAuditSuccessToast: UserAuditSuccessToastState
+  showPINUpdateSuccess: boolean
 }
 
 export const initialState: NotificationState = {
@@ -42,7 +43,8 @@ export const initialState: NotificationState = {
   saveDraftClicked: false,
   submitFormSuccessToast: null,
   submitFormErrorToast: null,
-  userAuditSuccessToast: { visible: false }
+  userAuditSuccessToast: { visible: false },
+  showPINUpdateSuccess: false
 }
 
 export const notificationReducer: LoopReducer<
@@ -124,6 +126,16 @@ export const notificationReducer: LoopReducer<
           ...state.userAuditSuccessToast,
           visible: false
         }
+      }
+    case actions.SHOW_PIN_UPDATE_SUCCESS:
+      return {
+        ...state,
+        showPINUpdateSuccess: true
+      }
+    case actions.HIDE_PIN_UPDATE_SUCCESS:
+      return {
+        ...state,
+        showPINUpdateSuccess: false
       }
     default:
       return state

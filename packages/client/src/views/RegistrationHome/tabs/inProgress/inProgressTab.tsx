@@ -743,11 +743,8 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const InProgressTab = connect(
-  mapStateToProps,
-  {
-    goToPage: goToPageAction,
-    goToRegistrarHomeTab: goToRegistrarHomeTabAction,
-    goToApplicationDetails
-  }
-)(injectIntl(withTheme(InProgressTabComponent)))
+export const InProgressTab = connect(mapStateToProps, {
+  goToPage: goToPageAction,
+  goToRegistrarHomeTab: goToRegistrarHomeTabAction,
+  goToApplicationDetails
+})(injectIntl(withTheme(InProgressTabComponent)))
