@@ -100,7 +100,6 @@ function LocationPickerComponent(props: LocationPickerProps) {
   const selectedSearchedLocation = searchableLocations.find(
     ({ id }) => id === selectedLocationId
   ) as ISearchLocation
-  console.log(searchableLocations, selectedSearchedLocation)
   useEffect(() => {
     function toggleBodyScroll() {
       const body = document.querySelector('body') as HTMLBodyElement
