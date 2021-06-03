@@ -100,7 +100,7 @@ function LocationPickerComponent(props: LocationPickerProps) {
   const selectedSearchedLocation = searchableLocations.find(
     ({ id }) => id === selectedLocationId
   ) as ISearchLocation
-
+  console.log(searchableLocations, selectedSearchedLocation)
   useEffect(() => {
     function toggleBodyScroll() {
       const body = document.querySelector('body') as HTMLBodyElement
@@ -123,7 +123,11 @@ function LocationPickerComponent(props: LocationPickerProps) {
         onClick={() => setModalVisible(true)}
       >
         <ContentWrapper>
-          <span>{selectedSearchedLocation.displayLabel}</span>
+          <span>
+            {selectedSearchedLocation
+              ? selectedSearchedLocation.displayLabel
+              : null}
+          </span>
           <MapPin />
         </ContentWrapper>
       </PickerButton>
