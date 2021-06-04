@@ -131,6 +131,7 @@ export class SubmissionController {
         }
       })
   }
+  /* eslint-disable no-console */
 
   private sync = async () => {
     this.syncCount++
@@ -156,6 +157,8 @@ export class SubmissionController {
     this.syncRunning = false
     console.debug(`[${this.syncCount}] Finish sync.`)
   }
+
+  /* eslint-enable no-console */
 
   private callMutation = async (application: IApplication | undefined) => {
     if (!application) {
@@ -186,16 +189,18 @@ export class SubmissionController {
     await this.store.dispatch(modifyApplication(application))
     await this.store.dispatch(writeApplication(application))
 
-    try {
-      const mutationResult = await this.client.mutate({
-        mutation,
-        variables,
-        refetchQueries: [getOperationName(REGISTRATION_HOME_QUERY) || ''],
-        awaitRefetchQueries: true
-      })
-      await this.onSuccess(application, mutationResult)
-    } catch (exception) {
-      await this.onError(application, exception)
+    if (mutation) {
+      try {
+        const mutationResult = await this.client.mutate({
+          mutation,
+          variables,
+          refetchQueries: [getOperationName(REGISTRATION_HOME_QUERY) || ''],
+          awaitRefetchQueries: true
+        })
+        await this.onSuccess(application, mutationResult)
+      } catch (exception) {
+        await this.onError(application, exception)
+      }
     }
   }
 

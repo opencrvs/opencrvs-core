@@ -34,7 +34,6 @@ import {
   mockUserResponse,
   resizeWindow
 } from '@client/tests/util'
-import { FETCH_REGISTRATION_BY_COMPOSITION } from '@client/views/RegistrationHome/queries'
 import { merge } from 'lodash'
 import moment from 'moment'
 import * as React from 'react'

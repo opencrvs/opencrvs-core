@@ -15,7 +15,6 @@ import { ReactWrapper } from 'enzyme'
 import { createStore } from '@client/store'
 import { Report } from './Report'
 import { PERFORMANCE_METRICS } from '@client/views/SysAdmin/Performance/metricsQuery'
-import { waitForElement } from '@client/tests/wait-for-element'
 import { Event } from '@client/forms'
 
 describe('Report page', () => {

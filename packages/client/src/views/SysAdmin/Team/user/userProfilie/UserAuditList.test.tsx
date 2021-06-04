@@ -13,7 +13,6 @@ import { AppStore } from '@client/store'
 import { createTestComponent, createTestStore } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { ReactWrapper } from 'enzyme'
-import { History } from 'history'
 import * as React from 'react'
 import { FETCH_TIME_LOGGED_METRICS_FOR_PRACTITIONER } from '@client/user/queries'
 import { UserAuditList } from '@client/views/SysAdmin/Team/user/userProfilie/UserAuditList'
@@ -21,7 +20,6 @@ import { UserAuditList } from '@client/views/SysAdmin/Team/user/userProfilie/Use
 describe('User audit list tests', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
-  let history: History<any>
 
   const graphqlMock = [
     {
@@ -119,9 +117,8 @@ describe('User audit list tests', () => {
 
   beforeAll(async () => {
     Date.now = jest.fn(() => 1487076708000)
-    const { store: testStore, history: testHistory } = await createTestStore()
+    const { store: testStore } = await createTestStore()
     store = testStore
-    history = testHistory
   })
 
   beforeEach(async () => {

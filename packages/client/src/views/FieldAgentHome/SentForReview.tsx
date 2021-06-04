@@ -29,7 +29,6 @@ import {
   StatusWaiting,
   StatusPendingOffline
 } from '@opencrvs/components/lib/icons'
-import { sentenceCase } from '@client/utils/data-formatting'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { calculateDays } from '@client/views/PrintCertificate/utils'
 import { goToApplicationDetails } from '@client/navigation'

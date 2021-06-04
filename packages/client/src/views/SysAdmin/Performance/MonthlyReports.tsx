@@ -14,7 +14,6 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
 import {
   ListTable,
   LocationSearch,

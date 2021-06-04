@@ -9,13 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { MessageDescriptor, IntlShape } from 'react-intl'
+import { MessageDescriptor } from 'react-intl'
 import { validationMessages as messages } from '@client/i18n/messages'
 import { IFormFieldValue, IFormData } from '@opencrvs/client/src/forms'
 import {
   REGEXP_BLOCK_ALPHA_NUMERIC_DOT,
-  REGEXP_ALPHA_NUMERIC,
-  REGEXP_BLOCK_ALPHA_NUMERIC
+  REGEXP_ALPHA_NUMERIC
 } from '@client/utils/constants'
 import { validate as validateEmail } from 'email-validator'
 import * as XRegExp from 'xregexp'
@@ -498,7 +497,7 @@ export const isValidEnglishName = (value: string): boolean => {
   return checkNameWords(value, isValidEnglishWord)
 }
 
-const isLengthWithinRange = (value: string, min: number, max: number) =>
+export const isLengthWithinRange = (value: string, min: number, max: number) =>
   !value || (value.length >= min && value.length <= max)
 
 export const isValueWithinRange = (min: number, max: number) => (

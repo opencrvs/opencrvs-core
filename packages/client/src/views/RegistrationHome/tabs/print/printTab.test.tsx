@@ -27,7 +27,6 @@ import {
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { createClient } from '@client/utils/apolloClient'
-import { FETCH_REGISTRATION_BY_COMPOSITION } from '@client/views/RegistrationHome/queries'
 import { RegistrationHome } from '@client/views/RegistrationHome/RegistrationHome'
 import { GridTable } from '@opencrvs/components/lib/interface'
 import { ReactWrapper } from 'enzyme'
@@ -37,7 +36,6 @@ import * as React from 'react'
 import { Store } from 'redux'
 import { PrintTab } from './printTab'
 import {
-  GQLEventSearchResultSet,
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'

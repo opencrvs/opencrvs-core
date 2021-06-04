@@ -9,11 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  DataTable,
-  Spinner,
-  GridTable
-} from '@opencrvs/components/lib/interface'
+import { Spinner, GridTable } from '@opencrvs/components/lib/interface'
 import { checkAuth } from '@opencrvs/client/src/profile/profileActions'
 import { merge } from 'lodash'
 import * as React from 'react'

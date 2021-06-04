@@ -687,10 +687,7 @@ describe('User list tests', () => {
         menuOptionButton.hostNodes().simulate('click')
         await flushPromises()
         component.update()
-        const successToast = await waitForElement(
-          component,
-          '#resend_invite_success'
-        )
+        await waitForElement(component, '#resend_invite_success')
       })
 
       it('clicking on menu options Resend SMS invite shows error if any submission error', async () => {
@@ -711,10 +708,7 @@ describe('User list tests', () => {
         menuOptionButton.hostNodes().simulate('click')
         await flushPromises()
         component.update()
-        const errorToast = await waitForElement(
-          component,
-          '#resend_invite_error'
-        )
+        await waitForElement(component, '#resend_invite_error')
       })
 
       it('clicking on menu options deactivate to user pops up audit action modal', async () => {
@@ -730,10 +724,7 @@ describe('User list tests', () => {
         )
         expect(menuOptionButton.hostNodes().text()).toBe('Deactivate')
         menuOptionButton.hostNodes().simulate('click')
-        const userAuditActionModal = await waitForElement(
-          component,
-          '#user-audit-modal'
-        )
+        await waitForElement(component, '#user-audit-modal')
       })
 
       it('clicking on menu options reactivate to user pops up audit action modal', async () => {
@@ -749,10 +740,7 @@ describe('User list tests', () => {
         )
         expect(menuOptionButton.hostNodes().text()).toBe('Reactivate')
         menuOptionButton.hostNodes().simulate('click')
-        const userAuditActionModal = await waitForElement(
-          component,
-          '#user-audit-modal'
-        )
+        await waitForElement(component, '#user-audit-modal')
       })
 
       it('clicking on name link takes to user preview page', async () => {

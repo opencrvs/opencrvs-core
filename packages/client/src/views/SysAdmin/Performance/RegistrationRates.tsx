@@ -90,7 +90,7 @@ function prepareChartData(data: GQLMonthWiseEstimationMetrics) {
         if (dataDetails !== null) {
           chartData.push({
             label:
-              moment.months().indexOf(dataDetails.month) == 0 && index > 0
+              moment.months().indexOf(dataDetails.month) === 0 && index > 0
                 ? `${dataDetails.month.slice(0, 3)} ${dataDetails.year}`
                 : `${dataDetails.month.slice(0, 3)}`,
             registeredIn45Days: dataDetails.actual45DayRegistration,

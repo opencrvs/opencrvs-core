@@ -27,7 +27,6 @@ import {
   SysAdminContentWrapper,
   SysAdminPageVariant
 } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
 import {
   GQLCertificationPaymentMetrics,
@@ -44,10 +43,6 @@ import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { NoResultMessage } from './NoResultMessage'
-
-const BackButton = styled(TertiaryButton)`
-  margin-top: 24px;
-`
 
 const ReportWrapper = styled.div`
   margin-top: 16px;
@@ -78,11 +73,9 @@ type Props = ReportProps &
   >
 
 function ReportComponent(props: Props) {
-  const [selectedLocation, setSelectedLocation] = useState<ISearchLocation>(
-    props.selectedLocation
-  )
+  const [selectedLocation] = useState<ISearchLocation>(props.selectedLocation)
 
-  const { timeRange, intl, eventType } = props
+  const { timeRange, eventType } = props
   const { start, end } = timeRange
 
   const title = moment(start).format('MMMM YYYY')

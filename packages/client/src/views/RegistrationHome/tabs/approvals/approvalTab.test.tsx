@@ -17,7 +17,6 @@ import {
   resizeWindow
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { FETCH_REGISTRATION_BY_COMPOSITION } from '@client/views/RegistrationHome/queries'
 import { GridTable } from '@opencrvs/components/lib/interface'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'

@@ -297,7 +297,9 @@ export const fieldTransformers: IFunctionTransformer = {
         key.idTypeKey
       ) as string
     } catch (error) {
+      /* eslint-disable no-console */
       console.error(error)
+      /* eslint-enable no-console */
     }
     if (!idType || idType !== key.idTypeValue) {
       return ' '
@@ -309,7 +311,9 @@ export const fieldTransformers: IFunctionTransformer = {
         key.idValueKey
       ) as string
     } catch (error) {
+      /* eslint-disable no-console */
       console.error(error)
+      /* eslint-enable no-console */
     }
     return idValue || ' '
   }

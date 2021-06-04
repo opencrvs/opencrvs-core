@@ -549,6 +549,7 @@ export async function alterRolesBasedOnUserRole(primaryOfficeId: string) {
 
   const roleList = [] as Array<GQLRole>
 
+  /* eslint-disable array-callback-return */
   roles.map(role => {
     if (
       role.value === ROLE_FIELD_AGENT ||
@@ -572,6 +573,8 @@ export async function alterRolesBasedOnUserRole(primaryOfficeId: string) {
       roleList.push(role)
     }
   })
+
+  /* eslint-enable array-callback-return */
   return roleList
 }
 

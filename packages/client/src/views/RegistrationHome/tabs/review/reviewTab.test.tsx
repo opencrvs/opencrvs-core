@@ -27,10 +27,7 @@ import {
 } from '@client/tests/util'
 import { waitForElement, waitFor } from '@client/tests/wait-for-element'
 import { createClient } from '@client/utils/apolloClient'
-import {
-  FETCH_REGISTRATION_BY_COMPOSITION,
-  REGISTRATION_HOME_QUERY
-} from '@client/views/RegistrationHome/queries'
+import { REGISTRATION_HOME_QUERY } from '@client/views/RegistrationHome/queries'
 import {
   RegistrationHome,
   EVENT_STATUS

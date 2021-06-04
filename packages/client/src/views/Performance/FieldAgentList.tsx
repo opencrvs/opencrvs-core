@@ -133,7 +133,6 @@ function FieldAgentListComponent(props: IProps) {
     intl,
     location: { search },
     goToOperationalReport,
-    locations,
     offices
   } = props
   const { locationId, timeStart, timeEnd } = (parse(
@@ -144,10 +143,6 @@ function FieldAgentListComponent(props: IProps) {
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
   const recordCount = DEFAULT_FIELD_AGENT_LIST_SIZE * currentPageNumber
-
-  const selectedSearchedLocation = locations.find(
-    ({ id }) => id === locationId
-  ) as ISearchLocation
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
 

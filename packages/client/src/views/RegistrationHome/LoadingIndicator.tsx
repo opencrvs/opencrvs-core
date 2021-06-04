@@ -13,7 +13,6 @@ import * as React from 'react'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { NoWifi } from '@opencrvs/components/lib/icons'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { connect } from 'react-redux'
 import styled from 'styled-components'
 import { errorMessages } from '@client/i18n/messages'
 

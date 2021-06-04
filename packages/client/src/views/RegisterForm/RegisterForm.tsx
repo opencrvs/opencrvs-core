@@ -14,7 +14,7 @@ import { FormikTouched, FormikValues } from 'formik'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { isNull, isUndefined, merge, flatten, isEqual } from 'lodash'
+import { isNull, isUndefined, merge, flatten } from 'lodash'
 import debounce from 'lodash/debounce'
 import {
   ICON_ALIGNMENT,
@@ -851,10 +851,12 @@ function getInitialValue(field: IFormField, data: IFormData) {
         field.initialValueKey
       )
     } catch (error) {
+      /* eslint-disable no-console */
       console.error(
         'Error while looking for key in draft to set initial value.',
         error
       )
+      /* eslint-enable no-console */
     }
   }
   return fieldInitialValue

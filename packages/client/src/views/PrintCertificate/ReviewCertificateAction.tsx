@@ -16,7 +16,6 @@ import {
   ResponsiveModal,
   ActionPageLight
 } from '@opencrvs/components/lib/interface'
-import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 import {
   IPrintableApplication,
   IApplicationsState,
@@ -71,9 +70,7 @@ export const ActionPageWrapper = styled.div`
   height: 100%;
   overflow-y: scroll;
 `
-const FormContainer = styled.div`
-  padding: 35px 25px;
-`
+
 const CustomTertiaryButton = styled(TertiaryButton)`
   height: 48px;
   &:disabled {

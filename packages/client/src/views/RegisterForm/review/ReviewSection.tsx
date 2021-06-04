@@ -550,7 +550,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const { intl } = this.props
     const documentSection = this.props.registerForm[
       this.props.draft.event
-    ].sections.find(section => section.id == 'documents')
+    ].sections.find(section => section.id === 'documents')
     const docSectionFields = documentSection && documentSection.groups[0].fields
     const docFieldsWithOptions =
       docSectionFields &&
