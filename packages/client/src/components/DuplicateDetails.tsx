@@ -300,7 +300,7 @@ class DuplicateDetailsClass extends React.Component<
           <Chip
             status={<StatusGray />}
             text={
-              intl.formatHTMLMessage(
+              intl.formatMessage(
                 dynamicConstantsMessages[data.event.toLowerCase()]
               ) as string
             }

@@ -217,24 +217,20 @@ class ReviewCertificateActionComponent extends React.Component<
 
   getTitle = () => {
     const { intl, event } = this.props
-    let eventName = intl
-      .formatHTMLMessage(constantsMessages.birth)
-      .toLowerCase()
+    let eventName = intl.formatMessage(constantsMessages.birth).toLowerCase()
 
     switch (event) {
       case Event.BIRTH:
-        return intl.formatHTMLMessage(certificateMessages.retiewTitle, {
+        return intl.formatMessage(certificateMessages.retiewTitle, {
           event: eventName
         })
       case Event.DEATH:
-        eventName = intl
-          .formatHTMLMessage(constantsMessages.death)
-          .toLowerCase()
-        return intl.formatHTMLMessage(certificateMessages.retiewTitle, {
+        eventName = intl.formatMessage(constantsMessages.death).toLowerCase()
+        return intl.formatMessage(certificateMessages.retiewTitle, {
           event: eventName
         })
       default:
-        return intl.formatHTMLMessage(certificateMessages.retiewTitle, {
+        return intl.formatMessage(certificateMessages.retiewTitle, {
           event: eventName
         })
     }
@@ -258,15 +254,13 @@ class ReviewCertificateActionComponent extends React.Component<
     return (
       <ActionPageLight
         id="collector_form"
-        title={intl.formatHTMLMessage(
+        title={intl.formatMessage(
           certificateMessages.certificateCollectionTitle
         )}
         goBack={this.goBack}
       >
         <Title>{this.getTitle()}</Title>
-        <Info>
-          {intl.formatHTMLMessage(certificateMessages.retiewDescription)}
-        </Info>
+        <Info>{intl.formatMessage(certificateMessages.retiewDescription)}</Info>
 
         <PdfWrapper id="pdfwrapper">
           <PDFViewer id="pdfholder" pdfSource={this.state.certificatePdf} />
@@ -279,11 +273,11 @@ class ReviewCertificateActionComponent extends React.Component<
             onClick={this.toggleModal}
             icon={() => <Check />}
           >
-            {intl.formatHTMLMessage(certificateMessages.confirmAndPrint)}
+            {intl.formatMessage(certificateMessages.confirmAndPrint)}
           </PrimaryButton>
 
           <CustomTertiaryButton disabled>
-            {intl.formatHTMLMessage(buttonMessages.editRecord)}
+            {intl.formatMessage(buttonMessages.editRecord)}
           </CustomTertiaryButton>
         </ButtonWrapper>
 
@@ -292,17 +286,17 @@ class ReviewCertificateActionComponent extends React.Component<
           title={intl.formatMessage(certificateMessages.modalTitle)}
           actions={[
             <CustomTertiaryButton onClick={this.toggleModal} id="close-modal">
-              {intl.formatHTMLMessage(buttonMessages.cancel)}
+              {intl.formatMessage(buttonMessages.cancel)}
             </CustomTertiaryButton>,
             <PrimaryButton onClick={this.readyToCertify} id="print-certificate">
-              {intl.formatHTMLMessage(buttonMessages.print)}
+              {intl.formatMessage(buttonMessages.print)}
             </PrimaryButton>
           ]}
           show={this.state.showConfirmationModal}
           handleClose={this.toggleModal}
           contentHeight={100}
         >
-          {intl.formatHTMLMessage(certificateMessages.modalBody)}
+          {intl.formatMessage(certificateMessages.modalBody)}
         </ResponsiveModal>
       </ActionPageLight>
     )
