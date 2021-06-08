@@ -36,7 +36,7 @@
     "react-dev-utils": "^11.0.4",
     "react-docgen-typescript": "^1.7.0",
     "react-dom": "^16.10.1",
-    "react-intl": "^3.1.13",
+    "react-intl": "^4.7.6",
     "react-pdf": "^4.0.2",
     "react-select": "^2.0.0",
     "react-stickynode": "^2.1.1",
