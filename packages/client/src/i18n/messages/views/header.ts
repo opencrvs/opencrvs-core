@@ -11,7 +11,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IHeaderMessages {
+interface IHeaderMessages extends Record<string, unknown> {
   typeBrnDrn: MessageDescriptor
   typePhone: MessageDescriptor
   placeHolderTrackingId: MessageDescriptor

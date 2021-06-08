@@ -11,13 +11,13 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IEventInfoMessages {
+interface IEventInfoMessages extends Record<string, unknown> {
   title: MessageDescriptor
-  birthBulletListItems: { [key: string]: MessageDescriptor }
-  deathBulletListItems: { [key: string]: MessageDescriptor }
+  birthBulletListItems: MessageDescriptor[]
+  deathBulletListItems: MessageDescriptor[]
 }
 
-const birthBulletListItemsToDefine: object = [
+const birthBulletListItemsToDefine: Record<string, unknown>[] = [
   {
     id: 'register.eventInfo.birth.listItem0',
     defaultMessage:
@@ -44,7 +44,7 @@ const birthBulletListItemsToDefine: object = [
   }
 ]
 
-const deathBulletListItemsToDefine: object = [
+const deathBulletListItemsToDefine: Record<string, unknown>[] = [
   {
     id: 'register.eventInfo.death.listItem0',
     defaultMessage:
@@ -81,6 +81,10 @@ const messagesToDefine = {
 
 export const messages: IEventInfoMessages = {
   ...defineMessages(messagesToDefine),
-  birthBulletListItems: defineMessages(birthBulletListItemsToDefine),
-  deathBulletListItems: defineMessages(deathBulletListItemsToDefine)
+  birthBulletListItems: birthBulletListItemsToDefine.map(birthMessage => {
+    return defineMessages(birthMessage)
+  }),
+  deathBulletListItems: deathBulletListItemsToDefine.map(deathMessage => {
+    return defineMessages(deathMessage)
+  })
 }

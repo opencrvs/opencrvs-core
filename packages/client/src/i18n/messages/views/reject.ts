@@ -11,7 +11,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IRejectMessages {
+interface IRejectMessages extends Record<string, unknown> {
   rejectionFormTitle: MessageDescriptor
   rejectionReasonSubmit: MessageDescriptor
   rejectionForm: MessageDescriptor
