@@ -304,7 +304,8 @@ export const isValidParentsBirthDate = (minAgeGap: number): Validation => (
   drafts
 ) => {
   const parentsBirthDate = value as string
-  const childBirthDate = (drafts && drafts.child.childBirthDate) as string
+  const childBirthDate =
+    drafts && drafts.child && (drafts.child.childBirthDate as string)
 
   return parentsBirthDate &&
     isAValidDateFormat(parentsBirthDate) &&

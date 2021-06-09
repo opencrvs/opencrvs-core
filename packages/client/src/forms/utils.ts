@@ -248,12 +248,22 @@ export const getFieldOptions = (
   values: IFormSectionData,
   resources: IOfflineData
 ) => {
+  const locations = resources[OFFLINE_LOCATIONS_KEY]
+  if (field.dynamicOptions.jurisdictionType) {
+    return generateOptions(
+      Object.values(locations).filter((location: ILocation) => {
+        return (
+          location.jurisdictionType === field.dynamicOptions.jurisdictionType
+        )
+      }),
+      'location'
+    )
+  }
   const dependencyVal = values[field.dynamicOptions.dependency] as string
   if (!dependencyVal) {
     return []
   }
   if (resources && field.dynamicOptions.resource === OFFLINE_LOCATIONS_KEY) {
-    const locations = resources[OFFLINE_LOCATIONS_KEY]
     let partOf: string
     if (dependencyVal === window.config.COUNTRY.toUpperCase()) {
       partOf = 'Location/0'
