@@ -469,7 +469,7 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
     const event = this.props.location.pathname.includes(Event.BIRTH)
       ? Event.BIRTH
       : Event.DEATH
-    const infornantFields = setInformantFields(intl, event)
+    const informantFields = setInformantFields(intl, event)
 
     let titleMessage
     switch (event) {
@@ -515,26 +515,26 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
             </ErrorText>
           )}
           <Actions id="select_parent_informant">
-            {infornantFields.map((infornantField: IInformantField) => {
+            {informantFields.map((informantField: IInformantField) => {
               return (
                 <RadioButton
                   size={RADIO_BUTTON_LARGE_STRING}
-                  key={infornantField.id}
+                  key={informantField.id}
                   name={INFORMANT_FIELD_STRING}
-                  label={infornantField.option.label}
-                  value={infornantField.option.value}
-                  id={infornantField.id}
+                  label={informantField.option.label}
+                  value={informantField.option.value}
+                  id={informantField.id}
                   selected={
-                    this.state.informant === infornantField.option.value
-                      ? infornantField.option.value
+                    this.state.informant === informantField.option.value
+                      ? informantField.option.value
                       : ''
                   }
                   onChange={() =>
                     this.setState({
-                      informant: infornantField.option.value as string
+                      informant: informantField.option.value as string
                     })
                   }
-                  disabled={infornantField.disabled}
+                  disabled={informantField.disabled}
                 />
               )
             })}
