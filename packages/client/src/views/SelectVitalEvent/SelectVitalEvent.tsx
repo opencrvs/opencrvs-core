@@ -95,9 +95,7 @@ class SelectVitalEventView extends React.Component<
     if (this.state.goTo === '') {
       this.setState({ noEventSelectedError: true })
     } else {
-      if (window.config.SHOW_EVENT_REGISTER_INFORMATION) {
-        this.props.goToEventInfo(this.state.goTo as Event)
-      } else {
+      if (window.config.HIDE_EVENT_REGISTER_INFORMATION) {
         let application: IApplication
         switch (this.state.goTo as Event) {
           case Event.BIRTH:
@@ -113,6 +111,8 @@ class SelectVitalEventView extends React.Component<
           default:
             throw new Error(`Unknown eventType ${this.state.goTo}`)
         }
+      } else {
+        this.props.goToEventInfo(this.state.goTo as Event)
       }
     }
   }
