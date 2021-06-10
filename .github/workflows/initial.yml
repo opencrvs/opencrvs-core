@@ -27,7 +27,7 @@ jobs:
 
       # Runs dependency installation
       - name: Runs dependency installation
-        run: npm install -g yarn lerna
+        run: npm install yarn lerna
 
       # Runs a single command using the runners shell
       - name: Run linting & unit testing
