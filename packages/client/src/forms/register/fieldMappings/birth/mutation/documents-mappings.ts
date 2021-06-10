@@ -58,6 +58,7 @@ export const birthDocumentTypeFhirMapping = {
   'Birth Registration': 'BIRTH_REGISTRATION',
   'National ID (front)': 'NATIONAL_ID_FRONT',
   'National ID (back)': 'NATIONAL_ID_BACK',
+  'Notification of birth': 'NOTIFICATION_OF_BIRTH',
   Passport: 'PASSPORT',
   'School Certificate': 'SCHOOL_CERTIFICATE',
   Other: 'OTHER',
