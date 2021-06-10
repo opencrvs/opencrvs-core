@@ -25,6 +25,10 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
+      # Runs dependency installation
+      - name: Runs dependency installation
+        run: npm install -g yarn lerna
+
       # Runs a single command using the runners shell
       - name: Run linting & unit testing
         run: yarn test && yarn lint
