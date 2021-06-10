@@ -78,8 +78,9 @@ const mobilePhonePatternTable: { [key: string]: IMobilePhonePattern } = {
     num: '10'
   },
   niu: {
-    pattern: /^[0-9]{7}$/,
-    example: '1234567',
+    pattern: /^683[0-9]{4}$/,
+    example: '6837767',
+    start: '683',
     num: '7'
   }
 }
@@ -303,7 +304,8 @@ export const isValidParentsBirthDate = (minAgeGap: number): Validation => (
   drafts
 ) => {
   const parentsBirthDate = value as string
-  const childBirthDate = (drafts && drafts.child.childBirthDate) as string
+  const childBirthDate =
+    drafts && drafts.child && (drafts.child.childBirthDate as string)
 
   return parentsBirthDate &&
     isAValidDateFormat(parentsBirthDate) &&
