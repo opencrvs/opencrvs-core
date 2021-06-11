@@ -44,7 +44,7 @@ jobs:
         run: |
           npm install codecov
           ./node_modules/.bin/codecov
-          ./node_modules/.bin/bundlesize
+          # ./node_modules/.bin/bundlesize
   # slackNotification:
   #   name: Slack Notification
   #   runs-on: ubuntu-latest
