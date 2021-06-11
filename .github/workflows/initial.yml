@@ -19,6 +19,10 @@ jobs:
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    env:
+      CYPRESS_LOGIN_URL: http://localhost:3020/
+      CYPRESS_CLIENT_URL: http://localhost:3000/
+      CYPRESS_AUTH_URL: http://localhost:4040/
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -39,7 +43,7 @@ jobs:
         if: ${{ success() }}
         run: |
           npm install codecov
-          codecov
+          ./node_modules/.bin/codecov
           ./node_modules/.bin/bundlesize
   # slackNotification:
   #   name: Slack Notification
