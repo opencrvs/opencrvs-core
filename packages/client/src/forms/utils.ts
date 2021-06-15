@@ -519,8 +519,8 @@ export const convertToMSISDN = (phone: string) => {
   const countryCode =
     callingCountries[window.config.COUNTRY.toUpperCase()].countryCallingCodes[0]
 
-  if (phone.startsWith(countryCode)) {
-    return phone
+  if (phone.startsWith(countryCode) || `+${phone}`.startsWith(countryCode)) {
+    return phone.startsWith('+') ? phone : `+${phone}`
   }
   return phone.startsWith('0')
     ? `${countryCode}${phone.substring(1)}`
