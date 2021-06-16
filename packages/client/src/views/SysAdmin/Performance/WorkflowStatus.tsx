@@ -82,6 +82,9 @@ const INITIAL_SORT_MAP = {
 
 const DEFAULT_APPLICATION_STATUS_PAGE_SIZE = 25
 
+if (!window.config.EXTERNAL_VALIDATION_WORKQUEUE) {
+  delete StatusMapping['WAITING_VALIDATION']
+}
 const statusOptions = [
   {
     label: constantsMessages.allStatuses,

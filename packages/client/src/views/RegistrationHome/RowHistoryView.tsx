@@ -332,7 +332,16 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
   getRenderedData() {
     const { intl } = this.props
     const transformedData = this.transformer()
-
+    if (!window.config.EXTERNAL_VALIDATION_WORKQUEUE) {
+      transformedData.operationHistories.forEach(item => {
+        if (item.type === 'WAITING_VALIDATION') {
+          transformedData.operationHistories.splice(
+            transformedData.operationHistories.indexOf(item),
+            1
+          )
+        }
+      })
+    }
     return (
       <>
         <BorderedPaddedContent>
