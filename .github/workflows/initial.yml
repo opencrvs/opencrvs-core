@@ -42,6 +42,7 @@ jobs:
   slackNotification:
     name: Slack Notification
     runs-on: ubuntu-latest
+    needs: [test]
     steps:
       - uses: actions/checkout@v2
       - name: Slack Notification
