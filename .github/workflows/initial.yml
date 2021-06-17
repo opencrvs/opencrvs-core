@@ -42,10 +42,10 @@ jobs:
   slackNotification:
     name: Slack Notification
     runs-on: ubuntu-latest
-    needs: [test]
+    # needs: [test]
     steps:
       - uses: actions/checkout@v2
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2
         env:
-          SLACK_WEBHOOK: TAHM19588/B025R6K2RGR/7plOmXuAlEiUorEhgf3CRCaw
+          SLACK_WEBHOOK_URL: https://hooks.slack.com/services/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
