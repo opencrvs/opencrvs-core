@@ -47,5 +47,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Slack Notification
         uses: act10ns/slack@v1
+        with:
+          status: ${{ job.status }}
         env:
           SLACK_WEBHOOK_URL: https://hooks.slack.com/services/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
