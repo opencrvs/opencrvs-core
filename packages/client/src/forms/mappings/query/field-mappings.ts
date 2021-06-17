@@ -38,17 +38,19 @@ interface IIgnoreAddressFields {
 
 export const nameToFieldTransformer = (
   language: string,
-  transformedFieldName?: string
+  transformedFieldName?: string,
+  fromSectionId?: string
 ) => (
   transformedData: IFormData,
   queryData: any,
   sectionId: string,
   field: IFormField
 ) => {
+  const selectSectionId = fromSectionId ? fromSectionId : sectionId
   const selectedName: IName | undefined =
-    queryData[sectionId] &&
-    queryData[sectionId].name &&
-    (queryData[sectionId].name as GQLHumanName[]).find(
+    queryData[selectSectionId] &&
+    queryData[selectSectionId].name &&
+    (queryData[selectSectionId].name as GQLHumanName[]).find(
       name => name.use === language
     )
   const nameKey = transformedFieldName ? transformedFieldName : field.name

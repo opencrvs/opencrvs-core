@@ -225,6 +225,8 @@ type DeathRegistration implements EventRegistration {
   mannerOfDeath: MannerOfDeath
   causeOfDeathMethod: CauseOfDeathMethodType
   causeOfDeath: String
+  dependentsOfDeceased: DependentsOfDeceased
+  medicalPractitioner: MedicalPractitioner
   createdAt: Date
   updatedAt: Date
 }
@@ -422,6 +424,8 @@ input DeathRegistrationInput {
   mannerOfDeath: MannerOfDeath
   causeOfDeathMethod: CauseOfDeathMethodType
   causeOfDeath: String
+  dependentsOfDeceased: DependentsOfDeceasedInput
+  medicalPractitioner: MedicalPractitionerInput
   createdAt: Date
   updatedAt: Date
 }
@@ -529,6 +533,17 @@ enum MannerOfDeath {
 enum CauseOfDeathMethodType {
   VERBAL_AUTOPSY
   MEDICALLY_CERTIFIED
+}
+
+type DependentsOfDeceased {
+  numberOfMaleDependents: Float
+  numberOfFemaleDependents: Float
+}
+
+type MedicalPractitioner {
+  name: String
+  qualification: String
+  lastVisitDate: Date
 }
 
 type IdentityType {
@@ -804,6 +819,17 @@ input PrimaryCaregiverInput {
   parentDetailsType: ParentDetailsType
 }
 
+input DependentsOfDeceasedInput {
+  numberOfMaleDependents: Float
+  numberOfFemaleDependents: Float
+}
+
+input MedicalPractitionerInput {
+  name: String
+  qualification: String
+  lastVisitDate: Date
+}
+
 input HumanNameInput {
   use: String
   firstNames: String
@@ -958,6 +984,7 @@ enum AttachmentType {
   PROOF_OF_LEGAL_GUARDIANSHIP
   PROOF_OF_ASSIGNED_RESPONSIBILITY
   LETTER_FROM_COUNCILLOR
+  CAUSE_OF_DEATH
 }
 
 enum AttachmentSubject {
