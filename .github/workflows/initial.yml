@@ -41,7 +41,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: execute cypress & run integration test
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
+      - name: Execute integration test
         run: |
           while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
           ./infrastructure/build-and-test-e2e-on-staging.sh
