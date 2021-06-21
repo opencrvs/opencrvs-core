@@ -1,10 +1,6 @@
 name: Linting & Unit Test
 
-on:
-  push:
-    branches: [OCRVS-2106]
-  pull_request:
-    branches: [OCRVS-2106]
+on: [pull_request]
 
   workflow_dispatch:
 
@@ -28,36 +24,18 @@ jobs:
         run: |
           npm install codecov
           ./node_modules/.bin/codecov
-          # ./node_modules/.bin/bundlesize
+          # ./node_modules/.bin/bundlesize  
 
-  E2E:
-    name: Integration Test
+  slackNotification:
+    name: Slack Notification
     runs-on: ubuntu-latest
-    # needs: [test]
-    env:
-      CYPRESS_LOGIN_URL: http://localhost:3020/
-      CYPRESS_CLIENT_URL: http://localhost:3000/
-      CYPRESS_AUTH_URL: http://localhost:4040/
+    needs: test
+    if: ${{ needs.test.result == 'failure' }}
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-
-      - name: Execute integration test
-        run: |
-          while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
-          ./infrastructure/build-and-test-e2e-on-staging.sh
-          kill %1
-  # slackNotification:
-  #   name: Slack Notification
-  #   runs-on: ubuntu-latest
-  #   # needs: [test]
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: 8398a7/action-slack@v3
-  #       with:
-  #         status: ${{ job.status }}
-  #         fields: repo,message,commit,author,action,eventName,ref,workflow,job,took # selectable (default: repo,message)
-  #       env:
-  #         SLACK_WEBHOOK_URL: https://hooks.slack.com/services/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
+      - name: Using Slack Action to Send message
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
