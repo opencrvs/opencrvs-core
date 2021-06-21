@@ -156,7 +156,7 @@ describe('it handles react unauthorized errors', () => {
       .simulate('click')
   })
 
-  it('Should create a failed test', () => {
+  xit('Should create a failed test', () => {
     expect(true).toBe(false)
   })
 })
