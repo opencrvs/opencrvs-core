@@ -178,9 +178,6 @@ export class SubmissionController {
       mutation: null,
       variables: null
     }
-    console.log(variables)
-    return
-    /*
     const requestInProgressStatus =
       REQUEST_IN_PROGRESS_STATUS[application.action || ''] ||
       SUBMISSION_STATUS.SUBMITTING
@@ -198,7 +195,7 @@ export class SubmissionController {
       await this.onSuccess(application, mutationResult)
     } catch (exception) {
       await this.onError(application, exception)
-    }*/
+    }
   }
 
   private onSuccess = async (

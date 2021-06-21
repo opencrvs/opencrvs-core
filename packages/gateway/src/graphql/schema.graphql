@@ -225,7 +225,8 @@ type DeathRegistration implements EventRegistration {
   mannerOfDeath: MannerOfDeath
   causeOfDeathMethod: CauseOfDeathMethodType
   causeOfDeath: String
-  dependentsOfDeceased: DependentsOfDeceased
+  maleDependentsOfDeceased: Float
+  femaleDependentsOfDeceased: Float
   medicalPractitioner: MedicalPractitioner
   createdAt: Date
   updatedAt: Date
@@ -424,7 +425,8 @@ input DeathRegistrationInput {
   mannerOfDeath: MannerOfDeath
   causeOfDeathMethod: CauseOfDeathMethodType
   causeOfDeath: String
-  dependentsOfDeceased: DependentsOfDeceasedInput
+  maleDependentsOfDeceased: Float
+  femaleDependentsOfDeceased: Float
   medicalPractitioner: MedicalPractitionerInput
   createdAt: Date
   updatedAt: Date
@@ -533,11 +535,6 @@ enum MannerOfDeath {
 enum CauseOfDeathMethodType {
   VERBAL_AUTOPSY
   MEDICALLY_CERTIFIED
-}
-
-type DependentsOfDeceased {
-  numberOfMaleDependents: Float
-  numberOfFemaleDependents: Float
 }
 
 type MedicalPractitioner {
@@ -819,11 +816,6 @@ input PrimaryCaregiverInput {
   parentDetailsType: ParentDetailsType
 }
 
-input DependentsOfDeceasedInput {
-  numberOfMaleDependents: Float
-  numberOfFemaleDependents: Float
-}
-
 input MedicalPractitionerInput {
   name: String
   qualification: String
@@ -984,7 +976,6 @@ enum AttachmentType {
   PROOF_OF_LEGAL_GUARDIANSHIP
   PROOF_OF_ASSIGNED_RESPONSIBILITY
   LETTER_FROM_COUNCILLOR
-  CAUSE_OF_DEATH
 }
 
 enum AttachmentSubject {
@@ -1003,6 +994,8 @@ enum AttachmentSubject {
   LEGAL_GUARDIAN_PROOF
   ASSIGNED_RESPONSIBILITY_PROOF
   WARD_COUNCILLOR_PROOF
+  CAUSE_OF_DEATH
+  CORONERS_REPORT
 }
 
 type GenderBasisDetailsMetrics {

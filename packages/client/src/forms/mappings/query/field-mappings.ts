@@ -444,6 +444,9 @@ export const nestedValueToFieldTransformer = (
     }
     transformedData[sectionId][field.name] =
       clonedData[nestedFieldName][field.name]
+  } else {
+    transformedData[sectionId][field.name] =
+      queryData[sectionId][nestedFieldName][field.name]
   }
   return transformedData
 }
