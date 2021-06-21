@@ -139,6 +139,7 @@
     "jest": "24.7.1",
     "jest-fetch-mock": "^2.1.2",
     "json2csv": "^4.3.2",
+    "mock-apollo-client": "^0.7.0",
     "moxios": "^0.4.0",
     "opener": "^1.5.1",
     "prettier": "^1.15.2",

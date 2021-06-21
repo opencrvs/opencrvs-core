@@ -17178,6 +17178,11 @@ mkpath@^0.1.0:
   resolved "https://registry.yarnpkg.com/mkpath/-/mkpath-0.1.0.tgz#7554a6f8d871834cc97b5462b122c4c124d6de91"
   integrity sha1-dVSm+Nhxg0zJe1RisSLEwSTW3pE=
 
+mock-apollo-client@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/mock-apollo-client/-/mock-apollo-client-0.7.0.tgz#5f70e75c842a9f3b3da2252f68fd47f2d9955f77"
+  integrity sha512-r0ICU01m007W0MwMej0lzlg1REtepDZ15Fyj8Hz9tiW/1TPb0PyHryGykrg9YhfbB8/+ZF2ovz+88yMF75TDoA==
+
 mockingoose@*, mockingoose@^2.13.0:
   version "2.13.2"
   resolved "https://registry.yarnpkg.com/mockingoose/-/mockingoose-2.13.2.tgz#32a23f4dd39542673ce7954583d89946be8abf7c"

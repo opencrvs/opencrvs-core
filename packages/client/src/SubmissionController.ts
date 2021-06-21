@@ -28,12 +28,13 @@ import { REGISTRATION_HOME_QUERY } from '@client/views/RegistrationHome/queries'
 import { getOperationName } from 'apollo-utilities'
 import { client } from '@client/utils/apolloClient'
 import moment from 'moment'
-import { FetchResult } from 'apollo-link'
+import { FetchResult, DocumentNode } from 'apollo-link'
 import {
   getAttachmentSectionKey,
   updateApplicationTaskHistory
 } from './utils/draftUtils'
 import { getScope } from './profile/profileSelectors'
+import { RequestHandler } from 'mock-apollo-client'
 
 const INTERVAL_TIME = 5000
 const HANGING_EXPIRE_MINUTES = 15
@@ -88,8 +89,10 @@ const SUCCESS_SUBMISSION_STATUS: IActionList = {
 
 export class SubmissionController {
   private store: AppStore
-  private client: ApolloClient<{}>
-  private syncRunning: boolean = false
+  public client: ApolloClient<{}> & {
+    setRequestHandler: (query: DocumentNode, handler: RequestHandler) => void // used for mocking in tests
+  }
+  public syncRunning: boolean = false
   private syncCount: number = 0
 
   constructor(store: AppStore) {
@@ -113,7 +116,7 @@ export class SubmissionController {
         ALLOWED_STATUS_FOR_RETRY.includes(app.submissionStatus)
     )
   }
-  private requeueHangingApplications = async () => {
+  public requeueHangingApplications = async () => {
     const now = moment(Date.now())
     this.getApplications()
       .filter((app: IApplication) => {
@@ -133,7 +136,7 @@ export class SubmissionController {
   }
   /* eslint-disable no-console */
 
-  private sync = async () => {
+  public sync = async () => {
     this.syncCount++
     console.debug(`[${this.syncCount}] Starting sync...`)
     if (!navigator.onLine || this.syncRunning) {
