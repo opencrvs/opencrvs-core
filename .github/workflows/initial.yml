@@ -28,7 +28,8 @@ jobs:
     name: Slack Notification
     runs-on: ubuntu-latest
     needs: test
-    if: ${{ needs.test.result == 'failure' }}
+    # if: ${{ needs.test.result == 'failure' }}
+    if: ${{ always() }}
     steps:
       - name: Using Slack Action to Send message
         uses: 8398a7/action-slack@v3
