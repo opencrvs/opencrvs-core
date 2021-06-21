@@ -2,8 +2,6 @@ name: Linting & Unit Test
 
 on: pull_request
 
-  workflow_dispatch:
-
 jobs:
   test:
     name: Unit Test & Linting & Code Coverage
