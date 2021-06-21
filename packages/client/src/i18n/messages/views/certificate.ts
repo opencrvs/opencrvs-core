@@ -247,7 +247,7 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.certificate.paymentInstruction'
   },
   paymentAmount: {
-    defaultMessage: '৳ {paymentAmount}',
+    defaultMessage: '{paymentAmount}',
     description: 'The label for payment amount subsection',
     id: 'print.certificate.paymentAmount'
   },
