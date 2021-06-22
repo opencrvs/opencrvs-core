@@ -169,18 +169,6 @@ const RowLink = styled(LinkButton)`
   padding-right: 15px !important;
 `
 
-const status: Array<string> = [
-  'IN_PROGRESS',
-  'DECLARED',
-  'REJECTED',
-  'VALIDATED',
-  'WAITING_VALIDATION',
-  'REGISTERED'
-]
-if (!window.config.EXTERNAL_VALIDATION_WORKQUEUE) {
-  status.splice(status.indexOf('WAITING_VALIDATION'), 1)
-}
-
 export const StatusMapping: IStatusMapping = {
   IN_PROGRESS: {
     labelDescriptor: statusMessages.inProgress,
