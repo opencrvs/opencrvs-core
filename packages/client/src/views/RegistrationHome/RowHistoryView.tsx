@@ -332,16 +332,6 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
   getRenderedData() {
     const { intl } = this.props
     const transformedData = this.transformer()
-    if (!window.config.EXTERNAL_VALIDATION_WORKQUEUE) {
-      transformedData.operationHistories.forEach(item => {
-        if (item.type === 'WAITING_VALIDATION') {
-          transformedData.operationHistories.splice(
-            transformedData.operationHistories.indexOf(item),
-            1
-          )
-        }
-      })
-    }
     return (
       <>
         <BorderedPaddedContent>
@@ -367,6 +357,15 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
         </BorderedPaddedContent>
         <>
           {transformedData.operationHistories
+            .filter(item => {
+              if (
+                window.config.EXTERNAL_VALIDATION_WORKQUEUE === false &&
+                item.type === 'WAITING_VALIDATION'
+              ) {
+                return false
+              }
+              return true
+            })
             .map((operationHistory, index) => {
               const { rejectReasons, comment } = operationHistory
               const type = operationHistory.type as string

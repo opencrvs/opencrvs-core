@@ -82,19 +82,26 @@ const INITIAL_SORT_MAP = {
 
 const DEFAULT_APPLICATION_STATUS_PAGE_SIZE = 25
 
-if (!window.config.EXTERNAL_VALIDATION_WORKQUEUE) {
-  delete StatusMapping['WAITING_VALIDATION']
-}
 const statusOptions = [
   {
     label: constantsMessages.allStatuses,
     value: ''
   }
 ].concat(
-  Object.entries(StatusMapping).map(([status, { labelDescriptor: label }]) => ({
-    label,
-    value: status
-  }))
+  Object.entries(StatusMapping)
+    .filter(item => {
+      if (
+        window.config.EXTERNAL_VALIDATION_WORKQUEUE === false &&
+        item[0] === 'WAITING_VALIDATION'
+      ) {
+        return false
+      }
+      return true
+    })
+    .map(([status, { labelDescriptor: label }]) => ({
+      label,
+      value: status
+    }))
 )
 
 const PrimaryContactLabelMapping = {

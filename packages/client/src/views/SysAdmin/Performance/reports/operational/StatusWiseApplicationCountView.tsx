@@ -132,27 +132,38 @@ class StatusWiseApplicationCountViewComponent extends React.Component<
             )}
           </Description>
         </StatusHeader>
-        {results.map((statusCount, index) => {
-          return (
-            statusCount && (
-              <StatusProgressBarWrapper key={index}>
-                <ProgressBar
-                  id={`${statusCount.status.toLowerCase()}-${index}`}
-                  title={intl.formatMessage(
-                    statusMapping![statusCount.status].labelDescriptor
-                  )}
-                  color={statusMapping![statusCount.status].color}
-                  totalPoints={total}
-                  disabled={disableApplicationLink || false}
-                  onClick={() =>
-                    this.props.onClickStatusDetails(statusCount.status)
-                  }
-                  currentPoints={statusCount.count}
-                />
-              </StatusProgressBarWrapper>
+        {results
+          .filter(item => {
+            if (
+              item &&
+              window.config.EXTERNAL_VALIDATION_WORKQUEUE === false &&
+              item.status === 'WAITING_VALIDATION'
+            ) {
+              return false
+            }
+            return true
+          })
+          .map((statusCount, index) => {
+            return (
+              statusCount && (
+                <StatusProgressBarWrapper key={index}>
+                  <ProgressBar
+                    id={`${statusCount.status.toLowerCase()}-${index}`}
+                    title={intl.formatMessage(
+                      statusMapping![statusCount.status].labelDescriptor
+                    )}
+                    color={statusMapping![statusCount.status].color}
+                    totalPoints={total}
+                    disabled={disableApplicationLink || false}
+                    onClick={() =>
+                      this.props.onClickStatusDetails(statusCount.status)
+                    }
+                    currentPoints={statusCount.count}
+                  />
+                </StatusProgressBarWrapper>
+              )
             )
-          )
-        })}
+          })}
         <StatusListFooter>
           <p>{intl.formatMessage(constantsMessages.total)}</p>
           <p>{total}</p>

@@ -589,7 +589,14 @@ class OperationalReportComponent extends React.Component<Props, State> {
               query={FETCH_STATUS_WISE_REGISTRATION_COUNT}
               variables={{
                 locationId,
-                status
+                status: [
+                  'IN_PROGRESS',
+                  'DECLARED',
+                  'REJECTED',
+                  'VALIDATED',
+                  'WAITING_VALIDATION',
+                  'REGISTERED'
+                ]
               }}
             >
               {({
