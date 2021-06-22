@@ -607,7 +607,15 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
               <ListTable
                 id="application-status-list"
                 content={getContent(data)}
-                columns={getColumns(total)}
+                columns={getColumns(total).filter(item => {
+                  if (
+                    window.config.EXTERNAL_VALIDATION_WORKQUEUE === false &&
+                    item.label === 'Time in waiting for waiting for BRIS'
+                  ) {
+                    return false
+                  }
+                  return true
+                })}
                 isLoading={loading || Boolean(error)}
                 noResultText={intl.formatMessage(constantsMessages.noResults)}
                 hideBoxShadow
