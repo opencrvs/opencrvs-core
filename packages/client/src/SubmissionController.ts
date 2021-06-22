@@ -178,6 +178,7 @@ export class SubmissionController {
       mutation: null,
       variables: null
     }
+
     const requestInProgressStatus =
       REQUEST_IN_PROGRESS_STATUS[application.action || ''] ||
       SUBMISSION_STATUS.SUBMITTING
