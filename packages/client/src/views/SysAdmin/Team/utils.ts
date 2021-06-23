@@ -36,7 +36,6 @@ import {
 import { GQLRole, GQLUser } from '@opencrvs/gateway/src/graphql/schema'
 import { MessageDescriptor } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/userSetup'
-import { IColumn } from '@client/../../components/lib/interface/GridTable/types'
 
 export enum UserStatus {
   ACTIVE,
