@@ -64,6 +64,7 @@ enum AttachmentType {
   PASSPORT
   NATIONAL_ID_FRONT
   NATIONAL_ID_BACK
+  NOTIFICATION_OF_BIRTH
   IMMUNISATION_CERTIFICATE
   PAPER_FORM
   PASSPORT_PHOTO
@@ -112,6 +113,8 @@ enum AttachmentSubject {
   LEGAL_GUARDIAN_PROOF
   ASSIGNED_RESPONSIBILITY_PROOF
   WARD_COUNCILLOR_PROOF
+  CAUSE_OF_DEATH
+  CORONERS_REPORT
 }
 
 enum RegistrationType {
@@ -158,6 +161,18 @@ type Payment { # -> PaymentReconciliation
   amount: Float # .detail.amount
   outcome: PaymentOutcomeType # -> .outcome
   date: Date # -> .detail.date
+}
+
+input MedicalPractitionerInput { # -> Encounter.participant
+  name: String # -> Encounter.participant.individual(Practitioner).name
+  qualification: String # -> Encounter.participant.individual(Practitioner).qualification
+  lastVisitDate: Date # -> Encounter.participant.preriod.start
+}
+
+type MedicalPractitioner { # -> Encounter.participant
+  name: String # -> Encounter.participant.individual(Practitioner).name
+  qualification: String # -> Encounter.participant.individual(Practitioner).qualification
+  lastVisitDate: Date # -> Encounter.participant.preriod.start
 }
 
 enum PrimaryCaregiverType {
@@ -301,6 +316,9 @@ input DeathRegistrationInput {
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
   causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept
   causeOfDeath: String # need to store ICD-10? More types of cause of death
+  maleDependentsOfDeceased: Float # -> Observation.valueCodeableConcept
+  femaleDependentsOfDeceased: Float # -> Observation.valueCodeableConcept
+  medicalPractitioner: MedicalPractitionerInput # -> Encounter.participant
   createdAt: Date
   updatedAt: Date
 }
@@ -320,6 +338,9 @@ type DeathRegistration implements EventRegistration { # -> Composition
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
   causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept
   causeOfDeath: String # -> Observation.valueCodeableConcept
+  maleDependentsOfDeceased: Float # -> Observation.valueCodeableConcept
+  femaleDependentsOfDeceased: Float # -> Observation.valueCodeableConcept
+  medicalPractitioner: MedicalPractitioner # -> Encounter.participant
   createdAt: Date # -> .date($first)
   updatedAt: Date # -> .date
 }

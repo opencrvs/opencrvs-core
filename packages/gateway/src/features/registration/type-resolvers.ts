@@ -44,7 +44,9 @@ import {
   REASON_CAREGIVER_NOT_APPLYING,
   PRIMARY_CAREGIVER,
   PARENT_DETAILS,
-  SPOUSE_CODE
+  SPOUSE_CODE,
+  MALE_DEPENDENTS_ON_DECEASED_CODE,
+  FEMALE_DEPENDENTS_ON_DECEASED_CODE
 } from '@gateway/features/fhir/templates'
 import { GQLResolver } from '@gateway/graphql/schema'
 import {
@@ -682,6 +684,59 @@ export const typeResolvers: GQLResolver = {
       )
     }
   },
+  MedicalPractitioner: {
+    name: async (encounterParticipant, _, authHeader) => {
+      if (
+        !encounterParticipant ||
+        !encounterParticipant.individual ||
+        !encounterParticipant.individual.reference
+      ) {
+        return null
+      }
+      const practitioner = await fetchFHIR(
+        `/${encounterParticipant.individual.reference}`,
+        authHeader
+      )
+      return (
+        (practitioner &&
+          practitioner.name &&
+          practitioner.name[0] &&
+          practitioner.name[0].family) ||
+        null
+      )
+    },
+    qualification: async (encounterParticipant, _, authHeader) => {
+      if (
+        !encounterParticipant ||
+        !encounterParticipant.individual ||
+        !encounterParticipant.individual.reference
+      ) {
+        return null
+      }
+      const practitioner = await fetchFHIR(
+        `/${encounterParticipant.individual.reference}`,
+        authHeader
+      )
+      return (
+        (practitioner &&
+          practitioner.qualification &&
+          practitioner.qualification[0] &&
+          practitioner.qualification[0].code &&
+          practitioner.qualification[0].code.coding &&
+          practitioner.qualification[0].code.coding[0] &&
+          practitioner.qualification[0].code.coding[0].code) ||
+        null
+      )
+    },
+    lastVisitDate: async (encounterParticipant, _, authHeader) => {
+      return (
+        (encounterParticipant &&
+          encounterParticipant.period &&
+          encounterParticipant.period.start) ||
+        null
+      )
+    }
+  },
 
   DeathRegistration: {
     // tslint:disable-next-line
@@ -850,6 +905,79 @@ export const typeResolvers: GQLResolver = {
           observations.entry[0].resource.valueCodeableConcept.coding[0].code) ||
         null
       )
+    },
+    async maleDependentsOfDeceased(
+      composition: ITemplatedComposition,
+      _,
+      authHeader
+    ) {
+      const encounterSection = findCompositionSection(
+        DEATH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection || !encounterSection.entry) {
+        return null
+      }
+      const observations = await fetchFHIR(
+        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${MALE_DEPENDENTS_ON_DECEASED_CODE}`,
+        authHeader
+      )
+
+      return (
+        (observations &&
+          observations.entry &&
+          observations.entry[0] &&
+          observations.entry[0].resource.valueString) ||
+        null
+      )
+    },
+    async femaleDependentsOfDeceased(
+      composition: ITemplatedComposition,
+      _,
+      authHeader
+    ) {
+      const encounterSection = findCompositionSection(
+        DEATH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection || !encounterSection.entry) {
+        return null
+      }
+      const observations = await fetchFHIR(
+        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${FEMALE_DEPENDENTS_ON_DECEASED_CODE}`,
+        authHeader
+      )
+
+      return (
+        (observations &&
+          observations.entry &&
+          observations.entry[0] &&
+          observations.entry[0].resource.valueString) ||
+        null
+      )
+    },
+    async medicalPractitioner(
+      composition: ITemplatedComposition,
+      _,
+      authHeader
+    ) {
+      const encounterSection = findCompositionSection(
+        DEATH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection || !encounterSection.entry) {
+        return null
+      }
+      const encounter = await fetchFHIR(
+        `/${encounterSection.entry[0].reference}`,
+        authHeader
+      )
+      const encounterParticipant =
+        encounter && encounter.participant && encounter.participant[0]
+      if (!encounterParticipant) {
+        return null
+      }
+      return encounterParticipant
     }
   },
   BirthRegistration: {
