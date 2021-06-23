@@ -60,6 +60,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
+import { checkExternalValidationStatus } from '@client/views/SysAdmin/Team/utils'
 import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
 import { IStatusMapping } from './reports/operational/StatusWiseApplicationCountView'
 
@@ -89,15 +90,7 @@ const statusOptions = [
   }
 ].concat(
   Object.entries(StatusMapping)
-    .filter(item => {
-      if (
-        window.config.EXTERNAL_VALIDATION_WORKQUEUE === false &&
-        item[0] === 'WAITING_VALIDATION'
-      ) {
-        return false
-      }
-      return true
-    })
+    .filter(item => checkExternalValidationStatus(item[0]))
     .map(([status, { labelDescriptor: label }]) => ({
       label,
       value: status
@@ -295,6 +288,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       checkStatus: string,
       eventProgress: GQLEventProgressSet
     ) {
+      if (!checkExternalValidationStatus(checkStatus)) return checkStatus
       const timeStructure = formatTimeDuration(
         eventProgress.registration &&
           eventProgress.registration.status === checkStatus
@@ -373,12 +367,12 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
               )) ||
             ''
 
-          let timeLoggedInProgress = <></>
-          let timeLoggedDeclared = <></>
-          let timeLoggedRejected = <></>
-          let timeLoggedValidated = <></>
-          let timeLoggedWaitingValidation = <></>
-          let timeLoggedRegistered = <></>
+          let timeLoggedInProgress
+          let timeLoggedDeclared
+          let timeLoggedRejected
+          let timeLoggedValidated
+          let timeLoggedWaitingValidation
+          let timeLoggedRegistered
 
           if (eventProgress.progressReport != null) {
             const {
@@ -601,21 +595,38 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           ) {
             total = data.getEventsWithProgress.totalItems
           }
-
+          let contentData = getContent(data)
+          let columnData = getColumns(total)
+          let statuses: Record<string, any>
+          console.log(contentData[0])
+          if (contentData[0]) {
+            statuses = (({
+              timeLoggedInProgress,
+              timeLoggedDeclared,
+              timeLoggedRejected,
+              timeLoggedValidated,
+              timeLoggedWaitingValidation,
+              timeLoggedRegistered
+            }) => ({
+              timeLoggedInProgress,
+              timeLoggedDeclared,
+              timeLoggedRejected,
+              timeLoggedValidated,
+              timeLoggedWaitingValidation,
+              timeLoggedRegistered
+            }))(contentData[0])
+            if (statuses) {
+              columnData = columnData.filter(item =>
+                checkExternalValidationStatus(statuses[item.key])
+              )
+            }
+          }
           return (
             <>
               <ListTable
                 id="application-status-list"
-                content={getContent(data)}
-                columns={getColumns(total).filter(item => {
-                  if (
-                    window.config.EXTERNAL_VALIDATION_WORKQUEUE === false &&
-                    item.label === 'Time in waiting for waiting for BRIS'
-                  ) {
-                    return false
-                  }
-                  return true
-                })}
+                content={contentData}
+                columns={columnData}
                 isLoading={loading || Boolean(error)}
                 noResultText={intl.formatMessage(constantsMessages.noResults)}
                 hideBoxShadow

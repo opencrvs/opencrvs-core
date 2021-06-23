@@ -36,6 +36,7 @@ import {
 import { GQLRole, GQLUser } from '@opencrvs/gateway/src/graphql/schema'
 import { MessageDescriptor } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/userSetup'
+import { IColumn } from '@client/../../components/lib/interface/GridTable/types'
 
 export enum UserStatus {
   ACTIVE,
@@ -591,4 +592,15 @@ export function getUserAuditDescription(
   status: string
 ): MessageDescriptor | undefined {
   return AuditDescriptionMapping[status] || undefined
+}
+export function checkExternalValidationStatus(
+  status: string | null | undefined
+): boolean {
+  if (
+    !window.config.EXTERNAL_VALIDATION_WORKQUEUE &&
+    status === 'WAITING_VALIDATION'
+  ) {
+    return false
+  }
+  return true
 }

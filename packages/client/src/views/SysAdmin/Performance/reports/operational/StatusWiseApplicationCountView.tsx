@@ -33,6 +33,7 @@ import { IStoreState } from '@client/store'
 import { getJurisidictionType } from '@client/utils/locationUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { SYS_ADMIN_ROLES } from '@client/utils/constants'
+import { checkExternalValidationStatus } from '@client/views/SysAdmin/Team/utils'
 
 type Props = WrappedComponentProps & BaseProps
 
@@ -133,16 +134,7 @@ class StatusWiseApplicationCountViewComponent extends React.Component<
           </Description>
         </StatusHeader>
         {results
-          .filter(item => {
-            if (
-              item &&
-              window.config.EXTERNAL_VALIDATION_WORKQUEUE === false &&
-              item.status === 'WAITING_VALIDATION'
-            ) {
-              return false
-            }
-            return true
-          })
+          .filter(item => item && checkExternalValidationStatus(item.status))
           .map((statusCount, index) => {
             return (
               statusCount && (
