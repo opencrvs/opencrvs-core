@@ -60,6 +60,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
+import { checkExternalValidationStatus } from '@client/views/SysAdmin/Team/utils'
 import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
 import { IStatusMapping } from './reports/operational/StatusWiseApplicationCountView'
 
@@ -88,10 +89,12 @@ const statusOptions = [
     value: ''
   }
 ].concat(
-  Object.entries(StatusMapping).map(([status, { labelDescriptor: label }]) => ({
-    label,
-    value: status
-  }))
+  Object.entries(StatusMapping)
+    .filter(item => checkExternalValidationStatus(item[0]))
+    .map(([status, { labelDescriptor: label }]) => ({
+      label,
+      value: status
+    }))
 )
 
 const PrimaryContactLabelMapping = {
@@ -591,7 +594,6 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           ) {
             total = data.getEventsWithProgress.totalItems
           }
-
           return (
             <>
               <ListTable
