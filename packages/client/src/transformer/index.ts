@@ -63,7 +63,7 @@ export const draftToGqlTransformer = (
   let inCompleteFieldList: string[] = []
   formDefinition.sections.forEach(section => {
     if (!draftData[section.id]) {
-      return
+      draftData[section.id] = {}
     }
     if (!transformedData[section.id]) {
       transformedData[section.id] = {}
