@@ -288,7 +288,6 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       checkStatus: string,
       eventProgress: GQLEventProgressSet
     ) {
-      if (!checkExternalValidationStatus(checkStatus)) return checkStatus
       const timeStructure = formatTimeDuration(
         eventProgress.registration &&
           eventProgress.registration.status === checkStatus
@@ -367,12 +366,12 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
               )) ||
             ''
 
-          let timeLoggedInProgress
-          let timeLoggedDeclared
-          let timeLoggedRejected
-          let timeLoggedValidated
-          let timeLoggedWaitingValidation
-          let timeLoggedRegistered
+          let timeLoggedInProgress = <></>
+          let timeLoggedDeclared = <></>
+          let timeLoggedRejected = <></>
+          let timeLoggedValidated = <></>
+          let timeLoggedWaitingValidation = <></>
+          let timeLoggedRegistered = <></>
 
           if (eventProgress.progressReport != null) {
             const {
@@ -595,38 +594,12 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           ) {
             total = data.getEventsWithProgress.totalItems
           }
-          let contentData = getContent(data)
-          let columnData = getColumns(total)
-          let statuses: Record<string, any>
-          console.log(contentData[0])
-          if (contentData[0]) {
-            statuses = (({
-              timeLoggedInProgress,
-              timeLoggedDeclared,
-              timeLoggedRejected,
-              timeLoggedValidated,
-              timeLoggedWaitingValidation,
-              timeLoggedRegistered
-            }) => ({
-              timeLoggedInProgress,
-              timeLoggedDeclared,
-              timeLoggedRejected,
-              timeLoggedValidated,
-              timeLoggedWaitingValidation,
-              timeLoggedRegistered
-            }))(contentData[0])
-            if (statuses) {
-              columnData = columnData.filter(item =>
-                checkExternalValidationStatus(statuses[item.key])
-              )
-            }
-          }
           return (
             <>
               <ListTable
                 id="application-status-list"
-                content={contentData}
-                columns={columnData}
+                content={getContent(data)}
+                columns={getColumns(total)}
                 isLoading={loading || Boolean(error)}
                 noResultText={intl.formatMessage(constantsMessages.noResults)}
                 hideBoxShadow
