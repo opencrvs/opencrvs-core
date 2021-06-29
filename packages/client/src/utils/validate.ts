@@ -635,11 +635,11 @@ export const isMoVisitDateAfterBirthDateAndBeforeDeathDate: Validation = (
     (cast <= drafts.deathEvent.deathDate && cast >= drafts.deceased.birthDate)
   ) {
     return undefined
-  } else if (drafts && cast >= drafts.deathEvent.deathDate) {
+  } else if (drafts && cast > drafts.deathEvent.deathDate) {
     return {
       message: messages.isMoVisitAfterDeath
     }
-  } else if (drafts && cast <= drafts.deceased.birthDate) {
+  } else if (drafts && cast < drafts.deceased.birthDate) {
     return {
       message: messages.isMoVisitBeforeBirth
     }
