@@ -27,6 +27,7 @@ import {
   PASSPORT,
   DRIVING_LICENSE
 } from '@client/forms/identity'
+import moment from 'moment'
 
 export interface IValidationResult {
   message: MessageDescriptor
@@ -624,6 +625,7 @@ export const isValidDeathOccurrenceDate: Validation = (
         message: messages.isValidDateOfDeath
       }
 }
+
 export const isDeceasedVisitDateBeforeDeathDate: Validation = (
   value: IFormFieldValue,
   drafts
@@ -634,6 +636,22 @@ export const isDeceasedVisitDateBeforeDeathDate: Validation = (
     : {
         message: messages.isDeceasedVisitDateBeforeDeathDate
       }
+}
+
+export const isInformantOfLegalAge: Validation = (value: IFormFieldValue) => {
+  if (
+    minAgeGapExist(
+      moment(new Date()).format('YYYY-MM-DD'),
+      value.toString(),
+      window.config.INFORMANT_MINIMUM_AGE
+    )
+  ) {
+    return undefined
+  } else {
+    return {
+      message: messages.isInformantOfLegalAge
+    }
+  }
 }
 
 export const greaterThanZero: Validation = (value: IFormFieldValue) => {

@@ -25,6 +25,7 @@ interface IValidationMessages {
   isDateNotAfterDeath: MessageDescriptor
   isDateNotBeforeBirth: MessageDescriptor
   isDeceasedVisitDateBeforeDeathDate: MessageDescriptor
+  isInformantOfLegalAge: MessageDescriptor
   maxLength: MessageDescriptor
   minLength: MessageDescriptor
   notGreaterThan: MessageDescriptor
@@ -126,6 +127,12 @@ const messagesToDefine: IValidationMessages = {
     description:
       'The error message appears when the given date of visit of medical practitioner is after the death date',
     id: 'validations.isDeceasedVisitDateBeforeDeathDate'
+  },
+  isInformantOfLegalAge: {
+    defaultMessage: 'Informant is not of legal age',
+    description:
+      'The error message appears when the informant is not old enough to register an event',
+    id: 'validations.isInformantOfLegalAge'
   },
   maxLength: {
     defaultMessage: 'Must not be more than {max} characters',
