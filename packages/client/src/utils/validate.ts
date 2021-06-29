@@ -625,6 +625,27 @@ export const isValidDeathOccurrenceDate: Validation = (
       }
 }
 
+export const isMoVisitDateAfterBirthDateAndBeforeDeathDate: Validation = (
+  value: IFormFieldValue,
+  drafts
+) => {
+  const cast = value && value.toString()
+  if (
+    drafts &&
+    (cast <= drafts.deathEvent.deathDate && cast >= drafts.deceased.birthDate)
+  ) {
+    return undefined
+  } else if (drafts && cast > drafts.deathEvent.deathDate) {
+    return {
+      message: messages.isMoVisitAfterDeath
+    }
+  } else if (drafts && cast < drafts.deceased.birthDate) {
+    return {
+      message: messages.isMoVisitBeforeBirth
+    }
+  }
+}
+
 export const greaterThanZero: Validation = (value: IFormFieldValue) => {
   return !value && value !== 0
     ? { message: messages.required }
