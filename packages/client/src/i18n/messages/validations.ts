@@ -24,6 +24,7 @@ interface IValidationMessages {
   isValidDateOfDeath: MessageDescriptor
   isDateNotAfterDeath: MessageDescriptor
   isDateNotBeforeBirth: MessageDescriptor
+  isDeceasedVisitDateBeforeDeathDate: MessageDescriptor
   maxLength: MessageDescriptor
   minLength: MessageDescriptor
   notGreaterThan: MessageDescriptor
@@ -118,6 +119,13 @@ const messagesToDefine: IValidationMessages = {
     description:
       'The error message appears when the given date of death is not valid',
     id: 'validations.isDateNotAfterDeath'
+  },
+  isDeceasedVisitDateBeforeDeathDate: {
+    defaultMessage:
+      'Medical Practitioner visit date must not be after the date of death',
+    description:
+      'The error message appears when the given date of visit of medical practitioner is after the death date',
+    id: 'validations.isDeceasedVisitDateBeforeDeathDate'
   },
   maxLength: {
     defaultMessage: 'Must not be more than {max} characters',

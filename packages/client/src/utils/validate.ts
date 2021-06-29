@@ -624,6 +624,17 @@ export const isValidDeathOccurrenceDate: Validation = (
         message: messages.isValidDateOfDeath
       }
 }
+export const isDeceasedVisitDateBeforeDeathDate: Validation = (
+  value: IFormFieldValue,
+  drafts
+) => {
+  const cast = value && value.toString()
+  return drafts && cast && cast <= drafts.deathEvent.deathDate
+    ? undefined
+    : {
+        message: messages.isDeceasedVisitDateBeforeDeathDate
+      }
+}
 
 export const greaterThanZero: Validation = (value: IFormFieldValue) => {
   return !value && value !== 0
