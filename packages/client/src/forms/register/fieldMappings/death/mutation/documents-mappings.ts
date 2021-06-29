@@ -55,6 +55,8 @@ export const deathDocumentTypeFhirMapping = {
   'Birth Registration': 'BIRTH_REGISTRATION',
   'National ID (front)': 'NATIONAL_ID_FRONT',
   'National ID (back)': 'NATIONAL_ID_BACK',
+  'Cuase of Death': 'CAUSE_OF_DEATH',
+  'Proof of Death of Deceased': 'DECEASED_DEATH_PROOF',
   'Certified Post Mortem Report': 'POST_MORTEM_CERTIFICATE',
   'Hospital Discharge Certificate': 'HOSPITAL_DISCHARGE_CERTIFICATE',
   'Attested Letter of Death': 'ATTESTED_DEATH_LETTER',
