@@ -97,7 +97,8 @@ export const draftToGqlTransformer = (
           return
         }
         if (
-          draftData[section.id][fieldDef.name] &&
+          draftData[section.id][fieldDef.name] !== null &&
+          draftData[section.id][fieldDef.name] !== undefined &&
           draftData[section.id][fieldDef.name] !== '' &&
           !conditionalActions.includes('hide')
         ) {
@@ -156,7 +157,7 @@ export const draftToGqlTransformer = (
       transformedData.registration = { draftId }
     }
   }
-
+  console.log(transformedData)
   return transformedData
 }
 
