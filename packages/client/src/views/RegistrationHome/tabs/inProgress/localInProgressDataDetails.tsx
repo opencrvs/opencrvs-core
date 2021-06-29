@@ -11,6 +11,7 @@
  */
 import { StatusProgress } from '@opencrvs/components/lib/icons'
 import { IApplication, SUBMISSION_STATUS } from '@client/applications'
+import { messages } from '@client/i18n/messages/views/search'
 import { IStoreState } from '@client/store'
 import { CERTIFICATE_DATE_FORMAT } from '@client/utils/constants'
 import moment from 'moment'
@@ -67,6 +68,13 @@ const HistoryWrapper = styled.div`
   padding: 10px 25px;
   margin: 20px 0px;
 `
+const BoldSpan = styled.span`
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  padding: 0 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`
 
 function LabelValue({ label, value }: { label: string; value: string }) {
   return (
@@ -103,6 +111,7 @@ type IApplicationWithContactPoint = IApplication & {
         value: string
         nestedFields?: NestedFields
       }
+      registrationPhone: string
     }
   }
 }
@@ -128,10 +137,11 @@ class LocalInProgressDataDetailsComponent extends React.Component<
     const contactPoint = draft.data.registration.contactPoint
     const relation = getInformant(draft)
 
-    const registrationPhone =
-      contactPoint &&
-      contactPoint.nestedFields &&
-      contactPoint.nestedFields.registrationPhone
+    const registrationPhone = contactPoint
+      ? contactPoint &&
+        contactPoint.nestedFields &&
+        contactPoint.nestedFields.registrationPhone
+      : draft.data.registration.registrationPhone
 
     return {
       draftStartedOn: draft && draft.savedOn,
@@ -177,20 +187,12 @@ class LocalInProgressDataDetailsComponent extends React.Component<
                 )}
                 value={timestamp}
               />
-              <ValueContainer>
-                <StyledLabel>
-                  {intl.formatMessage(
-                    constantsMessages.applicationInformantLabel
-                  )}
-                  :
-                </StyledLabel>
-                <ValuesWithSeparator
-                  strings={[
-                    getInformantText(),
-                    transformedData.informantContactNumber || ''
-                  ]}
-                />
-              </ValueContainer>
+              <ExpansionContainer>
+                <label>{intl.formatMessage(messages.informantContact)}:</label>
+                <BoldSpan>
+                  {[transformedData.informantContactNumber || '']}
+                </BoldSpan>
+              </ExpansionContainer>
             </ExpansionContentContainer>
           </ExpansionContainer>
         </HistoryWrapper>
