@@ -157,7 +157,6 @@ export const draftToGqlTransformer = (
       transformedData.registration = { draftId }
     }
   }
-  console.log(transformedData)
   return transformedData
 }
 
