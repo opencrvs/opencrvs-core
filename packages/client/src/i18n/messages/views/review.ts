@@ -66,7 +66,7 @@ const messagesToDefine: IReviewMessages = {
   validateApplicationActionModalDescription: {
     id: 'validate.application.action.modal.description',
     defaultMessage:
-      'This application will be sent to the registrar from them to register'
+      'This application will be sent to the registrar for them to register'
   },
   additionalComments: {
     defaultMessage: 'Any additional comments?',
