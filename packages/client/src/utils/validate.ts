@@ -15,7 +15,8 @@ import { IFormFieldValue, IFormData } from '@opencrvs/client/src/forms'
 import {
   REGEXP_BLOCK_ALPHA_NUMERIC_DOT,
   REGEXP_ALPHA_NUMERIC,
-  REGEXP_BLOCK_ALPHA_NUMERIC
+  REGEXP_BLOCK_ALPHA_NUMERIC,
+  REGEXP_DECIMAL_POINT_NUMBER
 } from '@client/utils/constants'
 import { validate as validateEmail } from 'email-validator'
 import * as XRegExp from 'xregexp'
@@ -178,6 +179,13 @@ export const blockAlphaNumericDot: Validation = (value: IFormFieldValue) => {
   return isRegexpMatched(cast, REGEXP_BLOCK_ALPHA_NUMERIC_DOT)
     ? undefined
     : { message: messages.blockAlphaNumericDot }
+}
+
+export const nonDecimalPointNumber: Validation = (value: IFormFieldValue) => {
+  const cast = value as string
+  return !isRegexpMatched(cast.toString(), REGEXP_DECIMAL_POINT_NUMBER)
+    ? undefined
+    : { message: messages.nonDecimalPointNumber }
 }
 
 export const numeric: Validation = (value: IFormFieldValue) => {
