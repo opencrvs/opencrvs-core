@@ -922,14 +922,12 @@ export const typeResolvers: GQLResolver = {
         `/Observation?encounter=${encounterSection.entry[0].reference}&code=${MALE_DEPENDENTS_ON_DECEASED_CODE}`,
         authHeader
       )
-
-      return (
-        (observations &&
-          observations.entry &&
-          observations.entry[0] &&
-          observations.entry[0].resource.valueString) ||
-        null
-      )
+      return observations &&
+        observations.entry &&
+        observations.entry[0] &&
+        observations.entry[0].resource
+        ? observations.entry[0].resource.valueString
+        : null
     },
     async femaleDependentsOfDeceased(
       composition: ITemplatedComposition,
@@ -948,13 +946,12 @@ export const typeResolvers: GQLResolver = {
         authHeader
       )
 
-      return (
-        (observations &&
-          observations.entry &&
-          observations.entry[0] &&
-          observations.entry[0].resource.valueString) ||
-        null
-      )
+      return observations &&
+        observations.entry &&
+        observations.entry[0] &&
+        observations.entry[0].resource
+        ? observations.entry[0].resource.valueString
+        : null
     },
     async medicalPractitioner(
       composition: ITemplatedComposition,
