@@ -42,6 +42,7 @@ interface IValidationMessages {
   validPassportNumber: MessageDescriptor
   phoneNumberNotValid: MessageDescriptor
   validDrivingLicenseNumber: MessageDescriptor
+  nonDecimalPointNumber: MessageDescriptor
 }
 
 const messagesToDefine: IValidationMessages = {
@@ -228,6 +229,12 @@ const messagesToDefine: IValidationMessages = {
       'The Driving License Number can only be alpha numeric and must be {validLength} characters long',
     description:
       'The error message that appeards when an invalid value is used as driving license number'
+  },
+  nonDecimalPointNumber: {
+    id: 'validations.nonDecimalPointNumber',
+    defaultMessage: 'Can not have any decimal point number',
+    description:
+      'The error message that appeards when any decimal point number is used'
   }
 }
 
