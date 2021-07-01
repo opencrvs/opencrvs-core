@@ -165,7 +165,7 @@
         "constants.PIN": "PIN",
         "constants.reason": "Reason",
         "constants.registered": "registered",
-        "constants.registrationAgent": "Registration Clerk",
+        "constants.registrationAgent": "Registration Agent",
         "constants.rejected": "rejected",
         "constants.rejectedDays": "Sent for updates {text}",
         "constants.relationship": "Relationship",
