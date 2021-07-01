@@ -437,7 +437,9 @@ export const nestedValueToFieldTransformer = (
   sectionId: string,
   field: IFormField
 ) => {
-  if (transformMethod) {
+  if (!queryData[sectionId] || !queryData[sectionId][nestedFieldName]) {
+    return transformedData
+  } else if (transformMethod) {
     const clonedData = cloneDeep(transformedData)
     if (!clonedData[nestedFieldName]) {
       clonedData[nestedFieldName] = {}
