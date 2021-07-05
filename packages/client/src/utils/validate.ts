@@ -184,9 +184,11 @@ export const blockAlphaNumericDot: Validation = (value: IFormFieldValue) => {
 
 export const nonDecimalPointNumber: Validation = (value: IFormFieldValue) => {
   const cast = value as string
-  return !isRegexpMatched(cast.toString(), REGEXP_DECIMAL_POINT_NUMBER)
-    ? undefined
-    : { message: messages.nonDecimalPointNumber }
+  if (cast) {
+    return !isRegexpMatched(cast.toString(), REGEXP_DECIMAL_POINT_NUMBER)
+      ? undefined
+      : { message: messages.nonDecimalPointNumber }
+  }
 }
 
 export const numeric: Validation = (value: IFormFieldValue) => {
@@ -661,17 +663,19 @@ export const isMoVisitDateAfterBirthDateAndBeforeDeathDate: Validation = (
 }
 
 export const isInformantOfLegalAge: Validation = (value: IFormFieldValue) => {
-  if (
-    minAgeGapExist(
-      moment(new Date()).format('YYYY-MM-DD'),
-      value.toString(),
-      window.config.INFORMANT_MINIMUM_AGE
-    )
-  ) {
-    return undefined
-  } else {
-    return {
-      message: messages.isInformantOfLegalAge
+  if (value) {
+    if (
+      minAgeGapExist(
+        moment(new Date()).format('YYYY-MM-DD'),
+        value.toString(),
+        window.config.INFORMANT_MINIMUM_AGE
+      )
+    ) {
+      return undefined
+    } else {
+      return {
+        message: messages.isInformantOfLegalAge
+      }
     }
   }
 }
