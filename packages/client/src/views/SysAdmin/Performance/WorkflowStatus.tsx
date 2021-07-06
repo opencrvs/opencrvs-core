@@ -133,10 +133,12 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
     .subtract(1, 'years')
     .toDate()
   let timeEnd = moment().toDate()
+  const historyState = props.history.location.state as any
+
   if (props.location.state) {
-    sectionId = props.location.state.sectionId
-    timeStart = props.location.state.timeStart
-    timeEnd = props.location.state.timeEnd
+    sectionId = historyState.sectionId
+    timeStart = historyState.timeStart
+    timeEnd = historyState.timeEnd
   }
 
   function toggleSort(key: keyof SortMap) {

@@ -11,7 +11,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IregistrationHomeMessages extends Record<string, unknown> {
+interface IregistrationHomeMessages extends Record<string, MessageDescriptor> {
   certified: MessageDescriptor
   dataTableResults: MessageDescriptor
   inProgress: MessageDescriptor

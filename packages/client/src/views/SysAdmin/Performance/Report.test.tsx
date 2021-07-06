@@ -161,7 +161,7 @@ describe('Report page', () => {
   ]
 
   beforeEach(async () => {
-    const mock: jest.Mock = jest.fn()
+    const mock: any = jest.fn()
 
     testComponent = (
       await createTestComponent(

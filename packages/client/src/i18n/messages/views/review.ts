@@ -11,7 +11,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IReviewMessages extends Record<string, unknown> {
+interface IReviewMessages extends Record<string, MessageDescriptor> {
   additionalComments: MessageDescriptor
   backToPreview: MessageDescriptor
   editApplicationConfirmationTitle: MessageDescriptor

@@ -11,7 +11,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IFieldAgentHomeMessages extends Record<string, unknown> {
+interface IFieldAgentHomeMessages extends Record<string, MessageDescriptor> {
   inProgressCount: MessageDescriptor
   sentForReviewCount: MessageDescriptor
   requireUpdates: MessageDescriptor

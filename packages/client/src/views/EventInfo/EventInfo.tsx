@@ -92,20 +92,20 @@ function EventInfoComponet(props: IFullProps) {
   switch (eventType) {
     case Event.BIRTH:
       topBarTitle = constantsMessages.newBirthRegistration
-      listItems = ((messages.birthBulletListItems as unknown) as MessageDescriptor[]).map(
-        message => intl.formatMessage(message)
+      listItems = messages.birthBulletListItems.map(message =>
+        intl.formatMessage(message)
       )
       break
     case Event.DEATH:
       topBarTitle = constantsMessages.newDeathRegistration
-      listItems = ((messages.deathBulletListItems as unknown) as MessageDescriptor[]).map(
-        message => intl.formatMessage(message)
+      listItems = messages.deathBulletListItems.map(message =>
+        intl.formatMessage(message)
       )
       break
     default:
       topBarTitle = constantsMessages.newBirthRegistration
-      listItems = ((messages.birthBulletListItems as unknown) as MessageDescriptor[]).map(
-        message => intl.formatMessage(message)
+      listItems = messages.birthBulletListItems.map(message =>
+        intl.formatMessage(message)
       )
   }
 

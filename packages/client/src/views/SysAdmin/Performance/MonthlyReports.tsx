@@ -77,11 +77,10 @@ interface IState {
 class MonthlyReportsComponent extends React.Component<Props, IState> {
   constructor(props: Props) {
     super(props)
+    const historyState = props.history.location.state as any
     this.state = {
       selectedLocation:
-        (props.history.location.state &&
-          props.history.location.state.selectedLocation) ||
-        undefined
+        (historyState && historyState.selectedLocation) || undefined
     }
   }
   getContent(eventType: Event) {

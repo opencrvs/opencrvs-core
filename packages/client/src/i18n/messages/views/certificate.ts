@@ -11,7 +11,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface ICertificateMessages extends Record<string, unknown> {
+interface ICertificateMessages extends Record<string, MessageDescriptor> {
   certificateCollectionTitle: MessageDescriptor
   addAnotherSignature: MessageDescriptor
   certificateConfirmationTxt: MessageDescriptor

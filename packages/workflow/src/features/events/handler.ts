@@ -177,8 +177,8 @@ async function forwardToHearth(request: Hapi.Request, h: Hapi.ResponseToolkit) {
   let path = request.path
   if (request.method === 'post' || request.method === 'put') {
     requestOpts.body = JSON.stringify(request.payload)
-  } else if (request.method === 'get' && request.url.path) {
-    path = request.url.path
+  } else if (request.method === 'get' && request.url.pathname) {
+    path = request.url.pathname
   }
   const res = await fetch(HEARTH_URL + path.replace('/fhir', ''), requestOpts)
   const resBody = await res.text()

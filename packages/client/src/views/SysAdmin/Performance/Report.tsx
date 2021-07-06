@@ -60,17 +60,7 @@ interface IMetricsQueryResult {
   fetchRegistrationMetrics: GQLRegistrationMetrics
 }
 
-type Props = ReportProps &
-  WrappedComponentProps &
-  RouteComponentProps<
-    {},
-    {},
-    {
-      selectedLocation: ISearchLocation
-      eventType: Event
-      timeRange: { start: Date; end: Date }
-    }
-  >
+type Props = ReportProps & WrappedComponentProps & RouteComponentProps<{}>
 
 function ReportComponent(props: Props) {
   const [selectedLocation] = useState<ISearchLocation>(props.selectedLocation)
@@ -177,13 +167,14 @@ function ReportComponent(props: Props) {
 }
 
 function mapStateToProps(state: IStoreState, props: Props) {
+  const historyState = props.history.location.state as any
   return {
-    eventType: props.location.state && props.location.state.eventType,
-    timeRange: (props.location.state && props.location.state.timeRange) || {
+    eventType: historyState && historyState.eventType,
+    timeRange: (historyState && historyState.timeRange) || {
       start: new Date(),
       end: new Date()
     },
-    selectedLocation: props.location.state!.selectedLocation,
+    selectedLocation: historyState!.selectedLocation,
     offlineResources: getOfflineData(state)
   }
 }

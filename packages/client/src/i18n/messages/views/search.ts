@@ -11,7 +11,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface ISearchMessages extends Record<string, unknown> {
+interface ISearchMessages extends Record<string, MessageDescriptor> {
   dataTableResults: MessageDescriptor
   dataTableNoResults: MessageDescriptor
   listItemEventRegistrationNumber: MessageDescriptor
