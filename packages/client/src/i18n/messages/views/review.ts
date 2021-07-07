@@ -129,7 +129,7 @@ const messagesToDefine: IReviewMessages = {
   },
   registerActionDescriptionComplete: {
     defaultMessage:
-      'By clicking register, you confirm that the information is correct and has been reviewed by the applicant. The applicant understands that it will be used to register the birth and for planning purposes.\n\nBy registering this birth, a birth certificate will be generated with your signature for issuance.',
+      'By clicking register, you confirm that the information is correct and has been reviewed by the applicant. The applicant understands that it will be used to register the {eventType, select, birth {birth application} death {death application}} and for planning purposes.\n\nBy registering this {eventType, select, birth {birth application} death {death application}}, a {eventType, select, birth {birth} death {death}} certificate will be generated with your signature for issuance.',
     id: 'review.actions.desc.regConfComp'
   },
   registerActionDescriptionIncomplete: {
