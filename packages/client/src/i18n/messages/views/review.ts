@@ -166,14 +166,14 @@ const messagesToDefine: IReviewMessages = {
   },
   reviewActionDescriptionComplete: {
     defaultMessage:
-      'By sending this application for review you confirm that the information has been reviewed by the applicant and that they are aware that they will receive an SMS with a tracking ID and details of how to collect the birth certificate',
+      'By sending this application for review you confirm that the information has been reviewed by the applicant and that they are aware that they will receive an SMS with a tracking ID and details of how to collect the {eventType, select, birth {birth} death {death}} certificate',
     description:
       'Description for review action component when complete application',
     id: 'review.actions.description.confirmComplete'
   },
   reviewActionDescriptionIncomplete: {
     defaultMessage:
-      'By sending this incomplete application, there will be a digital record made.\n\nTell the applicant that they will receive an SMS with a tracking ID. They will need this to complete the application at a registration office within 30 days. The applicant will need to provide all mandatory information before the birth can be registered.',
+      'By sending this incomplete application, there will be a digital record made.\n\nTell the applicant that they will receive an SMS with a tracking ID. They will need this to complete the application at a registration office within 30 days. The applicant will need to provide all mandatory information before the {eventType, select, birth {birth application} death {death application}} can be registered.',
     description:
       'Description for review action component when incomplete application',
     id: 'review.actions.description.confirmInComplete'
