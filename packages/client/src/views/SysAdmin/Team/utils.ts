@@ -36,6 +36,7 @@ import {
 import { GQLRole, GQLUser } from '@opencrvs/gateway/src/graphql/schema'
 import { MessageDescriptor } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/userSetup'
+import { ColumnContentAlignment } from '@client/../../components/lib/interface'
 
 export enum UserStatus {
   ACTIVE,
@@ -600,4 +601,44 @@ export function checkExternalValidationStatus(status?: string | null): boolean {
     return false
   }
   return true
+}
+export function checkIfLocalLanguageProvided(
+  columnObject: (
+    | {
+        label: string
+        key: string
+        width: number
+        isSortable?: undefined
+        sortFunction?: undefined
+        icon?: undefined
+        alignment?: undefined
+      }
+    | {
+        label: string
+        key: string
+        width: number
+        isSortable: boolean
+        sortFunction: () => void
+        icon: JSX.Element
+        alignment?: undefined
+      }
+    | {
+        label: string
+        key: string
+        width: number
+        alignment: ColumnContentAlignment
+        isSortable?: undefined
+        sortFunction?: undefined
+        icon?: undefined
+      })[]
+) {
+  let languages: Array<string> = window.config.LANGUAGES.split(',')
+  if (languages.length <= 1) {
+    for (let k in columnObject) {
+      if (columnObject[k].key === 'nameLocal') {
+        delete columnObject[k]
+      }
+    }
+  }
+  return columnObject
 }
