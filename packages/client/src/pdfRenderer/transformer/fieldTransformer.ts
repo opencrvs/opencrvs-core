@@ -126,6 +126,9 @@ export const fieldTransformers: IFunctionTransformer = {
       - key: Mendatory field. It will be able to traverse through the object structure
       and fetch the appropriate value if found otherwise will throw exception. Ex: 'child.dob'
       - condition: Optional field. ex: "(!draftData || !draftData.informant || draftData.informant.relationship == \"OTHER\")"
+      - messageDescriptors: Optional field. This option will allow you to configure 
+      a list message descriptors for fetched value against given key from application data.
+      ex: 'child.gender' key will return a value like: 'male' which will be presented as 'Male' through message descriptor
   */
   FieldValue: (
     templateData: TemplateTransformerData,
