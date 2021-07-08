@@ -849,17 +849,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
 function getInitialValue(field: IFormField, data: IFormData) {
   let fieldInitialValue = field.initialValue
   if (field.initialValueKey) {
-    try {
-      fieldInitialValue = getValueFromApplicationDataByKey(
-        data,
-        field.initialValueKey
-      )
-    } catch (error) {
-      console.error(
-        'Error while looking for key in draft to set initial value.',
-        error
-      )
-    }
+    fieldInitialValue =
+      getValueFromApplicationDataByKey(data, field.initialValueKey) || ''
   }
   return fieldInitialValue
 }

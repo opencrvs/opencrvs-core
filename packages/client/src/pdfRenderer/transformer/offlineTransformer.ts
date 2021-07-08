@@ -32,11 +32,12 @@ type KeyValues = { [key: string]: string }
 const getKeyValues = (keys: any, templateData: TemplateTransformerData) =>
   keys &&
   keys.reduce((keyValues: { [key: string]: string }, key: string) => {
-    keyValues[key] = getValueFromApplicationDataByKey(
-      templateData.application.data,
-      // Getting rid of { }
-      key.substr(1, key.length - 2)
-    )
+    keyValues[key] =
+      getValueFromApplicationDataByKey(
+        templateData.application.data,
+        // Getting rid of { }
+        key.substr(1, key.length - 2)
+      ) || ''
     return keyValues
   }, {})
 
@@ -50,7 +51,7 @@ const getCountryValue = (
         templateData.application.data,
         // Getting rid of { }
         countryCode
-      )
+      ) || ''
 }
 
 function getCountryMessage(
@@ -80,7 +81,7 @@ function getTransformedAddress(
   language: string
 ) {
   return Object.keys(keyValues).reduce((value, key) => {
-    if (key.includes('country')) {
+    if (key.includes('country') || key.includes('nationality')) {
       // countries are all translated and can be returned for both languages
       return value.replace(new RegExp(`${key}`, 'g'), countryMessage || '')
     } else if (!isDefaultCountry(countryValue)) {
@@ -127,6 +128,7 @@ export const offlineTransformers: IFunctionTransformer = {
     payload?: TransformerPayload,
     optionalData?: IAvailableCountries[]
   ) => {
+    console.log(templateData)
     const params = payload && (payload as IOfflineAddressPayload)
     if (!params) {
       throw new Error('No payload found for this transformer')
@@ -150,6 +152,9 @@ export const offlineTransformers: IFunctionTransformer = {
         matchedCondition.addresses.countryCode,
         templateData
       )
+      if (countryValue === '') {
+        return ''
+      }
 
       const countryMessage = getCountryMessage(
         optionalData,

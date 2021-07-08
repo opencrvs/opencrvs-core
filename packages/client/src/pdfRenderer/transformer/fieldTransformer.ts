@@ -60,7 +60,7 @@ export const fieldTransformers: IFunctionTransformer = {
             : getValueFromApplicationDataByKey(
                 templateData.application.data,
                 (message.messageValues && message.messageValues[valueKey]) || ''
-              )
+              ) || ''
 
         messageValues = {
           ...messageValues,
@@ -104,7 +104,7 @@ export const fieldTransformers: IFunctionTransformer = {
       )
     }
 
-    const applicantObj: IFormSectionData = getValueFromApplicationDataByKey(
+    const applicantObj: IFormSectionData | null = getValueFromApplicationDataByKey(
       templateData.application.data,
       matchedCondition.key[templateData.application.event]
     )
@@ -125,6 +125,7 @@ export const fieldTransformers: IFunctionTransformer = {
     @params:
       - key: Mendatory field. It will be able to traverse through the object structure
       and fetch the appropriate value if found otherwise will throw exception. Ex: 'child.dob'
+      - condition: Optional field. ex: "(!draftData || !draftData.informant || draftData.informant.relationship == \"OTHER\")"
   */
   FieldValue: (
     templateData: TemplateTransformerData,
@@ -135,10 +136,28 @@ export const fieldTransformers: IFunctionTransformer = {
     if (!key) {
       throw new Error('No payload found for this transformer')
     }
-    return getValueFromApplicationDataByKey(
+    // this is needed for eval fn to evalute the data against the given condition
+    const draftData = templateData.application.data
+    // eslint-disable-next-line no-eval
+    if (key.condition && !eval(key.condition)) {
+      return ''
+    }
+
+    const fieldValue = getValueFromApplicationDataByKey(
       templateData.application.data,
       key.valueKey
     )
+    if (key.messageDescriptors) {
+      const matchedOption = key.messageDescriptors.find(
+        option => option.matchValue === fieldValue
+      )
+      return (
+        (matchedOption &&
+          intl.formatMessage(matchedOption.messageDescriptor)) ||
+        fieldValue
+      )
+    }
+    return fieldValue
   },
 
   /*
@@ -179,28 +198,29 @@ export const fieldTransformers: IFunctionTransformer = {
     @params:
       - formattedKeys: Mendatory field. It will be able to traverse through the object structure
       and fetch the appropriate value if found otherwise will throw exception.
-      Ex: '{child.firstName}, {child.lastName}'
+      Ex: '{child.firstName}, {child.lastName}'      
   */
   FormattedFieldValue: (
     templateData: TemplateTransformerData,
     intl: IntlShape,
     payload?: TransformerPayload
   ) => {
-    const key = payload && (payload as IFormattedFeildValuePayload)
-    if (!key) {
+    const keyParam = payload && (payload as IFormattedFeildValuePayload)
+    if (!keyParam) {
       throw new Error('No payload found for this transformer')
     }
-    const keys = key.formattedKeys.match(/\{.*?\}/g)
+    const keys = keyParam.formattedKeys.match(/\{.*?\}/g)
     const keyValues: { [key: string]: string } = {}
     keys &&
       keys.forEach(key => {
-        keyValues[key] = getValueFromApplicationDataByKey(
-          templateData.application.data,
-          // Getting rid of { }
-          key.substr(1, key.length - 2)
-        )
+        keyValues[key] =
+          getValueFromApplicationDataByKey(
+            templateData.application.data,
+            // Getting rid of { }
+            key.substr(1, key.length - 2)
+          ) || ''
       })
-    let value = key.formattedKeys
+    let value = keyParam.formattedKeys
     Object.keys(keyValues).forEach(key => {
       value = value.replace(new RegExp(`${key}`, 'g'), keyValues[key] || '')
     })
@@ -234,7 +254,11 @@ export const fieldTransformers: IFunctionTransformer = {
 
     let value = null
     params.conditions.forEach(condition => {
-      if (condition.type === 'COMPARE_DATE_IN_DAYS') {
+      if (
+        condition.type === 'COMPARE_DATE_IN_DAYS' &&
+        toValue !== null &&
+        fromValue !== null
+      ) {
         const diffInDays = moment(toValue).diff(moment(fromValue), 'days')
         if (
           diffInDays >= condition.minDiff &&
@@ -267,10 +291,12 @@ export const fieldTransformers: IFunctionTransformer = {
     if (!params) {
       throw new Error('No payload found for this transformer')
     }
-    let value = (getValueFromApplicationDataByKey(
-      templateData.application.data,
-      params.valueKey
-    ) as string).toString()
+    let value = (
+      getValueFromApplicationDataByKey(
+        templateData.application.data,
+        params.valueKey
+      ) || ''
+    ).toString()
 
     Object.keys(params.conversionMap).forEach(numberKey => {
       value = value.replace(
@@ -290,27 +316,19 @@ export const fieldTransformers: IFunctionTransformer = {
     if (!key) {
       throw new Error('No payload found for this transformer')
     }
-    let idType = null
-    try {
-      idType = getValueFromApplicationDataByKey(
+    const idType =
+      getValueFromApplicationDataByKey(
         templateData.application.data,
         key.idTypeKey
-      ) as string
-    } catch (error) {
-      console.error(error)
-    }
-    if (!idType || idType !== key.idTypeValue) {
+      ) || ''
+    if (idType !== key.idTypeValue) {
       return ' '
     }
-    let idValue = null
-    try {
-      idValue = getValueFromApplicationDataByKey(
+    return (
+      getValueFromApplicationDataByKey(
         templateData.application.data,
         key.idValueKey
-      ) as string
-    } catch (error) {
-      console.error(error)
-    }
-    return idValue || ' '
+      ) || ' '
+    )
   }
 }
