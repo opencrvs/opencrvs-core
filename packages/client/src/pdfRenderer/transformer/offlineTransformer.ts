@@ -128,7 +128,6 @@ export const offlineTransformers: IFunctionTransformer = {
     payload?: TransformerPayload,
     optionalData?: IAvailableCountries[]
   ) => {
-    console.log(templateData)
     const params = payload && (payload as IOfflineAddressPayload)
     if (!params) {
       throw new Error('No payload found for this transformer')
