@@ -392,9 +392,14 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                         <>
                           <LabelValue
                             label={intl.formatMessage(constantsMessages.update)}
-                            value={this.props.intl.formatMessage(
-                              getRejectionReasonDisplayValue(rejectReasons)
-                            )}
+                            value={rejectReasons
+                              .split(',')
+                              .map(reason =>
+                                intl.formatMessage(
+                                  getRejectionReasonDisplayValue(reason)
+                                )
+                              )
+                              .join(', ')}
                           />
                           <LabelValue
                             label={intl.formatMessage(
