@@ -272,7 +272,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
       this.props.application.data[this.props.activeSection.id],
       this.props.application.data
     ).reduce((memo, field) => {
-      console.log(field)
       let fieldTouched: boolean | ITouchedNestedFields = true
       if (field.nestedFields) {
         fieldTouched = {
@@ -288,7 +287,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
       }
       return { ...memo, [field.name]: fieldTouched }
     }, {})
-    console.log(touched)
     this.setAllFormFieldsTouched(touched)
   }
 
@@ -448,7 +446,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
         groupHasError = hasFormError(activeSectionFields, activeSectionValues)
       }
       if (groupHasError) {
-        console.log(groupHasError)
         this.showAllValidationErrors()
         return
       }
