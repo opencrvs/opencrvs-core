@@ -25,6 +25,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           familyName
         }
         birthDate
+        age
         gender
         maritalStatus
         nationality
@@ -163,6 +164,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
           familyName
         }
         birthDate
+        age
         gender
         maritalStatus
         nationality
