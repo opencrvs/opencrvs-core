@@ -240,6 +240,7 @@ type Person {
   telecom: [ContactPoint]
   gender: String
   birthDate: String
+  age: Float
   maritalStatus: MaritalStatusType
   occupation: String
   dateOfMarriage: Date
@@ -754,6 +755,7 @@ input PersonInput {
   telecom: [ContactPointInput]
   gender: String
   birthDate: String
+  age: Float
   maritalStatus: MaritalStatusType
   occupation: String
   dateOfMarriage: Date

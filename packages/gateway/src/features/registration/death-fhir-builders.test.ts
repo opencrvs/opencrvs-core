@@ -20,6 +20,7 @@ test('should build a minimal FHIR registration document without error', async ()
         identifier: [{ id: '123456', type: 'OTHER', otherType: 'Custom type' }],
         gender: 'male',
         birthDate: '2000-01-28',
+        age: '34',
         maritalStatus: 'MARRIED',
         name: [{ firstNames: 'Jane', familyName: 'Doe', use: 'en' }],
         deceased: {

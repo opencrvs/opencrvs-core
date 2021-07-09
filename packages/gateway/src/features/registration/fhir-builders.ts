@@ -586,6 +586,16 @@ function createDateOfMarriageBuilder(
   })
 }
 
+function createAgeBuilder(resource: fhir.Patient, fieldValue: string) {
+  if (!resource.extension) {
+    resource.extension = []
+  }
+  resource.extension.push({
+    url: `${OPENCRVS_SPECIFICATION_URL}extension/age`,
+    valueString: fieldValue
+  })
+}
+
 function createNationalityBuilder(resource: fhir.Patient, fieldValue: string) {
   if (!resource.extension) {
     resource.extension = []
@@ -1196,6 +1206,14 @@ const builders: IFieldBuilders = {
         fhirBundle
       )
       person.birthDate = fieldValue as string
+    },
+    age: (fhirBundle, fieldValue, context) => {
+      const person = selectOrCreatePersonResource(
+        DECEASED_CODE,
+        DECEASED_TITLE,
+        fhirBundle
+      )
+      return createAgeBuilder(person, fieldValue as string)
     },
     maritalStatus: (fhirBundle, fieldValue, context) => {
       const person = selectOrCreatePersonResource(
