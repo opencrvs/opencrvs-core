@@ -257,7 +257,8 @@ export const isDateNotAfterBirthEvent = (date: string, drafts?: IFormData) => {
 export const isDateNotAfterDeath = (date: string, drafts?: IFormData) => {
   const deathDate = drafts && drafts.deathEvent && drafts.deathEvent.deathDate
   return deathDate
-    ? new Date(date) <= new Date(JSON.stringify(deathDate))
+    ? new Date(date).setHours(0, 0, 0, 0) <=
+        new Date(JSON.stringify(deathDate)).setHours(0, 0, 0, 0)
     : true
 }
 
