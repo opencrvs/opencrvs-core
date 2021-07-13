@@ -642,51 +642,27 @@ export const isMoVisitDateAfterBirthDateAndBeforeDeathDate: Validation = (
 ) => {
   const cast = value && value.toString()
   if (drafts && drafts.deathEvent && !drafts.deathEvent.birthDate) {
-    if (
-      drafts &&
-      drafts.deathEvent &&
-      (cast <= drafts.deathEvent.deathDate &&
-        parseInt(drafts.deathEvent.deathDate.toString().split('-')[0]) -
-          parseInt(
-            drafts.medicalPractitioner.moLastVisitDate.toString().split('-')[0]
-          ) <=
-          drafts.deceased.age)
-    ) {
+    if (drafts && drafts.deathEvent && cast <= drafts.deathEvent.deathDate) {
       return undefined
     } else if (
       drafts &&
       drafts.deathEvent &&
-      drafts.deathEvent.deathDate &&
       cast > drafts.deathEvent.deathDate
     ) {
       return {
         message: messages.isMoVisitAfterDeath
-      }
-    } else if (
-      drafts &&
-      drafts.deceased &&
-      parseInt(drafts.deathEvent.deathDate.toString().split('-')[0]) -
-        parseInt(
-          drafts.medicalPractitioner.moLastVisitDate.toString().split('-')[0]
-        ) >
-        drafts.deceased.age
-    ) {
-      return {
-        message: messages.isMoVisitBeforeBirth
       }
     }
   } else {
     if (
       drafts &&
       drafts.deathEvent &&
-      drafts.deathEvent.birthDate &&
       (cast <= drafts.deathEvent.deathDate && cast >= drafts.deceased.birthDate)
     ) {
       return undefined
     } else if (
       drafts &&
       drafts.deathEvent &&
-      drafts.deathEvent.deathDate &&
       cast > drafts.deathEvent.deathDate
     ) {
       return {
@@ -695,7 +671,6 @@ export const isMoVisitDateAfterBirthDateAndBeforeDeathDate: Validation = (
     } else if (
       drafts &&
       drafts.deathEvent &&
-      drafts.deceased.birthDate &&
       cast < drafts.deceased.birthDate
     ) {
       return {
