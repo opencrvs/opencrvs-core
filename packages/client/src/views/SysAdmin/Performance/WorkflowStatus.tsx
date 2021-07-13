@@ -60,7 +60,10 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
-import { checkExternalValidationStatus } from '@client/views/SysAdmin/Team/utils'
+import {
+  checkExternalValidationStatus,
+  checkIfLocalLanguageProvided
+} from '@client/views/SysAdmin/Team/utils'
 import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
 import { IStatusMapping } from './reports/operational/StatusWiseApplicationCountView'
 
@@ -151,7 +154,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
   }
 
   function getColumns(totalItems = 0): IColumn[] {
-    return [
+    const keys = [
       {
         label: intl.formatMessage(constantsMessages.applications, {
           totalItems
@@ -235,7 +238,14 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         width: 12,
         alignment: ColumnContentAlignment.RIGHT
       }
-    ]
+    ] as IColumn[]
+    return keys.filter(item => {
+      if (!checkIfLocalLanguageProvided() && item.key === 'nameLocal') {
+        return false
+      } else {
+        return true
+      }
+    })
   }
 
   function getContent(data: GQLQuery) {

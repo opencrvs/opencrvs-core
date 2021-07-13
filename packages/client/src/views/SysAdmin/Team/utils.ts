@@ -36,6 +36,7 @@ import {
 import { GQLRole, GQLUser } from '@opencrvs/gateway/src/graphql/schema'
 import { MessageDescriptor } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/userSetup'
+import { ColumnContentAlignment } from '@client/../../components/lib/interface'
 
 export enum UserStatus {
   ACTIVE,
@@ -600,4 +601,8 @@ export function checkExternalValidationStatus(status?: string | null): boolean {
     return false
   }
   return true
+}
+export function checkIfLocalLanguageProvided() {
+  let languages: Array<string> = window.config.LANGUAGES.split(',')
+  return languages.length > 1
 }
