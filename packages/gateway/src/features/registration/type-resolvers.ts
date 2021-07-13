@@ -126,6 +126,13 @@ export const typeResolvers: GQLResolver = {
       )
       return (marriageExtension && marriageExtension.valueDateTime) || null
     },
+    age: person => {
+      const marriageExtension = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/age`,
+        person.extension
+      )
+      return (marriageExtension && marriageExtension.valueString) || null
+    },
     maritalStatus: person => {
       return person && person.maritalStatus && person.maritalStatus.text
     },

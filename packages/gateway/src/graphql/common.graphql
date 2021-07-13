@@ -157,6 +157,7 @@ input PersonInput {
   telecom: [ContactPointInput]
   gender: String
   birthDate: String
+  age: Float
   maritalStatus: MaritalStatusType # Not in BDRIS2 - keep as optional
   occupation: String
   dateOfMarriage: Date # Not in BDRIS2
@@ -177,6 +178,7 @@ type Person { # -> Patient
   telecom: [ContactPoint] # -> .telecom
   gender: String # -> .gender
   birthDate: String # -> birthDate
+  age: Float # -> .extension(url='http://opencrvs.org/specs/age').valueInteger
   maritalStatus: MaritalStatusType # -> .maritalStatus
   occupation: String
   dateOfMarriage: Date # -> .extension(url='http://opencrvs.org/specs/date-of-marriage').valueDateTime

@@ -28,7 +28,8 @@ import {
   TransformerPayload,
   IFormattedFeildValuePayload,
   IPersonIdentifierValuePayload,
-  IApplicantNameCondition
+  IApplicantNameCondition,
+  IArithmeticOperationPayload
 } from '@client/pdfRenderer/transformer/types'
 import moment from 'moment'
 import { IFormSectionData } from '@client/forms'
@@ -228,6 +229,52 @@ export const fieldTransformers: IFunctionTransformer = {
       value = value.replace(new RegExp(`${key}`, 'g'), keyValues[key] || '')
     })
     return value
+  },
+
+  /*
+    ArithmeticOperation allows us to run arethmetic operations like addition, subtraction,
+    division, multiplication between two given field values.
+    @params:
+      - operationType: Mendatory field. ex: 'ADDITION'
+      - leftValueKey: Mendatory field. ex: deceased.noOfMaleDependants
+      - rightValueKey: Mendatory field. ex: deceased.noOfFemaleDependants
+  */
+  ArithmeticOperation: (
+    templateData: TemplateTransformerData,
+    intl: IntlShape,
+    payload?: TransformerPayload
+  ) => {
+    const params = payload && (payload as IArithmeticOperationPayload)
+    if (!params) {
+      throw new Error('No payload found for this transformer')
+    }
+    const leftValue =
+      getValueFromApplicationDataByKey(
+        templateData.application.data,
+        params.leftValueKey
+      ) || 0
+    const rightValue =
+      getValueFromApplicationDataByKey(
+        templateData.application.data,
+        params.rightValueKey
+      ) || 0
+
+    let value = null
+    switch (params.operationType) {
+      case 'ADDITION':
+        value = leftValue + rightValue
+        break
+      case 'SUBTRACTION':
+        value = leftValue - rightValue
+        break
+      case 'DIVISION':
+        value = leftValue / rightValue
+        break
+      case 'MULTIPLICATION':
+        value = leftValue * rightValue
+        break
+    }
+    return (value && value.toString()) || ''
   },
 
   /*

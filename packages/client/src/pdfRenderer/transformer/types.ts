@@ -41,6 +41,7 @@ export type TransformerPayload =
   | ILanguagePayload
   | ILocationPayload
   | IPersonIdentifierValuePayload
+  | IArithmeticOperationPayload
 
 export type Condition = IApplicantNameCondition | IOfflineAddressCondition
 
@@ -176,4 +177,16 @@ export interface IConditionExecutorPayload {
     maxDiff: number
     output: IIntLabelPayload // based on the we can add more type here
   }[]
+}
+
+export type ArithmeticOperationType =
+  | 'ADDITION'
+  | 'SUBTRACTION'
+  | 'DIVISION'
+  | 'MULTIPLICATION'
+
+export interface IArithmeticOperationPayload {
+  operationType: ArithmeticOperationType
+  leftValueKey: string
+  rightValueKey: string
 }
