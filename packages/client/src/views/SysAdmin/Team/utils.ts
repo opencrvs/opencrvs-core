@@ -602,43 +602,7 @@ export function checkExternalValidationStatus(status?: string | null): boolean {
   }
   return true
 }
-export function checkIfLocalLanguageProvided(
-  columnObject: (
-    | {
-        label: string
-        key: string
-        width: number
-        isSortable?: undefined
-        sortFunction?: undefined
-        icon?: undefined
-        alignment?: undefined
-      }
-    | {
-        label: string
-        key: string
-        width: number
-        isSortable: boolean
-        sortFunction: () => void
-        icon: JSX.Element
-        alignment?: undefined
-      }
-    | {
-        label: string
-        key: string
-        width: number
-        alignment: ColumnContentAlignment
-        isSortable?: undefined
-        sortFunction?: undefined
-        icon?: undefined
-      })[]
-) {
+export function checkIfLocalLanguageProvided() {
   let languages: Array<string> = window.config.LANGUAGES.split(',')
-  if (languages.length <= 1) {
-    for (let k in columnObject) {
-      if (columnObject[k].key === 'nameLocal') {
-        delete columnObject[k]
-      }
-    }
-  }
-  return columnObject
+  return languages.length > 1
 }

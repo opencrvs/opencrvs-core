@@ -154,7 +154,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
   }
 
   function getColumns(totalItems = 0): IColumn[] {
-    let keys = [
+    const keys = [
       {
         label: intl.formatMessage(constantsMessages.applications, {
           totalItems
@@ -238,8 +238,14 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         width: 12,
         alignment: ColumnContentAlignment.RIGHT
       }
-    ]
-    return checkIfLocalLanguageProvided(keys)
+    ] as IColumn[]
+    return keys.filter(item => {
+      if (!checkIfLocalLanguageProvided() && item.key === 'nameLocal') {
+        return false
+      } else {
+        return true
+      }
+    })
   }
 
   function getContent(data: GQLQuery) {
