@@ -291,7 +291,7 @@ export const getFieldOptions = (
         `Dependency '${dependencyVal}' has illegal value, the value should have an entry in the dynamic options object.`
       )
     } else {
-      options = field.dynamicOptions.options[dependencyVal]
+      options = field.dynamicOptions.options[dependencyVal] || []
     }
     return options
   }
