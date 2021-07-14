@@ -127,5 +127,9 @@ export function setInformantSectionTransformer(
       // @ts-ignore
       draftData[sectionId]._fhirIDMap.individual
   }
+  // Passing Informant's relationship data
+  if (draftData[sectionId].relationship) {
+    transformedData[sectionId].relationship = draftData[sectionId].relationship
+  }
   return transformedData
 }

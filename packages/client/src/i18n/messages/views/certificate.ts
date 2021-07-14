@@ -61,8 +61,8 @@ interface ICertificateMessages extends Record<string, MessageDescriptor> {
   typeOfID: MessageDescriptor
   whoToCollect: MessageDescriptor
   confirmAndPrint: MessageDescriptor
-  retiewTitle: MessageDescriptor
-  retiewDescription: MessageDescriptor
+  reviewTitle: MessageDescriptor
+  reviewDescription: MessageDescriptor
   modalTitle: MessageDescriptor
   modalBody: MessageDescriptor
   toastMessage: MessageDescriptor
@@ -247,7 +247,7 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.certificate.paymentInstruction'
   },
   paymentAmount: {
-    defaultMessage: '৳ {paymentAmount}',
+    defaultMessage: '{paymentAmount}',
     description: 'The label for payment amount subsection',
     id: 'print.certificate.paymentAmount'
   },
@@ -335,12 +335,12 @@ const messagesToDefine: ICertificateMessages = {
     description: 'The text for Confirm & print button',
     id: 'print.certificate.button.confirmPrint'
   },
-  retiewTitle: {
+  reviewTitle: {
     defaultMessage: 'Are all the details on the {event} certificate correct?',
     description: 'Certificate review title',
     id: 'print.certificate.review.title'
   },
-  retiewDescription: {
+  reviewDescription: {
     defaultMessage:
       'Please confirm that the applicant has reviewed that the information on the certificate is correct and that it is ready to print.',
     description: 'Certificate review description',

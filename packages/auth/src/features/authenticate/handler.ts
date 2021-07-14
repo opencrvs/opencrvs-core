@@ -39,9 +39,9 @@ export default async function authenticateHandler(
 ): Promise<IAuthResponse> {
   const payload = request.payload as IAuthPayload
   let result
-
+  const { username, password } = payload
   try {
-    result = await authenticate(payload.username, payload.password)
+    result = await authenticate(username.trim(), password)
   } catch (err) {
     throw unauthorized()
   }

@@ -14,7 +14,9 @@ import { validationMessages as messages } from '@client/i18n/messages'
 import { IFormFieldValue, IFormData } from '@opencrvs/client/src/forms'
 import {
   REGEXP_BLOCK_ALPHA_NUMERIC_DOT,
-  REGEXP_ALPHA_NUMERIC
+  REGEXP_ALPHA_NUMERIC,
+  REGEXP_BLOCK_ALPHA_NUMERIC,
+  REGEXP_DECIMAL_POINT_NUMBER
 } from '@client/utils/constants'
 import { validate as validateEmail } from 'email-validator'
 import * as XRegExp from 'xregexp'
@@ -26,6 +28,7 @@ import {
   PASSPORT,
   DRIVING_LICENSE
 } from '@client/forms/identity'
+import moment from 'moment'
 
 export interface IValidationResult {
   message: MessageDescriptor
@@ -53,7 +56,7 @@ const fallbackCountry = window.config.COUNTRY
 interface IMobilePhonePattern {
   pattern: RegExp
   example: string
-  start: string
+  start?: string
   num: string
 }
 
@@ -75,6 +78,12 @@ const mobilePhonePatternTable: { [key: string]: IMobilePhonePattern } = {
     example: '0970545855',
     start: '0[7|9]',
     num: '10'
+  },
+  niu: {
+    pattern: /^683[0-9]{4}$/,
+    example: '6837767',
+    start: '683',
+    num: '7'
   }
 }
 
@@ -173,6 +182,15 @@ export const blockAlphaNumericDot: Validation = (value: IFormFieldValue) => {
     : { message: messages.blockAlphaNumericDot }
 }
 
+export const nonDecimalPointNumber: Validation = (value: IFormFieldValue) => {
+  const cast = value as string
+  if (cast) {
+    return !isRegexpMatched(cast.toString(), REGEXP_DECIMAL_POINT_NUMBER)
+      ? undefined
+      : { message: messages.nonDecimalPointNumber }
+  }
+}
+
 export const numeric: Validation = (value: IFormFieldValue) => {
   const cast = value as string
   return isNumber(cast) ? undefined : { message: messages.numberRequired }
@@ -239,7 +257,8 @@ export const isDateNotAfterBirthEvent = (date: string, drafts?: IFormData) => {
 export const isDateNotAfterDeath = (date: string, drafts?: IFormData) => {
   const deathDate = drafts && drafts.deathEvent && drafts.deathEvent.deathDate
   return deathDate
-    ? new Date(date) <= new Date(JSON.stringify(deathDate))
+    ? new Date(date).setHours(0, 0, 0, 0) <=
+        new Date(JSON.stringify(deathDate)).setHours(0, 0, 0, 0)
     : true
 }
 
@@ -297,7 +316,8 @@ export const isValidParentsBirthDate = (minAgeGap: number): Validation => (
   drafts
 ) => {
   const parentsBirthDate = value as string
-  const childBirthDate = (drafts && drafts.child.childBirthDate) as string
+  const childBirthDate =
+    drafts && drafts.child && (drafts.child.childBirthDate as string)
 
   return parentsBirthDate &&
     isAValidDateFormat(parentsBirthDate) &&
@@ -615,6 +635,69 @@ export const isValidDeathOccurrenceDate: Validation = (
     : {
         message: messages.isValidDateOfDeath
       }
+}
+
+export const isMoVisitDateAfterBirthDateAndBeforeDeathDate: Validation = (
+  value: IFormFieldValue,
+  drafts
+) => {
+  const cast = value && value.toString()
+  if (drafts && drafts.deathEvent && !drafts.deathEvent.birthDate) {
+    if (drafts && drafts.deathEvent && cast <= drafts.deathEvent.deathDate) {
+      return undefined
+    } else if (
+      drafts &&
+      drafts.deathEvent &&
+      cast > drafts.deathEvent.deathDate
+    ) {
+      return {
+        message: messages.isMoVisitAfterDeath
+      }
+    }
+  } else {
+    if (
+      drafts &&
+      drafts.deathEvent &&
+      cast <= drafts.deathEvent.deathDate &&
+      cast >= drafts.deceased.birthDate
+    ) {
+      return undefined
+    } else if (
+      drafts &&
+      drafts.deathEvent &&
+      cast > drafts.deathEvent.deathDate
+    ) {
+      return {
+        message: messages.isMoVisitAfterDeath
+      }
+    } else if (
+      drafts &&
+      drafts.deathEvent &&
+      cast < drafts.deceased.birthDate
+    ) {
+      return {
+        message: messages.isMoVisitBeforeBirth
+      }
+    }
+  }
+}
+
+export const isInformantOfLegalAge: Validation = (value: IFormFieldValue) => {
+  if (value) {
+    if (
+      minAgeGapExist(
+        moment(new Date()).format('YYYY-MM-DD'),
+        value.toString(),
+        window.config.INFORMANT_MINIMUM_AGE
+      )
+    ) {
+      return undefined
+    } else {
+      return {
+        message: messages.isInformantOfLegalAge
+      }
+    }
+  }
 }
 
 export const greaterThanZero: Validation = (value: IFormFieldValue) => {

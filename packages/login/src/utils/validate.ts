@@ -71,7 +71,7 @@ const fallbackCountry = window.config.COUNTRY
 interface IMobilePhonePattern {
   pattern: RegExp
   example: string
-  start: string
+  start?: string
   num: string
 }
 
@@ -93,6 +93,12 @@ const mobilePhonePatternTable: { [key: string]: IMobilePhonePattern } = {
     example: '0970545855',
     start: '0[7|9]',
     num: '10'
+  },
+  niu: {
+    pattern: /^683[0-9]{4}$/,
+    example: '6837767',
+    start: '683',
+    num: '7'
   }
 }
 

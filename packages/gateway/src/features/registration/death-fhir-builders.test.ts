@@ -20,6 +20,7 @@ test('should build a minimal FHIR registration document without error', async ()
         identifier: [{ id: '123456', type: 'OTHER', otherType: 'Custom type' }],
         gender: 'male',
         birthDate: '2000-01-28',
+        age: '34',
         maritalStatus: 'MARRIED',
         name: [{ firstNames: 'Jane', familyName: 'Doe', use: 'en' }],
         deceased: {
@@ -54,6 +55,7 @@ test('should build a minimal FHIR registration document without error', async ()
           maritalStatus: 'MARRIED',
           name: [{ firstNames: 'John', familyName: 'Doe', use: 'en' }],
           multipleBirth: 1,
+          occupation: 'Nurse',
           dateOfMarriage: '2014-01-28',
           nationality: ['BGD'],
           educationalAttainment: 'UPPER_SECONDARY_ISCED_4',
@@ -92,6 +94,11 @@ test('should build a minimal FHIR registration document without error', async ()
         _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7xxy33',
         relationship: 'OTHER',
         otherRelationship: 'Nephew'
+      },
+      medicalPractitioner: {
+        name: 'Full Name of Doctor',
+        qualification: 'MBBS',
+        lastVisitDate: '2000-01-28'
       },
       registration: {
         _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eebce',
@@ -179,6 +186,8 @@ test('should build a minimal FHIR registration document without error', async ()
       mannerOfDeath: 'NATURAL_CAUSES',
       causeOfDeathMethod: 'MEDICALLY_CERTIFIED',
       causeOfDeath: 'age',
+      maleDependentsOfDeceased: 1,
+      femaleDependentsOfDeceased: 1,
       createdAt: new Date(),
       _fhirIDMap: {
         composition: '8f18a6ea-89d1-4b03-80b3-57509a7eebcedsd',

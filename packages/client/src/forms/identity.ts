@@ -24,15 +24,7 @@ export const OTHER = 'OTHER'
 export const NO_ID = 'NO_ID'
 export const SOCIAL_SECURITY_NO = 'SOCIAL_SECURITY_NO'
 
-export const birthIdentityOptions = [
-  { value: NATIONAL_ID, label: messages.nationalIdOption },
-  {
-    value: BIRTH_REGISTRATION_NUMBER,
-    label: messages.brnOption
-  }
-]
-
-export const deathIdentityOptions = [
+export const identityOptions = [
   { value: PASSPORT, label: messages.iDTypePassport },
   { value: NATIONAL_ID, label: messages.iDTypeNationalID },
   {

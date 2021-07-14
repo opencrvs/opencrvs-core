@@ -39,6 +39,7 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
 import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
+import { checkExternalValidationStatus } from '@client/views/SysAdmin/Team/utils'
 
 const ExpansionContent = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -332,7 +333,6 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
   getRenderedData() {
     const { intl } = this.props
     const transformedData = this.transformer()
-
     return (
       <>
         <BorderedPaddedContent>
@@ -358,6 +358,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
         </BorderedPaddedContent>
         <>
           {transformedData.operationHistories
+            .filter(item => checkExternalValidationStatus(item.type))
             .map((operationHistory, index) => {
               const { rejectReasons, comment } = operationHistory
               const type = operationHistory.type as string

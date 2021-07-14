@@ -28,6 +28,10 @@ export const BIRTH_REG_TYPE_CODE = 'birth-reg-type'
 export const BIRTH_REG_PRESENT_CODE = 'present-at-birth-reg'
 export const NUMBER_BORN_ALIVE_CODE = 'num-born-alive'
 export const NUMBER_FOEATAL_DEATH_CODE = 'num-foetal-death'
+export const MALE_DEPENDENTS_ON_DECEASED_CODE =
+  'num-male-dependents-on-deceased'
+export const FEMALE_DEPENDENTS_ON_DECEASED_CODE =
+  'num-female-dependents-on-deceased'
 export const LAST_LIVE_BIRTH_CODE = '68499-3'
 export const OBSERVATION_CATEGORY_PROCEDURE_CODE = 'procedure'
 export const OBSERVATION_CATEGORY_PROCEDURE_DESC = 'Procedure'
@@ -239,6 +243,16 @@ export function createPersonEntryTemplate(refUuid: string) {
       resourceType: 'Patient',
       active: true
     } as fhir.Patient
+  }
+}
+
+export function createPractitionerEntryTemplate(refUuid: string) {
+  return {
+    fullUrl: `urn:uuid:${refUuid}`,
+    resource: {
+      resourceType: 'Practitioner',
+      active: true
+    } as fhir.Practitioner
   }
 }
 

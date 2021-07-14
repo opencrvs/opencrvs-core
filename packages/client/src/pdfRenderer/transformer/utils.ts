@@ -44,18 +44,14 @@ export function getValueFromApplicationDataByKey(
 
   let valueObject: IFormSectionData | IFormFieldValue | null = null
 
-  try {
-    keyTree.forEach(keyNode => {
-      valueObject =
-        valueObject === null
-          ? data[keyNode]
-          : (valueObject as IFormSectionData)[keyNode]
-    })
-  } catch (error) {
-    throw new Error(`Given value key structure is not valid: ${valueKey}`)
-  }
+  keyTree.forEach(keyNode => {
+    valueObject =
+      valueObject === null
+        ? data[keyNode] || null
+        : (valueObject as IFormSectionData)[keyNode]
+  })
   if (valueObject === null) {
-    throw new Error(`Given value key structure is not valid: ${valueKey}`)
+    console.error(`Given value key structure is not valid: ${valueKey}`)
   }
   return valueObject
 }
@@ -93,6 +89,10 @@ function executeConditionalOperation(
   value: string
 ) {
   switch (operation) {
+    case ConditionOperation.VALUE_EXISTS:
+      return value !== ''
+    case ConditionOperation.VALUE_DOES_NOT_EXISTS:
+      return value === ''
     case ConditionOperation.DOES_NOT_MATCH:
       return !conditionInputs.includes(value)
     default:
@@ -119,11 +119,11 @@ export function getMatchedCondition(
       return executeConditionalOperation(
         getConditionalOperationEnumByValue(conditionObj.condition.operation),
         conditionObj.condition.values,
-        // Will throw an exception when value is not found for given key
+        // Will return empty string when value is not found for given key
         getValueFromApplicationDataByKey(
           applicationData,
           conditionObj.condition.key || ''
-        )
+        ) || ''
       )
     } catch (error) {
       /* eslint-disable no-console */

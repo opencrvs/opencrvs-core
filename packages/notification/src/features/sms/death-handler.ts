@@ -94,7 +94,8 @@ export async function sendDeathRegistrationConfirmation(
     messageKeys.deathRegistrationNotification,
     {
       name: payload.name,
-      trackingId: payload.trackingId
+      trackingId: payload.trackingId,
+      registrationNumber: payload.registrationNumber
     },
     getDefaultLanguage()
   )
