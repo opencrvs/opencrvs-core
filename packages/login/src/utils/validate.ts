@@ -95,10 +95,10 @@ const mobilePhonePatternTable: { [key: string]: IMobilePhonePattern } = {
     num: '10'
   },
   niu: {
-    pattern: /^683[0-9]{4}$/,
+    pattern: /^(683|683888)[0-9]{4}$/,
     example: '6837767',
-    start: '683',
-    num: '7'
+    start: '[683 or 683888]',
+    num: '7 or 10'
   }
 }
 
