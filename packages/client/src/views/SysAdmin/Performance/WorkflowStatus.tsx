@@ -240,11 +240,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       }
     ] as IColumn[]
     return keys.filter(item => {
-      if (!checkIfLocalLanguageProvided() && item.key === 'nameLocal') {
-        return false
-      } else {
-        return true
-      }
+      return !(!checkIfLocalLanguageProvided() && item.key === 'nameLocal')
     })
   }
 
