@@ -25,3 +25,5 @@ export const SENTRY_DSN =
 // This needs to be a string to make it easy to pass as an ENV var.
 export const CHECK_INVALID_TOKEN = process.env.CHECK_INVALID_TOKEN || 'false'
 export const SEARCH_URL = process.env.SEARCH_URL || 'http://localhost:9090/'
+export const EXPECTED_BIRTH_REGISTRATION_IN_DAYS =
+  process.env.EXPECTED_BIRTH_REGISTRATION_IN_DAYS || 45

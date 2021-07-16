@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { EXPECTED_BIRTH_REGISTRATION_IN_DAYS } from '@metrics/constants'
 import {
   FEMALE,
   MALE,
@@ -159,11 +160,11 @@ const birthRegWithinTimeFramesQuery = (
    SELECT within45Days, within45DTo1Yr, within1YrTo5Yr, over5Yr, ${lowerLocationLevel}
    FROM (
     SELECT COUNT(ageInDays) AS within45Days FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
-  AND ageInDays > -1 AND ageInDays <= 45 AND ${currentLocationLevel}='${locationId}'
+  AND ageInDays > -1 AND ageInDays <= ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} AND ${currentLocationLevel}='${locationId}'
     GROUP BY ${lowerLocationLevel}
    ), (
     SELECT COUNT(ageInDays) AS within45DTo1Yr FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
-  AND ageInDays > 46 AND ageInDays <= 365 AND ${currentLocationLevel}='${locationId}'
+  AND ageInDays > ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} AND ageInDays <= 365 AND ${currentLocationLevel}='${locationId}'
     GROUP BY ${lowerLocationLevel}
    ), (
     SELECT COUNT(ageInDays) AS within1YrTo5Yr FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
@@ -194,11 +195,11 @@ const deathRegWithinTimeFramesQuery = (
    SELECT within45Days, within45DTo1Yr, within1YrTo5Yr, over5Yr, ${lowerLocationLevel}
    FROM (
     SELECT COUNT(deathDays) AS within45Days FROM death_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
-  AND deathDays > -1 AND deathDays <= 45 AND ${currentLocationLevel}='${locationId}'
+  AND deathDays > -1 AND deathDays <= ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} AND ${currentLocationLevel}='${locationId}'
     GROUP BY ${lowerLocationLevel}
    ), (
     SELECT COUNT(deathDays) AS within45DTo1Yr FROM death_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
-  AND deathDays > 46 AND deathDays <= 365 AND ${currentLocationLevel}='${locationId}'
+  AND deathDays > ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} AND deathDays <= 365 AND ${currentLocationLevel}='${locationId}'
     GROUP BY ${lowerLocationLevel}
    ), (
     SELECT COUNT(deathDays) AS within1YrTo5Yr FROM death_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
@@ -361,7 +362,7 @@ export async function fetchKeyFigures(
 ) {
   const estimatedFigureFor45Days = await fetchEstimateByLocation(
     location,
-    45, // For 45 Days
+    Number(EXPECTED_BIRTH_REGISTRATION_IN_DAYS),
     EVENT_TYPE.BIRTH,
     authHeader,
     timeStart,
@@ -381,7 +382,7 @@ export async function fetchKeyFigures(
           OR locationLevel3 = '${queryLocationId}'
           OR locationLevel4 = '${queryLocationId}'
           OR locationLevel5 = '${queryLocationId}' )
-      AND ageInDays <= 45
+      AND ageInDays <= ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS}
     GROUP BY gender`
   )
   keyFigures.push(
@@ -409,7 +410,7 @@ export async function fetchKeyFigures(
           OR locationLevel3 = '${queryLocationId}'
           OR locationLevel4 = '${queryLocationId}'
           OR locationLevel5 = '${queryLocationId}' )
-      AND ageInDays > 45
+      AND ageInDays > ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS}
       AND ageInDays <= 365
     GROUP BY gender`
   )
@@ -622,7 +623,7 @@ export async function fetchEstimated45DayMetrics(
   const points = await query(`SELECT
                               COUNT(${column}) AS withIn45Day
                               FROM ${measurement}
-                              WHERE ${column} <= 45
+                              WHERE ${column} <= ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS}
                               AND time > '${timeFrom}'
                               AND time <= '${timeTo}'
                               AND ${currLocationLevel}='${currLocation}'
@@ -724,7 +725,7 @@ export async function fetchLocationWiseEventEstimations(
           OR locationLevel3 = '${locationId}'
           OR locationLevel4 = '${locationId}'
           OR locationLevel5 = '${locationId}' )
-      AND ${column} <= 45
+      AND ${column} <= ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS}
     GROUP BY gender`
   )
 
