@@ -594,15 +594,11 @@ export function getUserAuditDescription(
   return AuditDescriptionMapping[status] || undefined
 }
 export function checkExternalValidationStatus(status?: string | null): boolean {
-  if (
+  return !(
     !window.config.EXTERNAL_VALIDATION_WORKQUEUE &&
     status === 'WAITING_VALIDATION'
-  ) {
-    return false
-  }
-  return true
+  )
 }
 export function checkIfLocalLanguageProvided() {
-  let languages: Array<string> = window.config.LANGUAGES.split(',')
-  return languages.length > 1
+  return window.config.LANGUAGES.split(',').length > 1
 }
