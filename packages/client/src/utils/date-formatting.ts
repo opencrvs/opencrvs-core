@@ -44,12 +44,6 @@ export const formatLongDate = (
 }
 
 export const formattedDuration = (fromDate: moment.Moment) => {
-  const currentTime = moment(new Date())
-  fromDate.set({
-    hour: currentTime.get('hour'),
-    minute: currentTime.get('minute'),
-    second: currentTime.get('second')
-  })
-
+  moment.relativeTimeRounding(Math.floor)
   return fromDate.fromNow()
 }
