@@ -40,6 +40,7 @@ import { IStoreState } from '@client/store'
 import { IApplication, DOWNLOAD_STATUS } from '@client/applications'
 import { Action } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
+import { formattedDuration } from '@client/utils/date-formatting'
 
 interface IBasePrintTabProps {
   theme: ITheme
@@ -190,10 +191,12 @@ class PrintTabComponent extends React.Component<
         event,
         dateOfRegistration:
           (reg.modifiedAt &&
-            moment(
-              moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
-              'YYYY-MM-DD HH:mm:ss'
-            ).fromNow()) ||
+            formattedDuration(
+              moment(
+                moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
+                'YYYY-MM-DD HH:mm:ss'
+              )
+            )) ||
           '',
         actions,
         rowClickHandler: [

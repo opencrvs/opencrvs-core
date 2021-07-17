@@ -46,6 +46,7 @@ import {
   SYS_ADMIN_ROLES
 } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
+import { formattedDuration } from '@client/utils/date-formatting'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
 import { InProgress } from '@client/views/FieldAgentHome/InProgress'
 import { SentForReview } from '@client/views/FieldAgentHome/SentForReview'
@@ -313,9 +314,7 @@ class FieldAgentHomeView extends React.Component<
       const daysOfRejection =
         rejectedArray &&
         rejectedArray[0] &&
-        moment(rejectedArray[0].operatedOn)
-          .startOf('minute')
-          .fromNow()
+        formattedDuration(moment(rejectedArray[0].operatedOn))
       const event = registrationSearchSet.type as string
       return {
         id: registrationSearchSet.id,

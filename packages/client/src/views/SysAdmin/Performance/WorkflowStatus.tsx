@@ -66,6 +66,7 @@ import {
 } from '@client/views/SysAdmin/Team/utils'
 import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
 import { IStatusMapping } from './reports/operational/StatusWiseApplicationCountView'
+import { formattedDuration } from '@client/utils/date-formatting'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -260,7 +261,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           <DoubleLineValueWrapper>
             {dateMoment.format('MMMM DD, YYYY')}
             <br />
-            {`(${dateMoment.fromNow()})`}
+            {`(${formattedDuration(dateMoment)})`}
           </DoubleLineValueWrapper>
         )) || <></>
       )

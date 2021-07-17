@@ -67,6 +67,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import { convertToMSISDN } from '@client/forms/utils'
+import { formattedDuration } from '@client/utils/date-formatting'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
@@ -393,12 +394,15 @@ export class SearchResultView extends React.Component<
         status: this.getDeclarationStatusLabel(reg.declarationStatus),
         dateOfModification:
           (reg.modifiedAt &&
-            moment(
-              moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
-              'YYYY-MM-DD HH:mm:ss'
-            ).fromNow()) ||
+            formattedDuration(
+              moment(
+                moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
+                'YYYY-MM-DD HH:mm:ss'
+              )
+            )) ||
           '',
-        startedAt: (reg.createdAt && moment(reg.createdAt).fromNow()) || '',
+        startedAt:
+          (reg.createdAt && formattedDuration(moment(reg.createdAt))) || '',
         icon,
         actions,
         rowClickHandler: [
