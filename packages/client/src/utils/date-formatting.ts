@@ -42,3 +42,14 @@ export const formatLongDate = (
   moment.updateLocale(locale, config[locale])
   return moment(date).format(formatString)
 }
+
+export const formattedDuration = (fromDate: moment.Moment) => {
+  const currentTime = moment(new Date())
+  fromDate.set({
+    hour: currentTime.get('hour'),
+    minute: currentTime.get('minute'),
+    second: currentTime.get('second')
+  })
+
+  return fromDate.fromNow()
+}

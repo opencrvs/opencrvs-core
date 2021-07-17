@@ -35,6 +35,7 @@ import { connect } from 'react-redux'
 import ReactTooltip from 'react-tooltip'
 import { withTheme } from 'styled-components'
 import { LoadingIndicator } from '@client/views/RegistrationHome/LoadingIndicator'
+import { formattedDuration } from '@client/utils/date-formatting'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -169,14 +170,18 @@ class ApprovalTabComponent extends React.Component<
         event,
         eventTimeElapsed:
           (reg.dateOfEvent &&
-            moment(reg.dateOfEvent.toString(), 'YYYY-MM-DD').fromNow()) ||
+            formattedDuration(
+              moment(reg.dateOfEvent.toString(), 'YYYY-MM-DD')
+            )) ||
           '',
         dateOfApproval:
           (reg.modifiedAt &&
-            moment(
-              moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
-              'YYYY-MM-DD HH:mm:ss'
-            ).fromNow()) ||
+            formattedDuration(
+              moment(
+                moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
+                'YYYY-MM-DD HH:mm:ss'
+              )
+            )) ||
           '',
         icon,
         rowClickHandler: [
