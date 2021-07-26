@@ -22,19 +22,23 @@ export const deathDocumentForWhomFhirMapping = {
   'Proof Deceased Permanent Address': 'DECEASED_PARMANENT_ADDRESS_PROOF',
   'Proof of Death of Deceased': 'DECEASED_DEATH_PROOF',
   'Proof of Date of Birth of Deceased': 'DECEASED_BIRTH_PROOF',
+  'Cuase of Death': 'CAUSE_OF_DEATH',
   "Proof of Applicant's ID": 'APPLICANT_ID_PROOF',
   "Proof of applicant's authority to apply":
     'APPLICANT_ATHORITY_TO_APPLY_PROOF',
-  'Letter from ward councillor': 'WARD_COUNCILLOR_PROOF'
+  'Letter from ward councillor': 'WARD_COUNCILLOR_PROOF',
+  'Coroner Report': 'CORONERS_REPORT'
 }
 
 export const deathSectionMapping = {
   [DeathSection.Deceased]: [
+    deathDocumentForWhomFhirMapping['Cuase of Death'],
     deathDocumentForWhomFhirMapping["Proof of Deceased's ID"],
     deathDocumentForWhomFhirMapping['Proof Deceased Permanent Address'],
     deathDocumentForWhomFhirMapping['Proof of Death of Deceased'],
     deathDocumentForWhomFhirMapping['Proof of Date of Birth of Deceased'],
-    deathDocumentForWhomFhirMapping['Letter from ward councillor']
+    deathDocumentForWhomFhirMapping['Letter from ward councillor'],
+    deathDocumentForWhomFhirMapping['Coroner Report']
   ],
   [DeathSection.Applicants]: [
     deathDocumentForWhomFhirMapping["Proof of Applicant's ID"],
@@ -51,6 +55,8 @@ export const deathDocumentTypeFhirMapping = {
   'Birth Registration': 'BIRTH_REGISTRATION',
   'National ID (front)': 'NATIONAL_ID_FRONT',
   'National ID (back)': 'NATIONAL_ID_BACK',
+  'Cuase of Death': 'CAUSE_OF_DEATH',
+  'Proof of Death of Deceased': 'DECEASED_DEATH_PROOF',
   'Certified Post Mortem Report': 'POST_MORTEM_CERTIFICATE',
   'Hospital Discharge Certificate': 'HOSPITAL_DISCHARGE_CERTIFICATE',
   'Attested Letter of Death': 'ATTESTED_DEATH_LETTER',
@@ -59,7 +65,7 @@ export const deathDocumentTypeFhirMapping = {
   'Certified Copy of Funeral Receipt': 'FUNERAL_RECEIPT',
   Passport: 'PASSPORT',
   'Police Brought In Dead Certificate': 'BROUGHT_IN_DEAD_CERTIFICATE',
-  'Coroners Report': 'CORONERS_REPORT',
+  'Coroner Report': 'CORONERS_REPORT',
   'Signed Affidavit': 'SIGNED_AFFIDAVIT',
   'Proof of Date of Birth of Deceased': 'DECEASED_BIRTH_PROOF_PAPER',
   'Letter from ward councillor': 'LETTER_FROM_COUNCILLOR',

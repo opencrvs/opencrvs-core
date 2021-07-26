@@ -170,7 +170,7 @@ const messagesToDefine: IUserSetupMessages = {
     id: 'userSetup.waiting'
   },
   assignedOffice: {
-    defaultMessage: 'Assigned office',
+    defaultMessage: 'Assigned registration office',
     description: 'Title for assigned office field',
     id: 'user.profile.assignedOffice'
   },

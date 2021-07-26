@@ -60,6 +60,7 @@ import { get } from 'lodash'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { getDraftApplicantFullName } from '@client/utils/draftUtils'
 import { LoadingIndicator } from '@client/views/RegistrationHome/LoadingIndicator'
+import { formattedDuration } from '@client/utils/date-formatting'
 
 const BlueButton = styled(Button)`
   background-color: ${({ theme }) => theme.colors.secondary};
@@ -262,7 +263,7 @@ export class InProgressTabComponent extends React.Component<
         startedBy,
         dateOfModification:
           (lastModificationDate &&
-            moment(parseInt(lastModificationDate)).fromNow()) ||
+            formattedDuration(moment(parseInt(lastModificationDate)))) ||
           '',
         actions,
         rowClickHandler: [
@@ -312,7 +313,8 @@ export class InProgressTabComponent extends React.Component<
           '',
         name: name || '',
         dateOfModification:
-          (lastModificationDate && moment(lastModificationDate).fromNow()) ||
+          (lastModificationDate &&
+            formattedDuration(moment(lastModificationDate))) ||
           '',
         actions,
         rowClickHandler: [

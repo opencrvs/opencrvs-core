@@ -44,5 +44,9 @@ export function getInformantSectionTransformer(
       individual: queryData[sectionId].individual.id
     }
   }
+  // Getting Informant's relationship data
+  if (queryData[sectionId].relationship) {
+    transformedData[sectionId].relationship = queryData[sectionId].relationship
+  }
   return transformedData
 }

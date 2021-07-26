@@ -111,7 +111,8 @@ export async function sendBirthRegistrationConfirmation(
     messageKeys.birthRegistrationNotification,
     {
       name: payload.name,
-      trackingId: payload.trackingId
+      trackingId: payload.trackingId,
+      registrationNumber: payload.registrationNumber
     },
     getDefaultLanguage()
   )

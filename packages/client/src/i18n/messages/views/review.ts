@@ -66,7 +66,7 @@ const messagesToDefine: IReviewMessages = {
   validateApplicationActionModalDescription: {
     id: 'validate.application.action.modal.description',
     defaultMessage:
-      'This application will be sent to the registrar from them to register'
+      'This application will be sent to the registrar for them to register'
   },
   additionalComments: {
     defaultMessage: 'Any additional comments?',
@@ -129,7 +129,7 @@ const messagesToDefine: IReviewMessages = {
   },
   registerActionDescriptionComplete: {
     defaultMessage:
-      'By clicking register, you confirm that the information is correct and has been reviewed by the applicant. The applicant understands that it will be used to register the birth and for planning purposes.\n\nBy registering this birth, a birth certificate will be generated with your signature for issuance.',
+      'By clicking register, you confirm that the information is correct and has been reviewed by the applicant. The applicant understands that it will be used to register the {eventType, select, birth {birth application} death {death application}} and for planning purposes.\n\nBy registering this {eventType, select, birth {birth application} death {death application}}, a {eventType, select, birth {birth} death {death}} certificate will be generated with your signature for issuance.',
     id: 'review.actions.desc.regConfComp'
   },
   registerActionDescriptionIncomplete: {
@@ -166,14 +166,14 @@ const messagesToDefine: IReviewMessages = {
   },
   reviewActionDescriptionComplete: {
     defaultMessage:
-      'By sending this application for review you confirm that the information has been reviewed by the applicant and that they are aware that they will receive an SMS with a tracking ID and details of how to collect the birth certificate',
+      'By sending this application for review you confirm that the information has been reviewed by the applicant and that they are aware that they will receive an SMS with a tracking ID and details of how to collect the {eventType, select, birth {birth} death {death}} certificate',
     description:
       'Description for review action component when complete application',
     id: 'review.actions.description.confirmComplete'
   },
   reviewActionDescriptionIncomplete: {
     defaultMessage:
-      'By sending this incomplete application, there will be a digital record made.\n\nTell the applicant that they will receive an SMS with a tracking ID. They will need this to complete the application at a registration office within 30 days. The applicant will need to provide all mandatory information before the birth can be registered.',
+      'By sending this incomplete application, there will be a digital record made.\n\nTell the applicant that they will receive an SMS with a tracking ID. They will need this to complete the application at a registration office within 30 days. The applicant will need to provide all mandatory information before the {eventType, select, birth {birth application} death {death application}} can be registered.',
     description:
       'Description for review action component when incomplete application',
     id: 'review.actions.description.confirmInComplete'

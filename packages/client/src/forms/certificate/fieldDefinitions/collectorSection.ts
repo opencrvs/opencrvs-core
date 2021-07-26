@@ -22,8 +22,7 @@ import {
   TEXT
 } from '@client/forms'
 import {
-  birthIdentityOptions,
-  deathIdentityOptions,
+  identityOptions,
   identityHelperTextMapper,
   identityNameMapper,
   identityTypeMapper
@@ -161,7 +160,7 @@ export const collectBirthCertificateFormSection: IFormSection = {
           initialValue: '',
           validate: [],
           placeholder: formMessages.select,
-          options: birthIdentityOptions
+          options: identityOptions
         },
         {
           name: 'iDTypeOther',
@@ -199,7 +198,8 @@ export const collectBirthCertificateFormSection: IFormSection = {
           label: formMessages.iD,
           required: true,
           initialValue: '',
-          validate: []
+          validate: [],
+          conditionals: [conditionals.iDAvailable]
         },
         {
           name: 'firstName',
@@ -320,7 +320,7 @@ export const collectDeathCertificateFormSection: IFormSection = {
           initialValue: '',
           validate: [],
           placeholder: formMessages.select,
-          options: deathIdentityOptions
+          options: identityOptions
         },
         {
           name: 'iDTypeOther',
@@ -354,7 +354,8 @@ export const collectDeathCertificateFormSection: IFormSection = {
           label: formMessages.iD,
           required: true,
           initialValue: '',
-          validate: []
+          validate: [],
+          conditionals: [conditionals.iDAvailable]
         },
         {
           name: 'firstName',

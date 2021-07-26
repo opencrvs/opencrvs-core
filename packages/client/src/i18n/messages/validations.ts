@@ -24,6 +24,9 @@ interface IValidationMessages {
   isValidDateOfDeath: MessageDescriptor
   isDateNotAfterDeath: MessageDescriptor
   isDateNotBeforeBirth: MessageDescriptor
+  isInformantOfLegalAge: MessageDescriptor
+  isMoVisitBeforeBirth: MessageDescriptor
+  isMoVisitAfterDeath: MessageDescriptor
   maxLength: MessageDescriptor
   minLength: MessageDescriptor
   notGreaterThan: MessageDescriptor
@@ -40,6 +43,7 @@ interface IValidationMessages {
   validPassportNumber: MessageDescriptor
   phoneNumberNotValid: MessageDescriptor
   validDrivingLicenseNumber: MessageDescriptor
+  nonDecimalPointNumber: MessageDescriptor
 }
 
 const messagesToDefine: IValidationMessages = {
@@ -118,6 +122,26 @@ const messagesToDefine: IValidationMessages = {
     description:
       'The error message appears when the given date of death is not valid',
     id: 'validations.isDateNotAfterDeath'
+  },
+  isMoVisitBeforeBirth: {
+    defaultMessage:
+      'Medical Practitioner visit date must not be before the birth of deceased',
+    description:
+      'The error message appears when the given date of visit of medical practitioner is before the birth date of deceased',
+    id: 'validations.isMoVisitBeforeBirth'
+  },
+  isMoVisitAfterDeath: {
+    defaultMessage:
+      'Medical Practitioner visit date must not be after the date of death',
+    description:
+      'The error message appears when the given date of visit of medical practitioner is after the death date',
+    id: 'validations.isMoVisitAfterDeath'
+  },
+  isInformantOfLegalAge: {
+    defaultMessage: 'Informant is not of legal age',
+    description:
+      'The error message appears when the informant is not old enough to register an event',
+    id: 'validations.isInformantOfLegalAge'
   },
   maxLength: {
     defaultMessage: 'Must not be more than {max} characters',
@@ -212,6 +236,12 @@ const messagesToDefine: IValidationMessages = {
       'The Driving License Number can only be alpha numeric and must be {validLength} characters long',
     description:
       'The error message that appeards when an invalid value is used as driving license number'
+  },
+  nonDecimalPointNumber: {
+    id: 'validations.nonDecimalPointNumber',
+    defaultMessage: 'Can not have any decimal point number',
+    description:
+      'The error message that appeards when any decimal point number is used'
   }
 }
 

@@ -267,25 +267,26 @@ class RegisterFormView extends React.Component<FullProps, State> {
   setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
 
   showAllValidationErrors = () => {
-    const touched = getSectionFields(this.props.activeSection).reduce(
-      (memo, field) => {
-        let fieldTouched: boolean | ITouchedNestedFields = true
-        if (field.nestedFields) {
-          fieldTouched = {
-            value: true,
-            nestedFields: flatten(Object.values(field.nestedFields)).reduce(
-              (nestedMemo, nestedField) => ({
-                ...nestedMemo,
-                [nestedField.name]: true
-              }),
-              {}
-            )
-          }
+    const touched = getSectionFields(
+      this.props.activeSection,
+      this.props.application.data[this.props.activeSection.id],
+      this.props.application.data
+    ).reduce((memo, field) => {
+      let fieldTouched: boolean | ITouchedNestedFields = true
+      if (field.nestedFields) {
+        fieldTouched = {
+          value: true,
+          nestedFields: flatten(Object.values(field.nestedFields)).reduce(
+            (nestedMemo, nestedField) => ({
+              ...nestedMemo,
+              [nestedField.name]: true
+            }),
+            {}
+          )
         }
-        return { ...memo, [field.name]: fieldTouched }
-      },
-      {}
-    )
+      }
+      return { ...memo, [field.name]: fieldTouched }
+    }, {})
     this.setAllFormFieldsTouched(touched)
   }
 
@@ -845,17 +846,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
 function getInitialValue(field: IFormField, data: IFormData) {
   let fieldInitialValue = field.initialValue
   if (field.initialValueKey) {
-    try {
-      fieldInitialValue = getValueFromApplicationDataByKey(
-        data,
-        field.initialValueKey
-      )
-    } catch (error) {
-      console.error(
-        'Error while looking for key in draft to set initial value.',
-        error
-      )
-    }
+    fieldInitialValue =
+      getValueFromApplicationDataByKey(data, field.initialValueKey) || ''
   }
   return fieldInitialValue
 }

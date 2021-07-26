@@ -60,8 +60,13 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
+import {
+  checkExternalValidationStatus,
+  checkIfLocalLanguageProvided
+} from '@client/views/SysAdmin/Team/utils'
 import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
 import { IStatusMapping } from './reports/operational/StatusWiseApplicationCountView'
+import { formattedDuration } from '@client/utils/date-formatting'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -88,10 +93,12 @@ const statusOptions = [
     value: ''
   }
 ].concat(
-  Object.entries(StatusMapping).map(([status, { labelDescriptor: label }]) => ({
-    label,
-    value: status
-  }))
+  Object.entries(StatusMapping)
+    .filter(item => checkExternalValidationStatus(item[0]))
+    .map(([status, { labelDescriptor: label }]) => ({
+      label,
+      value: status
+    }))
 )
 
 const PrimaryContactLabelMapping = {
@@ -148,7 +155,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
   }
 
   function getColumns(totalItems = 0): IColumn[] {
-    return [
+    const keys = [
       {
         label: intl.formatMessage(constantsMessages.applications, {
           totalItems
@@ -232,7 +239,10 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         width: 12,
         alignment: ColumnContentAlignment.RIGHT
       }
-    ]
+    ] as IColumn[]
+    return keys.filter(item => {
+      return !(!checkIfLocalLanguageProvided() && item.key === 'nameLocal')
+    })
   }
 
   function getContent(data: GQLQuery) {
@@ -251,7 +261,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           <DoubleLineValueWrapper>
             {dateMoment.format('MMMM DD, YYYY')}
             <br />
-            {`(${dateMoment.fromNow()})`}
+            {`(${formattedDuration(dateMoment)})`}
           </DoubleLineValueWrapper>
         )) || <></>
       )
@@ -591,7 +601,6 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           ) {
             total = data.getEventsWithProgress.totalItems
           }
-
           return (
             <>
               <ListTable

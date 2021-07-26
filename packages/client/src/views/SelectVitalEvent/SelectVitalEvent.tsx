@@ -18,7 +18,13 @@ import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
 import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 import { Event } from '@client/forms'
-import { goBack, goToHome, goToEventInfo } from '@client/navigation'
+import {
+  goBack,
+  goToHome,
+  goToBirthInformant,
+  goToDeathInformant,
+  goToEventInfo
+} from '@client/navigation'
 import { messages } from '@client/i18n/messages/views/selectVitalEvent'
 import { constantsMessages, buttonMessages } from '@client/i18n/messages'
 import {
@@ -26,6 +32,12 @@ import {
   PAGE_TRANSITIONS_ENTER_TIME,
   PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE
 } from '@client/utils/constants'
+import {
+  storeApplication,
+  IApplication,
+  createApplication
+} from '@client/applications'
+
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
   margin-top: 16px;
@@ -69,7 +81,10 @@ class SelectVitalEventView extends React.Component<
   IntlShapeProps & {
     goBack: typeof goBack
     goToHome: typeof goToHome
+    storeApplication: typeof storeApplication
     goToEventInfo: typeof goToEventInfo
+    goToBirthInformant: typeof goToBirthInformant
+    goToDeathInformant: typeof goToDeathInformant
   }
 > {
   state = {
@@ -80,7 +95,25 @@ class SelectVitalEventView extends React.Component<
     if (this.state.goTo === '') {
       this.setState({ noEventSelectedError: true })
     } else {
-      this.props.goToEventInfo(this.state.goTo as Event)
+      if (window.config.HIDE_EVENT_REGISTER_INFORMATION) {
+        let application: IApplication
+        switch (this.state.goTo as Event) {
+          case Event.BIRTH:
+            application = createApplication(Event.BIRTH)
+            this.props.storeApplication(application)
+            this.props.goToBirthInformant(application.id)
+            break
+          case Event.DEATH:
+            application = createApplication(Event.DEATH)
+            this.props.storeApplication(application)
+            this.props.goToDeathInformant(application.id)
+            break
+          default:
+            throw new Error(`Unknown eventType ${this.state.goTo}`)
+        }
+      } else {
+        this.props.goToEventInfo(this.state.goTo as Event)
+      }
     }
   }
 
@@ -146,6 +179,9 @@ export const SelectVitalEvent = connect(
   {
     goBack,
     goToHome,
+    storeApplication,
+    goToBirthInformant,
+    goToDeathInformant,
     goToEventInfo
   }
 )(injectIntl(SelectVitalEventView))

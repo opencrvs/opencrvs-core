@@ -153,7 +153,7 @@ export const resolvers: GQLResolver = {
       }
 
       const bundle = await fetchFHIR(
-        `/Location?partof=${parentLocationId}`,
+        `/Location?partof=${parentLocationId}&type=CRVS_OFFICE`,
         authHeader
       )
 
