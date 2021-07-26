@@ -27,6 +27,8 @@ import {
   NUMBER_BORN_ALIVE_CODE,
   NUMBER_FOEATAL_DEATH_CODE,
   LAST_LIVE_BIRTH_CODE,
+  MALE_DEPENDENTS_ON_DECEASED_CODE,
+  FEMALE_DEPENDENTS_ON_DECEASED_CODE,
   OBSERVATION_CATEGORY_PROCEDURE_CODE,
   OBSERVATION_CATEGORY_PROCEDURE_DESC,
   OBSERVATION_CATEGORY_VSIGN_CODE,
@@ -73,7 +75,9 @@ import {
   setPrimaryCaregiverReference,
   selectObservationResource,
   getReasonCodeAndDesc,
-  removeObservationResource
+  removeObservationResource,
+  selectOrCreateEncounterPartitioner,
+  selectOrCreateEncounterParticipant
 } from '@gateway/features/fhir/utils'
 import {
   OPENCRVS_SPECIFICATION_URL,
@@ -579,6 +583,16 @@ function createDateOfMarriageBuilder(
   resource.extension.push({
     url: `${OPENCRVS_SPECIFICATION_URL}extension/date-of-marriage`,
     valueDateTime: fieldValue
+  })
+}
+
+function createAgeBuilder(resource: fhir.Patient, fieldValue: string) {
+  if (!resource.extension) {
+    resource.extension = []
+  }
+  resource.extension.push({
+    url: `${OPENCRVS_SPECIFICATION_URL}extension/age`,
+    valueString: fieldValue
   })
 }
 
@@ -1193,6 +1207,14 @@ const builders: IFieldBuilders = {
       )
       person.birthDate = fieldValue as string
     },
+    age: (fhirBundle, fieldValue, context) => {
+      const person = selectOrCreatePersonResource(
+        DECEASED_CODE,
+        DECEASED_TITLE,
+        fhirBundle
+      )
+      return createAgeBuilder(person, fieldValue as string)
+    },
     maritalStatus: (fhirBundle, fieldValue, context) => {
       const person = selectOrCreatePersonResource(
         DECEASED_CODE,
@@ -1624,6 +1646,10 @@ const builders: IFieldBuilders = {
       ) => {
         const person = selectOrCreateInformantResource(fhirBundle)
         return createNationalityBuilder(person, fieldValue)
+      },
+      occupation: (fhirBundle, fieldValue) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+        return createOccupationBulder(person, fieldValue as string)
       },
       dateOfMarriage: (
         fhirBundle: ITemplatedBundle,
@@ -2482,6 +2508,89 @@ const builders: IFieldBuilders = {
       }
     },
     address: createLocationAddressBuilder(BIRTH_ENCOUNTER_CODE)
+  },
+  medicalPractitioner: {
+    name: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
+      const practitioner = selectOrCreateEncounterPartitioner(
+        fhirBundle,
+        context
+      )
+      practitioner.name = [
+        {
+          use: 'en',
+          family: `${fieldValue}`
+        }
+      ]
+    },
+    qualification: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const practitioner = selectOrCreateEncounterPartitioner(
+        fhirBundle,
+        context
+      )
+      practitioner.qualification = [
+        {
+          code: {
+            coding: [
+              {
+                system: `${OPENCRVS_SPECIFICATION_URL}practitioner-degree`,
+                code: fieldValue
+              }
+            ]
+          }
+        }
+      ]
+    },
+    lastVisitDate: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const encounterParticipant = selectOrCreateEncounterParticipant(
+        fhirBundle,
+        context
+      ) as fhir.EncounterParticipant
+      if (!encounterParticipant.period) {
+        encounterParticipant.period = {}
+      }
+      encounterParticipant.period.start = fieldValue
+    }
+  },
+
+  maleDependentsOfDeceased: (
+    fhirBundle: ITemplatedBundle,
+    fieldValue: string,
+    context: any
+  ) => {
+    const observation = selectOrCreateObservationResource(
+      DEATH_ENCOUNTER_CODE,
+      OBSERVATION_CATEGORY_PROCEDURE_CODE,
+      OBSERVATION_CATEGORY_PROCEDURE_DESC,
+      MALE_DEPENDENTS_ON_DECEASED_CODE,
+      'Number of male dependents on Deceased',
+      fhirBundle,
+      context
+    )
+    observation.valueString = fieldValue as string
+  },
+  femaleDependentsOfDeceased: (
+    fhirBundle: ITemplatedBundle,
+    fieldValue: string,
+    context: any
+  ) => {
+    const observation = selectOrCreateObservationResource(
+      DEATH_ENCOUNTER_CODE,
+      OBSERVATION_CATEGORY_PROCEDURE_CODE,
+      OBSERVATION_CATEGORY_PROCEDURE_DESC,
+      FEMALE_DEPENDENTS_ON_DECEASED_CODE,
+      'Number of female dependents on Deceased',
+      fhirBundle,
+      context
+    )
+    observation.valueString = fieldValue as string
   },
   birthType: (
     fhirBundle: ITemplatedBundle,

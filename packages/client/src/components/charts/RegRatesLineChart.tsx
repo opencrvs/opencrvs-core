@@ -239,7 +239,9 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
           </div>
           <LegendData>
             <LegendDataLabel>
-              {intl.formatMessage(constantsMessages.totalRegistered)}
+              {intl.formatMessage(constantsMessages.totalRegistered, {
+                lineBreak: <span key={'totalRegistered-break'}>&nbsp;</span>
+              })}
             </LegendDataLabel>
             <br />
             <LegendDataValue>{activeTotalRegistered.value}</LegendDataValue>

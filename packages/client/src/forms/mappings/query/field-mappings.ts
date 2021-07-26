@@ -38,17 +38,19 @@ interface IIgnoreAddressFields {
 
 export const nameToFieldTransformer = (
   language: string,
-  transformedFieldName?: string
+  transformedFieldName?: string,
+  fromSectionId?: string
 ) => (
   transformedData: IFormData,
   queryData: any,
   sectionId: string,
   field: IFormField
 ) => {
+  const selectSectionId = fromSectionId ? fromSectionId : sectionId
   const selectedName: IName | undefined =
-    queryData[sectionId] &&
-    queryData[sectionId].name &&
-    (queryData[sectionId].name as GQLHumanName[]).find(
+    queryData[selectSectionId] &&
+    queryData[selectSectionId].name &&
+    (queryData[selectSectionId].name as GQLHumanName[]).find(
       name => name.use === language
     )
   const nameKey = transformedFieldName ? transformedFieldName : field.name
@@ -83,9 +85,15 @@ export const bundleFieldToSectionFieldTransformer = (
   sectionId: string,
   field: IFormField
 ) => {
-  if (queryData[transformedFieldName ? transformedFieldName : field.name]) {
-    transformedData[sectionId][field.name] =
-      queryData[transformedFieldName ? transformedFieldName : field.name]
+  const selectedFieldName = transformedFieldName
+    ? transformedFieldName
+    : field.name
+  if (
+    queryData[selectedFieldName] !== null &&
+    queryData[selectedFieldName] !== undefined &&
+    queryData[selectedFieldName] !== ''
+  ) {
+    transformedData[sectionId][field.name] = queryData[selectedFieldName]
   }
   return transformedData
 }
@@ -429,7 +437,9 @@ export const nestedValueToFieldTransformer = (
   sectionId: string,
   field: IFormField
 ) => {
-  if (transformMethod) {
+  if (!queryData[sectionId] || !queryData[sectionId][nestedFieldName]) {
+    return transformedData
+  } else if (transformMethod) {
     const clonedData = cloneDeep(transformedData)
     if (!clonedData[nestedFieldName]) {
       clonedData[nestedFieldName] = {}
@@ -442,6 +452,9 @@ export const nestedValueToFieldTransformer = (
     }
     transformedData[sectionId][field.name] =
       clonedData[nestedFieldName][field.name]
+  } else {
+    transformedData[sectionId][field.name] =
+      queryData[sectionId][nestedFieldName][field.name]
   }
   return transformedData
 }

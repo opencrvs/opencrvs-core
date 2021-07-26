@@ -33,6 +33,7 @@ import { IStoreState } from '@client/store'
 import { getJurisidictionType } from '@client/utils/locationUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { SYS_ADMIN_ROLES } from '@client/utils/constants'
+import { checkExternalValidationStatus } from '@client/views/SysAdmin/Team/utils'
 
 type Props = WrappedComponentProps & BaseProps
 
@@ -132,27 +133,29 @@ class StatusWiseApplicationCountViewComponent extends React.Component<
             )}
           </Description>
         </StatusHeader>
-        {results.map((statusCount, index) => {
-          return (
-            statusCount && (
-              <StatusProgressBarWrapper key={index}>
-                <ProgressBar
-                  id={`${statusCount.status.toLowerCase()}-${index}`}
-                  title={intl.formatMessage(
-                    statusMapping![statusCount.status].labelDescriptor
-                  )}
-                  color={statusMapping![statusCount.status].color}
-                  totalPoints={total}
-                  disabled={disableApplicationLink || false}
-                  onClick={() =>
-                    this.props.onClickStatusDetails(statusCount.status)
-                  }
-                  currentPoints={statusCount.count}
-                />
-              </StatusProgressBarWrapper>
+        {results
+          .filter(item => item && checkExternalValidationStatus(item.status))
+          .map((statusCount, index) => {
+            return (
+              statusCount && (
+                <StatusProgressBarWrapper key={index}>
+                  <ProgressBar
+                    id={`${statusCount.status.toLowerCase()}-${index}`}
+                    title={intl.formatMessage(
+                      statusMapping![statusCount.status].labelDescriptor
+                    )}
+                    color={statusMapping![statusCount.status].color}
+                    totalPoints={total}
+                    disabled={disableApplicationLink || false}
+                    onClick={() =>
+                      this.props.onClickStatusDetails(statusCount.status)
+                    }
+                    currentPoints={statusCount.count}
+                  />
+                </StatusProgressBarWrapper>
+              )
             )
-          )
-        })}
+          })}
         <StatusListFooter>
           <p>{intl.formatMessage(constantsMessages.total)}</p>
           <p>{total}</p>

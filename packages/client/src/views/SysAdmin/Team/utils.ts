@@ -36,6 +36,7 @@ import {
 import { GQLRole, GQLUser } from '@opencrvs/gateway/src/graphql/schema'
 import { MessageDescriptor } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/userSetup'
+import { ColumnContentAlignment } from '@client/../../components/lib/interface'
 
 export enum UserStatus {
   ACTIVE,
@@ -591,4 +592,13 @@ export function getUserAuditDescription(
   status: string
 ): MessageDescriptor | undefined {
   return AuditDescriptionMapping[status] || undefined
+}
+export function checkExternalValidationStatus(status?: string | null): boolean {
+  return !(
+    !window.config.EXTERNAL_VALIDATION_WORKQUEUE &&
+    status === 'WAITING_VALIDATION'
+  )
+}
+export function checkIfLocalLanguageProvided() {
+  return window.config.LANGUAGES.split(',').length > 1
 }

@@ -88,6 +88,11 @@ export function getBirthRegistrationSectionTransformer(
       queryData[sectionId].registrationNumber
   }
 
+  if (queryData.presentAtBirthRegistration) {
+    transformedData[sectionId].presentAtBirthRegistration =
+      queryData.presentAtBirthRegistration
+  }
+
   if (queryData[sectionId].type && queryData[sectionId].type === 'BIRTH') {
     transformedData[sectionId].type = Event.BIRTH
   }
@@ -101,18 +106,25 @@ export function getBirthRegistrationSectionTransformer(
   }
 }
 
-const convertToLocal = (mobileWithCountryCode: string, countryCode: string) => {
+const convertToLocal = (
+  mobileWithCountryCode: string,
+  countryCode: string,
+  codeReplacement?: string
+) => {
   countryCode = countryCode.toUpperCase()
   return (
     mobileWithCountryCode &&
     mobileWithCountryCode.replace(
       callingCountries[countryCode].countryCallingCodes[0],
-      '0'
+      codeReplacement ? codeReplacement : '0'
     )
   )
 }
 
-export const localPhoneTransformer = (transformedFieldName?: string) => (
+export const localPhoneTransformer = (
+  transformedFieldName?: string,
+  codeReplacement?: string
+) => (
   transformedData: TransformedData,
   queryData: IFormData,
   sectionId: string,
@@ -120,7 +132,11 @@ export const localPhoneTransformer = (transformedFieldName?: string) => (
 ) => {
   let fieldName = transformedFieldName || field.name
   const msisdnPhone = (get(queryData, fieldName as string) as unknown) as string
-  const localPhone = convertToLocal(msisdnPhone, window.config.COUNTRY)
+  const localPhone = convertToLocal(
+    msisdnPhone,
+    window.config.COUNTRY,
+    codeReplacement
+  )
   transformedData[sectionId][field.name] = localPhone
   return transformedData
 }

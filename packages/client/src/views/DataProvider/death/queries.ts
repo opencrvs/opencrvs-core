@@ -25,6 +25,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           familyName
         }
         birthDate
+        age
         gender
         maritalStatus
         nationality
@@ -64,6 +65,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
             familyName
           }
           nationality
+          occupation
           birthDate
           telecom {
             system
@@ -103,6 +105,11 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           firstNames
           familyName
         }
+      }
+      medicalPractitioner {
+        name
+        qualification
+        lastVisitDate
       }
       registration {
         id
@@ -138,6 +145,8 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
       }
       mannerOfDeath
       causeOfDeath
+      maleDependentsOfDeceased
+      femaleDependentsOfDeceased
     }
   }
 `
@@ -155,6 +164,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
           familyName
         }
         birthDate
+        age
         gender
         maritalStatus
         nationality
@@ -194,6 +204,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
             familyName
           }
           nationality
+          occupation
           birthDate
           telecom {
             system
@@ -233,6 +244,11 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
           firstNames
           familyName
         }
+      }
+      medicalPractitioner {
+        name
+        qualification
+        lastVisitDate
       }
       registration {
         id
@@ -278,6 +294,8 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
       mannerOfDeath
       causeOfDeathMethod
       causeOfDeath
+      maleDependentsOfDeceased
+      femaleDependentsOfDeceased
     }
   }
 `

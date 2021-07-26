@@ -30,6 +30,8 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
       }
       informant {
         id
+        relationship
+        otherRelationship
         individual {
           id
           identifier {
@@ -42,6 +44,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
             firstNames
             familyName
           }
+          occupation
           nationality
           birthDate
           address {
@@ -139,10 +142,6 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           value
         }
       }
-      informant {
-        relationship
-        otherRelationship
-      }
       registration {
         id
         contact
@@ -212,6 +211,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         dateOfMarriage
         educationalAttainment
         nationality
+        occupation
         identifier {
           id
           type
@@ -243,6 +243,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         dateOfMarriage
         educationalAttainment
         nationality
+        occupation
         identifier {
           id
           type
@@ -264,6 +265,8 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
       }
       informant {
         id
+        relationship
+        otherRelationship
         individual {
           id
           identifier {
@@ -277,6 +280,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
             familyName
           }
           nationality
+          occupation
           birthDate
           address {
             type

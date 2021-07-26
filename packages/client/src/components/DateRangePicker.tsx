@@ -720,7 +720,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
                 onClick={() => {
                   props.onDatesChange({
                     startDate: startDate.toDate(),
-                    endDate: endDate.toDate()
+                    endDate: endDate.endOf('month').toDate()
                   })
                   setModalVisible(false)
                 }}

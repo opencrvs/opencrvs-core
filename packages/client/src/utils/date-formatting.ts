@@ -42,3 +42,8 @@ export const formatLongDate = (
   moment.updateLocale(locale, config[locale])
   return moment(date).format(formatString)
 }
+
+export const formattedDuration = (fromDate: moment.Moment) => {
+  moment.relativeTimeRounding(Math.floor)
+  return fromDate.fromNow()
+}

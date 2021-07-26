@@ -41,6 +41,7 @@ export type TransformerPayload =
   | ILanguagePayload
   | ILocationPayload
   | IPersonIdentifierValuePayload
+  | IArithmeticOperationPayload
 
 export type Condition = IApplicantNameCondition | IOfflineAddressCondition
 
@@ -72,7 +73,9 @@ export interface IIntLabelPayload {
 
 export enum ConditionOperation {
   MATCH = 'MATCH',
-  DOES_NOT_MATCH = 'DOES_NOT_MATCH'
+  DOES_NOT_MATCH = 'DOES_NOT_MATCH',
+  VALUE_EXISTS = 'VALUE_EXISTS',
+  VALUE_DOES_NOT_EXISTS = 'VALUE_DOES_NOT_EXISTS'
 }
 export interface ICondition {
   key: string
@@ -98,6 +101,11 @@ export interface IApplicantNamePayload {
 
 export interface IFeildValuePayload {
   valueKey: string // ex: child.dob
+  condition?: string // ex: "(!draftData || !draftData.informant || draftData.informant.relationship == \"OTHER\")"
+  messageDescriptors?: {
+    messageDescriptor: MessageDescriptor
+    matchValue: string
+  }[]
 }
 
 export interface IDateFeildValuePayload {
@@ -169,4 +177,16 @@ export interface IConditionExecutorPayload {
     maxDiff: number
     output: IIntLabelPayload // based on the we can add more type here
   }[]
+}
+
+export type ArithmeticOperationType =
+  | 'ADDITION'
+  | 'SUBTRACTION'
+  | 'DIVISION'
+  | 'MULTIPLICATION'
+
+export interface IArithmeticOperationPayload {
+  operationType: ArithmeticOperationType
+  leftValueKey: string
+  rightValueKey: string
 }
