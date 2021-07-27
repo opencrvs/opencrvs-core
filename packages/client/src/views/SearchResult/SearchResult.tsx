@@ -257,6 +257,8 @@ export class SearchResultView extends React.Component<
 
   getDeclarationStatusLabel = (status: string) => {
     switch (status) {
+      case 'IN_PROGRESS':
+        return this.props.intl.formatMessage(registrarHomeMessages.inProgress)
       case 'DECLARED':
         return this.props.intl.formatMessage(
           registrarHomeMessages.readyForReview
@@ -265,7 +267,7 @@ export class SearchResultView extends React.Component<
         return this.props.intl.formatMessage(registrarHomeMessages.readyToPrint)
       case 'VALIDATED':
         return this.props.intl.formatMessage(
-          registrarHomeMessages.readyForReview
+          registrarHomeMessages.sentForApprovals
         )
       case 'WAITING_VALIDATION':
         return this.props.intl.formatMessage(
