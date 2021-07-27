@@ -57,7 +57,7 @@ class Outbox extends React.Component<IFullProps, IState> {
     let icon: () => React.ReactNode
     let statusText: string
     let iconId: string
-    console.log(status)
+
     switch (status) {
       case SUBMISSION_STATUS.READY_TO_SUBMIT:
         iconId = `waiting${index}`
