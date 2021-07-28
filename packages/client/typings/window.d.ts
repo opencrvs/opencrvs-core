@@ -15,6 +15,8 @@ interface Window {
     BACKGROUND_SYNC_BROADCAST_CHANNEL: string
     COUNTRY: string
     COUNTRY_LOGO_FILE: string
+    COUNTRY_LOGO_RENDER_WIDTH: number // in px
+    COUNTRY_LOGO_RENDER_HEIGHT: number // in px
     DESKTOP_TIME_OUT_MILLISECONDS: number
     LANGUAGES: string
     LOGIN_URL: string
