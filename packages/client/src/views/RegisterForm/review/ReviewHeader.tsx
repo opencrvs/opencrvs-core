@@ -51,8 +51,8 @@ const SubjectContainer = styled.div`
   }
 `
 const Image = styled.img`
-  height: 104px;
-  width: 104px;
+  height: ${window.config.COUNTRY_LOGO_RENDER_HEIGHT || 104}px;
+  width: ${window.config.COUNTRY_LOGO_RENDER_WIDTH || 104}px;
 `
 
 export const ReviewHeader = (props: IReviewHeaderProps) => {

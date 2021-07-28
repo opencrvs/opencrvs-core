@@ -362,7 +362,6 @@ export async function fetchKeyFigures(
 ) {
   const estimatedFigureFor45Days = await fetchEstimateByLocation(
     location,
-    Number(EXPECTED_BIRTH_REGISTRATION_IN_DAYS),
     EVENT_TYPE.BIRTH,
     authHeader,
     timeStart,
@@ -395,7 +394,6 @@ export async function fetchKeyFigures(
   /* Populating > 45D and < 365D data */
   const estimatedFigureFor1Year = await fetchEstimateByLocation(
     location,
-    365, // For 1 year
     EVENT_TYPE.BIRTH,
     authHeader,
     timeStart,

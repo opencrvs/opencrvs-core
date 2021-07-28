@@ -122,7 +122,6 @@ export const generateEmptyBirthKeyFigure = (
 
 export const fetchEstimateByLocation = async (
   locationData: Location,
-  estimationForDays: number,
   event: EVENT_TYPE,
   authHeader: IAuthHeader,
   timeFrom: string,
@@ -134,6 +133,10 @@ export const fetchEstimateByLocation = async (
   if (!locationData.extension) {
     throw new Error('Invalid location data found')
   }
+  const estimationForDays = Math.ceil(
+    Math.abs(new Date(timeTo).getTime() - new Date(timeFrom).getTime()) /
+      (1000 * 60 * 60 * 24)
+  )
   let estimateExtensionFound: boolean = false
   const toYear = new Date(timeTo).getFullYear()
   let selectedCrudYear = new Date(timeTo).getFullYear()
@@ -258,7 +261,6 @@ export const fetchEstimateFor45DaysByLocationId = async (
   const locationData: Location = await fetchFHIR(locationId, authHeader)
   return await fetchEstimateByLocation(
     locationData,
-    Number(EXPECTED_BIRTH_REGISTRATION_IN_DAYS), // For 45 days
     event,
     authHeader,
     timeFrom,

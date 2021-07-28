@@ -135,7 +135,6 @@ describe('verify metrics util', () => {
     it('Returns estimate properly for birth', async () => {
       const result = await fetchEstimateByLocation(
         location,
-        365,
         EVENT_TYPE.BIRTH,
         {
           Authorization: 'Bearer token'
@@ -168,7 +167,6 @@ describe('verify metrics util', () => {
       }
       const result = await fetchEstimateByLocation(
         clonedLocation,
-        365,
         EVENT_TYPE.DEATH,
         {
           Authorization: 'Bearer token'
@@ -189,7 +187,6 @@ describe('verify metrics util', () => {
       expect(
         fetchEstimateByLocation(
           { id: '' },
-          365,
           EVENT_TYPE.BIRTH,
           {
             Authorization: 'Bearer token'
@@ -203,7 +200,6 @@ describe('verify metrics util', () => {
       expect(
         fetchEstimateByLocation(
           { id: '', extension: [] },
-          365,
           EVENT_TYPE.BIRTH,
           {
             Authorization: 'Bearer token'
@@ -216,7 +212,6 @@ describe('verify metrics util', () => {
     it('Returns the estimatedFigures for right location', async () => {
       const result = await fetchEstimateByLocation(
         location,
-        365,
         EVENT_TYPE.BIRTH,
         {
           Authorization: 'Bearer token'
