@@ -27,7 +27,7 @@ import {
 } from '@opencrvs/components/lib/forms'
 import { Mobile2FA } from '@opencrvs/components/lib/icons'
 import { stepTwoFields } from '@login/views/StepTwo/stepTwoFields'
-
+import { getMSISDNCountryCode } from '@login/utils/dataCleanse'
 import {
   Title,
   FormWrapper,
@@ -159,9 +159,13 @@ export class StepTwoForm extends React.Component<FullProps> {
       stepOneDetails,
       submissionError
     } = this.props
+    const msisdnCode = getMSISDNCountryCode(window.config.COUNTRY)
     const mobileNumber = stepOneDetails.mobile.replace(
-      stepOneDetails.mobile.slice(5, 10),
-      '******'
+      stepOneDetails.mobile.slice(
+        msisdnCode.length,
+        stepOneDetails.mobile.length - 2
+      ),
+      '*'.repeat(stepOneDetails.mobile.length - msisdnCode.length - 2)
     )
     const field = stepTwoFields.code
     return (

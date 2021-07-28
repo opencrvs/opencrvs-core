@@ -20,3 +20,7 @@ export const convertToMSISDN = (
     callingCountries[countryCode].countryCallingCodes[0]
   }${localPhoneNumber.substring(1)}`
 }
+
+export const getMSISDNCountryCode = (countryCode: string) => {
+  return callingCountries[countryCode.toUpperCase()].countryCallingCodes[0]
+}
