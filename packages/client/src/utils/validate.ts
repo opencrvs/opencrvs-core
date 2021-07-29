@@ -15,7 +15,6 @@ import { IFormFieldValue, IFormData } from '@opencrvs/client/src/forms'
 import {
   REGEXP_BLOCK_ALPHA_NUMERIC_DOT,
   REGEXP_ALPHA_NUMERIC,
-  REGEXP_BLOCK_ALPHA_NUMERIC,
   REGEXP_DECIMAL_POINT_NUMBER
 } from '@client/utils/constants'
 import { validate as validateEmail } from 'email-validator'
@@ -51,49 +50,8 @@ export type Validation = (
 
 export type ValidationInitializer = (...value: any[]) => Validation
 
-const fallbackCountry = window.config.COUNTRY
-
-interface IMobilePhonePattern {
-  pattern: RegExp
-  example: string
-  start?: string
-  num: string
-}
-
-const mobilePhonePatternTable: { [key: string]: IMobilePhonePattern } = {
-  gbr: {
-    pattern: /^07[0-9]{9,10}$/,
-    example: '07123456789',
-    start: '07',
-    num: '10 or 11'
-  },
-  bgd: {
-    pattern: /^01[1-9][0-9]{8}$/,
-    example: '01741234567',
-    start: '01',
-    num: '11'
-  },
-  zmb: {
-    pattern: /^0(7|9)[0-9]{1}[0-9]{7}$/,
-    example: '0970545855',
-    start: '0[7|9]',
-    num: '10'
-  },
-  niu: {
-    pattern: /^(683|683888)[0-9]{4}$/,
-    example: '6837767',
-    start: '[683 or 683888]',
-    num: '7 or 10'
-  }
-}
-
-export const isAValidPhoneNumberFormat = (
-  value: string,
-  country: string
-): boolean => {
-  const countryMobileTable =
-    mobilePhonePatternTable[country] || mobilePhonePatternTable[fallbackCountry]
-  const { pattern } = countryMobileTable
+export const isAValidPhoneNumberFormat = (value: string): boolean => {
+  const { pattern } = window.config.PHONE_NUMBER_PATTERN
   return pattern.test(value)
 }
 
@@ -197,10 +155,7 @@ export const numeric: Validation = (value: IFormFieldValue) => {
 }
 
 export const phoneNumberFormat: Validation = (value: IFormFieldValue) => {
-  const country = window.config.COUNTRY
-  const countryMobileTable =
-    mobilePhonePatternTable[country] || mobilePhonePatternTable[fallbackCountry]
-  const { start, num } = countryMobileTable
+  const { start, num } = window.config.PHONE_NUMBER_PATTERN
   const validationProps = { start, num }
 
   const cast = value as string
@@ -210,7 +165,7 @@ export const phoneNumberFormat: Validation = (value: IFormFieldValue) => {
     return undefined
   }
 
-  return isAValidPhoneNumberFormat(trimmedValue, country)
+  return isAValidPhoneNumberFormat(trimmedValue)
     ? undefined
     : {
         message: messages.phoneNumberFormat,

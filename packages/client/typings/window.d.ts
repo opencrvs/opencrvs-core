@@ -33,6 +33,16 @@ interface Window {
     EXTERNAL_VALIDATION_WORKQUEUE: boolean
     FIELD_AGENT_AUDIT_LOCATIONS: string
     APPLICATION_AUDIT_LOCATIONS: string
+    PHONE_NUMBER_PATTERN: {
+      pattern: RegExp
+      example: string
+      start?: string
+      num: string
+      mask: {
+        startForm: number
+        endBefore: number
+      }
+    }
     LOGROCKET: string
     SENTRY: string
   }
