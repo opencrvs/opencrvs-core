@@ -31,6 +31,16 @@ window.config = {
   INFORMANT_MINIMUM_AGE: 16, // Minimum age to be able to register for a birth or death event
   HIDE_EVENT_REGISTER_INFORMATION: false, // this flag will decide whether to hide info form at the beginning of each event registration or not
   EXTERNAL_VALIDATION_WORKQUEUE: true, // this flag will decide whether to show external validation workqueue on registrar home
+  PHONE_NUMBER_PATTERN: {
+    pattern: /^01[1-9][0-9]{8}$/,
+    example: '01741234567',
+    start: '01',
+    num: '11',
+    mask: {
+      startForm: 5,
+      endBefore: 3
+    }
+  },
   SENTRY: 'https://2ed906a0ba1c4de2ae3f3f898ec9df0b@sentry.io/1774551',
   LOGROCKET: 'opencrvs-foundation/opencrvs-bangladesh'
 }

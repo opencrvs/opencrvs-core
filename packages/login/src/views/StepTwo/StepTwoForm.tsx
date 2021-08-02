@@ -159,13 +159,17 @@ export class StepTwoForm extends React.Component<FullProps> {
       stepOneDetails,
       submissionError
     } = this.props
-    const msisdnCode = getMSISDNCountryCode(window.config.COUNTRY)
+    const maskPattern = window.config.PHONE_NUMBER_PATTERN.mask
     const mobileNumber = stepOneDetails.mobile.replace(
       stepOneDetails.mobile.slice(
-        msisdnCode.length,
-        stepOneDetails.mobile.length - 2
+        maskPattern.startForm,
+        stepOneDetails.mobile.length - maskPattern.endBefore
       ),
-      '*'.repeat(stepOneDetails.mobile.length - msisdnCode.length - 2)
+      '*'.repeat(
+        stepOneDetails.mobile.length -
+          maskPattern.startForm -
+          maskPattern.endBefore
+      )
     )
     const field = stepTwoFields.code
     return (
