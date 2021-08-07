@@ -44,6 +44,7 @@ class Outbox extends React.Component<IFullProps, IState> {
     const { formatMessage } = this.props.intl
     const {
       statusWaitingToRegister,
+      statusWaitingToValidate,
       statusRegistering,
       statusWaitingToReject,
       statusRejecting,
@@ -61,6 +62,16 @@ class Outbox extends React.Component<IFullProps, IState> {
         iconId = `waiting${index}`
         icon = () => <StatusWaiting id={iconId} key={iconId} />
         statusText = formatMessage(statusWaitingToSubmit)
+        break
+      case SUBMISSION_STATUS.READY_TO_APPROVE:
+        iconId = `waiting${index}`
+        icon = () => <StatusWaiting id={iconId} key={iconId} />
+        statusText = formatMessage(statusWaitingToValidate)
+        break
+      case SUBMISSION_STATUS.APPROVING:
+        iconId = `registering${index}`
+        icon = () => <Spinner id={iconId} key={iconId} size={24} />
+        statusText = formatMessage(statusSubmitting)
         break
       case SUBMISSION_STATUS.SUBMITTING:
         iconId = `registering${index}`

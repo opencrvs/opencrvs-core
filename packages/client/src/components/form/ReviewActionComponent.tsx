@@ -352,10 +352,9 @@ class ReviewActionComponent extends React.Component<
             )}
           </Title>
           <Description>
-            {intl.formatMessage(
-              actionContent.description.message,
-              actionContent.description.payload
-            )}
+            {intl.formatMessage(actionContent.description.message, {
+              eventType: application.event
+            })}
           </Description>
           <ActionContainer>
             {applicationToBeRegistered ? (

@@ -381,7 +381,7 @@ class UserProfileComponent extends React.Component<Props, State> {
                       </InformationValue>
                     </InformationHolder>
                     <InformationHolder>
-                      <InformationTitle paddingRight={113}>
+                      <InformationTitle paddingRight={208}>
                         {intl.formatMessage(messages.roleType)}
                       </InformationTitle>
                       <InformationValue>
@@ -391,19 +391,19 @@ class UserProfileComponent extends React.Component<Props, State> {
                       </InformationValue>
                     </InformationHolder>
                     <InformationHolder>
-                      <InformationTitle paddingRight={74}>
+                      <InformationTitle paddingRight={169}>
                         {intl.formatMessage(messages.phoneNumber)}
                       </InformationTitle>
                       <InformationValue>{user.number}</InformationValue>
                     </InformationHolder>
                     <InformationHolder>
-                      <InformationTitle paddingRight={110}>
+                      <InformationTitle paddingRight={205}>
                         {intl.formatMessage(messages.userName)}
                       </InformationTitle>
                       <InformationValue>{user.username}</InformationValue>
                     </InformationHolder>
                     <InformationHolder>
-                      <InformationTitle paddingRight={112}>
+                      <InformationTitle paddingRight={210}>
                         {intl.formatMessage(messages.startDate)}
                       </InformationTitle>
                       <InformationValue>{user.startDate}</InformationValue>

@@ -15,6 +15,8 @@ interface Window {
     BACKGROUND_SYNC_BROADCAST_CHANNEL: string
     COUNTRY: string
     COUNTRY_LOGO_FILE: string
+    COUNTRY_LOGO_RENDER_WIDTH: number // in px
+    COUNTRY_LOGO_RENDER_HEIGHT: number // in px
     DESKTOP_TIME_OUT_MILLISECONDS: number
     LANGUAGES: string
     LOGIN_URL: string
@@ -26,9 +28,21 @@ interface Window {
     CERTIFICATE_PRINT_LOWEST_CHARGE: number
     CERTIFICATE_PRINT_HIGHEST_CHARGE: number
     UI_POLLING_INTERVAL: number
+    INFORMANT_MINIMUM_AGE: number
+    HIDE_EVENT_REGISTER_INFORMATION: boolean
     EXTERNAL_VALIDATION_WORKQUEUE: boolean
     FIELD_AGENT_AUDIT_LOCATIONS: string
     APPLICATION_AUDIT_LOCATIONS: string
+    PHONE_NUMBER_PATTERN: {
+      pattern: RegExp
+      example: string
+      start?: string
+      num: string
+      mask: {
+        startForm: number
+        endBefore: number
+      }
+    }
     LOGROCKET: string
     SENTRY: string
   }

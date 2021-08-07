@@ -24,6 +24,7 @@ import {
 } from '@client/i18n/messages'
 import { getDraftApplicantFullName } from '@client/utils/draftUtils'
 import { LoadingIndicator } from '@client/views/RegistrationHome/LoadingIndicator'
+import { formattedDuration } from '@client/utils/date-formatting'
 
 interface IInProgressProps {
   theme: ITheme
@@ -80,7 +81,7 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
         name: name || '',
         dateOfModification:
           `${intl.formatMessage(messages.lastUpdated)} ${lastModificationDate &&
-            moment(lastModificationDate).fromNow()}` || '',
+            formattedDuration(moment(lastModificationDate))}` || '',
         rowClickHandler: [
           {
             label: 'rowClickHandler',

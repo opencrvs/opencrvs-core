@@ -27,6 +27,7 @@ import {
 } from '@metrics/features/metrics/constants'
 import { IAuthHeader } from '@metrics/features/registration'
 import { fetchLocation, fetchFromResource, fetchFHIR } from '@metrics/api'
+import { EXPECTED_BIRTH_REGISTRATION_IN_DAYS } from '@metrics/constants'
 export const YEARLY_INTERVAL = '365d'
 export const MONTHLY_INTERVAL = '30d'
 export const WEEKLY_INTERVAL = '7d'
@@ -61,8 +62,16 @@ export enum EVENT_TYPE {
 export type Location = fhir.Location & { id: string }
 
 export const ageIntervals = [
-  { title: '45d', minAgeInDays: -1, maxAgeInDays: 45 },
-  { title: '46d - 1yr', minAgeInDays: 46, maxAgeInDays: 365 },
+  {
+    title: `${EXPECTED_BIRTH_REGISTRATION_IN_DAYS}d`,
+    minAgeInDays: -1,
+    maxAgeInDays: Number(EXPECTED_BIRTH_REGISTRATION_IN_DAYS)
+  },
+  {
+    title: `${Number(EXPECTED_BIRTH_REGISTRATION_IN_DAYS) + 1}d - 1yr`,
+    minAgeInDays: Number(EXPECTED_BIRTH_REGISTRATION_IN_DAYS),
+    maxAgeInDays: 365
+  },
   { title: '1yr', minAgeInDays: 366, maxAgeInDays: 730 },
   { title: '2yr', minAgeInDays: 731, maxAgeInDays: 1095 },
   { title: '3yr', minAgeInDays: 1096, maxAgeInDays: 1460 },
@@ -113,7 +122,6 @@ export const generateEmptyBirthKeyFigure = (
 
 export const fetchEstimateByLocation = async (
   locationData: Location,
-  estimationForDays: number,
   event: EVENT_TYPE,
   authHeader: IAuthHeader,
   timeFrom: string,
@@ -125,6 +133,10 @@ export const fetchEstimateByLocation = async (
   if (!locationData.extension) {
     throw new Error('Invalid location data found')
   }
+  const estimationForDays = Math.ceil(
+    Math.abs(new Date(timeTo).getTime() - new Date(timeFrom).getTime()) /
+      (1000 * 60 * 60 * 24)
+  )
   let estimateExtensionFound: boolean = false
   const toYear = new Date(timeTo).getFullYear()
   let selectedCrudYear = new Date(timeTo).getFullYear()
@@ -249,7 +261,6 @@ export const fetchEstimateFor45DaysByLocationId = async (
   const locationData: Location = await fetchFHIR(locationId, authHeader)
   return await fetchEstimateByLocation(
     locationData,
-    45, // For 45 days
     event,
     authHeader,
     timeFrom,

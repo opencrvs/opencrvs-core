@@ -28,6 +28,7 @@ import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
+import { formattedDuration } from '@client/utils/date-formatting'
 
 const validateScopeToken = jwt.sign(
   { scope: ['validate'] },
@@ -220,10 +221,12 @@ describe('RegistrationHome sent for approval tab related tests', () => {
 
     testComponent.component.update()
     const data = testComponent.component.find(GridTable).prop('content')
-    const EXPECTED_DATE_OF_APPLICATION = moment(
-      moment(TIME_STAMP, 'x').format('YYYY-MM-DD HH:mm:ss'),
-      'YYYY-MM-DD HH:mm:ss'
-    ).fromNow()
+    const EXPECTED_DATE_OF_APPLICATION = formattedDuration(
+      moment(
+        moment(TIME_STAMP, 'x').format('YYYY-MM-DD HH:mm:ss'),
+        'YYYY-MM-DD HH:mm:ss'
+      )
+    )
     expect(data.length).toBe(2)
     expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
     expect(data[0].eventTimeElapsed).toBe('8 years ago')

@@ -66,43 +66,8 @@ export const messages: {
   }
 })
 
-const fallbackCountry = window.config.COUNTRY
-
-interface IMobilePhonePattern {
-  pattern: RegExp
-  example: string
-  start: string
-  num: string
-}
-
-const mobilePhonePatternTable: { [key: string]: IMobilePhonePattern } = {
-  gbr: {
-    pattern: /^07[0-9]{9,10}$/,
-    example: '07123456789',
-    start: '07',
-    num: '10 or 11'
-  },
-  bgd: {
-    pattern: /^01[1-9][0-9]{8}$/,
-    example: '01741234567',
-    start: '01',
-    num: '11'
-  },
-  zmb: {
-    pattern: /^0(7|9)[0-9]{1}[0-9]{7}$/,
-    example: '0970545855',
-    start: '0[7|9]',
-    num: '10'
-  }
-}
-
-export const isAValidPhoneNumberFormat = (
-  value: string,
-  country: string
-): boolean => {
-  const countryMobileTable =
-    mobilePhonePatternTable[country] || mobilePhonePatternTable[fallbackCountry]
-  const { pattern } = countryMobileTable
+export const isAValidPhoneNumberFormat = (value: string): boolean => {
+  const { pattern } = window.config.PHONE_NUMBER_PATTERN
   return pattern.test(value)
 }
 
@@ -124,10 +89,7 @@ export const isNumber: Validation = (value: string) =>
     : undefined
 
 export const phoneNumberFormat: Validation = (value: string) => {
-  const country = window.config.COUNTRY
-  const countryMobileTable =
-    mobilePhonePatternTable[country] || mobilePhonePatternTable[fallbackCountry]
-  const { example } = countryMobileTable
+  const { example } = window.config.PHONE_NUMBER_PATTERN
   const validationProps = { example }
 
   const trimmedValue = value === undefined || value === null ? '' : value.trim()
@@ -136,7 +98,7 @@ export const phoneNumberFormat: Validation = (value: string) => {
     return undefined
   }
 
-  return isAValidPhoneNumberFormat(trimmedValue, country)
+  return isAValidPhoneNumberFormat(trimmedValue)
     ? undefined
     : {
         message: messages.phoneNumberFormat,

@@ -20,6 +20,7 @@ interface INotificationsMessages extends Record<string, MessageDescriptor> {
   statusRegistering: MessageDescriptor
   statusRejecting: MessageDescriptor
   statusSubmitting: MessageDescriptor
+  statusWaitingToValidate: MessageDescriptor
   statusWaitingToRegister: MessageDescriptor
   statusWaitingToReject: MessageDescriptor
   statusWaitingToSubmit: MessageDescriptor
@@ -73,6 +74,11 @@ const messagesToDefine: INotificationsMessages = {
     defaultMessage: 'Submitting...',
     description: 'Label for application status submitting',
     id: 'regHome.outbox.statusSubmitting'
+  },
+  statusWaitingToValidate: {
+    defaultMessage: 'Sending for approval',
+    description: 'Label for application status waiting for validate',
+    id: 'regHome.outbox.statusWaitingToValidate'
   },
   statusWaitingToRegister: {
     defaultMessage: 'Waiting to register',

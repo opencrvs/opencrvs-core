@@ -31,7 +31,8 @@ import {
   INFORMANT_TITLE,
   REASON_MOTHER_NOT_APPLYING,
   REASON_FATHER_NOT_APPLYING,
-  REASON_CAREGIVER_NOT_APPLYING
+  REASON_CAREGIVER_NOT_APPLYING,
+  createPractitionerEntryTemplate
 } from '@gateway/features/fhir/templates'
 import {
   ITemplatedBundle,
@@ -382,6 +383,49 @@ export function selectOrCreateLocationRefResource(
   }
 
   return locationEntry.resource as fhir.Location
+}
+
+export function selectOrCreateEncounterParticipant(
+  fhirBundle: ITemplatedBundle,
+  context: any
+): fhir.Reference {
+  const encounter = selectOrCreateEncounterResource(fhirBundle, context)
+  if (!encounter.participant || !encounter.participant[0]) {
+    encounter.participant = [{}]
+  }
+  return encounter.participant[0]
+}
+
+export function selectOrCreateEncounterPartitioner(
+  fhirBundle: ITemplatedBundle,
+  context: any
+): fhir.Practitioner {
+  const encounterParticipant = selectOrCreateEncounterParticipant(
+    fhirBundle,
+    context
+  ) as fhir.EncounterParticipant
+  let practitioner
+  if (
+    !encounterParticipant.individual ||
+    !encounterParticipant.individual.reference
+  ) {
+    const ref = uuid()
+    encounterParticipant.individual = {
+      reference: `urn:uuid:${ref}`
+    }
+    practitioner = createPractitionerEntryTemplate(ref)
+    fhirBundle.entry.push(practitioner)
+  } else {
+    practitioner = fhirBundle.entry.find(
+      entry => entry.fullUrl === encounterParticipant.individual?.reference
+    )
+    if (!practitioner) {
+      throw new Error(
+        'fhirBundle is expected to have an encounter practitioner entry'
+      )
+    }
+  }
+  return practitioner.resource as fhir.Practitioner
 }
 
 export function selectOrCreateEncounterLocationRef(

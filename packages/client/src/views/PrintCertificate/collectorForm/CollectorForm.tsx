@@ -519,13 +519,25 @@ const mapStateToProps = (
 
     const motherDataExist =
       applicationData && applicationData.mother && !isMotherDeceased
-    const fatherDataExist =
+    let fatherDataExist =
+      applicationData && applicationData.father && !isFatherDeceased
+
+    //TODO: This needs to be dynamic.
+    // We shouldn't hardcode 'fathersDetailsExist' field check here
+    // As it's part of the form definition so we can't ensure
+    // that all countries will have this field in their definition
+    if (
       applicationData &&
       applicationData.father &&
-      applicationData.father.fathersDetailsExist &&
-      !isFatherDeceased
+      applicationData.father.fathersDetailsExist !== undefined
+    ) {
+      fatherDataExist =
+        fatherDataExist && applicationData.father.fathersDetailsExist
+    }
 
     if (motherDataExist && fatherDataExist) {
+      //  !!applicationData.father.fathersDetailsExist &&
+
       clonedFormSection.groups.unshift(
         certCollectorGroupForBirthAppWithParentDetails
       )

@@ -109,16 +109,18 @@ class IDVerifierComponent extends React.Component<
 
     return (
       <>
-        <LabelValuePair
-          label={intl.formatMessage(constantsMessages.id)}
-          value={
-            intl.formatMessage(
-              identityNameMapper(collectorInformation.iDType as string)
-            ) +
-            ' | ' +
-            collectorInformation.iD
-          }
-        />
+        {collectorInformation.iD && (
+          <LabelValuePair
+            label={intl.formatMessage(constantsMessages.id)}
+            value={
+              intl.formatMessage(
+                identityNameMapper(collectorInformation.iDType as string)
+              ) +
+              ' | ' +
+              collectorInformation.iD
+            }
+          />
+        )}
         {collectorInformation.firstNames && (
           <LabelValuePair
             label={intl.formatMessage(certificateMessages.firstName)}

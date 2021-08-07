@@ -26,14 +26,18 @@ interface IPersonName {
 
 export const fieldToNameTransformer = (
   language: string,
-  transformedFieldName?: string
+  transformedFieldName?: string,
+  toSectionId?: string
 ) => (
   transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
 ) => {
-  const sectionData = transformedData[sectionId]
+  if (toSectionId && !transformedData[toSectionId]) {
+    transformedData[toSectionId] = {}
+  }
+  const sectionData = transformedData[toSectionId ? toSectionId : sectionId]
   if (!sectionData.name) {
     sectionData.name = [
       {

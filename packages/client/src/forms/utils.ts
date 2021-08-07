@@ -248,12 +248,24 @@ export const getFieldOptions = (
   values: IFormSectionData,
   resources: IOfflineData
 ) => {
+  const locations = resources[OFFLINE_LOCATIONS_KEY]
   const dependencyVal = values[field.dynamicOptions.dependency] as string
-  if (!dependencyVal) {
-    return []
-  }
-  if (resources && field.dynamicOptions.resource === OFFLINE_LOCATIONS_KEY) {
-    const locations = resources[OFFLINE_LOCATIONS_KEY]
+  if (field.dynamicOptions.jurisdictionType) {
+    return generateOptions(
+      Object.values(locations).filter((location: ILocation) => {
+        return (
+          location.jurisdictionType === field.dynamicOptions.jurisdictionType
+        )
+      }),
+      'location'
+    )
+  } else if (
+    resources &&
+    field.dynamicOptions.resource === OFFLINE_LOCATIONS_KEY
+  ) {
+    if (!dependencyVal) {
+      return []
+    }
     let partOf: string
     if (dependencyVal === window.config.COUNTRY.toUpperCase()) {
       partOf = 'Location/0'
@@ -279,7 +291,7 @@ export const getFieldOptions = (
         `Dependency '${dependencyVal}' has illegal value, the value should have an entry in the dynamic options object.`
       )
     } else {
-      options = field.dynamicOptions.options[dependencyVal]
+      options = field.dynamicOptions.options[dependencyVal] || []
     }
     return options
   }
@@ -509,8 +521,8 @@ export const convertToMSISDN = (phone: string) => {
   const countryCode =
     callingCountries[window.config.COUNTRY.toUpperCase()].countryCallingCodes[0]
 
-  if (phone.startsWith(countryCode)) {
-    return phone
+  if (phone.startsWith(countryCode) || `+${phone}`.startsWith(countryCode)) {
+    return phone.startsWith('+') ? phone : `+${phone}`
   }
   return phone.startsWith('0')
     ? `${countryCode}${phone.substring(1)}`

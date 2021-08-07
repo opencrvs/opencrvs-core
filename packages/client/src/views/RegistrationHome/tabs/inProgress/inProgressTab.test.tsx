@@ -43,6 +43,7 @@ import {
   GQLDeathEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
 import { waitForElement } from '@client/tests/wait-for-element'
+import { formattedDuration } from '@client/utils/date-formatting'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsInBlcmZvcm1hbmNlIiwiY2VydGlmeSIsImRlbW8iXSwiaWF0IjoxNTYzMzQzMTMzLCJleHAiOjE1NjM5NDc5MzMsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpyZXNvdXJjZXMtdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1ZDI1ZWM4YTI0YjExMGMyNWEyN2JhNjcifQ.C5v0fboxhawmzrHrO2kzdwfe9pNrF23UedkiPo_4PTBLuS6dm1UgPZWV7SXT9_JVS7djpH2lh-wZ24CR6S-QWI1QgGdvXGrzyUsayJxCdh2FSBnmgLpsD-LTvbDefpmliWzjLk_glbcqeoFX54hwjORZrsH6JMac4GSRRq2vL_Lq7bBUae7IdmB8itoZQLJJHi29bsCvGr3h1njV5BUvQ4N0Q9-w7QAd-ZPjTz4hYf_biFn52fWMwYaxY6_zA5GB6Bm_6ibI8cz14wY4fEME2cv33x4DwVRD8z4UL_Qq14nqWMO5EEf5mb_YKH-wTPl3kUzofngRsMY8cKI_YTr_1Q'
@@ -280,7 +281,7 @@ describe('In Progress tab', () => {
       })
       testComponent.component.update()
       const data = testComponent.component.find(GridTable).prop('content')
-      const EXPECTED_DATE_OF_REJECTION = moment(TIME_STAMP).fromNow()
+      const EXPECTED_DATE_OF_REJECTION = formattedDuration(moment(TIME_STAMP))
 
       expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
       expect(data[0].name).toBe('Anik Hoque')
@@ -537,7 +538,9 @@ describe('In Progress tab', () => {
       })
       testComponent.component.update()
       const data = testComponent.component.find(GridTable).prop('content')
-      const EXPECTED_DATE_OF_REJECTION = moment(Number(TIME_STAMP)).fromNow()
+      const EXPECTED_DATE_OF_REJECTION = formattedDuration(
+        moment(Number(TIME_STAMP))
+      )
 
       expect(data[0].id).toBe('956281c9-1f47-4c26-948a-970dd23c4094')
       expect(data[0].name).toBe('K M Abdullah al amin Khan')
@@ -864,7 +867,9 @@ describe('In Progress tab', () => {
       })
       testComponent.component.update()
       const data = testComponent.component.find(GridTable).prop('content')
-      const EXPECTED_DATE_OF_REJECTION = moment(Number(TIME_STAMP)).fromNow()
+      const EXPECTED_DATE_OF_REJECTION = formattedDuration(
+        moment(Number(TIME_STAMP))
+      )
 
       expect(data[0].id).toBe('f0a1ca2c-6a14-4b9e-a627-c3e2e110587e')
       expect(data[0].name).toBe('Anik Hoque')

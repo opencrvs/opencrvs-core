@@ -97,6 +97,7 @@ export interface ICheckboxOption {
 
 export interface IDynamicOptions {
   dependency: string
+  jurisdictionType?: string
   resource?: string
   options?: { [key: string]: ISelectOption[] }
 }

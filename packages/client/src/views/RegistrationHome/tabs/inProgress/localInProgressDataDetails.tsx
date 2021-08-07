@@ -11,6 +11,7 @@
  */
 import { StatusProgress } from '@opencrvs/components/lib/icons'
 import { IApplication, SUBMISSION_STATUS } from '@client/applications'
+import { messages } from '@client/i18n/messages/views/search'
 import { IStoreState } from '@client/store'
 import { CERTIFICATE_DATE_FORMAT } from '@client/utils/constants'
 import moment from 'moment'
@@ -18,10 +19,7 @@ import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
-import {
-  constantsMessages,
-  dynamicConstantsMessages
-} from '@client/i18n/messages'
+import { constantsMessages } from '@client/i18n/messages'
 
 const ExpansionContent = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -54,18 +52,17 @@ const StyledValue = styled.span`
   ${({ theme }) => theme.fonts.bodyStyle};
   text-transform: capitalize !important;
 `
-const ValueContainer = styled.div`
-  display: inline-flex;
-  flex-wrap: wrap;
-  & span:not(:last-child) {
-    border-right: 1px solid ${({ theme }) => theme.colors.placeholder};
-    margin-right: 10px;
-    padding-right: 10px;
-  }
-`
+
 const HistoryWrapper = styled.div`
   padding: 10px 25px;
   margin: 20px 0px;
+`
+const BoldSpan = styled.span`
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  padding: 0 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `
 
 function LabelValue({ label, value }: { label: string; value: string }) {
@@ -74,16 +71,6 @@ function LabelValue({ label, value }: { label: string; value: string }) {
       <StyledLabel>{label}:</StyledLabel>
       <StyledValue>{value}</StyledValue>
     </div>
-  )
-}
-
-function ValuesWithSeparator(props: { strings: string[] }): JSX.Element {
-  return (
-    <ValueContainer>
-      {props.strings.map((value, index) => (
-        <span key={index}>{value}</span>
-      ))}
-    </ValueContainer>
   )
 }
 
@@ -103,6 +90,7 @@ type IApplicationWithContactPoint = IApplication & {
         value: string
         nestedFields?: NestedFields
       }
+      registrationPhone: string
     }
   }
 }
@@ -128,10 +116,11 @@ class LocalInProgressDataDetailsComponent extends React.Component<
     const contactPoint = draft.data.registration.contactPoint
     const relation = getInformant(draft)
 
-    const registrationPhone =
-      contactPoint &&
-      contactPoint.nestedFields &&
-      contactPoint.nestedFields.registrationPhone
+    const registrationPhone = contactPoint
+      ? contactPoint &&
+        contactPoint.nestedFields &&
+        contactPoint.nestedFields.registrationPhone
+      : draft.data.registration.registrationPhone
 
     return {
       draftStartedOn: draft && draft.savedOn,
@@ -147,22 +136,6 @@ class LocalInProgressDataDetailsComponent extends React.Component<
       CERTIFICATE_DATE_FORMAT
     )
 
-    function getInformantText() {
-      const { informantRelation } = transformedData
-
-      if (!informantRelation) {
-        return ''
-      }
-
-      const message = dynamicConstantsMessages[informantRelation]
-
-      if (!message) {
-        return informantRelation
-      }
-
-      return intl.formatMessage(dynamicConstantsMessages[informantRelation])
-    }
-
     return (
       <ExpansionContent>
         <HistoryWrapper>
@@ -177,20 +150,12 @@ class LocalInProgressDataDetailsComponent extends React.Component<
                 )}
                 value={timestamp}
               />
-              <ValueContainer>
-                <StyledLabel>
-                  {intl.formatMessage(
-                    constantsMessages.applicationInformantLabel
-                  )}
-                  :
-                </StyledLabel>
-                <ValuesWithSeparator
-                  strings={[
-                    getInformantText(),
-                    transformedData.informantContactNumber || ''
-                  ]}
-                />
-              </ValueContainer>
+              <ExpansionContainer>
+                <label>{intl.formatMessage(messages.informantContact)}:</label>
+                <BoldSpan>
+                  {[transformedData.informantContactNumber || '']}
+                </BoldSpan>
+              </ExpansionContainer>
             </ExpansionContentContainer>
           </ExpansionContainer>
         </HistoryWrapper>
