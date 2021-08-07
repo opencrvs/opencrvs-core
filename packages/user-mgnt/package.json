@@ -21,7 +21,7 @@
     "@types/hapi-pino": "^6.3.0",
     "@types/pino": "^5.14.0",
     "app-module-path": "^2.2.0",
-    "@hapi/boom": "^7.2.0",
+    "@hapi/boom": "^9.1.1",
     "crypto": "^1.0.1",
     "@hapi/hapi": "^20.0.1",
     "hapi-auth-jwt2": "10.2.0",
