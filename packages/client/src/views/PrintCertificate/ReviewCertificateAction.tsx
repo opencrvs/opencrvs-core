@@ -221,7 +221,7 @@ class ReviewCertificateActionComponent extends React.Component<
 
     switch (event) {
       case Event.BIRTH:
-        return intl.formatMessage(certificateMessages.reviewTitle, {
+        return intl.formatMessage(certificateMessages.retiewTitle, {
           event: eventName
         })
       case Event.DEATH:
@@ -230,7 +230,7 @@ class ReviewCertificateActionComponent extends React.Component<
           event: eventName
         })
       default:
-        return intl.formatMessage(certificateMessages.reviewTitle, {
+        return intl.formatMessage(certificateMessages.retiewTitle, {
           event: eventName
         })
     }
@@ -260,7 +260,7 @@ class ReviewCertificateActionComponent extends React.Component<
         goBack={this.goBack}
       >
         <Title>{this.getTitle()}</Title>
-        <Info>{intl.formatMessage(certificateMessages.reviewDescription)}</Info>
+        <Info>{intl.formatMessage(certificateMessages.retiewDescription)}</Info>
 
         <PdfWrapper id="pdfwrapper">
           <PDFViewer id="pdfholder" pdfSource={this.state.certificatePdf} />
