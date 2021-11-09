@@ -480,24 +480,30 @@ function GeneratedInputField({
   }
 
   if (fieldDefinition.type === LOCATION_SEARCH_INPUT) {
-    const selectedLocation = fieldDefinition.locationList.find(
-      location => location.id === value
-    )
+    const locationOptions = fieldDefinition.locationList.map(location => {
+      return {
+        value: location.id,
+        label: location.displayLabel
+      }
+    })
 
     return (
       <InputField {...inputFieldProps}>
-        <LocationSearchFormField
+        <Select
           {...inputProps}
-          selectedLocation={selectedLocation}
-          locationList={fieldDefinition.locationList}
-          searchHandler={item => {
-            onSetFieldValue(fieldDefinition.name, item.id)
-            if (fieldDefinition.dispatchOptions) {
-              dynamicDispatch(fieldDefinition.dispatchOptions.action, {
-                [fieldDefinition.dispatchOptions.payloadKey]: item.id
-              })
-            }
+          isDisabled={fieldDefinition.disabled}
+          value={value as string}
+          onChange={(val: string) => {
+            resetDependentSelectValues(fieldDefinition.name)
+            onSetFieldValue(fieldDefinition.name, val)
           }}
+          onFocus={() =>
+            handleSelectFocus(
+              fieldDefinition.name,
+              fieldDefinition.locationList.length > 10
+            )
+          }
+          options={locationOptions}
         />
       </InputField>
     )
