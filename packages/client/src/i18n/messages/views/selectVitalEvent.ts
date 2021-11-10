@@ -12,7 +12,7 @@
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface ISelectPrimaryApplicantMessages
-  extends Record<string, MessageDescriptor> {
+  extends Record<string | number | symbol, MessageDescriptor> {
   registerNewEventTitle: MessageDescriptor
   registerNewEventHeading: MessageDescriptor
   errorMessage: MessageDescriptor

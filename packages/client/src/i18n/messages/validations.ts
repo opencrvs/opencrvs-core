@@ -11,7 +11,8 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IValidationMessages extends Record<string, MessageDescriptor> {
+interface IValidationMessages
+  extends Record<string | number | symbol, MessageDescriptor> {
   bengaliOnlyNameFormat: MessageDescriptor
   blockAlphaNumericDot: MessageDescriptor
   dateFormat: MessageDescriptor

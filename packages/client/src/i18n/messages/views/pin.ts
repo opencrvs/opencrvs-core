@@ -11,7 +11,8 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IPinMessages extends Record<string, MessageDescriptor> {
+interface IPinMessages
+  extends Record<string | number | symbol, MessageDescriptor> {
   createTitle: MessageDescriptor
   createDescription: MessageDescriptor
   pinSameDigitsError: MessageDescriptor

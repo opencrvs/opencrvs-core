@@ -11,7 +11,8 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface ISysAdminMessages extends Record<string, MessageDescriptor> {
+interface ISysAdminMessages
+  extends Record<string | number | symbol, MessageDescriptor> {
   auditReason: MessageDescriptor
   auditReasonOther: MessageDescriptor
   overviewTab: MessageDescriptor

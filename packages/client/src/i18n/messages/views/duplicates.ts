@@ -11,7 +11,8 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IDuplicatesMessages extends Record<string, MessageDescriptor> {
+interface IDuplicatesMessages
+  extends Record<string | number | symbol, MessageDescriptor> {
   notDuplicate: MessageDescriptor
   notDuplicateConfirmationTxt: MessageDescriptor
   rejectDescription: MessageDescriptor

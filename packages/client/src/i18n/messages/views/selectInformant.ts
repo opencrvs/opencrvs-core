@@ -11,7 +11,8 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface ISelectInformantMessages extends Record<string, MessageDescriptor> {
+interface ISelectInformantMessages
+  extends Record<string | number | symbol, MessageDescriptor> {
   birthInformantTitle: MessageDescriptor
   deathInformantTitle: MessageDescriptor
   parents: MessageDescriptor

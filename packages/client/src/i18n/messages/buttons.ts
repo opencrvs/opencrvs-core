@@ -11,7 +11,8 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IButtonsMessages extends Record<string, MessageDescriptor> {
+interface IButtonsMessages
+  extends Record<string | number | symbol, MessageDescriptor> {
   back: MessageDescriptor
   apply: MessageDescriptor
   cancel: MessageDescriptor

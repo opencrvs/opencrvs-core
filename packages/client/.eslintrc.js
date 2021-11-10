@@ -19,7 +19,7 @@ module.exports = {
     'plugin:import/warnings',
     'plugin:import/typescript'
   ],
-  plugins: ['react', '@typescript-eslint', 'import'],
+  plugins: ['react', '@typescript-eslint', 'import', 'formatjs'],
   env: {
     es6: true,
     browser: true,
@@ -64,6 +64,7 @@ Query component now sends errors automatically to Sentry.`
     'import/prefer-default-export': 'off',
     'import/no-relative-parent-imports': 2,
     'import/named': 0,
+    'formatjs/enforce-id': 'error',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/no-unused-vars': 'off',

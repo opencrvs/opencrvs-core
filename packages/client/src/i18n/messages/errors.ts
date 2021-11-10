@@ -11,7 +11,8 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IErrorMessages extends Record<string, MessageDescriptor> {
+interface IErrorMessages
+  extends Record<string | number | symbol, MessageDescriptor> {
   draftFailed: MessageDescriptor
   duplicateQueryError: MessageDescriptor
   errorCodeUnauthorized: MessageDescriptor

@@ -11,7 +11,8 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface INotificationsMessages extends Record<string, MessageDescriptor> {
+interface INotificationsMessages
+  extends Record<string | number | symbol, MessageDescriptor> {
   declarationsSynced: MessageDescriptor
   draftsSaved: MessageDescriptor
   outboxText: MessageDescriptor

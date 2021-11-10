@@ -12,7 +12,7 @@
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IPerformanceReportsMessages
-  extends Record<string, MessageDescriptor> {
+  extends Record<string | number | symbol, MessageDescriptor> {
   monthlyTabTitle: MessageDescriptor
   monthlyReportsBodyHeader: MessageDescriptor
   sysAdminPerformanceHomeHeader: MessageDescriptor

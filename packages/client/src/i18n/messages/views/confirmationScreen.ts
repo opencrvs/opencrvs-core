@@ -12,7 +12,7 @@
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IConfirmationScreenMessages
-  extends Record<string, MessageDescriptor> {
+  extends Record<string | number | symbol, MessageDescriptor> {
   backButton: MessageDescriptor
   boxHeaderDesc: MessageDescriptor
   trackingSectionTitle: MessageDescriptor
