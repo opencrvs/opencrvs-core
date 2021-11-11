@@ -509,11 +509,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
 
     if (!!activeSectionGroup.showExitButtonOnly) {
+      console.log(SUBMISSION_STATUS.DRAFT)
       eventTopBarProps = {
         ...eventTopBarProps,
         exitAction: {
           handler: () => {
-            application.submissionStatus === SUBMISSION_STATUS.DRAFT
+            application.submissionStatus !== SUBMISSION_STATUS.DRAFT
               ? this.onDeleteApplication(application)
               : goToHomeTab(this.getRedirectionTabOnSaveOrExit())
           },
