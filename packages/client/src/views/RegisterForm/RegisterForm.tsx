@@ -509,7 +509,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
 
     if (!!activeSectionGroup.showExitButtonOnly) {
-      console.log(SUBMISSION_STATUS.DRAFT)
       eventTopBarProps = {
         ...eventTopBarProps,
         exitAction: {
