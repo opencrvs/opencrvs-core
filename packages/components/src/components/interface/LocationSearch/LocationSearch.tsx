@@ -209,6 +209,10 @@ export class LocationSearch extends React.Component<IProps, IState> {
     }
   }
 
+  componentWillUnmount() {
+    document.removeEventListener('click', this.handler)
+  }
+
   render() {
     return (
       <LocationSearchContainer>
