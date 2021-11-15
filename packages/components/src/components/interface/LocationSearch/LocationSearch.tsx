@@ -100,6 +100,8 @@ interface IProps {
   selectedLocation?: ISearchLocation | undefined
   searchHandler?: (location: ISearchLocation) => void
   searchButtonHandler?: () => void
+  id?: string
+  onBlur?: (e: React.FocusEvent<any>) => void
   error?: boolean
   touched?: boolean
   className?: string
@@ -155,6 +157,17 @@ export class LocationSearch extends React.Component<IProps, IState> {
       selectedText: text
     }))
     this.search(event.target.value)
+  }
+
+  onBlurHandler = (event: React.FocusEvent<HTMLInputElement>) => {
+    if (this.props.onBlur && this.props.searchHandler) {
+      this.props.searchHandler({
+        id: this.state.selectedText ? '0' : '',
+        searchableText: this.state.selectedText || '',
+        displayLabel: this.state.selectedText || ''
+      })
+      this.props.onBlur(event)
+    }
   }
 
   onFocus = (event: React.FocusEvent<HTMLInputElement>) => {
@@ -219,10 +232,11 @@ export class LocationSearch extends React.Component<IProps, IState> {
         <Wrapper className={this.props.className}>
           <Location id="locationSearchIcon" />
           <SearchTextInput
-            id="locationSearchInput"
+            id={this.props.id ? this.props.id : 'locationSearchInput'}
             type="text"
             autoComplete="off"
             onFocus={this.onFocus}
+            onBlur={this.onBlurHandler}
             onClick={() => document.addEventListener('click', this.handler)}
             value={this.state.selectedText || ''}
             onChange={this.onChangeHandler}
