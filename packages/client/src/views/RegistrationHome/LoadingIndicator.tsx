@@ -45,10 +45,9 @@ type IBaseLoadingProps = {
   loading: boolean
   hasError: boolean
   noApplication?: boolean
-  isOnline: boolean
 }
 
-type IProps = IBaseLoadingProps & IntlShapeProps
+type IProps = IBaseLoadingProps & IntlShapeProps & IOnlineStatusProps
 
 export class LoadingIndicatorComp extends React.Component<IProps> {
   constructor(props: IProps) {
@@ -91,10 +90,12 @@ export class LoadingIndicatorComp extends React.Component<IProps> {
   }
 }
 
-export function withOnlineStatus<T>(WrappedComponent: React.ComponentType<T>) {
+export function withOnlineStatus<T>(
+  WrappedComponent: React.ComponentType<T & IOnlineStatusProps>
+) {
   const ONLINE_CHECK_INTERVAL = 500
 
-  return function WithOnlineStatus(props: Omit<T, 'isOnline'>) {
+  return function WithOnlineStatus(props: T) {
     const [isOnline, setOnline] = React.useState(navigator.onLine)
 
     React.useEffect(() => {
@@ -106,11 +107,11 @@ export function withOnlineStatus<T>(WrappedComponent: React.ComponentType<T>) {
       return () => clearInterval(intervalID)
     }, [])
 
-    return <WrappedComponent isOnline={isOnline} {...(props as T)} />
+    return <WrappedComponent isOnline={isOnline} {...props} />
   }
 }
 
-export interface IOnlineStatusProps {
+export type IOnlineStatusProps = {
   isOnline: boolean
 }
 
