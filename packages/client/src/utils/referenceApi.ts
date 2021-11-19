@@ -32,6 +32,7 @@ export interface IDefinitionsResponse {
       death: ICertificateCollectorDefinition
     }
     userForm: ISerializedForm
+    collectorForm: ISerializedForm
   }
   templates: {
     receipt?: IPDFTemplate
@@ -47,7 +48,6 @@ export interface IAssetResponse {
 
 async function loadDefinitions(): Promise<IDefinitionsResponse> {
   const url = `${window.config.RESOURCES_URL}/definitions/client`
-
   const res = await fetch(url, {
     method: 'GET',
     headers: {

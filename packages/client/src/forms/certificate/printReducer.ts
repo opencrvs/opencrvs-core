@@ -15,28 +15,49 @@ import {
   collectDeathCertificateFormSection
 } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { Action } from 'redux'
-import { IFormSection } from '@client/forms'
+import * as offlineActions from '@client/offline/actions'
+import { CertificateSection, IFormSection } from '@client/forms'
 import { paymentFormSection } from '@client/forms/certificate/fieldDefinitions/payment-section'
 import { certificatePreview } from '@client/forms/certificate/fieldDefinitions/preview-section'
+import { deserializeForm } from '@client/forms/mappings/deserializer'
 
 const initialState: IPrintFormState = {
-  collectBirthCertificateForm: collectBirthCertificateFormSection,
-  collectDeathCertificateForm: collectDeathCertificateFormSection,
+  collectBirthCertificateForm: {} as IFormSection,
+  collectDeathCertificateForm: {} as IFormSection,
   paymentForm: paymentFormSection,
-  certificatePreviewForm: certificatePreview
+  certificatePreviewForm: {} as IFormSection,
+  certCollectorGroupApplicationFormSection: {} as IFormSection
 }
 export interface IPrintFormState {
   collectBirthCertificateForm: IFormSection
   collectDeathCertificateForm: IFormSection
   paymentForm: IFormSection
   certificatePreviewForm: IFormSection
+  certCollectorGroupApplicationFormSection: IFormSection
 }
 
 export const printReducer: LoopReducer<IPrintFormState, Action> = (
   state: IPrintFormState = initialState,
-  action: Action
+  action: Action | offlineActions.Action
 ): IPrintFormState | Loop<IPrintFormState, Action> => {
   switch (action.type) {
+    case offlineActions.READY:
+    case offlineActions.DEFINITIONS_LOADED:
+      const {
+        collectorForm
+      } = (action as offlineActions.DefinitionsLoadedAction).payload.forms
+      const form = deserializeForm(collectorForm)
+      const previewFormSection = form.sections.find(
+        section => section.id === CertificateSection.CertificatePreview
+      )
+      //TODO :: do not use index number
+      return {
+        ...state,
+        collectBirthCertificateForm: form.sections[0],
+        collectDeathCertificateForm: form.sections[1],
+        certificatePreviewForm: previewFormSection as IFormSection,
+        certCollectorGroupApplicationFormSection: form.sections[3]
+      }
     default:
       return state
   }

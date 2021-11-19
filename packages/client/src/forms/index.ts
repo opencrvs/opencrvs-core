@@ -71,6 +71,13 @@ export enum Sort {
   DESC = 'desc'
 }
 
+export enum CertificateCollectorGroupForBirth {
+  BIRTH_WITH_PARENT_DETAILS = 'certCollectorWithParent',
+  BIRTH_WITHOUT_MOTHER_DETAILS = 'certCollectorWithoutMother',
+  BIRTH_WITHOUT_FATHER_DETAILS = 'certCollectorWithoutfather',
+  BIRTH_WITHOUT_PARENT_DETAILS = 'certCollectorWithoutParent'
+}
+
 export enum Action {
   SUBMIT_FOR_REVIEW = 'submit for review',
   APPROVE_APPLICATION = 'approve',
@@ -861,6 +868,7 @@ export interface IForm {
   sections: IFormSection[]
 }
 export interface ISerializedForm {
+  [x: string]: any
   sections: ISerializedFormSection[]
 }
 

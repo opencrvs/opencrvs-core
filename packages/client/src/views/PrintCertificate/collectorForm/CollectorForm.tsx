@@ -26,6 +26,7 @@ import {
 import { FormFieldGenerator } from '@client/components/form'
 import {
   Action,
+  CertificateCollectorGroupForBirth,
   Event,
   IForm,
   IFormData,
@@ -73,12 +74,6 @@ import { RouteComponentProps } from 'react-router'
 import { withTheme } from 'styled-components'
 import { IValidationResult } from '@client/utils/validate'
 import { getRegisterForm } from '@client/forms/register/application-selectors'
-import {
-  certCollectorGroupForBirthAppWithParentDetails,
-  certCollectorGroupForBirthAppWithoutFatherDetails,
-  certCollectorGroupForBirthAppWithoutParentDetails,
-  certCollectorGroupForBirthAppWithoutMotherDetails
-} from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 
 const FormSectionTitle = styled.h4`
@@ -488,6 +483,38 @@ const getCollectCertificateForm = (event: Event, state: IStoreState) => {
   }
 }
 
+const getIndivisualCertCollectorGroupForm = (
+  event: CertificateCollectorGroupForBirth,
+  state: IStoreState
+) => {
+  switch (event) {
+    case CertificateCollectorGroupForBirth.BIRTH_WITH_PARENT_DETAILS:
+      return state.printCertificateForm.certCollectorGroupApplicationFormSection.groups.find(
+        group =>
+          group.id ===
+          CertificateCollectorGroupForBirth.BIRTH_WITH_PARENT_DETAILS
+      )
+    case CertificateCollectorGroupForBirth.BIRTH_WITHOUT_MOTHER_DETAILS:
+      return state.printCertificateForm.certCollectorGroupApplicationFormSection.groups.find(
+        group =>
+          group.id ===
+          CertificateCollectorGroupForBirth.BIRTH_WITHOUT_MOTHER_DETAILS
+      )
+    case CertificateCollectorGroupForBirth.BIRTH_WITHOUT_FATHER_DETAILS:
+      return state.printCertificateForm.certCollectorGroupApplicationFormSection.groups.find(
+        group =>
+          group.id ===
+          CertificateCollectorGroupForBirth.BIRTH_WITHOUT_FATHER_DETAILS
+      )
+    case CertificateCollectorGroupForBirth.BIRTH_WITHOUT_PARENT_DETAILS:
+      return state.printCertificateForm.certCollectorGroupApplicationFormSection.groups.find(
+        group =>
+          group.id ===
+          CertificateCollectorGroupForBirth.BIRTH_WITHOUT_PARENT_DETAILS
+      )
+  }
+}
+
 const mapStateToProps = (
   state: IStoreState,
   props: RouteComponentProps<{
@@ -537,21 +564,36 @@ const mapStateToProps = (
 
     if (motherDataExist && fatherDataExist) {
       //  !!applicationData.father.fathersDetailsExist &&
-
+      const certFormWithParentDetails = getIndivisualCertCollectorGroupForm(
+        CertificateCollectorGroupForBirth.BIRTH_WITH_PARENT_DETAILS,
+        state
+      )
       clonedFormSection.groups.unshift(
-        certCollectorGroupForBirthAppWithParentDetails
+        certFormWithParentDetails as IFormSectionGroup
       )
     } else if (fatherDataExist && !motherDataExist) {
+      const certFormWithoutMotherDetails = getIndivisualCertCollectorGroupForm(
+        CertificateCollectorGroupForBirth.BIRTH_WITHOUT_MOTHER_DETAILS,
+        state
+      )
       clonedFormSection.groups.unshift(
-        certCollectorGroupForBirthAppWithoutMotherDetails
+        certFormWithoutMotherDetails as IFormSectionGroup
       )
     } else if (motherDataExist && !fatherDataExist) {
+      const certFormWithoutFatherDetails = getIndivisualCertCollectorGroupForm(
+        CertificateCollectorGroupForBirth.BIRTH_WITHOUT_FATHER_DETAILS,
+        state
+      )
       clonedFormSection.groups.unshift(
-        certCollectorGroupForBirthAppWithoutFatherDetails
+        certFormWithoutFatherDetails as IFormSectionGroup
       )
     } else if (!motherDataExist && !fatherDataExist) {
+      const certFormWithoutParentDetails = getIndivisualCertCollectorGroupForm(
+        CertificateCollectorGroupForBirth.BIRTH_WITHOUT_PARENT_DETAILS,
+        state
+      )
       clonedFormSection.groups.unshift(
-        certCollectorGroupForBirthAppWithoutParentDetails
+        certFormWithoutParentDetails as IFormSectionGroup
       )
     }
   }
