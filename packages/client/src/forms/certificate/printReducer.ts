@@ -10,15 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { LoopReducer, Loop } from 'redux-loop'
-import {
-  collectBirthCertificateFormSection,
-  collectDeathCertificateFormSection
-} from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { Action } from 'redux'
 import * as offlineActions from '@client/offline/actions'
 import { CertificateSection, IFormSection } from '@client/forms'
 import { paymentFormSection } from '@client/forms/certificate/fieldDefinitions/payment-section'
-import { certificatePreview } from '@client/forms/certificate/fieldDefinitions/preview-section'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
 
 const initialState: IPrintFormState = {
@@ -50,13 +45,16 @@ export const printReducer: LoopReducer<IPrintFormState, Action> = (
       const previewFormSection = form.sections.find(
         section => section.id === CertificateSection.CertificatePreview
       )
+      const groupFormSection = form.sections.find(
+        section => section.id === CertificateSection.CertificateCollectorGroup
+      )
       //TODO :: do not use index number
       return {
         ...state,
         collectBirthCertificateForm: form.sections[0],
         collectDeathCertificateForm: form.sections[1],
         certificatePreviewForm: previewFormSection as IFormSection,
-        certCollectorGroupApplicationFormSection: form.sections[3]
+        certCollectorGroupApplicationFormSection: groupFormSection as IFormSection
       }
     default:
       return state
