@@ -19,6 +19,7 @@ interface IValidationMessages {
   domLaterThanDob: MessageDescriptor
   emailAddressFormat: MessageDescriptor
   englishOnlyNameFormat: MessageDescriptor
+  facilityMustBeSelected: MessageDescriptor
   greaterThanZero: MessageDescriptor
   isValidBirthDate: MessageDescriptor
   isValidDateOfDeath: MessageDescriptor
@@ -92,6 +93,11 @@ const messagesToDefine: IValidationMessages = {
     description:
       'The error message that appears when a non English character is used in an English name',
     id: 'validations.englishOnlyNameFormat'
+  },
+  facilityMustBeSelected: {
+    defaultMessage: 'No facility selected',
+    description: 'The error message appears when no valid facility is selected',
+    id: 'validations.facilityMustBeSelected'
   },
   greaterThanZero: {
     defaultMessage: 'Must be a greater than zero',

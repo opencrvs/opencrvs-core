@@ -404,6 +404,7 @@ const renderValue = (
 
 const getErrorsOnFieldsBySection = (
   formSections: IFormSection[],
+  resources: IOfflineData,
   draft: IApplication
 ): IErrorsBySection => {
   return formSections.reduce((sections, section: IFormSection) => {
@@ -416,7 +417,7 @@ const getErrorsOnFieldsBySection = (
     const errors = getValidationErrorsForForm(
       fields,
       draft.data[section.id] || {},
-      undefined,
+      resources,
       draft.data
     )
 
@@ -1232,7 +1233,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     } = this.props
     const formSections = this.getViewableSection(registerForm[event])
 
-    const errorsOnFields = getErrorsOnFieldsBySection(formSections, application)
+    const errorsOnFields = getErrorsOnFieldsBySection(
+      formSections,
+      offlineResources,
+      application
+    )
 
     const isComplete =
       flatten(

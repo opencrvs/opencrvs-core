@@ -28,6 +28,8 @@ import {
   DRIVING_LICENSE
 } from '@client/forms/identity'
 import moment from 'moment'
+import { IOfflineData, LocationType } from '@client/offline/reducer'
+import { getListOfLocations } from '@client/forms/utils'
 
 export interface IValidationResult {
   message: MessageDescriptor
@@ -45,7 +47,8 @@ export type MaxLengthValidation = (
 
 export type Validation = (
   value: IFormFieldValue,
-  drafts?: IFormData
+  drafts?: IFormData,
+  resources?: IOfflineData
 ) => IValidationResult | undefined
 
 export type ValidationInitializer = (...value: any[]) => Validation
@@ -152,6 +155,21 @@ export const nonDecimalPointNumber: Validation = (value: IFormFieldValue) => {
 export const numeric: Validation = (value: IFormFieldValue) => {
   const cast = value as string
   return isNumber(cast) ? undefined : { message: messages.numberRequired }
+}
+
+export const facilityMustBeSelected: Validation = (
+  value: IFormFieldValue,
+  drafts,
+  resources
+) => {
+  const locationsList = getListOfLocations(
+    resources as IOfflineData,
+    'facilities',
+    LocationType.HEALTH_FACILITY
+  )
+  const isValid =
+    !value || locationsList.some(location => location.id === value)
+  return isValid ? undefined : { message: messages.facilityMustBeSelected }
 }
 
 export const phoneNumberFormat: Validation = (value: IFormFieldValue) => {
