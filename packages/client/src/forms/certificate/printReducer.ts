@@ -48,11 +48,20 @@ export const printReducer: LoopReducer<IPrintFormState, Action> = (
       const groupFormSection = form.sections.find(
         section => section.id === CertificateSection.CertificateCollectorGroup
       )
-      //TODO :: do not use index number
+      const birthCollectorSection = form.sections.find(
+        section => section.id === CertificateSection.BirthCollector
+      )
+      if (birthCollectorSection)
+        birthCollectorSection.id = CertificateSection.Collector
+      const deathCollectorSection = form.sections.find(
+        section => section.id === CertificateSection.DeathCollector
+      )
+      if (deathCollectorSection)
+        deathCollectorSection.id = CertificateSection.Collector
       return {
         ...state,
-        collectBirthCertificateForm: form.sections[0],
-        collectDeathCertificateForm: form.sections[1],
+        collectBirthCertificateForm: birthCollectorSection as IFormSection,
+        collectDeathCertificateForm: deathCollectorSection as IFormSection,
         certificatePreviewForm: previewFormSection as IFormSection,
         certCollectorGroupApplicationFormSection: groupFormSection as IFormSection
       }
