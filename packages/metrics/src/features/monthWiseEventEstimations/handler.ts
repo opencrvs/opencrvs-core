@@ -54,13 +54,22 @@ export async function monthWiseEventEstimationsHandler(
   )
   const estimations: IMonthWiseEstimation[] = []
   for (const monthFilter of monthFilters) {
-    const estimated45DayMetrics = await fetchLocationWiseEventEstimations(
-      monthFilter.startOfMonthTime,
-      monthFilter.endOfMonthTime,
-      locationId,
-      event,
-      authHeader
-    )
+    let estimated45DayMetrics
+    try {
+      estimated45DayMetrics = await fetchLocationWiseEventEstimations(
+        monthFilter.startOfMonthTime,
+        monthFilter.endOfMonthTime,
+        locationId,
+        event,
+        authHeader
+      )
+    } catch (error) {
+      estimated45DayMetrics = {
+        actualRegistration: 0,
+        estimatedRegistration: 0,
+        estimatedPercentage: 0
+      }
+    }
 
     estimations.push({
       startOfMonth: monthFilter.startOfMonthTime,
