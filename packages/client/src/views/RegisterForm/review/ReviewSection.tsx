@@ -351,9 +351,9 @@ const renderValue = (
   if (
     (field.type === DATE ||
       (field.type === FIELD_WITH_DYNAMIC_DEFINITIONS &&
-        (field.dynamicDefinitions.type &&
-          field.dynamicDefinitions.type.kind === 'static' &&
-          field.dynamicDefinitions.type.staticType === DATE))) &&
+        field.dynamicDefinitions.type &&
+        field.dynamicDefinitions.type.kind === 'static' &&
+        field.dynamicDefinitions.type.staticType === DATE)) &&
     value &&
     typeof value === 'string'
   ) {
@@ -404,6 +404,7 @@ const renderValue = (
 
 const getErrorsOnFieldsBySection = (
   formSections: IFormSection[],
+  resources: IOfflineData,
   draft: IApplication
 ): IErrorsBySection => {
   return formSections.reduce((sections, section: IFormSection) => {
@@ -416,7 +417,7 @@ const getErrorsOnFieldsBySection = (
     const errors = getValidationErrorsForForm(
       fields,
       draft.data[section.id] || {},
-      undefined,
+      resources,
       draft.data
     )
 
@@ -550,7 +551,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const { intl } = this.props
     const documentSection = this.props.registerForm[
       this.props.draft.event
-    ].sections.find(section => section.id == 'documents')
+    ].sections.find(section => section.id === 'documents')
     const docSectionFields = documentSection && documentSection.groups[0].fields
     const docFieldsWithOptions =
       docSectionFields &&
@@ -968,13 +969,13 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     )
     ;(
       (field.nestedFields &&
-        (draft.data[section.id] &&
-          draft.data[section.id][field.name] &&
-          (draft.data[section.id][field.name] as IFormSectionData).value &&
-          field.nestedFields[
-            (draft.data[section.id][field.name] as IFormSectionData)
-              .value as string
-          ])) ||
+        draft.data[section.id] &&
+        draft.data[section.id][field.name] &&
+        (draft.data[section.id][field.name] as IFormSectionData).value &&
+        field.nestedFields[
+          (draft.data[section.id][field.name] as IFormSectionData)
+            .value as string
+        ]) ||
       []
     ).forEach(nestedField => {
       if (nestedField.previewGroup) {
@@ -1232,7 +1233,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     } = this.props
     const formSections = this.getViewableSection(registerForm[event])
 
-    const errorsOnFields = getErrorsOnFieldsBySection(formSections, application)
+    const errorsOnFields = getErrorsOnFieldsBySection(
+      formSections,
+      offlineResources,
+      application
+    )
 
     const isComplete =
       flatten(

@@ -11,7 +11,8 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface ISessionMessages {
+interface ISessionMessages
+  extends Record<string | number | symbol, MessageDescriptor> {
   sessionExpireTxt: MessageDescriptor
 }
 

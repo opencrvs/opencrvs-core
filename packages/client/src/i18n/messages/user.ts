@@ -21,7 +21,8 @@ export enum QUESTION_KEYS {
   FAVORITE_FOOD,
   FIRST_CHILD_NAME
 }
-interface IUserMessages {
+interface IUserMessages
+  extends Record<string | number | symbol, MessageDescriptor> {
   accountTitle: MessageDescriptor
   BBS: MessageDescriptor
   BIRTH_TOWN: MessageDescriptor
@@ -81,7 +82,8 @@ interface IUserMessages {
   passwordUpdated: MessageDescriptor
 }
 
-interface IDynamicUserMessages {
+interface IDynamicUserMessages
+  extends Record<string | number | symbol, MessageDescriptor> {
   [key: string]: MessageDescriptor
 }
 
@@ -374,5 +376,6 @@ const messagesToDefine: IUserMessages = {
   }
 }
 
-export const userMessages: IUserMessages &
-  IDynamicUserMessages = defineMessages(messagesToDefine)
+export const userMessages:
+  | IUserMessages
+  | IDynamicUserMessages = defineMessages(messagesToDefine)

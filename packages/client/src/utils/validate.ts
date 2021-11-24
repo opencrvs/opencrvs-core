@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { MessageDescriptor, IntlShape } from 'react-intl'
+import { MessageDescriptor } from 'react-intl'
 import { validationMessages as messages } from '@client/i18n/messages'
 import { IFormFieldValue, IFormData } from '@opencrvs/client/src/forms'
 import {
@@ -28,6 +28,8 @@ import {
   DRIVING_LICENSE
 } from '@client/forms/identity'
 import moment from 'moment'
+import { IOfflineData, LocationType } from '@client/offline/reducer'
+import { getListOfLocations } from '@client/forms/utils'
 
 export interface IValidationResult {
   message: MessageDescriptor
@@ -45,7 +47,8 @@ export type MaxLengthValidation = (
 
 export type Validation = (
   value: IFormFieldValue,
-  drafts?: IFormData
+  drafts?: IFormData,
+  resources?: IOfflineData
 ) => IValidationResult | undefined
 
 export type ValidationInitializer = (...value: any[]) => Validation
@@ -152,6 +155,21 @@ export const nonDecimalPointNumber: Validation = (value: IFormFieldValue) => {
 export const numeric: Validation = (value: IFormFieldValue) => {
   const cast = value as string
   return isNumber(cast) ? undefined : { message: messages.numberRequired }
+}
+
+export const facilityMustBeSelected: Validation = (
+  value: IFormFieldValue,
+  drafts,
+  resources
+) => {
+  const locationsList = getListOfLocations(
+    resources as IOfflineData,
+    'facilities',
+    LocationType.HEALTH_FACILITY
+  )
+  const isValid =
+    !value || locationsList.some(location => location.id === value)
+  return isValid ? undefined : { message: messages.facilityMustBeSelected }
 }
 
 export const phoneNumberFormat: Validation = (value: IFormFieldValue) => {
@@ -472,7 +490,7 @@ export const isValidEnglishName = (value: string): boolean => {
   return checkNameWords(value, isValidEnglishWord)
 }
 
-const isLengthWithinRange = (value: string, min: number, max: number) =>
+export const isLengthWithinRange = (value: string, min: number, max: number) =>
   !value || (value.length >= min && value.length <= max)
 
 export const isValueWithinRange = (min: number, max: number) => (
@@ -613,7 +631,8 @@ export const isMoVisitDateAfterBirthDateAndBeforeDeathDate: Validation = (
     if (
       drafts &&
       drafts.deathEvent &&
-      (cast <= drafts.deathEvent.deathDate && cast >= drafts.deceased.birthDate)
+      cast <= drafts.deathEvent.deathDate &&
+      cast >= drafts.deceased.birthDate
     ) {
       return undefined
     } else if (
