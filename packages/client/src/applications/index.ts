@@ -12,9 +12,11 @@
 import {
   Action as ApplicationAction,
   Event,
+  IContactPoint,
   IForm,
   IFormData,
   IFormFieldValue,
+  IRegistration,
   Sort
 } from '@client/forms'
 import { getRegisterForm } from '@client/forms/register/application-selectors'
@@ -46,7 +48,8 @@ import {
   GQLEventSearchSet,
   GQLHumanName,
   GQLBirthEventSearchSet,
-  GQLDeathEventSearchSet
+  GQLDeathEventSearchSet,
+  GQLRegistrationSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
 import ApolloClient, { ApolloError, ApolloQueryResult } from 'apollo-client'
 import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
@@ -694,11 +697,34 @@ async function updateWorkqueueData(
       transformedApplication[sectionId] &&
       transformedApplication[sectionId].name) ||
     []
+  const transformedDeathDate =
+    (application.data &&
+      application.data.deathEvent &&
+      application.data.deathEvent.deathDate) ||
+    []
+  const transformedBirthDate =
+    (application.data &&
+      application.data.child &&
+      application.data.child.childBirthDate) ||
+    []
+  const transformedInformantContactNumber =
+    (application.data &&
+      application.data.registration &&
+      application.data.registration.contactPoint &&
+      (application.data.registration.contactPoint as IRegistration).nestedFields
+        .registrationPhone) ||
+    ''
 
   if (application.event === 'birth') {
     ;(workqueueApp as GQLBirthEventSearchSet).childName = transformedName
+    ;(workqueueApp as GQLBirthEventSearchSet).dateOfBirth = transformedBirthDate
+    ;((workqueueApp as GQLDeathEventSearchSet)
+      .registration as GQLRegistrationSearchSet).contactNumber = transformedInformantContactNumber
   } else {
     ;(workqueueApp as GQLDeathEventSearchSet).deceasedName = transformedName
+    ;(workqueueApp as GQLDeathEventSearchSet).dateOfDeath = transformedDeathDate
+    ;((workqueueApp as GQLDeathEventSearchSet)
+      .registration as GQLRegistrationSearchSet).contactNumber = transformedInformantContactNumber
   }
 }
 
@@ -754,6 +780,30 @@ export async function writeApplicationByUser(
       getState(),
       application,
       'reviewTab',
+      currentUserData.workqueue
+    )
+  }
+
+  if (
+    application.registrationStatus &&
+    application.registrationStatus === 'VALIDATED'
+  ) {
+    updateWorkqueueData(
+      getState(),
+      application,
+      'reviewTab',
+      currentUserData.workqueue
+    )
+  }
+
+  if (
+    application.registrationStatus &&
+    application.registrationStatus === 'REJECTED'
+  ) {
+    updateWorkqueueData(
+      getState(),
+      application,
+      'rejectTab',
       currentUserData.workqueue
     )
   }
@@ -867,7 +917,7 @@ async function getWorkqueueData(
   )
   return mergeWorkQueueData(
     state,
-    ['inProgressTab', 'notificationTab'],
+    ['inProgressTab', 'notificationTab', 'reviewTab', 'rejectTab'],
     currentUserData && currentUserData.applications,
     workqueue
   )
