@@ -75,7 +75,7 @@ const getValidationErrors = {
     }
 
     const validationResults = validators
-      .map(validator => validator(value, drafts))
+      .map(validator => validator(value, drafts, resources))
       .filter(error => error !== undefined) as IValidationResult[]
 
     return {

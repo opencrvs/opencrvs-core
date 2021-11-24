@@ -600,7 +600,9 @@ async function updateFieldAgentDeclaredApplicationsByUser(
 
   const userDetails =
     getUserDetails(state) ||
-    (JSON.parse(await storage.getItem('USER_DETAILS')) as IUserDetails)
+    (JSON.parse(
+      (await storage.getItem('USER_DETAILS')) as string
+    ) as IUserDetails)
 
   const uID = userDetails.userMgntUserID || ''
   let { allUserData, currentUserData } = await getUserData(uID)
@@ -695,7 +697,7 @@ async function updateWorkqueueData(
       transformedApplication[sectionId] &&
       transformedApplication[sectionId].name) ||
     []
-  const transformedDeathDateOfDate =
+  const transformedDeathDate =
     (application.data &&
       application.data.deathEvent &&
       application.data.deathEvent.deathDate) ||
@@ -720,7 +722,7 @@ async function updateWorkqueueData(
       .registration as GQLRegistrationSearchSet).contactNumber = transformedInformantContactNumber
   } else {
     ;(workqueueApp as GQLDeathEventSearchSet).deceasedName = transformedName
-    ;(workqueueApp as GQLDeathEventSearchSet).dateOfDeath = transformedDeathDateOfDate
+    ;(workqueueApp as GQLDeathEventSearchSet).dateOfDeath = transformedDeathDate
     ;((workqueueApp as GQLDeathEventSearchSet)
       .registration as GQLRegistrationSearchSet).contactNumber = transformedInformantContactNumber
   }
@@ -1291,7 +1293,7 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
       const { request, requestArgs } = createRequestForApplication(
         application,
         client
-      )
+      ) as any
 
       return loop(
         newState,
@@ -1386,7 +1388,10 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
       const {
         request: nextRequest,
         requestArgs: nextRequestArgs
-      } = createRequestForApplication(applicationToDownload, clientFromSuccess)
+      } = createRequestForApplication(
+        applicationToDownload,
+        clientFromSuccess
+      ) as any
 
       // Return state, write to indexedDB and download the next ready to download application, all in sequence
       return loop(
@@ -1435,7 +1440,7 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
       const {
         request: retryRequest,
         requestArgs: retryRequestArgs
-      } = createRequestForApplication(erroredApplication, clientFromFail)
+      } = createRequestForApplication(erroredApplication, clientFromFail) as any
 
       const applicationsAfterError = Array.from(state.applications)
       const erroredApplicationIndex = applicationsAfterError.findIndex(
@@ -1504,7 +1509,7 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
       const {
         request: nextApplicationRequest,
         requestArgs: nextApplicationRequestArgs
-      } = createRequestForApplication(nextApplication, clientFromFail)
+      } = createRequestForApplication(nextApplication, clientFromFail) as any
       return loop(
         {
           ...state,
