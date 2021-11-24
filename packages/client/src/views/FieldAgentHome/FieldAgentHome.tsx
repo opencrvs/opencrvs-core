@@ -50,7 +50,11 @@ import { formattedDuration } from '@client/utils/date-formatting'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
 import { InProgress } from '@client/views/FieldAgentHome/InProgress'
 import { SentForReview } from '@client/views/FieldAgentHome/SentForReview'
-import { LoadingIndicator } from '@client/views/RegistrationHome/LoadingIndicator'
+import {
+  LoadingIndicator,
+  IOnlineStatusProps,
+  withOnlineStatus
+} from '@client/views/RegistrationHome/LoadingIndicator'
 import { EVENT_STATUS } from '@client/views/RegistrationHome/RegistrationHome'
 import { getLanguage } from '@opencrvs/client/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
@@ -184,6 +188,7 @@ interface IMatchParams {
 }
 
 type FieldAgentHomeProps = IBaseFieldAgentHomeProps &
+  IOnlineStatusProps &
   IntlShapeProps &
   ISearchInputProps &
   RouteComponentProps<IMatchParams>
@@ -522,7 +527,7 @@ class FieldAgentHomeView extends React.Component<
                               data.searchEvents && data.searchEvents.totalItems
                             }
                             currentPage={this.state.requireUpdatesPage}
-                            clickable={true}
+                            clickable={this.props.isOnline}
                             showPaginated={this.showPaginated}
                             loading={loading}
                             loadMoreText={intl.formatMessage(
@@ -606,4 +611,4 @@ export const FieldAgentHome = connect(mapStateToProps, {
   goToFieldAgentHomeTab: goToFieldAgentHomeTabAction,
   goToApplicationDetails,
   updateFieldAgentDeclaredApplications
-})(injectIntl(withTheme(FieldAgentHomeView)))
+})(injectIntl(withTheme(withOnlineStatus(FieldAgentHomeView))))
