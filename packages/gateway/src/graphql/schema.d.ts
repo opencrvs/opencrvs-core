@@ -1729,7 +1729,7 @@ export interface QueryToSearchEventsResolver<TParent = any, TResult = any> {
 }
 
 export interface QueryToGetEventsWithProgressArgs {
-  parentLocationId?: string
+  locationId?: string
   count?: number
   skip?: number
   sort?: string

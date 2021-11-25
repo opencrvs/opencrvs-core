@@ -101,7 +101,7 @@ export const FETCH_STATUS_WISE_REGISTRATION_COUNT = gql`
 
 export const FETCH_EVENTS_WITH_PROGRESS = gql`
   query data(
-    $parentLocationId: String!
+    $locationId: String!
     $count: Int
     $skip: Int
     $status: [String]
@@ -110,7 +110,7 @@ export const FETCH_EVENTS_WITH_PROGRESS = gql`
     getEventsWithProgress(
       count: $count
       skip: $skip
-      parentLocationId: $parentLocationId
+      locationId: $locationId
       status: $status
       type: $type
     ) {
