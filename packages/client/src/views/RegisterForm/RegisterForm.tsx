@@ -518,7 +518,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
               ? this.onDeleteApplication(application)
               : goToHomeTab(this.getRedirectionTabOnSaveOrExit())
           },
-          label: intl.formatMessage(buttonMessages.exitButton)
+          label: application.review
+            ? intl.formatMessage(buttonMessages.saveExitButton)
+            : intl.formatMessage(buttonMessages.exitButton)
         }
       }
     } else {
