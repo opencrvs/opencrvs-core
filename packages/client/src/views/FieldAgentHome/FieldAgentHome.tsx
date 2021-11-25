@@ -27,7 +27,11 @@ import {
   goToEvents as goToEventsAction,
   goToFieldAgentHomeTab as goToFieldAgentHomeTabAction
 } from '@client/navigation'
-import { PERFORMANCE_HOME, REGISTRAR_HOME } from '@client/navigation/routes'
+import {
+  OPERATIONAL_REPORT,
+  PERFORMANCE_HOME,
+  REGISTRAR_HOME
+} from '@client/navigation/routes'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import {
   COUNT_USER_WISE_APPLICATIONS,
@@ -41,6 +45,7 @@ import {
   FIELD_AGENT_HOME_TAB_SENT_FOR_REVIEW,
   FIELD_AGENT_ROLES,
   LANG_EN,
+  NATL_ADMIN_ROLES,
   PAGE_TRANSITIONS_ENTER_TIME,
   REGISTRAR_ROLES,
   SYS_ADMIN_ROLES
@@ -86,6 +91,8 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { Redirect, RouteComponentProps } from 'react-router'
+import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
+import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
 
 const IconTab = styled(Button)<{ active: boolean }>`
   color: ${({ theme }) => theme.colors.copy};
@@ -355,6 +362,8 @@ class FieldAgentHomeView extends React.Component<
     } = this.props
     const tabId = match.params.tabId || TAB_ID.sentForReview
     const fieldAgentLocationId = userDetails && getUserLocation(userDetails).id
+    const jurisdictionLocationId =
+      userDetails && getJurisdictionLocationIdFromUserDetails(userDetails)
     let parentQueryLoading = false
     const role = userDetails && userDetails.role
     return (
@@ -560,8 +569,29 @@ class FieldAgentHomeView extends React.Component<
             </FABContainer>
           </>
         )}
-        {role && SYS_ADMIN_ROLES.includes(role) && (
+        {role && NATL_ADMIN_ROLES.includes(role) && (
           <Redirect to={PERFORMANCE_HOME} />
+        )}
+        {role && SYS_ADMIN_ROLES.includes(role) && (
+          <Redirect
+            to={{
+              pathname: OPERATIONAL_REPORT,
+              search:
+                '?locationId=' +
+                jurisdictionLocationId +
+                '&sectionId=' +
+                OPERATIONAL_REPORT_SECTION.OPERATIONAL +
+                '&timeStart=' +
+                moment()
+                  .subtract(1, 'years')
+                  .toDate()
+                  .toISOString() +
+                '&timeEnd=' +
+                moment()
+                  .toDate()
+                  .toISOString()
+            }}
+          />
         )}
         {role && REGISTRAR_ROLES.includes(role) && (
           <Redirect to={REGISTRAR_HOME} />
