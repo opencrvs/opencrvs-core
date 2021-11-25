@@ -15,7 +15,9 @@ import { LoaderBox } from '@client/views/SysAdmin/Performance/reports/operationa
 import {
   Description,
   SubHeader,
-  getJurisdictionLocationIdFromUserDetails
+  getJurisdictionLocationIdFromUserDetails,
+  getPrimaryLocationIdOfOffice,
+  isUnderJurisdictionOfUser
 } from '@opencrvs/client/src/views/SysAdmin/Performance/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { ProgressBar } from '@opencrvs/components/lib/forms'
@@ -178,8 +180,15 @@ class StatusWiseApplicationCountViewComponent extends React.Component<
 export const StatusWiseApplicationCountView = connect(
   (state: IStoreState, ownProps: BaseProps) => {
     const offlineLocations = getOfflineData(state).locations
-    let disableApplicationLink = !window.config.APPLICATION_AUDIT_LOCATIONS.includes(
-      getJurisidictionType(offlineLocations, ownProps.locationId) as string
+    const offlineOffices = getOfflineData(state).offices
+
+    const isAnOffice = !!offlineOffices[ownProps.locationId]
+
+    let disableApplicationLink = !(
+      isAnOffice ||
+      window.config.APPLICATION_AUDIT_LOCATIONS.includes(
+        getJurisidictionType(offlineLocations, ownProps.locationId) as string
+      )
     )
     const userDetails = getUserDetails(state)
     if (
@@ -187,9 +196,19 @@ export const StatusWiseApplicationCountView = connect(
       userDetails.role &&
       !SYS_ADMIN_ROLES.includes(userDetails.role)
     ) {
-      disableApplicationLink =
-        ownProps.locationId !==
-        getJurisdictionLocationIdFromUserDetails(userDetails)
+      const jurisdictionLocation = getJurisdictionLocationIdFromUserDetails(
+        userDetails
+      )
+      disableApplicationLink = !isUnderJurisdictionOfUser(
+        offlineLocations,
+        isAnOffice
+          ? getPrimaryLocationIdOfOffice(
+              offlineLocations,
+              offlineOffices[ownProps.locationId]
+            )
+          : ownProps.locationId,
+        jurisdictionLocation
+      )
     }
     return {
       ...ownProps,

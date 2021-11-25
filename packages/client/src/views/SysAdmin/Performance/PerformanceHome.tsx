@@ -119,6 +119,10 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
   render() {
     const { intl, offlineResources } = this.props
 
+    const offlineLocations = generateLocations(offlineResources.locations)
+
+    const offlineOffices = generateLocations(offlineResources.offices)
+
     return (
       <SysAdminContentWrapper>
         <Header>
@@ -127,7 +131,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
 
         <LocationSearch
           selectedLocation={this.state.selectedLocation}
-          locationList={generateLocations(offlineResources.locations)}
+          locationList={[...offlineLocations, ...offlineOffices]}
           searchHandler={this.searchHandler}
           searchButtonHandler={this.searchButtonHandler}
         />

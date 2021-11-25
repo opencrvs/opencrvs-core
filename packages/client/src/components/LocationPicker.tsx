@@ -166,6 +166,7 @@ function LocationPickerComponent(props: LocationPickerProps) {
 
 function mapStateToProps(state: IStoreState, props: IBaseProps): IConnectProps {
   const offlineLocations = getOfflineData(state).locations
+  const offlineOffices = getOfflineData(state).offices
   const jurisidictionTypeFilter =
     (props.requiredJurisdictionTypes &&
       props.requiredJurisdictionTypes.split(',')) ||
@@ -174,8 +175,12 @@ function mapStateToProps(state: IStoreState, props: IBaseProps): IConnectProps {
     offlineLocations,
     jurisidictionTypeFilter
   )
+  const offlineSearchableOffices = generateLocations(offlineOffices)
   return {
-    searchableLocations: offlineSearchableLocations
+    searchableLocations: [
+      ...offlineSearchableLocations,
+      ...offlineSearchableOffices
+    ]
   }
 }
 

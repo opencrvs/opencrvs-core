@@ -14,7 +14,9 @@ import {
   Description,
   SubHeader,
   ReportHeader,
-  getJurisdictionLocationIdFromUserDetails
+  getJurisdictionLocationIdFromUserDetails,
+  isUnderJurisdictionOfUser,
+  getPrimaryLocationIdOfOffice
 } from '@opencrvs/client/src/views/SysAdmin/Performance/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { GQLApplicationsStartedMetrics } from '@opencrvs/gateway/src/graphql/schema'
@@ -313,8 +315,15 @@ class ApplicationsStartedReportComponent extends React.Component<
 export const ApplicationsStartedReport = connect(
   (state: IStoreState, ownProps: BaseProps) => {
     const offlineLocations = getOfflineData(state).locations
-    let disableFieldAgentLink = !window.config.FIELD_AGENT_AUDIT_LOCATIONS.includes(
-      getJurisidictionType(offlineLocations, ownProps.locationId) as string
+    const offlineOffices = getOfflineData(state).offices
+
+    const isAnOffice = !!offlineOffices[ownProps.locationId]
+
+    let disableFieldAgentLink = !(
+      isAnOffice ||
+      window.config.FIELD_AGENT_AUDIT_LOCATIONS.includes(
+        getJurisidictionType(offlineLocations, ownProps.locationId) as string
+      )
     )
     const userDetails = getUserDetails(state)
     if (
@@ -322,9 +331,19 @@ export const ApplicationsStartedReport = connect(
       userDetails.role &&
       !SYS_ADMIN_ROLES.includes(userDetails.role)
     ) {
-      disableFieldAgentLink =
-        ownProps.locationId !==
-        getJurisdictionLocationIdFromUserDetails(userDetails)
+      const jurisdictionLocation = getJurisdictionLocationIdFromUserDetails(
+        userDetails
+      )
+      disableFieldAgentLink = !isUnderJurisdictionOfUser(
+        offlineLocations,
+        isAnOffice
+          ? getPrimaryLocationIdOfOffice(
+              offlineLocations,
+              offlineOffices[ownProps.locationId]
+            )
+          : ownProps.locationId,
+        jurisdictionLocation
+      )
     }
     return {
       ...ownProps,

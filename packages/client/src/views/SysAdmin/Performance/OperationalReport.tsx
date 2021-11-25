@@ -76,7 +76,7 @@ import { ApplicationsStartedReport } from './reports/operational/ApplicationsSta
 import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
 
 interface IConnectProps {
-  offlineLocations: IOfflineData['locations']
+  offlineResources: IOfflineData
 }
 interface IDispatchProps {
   goToPerformanceHome: typeof goToPerformanceHome
@@ -203,12 +203,18 @@ export const StatusMapping: IStatusMapping = {
 class OperationalReportComponent extends React.Component<Props, State> {
   static transformPropsToState(props: Props, state?: State) {
     const {
-      location: { search }
+      location: { search },
+      offlineResources
     } = props
     const { timeStart, timeEnd, locationId, sectionId } = (parse(
       search
     ) as unknown) as ISearchParams
-    const searchableLocations = generateLocations(props.offlineLocations)
+
+    const offlineLocations = generateLocations(offlineResources.locations)
+
+    const offlineOffices = generateLocations(offlineResources.offices)
+
+    const searchableLocations = [...offlineLocations, ...offlineOffices]
     const selectedLocation = searchableLocations.find(
       ({ id }) => id === locationId
     ) as ISearchLocation
@@ -629,7 +635,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
 function mapStateToProps(state: IStoreState) {
   const offlineResources = getOfflineData(state)
   return {
-    offlineLocations: offlineResources.locations
+    offlineResources: offlineResources
   }
 }
 
