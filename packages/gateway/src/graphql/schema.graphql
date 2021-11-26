@@ -44,7 +44,8 @@ type Query {
     sort: String
   ): SearchUserResult
   searchFieldAgents(
-    locationId: String!
+    locationId: String
+    primaryOfficeId: String
     status: String
     language: String
     timeStart: String!

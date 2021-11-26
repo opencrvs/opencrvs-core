@@ -1560,7 +1560,8 @@ export interface QueryToSearchUsersResolver<TParent = any, TResult = any> {
 }
 
 export interface QueryToSearchFieldAgentsArgs {
-  locationId: string
+  locationId?: string
+  primaryOfficeId?: string
   status?: string
   language?: string
   timeStart: string

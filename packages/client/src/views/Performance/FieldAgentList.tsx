@@ -146,6 +146,28 @@ function FieldAgentListComponent(props: IProps) {
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
 
+  const isOfficeSelected = offices.some(office => office.id === locationId)
+
+  const queryVariables = isOfficeSelected
+    ? {
+        timeStart: timeStart,
+        timeEnd: timeEnd,
+        primaryOfficeId: locationId,
+        status: status.toString(),
+        event: event === '' ? undefined : event.toUpperCase(),
+        count: recordCount,
+        sort: 'asc'
+      }
+    : {
+        timeStart: timeStart,
+        timeEnd: timeEnd,
+        locationId: locationId,
+        status: status.toString(),
+        event: event === '' ? undefined : event.toUpperCase(),
+        count: recordCount,
+        sort: 'asc'
+      }
+
   function toggleSort(key: keyof SortMap) {
     const invertedOrder =
       sortOrder[key] === SORT_ORDER.DESCENDING
@@ -370,15 +392,7 @@ function FieldAgentListComponent(props: IProps) {
     >
       <Query
         query={FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA}
-        variables={{
-          timeStart: timeStart,
-          timeEnd: timeEnd,
-          locationId: locationId,
-          status: status.toString(),
-          event: event === '' ? undefined : event.toUpperCase(),
-          count: recordCount,
-          sort: 'asc'
-        }}
+        variables={queryVariables}
         fetchPolicy={'no-cache'}
       >
         {({ data, loading, error }) => {

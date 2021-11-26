@@ -158,7 +158,8 @@ export const FETCH_EVENTS_WITH_PROGRESS = gql`
 `
 export const FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA = gql`
   query data(
-    $locationId: String!
+    $locationId: String
+    $primaryOfficeId: String
     $timeStart: String!
     $timeEnd: String!
     $event: String
@@ -172,6 +173,7 @@ export const FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA = gql`
       timeStart: $timeStart
       timeEnd: $timeEnd
       locationId: $locationId
+      primaryOfficeId: $primaryOfficeId
       event: $event
       status: $status
       language: $language
