@@ -49,7 +49,8 @@ import {
   VERIFY_COLLECTOR,
   WORKFLOW_STATUS,
   TEAM_USER_LIST,
-  USER_PROFILE
+  USER_PROFILE,
+  CHANGE_PHONE
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
@@ -391,6 +392,9 @@ export function goToSysAdminHomeTab(tabId: string) {
 
 export function goToSettings() {
   return push(SETTINGS)
+}
+export function goToPhoneSettings() {
+  return push(CHANGE_PHONE)
 }
 
 export function goToCreateNewUser() {

@@ -40,6 +40,7 @@ import { modifyUserDetails as modifyUserDetailsAction } from '@client/profile/pr
 import { getDefaultLanguage, getAvailableLanguages } from '@client/i18n/utils'
 import { IntlState } from '@client/i18n/reducer'
 import { PasswordChangeModal } from '@client/views/Settings/PasswordChangeModal'
+import { goToPhoneSettings } from '@client/navigation'
 
 const Container = styled.div`
   ${({ theme }) => theme.shadows.mistyShadow};
@@ -138,6 +139,7 @@ type IProps = IntlShapeProps & {
   languages: IntlState['languages']
   userDetails: IUserDetails | null
   modifyUserDetails: typeof modifyUserDetailsAction
+  goToPhoneSettings: typeof goToPhoneSettings
 }
 
 enum NOTIFICATION_SUBJECT {
@@ -259,7 +261,8 @@ class SettingsView extends React.Component<IProps, IState> {
             value: mobile,
             action: {
               label: intl.formatMessage(buttonMessages.change),
-              disabled: true
+              disabled: false,
+              handler: this.props.goToPhoneSettings
             }
           }
         ]
@@ -414,6 +417,7 @@ export const SettingsPage = connect(
     userDetails: getUserDetails(store)
   }),
   {
-    modifyUserDetails: modifyUserDetailsAction
+    modifyUserDetails: modifyUserDetailsAction,
+    goToPhoneSettings
   }
 )(injectIntl(SettingsView))

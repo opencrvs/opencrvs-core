@@ -254,6 +254,10 @@ export class App extends React.Component<IAppProps> {
                                             component={SettingsPage}
                                           />
                                           <ProtectedRoute
+                                            path={routes.CHANGE_PHONE}
+                                            component={SettingsPage}
+                                          />
+                                          <ProtectedRoute
                                             path={routes.APPLICATION_DETAIL}
                                             component={Details}
                                           />
