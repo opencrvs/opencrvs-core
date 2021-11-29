@@ -40,6 +40,7 @@ export interface IAuthHeader {
 export interface IBirthRegistrationTags {
   regStatus: string
   gender: string | undefined
+  officeLocation?: string
   locationLevel5?: string
   locationLevel4?: string
   locationLevel3?: string
@@ -51,6 +52,7 @@ export interface IDeathRegistrationTags {
   gender: string | undefined
   mannerOfDeath: string
   causeOfDeath: string
+  officeLocation?: string
   locationLevel5?: string
   locationLevel4?: string
   locationLevel3?: string
@@ -67,6 +69,7 @@ export interface IInProgressApplicationTags {
   missingFieldGroupId: string
   missingFieldId: string
   eventType: string
+  officeLocation?: string
   locationLevel5?: string
   locationLevel4?: string
   locationLevel3?: string
@@ -74,6 +77,7 @@ export interface IInProgressApplicationTags {
 }
 
 export interface ILocationTags {
+  officeLocation?: string
   locationLevel5?: string
   locationLevel4?: string
   locationLevel3?: string
@@ -89,6 +93,7 @@ export interface ITimeLoggedTags {
   currentStatus: string
   trackingId: string
   eventType: string
+  officeLocation?: string
   practitionerId?: string
   locationLevel5?: string
   locationLevel4?: string
@@ -140,7 +145,7 @@ export interface IBirthRegistrationPoints {
 
 export interface IPaymentPoints {
   measurement: string
-  tags: IPointLocation
+  tags: ILocationTags
   fields: IPaymentFields
 }
 
@@ -151,7 +156,7 @@ export interface IPaymentFields {
 
 export interface IApplicationsStartedPoints {
   measurement: string
-  tags: IPointLocation
+  tags: ILocationTags
   fields: IApplicationsStartedFields
 }
 
@@ -167,7 +172,7 @@ export interface IRejectedFields {
 
 export interface IRejectedPoints {
   measurement: string
-  tags: IPointLocation
+  tags: ILocationTags
   fields: IRejectedFields
 }
 

@@ -295,12 +295,25 @@ export async function getCurrentAndLowerLocationLevels(
   const measurement = event === EVENT_TYPE.BIRTH ? 'birth_reg' : 'death_reg'
   const allPointsContainingLocationId = await query(
     `SELECT LAST(*) FROM ${measurement} WHERE time > '${timeStart}' AND time <= '${timeEnd}'
-      AND ( locationLevel2 = '${locationId}'
+      AND ( officeLocation = '${locationId}'
+        OR locationLevel2 = '${locationId}'
         OR locationLevel3 = '${locationId}'
         OR locationLevel4 = '${locationId}'
         OR locationLevel5 = '${locationId}' )
-      GROUP BY locationLevel2,locationLevel3,locationLevel4,locationLevel5`
+      GROUP BY officeLocation,locationLevel2,locationLevel3,locationLevel4,locationLevel5`
   )
+
+  if (
+    allPointsContainingLocationId &&
+    allPointsContainingLocationId.length > 0 &&
+    allPointsContainingLocationId[0].officeLocation &&
+    allPointsContainingLocationId[0].officeLocation === locationId
+  ) {
+    return {
+      currentLocationLevel: 'officeLocation',
+      lowerLocationLevel: 'officeLocation'
+    }
+  }
 
   const locationLevelOfQueryId =
     allPointsContainingLocationId &&
