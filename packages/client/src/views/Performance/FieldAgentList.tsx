@@ -57,10 +57,14 @@ const { useState } = React
 interface SortMap {
   totalApplications: SORT_ORDER
   name: SORT_ORDER
+  startMonth: SORT_ORDER
+  avgCompleteApplicationTime: SORT_ORDER
 }
 const INITIAL_SORT_MAP = {
   totalApplications: SORT_ORDER.DESCENDING,
-  name: SORT_ORDER.ASCENDING
+  name: SORT_ORDER.ASCENDING,
+  startMonth: SORT_ORDER.ASCENDING,
+  avgCompleteApplicationTime: SORT_ORDER.DESCENDING
 }
 
 interface ISearchParams {
@@ -142,6 +146,9 @@ function FieldAgentListComponent(props: IProps) {
   const [event, setEvent] = useState<EVENT_OPTIONS>(EVENT_OPTIONS.ALL)
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
+  const [columnToBeSort, setColumnToBeSort] = useState<keyof SortMap>(
+    'totalApplications'
+  )
   const recordCount = DEFAULT_FIELD_AGENT_LIST_SIZE * currentPageNumber
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
@@ -152,6 +159,7 @@ function FieldAgentListComponent(props: IProps) {
         ? SORT_ORDER.ASCENDING
         : SORT_ORDER.DESCENDING
     setSortOrder({ ...sortOrder, [key]: invertedOrder })
+    setColumnToBeSort(key)
   }
 
   function getColumns(data?: GQLSearchFieldAgentResult) {
@@ -161,7 +169,10 @@ function FieldAgentListComponent(props: IProps) {
         label: intl.formatMessage(messages.fieldAgentColumnHeader, {
           totalAgents: (data && data.totalItems) || 0
         }),
-        width: 20
+        width: 20,
+        isSortable: true,
+        sortFunction: () => toggleSort('name'),
+        icon: <ArrowDownBlue />
       },
       {
         key: 'type',
@@ -176,7 +187,10 @@ function FieldAgentListComponent(props: IProps) {
       {
         key: 'startMonth',
         label: intl.formatMessage(messages.startMonthColumnHeader),
-        width: 12
+        width: 12,
+        isSortable: true,
+        sortFunction: () => toggleSort('startMonth'),
+        icon: <ArrowDownBlue />
       },
       {
         key: 'totalApplications',
@@ -200,7 +214,10 @@ function FieldAgentListComponent(props: IProps) {
         label: intl.formatMessage(messages.avgCompletionTimeColumnHeader, {
           linebreak: <br key={'avgCompleteApplicationTime-break'} />
         }),
-        width: 15
+        width: 15,
+        isSortable: true,
+        sortFunction: () => toggleSort('totalApplications'),
+        icon: <ArrowDownBlue />
       },
       {
         key: 'rejectedApplications',
@@ -235,10 +252,7 @@ function FieldAgentListComponent(props: IProps) {
           name: row.fullName,
           type: row.type,
           officeName: (office && office.displayLabel) || '',
-          startMonth:
-            (row.creationDate &&
-              moment(Number(row.creationDate)).format('MMMM YYYY')) ||
-            '',
+          startMonth: row.creationDate,
           totalApplications: String(row.totalNumberOfApplicationStarted),
           inProgressApplications: `${
             row.totalNumberOfInProgressAppStarted
@@ -260,10 +274,16 @@ function FieldAgentListComponent(props: IProps) {
       })
     return (
       (content &&
-        orderBy(
-          content,
-          ['totalApplications'],
-          [sortOrder.totalApplications]
+        orderBy(content, [columnToBeSort], [sortOrder[columnToBeSort]]).map(
+          row => {
+            return {
+              ...row,
+              startMonth:
+                (row.startMonth &&
+                  moment(Number(row.startMonth)).format('MMMM YYYY')) ||
+                ''
+            }
+          }
         )) ||
       []
     )
