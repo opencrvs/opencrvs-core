@@ -64,6 +64,8 @@ import {
   SettingsBlue,
   StatsBlack,
   StatsBlue,
+  SystemBlack,
+  SystemBlue,
   TrackingID,
   User,
   Users
@@ -185,6 +187,15 @@ class HeaderComp extends React.Component<IProps, IState> {
             iconHover: <Users stroke={this.props.theme.colors.secondary} />,
             label: this.props.intl.formatMessage(messages.teamTitle),
             onClick: () => this.goToTeamView(this.props)
+          }
+        ])
+      }
+      if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
+        menuItems = menuItems.concat([
+          {
+            icon: <SystemBlack />,
+            iconHover: <SystemBlue />,
+            onClick: this.props.goToConfigAction
           }
         ])
       }
