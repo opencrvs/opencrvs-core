@@ -119,15 +119,18 @@ const LoaderBox = styled.span<{
   width: ${({ width }) => (width ? `${width}%` : '100%')};
 `
 
-type Props = WrappedComponentProps & BaseProps & IDispatchProps
+type Props = WrappedComponentProps & BaseProps & IStateProps & IDispatchProps
 
 interface BaseProps {
   data?: GQLApplicationsStartedMetrics
   loading?: boolean
   reportTimeFrom: moment.Moment
   reportTimeTo: moment.Moment
-  disableFieldAgentLink?: boolean
   locationId: string
+}
+
+interface IStateProps {
+  disableFieldAgentLink: boolean
 }
 
 interface IDispatchProps {
@@ -312,15 +315,20 @@ class ApplicationsStartedReportComponent extends React.Component<
   }
 }
 
-export const ApplicationsStartedReport = connect(
+export const ApplicationsStartedReport = connect<
+  IStateProps,
+  IDispatchProps,
+  BaseProps,
+  IStoreState
+>(
   (state: IStoreState, ownProps: BaseProps) => {
     const offlineLocations = getOfflineData(state).locations
     const offlineOffices = getOfflineData(state).offices
 
-    const isAnOffice = !!offlineOffices[ownProps.locationId]
+    const isOfficeSelected = !!offlineOffices[ownProps.locationId]
 
     let disableFieldAgentLink = !(
-      isAnOffice ||
+      isOfficeSelected ||
       window.config.FIELD_AGENT_AUDIT_LOCATIONS.includes(
         getJurisidictionType(offlineLocations, ownProps.locationId) as string
       )
@@ -336,7 +344,7 @@ export const ApplicationsStartedReport = connect(
       )
       disableFieldAgentLink = !isUnderJurisdictionOfUser(
         offlineLocations,
-        isAnOffice
+        isOfficeSelected
           ? getPrimaryLocationIdOfOffice(
               offlineLocations,
               offlineOffices[ownProps.locationId]
@@ -346,7 +354,6 @@ export const ApplicationsStartedReport = connect(
       )
     }
     return {
-      ...ownProps,
       disableFieldAgentLink
     }
   },

@@ -37,7 +37,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { SYS_ADMIN_ROLES } from '@client/utils/constants'
 import { checkExternalValidationStatus } from '@client/views/SysAdmin/Team/utils'
 
-type Props = WrappedComponentProps & BaseProps
+type Props = WrappedComponentProps & IStateProps & BaseProps
 
 export interface IStatusMapping {
   [status: string]: { labelDescriptor: MessageDescriptor; color: string }
@@ -48,8 +48,11 @@ interface BaseProps {
   loading?: boolean
   statusMapping?: IStatusMapping
   onClickStatusDetails: (status?: keyof IStatusMapping) => void
-  disableApplicationLink?: boolean
   locationId: string
+}
+
+interface IStateProps {
+  disableApplicationLink: boolean
 }
 
 const ContentHolder = styled.div`
@@ -177,43 +180,44 @@ class StatusWiseApplicationCountViewComponent extends React.Component<
   }
 }
 
-export const StatusWiseApplicationCountView = connect(
-  (state: IStoreState, ownProps: BaseProps) => {
-    const offlineLocations = getOfflineData(state).locations
-    const offlineOffices = getOfflineData(state).offices
+export const StatusWiseApplicationCountView = connect<
+  IStateProps,
+  {},
+  BaseProps,
+  IStoreState
+>((state: IStoreState, ownProps: BaseProps) => {
+  const offlineLocations = getOfflineData(state).locations
+  const offlineOffices = getOfflineData(state).offices
 
-    const isAnOffice = !!offlineOffices[ownProps.locationId]
+  const isOfficeSelected = !!offlineOffices[ownProps.locationId]
 
-    let disableApplicationLink = !(
-      isAnOffice ||
-      window.config.APPLICATION_AUDIT_LOCATIONS.includes(
-        getJurisidictionType(offlineLocations, ownProps.locationId) as string
-      )
+  let disableApplicationLink = !(
+    isOfficeSelected ||
+    window.config.APPLICATION_AUDIT_LOCATIONS.includes(
+      getJurisidictionType(offlineLocations, ownProps.locationId) as string
     )
-    const userDetails = getUserDetails(state)
-    if (
-      userDetails &&
-      userDetails.role &&
-      !SYS_ADMIN_ROLES.includes(userDetails.role)
-    ) {
-      const jurisdictionLocation = getJurisdictionLocationIdFromUserDetails(
-        userDetails
-      )
-      disableApplicationLink = !isUnderJurisdictionOfUser(
-        offlineLocations,
-        isAnOffice
-          ? getPrimaryLocationIdOfOffice(
-              offlineLocations,
-              offlineOffices[ownProps.locationId]
-            )
-          : ownProps.locationId,
-        jurisdictionLocation
-      )
-    }
-    return {
-      ...ownProps,
-      disableApplicationLink
-    }
-  },
-  null
-)(injectIntl(StatusWiseApplicationCountViewComponent))
+  )
+  const userDetails = getUserDetails(state)
+  if (
+    userDetails &&
+    userDetails.role &&
+    !SYS_ADMIN_ROLES.includes(userDetails.role)
+  ) {
+    const jurisdictionLocation = getJurisdictionLocationIdFromUserDetails(
+      userDetails
+    )
+    disableApplicationLink = !isUnderJurisdictionOfUser(
+      offlineLocations,
+      isOfficeSelected
+        ? getPrimaryLocationIdOfOffice(
+            offlineLocations,
+            offlineOffices[ownProps.locationId]
+          )
+        : ownProps.locationId,
+      jurisdictionLocation
+    )
+  }
+  return {
+    disableApplicationLink
+  }
+})(injectIntl(StatusWiseApplicationCountViewComponent))

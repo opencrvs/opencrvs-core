@@ -27,7 +27,7 @@ import {
   goToRegistrationRates,
   goToWorkflowStatus
 } from '@client/navigation'
-import { IOfflineData } from '@client/offline/reducer'
+import { IOfflineData, ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
@@ -76,7 +76,8 @@ import { ApplicationsStartedReport } from './reports/operational/ApplicationsSta
 import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
 
 interface IConnectProps {
-  offlineResources: IOfflineData
+  locations: { [key: string]: ILocation }
+  offices: { [key: string]: ILocation }
 }
 interface IDispatchProps {
   goToPerformanceHome: typeof goToPerformanceHome
@@ -204,15 +205,16 @@ class OperationalReportComponent extends React.Component<Props, State> {
   static transformPropsToState(props: Props, state?: State) {
     const {
       location: { search },
-      offlineResources
+      locations,
+      offices
     } = props
     const { timeStart, timeEnd, locationId, sectionId } = (parse(
       search
     ) as unknown) as ISearchParams
 
-    const offlineLocations = generateLocations(offlineResources.locations)
+    const offlineLocations = generateLocations(locations)
 
-    const offlineOffices = generateLocations(offlineResources.offices)
+    const offlineOffices = generateLocations(offices)
 
     const searchableLocations = [...offlineLocations, ...offlineOffices]
     const selectedLocation = searchableLocations.find(
@@ -240,6 +242,10 @@ class OperationalReportComponent extends React.Component<Props, State> {
       props,
       undefined
     )
+  }
+
+  isOfficeSelected() {
+    return !!this.props.offices[this.state.selectedLocation.id]
   }
 
   static getDerivedStateFromProps(props: Props, state: State) {
@@ -487,7 +493,9 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 if (error) {
                   return (
                     <>
-                      <RegistrationRatesReport loading={true} />
+                      {!this.isOfficeSelected() && (
+                        <RegistrationRatesReport loading={true} />
+                      )}
                       <ApplicationsStartedReport
                         loading={true}
                         locationId={locationId}
@@ -500,15 +508,17 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 } else {
                   return (
                     <>
-                      <RegistrationRatesReport
-                        loading={loading}
-                        data={data && data.getEventEstimationMetrics}
-                        reportTimeFrom={timeStart.format()}
-                        reportTimeTo={timeEnd.format()}
-                        onClickEventDetails={
-                          this.onClickRegistrationRatesDetails
-                        }
-                      />
+                      {!this.isOfficeSelected() && (
+                        <RegistrationRatesReport
+                          loading={loading}
+                          data={data && data.getEventEstimationMetrics}
+                          reportTimeFrom={timeStart.format()}
+                          reportTimeTo={timeEnd.format()}
+                          onClickEventDetails={
+                            this.onClickRegistrationRatesDetails
+                          }
+                        />
+                      )}
                       <ApplicationsStartedReport
                         loading={loading}
                         locationId={locationId}
@@ -635,7 +645,8 @@ class OperationalReportComponent extends React.Component<Props, State> {
 function mapStateToProps(state: IStoreState) {
   const offlineResources = getOfflineData(state)
   return {
-    offlineResources: offlineResources
+    locations: offlineResources.locations,
+    offices: offlineResources.offices
   }
 }
 
