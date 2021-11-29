@@ -46,8 +46,11 @@ const Report = styled.div<{
   }
 `
 
-const ApplicationsStartedReportHeader = styled(ReportHeader)`
-  border-top: 1px solid ${({ theme }) => theme.colors.dividerDark};
+const ApplicationsStartedReportHeader = styled(ReportHeader)<
+  Pick<IStateProps, 'isOfficeSelected'>
+>`
+  border-top: ${({ isOfficeSelected }) => (!isOfficeSelected ? '1' : '0')}px
+    solid ${({ theme }) => theme.colors.dividerDark};
 `
 
 const ApplicationsStartedSubHeader = styled(SubHeader)`
@@ -131,6 +134,7 @@ interface BaseProps {
 
 interface IStateProps {
   disableFieldAgentLink: boolean
+  isOfficeSelected: boolean
 }
 
 interface IDispatchProps {
@@ -215,6 +219,7 @@ class ApplicationsStartedReportComponent extends React.Component<
       reportTimeFrom,
       reportTimeTo,
       disableFieldAgentLink,
+      isOfficeSelected,
       locationId
     } = this.props
     const {
@@ -224,7 +229,7 @@ class ApplicationsStartedReportComponent extends React.Component<
     } = data
     return (
       <>
-        <ApplicationsStartedReportHeader>
+        <ApplicationsStartedReportHeader isOfficeSelected={isOfficeSelected}>
           <ApplicationsStartedSubHeader>
             {intl.formatMessage(messages.applicationsStartedTitle)}
           </ApplicationsStartedSubHeader>
@@ -354,6 +359,7 @@ export const ApplicationsStartedReport = connect<
       )
     }
     return {
+      isOfficeSelected: isOfficeSelected,
       disableFieldAgentLink
     }
   },
