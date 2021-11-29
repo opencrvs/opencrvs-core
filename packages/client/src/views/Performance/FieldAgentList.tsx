@@ -64,7 +64,7 @@ const INITIAL_SORT_MAP = {
   totalApplications: SORT_ORDER.DESCENDING,
   name: SORT_ORDER.ASCENDING,
   startMonth: SORT_ORDER.ASCENDING,
-  avgCompleteApplicationTime: SORT_ORDER.DESCENDING
+  avgCompleteApplicationTime: SORT_ORDER.ASCENDING
 }
 
 interface ISearchParams {
@@ -172,7 +172,7 @@ function FieldAgentListComponent(props: IProps) {
         width: 20,
         isSortable: true,
         sortFunction: () => toggleSort('name'),
-        icon: <ArrowDownBlue />
+        icon: columnToBeSort === 'name' ? <ArrowDownBlue /> : <></>
       },
       {
         key: 'type',
@@ -190,7 +190,7 @@ function FieldAgentListComponent(props: IProps) {
         width: 12,
         isSortable: true,
         sortFunction: () => toggleSort('startMonth'),
-        icon: <ArrowDownBlue />
+        icon: columnToBeSort === 'startMonth' ? <ArrowDownBlue /> : <></>
       },
       {
         key: 'totalApplications',
@@ -200,7 +200,7 @@ function FieldAgentListComponent(props: IProps) {
         width: 12,
         isSortable: true,
         sortFunction: () => toggleSort('totalApplications'),
-        icon: <ArrowDownBlue />
+        icon: columnToBeSort === 'totalApplications' ? <ArrowDownBlue /> : <></>
       },
       {
         key: 'inProgressApplications',
@@ -216,8 +216,13 @@ function FieldAgentListComponent(props: IProps) {
         }),
         width: 15,
         isSortable: true,
-        sortFunction: () => toggleSort('totalApplications'),
-        icon: <ArrowDownBlue />
+        sortFunction: () => toggleSort('avgCompleteApplicationTime'),
+        icon:
+          columnToBeSort === 'avgCompleteApplicationTime' ? (
+            <ArrowDownBlue />
+          ) : (
+            <></>
+          )
       },
       {
         key: 'rejectedApplications',
@@ -260,10 +265,7 @@ function FieldAgentListComponent(props: IProps) {
             row.totalNumberOfApplicationStarted,
             row.totalNumberOfInProgressAppStarted
           )}%)`,
-          avgCompleteApplicationTime: getAverageCompletionTimeComponent(
-            row.averageTimeForDeclaredApplications,
-            idx
-          ),
+          avgCompleteApplicationTime: row.averageTimeForDeclaredApplications,
           rejectedApplications: `${
             row.totalNumberOfRejectedApplications
           } (${getPercentage(
@@ -275,13 +277,17 @@ function FieldAgentListComponent(props: IProps) {
     return (
       (content &&
         orderBy(content, [columnToBeSort], [sortOrder[columnToBeSort]]).map(
-          row => {
+          (row, idx) => {
             return {
               ...row,
               startMonth:
                 (row.startMonth &&
                   moment(Number(row.startMonth)).format('MMMM YYYY')) ||
-                ''
+                '',
+              avgCompleteApplicationTime: getAverageCompletionTimeComponent(
+                Number(row.avgCompleteApplicationTime),
+                idx
+              )
             }
           }
         )) ||
