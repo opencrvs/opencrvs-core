@@ -21,11 +21,7 @@ export function getLocationFromPartOfLocationId(
 ) {
   const id = (locationId && locationId.split('/')[1]) || ''
   return (
-    Object.values({
-      ...offlineResources.locations,
-      ...offlineResources.offices
-    }).find(location => location.id === id) || {
-      name: ''
-    }
+    offlineResources.locations[id] ||
+    offlineResources.offices[id] || { name: '' }
   )
 }
