@@ -71,7 +71,10 @@ import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { withTheme } from 'styled-components'
-import { OPERATIONAL_REPORTS_METRICS } from './metricsQuery'
+import {
+  OPERATIONAL_REPORTS_METRICS,
+  OPERATIONAL_REPORTS_METRICS_FOR_OFFICE
+} from './metricsQuery'
 import { ApplicationsStartedReport } from './reports/operational/ApplicationsStartedReport'
 import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
 
@@ -473,7 +476,11 @@ class OperationalReportComponent extends React.Component<Props, State> {
           </ActionContainer>
           {sectionId === OPERATIONAL_REPORT_SECTION.OPERATIONAL && (
             <Query
-              query={OPERATIONAL_REPORTS_METRICS}
+              query={
+                this.isOfficeSelected()
+                  ? OPERATIONAL_REPORTS_METRICS_FOR_OFFICE
+                  : OPERATIONAL_REPORTS_METRICS
+              }
               variables={{
                 timeStart: timeStart.toISOString(),
                 timeEnd: timeEnd.toISOString(),
