@@ -56,21 +56,27 @@ export function getLocation(userDetails: IUserDetails, locationKey: string) {
   return filteredArea[0] ? filteredArea[0].id : ''
 }
 
+export function generateLocationName(location: ILocation) {
+  let name = location.name
+  location.jurisdictionType &&
+    (name += ` ${JURISDICTION_TYPE[location.jurisdictionType] || ''}`.trimEnd())
+  return name
+}
+
 function generateSearchableLocations(
   locations: ILocation[],
   offlineLocations: { [key: string]: ILocation }
 ) {
   const generated: ISearchLocation[] = locations.map((location: ILocation) => {
-    let locationName = location.name
-    location.jurisdictionType &&
-      (locationName += ` ${JURISDICTION_TYPE[location.jurisdictionType] ||
-        ''}`.trimEnd())
+    let locationName = generateLocationName(location)
 
     if (location.partOf && location.partOf !== 'Location/0') {
       const locRef = location.partOf.split('/')[1]
       let parent
       if (
-        (parent = offlineLocations[locRef] && offlineLocations[locRef].name)
+        (parent =
+          offlineLocations[locRef] &&
+          generateLocationName(offlineLocations[locRef]))
       ) {
         locationName += `, ${parent}`
       }

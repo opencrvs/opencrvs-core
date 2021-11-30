@@ -92,6 +92,7 @@ export const JURISDICTION_TYPE: { [key: string]: string } = {
   MUNICIPALITY: 'Municipality',
   CITY_CORPORATION: 'City Corporation',
   UPAZILA: 'Upazila',
+  STATE: 'Province',
   DISTRICT: 'District',
   DIVISION: 'Division'
 }

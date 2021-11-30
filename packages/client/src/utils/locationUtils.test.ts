@@ -12,6 +12,7 @@
 import { mockOfflineData } from '@client/tests/util'
 import {
   filterLocations,
+  generateLocationName,
   getJurisidictionType
 } from '@client/utils/locationUtils'
 import { LocationType } from '@client/offline/reducer'
@@ -104,6 +105,21 @@ describe('locationUtil tests', () => {
       const locationId = '65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
 
       expect(getJurisidictionType(locations, locationId)).toEqual('DIVISION')
+    })
+  })
+
+  describe('generateLocationName()', () => {
+    it('returns the location name with the jurisdiction concatenated at the end', () => {
+      const locationId = '65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
+      const location = mockOfflineData.locations[locationId]
+
+      expect(generateLocationName(location)).toEqual('Barisal Division')
+    })
+    it('returns only the location name if there is no jurisdictionType', () => {
+      const officeId = '0d8474da-0361-4d32-979e-af91f012340a'
+      const office = mockOfflineData.offices[officeId]
+
+      expect(generateLocationName(office)).toEqual('Moktarpur Union Parishad')
     })
   })
 })
