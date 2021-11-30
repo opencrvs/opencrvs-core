@@ -12,6 +12,7 @@
 import {
   getSectionBySectionCode,
   getRegLastLocation,
+  getRegLastOffice,
   getResourceByType,
   getObservationValueByCode,
   getTimeLoggedFromTask,
@@ -386,6 +387,7 @@ describe('fhirUtils', () => {
     }
 
     expect(() => getRegLastLocation(bundle)).toThrow()
+    expect(() => getRegLastOffice(bundle)).toThrow()
   })
   it('returns false if no resource is provided in the bundle to get composition', () => {
     const bundle = {
