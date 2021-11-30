@@ -175,11 +175,13 @@ export const resolvers: GQLResolver = {
       return {
         totalItems:
           (searchResult &&
+            searchResult.body &&
             searchResult.body.hits &&
             searchResult.body.hits.total) ||
           0,
         results:
           (searchResult &&
+            searchResult.body &&
             searchResult.body.hits &&
             searchResult.body.hits.hits) ||
           []
