@@ -1,0 +1,3 @@
+```js
+<EnglishText>Hello</EnglishText>
+```

@@ -1,0 +1,3 @@
+```js
+<KeyboardArrowDown pathStroke={'primary'} />
+```
