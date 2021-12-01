@@ -68,6 +68,12 @@ interface IUserMessages
   currentPassword: MessageDescriptor
   changePassword: MessageDescriptor
   changePasswordMessage: MessageDescriptor
+  changePhoneTitle: MessageDescriptor
+  VerifyPhoneTitle: MessageDescriptor
+  changePhoneLabel: MessageDescriptor
+  VerifyPhoneLabel: MessageDescriptor
+  ConfirmationPhoneMsg: MessageDescriptor
+  phoneNumberChangeFormValidationMsg: MessageDescriptor
   newPasswordLabel: MessageDescriptor
   passwordUpdateFormValidationMsg: MessageDescriptor
   passwordLengthCharacteristicsForPasswordUpdateForm: MessageDescriptor
@@ -80,6 +86,7 @@ interface IUserMessages
   requiredfield: MessageDescriptor
   incorrectPassword: MessageDescriptor
   passwordUpdated: MessageDescriptor
+  phoneNumberUpdated: MessageDescriptor
 }
 
 interface IDynamicUserMessages
@@ -314,6 +321,37 @@ const messagesToDefine: IUserMessages = {
     description: 'Password change message',
     id: 'misc.newPass.instruction'
   },
+  changePhoneTitle: {
+    defaultMessage: 'Change phone number',
+    description: 'Change phone number title',
+    id: 'settings.changePhone'
+  },
+  VerifyPhoneTitle: {
+    defaultMessage: 'Verify phone number',
+    description: 'Verify phone number title',
+    id: 'settings.verifyPhone'
+  },
+  changePhoneLabel: {
+    defaultMessage: 'What is your new number?',
+    description: 'Change phone number label',
+    id: 'phone.label.changeNumber'
+  },
+  VerifyPhoneLabel: {
+    defaultMessage: 'Enter 6 digit verification code',
+    description: 'Verify phone number label',
+    id: 'phone.label.verify'
+  },
+  ConfirmationPhoneMsg: {
+    defaultMessage: 'A confirmational SMS has been sent to {num}',
+    description: 'Confirmation phone number message',
+    id: 'phone.label.confirmation'
+  },
+  phoneNumberChangeFormValidationMsg: {
+    id: 'changePhone.validation.msg',
+    defaultMessage:
+      'Must be a valid {num} digit number that starts with {start}',
+    description: 'Phone number validation message'
+  },
   newPasswordLabel: {
     id: 'password.label.new',
     defaultMessage: 'New password:',
@@ -373,6 +411,11 @@ const messagesToDefine: IUserMessages = {
     id: 'system.user.settings.passwordUpdated',
     defaultMessage: 'Password was successfully changed',
     description: 'Password change message on success'
+  },
+  phoneNumberUpdated: {
+    id: 'system.user.settings.phonedNumberUpdated',
+    defaultMessage: 'Phone number updated',
+    description: 'Phone change message on success'
   }
 }
 

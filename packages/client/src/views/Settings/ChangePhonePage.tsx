@@ -19,18 +19,26 @@ import {
 import { IStoreState } from '@client/store'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import styled from '@client/styledComponents'
 import { Header } from '@client/components/interface/Header/Header'
-import { AvatarLarge, Avatar } from '@opencrvs/components/lib/icons'
-import { DataSection } from '@opencrvs/components/lib/interface/ViewData'
 import {
+  EventTopBar,
   ResponsiveModal,
   NOTIFICATION_TYPE,
   Notification
 } from '@opencrvs/components/lib/interface'
-import { Select } from '@opencrvs/components/lib/forms'
-import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
+import {
+  Select,
+  ErrorMessage,
+  InputField,
+  TextInput
+} from '@opencrvs/components/lib/forms'
+import {
+  ICON_ALIGNMENT,
+  PrimaryButton,
+  TertiaryButton,
+  LinkButton
+} from '@opencrvs/components/lib/buttons'
 import {
   userMessages as messages,
   buttonMessages,
@@ -39,8 +47,20 @@ import {
 import { modifyUserDetails as modifyUserDetailsAction } from '@client/profile/profileActions'
 import { getDefaultLanguage, getAvailableLanguages } from '@client/i18n/utils'
 import { IntlState } from '@client/i18n/reducer'
-import { PasswordChangeModal } from '@client/views/Settings/PasswordChangeModal'
-import { goToPhoneSettings } from '@client/navigation'
+import {
+  goToSettingsWithPhoneSuccessMsg as goToSettingsWithPhoneSuccessMsgAction,
+  goBack as goBackAction
+} from '@client/navigation'
+import { BackArrow } from '@opencrvs/components/lib/icons'
+import {
+  SysAdminContentWrapper,
+  SysAdminPageVariant
+} from '@client/views/SysAdmin/SysAdminContentWrapper'
+import { EMPTY_STRING } from '@client/utils/constants'
+import {
+  isAValidPhoneNumberFormat,
+  phoneNumberFormat
+} from '@client/utils/validate'
 
 const Container = styled.div`
   ${({ theme }) => theme.shadows.mistyShadow};
@@ -57,6 +77,29 @@ const Container = styled.div`
     margin-top: 0;
     box-shadow: 0 0 0 rgba(0, 0, 0, 0);
   }
+`
+const StyledPrimaryButton = styled(PrimaryButton)`
+  display: absolute;
+  width: 115px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    width: 100%;
+    margin-top: 24px;
+  }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    margin-top: 24px;
+  }
+`
+const HalfWidthInput = styled(TextInput)`
+  width: 271px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    width: 100%;
+  }
+`
+const FormSectionTitle = styled.h4`
+  ${({ theme }) => theme.fonts.h4Style};
+  color: ${({ theme }) => theme.colors.copy};
+  margin-top: 0px;
+  margin-bottom: 16px;
 `
 
 const SettingsTitle = styled.div`
@@ -99,21 +142,16 @@ const Right = styled.div`
     }
   }
 `
-const Version = styled.div`
-  color: ${({ theme }) => theme.colors.disabled};
-  ${({ theme }) => theme.fonts.smallButtonStyle};
-  text-transform: none;
-  margin-top: 2rem;
-  span:last-child {
-    display: none;
+const Row = styled.div`
+  display: flex;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    margin-bottom: 20px;
   }
-  :hover {
-    span:first-child {
-      display: none;
-    }
-    span:last-child {
-      display: inline;
-    }
+`
+const Field = styled.div`
+  margin-bottom: 30px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    margin-bottom: 0px;
   }
 `
 const Message = styled.div`
@@ -122,71 +160,213 @@ const Message = styled.div`
 const Label = styled.label`
   margin-bottom: 8px;
 `
-const ApplyButton = styled(PrimaryButton)`
-  height: 40px;
-  & div {
-    padding: 0 8px;
-  }
+const InvalidPhoneNumber = styled.div`
+  ${({ theme }) => theme.fonts.semiBoldFont};
+  color: ${({ theme }) => theme.colors.error};
+  margin-top: 8px;
 `
-const CancelButton = styled(TertiaryButton)`
-  height: 40px;
-  & div {
-    padding: 0;
-  }
-`
+
 type IProps = IntlShapeProps & {
-  language: string
-  languages: IntlState['languages']
   userDetails: IUserDetails | null
-  modifyUserDetails: typeof modifyUserDetailsAction
-  goToPhoneSettings: typeof goToPhoneSettings
+  goBack: typeof goBackAction
+  goToSettingsWithPhoneSuccessMsg: typeof goToSettingsWithPhoneSuccessMsgAction
 }
 
-enum NOTIFICATION_SUBJECT {
-  LANGUAGE,
-  PASSWORD
+const VIEW_TYPE = {
+  CHANGE_NUMBER: 'change',
+  VERIFY_NUMBER: 'verify'
 }
 
 interface IState {
-  showLanguageSettings: boolean
-  selectedLanguage: string
+  phoneNumber: string
+  verifyCode: string
+  isInvalidPhoneNumber: boolean
+  isInvalidLength: boolean
+  phoneNumberFormatText: string
+  view: string
+  errorOccured: boolean
   showSuccessNotification: boolean
-  showPasswordChange: boolean
-  notificationSubject: NOTIFICATION_SUBJECT | null
 }
 
 interface ILanguageOptions {
   [key: string]: string
 }
 
-class SettingsView extends React.Component<IProps, IState> {
+class ChangePhoneView extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props)
     this.state = {
-      showLanguageSettings: false,
-      showSuccessNotification: false,
-      selectedLanguage: this.props.language,
-      showPasswordChange: false,
-      notificationSubject: null
+      phoneNumber: EMPTY_STRING,
+      verifyCode: EMPTY_STRING,
+      isInvalidPhoneNumber: false,
+      isInvalidLength: false,
+      phoneNumberFormatText: EMPTY_STRING,
+      view: VIEW_TYPE.CHANGE_NUMBER,
+      errorOccured: false,
+      showSuccessNotification: false
     }
+  }
+  setPhoneNumber = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const phoneNumber = event.target.value
+    this.setState(() => ({
+      phoneNumber,
+      isInvalidPhoneNumber: !isAValidPhoneNumberFormat(phoneNumber)
+    }))
+  }
+  setVerifyCode = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const verifyCode = event.target.value
+    this.setState(() => ({
+      verifyCode,
+      isInvalidLength: verifyCode.length === 6
+    }))
+  }
+  continueButtonHandler = (phoneNumber: string, view: string) => {
+    if (!phoneNumber) return
+    this.setState({
+      view: VIEW_TYPE.VERIFY_NUMBER
+    })
   }
 
   render() {
-    const { userDetails, intl } = this.props
-
+    const { userDetails, intl, goToSettingsWithPhoneSuccessMsg } = this.props
     const mobile = (userDetails && userDetails.mobile) || ''
-
     const role =
       userDetails && userDetails.role
         ? intl.formatMessage(messages[userDetails.role])
         : ''
+    const { start, num } = window.config.PHONE_NUMBER_PATTERN
     return (
       <>
-        <Container>
-          <Content>
-            <span>Changed goes here</span>
-          </Content>
-        </Container>
+        <SysAdminContentWrapper
+          id="user-phone-change"
+          type={SysAdminPageVariant.SUBPAGE_CENTERED}
+          backActionHandler={() => window.history.back()}
+          headerTitle={
+            this.state.view === VIEW_TYPE.CHANGE_NUMBER
+              ? intl.formatMessage(messages.changePhoneTitle)
+              : intl.formatMessage(messages.VerifyPhoneTitle)
+          }
+        >
+          {this.state.view === VIEW_TYPE.CHANGE_NUMBER && (
+            <Container>
+              <Content>
+                <FormSectionTitle>
+                  <>{intl.formatMessage(messages.changePhoneLabel)}</>
+                </FormSectionTitle>
+              </Content>
+              <Content>
+                <Field>
+                  <InputField
+                    id="phoneNumber"
+                    touched={true}
+                    required={false}
+                    optionalLabel=""
+                  >
+                    <HalfWidthInput
+                      id="PhoneNumber"
+                      type="number"
+                      touched={true}
+                      error={this.state.isInvalidPhoneNumber}
+                      value={this.state.phoneNumber}
+                      onChange={this.setPhoneNumber}
+                    />
+                  </InputField>
+                  {this.state.isInvalidPhoneNumber && (
+                    <InvalidPhoneNumber id="invalidPhoneNumber">
+                      {intl.formatMessage(
+                        messages.phoneNumberChangeFormValidationMsg,
+                        {
+                          num: intl.formatMessage({
+                            defaultMessage: num,
+                            description: 'Minimum number digit',
+                            id: 'phone.digit'
+                          }),
+                          start: intl.formatMessage({
+                            defaultMessage: start,
+                            description: 'Should starts with',
+                            id: 'phone.start'
+                          })
+                        }
+                      )}
+                    </InvalidPhoneNumber>
+                  )}
+                </Field>
+              </Content>
+              <Content>
+                <StyledPrimaryButton
+                  id="continue-button"
+                  key="continue"
+                  onClick={() => {
+                    this.continueButtonHandler(
+                      this.state.phoneNumber,
+                      this.state.view
+                    )
+                  }}
+                  disabled={
+                    !Boolean(this.state.phoneNumber.length) ||
+                    this.state.isInvalidPhoneNumber
+                  }
+                >
+                  {intl.formatMessage(buttonMessages.continueButton)}
+                </StyledPrimaryButton>
+              </Content>
+            </Container>
+          )}
+          {this.state.view === VIEW_TYPE.VERIFY_NUMBER && (
+            <Container>
+              <Content>
+                <FormSectionTitle>
+                  <>{intl.formatMessage(messages.VerifyPhoneLabel)}</>
+                </FormSectionTitle>
+              </Content>
+              <Content>
+                <Message>
+                  {intl.formatMessage(messages.ConfirmationPhoneMsg, {
+                    num: intl.formatMessage({
+                      defaultMessage: this.state.phoneNumber,
+                      description: 'Phone confirmation number',
+                      id: 'phone.number'
+                    })
+                  })}
+                </Message>
+              </Content>
+              <Content>
+                <Field>
+                  <InputField
+                    id="verifyCode"
+                    touched={true}
+                    required={false}
+                    optionalLabel=""
+                  >
+                    <HalfWidthInput
+                      id="VerifyCode"
+                      type="text"
+                      touched={true}
+                      error={this.state.isInvalidPhoneNumber}
+                      value={this.state.verifyCode}
+                      onChange={this.setVerifyCode}
+                    />
+                  </InputField>
+                </Field>
+              </Content>
+              <Content>
+                <StyledPrimaryButton
+                  id="verify-button"
+                  key="verify"
+                  onClick={() => {
+                    this.props.goToSettingsWithPhoneSuccessMsg(true)
+                  }}
+                  disabled={
+                    !Boolean(this.state.verifyCode.length) ||
+                    !this.state.isInvalidLength
+                  }
+                >
+                  {intl.formatMessage(buttonMessages.verify)}
+                </StyledPrimaryButton>
+              </Content>
+            </Container>
+          )}
+        </SysAdminContentWrapper>
       </>
     )
   }
@@ -194,11 +374,10 @@ class SettingsView extends React.Component<IProps, IState> {
 
 export const ChangePhonePage = connect(
   (store: IStoreState) => ({
-    language: store.i18n.language || getDefaultLanguage(),
-    languages: store.i18n.languages,
     userDetails: getUserDetails(store)
   }),
   {
-    modifyUserDetails: modifyUserDetailsAction
+    goBack: goBackAction,
+    goToSettingsWithPhoneSuccessMsg: goToSettingsWithPhoneSuccessMsgAction
   }
-)(injectIntl(SettingsView))
+)(injectIntl(ChangePhoneView))

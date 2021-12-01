@@ -61,6 +61,7 @@ import { ApolloProvider } from 'react-apollo'
 import { Provider } from 'react-redux'
 import { Switch } from 'react-router'
 import { AppStore } from './store'
+import { ChangePhonePage } from './views/Settings/ChangePhonePage'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 
 interface IAppProps {
@@ -250,12 +251,14 @@ export class App extends React.Component<IAppProps> {
                                             component={Payment}
                                           />
                                           <ProtectedRoute
+                                            exact
                                             path={routes.SETTINGS}
                                             component={SettingsPage}
                                           />
                                           <ProtectedRoute
+                                            exact
                                             path={routes.CHANGE_PHONE}
-                                            component={SettingsPage}
+                                            component={ChangePhonePage}
                                           />
                                           <ProtectedRoute
                                             path={routes.APPLICATION_DETAIL}

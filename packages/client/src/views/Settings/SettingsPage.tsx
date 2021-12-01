@@ -41,6 +41,9 @@ import { getDefaultLanguage, getAvailableLanguages } from '@client/i18n/utils'
 import { IntlState } from '@client/i18n/reducer'
 import { PasswordChangeModal } from '@client/views/Settings/PasswordChangeModal'
 import { goToPhoneSettings } from '@client/navigation'
+import { RouteComponentProps } from 'react-router'
+import { findLastKey } from 'lodash-es'
+import { SETTINGS } from '@client/navigation/routes'
 
 const Container = styled.div`
   ${({ theme }) => theme.shadows.mistyShadow};
@@ -134,17 +137,20 @@ const CancelButton = styled(TertiaryButton)`
     padding: 0;
   }
 `
-type IProps = IntlShapeProps & {
-  language: string
-  languages: IntlState['languages']
-  userDetails: IUserDetails | null
-  modifyUserDetails: typeof modifyUserDetailsAction
-  goToPhoneSettings: typeof goToPhoneSettings
-}
+type IProps = IntlShapeProps &
+  RouteComponentProps & {
+    language: string
+    languages: IntlState['languages']
+    userDetails: IUserDetails | null
+    modifyUserDetails: typeof modifyUserDetailsAction
+    goToPhoneSettingAction: typeof goToPhoneSettings
+    phonedNumberUpdated: boolean
+  }
 
 enum NOTIFICATION_SUBJECT {
   LANGUAGE,
-  PASSWORD
+  PASSWORD,
+  PHONE
 }
 
 interface IState {
@@ -168,6 +174,18 @@ class SettingsView extends React.Component<IProps, IState> {
       selectedLanguage: this.props.language,
       showPasswordChange: false,
       notificationSubject: null
+    }
+  }
+
+  componentDidMount() {
+    let phonedNumberUpdated = false
+    const historyState = this.props.history.location.state as any
+    if (this.props.location.state) {
+      phonedNumberUpdated = historyState.phonedNumberUpdated
+      if (phonedNumberUpdated) {
+        this.changePhoneNumber()
+        this.props.history.replace(SETTINGS, null)
+      }
     }
   }
 
@@ -210,9 +228,13 @@ class SettingsView extends React.Component<IProps, IState> {
     this.togglePasswordChangeModal()
     this.toggleSuccessNotification(NOTIFICATION_SUBJECT.PASSWORD)
   }
+  changePhoneNumber = () => {
+    this.toggleSuccessNotification(NOTIFICATION_SUBJECT.PHONE)
+  }
 
   render() {
-    const { userDetails, intl, languages } = this.props
+    const { userDetails, intl, languages, goToPhoneSettingAction } = this.props
+
     const langChoice = [] as ILanguageOptions[]
     const availableLangs = getAvailableLanguages()
     availableLangs.forEach((lang: string) => {
@@ -262,7 +284,7 @@ class SettingsView extends React.Component<IProps, IState> {
             action: {
               label: intl.formatMessage(buttonMessages.change),
               disabled: false,
-              handler: this.props.goToPhoneSettings
+              handler: goToPhoneSettingAction
             }
           }
         ]
@@ -400,9 +422,13 @@ class SettingsView extends React.Component<IProps, IState> {
             />
           )}
 
-          {/* Success notification message for Password Change */}
           {this.state.notificationSubject === NOTIFICATION_SUBJECT.PASSWORD && (
             <FormattedMessage {...messages.passwordUpdated} />
+          )}
+
+          {/* Success notification message for Password Change */}
+          {this.state.notificationSubject === NOTIFICATION_SUBJECT.PHONE && (
+            <FormattedMessage {...messages.phoneNumberUpdated} />
           )}
         </Notification>
       </>
@@ -418,6 +444,6 @@ export const SettingsPage = connect(
   }),
   {
     modifyUserDetails: modifyUserDetailsAction,
-    goToPhoneSettings
+    goToPhoneSettingAction: goToPhoneSettings
   }
 )(injectIntl(SettingsView))

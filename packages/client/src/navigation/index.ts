@@ -397,6 +397,15 @@ export function goToPhoneSettings() {
   return push(CHANGE_PHONE)
 }
 
+export function goToSettingsWithPhoneSuccessMsg(phonedNumberUpdated: boolean) {
+  return push({
+    pathname: SETTINGS,
+    state: {
+      phonedNumberUpdated
+    }
+  })
+}
+
 export function goToCreateNewUser() {
   return push(CREATE_USER)
 }
