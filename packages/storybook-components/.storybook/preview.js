@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { ThemeProvider, createGlobalStyle } from 'styled-components'
-import { getTheme } from '../src/stories/theme'
+import { getTheme } from '../src/components/theme'
 
 const language = process.env.REACT_APP_LANGUAGE
   ? process.env.REACT_APP_LANGUAGE

@@ -33,7 +33,7 @@ const Icon = styled.div`
   justify-content: center;
   margin-left: 2em;
 `
-interface IImagePickerProps {
+export interface IImagePickerProps {
   id: string
   title: string
   icon?: () => React.ReactNode

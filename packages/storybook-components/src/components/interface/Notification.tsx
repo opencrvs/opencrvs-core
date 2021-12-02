@@ -18,7 +18,7 @@ export enum NOTIFICATION_TYPE {
   WARNING = 'warning',
   ERROR = 'error'
 }
-interface IProps {
+export interface IProps {
   id?: string
   show: boolean
   type?: NOTIFICATION_TYPE

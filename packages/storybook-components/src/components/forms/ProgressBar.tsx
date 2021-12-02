@@ -46,7 +46,7 @@ const LoaderBox = styled.span<{
 
 type ProgressBarShape = 'square' | 'round' | 'butt'
 
-interface IProgressBarProps {
+export interface IProgressBarProps {
   id?: string
   loading?: boolean
   title?: string
