@@ -11,6 +11,7 @@
  */
 export const BENGALI_STATE = {
   lang: 'bn',
+  displayName: 'বাংলা',
   messages: {
     'buttons.confirm': 'নিশ্চিত করুন',
     'buttons.continue': 'পরবর্তী',

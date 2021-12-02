@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { LoopReducer, Loop } from 'redux-loop'
+import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
 import * as actions from '@login/i18n/actions'
 import { ENGLISH_STATE } from '@login/i18n/locales/en'
 import { BENGALI_STATE } from '@login/i18n/locales/bn'
-import { getDefaultLanguage } from './utils'
+import { getDefaultLanguage, storeLanguage } from './utils'
 
 export interface IntlMessages {
   [key: string]: string
@@ -21,6 +21,7 @@ export interface IntlMessages {
 
 export interface ILanguage {
   lang: string
+  displayName: string
   messages: IntlMessages
 }
 
@@ -57,11 +58,14 @@ export const intlReducer: LoopReducer<IntlState, any> = (
     case actions.CHANGE_LANGUAGE:
       const messages = getNextMessages(action.payload.language)
 
-      return {
-        ...state,
-        language: action.payload.language,
-        messages
-      }
+      return loop(
+        {
+          ...state,
+          language: action.payload.language,
+          messages
+        },
+        Cmd.run(() => storeLanguage(action.payload.language))
+      )
     default:
       return state
   }
