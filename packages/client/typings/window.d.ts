@@ -43,6 +43,11 @@ interface Window {
         endBefore: number
       }
     }
+    NID_NUMBER_PATTERN: {
+      pattern: RegExp
+      example: string
+      num: string
+    }
     LOGROCKET: string
     SENTRY: string
   }
