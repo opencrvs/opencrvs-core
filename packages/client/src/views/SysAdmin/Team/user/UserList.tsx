@@ -36,10 +36,10 @@ import { UserStatus } from '@client/views/SysAdmin/Team/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import {
   AddUser,
-  AvatarSmall,
   VerticalThreeDots,
   SearchRed
 } from '@opencrvs/components/lib/icons'
+import { AvatarSmall } from '@client/components/Avatar'
 import {
   ColumnContentAlignment,
   ListTable,
@@ -402,7 +402,7 @@ function UserListComponent(props: IProps) {
             (user.type && intl.formatMessage(userMessages[user.type])) || '-'
 
           return {
-            photo: <AvatarSmall />,
+            photo: <AvatarSmall name={name} />,
             name: (
               <LinkButton
                 id={`name-link-${user.id}`}
