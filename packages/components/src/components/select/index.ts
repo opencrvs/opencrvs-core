@@ -9,19 +9,4 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import {
-  ISelectOption,
-  ISelectProps,
-  Select
-} from '@opencrvs/components/lib/select'
-
-export interface IPerformanceSelectOption extends ISelectOption {
-  type?: string
-}
-interface IOperationalSelectProps
-  extends ISelectProps<IPerformanceSelectOption> {}
-
-export function PerformanceSelect(props: IOperationalSelectProps) {
-  return <Select {...props} />
-}
+export * from './Select'
