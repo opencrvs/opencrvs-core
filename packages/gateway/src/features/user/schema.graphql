@@ -107,6 +107,11 @@ type VerifyPasswordResult {
   id: String
 }
 
+input AvatarInput {
+  type: String!
+  data: String!
+}
+
 type Query {
   getUser(userId: String): User
   searchUsers(
@@ -147,6 +152,7 @@ type Mutation {
     existingPassword: String!
     password: String!
   ): String
+  changeAvatar(userId: String!, avatar: AvatarInput!): String
   auditUser(
     userId: String!
     action: String!
