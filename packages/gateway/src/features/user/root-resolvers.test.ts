@@ -595,15 +595,7 @@ describe('User root resolvers', () => {
     })
 
     it('changes password for loggedin user', async () => {
-      fetch.mockResponses(
-        [
-          JSON.stringify({
-            userId: 'ba7022f0ff4822'
-          }),
-          { status: 200 }
-        ],
-        [JSON.stringify({})]
-      )
+      fetch.mockResponseOnce(JSON.stringify({}), { status: 200 })
 
       const response = await resolvers.Mutation.changePassword(
         {},
@@ -617,12 +609,8 @@ describe('User root resolvers', () => {
 
       expect(response).toEqual(true)
     })
-    it('throws error if @user-mgnt/changeUserPassword sends anything but 201', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          statusCode: '401'
-        })
-      )
+    it('throws error if @user-mgnt/changeUserPassword sends anything but 200', async () => {
+      fetch.mockResponseOnce(JSON.stringify({}), { status: 401 })
 
       expect(
         resolvers.Mutation.changePassword(
@@ -639,16 +627,6 @@ describe('User root resolvers', () => {
       )
     })
     it("throws error if any user (except sysadmin) tries to update some other user's password", async () => {
-      fetch.mockResponses(
-        [
-          JSON.stringify({
-            userId: 'ba7022f0ff4822'
-          }),
-          { status: 201 }
-        ],
-        [JSON.stringify({})]
-      )
-
       expect(
         resolvers.Mutation.changePassword(
           {},
@@ -661,6 +639,94 @@ describe('User root resolvers', () => {
         )
       ).rejects.toThrowError(
         'Change password is not allowed. ba7022f0ff4822 is not the owner of the token'
+      )
+    })
+  })
+
+  describe('changeAvatar mutation', () => {
+    let authHeaderValidUser: { Authorization: string }
+    let authHeaderInValidUser: { Authorization: string }
+
+    beforeEach(() => {
+      fetch.resetMocks()
+      const validUserToken = jwt.sign(
+        { scope: ['register'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      authHeaderValidUser = {
+        Authorization: `Bearer ${validUserToken}`
+      }
+      const inValidUserToken = jwt.sign(
+        { scope: ['register'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      authHeaderInValidUser = {
+        Authorization: `Bearer ${inValidUserToken}`
+      }
+    })
+
+    it('changes avatar for loggedin user', async () => {
+      fetch.mockResponseOnce(JSON.stringify({}), { status: 200 })
+
+      const response = await resolvers.Mutation.changeAvatar(
+        {},
+        {
+          userId: 'ba7022f0ff4822',
+          avatar: {
+            type: 'image/png;base64',
+            data: 'aGVsbG8gd29ybGQ='
+          }
+        },
+        authHeaderValidUser
+      )
+
+      expect(response).toEqual(true)
+    })
+    it('throws error if @user-mgnt/changeUserAvatar sends anything but 200', async () => {
+      fetch.mockResponseOnce(JSON.stringify({}), { status: 401 })
+
+      expect(
+        resolvers.Mutation.changeAvatar(
+          {},
+          {
+            userId: 'ba7022f0ff4822',
+            avatar: {
+              type: 'image/png;base64',
+              data: 'aGVsbG8gd29ybGQ='
+            }
+          },
+          authHeaderValidUser
+        )
+      ).rejects.toThrowError(
+        "Something went wrong on user-mgnt service. Couldn't change user avatar"
+      )
+    })
+    it("throws error if any user tries to update some other user's avatar", async () => {
+      expect(
+        resolvers.Mutation.changeAvatar(
+          {},
+          {
+            userId: 'ba7022f0ff4822',
+            avatar: {
+              type: 'image/png;base64',
+              data: 'aGVsbG8gd29ybGQ='
+            }
+          },
+          authHeaderInValidUser
+        )
+      ).rejects.toThrowError(
+        'Changing avatar is not allowed. ba7022f0ff4822 is not the owner of the token'
       )
     })
   })
