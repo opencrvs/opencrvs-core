@@ -56,6 +56,10 @@ export interface IAuditHistory {
   reason: string
   comment?: string
 }
+export interface IAvatar {
+  type: string
+  data: string
+}
 export interface IUser {
   name: IUserName[]
   username: string
@@ -77,6 +81,7 @@ export interface IUser {
   securityQuestionAnswers?: ISecurityQuestionAnswer[]
   creationDate: number
   auditHistory?: IAuditHistory[]
+  avatar?: IAvatar
 }
 
 export interface IUserModel extends IUser, Document {}
@@ -136,6 +141,16 @@ const AuditHistory = new Schema(
     _id: false
   }
 )
+// tslint:disable-next-line
+const Avatar = new Schema(
+  {
+    type: String,
+    data: String
+  },
+  {
+    _id: false
+  }
+)
 
 const userSchema = new Schema({
   name: { type: [UserNameSchema], required: true },
@@ -164,7 +179,8 @@ const userSchema = new Schema({
   securityQuestionAnswers: [SecurityQuestionAnswerSchema],
   deviceId: String,
   creationDate: { type: Number, default: Date.now },
-  auditHistory: [AuditHistory]
+  auditHistory: [AuditHistory],
+  avatar: Avatar
 })
 
 export default model<IUserModel>('User', userSchema)
