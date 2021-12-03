@@ -12,7 +12,7 @@
 import * as Hapi from '@hapi/hapi'
 import ApplicationConfig, {
   IApplicationConfigurationModel
-} from '@config/models/ApplicationConfig' //   IApplicationConfigurationModel
+} from '@config/models/config' //   IApplicationConfigurationModel
 import { logger } from '@config/config/logger'
 
 export default async function applicationHandler(
@@ -22,10 +22,10 @@ export default async function applicationHandler(
   try {
     // tslint:disable-next-line
     const appConfig: IApplicationConfigurationModel | null =
-      await ApplicationConfig.findOne()
-    return appConfig
+      await ApplicationConfig.findOne({})
+    return appConfig || 'no configuration'
   } catch (ex) {
     logger.error(ex)
-    return null
+    return {}
   }
 }
