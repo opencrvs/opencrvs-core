@@ -296,6 +296,33 @@ export const resolvers: GQLResolver = {
       }
       return true
     },
+    async changeAvatar(_, { userId, avatar }, authHeader) {
+      // Only token owner should be able to change their avatar
+      if (!isTokenOwner(authHeader, userId)) {
+        return await Promise.reject(
+          new Error(
+            `Changing avatar is not allowed. ${userId} is not the owner of the token`
+          )
+        )
+      }
+      const res = await fetch(`${USER_MANAGEMENT_URL}changeUserAvatar`, {
+        method: 'POST',
+        body: JSON.stringify({ userId, avatar }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+
+      if (res.status !== 200) {
+        return await Promise.reject(
+          new Error(
+            "Something went wrong on user-mgnt service. Couldn't change user avatar"
+          )
+        )
+      }
+      return true
+    },
     async auditUser(_, { userId, action, reason, comment }, authHeader) {
       if (!hasScope(authHeader, 'sysadmin')) {
         return await Promise.reject(
