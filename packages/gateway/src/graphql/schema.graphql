@@ -305,6 +305,7 @@ type User {
   identifier: Identifier
   signature: Signature
   creationDate: String
+  avatar: Avatar
 }
 
 type SearchUserResult {
@@ -658,6 +659,11 @@ type LocalRegistrar {
 type Signature {
   data: String
   type: String
+}
+
+type Avatar {
+  type: String!
+  data: String!
 }
 
 type SearchFieldAgentResponse {
