@@ -27,6 +27,7 @@ import { readFileSync } from 'fs'
 import { validateFunc } from '@opencrvs/commons'
 import { ApolloServer } from 'apollo-server-hapi'
 import { getApolloConfig } from '@gateway/graphql/config'
+import * as database from '@gateway/features/user/database'
 
 DotEnv.config({
   path: `${process.cwd()}/.env`
@@ -80,11 +81,13 @@ export async function createServer() {
 
   async function start() {
     await app.start()
+    await database.start()
     app.log('info', `server started on port ${PORT}`)
   }
 
   async function stop() {
     await app.stop()
+    await database.stop()
     app.log('info', 'server stopped')
   }
 

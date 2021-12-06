@@ -145,6 +145,7 @@ type Mutation {
     existingPassword: String!
     password: String!
   ): String
+  changePhone(userId: String!, phoneNumber: String!): String
   auditUser(
     userId: String!
     action: String!

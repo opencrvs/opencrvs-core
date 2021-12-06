@@ -17,7 +17,7 @@ import {
   FormattedMessage
 } from 'react-intl'
 import { IStoreState } from '@client/store'
-import { getUserDetails } from '@client/profile/profileSelectors'
+import { getUserDetails, getUserNonce } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import styled from '@client/styledComponents'
 import { Header } from '@client/components/interface/Header/Header'
@@ -44,7 +44,7 @@ import {
   buttonMessages,
   constantsMessages
 } from '@client/i18n/messages'
-import { modifyUserDetails as modifyUserDetailsAction } from '@client/profile/profileActions'
+import { sendVerifyCode as SendVerifyCodeAction } from '@client/profile/profileActions'
 import { getDefaultLanguage, getAvailableLanguages } from '@client/i18n/utils'
 import { IntlState } from '@client/i18n/reducer'
 import {
@@ -61,6 +61,10 @@ import {
   isAValidPhoneNumberFormat,
   phoneNumberFormat
 } from '@client/utils/validate'
+import { Mutation } from 'react-apollo'
+import gql from 'graphql-tag'
+import { get } from 'lodash'
+import { getCurrentUserScope } from '@client/utils/authUtils'
 
 const Container = styled.div`
   ${({ theme }) => theme.shadows.mistyShadow};
@@ -165,9 +169,24 @@ const InvalidPhoneNumber = styled.div`
   color: ${({ theme }) => theme.colors.error};
   margin-top: 8px;
 `
+const BoxedError = styled.div`
+  margin-bottom: 10px;
+  display: flex;
+`
+
+export const changePhoneMutation = gql`
+  mutation changePhone(
+    $userId: String!
+    $phoneNumber: String!
+    $nonce: String!
+  ) {
+    changePhone(userId: $userId, phoneNumber: $phoneNumber, nonce: $nonce)
+  }
+`
 
 type IProps = IntlShapeProps & {
   userDetails: IUserDetails | null
+  nonce: string | null
   goBack: typeof goBackAction
   goToSettingsWithPhoneSuccessMsg: typeof goToSettingsWithPhoneSuccessMsgAction
 }
@@ -191,9 +210,12 @@ interface IState {
 interface ILanguageOptions {
   [key: string]: string
 }
+interface IDispatchProps {
+  sendVerifyCode: typeof SendVerifyCodeAction
+}
 
-class ChangePhoneView extends React.Component<IProps, IState> {
-  constructor(props: IProps) {
+class ChangePhoneView extends React.Component<IProps & IDispatchProps, IState> {
+  constructor(props: IProps & IDispatchProps) {
     super(props)
     this.state = {
       phoneNumber: EMPTY_STRING,
@@ -220,20 +242,50 @@ class ChangePhoneView extends React.Component<IProps, IState> {
       isInvalidLength: verifyCode.length === 6
     }))
   }
-  continueButtonHandler = (phoneNumber: string, view: string) => {
+  continueButtonHandler = (
+    userId: string,
+    phoneNumber: string,
+    view: string,
+    scope: string[]
+  ) => {
     if (!phoneNumber) return
+    if (VIEW_TYPE.CHANGE_NUMBER) {
+      this.props.sendVerifyCode(userId, phoneNumber, scope)
+      this.setState({
+        view: VIEW_TYPE.VERIFY_NUMBER
+      })
+    }
+  }
+
+  changePhone = (mutation: () => void) => {
+    if (
+      !!this.state.phoneNumber &&
+      !this.state.isInvalidPhoneNumber &&
+      this.state.isInvalidLength
+    ) {
+      mutation()
+    }
+  }
+
+  phoneChangecompleted = () => {
     this.setState({
-      view: VIEW_TYPE.VERIFY_NUMBER
+      phoneNumber: EMPTY_STRING,
+      verifyCode: EMPTY_STRING,
+      phoneNumberFormatText: EMPTY_STRING,
+      errorOccured: false
     })
+    this.props.goToSettingsWithPhoneSuccessMsg(true)
   }
 
   render() {
-    const { userDetails, intl, goToSettingsWithPhoneSuccessMsg } = this.props
+    const { userDetails, intl, nonce } = this.props
     const mobile = (userDetails && userDetails.mobile) || ''
+    const userId = get(userDetails, 'userMgntUserID') || ''
     const role =
       userDetails && userDetails.role
         ? intl.formatMessage(messages[userDetails.role])
         : ''
+    const scope = getCurrentUserScope()
     const { start, num } = window.config.PHONE_NUMBER_PATTERN
     return (
       <>
@@ -247,6 +299,14 @@ class ChangePhoneView extends React.Component<IProps, IState> {
               : intl.formatMessage(messages.VerifyPhoneTitle)
           }
         >
+          {this.state.errorOccured && (
+            <BoxedError>
+              <ErrorMessage>
+                {intl.formatMessage(messages.incorrectVerifyCode)}
+              </ErrorMessage>
+            </BoxedError>
+          )}
+
           {this.state.view === VIEW_TYPE.CHANGE_NUMBER && (
             <Container>
               <Content>
@@ -298,8 +358,10 @@ class ChangePhoneView extends React.Component<IProps, IState> {
                   key="continue"
                   onClick={() => {
                     this.continueButtonHandler(
+                      userId,
                       this.state.phoneNumber,
-                      this.state.view
+                      this.state.view,
+                      scope
                     )
                   }}
                   disabled={
@@ -350,19 +412,34 @@ class ChangePhoneView extends React.Component<IProps, IState> {
                 </Field>
               </Content>
               <Content>
-                <StyledPrimaryButton
-                  id="verify-button"
-                  key="verify"
-                  onClick={() => {
-                    this.props.goToSettingsWithPhoneSuccessMsg(true)
+                <Mutation
+                  mutation={changePhoneMutation}
+                  variables={{
+                    userId: get(this.props, 'userDetails.userMgntUserID'),
+                    phoneNumber: this.state.phoneNumber,
+                    nonce: nonce
                   }}
-                  disabled={
-                    !Boolean(this.state.verifyCode.length) ||
-                    !this.state.isInvalidLength
-                  }
+                  onCompleted={this.phoneChangecompleted}
+                  onError={() => this.setState({ errorOccured: true })}
                 >
-                  {intl.formatMessage(buttonMessages.verify)}
-                </StyledPrimaryButton>
+                  {(changePhone: any) => {
+                    return (
+                      <StyledPrimaryButton
+                        id="verify-button"
+                        key="verify"
+                        onClick={() => {
+                          this.changePhone(changePhone)
+                        }}
+                        disabled={
+                          !Boolean(this.state.verifyCode.length) ||
+                          !this.state.isInvalidLength
+                        }
+                      >
+                        {intl.formatMessage(buttonMessages.verify)}
+                      </StyledPrimaryButton>
+                    )
+                  }}
+                </Mutation>
               </Content>
             </Container>
           )}
@@ -374,10 +451,12 @@ class ChangePhoneView extends React.Component<IProps, IState> {
 
 export const ChangePhonePage = connect(
   (store: IStoreState) => ({
-    userDetails: getUserDetails(store)
+    userDetails: getUserDetails(store),
+    nonce: getUserNonce(store)
   }),
   {
     goBack: goBackAction,
+    sendVerifyCode: SendVerifyCodeAction,
     goToSettingsWithPhoneSuccessMsg: goToSettingsWithPhoneSuccessMsgAction
   }
 )(injectIntl(ChangePhoneView))

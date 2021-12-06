@@ -16,7 +16,8 @@
     "test:compilation": "tsc --noEmit",
     "build": "tsc && copyfiles 'src/**/*.graphql' build/dist",
     "postbuild": "ef-tspm",
-    "build:clean": "rm -rf build"
+    "build:clean": "rm -rf build",
+    "redis": "^3.1.1"
   },
   "dependencies": {
     "@elastic/elasticsearch": "6",

@@ -32,6 +32,7 @@ import {
   GQLUserInput
 } from '@gateway/graphql/schema'
 import { logger } from '@gateway/logger'
+import { getVerificationCodeDetails } from '@gateway/routes/verifyCode/handler'
 import fetch from 'node-fetch'
 
 export const resolvers: GQLResolver = {
@@ -281,6 +282,35 @@ export const resolvers: GQLResolver = {
       const res = await fetch(`${USER_MANAGEMENT_URL}changeUserPassword`, {
         method: 'POST',
         body: JSON.stringify({ userId, existingPassword, password }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+
+      if (res.status !== 200) {
+        return await Promise.reject(
+          new Error(
+            "Something went wrong on user-mgnt service. Couldn't change user password"
+          )
+        )
+      }
+      return true
+    },
+    async changePhone(_, { userId, phoneNumber, nonce }, authHeader) {
+      if (!isTokenOwner(authHeader, userId)) {
+        return await Promise.reject(
+          new Error(
+            `Change phone is not allowed. ${userId} is not the owner of the token`
+          )
+        )
+      }
+      const verifyCode = getVerificationCodeDetails(nonce)
+      logger.info('verifyCode', verifyCode)
+
+      const res = await fetch(`${USER_MANAGEMENT_URL}changeUserPassword`, {
+        method: 'POST',
+        body: JSON.stringify({ userId, phoneNumber }),
         headers: {
           'Content-Type': 'application/json',
           ...authHeader

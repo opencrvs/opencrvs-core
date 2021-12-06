@@ -32,19 +32,23 @@ import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { ApolloQueryResult } from 'apollo-client'
 import { queries } from '@client/profile/queries'
 import * as changeLanguageActions from '@client/i18n/actions'
+import { EMPTY_STRING } from '@client/utils/constants'
+import { serviceApi } from '@client/profile/serviceApi'
 
 export type ProfileState = {
   authenticated: boolean
   tokenPayload: ITokenPayload | null
   userDetailsFetched: boolean
   userDetails: IUserDetails | null
+  nonce: string
 }
 
 export const initialState: ProfileState = {
   authenticated: false,
   userDetailsFetched: false,
   tokenPayload: null,
-  userDetails: null
+  userDetails: null,
+  nonce: EMPTY_STRING
 }
 
 export const profileReducer: LoopReducer<
@@ -203,6 +207,33 @@ export const profileReducer: LoopReducer<
           Cmd.action(actions.userDetailsAvailable(userDetailsCollection!))
         )
       }
+    case actions.SEND_VERIFY_CODE:
+      const sendVerifyCodeDetails = action.payload
+      if (
+        state.tokenPayload &&
+        (!sendVerifyCodeDetails ||
+          sendVerifyCodeDetails.userId === state.tokenPayload.sub)
+      ) {
+        return loop(
+          {
+            ...state
+          },
+          Cmd.run(serviceApi.sendVerifyCode, {
+            successActionCreator: actions.SendVerifyCodeSuccess,
+            args: [action.payload]
+          })
+        )
+      }
+      return state
+    case actions.SEND_VERIFY_CODE_COMPLETED:
+      const successPayload = action.payload
+      if (
+        state.tokenPayload &&
+        (!successPayload || successPayload.userId === state.tokenPayload.sub)
+      ) {
+        return { ...state, nonce: successPayload.nonce }
+      }
+      return state
 
     default:
       return state
