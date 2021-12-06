@@ -2090,6 +2090,7 @@ export interface MutationToChangePhoneArgs {
   userId: string
   phoneNumber: string
   nonce: string
+  verifyCode: string
 }
 export interface MutationToChangePhonedResolver<TParent = any, TResult = any> {
   (

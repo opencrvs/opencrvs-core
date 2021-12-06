@@ -13,6 +13,7 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import {
   CERT_PRIVATE_KEY_PATH,
+  CONFIG_SMS_CODE_EXPIRY_SECONDS,
   CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS,
   CONFIG_TOKEN_EXPIRY_SECONDS,
   JWT_ISSUER,
@@ -76,6 +77,29 @@ export async function generateVerificationCode(
 
   await storeVerificationCode(nonce, code)
   return code
+}
+
+export async function checkVerificationCode(
+  nonce: string,
+  code: string
+): Promise<void> {
+  const codeDetails: ICodeDetails = await getVerificationCodeDetails(nonce)
+
+  if (!codeDetails) {
+    throw new Error('sms code not found')
+  }
+
+  const codeExpired =
+    (Date.now() - codeDetails.createdAt) / 1000 >=
+    CONFIG_SMS_CODE_EXPIRY_SECONDS
+
+  if (code !== codeDetails.code) {
+    throw new Error('sms code invalid')
+  }
+
+  if (codeExpired) {
+    throw new Error('sms code expired')
+  }
 }
 
 export async function getVerificationCodeDetails(
@@ -190,7 +214,6 @@ export default async function sendVerifyCodeHandler(
     status: 'Success'
   }
   await generateAndSendVerificationCode(nonce, phoneNumber, scope)
-  logger.info('---------respons----------------e', response)
   return response
 }
 

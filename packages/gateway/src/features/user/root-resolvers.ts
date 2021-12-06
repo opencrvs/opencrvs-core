@@ -32,7 +32,7 @@ import {
   GQLUserInput
 } from '@gateway/graphql/schema'
 import { logger } from '@gateway/logger'
-import { getVerificationCodeDetails } from '@gateway/routes/verifyCode/handler'
+import { checkVerificationCode } from '@gateway/routes/verifyCode/handler'
 import fetch from 'node-fetch'
 
 export const resolvers: GQLResolver = {
@@ -297,7 +297,11 @@ export const resolvers: GQLResolver = {
       }
       return true
     },
-    async changePhone(_, { userId, phoneNumber, nonce }, authHeader) {
+    async changePhone(
+      _,
+      { userId, phoneNumber, nonce, verifyCode },
+      authHeader
+    ) {
       if (!isTokenOwner(authHeader, userId)) {
         return await Promise.reject(
           new Error(
@@ -305,10 +309,15 @@ export const resolvers: GQLResolver = {
           )
         )
       }
-      const verifyCode = getVerificationCodeDetails(nonce)
-      logger.info('verifyCode', verifyCode)
-
-      const res = await fetch(`${USER_MANAGEMENT_URL}changeUserPassword`, {
+      try {
+        await checkVerificationCode(nonce, verifyCode)
+      } catch (err) {
+        logger.error(err)
+        return await Promise.reject(
+          new Error(`Change phone is not allowed. Error: ${err}`)
+        )
+      }
+      const res = await fetch(`${USER_MANAGEMENT_URL}changeUserPhone`, {
         method: 'POST',
         body: JSON.stringify({ userId, phoneNumber }),
         headers: {
@@ -320,7 +329,7 @@ export const resolvers: GQLResolver = {
       if (res.status !== 200) {
         return await Promise.reject(
           new Error(
-            "Something went wrong on user-mgnt service. Couldn't change user password"
+            "Something went wrong on user-mgnt service. Couldn't change user phone number"
           )
         )
       }

@@ -179,8 +179,14 @@ export const changePhoneMutation = gql`
     $userId: String!
     $phoneNumber: String!
     $nonce: String!
+    $verifyCode: String!
   ) {
-    changePhone(userId: $userId, phoneNumber: $phoneNumber, nonce: $nonce)
+    changePhone(
+      userId: $userId
+      phoneNumber: $phoneNumber
+      nonce: $nonce
+      verifyCode: $verifyCode
+    )
   }
 `
 
@@ -417,7 +423,8 @@ class ChangePhoneView extends React.Component<IProps & IDispatchProps, IState> {
                   variables={{
                     userId: get(this.props, 'userDetails.userMgntUserID'),
                     phoneNumber: this.state.phoneNumber,
-                    nonce: nonce
+                    nonce: nonce,
+                    verifyCode: this.state.verifyCode
                   }}
                   onCompleted={this.phoneChangecompleted}
                   onError={() => this.setState({ errorOccured: true })}
