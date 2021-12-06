@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { resolvers } from '@gateway/features/user/root-resolvers'
+import { generateVerificationCode } from '@gateway/routes/verifyCode/handler'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
@@ -661,6 +662,123 @@ describe('User root resolvers', () => {
         )
       ).rejects.toThrowError(
         'Change password is not allowed. ba7022f0ff4822 is not the owner of the token'
+      )
+    })
+  })
+
+  describe('changePhone mutation', () => {
+    let authHeaderValidUser: { Authorization: string }
+    let authHeaderInValidUser: { Authorization: string }
+
+    beforeEach(() => {
+      fetch.resetMocks()
+      const validUserToken = jwt.sign(
+        { scope: ['register'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      authHeaderValidUser = {
+        Authorization: `Bearer ${validUserToken}`
+      }
+      const inValidUserToken = jwt.sign(
+        { scope: ['register'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      authHeaderInValidUser = {
+        Authorization: `Bearer ${inValidUserToken}`
+      }
+    })
+
+    it('changes phone for loggedin user', async () => {
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            userId: 'ba7022f0ff4822'
+          }),
+          { status: 200 }
+        ],
+        [JSON.stringify({})]
+      )
+
+      const nonce = '12345'
+      const mobile = '0711111111'
+      const code = await generateVerificationCode(nonce, mobile)
+
+      const response = await resolvers.Mutation.changePhone(
+        {},
+        {
+          userId: 'ba7022f0ff4822',
+          phoneNumber: mobile,
+          nonce: nonce,
+          verifyCode: code
+        },
+        authHeaderValidUser
+      )
+
+      expect(response).toEqual(true)
+    })
+    it('throws error if @user-mgnt/changeUserPhone sends anything but 201', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          statusCode: '401'
+        })
+      )
+
+      const nonce = '12345'
+      const mobile = '0711111111'
+
+      expect(
+        resolvers.Mutation.changePassword(
+          {},
+          {
+            userId: 'ba7022f0ff4822',
+            phoneNumber: mobile,
+            nonce: nonce,
+            verifyCode: '000000'
+          },
+          authHeaderValidUser
+        )
+      ).rejects.toThrowError(
+        "Something went wrong on user-mgnt service. Couldn't change user phone number"
+      )
+    })
+    it("throws error if any user (except sysadmin) tries to update some other user's password", async () => {
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            userId: 'ba7022f0ff4822'
+          }),
+          { status: 201 }
+        ],
+        [JSON.stringify({})]
+      )
+
+      const nonce = '12345'
+      const mobile = '0711111111'
+
+      expect(
+        resolvers.Mutation.changePassword(
+          {},
+          {
+            userId: 'ba7022f0ff4822',
+            phoneNumber: mobile,
+            nonce: nonce,
+            verifyCode: '000000'
+          },
+          authHeaderInValidUser
+        )
+      ).rejects.toThrowError(
+        'Change phone is not allowed. ba7022f0ff4822 is not the owner of the token'
       )
     })
   })
