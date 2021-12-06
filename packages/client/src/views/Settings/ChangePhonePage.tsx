@@ -44,7 +44,10 @@ import {
   buttonMessages,
   constantsMessages
 } from '@client/i18n/messages'
-import { sendVerifyCode as SendVerifyCodeAction } from '@client/profile/profileActions'
+import {
+  sendVerifyCode as SendVerifyCodeAction,
+  modifyUserDetails as modifyUserDetailsAction
+} from '@client/profile/profileActions'
 import { getDefaultLanguage, getAvailableLanguages } from '@client/i18n/utils'
 import { IntlState } from '@client/i18n/reducer'
 import {
@@ -193,7 +196,9 @@ export const changePhoneMutation = gql`
 type IProps = IntlShapeProps & {
   userDetails: IUserDetails | null
   nonce: string | null
+  modifyUserDetails: typeof modifyUserDetailsAction
   goBack: typeof goBackAction
+  sendVerifyCode: typeof SendVerifyCodeAction
   goToSettingsWithPhoneSuccessMsg: typeof goToSettingsWithPhoneSuccessMsgAction
 }
 
@@ -280,6 +285,10 @@ class ChangePhoneView extends React.Component<IProps & IDispatchProps, IState> {
       phoneNumberFormatText: EMPTY_STRING,
       errorOccured: false
     })
+    if (this.props.userDetails) {
+      this.props.userDetails.mobile = this.state.phoneNumber
+      this.props.modifyUserDetails(this.props.userDetails)
+    }
     this.props.goToSettingsWithPhoneSuccessMsg(true)
   }
 
@@ -462,6 +471,7 @@ export const ChangePhonePage = connect(
     nonce: getUserNonce(store)
   }),
   {
+    modifyUserDetails: modifyUserDetailsAction,
     goBack: goBackAction,
     sendVerifyCode: SendVerifyCodeAction,
     goToSettingsWithPhoneSuccessMsg: goToSettingsWithPhoneSuccessMsgAction
