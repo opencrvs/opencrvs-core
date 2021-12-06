@@ -79,10 +79,24 @@ const { useState } = React
 
 interface SortMap {
   applicationStartedOn: SORT_ORDER
+  nameIntl: SORT_ORDER
+  timeLoggedInProgress: SORT_ORDER
+  timeLoggedDeclared: SORT_ORDER
+  timeLoggedRejected: SORT_ORDER
+  timeLoggedValidated: SORT_ORDER
+  timeLoggedWaitingValidation: SORT_ORDER
+  timeLoggedRegistered: SORT_ORDER
 }
 
 const INITIAL_SORT_MAP = {
-  applicationStartedOn: SORT_ORDER.DESCENDING
+  applicationStartedOn: SORT_ORDER.DESCENDING,
+  nameIntl: SORT_ORDER.ASCENDING,
+  timeLoggedInProgress: SORT_ORDER.ASCENDING,
+  timeLoggedDeclared: SORT_ORDER.ASCENDING,
+  timeLoggedRejected: SORT_ORDER.ASCENDING,
+  timeLoggedValidated: SORT_ORDER.ASCENDING,
+  timeLoggedWaitingValidation: SORT_ORDER.ASCENDING,
+  timeLoggedRegistered: SORT_ORDER.ASCENDING
 }
 
 const DEFAULT_APPLICATION_STATUS_PAGE_SIZE = 25
@@ -134,6 +148,9 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
   ) as unknown) as ISearchParams
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
+  const [columnToBeSort, setColumnToBeSort] = useState<keyof SortMap>(
+    'applicationStartedOn'
+  )
   const recordCount = DEFAULT_APPLICATION_STATUS_PAGE_SIZE * currentPageNumber
   let sectionId = OPERATIONAL_REPORT_SECTION.OPERATIONAL
   let timeStart = moment()
@@ -154,6 +171,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         ? SORT_ORDER.ASCENDING
         : SORT_ORDER.DESCENDING
     setSortOrder({ ...sortOrder, [key]: invertedOrder })
+    setColumnToBeSort(key)
   }
 
   function getColumns(totalItems = 0): IColumn[] {
@@ -183,7 +201,10 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.nameDefaultLocale),
         key: 'nameIntl',
-        width: 12
+        width: 12,
+        isSortable: true,
+        sortFunction: () => toggleSort('nameIntl'),
+        icon: columnToBeSort === 'nameIntl' ? <ArrowDownBlue /> : <></>
       },
       {
         label: intl.formatMessage(constantsMessages.nameRegionalLocale),
@@ -201,7 +222,8 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         width: 12,
         isSortable: true,
         sortFunction: () => toggleSort('applicationStartedOn'),
-        icon: <ArrowDownBlue />
+        icon:
+          columnToBeSort === 'applicationStartedOn' ? <ArrowDownBlue /> : <></>
       },
       {
         label: intl.formatMessage(constantsMessages.applicationStartedBy),
@@ -211,35 +233,63 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.timeInProgress),
         key: 'timeLoggedInProgress',
-        width: 12
+        width: 12,
+        isSortable: true,
+        sortFunction: () => toggleSort('timeLoggedInProgress'),
+        icon:
+          columnToBeSort === 'timeLoggedInProgress' ? <ArrowDownBlue /> : <></>
       },
       {
         label: intl.formatMessage(constantsMessages.timeReadyForReview),
         key: 'timeLoggedDeclared',
-        width: 12
+        width: 14,
+        isSortable: true,
+        sortFunction: () => toggleSort('timeLoggedDeclared'),
+        icon:
+          columnToBeSort === 'timeLoggedDeclared' ? <ArrowDownBlue /> : <></>
       },
       {
         label: intl.formatMessage(constantsMessages.timeRequireUpdates),
         key: 'timeLoggedRejected',
-        width: 12
+        width: 14,
+        isSortable: true,
+        sortFunction: () => toggleSort('timeLoggedRejected'),
+        icon:
+          columnToBeSort === 'timeLoggedRejected' ? <ArrowDownBlue /> : <></>
       },
       {
         label: intl.formatMessage(constantsMessages.timeWatingApproval),
         key: 'timeLoggedValidated',
-        width: 12
+        width: 12,
+        isSortable: true,
+        sortFunction: () => toggleSort('timeLoggedValidated'),
+        icon:
+          columnToBeSort === 'timeLoggedValidated' ? <ArrowDownBlue /> : <></>
       },
       {
         label: intl.formatMessage(
           constantsMessages.timeWaitingExternalValidation
         ),
         key: 'timeLoggedWaitingValidation',
-        width: 12
+        width: 12,
+        isSortable: true,
+        sortFunction: () => toggleSort('timeLoggedWaitingValidation'),
+        icon:
+          columnToBeSort === 'timeLoggedWaitingValidation' ? (
+            <ArrowDownBlue />
+          ) : (
+            <></>
+          )
       },
       {
         label: intl.formatMessage(constantsMessages.timeReadyToPrint),
         key: 'timeLoggedRegistered',
-        width: 12,
-        alignment: ColumnContentAlignment.RIGHT
+        width: 13,
+        alignment: ColumnContentAlignment.RIGHT,
+        isSortable: true,
+        sortFunction: () => toggleSort('timeLoggedRegistered'),
+        icon:
+          columnToBeSort === 'timeLoggedRegistered' ? <ArrowDownBlue /> : <></>
       }
     ] as IColumn[]
     return keys.filter(item => {
@@ -293,16 +343,9 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
     function getTimeDurationElements(
       timeDuration: number,
       tooltipId: string,
-      rowIndex: number,
-      checkStatus: string,
-      eventProgress: GQLEventProgressSet
+      rowIndex: number
     ) {
-      const timeStructure = formatTimeDuration(
-        eventProgress.registration &&
-          eventProgress.registration.status === checkStatus
-          ? getTimeDifferenceFromLastModification(eventProgress)
-          : timeDuration
-      )
+      const timeStructure = formatTimeDuration(timeDuration)
       const label =
         (timeStructure &&
           `${timeStructure.days}:${timeStructure.hours}:${timeStructure.minutes}`) ||
@@ -311,7 +354,6 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         (timeStructure &&
           `${timeStructure.days} days, ${timeStructure.hours} hours, ${timeStructure.minutes} minutes`) ||
         '-'
-
       return (
         <>
           <ReactTooltip id={`${tooltipId}_${rowIndex}`}>
@@ -324,8 +366,21 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       )
     }
 
+    function getTimeDuration(
+      timeDuration: number,
+      checkStatus: string,
+      eventProgress: GQLEventProgressSet
+    ) {
+      const timeStructure =
+        eventProgress.registration &&
+        eventProgress.registration.status === checkStatus
+          ? getTimeDifferenceFromLastModification(eventProgress)
+          : timeDuration
+      return timeStructure === null ? 0 : timeStructure
+    }
+
     const content = data.getEventsWithProgress.results.map(
-      (eventProgress: GQLEventProgressSet | null, index: number) => {
+      (eventProgress: GQLEventProgressSet | null) => {
         if (eventProgress !== null) {
           const nameIntl = createNamesMap(
             eventProgress && (eventProgress.name as GQLHumanName[])
@@ -375,12 +430,12 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
               )) ||
             ''
 
-          let timeLoggedInProgress = <></>
-          let timeLoggedDeclared = <></>
-          let timeLoggedRejected = <></>
-          let timeLoggedValidated = <></>
-          let timeLoggedWaitingValidation = <></>
-          let timeLoggedRegistered = <></>
+          let timeLoggedInProgress = 0
+          let timeLoggedDeclared = 0
+          let timeLoggedRejected = 0
+          let timeLoggedValidated = 0
+          let timeLoggedWaitingValidation = 0
+          let timeLoggedRegistered = 0
 
           if (eventProgress.progressReport != null) {
             const {
@@ -392,50 +447,38 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
               timeInReadyToPrint
             } = eventProgress.progressReport
 
-            timeLoggedInProgress = getTimeDurationElements(
+            timeLoggedInProgress = getTimeDuration(
               timeInProgress as number,
-              'in_prog_tltp',
-              index,
               'IN_PROGRESS',
               eventProgress
             )
 
-            timeLoggedDeclared = getTimeDurationElements(
+            timeLoggedDeclared = getTimeDuration(
               timeInReadyForReview as number,
-              'dclrd_tltp',
-              index,
               'DECLARED',
               eventProgress
             )
 
-            timeLoggedRejected = getTimeDurationElements(
+            timeLoggedRejected = getTimeDuration(
               timeInRequiresUpdates as number,
-              'rjctd_tltp',
-              index,
               'REJECTED',
               eventProgress
             )
 
-            timeLoggedValidated = getTimeDurationElements(
+            timeLoggedValidated = getTimeDuration(
               timeInWaitingForApproval as number,
-              'vldtd_tltp',
-              index,
               'VALIDATED',
               eventProgress
             )
 
-            timeLoggedWaitingValidation = getTimeDurationElements(
+            timeLoggedWaitingValidation = getTimeDuration(
               timeInWaitingForBRIS as number,
-              'wtng_vldtn_tltp',
-              index,
               'WAITING_VALIDATION',
               eventProgress
             )
 
-            timeLoggedRegistered = getTimeDurationElements(
+            timeLoggedRegistered = getTimeDuration(
               timeInReadyToPrint as number,
-              'rgstrd_tltp_tltp',
-              index,
               'REGISTERED',
               eventProgress
             )
@@ -494,9 +537,45 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
 
     return orderBy(
       content,
-      ['applicationStartedOnTime'],
-      [sortOrder.applicationStartedOn]
-    )
+      columnToBeSort === 'nameIntl'
+        ? [content => content[columnToBeSort]!.toString().toLowerCase()]
+        : [columnToBeSort],
+      [sortOrder[columnToBeSort]]
+    ).map((row, idx) => {
+      return {
+        ...row,
+        timeLoggedInProgress: getTimeDurationElements(
+          Number(row.timeLoggedInProgress),
+          'in_prog_tltp',
+          idx
+        ),
+        timeLoggedDeclared: getTimeDurationElements(
+          Number(row.timeLoggedDeclared),
+          'dclrd_tltp',
+          idx
+        ),
+        timeLoggedRejected: getTimeDurationElements(
+          Number(row.timeLoggedRejected),
+          'rjctd_tltp',
+          idx
+        ),
+        timeLoggedValidated: getTimeDurationElements(
+          Number(row.timeLoggedValidated),
+          'vldtd_tltp',
+          idx
+        ),
+        timeLoggedWaitingValidation: getTimeDurationElements(
+          Number(row.timeLoggedWaitingValidation),
+          'wtng_vldtn_tltp',
+          idx
+        ),
+        timeLoggedRegistered: getTimeDurationElements(
+          Number(row.timeLoggedRegistered),
+          'rgstrd_tltp_tltp',
+          idx
+        )
+      }
+    })
   }
 
   return (

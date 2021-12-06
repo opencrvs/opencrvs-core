@@ -276,21 +276,25 @@ function FieldAgentListComponent(props: IProps) {
       })
     return (
       (content &&
-        orderBy(content, [columnToBeSort], [sortOrder[columnToBeSort]]).map(
-          (row, idx) => {
-            return {
-              ...row,
-              startMonth:
-                (row.startMonth &&
-                  moment(Number(row.startMonth)).format('MMMM YYYY')) ||
-                '',
-              avgCompleteApplicationTime: getAverageCompletionTimeComponent(
-                Number(row.avgCompleteApplicationTime),
-                idx
-              )
-            }
+        orderBy(
+          content,
+          columnToBeSort === 'name'
+            ? [content => content[columnToBeSort]!.toString().toLowerCase()]
+            : [columnToBeSort],
+          [sortOrder[columnToBeSort]]
+        ).map((row, idx) => {
+          return {
+            ...row,
+            startMonth:
+              (row.startMonth &&
+                moment(Number(row.startMonth)).format('MMMM YYYY')) ||
+              '',
+            avgCompleteApplicationTime: getAverageCompletionTimeComponent(
+              Number(row.avgCompleteApplicationTime),
+              idx
+            )
           }
-        )) ||
+        })) ||
       []
     )
   }
