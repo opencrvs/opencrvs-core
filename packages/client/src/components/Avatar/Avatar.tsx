@@ -12,20 +12,29 @@
 import * as React from 'react'
 import { Avatar as DefaultAvatar } from '@opencrvs/components/lib/icons'
 import { AVATAR_API } from '@client/utils/constants'
+import { IAvatar } from '@client/utils/userUtils'
+import styled from '@client/styledComponents'
 
 interface IProps extends React.HTMLAttributes<Element> {
   name?: string
+  avatar?: IAvatar
 }
 
-export function Avatar(props: IProps) {
+const AvatarImage = styled.img`
+  border-radius: 50%;
+`
+
+export function Avatar({ name, avatar, ...props }: IProps) {
   const [error, setError] = React.useState<boolean>(false)
 
-  if (!error && props.name) {
+  if (!error && (name || avatar)) {
     return (
-      <img
+      <AvatarImage
         width={64}
         height={64}
-        src={`${AVATAR_API}${props.name.replaceAll(' ', '+')}`}
+        src={
+          avatar ? avatar.data : `${AVATAR_API}${name!.replaceAll(' ', '+')}`
+        }
         onError={() => setError(true)}
         {...props}
       />
