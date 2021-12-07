@@ -188,7 +188,7 @@ const Name = styled(LinkButton)`
 `
 
 const RoleType = styled.div`
-  ${({ theme }) => theme.fonts.captionStyle}
+  ${({ theme }) => theme.fonts.chartLegendStyle}
   color: ${({ theme }) => theme.colors.waitingForExternalValidation};
 `
 
@@ -468,17 +468,16 @@ function UserListComponent(props: IProps) {
       columns = columns.concat([
         {
           label: '',
-          width: 10,
           key: 'photo'
         },
         {
           label: intl.formatMessage(constantsMessages.name),
-          width: 65,
+          width: 66,
           key: 'nameRoleType'
         },
         {
           label: intl.formatMessage(constantsMessages.status),
-          width: 25,
+          width: 26,
           alignment: ColumnContentAlignment.RIGHT,
           key: 'status'
         }
@@ -488,7 +487,6 @@ function UserListComponent(props: IProps) {
         columns = columns.concat([
           {
             label: '',
-            width: 8,
             key: 'photo'
           },
           {
@@ -503,7 +501,7 @@ function UserListComponent(props: IProps) {
           },
           {
             label: intl.formatMessage(constantsMessages.status),
-            width: 15,
+            width: 16,
             alignment: ColumnContentAlignment.RIGHT,
             key: 'status'
           }
@@ -512,12 +510,11 @@ function UserListComponent(props: IProps) {
         columns = columns.concat([
           {
             label: '',
-            width: 8,
             key: 'photo'
           },
           {
             label: intl.formatMessage(constantsMessages.name),
-            width: 27,
+            width: 28,
             key: 'name'
           },
           {
@@ -527,7 +524,7 @@ function UserListComponent(props: IProps) {
           },
           {
             label: intl.formatMessage(constantsMessages.status),
-            width: 20,
+            width: 21,
             alignment: ColumnContentAlignment.RIGHT,
             key: 'status'
           },
@@ -591,6 +588,10 @@ function UserListComponent(props: IProps) {
                   rowHeight: {
                     desktop: 56,
                     mobileTablet: 80
+                  },
+                  paddingLeftRight: {
+                    desktop: 8,
+                    mobileTablet: 16
                   }
                 }}
               />

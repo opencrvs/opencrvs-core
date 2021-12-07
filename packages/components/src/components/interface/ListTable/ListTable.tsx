@@ -86,14 +86,15 @@ const TableBody = styled.div<{ footerColumns: boolean }>`
 const RowWrapper = styled.div<{
   totalWidth: number
   highlight?: boolean
-  rowHeight?: IRowHeight
+  rowHeight?: IRowPreference
+  paddingLeftRight?: IRowPreference
 }>`
   width: 100%;
   border-bottom: 1px solid ${({ theme }) => theme.colors.disabled};
   display: flex;
   align-items: center;
   ${({ rowHeight }) =>
-    rowHeight ? `min-height:${rowHeight.desktop}px` : `min-height: 48px)`};
+    rowHeight ? `min-height:${rowHeight.desktop}px;` : `min-height: 48px)`};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     ${({ rowHeight }) =>
       rowHeight
@@ -103,12 +104,38 @@ const RowWrapper = styled.div<{
   ${({ highlight, theme }) =>
     highlight && `:hover { background-color: ${theme.colors.dropdownHover};}`}
   & span:first-child {
-    padding-left: 8px;
+    ${({ paddingLeftRight }) =>
+      paddingLeftRight
+        ? `padding-right: 16px; padding-left:${paddingLeftRight.desktop}px;`
+        : `padding-left: 12px;`}
+  }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    & span:first-child {
+      ${({ paddingLeftRight }) =>
+        paddingLeftRight
+          ? `padding-right: 16px; padding-left:${paddingLeftRight.mobileTablet}px;`
+          : `padding-left: 12px;`}
+    }
   }
 
   & span:last-child {
     text-align: right;
     padding-right: 12px;
+    ${({ paddingLeftRight }) =>
+      paddingLeftRight
+        ? `padding-right:${paddingLeftRight.desktop}px;`
+        : `padding-right: 12px;`}
+  }
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    & span:last-child {
+      text-align: right;
+      padding-right: 12px;
+      ${({ paddingLeftRight }) =>
+        paddingLeftRight
+          ? `padding-right:${paddingLeftRight.mobileTablet}px;`
+          : `padding-right: 12px;`}
+    }
   }
 `
 const TableFooter = styled(RowWrapper)`
@@ -252,10 +279,8 @@ interface IListTableProps {
   noResultText: string
   tableHeight?: number
   userListPreference?: {
-    rowHeight: {
-      desktop: number
-      mobileTablet: number
-    }
+    rowHeight: IRowPreference
+    paddingLeftRight: IRowPreference
   }
   onPageChange?: (currentPage: number) => void
   disableScrollOnOverflow?: boolean
@@ -278,7 +303,7 @@ interface IListTableState {
   tableOffsetTop: number
 }
 
-interface IRowHeight {
+interface IRowPreference {
   desktop: number
   mobileTablet: number
 }
@@ -432,6 +457,9 @@ export class ListTable extends React.Component<
                           totalWidth={totalWidth}
                           highlight={highlightRowOnMouseOver}
                           rowHeight={userListPreference?.rowHeight}
+                          paddingLeftRight={
+                            userListPreference?.paddingLeftRight
+                          }
                         >
                           {columns.map((preference, indx) => {
                             return (
