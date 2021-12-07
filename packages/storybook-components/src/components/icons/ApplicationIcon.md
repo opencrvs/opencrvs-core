@@ -1,0 +1,3 @@
+```js
+<ApplicationIcon color="violet" />
+```
