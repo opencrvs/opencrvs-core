@@ -227,9 +227,6 @@ function UserAuditActionModalComponent(
         onChange={values => setFormValues({ ...formValues, ...values })}
         setAllFieldsDirty={false}
         draftData={{ formValues }}
-        onSetTouched={onSetTouchedCallback => {
-          makeAllFieldsDirty = onSetTouchedCallback
-        }}
       />
     </ResponsiveModal>
   )
