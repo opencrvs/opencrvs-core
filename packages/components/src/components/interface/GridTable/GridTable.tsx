@@ -157,10 +157,10 @@ export class GridTable extends React.Component<
   renderActionBlock = (
     itemId: string,
     actions: IAction[],
-    width?: number,
     key: number,
     idKey: number,
-    alignment?: ColumnContentAlignment
+    alignment?: ColumnContentAlignment,
+    width?: number
   ) => {
     if (this.props.expandable) {
       return (
@@ -302,10 +302,10 @@ export class GridTable extends React.Component<
                       return this.renderActionBlock(
                         item.id as string,
                         item[preference.key] as IAction[],
-                        preference.width,
                         index,
                         indx,
-                        preference.alignment
+                        preference.alignment,
+                        preference.width
                       )
                     } else if (preference.isIconColumn) {
                       return (

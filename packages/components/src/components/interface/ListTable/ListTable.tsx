@@ -118,7 +118,6 @@ const RowWrapper = styled.div<{
 
   & span:last-child {
     text-align: right;
-    padding-right: 12px;
     ${({ horizontalPadding }) =>
       horizontalPadding
         ? `padding-right:${horizontalPadding.lg}px;`
