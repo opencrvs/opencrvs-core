@@ -68,7 +68,8 @@ export function getUserDetails(user: GQLUser): IUserDetails {
     status,
     userMgntUserID,
     practitionerId,
-    localRegistrar
+    localRegistrar,
+    avatar
   } = user
   const userDetails: IUserDetails = {
     language: getDefaultLanguage(),
@@ -129,6 +130,10 @@ export function getUserDetails(user: GQLUser): IUserDetails {
     if (potentialCatchmentAreas !== undefined) {
       userDetails.catchmentArea = potentialCatchmentAreas
     }
+  }
+
+  if (avatar) {
+    userDetails.avatar = avatar
   }
 
   return userDetails
