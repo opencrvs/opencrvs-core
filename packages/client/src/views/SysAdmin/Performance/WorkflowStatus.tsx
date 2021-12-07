@@ -345,6 +345,8 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       tooltipId: string,
       rowIndex: number
     ) {
+      if (timeDuration === 0) return <>-</>
+
       const timeStructure = formatTimeDuration(timeDuration)
       const label =
         (timeStructure &&
@@ -544,54 +546,36 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
     ).map((row, idx) => {
       return {
         ...row,
-        timeLoggedInProgress:
-          row.timeLoggedInProgress === 0
-            ? '-'
-            : getTimeDurationElements(
-                Number(row.timeLoggedInProgress),
-                'in_prog_tltp',
-                idx
-              ),
-        timeLoggedDeclared:
-          row.timeLoggedDeclared === 0
-            ? '-'
-            : getTimeDurationElements(
-                Number(row.timeLoggedDeclared),
-                'dclrd_tltp',
-                idx
-              ),
-        timeLoggedRejected:
-          row.timeLoggedRejected === 0
-            ? '-'
-            : getTimeDurationElements(
-                Number(row.timeLoggedRejected),
-                'rjctd_tltp',
-                idx
-              ),
-        timeLoggedValidated:
-          row.timeLoggedValidated === 0
-            ? '-'
-            : getTimeDurationElements(
-                Number(row.timeLoggedValidated),
-                'vldtd_tltp',
-                idx
-              ),
-        timeLoggedWaitingValidation:
-          row.timeLoggedWaitingValidation === 0
-            ? '-'
-            : getTimeDurationElements(
-                Number(row.timeLoggedWaitingValidation),
-                'wtng_vldtn_tltp',
-                idx
-              ),
-        timeLoggedRegistered:
-          row.timeLoggedRegistered === 0
-            ? '-'
-            : getTimeDurationElements(
-                Number(row.timeLoggedRegistered),
-                'rgstrd_tltp_tltp',
-                idx
-              )
+        timeLoggedInProgress: getTimeDurationElements(
+          Number(row.timeLoggedInProgress),
+          'in_prog_tltp',
+          idx
+        ),
+        timeLoggedDeclared: getTimeDurationElements(
+          Number(row.timeLoggedDeclared),
+          'dclrd_tltp',
+          idx
+        ),
+        timeLoggedRejected: getTimeDurationElements(
+          Number(row.timeLoggedRejected),
+          'rjctd_tltp',
+          idx
+        ),
+        timeLoggedValidated: getTimeDurationElements(
+          Number(row.timeLoggedValidated),
+          'vldtd_tltp',
+          idx
+        ),
+        timeLoggedWaitingValidation: getTimeDurationElements(
+          Number(row.timeLoggedWaitingValidation),
+          'wtng_vldtn_tltp',
+          idx
+        ),
+        timeLoggedRegistered: getTimeDurationElements(
+          Number(row.timeLoggedRegistered),
+          'rgstrd_tltp_tltp',
+          idx
+        )
       }
     })
   }
