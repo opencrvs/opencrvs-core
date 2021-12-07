@@ -33,6 +33,11 @@ export interface IGQLLocation {
   status?: string
 }
 
+export interface IAvatar {
+  type: string
+  data: string
+}
+
 export interface IUserDetails {
   userMgntUserID?: string
   practitionerId?: string
@@ -49,6 +54,7 @@ export interface IUserDetails {
     role?: string
     signature?: GQLSignature
   }
+  avatar?: IAvatar
 }
 
 export function getUserDetails(user: GQLUser): IUserDetails {
