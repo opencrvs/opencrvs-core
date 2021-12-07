@@ -22,6 +22,7 @@
     "@types/pino": "^5.14.0",
     "hapi-pino": "^6.3.0",
     "hapi-sentry": "^3.2.0",
+    "joi": "^17.5.0",
     "mongoose": "^5.1.5",
     "pino": "^5.14.0"
   },
@@ -29,7 +30,7 @@
     "@types/mongoose": "^5.0.16",
     "nodemon": "^2.0.15",
     "prettier": "^2.5.0",
-    "ts-node": "^10.4.0",
+    "ts-node": "^6.1.1",
     "tsconfig-paths": "^3.8.0",
     "tslint": "^5.17.0",
     "tslint-microsoft-contrib": "^6.2.0",

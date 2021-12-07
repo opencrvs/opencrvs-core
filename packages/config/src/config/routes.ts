@@ -10,6 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import applicationConfigHandler from '@config/handlers/applicationConfigHandler'
+import createQuestionHandler, {
+  requestSchema as createQuestionReqSchema
+} from '@config/handlers/createQuestion/handler'
 
 export default function getRoutes() {
   return [
@@ -37,6 +40,18 @@ export default function getRoutes() {
         auth: false,
         tags: ['api'],
         description: 'Retrieve Application configuration'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/createQuestion',
+      handler: createQuestionHandler,
+      config: {
+        tags: ['api'], // TODO: add auth with scope of National system admin user
+        description: 'Create question',
+        validate: {
+          payload: createQuestionReqSchema
+        }
       }
     }
   ]
