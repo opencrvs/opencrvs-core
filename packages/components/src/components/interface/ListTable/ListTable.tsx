@@ -83,16 +83,27 @@ const TableBody = styled.div<{ footerColumns: boolean }>`
     ${({ footerColumns }) => (footerColumns ? 'border-bottom: none;' : '')};
   }
 `
-const RowWrapper = styled.div<{ totalWidth: number; highlight?: boolean }>`
+const RowWrapper = styled.div<{
+  totalWidth: number
+  highlight?: boolean
+  rowHeight?: IRowHeight
+}>`
   width: 100%;
   border-bottom: 1px solid ${({ theme }) => theme.colors.disabled};
   display: flex;
   align-items: center;
-  min-height: 48px;
+  ${({ rowHeight }) =>
+    rowHeight ? `min-height:${rowHeight.desktop}px` : `min-height: 48px)`};
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    ${({ rowHeight }) =>
+      rowHeight
+        ? `min-height:${rowHeight.mobileTablet}px`
+        : `min-height: 48px)`};
+  }
   ${({ highlight, theme }) =>
     highlight && `:hover { background-color: ${theme.colors.dropdownHover};}`}
   & span:first-child {
-    padding-left: 12px;
+    padding-left: 8px;
   }
 
   & span:last-child {
@@ -141,7 +152,7 @@ const ValueWrapper = styled.span<{
   flex-shrink: 0;
   margin: auto 0;
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
-  padding-right: 10px;
+  padding-right: 8px;
   ${({ color }) => color && `color: ${color};`}
 `
 const Error = styled.span`
@@ -240,6 +251,12 @@ interface IListTableProps {
   footerColumns?: IFooterFColumn[]
   noResultText: string
   tableHeight?: number
+  userListPreference?: {
+    rowHeight: {
+      desktop: number
+      mobileTablet: number
+    }
+  }
   onPageChange?: (currentPage: number) => void
   disableScrollOnOverflow?: boolean
   pageSize?: number
@@ -259,6 +276,11 @@ interface IListTableState {
   sortIconInverted: boolean
   sortKey: string | null
   tableOffsetTop: number
+}
+
+interface IRowHeight {
+  desktop: number
+  mobileTablet: number
 }
 
 export class ListTable extends React.Component<
@@ -328,6 +350,7 @@ export class ListTable extends React.Component<
       isLoading = false,
       tableTitle,
       tableHeight,
+      userListPreference,
       hideBoxShadow,
       hideTableHeader,
       footerColumns,
@@ -408,6 +431,7 @@ export class ListTable extends React.Component<
                           key={index}
                           totalWidth={totalWidth}
                           highlight={highlightRowOnMouseOver}
+                          rowHeight={userListPreference?.rowHeight}
                         >
                           {columns.map((preference, indx) => {
                             return (

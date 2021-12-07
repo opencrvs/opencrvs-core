@@ -86,9 +86,11 @@ const TableHeader = styled.div`
   padding: 8px 18px;
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.subtitleStyle};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
   border-bottom: 1px solid ${({ theme }) => theme.colors.silverSand};
 `
+
+const UserCount = styled.div``
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors};
@@ -585,6 +587,12 @@ function UserListComponent(props: IProps) {
                 hideBoxShadow={true}
                 hideTableHeader={true}
                 disableScrollOnOverflow
+                userListPreference={{
+                  rowHeight: {
+                    desktop: 56,
+                    mobileTablet: 80
+                  }
+                }}
               />
               <UserAuditActionModal
                 show={toggleActivation.modalVisible}
