@@ -584,14 +584,14 @@ function UserListComponent(props: IProps) {
                 hideBoxShadow={true}
                 hideTableHeader={true}
                 disableScrollOnOverflow
-                userListPreference={{
-                  rowHeight: {
-                    desktop: 56,
-                    mobileTablet: 80
+                rowStyle={{
+                  height: {
+                    lg: 56,
+                    md: 80
                   },
-                  paddingLeftRight: {
-                    desktop: 8,
-                    mobileTablet: 16
+                  horizontalPadding: {
+                    lg: 8,
+                    md: 16
                   }
                 }}
               />

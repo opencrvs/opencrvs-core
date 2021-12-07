@@ -86,34 +86,32 @@ const TableBody = styled.div<{ footerColumns: boolean }>`
 const RowWrapper = styled.div<{
   totalWidth: number
   highlight?: boolean
-  rowHeight?: IRowPreference
-  paddingLeftRight?: IRowPreference
+  height?: IBreakpoint
+  horizontalPadding?: IBreakpoint
 }>`
   width: 100%;
   border-bottom: 1px solid ${({ theme }) => theme.colors.disabled};
   display: flex;
   align-items: center;
-  ${({ rowHeight }) =>
-    rowHeight ? `min-height:${rowHeight.desktop}px;` : `min-height: 48px)`};
+  ${({ height }) =>
+    height ? `min-height:${height.lg}px;` : `min-height: 48px)`};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    ${({ rowHeight }) =>
-      rowHeight
-        ? `min-height:${rowHeight.mobileTablet}px`
-        : `min-height: 48px)`};
+    ${({ height }) =>
+      height ? `min-height:${height.md}px` : `min-height: 48px)`};
   }
   ${({ highlight, theme }) =>
     highlight && `:hover { background-color: ${theme.colors.dropdownHover};}`}
   & span:first-child {
-    ${({ paddingLeftRight }) =>
-      paddingLeftRight
-        ? `padding-right: 16px; padding-left:${paddingLeftRight.desktop}px;`
+    ${({ horizontalPadding }) =>
+      horizontalPadding
+        ? `padding-right: 16px; padding-left:${horizontalPadding.lg}px;`
         : `padding-left: 12px;`}
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     & span:first-child {
-      ${({ paddingLeftRight }) =>
-        paddingLeftRight
-          ? `padding-right: 16px; padding-left:${paddingLeftRight.mobileTablet}px;`
+      ${({ horizontalPadding }) =>
+        horizontalPadding
+          ? `padding-right: 16px; padding-left:${horizontalPadding.md}px;`
           : `padding-left: 12px;`}
     }
   }
@@ -121,9 +119,9 @@ const RowWrapper = styled.div<{
   & span:last-child {
     text-align: right;
     padding-right: 12px;
-    ${({ paddingLeftRight }) =>
-      paddingLeftRight
-        ? `padding-right:${paddingLeftRight.desktop}px;`
+    ${({ horizontalPadding }) =>
+      horizontalPadding
+        ? `padding-right:${horizontalPadding.lg}px;`
         : `padding-right: 12px;`}
   }
 
@@ -131,9 +129,9 @@ const RowWrapper = styled.div<{
     & span:last-child {
       text-align: right;
       padding-right: 12px;
-      ${({ paddingLeftRight }) =>
-        paddingLeftRight
-          ? `padding-right:${paddingLeftRight.mobileTablet}px;`
+      ${({ horizontalPadding }) =>
+        horizontalPadding
+          ? `padding-right:${horizontalPadding.md}px;`
           : `padding-right: 12px;`}
     }
   }
@@ -150,13 +148,13 @@ const TableFooter = styled(RowWrapper)`
 `
 
 const ContentWrapper = styled.span<{
-  width: number
+  width?: number
   alignment?: string
   sortable?: boolean
   totalWidth?: number
 }>`
   width: ${({ width, totalWidth }) =>
-    totalWidth && totalWidth > 100 ? (width * 100) / totalWidth : width}%;
+    totalWidth && totalWidth > 100 ? (width || 0 * 100) / totalWidth : width}%;
   flex-shrink: 0;
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
   padding-right: 10px;
@@ -164,13 +162,13 @@ const ContentWrapper = styled.span<{
   color: ${({ theme }) => theme.colors.tertiary};
 `
 const ValueWrapper = styled.span<{
-  width: number
+  width?: number
   totalWidth: number
   alignment?: string
   color?: string
 }>`
   width: ${({ width, totalWidth }) =>
-    totalWidth > 100 ? (width * 100) / totalWidth : width}%;
+    totalWidth > 100 ? (width || 0 * 100) / totalWidth : width}%;
 
   display: flex;
   justify-content: ${({ alignment }) =>
@@ -278,9 +276,9 @@ interface IListTableProps {
   footerColumns?: IFooterFColumn[]
   noResultText: string
   tableHeight?: number
-  userListPreference?: {
-    rowHeight: IRowPreference
-    paddingLeftRight: IRowPreference
+  rowStyle?: {
+    height: IBreakpoint
+    horizontalPadding: IBreakpoint
   }
   onPageChange?: (currentPage: number) => void
   disableScrollOnOverflow?: boolean
@@ -303,9 +301,9 @@ interface IListTableState {
   tableOffsetTop: number
 }
 
-interface IRowPreference {
-  desktop: number
-  mobileTablet: number
+interface IBreakpoint {
+  lg: number
+  md: number
 }
 
 export class ListTable extends React.Component<
@@ -375,7 +373,7 @@ export class ListTable extends React.Component<
       isLoading = false,
       tableTitle,
       tableHeight,
-      userListPreference,
+      rowStyle,
       hideBoxShadow,
       hideTableHeader,
       footerColumns,
@@ -385,7 +383,10 @@ export class ListTable extends React.Component<
       fixedWidth
     } = this.props
     const totalItems = this.props.totalItems || 0
-    const totalWidth = columns.reduce((total, col) => (total += col.width), 0)
+    const totalWidth = columns.reduce(
+      (total, col) => (total += col.width || 0),
+      0
+    )
 
     return (
       <>
@@ -456,10 +457,8 @@ export class ListTable extends React.Component<
                           key={index}
                           totalWidth={totalWidth}
                           highlight={highlightRowOnMouseOver}
-                          rowHeight={userListPreference?.rowHeight}
-                          paddingLeftRight={
-                            userListPreference?.paddingLeftRight
-                          }
+                          height={rowStyle?.height}
+                          horizontalPadding={rowStyle?.horizontalPadding}
                         >
                           {columns.map((preference, indx) => {
                             return (

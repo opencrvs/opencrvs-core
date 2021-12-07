@@ -66,7 +66,7 @@ const RowWrapper = styled.div<{
 `
 
 const ContentWrapper = styled.span<{
-  width: number
+  width?: number
   alignment?: string
   color?: string
   paddingRight?: number | null
@@ -157,7 +157,7 @@ export class GridTable extends React.Component<
   renderActionBlock = (
     itemId: string,
     actions: IAction[],
-    width: number,
+    width?: number,
     key: number,
     idKey: number,
     alignment?: ColumnContentAlignment
