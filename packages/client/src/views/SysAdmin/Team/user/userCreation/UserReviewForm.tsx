@@ -245,6 +245,9 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
         variables.user.id = variables.user._fhirID
         delete variables.user._fhirID
       }
+      if (variables.user.signature) {
+        delete variables.user.signature.__typename
+      }
 
       dispatch(
         submitUserFormData(
