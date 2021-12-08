@@ -10,18 +10,26 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Story, Meta } from '@storybook/react'
-import { PlusTransparent } from '../icons'
-import { FloatingActionButton, IButtonProps } from './FloatingActionButton'
+import { Tabs, Tab, IProps } from './Tabs'
 
 export default {
-  title: 'Components/buttons/FloatingActionButton',
-  component: FloatingActionButton
+  title: 'Components/Interface/Tabs',
+  component: Tabs
 } as Meta
 
-const Template: Story<IButtonProps> = args => <FloatingActionButton {...args} />
-export const SampleFloatButton = Template.bind({})
-SampleFloatButton.args = {
-  id: 'myButton',
-  onClick: () => alert('Hello'),
-  icon: () => <span style={{ color: '#fff', fontSize: '40px' }}>+</span>
-}
+const Template: Story<IProps> = () => (
+  <Tabs id="Tabs">
+    <Tab id="Child" active={true}>
+      {' '}
+      Child
+    </Tab>
+    <Tab id="Mother">Mother</Tab>
+    <Tab id="Father">Father</Tab>
+    <Tab id="Informant" disabled={true}>
+      Informant
+    </Tab>
+    <Tab id="Registration">Registration</Tab>
+  </Tabs>
+)
+
+export const TabsView = Template.bind({})

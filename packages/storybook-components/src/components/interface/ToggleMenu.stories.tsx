@@ -12,7 +12,7 @@
 import { Story, Meta } from '@storybook/react'
 import styled from 'styled-components'
 import { IToggleMenuItem, ToggleMenu } from './ToggleMenu'
-const { Settings, LogoutDark, ProfileIcon } = require('../icons')
+import { SettingsBlack, LogoutBlack, Avatar } from '../icons'
 
 interface Props {
   id: string
@@ -46,16 +46,16 @@ export const ToggleMenuView = Template.bind({})
 
 ToggleMenuView.args = {
   id: 'birth',
-  //menuHeader: header,
-  toggleButton: <ProfileIcon />,
+  menuHeader: header,
+  toggleButton: <Avatar />,
   menuItems: [
     {
-      icon: <Settings />,
+      icon: <SettingsBlack />,
       label: 'Settings',
       handler: () => alert('Settings')
     },
     {
-      icon: <LogoutDark />,
+      icon: <LogoutBlack />,
       label: 'Logout',
       handler: () => alert('Logout')
     }

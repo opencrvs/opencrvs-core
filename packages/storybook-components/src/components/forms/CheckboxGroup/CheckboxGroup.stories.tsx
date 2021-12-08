@@ -13,7 +13,7 @@ import { Meta, Story } from '@storybook/react'
 import { CheckboxGroup, ICheckboxGroup } from './CheckboxGroup'
 
 export default {
-  title: 'Components/forms/CheckboxGrup',
+  title: 'Components/forms/CheckboxGroup',
   component: CheckboxGroup
 } as Meta
 

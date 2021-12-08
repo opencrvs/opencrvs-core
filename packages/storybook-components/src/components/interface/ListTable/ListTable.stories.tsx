@@ -19,12 +19,6 @@ export default {
   component: ListTable
 } as Meta
 
-export enum ColumnContentAlignment {
-  LEFT = 'left',
-  RIGHT = 'right',
-  CENTER = 'center'
-}
-
 interface IProps {
   id?: string
   content: IDynamicValues[]

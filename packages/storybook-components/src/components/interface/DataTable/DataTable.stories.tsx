@@ -10,12 +10,61 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Meta, Story } from '@storybook/react'
+import { ListItem } from '..'
+import {
+  StatusCollected,
+  StatusGray,
+  StatusGreen,
+  StatusOrange
+} from '../../icons'
 import { DataTable, ISearchResultProps, ICustomState } from './DataTable'
 
 export default {
   title: 'Components/Interface/DataTable/DataTable',
   component: DataTable
 } as Meta
+
+const getDeclarationStatusIcon = (status: any) => {
+  switch (status) {
+    case 'application':
+      return <StatusOrange />
+    case 'registered':
+      return <StatusGreen />
+    case 'collected':
+      return <StatusCollected />
+    default:
+      return <StatusOrange />
+  }
+}
+
+const renderCell = (item: any, key: any) => {
+  const info = []
+  const status = []
+  const actions = []
+
+  info.push({ label: 'Name', value: item.name })
+  info.push({ label: 'D.o.B', value: item.dob })
+  info.push({ label: 'Date of application', value: item.date_of_application })
+  info.push({ label: 'Tracking ID', value: item.tracking_id })
+
+  actions.push({ label: 'review', handler: () => alert('Hello') })
+  status.push({ icon: <StatusGray />, label: item.event })
+  status.push({
+    icon: getDeclarationStatusIcon(item.declaration_status),
+    label: item.declaration_status
+  })
+  return (
+    <ListItem
+      actions={actions}
+      infoItems={info}
+      statusItems={status}
+      key={key}
+      expandedCellRenderer={() => <div>Dummy expanded view</div>}
+      index={1}
+      itemData={info[0]}
+    />
+  )
+}
 
 const Template: Story<ISearchResultProps> = args => <DataTable {...args} />
 export const DataTableView = Template.bind({})
@@ -229,7 +278,7 @@ DataTableView.args = {
       ]
     }
   },
-  cellRenderer: (data, key) => <></>,
+  cellRenderer: (data, key) => renderCell(data, key),
   resultLabel: 'Results',
   noResultText: 'No result to display'
 }

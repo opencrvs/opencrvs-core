@@ -44,7 +44,7 @@ CircleButtonView.args = {
   dark: true,
   onClick: () => alert('Circle button clicked'),
   children: (
-    <span style={{ color: '#fff', fontSize: '40px', lineHeight: '30px' }}>
+    <span style={{ color: '#111', fontSize: '40px', lineHeight: '30px' }}>
       +
     </span>
   )

@@ -41,6 +41,8 @@ export default {
 
 export const LeftPlusButton = Template.bind({})
 LeftPlusButton.args = {
+  id: 'myButton',
+  onClick: () => alert('Hello'),
   icon: () => <PlusTransparent />,
   align: ICON_ALIGNMENT.LEFT
 }
@@ -48,4 +50,11 @@ export const RightMinusButton = Template.bind({})
 RightMinusButton.args = {
   icon: () => <MinusTransparent />,
   align: ICON_ALIGNMENT.RIGHT
+}
+
+export const ButtonWithoutIcon = Template.bind({})
+ButtonWithoutIcon.args = {
+  id: 'myButton',
+  onClick: () => alert('Hello'),
+  children: 'Click here'
 }
