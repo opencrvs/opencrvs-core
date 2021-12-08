@@ -99,7 +99,7 @@ const ErrorText = styled.div`
 
 const StatusBox = styled.span`
   padding: 4px 8px;
-  ${({ theme }) => theme.fonts.smallPillStyle};
+  ${({ theme }) => theme.fonts.captionBold};
   border-radius: 2px;
   height: 30px;
   text-align: center;
