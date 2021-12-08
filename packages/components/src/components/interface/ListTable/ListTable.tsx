@@ -145,13 +145,13 @@ const TableFooter = styled(RowWrapper)`
 `
 
 const ContentWrapper = styled.span<{
-  width?: number
+  width: number
   alignment?: string
   sortable?: boolean
   totalWidth?: number
 }>`
   width: ${({ width, totalWidth }) =>
-    totalWidth && totalWidth > 100 ? (width || 0 * 100) / totalWidth : width}%;
+    totalWidth && totalWidth > 100 ? (width * 100) / totalWidth : width}%;
   flex-shrink: 0;
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
   padding-right: 10px;
@@ -159,13 +159,13 @@ const ContentWrapper = styled.span<{
   color: ${({ theme }) => theme.colors.tertiary};
 `
 const ValueWrapper = styled.span<{
-  width?: number
+  width: number
   totalWidth: number
   alignment?: string
   color?: string
 }>`
   width: ${({ width, totalWidth }) =>
-    totalWidth > 100 ? (width || 0 * 100) / totalWidth : width}%;
+    totalWidth > 100 ? (width * 100) / totalWidth : width}%;
 
   display: flex;
   justify-content: ${({ alignment }) =>
@@ -380,10 +380,7 @@ export class ListTable extends React.Component<
       fixedWidth
     } = this.props
     const totalItems = this.props.totalItems || 0
-    const totalWidth = columns.reduce(
-      (total, col) => (total += col.width || 0),
-      0
-    )
+    const totalWidth = columns.reduce((total, col) => (total += col.width), 0)
 
     return (
       <>

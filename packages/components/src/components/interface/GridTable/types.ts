@@ -34,7 +34,7 @@ type ReactChild = React.ReactNodeArray | ReactText
 
 export interface IColumn {
   label?: string | React.ReactNode
-  width?: number
+  width: number
   key: string
   errorValue?: string
   alignment?: ColumnContentAlignment

@@ -66,7 +66,7 @@ const RowWrapper = styled.div<{
 `
 
 const ContentWrapper = styled.span<{
-  width?: number
+  width: number
   alignment?: string
   color?: string
   paddingRight?: number | null
@@ -157,10 +157,10 @@ export class GridTable extends React.Component<
   renderActionBlock = (
     itemId: string,
     actions: IAction[],
+    width: number,
     key: number,
     idKey: number,
-    alignment?: ColumnContentAlignment,
-    width?: number
+    alignment?: ColumnContentAlignment
   ) => {
     if (this.props.expandable) {
       return (
@@ -302,10 +302,10 @@ export class GridTable extends React.Component<
                       return this.renderActionBlock(
                         item.id as string,
                         item[preference.key] as IAction[],
+                        preference.width,
                         index,
                         indx,
-                        preference.alignment,
-                        preference.width
+                        preference.alignment
                       )
                     } else if (preference.isIconColumn) {
                       return (
