@@ -84,6 +84,7 @@ export const colors = {
   chartAreaGradientStart: colorDictionary.greySmoky,
   chartAreaGradientEnd: colorDictionary.blueHover,
   dropdownHover: colorDictionary.blueHover,
+  loadingImage: colorDictionary.blueHover,
   menuBackground: colorDictionary.blackStormy,
   gradientDark: colorDictionary.nightshadeDark,
   gradientLight: colorDictionary.nightshadeLight,

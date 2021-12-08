@@ -51,6 +51,7 @@
     "react": "^16.10.1",
     "react-apollo": "^2.1.4",
     "react-dom": "^16.10.1",
+    "react-easy-crop": "^4.0.1",
     "react-idle-timer": "^4.2.11",
     "react-intl": "5.19.0",
     "react-moment": "^0.8.4",
