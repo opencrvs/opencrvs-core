@@ -9,11 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { loop, LoopReducer, Cmd, Loop } from 'redux-loop'
+import { loop, LoopReducer, Cmd, Loop, RunCmd } from 'redux-loop'
 import { push } from 'connected-react-router'
 import * as actions from '@login/login/actions'
 import { authApi } from '@login/utils/authApi'
 import * as routes from '@login/navigation/routes'
+import { merge } from 'lodash'
 
 export type LoginState = {
   submitting: boolean
@@ -37,11 +38,35 @@ export const initialState: LoginState = {
   stepOneDetails: { username: '' }
 }
 
+const CONFIG_CMD = Cmd.run<
+  actions.ApplicationConfigFailed,
+  actions.ApplicationConfigLoaded
+>(authApi.getApplicationConfig, {
+  successActionCreator: actions.applicationConfigLoadedAction,
+  failActionCreator: actions.applicationConfigFailedAction
+})
+const RETRY_TIMEOUT = 5000
+function delay(cmd: RunCmd<any>, time: number) {
+  return Cmd.list(
+    [Cmd.run(() => new Promise(resolve => setTimeout(resolve, time))), cmd],
+    { sequence: true }
+  )
+}
+
 export const loginReducer: LoopReducer<LoginState, actions.Action> = (
   state: LoginState = initialState,
   action: actions.Action
 ): LoginState | Loop<LoginState, actions.Action> => {
   switch (action.type) {
+    case actions.CONFIG_LOAD:
+      return loop(state, CONFIG_CMD)
+    case actions.CONFIG_LOADED:
+      return loop(
+        state,
+        Cmd.run(() => merge(window.config, action.payload))
+      )
+    case actions.CONFIG_LOAD_ERROR:
+      return loop(state, delay(CONFIG_CMD, RETRY_TIMEOUT))
     case actions.AUTHENTICATE:
       return loop(
         {
