@@ -729,6 +729,10 @@ export const conditionals: IConditionals = {
     expression:
       'values.role!=="LOCAL_REGISTRAR" && values.role!=="REGISTRATION_AGENT"'
   },
+  isRegistrarRoleSelected: {
+    action: 'hide',
+    expression: 'values.role!=="REGISTRATION_AGENT"'
+  },
   certCollectorOther: {
     action: 'hide',
     expression: 'values.type !== "OTHER"'
