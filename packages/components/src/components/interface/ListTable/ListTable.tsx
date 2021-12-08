@@ -101,19 +101,18 @@ const RowWrapper = styled.div<{
   }
   ${({ highlight, theme }) =>
     highlight && `:hover { background-color: ${theme.colors.dropdownHover};}`}
+
   & span:first-child {
     ${({ horizontalPadding }) =>
       horizontalPadding
-        ? `padding-right: 16px; padding-left:${horizontalPadding.lg}px;`
+        ? `padding-left:${horizontalPadding.lg}px;`
         : `padding-left: 12px;`}
-  }
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    & span:first-child {
+    @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
       ${({ horizontalPadding }) =>
         horizontalPadding
-          ? `padding-right: 16px; padding-left:${horizontalPadding.md}px;`
+          ? `padding-left:${horizontalPadding.md}px;`
           : `padding-left: 12px;`}
-    }
+  }
   }
 
   & span:last-child {
@@ -123,7 +122,6 @@ const RowWrapper = styled.div<{
         ? `padding-right:${horizontalPadding.lg}px;`
         : `padding-right: 12px;`}
   }
-
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     & span:last-child {
       text-align: right;

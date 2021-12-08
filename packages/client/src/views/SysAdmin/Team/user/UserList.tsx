@@ -89,9 +89,6 @@ const TableHeader = styled.div`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
   border-bottom: 1px solid ${({ theme }) => theme.colors.silverSand};
 `
-
-const UserCount = styled.div``
-
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors};
   ${({ theme }) => theme.fonts.bodyStyle};
@@ -152,6 +149,14 @@ const HeaderContainer = styled.div`
   }
 `
 
+const PhotoNameRoleContainer = styled.div`
+  display: flex;
+`
+
+const MarginPhotoRight = styled.span`
+  margin-right: 16px;
+`
+
 const LocationInfo = styled.div`
   padding: 8px 0px;
 `
@@ -178,6 +183,7 @@ const ChangeButton = styled(LinkButton)`
 `
 
 const NameRoleTypeContainer = styled.div`
+  margin-right: auto;
   display: flex;
   flex-direction: column;
 `
@@ -371,11 +377,68 @@ function UserListComponent(props: IProps) {
     )
   }
 
+  function getPhotoNameRoleType(
+    id: string,
+    name: string,
+    role: string,
+    type: string
+  ) {
+    return (
+      <PhotoNameRoleContainer>
+        <AvatarSmall />
+        <MarginPhotoRight />
+        <NameRoleTypeContainer>
+          <Name
+            id={`name-role-type-link-${id}`}
+            onClick={() => goToUserProfile(id)}
+          >
+            {name}
+          </Name>
+          <RoleType>{getRoleType(role, type)}</RoleType>
+        </NameRoleTypeContainer>
+      </PhotoNameRoleContainer>
+    )
+  }
+
+  function getPhotoNameType(id: string, name: string) {
+    return (
+      <>
+        <AvatarSmall />
+        <MarginPhotoRight />
+        <LinkButton
+          id={`name-link-${id}`}
+          onClick={() => goToUserProfile(id || '')}
+        >
+          {name}
+        </LinkButton>
+      </>
+    )
+  }
+
   function renderStatus(status?: string, underInvestigation?: boolean) {
     return (
       <>
         {underInvestigation && <SearchRed />}
         <Status status={status || 'pending'} />
+      </>
+    )
+  }
+
+  function getStatusMenuType(
+    user: GQLUser,
+    index: number,
+    status?: string,
+    underInvestigation?: boolean
+  ) {
+    const statusDetails = renderStatus(status, underInvestigation)
+    return (
+      <>
+        {statusDetails}
+        <ToggleMenu
+          id={`user-item-${index}-menu`}
+          toggleButton={<VerticalThreeDots />}
+          menuItems={getMenuItems(user)}
+        />
       </>
     )
   }
@@ -404,24 +467,21 @@ function UserListComponent(props: IProps) {
             (user.type && intl.formatMessage(userMessages[user.type])) || '-'
 
           return {
-            photo: <AvatarSmall />,
-            name: (
-              <LinkButton
-                id={`name-link-${user.id}`}
-                onClick={() => goToUserProfile(user.id || '')}
-              >
-                {name}
-              </LinkButton>
-            ),
+            photoNameType: getPhotoNameType(user.id || '', name),
             nameRoleType: getNameRoleType(user.id || '', name, role, type),
+            photoNameRoleType: getPhotoNameRoleType(
+              user.id || '',
+              name,
+              role,
+              type
+            ),
             roleType: getRoleType(role, type),
             status: renderStatus(user.status, user.underInvestigation),
-            menu: (
-              <ToggleMenu
-                id={`user-item-${index}-menu`}
-                toggleButton={<VerticalThreeDots />}
-                menuItems={getMenuItems(user)}
-              />
+            statusMenu: getStatusMenuType(
+              user,
+              index,
+              user.status,
+              user.underInvestigation
             )
           }
         }
@@ -467,17 +527,13 @@ function UserListComponent(props: IProps) {
     } else if (viewportWidth <= props.theme.grid.breakpoints.lg) {
       columns = columns.concat([
         {
-          label: '',
-          key: 'photo'
-        },
-        {
           label: intl.formatMessage(constantsMessages.name),
-          width: 66,
-          key: 'nameRoleType'
+          width: 75,
+          key: 'photoNameRoleType'
         },
         {
           label: intl.formatMessage(constantsMessages.status),
-          width: 26,
+          width: 25,
           alignment: ColumnContentAlignment.RIGHT,
           key: 'status'
         }
@@ -486,13 +542,9 @@ function UserListComponent(props: IProps) {
       if (viewOnly) {
         columns = columns.concat([
           {
-            label: '',
-            key: 'photo'
-          },
-          {
             label: intl.formatMessage(constantsMessages.name),
-            width: 27,
-            key: 'name'
+            width: 35,
+            key: 'photoNameType'
           },
           {
             label: intl.formatMessage(constantsMessages.labelRole),
@@ -501,7 +553,7 @@ function UserListComponent(props: IProps) {
           },
           {
             label: intl.formatMessage(constantsMessages.status),
-            width: 16,
+            width: 15,
             alignment: ColumnContentAlignment.RIGHT,
             key: 'status'
           }
@@ -509,13 +561,9 @@ function UserListComponent(props: IProps) {
       } else {
         columns = columns.concat([
           {
-            label: '',
-            key: 'photo'
-          },
-          {
             label: intl.formatMessage(constantsMessages.name),
-            width: 28,
-            key: 'name'
+            width: 35,
+            key: 'photoNameType'
           },
           {
             label: intl.formatMessage(constantsMessages.labelRole),
@@ -524,14 +572,9 @@ function UserListComponent(props: IProps) {
           },
           {
             label: intl.formatMessage(constantsMessages.status),
-            width: 21,
+            width: 25,
             alignment: ColumnContentAlignment.RIGHT,
-            key: 'status'
-          },
-          {
-            label: '',
-            width: 5,
-            key: 'menu'
+            key: 'statusMenu'
           }
         ])
       }
