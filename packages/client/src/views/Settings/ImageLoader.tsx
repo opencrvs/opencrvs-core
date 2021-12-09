@@ -11,7 +11,10 @@
  */
 import * as React from 'react'
 import styled from '@client/styledComponents'
-import { IImage } from '@client/utils/imageUtils'
+import { IImage, validateImage, ERROR_TYPES } from '@client/utils/imageUtils'
+import { ALLOWED_IMAGE_TYPE } from '@client/utils/constants'
+import { messages } from '@client/i18n/messages/views/imageUpload'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 
 const HiddenInput = styled.input`
   display: none;
@@ -20,23 +23,35 @@ const HiddenInput = styled.input`
 type IProps = {
   children: React.ReactNode
   onImageLoaded: (image: IImage) => void
-}
+  onError: (error: string) => void
+} & IntlShapeProps
 
-export function ImageLoader({ children, onImageLoaded, ...props }: IProps) {
+export function ImageLoaderComp({
+  children,
+  onImageLoaded,
+  onError,
+  intl,
+  ...props
+}: IProps) {
   const fileUploader = React.useRef<HTMLInputElement>(null)
 
-  const handleSelectFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSelectFile = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const { files } = event.target
     if (files && files.length > 0) {
-      const reader = new FileReader()
-      reader.onload = () => {
-        onImageLoaded({
-          type: files[0].type,
-          data: reader.result as string
-        })
+      try {
+        const image = await validateImage(files[0])
+        onImageLoaded({ type: files[0].type, data: image })
+        fileUploader.current!.value = ''
+      } catch (error) {
+        if (error.type === ERROR_TYPES.OVERSIZED) {
+          onError(intl.formatMessage(messages.overSized))
+        } else {
+          onError(intl.formatMessage(messages.imageFormat))
+        }
         fileUploader.current!.value = ''
       }
-      reader.readAsDataURL(files[0])
     }
   }
 
@@ -47,9 +62,11 @@ export function ImageLoader({ children, onImageLoaded, ...props }: IProps) {
         ref={fileUploader}
         id="image_file_uploader_field"
         type="file"
-        accept="image/*"
+        accept={ALLOWED_IMAGE_TYPE.join(',')}
         onChange={handleSelectFile}
       />
     </div>
   )
 }
+
+export const ImageLoader = injectIntl<'intl', IProps>(ImageLoaderComp)

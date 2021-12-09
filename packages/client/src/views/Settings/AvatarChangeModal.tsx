@@ -29,6 +29,10 @@ import { IStoreState } from '@client/store'
 import { connect } from 'react-redux'
 import { ImageLoader } from './ImageLoader'
 import { getCroppedImage, IImage } from '@client/utils/imageUtils'
+import {
+  withOnlineStatus,
+  IOnlineStatusProps
+} from '@client/views/RegistrationHome/LoadingIndicator'
 
 const Container = styled.div`
   align-self: center;
@@ -93,13 +97,14 @@ export const changeAvatarMutation = gql`
   }
 `
 
-type IProps = IntlShapeProps & {
-  showChangeAvatar: boolean
-  cancelAvatarChangeModal: () => void
-  image: IImage
-  onAvatarChanged: (img: IImage) => void
-  userDetails: IUserDetails | null
-}
+type IProps = IntlShapeProps &
+  IOnlineStatusProps & {
+    showChangeAvatar: boolean
+    cancelAvatarChangeModal: () => void
+    image: IImage
+    onAvatarChanged: (img: IImage) => void
+    userDetails: IUserDetails | null
+  }
 
 const DEFAULT_SIZE: Size = {
   height: 0,
@@ -120,12 +125,13 @@ function AvatarChangeModalComp({
   showChangeAvatar,
   intl,
   cancelAvatarChangeModal,
-  image,
+  image: imageProp,
   onAvatarChanged,
+  isOnline,
   userDetails
 }: IProps) {
   const [crop, setCrop] = React.useState<Point>(DEFAULT_CROP)
-  const [imgSrc, setImgSrc] = React.useState<IImage>()
+  const [imageState, setImage] = React.useState<IImage>()
   const [zoom, setZoom] = React.useState<number>(1)
   const [cropSize, setCropSize] = React.useState<Size>(DEFAULT_SIZE)
   const [croppedArea, setCroppedArea] = React.useState<Area>(DEFAULT_AREA)
@@ -135,7 +141,7 @@ function AvatarChangeModalComp({
   const resetCrop = () => {
     setCrop(DEFAULT_CROP)
     setCroppedArea(DEFAULT_AREA)
-    setImgSrc(undefined)
+    setImage(undefined)
     setZoom(1)
     setAvatar(undefined)
     setUploading(false)
@@ -168,11 +174,16 @@ function AvatarChangeModalComp({
               <PrimaryButton
                 key="apply"
                 id="apply_change"
-                disabled={!userDetails || !userDetails.userMgntUserID}
+                disabled={
+                  !userDetails ||
+                  !userDetails.userMgntUserID ||
+                  uploading ||
+                  !isOnline
+                }
                 onClick={async () => {
                   setUploading(true)
                   const croppedImage = await getCroppedImage(
-                    imgSrc ? imgSrc : image,
+                    imageState ? imageState : imageProp,
                     croppedArea
                   )
                   if (croppedImage) setAvatar(croppedImage)
@@ -198,8 +209,9 @@ function AvatarChangeModalComp({
         <ImageLoader
           onImageLoaded={(image) => {
             resetCrop()
-            setImgSrc(image)
+            setImage(image)
           }}
+          onError={error => console.log(error)}
         >
           <LinkButton>{intl.formatMessage(messages.changeImage)}</LinkButton>
         </ImageLoader>
@@ -213,7 +225,7 @@ function AvatarChangeModalComp({
         {!uploading && (
           <Wrapper>
             <Cropper
-              image={imgSrc ? imgSrc.data : image.data}
+              image={imageState ? imageState.data : imageProp.data}
               crop={crop}
               aspect={1}
               cropShape="round"
@@ -258,5 +270,5 @@ const mapStateToProps = (state: IStoreState) => {
 }
 
 export const AvatarChangeModal = connect(mapStateToProps)(
-  injectIntl(AvatarChangeModalComp)
+  injectIntl(withOnlineStatus(AvatarChangeModalComp))
 )
