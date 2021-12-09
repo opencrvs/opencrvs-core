@@ -309,6 +309,16 @@ services:
     networks:
       - overlay_net
 
+  config:
+    secrets:
+      - jwt-public-key.{{ts}}
+    environment:
+      - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
+    deploy:
+      replicas: 2
+    networks:
+      - overlay_net
+
   # Configure other dependencies with deployment specifc details
   hearth:
     environment:

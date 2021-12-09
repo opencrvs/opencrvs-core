@@ -12,6 +12,7 @@
 interface Window {
   config: {
     API_GATEWAY_URL: string
+    CONFIG_API_URL: String
     BACKGROUND_SYNC_BROADCAST_CHANNEL: string
     COUNTRY: string
     COUNTRY_LOGO_FILE: string
