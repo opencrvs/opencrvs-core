@@ -16,6 +16,7 @@ interface IImageUploadMessages
   uploadError: MessageDescriptor
   documentTypeRequired: MessageDescriptor
   overSized: MessageDescriptor
+  imageFormat: MessageDescriptor
 }
 
 const messagesToDefine: IImageUploadMessages = {
@@ -23,6 +24,12 @@ const messagesToDefine: IImageUploadMessages = {
     id: 'imageUploadOption.upload.error',
     defaultMessage:
       'File format not supported. Please attach a png, jpg or pdf (max 5mb)',
+    description: 'Show error messages while uploading'
+  },
+  imageFormat: {
+    id: 'imageUploadOption.upload.imageFormat',
+    defaultMessage:
+      'Image format not supported. Please attach a png or jpg (max 5mb)',
     description: 'Show error messages while uploading'
   },
   documentTypeRequired: {

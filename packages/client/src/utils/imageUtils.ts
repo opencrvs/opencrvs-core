@@ -10,10 +10,43 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Area } from 'react-easy-crop/types'
+import { ALLOWED_IMAGE_TYPE } from '@client/utils/constants'
 
 export type IImage = {
   type: string
   data: string
+}
+
+export const ERROR_TYPES = {
+  IMAGE_TYPE: 'imageType',
+  OVERSIZED: 'overSized'
+}
+
+export const getBase64String = (file: File) => {
+  return new Promise<string | ArrayBuffer>((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = () => {
+      if (reader.result) {
+        return resolve(reader.result)
+      }
+    }
+    reader.onerror = error => reject(error)
+  })
+}
+
+export const validateImage = async (uploadedImage: File) => {
+  if (!ALLOWED_IMAGE_TYPE.includes(uploadedImage.type)) {
+    throw new ErrorEvent(ERROR_TYPES.IMAGE_TYPE)
+  }
+
+  if (uploadedImage.size > 5242880) {
+    throw new ErrorEvent(ERROR_TYPES.OVERSIZED)
+  }
+
+  const fileAsBase64 = await getBase64String(uploadedImage)
+
+  return fileAsBase64.toString()
 }
 
 const createImage = (src: string): Promise<HTMLImageElement> =>

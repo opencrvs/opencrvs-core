@@ -368,7 +368,10 @@ class SettingsView extends React.Component<IProps, IState> {
               </Version>
             </Left>
             <Right>
-              <ImageLoader onImageLoaded={this.handleImageLoaded}>
+              <ImageLoader
+                onImageLoaded={this.handleImageLoaded}
+                onError={error => console.log(error)}
+              >
                 <Avatar
                   className="tablet"
                   avatar={userDetails?.avatar}
