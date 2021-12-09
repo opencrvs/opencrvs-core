@@ -158,6 +158,7 @@ interface IState {
   showChangeAvatar: boolean
   notificationSubject: NOTIFICATION_SUBJECT | null
   image: IImage
+  imageLoadingError: string
 }
 
 interface ILanguageOptions {
@@ -177,6 +178,7 @@ class SettingsView extends React.Component<IProps, IState> {
         type: '',
         data: ''
       },
+      imageLoadingError: '',
       notificationSubject: null
     }
   }
@@ -242,7 +244,6 @@ class SettingsView extends React.Component<IProps, IState> {
     this.setState({
       image
     })
-    this.toggleAvatarChangeModal()
   }
 
   render() {
@@ -370,7 +371,10 @@ class SettingsView extends React.Component<IProps, IState> {
             <Right>
               <ImageLoader
                 onImageLoaded={this.handleImageLoaded}
-                onError={error => console.log(error)}
+                onLoadingStarted={this.toggleAvatarChangeModal}
+                onError={imageLoadingError =>
+                  this.setState({ imageLoadingError })
+                }
               >
                 <Avatar
                   className="tablet"
@@ -429,7 +433,12 @@ class SettingsView extends React.Component<IProps, IState> {
         <AvatarChangeModal
           cancelAvatarChangeModal={this.toggleAvatarChangeModal}
           showChangeAvatar={this.state.showChangeAvatar}
-          image={this.state.image}
+          imgSrc={this.state.image}
+          onImgSrcChanged={image => this.setState({ image })}
+          error={this.state.imageLoadingError}
+          onErrorChanged={imageLoadingError =>
+            this.setState({ imageLoadingError })
+          }
           onAvatarChanged={this.changeAvatar}
         />
         <PasswordChangeModal

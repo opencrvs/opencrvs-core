@@ -23,12 +23,14 @@ const HiddenInput = styled.input`
 type IProps = {
   children: React.ReactNode
   onImageLoaded: (image: IImage) => void
+  onLoadingStarted?: () => void
   onError: (error: string) => void
 } & IntlShapeProps
 
 export function ImageLoaderComp({
   children,
   onImageLoaded,
+  onLoadingStarted,
   onError,
   intl,
   ...props
@@ -41,6 +43,7 @@ export function ImageLoaderComp({
     const { files } = event.target
     if (files && files.length > 0) {
       try {
+        onLoadingStarted && onLoadingStarted()
         const image = await validateImage(files[0])
         onImageLoaded({ type: files[0].type, data: image })
         fileUploader.current!.value = ''
