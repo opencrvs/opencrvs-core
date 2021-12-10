@@ -30,7 +30,8 @@ const messagesToDefine: IImageUploadMessages = {
     id: 'imageUploadOption.upload.imageFormat',
     defaultMessage:
       'Image format not supported. Please attach a png or jpg (max 5mb)',
-    description: 'Show error messages while uploading'
+    description:
+      'Show error message if the selected image type is not supported'
   },
   documentTypeRequired: {
     id: 'imageUploadOption.upload.documentType',
@@ -40,7 +41,7 @@ const messagesToDefine: IImageUploadMessages = {
   overSized: {
     id: 'imageUploadOption.upload.overSized',
     defaultMessage: 'File is too large. Please attach file less than 5mb',
-    description: 'Error message for Attachment size greater than 5MD.'
+    description: 'Error message for Attachment size greater than 5mb.'
   }
 }
 
