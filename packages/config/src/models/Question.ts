@@ -19,8 +19,13 @@ export enum FieldType {
 
 export const validFieldType = Object.values(FieldType)
 
+export const messageDescriptor = new Schema({
+  id: { type: String, required: true },
+  description: { type: String },
+  defaultMessage: { type: String }
+})
 export interface IQuestion {
-  label: string
+  label: typeof messageDescriptor
   placeholder: string
   maxLength?: number
   required: boolean
@@ -36,7 +41,7 @@ export interface IQuestion {
 export interface IQuestionModel extends IQuestion, Document {}
 
 const questionSchema = new Schema({
-  label: { type: String, required: true },
+  label: { type: messageDescriptor, required: true },
   placeholder: { type: String, required: false },
   maxLength: { type: String, required: false },
   fieldName: { type: String, required: true },

@@ -29,7 +29,11 @@ export default async function createQuestion(
 }
 
 export const requestSchema = Joi.object({
-  label: Joi.string().required(),
+  label: Joi.object({
+    id: Joi.string().required(),
+    defaultMessage: Joi.string(),
+    description: Joi.string()
+  }).required(),
   placeholder: Joi.string(),
   fieldName: Joi.string().required(),
   fieldType: Joi.string()
@@ -39,7 +43,8 @@ export const requestSchema = Joi.object({
   sectionPositionForField: Joi.number().required(),
   fhirSchema: Joi.string().required(),
   enabled: Joi.boolean().required(),
-  custom: Joi.boolean()
+  custom: Joi.boolean(),
+  required: Joi.boolean().required()
 })
 
 export const responseSchema = Joi.object({})
