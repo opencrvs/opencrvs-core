@@ -22,6 +22,9 @@ interface IProps extends React.HTMLAttributes<Element> {
 
 const AvatarImage = styled.img`
   border-radius: 50%;
+  &.clickable {
+    cursor: pointer;
+  }
 `
 
 export function AvatarLarge({ name, avatar, ...props }: IProps) {
