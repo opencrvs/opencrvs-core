@@ -201,7 +201,7 @@ function AvatarChangeModalComp({
       handleClose={handleCancel}
     >
       <Description>
-        {!error && intl.formatMessage(messages.resizeAvatarMsg)}
+        {!error && intl.formatMessage(messages.resizeAvatar)}
         {error && <Error>{error}</Error>}
         <ImageLoader
           onImageLoaded={image => {

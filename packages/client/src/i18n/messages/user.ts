@@ -70,7 +70,7 @@ interface IUserMessages
   changePasswordMessage: MessageDescriptor
   changeAvatar: MessageDescriptor
   changeImage: MessageDescriptor
-  resizeAvatarMsg: MessageDescriptor
+  resizeAvatar: MessageDescriptor
   newPasswordLabel: MessageDescriptor
   passwordUpdateFormValidationMsg: MessageDescriptor
   passwordLengthCharacteristicsForPasswordUpdateForm: MessageDescriptor
@@ -328,8 +328,8 @@ const messagesToDefine: IUserMessages = {
     defaultMessage: 'Change image',
     description: 'Change image label'
   },
-  resizeAvatarMsg: {
-    id: 'settings.resizeAvatar',
+  resizeAvatar: {
+    id: 'settings.changeAvatar.resizeAvatar',
     defaultMessage: 'Resize and position the chosen image.',
     description: 'Avatar resize and position message'
   },
