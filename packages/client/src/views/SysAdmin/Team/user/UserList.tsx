@@ -402,7 +402,7 @@ function UserListComponent(props: IProps) {
             (user.type && intl.formatMessage(userMessages[user.type])) || '-'
 
           return {
-            photo: <AvatarSmall name={name} />,
+            photo: <AvatarSmall name={name} avatar={user.avatar} />,
             name: (
               <LinkButton
                 id={`name-link-${user.id}`}

@@ -272,7 +272,8 @@ class UserProfileComponent extends React.Component<Props, State> {
           moment(new Date(Number(userData.creationDate))).format(
             'MMMM DD, YYYY'
           )) ||
-        ''
+        '',
+      avatar: userData.avatar
     }
   }
   getLoadingUserProfileView(hasError?: boolean) {
@@ -356,7 +357,7 @@ class UserProfileComponent extends React.Component<Props, State> {
                   }
                 >
                   <ContentWrapper>
-                    <UserAvatar name={user.name} />
+                    <UserAvatar name={user.name} avatar={user.avatar} />
                     <NameHolder>{user.name}</NameHolder>
                     <InformationHolder>
                       <InformationTitle paddingRight={70}>

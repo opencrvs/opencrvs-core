@@ -10,8 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled, { css } from 'styled-components'
-import { Avatar } from '../../icons'
+import styled from 'styled-components'
 
 const MenuMainWrapper = styled.div`
   width: 100%;
@@ -122,6 +121,7 @@ interface IProps {
   showMenu: boolean
   userDetails: IUserDetails
   menuItems: IMenuItem[]
+  avatar: React.ReactNode
   menuCollapse: () => void
 }
 
@@ -140,7 +140,7 @@ export class ExpandingMenu extends React.Component<IProps> {
           <Backdrop />
           <MenuContainer onClick={e => e.stopPropagation()}>
             <UserInfo>
-              <Avatar />
+              {this.props.avatar}
               <UserName>{this.props.userDetails.name}</UserName>
               <Role>{this.props.userDetails.role}</Role>
             </UserInfo>

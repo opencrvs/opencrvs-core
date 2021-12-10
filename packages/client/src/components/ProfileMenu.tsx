@@ -120,7 +120,10 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
         <ToggleMenu
           id="ProfileMenu"
           toggleButton={
-            <AvatarSmall name={this.getUserName(language, userDetails)} />
+            <AvatarSmall
+              name={this.getUserName(language, userDetails)}
+              avatar={userDetails?.avatar}
+            />
           }
           menuHeader={this.getMenuHeader(intl, language, userDetails)}
           menuItems={this.getMenuItems(intl)}

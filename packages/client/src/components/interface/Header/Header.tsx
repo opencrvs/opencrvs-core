@@ -78,6 +78,7 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
+import { Avatar } from '@client/components/Avatar'
 
 type IProps = IntlShapeProps & {
   theme: ITheme
@@ -206,11 +207,14 @@ class HeaderComp extends React.Component<IProps, IState> {
 
     const userInfo = { name, role }
 
+    const avatar = <Avatar name={name} avatar={userDetails?.avatar} />
+
     return (
       <>
         <Hamburger />
         <ExpandingMenu
           menuItems={menuItems}
+          avatar={avatar}
           userDetails={userInfo}
           showMenu={this.state.showMenu}
           menuCollapse={() => false}
