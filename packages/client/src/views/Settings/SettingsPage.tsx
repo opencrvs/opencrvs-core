@@ -377,12 +377,12 @@ class SettingsView extends React.Component<IProps, IState> {
                 }
               >
                 <Avatar
-                  className="tablet"
+                  className="tablet clickable"
                   avatar={userDetails?.avatar}
                   name={englishName}
                 />
                 <AvatarLarge
-                  className="desktop"
+                  className="desktop clickable"
                   avatar={userDetails?.avatar}
                   name={englishName}
                 />
