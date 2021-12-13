@@ -451,23 +451,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
       }
     }
 
-    const visitedGroupIds = this.updateVisitedGroups()
+    this.updateVisitedGroups()
 
-    this.props.writeApplication(
-      {
-        ...this.props.application,
-        visitedGroupIds
-      },
-      () => {
-        this.props.goToPageGroup(
-          pageRoute,
-          applicationId,
-          pageId,
-          groupId,
-          event
-        )
-      }
-    )
+    this.props.writeApplication(this.props.application, () => {
+      this.props.goToPageGroup(pageRoute, applicationId, pageId, groupId, event)
+    })
   }
 
   updateVisitedGroups = () => {
@@ -484,7 +472,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
         groupId: this.props.activeSectionGroup.id
       })
     }
-    return visitedGroups
+    this.props.application.visitedGroupIds = visitedGroups
   }
 
   getRedirectionTabOnSaveOrExit = () => {
