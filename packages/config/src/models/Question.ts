@@ -12,9 +12,33 @@
 import { Document, model, Schema } from 'mongoose'
 
 export enum FieldType {
-  Input = 'input',
-  Select = 'select',
-  Date = 'date'
+  TEXT = 'TEXT',
+  TEL = 'TEL',
+  NUMBER = 'NUMBER',
+  BIG_NUMBER = 'BIG_NUMBER',
+  RADIO_GROUP = 'RADIO_GROUP',
+  RADIO_GROUP_WITH_NESTED_FIELDS = 'RADIO_GROUP_WITH_NESTED_FIELDS',
+  INFORMATIVE_RADIO_GROUP = 'INFORMATIVE_RADIO_GROUP',
+  CHECKBOX_GROUP = 'CHECKBOX_GROUP',
+  DATE = 'DATE',
+  TEXTAREA = 'TEXTAREA',
+  SUBSECTION = 'SUBSECTION',
+  FIELD_GROUP_TITLE = 'FIELD_GROUP_TITLE',
+  LIST = 'LIST',
+  PARAGRAPH = 'PARAGRAPH',
+  DOCUMENTS = 'DOCUMENTS',
+  SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS',
+  SELECT_WITH_DYNAMIC_OPTIONS = 'SELECT_WITH_DYNAMIC_OPTIONS',
+  FIELD_WITH_DYNAMIC_DEFINITIONS = 'FIELD_WITH_DYNAMIC_DEFINITIONS',
+  IMAGE_UPLOADER_WITH_OPTIONS = 'IMAGE_UPLOADER_WITH_OPTIONS',
+  DOCUMENT_UPLOADER_WITH_OPTION = 'DOCUMENT_UPLOADER_WITH_OPTION',
+  SIMPLE_DOCUMENT_UPLOADER = 'SIMPLE_DOCUMENT_UPLOADER',
+  WARNING = 'WARNING',
+  LINK = 'LINK',
+  PDF_DOCUMENT_VIEWER = 'PDF_DOCUMENT_VIEWER',
+  DYNAMIC_LIST = 'DYNAMIC_LIST',
+  FETCH_BUTTON = 'FETCH_BUTTON',
+  LOCATION_SEARCH_INPUT = 'LOCATION_SEARCH_INPUT'
 }
 
 export const validFieldType = Object.values(FieldType)
@@ -49,7 +73,7 @@ const questionSchema = new Schema({
     type: String,
     required: true,
     enum: validFieldType,
-    default: FieldType.Input
+    default: FieldType.TEXT
   },
   fieldId: { type: String, unique: true, required: true },
   sectionPositionForField: { type: Number, required: true },
