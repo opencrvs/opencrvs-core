@@ -78,8 +78,14 @@ const DoubleLineValueWrapper = styled.div`
 const { useState } = React
 
 interface SortMap {
+  id: SORT_ORDER
+  status: SORT_ORDER
+  eventType: SORT_ORDER
+  dateOfEvent: SORT_ORDER
+  applicant: SORT_ORDER
   applicationStartedOn: SORT_ORDER
   nameIntl: SORT_ORDER
+  applicationStartedBy: SORT_ORDER
   timeLoggedInProgress: SORT_ORDER
   timeLoggedDeclared: SORT_ORDER
   timeLoggedRejected: SORT_ORDER
@@ -89,8 +95,14 @@ interface SortMap {
 }
 
 const INITIAL_SORT_MAP = {
+  id: SORT_ORDER.ASCENDING,
+  status: SORT_ORDER.ASCENDING,
+  eventType: SORT_ORDER.ASCENDING,
+  dateOfEvent: SORT_ORDER.ASCENDING,
+  applicant: SORT_ORDER.ASCENDING,
   applicationStartedOn: SORT_ORDER.DESCENDING,
   nameIntl: SORT_ORDER.ASCENDING,
+  applicationStartedBy: SORT_ORDER.ASCENDING,
   timeLoggedInProgress: SORT_ORDER.ASCENDING,
   timeLoggedDeclared: SORT_ORDER.ASCENDING,
   timeLoggedRejected: SORT_ORDER.ASCENDING,
@@ -181,22 +193,38 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           totalItems
         }),
         key: 'id',
-        width: 14
+        width: 14,
+        isSortable: true,
+        sortFunction: () => toggleSort('id'),
+        icon: columnToBeSort === 'id' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'id' ? true : false
       },
       {
         label: intl.formatMessage(constantsMessages.status),
         key: 'status',
-        width: 12
+        width: 12,
+        isSortable: true,
+        sortFunction: () => toggleSort('status'),
+        icon: columnToBeSort === 'status' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'status' ? true : false
       },
       {
         label: intl.formatMessage(constantsMessages.eventType),
         key: 'eventType',
-        width: 8
+        width: 8,
+        isSortable: true,
+        sortFunction: () => toggleSort('eventType'),
+        icon: columnToBeSort === 'eventType' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'eventType' ? true : false
       },
       {
         label: intl.formatMessage(constantsMessages.eventDate),
         key: 'dateOfEvent',
-        width: 12
+        width: 12,
+        isSortable: true,
+        sortFunction: () => toggleSort('dateOfEvent'),
+        icon: columnToBeSort === 'dateOfEvent' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'dateOfEvent' ? true : false
       },
       {
         label: intl.formatMessage(constantsMessages.nameDefaultLocale),
@@ -204,7 +232,8 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         width: 12,
         isSortable: true,
         sortFunction: () => toggleSort('nameIntl'),
-        icon: columnToBeSort === 'nameIntl' ? <ArrowDownBlue /> : <></>
+        icon: columnToBeSort === 'nameIntl' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'nameIntl' ? true : false
       },
       {
         label: intl.formatMessage(constantsMessages.nameRegionalLocale),
@@ -214,7 +243,11 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(formMessages.applicantName),
         key: 'applicant',
-        width: 14
+        width: 14,
+        isSortable: true,
+        sortFunction: () => toggleSort('applicant'),
+        icon: columnToBeSort === 'applicant' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'applicant' ? true : false
       },
       {
         label: intl.formatMessage(constantsMessages.applicationStarted),
@@ -223,12 +256,18 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         isSortable: true,
         sortFunction: () => toggleSort('applicationStartedOn'),
         icon:
-          columnToBeSort === 'applicationStartedOn' ? <ArrowDownBlue /> : <></>
+          columnToBeSort === 'applicationStartedOn' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'applicationStartedOn' ? true : false
       },
       {
         label: intl.formatMessage(constantsMessages.applicationStartedBy),
         key: 'applicationStartedBy',
-        width: 10
+        width: 10,
+        isSortable: true,
+        sortFunction: () => toggleSort('applicationStartedBy'),
+        icon:
+          columnToBeSort === 'applicationStartedBy' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'applicationStartedBy' ? true : false
       },
       {
         label: intl.formatMessage(constantsMessages.timeInProgress),
@@ -237,7 +276,8 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         isSortable: true,
         sortFunction: () => toggleSort('timeLoggedInProgress'),
         icon:
-          columnToBeSort === 'timeLoggedInProgress' ? <ArrowDownBlue /> : <></>
+          columnToBeSort === 'timeLoggedInProgress' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'timeLoggedInProgress' ? true : false
       },
       {
         label: intl.formatMessage(constantsMessages.timeReadyForReview),
@@ -246,7 +286,8 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         isSortable: true,
         sortFunction: () => toggleSort('timeLoggedDeclared'),
         icon:
-          columnToBeSort === 'timeLoggedDeclared' ? <ArrowDownBlue /> : <></>
+          columnToBeSort === 'timeLoggedDeclared' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'timeLoggedDeclared' ? true : false
       },
       {
         label: intl.formatMessage(constantsMessages.timeRequireUpdates),
@@ -255,7 +296,8 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         isSortable: true,
         sortFunction: () => toggleSort('timeLoggedRejected'),
         icon:
-          columnToBeSort === 'timeLoggedRejected' ? <ArrowDownBlue /> : <></>
+          columnToBeSort === 'timeLoggedRejected' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'timeLoggedRejected' ? true : false
       },
       {
         label: intl.formatMessage(constantsMessages.timeWatingApproval),
@@ -264,7 +306,8 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         isSortable: true,
         sortFunction: () => toggleSort('timeLoggedValidated'),
         icon:
-          columnToBeSort === 'timeLoggedValidated' ? <ArrowDownBlue /> : <></>
+          columnToBeSort === 'timeLoggedValidated' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'timeLoggedValidated' ? true : false
       },
       {
         label: intl.formatMessage(
@@ -279,7 +322,9 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
             <ArrowDownBlue />
           ) : (
             <></>
-          )
+          ),
+        isSorted:
+          columnToBeSort === 'timeLoggedWaitingValidation' ? true : false
       },
       {
         label: intl.formatMessage(constantsMessages.timeReadyToPrint),
@@ -289,7 +334,8 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         isSortable: true,
         sortFunction: () => toggleSort('timeLoggedRegistered'),
         icon:
-          columnToBeSort === 'timeLoggedRegistered' ? <ArrowDownBlue /> : <></>
+          columnToBeSort === 'timeLoggedRegistered' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'timeLoggedRegistered' ? true : false
       }
     ] as IColumn[]
     return keys.filter(item => {
@@ -486,17 +532,12 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
             )
           }
           return {
-            id: (
-              <LinkButton>
-                {eventProgress.registration &&
-                  eventProgress.registration.trackingId}
-              </LinkButton>
-            ),
+            id:
+              eventProgress.registration &&
+              eventProgress.registration.trackingId,
             status,
             eventType: event,
-            dateOfEvent: formateDateWithRelationalText(
-              eventProgress.dateOfEvent
-            ),
+            dateOfEvent: eventProgress.dateOfEvent,
             nameIntl,
             nameLocal,
             applicant:
@@ -516,15 +557,11 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                 .getTime()
                 .toString(),
             applicationStartedBy:
-              starterPractitionerRole !== '' ? (
-                <DoubleLineValueWrapper>
-                  {starterPractitionerName}
-                  <br />
-                  {`(${starterPractitionerRole})`}
-                </DoubleLineValueWrapper>
-              ) : (
-                starterPractitionerName
-              ),
+              starterPractitionerRole !== ''
+                ? starterPractitionerName +
+                  '\n' +
+                  `(${starterPractitionerRole})`
+                : starterPractitionerName,
             timeLoggedInProgress,
             timeLoggedDeclared,
             timeLoggedRejected,
@@ -541,11 +578,20 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       content,
       columnToBeSort === 'nameIntl'
         ? [content => content[columnToBeSort]!.toString().toLowerCase()]
+        : columnToBeSort === 'applicationStartedOn'
+        ? ['applicationStartedOnTime']
         : [columnToBeSort],
       [sortOrder[columnToBeSort]]
     ).map((row, idx) => {
       return {
         ...row,
+        id: <LinkButton>{row.id}</LinkButton>,
+        applicationStartedBy: (
+          <DoubleLineValueWrapper>
+            {row.applicationStartedBy}
+          </DoubleLineValueWrapper>
+        ),
+        dateOfEvent: formateDateWithRelationalText(row.dateOfEvent),
         timeLoggedInProgress: getTimeDurationElements(
           Number(row.timeLoggedInProgress),
           'in_prog_tltp',

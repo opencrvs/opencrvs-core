@@ -42,6 +42,7 @@ export interface IColumn {
   isIconColumn?: boolean
   color?: string
   isSortable?: boolean
+  isSorted?: boolean
   icon?: JSX.Element | React.ReactNode
   sortFunction?: (key: string) => void
 }

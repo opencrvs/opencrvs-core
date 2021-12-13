@@ -205,6 +205,7 @@ class UserAuditListComponent extends React.Component<Props, State> {
           width: 22,
           key: 'auditTime',
           isSortable: true,
+          isSorted: true,
           icon: <ArrowDownBlue />,
           alignment: ColumnContentAlignment.RIGHT,
           sortFunction: () => this.toggleAuditListSortOrder()

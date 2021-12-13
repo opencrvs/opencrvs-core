@@ -59,12 +59,20 @@ interface SortMap {
   name: SORT_ORDER
   startMonth: SORT_ORDER
   avgCompleteApplicationTime: SORT_ORDER
+  type: SORT_ORDER
+  officeName: SORT_ORDER
+  inProgressApplications: SORT_ORDER
+  rejectedApplications: SORT_ORDER
 }
 const INITIAL_SORT_MAP = {
   totalApplications: SORT_ORDER.DESCENDING,
   name: SORT_ORDER.ASCENDING,
   startMonth: SORT_ORDER.ASCENDING,
-  avgCompleteApplicationTime: SORT_ORDER.ASCENDING
+  avgCompleteApplicationTime: SORT_ORDER.ASCENDING,
+  type: SORT_ORDER.ASCENDING,
+  officeName: SORT_ORDER.ASCENDING,
+  inProgressApplications: SORT_ORDER.ASCENDING,
+  rejectedApplications: SORT_ORDER.ASCENDING
 }
 
 interface ISearchParams {
@@ -172,17 +180,26 @@ function FieldAgentListComponent(props: IProps) {
         width: 20,
         isSortable: true,
         sortFunction: () => toggleSort('name'),
-        icon: columnToBeSort === 'name' ? <ArrowDownBlue /> : <></>
+        icon: columnToBeSort === 'name' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'name' ? true : false
       },
       {
         key: 'type',
         label: intl.formatMessage(messages.typeColumnHeader),
-        width: 12
+        width: 12,
+        isSortable: true,
+        sortFunction: () => toggleSort('type'),
+        icon: columnToBeSort === 'type' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'type' ? true : false
       },
       {
         key: 'officeName',
         label: intl.formatMessage(messages.officeColumnHeader),
-        width: 20
+        width: 20,
+        isSortable: true,
+        sortFunction: () => toggleSort('officeName'),
+        icon: columnToBeSort === 'officeName' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'officeName' ? true : false
       },
       {
         key: 'startMonth',
@@ -190,7 +207,8 @@ function FieldAgentListComponent(props: IProps) {
         width: 12,
         isSortable: true,
         sortFunction: () => toggleSort('startMonth'),
-        icon: columnToBeSort === 'startMonth' ? <ArrowDownBlue /> : <></>
+        icon: columnToBeSort === 'startMonth' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'startMonth' ? true : false
       },
       {
         key: 'totalApplications',
@@ -200,14 +218,25 @@ function FieldAgentListComponent(props: IProps) {
         width: 12,
         isSortable: true,
         sortFunction: () => toggleSort('totalApplications'),
-        icon: columnToBeSort === 'totalApplications' ? <ArrowDownBlue /> : <></>
+        icon:
+          columnToBeSort === 'totalApplications' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'totalApplications' ? true : false
       },
       {
         key: 'inProgressApplications',
         label: intl.formatMessage(messages.totalInProgressColumnHeader, {
           linebreak: <br key={'inProgressApplications-break'} />
         }),
-        width: 12
+        width: 12,
+        isSortable: true,
+        sortFunction: () => toggleSort('inProgressApplications'),
+        icon:
+          columnToBeSort === 'inProgressApplications' ? (
+            <ArrowDownBlue />
+          ) : (
+            <></>
+          ),
+        isSorted: columnToBeSort === 'inProgressApplications' ? true : false
       },
       {
         key: 'avgCompleteApplicationTime',
@@ -222,13 +251,19 @@ function FieldAgentListComponent(props: IProps) {
             <ArrowDownBlue />
           ) : (
             <></>
-          )
+          ),
+        isSorted: columnToBeSort === 'avgCompleteApplicationTime' ? true : false
       },
       {
         key: 'rejectedApplications',
         label: intl.formatMessage(messages.totalRejectedColumnHeader),
         width: 10,
-        alignment: ColumnContentAlignment.RIGHT
+        alignment: ColumnContentAlignment.RIGHT,
+        isSortable: true,
+        sortFunction: () => toggleSort('rejectedApplications'),
+        icon:
+          columnToBeSort === 'rejectedApplications' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'rejectedApplications' ? true : false
       }
     ]
   }

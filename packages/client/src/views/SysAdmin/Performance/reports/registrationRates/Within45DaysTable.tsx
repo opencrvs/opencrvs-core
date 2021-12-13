@@ -159,7 +159,8 @@ function Within45DaysTableComponent(props: ITableProps) {
           width: 40,
           isSortable: true,
           sortFunction: () => toggleSort(firstColProp.sortKey),
-          icon: <ArrowDownBlue />
+          icon: <ArrowDownBlue />,
+          isSorted: true
         },
         {
           key: 'totalRegistered',
