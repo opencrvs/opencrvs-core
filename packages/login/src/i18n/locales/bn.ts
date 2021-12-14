@@ -50,7 +50,7 @@ export const BENGALI_STATE = {
       'নাগরিক নিবন্ধনের ক্ষেত্রে দেশের নির্দিষ্ট এলাকার কর্মদক্ষতা বিশ্লেষণ করুন',
     'resend.sms': 'এসএমএস পুনরায় পাঠান',
     'resetCredentials.form.title':
-      '{forgottenItem, select, username {ব্যবহারকারীর নাম পুনরুদ্ধারের অনুরোধ} password {পাসওয়ার্ড পুনরায় সেট করুন}}',
+      '{forgottenItem, select, username {ব্যবহারকারীর নাম পুনরুদ্ধারের অনুরোধ} password {পাসওয়ার্ড পুনরায় সেট করুন} other {}}',
     'resetCredentials.forgottenItem.form.title': 'লগইন হচ্ছেনা',
     'resetCredentials.forgottenItem.form.body.header': 'আপনি কি ভুলে গেছেন',
     'resetCredentials.label.field.verificationCode': 'যাচাইকরণ কোড (৬ ডিজিট)',
@@ -72,9 +72,9 @@ export const BENGALI_STATE = {
     'resetCredentials.securityQuestion.form.body.subheader':
       'আপনি অ্যাকাউন্ট সেট আপ করার সময় যে সুরক্ষা প্রশ্নগুলি চয়ন করেছিলেন এটি তার মধ্যে একটি',
     'resetCredentials.success.page.title':
-      '{forgottenItem, select, username {ব্যবহারকারীর নাম পাঠানো হয়েছে} password {সফলভাবে পাসওয়ার্ড পুনরায় সেট হয়েছে}}',
+      '{forgottenItem, select, username {ব্যবহারকারীর নাম পাঠানো হয়েছে} password {সফলভাবে পাসওয়ার্ড পুনরায় সেট হয়েছে} other {}}',
     'resetCredentials.success.page.subtitle':
-      '{forgottenItem, select, username {আপনার ব্যবহারকারীর নামের জন্য আপনার ফোনটি পরীক্ষা করুন} password {আপনি এখন আপনার নতুন পাসওয়ার্ড দিয়ে লগইন করতে পারেন}}',
+      '{forgottenItem, select, username {আপনার ব্যবহারকারীর নামের জন্য আপনার ফোনটি পরীক্ষা করুন} password {আপনি এখন আপনার নতুন পাসওয়ার্ড দিয়ে লগইন করতে পারেন} other {}}',
     'misc.newPass.header': 'নতুন একটি পাসওয়ার্ড পছন্দ করুন',
     'misc.newPass.instruction':
       'আমরা আপনাকে একটি অনন্য পাসওয়ার্ড তৈরির সুপারিশ করি - যেটি আপনি অন্য কোনও ওয়েবসাইট বা অ্যাপ্লিকেশনের জন্য ব্যবহার করেন না। বিঃদ্রঃ. আপনি এটি একবার পরিবর্তন করার পরে আপনার পুরানো পাসওয়ার্ড পুনরায় ব্যবহার করতে পারবেন না।',
