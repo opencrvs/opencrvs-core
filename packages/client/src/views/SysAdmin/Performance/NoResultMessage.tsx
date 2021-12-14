@@ -33,7 +33,7 @@ const StyledHeader = styled.h5`
 `
 interface NoResultMessageProps {
   id?: string
-  searchedLocation: string
+  searchedLocation: string | undefined
 }
 
 interface DispatchProps {

@@ -49,7 +49,7 @@ const ReportWrapper = styled.div`
 `
 
 interface ReportProps {
-  selectedLocation: ISearchLocation
+  selectedLocation: ISearchLocation | undefined
   timeRange: { start: Date; end: Date }
   eventType: Event
   goBack: typeof goBack
@@ -63,9 +63,7 @@ interface IMetricsQueryResult {
 type Props = ReportProps & WrappedComponentProps & RouteComponentProps<{}>
 
 function ReportComponent(props: Props) {
-  const [selectedLocation] = useState<ISearchLocation>(props.selectedLocation)
-
-  const { timeRange, eventType } = props
+  const { selectedLocation, timeRange, eventType } = props
   const { start, end } = timeRange
 
   const title = moment(start).format('MMMM YYYY')
@@ -82,7 +80,7 @@ function ReportComponent(props: Props) {
           event: eventType,
           timeStart: start.toISOString(),
           timeEnd: end.toISOString(),
-          locationId: selectedLocation.id
+          locationId: selectedLocation && selectedLocation.id
         }}
       >
         {({
@@ -105,7 +103,9 @@ function ReportComponent(props: Props) {
             return (
               <NoResultMessage
                 id="reports"
-                searchedLocation={selectedLocation.displayLabel}
+                searchedLocation={
+                  selectedLocation && selectedLocation.displayLabel
+                }
               />
             )
           } else {
@@ -174,7 +174,7 @@ function mapStateToProps(state: IStoreState, props: Props) {
       start: new Date(),
       end: new Date()
     },
-    selectedLocation: historyState!.selectedLocation,
+    selectedLocation: historyState && historyState.selectedLocation,
     offlineResources: getOfflineData(state)
   }
 }
