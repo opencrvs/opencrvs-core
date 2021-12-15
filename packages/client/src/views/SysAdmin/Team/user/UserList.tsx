@@ -97,7 +97,7 @@ const ErrorText = styled.div`
 `
 
 const StatusBox = styled.span`
-  padding: 2px 6px 4px 6px;
+  padding: 4px 8px;
   border-radius: 4px;
   height: 30px;
   text-align: center;
@@ -519,28 +519,28 @@ function UserListComponent(props: IProps) {
       columns = columns.concat([
         {
           label: intl.formatMessage(constantsMessages.name),
-          width: 70,
+          width: 65,
           key: 'nameRoleType'
         },
         {
           label: intl.formatMessage(constantsMessages.status),
-          width: 30,
+          width: 35,
           alignment: ColumnContentAlignment.RIGHT,
-          key: 'status'
+          key: 'statusMenu'
         }
       ])
     } else if (viewportWidth <= props.theme.grid.breakpoints.lg) {
       columns = columns.concat([
         {
           label: intl.formatMessage(constantsMessages.name),
-          width: 75,
+          width: 70,
           key: 'photoNameRoleType'
         },
         {
           label: intl.formatMessage(constantsMessages.status),
-          width: 25,
+          width: 30,
           alignment: ColumnContentAlignment.RIGHT,
-          key: 'status'
+          key: 'statusMenu'
         }
       ])
     } else {
@@ -553,14 +553,14 @@ function UserListComponent(props: IProps) {
           },
           {
             label: intl.formatMessage(constantsMessages.labelRole),
-            width: 50,
+            width: 45,
             key: 'roleType'
           },
           {
             label: intl.formatMessage(constantsMessages.status),
-            width: 15,
+            width: 20,
             alignment: ColumnContentAlignment.RIGHT,
-            key: 'status'
+            key: 'statusMenu'
           }
         ])
       } else {
