@@ -188,6 +188,11 @@ const NameRoleTypeContainer = styled.div`
   flex-direction: column;
 `
 
+const StatusMenu = styled.div`
+  display: flex;
+  align-items: center;
+`
+
 const Name = styled(LinkButton)`
   align-self: flex-start;
   text-align: left;
@@ -432,14 +437,14 @@ function UserListComponent(props: IProps) {
   ) {
     const statusDetails = renderStatus(status, underInvestigation)
     return (
-      <>
+      <StatusMenu>
         {statusDetails}
         <ToggleMenu
           id={`user-item-${index}-menu`}
           toggleButton={<VerticalThreeDots />}
           menuItems={getMenuItems(user)}
         />
-      </>
+      </StatusMenu>
     )
   }
 
