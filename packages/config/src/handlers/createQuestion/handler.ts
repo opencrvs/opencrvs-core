@@ -28,13 +28,21 @@ export default async function createQuestion(
   return h.response().code(201)
 }
 
+const messageDescriptorSchema = Joi.object({
+  id: Joi.string().required(),
+  defaultMessage: Joi.string(),
+  description: Joi.string()
+})
+
 export const requestSchema = Joi.object({
-  label: Joi.object({
-    id: Joi.string().required(),
-    defaultMessage: Joi.string(),
-    description: Joi.string()
-  }).required(),
-  placeholder: Joi.string(),
+  label: messageDescriptorSchema.required(),
+  options: Joi.array().items(
+    Joi.object({
+      label: messageDescriptorSchema.required(),
+      value: Joi.string().required()
+    })
+  ),
+  placeholder: Joi.string().allow(''),
   fieldName: Joi.string().required(),
   fieldType: Joi.string()
     .valid(...validFieldType)
@@ -44,7 +52,8 @@ export const requestSchema = Joi.object({
   fhirSchema: Joi.string().required(),
   enabled: Joi.boolean().required(),
   custom: Joi.boolean(),
-  required: Joi.boolean().required()
+  required: Joi.boolean().required(),
+  maxLength: Joi.number().optional()
 })
 
 export const responseSchema = Joi.object({})

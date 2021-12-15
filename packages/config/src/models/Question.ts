@@ -48,6 +48,11 @@ export const messageDescriptor = new Schema({
   description: { type: String },
   defaultMessage: { type: String }
 })
+
+export const dropdownOption = new Schema({
+  label: { type: messageDescriptor, required: true },
+  value: { type: String, required: true }
+})
 export interface IQuestion {
   label: typeof messageDescriptor
   placeholder: string
@@ -67,7 +72,8 @@ export interface IQuestionModel extends IQuestion, Document {}
 const questionSchema = new Schema({
   label: { type: messageDescriptor, required: true },
   placeholder: { type: String, required: false },
-  maxLength: { type: String, required: false },
+  maxLength: { type: Number, required: false },
+  options: { type: [dropdownOption], required: false },
   fieldName: { type: String, required: true },
   fieldType: {
     type: String,
