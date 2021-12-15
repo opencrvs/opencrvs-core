@@ -30,7 +30,7 @@ const ResponsiveContainer = styled.div`
     display: block;
   }
 `
-export interface IProps {
+interface IProps {
   id?: string
   title: string
   items: IDataProps[]

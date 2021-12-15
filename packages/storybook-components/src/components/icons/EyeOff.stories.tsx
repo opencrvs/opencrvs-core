@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Meta, Story } from '@storybook/react'
+import React from 'react'
 import { EyeOff } from './EyeOff'
 
 export default {

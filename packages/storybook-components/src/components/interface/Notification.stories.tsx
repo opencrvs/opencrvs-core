@@ -10,7 +10,15 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Meta, Story } from '@storybook/react'
-import { Notification, IProps, NOTIFICATION_TYPE } from './Notification'
+import { Notification, NOTIFICATION_TYPE } from './Notification'
+
+interface IProps {
+  id?: string
+  show: boolean
+  type?: NOTIFICATION_TYPE
+  callback?: (event: React.MouseEvent<HTMLDivElement>) => void
+  className?: string
+}
 
 const Template: Story<IProps> = args => <Notification {...args} />
 export const NotificationView = Template.bind({})

@@ -10,8 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Meta, Story } from '@storybook/react'
-import { MinusTransparent, PlusTransparent } from '../icons'
+import { EyeOff, EyeOn } from '../icons'
 import { PasswordInput, IPasswordInputProps } from './PasswordInput'
+import React from 'react'
 
 export default {
   title: 'Components/forms/PasswordInput',
@@ -22,6 +23,6 @@ const Template: Story<IPasswordInputProps> = args => <PasswordInput {...args} />
 
 export const PasswordInputView = Template.bind({})
 PasswordInputView.args = {
-  showIcon: <PlusTransparent />,
-  hideIcon: <MinusTransparent />
+  showIcon: <EyeOn />,
+  hideIcon: <EyeOff />
 }

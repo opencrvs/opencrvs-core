@@ -21,7 +21,7 @@ export interface IState {
   expand: boolean
 }
 
-export interface IProps {
+interface IProps {
   processingText: string
   outboxText: string
   theme: ITheme

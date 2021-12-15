@@ -10,7 +10,16 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Meta, Story } from '@storybook/react'
-import { DataSection, IProps } from './DataSection'
+import { DataSection } from './DataSection'
+import { IDataProps, DataRow } from './DataRow'
+import React from 'react'
+
+interface IProps {
+  id?: string
+  title: string
+  items: IDataProps[]
+  responsiveContents?: React.ReactNode
+}
 
 export default {
   title: 'Components/Interface/ViewData/DataSection',

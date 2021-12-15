@@ -118,7 +118,7 @@ interface IMenuItem {
   secondary?: boolean
   onClick: (e: React.MouseEvent) => void
 }
-export interface IProps {
+interface IProps {
   showMenu: boolean
   userDetails: IUserDetails
   menuItems: IMenuItem[]

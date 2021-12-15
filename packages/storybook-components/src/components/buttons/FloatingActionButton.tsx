@@ -40,8 +40,7 @@ const ButtonStyled = styled.button`
     color: ${({ theme }) => theme.colors.placeholder};
   }
 `
-export interface IButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface IButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: () => React.ReactNode
 }
 

@@ -9,19 +9,18 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Meta, Story } from '@storybook/react'
-import React from 'react'
-import { ProgressBar, IProgressBarProps } from './ProgressBar'
+import { ReportHandler } from 'web-vitals'
 
-export default {
-  title: 'Components/forms/ProgressBar',
-  component: ProgressBar
-} as Meta
-
-const Template: Story<IProgressBarProps> = args => <ProgressBar {...args} />
-
-export const ProgressBarView = Template.bind({})
-ProgressBarView.args = {
-  totalPoints: 900,
-  currentPoints: 100
+const reportWebVitals = (onPerfEntry?: ReportHandler) => {
+  if (onPerfEntry && onPerfEntry instanceof Function) {
+    import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
+      getCLS(onPerfEntry)
+      getFID(onPerfEntry)
+      getFCP(onPerfEntry)
+      getLCP(onPerfEntry)
+      getTTFB(onPerfEntry)
+    })
+  }
 }
+
+export default reportWebVitals

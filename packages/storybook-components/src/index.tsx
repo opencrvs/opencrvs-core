@@ -9,19 +9,20 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Meta, Story } from '@storybook/react'
 import React from 'react'
-import { ProgressBar, IProgressBarProps } from './ProgressBar'
+import ReactDOM from 'react-dom'
+import './index.css'
+import App from './App'
+import reportWebVitals from './reportWebVitals'
 
-export default {
-  title: 'Components/forms/ProgressBar',
-  component: ProgressBar
-} as Meta
+ReactDOM.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+  document.getElementById('root')
+)
 
-const Template: Story<IProgressBarProps> = args => <ProgressBar {...args} />
-
-export const ProgressBarView = Template.bind({})
-ProgressBarView.args = {
-  totalPoints: 900,
-  currentPoints: 100
-}
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals()

@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Story, Meta } from '@storybook/react'
-import { PlusTransparent } from '../icons'
-import { FloatingActionButton, IButtonProps } from './FloatingActionButton'
+import { FloatingActionButton, IButtonProps } from '.'
+import React from 'react'
 
 export default {
   title: 'Components/buttons/FloatingActionButton',

@@ -11,6 +11,7 @@
  */
 import { Meta, Story } from '@storybook/react'
 import { EyeOn } from './EyeOn'
+import React from 'react'
 
 export default {
   title: 'Components/icons/EyeOn',

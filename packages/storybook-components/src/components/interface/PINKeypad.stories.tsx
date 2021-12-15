@@ -10,7 +10,15 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Meta, Story } from '@storybook/react'
-import { PINKeypad, IProps } from './PINKeypad'
+import { PINKeypad } from './PINKeypad'
+
+interface IProps {
+  id?: string
+  onComplete: (pin: string) => void
+  forgotPinComponent?: React.ReactNode
+  pin?: string
+  ref?: any
+}
 
 const Template: Story<IProps> = args => <PINKeypad {...args} />
 export const PINKeypadView = Template.bind({})

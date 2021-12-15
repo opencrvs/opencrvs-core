@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import React from 'react'
 import { Story, Meta } from '@storybook/react'
 
 import { Action, IActionProps } from './Action'

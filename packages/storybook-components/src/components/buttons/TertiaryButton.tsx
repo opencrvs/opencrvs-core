@@ -77,13 +77,12 @@ const ButtonBase = styled.button`
   -webkit-tap-highlight-color: transparent;
   padding: 0;
 `
-export interface IButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface IButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: () => React.ReactNode
   align?: ICON_ALIGNMENT
 }
 
-export function Button({
+function Button({
   icon,
   children,
   align = ICON_ALIGNMENT.RIGHT,

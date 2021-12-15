@@ -9,19 +9,29 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Meta, Story } from '@storybook/react'
 import React from 'react'
-import { ProgressBar, IProgressBarProps } from './ProgressBar'
+import logo from './logo.svg'
+import './App.css'
 
-export default {
-  title: 'Components/forms/ProgressBar',
-  component: ProgressBar
-} as Meta
-
-const Template: Story<IProgressBarProps> = args => <ProgressBar {...args} />
-
-export const ProgressBarView = Template.bind({})
-ProgressBarView.args = {
-  totalPoints: 900,
-  currentPoints: 100
+function App() {
+  return (
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <p>
+          Edit <code>src/App.tsx</code> and save to reload.
+        </p>
+        <a
+          className="App-link"
+          href="https://reactjs.org"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Learn React
+        </a>
+      </header>
+    </div>
+  )
 }
+
+export default App

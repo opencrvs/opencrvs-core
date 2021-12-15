@@ -11,7 +11,7 @@
  */
 import { Meta, Story } from '@storybook/react'
 import { useState } from 'react'
-import { ExpandingMenu, IProps } from './ExpandingMenu'
+import { ExpandingMenu } from './ExpandingMenu'
 import {
   ApplicationBlack,
   ApplicationBlue,
@@ -25,6 +25,26 @@ import {
   LogoutBlue,
   Hamburger
 } from '../../icons'
+import React from 'react'
+
+interface IUserDetails {
+  name: string
+  role: string
+}
+interface IMenuItem {
+  icon: React.ReactNode
+  iconHover?: React.ReactNode
+  label: string
+  secondary?: boolean
+  onClick: (e: React.MouseEvent) => void
+}
+
+interface IProps {
+  showMenu: boolean
+  userDetails: IUserDetails
+  menuItems: IMenuItem[]
+  menuCollapse: () => void
+}
 
 export default {
   title: 'Components/Interface/ExpandingMenu',

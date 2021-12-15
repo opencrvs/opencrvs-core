@@ -13,7 +13,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { Backspace } from '../icons/Backspace'
 
-export interface IProps {
+interface IProps {
   id?: string
   onComplete: (pin: string) => void
   forgotPinComponent?: React.ReactNode
