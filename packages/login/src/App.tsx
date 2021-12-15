@@ -56,52 +56,52 @@ export class App extends React.Component<IAppProps> {
         <Provider store={this.props.store}>
           <IntlContainer>
             <ThemeProvider theme={getTheme(getDefaultLanguage())}>
-              <LanguageSelect>
-                <ConnectedRouter history={this.props.history}>
-                  <Switch>
-                    <Route exact path={routes.STEP_ONE}>
+              <ConnectedRouter history={this.props.history}>
+                <Switch>
+                  <Route exact path={routes.STEP_ONE}>
+                    <LanguageSelect>
                       <DarkPageContainer>
                         <StepOneContainer />
                       </DarkPageContainer>
-                    </Route>
-                    <Route exact path={routes.STEP_TWO}>
-                      <DarkPageContainer>
-                        <StepTwoContainer />
-                      </DarkPageContainer>
-                    </Route>
-                    <Route exact path={routes.FORGOTTEN_ITEM}>
-                      <PageContainer>
-                        <ForgottenItem />
-                      </PageContainer>
-                    </Route>
-                    <Route exact path={routes.PHONE_NUMBER_VERIFICATION}>
-                      <PageContainer>
-                        <PhoneNumberVerification />
-                      </PageContainer>
-                    </Route>
-                    <Route exact path={routes.RECOVERY_CODE_ENTRY}>
-                      <PageContainer>
-                        <RecoveryCodeEntry />
-                      </PageContainer>
-                    </Route>
-                    <Route exact path={routes.SECURITY_QUESTION}>
-                      <PageContainer>
-                        <SecurityQuestion />
-                      </PageContainer>
-                    </Route>
-                    <Route exact path={routes.UPDATE_PASSWORD}>
-                      <PageContainer>
-                        <UpdatePassword />
-                      </PageContainer>
-                    </Route>
-                    <Route
-                      exact
-                      path={routes.SUCCESS}
-                      component={ResetCredentialsSuccessPage}
-                    ></Route>
-                  </Switch>
-                </ConnectedRouter>
-              </LanguageSelect>
+                    </LanguageSelect>
+                  </Route>
+                  <Route exact path={routes.STEP_TWO}>
+                    <DarkPageContainer>
+                      <StepTwoContainer />
+                    </DarkPageContainer>
+                  </Route>
+                  <Route exact path={routes.FORGOTTEN_ITEM}>
+                    <PageContainer>
+                      <ForgottenItem />
+                    </PageContainer>
+                  </Route>
+                  <Route exact path={routes.PHONE_NUMBER_VERIFICATION}>
+                    <PageContainer>
+                      <PhoneNumberVerification />
+                    </PageContainer>
+                  </Route>
+                  <Route exact path={routes.RECOVERY_CODE_ENTRY}>
+                    <PageContainer>
+                      <RecoveryCodeEntry />
+                    </PageContainer>
+                  </Route>
+                  <Route exact path={routes.SECURITY_QUESTION}>
+                    <PageContainer>
+                      <SecurityQuestion />
+                    </PageContainer>
+                  </Route>
+                  <Route exact path={routes.UPDATE_PASSWORD}>
+                    <PageContainer>
+                      <UpdatePassword />
+                    </PageContainer>
+                  </Route>
+                  <Route
+                    exact
+                    path={routes.SUCCESS}
+                    component={ResetCredentialsSuccessPage}
+                  ></Route>
+                </Switch>
+              </ConnectedRouter>
             </ThemeProvider>
           </IntlContainer>
         </Provider>

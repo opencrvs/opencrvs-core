@@ -33,6 +33,7 @@ const SelectContainer = styled.div`
   position: fixed;
   top: 24px;
   right: 36px;
+  z-index: 1;
 `
 
 function LanguageSelectComponent({
@@ -48,6 +49,7 @@ function LanguageSelectComponent({
     }
 
     loadLanguage()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const onChange = ({ value }: ISelectOption) => {
