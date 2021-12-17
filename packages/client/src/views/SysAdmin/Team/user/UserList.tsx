@@ -98,8 +98,9 @@ const ErrorText = styled.div`
 `
 
 const StatusBox = styled.span`
-  padding: 2px 6px 4px 6px;
-  border-radius: 4px;
+  padding: 4px 8px;
+  ${({ theme }) => theme.fonts.captionBold};
+  border-radius: 2px;
   height: 30px;
   text-align: center;
   margin-left: 4px;
