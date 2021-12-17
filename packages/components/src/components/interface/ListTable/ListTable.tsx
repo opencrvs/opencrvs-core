@@ -90,6 +90,7 @@ const RowWrapper = styled.div<{
   horizontalPadding?: IBreakpoint
 }>`
   width: 100%;
+  min-height: 48px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.disabled};
   display: flex;
   align-items: center;
