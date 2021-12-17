@@ -96,7 +96,7 @@ const ErrorText = styled.div`
   margin-top: 100px;
 `
 
-const StatusBox = styled.span`
+const StatusBox = styled.div`
   padding: 4px 8px;
   border-radius: 4px;
   height: 30px;

@@ -116,10 +116,18 @@ const RowWrapper = styled.div<{
         ? `padding-right:${horizontalPadding.lg}px;`
         : `padding-right: 12px;`}
   }
+
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    & span:first-child {
+      text-align: right;
+      ${({ horizontalPadding }) =>
+        horizontalPadding
+          ? `padding-left:${horizontalPadding.md}px;`
+          : `padding-left: 12px;`}
+    }
+
     & span:last-child {
       text-align: right;
-      padding-right: 12px;
       ${({ horizontalPadding }) =>
         horizontalPadding
           ? `padding-right:${horizontalPadding.md}px;`
