@@ -68,6 +68,7 @@ type User {
   identifier: Identifier
   signature: Signature
   creationDate: String
+  device: String
 }
 
 type SearchUserResult {
