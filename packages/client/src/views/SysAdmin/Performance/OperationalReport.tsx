@@ -29,10 +29,13 @@ import {
 } from '@client/navigation'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { getToken } from '@client/utils/authUtils'
+import { SYS_ADMIN_ROLES } from '@client/utils/constants'
 import { generateLocations } from '@client/utils/locationUtils'
+import { IUserDetails } from '@client/utils/userUtils'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
 import { FETCH_STATUS_WISE_REGISTRATION_COUNT } from '@client/views/SysAdmin/Performance/queries'
 import {
@@ -104,8 +107,7 @@ interface ISearchParams {
 }
 
 type Props = WrappedComponentProps &
-  RouteComponentProps &
-  IConnectProps &
+  RouteComponentProps & { userDetails: IUserDetails | null } & IConnectProps &
   IDispatchProps & { theme: ITheme }
 
 interface State {
@@ -383,7 +385,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
     )
   }
   render() {
-    const { intl } = this.props
+    const { intl, userDetails } = this.props
 
     const {
       selectedLocation,
@@ -395,6 +397,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
       mainWindowLeftMargin,
       mainWindowRightMargin
     } = this.state
+    const role = userDetails && userDetails.role
     const { displayLabel: title, id: locationId } = selectedLocation
     return (
       <SysAdminContentWrapper
@@ -404,12 +407,14 @@ class OperationalReportComponent extends React.Component<Props, State> {
         <Container>
           <HeaderContainer>
             <Header id="header-location-name">{title}</Header>
-            <LinkButton
-              id="change-location-link"
-              onClick={this.onChangeLocation}
-            >
-              {intl.formatMessage(buttonMessages.change)}
-            </LinkButton>
+            {role && !SYS_ADMIN_ROLES.includes(role) && (
+              <LinkButton
+                id="change-location-link"
+                onClick={this.onChangeLocation}
+              >
+                {intl.formatMessage(buttonMessages.change)}
+              </LinkButton>
+            )}
           </HeaderContainer>
           <ActionContainer>
             <FilterContainer id="operational-report-view">
@@ -629,7 +634,8 @@ class OperationalReportComponent extends React.Component<Props, State> {
 function mapStateToProps(state: IStoreState) {
   const offlineResources = getOfflineData(state)
   return {
-    offlineLocations: offlineResources.locations
+    offlineLocations: offlineResources.locations,
+    userDetails: getUserDetails(state)
   }
 }
 

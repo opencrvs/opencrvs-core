@@ -49,7 +49,8 @@ import {
   VERIFY_COLLECTOR,
   WORKFLOW_STATUS,
   TEAM_USER_LIST,
-  USER_PROFILE
+  USER_PROFILE,
+  CONFIG
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
@@ -178,6 +179,10 @@ export function goBack() {
 
 export function goToHome() {
   return push(HOME)
+}
+
+export function goToConfig() {
+  return push(CONFIG)
 }
 
 export function goToHomeTab(tabId: string, selectorId: string = '') {
