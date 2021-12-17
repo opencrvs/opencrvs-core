@@ -13,7 +13,11 @@ import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
 import * as actions from '@login/i18n/actions'
 import { ENGLISH_STATE } from '@login/i18n/locales/en'
 import { BENGALI_STATE } from '@login/i18n/locales/bn'
-import { getDefaultLanguage, storeLanguage } from './utils'
+import {
+  getAvailableLanguages,
+  getDefaultLanguage,
+  storeLanguage
+} from './utils'
 
 export interface IntlMessages {
   [key: string]: string
@@ -43,7 +47,13 @@ export type IntlState = {
 export const initialState: IntlState = {
   language: getDefaultLanguage(),
   messages: languages[getDefaultLanguage()].messages,
-  languages
+  languages: getAvailableLanguages().reduce(
+    (accumulatedValues, language) => ({
+      ...accumulatedValues,
+      [language]: languages[language]
+    }),
+    {}
+  )
 }
 
 const getNextMessages = (language: string): IntlMessages => {

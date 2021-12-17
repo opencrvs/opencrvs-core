@@ -15,7 +15,7 @@ import { IStoreState } from '@login/store'
 import { changeLanguage } from '@login/i18n/actions'
 import { ISelectOption, Select } from '@opencrvs/components/lib/select'
 import styled from 'styled-components'
-import { retrieveLanguage } from '@login/i18n/utils'
+import { retrieveLanguage, getAvailableLanguages } from '@login/i18n/utils'
 import { getLanguages, getLanguage } from '@login/i18n/selectors'
 
 type IStateProps = {
@@ -44,8 +44,12 @@ function LanguageSelectComponent({
 }: IProps) {
   React.useEffect(() => {
     async function loadLanguage() {
-      const language = await retrieveLanguage()
-      if (language != selectedLanguage) changeLanguage({ language })
+      const savedLanguage = await retrieveLanguage()
+      if (
+        savedLanguage != selectedLanguage &&
+        getAvailableLanguages().some(language => language === savedLanguage)
+      )
+        changeLanguage({ language: savedLanguage })
     }
 
     loadLanguage()
@@ -58,13 +62,15 @@ function LanguageSelectComponent({
 
   return (
     <>
-      <SelectContainer>
-        <Select
-          value={selectedLanguage}
-          options={languageOptions}
-          onChange={onChange}
-        />
-      </SelectContainer>
+      {languageOptions.length > 1 && (
+        <SelectContainer>
+          <Select
+            value={selectedLanguage}
+            options={languageOptions}
+            onChange={onChange}
+          />
+        </SelectContainer>
+      )}
       {children}
     </>
   )
