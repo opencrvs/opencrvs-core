@@ -14,6 +14,8 @@ import styled from 'styled-components'
 import { Location } from '../../icons'
 import { PrimaryButton } from '../../buttons'
 
+const SEARCH_DEBOUNCE_DURATION = 300
+
 const SearchButton = styled(PrimaryButton)`
   height: 40px;
   margin-left: 4px;
@@ -107,6 +109,7 @@ interface IProps {
   className?: string
 }
 export class LocationSearch extends React.Component<IProps, IState> {
+  searchTimeout: number | undefined
   constructor(props: IProps) {
     super(props)
     this.state = {
@@ -151,12 +154,17 @@ export class LocationSearch extends React.Component<IProps, IState> {
     })
   }
 
+  debounce(callback: () => void, duration: number) {
+    clearTimeout(this.searchTimeout)
+    this.searchTimeout = setTimeout(callback, duration)
+  }
+
   onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     const text = event.target.value
     this.setState(_ => ({
       selectedText: text
     }))
-    this.search(event.target.value)
+    this.debounce(() => this.search(text), SEARCH_DEBOUNCE_DURATION)
   }
 
   onBlurHandler = (event: React.FocusEvent<HTMLInputElement>) => {
@@ -223,6 +231,9 @@ export class LocationSearch extends React.Component<IProps, IState> {
   }
 
   componentWillUnmount() {
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout)
+    }
     document.removeEventListener('click', this.handler)
   }
 

@@ -11,7 +11,8 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IConstantsMessages {
+interface IConstantsMessages
+  extends Record<string | number | symbol, MessageDescriptor> {
   address: MessageDescriptor
   allEvents: MessageDescriptor
   allStatuses: MessageDescriptor
@@ -773,15 +774,15 @@ const messagesToDefine: IConstantsMessages = {
   }
 }
 
-export const constantsMessages: IDynamicConstants = defineMessages(
-  messagesToDefine
-)
+export const constantsMessages: Record<
+  string | number | symbol,
+  MessageDescriptor
+> = defineMessages(messagesToDefine)
 
-interface IDynamicConstants {
-  [key: string]: MessageDescriptor
-}
-
-const dynamicMessagesToDefine: IDynamicConstants = {
+const dynamicMessagesToDefine: Record<
+  string | number | symbol,
+  MessageDescriptor
+> = {
   declared: {
     id: 'constants.submitted',
     defaultMessage: 'submitted',
@@ -915,11 +916,15 @@ const dynamicMessagesToDefine: IDynamicConstants = {
   }
 }
 
-export const dynamicConstantsMessages: IDynamicConstants = defineMessages(
-  dynamicMessagesToDefine
-)
+export const dynamicConstantsMessages: Record<
+  string | number | symbol,
+  MessageDescriptor
+> = defineMessages(dynamicMessagesToDefine)
 
-const countryMessagesToDefine: IDynamicConstants = {
+const countryMessagesToDefine: Record<
+  string | number | symbol,
+  MessageDescriptor
+> = {
   AFG: {
     id: 'countries.AFG',
     defaultMessage: 'Afghanistan',
@@ -2163,6 +2168,7 @@ const countryMessagesToDefine: IDynamicConstants = {
   }
 }
 
-export const countryMessages: IDynamicConstants = defineMessages(
-  countryMessagesToDefine
-)
+export const countryMessages: Record<
+  string | number | symbol,
+  MessageDescriptor
+> = defineMessages(countryMessagesToDefine)

@@ -17,7 +17,7 @@ import { ISearchLocation } from '@opencrvs/components/lib/interface/LocationSear
 export function filterLocations(
   locations: { [key: string]: ILocation },
   allowedType: LocationType,
-  match: {
+  match?: {
     locationLevel: keyof ILocation // ex: 'partOf' or 'id'
     locationId?: string
   }
@@ -26,7 +26,9 @@ export function filterLocations(
   Object.values(locations).forEach((location: ILocation) => {
     if (
       location.type === allowedType.toString() &&
-      (!match.locationId || location[match.locationLevel] === match.locationId)
+      (!match ||
+        !match.locationId ||
+        location[match.locationLevel] === match.locationId)
     ) {
       filteredLocations[location.id] = location
     }

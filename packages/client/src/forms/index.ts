@@ -211,6 +211,7 @@ export type IFormFieldValue =
   | IAttachmentValue
   | FieldValueArray
   | FieldValueMap
+  | IRegistration
 
 interface FieldValueArray extends Array<IFormFieldValue> {}
 export interface FieldValueMap {
@@ -221,6 +222,14 @@ export interface IFileValue {
   optionValues: IFormFieldValue[]
   type: string
   data: string
+}
+
+export interface IContactPoint {
+  contactRelationship: string
+  registrationPhone: string
+}
+export interface IRegistration {
+  nestedFields: IContactPoint
 }
 
 export interface IAttachmentValue {
@@ -598,8 +607,11 @@ export interface IFormTag {
   delimiter?: string
 }
 
-export type IDynamicFormField = ISelectFormFieldWithDynamicOptions &
-  IFormFieldWithDynamicDefinitions
+export interface IDynamicFormField
+  extends ISelectFormFieldWithDynamicOptions,
+    IFormFieldWithDynamicDefinitions {
+  type: any
+}
 
 export interface IConditional {
   action: string
@@ -949,6 +961,7 @@ export interface Ii18nNumberFormField extends Ii18nFormFieldBase {
   type: typeof NUMBER
   step?: number
   max?: number
+  inputFieldWidth?: string
 }
 
 export interface Ii18nBigNumberFormField extends Ii18nFormFieldBase {

@@ -9,14 +9,15 @@
     "test:watch": "jest --watch",
     "test:compilation": "tsc --noEmit",
     "postinstall": "yarn build",
-    "build": "tsc -d",
+    "build": "tsc",
     "build:clean": "rm -rf build"
   },
   "private": true,
   "dependencies": {
     "@types/node-fetch": "^2.3.3",
-    "hapi": "^18.1.0",
-    "node-fetch": "^2.5.0",
+    "@hapi/hapi": "^20.0.1",
+    "@types/hapi__hapi": "^20.0.0",
+    "node-fetch": "^2.6.1",
     "lint-staged": "^7.1.0",
     "typescript": "^3.7.2"
   },

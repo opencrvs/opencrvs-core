@@ -14,7 +14,7 @@ import { FormikTouched, FormikValues } from 'formik'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { isNull, isUndefined, merge, flatten, isEqual } from 'lodash'
+import { isNull, isUndefined, merge, flatten } from 'lodash'
 import debounce from 'lodash/debounce'
 import {
   ICON_ALIGNMENT,
@@ -513,11 +513,14 @@ class RegisterFormView extends React.Component<FullProps, State> {
         ...eventTopBarProps,
         exitAction: {
           handler: () => {
-            application.submissionStatus === SUBMISSION_STATUS.DRAFT
+            application.submissionStatus === SUBMISSION_STATUS.DRAFT &&
+            !application.review
               ? this.onDeleteApplication(application)
               : goToHomeTab(this.getRedirectionTabOnSaveOrExit())
           },
-          label: intl.formatMessage(buttonMessages.exitButton)
+          label: application.review
+            ? intl.formatMessage(buttonMessages.saveExitButton)
+            : intl.formatMessage(buttonMessages.exitButton)
         }
       }
     } else {
@@ -954,16 +957,13 @@ export const RegisterForm = connect<
   DispatchProps,
   FullProps,
   IStoreState
->(
-  mapStateToProps,
-  {
-    writeApplication,
-    modifyApplication,
-    deleteApplication,
-    goToPageGroup: goToPageGroupAction,
-    goBack: goBackAction,
-    goToHome,
-    goToHomeTab,
-    toggleDraftSavedNotification
-  }
-)(injectIntl<'intl', FullProps>(RegisterFormView))
+>(mapStateToProps, {
+  writeApplication,
+  modifyApplication,
+  deleteApplication,
+  goToPageGroup: goToPageGroupAction,
+  goBack: goBackAction,
+  goToHome,
+  goToHomeTab,
+  toggleDraftSavedNotification
+})(injectIntl<'intl', FullProps>(RegisterFormView))

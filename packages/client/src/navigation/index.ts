@@ -58,7 +58,7 @@ import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/opera
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
 import { goBack as back, push, replace } from 'connected-react-router'
 import moment from 'moment'
-import querystring from 'query-string'
+import { stringify } from 'query-string'
 import { Cmd, loop } from 'redux-loop'
 
 export interface IDynamicValues {
@@ -235,7 +235,7 @@ export function goToOperationalReport(
 ) {
   return push({
     pathname: OPERATIONAL_REPORT,
-    search: querystring.stringify({
+    search: stringify({
       sectionId,
       locationId,
       timeStart: timeStart.toISOString(),
@@ -250,7 +250,7 @@ export function goToTeamUserList(
 ) {
   return push({
     pathname: TEAM_USER_LIST,
-    search: querystring.stringify({
+    search: stringify({
       locationId: selectedLocation.id,
       viewOnly
     })
@@ -415,7 +415,7 @@ export function goToRegistrationRates(
 ) {
   return push({
     pathname: formatUrl(EVENT_REGISTRATION_RATES, { eventType }),
-    search: querystring.stringify({
+    search: stringify({
       locationId,
       title,
       timeStart: timeStart.toISOString(),
@@ -432,7 +432,7 @@ export function goToFieldAgentList(
 ) {
   return push({
     pathname: PERFORMANCE_FIELD_AGENT_LIST,
-    search: querystring.stringify({
+    search: stringify({
       locationId,
       timeStart,
       timeEnd
@@ -450,7 +450,7 @@ export function goToWorkflowStatus(
 ) {
   return push({
     pathname: WORKFLOW_STATUS,
-    search: querystring.stringify({
+    search: stringify({
       locationId,
       status,
       event

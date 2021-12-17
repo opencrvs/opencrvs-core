@@ -81,7 +81,7 @@ storage.setItem = storageSetItemMock
 const warn = jest.fn()
 const error = jest.fn()
 const debug = jest.fn()
-
+/* eslint-disable no-console */
 console.warn = warn
 console.error = error
 console.debug = debug
@@ -89,14 +89,13 @@ console.debug = debug
 const log = console.log.bind(console)
 
 const BLOCKED_MESSAGES = ['Warning: Setting up fake worker.']
-
 console.log = jest.fn().mockImplementation((...messages) => {
   if (BLOCKED_MESSAGES.includes(messages.join(' '))) {
     return
   }
   log(...messages)
 })
-
+/* eslint-enable no-console */
 /*
  * GraphQL Queries
  */
@@ -131,6 +130,9 @@ const navigatorMock = {
   APPLICATION_AUDIT_LOCATIONS: 'WARD,UNION',
   LOGIN_URL: 'http://localhost:3020',
   RESOURCES_URL: 'http://localhost:3040/bgd',
+  /**
+   * @deprecated HEALTH_FACILITY_FILTER is no longer used
+   */
   HEALTH_FACILITY_FILTER: 'UPAZILA',
   CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 45,
   CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 1825,
