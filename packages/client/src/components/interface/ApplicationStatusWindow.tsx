@@ -39,6 +39,7 @@ const Window = styled.div<{
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     width: 100%;
     top: 0px;
+    z-index: 3;
   }
 `
 
