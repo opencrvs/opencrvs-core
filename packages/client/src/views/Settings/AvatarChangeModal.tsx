@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { ResponsiveModal, Spinner } from '@opencrvs/components/lib/interface'
+import { ResponsiveModal } from '@opencrvs/components/lib/interface'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { userMessages as messages, buttonMessages } from '@client/i18n/messages'
 import {
@@ -96,6 +96,7 @@ type IProps = IntlShapeProps &
     onImgSrcChanged: (img: IImage) => void
     error: string
     onErrorChanged: (error: string) => void
+    onConfirmAvatarChange: () => void
     onAvatarChanged: (img: IImage) => void
     userDetails: IUserDetails | null
   }
@@ -123,6 +124,7 @@ function AvatarChangeModalComp({
   onImgSrcChanged: setImgSrc,
   error,
   onErrorChanged: setError,
+  onConfirmAvatarChange,
   onAvatarChanged,
   isOnline,
   theme,
@@ -132,7 +134,6 @@ function AvatarChangeModalComp({
   const [zoom, setZoom] = React.useState<number>(1)
   const [croppedArea, setCroppedArea] = React.useState<Area>(DEFAULT_AREA)
   const [avatar, setAvatar] = React.useState<IImage>()
-  const [uploading, setUploading] = React.useState<boolean>(false)
 
   const reset = () => {
     setCrop(DEFAULT_CROP)
@@ -140,7 +141,6 @@ function AvatarChangeModalComp({
     setZoom(1)
     setError('')
     setAvatar(undefined)
-    setUploading(false)
   }
 
   const handleCancel = () => {
@@ -171,25 +171,27 @@ function AvatarChangeModalComp({
                 key="apply"
                 id="apply_change"
                 disabled={
-                  !userDetails ||
-                  !userDetails.userMgntUserID ||
-                  uploading ||
-                  !isOnline
+                  !userDetails || !userDetails.userMgntUserID || !isOnline
                 }
                 onClick={async () => {
-                  setUploading(true)
                   const croppedImage = await getCroppedImage(
                     imgSrc,
                     croppedArea
                   )
                   if (croppedImage) setAvatar(croppedImage)
-                  if (userDetails && userDetails.userMgntUserID && croppedImage)
+                  if (
+                    userDetails &&
+                    userDetails.userMgntUserID &&
+                    croppedImage
+                  ) {
                     changeAvatar({
                       variables: {
                         userId: userDetails.userMgntUserID,
                         avatar: croppedImage
                       }
                     })
+                    onConfirmAvatarChange()
+                  }
                 }}
               >
                 {intl.formatMessage(buttonMessages.apply)}
@@ -210,17 +212,13 @@ function AvatarChangeModalComp({
           }}
           onError={(error) => setError(error)}
         >
-          <LinkButton disabled={uploading}>
-            {intl.formatMessage(messages.changeImage)}
-          </LinkButton>
+          <LinkButton>{intl.formatMessage(messages.changeImage)}</LinkButton>
         </ImageLoader>
       </Description>
-      {uploading || error ? (
+      {error ? (
         <DefaultImage
           size={window.innerWidth > theme.grid.breakpoints.md ? 360 : 240}
-        >
-          {uploading && <Spinner id="loading-image" />}
-        </DefaultImage>
+        ></DefaultImage>
       ) : (
         <>
           <Container>

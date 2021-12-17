@@ -83,6 +83,7 @@ interface IUserMessages
   requiredfield: MessageDescriptor
   incorrectPassword: MessageDescriptor
   passwordUpdated: MessageDescriptor
+  avatarUpdating: MessageDescriptor
   avatarUpdated: MessageDescriptor
 }
 
@@ -398,10 +399,15 @@ const messagesToDefine: IUserMessages = {
     defaultMessage: 'Password was successfully changed',
     description: 'Password change message on success'
   },
+  avatarUpdating: {
+    id: 'system.user.settings.avatarUpdating',
+    defaultMessage: 'Updating profile image',
+    description: 'Profile image message when uploading'
+  },
   avatarUpdated: {
     id: 'system.user.settings.avatarUpdated',
-    defaultMessage: 'Avatar was successfully changed',
-    description: 'Avatar change message on success'
+    defaultMessage: 'Profile image successfully updated',
+    description: 'Profile image change message on success'
   }
 }
 

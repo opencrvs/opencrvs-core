@@ -27,7 +27,8 @@ import { DataSection } from '@opencrvs/components/lib/interface/ViewData'
 import {
   ResponsiveModal,
   NOTIFICATION_TYPE,
-  Notification
+  Notification,
+  FloatingNotification
 } from '@opencrvs/components/lib/interface'
 import { Select } from '@opencrvs/components/lib/forms'
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
@@ -159,6 +160,8 @@ interface IState {
   notificationSubject: NOTIFICATION_SUBJECT | null
   image: IImage
   imageLoadingError: string
+  imageUploading: boolean
+  showAvatarNotification: boolean
 }
 
 interface ILanguageOptions {
@@ -179,6 +182,8 @@ class SettingsView extends React.Component<IProps, IState> {
         data: ''
       },
       imageLoadingError: '',
+      imageUploading: false,
+      showAvatarNotification: false,
       notificationSubject: null
     }
   }
@@ -193,6 +198,12 @@ class SettingsView extends React.Component<IProps, IState> {
     this.setState((state) => ({
       showSuccessNotification: !state.showSuccessNotification,
       notificationSubject: subject
+    }))
+  }
+
+  toggleAvatarNotification = () => {
+    this.setState(state => ({
+      showAvatarNotification: !state.showAvatarNotification
     }))
   }
 
@@ -230,13 +241,17 @@ class SettingsView extends React.Component<IProps, IState> {
     this.toggleSuccessNotification(NOTIFICATION_SUBJECT.PASSWORD)
   }
 
+  handleConfirmAvatarChange = () => {
+    this.setState({ imageUploading: true })
+    this.toggleAvatarChangeModal()
+    this.toggleAvatarNotification()
+  }
+
   changeAvatar = (avatar: IImage) => {
     if (this.props.userDetails) {
+      this.setState({ imageUploading: false })
       this.props.userDetails.avatar = avatar
       this.props.modifyUserDetails(this.props.userDetails)
-
-      this.toggleAvatarChangeModal()
-      this.toggleSuccessNotification(NOTIFICATION_SUBJECT.AVATAR)
     }
   }
 
@@ -439,6 +454,7 @@ class SettingsView extends React.Component<IProps, IState> {
           onErrorChanged={(imageLoadingError) =>
             this.setState({ imageLoadingError })
           }
+          onConfirmAvatarChange={this.handleConfirmAvatarChange}
           onAvatarChanged={this.changeAvatar}
         />
         <PasswordChangeModal
@@ -465,12 +481,26 @@ class SettingsView extends React.Component<IProps, IState> {
           {this.state.notificationSubject === NOTIFICATION_SUBJECT.PASSWORD && (
             <FormattedMessage {...messages.passwordUpdated} />
           )}
-
-          {/* Success notification message for Avatar Change */}
-          {this.state.notificationSubject === NOTIFICATION_SUBJECT.AVATAR && (
-            <FormattedMessage {...messages.avatarUpdated} />
-          )}
         </Notification>
+        <FloatingNotification
+          type={
+            this.state.imageUploading
+              ? NOTIFICATION_TYPE.IN_PROGRESS
+              : NOTIFICATION_TYPE.SUCCESS
+          }
+          show={this.state.showAvatarNotification}
+          callback={
+            this.state.imageUploading
+              ? undefined
+              : () => this.toggleAvatarNotification()
+          }
+        >
+          <FormattedMessage
+            {...(this.state.imageUploading
+              ? messages.avatarUpdating
+              : messages.avatarUpdated)}
+          />
+        </FloatingNotification>
       </>
     )
   }
