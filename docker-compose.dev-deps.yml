@@ -7,28 +7,28 @@
 #
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
-version: "3.3"
+version: '3.3'
 
 services:
   # For dependencies, expose ports locally for dev
   mongo1:
     ports:
-      - "27017:27017"
+      - '27017:27017'
     volumes:
-      - "./data/mongo:/data/db"
+      - './data/mongo:/data/db'
 
   redis:
     ports:
-      - "6379:6379"
+      - '6379:6379'
 
   elasticsearch:
     ports:
-      - "9200:9200"
-      - "9300:9300"
+      - '9200:9200'
+      - '9300:9300'
     volumes:
-      - "./data/elasticsearch:/usr/share/elasticsearch/data"
+      - './data/elasticsearch:/usr/share/elasticsearch/data'
     environment:
-      - "cluster.routing.allocation.disk.threshold_enabled=false"
+      - 'cluster.routing.allocation.disk.threshold_enabled=false'
       #- discovery.type=single-node
       #- http.port=9200
       #- http.cors.enabled=true
@@ -58,38 +58,38 @@ services:
 
   influxdb:
     ports:
-      - "8086:8086"
+      - '8086:8086'
     volumes:
-      - "./data/influxdb:/var/lib/influxdb"
+      - './data/influxdb:/var/lib/influxdb'
 
   # Expose dev secrets as a plain volume - these will use docker secrets in staging and prod
   hearth:
     volumes:
-      - ".secrets/public-key.pem:/secrets/public-key.pem"
-      - "./infrastructure/hearth-plugins/checkDuplicateTask.js:/src/hearth/lib/plugins/checkDuplicateTask.js"
-      - "./infrastructure/hearth-queryparam-extensions.json:/src/hearth/config/queryparam-extensions.json"
+      - '.secrets/public-key.pem:/secrets/public-key.pem'
+      - './infrastructure/hearth-plugins/checkDuplicateTask.js:/src/hearth/lib/plugins/checkDuplicateTask.js'
+      - './infrastructure/hearth-queryparam-extensions.json:/src/hearth/config/queryparam-extensions.json'
     ports:
-      - "3447:3447"
+      - '3447:3447'
 
   # Expose config as a plain volume - these will use docker config in staging and prod
   openhim-console:
     volumes:
-      - "./infrastructure/openhim-console-config.json:/usr/share/nginx/html/config/default.json"
+      - './infrastructure/openhim-console-config.json:/usr/share/nginx/html/config/default.json'
     ports:
-      - "8888:80"
+      - '8888:80'
 
   openhim-core:
     ports:
-      - "8080:8080"
-      - "5000:5000"
-      - "5001:5001"
+      - '8080:8080'
+      - '5000:5000'
+      - '5001:5001'
     extra_hosts:
-      - "gateway:${LOCAL_IP-172.17.0.1}"
-      - "workflow:${LOCAL_IP-172.17.0.1}"
-      - "search:${LOCAL_IP-172.17.0.1}"
-      - "auth:${LOCAL_IP-172.17.0.1}"
-      - "user-mgnt:${LOCAL_IP-172.17.0.1}"
-      - "notification:${LOCAL_IP-172.17.0.1}"
-      - "metrics:${LOCAL_IP-172.17.0.1}"
-      - "bgd-dhis2-mediator:${LOCAL_IP-172.17.0.1}"
-      - "ocrvs-chatbot-mediator:${LOCAL_IP-172.17.0.1}"
+      - 'gateway:${LOCAL_IP-172.17.0.1}'
+      - 'workflow:${LOCAL_IP-172.17.0.1}'
+      - 'search:${LOCAL_IP-172.17.0.1}'
+      - 'auth:${LOCAL_IP-172.17.0.1}'
+      - 'user-mgnt:${LOCAL_IP-172.17.0.1}'
+      - 'notification:${LOCAL_IP-172.17.0.1}'
+      - 'metrics:${LOCAL_IP-172.17.0.1}'
+      - 'bgd-dhis2-mediator:${LOCAL_IP-172.17.0.1}'
+      - 'age-verification-mediator:${LOCAL_IP-172.17.0.1}'

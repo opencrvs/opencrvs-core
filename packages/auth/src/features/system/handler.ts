@@ -21,7 +21,7 @@ import {
   JWT_ISSUER,
   NOTIFICATION_API_USER_AUDIENCE,
   VALIDATOR_API_USER_AUDIENCE,
-  CHATBOT_API_USER_AUDIENCE,
+  AGE_VERIFICATION_USER_AUDIENCE,
   NATIONAL_ID_USER_AUDIENCE,
   USER_MANAGEMENT_URL
 } from '@auth/constants'
@@ -52,7 +52,8 @@ export async function authenticateSystemClientHandler(
 
   const isNotificationAPIUser = result.scope.indexOf('notification-api') > -1
   const isValidatorAPIUser = result.scope.indexOf('validator-api') > -1
-  const isChatbotAPIUser = result.scope.indexOf('chatbot-api') > -1
+  const isAgeVerificationAPIUser =
+    result.scope.indexOf('age-verification-api') > -1
   const isNationalIDAPIUser = result.scope.indexOf('nationalId') > -1
 
   const response: ISystemAuthResponse = {}
@@ -63,8 +64,8 @@ export async function authenticateSystemClientHandler(
       ? WEB_USER_JWT_AUDIENCES.concat([NOTIFICATION_API_USER_AUDIENCE])
       : isValidatorAPIUser
       ? WEB_USER_JWT_AUDIENCES.concat([VALIDATOR_API_USER_AUDIENCE])
-      : isChatbotAPIUser
-      ? WEB_USER_JWT_AUDIENCES.concat([CHATBOT_API_USER_AUDIENCE])
+      : isAgeVerificationAPIUser
+      ? WEB_USER_JWT_AUDIENCES.concat([AGE_VERIFICATION_USER_AUDIENCE])
       : isNationalIDAPIUser
       ? WEB_USER_JWT_AUDIENCES.concat([NATIONAL_ID_USER_AUDIENCE])
       : WEB_USER_JWT_AUDIENCES,

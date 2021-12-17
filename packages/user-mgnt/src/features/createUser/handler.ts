@@ -78,7 +78,7 @@ export default async function createUser(
     if (
       user.role === 'NOTIFICATION_API_USER' ||
       user.role === 'VALIDATOR_API_USER' ||
-      user.role === 'CHATBOT_API_USER'
+      user.role === 'AGE_VERIFICATION_API_USER'
     ) {
       // Immediately active API users
       user.status = statuses.ACTIVE
