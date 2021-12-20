@@ -65,10 +65,10 @@ const Slider = styled.input`
   }
 `
 
-const DefaultImage = styled.div<{ size: number }>`
+const DefaultImage = styled.div<{ width: number; height: number }>`
   border-radius: 50%;
-  width: ${({ size }) => size}px;
-  height: ${({ size }) => size}px;
+  width: ${({ width }) => width}px;
+  height: ${({ height }) => height}px;
   margin: auto;
   display: flex;
   flex-direction: column;
@@ -116,6 +116,29 @@ const DEFAULT_AREA: Area = {
   ...DEFAULT_CROP
 }
 
+function useCropSize(breakpoint: number) {
+  const [value, setValue] = React.useState<number>(360)
+
+  React.useEffect(() => {
+    function handleResize() {
+      if (window.innerWidth > breakpoint) {
+        setValue(360)
+      } else {
+        setValue(240)
+      }
+    }
+
+    handleResize()
+
+    window.addEventListener('resize', handleResize)
+
+    return () => window.removeEventListener('resize', handleResize)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  return { width: value, height: value }
+}
+
 function AvatarChangeModalComp({
   showChangeAvatar,
   intl,
@@ -134,6 +157,8 @@ function AvatarChangeModalComp({
   const [zoom, setZoom] = React.useState<number>(1)
   const [croppedArea, setCroppedArea] = React.useState<Area>(DEFAULT_AREA)
   const [avatar, setAvatar] = React.useState<IImage>()
+
+  const cropSize = useCropSize(theme.grid.breakpoints.md)
 
   const reset = () => {
     setCrop(DEFAULT_CROP)
@@ -216,9 +241,7 @@ function AvatarChangeModalComp({
         </ImageLoader>
       </Description>
       {error ? (
-        <DefaultImage
-          size={window.innerWidth > theme.grid.breakpoints.md ? 360 : 240}
-        ></DefaultImage>
+        <DefaultImage {...cropSize}></DefaultImage>
       ) : (
         <>
           <Container>
@@ -228,11 +251,7 @@ function AvatarChangeModalComp({
               aspect={1}
               cropShape="round"
               showGrid={false}
-              cropSize={
-                window.innerWidth > theme.grid.breakpoints.md
-                  ? { width: 360, height: 360 }
-                  : { width: 240, height: 240 }
-              }
+              cropSize={cropSize}
               objectFit="vertical-cover"
               zoom={zoom}
               onZoomChange={(newZoom) => setZoom(newZoom)}
