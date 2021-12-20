@@ -30,6 +30,14 @@ const Padding = styled.span`
   color: ${({ theme }) => theme.colors.secondary};
 `
 
+const PostFixPadding = styled.span`
+  padding: 0 8px;
+  display: inline-flex;
+  align-items: center;
+  ${({ theme }) => theme.fonts.bodyStyle};
+  color: ${({ theme }) => theme.colors.menuBackground};
+`
+
 const InputDescription = styled.p<{
   ignoreMediaQuery?: boolean
 }>`
@@ -130,7 +138,7 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
         <ComponentWrapper>
           {prefix && <Padding>{prefix}</Padding>}
           {children}
-          {postfix && <Padding>{postfix}</Padding>}
+          {postfix && <PostFixPadding>{postfix}</PostFixPadding>}
         </ComponentWrapper>
 
         {error && touched && !hideErrorLabel && (

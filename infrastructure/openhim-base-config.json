@@ -1609,7 +1609,9 @@
       "name": "New Death InProgress"
     },
     {
-      "methods": ["POST"],
+      "methods": [
+        "POST"
+      ],
       "type": "http",
       "allow": [],
       "whitelist": [],
@@ -1629,9 +1631,9 @@
           "type": "http",
           "status": "enabled",
           "forwardAuthHeader": true,
-          "name": "Chatbot mediator",
+          "name": "Age verification mediator",
           "secured": false,
-          "host": "ocrvs-chatbot-mediator",
+          "host": "age-verification-mediator",
           "port": 8050,
           "path": "",
           "pathTransform": "",
@@ -1643,7 +1645,7 @@
       "requestBody": true,
       "responseBody": true,
       "rewriteUrlsConfig": [],
-      "name": "Chatbot mediator",
+      "name": "Age verification mediator",
       "urlPattern": "^/search",
       "priority": 1,
       "matchContentRegex": null,
@@ -1660,7 +1662,9 @@
       "alerts": []
     },
     {
-      "methods": ["POST"],
+      "methods": [
+        "POST"
+      ],
       "type": "http",
       "allow": [],
       "whitelist": [],
@@ -1711,7 +1715,9 @@
       "alerts": []
     },
     {
-      "methods": ["POST"],
+      "methods": [
+        "POST"
+      ],
       "type": "http",
       "allow": [],
       "whitelist": [],
@@ -1762,7 +1768,9 @@
       "name": "DHIS2 death notification mediator"
     },
     {
-      "methods": ["POST"],
+      "methods": [
+        "POST"
+      ],
       "type": "http",
       "allow": [],
       "whitelist": [],
@@ -1809,7 +1817,9 @@
       "priority": 1
     },
     {
-      "methods": ["GET"],
+      "methods": [
+        "GET"
+      ],
       "type": "http",
       "allow": [],
       "whitelist": [],
@@ -1858,7 +1868,9 @@
     {
       "methods": [],
       "type": "polling",
-      "allow": ["queue-trigger"],
+      "allow": [
+        "queue-trigger"
+      ],
       "whitelist": [],
       "authType": "private",
       "matchContentTypes": [],
@@ -1909,7 +1921,9 @@
     {
       "methods": [],
       "type": "polling",
-      "allow": ["queue-trigger"],
+      "allow": [
+        "queue-trigger"
+      ],
       "whitelist": [],
       "authType": "private",
       "matchContentTypes": [],
@@ -1958,7 +1972,9 @@
       "priority": 1
     },
     {
-      "methods": ["POST"],
+      "methods": [
+        "POST"
+      ],
       "type": "http",
       "allow": [],
       "whitelist": [],

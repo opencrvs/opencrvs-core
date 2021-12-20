@@ -130,6 +130,9 @@ const navigatorMock = {
   APPLICATION_AUDIT_LOCATIONS: 'WARD,UNION',
   LOGIN_URL: 'http://localhost:3020',
   RESOURCES_URL: 'http://localhost:3040/bgd',
+  /**
+   * @deprecated HEALTH_FACILITY_FILTER is no longer used
+   */
   HEALTH_FACILITY_FILTER: 'UPAZILA',
   CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 45,
   CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 1825,

@@ -340,14 +340,7 @@ function reducer(
     case actions.FACILITIES_LOADED: {
       const facilities = filterLocations(
         action.payload,
-        LocationType.HEALTH_FACILITY,
-        {
-          locationLevel: 'partOf',
-          locationId: `Location/${getLocation(
-            state.userDetails!,
-            window.config.HEALTH_FACILITY_FILTER
-          )}`
-        }
+        LocationType.HEALTH_FACILITY
       )
 
       const offices = filterLocations(

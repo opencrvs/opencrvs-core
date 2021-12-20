@@ -93,4 +93,4 @@ services:
       - 'notification:${LOCAL_IP-172.17.0.1}'
       - 'metrics:${LOCAL_IP-172.17.0.1}'
       - 'bgd-dhis2-mediator:${LOCAL_IP-172.17.0.1}'
-      - 'ocrvs-chatbot-mediator:${LOCAL_IP-172.17.0.1}'
+      - 'age-verification-mediator:${LOCAL_IP-172.17.0.1}'

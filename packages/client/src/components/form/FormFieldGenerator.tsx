@@ -435,6 +435,7 @@ function GeneratedInputField({
           onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
             event.currentTarget.blur()
           }}
+          inputFieldWidth={fieldDefinition.inputFieldWidth}
         />
       </InputField>
     )

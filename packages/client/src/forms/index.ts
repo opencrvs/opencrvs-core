@@ -961,6 +961,7 @@ export interface Ii18nNumberFormField extends Ii18nFormFieldBase {
   type: typeof NUMBER
   step?: number
   max?: number
+  inputFieldWidth?: string
 }
 
 export interface Ii18nBigNumberFormField extends Ii18nFormFieldBase {
