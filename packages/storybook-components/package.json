@@ -1,5 +1,5 @@
 {
-  "name": "storybook-components",
+  "name": "@opencrvs/components",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
