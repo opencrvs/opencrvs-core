@@ -19,8 +19,9 @@ import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { Container } from '@opencrvs/components/lib/layout'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/buttons'
 import { messages } from '@client/i18n/messages/views/config'
+import { TopBar } from '@opencrvs/components/lib/interface'
 
 const HeaderContainer = styled.div`
   display: flex;
@@ -31,38 +32,108 @@ const HeaderContainer = styled.div`
     margin-right: 24px;
   }
 `
+
+const SubMenuTab = styled(Button)<{ active: boolean }>`
+  color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.subtitleStyle};
+  margin-left: 88px;
+  padding-top: 15px;
+  padding-bottom: 12px;
+  border-radius: 0;
+  flex-shrink: 0;
+  outline: none;
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin-left: 8px;
+  }
+  ${({ active }) =>
+    active
+      ? 'border-bottom: 3px solid #5E93ED'
+      : 'border-bottom: 3px solid transparent'};
+  & > div {
+    padding: 0 8px;
+  }
+  :first-child > div {
+    position: relative;
+    padding-left: 0;
+  }
+  & div > div {
+    margin-right: 8px;
+  }
+  &:focus {
+    outline: none;
+    background: ${({ theme }) => theme.colors.focus};
+    color: ${({ theme }) => theme.colors.copy};
+  }
+  &:not([data-focus-visible-added]) {
+    background: transparent;
+    outline: none;
+    color: ${({ theme }) => theme.colors.copy};
+  }
+`
 type Props = WrappedComponentProps &
   Pick<RouteComponentProps, 'history'> & {
     offlineResources: IOfflineData
   }
 
-class ConfigHomeComponent extends React.Component<Props> {
+interface State {
+  selectedSubMenuItem: string
+}
+
+const SUB_MENU_ID = {
+  certificatesConfig: 'Certificates',
+  applicationsSettings: 'Application Settings'
+}
+
+class ConfigHomeComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
+    this.state = {
+      selectedSubMenuItem: ''
+    }
   }
 
   render() {
     const { intl, offlineResources } = this.props
+
     return (
-      <SysAdminContentWrapper>
-        <Container>
-          <HeaderContainer>
-            <LinkButton
-              id="go-to-application-settings"
-              className="item"
-              onClick={() => {}}
+      <SysAdminContentWrapper
+        subMenuComponent={
+          <TopBar id="top-bar">
+            <SubMenuTab
+              id={`tab_${SUB_MENU_ID.certificatesConfig}`}
+              key={SUB_MENU_ID.certificatesConfig}
+              active={
+                this.state.selectedSubMenuItem ===
+                SUB_MENU_ID.certificatesConfig
+              }
+              onClick={() =>
+                this.setState({
+                  selectedSubMenuItem: SUB_MENU_ID.certificatesConfig
+                })
+              }
             >
-              {intl.formatMessage(messages.applicationSettings)}
-            </LinkButton>
-            <LinkButton
-              id="go-to-certificate-configuration"
-              className="item"
-              onClick={() => {}}
+              {SUB_MENU_ID.certificatesConfig}
+            </SubMenuTab>
+            <SubMenuTab
+              id={`tab_${SUB_MENU_ID.applicationsSettings}`}
+              key={SUB_MENU_ID.applicationsSettings}
+              active={
+                this.state.selectedSubMenuItem ===
+                SUB_MENU_ID.applicationsSettings
+              }
+              onClick={() =>
+                this.setState({
+                  selectedSubMenuItem: SUB_MENU_ID.applicationsSettings
+                })
+              }
             >
-              {intl.formatMessage(messages.certificateConfiguration)}
-            </LinkButton>
-          </HeaderContainer>
-        </Container>
+              {SUB_MENU_ID.applicationsSettings}
+            </SubMenuTab>
+          </TopBar>
+        }
+      >
+        <Container></Container>
       </SysAdminContentWrapper>
     )
   }

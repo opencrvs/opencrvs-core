@@ -52,6 +52,7 @@ interface BasePage {
   marginRight?: number
   fixedWidth?: number
   mapPinClickHandler?: () => void
+  subMenuComponent?: React.ReactNode
 }
 
 interface DefaultPage extends BasePage {
@@ -206,6 +207,7 @@ export function SysAdminContentWrapper(props: SysAdminPage) {
   return (
     <Container>
       {pageHeader}
+      {props.subMenuComponent && props.subMenuComponent}
       {pageContent}
     </Container>
   )
