@@ -9,6 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import fetch from 'node-fetch'
+import uuid from 'uuid'
+import {
+  createObservationEntryTemplate,
+  createPersonEntryTemplate
+} from '@gateway/features/fhir/templates'
+import { set } from 'lodash'
+import { logger } from '@gateway/logger'
+
 export type IFieldBuilderFunction = (
   accumulatedObj: any,
   fieldValue: string | number | boolean,
@@ -107,4 +116,49 @@ export default async function transformObj(
   }
 
   return targetObj
+}
+
+function findAllEntriesWithResourceType(
+  entries: Array<any>,
+  resourceType: string
+) {
+  return entries.filter(entry => entry.resource?.resourceType === resourceType)
+}
+
+export async function transformObj2(
+  sourceArray: Array<{ fieldId: string; value: string }>,
+  targeObj: any,
+  context: any = {}
+) {
+  for (const { fieldId, value } of sourceArray) {
+    let entry = Object.create(null)
+    const res = await fetch(`http://localhost:2021/questions/${fieldId}`)
+    const field = await res.json()
+    logger.info(field)
+    const resourceType = field.fhirSchema.split('[')[0] // i.e. fhirSchema = "Patient[0]"
+    const entryIndexString = field.fhirSchema.match(/\[\d+\]/) // i.e. "[0]"
+    const path = field.fhirSchema.split(']')[1] // i.e. 'key[0].value
+    let specifiedIndex
+
+    if (entryIndexString) {
+      specifiedIndex = entryIndexString.replace(/\D/g, '')
+    }
+    if (specifiedIndex && resourceType) {
+      const entriesWithResourceType = findAllEntriesWithResourceType(
+        targeObj.entries,
+        resourceType
+      )
+      if (entriesWithResourceType[specifiedIndex]) {
+        entry = entriesWithResourceType[specifiedIndex]
+      } else {
+        const refUUID = uuid()
+        if (resourceType === 'Patient') {
+          entry = createPersonEntryTemplate(refUUID)
+        } else {
+          entry = createObservationEntryTemplate(refUUID)
+        }
+      }
+      entry = set(entry, path, value)
+    }
+  }
 }

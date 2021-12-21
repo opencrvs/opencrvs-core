@@ -9,7 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import transformObj, { IFieldBuilders } from '@gateway/features/transformation'
+import transformObj, {
+  IFieldBuilders,
+  transformObj2
+} from '@gateway/features/transformation'
 import { v4 as uuid } from 'uuid'
 import {
   createCompositionTemplate,
@@ -2954,6 +2957,34 @@ export async function buildFHIRBundle(
     context.authHeader = authHeader
   }
   await transformObj(reg, fhirBundle, builders, context)
+  return fhirBundle
+}
+
+/**
+ * @todo replace old buildFHIRBundle
+ *
+ */
+export async function buildFHIRBundle2(
+  reg: Array<any>,
+  eventType: EVENT_TYPE,
+  authHeader?: IAuthHeader
+) {
+  const ref = uuid()
+  const context: any = {
+    event: eventType
+  }
+
+  const fhirBundle = {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: [createCompositionTemplate(ref, context)]
+  }
+
+  if (authHeader) {
+    context.authHeader = authHeader
+  }
+
+  await transformObj2(reg, fhirBundle, context)
   return fhirBundle
 }
 

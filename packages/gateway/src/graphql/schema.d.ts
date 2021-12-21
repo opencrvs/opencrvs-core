@@ -320,6 +320,11 @@ export interface GQLBirthRegistrationInput {
   updatedAt?: GQLDate
 }
 
+export interface GQLFormValue {
+  fieldId: string
+  value?: string
+}
+
 export interface GQLDeathRegistrationInput {
   _fhirIDMap?: GQLMap
   registration?: GQLRegistrationInput
@@ -1820,7 +1825,7 @@ export interface MutationToVoidNotificationResolver<
 }
 
 export interface MutationToCreateBirthRegistrationArgs {
-  details: GQLBirthRegistrationInput
+  details: GQLFormValue[]
 }
 export interface MutationToCreateBirthRegistrationResolver<
   TParent = any,
