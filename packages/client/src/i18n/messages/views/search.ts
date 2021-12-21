@@ -20,6 +20,7 @@ interface ISearchMessages
   searchingFor: MessageDescriptor
   searchResultFor: MessageDescriptor
   totalResultText: MessageDescriptor
+  locationNotFound: MessageDescriptor
 }
 
 const messagesToDefine: ISearchMessages = {
@@ -62,6 +63,11 @@ const messagesToDefine: ISearchMessages = {
     defaultMessage:
       '{total, plural, =0 {} one {# record found} other {# records found}} ',
     description: 'The total result text'
+  },
+  locationNotFound: {
+    id: 'performance.location.notFound',
+    defaultMessage: 'Location not found',
+    description: 'Label for location not found'
   }
 }
 

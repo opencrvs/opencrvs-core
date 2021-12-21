@@ -13,6 +13,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { Location } from '../../icons'
 import { PrimaryButton } from '../../buttons'
+import { InputError } from '../../forms/InputField/InputError'
 
 const SEARCH_DEBOUNCE_DURATION = 300
 
@@ -96,6 +97,7 @@ interface IState {
   filteredList: ISearchLocation[]
   selectedText: string | null
   selectedItem: ISearchLocation | null
+  isFocused?: boolean
 }
 interface IProps {
   locationList: ISearchLocation[]
@@ -104,6 +106,7 @@ interface IProps {
   searchButtonHandler?: () => void
   id?: string
   onBlur?: (e: React.FocusEvent<any>) => void
+  errorMessage?: string
   error?: boolean
   touched?: boolean
   className?: string
@@ -116,7 +119,8 @@ export class LocationSearch extends React.Component<IProps, IState> {
       dropDownIsVisible: false,
       filteredList: [],
       selectedItem: null,
-      selectedText: null
+      selectedText: null,
+      isFocused: false
     }
   }
   handler = () => {
@@ -148,6 +152,12 @@ export class LocationSearch extends React.Component<IProps, IState> {
         }
       }
     }
+    if (searchResult.length === 0) {
+      this.setState({
+        selectedItem: null
+      })
+    }
+
     this.setState({
       filteredList: searchResult,
       dropDownIsVisible: searchResult.length > 0
@@ -168,6 +178,9 @@ export class LocationSearch extends React.Component<IProps, IState> {
   }
 
   onBlurHandler = (event: React.FocusEvent<HTMLInputElement>) => {
+    this.setState({
+      isFocused: false
+    })
     if (this.props.onBlur && this.props.searchHandler) {
       this.props.searchHandler({
         id: this.state.selectedText ? '0' : '',
@@ -179,6 +192,9 @@ export class LocationSearch extends React.Component<IProps, IState> {
   }
 
   onFocus = (event: React.FocusEvent<HTMLInputElement>) => {
+    this.setState({
+      isFocused: true
+    })
     setTimeout(event.target.select.bind(event.target), 20)
     if (
       this.state.selectedItem &&
@@ -239,32 +255,43 @@ export class LocationSearch extends React.Component<IProps, IState> {
 
   render() {
     return (
-      <LocationSearchContainer>
-        <Wrapper className={this.props.className}>
-          <Location id="locationSearchIcon" />
-          <SearchTextInput
-            id={this.props.id ? this.props.id : 'locationSearchInput'}
-            type="text"
-            autoComplete="off"
-            onFocus={this.onFocus}
-            onBlur={this.onBlurHandler}
-            onClick={() => document.addEventListener('click', this.handler)}
-            value={this.state.selectedText || ''}
-            onChange={this.onChangeHandler}
-            error={this.props.error}
-            touched={this.props.touched}
-          />
-          {this.dropdown()}
-        </Wrapper>
-        {this.props.searchButtonHandler && (
-          <SearchButton
-            id="location-search-btn"
-            onClick={this.props.searchButtonHandler}
-          >
-            Search
-          </SearchButton>
-        )}
-      </LocationSearchContainer>
+      <>
+        <LocationSearchContainer>
+          <Wrapper className={this.props.className}>
+            <Location id="locationSearchIcon" />
+            <SearchTextInput
+              id={this.props.id ? this.props.id : 'locationSearchInput'}
+              type="text"
+              autoComplete="off"
+              onFocus={this.onFocus}
+              onBlur={this.onBlurHandler}
+              onClick={() => document.addEventListener('click', this.handler)}
+              value={this.state.selectedText || ''}
+              onChange={this.onChangeHandler}
+              error={this.props.error}
+              touched={this.props.touched}
+            />
+            {this.dropdown()}
+          </Wrapper>
+          {this.props.searchButtonHandler && (
+            <SearchButton
+              id="location-search-btn"
+              onClick={this.props.searchButtonHandler}
+              disabled={!(this.state.selectedItem && this.state.selectedText)}
+            >
+              Search
+            </SearchButton>
+          )}
+        </LocationSearchContainer>
+        {!this.state.selectedItem &&
+          this.state.selectedText &&
+          this.props.errorMessage &&
+          !this.state.isFocused && (
+            <InputError id="location-search-error">
+              {this.props.errorMessage}
+            </InputError>
+          )}
+      </>
     )
   }
 }

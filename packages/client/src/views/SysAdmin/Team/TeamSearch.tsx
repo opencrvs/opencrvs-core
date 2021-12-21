@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { messages } from '@client/i18n/messages/views/performance'
+import { messages as messagesSearch } from '@client/i18n/messages/views/search'
 import { goToTeamUserList } from '@client/navigation'
 import { IOfflineData, ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
@@ -80,6 +81,7 @@ class TeamSearchComponent extends React.Component<Props, State> {
           )}
           searchHandler={this.searchHandler}
           searchButtonHandler={this.searchButtonHandler}
+          errorMessage={intl.formatMessage(messagesSearch.locationNotFound)}
         />
       </SysAdminContentWrapper>
     )
