@@ -13,6 +13,7 @@ import applicationConfigHandler from '@config/handlers/applicationConfigHandler'
 import createQuestionHandler, {
   requestSchema as createQuestionReqSchema
 } from '@config/handlers/createQuestion/handler'
+import getQuestionHandler from '@config/handlers/getQuestion/handler'
 
 export default function getRoutes() {
   return [
@@ -52,6 +53,15 @@ export default function getRoutes() {
         validate: {
           payload: createQuestionReqSchema
         }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/questions/{fieldId}',
+      handler: getQuestionHandler,
+      config: {
+        tags: ['api'], // TODO: add auth with scope of National system admin user
+        description: 'Get question by field id'
       }
     }
   ]
