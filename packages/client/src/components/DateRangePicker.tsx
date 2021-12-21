@@ -465,7 +465,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
         body.style.removeProperty('overflow')
         setActiveRoute(PRESET)
       } else {
-        body.style.overflow = 'hidden'
+        body.style.overflow = 'auto'
       }
     }
 
