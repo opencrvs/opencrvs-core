@@ -81,8 +81,7 @@ interface State {
 }
 
 const SUB_MENU_ID = {
-  certificatesConfig: 'Certificates',
-  applicationsSettings: 'Application Settings'
+  certificatesConfig: 'Certificates'
 }
 
 class ConfigHomeComponent extends React.Component<Props, State> {
@@ -114,21 +113,6 @@ class ConfigHomeComponent extends React.Component<Props, State> {
               }
             >
               {SUB_MENU_ID.certificatesConfig}
-            </SubMenuTab>
-            <SubMenuTab
-              id={`tab_${SUB_MENU_ID.applicationsSettings}`}
-              key={SUB_MENU_ID.applicationsSettings}
-              active={
-                this.state.selectedSubMenuItem ===
-                SUB_MENU_ID.applicationsSettings
-              }
-              onClick={() =>
-                this.setState({
-                  selectedSubMenuItem: SUB_MENU_ID.applicationsSettings
-                })
-              }
-            >
-              {SUB_MENU_ID.applicationsSettings}
             </SubMenuTab>
           </TopBar>
         }
