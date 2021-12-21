@@ -152,7 +152,11 @@ export class LocationSearch extends React.Component<IProps, IState> {
         }
       }
     }
-    if (searchResult.length === 0) {
+    if (
+      searchResult.length === 0 ||
+      (this.state.selectedItem &&
+        this.state.selectedText !== this.state.selectedItem.displayLabel)
+    ) {
       this.setState({
         selectedItem: null
       })
