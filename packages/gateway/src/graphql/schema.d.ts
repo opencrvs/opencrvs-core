@@ -210,6 +210,7 @@ export interface GQLUser {
   identifier?: GQLIdentifier
   signature?: GQLSignature
   creationDate?: string
+  device?: string
 }
 
 export interface GQLSearchUserResult {
