@@ -15,13 +15,17 @@ export LANGUAGES='en'
 
 echo ":::::::::::::::::::::::::::: INSTALLING OPEN CRVS ::::::::::::::::::::::::::::"
 echo ":::::::::::::::: PLEASE WAIT FOR THE OPEN CRVS LOGO TO APPEAR ::::::::::::::::"
-echo "::::::::::::::::::  THIS CAN TAKE TIME ON SLOW CONNECTIONS :::::::::::::::::: "
+echo "::::::::::::::::::: THIS CAN TAKE TIME ON SLOW CONNECTIONS :::::::::::::::::::"
 echo
 sleep 5
 echo ":::::: FIRST WE NEED TO CHECK THAT YOU HAVE INSTALLED YOUR DEPENDENCIES ::::::"
+sleep 1
+echo ":::::::::: YOU MUST BE RUNNING A SUPPORTED OS: MAC or UBUNTU > 18.04 :::::::::"
+echo ":::::::::::::::: YOU MUST HAVE NODE v14.15.0, YARN AND DOCKER ::::::::::::::::"
 
 if [  -n "$(uname -a | grep Ubuntu)" ] && [ lsb_release -sr < 18.04 ] ; then
   echo "Sorry your Ubuntu version is not supported.  You must upgrade Ubuntu to 18.04 or 20.04"
+  exit 1
 fi
 sleep 2
 dependencies=( "docker" "yarn" "node" )
@@ -56,7 +60,7 @@ do
                 echo "Please follow the documentation here: https://docs.docker.com/desktop/mac/install/"
             fi
         fi
-        sleep 1
+        exit 1
     fi
 done
 # check dependencies installed
