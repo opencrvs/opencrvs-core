@@ -15,6 +15,10 @@ interface IConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   applicationSettings: MessageDescriptor
   certificateConfiguration: MessageDescriptor
+  previewTemplate: MessageDescriptor
+  printTemplate: MessageDescriptor
+  downloadTemplate: MessageDescriptor
+  uploadTemplate: MessageDescriptor
 }
 
 const messagesToDefine: IConfigMessages = {
@@ -27,6 +31,26 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.certificateConfiguration',
     defaultMessage: 'Certificate configuration',
     description: 'Link Text for Config Application Settings'
+  },
+  previewTemplate: {
+    id: 'config.previewTemplate',
+    defaultMessage: 'Preview',
+    description: 'Preview action in certificate config action menu'
+  },
+  printTemplate: {
+    id: 'config.printTemplate',
+    defaultMessage: 'Print',
+    description: 'Print action in certificate config action menu'
+  },
+  downloadTemplate: {
+    id: 'config.downloadTemplate',
+    defaultMessage: 'Download',
+    description: 'Download action in certificate config action menu'
+  },
+  uploadTemplate: {
+    id: 'config.uploadTemplate',
+    defaultMessage: 'Upload',
+    description: 'Upload action in certificate config action menu'
   }
 }
 
