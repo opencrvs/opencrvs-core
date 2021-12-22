@@ -14,6 +14,7 @@ import styled from 'styled-components'
 
 interface ITextAreaProps {
   ignoreMediaQuery?: boolean
+  maxLength?: number
 }
 
 const StyledTextArea = styled.textarea<ITextAreaProps>`
@@ -48,7 +49,7 @@ const StyledTextArea = styled.textarea<ITextAreaProps>`
   }}
 `
 
-export class TextArea extends React.Component {
+export class TextArea extends React.Component<ITextAreaProps> {
   render() {
     return <StyledTextArea {...this.props} />
   }

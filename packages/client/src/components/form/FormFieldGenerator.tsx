@@ -80,7 +80,8 @@ import {
   IAttachmentValue,
   RADIO_GROUP_WITH_NESTED_FIELDS,
   Ii18nRadioGroupWithNestedFieldsFormField,
-  LOCATION_SEARCH_INPUT
+  LOCATION_SEARCH_INPUT,
+  Ii18nTextareaFormField
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -374,7 +375,10 @@ function GeneratedInputField({
   if (fieldDefinition.type === TEXTAREA) {
     return (
       <InputField {...inputFieldProps}>
-        <TextArea {...inputProps} />
+        <TextArea
+          maxLength={(fieldDefinition as Ii18nTextareaFormField).maxLength}
+          {...inputProps}
+        />
       </InputField>
     )
   }
