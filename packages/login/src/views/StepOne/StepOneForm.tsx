@@ -267,6 +267,7 @@ export class StepOneForm extends React.Component<FullProps> {
       submissionError,
       errorCode
     } = this.props
+    const isOffline: boolean = navigator.onLine ? false : true
 
     return (
       <Container id="login-step-one-box">
@@ -274,7 +275,7 @@ export class StepOneForm extends React.Component<FullProps> {
           <Logo />
         </LogoContainer>
         <Title>
-          {submissionError && (
+          {submissionError && errorCode ? (
             <ErrorMessage>
               {errorCode === ERROR_CODE_FIELD_MISSING &&
                 intl.formatMessage(messages.fieldMissing)}
@@ -284,8 +285,13 @@ export class StepOneForm extends React.Component<FullProps> {
                 intl.formatMessage(messages.forbiddenCredentialError)}
               {errorCode === ERROR_CODE_PHONE_NUMBER_VALIDATE &&
                 intl.formatMessage(messages.phoneNumberFormat)}
-              {!errorCode && intl.formatMessage(messages.networkError)}
             </ErrorMessage>
+          ) : (
+            isOffline && (
+              <ErrorMessage>
+                {intl.formatMessage(messages.networkError)}
+              </ErrorMessage>
+            )
           )}
         </Title>
         <FormWrapper id={formId} onSubmit={handleSubmit(submitAction)}>
