@@ -13,7 +13,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import * as React from 'react'
-import { injectIntl, WrappedComponentProps } from 'react-intl'
+import { injectIntl, IntlShape, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
@@ -21,17 +21,12 @@ import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWr
 import { Container } from '@opencrvs/components/lib/layout'
 import { Button } from '@opencrvs/components/lib/buttons'
 import { messages } from '@client/i18n/messages/views/config'
-import { TopBar } from '@opencrvs/components/lib/interface'
-
-const HeaderContainer = styled.div`
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-
-  & > :first-child {
-    margin-right: 24px;
-  }
-`
+import {
+  DataSection,
+  ToggleMenu,
+  TopBar
+} from '@opencrvs/components/lib/interface'
+import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 
 const SubMenuTab = styled(Button)<{ active: boolean }>`
   color: ${({ theme }) => theme.colors.copy};
@@ -71,6 +66,16 @@ const SubMenuTab = styled(Button)<{ active: boolean }>`
     color: ${({ theme }) => theme.colors.copy};
   }
 `
+
+const ColoredDataSection = styled.div`
+  background-color: ${({ theme }) => theme.colors.smallButtonFocus};
+  margin: 30px 32px 30px 32px;
+  padding: 1px 10px 21px 32px;
+  border-radius: 4px;
+  height: 269px;
+  width: 776px;
+`
+
 type Props = WrappedComponentProps &
   Pick<RouteComponentProps, 'history'> & {
     offlineCountryConfiguration: IOfflineData
@@ -83,6 +88,35 @@ interface State {
 const SUB_MENU_ID = {
   certificatesConfig: 'Certificates'
 }
+function getMenuItems(intl: IntlShape) {
+  const menuItems = [
+    {
+      label: intl.formatMessage(messages.previewTemplate),
+      handler: () => {
+        alert('Preview clicked')
+      }
+    },
+    {
+      label: intl.formatMessage(messages.printTemplate),
+      handler: () => {
+        alert('Print clicked')
+      }
+    },
+    {
+      label: intl.formatMessage(messages.downloadTemplate),
+      handler: () => {
+        alert('Download clicked')
+      }
+    },
+    {
+      label: intl.formatMessage(messages.uploadTemplate),
+      handler: () => {
+        alert('Upload clicked')
+      }
+    }
+  ]
+  return menuItems
+}
 
 class ConfigHomeComponent extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -94,6 +128,36 @@ class ConfigHomeComponent extends React.Component<Props, State> {
 
   render() {
     const { intl } = this.props
+
+    const CertificateSection = {
+      title: 'Certificates templates',
+      items: [
+        {
+          id: 'birth',
+          label: 'Birth certificate',
+          value: 'Default birth certificate template',
+          actionsMenu: (
+            <ToggleMenu
+              id={`template-birth-action-menu`}
+              toggleButton={<VerticalThreeDots />}
+              menuItems={getMenuItems(intl)}
+            />
+          )
+        },
+        {
+          id: 'death',
+          label: 'Death certificate',
+          value: 'Default death certificate template',
+          actionsMenu: (
+            <ToggleMenu
+              id={`template-death-action-menu`}
+              toggleButton={<VerticalThreeDots />}
+              menuItems={getMenuItems(intl)}
+            />
+          )
+        }
+      ]
+    }
 
     return (
       <SysAdminContentWrapper
@@ -117,7 +181,24 @@ class ConfigHomeComponent extends React.Component<Props, State> {
           </TopBar>
         }
       >
-        <Container></Container>
+        <Container>
+          {this.state.selectedSubMenuItem ===
+            SUB_MENU_ID.certificatesConfig && (
+            <ColoredDataSection>
+              <DataSection
+                title={CertificateSection.title}
+                items={CertificateSection.items}
+                responsiveContents={
+                  <div>
+                    To learn how to edit an SVG and upload a certificate to
+                    suite your country requirements please refer to this
+                    detailed guide. How to configure a certificate?
+                  </div>
+                }
+              />
+            </ColoredDataSection>
+          )}
+        </Container>
       </SysAdminContentWrapper>
     )
   }

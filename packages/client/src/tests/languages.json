@@ -1170,7 +1170,11 @@
         "form.field.label.relationHouseOwner": "Owner of the house or building where the birth occurred",
         "form.field.label.relationOperator": "Driver or operator of the land or water vehicle or aircraft where the birth occurred",
         "form.field.label.relationOfficeInCharge": "Officer-in-charge of the Thana of a road or public space where the birth occurred",
-        "form.field.label.relationSomeoneElse": "Someone else"
+        "form.field.label.relationSomeoneElse": "Someone else",
+        "config.previewTemplate": "Preview",
+        "config.printTemplate": "Print",
+        "config.downloadTemplate": "Download",
+        "config.uploadTemplate": "Upload"
       }
     },
     {
