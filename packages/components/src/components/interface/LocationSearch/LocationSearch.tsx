@@ -245,7 +245,8 @@ export class LocationSearch extends React.Component<IProps, IState> {
   componentDidMount() {
     if (this.props.selectedLocation) {
       this.setState({
-        selectedText: this.props.selectedLocation.displayLabel
+        selectedText: this.props.selectedLocation.displayLabel,
+        selectedItem: this.props.selectedLocation
       })
     }
   }
