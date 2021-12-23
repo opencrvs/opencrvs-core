@@ -34,9 +34,7 @@
     "node-fetch": "^2.6.1",
     "node-verhoeff": "^0.0.11",
     "pino": "^6.0.0",
-    "prettier": "^1.19.1",
     "short-uid": "^0.1.0",
-    "typescript": "^3.7.4",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
@@ -54,7 +52,7 @@
     "jest-fetch-mock": "^2.1.2",
     "lint-staged": "^7.1.0",
     "nodemon": "^1.17.5",
-    "prettier": "^1.13.5",
+    "prettier": "^1.19.1",
     "ts-jest": "^24.0.2",
     "ts-node": "^6.1.1",
     "tsconfig-paths": "^3.8.0",
