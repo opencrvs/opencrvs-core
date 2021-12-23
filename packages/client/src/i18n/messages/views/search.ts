@@ -65,7 +65,7 @@ const messagesToDefine: ISearchMessages = {
     description: 'The total result text'
   },
   locationNotFound: {
-    id: 'performance.location.notFound',
+    id: 'search.locationNotFound',
     defaultMessage: 'Location not found',
     description: 'Label for location not found'
   }
