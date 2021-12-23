@@ -19,6 +19,7 @@ interface IConfigMessages
   printTemplate: MessageDescriptor
   downloadTemplate: MessageDescriptor
   uploadTemplate: MessageDescriptor
+  listTitle: MessageDescriptor
 }
 
 const messagesToDefine: IConfigMessages = {
@@ -51,6 +52,11 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.uploadTemplate',
     defaultMessage: 'Upload',
     description: 'Upload action in certificate config action menu'
+  },
+  listTitle: {
+    id: 'config.listTitle',
+    defaultMessage: 'Certificate templates',
+    description: 'Title for certificate templates list'
   }
 }
 

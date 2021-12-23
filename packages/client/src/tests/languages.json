@@ -1169,7 +1169,8 @@
         "config.previewTemplate": "Preview",
         "config.printTemplate": "Print",
         "config.downloadTemplate": "Download",
-        "config.uploadTemplate": "Upload"
+        "config.uploadTemplate": "Upload",
+        "config.listTitle": "Certificate templates"
       }
     },
     {
