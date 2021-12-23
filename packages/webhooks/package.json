@@ -17,14 +17,14 @@
     "build:clean": "rm -rf build"
   },
   "dependencies": {
+    "@hapi/boom": "^9.1.1",
+    "@hapi/hapi": "^20.0.1",
     "@opencrvs/commons": "^1.0.0-alpha.3.0",
     "@types/hapi-pino": "8.0.5",
     "@types/pino": "^6.3.12",
     "app-module-path": "^2.2.0",
-    "@hapi/boom": "^9.1.1",
     "bullmq": "^1.9.0",
     "crypto": "^1.0.1",
-    "@hapi/hapi": "^20.0.1",
     "hapi-auth-jwt2": "10.2.0",
     "hapi-pino": "^8.5.0",
     "hapi-sentry": "^3.1.0",
@@ -41,9 +41,10 @@
     "uuid": "^3.3.2"
   },
   "devDependencies": {
-    "@types/hapi__boom": "^9.0.1",
     "@types/fhir": "^0.0.30",
+    "@types/hapi__boom": "^9.0.1",
     "@types/hapi__hapi": "^20.0.0",
+    "@types/ioredis": "^4.28.5",
     "@types/jest": "^26.0.14",
     "@types/jwt-decode": "^2.2.1",
     "@types/lodash": "^4.14.135",
