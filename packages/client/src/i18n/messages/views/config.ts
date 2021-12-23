@@ -20,6 +20,7 @@ interface IConfigMessages
   downloadTemplate: MessageDescriptor
   uploadTemplate: MessageDescriptor
   listTitle: MessageDescriptor
+  birthTemplate: MessageDescriptor
 }
 
 const messagesToDefine: IConfigMessages = {
@@ -57,6 +58,11 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.listTitle',
     defaultMessage: 'Certificate templates',
     description: 'Title for certificate templates list'
+  },
+  birthTemplate: {
+    id: 'config.birthTemplate',
+    defaultMessage: 'Birth certificate',
+    description: 'Label for birth certificate template'
   }
 }
 
