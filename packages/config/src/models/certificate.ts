@@ -33,7 +33,7 @@ export interface IApplicationCertificateModel extends Document {
 const certificateSchema = new Schema({
   svgCode: { type: String, required: false },
   svgFilename: { type: String, required: false },
-  svgDateUpdated: { type: Number, required: false },
+  svgDateUpdated: { type: Number, default: Date.now },
   svgDateCreated: { type: Number, default: Date.now },
   user: { type: String, required: false },
   event: {

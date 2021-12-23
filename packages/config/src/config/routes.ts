@@ -9,6 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import {
+  createCertificateHandler,
+  deleteCertificateHandler,
+  getCertificateHandler,
+  requestActiveCertificate,
+  requestNewCertificate,
+  updateCertificateHandler
+} from '@config/handlers/applicationCertificateHandler'
 import applicationConfigHandler from '@config/handlers/applicationConfigHandler'
 
 export default function getRoutes() {
@@ -37,6 +45,52 @@ export default function getRoutes() {
         auth: false,
         tags: ['api'],
         description: 'Retrieve Application configuration'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/getCertificate',
+      handler: getCertificateHandler,
+      config: {
+        tags: ['api'],
+        description: 'Retrieves certificate',
+        auth: false,
+        validate: {
+          payload: requestActiveCertificate
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/createCertificate',
+      handler: createCertificateHandler,
+      config: {
+        tags: ['api'],
+        description: 'Creates a new Certificate',
+        auth: false,
+        validate: {
+          payload: requestNewCertificate
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/updateCertificate',
+      handler: updateCertificateHandler,
+      config: {
+        tags: ['api'],
+        description: 'Updates an existing Certificate',
+        auth: false
+      }
+    },
+    {
+      method: 'DELETE',
+      path: '/certificate/{certificateId}',
+      handler: deleteCertificateHandler,
+      config: {
+        tags: ['api'],
+        description: 'Delete certificate',
+        auth: false
       }
     }
   ]
