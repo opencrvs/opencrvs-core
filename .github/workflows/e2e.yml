@@ -11,9 +11,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: [develop]
+    branches: [ocrvs-2339]
   pull_request:
-    branches: [develop]
+    branches: [ocrvs-2339]
 
 jobs:
   build:
@@ -32,3 +32,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
+
+      - name: Install docker
+        uses: docker-practice/actions-setup-docker@master
+
+      - name: Execute build & test script
+        run: ./infrastructure/build-and-test-e2e-new.sh
