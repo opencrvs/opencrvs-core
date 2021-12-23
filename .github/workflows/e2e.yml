@@ -38,3 +38,7 @@ jobs:
 
       - name: Execute build & test script
         run: ./infrastructure/build-and-test-e2e-new.sh
+        env:
+          CYPRESS_LOGIN_URL: http://localhost:3020/
+          CYPRESS_CLIENT_URL: http://localhost:3000/
+          CYPRESS_AUTH_URL: http://localhost:4040/
