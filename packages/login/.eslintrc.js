@@ -56,6 +56,16 @@ module.exports = {
     '@typescript-eslint/prefer-interface': 'off',
     '@typescript-eslint/array-type': 'off',
     '@typescript-eslint/no-object-literal-type-assertion': 'off',
+    '@typescript-eslint/ban-types': [
+      'error',
+      {
+        types: {
+          '{}': false
+        },
+        extendDefaults: true
+      }
+    ],
+    '@typescript-eslint/ban-ts-comment': 'off',
     'react/no-unescaped-entities': 'off',
     'react/destructuring-assignment': 'off',
     'react/jsx-filename-extension': [
