@@ -109,7 +109,7 @@ interface IProps {
   className?: string
 }
 export class LocationSearch extends React.Component<IProps, IState> {
-  searchTimeout: number | undefined
+  searchTimeout: NodeJS.Timeout | undefined
   constructor(props: IProps) {
     super(props)
     this.state = {
@@ -155,7 +155,9 @@ export class LocationSearch extends React.Component<IProps, IState> {
   }
 
   debounce(callback: () => void, duration: number) {
-    clearTimeout(this.searchTimeout)
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout)
+    }
     this.searchTimeout = setTimeout(callback, duration)
   }
 
