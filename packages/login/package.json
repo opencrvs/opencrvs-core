@@ -70,7 +70,7 @@
   "devDependencies": {
     "@types/enzyme": "^3.1.13",
     "@types/enzyme-adapter-react-16": "^1.0.3",
-    "@types/jest": "^24.0.13",
+    "@types/jest": "^26.0.14",
     "@types/jwt-decode": "^2.2.1",
     "@types/lodash-es": "^4.17.0",
     "@types/node": "^10.12.5",
