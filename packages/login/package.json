@@ -18,7 +18,7 @@
     "axios": "^0.21.1",
     "connected-react-router": "^6.5.2",
     "country-data": "^0.0.31",
-    "eslint": "^5.16.0",
+    "eslint": "^7.11.0",
     "eslint-config-prettier": "^4.3.0",
     "eslint-plugin-import": "^2.17.3",
     "eslint-plugin-prettier": "^3.1.0",

@@ -127,7 +127,7 @@
     "chalk": "^2.4.1",
     "enzyme": "^3.4.4",
     "enzyme-adapter-react-16": "^1.2.0",
-    "eslint": "^5.16.0",
+    "eslint": "^7.11.0",
     "eslint-config-prettier": "^4.3.0",
     "eslint-config-react-app": "^6.0.0",
     "eslint-plugin-formatjs": "^2.18.0",
