@@ -1170,7 +1170,8 @@
         "config.printTemplate": "Print",
         "config.downloadTemplate": "Download",
         "config.uploadTemplate": "Upload",
-        "config.listTitle": "Certificate templates"
+        "config.listTitle": "Certificate templates",
+        "config.birthTemplate": "Birth certificate"
       }
     },
     {
