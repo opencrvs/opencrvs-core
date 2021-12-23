@@ -682,7 +682,7 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.within45DaysTo1Year'
   },
   within1YearTo5Years: {
-    defaultMessage: '1 year to 5 years',
+    defaultMessage: '1 year - 5 years',
     description: 'Label for registrations within 1 year to 5 years',
     id: 'constants.within1YearTo5Years'
   },
