@@ -14,10 +14,10 @@ module.exports = {
     'eslint-config-react-app',
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
-    'prettier/@typescript-eslint',
     'plugin:import/errors',
     'plugin:import/warnings',
-    'plugin:import/typescript'
+    'plugin:import/typescript',
+    'prettier'
   ],
   plugins: ['react', '@typescript-eslint', 'import'],
   env: {
