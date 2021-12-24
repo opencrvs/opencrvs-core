@@ -47,10 +47,7 @@ describe('Gender basis report tests', () => {
       store
     )
 
-    const total = testComponent.component
-      .find('#row_0')
-      .find('span')
-      .at(6)
+    const total = testComponent.component.find('#row_0').find('span').at(6)
 
     expect(total.text()).toBe('20')
   })

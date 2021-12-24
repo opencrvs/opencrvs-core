@@ -62,7 +62,7 @@ describe('Login app step one', () => {
       expect(request.url).toMatch(/authenticate/)
     })
 
-    it('handles no connectivity', async done => {
+    it('handles no connectivity', async (done) => {
       moxios.stubRequest(
         resolve(window.config.AUTH_API_URL, 'authenticate'),
         undefined
@@ -74,7 +74,7 @@ describe('Login app step one', () => {
       expect(app.find(ErrorMessage)).toHaveLength(1)
     })
 
-    it('displays loading spinner when the user is submitting the form', async done => {
+    it('displays loading spinner when the user is submitting the form', async (done) => {
       moxios.stubRequest(resolve(window.config.AUTH_API_URL, 'authenticate'), {
         status: 400,
         responseText: { message: 'bad request' }
@@ -89,7 +89,7 @@ describe('Login app step one', () => {
       })
     })
 
-    it('redirects user to verification code form once username and password are accepted', async done => {
+    it('redirects user to verification code form once username and password are accepted', async (done) => {
       moxios.stubRequest(resolve(window.config.AUTH_API_URL, 'authenticate'), {
         status: 200,
         responseText: "{ nonce: '12345' }"

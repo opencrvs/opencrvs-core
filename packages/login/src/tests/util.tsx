@@ -35,7 +35,7 @@ export async function createTestApp() {
 }
 
 export function createTestComponent(
-  node: React.ReactElement<object>,
+  node: React.ReactElement,
   storeAndHistory?: ReturnType<typeof createStore>
 ) {
   storeAndHistory = storeAndHistory || createStore()
@@ -52,4 +52,4 @@ export function createTestComponent(
   )
 }
 
-export const wait = () => new Promise(res => process.nextTick(res))
+export const wait = () => new Promise((res) => process.nextTick(res))

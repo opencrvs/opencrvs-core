@@ -65,8 +65,9 @@ function generateSearchableLocations(
   const generated: ISearchLocation[] = locations.map((location: ILocation) => {
     let locationName = location.name
     location.jurisdictionType &&
-      (locationName += ` ${JURISDICTION_TYPE[location.jurisdictionType] ||
-        ''}`.trimEnd())
+      (locationName += ` ${
+        JURISDICTION_TYPE[location.jurisdictionType] || ''
+      }`.trimEnd())
 
     if (location.partOf && location.partOf !== 'Location/0') {
       const locRef = location.partOf.split('/')[1]
@@ -96,7 +97,7 @@ export function generateLocations(
 
   if (filterByLocationTypes) {
     locationArray = locationArray.filter(
-      location =>
+      (location) =>
         location.type &&
         filterByLocationTypes.includes(location.type as LocationType)
     )
@@ -104,7 +105,7 @@ export function generateLocations(
 
   if (filterByJurisdictionTypes) {
     locationArray = locationArray.filter(
-      location =>
+      (location) =>
         location.jurisdictionType &&
         filterByJurisdictionTypes.includes(location.jurisdictionType)
     )

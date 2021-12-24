@@ -134,7 +134,7 @@ class StatusWiseApplicationCountViewComponent extends React.Component<
           </Description>
         </StatusHeader>
         {results
-          .filter(item => item && checkExternalValidationStatus(item.status))
+          .filter((item) => item && checkExternalValidationStatus(item.status))
           .map((statusCount, index) => {
             return (
               statusCount && (
@@ -178,9 +178,10 @@ class StatusWiseApplicationCountViewComponent extends React.Component<
 export const StatusWiseApplicationCountView = connect(
   (state: IStoreState, ownProps: BaseProps) => {
     const offlineLocations = getOfflineData(state).locations
-    let disableApplicationLink = !window.config.APPLICATION_AUDIT_LOCATIONS.includes(
-      getJurisidictionType(offlineLocations, ownProps.locationId) as string
-    )
+    let disableApplicationLink =
+      !window.config.APPLICATION_AUDIT_LOCATIONS.includes(
+        getJurisidictionType(offlineLocations, ownProps.locationId) as string
+      )
     const userDetails = getUserDetails(state)
     if (
       userDetails &&

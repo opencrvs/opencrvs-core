@@ -299,7 +299,7 @@ class HeaderComp extends React.Component<IProps, IState> {
   }
 
   toggleMenu = () => {
-    this.setState(prevState => ({ showMenu: !prevState.showMenu }))
+    this.setState((prevState) => ({ showMenu: !prevState.showMenu }))
   }
 
   renderSearchInput(props: IProps, isMobile?: boolean) {
@@ -491,9 +491,8 @@ class HeaderComp extends React.Component<IProps, IState> {
       ]
     }
 
-    const mobileHeaderActionProps = this.getMobileHeaderActionProps(
-      activeMenuItem
-    )
+    const mobileHeaderActionProps =
+      this.getMobileHeaderActionProps(activeMenuItem)
 
     return (
       <>

@@ -62,7 +62,7 @@ function ExternalValidationTabComponent(props: IProps) {
     }
     const transformedData = transformData(data, props.intl)
 
-    return transformedData.map(reg => {
+    return transformedData.map((reg) => {
       const event =
         (reg.event &&
           intl.formatMessage(
@@ -157,7 +157,7 @@ function ExternalValidationTabComponent(props: IProps) {
   const renderExpandedComponent = (itemId: string) => {
     const { results } = props.queryData && props.queryData.data
     const eventDetails =
-      results && results.find(result => result && result.id === itemId)
+      results && results.find((result) => result && result.id === itemId)
     return <RowHistoryView eventDetails={eventDetails} />
   }
 

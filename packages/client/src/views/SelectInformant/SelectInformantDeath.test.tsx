@@ -47,15 +47,9 @@ describe('when user is selecting the informant', () => {
   })
   describe('when selects "Parent"', () => {
     it('takes user to the death registration contact view', () => {
-      app
-        .find('#select_informant_MOTHER')
-        .hostNodes()
-        .simulate('change')
+      app.find('#select_informant_MOTHER').hostNodes().simulate('change')
 
-      app
-        .find('#continue')
-        .hostNodes()
-        .simulate('click')
+      app.find('#continue').hostNodes().simulate('click')
 
       const expectation = `/drafts/${draft.id}/events/death`
       expect(window.location.pathname).toContain(expectation)
@@ -63,47 +57,23 @@ describe('when user is selecting the informant', () => {
   })
   describe('when click continue without select anything', () => {
     it('show the error message', () => {
-      app
-        .find('#continue')
-        .hostNodes()
-        .simulate('click')
+      app.find('#continue').hostNodes().simulate('click')
 
-      expect(
-        app
-          .find('#error_text')
-          .hostNodes()
-          .text()
-      ).toBe('Please select the relationship to the deceased.')
+      expect(app.find('#error_text').hostNodes().text()).toBe(
+        'Please select the relationship to the deceased.'
+      )
     })
   })
 
   describe('when traverse list then continue', () => {
     it('takes user to the death registration by parent informant view', () => {
-      app
-        .find('#select_informant_MOTHER')
-        .hostNodes()
-        .simulate('change')
-      app
-        .find('#select_informant_FATHER')
-        .hostNodes()
-        .simulate('change')
+      app.find('#select_informant_MOTHER').hostNodes().simulate('change')
+      app.find('#select_informant_FATHER').hostNodes().simulate('change')
 
-      app
-        .find('#select_informant_SPOUSE')
-        .hostNodes()
-        .simulate('change')
-      app
-        .find('#select_informant_SON')
-        .hostNodes()
-        .simulate('change')
-      app
-        .find('#select_informant_DAUGHTER')
-        .hostNodes()
-        .simulate('change')
-      app
-        .find('#continue')
-        .hostNodes()
-        .simulate('click')
+      app.find('#select_informant_SPOUSE').hostNodes().simulate('change')
+      app.find('#select_informant_SON').hostNodes().simulate('change')
+      app.find('#select_informant_DAUGHTER').hostNodes().simulate('change')
+      app.find('#continue').hostNodes().simulate('click')
 
       const expectation = `/drafts/${draft.id}/events/death`
       expect(window.location.pathname).toContain(expectation)
@@ -112,15 +82,9 @@ describe('when user is selecting the informant', () => {
 
   describe('when select other informant', () => {
     it('advances to additional relationship information if informant is other', async () => {
-      app
-        .find('#select_informant_OTHER')
-        .hostNodes()
-        .simulate('change')
+      app.find('#select_informant_OTHER').hostNodes().simulate('change')
 
-      app
-        .find('#continue')
-        .hostNodes()
-        .simulate('click')
+      app.find('#continue').hostNodes().simulate('click')
 
       await flushPromises()
       app.update()
@@ -131,25 +95,13 @@ describe('when user is selecting the informant', () => {
     })
 
     it('advances to contact point if informant is other', async () => {
-      app
-        .find('#select_informant_OTHER')
-        .hostNodes()
-        .simulate('change')
+      app.find('#select_informant_OTHER').hostNodes().simulate('change')
 
-      app
-        .find('#continue')
-        .hostNodes()
-        .simulate('click')
+      app.find('#continue').hostNodes().simulate('click')
 
-      app
-        .find('#relationship_OFFICER_IN_CHARGE')
-        .hostNodes()
-        .simulate('change')
+      app.find('#relationship_OFFICER_IN_CHARGE').hostNodes().simulate('change')
 
-      app
-        .find('#next_section')
-        .hostNodes()
-        .simulate('click')
+      app.find('#next_section').hostNodes().simulate('click')
 
       await flushPromises()
       app.update()
@@ -160,10 +112,7 @@ describe('when user is selecting the informant', () => {
 
   describe('when clicked on cross button', () => {
     it('go back to home page', async () => {
-      app
-        .find('#crcl-btn')
-        .hostNodes()
-        .simulate('click')
+      app.find('#crcl-btn').hostNodes().simulate('click')
 
       expect(window.location.href).toContain('/')
     })
@@ -188,10 +137,7 @@ describe('when select informant page loads with existing data', () => {
     await setPinCode(app)
 
     expect(
-      app
-        .find('#select_informant_OTHER')
-        .hostNodes()
-        .props().checked
+      app.find('#select_informant_OTHER').hostNodes().props().checked
     ).toBe(true)
   })
 })

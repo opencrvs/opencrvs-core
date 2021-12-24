@@ -33,7 +33,7 @@ if (process.env.CI) {
 const customGlobal: GlobalWithFetchMock = global as GlobalWithFetchMock
 customGlobal.fetch = require('jest-fetch-mock')
 customGlobal.fetchMock = customGlobal.fetch
-jest.mock('lodash/debounce', () => jest.fn(fn => fn))
+jest.mock('lodash/debounce', () => jest.fn((fn) => fn))
 
 /*
  * Local storage
@@ -155,30 +155,36 @@ const {
   assign
 } = require('./tests/util')
 
-jest.mock('@client/utils/referenceApi', (): {
-  referenceApi: typeof referenceApi
-} => ({
-  referenceApi: {
-    loadLocations: () => Promise.resolve(mockOfflineData.locations),
-    loadFacilities: () => Promise.resolve(mockOfflineData.facilities),
-    loadPilotLocations: () => Promise.resolve(mockOfflineData.pilotLocations),
-    loadDefinitions: () =>
-      Promise.resolve({
-        languages: mockOfflineData.languages,
-        forms: mockOfflineData.forms,
-        templates: mockOfflineData.templates
-      }),
-    loadAssets: () => Promise.resolve(mockOfflineData.assets)
-  }
-}))
+jest.mock(
+  '@client/utils/referenceApi',
+  (): {
+    referenceApi: typeof referenceApi
+  } => ({
+    referenceApi: {
+      loadLocations: () => Promise.resolve(mockOfflineData.locations),
+      loadFacilities: () => Promise.resolve(mockOfflineData.facilities),
+      loadPilotLocations: () => Promise.resolve(mockOfflineData.pilotLocations),
+      loadDefinitions: () =>
+        Promise.resolve({
+          languages: mockOfflineData.languages,
+          forms: mockOfflineData.forms,
+          templates: mockOfflineData.templates
+        }),
+      loadAssets: () => Promise.resolve(mockOfflineData.assets)
+    }
+  })
+)
 
-jest.mock('@client/utils/authApi', (): {
-  authApi: typeof authApi
-} => ({
-  authApi: {
-    invalidateToken: () => Promise.resolve()
-  }
-}))
+jest.mock(
+  '@client/utils/authApi',
+  (): {
+    authApi: typeof authApi
+  } => ({
+    authApi: {
+      invalidateToken: () => Promise.resolve()
+    }
+  })
+)
 
 beforeEach(() => {
   /*

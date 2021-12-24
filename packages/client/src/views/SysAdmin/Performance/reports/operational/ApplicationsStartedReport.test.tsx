@@ -65,17 +65,9 @@ describe('Registration rates report', () => {
     expect(
       component.find('#applications-started-reports').hostNodes()
     ).toHaveLength(1)
-    expect(
-      component
-        .find('#total-applications')
-        .hostNodes()
-        .text()
-    ).toBe('5')
-    expect(
-      component
-        .find('#field-agent-percentage')
-        .hostNodes()
-        .text()
-    ).toBe('(40%)')
+    expect(component.find('#total-applications').hostNodes().text()).toBe('5')
+    expect(component.find('#field-agent-percentage').hostNodes().text()).toBe(
+      '(40%)'
+    )
   })
 })

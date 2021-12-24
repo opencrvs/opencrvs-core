@@ -376,6 +376,5 @@ const messagesToDefine: IUserMessages = {
   }
 }
 
-export const userMessages:
-  | IUserMessages
-  | IDynamicUserMessages = defineMessages(messagesToDefine)
+export const userMessages: IUserMessages | IDynamicUserMessages =
+  defineMessages(messagesToDefine)

@@ -61,10 +61,11 @@ export default class TimeoutLink extends ApolloLink {
     if (forward) {
       const chainObservable = forward(operation) // observable for remaining link chain
 
-      const operationType: string = ((operation.query
-        .definitions as ReadonlyArray<DefinitionNode>).find(
-        (def: DefinitionNode) => def.kind === 'OperationDefinition'
-      ) as OperationDefinitionNode).operation
+      const operationType: string = (
+        (operation.query.definitions as ReadonlyArray<DefinitionNode>).find(
+          (def: DefinitionNode) => def.kind === 'OperationDefinition'
+        ) as OperationDefinitionNode
+      ).operation
 
       if (this.timeout <= 0 || operationType === 'subscription') {
         return chainObservable // skip this link if timeout is zero or it's a subscription request
@@ -72,17 +73,18 @@ export default class TimeoutLink extends ApolloLink {
 
       // create local observable with timeout functionality (unsubscibe from chain observable and
       // return an error if the timeout expires before chain observable resolves)
-      const localObservable = new Observable(observer => {
+      const localObservable = new Observable((observer) => {
+        // eslint-disable-next-line prefer-const
         let timer: ReturnType<typeof setTimeout>
 
         // listen to chainObservable for result and pass to localObservable if received before timeout
         const subscription = chainObservable.subscribe(
-          result => {
+          (result) => {
             clearTimeout(timer)
             observer.next(result)
             observer.complete()
           },
-          error => {
+          (error) => {
             clearTimeout(timer)
             observer.error(error) // pass error to the errorLink
             observer.complete()

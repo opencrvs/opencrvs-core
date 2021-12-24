@@ -51,7 +51,7 @@ type IFullProps = IProps & IntlShapeProps
 class NotificationToast extends React.Component<IFullProps> {
   render() {
     const outboxData = this.props.application.filter(
-      item =>
+      (item) =>
         item.submissionStatus === SUBMISSION_STATUS.READY_TO_SUBMIT ||
         item.submissionStatus === SUBMISSION_STATUS.READY_TO_APPROVE ||
         item.submissionStatus === SUBMISSION_STATUS.READY_TO_REGISTER ||

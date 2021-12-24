@@ -33,7 +33,8 @@ import { Cmd, Loop, loop, LoopReducer } from 'redux-loop'
 import {
   GQLQuery,
   GQLUser,
-  GQLLocation
+  GQLLocation,
+  GQLRole
 } from '@opencrvs/gateway/src/graphql/schema'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { userAuditForm, IUserAuditForm } from '@client/user/user-audit'
@@ -69,13 +70,13 @@ const initialState: IUserFormState = {
 interface IUpdateUserFormFieldDefsAction {
   type: typeof UPDATE_FORM_FIELD_DEFINITIONS
   payload: {
-    data: object
+    data: GQLRole[]
     queryData?: ApolloQueryResult<GQLQuery>
   }
 }
 
 export function updateUserFormFieldDefinitions(
-  data: object,
+  data: GQLRole[],
   queryData?: ApolloQueryResult<GQLQuery>
 ): IUpdateUserFormFieldDefsAction {
   return {
@@ -125,7 +126,7 @@ interface IUserFormDataSubmitAction {
   payload: {
     client: ApolloClient<unknown>
     mutation: any
-    variables: object
+    variables: Record<string, unknown>
     isUpdate: boolean
     officeLocationId: string
   }
@@ -149,9 +150,9 @@ interface ISubmitSuccessAction {
 export function submitUserFormData(
   client: ApolloClient<unknown>,
   mutation: any,
-  variables: object,
+  variables: Record<string, unknown>,
   officeLocationId: string,
-  isUpdate: boolean = false
+  isUpdate = false
 ): IUserFormDataSubmitAction {
   return {
     type: SUBMIT_USER_FORM_DATA,
@@ -173,7 +174,7 @@ export function clearUserFormData(): Action {
 
 export function submitSuccess(
   locationId: string,
-  isUpdate: boolean = false
+  isUpdate = false
 ): ISubmitSuccessAction {
   return {
     type: SUBMIT_USER_FORM_DATA_SUCCESS,
@@ -269,9 +270,8 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
   switch (action.type) {
     case offlineActions.READY:
     case offlineActions.DEFINITIONS_LOADED:
-      const {
-        userForm
-      } = (action as offlineActions.DefinitionsLoadedAction).payload.forms
+      const { userForm } = (action as offlineActions.DefinitionsLoadedAction)
+        .payload.forms
       const form = deserializeForm(userForm)
 
       return {
@@ -281,26 +281,24 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         }
       }
     case PROCESS_ROLES:
-      const {
-        primaryOfficeId,
-        queryData: fetchUserQueryData
-      } = (action as IProcessRoles).payload
+      const { primaryOfficeId, queryData: fetchUserQueryData } = (
+        action as IProcessRoles
+      ).payload
       return loop(
         {
           ...state,
           loadingRoles: true
         },
         Cmd.run(alterRolesBasedOnUserRole, {
-          successActionCreator: data =>
+          successActionCreator: (data: GQLRole[]) =>
             updateUserFormFieldDefinitions(data, fetchUserQueryData),
           args: [primaryOfficeId]
         })
       )
     case UPDATE_FORM_FIELD_DEFINITIONS:
-      const {
-        data,
-        queryData: userQueryData
-      } = (action as IUpdateUserFormFieldDefsAction).payload
+      const { data, queryData: userQueryData } = (
+        action as IUpdateUserFormFieldDefsAction
+      ).payload
       const updatedSections = state.userForm!.sections
       if (
         userQueryData &&
@@ -308,27 +306,29 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         userQueryData.data.getUser.role &&
         userQueryData.data.getUser.type
       ) {
-        const {
-          role: existingRole,
-          type: existingType
-        } = userQueryData.data.getUser
+        const { role: existingRole, type: existingType } =
+          userQueryData.data.getUser
 
-        const roleData = (data as Array<{
-          value: string
-          types: string[]
-        }>).find(({ value }: { value: string }) => value === existingRole)
+        const roleData = (
+          data as Array<{
+            value: string
+            types: string[]
+          }>
+        ).find(({ value }: { value: string }) => value === existingRole)
 
         if (roleData && !roleData.types.includes(existingType)) {
           roleData.types.push(existingType)
         } else {
-          ;(data as Array<{
-            value: string
-            types: string[]
-          }>).push({ value: existingRole, types: [existingType] })
+          ;(
+            data as Array<{
+              value: string
+              types: string[]
+            }>
+          ).push({ value: existingRole, types: [existingType] })
         }
       }
-      updatedSections.forEach(section => {
-        section.groups.forEach(group => {
+      updatedSections.forEach((section) => {
+        section.groups.forEach((group) => {
           group.fields = transformRoleDataToDefinitions(
             group.fields,
             data,
@@ -365,13 +365,9 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         userForm: state.userForm
       }
     case SUBMIT_USER_FORM_DATA:
-      const {
-        client,
-        mutation,
-        variables,
-        officeLocationId,
-        isUpdate
-      } = (action as IUserFormDataSubmitAction).payload
+      const { client, mutation, variables, officeLocationId, isUpdate } = (
+        action as IUserFormDataSubmitAction
+      ).payload
       return loop(
         { ...state, submitting: true },
         Cmd.run(
@@ -451,9 +447,8 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         )
       )
     case UPDATE_DEFINITIONS_AND_FORM_DATA:
-      const {
-        queryData: getUserQueryData
-      } = (action as IUpdateFormAndFormData).payload
+      const { queryData: getUserQueryData } = (action as IUpdateFormAndFormData)
+        .payload
       const { primaryOffice } = getUserQueryData.data.getUser as GQLUser
       return loop(
         state,

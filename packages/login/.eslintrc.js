@@ -44,6 +44,7 @@ module.exports = {
     'import/no-extraneous-dependencies': 'off',
     'import/no-unresolved': 'off',
     'import/prefer-default-export': 'off',
+    'import/no-named-as-default': 'off',
     'import/no-relative-parent-imports': 2,
     'import/named': 0,
     '@typescript-eslint/explicit-function-return-type': 'off',
@@ -66,6 +67,8 @@ module.exports = {
       }
     ],
     '@typescript-eslint/ban-ts-comment': 'off',
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
+    '@typescript-eslint/no-empty-function': 'off',
     'react/no-unescaped-entities': 'off',
     'react/destructuring-assignment': 'off',
     'react/jsx-filename-extension': [

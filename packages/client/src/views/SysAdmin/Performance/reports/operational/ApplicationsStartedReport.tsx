@@ -212,11 +212,8 @@ class ApplicationsStartedReportComponent extends React.Component<
       disableFieldAgentLink,
       locationId
     } = this.props
-    const {
-      fieldAgentApplications,
-      hospitalApplications,
-      officeApplications
-    } = data
+    const { fieldAgentApplications, hospitalApplications, officeApplications } =
+      data
     return (
       <>
         <ApplicationsStartedReportHeader>
@@ -313,9 +310,10 @@ class ApplicationsStartedReportComponent extends React.Component<
 export const ApplicationsStartedReport = connect(
   (state: IStoreState, ownProps: BaseProps) => {
     const offlineLocations = getOfflineData(state).locations
-    let disableFieldAgentLink = !window.config.FIELD_AGENT_AUDIT_LOCATIONS.includes(
-      getJurisidictionType(offlineLocations, ownProps.locationId) as string
-    )
+    let disableFieldAgentLink =
+      !window.config.FIELD_AGENT_AUDIT_LOCATIONS.includes(
+        getJurisidictionType(offlineLocations, ownProps.locationId) as string
+      )
     const userDetails = getUserDetails(state)
     if (
       userDetails &&

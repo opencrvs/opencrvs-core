@@ -136,7 +136,7 @@ function ValuesWithSeparator(props: { strings: string[] }): JSX.Element {
 function formatRoleCode(str: string) {
   const sections = str.split('_')
   const formattedString: string[] = []
-  sections.map(section => {
+  sections.map((section) => {
     section = section.charAt(0) + section.slice(1).toLowerCase()
     formattedString.push(section)
     return section
@@ -195,7 +195,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
       contactNumber,
       operationHistories:
         (eventDetails.operationHistories &&
-          eventDetails.operationHistories.map(operationHistory => {
+          eventDetails.operationHistories.map((operationHistory) => {
             return {
               type: operationHistory && operationHistory.operationType,
               practitionerName:
@@ -358,7 +358,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
         </BorderedPaddedContent>
         <>
           {transformedData.operationHistories
-            .filter(item => checkExternalValidationStatus(item.type))
+            .filter((item) => checkExternalValidationStatus(item.type))
             .map((operationHistory, index) => {
               const { rejectReasons, comment } = operationHistory
               const type = operationHistory.type as string
@@ -394,7 +394,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                             label={intl.formatMessage(constantsMessages.update)}
                             value={rejectReasons
                               .split(',')
-                              .map(reason =>
+                              .map((reason) =>
                                 intl.formatMessage(
                                   getRejectionReasonDisplayValue(reason)
                                 )

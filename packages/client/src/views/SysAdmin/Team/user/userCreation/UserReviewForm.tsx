@@ -94,7 +94,7 @@ class UserReviewFormComponent extends React.Component<
     getVisibleSectionGroupsBasedOnConditions(
       userFormSection,
       this.props.formData
-    ).forEach(group => {
+    ).forEach((group) => {
       group.fields.forEach((field: IFormField) => {
         if (field && field.type === FIELD_GROUP_TITLE) {
           sections.push({ title: intl.formatMessage(field.label), items: [] })
@@ -135,7 +135,7 @@ class UserReviewFormComponent extends React.Component<
     const { intl, formData } = this.props
 
     if (field.type === SIMPLE_DOCUMENT_UPLOADER) {
-      const files = (formData[field.name] as unknown) as IAttachmentValue
+      const files = formData[field.name] as unknown as IAttachmentValue
 
       return (
         <SimpleDocumentUploader
@@ -149,9 +149,8 @@ class UserReviewFormComponent extends React.Component<
     }
 
     if (field.type === LOCATION_SEARCH_INPUT) {
-      const offlineLocations = this.props.offlineResources[
-        field.searchableResource
-      ]
+      const offlineLocations =
+        this.props.offlineResources[field.searchableResource]
 
       const locationId = formData[field.name] as string
       return offlineLocations[locationId] && offlineLocations[locationId].name

@@ -35,9 +35,7 @@ function request<T>(options: AxiosRequestConfig) {
     throw error
   }
 
-  return client(options)
-    .then(onSuccess)
-    .catch(onError)
+  return client(options).then(onSuccess).catch(onError)
 }
 
 const invalidateToken = (token: string): Promise<void> => {

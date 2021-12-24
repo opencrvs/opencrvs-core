@@ -46,10 +46,7 @@ describe('Login app step two', () => {
       component.unmount()
     })
     it('Requests another SMS code to be sent', async () => {
-      component
-        .find('#login-mobile-resend')
-        .hostNodes()
-        .simulate('click')
+      component.find('#login-mobile-resend').hostNodes().simulate('click')
       await wait()
       const request = moxios.requests.mostRecent()
       expect(request.url).toMatch(/resendSms/)

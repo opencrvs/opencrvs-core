@@ -130,10 +130,10 @@ class UserFormComponent extends React.Component<IFullProps> {
           <FormFieldGenerator
             key={activeGroup.id}
             id={section.id}
-            onChange={values => this.modifyData(values)}
+            onChange={(values) => this.modifyData(values)}
             setAllFieldsDirty={false}
             fields={getVisibleGroupFields(activeGroup)}
-            onSetTouched={setTouchedFunc => {
+            onSetTouched={(setTouchedFunc) => {
               this.setAllFormFieldsTouched = setTouchedFunc
             }}
             requiredErrorMessage={messages.requiredForNewUser}

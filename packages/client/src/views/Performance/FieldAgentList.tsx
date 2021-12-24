@@ -147,16 +147,15 @@ function FieldAgentListComponent(props: IProps) {
     goToOperationalReport,
     offices
   } = props
-  const { locationId, timeStart, timeEnd } = (parse(
+  const { locationId, timeStart, timeEnd } = parse(
     search
-  ) as unknown) as ISearchParams
+  ) as unknown as ISearchParams
   const [status, setStatus] = useState<STATUS_OPTIONS>(STATUS_OPTIONS.ACTIVE)
   const [event, setEvent] = useState<EVENT_OPTIONS>(EVENT_OPTIONS.ALL)
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
-  const [columnToBeSort, setColumnToBeSort] = useState<keyof SortMap>(
-    'totalApplications'
-  )
+  const [columnToBeSort, setColumnToBeSort] =
+    useState<keyof SortMap>('totalApplications')
   const recordCount = DEFAULT_FIELD_AGENT_LIST_SIZE * currentPageNumber
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
@@ -314,7 +313,7 @@ function FieldAgentListComponent(props: IProps) {
         orderBy(
           content,
           columnToBeSort === 'name'
-            ? [content => content[columnToBeSort]!.toString().toLowerCase()]
+            ? [(content) => content[columnToBeSort]!.toString().toLowerCase()]
             : [columnToBeSort],
           [sortOrder[columnToBeSort]]
         ).map((row, idx) => {
@@ -352,7 +351,7 @@ function FieldAgentListComponent(props: IProps) {
         <FilterContainer>
           <LocationPicker
             selectedLocationId={locationId}
-            onChangeLocation={newLocationId => {
+            onChangeLocation={(newLocationId) => {
               props.goToFieldAgentList(newLocationId, timeStart, timeEnd, event)
             }}
             requiredJurisdictionTypes={
@@ -371,10 +370,10 @@ function FieldAgentListComponent(props: IProps) {
             }
           />
           <PerformanceSelect
-            onChange={option => {
+            onChange={(option) => {
               setEvent(
                 Object.values(EVENT_OPTIONS).find(
-                  val => val === option.value
+                  (val) => val === option.value
                 ) || EVENT_OPTIONS.ALL
               )
             }}
@@ -398,10 +397,10 @@ function FieldAgentListComponent(props: IProps) {
             ]}
           />
           <PerformanceSelect
-            onChange={option => {
+            onChange={(option) => {
               setStatus(
                 Object.values(STATUS_OPTIONS).find(
-                  val => val === option.value
+                  (val) => val === option.value
                 ) || STATUS_OPTIONS.ACTIVE
               )
             }}

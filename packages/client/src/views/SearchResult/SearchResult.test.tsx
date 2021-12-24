@@ -314,7 +314,7 @@ describe('SearchResult tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     testComponent.component.update()
@@ -357,7 +357,7 @@ describe('SearchResult tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
@@ -478,7 +478,7 @@ describe('SearchResult tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
@@ -582,7 +582,7 @@ describe('SearchResult tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
@@ -683,7 +683,7 @@ describe('SearchResult tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
@@ -789,7 +789,7 @@ describe('SearchResult tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
@@ -896,7 +896,7 @@ describe('SearchResult tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
@@ -1003,7 +1003,7 @@ describe('SearchResult tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 

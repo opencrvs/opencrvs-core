@@ -168,7 +168,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
 
     if (this.state.attempt === MAX_ALLOWED_ATTEMPT && !pinMatched) {
       await storage.setItem(SECURITY_PIN_EXPIRED_AT, moment.now().toString())
-      this.setState(prevState => {
+      this.setState((prevState) => {
         return {
           attempt: prevState.attempt + 1
         }
@@ -178,7 +178,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
     }
 
     if (this.state.attempt < MAX_ALLOWED_ATTEMPT - 1 && !pinMatched) {
-      this.setState(preState => ({
+      this.setState((preState) => ({
         attempt: preState.attempt + 1,
         errorMessage: intl.formatMessage(messages.incorrect),
         resetKey: Date.now()
@@ -187,7 +187,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
     }
 
     if (this.state.attempt === MAX_ALLOWED_ATTEMPT - 1 && !pinMatched) {
-      this.setState(preState => ({
+      this.setState((preState) => ({
         attempt: preState.attempt + 1,
         errorMessage: intl.formatMessage(messages.lastTry),
         resetKey: Date.now()
@@ -218,7 +218,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
           if (this.state.attempt === MAX_ALLOWED_ATTEMPT + 2) {
             return
           }
-          this.setState(prevState => ({
+          this.setState((prevState) => ({
             attempt: MAX_ALLOWED_ATTEMPT + 2,
             errorMessage: intl.formatMessage(messages.locked)
           }))
