@@ -119,7 +119,6 @@ class UserFormComponent extends React.Component<IFullProps> {
           }
           goBack={this.handleBackAction}
         >
-          form
           <FormTitle id="form-title">
             {userId
               ? intl.formatMessage(sysAdminMessages.editUserCommonTitle)
