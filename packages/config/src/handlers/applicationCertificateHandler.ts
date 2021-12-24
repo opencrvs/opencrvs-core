@@ -14,7 +14,7 @@ import Certificate, {
   IApplicationCertificateModel,
   Status,
   Event
-} from '@config/models/certificate' //   IApplicationConfigurationModel
+} from '@config/models/Certificate' //   IApplicationConfigurationModel
 import { logger } from '@config/config/logger'
 import * as Joi from 'joi'
 
@@ -28,9 +28,6 @@ export async function getCertificateHandler(
   h: Hapi.ResponseToolkit
 ) {
   const { status, event } = request.payload as IActivePayload
-
-  logger.info('request.payload', request.payload)
-
   const certificate: IApplicationCertificateModel | null =
     await Certificate.findOne({ status: status, event: event })
 
@@ -60,34 +57,30 @@ export async function updateCertificateHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const certificate = request.payload as IApplicationCertificateModel
-
-  const existingCertificate: IApplicationCertificateModel | null =
-    await Certificate.findOne({ _id: certificate.id })
-  if (!existingCertificate) {
-    throw new Error(`No certificate found by given id: ${certificate.id}`)
-  }
-
-  // Update existing certificate's fields
-  existingCertificate.svgCode = certificate.svgCode
-  existingCertificate.svgFilename = certificate.svgFilename
-  existingCertificate.svgDateUpdated = Date.now()
-  existingCertificate.user = certificate.user
-  existingCertificate.event = certificate.event
-  existingCertificate.status = certificate.status
-
-  // Updating certificate
   try {
+    const certificate = request.payload as IApplicationCertificateModel
+    const existingCertificate: IApplicationCertificateModel | null =
+      await Certificate.findOne({ _id: certificate.id })
+    if (!existingCertificate) {
+      throw new Error(`No certificate found by given id: ${certificate.id}`)
+    }
+    // Update existing certificate's fields
+    existingCertificate.svgCode = certificate.svgCode
+    existingCertificate.svgFilename = certificate.svgFilename
+    existingCertificate.svgDateUpdated = Date.now()
+    existingCertificate.user = certificate.user
+    existingCertificate.event = certificate.event
+    existingCertificate.status = certificate.status
     await Certificate.update(
       { _id: existingCertificate._id },
       existingCertificate
     )
+    return h.response(existingCertificate).code(201)
   } catch (err) {
     logger.error(err)
     // return 400 if there is a validation error when saving to mongo
     return h.response().code(400)
   }
-  return h.response(existingCertificate).code(201)
 }
 
 export async function deleteCertificateHandler(
@@ -96,7 +89,7 @@ export async function deleteCertificateHandler(
 ) {
   const certificateId = request.params.certificateId
   if (!certificateId) {
-    return h.response('No certificate id in URL params').code(400)
+    return h.response('No certificate id in URL params').code(404)
   }
   try {
     await Certificate.findOneAndRemove({ _id: certificateId })

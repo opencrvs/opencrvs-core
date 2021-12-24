@@ -9,7 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+<<<<<<< HEAD
 
 import * as fetch from 'jest-fetch-mock'
 
 jest.setMock('node-fetch', { default: fetch })
+=======
+import { join } from 'path'
+import * as fetch from 'jest-fetch-mock'
+
+jest.setMock('node-fetch', { default: fetch })
+
+process.env.CERT_PUBLIC_KEY_PATH = join(__dirname, './cert.key.pub')
+>>>>>>> 2defc0b2a... Setup Jest in config microservice
