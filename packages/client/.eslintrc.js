@@ -103,9 +103,14 @@ Query component now sends errors automatically to Sentry.`
       version: 'detect'
     }
   },
+  overrides: [
+    {
+      files: ['*.ts', '*.tsx'],
+      parserOptions: {
+        project: ['./tsconfig.json']
+      }
+    }
+  ],
   globals: {},
-  parser: '@typescript-eslint/parser',
-  parserOptions: {
-    project: 'tsconfig.json'
-  }
+  parser: '@typescript-eslint/parser'
 }
