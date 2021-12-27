@@ -44,12 +44,12 @@
     ]
   },
   "devDependencies": {
-    "@storybook/addon-actions": "^6.4.9",
-    "@storybook/addon-essentials": "^6.4.9",
-    "@storybook/addon-links": "^6.4.9",
-    "@storybook/node-logger": "^6.4.9",
+    "@storybook/addon-actions": "6.1.21",
+    "@storybook/addon-essentials": "6.1.21",
+    "@storybook/addon-links": "6.1.21",
+    "@storybook/node-logger": "6.1.21",
     "@storybook/preset-create-react-app": "^3.2.0",
-    "@storybook/react": "^6.4.9",
+    "@storybook/react": "6.1.21",
     "@types/jest": "^26.0.14",
     "@types/lodash": "^4.14.126",
     "@types/node": "^10.12.5",
