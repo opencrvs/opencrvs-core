@@ -66,6 +66,7 @@ export interface GQLMutation {
   changeAvatar?: string
   auditUser?: string
   resendSMSInvite?: string
+  createCertificateSVG?: GQLCertificateSVG
 }
 
 export interface GQLDummy {
@@ -214,6 +215,15 @@ export interface GQLUser {
   creationDate?: string
   avatar?: GQLAvatar
   device?: string
+}
+export interface GQLCertificateSVG {
+  svgCode: string
+  svgFilename: string
+  svgDateUpdated: number
+  svgDateCreated: number
+  user: string
+  event: string
+  status: string
 }
 
 export interface GQLSearchUserResult {
@@ -1293,6 +1303,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   searchEvents?: QueryToSearchEventsResolver<TParent>
   getEventsWithProgress?: QueryToGetEventsWithProgressResolver<TParent>
   getRoles?: QueryToGetRolesResolver<TParent>
+  getCertificatesSVG?: QueryToGetCertificateResolver<TParent>
 }
 
 export interface QueryToListNotificationsArgs {
@@ -1760,10 +1771,22 @@ export interface QueryToGetRolesArgs {
   sortBy?: string
   sortOrder?: string
 }
+export interface QueryToGetCertificateArgs {
+  status?: string
+  event?: string
+}
 export interface QueryToGetRolesResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: QueryToGetRolesArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+export interface QueryToGetCertificateResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: QueryToGetCertificateArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -1793,6 +1816,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   changeAvatar?: MutationToChangeAvatarResolver<TParent>
   auditUser?: MutationToAuditUserResolver<TParent>
   resendSMSInvite?: MutationToResendSMSInviteResolver<TParent>
+  createCertificateSVG?: MutationCreateCertificateSVGResolver<TParent>
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -2144,6 +2168,20 @@ export interface MutationToResendSMSInviteResolver<
   (
     parent: TParent,
     args: MutationToResendSMSInviteArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+export interface MutationCreateCertificateSVGArgs {
+  certificateSVG: GQLCertificateSVG
+}
+export interface MutationCreateCertificateSVGResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationCreateCertificateSVGArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
