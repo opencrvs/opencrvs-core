@@ -20,7 +20,11 @@ interface IConfigMessages
   downloadTemplate: MessageDescriptor
   uploadTemplate: MessageDescriptor
   listTitle: MessageDescriptor
+  listDetails: MessageDescriptor
   birthTemplate: MessageDescriptor
+  deathTemplate: MessageDescriptor
+  birthDefaultTempDesc: MessageDescriptor
+  deathDefaultTempDesc: MessageDescriptor
 }
 
 const messagesToDefine: IConfigMessages = {
@@ -56,13 +60,34 @@ const messagesToDefine: IConfigMessages = {
   },
   listTitle: {
     id: 'config.listTitle',
-    defaultMessage: 'Certificate templates',
-    description: 'Title for certificate templates list'
+    defaultMessage: 'Certificates templates',
+    description: 'Title for certificates templates list'
+  },
+  listDetails: {
+    id: 'config.listDetails',
+    defaultMessage:
+      'To learn how to edit an SVG and upload a certificate to suite your country requirements please refer to this detailed guide. How to configure a certificate?',
+    description: 'Details for certificates templates list'
   },
   birthTemplate: {
     id: 'config.birthTemplate',
     defaultMessage: 'Birth certificate',
     description: 'Label for birth certificate template'
+  },
+  deathTemplate: {
+    id: 'config.deathTemplate',
+    defaultMessage: 'Death certificate',
+    description: 'Label for death certificate template'
+  },
+  birthDefaultTempDesc: {
+    id: 'config.birthDefaultTempDesc',
+    defaultMessage: 'Default birth certificate template',
+    description: 'Label for default birth certificate template'
+  },
+  deathDefaultTempDesc: {
+    id: 'config.deathDefaultTempDesc',
+    defaultMessage: 'Default death certificate template',
+    description: 'Label for default death certificate template'
   }
 }
 

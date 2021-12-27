@@ -1170,8 +1170,12 @@
         "config.printTemplate": "Print",
         "config.downloadTemplate": "Download",
         "config.uploadTemplate": "Upload",
-        "config.listTitle": "Certificate templates",
-        "config.birthTemplate": "Birth certificate"
+        "config.listTitle": "Certificates templates",
+        "config.birthTemplate": "Birth certificate",
+        "config.deathTemplate": "Death certificate",
+        "config.birthDefaultTempDesc": "Default birth certificate template",
+        "config.deathDefaultTempDesc": "Default death certificate template",
+        "config.listDetails": "To learn how to edit an SVG and upload a certificate to suite your country requirements please refer to this detailed guide. How to configure a certificate?"
       }
     },
     {

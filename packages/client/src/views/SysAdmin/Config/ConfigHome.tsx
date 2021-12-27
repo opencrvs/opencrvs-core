@@ -148,12 +148,12 @@ class ConfigHomeComponent extends React.Component<Props, State> {
     const { intl, offlineResources } = this.props
 
     const CertificateSection = {
-      title: 'Certificates templates',
+      title: intl.formatMessage(messages.listTitle),
       items: [
         {
           id: 'birth',
-          label: 'Birth certificate',
-          value: 'Default birth certificate template',
+          label: intl.formatMessage(messages.birthTemplate),
+          value: intl.formatMessage(messages.birthDefaultTempDesc),
           actionsMenu: (
             <ToggleMenu
               id={`template-birth-action-menu`}
@@ -164,8 +164,8 @@ class ConfigHomeComponent extends React.Component<Props, State> {
         },
         {
           id: 'death',
-          label: 'Death certificate',
-          value: 'Default death certificate template',
+          label: intl.formatMessage(messages.deathTemplate),
+          value: intl.formatMessage(messages.deathDefaultTempDesc),
           actionsMenu: (
             <ToggleMenu
               id={`template-death-action-menu`}
@@ -209,9 +209,7 @@ class ConfigHomeComponent extends React.Component<Props, State> {
               items={CertificateSection.items}
               responsiveContents={
                 <ListTitleDiv>
-                  To learn how to edit an SVG and upload a certificate to suite
-                  your country requirements please refer to this detailed guide.
-                  How to configure a certificate?
+                  {intl.formatMessage(messages.listDetails)}
                 </ListTitleDiv>
               }
               isConfigPage={true}
