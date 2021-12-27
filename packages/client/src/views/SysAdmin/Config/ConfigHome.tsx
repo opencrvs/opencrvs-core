@@ -18,7 +18,6 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { Container } from '@opencrvs/components/lib/layout'
 import { Button } from '@opencrvs/components/lib/buttons'
 import { messages } from '@client/i18n/messages/views/config'
 import {
@@ -68,12 +67,31 @@ const SubMenuTab = styled(Button)<{ active: boolean }>`
 `
 
 const ColoredDataSection = styled.div`
-  background-color: ${({ theme }) => theme.colors.smallButtonFocus};
-  margin: 30px 32px 30px 32px;
-  padding: 1px 10px 21px 32px;
-  border-radius: 4px;
-  height: 269px;
+  background-color: ${({ theme }) => theme.colors.white};
   width: 776px;
+  position: absolute;
+  top: 81px;
+  left: 162px;
+  padding-left: 32px;
+  padding-right: 47px;
+  padding-bottom: 37px;
+  border: 1px solid '#D7DCDE';
+  box-sizing: border-box;
+  border-radius: 4px;
+`
+
+const ListTitleDiv = styled.div`
+  width: 645px;
+  height: 46px;
+  ${({ theme }) => theme.fonts.bodyStyle};
+`
+
+const TopBarContainer = styled.div`
+  position: absolute;
+  left: 0px;
+  top: 64px;
+  width: 100%;
+  height: 48px;
 `
 
 type Props = WrappedComponentProps &
@@ -162,43 +180,44 @@ class ConfigHomeComponent extends React.Component<Props, State> {
     return (
       <SysAdminContentWrapper
         subMenuComponent={
-          <TopBar id="top-bar">
-            <SubMenuTab
-              id={`tab_${SUB_MENU_ID.certificatesConfig}`}
-              key={SUB_MENU_ID.certificatesConfig}
-              active={
-                this.state.selectedSubMenuItem ===
-                SUB_MENU_ID.certificatesConfig
-              }
-              onClick={() =>
-                this.setState({
-                  selectedSubMenuItem: SUB_MENU_ID.certificatesConfig
-                })
-              }
-            >
-              {SUB_MENU_ID.certificatesConfig}
-            </SubMenuTab>
-          </TopBar>
-        }
-      >
-        <Container>
-          {this.state.selectedSubMenuItem ===
-            SUB_MENU_ID.certificatesConfig && (
-            <ColoredDataSection>
-              <DataSection
-                title={CertificateSection.title}
-                items={CertificateSection.items}
-                responsiveContents={
-                  <div>
-                    To learn how to edit an SVG and upload a certificate to
-                    suite your country requirements please refer to this
-                    detailed guide. How to configure a certificate?
-                  </div>
+          <TopBarContainer>
+            <TopBar id="top-bar">
+              <SubMenuTab
+                id={`tab_${SUB_MENU_ID.certificatesConfig}`}
+                key={SUB_MENU_ID.certificatesConfig}
+                active={
+                  this.state.selectedSubMenuItem ===
+                  SUB_MENU_ID.certificatesConfig
                 }
-              />
-            </ColoredDataSection>
-          )}
-        </Container>
+                onClick={() =>
+                  this.setState({
+                    selectedSubMenuItem: SUB_MENU_ID.certificatesConfig
+                  })
+                }
+              >
+                {SUB_MENU_ID.certificatesConfig}
+              </SubMenuTab>
+            </TopBar>
+          </TopBarContainer>
+        }
+        isCertificatesConfigPage={true}
+      >
+        {this.state.selectedSubMenuItem === SUB_MENU_ID.certificatesConfig && (
+          <ColoredDataSection>
+            <DataSection
+              title={CertificateSection.title}
+              items={CertificateSection.items}
+              responsiveContents={
+                <ListTitleDiv>
+                  To learn how to edit an SVG and upload a certificate to suite
+                  your country requirements please refer to this detailed guide.
+                  How to configure a certificate?
+                </ListTitleDiv>
+              }
+              isConfigPage={true}
+            />
+          </ColoredDataSection>
+        )}
       </SysAdminContentWrapper>
     )
   }
