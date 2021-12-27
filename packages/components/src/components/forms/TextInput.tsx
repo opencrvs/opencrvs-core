@@ -135,7 +135,7 @@ export const TextInput = React.forwardRef<IRef, ITextInputProps>(
     }))
 
     React.useEffect(() => {
-      if (!focusInput) {
+      if (focusInput) {
         focusField()
       }
     }, [focusInput])
