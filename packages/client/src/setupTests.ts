@@ -112,7 +112,11 @@ userQueries.searchUsers = jest.fn()
 const navigatorMock = {
   onLine: true
 }
-;(window as any).location.assign = jest.fn()
+
+const location = window.location
+
+delete window.location
+;(window as any).location = { ...location, assign: jest.fn() }
 ;(window as any).navigator = navigatorMock
 ;(window as any).location.reload = jest.fn()
 ;(window as any).scrollTo = noop
