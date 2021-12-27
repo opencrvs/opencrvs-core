@@ -134,7 +134,7 @@ describe('createCertificate handler', () => {
     expect(res.statusCode).toBe(201)
   })
 
-  it('returns error when tries to saves invalid data using mongoose', async () => {
+  it('returns error when tries to saves invalid svg code using mongoose', async () => {
     mockingoose(Certificate).toReturn(mockCertificate, 'save')
 
     const res = await server.server.inject({

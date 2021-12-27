@@ -17,7 +17,8 @@ import Certificate, {
 } from '@config/models/Certificate' //   IApplicationConfigurationModel
 import { logger } from '@config/config/logger'
 import * as Joi from 'joi'
-
+import { badRequest } from '@hapi/boom'
+import { isValidSVGCode } from '@config/services/applicationCertificateService'
 interface IActivePayload {
   status: Status
   event: Event
@@ -40,17 +41,25 @@ export async function createCertificateHandler(
 ) {
   const newCertificate = request.payload as IApplicationCertificateModel
 
-  // save new certificate
-  let certificateResponse
-  try {
-    certificateResponse = await Certificate.create(newCertificate)
-  } catch (err) {
-    logger.error(err)
-    // return 400 if there is a validation error when saving to mongo
-    return h.response().code(400)
-  }
+  const validSvgCode: boolean = await isValidSVGCode(newCertificate.svgCode)
 
-  return h.response(certificateResponse).code(201)
+  if (!validSvgCode) {
+    throw badRequest(
+      `SVG code is not valid by given id: ${newCertificate.user}`
+    )
+  } else {
+    // save new certificate
+    let certificateResponse
+    try {
+      certificateResponse = await Certificate.create(newCertificate)
+    } catch (err) {
+      logger.error(err)
+      // return 400 if there is a validation error when saving to mongo
+      return h.response().code(400)
+    }
+
+    return h.response(certificateResponse).code(201)
+  }
 }
 
 export async function updateCertificateHandler(
@@ -62,7 +71,7 @@ export async function updateCertificateHandler(
     const existingCertificate: IApplicationCertificateModel | null =
       await Certificate.findOne({ _id: certificate.id })
     if (!existingCertificate) {
-      throw new Error(`No certificate found by given id: ${certificate.id}`)
+      throw badRequest(`No certificate found by given id: ${certificate.id}`)
     }
     // Update existing certificate's fields
     existingCertificate.svgCode = certificate.svgCode
