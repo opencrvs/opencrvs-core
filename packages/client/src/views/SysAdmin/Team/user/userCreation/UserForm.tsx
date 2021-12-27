@@ -63,6 +63,10 @@ type IProps = {
   resources: IOfflineData
 }
 
+type IState = {
+  disableContinueOnLocation: boolean
+}
+
 type IDispatchProps = {
   goBack: typeof goBack
   modifyUserFormData: typeof modifyUserFormData
@@ -72,8 +76,14 @@ type IDispatchProps = {
 }
 type IFullProps = IntlShapeProps & IProps & IDispatchProps
 
-class UserFormComponent extends React.Component<IFullProps> {
+class UserFormComponent extends React.Component<IFullProps, IState> {
   setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
+  constructor(props: IFullProps) {
+    super(props)
+    this.state = {
+      disableContinueOnLocation: false
+    }
+  }
 
   handleFormAction = () => {
     const { formData, activeGroup, resources } = this.props
@@ -107,12 +117,18 @@ class UserFormComponent extends React.Component<IFullProps> {
 
   modifyData = (values: any) => {
     const { formData } = this.props
-    console.log(values['registrationOffice'])
     if (
       values['registrationOffice'] !== '0' &&
       values['registrationOffice'] !== ''
     ) {
       this.props.modifyUserFormData({ ...formData, ...values })
+      this.setState({
+        disableContinueOnLocation: false
+      })
+    } else {
+      this.setState({
+        disableContinueOnLocation: true
+      })
     }
   }
 
@@ -146,7 +162,11 @@ class UserFormComponent extends React.Component<IFullProps> {
             requiredErrorMessage={messages.requiredForNewUser}
           />
           <Action>
-            <PrimaryButton id="confirm_form" onClick={this.handleFormAction}>
+            <PrimaryButton
+              id="confirm_form"
+              onClick={this.handleFormAction}
+              disabled={this.state.disableContinueOnLocation}
+            >
               {intl.formatMessage(buttonMessages.continueButton)}
             </PrimaryButton>
           </Action>
