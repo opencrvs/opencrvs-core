@@ -29,6 +29,7 @@ import {
   goToCreateUserSection,
   goToUserReviewForm
 } from '@client/navigation'
+import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { clearUserFormData, modifyUserFormData } from '@client/user/userReducer'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -38,6 +39,8 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
+import { IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
 
 export const FormTitle = styled.div`
   ${({ theme }) => theme.fonts.h2Style};
@@ -57,6 +60,7 @@ type IProps = {
   activeGroup: IFormSectionGroup
   nextSectionId: string
   nextGroupId: string
+  resources: IOfflineData
 }
 
 type IDispatchProps = {
@@ -72,8 +76,8 @@ class UserFormComponent extends React.Component<IFullProps> {
   setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
 
   handleFormAction = () => {
-    const { formData, activeGroup } = this.props
-    if (hasFormError(activeGroup.fields, formData)) {
+    const { formData, activeGroup, resources } = this.props
+    if (hasFormError(activeGroup.fields, formData, resources)) {
       this.showAllValidationErrors()
     } else {
       this.props.userId
@@ -103,7 +107,13 @@ class UserFormComponent extends React.Component<IFullProps> {
 
   modifyData = (values: any) => {
     const { formData } = this.props
-    this.props.modifyUserFormData({ ...formData, ...values })
+    console.log(values['registrationOffice'])
+    if (
+      values['registrationOffice'] !== '0' &&
+      values['registrationOffice'] !== ''
+    ) {
+      this.props.modifyUserFormData({ ...formData, ...values })
+    }
   }
 
   render = () => {
@@ -146,7 +156,13 @@ class UserFormComponent extends React.Component<IFullProps> {
   }
 }
 
-export const UserForm = connect(undefined, {
+const mapStateToProps = (state: IStoreState): { resources: IOfflineData } => {
+  return {
+    resources: getOfflineData(state)
+  }
+}
+
+export const UserForm = connect(mapStateToProps, {
   modifyUserFormData,
   goToCreateUserSection,
   goToUserReviewForm,
