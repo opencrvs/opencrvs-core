@@ -178,7 +178,9 @@ type Mutation {
     comment: String
   ): String
   resendSMSInvite(userId: String!): String
-  createCertificateSVG(certificateSVG: CertificateSVGInput!): CertificateSVG
+  createOrUpdateCertificateSVG(
+    certificateSVG: CertificateSVGInput!
+  ): CertificateSVG
 }
 
 type Dummy {
@@ -482,6 +484,7 @@ input AvatarInput {
 }
 
 input CertificateSVGInput {
+  id: ID
   svgCode: String
   svgFilename: String
   svgDateUpdated: Int
