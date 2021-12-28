@@ -29,6 +29,7 @@ type CertificateSVG {
 }
 
 input CertificateSVGInput {
+  id: ID
   svgCode: String
   svgFilename: String
   svgDateUpdated: Int
@@ -43,5 +44,7 @@ type Query {
 }
 
 type Mutation {
-  createCertificateSVG(certificateSVG: CertificateSVGInput!): CertificateSVG
+  createOrUpdateCertificateSVG(
+    certificateSVG: CertificateSVGInput!
+  ): CertificateSVG
 }

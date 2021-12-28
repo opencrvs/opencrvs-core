@@ -15,7 +15,8 @@ export interface IGetCertificatePayload {
   event?: string
 }
 
-export interface ICertificatePayload {
+export interface ICertificateSVGPayload {
+  id: string
   svgCode: string
   svgFilename: string
   svgDateUpdated: number

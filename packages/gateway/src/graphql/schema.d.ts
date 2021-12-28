@@ -64,7 +64,7 @@ export interface GQLMutation {
   changePassword?: string
   auditUser?: string
   resendSMSInvite?: string
-  createCertificateSVG?: GQLCertificateSVG
+  createOrUpdateCertificateSVG?: GQLCertificateSVG
 }
 
 export interface GQLDummy {
@@ -213,6 +213,7 @@ export interface GQLUser {
   creationDate?: string
 }
 export interface GQLCertificateSVG {
+  id: string
   svgCode: string
   svgFilename: string
   svgDateUpdated: number
@@ -1810,7 +1811,9 @@ export interface GQLMutationTypeResolver<TParent = any> {
   changePassword?: MutationToChangePasswordResolver<TParent>
   auditUser?: MutationToAuditUserResolver<TParent>
   resendSMSInvite?: MutationToResendSMSInviteResolver<TParent>
-  createCertificateSVG?: MutationCreateCertificateSVGResolver<TParent>
+  createOrUpdateCertificateSVG?: MutationCreateOrUpdateCertificateSVGResolver<
+    TParent
+  >
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -2138,21 +2141,20 @@ export interface MutationToResendSMSInviteResolver<
     info: GraphQLResolveInfo
   ): TResult
 }
-export interface MutationCreateCertificateSVGArgs {
+export interface MutationCreateOrUpdateCertificateSVGArgs {
   certificateSVG: GQLCertificateSVG
 }
-export interface MutationCreateCertificateSVGResolver<
+export interface MutationCreateOrUpdateCertificateSVGResolver<
   TParent = any,
   TResult = any
 > {
   (
     parent: TParent,
-    args: MutationCreateCertificateSVGArgs,
+    args: MutationCreateOrUpdateCertificateSVGArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
 }
-
 export interface GQLDummyTypeResolver<TParent = any> {
   dummy?: DummyToDummyResolver<TParent>
 }
