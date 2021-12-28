@@ -124,3 +124,14 @@ export const requestNewCertificate = Joi.object({
   event: Joi.string(),
   status: Joi.string()
 })
+
+export const updateCertificate = Joi.object({
+  id: Joi.string().required(),
+  svgCode: Joi.string(),
+  svgFilename: Joi.string(),
+  svgDateUpdated: Joi.number(),
+  svgDateCreated: Joi.number(),
+  user: Joi.string(),
+  event: Joi.string(),
+  status: Joi.string()
+})

@@ -15,6 +15,7 @@ import {
   getCertificateHandler,
   requestActiveCertificate,
   requestNewCertificate,
+  updateCertificate,
   updateCertificateHandler
 } from '@config/handlers/applicationCertificateHandler'
 import applicationConfigHandler from '@config/handlers/applicationConfigHandler'
@@ -80,7 +81,10 @@ export default function getRoutes() {
       config: {
         tags: ['api'],
         description: 'Updates an existing Certificate',
-        auth: false
+        auth: false,
+        validate: {
+          payload: updateCertificate
+        }
       }
     },
     {
