@@ -53,7 +53,7 @@
     "mockingoose": "^2.13.0",
     "nodemon": "^1.17.5",
     "prettier": "^2.5.1",
-    "ts-jest": "^24.0.2",
+    "ts-jest": "^26.4.4",
     "ts-node": "^6.1.1",
     "tsconfig-paths": "^3.8.0",
     "tslint": "^5.17.0",
