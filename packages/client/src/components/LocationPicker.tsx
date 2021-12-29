@@ -31,11 +31,13 @@ import {
   CancelableArea
 } from '@client/components/DateRangePicker'
 import styled from '@client/styledComponents'
+import { ILocation } from '@client/offline/reducer'
 
 const { useState, useEffect } = React
 
 interface IConnectProps {
-  searchableLocations: ISearchLocation[]
+  offlineLocations: { [key: string]: ILocation }
+  jurisidictionTypeFilter: string[] | undefined
 }
 
 interface IBaseProps {
@@ -95,8 +97,20 @@ const StyledLocationSearch = styled(LocationSearch)`
 `
 
 function LocationPickerComponent(props: LocationPickerProps) {
-  const { searchableLocations, selectedLocationId, intl } = props
+  const {
+    offlineLocations,
+    jurisidictionTypeFilter,
+    selectedLocationId,
+    intl
+  } = props
   const [modalVisible, setModalVisible] = useState<boolean>(false)
+
+  const searchableLocations = generateLocations(
+    offlineLocations,
+    intl,
+    jurisidictionTypeFilter
+  )
+
   const selectedSearchedLocation = searchableLocations.find(
     ({ id }) => id === selectedLocationId
   ) as ISearchLocation
@@ -170,12 +184,9 @@ function mapStateToProps(state: IStoreState, props: IBaseProps): IConnectProps {
     (props.requiredJurisdictionTypes &&
       props.requiredJurisdictionTypes.split(',')) ||
     undefined
-  const offlineSearchableLocations = generateLocations(
+  return {
     offlineLocations,
     jurisidictionTypeFilter
-  )
-  return {
-    searchableLocations: offlineSearchableLocations
   }
 }
 

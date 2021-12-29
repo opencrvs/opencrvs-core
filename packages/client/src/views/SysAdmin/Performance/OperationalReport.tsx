@@ -208,7 +208,10 @@ class OperationalReportComponent extends React.Component<Props, State> {
     const { timeStart, timeEnd, locationId, sectionId } = (parse(
       search
     ) as unknown) as ISearchParams
-    const searchableLocations = generateLocations(props.offlineLocations)
+    const searchableLocations = generateLocations(
+      props.offlineLocations,
+      props.intl
+    )
     const selectedLocation = searchableLocations.find(
       ({ id }) => id === locationId
     ) as ISearchLocation

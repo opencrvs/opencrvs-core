@@ -164,11 +164,9 @@ export const facilityMustBeSelected: Validation = (
 ) => {
   const locationsList = getListOfLocations(
     resources as IOfflineData,
-    'facilities',
-    LocationType.HEALTH_FACILITY
+    'facilities'
   )
-  const isValid =
-    !value || locationsList.some(location => location.id === value)
+  const isValid = !value || locationsList[value as string]
   return isValid ? undefined : { message: messages.facilityMustBeSelected }
 }
 

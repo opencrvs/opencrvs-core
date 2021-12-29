@@ -116,6 +116,7 @@ import { dynamicDispatch } from '@client/applications'
 import { LocationSearch } from '@opencrvs/components/lib/interface'
 import { REGEXP_NUMBER_INPUT_NON_NUMERIC } from '@client/utils/constants'
 import { isMobileDevice } from '@client/utils/commonUtils'
+import { generateLocations } from '@client/utils/locationUtils'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -846,10 +847,11 @@ class FormSectionComponent extends React.Component<Props> {
               : field.type === LOCATION_SEARCH_INPUT
               ? {
                   ...field,
-                  locationList: getListOfLocations(
-                    resources,
-                    field.searchableResource,
-                    field.searchableType as LocationType
+                  locationList: generateLocations(
+                    getListOfLocations(resources, field.searchableResource),
+                    intl,
+                    undefined,
+                    [field.searchableType as LocationType]
                   )
                 }
               : field
