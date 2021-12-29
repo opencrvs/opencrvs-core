@@ -13,6 +13,7 @@ set -e
 
 docker stop $(docker ps -qa)
 
+yarn
 yarn dev:secrets:gen
 echo $ROOT_PASSWORD | sudo -S mkdir -p data/elasticsearch
 sudo chown -R 1000:1000 data/elasticsearch
