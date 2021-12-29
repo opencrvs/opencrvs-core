@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Execute build & test script
-        run: ./infrastructure/build-and-test-e2e-SH.sh
+        run: ./infrastructure/build-and-test-e2e-sh.sh
         env:
           ROOT_PASSWORD: ${{ secrets.ROOT_PASSWORD }}
           CYPRESS_LOGIN_URL: http://localhost:3020/
