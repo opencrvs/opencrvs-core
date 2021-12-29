@@ -111,7 +111,7 @@ const DeactivatedStatusBox = styled(StatusBox)`
   background: rgba(245, 209, 209, 1);
 `
 const PendingStatusBox = styled(StatusBox)`
-  background: rgba(241, 177, 98, 1);
+  background: rgba(252, 236, 217, 1);
 `
 const DisabledStatusBox = styled(StatusBox)`
   background: rgba(206, 206, 206, 0.3);
