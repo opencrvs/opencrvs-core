@@ -24,6 +24,12 @@ jobs:
         node-version: [14.17.x]
 
     steps:
+      - name: Initialization
+        run: |
+          killall screen
+          docker stop $(docker ps -qa)
+          echo $ROOT_PASSWORD | sudo -S rm -rf opencrvs-core
+
       - name: Checking out git repo
         uses: actions/checkout@v2
 
