@@ -29,7 +29,7 @@ jobs:
         run: |
           killall screen || true
           screen -wipe || true
-          echo $ROOT_PASSWORD | sudo -S killall -s KILL node
+          echo $ROOT_PASSWORD | sudo -S killall -s KILL node || true
           docker stop $(docker ps -qa)
           echo $ROOT_PASSWORD | sudo -S rm -rf data        
 
