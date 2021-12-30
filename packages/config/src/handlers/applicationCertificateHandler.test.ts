@@ -191,6 +191,26 @@ describe('getCertificate handler', () => {
   })
 })
 
+describe('getActiveCertificates handler', () => {
+  let server: any
+
+  beforeEach(async () => {
+    mockingoose.resetAll()
+    server = await createServer()
+    fetch.resetMocks()
+  })
+
+  it('get active certificate for birth and death using mongoose', async () => {
+    mockingoose(Certificate).toReturn(mockCertificate, 'find')
+
+    const res = await server.server.inject({
+      method: 'GET',
+      url: '/getActiveCertificates'
+    })
+    expect(res.statusCode).toBe(200)
+  })
+})
+
 describe('updateCertificate handler', () => {
   let server: any
 

@@ -40,7 +40,8 @@ input CertificateSVGInput {
 }
 
 type Query {
-  getCertificatesSVG(status: String, event: String): CertificateSVG
+  getCertificateSVG(status: String, event: String): CertificateSVG
+  getActiveCertificatesSVG: [CertificateSVG]
 }
 
 type Mutation {

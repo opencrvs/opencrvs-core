@@ -20,7 +20,7 @@ import { hasScope } from '@gateway/features/user/utils'
 
 export const resolvers: GQLResolver = {
   Query: {
-    async getCertificatesSVG(_, { status = null, event = null }, authHeader) {
+    async getCertificateSVG(_, { status = null, event = null }, authHeader) {
       let payload: IGetCertificatePayload = {}
       if (status) {
         payload = { ...payload, status }
@@ -36,6 +36,19 @@ export const resolvers: GQLResolver = {
           ...authHeader
         }
       })
+      return await res.json()
+    },
+    async getActiveCertificatesSVG(_, {}, authHeader) {
+      const res = await fetch(
+        `${APPLICATION_CONFIG_URL}getActiveCertificates`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            ...authHeader
+          }
+        }
+      )
       return await res.json()
     }
   },

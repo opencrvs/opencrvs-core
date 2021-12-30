@@ -12,6 +12,7 @@
 import {
   createCertificateHandler,
   deleteCertificateHandler,
+  getActiveCertificatesHandler,
   getCertificateHandler,
   requestActiveCertificate,
   requestNewCertificate,
@@ -59,6 +60,16 @@ export default function getRoutes() {
         validate: {
           payload: requestActiveCertificate
         }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/getActiveCertificates',
+      handler: getActiveCertificatesHandler,
+      config: {
+        tags: ['api'],
+        description: 'Retrieves active certificates for birth and death',
+        auth: false
       }
     },
     {
