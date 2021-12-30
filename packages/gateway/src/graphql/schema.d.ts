@@ -1304,7 +1304,8 @@ export interface GQLQueryTypeResolver<TParent = any> {
   searchEvents?: QueryToSearchEventsResolver<TParent>
   getEventsWithProgress?: QueryToGetEventsWithProgressResolver<TParent>
   getRoles?: QueryToGetRolesResolver<TParent>
-  getCertificatesSVG?: QueryToGetCertificateResolver<TParent>
+  getCertificateSVG?: QueryToGetCertificateResolver<TParent>
+  getActiveCertificatesSVG?: QueryToGetActiveCertificatesResolver<TParent>
 }
 
 export interface QueryToListNotificationsArgs {
@@ -1791,6 +1792,12 @@ export interface QueryToGetCertificateResolver<TParent = any, TResult = any> {
     context: any,
     info: GraphQLResolveInfo
   ): TResult
+}
+export interface QueryToGetActiveCertificatesResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
 export interface GQLMutationTypeResolver<TParent = any> {
