@@ -70,7 +70,6 @@ ${({ fixedWidth, totalWidth }) =>
 `
 
 const TableHeaderText = styled.div<{
-  isSortable?: boolean
   isSorted?: boolean
 }>`
   ${({ isSorted, theme }) =>
@@ -373,10 +372,7 @@ export class ListTable extends React.Component<
                           preference.sortFunction(preference.key)
                         }
                       >
-                        <TableHeaderText
-                          isSortable={preference.isSortable}
-                          isSorted={preference.isSorted}
-                        >
+                        <TableHeaderText isSorted={preference.isSorted}>
                           {preference.label}
                           <ToggleSortIcon
                             toggle={
