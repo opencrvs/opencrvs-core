@@ -11,8 +11,6 @@
 
 set -e
 
-docker stop $(docker ps -qa)
-
 yarn
 yarn dev:secrets:gen
 echo $ROOT_PASSWORD | sudo -S mkdir -p data/elasticsearch
@@ -34,3 +32,7 @@ screen -d -m CERT_PUBLIC_KEY_PATH=./../.secrets/public-key.pem yarn start
 wait-on -l http://localhost:3040
 
 yarn e2e --record false
+
+killall screen
+docker stop $(docker ps -qa)
+echo $ROOT_PASSWORD | sudo -S rm -rf data
