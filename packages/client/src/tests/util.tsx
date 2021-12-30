@@ -2755,7 +2755,9 @@ export const mockOfflineData = {
       num: '10'
     },
     SENTRY: 'https://sentry.com',
-    LOGROCKET: 'opencrvs-foundation/opencrvs-zambia'
+    LOGROCKET: 'opencrvs-foundation/opencrvs-zambia',
+    BIRTH_REGISTRATION_TARGET: 45,
+    DEATH_REGISTRATION_TARGET: 45
   }
 }
 
