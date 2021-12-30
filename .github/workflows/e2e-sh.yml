@@ -39,7 +39,7 @@ jobs:
       - name: Execute build & test script
         run: ./infrastructure/build-and-test-e2e-sh.sh
 
-      - name: Release memory
+      - name: Clear up
         run: |
           killall screen || true
           screen -wipe || true

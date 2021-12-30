@@ -10,8 +10,8 @@
 name: E2E Test
 
 on:
-  # push:
-  #   branches: [ocrvs-2339]
+  push:
+    branches: [ocrvs-2339]
   pull_request:
     branches: [ocrvs-2339]
 
