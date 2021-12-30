@@ -21,6 +21,16 @@ import {
 } from '@config/handlers/applicationCertificateHandler'
 import applicationConfigHandler from '@config/handlers/applicationConfigHandler'
 
+const enum RouteScope {
+  DECLARE = 'declare',
+  REGISTER = 'register',
+  CERTIFY = 'certify',
+  PERFORMANCE = 'performance',
+  SYSADMIN = 'sysadmin',
+  VALIDATE = 'validate',
+  NATLSYSADMIN = 'natlsysadmin'
+}
+
 export default function getRoutes() {
   return [
     // add ping route by default for health check
@@ -56,7 +66,9 @@ export default function getRoutes() {
       config: {
         tags: ['api'],
         description: 'Retrieves certificate',
-        auth: false,
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
         validate: {
           payload: requestActiveCertificate
         }
@@ -69,7 +81,9 @@ export default function getRoutes() {
       config: {
         tags: ['api'],
         description: 'Retrieves active certificates for birth and death',
-        auth: false
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        }
       }
     },
     {
@@ -79,7 +93,9 @@ export default function getRoutes() {
       config: {
         tags: ['api'],
         description: 'Creates a new Certificate',
-        auth: false,
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
         validate: {
           payload: requestNewCertificate
         }
@@ -92,7 +108,9 @@ export default function getRoutes() {
       config: {
         tags: ['api'],
         description: 'Updates an existing Certificate',
-        auth: false,
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
         validate: {
           payload: updateCertificate
         }
@@ -105,7 +123,9 @@ export default function getRoutes() {
       config: {
         tags: ['api'],
         description: 'Delete certificate',
-        auth: false
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        }
       }
     }
   ]

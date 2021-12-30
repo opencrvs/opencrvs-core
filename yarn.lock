@@ -4022,6 +4022,11 @@
     "@types/connect" "*"
     "@types/node" "*"
 
+"@types/boom@^7.3.1":
+  version "7.3.1"
+  resolved "https://registry.yarnpkg.com/@types/boom/-/boom-7.3.1.tgz#afec3ee9ed56ac22f5dffc45ae33a93fc0f9a481"
+  integrity sha512-9952U+NySPQ35Xr8CU0lHrC3vBuqjh2xmK87l06uW8PN4ePHOqhtjrJV5+e7lqgb4UtzwUHELkbxEXxnPXLlTA==
+
 "@types/bson@*":
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/@types/bson/-/bson-4.0.2.tgz#7accb85942fc39bbdb7515d4de437c04f698115f"
