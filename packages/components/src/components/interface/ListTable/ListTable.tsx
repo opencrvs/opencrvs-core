@@ -73,8 +73,8 @@ const TableHeaderText = styled.div<{
   isSortable?: boolean
   isSorted?: boolean
 }>`
-  ${({ isSortable, isSorted, theme }) =>
-    isSortable && isSorted ? theme.fonts.bodyBoldStyle : theme.fonts.bodyStyle}
+  ${({ isSorted, theme }) =>
+    isSorted ? theme.fonts.bodyBoldStyle : theme.fonts.bodyStyle}
 `
 
 const TableBody = styled.div<{ footerColumns: boolean }>`
