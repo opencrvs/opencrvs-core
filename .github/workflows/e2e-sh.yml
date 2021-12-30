@@ -26,8 +26,11 @@ jobs:
     steps:
       - name: Initialization
         run: |
+          killall screen || true
+          screen -wipe || true
           docker stop $(docker ps -qa)
           echo $ROOT_PASSWORD | sudo -S rm -rf opencrvs-core
+          echo $ROOT_PASSWORD | sudo -S rm -rf data
         env:
           ROOT_PASSWORD: ${{ secrets.ROOT_PASSWORD }}
 

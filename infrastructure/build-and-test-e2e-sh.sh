@@ -26,8 +26,8 @@ yarn install
 yarn db:clear:all
 yarn db:backup:restore
 
-screen -d -m CERT_PUBLIC_KEY_PATH=./../.secrets/public-key.pem yarn start
-wait-on -l http://localhost:3040
+screen -dm bash -c 'CERT_PUBLIC_KEY_PATH=./../.secrets/public-key.pem yarn start'
+wait-on -l tcp:3040
 
 yarn e2e --record false
 
