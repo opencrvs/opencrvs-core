@@ -18,29 +18,31 @@ on:
 jobs:
   build:
     runs-on: self-hosted
-
-    strategy:
-      matrix:
-        node-version: [14.17.x]
+    env:
+      ROOT_PASSWORD: ${{ secrets.ROOT_PASSWORD }}
+      CYPRESS_LOGIN_URL: http://localhost:3020/
+      CYPRESS_CLIENT_URL: http://localhost:3000/
+      CYPRESS_AUTH_URL: http://localhost:4040/
 
     steps:
       - name: Initialization
         run: |
           killall screen || true
           screen -wipe || true
+          echo $ROOT_PASSWORD | sudo -S killall -s KILL node
           docker stop $(docker ps -qa)
-          echo $ROOT_PASSWORD | sudo -S rm -rf opencrvs-core
-          echo $ROOT_PASSWORD | sudo -S rm -rf data
-        env:
-          ROOT_PASSWORD: ${{ secrets.ROOT_PASSWORD }}
+          echo $ROOT_PASSWORD | sudo -S rm -rf data        
 
       - name: Checking out git repo
         uses: actions/checkout@v2
 
       - name: Execute build & test script
         run: ./infrastructure/build-and-test-e2e-sh.sh
-        env:
-          ROOT_PASSWORD: ${{ secrets.ROOT_PASSWORD }}
-          CYPRESS_LOGIN_URL: http://localhost:3020/
-          CYPRESS_CLIENT_URL: http://localhost:3000/
-          CYPRESS_AUTH_URL: http://localhost:4040/
+
+      - name: Release memory
+        run: |
+          killall screen || true
+          screen -wipe || true
+          echo $ROOT_PASSWORD | sudo -S killall -s KILL node
+          docker stop $(docker ps -qa)
+          echo $ROOT_PASSWORD | sudo -S rm -rf data
