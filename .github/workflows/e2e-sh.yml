@@ -26,9 +26,10 @@ jobs:
     steps:
       - name: Initialization
         run: |
-          killall screen
           docker stop $(docker ps -qa)
           echo $ROOT_PASSWORD | sudo -S rm -rf opencrvs-core
+        env:
+          ROOT_PASSWORD: ${{ secrets.ROOT_PASSWORD }}
 
       - name: Checking out git repo
         uses: actions/checkout@v2
