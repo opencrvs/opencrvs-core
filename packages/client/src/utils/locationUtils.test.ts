@@ -16,6 +16,8 @@ import {
   getJurisidictionType
 } from '@client/utils/locationUtils'
 import { LocationType } from '@client/offline/reducer'
+import { createIntl } from 'react-intl'
+import { ILanguage } from '@client/i18n/reducer'
 
 describe('locationUtil tests', () => {
   describe('filterLocations()', () => {
@@ -110,16 +112,30 @@ describe('locationUtil tests', () => {
 
   describe('generateLocationName()', () => {
     it('returns the location name with the jurisdiction concatenated at the end', () => {
-      const locationId = '65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
+      const locationId = '81317429-1d89-42ac-8abc-7a92f268273c'
       const location = mockOfflineData.locations[locationId]
+      const language: ILanguage = mockOfflineData.languages[0]
 
-      expect(generateLocationName(location)).toEqual('Barisal Division')
+      const intl = createIntl({
+        locale: language.lang,
+        messages: language.messages
+      })
+
+      expect(generateLocationName(location, intl)).toEqual('Lusaka District')
     })
     it('returns only the location name if there is no jurisdictionType', () => {
       const officeId = '0d8474da-0361-4d32-979e-af91f012340a'
       const office = mockOfflineData.offices[officeId]
+      const language: ILanguage = mockOfflineData.languages[0]
 
-      expect(generateLocationName(office)).toEqual('Moktarpur Union Parishad')
+      const intl = createIntl({
+        locale: language.lang,
+        messages: language.messages
+      })
+
+      expect(generateLocationName(office, intl)).toEqual(
+        'Moktarpur Union Parishad'
+      )
     })
   })
 })
