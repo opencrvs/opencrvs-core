@@ -152,7 +152,7 @@ const FieldGroupTitle = styled.div`
 
 const LocationSearchFormField = styled(LocationSearch)`
   ${({ theme }) => `@media (min-width: ${theme.grid.breakpoints.md}px) {
-    width: 535px;
+    width: 344px;
   }`}
 
   & > input {

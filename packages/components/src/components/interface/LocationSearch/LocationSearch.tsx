@@ -21,11 +21,12 @@ const SearchButton = styled(PrimaryButton)`
 const LocationSearchContainer = styled.div`
   display: flex;
   flex-direction: row;
+  width: 100%;
 `
 const Wrapper = styled.div`
   align-items: center;
   display: flex;
-  width: 312px;
+  width: 344px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     width: 100%;
   }
