@@ -18,6 +18,11 @@ on:
 jobs:
   build:
     runs-on: self-hosted
+    env:
+      ROOT_PASSWORD: ${{ secrets.ROOT_PASSWORD }}
+      CYPRESS_LOGIN_URL: http://localhost:3020/
+      CYPRESS_CLIENT_URL: http://localhost:3000/
+      CYPRESS_AUTH_URL: http://localhost:4040/
 
     steps:
       - name: Initialization
@@ -27,21 +32,12 @@ jobs:
           echo $ROOT_PASSWORD | sudo -S killall -s KILL node || true
           docker stop $(docker ps -qa)
           echo $ROOT_PASSWORD | sudo -S rm -rf data
-        env:
-          ROOT_PASSWORD: ${{ secrets.ROOT_PASSWORD }}
 
       - name: Checking out git repo
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: '0'
+        uses: actions/checkout@v1
 
       - name: Execute build & test script
         run: ./infrastructure/build-and-test-e2e-sh.sh
-        env:
-          ROOT_PASSWORD: ${{ secrets.ROOT_PASSWORD }}
-          CYPRESS_LOGIN_URL: http://localhost:3020/
-          CYPRESS_CLIENT_URL: http://localhost:3000/
-          CYPRESS_AUTH_URL: http://localhost:4040/
 
       - name: Clear up
         run: |
