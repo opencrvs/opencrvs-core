@@ -13,7 +13,7 @@ set -e
 
 yarn
 yarn global add wait-on
-
+yarn dev:secrets:gen
 docker swarm init
 sudo mkdir -p data/elasticsearch
 sudo chown -R 1000:1000 data/elasticsearch
@@ -27,7 +27,6 @@ echo "wait-on tcp:27017" && wait-on -l tcp:27017
 echo "wait-on tcp:6379" && wait-on -l tcp:6379
 echo "wait-on tcp:8086" && wait-on -l tcp:8086
 
-yarn dev:secrets:gen
 screen -d -m LANGUAGES=en yarn start
 echo "wait-on tcp:4040" && wait-on -l tcp:4040
 echo "wait-on http://localhost:3000" && wait-on -l http://localhost:3000
