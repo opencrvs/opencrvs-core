@@ -28,7 +28,7 @@ echo "wait-on tcp:27017" && wait-on -l tcp:27017
 echo "wait-on tcp:6379" && wait-on -l tcp:6379
 echo "wait-on tcp:8086" && wait-on -l tcp:8086
 
-screen -d -m LANGUAGES=en yarn start
+screen -dm bash -c 'LANGUAGES=en yarn start'
 echo "wait-on tcp:4040" && wait-on -l tcp:4040
 echo "wait-on http://localhost:3000" && wait-on -l http://localhost:3000
 echo "wait-on http://localhost:3020" && wait-on -l http://localhost:3020
