@@ -13,7 +13,8 @@ set -e
 
 yarn
 yarn global add wait-on
-yarn dev:secrets:gen
+# yarn dev:secrets:gen
+openssl genrsa -out .secrets/private-key.pem 2048 && openssl rsa -pubout -in .secrets/private-key.pem -out .secrets/public-key.pem
 docker swarm init
 sudo mkdir -p data/elasticsearch
 sudo chown -R 1000:1000 data/elasticsearch

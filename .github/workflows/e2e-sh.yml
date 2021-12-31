@@ -35,6 +35,8 @@ jobs:
 
       - name: Checking out git repo
         uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
 
       - name: Execute build & test script
         run: ./infrastructure/build-and-test-e2e-sh.sh
