@@ -664,7 +664,6 @@ export interface IConditionals {
   between46daysTo5yrs: IConditional
   after5yrs: IConditional
   deceasedNationIdSelected: IConditional
-  isRegistrarOrRegistrationAgentRoleSelected: IConditional
   isRegistrarRoleSelected: IConditional
   certCollectorOther: IConditional
   userAuditReasonSpecified: IConditional
