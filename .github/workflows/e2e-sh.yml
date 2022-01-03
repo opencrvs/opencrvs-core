@@ -16,7 +16,7 @@ on:
     branches: [ocrvs-2339]
 
 jobs:
-  build:
+  Build_E2E:
     runs-on: self-hosted
     env:
       ROOT_PASSWORD: ${{ secrets.ROOT_PASSWORD }}
