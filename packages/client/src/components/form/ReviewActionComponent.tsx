@@ -412,7 +412,7 @@ class ReviewActionComponent extends React.Component<
               event: application.event
             })}
             responsive={false}
-            contentHeight={115}
+            autoHeight={true}
             actions={[
               <TertiaryButton
                 id="cancel-btn"
