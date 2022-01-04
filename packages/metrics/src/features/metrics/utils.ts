@@ -130,9 +130,6 @@ export const fetchEstimateByLocation = async (
   let crudRate: number = 0
   let totalPopulation: number = 0
 
-  if (!locationData.extension) {
-    throw new Error('Invalid location data found')
-  }
   const estimationForDays = Math.ceil(
     Math.abs(new Date(timeTo).getTime() - new Date(timeFrom).getTime()) /
       (1000 * 60 * 60 * 24)
@@ -143,6 +140,18 @@ export const fetchEstimateByLocation = async (
   let selectedPopYear = new Date(timeTo).getFullYear()
   let malePopulationArray: [] = []
   let femalePopulationArray: [] = []
+
+  if (!locationData.extension) {
+    return {
+      totalEstimation: 0,
+      maleEstimation: 0,
+      femaleEstimation: 0,
+      locationId: locationData.id,
+      estimationYear: toYear,
+      locationLevel: getLocationLevelFromLocationData(locationData)
+    }
+  }
+
   locationData.extension.forEach(extension => {
     if (
       extension.url === OPENCRVS_SPECIFICATION_URL + CRUD_BIRTH_RATE_SEC &&

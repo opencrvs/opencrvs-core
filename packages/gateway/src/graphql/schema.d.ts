@@ -1561,7 +1561,8 @@ export interface QueryToSearchUsersResolver<TParent = any, TResult = any> {
 }
 
 export interface QueryToSearchFieldAgentsArgs {
-  locationId: string
+  locationId?: string
+  primaryOfficeId?: string
   status?: string
   language?: string
   timeStart: string
@@ -1730,7 +1731,7 @@ export interface QueryToSearchEventsResolver<TParent = any, TResult = any> {
 }
 
 export interface QueryToGetEventsWithProgressArgs {
-  parentLocationId?: string
+  locationId?: string
   count?: number
   skip?: number
   sort?: string

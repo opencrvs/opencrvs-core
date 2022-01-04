@@ -190,6 +190,28 @@ export function getStartedByFieldAgent(taskHistory: fhir.Bundle): string {
   return regLastUser?.split('/')?.[1] || ''
 }
 
+export function getRegLastOffice(bundle: fhir.Bundle) {
+  const task: fhir.Task = getResourceByType(
+    bundle,
+    FHIR_RESOURCE_TYPE.TASK
+  ) as fhir.Task
+  if (!task) {
+    throw new Error('Task not found!')
+  }
+  const regLastOffice =
+    task.extension &&
+    task.extension.find(
+      extension =>
+        extension.url === 'http://opencrvs.org/specs/extension/regLastOffice'
+    )
+
+  return (
+    regLastOffice &&
+    regLastOffice.valueReference &&
+    regLastOffice.valueReference.reference
+  )
+}
+
 export function getRegLastLocation(bundle: fhir.Bundle) {
   const task: fhir.Task = getResourceByType(
     bundle,
