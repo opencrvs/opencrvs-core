@@ -120,8 +120,8 @@ export interface GQLDeathRegistration extends GQLEventRegistration {
   mannerOfDeath?: GQLMannerOfDeath
   causeOfDeathMethod?: GQLCauseOfDeathMethodType
   causeOfDeath?: string
-  maleDependentsOfDeceased?: string
-  femaleDependentsOfDeceased?: string
+  maleDependentsOfDeceased?: number
+  femaleDependentsOfDeceased?: number
   medicalPractitioner?: GQLMedicalPractitioner
   createdAt?: GQLDate
   updatedAt?: GQLDate
@@ -332,8 +332,8 @@ export interface GQLDeathRegistrationInput {
   mannerOfDeath?: GQLMannerOfDeath
   causeOfDeathMethod?: GQLCauseOfDeathMethodType
   causeOfDeath?: string
-  maleDependentsOfDeceased?: string
-  femaleDependentsOfDeceased?: string
+  maleDependentsOfDeceased?: number
+  femaleDependentsOfDeceased?: number
   medicalPractitioner?: GQLMedicalPractitionerInput
   createdAt?: GQLDate
   updatedAt?: GQLDate
@@ -914,7 +914,9 @@ export const enum GQLAttachmentSubject {
   APPLICANT_ATHORITY_TO_APPLY_PROOF = 'APPLICANT_ATHORITY_TO_APPLY_PROOF',
   LEGAL_GUARDIAN_PROOF = 'LEGAL_GUARDIAN_PROOF',
   ASSIGNED_RESPONSIBILITY_PROOF = 'ASSIGNED_RESPONSIBILITY_PROOF',
-  WARD_COUNCILLOR_PROOF = 'WARD_COUNCILLOR_PROOF'
+  WARD_COUNCILLOR_PROOF = 'WARD_COUNCILLOR_PROOF',
+  CAUSE_OF_DEATH = 'CAUSE_OF_DEATH',
+  CORONERS_REPORT = 'CORONERS_REPORT'
 }
 
 export interface GQLGenderBasisDetailsMetrics {
