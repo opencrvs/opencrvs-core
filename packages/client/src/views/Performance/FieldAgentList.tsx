@@ -34,7 +34,6 @@ import {
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
 import {
   ColumnContentAlignment,
-  ISearchLocation,
   ListTable
 } from '@opencrvs/components/lib/interface'
 import { GQLSearchFieldAgentResult } from '@opencrvs/gateway/src/graphql/schema'
@@ -47,6 +46,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
+import { ILocation } from '@client/offline/reducer'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -82,8 +82,7 @@ interface ISearchParams {
 }
 
 interface IConnectProps {
-  locations: ISearchLocation[]
-  offices: ISearchLocation[]
+  offlineOffices: { [key: string]: ILocation }
 }
 
 interface IDispatchProps {
@@ -145,7 +144,7 @@ function FieldAgentListComponent(props: IProps) {
     intl,
     location: { search },
     goToOperationalReport,
-    offices
+    offlineOffices
   } = props
   const { locationId, timeStart, timeEnd } = (parse(
     search
@@ -160,6 +159,7 @@ function FieldAgentListComponent(props: IProps) {
   const recordCount = DEFAULT_FIELD_AGENT_LIST_SIZE * currentPageNumber
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
+  const offices = generateLocations(offlineOffices, intl)
 
   function toggleSort(key: keyof SortMap) {
     const invertedOrder =
@@ -502,13 +502,9 @@ function FieldAgentListComponent(props: IProps) {
 
 export const FieldAgentList = connect(
   (state: IStoreState) => {
-    const offlineLocations = getOfflineData(state).locations
-    const offlineSearchableLocations = generateLocations(offlineLocations)
     const offlineOffices = getOfflineData(state).offices
-    const offlineSearchableOffices = generateLocations(offlineOffices)
     return {
-      locations: offlineSearchableLocations,
-      offices: offlineSearchableOffices
+      offlineOffices
     }
   },
   { goToOperationalReport, goToFieldAgentList }

@@ -376,14 +376,9 @@ export function getListOfLocations(
   resourceType: Extract<
     keyof IOfflineData,
     'facilities' | 'locations' | 'offices'
-  >,
-  locationType?: LocationType
+  >
 ) {
   return resource[resourceType]
-    ? locationType
-      ? generateLocations(resource[resourceType], undefined, [locationType])
-      : generateLocations(resource[resourceType])
-    : []
 }
 
 interface IVars {

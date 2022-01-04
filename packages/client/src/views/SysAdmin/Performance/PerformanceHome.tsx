@@ -23,7 +23,7 @@ import {
   LocationSearch
 } from '@opencrvs/components/lib/interface'
 import * as React from 'react'
-import { injectIntl, WrappedComponentProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps, IntlShape } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
@@ -83,7 +83,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
       )
   }
 
-  renderPilotLocations() {
+  renderPilotLocations(intl: IntlShape) {
     return (
       (this.props.offlineResources.pilotLocations &&
         Object.keys(this.props.offlineResources.pilotLocations).length > 0 && (
@@ -93,7 +93,8 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
             </MessageHeader>
             {generatePilotLocations(
               this.props.offlineResources.pilotLocations,
-              this.props.offlineResources.locations
+              this.props.offlineResources.locations,
+              intl
             ).map((pilotLocation, index) => (
               <MessageRow key={index}>
                 <LinkButton
@@ -127,12 +128,12 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
 
         <LocationSearch
           selectedLocation={this.state.selectedLocation}
-          locationList={generateLocations(offlineResources.locations)}
+          locationList={generateLocations(offlineResources.locations, intl)}
           searchHandler={this.searchHandler}
           searchButtonHandler={this.searchButtonHandler}
         />
 
-        {this.renderPilotLocations()}
+        {this.renderPilotLocations(intl)}
       </SysAdminContentWrapper>
     )
   }
