@@ -12,9 +12,13 @@
 import { ISerializedForm } from '@client/forms'
 import { ILanguage } from '@client/i18n/reducer'
 import { ILocation } from '@client/offline/reducer'
-import { IPDFTemplate } from '@client/pdfRenderer/transformer/types'
+import {
+  IPDFTemplate,
+  ISVGTemplate
+} from '@client/pdfRenderer/transformer/types'
 import { getToken } from '@client/utils/authUtils'
 import { ICertificateCollectorDefinition } from '@client/views/PrintCertificate/VerifyCollector'
+import _ from 'lodash'
 
 export interface ILocationDataResponse {
   [locationId: string]: ILocation
@@ -35,9 +39,17 @@ export interface IDefinitionsResponse {
   templates: {
     receipt?: IPDFTemplate
     certificates: {
-      birth: IPDFTemplate
-      death: IPDFTemplate
+      birth: ISVGTemplate
+      death: ISVGTemplate
     }
+  }
+}
+export interface ICertificateResponse {
+  birth: {
+    svgCode: string
+  }
+  death: {
+    svgCode: string
   }
 }
 export interface IAssetResponse {
@@ -94,6 +106,40 @@ async function loadConfig(): Promise<IApplicationConfig> {
   return response
 }
 
+async function loadCertificatesTemplatesDefinitions(): Promise<
+  ICertificateResponse
+> {
+  const url = `${window.config.CONFIG_API_URL}/getActiveCertificates`
+
+  const res = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${getToken()}`
+    }
+  })
+
+  if (res && res.status !== 200) {
+    throw Error(res.statusText)
+  }
+  const response = await res.json()
+
+  const birthCertificateTemplate: any = _.find(response, {
+    event: 'birth',
+    status: 'ACTIVE'
+  })
+
+  const deathCertificateTemplate: any = _.find(response, {
+    event: 'death',
+    status: 'ACTIVE'
+  })
+
+  const certificatesTemplates = {
+    birth: { svgCode: birthCertificateTemplate.svgCode },
+    death: { svgCode: deathCertificateTemplate.svgCode }
+  } as ICertificateResponse
+
+  return certificatesTemplates
+}
 async function loadDefinitions(): Promise<IDefinitionsResponse> {
   const url = `${window.config.RESOURCES_URL}/definitions/client`
 
@@ -108,7 +154,13 @@ async function loadDefinitions(): Promise<IDefinitionsResponse> {
     throw Error(res.statusText)
   }
 
-  const response = await res.json()
+  const certificateTemplates = await loadCertificatesTemplatesDefinitions()
+  let response = await res.json()
+
+  response.templates.certificates.birth.definition =
+    certificateTemplates.birth.svgCode
+  response.templates.certificates.death.definition =
+    certificateTemplates.death.svgCode
   return response
 }
 

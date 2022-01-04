@@ -88,7 +88,7 @@ const ButtonWrapper = styled.div`
     margin-right: 0px;
   }
 `
-const PdfWrapper = styled.div`
+const SvgWrapper = styled.div`
   ${({ theme }) => theme.shadows.mistyShadow};
   background: ${({ theme }) => theme.colors.blueDeepSeaLight};
   display: flex;
@@ -96,6 +96,12 @@ const PdfWrapper = styled.div`
   align-items: center;
   justify-content: center;
   margin-bottom: 32px;
+`
+const Certificate = styled.img`
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
 `
 
 const Info = styled.div`
@@ -150,9 +156,9 @@ class ReviewCertificateActionComponent extends React.Component<
         this.props.draft,
         this.props.userDetails,
         this.props.resources,
-        (base64PDF: string) => {
+        (svg: string) => {
           this.setState({
-            certificatePdf: base64PDF
+            certificatePdf: svg
           })
         },
         this.props.countries
@@ -218,7 +224,6 @@ class ReviewCertificateActionComponent extends React.Component<
   getTitle = () => {
     const { intl, event } = this.props
     let eventName = intl.formatMessage(constantsMessages.birth).toLowerCase()
-    console.log('')
     switch (event) {
       case Event.BIRTH:
         return intl.formatMessage(certificateMessages.reviewTitle, {
@@ -261,11 +266,11 @@ class ReviewCertificateActionComponent extends React.Component<
       >
         <Title>{this.getTitle()}</Title>
         <Info>{intl.formatMessage(certificateMessages.reviewDescription)}</Info>
-
-        <PdfWrapper id="pdfwrapper">
-          <PDFViewer id="pdfholder" pdfSource={this.state.certificatePdf} />
-        </PdfWrapper>
-
+        {this.state.certificatePdf && (
+          <SvgWrapper>
+            <Certificate id="svgholder" src={this.state.certificatePdf} />
+          </SvgWrapper>
+        )}
         <ButtonWrapper>
           <PrimaryButton
             align={0}

@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IntlShape } from 'react-intl'
-import { createPDF, printPDF } from '@client/pdfRenderer'
+import { createPDF, createSVG, printPDF } from '@client/pdfRenderer'
 import { IApplication } from '@client/applications'
 import { IUserDetails } from '@opencrvs/client/src/utils/userUtils'
 import { Event } from '@client/forms'
@@ -50,7 +50,7 @@ export async function previewCertificate(
     throw new Error('No user details found')
   }
 
-  await createPDF(
+  const svgCode = await createSVG(
     application.event === Event.BIRTH
       ? offlineResource.templates.certificates.birth
       : offlineResource.templates.certificates.death,
@@ -59,9 +59,10 @@ export async function previewCertificate(
     offlineResource,
     intl,
     optionalData
-  ).getDataUrl((pdf: string) => {
-    callBack(pdf)
-  })
+  )
+  const blob = new Blob([svgCode], { type: 'image/svg+xml' })
+  const url = URL.createObjectURL(blob)
+  callBack(url)
 }
 
 export function printCertificate(
@@ -74,14 +75,14 @@ export function printCertificate(
   if (!userDetails) {
     throw new Error('No user details found')
   }
-  printPDF(
-    application.event === Event.BIRTH
-      ? offlineResource.templates.certificates.birth
-      : offlineResource.templates.certificates.death,
-    application,
-    userDetails,
-    offlineResource,
-    intl,
-    optionalData
-  )
+  // printPDF(
+  //   application.event === Event.BIRTH
+  //     ? offlineResource.templates.certificates.birth
+  //     : offlineResource.templates.certificates.death,
+  //   application,
+  //   userDetails,
+  //   offlineResource,
+  //   intl,
+  //   optionalData
+  // )
 }
