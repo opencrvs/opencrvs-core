@@ -11,6 +11,7 @@
  */
 export const ENGLISH_STATE = {
   lang: 'en',
+  displayName: 'English',
   messages: {
     'buttons.confirm': 'Confirm',
     'buttons.continue': 'Continue',

@@ -39,6 +39,8 @@ import {
   ERROR_CODE_FORBIDDEN_CREDENTIALS,
   ERROR_CODE_PHONE_NUMBER_VALIDATE
 } from '@login/utils/authUtils'
+import { goToForgottenItemForm } from '@login/login/actions'
+
 export const messages: {
   [key: string]: MessageDescriptor
 } = defineMessages({
@@ -193,6 +195,7 @@ export interface IProps {
 }
 export interface IDispatchProps {
   submitAction: (values: IAuthenticationData) => void
+  forgetAction: typeof goToForgottenItemForm
 }
 
 type IStepOneForm = IProps & IDispatchProps
@@ -264,6 +267,7 @@ export class StepOneForm extends React.Component<FullProps> {
       handleSubmit,
       formId,
       submitAction,
+      forgetAction,
       submissionError,
       errorCode
     } = this.props
@@ -311,7 +315,7 @@ export class StepOneForm extends React.Component<FullProps> {
               <StyledButton
                 id="login-forgot-password"
                 type="button"
-                onClick={() => (window.location.href = '/forgotten-item')}
+                onClick={forgetAction}
               >
                 {intl.formatMessage(messages.forgotPassword)}
               </StyledButton>
