@@ -27,7 +27,10 @@ import { filterLocations, getLocation } from '@client/utils/locationUtils'
 import { ISerializedForm } from '@client/forms'
 import { isOfflineDataLoaded, isNationalSystemAdmin } from './selectors'
 import { IUserDetails } from '@client/utils/userUtils'
-import { IPDFTemplate } from '@client/pdfRenderer/transformer/types'
+import {
+  IPDFTemplate,
+  ISVGTemplate
+} from '@client/pdfRenderer/transformer/types'
 import { ICertificateCollectorDefinition } from '@client/views/PrintCertificate/VerifyCollector'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
@@ -70,8 +73,8 @@ export interface IOfflineData {
   templates: {
     receipt?: IPDFTemplate
     certificates: {
-      birth: IPDFTemplate
-      death: IPDFTemplate
+      birth: ISVGTemplate
+      death: ISVGTemplate
     }
   }
   assets: {

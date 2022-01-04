@@ -82,7 +82,15 @@ export default function getRoutes() {
         tags: ['api'],
         description: 'Retrieves active certificates for birth and death',
         auth: {
-          scope: [RouteScope.NATLSYSADMIN]
+          scope: [
+            RouteScope.NATLSYSADMIN,
+            RouteScope.DECLARE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN,
+            RouteScope.VALIDATE
+          ]
         }
       }
     },
