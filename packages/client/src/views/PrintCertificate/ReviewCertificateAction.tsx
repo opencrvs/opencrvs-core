@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
-import { PDFViewer } from '@opencrvs/components/lib/forms'
 import { Check } from '@opencrvs/components/lib/icons'
 import {
   ResponsiveModal,
@@ -57,6 +56,7 @@ import {
 } from './utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { countries } from '@client/forms/countries'
+import ReactToPrint, { PrintContextConsumer } from 'react-to-print'
 
 export const ActionPageWrapper = styled.div`
   position: fixed;
@@ -99,9 +99,10 @@ const SvgWrapper = styled.div`
 `
 const Certificate = styled.img`
   display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 50%;
+  width: 70%;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
 `
 
 const Info = styled.div`
@@ -142,8 +143,10 @@ class ReviewCertificateActionComponent extends React.Component<
   IFullProps,
   State
 > {
+  componentRef: React.RefObject<HTMLImageElement>
   constructor(props: IFullProps) {
     super(props)
+    this.componentRef = React.createRef()
     this.state = {
       certificatePdf: null,
       showConfirmationModal: false
@@ -172,7 +175,7 @@ class ReviewCertificateActionComponent extends React.Component<
     })
   }
 
-  readyToCertify = () => {
+  readyToCertify = (printSvgCertificate: () => void) => {
     const { draft } = this.props
     draft.submissionStatus = SUBMISSION_STATUS.READY_TO_CERTIFY
     draft.action = Action.COLLECT_CERTIFICATE
@@ -208,13 +211,9 @@ class ReviewCertificateActionComponent extends React.Component<
         }
       ]
     }
-    printCertificate(
-      this.props.intl,
-      draft,
-      this.props.userDetails,
-      this.props.offlineCountryConfig,
-      this.props.countries
-    )
+
+
+    printSvgCertificate()
     this.props.modifyApplication(draft)
     this.props.writeApplication(draft)
     this.toggleModal()
@@ -267,43 +266,60 @@ class ReviewCertificateActionComponent extends React.Component<
       >
         <Title>{this.getTitle()}</Title>
         <Info>{intl.formatMessage(certificateMessages.reviewDescription)}</Info>
-        {this.state.certificatePdf && (
-          <SvgWrapper>
-            <Certificate id="svgholder" src={this.state.certificatePdf} />
-          </SvgWrapper>
-        )}
-        <ButtonWrapper>
-          <PrimaryButton
-            align={0}
-            id="confirm-print"
-            onClick={this.toggleModal}
-            icon={() => <Check />}
-          >
-            {intl.formatMessage(certificateMessages.confirmAndPrint)}
-          </PrimaryButton>
+        <ReactToPrint content={() => this.componentRef.current}>
+          <PrintContextConsumer>
+            {({ handlePrint }) => (
+              <>
+                {this.state.certificatePdf && (
+                  <SvgWrapper>
+                    <Certificate
+                      id="svgholder"
+                      src={this.state.certificatePdf}
+                      ref={this.componentRef}
+                    />
+                  </SvgWrapper>
+                )}
+                <ButtonWrapper>
+                  <PrimaryButton
+                    align={0}
+                    id="confirm-print"
+                    onClick={this.toggleModal}
+                    icon={() => <Check />}
+                  >
+                    {intl.formatMessage(certificateMessages.confirmAndPrint)}
+                  </PrimaryButton>
 
-          <CustomTertiaryButton disabled>
-            {intl.formatMessage(buttonMessages.editRecord)}
-          </CustomTertiaryButton>
-        </ButtonWrapper>
-
-        <ResponsiveModal
-          id="confirm-print-modal"
-          title={intl.formatMessage(certificateMessages.modalTitle)}
-          actions={[
-            <CustomTertiaryButton onClick={this.toggleModal} id="close-modal">
-              {intl.formatMessage(buttonMessages.cancel)}
-            </CustomTertiaryButton>,
-            <PrimaryButton onClick={this.readyToCertify} id="print-certificate">
-              {intl.formatMessage(buttonMessages.print)}
-            </PrimaryButton>
-          ]}
-          show={this.state.showConfirmationModal}
-          handleClose={this.toggleModal}
-          contentHeight={100}
-        >
-          {intl.formatMessage(certificateMessages.modalBody)}
-        </ResponsiveModal>
+                  <CustomTertiaryButton disabled>
+                    {intl.formatMessage(buttonMessages.editRecord)}
+                  </CustomTertiaryButton>
+                </ButtonWrapper>
+                <ResponsiveModal
+                  id="confirm-print-modal"
+                  title={intl.formatMessage(certificateMessages.modalTitle)}
+                  actions={[
+                    <CustomTertiaryButton
+                      onClick={this.toggleModal}
+                      id="close-modal"
+                    >
+                      {intl.formatMessage(buttonMessages.cancel)}
+                    </CustomTertiaryButton>,
+                    <PrimaryButton
+                      onClick={() => this.readyToCertify(handlePrint)}
+                      id="print-certificate"
+                    >
+                      {intl.formatMessage(buttonMessages.print)}
+                    </PrimaryButton>
+                  ]}
+                  show={this.state.showConfirmationModal}
+                  handleClose={this.toggleModal}
+                  contentHeight={100}
+                >
+                  {intl.formatMessage(certificateMessages.modalBody)}
+                </ResponsiveModal>
+              </>
+            )}
+          </PrintContextConsumer>
+        </ReactToPrint>
       </ActionPageLight>
     )
   }
