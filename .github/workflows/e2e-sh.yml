@@ -30,7 +30,11 @@ jobs:
           killall screen || true
           screen -wipe || true
           echo $ROOT_PASSWORD | sudo -S killall -s KILL node || true
-          docker stop $(docker ps -qa)
+          if docker stop $(docker ps -qa); then
+            echo "All the docker containers are down"
+          else
+            echo "No docker container available to shutdown"
+          fi
           echo $ROOT_PASSWORD | sudo -S rm -rf data
 
       - name: Checking out git repo
