@@ -632,10 +632,10 @@ async function updateFieldAgentDeclaredApplicationsByUser(
     userDetails
   )
 
-  const rejectedApplication = await getFieldAgentRejectedApplications(
+  const rejectedApplications = await getFieldAgentRejectedApplications(
     userDetails
   )
-  const rejectedApplicationId = (rejectedApplication.results as IApplication[]).map(
+  const rejectedApplicationIds = (rejectedApplications.results as IApplication[]).map(
     application => application.id
   )
 
@@ -655,7 +655,7 @@ async function updateFieldAgentDeclaredApplicationsByUser(
     ...currentUserData,
     applications: currentUserData.applications.filter(
       application =>
-        !rejectedApplicationId.includes(application.compositionId as string)
+        !rejectedApplicationIds.includes(application.compositionId as string)
     )
   }
 
@@ -667,10 +667,7 @@ async function updateFieldAgentDeclaredApplicationsByUser(
     } else {
       return {
         ...userData,
-        applications: (userData.applications as IApplication[]).filter(
-          application =>
-            !rejectedApplicationId.includes(application.compositionId as string)
-        )
+        ...currentUserData
       }
     }
   })
