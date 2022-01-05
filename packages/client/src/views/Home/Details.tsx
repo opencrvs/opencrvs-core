@@ -213,7 +213,7 @@ function generateHistoryEntry(
     type,
     practitionerName:
       (name && (createNamesMap(name)[language] as string)) || '',
-    timestamp: date && formatLongDate(date, language, 'LL'),
+    timestamp: date && formatLongDate(date, language, 'LLL'),
     practitionerRole: role,
     officeName: office,
     trackingId,
