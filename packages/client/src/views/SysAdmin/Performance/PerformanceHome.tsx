@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { messages } from '@client/i18n/messages/views/performance'
+import { messages as messagesSearch } from '@client/i18n/messages/views/search'
 import { goToOperationalReport } from '@client/navigation'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
@@ -135,6 +136,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
           locationList={[...offlineLocations, ...offlineOffices]}
           searchHandler={this.searchHandler}
           searchButtonHandler={this.searchButtonHandler}
+          errorMessage={intl.formatMessage(messagesSearch.locationNotFound)}
         />
 
         {this.renderPilotLocations(intl)}
