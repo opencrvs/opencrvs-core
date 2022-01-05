@@ -21,6 +21,7 @@ const StyledTextArea = styled.textarea<ITextAreaProps>`
   width: 100%;
   padding: 10px;
   min-height: 104px;
+  max-width: 344px;
   border: 2px solid ${({ theme }) => theme.colors.menuBackground};
   &:focus {
     box-shadow: 0 0 0px 2px ${({ theme }) => theme.colors.focus};
@@ -42,7 +43,7 @@ const StyledTextArea = styled.textarea<ITextAreaProps>`
   ${({ ignoreMediaQuery, theme }) => {
     return !ignoreMediaQuery
       ? `@media (min-width: ${theme.grid.breakpoints.md}px) {
-        width: 515px;
+        width: 344px;
       }`
       : ''
   }}
