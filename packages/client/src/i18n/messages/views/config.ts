@@ -25,6 +25,7 @@ interface IConfigMessages
   deathTemplate: MessageDescriptor
   birthDefaultTempDesc: MessageDescriptor
   deathDefaultTempDesc: MessageDescriptor
+  listDetailsQsn: MessageDescriptor
 }
 
 const messagesToDefine: IConfigMessages = {
@@ -66,8 +67,13 @@ const messagesToDefine: IConfigMessages = {
   listDetails: {
     id: 'config.listDetails',
     defaultMessage:
-      'To learn how to edit an SVG and upload a certificate to suite your country requirements please refer to this detailed guide. How to configure a certificate?',
+      'To learn how to edit an SVG and upload a certificate to suite your country requirements please refer to this detailed guide. ',
     description: 'Details for certificates templates list'
+  },
+  listDetailsQsn: {
+    id: 'config.listDetailsQsn',
+    defaultMessage: 'How to configure a certificate?',
+    description: 'Details question for certificates templates list'
   },
   birthTemplate: {
     id: 'config.birthTemplate',
