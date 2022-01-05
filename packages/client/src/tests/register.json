@@ -20528,7 +20528,9 @@
                 "initialValue": "",
                 "searchableResource": "offices",
                 "searchableType": "CRVS_OFFICE",
-                "validate": [],
+                "validate": [ {
+                  "operation": "officeMustBeSelected"
+                }],
                 "mapping": {
                   "mutation": {
                     "operation": "fieldNameTransformer",
@@ -20896,7 +20898,9 @@
                 "initialValue": "",
                 "searchableResource": "facilities",
                 "searchableType": "CRVS_OFFICE",
-                "validate": [],
+                "validate": [ {
+                  "operation": "officeMustBeSelected"
+                }],
                 "mapping": {
                   "mutation": {
                     "operation": "fieldNameTransformer",
