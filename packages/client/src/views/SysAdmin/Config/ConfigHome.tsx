@@ -86,6 +86,10 @@ const ListTitleDiv = styled.div`
   ${({ theme }) => theme.fonts.bodyStyle};
 `
 
+const BlueTitle = styled.span`
+  color: ${({ theme }) => theme.colors.tertiary};
+`
+
 const TopBarContainer = styled.div`
   position: absolute;
   left: 0px;
@@ -210,6 +214,9 @@ class ConfigHomeComponent extends React.Component<Props, State> {
               responsiveContents={
                 <ListTitleDiv>
                   {intl.formatMessage(messages.listDetails)}
+                  <BlueTitle>
+                    {intl.formatMessage(messages.listDetailsQsn)}
+                  </BlueTitle>
                 </ListTitleDiv>
               }
               isConfigPage={true}
