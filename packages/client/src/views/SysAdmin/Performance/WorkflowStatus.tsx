@@ -391,6 +391,8 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       tooltipId: string,
       rowIndex: number
     ) {
+      if (timeDuration === 0) return <>-</>
+
       const timeStructure = formatTimeDuration(timeDuration)
       const label =
         (timeStructure &&

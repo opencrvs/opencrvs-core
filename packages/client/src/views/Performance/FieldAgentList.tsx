@@ -324,10 +324,13 @@ function FieldAgentListComponent(props: IProps) {
               (row.startMonth &&
                 moment(Number(row.startMonth)).format('MMMM YYYY')) ||
               '',
-            avgCompleteApplicationTime: getAverageCompletionTimeComponent(
-              Number(row.avgCompleteApplicationTime),
-              idx
-            )
+            avgCompleteApplicationTime:
+              row.avgCompleteApplicationTime === 0
+                ? '-'
+                : getAverageCompletionTimeComponent(
+                    Number(row.avgCompleteApplicationTime),
+                    idx
+                  )
           }
         })) ||
       []
