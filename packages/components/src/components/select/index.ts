@@ -9,20 +9,4 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { storage } from '@login/storage'
-
-export function getAvailableLanguages() {
-  return window.config.LANGUAGES.split(',')
-}
-
-export function getDefaultLanguage() {
-  return getAvailableLanguages()[0]
-}
-
-export function storeLanguage(language: string) {
-  storage.setItem('language', language)
-}
-
-export async function retrieveLanguage() {
-  return (await storage.getItem('language')) || getDefaultLanguage()
-}
+export * from './Select'
