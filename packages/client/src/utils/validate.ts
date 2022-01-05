@@ -170,21 +170,6 @@ export const facilityMustBeSelected: Validation = (
   return isValid ? undefined : { message: messages.facilityMustBeSelected }
 }
 
-export const officeMustBeSelected: Validation = (
-  value: IFormFieldValue,
-  drafts,
-  resources
-) => {
-  const locationsList = getListOfLocations(
-    resources as IOfflineData,
-    'offices',
-    LocationType.CRVS_OFFICE
-  )
-  const isValid =
-    !value || locationsList.some(location => location.id === value)
-  return isValid ? undefined : { message: messages.officeMustBeSelected }
-}
-
 export const phoneNumberFormat: Validation = (value: IFormFieldValue) => {
   const { start, num } = window.config.PHONE_NUMBER_PATTERN
   const validationProps = { start, num }

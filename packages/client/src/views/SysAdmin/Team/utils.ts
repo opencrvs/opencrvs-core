@@ -160,11 +160,7 @@ export const mockUserGraphqlOperation = {
                     searchableResource: 'facilities',
                     searchableType: 'CRVS_OFFICE',
                     locationList: [],
-                    validate: [
-                      {
-                        operation: 'officeMustBeSelected'
-                      }
-                    ],
+                    validate: [],
                     mapping: {
                       mutation: {
                         operation: 'fieldNameTransformer',
