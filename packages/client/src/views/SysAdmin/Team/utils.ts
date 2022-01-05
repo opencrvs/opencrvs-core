@@ -159,10 +159,6 @@ export const mockUserGraphqlOperation = {
                     initialValue: '',
                     searchableResource: 'facilities',
                     searchableType: 'CRVS_OFFICE',
-                    dispatchOptions: {
-                      action: 'USER_FORM/PROCESS_ROLES',
-                      payloadKey: 'primaryOfficeId'
-                    },
                     locationList: [],
                     validate: [],
                     mapping: {
