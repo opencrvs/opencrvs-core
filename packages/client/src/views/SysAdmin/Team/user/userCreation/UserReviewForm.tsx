@@ -86,15 +86,9 @@ interface ISectionData {
   items: IDataProps[]
 }
 
-type GeneratedInputFieldProps = {
-  onSetFieldValue?: (name: string, value: IFormFieldValue) => void
-}
-
 type IFullProps = IUserReviewFormProps &
   IntlShapeProps &
-  GeneratedInputFieldProps &
   RouteComponentProps<{ userId?: string }>
-
 class UserReviewFormComponent extends React.Component<
   IFullProps & IDispatchProps
 > {
