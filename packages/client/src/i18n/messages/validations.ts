@@ -21,7 +21,6 @@ interface IValidationMessages
   emailAddressFormat: MessageDescriptor
   englishOnlyNameFormat: MessageDescriptor
   facilityMustBeSelected: MessageDescriptor
-  officeMustBeSelected: MessageDescriptor
   greaterThanZero: MessageDescriptor
   isValidBirthDate: MessageDescriptor
   isValidDateOfDeath: MessageDescriptor
@@ -100,11 +99,6 @@ const messagesToDefine: IValidationMessages = {
     defaultMessage: 'No facility selected',
     description: 'The error message appears when no valid facility is selected',
     id: 'validations.facilityMustBeSelected'
-  },
-  officeMustBeSelected: {
-    defaultMessage: 'No Office selected',
-    description: 'The error message appears when no valid office is selected',
-    id: 'validations.officeMustBeSelected'
   },
   greaterThanZero: {
     defaultMessage: 'Must be a greater than zero',
