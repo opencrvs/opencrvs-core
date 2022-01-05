@@ -713,7 +713,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       <Query
         query={FETCH_EVENTS_WITH_PROGRESS}
         variables={{
-          parentLocationId: locationId,
+          locationId: locationId,
           skip: 0,
           count: recordCount,
           status: (status && [status]) || undefined,

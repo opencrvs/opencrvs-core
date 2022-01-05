@@ -37,6 +37,7 @@ const { useState, useEffect } = React
 
 interface IConnectProps {
   offlineLocations: { [key: string]: ILocation }
+  offlineOffices: { [key: string]: ILocation }
   jurisidictionTypeFilter: string[] | undefined
 }
 
@@ -99,17 +100,25 @@ const StyledLocationSearch = styled(LocationSearch)`
 function LocationPickerComponent(props: LocationPickerProps) {
   const {
     offlineLocations,
+    offlineOffices,
     jurisidictionTypeFilter,
     selectedLocationId,
     intl
   } = props
   const [modalVisible, setModalVisible] = useState<boolean>(false)
 
-  const searchableLocations = generateLocations(
+  const offlineSearchableLocations = generateLocations(
     offlineLocations,
     intl,
     jurisidictionTypeFilter
   )
+
+  const offlineSearchableOffices = generateLocations(offlineOffices, intl)
+
+  const searchableLocations = [
+    ...offlineSearchableLocations,
+    ...offlineSearchableOffices
+  ]
 
   const selectedSearchedLocation = searchableLocations.find(
     ({ id }) => id === selectedLocationId
@@ -180,12 +189,14 @@ function LocationPickerComponent(props: LocationPickerProps) {
 
 function mapStateToProps(state: IStoreState, props: IBaseProps): IConnectProps {
   const offlineLocations = getOfflineData(state).locations
+  const offlineOffices = getOfflineData(state).offices
   const jurisidictionTypeFilter =
     (props.requiredJurisdictionTypes &&
       props.requiredJurisdictionTypes.split(',')) ||
     undefined
   return {
     offlineLocations,
+    offlineOffices,
     jurisidictionTypeFilter
   }
 }

@@ -140,10 +140,11 @@ export function getJurisidictionType(
   locations: { [key: string]: ILocation },
   locationId: string
 ): string {
-  const relevantLocation = Object.values(locations).filter(
-    (location: ILocation) => {
-      return location.id === locationId
-    }
-  )
-  return relevantLocation[0].jurisdictionType as string
+  let relevantLocation = locations[locationId]
+
+  if (!relevantLocation) {
+    throw new Error(`Location ${locationId} not found`)
+  }
+
+  return relevantLocation.jurisdictionType as string
 }

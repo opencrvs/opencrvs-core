@@ -27,7 +27,7 @@ import {
   goToRegistrationRates,
   goToWorkflowStatus
 } from '@client/navigation'
-import { IOfflineData } from '@client/offline/reducer'
+import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
@@ -74,12 +74,16 @@ import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { withTheme } from 'styled-components'
-import { OPERATIONAL_REPORTS_METRICS } from './metricsQuery'
+import {
+  OPERATIONAL_REPORTS_METRICS,
+  OPERATIONAL_REPORTS_METRICS_FOR_OFFICE
+} from './metricsQuery'
 import { ApplicationsStartedReport } from './reports/operational/ApplicationsStartedReport'
 import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
 
 interface IConnectProps {
-  offlineLocations: IOfflineData['locations']
+  locations: { [key: string]: ILocation }
+  offices: { [key: string]: ILocation }
 }
 interface IDispatchProps {
   goToPerformanceHome: typeof goToPerformanceHome
@@ -205,13 +209,15 @@ export const StatusMapping: IStatusMapping = {
 class OperationalReportComponent extends React.Component<Props, State> {
   static transformPropsToState(props: Props, state?: State) {
     const {
-      location: { search }
+      location: { search },
+      locations,
+      offices
     } = props
     const { timeStart, timeEnd, locationId, sectionId } = (parse(
       search
     ) as unknown) as ISearchParams
     const searchableLocations = generateLocations(
-      props.offlineLocations,
+      { ...locations, ...offices },
       props.intl
     )
     const selectedLocation = searchableLocations.find(
@@ -239,6 +245,10 @@ class OperationalReportComponent extends React.Component<Props, State> {
       props,
       undefined
     )
+  }
+
+  isOfficeSelected() {
+    return !!this.props.offices[this.state.selectedLocation.id]
   }
 
   static getDerivedStateFromProps(props: Props, state: State) {
@@ -469,7 +479,11 @@ class OperationalReportComponent extends React.Component<Props, State> {
           </ActionContainer>
           {sectionId === OPERATIONAL_REPORT_SECTION.OPERATIONAL && (
             <Query
-              query={OPERATIONAL_REPORTS_METRICS}
+              query={
+                this.isOfficeSelected()
+                  ? OPERATIONAL_REPORTS_METRICS_FOR_OFFICE
+                  : OPERATIONAL_REPORTS_METRICS
+              }
               variables={{
                 timeStart: timeStart.toISOString(),
                 timeEnd: timeEnd.toISOString(),
@@ -489,7 +503,9 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 if (error) {
                   return (
                     <>
-                      <RegistrationRatesReport loading={true} />
+                      {!this.isOfficeSelected() && (
+                        <RegistrationRatesReport loading={true} />
+                      )}
                       <ApplicationsStartedReport
                         loading={true}
                         locationId={locationId}
@@ -502,15 +518,17 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 } else {
                   return (
                     <>
-                      <RegistrationRatesReport
-                        loading={loading}
-                        data={data && data.getEventEstimationMetrics}
-                        reportTimeFrom={timeStart.format()}
-                        reportTimeTo={timeEnd.format()}
-                        onClickEventDetails={
-                          this.onClickRegistrationRatesDetails
-                        }
-                      />
+                      {!this.isOfficeSelected() && (
+                        <RegistrationRatesReport
+                          loading={loading}
+                          data={data && data.getEventEstimationMetrics}
+                          reportTimeFrom={timeStart.format()}
+                          reportTimeTo={timeEnd.format()}
+                          onClickEventDetails={
+                            this.onClickRegistrationRatesDetails
+                          }
+                        />
+                      )}
                       <ApplicationsStartedReport
                         loading={loading}
                         locationId={locationId}
@@ -637,7 +655,8 @@ class OperationalReportComponent extends React.Component<Props, State> {
 function mapStateToProps(state: IStoreState) {
   const offlineResources = getOfflineData(state)
   return {
-    offlineLocations: offlineResources.locations,
+    locations: offlineResources.locations,
+    offices: offlineResources.offices,
     userDetails: getUserDetails(state)
   }
 }
