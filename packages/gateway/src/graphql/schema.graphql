@@ -44,7 +44,8 @@ type Query {
     sort: String
   ): SearchUserResult
   searchFieldAgents(
-    locationId: String!
+    locationId: String
+    primaryOfficeId: String
     status: String
     language: String
     timeStart: String!
@@ -105,7 +106,7 @@ type Query {
     sortColumn: String
   ): EventSearchResultSet
   getEventsWithProgress(
-    parentLocationId: String
+    locationId: String
     count: Int
     skip: Int
     sort: String
@@ -304,6 +305,7 @@ type User {
   identifier: Identifier
   signature: Signature
   creationDate: String
+  device: String
 }
 
 type SearchUserResult {
@@ -501,6 +503,7 @@ enum AttendantType {
   LAYPERSON
   NONE
   OTHER
+  TRADITIONAL_BIRTH_ATTENDANT
 }
 
 enum BirthRegType {
@@ -530,7 +533,7 @@ enum MannerOfDeath {
   ACCIDENT
   SUICIDE
   HOMICIDE
-  UNDETERMINED
+  MANNER_UNDETERMINED
 }
 
 enum CauseOfDeathMethodType {

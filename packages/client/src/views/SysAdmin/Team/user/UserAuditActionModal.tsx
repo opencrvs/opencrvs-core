@@ -119,11 +119,17 @@ function UserAuditActionModalComponent(
     if (
       hasFormError(props.form.fields, formValues, undefined, { formValues })
     ) {
-      setFormError(intl.formatMessage(messages.formError))
+      if (user && user.status === 'active') {
+        const auditAction = 'deactivating' as string
+        setFormError(intl.formatMessage(messages.formError, { auditAction }))
+      } else if (user && user.status === 'deactivated') {
+        const auditAction = 'reactivating' as string
+        setFormError(intl.formatMessage(messages.formError, { auditAction }))
+      }
     } else {
       setFormError(null)
     }
-  }, [props.form.fields, formValues, intl])
+  }, [props.form.fields, formValues, intl, user])
 
   useEffect(() => {
     function cleanUpFormState() {
@@ -227,9 +233,6 @@ function UserAuditActionModalComponent(
         onChange={(values) => setFormValues({ ...formValues, ...values })}
         setAllFieldsDirty={false}
         draftData={{ formValues }}
-        onSetTouched={(onSetTouchedCallback) => {
-          makeAllFieldsDirty = onSetTouchedCallback
-        }}
       />
     </ResponsiveModal>
   )

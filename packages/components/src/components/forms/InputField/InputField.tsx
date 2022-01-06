@@ -20,6 +20,7 @@ const InputHeader = styled.div`
 `
 const ComponentWrapper = styled.span`
   display: flex;
+  max-width: 344px;
 `
 
 const Padding = styled.span`
@@ -47,7 +48,7 @@ const InputDescription = styled.p<{
   ${({ ignoreMediaQuery, theme }) => {
     return !ignoreMediaQuery
       ? `@media (min-width: ${theme.grid.breakpoints.md}px) {
-        width: 515px;
+        width: 344px;
       }`
       : ''
   }}

@@ -12,7 +12,6 @@
 import {
   Action as ApplicationAction,
   Event,
-  IContactPoint,
   IForm,
   IFormData,
   IFormFieldValue,
@@ -363,10 +362,6 @@ interface UpdateFieldAgentDeclaredApplicationsFailAction {
   type: typeof UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_FAIL
 }
 
-interface IApplicationRequestQueue {
-  id: string
-  action: Action
-}
 export type Action =
   | IStoreApplicationAction
   | IModifyApplicationAction
@@ -565,6 +560,28 @@ async function getFieldAgentDeclaredApplications(userDetails: IUserDetails) {
   return result
 }
 
+async function getFieldAgentRejectedApplications(userDetails: IUserDetails) {
+  const userId = userDetails.practitionerId
+  const locationIds = (userDetails && [getUserLocation(userDetails).id]) || []
+
+  let result
+  try {
+    const response = await client.query({
+      query: SEARCH_APPLICATIONS_USER_WISE,
+      variables: {
+        userId,
+        status: [EVENT_STATUS.REJECTED],
+        locationIds
+      },
+      fetchPolicy: 'no-cache'
+    })
+    result = response.data && response.data.searchEvents
+  } catch (exception) {
+    result = undefined
+  }
+  return result
+}
+
 export function mergeDeclaredApplications(
   applications: IApplication[],
   declaredApplications: GQLEventSearchSet[]
@@ -593,7 +610,6 @@ async function updateFieldAgentDeclaredApplicationsByUser(
 
   if (
     !state.applicationsState.applications ||
-    state.applicationsState.applications.length !== 0 ||
     !scope ||
     !scope.includes('declare')
   ) {
@@ -607,13 +623,18 @@ async function updateFieldAgentDeclaredApplicationsByUser(
     ) as IUserDetails)
 
   const uID = userDetails.userMgntUserID || ''
-  const userData = await getUserData(uID)
-  const { allUserData } = userData
-  let { currentUserData } = await getUserData(uID)
+  let { allUserData, currentUserData } = await getUserData(uID)
 
   const declaredApplications = await getFieldAgentDeclaredApplications(
     userDetails
   )
+
+  const rejectedApplications = await getFieldAgentRejectedApplications(
+    userDetails
+  )
+  const rejectedApplicationIds = (
+    rejectedApplications.results as IApplication[]
+  ).map((application) => application.id)
 
   if (!currentUserData) {
     currentUserData = {
@@ -626,6 +647,27 @@ async function updateFieldAgentDeclaredApplicationsByUser(
     currentUserData.applications,
     declaredApplications.results
   )
+
+  currentUserData = {
+    ...currentUserData,
+    applications: currentUserData.applications.filter(
+      (application) =>
+        !rejectedApplicationIds.includes(application.compositionId as string)
+    )
+  }
+
+  allUserData = allUserData.map((userData) => {
+    if (userData.userID !== currentUserData!.userID) {
+      return {
+        ...userData
+      }
+    } else {
+      return {
+        ...userData,
+        ...currentUserData
+      }
+    }
+  })
 
   return Promise.all([
     storage.setItem('USER_DATA', JSON.stringify(allUserData)),
@@ -744,7 +786,7 @@ export async function writeApplicationByUser(
   const uID = userId || (await getCurrentUserID())
   const userData = await getUserData(uID)
   const { allUserData } = userData
-  let { currentUserData } = await getUserData(uID)
+  let { currentUserData } = userData
 
   const existingApplicationId = currentUserData
     ? currentUserData.applications.findIndex((app) => app.id === application.id)
@@ -944,7 +986,7 @@ export async function writeRegistrarWorkqueueByUser(
   const uID = userDetails.userMgntUserID || ''
   const userData = await getUserData(uID)
   const { allUserData } = userData
-  let { currentUserData } = await getUserData(uID)
+  let { currentUserData } = userData
 
   const workqueue = await getWorkqueueData(
     state,

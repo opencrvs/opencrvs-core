@@ -253,13 +253,14 @@ class ReviewTabComponent extends React.Component<
         },
         {
           label: this.props.intl.formatMessage(constantsMessages.name),
-          width: 64,
+          width: 50,
           key: 'name'
         },
         {
-          width: 6,
+          width: 20,
           key: 'icons',
-          isIconColumn: true
+          isIconColumn: true,
+          alignment: ColumnContentAlignment.RIGHT
         }
       ]
     }

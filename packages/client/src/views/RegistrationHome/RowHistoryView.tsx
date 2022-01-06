@@ -95,6 +95,10 @@ const HistoryWrapper = styled.div`
 const PaddedContent = styled.div`
   padding: 24px;
 `
+const OverflowContent = styled.div`
+  max-height: 200px;
+  overflow-y: auto;
+`
 const BorderedPaddedContent = styled(PaddedContent)`
   border-bottom: ${({ theme }) => `2px solid ${theme.colors.background}`};
 `
@@ -115,12 +119,21 @@ function LabelValue({
   label: string
   value: string
 }) {
-  return (
-    <div id={id}>
-      <StyledLabel>{label}:</StyledLabel>
-      <StyledValue>{value}</StyledValue>
-    </div>
-  )
+  if (id && id.includes('expanded_history_item_comment')) {
+    return (
+      <OverflowContent id={id}>
+        <StyledLabel>{label}:</StyledLabel>
+        <StyledValue>{value}</StyledValue>
+      </OverflowContent>
+    )
+  } else {
+    return (
+      <div id={id}>
+        <StyledLabel>{label}:</StyledLabel>
+        <StyledValue>{value}</StyledValue>
+      </div>
+    )
+  }
 }
 
 function ValuesWithSeparator(props: { strings: string[] }): JSX.Element {
@@ -402,6 +415,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                               .join(', ')}
                           />
                           <LabelValue
+                            id="expanded_history_item_comment"
                             label={intl.formatMessage(
                               constantsMessages.comment
                             )}

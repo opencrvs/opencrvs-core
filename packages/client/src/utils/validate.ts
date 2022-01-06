@@ -28,7 +28,7 @@ import {
   DRIVING_LICENSE
 } from '@client/forms/identity'
 import moment from 'moment'
-import { IOfflineData, LocationType } from '@client/offline/reducer'
+import { IOfflineData } from '@client/offline/reducer'
 import { getListOfLocations } from '@client/forms/utils'
 
 export interface IValidationResult {
@@ -160,11 +160,9 @@ export const facilityMustBeSelected: Validation = (
 ) => {
   const locationsList = getListOfLocations(
     resources as IOfflineData,
-    'facilities',
-    LocationType.HEALTH_FACILITY
+    'facilities'
   )
-  const isValid =
-    !value || locationsList.some((location) => location.id === value)
+  const isValid = !value || locationsList[value as string]
   return isValid ? undefined : { message: messages.facilityMustBeSelected }
 }
 
@@ -522,6 +520,11 @@ export const range: RangeValidation =
 const hasValidLength = (value: string, length: number): boolean =>
   !value || value.length === length
 
+export const isAValidNIDNumberFormat = (value: string): boolean => {
+  const { pattern } = window.config.NID_NUMBER_PATTERN
+  return pattern.test(value)
+}
+
 export const validIDNumber =
   (typeOfID: string): Validation =>
   (value: any) => {
@@ -533,19 +536,22 @@ export const validIDNumber =
     value = (value && value.toString()) || ''
     switch (typeOfID) {
       case NATIONAL_ID:
-        const containsOnlyNumbers = value.match(/^[0-9]+$/)
+        const { num } = window.config.NID_NUMBER_PATTERN
 
-        if (
-          validNationalIDLengths.includes(value.length) &&
-          containsOnlyNumbers
-        ) {
+        const cast = value as string
+        const trimmedValue =
+          cast === undefined || cast === null ? '' : cast.trim()
+
+        if (isAValidNIDNumberFormat(trimmedValue) || !trimmedValue) {
           return undefined
         }
+
         return {
           message: messages.validNationalId,
           props: {
             min: validNationalIDLengths[0],
-            max: validNationalIDLengths[1]
+            max: validNationalIDLengths[1],
+            validLength: num
           }
         }
 

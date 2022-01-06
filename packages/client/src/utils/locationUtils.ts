@@ -11,8 +11,9 @@
  */
 import { ILocation, LocationType } from '@client/offline/reducer'
 import { IUserDetails, IGQLLocation, IIdentifier } from './userUtils'
-import { JURISDICTION_TYPE } from './constants'
 import { ISearchLocation } from '@opencrvs/components/lib/interface/LocationSearch/LocationSearch'
+import { IntlShape } from 'react-intl'
+import { locationMessages } from '@client/i18n/messages'
 
 export function filterLocations(
   locations: { [key: string]: ILocation },
@@ -58,22 +59,30 @@ export function getLocation(userDetails: IUserDetails, locationKey: string) {
   return filteredArea[0] ? filteredArea[0].id : ''
 }
 
+export function generateLocationName(location: ILocation, intl: IntlShape) {
+  let name = location.name
+  location.jurisdictionType &&
+    (name += ` ${
+      intl.formatMessage(locationMessages[location.jurisdictionType]) || ''
+    }`.trimEnd())
+  return name
+}
+
 function generateSearchableLocations(
   locations: ILocation[],
-  offlineLocations: { [key: string]: ILocation }
+  offlineLocations: { [key: string]: ILocation },
+  intl: IntlShape
 ) {
   const generated: ISearchLocation[] = locations.map((location: ILocation) => {
-    let locationName = location.name
-    location.jurisdictionType &&
-      (locationName += ` ${
-        JURISDICTION_TYPE[location.jurisdictionType] || ''
-      }`.trimEnd())
+    let locationName = generateLocationName(location, intl)
 
     if (location.partOf && location.partOf !== 'Location/0') {
       const locRef = location.partOf.split('/')[1]
       let parent
       if (
-        (parent = offlineLocations[locRef] && offlineLocations[locRef].name)
+        (parent =
+          offlineLocations[locRef] &&
+          generateLocationName(offlineLocations[locRef], intl))
       ) {
         locationName += `, ${parent}`
       }
@@ -90,6 +99,7 @@ function generateSearchableLocations(
 
 export function generateLocations(
   locations: { [key: string]: ILocation },
+  intl: IntlShape,
   filterByJurisdictionTypes?: string[],
   filterByLocationTypes?: LocationType[]
 ) {
@@ -111,16 +121,18 @@ export function generateLocations(
     )
   }
 
-  return generateSearchableLocations(locationArray, locations)
+  return generateSearchableLocations(locationArray, locations, intl)
 }
 
 export function generatePilotLocations(
   pilotLocations: { [key: string]: ILocation },
-  offlineLocations: { [key: string]: ILocation }
+  offlineLocations: { [key: string]: ILocation },
+  intl: IntlShape
 ) {
   return generateSearchableLocations(
     Object.values(pilotLocations),
-    offlineLocations
+    offlineLocations,
+    intl
   )
 }
 
@@ -128,10 +140,11 @@ export function getJurisidictionType(
   locations: { [key: string]: ILocation },
   locationId: string
 ): string {
-  const relevantLocation = Object.values(locations).filter(
-    (location: ILocation) => {
-      return location.id === locationId
-    }
-  )
-  return relevantLocation[0].jurisdictionType as string
+  const relevantLocation = locations[locationId]
+
+  if (!relevantLocation) {
+    throw new Error(`Location ${locationId} not found`)
+  }
+
+  return relevantLocation.jurisdictionType as string
 }

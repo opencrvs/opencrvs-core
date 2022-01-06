@@ -151,7 +151,7 @@ class MonthlyReportsComponent extends React.Component<Props, IState> {
 
         <LocationSearch
           selectedLocation={this.state.selectedLocation}
-          locationList={generateLocations(offlineResources.locations)}
+          locationList={generateLocations(offlineResources.locations, intl)}
           searchHandler={this.onClickSearchResult}
         />
 

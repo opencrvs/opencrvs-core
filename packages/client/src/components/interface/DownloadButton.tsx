@@ -58,6 +58,11 @@ const DownloadAction = styled(TertiaryButton)<{
   isFullHeight?: boolean
 }>`
   ${({ isFullHeight }) => isFullHeight && `height: 100%;`}
+  border-radius: 50%;
+  height: 40px;
+  & > div {
+    padding: 0px 0px;
+  }
 `
 
 function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {

@@ -126,6 +126,7 @@ import { ReviewHeader } from './ReviewHeader'
 import { IValidationResult } from '@client/utils/validate'
 import { DocumentListPreview } from '@client/components/form/DocumentUploadfield/DocumentListPreview'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
+import { generateLocations } from '@client/utils/locationUtils'
 
 const RequiredField = styled.span`
   color: ${({ theme }) => theme.colors.error};
@@ -381,9 +382,9 @@ const renderValue = (
   }
 
   if (value && field.type === LOCATION_SEARCH_INPUT) {
-    const searchableListOfLocations = getListOfLocations(
-      offlineResources,
-      field.searchableResource
+    const searchableListOfLocations = generateLocations(
+      getListOfLocations(offlineResources, field.searchableResource),
+      intl
     )
     const selectedLocation = searchableListOfLocations.find(
       (location) => location.id === value

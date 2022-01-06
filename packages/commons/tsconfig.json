@@ -10,6 +10,7 @@
     "sourceMap": true,
     "moduleResolution": "node",
     "rootDir": "src",
+    "declaration": true,
     "lib": ["esnext.asynciterable", "es2015", "es6"],
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,

@@ -143,6 +143,11 @@ const messagesToDefine: IUserMessages = {
     description: 'The description for DISTRICT_REGISTRAR role',
     id: 'constants.districtRegistrar'
   },
+  DNRPC: {
+    defaultMessage: 'DNRPC',
+    description: 'The description for DNRPC type',
+    id: 'constants.dnrpc'
+  },
   ENTREPENEUR: {
     defaultMessage: 'Entrepeneur',
     description: 'The description for ENTREPENEUR type',

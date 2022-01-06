@@ -80,7 +80,8 @@ import {
   IAttachmentValue,
   RADIO_GROUP_WITH_NESTED_FIELDS,
   Ii18nRadioGroupWithNestedFieldsFormField,
-  LOCATION_SEARCH_INPUT
+  LOCATION_SEARCH_INPUT,
+  Ii18nTextareaFormField
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -116,6 +117,7 @@ import { dynamicDispatch } from '@client/applications'
 import { LocationSearch } from '@opencrvs/components/lib/interface'
 import { REGEXP_NUMBER_INPUT_NON_NUMERIC } from '@client/utils/constants'
 import { isMobileDevice } from '@client/utils/commonUtils'
+import { generateLocations } from '@client/utils/locationUtils'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -152,7 +154,7 @@ const FieldGroupTitle = styled.div`
 
 const LocationSearchFormField = styled(LocationSearch)`
   ${({ theme }) => `@media (min-width: ${theme.grid.breakpoints.md}px) {
-    width: 535px;
+    width: 344px;
   }`}
 
   & > input {
@@ -374,7 +376,10 @@ function GeneratedInputField({
   if (fieldDefinition.type === TEXTAREA) {
     return (
       <InputField {...inputFieldProps}>
-        <TextArea {...inputProps} />
+        <TextArea
+          maxLength={(fieldDefinition as Ii18nTextareaFormField).maxLength}
+          {...inputProps}
+        />
       </InputField>
     )
   }
@@ -848,10 +853,11 @@ class FormSectionComponent extends React.Component<Props> {
               : field.type === LOCATION_SEARCH_INPUT
               ? {
                   ...field,
-                  locationList: getListOfLocations(
-                    resources,
-                    field.searchableResource,
-                    field.searchableType as LocationType
+                  locationList: generateLocations(
+                    getListOfLocations(resources, field.searchableResource),
+                    intl,
+                    undefined,
+                    [field.searchableType as LocationType]
                   )
                 }
               : field
