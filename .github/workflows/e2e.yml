@@ -32,15 +32,6 @@ jobs:
       - name: Checking out git repo
         uses: actions/checkout@v2
 
-      - name: Check folder structure
-        run: |
-          ls -la
-          ls -la .secrets
-          openssl genrsa -out .secrets/private-key.pem 2048 
-          ls -la .secrets
-          openssl rsa -pubout -in .secrets/private-key.pem -out .secrets/public-key.pem
-          ls -la .secrets
-
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
@@ -68,7 +59,8 @@ jobs:
 
       - name: Run Microservices
         run: |
-          openssl genrsa -out .secrets/private-key.pem 2048 && openssl rsa -pubout -in .secrets/private-key.pem -out .secrets/public-key.pem
+          openssl genrsa -out .secrets/private-key.pem 2048           
+          openssl rsa -pubout -in .secrets/private-key.pem -out .secrets/public-key.pem
           screen -dm bash -c 'LANGUAGES=en yarn start'
           wait-on -l tcp:4040 http://localhost:3000 http://localhost:3020 tcp:3030 tcp:2020 tcp:7070 tcp:5050 tcp:9090 tcp:1050
 
