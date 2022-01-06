@@ -70,10 +70,10 @@ ${({ fixedWidth, totalWidth }) =>
 `
 
 const TableHeaderText = styled.div<{
-  isSortable?: boolean
+  isSorted?: boolean
 }>`
-  ${({ isSortable, theme }) =>
-    isSortable ? theme.fonts.bodyBoldStyle : theme.fonts.bodyStyle}
+  ${({ isSorted, theme }) =>
+    isSorted ? theme.fonts.bodyBoldStyle : theme.fonts.bodyStyle}
 `
 
 const TableBody = styled.div<{ footerColumns: boolean }>`
@@ -90,6 +90,7 @@ const RowWrapper = styled.div<{
   horizontalPadding?: IBreakpoint
 }>`
   width: 100%;
+  min-height: 48px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.disabled};
   display: flex;
   align-items: center;
@@ -417,7 +418,7 @@ export class ListTable extends React.Component<
                           preference.sortFunction(preference.key)
                         }
                       >
-                        <TableHeaderText isSortable={preference.isSortable}>
+                        <TableHeaderText isSorted={preference.isSorted}>
                           {preference.label}
                           <ToggleSortIcon
                             toggle={

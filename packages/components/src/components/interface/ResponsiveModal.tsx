@@ -74,11 +74,13 @@ const Title = styled.h1`
 `
 const Body = styled.div<{
   height?: number
+  autoHeight?: boolean
   scrollableY?: boolean
   responsive?: boolean
 }>`
   ${({ theme }) => theme.fonts.bodyStyle};
   height: ${({ height }) => (height ? height : 250)}px;
+  height: ${({ autoHeight }) => autoHeight && `auto`};
   overflow-y: ${({ scrollableY }) => (scrollableY ? 'visible' : 'auto')};
   padding: 0 24px 16px;
   display: flex;
@@ -125,6 +127,7 @@ interface IProps {
   responsive?: boolean
   width?: number
   contentHeight?: number
+  autoHeight?: boolean
   contentScrollableY?: boolean
   actions: JSX.Element[]
   handleClose?: () => void
@@ -154,6 +157,7 @@ export class ResponsiveModal extends React.Component<IProps> {
       actions,
       width,
       contentHeight,
+      autoHeight,
       contentScrollableY,
       hideHeaderBoxShadow
     } = this.props
@@ -173,7 +177,11 @@ export class ResponsiveModal extends React.Component<IProps> {
               <Cross color="currentColor" />
             </CircleButton>
           </Header>
-          <Body height={contentHeight} scrollableY={contentScrollableY}>
+          <Body
+            height={contentHeight}
+            autoHeight={autoHeight}
+            scrollableY={contentScrollableY}
+          >
             {this.props.children}
           </Body>
           <Footer responsive={responsive}>

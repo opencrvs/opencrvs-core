@@ -22,6 +22,9 @@ interface Window {
     LOGIN_URL: string
     AUTH_URL: string
     RESOURCES_URL: string
+    /**
+     * @deprecated HEALTH_FACILITY_FILTER is no longer used
+     */
     HEALTH_FACILITY_FILTER: string
     CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: number
     CERTIFICATE_PRINT_CHARGE_UP_LIMIT: number
@@ -42,6 +45,11 @@ interface Window {
         startForm: number
         endBefore: number
       }
+    }
+    NID_NUMBER_PATTERN: {
+      pattern: RegExp
+      example: string
+      num: string
     }
     LOGROCKET: string
     SENTRY: string

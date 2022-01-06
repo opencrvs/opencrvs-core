@@ -95,10 +95,10 @@ const ErrorText = styled.div`
   text-align: center;
   margin-top: 100px;
 `
-
-const StatusBox = styled.div`
+const StatusBox = styled.span`
   padding: 4px 8px;
-  border-radius: 4px;
+  ${({ theme }) => theme.fonts.captionBold};
+  border-radius: 2px;
   height: 30px;
   text-align: center;
   margin-left: 4px;
@@ -110,7 +110,7 @@ const DeactivatedStatusBox = styled(StatusBox)`
   background: rgba(245, 209, 209, 1);
 `
 const PendingStatusBox = styled(StatusBox)`
-  background: rgba(255, 255, 153, 1);
+  background: rgba(252, 236, 217, 1);
 `
 const DisabledStatusBox = styled(StatusBox)`
   background: rgba(206, 206, 206, 0.3);

@@ -62,7 +62,7 @@ interface IUserMessages
   API_USER: MessageDescriptor
   NOTIFICATION_API_USER: MessageDescriptor
   VALIDATOR_API_USER: MessageDescriptor
-  CHATBOT_API_USER: MessageDescriptor
+  AGE_VERIFICATION_API_USER: MessageDescriptor
   systemTitle: MessageDescriptor
   FIELD_AGENT: MessageDescriptor
   currentPassword: MessageDescriptor
@@ -142,6 +142,11 @@ const messagesToDefine: IUserMessages = {
     defaultMessage: 'District Registrar',
     description: 'The description for DISTRICT_REGISTRAR role',
     id: 'constants.districtRegistrar'
+  },
+  DNRPC: {
+    defaultMessage: 'DNRPC',
+    description: 'The description for DNRPC type',
+    id: 'constants.dnrpc'
   },
   ENTREPENEUR: {
     defaultMessage: 'Entrepeneur',
@@ -274,24 +279,24 @@ const messagesToDefine: IUserMessages = {
     id: 'constants.stateRegistrar'
   },
   API_USER: {
-    defaultMessage: 'API User',
-    description: 'The description for API_USER type',
+    defaultMessage: 'API role',
+    description: 'The description for API_USER role',
     id: 'constants.apiUser'
   },
   NOTIFICATION_API_USER: {
-    defaultMessage: 'Notification API User',
+    defaultMessage: 'Notification API role',
     description: 'The description for NOTIFICATION_API_USER role',
     id: 'constants.notificationApiUser'
   },
   VALIDATOR_API_USER: {
-    defaultMessage: 'Validator API User',
+    defaultMessage: 'Validator API role',
     description: 'The description for VALIDATOR_API_USER role',
     id: 'constants.validatorApiUser'
   },
-  CHATBOT_API_USER: {
-    defaultMessage: 'Chatbot API User',
-    description: 'The description for CHATBOT_API_USER role',
-    id: 'constants.chatbotApiUser'
+  AGE_VERIFICATION_API_USER: {
+    defaultMessage: 'Age verificatiion API role',
+    description: 'The description for AGE_VERIFICATION_API_USER role',
+    id: 'constants.ageVerificationApiUser'
   },
   systemTitle: {
     defaultMessage: 'System',

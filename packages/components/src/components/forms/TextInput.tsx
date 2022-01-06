@@ -21,13 +21,15 @@ export interface ICustomProps {
   autocomplete?: boolean
   isSmallSized?: boolean
   isDisabled?: boolean
+  inputFieldWidth?: string
 }
 
 export type ITextInputProps = ICustomProps &
   React.InputHTMLAttributes<HTMLInputElement>
 
 const StyledInput = styled.input<ITextInputProps>`
-  width: 100%;
+  ${({ inputFieldWidth }) =>
+    inputFieldWidth ? `width: ${inputFieldWidth}` : `width: 100%`};
   padding: 8px 10px;
   height: 40px;
   transition: border-color 500ms ease-out;
@@ -91,8 +93,8 @@ const StyledInput = styled.input<ITextInputProps>`
     text-align: center;
   }
 
-  ${({ ignoreMediaQuery, isSmallSized, theme }) => {
-    return !ignoreMediaQuery
+  ${({ ignoreMediaQuery, isSmallSized, theme, inputFieldWidth }) => {
+    return !ignoreMediaQuery && !inputFieldWidth
       ? isSmallSized
         ? `@media (min-width: ${theme.grid.breakpoints.md}px) {
         width: 234px;
@@ -129,7 +131,13 @@ export class TextInput extends React.Component<ITextInputProps> {
   }
 
   render() {
-    const { focusInput, maxLength = 250, isDisabled, ...props } = this.props
+    const {
+      focusInput,
+      maxLength = 250,
+      isDisabled,
+      inputFieldWidth,
+      ...props
+    } = this.props
 
     return (
       <StyledInput
@@ -139,6 +147,7 @@ export class TextInput extends React.Component<ITextInputProps> {
         autoComplete={process.env.NODE_ENV === 'production' ? 'off' : undefined}
         maxLength={maxLength}
         disabled={isDisabled}
+        inputFieldWidth={inputFieldWidth}
       />
     )
   }

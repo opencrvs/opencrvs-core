@@ -61,8 +61,8 @@ const KeyNumber = styled.div`
   margin: 0px 0px -16px 0px;
 `
 const KeyNumberDescription = styled.div`
-  color: ${({ theme }) => theme.colors.placeholder};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  color: ${({ theme }) => theme.colors.menuBackground};
+  ${({ theme }) => theme.fonts.chartLegendStyle};
   margin: 16px 0px;
 `
 
@@ -71,12 +71,12 @@ const Pair = styled.div`
   flex-wrap: no-wrap;
 `
 const Label = styled.span`
-  color: ${({ theme }) => theme.colors.placeholder};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  color: ${({ theme }) => theme.colors.menuBackground};
+  ${({ theme }) => theme.fonts.chartLegendStyle};
 `
 const Value = styled.span`
   color: ${({ theme }) => theme.colors.menuBackground};
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.subtitleStyle};
 `
 
 export const LoaderBox = styled.span<{

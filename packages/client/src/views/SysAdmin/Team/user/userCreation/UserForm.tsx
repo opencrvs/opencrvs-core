@@ -99,9 +99,6 @@ class UserFormComponent extends React.Component<IFullProps> {
 
   handleBackAction = () => {
     this.props.goBack()
-    if (this.props.activeGroup.id === this.props.section.groups[0].id) {
-      this.props.clearUserFormData()
-    }
   }
 
   modifyData = (values: any) => {

@@ -312,15 +312,26 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
           role: existingRole,
           type: existingType
         } = userQueryData.data.getUser
-
         const roleData = (data as Array<{
           value: string
           types: string[]
         }>).find(({ value }: { value: string }) => value === existingRole)
 
         if (roleData && !roleData.types.includes(existingType)) {
-          roleData.types.push(existingType)
-        } else {
+          ;(data as Array<{
+            value: string
+            types: string[]
+          }>).map(role => {
+            if (role.value === existingRole) {
+              return {
+                ...role,
+                types: [existingRole, ...role.types]
+              }
+            } else {
+              return role
+            }
+          })
+        } else if (!roleData) {
           ;(data as Array<{
             value: string
             types: string[]

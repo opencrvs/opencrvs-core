@@ -58,6 +58,7 @@ export const ROLE_REGISTRATION_AGENT = 'REGISTRATION_AGENT'
 export const ROLE_LOCAL_REGISTRAR = 'LOCAL_REGISTRAR'
 export const FIELD_AGENT_ROLES = [ROLE_FIELD_AGENT]
 export const SYS_ADMIN_ROLES = ['LOCAL_SYSTEM_ADMIN']
+export const NATL_ADMIN_ROLES = 'NATIONAL_SYSTEM_ADMIN'
 export const REGISTRAR_ROLES = [
   ROLE_LOCAL_REGISTRAR,
   'DISTRICT_REGISTRAR',
@@ -92,6 +93,7 @@ export const JURISDICTION_TYPE: { [key: string]: string } = {
   MUNICIPALITY: 'Municipality',
   CITY_CORPORATION: 'City Corporation',
   UPAZILA: 'Upazila',
+  STATE: 'Province',
   DISTRICT: 'District',
   DIVISION: 'Division'
 }

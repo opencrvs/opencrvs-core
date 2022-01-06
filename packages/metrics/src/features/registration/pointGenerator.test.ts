@@ -52,6 +52,7 @@ describe('Verify point generation', () => {
       tags: {
         regStatus: 'mark-existing-application-registered',
         gender: 'male',
+        officeLocation: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6',
         locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1',
         locationLevel4: 'Location/4',
         locationLevel3: 'Location/3',
@@ -63,7 +64,7 @@ describe('Verify point generation', () => {
       }
     })
   })
-  it('Only populates level5 location data if rest of the tree is missing', async () => {
+  it('Only populates level5 and office location data if rest of the tree is missing', async () => {
     const payload = cloneDeep(testPayload)
     // @ts-ignore
     payload.entry[2].resource = {
@@ -93,6 +94,7 @@ describe('Verify point generation', () => {
       tags: {
         regStatus: 'mark-existing-application-registered',
         gender: 'male',
+        officeLocation: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6',
         locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1'
       },
       fields: {
@@ -117,6 +119,7 @@ describe('Verify point generation', () => {
       tags: {
         regStatus: 'mark-existing-application-registered',
         gender: 'male',
+        officeLocation: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6',
         locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1',
         locationLevel4: 'Location/4'
       },
@@ -159,6 +162,7 @@ describe('Verify point generation', () => {
         gender: 'male',
         causeOfDeath: 'Old age',
         mannerOfDeath: 'NATURAL_CAUSES',
+        officeLocation: 'Location/232ed3db-6b3f-4a5c-875e-f57aacadb2d3',
         locationLevel5: 'Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af',
         locationLevel4: 'Location/4',
         locationLevel3: 'Location/3',
@@ -192,6 +196,7 @@ describe('Verify point generation', () => {
       measurement: 'certification_payment',
       tags: {
         eventType: 'DEATH',
+        officeLocation: 'Location/232ed3db-6b3f-4a5c-875e-f57aacadb2d3',
         locationLevel5: 'Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af'
       },
       fields: {
@@ -232,6 +237,7 @@ describe('Verify point generation', () => {
       tags: {
         eventType: 'BIRTH',
         practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
+        officeLocation: 'Location/232ed3db-6b3f-4a5c-875e-f57aacadb2d3',
         locationLevel4: 'Location/4',
         locationLevel3: 'Location/3',
         locationLevel2: 'Location/2',
@@ -260,6 +266,7 @@ describe('Verify point generation', () => {
       tags: {
         eventType: 'BIRTH',
         practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
+        officeLocation: 'Location/232ed3db-6b3f-4a5c-875e-f57aacadb2d3',
         locationLevel4: 'Location/4',
         locationLevel3: 'Location/3',
         locationLevel2: 'Location/2',
@@ -291,6 +298,7 @@ describe('Verify point generation', () => {
         locationLevel4: 'Location/4',
         locationLevel3: 'Location/3',
         locationLevel2: 'Location/2',
+        officeLocation: 'Location/232ed3db-6b3f-4a5c-875e-f57aacadb2d3',
         locationLevel5: 'Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af'
       },
       fields: {
@@ -316,6 +324,7 @@ describe('Verify point generation', () => {
       tags: {
         eventType: 'BIRTH',
         practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
+        officeLocation: 'Location/232ed3db-6b3f-4a5c-875e-f57aacadb2d3',
         locationLevel4: 'Location/4',
         locationLevel3: 'Location/3',
         locationLevel2: 'Location/2',
@@ -347,6 +356,7 @@ describe('Verify point generation', () => {
       tags: {
         eventType: 'BIRTH',
         practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
+        officeLocation: 'Location/232ed3db-6b3f-4a5c-875e-f57aacadb2d3',
         locationLevel4: 'Location/4',
         locationLevel3: 'Location/3',
         locationLevel2: 'Location/2',
@@ -359,7 +369,7 @@ describe('Verify point generation', () => {
       }
     })
   })
-  it('returns rejected ppint', async () => {
+  it('returns rejected point', async () => {
     const payload = require('./test-data/rejected.json')
     const taskHistory = require('./test-data/task-history.json')
     // @ts-ignore
@@ -375,6 +385,7 @@ describe('Verify point generation', () => {
       tags: {
         eventType: 'BIRTH',
         startedBy: 'fe16875f-3e5f-47bc-85d6-16482a63e7df',
+        officeLocation: 'Location/2a520dc1-0a9a-48a1-a4b8-66f3075a9155',
         locationLevel4: 'Location/4',
         locationLevel3: 'Location/3',
         locationLevel2: 'Location/2',
