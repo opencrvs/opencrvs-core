@@ -59,7 +59,8 @@ jobs:
 
       - name: Run Microservices
         run: |
-          openssl genrsa -out .secrets/private-key.pem 2048           
+          openssl genrsa -out .secrets/private-key.pem 2048    
+          wait-on -l .secrets/private-key.pem
           openssl rsa -pubout -in .secrets/private-key.pem -out .secrets/public-key.pem
           screen -dm bash -c 'LANGUAGES=en yarn start'
           wait-on -l tcp:4040 http://localhost:3000 http://localhost:3020 tcp:3030 tcp:2020 tcp:7070 tcp:5050 tcp:9090 tcp:1050
