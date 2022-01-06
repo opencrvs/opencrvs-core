@@ -175,13 +175,8 @@ export const officeMustBeSelected: Validation = (
   drafts,
   resources
 ) => {
-  const locationsList = getListOfLocations(
-    resources as IOfflineData,
-    'offices',
-    LocationType.CRVS_OFFICE
-  )
-  const isValid =
-    !value || locationsList.some(location => location.id === value)
+  const locationsList = getListOfLocations(resources as IOfflineData, 'offices')
+  const isValid = !value || locationsList[value as string]
   return isValid ? undefined : { message: messages.officeMustBeSelected }
 }
 
