@@ -35,7 +35,7 @@ jobs:
       - name: Generate Secrets
         run: |
           openssl genrsa -out .secrets/private-key.pem 2048
-          ls -la .secret
+          ls -la .secrets
           openssl rsa -pubout -in .secrets/private-key.pem -out .secrets/public-key.pem
 
       - name: Use Node.js ${{ matrix.node-version }}
