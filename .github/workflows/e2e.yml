@@ -33,7 +33,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Generate Secrets
-        runs: |
+        run: |
           openssl genrsa -out .secrets/private-key.pem 2048
           ls -la .secret
           openssl rsa -pubout -in .secrets/private-key.pem -out .secrets/public-key.pem
