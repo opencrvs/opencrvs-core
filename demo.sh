@@ -10,24 +10,80 @@
 set -e
 
 export LANGUAGES='en'
+do_version_check() {
 
+   if [ "$1" == "$2" ] ; then
+    echo "SAME"
+    return "$?"
+  fi
+   ver1front=`echo $1 | cut -d "." -f -1`
+   ver1back=`echo $1 | cut -d "." -f 2-`
+
+   ver2front=`echo $2 | cut -d "." -f -1`
+   ver2back=`echo $2 | cut -d "." -f 2-`
+
+   if [ "$ver1front" != "$1" ] || [ "$ver2front" != "$2" ]; then
+       if [ "$ver1front" -gt "$ver2front" ] ; then
+        echo "GREATER"
+        return "$?"
+      fi
+       if [ "$ver1front" -lt "$ver2front" ] ; then
+        echo "LOWER"
+        return "$?"
+      fi
+
+
+       [ "$ver1front" == "$1" ] || [ -z "$ver1back" ] && ver1back=0
+       [ "$ver2front" == "$2" ] || [ -z "$ver2back" ] && ver2back=0
+       do_version_check "$ver1back" "$ver2back"
+       return "$?"
+   else
+      if [ "$1" -gt "$2" ] ; then
+        echo "GREATER"
+         return "$?"
+      else
+         echo "LOWER"
+         return "$?"
+      fi
+   fi
+}
 
 echo ":::::::::::::::::::::::::::: INSTALLING OPEN CRVS ::::::::::::::::::::::::::::"
 echo ":::::::::::::::: PLEASE WAIT FOR THE OPEN CRVS LOGO TO APPEAR ::::::::::::::::"
-echo "::::::::::::::::::: THIS CAN TAKE TIME ON SLOW CONNECTIONS :::::::::::::::::::"
 echo
-sleep 5
-echo ":::::: FIRST WE NEED TO CHECK THAT YOU HAVE INSTALLED YOUR DEPENDENCIES ::::::"
-sleep 1
-echo ":::::::::: YOU MUST BE RUNNING A SUPPORTED OS: MAC or UBUNTU > 18.04 :::::::::"
-echo "::::::::::::::::::: YOU MUST HAVE NODE > v14.15.0, & DOCKER ::::::::::::::::::"
+#sleep 5
 
-if [  -n "$(uname -a | grep Ubuntu)" ] && [ lsb_release -sr < 18.04 ] ; then
-  echo "Sorry your Ubuntu version is not supported.  You must upgrade Ubuntu to 18.04 or 20.04"
+  echo "::::::::::::::::::: Checking your operating system ::::::::::::::::::"
+  echo
+#sleep 1
+if [  -n "$(uname -a | grep Ubuntu)" ]; then
+  echo ":::::::::::::::: You are running Ubuntu.  Checking version ::::::::::::::::"
+  echo
+  #sleep 1
+  OS="UBUNTU"
+  ubuntuVersion=`echo awk -F= '$1 == "VERSION_ID" {gsub(/"/, "", $2); print $2}' /etc/os-release`
+  ubuntuVersionTest=$(do_version_check $ubuntuVersion 18.04)
+  if [ "$ubuntuVersionTest" == "LOWER" ] ; then
+    echo "Sorry your Ubuntu version is not supported.  You must upgrade Ubuntu to 18.04 or 20.04"
+    echo "Follow the instructions here: https://ubuntu.com/tutorials/upgrading-ubuntu-desktop#1-before-you-start"
+    exit 1
+  else
+    echo -e "Your Ubuntu version: $ubuntuVersion is \033[32msupported!\033[0m :)"
+  fi
+elif [ "$(uname)" == "Darwin" ]; then
+  echo "::::::::::::::::::::::::: You are running Mac OSX. :::::::::::::::::::::::::"
+  echo
+  OS="MAC"
+else
+  echo "Sorry your operating system is not supported."
+  echo "YOU MUST BE RUNNING A SUPPORTED OS: MAC or UBUNTU > 18.04"
   exit 1
 fi
-sleep 2
-dependencies=( "docker" "node" )
+
+echo ":::::::: Checking that you have the required dependencies installed ::::::::"
+echo
+#sleep 1
+dependencies=( "docker" "node" "yarn" )
 if [  -n "$(uname -a | grep Ubuntu)" ]; then
   dependencies+=("docker-compose")
 fi
@@ -61,29 +117,33 @@ do
         fi
         if [ $i == "node" ] ; then
             echo "You need to install Node, or if you did, we can't find it and perhaps it is not in your PATH. Please fix your node installation."
-            echo "We recommend you install Node v.14.15.0, v14.15.4 or v14.18.1 as this release has been tested on those versions."
+            echo "We recommend you install Node v.14.15.0, v14.15.4, 14.17.0 or v14.18.1 as this release has been tested on those versions."
             echo "There are various ways you can install Node.  The easiest way to get Node running with the version of your choice is using Node Version Manager."
-            echo "Documentation is here: https://nodejs.org/en/download/package-manager/#nvm"
+            echo "Documentation is here: https://nodejs.org/en/download/package-manager/#nvm.  For example run:"
+            echo "curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash"
+            echo "Then use nvm to install the Node version of choice.  For example run:"
+            echo "nvm install 14.17.0"
         fi
         exit 1
     fi
 done
 
-min_ver="a-1.1.1"
-max_ver="a-9.1.1"
-check_ver="a-2.2.9"
-if [ "$( echo -e "${min_ver}\\n${max_ver}\\n${check_ver}" | sort --sort=version | head -2 | tail -1)" == ${check_ver} ]
-then
-  echo YES - apply  ${check_ver}
+echo ":::::: NOW WE NEED TO CHECK THAT YOUR NODE VERSION IS SUPPORTED ::::::"
+#sleep 1
+myNodeVersion=`echo "$(node -v)" | sed 's/v//'`
+versionTest=$(do_version_check $myNodeVersion 14.15.0)
+if [ "$versionTest" == "LOWER" ] ; then
+  echo "Sorry your Node version is not supported.  You must upgrade Node to use a supported version."
+  echo "We recommend you install Node v.14.15.0, v14.15.4, v14.17.0 or v14.18.1 as this release has been tested on those versions."
+  echo "Documentation is here: https://nodejs.org/en/download/package-manager/#nvm"
+  echo "Then use nvm to install the Node version of choice.  For example run:"
+  echo "nvm install 14.17.0"
+  exit 1
+  else
+    echo -e "Your Node version: $myNodeVersion is \033[32msupported!\033[0m :)"
 fi
 
-if [ "${node -v:1}" -le 14.15 ] ; then
-  echo "Sorry your Node version is not supported.  You must upgrade Node to use a supported version."
-  echo "We recommend you install Node v.14.15.0, v14.15.4 or v14.18.1 as this release has been tested on those versions."
-  echo "Documentation is here: https://nodejs.org/en/download/package-manager/#nvm"
-  exit 1
-fi
-# check dependencies installed
+
 # check environment for correct commands
 # check memory assigned
 echo "
