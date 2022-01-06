@@ -34,7 +34,8 @@ const mapStateToProps = (store: IStoreState): IProps => {
 }
 
 const mapDispatchToProps = {
-  submitAction: actions.authenticate
+  submitAction: actions.authenticate,
+  forgetAction: actions.goToForgottenItemForm
 }
 
 const stepOneForm = reduxForm({

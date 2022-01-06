@@ -2695,6 +2695,24 @@ export const mockOfflineData = {
       partOf: 'Location/8f1aae72-2f90-4585-b853-e8c37f4be764',
       physicalType: 'Jurisdiction',
       type: 'ADMIN_STRUCTURE'
+    },
+    '473ed705-13e8-4ec1-9836-69bc269f7fad': {
+      alias: '',
+      id: '473ed705-13e8-4ec1-9836-69bc269f7fad',
+      jurisdictionType: 'STATE',
+      name: 'Lusaka',
+      partOf: 'Location/0',
+      physicalType: 'Jurisdiction',
+      type: 'ADMIN_STRUCTURE'
+    },
+    '81317429-1d89-42ac-8abc-7a92f268273c': {
+      alias: '',
+      id: '81317429-1d89-42ac-8abc-7a92f268273c',
+      jurisdictionType: 'DISTRICT',
+      name: 'Lusaka',
+      partOf: 'Location/473ed705-13e8-4ec1-9836-69bc269f7fad',
+      physicalType: 'Jurisdiction',
+      type: 'ADMIN_STRUCTURE'
     }
   },
   pilotLocations: {

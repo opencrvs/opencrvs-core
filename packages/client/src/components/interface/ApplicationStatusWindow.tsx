@@ -28,7 +28,7 @@ const Window = styled.div<{
   position: fixed;
   top: 64px;
   right: 0;
-  z-index: 3;
+  z-index: 1;
   height: 100%;
   width: ${({ width }) => `${width}px`};
   border: 1px solid ${({ theme }) => theme.colors.dividerDark};
@@ -39,6 +39,7 @@ const Window = styled.div<{
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     width: 100%;
     top: 0px;
+    z-index: 3;
   }
 `
 

@@ -210,6 +210,7 @@ export interface GQLUser {
   identifier?: GQLIdentifier
   signature?: GQLSignature
   creationDate?: string
+  device?: string
 }
 
 export interface GQLSearchUserResult {
@@ -406,7 +407,8 @@ export const enum GQLAttendantType {
   OTHER_PARAMEDICAL_PERSONNEL = 'OTHER_PARAMEDICAL_PERSONNEL',
   LAYPERSON = 'LAYPERSON',
   NONE = 'NONE',
-  OTHER = 'OTHER'
+  OTHER = 'OTHER',
+  TRADITIONAL_BIRTH_ATTENDANT = 'TRADITIONAL_BIRTH_ATTENDANT'
 }
 
 export const enum GQLBirthRegType {
@@ -436,7 +438,7 @@ export const enum GQLMannerOfDeath {
   ACCIDENT = 'ACCIDENT',
   SUICIDE = 'SUICIDE',
   HOMICIDE = 'HOMICIDE',
-  UNDETERMINED = 'UNDETERMINED'
+  MANNER_UNDETERMINED = 'MANNER_UNDETERMINED'
 }
 
 export const enum GQLCauseOfDeathMethodType {
@@ -1562,7 +1564,8 @@ export interface QueryToSearchUsersResolver<TParent = any, TResult = any> {
 }
 
 export interface QueryToSearchFieldAgentsArgs {
-  locationId: string
+  locationId?: string
+  primaryOfficeId?: string
   status?: string
   language?: string
   timeStart: string
@@ -1731,7 +1734,7 @@ export interface QueryToSearchEventsResolver<TParent = any, TResult = any> {
 }
 
 export interface QueryToGetEventsWithProgressArgs {
-  parentLocationId?: string
+  locationId?: string
   count?: number
   skip?: number
   sort?: string

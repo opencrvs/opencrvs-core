@@ -391,6 +391,8 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       tooltipId: string,
       rowIndex: number
     ) {
+      if (timeDuration === 0) return <>-</>
+
       const timeStructure = formatTimeDuration(timeDuration)
       const label =
         (timeStructure &&
@@ -711,7 +713,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       <Query
         query={FETCH_EVENTS_WITH_PROGRESS}
         variables={{
-          parentLocationId: locationId,
+          locationId: locationId,
           skip: 0,
           count: recordCount,
           status: (status && [status]) || undefined,
