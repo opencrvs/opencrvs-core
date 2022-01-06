@@ -48,12 +48,14 @@ do_version_check() {
    fi
 }
 
+echo
 echo ":::::::::::::::::::::::::::: INSTALLING OPEN CRVS ::::::::::::::::::::::::::::"
+echo
 echo ":::::::::::::::: PLEASE WAIT FOR THE OPEN CRVS LOGO TO APPEAR ::::::::::::::::"
 echo
 #sleep 5
 
-  echo "::::::::::::::::::: Checking your operating system ::::::::::::::::::"
+  echo ":::::::::::::::::::::: Checking your operating system ::::::::::::::::::::::"
   echo
 #sleep 1
 if [  -n "$(uname -a | grep Ubuntu)" ]; then
@@ -69,11 +71,43 @@ if [  -n "$(uname -a | grep Ubuntu)" ]; then
     exit 1
   else
     echo -e "Your Ubuntu version: $ubuntuVersion is \033[32msupported!\033[0m :)"
+    echo
+    #sleep 1
+    echo ":::::::: Setting memory requirements for file watch limit and ElasticSearch ::::::::"
+    echo
+    #sleep 1
+    echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+    echo vm.max_map_count=262144 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+    echo
+    if [  -n "$(google-chrome --version | grep Chrome)" ]; then
+      echo -e "Chrome is \033[32minstalled!\033[0m :)"
+      echo
+    else
+      echo ":::::::: The OpenCRVS client application is a progressive web application. ::::::::"
+      echo "::::::::::::: It is best experienced using the Google Chrome browser. :::::::::::::"
+      echo
+      echo "We think that you do not have Chrome installed, or it is not available on this path: "
+      echo "/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
+      echo ":::: We recommend that you install Google Chrome: https://www.google.com/chrome ::::"
+      echo
+    fi
   fi
 elif [ "$(uname)" == "Darwin" ]; then
   echo "::::::::::::::::::::::::: You are running Mac OSX. :::::::::::::::::::::::::"
   echo
   OS="MAC"
+  if [  -n "$(/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version | grep Chrome)" ]; then
+    echo -e "Chrome is \033[32minstalled!\033[0m :)"
+    echo
+  else
+    echo ":::::::: The OpenCRVS client application is a progressive web application. ::::::::"
+    echo "::::::::::::: It is best experienced using the Google Chrome browser. :::::::::::::"
+    echo
+    echo "We think that you do not have Chrome installed, or it is not available on this path: "
+    echo "/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
+    echo ":::: We recommend that you install Google Chrome: https://www.google.com/chrome ::::"
+    echo
+  fi
 else
   echo "Sorry your operating system is not supported."
   echo "YOU MUST BE RUNNING A SUPPORTED OS: MAC or UBUNTU > 18.04"
@@ -84,8 +118,8 @@ echo ":::::::: Checking that you have the required dependencies installed ::::::
 echo
 #sleep 1
 dependencies=( "docker" "node" "yarn" )
-if [  -n "$(uname -a | grep Ubuntu)" ]; then
-  dependencies+=("docker-compose")
+if [ $OS == "UBUNTU" ]; then
+  dependencies+=("docker-compose" "google-chrome")
 fi
 for i in "${dependencies[@]}"
 do
@@ -98,7 +132,7 @@ do
     else
         echo -e "OpenCRVS thinks $i is not installed.\r"
         if [ $i == "docker" ] ; then
-            if [  -n "$(uname -a | grep Ubuntu)" ]; then
+            if [ $OS == "UBUNTU" ]; then
                 echo "You need to install Docker, or if you did, we can't find it and perhaps it is not in your PATH. Please fix your docker installation."
                 echo "Please follow the documentation here: https://docs.docker.com/engine/install/ubuntu/"
             else
@@ -107,7 +141,7 @@ do
             fi
         fi
         if [ $i == "docker-compose" ] ; then
-            if [  -n "$(uname -a | grep Ubuntu)" ]; then
+            if [ $OS == "UBUNTU" ]; then
                 echo "You need to install Docker Compose, or if you did, we can't find it and perhaps it is not in your PATH. Please fix your docker-compose installation."
                 echo "Please follow the documentation here: https://docs.docker.com/compose/install/"
             else
@@ -128,7 +162,9 @@ do
     fi
 done
 
+echo
 echo ":::::: NOW WE NEED TO CHECK THAT YOUR NODE VERSION IS SUPPORTED ::::::"
+echo
 #sleep 1
 myNodeVersion=`echo "$(node -v)" | sed 's/v//'`
 versionTest=$(do_version_check $myNodeVersion 14.15.0)
@@ -141,20 +177,99 @@ if [ "$versionTest" == "LOWER" ] ; then
   exit 1
   else
     echo -e "Your Node version: $myNodeVersion is \033[32msupported!\033[0m :)"
+    echo
 fi
 
 
-# check environment for correct commands
-# check memory assigned
-echo "
+echo
+echo ":::::::::::::::::::::: Initialising Docker Swarm ::::::::::::::::::::::"
+echo
+docker swarm init
 
- ... some output ...
+if [ $OS == "UBUNTU" ]; then
+  echo
+  echo "::::::::::::::::: Giving Docker user sudo privileges :::::::::::::::::"
+  echo
+  sudo usermod -aG docker $USER
+fi
 
-"
+echo
+echo ":::::::::::::::::: Installing some Node dependencies ::::::::::::::::::"
+echo
+npm install -g wait-on
 
-echo -e "Now my color changes to \033[32mGreen\033[0m"
-#
-# echo -e "\033[41;32m" # change background color and text
+echo
+echo ":::::::::::::::::::::::::: Building OpenCRVS ::::::::::::::::::::::::::"
+echo
+echo ":::::::::::::: This can take some time on slow connections ::::::::::::::"
+echo
+echo ":::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::"
+echo
+openssl genrsa -out .secrets/private-key.pem 2048 && openssl rsa -pubout -in .secrets/private-key.pem -out .secrets/public-key.pem
+sudo mkdir -p data/elasticsearch
+sudo chown -R 1000:1000 data/elasticsearch
+
+echo ":::::::::::::::::::: Starting OpenCRVS dependencies ::::::::::::::::::::"
+echo
+echo ":::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::"
+echo
+yarn compose:deps
+echo "wait-on tcp:3447" && wait-on -l tcp:3447
+echo "wait-on http://localhost:9200" && wait-on -l http://localhost:9200
+echo "wait-on tcp:5001" && wait-on -l tcp:5001
+echo "wait-on tcp:9200" && wait-on -l tcp:9200
+echo "wait-on tcp:27017" && wait-on -l tcp:27017
+echo "wait-on tcp:6379" && wait-on -l tcp:6379
+echo "wait-on tcp:8086" && wait-on -l tcp:8086
+
+echo
+echo "::::::::::::::::::::::: Starting OpenCRVS Core :::::::::::::::::::::::"
+echo
+echo ":::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::"
+echo
+
+if [ $OS == "UBUNTU" ]; then
+  LANGUAGES=en yarn start --silent
+  else
+  LOCAL_IP=$(hostname -I | cut -d' ' -f1)
+  LANGUAGES=en yarn start --silent
+fi
+echo "wait-on tcp:4040" && wait-on -l tcp:4040
+echo "wait-on http://localhost:3000" && wait-on -l http://localhost:3000
+echo "wait-on http://localhost:3020" && wait-on -l http://localhost:3020
+echo "wait-on tcp:3030" && wait-on -l tcp:3030
+echo "wait-on tcp:2020" && wait-on -l tcp:2020
+echo "wait-on tcp:7070" && wait-on -l tcp:7070
+echo "wait-on tcp:5050" && wait-on -l tcp:5050
+echo "wait-on tcp:9090" && wait-on -l tcp:9090
+echo "wait-on tcp:1050" && wait-on -l tcp:1050
+
+
+echo
+echo "::::::::::::::: Cloning the Zambia Country Configuration :::::::::::::::"
+echo
+echo ":::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::"
+echo
+git clone https://github.com/opencrvs/opencrvs-zambia.git
+cd opencrvs-zambia
+echo
+echo ":::::::::::::::::::: Installing Zambia Configuration ::::::::::::::::::::"
+echo
+echo ":::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::"
+echo
+yarn install
+yarn db:clear:all
+yarn db:backup:restore
+echo
+echo "::::::::::::::::::::: Starting Zambia Config Server :::::::::::::::::::::"
+echo
+echo ":::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::"
+echo
+CERT_PUBLIC_KEY_PATH=./../.secrets/public-key.pem yarn start
+wait-on -l tcp:3040
+echo
+echo -e "::::::::::::::::::::::::::: \033[32mCONGRATULATIONS!!\033[0m :::::::::::::::::::::::::::"
+echo
 echo "
                                             -=================================.
                                           -@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-
@@ -189,4 +304,32 @@ echo "
 :@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%:
 ---------------------------------------------------------------------------
 "
-# yarn dev:secrets:gen && concurrently "yarn run start" "yarn run compose:deps"
+echo
+echo "::::::::::::::::::::::: OpenCRVS IS READY TO DEMO. :::::::::::::::::::::::"
+
+echo "::::::::::::::::::::::: OPEN THIS LINK IN CHROME: :::::::::::::::::::::::"
+echo
+
+echo -e "::::::::::::::::::::::::: \033[32mhttp://localhost:3020/\033[0m :::::::::::::::::::::::::"
+echo
+
+echo "::::::::::::::::::::::::::: Login Details are :::::::::::::::::::::::::::"
+echo
+
+echo ":::::: Field Agent role: Username: kalusha.bwalya - Password: test ::::::"
+echo
+
+echo "::: Registration Agent role: Username: felix.katongo - Password: test :::"
+echo
+
+echo "::::::: Registrar role: Username: kennedy.mweene - Password: test :::::::"
+echo
+
+echo "::::: Local System Admin: Username: emmanuel.mayuka - Password: test :::::"
+echo
+
+echo ":: National System Admin: Username: jonathan.campbell - Password: test ::"
+echo
+
+echo "::::::::: Demo Two Factor Authentication SMS access code: 000000 :::::::::"
+echo
