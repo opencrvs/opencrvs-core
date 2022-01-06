@@ -32,6 +32,11 @@ jobs:
       - name: Checking out git repo
         uses: actions/checkout@v2
 
+      - name: Check folder structure
+        run: |
+          ls -la
+          ls -la .secrets
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
