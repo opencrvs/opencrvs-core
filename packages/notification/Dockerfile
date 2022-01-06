@@ -3,7 +3,7 @@ FROM node:erbium-alpine
 # this package has dependencies (iconv) that require build tools
 # --no-cache: download package index on-the-fly, no need to cleanup afterwards
 # --virtual: bundle packages, remove whole bundle at once, when done
-RUN apk --no-cache --virtual build-dependencies add python make g++
+RUN apk --no-cache --virtual build-dependencies add python3 make g++
 
 WORKDIR /usr/src/app
 
@@ -13,7 +13,7 @@ ENV NPM_CONFIG_LOGLEVEL warn
 # Install npm dependencies first (so they may be cached if dependencies don't change)
 COPY package.json package.json
 COPY packages/notification/package.json packages/notification/package.json
-COPY packages/commons/package.json packages/commons/package.json
+COPY packages/commons packages/commons
 COPY yarn.lock yarn.lock
 RUN yarn install --production
 

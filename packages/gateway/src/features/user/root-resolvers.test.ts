@@ -322,6 +322,63 @@ describe('User root resolvers', () => {
         creationDate: 1559054406444
       }
     ]
+    it('Returns field agent list with metrics data for an office', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          totalItems: dummyUserList.length,
+          results: dummyUserList
+        })
+      )
+      fetch.mockResponseOnce(
+        JSON.stringify([
+          {
+            practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
+            totalNumberOfApplicationStarted: 12,
+            totalNumberOfInProgressAppStarted: 5,
+            totalNumberOfRejectedApplications: 2,
+            averageTimeForDeclaredApplications: 360
+          }
+        ])
+      )
+
+      const response = await resolvers.Query.searchFieldAgents(
+        {},
+        {
+          primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
+          timeStart: '2019-03-31T18:00:00.000Z',
+          timeEnd: '2020-06-30T17:59:59.999Z'
+        },
+        authHeaderSysAdmin
+      )
+
+      expect(response.totalItems).toBe(2)
+      expect(response.results).toEqual([
+        {
+          practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
+          fullName: 'Sakib Al Hasan',
+          type: 'HA',
+          status: 'active',
+          primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
+          creationDate: 1559054406433,
+          totalNumberOfApplicationStarted: 12,
+          totalNumberOfInProgressAppStarted: 5,
+          totalNumberOfRejectedApplications: 2,
+          averageTimeForDeclaredApplications: 360
+        },
+        {
+          practitionerId: 'sseq1203-f0ff-4822-b5d9-cb90d0e7biwuw',
+          fullName: 'Md. Ariful Islam',
+          type: 'HA',
+          status: 'pending',
+          primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
+          creationDate: 1559054406444,
+          totalNumberOfApplicationStarted: 0,
+          totalNumberOfInProgressAppStarted: 0,
+          totalNumberOfRejectedApplications: 0,
+          averageTimeForDeclaredApplications: 0
+        }
+      ])
+    })
     it('Returns field agent list with metrics data for sysadmin', async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
@@ -461,6 +518,20 @@ describe('User root resolvers', () => {
           authHeaderSysAdmin
         )
       ).rejects.toThrow('Invalid result found from search user endpoint')
+    })
+    it('should return error if no locationId or primaryOfficeId is provided', async () => {
+      fetch.mockResponseOnce(JSON.stringify({}))
+
+      expect(
+        resolvers.Query.searchFieldAgents(
+          {},
+          {
+            timeStart: '2019-03-31T18:00:00.000Z',
+            timeEnd: '2020-06-30T17:59:59.999Z'
+          },
+          authHeaderSysAdmin
+        )
+      ).rejects.toThrow('No location provided')
     })
   })
 

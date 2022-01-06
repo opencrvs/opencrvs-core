@@ -80,6 +80,7 @@ export const GET_USER = gql`
         type
         data
       }
+      device
     }
   }
 `

@@ -564,6 +564,28 @@ async function getFieldAgentDeclaredApplications(userDetails: IUserDetails) {
   return result
 }
 
+async function getFieldAgentRejectedApplications(userDetails: IUserDetails) {
+  const userId = userDetails.practitionerId
+  const locationIds = (userDetails && [getUserLocation(userDetails).id]) || []
+
+  let result
+  try {
+    const response = await client.query({
+      query: SEARCH_APPLICATIONS_USER_WISE,
+      variables: {
+        userId,
+        status: [EVENT_STATUS.REJECTED],
+        locationIds
+      },
+      fetchPolicy: 'no-cache'
+    })
+    result = response.data && response.data.searchEvents
+  } catch (exception) {
+    result = undefined
+  }
+  return result
+}
+
 export function mergeDeclaredApplications(
   applications: IApplication[],
   declaredApplications: GQLEventSearchSet[]
@@ -591,7 +613,6 @@ async function updateFieldAgentDeclaredApplicationsByUser(
 
   if (
     !state.applicationsState.applications ||
-    state.applicationsState.applications.length !== 0 ||
     !scope ||
     !scope.includes('declare')
   ) {
@@ -611,6 +632,13 @@ async function updateFieldAgentDeclaredApplicationsByUser(
     userDetails
   )
 
+  const rejectedApplications = await getFieldAgentRejectedApplications(
+    userDetails
+  )
+  const rejectedApplicationIds = (rejectedApplications.results as IApplication[]).map(
+    application => application.id
+  )
+
   if (!currentUserData) {
     currentUserData = {
       userID: uID,
@@ -622,6 +650,27 @@ async function updateFieldAgentDeclaredApplicationsByUser(
     currentUserData.applications,
     declaredApplications.results
   )
+
+  currentUserData = {
+    ...currentUserData,
+    applications: currentUserData.applications.filter(
+      application =>
+        !rejectedApplicationIds.includes(application.compositionId as string)
+    )
+  }
+
+  allUserData = allUserData.map(userData => {
+    if (userData.userID !== currentUserData!.userID) {
+      return {
+        ...userData
+      }
+    } else {
+      return {
+        ...userData,
+        ...currentUserData
+      }
+    }
+  })
 
   return Promise.all([
     storage.setItem('USER_DATA', JSON.stringify(allUserData)),

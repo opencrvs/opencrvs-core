@@ -106,7 +106,7 @@ const messagesToDefine: ISysAdminMessages = {
   },
   formError: {
     id: 'sysAdHome.user.audit.form.error',
-    defaultMessage: 'Please complete all mandatory fields',
+    defaultMessage: 'A reason is required for {auditAction} this user',
     description: 'The label for form error'
   },
   networkTab: {

@@ -56,6 +56,9 @@ import { userMutations } from '@client/user/mutations'
 
 const ContentWrapper = styled.div`
   margin: 40px auto 0;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin: 0px auto 0;
+  }
   color: ${({ theme }) => theme.colors.copy};
 `
 
@@ -79,6 +82,9 @@ const InformationHolder = styled.div`
     flex-direction: column;
   }
   margin-bottom: 14px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin-bottom: 16px;
+  }
 `
 
 export const InformationTitle = styled.div<{ paddingRight?: number }>`
@@ -355,6 +361,10 @@ class UserProfileComponent extends React.Component<Props, State> {
                       />
                     </HeaderMenuHolder>
                   }
+                  profilePageStyle={{
+                    paddingTopMd: 24,
+                    horizontalPaddingMd: 24
+                  }}
                 >
                   <ContentWrapper>
                     <UserAvatar name={user.name} avatar={user.avatar} />

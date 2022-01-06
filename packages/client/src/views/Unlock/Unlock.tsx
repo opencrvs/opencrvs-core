@@ -136,10 +136,11 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
           // @ts-ignore
           (storedName: GQLHumanName) => storedName.use === 'en'
         ) as GQLHumanName)) ||
-      {}
-    const fullName = `${String(nameObj.firstNames)} ${String(
-      nameObj.familyName
-    )}`
+      null
+    const fullName =
+      (nameObj &&
+        `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`) ||
+      ''
     return <Name>{fullName}</Name>
   }
 

@@ -14,6 +14,7 @@ import {
   FIELD_GROUP_TITLE,
   IAttachmentValue,
   IFormField,
+  IFormFieldValue,
   IFormSection,
   IFormSectionData,
   LOCATION_SEARCH_INPUT,
@@ -35,7 +36,10 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { draftToGqlTransformer } from '@client/transformer'
-import { submitUserFormData } from '@client/user/userReducer'
+import {
+  modifyUserFormData,
+  submitUserFormData
+} from '@client/user/userReducer'
 import {
   Action,
   FormTitle
@@ -74,6 +78,7 @@ interface IDispatchProps {
   userFormSection: IFormSection
   offlineResources: IOfflineData
   goBack: typeof goBack
+  modify: (values: IFormSectionData) => void
 }
 
 interface ISectionData {
@@ -84,7 +89,6 @@ interface ISectionData {
 type IFullProps = IUserReviewFormProps &
   IntlShapeProps &
   RouteComponentProps<{ userId?: string }>
-
 class UserReviewFormComponent extends React.Component<
   IFullProps & IDispatchProps
 > {
@@ -142,7 +146,9 @@ class UserReviewFormComponent extends React.Component<
           label={intl.formatMessage(field.label)}
           disableDeleteInPreview={true}
           name={field.name}
-          onComplete={() => {}}
+          onComplete={file => {
+            this.props.modify({ ...this.props.formData, [field.name]: file })
+          }}
           files={files}
         />
       )
@@ -223,6 +229,7 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
       fieldName?: string
     ) => dispatch(goToUserReviewForm(userId, sec, group, fieldName)),
     goBack: () => dispatch(goBack()),
+    modify: (values: IFormSectionData) => dispatch(modifyUserFormData(values)),
     submitForm: (userFormSection: IFormSection) => {
       const variables = draftToGqlTransformer(
         { sections: [userFormSection] },
