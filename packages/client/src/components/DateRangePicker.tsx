@@ -125,7 +125,7 @@ export const ContentWrapper = styled.div`
 `
 
 export const ModalContainer = styled.div`
-  position: absolute;
+  position: relative;
   z-index: 2;
   width: 608px;
   margin: -42px 0 0 -16px;
@@ -140,7 +140,7 @@ export const ModalContainer = styled.div`
     margin-left: 0;
   }
 
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  /* @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     position: fixed;
     border-radius: 2px;
     width: auto;
@@ -148,7 +148,7 @@ export const ModalContainer = styled.div`
     left: 50vw;
     transform: translateX(-50%);
     margin: 0;
-  }
+  } */
 `
 export const ModalHeader = styled.div<{ hide?: boolean }>`
   display: flex;
