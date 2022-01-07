@@ -38,5 +38,5 @@ const Template: Story<IDesktopHeaderProps> = (args) => (
 )
 export const DesktopHeaderView = Template.bind({})
 DesktopHeaderView.args = {
-  menuItems: { menuItems }
+  menuItems
 }

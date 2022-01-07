@@ -259,7 +259,7 @@ const Template: Story<IProps> = (args) => <GridTable {...args} />
 export const GridView = Template.bind({})
 GridView.args = {
   content: list,
-  columns: { columns },
+  columns,
   noResultText: 'No result to display',
   expandable: false,
   totalItems: list.length || 0,

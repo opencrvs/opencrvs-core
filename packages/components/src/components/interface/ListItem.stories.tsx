@@ -57,8 +57,8 @@ const style = {
 export const ListItemView = Template.bind({})
 ListItemView.args = {
   actions: [{ label: 'review', handler: () => alert('Review clicked') }],
-  infoItems: { infoItems },
-  statusItems: { statusItems },
+  infoItems,
+  statusItems,
   index: 1,
   expandedCellRenderer: () => (
     <div style={style}>

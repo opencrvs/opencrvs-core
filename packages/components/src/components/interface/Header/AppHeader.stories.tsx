@@ -53,7 +53,7 @@ const menuItems = [
 const Template: Story<IProps> = (args) => <AppHeader {...args} />
 export const AppHeaderView = Template.bind({})
 AppHeaderView.args = {
-  menuItems: { menuItems },
+  menuItems,
   id: 'register_app_header',
   mobileLeft: {
     icon: () => <Hamburger />,

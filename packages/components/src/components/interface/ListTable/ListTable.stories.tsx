@@ -153,7 +153,7 @@ export const ListView = Template.bind({})
 ListView.args = {
   tableTitle: 'Table Title',
   content: list,
-  columns: { columns },
+  columns,
   noResultText: 'No result to display',
-  footerColumns: { footerColumns }
+  footerColumns
 }
