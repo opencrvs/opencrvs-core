@@ -64,6 +64,7 @@ export interface GQLMutation {
   changePassword?: string
   auditUser?: string
   resendSMSInvite?: string
+  correctRecord?: string
 }
 
 export interface GQLDummy {
@@ -1790,6 +1791,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   changePassword?: MutationToChangePasswordResolver<TParent>
   auditUser?: MutationToAuditUserResolver<TParent>
   resendSMSInvite?: MutationToResendSMSInviteResolver<TParent>
+  correctRecord?: MutationToCorrectRecordResolver<TParent>
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -2116,6 +2118,26 @@ export interface MutationToResendSMSInviteResolver<
     context: any,
     info: GraphQLResolveInfo
   ): TResult
+}
+
+export interface MutationToCorrectRecordResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToCorrectRecordArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface GQLCorrectionInput {
+  section: string
+  fieldName: string
+  oldValue: string
+  newValue: string
+}
+export interface MutationToCorrectRecordArgs {
+  id: string
+  correctionInput: GQLCorrectionInput
 }
 
 export interface GQLDummyTypeResolver<TParent = any> {
