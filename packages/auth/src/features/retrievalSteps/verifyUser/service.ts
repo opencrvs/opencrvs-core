@@ -27,7 +27,8 @@ export async function verifyUser(mobile: string) {
 
   const res = await fetch(url, {
     method: 'POST',
-    body: JSON.stringify({ mobile })
+    body: JSON.stringify({ mobile }),
+    headers: { 'Content-Type': 'application/json' }
   })
 
   if (res.status !== 200) {

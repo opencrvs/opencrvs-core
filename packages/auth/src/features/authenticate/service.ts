@@ -97,7 +97,8 @@ export async function authenticateSystem(
 
   const res = await fetch(url, {
     method: 'POST',
-    body: JSON.stringify({ client_id, client_secret })
+    body: JSON.stringify({ client_id, client_secret }),
+    headers: { 'Content-Type': 'application/json' }
   })
 
   if (res.status !== 200) {
