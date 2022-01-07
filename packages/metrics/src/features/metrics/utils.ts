@@ -26,8 +26,12 @@ import {
   JURISDICTION_TYPE_IDENTIFIER
 } from '@metrics/features/metrics/constants'
 import { IAuthHeader } from '@metrics/features/registration'
-import { fetchLocation, fetchFromResource, fetchFHIR } from '@metrics/api'
-import { EXPECTED_BIRTH_REGISTRATION_IN_DAYS } from '@metrics/constants'
+import {
+  fetchLocation,
+  fetchFromResource,
+  fetchFHIR,
+  getApplicationConfig
+} from '@metrics/api'
 export const YEARLY_INTERVAL = '365d'
 export const MONTHLY_INTERVAL = '30d'
 export const WEEKLY_INTERVAL = '7d'
@@ -58,6 +62,10 @@ export enum EVENT_TYPE {
   BIRTH = 'BIRTH',
   DEATH = 'DEATH'
 }
+
+const EXPECTED_BIRTH_REGISTRATION_IN_DAYS = getRegistrationTargetDays(
+  'BIRTH'
+).then(data => data)
 
 export type Location = fhir.Location & { id: string }
 
@@ -251,7 +259,7 @@ export const getLocationLevelFromLocationData = (locationData: Location) => {
   )
 }
 
-export const fetchEstimateFor45DaysByLocationId = async (
+export const fetchEstimateForTargetDaysByLocationId = async (
   locationId: string,
   event: EVENT_TYPE,
   authHeader: IAuthHeader,
@@ -383,4 +391,13 @@ export function getMonthRangeFilterListFromTimeRage(
   }
 
   return monthFilterList
+}
+
+export async function getRegistrationTargetDays(event: string) {
+  const applicationConfig = await getApplicationConfig()
+  const targetDays =
+    event === EVENT_TYPE.BIRTH
+      ? applicationConfig.BIRTH_REGISTRATION_TARGET
+      : applicationConfig.DEATH_REGISTRATION_TARGET
+  return targetDays
 }

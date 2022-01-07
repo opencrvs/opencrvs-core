@@ -127,13 +127,28 @@ class TimeFrameComponent extends React.Component<FullProps> {
             isSortable: false
           },
           {
-            label: intl.formatMessage(constantsMessages.within45Days),
+            label: intl.formatMessage(constantsMessages.withinTargetDays, {
+              registrationTargetDays:
+                eventType === Event.BIRTH
+                  ? this.props.offlineResources.config.BIRTH_REGISTRATION_TARGET
+                  : this.props.offlineResources.config.DEATH_REGISTRATION_TARGET
+            }),
             width: 15,
             key: 'regWithin45d',
             isSortable: false
           },
           {
-            label: intl.formatMessage(constantsMessages.within45DaysTo1Year),
+            label: intl.formatMessage(
+              constantsMessages.withinTargetDaysTo1Year,
+              {
+                registrationTargetDays:
+                  eventType === Event.BIRTH
+                    ? this.props.offlineResources.config
+                        .BIRTH_REGISTRATION_TARGET
+                    : this.props.offlineResources.config
+                        .DEATH_REGISTRATION_TARGET
+              }
+            ),
             width: 15,
             key: 'regWithin45dTo1yr',
             isSortable: false

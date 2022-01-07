@@ -39,18 +39,18 @@ export const FETCH_MONTH_WISE_EVENT_ESTIMATIONS = gql`
     ) {
       details {
         actualTotalRegistration
-        actual45DayRegistration
+        actualTargetDayRegistration
         estimatedRegistration
-        estimated45DayPercentage
+        estimatedTargetDayPercentage
         month
         year
         startOfMonth
       }
       total {
         actualTotalRegistration
-        actual45DayRegistration
+        actualTargetDayRegistration
         estimatedRegistration
-        estimated45DayPercentage
+        estimatedTargetDayPercentage
       }
     }
   }
@@ -71,17 +71,17 @@ export const FETCH_LOCATION_WISE_EVENT_ESTIMATIONS = gql`
     ) {
       details {
         actualTotalRegistration
-        actual45DayRegistration
+        actualTargetDayRegistration
         estimatedRegistration
-        estimated45DayPercentage
+        estimatedTargetDayPercentage
         locationId
         locationName
       }
       total {
         actualTotalRegistration
-        actual45DayRegistration
+        actualTargetDayRegistration
         estimatedRegistration
-        estimated45DayPercentage
+        estimatedTargetDayPercentage
       }
     }
   }

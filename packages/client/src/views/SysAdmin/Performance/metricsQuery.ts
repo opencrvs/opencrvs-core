@@ -58,18 +58,18 @@ export const PERFORMANCE_METRICS = gql`
           total
         }
       }
-      estimated45DayMetrics {
+      estimatedTargetDayMetrics {
         details {
           locationId
           estimatedRegistration
-          registrationIn45Day
+          registrationInTargetDay
           estimationYear
           estimationLocationLevel
           estimationPercentage
         }
         total {
           estimatedRegistration
-          registrationIn45Day
+          registrationInTargetDay
           estimationPercentage
         }
       }
@@ -92,14 +92,14 @@ export const OPERATIONAL_REPORTS_METRICS = gql`
       timeEnd: $timeEnd
       locationId: $locationId
     ) {
-      birth45DayMetrics {
+      birthTargetDayMetrics {
         actualRegistration
         estimatedRegistration
         estimatedPercentage
         malePercentage
         femalePercentage
       }
-      death45DayMetrics {
+      deathTargetDayMetrics {
         actualRegistration
         estimatedRegistration
         estimatedPercentage

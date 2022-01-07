@@ -27,9 +27,9 @@ import { injectIntl, WrappedComponentProps } from 'react-intl'
 
 interface IMonthWiseEstimationCount {
   actualTotalRegistration: number
-  actual45DayRegistration: number
+  actualTargetDayRegistration: number
   estimatedRegistration: number
-  estimated45DayPercentage: number
+  estimatedTargetDayPercentage: number
 }
 interface IMonthWiseEstimation extends IMonthWiseEstimationCount {
   month?: string
@@ -62,7 +62,7 @@ const INITIAL_SORT_MAP = {
   location: SORT_ORDER.ASCENDING
 }
 
-function Within45DaysTableComponent(props: ITableProps) {
+function WithinTargetDaysTableComponent(props: ITableProps) {
   const { intl, loading, eventType, base } = props
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
 
@@ -74,18 +74,18 @@ function Within45DaysTableComponent(props: ITableProps) {
         startTime: item.startOfMonth,
         month: `${item.month} ${item.year}`,
         totalRegistered: String(item.actualTotalRegistration),
-        registeredWithin45d: String(item.actual45DayRegistration),
+        registeredWithinTargetd: String(item.actualTargetDayRegistration),
         estimated: String(item.estimatedRegistration),
-        rateOfRegistrationWithin45d: `${item.estimated45DayPercentage}%`
+        rateOfRegistrationWithinTargetd: `${item.estimatedTargetDayPercentage}%`
       }))) ||
     []
 
   function getFooterColumns() {
     const {
       actualTotalRegistration = 0,
-      actual45DayRegistration = 0,
+      actualTargetDayRegistration = 0,
       estimatedRegistration = 0,
-      estimated45DayPercentage = 0
+      estimatedTargetDayPercentage = 0
     } = (props.data && props.data.total) || {}
     return [
       {
@@ -97,7 +97,7 @@ function Within45DaysTableComponent(props: ITableProps) {
         width: 15
       },
       {
-        label: String(actual45DayRegistration),
+        label: String(actualTargetDayRegistration),
         width: 15
       },
       {
@@ -108,7 +108,7 @@ function Within45DaysTableComponent(props: ITableProps) {
         label: intl.formatMessage(
           constantsMessages.averageRateOfRegistrations,
           {
-            amount: estimated45DayPercentage
+            amount: estimatedTargetDayPercentage
           }
         ),
         width: 15
@@ -170,10 +170,14 @@ function Within45DaysTableComponent(props: ITableProps) {
           width: 15
         },
         {
-          key: 'registeredWithin45d',
+          key: 'registeredWithinTargetd',
 
-          label: intl.formatMessage(constantsMessages.registeredWithin45d, {
-            lineBreak: <br key={'registeredWithin45d-break'} />
+          label: intl.formatMessage(constantsMessages.registeredWithinTargetd, {
+            registrationTargetDays:
+              eventType === Event.BIRTH
+                ? window.config.BIRTH_REGISTRATION_TARGET
+                : window.config.DEATH_REGISTRATION_TARGET,
+            lineBreak: <br key={'registeredWithinTargetd-break'} />
           }),
           width: 15
         },
@@ -186,11 +190,16 @@ function Within45DaysTableComponent(props: ITableProps) {
           width: 15
         },
         {
-          key: 'rateOfRegistrationWithin45d',
+          key: 'rateOfRegistrationWithinTargetd',
           label: intl.formatMessage(
-            constantsMessages.rateOfRegistrationWithin45d,
+            constantsMessages.rateOfRegistrationWithinTargetd,
             {
-              lineBreak: <br key={'rateOfRegistrationWithin45d-break'} />
+              registrationTargetDays:
+                eventType === Event.BIRTH
+                  ? window.config.BIRTH_REGISTRATION_TARGET
+                  : window.config.DEATH_REGISTRATION_TARGET,
+
+              lineBreak: <br key={'rateOfRegistrationWithinTargetd-break'} />
             }
           ),
           alignment: ColumnContentAlignment.RIGHT,
@@ -206,4 +215,4 @@ function Within45DaysTableComponent(props: ITableProps) {
   )
 }
 
-export const Within45DaysTable = injectIntl(Within45DaysTableComponent)
+export const WithinTargetDaysTable = injectIntl(WithinTargetDaysTableComponent)

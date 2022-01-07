@@ -75,12 +75,12 @@ describe('Report page', () => {
                 total: 2
               }
             },
-            estimated45DayMetrics: {
+            estimatedTargetDayMetrics: {
               details: [
                 {
                   locationId: 'Location/db5faba3-8143-4924-a44a-8562ed5e0437',
                   estimatedRegistration: 99,
-                  registrationIn45Day: 2,
+                  registrationInTargetDay: 2,
                   estimationYear: 2019,
                   estimationLocationLevel: 'UNION',
                   estimationPercentage: 2
@@ -88,7 +88,7 @@ describe('Report page', () => {
               ],
               total: {
                 estimatedRegistration: 99,
-                registrationIn45Day: 2,
+                registrationInTargetDay: 2,
                 estimationPercentage: 2
               }
             },
@@ -140,11 +140,11 @@ describe('Report page', () => {
                 total: 0
               }
             },
-            estimated45DayMetrics: {
+            estimatedTargetDayMetrics: {
               details: [],
               total: {
                 estimatedRegistration: 0,
-                registrationIn45Day: 0,
+                registrationInTargetDay: 0,
                 estimationPercentage: 0
               }
             },

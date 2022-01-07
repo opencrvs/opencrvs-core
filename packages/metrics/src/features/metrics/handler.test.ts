@@ -75,13 +75,13 @@ describe('verify metrics handler', () => {
 
     readPoints.mockResolvedValueOnce([
       {
-        withIn45Day: 1,
+        withInTargetDay: 1,
         locationLevel2: 'Location/0eaa73dd-2a21-4998-b1e6-b08430595201'
       }
     ])
     const utilService = require('./utils')
     jest
-      .spyOn(utilService, 'fetchEstimateFor45DaysByLocationId')
+      .spyOn(utilService, 'fetchEstimateForTargetDaysByLocationId')
       .mockReturnValue({
         estimation: 100,
         locationId: 'Location/0eaa73dd-2a21-4998-b1e6-b08430595201',
@@ -137,13 +137,13 @@ describe('verify metrics handler', () => {
     ])
     readPoints.mockResolvedValueOnce([
       {
-        withIn45Day: 1,
+        withInTargetDay: 1,
         locationLevel2: 'Location/0eaa73dd-2a21-4998-b1e6-b08430595201'
       }
     ])
     const utilService = require('./utils')
     jest
-      .spyOn(utilService, 'fetchEstimateFor45DaysByLocationId')
+      .spyOn(utilService, 'fetchEstimateForTargetDaysByLocationId')
       .mockReturnValue({
         estimation: 100,
         locationId: 'Location/0eaa73dd-2a21-4998-b1e6-b08430595201',

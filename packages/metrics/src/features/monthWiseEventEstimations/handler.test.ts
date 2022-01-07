@@ -45,7 +45,7 @@ describe('verify monthWiseEventEstimations handler', () => {
       }
     ])
     jest
-      .spyOn(utilService, 'fetchEstimateFor45DaysByLocationId')
+      .spyOn(utilService, 'fetchEstimateForTargetDaysByLocationId')
       .mockReturnValue({
         totalEstimation: 100,
         maleEstimation: 60,

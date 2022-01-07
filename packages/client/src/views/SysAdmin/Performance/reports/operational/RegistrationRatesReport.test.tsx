@@ -42,14 +42,14 @@ describe('Registration rates report', () => {
     let component: ReactWrapper<{}, {}>
     beforeEach(async () => {
       const data: GQLEventEstimationMetrics = {
-        birth45DayMetrics: {
+        birthTargetDayMetrics: {
           actualRegistration: 0,
           estimatedPercentage: 0,
           estimatedRegistration: 0,
           malePercentage: 0,
           femalePercentage: 0
         },
-        death45DayMetrics: {
+        deathTargetDayMetrics: {
           actualRegistration: 0,
           estimatedPercentage: 0,
           estimatedRegistration: 0,

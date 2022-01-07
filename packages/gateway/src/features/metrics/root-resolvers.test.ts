@@ -47,11 +47,11 @@ describe('fetch birth registration metrics', () => {
             total: 0
           }
         ],
-        estimated45DayMetrics: [
+        estimatedTargetDayMetrics: [
           {
             locationId: 'fake',
             estimatedRegistration: 0,
-            registrationIn45Day: 0,
+            registrationInTargetDay: 0,
             estimationPercentage: 0
           }
         ]
@@ -77,8 +77,8 @@ describe('fetch birth registration metrics', () => {
     expect(data.payments.details.length).toBe(1)
     expect(data.genderBasisMetrics).toBeInstanceOf(Object)
     expect(data.genderBasisMetrics.details.length).toBe(1)
-    expect(data.estimated45DayMetrics).toBeInstanceOf(Object)
-    expect(data.estimated45DayMetrics.details.length).toBe(1)
+    expect(data.estimatedTargetDayMetrics).toBeInstanceOf(Object)
+    expect(data.estimatedTargetDayMetrics.details.length).toBe(1)
   })
 
   it('returns an empty array of birth registraiton metrics when error is thrown', async () => {
@@ -92,14 +92,14 @@ describe('get event estimation metrics', () => {
   it('returns estimated data for both birth and death', async () => {
     fetch.mockResponseOnce(
       JSON.stringify({
-        birth45DayMetrics: {
+        birthTargetDayMetrics: {
           actualRegistration: 50,
           estimatedRegistration: 356,
           estimatedPercentage: 14,
           malePercentage: 50,
           femalePercentage: 50
         },
-        death45DayMetrics: {
+        deathTargetDayMetrics: {
           actualRegistration: 0,
           estimatedRegistration: 150,
           estimatedPercentage: 0,
@@ -119,10 +119,10 @@ describe('get event estimation metrics', () => {
     )
 
     expect(data).toBeDefined()
-    expect(data.birth45DayMetrics).toBeInstanceOf(Object)
-    expect(data.birth45DayMetrics.estimatedPercentage).toBe(14)
-    expect(data.death45DayMetrics).toBeInstanceOf(Object)
-    expect(data.death45DayMetrics.estimatedPercentage).toBe(0)
+    expect(data.birthTargetDayMetrics).toBeInstanceOf(Object)
+    expect(data.birthTargetDayMetrics.estimatedPercentage).toBe(14)
+    expect(data.deathTargetDayMetrics).toBeInstanceOf(Object)
+    expect(data.deathTargetDayMetrics.estimatedPercentage).toBe(0)
   })
 })
 describe('get applications started metrics', () => {
@@ -154,17 +154,17 @@ describe('get month wise event estimation metrics', () => {
       JSON.stringify([
         {
           actualTotalRegistration: 120,
-          actual45DayRegistration: 50,
+          actualTargetDayRegistration: 50,
           estimatedRegistration: 356,
-          estimated45DayPercentage: 14,
+          estimatedTargetDayPercentage: 14,
           month: 'January',
           year: '2020'
         },
         {
           actualTotalRegistration: 10,
-          actual45DayRegistration: 0,
+          actualTargetDayRegistration: 0,
           estimatedRegistration: 356,
-          estimated45DayPercentage: 0,
+          estimatedTargetDayPercentage: 0,
           month: 'February',
           year: '2020'
         }
@@ -192,17 +192,17 @@ describe('get location wise event estimation metrics', () => {
       JSON.stringify([
         {
           actualTotalRegistration: 120,
-          actual45DayRegistration: 50,
+          actualTargetDayRegistration: 50,
           estimatedRegistration: 356,
-          estimated45DayPercentage: 14,
+          estimatedTargetDayPercentage: 14,
           locationName: 'Baniajan Union Parishod',
           locationId: '123'
         },
         {
           actualTotalRegistration: 10,
-          actual45DayRegistration: 0,
+          actualTargetDayRegistration: 0,
           estimatedRegistration: 356,
-          estimated45DayPercentage: 0,
+          estimatedTargetDayPercentage: 0,
           locationName: 'Atarpar Union Parishod',
           locationId: '123'
         }

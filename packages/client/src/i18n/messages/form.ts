@@ -238,7 +238,7 @@ interface IFormMessages
   otherHealthInstitution: MessageDescriptor
   otherInstitution: MessageDescriptor
   otherOption: MessageDescriptor
-  paragraph45daysTo5Years: MessageDescriptor
+  paragraphTargetDaysTo5Years: MessageDescriptor
   paragraph: MessageDescriptor
   paragraphAbove5Years: MessageDescriptor
   permanentAddress: MessageDescriptor
@@ -1474,11 +1474,11 @@ const messagesToDefine: IFormMessages = {
     description: 'Documents Paragraph text',
     id: 'form.section.documents.birth.requirements'
   },
-  paragraph45daysTo5Years: {
+  paragraphTargetDaysTo5Years: {
     defaultMessage:
       'For birth regiatration of children below 5 years old, one of the documents listed below is required:',
     description: 'Documents Paragraph text',
-    id: 'form.section.documents.paragraph45daysTo5Years'
+    id: 'form.section.documents.paragraphTargetDaysTo5Years'
   },
   paragraphAbove5Years: {
     defaultMessage:

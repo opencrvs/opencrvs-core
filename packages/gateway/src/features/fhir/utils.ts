@@ -59,11 +59,11 @@ import {
   GQLGenderBasisTotalCount,
   GQLCertificationPaymentDetailsMetrics,
   GQLCertificationPaymentTotalCount,
-  GQLEstimate45DayTotalCount,
-  GQLEstimated45DayMetrics,
-  GQLMonthWise45DayEstimation,
-  GQLLocationWise45DayEstimation,
-  GQLEventIn45DayEstimationCount
+  GQLEstimateTargetDayTotalCount,
+  GQLEstimatedTargetDayMetrics,
+  GQLMonthWiseTargetDayEstimation,
+  GQLLocationWiseTargetDayEstimation,
+  GQLEventInTargetDayEstimationCount
 } from '@gateway/graphql/schema'
 import { reduce } from 'lodash'
 
@@ -1206,28 +1206,30 @@ export function genderBasisTotalCalculator(
   )
 }
 
-export function estimated45DayMetricsTotalCalculator(
-  estimated45DayMetrics: Array<GQLEstimated45DayMetrics>
-): GQLEstimate45DayTotalCount {
-  const initialValue: GQLEstimate45DayTotalCount = {
+export function estimatedTargetDayMetricsTotalCalculator(
+  estimatedTargetDayMetrics: Array<GQLEstimatedTargetDayMetrics>
+): GQLEstimateTargetDayTotalCount {
+  const initialValue: GQLEstimateTargetDayTotalCount = {
     estimatedRegistration: 0,
-    registrationIn45Day: 0,
+    registrationInTargetDay: 0,
     estimationPercentage: 0
   }
   return reduce(
-    estimated45DayMetrics,
+    estimatedTargetDayMetrics,
     (accumulator, item) => {
       const estimatedRegistration =
         accumulator.estimatedRegistration + item.estimatedRegistration
-      const registrationIn45Day =
-        accumulator.registrationIn45Day + item.registrationIn45Day
+      const registrationInTargetDay =
+        accumulator.registrationInTargetDay + item.registrationInTargetDay
       return {
         estimatedRegistration,
-        registrationIn45Day,
+        registrationInTargetDay,
         estimationPercentage:
-          registrationIn45Day === 0 || estimatedRegistration === 0
+          registrationInTargetDay === 0 || estimatedRegistration === 0
             ? 0
-            : Math.round((registrationIn45Day / estimatedRegistration) * 100)
+            : Math.round(
+                (registrationInTargetDay / estimatedRegistration) * 100
+              )
       }
     },
     initialValue
@@ -1246,37 +1248,38 @@ export function paymentTotalCalculator(
   )
 }
 
-export function eventIn45DayEstimationCalculator(
-  eventIn45DayEstimations: Array<
-    GQLMonthWise45DayEstimation | GQLLocationWise45DayEstimation
+export function eventInTargetDayEstimationCalculator(
+  eventInTargetDayEstimations: Array<
+    GQLMonthWiseTargetDayEstimation | GQLLocationWiseTargetDayEstimation
   >
-): GQLEventIn45DayEstimationCount {
-  const initialValue: GQLEventIn45DayEstimationCount = {
+): GQLEventInTargetDayEstimationCount {
+  const initialValue: GQLEventInTargetDayEstimationCount = {
     actualTotalRegistration: 0,
-    actual45DayRegistration: 0,
+    actualTargetDayRegistration: 0,
     estimatedRegistration: 0,
-    estimated45DayPercentage: 0
+    estimatedTargetDayPercentage: 0
   }
   return reduce(
-    eventIn45DayEstimations,
+    eventInTargetDayEstimations,
     (accumulator, item) => {
       const actualTotalRegistration =
         accumulator.actualTotalRegistration + item.actualTotalRegistration
-      const actual45DayRegistration =
-        accumulator.actual45DayRegistration + item.actual45DayRegistration
+      const actualTargetDayRegistration =
+        accumulator.actualTargetDayRegistration +
+        item.actualTargetDayRegistration
       const estimatedRegistration =
         accumulator.estimatedRegistration + item.estimatedRegistration
 
       return {
         actualTotalRegistration,
-        actual45DayRegistration,
+        actualTargetDayRegistration,
         estimatedRegistration,
-        estimated45DayPercentage:
-          actual45DayRegistration === 0 || estimatedRegistration === 0
+        estimatedTargetDayPercentage:
+          actualTargetDayRegistration === 0 || estimatedRegistration === 0
             ? 0
             : Number(
                 (
-                  (actual45DayRegistration / estimatedRegistration) *
+                  (actualTargetDayRegistration / estimatedRegistration) *
                   100
                 ).toFixed(2)
               )

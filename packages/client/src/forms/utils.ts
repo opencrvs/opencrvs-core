@@ -65,6 +65,8 @@ import { IDynamicValues } from '@client/navigation'
 import { generateLocations } from '@client/utils/locationUtils'
 import { callingCountries } from 'country-data'
 
+const REGISTRATION_TARGET_DAYS = window.config.BIRTH_REGISTRATION_TARGET
+
 interface IRange {
   start: number
   end?: number
@@ -337,14 +339,19 @@ export const getFieldOptionsByValueMapper = (
 }
 
 export const diffDoB = (doB: string) => {
-  if (!isAValidDateFormat(doB) || !isDateNotInFuture(doB)) return 'within45days'
+  if (!isAValidDateFormat(doB) || !isDateNotInFuture(doB))
+    return 'withinTargetdays'
   const todaysDate = moment(Date.now())
   const birthDate = moment(doB)
   const diffInDays = todaysDate.diff(birthDate, 'days')
 
   const ranges: IRange[] = [
-    { start: 0, end: 45, value: 'within45days' },
-    { start: 46, end: 5 * 365, value: 'between46daysTo5yrs' },
+    { start: 0, end: REGISTRATION_TARGET_DAYS, value: 'withinTargetdays' },
+    {
+      start: REGISTRATION_TARGET_DAYS + 1,
+      end: 5 * 365,
+      value: 'between46daysTo5yrs'
+    },
     { start: 5 * 365 + 1, value: 'after5yrs' }
   ]
   const valueWithinRange = ranges.find(range => betweenRange(range, diffInDays))
@@ -704,10 +711,10 @@ export const conditionals: IConditionals = {
     expression:
       '(draftData && draftData.registration && draftData.registration.whoseContactDetails === "FATHER")'
   },
-  withIn45Days: {
+  withInTargetDays: {
     action: 'hide',
     expression:
-      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "within45days") || !draftData.child || !draftData.child.childBirthDate'
+      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "withinTargetdays") || !draftData.child || !draftData.child.childBirthDate'
   },
   between46daysTo5yrs: {
     action: 'hide',

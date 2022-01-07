@@ -11,7 +11,12 @@
  */
 import fetch from 'node-fetch'
 import { IAuthHeader } from '@metrics/features/registration'
-import { fhirUrl, RESOURCE_URL, SEARCH_URL } from '@metrics/constants'
+import {
+  CONFIG_API_URL,
+  fhirUrl,
+  RESOURCE_URL,
+  SEARCH_URL
+} from '@metrics/constants'
 
 export function fetchFHIR<T = any>(
   suffix: string,
@@ -151,4 +156,58 @@ export const fetchPractitionerRole = async (
   } else {
     return Promise.reject(new Error(`Role code cannot be found`))
   }
+}
+
+export interface IPhoneNumberPattern {
+  pattern: RegExp
+  example: string
+  start: string
+  num: string
+  mask: {
+    startForm: number
+    endBefore: number
+  }
+}
+
+export interface IApplicationConfig {
+  BACKGROUND_SYNC_BROADCAST_CHANNEL: string
+  COUNTRY: string
+  COUNTRY_LOGO_FILE: string
+  COUNTRY_LOGO_RENDER_WIDTH: number
+  COUNTRY_LOGO_RENDER_HEIGHT: number
+  DESKTOP_TIME_OUT_MILLISECONDS: number
+  HEALTH_FACILITY_FILTER: string
+  LANGUAGES: string
+  CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: number
+  CERTIFICATE_PRINT_CHARGE_UP_LIMIT: number
+  CERTIFICATE_PRINT_LOWEST_CHARGE: number
+  CERTIFICATE_PRINT_HIGHEST_CHARGE: number
+  UI_POLLING_INTERVAL: number
+  FIELD_AGENT_AUDIT_LOCATIONS: string
+  APPLICATION_AUDIT_LOCATIONS: string
+  INFORMANT_MINIMUM_AGE: number
+  HIDE_EVENT_REGISTER_INFORMATION: boolean
+  EXTERNAL_VALIDATION_WORKQUEUE: boolean
+  SENTRY: string
+  LOGROCKET: string
+  PHONE_NUMBER_PATTERN: IPhoneNumberPattern
+  BIRTH_REGISTRATION_TARGET: number
+  DEATH_REGISTRATION_TARGET: number
+}
+
+export async function getApplicationConfig(): Promise<IApplicationConfig> {
+  return fetch(`${CONFIG_API_URL}/getConfig`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+    .then(response => {
+      return response.json()
+    })
+    .catch(error => {
+      return Promise.reject(
+        new Error(`Application config request failed: ${error.message}`)
+      )
+    })
 }

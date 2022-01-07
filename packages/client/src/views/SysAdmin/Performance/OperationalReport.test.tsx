@@ -56,7 +56,7 @@ describe('OperationalReport tests', () => {
         result: {
           data: {
             getEventEstimationMetrics: {
-              birth45DayMetrics: {
+              birthTargetDayMetrics: {
                 actualRegistration: 4,
                 estimatedRegistration: 0,
                 estimatedPercentage: 0,
@@ -64,7 +64,7 @@ describe('OperationalReport tests', () => {
                 femalePercentage: 0,
                 __typename: 'EstimationMetrics'
               },
-              death45DayMetrics: {
+              deathTargetDayMetrics: {
                 actualRegistration: 0,
                 estimatedRegistration: 0,
                 estimatedPercentage: 0,
