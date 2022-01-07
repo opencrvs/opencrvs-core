@@ -80,4 +80,6 @@ jobs:
           wait-on -l tcp:3040
 
       - name: Running the E2E test
-        run: yarn e2e --record false
+        run: |
+          cd opencrvs-zambia
+          yarn e2e --record false
