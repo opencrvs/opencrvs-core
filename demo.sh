@@ -48,6 +48,17 @@ do_version_check() {
    fi
 }
 
+DOCKER_STARTED=0
+
+trap ctrl_c INT
+
+function ctrl_c() {
+  if [ $DOCKER_STARTED == 1 ]; then
+    docker stop $(docker ps -aq)
+  fi
+  exit 1
+}
+
 echo
 echo ":::::::::::::::::::::::::::: INSTALLING OPEN CRVS ::::::::::::::::::::::::::::"
 echo
@@ -214,6 +225,7 @@ echo
 echo ":::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::"
 echo
 yarn compose:deps
+DOCKER_STARTED=1
 echo "wait-on tcp:3447" && wait-on -l tcp:3447
 echo "wait-on http://localhost:9200" && wait-on -l http://localhost:9200
 echo "wait-on tcp:5001" && wait-on -l tcp:5001
