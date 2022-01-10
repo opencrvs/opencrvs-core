@@ -14,6 +14,7 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 interface ICertificateMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   certificateCollectionTitle: MessageDescriptor
+  correctRecordTitle: MessageDescriptor
   addAnotherSignature: MessageDescriptor
   certificateConfirmationTxt: MessageDescriptor
   certificateIsCorrect: MessageDescriptor
@@ -110,6 +111,11 @@ const messagesToDefine: ICertificateMessages = {
     defaultMessage: '{event} Registration after {DOBDiff} of {DOE}',
     description: 'Subheader for receipt on payment on certificate',
     id: 'certificate.receipt.subheader'
+  },
+  correctRecordTitle: {
+    defaultMessage: 'Correct record',
+    description: 'The title of correct certificate action',
+    id: 'correct.certificate.section.title'
   },
   collectPayment: {
     defaultMessage:
