@@ -36,7 +36,7 @@ export type Errors = {
 }
 
 const getValidationErrors = {
-  forField: function(
+  forField: function (
     field: IFormField,
     values: IFormSectionData,
     resources?: IOfflineData,
@@ -75,8 +75,8 @@ const getValidationErrors = {
     }
 
     const validationResults = validators
-      .map(validator => validator(value, drafts, resources))
-      .filter(error => error !== undefined) as IValidationResult[]
+      .map((validator) => validator(value, drafts, resources))
+      .filter((error) => error !== undefined) as IValidationResult[]
 
     return {
       errors: validationResults,
@@ -89,7 +89,7 @@ const getValidationErrors = {
       )
     }
   },
-  forNestedField: function(
+  forNestedField: function (
     field: IFormField,
     values: IFormSectionData,
     resource?: IOfflineData,

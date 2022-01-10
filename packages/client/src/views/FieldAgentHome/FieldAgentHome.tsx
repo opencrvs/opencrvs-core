@@ -320,7 +320,7 @@ class FieldAgentHomeView extends React.Component<
       const rejectedArray =
         registrationSearchSet &&
         registrationSearchSet.operationHistories &&
-        registrationSearchSet.operationHistories.filter(item => {
+        registrationSearchSet.operationHistories.filter((item) => {
           return item && item.operationType === 'REJECTED'
         })
       const daysOfRejection =
@@ -587,14 +587,9 @@ class FieldAgentHomeView extends React.Component<
                 '&sectionId=' +
                 OPERATIONAL_REPORT_SECTION.OPERATIONAL +
                 '&timeStart=' +
-                moment()
-                  .subtract(1, 'years')
-                  .toDate()
-                  .toISOString() +
+                moment().subtract(1, 'years').toDate().toISOString() +
                 '&timeEnd=' +
-                moment()
-                  .toDate()
-                  .toISOString()
+                moment().toDate().toISOString()
             }}
           />
         )}

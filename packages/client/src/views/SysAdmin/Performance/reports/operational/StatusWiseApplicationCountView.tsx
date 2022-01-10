@@ -139,7 +139,7 @@ class StatusWiseApplicationCountViewComponent extends React.Component<
           </Description>
         </StatusHeader>
         {results
-          .filter(item => item && checkExternalValidationStatus(item.status))
+          .filter((item) => item && checkExternalValidationStatus(item.status))
           .map((statusCount, index) => {
             return (
               statusCount && (
@@ -203,9 +203,8 @@ export const StatusWiseApplicationCountView = connect<
     userDetails.role &&
     !SYS_ADMIN_ROLES.includes(userDetails.role)
   ) {
-    const jurisdictionLocation = getJurisdictionLocationIdFromUserDetails(
-      userDetails
-    )
+    const jurisdictionLocation =
+      getJurisdictionLocationIdFromUserDetails(userDetails)
     disableApplicationLink = !isUnderJurisdictionOfUser(
       offlineLocations,
       isOfficeSelected

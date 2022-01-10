@@ -54,15 +54,9 @@ describe('when user is selecting the vital event', () => {
     })
     describe('when selects "Mother"', () => {
       beforeEach(() => {
-        app
-          .find('#select_mother_event')
-          .hostNodes()
-          .simulate('change')
+        app.find('#select_mother_event').hostNodes().simulate('change')
 
-        app
-          .find('#continue')
-          .hostNodes()
-          .simulate('click')
+        app.find('#continue').hostNodes().simulate('click')
       })
       it('takes user to the contact selection view', () => {
         expect(window.location.pathname).toContain(
@@ -73,14 +67,8 @@ describe('when user is selecting the vital event', () => {
 
     describe('when selects "Father"', () => {
       beforeEach(() => {
-        app
-          .find('#select_father_event')
-          .hostNodes()
-          .simulate('change')
-        app
-          .find('#continue')
-          .hostNodes()
-          .simulate('click')
+        app.find('#select_father_event').hostNodes().simulate('change')
+        app.find('#continue').hostNodes().simulate('click')
       })
       it('takses user to the contact selection form', () => {
         expect(window.location.pathname).toContain(
@@ -90,18 +78,12 @@ describe('when user is selecting the vital event', () => {
     })
     describe('when selects "Father"', () => {
       beforeEach(() => {
-        app
-          .find('#continue')
-          .hostNodes()
-          .simulate('click')
+        app.find('#continue').hostNodes().simulate('click')
       })
       it('shows error message', () => {
-        expect(
-          app
-            .find('#error_text')
-            .hostNodes()
-            .text()
-        ).toBe('Please select who is the primary applicant')
+        expect(app.find('#error_text').hostNodes().text()).toBe(
+          'Please select who is the primary applicant'
+        )
       })
     })
   })

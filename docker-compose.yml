@@ -7,7 +7,7 @@
 #
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
-version: "3.3"
+version: '3.3'
 
 services:
   client:
@@ -15,6 +15,13 @@ services:
     build:
       context: .
       dockerfile: ./packages/client/Dockerfile
+    restart: unless-stopped
+
+  components:
+    image: opencrvs/ocrvs-components:${VERSION:-latest}
+    build:
+      context: .
+      dockerfile: ./packages/components/Dockerfile
     restart: unless-stopped
   login:
     image: opencrvs/ocrvs-login:${VERSION:-latest}

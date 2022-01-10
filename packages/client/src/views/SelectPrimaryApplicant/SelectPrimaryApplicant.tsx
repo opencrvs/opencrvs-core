@@ -91,11 +91,8 @@ class SelectPrimaryApplicantView extends React.Component<IFullProps, IState> {
       this.state.applicant === APPLICANT.MOTHER ||
       this.state.applicant === APPLICANT.FATHER
     ) {
-      const {
-        application,
-        goToBirthContactPoint,
-        registrationSection
-      } = this.props
+      const { application, goToBirthContactPoint, registrationSection } =
+        this.props
       this.props.modifyApplication({
         ...application,
         data: {

@@ -27,10 +27,7 @@ describe('when user opens profile menu without user details', () => {
   })
 
   it('open menu', () => {
-    component
-      .find('#ProfileMenuToggleButton')
-      .hostNodes()
-      .simulate('click')
+    component.find('#ProfileMenuToggleButton').hostNodes().simulate('click')
 
     expect(component.find('#ProfileMenuSubMenu').hostNodes()).toHaveLength(1)
   })
@@ -53,19 +50,13 @@ describe('when user opens profile menu with user details', () => {
   })
 
   it('open menu', () => {
-    component
-      .find('#ProfileMenuToggleButton')
-      .hostNodes()
-      .simulate('click')
+    component.find('#ProfileMenuToggleButton').hostNodes().simulate('click')
 
     expect(component.find('#ProfileMenuSubMenu').hostNodes()).toHaveLength(1)
   })
 
   it('handle clicks', () => {
-    component
-      .find('#ProfileMenuToggleButton')
-      .hostNodes()
-      .simulate('click')
+    component.find('#ProfileMenuToggleButton').hostNodes().simulate('click')
 
     // Settings click
     component

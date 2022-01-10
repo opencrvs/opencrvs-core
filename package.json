@@ -46,7 +46,7 @@
     "js-yaml": "^3.13.1",
     "lerna": "^3.18.3",
     "lint-staged": "^7.1.0",
-    "prettier": "^1.15.2"
+    "prettier": "^2.5.1"
   },
   "dependencies": {
     "doctoc": "^1.4.0",

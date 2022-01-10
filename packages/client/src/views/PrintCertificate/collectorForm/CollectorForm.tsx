@@ -156,9 +156,9 @@ const getErrorsOnFieldsBySection = (
 
   return {
     [sectionId]: fields.reduce((fields, field) => {
-      const validationErrors: IValidationResult[] = (errors[
-        field.name as keyof typeof errors
-      ] as IFieldErrors).errors
+      const validationErrors: IValidationResult[] = (
+        errors[field.name as keyof typeof errors] as IFieldErrors
+      ).errors
 
       const value = draft.data[sectionId]
         ? draft.data[sectionId][field.name]
@@ -223,8 +223,9 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
 
     const errors = getErrorsOnFieldsBySection(sectionId, fields, draft)
     const errorValues = Object.values(errors).map(Object.values)
-    const errLength = flatten(errorValues).filter(errs => errs.length > 0)
-      .length
+    const errLength = flatten(errorValues).filter(
+      (errs) => errs.length > 0
+    ).length
 
     const certificates = draft.data.registration.certificates
     const certificate = (certificates && certificates[0]) || {}
@@ -303,7 +304,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
   }
 
   toggleSubmitModalOpen = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       showModalForNoSignedAffidavit: !prevState.showModalForNoSignedAffidavit
     }))
   }
@@ -407,7 +408,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
           )}
           <FormFieldGenerator
             id={formGroup.id}
-            onChange={values => {
+            onChange={(values) => {
               if (values && values.affidavitFile) {
                 this.setState({
                   showError: false
@@ -500,7 +501,7 @@ const mapStateToProps = (
   const event = getEvent(eventType)
 
   const application = state.applicationsState.applications.find(
-    application => application.id === registrationId
+    (application) => application.id === registrationId
   ) as IPrintableApplication | undefined
 
   const formSection = getCollectCertificateForm(event, state)
@@ -556,7 +557,7 @@ const mapStateToProps = (
     }
   }
   const formGroup =
-    clonedFormSection.groups.find(group => group.id === groupId) ||
+    clonedFormSection.groups.find((group) => group.id === groupId) ||
     clonedFormSection.groups[0]
 
   const fields = replaceInitialValues(

@@ -81,21 +81,11 @@ describe('Within45DaysTable tests for over time option', () => {
       component,
       '#month-label'
     )
-    expect(
-      firstRowElement
-        .hostNodes()
-        .childAt(0)
-        .text()
-    ).toBe('April 2020')
+    expect(firstRowElement.hostNodes().childAt(0).text()).toBe('April 2020')
 
     toggleSortActionElement.hostNodes().simulate('click')
 
-    expect(
-      firstRowElement
-        .hostNodes()
-        .childAt(0)
-        .text()
-    ).toBe('March 2020')
+    expect(firstRowElement.hostNodes().childAt(0).text()).toBe('March 2020')
   })
 })
 describe('Within45DaysTable tests for by location option', () => {
@@ -161,20 +151,10 @@ describe('Within45DaysTable tests for by location option', () => {
       component,
       '#location-label'
     )
-    expect(
-      firstRowElement
-        .hostNodes()
-        .childAt(0)
-        .text()
-    ).toBe('Atpara Sadar')
+    expect(firstRowElement.hostNodes().childAt(0).text()).toBe('Atpara Sadar')
 
     toggleSortActionElement.hostNodes().simulate('click')
 
-    expect(
-      firstRowElement
-        .hostNodes()
-        .childAt(0)
-        .text()
-    ).toBe('Baniajan')
+    expect(firstRowElement.hostNodes().childAt(0).text()).toBe('Baniajan')
   })
 })

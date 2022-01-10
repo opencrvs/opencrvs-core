@@ -18,7 +18,8 @@ export async function changePassword(userId: string, password: string) {
 
   const res = await fetch(url, {
     method: 'POST',
-    body: JSON.stringify({ userId, password })
+    body: JSON.stringify({ userId, password }),
+    headers: { 'Content-Type': 'application/json' }
   })
 
   if (res.status !== 200) {

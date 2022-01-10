@@ -18,6 +18,7 @@ build
 # But, keep the .gitignore so the folder is created
 !.secrets/.gitignore
 .idea
+.vim
 data
 grafana
 

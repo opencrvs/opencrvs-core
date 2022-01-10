@@ -20,6 +20,7 @@ export async function sendUserName(mobile: string, username: string) {
     method: 'POST',
     body: JSON.stringify({ msisdn: mobile, username }),
     headers: {
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${await createToken(
         'auth',
         ['service'],

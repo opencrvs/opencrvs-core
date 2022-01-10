@@ -92,7 +92,7 @@ const KeyPercentage = styled.span`
 
 const PerformanceLink = styled(LinkButton)<{ disabled: boolean }>`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
-  ${({ disabled, theme }) =>
+  ${({ disabled }) =>
     disabled
       ? `
     cursor: default;
@@ -222,11 +222,8 @@ class ApplicationsStartedReportComponent extends React.Component<
       isOfficeSelected,
       locationId
     } = this.props
-    const {
-      fieldAgentApplications,
-      hospitalApplications,
-      officeApplications
-    } = data
+    const { fieldAgentApplications, hospitalApplications, officeApplications } =
+      data
     return (
       <>
         <ApplicationsStartedReportHeader isOfficeSelected={isOfficeSelected}>
@@ -344,9 +341,8 @@ export const ApplicationsStartedReport = connect<
       userDetails.role &&
       !SYS_ADMIN_ROLES.includes(userDetails.role)
     ) {
-      const jurisdictionLocation = getJurisdictionLocationIdFromUserDetails(
-        userDetails
-      )
+      const jurisdictionLocation =
+        getJurisdictionLocationIdFromUserDetails(userDetails)
       disableFieldAgentLink = !isUnderJurisdictionOfUser(
         offlineLocations,
         isOfficeSelected

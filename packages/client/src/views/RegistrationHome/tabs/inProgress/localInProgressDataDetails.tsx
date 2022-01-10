@@ -171,7 +171,7 @@ function mapStateToProps(state: IStoreState, props: { eventId: string }) {
       (state.applicationsState.applications &&
         eventId &&
         (state.applicationsState.applications.find(
-          application =>
+          (application) =>
             application.id === eventId &&
             application.submissionStatus ===
               SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]

@@ -137,7 +137,7 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
 
     const answeredQuestions: IDataProps[] = []
     this.props.setupData.securityQuestionAnswers &&
-      this.props.setupData.securityQuestionAnswers.forEach(e => {
+      this.props.setupData.securityQuestionAnswers.forEach((e) => {
         answeredQuestions.push({
           id: `Question_${e.questionKey}`,
           label: intl.formatMessage(userMessages[e.questionKey]),

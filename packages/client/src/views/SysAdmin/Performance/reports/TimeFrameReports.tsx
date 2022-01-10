@@ -44,7 +44,7 @@ class TimeFrameComponent extends React.Component<FullProps> {
   getContent = () => {
     return (
       (this.props.data.details &&
-        this.props.data.details.map(timeFrame => ({
+        this.props.data.details.map((timeFrame) => ({
           location: getLocationFromPartOfLocationId(
             timeFrame.locationId,
             this.props.offlineResources

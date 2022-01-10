@@ -10,8 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import styled from 'styled-components'
-
-import React = require('react')
+import React from 'react'
 import { CircleButton } from '../buttons'
 const ToggleMenuContainer = styled.div`
   position: relative;
@@ -121,14 +120,8 @@ export class ToggleMenu extends React.Component<IProps, IState> {
   }
 
   render() {
-    const {
-      id,
-      toggleButton,
-      menuHeader,
-      menuItems,
-      hasFocusRing,
-      hide
-    } = this.props
+    const { id, toggleButton, menuHeader, menuItems, hasFocusRing, hide } =
+      this.props
     if (hide) {
       return null
     }
@@ -163,7 +156,9 @@ export class ToggleMenu extends React.Component<IProps, IState> {
   }
 }
 
-const Button = styled(props => <CircleButton {...props} />)<ToggleButtonProps>`
+const Button = styled((props) => (
+  <CircleButton {...props} />
+))<ToggleButtonProps>`
   height: 40px;
   width: 40px;
   &:hover {

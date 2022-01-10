@@ -244,7 +244,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
   ) {
     const { locale } = this.props.intl
 
-    return Object.keys(data).map(key => {
+    return Object.keys(data).map((key) => {
       const rec = data[key]
 
       const childNamesMap =
@@ -265,8 +265,10 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
         rec.registration.status[index] &&
         (rec.registration.status[index] as GQLRegWorkflow).user
           ? createNamesMap(
-              ((rec.registration.status[index] as GQLRegWorkflow)
-                .user as GQLUser).name as GQLHumanName[]
+              (
+                (rec.registration.status[index] as GQLRegWorkflow)
+                  .user as GQLUser
+              ).name as GQLHumanName[]
             )
           : {}
 
@@ -357,13 +359,13 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
       }
     })
   }
-  toggleRejectModal = (id: string = '') => {
+  toggleRejectModal = (id = '') => {
     this.setState((prevState: IState) => ({
       selectedCompositionID: id,
       showRejectModal: !prevState.showRejectModal
     }))
   }
-  toggleNotDuplicateModal = (id: string = '') => {
+  toggleNotDuplicateModal = (id = '') => {
     this.setState((prevState: IState) => ({
       selectedCompositionID: id,
       showNotDuplicateModal: !prevState.showNotDuplicateModal

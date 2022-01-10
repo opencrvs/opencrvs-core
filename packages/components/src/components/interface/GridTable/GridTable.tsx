@@ -16,8 +16,8 @@ import { ListItemAction } from '../../buttons'
 import { grid } from '../../grid'
 import { Box } from '../../interface'
 import { IAction, IColumn, IDynamicValues, IActionObject } from './types'
-export { IAction } from './types'
 import { LoadMore } from './LoadMore'
+export { IAction } from './types'
 
 const Wrapper = styled.div`
   width: 100%;
@@ -173,7 +173,7 @@ export class GridTable extends React.Component<
           <ListItemAction
             actions={actions}
             expanded={
-              this.state.expanded.findIndex(id => id === itemId) >= 0 || false
+              this.state.expanded.findIndex((id) => id === itemId) >= 0 || false
             }
             alignment={alignment}
             arrowExpansion={true}
@@ -197,11 +197,11 @@ export class GridTable extends React.Component<
     }
     const toggledExpandedList = [] as string[]
     const { expanded } = this.state
-    const index = expanded.findIndex(id => id === itemId)
+    const index = expanded.findIndex((id) => id === itemId)
     if (index < 0) {
       toggledExpandedList.push(itemId)
     }
-    expanded.forEach(id => {
+    expanded.forEach((id) => {
       if (itemId !== id) {
         toggledExpandedList.push(id)
       }
@@ -210,7 +210,7 @@ export class GridTable extends React.Component<
   }
 
   showExpandedSection = (itemId: string) => {
-    return this.state.expanded.findIndex(id => id === itemId) >= 0
+    return this.state.expanded.findIndex((id) => id === itemId) >= 0
   }
 
   getDisplayItems = (

@@ -340,7 +340,7 @@ class DuplicateDetailsClass extends React.Component<
                     <b>{intl.formatMessage(constantsMessages.reason)}:</b>{' '}
                     {status.reasons
                       .split(',')
-                      .map(reason =>
+                      .map((reason) =>
                         intl.formatMessage(
                           getRejectionReasonDisplayValue(reason)
                         )

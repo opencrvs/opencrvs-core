@@ -282,7 +282,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
                   </Label>
                   <FullWidthInput
                     id={`answer-${index}`}
-                    onChange={answer => this.onAnswerChange(answer, index)}
+                    onChange={(answer) => this.onAnswerChange(answer, index)}
                     value={this.state.questionnaire[index].answer}
                     error={
                       this.state.showError &&

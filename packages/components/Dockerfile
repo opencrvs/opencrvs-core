@@ -27,4 +27,4 @@ ENV REACT_APP_LANGUAGE='en'
 EXPOSE 6060
 WORKDIR /usr/src/app/packages/components
 
-CMD ["sh","-c","yarn build && yarn start"]
+CMD ["sh","-c","yarn start"]

@@ -342,8 +342,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
                 certificates: null,
                 status: [
                   {
-                    id:
-                      '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
+                    id: '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
                     timestamp: '2019-04-03T07:08:24.936Z',
                     user: {
                       id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
@@ -501,7 +500,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 200)
     })
     testComponent.component.update()
@@ -509,7 +508,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
 
     instance.toggleExpanded('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
@@ -760,7 +759,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
         testComponent.find('#action-loading-ListItemAction-0').hostNodes()
       ).toHaveLength(1)
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.update()
@@ -771,7 +770,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
       )
       action.hostNodes().simulate('click')
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.update()
@@ -894,7 +893,7 @@ describe('Tablet tests', () => {
     const element = await waitForElement(testComponent.component, '#row_0')
     element.hostNodes().simulate('click')
 
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     testComponent.component.update()

@@ -75,17 +75,20 @@ export type HideUserAuditSuccessToast = {
   type: typeof HIDE_USER_AUDIT_SUCCESS_TOAST
 }
 
-export const showConfigurationErrorNotification = (): ShowConfigurationErrorAction => ({
-  type: SHOW_CONFIG_ERROR
-})
+export const showConfigurationErrorNotification =
+  (): ShowConfigurationErrorAction => ({
+    type: SHOW_CONFIG_ERROR
+  })
 
-export const hideConfigurationErrorNotification = (): HideConfigurationErrorAction => ({
-  type: HIDE_CONFIG_ERROR
-})
+export const hideConfigurationErrorNotification =
+  (): HideConfigurationErrorAction => ({
+    type: HIDE_CONFIG_ERROR
+  })
 
-export const toggleDraftSavedNotification = (): toggleDraftSavedNotificationAction => ({
-  type: TOGGLE_DRAFT_SAVED_NOTIFICATION
-})
+export const toggleDraftSavedNotification =
+  (): toggleDraftSavedNotificationAction => ({
+    type: TOGGLE_DRAFT_SAVED_NOTIFICATION
+  })
 
 export type ShowBackgroundSyncedAction = {
   type: typeof SHOW_BACKGROUND_SYNC_TRIGGERED
@@ -99,13 +102,15 @@ export type SessionExpiredAction = {
   type: typeof SESSION_EXPIRED
 }
 
-export const showBackgroundSyncedNotification = (): ShowBackgroundSyncedAction => ({
-  type: SHOW_BACKGROUND_SYNC_TRIGGERED
-})
+export const showBackgroundSyncedNotification =
+  (): ShowBackgroundSyncedAction => ({
+    type: SHOW_BACKGROUND_SYNC_TRIGGERED
+  })
 
-export const hideBackgroundSyncedNotification = (): HideBackgroundSyncedAction => ({
-  type: HIDE_BACKGROUND_SYNC_TRIGGERED
-})
+export const hideBackgroundSyncedNotification =
+  (): HideBackgroundSyncedAction => ({
+    type: HIDE_BACKGROUND_SYNC_TRIGGERED
+  })
 
 export const showSessionExpireConfirmation = (): SessionExpiredAction => ({
   type: SESSION_EXPIRED

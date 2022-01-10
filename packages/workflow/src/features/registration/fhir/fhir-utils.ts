@@ -24,7 +24,7 @@ import {
   findPersonEntry,
   getSectionEntryBySectionCode
 } from '@workflow/features/registration/fhir/fhir-template'
-import { ITokenPayload, USER_SCOPE } from '@workflow/utils/authUtils.ts'
+import { ITokenPayload, USER_SCOPE } from '@workflow/utils/authUtils'
 import fetch from 'node-fetch'
 import { getEventType } from '@workflow/features/registration/utils'
 
