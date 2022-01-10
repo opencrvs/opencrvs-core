@@ -27,12 +27,11 @@
   "scripts": {
     "precommit": "lint-staged",
     "clean": "rimraf lib",
-    "start": "concurrently 'start-storybook --quiet -p 6006' 'tsc -w'",
-    "postinstall": "patch-package && yarn build",
+    "start": "concurrently 'start-storybook --quiet -p 6060' 'tsc -w'",
     "build": "yarn clean && tsc",
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
     "build:clean": "rm -rf lib",
-    "storybook": "start-storybook -p 6006 -s public",
+    "storybook": "start-storybook -p 6060 -s public",
     "build-storybook": "build-storybook -s public"
   },
   "lint-staged": {
