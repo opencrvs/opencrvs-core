@@ -180,7 +180,7 @@
                 "messageDescriptor": {
                   "defaultMessage": "{event} registratin after 45 days of date of event",
                   "description": "Label for 45 day+ service of event",
-                  "id": "certificate.receipt.service.Targetday"
+                  "id": "certificate.receipt.service.targetDay"
                 },
                 "messageValues": {
                   "event": "event"
@@ -234,7 +234,7 @@
                 "messageDescriptor": {
                   "defaultMessage": "\u09F3 25",
                   "description": "Amount for 45 day+ service of event",
-                  "id": "certificate.receipt.service.Targetday.amount"
+                  "id": "certificate.receipt.service.targetDay.amount"
                 }
               }
             },
