@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { RadioSize } from '@client/../../components/lib/forms'
+import { RadioSize } from '@opencrvs/components/lib/forms'
 import {
   CertificateSection,
   IFormSection,
