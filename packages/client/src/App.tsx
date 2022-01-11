@@ -61,6 +61,7 @@ import { ApolloProvider } from 'react-apollo'
 import { Provider } from 'react-redux'
 import { Switch } from 'react-router'
 import { AppStore } from './store'
+import { VerifyCorrector } from './views/CorrectRecord/VerifyCorrector'
 import { ConfigHome } from './views/SysAdmin/Config/ConfigHome'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 
