@@ -1,5 +1,3 @@
-import SingleValue from 'react-select/lib/components/SingleValue'
-
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -42,7 +40,13 @@ export const colorDictionary = {
   silverSand: '#C1C7C9',
   swansDown: '#D3EEE4',
   fountainBlue: '#4CC1BA',
-  ronchi: '#EDC55E'
+  ronchi: '#EDC55E',
+  grey: '#292F33',
+  greyLight: '#727578',
+  greySelected: '#F1F2F3',
+  greyHover: '#F8F8F8',
+  indigo: '#4972BB',
+  borderBottom: '#d8dbde'
 }
 
 export const gradients = {
@@ -78,7 +82,13 @@ export const colors = {
   successHover: colorDictionary.greenPeaPeaDark,
   white: colorDictionary.white,
   black: colorDictionary.black,
+  indigo: colorDictionary.indigo,
   focus: colorDictionary.yellowFocus,
+  grey: colorDictionary.grey,
+  greyLight: colorDictionary.greyLight,
+  greySelected: colorDictionary.greySelected,
+  greyHover: colorDictionary.greyHover,
+  borderBottom: colorDictionary.borderBottom,
 
   // Exceptions - Try to use one of the above before creating exceptions
   chartAreaGradientStart: colorDictionary.greySmoky,
