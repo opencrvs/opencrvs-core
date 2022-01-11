@@ -59,6 +59,10 @@ import {
 import * as Sentry from '@sentry/browser'
 import createSentryMiddleware from 'redux-sentry-middleware'
 import { userFormReducer, IUserFormState } from '@client/user/userReducer'
+import {
+  correctRecordReducer,
+  IRecordCorrectionFormState
+} from './forms/certificate/recordCorrectionReducer'
 
 export interface IStoreState {
   profile: ProfileState
@@ -74,6 +78,7 @@ export interface IStoreState {
   offline: IOfflineDataState
   userForm: IUserFormState
   workqueueState: WorkqueueState
+  correctRecordForm: IRecordCorrectionFormState
 }
 
 const enhancedCreateStore = createReduxStore as StoreCreator
@@ -97,7 +102,8 @@ export const createStore = (): { store: AppStore; history: History } => {
     printCertificateForm: printReducer,
     offline: offlineDataReducer,
     userForm: userFormReducer,
-    workqueueState: registrarWorkqueueReducer
+    workqueueState: registrarWorkqueueReducer,
+    correctRecordForm: correctRecordReducer
   })
   const enhancer = compose(
     install(config),

@@ -40,6 +40,11 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
 import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
 import { checkExternalValidationStatus } from '@client/views/SysAdmin/Team/utils'
+import {
+  ICON_ALIGNMENT,
+  TertiaryButton
+} from '@opencrvs/components/lib/buttons'
+import { goToCorrectCertificate } from '@client/navigation'
 
 const ExpansionContent = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -89,6 +94,45 @@ const ValueContainer = styled.div`
     padding-right: 10px;
   }
 `
+const RecordCorrectionButton = styled(TertiaryButton)`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 4px 8px;
+  position: relative;
+  width: 136px;
+  height: 29px;
+  border-radius: 4px;
+`
+const RecordCorrectionText = styled.div`
+  position: static;
+  height: 21px;
+  top: 29px;
+  right: 8px;
+  color: '#4972bb';
+  font-style: normal;
+  ${({ theme }) => theme.fonts.subtitleStyle};
+  display: inline-flex;
+  flex-direction: column;
+  align-items: baseline;
+  text-align: center;
+  font-feature-settings: 'pnum' on, 'lnum' on;
+  white-space: noWrap;
+`
+
+const EditIcon = styled.div`
+  position: static;
+  width: 16px;
+  height: 16px;
+  left: 8px;
+  top: 6.5px;
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+  margin: 0px 5px;
+`
+
 const HistoryWrapper = styled.div`
   margin: 24px;
 `
@@ -161,6 +205,8 @@ function formatRoleCode(str: string) {
 type IProps = IntlShapeProps & {
   theme: ITheme
   eventDetails?: GQLEventSearchSet | null
+  isPrintTab?: boolean
+  goToCorrectCertificate?: typeof goToCorrectCertificate
 }
 
 type ISODateString = string
@@ -400,6 +446,34 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                         <ValuesWithSeparator
                           strings={this.getValueSepartorsProp(operationHistory)}
                         />
+                        {this.props.isPrintTab && (
+                          <RecordCorrectionButton
+                            align={ICON_ALIGNMENT.LEFT}
+                            onClick={() => alert(transformedData.trackingId)}
+                            icon={() => (
+                              <EditIcon>
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-6 w-6"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                  />
+                                </svg>
+                              </EditIcon>
+                            )}
+                          >
+                            <RecordCorrectionText>
+                              Correct record
+                            </RecordCorrectionText>
+                          </RecordCorrectionButton>
+                        )}
                       </ValueContainer>
                       {rejectReasons && (
                         <>

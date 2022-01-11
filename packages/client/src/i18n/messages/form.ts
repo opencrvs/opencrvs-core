@@ -362,6 +362,12 @@ interface IFormMessages
   nationalIdOption: MessageDescriptor
   brnOption: MessageDescriptor
   helperTextNID: MessageDescriptor
+  motherWithName: MessageDescriptor
+  fatherWithName: MessageDescriptor
+  childWithName: MessageDescriptor
+  meWithRole: MessageDescriptor
+  anotherRegOrFieldAgent: MessageDescriptor
+  informantWithName: MessageDescriptor
 }
 
 const messagesToDefine: IFormMessages = {
@@ -2141,6 +2147,37 @@ const messagesToDefine: IFormMessages = {
       'If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000. If the National ID number is 10 digits long ID, please use an older ID.',
     description: 'Helper text for nid input field',
     id: 'form.field.helpertext.nid'
+  },
+  motherWithName: {
+    id: 'form.field.label.certificateCorrector.motherWithName',
+    defaultMessage: '{motherName} (Mother)',
+    description: 'Label for mother option in certificate correction form'
+  },
+  fatherWithName: {
+    id: 'form.field.label.certificateCorrector.fatherWithName',
+    defaultMessage: '{fatherName} (Father)',
+    description: 'Label for father option in certificate correction form'
+  },
+  childWithName: {
+    id: 'form.field.label.certificateCorrector.childWithName',
+    defaultMessage: '{childName} (Child)',
+    description: 'Label for child option in certificate correction form'
+  },
+  meWithRole: {
+    id: 'form.field.label.certificateCorrector.meWithRole',
+    defaultMessage: 'Me (Registrar)',
+    description: 'Label for registrar option in certificate correction form'
+  },
+  anotherRegOrFieldAgent: {
+    id: 'form.field.label.certificateCorrector.anotherRegOrFieldAgent',
+    defaultMessage: 'Another registration agent or field agent',
+    description:
+      'Label for another registration or field agent option in certificate correction form'
+  },
+  informantWithName: {
+    id: 'form.field.label.certificateCorrector.anotherRegOrFieldAgent',
+    defaultMessage: '{informantName} Informant',
+    description: 'Label for informant option in certificate correction form'
   }
 }
 

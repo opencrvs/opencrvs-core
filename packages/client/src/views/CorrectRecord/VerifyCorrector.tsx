@@ -137,7 +137,7 @@ class VerifyVerifyCorrectorComponent extends React.Component<IFullProps> {
     const { intl } = this.props
     const correctorInfo = this.getGenericCorrectorInfo(corrector)
     const hasNoInfo = Object.values(correctorInfo).every(
-      property => property === null || property === undefined
+      (property) => property === null || property === undefined
     )
 
     return (
@@ -193,7 +193,7 @@ const mapStateToProps = (
   const { registrationId } = ownProps.match.params
 
   const application = state.applicationsState.applications.find(
-    draft => draft.id === registrationId
+    (draft) => draft.id === registrationId
   ) as IPrintableApplication
 
   return {

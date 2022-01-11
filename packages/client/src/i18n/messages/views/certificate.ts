@@ -79,6 +79,8 @@ interface ICertificateMessages
   noAffidavitModalTitle: MessageDescriptor
   noAffidavitModalDescription: MessageDescriptor
   signedAffidavitFileLabel: MessageDescriptor
+  whoToRequestCertificateCorrection: MessageDescriptor
+  certificateCorrectionTitle: MessageDescriptor
 }
 
 const messagesToDefine: ICertificateMessages = {
@@ -434,6 +436,16 @@ const messagesToDefine: ICertificateMessages = {
     defaultMessage: 'Signed affidavit',
     description: 'File label for signed affidavit',
     id: 'print.cert.coll.other.aff.label'
+  },
+  whoToRequestCertificateCorrection: {
+    id: 'print.certificate.corrector.whoToRequestCertificateCorrection',
+    defaultMessage: 'Who is requesting a change to this record?',
+    description: 'The label for corrector of certificate select'
+  },
+  certificateCorrectionTitle: {
+    id: 'certificate.certificateCorrectionTitle',
+    defaultMessage: 'Correct record',
+    description: 'Certificate correction title '
   }
 }
 

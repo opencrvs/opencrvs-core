@@ -48,6 +48,9 @@ export const CERTIFICATE_COLLECTOR =
   '/cert/collector/:registrationId/:eventType/:groupId'
 export const VERIFY_COLLECTOR =
   '/print/check/:registrationId/:eventType/:collector'
+export const CERTIFICATE_CORRECTION =
+  '/cert/correction/:registrationId/:eventType/:groupId'
+
 export const VERIFY_CORRECTOR =
   '/correctRecord/check/:registrationId/:eventType/:corrector'
 export const REVIEW_CERTIFICATE = '/review/:registrationId/:eventType'
