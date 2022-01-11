@@ -19,85 +19,86 @@ import {
 import { cloneDeep } from 'lodash'
 import { transformCertificateData } from '@client/forms/register/fieldMappings/birth/mutation/registration-mappings'
 
-export const fieldToDeceasedDateTransformation = (
-  alternativeSectionId?: string,
-  nestedTransformer?: IFormFieldMutationMapFunction
-) => (
-  transformedData: TransformedData,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) => {
-  if (!draftData[sectionId] || !draftData[sectionId][field.name]) {
+export const fieldToDeceasedDateTransformation =
+  (
+    alternativeSectionId?: string,
+    nestedTransformer?: IFormFieldMutationMapFunction
+  ) =>
+  (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    if (!draftData[sectionId] || !draftData[sectionId][field.name]) {
+      return transformedData
+    }
+
+    let fieldValue = draftData[sectionId][field.name]
+
+    if (nestedTransformer) {
+      const clonedTransformedData = cloneDeep(transformedData)
+      nestedTransformer(clonedTransformedData, draftData, sectionId, field)
+      fieldValue = clonedTransformedData[sectionId][field.name]
+    }
+
+    transformedData[
+      alternativeSectionId ? alternativeSectionId : sectionId
+    ].deceased = {
+      deceased: true,
+      deathDate: fieldValue
+    }
     return transformedData
   }
 
-  let fieldValue = draftData[sectionId][field.name]
+export const deathEventLocationMutationTransformer =
+  (lineNumber = 0, transformedFieldName?: string) =>
+  (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    if (!transformedData.eventLocation.address) {
+      transformedData.eventLocation = {
+        ...transformedData.eventLocation,
+        address: {
+          country: '',
+          state: '',
+          district: '',
+          postalCode: '',
+          line: ['', '', '', '', '', '']
+        }
+      } as fhir.Location
+    }
 
-  if (nestedTransformer) {
-    const clonedTransformedData = cloneDeep(transformedData)
-    nestedTransformer(clonedTransformedData, draftData, sectionId, field)
-    fieldValue = clonedTransformedData[sectionId][field.name]
-  }
+    if (lineNumber > 0) {
+      transformedData.eventLocation.address.line[lineNumber - 1] = `${
+        draftData[sectionId][field.name]
+      }`
+    } else if (field.name === 'deathLocation') {
+      transformedData.eventLocation._fhirID = `${
+        draftData[sectionId][field.name]
+      }`
+      delete transformedData.eventLocation.address
+      delete transformedData.eventLocation.type
+    } else if (transformedFieldName) {
+      transformedData.eventLocation.address[transformedFieldName] = `${
+        draftData[sectionId][field.name]
+      }`
+    } else {
+      transformedData.eventLocation.address[field.name] = `${
+        draftData[sectionId][field.name]
+      }`
+    }
+    if (field.name === 'addressLine4') {
+      transformedData.eventLocation.partOf = `Location/${
+        draftData[sectionId][field.name]
+      }`
+    }
 
-  transformedData[
-    alternativeSectionId ? alternativeSectionId : sectionId
-  ].deceased = {
-    deceased: true,
-    deathDate: fieldValue
+    return transformedData
   }
-  return transformedData
-}
-
-export const deathEventLocationMutationTransformer = (
-  lineNumber: number = 0,
-  transformedFieldName?: string
-) => (
-  transformedData: TransformedData,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) => {
-  if (!transformedData.eventLocation.address) {
-    transformedData.eventLocation = {
-      ...transformedData.eventLocation,
-      address: {
-        country: '',
-        state: '',
-        district: '',
-        postalCode: '',
-        line: ['', '', '', '', '', '']
-      }
-    } as fhir.Location
-  }
-
-  if (lineNumber > 0) {
-    transformedData.eventLocation.address.line[lineNumber - 1] = `${
-      draftData[sectionId][field.name]
-    }`
-  } else if (field.name === 'deathLocation') {
-    transformedData.eventLocation._fhirID = `${
-      draftData[sectionId][field.name]
-    }`
-    delete transformedData.eventLocation.address
-    delete transformedData.eventLocation.type
-  } else if (transformedFieldName) {
-    transformedData.eventLocation.address[transformedFieldName] = `${
-      draftData[sectionId][field.name]
-    }`
-  } else {
-    transformedData.eventLocation.address[field.name] = `${
-      draftData[sectionId][field.name]
-    }`
-  }
-  if (field.name === 'addressLine4') {
-    transformedData.eventLocation.partOf = `Location/${
-      draftData[sectionId][field.name]
-    }`
-  }
-
-  return transformedData
-}
 
 export function setDeathRegistrationSectionTransformer(
   transformedData: TransformedData,

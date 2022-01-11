@@ -56,8 +56,8 @@ class StyledErrorBoundaryComponent extends React.Component<IFullProps> {
   componentDidCatch(error: Error, errorInfo: IErrorInfo) {
     this.setState({ error, authError: error.message === '401' })
 
-    Sentry.withScope(scope => {
-      Object.keys(errorInfo).forEach(key => {
+    Sentry.withScope((scope) => {
+      Object.keys(errorInfo).forEach((key) => {
         scope.setExtra(key, errorInfo[key])
       })
       Sentry.captureException(error)

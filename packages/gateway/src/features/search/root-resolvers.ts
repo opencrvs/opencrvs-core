@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { ApiResponse } from '@elastic/elasticsearch'
-import { postSearch, fetchFHIR } from '@gateway/features/fhir/utils'
+import { postSearch } from '@gateway/features/fhir/utils'
 import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import { hasScope, inScope } from '@gateway/features/user/utils'
 import { GQLResolver } from '@gateway/graphql/schema'
@@ -137,7 +137,7 @@ export const resolvers: GQLResolver = {
     },
     async getEventsWithProgress(
       _,
-      { parentLocationId, count, skip, sort = 'desc', status, type },
+      { locationId, count, skip, sort = 'desc', status, type },
       authHeader
     ) {
       if (!inScope(authHeader, ['sysadmin', 'register', 'validate'])) {
@@ -149,25 +149,9 @@ export const resolvers: GQLResolver = {
       }
 
       const searchCriteria: ISearchCriteria = {
+        applicationLocationHirarchyId: locationId,
         sort
       }
-
-      const bundle = await fetchFHIR(
-        `/Location?partof=${parentLocationId}&type=CRVS_OFFICE`,
-        authHeader
-      )
-
-      const locationIds = bundle.entry.map(
-        (entry: { resource: { id: string } }) => entry.resource.id
-      )
-
-      if (!locationIds || locationIds.length <= 0 || locationIds.includes('')) {
-        return {
-          totalItems: 0,
-          results: []
-        }
-      }
-      searchCriteria.applicationLocationId = locationIds.join(',')
 
       if (count) {
         searchCriteria.size = count
@@ -191,11 +175,13 @@ export const resolvers: GQLResolver = {
       return {
         totalItems:
           (searchResult &&
+            searchResult.body &&
             searchResult.body.hits &&
             searchResult.body.hits.total) ||
           0,
         results:
           (searchResult &&
+            searchResult.body &&
             searchResult.body.hits &&
             searchResult.body.hits.hits) ||
           []

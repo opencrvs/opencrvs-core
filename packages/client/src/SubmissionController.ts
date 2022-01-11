@@ -56,7 +56,8 @@ const INPROGRESS_STATUS = [
 const changeStatus = {
   [SUBMISSION_STATUS.SUBMITTING.toString()]: SUBMISSION_STATUS.READY_TO_SUBMIT,
   [SUBMISSION_STATUS.APPROVING.toString()]: SUBMISSION_STATUS.READY_TO_APPROVE,
-  [SUBMISSION_STATUS.REGISTERING.toString()]: SUBMISSION_STATUS.READY_TO_REGISTER,
+  [SUBMISSION_STATUS.REGISTERING.toString()]:
+    SUBMISSION_STATUS.READY_TO_REGISTER,
   [SUBMISSION_STATUS.REJECTING.toString()]: SUBMISSION_STATUS.READY_TO_REJECT,
   [SUBMISSION_STATUS.CERTIFYING.toString()]: SUBMISSION_STATUS.READY_TO_CERTIFY
 }
@@ -92,8 +93,8 @@ export class SubmissionController {
   public client: ApolloClient<{}> & {
     setRequestHandler: (query: DocumentNode, handler: RequestHandler) => void // used for mocking in tests
   }
-  public syncRunning: boolean = false
-  private syncCount: number = 0
+  public syncRunning = false
+  private syncCount = 0
 
   constructor(store: AppStore) {
     this.store = store
@@ -215,7 +216,7 @@ export class SubmissionController {
       SUCCESS_SUBMISSION_STATUS[application.action || ''] ||
       SUBMISSION_STATUS.SUBMITTED
     application.submissionStatus = submissionStatus
-    let response =
+    const response =
       (result && result.data && result.data.createBirthRegistration) ||
       (result && result.data && result.data.createDeathRegistration) ||
       null

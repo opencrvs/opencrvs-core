@@ -36,15 +36,9 @@ describe('when user is selecting the vital event', () => {
     })
     describe('when selects "Birth"', () => {
       beforeEach(() => {
-        app
-          .find('#select_birth_event')
-          .hostNodes()
-          .simulate('change')
+        app.find('#select_birth_event').hostNodes().simulate('change')
 
-        app
-          .find('#continue')
-          .hostNodes()
-          .simulate('click')
+        app.find('#continue').hostNodes().simulate('click')
       })
       it('takes user to the event info view', () => {
         expect(app.find('#birth-info-container').hostNodes()).toHaveLength(1)
@@ -53,14 +47,8 @@ describe('when user is selecting the vital event', () => {
 
     describe('when selects "Death"', () => {
       beforeEach(() => {
-        app
-          .find('#select_death_event')
-          .hostNodes()
-          .simulate('change')
-        app
-          .find('#continue')
-          .hostNodes()
-          .simulate('click')
+        app.find('#select_death_event').hostNodes().simulate('change')
+        app.find('#continue').hostNodes().simulate('click')
       })
       it('takses user to the death registration form', () => {
         expect(history.location.pathname).toContain('events/death')
@@ -69,10 +57,7 @@ describe('when user is selecting the vital event', () => {
 
     describe('when no event is selected', () => {
       beforeEach(() => {
-        app
-          .find('#continue')
-          .hostNodes()
-          .simulate('click')
+        app.find('#continue').hostNodes().simulate('click')
       })
       it('shows the required error to user', () => {
         expect(app.find('#require-error').hostNodes().length).toBe(1)
@@ -81,10 +66,7 @@ describe('when user is selecting the vital event', () => {
 
     describe('when clicked on cross button', () => {
       beforeEach(async () => {
-        app
-          .find('#crcl-btn')
-          .hostNodes()
-          .simulate('click')
+        app.find('#crcl-btn').hostNodes().simulate('click')
         await flushPromises()
         app.update()
       })

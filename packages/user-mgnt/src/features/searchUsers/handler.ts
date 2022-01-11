@@ -90,6 +90,6 @@ export const searchSchema = Joi.object({
     .min(0)
     .required(),
   sortOrder: Joi.string()
-    .only(['asc', 'desc'])
+    .valid('asc', 'desc')
     .required()
 })

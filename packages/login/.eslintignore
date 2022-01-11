@@ -1,3 +1,4 @@
 craco.config.js
+src/setupTests.ts
 # dependencies
 /node_modules

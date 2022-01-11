@@ -103,7 +103,8 @@ export function getUserDetails(user: GQLUser): IUserDetails {
     const potentialCatchmentAreas = areaWithLocations.map(
       (cArea: GQLLocation) => {
         if (cArea.identifier) {
-          const identifiers: GQLIdentifier[] = cArea.identifier as GQLIdentifier[]
+          const identifiers: GQLIdentifier[] =
+            cArea.identifier as GQLIdentifier[]
           return {
             id: cArea.id,
             name: cArea.name,

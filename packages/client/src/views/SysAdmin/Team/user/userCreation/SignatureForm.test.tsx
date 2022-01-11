@@ -70,21 +70,18 @@ describe('signature upload tests', () => {
     })
 
     it('show the signature form page', async () => {
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.update()
 
-      const title = testComponent
-        .find('#form-title')
-        .hostNodes()
-        .text()
+      const title = testComponent.find('#form-title').hostNodes().text()
 
       expect(title).toBe('Attach the signature')
     })
 
     it('No error while uploading if valid file', async () => {
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.update()
@@ -109,7 +106,7 @@ describe('signature upload tests', () => {
     })
 
     it('return if not file', async () => {
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.update()
@@ -164,19 +161,13 @@ describe('signature upload tests', () => {
     })
 
     it('renders review header', () => {
-      expect(
-        testComponent
-          .find('#preview_title')
-          .hostNodes()
-          .text()
-      ).toBe('Please review the new users details')
+      expect(testComponent.find('#preview_title').hostNodes().text()).toBe(
+        'Please review the new users details'
+      )
     })
 
     it('clicking submit button submits the form data', async () => {
-      testComponent
-        .find('#submit_user_form')
-        .hostNodes()
-        .simulate('click')
+      testComponent.find('#submit_user_form').hostNodes().simulate('click')
 
       await flushPromises()
 

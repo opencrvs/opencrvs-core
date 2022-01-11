@@ -70,7 +70,7 @@ export const validateScopeToken = jwt.sign(
 )
 
 export function flushPromises() {
-  return new Promise(resolve => setImmediate(resolve))
+  return new Promise((resolve) => setImmediate(resolve))
 }
 export const assign = window.location.assign as jest.Mock
 export const getItem = window.localStorage.getItem as jest.Mock
@@ -83,12 +83,12 @@ function createGraphQLClient() {
 
   return new ApolloClient({
     cache: new InMemoryCache(),
-    link: new ApolloLink(operation => {
-      return new Observable(observer => {
+    link: new ApolloLink((operation) => {
+      return new Observable((observer) => {
         const { query, operationName, variables } = operation
 
         graphql(schema, print(query), null, null, variables, operationName)
-          .then(result => {
+          .then((result) => {
             observer.next(result)
             observer.complete()
           })
@@ -134,7 +134,7 @@ export function createShallowRenderedComponent(
   return shallow(node)
 }
 
-export const wait = () => new Promise(res => process.nextTick(res))
+export const wait = () => new Promise((res) => process.nextTick(res))
 
 export const resizeWindow = (width: number, height: number) => {
   const resizeEvent = document.createEvent('Event')
@@ -159,14 +159,8 @@ export const selectOption = (
 ): ReactWrapper => {
   const input = wrapper.find(selector).hostNodes()
 
-  input
-    .find('input')
-    .simulate('focus')
-    .update()
-  input
-    .find('.react-select__control')
-    .simulate('mousedown')
-    .update()
+  input.find('input').simulate('focus').update()
+  input.find('.react-select__control').simulate('mousedown').update()
   input
     .update()
     .find('.react-select__option')
@@ -2695,6 +2689,24 @@ export const mockOfflineData = {
       partOf: 'Location/8f1aae72-2f90-4585-b853-e8c37f4be764',
       physicalType: 'Jurisdiction',
       type: 'ADMIN_STRUCTURE'
+    },
+    '473ed705-13e8-4ec1-9836-69bc269f7fad': {
+      alias: '',
+      id: '473ed705-13e8-4ec1-9836-69bc269f7fad',
+      jurisdictionType: 'STATE',
+      name: 'Lusaka',
+      partOf: 'Location/0',
+      physicalType: 'Jurisdiction',
+      type: 'ADMIN_STRUCTURE'
+    },
+    '81317429-1d89-42ac-8abc-7a92f268273c': {
+      alias: '',
+      id: '81317429-1d89-42ac-8abc-7a92f268273c',
+      jurisdictionType: 'DISTRICT',
+      name: 'Lusaka',
+      partOf: 'Location/473ed705-13e8-4ec1-9836-69bc269f7fad',
+      physicalType: 'Jurisdiction',
+      type: 'ADMIN_STRUCTURE'
     }
   },
   pilotLocations: {
@@ -2952,10 +2964,7 @@ export const getFileFromBase64String = (
 
 export async function goToSection(component: ReactWrapper, nth: number) {
   for (let i = 0; i < nth; i++) {
-    component
-      .find('#next_section')
-      .hostNodes()
-      .simulate('click')
+    component.find('#next_section').hostNodes().simulate('click')
 
     await flushPromises()
     component.update()
@@ -3001,10 +3010,7 @@ export async function getReviewFormFromStore(
 }
 
 export async function setPinCode(component: ReactWrapper) {
-  component
-    .find('#createPinBtn')
-    .hostNodes()
-    .simulate('click')
+  component.find('#createPinBtn').hostNodes().simulate('click')
 
   for (let i = 1; i <= 8; i++) {
     component

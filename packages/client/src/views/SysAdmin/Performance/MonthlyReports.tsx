@@ -55,8 +55,8 @@ function downloadAllData() {
       Authorization: `Bearer ${getToken()}`
     }
   })
-    .then(resp => resp.blob())
-    .then(blob => {
+    .then((resp) => resp.blob())
+    .then((blob) => {
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
@@ -85,7 +85,7 @@ class MonthlyReportsComponent extends React.Component<Props, IState> {
   }
   getContent(eventType: Event) {
     moment.locale(this.props.intl.locale)
-    let content = []
+    const content = []
 
     const currentYear = moment().year()
     let currentMonth = 1
@@ -120,7 +120,9 @@ class MonthlyReportsComponent extends React.Component<Props, IState> {
     return content
   }
 
-  pushStateToTheCurrentRoute = (state: object) => {
+  pushStateToTheCurrentRoute = (state: {
+    selectedLocation: ISearchLocation
+  }) => {
     const {
       push,
       location: { pathname: currentRoute }
@@ -149,7 +151,7 @@ class MonthlyReportsComponent extends React.Component<Props, IState> {
 
         <LocationSearch
           selectedLocation={this.state.selectedLocation}
-          locationList={generateLocations(offlineResources.locations)}
+          locationList={generateLocations(offlineResources.locations, intl)}
           searchHandler={this.onClickSearchResult}
         />
 

@@ -36,8 +36,8 @@ const config: { [key: string]: moment.LocaleSpecification } = {
 
 export const formatLongDate = (
   date: string,
-  locale: string = 'en',
-  formatString: string = 'LL'
+  locale = 'en',
+  formatString = 'LL'
 ) => {
   moment.updateLocale(locale, config[locale])
   return moment(date).format(formatString)

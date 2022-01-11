@@ -256,15 +256,12 @@ describe('create new user tests', () => {
     })
 
     it('clicking on confirm button with unfilled required fields shows validation errors', async () => {
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.update()
       store.dispatch(modifyUserFormData(mockIncompleteFormData))
-      testComponent
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
+      testComponent.find('#confirm_form').hostNodes().simulate('click')
 
       await flushPromises()
       testComponent.update()
@@ -279,32 +276,26 @@ describe('create new user tests', () => {
     })
 
     it('clicking on confirm button with complete data takes user to preview page', async () => {
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.update()
 
       store.dispatch(modifyUserFormData(mockCompleteFormData))
-      testComponent
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
+      testComponent.find('#confirm_form').hostNodes().simulate('click')
       await flushPromises()
 
       expect(history.location.pathname).toContain('preview')
     })
 
     it('clicking on confirm by selecting registrar as role will go to signature form page', async () => {
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.update()
 
       store.dispatch(modifyUserFormData(mockDataWithRegistarRoleSelected))
-      testComponent
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
+      testComponent.find('#confirm_form').hostNodes().simulate('click')
       await flushPromises()
 
       expect(history.location.pathname).toContain(
@@ -337,12 +328,9 @@ describe('create new user tests', () => {
     })
 
     it('renders review header', () => {
-      expect(
-        testComponent
-          .find('#preview_title')
-          .hostNodes()
-          .text()
-      ).toBe('Please review the new users details')
+      expect(testComponent.find('#preview_title').hostNodes().text()).toBe(
+        'Please review the new users details'
+      )
     })
 
     it('clicking change button on a field takes user back to form', async () => {
@@ -356,10 +344,7 @@ describe('create new user tests', () => {
     })
 
     it('clicking submit button submits the form data', async () => {
-      testComponent
-        .find('#submit_user_form')
-        .hostNodes()
-        .simulate('click')
+      testComponent.find('#submit_user_form').hostNodes().simulate('click')
 
       await flushPromises()
 
@@ -467,7 +452,7 @@ describe('edit user tests', () => {
       )
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.component.update()
@@ -517,7 +502,7 @@ describe('edit user tests', () => {
       )
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       component = testComponent.component

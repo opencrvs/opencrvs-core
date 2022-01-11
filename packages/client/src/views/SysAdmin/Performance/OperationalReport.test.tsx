@@ -126,10 +126,7 @@ describe('OperationalReport tests', () => {
       '#operational-select'
     )
     expect(
-      performanceSelect
-        .find('.react-select__single-value')
-        .hostNodes()
-        .text()
+      performanceSelect.find('.react-select__single-value').hostNodes().text()
     ).toBe('Operational')
     expect(
       component.find('#registration-rates-reports-loader').hostNodes()
@@ -175,10 +172,7 @@ describe('OperationalReport tests', () => {
 
   describe('status window test', () => {
     beforeEach(() => {
-      component
-        .find('#btn-status')
-        .hostNodes()
-        .simulate('click')
+      component.find('#btn-status').hostNodes().simulate('click')
       component.update()
     })
 
@@ -188,10 +182,7 @@ describe('OperationalReport tests', () => {
     })
 
     it('closes status window and show status button', () => {
-      component
-        .find('#btn-sts-wnd-cross')
-        .hostNodes()
-        .simulate('click')
+      component.find('#btn-sts-wnd-cross').hostNodes().simulate('click')
       component.update()
 
       expect(component.find('#status-window').hostNodes()).toHaveLength(0)
@@ -240,10 +231,7 @@ describe('OperationalReport tests', () => {
         component,
         '#last30Days'
       )
-      last30DaysPresetButtonElement
-        .hostNodes()
-        .at(0)
-        .simulate('click')
+      last30DaysPresetButtonElement.hostNodes().at(0).simulate('click')
       const confirmButtonElement = await waitForElement(
         component,
         '#date-range-confirm-action'

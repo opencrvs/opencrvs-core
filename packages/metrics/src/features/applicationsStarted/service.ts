@@ -27,7 +27,8 @@ export async function fetchLocationWiseApplicationsStarted(
           FROM applications_started
         WHERE time > '${timeFrom}'
           AND time <= '${timeTo}'
-          AND ( locationLevel2 = '${locationId}'
+          AND ( officeLocation = '${locationId}'
+              OR locationLevel2 = '${locationId}'
               OR locationLevel3 = '${locationId}'
               OR locationLevel4 = '${locationId}'
               OR locationLevel5 = '${locationId}' )
@@ -39,7 +40,8 @@ export async function fetchLocationWiseApplicationsStarted(
           FROM applications_started
         WHERE time > '${timeFrom}'
           AND time <= '${timeTo}'
-          AND ( locationLevel2 = '${locationId}'
+          AND ( officeLocation = '${locationId}'
+              OR locationLevel2 = '${locationId}'
               OR locationLevel3 = '${locationId}'
               OR locationLevel4 = '${locationId}'
               OR locationLevel5 = '${locationId}' )
@@ -51,7 +53,8 @@ export async function fetchLocationWiseApplicationsStarted(
           FROM applications_started
         WHERE time > '${timeFrom}'
           AND time <= '${timeTo}'
-          AND ( locationLevel2 = '${locationId}'
+          AND ( officeLocation = '${locationId}'
+              OR locationLevel2 = '${locationId}'
               OR locationLevel3 = '${locationId}'
               OR locationLevel4 = '${locationId}'
               OR locationLevel5 = '${locationId}' )
@@ -89,7 +92,8 @@ export async function getNumberOfAppStartedByPractitioners(
             FROM applications_started
             WHERE time > '${timeFrom}'
               AND time <= '${timeTo}'
-              AND ( locationLevel2 = '${locationId}'
+              AND ( officeLocation = '${locationId}'
+                  OR locationLevel2 = '${locationId}'
                   OR locationLevel3 = '${locationId}'
                   OR locationLevel4 = '${locationId}'
                   OR locationLevel5 = '${locationId}' ) 
@@ -120,7 +124,8 @@ export async function getNumberOfRejectedAppStartedByPractitioners(
               FROM applications_rejected
               WHERE time > '${timeFrom}'
                 AND time <= '${timeTo}'
-                AND ( locationLevel2 = '${locationId}'
+                AND ( officeLocation = '${locationId}'
+                    OR locationLevel2 = '${locationId}'
                     OR locationLevel3 = '${locationId}'
                     OR locationLevel4 = '${locationId}'
                     OR locationLevel5 = '${locationId}' ) 
@@ -155,7 +160,8 @@ export async function getAvgTimeSpentOnAppByPractitioners(
                 WHERE time > '${timeFrom}'
                     AND time <= '${timeTo}'
                     AND currentStatus = '${status}'
-                    AND ( locationLevel2 = '${locationId}'
+                    AND ( officeLocation = '${locationId}'
+                        OR locationLevel2 = '${locationId}'
                         OR locationLevel3 = '${locationId}'
                         OR locationLevel4 = '${locationId}'
                         OR locationLevel5 = '${locationId}' ) 

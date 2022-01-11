@@ -311,8 +311,10 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
                     this.props.application.data[registrationSection.id] &&
                     this.props.application.data[registrationSection.id]
                       .applicant &&
-                    (this.props.application.data[registrationSection.id]
-                      .applicant as IFormSectionData).value) ||
+                    (
+                      this.props.application.data[registrationSection.id]
+                        .applicant as IFormSectionData
+                    ).value) ||
                   '',
                 nestedFields: {}
               }
@@ -374,11 +376,8 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       this.state.informant !== 'error' &&
       this.state.informant === INFORMANT.SOMEONE_ELSE
     ) {
-      const {
-        application,
-        goToDeathRegistration,
-        applicantsSection
-      } = this.props
+      const { application, goToDeathRegistration, applicantsSection } =
+        this.props
       this.props.modifyApplication({
         ...application,
         data: {
@@ -420,8 +419,10 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
                     this.props.application.data[registrationSection.id] &&
                     this.props.application.data[registrationSection.id]
                       .applicant &&
-                    (this.props.application.data[registrationSection.id]
-                      .applicant as IFormSectionData).value) ||
+                    (
+                      this.props.application.data[registrationSection.id]
+                        .applicant as IFormSectionData
+                    ).value) ||
                   '',
                 nestedFields:
                   (this.props.application &&
@@ -429,8 +430,10 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
                     this.props.application.data[registrationSection.id] &&
                     this.props.application.data[registrationSection.id]
                       .applicant &&
-                    (this.props.application.data[registrationSection.id]
-                      .applicant as IFormSectionData).nestedFields) ||
+                    (
+                      this.props.application.data[registrationSection.id]
+                        .applicant as IFormSectionData
+                    ).nestedFields) ||
                   {}
               }
             }

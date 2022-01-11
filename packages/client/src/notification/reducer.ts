@@ -106,10 +106,9 @@ export const notificationReducer: LoopReducer<
         submitFormErrorToast: null
       }
     case actions.SHOW_USER_AUDIT_SUCCESS_TOAST:
-      const {
-        userFullName,
-        action: auditAction
-      } = (action as actions.ShowUserAuditSuccessToast).payload
+      const { userFullName, action: auditAction } = (
+        action as actions.ShowUserAuditSuccessToast
+      ).payload
       return {
         ...state,
         userAuditSuccessToast: {

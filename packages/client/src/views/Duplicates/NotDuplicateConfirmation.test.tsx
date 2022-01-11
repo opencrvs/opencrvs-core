@@ -40,19 +40,13 @@ describe('when user opens the log out modal', () => {
   })
 
   it('calls yes button handler', () => {
-    logoutComponent
-      .find('#not_duplicate_confirm')
-      .hostNodes()
-      .simulate('click')
+    logoutComponent.find('#not_duplicate_confirm').hostNodes().simulate('click')
 
     expect(mockHandleYes).toHaveBeenCalled()
   })
 
   it('calls no button handler', () => {
-    logoutComponent
-      .find('#not_duplicate_close')
-      .hostNodes()
-      .simulate('click')
+    logoutComponent.find('#not_duplicate_close').hostNodes().simulate('click')
 
     expect(mockHandleClose).toHaveBeenCalled()
   })

@@ -108,18 +108,15 @@ describe('In Progress tab', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
     testComponent.component.update()
     const app = testComponent.component
 
-    app
-      .find(`#selector_${SELECTOR_ID.ownDrafts}`)
-      .hostNodes()
-      .simulate('click')
-    await new Promise(resolve => {
+    app.find(`#selector_${SELECTOR_ID.ownDrafts}`).hostNodes().simulate('click')
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     expect(history.location.pathname).toBe(
@@ -132,7 +129,7 @@ describe('In Progress tab', () => {
       .find(`#selector_${SELECTOR_ID.fieldAgentDrafts}`)
       .hostNodes()
       .simulate('click')
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     expect(history.location.pathname).toBe(
@@ -172,25 +169,17 @@ describe('In Progress tab', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
     testComponent.component.update()
     const app = testComponent.component
 
-    expect(
-      app
-        .find('#selector_you')
-        .hostNodes()
-        .text()
-    ).toContain('Yours (2)')
-    expect(
-      app
-        .find('#selector_field-agents')
-        .hostNodes()
-        .text()
-    ).toContain('Field agents (5)')
+    expect(app.find('#selector_you').hostNodes().text()).toContain('Yours (2)')
+    expect(app.find('#selector_field-agents').hostNodes().text()).toContain(
+      'Field agents (5)'
+    )
   })
 
   describe('When the local drafts selector is selected', () => {
@@ -276,7 +265,7 @@ describe('In Progress tab', () => {
       )
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.component.update()
@@ -312,7 +301,7 @@ describe('In Progress tab', () => {
       )
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
 
@@ -436,7 +425,7 @@ describe('In Progress tab', () => {
       )
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.component.update()
@@ -448,7 +437,7 @@ describe('In Progress tab', () => {
         .hostNodes()
         .simulate('click')
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.component.update()
@@ -533,7 +522,7 @@ describe('In Progress tab', () => {
       )
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.component.update()
@@ -568,7 +557,7 @@ describe('In Progress tab', () => {
       )
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
 
@@ -663,7 +652,7 @@ describe('In Progress tab', () => {
       )
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.component.update()
@@ -772,7 +761,7 @@ describe('In Progress tab', () => {
           .hostNodes()
           .simulate('click')
 
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
           setTimeout(resolve, 100)
         })
         testComponent.component.update()
@@ -862,7 +851,7 @@ describe('In Progress tab', () => {
       )
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.component.update()
@@ -939,16 +928,13 @@ describe('Tablet tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     testComponent.component.update()
-    testComponent.component
-      .find('#row_0')
-      .hostNodes()
-      .simulate('click')
+    testComponent.component.find('#row_0').hostNodes().simulate('click')
 
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     testComponent.component.update()

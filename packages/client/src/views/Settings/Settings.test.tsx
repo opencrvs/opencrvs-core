@@ -47,18 +47,8 @@ describe('Settings page tests', () => {
         store
       )
     ).component
-    expect(
-      comp
-        .find('#English-name')
-        .first()
-        .text()
-    ).toBe('English nameChange')
-    expect(
-      comp
-        .find('#Phone-number')
-        .first()
-        .text()
-    ).toBe('Phone numberChange')
+    expect(comp.find('#English-name').first().text()).toBe('English nameChange')
+    expect(comp.find('#Phone-number').first().text()).toBe('Phone numberChange')
   })
 
   it('it checks component has loaded', () => {
@@ -66,56 +56,35 @@ describe('Settings page tests', () => {
     expect(component.containsMatchingElement(DataSection)).toBe(true)
   })
   it('it checks modal is open when button clicked', () => {
-    component
-      .find('#BtnChangeLanguage')
-      .hostNodes()
-      .simulate('click')
+    component.find('#BtnChangeLanguage').hostNodes().simulate('click')
 
     expect(component.find('#ChangeLanguageModal').hostNodes()).toHaveLength(1)
   })
   it('it checks cancel button clicked', () => {
-    component
-      .find('#BtnChangeLanguage')
-      .hostNodes()
-      .simulate('click')
+    component.find('#BtnChangeLanguage').hostNodes().simulate('click')
 
     const modal = component.find('#ChangeLanguageModal').hostNodes()
 
-    modal
-      .find('#modal_cancel')
-      .hostNodes()
-      .simulate('click')
+    modal.find('#modal_cancel').hostNodes().simulate('click')
   })
   it('it checks cancel button clicked', () => {
-    component
-      .find('#BtnChangeLanguage')
-      .hostNodes()
-      .simulate('click')
+    component.find('#BtnChangeLanguage').hostNodes().simulate('click')
 
     const modal = component.find('#ChangeLanguageModal').hostNodes()
 
-    modal
-      .find('#apply_change')
-      .hostNodes()
-      .simulate('click')
+    modal.find('#apply_change').hostNodes().simulate('click')
   })
 
   describe('When user changes password', () => {
     beforeEach(() => {
-      component
-        .find('#BtnChangePassword')
-        .hostNodes()
-        .simulate('click')
+      component.find('#BtnChangePassword').hostNodes().simulate('click')
     })
 
     it('Should display password change modal', () => {
       const modal = component.find('#ChangePasswordModal').hostNodes()
       expect(modal.length).toEqual(1)
 
-      modal
-        .find('#confirm-button')
-        .hostNodes()
-        .simulate('click')
+      modal.find('#confirm-button').hostNodes().simulate('click')
     })
 
     it('Should display match message for valid password', () => {
@@ -149,10 +118,7 @@ describe('Settings page tests', () => {
     })
 
     it('Should hide the password modal', () => {
-      component
-        .find('#close-btn')
-        .hostNodes()
-        .simulate('click')
+      component.find('#close-btn').hostNodes().simulate('click')
       component.update()
 
       const modalIsClosed = !Boolean(

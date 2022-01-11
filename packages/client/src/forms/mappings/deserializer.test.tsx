@@ -20,7 +20,7 @@ function isGraphQLTag(item: any) {
 
 function hasOperatorDescriptors(form: IForm) {
   return traverse(form).reduce(
-    function([paths, found], item) {
+    function ([paths, found], item) {
       if (typeof item === 'object' && item.operation && !isGraphQLTag(item)) {
         return [[...paths, this.path.join('.')], true]
       }
@@ -43,7 +43,8 @@ describe('Form desearializer', () => {
     const definitions = await referenceApi.loadDefinitions()
     const { birth } = definitions.forms.registerForm
 
-    birth.sections[0].groups[0].fields[0].mapping!.mutation!.operation = 'non_existing_123' as any
+    birth.sections[0].groups[0].fields[0].mapping!.mutation!.operation =
+      'non_existing_123' as any
 
     expect(() => deserializeForm(birth)).toThrow()
     /* eslint-disable no-console */

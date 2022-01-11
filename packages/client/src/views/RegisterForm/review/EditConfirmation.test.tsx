@@ -38,19 +38,13 @@ describe('when user is in the review page', () => {
   })
 
   it('mock edit button click', () => {
-    editComponent
-      .find('#edit_confirm')
-      .hostNodes()
-      .simulate('click')
+    editComponent.find('#edit_confirm').hostNodes().simulate('click')
 
     expect(mockHandleEdit).toHaveBeenCalled()
   })
 
   it('mock preview back button click', () => {
-    editComponent
-      .find('#preview_back')
-      .hostNodes()
-      .simulate('click')
+    editComponent.find('#preview_back').hostNodes().simulate('click')
 
     expect(mockHandleClose).toHaveBeenCalled()
   })

@@ -47,9 +47,9 @@ const supportedLanguages: ISupportedLanguages[] = [
 
 export const initLanguages = () => {
   const initLanguages: ILanguageState = {}
-  getAvailableLanguages().forEach(lang => {
+  getAvailableLanguages().forEach((lang) => {
     const languageDescription = supportedLanguages.find(
-      obj => obj.code === lang
+      (obj) => obj.code === lang
     ) as ISupportedLanguages
     initLanguages[lang] = {
       lang,

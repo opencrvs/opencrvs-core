@@ -62,6 +62,6 @@ export const searchRoleSchema = Joi.object({
   active: Joi.boolean().optional(),
   sortBy: Joi.string().optional(),
   sortOrder: Joi.string()
-    .only(['asc', 'desc'])
+    .valid('asc', 'desc')
     .optional()
 })

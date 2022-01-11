@@ -70,18 +70,13 @@ describe('User list tests', () => {
       )
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 200)
       })
 
       testComponent.component.update()
       const app = testComponent.component
-      expect(
-        app
-          .find('#user_list')
-          .hostNodes()
-          .html()
-      ).toContain('0 users')
+      expect(app.find('#user_list').hostNodes().html()).toContain('0 users')
     })
     it('load user list in view only mode', async () => {
       const userListMock = [
@@ -239,7 +234,7 @@ describe('User list tests', () => {
       )
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
 
@@ -368,7 +363,7 @@ describe('User list tests', () => {
         )
 
         // wait for mocked data to load mockedProvider
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
           setTimeout(resolve, 100)
         })
 
@@ -381,7 +376,7 @@ describe('User list tests', () => {
           .simulate('click')
 
         // wait for mocked data to load mockedProvider
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
           setTimeout(resolve, 100)
         })
 
@@ -411,7 +406,7 @@ describe('User list tests', () => {
         )
 
         // wait for mocked data to load mockedProvider
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
           setTimeout(resolve, 100)
         })
 
@@ -441,7 +436,7 @@ describe('User list tests', () => {
         )
 
         // wait for mocked data to load mockedProvider
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
           setTimeout(resolve, 100)
         })
 
@@ -472,7 +467,7 @@ describe('User list tests', () => {
         )
 
         // wait for mocked data to load mockedProvider
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
           setTimeout(resolve, 100)
         })
 
@@ -502,7 +497,7 @@ describe('User list tests', () => {
         )
 
         // wait for mocked data to load mockedProvider
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
           setTimeout(resolve, 100)
         })
 
@@ -627,7 +622,7 @@ describe('User list tests', () => {
         )
 
         // wait for mocked data to load mockedProvider
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
           setTimeout(resolve, 100)
         })
 
@@ -869,7 +864,7 @@ describe('User list tests', () => {
       )
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
 
@@ -1062,18 +1057,15 @@ describe('User list tests', () => {
       )
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
 
       testComponent.component.update()
       const app = testComponent.component
-      expect(
-        app
-          .find('#load_more_button')
-          .hostNodes()
-          .text()
-      ).toContain('Show next 10')
+      expect(app.find('#load_more_button').hostNodes().text()).toContain(
+        'Show next 10'
+      )
     })
     it('renders next page of the user list when the next page button is pressed', async () => {
       const userListMock = [
@@ -1488,7 +1480,7 @@ describe('User list tests', () => {
       )
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
 
@@ -1496,11 +1488,8 @@ describe('User list tests', () => {
       const app = testComponent.component
       expect(app.find('#load_more_button').hostNodes()).toHaveLength(1)
 
-      app
-        .find('#load_more_button')
-        .hostNodes()
-        .simulate('click')
-      await new Promise(resolve => {
+      app.find('#load_more_button').hostNodes().simulate('click')
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
 
