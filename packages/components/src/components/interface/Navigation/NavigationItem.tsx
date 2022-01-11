@@ -59,7 +59,8 @@ const LabelContainer = styled.span<{
   ${({ theme }) => theme.fonts.subtitleStyle};
   margin-left: 13px;
   padding-top: 3px;
-  color: ${({ isSelected, theme }) => isSelected && theme.colors.grey};
+  color: ${({ isSelected, theme }) =>
+    isSelected ? theme.colors.grey : theme.colors.greyLight};
 `
 const ValueContainer = styled.span<{ isSelected?: boolean }>`
   margin-left: auto;

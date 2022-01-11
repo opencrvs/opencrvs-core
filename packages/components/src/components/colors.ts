@@ -42,7 +42,7 @@ export const colorDictionary = {
   fountainBlue: '#4CC1BA',
   ronchi: '#EDC55E',
   grey: '#292F33',
-  greyLight: '#727578',
+  greyLight: '#595C5F',
   greySelected: '#F1F2F3',
   greyHover: '#F8F8F8',
   indigo: '#4972BB',
