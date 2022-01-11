@@ -184,6 +184,11 @@ const messagesToDefine: ICertificateMessages = {
     description: 'The title for id check component',
     id: 'print.certificate.collector.idCheck.title'
   },
+  otherIdCheckTitle: {
+    defaultMessage: 'Have you checked their proof of identification?',
+    description: 'The title for other id check component',
+    id: 'print.certificate.collector.otherIdCheck.title'
+  },
   idCheckVerify: {
     defaultMessage: 'Yes',
     description: 'The label for id check component action when verify details',
