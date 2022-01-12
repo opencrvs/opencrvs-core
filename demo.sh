@@ -230,7 +230,7 @@ echo
 echo ":::::::::::::::::: Installing some Node dependencies ::::::::::::::::::"
 echo
 npm install -g wait-on
-
+yarn install
 echo
 echo ":::::::::::::::::::::::::: Building OpenCRVS ::::::::::::::::::::::::::"
 echo
@@ -291,7 +291,6 @@ echo ":::::::::::::::::::: Installing Zambia Configuration ::::::::::::::::::::"
 echo
 echo ":::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::"
 echo
-yarn install
 yarn db:clear:all
 yarn db:backup:restore
 echo
