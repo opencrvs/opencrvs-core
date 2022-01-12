@@ -107,8 +107,7 @@ if [  -n "$(uname -a | grep Ubuntu)" ]; then
       echo ":::::::: The OpenCRVS client application is a progressive web application. ::::::::"
       echo "::::::::::::: It is best experienced using the Google Chrome browser. :::::::::::::"
       echo
-      echo "We think that you do not have Chrome installed, or it is not available on this path: "
-      echo "/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
+      echo "We think that you do not have Chrome installed."
       echo ":::: We recommend that you install Google Chrome: https://www.google.com/chrome ::::"
       echo
     fi
@@ -178,6 +177,10 @@ do
             echo "curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash"
             echo "Then use nvm to install the Node version of choice.  For example run:"
             echo "nvm install 14.17.0"
+        fi
+        if [ $i == "yarn" ] ; then
+           echo "You need to install the Yarn Package Manager for Node."
+           echo "The documentation is here: https://classic.yarnpkg.com/en/docs/install"
         fi
         exit 1
     fi
