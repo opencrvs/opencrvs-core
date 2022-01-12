@@ -212,18 +212,18 @@ if [ "$versionTest" == "LOWER" ] ; then
     echo
 fi
 
-
-echo
-echo ":::::::::::::::::::::: Initialising Docker Swarm ::::::::::::::::::::::"
-echo
-docker swarm init
-
 if [ $OS == "UBUNTU" ]; then
   echo
   echo "::::::::::::::::: Giving Docker user sudo privileges :::::::::::::::::"
   echo
   sudo usermod -aG docker $USER
 fi
+
+echo
+echo ":::::::::::::::::::::: Initialising Docker Swarm ::::::::::::::::::::::"
+echo
+docker swarm init
+
 
 echo
 echo ":::::::::::::::::: Installing some Node dependencies ::::::::::::::::::"
