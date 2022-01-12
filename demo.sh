@@ -74,7 +74,7 @@ if [  -n "$(uname -a | grep Ubuntu)" ]; then
   echo
   #sleep 1
   OS="UBUNTU"
-  ubuntuVersion=`$(grep -oP 'VERSION_ID="\K[\d.]+' /etc/os-release)`
+  ubuntuVersion="$(grep -oP 'VERSION_ID="\K[\d.]+' /etc/os-release)"
   ubuntuVersionTest=$(do_version_check $ubuntuVersion 18.04)
   if [ "$ubuntuVersionTest" == "LOWER" ] ; then
     echo "Sorry your Ubuntu version is not supported.  You must upgrade Ubuntu to 18.04 or 20.04"
