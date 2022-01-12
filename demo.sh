@@ -182,6 +182,14 @@ do
            echo "You need to install the Yarn Package Manager for Node."
            echo "The documentation is here: https://classic.yarnpkg.com/en/docs/install"
         fi
+        if [ $i == "google-chrome" ] ; then
+          echo ":::::::: The OpenCRVS client application is a progressive web application. ::::::::"
+          echo "::::::::::::: It is best experienced using the Google Chrome browser. :::::::::::::"
+          echo
+          echo "We think that you do not have Chrome installed."
+          echo ":::: We recommend that you install Google Chrome: https://www.google.com/chrome ::::"
+          echo
+        fi
         exit 1
     fi
 done
