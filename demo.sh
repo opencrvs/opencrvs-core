@@ -61,6 +61,7 @@ function ctrl_c() {
     tmux kill-session -t opencrvs-core
   fi
   if [ $TMUX_STARTED == 2 ]; then
+    tmux kill-session -t opencrvs-core
     tmux kill-session -t opencrvs-zambia
   fi
   exit 1
