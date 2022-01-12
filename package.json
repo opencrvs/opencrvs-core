@@ -22,6 +22,7 @@
     "test": "CI=true lerna run test --stream",
     "compose:deps:demo": "docker-compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.demo-deps.yml up",
     "compose:deps": "docker-compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev-deps.yml up",
+    "compose:deps:detached": "docker-compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev-deps.yml up -d",
     "compose:down:deps": "docker-compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev-deps.yml down",
     "compose:build": "yarn build:image && docker-compose build",
     "compose:push": "yarn compose:build && docker-compose push && yarn compose:push:version",
