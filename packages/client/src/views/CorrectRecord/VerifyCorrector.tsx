@@ -105,7 +105,7 @@ class VerifyVerifyCorrectorComponent extends React.Component<IFullProps> {
     const info = application.data[corrector]
     //TODO :: we have to get form defination from new certificateCorrectorDefination
     const fields =
-      offlineResources.forms.certificateCollectorDefinition[application.event][
+      offlineResources.forms.certificateCorrectorDefinition[application.event][
         corrector
       ]
     const iD = info[fields.identifierField] as string

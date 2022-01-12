@@ -31,11 +31,11 @@ export interface IDefinitionsResponse {
       birth: ICertificateCollectorDefinition
       death: ICertificateCollectorDefinition
     }
-    userForm: ISerializedForm
     certificateCorrectorDefinition: {
       birth: ICertificateCorrectorDefinition
       death: ICertificateCorrectorDefinition
     }
+    userForm: ISerializedForm
   }
   templates: {
     receipt?: IPDFTemplate

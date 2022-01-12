@@ -29,7 +29,6 @@ import { isOfflineDataLoaded, isSystemAdmin } from './selectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IPDFTemplate } from '@client/pdfRenderer/transformer/types'
 import { ICertificateCollectorDefinition } from '@client/views/PrintCertificate/VerifyCollector'
-import { ICertificateCorrectorDefinition } from '@client/views/CorrectRecord/VerifyCorrector'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -66,11 +65,11 @@ export interface IOfflineData {
       birth: ICertificateCollectorDefinition
       death: ICertificateCollectorDefinition
     }
-    userForm: ISerializedForm
     certificateCorrectorDefinition: {
-      birth: ICertificateCorrectorDefinition
-      death: ICertificateCorrectorDefinition
+      birth: ICertificateCollectorDefinition
+      death: ICertificateCollectorDefinition
     }
+    userForm: ISerializedForm
   }
   templates: {
     receipt?: IPDFTemplate

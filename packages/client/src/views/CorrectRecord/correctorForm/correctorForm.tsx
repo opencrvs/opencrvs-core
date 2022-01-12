@@ -436,9 +436,7 @@ const mapStateToProps = (
         fatherDataExist && applicationData.father.fathersDetailsExist
     }
   }
-  const formGroup =
-    clonedFormSection.groups.find((group) => group.id === groupId) ||
-    clonedFormSection.groups[0]
+  const formGroup = clonedFormSection.groups[0]
 
   const fields = replaceInitialValues(
     formGroup.fields,
