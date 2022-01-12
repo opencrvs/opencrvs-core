@@ -49,12 +49,19 @@ do_version_check() {
 }
 
 DOCKER_STARTED=0
+TMUX_STARTED=0
 
 trap ctrl_c INT
 
 function ctrl_c() {
   if [ $DOCKER_STARTED == 1 ]; then
     docker stop $(docker ps -aq)
+  fi
+  if [ $TMUX_STARTED == 1 ]; then
+    tmux kill-session -t opencrvs-core
+  fi
+  if [ $TMUX_STARTED == 2 ]; then
+    tmux kill-session -t opencrvs-zambia
   fi
   exit 1
 }
@@ -139,7 +146,7 @@ fi
 echo ":::::::: Checking that you have the required dependencies installed ::::::::"
 echo
 #sleep 1
-dependencies=( "docker" "node" "yarn" )
+dependencies=( "docker" "node" "yarn" "tmux")
 if [ $OS == "UBUNTU" ]; then
   dependencies+=("docker-compose" "google-chrome")
 fi
@@ -192,6 +199,20 @@ do
           echo ":::: We recommend that you install Google Chrome: https://www.google.com/chrome ::::"
           echo
         fi
+        if [ $i == "tmux" ] ; then
+          if [ $OS == "UBUNTU" ]; then
+              echo "OpenCRVS requires multiple terminal windows open in order to run OpenCRVS Core alongside the default country configuration."
+              echo "::::::::::::: We want to install the tool tmux to do this. :::::::::::::"
+              echo
+              echo "::::::::::::: Please enter your sudo password when prompted :::::::::::::"
+              echo
+              sudo apt-get install tmux
+          else
+              echo "OpenCRVS requires multiple terminal windows open in order to run OpenCRVS Core alongside the default country configuration."
+              echo
+              echo "We use the tool tmux to do this.  Please install it following the documentation here: https://github.com/tmux/tmux/wiki"
+          fi
+        fi
         exit 1
     fi
 done
@@ -218,6 +239,8 @@ if [ $OS == "UBUNTU" ]; then
   echo
   echo "::::::::::::::::: Giving Docker user sudo privileges :::::::::::::::::"
   echo
+  echo "::::::::::: Please enter your sudo password when prompted :::::::::::"
+  echo
   sudo chmod 666 /var/run/docker.sock
   sudo usermod -aG docker $USER
 fi
@@ -233,20 +256,18 @@ echo ":::::::::::::::::: Installing some Node dependencies ::::::::::::::::::"
 echo
 npm install -g wait-on
 yarn install
+
+echo "::::::::::::::::::::::: Creating some directories :::::::::::::::::::::::"
 echo
-echo ":::::::::::::::::::::::::: Building OpenCRVS ::::::::::::::::::::::::::"
-echo
-echo ":::::::::::::: This can take some time on slow connections ::::::::::::::"
-echo
-echo ":::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::"
+echo "::::::::::::: Please enter your sudo password when prompted :::::::::::::"
 echo
 openssl genrsa -out .secrets/private-key.pem 2048 && openssl rsa -pubout -in .secrets/private-key.pem -out .secrets/public-key.pem
 sudo mkdir -p data/elasticsearch
 sudo chown -R 1000:1000 data/elasticsearch
 
-echo ":::::::::::::::::::: Starting OpenCRVS dependencies ::::::::::::::::::::"
+echo ":::::::::::::::::::: Building OpenCRVS dependencies ::::::::::::::::::::"
 echo
-echo ":::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::"
+echo ":::::::::::::: This can take some time on slow connections ::::::::::::::"
 echo
 yarn compose:deps:detached
 DOCKER_STARTED=1
@@ -264,11 +285,14 @@ echo
 echo ":::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::"
 echo
 
+tmux new -d -s opencrvs-core
+TMUX_STARTED=1
+
 if [ $OS == "UBUNTU" ]; then
-  LANGUAGES=en yarn start --silent
+  tmux send -t opencrvs-core.0 LANGUAGES=en && yarn start ENTER
   else
-  LOCAL_IP=$(hostname -I | cut -d' ' -f1)
-  LANGUAGES=en yarn start --silent
+  $MY_IP = $(hostname -I | cut -d' ' -f1)
+  tmux send -t opencrvs-core.0 LANGUAGES=en && LOCAL_IP=$MY_IP && yarn start ENTER
 fi
 echo "wait-on tcp:4040" && wait-on -l tcp:4040
 echo "wait-on http://localhost:3000" && wait-on -l http://localhost:3000
@@ -282,26 +306,26 @@ echo "wait-on tcp:1050" && wait-on -l tcp:1050
 
 
 echo
-echo "::::::::::::::: Cloning the Zambia Country Configuration :::::::::::::::"
+echo ":::::::::::::::::::: Installing Zambia Configuration ::::::::::::::::::::"
 echo
-echo ":::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::"
+echo "::::::::::::::: Cloning the Zambia Country Configuration :::::::::::::::"
 echo
 git clone https://github.com/opencrvs/opencrvs-zambia.git
 cd opencrvs-zambia
 echo
-echo ":::::::::::::::::::: Installing Zambia Configuration ::::::::::::::::::::"
-echo
-echo ":::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::"
+echo ":::::::::::::::::: Installing some Node dependencies ::::::::::::::::::"
 echo
 yarn install
+echo
+echo ":::::::::::::::::: Installing Zambia Reference Data ::::::::::::::::::"
+echo
 yarn db:clear:all
 yarn db:backup:restore
 echo
 echo "::::::::::::::::::::: Starting Zambia Config Server :::::::::::::::::::::"
-echo
-echo ":::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::"
-echo
-CERT_PUBLIC_KEY_PATH=./../.secrets/public-key.pem yarn start
+tmux new -d -s opencrvs-zambia
+TMUX_STARTED=2
+tmux send -t opencrvs-zambia.0 CERT_PUBLIC_KEY_PATH=./../.secrets/public-key.pem yarn start ENTER
 wait-on -l tcp:3040
 echo
 echo -e "::::::::::::::::::::::::::: \033[32mCONGRATULATIONS!!\033[0m :::::::::::::::::::::::::::"
