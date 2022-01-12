@@ -50,6 +50,9 @@ export interface ICertificateCollectorField {
 export interface ICertificateCollectorDefinition {
   [collector: string]: ICertificateCollectorField
 }
+export interface ICertificateCorrectorDefinition {
+  [collector: string]: ICertificateCollectorField
+}
 
 interface IMatchParams {
   registrationId: string
