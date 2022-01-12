@@ -74,7 +74,7 @@ if [  -n "$(uname -a | grep Ubuntu)" ]; then
   echo
   #sleep 1
   OS="UBUNTU"
-  ubuntuVersion=`echo awk -F= '$1 == "VERSION_ID" {gsub(/"/, "", $2); print $2}' /etc/os-release`
+  ubuntuVersion=`$(grep -oP 'VERSION_ID="\K[\d.]+' /etc/os-release)`
   ubuntuVersionTest=$(do_version_check $ubuntuVersion 18.04)
   if [ "$ubuntuVersionTest" == "LOWER" ] ; then
     echo "Sorry your Ubuntu version is not supported.  You must upgrade Ubuntu to 18.04 or 20.04"
@@ -87,8 +87,18 @@ if [  -n "$(uname -a | grep Ubuntu)" ]; then
     echo ":::::::: Setting memory requirements for file watch limit and ElasticSearch ::::::::"
     echo
     #sleep 1
-    echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
-    echo vm.max_map_count=262144 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+    if [ grep -Fxq "fs.inotify.max_user_watches=524288" /etc/sysctl.conf ] ; then
+        echo "File watch limit already meets requirements."
+    else
+        echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+    fi
+
+    if [ grep -Fxq "vm.max_map_count=262144" /etc/sysctl.conf ] ; then
+        echo "Max map count already meets requirements."
+    else
+        echo vm.max_map_count=262144 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+    fi
+
     echo
     if [  -n "$(google-chrome --version | grep Chrome)" ]; then
       echo -e "Chrome is \033[32minstalled!\033[0m :)"
