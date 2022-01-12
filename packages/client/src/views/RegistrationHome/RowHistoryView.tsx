@@ -45,6 +45,7 @@ import {
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
 import { goToCorrectCertificate } from '@client/navigation'
+import { connect } from 'react-redux'
 
 const ExpansionContent = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -205,7 +206,6 @@ function formatRoleCode(str: string) {
 type IProps = IntlShapeProps & {
   theme: ITheme
   eventDetails?: GQLEventSearchSet | null
-  isPrintTab?: boolean
   goToCorrectCertificate?: typeof goToCorrectCertificate
 }
 
@@ -391,6 +391,9 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
 
   getRenderedData() {
     const { intl } = this.props
+    const eventDetails = this.props.eventDetails as GQLEventSearchSet
+    const type = eventDetails.type || ''
+
     const transformedData = this.transformer()
     return (
       <>
@@ -446,10 +449,17 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                         <ValuesWithSeparator
                           strings={this.getValueSepartorsProp(operationHistory)}
                         />
-                        {this.props.isPrintTab && (
+                        {type === 'REGISTERED' && (
                           <RecordCorrectionButton
                             align={ICON_ALIGNMENT.LEFT}
-                            onClick={() => alert(transformedData.trackingId)}
+                            onClick={() =>
+                              this.props.goToCorrectCertificate &&
+                              this.props.goToCorrectCertificate(
+                                eventDetails.id,
+                                transformedData.type,
+                                'recordCorrection'
+                              )
+                            }
                             icon={() => (
                               <EditIcon>
                                 <svg
@@ -513,4 +523,6 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
   }
 }
 
-export const RowHistoryView = injectIntl(withTheme(RowHistoryViewComponent))
+export const RowHistoryView = connect(undefined, {
+  goToCorrectCertificate: goToCorrectCertificate
+})(injectIntl(withTheme(RowHistoryViewComponent)))

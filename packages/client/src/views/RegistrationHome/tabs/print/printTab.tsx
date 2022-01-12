@@ -213,7 +213,7 @@ class PrintTabComponent extends React.Component<
     const { results } = this.props.queryData && this.props.queryData.data
     const eventDetails =
       results && results.find((result) => result && result.id === itemId)
-    return <RowHistoryView isPrintTab={true} eventDetails={eventDetails} />
+    return <RowHistoryView eventDetails={eventDetails} />
   }
 
   render() {

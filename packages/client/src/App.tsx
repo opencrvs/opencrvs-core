@@ -61,6 +61,7 @@ import { ApolloProvider } from 'react-apollo'
 import { Provider } from 'react-redux'
 import { Switch } from 'react-router'
 import { AppStore } from './store'
+import { CorrectorForm } from './views/CorrectRecord/correctorForm/correctorForm'
 import { VerifyCorrector } from './views/CorrectRecord/VerifyCorrector'
 import { ConfigHome } from './views/SysAdmin/Config/ConfigHome'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
@@ -245,6 +246,16 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.VERIFY_COLLECTOR}
                                             component={VerifyCollector}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.CERTIFICATE_CORRECTION}
+                                            component={CorrectorForm}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.VERIFY_CORRECTOR}
+                                            component={VerifyCorrector}
                                           />
                                           <ProtectedRoute
                                             path={routes.REVIEW_CERTIFICATE}
