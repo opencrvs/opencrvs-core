@@ -216,6 +216,7 @@ if [ $OS == "UBUNTU" ]; then
   echo
   echo "::::::::::::::::: Giving Docker user sudo privileges :::::::::::::::::"
   echo
+  sudo chmod 666 /var/run/docker.sock
   sudo usermod -aG docker $USER
 fi
 
