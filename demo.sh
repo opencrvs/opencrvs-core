@@ -87,13 +87,13 @@ if [  -n "$(uname -a | grep Ubuntu)" ]; then
     echo ":::::::: Setting memory requirements for file watch limit and ElasticSearch ::::::::"
     echo
     #sleep 1
-    if [ grep -Fxq "fs.inotify.max_user_watches=524288" /etc/sysctl.conf ] ; then
+    if grep -Fxq "fs.inotify.max_user_watches=524288" /etc/sysctl.conf ; then
         echo "File watch limit already meets requirements."
     else
         echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
     fi
 
-    if [ grep -Fxq "vm.max_map_count=262144" /etc/sysctl.conf ] ; then
+    if grep -Fxq "vm.max_map_count=262144" /etc/sysctl.conf ; then
         echo "Max map count already meets requirements."
     else
         echo vm.max_map_count=262144 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
