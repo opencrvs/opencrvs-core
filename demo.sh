@@ -205,15 +205,16 @@ do
               echo "OpenCRVS requires multiple terminal windows open in order to run OpenCRVS Core alongside the default country configuration."
               echo "::::::::::::: We want to install the tool tmux to do this. :::::::::::::"
               echo
-              echo "::::::::::::: Please enter your sudo password when prompted :::::::::::::"
-              echo
-              sudo apt-get install tmux
+              echo "::::::::::::: Run this command: sudo apt-get install tmux :::::::::::::"
           else
               echo "OpenCRVS requires multiple terminal windows open in order to run OpenCRVS Core alongside the default country configuration."
               echo
               echo "We use the tool tmux to do this.  Please install it following the documentation here: https://github.com/tmux/tmux/wiki"
           fi
         fi
+        echo
+        echo "::::::::::::::: After $i is installed please try again :::::::::::::::"
+        echo
         exit 1
     fi
 done
