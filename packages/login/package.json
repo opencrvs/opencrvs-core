@@ -45,7 +45,7 @@
   "scripts": {
     "postinstall": "patch-package",
     "precommit": "lint-staged",
-    "start": "BROWSER=none PORT=3020 craco start",
+    "start": "BROWSER=none PORT=3020 FAST_REFRESH=false craco start",
     "build": "craco --max_old_space_size=8000 build && yarn gen:sw",
     "gen:sw": "workbox generateSW --config workbox-config.js",
     "docker:build": "docker build ../../ -f ../../Dockerfile-login -t ocrvs-login",

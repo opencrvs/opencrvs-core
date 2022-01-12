@@ -71,7 +71,7 @@
   "scripts": {
     "postinstall": "patch-package",
     "precommit": "lint-staged",
-    "start": "BROWSER=none PORT=3000 craco start",
+    "start": "BROWSER=none PORT=3000 FAST_REFRESH=false craco start",
     "build": "REACT_APP_VERSION=$VERSION craco --max_old_space_size=8000 build && yarn gen:sw",
     "gen:sw": "workbox injectManifest --config workbox-config.js",
     "docker:build": "docker build ../../ -f ../../Dockerfile-register -t ocrvs-client",
