@@ -291,10 +291,12 @@ tmux new -d -s opencrvs-core
 TMUX_STARTED=1
 
 if [ $OS == "UBUNTU" ]; then
-  tmux send -t opencrvs-core.0 LANGUAGES=en && yarn start ENTER
+  tmux send -t opencrvs-core.0 "LANGUAGES=en && yarn start"
+  tmux send -t opencrvs-core.0 ENTER
   else
   $MY_IP = $(hostname -I | cut -d' ' -f1)
-  tmux send -t opencrvs-core.0 LANGUAGES=en && LOCAL_IP=$MY_IP && yarn start ENTER
+  tmux send -t opencrvs-core.0 "LANGUAGES=en && LOCAL_IP=$MY_IP && yarn start"
+  tmux send -t opencrvs-core.0 ENTER
 fi
 echo "wait-on tcp:4040" && wait-on -l tcp:4040
 echo "wait-on http://localhost:3000" && wait-on -l http://localhost:3000
@@ -327,7 +329,8 @@ echo
 echo "::::::::::::::::::::: Starting Zambia Config Server :::::::::::::::::::::"
 tmux new -d -s opencrvs-zambia
 TMUX_STARTED=2
-tmux send -t opencrvs-zambia.0 CERT_PUBLIC_KEY_PATH=./../.secrets/public-key.pem yarn start ENTER
+tmux send -t opencrvs-zambia.0 "CERT_PUBLIC_KEY_PATH=./../.secrets/public-key.pem yarn start"
+tmux send -t opencrvs-zambia.0 ENTER
 wait-on -l tcp:3040
 echo
 echo -e "::::::::::::::::::::::::::: \033[32mCONGRATULATIONS!!\033[0m :::::::::::::::::::::::::::"
