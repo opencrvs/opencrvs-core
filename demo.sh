@@ -61,10 +61,12 @@ function ctrl_c() {
 
 echo
 echo ":::::::::::::::::::::::::::: INSTALLING OPEN CRVS ::::::::::::::::::::::::::::"
+echo "::::::::::::::::::::: INTERNET CONNECTIVITY IS REQUIRED :::::::::::::::::::::"
 echo
+echo ":::::::::::::::::: THIS PROCESS CAN TAKE 15 MINUTES OR MORE ::::::::::::::::::"
 echo ":::::::::::::::: PLEASE WAIT FOR THE OPEN CRVS LOGO TO APPEAR ::::::::::::::::"
 echo
-#sleep 5
+sleep 5
 
   echo ":::::::::::::::::::::: Checking your operating system ::::::::::::::::::::::"
   echo
@@ -291,6 +293,7 @@ echo ":::::::::::::::::::: Installing Zambia Configuration ::::::::::::::::::::"
 echo
 echo ":::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::"
 echo
+yarn install
 yarn db:clear:all
 yarn db:backup:restore
 echo
