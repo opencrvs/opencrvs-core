@@ -30,17 +30,16 @@ const ItemContainer = styled.button<{ isSelected?: boolean }>`
   padding: 0px 0px;
   border: 0;
   outline: none;
+  background-color: ${({ isSelected, theme }) =>
+    isSelected ? theme.colors.greyHover : theme.colors.white};
   :hover {
-    background-color: ${({ theme, isSelected }) =>
-      isSelected ? theme.colors.greySelected : theme.colors.greyHover};
+    background-color: ${({ theme }) => theme.colors.greyHover};
   }
   :focus {
     border: 2px;
     border-style: solid;
     border-color: ${({ theme }) => theme.colors.focus};
   }
-  background-color: ${({ isSelected, theme }) =>
-    isSelected ? theme.colors.greySelected : theme.colors.white};
 `
 
 const ItemContentContainer = styled.div<{ isSelected?: boolean }>`
@@ -51,6 +50,7 @@ const ItemContentContainer = styled.div<{ isSelected?: boolean }>`
 const IconContainer = styled.span`
   padding: 2px 0px;
   width: 12px;
+  margin-top: 2px;
 `
 const LabelContainer = styled.span<{
   isSelected?: boolean

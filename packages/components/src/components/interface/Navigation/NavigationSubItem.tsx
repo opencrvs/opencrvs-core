@@ -21,13 +21,17 @@ export interface INavigationSubItemProps {
 export const SubItemContainer = styled.a<{ isSelected?: boolean }>`
   display: block;
   border: 0;
+  background-color: ${({ theme }) => theme.colors.white};
+  :hover {
+    background-color: ${({ theme }) => theme.colors.greyHover};
+  }
   cursor: pointer;
-  padding: 8px 37px 8px 47px;
+  padding: 9px 38px 9px 46px;
   width: 100%;
-  height: 40px;
+  height: 38px;
   text-align: left;
   color: ${({ isSelected, theme }) =>
-    isSelected ? theme.colors.indigo : theme.colors.grey};
+    isSelected ? theme.colors.grey : theme.colors.greyLight};
   ${({ theme }) => theme.fonts.chartLegendStyle};
 `
 

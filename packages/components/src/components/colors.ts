@@ -41,11 +41,9 @@ export const colorDictionary = {
   swansDown: '#D3EEE4',
   fountainBlue: '#4CC1BA',
   ronchi: '#EDC55E',
-  grey: '#292F33',
+  grey: '#1E2326',
   greyLight: '#595C5F',
-  greySelected: '#F1F2F3',
   greyHover: '#F8F8F8',
-  indigo: '#4972BB',
   borderBottom: '#d8dbde'
 }
 
@@ -82,11 +80,9 @@ export const colors = {
   successHover: colorDictionary.greenPeaPeaDark,
   white: colorDictionary.white,
   black: colorDictionary.black,
-  indigo: colorDictionary.indigo,
   focus: colorDictionary.yellowFocus,
   grey: colorDictionary.grey,
   greyLight: colorDictionary.greyLight,
-  greySelected: colorDictionary.greySelected,
   greyHover: colorDictionary.greyHover,
   borderBottom: colorDictionary.borderBottom,
 
