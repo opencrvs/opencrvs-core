@@ -8543,10 +8543,15 @@ camelcase@^4.0.0, camelcase@^4.1.0:
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-4.1.0.tgz#d545635be1e33c542649c69173e5de6acfae34dd"
   integrity sha1-1UVjW+HjPFQmScaRc+Xeas+uNN0=
 
-camelcase@^6.0.0, camelcase@^6.1.0, camelcase@^6.2.0:
+camelcase@^6.0.0, camelcase@^6.1.0:
   version "6.2.1"
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-6.2.1.tgz#250fd350cfd555d0d2160b1d51510eaf8326e86e"
   integrity sha512-tVI4q5jjFV5CavAU8DXfza/TJcZutVKo/5Foskmsqcm0MsL91moHvwiGNnqaa2o6PF/7yT5ikDRcVcl8Rj6LCA==
+
+camelcase@^6.2.0:
+  version "6.3.0"
+  resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-6.3.0.tgz#5685b95eb209ac9c0c177467778c9c84df58ba9a"
+  integrity sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==
 
 camelize@^1.0.0:
   version "1.0.0"
@@ -13365,7 +13370,7 @@ graphql-request@^3.3.0:
     extract-files "^9.0.0"
     form-data "^3.0.0"
 
-graphql-schema-typescript@^1.2.7:
+graphql-schema-typescript@^1.5.0:
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/graphql-schema-typescript/-/graphql-schema-typescript-1.5.2.tgz#04433236617689825842e45ccfe2fd384c01d8f2"
   integrity sha512-r09ycu9BLSeRg8VcEB1Jg2kHeBxeDOdz1iyhA/rja3IcZoau3MRie0203piWI8j+N/KIv60OBPquiEgq1snYAQ==

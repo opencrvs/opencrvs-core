@@ -120,8 +120,8 @@ export interface GQLDeathRegistration extends GQLEventRegistration {
   mannerOfDeath?: GQLMannerOfDeath
   causeOfDeathMethod?: GQLCauseOfDeathMethodType
   causeOfDeath?: string
-  maleDependentsOfDeceased?: string
-  femaleDependentsOfDeceased?: string
+  maleDependentsOfDeceased?: number
+  femaleDependentsOfDeceased?: number
   medicalPractitioner?: GQLMedicalPractitioner
   createdAt?: GQLDate
   updatedAt?: GQLDate
@@ -333,8 +333,8 @@ export interface GQLDeathRegistrationInput {
   mannerOfDeath?: GQLMannerOfDeath
   causeOfDeathMethod?: GQLCauseOfDeathMethodType
   causeOfDeath?: string
-  maleDependentsOfDeceased?: string
-  femaleDependentsOfDeceased?: string
+  maleDependentsOfDeceased?: number
+  femaleDependentsOfDeceased?: number
   medicalPractitioner?: GQLMedicalPractitionerInput
   createdAt?: GQLDate
   updatedAt?: GQLDate
@@ -407,8 +407,7 @@ export const enum GQLAttendantType {
   OTHER_PARAMEDICAL_PERSONNEL = 'OTHER_PARAMEDICAL_PERSONNEL',
   LAYPERSON = 'LAYPERSON',
   NONE = 'NONE',
-  OTHER = 'OTHER',
-  TRADITIONAL_BIRTH_ATTENDANT = 'TRADITIONAL_BIRTH_ATTENDANT'
+  OTHER = 'OTHER'
 }
 
 export const enum GQLBirthRegType {
@@ -438,7 +437,7 @@ export const enum GQLMannerOfDeath {
   ACCIDENT = 'ACCIDENT',
   SUICIDE = 'SUICIDE',
   HOMICIDE = 'HOMICIDE',
-  MANNER_UNDETERMINED = 'MANNER_UNDETERMINED'
+  UNDETERMINED = 'UNDETERMINED'
 }
 
 export const enum GQLCauseOfDeathMethodType {
@@ -916,7 +915,9 @@ export const enum GQLAttachmentSubject {
   APPLICANT_ATHORITY_TO_APPLY_PROOF = 'APPLICANT_ATHORITY_TO_APPLY_PROOF',
   LEGAL_GUARDIAN_PROOF = 'LEGAL_GUARDIAN_PROOF',
   ASSIGNED_RESPONSIBILITY_PROOF = 'ASSIGNED_RESPONSIBILITY_PROOF',
-  WARD_COUNCILLOR_PROOF = 'WARD_COUNCILLOR_PROOF'
+  WARD_COUNCILLOR_PROOF = 'WARD_COUNCILLOR_PROOF',
+  CAUSE_OF_DEATH = 'CAUSE_OF_DEATH',
+  CORONERS_REPORT = 'CORONERS_REPORT'
 }
 
 export interface GQLGenderBasisDetailsMetrics {
@@ -2690,6 +2691,7 @@ export interface GQLUserTypeResolver<TParent = any> {
   identifier?: UserToIdentifierResolver<TParent>
   signature?: UserToSignatureResolver<TParent>
   creationDate?: UserToCreationDateResolver<TParent>
+  device?: UserToDeviceResolver<TParent>
 }
 
 export interface UserToIdResolver<TParent = any, TResult = any> {
@@ -2760,6 +2762,10 @@ export interface UserToSignatureResolver<TParent = any, TResult = any> {
 }
 
 export interface UserToCreationDateResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserToDeviceResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
