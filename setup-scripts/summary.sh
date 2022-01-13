@@ -8,7 +8,7 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 set -e
-echo -e "\033[32m:::::::: In the terminal on the bottom left, OpenCRVS is starting. ::::::::\033[0m"
+echo -e "\033[32m:::::::: In the terminal on the bottom left, OpenCRVS core is starting. ::::::::\033[0m"
 echo
 echo -e "\033[32m:::::::: In the terminal on the bottom right, an OpenCRVS country config will start when OpenCRVS core is running ::::::::\033[0m"
 echo

@@ -27,6 +27,7 @@ if [ -z "$1" ] ; then
     echo 'Error: Argument PATH_TO_OPEN_CRVS_CORE_DIRECTORY is required in position 1.'
     print_usage_and_exit
 fi
+PATH_TO_OPEN_CRVS_CORE_DIRECTORY=$1
 echo
 echo -e "\033[32m::::::::::::::::::::::: Starting OpenCRVS Core :::::::::::::::::::::::\033[0m"
 echo
@@ -75,7 +76,7 @@ echo -e "\033[32m:::::::: OpenCRVS Core is running, now we must checkout a confi
 echo
 echo -e "\033[32m::::::::::::::: Cloning the Zambia Country Configuration :::::::::::::::\033[0m"
 echo
-PATH_TO_CORE=$(pwd)
+
 cd ../
 git clone https://github.com/opencrvs/opencrvs-zambia.git
 cd opencrvs-zambia
