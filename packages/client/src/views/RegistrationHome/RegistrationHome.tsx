@@ -69,6 +69,7 @@ import { RejectTab } from './tabs/reject/rejectTab'
 import { ReviewTab } from './tabs/review/reviewTab'
 import { StatusWaitingValidation } from '@opencrvs/components/lib/icons/StatusWaitingValidation'
 import { ExternalValidationTab } from './tabs/externalValidation/externalValidationTab'
+import { Navigation } from '@client/components/interface/Navigation'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -138,6 +139,13 @@ const FABContainer = styled.div`
   bottom: 55px;
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
+  }
+`
+
+const BodyContainer = styled.div`
+  margin-left: 0px;
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    margin-left: 265px;
   }
 `
 
@@ -326,7 +334,6 @@ export class RegistrationHomeView extends React.Component<
   ) => {
     const {
       workqueue,
-      intl,
       tabId,
       drafts,
       selectorId,
@@ -341,183 +348,122 @@ export class RegistrationHomeView extends React.Component<
 
     return (
       <>
-        <TopBar>
-          <IconTab
-            id={`tab_${TAB_ID.inProgress}`}
-            key={TAB_ID.inProgress}
-            active={tabId === TAB_ID.inProgress}
-            align={ICON_ALIGNMENT.LEFT}
-            icon={() => <StatusProgress />}
-            onClick={() => this.props.goToRegistrarHomeTab(TAB_ID.inProgress)}
-          >
-            {intl.formatMessage(messages.inProgress)} (
-            {!initialSyncDone
-              ? '?'
+        <Navigation
+          tabId={tabId}
+          count={{
+            inProgress: !initialSyncDone
+              ? 0
               : drafts.filter(
                   (draft) =>
                     draft.submissionStatus ===
                     SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
                 ).length +
                 (filteredData.inProgressTab.totalItems || 0) +
-                (filteredData.notificationTab.totalItems || 0)}
-            )
-          </IconTab>
-          <IconTab
-            id={`tab_${TAB_ID.readyForReview}`}
-            key={TAB_ID.readyForReview}
-            active={tabId === TAB_ID.readyForReview}
-            align={ICON_ALIGNMENT.LEFT}
-            icon={() => <StatusOrange />}
-            onClick={() =>
-              this.props.goToRegistrarHomeTab(TAB_ID.readyForReview)
-            }
-          >
-            {intl.formatMessage(messages.readyForReview)} (
-            {!initialSyncDone ? '?' : filteredData.reviewTab.totalItems})
-          </IconTab>
-          <IconTab
-            id={`tab_${TAB_ID.sentForUpdates}`}
-            key={TAB_ID.sentForUpdates}
-            active={tabId === TAB_ID.sentForUpdates}
-            align={ICON_ALIGNMENT.LEFT}
-            icon={() => <StatusRejected />}
-            onClick={() =>
-              this.props.goToRegistrarHomeTab(TAB_ID.sentForUpdates)
-            }
-          >
-            {intl.formatMessage(messages.sentForUpdates)} (
-            {!initialSyncDone ? '?' : filteredData.rejectTab.totalItems})
-          </IconTab>
-          {this.userHasValidateScope() && (
-            <IconTab
-              id={`tab_${TAB_ID.sentForApproval}`}
-              key={TAB_ID.sentForApproval}
-              active={tabId === TAB_ID.sentForApproval}
-              align={ICON_ALIGNMENT.LEFT}
-              icon={() => <StatusGray />}
-              onClick={() =>
-                this.props.goToRegistrarHomeTab(TAB_ID.sentForApproval)
-              }
-            >
-              {intl.formatMessage(messages.sentForApprovals)} (
-              {!initialSyncDone ? '?' : filteredData.approvalTab.totalItems})
-            </IconTab>
-          )}
-          {window.config.EXTERNAL_VALIDATION_WORKQUEUE && (
-            <IconTab
-              id={`tab_${TAB_ID.externalValidation}`}
-              key={TAB_ID.externalValidation}
-              active={tabId === TAB_ID.externalValidation}
-              align={ICON_ALIGNMENT.LEFT}
-              icon={() => <StatusWaitingValidation />}
-              onClick={() =>
-                this.props.goToRegistrarHomeTab(TAB_ID.externalValidation)
-              }
-            >
-              {intl.formatMessage(messages.waitingForExternalValidation)} (
-              {!initialSyncDone
-                ? '?'
-                : filteredData.externalValidationTab.totalItems}
-              )
-            </IconTab>
-          )}
-          <IconTab
-            id={`tab_${TAB_ID.readyForPrint}`}
-            key={TAB_ID.readyForPrint}
-            active={tabId === TAB_ID.readyForPrint}
-            align={ICON_ALIGNMENT.LEFT}
-            icon={() => <StatusGreen />}
-            onClick={() =>
-              this.props.goToRegistrarHomeTab(TAB_ID.readyForPrint)
-            }
-          >
-            {intl.formatMessage(messages.readyToPrint)} (
-            {!initialSyncDone ? '?' : filteredData.printTab.totalItems})
-          </IconTab>
-        </TopBar>
-        {tabId === TAB_ID.inProgress && (
-          <InProgressTab
-            drafts={drafts}
-            selectorId={selectorId}
-            registrarLocationId={registrarLocationId}
-            queryData={{
-              inProgressData: filteredData.inProgressTab,
-              notificationData: filteredData.notificationTab
-            }}
-            showPaginated={this.showPaginated}
-            page={progressCurrentPage}
-            onPageChange={this.onPageChange}
-            loading={loading}
-            error={error}
-          />
-        )}
-        {tabId === TAB_ID.readyForReview && (
-          <ReviewTab
-            registrarLocationId={registrarLocationId}
-            queryData={{
-              data: filteredData.reviewTab
-            }}
-            showPaginated={this.showPaginated}
-            page={reviewCurrentPage}
-            onPageChange={this.onPageChange}
-            loading={loading}
-            error={error}
-          />
-        )}
-        {tabId === TAB_ID.sentForUpdates && (
-          <RejectTab
-            registrarLocationId={registrarLocationId}
-            queryData={{
-              data: filteredData.rejectTab
-            }}
-            showPaginated={this.showPaginated}
-            page={updatesCurrentPage}
-            onPageChange={this.onPageChange}
-            loading={loading}
-            error={error}
-          />
-        )}
-
-        {tabId === TAB_ID.externalValidation &&
-          window.config.EXTERNAL_VALIDATION_WORKQUEUE && (
-            <ExternalValidationTab
+                (filteredData.notificationTab.totalItems || 0),
+            readyForReview: !initialSyncDone
+              ? 0
+              : filteredData.reviewTab.totalItems,
+            sentForUpdates: !initialSyncDone
+              ? 0
+              : filteredData.approvalTab.totalItems,
+            sentForApproval:
+              this.userHasValidateScope() && !initialSyncDone
+                ? 0
+                : filteredData.approvalTab.totalItems,
+            externalValidation:
+              window.config.EXTERNAL_VALIDATION_WORKQUEUE && !initialSyncDone
+                ? 0
+                : filteredData.externalValidationTab.totalItems,
+            readyToPrint: !initialSyncDone
+              ? 0
+              : filteredData.printTab.totalItems
+          }}
+        />
+        <BodyContainer>
+          {tabId === TAB_ID.inProgress && (
+            <InProgressTab
+              drafts={drafts}
+              selectorId={selectorId}
               registrarLocationId={registrarLocationId}
               queryData={{
-                data: filteredData.externalValidationTab
+                inProgressData: filteredData.inProgressTab,
+                notificationData: filteredData.notificationTab
               }}
               showPaginated={this.showPaginated}
-              page={externalValidationCurrentPage}
+              page={progressCurrentPage}
               onPageChange={this.onPageChange}
               loading={loading}
               error={error}
             />
           )}
-        {tabId === TAB_ID.sentForApproval && (
-          <ApprovalTab
-            registrarLocationId={registrarLocationId}
-            queryData={{
-              data: filteredData.approvalTab
-            }}
-            showPaginated={this.showPaginated}
-            page={approvalCurrentPage}
-            onPageChange={this.onPageChange}
-            loading={loading}
-            error={error}
-          />
-        )}
-        {tabId === TAB_ID.readyForPrint && (
-          <PrintTab
-            registrarLocationId={registrarLocationId}
-            queryData={{
-              data: filteredData.printTab
-            }}
-            showPaginated={this.showPaginated}
-            page={printCurrentPage}
-            onPageChange={this.onPageChange}
-            loading={loading}
-            error={error}
-          />
-        )}
+          {tabId === TAB_ID.readyForReview && (
+            <ReviewTab
+              registrarLocationId={registrarLocationId}
+              queryData={{
+                data: filteredData.reviewTab
+              }}
+              showPaginated={this.showPaginated}
+              page={reviewCurrentPage}
+              onPageChange={this.onPageChange}
+              loading={loading}
+              error={error}
+            />
+          )}
+          {tabId === TAB_ID.sentForUpdates && (
+            <RejectTab
+              registrarLocationId={registrarLocationId}
+              queryData={{
+                data: filteredData.rejectTab
+              }}
+              showPaginated={this.showPaginated}
+              page={updatesCurrentPage}
+              onPageChange={this.onPageChange}
+              loading={loading}
+              error={error}
+            />
+          )}
+
+          {tabId === TAB_ID.externalValidation &&
+            window.config.EXTERNAL_VALIDATION_WORKQUEUE && (
+              <ExternalValidationTab
+                registrarLocationId={registrarLocationId}
+                queryData={{
+                  data: filteredData.externalValidationTab
+                }}
+                showPaginated={this.showPaginated}
+                page={externalValidationCurrentPage}
+                onPageChange={this.onPageChange}
+                loading={loading}
+                error={error}
+              />
+            )}
+          {tabId === TAB_ID.sentForApproval && (
+            <ApprovalTab
+              registrarLocationId={registrarLocationId}
+              queryData={{
+                data: filteredData.approvalTab
+              }}
+              showPaginated={this.showPaginated}
+              page={approvalCurrentPage}
+              onPageChange={this.onPageChange}
+              loading={loading}
+              error={error}
+            />
+          )}
+          {tabId === TAB_ID.readyForPrint && (
+            <PrintTab
+              registrarLocationId={registrarLocationId}
+              queryData={{
+                data: filteredData.printTab
+              }}
+              showPaginated={this.showPaginated}
+              page={printCurrentPage}
+              onPageChange={this.onPageChange}
+              loading={loading}
+              error={error}
+            />
+          )}
+        </BodyContainer>
       </>
     )
   }
@@ -536,7 +482,6 @@ export class RegistrationHomeView extends React.Component<
     return (
       <>
         <Header />
-
         {this.getData(
           progressCurrentPage,
           reviewCurrentPage,

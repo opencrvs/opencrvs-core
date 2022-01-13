@@ -84,7 +84,7 @@ export const colors = {
   grey: colorDictionary.grey,
   greyLight: colorDictionary.greyLight,
   greyHover: colorDictionary.greyHover,
-  borderBottom: colorDictionary.borderBottom,
+  border: colorDictionary.borderBottom,
 
   // Exceptions - Try to use one of the above before creating exceptions
   chartAreaGradientStart: colorDictionary.greySmoky,

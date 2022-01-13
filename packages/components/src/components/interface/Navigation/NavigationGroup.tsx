@@ -29,9 +29,5 @@ interface IProps {
 }
 
 export const NavigationGroup = (props: IProps) => {
-  return (
-    <NavigationGroupContainer className="check">
-      {props.children}
-    </NavigationGroupContainer>
-  )
+  return <NavigationGroupContainer>{props.children}</NavigationGroupContainer>
 }

@@ -12,7 +12,7 @@
 import * as React from 'react'
 
 export const LeftNavigationApplicationIcons = (
-  props: React.HTMLAttributes<SVGElement>
+  props: React.HTMLAttributes<SVGElement> & { color?: string }
 ) => {
   let fill: string
   let corner: string
@@ -29,6 +29,14 @@ export const LeftNavigationApplicationIcons = (
     case 'red':
       fill = '#EB9284'
       corner = '#D53F3F'
+      break
+    case 'teal':
+      fill = '#96E9E4'
+      corner = '#4CC1BA'
+      break
+    case 'grey':
+      fill = '#DEE2E4'
+      corner = '#909397'
       break
     default:
       fill = '#BFA4DB'

@@ -31,13 +31,12 @@ const HeaderContainer = styled.div`
   align-items: center;
   position: sticky;
   top: 0;
+  margin-left: 249px;
   z-index: 2;
   ${({ theme }) => theme.gradients.gradientNightshade};
 `
-const HeaderLeft = styled.div`
-  display: flex;
-`
 const HeaderRight = styled.div`
+  margin-left: auto;
   display: flex;
   & > * {
     margin-left: 8px;
@@ -50,10 +49,6 @@ export class DesktopHeader extends React.Component<IDesktopHeaderProps> {
 
     return (
       <HeaderContainer>
-        <HeaderLeft>
-          <HeaderLogo />
-          <Menu menuItems={menuItems} />
-        </HeaderLeft>
         <HeaderRight>
           {desktopRightMenu &&
             desktopRightMenu.map((item: IRightMenu) => item.element)}

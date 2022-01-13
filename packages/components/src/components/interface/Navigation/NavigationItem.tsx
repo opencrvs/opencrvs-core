@@ -13,10 +13,10 @@
 import * as React from 'react'
 import { Expandable } from './../../icons/Expandable'
 import styled from 'styled-components'
-export interface INavigationItemProps {
-  icon?: JSX.Element
+export interface INavigationItemProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  icon?: () => React.ReactNode
   label: string
-  onClick?: () => void
   count?: number
   isSelected?: boolean
   isExpandable?: boolean
@@ -70,22 +70,28 @@ const ValueContainer = styled.span<{ isSelected?: boolean }>`
     isSelected ? theme.colors.grey : theme.colors.greyLight};
 `
 
-export const NavigationItem = (props: INavigationItemProps) => {
+export const NavigationItem = ({
+  icon,
+  label,
+  count,
+  isSelected,
+  isExpandable,
+  isSubItem,
+  children,
+  ...otherProps
+}: INavigationItemProps) => {
   return (
-    <ItemContainer isSelected={props.isSelected}>
+    <ItemContainer isSelected={isSelected} {...otherProps}>
       <ItemContentContainer>
-        <IconContainer>{props.icon && props.icon}</IconContainer>
-        <LabelContainer
-          isSelected={props.isSelected}
-          isSubItem={props.isSubItem}
-        >
-          {props.label}
+        <IconContainer>{icon && icon()}</IconContainer>
+        <LabelContainer isSelected={isSelected} isSubItem={isSubItem}>
+          {label}
         </LabelContainer>
-        <ValueContainer isSelected={props.isSelected}>
-          {props.count ? props.count : props.isExpandable && <Expandable />}
+        <ValueContainer isSelected={isSelected}>
+          {count && count !== 0 ? count : isExpandable && <Expandable />}
         </ValueContainer>
       </ItemContentContainer>
-      {props.isSelected && props.children}
+      {isSelected && children}
     </ItemContainer>
   )
 }

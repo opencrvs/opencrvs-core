@@ -393,29 +393,16 @@ class HeaderComp extends React.Component<IProps, IState> {
     }
   }
 
-  render() {
-    const {
-      intl,
-      userDetails,
-      enableMenuSelection = true,
-      goToHomeAction,
-      goToConfigAction,
-      activeMenuItem
-    } = this.props
-    const title =
-      this.props.title ||
-      intl.formatMessage(
-        activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
-          ? constantsMessages.performanceTitle
-          : activeMenuItem === ACTIVE_MENU_ITEM.TEAM ||
-            activeMenuItem === ACTIVE_MENU_ITEM.USERS
-          ? messages.teamTitle
-          : activeMenuItem === ACTIVE_MENU_ITEM.CONFIG
-          ? constantsMessages.configTitle
-          : constantsMessages.applicationTitle
-      )
+  getMenuItems(props: IProps) {
     let menuItems: any[] = []
-
+    const {
+      userDetails,
+      intl,
+      enableMenuSelection = true,
+      activeMenuItem,
+      goToHomeAction,
+      goToConfigAction
+    } = props
     if (userDetails && userDetails.role) {
       if (
         !SYS_ADMIN_ROLES.includes(userDetails.role) &&
@@ -463,6 +450,25 @@ class HeaderComp extends React.Component<IProps, IState> {
         ])
       }
     }
+    return menuItems
+  }
+
+  render() {
+    const { intl, activeMenuItem } = this.props
+    const title =
+      this.props.title ||
+      intl.formatMessage(
+        activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
+          ? constantsMessages.performanceTitle
+          : activeMenuItem === ACTIVE_MENU_ITEM.TEAM ||
+            activeMenuItem === ACTIVE_MENU_ITEM.USERS
+          ? messages.teamTitle
+          : activeMenuItem === ACTIVE_MENU_ITEM.CONFIG
+          ? constantsMessages.configTitle
+          : constantsMessages.applicationTitle
+      )
+
+    const menuItems = this.getMenuItems(this.props)
 
     let rightMenu = [
       {

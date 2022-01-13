@@ -18,15 +18,26 @@ export interface ILeftNavigationProps {
   children?: React.ReactNode
 }
 const LeftNavigationContainer = styled.div`
+  position: fixed;
+  top: 0px;
   width: 249px;
   height: 100vh;
   overflow-y: auto;
+  background-color: ${({ theme }) => theme.colors.white};
+  border: 0px;
+  border-right: 1px;
+  border-style: solid;
+  border-color: ${({ theme }) => theme.colors.border};
+  z-index: 3;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: none;
+  }
 `
 const ApplicationNameContainer = styled.div`
   padding: 16px 20px;
-  height: 55px;
+  height: 64px;
   background-color: ${({ theme }) => theme.colors.white};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.borderBottom};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
 `
 const ApplicationName = styled.div`
   color: ${({ theme }) => theme.colors.grey};
