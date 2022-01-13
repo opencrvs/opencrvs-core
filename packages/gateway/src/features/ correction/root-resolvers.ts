@@ -13,22 +13,29 @@ import { IAuthHeader } from '@gateway/common-types'
 import { GQLCorrectionInput, GQLResolver } from '@gateway/graphql/schema'
 import { hasScope } from '@gateway/features/user/utils'
 import { buildFHIRBundle } from '@gateway/features/ correction/fhir-builders'
+import { EVENT_TYPE } from '../fhir/constants'
 
 export const resolvers: GQLResolver = {
   Mutation: {
-    async correctRecord(_, { id, correctionInput }, authHeader) {
+    async requestBirthRegistrationCorrection(_, { id, details }, authHeader) {
       if (hasScope(authHeader, 'register')) {
-        await correctRecord(id, authHeader, correctionInput)
+        await requestEventRegistrationCorrection(
+          id,
+          authHeader,
+          details,
+          EVENT_TYPE.BIRTH
+        )
       }
     }
   }
 }
 
-async function correctRecord(
+async function requestEventRegistrationCorrection(
   id: string,
   authHeader: IAuthHeader,
-  correctionInput: GQLCorrectionInput
+  reg: object,
+  eventType: EVENT_TYPE
 ) {
-  const taskHistoryBundle = await buildFHIRBundle(correctRecord, authHeader)
+  const fhirBundle = await buildFHIRBundle(reg, eventType, authHeader)
   // TODO: fhir calls
 }

@@ -759,7 +759,7 @@ function createRegStatusCommentTimeStamp(
   resource.note[context._index.comments].time = fieldValue
 }
 
-const builders: IFieldBuilders = {
+export const builders: IFieldBuilders = {
   _fhirIDMap: {
     composition: (fhirBundle, fieldValue) => {
       fhirBundle.entry[0].resource.id = fieldValue as string
@@ -1811,6 +1811,199 @@ const builders: IFieldBuilders = {
     ) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return setResourceIdentifier(taskResource, 'paper-form-id', fieldValue)
+    },
+    correction: {
+      requester: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: number,
+        context: any
+      ) => {
+        const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+        taskResource.requester = {
+          agent: {
+            reference: (fieldValue as unknown) as string
+          }
+        }
+      },
+      hasShowedVerifiedDocument: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const certDocResource = selectOrCreateCertificateDocRefResource(
+          fhirBundle,
+          context,
+          EVENT_TYPE.BIRTH
+        )
+        if (!certDocResource.extension) {
+          certDocResource.extension = []
+        }
+        const hasVerifiedExt = certDocResource.extension.find(
+          extention =>
+            extention.url ===
+            `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`
+        )
+        if (!hasVerifiedExt) {
+          certDocResource.extension.push({
+            url: `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`,
+            valueString: fieldValue
+          })
+        } else {
+          hasVerifiedExt.valueString = fieldValue
+        }
+      },
+      payments: {
+        paymentId: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const paymentResource = selectOrCreatePaymentReconciliationResource(
+            fhirBundle,
+            context,
+            EVENT_TYPE.BIRTH
+          )
+          if (!paymentResource.identifier) {
+            paymentResource.identifier = []
+          }
+          paymentResource.identifier.push({
+            system: `${OPENCRVS_SPECIFICATION_URL}id/payment-id`,
+            value: fieldValue
+          })
+        },
+        type: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const paymentResource = selectOrCreatePaymentReconciliationResource(
+            fhirBundle,
+            context,
+            EVENT_TYPE.BIRTH
+          )
+          if (!paymentResource.detail) {
+            paymentResource.detail = [
+              {
+                type: {
+                  coding: [{ code: fieldValue }]
+                }
+              }
+            ]
+          } else {
+            paymentResource.detail[0].type = {
+              coding: [{ code: fieldValue }]
+            }
+          }
+        },
+        total: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const paymentResource = selectOrCreatePaymentReconciliationResource(
+            fhirBundle,
+            context,
+            EVENT_TYPE.BIRTH
+          )
+          paymentResource.total = fieldValue as fhir.Money
+        },
+        amount: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const paymentResource = selectOrCreatePaymentReconciliationResource(
+            fhirBundle,
+            context,
+            EVENT_TYPE.BIRTH
+          )
+          if (!paymentResource.detail) {
+            paymentResource.detail = [
+              {
+                /* should be replaced when type value comes in */
+                type: {
+                  coding: [{ code: 'payment' }]
+                },
+                amount: fieldValue as fhir.Money
+              }
+            ]
+          } else {
+            paymentResource.detail[0].amount = fieldValue as fhir.Money
+          }
+        },
+        outcome: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const paymentResource = selectOrCreatePaymentReconciliationResource(
+            fhirBundle,
+            context,
+            EVENT_TYPE.BIRTH
+          )
+          paymentResource.outcome = {
+            coding: [{ code: fieldValue }]
+          }
+        },
+        date: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const paymentResource = selectOrCreatePaymentReconciliationResource(
+            fhirBundle,
+            context,
+            EVENT_TYPE.BIRTH
+          )
+          if (!paymentResource.detail) {
+            paymentResource.detail = [
+              {
+                /* should be replaced when type value comes in */
+                type: {
+                  coding: [{ code: 'payment' }]
+                },
+                date: fieldValue
+              }
+            ]
+          } else {
+            paymentResource.detail[0].date = fieldValue
+          }
+        }
+      },
+      values: (fhirBundle: ITemplatedBundle, fieldValue: any, context) => {
+        const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+        if (!taskResource.input) {
+          taskResource.input = []
+        }
+        if (!taskResource.output) {
+          taskResource.output = []
+        }
+        ;(fieldValue as any[]).forEach(correction => {
+          taskResource.input?.push({
+            type: {
+              coding: [
+                {
+                  code: 'TBD'
+                }
+              ]
+            },
+            valueId: `${correction.section}.${correction.fieldName}`,
+            valueString: correction.oldValue
+          })
+
+          taskResource.output?.push({
+            type: {
+              coding: [
+                {
+                  code: 'TBD'
+                }
+              ]
+            },
+            valueId: `${correction.section}.${correction.fieldName}`,
+            valueString: correction.newValue
+          })
+        })
+      }
     },
     status: {
       comments: {

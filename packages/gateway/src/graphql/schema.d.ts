@@ -721,6 +721,7 @@ export interface GQLRegistrationInput {
   attachments?: Array<GQLAttachmentInput | null>
   certificates?: Array<GQLCertificateInput | null>
   location?: GQLLocationInput
+  correction?: GQLCorrectionInput
 }
 
 export interface GQLRelatedPersonInput {
@@ -1778,6 +1779,9 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markBirthAsValidated?: MutationToMarkBirthAsValidatedResolver<TParent>
   markBirthAsRegistered?: MutationToMarkBirthAsRegisteredResolver<TParent>
   markBirthAsCertified?: MutationToMarkBirthAsCertifiedResolver<TParent>
+  requestBirthRegistrationCorrection?: MutationToRequestBirthRegistrationCorrectionResolver<
+    TParent
+  >
   markEventAsVoided?: MutationToMarkEventAsVoidedResolver<TParent>
   notADuplicate?: MutationToNotADuplicateResolver<TParent>
   createDeathRegistration?: MutationToCreateDeathRegistrationResolver<TParent>
@@ -1786,12 +1790,14 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markDeathAsValidated?: MutationToMarkDeathAsValidatedResolver<TParent>
   markDeathAsRegistered?: MutationToMarkDeathAsRegisteredResolver<TParent>
   markDeathAsCertified?: MutationToMarkDeathAsCertifiedResolver<TParent>
+  requestDeathRegistrationCorrection?: MutationToRequestDeathRegistrationCorrectionResolver<
+    TParent
+  >
   createOrUpdateUser?: MutationToCreateOrUpdateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
   changePassword?: MutationToChangePasswordResolver<TParent>
   auditUser?: MutationToAuditUserResolver<TParent>
   resendSMSInvite?: MutationToResendSMSInviteResolver<TParent>
-  correctRecord?: MutationToCorrectRecordResolver<TParent>
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -2120,26 +2126,45 @@ export interface MutationToResendSMSInviteResolver<
   ): TResult
 }
 
-export interface MutationToCorrectRecordResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: MutationToCorrectRecordArgs,
-    context: any,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
 export interface GQLCorrectionInput {
   section: string
   fieldName: string
   oldValue: string
   newValue: string
 }
-export interface MutationToCorrectRecordArgs {
-  id: string
-  correctionInput: GQLCorrectionInput
+export interface MutationToRequestBirthRegistrationCorrectionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToRequestBirthRegistrationCorrectionArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
 }
 
+export interface MutationToRequestBirthRegistrationCorrectionArgs {
+  id: string
+  details: GQLBirthRegistrationInput
+}
+
+export interface MutationToRequestDeathRegistrationCorrectionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToRequestDeathRegistrationCorrectionArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToRequestDeathRegistrationCorrectionArgs {
+  id: string
+  details: GQLDeathRegistrationInput
+}
 export interface GQLDummyTypeResolver<TParent = any> {
   dummy?: DummyToDummyResolver<TParent>
 }

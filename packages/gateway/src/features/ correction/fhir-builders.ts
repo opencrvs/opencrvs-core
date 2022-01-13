@@ -11,25 +11,29 @@
  */
 import { IAuthHeader } from '@gateway/common-types'
 import { v4 as uuid } from 'uuid'
-import transformObj from '../transformation'
-
-const builders = {} // TODO: add fhir builders
+import transformObj from '@gateway/features/transformation'
+import { builders } from '@gateway/features/registration/fhir-builders'
+import { createCompositionTemplate } from '@gateway/features/fhir/templates'
+import { EVENT_TYPE } from '@gateway/features/fhir/constants'
 
 export async function buildFHIRBundle(
-  correctionInput: object,
+  reg: object,
+  eventType: EVENT_TYPE,
   authHeader?: IAuthHeader
 ) {
   const ref = uuid()
-  const context: any = {}
+  const context: any = {
+    event: eventType
+  }
   const fhirBundle = {
     resourceType: 'Bundle',
     type: 'document',
-    entry: [] // TODO: create task history
+    entry: [createCompositionTemplate(ref, context)] // TODO: create task history
   }
 
   if (authHeader) {
     context.authHeader = authHeader
   }
-  await transformObj(correctionInput, fhirBundle, builders, context)
+  await transformObj(reg, fhirBundle, builders, context)
   return fhirBundle
 }
