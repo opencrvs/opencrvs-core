@@ -333,8 +333,7 @@ tmux split-window -v -f
 if [ $OS == "UBUNTU" ]; then
   tmux send-keys -t opencrvs "LANGUAGES=en && yarn start" C-m
   else
-  $MY_IP = $(hostname -I | cut -d' ' -f1)
-  tmux send-keys -t opencrvs "LANGUAGES=en && LOCAL_IP=$MY_IP && yarn start" C-m
+  tmux send-keys -t opencrvs "LANGUAGES=en && LOCAL_IP=$(ipconfig getifaddr en0) && yarn start" C-m
 fi
 tmux set -p @mytitle "opencrvs-core"
 tmux split-window -h

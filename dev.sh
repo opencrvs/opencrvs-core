@@ -34,8 +34,7 @@ export LANGUAGES=$1
 if [ $OS == "UBUNTU" ]; then
   yarn dev:secrets:gen && concurrently "yarn run start" "yarn run compose:deps"
   else
-  $MY_IP = $(hostname -I | cut -d' ' -f1)
-  export LOCAL_IP=$MY_IP
+  export LOCAL_IP=$(ipconfig getifaddr en0)
   yarn dev:secrets:gen && concurrently "yarn run start" "yarn run compose:deps"
 fi
 
