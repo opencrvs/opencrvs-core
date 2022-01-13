@@ -66,11 +66,35 @@ function ctrl_c() {
 echo
 echo -e "\033[32m:::::::::::::::::::::::::::: INSTALLING OPEN CRVS ::::::::::::::::::::::::::::\033[0m"
 echo -e "\033[32m::::::::::::::::::::: INTERNET CONNECTIVITY IS REQUIRED :::::::::::::::::::::\033[0m"
+
+echo
+
+# Retrieve 2-step verification to continue
+#-----------------------------------------
+function ask_yes_or_no() {
+    read -p "$1 ([y]es or [N]o): "
+    case $(echo $REPLY | tr '[A-Z]' '[a-z]') in
+        y|yes) echo "yes" ;;
+        *)     echo "no" ;;
+    esac
+}
+if [[ "no" == $(ask_yes_or_no "This is a ONE TIME USE ONLY setup command for OpenCRVS.  If you have already successfully installed OpenCRVS, you should use 'yarn dev' to start OpenCRVS again.  Type: no to exit.  If you want to continue, you must have 30 minutes available as the process cannot be interrupted.  You must also have at least 10GB of available disk space and at least 8GB of RAM.  Type: yes to continue.") ]]
+then
+    echo "Exiting OpenCRVS setup."
+    exit 0
+fi
+
 echo
 echo -e "\033[32m:::::::::::::::::: THIS PROCESS CAN TAKE 15 MINUTES OR MORE ::::::::::::::::::\033[0m"
 echo
 echo "We will check your dependencies, build docker images, load and configure OpenCRVS. It takes a long time so please be patient and do not quit this process."
+echo
 sleep 5
+echo "If we recognise that you have not installed a dependency correctly, we will display links to instructions you can follow on 3rd party websites. The links worked at the time of writing but may change. Please let us know on Gitter if you encounter any broken links."
+sleep 5
+echo
+echo "Installing Docker and Node for example, is outside the scope of this script."
+sleep 10
 echo
 echo -e "\033[32m:::::::::::::::: PLEASE WAIT FOR THE OPEN CRVS LOGO TO APPEAR ::::::::::::::::\033[0m"
 echo
