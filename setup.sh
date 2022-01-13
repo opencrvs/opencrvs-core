@@ -64,19 +64,23 @@ function ctrl_c() {
 }
 
 echo
-echo ":::::::::::::::::::::::::::: INSTALLING OPEN CRVS ::::::::::::::::::::::::::::"
-echo "::::::::::::::::::::: INTERNET CONNECTIVITY IS REQUIRED :::::::::::::::::::::"
+echo -e "\033[32m:::::::::::::::::::::::::::: INSTALLING OPEN CRVS ::::::::::::::::::::::::::::\033[0m"
+echo -e "\033[32m::::::::::::::::::::: INTERNET CONNECTIVITY IS REQUIRED :::::::::::::::::::::\033[0m"
 echo
-echo ":::::::::::::::::: THIS PROCESS CAN TAKE 15 MINUTES OR MORE ::::::::::::::::::"
-echo ":::::::::::::::: PLEASE WAIT FOR THE OPEN CRVS LOGO TO APPEAR ::::::::::::::::"
+echo -e "\033[32m:::::::::::::::::: THIS PROCESS CAN TAKE 15 MINUTES OR MORE ::::::::::::::::::\033[0m"
+echo
+echo "We will check your dependencies, build docker images, load and configure OpenCRVS. It takes a long time so please be patient and do not quit this process."
+sleep 5
+echo
+echo -e "\033[32m:::::::::::::::: PLEASE WAIT FOR THE OPEN CRVS LOGO TO APPEAR ::::::::::::::::\033[0m"
 echo
 sleep 5
 
-  echo ":::::::::::::::::::::: Checking your operating system ::::::::::::::::::::::"
+  echo -e "\033[32m:::::::::::::::::::::: Checking your operating system ::::::::::::::::::::::\033[0m"
   echo
 #sleep 1
 if [  -n "$(uname -a | grep Ubuntu)" ]; then
-  echo ":::::::::::::::: You are running Ubuntu.  Checking version ::::::::::::::::"
+  echo -e "\033[32m:::::::::::::::: You are running Ubuntu.  Checking version ::::::::::::::::\033[0m"
   echo
   #sleep 1
   OS="UBUNTU"
@@ -90,7 +94,7 @@ if [  -n "$(uname -a | grep Ubuntu)" ]; then
     echo -e "Your Ubuntu version: $ubuntuVersion is \033[32msupported!\033[0m :)"
     echo
     #sleep 1
-    echo ":::::::: Setting memory requirements for file watch limit and ElasticSearch ::::::::"
+    echo -e "\033[32m:::::::: Setting memory requirements for file watch limit and ElasticSearch ::::::::\033[0m"
     echo
     #sleep 1
     if grep -Fxq "fs.inotify.max_user_watches=524288" /etc/sysctl.conf ; then
@@ -110,28 +114,28 @@ if [  -n "$(uname -a | grep Ubuntu)" ]; then
       echo -e "Chrome is \033[32minstalled!\033[0m :)"
       echo
     else
-      echo ":::::::: The OpenCRVS client application is a progressive web application. ::::::::"
-      echo "::::::::::::: It is best experienced using the Google Chrome browser. :::::::::::::"
+      echo -e "\033[32m:::::::: The OpenCRVS client application is a progressive web application. ::::::::\033[0m"
+      echo -e "\033[32m::::::::::::: It is best experienced using the Google Chrome browser. :::::::::::::\033[0m"
       echo
       echo "We think that you do not have Chrome installed."
-      echo ":::: We recommend that you install Google Chrome: https://www.google.com/chrome ::::"
+      echo -e "\033[32m:::: We recommend that you install Google Chrome: https://www.google.com/chrome ::::\033[0m"
       echo
     fi
   fi
 elif [ "$(uname)" == "Darwin" ]; then
-  echo "::::::::::::::::::::::::: You are running Mac OSX. :::::::::::::::::::::::::"
+  echo -e "\033[32m::::::::::::::::::::::::: You are running Mac OSX. :::::::::::::::::::::::::\033[0m"
   echo
   OS="MAC"
   if [  -n "$(/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version | grep Chrome)" ]; then
     echo -e "Chrome is \033[32minstalled!\033[0m :)"
     echo
   else
-    echo ":::::::: The OpenCRVS client application is a progressive web application. ::::::::"
-    echo "::::::::::::: It is best experienced using the Google Chrome browser. :::::::::::::"
+    echo -e "\033[32m:::::::: The OpenCRVS client application is a progressive web application. ::::::::\033[0m"
+    echo -e "\033[32m::::::::::::: It is best experienced using the Google Chrome browser. :::::::::::::\033[0m"
     echo
     echo "We think that you do not have Chrome installed, or it is not available on this path: "
     echo "/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
-    echo ":::: We recommend that you install Google Chrome: https://www.google.com/chrome ::::"
+    echo -e "\033[32m:::: We recommend that you install Google Chrome: https://www.google.com/chrome ::::\033[0m"
     echo
   fi
 else
@@ -140,7 +144,7 @@ else
   exit 1
 fi
 
-echo ":::::::: Checking that you have the required dependencies installed ::::::::"
+echo -e "\033[32m:::::::: Checking that you have the required dependencies installed ::::::::\033[0m"
 echo
 #sleep 1
 dependencies=( "docker" "node" "yarn" "tmux")
@@ -179,9 +183,9 @@ do
             echo "You need to install Node, or if you did, we can't find it and perhaps it is not in your PATH. Please fix your node installation."
             echo "We recommend you install Node v.14.15.0, v14.15.4, 14.17.0 or v14.18.1 as this release has been tested on those versions."
             echo "There are various ways you can install Node.  The easiest way to get Node running with the version of your choice is using Node Version Manager."
-            echo "Documentation is here: https://nodejs.org/en/download/package-manager/#nvm.  For example run:"
+            echo "Documentation is here: https://nodejs.org/en/download/package-manager/#nvm.  For example run:\033[0m"
             echo "curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash"
-            echo "Then use nvm to install the Node version of choice.  For example run:"
+            echo "Then use nvm to install the Node version of choice.  For example run:\033[0m"
             echo "nvm install 14.17.0"
         fi
         if [ $i == "yarn" ] ; then
@@ -189,19 +193,19 @@ do
            echo "The documentation is here: https://classic.yarnpkg.com/en/docs/install"
         fi
         if [ $i == "google-chrome" ] ; then
-          echo ":::::::: The OpenCRVS client application is a progressive web application. ::::::::"
-          echo "::::::::::::: It is best experienced using the Google Chrome browser. :::::::::::::"
+          echo -e "\033[32m:::::::: The OpenCRVS client application is a progressive web application. ::::::::\033[0m"
+          echo -e "\033[32m::::::::::::: It is best experienced using the Google Chrome browser. :::::::::::::\033[0m"
           echo
           echo "We think that you do not have Chrome installed."
-          echo ":::: We recommend that you install Google Chrome: https://www.google.com/chrome ::::"
+          echo -e "\033[32m:::: We recommend that you install Google Chrome: https://www.google.com/chrome ::::\033[0m"
           echo
         fi
         if [ $i == "tmux" ] ; then
           if [ $OS == "UBUNTU" ]; then
               echo "OpenCRVS requires multiple terminal windows open in order to run OpenCRVS Core alongside the default country configuration."
-              echo "::::::::::::: We want to install the tool tmux to do this. :::::::::::::"
+              echo -e "\033[32m::::::::::::: We want to install the tool tmux to do this. :::::::::::::\033[0m"
               echo
-              echo "::::::::::::: Run this command: sudo apt-get install tmux :::::::::::::"
+              echo -e "\033[32m::::::::::::: Run this command: sudo apt-get install tmux :::::::::::::\033[0m"
           else
               echo "OpenCRVS requires multiple terminal windows open in order to run OpenCRVS Core alongside the default country configuration."
               echo
@@ -209,14 +213,14 @@ do
           fi
         fi
         echo
-        echo "::::::::::::::: After $i is installed please try again :::::::::::::::"
+        echo -e "\033[32m::::::::::::::: After $i is installed please try again :::::::::::::::\033[0m"
         echo
         exit 1
     fi
 done
 
 echo
-echo ":::::: NOW WE NEED TO CHECK THAT YOUR NODE VERSION IS SUPPORTED ::::::"
+echo -e "\033[32m:::::: NOW WE NEED TO CHECK THAT YOUR NODE VERSION IS SUPPORTED ::::::\033[0m"
 echo
 #sleep 1
 myNodeVersion=`echo "$(node -v)" | sed 's/v//'`
@@ -225,7 +229,7 @@ if [ "$versionTest" == "LOWER" ] ; then
   echo "Sorry your Node version is not supported.  You must upgrade Node to use a supported version."
   echo "We recommend you install Node v.14.15.0, v14.15.4, v14.17.0 or v14.18.1 as this release has been tested on those versions."
   echo "Documentation is here: https://nodejs.org/en/download/package-manager/#nvm"
-  echo "Then use nvm to install the Node version of choice.  For example run:"
+  echo "Then use nvm to install the Node version of choice.  For example run:\033[0m"
   echo "nvm install 14.17.0"
   exit 1
   else
@@ -235,37 +239,45 @@ fi
 
 if [ $OS == "UBUNTU" ]; then
   echo
-  echo "::::::::::::::::: Giving Docker user sudo privileges :::::::::::::::::"
+  echo -e "\033[32m::::::::::::::::: Giving Docker user sudo privileges :::::::::::::::::\033[0m"
   echo
-  echo "::::::::::: Please enter your sudo password when prompted :::::::::::"
+  echo -e "\033[32m::::::::::: Please enter your sudo password when prompted :::::::::::\033[0m"
   echo
   sudo chmod 666 /var/run/docker.sock
   sudo usermod -aG docker $USER
 fi
 
 echo
-echo ":::::::::::::::::::::: Initialising Docker Swarm ::::::::::::::::::::::"
+echo -e "\033[32m:::::::::::::::::::::: Initialising Docker Swarm ::::::::::::::::::::::\033[0m"
+echo
+echo -e "\033[32m:::::::: If Docker is already part of a swarm, this can fail. ::::::::\033[0m"
+echo
+echo -e "\033[32m::::::::::::::::: To leave an existing swarm, type: :::::::::::::::::\033[0m"
+echo
+echo -e "\033[32m::::::::::::::::::::: docker swarm leave --force :::::::::::::::::::::\033[0m"
 echo
 docker swarm init
-
-
 echo
-echo ":::::::::::::::::: Installing some Node dependencies ::::::::::::::::::"
+echo -e "\033[32m:::::::::: Stopping any currently running Docker containers ::::::::::\033[0m"
+echo
+docker stop $(docker ps -aq)
+echo
+echo -e "\033[32m:::::::::::::::::: Installing some Node dependencies ::::::::::::::::::\033[0m"
 echo
 npm install -g wait-on
 yarn install
 
-echo "::::::::::::::::::::::: Creating some directories :::::::::::::::::::::::"
+echo -e "\033[32m::::::::::::::::::::::: Creating some directories :::::::::::::::::::::::\033[0m"
 echo
-echo "::::::::::::: Please enter your sudo password when prompted :::::::::::::"
+echo -e "\033[32m::::::::::::: Please enter your sudo password when prompted :::::::::::::\033[0m"
 echo
 openssl genrsa -out .secrets/private-key.pem 2048 && openssl rsa -pubout -in .secrets/private-key.pem -out .secrets/public-key.pem
 sudo mkdir -p data/elasticsearch
 sudo chown -R 1000:1000 data/elasticsearch
 
-echo ":::::::::::::::::::: Building OpenCRVS dependencies ::::::::::::::::::::"
+echo -e "\033[32m:::::::::::::::::::: Building OpenCRVS dependencies ::::::::::::::::::::\033[0m"
 echo
-echo ":::::::::::::: This can take some time on slow connections ::::::::::::::"
+echo -e "\033[32m:::::::::::::: This can take some time on slow connections ::::::::::::::\033[0m"
 echo
 yarn compose:deps:detached
 DOCKER_STARTED=1
@@ -286,7 +298,10 @@ tmux new-session -s opencrvs -n opencrvs -d -x "$2" -y "$(($1 - 1))"
 TMUX_STARTED=1
 tmux set -p @mytitle "opencrvs-core-working"
 tmux send-keys -t opencrvs "bash setup/summary.sh" C-m
-tmux split-window -v
+tmux split-window -h
+tmux set -p @mytitle "opencrvs-instructions"
+tmux send-keys -t opencrvs "bash setup/instructions.sh" C-m
+tmux split-window -v -f
 
 if [ $OS == "UBUNTU" ]; then
   tmux send-keys -t opencrvs "LANGUAGES=en && yarn start" C-m
@@ -298,5 +313,6 @@ tmux set -p @mytitle "opencrvs-core"
 tmux split-window -h
 tmux set -p @mytitle "opencrvs-zambia"
 tmux send-keys -t opencrvs "bash setup/setup-resources.sh" C-m
+tmux setw -g mouse on
 tmux attach -t opencrvs
 
