@@ -151,7 +151,7 @@ describe('Registraion Rates tests', () => {
     ).component
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
@@ -174,12 +174,9 @@ describe('Registraion Rates tests', () => {
       .simulate('keyDown', { key: 'ArrowDown', keyCode: 40 })
     component.update()
     expect(component.find('.react-select__menu-list').children().length).toBe(2)
-    expect(
-      component
-        .find('.react-select__menu-list')
-        .childAt(1)
-        .text()
-    ).toBe('By location')
+    expect(component.find('.react-select__menu-list').childAt(1).text()).toBe(
+      'By location'
+    )
   })
 
   it('clicking on back takes back to operational dashboard with selected location', async () => {
@@ -207,10 +204,7 @@ describe('Registraion Rates tests', () => {
       component,
       '#last30Days'
     )
-    last30DaysPresetButtonElement
-      .hostNodes()
-      .at(0)
-      .simulate('click')
+    last30DaysPresetButtonElement.hostNodes().at(0).simulate('click')
     const confirmButtonElement = await waitForElement(
       component,
       '#date-range-confirm-action'
@@ -228,19 +222,13 @@ describe('Registraion Rates tests', () => {
 
     expect(component.find('#picker-modal').hostNodes()).toHaveLength(1)
 
-    component
-      .find('#close-btn')
-      .hostNodes()
-      .simulate('click')
+    component.find('#close-btn').hostNodes().simulate('click')
 
     expect(component.find('#picker-modal').hostNodes()).toHaveLength(0)
 
     locationPickerElement.hostNodes().simulate('click')
     expect(component.find('#picker-modal').hostNodes()).toHaveLength(1)
-    component
-      .find('#cancelable-area')
-      .hostNodes()
-      .simulate('click')
+    component.find('#cancelable-area').hostNodes().simulate('click')
     expect(component.find('#picker-modal').hostNodes()).toHaveLength(0)
   })
 
@@ -352,7 +340,7 @@ describe('Registraion Rates error state tests', () => {
     ).component
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 

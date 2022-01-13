@@ -82,10 +82,7 @@ describe('when user is in the document upload page', () => {
     const action = actions.changeLanguage({ language: 'bn' })
     store.dispatch(action)
 
-    const lastItem = formListComponent
-      .update()
-      .find('ul li')
-      .last()
+    const lastItem = formListComponent.update().find('ul li').last()
     expect(lastItem.text()).toBe(
       'রেজিস্টারের চাহিদা মোতাবেক অন্যান্য কাগজপত্রের সত্যায়িত অনুলিপি'
     )

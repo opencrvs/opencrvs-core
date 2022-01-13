@@ -62,11 +62,11 @@ describe('when user wants to review death certificate', () => {
     await store.dispatch(checkAuth({ '?token': validToken }))
 
     await store.dispatch(
-      storeApplication(({
+      storeApplication({
         id: 'mockDeath1234',
         data: mockDeathApplicationData,
         event: Event.DEATH
-      } as unknown) as IApplication)
+      } as unknown as IApplication)
     )
     const testComponent = await createTestComponent(
       <ReviewCertificateAction
@@ -109,11 +109,11 @@ describe('when user wants to review birth certificate', () => {
       }
     }
     await store.dispatch(
-      storeApplication(({
+      storeApplication({
         id: 'asdhdqe2472487jsdfsdf',
         data: mockBirthApplicationData,
         event: Event.BIRTH
-      } as unknown) as IApplication)
+      } as unknown as IApplication)
     )
 
     const testComponent = await createTestComponent(
@@ -158,10 +158,7 @@ describe('when user wants to review birth certificate', () => {
     confirmBtn.hostNodes().simulate('click')
     component.update()
 
-    component
-      .find('#print-certificate')
-      .hostNodes()
-      .simulate('click')
+    component.find('#print-certificate').hostNodes().simulate('click')
     component.update()
 
     const modalIsClosed = !!component.find('#confirm-print-modal').hostNodes()
@@ -184,11 +181,11 @@ describe('back button behavior tests of review certificate action', () => {
       }
     }
     store.dispatch(
-      storeApplication(({
+      storeApplication({
         id: 'asdhdqe2472487jsdfsdf',
         data: mockBirthApplicationData,
         event: Event.BIRTH
-      } as unknown) as IApplication)
+      } as unknown as IApplication)
     )
   })
 
@@ -219,10 +216,7 @@ describe('back button behavior tests of review certificate action', () => {
     testComponent.component.update()
     component = testComponent.component
 
-    component
-      .find('#action_page_back_button')
-      .hostNodes()
-      .simulate('click')
+    component.find('#action_page_back_button').hostNodes().simulate('click')
     expect(history.goBack).toBeCalledTimes(1)
   })
 
@@ -249,10 +243,7 @@ describe('back button behavior tests of review certificate action', () => {
     testComponent.component.update()
     component = testComponent.component
 
-    component
-      .find('#action_page_back_button')
-      .hostNodes()
-      .simulate('click')
+    component.find('#action_page_back_button').hostNodes().simulate('click')
     await flushPromises()
     expect(history.push).toBeCalledWith('/registration-home/print/')
   })

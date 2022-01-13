@@ -126,6 +126,5 @@ const messagesToDefine: IregistrationHomeMessages = {
   }
 }
 
-export const messages: IregistrationHomeMessages = defineMessages(
-  messagesToDefine
-)
+export const messages: IregistrationHomeMessages =
+  defineMessages(messagesToDefine)

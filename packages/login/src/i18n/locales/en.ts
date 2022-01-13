@@ -11,6 +11,7 @@
  */
 export const ENGLISH_STATE = {
   lang: 'en',
+  displayName: 'English',
   messages: {
     'buttons.confirm': 'Confirm',
     'buttons.continue': 'Continue',
@@ -52,7 +53,7 @@ export const ENGLISH_STATE = {
       "Analyse the performance of a particular area of your country in it's Civil Registration.",
     'resend.sms': 'Resend SMS',
     'resetCredentials.form.title':
-      '{forgottenItem, select, username {Username reminder request} password {Password reset}}',
+      '{forgottenItem, select, username {Username reminder request} password {Password reset} other {}}',
     'resetCredentials.forgottenItem.form.title': "Can't login",
     'resetCredentials.forgottenItem.form.body.header':
       'What have you forgotten?',
@@ -76,9 +77,9 @@ export const ENGLISH_STATE = {
     'resetCredentials.securityQuestion.form.body.subheader':
       'This is one of the security questions you choose when setting up your account',
     'resetCredentials.success.page.title':
-      '{forgottenItem, select, username {Username reminder sent} password {Password reset successful}}',
+      '{forgottenItem, select, username {Username reminder sent} password {Password reset successful} other {}}',
     'resetCredentials.success.page.subtitle':
-      '{forgottenItem, select, username {Check your phone for a reminder of your username} password {You can now login with your new password}}',
+      '{forgottenItem, select, username {Check your phone for a reminder of your username} password {You can now login with your new password} other {}}',
     'misc.newPass.header': 'Choose a new password',
     'misc.newPass.instruction':
       'We recommend you create a unique password - one that you don’t use for another website or app. Note. You can’t reuse your old password once you change it.',

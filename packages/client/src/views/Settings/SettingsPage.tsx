@@ -170,27 +170,27 @@ class SettingsView extends React.Component<IProps, IState> {
   }
 
   toggleLanguageSettingsModal = () => {
-    this.setState(state => ({
+    this.setState((state) => ({
       showLanguageSettings: !state.showLanguageSettings
     }))
   }
 
   toggleSuccessNotification = (subject: NOTIFICATION_SUBJECT | null = null) => {
-    this.setState(state => ({
+    this.setState((state) => ({
       showSuccessNotification: !state.showSuccessNotification,
       notificationSubject: subject
     }))
   }
 
   cancelLanguageSettings = () => {
-    this.setState(state => ({
+    this.setState((state) => ({
       selectedLanguage: this.props.language,
       showLanguageSettings: !state.showLanguageSettings
     }))
   }
 
   togglePasswordChangeModal = () => {
-    this.setState(state => ({
+    this.setState((state) => ({
       showPasswordChange: !state.showPasswordChange
     }))
   }

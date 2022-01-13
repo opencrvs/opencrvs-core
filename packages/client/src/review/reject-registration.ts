@@ -49,7 +49,8 @@ export const rejectRegistration: IRejectRegistrationForm = {
       label: messages.rejectionCommentForHealthWorkerLabel,
       initialValue: '',
       validate: [],
-      required: true
+      required: true,
+      maxLength: 500
     }
   ]
 }

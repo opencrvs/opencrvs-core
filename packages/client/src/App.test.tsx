@@ -150,9 +150,6 @@ describe('it handles react unauthorized errors', () => {
       testComponent.component.find('#GoToHomepage').hostNodes()
     ).toHaveLength(1)
 
-    testComponent.component
-      .find('#GoToHomepage')
-      .hostNodes()
-      .simulate('click')
+    testComponent.component.find('#GoToHomepage').hostNodes().simulate('click')
   })
 })

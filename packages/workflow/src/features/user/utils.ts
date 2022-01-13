@@ -12,7 +12,7 @@
 import { USER_MANAGEMENT_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { callingCountries } from 'country-data'
-import { getTokenPayload } from '@workflow/utils/authUtils.ts'
+import { getTokenPayload } from '@workflow/utils/authUtils'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
 const JURISDICTION_TYPE_DISTRICT = 'district'
 const JURISDICTION_TYPE_UPAZILA = 'upazila'

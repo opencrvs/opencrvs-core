@@ -218,7 +218,6 @@ class ReviewCertificateActionComponent extends React.Component<
   getTitle = () => {
     const { intl, event } = this.props
     let eventName = intl.formatMessage(constantsMessages.birth).toLowerCase()
-    console.log('')
     switch (event) {
       case Event.BIRTH:
         return intl.formatMessage(certificateMessages.reviewTitle, {
@@ -318,7 +317,7 @@ const getDraft = (
   registrationId: string,
   eventType: string
 ) =>
-  drafts.find(draftItem => draftItem.id === registrationId) ||
+  drafts.find((draftItem) => draftItem.id === registrationId) ||
   ({
     id: '',
     data: {},

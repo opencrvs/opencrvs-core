@@ -36,13 +36,9 @@ describe('Test phone number verification form', () => {
         forgottenItem: FORGOTTEN_ITEMS.USERNAME
       })
 
-      expect(
-        app
-          .update()
-          .find('#page-title')
-          .hostNodes()
-          .text()
-      ).toContain('ব্যবহারকারীর নাম পুনরুদ্ধারের অনুরোধ')
+      expect(app.update().find('#page-title').hostNodes().text()).toContain(
+        'ব্যবহারকারীর নাম পুনরুদ্ধারের অনুরোধ'
+      )
     })
 
     it('loads title when password is chosen as the forgotten item', async () => {
@@ -51,13 +47,9 @@ describe('Test phone number verification form', () => {
         forgottenItem: FORGOTTEN_ITEMS.PASSWORD
       })
 
-      expect(
-        app
-          .update()
-          .find('#page-title')
-          .hostNodes()
-          .text()
-      ).toContain('পাসওয়ার্ড পুনরায় সেট করুন')
+      expect(app.update().find('#page-title').hostNodes().text()).toContain(
+        'পাসওয়ার্ড পুনরায় সেট করুন'
+      )
     })
   })
 
@@ -82,10 +74,7 @@ describe('Test phone number verification form', () => {
         .find('#phone-number-input')
         .hostNodes()
         .simulate('change', { target: { value: '123' } })
-      app
-        .find('#continue')
-        .hostNodes()
-        .simulate('click')
+      app.find('#continue').hostNodes().simulate('click')
       expect(history.location.pathname).toContain(
         routes.PHONE_NUMBER_VERIFICATION
       )
@@ -117,10 +106,7 @@ describe('Test phone number verification form', () => {
         .find('#phone-number-input')
         .hostNodes()
         .simulate('change', { target: { value: '01711111111' } })
-      app
-        .find('#continue')
-        .hostNodes()
-        .simulate('submit')
+      app.find('#continue').hostNodes().simulate('submit')
       await wait()
 
       const request = moxios.requests.mostRecent()
@@ -136,7 +122,7 @@ describe('Test phone number verification form', () => {
       moxios.uninstall(client)
     })
 
-    it('should show error message', done => {
+    it('should show error message', (done) => {
       history.replace(routes.PHONE_NUMBER_VERIFICATION, {
         forgottenItem: FORGOTTEN_ITEMS.PASSWORD
       })
@@ -145,10 +131,7 @@ describe('Test phone number verification form', () => {
         .find('#phone-number-input')
         .hostNodes()
         .simulate('change', { target: { value: '01712345679' } })
-      app
-        .find('#continue')
-        .hostNodes()
-        .simulate('submit')
+      app.find('#continue').hostNodes().simulate('submit')
       app.update()
 
       moxios.wait(() => {
@@ -178,7 +161,7 @@ describe('Test phone number verification form', () => {
       moxios.uninstall(client)
     })
 
-    it('redirects to security question form when username is chosen as forgotten item', done => {
+    it('redirects to security question form when username is chosen as forgotten item', (done) => {
       history.replace(routes.PHONE_NUMBER_VERIFICATION, {
         forgottenItem: FORGOTTEN_ITEMS.USERNAME
       })
@@ -187,10 +170,7 @@ describe('Test phone number verification form', () => {
         .find('#phone-number-input')
         .hostNodes()
         .simulate('change', { target: { value: '01712345678' } })
-      app
-        .find('#continue')
-        .hostNodes()
-        .simulate('submit')
+      app.find('#continue').hostNodes().simulate('submit')
       moxios.wait(() => {
         const request = moxios.requests.mostRecent()
         request
@@ -208,7 +188,7 @@ describe('Test phone number verification form', () => {
       })
     })
 
-    it('redirects to recovery code entry form form when password is chosen as forgotten item', done => {
+    it('redirects to recovery code entry form form when password is chosen as forgotten item', (done) => {
       history.replace(routes.PHONE_NUMBER_VERIFICATION, {
         forgottenItem: FORGOTTEN_ITEMS.PASSWORD
       })
@@ -217,10 +197,7 @@ describe('Test phone number verification form', () => {
         .find('#phone-number-input')
         .hostNodes()
         .simulate('change', { target: { value: '01712345678' } })
-      app
-        .find('#continue')
-        .hostNodes()
-        .simulate('submit')
+      app.find('#continue').hostNodes().simulate('submit')
       moxios.wait(() => {
         const request = moxios.requests.mostRecent()
         request

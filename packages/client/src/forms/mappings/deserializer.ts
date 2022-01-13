@@ -155,11 +155,10 @@ function fieldQueryDescriptorToQueryFunction(
   if (isFactoryOperation(descriptor)) {
     const factory = transformer as AnyFactoryFn<string>
 
-    const potentiallyNestedOperations = descriptor.parameters as Array<
-      IQueryDescriptor
-    >
+    const potentiallyNestedOperations =
+      descriptor.parameters as Array<IQueryDescriptor>
 
-    const parameters = potentiallyNestedOperations.map(parameter =>
+    const parameters = potentiallyNestedOperations.map((parameter) =>
       isOperation(parameter)
         ? fieldQueryDescriptorToQueryFunction(parameter)
         : parameter
@@ -183,11 +182,10 @@ function fieldMutationDescriptorToMutationFunction(
   if (isFactoryOperation(descriptor)) {
     const factory = transformer as AnyFactoryFn<string>
 
-    const potentiallyNestedOperations = descriptor.parameters as Array<
-      IMutationDescriptor
-    >
+    const potentiallyNestedOperations =
+      descriptor.parameters as Array<IMutationDescriptor>
 
-    const parameters = potentiallyNestedOperations.map(parameter =>
+    const parameters = potentiallyNestedOperations.map((parameter) =>
       isOperation(parameter)
         ? fieldMutationDescriptorToMutationFunction(parameter)
         : parameter
@@ -243,11 +241,11 @@ function deserializeDynamicDefinitions(
           }),
     validate:
       descriptor.validate &&
-      descriptor.validate.map(validatorDescriptor => ({
+      descriptor.validate.map((validatorDescriptor) => ({
         dependencies: validatorDescriptor.dependencies,
-        validator: validators[validatorDescriptor.validator.operation] as AnyFn<
-          Validation
-        >
+        validator: validators[
+          validatorDescriptor.validator.operation
+        ] as AnyFn<Validation>
       }))
   }
 }
@@ -294,9 +292,9 @@ export function deserializeFormSection(
       section.mapping.mutation &&
       sectionMutationDescriptorToMutationFunction(section.mapping.mutation)
   }
-  const groups = section.groups.map(group => ({
+  const groups = section.groups.map((group) => ({
     ...group,
-    fields: group.fields.map(field => {
+    fields: group.fields.map((field) => {
       const baseFields = deserializeFormField(field)
 
       if (field.type === FIELD_WITH_DYNAMIC_DEFINITIONS) {

@@ -224,7 +224,7 @@ describe('Workflow status tests', () => {
       component = testComponent.component
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
 
@@ -264,33 +264,21 @@ describe('Workflow status tests', () => {
         component,
         'span#applicationStartedOn-label'
       )
-      expect(
-        listTable
-          .find('div#row_0')
-          .hostNodes()
-          .childAt(7)
-          .text()
-      ).toMatch(/May 17, 2020/)
+      expect(listTable.find('div#row_0').hostNodes().childAt(7).text()).toMatch(
+        /May 17, 2020/
+      )
 
       toggleSortButton.hostNodes().simulate('click')
 
-      expect(
-        listTable
-          .find('div#row_2')
-          .hostNodes()
-          .childAt(7)
-          .text()
-      ).toMatch(/May 17, 2020/)
+      expect(listTable.find('div#row_2').hostNodes().childAt(7).text()).toMatch(
+        /May 17, 2020/
+      )
 
       toggleSortButton.hostNodes().simulate('click')
 
-      expect(
-        listTable
-          .find('div#row_0')
-          .hostNodes()
-          .childAt(7)
-          .text()
-      ).toMatch(/May 17, 2020/)
+      expect(listTable.find('div#row_0').hostNodes().childAt(7).text()).toMatch(
+        /May 17, 2020/
+      )
     })
 
     it('update event from select updates query params', async () => {
@@ -379,7 +367,7 @@ describe('Workflow status tests', () => {
       component = testComponent.component
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
 

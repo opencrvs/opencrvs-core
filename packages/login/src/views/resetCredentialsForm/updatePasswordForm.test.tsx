@@ -43,16 +43,10 @@ describe('Test password update form', () => {
       .simulate('change', {
         target: { value: 'missmatch' }
       })
-    app
-      .find('#continue-button')
-      .hostNodes()
-      .simulate('submit')
-    expect(
-      app
-        .find('#GlobalError')
-        .hostNodes()
-        .text()
-    ).toEqual('উল্লেখিত পাসওয়ার্ড মিলে নি')
+    app.find('#continue-button').hostNodes().simulate('submit')
+    expect(app.find('#GlobalError').hostNodes().text()).toEqual(
+      'উল্লেখিত পাসওয়ার্ড মিলে নি'
+    )
   })
 
   it('it passes validations', () => {
@@ -68,23 +62,14 @@ describe('Test password update form', () => {
       .simulate('change', {
         target: { value: '0crvsPassword' }
       })
-    app
-      .find('#continue-button')
-      .hostNodes()
-      .simulate('submit')
+    app.find('#continue-button').hostNodes().simulate('submit')
     expect(app.text()).toContain('উল্লেখিত পাসওয়ার্ড মিলেছে')
   })
 
   it('it shows passwords required error when Continue button is pressed', () => {
-    app
-      .find('#continue-button')
-      .hostNodes()
-      .simulate('submit')
-    expect(
-      app
-        .find('#GlobalError')
-        .hostNodes()
-        .text()
-    ).toEqual('নতুন পাসওয়ার্ডটি সঠিক নয়')
+    app.find('#continue-button').hostNodes().simulate('submit')
+    expect(app.find('#GlobalError').hostNodes().text()).toEqual(
+      'নতুন পাসওয়ার্ডটি সঠিক নয়'
+    )
   })
 })

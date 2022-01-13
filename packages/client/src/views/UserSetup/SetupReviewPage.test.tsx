@@ -158,15 +158,12 @@ describe('SetupReviewPage page tests', () => {
 
     testComponent.component.find('button#Confirm').simulate('click')
 
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     testComponent.component.update()
     expect(
-      testComponent.component
-        .find('#GlobalError')
-        .hostNodes()
-        .text()
+      testComponent.component.find('#GlobalError').hostNodes().text()
     ).toBe('An error occurred. Please try again.')
   })
 
@@ -213,28 +210,19 @@ describe('SetupReviewPage page tests', () => {
       store
     )
 
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     testComponent.component.update()
 
     expect(
-      testComponent.component
-        .find('div#BengaliName')
-        .hostNodes()
-        .text()
+      testComponent.component.find('div#BengaliName').hostNodes().text()
     ).toBe('Bengali nameChange')
     expect(
-      testComponent.component
-        .find('div#EnglishName')
-        .hostNodes()
-        .text()
+      testComponent.component.find('div#EnglishName').hostNodes().text()
     ).toBe('English nameChange')
     expect(
-      testComponent.component
-        .find('div#UserPhone')
-        .hostNodes()
-        .text()
+      testComponent.component.find('div#UserPhone').hostNodes().text()
     ).toBe('Phone numberChange')
   })
 })

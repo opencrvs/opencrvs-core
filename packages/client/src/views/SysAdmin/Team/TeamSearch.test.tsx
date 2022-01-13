@@ -45,10 +45,7 @@ describe('Team search test', () => {
 
     it('loads nothing in the search input box', () => {
       expect(
-        app
-          .find('#locationSearchInput')
-          .hostNodes()
-          .props().value
+        app.find('#locationSearchInput').hostNodes().props().value
       ).toEqual('')
     })
 
@@ -68,19 +65,13 @@ describe('Team search test', () => {
       app.update()
 
       expect(
-        app
-          .find('#locationSearchInput')
-          .hostNodes()
-          .props().value
+        app.find('#locationSearchInput').hostNodes().props().value
       ).toEqual('Moktarpur Union Parishad')
     })
 
     it('redirect to user list on search button click', () => {
       Date.now = jest.fn(() => 1455454308000)
-      app
-        .find('#location-search-btn')
-        .hostNodes()
-        .simulate('click')
+      app.find('#location-search-btn').hostNodes().simulate('click')
       app.update()
       flushPromises()
 
@@ -112,10 +103,7 @@ describe('Team search test', () => {
 
     it('loads the location in the search input box', () => {
       expect(
-        app
-          .find('#locationSearchInput')
-          .hostNodes()
-          .props().value
+        app.find('#locationSearchInput').hostNodes().props().value
       ).toEqual('Alokbali Union Parishad')
     })
   })

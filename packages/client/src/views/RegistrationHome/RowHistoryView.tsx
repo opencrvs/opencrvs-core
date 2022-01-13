@@ -95,6 +95,10 @@ const HistoryWrapper = styled.div`
 const PaddedContent = styled.div`
   padding: 24px;
 `
+const OverflowContent = styled.div`
+  max-height: 200px;
+  overflow-y: auto;
+`
 const BorderedPaddedContent = styled(PaddedContent)`
   border-bottom: ${({ theme }) => `2px solid ${theme.colors.background}`};
 `
@@ -115,12 +119,21 @@ function LabelValue({
   label: string
   value: string
 }) {
-  return (
-    <div id={id}>
-      <StyledLabel>{label}:</StyledLabel>
-      <StyledValue>{value}</StyledValue>
-    </div>
-  )
+  if (id && id.includes('expanded_history_item_comment')) {
+    return (
+      <OverflowContent id={id}>
+        <StyledLabel>{label}:</StyledLabel>
+        <StyledValue>{value}</StyledValue>
+      </OverflowContent>
+    )
+  } else {
+    return (
+      <div id={id}>
+        <StyledLabel>{label}:</StyledLabel>
+        <StyledValue>{value}</StyledValue>
+      </div>
+    )
+  }
 }
 
 function ValuesWithSeparator(props: { strings: string[] }): JSX.Element {
@@ -136,7 +149,7 @@ function ValuesWithSeparator(props: { strings: string[] }): JSX.Element {
 function formatRoleCode(str: string) {
   const sections = str.split('_')
   const formattedString: string[] = []
-  sections.map(section => {
+  sections.map((section) => {
     section = section.charAt(0) + section.slice(1).toLowerCase()
     formattedString.push(section)
     return section
@@ -195,7 +208,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
       contactNumber,
       operationHistories:
         (eventDetails.operationHistories &&
-          eventDetails.operationHistories.map(operationHistory => {
+          eventDetails.operationHistories.map((operationHistory) => {
             return {
               type: operationHistory && operationHistory.operationType,
               practitionerName:
@@ -358,7 +371,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
         </BorderedPaddedContent>
         <>
           {transformedData.operationHistories
-            .filter(item => checkExternalValidationStatus(item.type))
+            .filter((item) => checkExternalValidationStatus(item.type))
             .map((operationHistory, index) => {
               const { rejectReasons, comment } = operationHistory
               const type = operationHistory.type as string
@@ -394,7 +407,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                             label={intl.formatMessage(constantsMessages.update)}
                             value={rejectReasons
                               .split(',')
-                              .map(reason =>
+                              .map((reason) =>
                                 intl.formatMessage(
                                   getRejectionReasonDisplayValue(reason)
                                 )
@@ -402,6 +415,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                               .join(', ')}
                           />
                           <LabelValue
+                            id="expanded_history_item_comment"
                             label={intl.formatMessage(
                               constantsMessages.comment
                             )}

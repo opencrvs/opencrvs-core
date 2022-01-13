@@ -37,10 +37,6 @@ type Props = WrappedComponentProps &
   }
 
 class ConfigHomeComponent extends React.Component<Props> {
-  constructor(props: Props) {
-    super(props)
-  }
-
   render() {
     const { intl, offlineResources } = this.props
     return (

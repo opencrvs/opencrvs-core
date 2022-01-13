@@ -156,7 +156,7 @@ describe('user audit action modal tests', () => {
 
   describe('in case of successful deactivate audit action', () => {
     beforeEach(async () => {
-      let [successMock] = graphqlMocksOfDeactivate
+      const [successMock] = graphqlMocksOfDeactivate
       const testComponent = await createTestComponent(
         <UserAuditActionModal
           show={true}
@@ -169,7 +169,7 @@ describe('user audit action modal tests', () => {
       component = testComponent.component
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       component.update()
@@ -225,7 +225,7 @@ describe('user audit action modal tests', () => {
 
   describe('in case of failed deactivate audit action', () => {
     beforeEach(async () => {
-      let [errorMock] = graphqlMocksOfDeactivate
+      const [errorMock] = graphqlMocksOfDeactivate
       component = (
         await createTestComponent(
           <UserAuditActionModal
@@ -239,7 +239,7 @@ describe('user audit action modal tests', () => {
       ).component
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       component.update()
@@ -271,7 +271,7 @@ describe('user audit action modal tests', () => {
 
   describe('in case of successful reactivate audit action', () => {
     beforeEach(async () => {
-      let [successMock] = graphqlMocksOfReactivate
+      const [successMock] = graphqlMocksOfReactivate
       const testComponent = await createTestComponent(
         <UserAuditActionModal
           show={true}
@@ -284,7 +284,7 @@ describe('user audit action modal tests', () => {
       component = testComponent.component
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       component.update()
@@ -327,7 +327,7 @@ describe('user audit action modal tests', () => {
 
   describe('in case of failed reactivate audit action', () => {
     beforeEach(async () => {
-      let [errorMock] = graphqlMocksOfReactivate
+      const [errorMock] = graphqlMocksOfReactivate
       component = (
         await createTestComponent(
           <UserAuditActionModal
@@ -341,7 +341,7 @@ describe('user audit action modal tests', () => {
       ).component
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       component.update()

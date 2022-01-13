@@ -155,7 +155,7 @@ function getNextSectionIds(
 
   if (currentGroupIndex === visibleGroups.length - 1) {
     const visibleSections = sections.filter(
-      section => section.viewType !== 'hidden'
+      (section) => section.viewType !== 'hidden'
     )
     const currentIndex = visibleSections.findIndex(
       (section: IFormSection) => section.id === fromSection.id
@@ -180,7 +180,7 @@ const mapStateToProps = (state: IStoreState, props: Props) => {
     props.match.params.sectionId || state.userForm.userForm!.sections[0].id
 
   const section = state.userForm.userForm!.sections.find(
-    section => section.id === sectionId
+    (section) => section.id === sectionId
   ) as IFormSection
 
   if (!section) {
@@ -211,7 +211,7 @@ const mapStateToProps = (state: IStoreState, props: Props) => {
     props.match.params.groupId ||
     getVisibleSectionGroupsBasedOnConditions(section, formData)[0].id
   const group = section.groups.find(
-    group => group.id === groupId
+    (group) => group.id === groupId
   ) as IFormSectionGroup
 
   const fields = replaceInitialValues(group.fields, formData)

@@ -68,6 +68,7 @@ type User {
   identifier: Identifier
   signature: Signature
   creationDate: String
+  device: String
 }
 
 type SearchUserResult {
@@ -120,7 +121,8 @@ type Query {
     sort: String
   ): SearchUserResult
   searchFieldAgents(
-    locationId: String!
+    locationId: String
+    primaryOfficeId: String
     status: String
     language: String
     timeStart: String!
