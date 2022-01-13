@@ -300,6 +300,7 @@ tmux set -p @mytitle "opencrvs-core"
 tmux split-window -h
 tmux set -p @mytitle "opencrvs-zambia"
 tmux send-keys -t opencrvs "bash setup/setup-resources.sh" C-m
+tmux split-window -h
 tmux set -p @mytitle "opencrvs-core-working"
 tmux send-keys -t opencrvs "bash setup/summary.sh" C-m
 tmux attach -t opencrvs
