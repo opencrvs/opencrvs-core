@@ -13,6 +13,7 @@ echo
 echo -e "\033[32m:::::::: In the terminal on the bottom right, an OpenCRVS country config will start when OpenCRVS core is running ::::::::\033[0m"
 echo
 echo "Please be patient as this can still take 15 minutes if your RAM isnt high."
+echo "Please do not give up, you are nearly there.  This process cannot be interrupted."
 echo
 echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
 echo

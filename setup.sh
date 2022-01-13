@@ -254,7 +254,7 @@ echo -e "\033[32m:::::::: If Docker is already part of a swarm, this can fail. :
 echo
 echo -e "\033[32m::::::::::::::::: To leave an existing swarm, type: :::::::::::::::::\033[0m"
 echo
-echo -e "\033[32m::::::::::::::::::::: docker swarm leave --force :::::::::::::::::::::\033[0m"
+echo "docker swarm leave --force"
 echo
 docker swarm init
 echo
@@ -277,7 +277,7 @@ sudo chown -R 1000:1000 data/elasticsearch
 
 echo -e "\033[32m:::::::::::::::::::: Building OpenCRVS dependencies ::::::::::::::::::::\033[0m"
 echo
-echo -e "\033[32m:::::::::::::: This can take some time on slow connections ::::::::::::::\033[0m"
+echo "This can take some time on slow connections.  Docker is downloading Mongo DB, ElasticSearch, OpenHIM and Hearth docker images.  These are large files.  Then it will build them."
 echo
 yarn compose:deps:detached
 DOCKER_STARTED=1

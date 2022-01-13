@@ -9,8 +9,10 @@
 # graphic logo are (registered/a) trademark(s) of Plan International.
 set -e
 echo
-echo "All the dependencies have been installed and are running.  Now we are starting the microservices."
-echo "We are building the client applications.  Building the client applications can take many minutes depending on your RAM."
+echo -e "\033[32m:::::::: All the dependencies have been installed and are running.  Now we are starting the microservices. ::::::::\033[0m"
+echo
+echo -e "\033[32m:::::::: We are building the client applications.  Building the client applications can take many minutes depending on your RAM. ::::::::\033[0m"
+echo
 echo "Please do not give up, you are nearly there.  This process cannot be interrupted."
 echo
 echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
