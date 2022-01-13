@@ -54,5 +54,10 @@
     "opener": "^1.5.1",
     "patch-package": "^6.1.2",
     "postinstall-postinstall": "^2.0.0"
+  },
+  "resolutions": {
+    "//": "See https://github.com/facebook/create-react-app/issues/11773",
+    "react-error-overlay": "6.0.9",
+    "babel-loader": "8.1.0"
   }
 }
