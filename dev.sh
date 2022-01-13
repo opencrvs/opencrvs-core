@@ -9,15 +9,18 @@
 # graphic logo are (registered/a) trademark(s) of Plan International.
 set -e
 
-print_usage_and_exit () {
-    echo 'Usage: ./dev.sh LANGUAGES'
-    echo "LANGUAGES must have a value of either 'bn,en' or 'en'"
-    exit 1
-}
-
-if [ -z "$1" ] || { [ $1 != 'bn,en' ] && [ $1 != 'en' ] ;} ; then
-    echo 'Error: Argument LANGUAGES is required in position 1.'
-    print_usage_and_exit
+if [  -n "$(uname -a | grep Ubuntu)" ]; then
+  OS="UBUNTU"
+  else
+  OS="MAC"
 fi
 export LANGUAGES=$1
-yarn dev:secrets:gen && concurrently "yarn run start" "yarn run compose:deps"
+if [ $OS == "UBUNTU" ]; then
+  yarn dev:secrets:gen && concurrently "yarn run start" "yarn run compose:deps"
+  else
+  $MY_IP = $(hostname -I | cut -d' ' -f1)
+  export LOCAL_IP=$MY_IP
+  yarn dev:secrets:gen && concurrently "yarn run start" "yarn run compose:deps"
+fi
+
+

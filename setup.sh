@@ -78,7 +78,7 @@ function ask_yes_or_no() {
         *)     echo "no" ;;
     esac
 }
-if [[ "no" == $(ask_yes_or_no "This is a ONE TIME USE ONLY setup command for OpenCRVS.  If you have already successfully installed OpenCRVS, you should use 'yarn dev' to start OpenCRVS again.  Type: no to exit.  If you want to continue, you must have 30 minutes available as the process cannot be interrupted.  You must also have at least 10GB of available disk space and at least 8GB of RAM.  Type: yes to continue.") ]]
+if [[ "no" == $(ask_yes_or_no "OpenCRVS can ONLY run on Ubuntu or Mac OSX.  This is a ONE TIME USE ONLY setup command for OpenCRVS.  If you have already successfully installed OpenCRVS, you should use 'yarn dev' to start OpenCRVS again.  Type: no to exit.  If you want to continue, your OS must be Ubuntu or Mac and you must have at least 30 minutes available as the process cannot be interrupted.  You must also have at least 10GB of available disk space and at least 8GB of RAM.  Type: yes to continue.") ]]
 then
     echo "Exiting OpenCRVS setup."
     exit 0
@@ -94,6 +94,9 @@ echo "If we recognise that you have not installed a dependency correctly, we wil
 sleep 5
 echo
 echo "Installing Docker and Node for example, is outside the scope of this script."
+sleep 10
+echo
+echo "As part of this script, we checkout another GIT repo: The Zambia country configuration into the folder 'opencrvs-zambia'. We do this to make it easy for you to try OpenCRVS.  If you are developing your own country configuration, you should delete this folder and fork the config resources repo somewhere else."
 sleep 10
 echo
 echo -e "\033[32m:::::::::::::::: PLEASE WAIT FOR THE OPEN CRVS LOGO TO APPEAR ::::::::::::::::\033[0m"
