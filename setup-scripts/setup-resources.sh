@@ -56,6 +56,7 @@ echo -e "\033[32m:::::::: OpenCRVS Core is running, now we must checkout a confi
 echo
 echo -e "\033[32m::::::::::::::: Cloning the Zambia Country Configuration :::::::::::::::\033[0m"
 echo
+cd ../
 git clone https://github.com/opencrvs/opencrvs-zambia.git
 cd opencrvs-zambia
 echo
