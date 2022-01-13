@@ -62,9 +62,9 @@ export function getLocation(userDetails: IUserDetails, locationKey: string) {
 export function generateLocationName(location: ILocation, intl: IntlShape) {
   let name = location.name
   location.jurisdictionType &&
-    (name += ` ${intl.formatMessage(
-      locationMessages[location.jurisdictionType]
-    ) || ''}`.trimEnd())
+    (name += ` ${
+      intl.formatMessage(locationMessages[location.jurisdictionType]) || ''
+    }`.trimEnd())
   return name
 }
 
@@ -107,7 +107,7 @@ export function generateLocations(
 
   if (filterByLocationTypes) {
     locationArray = locationArray.filter(
-      location =>
+      (location) =>
         location.type &&
         filterByLocationTypes.includes(location.type as LocationType)
     )
@@ -115,7 +115,7 @@ export function generateLocations(
 
   if (filterByJurisdictionTypes) {
     locationArray = locationArray.filter(
-      location =>
+      (location) =>
         location.jurisdictionType &&
         filterByJurisdictionTypes.includes(location.jurisdictionType)
     )
@@ -140,7 +140,7 @@ export function getJurisidictionType(
   locations: { [key: string]: ILocation },
   locationId: string
 ): string {
-  let relevantLocation = locations[locationId]
+  const relevantLocation = locations[locationId]
 
   if (!relevantLocation) {
     throw new Error(`Location ${locationId} not found`)

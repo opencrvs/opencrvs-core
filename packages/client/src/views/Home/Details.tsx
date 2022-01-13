@@ -203,7 +203,7 @@ function generateHistoryEntry(
   date: string,
   role: string,
   office: string,
-  language: string = 'en',
+  language = 'en',
   trackingId?: string,
   contactNumber?: string,
   rejectReason?: string,
@@ -362,7 +362,7 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
     const id = application && (application.id as string)
 
     const foundApplication = this.props.outboxApplications.find(
-      application => application.id === id
+      (application) => application.id === id
     )
 
     const downloadStatus =
@@ -627,7 +627,7 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
       (data.fetchRegistration.id as string)
 
     const foundApplication = this.props.outboxApplications.find(
-      application => application.id === id
+      (application) => application.id === id
     )
 
     const downloadStatus =
@@ -800,7 +800,7 @@ function mapStateToProps(
         match.params &&
         match.params.applicationId &&
         state.applicationsState.applications.find(
-          application =>
+          (application) =>
             (application.id === match.params.applicationId ||
               application.compositionId === match.params.applicationId) &&
             (application.submissionStatus ===

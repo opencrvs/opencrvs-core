@@ -1256,20 +1256,14 @@ export interface GQLQueryTypeResolver<TParent = any> {
   fetchBirthRegistration?: QueryToFetchBirthRegistrationResolver<TParent>
   searchBirthRegistrations?: QueryToSearchBirthRegistrationsResolver<TParent>
   searchDeathRegistrations?: QueryToSearchDeathRegistrationsResolver<TParent>
-  queryRegistrationByIdentifier?: QueryToQueryRegistrationByIdentifierResolver<
-    TParent
-  >
+  queryRegistrationByIdentifier?: QueryToQueryRegistrationByIdentifierResolver<TParent>
   queryPersonByIdentifier?: QueryToQueryPersonByIdentifierResolver<TParent>
   listBirthRegistrations?: QueryToListBirthRegistrationsResolver<TParent>
   fetchDeathRegistration?: QueryToFetchDeathRegistrationResolver<TParent>
   fetchEventRegistration?: QueryToFetchEventRegistrationResolver<TParent>
   fetchRegistration?: QueryToFetchRegistrationResolver<TParent>
-  queryPersonByNidIdentifier?: QueryToQueryPersonByNidIdentifierResolver<
-    TParent
-  >
-  fetchRegistrationCountByStatus?: QueryToFetchRegistrationCountByStatusResolver<
-    TParent
-  >
+  queryPersonByNidIdentifier?: QueryToQueryPersonByNidIdentifierResolver<TParent>
+  fetchRegistrationCountByStatus?: QueryToFetchRegistrationCountByStatusResolver<TParent>
   locationsByParent?: QueryToLocationsByParentResolver<TParent>
   locationById?: QueryToLocationByIdResolver<TParent>
   hasChildLocation?: QueryToHasChildLocationResolver<TParent>
@@ -1279,18 +1273,10 @@ export interface GQLQueryTypeResolver<TParent = any> {
   verifyPasswordById?: QueryToVerifyPasswordByIdResolver<TParent>
   fetchRegistrationMetrics?: QueryToFetchRegistrationMetricsResolver<TParent>
   getEventEstimationMetrics?: QueryToGetEventEstimationMetricsResolver<TParent>
-  getApplicationsStartedMetrics?: QueryToGetApplicationsStartedMetricsResolver<
-    TParent
-  >
-  fetchMonthWiseEventMetrics?: QueryToFetchMonthWiseEventMetricsResolver<
-    TParent
-  >
-  fetchLocationWiseEventMetrics?: QueryToFetchLocationWiseEventMetricsResolver<
-    TParent
-  >
-  fetchTimeLoggedMetricsByPractitioner?: QueryToFetchTimeLoggedMetricsByPractitionerResolver<
-    TParent
-  >
+  getApplicationsStartedMetrics?: QueryToGetApplicationsStartedMetricsResolver<TParent>
+  fetchMonthWiseEventMetrics?: QueryToFetchMonthWiseEventMetricsResolver<TParent>
+  fetchLocationWiseEventMetrics?: QueryToFetchLocationWiseEventMetricsResolver<TParent>
+  fetchTimeLoggedMetricsByPractitioner?: QueryToFetchTimeLoggedMetricsByPractitionerResolver<TParent>
   searchEvents?: QueryToSearchEventsResolver<TParent>
   getEventsWithProgress?: QueryToGetEventsWithProgressResolver<TParent>
   getRoles?: QueryToGetRolesResolver<TParent>
@@ -2228,27 +2214,13 @@ export interface GQLBirthRegistrationTypeResolver<TParent = any> {
   birthType?: BirthRegistrationToBirthTypeResolver<TParent>
   weightAtBirth?: BirthRegistrationToWeightAtBirthResolver<TParent>
   attendantAtBirth?: BirthRegistrationToAttendantAtBirthResolver<TParent>
-  otherAttendantAtBirth?: BirthRegistrationToOtherAttendantAtBirthResolver<
-    TParent
-  >
-  birthRegistrationType?: BirthRegistrationToBirthRegistrationTypeResolver<
-    TParent
-  >
-  presentAtBirthRegistration?: BirthRegistrationToPresentAtBirthRegistrationResolver<
-    TParent
-  >
-  otherPresentAtBirthRegistration?: BirthRegistrationToOtherPresentAtBirthRegistrationResolver<
-    TParent
-  >
-  childrenBornAliveToMother?: BirthRegistrationToChildrenBornAliveToMotherResolver<
-    TParent
-  >
-  foetalDeathsToMother?: BirthRegistrationToFoetalDeathsToMotherResolver<
-    TParent
-  >
-  lastPreviousLiveBirth?: BirthRegistrationToLastPreviousLiveBirthResolver<
-    TParent
-  >
+  otherAttendantAtBirth?: BirthRegistrationToOtherAttendantAtBirthResolver<TParent>
+  birthRegistrationType?: BirthRegistrationToBirthRegistrationTypeResolver<TParent>
+  presentAtBirthRegistration?: BirthRegistrationToPresentAtBirthRegistrationResolver<TParent>
+  otherPresentAtBirthRegistration?: BirthRegistrationToOtherPresentAtBirthRegistrationResolver<TParent>
+  childrenBornAliveToMother?: BirthRegistrationToChildrenBornAliveToMotherResolver<TParent>
+  foetalDeathsToMother?: BirthRegistrationToFoetalDeathsToMotherResolver<TParent>
+  lastPreviousLiveBirth?: BirthRegistrationToLastPreviousLiveBirthResolver<TParent>
   primaryCaregiver?: BirthRegistrationToPrimaryCaregiverResolver<TParent>
   createdAt?: BirthRegistrationToCreatedAtResolver<TParent>
   updatedAt?: BirthRegistrationToUpdatedAtResolver<TParent>
@@ -2411,12 +2383,8 @@ export interface GQLDeathRegistrationTypeResolver<TParent = any> {
   mannerOfDeath?: DeathRegistrationToMannerOfDeathResolver<TParent>
   causeOfDeathMethod?: DeathRegistrationToCauseOfDeathMethodResolver<TParent>
   causeOfDeath?: DeathRegistrationToCauseOfDeathResolver<TParent>
-  maleDependentsOfDeceased?: DeathRegistrationToMaleDependentsOfDeceasedResolver<
-    TParent
-  >
-  femaleDependentsOfDeceased?: DeathRegistrationToFemaleDependentsOfDeceasedResolver<
-    TParent
-  >
+  maleDependentsOfDeceased?: DeathRegistrationToMaleDependentsOfDeceasedResolver<TParent>
+  femaleDependentsOfDeceased?: DeathRegistrationToFemaleDependentsOfDeceasedResolver<TParent>
   medicalPractitioner?: DeathRegistrationToMedicalPractitionerResolver<TParent>
   createdAt?: DeathRegistrationToCreatedAtResolver<TParent>
   updatedAt?: DeathRegistrationToUpdatedAtResolver<TParent>
@@ -2926,9 +2894,7 @@ export interface VerifyPasswordResultToIdResolver<
 export interface GQLRegistrationMetricsTypeResolver<TParent = any> {
   genderBasisMetrics?: RegistrationMetricsToGenderBasisMetricsResolver<TParent>
   timeFrames?: RegistrationMetricsToTimeFramesResolver<TParent>
-  estimated45DayMetrics?: RegistrationMetricsToEstimated45DayMetricsResolver<
-    TParent
-  >
+  estimated45DayMetrics?: RegistrationMetricsToEstimated45DayMetricsResolver<TParent>
   payments?: RegistrationMetricsToPaymentsResolver<TParent>
 }
 
@@ -2980,15 +2946,9 @@ export interface EventEstimationMetricsToDeath45DayMetricsResolver<
 }
 
 export interface GQLApplicationsStartedMetricsTypeResolver<TParent = any> {
-  fieldAgentApplications?: ApplicationsStartedMetricsToFieldAgentApplicationsResolver<
-    TParent
-  >
-  hospitalApplications?: ApplicationsStartedMetricsToHospitalApplicationsResolver<
-    TParent
-  >
-  officeApplications?: ApplicationsStartedMetricsToOfficeApplicationsResolver<
-    TParent
-  >
+  fieldAgentApplications?: ApplicationsStartedMetricsToFieldAgentApplicationsResolver<TParent>
+  hospitalApplications?: ApplicationsStartedMetricsToHospitalApplicationsResolver<TParent>
+  officeApplications?: ApplicationsStartedMetricsToOfficeApplicationsResolver<TParent>
 }
 
 export interface ApplicationsStartedMetricsToFieldAgentApplicationsResolver<
@@ -3650,18 +3610,10 @@ export interface GQLSearchFieldAgentResponseTypeResolver<TParent = any> {
   status?: SearchFieldAgentResponseToStatusResolver<TParent>
   primaryOfficeId?: SearchFieldAgentResponseToPrimaryOfficeIdResolver<TParent>
   creationDate?: SearchFieldAgentResponseToCreationDateResolver<TParent>
-  totalNumberOfApplicationStarted?: SearchFieldAgentResponseToTotalNumberOfApplicationStartedResolver<
-    TParent
-  >
-  totalNumberOfInProgressAppStarted?: SearchFieldAgentResponseToTotalNumberOfInProgressAppStartedResolver<
-    TParent
-  >
-  totalNumberOfRejectedApplications?: SearchFieldAgentResponseToTotalNumberOfRejectedApplicationsResolver<
-    TParent
-  >
-  averageTimeForDeclaredApplications?: SearchFieldAgentResponseToAverageTimeForDeclaredApplicationsResolver<
-    TParent
-  >
+  totalNumberOfApplicationStarted?: SearchFieldAgentResponseToTotalNumberOfApplicationStartedResolver<TParent>
+  totalNumberOfInProgressAppStarted?: SearchFieldAgentResponseToTotalNumberOfInProgressAppStartedResolver<TParent>
+  totalNumberOfRejectedApplications?: SearchFieldAgentResponseToTotalNumberOfRejectedApplicationsResolver<TParent>
+  averageTimeForDeclaredApplications?: SearchFieldAgentResponseToAverageTimeForDeclaredApplicationsResolver<TParent>
 }
 
 export interface SearchFieldAgentResponseToPractitionerIdResolver<
@@ -3814,9 +3766,7 @@ export interface CertificationPaymentMetricsToTotalResolver<
 
 export interface GQLEstimationMetricsTypeResolver<TParent = any> {
   actualRegistration?: EstimationMetricsToActualRegistrationResolver<TParent>
-  estimatedRegistration?: EstimationMetricsToEstimatedRegistrationResolver<
-    TParent
-  >
+  estimatedRegistration?: EstimationMetricsToEstimatedRegistrationResolver<TParent>
   estimatedPercentage?: EstimationMetricsToEstimatedPercentageResolver<TParent>
   malePercentage?: EstimationMetricsToMalePercentageResolver<TParent>
   femalePercentage?: EstimationMetricsToFemalePercentageResolver<TParent>
@@ -3858,18 +3808,10 @@ export interface EstimationMetricsToFemalePercentageResolver<
 }
 
 export interface GQLMonthWise45DayEstimationTypeResolver<TParent = any> {
-  actualTotalRegistration?: MonthWise45DayEstimationToActualTotalRegistrationResolver<
-    TParent
-  >
-  actual45DayRegistration?: MonthWise45DayEstimationToActual45DayRegistrationResolver<
-    TParent
-  >
-  estimatedRegistration?: MonthWise45DayEstimationToEstimatedRegistrationResolver<
-    TParent
-  >
-  estimated45DayPercentage?: MonthWise45DayEstimationToEstimated45DayPercentageResolver<
-    TParent
-  >
+  actualTotalRegistration?: MonthWise45DayEstimationToActualTotalRegistrationResolver<TParent>
+  actual45DayRegistration?: MonthWise45DayEstimationToActual45DayRegistrationResolver<TParent>
+  estimatedRegistration?: MonthWise45DayEstimationToEstimatedRegistrationResolver<TParent>
+  estimated45DayPercentage?: MonthWise45DayEstimationToEstimated45DayPercentageResolver<TParent>
   month?: MonthWise45DayEstimationToMonthResolver<TParent>
   year?: MonthWise45DayEstimationToYearResolver<TParent>
   startOfMonth?: MonthWise45DayEstimationToStartOfMonthResolver<TParent>
@@ -3933,18 +3875,10 @@ export interface MonthWise45DayEstimationToEndOfMonthResolver<
 }
 
 export interface GQLEventIn45DayEstimationCountTypeResolver<TParent = any> {
-  actualTotalRegistration?: EventIn45DayEstimationCountToActualTotalRegistrationResolver<
-    TParent
-  >
-  actual45DayRegistration?: EventIn45DayEstimationCountToActual45DayRegistrationResolver<
-    TParent
-  >
-  estimatedRegistration?: EventIn45DayEstimationCountToEstimatedRegistrationResolver<
-    TParent
-  >
-  estimated45DayPercentage?: EventIn45DayEstimationCountToEstimated45DayPercentageResolver<
-    TParent
-  >
+  actualTotalRegistration?: EventIn45DayEstimationCountToActualTotalRegistrationResolver<TParent>
+  actual45DayRegistration?: EventIn45DayEstimationCountToActual45DayRegistrationResolver<TParent>
+  estimatedRegistration?: EventIn45DayEstimationCountToEstimatedRegistrationResolver<TParent>
+  estimated45DayPercentage?: EventIn45DayEstimationCountToEstimated45DayPercentageResolver<TParent>
 }
 
 export interface EventIn45DayEstimationCountToActualTotalRegistrationResolver<
@@ -3976,18 +3910,10 @@ export interface EventIn45DayEstimationCountToEstimated45DayPercentageResolver<
 }
 
 export interface GQLLocationWise45DayEstimationTypeResolver<TParent = any> {
-  actualTotalRegistration?: LocationWise45DayEstimationToActualTotalRegistrationResolver<
-    TParent
-  >
-  actual45DayRegistration?: LocationWise45DayEstimationToActual45DayRegistrationResolver<
-    TParent
-  >
-  estimatedRegistration?: LocationWise45DayEstimationToEstimatedRegistrationResolver<
-    TParent
-  >
-  estimated45DayPercentage?: LocationWise45DayEstimationToEstimated45DayPercentageResolver<
-    TParent
-  >
+  actualTotalRegistration?: LocationWise45DayEstimationToActualTotalRegistrationResolver<TParent>
+  actual45DayRegistration?: LocationWise45DayEstimationToActual45DayRegistrationResolver<TParent>
+  estimatedRegistration?: LocationWise45DayEstimationToEstimatedRegistrationResolver<TParent>
+  estimated45DayPercentage?: LocationWise45DayEstimationToEstimated45DayPercentageResolver<TParent>
   locationId?: LocationWise45DayEstimationToLocationIdResolver<TParent>
   locationName?: LocationWise45DayEstimationToLocationNameResolver<TParent>
 }
@@ -4188,9 +4114,7 @@ export interface RegWorkflowToTimeLoggedResolver<TParent = any, TResult = any> {
 
 export interface GQLCertificateTypeResolver<TParent = any> {
   collector?: CertificateToCollectorResolver<TParent>
-  hasShowedVerifiedDocument?: CertificateToHasShowedVerifiedDocumentResolver<
-    TParent
-  >
+  hasShowedVerifiedDocument?: CertificateToHasShowedVerifiedDocumentResolver<TParent>
   payments?: CertificateToPaymentsResolver<TParent>
   data?: CertificateToDataResolver<TParent>
 }
@@ -4215,9 +4139,7 @@ export interface CertificateToDataResolver<TParent = any, TResult = any> {
 }
 
 export interface GQLReasonsNotApplyingTypeResolver<TParent = any> {
-  primaryCaregiverType?: ReasonsNotApplyingToPrimaryCaregiverTypeResolver<
-    TParent
-  >
+  primaryCaregiverType?: ReasonsNotApplyingToPrimaryCaregiverTypeResolver<TParent>
   reasonNotApplying?: ReasonsNotApplyingToReasonNotApplyingResolver<TParent>
   isDeceased?: ReasonsNotApplyingToIsDeceasedResolver<TParent>
 }
@@ -4433,19 +4355,11 @@ export interface TimeFrameTotalCountToTotalResolver<
 
 export interface GQLEstimated45DayMetricsTypeResolver<TParent = any> {
   locationId?: Estimated45DayMetricsToLocationIdResolver<TParent>
-  estimatedRegistration?: Estimated45DayMetricsToEstimatedRegistrationResolver<
-    TParent
-  >
-  registrationIn45Day?: Estimated45DayMetricsToRegistrationIn45DayResolver<
-    TParent
-  >
+  estimatedRegistration?: Estimated45DayMetricsToEstimatedRegistrationResolver<TParent>
+  registrationIn45Day?: Estimated45DayMetricsToRegistrationIn45DayResolver<TParent>
   estimationYear?: Estimated45DayMetricsToEstimationYearResolver<TParent>
-  estimationLocationLevel?: Estimated45DayMetricsToEstimationLocationLevelResolver<
-    TParent
-  >
-  estimationPercentage?: Estimated45DayMetricsToEstimationPercentageResolver<
-    TParent
-  >
+  estimationLocationLevel?: Estimated45DayMetricsToEstimationLocationLevelResolver<TParent>
+  estimationPercentage?: Estimated45DayMetricsToEstimationPercentageResolver<TParent>
 }
 
 export interface Estimated45DayMetricsToLocationIdResolver<
@@ -4491,15 +4405,9 @@ export interface Estimated45DayMetricsToEstimationPercentageResolver<
 }
 
 export interface GQLEstimate45DayTotalCountTypeResolver<TParent = any> {
-  estimatedRegistration?: Estimate45DayTotalCountToEstimatedRegistrationResolver<
-    TParent
-  >
-  registrationIn45Day?: Estimate45DayTotalCountToRegistrationIn45DayResolver<
-    TParent
-  >
-  estimationPercentage?: Estimate45DayTotalCountToEstimationPercentageResolver<
-    TParent
-  >
+  estimatedRegistration?: Estimate45DayTotalCountToEstimatedRegistrationResolver<TParent>
+  registrationIn45Day?: Estimate45DayTotalCountToRegistrationIn45DayResolver<TParent>
+  estimationPercentage?: Estimate45DayTotalCountToEstimationPercentageResolver<TParent>
 }
 
 export interface Estimate45DayTotalCountToEstimatedRegistrationResolver<
@@ -4558,18 +4466,12 @@ export interface CertificationPaymentTotalCountToTotalResolver<
 export interface GQLRegistrationSearchSetTypeResolver<TParent = any> {
   status?: RegistrationSearchSetToStatusResolver<TParent>
   contactNumber?: RegistrationSearchSetToContactNumberResolver<TParent>
-  contactRelationship?: RegistrationSearchSetToContactRelationshipResolver<
-    TParent
-  >
+  contactRelationship?: RegistrationSearchSetToContactRelationshipResolver<TParent>
   dateOfApplication?: RegistrationSearchSetToDateOfApplicationResolver<TParent>
   trackingId?: RegistrationSearchSetToTrackingIdResolver<TParent>
-  registrationNumber?: RegistrationSearchSetToRegistrationNumberResolver<
-    TParent
-  >
+  registrationNumber?: RegistrationSearchSetToRegistrationNumberResolver<TParent>
   eventLocationId?: RegistrationSearchSetToEventLocationIdResolver<TParent>
-  registeredLocationId?: RegistrationSearchSetToRegisteredLocationIdResolver<
-    TParent
-  >
+  registeredLocationId?: RegistrationSearchSetToRegisteredLocationIdResolver<TParent>
   reason?: RegistrationSearchSetToReasonResolver<TParent>
   comment?: RegistrationSearchSetToCommentResolver<TParent>
   duplicates?: RegistrationSearchSetToDuplicatesResolver<TParent>
@@ -4673,18 +4575,10 @@ export interface GQLOperationHistorySearchSetTypeResolver<TParent = any> {
   operatedOn?: OperationHistorySearchSetToOperatedOnResolver<TParent>
   operatorRole?: OperationHistorySearchSetToOperatorRoleResolver<TParent>
   operatorName?: OperationHistorySearchSetToOperatorNameResolver<TParent>
-  operatorOfficeName?: OperationHistorySearchSetToOperatorOfficeNameResolver<
-    TParent
-  >
-  operatorOfficeAlias?: OperationHistorySearchSetToOperatorOfficeAliasResolver<
-    TParent
-  >
-  notificationFacilityName?: OperationHistorySearchSetToNotificationFacilityNameResolver<
-    TParent
-  >
-  notificationFacilityAlias?: OperationHistorySearchSetToNotificationFacilityAliasResolver<
-    TParent
-  >
+  operatorOfficeName?: OperationHistorySearchSetToOperatorOfficeNameResolver<TParent>
+  operatorOfficeAlias?: OperationHistorySearchSetToOperatorOfficeAliasResolver<TParent>
+  notificationFacilityName?: OperationHistorySearchSetToNotificationFacilityNameResolver<TParent>
+  notificationFacilityAlias?: OperationHistorySearchSetToNotificationFacilityAliasResolver<TParent>
   rejectReason?: OperationHistorySearchSetToRejectReasonResolver<TParent>
   rejectComment?: OperationHistorySearchSetToRejectCommentResolver<TParent>
 }
@@ -4857,18 +4751,10 @@ export interface DeathEventSearchSetToOperationHistoriesResolver<
 
 export interface GQLEventProgressDataTypeResolver<TParent = any> {
   timeInProgress?: EventProgressDataToTimeInProgressResolver<TParent>
-  timeInReadyForReview?: EventProgressDataToTimeInReadyForReviewResolver<
-    TParent
-  >
-  timeInRequiresUpdates?: EventProgressDataToTimeInRequiresUpdatesResolver<
-    TParent
-  >
-  timeInWaitingForApproval?: EventProgressDataToTimeInWaitingForApprovalResolver<
-    TParent
-  >
-  timeInWaitingForBRIS?: EventProgressDataToTimeInWaitingForBRISResolver<
-    TParent
-  >
+  timeInReadyForReview?: EventProgressDataToTimeInReadyForReviewResolver<TParent>
+  timeInRequiresUpdates?: EventProgressDataToTimeInRequiresUpdatesResolver<TParent>
+  timeInWaitingForApproval?: EventProgressDataToTimeInWaitingForApprovalResolver<TParent>
+  timeInWaitingForBRIS?: EventProgressDataToTimeInWaitingForBRISResolver<TParent>
   timeInReadyToPrint?: EventProgressDataToTimeInReadyToPrintResolver<TParent>
 }
 

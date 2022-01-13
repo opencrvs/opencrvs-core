@@ -208,19 +208,13 @@ describe('Certificate collector test for a birth registration without father det
     })
 
     it('prompt error when no option is selected', async () => {
-      component
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
+      component.find('#confirm_form').hostNodes().simulate('click')
 
       await waitForElement(component, '#form_error')
 
-      expect(
-        component
-          .find('#form_error')
-          .hostNodes()
-          .text()
-      ).toBe('Please select who is collecting the certificate')
+      expect(component.find('#form_error').hostNodes().text()).toBe(
+        'Please select who is collecting the certificate'
+      )
     })
 
     it('redirects to id check component upon MOTHER option selection', async () => {
@@ -229,17 +223,14 @@ describe('Certificate collector test for a birth registration without father det
         .hostNodes()
         .simulate('change', { target: { value: 'MOTHER' } })
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()
 
-      component
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
+      component.find('#confirm_form').hostNodes().simulate('click')
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()
@@ -255,37 +246,28 @@ describe('Certificate collector test for a birth registration without father det
         .hostNodes()
         .simulate('change', { target: { value: 'MOTHER' } })
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()
 
-      component
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
+      component.find('#confirm_form').hostNodes().simulate('click')
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()
 
-      component
-        .find('#action_page_back_button')
-        .hostNodes()
-        .simulate('click')
+      component.find('#action_page_back_button').hostNodes().simulate('click')
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()
 
-      expect(
-        component
-          .find('#type_MOTHER')
-          .hostNodes()
-          .props().checked
-      ).toBe(true)
+      expect(component.find('#type_MOTHER').hostNodes().props().checked).toBe(
+        true
+      )
     })
 
     it('redirects to user form for other collector upon Someone else option selection', async () => {
@@ -294,17 +276,14 @@ describe('Certificate collector test for a birth registration without father det
         .hostNodes()
         .simulate('change', { target: { value: 'OTHER' } })
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()
 
-      component
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
+      component.find('#confirm_form').hostNodes().simulate('click')
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()
@@ -342,19 +321,13 @@ describe('Certificate collector test for a birth registration without father det
     })
 
     it('show form level error when the mandatory fields are not filled', async () => {
-      component
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
+      component.find('#confirm_form').hostNodes().simulate('click')
 
       await waitForElement(component, '#form_error')
 
-      expect(
-        component
-          .find('#form_error')
-          .hostNodes()
-          .text()
-      ).toBe('Complete all the mandatory fields')
+      expect(component.find('#form_error').hostNodes().text()).toBe(
+        'Complete all the mandatory fields'
+      )
     })
 
     it('continue to next group when the mandatory fields are filled', async () => {
@@ -380,17 +353,14 @@ describe('Certificate collector test for a birth registration without father det
         .hostNodes()
         .simulate('change', { target: { value: 'Uncle', id: 'relationship' } })
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()
 
-      component
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
+      component.find('#confirm_form').hostNodes().simulate('click')
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()
@@ -428,19 +398,11 @@ describe('Certificate collector test for a birth registration without father det
     })
 
     it('show form level error when the mandatory fields are not filled', async () => {
-      component
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
+      component.find('#confirm_form').hostNodes().simulate('click')
 
       await waitForElement(component, '#form_error')
 
-      expect(
-        component
-          .find('#form_error')
-          .hostNodes()
-          .text()
-      ).toBe(
+      expect(component.find('#form_error').hostNodes().text()).toBe(
         'Attach a signed affidavit or click the checkbox if they do not have one.'
       )
     })
@@ -453,17 +415,14 @@ describe('Certificate collector test for a birth registration without father det
           checked: true
         })
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()
 
-      component
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
+      component.find('#confirm_form').hostNodes().simulate('click')
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()
@@ -472,11 +431,8 @@ describe('Certificate collector test for a birth registration without father det
         component.find('#noAffidavitAgreementConfirmationModal').hostNodes()
       ).toHaveLength(1)
 
-      component
-        .find('#submit_confirm')
-        .hostNodes()
-        .simulate('click')
-      await new Promise(resolve => {
+      component.find('#submit_confirm').hostNodes().simulate('click')
+      await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()
@@ -487,12 +443,9 @@ describe('Certificate collector test for a birth registration without father det
     })
 
     it('should hide form level error while uploading valid file', async () => {
-      component
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
+      component.find('#confirm_form').hostNodes().simulate('click')
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()
@@ -512,7 +465,7 @@ describe('Certificate collector test for a birth registration without father det
           }
         })
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()
@@ -711,24 +664,18 @@ describe('Test for a free birth registration', () => {
           checked: true
         })
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()
 
-      component
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
+      component.find('#confirm_form').hostNodes().simulate('click')
 
       expect(
         component.find('#noAffidavitAgreementConfirmationModal').hostNodes()
       ).toHaveLength(1)
 
-      component
-        .find('#submit_confirm')
-        .hostNodes()
-        .simulate('click')
+      component.find('#submit_confirm').hostNodes().simulate('click')
 
       expect(history.location.pathname).toBe(
         '/review/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
@@ -1244,17 +1191,14 @@ describe('Certificate collector test for a death registration', () => {
         .hostNodes()
         .simulate('change', { target: { value: 'PRINT_IN_ADVANCE' } })
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()
 
-      component
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
+      component.find('#confirm_form').hostNodes().simulate('click')
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()

@@ -49,7 +49,7 @@ export function getCountryTranslations(
   getAvailableLanguages().forEach((language: string) => {
     const certificateCountry: IAvailableCountries = { language }
     const availableCountries: ICountry[] = []
-    countries.forEach(country => {
+    countries.forEach((country) => {
       availableCountries.push({
         value: country.value,
         name: languageState[language].messages[`countries.${country.value}`]
@@ -82,7 +82,7 @@ function getValue(
   check: number
 ): IRange['value'] {
   const rangeByEvent = this.rangeData[event] as IRange[]
-  const foundRange = rangeByEvent.find(range =>
+  const foundRange = rangeByEvent.find((range) =>
     range.end
       ? check >= range.start && check <= range.end
       : check >= range.start

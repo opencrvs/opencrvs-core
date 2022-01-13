@@ -31,11 +31,8 @@ describe('Login app > Secure Account Page', () => {
     expect(elem).toHaveLength(1)
   })
   it('Create pin button click takes user to create pin screen', async () => {
-    component
-      .find('#createPinBtn')
-      .hostNodes()
-      .simulate('click')
-    await new Promise(resolve => {
+    component.find('#createPinBtn').hostNodes().simulate('click')
+    await new Promise((resolve) => {
       setTimeout(() => {
         resolve()
       }, 50)

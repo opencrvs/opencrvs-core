@@ -94,8 +94,7 @@ export const mockDataWithRegistarRoleSelected = {
   username: '',
   signature: {
     type: 'image/png',
-    data:
-      'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUt'
+    data: 'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUt'
   }
 }
 
@@ -500,12 +499,12 @@ export const transformRoleDataToDefinitions = (
 ): IFormField[] => {
   const roles = data as Array<any>
   const transformTypes = (types: string[]) =>
-    types.map(type => ({
+    types.map((type) => ({
       label: userMessages[type],
       value: type
     }))
 
-  return fields.map(field => {
+  return fields.map((field) => {
     if (field.name === 'role') {
       if (userFormData && userFormData.role) {
         userFormData.role = ''
@@ -521,13 +520,14 @@ export const transformRoleDataToDefinitions = (
       if (userFormData && userFormData.type) {
         userFormData.type = ''
       }
-      ;(field as ISelectFormFieldWithDynamicOptions).dynamicOptions.options = roles.reduce(
-        (options, { value, types }) => ({
-          ...options,
-          [value]: transformTypes(types)
-        }),
-        {}
-      )
+      ;(field as ISelectFormFieldWithDynamicOptions).dynamicOptions.options =
+        roles.reduce(
+          (options, { value, types }) => ({
+            ...options,
+            [value]: transformTypes(types)
+          }),
+          {}
+        )
       return field
     } else return field
   })
@@ -539,14 +539,14 @@ export async function alterRolesBasedOnUserRole(primaryOfficeId: string) {
   const roles = roleData.data.getRoles as Array<GQLRole>
   const users = userData.data.searchUsers.results as Array<GQLUser>
 
-  const hasSecretary = users.some(user => user.type === ROLE_TYPE_SECRETARY)
-  const hasMayor = users.some(user => user.type === ROLE_TYPE_MAYOR)
-  const hasChariman = users.some(user => user.type === ROLE_TYPE_CHAIRMAN)
+  const hasSecretary = users.some((user) => user.type === ROLE_TYPE_SECRETARY)
+  const hasMayor = users.some((user) => user.type === ROLE_TYPE_MAYOR)
+  const hasChariman = users.some((user) => user.type === ROLE_TYPE_CHAIRMAN)
 
   const roleList = [] as Array<GQLRole>
 
   /* eslint-disable array-callback-return */
-  roles.map(role => {
+  roles.map((role) => {
     if (
       role.value === ROLE_FIELD_AGENT ||
       role.value === ROLE_REGISTRATION_AGENT

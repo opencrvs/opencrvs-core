@@ -217,7 +217,7 @@ export class InProgressTabComponent extends React.Component<
 
       const actions: IAction[] = []
       const foundApplication = this.props.outboxApplications.find(
-        application => application.id === reg.id
+        (application) => application.id === reg.id
       )
       const downloadStatus =
         (foundApplication && foundApplication.downloadStatus) || undefined
@@ -450,7 +450,7 @@ export class InProgressTabComponent extends React.Component<
     const { results } =
       this.props.queryData && this.props.queryData[queryDataKey]
     const eventDetails =
-      results && results.find(result => result && result.id === itemId)
+      results && results.find((result) => result && result.id === itemId)
     return <RowHistoryView eventDetails={eventDetails} />
   }
 
@@ -688,14 +688,8 @@ export class InProgressTabComponent extends React.Component<
   }
 
   render() {
-    const {
-      intl,
-      selectorId,
-      drafts,
-      queryData,
-      page,
-      onPageChange
-    } = this.props
+    const { intl, selectorId, drafts, queryData, page, onPageChange } =
+      this.props
     const { inProgressData, notificationData } = queryData
 
     return (

@@ -42,7 +42,7 @@ import {
   getPractitionerRef
 } from '@workflow/features/user/utils'
 import { logger } from '@workflow/logger'
-import { getTokenPayload, ITokenPayload } from '@workflow/utils/authUtils.ts'
+import { getTokenPayload, ITokenPayload } from '@workflow/utils/authUtils'
 import { RESOURCE_SERVICE_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 

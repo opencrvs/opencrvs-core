@@ -54,6 +54,5 @@ const messagesToDefine: ILocationMessages = {
   }
 }
 
-export const locationMessages: ILocationMessages = defineMessages(
-  messagesToDefine
-)
+export const locationMessages: ILocationMessages =
+  defineMessages(messagesToDefine)

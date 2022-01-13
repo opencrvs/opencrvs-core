@@ -149,7 +149,7 @@ describe('User audit list tests', () => {
     ).component
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
@@ -193,7 +193,7 @@ describe('User audit list tests', () => {
     editUserLink.hostNodes().simulate('click')
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     expect(history.location.pathname).toBe(
@@ -205,7 +205,7 @@ describe('User audit list tests', () => {
     officeLink.hostNodes().simulate('click')
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     expect(history.location.pathname).toBe('/team/users')
@@ -295,7 +295,7 @@ describe('User audit list tests', () => {
     ).component
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 

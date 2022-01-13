@@ -101,7 +101,7 @@ class IDVerifierComponent extends React.Component<
   state = { showPrompt: false }
 
   togglePrompt = () => {
-    this.setState(prevState => ({ showPrompt: !prevState.showPrompt }))
+    this.setState((prevState) => ({ showPrompt: !prevState.showPrompt }))
   }
 
   renderLabelValue = () => {

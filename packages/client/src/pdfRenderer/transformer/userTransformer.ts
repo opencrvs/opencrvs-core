@@ -140,11 +140,11 @@ export const userTransformers: IFunctionTransformer = {
     }
     const crvsLocation =
       templateData.userDetails.catchmentArea &&
-      templateData.userDetails.catchmentArea.find(cArea => {
+      templateData.userDetails.catchmentArea.find((cArea) => {
         return (
           (cArea.identifier &&
             cArea.identifier.find(
-              identifier =>
+              (identifier) =>
                 identifier.system ===
                   'http://opencrvs.org/specs/id/jurisdiction-type' &&
                 identifier.value === key.jurisdictionType

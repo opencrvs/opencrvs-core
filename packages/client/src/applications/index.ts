@@ -12,7 +12,6 @@
 import {
   Action as ApplicationAction,
   Event,
-  IContactPoint,
   IForm,
   IFormData,
   IFormFieldValue,
@@ -363,10 +362,6 @@ interface UpdateFieldAgentDeclaredApplicationsFailAction {
   type: typeof UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_FAIL
 }
 
-interface IApplicationRequestQueue {
-  id: string
-  action: Action
-}
 export type Action =
   | IStoreApplicationAction
   | IModifyApplicationAction
@@ -502,9 +497,10 @@ export const getStorageApplicationsSuccess = (
   payload: response
 })
 
-export const getStorageApplicationsFailed = (): IGetStorageApplicationsFailedAction => ({
-  type: GET_APPLICATIONS_FAILED
-})
+export const getStorageApplicationsFailed =
+  (): IGetStorageApplicationsFailedAction => ({
+    type: GET_APPLICATIONS_FAILED
+  })
 
 export function deleteApplication(
   application: IApplication | IPrintableApplication,
@@ -534,7 +530,7 @@ async function getUserData(userId: string) {
   const allUserData: IUserData[] = !userData
     ? []
     : (JSON.parse(userData) as IUserData[])
-  const currentUserData = allUserData.find(uData => uData.userID === userId)
+  const currentUserData = allUserData.find((uData) => uData.userID === userId)
 
   return { allUserData, currentUserData }
 }
@@ -591,14 +587,15 @@ export function mergeDeclaredApplications(
   declaredApplications: GQLEventSearchSet[]
 ) {
   const localApplications = applications.map(
-    application => application.compositionId
+    (application) => application.compositionId
   )
 
   const transformedDeclaredApplications = declaredApplications
     .filter(
-      declaredApplication => !localApplications.includes(declaredApplication.id)
+      (declaredApplication) =>
+        !localApplications.includes(declaredApplication.id)
     )
-    .map(app => {
+    .map((app) => {
       return transformSearchQueryDataToDraft(app)
     })
 
@@ -635,9 +632,9 @@ async function updateFieldAgentDeclaredApplicationsByUser(
   const rejectedApplications = await getFieldAgentRejectedApplications(
     userDetails
   )
-  const rejectedApplicationIds = (rejectedApplications.results as IApplication[]).map(
-    application => application.id
-  )
+  const rejectedApplicationIds = (
+    rejectedApplications.results as IApplication[]
+  ).map((application) => application.id)
 
   if (!currentUserData) {
     currentUserData = {
@@ -654,12 +651,12 @@ async function updateFieldAgentDeclaredApplicationsByUser(
   currentUserData = {
     ...currentUserData,
     applications: currentUserData.applications.filter(
-      application =>
+      (application) =>
         !rejectedApplicationIds.includes(application.compositionId as string)
     )
   }
 
-  allUserData = allUserData.map(userData => {
+  allUserData = allUserData.map((userData) => {
     if (userData.userID !== currentUserData!.userID) {
       return {
         ...userData
@@ -700,7 +697,7 @@ export async function getApplicationsOfCurrentUser(): Promise<string> {
   }
 
   const currentUserData = allUserData.find(
-    uData => uData.userID === currentUserID
+    (uData) => uData.userID === currentUserID
   )
   const currentUserApplications: IApplication[] =
     (currentUserData && currentUserData.applications) || []
@@ -721,12 +718,12 @@ async function updateWorkqueueData(
     return
   }
 
-  let workqueueApp =
+  const workqueueApp =
     userWorkqueue.data[workQueueId] &&
     userWorkqueue.data[workQueueId].results &&
     // @ts-ignore
     userWorkqueue.data[workQueueId].results.find(
-      app => app && app.id === application.id
+      (app) => app && app.id === application.id
     )
   if (!workqueueApp) {
     return
@@ -734,7 +731,7 @@ async function updateWorkqueueData(
   const sectionId = application.event === 'birth' ? 'child' : 'deceased'
   const sectionDefinition = getRegisterForm(state)[
     application.event
-  ].sections.find(section => section.id === sectionId)
+  ].sections.find((section) => section.id === sectionId)
 
   const transformedApplication = draftToGqlTransformer(
     // transforming required section only
@@ -767,13 +764,17 @@ async function updateWorkqueueData(
   if (application.event === 'birth') {
     ;(workqueueApp as GQLBirthEventSearchSet).childName = transformedName
     ;(workqueueApp as GQLBirthEventSearchSet).dateOfBirth = transformedBirthDate
-    ;((workqueueApp as GQLDeathEventSearchSet)
-      .registration as GQLRegistrationSearchSet).contactNumber = transformedInformantContactNumber
+    ;(
+      (workqueueApp as GQLDeathEventSearchSet)
+        .registration as GQLRegistrationSearchSet
+    ).contactNumber = transformedInformantContactNumber
   } else {
     ;(workqueueApp as GQLDeathEventSearchSet).deceasedName = transformedName
     ;(workqueueApp as GQLDeathEventSearchSet).dateOfDeath = transformedDeathDate
-    ;((workqueueApp as GQLDeathEventSearchSet)
-      .registration as GQLRegistrationSearchSet).contactNumber = transformedInformantContactNumber
+    ;(
+      (workqueueApp as GQLDeathEventSearchSet)
+        .registration as GQLRegistrationSearchSet
+    ).contactNumber = transformedInformantContactNumber
   }
 }
 
@@ -783,10 +784,12 @@ export async function writeApplicationByUser(
   application: IApplication
 ): Promise<string> {
   const uID = userId || (await getCurrentUserID())
-  let { allUserData, currentUserData } = await getUserData(uID)
+  const userData = await getUserData(uID)
+  const { allUserData } = userData
+  let { currentUserData } = userData
 
   const existingApplicationId = currentUserData
-    ? currentUserData.applications.findIndex(app => app.id === application.id)
+    ? currentUserData.applications.findIndex((app) => app.id === application.id)
     : -1
 
   if (existingApplicationId >= 0) {
@@ -872,17 +875,18 @@ function mergeWorkQueueData(
   if (!currentApplicatons) {
     return destinationWorkQueue
   }
-  workQueueIds.forEach(workQueueId => {
+  workQueueIds.forEach((workQueueId) => {
     if (!destinationWorkQueue.data[workQueueId].results) {
       return
     }
-    ;(destinationWorkQueue.data[workQueueId]
-      .results as GQLEventSearchSet[]).forEach(application => {
+    ;(
+      destinationWorkQueue.data[workQueueId].results as GQLEventSearchSet[]
+    ).forEach((application) => {
       if (application == null) {
         return
       }
       const applicationIndex = currentApplicatons.findIndex(
-        app => app && app.id === application.id
+        (app) => app && app.id === application.id
       )
       if (applicationIndex >= 0) {
         updateWorkqueueData(
@@ -980,7 +984,9 @@ export async function writeRegistrarWorkqueueByUser(
   const userDetails = getUserDetails(state) as IUserDetails
 
   const uID = userDetails.userMgntUserID || ''
-  let { allUserData, currentUserData } = await getUserData(uID)
+  const userData = await getUserData(uID)
+  const { allUserData } = userData
+  let { currentUserData } = userData
 
   const workqueue = await getWorkqueueData(
     state,
@@ -1010,10 +1016,10 @@ export async function deleteApplicationByUser(
   application: IApplication
 ): Promise<string> {
   const uID = userId || (await getCurrentUserID())
-  let { allUserData, currentUserData } = await getUserData(uID)
+  const { allUserData, currentUserData } = await getUserData(uID)
 
   const deletedApplicationId = currentUserData
-    ? currentUserData.applications.findIndex(app => app.id === application.id)
+    ? currentUserData.applications.findIndex((app) => app.id === application.id)
     : -1
 
   if (deletedApplicationId >= 0) {
@@ -1039,19 +1045,19 @@ export function downloadApplication(
 }
 
 export function updateRegistrarWorkqueue(
-  inProgressCount: number = 10,
-  reviewCount: number = 10,
-  rejectCount: number = 10,
-  approvalCount: number = 10,
-  externalValidationCount: number = 10,
-  printCount: number = 10,
+  inProgressCount = 10,
+  reviewCount = 10,
+  rejectCount = 10,
+  approvalCount = 10,
+  externalValidationCount = 10,
+  printCount = 10,
 
-  inProgressSkip: number = 0,
-  reviewSkip: number = 0,
-  rejectSkip: number = 0,
-  approvalSkip: number = 0,
-  externalValidationSkip: number = 0,
-  printSkip: number = 0
+  inProgressSkip = 0,
+  reviewSkip = 0,
+  rejectSkip = 0,
+  approvalSkip = 0,
+  externalValidationSkip = 0,
+  printSkip = 0
 ) {
   return {
     type: UPDATE_REGISTRAR_WORKQUEUE,
@@ -1080,9 +1086,10 @@ export const updateRegistrarWorkqueueSuccessActionCreator = (
   payload: response
 })
 
-export const updateRegistrarWorkqueueFailActionCreator = (): UpdateRegistrarWorkQueueFailAction => ({
-  type: UPDATE_REGISTRAR_WORKQUEUE_FAIL
-})
+export const updateRegistrarWorkqueueFailActionCreator =
+  (): UpdateRegistrarWorkQueueFailAction => ({
+    type: UPDATE_REGISTRAR_WORKQUEUE_FAIL
+  })
 
 export function updateFieldAgentDeclaredApplications() {
   return {
@@ -1097,9 +1104,10 @@ export const updateFieldAgentDeclaredApplicationsSuccessActionCreator = (
   payload: response
 })
 
-export const updateFieldAgentDeclaredApplicationsFailActionCreator = (): UpdateFieldAgentDeclaredApplicationsFailAction => ({
-  type: UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_FAIL
-})
+export const updateFieldAgentDeclaredApplicationsFailActionCreator =
+  (): UpdateFieldAgentDeclaredApplicationsFailAction => ({
+    type: UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_FAIL
+  })
 
 function createRequestForApplication(
   application: IApplication,
@@ -1230,7 +1238,7 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
     case MODIFY_APPLICATION:
       const newApplications: IApplication[] = state.applications || []
       const currentApplicationIndex = newApplications.findIndex(
-        application => application.id === action.payload.application.id
+        (application) => application.id === action.payload.application.id
       )
       newApplications[currentApplicationIndex] = action.payload.application
       return {
@@ -1287,12 +1295,12 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
       const { applications } = state
       const { application, client } = action.payload
       const downloadIsRunning = applications.some(
-        application =>
+        (application) =>
           application.downloadStatus === DOWNLOAD_STATUS.DOWNLOADING
       )
 
       const applicationIndex = applications.findIndex(
-        app => application.id === app.id
+        (app) => application.id === app.id
       )
       let newApplicationsAfterStartingDownload = Array.from(applications)
 
@@ -1355,7 +1363,7 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
               client
             ],
             successActionCreator: downloadApplicationSuccess,
-            failActionCreator: err =>
+            failActionCreator: (err) =>
               downloadApplicationFail(
                 err,
                 {
@@ -1371,7 +1379,7 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
       const { queryData, form, client: clientFromSuccess } = action.payload
 
       const downloadingApplicationIndex = state.applications.findIndex(
-        application =>
+        (application) =>
           application.downloadStatus === DOWNLOAD_STATUS.DOWNLOADING
       )
       const newApplicationsAfterDownload = Array.from(state.applications)
@@ -1390,14 +1398,13 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
           eventData.registration.status &&
           eventData.registration.status[0].type) ||
         ''
-      newApplicationsAfterDownload[
-        downloadingApplicationIndex
-      ] = createReviewApplication(
-        downloadingApplication.id,
-        transData,
-        downloadingApplication.event,
-        downloadedAppStatus
-      )
+      newApplicationsAfterDownload[downloadingApplicationIndex] =
+        createReviewApplication(
+          downloadingApplication.id,
+          transData,
+          downloadingApplication.event,
+          downloadedAppStatus
+        )
       newApplicationsAfterDownload[downloadingApplicationIndex].downloadStatus =
         DOWNLOAD_STATUS.DOWNLOADED
 
@@ -1408,7 +1415,7 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
 
       // Check if there is more to download
       const downloadQueueInprogress = state.applications.filter(
-        application =>
+        (application) =>
           application.downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD
       )
 
@@ -1422,7 +1429,7 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
               state.userID,
               newApplicationsAfterDownload[downloadingApplicationIndex]
             ],
-            failActionCreator: err =>
+            failActionCreator: (err) =>
               downloadApplicationFail(
                 err,
                 newApplicationsAfterDownload[downloadingApplicationIndex],
@@ -1434,13 +1441,11 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
 
       const applicationToDownload = downloadQueueInprogress[0]
       applicationToDownload.downloadStatus = DOWNLOAD_STATUS.DOWNLOADING
-      const {
-        request: nextRequest,
-        requestArgs: nextRequestArgs
-      } = createRequestForApplication(
-        applicationToDownload,
-        clientFromSuccess
-      ) as any
+      const { request: nextRequest, requestArgs: nextRequestArgs } =
+        createRequestForApplication(
+          applicationToDownload,
+          clientFromSuccess
+        ) as any
 
       // Return state, write to indexedDB and download the next ready to download application, all in sequence
       return loop(
@@ -1464,7 +1469,7 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
                   clientFromSuccess
                 ],
                 successActionCreator: downloadApplicationSuccess,
-                failActionCreator: err =>
+                failActionCreator: (err) =>
                   downloadApplicationFail(
                     err,
                     newApplicationsAfterDownload[downloadingApplicationIndex],
@@ -1486,14 +1491,12 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
       erroredApplication.downloadRetryAttempt =
         (erroredApplication.downloadRetryAttempt || 0) + 1
 
-      const {
-        request: retryRequest,
-        requestArgs: retryRequestArgs
-      } = createRequestForApplication(erroredApplication, clientFromFail) as any
+      const { request: retryRequest, requestArgs: retryRequestArgs } =
+        createRequestForApplication(erroredApplication, clientFromFail) as any
 
       const applicationsAfterError = Array.from(state.applications)
       const erroredApplicationIndex = applicationsAfterError.findIndex(
-        application =>
+        (application) =>
           application.downloadStatus === DOWNLOAD_STATUS.DOWNLOADING
       )
 
@@ -1517,7 +1520,7 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
                 clientFromFail
               ],
               successActionCreator: downloadApplicationSuccess,
-              failActionCreator: err =>
+              failActionCreator: (err) =>
                 downloadApplicationFail(err, erroredApplication, clientFromFail)
             }
           )
@@ -1536,7 +1539,7 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
       applicationsAfterError[erroredApplicationIndex] = erroredApplication
 
       const downloadQueueFollowing = state.applications.filter(
-        application =>
+        (application) =>
           application.downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD
       )
 
@@ -1579,7 +1582,7 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
                 clientFromFail
               ],
               successActionCreator: downloadApplicationSuccess,
-              failActionCreator: err =>
+              failActionCreator: (err) =>
                 downloadApplicationFail(err, nextApplication, clientFromFail)
             })
           ],
@@ -1591,8 +1594,10 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
       return loop(
         state,
         Cmd.run(updateFieldAgentDeclaredApplicationsByUser, {
-          successActionCreator: updateFieldAgentDeclaredApplicationsSuccessActionCreator,
-          failActionCreator: updateFieldAgentDeclaredApplicationsFailActionCreator,
+          successActionCreator:
+            updateFieldAgentDeclaredApplicationsSuccessActionCreator,
+          failActionCreator:
+            updateFieldAgentDeclaredApplicationsFailActionCreator,
           args: [Cmd.getState]
         })
       )
@@ -1656,7 +1661,7 @@ export function filterProcessingApplications(
     return data
   }
 
-  const filteredResults = data.results.filter(result => {
+  const filteredResults = data.results.filter((result) => {
     if (result === null) {
       return false
     }
@@ -1678,13 +1683,13 @@ export function filterProcessingApplicationsFromQuery(
 ): IQueryData {
   const processingApplicationIds = storedApplications
     .filter(
-      application =>
+      (application) =>
         application.submissionStatus &&
         processingStates.includes(
           application.submissionStatus as SUBMISSION_STATUS
         )
     )
-    .map(application => application.id)
+    .map((application) => application.id)
 
   return {
     inProgressTab: filterProcessingApplications(

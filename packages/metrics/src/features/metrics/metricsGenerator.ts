@@ -134,7 +134,7 @@ export async function fetchCertificationPayments(
     locationId: payment[lowerLocationLevel]
   }))
 
-  const emptyData = childLocationIds.map(id => ({ locationId: id, total: 0 }))
+  const emptyData = childLocationIds.map((id) => ({ locationId: id, total: 0 }))
 
   const paymentsData = fillEmptyDataArrayByKey(
     dataFromInflux,
@@ -246,12 +246,8 @@ export async function fetchRegWithinTimeFrames(
   const timeFramePoints = await query(queryString)
 
   const dataFromInflux = timeFramePoints.map((point: any) => {
-    const {
-      regWithin45d,
-      regWithin45dTo1yr,
-      regWithin1yrTo5yr,
-      regOver5yr
-    } = point
+    const { regWithin45d, regWithin45dTo1yr, regWithin1yrTo5yr, regOver5yr } =
+      point
     const total =
       regWithin45d + regWithin45dTo1yr + regWithin1yrTo5yr + regOver5yr
     return {
@@ -272,7 +268,7 @@ export async function fetchRegWithinTimeFrames(
     regOver5yr: 0
   }
 
-  const emptyData = childLocationIds.map(id => ({
+  const emptyData = childLocationIds.map((id) => ({
     locationId: id,
     ...placeholder
   }))
@@ -319,11 +315,11 @@ export async function getCurrentAndLowerLocationLevels(
     allPointsContainingLocationId &&
     allPointsContainingLocationId.length > 0 &&
     Object.keys(allPointsContainingLocationId[0]).find(
-      key => allPointsContainingLocationId[0][key] === locationId
+      (key) => allPointsContainingLocationId[0][key] === locationId
     )
   const oneLevelLowerLocationColumn =
     locationLevelOfQueryId &&
-    locationLevelOfQueryId.replace(/\d/, level =>
+    locationLevelOfQueryId.replace(/\d/, (level) =>
       level === '5' ? level : String(Number(level) + 1)
     )
 
@@ -462,7 +458,7 @@ const populateBirthKeyFigurePoint = (
   let totalMale = 0
   let totalFemale = 0
 
-  groupedByGenderData.forEach(data => {
+  groupedByGenderData.forEach((data) => {
     if (data.gender === FEMALE) {
       totalFemale += data.total
     } else if (data.gender === MALE) {
@@ -606,7 +602,7 @@ export async function fetchGenderBasisMetrics(
     femaleUnder18: 0
   }
 
-  const emptyData = childLocationIds.map(id => ({
+  const emptyData = childLocationIds.map((id) => ({
     location: id,
     ...placeholder
   }))
@@ -641,13 +637,14 @@ export async function fetchEstimated45DayMetrics(
                               GROUP BY ${locationLevel}`)
   const dataFromInflux: IRegistrationIn45DayEstimation[] = []
   for (const point of points) {
-    const estimationOf45Day: IEstimation = await fetchEstimateFor45DaysByLocationId(
-      point[locationLevel],
-      event,
-      authHeader,
-      timeFrom,
-      timeTo
-    )
+    const estimationOf45Day: IEstimation =
+      await fetchEstimateFor45DaysByLocationId(
+        point[locationLevel],
+        event,
+        authHeader,
+        timeFrom,
+        timeTo
+      )
     dataFromInflux.push({
       locationId: point[locationLevel],
       registrationIn45Day: point.withIn45Day,
@@ -668,13 +665,14 @@ export async function fetchEstimated45DayMetrics(
 
   const emptyEstimationData: IRegistrationIn45DayEstimation[] = []
   for (const id of childLocationIds) {
-    const estimationOf45Day: IEstimation = await fetchEstimateFor45DaysByLocationId(
-      id,
-      event,
-      authHeader,
-      timeFrom,
-      timeTo
-    )
+    const estimationOf45Day: IEstimation =
+      await fetchEstimateFor45DaysByLocationId(
+        id,
+        event,
+        authHeader,
+        timeFrom,
+        timeTo
+      )
     emptyEstimationData.push({
       locationId: id,
       registrationIn45Day: 0,
@@ -743,7 +741,7 @@ export async function fetchLocationWiseEventEstimations(
   let totalRegistrationIn45Day: number = 0
   let totalMaleRegistrationIn45Day: number = 0
   let totalFemaleRegistrationIn45Day: number = 0
-  registrationsIn45DaysPoints.forEach(point => {
+  registrationsIn45DaysPoints.forEach((point) => {
     totalRegistrationIn45Day += point.total
     if (point.gender === 'male') {
       totalMaleRegistrationIn45Day += point.total
@@ -751,13 +749,14 @@ export async function fetchLocationWiseEventEstimations(
       totalFemaleRegistrationIn45Day += point.total
     }
   })
-  const estimationOf45Day: IEstimation = await fetchEstimateFor45DaysByLocationId(
-    locationId,
-    event,
-    authHeader,
-    timeFrom,
-    timeTo
-  )
+  const estimationOf45Day: IEstimation =
+    await fetchEstimateFor45DaysByLocationId(
+      locationId,
+      event,
+      authHeader,
+      timeFrom,
+      timeTo
+    )
 
   return {
     actualRegistration: totalRegistrationIn45Day,
@@ -804,7 +803,7 @@ function populateGenderBasisMetrics(
 
   points.forEach((point: IGenderBasisPoint) => {
     const metrics = metricsArray.find(
-      element => element.location === point[locationLevel]
+      (element) => element.location === point[locationLevel]
     )
     const femaleOver18 =
       point.gender === 'female'

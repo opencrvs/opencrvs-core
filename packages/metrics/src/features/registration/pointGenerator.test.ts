@@ -27,7 +27,8 @@ import { Events } from '@metrics/features/metrics/constants'
 
 import * as api from '@metrics/api'
 const fetchLocation = api.fetchLocation as jest.Mock
-const fetchParentLocationByLocationID = api.fetchParentLocationByLocationID as jest.Mock
+const fetchParentLocationByLocationID =
+  api.fetchParentLocationByLocationID as jest.Mock
 const fetchTaskHistory = api.fetchTaskHistory as jest.Mock
 
 const AUTH_HEADER = {

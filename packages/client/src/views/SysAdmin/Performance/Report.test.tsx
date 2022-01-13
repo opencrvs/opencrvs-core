@@ -200,11 +200,8 @@ describe('Report page', () => {
   })
 
   it('loads with page title from given time range from props', () => {
-    expect(
-      testComponent
-        .find('#reports-header')
-        .first()
-        .text()
-    ).toBe('December 2019')
+    expect(testComponent.find('#reports-header').first().text()).toBe(
+      'December 2019'
+    )
   })
 })

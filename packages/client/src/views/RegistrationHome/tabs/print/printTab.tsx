@@ -150,7 +150,7 @@ class PrintTabComponent extends React.Component<
     const transformedData = transformData(data, this.props.intl)
     return transformedData.map((reg, index) => {
       const foundApplication = this.props.outboxApplications.find(
-        application => application.id === reg.id
+        (application) => application.id === reg.id
       )
       const actions: IAction[] = []
       const downloadStatus =
@@ -212,7 +212,7 @@ class PrintTabComponent extends React.Component<
   renderExpandedComponent = (itemId: string) => {
     const { results } = this.props.queryData && this.props.queryData.data
     const eventDetails =
-      results && results.find(result => result && result.id === itemId)
+      results && results.find((result) => result && result.id === itemId)
     return <RowHistoryView eventDetails={eventDetails} />
   }
 
