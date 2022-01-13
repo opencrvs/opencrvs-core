@@ -7,22 +7,28 @@
 #
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
-set -e
-if [  -n "$(uname -a | grep Ubuntu)" ]; then
+#!/bin/bash
 
-    echo "OpenCRVS requires multiple terminal windows open in order to run OpenCRVS Core alongside the default country configuration."
-    echo "::::::::::::: We want to install the tool tmux to do this. :::::::::::::"
-    echo
-    echo "::::::::::::: Please enter your sudo password when prompted :::::::::::::"
-    echo
-    sudo apt-get install tmux
-else
-  echo "OpenCRVS requires multiple terminal windows open in order to run OpenCRVS Core alongside the default country configuration."
-  echo
-  echo "We use the tool tmux to do this.  Please install it following the documentation here: https://github.com/tmux/tmux/wiki"
-fi
-tmux new -d -s opencrvs-core
-tmux new -d -s opencrvs-zambia
-tmux send -t opencrvs-core.0 ls ENTER
-tmux send -t opencrvs-zambia.0 ls ENTER
-tmux attach -d -t opencrvs-core
+session=$1
+window=$2
+pan1=$3
+pan2=$4
+
+#Get width and lenght size of terminal, this is needed if one wants to resize a detached session/window/pane
+#with resize-pane command here
+set -- $(stty size) #$1=rows, $2=columns
+
+#start a new session in dettached mode with resizable panes
+tmux new-session -s $session -n $window -d -x "$2" -y "$(($1 - 1))"
+tmux send-keys -t $session 'echo "first command in 1st pane"' C-m
+
+#rename pane 0 with value of $pan1
+tmux set -p @mytitle "$pan1"
+
+#split window vertically
+tmux split-window -h
+tmux send-keys -t $session 'echo "first command in 2nd pane"' C-m
+tmux set -p @mytitle "$pan2"
+
+#At the end, attach to the customized session
+tmux attach -t $session

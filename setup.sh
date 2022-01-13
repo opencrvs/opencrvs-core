@@ -58,11 +58,7 @@ function ctrl_c() {
     docker stop $(docker ps -aq)
   fi
   if [ $TMUX_STARTED == 1 ]; then
-    tmux kill-session -t opencrvs-core
-  fi
-  if [ $TMUX_STARTED == 2 ]; then
-    tmux kill-session -t opencrvs-core
-    tmux kill-session -t opencrvs-zambia
+    tmux kill-session -t opencrvs
   fi
   exit 1
 }
@@ -287,114 +283,24 @@ echo
 echo ":::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::"
 echo
 
-tmux new -d -s opencrvs-core
+set -- $(stty size) #$1=rows, $2=columns
+
+#start a new session in dettached mode with resizable panes
+tmux new-session -s opencrvs -n opencrvs -d -x "$2" -y "$(($1 - 1))"
+
 TMUX_STARTED=1
 
 if [ $OS == "UBUNTU" ]; then
-  tmux send -t opencrvs-core.0 "LANGUAGES=en && yarn start"
-  tmux send -t opencrvs-core.0 ENTER
+  tmux send-keys -t opencrvs "LANGUAGES=en && yarn start" C-m
   else
   $MY_IP = $(hostname -I | cut -d' ' -f1)
-  tmux send -t opencrvs-core.0 "LANGUAGES=en && LOCAL_IP=$MY_IP && yarn start"
-  tmux send -t opencrvs-core.0 ENTER
+  tmux send-keys -t opencrvs "LANGUAGES=en && LOCAL_IP=$MY_IP && yarn start" C-m
 fi
-echo "wait-on tcp:4040" && wait-on -l tcp:4040
-echo "wait-on http://localhost:3000" && wait-on -l http://localhost:3000
-echo "wait-on http://localhost:3020" && wait-on -l http://localhost:3020
-echo "wait-on tcp:3030" && wait-on -l tcp:3030
-echo "wait-on tcp:2020" && wait-on -l tcp:2020
-echo "wait-on tcp:7070" && wait-on -l tcp:7070
-echo "wait-on tcp:5050" && wait-on -l tcp:5050
-echo "wait-on tcp:9090" && wait-on -l tcp:9090
-echo "wait-on tcp:1050" && wait-on -l tcp:1050
+tmux set -p @mytitle "opencrvs-core"
+tmux split-window -h
+tmux set -p @mytitle "opencrvs-zambia"
+tmux send-keys -t opencrvs "bash setup/setup-resources.sh" C-m
+tmux set -p @mytitle "opencrvs-core-working"
+tmux send-keys -t opencrvs "bash setup/summary.sh" C-m
+tmux attach -t opencrvs
 
-
-echo
-echo ":::::::::::::::::::: Installing Zambia Configuration ::::::::::::::::::::"
-echo
-echo "::::::::::::::: Cloning the Zambia Country Configuration :::::::::::::::"
-echo
-git clone https://github.com/opencrvs/opencrvs-zambia.git
-cd opencrvs-zambia
-echo
-echo ":::::::::::::::::: Installing some Node dependencies ::::::::::::::::::"
-echo
-yarn install
-echo
-echo ":::::::::::::::::: Installing Zambia Reference Data ::::::::::::::::::"
-echo
-yarn db:clear:all
-yarn db:backup:restore
-echo
-echo "::::::::::::::::::::: Starting Zambia Config Server :::::::::::::::::::::"
-tmux new -d -s opencrvs-zambia
-TMUX_STARTED=2
-tmux send -t opencrvs-zambia.0 "CERT_PUBLIC_KEY_PATH=./../.secrets/public-key.pem yarn start"
-tmux send -t opencrvs-zambia.0 ENTER
-wait-on -l tcp:3040
-echo
-echo -e "::::::::::::::::::::::::::: \033[32mCONGRATULATIONS!!\033[0m :::::::::::::::::::::::::::"
-echo
-echo "
-                                            -=================================.
-                                          -@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-
-  --                                                                       +@@-
-.%@*                                                                       +@@-
-:@@*                                                                       +@@-
-:@@*                                                                       +@@-
-:@@*                                                                       +@@-
-:@@*                                                                       +@@-
-:@@*                   .                                                   +@@-
-:@@*               .*@@%@@*.   =@@%@@#.  -@@%%%%   =@@-  @@                +@@-
-:@@*               %@-   -@%   =@*  *@+  -@*       =@@@= @@                +@@-
-:@@*              :@%     %@:  =@@@@@#.  -@@@@@    =@**@+@@                +@@-
-:@@*               %@=   =@%   =@*       -@*       =@* *@@@                +@@-
-:@@*                +%@@@%+    =@*       -@@@@@@   =@*  +@@                +@@-
-:@@*                                                                       +@=
-:@@*
-:@@*
-:@@*
-:@@*                 .-=-:     .----:     --    --.   :--:
-:@@*               :%@*+*@%:   -@@**@@:   *@+  -@%   +@**@=
-:@@*              .@@.   .-.   -@%-=%@-   .@@. %@:   +@#-.
-:@@*              .@@          -@@*@@:     -@#+@+     :+#@#
-:@@*               *@#-:-#@-   -@# =@%.     *@@%    .@%::%@.
-:@@*                :+###+:    :#+  :#*     .##:     :+##*:
-:@@*
-:@@*
-:@@*
-:@@*
-:@@*
-:@@*
-:@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%:
----------------------------------------------------------------------------
-"
-echo
-echo "::::::::::::::::::::::: OpenCRVS IS READY TO DEMO. :::::::::::::::::::::::"
-
-echo "::::::::::::::::::::::: OPEN THIS LINK IN CHROME: :::::::::::::::::::::::"
-echo
-
-echo -e "::::::::::::::::::::::::: \033[32mhttp://localhost:3020/\033[0m :::::::::::::::::::::::::"
-echo
-
-echo "::::::::::::::::::::::::::: Login Details are :::::::::::::::::::::::::::"
-echo
-
-echo ":::::: Field Agent role: Username: kalusha.bwalya - Password: test ::::::"
-echo
-
-echo "::: Registration Agent role: Username: felix.katongo - Password: test :::"
-echo
-
-echo "::::::: Registrar role: Username: kennedy.mweene - Password: test :::::::"
-echo
-
-echo "::::: Local System Admin: Username: emmanuel.mayuka - Password: test :::::"
-echo
-
-echo ":: National System Admin: Username: jonathan.campbell - Password: test ::"
-echo
-
-echo "::::::::: Demo Two Factor Authentication SMS access code: 000000 :::::::::"
-echo
