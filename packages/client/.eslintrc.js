@@ -14,10 +14,10 @@ module.exports = {
     'eslint-config-react-app',
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
-    'prettier/@typescript-eslint',
     'plugin:import/errors',
     'plugin:import/warnings',
-    'plugin:import/typescript'
+    'plugin:import/typescript',
+    'prettier'
   ],
   plugins: ['react', '@typescript-eslint', 'import', 'formatjs'],
   env: {
@@ -62,6 +62,7 @@ Query component now sends errors automatically to Sentry.`
     'import/no-extraneous-dependencies': 'off',
     'import/no-unresolved': 'off',
     'import/prefer-default-export': 'off',
+    'import/no-named-as-default': 'off',
     'import/no-relative-parent-imports': 2,
     'import/named': 0,
     'formatjs/enforce-id': 'error',
@@ -75,6 +76,18 @@ Query component now sends errors automatically to Sentry.`
     '@typescript-eslint/prefer-interface': 'off',
     '@typescript-eslint/array-type': 'off',
     '@typescript-eslint/no-object-literal-type-assertion': 'off',
+    '@typescript-eslint/ban-types': [
+      'error',
+      {
+        types: {
+          '{}': false
+        },
+        extendDefaults: true
+      }
+    ],
+    '@typescript-eslint/ban-ts-comment': 'off',
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
+    '@typescript-eslint/no-empty-function': 'off',
     'react/no-unescaped-entities': 'off',
     'react/destructuring-assignment': 'off',
     'react/jsx-filename-extension': [
@@ -93,9 +106,14 @@ Query component now sends errors automatically to Sentry.`
       version: 'detect'
     }
   },
+  overrides: [
+    {
+      files: ['*.ts', '*.tsx'],
+      parserOptions: {
+        project: ['./tsconfig.json']
+      }
+    }
+  ],
   globals: {},
-  parser: '@typescript-eslint/parser',
-  parserOptions: {
-    project: 'tsconfig.json'
-  }
+  parser: '@typescript-eslint/parser'
 }

@@ -34,13 +34,13 @@ if (
   LogRocket.init(window.config.LOGROCKET)
 
   // Integrate the two
-  Sentry.configureScope(scope => {
-    scope.addEventProcessor(async event => {
+  Sentry.configureScope((scope) => {
+    scope.addEventProcessor(async (event) => {
       if (!event.extra) {
         event.extra = {}
       }
-      const sessionUrl = await new Promise(resolve => {
-        LogRocket.getSessionURL(url => {
+      const sessionUrl = await new Promise((resolve) => {
+        LogRocket.getSessionURL((url) => {
           resolve(url)
         })
       })

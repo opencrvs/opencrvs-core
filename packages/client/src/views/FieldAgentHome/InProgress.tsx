@@ -80,8 +80,10 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
         event: event,
         name: name || '',
         dateOfModification:
-          `${intl.formatMessage(messages.lastUpdated)} ${lastModificationDate &&
-            formattedDuration(moment(lastModificationDate))}` || '',
+          `${intl.formatMessage(messages.lastUpdated)} ${
+            lastModificationDate &&
+            formattedDuration(moment(lastModificationDate))
+          }` || '',
         rowClickHandler: [
           {
             label: 'rowClickHandler',

@@ -732,7 +732,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
         testComponent.find('#action-loading-ListItemAction-0').hostNodes()
       ).toHaveLength(1)
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.update()
@@ -743,7 +743,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
       )
       action.hostNodes().simulate('click')
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.update()

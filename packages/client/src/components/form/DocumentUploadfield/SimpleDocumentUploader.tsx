@@ -76,11 +76,11 @@ class SimpleDocumentUploaderComponent extends React.Component<
       return
     }
     const allowedDocType = this.props.allowedDocType
-    getBase64String(uploadedImage).then(data => {
+    getBase64String(uploadedImage).then((data) => {
       let base64String = data as string
       base64String = base64String.split('base64,')[1]
       Jimp.read(new Buffer(base64String, 'base64'))
-        .then(buffer => {
+        .then((buffer) => {
           if (
             allowedDocType &&
             allowedDocType.length > 0 &&
@@ -90,7 +90,7 @@ class SimpleDocumentUploaderComponent extends React.Component<
           }
           return data as string
         })
-        .then(buffer => {
+        .then((buffer) => {
           this.props.onComplete({
             type: uploadedImage.type,
             data: buffer
@@ -125,14 +125,8 @@ class SimpleDocumentUploaderComponent extends React.Component<
   }
 
   render() {
-    const {
-      label,
-      intl,
-      files,
-      description,
-      error,
-      disableDeleteInPreview
-    } = this.props
+    const { label, intl, files, description, error, disableDeleteInPreview } =
+      this.props
     const errorMessage = this.state.error || error || ''
 
     return (

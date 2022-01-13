@@ -55,10 +55,7 @@ export async function getVerificationCodeDetails(
 }
 
 export function generateNonce() {
-  return crypto
-    .randomBytes(16)
-    .toString('base64')
-    .toString()
+  return crypto.randomBytes(16).toString('base64').toString()
 }
 
 export async function sendVerificationCode(
@@ -74,6 +71,7 @@ export async function sendVerificationCode(
     method: 'POST',
     body: JSON.stringify(params),
     headers: {
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${await createToken(
         'auth',
         ['service'],

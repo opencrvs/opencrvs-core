@@ -27,7 +27,7 @@ import { BIRTH, DEATH } from './constants'
 
 const getApplicantFullName = (
   sectionData: IFormSectionData,
-  language: string = 'en'
+  language = 'en'
 ): string => {
   let fullName = ''
   if (!sectionData) {
@@ -35,13 +35,17 @@ const getApplicantFullName = (
   }
   if (language === 'en') {
     if (sectionData.firstNamesEng) {
-      fullName = `${sectionData.firstNamesEng as string} ${sectionData.familyNameEng as string}`
+      fullName = `${sectionData.firstNamesEng as string} ${
+        sectionData.familyNameEng as string
+      }`
     } else {
       fullName = sectionData.familyNameEng as string
     }
   } else {
     if (sectionData.firstNames) {
-      fullName = `${sectionData.firstNames as string} ${sectionData.familyName as string}`
+      fullName = `${sectionData.firstNames as string} ${
+        sectionData.familyName as string
+      }`
     } else {
       fullName = sectionData.familyName as string
     }
@@ -69,26 +73,26 @@ const transformBirthSearchQueryDataToDraft = (
     firstNamesEng:
       (data.childName &&
         data.childName
-          .filter(name => name && name.use === 'en')
-          .map(name => name && name.firstNames)[0]) ||
+          .filter((name) => name && name.use === 'en')
+          .map((name) => name && name.firstNames)[0]) ||
       '',
     familyNameEng:
       (data.childName &&
         data.childName
-          .filter(name => name && name.use === 'en')
-          .map(name => name && name.familyName)[0]) ||
+          .filter((name) => name && name.use === 'en')
+          .map((name) => name && name.familyName)[0]) ||
       '',
     firstNames:
       (data.childName &&
         data.childName
-          .filter(name => name && name.use !== 'en')
-          .map(name => name && name.firstNames)[0]) ||
+          .filter((name) => name && name.use !== 'en')
+          .map((name) => name && name.firstNames)[0]) ||
       '',
     familyName:
       (data.childName &&
         data.childName
-          .filter(name => name && name.use !== 'en')
-          .map(name => name && name.familyName)[0]) ||
+          .filter((name) => name && name.use !== 'en')
+          .map((name) => name && name.familyName)[0]) ||
       ''
   }
 }
@@ -101,26 +105,26 @@ const transformDeathSearchQueryDataToDraft = (
     firstNamesEng:
       (data.deceasedName &&
         data.deceasedName
-          .filter(name => name && name.use === 'en')
-          .map(name => name && name.firstNames)[0]) ||
+          .filter((name) => name && name.use === 'en')
+          .map((name) => name && name.firstNames)[0]) ||
       '',
     familyNameEng:
       (data.deceasedName &&
         data.deceasedName
-          .filter(name => name && name.use === 'en')
-          .map(name => name && name.familyName)[0]) ||
+          .filter((name) => name && name.use === 'en')
+          .map((name) => name && name.familyName)[0]) ||
       '',
     firstNames:
       (data.deceasedName &&
         data.deceasedName
-          .filter(name => name && name.use !== 'en')
-          .map(name => name && name.firstNames)[0]) ||
+          .filter((name) => name && name.use !== 'en')
+          .map((name) => name && name.firstNames)[0]) ||
       '',
     familyName:
       (data.deceasedName &&
         data.deceasedName
-          .filter(name => name && name.use !== 'en')
-          .map(name => name && name.familyName)[0]) ||
+          .filter((name) => name && name.use !== 'en')
+          .map((name) => name && name.familyName)[0]) ||
       ''
   }
 }
@@ -130,7 +134,7 @@ export const transformSearchQueryDataToDraft = (
 ): IApplication => {
   const eventType = getEvent(data.type)
 
-  let application: IApplication = {
+  const application: IApplication = {
     id: data.id,
     data: {
       registration: {

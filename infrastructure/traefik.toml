@@ -58,7 +58,8 @@ entryPoint = "http"
     "api.{{hostname}}",
     "openhim.{{hostname}}",
     "webhooks.{{hostname}}",
-    "monitor.{{hostname}}"
+    "monitor.{{hostname}}",
+    "styleguide.{{hostname}}"
   ]
 
 [retry]

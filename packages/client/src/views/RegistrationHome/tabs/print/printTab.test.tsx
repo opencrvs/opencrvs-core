@@ -440,10 +440,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
     it('renders correct timestamps for history steps [OCRVS-2214]', async () => {
       expect(
-        expandedRow
-          .find('#expanded_history_item_timestamp')
-          .hostNodes()
-          .text()
+        expandedRow.find('#expanded_history_item_timestamp').hostNodes().text()
       ).toBe('Registered on:20 October 2019')
     })
   })
@@ -741,7 +738,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
         testComponent.find('#action-loading-ListItemAction-0').hostNodes()
       ).toHaveLength(1)
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.update()
@@ -752,7 +749,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
       )
       action.hostNodes().simulate('click')
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.update()
@@ -815,7 +812,7 @@ describe('Tablet tests', () => {
     const element = await waitForElement(testComponent.component, '#row_0')
     element.hostNodes().simulate('click')
 
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     testComponent.component.update()

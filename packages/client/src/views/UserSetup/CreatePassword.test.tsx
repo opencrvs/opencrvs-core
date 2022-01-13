@@ -37,12 +37,9 @@ describe('CreatePassword page tests', () => {
       target: { id: 'ConfirmPassword', value: 'missmatch' }
     })
     component.find('button#Continue').simulate('click')
-    expect(
-      component
-        .find('#GlobalError')
-        .hostNodes()
-        .text()
-    ).toEqual('Passwords do not match')
+    expect(component.find('#GlobalError').hostNodes().text()).toEqual(
+      'Passwords do not match'
+    )
   })
   it('it passes validations', () => {
     component.find('input#NewPassword').simulate('change', {
@@ -55,11 +52,8 @@ describe('CreatePassword page tests', () => {
   })
   it('it shows passwords required error when Continue button is pressed', () => {
     component.find('button#Continue').simulate('click')
-    expect(
-      component
-        .find('#GlobalError')
-        .hostNodes()
-        .text()
-    ).toEqual('New password is not valid')
+    expect(component.find('#GlobalError').hostNodes().text()).toEqual(
+      'New password is not valid'
+    )
   })
 })

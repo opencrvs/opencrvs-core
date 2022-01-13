@@ -30,7 +30,7 @@ export function transformStatusData(
 ) {
   const registrationStatus =
     statusData &&
-    statusData.find(status => {
+    statusData.find((status) => {
       return status.type && (status.type as GQLRegStatus) === 'REGISTERED'
     })
   transformedData[sectionId] = {
@@ -121,53 +121,53 @@ const convertToLocal = (
   )
 }
 
-export const localPhoneTransformer = (
-  transformedFieldName?: string,
-  codeReplacement?: string
-) => (
-  transformedData: TransformedData,
-  queryData: IFormData,
-  sectionId: string,
-  field: IFormField
-) => {
-  let fieldName = transformedFieldName || field.name
-  const msisdnPhone = (get(queryData, fieldName as string) as unknown) as string
-  const localPhone = convertToLocal(
-    msisdnPhone,
-    window.config.COUNTRY,
-    codeReplacement
-  )
-  transformedData[sectionId][field.name] = localPhone
-  return transformedData
-}
-
-export const changeHirerchyQueryTransformer = (
-  transformedFieldName?: string,
-  transformerMethod?: IFormFieldQueryMapFunction
-) => (
-  transformedData: TransformedData,
-  queryData: IFormData,
-  sectionId: string,
-  field: IFormField,
-  nestedField: IFormField
-) => {
-  if (transformedFieldName) {
-    transformedData[sectionId][field.name]['nestedFields'][
-      nestedField.name
-    ] = get(queryData, transformedFieldName)
-
-    if (transformerMethod) {
-      const clonedTransformedData = cloneDeep(transformedData)
-      transformerMethod(clonedTransformedData, queryData, sectionId, field)
-
-      transformedData[sectionId][field.name]['nestedFields'][nestedField.name] =
-        clonedTransformedData[sectionId][field.name]
-    }
-  } else {
-    transformedData[sectionId][field.name]['nestedFields'][
-      nestedField.name
-    ] = get(queryData, `${sectionId}.${nestedField.name}`)
+export const localPhoneTransformer =
+  (transformedFieldName?: string, codeReplacement?: string) =>
+  (
+    transformedData: TransformedData,
+    queryData: IFormData,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    const fieldName = transformedFieldName || field.name
+    const msisdnPhone = get(queryData, fieldName as string) as unknown as string
+    const localPhone = convertToLocal(
+      msisdnPhone,
+      window.config.COUNTRY,
+      codeReplacement
+    )
+    transformedData[sectionId][field.name] = localPhone
+    return transformedData
   }
 
-  return transformedData
-}
+export const changeHirerchyQueryTransformer =
+  (
+    transformedFieldName?: string,
+    transformerMethod?: IFormFieldQueryMapFunction
+  ) =>
+  (
+    transformedData: TransformedData,
+    queryData: IFormData,
+    sectionId: string,
+    field: IFormField,
+    nestedField: IFormField
+  ) => {
+    if (transformedFieldName) {
+      transformedData[sectionId][field.name]['nestedFields'][nestedField.name] =
+        get(queryData, transformedFieldName)
+
+      if (transformerMethod) {
+        const clonedTransformedData = cloneDeep(transformedData)
+        transformerMethod(clonedTransformedData, queryData, sectionId, field)
+
+        transformedData[sectionId][field.name]['nestedFields'][
+          nestedField.name
+        ] = clonedTransformedData[sectionId][field.name]
+      }
+    } else {
+      transformedData[sectionId][field.name]['nestedFields'][nestedField.name] =
+        get(queryData, `${sectionId}.${nestedField.name}`)
+    }
+
+    return transformedData
+  }

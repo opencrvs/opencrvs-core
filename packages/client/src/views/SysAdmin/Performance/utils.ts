@@ -127,11 +127,11 @@ export function getJurisdictionLocationIdFromUserDetails(
 ) {
   const location =
     userDetails.catchmentArea &&
-    userDetails.catchmentArea.find(location => {
+    userDetails.catchmentArea.find((location) => {
       const jurisdictionTypeIdentifier =
         location.identifier &&
         location.identifier.find(
-          identifier =>
+          (identifier) =>
             identifier.system ===
             'http://opencrvs.org/specs/id/jurisdiction-type'
         )

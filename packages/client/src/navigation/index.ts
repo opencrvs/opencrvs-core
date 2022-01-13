@@ -185,7 +185,7 @@ export function goToConfig() {
   return push(CONFIG)
 }
 
-export function goToHomeTab(tabId: string, selectorId: string = '') {
+export function goToHomeTab(tabId: string, selectorId = '') {
   const path = getCurrentUserScope().includes('declare')
     ? FIELD_AGENT_HOME_TAB
     : REGISTRAR_HOME_TAB
@@ -228,9 +228,7 @@ export function goToPerformanceReport(
 export function goToOperationalReport(
   locationId: string,
   sectionId: OPERATIONAL_REPORT_SECTION = OPERATIONAL_REPORT_SECTION.OPERATIONAL,
-  timeStart: Date = moment()
-    .subtract(1, 'years')
-    .toDate(),
+  timeStart: Date = moment().subtract(1, 'years').toDate(),
   timeEnd: Date = moment().toDate()
 ) {
   return push({

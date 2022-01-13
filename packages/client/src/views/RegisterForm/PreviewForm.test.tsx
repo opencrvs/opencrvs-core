@@ -179,38 +179,26 @@ describe('when user is previewing the form data', () => {
       beforeEach(async () => goToEndOfForm(app))
 
       it('check whether submit button is enabled or not', async () => {
-        expect(
-          app
-            .find('#submit_form')
-            .hostNodes()
-            .prop('disabled')
-        ).toBe(false)
+        expect(app.find('#submit_form').hostNodes().prop('disabled')).toBe(
+          false
+        )
       })
       describe('All sections visited', () => {
         it('Should be able to click SEND FOR REVIEW Button', () => {
-          expect(
-            app
-              .find('#submit_form')
-              .hostNodes()
-              .prop('disabled')
-          ).toBe(false)
+          expect(app.find('#submit_form').hostNodes().prop('disabled')).toBe(
+            false
+          )
         })
         describe('button clicked', () => {
           beforeEach(async () => {
-            app
-              .find('#submit_form')
-              .hostNodes()
-              .simulate('click')
+            app.find('#submit_form').hostNodes().simulate('click')
           })
 
           it('confirmation screen should show up', () => {
             expect(app.find('#submit_confirm').hostNodes()).toHaveLength(1)
           })
           it('should redirect to home page', () => {
-            app
-              .find('#submit_confirm')
-              .hostNodes()
-              .simulate('click')
+            app.find('#submit_confirm').hostNodes().simulate('click')
             expect(history.location.pathname).toBe(HOME)
           })
         })
@@ -344,15 +332,9 @@ describe('when user is previewing the form data', () => {
     it('rejecting application redirects to home screen', async () => {
       jest.setMock('react-apollo', { default: ReactApollo })
 
-      app
-        .find('#rejectApplicationBtn')
-        .hostNodes()
-        .simulate('click')
+      app.find('#rejectApplicationBtn').hostNodes().simulate('click')
 
-      app
-        .find('#rejectionReasonmisspelling')
-        .hostNodes()
-        .simulate('change')
+      app.find('#rejectionReasonmisspelling').hostNodes().simulate('change')
 
       app
         .find('#rejectionCommentForHealthWorker')
@@ -364,10 +346,7 @@ describe('when user is previewing the form data', () => {
           }
         })
 
-      app
-        .find('#submit_reject_form')
-        .hostNodes()
-        .simulate('click')
+      app.find('#submit_reject_form').hostNodes().simulate('click')
 
       expect(history.location.pathname).toEqual('/')
     })
@@ -562,29 +541,17 @@ describe('when user is previewing the form data', () => {
     it('successfully submits the review form', async () => {
       jest.setMock('react-apollo', { default: ReactApollo })
 
-      app
-        .find('#registerApplicationBtn')
-        .hostNodes()
-        .simulate('click')
+      app.find('#registerApplicationBtn').hostNodes().simulate('click')
 
-      app
-        .find('#submit_confirm')
-        .hostNodes()
-        .simulate('click')
+      app.find('#submit_confirm').hostNodes().simulate('click')
     })
 
     it('rejecting application redirects to reject confirmation screen', async () => {
       jest.setMock('react-apollo', { default: ReactApollo })
 
-      app
-        .find('#rejectApplicationBtn')
-        .hostNodes()
-        .simulate('click')
+      app.find('#rejectApplicationBtn').hostNodes().simulate('click')
 
-      app
-        .find('#rejectionReasonmisspelling')
-        .hostNodes()
-        .simulate('change')
+      app.find('#rejectionReasonmisspelling').hostNodes().simulate('change')
 
       app
         .find('#rejectionCommentForHealthWorker')
@@ -596,10 +563,7 @@ describe('when user is previewing the form data', () => {
           }
         })
 
-      app
-        .find('#submit_reject_form')
-        .hostNodes()
-        .simulate('click')
+      app.find('#submit_reject_form').hostNodes().simulate('click')
 
       expect(history.location.pathname).toEqual('/')
     })
@@ -635,11 +599,7 @@ describe('when user is previewing the form data', () => {
       await waitForElement(app, '#readyApplication')
 
       expect(
-        app
-          .update()
-          .find('#validateApplicationBtn')
-          .hostNodes()
-          .text()
+        app.update().find('#validateApplicationBtn').hostNodes().text()
       ).toBe('Send For Approval')
     })
   })

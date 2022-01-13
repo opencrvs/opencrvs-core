@@ -27,8 +27,8 @@ export class ErrorBoundary extends React.Component {
 
   componentDidCatch(error: Error, errorInfo: IErrorInfo) {
     this.setState({ error })
-    Sentry.withScope(scope => {
-      Object.keys(errorInfo).forEach(key => {
+    Sentry.withScope((scope) => {
+      Object.keys(errorInfo).forEach((key) => {
         scope.setExtra(key, errorInfo[key])
       })
       Sentry.captureException(error)

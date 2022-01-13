@@ -17,6 +17,7 @@ export const verifyToken = async (token: string, authUrl: string) => {
     method: 'POST',
     body: JSON.stringify({ token }),
     headers: {
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`
     }
   })

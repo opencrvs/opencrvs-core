@@ -167,7 +167,7 @@ function getNextSectionIds(
 
   if (currentGroupIndex === visibleGroups.length - 1) {
     const visibleSections = sections.filter(
-      section =>
+      (section) =>
         section.viewType !== VIEW_TYPE.HIDDEN &&
         getVisibleSectionGroupsBasedOnConditions(
           section,
@@ -370,13 +370,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   toggleRejectForm = () => {
-    this.setState(state => ({
+    this.setState((state) => ({
       rejectFormOpen: !state.rejectFormOpen
     }))
   }
 
   toggleConfirmationModal = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       showConfirmationModal: !prevState.showConfirmationModal
     }))
   }
@@ -440,9 +440,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
         groupHasError = true
       } else {
         const activeSectionFields = this.props.activeSectionGroup.fields
-        const activeSectionValues = this.props.application.data[
-          this.props.activeSection.id
-        ]
+        const activeSectionValues =
+          this.props.application.data[this.props.activeSection.id]
         groupHasError = hasFormError(activeSectionFields, activeSectionValues)
       }
       if (groupHasError) {
@@ -461,7 +460,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const visitedGroups = this.props.application.visitedGroupIds || []
     if (
       visitedGroups.findIndex(
-        visitedGroup =>
+        (visitedGroup) =>
           visitedGroup.sectionId === this.props.activeSection.id &&
           visitedGroup.groupId === this.props.activeSectionGroup.id
       ) === -1
@@ -674,7 +673,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
                             activeSectionGroup.fields.length === 1 && (
                               <>
                                 {
-                                  (activeSectionGroup.fields[0].hideHeader = true)
+                                  (activeSectionGroup.fields[0].hideHeader =
+                                    true)
                                 }
                                 {intl.formatMessage(
                                   activeSectionGroup.fields[0].label
@@ -728,7 +728,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                         >
                           <FormFieldGenerator
                             id={activeSectionGroup.id}
-                            onChange={values => {
+                            onChange={(values) => {
                               debouncedModifyApplication(
                                 values,
                                 activeSection,
@@ -741,7 +741,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                             }
                             fields={getVisibleGroupFields(activeSectionGroup)}
                             draftData={application.data}
-                            onSetTouched={setTouchedFunc => {
+                            onSetTouched={(setTouchedFunc) => {
                               this.setAllFormFieldsTouched = setTouchedFunc
                             }}
                           />
@@ -860,7 +860,7 @@ export function replaceInitialValues(
   sectionValues: any,
   data?: IFormData
 ) {
-  return fields.map(field => ({
+  return fields.map((field) => ({
     ...field,
     initialValue:
       isUndefined(sectionValues[field.name]) ||
@@ -889,7 +889,7 @@ function mapStateToProps(
   const sectionId = match.params.pageId || firstVisibleSection(registerForm).id
 
   const activeSection = registerForm.sections.find(
-    section => section.id === sectionId
+    (section) => section.id === sectionId
   )
   if (!activeSection) {
     throw new Error(`Configuration for tab "${match.params.pageId}" missing!`)
@@ -902,7 +902,7 @@ function mapStateToProps(
       application.data
     )[0].id
   const activeSectionGroup = activeSection.groups.find(
-    group => group.id === groupId
+    (group) => group.id === groupId
   )
   if (!activeSectionGroup) {
     throw new Error(
@@ -917,7 +917,7 @@ function mapStateToProps(
   const setAllFieldsDirty =
     (application.visitedGroupIds &&
       application.visitedGroupIds.findIndex(
-        visitedGroup =>
+        (visitedGroup) =>
           visitedGroup.sectionId === activeSection.id &&
           visitedGroup.groupId === activeSectionGroup.id
       ) > -1) ||

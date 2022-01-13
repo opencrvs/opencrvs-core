@@ -503,7 +503,6 @@ enum AttendantType {
   LAYPERSON
   NONE
   OTHER
-  TRADITIONAL_BIRTH_ATTENDANT
 }
 
 enum BirthRegType {
@@ -533,7 +532,7 @@ enum MannerOfDeath {
   ACCIDENT
   SUICIDE
   HOMICIDE
-  MANNER_UNDETERMINED
+  UNDETERMINED
 }
 
 enum CauseOfDeathMethodType {

@@ -75,7 +75,7 @@ export const internationaliseOptions = (
   intl: IntlShape,
   options: Array<ISelectOption | IRadioOption | ICheckboxOption>
 ) => {
-  return options.map(opt => {
+  return options.map((opt) => {
     return {
       ...opt,
       label: intl.formatMessage(opt.label)
@@ -241,7 +241,7 @@ export const getFieldValidation = (
 }
 
 export const getVisibleGroupFields = (group: IFormSectionGroup) => {
-  return group.fields.filter(field => !field.hidden)
+  return group.fields.filter((field) => !field.hidden)
 }
 export const getFieldOptions = (
   field: ISelectFormFieldWithDynamicOptions,
@@ -301,7 +301,7 @@ interface INested {
   [key: string]: any
 }
 
-const getNestedValue = (obj: object, key: string) => {
+const getNestedValue = (obj: Record<string, unknown>, key: string) => {
   return key.split('.').reduce((res: INested, k) => res[k] || '', obj)
 }
 
@@ -313,10 +313,10 @@ export const getFieldOptionsByValueMapper = (
   values: IFormSectionData | IFormData,
   valueMapper: IDynamicValueMapper
 ) => {
-  const dependencyVal = (getNestedValue(
+  const dependencyVal = getNestedValue(
     values,
     field.dynamicItems.dependency
-  ) as unknown) as string
+  ) as unknown as string
 
   const firstKey = Object.keys(field.dynamicItems.items)[0]
 
@@ -347,7 +347,9 @@ export const diffDoB = (doB: string) => {
     { start: 46, end: 5 * 365, value: 'between46daysTo5yrs' },
     { start: 5 * 365 + 1, value: 'after5yrs' }
   ]
-  const valueWithinRange = ranges.find(range => betweenRange(range, diffInDays))
+  const valueWithinRange = ranges.find((range) =>
+    betweenRange(range, diffInDays)
+  )
   return valueWithinRange ? valueWithinRange.value : ''
 }
 
@@ -432,7 +434,7 @@ export const getConditionalActionsForField = (
   return (
     field.conditionals
       // eslint-disable-next-line no-eval
-      .filter(conditional => eval(conditional.expression))
+      .filter((conditional) => eval(conditional.expression))
       .map((conditional: IConditional) => conditional.action)
   )
 }
@@ -442,14 +444,14 @@ export const getVisibleSectionGroupsBasedOnConditions = (
   values: IFormSectionData,
   draftData?: IFormData
 ): IFormSectionGroup[] => {
-  return section.groups.filter(group => {
+  return section.groups.filter((group) => {
     if (!group.conditionals) {
       return true
     }
     return (
       group.conditionals
         // eslint-disable-next-line no-eval
-        .filter(conditional => eval(conditional.expression))
+        .filter((conditional) => eval(conditional.expression))
         .map((conditional: IConditional) => conditional.action)
         .includes('hide') !== true
     )
@@ -460,14 +462,14 @@ export const getVisibleOptions = (
   radioOptions: CRadioOption[],
   draftData: IFormData
 ): CRadioOption[] => {
-  return radioOptions.filter(option => {
+  return radioOptions.filter((option) => {
     if (!option.conditionals) {
       return true
     }
     return (
       option.conditionals
         // eslint-disable-next-line no-eval
-        .filter(conditional => eval(conditional.expression))
+        .filter((conditional) => eval(conditional.expression))
         .map((conditional: IConditional) => conditional.action)
         .includes('hide') !== true
     )
@@ -484,7 +486,7 @@ export const getSectionFields = (
     section,
     values || {},
     draftData
-  ).forEach(group => (fields = fields.concat(group.fields)))
+  ).forEach((group) => (fields = fields.concat(group.fields)))
   return fields
 }
 
@@ -502,10 +504,10 @@ export const hasFormError = (
   )
 
   const fieldListWithErrors = Object.values(errors).filter(
-    error =>
+    (error) =>
       (error as IFieldErrors).errors.length > 0 ||
       Object.values(error.nestedFields).some(
-        nestedFieldErrors => nestedFieldErrors.length > 0
+        (nestedFieldErrors) => nestedFieldErrors.length > 0
       )
   )
 

@@ -37,13 +37,11 @@ type FullProps = {
 } & IStateProps &
   WrappedComponentProps
 
-class Estimated45DayRegistrationReportComponent extends React.Component<
-  FullProps
-> {
+class Estimated45DayRegistrationReportComponent extends React.Component<FullProps> {
   getContent = () => {
     return (
       (this.props.data.details &&
-        this.props.data.details.map(registrationIn45Day => {
+        this.props.data.details.map((registrationIn45Day) => {
           const location = getLocationFromPartOfLocationId(
             registrationIn45Day.locationId,
             this.props.offlineResources
@@ -54,7 +52,8 @@ class Estimated45DayRegistrationReportComponent extends React.Component<
                 location,
                 estimation: 'No data',
                 estimationYear: String(registrationIn45Day.estimationYear),
-                estimationLevel: registrationIn45Day.estimationLocationLevel.toLowerCase(),
+                estimationLevel:
+                  registrationIn45Day.estimationLocationLevel.toLowerCase(),
                 registrationIn45Day: 'No data',
                 percentage: 'No data'
               }
@@ -62,7 +61,8 @@ class Estimated45DayRegistrationReportComponent extends React.Component<
                 location,
                 estimation: String(registrationIn45Day.estimatedRegistration),
                 estimationYear: String(registrationIn45Day.estimationYear),
-                estimationLevel: registrationIn45Day.estimationLocationLevel.toLowerCase(),
+                estimationLevel:
+                  registrationIn45Day.estimationLocationLevel.toLowerCase(),
                 registrationIn45Day: String(
                   registrationIn45Day.registrationIn45Day
                 ),

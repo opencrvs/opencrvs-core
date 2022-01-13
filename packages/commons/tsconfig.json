@@ -19,7 +19,7 @@
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
-    "types": []
+    "types": ["jest"]
   },
   "include": ["src/**/*.ts", "typings", "tslint-rules"],
   "exclude": [

@@ -281,7 +281,7 @@ function GeneratedInputField({
         allowedDocType={fieldDefinition.allowedDocType}
         files={value as IAttachmentValue}
         error={error}
-        onComplete={file => onSetFieldValue(fieldDefinition.name, file)}
+        onComplete={(file) => onSetFieldValue(fieldDefinition.name, file)}
       />
     )
   }
@@ -407,7 +407,7 @@ function GeneratedInputField({
     return <FieldGroupTitle>{fieldDefinition.label}</FieldGroupTitle>
   }
   if (fieldDefinition.type === PARAGRAPH) {
-    const label = (fieldDefinition.label as unknown) as MessageDescriptor
+    const label = fieldDefinition.label as unknown as MessageDescriptor
 
     return (
       <Paragraph fontSize={fieldDefinition.fontSize}>
@@ -431,7 +431,7 @@ function GeneratedInputField({
           step={fieldDefinition.step}
           max={fieldDefinition.max}
           {...inputProps}
-          onKeyPress={e => {
+          onKeyPress={(e) => {
             if (e.key.match(REGEXP_NUMBER_INPUT_NON_NUMERIC)) {
               e.preventDefault()
             }
@@ -487,7 +487,7 @@ function GeneratedInputField({
 
   if (fieldDefinition.type === LOCATION_SEARCH_INPUT) {
     const selectedLocation = fieldDefinition.locationList.find(
-      location => location.id === value
+      (location) => location.id === value
     )
 
     return (
@@ -496,7 +496,7 @@ function GeneratedInputField({
           {...inputProps}
           selectedLocation={selectedLocation}
           locationList={fieldDefinition.locationList}
-          searchHandler={item => {
+          searchHandler={(item) => {
             onSetFieldValue(fieldDefinition.name, item.id)
             if (fieldDefinition.dispatchOptions) {
               dynamicDispatch(fieldDefinition.dispatchOptions.action, {
@@ -679,7 +679,7 @@ class FormSectionComponent extends React.Component<Props> {
   resetDependentSelectValues = (fieldName: string) => {
     const fields = this.props.fields
     const fieldToReset = fields.find(
-      field =>
+      (field) =>
         field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
         field.dynamicOptions.dependency === fieldName
     )
@@ -689,13 +689,14 @@ class FormSectionComponent extends React.Component<Props> {
   }
 
   resetNestedInputValues = (parentField: Ii18nFormField) => {
-    const nestedFields = (parentField as Ii18nRadioGroupWithNestedFieldsFormField)
-      .nestedFields
+    const nestedFields = (
+      parentField as Ii18nRadioGroupWithNestedFieldsFormField
+    ).nestedFields
     const nestedFieldsToReset = flatten(
-      Object.keys(nestedFields).map(key => nestedFields[key])
+      Object.keys(nestedFields).map((key) => nestedFields[key])
     )
 
-    nestedFieldsToReset.forEach(nestedField => {
+    nestedFieldsToReset.forEach((nestedField) => {
       this.props.setFieldValue(
         `${parentField.name}.nestedFields.${nestedField.name}`,
         ''
@@ -718,7 +719,7 @@ class FormSectionComponent extends React.Component<Props> {
 
     const language = this.props.intl.locale
 
-    const errors = (this.props.errors as unknown) as Errors
+    const errors = this.props.errors as unknown as Errors
     /*
      * HACK
      *
@@ -736,12 +737,12 @@ class FormSectionComponent extends React.Component<Props> {
      * This might be because of setState not used with the function syntax
      */
     const fieldsWithValuesDefined = fields.filter(
-      field => values[field.name] !== undefined
+      (field) => values[field.name] !== undefined
     )
 
     return (
       <section>
-        {fieldsWithValuesDefined.map(field => {
+        {fieldsWithValuesDefined.map((field) => {
           let error: string
           const fieldErrors = errors[field.name] && errors[field.name].errors
 
@@ -819,7 +820,7 @@ class FormSectionComponent extends React.Component<Props> {
                   ...field,
                   queryData: getQueryData(field as ILoaderButton, values),
                   draftData: draftData as IFormData,
-                  onFetch: response => {
+                  onFetch: (response) => {
                     const section = {
                       id: this.props.id,
                       groups: [
@@ -903,7 +904,7 @@ class FormSectionComponent extends React.Component<Props> {
             nestedFieldElements = Object.keys(field.nestedFields).reduce(
               (childElements, key) => ({
                 ...childElements,
-                [key]: field.nestedFields[key].map(nestedField => {
+                [key]: field.nestedFields[key].map((nestedField) => {
                   let nestedError: string
                   const nestedFieldErrors =
                     errors[field.name] &&
@@ -920,9 +921,9 @@ class FormSectionComponent extends React.Component<Props> {
                   const nestedFieldName = `${field.name}.nestedFields.${nestedField.name}`
                   const nestedFieldTouched =
                     touched[field.name] &&
-                    ((touched[field.name] as unknown) as ITouchedNestedFields)
+                    (touched[field.name] as unknown as ITouchedNestedFields)
                       .nestedFields &&
-                    ((touched[field.name] as unknown) as ITouchedNestedFields)
+                    (touched[field.name] as unknown as ITouchedNestedFields)
                       .nestedFields[nestedField.name]
 
                   return (
@@ -1026,8 +1027,8 @@ const FormFieldGeneratorWithFormik = withFormik<
   IFormSectionProps & IStateProps & IDispatchProps,
   IFormSectionData
 >({
-  mapPropsToValues: props => mapFieldsToValues(props.fields),
-  handleSubmit: values => {},
+  mapPropsToValues: (props) => mapFieldsToValues(props.fields),
+  handleSubmit: (values) => {},
   validate: (values, props: IFormSectionProps & IStateProps) =>
     getValidationErrorsForForm(
       props.fields,
