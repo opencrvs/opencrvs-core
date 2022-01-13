@@ -25,11 +25,24 @@ then
     exit 0
 fi
 
+echo
+echo -e "\033[32m:::::::::: Stopping any currently running Docker containers ::::::::::\033[0m"
+echo
+if [[ $(docker ps -aq) ]] ; then docker stop $(docker ps -aq) ; fi
+
 if [  -n "$(uname -a | grep Ubuntu)" ]; then
   OS="UBUNTU"
   else
   OS="MAC"
 fi
+echo
+echo -e "\033[32m:::::::::: STARTING OPENCRVS ::::::::::\033[0m"
+echo
+echo "If you did not previously run our setup command, Docker is downloading Mongo DB, ElasticSearch, OpenHIM and Hearth docker images.  These are large files.  Then it will build them.  Wait for the OpenCRVS client app to build completely, then OpenCRVS Core will be available."
+echo
+echo -e "\033[32m:::::::::: PLEASE WAIT for @opencrvs/client ::::::::::\033[0m"
+echo
+sleep 10
 export LANGUAGES=$1
 if [ $OS == "UBUNTU" ]; then
   yarn dev:secrets:gen && concurrently "yarn run start" "yarn run compose:deps"

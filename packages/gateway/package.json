@@ -4,7 +4,7 @@
   "description": "OpenCRVS API Gateway with GraphQL",
   "license": "MPL-2.0",
   "scripts": {
-    "start": "concurrently \"nodemon --exec ts-node -r tsconfig-paths/register src/index.ts > ./consoleLogsAndErrors.txt\" \"yarn gen:types:watch\" ",
+    "start": "concurrently \"nodemon --exec ts-node -r tsconfig-paths/register src/index.ts\" \"yarn gen:types:watch\" ",
     "start:prod": "node build/dist/src/index.js",
     "test": "jest --coverage --silent --noStackTrace && yarn test:compilation",
     "test:watch": "jest --watch",

@@ -287,7 +287,8 @@ docker swarm init
 echo
 echo -e "\033[32m:::::::::: Stopping any currently running Docker containers ::::::::::\033[0m"
 echo
-docker stop $(docker ps -aq)
+if [[ $(docker ps -aq) ]] ; then docker stop $(docker ps -aq) ; fi
+
 echo
 echo -e "\033[32m:::::::::::::::::: Installing some Node dependencies ::::::::::::::::::\033[0m"
 echo
