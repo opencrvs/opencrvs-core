@@ -277,18 +277,16 @@ echo "wait-on tcp:27017" && wait-on -l tcp:27017
 echo "wait-on tcp:6379" && wait-on -l tcp:6379
 echo "wait-on tcp:8086" && wait-on -l tcp:8086
 
-echo
-echo "::::::::::::::::::::::: Starting OpenCRVS Core :::::::::::::::::::::::"
-echo
-echo ":::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::"
-echo
+
 
 set -- $(stty size) #$1=rows, $2=columns
 
 #start a new session in dettached mode with resizable panes
 tmux new-session -s opencrvs -n opencrvs -d -x "$2" -y "$(($1 - 1))"
-
 TMUX_STARTED=1
+tmux set -p @mytitle "opencrvs-core-working"
+tmux send-keys -t opencrvs "bash setup/summary.sh" C-m
+tmux split-window -v
 
 if [ $OS == "UBUNTU" ]; then
   tmux send-keys -t opencrvs "LANGUAGES=en && yarn start" C-m
@@ -300,8 +298,5 @@ tmux set -p @mytitle "opencrvs-core"
 tmux split-window -h
 tmux set -p @mytitle "opencrvs-zambia"
 tmux send-keys -t opencrvs "bash setup/setup-resources.sh" C-m
-tmux split-window -h
-tmux set -p @mytitle "opencrvs-core-working"
-tmux send-keys -t opencrvs "bash setup/summary.sh" C-m
 tmux attach -t opencrvs
 

@@ -8,6 +8,14 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 set -e
+echo ":::::::: In the terminal on the bottom left, OpenCRVS is starting. ::::::::"
+echo
+echo ":::::::: In the terminal on the bottom right, an OpenCRVS country config will start when OpenCRVS core is running ::::::::"
+echo
+echo "Please be patient as this can still take 10 minutes if your RAM isnt high."
+echo
+echo ":::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::"
+echo
 echo "wait-on Zambia country configuration server tcp:3040" && wait-on -l tcp:3040
 echo
 echo -e "::::::::::::::::::::::::::: \033[32mCONGRATULATIONS!!\033[0m :::::::::::::::::::::::::::"
