@@ -8,6 +8,25 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 set -e
+print_usage_and_exit () {
+    echo
+    echo -e 'Usage: \033[32mbash setup-resources.sh PATH_TO_OPEN_CRVS_CORE_DIRECTORY\033[0m'
+    echo
+    echo "PATH_TO_OPEN_CRVS_CORE_DIRECTORY must be provided"
+    echo
+    echo "Open a terminal window and cd into the opencrvs-core directory. Then type:"
+    echo
+    echo -e "\033[32mpwd\033[0m"
+    echo
+    echo "This will display the absolute path to the opencrvs-core directory that must be provided here."
+    echo
+    exit 1
+}
+
+if [ -z "$1" ] ; then
+    echo 'Error: Argument PATH_TO_OPEN_CRVS_CORE_DIRECTORY is required in position 1.'
+    print_usage_and_exit
+fi
 echo
 echo -e "\033[32m::::::::::::::::::::::: Starting OpenCRVS Core :::::::::::::::::::::::\033[0m"
 echo
@@ -56,6 +75,7 @@ echo -e "\033[32m:::::::: OpenCRVS Core is running, now we must checkout a confi
 echo
 echo -e "\033[32m::::::::::::::: Cloning the Zambia Country Configuration :::::::::::::::\033[0m"
 echo
+PATH_TO_CORE=$(pwd)
 cd ../
 git clone https://github.com/opencrvs/opencrvs-zambia.git
 cd opencrvs-zambia
@@ -71,4 +91,6 @@ yarn db:backup:restore
 echo
 echo -e "\033[32m::::::::::::::::::::: Starting Zambia Config Server :::::::::::::::::::::\033[0m"
 echo
-CERT_PUBLIC_KEY_PATH=./../.secrets/public-key.pem yarn start
+export CERT_PUBLIC_KEY_PATH=$PATH_TO_OPEN_CRVS_CORE_DIRECTORY/.secrets/public-key.pem
+echo $CERT_PUBLIC_KEY_PATH
+yarn start
