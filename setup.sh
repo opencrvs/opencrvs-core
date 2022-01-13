@@ -324,10 +324,10 @@ set -- $(stty size) #$1=rows, $2=columns
 tmux new-session -s opencrvs -n opencrvs -d -x "$2" -y "$(($1 - 1))"
 TMUX_STARTED=1
 tmux set -p @mytitle "opencrvs-core-working"
-tmux send-keys -t opencrvs "bash setup/summary.sh" C-m
+tmux send-keys -t opencrvs "bash setup-scripts/summary.sh" C-m
 tmux split-window -h
 tmux set -p @mytitle "opencrvs-instructions"
-tmux send-keys -t opencrvs "bash setup/instructions.sh" C-m
+tmux send-keys -t opencrvs "bash setup-scripts/instructions.sh" C-m
 tmux split-window -v -f
 
 if [ $OS == "UBUNTU" ]; then
@@ -339,7 +339,7 @@ fi
 tmux set -p @mytitle "opencrvs-core"
 tmux split-window -h
 tmux set -p @mytitle "opencrvs-zambia"
-tmux send-keys -t opencrvs "bash setup/setup-resources.sh" C-m
+tmux send-keys -t opencrvs "bash setup-scripts/setup-resources.sh" C-m
 tmux setw -g mouse on
 tmux attach -t opencrvs
 
