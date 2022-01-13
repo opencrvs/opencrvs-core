@@ -642,7 +642,7 @@ function createOccupationBulder(resource: fhir.Patient, fieldValue: string) {
   }
 
   const hasOccupation = resource.extension.find(
-    extention =>
+    (extention) =>
       extention.url ===
       `${OPENCRVS_SPECIFICATION_URL}extension/patient-occupation`
   )
@@ -757,6 +757,40 @@ function createRegStatusCommentTimeStamp(
     }
   }
   resource.note[context._index.comments].time = fieldValue
+}
+
+function createActionTypesFromCorrectionValues(
+  resource: fhir.Task,
+  fieldValue: any[],
+  context: any
+) {
+  if (!resource.input) {
+    resource.input = []
+  }
+  if (!resource.output) {
+    resource.output = []
+  }
+  const actionType = {
+    coding: [
+      {
+        system: 'http://terminology.hl7.org/CodeSystem/action-type',
+        code: 'update'
+      }
+    ]
+  }
+  ;(fieldValue as any[]).forEach((correction) => {
+    resource.input?.push({
+      type: actionType,
+      valueId: `${context.event}.${correction.section}.${correction.fieldName}`,
+      valueString: correction.oldValue
+    })
+
+    resource.output?.push({
+      type: actionType,
+      valueId: `${context.event}.${correction.section}.${correction.fieldName}`,
+      valueString: correction.newValue
+    })
+  })
 }
 
 export const builders: IFieldBuilders = {
@@ -1821,7 +1855,7 @@ export const builders: IFieldBuilders = {
         const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
         taskResource.requester = {
           agent: {
-            reference: (fieldValue as unknown) as string
+            reference: fieldValue as unknown as string
           }
         }
       },
@@ -1839,7 +1873,7 @@ export const builders: IFieldBuilders = {
           certDocResource.extension = []
         }
         const hasVerifiedExt = certDocResource.extension.find(
-          extention =>
+          (extention) =>
             extention.url ===
             `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`
         )
@@ -1972,37 +2006,7 @@ export const builders: IFieldBuilders = {
       },
       values: (fhirBundle: ITemplatedBundle, fieldValue: any, context) => {
         const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-        if (!taskResource.input) {
-          taskResource.input = []
-        }
-        if (!taskResource.output) {
-          taskResource.output = []
-        }
-        ;(fieldValue as any[]).forEach(correction => {
-          taskResource.input?.push({
-            type: {
-              coding: [
-                {
-                  code: 'TBD'
-                }
-              ]
-            },
-            valueId: `${correction.section}.${correction.fieldName}`,
-            valueString: correction.oldValue
-          })
-
-          taskResource.output?.push({
-            type: {
-              coding: [
-                {
-                  code: 'TBD'
-                }
-              ]
-            },
-            valueId: `${correction.section}.${correction.fieldName}`,
-            valueString: correction.newValue
-          })
-        })
+        createActionTypesFromCorrectionValues(taskResource, fieldValue, context)
       }
     },
     status: {
@@ -2055,7 +2059,7 @@ export const builders: IFieldBuilders = {
         }
 
         const hasTimeLoggedMS = taskResource.extension.find(
-          extension =>
+          (extension) =>
             extension.url ===
             `${OPENCRVS_SPECIFICATION_URL}extension/timeLoggedMS`
         )
@@ -2333,7 +2337,7 @@ export const builders: IFieldBuilders = {
               relatedPersonResource.extension = []
             }
             const hasAffidavit = relatedPersonResource.extension.find(
-              extention =>
+              (extention) =>
                 extention.url ===
                 `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`
             )
@@ -2365,7 +2369,7 @@ export const builders: IFieldBuilders = {
               relatedPersonResource.extension = []
             }
             const hasAffidavit = relatedPersonResource.extension.find(
-              extention =>
+              (extention) =>
                 extention.url ===
                 `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`
             )
@@ -2496,7 +2500,7 @@ export const builders: IFieldBuilders = {
           certDocResource.extension = []
         }
         const hasVerifiedExt = certDocResource.extension.find(
-          extention =>
+          (extention) =>
             extention.url ===
             `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`
         )

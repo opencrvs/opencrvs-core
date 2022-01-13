@@ -13,7 +13,11 @@ export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
 export const MOTHER_SECTION_CODE = 'mother-details'
 export const FATHER_SECTION_CODE = 'father-details'
 export const CHILD_SECTION_CODE = 'child-details'
+export const BIRTH_CORRECTION_ENCOUNTERS_SECTION_CODE =
+  'birth-correction-encounters'
 export const DECEASED_SECTION_CODE = 'deceased-details'
+export const DEATH_CORRECTION_ENCOUNTERS_SECTION_CODE =
+  'death-correction-encounters'
 export const BIRTH_REG_NUMBER_SYSTEM = 'BIRTH_REGISTRATION_NUMBER'
 export const DEATH_REG_NUMBER_SYSTEM = 'DEATH_REGISTRATION_NUMBER'
 export const REG_STATUS_IN_PROGRESS = 'IN_PROGRESS'
