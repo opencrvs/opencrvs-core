@@ -843,6 +843,7 @@ export type Section =
 export interface IFormSection {
   id: Section
   viewType: ViewType
+  replaceable?: boolean
   name: MessageDescriptor
   title: MessageDescriptor
   groups: IFormSectionGroup[]

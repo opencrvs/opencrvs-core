@@ -233,9 +233,10 @@ interface IProps {
 }
 type State = {
   displayEditDialog: boolean
-  editClickedSectionId: Section | null
+  displayReplaceDialog: boolean
+  editClickedSectionId: string
   editClickedSectionGroupId: string
-  editClickFieldName?: string
+  editClickFieldName: string
   activeSection: Section | null
   previewImage: IFileValue | null
 }
@@ -472,9 +473,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
     this.state = {
       displayEditDialog: false,
+      displayReplaceDialog: false,
       editClickedSectionGroupId: '',
       editClickFieldName: '',
-      editClickedSectionId: null,
+      editClickedSectionId: '',
       activeSection: null,
       previewImage: null
     }
@@ -646,10 +648,16 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }))
   }
 
+  toggleReplaceDialog = () => {
+    this.setState((prevState) => ({
+      displayReplaceDialog: !prevState.displayReplaceDialog
+    }))
+  }
+
   editLinkClickHandler = (
-    sectionId: Section | null,
+    sectionId: string,
     sectionGroupId: string,
-    fieldName?: string
+    fieldName: string
   ) => {
     this.setState(() => ({
       editClickedSectionId: sectionId,
@@ -675,6 +683,28 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       groupId,
       application.event.toLowerCase(),
       fieldName
+    )
+  }
+
+  replaceClickHandler(sectionId: string, groupId: string) {
+    this.setState(() => ({
+      editClickedSectionId: sectionId,
+      editClickedSectionGroupId: groupId
+    }))
+    this.toggleReplaceDialog()
+  }
+
+  replaceHandler(sectionId: string, groupId: string) {
+    const { draft, pageRoute, writeApplication, goToPageGroup } = this.props
+    const application = draft
+    application.data[sectionId] = {}
+    writeApplication(application)
+    goToPageGroup(
+      pageRoute,
+      application.id,
+      sectionId,
+      groupId,
+      application.event.toLowerCase()
     )
   }
 
@@ -1220,11 +1250,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const initialTransformedSection = formSections.map((section) => {
       let items: any[] = []
       const visitedTags: string[] = []
-      getVisibleSectionGroupsBasedOnConditions(
+      const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
         section,
         draft.data[section.id] || {},
         draft.data
-      ).forEach((group) => {
+      )
+      visibleGroups.forEach((group) => {
         group.fields
           .filter(
             (field) =>
@@ -1275,7 +1306,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       return {
         id: section.id,
         title: intl.formatMessage(section.title),
-        items: items.filter((item) => item)
+        items: items.filter((item) => item),
+        action: section.replaceable
+          ? {
+              label: intl.formatMessage(buttonMessages.replace),
+              handler: () =>
+                this.replaceClickHandler(section.id, visibleGroups[0].id)
+            }
+          : undefined
       }
     })
 
@@ -1464,6 +1502,36 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           handleClose={this.toggleDisplayDialog}
         >
           {intl.formatMessage(messages.editApplicationConfirmation)}
+        </ResponsiveModal>
+        <ResponsiveModal
+          title={intl.formatMessage(messages.replaceSectionConfirmationTitle)}
+          contentHeight={96}
+          responsive={false}
+          actions={[
+            <TertiaryButton
+              id="cancel-btn"
+              key="cancel"
+              onClick={this.toggleReplaceDialog}
+            >
+              {intl.formatMessage(buttonMessages.cancel)}
+            </TertiaryButton>,
+            <PrimaryButton
+              id="edit_confirm"
+              key="submit"
+              onClick={() => {
+                this.replaceHandler(
+                  this.state.editClickedSectionId,
+                  this.state.editClickedSectionGroupId
+                )
+              }}
+            >
+              {intl.formatMessage(buttonMessages.continueButton)}
+            </PrimaryButton>
+          ]}
+          show={this.state.displayReplaceDialog}
+          handleClose={this.toggleReplaceDialog}
+        >
+          {intl.formatMessage(messages.replaceSectionConfirmation)}
         </ResponsiveModal>
         {this.state.previewImage && (
           <DocumentPreview
