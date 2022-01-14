@@ -17,6 +17,7 @@ import { LeftNavigationApplicationIcons } from '@opencrvs/components/lib/icons/L
 import { LeftNavigation } from '@opencrvs/components/lib/interface/Navigation/LeftNavigation'
 import { NavigationGroup } from '@opencrvs/components/lib/interface/Navigation/NavigationGroup'
 import { NavigationItem } from '@opencrvs/components/lib/interface/Navigation/NavigationItem'
+import { NavigationSubItem } from '@opencrvs/components/lib/interface/Navigation/NavigationSubItem'
 import { connect } from 'react-redux'
 import {
   goToFieldAgentHomeTab as goToFieldAgentHomeTabAction,
@@ -32,6 +33,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { Activity, Users } from '@opencrvs/components/lib/icons'
 import { Configuration } from '@opencrvs/components/lib/icons/Configuration'
+import { Expandable } from '@opencrvs/components/lib/icons/Expandable'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { constantsMessages } from '@client/i18n/messages'
@@ -95,7 +97,8 @@ const TAB_ID = {
   performance: 'performance',
   team: 'team',
   config: 'config',
-  users: 'users'
+  certificates: 'certificates',
+  settings: 'settings'
 }
 
 const TAB_LABEL = {
@@ -110,8 +113,9 @@ const TAB_LABEL = {
   application: 'Application',
   performance: 'Performance',
   team: 'Team',
-  users: 'Users',
-  configuration: 'Configuration'
+  configuration: 'Configuration',
+  certificatesConfiguration: 'Certificates',
+  applicationSettings: 'Application Settings'
 }
 
 const goToPerformanceView = (props: IFullProps) => {
@@ -164,6 +168,7 @@ export const NavigationView = (props: IFullProps) => {
     activeMenuItem,
     goToConfigAction
   } = props
+  const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
   return (
     <LeftNavigation
       applicationName={intl.formatMessage(constantsMessages.applicationName)}
@@ -271,15 +276,42 @@ export const NavigationView = (props: IFullProps) => {
             isSelected={enableMenuSelection && activeMenuItem === TAB_ID.team}
           />
           {userDetails?.role === USER_SCOPE.NATIONAL_SYSTEM_ADMIN && (
-            <NavigationItem
-              icon={() => <Configuration />}
-              label={TAB_LABEL.configuration}
-              onClick={goToConfigAction}
-              isSelected={
-                enableMenuSelection && activeMenuItem === TAB_ID.config
-              }
-              isExpandable={true}
-            />
+            <>
+              <NavigationItem
+                icon={() => <Configuration />}
+                label={TAB_LABEL.configuration}
+                onClick={() => setIsConfigExpanded(!isConfigExpanded)}
+                isSelected={
+                  enableMenuSelection && activeMenuItem === TAB_ID.config
+                }
+                expandableIcon={() =>
+                  isConfigExpanded || activeMenuItem === TAB_ID.config ? (
+                    <Expandable selected={true} />
+                  ) : (
+                    <Expandable />
+                  )
+                }
+              />
+              {(isConfigExpanded || activeMenuItem === TAB_ID.config) && (
+                <>
+                  <NavigationSubItem
+                    label={TAB_LABEL.certificatesConfiguration}
+                    onClick={goToConfigAction}
+                    isSelected={
+                      enableMenuSelection && activeMenuItem === TAB_ID.config
+                    }
+                  />
+                  <NavigationSubItem
+                    label={TAB_LABEL.applicationSettings}
+                    onClick={() => {}}
+                    isSelected={
+                      enableMenuSelection &&
+                      activeMenuItem === TAB_ID.application
+                    }
+                  />
+                </>
+              )}
+            </>
           )}
         </NavigationGroup>
       )}
@@ -313,6 +345,10 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
       ? TAB_ID.team
       : window.location.href.includes('config')
       ? TAB_ID.config
+      : window.location.href.includes('settings')
+      ? TAB_ID.settings
+      : window.location.href.includes('certificate')
+      ? TAB_ID.certificates
       : ''
   }
 }

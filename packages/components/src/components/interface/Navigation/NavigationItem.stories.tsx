@@ -72,7 +72,6 @@ export const itemConfiguration = Template.bind({})
 itemConfiguration.args = {
   icon: <Configuration />,
   label: 'Configuration',
-  isExpandable: true,
   isSelected: true
 }
 
