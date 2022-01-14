@@ -19,6 +19,7 @@ import {
 import {
   createRegistrationHandler,
   markEventAsCertifiedHandler,
+  markEventAsRequestedForCorrectionHandler,
   markEventAsValidatedHandler,
   markEventAsWaitingValidationHandler
 } from '@workflow/features/registration/handler'
@@ -264,6 +265,22 @@ export async function fhirWorkflowEventHandler(
       response = await markEventAsWaitingValidationHandler(request, h, event)
       await triggerEvent(
         Events.DEATH_WAITING_VALIDATION,
+        request.payload,
+        request.headers.authorization
+      )
+      break
+    case Events.BIRTH_REQUEST_CORRECTION:
+      response = await markEventAsRequestedForCorrectionHandler(request, h)
+      await triggerEvent(
+        Events.BIRTH_REQUEST_CORRECTION,
+        request.payload,
+        request.headers.authorization
+      )
+      break
+    case Events.DEATH_REQUEST_CORRECTION:
+      response = await markEventAsRequestedForCorrectionHandler(request, h)
+      await triggerEvent(
+        Events.DEATH_REQUEST_CORRECTION,
         request.payload,
         request.headers.authorization
       )
