@@ -11,14 +11,11 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { IMenuItem, Menu } from './Menu'
-import { HeaderLogo } from '../../../icons'
 
 export interface IRightMenu {
   element: JSX.Element
 }
 export interface IDesktopHeaderProps {
-  menuItems: IMenuItem[]
   desktopRightMenu?: IRightMenu[]
 }
 
@@ -45,7 +42,7 @@ const HeaderRight = styled.div`
 
 export class DesktopHeader extends React.Component<IDesktopHeaderProps> {
   render() {
-    const { menuItems, desktopRightMenu } = this.props
+    const { desktopRightMenu } = this.props
 
     return (
       <HeaderContainer>

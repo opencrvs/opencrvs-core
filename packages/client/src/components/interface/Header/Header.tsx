@@ -393,66 +393,6 @@ class HeaderComp extends React.Component<IProps, IState> {
     }
   }
 
-  getMenuItems(props: IProps) {
-    let menuItems: any[] = []
-    const {
-      userDetails,
-      intl,
-      enableMenuSelection = true,
-      activeMenuItem,
-      goToHomeAction,
-      goToConfigAction
-    } = props
-    if (userDetails && userDetails.role) {
-      if (
-        !SYS_ADMIN_ROLES.includes(userDetails.role) &&
-        !NATL_ADMIN_ROLES.includes(userDetails.role)
-      ) {
-        menuItems = menuItems.concat([
-          {
-            key: 'application',
-            title: intl.formatMessage(constantsMessages.applicationTitle),
-            onClick: goToHomeAction,
-            selected:
-              enableMenuSelection &&
-              activeMenuItem === ACTIVE_MENU_ITEM.APPLICATIONS
-          }
-        ])
-      }
-      if (!FIELD_AGENT_ROLES.includes(userDetails.role)) {
-        menuItems = menuItems.concat([
-          {
-            key: 'performance',
-            title: intl.formatMessage(constantsMessages.performanceTitle),
-            onClick: () => this.goToPerformanceView(this.props),
-            selected:
-              enableMenuSelection &&
-              activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
-          },
-          {
-            key: 'team',
-            title: intl.formatMessage(messages.teamTitle),
-            onClick: () => this.goToTeamView(this.props),
-            selected:
-              enableMenuSelection && activeMenuItem === ACTIVE_MENU_ITEM.TEAM
-          }
-        ])
-      }
-      if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
-        menuItems = menuItems.concat([
-          {
-            key: 'config',
-            title: intl.formatMessage(constantsMessages.configTitle),
-            onClick: goToConfigAction,
-            selected:
-              enableMenuSelection && activeMenuItem === ACTIVE_MENU_ITEM.CONFIG
-          }
-        ])
-      }
-    }
-    return menuItems
-  }
-
   render() {
     const { intl, activeMenuItem } = this.props
     const title =
@@ -467,8 +407,6 @@ class HeaderComp extends React.Component<IProps, IState> {
           ? constantsMessages.configTitle
           : constantsMessages.applicationTitle
       )
-
-    const menuItems = this.getMenuItems(this.props)
 
     let rightMenu = [
       {
@@ -503,7 +441,6 @@ class HeaderComp extends React.Component<IProps, IState> {
     return (
       <>
         <AppHeader
-          menuItems={menuItems}
           id="register_app_header"
           desktopRightMenu={rightMenu}
           title={title}

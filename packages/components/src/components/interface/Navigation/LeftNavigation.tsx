@@ -28,13 +28,12 @@ const LeftNavigationContainer = styled.div`
   border-right: 1px;
   border-style: solid;
   border-color: ${({ theme }) => theme.colors.border};
-  z-index: 3;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
 `
 const ApplicationNameContainer = styled.div`
-  padding: 16px 20px;
+  padding: 20px 20px;
   height: 64px;
   background-color: ${({ theme }) => theme.colors.white};
   border-bottom: 1px solid ${({ theme }) => theme.colors.border};

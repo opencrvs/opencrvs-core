@@ -16,36 +16,25 @@ import { IStoreState } from '@opencrvs/client/src/store'
 import { LeftNavigationApplicationIcons } from '@opencrvs/components/lib/icons/LeftNavigationApplicationIcons'
 import { LeftNavigation } from '@opencrvs/components/lib/interface/Navigation/LeftNavigation'
 import { NavigationGroup } from '@opencrvs/components/lib/interface/Navigation/NavigationGroup'
-import {
-  INavigationItemProps,
-  NavigationItem
-} from '@opencrvs/components/lib/interface/Navigation/NavigationItem'
+import { NavigationItem } from '@opencrvs/components/lib/interface/Navigation/NavigationItem'
 import { connect } from 'react-redux'
 import {
   goToFieldAgentHomeTab as goToFieldAgentHomeTabAction,
   goToRegistrarHomeTab,
-  goToHome,
   goToConfig,
-  goToSearchResult,
-  goToEvents as goToEventsAction,
   goToOperationalReport,
   goToPerformanceHome,
-  goToPerformanceReportList,
-  goToSearch,
-  goToSettings,
   goToTeamSearch,
   goToTeamUserList
 } from '@client/navigation'
-import {
-  FIELD_AGENT_ROLES,
-  NATL_ADMIN_ROLES,
-  SYS_ADMIN_ROLES
-} from '@client/utils/constants'
+import { NATL_ADMIN_ROLES } from '@client/utils/constants'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { Activity, Users } from '@opencrvs/components/lib/icons'
 import { Configuration } from '@opencrvs/components/lib/icons/Configuration'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { constantsMessages } from '@client/i18n/messages'
 
 const USER_SCOPE = {
   FIELD_AGENT: 'FIELD_AGENT',
@@ -77,7 +66,6 @@ interface IProps {
 interface IDispatchProps {
   goToFieldAgentHomeTab: typeof goToFieldAgentHomeTabAction
   goToRegistrarHomeTab: typeof goToRegistrarHomeTab
-  goToHomeAction: typeof goToHome
   goToConfigAction: typeof goToConfig
   goToPerformanceHomeAction: typeof goToPerformanceHome
   goToOperationalReportAction: typeof goToOperationalReport
@@ -92,7 +80,7 @@ interface IStateProps {
   activeMenuItem: string
 }
 
-type IFullProps = IProps & IStateProps & IDispatchProps
+type IFullProps = IProps & IStateProps & IDispatchProps & IntlShapeProps
 
 const TAB_ID = {
   inProgress: 'progress',
@@ -166,61 +154,20 @@ const goToTeamView = (props: IFullProps) => {
   }
 }
 
-const getMenuItems = (props: IFullProps): INavigationItemProps[] => {
-  let menuItems: INavigationItemProps[] = []
-  const {
-    userDetails,
-    enableMenuSelection = true,
-    activeMenuItem,
-    goToHomeAction,
-    goToConfigAction
-  } = props
-  console.log(userDetails)
-  if (userDetails && userDetails.role) {
-    if (!FIELD_AGENT_ROLES.includes(userDetails.role)) {
-      menuItems = menuItems.concat([
-        {
-          icon: () => <Activity stroke={'#595C5F'} height={15} width={15} />,
-          label: TAB_LABEL.performance,
-          onClick: () => goToPerformanceView(props),
-          isSelected:
-            enableMenuSelection && activeMenuItem === TAB_ID.performance
-        },
-        {
-          onClick: () => goToTeamView(props),
-          icon: () => <Users stroke={'#595C5F'} height={15} width={15} />,
-          label: TAB_LABEL.team,
-          isSelected: enableMenuSelection && activeMenuItem === TAB_ID.team
-        }
-      ])
-    }
-    if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
-      menuItems = menuItems.concat([
-        {
-          icon: () => <Configuration />,
-          label: TAB_LABEL.configuration,
-          onClick: goToConfigAction,
-          isSelected: enableMenuSelection && activeMenuItem === TAB_ID.config
-        }
-      ])
-    }
-  }
-  return menuItems
-}
-
 export const NavigationView = (props: IFullProps) => {
   const {
     tabId,
-    userScope,
+    intl,
     count,
     userDetails,
     enableMenuSelection = true,
     activeMenuItem,
-    goToHomeAction,
     goToConfigAction
   } = props
   return (
-    <LeftNavigation applicationName={'Open CRVS'}>
+    <LeftNavigation
+      applicationName={intl.formatMessage(constantsMessages.applicationName)}
+    >
       {(userDetails?.role === USER_SCOPE.FIELD_AGENT ||
         userDetails?.role === USER_SCOPE.REGISTRATION_AGENT ||
         userDetails?.role === USER_SCOPE.LOCAL_REGISTRAR) && (
@@ -378,10 +325,9 @@ export const Navigation = connect<
 >(mapStateToProps, {
   goToFieldAgentHomeTab: goToFieldAgentHomeTabAction,
   goToRegistrarHomeTab,
-  goToHomeAction: goToHome,
   goToConfigAction: goToConfig,
   goToPerformanceHomeAction: goToPerformanceHome,
   goToOperationalReportAction: goToOperationalReport,
   goToTeamSearchAction: goToTeamSearch,
   goToTeamUserListAction: goToTeamUserList
-})(NavigationView)
+})(injectIntl(NavigationView))

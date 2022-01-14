@@ -365,7 +365,7 @@ export class RegistrationHomeView extends React.Component<
               : filteredData.reviewTab.totalItems,
             sentForUpdates: !initialSyncDone
               ? 0
-              : filteredData.approvalTab.totalItems,
+              : filteredData.rejectTab.totalItems,
             sentForApproval:
               this.userHasValidateScope() && !initialSyncDone
                 ? 0

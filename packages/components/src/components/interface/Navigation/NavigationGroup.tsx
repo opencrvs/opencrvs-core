@@ -18,7 +18,7 @@ export interface INavigationGroup
 
 const NavigationGroupContainer = styled.div`
   padding: 8px 0px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.borderBottom};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
   &:last-child {
     border-bottom: none;
   }
