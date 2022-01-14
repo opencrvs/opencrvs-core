@@ -102,9 +102,10 @@ const RecordCorrectionButton = styled(TertiaryButton)`
   align-items: center;
   padding: 4px 8px;
   position: relative;
-  width: 136px;
+  width: auto;
   height: 29px;
   border-radius: 4px;
+  margin-left: 395px;
 `
 const RecordCorrectionText = styled.div`
   position: static;
