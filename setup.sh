@@ -171,6 +171,25 @@ else
   exit 1
 fi
 
+echo -e "\033[32m:::::::: Checking that you have nothing running on OpenCRVS ports ::::::::\033[0m"
+echo
+
+
+openCRVSPorts=( 3447 9200 5001 5000 9200 27017 6379 8086 3040 5050 2020 7070 9090 1050 3030 3000 3020 2525)
+for x in "${openCRVSPorts[@]}"
+do
+   :
+    if lsof -i:$x; then
+      echo -e "OpenCRVS thinks that port: $x is in use by another application.\r"
+      echo "You need to find out which application is using this port and quit the application."
+      echo "You can find out the application by running:"
+      echo "lsof -i:$x"
+      exit 1
+    else
+        echo -e "$x \033[32m port is available!\033[0m :)"
+    fi
+done
+
 echo -e "\033[32m:::::::: Checking that you have the required dependencies installed ::::::::\033[0m"
 echo
 #sleep 1
@@ -292,7 +311,13 @@ if [[ $(docker ps -aq) ]] ; then docker stop $(docker ps -aq) ; fi
 echo
 echo -e "\033[32m:::::::::::::::::: Installing some Node dependencies ::::::::::::::::::\033[0m"
 echo
-npm install -g wait-on
+if [ $(which wait-on 2>/dev/null) ]; then
+  echo "wait-on found so skipping installation"
+  exit 1
+else
+  echo "wait-on not found"
+  npm install -g wait-on
+fi
 yarn install
 
 echo -e "\033[32m::::::::::::::::::::::: Creating some directories :::::::::::::::::::::::\033[0m"
@@ -300,8 +325,8 @@ echo
 echo -e "\033[32m::::::::::::: Please enter your sudo password when prompted :::::::::::::\033[0m"
 echo
 openssl genrsa -out .secrets/private-key.pem 2048 && openssl rsa -pubout -in .secrets/private-key.pem -out .secrets/public-key.pem
-sudo mkdir -p data/elasticsearch
-sudo chown -R 1000:1000 data/elasticsearch
+mkdir -p data/elasticsearch
+chmod 775 data/elasticsearch
 
 echo -e "\033[32m:::::::::::::::::::: Building OpenCRVS dependencies ::::::::::::::::::::\033[0m"
 echo
