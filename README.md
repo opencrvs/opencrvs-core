@@ -1,7 +1,7 @@
 <p align="center"> <a href="https://imgur.com/mGNCIvh"><img src="https://i.imgur.com/mGNCIvh.png" title="source: imgur.com" / style="max-width:100%;"width="72" height="72"></a>
 </p>
 <h3 align="center">OpenCRVS</h3>
-<p align="center"> A global solution to civil registration
+<p align="center"> A [digital public good](https://digitalpublicgoods.net/) for [civil registration](https://en.wikipedia.org/wiki/Civil_registration)
 <br>
 <a href="https://github.com/opencrvs/opencrvs-core/issues">Report an issue</a>  ·  <a href="https://www.opencrvs.org/case-studies">Case studies</a>  ·  <a href="https://www.opencrvs.org/implementation">Implementations</a>  ·  <a href="https://www.opencrvs.org/about-us">About us</a></p>
 
