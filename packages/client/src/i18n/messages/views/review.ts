@@ -31,8 +31,6 @@ interface IReviewMessages
   approvalActionDescriptionComplete: MessageDescriptor
   approvalActionDescriptionIncomplete: MessageDescriptor
   approvalActionTitle: MessageDescriptor
-  replaceSectionConfirmationTitle: MessageDescriptor
-  replaceSectionConfirmation: MessageDescriptor
   reviewActionDescriptionComplete: MessageDescriptor
   reviewActionDescriptionIncomplete: MessageDescriptor
   reviewActionTitle: MessageDescriptor
@@ -166,19 +164,6 @@ const messagesToDefine: IReviewMessages = {
       'Send for {draftStatus, select, true {approval} false {approval or reject}}?',
     description: 'Title for review action component',
     id: 'misc.title.applicationStatus'
-  },
-  replaceSectionConfirmationTitle: {
-    defaultMessage: 'Replace section?',
-    description:
-      'Title for the confirmation dialog when replacing whole section',
-    id: 'review.replace.modal.confirmationTitle'
-  },
-  replaceSectionConfirmation: {
-    defaultMessage:
-      'This will remove all the previous information stored in this section.',
-    description:
-      'Description for the confirmation dialog when replacing whole section',
-    id: 'review.replace.modal.confirmationText'
   },
   reviewActionDescriptionComplete: {
     defaultMessage:

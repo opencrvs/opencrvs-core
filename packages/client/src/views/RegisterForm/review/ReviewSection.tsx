@@ -233,7 +233,6 @@ interface IProps {
 }
 type State = {
   displayEditDialog: boolean
-  displayReplaceDialog: boolean
   editClickedSectionId: string
   editClickedSectionGroupId: string
   editClickFieldName: string
@@ -473,7 +472,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
     this.state = {
       displayEditDialog: false,
-      displayReplaceDialog: false,
       editClickedSectionGroupId: '',
       editClickFieldName: '',
       editClickedSectionId: '',
@@ -648,12 +646,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }))
   }
 
-  toggleReplaceDialog = () => {
-    this.setState((prevState) => ({
-      displayReplaceDialog: !prevState.displayReplaceDialog
-    }))
-  }
-
   editLinkClickHandler = (
     sectionId: string,
     sectionGroupId: string,
@@ -684,14 +676,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       application.event.toLowerCase(),
       fieldName
     )
-  }
-
-  replaceClickHandler(sectionId: string, groupId: string) {
-    this.setState(() => ({
-      editClickedSectionId: sectionId,
-      editClickedSectionGroupId: groupId
-    }))
-    this.toggleReplaceDialog()
   }
 
   replaceHandler(sectionId: string, groupId: string) {
@@ -1311,7 +1295,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           ? {
               label: intl.formatMessage(buttonMessages.replace),
               handler: () =>
-                this.replaceClickHandler(section.id, visibleGroups[0].id)
+                this.replaceHandler(section.id, visibleGroups[0].id)
             }
           : undefined
       }
@@ -1502,36 +1486,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           handleClose={this.toggleDisplayDialog}
         >
           {intl.formatMessage(messages.editApplicationConfirmation)}
-        </ResponsiveModal>
-        <ResponsiveModal
-          title={intl.formatMessage(messages.replaceSectionConfirmationTitle)}
-          contentHeight={96}
-          responsive={false}
-          actions={[
-            <TertiaryButton
-              id="cancel-btn"
-              key="cancel"
-              onClick={this.toggleReplaceDialog}
-            >
-              {intl.formatMessage(buttonMessages.cancel)}
-            </TertiaryButton>,
-            <PrimaryButton
-              id="edit_confirm"
-              key="submit"
-              onClick={() => {
-                this.replaceHandler(
-                  this.state.editClickedSectionId,
-                  this.state.editClickedSectionGroupId
-                )
-              }}
-            >
-              {intl.formatMessage(buttonMessages.continueButton)}
-            </PrimaryButton>
-          ]}
-          show={this.state.displayReplaceDialog}
-          handleClose={this.toggleReplaceDialog}
-        >
-          {intl.formatMessage(messages.replaceSectionConfirmation)}
         </ResponsiveModal>
         {this.state.previewImage && (
           <DocumentPreview
