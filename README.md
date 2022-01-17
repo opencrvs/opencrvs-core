@@ -22,10 +22,10 @@
 - [Learn more](#learn-more)
 - [Configure OpenCRVS for your country](#configure-opencrvs-for-your-country)
 - [What are the key OpenSource dependencies of OpenCRVS?](#what-are-the-key-opensource-dependencies-of-opencrvs)
-    - [Hearth MongoDB Database layer](#hearth-mongodb-database-layer)
-    - [ElasticSearch](#elasticsearch)
-    - [InfluxData](#influxdata)
-    - [OpenHIM enterprise service bus, interoperability Layer](#openhim-enterprise-service-bus-interoperability-layer)
+  - [Hearth MongoDB Database layer](#hearth-mongodb-database-layer)
+  - [ElasticSearch](#elasticsearch)
+  - [InfluxData](#influxdata)
+  - [OpenHIM enterprise service bus, interoperability Layer](#openhim-enterprise-service-bus-interoperability-layer)
 - [What is inside the OpenCRVS packages?](#what-is-inside-the-opencrvs-packages)
   - [OpenCRVS microservice business layer packages](#opencrvs-microservice-business-layer-packages)
   - [OpenCRVS client application packages](#opencrvs-client-application-packages)
@@ -89,9 +89,13 @@ When fully installed and running, you will see the following information in one 
 User details are:
 
 Field Agent role: Username: **kalusha.bwalya** / Password: **test** / Test two-factor authentication SMS code: **000000**
+
 Registration Agent role: Username: **felix.katongo** / Password: **test** / Test two-factor authentication SMS code: **000000**
+
 Registrar role: Username: **kennedy.mweene** / Password: **test** / Test two-factor authentication SMS code: **000000**
+
 Local System Admin: Username: **emmanuel.mayuka** / Password: **test** / Test two-factor authentication SMS code: **000000**
+
 National System Admin: Username: **jonathan.campbell** / Password: **test** / Test two-factor authentication SMS code: **000000**
 
 To learn about these user roles and to perform civil registration tasks, read the [Documentation](http://documentation.opencrvs.org/).
@@ -147,7 +151,7 @@ Wait for the OpenCRVS client app to build completely (output will stop and you w
 
 5. Now start the country configuration server by running:
 
-`yarn dev ` _<!-- paste in the absolute path to your opencrvs-core directory here -->_
+`yarn dev <!-- paste in the absolute path to your opencrvs-core directory here -->`
 
 ### Stopping OpenCRVS
 
