@@ -312,8 +312,7 @@ echo
 echo -e "\033[32m:::::::::::::::::: Installing some Node dependencies ::::::::::::::::::\033[0m"
 echo
 if [ $(which wait-on 2>/dev/null) ]; then
-  echo "wait-on found so skipping installation"
-  exit 1
+  echo -e "wait-on is \033[32minstalled!\033[0m :)"
 else
   echo "wait-on not found"
   npm install -g wait-on
