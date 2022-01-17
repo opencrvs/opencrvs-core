@@ -47,6 +47,13 @@
 
 </p>
 
+**_We are on a mission to ensure that every individual on the planet is recognised, protected and provided for from birth._**
+
+[OpenCRVS](https://www.opencrvs.org) (Civil registration & Vital Statistics) is a digital public good to help achieve universal civil
+registration and evidence-based decision making in all country contexts.
+
+<br>
+
 ## Presumed experience for developers checking out this software
 
 In order to run OpenCRVS, we expect that you have a working knowledge of Linux / Unix operating systems and can run Terminal commands. OpenCRVS consists of multiple servers which run in Docker containers and requires Node JS. You should be familiar with the concepts of Docker and Node JS web application software development.
