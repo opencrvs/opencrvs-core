@@ -30,7 +30,8 @@ import { buttonMessages } from '@client/i18n/messages/buttons'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import {
   goToRegistrarHomeTab as goToRegistrarHomeTabAction,
-  goBack
+  goBack,
+  goToCorrectCertificate
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
@@ -126,6 +127,7 @@ type IProps = {
   writeApplication: typeof writeApplication
   goToRegistrarHomeTabAction: typeof goToRegistrarHomeTabAction
   storeApplication: typeof storeApplication
+  goToCorrectCertificate?: typeof goToCorrectCertificate
 }
 
 type IFullProps = IntlShapeProps &
@@ -275,7 +277,16 @@ class ReviewCertificateActionComponent extends React.Component<
             {intl.formatMessage(certificateMessages.confirmAndPrint)}
           </PrimaryButton>
 
-          <CustomTertiaryButton disabled>
+          <CustomTertiaryButton
+            onClick={() =>
+              this.props.goToCorrectCertificate &&
+              this.props.goToCorrectCertificate(
+                this.props.registrationId,
+                this.props.event,
+                'recordCorrection'
+              )
+            }
+          >
             {intl.formatMessage(buttonMessages.editRecord)}
           </CustomTertiaryButton>
         </ButtonWrapper>
@@ -351,7 +362,8 @@ const mapDispatchToProps = {
   writeApplication,
   goToRegistrarHomeTabAction,
   storeApplication,
-  goBack
+  goBack,
+  goToCorrectCertificate
 }
 export const ReviewCertificateAction = connect(
   mapStatetoProps,
