@@ -20,8 +20,7 @@ import {
   modifyApplication,
   storeApplication,
   writeApplication,
-  IPrintableApplication,
-  ICertificate
+  IPrintableApplication
 } from '@client/applications'
 import { FormFieldGenerator } from '@client/components/form'
 import {
@@ -32,7 +31,8 @@ import {
   IFormField,
   IFormSection,
   IFormSectionData,
-  IFormSectionGroup
+  IFormSectionGroup,
+  IRadioGroupWithNestedFieldsFormField
 } from '@client/forms'
 import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
 import {
@@ -59,13 +59,12 @@ import {
 import {
   getEvent,
   getEventDate,
-  isFreeOfCost,
-  isCertificateForPrintInAdvance
+  isFreeOfCost
 } from '@client/views/PrintCertificate/utils'
 import { StyledSpinner } from '@client/views/RegistrationHome/RegistrationHome'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
-import { flatten, cloneDeep, get, isEqual } from 'lodash'
+import { cloneDeep, get, isEqual } from 'lodash'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
@@ -73,12 +72,6 @@ import { RouteComponentProps } from 'react-router'
 import { withTheme } from 'styled-components'
 import { IValidationResult } from '@client/utils/validate'
 import { getRegisterForm } from '@client/forms/register/application-selectors'
-import {
-  certCollectorGroupForBirthAppWithParentDetails,
-  certCollectorGroupForBirthAppWithoutFatherDetails,
-  certCollectorGroupForBirthAppWithoutParentDetails,
-  certCollectorGroupForBirthAppWithoutMotherDetails
-} from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 
 const FormSectionTitle = styled.h4`
@@ -295,7 +288,7 @@ class CorrectorFormComponent extends React.Component<IProps, IState> {
     return (
       <>
         <ActionPageLight
-          id="collector_form"
+          id="corrector_form"
           title={intl.formatMessage(formSection.title)}
           goBack={goBack}
         >
@@ -418,10 +411,17 @@ const mapStateToProps = (
       ['deceased']
     )
 
+    const isChildDeceased = isEqual(
+      get(applicationData, 'primaryCaregiver.child'),
+      ['deceased']
+    )
+
     const motherDataExist =
       applicationData && applicationData.mother && !isMotherDeceased
     let fatherDataExist =
       applicationData && applicationData.father && !isFatherDeceased
+    const childDataExist =
+      applicationData && applicationData.child && !isChildDeceased
 
     //TODO: This needs to be dynamic.
     // We shouldn't hardcode 'fathersDetailsExist' field check here
@@ -435,8 +435,57 @@ const mapStateToProps = (
       fatherDataExist =
         fatherDataExist && applicationData.father.fathersDetailsExist
     }
+    if (!fatherDataExist && motherDataExist && childDataExist) {
+      ;(
+        clonedFormSection.groups[0]
+          .fields[0] as IRadioGroupWithNestedFieldsFormField
+      ).options.splice(1, 1)
+    } else if (!fatherDataExist && motherDataExist && !childDataExist) {
+      ;(
+        clonedFormSection.groups[0]
+          .fields[0] as IRadioGroupWithNestedFieldsFormField
+      ).options.splice(1, 2)
+    } else if (fatherDataExist && !motherDataExist && childDataExist) {
+      ;(
+        clonedFormSection.groups[0]
+          .fields[0] as IRadioGroupWithNestedFieldsFormField
+      ).options.splice(0, 1)
+      ;(
+        clonedFormSection.groups[0]
+          .fields[0] as IRadioGroupWithNestedFieldsFormField
+      ).options.splice(2, 1)
+    } else if (fatherDataExist && !motherDataExist && !childDataExist) {
+      ;(
+        clonedFormSection.groups[0]
+          .fields[0] as IRadioGroupWithNestedFieldsFormField
+      ).options.splice(0, 1)
+    } else if (!fatherDataExist && !motherDataExist && childDataExist) {
+      ;(
+        clonedFormSection.groups[0]
+          .fields[0] as IRadioGroupWithNestedFieldsFormField
+      ).options.splice(0, 2)
+    } else if (!fatherDataExist && !motherDataExist && !childDataExist) {
+      ;(
+        clonedFormSection.groups[0]
+          .fields[0] as IRadioGroupWithNestedFieldsFormField
+      ).options.splice(0, 3)
+    }
+  } else if (event === Event.DEATH && groupId === 'recordCorrection') {
+    const applicationData = application && application.data
+    const isInformantDataNull = isEqual(
+      get(applicationData, 'informant.relationship'),
+      null
+    )
+    if (isInformantDataNull) {
+      ;(
+        clonedFormSection.groups[0]
+          .fields[0] as IRadioGroupWithNestedFieldsFormField
+      ).options.splice(0, 1)
+    }
   }
-  const formGroup = clonedFormSection.groups[0]
+  const formGroup =
+    clonedFormSection.groups.find((group) => group.id === groupId) ||
+    clonedFormSection.groups[0]
 
   const fields = replaceInitialValues(
     formGroup.fields,

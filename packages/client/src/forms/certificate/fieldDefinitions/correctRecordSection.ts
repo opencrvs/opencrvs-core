@@ -106,12 +106,8 @@ export const correctRecordDeathSectionGroup: IFormSectionGroup = {
         }
       ],
       nestedFields: {
-        MOTHER: [],
-        FATHER: [],
-        CHILD: [],
-        LEGAL_GUARDIAN: [],
-        ANOTHER_AGENT: [],
-        REGISTER: [],
+        INFORMANT: [],
+        REGISTRAR: [],
         SOMEONE_ELSE: [
           {
             name: 'otherRelationShip',
