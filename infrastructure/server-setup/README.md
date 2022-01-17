@@ -19,7 +19,45 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# OpenCRVS server setup
+# Setting up a hosting environment for deplouying OpenCRVS
+
+This README outlines the process to setup and deploy OpenCRVS on a remote server environment. The documentation is in progress and will be finalised for the public Beta release scheduled for June 2022.
+
+### How can I install and manage an OpenCRVS server cluster?
+
+OpenCRVS should be deployed on a minimum cluster of 3 nodes, each with the following minimm specification:
+
+#### 8 GB Memory (preferrably 16 GB) / 160 GB Disk / Ubuntu 18.04.3 (LTS) x64
+
+To prepare your server cluster and manage the Docker Swarm, some pre-requisites and instructions are documented [here](https://github.com/opencrvs/opencrvs-core/tree/master/infrastructure/server-setup)
+
+An [Ansible](https://www.ansible.com/) playbook script is provided [here](https://github.com/opencrvs/opencrvs-core/blob/master/infrastructure/server-setup/playbook.yml) to automate the vast majority of your server cluster setup.
+
+## How can I deploy to a staging environment cluster?
+
+To deploy to a staging environment we combine docker-compose files that are used in the docker setup above with a few others to configure the stack.
+
+The deployment uses Docker Swarm and sets up an OpenCRVS stack containing each service with a number of replicas defined in the docker compose files. **Note:** This deployment is currently automated so that every time we push to master the build will be deployed during the CI process.
+
+The deploy is easily executed by just running: `yarn deploy:staging --clear-data=yes --restore-metadata=yes <<insert host>> <<insert version>>` - you will need ssh access to the server for this to work.
+
+<br>
+
+## How can I deploy to a QA environment cluster?
+
+Deploying to QA is much the same as above, however you may specify a version to deploy. The version can be any docker image tag. Each time master is build on CI docker images are created for that commit hash. Any of these hashes may be used as the version. In addition any time a git tag is created and pushed all the docker images will automatically build. Once complete the name of this tag can be used to deploy to the QA environment as well.
+
+`yarn deploy:qa --clear-data=yes --restore-metadata=yes <<insert host>> <<insert version>>`
+
+<br>
+
+## How can I deploy to production?
+
+Deploying to Production is much the same as deploying to QA.
+
+`yarn deploy:prod --clear-data=yes --restore-metadata=yes <<insert host>> <<insert version>>`
+
+<br>
 
 This folder contains script to setup a new set of servers for OpenCRVS. It sets up docker swarm and configures the servers to prepare them for a deployment for OpenCRVS.
 
@@ -295,3 +333,29 @@ docker inspect <container id e.g. "opencrvs_user-mgnt.1.t0178z73i4tjcll68a7r72en
 ### You need to rollback the changes made to a service
 
 docker service rollback opencrvs_user-mgnt
+
+## Why Docker Swarm? ...and is there Kubernetes support?
+
+[Docker Swarm](https://docs.docker.com/engine/swarm/) was chosen for it's simplicity, so that previously unskilled system administrators can quickly up-skill in the techniques of private and public cloud infrastructure management. We wanted to democratise the containerisation benefits of AWS/Kubernetes style public cloud deployments for developing nations.
+
+Some nations may be located far from a developed world datacentre. Many nations may not be able to legally support international data storage of citizen data. Often getting the legal approval requires regulatory change which obviously can take some time. In the short term, these nations may not have access to the development skills necessary to manage a complicated distributed cloud deployment, so ease-of-use is paramount.
+
+Docker Swarm makes it easy to commence service distribution privately and then migrate publically when an organisation is ready to do so. Docker Swarm automatically configures a "round robin" load balanced cluster, and provides Service Discovery out-the-box.
+
+We are working on a [Kubernetes](https://kubernetes.io/) Software-As-A-Service solution, so that smaller nations can hand over system administration to a 3rd party to manage solely in the public cloud, if these nations can get regulatory approval.
+
+<br>
+
+## How do I export recent registrations?
+
+You can export registrations (both death and birth) from the last n days by running a script from `infrastructure/export-registrations.sh <<insert number of days>> <<insert host>> <<insert system admin token>>`.
+
+Would create a new .zip file `export.zip` with 2 CSV files inside of it. You can tweak the time period from inside the script if needed.
+
+<br>
+
+## How does OpenCRVS back up registration data?
+
+OpenCRVS backs up all of its data by default and the [Ansible](https://www.ansible.com/) playbook script [here](https://github.com/opencrvs/opencrvs-core/blob/master/infrastructure/server-setup/playbook.yml) allows you to configure a remote server in which all data will be zipped and copied to on a nightly cron job. Follow the instructions [here](https://github.com/opencrvs/opencrvs-core/tree/master/infrastructure/server-setup)
+
+<br>
