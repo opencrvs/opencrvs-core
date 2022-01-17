@@ -84,6 +84,8 @@ Now you have satisfied the dependencies, run the following **ONE TIME ONLY** com
 
 If there are any missing dependencies the script will exit and display instructions. Once the dependency is satisfied, you can try again.
 
+### The first time setup command
+
 `bash setup.sh`
 
 **When the script completes, you will see the OpenCRVS logo in one of the tmux terminal windows.**
