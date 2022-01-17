@@ -1,7 +1,12 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-- [OpenCRVS server setup](#opencrvs-server-setup)
+- [Setting up a hosting environment for deploying OpenCRVS](#setting-up-a-hosting-environment-for-deploying-opencrvs)
+  - [How can I install and manage an OpenCRVS server cluster?](#how-can-i-install-and-manage-an-opencrvs-server-cluster)
+    - [8 GB Memory (preferrably 16 GB) / 160 GB Disk / Ubuntu 18.04.3 (LTS) x64](#8-gb-memory-preferrably-16-gb--160-gb-disk--ubuntu-18043-lts-x64)
+  - [How can I deploy to a staging environment cluster?](#how-can-i-deploy-to-a-staging-environment-cluster)
+  - [How can I deploy to a QA environment cluster?](#how-can-i-deploy-to-a-qa-environment-cluster)
+  - [How can I deploy to production?](#how-can-i-deploy-to-production)
   - [Enabling encryption](#enabling-encryption)
   - [Enabling Mongo replica sets](#enabling-mongo-replica-sets)
   - [Emergency Backup & Restore](#emergency-backup--restore)
@@ -16,10 +21,11 @@
     - [You need to run commands inside a container](#you-need-to-run-commands-inside-a-container)
     - [You need to inspect a container to see networking and all other information](#you-need-to-inspect-a-container-to-see-networking-and-all-other-information)
     - [You need to rollback the changes made to a service](#you-need-to-rollback-the-changes-made-to-a-service)
+  - [Why Docker Swarm? ...and is there Kubernetes support?](#why-docker-swarm-and-is-there-kubernetes-support)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# Setting up a hosting environment for deplouying OpenCRVS
+# Setting up a hosting environment for deploying OpenCRVS
 
 This README outlines the process to setup and deploy OpenCRVS on a remote server environment. The documentation is in progress and will be finalised for the public Beta release scheduled for June 2022.
 
@@ -343,19 +349,5 @@ Some nations may be located far from a developed world datacentre. Many nations 
 Docker Swarm makes it easy to commence service distribution privately and then migrate publically when an organisation is ready to do so. Docker Swarm automatically configures a "round robin" load balanced cluster, and provides Service Discovery out-the-box.
 
 We are working on a [Kubernetes](https://kubernetes.io/) Software-As-A-Service solution, so that smaller nations can hand over system administration to a 3rd party to manage solely in the public cloud, if these nations can get regulatory approval.
-
-<br>
-
-## How do I export recent registrations?
-
-You can export registrations (both death and birth) from the last n days by running a script from `infrastructure/export-registrations.sh <<insert number of days>> <<insert host>> <<insert system admin token>>`.
-
-Would create a new .zip file `export.zip` with 2 CSV files inside of it. You can tweak the time period from inside the script if needed.
-
-<br>
-
-## How does OpenCRVS back up registration data?
-
-OpenCRVS backs up all of its data by default and the [Ansible](https://www.ansible.com/) playbook script [here](https://github.com/opencrvs/opencrvs-core/blob/master/infrastructure/server-setup/playbook.yml) allows you to configure a remote server in which all data will be zipped and copied to on a nightly cron job. Follow the instructions [here](https://github.com/opencrvs/opencrvs-core/tree/master/infrastructure/server-setup)
 
 <br>
