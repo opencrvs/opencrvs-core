@@ -51,7 +51,9 @@ import {
   PRIMARY_CAREGIVER_TITLE,
   PARENT_DETAILS,
   SPOUSE_CODE,
-  SPOUSE_TITLE
+  SPOUSE_TITLE,
+  BIRTH_CORRECTION_ENCOUNTER_CODE,
+  DEATH_CORRECTION_ENCOUNTER_CODE
 } from '@gateway/features/fhir/templates'
 import {
   selectOrCreateEncounterResource,
@@ -2003,6 +2005,64 @@ export const builders: IFieldBuilders = {
             paymentResource.detail[0].date = fieldValue
           }
         }
+      },
+      location: {
+        _fhirID: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const encounterLocationRef = selectOrCreateEncounterLocationRef(
+            fhirBundle,
+            context,
+            true
+          )
+          encounterLocationRef.reference = `Location/${fieldValue}`
+        },
+        type: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          let location
+          location = selectOrCreateLocationRefResource(
+            context.event === EVENT_TYPE.BIRTH
+              ? BIRTH_CORRECTION_ENCOUNTER_CODE
+              : DEATH_CORRECTION_ENCOUNTER_CODE,
+            fhirBundle,
+            context
+          )
+          location.type = {
+            coding: [
+              {
+                system: `${OPENCRVS_SPECIFICATION_URL}location-type`,
+                code: fieldValue
+              }
+            ]
+          }
+        },
+        partOf: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const location = selectOrCreateLocationRefResource(
+            context.event === EVENT_TYPE.BIRTH
+              ? BIRTH_CORRECTION_ENCOUNTER_CODE
+              : DEATH_CORRECTION_ENCOUNTER_CODE,
+            fhirBundle,
+            context
+          )
+          location.partOf = {
+            reference: fieldValue
+          }
+        },
+        address: (_, __, context: any) =>
+          createLocationAddressBuilder(
+            context.event === EVENT_TYPE.BIRTH
+              ? BIRTH_CORRECTION_ENCOUNTER_CODE
+              : DEATH_CORRECTION_ENCOUNTER_CODE
+          )
       },
       values: (fhirBundle: ITemplatedBundle, fieldValue: any, context) => {
         const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)

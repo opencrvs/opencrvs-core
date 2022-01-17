@@ -1765,9 +1765,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markBirthAsValidated?: MutationToMarkBirthAsValidatedResolver<TParent>
   markBirthAsRegistered?: MutationToMarkBirthAsRegisteredResolver<TParent>
   markBirthAsCertified?: MutationToMarkBirthAsCertifiedResolver<TParent>
-  requestBirthRegistrationCorrection?: MutationToRequestBirthRegistrationCorrectionResolver<
-    TParent
-  >
+  requestBirthRegistrationCorrection?: MutationToRequestBirthRegistrationCorrectionResolver<TParent>
   markEventAsVoided?: MutationToMarkEventAsVoidedResolver<TParent>
   notADuplicate?: MutationToNotADuplicateResolver<TParent>
   createDeathRegistration?: MutationToCreateDeathRegistrationResolver<TParent>
@@ -1776,9 +1774,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markDeathAsValidated?: MutationToMarkDeathAsValidatedResolver<TParent>
   markDeathAsRegistered?: MutationToMarkDeathAsRegisteredResolver<TParent>
   markDeathAsCertified?: MutationToMarkDeathAsCertifiedResolver<TParent>
-  requestDeathRegistrationCorrection?: MutationToRequestDeathRegistrationCorrectionResolver<
-    TParent
-  >
+  requestDeathRegistrationCorrection?: MutationToRequestDeathRegistrationCorrectionResolver<TParent>
   createOrUpdateUser?: MutationToCreateOrUpdateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
   changePassword?: MutationToChangePasswordResolver<TParent>
@@ -2112,12 +2108,21 @@ export interface MutationToResendSMSInviteResolver<
   ): TResult
 }
 
-export interface GQLCorrectionInput {
+export interface GQLCorrectionValueInput {
   section: string
   fieldName: string
   oldValue: string
   newValue: string
 }
+
+export interface GQLCorrectionInput {
+  requester: GQLRelatedPersonInput
+  hasShowedVerifiedDocument: boolean
+  payments: GQLPaymentInput[]
+  values: GQLCorrectionValueInput[]
+  location: GQLLocationInput
+}
+
 export interface MutationToRequestBirthRegistrationCorrectionResolver<
   TParent = any,
   TResult = any

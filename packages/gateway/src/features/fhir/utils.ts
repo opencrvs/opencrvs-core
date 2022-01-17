@@ -32,7 +32,9 @@ import {
   REASON_MOTHER_NOT_APPLYING,
   REASON_FATHER_NOT_APPLYING,
   REASON_CAREGIVER_NOT_APPLYING,
-  createPractitionerEntryTemplate
+  createPractitionerEntryTemplate,
+  BIRTH_CORRECTION_ENCOUNTER_CODE,
+  DEATH_CORRECTION_ENCOUNTER_CODE
 } from '@gateway/features/fhir/templates'
 import {
   ITemplatedBundle,
@@ -135,13 +137,18 @@ export function selectOrCreatePersonResource(
 
 export function selectOrCreateEncounterResource(
   fhirBundle: ITemplatedBundle,
-  context: any
+  context: any,
+  correction?: boolean
 ): fhir.Encounter {
   let sectionCode
   if (context.event === EVENT_TYPE.BIRTH) {
-    sectionCode = BIRTH_ENCOUNTER_CODE
+    sectionCode = correction
+      ? BIRTH_CORRECTION_ENCOUNTER_CODE
+      : BIRTH_ENCOUNTER_CODE
   } else if (context.event === EVENT_TYPE.DEATH) {
-    sectionCode = DEATH_ENCOUNTER_CODE
+    sectionCode = correction
+      ? DEATH_CORRECTION_ENCOUNTER_CODE
+      : DEATH_ENCOUNTER_CODE
   } else {
     throw new Error(`Unknown event ${context}`)
   }
@@ -430,7 +437,8 @@ export function selectOrCreateEncounterPartitioner(
 
 export function selectOrCreateEncounterLocationRef(
   fhirBundle: ITemplatedBundle,
-  context: any
+  context: any,
+  correction?: boolean
 ): fhir.Reference {
   const encounter = selectOrCreateEncounterResource(fhirBundle, context)
   if (!encounter.location) {

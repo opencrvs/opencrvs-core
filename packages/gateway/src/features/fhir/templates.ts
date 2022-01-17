@@ -58,6 +58,8 @@ export const PRIMARY_CAREGIVER = 'primary-caregiver'
 export const PRIMARY_CAREGIVER_CODE = 'primary-caregiver-details'
 export const PRIMARY_CAREGIVER_TITLE = "Primary caregiver's details"
 export const PARENT_DETAILS = 'parent-details'
+export const BIRTH_CORRECTION_ENCOUNTER_CODE = 'birth-correction-encounters'
+export const DEATH_CORRECTION_ENCOUNTER_CODE = 'death-correction-encounters'
 
 export function createPersonSection(
   refUuid: string,

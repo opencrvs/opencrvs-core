@@ -358,7 +358,8 @@ input CorrectionInput {
   requester: RelatedPersonInput
   hasShowedVerifiedDocument: Boolean
   payments: [PaymentInput]
-  corrections: [CorrectionValueInput]
+  values: [CorrectionValueInput]
+  location: LocationInput
 }
 
 input RegistrationInput {
