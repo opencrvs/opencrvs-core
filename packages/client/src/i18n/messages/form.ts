@@ -2150,17 +2150,17 @@ const messagesToDefine: IFormMessages = {
   },
   motherWithName: {
     id: 'form.field.label.certificateCorrector.motherWithName',
-    defaultMessage: '{motherName} (Mother)',
+    defaultMessage: 'Mother',
     description: 'Label for mother option in certificate correction form'
   },
   fatherWithName: {
     id: 'form.field.label.certificateCorrector.fatherWithName',
-    defaultMessage: '{fatherName} (Father)',
+    defaultMessage: 'Father',
     description: 'Label for father option in certificate correction form'
   },
   childWithName: {
     id: 'form.field.label.certificateCorrector.childWithName',
-    defaultMessage: '{childName} (Child)',
+    defaultMessage: 'Child',
     description: 'Label for child option in certificate correction form'
   },
   meWithRole: {
@@ -2175,8 +2175,8 @@ const messagesToDefine: IFormMessages = {
       'Label for another registration or field agent option in certificate correction form'
   },
   informantWithName: {
-    id: 'form.field.label.certificateCorrector.anotherRegOrFieldAgent',
-    defaultMessage: '{informantName} Informant',
+    id: 'form.field.label.certificateCorrector.informant',
+    defaultMessage: 'Informant',
     description: 'Label for informant option in certificate correction form'
   }
 }
