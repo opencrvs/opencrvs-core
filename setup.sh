@@ -296,14 +296,6 @@ fi
 echo
 echo -e "\033[32m:::::::::::::::::::::: Initialising Docker Swarm ::::::::::::::::::::::\033[0m"
 echo
-echo -e "\033[32m:::::::: If Docker is already part of a swarm, this can fail. ::::::::\033[0m"
-echo
-echo -e "\033[32m::::::::::::::::: To leave an existing swarm, type: :::::::::::::::::\033[0m"
-echo
-echo "docker swarm leave --force"
-echo
-docker swarm init
-echo
 echo -e "\033[32m:::::::::: Stopping any currently running Docker containers ::::::::::\033[0m"
 echo
 if [[ $(docker ps -aq) ]] ; then docker stop $(docker ps -aq) ; fi
