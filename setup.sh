@@ -294,7 +294,7 @@ if [ $OS == "UBUNTU" ]; then
 fi
 
 echo
-echo -e "\033[32m:::::::::::::::::::::: Initialising Docker Swarm ::::::::::::::::::::::\033[0m"
+echo -e "\033[32m:::::::::::::::::::::: Initialising Docker ::::::::::::::::::::::\033[0m"
 echo
 echo -e "\033[32m:::::::::: Stopping any currently running Docker containers ::::::::::\033[0m"
 echo
