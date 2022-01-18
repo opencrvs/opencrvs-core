@@ -46,7 +46,8 @@ import {
   goToPrintCertificate,
   goToPrintCertificatePayment,
   goToReviewCertificate,
-  goToVerifyCollector
+  goToVerifyCollector,
+  goToVerifyCorrector
 } from '@client/navigation'
 import { CERTIFICATE_CORRECTION } from '@client/navigation/routes'
 import { IStoreState } from '@client/store'
@@ -59,12 +60,13 @@ import {
 import {
   getEvent,
   getEventDate,
+  isCertificateForPrintInAdvance,
   isFreeOfCost
 } from '@client/views/PrintCertificate/utils'
 import { StyledSpinner } from '@client/views/RegistrationHome/RegistrationHome'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
-import { cloneDeep, get, isEqual } from 'lodash'
+import { cloneDeep, flatten, get, isEqual } from 'lodash'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
@@ -100,7 +102,7 @@ interface IBaseProps {
   writeApplication: typeof writeApplication
   modifyApplication: typeof modifyApplication
   goToPrintCertificate: typeof goToPrintCertificate
-  goToVerifyCollector: typeof goToVerifyCollector
+  goToVerifyCorrector: typeof goToVerifyCorrector
   goToReviewCertificate: typeof goToReviewCertificate
   goToPrintCertificatePayment: typeof goToPrintCertificatePayment
 }
@@ -188,7 +190,47 @@ class CorrectorFormComponent extends React.Component<IProps, IState> {
     fields: IFormField[],
     draft: IPrintableApplication | undefined
   ) => {
-    alert('Continue')
+    if (!draft) return
+
+    const errors = getErrorsOnFieldsBySection(sectionId, fields, draft)
+    const errorValues = Object.values(errors).map(Object.values)
+    const errLength = flatten(errorValues).filter(
+      (errs) => errs.length > 0
+    ).length
+
+    const certificates = draft.data.registration.certificates
+    const certificate = (certificates && certificates[0]) || {}
+    const corrector = certificate[
+      sectionId as keyof typeof certificate
+    ] as IFormSectionData
+
+    if (errLength > 0) {
+      this.setState({
+        showError: true
+      })
+
+      return
+    }
+
+    this.setState({
+      showError: false,
+      showModalForNoSignedAffidavit: false
+    })
+    if (!nextGroup) {
+      this.props.writeApplication(draft)
+
+      if (isCertificateForPrintInAdvance(draft)) {
+        this.props.goToReviewCertificate(applicationId, event)
+      } else {
+        this.props.goToVerifyCorrector(
+          applicationId,
+          event,
+          corrector.type as string
+        )
+      }
+    } else {
+      this.props.goToPrintCertificate(applicationId, event, nextGroup)
+    }
   }
 
   goToNextFormForSomeoneElse = (
