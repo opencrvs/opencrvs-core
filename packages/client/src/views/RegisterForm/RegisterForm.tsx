@@ -454,8 +454,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
       }
     }
 
+    this.updateVisitedGroups()
+
     this.props.writeApplication(this.props.application, () => {
-      this.updateVisitedGroups()
       this.props.goToPageGroup(pageRoute, applicationId, pageId, groupId, event)
     })
   }
