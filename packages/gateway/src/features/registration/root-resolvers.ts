@@ -162,7 +162,7 @@ export const resolvers: GQLResolver = {
             'Content-Type': 'application/json',
             ...authHeader
           }
-        }).then(data => data.json())
+        }).then((data) => data.json())
 
         if (!response.operationResult.success) {
           throw new Error(response.operationResult.error.errorMessage)
@@ -203,7 +203,7 @@ export const resolvers: GQLResolver = {
               ...authHeader
             }
           }
-        ).then(data => data.json())
+        ).then((data) => data.json())
         let total = 0
         if (results && results.length > 0) {
           total = results.reduce(
@@ -364,7 +364,7 @@ export const resolvers: GQLResolver = {
             ...authHeader
           },
           body: JSON.stringify(composition)
-        }).catch(error => {
+        }).catch((error) => {
           return Promise.reject(
             new Error(`Search request failed: ${error.message}`)
           )
@@ -377,7 +377,7 @@ export const resolvers: GQLResolver = {
             ...authHeader
           },
           body: JSON.stringify(composition)
-        }).catch(error => {
+        }).catch((error) => {
           return Promise.reject(
             new Error(`FHIR request failed: ${error.message}`)
           )

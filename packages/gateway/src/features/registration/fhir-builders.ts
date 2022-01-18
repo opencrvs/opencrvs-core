@@ -1869,7 +1869,9 @@ export const builders: IFieldBuilders = {
         const certDocResource = selectOrCreateCertificateDocRefResource(
           fhirBundle,
           context,
-          EVENT_TYPE.BIRTH
+          context.event === EVENT_TYPE.BIRTH
+            ? 'birth-correction'
+            : 'death-correction'
         )
         if (!certDocResource.extension) {
           certDocResource.extension = []
@@ -1882,6 +1884,64 @@ export const builders: IFieldBuilders = {
         if (!hasVerifiedExt) {
           certDocResource.extension.push({
             url: `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`,
+            valueString: fieldValue
+          })
+        } else {
+          hasVerifiedExt.valueString = fieldValue
+        }
+      },
+      attestedAndCopied: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const certDocResource = selectOrCreateCertificateDocRefResource(
+          fhirBundle,
+          context,
+          context.event === EVENT_TYPE.BIRTH
+            ? 'birth-correction'
+            : 'death-correction'
+        )
+        if (!certDocResource.extension) {
+          certDocResource.extension = []
+        }
+        const hasVerifiedExt = certDocResource.extension.find(
+          (extention) =>
+            extention.url ===
+            `${OPENCRVS_SPECIFICATION_URL}extension/attestedAndCopied`
+        )
+        if (!hasVerifiedExt) {
+          certDocResource.extension.push({
+            url: `${OPENCRVS_SPECIFICATION_URL}extension/attestedAndCopied`,
+            valueString: fieldValue
+          })
+        } else {
+          hasVerifiedExt.valueString = fieldValue
+        }
+      },
+      noSupportingDocumentationRequired: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const certDocResource = selectOrCreateCertificateDocRefResource(
+          fhirBundle,
+          context,
+          context.event === EVENT_TYPE.BIRTH
+            ? 'birth-correction'
+            : 'death-correction'
+        )
+        if (!certDocResource.extension) {
+          certDocResource.extension = []
+        }
+        const hasVerifiedExt = certDocResource.extension.find(
+          (extention) =>
+            extention.url ===
+            `${OPENCRVS_SPECIFICATION_URL}extension/noSupportingDocumentationRequired`
+        )
+        if (!hasVerifiedExt) {
+          certDocResource.extension.push({
+            url: `${OPENCRVS_SPECIFICATION_URL}extension/noSupportingDocumentationRequired`,
             valueString: fieldValue
           })
         } else {
@@ -2067,6 +2127,27 @@ export const builders: IFieldBuilders = {
       values: (fhirBundle: ITemplatedBundle, fieldValue: any, context) => {
         const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
         createActionTypesFromCorrectionValues(taskResource, fieldValue, context)
+      },
+      data: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const certDocResource = selectOrCreateCertificateDocRefResource(
+          fhirBundle,
+          context,
+          EVENT_TYPE.BIRTH
+        )
+        if (!certDocResource.content) {
+          certDocResource.content = [
+            {
+              attachment: {
+                contentType: 'application/pdf'
+              }
+            }
+          ]
+        }
+        certDocResource.content[0].attachment.data = fieldValue
       }
     },
     status: {

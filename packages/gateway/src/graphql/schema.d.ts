@@ -2118,9 +2118,12 @@ export interface GQLCorrectionValueInput {
 export interface GQLCorrectionInput {
   requester: GQLRelatedPersonInput
   hasShowedVerifiedDocument: boolean
+  attestedAndCopied: boolean
+  noSupportingDocumentationRequired: boolean
   payments: GQLPaymentInput[]
   values: GQLCorrectionValueInput[]
   location: GQLLocationInput
+  data: string
 }
 
 export interface MutationToRequestBirthRegistrationCorrectionResolver<
