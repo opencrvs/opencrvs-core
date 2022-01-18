@@ -58,7 +58,7 @@ const StyledSpinner = styled(Spinner)`
   margin: 20% auto;
 `
 
-export const SCREEN_LOCK = 'screenLock'
+const SCREEN_LOCK = 'screenLock'
 
 const TAB_ID = {
   inProgress: 'progress',

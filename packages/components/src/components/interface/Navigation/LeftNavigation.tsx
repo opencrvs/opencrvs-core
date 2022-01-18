@@ -12,7 +12,6 @@
 
 import * as React from 'react'
 import styled from 'styled-components'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 
 export interface ILeftNavigationProps {
   applicationName: string

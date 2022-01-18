@@ -21,7 +21,7 @@ export default {
 } as Meta
 
 interface IMenuAction {
-  navigation: () => React.ReactNode
+  icon: () => React.ReactNode
   handler: () => void
 }
 interface IProps {

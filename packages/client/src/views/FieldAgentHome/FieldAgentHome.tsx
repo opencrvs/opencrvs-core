@@ -34,7 +34,7 @@ import {
 } from '@client/navigation/routes'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { SEARCH_APPLICATIONS_USER_WISE } from '@client/search/queries'
-import styled, { ITheme, withTheme } from '@client/styledComponents'
+import styled, { ITheme } from '@client/styledComponents'
 import {
   EMPTY_STRING,
   FIELD_AGENT_HOME_TAB_IN_PROGRESS,
@@ -68,8 +68,7 @@ import {
 import {
   GridTable,
   ISearchInputProps,
-  Loader,
-  Spinner
+  Loader
 } from '@opencrvs/components/lib/interface'
 import { HomeContent } from '@opencrvs/components/lib/layout'
 import {

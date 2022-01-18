@@ -11,11 +11,7 @@
  */
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
-import {
-  buttonMessages,
-  constantsMessages,
-  userMessages
-} from '@client/i18n/messages'
+import { constantsMessages, userMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/header'
 import {
   goToConfig,
@@ -37,37 +33,22 @@ import { IStoreState } from '@client/store'
 import { withTheme } from '@client/styledComponents'
 import {
   BRN_DRN_TEXT,
-  FIELD_AGENT_ROLES,
   NAME_TEXT,
   NATL_ADMIN_ROLES,
   PHONE_TEXT,
-  SYS_ADMIN_ROLES,
   TRACKING_ID_TEXT
 } from '@client/utils/constants'
 import { getIndividualNameObj, IUserDetails } from '@client/utils/userUtils'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import {
-  ApplicationBlack,
-  ApplicationBlue,
   ArrowBack,
   BRN,
-  HelpBlack,
-  HelpBlue,
   Location,
-  LogoutBlack,
-  LogoutBlue,
   Phone,
   Plus,
   SearchDark,
-  SettingsBlack,
-  SettingsBlue,
-  StatsBlack,
-  StatsBlue,
-  SystemBlack,
-  SystemBlue,
   TrackingID,
-  User,
-  Users
+  User
 } from '@opencrvs/components/lib/icons'
 import {
   AppHeader,
