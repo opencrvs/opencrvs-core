@@ -8,14 +8,14 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 set -e
-echo -e "\033[32m:::::::: In the terminal on the bottom left, OpenCRVS core is starting. ::::::::\033[0m"
+echo -e "\033[32m:::::::: In the terminal on the top right, OpenCRVS core is starting. ::::::::\033[0m"
 echo
 echo -e "\033[32m:::::::: In the terminal on the bottom right, an OpenCRVS country config will start when OpenCRVS core is running ::::::::\033[0m"
 echo
 echo "Please be patient as this can still take 15 minutes if your RAM isnt high."
 echo "Please do not give up, you are nearly there.  This process cannot be interrupted."
 echo
-echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
+echo -e "\033[32m::::::::::::::::::::::::: PLEASE WAIT FOR THE LOGO :::::::::::::::::::::::::\033[0m"
 echo
 echo "Waiting till everything is finished." && wait-on -l tcp:3040
 echo

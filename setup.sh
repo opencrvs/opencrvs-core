@@ -344,9 +344,6 @@ TMUX_STARTED=1
 tmux set -p @mytitle "opencrvs-core-working"
 tmux send-keys -t opencrvs "bash setup-scripts/summary.sh" C-m
 tmux split-window -h
-tmux set -p @mytitle "opencrvs-instructions"
-tmux send-keys -t opencrvs "bash setup-scripts/instructions.sh" C-m
-tmux split-window -v -f
 
 if [ $OS == "UBUNTU" ]; then
   tmux send-keys -t opencrvs "LANGUAGES=en && yarn start" C-m
@@ -354,7 +351,7 @@ if [ $OS == "UBUNTU" ]; then
   tmux send-keys -t opencrvs "LANGUAGES=en && LOCAL_IP=$(ipconfig getifaddr en0) && yarn start" C-m
 fi
 tmux set -p @mytitle "opencrvs-core"
-tmux split-window -h
+tmux split-window -v
 tmux set -p @mytitle "opencrvs-zambia"
 DIR=$(cd "$(dirname "$0")"; pwd)
 tmux send-keys -t opencrvs "bash setup-scripts/setup-resources.sh $DIR" C-m

@@ -31,7 +31,7 @@ PATH_TO_OPEN_CRVS_CORE_DIRECTORY=$1
 echo
 echo -e "\033[32m::::::::::::::::::::::: Starting OpenCRVS Core :::::::::::::::::::::::\033[0m"
 echo
-echo -e "\033[32m:::::::: In the terminal on the left OpenCRVS core is starting ::::::::\033[0m"
+echo -e "\033[32m:::::::: In the terminal above OpenCRVS core is starting ::::::::\033[0m"
 echo
 echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
 echo
