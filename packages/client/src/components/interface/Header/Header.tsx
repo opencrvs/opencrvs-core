@@ -51,7 +51,6 @@ import {
   ApplicationBlue,
   ArrowBack,
   BRN,
-  Hamburger,
   HelpBlack,
   HelpBlue,
   Location,
@@ -82,6 +81,7 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
+import { Navigation } from '@client/components/interface/Navigation'
 
 type IProps = IntlShapeProps & {
   theme: ITheme
@@ -154,84 +154,20 @@ class HeaderComp extends React.Component<IProps, IState> {
       userDetails && userDetails.role
         ? intl.formatMessage(userMessages[userDetails.role])
         : ''
-
-    let menuItems: any[] = []
-    if (userDetails && userDetails.role) {
-      if (
-        !SYS_ADMIN_ROLES.includes(userDetails.role) &&
-        !NATL_ADMIN_ROLES.includes(userDetails.role)
-      ) {
-        menuItems = menuItems.concat([
-          {
-            icon: <ApplicationBlack />,
-            iconHover: <ApplicationBlue />,
-            label: this.props.intl.formatMessage(
-              constantsMessages.applicationTitle
-            ),
-            onClick: this.props.goToHomeAction
-          }
-        ])
-      }
-      if (!FIELD_AGENT_ROLES.includes(userDetails.role)) {
-        menuItems = menuItems.concat([
-          {
-            icon: <StatsBlack />,
-            iconHover: <StatsBlue />,
-            label: this.props.intl.formatMessage(
-              constantsMessages.performanceTitle
-            ),
-            onClick: () => this.goToPerformanceView(this.props)
-          },
-          {
-            icon: <Users />,
-            iconHover: <Users stroke={this.props.theme.colors.secondary} />,
-            label: this.props.intl.formatMessage(messages.teamTitle),
-            onClick: () => this.goToTeamView(this.props)
-          }
-        ])
-      }
-      if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
-        menuItems = menuItems.concat([
-          {
-            icon: <SystemBlack />,
-            iconHover: <SystemBlue />,
-            onClick: this.props.goToConfigAction
-          }
-        ])
-      }
-    }
-    menuItems = menuItems.concat([
-      {
-        icon: <SettingsBlack />,
-        iconHover: <SettingsBlue />,
-        label: this.props.intl.formatMessage(messages.settingsTitle),
-        onClick: this.props.goToSettings
-      },
-      {
-        icon: <HelpBlack />,
-        iconHover: <HelpBlue />,
-        label: this.props.intl.formatMessage(messages.helpTitle),
-        onClick: () => alert('Help!')
-      },
-      {
-        icon: <LogoutBlack />,
-        iconHover: <LogoutBlue />,
-        label: this.props.intl.formatMessage(buttonMessages.logout),
-        secondary: true,
-        onClick: this.logout
-      }
-    ])
-
     const userInfo = { name, role }
 
     return (
       <>
-        <Hamburger />
         <ExpandingMenu
-          menuItems={menuItems}
-          userDetails={userInfo}
           showMenu={this.state.showMenu}
-          menuCollapse={() => false}
+          menuCollapse={() => this.toggleMenu()}
+          navigation={() => (
+            <Navigation
+              navigationWidth={320}
+              menuCollapse={() => this.toggleMenu()}
+              userInfo={userInfo}
+            />
+          )}
         />
       </>
     )

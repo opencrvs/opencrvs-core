@@ -19,7 +19,6 @@ import {
 import { Header } from '@client/components/interface/Header/Header'
 import { IViewHeadingProps } from '@client/components/ViewHeading'
 import { messages as certificateMessage } from '@client/i18n/messages/views/certificate'
-import { messages } from '@client/i18n/messages/views/registrarHome'
 import {
   goToEvents,
   goToPage,
@@ -29,31 +28,22 @@ import {
 } from '@client/navigation'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import styled, { ITheme, withTheme } from '@client/styledComponents'
+import styled from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
 import { getUserLocation } from '@client/utils/userUtils'
 import NotificationToast from '@client/views/RegistrationHome/NotificationToast'
 import {
   Button,
   FloatingActionButton,
-  IButtonProps,
-  ICON_ALIGNMENT
+  IButtonProps
 } from '@opencrvs/components/lib/buttons'
-import {
-  PlusTransparentWhite,
-  StatusGray,
-  StatusGreen,
-  StatusOrange,
-  StatusProgress,
-  StatusRejected
-} from '@opencrvs/components/lib/icons'
+import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
 import { PAGE_TRANSITIONS_ENTER_TIME } from '@client/utils/constants'
 import {
   FloatingNotification,
   ISearchInputProps,
   NOTIFICATION_TYPE,
-  Spinner,
-  TopBar
+  Spinner
 } from '@opencrvs/components/lib/interface'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import ApolloClient from 'apollo-client'
@@ -67,7 +57,6 @@ import { InProgressTab } from './tabs/inProgress/inProgressTab'
 import { PrintTab } from './tabs/print/printTab'
 import { RejectTab } from './tabs/reject/rejectTab'
 import { ReviewTab } from './tabs/review/reviewTab'
-import { StatusWaitingValidation } from '@opencrvs/components/lib/icons/StatusWaitingValidation'
 import { ExternalValidationTab } from './tabs/externalValidation/externalValidationTab'
 import { Navigation } from '@client/components/interface/Navigation'
 
@@ -150,7 +139,6 @@ const BodyContainer = styled.div`
 `
 
 interface IBaseRegistrationHomeProps {
-  theme: ITheme
   language: string
   scope: Scope | null
   goToPage: typeof goToPage
@@ -340,7 +328,7 @@ export class RegistrationHomeView extends React.Component<
       registrarLocationId,
       storedApplications
     } = this.props
-    const { loading, error, data, initialSyncDone } = workqueue
+    const { loading, error, data } = workqueue
     const filteredData = filterProcessingApplicationsFromQuery(
       data,
       storedApplications
@@ -348,37 +336,7 @@ export class RegistrationHomeView extends React.Component<
 
     return (
       <>
-        <Navigation
-          tabId={tabId}
-          count={{
-            inProgress: !initialSyncDone
-              ? 0
-              : drafts.filter(
-                  (draft) =>
-                    draft.submissionStatus ===
-                    SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-                ).length +
-                (filteredData.inProgressTab.totalItems || 0) +
-                (filteredData.notificationTab.totalItems || 0),
-            readyForReview: !initialSyncDone
-              ? 0
-              : filteredData.reviewTab.totalItems,
-            sentForUpdates: !initialSyncDone
-              ? 0
-              : filteredData.rejectTab.totalItems,
-            sentForApproval:
-              this.userHasValidateScope() && !initialSyncDone
-                ? 0
-                : filteredData.approvalTab.totalItems,
-            externalValidation:
-              window.config.EXTERNAL_VALIDATION_WORKQUEUE && !initialSyncDone
-                ? 0
-                : filteredData.externalValidationTab.totalItems,
-            readyToPrint: !initialSyncDone
-              ? 0
-              : filteredData.printTab.totalItems
-          }}
-        />
+        <Navigation />
         <BodyContainer>
           {tabId === TAB_ID.inProgress && (
             <InProgressTab
@@ -554,4 +512,4 @@ export const RegistrationHome = connect(mapStateToProps, {
   goToReviewDuplicate,
   goToPrintCertificate,
   updateRegistrarWorkqueue
-})(injectIntl(withTheme(RegistrationHomeView)))
+})(injectIntl(RegistrationHomeView))

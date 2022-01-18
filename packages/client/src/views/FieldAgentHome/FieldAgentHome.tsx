@@ -33,10 +33,7 @@ import {
   REGISTRAR_HOME
 } from '@client/navigation/routes'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import {
-  COUNT_USER_WISE_APPLICATIONS,
-  SEARCH_APPLICATIONS_USER_WISE
-} from '@client/search/queries'
+import { SEARCH_APPLICATIONS_USER_WISE } from '@client/search/queries'
 import styled, { ITheme, withTheme } from '@client/styledComponents'
 import {
   EMPTY_STRING,
@@ -63,21 +60,16 @@ import {
 import { EVENT_STATUS } from '@client/views/RegistrationHome/RegistrationHome'
 import { getLanguage } from '@opencrvs/client/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
-import { LeftNavigation } from '@opencrvs/components/lib/interface/Navigation/LeftNavigation'
-import { NavigationGroup } from '@opencrvs/components/lib/interface/Navigation/NavigationGroup'
-import { NavigationItem } from '@opencrvs/components/lib/interface/Navigation/NavigationItem'
 import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
 import {
   ApplicationsOrangeAmber,
   PlusTransparentWhite
 } from '@opencrvs/components/lib/icons'
-import { LeftNavigationApplicationIcons } from '@opencrvs/components/lib/icons/LeftNavigationApplicationIcons'
 import {
   GridTable,
   ISearchInputProps,
   Loader,
-  Spinner,
-  TopBar
+  Spinner
 } from '@opencrvs/components/lib/interface'
 import { HomeContent } from '@opencrvs/components/lib/layout'
 import {
@@ -109,10 +101,6 @@ const BodyContainer = styled.div`
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin-left: 265px;
   }
-`
-
-const StyledSpinner = styled(Spinner)`
-  margin: 20% auto;
 `
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors};
@@ -326,63 +314,19 @@ class FieldAgentHomeView extends React.Component<
       userDetails,
       match,
       intl,
-      applicationsReadyToSend,
-      theme
+      applicationsReadyToSend
     } = this.props
     const tabId = match.params.tabId || TAB_ID.sentForReview
     const fieldAgentLocationId = userDetails && getUserLocation(userDetails).id
     const jurisdictionLocationId =
       userDetails && getJurisdictionLocationIdFromUserDetails(userDetails)
-    let parentQueryLoading = false
     const role = userDetails && userDetails.role
     return (
       <>
         {role && FIELD_AGENT_ROLES.includes(role) && (
           <>
-            <Query
-              query={COUNT_USER_WISE_APPLICATIONS}
-              variables={{
-                userId: userDetails ? userDetails.practitionerId : '',
-                status: [EVENT_STATUS.REJECTED],
-                locationIds: fieldAgentLocationId ? [fieldAgentLocationId] : []
-              }}
-            >
-              {({
-                loading,
-                error,
-                data
-              }: {
-                loading: any
-                data?: any
-                error?: any
-              }) => {
-                if (loading) {
-                  parentQueryLoading = true
-                  return (
-                    <StyledSpinner
-                      id="field-agent-home-spinner"
-                      baseColor={theme.colors.background}
-                    />
-                  )
-                }
-                return (
-                  <>
-                    <Header />
-                    <Navigation
-                      data={data}
-                      tabId={tabId}
-                      userScope={'field_agent'}
-                      count={{
-                        inProgress: this.props.draftApplications.length,
-                        sentForReview:
-                          this.props.applicationsReadyToSend.length,
-                        requiresUpdate: data.searchEvents.totalItems
-                      }}
-                    />
-                  </>
-                )
-              }}
-            </Query>
+            <Header />
+            <Navigation />
             <BodyContainer>
               {tabId === TAB_ID.inProgress && (
                 <InProgress
@@ -424,17 +368,13 @@ class FieldAgentHomeView extends React.Component<
                   }) => {
                     if (loading) {
                       return (
-                        <>
-                          {!parentQueryLoading && (
-                            <Loader
-                              id="require_updates_loader"
-                              marginPercent={20}
-                              loadingText={intl.formatMessage(
-                                messages.requireUpdatesLoading
-                              )}
-                            />
+                        <Loader
+                          id="require_updates_loader"
+                          marginPercent={20}
+                          loadingText={intl.formatMessage(
+                            messages.requireUpdatesLoading
                           )}
-                        </>
+                        />
                       )
                     }
                     if (error) {
@@ -564,4 +504,4 @@ export const FieldAgentHome = connect(mapStateToProps, {
   goToFieldAgentHomeTab: goToFieldAgentHomeTabAction,
   goToApplicationDetails,
   updateFieldAgentDeclaredApplications
-})(injectIntl(withTheme(withOnlineStatus(FieldAgentHomeView))))
+})(injectIntl(withOnlineStatus(FieldAgentHomeView)))

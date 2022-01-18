@@ -11,7 +11,6 @@
  */
 
 import * as React from 'react'
-import { Expandable } from './../../icons/Expandable'
 import styled from 'styled-components'
 export interface INavigationItemProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {

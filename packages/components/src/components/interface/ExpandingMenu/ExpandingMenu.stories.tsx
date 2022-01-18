@@ -99,12 +99,7 @@ const Template: Story<IProps> = () => {
   return (
     <>
       <Hamburger onClick={() => setMenu(true)} />
-      <ExpandingMenu
-        showMenu={showMenu}
-        userDetails={userDetails}
-        menuItems={menuItems}
-        menuCollapse={() => setMenu(false)}
-      />
+      <ExpandingMenu showMenu={showMenu} menuCollapse={() => setMenu(false)} />
     </>
   )
 }

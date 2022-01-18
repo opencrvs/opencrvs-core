@@ -12,15 +12,23 @@
 
 import * as React from 'react'
 import styled from 'styled-components'
+import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 
 export interface ILeftNavigationProps {
   applicationName: string
   children?: React.ReactNode
+  navigationWidth?: number
+  avatar?: () => void
+  name?: string | null
+  role?: string | null
 }
-const LeftNavigationContainer = styled.div`
+const LeftNavigationContainer = styled.div<{
+  navigationWidth?: number
+}>`
   position: fixed;
   top: 0px;
-  width: 249px;
+  width: ${({ navigationWidth }) =>
+    navigationWidth ? navigationWidth : 249}px;
   height: 100vh;
   overflow-y: auto;
   background-color: ${({ theme }) => theme.colors.white};
@@ -29,14 +37,40 @@ const LeftNavigationContainer = styled.div`
   border-style: solid;
   border-color: ${({ theme }) => theme.colors.border};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    ${({ navigationWidth }) => !navigationWidth && `display: none;`}
+  }
+`
+
+const UserInfo = styled.div`
+  background: ${({ theme }) => theme.colors.white};
+  padding: 30px 24px;
+  text-align: justify;
+  border: 0px;
+  border-bottom: 1px;
+  border-style: solid;
+  border-color: ${({ theme }) => theme.colors.border};
+  border-color: ${({ theme }) => theme.colors.border};
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
 `
+const UserName = styled.p`
+  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+  margin: 25px 0px 5px;
+`
+const Role = styled.p`
+  ${({ theme }) => theme.fonts.captionStyle};
+  margin: 0px;
+`
+
 const ApplicationNameContainer = styled.div`
   padding: 20px 20px;
   height: 64px;
   background-color: ${({ theme }) => theme.colors.white};
   border-bottom: 1px solid ${({ theme }) => theme.colors.border};
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: none;
+  }
 `
 const ApplicationName = styled.div`
   color: ${({ theme }) => theme.colors.grey};
@@ -48,10 +82,15 @@ const ApplicationName = styled.div`
 
 export const LeftNavigation = (props: ILeftNavigationProps) => {
   return (
-    <LeftNavigationContainer>
+    <LeftNavigationContainer navigationWidth={props.navigationWidth}>
       <ApplicationNameContainer>
         <ApplicationName>{props.applicationName}</ApplicationName>
       </ApplicationNameContainer>
+      <UserInfo>
+        {props.avatar && props.avatar()}
+        <UserName>{props.name && props.name}</UserName>
+        <Role>{props.role && props.role}</Role>
+      </UserInfo>
       {props.children && props.children}
     </LeftNavigationContainer>
   )
