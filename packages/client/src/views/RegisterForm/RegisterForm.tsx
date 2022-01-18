@@ -201,6 +201,12 @@ export interface IFormProps {
   duplicate?: boolean
 }
 
+export type RouteProps = RouteComponentProps<{
+  pageId: string
+  groupId: string
+  applicationId: string
+}>
+
 type DispatchProps = {
   goToPageGroup: typeof goToPageGroupAction
   goBack: typeof goBackAction
@@ -218,16 +224,14 @@ type Props = {
   setAllFieldsDirty: boolean
   fieldsToShowValidationErrors?: IFormField[]
   isWritingDraft: boolean
+  scope: Scope | null
 }
 
 export type FullProps = IFormProps &
   Props &
   DispatchProps &
-  IntlShapeProps & { scope: Scope } & RouteComponentProps<{
-    pageId: string
-    groupId?: string
-    applicationId: string
-  }>
+  IntlShapeProps &
+  RouteProps
 
 type State = {
   isDataAltered: boolean
@@ -874,16 +878,7 @@ function firstVisibleSection(form: IForm) {
   return form.sections.filter(({ viewType }) => viewType !== 'hidden')[0]
 }
 
-function mapStateToProps(
-  state: IStoreState,
-  props: IFormProps &
-    Props &
-    RouteComponentProps<{
-      pageId: string
-      groupId?: string
-      applicationId: string
-    }>
-) {
+function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
   const { match, registerForm, application } = props
 
   const sectionId = match.params.pageId || firstVisibleSection(registerForm).id
@@ -938,24 +933,22 @@ function mapStateToProps(
   }
 
   return {
-    registerForm,
-    scope: getScope(state),
-    isWritingDraft: state.applicationsState.isWritingDraft,
-    setAllFieldsDirty,
-    fieldsToShowValidationErrors: updatedFields,
     activeSection,
     activeSectionGroup: {
       ...activeSectionGroup,
       fields
     },
-    application
+    setAllFieldsDirty,
+    fieldsToShowValidationErrors: updatedFields,
+    isWritingDraft: state.applicationsState.isWritingDraft,
+    scope: getScope(state)
   }
 }
 
 export const RegisterForm = connect<
   Props,
   DispatchProps,
-  FullProps,
+  IFormProps & RouteProps,
   IStoreState
 >(mapStateToProps, {
   writeApplication,
