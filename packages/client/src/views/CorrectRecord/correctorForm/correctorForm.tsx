@@ -235,7 +235,11 @@ class CorrectorFormComponent extends React.Component<IProps, IState> {
 
       return
     }*/
-
+    console.log(
+      '------------------------------------------------------------',
+      corrector,
+      corrector.type
+    )
     this.setState({
       showError: false,
       showModalForNoSignedAffidavit: false

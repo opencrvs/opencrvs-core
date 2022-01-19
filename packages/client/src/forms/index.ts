@@ -815,7 +815,7 @@ export enum CertificateSection {
   CollectCertificate = 'collectCertificate',
   CollectDeathCertificate = 'collectDeathCertificate',
   CertificatePreview = 'certificatePreview',
-  Corrector = 'certificateCorrection'
+  Corrector = 'corrector'
 }
 export enum PaymentSection {
   Payment = 'payment'

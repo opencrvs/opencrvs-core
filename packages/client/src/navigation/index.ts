@@ -378,7 +378,7 @@ export function goToVerifyCorrector(
     formatUrl(VERIFY_CORRECTOR, {
       registrationId: registrationId.toString(),
       eventType: event.toLowerCase().toString(),
-      corrector: corrector.toLowerCase().toString()
+      corrector: corrector.toString()
     })
   )
 }
