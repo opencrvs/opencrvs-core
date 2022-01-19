@@ -16,6 +16,7 @@ import styled from 'styled-components'
 const Container = styled.div<{ size: string }>`
   z-index: 1;
   position: relative;
+  margin: 0 auto;
   max-width: ${({ size }) => (size === 'large' ? '1140px' : '778px')};
   height: 100%;
   border-radius: 4px;
