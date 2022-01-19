@@ -1191,9 +1191,12 @@ input CertificateInput {
 input CorrectionInput {
   requester: RelatedPersonInput
   hasShowedVerifiedDocument: Boolean
+  attestedAndCopied: Boolean
+  noSupportingDocumentationRequired: Boolean
   payments: [PaymentInput]
   values: [CorrectionValueInput]
   location: LocationInput
+  data: String
 }
 
 input ReasonsNotApplyingInput {
