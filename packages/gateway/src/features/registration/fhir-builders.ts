@@ -2072,11 +2072,23 @@ export const builders: IFieldBuilders = {
           fieldValue: string,
           context: any
         ) => {
+          const taskResource = selectOrCreateTaskRefResource(
+            fhirBundle,
+            context
+          )
+          const encounterRef = selectOrCreateEncounterResource(
+            fhirBundle,
+            context,
+            true
+          )
           const encounterLocationRef = selectOrCreateEncounterLocationRef(
             fhirBundle,
             context,
             true
           )
+
+          //@ts-ignore
+          taskResource.encounter = encounterRef._id
           encounterLocationRef.reference = `Location/${fieldValue}`
         },
         type: (

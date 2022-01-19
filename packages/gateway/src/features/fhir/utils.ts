@@ -138,15 +138,15 @@ export function selectOrCreatePersonResource(
 export function selectOrCreateEncounterResource(
   fhirBundle: ITemplatedBundle,
   context: any,
-  correction?: boolean
+  isCorrection?: boolean
 ): fhir.Encounter {
   let sectionCode
   if (context.event === EVENT_TYPE.BIRTH) {
-    sectionCode = correction
+    sectionCode = isCorrection
       ? BIRTH_CORRECTION_ENCOUNTER_CODE
       : BIRTH_ENCOUNTER_CODE
   } else if (context.event === EVENT_TYPE.DEATH) {
-    sectionCode = correction
+    sectionCode = isCorrection
       ? DEATH_CORRECTION_ENCOUNTER_CODE
       : DEATH_ENCOUNTER_CODE
   } else {
@@ -361,8 +361,15 @@ export function selectOrCreateLocationRefResource(
   context: any
 ): fhir.Location {
   let locationEntry
-
-  const encounter = selectOrCreateEncounterResource(fhirBundle, context)
+  const isCorrection = [
+    BIRTH_CORRECTION_ENCOUNTER_CODE,
+    DEATH_CORRECTION_ENCOUNTER_CODE
+  ].includes(sectionCode)
+  const encounter = selectOrCreateEncounterResource(
+    fhirBundle,
+    context,
+    isCorrection
+  )
 
   if (!encounter.location) {
     // create location
@@ -440,7 +447,11 @@ export function selectOrCreateEncounterLocationRef(
   context: any,
   correction?: boolean
 ): fhir.Reference {
-  const encounter = selectOrCreateEncounterResource(fhirBundle, context)
+  const encounter = selectOrCreateEncounterResource(
+    fhirBundle,
+    context,
+    correction
+  )
   if (!encounter.location) {
     encounter.location = []
     encounter.location.push({
