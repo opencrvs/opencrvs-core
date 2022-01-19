@@ -29,10 +29,10 @@
   - [**OpenHIM**](#openhim)
 - [Configuring OpenCRVS](#configuring-opencrvs)
 - [What are the key OpenSource dependencies of OpenCRVS?](#what-are-the-key-opensource-dependencies-of-opencrvs)
-    - [Hearth MongoDB Database layer](#hearth-mongodb-database-layer)
-    - [ElasticSearch](#elasticsearch)
-    - [InfluxData](#influxdata)
-    - [OpenHIM enterprise service bus, interoperability Layer](#openhim-enterprise-service-bus-interoperability-layer)
+  - [Hearth MongoDB Database layer](#hearth-mongodb-database-layer)
+  - [ElasticSearch](#elasticsearch)
+  - [InfluxData](#influxdata)
+  - [OpenHIM enterprise service bus, interoperability Layer](#openhim-enterprise-service-bus-interoperability-layer)
 - [What is inside the OpenCRVS packages?](#what-is-inside-the-opencrvs-packages)
   - [OpenCRVS microservice business layer packages](#opencrvs-microservice-business-layer-packages)
   - [OpenCRVS client application packages](#opencrvs-client-application-packages)
@@ -85,6 +85,7 @@ Dependencies are required. Ensure you have satisfied all the following requireme
    This installer script will:
 
    - Tests your dependencies
+   - Checks that required ports are available. NOTE: Latest Macbooks run AirPlay on port 5000. Some Mac users need to disable AirPlay when running OpenCRVS.
    - Download and install all Docker images
    - Check out the example OpenCRVS country configuration
    - Runs all OpenCRVS Core microservices
