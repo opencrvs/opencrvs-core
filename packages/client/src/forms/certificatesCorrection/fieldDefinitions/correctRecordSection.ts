@@ -24,7 +24,7 @@ export const correctRecordBirthSectionGroup: IFormSectionGroup = {
   title: messages.whoToRequestCertificateCorrection,
   fields: [
     {
-      name: 'type',
+      name: 'relationship',
       type: RADIO_GROUP_WITH_NESTED_FIELDS,
       size: RadioSize.LARGE,
       label: messages.whoToRequestCertificateCorrection,
@@ -45,7 +45,7 @@ export const correctRecordBirthSectionGroup: IFormSectionGroup = {
           label: formMessages.meWithRole
         },
         {
-          value: 'SOMEONE_ELSE',
+          value: 'OTHERS',
           label: formMessages.someoneElse
         }
       ],
@@ -55,8 +55,8 @@ export const correctRecordBirthSectionGroup: IFormSectionGroup = {
         CHILD: [],
         LEGAL_GUARDIAN: [],
         ANOTHER_AGENT: [],
-        REGISTER: [],
-        SOMEONE_ELSE: [
+        REGISTRAR: [],
+        OTHERS: [
           {
             name: 'otherRelationShip',
             type: 'TEXT',
@@ -86,7 +86,7 @@ export const correctRecordDeathSectionGroup: IFormSectionGroup = {
   title: messages.whoToRequestCertificateCorrection,
   fields: [
     {
-      name: 'type',
+      name: 'relationship',
       type: RADIO_GROUP_WITH_NESTED_FIELDS,
       size: RadioSize.LARGE,
       label: messages.whoToRequestCertificateCorrection,
@@ -101,14 +101,15 @@ export const correctRecordDeathSectionGroup: IFormSectionGroup = {
           label: formMessages.meWithRole
         },
         {
-          value: 'SOMEONE_ELSE',
+          value: 'OTHERS',
           label: formMessages.someoneElse
         }
       ],
       nestedFields: {
         INFORMANT: [],
         REGISTRAR: [],
-        SOMEONE_ELSE: [
+        ANOTHER_AGENT: [],
+        OTHERS: [
           {
             name: 'otherRelationShip',
             type: 'TEXT',
