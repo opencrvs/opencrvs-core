@@ -14,6 +14,7 @@ import { GQLResolver } from '@gateway/graphql/schema'
 import { hasScope } from '@gateway/features/user/utils'
 import { buildFHIRBundle } from '@gateway/features/ correction/fhir-builders'
 import { EVENT_TYPE } from '@gateway/features/fhir/constants'
+import { fetchFHIR } from '@gateway/features/fhir/utils'
 
 export const resolvers: GQLResolver = {
   Mutation: {
@@ -24,6 +25,16 @@ export const resolvers: GQLResolver = {
           authHeader,
           details,
           EVENT_TYPE.BIRTH
+        )
+      }
+    },
+    async requestDeathRegistrationCorrection(_, { id, details }, authHeader) {
+      if (hasScope(authHeader, 'register')) {
+        await requestEventRegistrationCorrection(
+          id,
+          authHeader,
+          details,
+          EVENT_TYPE.DEATH
         )
       }
     }
@@ -37,6 +48,7 @@ async function requestEventRegistrationCorrection(
   eventType: EVENT_TYPE
 ) {
   const fhirBundle = await buildFHIRBundle(reg, eventType, authHeader)
-  // TODO: fhir calls
-  return fhirBundle
+  await fetchFHIR('', authHeader, 'POST', JSON.stringify(fhirBundle))
+  // return the full composition
+  return fetchFHIR(`/Composition/${id}`, authHeader)
 }
