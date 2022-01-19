@@ -82,6 +82,7 @@ interface IFormMessages
   contactDetailsBoth: MessageDescriptor
   contactDetailsFather: MessageDescriptor
   contactDetailsMother: MessageDescriptor
+  correctorSupportDocumentTitle: MessageDescriptor
   country: MessageDescriptor
   currentAddress: MessageDescriptor
   currentAddressSameAsPermanent: MessageDescriptor
@@ -715,7 +716,12 @@ const messagesToDefine: IFormMessages = {
   contactDetailsMother: {
     defaultMessage: 'Mother',
     description: 'Label for "Mother" select option',
-    id: 'form.field.label.app.whoContDet.mother'
+    id: 'form.section.corrector.supportDocument.title'
+  },
+  correctorSupportDocumentTitle: {
+    defaultMessage: 'Upload supporting documents',
+    description: 'Title for corrector supporting document',
+    id: 'certificate.correctorSupportdocumentTitle'
   },
   country: {
     defaultMessage: 'Country',
@@ -2176,6 +2182,11 @@ const messagesToDefine: IFormMessages = {
   },
   informantWithName: {
     id: 'form.field.label.certificateCorrector.informant',
+    defaultMessage: 'Informant',
+    description: 'Label for informant option in certificate correction form'
+  },
+  CorrectorSupportDocumentCopy: {
+    id: 'form.field.label.corrector.supportDocumentCopy',
     defaultMessage: 'Informant',
     description: 'Label for informant option in certificate correction form'
   }

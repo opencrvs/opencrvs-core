@@ -14,16 +14,19 @@ import {
   correctRecordBirthSection,
   correctRecordDeathSection
 } from '@client/forms/certificatesCorrection/fieldDefinitions/correctRecordSection'
+import { correctSupportDocumentSection } from '@client/forms/certificatesCorrection/fieldDefinitions/supportDocumentSection'
 import { Action } from 'redux'
 import { IFormSection } from '@client/forms'
 
 const initialState: IRecordCorrectionFormState = {
   correctRecordBirthSection: correctRecordBirthSection,
-  correctRecordDeathSection: correctRecordDeathSection
+  correctRecordDeathSection: correctRecordDeathSection,
+  supportDocumentSection: correctSupportDocumentSection
 }
 export interface IRecordCorrectionFormState {
   correctRecordBirthSection: IFormSection
   correctRecordDeathSection: IFormSection
+  supportDocumentSection: IFormSection
 }
 
 export const correctRecordReducer: LoopReducer<
