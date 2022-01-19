@@ -70,7 +70,7 @@ export const validateScopeToken = jwt.sign(
 )
 
 export function flushPromises() {
-  return new Promise(resolve => setImmediate(resolve))
+  return new Promise((resolve) => setImmediate(resolve))
 }
 export const assign = window.location.assign as jest.Mock
 export const getItem = window.localStorage.getItem as jest.Mock
@@ -83,12 +83,12 @@ function createGraphQLClient() {
 
   return new ApolloClient({
     cache: new InMemoryCache(),
-    link: new ApolloLink(operation => {
-      return new Observable(observer => {
+    link: new ApolloLink((operation) => {
+      return new Observable((observer) => {
         const { query, operationName, variables } = operation
 
         graphql(schema, print(query), null, null, variables, operationName)
-          .then(result => {
+          .then((result) => {
             observer.next(result)
             observer.complete()
           })
@@ -134,7 +134,7 @@ export function createShallowRenderedComponent(
   return shallow(node)
 }
 
-export const wait = () => new Promise(res => process.nextTick(res))
+export const wait = () => new Promise((res) => process.nextTick(res))
 
 export const resizeWindow = (width: number, height: number) => {
   const resizeEvent = document.createEvent('Event')
@@ -159,14 +159,8 @@ export const selectOption = (
 ): ReactWrapper => {
   const input = wrapper.find(selector).hostNodes()
 
-  input
-    .find('input')
-    .simulate('focus')
-    .update()
-  input
-    .find('.react-select__control')
-    .simulate('mousedown')
-    .update()
+  input.find('input').simulate('focus').update()
+  input.find('.react-select__control').simulate('mousedown').update()
   input
     .update()
     .find('.react-select__option')
@@ -2970,10 +2964,7 @@ export const getFileFromBase64String = (
 
 export async function goToSection(component: ReactWrapper, nth: number) {
   for (let i = 0; i < nth; i++) {
-    component
-      .find('#next_section')
-      .hostNodes()
-      .simulate('click')
+    component.find('#next_section').hostNodes().simulate('click')
 
     await flushPromises()
     component.update()
@@ -3019,10 +3010,7 @@ export async function getReviewFormFromStore(
 }
 
 export async function setPinCode(component: ReactWrapper) {
-  component
-    .find('#createPinBtn')
-    .hostNodes()
-    .simulate('click')
+  component.find('#createPinBtn').hostNodes().simulate('click')
 
   for (let i = 1; i <= 8; i++) {
     component

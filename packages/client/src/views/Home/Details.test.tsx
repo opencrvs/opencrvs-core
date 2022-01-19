@@ -397,8 +397,7 @@ describe('Field Agnet tests', () => {
                 contactPhoneNumber: '01622688231',
                 status: [
                   {
-                    id:
-                      '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
+                    id: '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
                     timestamp: '2019-04-03T07:08:24.936Z',
                     user: {
                       id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
@@ -464,7 +463,7 @@ describe('Field Agnet tests', () => {
       graphqlMock
     )
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
@@ -575,7 +574,7 @@ describe('Field Agnet tests', () => {
       graphqlMock
     )
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
@@ -699,7 +698,7 @@ describe('Field Agnet tests', () => {
       graphqlMock
     )
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
@@ -781,7 +780,7 @@ describe('Field Agnet tests', () => {
       graphqlMock
     )
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
@@ -813,8 +812,7 @@ describe('Registrar tests', () => {
               certificates: null,
               status: [
                 {
-                  id:
-                    '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
+                  id: '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
                   timestamp: '2019-04-03T07:08:24.936Z',
                   user: {
                     id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
@@ -1007,8 +1005,7 @@ describe('Registrar tests', () => {
               certificates: null,
               status: [
                 {
-                  id:
-                    '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
+                  id: '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
                   timestamp: '2019-04-03T07:08:24.936Z',
                   user: {
                     id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
@@ -1110,18 +1107,18 @@ describe('Registrar tests', () => {
       graphqlMock
     )
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     getItem.mockReturnValue(registerScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     testComponent.component.update()
@@ -1135,7 +1132,7 @@ describe('Registrar tests', () => {
     ).toHaveLength(1)
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     testComponent.component.update()
@@ -1170,18 +1167,18 @@ describe('Registrar tests', () => {
       graphqlErrorMock
     )
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     getItem.mockReturnValue(registerScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     testComponent.component.update()
@@ -1195,7 +1192,7 @@ describe('Registrar tests', () => {
     ).toHaveLength(1)
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     testComponent.component.update()
@@ -1609,11 +1606,11 @@ describe('Registrar tests', () => {
       graphqlMock
     )
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     getItem.mockReturnValue(registerScopeToken)
@@ -1622,7 +1619,7 @@ describe('Registrar tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
@@ -1637,7 +1634,7 @@ describe('Registrar tests', () => {
     ).toHaveLength(1)
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 

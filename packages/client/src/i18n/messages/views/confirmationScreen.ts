@@ -67,6 +67,5 @@ const messagesToDefine: IConfirmationScreenMessages = {
   }
 }
 
-export const messages: IConfirmationScreenMessages = defineMessages(
-  messagesToDefine
-)
+export const messages: IConfirmationScreenMessages =
+  defineMessages(messagesToDefine)

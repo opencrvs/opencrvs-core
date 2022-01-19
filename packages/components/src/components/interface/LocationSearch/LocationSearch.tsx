@@ -113,7 +113,7 @@ interface IProps {
   className?: string
 }
 export class LocationSearch extends React.Component<IProps, IState> {
-  searchTimeout: number | undefined
+  searchTimeout: NodeJS.Timeout | undefined
   constructor(props: IProps) {
     super(props)
     this.state = {
@@ -170,13 +170,15 @@ export class LocationSearch extends React.Component<IProps, IState> {
   }
 
   debounce(callback: () => void, duration: number) {
-    clearTimeout(this.searchTimeout)
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout)
+    }
     this.searchTimeout = setTimeout(callback, duration)
   }
 
   onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     const text = event.target.value
-    this.setState(_ => ({
+    this.setState((_) => ({
       selectedText: text
     }))
     this.debounce(() => this.search(text), SEARCH_DEBOUNCE_DURATION)
@@ -216,7 +218,7 @@ export class LocationSearch extends React.Component<IProps, IState> {
       this.props.searchHandler(item)
     }
 
-    this.setState(_ => ({
+    this.setState((_) => ({
       dropDownIsVisible: false,
       selectedItem: item,
       selectedText: item.displayLabel
@@ -227,7 +229,7 @@ export class LocationSearch extends React.Component<IProps, IState> {
     return (
       this.state.dropDownIsVisible && (
         <DropDownWrapper>
-          {this.state.filteredList.map(item => {
+          {this.state.filteredList.map((item) => {
             return (
               <DropDownItem
                 id={`locationOption${item.id}`}

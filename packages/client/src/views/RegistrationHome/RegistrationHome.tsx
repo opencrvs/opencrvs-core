@@ -213,7 +213,7 @@ export class RegistrationHomeView extends React.Component<
       externalValidationCurrentPage: 1,
       showCertificateToast: Boolean(
         this.props.applications.filter(
-          item => item.submissionStatus === SUBMISSION_STATUS.READY_TO_CERTIFY
+          (item) => item.submissionStatus === SUBMISSION_STATUS.READY_TO_CERTIFY
         ).length
       )
     }
@@ -273,7 +273,7 @@ export class RegistrationHomeView extends React.Component<
 
   subtractApplicationsWithStatus(count: number, status: string[]) {
     const outboxCount = this.props.storedApplications.filter(
-      app => app.submissionStatus && status.includes(app.submissionStatus)
+      (app) => app.submissionStatus && status.includes(app.submissionStatus)
     ).length
     return count - outboxCount
   }
@@ -354,7 +354,7 @@ export class RegistrationHomeView extends React.Component<
             {!initialSyncDone
               ? '?'
               : drafts.filter(
-                  draft =>
+                  (draft) =>
                     draft.submissionStatus ===
                     SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
                 ).length +

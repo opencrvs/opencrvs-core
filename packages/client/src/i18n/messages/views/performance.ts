@@ -284,6 +284,5 @@ const messagesToDefine: IPerformanceReportsMessages = {
   }
 }
 
-export const messages: IPerformanceReportsMessages = defineMessages(
-  messagesToDefine
-)
+export const messages: IPerformanceReportsMessages =
+  defineMessages(messagesToDefine)

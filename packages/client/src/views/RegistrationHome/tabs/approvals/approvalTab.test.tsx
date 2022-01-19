@@ -412,7 +412,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 200)
     })
     testComponent.component.update()
@@ -420,7 +420,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
 
     instance.toggleExpanded('bc09200d-0160-43b4-9e2b-5b9e90424e95')
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     testComponent.component.update()
@@ -522,7 +522,7 @@ describe('Tablet tests', () => {
     const element = await waitForElement(testComponent.component, '#row_0')
     element.hostNodes().simulate('click')
 
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     testComponent.component.update()

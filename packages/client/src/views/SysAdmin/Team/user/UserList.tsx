@@ -95,7 +95,7 @@ const ErrorText = styled.div`
   text-align: center;
   margin-top: 100px;
 `
-const StatusBox = styled.span`
+const StatusBox = styled.div`
   padding: 4px 8px;
   ${({ theme }) => theme.fonts.captionBold};
   border-radius: 2px;
@@ -246,9 +246,8 @@ export const Status = (statusProps: IStatusProps) => {
 }
 
 function UserListComponent(props: IProps) {
-  const [showResendSMSSuccess, setShowResendSMSSuccess] = useState<boolean>(
-    false
-  )
+  const [showResendSMSSuccess, setShowResendSMSSuccess] =
+    useState<boolean>(false)
   const [showResendSMSError, setShowResendSMSError] = useState<boolean>(false)
 
   const {
@@ -262,14 +261,13 @@ function UserListComponent(props: IProps) {
     location: { search }
   } = props
 
-  const { locationId, viewOnly } = (parse(search) as unknown) as ISearchParams
+  const { locationId, viewOnly } = parse(search) as unknown as ISearchParams
 
-  const [toggleActivation, setToggleActivation] = useState<
-    ToggleUserActivation
-  >({
-    modalVisible: false,
-    selectedUser: null
-  })
+  const [toggleActivation, setToggleActivation] =
+    useState<ToggleUserActivation>({
+      modalVisible: false,
+      selectedUser: null
+    })
 
   const [viewportWidth, setViewportWidth] = useState<number>(window.innerWidth)
   useEffect(() => {

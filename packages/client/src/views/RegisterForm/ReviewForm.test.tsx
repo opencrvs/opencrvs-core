@@ -115,7 +115,7 @@ describe('ReviewForm tests', () => {
       graphqlMock
     )
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 0)
     })
 
@@ -283,7 +283,7 @@ describe('ReviewForm tests', () => {
       graphqlMock
     )
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 0)
     })
 
@@ -449,7 +449,7 @@ describe('ReviewForm tests', () => {
       graphqlMock
     )
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 0)
     })
     testComponent.component.update()
@@ -458,8 +458,10 @@ describe('ReviewForm tests', () => {
       .find(RegisterForm)
       .prop('application') as IApplication
     expect(
-      ((data.data.registration.contactPoint as IFormSectionData)
-        .nestedFields as IFormSectionData).registrationPhone
+      (
+        (data.data.registration.contactPoint as IFormSectionData)
+          .nestedFields as IFormSectionData
+      ).registrationPhone
     ).toBe('01733333333')
   })
   it('when registration has attachment', async () => {
@@ -555,7 +557,7 @@ describe('ReviewForm tests', () => {
       graphqlMock
     )
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 0)
     })
 
@@ -719,7 +721,7 @@ describe('ReviewForm tests', () => {
       graphqlMock
     )
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 0)
     })
 
@@ -1113,7 +1115,7 @@ describe('ReviewForm tests', () => {
       store
     )
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 0)
     })
 
@@ -1192,7 +1194,7 @@ describe('ReviewForm tests', () => {
       store
     )
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 0)
     })
 
@@ -1476,7 +1478,7 @@ describe('ReviewForm tests', () => {
         graphqlMock
       )
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 0)
       })
 
@@ -1790,7 +1792,7 @@ describe('ReviewForm tests', () => {
         graphqlMock
       )
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 0)
       })
 
@@ -1882,7 +1884,7 @@ describe('ReviewForm tests', () => {
         store,
         graphqlMock
       )
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 0)
       })
 

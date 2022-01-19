@@ -14,7 +14,7 @@ import { RouteComponentProps } from 'react-router'
 import {
   RegisterForm,
   IFormProps,
-  FullProps
+  RouteProps
 } from '@opencrvs/client/src/views/RegisterForm/RegisterForm'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
@@ -23,29 +23,22 @@ import {
 import { getRegisterForm } from '@opencrvs/client/src/forms/register/application-selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { connect } from 'react-redux'
-import { Event, IForm } from '@client/forms'
-import { IApplication } from '@client/applications'
+import { Event } from '@client/forms'
 
 const pageRoute: { [key in Event]: string } = {
   birth: DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
   death: DRAFT_DEATH_FORM_PAGE_GROUP
 }
-export class ApplicationFormView extends React.Component<FullProps> {
+
+export class ApplicationFormView extends React.Component<
+  IFormProps & RouteProps
+> {
   render() {
     return <RegisterForm {...this.props} />
   }
 }
 
-interface StateProps {
-  application: IApplication
-  registerForm: IForm
-  pageRoute: string
-}
-
-function mapStatetoProps(
-  state: IStoreState,
-  props: RouteComponentProps<{ pageId: string; applicationId: string }>
-): StateProps {
+function mapStatetoProps(state: IStoreState, props: RouteProps) {
   const { match } = props
   const application = state.applicationsState.applications.find(
     ({ id }) => id === match.params.applicationId
@@ -70,14 +63,6 @@ function mapStatetoProps(
   }
 }
 
-export const ApplicationForm = connect<
-  StateProps,
-  {},
-  IFormProps &
-    RouteComponentProps<{
-      pageId: string
-      groupId: string
-      applicationId: string
-    }>,
-  IStoreState
->(mapStatetoProps)(ApplicationFormView)
+export const ApplicationForm = connect<IFormProps, {}, RouteProps, IStoreState>(
+  mapStatetoProps
+)(ApplicationFormView)

@@ -41,7 +41,7 @@ class CertificationPaymentReportComponent extends React.Component<FullProps> {
   getContent = () => {
     return (
       (this.props.data.details &&
-        this.props.data.details.map(payment => ({
+        this.props.data.details.map((payment) => ({
           location: getLocationFromPartOfLocationId(
             payment.locationId,
             this.props.offlineResources

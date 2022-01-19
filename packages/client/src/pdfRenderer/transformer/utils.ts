@@ -44,7 +44,7 @@ export function getValueFromApplicationDataByKey(
 
   let valueObject: IFormSectionData | IFormFieldValue | null = null
 
-  keyTree.forEach(keyNode => {
+  keyTree.forEach((keyNode) => {
     valueObject =
       valueObject === null
         ? data[keyNode] || null
@@ -112,7 +112,7 @@ export function getMatchedCondition(
   conditions: Condition[],
   applicationData: IFormData
 ) {
-  return conditions.find(conditionObj => {
+  return conditions.find((conditionObj) => {
     try {
       if (!conditionObj.condition) {
         return true

@@ -72,24 +72,15 @@ describe('verify collector tests', () => {
         )
       ).component
 
-      expect(
-        testComponent
-          .find('#service')
-          .hostNodes()
-          .text()
-      ).toContain('Birth')
+      expect(testComponent.find('#service').hostNodes().text()).toContain(
+        'Birth'
+      )
 
-      expect(
-        testComponent
-          .find('#amountDue')
-          .hostNodes()
-          .text()
-      ).toContain('50')
+      expect(testComponent.find('#amountDue').hostNodes().text()).toContain(
+        '50'
+      )
 
-      testComponent
-        .find('#Continue')
-        .hostNodes()
-        .simulate('click')
+      testComponent.find('#Continue').hostNodes().simulate('click')
     })
 
     it('print payment receipt', async () => {
@@ -113,10 +104,7 @@ describe('verify collector tests', () => {
         )
       ).component
 
-      testComponent
-        .find('#print-receipt')
-        .hostNodes()
-        .simulate('click')
+      testComponent.find('#print-receipt').hostNodes().simulate('click')
 
       expect(printMoneyReceiptSpy).toBeCalled()
     })
@@ -168,12 +156,9 @@ describe('verify collector tests', () => {
         )
       ).component
 
-      expect(
-        testComponent
-          .find('#service')
-          .hostNodes()
-          .text()
-      ).toContain('Death')
+      expect(testComponent.find('#service').hostNodes().text()).toContain(
+        'Death'
+      )
     })
   })
 })

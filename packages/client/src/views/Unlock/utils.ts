@@ -18,7 +18,7 @@ async function loadUserPin() {
     (await storage.getItem('USER_DATA')) as string
   ) as IUserData[]
   const currentUserData = allUserData.find(
-    user => user.userID === currentUserID
+    (user) => user.userID === currentUserID
   ) as IUserData
   return currentUserData.userPIN as string
 }

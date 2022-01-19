@@ -73,7 +73,7 @@ export const generateInCompleteFieldPoints = async (
     task &&
     task.extension &&
     task.extension.find(
-      extension =>
+      (extension) =>
         extension.url ===
         `${OPENCRVS_SPECIFICATION_URL}extension/in-complete-fields`
     )
@@ -102,22 +102,24 @@ export const generateInCompleteFieldPoints = async (
     authHeader
   )
 
-  return inCompleteFieldExtension.valueString.split(',').map(missingFieldId => {
-    const missingFieldIds = missingFieldId.split('/')
-    const tags: IInProgressApplicationTags = {
-      missingFieldSectionId: missingFieldIds[0],
-      missingFieldGroupId: missingFieldIds[1],
-      missingFieldId: missingFieldIds[2],
-      eventType: getApplicationType(task) as string,
-      regStatus: 'IN_PROGESS',
-      ...locationTags
-    }
-    return {
-      measurement: 'in_complete_fields',
-      tags,
-      fields
-    }
-  })
+  return inCompleteFieldExtension.valueString
+    .split(',')
+    .map((missingFieldId) => {
+      const missingFieldIds = missingFieldId.split('/')
+      const tags: IInProgressApplicationTags = {
+        missingFieldSectionId: missingFieldIds[0],
+        missingFieldGroupId: missingFieldIds[1],
+        missingFieldId: missingFieldIds[2],
+        eventType: getApplicationType(task) as string,
+        regStatus: 'IN_PROGESS',
+        ...locationTags
+      }
+      return {
+        measurement: 'in_complete_fields',
+        tags,
+        fields
+      }
+    })
 }
 
 export const generateBirthRegPoint = async (

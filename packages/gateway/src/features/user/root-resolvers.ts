@@ -177,8 +177,8 @@ export const resolvers: GQLResolver = {
         authHeader
       )
 
-      const fieldAgentList: GQLSearchFieldAgentResponse[] = userResponse.results.map(
-        (user: IUserModelData) => {
+      const fieldAgentList: GQLSearchFieldAgentResponse[] =
+        userResponse.results.map((user: IUserModelData) => {
           const metricsData = metricsForPractitioners.find(
             (metricsForPractitioner: { practitionerId: string }) =>
               metricsForPractitioner.practitionerId === user.practitionerId
@@ -199,8 +199,7 @@ export const resolvers: GQLResolver = {
             averageTimeForDeclaredApplications:
               metricsData?.averageTimeForDeclaredApplications ?? 0
           }
-        }
-      )
+        })
 
       return {
         results: fieldAgentList,

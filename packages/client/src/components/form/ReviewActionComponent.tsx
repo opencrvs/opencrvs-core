@@ -307,7 +307,7 @@ class ReviewActionComponent extends React.Component<
 > {
   state = { showSubmitModal: false }
   toggleSubmitModalOpen = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       showSubmitModal: !prevState.showSubmitModal
     }))
   }
