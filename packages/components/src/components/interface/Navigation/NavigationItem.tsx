@@ -35,9 +35,7 @@ const ItemContainer = styled.button<{ isSelected?: boolean }>`
     background-color: ${({ theme }) => theme.colors.greyHover};
   }
   :focus {
-    border: 2px;
-    border-style: solid;
-    border-color: ${({ theme }) => theme.colors.focus};
+    box-shadow: inset 0px 0px 0px 2px ${({ theme }) => theme.colors.focus};
   }
 `
 

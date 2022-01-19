@@ -27,18 +27,19 @@ export const SubItemContainer = styled.button<{ isSelected?: boolean }>`
   }
   outline: none;
   :focus {
-    border: 2px;
-    border-style: solid;
-    border-color: ${({ theme }) => theme.colors.focus};
+    box-shadow: inset 0px 0px 0px 2px ${({ theme }) => theme.colors.focus};
   }
   cursor: pointer;
-  padding: 7px 38px 9px 46px;
   width: 100%;
   height: 38px;
   text-align: left;
   color: ${({ isSelected, theme }) =>
     isSelected ? theme.colors.grey : theme.colors.greyLight};
   ${({ theme }) => theme.fonts.chartLegendStyle};
+`
+
+const LabelContainer = styled.div`
+  padding: 7px 38px 9px 46px;
 `
 
 export const NavigationSubItem = ({
@@ -48,7 +49,7 @@ export const NavigationSubItem = ({
 }: INavigationSubItemProps) => {
   return (
     <SubItemContainer isSelected={isSelected} {...otherProps}>
-      {label}
+      <LabelContainer>{label}</LabelContainer>
     </SubItemContainer>
   )
 }

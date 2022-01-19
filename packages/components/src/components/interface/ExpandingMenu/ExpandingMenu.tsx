@@ -62,7 +62,7 @@ const NavigationContainer = styled.div`
 interface IProps {
   showMenu: boolean
   menuCollapse: () => void
-  navigation: () => React.ReactNode
+  navigation?: () => React.ReactNode
 }
 
 export class ExpandingMenu extends React.Component<IProps> {
@@ -79,7 +79,7 @@ export class ExpandingMenu extends React.Component<IProps> {
         <NavigationMainWrapper onClick={() => this.props.menuCollapse()}>
           <Backdrop />
           <NavigationContainer onClick={(e) => e.stopPropagation()}>
-            {this.props.navigation()}
+            {this.props.navigation && this.props.navigation()}
           </NavigationContainer>
         </NavigationMainWrapper>
       )
