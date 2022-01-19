@@ -86,7 +86,7 @@ export const correctRecordDeathSectionGroup: IFormSectionGroup = {
   title: messages.whoToRequestCertificateCorrection,
   fields: [
     {
-      name: 'type',
+      name: 'relationship',
       type: RADIO_GROUP_WITH_NESTED_FIELDS,
       size: RadioSize.LARGE,
       label: messages.whoToRequestCertificateCorrection,

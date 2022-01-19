@@ -20,7 +20,8 @@ import {
   modifyApplication,
   storeApplication,
   writeApplication,
-  IPrintableApplication
+  IPrintableApplication,
+  ICertificate
 } from '@client/applications'
 import { FormFieldGenerator } from '@client/components/form'
 import {
@@ -46,7 +47,6 @@ import {
   goToPrintCertificate,
   goToPrintCertificatePayment,
   goToReviewCertificate,
-  goToVerifyCollector,
   goToVerifyCorrector
 } from '@client/navigation'
 import { CERTIFICATE_CORRECTION } from '@client/navigation/routes'
@@ -181,6 +181,30 @@ class CorrectorFormComponent extends React.Component<IProps, IState> {
     }
   }
 
+  modifyApplication = (
+    sectionData: ICertificate['corrector'],
+    application: IPrintableApplication
+  ) => {
+    const certificates = application.data.registration.certificates
+    const certificate = (certificates && certificates[0]) || {}
+    const corrector = { ...(certificate.corrector || {}), ...sectionData }
+
+    this.props.modifyApplication({
+      ...application,
+      data: {
+        ...application.data,
+        registration: {
+          ...application.data.registration,
+          certificates: [
+            {
+              corrector: corrector,
+              hasShowedVerifiedDocument: false
+            }
+          ]
+        }
+      }
+    })
+  }
   continueButtonHandler = (
     applicationId: string,
     currentGroup: string,
@@ -192,11 +216,11 @@ class CorrectorFormComponent extends React.Component<IProps, IState> {
   ) => {
     if (!draft) return
 
-    const errors = getErrorsOnFieldsBySection(sectionId, fields, draft)
+    /*const errors = getErrorsOnFieldsBySection(sectionId, fields, draft)
     const errorValues = Object.values(errors).map(Object.values)
     const errLength = flatten(errorValues).filter(
       (errs) => errs.length > 0
-    ).length
+    ).length*/
 
     const certificates = draft.data.registration.certificates
     const certificate = (certificates && certificates[0]) || {}
@@ -204,33 +228,23 @@ class CorrectorFormComponent extends React.Component<IProps, IState> {
       sectionId as keyof typeof certificate
     ] as IFormSectionData
 
-    if (errLength > 0) {
+    /*if (errLength > 0) {
       this.setState({
         showError: true
       })
 
       return
-    }
+    }*/
 
     this.setState({
       showError: false,
       showModalForNoSignedAffidavit: false
     })
-    if (!nextGroup) {
-      this.props.writeApplication(draft)
-
-      if (isCertificateForPrintInAdvance(draft)) {
-        this.props.goToReviewCertificate(applicationId, event)
-      } else {
-        this.props.goToVerifyCorrector(
-          applicationId,
-          event,
-          corrector.type as string
-        )
-      }
-    } else {
-      this.props.goToPrintCertificate(applicationId, event, nextGroup)
-    }
+    this.props.goToVerifyCorrector(
+      applicationId,
+      event,
+      corrector.type as string
+    )
   }
 
   goToNextFormForSomeoneElse = (
@@ -356,6 +370,7 @@ class CorrectorFormComponent extends React.Component<IProps, IState> {
                   showError: false
                 })
               }
+              this.modifyApplication(values, applicationToBeCertified)
             }}
             setAllFieldsDirty={false}
             fields={formGroup.fields}
@@ -560,7 +575,7 @@ export const CorrectorForm = connect(mapStateToProps, {
   writeApplication,
   modifyApplication,
   goToPrintCertificate,
-  goToVerifyCollector,
+  goToVerifyCorrector,
   goToReviewCertificate,
   goToPrintCertificatePayment
 })(injectIntl(withTheme(CorrectorFormComponent)))

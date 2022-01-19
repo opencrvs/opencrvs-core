@@ -13,7 +13,7 @@ import { LoopReducer, Loop } from 'redux-loop'
 import {
   correctRecordBirthSection,
   correctRecordDeathSection
-} from '@client/forms/certificate/fieldDefinitions/correctRecordSection'
+} from '@client/forms/certificatesCorrection/fieldDefinitions/correctRecordSection'
 import { Action } from 'redux'
 import { IFormSection } from '@client/forms'
 

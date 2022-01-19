@@ -214,6 +214,7 @@ export type ICertificate = {
   hasShowedVerifiedDocument?: boolean
   payments?: Payment
   data?: string
+  corrector?: Partial<{ type: Relation }>
 }
 
 /*

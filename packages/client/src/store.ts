@@ -62,7 +62,7 @@ import { userFormReducer, IUserFormState } from '@client/user/userReducer'
 import {
   correctRecordReducer,
   IRecordCorrectionFormState
-} from './forms/certificate/recordCorrectionReducer'
+} from './forms/certificatesCorrection/recordCorrectionReducer'
 
 export interface IStoreState {
   profile: ProfileState
