@@ -104,31 +104,43 @@ class VerifyVerifyCorrectorComponent extends React.Component<IFullProps> {
     const { intl, application, offlineResources } = this.props
     const info = application.data[corrector]
     //TODO :: we have to get form defination from new certificateCorrectorDefination
-    const fields =
-      offlineResources.forms.certificateCorrectorDefinition[application.event][
-        corrector
-      ]
-    const iD = info[fields.identifierField] as string
-    const iDType = (info[fields.identifierTypeField] ||
-      info[fields.identifierOtherTypeField]) as string
+    const showInfoFor = ['mother', 'father', 'child']
+    if (showInfoFor.includes(corrector)) {
+      const fields =
+        offlineResources.forms.certificateCorrectorDefinition[
+          application.event
+        ][corrector]
+      const iD = info[fields.identifierField] as string
+      const iDType = (info[fields.identifierTypeField] ||
+        info[fields.identifierOtherTypeField]) as string
 
-    const firstNames = info[
-      fields.nameFields[intl.locale].firstNamesField
-    ] as string
-    const familyName = info[
-      fields.nameFields[intl.locale].familyNameField
-    ] as string
+      const firstNames = info[
+        fields.nameFields[intl.locale].firstNamesField
+      ] as string
+      const familyName = info[
+        fields.nameFields[intl.locale].familyNameField
+      ] as string
 
-    const birthDate = info[fields.birthDateField] as string
-    const nationality = info[fields.nationalityField] as string
+      const birthDate = info[fields.birthDateField] as string
+      const nationality = info[fields.nationalityField] as string
 
-    return {
-      iD,
-      iDType,
-      firstNames,
-      familyName,
-      birthDate,
-      nationality
+      return {
+        iD,
+        iDType,
+        firstNames,
+        familyName,
+        birthDate,
+        nationality
+      }
+    } else {
+      return {
+        iD: '',
+        iDType: '',
+        firstNames: '',
+        familyName: '',
+        birthDate: '',
+        nationality: ''
+      }
     }
   }
 
@@ -137,7 +149,7 @@ class VerifyVerifyCorrectorComponent extends React.Component<IFullProps> {
     const { intl } = this.props
     const correctorInfo = this.getGenericCorrectorInfo(corrector)
     const hasNoInfo = Object.values(correctorInfo).every(
-      (property) => property === null || property === undefined
+      (property) => property === '' || property === null
     )
 
     return (
