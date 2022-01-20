@@ -88,6 +88,7 @@ export const countries = [
   { value: 'EST', label: messages.EST },
   { value: 'SWZ', label: messages.SWZ },
   { value: 'ETH', label: messages.ETH },
+  { value: 'FAR', label: messages.FAR },
   { value: 'FLK', label: messages.FLK },
   { value: 'FRO', label: messages.FRO },
   { value: 'FJI', label: messages.FJI },
