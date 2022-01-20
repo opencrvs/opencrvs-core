@@ -31,7 +31,7 @@ export const getBase64String = (file: File) => {
         return resolve(reader.result)
       }
     }
-    reader.onerror = error => reject(error)
+    reader.onerror = (error) => reject(error)
   })
 }
 

@@ -370,7 +370,7 @@ class SettingsView extends React.Component<IProps, IState> {
             <Right>
               <ImageLoader
                 onImageLoaded={this.handleImageLoaded}
-                onError={error => console.log(error)}
+                onError={(error) => console.log(error)}
               >
                 <Avatar
                   className="tablet"
