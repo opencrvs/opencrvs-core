@@ -46,7 +46,6 @@
     "hapi-auth-jwt2": "10.2.0",
     "hapi-boom-decorators": "^3.0.0",
     "hapi-pino": "^8.5.0",
-    "hapijs-status-monitor": "^0.6.0",
     "joi": "^17.3.0",
     "jsonwebtoken": "^8.3.0",
     "jwt-decode": "^2.2.0",
