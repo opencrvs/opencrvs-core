@@ -21,6 +21,7 @@ interface ICertificateMessages
   certificateReceiptHeader: MessageDescriptor
   certificateReceiptSubHeader: MessageDescriptor
   collectPayment: MessageDescriptor
+  CorrectCertificate: MessageDescriptor
   dateOfBirth: MessageDescriptor
   familyName: MessageDescriptor
   familyNameInEng: MessageDescriptor
@@ -118,6 +119,11 @@ const messagesToDefine: ICertificateMessages = {
     defaultMessage: 'Correct record',
     description: 'The title of correct certificate action',
     id: 'correct.certificate.section.title'
+  },
+  CorrectCertificate: {
+    defaultMessage: 'Correct',
+    description: 'The title of Correct button in list expansion actions',
+    id: 'correct.certificate.SupportDocument.form.name'
   },
   collectPayment: {
     defaultMessage:

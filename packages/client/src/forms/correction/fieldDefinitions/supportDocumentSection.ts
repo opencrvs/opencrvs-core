@@ -105,7 +105,7 @@ export const correctSupportDocumentSectionGroup: IFormSectionGroup = {
 export const correctSupportDocumentSection: IFormSection = {
   id: CertificateSection.Corrector,
   viewType: 'form',
-  name: messages.printCertificate,
-  title: messages.certificateCollectionTitle,
+  name: messages.CorrectCertificate,
+  title: messages.correctRecordTitle,
   groups: [correctSupportDocumentSectionGroup]
 }
