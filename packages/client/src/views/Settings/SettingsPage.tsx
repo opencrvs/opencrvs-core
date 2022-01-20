@@ -22,7 +22,7 @@ import { IUserDetails } from '@client/utils/userUtils'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import styled from '@client/styledComponents'
 import { Header } from '@client/components/interface/Header/Header'
-import { AvatarLarge, Avatar } from '@opencrvs/components/lib/icons'
+import { AvatarLarge, Avatar } from '@client/components/Avatar'
 import { DataSection } from '@opencrvs/components/lib/interface/ViewData'
 import {
   ResponsiveModal,
@@ -332,8 +332,8 @@ class SettingsView extends React.Component<IProps, IState> {
               </Version>
             </Left>
             <Right>
-              <Avatar className="tablet" />
-              <AvatarLarge className="desktop" />
+              <Avatar className="tablet" name={englishName} />
+              <AvatarLarge className="desktop" name={englishName} />
             </Right>
           </Content>
         </Container>

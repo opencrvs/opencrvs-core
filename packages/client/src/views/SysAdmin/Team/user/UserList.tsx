@@ -36,10 +36,10 @@ import { UserStatus } from '@client/views/SysAdmin/Team/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import {
   AddUser,
-  AvatarSmall,
   VerticalThreeDots,
   SearchRed
 } from '@opencrvs/components/lib/icons'
+import { AvatarSmall } from '@client/components/Avatar'
 import {
   ColumnContentAlignment,
   ListTable,
@@ -389,7 +389,7 @@ function UserListComponent(props: IProps) {
   ) {
     return (
       <PhotoNameRoleContainer>
-        <AvatarSmall />
+        <AvatarSmall name={name} />
         <MarginPhotoRight />
         <NameRoleTypeContainer>
           <Name
@@ -407,7 +407,7 @@ function UserListComponent(props: IProps) {
   function getPhotoNameType(id: string, name: string) {
     return (
       <>
-        <AvatarSmall />
+        <AvatarSmall name={name} />
         <MarginPhotoRight />
         <LinkButton
           id={`name-link-${id}`}
