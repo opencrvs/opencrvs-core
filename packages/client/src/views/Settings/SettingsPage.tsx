@@ -40,6 +40,9 @@ import { modifyUserDetails as modifyUserDetailsAction } from '@client/profile/pr
 import { getDefaultLanguage, getAvailableLanguages } from '@client/i18n/utils'
 import { IntlState } from '@client/i18n/reducer'
 import { PasswordChangeModal } from '@client/views/Settings/PasswordChangeModal'
+import { AvatarChangeModal } from './AvatarChangeModal'
+import { ImageLoader } from './ImageLoader'
+import { IImage } from '@client/utils/imageUtils'
 
 const Container = styled.div`
   ${({ theme }) => theme.shadows.mistyShadow};
@@ -133,6 +136,7 @@ const CancelButton = styled(TertiaryButton)`
     padding: 0;
   }
 `
+
 type IProps = IntlShapeProps & {
   language: string
   languages: IntlState['languages']
@@ -142,6 +146,7 @@ type IProps = IntlShapeProps & {
 
 enum NOTIFICATION_SUBJECT {
   LANGUAGE,
+  AVATAR,
   PASSWORD
 }
 
@@ -150,7 +155,9 @@ interface IState {
   selectedLanguage: string
   showSuccessNotification: boolean
   showPasswordChange: boolean
+  showChangeAvatar: boolean
   notificationSubject: NOTIFICATION_SUBJECT | null
+  image: IImage
 }
 
 interface ILanguageOptions {
@@ -165,6 +172,11 @@ class SettingsView extends React.Component<IProps, IState> {
       showSuccessNotification: false,
       selectedLanguage: this.props.language,
       showPasswordChange: false,
+      showChangeAvatar: false,
+      image: {
+        type: '',
+        data: ''
+      },
       notificationSubject: null
     }
   }
@@ -179,6 +191,12 @@ class SettingsView extends React.Component<IProps, IState> {
     this.setState((state) => ({
       showSuccessNotification: !state.showSuccessNotification,
       notificationSubject: subject
+    }))
+  }
+
+  toggleAvatarChangeModal = () => {
+    this.setState((state) => ({
+      showChangeAvatar: !state.showChangeAvatar
     }))
   }
 
@@ -204,9 +222,27 @@ class SettingsView extends React.Component<IProps, IState> {
       this.toggleSuccessNotification(NOTIFICATION_SUBJECT.LANGUAGE)
     }
   }
+
   changePassword = () => {
     this.togglePasswordChangeModal()
     this.toggleSuccessNotification(NOTIFICATION_SUBJECT.PASSWORD)
+  }
+
+  changeAvatar = (avatar: IImage) => {
+    if (this.props.userDetails) {
+      this.props.userDetails.avatar = avatar
+      this.props.modifyUserDetails(this.props.userDetails)
+
+      this.toggleAvatarChangeModal()
+      this.toggleSuccessNotification(NOTIFICATION_SUBJECT.AVATAR)
+    }
+  }
+
+  handleImageLoaded = (image: IImage) => {
+    this.setState({
+      image
+    })
+    this.toggleAvatarChangeModal()
   }
 
   render() {
@@ -332,8 +368,18 @@ class SettingsView extends React.Component<IProps, IState> {
               </Version>
             </Left>
             <Right>
-              <Avatar className="tablet" name={englishName} />
-              <AvatarLarge className="desktop" name={englishName} />
+              <ImageLoader onImageLoaded={this.handleImageLoaded}>
+                <Avatar
+                  className="tablet"
+                  avatar={userDetails?.avatar}
+                  name={englishName}
+                />
+                <AvatarLarge
+                  className="desktop"
+                  avatar={userDetails?.avatar}
+                  name={englishName}
+                />
+              </ImageLoader>
             </Right>
           </Content>
         </Container>
@@ -377,6 +423,12 @@ class SettingsView extends React.Component<IProps, IState> {
             placeholder=""
           />
         </ResponsiveModal>
+        <AvatarChangeModal
+          cancelAvatarChangeModal={this.toggleAvatarChangeModal}
+          showChangeAvatar={this.state.showChangeAvatar}
+          image={this.state.image}
+          onAvatarChanged={this.changeAvatar}
+        />
         <PasswordChangeModal
           togglePasswordChangeModal={this.togglePasswordChangeModal}
           showPasswordChange={this.state.showPasswordChange}
@@ -400,6 +452,11 @@ class SettingsView extends React.Component<IProps, IState> {
           {/* Success notification message for Password Change */}
           {this.state.notificationSubject === NOTIFICATION_SUBJECT.PASSWORD && (
             <FormattedMessage {...messages.passwordUpdated} />
+          )}
+
+          {/* Success notification message for Avatar Change */}
+          {this.state.notificationSubject === NOTIFICATION_SUBJECT.AVATAR && (
+            <FormattedMessage {...messages.avatarUpdated} />
           )}
         </Notification>
       </>
