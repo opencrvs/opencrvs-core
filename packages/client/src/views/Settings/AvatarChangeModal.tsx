@@ -77,6 +77,10 @@ const DefaultImage = styled.div<{ size: number }>`
   background-color: ${({ theme }) => theme.colors.loadingImage};
 `
 
+const Error = styled.div`
+  color: ${({ theme }) => theme.colors.error};
+`
+
 export const changeAvatarMutation = gql`
   mutation changeAvatar($userId: String!, $avatar: AvatarInput!) {
     changeAvatar(userId: $userId, avatar: $avatar)
@@ -88,7 +92,10 @@ type IProps = IntlShapeProps &
     theme: ITheme
     showChangeAvatar: boolean
     cancelAvatarChangeModal: () => void
-    image: IImage
+    imgSrc: IImage
+    onImgSrcChanged: (img: IImage) => void
+    error: string
+    onErrorChanged: (error: string) => void
     onAvatarChanged: (img: IImage) => void
     userDetails: IUserDetails | null
   }
@@ -112,31 +119,33 @@ function AvatarChangeModalComp({
   showChangeAvatar,
   intl,
   cancelAvatarChangeModal,
-  image: imageProp,
+  imgSrc,
+  onImgSrcChanged: setImgSrc,
+  error,
+  onErrorChanged: setError,
   onAvatarChanged,
   isOnline,
   theme,
   userDetails
 }: IProps) {
   const [crop, setCrop] = React.useState<Point>(DEFAULT_CROP)
-  const [imageState, setImage] = React.useState<IImage>()
   const [zoom, setZoom] = React.useState<number>(1)
   const [croppedArea, setCroppedArea] = React.useState<Area>(DEFAULT_AREA)
   const [avatar, setAvatar] = React.useState<IImage>()
   const [uploading, setUploading] = React.useState<boolean>(false)
 
-  const resetCrop = () => {
+  const reset = () => {
     setCrop(DEFAULT_CROP)
     setCroppedArea(DEFAULT_AREA)
-    setImage(undefined)
     setZoom(1)
+    setError('')
     setAvatar(undefined)
     setUploading(false)
   }
 
   const handleCancel = () => {
     cancelAvatarChangeModal()
-    resetCrop()
+    reset()
   }
 
   return (
@@ -153,7 +162,7 @@ function AvatarChangeModalComp({
           mutation={changeAvatarMutation}
           onCompleted={(_) => {
             avatar && onAvatarChanged(avatar)
-            resetCrop()
+            reset()
           }}
         >
           {(changeAvatar) => {
@@ -170,7 +179,7 @@ function AvatarChangeModalComp({
                 onClick={async () => {
                   setUploading(true)
                   const croppedImage = await getCroppedImage(
-                    imageState ? imageState : imageProp,
+                    imgSrc,
                     croppedArea
                   )
                   if (croppedImage) setAvatar(croppedImage)
@@ -192,18 +201,21 @@ function AvatarChangeModalComp({
       handleClose={handleCancel}
     >
       <Description>
-        {intl.formatMessage(messages.resizeAvatarMsg)}
+        {!error && intl.formatMessage(messages.resizeAvatarMsg)}
+        {error && <Error>{error}</Error>}
         <ImageLoader
           onImageLoaded={(image) => {
-            resetCrop()
-            setImage(image)
+            reset()
+            setImgSrc(image)
           }}
-          onError={(error) => console.log(error)}
+          onError={(error) => setError(error)}
         >
-          <LinkButton>{intl.formatMessage(messages.changeImage)}</LinkButton>
+          <LinkButton disabled={uploading}>
+            {intl.formatMessage(messages.changeImage)}
+          </LinkButton>
         </ImageLoader>
       </Description>
-      {uploading ? (
+      {uploading || error ? (
         <DefaultImage
           size={window.innerWidth > theme.grid.breakpoints.md ? 360 : 240}
         >
@@ -213,7 +225,7 @@ function AvatarChangeModalComp({
         <>
           <Container>
             <Cropper
-              image={imageState ? imageState.data : imageProp.data}
+              image={imgSrc.data}
               crop={crop}
               aspect={1}
               cropShape="round"
