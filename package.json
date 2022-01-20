@@ -43,11 +43,10 @@
   "devDependencies": {
     "@types/dotenv": "^6.1.0",
     "@types/js-yaml": "^3.12.1",
-    "bundlesize": "^0.18.0",
     "concurrently": "^3.5.1",
     "husky": "1.0.0-rc.13",
     "js-yaml": "^3.13.1",
-    "lerna": "^3.18.3",
+    "lerna": "^4.0.0",
     "lint-staged": "^7.1.0",
     "prettier": "^2.5.1"
   },
