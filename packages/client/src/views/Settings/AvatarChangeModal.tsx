@@ -33,13 +33,13 @@ import {
   withOnlineStatus,
   IOnlineStatusProps
 } from '@client/views/RegistrationHome/LoadingIndicator'
+import { ITheme } from '@opencrvs/components/lib/theme'
+import { withTheme } from 'styled-components'
 
 const Container = styled.div`
   align-self: center;
   flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  position: relative;
   width: 800px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     width: 500px;
@@ -49,25 +49,11 @@ const Container = styled.div`
   }
 `
 
-const Wrapper = styled.div`
-  position: relative;
-  height: 600px;
-  flex-grow: 1;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    height: 500px;
-  }
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    height: 300px;
-  }
-`
-
 const Description = styled.div`
   margin-bottom: 20px;
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    flex-direction: column;
-  }
 `
 
 const Slider = styled.input`
@@ -79,10 +65,10 @@ const Slider = styled.input`
   }
 `
 
-const LoadingImage = styled.div`
+const DefaultImage = styled.div<{ size: number }>`
   border-radius: 50%;
-  width: 300px;
-  height: 300px;
+  width: ${({ size }) => size}px;
+  height: ${({ size }) => size}px;
   margin: auto;
   display: flex;
   flex-direction: column;
@@ -99,6 +85,7 @@ export const changeAvatarMutation = gql`
 
 type IProps = IntlShapeProps &
   IOnlineStatusProps & {
+    theme: ITheme
     showChangeAvatar: boolean
     cancelAvatarChangeModal: () => void
     image: IImage
@@ -128,12 +115,12 @@ function AvatarChangeModalComp({
   image: imageProp,
   onAvatarChanged,
   isOnline,
+  theme,
   userDetails
 }: IProps) {
   const [crop, setCrop] = React.useState<Point>(DEFAULT_CROP)
   const [imageState, setImage] = React.useState<IImage>()
   const [zoom, setZoom] = React.useState<number>(1)
-  const [cropSize, setCropSize] = React.useState<Size>(DEFAULT_SIZE)
   const [croppedArea, setCroppedArea] = React.useState<Area>(DEFAULT_AREA)
   const [avatar, setAvatar] = React.useState<IImage>()
   const [uploading, setUploading] = React.useState<boolean>(false)
@@ -211,53 +198,49 @@ function AvatarChangeModalComp({
             resetCrop()
             setImage(image)
           }}
-          onError={error => console.log(error)}
+          onError={(error) => console.log(error)}
         >
           <LinkButton>{intl.formatMessage(messages.changeImage)}</LinkButton>
         </ImageLoader>
       </Description>
-      <Container>
-        {uploading && (
-          <LoadingImage>
-            <Spinner id="loading-image" />
-          </LoadingImage>
-        )}
-        {!uploading && (
-          <Wrapper>
+      {uploading ? (
+        <DefaultImage
+          size={window.innerWidth > theme.grid.breakpoints.md ? 360 : 240}
+        >
+          {uploading && <Spinner id="loading-image" />}
+        </DefaultImage>
+      ) : (
+        <>
+          <Container>
             <Cropper
               image={imageState ? imageState.data : imageProp.data}
               crop={crop}
               aspect={1}
               cropShape="round"
               showGrid={false}
-              cropSize={cropSize}
-              onCropSizeChange={(newSize) => setCropSize(newSize)}
+              cropSize={
+                window.innerWidth > theme.grid.breakpoints.md
+                  ? { width: 360, height: 360 }
+                  : { width: 240, height: 240 }
+              }
               objectFit="vertical-cover"
               zoom={zoom}
               onZoomChange={(newZoom) => setZoom(newZoom)}
               onCropChange={(newCrop) => setCrop(newCrop)}
-              onMediaLoaded={(mediaSize) => {
-                setCropSize({
-                  width: Math.min(mediaSize.width, mediaSize.height) / 2,
-                  height: Math.min(mediaSize.width, mediaSize.height) / 2
-                })
-              }}
               onCropComplete={async (_, croppedArea) =>
                 setCroppedArea(croppedArea)
               }
             />
-          </Wrapper>
-        )}
-      </Container>
-      {!uploading && (
-        <Slider
-          type="range"
-          value={zoom}
-          min={1}
-          step={0.02}
-          max={3}
-          onChange={({ target: { value } }) => setZoom(+value)}
-        />
+          </Container>
+          <Slider
+            type="range"
+            value={zoom}
+            min={1}
+            step={0.02}
+            max={3}
+            onChange={({ target: { value } }) => setZoom(+value)}
+          />
+        </>
       )}
     </ResponsiveModal>
   )
@@ -270,5 +253,5 @@ const mapStateToProps = (state: IStoreState) => {
 }
 
 export const AvatarChangeModal = connect(mapStateToProps)(
-  injectIntl(withOnlineStatus(AvatarChangeModalComp))
+  injectIntl(withTheme(withOnlineStatus(AvatarChangeModalComp)))
 )
