@@ -28,6 +28,10 @@ export const SEARCH_USERS = gql`
         type
         status
         underInvestigation
+        avatar {
+          type
+          data
+        }
       }
     }
   }
@@ -72,7 +76,15 @@ export const GET_USER = gql`
         data
       }
       creationDate
+      avatar {
+        type
+        data
+      }
       device
+      avatar {
+        type
+        data
+      }
     }
   }
 `

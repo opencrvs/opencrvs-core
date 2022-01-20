@@ -15,6 +15,9 @@ import activateUser, {
 import changePasswordHandler, {
   changePasswordRequestSchema
 } from '@user-mgnt/features/changePassword/handler'
+import changeAvatarHandler, {
+  changeAvatarRequestSchema
+} from '@user-mgnt/features/changeAvatar/handler'
 import createUser from '@user-mgnt/features/createUser/handler'
 import getRoles, {
   searchRoleSchema
@@ -189,6 +192,31 @@ export const getRoutes = () => {
         },
         validate: {
           payload: changePasswordRequestSchema
+        },
+        response: {
+          schema: false
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/changeUserAvatar',
+      handler: changeAvatarHandler,
+      config: {
+        tags: ['api'],
+        description: 'Changes avatar for logged-in user',
+        auth: {
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN,
+            RouteScope.VALIDATE
+          ]
+        },
+        validate: {
+          payload: changeAvatarRequestSchema
         },
         response: {
           schema: false

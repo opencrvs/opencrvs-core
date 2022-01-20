@@ -50,6 +50,11 @@ type LocalRegistrar {
   signature: Signature
 }
 
+type Avatar {
+  type: String!
+  data: String!
+}
+
 type User {
   id: ID
   userMgntUserID: ID
@@ -68,6 +73,7 @@ type User {
   identifier: Identifier
   signature: Signature
   creationDate: String
+  avatar: Avatar
   device: String
 }
 
@@ -105,6 +111,11 @@ type VerifyPasswordResult {
   status: String
   username: String
   id: String
+}
+
+input AvatarInput {
+  type: String!
+  data: String!
 }
 
 type Query {
@@ -147,6 +158,7 @@ type Mutation {
     existingPassword: String!
     password: String!
   ): String
+  changeAvatar(userId: String!, avatar: AvatarInput!): String
   auditUser(
     userId: String!
     action: String!

@@ -163,6 +163,7 @@ type Mutation {
     existingPassword: String!
     password: String!
   ): String
+  changeAvatar(userId: String!, avatar: AvatarInput!): String
   auditUser(
     userId: String!
     action: String!
@@ -305,6 +306,7 @@ type User {
   identifier: Identifier
   signature: Signature
   creationDate: String
+  avatar: Avatar
   device: String
 }
 
@@ -453,6 +455,11 @@ input UserInput {
 input SecurityQuestionAnswer {
   questionKey: String
   answer: String
+}
+
+input AvatarInput {
+  type: String!
+  data: String!
 }
 
 scalar Map
@@ -654,6 +661,11 @@ type LocalRegistrar {
 type Signature {
   data: String
   type: String
+}
+
+type Avatar {
+  type: String!
+  data: String!
 }
 
 type SearchFieldAgentResponse {
