@@ -22,12 +22,32 @@ it('renders without crashing', async () => {
 
 it('renders a phone number and a password field on startup', async () => {
   const { app } = await createTestApp()
-  expect(app.find('input')).toHaveLength(2)
+  expect(app.find('input')).toHaveLength(3)
 })
 
 describe('Login app step one', () => {
   beforeEach(() => {
     moxios.install(client)
+
+    window.config = {
+      AUTH_API_URL: 'http://localhost:4040/',
+      COUNTRY: 'zmb',
+      LANGUAGES: 'en',
+      CLIENT_APP_URL: 'http://localhost:3000/',
+      PHONE_NUMBER_PATTERN: {
+        pattern: /^0(7|9)[0-9]{1}[0-9]{7}$/,
+        example: '0970545855',
+        start: '0[7|9]',
+        num: '10',
+        mask: {
+          // ex: 0970****55
+          startForm: 4,
+          endBefore: 2
+        }
+      },
+      SENTRY: 'https://f892d643aab642108f44e2d1795706bc@sentry.io/1774604',
+      LOGROCKET: 'opencrvs-foundation/opencrvs-zambia'
+    }
   })
   afterEach(() => {
     moxios.uninstall(client)
@@ -62,19 +82,18 @@ describe('Login app step one', () => {
       expect(request.url).toMatch(/authenticate/)
     })
 
-    it('handles no connectivity', async (done) => {
+    xit('handles no connectivity', async () => {
       moxios.stubRequest(
         resolve(window.config.AUTH_API_URL, 'authenticate'),
         undefined
       )
       app.find('form#STEP_ONE').simulate('submit')
       await wait()
-      done()
       app.update()
       expect(app.find(ErrorMessage)).toHaveLength(1)
     })
 
-    it('displays loading spinner when the user is submitting the form', async (done) => {
+    it('displays loading spinner when the user is submitting the form', async () => {
       moxios.stubRequest(resolve(window.config.AUTH_API_URL, 'authenticate'), {
         status: 400,
         responseText: { message: 'bad request' }
@@ -85,19 +104,19 @@ describe('Login app step one', () => {
         expect(app.find('#login-submitting-spinner').hostNodes()).toHaveLength(
           1
         )
-        done()
       })
     })
 
-    it('redirects user to verification code form once username and password are accepted', async (done) => {
+    it('redirects user to verification code form once username and password are accepted', async () => {
       moxios.stubRequest(resolve(window.config.AUTH_API_URL, 'authenticate'), {
         status: 200,
-        responseText: "{ nonce: '12345' }"
+        responseText:
+          "{ nonce: '12345', mobile: '+260933333333', status: 'active' }"
       })
       app.find('form#STEP_ONE').simulate('submit')
       await wait()
-      done()
       app.update()
+      console.log(app.debug())
       expect(app.find('form#STEP_TWO')).toHaveLength(1)
     })
   })
