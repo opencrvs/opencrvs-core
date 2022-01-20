@@ -10,8 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { countryMessages as messages } from '@client/i18n/messages'
+import { MessageDescriptor } from 'react-intl'
 
-export const defaultCountries = [
+type CountryItem = { value: string; label: MessageDescriptor }
+
+export const countries = [
   { value: 'AFG', label: messages.AFG },
   { value: 'ALA', label: messages.ALA },
   { value: 'ALB', label: messages.ALB },
@@ -260,8 +263,5 @@ export const defaultCountries = [
   { value: 'YEM', label: messages.YEM },
   { value: 'ZMB', label: messages.ZMB },
   { value: 'ZWE', label: messages.ZWE }
-]
-
-export const countries = window.config.SHOW_FARAJALAND_IN_COUNTRY_LISTS
-  ? defaultCountries.splice(75, 0, { value: 'FAR', label: messages.FAR })
-  : defaultCountries
+  // Remove potentially null country values (Farajaland)
+].filter((country): country is CountryItem => Boolean(country))
