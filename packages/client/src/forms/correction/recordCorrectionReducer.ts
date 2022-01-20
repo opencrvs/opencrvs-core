@@ -11,21 +11,25 @@
  */
 import { LoopReducer, Loop } from 'redux-loop'
 import {
-  correctRecordBirthSection,
-  correctRecordDeathSection
-} from '@client/forms/certificatesCorrection/fieldDefinitions/correctRecordSection'
-import { correctSupportDocumentSection } from '@client/forms/certificatesCorrection/fieldDefinitions/supportDocumentSection'
+  birthCorrectorSection,
+  deathCorrectorSection
+} from '@client/forms/correction/fieldDefinitions/correctRecordSection'
 import { Action } from 'redux'
-import { IFormSection } from '@client/forms'
+import { IForm, IFormSection } from '@client/forms'
+import { correctSupportDocumentSection } from '@client/forms/correction/fieldDefinitions/supportDocumentSection'
 
 const initialState: IRecordCorrectionFormState = {
-  correctRecordBirthSection: correctRecordBirthSection,
-  correctRecordDeathSection: correctRecordDeathSection,
+  birth: {
+    sections: [birthCorrectorSection]
+  },
+  death: {
+    sections: [deathCorrectorSection]
+  },
   supportDocumentSection: correctSupportDocumentSection
 }
 export interface IRecordCorrectionFormState {
-  correctRecordBirthSection: IFormSection
-  correctRecordDeathSection: IFormSection
+  birth: IForm
+  death: IForm
   supportDocumentSection: IFormSection
 }
 

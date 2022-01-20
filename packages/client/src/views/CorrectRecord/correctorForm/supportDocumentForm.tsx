@@ -120,37 +120,6 @@ function getNextSectionIds(
   }
 }
 
-const getErrorsOnFieldsBySection = (
-  sectionId: keyof IPrintableApplication['data'],
-  fields: IFormField[],
-  draft: IPrintableApplication
-) => {
-  const certificates = draft.data.registration.certificates
-  const certificate = (certificates && certificates[0]) || {}
-  const errors = getValidationErrorsForForm(
-    fields,
-    (certificate[sectionId as keyof typeof certificate] as IFormSectionData) ||
-      {}
-  )
-
-  return {
-    [sectionId]: fields.reduce((fields, field) => {
-      const validationErrors: IValidationResult[] = (
-        errors[field.name as keyof typeof errors] as IFieldErrors
-      ).errors
-
-      const value = draft.data[sectionId]
-        ? draft.data[sectionId][field.name]
-        : null
-
-      const informationMissing =
-        validationErrors.length > 0 || value === null ? validationErrors : []
-
-      return { ...fields, [field.name]: informationMissing }
-    }, {})
-  }
-}
-
 interface IState {
   hasUploadDocOrSelectOption: boolean
 }
@@ -231,8 +200,6 @@ class CorrectorSupportDocumentFormComponent extends React.Component<
       application
     )
     const applicationToBeCertified = application
-    console.log('applicationToBeCertified', applicationToBeCertified)
-
     if (
       !applicationToBeCertified ||
       !applicationToBeCertified.data.registration.regStatus
@@ -293,7 +260,6 @@ class CorrectorSupportDocumentFormComponent extends React.Component<
             <FormFieldGenerator
               id={formGroup.id}
               onChange={(values) => {
-                console.log('values', values)
                 if (
                   (values &&
                     values.supportDocumentRequiredForCorrection !==

@@ -806,10 +806,12 @@ export enum DeathSection {
   DeathDocuments = 'documents',
   Preview = 'preview'
 }
+
 export enum UserSection {
   User = 'user',
   Preview = 'preview'
 }
+
 export enum CertificateSection {
   Collector = 'collector',
   CollectCertificate = 'collectCertificate',
@@ -817,9 +819,16 @@ export enum CertificateSection {
   CertificatePreview = 'certificatePreview',
   Corrector = 'corrector'
 }
+
+export enum CorrectionSection {
+  Corrector = 'corrector',
+  Review = 'review'
+}
+
 export enum PaymentSection {
   Payment = 'payment'
 }
+
 export enum ReviewSection {
   Review = 'review'
 }
@@ -831,6 +840,7 @@ export type Section =
   | DeathSection
   | UserSection
   | CertificateSection
+  | CorrectionSection
 
 export interface IFormSection {
   id: Section

@@ -216,11 +216,11 @@ class CorrectorFormComponent extends React.Component<IProps, IState> {
   ) => {
     if (!draft) return
 
-    /*const errors = getErrorsOnFieldsBySection(sectionId, fields, draft)
+    const errors = getErrorsOnFieldsBySection(sectionId, fields, draft)
     const errorValues = Object.values(errors).map(Object.values)
     const errLength = flatten(errorValues).filter(
       (errs) => errs.length > 0
-    ).length*/
+    ).length
 
     const certificates = draft.data.registration.certificates
     const certificate = (certificates && certificates[0]) || {}
@@ -228,18 +228,13 @@ class CorrectorFormComponent extends React.Component<IProps, IState> {
       sectionId as keyof typeof certificate
     ] as IFormSectionData
 
-    /*if (errLength > 0) {
+    if (errLength > 0) {
       this.setState({
         showError: true
       })
 
       return
-    }*/
-    console.log(
-      '------------------------------------------------------------',
-      corrector,
-      corrector.type
-    )
+    }
     this.setState({
       showError: false,
       showModalForNoSignedAffidavit: false
@@ -247,7 +242,7 @@ class CorrectorFormComponent extends React.Component<IProps, IState> {
     this.props.goToVerifyCorrector(
       applicationId,
       event,
-      corrector.type as string
+      (corrector.relationship as any).value as string
     )
   }
 
@@ -437,9 +432,9 @@ const getCorrectCertificateForm = (event: Event, state: IStoreState) => {
   switch (event) {
     case Event.BIRTH:
     default:
-      return state.correctRecordForm.correctRecordBirthSection
+      return state.correctRecordForm.birth.sections[0]
     case Event.DEATH:
-      return state.correctRecordForm.correctRecordDeathSection
+      return state.correctRecordForm.death.sections[0]
   }
 }
 
