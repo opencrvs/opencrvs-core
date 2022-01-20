@@ -13,11 +13,16 @@ import * as React from 'react'
 import { ReactElement } from 'react'
 import styled from 'styled-components'
 
+export enum ContentSize {
+  LARGE = 'large',
+  NORMAL = 'normal'
+}
+
 const Container = styled.div<{ size: string }>`
   z-index: 1;
   position: relative;
   margin: 0 auto;
-  max-width: ${({ size }) => (size === 'large' ? '1140px' : '778px')};
+  max-width: ${({ size }) => (size === ContentSize.LARGE ? '1140px' : '778px')};
   height: 100%;
   border-radius: 4px;
   border: 1px solid ${({ theme }) => theme.colors.dividerDark};
@@ -86,7 +91,7 @@ interface IProps {
   supportingCopy?: string
   children?: React.ReactNode
   bottomActionButtons?: ReactElement[]
-  size?: 'normal' | 'large' | undefined
+  size?: ContentSize
 }
 
 export class Content extends React.Component<IProps> {

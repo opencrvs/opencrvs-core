@@ -13,7 +13,8 @@ import { RadioSize } from '@opencrvs/components/lib/forms'
 import {
   CertificateSection,
   IFormSection,
-  IFormSectionGroup
+  IFormSectionGroup,
+  RADIO_GROUP
 } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/certificate'
 
@@ -60,8 +61,8 @@ export const correctSupportDocumentSectionGroup: IFormSectionGroup = {
       ]
     },
     {
-      name: 'supportDocumentForCorrection',
-      type: 'RADIO_GROUP',
+      name: 'supportDocumentRequiredForCorrection',
+      type: RADIO_GROUP,
       label: {
         defaultMessage: 'Check Supporting Document?',
         description: 'Label for form field: Correction Supporting Document',

@@ -29,8 +29,7 @@ import {
   IFormField,
   IFormSection,
   IFormSectionData,
-  IFormSectionGroup,
-  IRadioGroupWithNestedFieldsFormField
+  IFormSectionGroup
 } from '@client/forms'
 import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
 import {
@@ -42,7 +41,6 @@ import {
   errorMessages,
   formMessages
 } from '@client/i18n/messages'
-import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import {
   goBack,
   goToPrintCertificate,
@@ -58,16 +56,11 @@ import {
   QueryContext,
   QueryProvider
 } from '@client/views/DataProvider/QueryProvider'
-import {
-  getEvent,
-  getEventDate,
-  isCertificateForPrintInAdvance,
-  isFreeOfCost
-} from '@client/views/PrintCertificate/utils'
+import { getEvent } from '@client/views/PrintCertificate/utils'
 import { StyledSpinner } from '@client/views/RegistrationHome/RegistrationHome'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
-import { cloneDeep, flatten, get, isEqual } from 'lodash'
+import { cloneDeep } from 'lodash'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
@@ -75,20 +68,10 @@ import { RouteComponentProps } from 'react-router'
 import { withTheme } from 'styled-components'
 import { IValidationResult } from '@client/utils/validate'
 import { getRegisterForm } from '@client/forms/register/application-selectors'
-import { Content } from '@opencrvs/components/lib/interface/Content'
-
-const FormSectionTitle = styled.h4`
-  ${({ theme }) => theme.fonts.h4Style};
-  color: ${({ theme }) => theme.colors.copy};
-  margin-top: 0px;
-  margin-bottom: 16px;
-`
-
-const ErrorWrapper = styled.div`
-  margin-top: -3px;
-  margin-bottom: 16px;
-`
-
+import {
+  Content,
+  ContentSize
+} from '@opencrvs/components/lib/interface/Content'
 interface IBaseProps {
   registerForm: IForm
   event: Event
@@ -169,7 +152,7 @@ const getErrorsOnFieldsBySection = (
 }
 
 interface IState {
-  showError: boolean
+  hasUploadDocOrSelectOption: boolean
 }
 
 class CorrectorSupportDocumentFormComponent extends React.Component<
@@ -179,7 +162,7 @@ class CorrectorSupportDocumentFormComponent extends React.Component<
   constructor(props: IProps) {
     super(props)
     this.state = {
-      showError: false
+      hasUploadDocOrSelectOption: false
     }
   }
 
@@ -217,38 +200,10 @@ class CorrectorSupportDocumentFormComponent extends React.Component<
     draft: IPrintableApplication | undefined
   ) => {
     if (!draft) return
-
-    const certificates = draft.data.registration.certificates
-    const certificate = (certificates && certificates[0]) || {}
-    const corrector = certificate[
-      sectionId as keyof typeof certificate
-    ] as IFormSectionData
-    console.log(
-      '------------------------------------------------------------',
-      corrector,
-      corrector.type
-    )
+    alert('Go to next page ...')
     this.setState({
-      showError: false
+      hasUploadDocOrSelectOption: false
     })
-  }
-
-  goToNextFormForSomeoneElse = (
-    applicationId: string,
-    application: IPrintableApplication,
-    event: Event
-  ) => {
-    if (isFreeOfCost(event, getEventDate(application.data, event))) {
-      this.props.goToReviewCertificate(applicationId, event)
-    } else {
-      this.props.goToPrintCertificatePayment(applicationId, event)
-    }
-  }
-
-  resetCertificatesInformation = () => {
-    const application = Object.assign({}, this.props.application)
-    application.data.registration.certificates = []
-    this.props.modifyApplication(application)
   }
 
   render() {
@@ -262,14 +217,12 @@ class CorrectorSupportDocumentFormComponent extends React.Component<
       goBack,
       registerForm
     } = this.props
-    console.log('formGroup', formGroup)
-
-    const { showError } = this.state
 
     const contentProps = {
       title: formMessages.documentsTitle.defaultMessage as string,
       supportingCopy: formMessages.CorrectorSupportDocumentCopy
-        .defaultMessage as string
+        .defaultMessage as string,
+      size: ContentSize.LARGE
     }
 
     const nextSectionGroup = getNextSectionIds(
@@ -337,20 +290,18 @@ class CorrectorSupportDocumentFormComponent extends React.Component<
           goBack={goBack}
         >
           <Content {...contentProps}>
-            {showError && (
-              <ErrorWrapper>
-                <ErrorText id="form_error" ignoreMediaQuery={true}>
-                  {(formGroup.error && intl.formatMessage(formGroup.error)) ||
-                    ''}
-                </ErrorText>
-              </ErrorWrapper>
-            )}
             <FormFieldGenerator
               id={formGroup.id}
               onChange={(values) => {
-                if (values && values.affidavitFile) {
+                console.log('values', values)
+                if (
+                  (values &&
+                    values.supportDocumentRequiredForCorrection !==
+                      undefined) ||
+                  values.uploadDocForLegalProof != undefined
+                ) {
                   this.setState({
-                    showError: false
+                    hasUploadDocOrSelectOption: true
                   })
                 }
                 this.modifyApplication(values, applicationToBeCertified)
@@ -361,6 +312,7 @@ class CorrectorSupportDocumentFormComponent extends React.Component<
             />
             <PrimaryButton
               id="confirm_form"
+              disabled={!this.state.hasUploadDocOrSelectOption}
               onClick={() => {
                 this.continueButtonHandler(
                   applicationToBeCertified.id,
