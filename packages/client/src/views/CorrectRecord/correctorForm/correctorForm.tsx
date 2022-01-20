@@ -432,9 +432,9 @@ const getCorrectCertificateForm = (event: Event, state: IStoreState) => {
   switch (event) {
     case Event.BIRTH:
     default:
-      return state.correctRecordForm.correctRecordBirthSection
+      return state.correctRecordForm.birth.sections[0]
     case Event.DEATH:
-      return state.correctRecordForm.correctRecordDeathSection
+      return state.correctRecordForm.death.sections[0]
   }
 }
 

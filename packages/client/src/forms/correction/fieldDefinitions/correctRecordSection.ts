@@ -11,23 +11,23 @@
  */
 import { RadioSize } from '@opencrvs/components/lib/forms'
 import {
-  CertificateSection,
+  CorrectionSection,
   IFormSection,
   IFormSectionGroup,
   RADIO_GROUP_WITH_NESTED_FIELDS
 } from '@client/forms'
 import { formMessages } from '@client/i18n/messages/form'
-import { messages } from '@client/i18n/messages/views/certificate'
+import { messages } from '@client/i18n/messages/views/correction'
 
-export const correctRecordBirthSectionGroup: IFormSectionGroup = {
-  id: 'recordCorrection',
-  title: messages.whoToRequestCertificateCorrection,
+const birthCorrectorRelationGroup: IFormSectionGroup = {
+  id: 'corrector-relation',
+  title: messages.whoRequestedCorrection,
   fields: [
     {
       name: 'relationship',
       type: RADIO_GROUP_WITH_NESTED_FIELDS,
       size: RadioSize.LARGE,
-      label: messages.whoToRequestCertificateCorrection,
+      label: messages.whoRequestedCorrection,
       required: true,
       initialValue: '',
       validate: [],
@@ -58,7 +58,7 @@ export const correctRecordBirthSectionGroup: IFormSectionGroup = {
         REGISTRAR: [],
         OTHERS: [
           {
-            name: 'otherRelationShip',
+            name: 'other-relationship',
             type: 'TEXT',
             label: {
               defaultMessage: 'Relationship to child',
@@ -81,15 +81,15 @@ export const correctRecordBirthSectionGroup: IFormSectionGroup = {
   ]
 }
 
-export const correctRecordDeathSectionGroup: IFormSectionGroup = {
+const deathCorrectorRelationGroup: IFormSectionGroup = {
   id: 'recordCorrection',
-  title: messages.whoToRequestCertificateCorrection,
+  title: messages.whoRequestedCorrection,
   fields: [
     {
       name: 'relationship',
       type: RADIO_GROUP_WITH_NESTED_FIELDS,
       size: RadioSize.LARGE,
-      label: messages.whoToRequestCertificateCorrection,
+      label: messages.whoRequestedCorrection,
       required: true,
       initialValue: '',
       validate: [],
@@ -111,7 +111,7 @@ export const correctRecordDeathSectionGroup: IFormSectionGroup = {
         ANOTHER_AGENT: [],
         OTHERS: [
           {
-            name: 'otherRelationShip',
+            name: 'other-relationship',
             type: 'TEXT',
             label: {
               defaultMessage: 'Relationship to child',
@@ -134,18 +134,18 @@ export const correctRecordDeathSectionGroup: IFormSectionGroup = {
   ]
 }
 
-export const correctRecordBirthSection: IFormSection = {
-  id: CertificateSection.Corrector,
+export const birthCorrectorSection: IFormSection = {
+  id: CorrectionSection.Corrector,
   viewType: 'form',
-  name: messages.printCertificate,
-  title: messages.certificateCollectionTitle,
-  groups: [correctRecordBirthSectionGroup]
+  name: messages.name,
+  title: messages.title,
+  groups: [birthCorrectorRelationGroup]
 }
 
-export const correctRecordDeathSection: IFormSection = {
-  id: CertificateSection.Corrector,
+export const deathCorrectorSection: IFormSection = {
+  id: CorrectionSection.Corrector,
   viewType: 'form',
-  name: messages.printCertificate,
-  title: messages.certificateCollectionTitle,
-  groups: [correctRecordDeathSectionGroup]
+  name: messages.name,
+  title: messages.title,
+  groups: [deathCorrectorRelationGroup]
 }
