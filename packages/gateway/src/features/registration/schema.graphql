@@ -534,7 +534,7 @@ type Mutation {
     details: BirthRegistrationInput
   ): BirthRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
-  requestBirthApplicationCorrection(
+  requestBirthRegistrationCorrection(
     id: ID!
     details: BirthRegistrationInput!
   ): ID!
@@ -554,7 +554,7 @@ type Mutation {
     details: DeathRegistrationInput
   ): DeathRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced
-  correctDeathApplicationCorrection(
+  requestDeathRegistrationCorrection(
     id: ID!
     details: DeathRegistrationInput!
   ): ID!

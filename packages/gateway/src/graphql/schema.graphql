@@ -138,7 +138,7 @@ type Mutation {
     details: BirthRegistrationInput
   ): BirthRegistration!
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
-  requestBirthApplicationCorrection(
+  requestBirthRegistrationCorrection(
     id: ID!
     details: BirthRegistrationInput!
   ): ID!
@@ -156,7 +156,7 @@ type Mutation {
     details: DeathRegistrationInput
   ): DeathRegistration!
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID!
-  correctDeathApplicationCorrection(
+  requestDeathRegistrationCorrection(
     id: ID!
     details: DeathRegistrationInput!
   ): ID!

@@ -20,7 +20,7 @@ export const resolvers: GQLResolver = {
   Mutation: {
     async requestBirthRegistrationCorrection(_, { id, details }, authHeader) {
       if (hasScope(authHeader, 'register')) {
-        await requestEventRegistrationCorrection(
+        return await requestEventRegistrationCorrection(
           id,
           authHeader,
           details,
@@ -30,7 +30,7 @@ export const resolvers: GQLResolver = {
     },
     async requestDeathRegistrationCorrection(_, { id, details }, authHeader) {
       if (hasScope(authHeader, 'register')) {
-        await requestEventRegistrationCorrection(
+        return await requestEventRegistrationCorrection(
           id,
           authHeader,
           details,
