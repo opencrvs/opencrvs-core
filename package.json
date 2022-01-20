@@ -11,7 +11,7 @@
     }
   },
   "scripts": {
-    "postinstall": "patch-package && npx crlf --set=LF ./node_modules/graphql-schema-typescript/**/*",
+    "postinstall": "patch-package && if [ \"$NODE_ENV\" != \"production\" ]; then npx crlf --set=LF ./node_modules/graphql-schema-typescript/**/*; fi",
     "start": "lerna run build --scope @opencrvs/commons && lerna run build --scope @opencrvs/components && lerna run --parallel --ignore @opencrvs/mobile-proxy --ignore @opencrvs/integration $OTHER_LERNA_FLAGS start",
     "start:prod": "yarn build && lerna run --parallel --ignore @opencrvs/mobile-proxy --ignore @opencrvs/integration $OTHER_LERNA_FLAGS start:prod",
     "demo": "bash demo.sh",
