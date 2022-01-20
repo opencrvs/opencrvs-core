@@ -51,7 +51,6 @@
     "prettier": "^2.5.1"
   },
   "dependencies": {
-    "doctoc": "^1.4.0",
     "license-check-and-add": "^3.0.3",
     "opener": "^1.5.1",
     "patch-package": "^6.1.2",
@@ -60,6 +59,7 @@
   "resolutions": {
     "//": "See https://github.com/facebook/create-react-app/issues/11773",
     "react-error-overlay": "6.0.9",
-    "babel-loader": "8.1.0"
+    "babel-loader": "8.1.0",
+    "underscore": ">1.12.1"
   }
 }

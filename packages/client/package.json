@@ -36,7 +36,7 @@
     "graphql-tools": "^4.0.7",
     "history": "^4.7.2",
     "http-proxy-middleware": "^0.20.0",
-    "jimp": "^0.6.1",
+    "jimp": "^0.16.1",
     "jsdom-worker": "^0.1.0",
     "jwt-decode": "^2.2.0",
     "lint-staged": "^7.1.0",
