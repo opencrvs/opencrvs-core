@@ -202,7 +202,7 @@ class SettingsView extends React.Component<IProps, IState> {
   }
 
   toggleAvatarNotification = () => {
-    this.setState(state => ({
+    this.setState((state) => ({
       showAvatarNotification: !state.showAvatarNotification
     }))
   }

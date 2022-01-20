@@ -473,14 +473,18 @@ function UserListComponent(props: IProps) {
             (user.type && intl.formatMessage(userMessages[user.type])) || '-'
 
           return {
-            photoNameType: getPhotoNameType(user.id || '', name, user.avatar),
+            photoNameType: getPhotoNameType(
+              user.id || '',
+              name,
+              user.avatar as IAvatar
+            ),
             nameRoleType: getNameRoleType(user.id || '', name, role, type),
             photoNameRoleType: getPhotoNameRoleType(
               user.id || '',
               name,
               role,
               type,
-              user.avatar
+              user.avatar as IAvatar
             ),
             roleType: getRoleType(role, type),
             status: renderStatus(user.status, user.underInvestigation),

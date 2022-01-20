@@ -22,7 +22,9 @@ interface IProps {
   className?: string
 }
 
-const Template: Story<IProps> = (args) => <FloatingNotification {...args} />
+const Template: Story<IProps> = (args) => (
+  <FloatingNotification {...args}>Test</FloatingNotification>
+)
 export const FloatingNotificationView = Template.bind({})
 FloatingNotificationView.args = {
   show: true,
