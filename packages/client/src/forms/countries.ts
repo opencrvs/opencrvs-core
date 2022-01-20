@@ -91,6 +91,12 @@ export const countries = [
   { value: 'EST', label: messages.EST },
   { value: 'SWZ', label: messages.SWZ },
   { value: 'ETH', label: messages.ETH },
+  /*
+   * Include imaginary Farajaland country to country lists for demo environments
+   */
+  window.config.SHOW_FARAJALAND_IN_COUNTRY_LISTS
+    ? { value: 'FAR', label: messages.FAR }
+    : null,
   { value: 'FLK', label: messages.FLK },
   { value: 'FRO', label: messages.FRO },
   { value: 'FJI', label: messages.FJI },

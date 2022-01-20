@@ -2,6 +2,7 @@
 
 # dependencies
 node_modules
+opencrvs-zambia
 package-lock.json
 
 # testing
