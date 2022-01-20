@@ -193,6 +193,11 @@ export interface GQLLocation {
   geoData?: string
 }
 
+export interface GQLAvatar {
+  type: string
+  data: string
+}
+
 export interface GQLUser {
   id?: string
   userMgntUserID?: string
@@ -212,6 +217,7 @@ export interface GQLUser {
   signature?: GQLSignature
   creationDate?: string
   device?: string
+  avatar?: GQLAvatar
 }
 
 export interface GQLSearchUserResult {

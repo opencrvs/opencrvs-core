@@ -50,6 +50,11 @@ type LocalRegistrar {
   signature: Signature
 }
 
+type Avatar {
+  type: String!
+  data: String!
+}
+
 type User {
   id: ID
   userMgntUserID: ID
@@ -69,6 +74,7 @@ type User {
   signature: Signature
   creationDate: String
   device: String
+  avatar: Avatar
 }
 
 type SearchUserResult {
