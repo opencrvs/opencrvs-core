@@ -49,10 +49,11 @@ interface BaseProps {
   statusMapping?: IStatusMapping
   onClickStatusDetails: (status?: keyof IStatusMapping) => void
   locationId: string
-  disableApplicationLink?: boolean
 }
 
-interface IStateProps {}
+interface IStateProps {
+  disableApplicationLink: boolean
+}
 
 const ContentHolder = styled.div`
   padding: 0px 25px;
