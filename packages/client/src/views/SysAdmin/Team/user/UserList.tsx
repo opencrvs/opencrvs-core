@@ -34,6 +34,7 @@ import { createNamesMap } from '@client/utils/data-formatting'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { UserStatus } from '@client/views/SysAdmin/Team/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { IAvatar } from '@client/utils/userUtils'
 import {
   AddUser,
   VerticalThreeDots,
@@ -385,11 +386,12 @@ function UserListComponent(props: IProps) {
     id: string,
     name: string,
     role: string,
-    type: string
+    type: string,
+    avatar: IAvatar
   ) {
     return (
       <PhotoNameRoleContainer>
-        <AvatarSmall name={name} />
+        <AvatarSmall name={name} avatar={avatar} />
         <MarginPhotoRight />
         <NameRoleTypeContainer>
           <Name
@@ -404,10 +406,10 @@ function UserListComponent(props: IProps) {
     )
   }
 
-  function getPhotoNameType(id: string, name: string) {
+  function getPhotoNameType(id: string, name: string, avatar: IAvatar) {
     return (
       <>
-        <AvatarSmall name={name} />
+        <AvatarSmall name={name} avatar={avatar} />
         <MarginPhotoRight />
         <LinkButton
           id={`name-link-${id}`}
@@ -471,13 +473,14 @@ function UserListComponent(props: IProps) {
             (user.type && intl.formatMessage(userMessages[user.type])) || '-'
 
           return {
-            photoNameType: getPhotoNameType(user.id || '', name),
+            photoNameType: getPhotoNameType(user.id || '', name, user.avatar),
             nameRoleType: getNameRoleType(user.id || '', name, role, type),
             photoNameRoleType: getPhotoNameRoleType(
               user.id || '',
               name,
               role,
-              type
+              type,
+              user.avatar
             ),
             roleType: getRoleType(role, type),
             status: renderStatus(user.status, user.underInvestigation),
