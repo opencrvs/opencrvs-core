@@ -11,7 +11,7 @@
  */
 import { countryMessages as messages } from '@client/i18n/messages'
 
-export const countries = [
+export const defaultCountries = [
   { value: 'AFG', label: messages.AFG },
   { value: 'ALA', label: messages.ALA },
   { value: 'ALB', label: messages.ALB },
@@ -88,12 +88,6 @@ export const countries = [
   { value: 'EST', label: messages.EST },
   { value: 'SWZ', label: messages.SWZ },
   { value: 'ETH', label: messages.ETH },
-  /*
-   * Include imaginary Farajaland country to country lists for demo environments
-   */
-  window.config.SHOW_FARAJALAND_IN_COUNTRY_LISTS
-    ? { value: 'FAR', label: messages.FAR }
-    : null,
   { value: 'FLK', label: messages.FLK },
   { value: 'FRO', label: messages.FRO },
   { value: 'FJI', label: messages.FJI },
@@ -266,5 +260,8 @@ export const countries = [
   { value: 'YEM', label: messages.YEM },
   { value: 'ZMB', label: messages.ZMB },
   { value: 'ZWE', label: messages.ZWE }
-  // Remove potentially null country values (Farajaland)
-].filter(Boolean)
+]
+
+export const countries = window.config.SHOW_FARAJALAND_IN_COUNTRY_LISTS
+  ? defaultCountries.splice(75, 0, { value: 'FAR', label: messages.FAR })
+  : defaultCountries
