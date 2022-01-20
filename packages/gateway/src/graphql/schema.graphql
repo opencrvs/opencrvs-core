@@ -306,6 +306,7 @@ type User {
   identifier: Identifier
   signature: Signature
   creationDate: String
+  avatar: Avatar
   device: String
   avatar: Avatar
 }

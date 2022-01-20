@@ -76,6 +76,10 @@ export const GET_USER = gql`
         data
       }
       creationDate
+      avatar {
+        type
+        data
+      }
       device
       avatar {
         type

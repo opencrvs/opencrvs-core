@@ -387,7 +387,7 @@ function UserListComponent(props: IProps) {
     name: string,
     role: string,
     type: string,
-    avatar: IAvatar
+    avatar: IAvatar | undefined
   ) {
     return (
       <PhotoNameRoleContainer>
@@ -406,7 +406,11 @@ function UserListComponent(props: IProps) {
     )
   }
 
-  function getPhotoNameType(id: string, name: string, avatar: IAvatar) {
+  function getPhotoNameType(
+    id: string,
+    name: string,
+    avatar: IAvatar | undefined
+  ) {
     return (
       <>
         <AvatarSmall name={name} avatar={avatar} />
@@ -472,19 +476,17 @@ function UserListComponent(props: IProps) {
           const type =
             (user.type && intl.formatMessage(userMessages[user.type])) || '-'
 
+          const avatar = user.avatar
+
           return {
-            photoNameType: getPhotoNameType(
-              user.id || '',
-              name,
-              user.avatar as IAvatar
-            ),
+            photoNameType: getPhotoNameType(user.id || '', name, avatar),
             nameRoleType: getNameRoleType(user.id || '', name, role, type),
             photoNameRoleType: getPhotoNameRoleType(
               user.id || '',
               name,
               role,
               type,
-              user.avatar as IAvatar
+              avatar
             ),
             roleType: getRoleType(role, type),
             status: renderStatus(user.status, user.underInvestigation),

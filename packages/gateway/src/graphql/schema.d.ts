@@ -193,6 +193,11 @@ export interface GQLLocation {
   geoData?: string
 }
 
+export interface GQLAvatar {
+  type: string
+  data: string
+}
+
 export interface GQLUser {
   id?: string
   userMgntUserID?: string
@@ -211,6 +216,7 @@ export interface GQLUser {
   identifier?: GQLIdentifier
   signature?: GQLSignature
   creationDate?: string
+  avatar?: GQLAvatar
   device?: string
   avatar?: GQLAvatar
 }
@@ -2091,7 +2097,10 @@ export interface MutationToChangePasswordResolver<
 
 export interface MutationToChangeAvatarArgs {
   userId: string
-  avatar: GQLAvatarInput
+  avatar: {
+    type: string
+    data: string
+  }
 }
 export interface MutationToChangeAvatarResolver<TParent = any, TResult = any> {
   (

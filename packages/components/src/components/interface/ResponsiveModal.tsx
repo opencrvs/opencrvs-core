@@ -166,8 +166,8 @@ export class ResponsiveModal extends React.Component<IProps> {
       actions,
       width,
       contentHeight,
-      autoHeight,
       fullscreen,
+      autoHeight,
       contentScrollableY,
       hideHeaderBoxShadow
     } = this.props
@@ -193,9 +193,9 @@ export class ResponsiveModal extends React.Component<IProps> {
           </Header>
           <Body
             height={contentHeight}
-            autoHeight={autoHeight}
             scrollableY={contentScrollableY}
             fullscreen={fullscreen}
+            autoHeight={autoHeight}
           >
             {this.props.children}
           </Body>
