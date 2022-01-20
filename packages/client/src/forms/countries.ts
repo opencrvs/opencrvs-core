@@ -88,7 +88,12 @@ export const countries = [
   { value: 'EST', label: messages.EST },
   { value: 'SWZ', label: messages.SWZ },
   { value: 'ETH', label: messages.ETH },
-  { value: 'FAR', label: messages.FAR },
+  /*
+   * Include imaginary Farajaland country to country lists for demo environments
+   */
+  window.config.SHOW_FARAJALAND_IN_COUNTRY_LISTS
+    ? { value: 'FAR', label: messages.FAR }
+    : null,
   { value: 'FLK', label: messages.FLK },
   { value: 'FRO', label: messages.FRO },
   { value: 'FJI', label: messages.FJI },
@@ -261,4 +266,5 @@ export const countries = [
   { value: 'YEM', label: messages.YEM },
   { value: 'ZMB', label: messages.ZMB },
   { value: 'ZWE', label: messages.ZWE }
-]
+  // Remove potentially null country values (Farajaland)
+].filter(Boolean)
