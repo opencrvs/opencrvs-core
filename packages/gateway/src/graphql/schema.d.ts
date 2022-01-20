@@ -193,11 +193,6 @@ export interface GQLLocation {
   geoData?: string
 }
 
-export interface GQLAvatar {
-  type: string
-  data: string
-}
-
 export interface GQLUser {
   id?: string
   userMgntUserID?: string
@@ -218,7 +213,6 @@ export interface GQLUser {
   creationDate?: string
   avatar?: GQLAvatar
   device?: string
-  avatar?: GQLAvatar
 }
 
 export interface GQLSearchUserResult {
@@ -2097,10 +2091,7 @@ export interface MutationToChangePasswordResolver<
 
 export interface MutationToChangeAvatarArgs {
   userId: string
-  avatar: {
-    type: string
-    data: string
-  }
+  avatar: GQLAvatarInput
 }
 export interface MutationToChangeAvatarResolver<TParent = any, TResult = any> {
   (
@@ -2727,8 +2718,8 @@ export interface GQLUserTypeResolver<TParent = any> {
   identifier?: UserToIdentifierResolver<TParent>
   signature?: UserToSignatureResolver<TParent>
   creationDate?: UserToCreationDateResolver<TParent>
-  device?: UserToDeviceResolver<TParent>
   avatar?: UserToAvatarResolver<TParent>
+  device?: UserToDeviceResolver<TParent>
 }
 
 export interface UserToIdResolver<TParent = any, TResult = any> {
@@ -2802,11 +2793,11 @@ export interface UserToCreationDateResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface UserToDeviceResolver<TParent = any, TResult = any> {
+export interface UserToAvatarResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface UserToAvatarResolver<TParent = any, TResult = any> {
+export interface UserToDeviceResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

@@ -308,7 +308,6 @@ type User {
   creationDate: String
   avatar: Avatar
   device: String
-  avatar: Avatar
 }
 
 type SearchUserResult {
