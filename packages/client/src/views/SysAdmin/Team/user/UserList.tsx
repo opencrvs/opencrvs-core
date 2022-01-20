@@ -36,10 +36,10 @@ import { UserStatus } from '@client/views/SysAdmin/Team/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import {
   AddUser,
-  AvatarSmall,
   VerticalThreeDots,
   SearchRed
 } from '@opencrvs/components/lib/icons'
+import { AvatarSmall } from '@client/components/Avatar'
 import {
   ColumnContentAlignment,
   ListTable,
@@ -66,6 +66,7 @@ import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { userMutations } from '@client/user/mutations'
+import { IAvatar } from '@client/utils/userUtils'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const { useState, useEffect } = React
@@ -385,11 +386,12 @@ function UserListComponent(props: IProps) {
     id: string,
     name: string,
     role: string,
-    type: string
+    type: string,
+    avatar: IAvatar | undefined
   ) {
     return (
       <PhotoNameRoleContainer>
-        <AvatarSmall />
+        <AvatarSmall name={name} avatar={avatar} />
         <MarginPhotoRight />
         <NameRoleTypeContainer>
           <Name
@@ -404,10 +406,14 @@ function UserListComponent(props: IProps) {
     )
   }
 
-  function getPhotoNameType(id: string, name: string) {
+  function getPhotoNameType(
+    id: string,
+    name: string,
+    avatar: IAvatar | undefined
+  ) {
     return (
       <>
-        <AvatarSmall />
+        <AvatarSmall name={name} avatar={avatar} />
         <MarginPhotoRight />
         <LinkButton
           id={`name-link-${id}`}
@@ -470,14 +476,17 @@ function UserListComponent(props: IProps) {
           const type =
             (user.type && intl.formatMessage(userMessages[user.type])) || '-'
 
+          const avatar = user.avatar
+
           return {
-            photoNameType: getPhotoNameType(user.id || '', name),
+            photoNameType: getPhotoNameType(user.id || '', name, avatar),
             nameRoleType: getNameRoleType(user.id || '', name, role, type),
             photoNameRoleType: getPhotoNameRoleType(
               user.id || '',
               name,
               role,
-              type
+              type,
+              avatar
             ),
             roleType: getRoleType(role, type),
             status: renderStatus(user.status, user.underInvestigation),

@@ -24,11 +24,8 @@ import {
 } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { GQLUser, GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { createNamesMap } from '@client/utils/data-formatting'
-import {
-  SearchRed,
-  Avatar,
-  VerticalThreeDots
-} from '@opencrvs/components/lib/icons'
+import { SearchRed, VerticalThreeDots } from '@opencrvs/components/lib/icons'
+import { Avatar } from '@client/components/Avatar'
 import styled from 'styled-components'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import moment from 'moment'
@@ -281,7 +278,8 @@ class UserProfileComponent extends React.Component<Props, State> {
           moment(new Date(Number(userData.creationDate))).format(
             'MMMM DD, YYYY'
           )) ||
-        ''
+        '',
+      avatar: userData.avatar
     }
   }
   getLoadingUserProfileView(hasError?: boolean) {
@@ -369,7 +367,7 @@ class UserProfileComponent extends React.Component<Props, State> {
                   }}
                 >
                   <ContentWrapper>
-                    <UserAvatar />
+                    <UserAvatar name={user.name} avatar={user.avatar} />
                     <NameHolder>{user.name}</NameHolder>
                     <InformationHolder>
                       <InformationTitle paddingRight={70}>

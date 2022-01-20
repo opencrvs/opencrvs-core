@@ -62,6 +62,7 @@ export interface GQLMutation {
   createOrUpdateUser: GQLUser
   activateUser?: string
   changePassword?: string
+  changeAvatar?: string
   auditUser?: string
   resendSMSInvite?: string
 }
@@ -192,6 +193,11 @@ export interface GQLLocation {
   geoData?: string
 }
 
+export interface GQLAvatar {
+  type: string
+  data: string
+}
+
 export interface GQLUser {
   id?: string
   userMgntUserID?: string
@@ -210,6 +216,7 @@ export interface GQLUser {
   identifier?: GQLIdentifier
   signature?: GQLSignature
   creationDate?: string
+  avatar?: GQLAvatar
   device?: string
 }
 
@@ -1775,6 +1782,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   createOrUpdateUser?: MutationToCreateOrUpdateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
   changePassword?: MutationToChangePasswordResolver<TParent>
+  changeAvatar?: MutationToChangeAvatarResolver<TParent>
   auditUser?: MutationToAuditUserResolver<TParent>
   resendSMSInvite?: MutationToResendSMSInviteResolver<TParent>
 }
@@ -2070,6 +2078,22 @@ export interface MutationToChangePasswordResolver<
   (
     parent: TParent,
     args: MutationToChangePasswordArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToChangeAvatarArgs {
+  userId: string
+  avatar: {
+    type: string
+    data: string
+  }
+}
+export interface MutationToChangeAvatarResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToChangeAvatarArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
