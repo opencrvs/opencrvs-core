@@ -130,10 +130,10 @@ interface BaseProps {
   reportTimeFrom: moment.Moment
   reportTimeTo: moment.Moment
   locationId: string
+  disableFieldAgentLink?: boolean
 }
 
 interface IStateProps {
-  disableFieldAgentLink: boolean
   isOfficeSelected: boolean
 }
 

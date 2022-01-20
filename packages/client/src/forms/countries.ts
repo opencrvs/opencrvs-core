@@ -10,6 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { countryMessages as messages } from '@client/i18n/messages'
+import { MessageDescriptor } from 'react-intl'
+
+type CountryItem = { value: string; label: MessageDescriptor }
 
 export const countries = [
   { value: 'AFG', label: messages.AFG },
@@ -260,4 +263,5 @@ export const countries = [
   { value: 'YEM', label: messages.YEM },
   { value: 'ZMB', label: messages.ZMB },
   { value: 'ZWE', label: messages.ZWE }
-]
+  // Remove potentially null country values (Farajaland)
+].filter((country): country is CountryItem => Boolean(country))
