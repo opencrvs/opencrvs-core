@@ -17,7 +17,6 @@ import {
   RADIO_GROUP_WITH_NESTED_FIELDS,
   Event
 } from '@client/forms'
-import { formMessages } from '@client/i18n/messages/form'
 import { messages } from '@client/i18n/messages/views/correction'
 
 const birthCorrectorRelationGroup: IFormSectionGroup = {
@@ -34,21 +33,25 @@ const birthCorrectorRelationGroup: IFormSectionGroup = {
       initialValue: '',
       validate: [],
       options: [
-        { value: 'MOTHER', label: formMessages.motherWithName },
-        { value: 'FATHER', label: formMessages.fatherWithName },
-        { value: 'CHILD', label: formMessages.childWithName },
+        { value: 'MOTHER', label: messages.mother },
+        { value: 'FATHER', label: messages.father },
+        { value: 'CHILD', label: messages.child },
         {
           value: 'LEGAL_GUARDIAN',
-          label: formMessages.legalGuardianCaregiverTypeLabel
+          label: messages.legalGuardian
         },
-        { value: 'ANOTHER_AGENT', label: formMessages.anotherRegOrFieldAgent },
+        { value: 'ANOTHER_AGENT', label: messages.anotherRegOrFieldAgent },
         {
           value: 'REGISTRAR',
-          label: formMessages.meWithRole
+          label: messages.me
+        },
+        {
+          value: 'COURT',
+          label: messages.court
         },
         {
           value: 'OTHERS',
-          label: formMessages.someoneElse
+          label: messages.others
         }
       ],
       nestedFields: {
@@ -97,15 +100,19 @@ const deathCorrectorRelationGroup: IFormSectionGroup = {
       initialValue: '',
       validate: [],
       options: [
-        { value: 'INFORMANT', label: formMessages.informantWithName },
-        { value: 'ANOTHER_AGENT', label: formMessages.anotherRegOrFieldAgent },
+        { value: 'INFORMANT', label: messages.informant },
+        { value: 'ANOTHER_AGENT', label: messages.anotherRegOrFieldAgent },
         {
           value: 'REGISTRAR',
-          label: formMessages.meWithRole
+          label: messages.me
+        },
+        {
+          value: 'COURT',
+          label: messages.court
         },
         {
           value: 'OTHERS',
-          label: formMessages.someoneElse
+          label: messages.others
         }
       ],
       nestedFields: {

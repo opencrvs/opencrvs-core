@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { Event, UserSection } from '@client/forms'
+import { Event, UserSection, CorrectionSection } from '@client/forms'
 import {
   APPLICATION_DETAIL,
   CERTIFICATE_COLLECTOR,
@@ -332,7 +332,7 @@ export function goToPrintCertificate(
 
 export function goToCertificateCorrection(
   registrationId: string,
-  sectionId: string
+  sectionId: CorrectionSection
 ) {
   return push(
     formatUrl(CERTIFICATE_CORRECTION, {
