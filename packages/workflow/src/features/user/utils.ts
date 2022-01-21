@@ -117,7 +117,7 @@ export function getPrimaryLocationFromLocationList(
     throw new Error('No primary location found')
   }
 
-  const location = locations.find(loc => loc.id === primaryLocationId)
+  const location = locations.find((loc) => loc.id === primaryLocationId)
   if (!location) {
     throw new Error(
       `No primary location not found for office: ${primaryLocationId}`
@@ -132,7 +132,7 @@ function getOfficeLocationFromLocationList(
   let office: fhir.Location | undefined
   locations.forEach((location: fhir.Location) => {
     if (location.type && location.type.coding) {
-      location.type.coding.forEach(code => {
+      location.type.coding.forEach((code) => {
         if (code.code === 'CRVS_OFFICE') {
           office = location
         }

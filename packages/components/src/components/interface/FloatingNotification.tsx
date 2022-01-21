@@ -10,30 +10,43 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled, { keyframes } from 'styled-components'
+import styled, { keyframes, withTheme } from 'styled-components'
 import { CrossLarge, Error, Success, Warning } from '../icons'
+import { Spinner } from './Spinner'
+import { ITheme } from '../theme'
+
 enum NOTIFICATION_TYPE {
   SUCCESS = 'success',
   WARNING = 'warning',
+  IN_PROGRESS = 'inProgress',
   ERROR = 'error'
 }
+
 interface IProps {
   id?: string
   show: boolean
   type?: NOTIFICATION_TYPE
   callback?: (event: React.MouseEvent<HTMLDivElement>) => void
   className?: string
+  children: React.ReactNode
 }
 
-const easeIn = keyframes`
+type FullProps = IProps & { theme: ITheme }
+
+const easeInFromBottom = keyframes`
   from { bottom: -200px; }
-  to { bottom: 100; }
+  to { bottom: 100px; }
 `
+
+const easeInFromTop = keyframes`
+  from { top: -200px; }
+  to { top: 56px; }
+`
+
 const NotificationContainer = styled.div`
   position: fixed;
   padding: 4px 8px;
   width: 50%;
-  margin-bottom: 100px;
   transform: translateX(-50%);
   left: 50%;
   display: flex;
@@ -45,18 +58,30 @@ const NotificationContainer = styled.div`
   box-sizing: border-box;
 
   &.show {
-    animation: ${easeIn} 500ms;
-    bottom: 0;
+    animation: ${easeInFromBottom} 500ms;
+    bottom: 100px;
   }
 
   &.success {
     background: ${({ theme }) => theme.colors.success};
+  }
+  &.inProgress {
+    background: ${({ theme }) => theme.colors.primary};
   }
   &.error {
     background: ${({ theme }) => theme.colors.error};
   }
   &.warning {
     background: ${({ theme }) => theme.colors.warning};
+  }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    width: 100%;
+
+    &.show {
+      animation: ${easeInFromTop} 500ms;
+      top: 56px;
+      bottom: auto;
+    }
   }
 `
 
@@ -84,9 +109,9 @@ const NotificationMessage = styled.div`
   min-width: 160px;
 `
 
-export class FloatingNotification extends React.Component<IProps> {
+class FloatingNotificationComp extends React.Component<FullProps> {
   render() {
-    const { id, type, show, children, callback, className } = this.props
+    const { id, type, show, children, callback, className, theme } = this.props
 
     return (
       <NotificationContainer
@@ -97,16 +122,26 @@ export class FloatingNotification extends React.Component<IProps> {
           {type === NOTIFICATION_TYPE.SUCCESS && <Success />}
           {type === NOTIFICATION_TYPE.WARNING && <Warning />}
           {type === NOTIFICATION_TYPE.ERROR && <Error />}
+          {type === NOTIFICATION_TYPE.IN_PROGRESS && (
+            <Spinner
+              id="in-progress-floating-notification"
+              baseColor={theme.colors.white}
+            />
+          )}
           <NotificationMessage>{children}</NotificationMessage>
         </Content>
-        <Cancel
-          id={`${id}Cancel`}
-          onClick={callback}
-          className={callback ? ' clickable' : ''}
-        >
-          <CrossLarge />
-        </Cancel>
+        {callback && (
+          <Cancel
+            id={`${id}Cancel`}
+            onClick={callback}
+            className={' clickable'}
+          >
+            <CrossLarge />
+          </Cancel>
+        )}
       </NotificationContainer>
     )
   }
 }
+
+export const FloatingNotification = withTheme(FloatingNotificationComp)

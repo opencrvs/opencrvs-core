@@ -12,6 +12,7 @@
 import { Meta, Story } from '@storybook/react'
 import { useState } from 'react'
 import { ExpandingMenu } from './ExpandingMenu'
+import styled from 'styled-components'
 import {
   ApplicationBlack,
   ApplicationBlue,
@@ -92,8 +93,20 @@ const menuItems = [
     onClick: () => alert('Logout')
   }
 ]
+const AvatarImage = styled.img`
+  border-radius: 50%;
+  &.clickable {
+    cursor: pointer;
+  }
+`
 const userDetails = { name: 'Yeasin', role: 'Field agent' }
-
+const avatar = (
+  <AvatarImage
+    width={64}
+    height={64}
+    src={`https:/eu.ui-avatars.com/api/?name=Yeasin`}
+  />
+)
 const Template: Story<IProps> = () => {
   const [showMenu, setMenu] = useState(false)
   return (
@@ -104,6 +117,7 @@ const Template: Story<IProps> = () => {
         userDetails={userDetails}
         menuItems={menuItems}
         menuCollapse={() => setMenu(false)}
+        avatar={avatar}
       />
     </>
   )

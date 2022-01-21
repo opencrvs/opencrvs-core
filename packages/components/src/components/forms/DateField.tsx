@@ -145,14 +145,8 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
   }
 
   render() {
-    const {
-      id,
-      meta,
-      focusInput,
-      notice,
-      ignorePlaceHolder,
-      ...props
-    } = this.props
+    const { id, meta, focusInput, notice, ignorePlaceHolder, ...props } =
+      this.props
 
     return (
       <>
