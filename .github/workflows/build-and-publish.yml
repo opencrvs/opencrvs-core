@@ -14,6 +14,7 @@ on:
   push:
     branches:
       - master
+      - ocrvs-2339
 
 jobs:
   buildAndPublish:
