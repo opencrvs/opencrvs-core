@@ -1264,10 +1264,17 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const sectionName = this.state.activeSection || this.docSections[0].id
     const applicantName = getDraftApplicantFullName(application, intl.locale)
     const draft = this.isDraft()
+    console.log(this.transformSectionData(formSections, errorsOnFields))
     const transformedSectionData = this.transformSectionData(
       formSections,
       errorsOnFields
-    )
+    ).map((sec) => {
+      if (sec.id === 'father' && sec.items[0].value === 'No') {
+        return { ...sec, items: [sec.items[0]] }
+      } else return { ...sec }
+    })
+    console.log(transformedSectionData)
+
     return (
       <FullBodyContent>
         <Row>
