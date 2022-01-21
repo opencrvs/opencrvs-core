@@ -21,13 +21,16 @@ import {
 import * as actions from '@client/offline/actions'
 import * as profileActions from '@client/profile/profileActions'
 import { storage } from '@client/storage'
-import { referenceApi } from '@client/utils/referenceApi'
+import { IApplicationConfig, referenceApi } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations, getLocation } from '@client/utils/locationUtils'
 import { ISerializedForm } from '@client/forms'
 import { isOfflineDataLoaded, isSystemAdmin } from './selectors'
 import { IUserDetails } from '@client/utils/userUtils'
-import { IPDFTemplate } from '@client/pdfRenderer/transformer/types'
+import {
+  IPDFTemplate,
+  ISVGTemplate
+} from '@client/pdfRenderer/transformer/types'
 import { ICertificateCollectorDefinition } from '@client/views/PrintCertificate/VerifyCollector'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
@@ -70,13 +73,14 @@ export interface IOfflineData {
   templates: {
     receipt?: IPDFTemplate
     certificates: {
-      birth: IPDFTemplate
-      death: IPDFTemplate
+      birth: ISVGTemplate
+      death: ISVGTemplate
     }
   }
   assets: {
     logo: string
   }
+  config: IApplicationConfig
 }
 
 export type IOfflineDataState = {
@@ -164,6 +168,11 @@ const ASSETS_CMD = Cmd.run(() => referenceApi.loadAssets(), {
   failActionCreator: actions.assetsFailed
 })
 
+const CONFIG_CMD = Cmd.run(() => referenceApi.loadConfig(), {
+  successActionCreator: actions.configLoaded,
+  failActionCreator: actions.configFailed
+})
+
 const RETRY_TIMEOUT = 5000
 
 function delay(cmd: RunCmd<any>, time: number) {
@@ -175,6 +184,7 @@ function delay(cmd: RunCmd<any>, time: number) {
 
 function getDataLoadingCommands() {
   return Cmd.list<actions.Action>([
+    CONFIG_CMD,
     FACILITIES_CMD,
     LOCATIONS_CMD,
     PILOT_LOCATIONS_CMD,
@@ -253,6 +263,29 @@ function reducer(
         )
       }
       return loop(state, dataLoadingCmds)
+    }
+
+    /*
+     * Configurations
+     */
+    case actions.APPLICATION_CONFIG_LOADED: {
+      return {
+        ...state,
+        offlineData: {
+          ...state.offlineData,
+          config: action.payload
+        }
+      }
+    }
+
+    case actions.APPLICATION_CONFIG_FAILED: {
+      return loop(
+        {
+          ...state,
+          loadingError: errorIfDataNotLoaded(state)
+        },
+        delay(CONFIG_CMD, RETRY_TIMEOUT)
+      )
     }
 
     /*

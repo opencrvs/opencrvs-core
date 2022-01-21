@@ -64,6 +64,7 @@ export interface GQLMutation {
   changePassword?: string
   auditUser?: string
   resendSMSInvite?: string
+  createOrUpdateCertificateSVG?: GQLCertificateSVG
 }
 
 export interface GQLDummy {
@@ -211,6 +212,16 @@ export interface GQLUser {
   signature?: GQLSignature
   creationDate?: string
   device?: string
+}
+export interface GQLCertificateSVG {
+  id: string
+  svgCode: string
+  svgFilename: string
+  svgDateUpdated: number
+  svgDateCreated: number
+  user: string
+  event: string
+  status: string
 }
 
 export interface GQLSearchUserResult {
@@ -1291,6 +1302,8 @@ export interface GQLQueryTypeResolver<TParent = any> {
   searchEvents?: QueryToSearchEventsResolver<TParent>
   getEventsWithProgress?: QueryToGetEventsWithProgressResolver<TParent>
   getRoles?: QueryToGetRolesResolver<TParent>
+  getCertificateSVG?: QueryToGetCertificateResolver<TParent>
+  getActiveCertificatesSVG?: QueryToGetActiveCertificatesResolver<TParent>
 }
 
 export interface QueryToListNotificationsArgs {
@@ -1757,6 +1770,10 @@ export interface QueryToGetRolesArgs {
   sortBy?: string
   sortOrder?: string
 }
+export interface QueryToGetCertificateArgs {
+  status?: string
+  event?: string
+}
 export interface QueryToGetRolesResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
@@ -1764,6 +1781,20 @@ export interface QueryToGetRolesResolver<TParent = any, TResult = any> {
     context: any,
     info: GraphQLResolveInfo
   ): TResult
+}
+export interface QueryToGetCertificateResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: QueryToGetCertificateArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+export interface QueryToGetActiveCertificatesResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
 export interface GQLMutationTypeResolver<TParent = any> {
@@ -1788,6 +1819,9 @@ export interface GQLMutationTypeResolver<TParent = any> {
   changePassword?: MutationToChangePasswordResolver<TParent>
   auditUser?: MutationToAuditUserResolver<TParent>
   resendSMSInvite?: MutationToResendSMSInviteResolver<TParent>
+  createOrUpdateCertificateSVG?: MutationCreateOrUpdateCertificateSVGResolver<
+    TParent
+  >
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -2115,7 +2149,20 @@ export interface MutationToResendSMSInviteResolver<
     info: GraphQLResolveInfo
   ): TResult
 }
-
+export interface MutationCreateOrUpdateCertificateSVGArgs {
+  certificateSVG: GQLCertificateSVG
+}
+export interface MutationCreateOrUpdateCertificateSVGResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationCreateOrUpdateCertificateSVGArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
 export interface GQLDummyTypeResolver<TParent = any> {
   dummy?: DummyToDummyResolver<TParent>
 }

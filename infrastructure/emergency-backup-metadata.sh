@@ -65,7 +65,7 @@ fi
 #-----------------------------------
 BACKUP_DATE=$(date +%Y-%m-%d)
 
-# Backup Hearth, OpenHIM and any other service related Mongo databases into a mongo sub folder
+# Backup Hearth, OpenHIM, User, Application-config and any other service related Mongo databases into a mongo sub folder
 #---------------------------------------------------------------------------------------------
 docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:3.6 bash \
  -c "mongodump --host $HOST -d hearth-dev --gzip --archive=/data/backups/mongo/hearth-dev-$BACKUP_DATE.gz"
@@ -73,6 +73,8 @@ docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mo
  -c "mongodump --host $HOST -d openhim-dev --gzip --archive=/data/backups/mongo/openhim-dev-$BACKUP_DATE.gz"
 docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:3.6 bash \
  -c "mongodump --host $HOST -d user-mgnt --gzip --archive=/data/backups/mongo/user-mgnt-$BACKUP_DATE.gz"
+docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:3.6 bash \
+ -c "mongodump --host $HOST -d application-config --gzip --archive=/data/backups/mongo/application-config-$BACKUP_DATE.gz"
 
 # Register backup folder as an Elasticsearch repository for backing up the search data
 #-------------------------------------------------------------------------------------
@@ -113,6 +115,7 @@ if [[ "$OWN_IP" = "$PRODUCTION_IP" ]]; then
   script -q -c "scp -v -r -P $SSH_PORT /data/backups/mongo/hearth-dev-$BACKUP_DATE.gz $SSH_USER@$SSH_HOST:$REMOTE_DIR/mongo" && echo "Copied hearth backup files to remote server."
   script -q -c "scp -v -r -P $SSH_PORT /data/backups/mongo/user-mgnt-$BACKUP_DATE.gz $SSH_USER@$SSH_HOST:$REMOTE_DIR/mongo" && echo "Copied user backup files to remote server."
   script -q -c "scp -v -r -P $SSH_PORT /data/backups/mongo/openhim-dev-$BACKUP_DATE.gz $SSH_USER@$SSH_HOST:$REMOTE_DIR/mongo" && echo "Copied openhim backup files to remote server."
+  script -q -c "scp -v -r -P $SSH_PORT /data/backups/mongo/application-config-$BACKUP_DATE.gz $SSH_USER@$SSH_HOST:$REMOTE_DIR/mongo" && echo "Copied application-config backup files to remote server."
 fi
 
 # Cleanup any old backups from influx or mongo. Keep previous 7 days of data and all elastic data
