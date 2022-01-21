@@ -34,4 +34,5 @@ COPY . .
 ENV VERSION "$VERSION"
 ENV RESOURCES_URL "THIS_WILL_BE_REPLACED_BY_RUNTIME_ENV_VARIABLE"
 ENV HOST "{{hostname}}"
+RUN ./node_modules/.bin/lerna run build --scope @opencrvs/commons
 RUN yarn build
