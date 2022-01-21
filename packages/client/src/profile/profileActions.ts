@@ -16,16 +16,21 @@ import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { ApolloQueryResult } from 'apollo-client'
 import { IUserDetails } from '@client/utils/userUtils'
 export const CHECK_AUTH = 'PROFILE/CHECK_AUTH' as const
-export const REDIRECT_TO_AUTHENTICATION = 'PROFILE/REDIRECT_TO_AUTHENTICATION' as const
+export const REDIRECT_TO_AUTHENTICATION =
+  'PROFILE/REDIRECT_TO_AUTHENTICATION' as const
 export const FETCH_USER_DETAILS = 'PROFILE/FETCH_USER_DETAILS' as const
 export const SET_USER_DETAILS = 'PROFILE/SET_USER_DETAILS' as const
 export const MODIFY_USER_DETAILS = 'PROFILE/MODIFY_USER_DETAILS' as const
-export const SET_INITIAL_USER_DETAILS = 'PROFILE/SET_INITIAL_USER_DETAILS' as const
-export const GET_USER_DETAILS_SUCCESS = 'PROFILE/GET_USER_DETAILS_SUCCESS' as const
-export const GET_USER_DETAILS_FAILED = 'PROFILE/GET_USER_DETAILS_FAILED' as const
+export const SET_INITIAL_USER_DETAILS =
+  'PROFILE/SET_INITIAL_USER_DETAILS' as const
+export const GET_USER_DETAILS_SUCCESS =
+  'PROFILE/GET_USER_DETAILS_SUCCESS' as const
+export const GET_USER_DETAILS_FAILED =
+  'PROFILE/GET_USER_DETAILS_FAILED' as const
 export const USER_DETAILS_AVAILABLE = 'PROFILE/USER_DETAILS_AVAILABLE' as const
 export const SEND_VERIFY_CODE = 'PROFILE/SEND_VERIFY_CODE' as const
-export const SEND_VERIFY_CODE_COMPLETED = 'PROFILE/SEND_VERIFY_CODE_COMPLETED' as const
+export const SEND_VERIFY_CODE_COMPLETED =
+  'PROFILE/SEND_VERIFY_CODE_COMPLETED' as const
 
 type RedirectToAuthenticationAction = {
   type: typeof REDIRECT_TO_AUTHENTICATION
@@ -115,9 +120,10 @@ export const getStorageUserDetailsSuccess = (
   }
 }
 
-export const getStorageUserDetailsFailed = (): IGetStorageUserDetailsFailedAction => ({
-  type: GET_USER_DETAILS_FAILED
-})
+export const getStorageUserDetailsFailed =
+  (): IGetStorageUserDetailsFailedAction => ({
+    type: GET_USER_DETAILS_FAILED
+  })
 
 export const redirectToAuthentication = (): RedirectToAuthenticationAction => ({
   type: REDIRECT_TO_AUTHENTICATION

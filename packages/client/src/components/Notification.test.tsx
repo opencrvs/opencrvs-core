@@ -87,10 +87,7 @@ describe('when app notifies the user', () => {
       })
 
       it('clicking cancel button should hide the toast', () => {
-        app
-          .find('#submissionSuccessToastCancel')
-          .hostNodes()
-          .simulate('click')
+        app.find('#submissionSuccessToastCancel').hostNodes().simulate('click')
         app.update()
         expect(store.getState().notification.submitFormSuccessToast).toBe(null)
       })
@@ -105,12 +102,9 @@ describe('when app notifies the user', () => {
         app.update()
       })
       it('Shows different message for update submission', () => {
-        expect(
-          app
-            .find('#submissionSuccessToast')
-            .hostNodes()
-            .text()
-        ).toBe('User details have been updated')
+        expect(app.find('#submissionSuccessToast').hostNodes().text()).toBe(
+          'User details have been updated'
+        )
       })
     })
 
@@ -126,10 +120,7 @@ describe('when app notifies the user', () => {
       })
 
       it('clicking cancel button should hide the toast', () => {
-        app
-          .find('#submissionErrorToastCancel')
-          .hostNodes()
-          .simulate('click')
+        app.find('#submissionErrorToastCancel').hostNodes().simulate('click')
         app.update()
         expect(store.getState().notification.submitFormErrorToast).toBe(null)
       })
@@ -145,20 +136,14 @@ describe('when app notifies the user', () => {
       })
 
       it('shows submit success toast', () => {
-        expect(
-          app
-            .find('#userAuditSuccessToast')
-            .hostNodes()
-            .text()
-        ).toBe('John Doe was deactivated')
+        expect(app.find('#userAuditSuccessToast').hostNodes().text()).toBe(
+          'John Doe was deactivated'
+        )
         expect(app.find('#userAuditSuccessToast').hostNodes()).toHaveLength(1)
       })
 
       it('clicking cancel button should hide the toast', () => {
-        app
-          .find('#userAuditSuccessToastCancel')
-          .hostNodes()
-          .simulate('click')
+        app.find('#userAuditSuccessToastCancel').hostNodes().simulate('click')
         app.update()
         expect(
           store.getState().notification.userAuditSuccessToast.visible

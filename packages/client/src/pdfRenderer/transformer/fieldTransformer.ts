@@ -52,7 +52,7 @@ export const fieldTransformers: IFunctionTransformer = {
       throw new Error('No payload found for this transformer')
     }
     if (message.messageValues) {
-      Object.keys(message.messageValues).forEach(valueKey => {
+      Object.keys(message.messageValues).forEach((valueKey) => {
         const messageValue =
           valueKey === 'event'
             ? intl.formatMessage(
@@ -105,14 +105,15 @@ export const fieldTransformers: IFunctionTransformer = {
       )
     }
 
-    const applicantObj: IFormSectionData | null = getValueFromApplicationDataByKey(
-      templateData.application.data,
-      matchedCondition.key[templateData.application.event]
-    )
+    const applicantObj: IFormSectionData | null =
+      getValueFromApplicationDataByKey(
+        templateData.application.data,
+        matchedCondition.key[templateData.application.event]
+      )
     let applicantName = ''
     matchedCondition.format[
       formatPayload.language ? formatPayload.language : intl.locale
-    ].forEach(field => {
+    ].forEach((field) => {
       applicantName = applicantName.concat(
         `${(applicantObj && applicantObj[field]) || ''} `
       )
@@ -154,7 +155,7 @@ export const fieldTransformers: IFunctionTransformer = {
     )
     if (key.messageDescriptors) {
       const matchedOption = key.messageDescriptors.find(
-        option => option.matchValue === fieldValue
+        (option) => option.matchValue === fieldValue
       )
       return (
         (matchedOption &&
@@ -217,7 +218,7 @@ export const fieldTransformers: IFunctionTransformer = {
     const keys = keyParam.formattedKeys.match(/\{.*?\}/g)
     const keyValues: { [key: string]: string } = {}
     keys &&
-      keys.forEach(key => {
+      keys.forEach((key) => {
         keyValues[key] =
           getValueFromApplicationDataByKey(
             templateData.application.data,
@@ -226,7 +227,7 @@ export const fieldTransformers: IFunctionTransformer = {
           ) || ''
       })
     let value = keyParam.formattedKeys
-    Object.keys(keyValues).forEach(key => {
+    Object.keys(keyValues).forEach((key) => {
       value = value.replace(new RegExp(`${key}`, 'g'), keyValues[key] || '')
     })
     return value
@@ -304,7 +305,7 @@ export const fieldTransformers: IFunctionTransformer = {
     )
 
     let value = null
-    params.conditions.forEach(condition => {
+    params.conditions.forEach((condition) => {
       if (
         condition.type === 'COMPARE_DATE_IN_DAYS' &&
         toValue !== null &&
@@ -349,7 +350,7 @@ export const fieldTransformers: IFunctionTransformer = {
       ) || ''
     ).toString()
 
-    Object.keys(params.conversionMap).forEach(numberKey => {
+    Object.keys(params.conversionMap).forEach((numberKey) => {
       value = value.replace(
         new RegExp(numberKey, 'g'),
         params.conversionMap[numberKey]

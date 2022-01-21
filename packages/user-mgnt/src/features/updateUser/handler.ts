@@ -51,7 +51,7 @@ export default async function updateUser(
   existingUser.mobile = user.mobile
   existingUser.signature = user.signature
   existingUser.localRegistrar = user.localRegistrar
-  existingUser.deviceId = user.deviceId
+  existingUser.device = user.device
   if (existingUser.role !== user.role) {
     existingUser.role = user.role
     // Updating user sope

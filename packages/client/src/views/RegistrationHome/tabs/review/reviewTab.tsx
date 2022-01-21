@@ -117,7 +117,7 @@ class ReviewTabComponent extends React.Component<
     return transformedData.map((reg, index) => {
       const actions = [] as IAction[]
       const foundApplication = this.props.outboxApplications.find(
-        application => application.id === reg.id
+        (application) => application.id === reg.id
       )
       const downloadStatus =
         (foundApplication && foundApplication.downloadStatus) || undefined
@@ -253,13 +253,14 @@ class ReviewTabComponent extends React.Component<
         },
         {
           label: this.props.intl.formatMessage(constantsMessages.name),
-          width: 64,
+          width: 50,
           key: 'name'
         },
         {
-          width: 6,
+          width: 20,
           key: 'icons',
-          isIconColumn: true
+          isIconColumn: true,
+          alignment: ColumnContentAlignment.RIGHT
         }
       ]
     }
@@ -268,7 +269,7 @@ class ReviewTabComponent extends React.Component<
   renderExpandedComponent = (itemId: string) => {
     const { results } = this.props.queryData && this.props.queryData.data
     const eventDetails =
-      results && results.find(result => result && result.id === itemId)
+      results && results.find((result) => result && result.id === itemId)
     return <RowHistoryView eventDetails={eventDetails} />
   }
 

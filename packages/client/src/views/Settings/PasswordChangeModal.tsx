@@ -273,7 +273,7 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
 
         <form
           id="password-update-modal-form"
-          onSubmit={e => {
+          onSubmit={(e) => {
             e.preventDefault()
           }}
         >

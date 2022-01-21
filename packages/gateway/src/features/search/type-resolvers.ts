@@ -30,6 +30,7 @@ interface ISearchDataTemplate {
 }
 export interface ISearchCriteria {
   applicationLocationId?: string
+  applicationLocationHirarchyId?: string
   status?: string[]
   type?: string[]
   trackingId?: string
@@ -50,7 +51,7 @@ const getTimeLoggedDataByStatus = (
   return (
     (timeLoggedData &&
       timeLoggedData.find(
-        timeLoggedByStatus =>
+        (timeLoggedByStatus) =>
           timeLoggedByStatus.status && timeLoggedByStatus.status === status
       )?.durationInSeconds) ||
     null
@@ -241,8 +242,10 @@ export const searchTypeResolvers: GQLResolver = {
     startedAt(searchData: ISearchEventDataTemplate) {
       let startedAt = null
       if (searchData._source.operationHistories) {
-        startedAt = (searchData._source
-          .operationHistories as GQLOperationHistorySearchSet[])[0].operatedOn
+        startedAt = (
+          searchData._source
+            .operationHistories as GQLOperationHistorySearchSet[]
+        )[0].operatedOn
       }
       return startedAt
     },
@@ -255,9 +258,10 @@ export const searchTypeResolvers: GQLResolver = {
     startedByFacility(searchData: ISearchEventDataTemplate) {
       let facilityName = null
       if (searchData._source.operationHistories) {
-        facilityName = (searchData._source
-          .operationHistories as GQLOperationHistorySearchSet[])[0]
-          .notificationFacilityName
+        facilityName = (
+          searchData._source
+            .operationHistories as GQLOperationHistorySearchSet[]
+        )[0].notificationFacilityName
       }
       return facilityName
     },

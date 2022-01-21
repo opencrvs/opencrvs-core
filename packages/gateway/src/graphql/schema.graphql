@@ -44,7 +44,8 @@ type Query {
     sort: String
   ): SearchUserResult
   searchFieldAgents(
-    locationId: String!
+    locationId: String
+    primaryOfficeId: String
     status: String
     language: String
     timeStart: String!
@@ -105,7 +106,7 @@ type Query {
     sortColumn: String
   ): EventSearchResultSet
   getEventsWithProgress(
-    parentLocationId: String
+    locationId: String
     count: Int
     skip: Int
     sort: String
@@ -168,6 +169,7 @@ type Mutation {
     nonce: String!
     verifyCode: String!
   ): String
+  changeAvatar(userId: String!, avatar: AvatarInput!): String
   auditUser(
     userId: String!
     action: String!
@@ -310,6 +312,8 @@ type User {
   identifier: Identifier
   signature: Signature
   creationDate: String
+  avatar: Avatar
+  device: String
 }
 
 type SearchUserResult {
@@ -457,6 +461,11 @@ input UserInput {
 input SecurityQuestionAnswer {
   questionKey: String
   answer: String
+}
+
+input AvatarInput {
+  type: String!
+  data: String!
 }
 
 scalar Map
@@ -658,6 +667,11 @@ type LocalRegistrar {
 type Signature {
   data: String
   type: String
+}
+
+type Avatar {
+  type: String!
+  data: String!
 }
 
 type SearchFieldAgentResponse {

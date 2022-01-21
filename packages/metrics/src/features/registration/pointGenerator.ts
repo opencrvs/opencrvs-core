@@ -48,7 +48,8 @@ import {
   MANNER_OF_DEATH_CODE,
   CAUSE_OF_DEATH_CODE,
   getPractionerIdFromTask,
-  getTrackingId
+  getTrackingId,
+  getRegLastOffice
 } from '@metrics/features/registration/fhirUtils'
 import {
   getAgeInDays,
@@ -72,7 +73,7 @@ export const generateInCompleteFieldPoints = async (
     task &&
     task.extension &&
     task.extension.find(
-      extension =>
+      (extension) =>
         extension.url ===
         `${OPENCRVS_SPECIFICATION_URL}extension/in-complete-fields`
     )
@@ -101,22 +102,24 @@ export const generateInCompleteFieldPoints = async (
     authHeader
   )
 
-  return inCompleteFieldExtension.valueString.split(',').map(missingFieldId => {
-    const missingFieldIds = missingFieldId.split('/')
-    const tags: IInProgressApplicationTags = {
-      missingFieldSectionId: missingFieldIds[0],
-      missingFieldGroupId: missingFieldIds[1],
-      missingFieldId: missingFieldIds[2],
-      eventType: getApplicationType(task) as string,
-      regStatus: 'IN_PROGESS',
-      ...locationTags
-    }
-    return {
-      measurement: 'in_complete_fields',
-      tags,
-      fields
-    }
-  })
+  return inCompleteFieldExtension.valueString
+    .split(',')
+    .map((missingFieldId) => {
+      const missingFieldIds = missingFieldId.split('/')
+      const tags: IInProgressApplicationTags = {
+        missingFieldSectionId: missingFieldIds[0],
+        missingFieldGroupId: missingFieldIds[1],
+        missingFieldId: missingFieldIds[2],
+        eventType: getApplicationType(task) as string,
+        regStatus: 'IN_PROGESS',
+        ...locationTags
+      }
+      return {
+        measurement: 'in_complete_fields',
+        tags,
+        fields
+      }
+    })
 }
 
 export const generateBirthRegPoint = async (
@@ -142,6 +145,7 @@ export const generateBirthRegPoint = async (
   const tags: IBirthRegistrationTags = {
     regStatus: regStatus,
     gender: child.gender,
+    officeLocation: getRegLastOffice(payload),
     ...(await generatePointLocations(payload, authHeader))
   }
 
@@ -187,6 +191,7 @@ export const generateDeathRegPoint = async (
     gender: deceased.gender,
     mannerOfDeath: getObservationValueByCode(payload, MANNER_OF_DEATH_CODE),
     causeOfDeath: getObservationValueByCode(payload, CAUSE_OF_DEATH_CODE),
+    officeLocation: getRegLastOffice(payload),
     ...(await generatePointLocations(payload, authHeader))
   }
 
@@ -249,6 +254,7 @@ export async function generatePaymentPoint(
 
   const tags = {
     eventType: getApplicationType(task),
+    officeLocation: getRegLastOffice(payload),
     ...(await generatePointLocations(payload, authHeader))
   }
 
@@ -357,6 +363,7 @@ export async function generateTimeLoggedPoint(
     trackingId: getTrackingId(currentTask) as string,
     eventType: getApplicationType(currentTask) as string,
     practitionerId: getPractionerIdFromTask(currentTask),
+    officeLocation: getRegLastOffice(payload),
     ...(await generatePointLocations(payload, authHeader))
   }
 
@@ -410,6 +417,7 @@ export async function generateApplicationStartedPoint(
   const tags = {
     eventType: getApplicationType(task),
     practitionerId: getPractionerIdFromTask(task),
+    officeLocation: getRegLastOffice(payload),
     ...(await generatePointLocations(payload, authHeader))
   }
 
@@ -444,6 +452,7 @@ export async function generateRejectedPoints(
   const tags = {
     eventType: getApplicationType(task),
     startedBy: getStartedByFieldAgent(taskHistory),
+    officeLocation: getRegLastOffice(payload),
     ...(await generatePointLocations(payload, authHeader))
   }
 

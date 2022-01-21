@@ -42,6 +42,7 @@ interface IConstantsMessages
   collected: MessageDescriptor
   collectedBy: MessageDescriptor
   comment: MessageDescriptor
+  configTitle: MessageDescriptor
   customTimePeriod: MessageDescriptor
   dateOfApplication: MessageDescriptor
   death: MessageDescriptor
@@ -290,6 +291,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Comment',
     description: 'Label for rejection comment',
     id: 'constants.comment'
+  },
+  configTitle: {
+    defaultMessage: 'Config',
+    description: 'Config title',
+    id: 'constants.config'
   },
   customTimePeriod: {
     defaultMessage: 'Custom time period',
@@ -676,7 +682,7 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.within45DaysTo1Year'
   },
   within1YearTo5Years: {
-    defaultMessage: '1 year to 5 years',
+    defaultMessage: '1 year - 5 years',
     description: 'Label for registrations within 1 year to 5 years',
     id: 'constants.within1YearTo5Years'
   },
@@ -1303,6 +1309,11 @@ const countryMessagesToDefine: Record<
     id: 'countries.FLK',
     defaultMessage: 'Falkland Islands (Malvinas)',
     description: 'ISO Country: FLK'
+  },
+  FAR: {
+    id: 'countries.FAR',
+    defaultMessage: 'Farajaland',
+    description: 'Fictional country for OpenCRSV demo'
   },
   FRO: {
     id: 'countries.FRO',

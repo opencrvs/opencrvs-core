@@ -107,21 +107,11 @@ describe('Field agent list tests', () => {
       component,
       '#totalApplications-label'
     )
-    expect(
-      firstRowElement
-        .hostNodes()
-        .childAt(0)
-        .text()
-    ).toBe('Sakib Al Hasan')
+    expect(firstRowElement.hostNodes().childAt(0).text()).toBe('Sakib Al Hasan')
 
     toggleSortActionElement.hostNodes().simulate('click')
 
-    expect(
-      firstRowElement
-        .hostNodes()
-        .childAt(0)
-        .text()
-    ).toBe('Naeem Hossain')
+    expect(firstRowElement.hostNodes().childAt(0).text()).toBe('Naeem Hossain')
   })
 
   it('changing location id from location picker updates the query params', async () => {

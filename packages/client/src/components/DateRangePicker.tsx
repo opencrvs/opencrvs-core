@@ -125,7 +125,7 @@ export const ContentWrapper = styled.div`
 `
 
 export const ModalContainer = styled.div`
-  position: absolute;
+  position: relative;
   z-index: 2;
   width: 608px;
   margin: -42px 0 0 -16px;
@@ -140,7 +140,7 @@ export const ModalContainer = styled.div`
     margin-left: 0;
   }
 
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  /* @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     position: fixed;
     border-radius: 2px;
     width: auto;
@@ -148,7 +148,7 @@ export const ModalContainer = styled.div`
     left: 50vw;
     transform: translateX(-50%);
     margin: 0;
-  }
+  } */
 `
 export const ModalHeader = styled.div<{ hide?: boolean }>`
   display: flex;
@@ -232,7 +232,7 @@ const LabelContainer = styled.div`
     ${({ theme }) => theme.fonts.bodyBoldStyle}
     text-align: center;
   }
-  `
+`
 const YearLabelContainer = styled.div`
   padding: 8px;
   ${({ theme }) => theme.fonts.smallButtonStyleNoCapitalize}
@@ -296,7 +296,7 @@ const PresetRangeButton = styled.button<{ selected?: boolean }>`
   &:focus {
     outline: none;
   }
-  
+
   ${({ theme, selected }) =>
     selected
       ? `background: ${theme.colors.secondary};
@@ -304,7 +304,7 @@ const PresetRangeButton = styled.button<{ selected?: boolean }>`
       : `background: none;
   color: ${theme.colors.copy};`}
 
-@media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 12px 24px;
 
     &:active {
@@ -391,9 +391,8 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
   const [startDate, setStartDate] = useState<moment.Moment>(startDateFromProps)
   const [endDate, setEndDate] = useState<moment.Moment>(endDateFromProps)
 
-  const [startDateNav, setStartDateNav] = useState<moment.Moment>(
-    startDateFromProps
-  )
+  const [startDateNav, setStartDateNav] =
+    useState<moment.Moment>(startDateFromProps)
   const [endDateNav, setEndDateNav] = useState<moment.Moment>(endDateFromProps)
 
   const todaysDateMoment = moment()
@@ -465,7 +464,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
         body.style.removeProperty('overflow')
         setActiveRoute(PRESET)
       } else {
-        body.style.overflow = 'hidden'
+        body.style.overflow = 'auto'
       }
     }
 
@@ -552,7 +551,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
   function PresetSelector(props: PresetSelectorProps) {
     return (
       <PresetContainer id={props.id}>
-        {presetOptions.map(item => {
+        {presetOptions.map((item) => {
           return isPresetNavButton(item) ? (
             <PresetRangeButton
               id={item.key}
@@ -585,7 +584,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
   }
 
   const selectedPresetFromProps = presetOptions.find(
-    item =>
+    (item) =>
       !isPresetNavButton(item) &&
       item.startDate.isSame(startDateFromProps, 'month') &&
       item.endDate.isSame(endDateFromProps, 'month')
@@ -617,7 +616,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
           date={startDateNav}
           onNavigateDate={setStartDateNav}
           label={intl.formatMessage(constantsMessages.from)}
-          onSelectDate={date => {
+          onSelectDate={(date) => {
             setStartDate(date)
             setActiveRoute(END_MONTH)
           }}
@@ -636,7 +635,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
           onNavigateDate={setEndDateNav}
           label={intl.formatMessage(constantsMessages.toCapitalized)}
           selectedDate={endDate}
-          onSelectDate={date => {
+          onSelectDate={(date) => {
             props.onDatesChange({
               startDate: startDate.toDate(),
               endDate: date.toDate()

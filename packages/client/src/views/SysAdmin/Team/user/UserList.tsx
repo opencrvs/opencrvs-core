@@ -34,12 +34,13 @@ import { createNamesMap } from '@client/utils/data-formatting'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { UserStatus } from '@client/views/SysAdmin/Team/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { IAvatar } from '@client/utils/userUtils'
 import {
   AddUser,
-  AvatarSmall,
   VerticalThreeDots,
   SearchRed
 } from '@opencrvs/components/lib/icons'
+import { AvatarSmall } from '@client/components/Avatar'
 import {
   ColumnContentAlignment,
   ListTable,
@@ -86,10 +87,9 @@ const TableHeader = styled.div`
   padding: 8px 18px;
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.subtitleStyle};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
   border-bottom: 1px solid ${({ theme }) => theme.colors.silverSand};
 `
-
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors};
   ${({ theme }) => theme.fonts.bodyStyle};
@@ -98,8 +98,9 @@ const ErrorText = styled.div`
 `
 
 const StatusBox = styled.span`
-  padding: 2px 6px 4px 6px;
-  border-radius: 4px;
+  padding: 4px 8px;
+  ${({ theme }) => theme.fonts.captionBold};
+  border-radius: 2px;
   height: 30px;
   text-align: center;
   margin-left: 4px;
@@ -111,7 +112,7 @@ const DeactivatedStatusBox = styled(StatusBox)`
   background: rgba(245, 209, 209, 1);
 `
 const PendingStatusBox = styled(StatusBox)`
-  background: rgba(255, 255, 153, 1);
+  background: rgba(252, 236, 217, 1);
 `
 const DisabledStatusBox = styled(StatusBox)`
   background: rgba(206, 206, 206, 0.3);
@@ -150,6 +151,14 @@ const HeaderContainer = styled.div`
   }
 `
 
+const PhotoNameRoleContainer = styled.div`
+  display: flex;
+`
+
+const MarginPhotoRight = styled.span`
+  margin-right: 16px;
+`
+
 const LocationInfo = styled.div`
   padding: 8px 0px;
 `
@@ -176,8 +185,14 @@ const ChangeButton = styled(LinkButton)`
 `
 
 const NameRoleTypeContainer = styled.div`
+  margin-right: auto;
   display: flex;
   flex-direction: column;
+`
+
+const StatusMenu = styled.div`
+  display: flex;
+  align-items: center;
 `
 
 const Name = styled(LinkButton)`
@@ -186,7 +201,7 @@ const Name = styled(LinkButton)`
 `
 
 const RoleType = styled.div`
-  ${({ theme }) => theme.fonts.captionStyle}
+  ${({ theme }) => theme.fonts.chartLegendStyle}
   color: ${({ theme }) => theme.colors.waitingForExternalValidation};
 `
 
@@ -233,9 +248,8 @@ export const Status = (statusProps: IStatusProps) => {
 }
 
 function UserListComponent(props: IProps) {
-  const [showResendSMSSuccess, setShowResendSMSSuccess] = useState<boolean>(
-    false
-  )
+  const [showResendSMSSuccess, setShowResendSMSSuccess] =
+    useState<boolean>(false)
   const [showResendSMSError, setShowResendSMSError] = useState<boolean>(false)
 
   const {
@@ -249,14 +263,13 @@ function UserListComponent(props: IProps) {
     location: { search }
   } = props
 
-  const { locationId, viewOnly } = (parse(search) as unknown) as ISearchParams
+  const { locationId, viewOnly } = parse(search) as unknown as ISearchParams
 
-  const [toggleActivation, setToggleActivation] = useState<
-    ToggleUserActivation
-  >({
-    modalVisible: false,
-    selectedUser: null
-  })
+  const [toggleActivation, setToggleActivation] =
+    useState<ToggleUserActivation>({
+      modalVisible: false,
+      selectedUser: null
+    })
 
   const [viewportWidth, setViewportWidth] = useState<number>(window.innerWidth)
   useEffect(() => {
@@ -369,12 +382,74 @@ function UserListComponent(props: IProps) {
     )
   }
 
+  function getPhotoNameRoleType(
+    id: string,
+    name: string,
+    role: string,
+    type: string,
+    avatar: IAvatar | undefined
+  ) {
+    return (
+      <PhotoNameRoleContainer>
+        <AvatarSmall name={name} avatar={avatar} />
+        <MarginPhotoRight />
+        <NameRoleTypeContainer>
+          <Name
+            id={`name-role-type-link-${id}`}
+            onClick={() => goToUserProfile(id)}
+          >
+            {name}
+          </Name>
+          <RoleType>{getRoleType(role, type)}</RoleType>
+        </NameRoleTypeContainer>
+      </PhotoNameRoleContainer>
+    )
+  }
+
+  function getPhotoNameType(
+    id: string,
+    name: string,
+    avatar: IAvatar | undefined
+  ) {
+    return (
+      <>
+        <AvatarSmall name={name} avatar={avatar} />
+        <MarginPhotoRight />
+        <LinkButton
+          id={`name-link-${id}`}
+          onClick={() => goToUserProfile(id || '')}
+        >
+          {name}
+        </LinkButton>
+      </>
+    )
+  }
+
   function renderStatus(status?: string, underInvestigation?: boolean) {
     return (
       <>
         {underInvestigation && <SearchRed />}
         <Status status={status || 'pending'} />
       </>
+    )
+  }
+
+  function getStatusMenuType(
+    user: GQLUser,
+    index: number,
+    status?: string,
+    underInvestigation?: boolean
+  ) {
+    const statusDetails = renderStatus(status, underInvestigation)
+    return (
+      <StatusMenu>
+        {statusDetails}
+        <ToggleMenu
+          id={`user-item-${index}-menu`}
+          toggleButton={<VerticalThreeDots />}
+          menuItems={getMenuItems(user)}
+        />
+      </StatusMenu>
     )
   }
 
@@ -401,25 +476,25 @@ function UserListComponent(props: IProps) {
           const type =
             (user.type && intl.formatMessage(userMessages[user.type])) || '-'
 
+          const avatar = user.avatar
+
           return {
-            photo: <AvatarSmall />,
-            name: (
-              <LinkButton
-                id={`name-link-${user.id}`}
-                onClick={() => goToUserProfile(user.id || '')}
-              >
-                {name}
-              </LinkButton>
-            ),
+            photoNameType: getPhotoNameType(user.id || '', name, avatar),
             nameRoleType: getNameRoleType(user.id || '', name, role, type),
+            photoNameRoleType: getPhotoNameRoleType(
+              user.id || '',
+              name,
+              role,
+              type,
+              avatar
+            ),
             roleType: getRoleType(role, type),
             status: renderStatus(user.status, user.underInvestigation),
-            menu: (
-              <ToggleMenu
-                id={`user-item-${index}-menu`}
-                toggleButton={<VerticalThreeDots />}
-                menuItems={getMenuItems(user)}
-              />
+            statusMenu: getStatusMenuType(
+              user,
+              index,
+              user.status,
+              user.underInvestigation
             )
           }
         }
@@ -465,14 +540,9 @@ function UserListComponent(props: IProps) {
     } else if (viewportWidth <= props.theme.grid.breakpoints.lg) {
       columns = columns.concat([
         {
-          label: '',
-          width: 10,
-          key: 'photo'
-        },
-        {
           label: intl.formatMessage(constantsMessages.name),
-          width: 65,
-          key: 'nameRoleType'
+          width: 75,
+          key: 'photoNameRoleType'
         },
         {
           label: intl.formatMessage(constantsMessages.status),
@@ -485,14 +555,9 @@ function UserListComponent(props: IProps) {
       if (viewOnly) {
         columns = columns.concat([
           {
-            label: '',
-            width: 8,
-            key: 'photo'
-          },
-          {
             label: intl.formatMessage(constantsMessages.name),
-            width: 27,
-            key: 'name'
+            width: 35,
+            key: 'photoNameType'
           },
           {
             label: intl.formatMessage(constantsMessages.labelRole),
@@ -509,14 +574,9 @@ function UserListComponent(props: IProps) {
       } else {
         columns = columns.concat([
           {
-            label: '',
-            width: 8,
-            key: 'photo'
-          },
-          {
             label: intl.formatMessage(constantsMessages.name),
-            width: 27,
-            key: 'name'
+            width: 35,
+            key: 'photoNameType'
           },
           {
             label: intl.formatMessage(constantsMessages.labelRole),
@@ -525,14 +585,9 @@ function UserListComponent(props: IProps) {
           },
           {
             label: intl.formatMessage(constantsMessages.status),
-            width: 20,
+            width: 25,
             alignment: ColumnContentAlignment.RIGHT,
-            key: 'status'
-          },
-          {
-            label: '',
-            width: 5,
-            key: 'menu'
+            key: 'statusMenu'
           }
         ])
       }
@@ -585,6 +640,16 @@ function UserListComponent(props: IProps) {
                 hideBoxShadow={true}
                 hideTableHeader={true}
                 disableScrollOnOverflow
+                rowStyle={{
+                  height: {
+                    lg: 56,
+                    md: 80
+                  },
+                  horizontalPadding: {
+                    lg: 8,
+                    md: 16
+                  }
+                }}
               />
               <UserAuditActionModal
                 show={toggleActivation.modalVisible}

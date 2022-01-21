@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import styled from 'styled-components'
-import React = require('react')
+import React from 'react'
 
 interface IProps {
   status: JSX.Element

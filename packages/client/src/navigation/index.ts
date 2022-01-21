@@ -50,7 +50,8 @@ import {
   WORKFLOW_STATUS,
   TEAM_USER_LIST,
   USER_PROFILE,
-  CHANGE_PHONE
+  CHANGE_PHONE,
+  CONFIG
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
@@ -181,7 +182,11 @@ export function goToHome() {
   return push(HOME)
 }
 
-export function goToHomeTab(tabId: string, selectorId: string = '') {
+export function goToConfig() {
+  return push(CONFIG)
+}
+
+export function goToHomeTab(tabId: string, selectorId = '') {
   const path = getCurrentUserScope().includes('declare')
     ? FIELD_AGENT_HOME_TAB
     : REGISTRAR_HOME_TAB
@@ -224,9 +229,7 @@ export function goToPerformanceReport(
 export function goToOperationalReport(
   locationId: string,
   sectionId: OPERATIONAL_REPORT_SECTION = OPERATIONAL_REPORT_SECTION.OPERATIONAL,
-  timeStart: Date = moment()
-    .subtract(1, 'years')
-    .toDate(),
+  timeStart: Date = moment().subtract(1, 'years').toDate(),
   timeEnd: Date = moment().toDate()
 ) {
   return push({

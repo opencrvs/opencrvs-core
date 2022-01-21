@@ -102,7 +102,7 @@ describe('ForgotPIN tests', () => {
     ).component
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 

@@ -55,6 +55,5 @@ const messagesToDefine: IFieldAgentHomeMessages = {
   }
 }
 
-export const messages: IFieldAgentHomeMessages = defineMessages(
-  messagesToDefine
-)
+export const messages: IFieldAgentHomeMessages =
+  defineMessages(messagesToDefine)

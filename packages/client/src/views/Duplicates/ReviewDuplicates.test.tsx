@@ -611,12 +611,9 @@ describe('Review Duplicates component', () => {
       '#duplicates-error-text'
     )
 
-    expect(
-      error
-        .children()
-        .hostNodes()
-        .text()
-    ).toBe('An error occurred while fetching data')
+    expect(error.children().hostNodes().text()).toBe(
+      'An error occurred while fetching data'
+    )
   })
 
   it('displays error text when the query to fetch the duplicates DETAILS fails', async () => {
@@ -651,12 +648,9 @@ describe('Review Duplicates component', () => {
       '#duplicates-error-text'
     )
 
-    expect(
-      error
-        .children()
-        .hostNodes()
-        .text()
-    ).toBe('An error occurred while fetching data')
+    expect(error.children().hostNodes().text()).toBe(
+      'An error occurred while fetching data'
+    )
   })
   describe('reject for duplication', () => {
     let component: ReactWrapper<{}, {}>
@@ -704,10 +698,7 @@ describe('Review Duplicates component', () => {
         .hostNodes()
         .simulate('click')
 
-      component
-        .find('#back_link')
-        .hostNodes()
-        .simulate('click')
+      component.find('#back_link').hostNodes().simulate('click')
 
       component.update()
 
@@ -745,7 +736,7 @@ describe('Review Duplicates component', () => {
         store,
         mock
       )
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.component.update()
@@ -762,7 +753,7 @@ describe('Review Duplicates component', () => {
         .simulate('click')
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.component.update()
@@ -790,7 +781,7 @@ describe('Review Duplicates component', () => {
       )
       component = testComponent.component
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       component.update()
@@ -813,10 +804,7 @@ describe('Review Duplicates component', () => {
         .hostNodes()
         .simulate('click')
 
-      component
-        .find('#not_duplicate_close')
-        .hostNodes()
-        .simulate('click')
+      component.find('#not_duplicate_close').hostNodes().simulate('click')
 
       component.update()
 
@@ -857,7 +845,7 @@ describe('Review Duplicates component', () => {
         store,
         mock
       )
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.component.update()
@@ -874,7 +862,7 @@ describe('Review Duplicates component', () => {
         .simulate('click')
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.component.update()
@@ -950,13 +938,13 @@ describe('Review Duplicates component', () => {
         store,
         graphqlMock
       )
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.component.update()
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.component.update()

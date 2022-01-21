@@ -33,7 +33,7 @@ if (process.env.CI) {
 const customGlobal: GlobalWithFetchMock = global as GlobalWithFetchMock
 customGlobal.fetch = require('jest-fetch-mock')
 customGlobal.fetchMock = customGlobal.fetch
-jest.mock('lodash/debounce', () => jest.fn(fn => fn))
+jest.mock('lodash/debounce', () => jest.fn((fn) => fn))
 
 /*
  * Local storage
@@ -112,7 +112,11 @@ userQueries.searchUsers = jest.fn()
 const navigatorMock = {
   onLine: true
 }
-;(window as any).location.assign = jest.fn()
+
+const location = window.location
+
+delete window.location
+;(window as any).location = { ...location, assign: jest.fn() }
 ;(window as any).navigator = navigatorMock
 ;(window as any).location.reload = jest.fn()
 ;(window as any).scrollTo = noop
@@ -130,6 +134,9 @@ const navigatorMock = {
   APPLICATION_AUDIT_LOCATIONS: 'WARD,UNION',
   LOGIN_URL: 'http://localhost:3020',
   RESOURCES_URL: 'http://localhost:3040/bgd',
+  /**
+   * @deprecated HEALTH_FACILITY_FILTER is no longer used
+   */
   HEALTH_FACILITY_FILTER: 'UPAZILA',
   CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 45,
   CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 1825,
@@ -152,30 +159,36 @@ const {
   assign
 } = require('./tests/util')
 
-jest.mock('@client/utils/referenceApi', (): {
-  referenceApi: typeof referenceApi
-} => ({
-  referenceApi: {
-    loadLocations: () => Promise.resolve(mockOfflineData.locations),
-    loadFacilities: () => Promise.resolve(mockOfflineData.facilities),
-    loadPilotLocations: () => Promise.resolve(mockOfflineData.pilotLocations),
-    loadDefinitions: () =>
-      Promise.resolve({
-        languages: mockOfflineData.languages,
-        forms: mockOfflineData.forms,
-        templates: mockOfflineData.templates
-      }),
-    loadAssets: () => Promise.resolve(mockOfflineData.assets)
-  }
-}))
+jest.mock(
+  '@client/utils/referenceApi',
+  (): {
+    referenceApi: typeof referenceApi
+  } => ({
+    referenceApi: {
+      loadLocations: () => Promise.resolve(mockOfflineData.locations),
+      loadFacilities: () => Promise.resolve(mockOfflineData.facilities),
+      loadPilotLocations: () => Promise.resolve(mockOfflineData.pilotLocations),
+      loadDefinitions: () =>
+        Promise.resolve({
+          languages: mockOfflineData.languages,
+          forms: mockOfflineData.forms,
+          templates: mockOfflineData.templates
+        }),
+      loadAssets: () => Promise.resolve(mockOfflineData.assets)
+    }
+  })
+)
 
-jest.mock('@client/utils/authApi', (): {
-  authApi: typeof authApi
-} => ({
-  authApi: {
-    invalidateToken: () => Promise.resolve()
-  }
-}))
+jest.mock(
+  '@client/utils/authApi',
+  (): {
+    authApi: typeof authApi
+  } => ({
+    authApi: {
+      invalidateToken: () => Promise.resolve()
+    }
+  })
+)
 
 beforeEach(() => {
   /*
