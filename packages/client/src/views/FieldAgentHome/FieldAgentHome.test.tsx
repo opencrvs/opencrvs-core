@@ -128,7 +128,7 @@ describe('FieldAgentHome tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
@@ -158,7 +158,7 @@ describe('FieldAgentHome tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
@@ -293,7 +293,7 @@ describe('FieldAgentHome tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
@@ -424,15 +424,12 @@ describe('FieldAgentHome tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
     testComponent.component.update()
-    testComponent.component
-      .find('#row_0')
-      .hostNodes()
-      .simulate('click')
+    testComponent.component.find('#row_0').hostNodes().simulate('click')
 
     expect(window.location.href).toContain(
       'details/613da949-db8c-49ad-94b4-631ab0b7503e'
@@ -457,15 +454,12 @@ describe('FieldAgentHome tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
     testComponent.component.update()
-    testComponent.component
-      .find('#tab_review')
-      .hostNodes()
-      .simulate('click')
+    testComponent.component.find('#tab_review').hostNodes().simulate('click')
     await flushPromises()
 
     testComponent.component.update()
@@ -490,15 +484,12 @@ describe('FieldAgentHome tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
     testComponent.component.update()
-    testComponent.component
-      .find('#tab_updates')
-      .hostNodes()
-      .simulate('click')
+    testComponent.component.find('#tab_updates').hostNodes().simulate('click')
     await flushPromises()
 
     testComponent.component.update()
@@ -523,15 +514,12 @@ describe('FieldAgentHome tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
     testComponent.component.update()
-    testComponent.component
-      .find('#tab_progress')
-      .hostNodes()
-      .simulate('click')
+    testComponent.component.find('#tab_progress').hostNodes().simulate('click')
     await flushPromises()
 
     testComponent.component.update()
@@ -542,20 +530,22 @@ describe('FieldAgentHome tests', () => {
     let component: ReactWrapper
 
     beforeEach(async () => {
-      component = (await createTestComponent(
-        // @ts-ignore
-        <FieldAgentHome
-          match={{
-            params: {
-              tabId: 'review'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        store
-      )).component
+      component = (
+        await createTestComponent(
+          // @ts-ignore
+          <FieldAgentHome
+            match={{
+              params: {
+                tabId: 'review'
+              },
+              isExact: true,
+              path: '',
+              url: ''
+            }}
+          />,
+          store
+        )
+      ).component
     })
 
     it('renders no records text when no data in grid table', async () => {
@@ -641,20 +631,22 @@ describe('FieldAgentHome tests', () => {
     let component: ReactWrapper
 
     beforeEach(async () => {
-      component = (await createTestComponent(
-        // @ts-ignore
-        <FieldAgentHome
-          match={{
-            params: {
-              tabId: 'progress'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        store
-      )).component
+      component = (
+        await createTestComponent(
+          // @ts-ignore
+          <FieldAgentHome
+            match={{
+              params: {
+                tabId: 'progress'
+              },
+              isExact: true,
+              path: '',
+              url: ''
+            }}
+          />,
+          store
+        )
+      ).component
     })
 
     it('renders no records text when no data in grid table', () => {

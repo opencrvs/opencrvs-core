@@ -44,7 +44,7 @@ class TimeFrameComponent extends React.Component<FullProps> {
   getContent = () => {
     return (
       (this.props.data.details &&
-        this.props.data.details.map(timeFrame => ({
+        this.props.data.details.map((timeFrame) => ({
           location: getLocationFromPartOfLocationId(
             timeFrame.locationId,
             this.props.offlineResources
@@ -165,11 +165,8 @@ class TimeFrameComponent extends React.Component<FullProps> {
   }
 }
 
-export const TimeFrameReports = connect(
-  (store: IStoreState) => {
-    return {
-      offlineResources: getOfflineData(store)
-    }
-  },
-  {}
-)(injectIntl(TimeFrameComponent))
+export const TimeFrameReports = connect((store: IStoreState) => {
+  return {
+    offlineResources: getOfflineData(store)
+  }
+}, {})(injectIntl(TimeFrameComponent))

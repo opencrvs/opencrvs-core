@@ -14,7 +14,6 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
 import {
   ListTable,
   LocationSearch,
@@ -56,8 +55,8 @@ function downloadAllData() {
       Authorization: `Bearer ${getToken()}`
     }
   })
-    .then(resp => resp.blob())
-    .then(blob => {
+    .then((resp) => resp.blob())
+    .then((blob) => {
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
@@ -78,16 +77,15 @@ interface IState {
 class MonthlyReportsComponent extends React.Component<Props, IState> {
   constructor(props: Props) {
     super(props)
+    const historyState = props.history.location.state as any
     this.state = {
       selectedLocation:
-        (props.history.location.state &&
-          props.history.location.state.selectedLocation) ||
-        undefined
+        (historyState && historyState.selectedLocation) || undefined
     }
   }
   getContent(eventType: Event) {
     moment.locale(this.props.intl.locale)
-    let content = []
+    const content = []
 
     const currentYear = moment().year()
     let currentMonth = 1
@@ -122,7 +120,9 @@ class MonthlyReportsComponent extends React.Component<Props, IState> {
     return content
   }
 
-  pushStateToTheCurrentRoute = (state: object) => {
+  pushStateToTheCurrentRoute = (state: {
+    selectedLocation: ISearchLocation
+  }) => {
     const {
       push,
       location: { pathname: currentRoute }
@@ -151,7 +151,7 @@ class MonthlyReportsComponent extends React.Component<Props, IState> {
 
         <LocationSearch
           selectedLocation={this.state.selectedLocation}
-          locationList={generateLocations(offlineResources.locations)}
+          locationList={generateLocations(offlineResources.locations, intl)}
           searchHandler={this.onClickSearchResult}
         />
 
@@ -217,9 +217,6 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const MonthlyReports = connect(
-  mapStateToProps,
-  {
-    goToPerformanceReport
-  }
-)(injectIntl(MonthlyReportsComponent))
+export const MonthlyReports = connect(mapStateToProps, {
+  goToPerformanceReport
+})(injectIntl(MonthlyReportsComponent))

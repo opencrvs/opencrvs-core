@@ -156,9 +156,9 @@ const getErrorsOnFieldsBySection = (
 
   return {
     [sectionId]: fields.reduce((fields, field) => {
-      const validationErrors: IValidationResult[] = (errors[
-        field.name as keyof typeof errors
-      ] as IFieldErrors).errors
+      const validationErrors: IValidationResult[] = (
+        errors[field.name as keyof typeof errors] as IFieldErrors
+      ).errors
 
       const value = draft.data[sectionId]
         ? draft.data[sectionId][field.name]
@@ -223,8 +223,9 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
 
     const errors = getErrorsOnFieldsBySection(sectionId, fields, draft)
     const errorValues = Object.values(errors).map(Object.values)
-    const errLength = flatten(errorValues).filter(errs => errs.length > 0)
-      .length
+    const errLength = flatten(errorValues).filter(
+      (errs) => errs.length > 0
+    ).length
 
     const certificates = draft.data.registration.certificates
     const certificate = (certificates && certificates[0]) || {}
@@ -303,7 +304,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
   }
 
   toggleSubmitModalOpen = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       showModalForNoSignedAffidavit: !prevState.showModalForNoSignedAffidavit
     }))
   }
@@ -407,7 +408,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
           )}
           <FormFieldGenerator
             id={formGroup.id}
-            onChange={values => {
+            onChange={(values) => {
               if (values && values.affidavitFile) {
                 this.setState({
                   showError: false
@@ -500,7 +501,7 @@ const mapStateToProps = (
   const event = getEvent(eventType)
 
   const application = state.applicationsState.applications.find(
-    application => application.id === registrationId
+    (application) => application.id === registrationId
   ) as IPrintableApplication | undefined
 
   const formSection = getCollectCertificateForm(event, state)
@@ -519,13 +520,25 @@ const mapStateToProps = (
 
     const motherDataExist =
       applicationData && applicationData.mother && !isMotherDeceased
-    const fatherDataExist =
+    let fatherDataExist =
+      applicationData && applicationData.father && !isFatherDeceased
+
+    //TODO: This needs to be dynamic.
+    // We shouldn't hardcode 'fathersDetailsExist' field check here
+    // As it's part of the form definition so we can't ensure
+    // that all countries will have this field in their definition
+    if (
       applicationData &&
       applicationData.father &&
-      applicationData.father.fathersDetailsExist &&
-      !isFatherDeceased
+      applicationData.father.fathersDetailsExist !== undefined
+    ) {
+      fatherDataExist =
+        fatherDataExist && applicationData.father.fathersDetailsExist
+    }
 
     if (motherDataExist && fatherDataExist) {
+      //  !!applicationData.father.fathersDetailsExist &&
+
       clonedFormSection.groups.unshift(
         certCollectorGroupForBirthAppWithParentDetails
       )
@@ -544,7 +557,7 @@ const mapStateToProps = (
     }
   }
   const formGroup =
-    clonedFormSection.groups.find(group => group.id === groupId) ||
+    clonedFormSection.groups.find((group) => group.id === groupId) ||
     clonedFormSection.groups[0]
 
   const fields = replaceInitialValues(
@@ -572,16 +585,13 @@ const mapStateToProps = (
   }
 }
 
-export const CollectorForm = connect(
-  mapStateToProps,
-  {
-    goBack,
-    storeApplication,
-    writeApplication,
-    modifyApplication,
-    goToPrintCertificate,
-    goToVerifyCollector,
-    goToReviewCertificate,
-    goToPrintCertificatePayment
-  }
-)(injectIntl(withTheme(CollectorFormComponent)))
+export const CollectorForm = connect(mapStateToProps, {
+  goBack,
+  storeApplication,
+  writeApplication,
+  modifyApplication,
+  goToPrintCertificate,
+  goToVerifyCollector,
+  goToReviewCertificate,
+  goToPrintCertificatePayment
+})(injectIntl(withTheme(CollectorFormComponent)))

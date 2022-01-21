@@ -32,7 +32,7 @@ import {
   storeVerificationCode
 } from '@auth/features/verifyCode/service'
 import { logger } from '@auth/logger'
-import { unauthorized } from 'boom'
+import { unauthorized } from '@hapi/boom'
 
 const cert = readFileSync(CERT_PRIVATE_KEY_PATH)
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
@@ -70,7 +70,8 @@ export async function authenticate(
 
   const res = await fetch(url, {
     method: 'POST',
-    body: JSON.stringify({ username, password })
+    body: JSON.stringify({ username, password }),
+    headers: { 'Content-Type': 'application/json' }
   })
 
   if (res.status !== 200) {
@@ -96,7 +97,8 @@ export async function authenticateSystem(
 
   const res = await fetch(url, {
     method: 'POST',
-    body: JSON.stringify({ client_id, client_secret })
+    body: JSON.stringify({ client_id, client_secret }),
+    headers: { 'Content-Type': 'application/json' }
   })
 
   if (res.status !== 200) {

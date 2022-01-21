@@ -58,18 +58,12 @@ class DocumentListPreviewComponent extends React.Component<IProps> {
   getFormattedLabelForDocType = (docType: string) => {
     const matchingOptionForDocType =
       this.props.dropdownOptions &&
-      this.props.dropdownOptions.find(option => option.value === docType)
+      this.props.dropdownOptions.find((option) => option.value === docType)
     return matchingOptionForDocType && matchingOptionForDocType.label
   }
   render() {
-    const {
-      id,
-      documents,
-      processingDocuments,
-      label,
-      attachment,
-      theme
-    } = this.props
+    const { id, documents, processingDocuments, label, attachment, theme } =
+      this.props
     return (
       <Wrapper id={`preview-list-${id}`}>
         {documents &&
@@ -80,12 +74,13 @@ class DocumentListPreviewComponent extends React.Component<IProps> {
                 ''
               )}_link`}
               key={key}
-              onClick={_ => this.props.onSelect(document)}
+              onClick={(_) => this.props.onSelect(document)}
             >
               <PaperClip />
               <span>
-                {this.getFormattedLabelForDocType(document
-                  .optionValues[1] as string) || document.optionValues[1]}
+                {this.getFormattedLabelForDocType(
+                  document.optionValues[1] as string
+                ) || document.optionValues[1]}
               </span>
             </PreviewLink>
           ))}
@@ -101,7 +96,7 @@ class DocumentListPreviewComponent extends React.Component<IProps> {
             </PreviewLink>
           ))}
         {attachment && attachment.data && label && (
-          <PreviewLink onClick={_ => this.props.onSelect(attachment)}>
+          <PreviewLink onClick={(_) => this.props.onSelect(attachment)}>
             <PaperClip />
             <span>{this.getFormattedLabelForDocType(label) || label}</span>
           </PreviewLink>

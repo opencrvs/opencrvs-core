@@ -17,7 +17,6 @@ import {
   resizeWindow
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { FETCH_REGISTRATION_BY_COMPOSITION } from '@client/views/RegistrationHome/queries'
 import { GridTable } from '@opencrvs/components/lib/interface'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
@@ -29,6 +28,7 @@ import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
+import { formattedDuration } from '@client/utils/date-formatting'
 
 const validateScopeToken = jwt.sign(
   { scope: ['validate'] },
@@ -221,10 +221,12 @@ describe('RegistrationHome sent for approval tab related tests', () => {
 
     testComponent.component.update()
     const data = testComponent.component.find(GridTable).prop('content')
-    const EXPECTED_DATE_OF_APPLICATION = moment(
-      moment(TIME_STAMP, 'x').format('YYYY-MM-DD HH:mm:ss'),
-      'YYYY-MM-DD HH:mm:ss'
-    ).fromNow()
+    const EXPECTED_DATE_OF_APPLICATION = formattedDuration(
+      moment(
+        moment(TIME_STAMP, 'x').format('YYYY-MM-DD HH:mm:ss'),
+        'YYYY-MM-DD HH:mm:ss'
+      )
+    )
     expect(data.length).toBe(2)
     expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
     expect(data[0].eventTimeElapsed).toBe('8 years ago')
@@ -251,10 +253,9 @@ describe('RegistrationHome sent for approval tab related tests', () => {
       store
     )
 
-    const data = (await waitForElement(
-      testComponent.component,
-      GridTable
-    )).prop('content')
+    const data = (
+      await waitForElement(testComponent.component, GridTable)
+    ).prop('content')
     expect(data.length).toBe(0)
   })
 
@@ -411,7 +412,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 200)
     })
     testComponent.component.update()
@@ -419,7 +420,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
 
     instance.toggleExpanded('bc09200d-0160-43b4-9e2b-5b9e90424e95')
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     testComponent.component.update()
@@ -521,7 +522,7 @@ describe('Tablet tests', () => {
     const element = await waitForElement(testComponent.component, '#row_0')
     element.hostNodes().simulate('click')
 
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     testComponent.component.update()

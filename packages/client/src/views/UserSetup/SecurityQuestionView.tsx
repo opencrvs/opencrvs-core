@@ -115,7 +115,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
     questionKeys.forEach((value: string) => {
       result.push({
         value,
-        label: this.props.intl.formatHTMLMessage(userMessages[value])
+        label: this.props.intl.formatMessage(userMessages[value])
       })
     })
 
@@ -282,7 +282,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
                   </Label>
                   <FullWidthInput
                     id={`answer-${index}`}
-                    onChange={answer => this.onAnswerChange(answer, index)}
+                    onChange={(answer) => this.onAnswerChange(answer, index)}
                     value={this.state.questionnaire[index].answer}
                     error={
                       this.state.showError &&

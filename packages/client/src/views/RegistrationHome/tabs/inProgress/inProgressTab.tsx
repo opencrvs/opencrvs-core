@@ -60,6 +60,7 @@ import { get } from 'lodash'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { getDraftApplicantFullName } from '@client/utils/draftUtils'
 import { LoadingIndicator } from '@client/views/RegistrationHome/LoadingIndicator'
+import { formattedDuration } from '@client/utils/date-formatting'
 
 const BlueButton = styled(Button)`
   background-color: ${({ theme }) => theme.colors.secondary};
@@ -216,7 +217,7 @@ export class InProgressTabComponent extends React.Component<
 
       const actions: IAction[] = []
       const foundApplication = this.props.outboxApplications.find(
-        application => application.id === reg.id
+        (application) => application.id === reg.id
       )
       const downloadStatus =
         (foundApplication && foundApplication.downloadStatus) || undefined
@@ -262,7 +263,7 @@ export class InProgressTabComponent extends React.Component<
         startedBy,
         dateOfModification:
           (lastModificationDate &&
-            moment(parseInt(lastModificationDate)).fromNow()) ||
+            formattedDuration(moment(parseInt(lastModificationDate)))) ||
           '',
         actions,
         rowClickHandler: [
@@ -312,7 +313,8 @@ export class InProgressTabComponent extends React.Component<
           '',
         name: name || '',
         dateOfModification:
-          (lastModificationDate && moment(lastModificationDate).fromNow()) ||
+          (lastModificationDate &&
+            formattedDuration(moment(lastModificationDate))) ||
           '',
         actions,
         rowClickHandler: [
@@ -448,7 +450,7 @@ export class InProgressTabComponent extends React.Component<
     const { results } =
       this.props.queryData && this.props.queryData[queryDataKey]
     const eventDetails =
-      results && results.find(result => result && result.id === itemId)
+      results && results.find((result) => result && result.id === itemId)
     return <RowHistoryView eventDetails={eventDetails} />
   }
 
@@ -686,14 +688,8 @@ export class InProgressTabComponent extends React.Component<
   }
 
   render() {
-    const {
-      intl,
-      selectorId,
-      drafts,
-      queryData,
-      page,
-      onPageChange
-    } = this.props
+    const { intl, selectorId, drafts, queryData, page, onPageChange } =
+      this.props
     const { inProgressData, notificationData } = queryData
 
     return (
@@ -743,11 +739,8 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const InProgressTab = connect(
-  mapStateToProps,
-  {
-    goToPage: goToPageAction,
-    goToRegistrarHomeTab: goToRegistrarHomeTabAction,
-    goToApplicationDetails
-  }
-)(injectIntl(withTheme(InProgressTabComponent)))
+export const InProgressTab = connect(mapStateToProps, {
+  goToPage: goToPageAction,
+  goToRegistrarHomeTab: goToRegistrarHomeTabAction,
+  goToApplicationDetails
+})(injectIntl(withTheme(InProgressTabComponent)))

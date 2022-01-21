@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from 'hapi'
+import * as Hapi from '@hapi/hapi'
 import {
   IInProgressPayload,
   IDeclarationPayload,
@@ -94,7 +94,8 @@ export async function sendDeathRegistrationConfirmation(
     messageKeys.deathRegistrationNotification,
     {
       name: payload.name,
-      trackingId: payload.trackingId
+      trackingId: payload.trackingId,
+      registrationNumber: payload.registrationNumber
     },
     getDefaultLanguage()
   )

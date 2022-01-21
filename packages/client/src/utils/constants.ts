@@ -41,6 +41,7 @@ export const REGEXP_ALPHA_NUMERIC = '^[0-9a-zA-Z]+$'
 export const REGEXP_BLOCK_ALPHA_NUMERIC = '^[0-9A-Z]+$'
 export const REGEXP_BLOCK_ALPHA_NUMERIC_DOT = '^[0-9A-Z.]+$'
 export const REGEXP_NUMBER_INPUT_NON_NUMERIC = '[eE+-]'
+export const REGEXP_DECIMAL_POINT_NUMBER = '\\.'
 
 export const SECURITY_PIN_INDEX = 'pin'
 export const SECURITY_PIN_EXPIRED_AT = 'locked_time'
@@ -57,6 +58,7 @@ export const ROLE_REGISTRATION_AGENT = 'REGISTRATION_AGENT'
 export const ROLE_LOCAL_REGISTRAR = 'LOCAL_REGISTRAR'
 export const FIELD_AGENT_ROLES = [ROLE_FIELD_AGENT]
 export const SYS_ADMIN_ROLES = ['LOCAL_SYSTEM_ADMIN']
+export const NATL_ADMIN_ROLES = 'NATIONAL_SYSTEM_ADMIN'
 export const REGISTRAR_ROLES = [
   ROLE_LOCAL_REGISTRAR,
   'DISTRICT_REGISTRAR',
@@ -91,6 +93,7 @@ export const JURISDICTION_TYPE: { [key: string]: string } = {
   MUNICIPALITY: 'Municipality',
   CITY_CORPORATION: 'City Corporation',
   UPAZILA: 'Upazila',
+  STATE: 'Province',
   DISTRICT: 'District',
   DIVISION: 'Division'
 }
@@ -102,3 +105,5 @@ export const MONTHS_IN_YEAR = 12
 
 export const DECLARED_APPLICATION_SEARCH_QUERY_COUNT =
   process.env.DECLARED_APPLICATION_SEARCH_QUERY_COUNT || 100
+
+export const AVATAR_API = 'https:/eu.ui-avatars.com/api/?name='

@@ -14,6 +14,7 @@ import {
   FIELD_GROUP_TITLE,
   IAttachmentValue,
   IFormField,
+  IFormFieldValue,
   IFormSection,
   IFormSectionData,
   LOCATION_SEARCH_INPUT,
@@ -35,7 +36,10 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { draftToGqlTransformer } from '@client/transformer'
-import { submitUserFormData } from '@client/user/userReducer'
+import {
+  modifyUserFormData,
+  submitUserFormData
+} from '@client/user/userReducer'
 import {
   Action,
   FormTitle
@@ -74,6 +78,7 @@ interface IDispatchProps {
   userFormSection: IFormSection
   offlineResources: IOfflineData
   goBack: typeof goBack
+  modify: (values: IFormSectionData) => void
 }
 
 interface ISectionData {
@@ -84,7 +89,6 @@ interface ISectionData {
 type IFullProps = IUserReviewFormProps &
   IntlShapeProps &
   RouteComponentProps<{ userId?: string }>
-
 class UserReviewFormComponent extends React.Component<
   IFullProps & IDispatchProps
 > {
@@ -94,7 +98,7 @@ class UserReviewFormComponent extends React.Component<
     getVisibleSectionGroupsBasedOnConditions(
       userFormSection,
       this.props.formData
-    ).forEach(group => {
+    ).forEach((group) => {
       group.fields.forEach((field: IFormField) => {
         if (field && field.type === FIELD_GROUP_TITLE) {
           sections.push({ title: intl.formatMessage(field.label), items: [] })
@@ -135,23 +139,24 @@ class UserReviewFormComponent extends React.Component<
     const { intl, formData } = this.props
 
     if (field.type === SIMPLE_DOCUMENT_UPLOADER) {
-      const files = (formData[field.name] as unknown) as IAttachmentValue
+      const files = formData[field.name] as unknown as IAttachmentValue
 
       return (
         <SimpleDocumentUploader
           label={intl.formatMessage(field.label)}
           disableDeleteInPreview={true}
           name={field.name}
-          onComplete={() => {}}
+          onComplete={(file) => {
+            this.props.modify({ ...this.props.formData, [field.name]: file })
+          }}
           files={files}
         />
       )
     }
 
     if (field.type === LOCATION_SEARCH_INPUT) {
-      const offlineLocations = this.props.offlineResources[
-        field.searchableResource
-      ]
+      const offlineLocations =
+        this.props.offlineResources[field.searchableResource]
 
       const locationId = formData[field.name] as string
       return offlineLocations[locationId] && offlineLocations[locationId].name
@@ -223,6 +228,7 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
       fieldName?: string
     ) => dispatch(goToUserReviewForm(userId, sec, group, fieldName)),
     goBack: () => dispatch(goBack()),
+    modify: (values: IFormSectionData) => dispatch(modifyUserFormData(values)),
     submitForm: (userFormSection: IFormSection) => {
       const variables = draftToGqlTransformer(
         { sections: [userFormSection] },
@@ -245,12 +251,11 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
     }
   }
 }
-export const UserReviewForm = connect(
-  (store: IStoreState) => {
-    return {
-      userFormSection: store.userForm.userForm!.sections[0],
-      offlineResources: getOfflineData(store)
-    }
-  },
-  mapDispatchToProps
-)(injectIntl<'intl', IFullProps & IDispatchProps>(UserReviewFormComponent))
+export const UserReviewForm = connect((store: IStoreState) => {
+  return {
+    userFormSection: store.userForm.userForm!.sections[0],
+    offlineResources: getOfflineData(store)
+  }
+}, mapDispatchToProps)(
+  injectIntl<'intl', IFullProps & IDispatchProps>(UserReviewFormComponent)
+)

@@ -11,7 +11,8 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IregistrationHomeMessages {
+interface IregistrationHomeMessages
+  extends Record<string | number | symbol, MessageDescriptor> {
   certified: MessageDescriptor
   dataTableResults: MessageDescriptor
   inProgress: MessageDescriptor
@@ -125,6 +126,5 @@ const messagesToDefine: IregistrationHomeMessages = {
   }
 }
 
-export const messages: IregistrationHomeMessages = defineMessages(
-  messagesToDefine
-)
+export const messages: IregistrationHomeMessages =
+  defineMessages(messagesToDefine)

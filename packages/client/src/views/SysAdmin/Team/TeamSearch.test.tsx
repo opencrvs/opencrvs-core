@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { PERFORMANCE_HOME, TEAM_SEARCH } from '@client/navigation/routes'
+import { TEAM_SEARCH } from '@client/navigation/routes'
 import { AppStore } from '@client/store'
 import {
   createTestApp,
@@ -20,7 +20,7 @@ import {
 } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
-import querystring from 'query-string'
+import { parse } from 'query-string'
 import * as React from 'react'
 import { TeamSearch } from './TeamSearch'
 
@@ -45,10 +45,7 @@ describe('Team search test', () => {
 
     it('loads nothing in the search input box', () => {
       expect(
-        app
-          .find('#locationSearchInput')
-          .hostNodes()
-          .props().value
+        app.find('#locationSearchInput').hostNodes().props().value
       ).toEqual('')
     })
 
@@ -68,23 +65,17 @@ describe('Team search test', () => {
       app.update()
 
       expect(
-        app
-          .find('#locationSearchInput')
-          .hostNodes()
-          .props().value
+        app.find('#locationSearchInput').hostNodes().props().value
       ).toEqual('Moktarpur Union Parishad')
     })
 
     it('redirect to user list on search button click', () => {
       Date.now = jest.fn(() => 1455454308000)
-      app
-        .find('#location-search-btn')
-        .hostNodes()
-        .simulate('click')
+      app.find('#location-search-btn').hostNodes().simulate('click')
       app.update()
       flushPromises()
 
-      expect(querystring.parse(history.location.search)).toEqual({
+      expect(parse(history.location.search)).toEqual({
         locationId: '0d8474da-0361-4d32-979e-af91f012340a'
       })
       expect(history.location.pathname).toContain('/team/users')
@@ -112,10 +103,7 @@ describe('Team search test', () => {
 
     it('loads the location in the search input box', () => {
       expect(
-        app
-          .find('#locationSearchInput')
-          .hostNodes()
-          .props().value
+        app.find('#locationSearchInput').hostNodes().props().value
       ).toEqual('Alokbali Union Parishad')
     })
   })

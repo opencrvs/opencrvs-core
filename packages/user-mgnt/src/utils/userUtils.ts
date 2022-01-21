@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from 'hapi'
+import * as Hapi from '@hapi/hapi'
 
 export const statuses = {
   PENDING: 'pending',
@@ -36,7 +36,7 @@ export const systemScopeMapping: IRoleScopeMapping = {
   HEALTH: ['declare', 'notification-api'],
   NATIONAL_ID: ['nationalId'],
   EXTERNAL_VALIDATION: ['validator-api'],
-  AGE_CHECK: ['declare', 'chatbot-api']
+  AGE_CHECK: ['declare', 'age-verification-api']
 }
 
 export const hasScope = (request: Hapi.Request, scope: string): boolean => {

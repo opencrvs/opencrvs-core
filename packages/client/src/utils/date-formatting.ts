@@ -36,9 +36,14 @@ const config: { [key: string]: moment.LocaleSpecification } = {
 
 export const formatLongDate = (
   date: string,
-  locale: string = 'en',
-  formatString: string = 'LL'
+  locale = 'en',
+  formatString = 'LL'
 ) => {
   moment.updateLocale(locale, config[locale])
   return moment(date).format(formatString)
+}
+
+export const formattedDuration = (fromDate: moment.Moment) => {
+  moment.relativeTimeRounding(Math.floor)
+  return fromDate.fromNow()
 }

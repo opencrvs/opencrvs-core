@@ -23,27 +23,12 @@ describe('validate', () => {
     it('should error when supplied a bad value.', () => {
       const badValue = 'hgjhg'
       const response = false
-      expect(isAValidPhoneNumberFormat(badValue, 'bgd')).toEqual(response)
+      expect(isAValidPhoneNumberFormat(badValue)).toEqual(response)
     })
-    it('should error when supplied a bad value for a British number', () => {
-      const badValue = '01720067890'
-      const response = false
-      expect(isAValidPhoneNumberFormat(badValue, 'gbr')).toEqual(response)
-    })
-    it('should pass when supplied a good value for a British number', () => {
-      const goodValue = '07111111111'
-      const response = true
-      expect(isAValidPhoneNumberFormat(goodValue, 'gbr')).toEqual(response)
-    })
-    it('should pass when supplied a good value for a Bangladeshi number', () => {
+    it('should pass when supplied a good value', () => {
       const goodValue = '01720067890'
       const response = true
-      expect(isAValidPhoneNumberFormat(goodValue, 'bgd')).toEqual(response)
-    })
-    it('should pass when supplied a good value and country is not added to the lookup table', () => {
-      const goodValue = '01720067890'
-      const response = true
-      expect(isAValidPhoneNumberFormat(goodValue, 'th')).toEqual(response)
+      expect(isAValidPhoneNumberFormat(goodValue)).toEqual(response)
     })
   })
   describe('requiredSymbol. Used for number fields that use a symbol (e.g.: x) as an error message', () => {

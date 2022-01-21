@@ -11,11 +11,7 @@
  */
 import * as React from 'react'
 import styled from '@client/styledComponents'
-import {
-  ActionPage,
-  Box,
-  ResponsiveModal
-} from '@opencrvs/components/lib/interface'
+import { ResponsiveModal } from '@opencrvs/components/lib/interface'
 import { FormFieldGenerator } from '@client/components/form'
 import { IFormSectionData, Event, Action } from '@client/forms'
 import { hasFormError } from '@client/forms/utils'
@@ -95,17 +91,12 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
   }
 
   render = () => {
-    const {
-      application,
-      form,
-      intl,
-      confirmRejectionEvent,
-      duplicate
-    } = this.props
+    const { application, form, intl, confirmRejectionEvent, duplicate } =
+      this.props
     const payload = this.processSubmitData()
     const { fields } = form
     if (duplicate) {
-      fields.map(field => {
+      fields.map((field) => {
         if (field.name === 'rejectionReason') {
           field.initialValue = ['duplicate']
         }

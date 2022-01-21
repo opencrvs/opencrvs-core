@@ -35,6 +35,7 @@ import { connect } from 'react-redux'
 import ReactTooltip from 'react-tooltip'
 import { withTheme } from 'styled-components'
 import { LoadingIndicator } from '@client/views/RegistrationHome/LoadingIndicator'
+import { formattedDuration } from '@client/utils/date-formatting'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -154,7 +155,7 @@ class ApprovalTabComponent extends React.Component<
     }
     const transformedData = transformData(data, this.props.intl)
 
-    return transformedData.map(reg => {
+    return transformedData.map((reg) => {
       const icon: JSX.Element = (
         <Validate data-tip data-for="validatedTooltip" />
       )
@@ -169,14 +170,18 @@ class ApprovalTabComponent extends React.Component<
         event,
         eventTimeElapsed:
           (reg.dateOfEvent &&
-            moment(reg.dateOfEvent.toString(), 'YYYY-MM-DD').fromNow()) ||
+            formattedDuration(
+              moment(reg.dateOfEvent.toString(), 'YYYY-MM-DD')
+            )) ||
           '',
         dateOfApproval:
           (reg.modifiedAt &&
-            moment(
-              moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
-              'YYYY-MM-DD HH:mm:ss'
-            ).fromNow()) ||
+            formattedDuration(
+              moment(
+                moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
+                'YYYY-MM-DD HH:mm:ss'
+              )
+            )) ||
           '',
         icon,
         rowClickHandler: [
@@ -192,7 +197,7 @@ class ApprovalTabComponent extends React.Component<
   renderExpandedComponent = (itemId: string) => {
     const { results } = this.props.queryData && this.props.queryData.data
     const eventDetails =
-      results && results.find(result => result && result.id === itemId)
+      results && results.find((result) => result && result.id === itemId)
     return <RowHistoryView eventDetails={eventDetails} />
   }
 
@@ -240,10 +245,7 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const ApprovalTab = connect(
-  mapStateToProps,
-  {
-    goToPage,
-    goToApplicationDetails
-  }
-)(injectIntl(withTheme(ApprovalTabComponent)))
+export const ApprovalTab = connect(mapStateToProps, {
+  goToPage,
+  goToApplicationDetails
+})(injectIntl(withTheme(ApprovalTabComponent)))

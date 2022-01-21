@@ -127,7 +127,9 @@ describe('when user logs in', () => {
     expect(currentUserDrafts.length).toBe(2)
     expect(currentUserDrafts[0]).toEqual(draft1)
     expect(currentUserDrafts[1]).toEqual(draft2)
-    expect(currentUserDrafts.find(draft => draft.id === draft3.id)).toBeFalsy()
+    expect(
+      currentUserDrafts.find((draft) => draft.id === draft3.id)
+    ).toBeFalsy()
   })
 
   describe('Application in index db', () => {
@@ -159,7 +161,7 @@ describe('when user logs in', () => {
       const currentUserDrafts = (JSON.parse(details) as IUserData).applications
       expect(currentUserDrafts.length).toBe(2)
       expect(
-        currentUserDrafts.find(cDraft => cDraft.id === draft.id)
+        currentUserDrafts.find((cDraft) => cDraft.id === draft.id)
       ).toBeFalsy()
     })
   })
@@ -281,10 +283,7 @@ describe('when user is in the register form for birth event', () => {
         (key: string) =>
           'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJkZWNsYXJlIiwiZGVtbyJdLCJpYXQiOjE1NjMyNTYyNDIsImV4cCI6MTU2Mzg2MTA0MiwiYXVkIjpbIm9wZW5jcnZzOmF1dGgtdXNlciIsIm9wZW5jcnZzOnVzZXItbWdudC11c2VyIiwib3BlbmNydnM6aGVhcnRoLXVzZXIiLCJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJvcGVuY3J2czpub3RpZmljYXRpb24tdXNlciIsIm9wZW5jcnZzOndvcmtmbG93LXVzZXIiLCJvcGVuY3J2czpzZWFyY2gtdXNlciIsIm9wZW5jcnZzOm1ldHJpY3MtdXNlciIsIm9wZW5jcnZzOnJlc291cmNlcy11c2VyIl0sImlzcyI6Im9wZW5jcnZzOmF1dGgtc2VydmljZSIsInN1YiI6IjVkMWM1YTJhNTgxNjM0MDBlZjFkMDEyOSJ9.hZu0em2JA0sl-5uzck4mn4HfYdzxSmgoERA8SbWRPXEmriSYjs4PEPk9StXF_Ed5kd53VlNF9xf39DDGWqyyn76gpcMPbHJAL8nqLV82hot8fgU1WtEk865U8-9oAxaVmxAsjpHayiuD6zfKuR-ixrLFdoRKP13LdORktFCQe5e7To2w7vXArjUb6SDpSHST4Fbkhg8vzOcykweSGiNlmoEVtLzkpamS6fcTGRHkNpb_Wk_AQW9TAdw6NqG5lDEAO10auNgJpKxO8X-DQKhvEfY5TbpblR51L_U8pUXpDCAvGegMLnwmfAIoH1hMj--Wd2JhqgUvj0YrlDKI99fntA'
       )
-      component
-        .find('#save_draft')
-        .hostNodes()
-        .simulate('click')
+      component.find('#save_draft').hostNodes().simulate('click')
       await flushPromises()
       expect(history.location.pathname).toEqual('/field-agent-home/progress')
     })
@@ -293,10 +292,7 @@ describe('when user is in the register form for birth event', () => {
         (key: string) =>
           'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsInBlcmZvcm1hbmNlIiwiY2VydGlmeSIsImRlbW8iXSwiaWF0IjoxNTYzOTcyOTQ0LCJleHAiOjE1NjQ1Nzc3NDQsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpyZXNvdXJjZXMtdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1ZDFjNWEyYTU4MTYzNDAwZWYxZDAxMmIifQ.VrH31goeitKvLHQchy5HQJkQWjhK-cWisxSgQUXChK4MZQis9Ufzn7dWK3s2s0dSpnFqk-0Yj5cVlq7JgQVcniO26WhnSyXHYQk7DG-TSA5FXGYoKMhjMZCh5qOZTRaVI6yvnEsLKTYeNvkXKJ2wb6M9U5OWjUh1KGPexd9mSjUsUwZ5BDTvI0WjnBTgQ_a0-KhxjjypT8Y_VXiiY-KWLxuOpVGalv3P3nbH8dAUzEuzKsrq6q0MJsaJkgDliaz2pZd10JxnJE1VYUob2SNHFnmJnz8Llwe1lH4xa8rluIA6YBmxdkrU2VkhCBPD6VxGYRHrD3LKRa3Cgm1X0qNQTw'
       )
-      component
-        .find('#save_draft')
-        .hostNodes()
-        .simulate('click')
+      component.find('#save_draft').hostNodes().simulate('click')
       await flushPromises()
       expect(
         history.location.pathname.includes('/registration-home/progress')
@@ -410,18 +406,12 @@ describe('when user is in the register form for death event', () => {
         store
       )
       component = testComponent.component
-      component
-        .find('#next_section')
-        .hostNodes()
-        .simulate('click')
+      component.find('#next_section').hostNodes().simulate('click')
 
       await waitForElement(component, '#contactPoint_error')
-      expect(
-        component
-          .find('#contactPoint_error')
-          .hostNodes()
-          .text()
-      ).toBe('Required for registration')
+      expect(component.find('#contactPoint_error').hostNodes().text()).toBe(
+        'Required for registration'
+      )
     })
 
     it('after clicking exit, takes back home', async () => {
@@ -445,10 +435,7 @@ describe('when user is in the register form for death event', () => {
         store
       )
       component = testComponent.component
-      component
-        .find('#exit_top_bar')
-        .hostNodes()
-        .simulate('click')
+      component.find('#exit_top_bar').hostNodes().simulate('click')
 
       component.update()
 
@@ -536,7 +523,7 @@ describe('when user is in the register form for death event', () => {
         graphqlMock
       )
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       component = testComponent.component
@@ -547,11 +534,11 @@ describe('when user is in the register form for death event', () => {
       })
 
       component.update()
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 200)
       })
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 200)
       })
       component.update()
@@ -614,7 +601,7 @@ describe('when user is in the register form for death event', () => {
         graphqlMock
       )
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       component = testComponent.component
@@ -637,7 +624,7 @@ describe('when user is in the register form for death event', () => {
       })
 
       component.update()
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 200)
       })
       component
@@ -648,7 +635,7 @@ describe('when user is in the register form for death event', () => {
         .childAt(0)
         .simulate('click')
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 200)
       })
       component.update()
@@ -711,7 +698,7 @@ describe('when user is in the register form for death event', () => {
         graphqlMock
       )
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       component = testComponent.component
@@ -734,7 +721,7 @@ describe('when user is in the register form for death event', () => {
       })
 
       component.update()
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 200)
       })
       component
@@ -745,7 +732,7 @@ describe('when user is in the register form for death event', () => {
         .childAt(0)
         .simulate('click')
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 200)
       })
       component.update()
@@ -788,7 +775,7 @@ describe('when user is in the register form for death event', () => {
         graphqlMock
       )
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       component = testComponent.component
@@ -1040,19 +1027,13 @@ describe('when user is in the register form preview section', () => {
   })
 
   it('submit button will be enabled when even if form is not fully filled-up', () => {
-    expect(
-      component
-        .find('#submit_form')
-        .hostNodes()
-        .prop('disabled')
-    ).toBe(false)
+    expect(component.find('#submit_form').hostNodes().prop('disabled')).toBe(
+      false
+    )
   })
 
   it('Displays submit confirm modal when submit button is clicked', () => {
-    component
-      .find('#submit_form')
-      .hostNodes()
-      .simulate('click')
+    component.find('#submit_form').hostNodes().simulate('click')
 
     expect(component.find('#submit_confirm').hostNodes()).toHaveLength(1)
   })
@@ -1091,10 +1072,7 @@ describe('when user is in the register form preview section', () => {
     })
 
     it('should be able to submit the form', () => {
-      component
-        .find('#submit_form')
-        .hostNodes()
-        .simulate('click')
+      component.find('#submit_form').hostNodes().simulate('click')
       component.update()
 
       const cancelBtn = component.find('#cancel-btn').hostNodes()
@@ -1106,10 +1084,7 @@ describe('when user is in the register form preview section', () => {
       expect(component.find('#submit_confirm').hostNodes().length).toEqual(0)
       expect(component.find('#submit_form').hostNodes().length).toEqual(1)
 
-      component
-        .find('#submit_form')
-        .hostNodes()
-        .simulate('click')
+      component.find('#submit_form').hostNodes().simulate('click')
       component.update()
 
       const confirmBtn = component.find('#submit_confirm').hostNodes()
@@ -1166,10 +1141,7 @@ describe('when user is in the register form review section', () => {
   })
 
   it('clicking the reject button launches the reject form action page', async () => {
-    component
-      .find('#rejectApplicationBtn')
-      .hostNodes()
-      .simulate('click')
+    component.find('#rejectApplicationBtn').hostNodes().simulate('click')
 
     await waitForElement(component, '#reject-registration-form-container')
     expect(
@@ -1319,8 +1291,8 @@ describe('when user is in the register form from sent for review edit', () => {
       .simulate('click')
     component.update()
 
-    const modifyTime = testAppStore.getState().applicationsState.applications[0]
-      .modifiedOn
+    const modifyTime =
+      testAppStore.getState().applicationsState.applications[0].modifiedOn
 
     expect(modifyTime).toBe(DRAFT_MODIFY_TIME)
   })
@@ -1395,10 +1367,7 @@ describe('When user is in Preview section death event', () => {
   })
 
   it('Should be able to submit the form', () => {
-    component
-      .find('#submit_form')
-      .hostNodes()
-      .simulate('click')
+    component.find('#submit_form').hostNodes().simulate('click')
 
     const confirmBtn = component.find('#submit_confirm').hostNodes()
     expect(confirmBtn.length).toEqual(1)
@@ -1534,10 +1503,7 @@ describe('When user is in Preview section death event in offline mode', () => {
   })
 
   it('Should be able to submit the form', async () => {
-    component
-      .find('#submit_form')
-      .hostNodes()
-      .simulate('click')
+    component.find('#submit_form').hostNodes().simulate('click')
 
     const confirmBtn = component.find('#submit_confirm').hostNodes()
     expect(confirmBtn.length).toEqual(1)

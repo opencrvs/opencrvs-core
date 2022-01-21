@@ -36,7 +36,7 @@ import {
   GQLMonthWise45DayEstimation,
   GQLMonthWiseEstimationMetrics
 } from '@opencrvs/gateway/src/graphql/schema'
-import querystring from 'query-string'
+import { parse } from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -90,7 +90,7 @@ function prepareChartData(data: GQLMonthWiseEstimationMetrics) {
         if (dataDetails !== null) {
           chartData.push({
             label:
-              moment.months().indexOf(dataDetails.month) == 0 && index > 0
+              moment.months().indexOf(dataDetails.month) === 0 && index > 0
                 ? `${dataDetails.month.slice(0, 3)} ${dataDetails.year}`
                 : `${dataDetails.month.slice(0, 3)}`,
             registeredIn45Days: dataDetails.actual45DayRegistration,
@@ -119,9 +119,9 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
     },
     goToOperationalReport
   } = props
-  const { locationId, timeStart, timeEnd, title } = (querystring.parse(
+  const { locationId, timeStart, timeEnd, title } = parse(
     search
-  ) as unknown) as ISearchParams
+  ) as unknown as ISearchParams
 
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
@@ -142,7 +142,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
       toolbarComponent={
         <Query query={HAS_CHILD_LOCATION} variables={{ parentId: locationId }}>
           {({ data, loading, error }) => {
-            let options: IPerformanceSelectOption[] = [
+            const options: IPerformanceSelectOption[] = [
               {
                 label: intl.formatMessage(messages.overTime),
                 value: REG_RATE_BASE.TIME
@@ -172,7 +172,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
                   id="base-select"
                   value={base.baseType}
                   options={options}
-                  onChange={option =>
+                  onChange={(option) =>
                     setBase({
                       baseType: option.value as REG_RATE_BASE,
                       locationJurisdictionType: option.type
@@ -181,7 +181,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
                 />
                 <LocationPicker
                   selectedLocationId={locationId}
-                  onChangeLocation={newLocationId => {
+                  onChangeLocation={(newLocationId) => {
                     props.goToRegistrationRates(
                       eventType as Event,
                       title,
@@ -267,7 +267,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
   )
 }
 
-export const RegistrationRates = connect(
-  null,
-  { goToOperationalReport, goToRegistrationRates }
-)(injectIntl(RegistrationRatesComponent))
+export const RegistrationRates = connect(null, {
+  goToOperationalReport,
+  goToRegistrationRates
+})(injectIntl(RegistrationRatesComponent))

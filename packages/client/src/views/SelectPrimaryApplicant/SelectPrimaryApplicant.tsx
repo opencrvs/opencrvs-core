@@ -91,11 +91,8 @@ class SelectPrimaryApplicantView extends React.Component<IFullProps, IState> {
       this.state.applicant === APPLICANT.MOTHER ||
       this.state.applicant === APPLICANT.FATHER
     ) {
-      const {
-        application,
-        goToBirthContactPoint,
-        registrationSection
-      } = this.props
+      const { application, goToBirthContactPoint, registrationSection } =
+        this.props
       this.props.modifyApplication({
         ...application,
         data: {
@@ -183,13 +180,10 @@ const mapStateToProps = (
   }
 }
 
-export const SelectPrimaryApplicant = connect(
-  mapStateToProps,
-  {
-    goBack,
-    goToHome,
-    goToBirthContactPoint,
-    goToBirthRegistrationAsParent,
-    modifyApplication
-  }
-)(injectIntl(SelectPrimaryApplicantView))
+export const SelectPrimaryApplicant = connect(mapStateToProps, {
+  goBack,
+  goToHome,
+  goToBirthContactPoint,
+  goToBirthRegistrationAsParent,
+  modifyApplication
+})(injectIntl(SelectPrimaryApplicantView))

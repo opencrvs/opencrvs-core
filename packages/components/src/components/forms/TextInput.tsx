@@ -21,13 +21,15 @@ export interface ICustomProps {
   autocomplete?: boolean
   isSmallSized?: boolean
   isDisabled?: boolean
+  inputFieldWidth?: string
 }
 
 export type ITextInputProps = ICustomProps &
   React.InputHTMLAttributes<HTMLInputElement>
 
 const StyledInput = styled.input<ITextInputProps>`
-  width: 100%;
+  ${({ inputFieldWidth }) =>
+    inputFieldWidth ? `width: ${inputFieldWidth}` : `width: 100%`};
   padding: 8px 10px;
   height: 40px;
   transition: border-color 500ms ease-out;
@@ -91,8 +93,8 @@ const StyledInput = styled.input<ITextInputProps>`
     text-align: center;
   }
 
-  ${({ ignoreMediaQuery, isSmallSized, theme }) => {
-    return !ignoreMediaQuery
+  ${({ ignoreMediaQuery, isSmallSized, theme, inputFieldWidth }) => {
+    return !ignoreMediaQuery && !inputFieldWidth
       ? isSmallSized
         ? `@media (min-width: ${theme.grid.breakpoints.md}px) {
         width: 234px;
@@ -104,42 +106,52 @@ const StyledInput = styled.input<ITextInputProps>`
   }}
 `
 
-export class TextInput extends React.Component<ITextInputProps> {
-  private $element: React.RefObject<HTMLInputElement>
-  constructor(props: ITextInputProps, {}) {
-    super(props)
-    this.$element = React.createRef()
-  }
-  focusField(): void {
-    /*
-     * Needs to be run on the next tick
-     * so that 'value' prop has enough time to flow back here
-     * if the focusInput prop is called right after keydown
-     */
-    setTimeout(() => {
-      if (this.$element.current) {
-        this.$element.current!.focus()
-      }
-    })
-  }
-  componentDidUpdate(prevProps: ITextInputProps) {
-    if (!prevProps.focusInput && this.props.focusInput) {
-      this.focusField()
-    }
-  }
+export interface IRef {
+  focusField: () => void
+}
 
-  render() {
-    const { focusInput, maxLength = 250, isDisabled, ...props } = this.props
+export const TextInput = React.forwardRef<IRef, ITextInputProps>(
+  (
+    { focusInput, maxLength = 250, isDisabled, inputFieldWidth, ...otherProps },
+    ref
+  ) => {
+    const $element = React.useRef<HTMLInputElement>(null)
+
+    function focusField(): void {
+      /*
+       * Needs to be run on the next tick
+       * so that 'value' prop has enough time to flow back here
+       * if the focusInput prop is called right after keydown
+       */
+      setTimeout(() => {
+        if ($element.current) {
+          $element.current.focus()
+        }
+      })
+    }
+
+    React.useImperativeHandle(ref, () => ({
+      focusField
+    }))
+
+    React.useEffect(() => {
+      if (focusInput) {
+        focusField()
+      }
+    }, [focusInput])
 
     return (
       <StyledInput
-        ref={this.$element}
-        name={props.id}
-        {...this.props}
+        ref={$element}
+        name={otherProps.id}
+        {...otherProps}
         autoComplete={process.env.NODE_ENV === 'production' ? 'off' : undefined}
         maxLength={maxLength}
         disabled={isDisabled}
+        inputFieldWidth={inputFieldWidth}
       />
     )
   }
-}
+)
+
+TextInput.displayName = 'TextInput'

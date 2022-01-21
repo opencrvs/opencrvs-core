@@ -11,7 +11,8 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface INotificationsMessages {
+interface INotificationsMessages
+  extends Record<string | number | symbol, MessageDescriptor> {
   declarationsSynced: MessageDescriptor
   draftsSaved: MessageDescriptor
   outboxText: MessageDescriptor
@@ -20,6 +21,7 @@ interface INotificationsMessages {
   statusRegistering: MessageDescriptor
   statusRejecting: MessageDescriptor
   statusSubmitting: MessageDescriptor
+  statusWaitingToValidate: MessageDescriptor
   statusWaitingToRegister: MessageDescriptor
   statusWaitingToReject: MessageDescriptor
   statusWaitingToSubmit: MessageDescriptor
@@ -73,6 +75,11 @@ const messagesToDefine: INotificationsMessages = {
     defaultMessage: 'Submitting...',
     description: 'Label for application status submitting',
     id: 'regHome.outbox.statusSubmitting'
+  },
+  statusWaitingToValidate: {
+    defaultMessage: 'Sending for approval',
+    description: 'Label for application status waiting for validate',
+    id: 'regHome.outbox.statusWaitingToValidate'
   },
   statusWaitingToRegister: {
     defaultMessage: 'Waiting to register',

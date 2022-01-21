@@ -104,7 +104,7 @@ export const getBase64String = (file: File) => {
         return resolve(reader.result)
       }
     }
-    reader.onerror = error => reject(error)
+    reader.onerror = (error) => reject(error)
   })
 }
 
@@ -193,7 +193,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
       this.state.fields.documentType
     ]
 
-    this.setState(state => ({
+    this.setState((state) => ({
       filesBeingProcessed: [
         ...state.filesBeingProcessed,
         {
@@ -202,7 +202,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
       ]
     }))
 
-    const minimumProcessingTime = new Promise<void>(resolve =>
+    const minimumProcessingTime = new Promise<void>((resolve) =>
       setTimeout(resolve, 2000)
     )
 
@@ -213,8 +213,6 @@ class DocumentUploaderWithOptionComp extends React.Component<
         minimumProcessingTime
       ])
     } catch (error) {
-      console.error(error)
-
       this.setState({
         errorMessage:
           this.state.errorMessage ||
@@ -227,7 +225,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
       return
     }
 
-    let tempOptions = this.state.dropDownOptions
+    const tempOptions = this.state.dropDownOptions
 
     remove(
       tempOptions,
@@ -235,7 +233,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
     )
 
     this.setState(
-      prevState => {
+      (prevState) => {
         const newDocument: IFileValue = {
           optionValues,
           type: uploadedImage.type,
@@ -302,7 +300,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
           <DocumentUploader
             id={`upload_document${idx}`}
             title={intl.formatMessage(formMessages.addFile)}
-            onClick={e => {
+            onClick={(e) => {
               this.onChange(opt.value)
               return !this.isValid() && e.preventDefault()
             }}
@@ -323,7 +321,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
         <DocumentUploader
           id="upload_document"
           title={intl.formatMessage(formMessages.addFile)}
-          onClick={e => !this.isValid() && e.preventDefault()}
+          onClick={(e) => !this.isValid() && e.preventDefault()}
           handleFileChange={this.handleFileChange}
           disabled={this.state.filesBeingProcessed.length > 0}
         />

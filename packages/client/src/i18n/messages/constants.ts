@@ -11,7 +11,8 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IConstantsMessages {
+interface IConstantsMessages
+  extends Record<string | number | symbol, MessageDescriptor> {
   address: MessageDescriptor
   allEvents: MessageDescriptor
   allStatuses: MessageDescriptor
@@ -41,6 +42,7 @@ interface IConstantsMessages {
   collected: MessageDescriptor
   collectedBy: MessageDescriptor
   comment: MessageDescriptor
+  configTitle: MessageDescriptor
   customTimePeriod: MessageDescriptor
   dateOfApplication: MessageDescriptor
   death: MessageDescriptor
@@ -289,6 +291,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Comment',
     description: 'Label for rejection comment',
     id: 'constants.comment'
+  },
+  configTitle: {
+    defaultMessage: 'Config',
+    description: 'Config title',
+    id: 'constants.config'
   },
   customTimePeriod: {
     defaultMessage: 'Custom time period',
@@ -675,7 +682,7 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.within45DaysTo1Year'
   },
   within1YearTo5Years: {
-    defaultMessage: '1 year to 5 years',
+    defaultMessage: '1 year - 5 years',
     description: 'Label for registrations within 1 year to 5 years',
     id: 'constants.within1YearTo5Years'
   },
@@ -767,15 +774,15 @@ const messagesToDefine: IConstantsMessages = {
   }
 }
 
-export const constantsMessages: IDynamicConstants = defineMessages(
-  messagesToDefine
-)
+export const constantsMessages: Record<
+  string | number | symbol,
+  MessageDescriptor
+> = defineMessages(messagesToDefine)
 
-interface IDynamicConstants {
-  [key: string]: MessageDescriptor
-}
-
-const dynamicMessagesToDefine: IDynamicConstants = {
+const dynamicMessagesToDefine: Record<
+  string | number | symbol,
+  MessageDescriptor
+> = {
   declared: {
     id: 'constants.submitted',
     defaultMessage: 'submitted',
@@ -909,11 +916,15 @@ const dynamicMessagesToDefine: IDynamicConstants = {
   }
 }
 
-export const dynamicConstantsMessages: IDynamicConstants = defineMessages(
-  dynamicMessagesToDefine
-)
+export const dynamicConstantsMessages: Record<
+  string | number | symbol,
+  MessageDescriptor
+> = defineMessages(dynamicMessagesToDefine)
 
-const countryMessagesToDefine: IDynamicConstants = {
+const countryMessagesToDefine: Record<
+  string | number | symbol,
+  MessageDescriptor
+> = {
   AFG: {
     id: 'countries.AFG',
     defaultMessage: 'Afghanistan',
@@ -1298,6 +1309,11 @@ const countryMessagesToDefine: IDynamicConstants = {
     id: 'countries.FLK',
     defaultMessage: 'Falkland Islands (Malvinas)',
     description: 'ISO Country: FLK'
+  },
+  FAR: {
+    id: 'countries.FAR',
+    defaultMessage: 'Farajaland',
+    description: 'Fictional country for OpenCRSV demo'
   },
   FRO: {
     id: 'countries.FRO',
@@ -2157,6 +2173,7 @@ const countryMessagesToDefine: IDynamicConstants = {
   }
 }
 
-export const countryMessages: IDynamicConstants = defineMessages(
-  countryMessagesToDefine
-)
+export const countryMessages: Record<
+  string | number | symbol,
+  MessageDescriptor
+> = defineMessages(countryMessagesToDefine)

@@ -50,6 +50,11 @@ type LocalRegistrar {
   signature: Signature
 }
 
+type Avatar {
+  type: String!
+  data: String!
+}
+
 type User {
   id: ID
   userMgntUserID: ID
@@ -68,6 +73,8 @@ type User {
   identifier: Identifier
   signature: Signature
   creationDate: String
+  avatar: Avatar
+  device: String
 }
 
 type SearchUserResult {
@@ -106,6 +113,11 @@ type VerifyPasswordResult {
   id: String
 }
 
+input AvatarInput {
+  type: String!
+  data: String!
+}
+
 type Query {
   getUser(userId: String): User
   searchUsers(
@@ -120,7 +132,8 @@ type Query {
     sort: String
   ): SearchUserResult
   searchFieldAgents(
-    locationId: String!
+    locationId: String
+    primaryOfficeId: String
     status: String
     language: String
     timeStart: String!
@@ -145,6 +158,7 @@ type Mutation {
     existingPassword: String!
     password: String!
   ): String
+  changeAvatar(userId: String!, avatar: AvatarInput!): String
   auditUser(
     userId: String!
     action: String!

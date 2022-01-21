@@ -18,7 +18,10 @@ export function fetchToken(username, password) {
     JSON.stringify({
       username: username,
       password: password
-    })
+    }),
+    {
+      headers: { 'Content-Type': 'application/json' }
+    }
   )
   const body = resAuth.json()
 
@@ -27,7 +30,10 @@ export function fetchToken(username, password) {
     JSON.stringify({
       nonce: body.nonce,
       code: '000000'
-    })
+    }),
+    {
+      headers: { 'Content-Type': 'application/json' }
+    }
   )
   return resVerify.json().token
 }

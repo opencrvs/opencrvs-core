@@ -1,4 +1,4 @@
-import { ILocation, IOfflineData } from '@client/offline/reducer'
+import { IOfflineData } from '@client/offline/reducer'
 
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -21,10 +21,7 @@ export function getLocationFromPartOfLocationId(
 ) {
   const id = (locationId && locationId.split('/')[1]) || ''
   return (
-    Object.values(offlineResources.locations).find(
-      location => location.id === id
-    ) || {
-      name: ''
-    }
+    offlineResources.locations[id] ||
+    offlineResources.offices[id] || { name: '' }
   )
 }

@@ -61,6 +61,7 @@ import { ApolloProvider } from 'react-apollo'
 import { Provider } from 'react-redux'
 import { Switch } from 'react-router'
 import { AppStore } from './store'
+import { ConfigHome } from './views/SysAdmin/Config/ConfigHome'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 
 interface IAppProps {
@@ -216,6 +217,11 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.REGISTRAR_HOME_TAB}
                                             component={RegistrationHome}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.CONFIG}
+                                            component={ConfigHome}
                                           />
                                           <ProtectedRoute
                                             path={routes.SEARCH}

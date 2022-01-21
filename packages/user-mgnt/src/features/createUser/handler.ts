@@ -30,7 +30,7 @@ import {
   hasDemoScope
 } from '@user-mgnt/utils/userUtils'
 import { QA_ENV } from '@user-mgnt/constants'
-import * as Hapi from 'hapi'
+import * as Hapi from '@hapi/hapi'
 import * as _ from 'lodash'
 
 export default async function createUser(
@@ -78,7 +78,7 @@ export default async function createUser(
     if (
       user.role === 'NOTIFICATION_API_USER' ||
       user.role === 'VALIDATOR_API_USER' ||
-      user.role === 'CHATBOT_API_USER'
+      user.role === 'AGE_VERIFICATION_API_USER'
     ) {
       // Immediately active API users
       user.status = statuses.ACTIVE

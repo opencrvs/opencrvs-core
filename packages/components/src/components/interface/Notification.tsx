@@ -11,11 +11,10 @@
  */
 import * as React from 'react'
 import styled, { keyframes } from 'styled-components'
-import { Button } from '../buttons'
-import { classNames } from 'react-select/lib/utils'
 export enum NOTIFICATION_TYPE {
   SUCCESS = 'success',
   WARNING = 'warning',
+  IN_PROGRESS = 'inProgress',
   ERROR = 'error'
 }
 interface IProps {
@@ -53,6 +52,7 @@ const NotificationContainer = styled.div`
 
   &.success,
   &.error,
+  &.inProgress,
   &.warning {
     background: ${({ theme }) => theme.colors.placeholder};
     border-top: 10px solid;
@@ -65,9 +65,15 @@ const NotificationContainer = styled.div`
   &.error {
     border-color: ${({ theme }) => theme.colors.error};
   }
+
+  &.inProgress {
+    border-color: ${({ theme }) => theme.colors.primary};
+  }
+
   &.warning {
     border-color: ${({ theme }) => theme.colors.warning};
   }
+
   &.clickable {
     cursor: pointer;
   }

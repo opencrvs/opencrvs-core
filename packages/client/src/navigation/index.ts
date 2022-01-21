@@ -49,7 +49,8 @@ import {
   VERIFY_COLLECTOR,
   WORKFLOW_STATUS,
   TEAM_USER_LIST,
-  USER_PROFILE
+  USER_PROFILE,
+  CONFIG
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
@@ -57,7 +58,7 @@ import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/opera
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
 import { goBack as back, push, replace } from 'connected-react-router'
 import moment from 'moment'
-import querystring from 'query-string'
+import { stringify } from 'query-string'
 import { Cmd, loop } from 'redux-loop'
 
 export interface IDynamicValues {
@@ -180,7 +181,11 @@ export function goToHome() {
   return push(HOME)
 }
 
-export function goToHomeTab(tabId: string, selectorId: string = '') {
+export function goToConfig() {
+  return push(CONFIG)
+}
+
+export function goToHomeTab(tabId: string, selectorId = '') {
   const path = getCurrentUserScope().includes('declare')
     ? FIELD_AGENT_HOME_TAB
     : REGISTRAR_HOME_TAB
@@ -223,14 +228,12 @@ export function goToPerformanceReport(
 export function goToOperationalReport(
   locationId: string,
   sectionId: OPERATIONAL_REPORT_SECTION = OPERATIONAL_REPORT_SECTION.OPERATIONAL,
-  timeStart: Date = moment()
-    .subtract(1, 'years')
-    .toDate(),
+  timeStart: Date = moment().subtract(1, 'years').toDate(),
   timeEnd: Date = moment().toDate()
 ) {
   return push({
     pathname: OPERATIONAL_REPORT,
-    search: querystring.stringify({
+    search: stringify({
       sectionId,
       locationId,
       timeStart: timeStart.toISOString(),
@@ -245,7 +248,7 @@ export function goToTeamUserList(
 ) {
   return push({
     pathname: TEAM_USER_LIST,
-    search: querystring.stringify({
+    search: stringify({
       locationId: selectedLocation.id,
       viewOnly
     })
@@ -410,7 +413,7 @@ export function goToRegistrationRates(
 ) {
   return push({
     pathname: formatUrl(EVENT_REGISTRATION_RATES, { eventType }),
-    search: querystring.stringify({
+    search: stringify({
       locationId,
       title,
       timeStart: timeStart.toISOString(),
@@ -427,7 +430,7 @@ export function goToFieldAgentList(
 ) {
   return push({
     pathname: PERFORMANCE_FIELD_AGENT_LIST,
-    search: querystring.stringify({
+    search: stringify({
       locationId,
       timeStart,
       timeEnd
@@ -445,7 +448,7 @@ export function goToWorkflowStatus(
 ) {
   return push({
     pathname: WORKFLOW_STATUS,
-    search: querystring.stringify({
+    search: stringify({
       locationId,
       status,
       event

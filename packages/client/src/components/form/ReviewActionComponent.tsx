@@ -307,7 +307,7 @@ class ReviewActionComponent extends React.Component<
 > {
   state = { showSubmitModal: false }
   toggleSubmitModalOpen = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       showSubmitModal: !prevState.showSubmitModal
     }))
   }
@@ -352,10 +352,9 @@ class ReviewActionComponent extends React.Component<
             )}
           </Title>
           <Description>
-            {intl.formatMessage(
-              actionContent.description.message,
-              actionContent.description.payload
-            )}
+            {intl.formatMessage(actionContent.description.message, {
+              eventType: application.event
+            })}
           </Description>
           <ActionContainer>
             {applicationToBeRegistered ? (
@@ -413,7 +412,7 @@ class ReviewActionComponent extends React.Component<
               event: application.event
             })}
             responsive={false}
-            contentHeight={96}
+            autoHeight={true}
             actions={[
               <TertiaryButton
                 id="cancel-btn"

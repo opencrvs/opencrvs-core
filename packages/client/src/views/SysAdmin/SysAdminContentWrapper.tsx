@@ -28,11 +28,25 @@ const DynamicContainer = styled.div<{
     fixedWidth ? `width: ${fixedWidth}px;` : `width: 100%`}
 `
 
-const Content = styled(BodyContent)`
+interface IprofilePageStyle {
+  paddingTopMd: number
+  horizontalPaddingMd: number
+}
+
+const Content = styled(BodyContent)<{
+  profilePageStyle?: IprofilePageStyle
+}>`
   padding: 0px 24px;
   margin: 32px auto 0;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     padding: 0px 16px;
+
+    ${({ profilePageStyle }) =>
+      profilePageStyle &&
+      `
+      margin: ${profilePageStyle.paddingTopMd}px auto ${0};
+      padding: ${0}px ${profilePageStyle.horizontalPaddingMd}px
+    `}
   }
 `
 const SubPageContent = styled(Content)`
@@ -52,6 +66,7 @@ interface BasePage {
   marginRight?: number
   fixedWidth?: number
   mapPinClickHandler?: () => void
+  profilePageStyle?: IprofilePageStyle
 }
 
 interface DefaultPage extends BasePage {
@@ -68,9 +83,7 @@ interface HeaderProps {
 }
 
 interface SubPage extends BasePage, HeaderProps {
-  type:
-    | typeof SysAdminPageVariant.SUBPAGE
-    | SysAdminPageVariant.SUBPAGE_CENTERED
+  type: any
 }
 
 type SysAdminPage = DefaultPage | SubPage
@@ -189,7 +202,9 @@ export function SysAdminContentWrapper(props: SysAdminPage) {
         marginRight={props.marginRight}
         fixedWidth={props.fixedWidth}
       >
-        <Content>{props.children}</Content>
+        <Content profilePageStyle={props.profilePageStyle}>
+          {props.children}
+        </Content>
       </DynamicContainer>
     )
   } else {

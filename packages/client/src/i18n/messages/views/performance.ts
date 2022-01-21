@@ -11,7 +11,8 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IPerformanceReportsMessages {
+interface IPerformanceReportsMessages
+  extends Record<string | number | symbol, MessageDescriptor> {
   monthlyTabTitle: MessageDescriptor
   monthlyReportsBodyHeader: MessageDescriptor
   sysAdminPerformanceHomeHeader: MessageDescriptor
@@ -283,6 +284,5 @@ const messagesToDefine: IPerformanceReportsMessages = {
   }
 }
 
-export const messages: IPerformanceReportsMessages = defineMessages(
-  messagesToDefine
-)
+export const messages: IPerformanceReportsMessages =
+  defineMessages(messagesToDefine)

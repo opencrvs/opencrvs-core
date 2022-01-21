@@ -44,7 +44,7 @@ class GenderBasisComponent extends React.Component<FullProps> {
   getContent() {
     return (
       (this.props.genderBasisMetrics.details &&
-        this.props.genderBasisMetrics.details.map(content => {
+        this.props.genderBasisMetrics.details.map((content) => {
           return {
             location: getLocationFromPartOfLocationId(
               content.location,
@@ -167,11 +167,8 @@ class GenderBasisComponent extends React.Component<FullProps> {
   }
 }
 
-export const GenderBasisReports = connect(
-  (store: IStoreState) => {
-    return {
-      offlineResources: getOfflineData(store)
-    }
-  },
-  {}
-)(injectIntl(GenderBasisComponent))
+export const GenderBasisReports = connect((store: IStoreState) => {
+  return {
+    offlineResources: getOfflineData(store)
+  }
+}, {})(injectIntl(GenderBasisComponent))

@@ -27,7 +27,11 @@ import {
   goToEvents as goToEventsAction,
   goToFieldAgentHomeTab as goToFieldAgentHomeTabAction
 } from '@client/navigation'
-import { PERFORMANCE_HOME, REGISTRAR_HOME } from '@client/navigation/routes'
+import {
+  OPERATIONAL_REPORT,
+  PERFORMANCE_HOME,
+  REGISTRAR_HOME
+} from '@client/navigation/routes'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import {
   COUNT_USER_WISE_APPLICATIONS,
@@ -41,15 +45,21 @@ import {
   FIELD_AGENT_HOME_TAB_SENT_FOR_REVIEW,
   FIELD_AGENT_ROLES,
   LANG_EN,
+  NATL_ADMIN_ROLES,
   PAGE_TRANSITIONS_ENTER_TIME,
   REGISTRAR_ROLES,
   SYS_ADMIN_ROLES
 } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
+import { formattedDuration } from '@client/utils/date-formatting'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
 import { InProgress } from '@client/views/FieldAgentHome/InProgress'
 import { SentForReview } from '@client/views/FieldAgentHome/SentForReview'
-import { LoadingIndicator } from '@client/views/RegistrationHome/LoadingIndicator'
+import {
+  LoadingIndicator,
+  IOnlineStatusProps,
+  withOnlineStatus
+} from '@client/views/RegistrationHome/LoadingIndicator'
 import { EVENT_STATUS } from '@client/views/RegistrationHome/RegistrationHome'
 import { getLanguage } from '@opencrvs/client/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
@@ -85,6 +95,8 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { Redirect, RouteComponentProps } from 'react-router'
+import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
+import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
 
 const IconTab = styled(Button)<{ active: boolean }>`
   color: ${({ theme }) => theme.colors.copy};
@@ -183,6 +195,7 @@ interface IMatchParams {
 }
 
 type FieldAgentHomeProps = IBaseFieldAgentHomeProps &
+  IOnlineStatusProps &
   IntlShapeProps &
   ISearchInputProps &
   RouteComponentProps<IMatchParams>
@@ -304,14 +317,17 @@ class FieldAgentHomeView extends React.Component<
         names = deathReg && (deathReg.deceasedName as GQLHumanName[])
       }
       moment.locale(this.props.intl.locale)
+      const rejectedArray =
+        registrationSearchSet &&
+        registrationSearchSet.operationHistories &&
+        registrationSearchSet.operationHistories.filter((item) => {
+          return item && item.operationType === 'REJECTED'
+        })
       const daysOfRejection =
-        registrationSearchSet.registration &&
-        registrationSearchSet.registration.dateOfApplication &&
-        moment(registrationSearchSet.registration.dateOfApplication)
-          .startOf('minute')
-          .fromNow()
+        rejectedArray &&
+        rejectedArray[0] &&
+        formattedDuration(moment(rejectedArray[0].operatedOn))
       const event = registrationSearchSet.type as string
-
       return {
         id: registrationSearchSet.id,
         event:
@@ -351,6 +367,8 @@ class FieldAgentHomeView extends React.Component<
     } = this.props
     const tabId = match.params.tabId || TAB_ID.sentForReview
     const fieldAgentLocationId = userDetails && getUserLocation(userDetails).id
+    const jurisdictionLocationId =
+      userDetails && getJurisdictionLocationIdFromUserDetails(userDetails)
     let parentQueryLoading = false
     const role = userDetails && userDetails.role
     return (
@@ -518,7 +536,7 @@ class FieldAgentHomeView extends React.Component<
                               data.searchEvents && data.searchEvents.totalItems
                             }
                             currentPage={this.state.requireUpdatesPage}
-                            clickable={true}
+                            clickable={this.props.isOnline}
                             showPaginated={this.showPaginated}
                             loading={loading}
                             loadMoreText={intl.formatMessage(
@@ -556,8 +574,24 @@ class FieldAgentHomeView extends React.Component<
             </FABContainer>
           </>
         )}
-        {role && SYS_ADMIN_ROLES.includes(role) && (
+        {role && NATL_ADMIN_ROLES.includes(role) && (
           <Redirect to={PERFORMANCE_HOME} />
+        )}
+        {role && SYS_ADMIN_ROLES.includes(role) && (
+          <Redirect
+            to={{
+              pathname: OPERATIONAL_REPORT,
+              search:
+                '?locationId=' +
+                jurisdictionLocationId +
+                '&sectionId=' +
+                OPERATIONAL_REPORT_SECTION.OPERATIONAL +
+                '&timeStart=' +
+                moment().subtract(1, 'years').toDate().toISOString() +
+                '&timeEnd=' +
+                moment().toDate().toISOString()
+            }}
+          />
         )}
         {role && REGISTRAR_ROLES.includes(role) && (
           <Redirect to={REGISTRAR_HOME} />
@@ -597,12 +631,9 @@ const mapStateToProps = (
   }
 }
 
-export const FieldAgentHome = connect(
-  mapStateToProps,
-  {
-    goToEvents: goToEventsAction,
-    goToFieldAgentHomeTab: goToFieldAgentHomeTabAction,
-    goToApplicationDetails,
-    updateFieldAgentDeclaredApplications
-  }
-)(injectIntl(withTheme(FieldAgentHomeView)))
+export const FieldAgentHome = connect(mapStateToProps, {
+  goToEvents: goToEventsAction,
+  goToFieldAgentHomeTab: goToFieldAgentHomeTabAction,
+  goToApplicationDetails,
+  updateFieldAgentDeclaredApplications
+})(injectIntl(withTheme(withOnlineStatus(FieldAgentHomeView))))

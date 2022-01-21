@@ -27,12 +27,15 @@ import {
   goToRegistrationRates,
   goToWorkflowStatus
 } from '@client/navigation'
-import { IOfflineData } from '@client/offline/reducer'
+import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { getToken } from '@client/utils/authUtils'
+import { SYS_ADMIN_ROLES } from '@client/utils/constants'
 import { generateLocations } from '@client/utils/locationUtils'
+import { IUserDetails } from '@client/utils/userUtils'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
 import { FETCH_STATUS_WISE_REGISTRATION_COUNT } from '@client/views/SysAdmin/Performance/queries'
 import {
@@ -65,18 +68,22 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema'
 import { ApolloError } from 'apollo-client'
 import moment from 'moment'
-import querystring from 'query-string'
+import { parse } from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { withTheme } from 'styled-components'
-import { OPERATIONAL_REPORTS_METRICS } from './metricsQuery'
+import {
+  OPERATIONAL_REPORTS_METRICS,
+  OPERATIONAL_REPORTS_METRICS_FOR_OFFICE
+} from './metricsQuery'
 import { ApplicationsStartedReport } from './reports/operational/ApplicationsStartedReport'
 import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
 
 interface IConnectProps {
-  offlineLocations: IOfflineData['locations']
+  locations: { [key: string]: ILocation }
+  offices: { [key: string]: ILocation }
 }
 interface IDispatchProps {
   goToPerformanceHome: typeof goToPerformanceHome
@@ -104,8 +111,7 @@ interface ISearchParams {
 }
 
 type Props = WrappedComponentProps &
-  RouteComponentProps &
-  IConnectProps &
+  RouteComponentProps & { userDetails: IUserDetails | null } & IConnectProps &
   IDispatchProps & { theme: ITheme }
 
 interface State {
@@ -203,12 +209,17 @@ export const StatusMapping: IStatusMapping = {
 class OperationalReportComponent extends React.Component<Props, State> {
   static transformPropsToState(props: Props, state?: State) {
     const {
-      location: { search }
+      location: { search },
+      locations,
+      offices
     } = props
-    const { timeStart, timeEnd, locationId, sectionId } = (querystring.parse(
+    const { timeStart, timeEnd, locationId, sectionId } = parse(
       search
-    ) as unknown) as ISearchParams
-    const searchableLocations = generateLocations(props.offlineLocations)
+    ) as unknown as ISearchParams
+    const searchableLocations = generateLocations(
+      { ...locations, ...offices },
+      props.intl
+    )
     const selectedLocation = searchableLocations.find(
       ({ id }) => id === locationId
     ) as ISearchLocation
@@ -236,6 +247,10 @@ class OperationalReportComponent extends React.Component<Props, State> {
     )
   }
 
+  isOfficeSelected() {
+    return !!this.props.offices[this.state.selectedLocation.id]
+  }
+
   static getDerivedStateFromProps(props: Props, state: State) {
     return OperationalReportComponent.transformPropsToState(props, state)
   }
@@ -255,8 +270,8 @@ class OperationalReportComponent extends React.Component<Props, State> {
         Authorization: `Bearer ${getToken()}`
       }
     })
-      .then(resp => resp.blob())
-      .then(blob => {
+      .then((resp) => resp.blob())
+      .then((blob) => {
         const url = window.URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = url
@@ -282,8 +297,8 @@ class OperationalReportComponent extends React.Component<Props, State> {
 
   getContent(eventType: Event) {
     moment.locale(this.props.intl.locale)
-    let content = []
-    let currentYear = this.state.timeStart.year()
+    const content = []
+    const currentYear = this.state.timeStart.year()
     let currentMonth = this.state.timeStart.month() + 1
     const startMonth =
       this.state.timeStart.month() + this.state.timeStart.year() * 12
@@ -383,7 +398,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
     )
   }
   render() {
-    const { intl } = this.props
+    const { intl, userDetails } = this.props
 
     const {
       selectedLocation,
@@ -395,6 +410,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
       mainWindowLeftMargin,
       mainWindowRightMargin
     } = this.state
+    const role = userDetails && userDetails.role
     const { displayLabel: title, id: locationId } = selectedLocation
     return (
       <SysAdminContentWrapper
@@ -404,17 +420,19 @@ class OperationalReportComponent extends React.Component<Props, State> {
         <Container>
           <HeaderContainer>
             <Header id="header-location-name">{title}</Header>
-            <LinkButton
-              id="change-location-link"
-              onClick={this.onChangeLocation}
-            >
-              {intl.formatMessage(buttonMessages.change)}
-            </LinkButton>
+            {role && !SYS_ADMIN_ROLES.includes(role) && (
+              <LinkButton
+                id="change-location-link"
+                onClick={this.onChangeLocation}
+              >
+                {intl.formatMessage(buttonMessages.change)}
+              </LinkButton>
+            )}
           </HeaderContainer>
           <ActionContainer>
             <FilterContainer id="operational-report-view">
               <PerformanceSelect
-                onChange={option => {
+                onChange={(option) => {
                   this.props.goToOperationalReport(
                     selectedLocation.id,
                     option.value as OPERATIONAL_REPORT_SECTION,
@@ -461,7 +479,11 @@ class OperationalReportComponent extends React.Component<Props, State> {
           </ActionContainer>
           {sectionId === OPERATIONAL_REPORT_SECTION.OPERATIONAL && (
             <Query
-              query={OPERATIONAL_REPORTS_METRICS}
+              query={
+                this.isOfficeSelected()
+                  ? OPERATIONAL_REPORTS_METRICS_FOR_OFFICE
+                  : OPERATIONAL_REPORTS_METRICS
+              }
               variables={{
                 timeStart: timeStart.toISOString(),
                 timeEnd: timeEnd.toISOString(),
@@ -481,7 +503,9 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 if (error) {
                   return (
                     <>
-                      <RegistrationRatesReport loading={true} />
+                      {!this.isOfficeSelected() && (
+                        <RegistrationRatesReport loading={true} />
+                      )}
                       <ApplicationsStartedReport
                         loading={true}
                         locationId={locationId}
@@ -494,15 +518,17 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 } else {
                   return (
                     <>
-                      <RegistrationRatesReport
-                        loading={loading}
-                        data={data && data.getEventEstimationMetrics}
-                        reportTimeFrom={timeStart.format()}
-                        reportTimeTo={timeEnd.format()}
-                        onClickEventDetails={
-                          this.onClickRegistrationRatesDetails
-                        }
-                      />
+                      {!this.isOfficeSelected() && (
+                        <RegistrationRatesReport
+                          loading={loading}
+                          data={data && data.getEventEstimationMetrics}
+                          reportTimeFrom={timeStart.format()}
+                          reportTimeTo={timeEnd.format()}
+                          onClickEventDetails={
+                            this.onClickRegistrationRatesDetails
+                          }
+                        />
+                      )}
                       <ApplicationsStartedReport
                         loading={loading}
                         locationId={locationId}
@@ -629,17 +655,16 @@ class OperationalReportComponent extends React.Component<Props, State> {
 function mapStateToProps(state: IStoreState) {
   const offlineResources = getOfflineData(state)
   return {
-    offlineLocations: offlineResources.locations
+    locations: offlineResources.locations,
+    offices: offlineResources.offices,
+    userDetails: getUserDetails(state)
   }
 }
 
-export const OperationalReport = connect(
-  mapStateToProps,
-  {
-    goToPerformanceHome,
-    goToOperationalReport,
-    goToPerformanceReport,
-    goToRegistrationRates,
-    goToWorkflowStatus
-  }
-)(withTheme(injectIntl(OperationalReportComponent)))
+export const OperationalReport = connect(mapStateToProps, {
+  goToPerformanceHome,
+  goToOperationalReport,
+  goToPerformanceReport,
+  goToRegistrationRates,
+  goToWorkflowStatus
+})(withTheme(injectIntl(OperationalReportComponent)))

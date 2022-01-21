@@ -66,9 +66,7 @@ function request<T>(options: AxiosRequestConfig) {
     throw error
   }
 
-  return client(options)
-    .then(onSuccess)
-    .catch(onError)
+  return client(options).then(onSuccess).catch(onError)
 }
 
 const authenticate = (data: IAuthenticationData) => {
@@ -132,7 +130,8 @@ export type IVerifySecurityAnswerResponse = { nonce: string } & (
       matched: false
       securityQuestionKey: QUESTION_KEYS
     }
-  | { matched: true })
+  | { matched: true }
+)
 
 const verifySecurityAnswer = (
   nonce: string,

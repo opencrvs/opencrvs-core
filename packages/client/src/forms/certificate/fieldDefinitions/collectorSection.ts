@@ -22,8 +22,7 @@ import {
   TEXT
 } from '@client/forms'
 import {
-  birthIdentityOptions,
-  deathIdentityOptions,
+  identityOptions,
   identityHelperTextMapper,
   identityNameMapper,
   identityTypeMapper
@@ -34,105 +33,109 @@ import { messages as certificateMessages } from '@client/i18n/messages/views/cer
 import { validIDNumber } from '@client/utils/validate'
 import { RadioSize } from '@opencrvs/components/lib/forms'
 
-export const certCollectorGroupForBirthAppWithoutFatherDetails: IFormSectionGroup = {
-  id: 'certCollector',
-  title: certificateMessages.whoToCollect,
-  error: certificateMessages.certificateCollectorError,
-  fields: [
-    {
-      name: 'type',
-      type: RADIO_GROUP,
-      size: RadioSize.LARGE,
-      label: certificateMessages.whoToCollect,
-      required: true,
-      initialValue: '',
-      validate: [],
-      options: [
-        { value: 'MOTHER', label: formMessages.contactDetailsMother },
-        { value: 'OTHER', label: formMessages.someoneElse },
-        {
-          value: 'PRINT_IN_ADVANCE',
-          label: formMessages.certificatePrintInAdvance
-        }
-      ]
-    }
-  ]
-}
+export const certCollectorGroupForBirthAppWithoutFatherDetails: IFormSectionGroup =
+  {
+    id: 'certCollector',
+    title: certificateMessages.whoToCollect,
+    error: certificateMessages.certificateCollectorError,
+    fields: [
+      {
+        name: 'type',
+        type: RADIO_GROUP,
+        size: RadioSize.LARGE,
+        label: certificateMessages.whoToCollect,
+        required: true,
+        initialValue: '',
+        validate: [],
+        options: [
+          { value: 'MOTHER', label: formMessages.contactDetailsMother },
+          { value: 'OTHER', label: formMessages.someoneElse },
+          {
+            value: 'PRINT_IN_ADVANCE',
+            label: formMessages.certificatePrintInAdvance
+          }
+        ]
+      }
+    ]
+  }
 
-export const certCollectorGroupForBirthAppWithoutMotherDetails: IFormSectionGroup = {
-  id: 'certCollector',
-  title: certificateMessages.whoToCollect,
-  error: certificateMessages.certificateCollectorError,
-  fields: [
-    {
-      name: 'type',
-      type: RADIO_GROUP,
-      size: RadioSize.LARGE,
-      label: certificateMessages.whoToCollect,
-      required: true,
-      initialValue: '',
-      validate: [],
-      options: [
-        { value: 'FATHER', label: formMessages.contactDetailsFather },
-        { value: 'OTHER', label: formMessages.someoneElse },
-        {
-          value: 'PRINT_IN_ADVANCE',
-          label: formMessages.certificatePrintInAdvance
-        }
-      ]
-    }
-  ]
-}
+export const certCollectorGroupForBirthAppWithoutMotherDetails: IFormSectionGroup =
+  {
+    id: 'certCollector',
+    title: certificateMessages.whoToCollect,
+    error: certificateMessages.certificateCollectorError,
+    fields: [
+      {
+        name: 'type',
+        type: RADIO_GROUP,
+        size: RadioSize.LARGE,
+        label: certificateMessages.whoToCollect,
+        required: true,
+        initialValue: '',
+        validate: [],
+        options: [
+          { value: 'FATHER', label: formMessages.contactDetailsFather },
+          { value: 'OTHER', label: formMessages.someoneElse },
+          {
+            value: 'PRINT_IN_ADVANCE',
+            label: formMessages.certificatePrintInAdvance
+          }
+        ]
+      }
+    ]
+  }
 
-export const certCollectorGroupForBirthAppWithParentDetails: IFormSectionGroup = {
-  id: 'certCollector',
-  title: certificateMessages.whoToCollect,
-  error: certificateMessages.certificateCollectorError,
-  fields: [
-    {
-      name: 'type',
-      type: RADIO_GROUP,
-      size: RadioSize.LARGE,
-      label: certificateMessages.whoToCollect,
-      required: true,
-      initialValue: '',
-      validate: [],
-      options: [
-        { value: 'MOTHER', label: formMessages.contactDetailsMother },
-        { value: 'FATHER', label: formMessages.contactDetailsFather },
-        { value: 'OTHER', label: formMessages.someoneElse },
-        {
-          value: 'PRINT_IN_ADVANCE',
-          label: formMessages.certificatePrintInAdvance
-        }
-      ]
-    }
-  ]
-}
+export const certCollectorGroupForBirthAppWithParentDetails: IFormSectionGroup =
+  {
+    id: 'certCollector',
+    title: certificateMessages.whoToCollect,
+    error: certificateMessages.certificateCollectorError,
+    fields: [
+      {
+        name: 'type',
+        type: RADIO_GROUP,
+        size: RadioSize.LARGE,
+        label: certificateMessages.whoToCollect,
+        required: true,
+        initialValue: '',
+        validate: [],
+        options: [
+          { value: 'MOTHER', label: formMessages.contactDetailsMother },
+          { value: 'FATHER', label: formMessages.contactDetailsFather },
+          { value: 'OTHER', label: formMessages.someoneElse },
+          {
+            value: 'PRINT_IN_ADVANCE',
+            label: formMessages.certificatePrintInAdvance
+          }
+        ]
+      }
+    ]
+  }
 
-export const certCollectorGroupForBirthAppWithoutParentDetails: IFormSectionGroup = {
-  id: 'certCollector',
-  title: certificateMessages.whoToCollect,
-  error: certificateMessages.certificateCollectorError,
-  fields: [
-    {
-      name: 'type',
-      type: RADIO_GROUP,
-      size: RadioSize.LARGE,
-      label: certificateMessages.whoToCollect,
-      required: true,
-      initialValue: '',
-      validate: [],
-      options: [
-        { value: 'OTHER', label: formMessages.someoneElse },
-        {
-          value: 'PRINT_IN_ADVANCE',
-          label: formMessages.certificatePrintInAdvance
-        }
-      ]
-    }
-  ]
-}
+export const certCollectorGroupForBirthAppWithoutParentDetails: IFormSectionGroup =
+  {
+    id: 'certCollector',
+    title: certificateMessages.whoToCollect,
+    error: certificateMessages.certificateCollectorError,
+    fields: [
+      {
+        name: 'type',
+        type: RADIO_GROUP,
+        size: RadioSize.LARGE,
+        label: certificateMessages.whoToCollect,
+        required: true,
+        initialValue: '',
+        validate: [],
+        options: [
+          { value: 'OTHER', label: formMessages.someoneElse },
+          {
+            value: 'PRINT_IN_ADVANCE',
+            label: formMessages.certificatePrintInAdvance
+          }
+        ]
+      }
+    ]
+  }
 
 export const collectBirthCertificateFormSection: IFormSection = {
   id: CertificateSection.Collector,
@@ -161,7 +164,7 @@ export const collectBirthCertificateFormSection: IFormSection = {
           initialValue: '',
           validate: [],
           placeholder: formMessages.select,
-          options: birthIdentityOptions
+          options: identityOptions
         },
         {
           name: 'iDTypeOther',
@@ -199,7 +202,8 @@ export const collectBirthCertificateFormSection: IFormSection = {
           label: formMessages.iD,
           required: true,
           initialValue: '',
-          validate: []
+          validate: [],
+          conditionals: [conditionals.iDAvailable]
         },
         {
           name: 'firstName',
@@ -320,7 +324,7 @@ export const collectDeathCertificateFormSection: IFormSection = {
           initialValue: '',
           validate: [],
           placeholder: formMessages.select,
-          options: deathIdentityOptions
+          options: identityOptions
         },
         {
           name: 'iDTypeOther',
@@ -354,7 +358,8 @@ export const collectDeathCertificateFormSection: IFormSection = {
           label: formMessages.iD,
           required: true,
           initialValue: '',
-          validate: []
+          validate: [],
+          conditionals: [conditionals.iDAvailable]
         },
         {
           name: 'firstName',

@@ -60,7 +60,8 @@ class NoResultMessageComponent extends React.Component<Props> {
             </StyledHeader>
             {generatePilotLocations(
               offlineResources.pilotLocations,
-              offlineResources.locations
+              offlineResources.locations,
+              intl
             ).map((pilotLocation, index) => (
               <MessageRow key={index}>
                 <LinkButton
@@ -98,9 +99,6 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const NoResultMessage = connect(
-  mapStateToProps,
-  {
-    goToOperationalReport
-  }
-)(injectIntl(NoResultMessageComponent))
+export const NoResultMessage = connect(mapStateToProps, {
+  goToOperationalReport
+})(injectIntl(NoResultMessageComponent))

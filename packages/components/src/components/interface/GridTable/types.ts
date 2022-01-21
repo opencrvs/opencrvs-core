@@ -33,7 +33,7 @@ type ReactText = string | number
 type ReactChild = React.ReactNodeArray | ReactText
 
 export interface IColumn {
-  label?: string | ReactChild
+  label?: string | React.ReactNode
   width: number
   key: string
   errorValue?: string
@@ -42,6 +42,7 @@ export interface IColumn {
   isIconColumn?: boolean
   color?: string
   isSortable?: boolean
+  isSorted?: boolean
   icon?: JSX.Element | React.ReactNode
   sortFunction?: (key: string) => void
 }

@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { MessageDescriptor } from 'react-intl'
-import { NUMBER, TEXT, IDynamicFieldTypeMapper, BIG_NUMBER } from '.'
+import { TEXT, IDynamicFieldTypeMapper, BIG_NUMBER } from '.'
 import { formMessages as messages } from '@client/i18n/messages'
 
 export const NATIONAL_ID = 'NATIONAL_ID'
@@ -24,15 +24,7 @@ export const OTHER = 'OTHER'
 export const NO_ID = 'NO_ID'
 export const SOCIAL_SECURITY_NO = 'SOCIAL_SECURITY_NO'
 
-export const birthIdentityOptions = [
-  { value: NATIONAL_ID, label: messages.nationalIdOption },
-  {
-    value: BIRTH_REGISTRATION_NUMBER,
-    label: messages.brnOption
-  }
-]
-
-export const deathIdentityOptions = [
+export const identityOptions = [
   { value: PASSPORT, label: messages.iDTypePassport },
   { value: NATIONAL_ID, label: messages.iDTypeNationalID },
   {

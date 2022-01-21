@@ -10,13 +10,14 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import * as Hapi from 'hapi'
+import * as Hapi from '@hapi/hapi'
 import { query, getCSV } from '@metrics/influxdb/client'
 import * as archiver from 'archiver'
 import { metricsHandler } from '@metrics/features/metrics/handler'
 import * as stringify from 'csv-stringify'
 import { fetchLocation } from '@metrics/api'
 import { EVENT } from '@metrics/features/metrics/constants'
+import { EXPECTED_BIRTH_REGISTRATION_IN_DAYS } from '@metrics/constants'
 
 async function getMeasurementNames() {
   const points = await query<Array<{ key: string }>>('SHOW SERIES')
@@ -93,11 +94,10 @@ export async function monthlyExportHandler(
       })
       stream.push({
         Location: loc.name,
-        'Within 45 days': `${timeFrameData.regWithin45d} (${getPercentage(
-          timeFrameData.regWithin45d,
-          timeFrameData.total
-        )}%)`,
-        '45 days - 1 year': `${
+        [`Within ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} days`]: `${
+          timeFrameData.regWithin45d
+        } (${getPercentage(timeFrameData.regWithin45d, timeFrameData.total)}%)`,
+        [`${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} days - 1 year`]: `${
           timeFrameData.regWithin45dTo1yr
         } (${getPercentage(
           timeFrameData.regWithin45dTo1yr,
@@ -132,12 +132,12 @@ export async function monthlyExportHandler(
         Location: loc.name,
         'Estimated no. of registrations':
           estimated45DayData.estimatedRegistration,
-        'Total registered in 45 days': estimated45DayData.registrationIn45Day,
+        [`Total registered in ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} days`]: estimated45DayData.registrationIn45Day,
         'Percentage of estimate': `${estimated45DayData.estimationPercentage}%`
       })
     }
     csvStreams.push([
-      'Estimated vs total registered in 45 days',
+      `Estimated vs total registered in ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} days`,
       stringify(stream, { header: true })
     ])
   }

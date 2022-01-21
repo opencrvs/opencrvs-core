@@ -57,15 +57,17 @@ describe('Within45DaysTable tests for over time option', () => {
   })
 
   beforeEach(async () => {
-    component = (await createTestComponent(
-      <Within45DaysTable
-        loading={false}
-        base={{ baseType: REG_RATE_BASE.TIME }}
-        eventType={Event.BIRTH}
-        data={mockData}
-      />,
-      store
-    )).component
+    component = (
+      await createTestComponent(
+        <Within45DaysTable
+          loading={false}
+          base={{ baseType: REG_RATE_BASE.TIME }}
+          eventType={Event.BIRTH}
+          data={mockData}
+        />,
+        store
+      )
+    ).component
   })
 
   it('runs without crashing', async () => {
@@ -79,21 +81,11 @@ describe('Within45DaysTable tests for over time option', () => {
       component,
       '#month-label'
     )
-    expect(
-      firstRowElement
-        .hostNodes()
-        .childAt(0)
-        .text()
-    ).toBe('April 2020')
+    expect(firstRowElement.hostNodes().childAt(0).text()).toBe('April 2020')
 
     toggleSortActionElement.hostNodes().simulate('click')
 
-    expect(
-      firstRowElement
-        .hostNodes()
-        .childAt(0)
-        .text()
-    ).toBe('March 2020')
+    expect(firstRowElement.hostNodes().childAt(0).text()).toBe('March 2020')
   })
 })
 describe('Within45DaysTable tests for by location option', () => {
@@ -132,18 +124,20 @@ describe('Within45DaysTable tests for by location option', () => {
   })
 
   beforeEach(async () => {
-    component = (await createTestComponent(
-      <Within45DaysTable
-        loading={false}
-        base={{
-          baseType: REG_RATE_BASE.LOCATION,
-          locationJurisdictionType: 'UNION'
-        }}
-        eventType={Event.BIRTH}
-        data={mockData}
-      />,
-      store
-    )).component
+    component = (
+      await createTestComponent(
+        <Within45DaysTable
+          loading={false}
+          base={{
+            baseType: REG_RATE_BASE.LOCATION,
+            locationJurisdictionType: 'UNION'
+          }}
+          eventType={Event.BIRTH}
+          data={mockData}
+        />,
+        store
+      )
+    ).component
   })
 
   it('runs without crashing', async () => {
@@ -157,20 +151,10 @@ describe('Within45DaysTable tests for by location option', () => {
       component,
       '#location-label'
     )
-    expect(
-      firstRowElement
-        .hostNodes()
-        .childAt(0)
-        .text()
-    ).toBe('Atpara Sadar')
+    expect(firstRowElement.hostNodes().childAt(0).text()).toBe('Atpara Sadar')
 
     toggleSortActionElement.hostNodes().simulate('click')
 
-    expect(
-      firstRowElement
-        .hostNodes()
-        .childAt(0)
-        .text()
-    ).toBe('Baniajan')
+    expect(firstRowElement.hostNodes().childAt(0).text()).toBe('Baniajan')
   })
 })

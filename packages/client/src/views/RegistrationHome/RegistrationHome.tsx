@@ -18,7 +18,6 @@ import {
 } from '@client/applications'
 import { Header } from '@client/components/interface/Header/Header'
 import { IViewHeadingProps } from '@client/components/ViewHeading'
-import { errorMessages } from '@client/i18n/messages'
 import { messages as certificateMessage } from '@client/i18n/messages/views/certificate'
 import { messages } from '@client/i18n/messages/views/registrarHome'
 import {
@@ -214,7 +213,7 @@ export class RegistrationHomeView extends React.Component<
       externalValidationCurrentPage: 1,
       showCertificateToast: Boolean(
         this.props.applications.filter(
-          item => item.submissionStatus === SUBMISSION_STATUS.READY_TO_CERTIFY
+          (item) => item.submissionStatus === SUBMISSION_STATUS.READY_TO_CERTIFY
         ).length
       )
     }
@@ -274,7 +273,7 @@ export class RegistrationHomeView extends React.Component<
 
   subtractApplicationsWithStatus(count: number, status: string[]) {
     const outboxCount = this.props.storedApplications.filter(
-      app => app.submissionStatus && status.includes(app.submissionStatus)
+      (app) => app.submissionStatus && status.includes(app.submissionStatus)
     ).length
     return count - outboxCount
   }
@@ -327,7 +326,6 @@ export class RegistrationHomeView extends React.Component<
   ) => {
     const {
       workqueue,
-      theme,
       intl,
       tabId,
       drafts,
@@ -356,7 +354,7 @@ export class RegistrationHomeView extends React.Component<
             {!initialSyncDone
               ? '?'
               : drafts.filter(
-                  draft =>
+                  (draft) =>
                     draft.submissionStatus ===
                     SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
                 ).length +
@@ -566,7 +564,7 @@ export class RegistrationHomeView extends React.Component<
               this.setState({ showCertificateToast: false })
             }}
           >
-            {intl.formatHTMLMessage(certificateMessage.toastMessage)}
+            {intl.formatMessage(certificateMessage.toastMessage)}
           </FloatingNotification>
         )}
       </>
@@ -604,14 +602,11 @@ function mapStateToProps(
   }
 }
 
-export const RegistrationHome = connect(
-  mapStateToProps,
-  {
-    goToEvents,
-    goToPage,
-    goToRegistrarHomeTab,
-    goToReviewDuplicate,
-    goToPrintCertificate,
-    updateRegistrarWorkqueue
-  }
-)(injectIntl(withTheme(RegistrationHomeView)))
+export const RegistrationHome = connect(mapStateToProps, {
+  goToEvents,
+  goToPage,
+  goToRegistrarHomeTab,
+  goToReviewDuplicate,
+  goToPrintCertificate,
+  updateRegistrarWorkqueue
+})(injectIntl(withTheme(RegistrationHomeView)))

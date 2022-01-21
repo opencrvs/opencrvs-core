@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from 'hapi'
+import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 
 import Role from '@user-mgnt/model/role'
@@ -61,7 +61,5 @@ export const searchRoleSchema = Joi.object({
   type: Joi.string().optional(),
   active: Joi.boolean().optional(),
   sortBy: Joi.string().optional(),
-  sortOrder: Joi.string()
-    .only(['asc', 'desc'])
-    .optional()
+  sortOrder: Joi.string().valid('asc', 'desc').optional()
 })

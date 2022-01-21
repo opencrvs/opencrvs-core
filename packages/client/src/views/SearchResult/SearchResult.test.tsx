@@ -9,11 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  DataTable,
-  Spinner,
-  GridTable
-} from '@opencrvs/components/lib/interface'
+import { Spinner, GridTable } from '@opencrvs/components/lib/interface'
 import { checkAuth } from '@opencrvs/client/src/profile/profileActions'
 import { merge } from 'lodash'
 import * as React from 'react'
@@ -318,7 +314,7 @@ describe('SearchResult tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     testComponent.component.update()
@@ -361,7 +357,7 @@ describe('SearchResult tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
@@ -374,11 +370,13 @@ describe('SearchResult tests', () => {
     ).toBe('An error occurred while searching')
   })
   it('renders empty search page with a header in small devices', async () => {
-    const testSearchResultComponent = (await createTestComponent(
-      // @ts-ignore
-      <SearchResult match={{ params: {} }} />,
-      store
-    )).component
+    const testSearchResultComponent = (
+      await createTestComponent(
+        // @ts-ignore
+        <SearchResult match={{ params: {} }} />,
+        store
+      )
+    ).component
 
     Object.defineProperty(window, 'innerWidth', {
       writable: true,
@@ -480,7 +478,7 @@ describe('SearchResult tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
@@ -584,7 +582,7 @@ describe('SearchResult tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
@@ -685,7 +683,7 @@ describe('SearchResult tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
@@ -791,7 +789,7 @@ describe('SearchResult tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
@@ -898,7 +896,7 @@ describe('SearchResult tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
@@ -1005,7 +1003,7 @@ describe('SearchResult tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 

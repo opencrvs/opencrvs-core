@@ -113,8 +113,8 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
   async handleVisibilityChange(isVisible: boolean) {
     const alreadyLocked = isVisible || (await storage.getItem(SCREEN_LOCK))
 
-    const onUnprotectedPage = this.props.unprotectedRouteElements.some(route =>
-      this.props.location.pathname.includes(route)
+    const onUnprotectedPage = this.props.unprotectedRouteElements.some(
+      (route) => this.props.location.pathname.includes(route)
     )
 
     const newState = { ...this.state }
@@ -159,7 +159,7 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
       return ''
     }
     const currentUserData = allUserData.find(
-      user => user.userID === currentUserID
+      (user) => user.userID === currentUserID
     )
     return (currentUserData && currentUserData.userPIN) || ''
   }
@@ -247,10 +247,7 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     )
   }
 }
-export const ProtectedPage = connect<{}, DispatchProps, OwnProps>(
-  null,
-  {
-    onNumPadVisible: refreshOfflineData,
-    showPINUpdateSuccessToast
-  }
-)(withRouter(ProtectedPageComponent))
+export const ProtectedPage = connect<{}, DispatchProps, OwnProps>(null, {
+  onNumPadVisible: refreshOfflineData,
+  showPINUpdateSuccessToast
+})(withRouter(ProtectedPageComponent))

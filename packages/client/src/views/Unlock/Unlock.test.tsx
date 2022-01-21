@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
-import { createTestComponent, flushPromises, wait } from '@client/tests/util'
+import { createTestComponent, flushPromises } from '@client/tests/util'
 import { createStore } from '@client/store'
 import { Unlock } from '@client/views/Unlock/Unlock'
 import { storage } from '@client/storage'
@@ -32,7 +32,7 @@ const clearPassword = (component: ReactWrapper) => {
 
 describe('Unlock page loads Properly', () => {
   let testComponent: { component: ReactWrapper }
-  let onForgetPinMock: jest.Mock = jest.fn()
+  const onForgetPinMock: jest.Mock = jest.fn()
   beforeEach(async () => {
     await flushPromises()
 
@@ -49,7 +49,6 @@ describe('Unlock page loads Properly', () => {
       ]),
       screenLock: undefined,
       USER_ID: 'shakib75',
-      // eslint-disable-next-line @typescript-eslint/camelcase
       locked_time: undefined
     }
 
@@ -99,7 +98,7 @@ describe('Unlock page loads Properly', () => {
 
 describe('For wrong inputs', () => {
   let testComponent: { component: ReactWrapper }
-  let onForgetPinMock: jest.Mock = jest.fn()
+  const onForgetPinMock: jest.Mock = jest.fn()
 
   beforeEach(async () => {
     await flushPromises()
@@ -111,7 +110,7 @@ describe('For wrong inputs', () => {
     )
 
     // These tests are only for wrong inputs, so this mock fn only returns a promise of false
-    pinValidator.isValidPin = jest.fn(async pin => Promise.resolve(false))
+    pinValidator.isValidPin = jest.fn(async (pin) => Promise.resolve(false))
   })
   it('Should Display Incorrect error message', async () => {
     const numberElem = testComponent.component.find('#keypad-1').hostNodes()
@@ -146,7 +145,7 @@ describe('For wrong inputs', () => {
 
 describe('Pin locked session', () => {
   let testComponent: { component: ReactWrapper }
-  let onForgetPinMock: jest.Mock = jest.fn()
+  const onForgetPinMock: jest.Mock = jest.fn()
   beforeEach(async () => {
     await flushPromises()
     jest.clearAllMocks()
@@ -165,7 +164,6 @@ describe('Pin locked session', () => {
       ]),
       screenLock: undefined,
       USER_ID: 'shakib75',
-      // eslint-disable-next-line @typescript-eslint/camelcase
       locked_time: '1578308927392'
     }
 
@@ -207,7 +205,7 @@ describe('Pin locked session', () => {
 })
 
 describe('Logout Sequence', () => {
-  let onForgetPinMock: jest.Mock = jest.fn()
+  const onForgetPinMock: jest.Mock = jest.fn()
 
   it('should clear lock-related indexeddb entries upon logout', async () => {
     const { store } = createStore()
@@ -228,10 +226,7 @@ describe('Logout Sequence', () => {
       // @ts-ignore
       delete indexeddb[key]
     })
-    testComponent.component
-      .find('#logout')
-      .hostNodes()
-      .simulate('click')
+    testComponent.component.find('#logout').hostNodes().simulate('click')
     testComponent.component.update()
     // @ts-ignore
     expect(indexeddb[SCREEN_LOCK]).toBeFalsy()

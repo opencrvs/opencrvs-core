@@ -44,7 +44,8 @@ type Query {
     sort: String
   ): SearchUserResult
   searchFieldAgents(
-    locationId: String!
+    locationId: String
+    primaryOfficeId: String
     status: String
     language: String
     timeStart: String!
@@ -105,7 +106,7 @@ type Query {
     sortColumn: String
   ): EventSearchResultSet
   getEventsWithProgress(
-    parentLocationId: String
+    locationId: String
     count: Int
     skip: Int
     sort: String
@@ -162,6 +163,7 @@ type Mutation {
     existingPassword: String!
     password: String!
   ): String
+  changeAvatar(userId: String!, avatar: AvatarInput!): String
   auditUser(
     userId: String!
     action: String!
@@ -225,6 +227,9 @@ type DeathRegistration implements EventRegistration {
   mannerOfDeath: MannerOfDeath
   causeOfDeathMethod: CauseOfDeathMethodType
   causeOfDeath: String
+  maleDependentsOfDeceased: Float
+  femaleDependentsOfDeceased: Float
+  medicalPractitioner: MedicalPractitioner
   createdAt: Date
   updatedAt: Date
 }
@@ -237,6 +242,7 @@ type Person {
   telecom: [ContactPoint]
   gender: String
   birthDate: String
+  age: Float
   maritalStatus: MaritalStatusType
   occupation: String
   dateOfMarriage: Date
@@ -300,6 +306,8 @@ type User {
   identifier: Identifier
   signature: Signature
   creationDate: String
+  avatar: Avatar
+  device: String
 }
 
 type SearchUserResult {
@@ -422,6 +430,9 @@ input DeathRegistrationInput {
   mannerOfDeath: MannerOfDeath
   causeOfDeathMethod: CauseOfDeathMethodType
   causeOfDeath: String
+  maleDependentsOfDeceased: Float
+  femaleDependentsOfDeceased: Float
+  medicalPractitioner: MedicalPractitionerInput
   createdAt: Date
   updatedAt: Date
 }
@@ -444,6 +455,11 @@ input UserInput {
 input SecurityQuestionAnswer {
   questionKey: String
   answer: String
+}
+
+input AvatarInput {
+  type: String!
+  data: String!
 }
 
 scalar Map
@@ -529,6 +545,12 @@ enum MannerOfDeath {
 enum CauseOfDeathMethodType {
   VERBAL_AUTOPSY
   MEDICALLY_CERTIFIED
+}
+
+type MedicalPractitioner {
+  name: String
+  qualification: String
+  lastVisitDate: Date
 }
 
 type IdentityType {
@@ -641,6 +663,11 @@ type Signature {
   type: String
 }
 
+type Avatar {
+  type: String!
+  data: String!
+}
+
 type SearchFieldAgentResponse {
   practitionerId: String
   fullName: String
@@ -742,6 +769,7 @@ input PersonInput {
   telecom: [ContactPointInput]
   gender: String
   birthDate: String
+  age: Float
   maritalStatus: MaritalStatusType
   occupation: String
   dateOfMarriage: Date
@@ -802,6 +830,12 @@ input PrimaryCaregiverInput {
   primaryCaregiver: PersonInput
   reasonsNotApplying: [ReasonsNotApplyingInput]
   parentDetailsType: ParentDetailsType
+}
+
+input MedicalPractitionerInput {
+  name: String
+  qualification: String
+  lastVisitDate: Date
 }
 
 input HumanNameInput {
@@ -927,6 +961,7 @@ enum AttachmentType {
   PASSPORT
   NATIONAL_ID_FRONT
   NATIONAL_ID_BACK
+  NOTIFICATION_OF_BIRTH
   IMMUNISATION_CERTIFICATE
   PAPER_FORM
   PASSPORT_PHOTO
@@ -957,6 +992,8 @@ enum AttachmentType {
   PROOF_OF_LEGAL_GUARDIANSHIP
   PROOF_OF_ASSIGNED_RESPONSIBILITY
   LETTER_FROM_COUNCILLOR
+  CAUSE_OF_DEATH
+  DECEASED_DEATH_PROOF
 }
 
 enum AttachmentSubject {
@@ -975,6 +1012,8 @@ enum AttachmentSubject {
   LEGAL_GUARDIAN_PROOF
   ASSIGNED_RESPONSIBILITY_PROOF
   WARD_COUNCILLOR_PROOF
+  CAUSE_OF_DEATH
+  CORONERS_REPORT
 }
 
 type GenderBasisDetailsMetrics {

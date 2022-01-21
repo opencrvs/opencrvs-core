@@ -27,9 +27,8 @@ describe('LoadingIndicator test cases', () => {
       />,
       store
     )
-    const isShowingLoadingText = testComponent.component.find(
-      'span#loading-text'
-    ).length
+    const isShowingLoadingText =
+      testComponent.component.find('span#loading-text').length
     expect(isShowingLoadingText).toBe(1)
   })
 

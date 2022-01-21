@@ -32,21 +32,17 @@ const nestedFieldsMapping = (
   mappingKey: keyof IFormFieldMapping
 ) => {
   let tempFormField: IFormField
-  for (let index in fieldDef.nestedFields) {
-    for (let nestedIndex in fieldDef.nestedFields[index]) {
+  for (const index in fieldDef.nestedFields) {
+    for (const nestedIndex in fieldDef.nestedFields[index]) {
       tempFormField = fieldDef.nestedFields[index][nestedIndex]
       tempFormField &&
         tempFormField.mapping &&
         tempFormField.mapping[mappingKey] &&
-        (tempFormField.mapping[mappingKey] as
-          | IFormFieldMutationMapFunction
-          | IFormFieldQueryMapFunction)(
-          transformedData,
-          draftData,
-          sectionId,
-          fieldDef,
-          tempFormField
-        )
+        (
+          tempFormField.mapping[mappingKey] as
+            | IFormFieldMutationMapFunction
+            | IFormFieldQueryMapFunction
+        )(transformedData, draftData, sectionId, fieldDef, tempFormField)
     }
   }
 }
@@ -60,10 +56,10 @@ export const draftToGqlTransformer = (
     throw new Error('Sections are missing in form definition')
   }
   const transformedData: TransformedData = { createdAt: new Date() }
-  let inCompleteFieldList: string[] = []
-  formDefinition.sections.forEach(section => {
+  const inCompleteFieldList: string[] = []
+  formDefinition.sections.forEach((section) => {
     if (!draftData[section.id]) {
-      return
+      draftData[section.id] = {}
     }
     if (!transformedData[section.id]) {
       transformedData[section.id] = {}
@@ -72,8 +68,8 @@ export const draftToGqlTransformer = (
       section,
       draftData[section.id],
       draftData
-    ).forEach(groupDef => {
-      groupDef.fields.forEach(fieldDef => {
+    ).forEach((groupDef) => {
+      groupDef.fields.forEach((fieldDef) => {
         const conditionalActions: string[] = getConditionalActionsForField(
           fieldDef,
           draftData[section.id],
@@ -87,17 +83,20 @@ export const draftToGqlTransformer = (
           (draftData[section.id][fieldDef.name] === undefined ||
             draftData[section.id][fieldDef.name] === '')
         ) {
+          /* eslint-disable no-console */
           console.error(
             `Data is missing for a required field: ${fieldDef.name}` +
               `on section ${section.id}`
           )
+          /* eslint-enable no-console */
           inCompleteFieldList.push(
             `${section.id}/${groupDef.id}/${fieldDef.name}`
           )
           return
         }
         if (
-          draftData[section.id][fieldDef.name] &&
+          draftData[section.id][fieldDef.name] !== null &&
+          draftData[section.id][fieldDef.name] !== undefined &&
           draftData[section.id][fieldDef.name] !== '' &&
           !conditionalActions.includes('hide')
         ) {
@@ -140,9 +139,8 @@ export const draftToGqlTransformer = (
   }
   if (inCompleteFieldList && inCompleteFieldList.length > 0) {
     if (transformedData.registration) {
-      transformedData.registration.inCompleteFields = inCompleteFieldList.join(
-        ','
-      )
+      transformedData.registration.inCompleteFields =
+        inCompleteFieldList.join(',')
     } else {
       transformedData.registration = {
         inCompleteFields: inCompleteFieldList.join(',')
@@ -156,7 +154,6 @@ export const draftToGqlTransformer = (
       transformedData.registration = { draftId }
     }
   }
-
   return transformedData
 }
 
@@ -188,7 +185,7 @@ export const gqlToDraftTransformer = (
   const transformedData: IFormData = {}
 
   const visibleSections = formDefinition.sections.filter(
-    section =>
+    (section) =>
       getVisibleSectionGroupsBasedOnConditions(
         section,
         queryData[section.id] || {},
@@ -196,10 +193,10 @@ export const gqlToDraftTransformer = (
       ).length > 0
   )
 
-  visibleSections.forEach(section => {
+  visibleSections.forEach((section) => {
     transformedData[section.id] = {}
-    section.groups.forEach(groupDef => {
-      groupDef.fields.forEach(fieldDef => {
+    section.groups.forEach((groupDef) => {
+      groupDef.fields.forEach((fieldDef) => {
         if (fieldDef.mapping && fieldDef.mapping.query) {
           fieldDef.mapping.query(
             transformedData,

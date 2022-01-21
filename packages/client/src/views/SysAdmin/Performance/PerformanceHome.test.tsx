@@ -20,7 +20,7 @@ import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import * as React from 'react'
 import { PerformanceHome } from './PerformanceHome'
-import querystring from 'query-string'
+import { parse } from 'query-string'
 
 describe('Performance home test', () => {
   describe('Performance home without location in props', () => {
@@ -28,19 +28,15 @@ describe('Performance home test', () => {
     let app: ReactWrapper
 
     beforeAll(async () => {
-      app = (await createTestComponent(
-        <PerformanceHome history={history} />,
-        store
-      )).component
+      app = (
+        await createTestComponent(<PerformanceHome history={history} />, store)
+      ).component
       app.update()
     })
 
     it('loads nothing in the search input box', () => {
       expect(
-        app
-          .find('#locationSearchInput')
-          .hostNodes()
-          .props().value
+        app.find('#locationSearchInput').hostNodes().props().value
       ).toEqual('')
     })
 
@@ -60,23 +56,17 @@ describe('Performance home test', () => {
       app.update()
 
       expect(
-        app
-          .find('#locationSearchInput')
-          .hostNodes()
-          .props().value
+        app.find('#locationSearchInput').hostNodes().props().value
       ).toEqual('Dhaka Division')
     })
 
     it('redirect to operatoins on search button click', () => {
       Date.now = jest.fn(() => 1455454308000)
-      app
-        .find('#location-search-btn')
-        .hostNodes()
-        .simulate('click')
+      app.find('#location-search-btn').hostNodes().simulate('click')
       app.update()
       flushPromises()
 
-      expect(querystring.parse(history.location.search)).toEqual({
+      expect(parse(history.location.search)).toEqual({
         sectionId: 'OPERATIONAL',
         locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
         timeEnd: '2016-02-14T12:51:48.000Z',
@@ -86,10 +76,7 @@ describe('Performance home test', () => {
     })
     it('redirect to operatoins on pilot location link click', () => {
       Date.now = jest.fn(() => 1455454308000)
-      app
-        .find('#pilot-location-link-0')
-        .hostNodes()
-        .simulate('click')
+      app.find('#pilot-location-link-0').hostNodes().simulate('click')
       app.update()
       flushPromises()
 
@@ -118,10 +105,7 @@ describe('Performance home test', () => {
 
     it('loads the location in the search input box', () => {
       expect(
-        app
-          .find('#locationSearchInput')
-          .hostNodes()
-          .props().value
+        app.find('#locationSearchInput').hostNodes().props().value
       ).toEqual('Khulna')
     })
   })

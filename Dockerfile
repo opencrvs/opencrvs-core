@@ -1,6 +1,6 @@
 # This dockerfile only installs dependencies and build all packages
 # It is used by each packages Dockerfile to copy out build artifacts
-FROM node:dubnium
+FROM node:erbium
 
 # Make sure version variable is set
 ARG VERSION
@@ -9,15 +9,16 @@ RUN test -n "$VERSION"
 # Override the base log level (info).
 ENV NPM_CONFIG_LOGLEVEL warn
 
+
 # install dependencies first so they may be cached if there are no package.json changes
+
 COPY package.json .
 COPY yarn.lock .
 COPY lerna.json .
 COPY packages/auth/package.json packages/auth/package.json
-COPY packages/commons/package.json packages/commons/package.json
-COPY packages/components/package.json packages/components/package.json
+COPY packages/commons packages/commons
+COPY packages/components packages/components
 COPY packages/gateway/package.json packages/gateway/package.json
-COPY packages/integration/package.json packages/integration/package.json
 COPY packages/login/package.json packages/login/package.json
 COPY packages/metrics/package.json packages/metrics/package.json
 COPY packages/notification/package.json packages/notification/package.json

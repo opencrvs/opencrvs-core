@@ -12,8 +12,6 @@
 import {
   createApplication,
   storeApplication,
-  getApplicationsOfCurrentUser,
-  deleteApplication,
   IUserData
 } from '@client/applications'
 import { Event } from '@client/forms'
@@ -183,32 +181,17 @@ describe('RegistrationHome related tests', () => {
       )
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
 
       testComponent.component.update()
       const app = testComponent.component
-      app
-        .find('#tab_progress')
-        .hostNodes()
-        .simulate('click')
-      app
-        .find('#tab_review')
-        .hostNodes()
-        .simulate('click')
-      app
-        .find('#tab_updates')
-        .hostNodes()
-        .simulate('click')
-      app
-        .find('#tab_print')
-        .hostNodes()
-        .simulate('click')
-      app
-        .find('#tab_waitingValidation')
-        .hostNodes()
-        .simulate('click')
+      app.find('#tab_progress').hostNodes().simulate('click')
+      app.find('#tab_review').hostNodes().simulate('click')
+      app.find('#tab_updates').hostNodes().simulate('click')
+      app.find('#tab_print').hostNodes().simulate('click')
+      app.find('#tab_waitingValidation').hostNodes().simulate('click')
     })
 
     it('renders tabs with count', async () => {
@@ -220,42 +203,27 @@ describe('RegistrationHome related tests', () => {
       )
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 600)
       })
 
       testComponent.component.update()
       const app = testComponent.component
-      expect(
-        app
-          .find('#tab_progress')
-          .hostNodes()
-          .text()
-      ).toContain('In progress (7)')
-      expect(
-        app
-          .find('#tab_review')
-          .hostNodes()
-          .text()
-      ).toContain('Ready for review (3)')
-      expect(
-        app
-          .find('#tab_updates')
-          .hostNodes()
-          .text()
-      ).toContain('Sent for updates (4)')
-      expect(
-        app
-          .find('#tab_waitingValidation')
-          .hostNodes()
-          .text()
-      ).toContain('Waiting for BRIS (6)')
-      expect(
-        app
-          .find('#tab_print')
-          .hostNodes()
-          .text()
-      ).toContain('Ready to print (1)')
+      expect(app.find('#tab_progress').hostNodes().text()).toContain(
+        'In progress (7)'
+      )
+      expect(app.find('#tab_review').hostNodes().text()).toContain(
+        'Ready for review (3)'
+      )
+      expect(app.find('#tab_updates').hostNodes().text()).toContain(
+        'Sent for updates (4)'
+      )
+      expect(app.find('#tab_waitingValidation').hostNodes().text()).toContain(
+        'Waiting for BRIS (6)'
+      )
+      expect(app.find('#tab_print').hostNodes().text()).toContain(
+        'Ready to print (1)'
+      )
     })
   })
   describe('shows no-record message if error there is no data', () => {
@@ -281,7 +249,7 @@ describe('RegistrationHome related tests', () => {
         client
       )
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       await waitForElement(testComponent.component, '#no-record')
@@ -304,7 +272,7 @@ describe('RegistrationHome related tests', () => {
         client
       )
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       await waitForElement(testComponent.component, '#no-record')
@@ -327,7 +295,7 @@ describe('RegistrationHome related tests', () => {
         client
       )
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       await waitForElement(testComponent.component, '#no-record')
@@ -340,7 +308,7 @@ describe('RegistrationHome related tests', () => {
         client
       )
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.component.update()
@@ -354,7 +322,7 @@ describe('RegistrationHome related tests', () => {
         client
       )
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.component.update()
@@ -368,7 +336,7 @@ describe('RegistrationHome related tests', () => {
         client
       )
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.component.update()
@@ -382,7 +350,7 @@ describe('RegistrationHome related tests', () => {
         client
       )
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.component.update()
@@ -397,7 +365,7 @@ describe('RegistrationHome related tests', () => {
         client
       )
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
 
@@ -431,7 +399,7 @@ describe('RegistrationHome related tests', () => {
         client
       )
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       await waitForElement(
@@ -457,7 +425,7 @@ describe('RegistrationHome related tests', () => {
         client
       )
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       await waitForElement(
@@ -473,7 +441,7 @@ describe('RegistrationHome related tests', () => {
         client
       )
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.component.update()
@@ -490,7 +458,7 @@ describe('RegistrationHome related tests', () => {
         client
       )
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.component.update()
@@ -507,7 +475,7 @@ describe('RegistrationHome related tests', () => {
         client
       )
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.component.update()
@@ -524,7 +492,7 @@ describe('RegistrationHome related tests', () => {
         client
       )
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.component.update()
@@ -541,7 +509,7 @@ describe('RegistrationHome related tests', () => {
         client
       )
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.component.update()
@@ -588,7 +556,7 @@ describe('RegistrationHome related tests', () => {
         store,
         client
       ) // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
 
@@ -608,7 +576,7 @@ describe('RegistrationHome related tests', () => {
         client
       )
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.component.update()
@@ -627,7 +595,7 @@ describe('RegistrationHome related tests', () => {
         client
       )
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.component.update()
@@ -646,7 +614,7 @@ describe('RegistrationHome related tests', () => {
         client
       )
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 600)
       })
       testComponent.component.update()
@@ -668,7 +636,7 @@ describe('RegistrationHome related tests', () => {
       )
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       testComponent.component.update()

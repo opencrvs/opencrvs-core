@@ -27,6 +27,7 @@ import {
 } from '@metrics/features/metrics/constants'
 import { IAuthHeader } from '@metrics/features/registration'
 import { fetchLocation, fetchFromResource, fetchFHIR } from '@metrics/api'
+import { EXPECTED_BIRTH_REGISTRATION_IN_DAYS } from '@metrics/constants'
 export const YEARLY_INTERVAL = '365d'
 export const MONTHLY_INTERVAL = '30d'
 export const WEEKLY_INTERVAL = '7d'
@@ -61,8 +62,16 @@ export enum EVENT_TYPE {
 export type Location = fhir.Location & { id: string }
 
 export const ageIntervals = [
-  { title: '45d', minAgeInDays: -1, maxAgeInDays: 45 },
-  { title: '46d - 1yr', minAgeInDays: 46, maxAgeInDays: 365 },
+  {
+    title: `${EXPECTED_BIRTH_REGISTRATION_IN_DAYS}d`,
+    minAgeInDays: -1,
+    maxAgeInDays: Number(EXPECTED_BIRTH_REGISTRATION_IN_DAYS)
+  },
+  {
+    title: `${Number(EXPECTED_BIRTH_REGISTRATION_IN_DAYS) + 1}d - 1yr`,
+    minAgeInDays: Number(EXPECTED_BIRTH_REGISTRATION_IN_DAYS),
+    maxAgeInDays: 365
+  },
   { title: '1yr', minAgeInDays: 366, maxAgeInDays: 730 },
   { title: '2yr', minAgeInDays: 731, maxAgeInDays: 1095 },
   { title: '3yr', minAgeInDays: 1096, maxAgeInDays: 1460 },
@@ -113,7 +122,6 @@ export const generateEmptyBirthKeyFigure = (
 
 export const fetchEstimateByLocation = async (
   locationData: Location,
-  estimationForDays: number,
   event: EVENT_TYPE,
   authHeader: IAuthHeader,
   timeFrom: string,
@@ -122,16 +130,29 @@ export const fetchEstimateByLocation = async (
   let crudRate: number = 0
   let totalPopulation: number = 0
 
-  if (!locationData.extension) {
-    throw new Error('Invalid location data found')
-  }
+  const estimationForDays = Math.ceil(
+    Math.abs(new Date(timeTo).getTime() - new Date(timeFrom).getTime()) /
+      (1000 * 60 * 60 * 24)
+  )
   let estimateExtensionFound: boolean = false
   const toYear = new Date(timeTo).getFullYear()
   let selectedCrudYear = new Date(timeTo).getFullYear()
   let selectedPopYear = new Date(timeTo).getFullYear()
   let malePopulationArray: [] = []
   let femalePopulationArray: [] = []
-  locationData.extension.forEach(extension => {
+
+  if (!locationData.extension) {
+    return {
+      totalEstimation: 0,
+      maleEstimation: 0,
+      femaleEstimation: 0,
+      locationId: locationData.id,
+      estimationYear: toYear,
+      locationLevel: getLocationLevelFromLocationData(locationData)
+    }
+  }
+
+  locationData.extension.forEach((extension) => {
     if (
       extension.url === OPENCRVS_SPECIFICATION_URL + CRUD_BIRTH_RATE_SEC &&
       event === EVENT_TYPE.BIRTH
@@ -142,7 +163,7 @@ export const fetchEstimateByLocation = async (
       // have any estimation data for recent years
       // tslint:disable-next-line
       for (let key = toYear; key > 1; key--) {
-        valueArray.forEach(data => {
+        valueArray.forEach((data) => {
           if (key in data) {
             crudRate = data[key]
             selectedCrudYear = key
@@ -160,7 +181,7 @@ export const fetchEstimateByLocation = async (
       const valueArray: [] = JSON.parse(extension.valueString as string)
       // tslint:disable-next-line
       for (let key = toYear; key > 1; key--) {
-        valueArray.forEach(data => {
+        valueArray.forEach((data) => {
           if (key in data) {
             totalPopulation = data[key]
             selectedPopYear = key
@@ -200,16 +221,16 @@ export const fetchEstimateByLocation = async (
     crudRate = crudeDeathRateResponse.crudeDeathRate
   }
   let populationData =
-    malePopulationArray?.find(data => data[selectedPopYear] !== undefined)?.[
+    malePopulationArray?.find((data) => data[selectedPopYear] !== undefined)?.[
       selectedPopYear
     ] ?? ''
   const malePopulation: number =
     populationData === '' ? totalPopulation / 2 : Number(populationData)
 
   populationData =
-    femalePopulationArray?.find(data => data[selectedPopYear] !== undefined)?.[
-      selectedPopYear
-    ] ?? ''
+    femalePopulationArray?.find(
+      (data) => data[selectedPopYear] !== undefined
+    )?.[selectedPopYear] ?? ''
   const femalePopulation: number =
     populationData === '' ? totalPopulation / 2 : Number(populationData)
 
@@ -232,7 +253,7 @@ export const fetchEstimateByLocation = async (
 export const getLocationLevelFromLocationData = (locationData: Location) => {
   return (
     locationData?.identifier?.find(
-      identifier =>
+      (identifier) =>
         identifier.system ===
         OPENCRVS_SPECIFICATION_URL + JURISDICTION_TYPE_IDENTIFIER
     )?.value ?? ''
@@ -249,7 +270,6 @@ export const fetchEstimateFor45DaysByLocationId = async (
   const locationData: Location = await fetchFHIR(locationId, authHeader)
   return await fetchEstimateByLocation(
     locationData,
-    45, // For 45 days
     event,
     authHeader,
     timeFrom,
@@ -293,7 +313,7 @@ function getLocationType(locationBundle: fhir.Location) {
     locationBundle &&
     locationBundle.identifier &&
     locationBundle.identifier.find(
-      identifier =>
+      (identifier) =>
         identifier.system === OPENCRVS_SPECIFICATION_URL + JURISDICTION_TYPE_SEC
     )
   )
@@ -307,7 +327,7 @@ export function fillEmptyDataArrayByKey(
   const result: Array<any> = []
   for (const eachItem of emptyDataArray) {
     const itemInArray = dataArray.find(
-      itemInDataArray => itemInDataArray[key] === eachItem[key]
+      (itemInDataArray) => itemInDataArray[key] === eachItem[key]
     )
 
     result.push(itemInArray || eachItem)

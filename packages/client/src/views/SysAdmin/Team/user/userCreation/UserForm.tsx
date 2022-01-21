@@ -99,9 +99,6 @@ class UserFormComponent extends React.Component<IFullProps> {
 
   handleBackAction = () => {
     this.props.goBack()
-    if (this.props.activeGroup.id === this.props.section.groups[0].id) {
-      this.props.clearUserFormData()
-    }
   }
 
   modifyData = (values: any) => {
@@ -130,10 +127,10 @@ class UserFormComponent extends React.Component<IFullProps> {
           <FormFieldGenerator
             key={activeGroup.id}
             id={section.id}
-            onChange={values => this.modifyData(values)}
+            onChange={(values) => this.modifyData(values)}
             setAllFieldsDirty={false}
             fields={getVisibleGroupFields(activeGroup)}
-            onSetTouched={setTouchedFunc => {
+            onSetTouched={(setTouchedFunc) => {
               this.setAllFormFieldsTouched = setTouchedFunc
             }}
             requiredErrorMessage={messages.requiredForNewUser}
@@ -149,13 +146,10 @@ class UserFormComponent extends React.Component<IFullProps> {
   }
 }
 
-export const UserForm = connect(
-  undefined,
-  {
-    modifyUserFormData,
-    goToCreateUserSection,
-    goToUserReviewForm,
-    goBack,
-    clearUserFormData
-  }
-)(injectIntl(UserFormComponent))
+export const UserForm = connect(undefined, {
+  modifyUserFormData,
+  goToCreateUserSection,
+  goToUserReviewForm,
+  goBack,
+  clearUserFormData
+})(injectIntl(UserFormComponent))

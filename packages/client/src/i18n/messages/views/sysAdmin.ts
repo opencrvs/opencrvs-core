@@ -11,7 +11,8 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface ISysAdminMessages {
+interface ISysAdminMessages
+  extends Record<string | number | symbol, MessageDescriptor> {
   auditReason: MessageDescriptor
   auditReasonOther: MessageDescriptor
   overviewTab: MessageDescriptor
@@ -105,7 +106,7 @@ const messagesToDefine: ISysAdminMessages = {
   },
   formError: {
     id: 'sysAdHome.user.audit.form.error',
-    defaultMessage: 'Please complete all mandatory fields',
+    defaultMessage: 'A reason is required for {auditAction} this user',
     description: 'The label for form error'
   },
   networkTab: {

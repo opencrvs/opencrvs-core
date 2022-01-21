@@ -67,6 +67,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import { convertToMSISDN } from '@client/forms/utils'
+import { formattedDuration } from '@client/utils/date-formatting'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
@@ -256,6 +257,8 @@ export class SearchResultView extends React.Component<
 
   getDeclarationStatusLabel = (status: string) => {
     switch (status) {
+      case 'IN_PROGRESS':
+        return this.props.intl.formatMessage(registrarHomeMessages.inProgress)
       case 'DECLARED':
         return this.props.intl.formatMessage(
           registrarHomeMessages.readyForReview
@@ -264,7 +267,7 @@ export class SearchResultView extends React.Component<
         return this.props.intl.formatMessage(registrarHomeMessages.readyToPrint)
       case 'VALIDATED':
         return this.props.intl.formatMessage(
-          registrarHomeMessages.readyForReview
+          registrarHomeMessages.sentForApprovals
         )
       case 'WAITING_VALIDATION':
         return this.props.intl.formatMessage(
@@ -308,7 +311,7 @@ export class SearchResultView extends React.Component<
     const transformedData = transformData(data, this.props.intl)
     return transformedData.map((reg, index) => {
       const foundApplication = this.props.outboxApplications.find(
-        application => application.id === reg.id
+        (application) => application.id === reg.id
       )
       const actions: IAction[] = []
       const downloadStatus =
@@ -393,12 +396,15 @@ export class SearchResultView extends React.Component<
         status: this.getDeclarationStatusLabel(reg.declarationStatus),
         dateOfModification:
           (reg.modifiedAt &&
-            moment(
-              moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
-              'YYYY-MM-DD HH:mm:ss'
-            ).fromNow()) ||
+            formattedDuration(
+              moment(
+                moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
+                'YYYY-MM-DD HH:mm:ss'
+              )
+            )) ||
           '',
-        startedAt: (reg.createdAt && moment(reg.createdAt).fromNow()) || '',
+        startedAt:
+          (reg.createdAt && formattedDuration(moment(reg.createdAt))) || '',
         icon,
         actions,
         rowClickHandler: [
@@ -417,7 +423,7 @@ export class SearchResultView extends React.Component<
   renderExpandedComponent = (itemId: string, data: GQLQuery) => {
     const results = data && data.searchEvents && data.searchEvents.results
     const eventDetails =
-      results && results.find(result => result && result.id === itemId)
+      results && results.find((result) => result && result.id === itemId)
     return <RowHistoryView eventDetails={eventDetails} />
   }
 

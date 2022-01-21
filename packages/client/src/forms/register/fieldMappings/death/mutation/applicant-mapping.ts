@@ -46,7 +46,7 @@ const addressObjectProcessor = (
   objValues: Array<{ [key: string]: string | string[] }> = [],
   srcValues: Array<{ [key: string]: string | string[] }> = []
 ) => {
-  srcValues.forEach(srcValue => {
+  srcValues.forEach((srcValue) => {
     let index = findIndex(objValues, { type: srcValue.type })
     if (index < 0) {
       objValues.push({
@@ -71,48 +71,50 @@ const addressObjectProcessor = (
   return objValues
 }
 
-export const fieldValueNestingTransformer = (
-  transformedFieldName: string,
-  transformerMethod?: any,
-  objectType?: string
-) => (
-  transformedData: TransformedData,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) => {
-  if (transformerMethod) {
-    transformedData[sectionId][transformedFieldName] =
-      transformedData[sectionId][transformedFieldName] || {}
-    const newTransformedData = cloneDeep(transformedData)
-    const oldTransformedDataKeys = keys(transformedData[sectionId])
-    transformerMethod(newTransformedData, draftData, sectionId, field)
-    if (objectType === OBJECT_TYPE.NAME) {
-      mergeWith(
-        transformedData[sectionId][transformedFieldName],
-        omit(newTransformedData[sectionId], oldTransformedDataKeys),
-        nameObjectProcessor
-      )
-    } else if (objectType === OBJECT_TYPE.ADDRESS) {
-      mergeWith(
-        transformedData[sectionId][transformedFieldName],
-        omit(newTransformedData[sectionId], oldTransformedDataKeys),
-        addressObjectProcessor
-      )
+export const fieldValueNestingTransformer =
+  (
+    transformedFieldName: string,
+    transformerMethod?: any,
+    objectType?: string
+  ) =>
+  (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    if (transformerMethod) {
+      transformedData[sectionId][transformedFieldName] =
+        transformedData[sectionId][transformedFieldName] || {}
+      const newTransformedData = cloneDeep(transformedData)
+      const oldTransformedDataKeys = keys(transformedData[sectionId])
+      transformerMethod(newTransformedData, draftData, sectionId, field)
+      if (objectType === OBJECT_TYPE.NAME) {
+        mergeWith(
+          transformedData[sectionId][transformedFieldName],
+          omit(newTransformedData[sectionId], oldTransformedDataKeys),
+          nameObjectProcessor
+        )
+      } else if (objectType === OBJECT_TYPE.ADDRESS) {
+        mergeWith(
+          transformedData[sectionId][transformedFieldName],
+          omit(newTransformedData[sectionId], oldTransformedDataKeys),
+          addressObjectProcessor
+        )
+      } else {
+        merge(
+          transformedData[sectionId][transformedFieldName],
+          omit(newTransformedData[sectionId], oldTransformedDataKeys)
+        )
+      }
     } else {
-      merge(
-        transformedData[sectionId][transformedFieldName],
-        omit(newTransformedData[sectionId], oldTransformedDataKeys)
-      )
+      transformedData[sectionId][transformedFieldName] =
+        transformedData[sectionId][transformedFieldName] || {}
+      transformedData[sectionId][transformedFieldName][field.name] =
+        draftData[sectionId][field.name]
     }
-  } else {
-    transformedData[sectionId][transformedFieldName] =
-      transformedData[sectionId][transformedFieldName] || {}
-    transformedData[sectionId][transformedFieldName][field.name] =
-      draftData[sectionId][field.name]
+    return transformedData
   }
-  return transformedData
-}
 
 export function setInformantSectionTransformer(
   transformedData: TransformedData,
@@ -126,6 +128,10 @@ export function setInformantSectionTransformer(
     transformedData[sectionId].individual._fhirID =
       // @ts-ignore
       draftData[sectionId]._fhirIDMap.individual
+  }
+  // Passing Informant's relationship data
+  if (draftData[sectionId].relationship) {
+    transformedData[sectionId].relationship = draftData[sectionId].relationship
   }
   return transformedData
 }

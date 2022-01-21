@@ -11,7 +11,8 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IUserSetupMessages {
+interface IUserSetupMessages
+  extends Record<string | number | symbol, MessageDescriptor> {
   confirmPassword: MessageDescriptor
   hasCases: MessageDescriptor
   hasNumber: MessageDescriptor
@@ -170,7 +171,7 @@ const messagesToDefine: IUserSetupMessages = {
     id: 'userSetup.waiting'
   },
   assignedOffice: {
-    defaultMessage: 'Assigned office',
+    defaultMessage: 'Assigned registration office',
     description: 'Title for assigned office field',
     id: 'user.profile.assignedOffice'
   },

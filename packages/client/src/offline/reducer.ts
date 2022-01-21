@@ -168,7 +168,7 @@ const RETRY_TIMEOUT = 5000
 
 function delay(cmd: RunCmd<any>, time: number) {
   return Cmd.list(
-    [Cmd.run(() => new Promise(resolve => setTimeout(resolve, time))), cmd],
+    [Cmd.run(() => new Promise((resolve) => setTimeout(resolve, time))), cmd],
     { sequence: true }
   )
 }
@@ -310,14 +310,7 @@ function reducer(
     case actions.FACILITIES_LOADED: {
       const facilities = filterLocations(
         action.payload,
-        LocationType.HEALTH_FACILITY,
-        {
-          locationLevel: 'partOf',
-          locationId: `Location/${getLocation(
-            state.userDetails!,
-            window.config.HEALTH_FACILITY_FILTER
-          )}`
-        }
+        LocationType.HEALTH_FACILITY
       )
 
       const offices = filterLocations(

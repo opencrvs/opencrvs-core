@@ -158,7 +158,7 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
                   name="recoveryCodeInput"
                   isSmallSized={true}
                   value={this.state.recoveryCode}
-                  onChange={e => this.handleChange(e.target.value)}
+                  onChange={(e) => this.handleChange(e.target.value)}
                   touched={this.state.touched}
                   error={this.state.error}
                 />
@@ -174,10 +174,7 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
   }
 }
 
-export const RecoveryCodeEntry = connect(
-  null,
-  {
-    goToPhoneNumberVerificationForm,
-    goToSecurityQuestionForm
-  }
-)(withRouter(injectIntl(RecoveryCodeEntryComponent)))
+export const RecoveryCodeEntry = connect(null, {
+  goToPhoneNumberVerificationForm,
+  goToSecurityQuestionForm
+})(withRouter(injectIntl(RecoveryCodeEntryComponent)))

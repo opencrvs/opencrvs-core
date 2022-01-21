@@ -19,7 +19,7 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { SEARCH_USERS } from '@client/user/queries'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
-import querystring from 'query-string'
+import { stringify } from 'query-string'
 import * as React from 'react'
 import { UserList } from './UserList'
 import { userMutations } from '@client/user/mutations'
@@ -60,7 +60,7 @@ describe('User list tests', () => {
         <UserList
           // @ts-ignore
           location={{
-            search: querystring.stringify({
+            search: stringify({
               locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
             })
           }}
@@ -70,18 +70,13 @@ describe('User list tests', () => {
       )
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 200)
       })
 
       testComponent.component.update()
       const app = testComponent.component
-      expect(
-        app
-          .find('#user_list')
-          .hostNodes()
-          .html()
-      ).toContain('0 users')
+      expect(app.find('#user_list').hostNodes().html()).toContain('0 users')
     })
     it('load user list in view only mode', async () => {
       const userListMock = [
@@ -107,7 +102,7 @@ describe('User list tests', () => {
         <UserList
           // @ts-ignore
           location={{
-            search: querystring.stringify({
+            search: stringify({
               locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
               viewOnly: true
             })
@@ -143,7 +138,7 @@ describe('User list tests', () => {
         <UserList
           // @ts-ignore
           location={{
-            search: querystring.stringify({
+            search: stringify({
               locationId: '0d8474da-0361-4d32-979e-af91f012340a'
             })
           }}
@@ -184,7 +179,7 @@ describe('User list tests', () => {
         <UserList
           // @ts-ignore
           location={{
-            search: querystring.stringify({
+            search: stringify({
               locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
             })
           }}
@@ -229,7 +224,7 @@ describe('User list tests', () => {
         <UserList
           // @ts-ignore
           location={{
-            search: querystring.stringify({
+            search: stringify({
               locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
             })
           }}
@@ -239,7 +234,7 @@ describe('User list tests', () => {
       )
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
 
@@ -358,7 +353,7 @@ describe('User list tests', () => {
           <UserList
             // @ts-ignore
             location={{
-              search: querystring.stringify({
+              search: stringify({
                 locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
               })
             }}
@@ -368,7 +363,7 @@ describe('User list tests', () => {
         )
 
         // wait for mocked data to load mockedProvider
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
           setTimeout(resolve, 100)
         })
 
@@ -381,7 +376,7 @@ describe('User list tests', () => {
           .simulate('click')
 
         // wait for mocked data to load mockedProvider
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
           setTimeout(resolve, 100)
         })
 
@@ -401,7 +396,7 @@ describe('User list tests', () => {
           <UserList
             // @ts-ignore
             location={{
-              search: querystring.stringify({
+              search: stringify({
                 locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
               })
             }}
@@ -411,7 +406,7 @@ describe('User list tests', () => {
         )
 
         // wait for mocked data to load mockedProvider
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
           setTimeout(resolve, 100)
         })
 
@@ -431,7 +426,7 @@ describe('User list tests', () => {
           <UserList
             // @ts-ignore
             location={{
-              search: querystring.stringify({
+              search: stringify({
                 locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
               })
             }}
@@ -441,7 +436,7 @@ describe('User list tests', () => {
         )
 
         // wait for mocked data to load mockedProvider
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
           setTimeout(resolve, 100)
         })
 
@@ -461,7 +456,7 @@ describe('User list tests', () => {
           <UserList
             // @ts-ignore
             location={{
-              search: querystring.stringify({
+              search: stringify({
                 locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
                 viewOnly: true
               })
@@ -472,7 +467,7 @@ describe('User list tests', () => {
         )
 
         // wait for mocked data to load mockedProvider
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
           setTimeout(resolve, 100)
         })
 
@@ -492,7 +487,7 @@ describe('User list tests', () => {
           <UserList
             // @ts-ignore
             location={{
-              search: querystring.stringify({
+              search: stringify({
                 locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
               })
             }}
@@ -502,7 +497,7 @@ describe('User list tests', () => {
         )
 
         // wait for mocked data to load mockedProvider
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
           setTimeout(resolve, 100)
         })
 
@@ -617,7 +612,7 @@ describe('User list tests', () => {
           <UserList
             // @ts-ignore
             location={{
-              search: querystring.stringify({
+              search: stringify({
                 locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
               })
             }}
@@ -627,7 +622,7 @@ describe('User list tests', () => {
         )
 
         // wait for mocked data to load mockedProvider
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
           setTimeout(resolve, 100)
         })
 
@@ -687,10 +682,7 @@ describe('User list tests', () => {
         menuOptionButton.hostNodes().simulate('click')
         await flushPromises()
         component.update()
-        const successToast = await waitForElement(
-          component,
-          '#resend_invite_success'
-        )
+        await waitForElement(component, '#resend_invite_success')
       })
 
       it('clicking on menu options Resend SMS invite shows error if any submission error', async () => {
@@ -711,10 +703,7 @@ describe('User list tests', () => {
         menuOptionButton.hostNodes().simulate('click')
         await flushPromises()
         component.update()
-        const errorToast = await waitForElement(
-          component,
-          '#resend_invite_error'
-        )
+        await waitForElement(component, '#resend_invite_error')
       })
 
       it('clicking on menu options deactivate to user pops up audit action modal', async () => {
@@ -730,10 +719,7 @@ describe('User list tests', () => {
         )
         expect(menuOptionButton.hostNodes().text()).toBe('Deactivate')
         menuOptionButton.hostNodes().simulate('click')
-        const userAuditActionModal = await waitForElement(
-          component,
-          '#user-audit-modal'
-        )
+        await waitForElement(component, '#user-audit-modal')
       })
 
       it('clicking on menu options reactivate to user pops up audit action modal', async () => {
@@ -749,10 +735,7 @@ describe('User list tests', () => {
         )
         expect(menuOptionButton.hostNodes().text()).toBe('Reactivate')
         menuOptionButton.hostNodes().simulate('click')
-        const userAuditActionModal = await waitForElement(
-          component,
-          '#user-audit-modal'
-        )
+        await waitForElement(component, '#user-audit-modal')
       })
 
       it('clicking on name link takes to user preview page', async () => {
@@ -871,7 +854,7 @@ describe('User list tests', () => {
         <UserList
           // @ts-ignore
           location={{
-            search: querystring.stringify({
+            search: stringify({
               locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
             })
           }}
@@ -881,7 +864,7 @@ describe('User list tests', () => {
       )
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
 
@@ -1064,7 +1047,7 @@ describe('User list tests', () => {
         <UserList
           // @ts-ignore
           location={{
-            search: querystring.stringify({
+            search: stringify({
               locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
             })
           }}
@@ -1074,18 +1057,15 @@ describe('User list tests', () => {
       )
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
 
       testComponent.component.update()
       const app = testComponent.component
-      expect(
-        app
-          .find('#load_more_button')
-          .hostNodes()
-          .text()
-      ).toContain('Show next 10')
+      expect(app.find('#load_more_button').hostNodes().text()).toContain(
+        'Show next 10'
+      )
     })
     it('renders next page of the user list when the next page button is pressed', async () => {
       const userListMock = [
@@ -1490,7 +1470,7 @@ describe('User list tests', () => {
         <UserList
           // @ts-ignore
           location={{
-            search: querystring.stringify({
+            search: stringify({
               locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
             })
           }}
@@ -1500,7 +1480,7 @@ describe('User list tests', () => {
       )
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
 
@@ -1508,11 +1488,8 @@ describe('User list tests', () => {
       const app = testComponent.component
       expect(app.find('#load_more_button').hostNodes()).toHaveLength(1)
 
-      app
-        .find('#load_more_button')
-        .hostNodes()
-        .simulate('click')
-      await new Promise(resolve => {
+      app.find('#load_more_button').hostNodes().simulate('click')
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
 

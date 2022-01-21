@@ -13,7 +13,6 @@ import * as React from 'react'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { NoWifi } from '@opencrvs/components/lib/icons'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { connect } from 'react-redux'
 import styled from 'styled-components'
 import { errorMessages } from '@client/i18n/messages'
 
@@ -47,43 +46,15 @@ type IBaseLoadingProps = {
   noApplication?: boolean
 }
 
-type IState = {
-  intervalID: NodeJS.Timeout | null
-  isOnline: boolean
-}
+type IProps = IBaseLoadingProps & IntlShapeProps & IOnlineStatusProps
 
-type IProps = IBaseLoadingProps & IntlShapeProps
-
-export class LoadingIndicatorComp extends React.Component<IProps, IState> {
-  ONLINE_CHECK_INTERVAL = 500
-  constructor(props: IProps) {
-    super(props)
-
-    this.state = {
-      intervalID: null,
-      isOnline: navigator.onLine
-    }
-  }
-
-  componentDidMount() {
-    const intervalID: NodeJS.Timeout = setInterval(() => {
-      this.setState({
-        isOnline: navigator.onLine,
-        intervalID
-      })
-    }, this.ONLINE_CHECK_INTERVAL)
-  }
-
-  componentWillUnmount() {
-    this.state.intervalID && clearInterval(this.state.intervalID)
-  }
-
+export class LoadingIndicatorComp extends React.Component<IProps> {
   render() {
     const { loading, noApplication, hasError, intl } = this.props
 
     return (
       <Wrapper>
-        {this.state.isOnline && loading && (
+        {this.props.isOnline && loading && (
           <>
             <Loading id="Spinner" baseColor="#4C68C1" />
             <Text id="loading-text">
@@ -91,17 +62,17 @@ export class LoadingIndicatorComp extends React.Component<IProps, IState> {
             </Text>
           </>
         )}
-        {this.state.isOnline && hasError && (
+        {this.props.isOnline && hasError && (
           <ErrorText id="search-result-error-text-count">
             {intl.formatMessage(errorMessages.queryError)}
           </ErrorText>
         )}
-        {this.state.isOnline && noApplication && (
+        {this.props.isOnline && noApplication && (
           <Text id="no-application-text">
             {intl.formatMessage(errorMessages.noApplication)}
           </Text>
         )}
-        {!this.state.isOnline && (
+        {!this.props.isOnline && (
           <>
             <NoConnectivity />
             <Text id="wait-connection-text">
@@ -114,4 +85,31 @@ export class LoadingIndicatorComp extends React.Component<IProps, IState> {
   }
 }
 
-export const LoadingIndicator = injectIntl(LoadingIndicatorComp)
+export function withOnlineStatus<T>(
+  WrappedComponent: React.ComponentType<T & IOnlineStatusProps>
+) {
+  const ONLINE_CHECK_INTERVAL = 500
+
+  return function WithOnlineStatus(props: T) {
+    const [isOnline, setOnline] = React.useState(navigator.onLine)
+
+    React.useEffect(() => {
+      const intervalID = setInterval(
+        () => setOnline(navigator.onLine),
+        ONLINE_CHECK_INTERVAL
+      )
+
+      return () => clearInterval(intervalID)
+    }, [])
+
+    return <WrappedComponent isOnline={isOnline} {...props} />
+  }
+}
+
+export type IOnlineStatusProps = {
+  isOnline: boolean
+}
+
+export const LoadingIndicator = injectIntl(
+  withOnlineStatus(LoadingIndicatorComp)
+)

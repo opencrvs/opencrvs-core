@@ -33,29 +33,33 @@ const testOperation: GraphQLRequest = {
 }
 
 const fastResponseLink = new ApolloLink((operation: Operation) => {
-  return new Observable(observer => {
-    new Promise(resolve => {
+  return new Observable((observer) => {
+    new Promise((resolve) => {
       setTimeout(() => resolve({ response: true }), 100)
-    }).then(res =>
-      observer.next(res as FetchResult<
-        { [key: string]: any },
-        Record<string, any>,
-        Record<string, any>
-      >)
+    }).then((res) =>
+      observer.next(
+        res as FetchResult<
+          { [key: string]: any },
+          Record<string, any>,
+          Record<string, any>
+        >
+      )
     )
   })
 })
 
 const slowResponseLink = new ApolloLink((operation: Operation) => {
-  return new Observable(observer => {
-    new Promise(resolve => {
+  return new Observable((observer) => {
+    new Promise((resolve) => {
       setTimeout(() => resolve({ response: true }), 300)
-    }).then(res =>
-      observer.next(res as FetchResult<
-        { [key: string]: any },
-        Record<string, any>,
-        Record<string, any>
-      >)
+    }).then((res) =>
+      observer.next(
+        res as FetchResult<
+          { [key: string]: any },
+          Record<string, any>,
+          Record<string, any>
+        >
+      )
     )
   })
 })
@@ -68,39 +72,39 @@ const composedFailingLink = timeoutLink.concat(slowResponseLink)
 const composedTimelessLink = fakeTimeoutLink.concat(slowResponseLink)
 
 describe('tests for timeout link', () => {
-  it.skip('request served within timeout', done => {
+  it.skip('request served within timeout', (done) => {
     execute(composedPassingLink, testOperation).subscribe({
-      next: data => {
+      next: (data) => {
         expect(data).toEqual({ response: true })
         done()
       },
-      error: e => {
+      error: (e) => {
         expect(e).toBe(null)
         done()
       }
     })
   })
 
-  it.skip('resquest aborted with error when exceeds timeout', done => {
+  it.skip('resquest aborted with error when exceeds timeout', (done) => {
     execute(composedFailingLink, testOperation).subscribe({
-      next: data => {
+      next: (data) => {
         expect(data).toBe(null)
         done()
       },
-      error: e => {
+      error: (e) => {
         expect(e.message).toBe('Timeout exceeded for query "testQuery"')
         done()
       }
     })
   })
 
-  it.skip('skips timeout link when timeout is explicitly set <0 even if slow response', done => {
+  it.skip('skips timeout link when timeout is explicitly set <0 even if slow response', (done) => {
     execute(composedTimelessLink, testOperation).subscribe({
-      next: data => {
+      next: (data) => {
         expect(data).toEqual({ response: true })
         done()
       },
-      error: e => {
+      error: (e) => {
         expect(e).toBe(null)
         done()
       }

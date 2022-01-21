@@ -23,7 +23,7 @@ import { logger } from '@user-mgnt/logger'
 import User, { IUser, IUserModel } from '@user-mgnt/model/user'
 import { roleScopeMapping } from '@user-mgnt/utils/userUtils'
 import { QA_ENV } from '@user-mgnt/constants'
-import * as Hapi from 'hapi'
+import * as Hapi from '@hapi/hapi'
 import * as _ from 'lodash'
 
 export default async function updateUser(
@@ -51,7 +51,7 @@ export default async function updateUser(
   existingUser.mobile = user.mobile
   existingUser.signature = user.signature
   existingUser.localRegistrar = user.localRegistrar
-  existingUser.deviceId = user.deviceId
+  existingUser.device = user.device
   if (existingUser.role !== user.role) {
     existingUser.role = user.role
     // Updating user sope

@@ -97,6 +97,7 @@ export interface ICheckboxOption {
 
 export interface IDynamicOptions {
   dependency: string
+  jurisdictionType?: string
   resource?: string
   options?: { [key: string]: ISelectOption[] }
 }
@@ -210,6 +211,7 @@ export type IFormFieldValue =
   | IAttachmentValue
   | FieldValueArray
   | FieldValueMap
+  | IRegistration
 
 interface FieldValueArray extends Array<IFormFieldValue> {}
 export interface FieldValueMap {
@@ -220,6 +222,14 @@ export interface IFileValue {
   optionValues: IFormFieldValue[]
   type: string
   data: string
+}
+
+export interface IContactPoint {
+  contactRelationship: string
+  registrationPhone: string
+}
+export interface IRegistration {
+  nestedFields: IContactPoint
 }
 
 export interface IAttachmentValue {
@@ -471,6 +481,7 @@ export interface IDateFormField extends IFormFieldBase {
 }
 export interface ITextareaFormField extends IFormFieldBase {
   type: typeof TEXTAREA
+  maxLength?: number
 }
 export interface ISubsectionFormField extends IFormFieldBase {
   type: typeof SUBSECTION
@@ -597,8 +608,11 @@ export interface IFormTag {
   delimiter?: string
 }
 
-export type IDynamicFormField = ISelectFormFieldWithDynamicOptions &
-  IFormFieldWithDynamicDefinitions
+export interface IDynamicFormField
+  extends ISelectFormFieldWithDynamicOptions,
+    IFormFieldWithDynamicDefinitions {
+  type: any
+}
 
 export interface IConditional {
   action: string
@@ -651,7 +665,7 @@ export interface IConditionals {
   between46daysTo5yrs: IConditional
   after5yrs: IConditional
   deceasedNationIdSelected: IConditional
-  isRegistrarOrRegistrationAgentRoleSelected: IConditional
+  isRegistrarRoleSelected: IConditional
   certCollectorOther: IConditional
   userAuditReasonSpecified: IConditional
   userAuditReasonOther: IConditional
@@ -948,6 +962,7 @@ export interface Ii18nNumberFormField extends Ii18nFormFieldBase {
   type: typeof NUMBER
   step?: number
   max?: number
+  inputFieldWidth?: string
 }
 
 export interface Ii18nBigNumberFormField extends Ii18nFormFieldBase {
@@ -966,6 +981,7 @@ export interface Ii18nDateFormField extends Ii18nFormFieldBase {
 }
 export interface Ii18nTextareaFormField extends Ii18nFormFieldBase {
   type: typeof TEXTAREA
+  maxLength?: number
 }
 export interface Ii18nSubsectionFormField extends Ii18nFormFieldBase {
   type: typeof SUBSECTION

@@ -43,6 +43,7 @@ import { messages } from '@client/i18n/messages/views/registrarHome'
 import { IApplication, DOWNLOAD_STATUS } from '@client/applications'
 import { Action } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
+import { formattedDuration } from '@client/utils/date-formatting'
 
 interface IBaseRejectTabProps {
   theme: ITheme
@@ -160,7 +161,7 @@ class RejectTabComponent extends React.Component<
     return transformedData.map((reg, index) => {
       const actions = [] as IAction[]
       const foundApplication = this.props.outboxApplications.find(
-        application => application.id === reg.id
+        (application) => application.id === reg.id
       )
       const downloadStatus =
         (foundApplication && foundApplication.downloadStatus) || undefined
@@ -209,10 +210,12 @@ class RejectTabComponent extends React.Component<
         event,
         dateOfRejection:
           (reg.modifiedAt &&
-            moment(
-              moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
-              'YYYY-MM-DD HH:mm:ss'
-            ).fromNow()) ||
+            formattedDuration(
+              moment(
+                moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
+                'YYYY-MM-DD HH:mm:ss'
+              )
+            )) ||
           '',
         actions,
         rowClickHandler: [
@@ -228,7 +231,7 @@ class RejectTabComponent extends React.Component<
   renderExpandedComponent = (itemId: string) => {
     const { results } = this.props.queryData && this.props.queryData.data
     const eventDetails =
-      results && results.find(result => result && result.id === itemId)
+      results && results.find((result) => result && result.id === itemId)
     return <RowHistoryView eventDetails={eventDetails} />
   }
 
@@ -269,11 +272,8 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const RejectTab = connect(
-  mapStateToProps,
-  {
-    goToPage,
-    goToReviewDuplicate,
-    goToApplicationDetails
-  }
-)(injectIntl(withTheme(RejectTabComponent)))
+export const RejectTab = connect(mapStateToProps, {
+  goToPage,
+  goToReviewDuplicate,
+  goToApplicationDetails
+})(injectIntl(withTheme(RejectTabComponent)))

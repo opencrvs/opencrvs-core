@@ -33,7 +33,7 @@ if (process.env.CI) {
 const customGlobal: GlobalWithFetchMock = global as GlobalWithFetchMock
 customGlobal.fetch = require('jest-fetch-mock')
 customGlobal.fetchMock = customGlobal.fetch
-jest.mock('lodash/debounce', () => jest.fn(fn => fn))
+jest.mock('lodash/debounce', () => jest.fn((fn) => fn))
 
 /*
  * Local storage
@@ -81,7 +81,7 @@ storage.setItem = storageSetItemMock
 const warn = jest.fn()
 const error = jest.fn()
 const debug = jest.fn()
-
+/* eslint-disable no-console */
 console.warn = warn
 console.error = error
 console.debug = debug
@@ -89,14 +89,13 @@ console.debug = debug
 const log = console.log.bind(console)
 
 const BLOCKED_MESSAGES = ['Warning: Setting up fake worker.']
-
 console.log = jest.fn().mockImplementation((...messages) => {
   if (BLOCKED_MESSAGES.includes(messages.join(' '))) {
     return
   }
   log(...messages)
 })
-
+/* eslint-enable no-console */
 /*
  * GraphQL Queries
  */
@@ -113,7 +112,11 @@ userQueries.searchUsers = jest.fn()
 const navigatorMock = {
   onLine: true
 }
-;(window as any).location.assign = jest.fn()
+
+const location = window.location
+
+delete window.location
+;(window as any).location = { ...location, assign: jest.fn() }
 ;(window as any).navigator = navigatorMock
 ;(window as any).location.reload = jest.fn()
 ;(window as any).scrollTo = noop
@@ -124,12 +127,16 @@ const navigatorMock = {
   COUNTRY: 'bgd',
   COUNTRY_LOGO_FILE: 'logo.png',
   LANGUAGES: 'en,bn',
+  HIDE_EVENT_REGISTER_INFORMATION: false,
   EXTERNAL_VALIDATION_WORKQUEUE: true,
   FIELD_AGENT_AUDIT_LOCATIONS:
     'WARD,UNION,CITY_CORPORATION,MUNICIPALITY,UPAZILA',
   APPLICATION_AUDIT_LOCATIONS: 'WARD,UNION',
   LOGIN_URL: 'http://localhost:3020',
   RESOURCES_URL: 'http://localhost:3040/bgd',
+  /**
+   * @deprecated HEALTH_FACILITY_FILTER is no longer used
+   */
   HEALTH_FACILITY_FILTER: 'UPAZILA',
   CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 45,
   CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 1825,
@@ -152,30 +159,36 @@ const {
   assign
 } = require('./tests/util')
 
-jest.mock('@client/utils/referenceApi', (): {
-  referenceApi: typeof referenceApi
-} => ({
-  referenceApi: {
-    loadLocations: () => Promise.resolve(mockOfflineData.locations),
-    loadFacilities: () => Promise.resolve(mockOfflineData.facilities),
-    loadPilotLocations: () => Promise.resolve(mockOfflineData.pilotLocations),
-    loadDefinitions: () =>
-      Promise.resolve({
-        languages: mockOfflineData.languages,
-        forms: mockOfflineData.forms,
-        templates: mockOfflineData.templates
-      }),
-    loadAssets: () => Promise.resolve(mockOfflineData.assets)
-  }
-}))
+jest.mock(
+  '@client/utils/referenceApi',
+  (): {
+    referenceApi: typeof referenceApi
+  } => ({
+    referenceApi: {
+      loadLocations: () => Promise.resolve(mockOfflineData.locations),
+      loadFacilities: () => Promise.resolve(mockOfflineData.facilities),
+      loadPilotLocations: () => Promise.resolve(mockOfflineData.pilotLocations),
+      loadDefinitions: () =>
+        Promise.resolve({
+          languages: mockOfflineData.languages,
+          forms: mockOfflineData.forms,
+          templates: mockOfflineData.templates
+        }),
+      loadAssets: () => Promise.resolve(mockOfflineData.assets)
+    }
+  })
+)
 
-jest.mock('@client/utils/authApi', (): {
-  authApi: typeof authApi
-} => ({
-  authApi: {
-    invalidateToken: () => Promise.resolve()
-  }
-}))
+jest.mock(
+  '@client/utils/authApi',
+  (): {
+    authApi: typeof authApi
+  } => ({
+    authApi: {
+      invalidateToken: () => Promise.resolve()
+    }
+  })
+)
 
 beforeEach(() => {
   /*

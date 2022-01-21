@@ -207,7 +207,7 @@ function mapStatetoProps(
   const { registrationId, eventType } = props.match.params
   const event = getEvent(eventType)
   const application = state.applicationsState.applications.find(
-    app => app.id === registrationId && app.event === event
+    (app) => app.id === registrationId && app.event === event
   ) as IPrintableApplication | undefined
 
   if (!application) {
@@ -224,11 +224,8 @@ function mapStatetoProps(
   }
 }
 
-export const Payment = connect(
-  mapStatetoProps,
-  {
-    goBack: goBackAction,
-    modifyApplication,
-    goToReviewCertificate: goToReviewCertificateAction
-  }
-)(injectIntl(withTheme(PaymentComponent)))
+export const Payment = connect(mapStatetoProps, {
+  goBack: goBackAction,
+  modifyApplication,
+  goToReviewCertificate: goToReviewCertificateAction
+})(injectIntl(withTheme(PaymentComponent)))

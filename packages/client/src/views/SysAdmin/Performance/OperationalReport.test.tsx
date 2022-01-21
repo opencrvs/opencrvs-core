@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { OPERATIONAL_REPORT } from '@client/navigation/routes'
 import { AppStore } from '@client/store'
 import { createTestComponent, createTestStore } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
@@ -21,7 +20,7 @@ import {
   OPERATIONAL_REPORT_SECTION
 } from './OperationalReport'
 import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
-import querystring from 'query-string'
+import { stringify, parse } from 'query-string'
 import { OPERATIONAL_REPORTS_METRICS } from './metricsQuery'
 import { GraphQLError } from 'graphql'
 
@@ -89,7 +88,7 @@ describe('OperationalReport tests', () => {
       <OperationalReport
         // @ts-ignore
         location={{
-          search: querystring.stringify({
+          search: stringify({
             locationId: LOCATION_DHAKA_DIVISION.id,
             sectionId: OPERATIONAL_REPORT_SECTION.OPERATIONAL,
             timeEnd: new Date(1487076708000).toISOString(),
@@ -104,7 +103,7 @@ describe('OperationalReport tests', () => {
   })
 
   it('renders without crashing', async () => {
-    const header = await waitForElement(component, '#header-location-name')
+    await waitForElement(component, '#header-location-name')
   })
 
   it('header shows location display label', async () => {
@@ -127,10 +126,7 @@ describe('OperationalReport tests', () => {
       '#operational-select'
     )
     expect(
-      performanceSelect
-        .find('.react-select__single-value')
-        .hostNodes()
-        .text()
+      performanceSelect.find('.react-select__single-value').hostNodes().text()
     ).toBe('Operational')
     expect(
       component.find('#registration-rates-reports-loader').hostNodes()
@@ -148,7 +144,7 @@ describe('OperationalReport tests', () => {
       'Birth registration rate within 45 days of event'
     )
 
-    expect(querystring.parse(history.location.search)).toEqual({
+    expect(parse(history.location.search)).toEqual({
       locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
       timeEnd: new Date(1487076708000).toISOString(),
       timeStart: new Date(1455454308000).toISOString(),
@@ -166,7 +162,7 @@ describe('OperationalReport tests', () => {
       value: 'REPORTS'
     })
     component.update()
-    expect(querystring.parse(history.location.search)).toEqual({
+    expect(parse(history.location.search)).toEqual({
       locationId: LOCATION_DHAKA_DIVISION.id,
       sectionId: OPERATIONAL_REPORT_SECTION.REPORTS,
       timeEnd: new Date(1487076708000).toISOString(),
@@ -176,10 +172,7 @@ describe('OperationalReport tests', () => {
 
   describe('status window test', () => {
     beforeEach(() => {
-      component
-        .find('#btn-status')
-        .hostNodes()
-        .simulate('click')
+      component.find('#btn-status').hostNodes().simulate('click')
       component.update()
     })
 
@@ -189,10 +182,7 @@ describe('OperationalReport tests', () => {
     })
 
     it('closes status window and show status button', () => {
-      component
-        .find('#btn-sts-wnd-cross')
-        .hostNodes()
-        .simulate('click')
+      component.find('#btn-sts-wnd-cross').hostNodes().simulate('click')
       component.update()
 
       expect(component.find('#status-window').hostNodes()).toHaveLength(0)
@@ -210,10 +200,7 @@ describe('OperationalReport tests', () => {
     })
 
     it('modal shows up', async () => {
-      const pickerModalElement = await waitForElement(
-        component,
-        '#picker-modal'
-      )
+      await waitForElement(component, '#picker-modal')
     })
 
     it('clicking on close button dismisses the modal', async () => {
@@ -244,10 +231,7 @@ describe('OperationalReport tests', () => {
         component,
         '#last30Days'
       )
-      last30DaysPresetButtonElement
-        .hostNodes()
-        .at(0)
-        .simulate('click')
+      last30DaysPresetButtonElement.hostNodes().at(0).simulate('click')
       const confirmButtonElement = await waitForElement(
         component,
         '#date-range-confirm-action'
@@ -260,7 +244,6 @@ describe('OperationalReport tests', () => {
 describe('OperationalReport reports tests', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
-  let history: History<any>
 
   const LOCATION_DHAKA_DIVISION = {
     displayLabel: 'Dhaka Division',
@@ -270,9 +253,8 @@ describe('OperationalReport reports tests', () => {
 
   beforeAll(async () => {
     Date.now = jest.fn(() => 1487076708000)
-    const { store: testStore, history: testHistory } = await createTestStore()
+    const { store: testStore } = await createTestStore()
     store = testStore
-    history = testHistory
   })
 
   beforeEach(async () => {
@@ -280,7 +262,7 @@ describe('OperationalReport reports tests', () => {
       <OperationalReport
         // @ts-ignore
         location={{
-          search: querystring.stringify({
+          search: stringify({
             locationId: LOCATION_DHAKA_DIVISION.id,
             sectionId: OPERATIONAL_REPORT_SECTION.REPORTS,
             timeEnd: new Date(1487076708000).toISOString(),
@@ -301,7 +283,6 @@ describe('OperationalReport reports tests', () => {
 describe('Test error toast notification', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
-  let history: History<any>
 
   const LOCATION_DHAKA_DIVISION = {
     displayLabel: 'Dhaka Division',
@@ -311,9 +292,8 @@ describe('Test error toast notification', () => {
 
   beforeAll(async () => {
     Date.now = jest.fn(() => 1487076708000)
-    const { store: testStore, history: testHistory } = await createTestStore()
+    const { store: testStore } = await createTestStore()
     store = testStore
-    history = testHistory
   })
 
   beforeEach(async () => {
@@ -336,7 +316,7 @@ describe('Test error toast notification', () => {
       <OperationalReport
         // @ts-ignore
         location={{
-          search: querystring.stringify({
+          search: stringify({
             locationId: LOCATION_DHAKA_DIVISION.id,
             sectionId: OPERATIONAL_REPORT_SECTION.OPERATIONAL,
             timeEnd: new Date(1487076708000).toISOString(),

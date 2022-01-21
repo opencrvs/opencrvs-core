@@ -26,7 +26,6 @@ import { messages } from '@client/i18n/messages/views/notifications'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import styled from '@client/styledComponents'
 import { IApplication, SUBMISSION_STATUS } from '@client/applications'
-import { sentenceCase } from '@client/utils/data-formatting'
 import { getDefaultLanguage } from '@client/i18n/utils'
 const Container = styled(BodyContent)`
   padding-top: 32px;
@@ -45,6 +44,7 @@ class Outbox extends React.Component<IFullProps, IState> {
     const { formatMessage } = this.props.intl
     const {
       statusWaitingToRegister,
+      statusWaitingToValidate,
       statusRegistering,
       statusWaitingToReject,
       statusRejecting,
@@ -62,6 +62,16 @@ class Outbox extends React.Component<IFullProps, IState> {
         iconId = `waiting${index}`
         icon = () => <StatusWaiting id={iconId} key={iconId} />
         statusText = formatMessage(statusWaitingToSubmit)
+        break
+      case SUBMISSION_STATUS.READY_TO_APPROVE:
+        iconId = `waiting${index}`
+        icon = () => <StatusWaiting id={iconId} key={iconId} />
+        statusText = formatMessage(statusWaitingToValidate)
+        break
+      case SUBMISSION_STATUS.APPROVING:
+        iconId = `registering${index}`
+        icon = () => <Spinner id={iconId} key={iconId} size={24} />
+        statusText = formatMessage(statusSubmitting)
         break
       case SUBMISSION_STATUS.SUBMITTING:
         iconId = `registering${index}`

@@ -24,11 +24,8 @@ import {
 } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { GQLUser, GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { createNamesMap } from '@client/utils/data-formatting'
-import {
-  SearchRed,
-  Avatar,
-  VerticalThreeDots
-} from '@opencrvs/components/lib/icons'
+import { SearchRed, VerticalThreeDots } from '@opencrvs/components/lib/icons'
+import { Avatar } from '@client/components/Avatar'
 import styled from 'styled-components'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import moment from 'moment'
@@ -59,6 +56,9 @@ import { userMutations } from '@client/user/mutations'
 
 const ContentWrapper = styled.div`
   margin: 40px auto 0;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin: 0px auto 0;
+  }
   color: ${({ theme }) => theme.colors.copy};
 `
 
@@ -82,6 +82,9 @@ const InformationHolder = styled.div`
     flex-direction: column;
   }
   margin-bottom: 14px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin-bottom: 16px;
+  }
 `
 
 export const InformationTitle = styled.div<{ paddingRight?: number }>`
@@ -114,12 +117,6 @@ const HeaderMenuHolder = styled.div`
 
   & > :not(:last-child) {
     margin: auto 8px;
-  }
-`
-
-const HeaderMenu = styled(ToggleMenu)`
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: none;
   }
 `
 
@@ -281,7 +278,8 @@ class UserProfileComponent extends React.Component<Props, State> {
           moment(new Date(Number(userData.creationDate))).format(
             'MMMM DD, YYYY'
           )) ||
-        ''
+        '',
+      avatar: userData.avatar
     }
   }
   getLoadingUserProfileView(hasError?: boolean) {
@@ -363,9 +361,13 @@ class UserProfileComponent extends React.Component<Props, State> {
                       />
                     </HeaderMenuHolder>
                   }
+                  profilePageStyle={{
+                    paddingTopMd: 24,
+                    horizontalPaddingMd: 24
+                  }}
                 >
                   <ContentWrapper>
-                    <UserAvatar />
+                    <UserAvatar name={user.name} avatar={user.avatar} />
                     <NameHolder>{user.name}</NameHolder>
                     <InformationHolder>
                       <InformationTitle paddingRight={70}>
@@ -387,7 +389,7 @@ class UserProfileComponent extends React.Component<Props, State> {
                       </InformationValue>
                     </InformationHolder>
                     <InformationHolder>
-                      <InformationTitle paddingRight={113}>
+                      <InformationTitle paddingRight={208}>
                         {intl.formatMessage(messages.roleType)}
                       </InformationTitle>
                       <InformationValue>
@@ -397,19 +399,19 @@ class UserProfileComponent extends React.Component<Props, State> {
                       </InformationValue>
                     </InformationHolder>
                     <InformationHolder>
-                      <InformationTitle paddingRight={74}>
+                      <InformationTitle paddingRight={169}>
                         {intl.formatMessage(messages.phoneNumber)}
                       </InformationTitle>
                       <InformationValue>{user.number}</InformationValue>
                     </InformationHolder>
                     <InformationHolder>
-                      <InformationTitle paddingRight={110}>
+                      <InformationTitle paddingRight={205}>
                         {intl.formatMessage(messages.userName)}
                       </InformationTitle>
                       <InformationValue>{user.username}</InformationValue>
                     </InformationHolder>
                     <InformationHolder>
-                      <InformationTitle paddingRight={112}>
+                      <InformationTitle paddingRight={210}>
                         {intl.formatMessage(messages.startDate)}
                       </InformationTitle>
                       <InformationValue>{user.startDate}</InformationValue>

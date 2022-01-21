@@ -199,19 +199,13 @@ class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
       queryData,
       isDisabled
     } = this.props
-    const {
-      loading,
-      error,
-      success,
-      show,
-      isDisconnected,
-      networkError
-    } = this.state
+    const { loading, error, success, show, isDisconnected, networkError } =
+      this.state
 
     return (
       <Container {...this.props}>
         <ApolloConsumer>
-          {client => {
+          {(client) => {
             return (
               <div>
                 <StyledPrimaryButton

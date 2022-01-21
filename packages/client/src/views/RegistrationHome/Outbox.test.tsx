@@ -135,7 +135,7 @@ describe('OutBox tests', () => {
   describe('When all the fields are fully provided', () => {
     it('renders texts in data rows for birth applications', async () => {
       const applications: IApplication[] = []
-      statuses.map(status =>
+      statuses.map((status) =>
         applications.push({
           ...birthApp,
           submissionStatus: status
@@ -160,7 +160,7 @@ describe('OutBox tests', () => {
 
     it('renders texts in data rows for death applications', async () => {
       const applications: IApplication[] = []
-      statuses.map(status =>
+      statuses.map((status) =>
         applications.push({
           ...deathApp,
           submissionStatus: status
@@ -273,26 +273,30 @@ describe('OutBox tests', () => {
       applications.push(birthApp)
     }
     it('shows pagination bar when pagination is used', async () => {
-      const testComp = (await createTestComponent(
-        <OutBox application={applications} showPaginated={true} />,
-        store
-      )).component
+      const testComp = (
+        await createTestComponent(
+          <OutBox application={applications} showPaginated={true} />,
+          store
+        )
+      ).component
       expect(testComp.exists('#pagination')).toBeTruthy()
       testComp
         .find('#pagination')
         .children()
-        .map(child => child.simulate('click'))
+        .map((child) => child.simulate('click'))
     })
     it('shows loadmore button when loadmore is used', async () => {
-      const testComp = (await createTestComponent(
-        <OutBox application={applications} showPaginated={false} />,
-        store
-      )).component
+      const testComp = (
+        await createTestComponent(
+          <OutBox application={applications} showPaginated={false} />,
+          store
+        )
+      ).component
       expect(testComp.exists('#load_more_button')).toBeTruthy()
       testComp
         .find('#load_more_button')
         .children()
-        .map(child => child.simulate('click'))
+        .map((child) => child.simulate('click'))
     })
   })
 })

@@ -198,7 +198,7 @@ class SecurityQuestionComponent extends React.Component<Props, State> {
                   name="securityAnswerInput"
                   isSmallSized={true}
                   value={this.state.answer}
-                  onChange={e => this.handleChange(e.target.value)}
+                  onChange={(e) => this.handleChange(e.target.value)}
                   touched={this.state.touched}
                   error={this.state.error}
                 />
@@ -216,12 +216,9 @@ class SecurityQuestionComponent extends React.Component<Props, State> {
 }
 
 export const SecurityQuestion = withRouter(
-  connect(
-    null,
-    {
-      goToPhoneNumberVerificationForm,
-      goToUpdatePasswordForm,
-      goToSuccessPage
-    }
-  )(injectIntl(SecurityQuestionComponent))
+  connect(null, {
+    goToPhoneNumberVerificationForm,
+    goToUpdatePasswordForm,
+    goToSuccessPage
+  })(injectIntl(SecurityQuestionComponent))
 )

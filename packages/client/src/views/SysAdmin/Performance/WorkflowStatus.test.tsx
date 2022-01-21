@@ -15,7 +15,7 @@ import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatu
 import { AppStore } from '@client/store'
 import { History } from 'history'
 import { ReactWrapper } from 'enzyme'
-import queryString from 'query-string'
+import { stringify, parse } from 'query-string'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
 import { OPERATIONAL_REPORT_SECTION } from './OperationalReport'
@@ -205,7 +205,7 @@ describe('Workflow status tests', () => {
         <WorkflowStatus
           // @ts-ignore
           location={{
-            search: queryString.stringify({
+            search: stringify({
               locationId,
               event: 'BIRTH',
               status: 'REGISTERED'
@@ -224,7 +224,7 @@ describe('Workflow status tests', () => {
       component = testComponent.component
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
 
@@ -232,7 +232,7 @@ describe('Workflow status tests', () => {
     })
 
     it('renders without crashing', async () => {
-      const header = await waitForElement(component, '#workflow-status-header')
+      await waitForElement(component, '#workflow-status-header')
     })
 
     it('clicking on back takes back to operational dashboard', async () => {
@@ -264,40 +264,28 @@ describe('Workflow status tests', () => {
         component,
         'span#applicationStartedOn-label'
       )
-      expect(
-        listTable
-          .find('div#row_0')
-          .hostNodes()
-          .childAt(7)
-          .text()
-      ).toMatch(/May 17, 2020/)
+      expect(listTable.find('div#row_0').hostNodes().childAt(7).text()).toMatch(
+        /May 17, 2020/
+      )
 
       toggleSortButton.hostNodes().simulate('click')
 
-      expect(
-        listTable
-          .find('div#row_2')
-          .hostNodes()
-          .childAt(7)
-          .text()
-      ).toMatch(/May 17, 2020/)
+      expect(listTable.find('div#row_2').hostNodes().childAt(7).text()).toMatch(
+        /May 17, 2020/
+      )
 
       toggleSortButton.hostNodes().simulate('click')
 
-      expect(
-        listTable
-          .find('div#row_0')
-          .hostNodes()
-          .childAt(7)
-          .text()
-      ).toMatch(/May 17, 2020/)
+      expect(listTable.find('div#row_0').hostNodes().childAt(7).text()).toMatch(
+        /May 17, 2020/
+      )
     })
 
     it('update event from select updates query params', async () => {
       const eventSelect = await waitForElement(component, '#event-select')
       eventSelect.at(0).prop('onChange')({ label: 'Deaths', value: 'DEATH' })
       component.update()
-      expect(queryString.parse(history.location.search).event).toBe('DEATH')
+      expect(parse(history.location.search).event).toBe('DEATH')
     })
 
     it('update status from select updates query params', async () => {
@@ -307,14 +295,11 @@ describe('Workflow status tests', () => {
         value: 'REGISTERED'
       })
       component.update()
-      expect(queryString.parse(history.location.search).status).toBe(
-        'REGISTERED'
-      )
+      expect(parse(history.location.search).status).toBe('REGISTERED')
     })
 
     it('changing location id from location picker updates the query params', async () => {
-      const locationIdBeforeChange = queryString.parse(history.location.search)
-        .locationId
+      const locationIdBeforeChange = parse(history.location.search).locationId
       const locationPickerElement = await waitForElement(
         component,
         '#location-range-picker-action'
@@ -335,8 +320,7 @@ describe('Workflow status tests', () => {
         '#locationOptiond3cef1d4-6187-4f0e-a024-61abd3fce9d4'
       )
       searchResultOption.hostNodes().simulate('click')
-      const newLocationId = queryString.parse(history.location.search)
-        .locationId
+      const newLocationId = parse(history.location.search).locationId
       expect(newLocationId).not.toBe(locationIdBeforeChange)
       expect(newLocationId).toBe('d3cef1d4-6187-4f0e-a024-61abd3fce9d4')
     })
@@ -366,7 +350,7 @@ describe('Workflow status tests', () => {
         <WorkflowStatus
           // @ts-ignore
           location={{
-            search: queryString.stringify({
+            search: stringify({
               locationId
             }),
             state: {
@@ -383,7 +367,7 @@ describe('Workflow status tests', () => {
       component = testComponent.component
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
 

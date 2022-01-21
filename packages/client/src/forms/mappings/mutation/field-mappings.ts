@@ -24,36 +24,37 @@ interface IPersonName {
   [key: string]: string
 }
 
-export const fieldToNameTransformer = (
-  language: string,
-  transformedFieldName?: string
-) => (
-  transformedData: TransformedData,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) => {
-  const sectionData = transformedData[sectionId]
-  if (!sectionData.name) {
-    sectionData.name = [
-      {
-        use: language
-      }
-    ]
-  }
-  let personName: IPersonName | undefined = (sectionData.name as [
-    { use: string }
-  ]).find(name => name.use === language)
-  if (!personName) {
-    personName = { use: language }
-    sectionData.name.push(personName)
-  }
-  personName[
-    !transformedFieldName ? field.name : transformedFieldName
-  ] = draftData[sectionId][field.name] as string
+export const fieldToNameTransformer =
+  (language: string, transformedFieldName?: string, toSectionId?: string) =>
+  (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    if (toSectionId && !transformedData[toSectionId]) {
+      transformedData[toSectionId] = {}
+    }
+    const sectionData = transformedData[toSectionId ? toSectionId : sectionId]
+    if (!sectionData.name) {
+      sectionData.name = [
+        {
+          use: language
+        }
+      ]
+    }
+    let personName: IPersonName | undefined = (
+      sectionData.name as [{ use: string }]
+    ).find((name) => name.use === language)
+    if (!personName) {
+      personName = { use: language }
+      sectionData.name.push(personName)
+    }
+    personName[!transformedFieldName ? field.name : transformedFieldName] =
+      draftData[sectionId][field.name] as string
 
-  return transformedData
-}
+    return transformedData
+  }
 
 export function ignoreFieldTransformer(
   transformedData: TransformedData,
@@ -75,259 +76,266 @@ export function fieldToArrayTransformer(
   return transformedData
 }
 
-export const fieldToIdentifierTransformer = (identifierField: string) => (
-  transformedData: TransformedData,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) => {
-  const sectionData = transformedData[sectionId]
-  if (!sectionData.identifier) {
-    sectionData.identifier = [{}]
-  }
-  sectionData.identifier[0][identifierField] = draftData[sectionId][field.name]
-  return transformedData
-}
-
-export const fieldToIdentityTransformer = (
-  identifierField: string,
-  identityType: string
-) => (
-  transformedData: TransformedData,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) => {
-  const sectionData = transformedData[sectionId]
-  if (!sectionData.identifier) {
-    sectionData.identifier = []
+export const fieldToIdentifierTransformer =
+  (identifierField: string) =>
+  (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    const sectionData = transformedData[sectionId]
+    if (!sectionData.identifier) {
+      sectionData.identifier = [{}]
+    }
+    sectionData.identifier[0][identifierField] =
+      draftData[sectionId][field.name]
+    return transformedData
   }
 
-  const existingIdentity = sectionData.identifier.find(
-    (identifier: fhir.Identifier) =>
-      identifier.type && identifier.type === identityType
-  )
-  if (!existingIdentity) {
-    sectionData.identifier.push({
-      [identifierField]: draftData[sectionId][field.name],
-      type: identityType
-    })
-  } else {
-    existingIdentity[identifierField] = draftData[sectionId][field.name]
-    existingIdentity.type = identityType
+export const fieldToIdentityTransformer =
+  (identifierField: string, identityType: string) =>
+  (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    const sectionData = transformedData[sectionId]
+    if (!sectionData.identifier) {
+      sectionData.identifier = []
+    }
+
+    const existingIdentity = sectionData.identifier.find(
+      (identifier: fhir.Identifier) =>
+        identifier.type && identifier.type === identityType
+    )
+    if (!existingIdentity) {
+      sectionData.identifier.push({
+        [identifierField]: draftData[sectionId][field.name],
+        type: identityType
+      })
+    } else {
+      existingIdentity[identifierField] = draftData[sectionId][field.name]
+      existingIdentity.type = identityType
+    }
+    return transformedData
   }
-  return transformedData
-}
 
 interface IAddress {
   [key: string]: any
 }
 
-export const fieldToAddressTransformer = (
-  addressType: string,
-  lineNumber: number = 0,
-  transformedFieldName?: string
-) => (
-  transformedData: TransformedData,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) => {
-  const sectionData = transformedData[sectionId]
+export const fieldToAddressTransformer =
+  (addressType: string, lineNumber = 0, transformedFieldName?: string) =>
+  (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    const sectionData = transformedData[sectionId]
 
-  if (!sectionData.address) {
-    sectionData.address = []
-  }
-  let address: IAddress | undefined = (sectionData.address as [
-    { type: string; line: IFormFieldValue[] }
-  ]).find(addr => addr.type === addressType)
-  if (!address) {
-    address = {
-      type: addressType,
-      line: ['', '', '', '', '', '']
+    if (!sectionData.address) {
+      sectionData.address = []
     }
-    sectionData.address.push(address)
+    let address: IAddress | undefined = (
+      sectionData.address as [{ type: string; line: IFormFieldValue[] }]
+    ).find((addr) => addr.type === addressType)
+    if (!address) {
+      address = {
+        type: addressType,
+        line: ['', '', '', '', '', '']
+      }
+      sectionData.address.push(address)
+    }
+    if (lineNumber > 0) {
+      address.line[lineNumber - 1] = `${draftData[sectionId][field.name]}`
+    } else {
+      address[!transformedFieldName ? field.name : transformedFieldName] = `${
+        draftData[sectionId][field.name]
+      }`
+    }
+
+    return transformedData
   }
-  if (lineNumber > 0) {
-    address.line[lineNumber - 1] = `${draftData[sectionId][field.name]}`
-  } else {
-    address[!transformedFieldName ? field.name : transformedFieldName] = `${
+
+export const fieldNameTransformer =
+  (transformedFieldName: string) =>
+  (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    transformedData[sectionId][transformedFieldName] =
       draftData[sectionId][field.name]
-    }`
-  }
-
-  return transformedData
-}
-
-export const fieldNameTransformer = (transformedFieldName: string) => (
-  transformedData: TransformedData,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) => {
-  transformedData[sectionId][transformedFieldName] =
-    draftData[sectionId][field.name]
-  return transformedData
-}
-
-export const fieldValueSectionExchangeTransformer = (
-  toSectionId: string,
-  toSectionField?: string
-) => (
-  transformedData: TransformedData,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) => {
-  if (!transformedData[toSectionId]) {
-    transformedData[toSectionId] = {}
-  }
-  transformedData[toSectionId][toSectionField ? toSectionField : field.name] =
-    draftData[sectionId][field.name]
-  return transformedData
-}
-
-export const sectionFieldToBundleFieldTransformer = (
-  transformedFieldName?: string
-) => (
-  transformedData: TransformedData,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) => {
-  if (transformedFieldName) {
-    transformedData[transformedFieldName] = draftData[sectionId][field.name]
-  } else {
-    transformedData[field.name] = draftData[sectionId][field.name]
-  }
-  return transformedData
-}
-
-export const nestedRadioFieldToBundleFieldTransformer = (
-  transformedFieldName?: string
-) => (
-  transformedData: TransformedData,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) => {
-  if (transformedFieldName) {
-    set(
-      transformedData,
-      transformedFieldName,
-      (draftData[sectionId][field.name] as IFormSectionData).value
-    )
-  } else {
-    transformedData[field.name] = (draftData[sectionId][
-      field.name
-    ] as IFormSectionData).value
-  }
-  return transformedData
-}
-
-export const copyEventAddressTransformer = (fromSection: string) => (
-  transformedData: TransformedData,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) => {
-  if (
-    draftData[sectionId][field.name] === 'OTHER' ||
-    draftData[sectionId][field.name] === 'PRIVATE_HOME' ||
-    draftData[sectionId][field.name] === 'HEALTH_FACILITY'
-  ) {
-    transformedData.eventLocation = { type: draftData[sectionId][field.name] }
-    return transformedData
-  }
-  const fromSectionData = transformedData[fromSection]
-  if (!fromSectionData.address) {
-    return transformedData
-  }
-  const address = (fromSectionData.address as [fhir.Address]).find(
-    addr => addr.type === draftData[sectionId][field.name]
-  )
-  if (!address) {
     return transformedData
   }
 
-  transformedData.eventLocation = {
-    address: {
-      ...address
-    } as fhir.Address
-  } as fhir.Location
-
-  transformedData.eventLocation.type = draftData[sectionId][field.name]
-  if (address && address.line && address.line[5]) {
-    transformedData.eventLocation.partOf = `Location/${address.line[5]}`
-  }
-
-  return transformedData
-}
-
-export const copyAddressTransformer = (
-  fromAddressType: string,
-  fromSection: string,
-  toAddressType: string,
-  toSection: string,
-  triggerValue: boolean = true,
-  nodeName?: string
-) => (
-  transformedData: TransformedData,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) => {
-  if (draftData[sectionId][field.name] !== triggerValue) {
-    return transformedData
-  }
-
-  let fromSectionData = transformedData[fromSection]
-  if (nodeName) {
-    fromSectionData = transformedData[fromSection][nodeName]
-  }
-
-  if (!fromSectionData.address) {
-    throw new Error(`Address data not found on section ${sectionId}`)
-  }
-  const address = (fromSectionData.address as [{ type: string }]).find(
-    addr => addr.type === fromAddressType
-  )
-  if (!address) {
-    throw new Error(
-      `Address not found for given type: ${fromAddressType} on section ${fromSection}`
-    )
-  }
-  const toSectionData = transformedData[toSection]
-  if (!toSectionData.address) {
-    toSectionData.address = []
-  }
-  let toAddress = (toSectionData.address as [{ type: string }]).find(
-    addr => addr.type === toAddressType
-  )
-  if (toAddress) {
-    toAddress = { ...address, type: toAddressType }
-  } else {
-    toAddress = {
-      ...address,
-      type: toAddressType
+export const fieldValueSectionExchangeTransformer =
+  (toSectionId: string, toSectionField?: string) =>
+  (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    if (!transformedData[toSectionId]) {
+      transformedData[toSectionId] = {}
     }
-    toSectionData.address.push(toAddress)
-  }
-  return transformedData
-}
-
-export const sectionRemoveTransformer = (triggerValue: boolean = false) => (
-  transformedData: TransformedData,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) => {
-  if (draftData[sectionId][field.name] !== triggerValue) {
+    transformedData[toSectionId][toSectionField ? toSectionField : field.name] =
+      draftData[sectionId][field.name]
     return transformedData
   }
-  delete transformedData[sectionId]
-  return transformedData
-}
+
+export const sectionFieldToBundleFieldTransformer =
+  (transformedFieldName?: string) =>
+  (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    if (transformedFieldName) {
+      transformedData[transformedFieldName] = draftData[sectionId][field.name]
+    } else {
+      transformedData[field.name] = draftData[sectionId][field.name]
+    }
+    return transformedData
+  }
+
+export const nestedRadioFieldToBundleFieldTransformer =
+  (transformedFieldName?: string) =>
+  (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    if (transformedFieldName) {
+      set(
+        transformedData,
+        transformedFieldName,
+        (draftData[sectionId][field.name] as IFormSectionData).value
+      )
+    } else {
+      transformedData[field.name] = (
+        draftData[sectionId][field.name] as IFormSectionData
+      ).value
+    }
+    return transformedData
+  }
+
+export const copyEventAddressTransformer =
+  (fromSection: string) =>
+  (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    if (
+      draftData[sectionId][field.name] === 'OTHER' ||
+      draftData[sectionId][field.name] === 'PRIVATE_HOME' ||
+      draftData[sectionId][field.name] === 'HEALTH_FACILITY'
+    ) {
+      transformedData.eventLocation = { type: draftData[sectionId][field.name] }
+      return transformedData
+    }
+    const fromSectionData = transformedData[fromSection]
+    if (!fromSectionData.address) {
+      return transformedData
+    }
+    const address = (fromSectionData.address as [fhir.Address]).find(
+      (addr) => addr.type === draftData[sectionId][field.name]
+    )
+    if (!address) {
+      return transformedData
+    }
+
+    transformedData.eventLocation = {
+      address: {
+        ...address
+      } as fhir.Address
+    } as fhir.Location
+
+    transformedData.eventLocation.type = draftData[sectionId][field.name]
+    if (address && address.line && address.line[5]) {
+      transformedData.eventLocation.partOf = `Location/${address.line[5]}`
+    }
+
+    return transformedData
+  }
+
+export const copyAddressTransformer =
+  (
+    fromAddressType: string,
+    fromSection: string,
+    toAddressType: string,
+    toSection: string,
+    triggerValue = true,
+    nodeName?: string
+  ) =>
+  (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    if (draftData[sectionId][field.name] !== triggerValue) {
+      return transformedData
+    }
+
+    let fromSectionData = transformedData[fromSection]
+    if (nodeName) {
+      fromSectionData = transformedData[fromSection][nodeName]
+    }
+
+    if (!fromSectionData.address) {
+      throw new Error(`Address data not found on section ${sectionId}`)
+    }
+    const address = (fromSectionData.address as [{ type: string }]).find(
+      (addr) => addr.type === fromAddressType
+    )
+    if (!address) {
+      throw new Error(
+        `Address not found for given type: ${fromAddressType} on section ${fromSection}`
+      )
+    }
+    const toSectionData = transformedData[toSection]
+    if (!toSectionData.address) {
+      toSectionData.address = []
+    }
+    let toAddress = (toSectionData.address as [{ type: string }]).find(
+      (addr) => addr.type === toAddressType
+    )
+    if (toAddress) {
+      toAddress = { ...address, type: toAddressType }
+    } else {
+      toAddress = {
+        ...address,
+        type: toAddressType
+      }
+      toSectionData.address.push(toAddress)
+    }
+    return transformedData
+  }
+
+export const sectionRemoveTransformer =
+  (triggerValue = false) =>
+  (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    if (draftData[sectionId][field.name] !== triggerValue) {
+      return transformedData
+    }
+    delete transformedData[sectionId]
+    return transformedData
+  }
 
 export function fieldToCommentTransformer(
   transformedData: TransformedData,
@@ -362,7 +370,7 @@ export function fieldToAttachmentTransformer(
     return transformedData
   }
   const attachments = (draftData[sectionId][field.name] as IAttachment[]).map(
-    attachment => {
+    (attachment) => {
       return {
         data: attachment.data,
         subject: attachment.optionValues[0],
@@ -389,129 +397,133 @@ export function fieldToAttachmentTransformer(
   return transformedData
 }
 
-export const fieldToPhoneNumberTransformer = (
-  transformedSectionId?: string
-) => (
-  transformedData: TransformedData,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) => {
-  transformedData[
-    transformedSectionId ? transformedSectionId : sectionId
-  ].telecom = [{ system: 'phone', value: draftData[sectionId][field.name] }]
-  return transformedData
-}
-
-export const fieldToIdentifierWithTypeTransformer = (
-  identifierType: string
-) => (
-  transformedData: TransformedData,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) => {
-  const sectionData = transformedData[sectionId]
-  if (!sectionData.identifier) {
-    sectionData.identifier = [{}]
+export const fieldToPhoneNumberTransformer =
+  (transformedSectionId?: string) =>
+  (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    transformedData[
+      transformedSectionId ? transformedSectionId : sectionId
+    ].telecom = [{ system: 'phone', value: draftData[sectionId][field.name] }]
+    return transformedData
   }
-  sectionData.identifier[0].system = identifierType
-  sectionData.identifier[0].value = draftData[sectionId][field.name]
-  return transformedData
-}
 
-export const nestedRadioFieldTransformer = (
-  nestedTransformer: IFormFieldMutationMapFunction
-) => (
-  transformedData: TransformedData,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField,
-  nestedField?: IFormField
-) => {
-  const fieldValueObj = draftData[sectionId][field.name] as IFormSectionData
-  let partialDraftData: IFormData = {}
-
-  if (!nestedField) {
-    const parentData: IFormSectionData = {}
-    parentData[field.name] = fieldValueObj.value as IFormSectionData
-    partialDraftData[sectionId] = parentData
-  } else {
-    if (
-      nestedField.extraValue &&
-      nestedField.extraValue !== fieldValueObj.value
-    ) {
-      return
+export const fieldToIdentifierWithTypeTransformer =
+  (identifierType: string) =>
+  (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    const sectionData = transformedData[sectionId]
+    if (!sectionData.identifier) {
+      sectionData.identifier = [{}]
     }
-    partialDraftData[sectionId] = fieldValueObj.nestedFields as IFormSectionData
+    sectionData.identifier[0].system = identifierType
+    sectionData.identifier[0].value = draftData[sectionId][field.name]
+    return transformedData
   }
-  nestedTransformer(
-    transformedData,
-    partialDraftData,
-    sectionId,
-    nestedField || field
-  )
-}
 
-export const fieldToReasonsNotApplyingTransformer = (
-  transformedArrayName: string,
-  transformedFieldName?: string,
-  extraField?: string,
-  transformeValueArrayToBoolean?: boolean,
-  isCaregiver?: boolean
-) => (
-  transformedData: TransformedData,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) => {
-  let fieldValue = draftData[sectionId][field.name]
-  const transFieldName = transformedFieldName
-    ? transformedFieldName
-    : field.name
+export const nestedRadioFieldTransformer =
+  (nestedTransformer: IFormFieldMutationMapFunction) =>
+  (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: string,
+    field: IFormField,
+    nestedField?: IFormField
+  ) => {
+    const fieldValueObj = draftData[sectionId][field.name] as IFormSectionData
+    const partialDraftData: IFormData = {}
 
-  if (!fieldValue) {
-    return
-  } else {
-    if (transformeValueArrayToBoolean) {
-      const valueArray = fieldValue as IFormFieldValue[]
-      fieldValue = valueArray.length > 0
-    }
-
-    if (!transformedData[sectionId][transformedArrayName]) {
-      transformedData[sectionId][transformedArrayName] = []
-    }
-
-    const transformedArray: TransformedData[] =
-      transformedData[sectionId][transformedArrayName]
-
-    let transformedField = transformedArray.find(transField => {
-      if (extraField) {
-        return (
-          transField[extraField] && transField[extraField] === field.extraValue
-        )
-      }
-      return (
-        !isCaregiver &&
-        transField[transFieldName] &&
-        transField[transFieldName] === fieldValue
-      )
-    })
-
-    if (!transformedField) {
-      transformedField = {}
-      transformedField[transFieldName] = fieldValue
-
-      if (extraField) {
-        transformedField[extraField] = field.extraValue
-      }
-
-      transformedArray.push(transformedField)
+    if (!nestedField) {
+      const parentData: IFormSectionData = {}
+      parentData[field.name] = fieldValueObj.value as IFormSectionData
+      partialDraftData[sectionId] = parentData
     } else {
-      transformedField[transFieldName] = fieldValue
+      if (
+        nestedField.extraValue &&
+        nestedField.extraValue !== fieldValueObj.value
+      ) {
+        return
+      }
+      partialDraftData[sectionId] =
+        fieldValueObj.nestedFields as IFormSectionData
+    }
+    nestedTransformer(
+      transformedData,
+      partialDraftData,
+      sectionId,
+      nestedField || field
+    )
+  }
+
+export const fieldToReasonsNotApplyingTransformer =
+  (
+    transformedArrayName: string,
+    transformedFieldName?: string,
+    extraField?: string,
+    transformeValueArrayToBoolean?: boolean,
+    isCaregiver?: boolean
+  ) =>
+  (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    let fieldValue = draftData[sectionId][field.name]
+    const transFieldName = transformedFieldName
+      ? transformedFieldName
+      : field.name
+
+    if (!fieldValue) {
+      return
+    } else {
+      if (transformeValueArrayToBoolean) {
+        const valueArray = fieldValue as IFormFieldValue[]
+        fieldValue = valueArray.length > 0
+      }
+
+      if (!transformedData[sectionId][transformedArrayName]) {
+        transformedData[sectionId][transformedArrayName] = []
+      }
+
+      const transformedArray: TransformedData[] =
+        transformedData[sectionId][transformedArrayName]
+
+      let transformedField = transformedArray.find((transField) => {
+        if (extraField) {
+          return (
+            transField[extraField] &&
+            transField[extraField] === field.extraValue
+          )
+        }
+        return (
+          !isCaregiver &&
+          transField[transFieldName] &&
+          transField[transFieldName] === fieldValue
+        )
+      })
+
+      if (!transformedField) {
+        transformedField = {}
+        transformedField[transFieldName] = fieldValue
+
+        if (extraField) {
+          transformedField[extraField] = field.extraValue
+        }
+
+        transformedArray.push(transformedField)
+      } else {
+        transformedField[transFieldName] = fieldValue
+      }
     }
   }
-}
 
 function formatDate(dateString: string) {
   const [year, month, day] = dateString.split('-')
@@ -526,18 +538,20 @@ function formatDate(dateString: string) {
   } else return null
 }
 
-export const longDateTransformer = (transformedFieldName?: string) => (
-  transformedData: TransformedData,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) => {
-  const fieldName = transformedFieldName || field.name
-  const sectionData = draftData[sectionId][field.name] as string
+export const longDateTransformer =
+  (transformedFieldName?: string) =>
+  (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    const fieldName = transformedFieldName || field.name
+    const sectionData = draftData[sectionId][field.name] as string
 
-  if (sectionData) {
-    transformedData[sectionId][fieldName] = formatDate(sectionData)
+    if (sectionData) {
+      transformedData[sectionId][fieldName] = formatDate(sectionData)
+    }
+
+    return transformedData
   }
-
-  return transformedData
-}

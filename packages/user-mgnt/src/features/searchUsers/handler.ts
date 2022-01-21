@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from 'hapi'
+import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 
 import User, { IUserModel } from '@user-mgnt/model/user'
@@ -83,13 +83,7 @@ export const searchSchema = Joi.object({
   status: Joi.string().optional(),
   primaryOfficeId: Joi.string().optional(),
   locationId: Joi.string().optional(),
-  count: Joi.number()
-    .min(0)
-    .required(),
-  skip: Joi.number()
-    .min(0)
-    .required(),
-  sortOrder: Joi.string()
-    .only(['asc', 'desc'])
-    .required()
+  count: Joi.number().min(0).required(),
+  skip: Joi.number().min(0).required(),
+  sortOrder: Joi.string().valid('asc', 'desc').required()
 })

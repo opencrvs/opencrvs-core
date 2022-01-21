@@ -13,7 +13,6 @@ import {
   createTestApp,
   flushPromises,
   userDetails,
-  goToEndOfForm,
   goToDocumentsSection,
   goToFatherSection,
   goToMotherSection,
@@ -108,10 +107,7 @@ describe('when user has starts a new application', () => {
       })
       describe('when user clicks continue without choosing point of contact', () => {
         it('prevents from continuing and show radio button error', async () => {
-          app
-            .find('#next_section')
-            .hostNodes()
-            .simulate('click')
+          app.find('#next_section').hostNodes().simulate('click')
           await waitForElement(app, '#contactPoint_error')
           expect(app.find('#contactPoint_error').hostNodes()).toHaveLength(1)
         })
@@ -135,10 +131,7 @@ describe('when user has starts a new application', () => {
               }
             })
 
-          app
-            .find('#next_section')
-            .hostNodes()
-            .simulate('click')
+          app.find('#next_section').hostNodes().simulate('click')
           await waitForElement(
             app,
             'div[id="contactPoint.nestedFields.registrationPhone_error"]'
@@ -189,10 +182,7 @@ describe('when user has starts a new application', () => {
               value: '01999999999'
             }
           })
-        app
-          .find('#next_section')
-          .hostNodes()
-          .simulate('click')
+        app.find('#next_section').hostNodes().simulate('click')
         await waitForElement(app, '#form_section_id_child-view-group')
       })
 
@@ -206,10 +196,7 @@ describe('when user has starts a new application', () => {
               target: { id: 'firstNames', value: 'hello' }
             })
 
-          app
-            .find('#next_section')
-            .hostNodes()
-            .simulate('click')
+          app.find('#next_section').hostNodes().simulate('click')
           await flushPromises()
         })
         it('stores the value to a new draft and move to next section', () => {
@@ -222,19 +209,13 @@ describe('when user has starts a new application', () => {
           expect(window.location.href).toContain('mother')
         })
         it('redirect to home when pressed save and exit button', async () => {
-          app
-            .find('#save_draft')
-            .hostNodes()
-            .simulate('click')
+          app.find('#save_draft').hostNodes().simulate('click')
           await flushPromises()
           app.update()
           expect(window.location.href).toContain('/')
         })
         it('check toggle menu toggle button handler', async () => {
-          app
-            .find('#eventToggleMenuToggleButton')
-            .hostNodes()
-            .simulate('click')
+          app.find('#eventToggleMenuToggleButton').hostNodes().simulate('click')
           await flushPromises()
           app.update()
           expect(
@@ -242,17 +223,11 @@ describe('when user has starts a new application', () => {
           ).toEqual(1)
         })
         it('check toggle menu item handler', async () => {
-          app
-            .find('#eventToggleMenuToggleButton')
-            .hostNodes()
-            .simulate('click')
+          app.find('#eventToggleMenuToggleButton').hostNodes().simulate('click')
           await flushPromises()
           app.update()
 
-          app
-            .find('#eventToggleMenuItem0')
-            .hostNodes()
-            .simulate('click')
+          app.find('#eventToggleMenuItem0').hostNodes().simulate('click')
           await flushPromises()
           app.update()
 
@@ -286,22 +261,13 @@ describe('when user has starts a new application', () => {
 
         describe('when user goes to documents page', () => {
           beforeEach(async () => {
-            app
-              .find('#next_section')
-              .hostNodes()
-              .simulate('click')
+            app.find('#next_section').hostNodes().simulate('click')
             await flushPromises()
             app.update()
-            app
-              .find('#next_section')
-              .hostNodes()
-              .simulate('click')
+            app.find('#next_section').hostNodes().simulate('click')
             await flushPromises()
             app.update()
-            app
-              .find('#next_section')
-              .hostNodes()
-              .simulate('click')
+            app.find('#next_section').hostNodes().simulate('click')
             await flushPromises()
             app.update()
           })
@@ -350,13 +316,9 @@ describe('when user has starts a new application', () => {
             await flushPromises()
             app.update()
 
-            expect(
-              app
-                .find('#upload-error')
-                .hostNodes()
-                .first()
-                .text()
-            ).toBe('')
+            expect(app.find('#upload-error').hostNodes().first().text()).toBe(
+              ''
+            )
           })
 
           it('Error while uploading invalid file', async () => {
@@ -383,13 +345,7 @@ describe('when user has starts a new application', () => {
               })
             await flushPromises()
             app.update()
-            expect(
-              app
-                .find('#upload-error')
-                .hostNodes()
-                .first()
-                .text()
-            ).toBe(
+            expect(app.find('#upload-error').hostNodes().first().text()).toBe(
               'File format not supported. Please attach a png, jpf or pdf (max 5mb)'
             )
           })
@@ -399,10 +355,7 @@ describe('when user has starts a new application', () => {
       describe('when user goes to preview page', () => {
         beforeEach(async () => {
           await goToSection(app, 4)
-          app
-            .find('#btn_change_child_familyName')
-            .hostNodes()
-            .simulate('click')
+          app.find('#btn_change_child_familyName').hostNodes().simulate('click')
         })
 
         it('renders preview page', async () => {

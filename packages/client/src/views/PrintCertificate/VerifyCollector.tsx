@@ -176,7 +176,7 @@ const mapStateToProps = (
   const { registrationId } = ownProps.match.params
 
   const application = state.applicationsState.applications.find(
-    draft => draft.id === registrationId
+    (draft) => draft.id === registrationId
   ) as IPrintableApplication
 
   return {
@@ -185,12 +185,9 @@ const mapStateToProps = (
   }
 }
 
-export const VerifyCollector = connect(
-  mapStateToProps,
-  {
-    goBack,
-    modifyApplication,
-    goToReviewCertificate,
-    goToPrintCertificatePayment
-  }
-)(injectIntl(VerifyCollectorComponent))
+export const VerifyCollector = connect(mapStateToProps, {
+  goBack,
+  modifyApplication,
+  goToReviewCertificate,
+  goToPrintCertificatePayment
+})(injectIntl(VerifyCollectorComponent))

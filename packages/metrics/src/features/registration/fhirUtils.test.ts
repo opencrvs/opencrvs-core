@@ -12,6 +12,7 @@
 import {
   getSectionBySectionCode,
   getRegLastLocation,
+  getRegLastOffice,
   getResourceByType,
   getObservationValueByCode,
   getTimeLoggedFromTask,
@@ -200,8 +201,7 @@ describe('fhirUtils', () => {
             ],
             extension: [
               {
-                url:
-                  'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+                url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
                 extension: [
                   {
                     url: 'code',
@@ -353,8 +353,7 @@ describe('fhirUtils', () => {
             ],
             extension: [
               {
-                url:
-                  'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+                url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
                 extension: [
                   {
                     url: 'code',
@@ -386,6 +385,7 @@ describe('fhirUtils', () => {
     }
 
     expect(() => getRegLastLocation(bundle)).toThrow()
+    expect(() => getRegLastOffice(bundle)).toThrow()
   })
   it('returns false if no resource is provided in the bundle to get composition', () => {
     const bundle = {
@@ -855,8 +855,7 @@ describe('fhirUtils', () => {
           valueString: ''
         },
         {
-          url:
-            'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
           valueString: '+8801916543214'
         },
         {
@@ -960,8 +959,7 @@ describe('fhirUtils', () => {
           valueString: ''
         },
         {
-          url:
-            'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
           valueString: '+8801916543214'
         },
         {

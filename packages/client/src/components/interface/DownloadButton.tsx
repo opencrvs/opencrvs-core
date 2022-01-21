@@ -58,6 +58,11 @@ const DownloadAction = styled(TertiaryButton)<{
   isFullHeight?: boolean
 }>`
   ${({ isFullHeight }) => isFullHeight && `height: 100%;`}
+  border-radius: 50%;
+  height: 40px;
+  & > div {
+    padding: 0px 0px;
+  }
 `
 
 function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
@@ -66,7 +71,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
   function initiateDownload() {
     const { event, compositionId, action } = props.downloadConfigs
     const downloadableApplication = makeApplicationReadyToDownload(
-      (event.toLowerCase() as unknown) as Event,
+      event.toLowerCase() as unknown as Event,
       compositionId,
       action
     )
@@ -96,7 +101,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
         <DownloadAction
           isFullHeight={false}
           id={`${id}-icon`}
-          onClick={e => {
+          onClick={(e) => {
             initiateDownload()
             e.stopPropagation()
           }}
@@ -110,7 +115,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
     <DownloadAction
       isFullHeight={false}
       id={`${id}-icon`}
-      onClick={e => {
+      onClick={(e) => {
         initiateDownload()
         e.stopPropagation()
       }}
@@ -120,7 +125,6 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
   )
 }
 
-export const DownloadButton = connect(
-  null,
-  { downloadApplication }
-)(injectIntl(withApollo(DownloadButtonComponent)))
+export const DownloadButton = connect(null, { downloadApplication })(
+  injectIntl(withApollo(DownloadButtonComponent))
+)

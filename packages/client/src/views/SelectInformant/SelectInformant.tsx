@@ -14,11 +14,7 @@ import {
   PrimaryButton,
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
-import {
-  InputField,
-  IRadioOption as RadioComponentOption,
-  TextInput
-} from '@opencrvs/components/lib/forms'
+import { IRadioOption as RadioComponentOption } from '@opencrvs/components/lib/forms'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { BackArrow } from '@opencrvs/components/lib/icons'
 import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
@@ -39,11 +35,7 @@ import {
   getBirthSection,
   getDeathSection
 } from '@client/forms/register/application-selectors'
-import {
-  buttonMessages,
-  formMessages,
-  validationMessages
-} from '@client/i18n/messages'
+import { buttonMessages, formMessages } from '@client/i18n/messages'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { messages } from '@client/i18n/messages/views/selectInformant'
 import {
@@ -59,10 +51,8 @@ import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import {
   INFORMANT_FIELD_STRING,
-  PHONE_NO_FIELD_STRING,
   RADIO_BUTTON_LARGE_STRING
 } from '@client/utils/constants'
-import { phoneNumberFormat } from '@client/utils/validate'
 import * as React from 'react'
 import {
   injectIntl,
@@ -84,17 +74,6 @@ const Actions = styled.div`
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding-bottom: 16px;
-  }
-`
-
-const ChildContainer = styled.div`
-  margin-left: 18px;
-  padding-left: 33px;
-  border-left: 4px solid ${({ theme }) => theme.colors.copy};
-  padding-top: 0px !important;
-
-  > div {
-    padding: 16px 0;
   }
 `
 
@@ -332,8 +311,10 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
                     this.props.application.data[registrationSection.id] &&
                     this.props.application.data[registrationSection.id]
                       .applicant &&
-                    (this.props.application.data[registrationSection.id]
-                      .applicant as IFormSectionData).value) ||
+                    (
+                      this.props.application.data[registrationSection.id]
+                        .applicant as IFormSectionData
+                    ).value) ||
                   '',
                 nestedFields: {}
               }
@@ -395,11 +376,8 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       this.state.informant !== 'error' &&
       this.state.informant === INFORMANT.SOMEONE_ELSE
     ) {
-      const {
-        application,
-        goToDeathRegistration,
-        applicantsSection
-      } = this.props
+      const { application, goToDeathRegistration, applicantsSection } =
+        this.props
       this.props.modifyApplication({
         ...application,
         data: {
@@ -441,8 +419,10 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
                     this.props.application.data[registrationSection.id] &&
                     this.props.application.data[registrationSection.id]
                       .applicant &&
-                    (this.props.application.data[registrationSection.id]
-                      .applicant as IFormSectionData).value) ||
+                    (
+                      this.props.application.data[registrationSection.id]
+                        .applicant as IFormSectionData
+                    ).value) ||
                   '',
                 nestedFields:
                   (this.props.application &&
@@ -450,8 +430,10 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
                     this.props.application.data[registrationSection.id] &&
                     this.props.application.data[registrationSection.id]
                       .applicant &&
-                    (this.props.application.data[registrationSection.id]
-                      .applicant as IFormSectionData).nestedFields) ||
+                    (
+                      this.props.application.data[registrationSection.id]
+                        .applicant as IFormSectionData
+                    ).nestedFields) ||
                   {}
               }
             }
@@ -469,7 +451,7 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
     const event = this.props.location.pathname.includes(Event.BIRTH)
       ? Event.BIRTH
       : Event.DEATH
-    const infornantFields = setInformantFields(intl, event)
+    const informantFields = setInformantFields(intl, event)
 
     let titleMessage
     switch (event) {
@@ -515,26 +497,26 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
             </ErrorText>
           )}
           <Actions id="select_parent_informant">
-            {infornantFields.map((infornantField: IInformantField) => {
+            {informantFields.map((informantField: IInformantField) => {
               return (
                 <RadioButton
                   size={RADIO_BUTTON_LARGE_STRING}
-                  key={infornantField.id}
+                  key={informantField.id}
                   name={INFORMANT_FIELD_STRING}
-                  label={infornantField.option.label}
-                  value={infornantField.option.value}
-                  id={infornantField.id}
+                  label={informantField.option.label}
+                  value={informantField.option.value}
+                  id={informantField.id}
                   selected={
-                    this.state.informant === infornantField.option.value
-                      ? infornantField.option.value
+                    this.state.informant === informantField.option.value
+                      ? informantField.option.value
                       : ''
                   }
                   onChange={() =>
                     this.setState({
-                      informant: infornantField.option.value as string
+                      informant: informantField.option.value as string
                     })
                   }
-                  disabled={infornantField.disabled}
+                  disabled={informantField.disabled}
                 />
               )
             })}
@@ -563,18 +545,15 @@ const mapStateToProps = (
 }
 
 export const SelectInformant = withRouter(
-  connect(
-    mapStateToProps,
-    {
-      goBack,
-      goToHome,
-      goToBirthContactPoint,
-      goToDeathContactPoint,
-      goToBirthRegistrationAsParent,
-      goToPrimaryApplicant,
-      goToDeathRegistration,
-      modifyApplication,
-      deleteApplication
-    }
-  )(injectIntl(SelectInformantView))
+  connect(mapStateToProps, {
+    goBack,
+    goToHome,
+    goToBirthContactPoint,
+    goToDeathContactPoint,
+    goToBirthRegistrationAsParent,
+    goToPrimaryApplicant,
+    goToDeathRegistration,
+    modifyApplication,
+    deleteApplication
+  })(injectIntl(SelectInformantView))
 )

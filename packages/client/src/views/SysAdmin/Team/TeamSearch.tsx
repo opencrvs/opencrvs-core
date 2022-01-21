@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { messages } from '@client/i18n/messages/views/performance'
+import { messages as messagesSearch } from '@client/i18n/messages/views/search'
 import { goToTeamUserList } from '@client/navigation'
 import { IOfflineData, ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
@@ -42,11 +43,10 @@ interface State {
 class TeamSearchComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
+    const historyState = props.history.location.state as any
     this.state = {
       selectedLocation:
-        (props.history.location.state &&
-          props.history.location.state.selectedLocation) ||
-        undefined
+        (historyState && historyState.selectedLocation) || undefined
     }
   }
 
@@ -81,6 +81,7 @@ class TeamSearchComponent extends React.Component<Props, State> {
           )}
           searchHandler={this.searchHandler}
           searchButtonHandler={this.searchButtonHandler}
+          errorMessage={intl.formatMessage(messagesSearch.locationNotFound)}
         />
       </SysAdminContentWrapper>
     )
@@ -93,9 +94,6 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const TeamSearch = connect(
-  mapStateToProps,
-  {
-    goToTeamUserList
-  }
-)(injectIntl(TeamSearchComponent))
+export const TeamSearch = connect(mapStateToProps, {
+  goToTeamUserList
+})(injectIntl(TeamSearchComponent))

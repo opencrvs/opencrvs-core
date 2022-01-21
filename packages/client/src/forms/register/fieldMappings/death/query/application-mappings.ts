@@ -19,7 +19,7 @@ export const phoneNumberToFieldTransformer = (
   field: IFormField
 ) => {
   if (queryData[sectionId] && queryData[sectionId].telecom) {
-    ;(queryData[sectionId].telecom as GQLContactPoint[]).map(tel => {
+    ;(queryData[sectionId].telecom as GQLContactPoint[]).map((tel) => {
       if (tel.system === 'phone' && tel.value) {
         transformedData[sectionId][field.name] = tel.value
       }
@@ -43,6 +43,10 @@ export function getInformantSectionTransformer(
       relatedPerson: queryData[sectionId].id,
       individual: queryData[sectionId].individual.id
     }
+  }
+  // Getting Informant's relationship data
+  if (queryData[sectionId].relationship) {
+    transformedData[sectionId].relationship = queryData[sectionId].relationship
   }
   return transformedData
 }

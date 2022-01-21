@@ -11,7 +11,8 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IFieldAgentHomeMessages {
+interface IFieldAgentHomeMessages
+  extends Record<string | number | symbol, MessageDescriptor> {
   inProgressCount: MessageDescriptor
   sentForReviewCount: MessageDescriptor
   requireUpdates: MessageDescriptor
@@ -54,6 +55,5 @@ const messagesToDefine: IFieldAgentHomeMessages = {
   }
 }
 
-export const messages: IFieldAgentHomeMessages = defineMessages(
-  messagesToDefine
-)
+export const messages: IFieldAgentHomeMessages =
+  defineMessages(messagesToDefine)
