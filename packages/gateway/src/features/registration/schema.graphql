@@ -355,7 +355,7 @@ input CorrectionValueInput {
 }
 
 input CorrectionInput {
-  requester: RelatedPersonInput
+  requester: ID # -> Practitioner ID
   hasShowedVerifiedDocument: Boolean
   attestedAndCopied: Boolean
   noSupportingDocumentationRequired: Boolean

@@ -14,7 +14,7 @@ import { GQLResolver } from '@gateway/graphql/schema'
 import { hasScope } from '@gateway/features/user/utils'
 import { buildFHIRBundle } from '@gateway/features/ correction/fhir-builders'
 import { EVENT_TYPE } from '@gateway/features/fhir/constants'
-import { fetchFHIR } from '@gateway/features/fhir/utils'
+import { fetchFHIR, getIDFromResponse } from '@gateway/features/fhir/utils'
 
 export const resolvers: GQLResolver = {
   Mutation: {
@@ -26,6 +26,8 @@ export const resolvers: GQLResolver = {
           details,
           EVENT_TYPE.BIRTH
         )
+      } else {
+        throw new Error('User does not have a register scope')
       }
     },
     async requestDeathRegistrationCorrection(_, { id, details }, authHeader) {
@@ -36,6 +38,8 @@ export const resolvers: GQLResolver = {
           details,
           EVENT_TYPE.DEATH
         )
+      } else {
+        throw new Error('User does not have a register scope')
       }
     }
   }
@@ -48,7 +52,13 @@ async function requestEventRegistrationCorrection(
   eventType: EVENT_TYPE
 ) {
   const fhirBundle = await buildFHIRBundle(reg, eventType, authHeader)
-  await fetchFHIR('', authHeader, 'POST', JSON.stringify(fhirBundle))
-  // return the full composition
-  return fetchFHIR(`/Composition/${id}`, authHeader)
+  const res = await fetchFHIR(
+    '',
+    authHeader,
+    'POST',
+    JSON.stringify(fhirBundle)
+  )
+
+  // return composition-id
+  return getIDFromResponse(res)
 }

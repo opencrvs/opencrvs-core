@@ -101,6 +101,10 @@ export function createEncounterSection(refUuid: string, sectionCode: string) {
     sectionTitle = 'Birth encounter'
   } else if (sectionCode === DEATH_ENCOUNTER_CODE) {
     sectionTitle = 'Death encounter'
+  } else if (sectionCode === BIRTH_CORRECTION_ENCOUNTER_CODE) {
+    sectionTitle = 'Birth correction encounters'
+  } else if (sectionCode === DEATH_CORRECTION_ENCOUNTER_CODE) {
+    sectionTitle = 'Death correction encounters'
   } else {
     throw new Error(`Unknown section code ${sectionCode}`)
   }

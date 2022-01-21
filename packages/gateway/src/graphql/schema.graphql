@@ -1201,7 +1201,7 @@ input CertificateInput {
 }
 
 input CorrectionInput {
-  requester: RelatedPersonInput
+  requester: ID
   hasShowedVerifiedDocument: Boolean
   attestedAndCopied: Boolean
   noSupportingDocumentationRequired: Boolean

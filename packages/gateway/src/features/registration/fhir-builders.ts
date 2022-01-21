@@ -761,17 +761,7 @@ function createRegStatusCommentTimeStamp(
   resource.note[context._index.comments].time = fieldValue
 }
 
-function createActionTypesFromCorrectionValues(
-  resource: fhir.Task,
-  fieldValue: any[],
-  context: any
-) {
-  if (!resource.input) {
-    resource.input = []
-  }
-  if (!resource.output) {
-    resource.output = []
-  }
+function createActionTypesBuilder() {
   const actionType = {
     coding: [
       {
@@ -780,19 +770,80 @@ function createActionTypesFromCorrectionValues(
       }
     ]
   }
-  ;(fieldValue as any[]).forEach((correction) => {
-    resource.input?.push({
-      type: actionType,
-      valueId: `${context.event}.${correction.section}.${correction.fieldName}`,
-      valueString: correction.oldValue
-    })
-
-    resource.output?.push({
-      type: actionType,
-      valueId: `${context.event}.${correction.section}.${correction.fieldName}`,
-      valueString: correction.newValue
-    })
-  })
+  return {
+    section: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const task = selectOrCreateTaskRefResource(fhirBundle, context)
+      setObjectPropInResourceArray(
+        task,
+        'input',
+        fieldValue,
+        'valueCode',
+        context
+      )
+      setObjectPropInResourceArray(
+        task,
+        'output',
+        fieldValue,
+        'valueCode',
+        context
+      )
+    },
+    fieldName: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const task = selectOrCreateTaskRefResource(fhirBundle, context)
+      setObjectPropInResourceArray(
+        task,
+        'input',
+        fieldValue,
+        'valueId',
+        context
+      )
+      setObjectPropInResourceArray(
+        task,
+        'output',
+        fieldValue,
+        'valueId',
+        context
+      )
+    },
+    oldValue: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const task = selectOrCreateTaskRefResource(fhirBundle, context)
+      setObjectPropInResourceArray(task, 'input', actionType, 'type', context)
+      setObjectPropInResourceArray(
+        task,
+        'input',
+        fieldValue,
+        'valueString',
+        context
+      )
+    },
+    newValue: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const task = selectOrCreateTaskRefResource(fhirBundle, context)
+      setObjectPropInResourceArray(task, 'input', actionType, 'type', context)
+      setObjectPropInResourceArray(
+        task,
+        'input',
+        fieldValue,
+        'valueString',
+        context
+      )
+    }
+  }
 }
 
 export const builders: IFieldBuilders = {
@@ -1851,13 +1902,13 @@ export const builders: IFieldBuilders = {
     correction: {
       requester: (
         fhirBundle: ITemplatedBundle,
-        fieldValue: number,
+        fieldValue: string,
         context: any
       ) => {
         const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
         taskResource.requester = {
           agent: {
-            reference: fieldValue as unknown as string
+            reference: `Practitioner/${fieldValue}`
           }
         }
       },
@@ -2136,10 +2187,7 @@ export const builders: IFieldBuilders = {
               : DEATH_CORRECTION_ENCOUNTER_CODE
           )
       },
-      values: (fhirBundle: ITemplatedBundle, fieldValue: any, context) => {
-        const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-        createActionTypesFromCorrectionValues(taskResource, fieldValue, context)
-      },
+      values: createActionTypesBuilder(),
       data: (
         fhirBundle: ITemplatedBundle,
         fieldValue: string,

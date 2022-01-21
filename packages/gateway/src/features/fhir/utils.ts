@@ -802,7 +802,7 @@ export function selectOrCreateTaskRefResource(
 export function setObjectPropInResourceArray(
   resource: fhir.Resource,
   label: string,
-  value: string | string[],
+  value: string | string[] | object,
   propName: string,
   context: any
 ) {

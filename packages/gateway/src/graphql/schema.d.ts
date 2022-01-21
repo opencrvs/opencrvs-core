@@ -51,6 +51,7 @@ export interface GQLMutation {
   markBirthAsValidated?: string
   markBirthAsRegistered: GQLBirthRegistration
   markBirthAsCertified: string
+  requestBirthRegistrationCorrection: string
   markEventAsVoided: string
   notADuplicate: string
   createDeathRegistration: GQLCreatedIds
@@ -59,13 +60,13 @@ export interface GQLMutation {
   markDeathAsValidated?: string
   markDeathAsRegistered: GQLDeathRegistration
   markDeathAsCertified: string
+  requestDeathRegistrationCorrection: string
   createOrUpdateUser: GQLUser
   activateUser?: string
   changePassword?: string
   changeAvatar?: string
   auditUser?: string
   resendSMSInvite?: string
-  correctRecord?: string
 }
 
 export interface GQLDummy {
@@ -1109,6 +1110,17 @@ export interface GQLCertificateInput {
   data?: string
 }
 
+export interface GQLCorrectionInput {
+  requester?: string
+  hasShowedVerifiedDocument?: boolean
+  attestedAndCopied?: boolean
+  noSupportingDocumentationRequired?: boolean
+  payments?: Array<GQLPaymentInput | null>
+  values?: Array<GQLCorrectionValueInput | null>
+  location?: GQLLocationInput
+  data?: string
+}
+
 export interface GQLReasonsNotApplyingInput {
   primaryCaregiverType?: GQLPrimaryCaregiverType
   reasonNotApplying?: string
@@ -1163,6 +1175,13 @@ export interface GQLPaymentInput {
   amount?: number
   outcome?: GQLPaymentOutcomeType
   date?: GQLDate
+}
+
+export interface GQLCorrectionValueInput {
+  section?: string
+  fieldName?: string
+  oldValue?: string
+  newValue?: string
 }
 
 export const enum GQLPaymentType {
@@ -1922,6 +1941,22 @@ export interface MutationToMarkBirthAsCertifiedResolver<
   ): TResult
 }
 
+export interface MutationToRequestBirthRegistrationCorrectionArgs {
+  id: string
+  details: GQLBirthRegistrationInput
+}
+export interface MutationToRequestBirthRegistrationCorrectionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToRequestBirthRegistrationCorrectionArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface MutationToMarkEventAsVoidedArgs {
   id: string
   reason: string
@@ -2047,6 +2082,22 @@ export interface MutationToMarkDeathAsCertifiedResolver<
   ): TResult
 }
 
+export interface MutationToRequestDeathRegistrationCorrectionArgs {
+  id: string
+  details: GQLDeathRegistrationInput
+}
+export interface MutationToRequestDeathRegistrationCorrectionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToRequestDeathRegistrationCorrectionArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface MutationToCreateOrUpdateUserArgs {
   user: GQLUserInput
 }
@@ -2136,57 +2187,6 @@ export interface MutationToResendSMSInviteResolver<
   ): TResult
 }
 
-export interface GQLCorrectionValueInput {
-  section: string
-  fieldName: string
-  oldValue: string
-  newValue: string
-}
-
-export interface GQLCorrectionInput {
-  requester: GQLRelatedPersonInput
-  hasShowedVerifiedDocument: boolean
-  attestedAndCopied: boolean
-  noSupportingDocumentationRequired: boolean
-  payments: GQLPaymentInput[]
-  values: GQLCorrectionValueInput[]
-  location: GQLLocationInput
-  data: string
-}
-
-export interface MutationToRequestBirthRegistrationCorrectionResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: MutationToRequestBirthRegistrationCorrectionArgs,
-    context: any,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface MutationToRequestBirthRegistrationCorrectionArgs {
-  id: string
-  details: GQLBirthRegistrationInput
-}
-
-export interface MutationToRequestDeathRegistrationCorrectionResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: MutationToRequestDeathRegistrationCorrectionArgs,
-    context: any,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface MutationToRequestDeathRegistrationCorrectionArgs {
-  id: string
-  details: GQLDeathRegistrationInput
-}
 export interface GQLDummyTypeResolver<TParent = any> {
   dummy?: DummyToDummyResolver<TParent>
 }
