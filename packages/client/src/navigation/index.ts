@@ -50,7 +50,8 @@ import {
   WORKFLOW_STATUS,
   TEAM_USER_LIST,
   USER_PROFILE,
-  CONFIG
+  CONFIG,
+  CERTIFICATE_CORRECTION
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
@@ -325,6 +326,18 @@ export function goToPrintCertificate(
       registrationId: registrationId.toString(),
       eventType: event.toLowerCase().toString(),
       groupId: groupId || 'certCollector'
+    })
+  )
+}
+
+export function goToCertificateCorrection(
+  registrationId: string,
+  sectionId: string
+) {
+  return push(
+    formatUrl(CERTIFICATE_CORRECTION, {
+      registrationId: registrationId.toString(),
+      sectionId: sectionId.toString()
     })
   )
 }

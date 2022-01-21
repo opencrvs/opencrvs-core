@@ -63,6 +63,7 @@ import { Switch } from 'react-router'
 import { AppStore } from './store'
 import { ConfigHome } from './views/SysAdmin/Config/ConfigHome'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
+import { CorrectionForm } from './views/CorrectionForm/CorrectionForm'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -254,6 +255,10 @@ export class App extends React.Component<IAppProps> {
                                               routes.PRINT_CERTIFICATE_PAYMENT
                                             }
                                             component={Payment}
+                                          />
+                                          <ProtectedRoute
+                                            path={routes.CERTIFICATE_CORRECTION}
+                                            component={CorrectionForm}
                                           />
                                           <ProtectedRoute
                                             path={routes.SETTINGS}

@@ -36,6 +36,8 @@ export const REVIEW_EVENT_PARENT_FORM_PAGE =
 export const REVIEW_EVENT_PARENT_FORM_PAGE_GROUP =
   '/reviews/:applicationId/events/:event/parent/:pageId/group/:groupId'
 
+export const CERTIFICATE_CORRECTION = '/correction/:registrationId/:sectionId'
+
 export const SAVED_REGISTRATION = '/saved'
 export const REJECTED_REGISTRATION = '/rejected'
 export const SEARCH = '/search'
