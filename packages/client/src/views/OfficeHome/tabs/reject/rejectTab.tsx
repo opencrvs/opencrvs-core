@@ -18,11 +18,8 @@ import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { getScope } from '@client/profile/profileSelectors'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
-import styled, { ITheme } from '@client/styledComponents'
+import { ITheme } from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
-import { EVENT_STATUS } from '@client/views/RegistrationHome/RegistrationHome'
-import { RowHistoryView } from '@client/views/RegistrationHome/RowHistoryView'
-import { Duplicate, Validate } from '@opencrvs/components/lib/icons'
 import {
   ColumnContentAlignment,
   GridTable,
@@ -34,8 +31,11 @@ import moment from 'moment'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import ReactTooltip from 'react-tooltip'
+import { withTheme } from 'styled-components'
+import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
+import { RowHistoryView } from '@client/views/OfficeHome/RowHistoryView'
 import {
+  buttonMessages,
   constantsMessages,
   dynamicConstantsMessages
 } from '@client/i18n/messages'
@@ -43,14 +43,9 @@ import { messages } from '@client/i18n/messages/views/registrarHome'
 import { IApplication, DOWNLOAD_STATUS } from '@client/applications'
 import { Action } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
-import { withTheme } from 'styled-components'
-import { LoadingIndicator } from '@client/views/RegistrationHome/LoadingIndicator'
 import { formattedDuration } from '@client/utils/date-formatting'
 
-const ToolTipContainer = styled.span`
-  text-align: center;
-`
-interface IBaseReviewTabProps {
+interface IBaseRejectTabProps {
   theme: ITheme
   scope: Scope | null
   goToPage: typeof goToPage
@@ -68,22 +63,26 @@ interface IBaseReviewTabProps {
   error?: boolean
 }
 
-interface IReviewTabState {
+interface IRejectTabState {
   width: number
 }
 
-type IReviewTabProps = IntlShapeProps & IBaseReviewTabProps
+type IRejectTabProps = IntlShapeProps & IBaseRejectTabProps
 
-class ReviewTabComponent extends React.Component<
-  IReviewTabProps,
-  IReviewTabState
+class RejectTabComponent extends React.Component<
+  IRejectTabProps,
+  IRejectTabState
 > {
   pageSize = 10
-  constructor(props: IReviewTabProps) {
+  constructor(props: IRejectTabProps) {
     super(props)
     this.state = {
       width: window.innerWidth
     }
+  }
+
+  userHasRegisterScope() {
+    return this.props.scope && this.props.scope.includes('register')
   }
 
   componentDidMount() {
@@ -104,11 +103,56 @@ class ReviewTabComponent extends React.Component<
       : false
   }
 
-  userHasRegisterScope() {
-    return this.props.scope && this.props.scope.includes('register')
+  getColumns = () => {
+    if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+      return [
+        {
+          label: this.props.intl.formatMessage(constantsMessages.type),
+          width: 14,
+          key: 'event'
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.name),
+          width: 23,
+          key: 'name'
+        },
+        {
+          label: this.props.intl.formatMessage(
+            constantsMessages.applicantContactNumber
+          ),
+          width: 21,
+          key: 'contactNumber'
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.sentOn),
+          width: 22,
+          key: 'dateOfRejection'
+        },
+        {
+          label: this.props.intl.formatMessage(messages.listItemAction),
+          width: 20,
+          key: 'actions',
+          isActionColumn: true,
+          alignment: ColumnContentAlignment.CENTER
+        }
+      ]
+    } else {
+      return [
+        {
+          label: this.props.intl.formatMessage(constantsMessages.type),
+          width: 30,
+          key: 'event'
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.name),
+          width: 70,
+          key: 'name'
+        }
+      ]
+    }
   }
 
-  transformDeclaredContent = (data: GQLEventSearchResultSet) => {
+  transformRejectedContent = (data: GQLEventSearchResultSet) => {
     const { intl } = this.props
     if (!data || !data.results) {
       return []
@@ -121,52 +165,30 @@ class ReviewTabComponent extends React.Component<
       )
       const downloadStatus =
         (foundApplication && foundApplication.downloadStatus) || undefined
-      let icon: JSX.Element = <div />
 
-      if (reg.duplicates && reg.duplicates.length > 0) {
-        if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
-          actions.push({
-            actionComponent: (
-              <DownloadButton
-                downloadConfigs={{
-                  event: reg.event,
-                  compositionId: reg.id,
-                  action: Action.LOAD_REVIEW_APPLICATION
-                }}
-                key={`DownloadButton-${index}`}
-                status={downloadStatus as DOWNLOAD_STATUS}
-              />
-            )
-          })
-        } else {
+      if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
+        actions.push({
+          actionComponent: (
+            <DownloadButton
+              downloadConfigs={{
+                event: reg.event,
+                compositionId: reg.id,
+                action: Action.LOAD_REVIEW_APPLICATION
+              }}
+              key={`DownloadButton-${index}`}
+              status={downloadStatus as DOWNLOAD_STATUS}
+            />
+          )
+        })
+      } else {
+        if (reg.duplicates && reg.duplicates.length > 0) {
           actions.push({
             label: this.props.intl.formatMessage(constantsMessages.review),
             handler: () => this.props.goToReviewDuplicate(reg.id)
           })
-        }
-
-        icon = <Duplicate />
-      } else {
-        if (reg.declarationStatus === EVENT_STATUS.VALIDATED) {
-          icon = <Validate data-tip data-for="validateTooltip" />
-        }
-        if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
-          actions.push({
-            actionComponent: (
-              <DownloadButton
-                downloadConfigs={{
-                  event: reg.event,
-                  compositionId: reg.id,
-                  action: Action.LOAD_REVIEW_APPLICATION
-                }}
-                key={`DownloadButton-${index}`}
-                status={downloadStatus as DOWNLOAD_STATUS}
-              />
-            )
-          })
         } else {
           actions.push({
-            label: this.props.intl.formatMessage(constantsMessages.review),
+            label: this.props.intl.formatMessage(buttonMessages.update),
             handler: () =>
               this.props.goToPage(
                 REVIEW_EVENT_PARENT_FORM_PAGE,
@@ -186,16 +208,16 @@ class ReviewTabComponent extends React.Component<
       return {
         ...reg,
         event,
-        eventTimeElapsed:
-          (reg.dateOfEvent &&
+        dateOfRejection:
+          (reg.modifiedAt &&
             formattedDuration(
-              moment(reg.dateOfEvent.toString(), 'YYYY-MM-DD')
+              moment(
+                moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
+                'YYYY-MM-DD HH:mm:ss'
+              )
             )) ||
           '',
-        applicationTimeElapsed:
-          (reg.createdAt && formattedDuration(moment(reg.createdAt))) || '',
         actions,
-        icon,
         rowClickHandler: [
           {
             label: 'rowClickHandler',
@@ -204,66 +226,6 @@ class ReviewTabComponent extends React.Component<
         ]
       }
     })
-  }
-
-  getColumns = () => {
-    if (this.state.width > this.props.theme.grid.breakpoints.lg) {
-      return [
-        {
-          label: this.props.intl.formatMessage(constantsMessages.type),
-          width: 14,
-          key: 'event'
-        },
-        {
-          label: this.props.intl.formatMessage(constantsMessages.name),
-          width: 22,
-          key: 'name'
-        },
-        {
-          label: this.props.intl.formatMessage(
-            messages.listItemApplicationDate
-          ),
-          width: 19,
-          key: 'applicationTimeElapsed'
-        },
-        {
-          label: this.props.intl.formatMessage(constantsMessages.eventDate),
-          width: 19,
-          key: 'eventTimeElapsed'
-        },
-        {
-          width: 6,
-          key: 'icons',
-          isIconColumn: true
-        },
-        {
-          label: this.props.intl.formatMessage(messages.listItemAction),
-          width: 20,
-          key: 'actions',
-          isActionColumn: true,
-          alignment: ColumnContentAlignment.CENTER
-        }
-      ]
-    } else {
-      return [
-        {
-          label: this.props.intl.formatMessage(constantsMessages.type),
-          width: 30,
-          key: 'event'
-        },
-        {
-          label: this.props.intl.formatMessage(constantsMessages.name),
-          width: 50,
-          key: 'name'
-        },
-        {
-          width: 20,
-          key: 'icons',
-          isIconColumn: true,
-          alignment: ColumnContentAlignment.RIGHT
-        }
-      ]
-    }
   }
 
   renderExpandedComponent = (itemId: string) => {
@@ -279,15 +241,8 @@ class ReviewTabComponent extends React.Component<
 
     return (
       <HomeContent>
-        <ReactTooltip id="validateTooltip">
-          <ToolTipContainer>
-            {this.props.intl.formatMessage(
-              messages.validatedApplicationTooltipForRegistrar
-            )}
-          </ToolTipContainer>
-        </ReactTooltip>
         <GridTable
-          content={this.transformDeclaredContent(data)}
+          content={this.transformRejectedContent(data)}
           columns={this.getColumns()}
           renderExpandedComponent={this.renderExpandedComponent}
           noResultText={intl.formatMessage(constantsMessages.noResults)}
@@ -317,8 +272,8 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const ReviewTab = connect(mapStateToProps, {
+export const RejectTab = connect(mapStateToProps, {
   goToPage,
   goToReviewDuplicate,
   goToApplicationDetails
-})(injectIntl(withTheme(ReviewTabComponent)))
+})(injectIntl(withTheme(RejectTabComponent)))

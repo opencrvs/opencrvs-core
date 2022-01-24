@@ -27,8 +27,8 @@ import { messages } from '@client/i18n/messages/views/registrarHome'
 import moment from 'moment'
 import { connect } from 'react-redux'
 import { goToPage, goToApplicationDetails } from '@client/navigation'
-import { RowHistoryView } from '@client/views/RegistrationHome/RowHistoryView'
-import { LoadingIndicator } from '@client/views/RegistrationHome/LoadingIndicator'
+import { RowHistoryView } from '@client/views/OfficeHome/RowHistoryView'
+import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { formattedDuration } from '@client/utils/date-formatting'
 
 const { useState, useEffect } = React

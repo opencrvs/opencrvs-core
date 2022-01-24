@@ -24,7 +24,7 @@ import { checkAuth } from '@client/profile/profileActions'
 import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { GridTable } from '@opencrvs/components/lib/interface'
-import { RowHistoryView } from '@client/views/RegistrationHome/RowHistoryView'
+import { RowHistoryView } from '@client/views/OfficeHome/RowHistoryView'
 import { History } from 'history'
 
 const EVENT_CREATION_TIME = 1583322631424

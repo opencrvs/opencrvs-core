@@ -12,35 +12,31 @@
 import {
   DOWNLOAD_STATUS,
   makeApplicationReadyToDownload,
-  storeApplication,
-  modifyApplication
+  storeApplication
 } from '@client/applications'
 import { Action, Event } from '@client/forms'
 import { checkAuth } from '@client/profile/profileActions'
 import { queries } from '@client/profile/queries'
+import { storage } from '@client/storage'
 import { createStore } from '@client/store'
 import {
   createTestComponent,
   createTestComponentWithApolloClient,
   mockUserResponse,
-  resizeWindow
+  resizeWindow,
+  registrationClerkScopeToken
 } from '@client/tests/util'
-import { waitForElement, waitFor } from '@client/tests/wait-for-element'
+import { waitForElement } from '@client/tests/wait-for-element'
 import { createClient } from '@client/utils/apolloClient'
-import { REGISTRATION_HOME_QUERY } from '@client/views/RegistrationHome/queries'
-import {
-  RegistrationHome,
-  EVENT_STATUS
-} from '@client/views/RegistrationHome/RegistrationHome'
-import { Validate } from '@opencrvs/components/lib/icons'
+import { FETCH_REGISTRATION_BY_COMPOSITION } from '@client/views/OfficeHome/queries'
+import { RegistrationHome } from '@client/views/OfficeHome/OfficeHome'
 import { GridTable } from '@opencrvs/components/lib/interface'
-import ApolloClient from 'apollo-client'
 import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
 import moment from 'moment'
 import * as React from 'react'
 import { Store } from 'redux'
-import { ReviewTab } from './reviewTab'
+import { RejectTab } from './rejectTab'
 import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
@@ -50,6 +46,9 @@ import { formattedDuration } from '@client/utils/date-formatting'
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
 const getItem = window.localStorage.getItem as jest.Mock
+
+const mockFetchUserDetails = jest.fn()
+const mockListSyncController = jest.fn()
 
 const nameObj = {
   data: {
@@ -68,13 +67,11 @@ const nameObj = {
   }
 }
 
-const mockListSyncController = jest.fn()
-
-const mockSearchData = {
+const mockUserData = {
   id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
   type: 'Birth',
   registration: {
-    status: 'DECLARED',
+    status: 'REJECTED',
     contactNumber: '01622688231',
     trackingId: 'BW0UTHR',
     registrationNumber: null,
@@ -141,141 +138,115 @@ const mockSearchData = {
   deceasedName: null,
   createdAt: '2018-05-23T14:44:58+02:00'
 }
-const searchData: any = []
+const userData: any = []
 for (let i = 0; i < 14; i++) {
-  searchData.push(mockSearchData)
+  userData.push(mockUserData)
 }
 merge(mockUserResponse, nameObj)
+mockFetchUserDetails.mockReturnValue(mockUserResponse)
+queries.fetchUserDetails = mockFetchUserDetails
 
-const mockReviewTabData = {
-  totalItems: 2,
-  results: [
-    {
-      id: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
-      type: 'Birth',
-      operationHistories: [
-        {
-          operationType: 'DECLARED',
-          operatedOn: new Date(1544188309380).toISOString(),
-          operatorOfficeName: 'Baniajan Union Parishad',
-          operatorRole: 'FIELD_AGENT',
-          operatorName: [
-            {
-              familyName: 'Al Hasan',
-              firstNames: 'Shakib',
-              use: 'en'
-            },
-            {
-              familyName: null,
-              firstNames: '',
-              use: 'bn'
-            }
-          ],
-          operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ']
-        }
-      ],
-      registration: {
-        status: 'DECLARED',
-        contactNumber: '01622688231',
-        trackingId: 'BW0UTHR',
-        registrationNumber: undefined,
-        eventLocationId: undefined,
-        registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
-        createdAt: '1544188309380',
-        modifiedAt: '1544188309380'
-      },
-      dateOfBirth: '2010-10-10',
-      childName: [
-        {
-          firstNames: 'Iliyas',
-          familyName: 'Khan',
-          use: 'en'
-        },
-        {
-          firstNames: 'ইলিয়াস',
-          familyName: 'খান',
-          use: 'bn'
-        }
-      ]
-    } as GQLBirthEventSearchSet,
-    {
-      id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-      type: 'Death',
-      registration: {
-        status: 'VALIDATED',
-        trackingId: 'DW0UTHR',
-        registrationNumber: undefined,
-        eventLocationId: undefined,
-        contactNumber: undefined,
-        duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
-        registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
-        createdAt: '1544188309380',
-        modifiedAt: '1544188309380'
-      },
-      dateOfDeath: '2007-01-01',
-      deceasedName: [
-        {
-          firstNames: 'Iliyas',
-          familyName: 'Khan',
-          use: 'en'
-        },
-        {
-          firstNames: 'ইলিয়াস',
-          familyName: 'খান',
-          use: 'bn'
-        }
-      ]
-    } as GQLDeathEventSearchSet
-  ]
-}
+storage.getItem = jest.fn()
+storage.setItem = jest.fn()
 
-describe('RegistrationHome sent for review tab related tests', () => {
-  let store: ReturnType<typeof createStore>['store']
-  let history: ReturnType<typeof createStore>['history']
-  let client: ApolloClient<{}>
+describe('RegistrationHome sent for update tab related tests', () => {
+  const { store, history } = createStore()
+  const client = createClient(store)
 
-  beforeEach(async () => {
-    ;(queries.fetchUserDetails as jest.Mock).mockReturnValue(mockUserResponse)
-    const createdStore = createStore()
-    store = createdStore.store
-    history = createdStore.history
-
-    client = createClient(store)
-
-    getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+  beforeAll(async () => {
+    getItem.mockReturnValue(registrationClerkScopeToken)
+    await store.dispatch(checkAuth({ '?token': registrationClerkScopeToken }))
   })
 
-  it('renders all items returned from graphql query in ready for review', async () => {
+  it('renders all items returned from graphql query in sent for update tab', async () => {
     const TIME_STAMP = '1544188309380'
-    Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <ReviewTab
+      <RejectTab
         registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         queryData={{
-          data: mockReviewTabData
+          data: {
+            totalItems: 2,
+            results: [
+              {
+                id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                type: 'Birth',
+                registration: {
+                  status: 'REJECTED',
+                  contactNumber: '01622688231',
+                  trackingId: 'BW0UTHR',
+                  registrationNumber: undefined,
+                  eventLocationId: undefined,
+                  registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
+                  duplicates: [null],
+                  createdAt: '2018-05-23T14:44:58+02:00',
+                  modifiedAt: '2018-05-23T14:44:58+02:00'
+                },
+                dateOfBirth: '2010-10-10',
+                childName: [
+                  {
+                    firstNames: 'Iliyas',
+                    familyName: 'Khan',
+                    use: 'en'
+                  },
+                  {
+                    firstNames: 'ইলিয়াস',
+                    familyName: 'খান',
+                    use: 'bn'
+                  }
+                ]
+              } as GQLBirthEventSearchSet,
+              {
+                id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+                type: 'Death',
+                registration: {
+                  status: 'REJECTED',
+                  trackingId: 'DW0UTHR',
+                  registrationNumber: undefined,
+                  eventLocationId: undefined,
+                  contactNumber: '01622688231',
+                  duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
+                  registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
+                  createdAt: TIME_STAMP,
+                  modifiedAt: TIME_STAMP
+                },
+                dateOfDeath: '2007-01-01',
+                deceasedName: [
+                  {
+                    firstNames: 'Iliyas',
+                    familyName: 'Khan',
+                    use: 'en'
+                  },
+                  {
+                    firstNames: 'ইলিয়াস',
+                    familyName: 'খান',
+                    use: 'bn'
+                  }
+                ]
+              } as GQLDeathEventSearchSet
+            ]
+          }
         }}
       />,
       store
     )
 
-    const gridTable = await waitForElement(testComponent.component, GridTable)
-
-    const data = gridTable.prop('content')
-    const EXPECTED_DATE_OF_APPLICATION = formattedDuration(
-      moment(new Date(Number.parseInt(TIME_STAMP)))
+    const table = await waitForElement(testComponent.component, GridTable)
+    const data = table.prop('content')
+    const EXPECTED_DATE_OF_REJECTION = formattedDuration(
+      moment(
+        moment(TIME_STAMP, 'x').format('YYYY-MM-DD HH:mm:ss'),
+        'YYYY-MM-DD HH:mm:ss'
+      )
     )
 
     expect(data.length).toBe(2)
-    expect(data[0].id).toBe('9a55d213-ad9f-4dcd-9418-340f3a7f6269')
-    expect(data[0].eventTimeElapsed).toBe('8 years ago')
-    expect(data[0].applicationTimeElapsed).toBe(EXPECTED_DATE_OF_APPLICATION)
-    expect(data[0].name).toBe('Iliyas Khan')
-    expect(data[0].trackingId).toBe('BW0UTHR')
-    expect(data[0].event).toBe('Birth')
-    expect(data[0].actions).toBeDefined()
+    expect(data[1].id).toBe('bc09200d-0160-43b4-9e2b-5b9e90424e95')
+    expect(data[1].contactNumber).toBe('01622688231')
+    expect(data[1].dateOfRejection).toBe(EXPECTED_DATE_OF_REJECTION)
+    expect(data[1].event).toBe('Death')
+    expect(data[1].actions).toBeDefined()
   })
 
   it('returns an empty array incase of invalid graphql query response', async () => {
@@ -283,11 +254,11 @@ describe('RegistrationHome sent for review tab related tests', () => {
 
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <ReviewTab
+      <RejectTab
         registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         queryData={{
           data: {
-            totalItems: 12,
+            totalItems: 2,
             results: []
           }
         }}
@@ -295,17 +266,16 @@ describe('RegistrationHome sent for review tab related tests', () => {
       store
     )
 
-    const gridTable = await waitForElement(testComponent.component, GridTable)
-    const data = gridTable.prop('content')
+    const table = await waitForElement(testComponent.component, GridTable)
+
+    const data = table.prop('content')
     expect(data.length).toBe(0)
   })
 
-  it('should show pagination bar if pagination is used and items more than 11 in ReviewTab', async () => {
-    Date.now = jest.fn(() => 1554055200000)
-
+  it('should show pagination bar in sent for update tab if pagination is used and items more than 11', async () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <ReviewTab
+      <RejectTab
         registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         queryData={{
           data: {
@@ -318,12 +288,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
       store
     )
 
-    const pagination = await waitForElement(
-      testComponent.component,
-      '#pagination'
-    )
-
-    expect(pagination.hostNodes()).toHaveLength(1)
+    await waitForElement(testComponent.component, '#pagination')
 
     testComponent.component
       .find('#pagination button')
@@ -331,12 +296,11 @@ describe('RegistrationHome sent for review tab related tests', () => {
       .hostNodes()
       .simulate('click')
   })
-  it('should show loadmore button if loadmore is used and items more than 11 in ReviewTab', async () => {
-    Date.now = jest.fn(() => 1554055200000)
 
+  it('should show loadmore button in sent for update tab if loadmore is used and items more than 11', async () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <ReviewTab
+      <RejectTab
         registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         queryData={{
           data: {
@@ -349,12 +313,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
       store
     )
 
-    const loadmore = await waitForElement(
-      testComponent.component,
-      '#load_more_button'
-    )
-
-    expect(loadmore.hostNodes()).toHaveLength(1)
+    await waitForElement(testComponent.component, '#load_more_button')
 
     testComponent.component
       .find('#load_more_button')
@@ -363,12 +322,91 @@ describe('RegistrationHome sent for review tab related tests', () => {
       .simulate('click')
   })
 
-  it('renders expanded area for validated status', async () => {
+  it('renders expanded area for required updates', async () => {
     Date.now = jest.fn(() => 1554055200000)
+    const graphqlMock = [
+      {
+        request: {
+          query: FETCH_REGISTRATION_BY_COMPOSITION,
+          variables: {
+            id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+          }
+        },
+        result: {
+          data: {
+            fetchRegistration: {
+              id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+              registration: {
+                id: '345678',
+                type: 'BIRTH',
+                certificates: null,
+                status: [
+                  {
+                    id: '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
+                    timestamp: '2019-04-03T07:08:24.936Z',
+                    user: {
+                      id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                      name: [
+                        {
+                          use: 'en',
+                          firstNames: 'Mohammad',
+                          familyName: 'Ashraful'
+                        },
+                        {
+                          use: 'bn',
+                          firstNames: '',
+                          familyName: ''
+                        }
+                      ],
+                      role: 'LOCAL_REGISTRAR'
+                    },
+                    location: {
+                      id: '123',
+                      name: 'Kaliganj Union Sub Center',
+                      alias: ['']
+                    },
+                    office: {
+                      id: '123',
+                      name: 'Kaliganj Union Sub Center',
+                      alias: [''],
+                      address: {
+                        district: '7876',
+                        state: 'iuyiuy'
+                      }
+                    },
+                    type: 'REJECTED',
+                    comments: [
+                      {
+                        comment: 'reason=duplicate&comment=dup'
+                      }
+                    ]
+                  }
+                ],
+                contact: 'MOTHER',
+                contactPhoneNumber: '01622688231'
+              },
+              child: {
+                id: 'FAKE_ID',
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: 'Mushraful',
+                    familyName: 'Hoque'
+                  }
+                ],
+                birthDate: '01-01-1984'
+              },
+              deceased: null,
+              informant: null
+            }
+          }
+        }
+      }
+    ]
 
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <ReviewTab
+      <RejectTab
         registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         queryData={{
           data: {
@@ -378,7 +416,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
                 id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                 type: 'Birth',
                 registration: {
-                  status: 'DECLARED',
+                  status: 'REJECTED',
                   contactNumber: '01622688231',
                   trackingId: 'BW0UTHR',
                   registrationNumber: undefined,
@@ -388,6 +426,29 @@ describe('RegistrationHome sent for review tab related tests', () => {
                   createdAt: '2018-05-23T14:44:58+02:00',
                   modifiedAt: '2018-05-23T14:44:58+02:00'
                 },
+                operationHistories: [
+                  {
+                    operationType: 'REJECTED',
+                    operatedOn: '2019-12-12T15:24:53.586Z',
+                    operatorRole: 'LOCAL_REGISTRAR',
+                    operatorName: [
+                      {
+                        firstNames: 'Mohammad',
+                        familyName: 'Ashraful',
+                        use: 'en'
+                      },
+                      {
+                        firstNames: '',
+                        familyName: null,
+                        use: 'bn'
+                      }
+                    ],
+                    operatorOfficeName: 'Alokbali Union Parishad',
+                    operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ'],
+                    rejectReason: 'missing_supporting_doc',
+                    rejectComment: 'No supporting documents provided.'
+                  }
+                ],
                 dateOfBirth: '2010-10-10',
                 childName: [
                   {
@@ -406,146 +467,16 @@ describe('RegistrationHome sent for review tab related tests', () => {
                 id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
                 type: 'Death',
                 registration: {
-                  status: 'VALIDATED',
+                  status: 'REJECTED',
                   trackingId: 'DW0UTHR',
                   registrationNumber: undefined,
                   eventLocationId: undefined,
-                  contactNumber: undefined,
-                  duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
-                  registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
-                  createdAt: '2007-01-01',
-                  modifiedAt: '2007-01-01'
-                },
-                operationHistories: [
-                  {
-                    operationType: 'VALIDATED',
-                    operatedOn: '2019-12-12T15:23:21.280Z',
-                    operatorRole: 'REGISTRATION_AGENT',
-                    operatorName: [
-                      {
-                        firstNames: 'Tamim',
-                        familyName: 'Iqbal',
-                        use: 'en'
-                      },
-                      {
-                        firstNames: '',
-                        familyName: null,
-                        use: 'bn'
-                      }
-                    ],
-                    operatorOfficeName: 'Alokbali Union Parishad',
-                    operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ']
-                  }
-                ],
-                dateOfDeath: '2007-01-01',
-                deceasedName: [
-                  {
-                    firstNames: 'Iliyas',
-                    familyName: 'Khan',
-                    use: 'en'
-                  },
-                  {
-                    firstNames: 'ইলিয়াস',
-                    familyName: 'খান',
-                    use: 'bn'
-                  }
-                ]
-              } as GQLDeathEventSearchSet
-            ]
-          }
-        }}
-      />,
-      store
-    )
-
-    const gridTable = (
-      await waitForElement(testComponent.component, GridTable)
-    ).instance()
-
-    gridTable.toggleExpanded('bc09200d-0160-43b4-9e2b-5b9e90424e95')
-
-    const element = await waitForElement(
-      testComponent.component,
-      '#VALIDATED-0'
-    )
-
-    expect(element.hostNodes().length).toBe(1)
-  })
-
-  it('renders expanded area for declared status', async () => {
-    Date.now = jest.fn(() => 1554055200000)
-
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <ReviewTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
-        queryData={{
-          data: {
-            totalItems: 2,
-            results: [
-              {
-                id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                type: 'Birth',
-                registration: {
-                  status: 'DECLARED',
                   contactNumber: '01622688231',
-                  trackingId: 'BW0UTHR',
-                  registrationNumber: undefined,
-                  eventLocationId: undefined,
-                  registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
-                  duplicates: [null],
-                  createdAt: '2018-05-23T14:44:58+02:00',
-                  modifiedAt: '2018-05-23T14:44:58+02:00'
-                },
-                dateOfBirth: '2010-10-10',
-                childName: [
-                  {
-                    firstNames: 'Iliyas',
-                    familyName: 'Khan',
-                    use: 'en'
-                  },
-                  {
-                    firstNames: 'ইলিয়াস',
-                    familyName: 'খান',
-                    use: 'bn'
-                  }
-                ]
-              } as GQLBirthEventSearchSet,
-              {
-                id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                type: 'Death',
-                registration: {
-                  status: 'VALIDATED',
-                  trackingId: 'DW0UTHR',
-                  registrationNumber: undefined,
-                  eventLocationId: undefined,
-                  contactNumber: undefined,
                   duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
                   registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
                   createdAt: '2007-01-01',
                   modifiedAt: '2007-01-01'
                 },
-                operationHistories: [
-                  {
-                    operationType: 'DECLARED',
-                    operatedOn: '2019-12-12T15:23:21.280Z',
-                    operatorRole: 'FIELD_AGENT',
-                    operatorName: [
-                      {
-                        firstNames: 'Tamim',
-                        familyName: 'Iqbal',
-                        use: 'en'
-                      },
-                      {
-                        firstNames: '',
-                        familyName: null,
-                        use: 'bn'
-                      }
-                    ],
-                    operatorOfficeName: 'Alokbali Union Parishad',
-                    operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ']
-                  }
-                ],
                 dateOfDeath: '2007-01-01',
                 deceasedName: [
                   {
@@ -564,24 +495,34 @@ describe('RegistrationHome sent for review tab related tests', () => {
           }
         }}
       />,
-      store
+      store,
+      graphqlMock
     )
 
-    const instance = (
-      await waitForElement(testComponent.component, GridTable)
-    ).instance()
+    // wait for mocked data to load mockedProvider
+    await new Promise((resolve) => {
+      setTimeout(resolve, 200)
+    })
+    testComponent.component.update()
+    const instance = testComponent.component.find(GridTable).instance() as any
 
-    instance.toggleExpanded('bc09200d-0160-43b4-9e2b-5b9e90424e95')
+    instance.toggleExpanded('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
+    // wait for mocked data to load mockedProvider
+    await new Promise((resolve) => {
+      setTimeout(resolve, 100)
+    })
 
-    const element = await waitForElement(testComponent.component, '#DECLARED-0')
-
-    expect(element.hostNodes().length).toBe(1)
+    testComponent.component.update()
+    expect(testComponent.component.find('#REJECTED-0').hostNodes().length).toBe(
+      1
+    )
   })
 
   describe('handles download status', () => {
     let testComponent: ReactWrapper<{}, {}>
     let createdTestComponent: { component: ReactWrapper; store: Store }
     beforeEach(async () => {
+      const TIME_STAMP = '1544188309380'
       Date.now = jest.fn(() => 1554055200000)
 
       mockListSyncController
@@ -589,13 +530,78 @@ describe('RegistrationHome sent for review tab related tests', () => {
           data: {
             inProgressTab: { totalItems: 0, results: [] },
             notificationTab: { totalItems: 0, results: [] },
-            reviewTab: mockReviewTabData,
-            rejectTab: { totalItems: 0, results: [] },
+            reviewTab: { totalItems: 0, results: [] },
+            rejectTab: {
+              totalItems: 2,
+              results: [
+                {
+                  id: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
+                  type: 'Birth',
+                  registration: {
+                    status: 'REJECTED',
+                    contactNumber: '01622688231',
+                    trackingId: 'BW0UTHR',
+                    registrationNumber: null,
+                    eventLocationId: null,
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    duplicates: null,
+                    createdAt: '2018-05-23T14:44:58+02:00',
+                    modifiedAt: '2018-05-23T14:44:58+02:00'
+                  },
+                  dateOfBirth: '2010-10-10',
+                  childName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan',
+                      use: 'en'
+                    },
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান',
+                      use: 'bn'
+                    }
+                  ],
+                  dateOfDeath: null,
+                  deceasedName: null
+                },
+                {
+                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+                  type: 'Death',
+                  registration: {
+                    status: 'REJECTED',
+                    trackingId: 'DW0UTHR',
+                    registrationNumber: null,
+                    eventLocationId: null,
+                    contactNumber: '01622688231',
+                    duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    createdAt: TIME_STAMP,
+                    modifiedAt: TIME_STAMP
+                  },
+                  dateOfBirth: null,
+                  childName: null,
+                  dateOfDeath: '2007-01-01',
+                  deceasedName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan',
+                      use: 'en'
+                    },
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান',
+                      use: 'bn'
+                    }
+                  ]
+                }
+              ]
+            },
             approvalTab: { totalItems: 0, results: [] },
             printTab: { totalItems: 0, results: [] },
             externalValidationTab: { totalItems: 0, results: [] }
-          },
-          initialSyncDone: true
+          }
         })
         .mockReturnValueOnce({
           data: {
@@ -678,6 +684,15 @@ describe('RegistrationHome sent for review tab related tests', () => {
                         comment: 'This is a note'
                       }
                     ],
+                    type: 'REJECTED',
+                    timestamp: null
+                  },
+                  {
+                    comments: [
+                      {
+                        comment: 'This is a note'
+                      }
+                    ],
                     type: 'DECLARED',
                     timestamp: null
                   }
@@ -710,15 +725,27 @@ describe('RegistrationHome sent for review tab related tests', () => {
 
       createdTestComponent = await createTestComponentWithApolloClient(
         // @ts-ignore
-        <RegistrationHome />,
+        <RegistrationHome
+          match={{
+            params: {
+              tabId: 'updates'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
         store,
         client
       )
-
       testComponent = createdTestComponent.component
+      getItem.mockReturnValue(registerScopeToken)
+      await createdTestComponent.store.dispatch(
+        checkAuth({ '?token': registerScopeToken })
+      )
     })
 
-    it('downloads application after clicking download button', async () => {
+    it('downloads the application after clicking download button', async () => {
       const downloadButton = await waitForElement(
         testComponent,
         '#ListItemAction-0-icon'
@@ -739,7 +766,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
 
       const action = await waitForElement(
         testComponent,
-        '#ListItemAction-0-Review'
+        '#ListItemAction-0-Update'
       )
       action.hostNodes().simulate('click')
 
@@ -773,197 +800,14 @@ describe('RegistrationHome sent for review tab related tests', () => {
       expect(errorIcon.hostNodes()).toHaveLength(1)
     })
   })
-
-  it('check the validate icon', async () => {
-    const TIME_STAMP = '1544188309380'
-    Date.now = jest.fn(() => 1554055200000)
-
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <ReviewTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
-        queryData={{
-          data: {
-            totalItems: 2,
-            results: [
-              {
-                id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                type: 'Birth',
-                registration: {
-                  status: 'VALIDATED',
-                  contactNumber: '01622688231',
-                  trackingId: 'BW0UTHR',
-                  registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
-                  createdAt: TIME_STAMP,
-                  modifiedAt: TIME_STAMP
-                },
-                dateOfBirth: '2010-10-10',
-                childName: [
-                  {
-                    firstNames: 'Iliyas',
-                    familyName: 'Khan',
-                    use: 'en'
-                  },
-                  {
-                    firstNames: 'ইলিয়াস',
-                    familyName: 'খান',
-                    use: 'bn'
-                  }
-                ]
-              } as GQLBirthEventSearchSet,
-              {
-                id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                type: 'Death',
-                registration: {
-                  status: 'DECLARED',
-                  trackingId: 'DW0UTHR',
-                  duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
-                  registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
-                  createdAt: TIME_STAMP,
-                  modifiedAt: TIME_STAMP
-                },
-                dateOfDeath: '2007-01-01',
-                deceasedName: [
-                  {
-                    firstNames: 'Iliyas',
-                    familyName: 'Khan',
-                    use: 'en'
-                  },
-                  {
-                    firstNames: 'ইলিয়াস',
-                    familyName: 'খান',
-                    use: 'bn'
-                  }
-                ]
-              } as GQLDeathEventSearchSet
-            ]
-          }
-        }}
-      />,
-      store
-    )
-
-    const validate = await waitForElement(testComponent.component, Validate)
-
-    expect(validate).toHaveLength(1)
-  })
-
-  describe.skip('handles download status for possible duplicate application', () => {
-    let testComponent: ReactWrapper<{}, {}>
-    let createdTestComponent: { component: ReactWrapper; store: Store }
-    beforeAll(async () => {
-      Date.now = jest.fn(() => 1554055200000)
-      const graphqlMock = [
-        {
-          request: {
-            query: REGISTRATION_HOME_QUERY,
-            variables: {
-              locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
-              count: 10,
-              reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
-              inProgressSkip: 0,
-              reviewSkip: 0,
-              rejectSkip: 0,
-              approvalSkip: 0,
-              externalValidationSkip: 0,
-              printSkip: 0
-            }
-          },
-          result: {
-            data: {
-              inProgressTab: { totalItems: 0, results: [] },
-              notificationTab: { totalItems: 0, results: [] },
-              reviewTab: mockReviewTabData,
-              rejectTab: { totalItems: 0, results: [] },
-              approvalTab: { totalItems: 0, results: [] },
-              externalValidationTab: { totalItems: 0, results: [] },
-              printTab: { totalItems: 0, results: [] }
-            }
-          }
-        }
-      ]
-
-      createdTestComponent = await createTestComponent(
-        // @ts-ignore
-        <RegistrationHome />,
-        store,
-        graphqlMock
-      )
-
-      getItem.mockReturnValue(registerScopeToken)
-      await createdTestComponent.store.dispatch(
-        checkAuth({ '?token': registerScopeToken })
-      )
-      testComponent = createdTestComponent.component
-    })
-
-    it('starts downloading after clicking download button', async () => {
-      const downloadButton = await waitForElement(
-        testComponent,
-        '#ListItemAction-1-icon'
-      )
-
-      downloadButton.hostNodes().simulate('click')
-      testComponent.update()
-
-      expect(
-        testComponent.find('#action-loading-ListItemAction-1').hostNodes()
-      ).toHaveLength(1)
-    })
-
-    it('shows review button when download is complete', async () => {
-      const downloadedApplication = makeApplicationReadyToDownload(
-        Event.DEATH,
-        'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-        Action.LOAD_REVIEW_APPLICATION
-      )
-      downloadedApplication.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
-      createdTestComponent.store.dispatch(
-        modifyApplication(downloadedApplication)
-      )
-
-      const action = await waitForElement(
-        testComponent,
-        '#ListItemAction-1-Review'
-      )
-
-      expect(action.hostNodes()).toHaveLength(1)
-      action.hostNodes().simulate('click')
-
-      await waitFor(() =>
-        window.location.href.includes(
-          '/duplicates/bc09200d-0160-43b4-9e2b-5b9e90424e95'
-        )
-      )
-    })
-
-    it('shows error when download is failed', async () => {
-      const downloadedApplication = makeApplicationReadyToDownload(
-        Event.DEATH,
-        'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-        Action.LOAD_REVIEW_APPLICATION
-      )
-      downloadedApplication.downloadStatus = DOWNLOAD_STATUS.FAILED
-      createdTestComponent.store.dispatch(
-        modifyApplication(downloadedApplication)
-      )
-
-      testComponent.update()
-
-      const errorIcon = await waitForElement(
-        testComponent,
-        '#action-error-ListItemAction-1'
-      )
-
-      expect(errorIcon.hostNodes()).toHaveLength(1)
-    })
-  })
 })
 
 describe('Tablet tests', () => {
   const { store } = createStore()
 
   beforeAll(async () => {
+    getItem.mockReturnValue(registerScopeToken)
+    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
     resizeWindow(800, 1280)
   })
 
@@ -977,7 +821,7 @@ describe('Tablet tests', () => {
 
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <ReviewTab
+      <RejectTab
         registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         queryData={{
           data: {
@@ -987,15 +831,15 @@ describe('Tablet tests', () => {
                 id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                 type: 'Birth',
                 registration: {
-                  status: 'VALIDATED',
+                  status: 'REJECTED',
                   contactNumber: '01622688231',
                   trackingId: 'BW0UTHR',
                   registrationNumber: undefined,
                   eventLocationId: undefined,
                   registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
                   duplicates: [null],
-                  createdAt: TIME_STAMP,
-                  modifiedAt: TIME_STAMP
+                  createdAt: '2018-05-23T14:44:58+02:00',
+                  modifiedAt: '2018-05-23T14:44:58+02:00'
                 },
                 dateOfBirth: '2010-10-10',
                 childName: [
@@ -1015,11 +859,11 @@ describe('Tablet tests', () => {
                 id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
                 type: 'Death',
                 registration: {
-                  status: 'DECLARED',
+                  status: 'REJECTED',
                   trackingId: 'DW0UTHR',
                   registrationNumber: undefined,
                   eventLocationId: undefined,
-                  contactNumber: undefined,
+                  contactNumber: '01622688231',
                   duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
                   registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
                   createdAt: TIME_STAMP,
@@ -1046,13 +890,13 @@ describe('Tablet tests', () => {
       store
     )
 
-    getItem.mockReturnValue(registerScopeToken)
-    await testComponent.store.dispatch(
-      checkAuth({ '?token': registerScopeToken })
-    )
+    const element = await waitForElement(testComponent.component, '#row_0')
+    element.hostNodes().simulate('click')
 
-    const row = await waitForElement(testComponent.component, '#row_0')
-    row.hostNodes().simulate('click')
+    await new Promise((resolve) => {
+      setTimeout(resolve, 100)
+    })
+    testComponent.component.update()
 
     expect(window.location.href).toContain(
       '/details/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'

@@ -45,7 +45,7 @@ import {
 } from 'react-intl'
 import { connect } from 'react-redux'
 import { LocalInProgressDataDetails } from './localInProgressDataDetails'
-import { RowHistoryView } from '@client/views/RegistrationHome/RowHistoryView'
+import { RowHistoryView } from '@client/views/OfficeHome/RowHistoryView'
 import {
   buttonMessages,
   constantsMessages,
@@ -59,7 +59,7 @@ import { Action } from '@client/forms'
 import { get } from 'lodash'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { getDraftApplicantFullName } from '@client/utils/draftUtils'
-import { LoadingIndicator } from '@client/views/RegistrationHome/LoadingIndicator'
+import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { formattedDuration } from '@client/utils/date-formatting'
 
 const BlueButton = styled(Button)`

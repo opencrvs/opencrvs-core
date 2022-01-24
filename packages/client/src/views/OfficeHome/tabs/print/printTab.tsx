@@ -9,22 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IApplication } from '@client/applications'
+
 import {
-  constantsMessages,
-  dynamicConstantsMessages
-} from '@client/i18n/messages'
-import { messages } from '@client/i18n/messages/views/registrarHome'
-import { goToApplicationDetails, goToPage } from '@client/navigation'
-import { getScope } from '@client/profile/profileSelectors'
+  goToApplicationDetails,
+  goToPrintCertificate
+} from '@client/navigation'
 import { transformData } from '@client/search/transformer'
-import { IStoreState } from '@client/store'
-import styled, { ITheme } from '@client/styledComponents'
-import { RowHistoryView } from '@client/views/RegistrationHome/RowHistoryView'
-import { Validate } from '@opencrvs/components/lib/icons'
+import { ITheme } from '@client/styledComponents'
 import {
   ColumnContentAlignment,
-  GridTable
+  GridTable,
+  IAction
 } from '@opencrvs/components/lib/interface'
 import { HomeContent } from '@opencrvs/components/lib/layout'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
@@ -32,17 +27,24 @@ import moment from 'moment'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import ReactTooltip from 'react-tooltip'
 import { withTheme } from 'styled-components'
-import { LoadingIndicator } from '@client/views/RegistrationHome/LoadingIndicator'
+import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
+import { RowHistoryView } from '@client/views/OfficeHome/RowHistoryView'
+import {
+  buttonMessages,
+  constantsMessages,
+  dynamicConstantsMessages
+} from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/registrarHome'
+import { IStoreState } from '@client/store'
+import { IApplication, DOWNLOAD_STATUS } from '@client/applications'
+import { Action } from '@client/forms'
+import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { formattedDuration } from '@client/utils/date-formatting'
 
-const ToolTipContainer = styled.span`
-  text-align: center;
-`
-interface IBaseApprovalTabProps {
+interface IBasePrintTabProps {
   theme: ITheme
-  goToPage: typeof goToPage
+  goToPrintCertificate: typeof goToPrintCertificate
   registrarLocationId: string | null
   goToApplicationDetails: typeof goToApplicationDetails
   outboxApplications: IApplication[]
@@ -56,18 +58,18 @@ interface IBaseApprovalTabProps {
   error?: boolean
 }
 
-interface IApprovalTabState {
+interface IPrintTabState {
   width: number
 }
 
-type IApprovalTabProps = IntlShapeProps & IBaseApprovalTabProps
+type IPrintTabProps = IntlShapeProps & IBasePrintTabProps
 
-class ApprovalTabComponent extends React.Component<
-  IApprovalTabProps,
-  IApprovalTabState
+class PrintTabComponent extends React.Component<
+  IPrintTabProps,
+  IPrintTabState
 > {
   pageSize = 10
-  constructor(props: IApprovalTabProps) {
+  constructor(props: IPrintTabProps) {
     super(props)
     this.state = {
       width: window.innerWidth
@@ -102,29 +104,25 @@ class ApprovalTabComponent extends React.Component<
         },
         {
           label: this.props.intl.formatMessage(constantsMessages.name),
-          width: 26,
+          width: 25,
           key: 'name'
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.eventDate),
+          label: this.props.intl.formatMessage(messages.listItemRegisteredDate),
+          width: 16,
+          key: 'dateOfRegistration'
+        },
+        {
+          label: this.props.intl.formatMessage(messages.registrationNumber),
           width: 25,
-          key: 'eventTimeElapsed'
+          key: 'registrationNumber'
         },
         {
-          label: this.props.intl.formatMessage(messages.sentForApprovals),
-          width: 25,
-          key: 'dateOfApproval'
-        },
-        {
-          width: 5,
-          key: 'icons',
-          isIconColumn: true
-        },
-        {
-          width: 5,
+          label: this.props.intl.formatMessage(messages.listItemAction),
+          width: 20,
           key: 'actions',
-          isActionColumn: true,
-          alignment: ColumnContentAlignment.CENTER
+          alignment: ColumnContentAlignment.CENTER,
+          isActionColumn: true
         }
       ]
     } else {
@@ -136,29 +134,52 @@ class ApprovalTabComponent extends React.Component<
         },
         {
           label: this.props.intl.formatMessage(constantsMessages.name),
-          width: 64,
+          width: 70,
           key: 'name'
-        },
-        {
-          width: 6,
-          key: 'icons',
-          isIconColumn: true
         }
       ]
     }
   }
 
-  transformValidatedContent = (data: GQLEventSearchResultSet) => {
+  transformRegisteredContent = (data: GQLEventSearchResultSet) => {
     const { intl } = this.props
     if (!data || !data.results) {
       return []
     }
-    const transformedData = transformData(data, this.props.intl)
 
-    return transformedData.map((reg) => {
-      const icon: JSX.Element = (
-        <Validate data-tip data-for="validatedTooltip" />
+    const transformedData = transformData(data, this.props.intl)
+    return transformedData.map((reg, index) => {
+      const foundApplication = this.props.outboxApplications.find(
+        (application) => application.id === reg.id
       )
+      const actions: IAction[] = []
+      const downloadStatus =
+        (foundApplication && foundApplication.downloadStatus) || undefined
+
+      if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
+        actions.push({
+          actionComponent: (
+            <DownloadButton
+              downloadConfigs={{
+                event: reg.event,
+                compositionId: reg.id,
+                action: Action.LOAD_CERTIFICATE_APPLICATION
+              }}
+              key={`DownloadButton-${index}`}
+              status={downloadStatus as DOWNLOAD_STATUS}
+            />
+          )
+        })
+      } else {
+        actions.push({
+          label: this.props.intl.formatMessage(buttonMessages.print),
+          handler: () =>
+            this.props.goToPrintCertificate(
+              reg.id,
+              reg.event.toLocaleLowerCase() || ''
+            )
+        })
+      }
       const event =
         (reg.event &&
           intl.formatMessage(
@@ -168,13 +189,7 @@ class ApprovalTabComponent extends React.Component<
       return {
         ...reg,
         event,
-        eventTimeElapsed:
-          (reg.dateOfEvent &&
-            formattedDuration(
-              moment(reg.dateOfEvent.toString(), 'YYYY-MM-DD')
-            )) ||
-          '',
-        dateOfApproval:
+        dateOfRegistration:
           (reg.modifiedAt &&
             formattedDuration(
               moment(
@@ -183,7 +198,7 @@ class ApprovalTabComponent extends React.Component<
               )
             )) ||
           '',
-        icon,
+        actions,
         rowClickHandler: [
           {
             label: 'rowClickHandler',
@@ -207,15 +222,8 @@ class ApprovalTabComponent extends React.Component<
 
     return (
       <HomeContent>
-        <ReactTooltip id="validatedTooltip">
-          <ToolTipContainer>
-            {this.props.intl.formatMessage(
-              messages.validatedApplicationTooltipForRegistrationAgent
-            )}
-          </ToolTipContainer>
-        </ReactTooltip>
         <GridTable
-          content={this.transformValidatedContent(data)}
+          content={this.transformRegisteredContent(data)}
           columns={this.getColumns()}
           renderExpandedComponent={this.renderExpandedComponent}
           noResultText={intl.formatMessage(constantsMessages.noResults)}
@@ -240,12 +248,11 @@ class ApprovalTabComponent extends React.Component<
 
 function mapStateToProps(state: IStoreState) {
   return {
-    scope: getScope(state),
     outboxApplications: state.applicationsState.applications
   }
 }
 
-export const ApprovalTab = connect(mapStateToProps, {
-  goToPage,
+export const PrintTab = connect(mapStateToProps, {
+  goToPrintCertificate,
   goToApplicationDetails
-})(injectIntl(withTheme(ApprovalTabComponent)))
+})(injectIntl(withTheme(PrintTabComponent)))

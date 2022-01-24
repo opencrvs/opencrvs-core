@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import OutBox from '@client/views/RegistrationHome/Outbox'
+import OutBox from '@client/views/OfficeHome/Outbox'
 import { IApplication } from '@client/applications'
 import { Event } from '@client/forms'
 import { createTestComponent } from '@client/tests/util'

@@ -40,7 +40,7 @@ import { COUNT_USER_WISE_APPLICATIONS } from '@client/search/queries'
 import { NATL_ADMIN_ROLES } from '@client/utils/constants'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
-import { EVENT_STATUS } from '@client/views/RegistrationHome/RegistrationHome'
+import { EVENT_STATUS } from '@client/views/OfficeHome/OfficeHome'
 import { Activity, Avatar, Users } from '@opencrvs/components/lib/icons'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
@@ -281,7 +281,7 @@ export const NavigationView = (props: IFullProps) => {
     menuCollapse,
     userInfo
   } = props
-  const tabId = match.params.tabId || activeMenuItem
+  const tabId = match.params.tabId || activeMenuItem ? activeMenuItem : 'review'
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
   const { loading, error, data, initialSyncDone } = workqueue
   const filteredData = filterProcessingApplicationsFromQuery(

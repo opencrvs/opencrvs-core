@@ -27,7 +27,7 @@ import {
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { createClient } from '@client/utils/apolloClient'
-import { RegistrationHome } from '@client/views/RegistrationHome/RegistrationHome'
+import { RegistrationHome } from '@client/views/OfficeHome/OfficeHome'
 import { GridTable } from '@opencrvs/components/lib/interface'
 import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'

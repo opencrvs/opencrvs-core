@@ -26,7 +26,7 @@ import {
   flushPromises
 } from '@client/tests/util'
 import { createClient } from '@client/utils/apolloClient'
-import { RegistrationHome } from '@client/views/RegistrationHome/RegistrationHome'
+import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { merge } from 'lodash'
 import * as React from 'react'
@@ -136,11 +136,11 @@ beforeAll(async () => {
   await store.dispatch(checkAuth({ '?token': registerScopeToken }))
 })
 
-describe('RegistrationHome related tests', () => {
+describe('OfficeHome related tests', () => {
   it('sets loading state while waiting for data', async () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <RegistrationHome
+      <OfficeHome
         match={{
           params: {
             tabId: 'progress'
@@ -175,7 +175,7 @@ describe('RegistrationHome related tests', () => {
     it('renders page with five tabs', async () => {
       const testComponent = await createTestComponentWithApolloClient(
         // @ts-ignore
-        <RegistrationHome match={{ params: { tabId: 'progress' } }} />,
+        <OfficeHome match={{ params: { tabId: 'progress' } }} />,
         store,
         client
       )
@@ -197,7 +197,7 @@ describe('RegistrationHome related tests', () => {
     it('renders tabs with count', async () => {
       const testComponent = await createTestComponentWithApolloClient(
         // @ts-ignore
-        <RegistrationHome match={{ params: { tabId: 'progress' } }} />,
+        <OfficeHome match={{ params: { tabId: 'progress' } }} />,
         store,
         client
       )
@@ -244,7 +244,7 @@ describe('RegistrationHome related tests', () => {
     it('shows no-record message in inProgress drafts tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
         // @ts-ignore
-        <RegistrationHome match={{ params: { tabId: 'progress' } }} />,
+        <OfficeHome match={{ params: { tabId: 'progress' } }} />,
         store,
         client
       )
@@ -257,7 +257,7 @@ describe('RegistrationHome related tests', () => {
     it('shows no-record message in inProgress fieldagent drafts tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
         // @ts-ignore
-        <RegistrationHome
+        <OfficeHome
           match={{
             params: {
               tabId: 'progress',
@@ -280,7 +280,7 @@ describe('RegistrationHome related tests', () => {
     it('shows no-record message in inProgress hospital drafts tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
         // @ts-ignore
-        <RegistrationHome
+        <OfficeHome
           match={{
             params: {
               tabId: 'progress',
@@ -303,7 +303,7 @@ describe('RegistrationHome related tests', () => {
     it('shows no-record message  in review tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
         // @ts-ignore
-        <RegistrationHome match={{ params: { tabId: 'review' } }} />,
+        <OfficeHome match={{ params: { tabId: 'review' } }} />,
         store,
         client
       )
@@ -317,7 +317,7 @@ describe('RegistrationHome related tests', () => {
     it('shows no-record message  in reject tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
         // @ts-ignore
-        <RegistrationHome match={{ params: { tabId: 'updates' } }} />,
+        <OfficeHome match={{ params: { tabId: 'updates' } }} />,
         store,
         client
       )
@@ -331,7 +331,7 @@ describe('RegistrationHome related tests', () => {
     it('shows no-record message  in approval tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
         // @ts-ignore
-        <RegistrationHome match={{ params: { tabId: 'approvals' } }} />,
+        <OfficeHome match={{ params: { tabId: 'approvals' } }} />,
         store,
         client
       )
@@ -345,7 +345,7 @@ describe('RegistrationHome related tests', () => {
     it('shows no-record message  in print tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
         // @ts-ignore
-        <RegistrationHome match={{ params: { tabId: 'print' } }} />,
+        <OfficeHome match={{ params: { tabId: 'print' } }} />,
         store,
         client
       )
@@ -360,7 +360,7 @@ describe('RegistrationHome related tests', () => {
     it('shows no-record message  in externalValidation tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
         // @ts-ignore
-        <RegistrationHome match={{ params: { tabId: 'waitingValidation' } }} />,
+        <OfficeHome match={{ params: { tabId: 'waitingValidation' } }} />,
         store,
         client
       )
@@ -384,7 +384,7 @@ describe('RegistrationHome related tests', () => {
     it('shows error message in inProgress fieldagent drafts tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
         // @ts-ignore
-        <RegistrationHome
+        <OfficeHome
           match={{
             params: {
               tabId: 'progress',
@@ -410,7 +410,7 @@ describe('RegistrationHome related tests', () => {
     it('shows error message in inProgress hospital drafts tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
         // @ts-ignore
-        <RegistrationHome
+        <OfficeHome
           match={{
             params: {
               tabId: 'progress',
@@ -436,7 +436,7 @@ describe('RegistrationHome related tests', () => {
     it('shows error message  in review tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
         // @ts-ignore
-        <RegistrationHome match={{ params: { tabId: 'review' } }} />,
+        <OfficeHome match={{ params: { tabId: 'review' } }} />,
         store,
         client
       )
@@ -453,7 +453,7 @@ describe('RegistrationHome related tests', () => {
     it('shows error message  in reject tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
         // @ts-ignore
-        <RegistrationHome match={{ params: { tabId: 'updates' } }} />,
+        <OfficeHome match={{ params: { tabId: 'updates' } }} />,
         store,
         client
       )
@@ -470,7 +470,7 @@ describe('RegistrationHome related tests', () => {
     it('shows error message  in approval tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
         // @ts-ignore
-        <RegistrationHome match={{ params: { tabId: 'approvals' } }} />,
+        <OfficeHome match={{ params: { tabId: 'approvals' } }} />,
         store,
         client
       )
@@ -487,7 +487,7 @@ describe('RegistrationHome related tests', () => {
     it('shows error message  in print tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
         // @ts-ignore
-        <RegistrationHome match={{ params: { tabId: 'print' } }} />,
+        <OfficeHome match={{ params: { tabId: 'print' } }} />,
         store,
         client
       )
@@ -504,7 +504,7 @@ describe('RegistrationHome related tests', () => {
     it('shows error message  in externalValidation tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
         // @ts-ignore
-        <RegistrationHome match={{ params: { tabId: 'waitingValidation' } }} />,
+        <OfficeHome match={{ params: { tabId: 'waitingValidation' } }} />,
         store,
         client
       )
@@ -552,7 +552,7 @@ describe('RegistrationHome related tests', () => {
       }
       const testComponent = await createTestComponentWithApolloClient(
         // @ts-ignore
-        <RegistrationHome match={{ params: { tabId: 'progress' } }} />,
+        <OfficeHome match={{ params: { tabId: 'progress' } }} />,
         store,
         client
       ) // wait for mocked data to load mockedProvider
@@ -571,7 +571,7 @@ describe('RegistrationHome related tests', () => {
     it('shows loadmore in review tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
         // @ts-ignore
-        <RegistrationHome match={{ params: { tabId: 'review' } }} />,
+        <OfficeHome match={{ params: { tabId: 'review' } }} />,
         store,
         client
       )
@@ -590,7 +590,7 @@ describe('RegistrationHome related tests', () => {
     it('shows loadmore in reject tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
         // @ts-ignore
-        <RegistrationHome match={{ params: { tabId: 'updates' } }} />,
+        <OfficeHome match={{ params: { tabId: 'updates' } }} />,
         store,
         client
       )
@@ -609,7 +609,7 @@ describe('RegistrationHome related tests', () => {
     it('shows loadmore in print tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
         // @ts-ignore
-        <RegistrationHome match={{ params: { tabId: 'print' } }} />,
+        <OfficeHome match={{ params: { tabId: 'print' } }} />,
         store,
         client
       )
@@ -630,7 +630,7 @@ describe('RegistrationHome related tests', () => {
     it('shows loadmore in externalValidation tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
         // @ts-ignore
-        <RegistrationHome match={{ params: { tabId: 'waitingValidation' } }} />,
+        <OfficeHome match={{ params: { tabId: 'waitingValidation' } }} />,
         store,
         client
       )

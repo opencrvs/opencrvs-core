@@ -31,7 +31,7 @@ import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
 import { getUserLocation } from '@client/utils/userUtils'
-import NotificationToast from '@client/views/RegistrationHome/NotificationToast'
+import NotificationToast from '@client/views/OfficeHome/NotificationToast'
 import {
   Button,
   FloatingActionButton,
@@ -505,7 +505,7 @@ function mapStateToProps(
   }
 }
 
-export const RegistrationHome = connect(mapStateToProps, {
+export const OfficeHome = connect(mapStateToProps, {
   goToEvents,
   goToPage,
   goToRegistrarHomeTab,

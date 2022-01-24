@@ -56,8 +56,8 @@ import {
   LoadingIndicator,
   IOnlineStatusProps,
   withOnlineStatus
-} from '@client/views/RegistrationHome/LoadingIndicator'
-import { EVENT_STATUS } from '@client/views/RegistrationHome/RegistrationHome'
+} from '@client/views/OfficeHome/LoadingIndicator'
+import { EVENT_STATUS } from '@client/views/OfficeHome/OfficeHome'
 import { getLanguage } from '@opencrvs/client/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
