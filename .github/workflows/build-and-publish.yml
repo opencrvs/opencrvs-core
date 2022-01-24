@@ -15,7 +15,6 @@ on:
     branches:
       - master
       - develop
-      - ocrvs-2339
 
 jobs:
   buildAndPublish:
