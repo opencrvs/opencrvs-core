@@ -19,23 +19,24 @@ import { CorrectionSection } from '@client/forms'
 
 type IProps = IStateProps & IDispatchProps
 
-function CorrectionFormComponent({ application, sectionId }: IProps) {
+function CorrectionFormComponent({ sectionId, ...props }: IProps) {
   switch (sectionId) {
     case CorrectionSection.Corrector:
-      return <CorrectorForm application={application} />
+      return <CorrectorForm {...props} />
   }
   return <></>
 }
 
 function mapStateToProps(state: IStoreState, props: IRouteProps) {
-  const { registrationId, sectionId } = props.match.params
+  const { applicationId, pageId: sectionId } = props.match.params
   const application = state.applicationsState.applications.find(
-    ({ id }) => id === registrationId
+    ({ id }) => id === applicationId
   )
 
   if (!application) {
-    throw new Error(`Draft "${registrationId}" missing!`)
+    throw new Error(`Draft "${applicationId}" missing!`)
   }
+
   return {
     application,
     sectionId
@@ -50,8 +51,8 @@ type IStateProps = {
 type IDispatchProps = {}
 
 type IRouteProps = RouteComponentProps<{
-  registrationId: string
-  sectionId: string
+  applicationId: string
+  pageId: string
 }>
 
 export const CorrectionForm = connect<

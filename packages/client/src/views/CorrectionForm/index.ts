@@ -10,4 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
+export * from '@client/views/CorrectionForm/CorrectionForm'
 export * from '@client/views/CorrectionForm/CorrectorForm'
+export * from '@client/views/CorrectionForm/ReviewForm'

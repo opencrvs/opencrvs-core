@@ -331,13 +331,13 @@ export function goToPrintCertificate(
 }
 
 export function goToCertificateCorrection(
-  registrationId: string,
-  sectionId: CorrectionSection
+  applicationId: string,
+  pageId: CorrectionSection
 ) {
   return push(
     formatUrl(CERTIFICATE_CORRECTION, {
-      registrationId: registrationId.toString(),
-      sectionId: sectionId.toString()
+      applicationId: applicationId.toString(),
+      pageId: pageId.toString()
     })
   )
 }
