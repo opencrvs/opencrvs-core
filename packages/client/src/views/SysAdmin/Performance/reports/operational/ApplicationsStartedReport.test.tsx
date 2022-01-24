@@ -28,7 +28,6 @@ describe('Registration rates report', () => {
       <ApplicationsStartedReport
         loading={true}
         locationId={'c879ce5c-545b-4042-98a6-77015b0e13df'}
-        disableFieldAgentLink={false}
         reportTimeFrom={moment(new Date())}
         reportTimeTo={moment(new Date())}
       />,
@@ -52,7 +51,6 @@ describe('Registration rates report', () => {
       <ApplicationsStartedReport
         data={data}
         locationId={'c879ce5c-545b-4042-98a6-77015b0e13df'}
-        disableFieldAgentLink={true}
         reportTimeFrom={moment(new Date())}
         reportTimeTo={moment(new Date())}
       />,

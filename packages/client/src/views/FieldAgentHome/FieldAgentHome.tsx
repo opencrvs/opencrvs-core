@@ -34,7 +34,7 @@ import {
 } from '@client/navigation/routes'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { SEARCH_APPLICATIONS_USER_WISE } from '@client/search/queries'
-import styled, { ITheme } from '@client/styledComponents'
+import styled, { ITheme, withTheme } from '@client/styledComponents'
 import {
   EMPTY_STRING,
   FIELD_AGENT_HOME_TAB_IN_PROGRESS,
@@ -503,4 +503,4 @@ export const FieldAgentHome = connect(mapStateToProps, {
   goToFieldAgentHomeTab: goToFieldAgentHomeTabAction,
   goToApplicationDetails,
   updateFieldAgentDeclaredApplications
-})(injectIntl(withOnlineStatus(FieldAgentHomeView)))
+})(injectIntl(withTheme(withOnlineStatus(FieldAgentHomeView))))

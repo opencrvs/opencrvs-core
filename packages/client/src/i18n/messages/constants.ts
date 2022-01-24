@@ -1316,6 +1316,11 @@ const countryMessagesToDefine: Record<
     defaultMessage: 'Falkland Islands (Malvinas)',
     description: 'ISO Country: FLK'
   },
+  FAR: {
+    id: 'countries.FAR',
+    defaultMessage: 'Farajaland',
+    description: 'Fictional country for OpenCRSV demo'
+  },
   FRO: {
     id: 'countries.FRO',
     defaultMessage: 'Faroe Islands',

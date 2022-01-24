@@ -138,6 +138,7 @@ interface ICount {
 interface IUserInfo {
   name: string
   role: string
+  avatar: JSX.Element
 }
 
 interface IProps {
@@ -281,7 +282,8 @@ export const NavigationView = (props: IFullProps) => {
     menuCollapse,
     userInfo
   } = props
-  const tabId = match.params.tabId || activeMenuItem ? activeMenuItem : 'review'
+  const tabId =
+    match.params.tabId || activeMenuItem !== '' ? activeMenuItem : 'review'
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
   const { loading, error, data, initialSyncDone } = workqueue
   const filteredData = filterProcessingApplicationsFromQuery(
@@ -315,7 +317,7 @@ export const NavigationView = (props: IFullProps) => {
       navigationWidth={navigationWidth}
       name={userInfo && userInfo.name}
       role={userInfo && userInfo.role}
-      avatar={() => <Avatar />}
+      avatar={() => userInfo && userInfo.avatar}
     >
       {userDetails?.role === 'FIELD_AGENT' ? (
         <>

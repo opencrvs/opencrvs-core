@@ -83,13 +83,7 @@ export const searchSchema = Joi.object({
   status: Joi.string().optional(),
   primaryOfficeId: Joi.string().optional(),
   locationId: Joi.string().optional(),
-  count: Joi.number()
-    .min(0)
-    .required(),
-  skip: Joi.number()
-    .min(0)
-    .required(),
-  sortOrder: Joi.string()
-    .valid('asc', 'desc')
-    .required()
+  count: Joi.number().min(0).required(),
+  skip: Joi.number().min(0).required(),
+  sortOrder: Joi.string().valid('asc', 'desc').required()
 })

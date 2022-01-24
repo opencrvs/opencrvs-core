@@ -22,6 +22,7 @@ interface Window {
     LOGIN_URL: string
     AUTH_URL: string
     RESOURCES_URL: string
+    SHOW_FARAJALAND_IN_COUNTRY_LISTS: boolean
     /**
      * @deprecated HEALTH_FACILITY_FILTER is no longer used
      */

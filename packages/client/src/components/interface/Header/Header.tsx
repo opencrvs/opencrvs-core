@@ -63,6 +63,7 @@ import { connect } from 'react-redux'
 import styled from 'styled-components'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { Navigation } from '@client/components/interface/Navigation'
+import { Avatar } from '@client/components/Avatar'
 
 type IProps = IntlShapeProps & {
   theme: ITheme
@@ -135,7 +136,10 @@ class HeaderComp extends React.Component<IProps, IState> {
       userDetails && userDetails.role
         ? intl.formatMessage(userMessages[userDetails.role])
         : ''
-    const userInfo = { name, role }
+
+    const avatar = <Avatar name={name} avatar={userDetails?.avatar} />
+
+    const userInfo = { name, role, avatar }
 
     return (
       <>
