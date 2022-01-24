@@ -1906,10 +1906,20 @@ export const builders: IFieldBuilders = {
         context: any
       ) => {
         const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-        taskResource.requester = {
-          agent: {
-            reference: `Practitioner/${fieldValue}`
-          }
+        if (!taskResource.extension) {
+          taskResource.extension = []
+        }
+        const requesterExtensionURL = `${OPENCRVS_SPECIFICATION_URL}extension/requestingIndividual`
+        const requesterExtension = taskResource.extension.find(
+          (ext) => ext.url === requesterExtensionURL
+        )
+        if (!requesterExtension) {
+          taskResource.extension.push({
+            url: requesterExtensionURL,
+            valueString: fieldValue
+          })
+        } else {
+          requesterExtension.valueString = fieldValue
         }
       },
       hasShowedVerifiedDocument: (
