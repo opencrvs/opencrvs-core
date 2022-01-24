@@ -101,9 +101,9 @@ Edit the automatic cron job backup to suit your external server set-up on line 6
 job: 'cd ~/ && bash /tmp/compose/infrastructure/emergency-backup-metadata.sh <ssh-user> <external-server-for-remote-backup-host> <ssh-port> <your-production-environment-manger-node-host> <path-to-encrypted-volume-on-external-server> >> /var/log/opencrvs-backup.log 2>&1'
 ```
 
-Ensure your external server also allows SSH from the OpenCRVS manager node. Follow the same process as per the workers
+Ensure your external backup server also allows SSH from the OpenCRVS manager node. Follow the same process as per the workers
 
-Run the Ansible playbook configuration script from your client computer (You must have Ansible installed, a Dockerhub account & a Papertrail account - remove Papertrail config from playbook if you do not wish to use the logging service. We recommend you use an external Logging service to have live access to logs):
+Run the Ansible playbook configuration script from your client computer (You must have Ansible installed, a Dockerhub account & a Papertrail account - leave "papertrail_token" variable undefined if you do not wish to use the logging service. We recommend you use an external Logging service to have live access to logs):
 
 ```
 ansible-playbook -i <inventory_file> playbook.yml -e "dockerhub_username=your_username dockerhub_password=your_password papertrail_token=your_papertrail_token external_backup_server_ip=your_external_backup_server_ip external_backup_server_user=your_external_backup_server_user external_backup_server_ssh_port=your_external_backup_server_ssh_port manager_production_server_ip=your_manager_production_server_ip external_backup_server_remote_directory=your_external_backup_server_remote_directory"
@@ -126,7 +126,7 @@ Before the deployment can be done a few secrets need to be manually added to the
 ssh into the leader manager and run the following, replacing the values with the actual secrets:
 
 ```sh
-# For API integration medaitors, allows API access to the OpenHIM
+# For API integration mediators, allows API access to the OpenHIM
 printf "<openhim-user>" | docker secret create openhim-user -
 printf "<openhim-password>" | docker secret create openhim-password -
 ```
@@ -146,7 +146,7 @@ printf "<infobip-sender-id>" | docker secret create infobip-sender-id -
 
 ```
 
-After creating the secrets make sure the commands are removed from the shell history
+After creating the secrets make sure the commands are removed from the shell history by running `history -c`
 
 Also, if you can't ssh into the manager as root you will need to add your ssh user to be able to run docker commands:
 
@@ -170,25 +170,25 @@ resources.<your_domain>
 styleguide.<your_domain>
 monitor.<your_domain>
 
-Now, in the package.json file in the root folder of the repository, amend the deployment script appropriately:
-
-```
-"deploy": "SSH_USER=<<your_ssh_username>> SSH_HOST=<<your_swarm_manager_node_ip>> bash deploy.sh",
-```
-
-You may also add the following variables to the above that will change the username and password for monitoring service, Netdata, away from the default of monitor:monitor-password. `NETDATA_USER=<username> NETDATA_PASSWORD=<password>`
-
 Then, run the deployment like so:
 
 ```
-yarn deploy <<insert country code>> --clear-data=yes --restore-metadata=yes <<insert host domain e.g.: opencrvs.your_country.org>> <<insert version e.g.: latest>>
+SSH_USER=<<your_ssh_username>> SSH_HOST=<<your_swarm_manager_node_ip>> yarn deploy <<insert country code>> --clear-data=yes --restore-metadata=yes <<insert host domain e.g.: opencrvs.your_country.org>> <<insert version e.g.: latest>>
 ```
 
 Version can be any git commit hash, git tag, dockerhub tag or 'latest'
 
+You may also use the following environment variables variables to the above that will change the username and password for monitoring service,
+Netdata, away from the default of monitor:monitor-password.
+
+```
+NETDATA_USER=<username>
+NETDATA_PASSWORD=<password>
+```
+
 ## Enabling Mongo replica sets
 
-Mongo is enabled with replica sets in order to provide backup in case a node fails. When the deploy script runs, the mongo-rs-init container waits 20s before trying to setup the replica set. If the mongo instances aren't up by then then there is a chance that the deployment will fail. You can recognise this by the following error in the opencrvs_mongo service logs `Unable to reach primary for set rs0`. Run `docker service ls` to see if the replicas have scaled or not. Running the following commands manually scales the replica set, and allows you to continue.
+Mongo is enabled with replica sets in order to provide backup in case a node fails. When the deploy script runs, the mongo-rs-init container waits 20s before trying to setup the replica set. If the mongo instances aren't up by then, then there is a chance that the deployment will fail. You can recognise this by the following error in the opencrvs_mongo service logs `Unable to reach primary for set rs0`. Run `docker service ls` to see if the replicas have scaled or not. Running the following commands manually scales the replica set, and allows you to continue.
 
 ```
 docker service scale opencrvs_mongo-rs-init=0
