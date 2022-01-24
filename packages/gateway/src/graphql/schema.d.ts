@@ -62,6 +62,7 @@ export interface GQLMutation {
   createOrUpdateUser: GQLUser
   activateUser?: string
   changePassword?: string
+  changeAvatar?: string
   auditUser?: string
   resendSMSInvite?: string
 }
@@ -120,8 +121,8 @@ export interface GQLDeathRegistration extends GQLEventRegistration {
   mannerOfDeath?: GQLMannerOfDeath
   causeOfDeathMethod?: GQLCauseOfDeathMethodType
   causeOfDeath?: string
-  maleDependentsOfDeceased?: string
-  femaleDependentsOfDeceased?: string
+  maleDependentsOfDeceased?: number
+  femaleDependentsOfDeceased?: number
   medicalPractitioner?: GQLMedicalPractitioner
   createdAt?: GQLDate
   updatedAt?: GQLDate
@@ -210,6 +211,7 @@ export interface GQLUser {
   identifier?: GQLIdentifier
   signature?: GQLSignature
   creationDate?: string
+  avatar?: GQLAvatar
   device?: string
 }
 
@@ -333,8 +335,8 @@ export interface GQLDeathRegistrationInput {
   mannerOfDeath?: GQLMannerOfDeath
   causeOfDeathMethod?: GQLCauseOfDeathMethodType
   causeOfDeath?: string
-  maleDependentsOfDeceased?: string
-  femaleDependentsOfDeceased?: string
+  maleDependentsOfDeceased?: number
+  femaleDependentsOfDeceased?: number
   medicalPractitioner?: GQLMedicalPractitionerInput
   createdAt?: GQLDate
   updatedAt?: GQLDate
@@ -358,6 +360,11 @@ export interface GQLUserInput {
 export interface GQLSecurityQuestionAnswer {
   questionKey?: string
   answer?: string
+}
+
+export interface GQLAvatarInput {
+  type: string
+  data: string
 }
 
 export type GQLMap = any
@@ -407,8 +414,7 @@ export const enum GQLAttendantType {
   OTHER_PARAMEDICAL_PERSONNEL = 'OTHER_PARAMEDICAL_PERSONNEL',
   LAYPERSON = 'LAYPERSON',
   NONE = 'NONE',
-  OTHER = 'OTHER',
-  TRADITIONAL_BIRTH_ATTENDANT = 'TRADITIONAL_BIRTH_ATTENDANT'
+  OTHER = 'OTHER'
 }
 
 export const enum GQLBirthRegType {
@@ -438,7 +444,7 @@ export const enum GQLMannerOfDeath {
   ACCIDENT = 'ACCIDENT',
   SUICIDE = 'SUICIDE',
   HOMICIDE = 'HOMICIDE',
-  MANNER_UNDETERMINED = 'MANNER_UNDETERMINED'
+  UNDETERMINED = 'UNDETERMINED'
 }
 
 export const enum GQLCauseOfDeathMethodType {
@@ -560,6 +566,11 @@ export interface GQLLocalRegistrar {
 export interface GQLSignature {
   data?: string
   type?: string
+}
+
+export interface GQLAvatar {
+  type: string
+  data: string
 }
 
 export interface GQLSearchFieldAgentResponse {
@@ -916,7 +927,9 @@ export const enum GQLAttachmentSubject {
   APPLICANT_ATHORITY_TO_APPLY_PROOF = 'APPLICANT_ATHORITY_TO_APPLY_PROOF',
   LEGAL_GUARDIAN_PROOF = 'LEGAL_GUARDIAN_PROOF',
   ASSIGNED_RESPONSIBILITY_PROOF = 'ASSIGNED_RESPONSIBILITY_PROOF',
-  WARD_COUNCILLOR_PROOF = 'WARD_COUNCILLOR_PROOF'
+  WARD_COUNCILLOR_PROOF = 'WARD_COUNCILLOR_PROOF',
+  CAUSE_OF_DEATH = 'CAUSE_OF_DEATH',
+  CORONERS_REPORT = 'CORONERS_REPORT'
 }
 
 export interface GQLGenderBasisDetailsMetrics {
@@ -1215,6 +1228,7 @@ export interface GQLResolver {
   Identifier?: GQLIdentifierTypeResolver
   LocalRegistrar?: GQLLocalRegistrarTypeResolver
   Signature?: GQLSignatureTypeResolver
+  Avatar?: GQLAvatarTypeResolver
   SearchFieldAgentResponse?: GQLSearchFieldAgentResponseTypeResolver
   RegistrationGenderBasisMetrics?: GQLRegistrationGenderBasisMetricsTypeResolver
   RegistrationTimeFrameMetrics?: GQLRegistrationTimeFrameMetricsTypeResolver
@@ -1774,6 +1788,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   createOrUpdateUser?: MutationToCreateOrUpdateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
   changePassword?: MutationToChangePasswordResolver<TParent>
+  changeAvatar?: MutationToChangeAvatarResolver<TParent>
   auditUser?: MutationToAuditUserResolver<TParent>
   resendSMSInvite?: MutationToResendSMSInviteResolver<TParent>
 }
@@ -2069,6 +2084,19 @@ export interface MutationToChangePasswordResolver<
   (
     parent: TParent,
     args: MutationToChangePasswordArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToChangeAvatarArgs {
+  userId: string
+  avatar: GQLAvatarInput
+}
+export interface MutationToChangeAvatarResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToChangeAvatarArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -2690,6 +2718,8 @@ export interface GQLUserTypeResolver<TParent = any> {
   identifier?: UserToIdentifierResolver<TParent>
   signature?: UserToSignatureResolver<TParent>
   creationDate?: UserToCreationDateResolver<TParent>
+  avatar?: UserToAvatarResolver<TParent>
+  device?: UserToDeviceResolver<TParent>
 }
 
 export interface UserToIdResolver<TParent = any, TResult = any> {
@@ -2760,6 +2790,14 @@ export interface UserToSignatureResolver<TParent = any, TResult = any> {
 }
 
 export interface UserToCreationDateResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserToAvatarResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserToDeviceResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -3553,6 +3591,19 @@ export interface SignatureToDataResolver<TParent = any, TResult = any> {
 }
 
 export interface SignatureToTypeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLAvatarTypeResolver<TParent = any> {
+  type?: AvatarToTypeResolver<TParent>
+  data?: AvatarToDataResolver<TParent>
+}
+
+export interface AvatarToTypeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface AvatarToDataResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
