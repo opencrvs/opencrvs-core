@@ -16,19 +16,12 @@ import { resolve } from 'url'
 import { ReactWrapper } from 'enzyme'
 import { ErrorMessage } from '@opencrvs/components/lib/forms'
 
-it('renders without crashing', async () => {
-  createTestApp()
-})
-
-it('renders a phone number and a password field on startup', async () => {
-  const { app } = await createTestApp()
-  expect(app.find('input')).toHaveLength(3)
-})
-
 describe('Login app step one', () => {
-  beforeEach(() => {
+  let app: any
+  beforeEach(async () => {
     moxios.install(client)
-
+    const appBundle = await createTestApp()
+    app = appBundle.app
     window.config = {
       AUTH_API_URL: 'http://localhost:4040/',
       COUNTRY: 'zmb',
@@ -49,28 +42,44 @@ describe('Login app step one', () => {
       LOGROCKET: 'opencrvs-foundation/opencrvs-zambia'
     }
   })
+
   afterEach(() => {
+    app.unmount()
     moxios.uninstall(client)
   })
 
-  describe('when credential form is filled', () => {
-    let app: ReactWrapper<{}, {}>
-    beforeEach(async () => {
-      const appBundle = await createTestApp()
-      app = appBundle.app
-      app
-        .find('input#username')
-        .simulate('change', { target: { value: '01711111111' } })
+  it('renders a phone number and a password field on startup', async () => {
+    expect(app.find('input')).toHaveLength(3)
+  })
 
-      app
-        .find('input#password')
-        .simulate('change', { target: { value: 'test' } })
-    })
+  it('fills credentials form', async () => {
+    const { app } = await createTestApp()
+    app
+      .find('input#username')
+      .simulate('change', { target: { value: 'kennedy.mweene' } })
 
-    afterEach(() => {
-      app.unmount()
+    app.find('input#password').simulate('change', { target: { value: 'test' } })
+  })
+
+  it('redirects user to verification code form once username and password are accepted', async () => {
+    moxios.stubRequest(resolve(window.config.AUTH_API_URL, 'authenticate'), {
+      status: 200,
+      response: { nonce: '12345', mobile: '+260933333333', status: 'active' }
     })
-    it('sends the phone number and the password to our api when user submits the form', async () => {
+    app
+      .find('input#username')
+      .simulate('change', { target: { value: 'kennedy.mweene' } })
+    app.find('input#password').simulate('change', { target: { value: 'test' } })
+
+    app.find('form#STEP_ONE').simulate('submit')
+    await wait()
+    app.update()
+    expect(app.find('form#STEP_TWO')).toHaveLength(1)
+  })
+
+  /* describe('when credential form is filled', () => {
+
+    /*it('sends the phone number and the password to our api when user submits the form', async () => {
       moxios.stubRequest(resolve(window.config.AUTH_API_URL, 'authenticate'), {
         status: 401,
         responseText: { message: 'unauthorized' }
@@ -105,19 +114,7 @@ describe('Login app step one', () => {
           1
         )
       })
-    })
+    })*/
 
-    it('redirects user to verification code form once username and password are accepted', async () => {
-      moxios.stubRequest(resolve(window.config.AUTH_API_URL, 'authenticate'), {
-        status: 200,
-        responseText:
-          "{ nonce: '12345', mobile: '+260933333333', status: 'active' }"
-      })
-      app.find('form#STEP_ONE').simulate('submit')
-      await wait()
-      app.update()
-      console.log(app.debug())
-      expect(app.find('form#STEP_TWO')).toHaveLength(1)
-    })
-  })
+  //})
 })

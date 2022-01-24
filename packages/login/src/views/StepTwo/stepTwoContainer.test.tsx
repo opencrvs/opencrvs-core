@@ -13,10 +13,13 @@ import * as React from 'react'
 import * as moxios from 'moxios'
 import { ReactWrapper } from 'enzyme'
 import { StepTwoContainer } from '@login/views/StepTwo/StepTwoContainer'
-import { createTestComponent, wait } from '@login/tests/util'
+import { createTestComponent, wait, mockState } from '@login/tests/util'
 import { client } from '@login/utils/authApi'
+import { createStore } from '@login/store'
+import { authenticate, completeAuthentication } from '@login/login/actions'
 
 describe('Login app step two', () => {
+  const { store, history } = createStore()
   beforeEach(() => {
     moxios.install(client)
 
@@ -37,8 +40,19 @@ describe('Login app step two', () => {
   describe('Step Two Container test', () => {
     let component: ReactWrapper
 
-    beforeEach(() => {
-      component = createTestComponent(<StepTwoContainer />)
+    beforeEach(async () => {
+      store.dispatch(
+        authenticate({ username: 'kennedy.mweene', password: 'test' })
+      )
+      store.dispatch(
+        completeAuthentication({
+          nonce: 'drhdryhdyh',
+          token: 'test',
+          mobile: '+260933333333'
+        })
+      )
+      component = createTestComponent(<StepTwoContainer />, { store, history })
+      await wait()
       component.find('input#code').simulate('change', { target: { value: '' } })
     })
     it('Renders successfully', () => {
