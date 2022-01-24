@@ -1119,6 +1119,8 @@ export interface GQLCorrectionInput {
   values?: Array<GQLCorrectionValueInput | null>
   location?: GQLLocationInput
   data?: string
+  reason?: string
+  note?: string
 }
 
 export interface GQLReasonsNotApplyingInput {

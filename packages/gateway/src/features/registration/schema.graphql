@@ -363,6 +363,8 @@ input CorrectionInput {
   values: [CorrectionValueInput]
   location: LocationInput
   data: String
+  reason: String
+  note: String
 }
 
 input RegistrationInput {

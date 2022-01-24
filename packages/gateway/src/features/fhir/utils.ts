@@ -34,7 +34,10 @@ import {
   REASON_CAREGIVER_NOT_APPLYING,
   createPractitionerEntryTemplate,
   BIRTH_CORRECTION_ENCOUNTER_CODE,
-  DEATH_CORRECTION_ENCOUNTER_CODE
+  DEATH_CORRECTION_ENCOUNTER_CODE,
+  CORRECTION_CERTIFICATE_DOCS_CODE,
+  CORRECTION_CERTIFICATE_DOCS_TITLE,
+  CORRECTION_CERTIFICATE_DOCS_CONTEXT_KEY
 } from '@gateway/features/fhir/templates'
 import {
   ITemplatedBundle,
@@ -522,14 +525,26 @@ export function selectOrCreateDocRefResource(
 export function selectOrCreateCertificateDocRefResource(
   fhirBundle: ITemplatedBundle,
   context: any,
-  eventType: string
+  eventType: string,
+  isCorrection?: boolean
 ): fhir.DocumentReference {
+  const certificate = isCorrection
+    ? {
+        code: CORRECTION_CERTIFICATE_DOCS_CODE,
+        title: CORRECTION_CERTIFICATE_DOCS_TITLE,
+        indexKey: CORRECTION_CERTIFICATE_DOCS_CONTEXT_KEY
+      }
+    : {
+        code: CERTIFICATE_DOCS_CODE,
+        title: CERTIFICATE_DOCS_TITLE,
+        indexKey: CERTIFICATE_CONTEXT_KEY
+      }
   const docRef = selectOrCreateDocRefResource(
-    CERTIFICATE_DOCS_CODE,
-    CERTIFICATE_DOCS_TITLE,
+    certificate.code,
+    certificate.title,
     fhirBundle,
     context,
-    CERTIFICATE_CONTEXT_KEY
+    certificate.indexKey
   )
   if (!docRef.type) {
     docRef.type = {

@@ -1930,9 +1930,8 @@ export const builders: IFieldBuilders = {
         const certDocResource = selectOrCreateCertificateDocRefResource(
           fhirBundle,
           context,
-          context.event === EVENT_TYPE.BIRTH
-            ? 'birth-correction'
-            : 'death-correction'
+          context.event,
+          true
         )
         if (!certDocResource.extension) {
           certDocResource.extension = []
@@ -1959,9 +1958,8 @@ export const builders: IFieldBuilders = {
         const certDocResource = selectOrCreateCertificateDocRefResource(
           fhirBundle,
           context,
-          context.event === EVENT_TYPE.BIRTH
-            ? 'birth-correction'
-            : 'death-correction'
+          context.event,
+          true
         )
         if (!certDocResource.extension) {
           certDocResource.extension = []
@@ -1988,9 +1986,8 @@ export const builders: IFieldBuilders = {
         const certDocResource = selectOrCreateCertificateDocRefResource(
           fhirBundle,
           context,
-          context.event === EVENT_TYPE.BIRTH
-            ? 'birth-correction'
-            : 'death-correction'
+          context.event,
+          true
         )
         if (!certDocResource.extension) {
           certDocResource.extension = []
@@ -2218,6 +2215,34 @@ export const builders: IFieldBuilders = {
           ]
         }
         certDocResource.content[0].attachment.data = fieldValue
+      },
+      reason: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+        if (!taskResource.reason) {
+          taskResource.reason = {}
+        }
+        taskResource.reason.text = fieldValue
+      },
+      note: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+
+        const newNote: fhir.Annotation = {
+          text: fieldValue ? fieldValue : '',
+          time: new Date().toUTCString(),
+          authorString: ''
+        }
+        if (!taskResource.note) {
+          taskResource.note = []
+        }
+        taskResource.note.push(newNote)
       }
     },
     status: {
