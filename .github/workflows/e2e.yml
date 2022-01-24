@@ -11,14 +11,13 @@ name: End-to-end tests
 
 on:
   push:
-    branches: [ocrvs-2339]
-  pull_request:
-    branches: [ocrvs-2339]
+    branches:
+      - 'develop'
 
 jobs:
   E2E:
     runs-on: ubuntu-20.04
-
+    timeout-minutes: 30
     env:
       CYPRESS_LOGIN_URL: http://localhost:3020/
       CYPRESS_CLIENT_URL: http://localhost:3000/
