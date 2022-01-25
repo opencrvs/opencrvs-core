@@ -21,6 +21,7 @@ import 'core-js/features/array/flat'
 import 'jsdom-worker'
 import { roleQueries } from './forms/user/fieldDefinitions/query/queries'
 import { userQueries } from './user/queries'
+import debounce from 'lodash/debounce'
 
 if (process.env.CI) {
   jest.setTimeout(30000)
@@ -195,6 +196,7 @@ beforeEach(() => {
    * Reset all mocks
    */
 
+  ;(debounce as jest.Mock).mockImplementation((fn) => fn)
   storageGetItemMock.mockReset()
   storageSetItemMock.mockReset()
   warn.mockReset()
