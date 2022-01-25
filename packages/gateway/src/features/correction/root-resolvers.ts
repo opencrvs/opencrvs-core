@@ -12,7 +12,7 @@
 import { IAuthHeader } from '@gateway/common-types'
 import { GQLResolver } from '@gateway/graphql/schema'
 import { hasScope } from '@gateway/features/user/utils'
-import { buildFHIRBundle } from '@gateway/features/ correction/fhir-builders'
+import { buildFHIRBundle } from '@gateway/features/correction/fhir-builders'
 import { EVENT_TYPE } from '@gateway/features/fhir/constants'
 import { fetchFHIR, getIDFromResponse } from '@gateway/features/fhir/utils'
 
