@@ -68,6 +68,9 @@ interface IUserMessages
   currentPassword: MessageDescriptor
   changePassword: MessageDescriptor
   changePasswordMessage: MessageDescriptor
+  changeAvatar: MessageDescriptor
+  changeImage: MessageDescriptor
+  resizeAvatar: MessageDescriptor
   newPasswordLabel: MessageDescriptor
   passwordUpdateFormValidationMsg: MessageDescriptor
   passwordLengthCharacteristicsForPasswordUpdateForm: MessageDescriptor
@@ -80,6 +83,8 @@ interface IUserMessages
   requiredfield: MessageDescriptor
   incorrectPassword: MessageDescriptor
   passwordUpdated: MessageDescriptor
+  avatarUpdating: MessageDescriptor
+  avatarUpdated: MessageDescriptor
 }
 
 interface IDynamicUserMessages
@@ -319,6 +324,21 @@ const messagesToDefine: IUserMessages = {
     description: 'Password change message',
     id: 'misc.newPass.instruction'
   },
+  changeAvatar: {
+    id: 'settings.changeAvatar',
+    defaultMessage: 'Change profile image',
+    description: 'Avatar change modal header'
+  },
+  changeImage: {
+    id: 'settings.changeAvatar.changeImage',
+    defaultMessage: 'Change image',
+    description: 'Change image label'
+  },
+  resizeAvatar: {
+    id: 'settings.changeAvatar.resizeAvatar',
+    defaultMessage: 'Resize and position the chosen image.',
+    description: 'Avatar resize and position message'
+  },
   newPasswordLabel: {
     id: 'password.label.new',
     defaultMessage: 'New password:',
@@ -378,6 +398,16 @@ const messagesToDefine: IUserMessages = {
     id: 'system.user.settings.passwordUpdated',
     defaultMessage: 'Password was successfully changed',
     description: 'Password change message on success'
+  },
+  avatarUpdating: {
+    id: 'system.user.settings.avatarUpdating',
+    defaultMessage: 'Updating profile image',
+    description: 'Profile image message when uploading'
+  },
+  avatarUpdated: {
+    id: 'system.user.settings.avatarUpdated',
+    defaultMessage: 'Profile image successfully updated',
+    description: 'Profile image change message on success'
   }
 }
 

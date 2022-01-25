@@ -12,15 +12,22 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 - [OpenCRVS](#opencrvs)
-- [Presumed experience for developers checking out this software](#presumed-experience-for-developers-checking-out-this-software)
-- [Install these dependencies](#install-these-dependencies)
-- [First time setup](#first-time-setup)
+- [Important! Please read](#important-please-read)
+- [Install dependencies](#install-dependencies)
+- [Install OpenCRVS](#install-opencrvs)
+- [Log into OpenCRVS](#log-into-opencrvs)
+  - [**Field Agent**](#field-agent)
+  - [**Registration Agent**](#registration-agent)
+  - [Registrar](#registrar)
+  - [Local System Admin](#local-system-admin)
+  - [National System Admin](#national-system-admin)
 - [Starting and stopping OpenCRVS](#starting-and-stopping-opencrvs)
-  - [Starting OpenCRVS](#starting-opencrvs)
-  - [Stopping OpenCRVS](#stopping-opencrvs)
-- [Read the docs](#read-the-docs)
-- [Learn more](#learn-more)
-- [Configure OpenCRVS for your country](#configure-opencrvs-for-your-country)
+  - [Starting](#starting)
+  - [Stopping](#stopping)
+- [Other servers](#other-servers)
+  - [React Storybook](#react-storybook)
+  - [**OpenHIM**](#openhim)
+- [Configuring OpenCRVS](#configuring-opencrvs)
 - [What are the key OpenSource dependencies of OpenCRVS?](#what-are-the-key-opensource-dependencies-of-opencrvs)
   - [Hearth MongoDB Database layer](#hearth-mongodb-database-layer)
   - [ElasticSearch](#elasticsearch)
@@ -41,153 +48,138 @@
 
 ## OpenCRVS
 
-<p align="left">
+[OpenCRVS](https://www.opencrvs.org/) (Civil registration & Vital Statistics) is a digital public good to help achieve universal civil registration and evidence-based decision making in all country contexts.
 
-<img width="844" height="421" src="https://static.wixstatic.com/media/93440e_c5d62bf627ab4edf9d7100441eb9e01c~mv2_d_5500_3694_s_4_2.png/v1/crop/x_0,y_345,w_5500,h_2749/fill/w_844,h_421,al_c,q_80,usm_0.66_1.00_0.01/oCRVS_MockupALL.webp">
+> **We are on a mission to ensure that every individual on the planet is recognised, protected and provided for from birth.**
 
-</p>
+## Important! Please read
 
-**_We are on a mission to ensure that every individual on the planet is recognised, protected and provided for from birth._**
+In order to run OpenCRVS, we expect that you have a working knowledge of Linux / Unix operating systems and can run terminal commands.
 
-[OpenCRVS](https://www.opencrvs.org) (Civil registration & Vital Statistics) is a digital public good to help achieve universal civil
-registration and evidence-based decision making in all country contexts.
-
-<br>
-
-## Presumed experience for developers checking out this software
-
-In order to run OpenCRVS, we expect that you have a working knowledge of Linux / Unix operating systems and can run Terminal commands. OpenCRVS consists of multiple servers which run in Docker containers and requires Node JS. You should be familiar with the concepts of Docker and Node JS web application software development.
+OpenCRVS consists of multiple servers which run in Docker containers and requires Node JS. You should be familiar with the concepts of Docker and Node JS web application software development.
 
 Install the dependencies and follow the first time setup instructions. This will checkout, download, install, configure and start all the servers for you in order to get up and running quickly with OpenCRVS.
 
-<br>
+Read review our [documentation](http://documentation.opencrvs.org/opencrvs-core/) before going further.
 
-## Install these dependencies
+## Install dependencies
 
-Dependencies are required. Ensure you have satisfied ALL the following requirements before continuing:
+Dependencies are required. Ensure you have satisfied all the following requirements before continuing:
 
-- You have a working Linux or Unix operating system: e.g. Ubuntu or Mac OSX: If you do not have Ubuntu or MacOSX, investigate installing a [virtual](https://www.virtualbox.org/) [Ubuntu](https://ubuntu.com/download/desktop) environment on your computer.
-- You need a minimum of 10GB of hard drive space available and at least 8GB of RAM. If you are using virtualisation, ensure this is dedicated to the environment.
-- On Ubuntu, install [Docker](https://docs.docker.com/engine/install/ubuntu/) & [Docker Compose](https://docs.docker.com/compose/install/). On Mac, install [Docker for Mac](https://docs.docker.com/desktop/mac/install/)
-- The Node runtime is required. We recommend you install Node v.14.15.0, v14.15.4, 14.17.0 or v14.18.1 as this release has been tested on those versions. There are various ways you can install Node. The easiest way to get Node running with the version of your choice is using [Node Version Manager](https://nodejs.org/en/download/package-manager/#nvm).
-- You need to install the Yarn Package Manager for Node. The documentation is [here](https://classic.yarnpkg.com/en/docs/install)
-- You should install the Chrome web browser. The OpenCRVS client application is a progressive web application. It is best experienced using [Google Chrome](https://www.google.com/chrome).
-- OpenCRVS requires multiple terminal windows open in order to run OpenCRVS Core alongside the default country configuration. Our setup script uses the tool tmux to do this. On Ubuntu run: `sudo apt-get install tmux` to install. On Mac, you can install tmux using Homebrew or MacPorts. [tmux wiki](https://github.com/tmux/tmux/wiki)
+- **Operation system**: Linux or Unix operating system is required: e.g. Ubuntu or Mac OSX: If you do not have Ubuntu or MacOSX, investigate installing a [virtual](https://www.virtualbox.org/) [Ubuntu](https://ubuntu.com/download/desktop) environment on your computer.
+- **Disk space and RAM:** A minimum of 10GB of hard drive space available and at least 8GB of RAM. If you are using virtualisation, ensure this is dedicated to the environment.
+- **Docker**: On Ubuntu, install [Docker](https://docs.docker.com/engine/install/ubuntu/) & [Docker Compose](https://docs.docker.com/compose/install/). On Mac, install [Docker for Mac](https://docs.docker.com/desktop/mac/install/)
+- **Nodejs:** Install [Node](https://nodejs.org/en/download/) v.14.15.0, v14.15.4, 14.17.0 or v14.18.1 (this release has been tested on those versions). You can manage the Node version of your choice using [Node Version Manager](https://nodejs.org/en/download/package-manager/#nvm).
+- **Yarn:** Install the [Yarn Package Manager](https://classic.yarnpkg.com/en/docs/install) for Node
+- **Chrome:** Install [Google Chrome](https://www.google.com/chrome). The OpenCRVS client application is a progressive web application.
+- **tmux:** Install [tmux](https://github.com/tmux/tmux/wiki). Multiple terminal windows are required to run OpenCRVS Core alongside the default country configuration. On Ubuntu run: `sudo apt-get install tmux` to install. On Mac, you can install tmux using Homebrew or MacPorts.
 
-<br>
+## Install OpenCRVS
 
-## First time setup
+1. Check you have installed all the dependencies. See above.
+2. Run `git clone[https://github.com/opencrvs/opencrvs-core.git](https://github.com/opencrvs/opencrvs-core.git)`
+3. Run `git checkout master`
+4. Run `cd opencrvs-core`
+5. Run `bash setup.sh` (takes 10-15 minutes)
 
-Now you have satisfied the dependencies, run the following **ONE TIME ONLY** command to install OpenCRVS.
+   This installer script will:
 
-**The setup command tests your dependencies, downloads and installs all Docker images, checks out the example OpenCRVS country configuration, runs all OpenCRVS Core microservices, runs the OpenCRVS Zambia country configuration and populates local databases with Zambia country configuration reference data required in order to demo OpenCRVS. The script requries internet connectivity and takes approximately 15 minutes to complete.**
+   - Tests your dependencies
+   - Checks that required ports are available. NOTE: Latest Macbooks run AirPlay on port 5000. Some Mac users need to disable AirPlay when running OpenCRVS.
+   - Download and install all Docker images
+   - Check out the example OpenCRVS country configuration
+   - Runs all OpenCRVS Core microservices
+   - Run the OpenCRVS Zambia country configuration and populate local databases with Zambia country configuration reference data
+   - If there are any missing dependencies the script will exit and display instructions. Once the dependency is satisfied, you can try again.
 
-If there are any missing dependencies the script will exit and display instructions. Once the dependency is satisfied, you can try again.
+6. On completion you will see the OpenCRVS logo
+7. Open the url **[`http://localhost:3020/`](http://localhost:3020/)**
+8. You have successfully installed OpenCRVS! 🎉
+9. Proceed to login using the details below
+10. To stop OpenCRVS running in the installer, type **Ctrl+c**, then **exit** in each tmux terminal window
 
-### The first time setup command
+## Log into OpenCRVS
 
-`bash setup.sh`
+Open the url **[`http://localhost:3020/`](http://localhost:3020/)**
 
-**When the script completes, you will see the OpenCRVS logo in one of the tmux terminal windows.**
-**Once this command completes, you should not run it again. Instead, use the start up commands to start and stop OpenCRVS explained later in this README.**
+Use one of the following authentication details for your user of choice. To learn about these user roles and to perform civil registration tasks, read our [documentation](http://documentation.opencrvs.org/)
 
-When fully installed and running, you will see the following information in one of the tmux windows...
+### **Field Agent**
 
-1. You can log in to OpenCRVS on this url: **[http://localhost:3020/](http://localhost:3020/)**
+Username: **kalusha.bwalya** / Password: **test** / SMS code: **000000**
 
-User details are:
+### **Registration Agent**
 
-Field Agent role: Username: **kalusha.bwalya** / Password: **test** / Test two-factor authentication SMS code: **000000**
+Username: **felix.katongo** / Password: **test** / SMS code: **000000**
 
-Registration Agent role: Username: **felix.katongo** / Password: **test** / Test two-factor authentication SMS code: **000000**
+### Registrar
 
-Registrar role: Username: **kennedy.mweene** / Password: **test** / Test two-factor authentication SMS code: **000000**
+Username: **kennedy.mweene** / Password: **test** / SMS code: **000000**
 
-Local System Admin: Username: **emmanuel.mayuka** / Password: **test** / Test two-factor authentication SMS code: **000000**
+### Local System Admin
 
-National System Admin: Username: **jonathan.campbell** / Password: **test** / Test two-factor authentication SMS code: **000000**
+Username: **emmanuel.mayuka** / Password: **test** / SMS code: **000000**
 
-To learn about these user roles and to perform civil registration tasks, read the [Documentation](http://documentation.opencrvs.org/).
+### National System Admin
 
-You can browse to other interesting servers such as:
-
-2. The React Storybook component styleguide, available here: **[http://localhost:6060/](http://localhost:6060/)**
-
-3. The OpenHIM NodeJS enterprise service bus available here: **[http://localhost:8888/#!/login](http://localhost:8888/#!/login)**
-
-OpenHIM access details: Username: **root@openhim.org** / Password: **password**
-
-OpenHIM is designed to ease interoperability between OpenCRVS and external systems such as Health & National ID. It provides external access to the system via secure APIs. OpenHIM channels and governs internal transactions, routing, orchestrating and translating requests into [FHIR](https://www.hl7.org/fhir/) between services and the database layer.
-
-When logging into OpenCRVS core locally, OpenHIM will display an error " ..if you are using a self-signed certificate, you may first need to instruct your browser to accept it. You can do so by accessing the following link." Click the link, and you will see the Chrome: Your connection is not private" error. This is nothing to worry about as when deploying OpenCRVS core to a server, our Traefik service provisions a LetsEncrypt SSL cert across the entire stack. Click "Advanced" & "Proceed to localhost (unsafe)". You will see output like this:
-
-`{"master":655.1310464,"now":1642447245037}`
-
-You can now go back to this OpenHIM link and login again freely: **[http://localhost:8888/#!/login](http://localhost:8888/#!/login)**
-
-4. To quit OpenCRVS: press **Ctrl+C** in each terminal and type `exit` in each terminal to close the tmux window.
-
-<br>
+Username: **jonathan.campbell** / Password: **test** / SMS code: **000000**
 
 ## Starting and stopping OpenCRVS
 
-After quitting the setup process above. If you want to start and stop opencrvs-core and the country configuration server, use the following commands
+After you have installed OpenCRVS. The setup script will have installed the [opencrvs-zambia country configuration](https://github.com/opencrvs/opencrvs-zambia) in a directory alongside opencrvs-core. The country configuration is a separate server that must be started and stopped alongside opencrvs-core.
 
-### Starting OpenCRVS
+To start and stop opencrvs-core and the country configuration server, use the following commands.
 
-The setup script will have installed the [opencrvs-zambia country configuration](https://github.com/opencrvs/opencrvs-zambia) in a directory alongside opencrvs-core.
-The country configuration is a separate server that must be started and stopped alongside opencrvs-core.
+### Starting
 
-1. You need to pass the absolute path to opencrvs-core as a parameter when starting the country configuration. First you can output the path by entering the following command in the opencrvs-core directory:
+1. Run `cd opencrvs-core`
+2. Run `pwd` to output the path. (You have to pass the absolute path to opencrvs-core as a parameter when starting the country configuration )
+3. Copy the path
+4. Run `yarn dev` to start opencrvs-core
 
-`pwd`
+   If you did not previously run our setup command, Docker will have to download Mongo DB, ElasticSearch, OpenHIM and Hearth docker images. These are large files. Then docker will build them and you will see Mongo errors output for a long time until Mongo is running.
 
-2. Copy the path to save it in your clipboard.
+   If you did run our setup command, OpenCRVS will start much faster.
 
-3. To start up opencrvs-core, run:
+   Wait for the OpenCRVS client app to build completely (output will stop and you will see the message: @opencrvs/client: Compiled with warnings. Along with TypeScript/Node dependency warnings... ), then OpenCRVS Core will be available.
 
-`yarn dev`
+5. Open a new terminal window
+6. Run `cd ../opencrvs-zambia`
+7. Run `yarn dev <!-- paste in the absolute path to your opencrvs-core directory here -->` to start the country configuration server
 
-If you did not previously run our setup command, Docker will have to download Mongo DB, ElasticSearch, OpenHIM and Hearth docker images. These are large files. Then docker will build them and you will see Mongo errors output for a long time until Mongo is running.
+### Stopping
 
-If you did run our setup command, OpenCRVS will start much faster.
+1. Press Ctrl+c in the opencrvs-core terminal
+2. Press Ctrl+c in the opencrvs-zambia terminal
 
-Wait for the OpenCRVS client app to build completely (output will stop and you will see the message: @opencrvs/client: Compiled with warnings. Along with TypeScript/Node dependency warnings... ), then OpenCRVS Core will be available.
+## Other servers
 
-4. In a new terminal window, cd into the opencrvs-zambia repo. e.g. if you used our setup script, it will be here:
+When OpenCRVS is running, you can browse to other interesting servers such as:
 
-`cd ../opencrvs-zambia`
+### React Storybook
 
-5. Now start the country configuration server by running:
+Our UI component styleguide, available here: **[http://localhost:6060/](http://localhost:6060/)**
 
-`yarn dev <!-- paste in the absolute path to your opencrvs-core directory here -->`
+This is a work in progress
 
-### Stopping OpenCRVS
+### **OpenHIM**
 
-To quit: press **Ctrl+C** in the 2 terminal windows you have open to quit opencrvs-core and opencrvs-zambia respectively.
+OpenHIM is designed to ease interoperability between OpenCRVS and external systems such as Health & National ID. It provides external access to the system via secure APIs. OpenHIM channels and governs internal transactions, routing, orchestrating and translating requests into [FHIR](https://www.hl7.org/fhir/) between services and the database layer.
 
-<br>
+1. Visit [`http://localhost:8888/#!/login`](http://localhost:8888/#!/login)
+2. Login. username: **root@openhim.org** / Password: **password**
 
-## Read the docs
+   When logging into OpenCRVS core locally, OpenHIM will display an error " ..if you are using a self-signed certificate, you may first need to instruct your browser to accept it.
 
-Before going further, you should read the [Documentation](http://documentation.opencrvs.org/).
+   You can do so by accessing the following link." Click the link, and you will see the Chrome: Your connection is not private" error.
 
-<br>
+   This is nothing to worry about as when deploying OpenCRVS core to a server, our Traefik service provisions a LetsEncrypt SSL cert across the entire stack. Click "Advanced" & "Proceed to localhost (unsafe)". You will see output like this `{"master":655.1310464,"now":1642447245037}`.
 
-## Learn more
+   You can now go back to this OpenHIM link and login again freely: **[http://localhost:8888/#!/login](http://localhost:8888/#!/login)**
 
-**_We are on a mission to ensure that every individual on the planet is recognised, protected and provided for from birth._**
+## Configuring OpenCRVS
 
-[OpenCRVS](https://www.opencrvs.org) (Civil registration & Vital Statistics) is a digital public good to help achieve universal civil
-registration and evidence-based decision making in all country contexts.
-
-<br>
-
-## Configure OpenCRVS for your country
-
-A companion example country cnfiguration for Zambia is checked out for you automatically using our setup script above. This country configuration server runs alongside opencrvs-core and serves languages, form configuration, logo files, adminisrative structure (jurisdictions and offices) etc. To see the code, learn more and fork for your requirements, visit the repo. [opencrvs-zambia](https://github.com/opencrvs/opencrvs-zambia).
-
-<br>
+A companion example country configuration for Zambia is checked out for you automatically using our setup script above. This country configuration server runs alongside opencrvs-core and serves languages, form configuration, logo files, adminisrative structure (jurisdictions and offices) etc. To see the code, learn more and fork for your requirements, visit the repo. [opencrvs-zambia](https://github.com/opencrvs/opencrvs-zambia).
 
 ## What are the key OpenSource dependencies of OpenCRVS?
 

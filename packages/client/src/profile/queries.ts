@@ -54,6 +54,10 @@ export const FETCH_USER = gql`
           type
         }
       }
+      avatar {
+        type
+        data
+      }
     }
   }
 `

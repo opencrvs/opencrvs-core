@@ -165,9 +165,8 @@ describe('Report page', () => {
 
     testComponent = (
       await createTestComponent(
-        // @ts-ignore
         <Report
-          history={history}
+          history={history as any}
           staticContext={mock}
           match={{
             params: {},
