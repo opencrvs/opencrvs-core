@@ -21,6 +21,7 @@ import 'core-js/features/array/flat'
 import 'jsdom-worker'
 import { roleQueries } from './forms/user/fieldDefinitions/query/queries'
 import { userQueries } from './user/queries'
+import debounce from 'lodash/debounce'
 
 if (process.env.CI) {
   jest.setTimeout(30000)
@@ -88,13 +89,14 @@ console.debug = debug
 
 const log = console.log.bind(console)
 
+/*
 const BLOCKED_MESSAGES = ['Warning: Setting up fake worker.']
 console.log = jest.fn().mockImplementation((...messages) => {
   if (BLOCKED_MESSAGES.includes(messages.join(' '))) {
     return
   }
   log(...messages)
-})
+})*/
 /* eslint-enable no-console */
 /*
  * GraphQL Queries
@@ -205,6 +207,7 @@ beforeEach(() => {
    * Reset all mocks
    */
 
+  ;(debounce as jest.Mock).mockImplementation((fn) => fn)
   storageGetItemMock.mockReset()
   storageSetItemMock.mockReset()
   warn.mockReset()

@@ -28,12 +28,6 @@ import {
   createReviewApplication,
   storeApplication,
   setInitialApplications,
-  IUserData,
-  getCurrentUserID,
-  getApplicationsOfCurrentUser,
-  writeApplicationByUser,
-  deleteApplicationByUser,
-  IApplication,
   SUBMISSION_STATUS,
   modifyApplication
 } from '@client/applications'
@@ -54,8 +48,6 @@ import { IForm } from '@client/forms'
 import { clone, cloneDeep } from 'lodash'
 import { FETCH_REGISTRATION } from '@opencrvs/client/src/forms/register/queries/registration'
 import { FETCH_PERSON_NID } from '@opencrvs/client/src/forms/register/queries/person'
-import { storage } from '@client/storage'
-import { IUserDetails } from '@client/utils/userUtils'
 
 import { formMessages as messages } from '@client/i18n/messages'
 import * as profileSelectors from '@client/profile/profileSelectors'
