@@ -89,7 +89,7 @@ console.debug = debug
 const log = console.log.bind(console)
 
 const BLOCKED_MESSAGES = ['Warning: Setting up fake worker.']
-console.log = (...messages) => {
+console.log = (...messages: any[]) => {
   if (BLOCKED_MESSAGES.includes(messages.join(' '))) {
     return
   }
