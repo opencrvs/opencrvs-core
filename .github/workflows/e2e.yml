@@ -60,12 +60,12 @@ jobs:
 
       - name: Download & run docker images
         run: |
-          screen -d -m yarn compose:deps
+          yarn compose:deps -d
           wait-on -l tcp:3447 http://localhost:9200 tcp:5001 tcp:9200 tcp:27017 tcp:6379 tcp:8086
 
       - name: Run Microservices
         run: |
-          screen -dm bash -c 'LANGUAGES=en yarn start'
+          bash -c 'LANGUAGES=en yarn start' &
           wait-on -l tcp:4040 http://localhost:3000 http://localhost:3020 tcp:3030 tcp:2020 tcp:7070 tcp:5050 tcp:9090 tcp:1050
 
       - name: Running the Country specific resource package
@@ -76,10 +76,10 @@ jobs:
           yarn db:clear:all
           yarn db:backup:restore
 
-          screen -dm bash -c 'CERT_PUBLIC_KEY_PATH=./../.secrets/public-key.pem yarn start'
+          bash -c 'CERT_PUBLIC_KEY_PATH=./../.secrets/public-key.pem yarn start' &
           wait-on -l tcp:3040
 
       - name: Running the E2E test
         run: |
-          cd opencrvs-zambia
+          cd opencrvs-farajaland
           yarn e2e --record false
