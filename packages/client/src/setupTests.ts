@@ -86,15 +86,6 @@ console.warn = warn
 console.error = error
 console.debug = debug
 
-const log = console.log.bind(console)
-
-const BLOCKED_MESSAGES = ['Warning: Setting up fake worker.']
-console.log = (...messages: any[]) => {
-  if (BLOCKED_MESSAGES.includes(messages.join(' '))) {
-    return
-  }
-  log(...messages)
-}
 /* eslint-enable no-console */
 /*
  * GraphQL Queries
@@ -165,8 +156,7 @@ const {
   mockOfflineData,
   userDetails,
   validToken,
-  getItem,
-  assign
+  getItem
 } = require('./tests/util')
 
 jest.mock(
@@ -211,6 +201,8 @@ beforeEach(() => {
   error.mockReset()
   debug.mockReset()
   hiddenMock.mockReset()
+
+  Date.now = jest.fn(() => 1487076708000)
 
   /*
    * Assign sane defaults for everything
