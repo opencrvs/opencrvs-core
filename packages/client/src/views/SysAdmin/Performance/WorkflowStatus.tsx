@@ -149,7 +149,7 @@ interface ISearchParams {
   event?: Event
 }
 export interface IHistoryStateProps {
-  sectionId: typeof OPERATIONAL_REPORT_SECTION
+  sectionId: OPERATIONAL_REPORT_SECTION
   timeStart: Date | string
   timeEnd: Date | string
 }
