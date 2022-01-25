@@ -92,7 +92,7 @@ function CorrectionReasonFormComponent(props: IFullProps) {
       application.data[section.id] || {}
     )
 
-    group.fields.forEach((field) => {
+    for (const field of group.fields) {
       const fieldErrors = errors[field.name].errors
       const nestedFieldErrors = errors[field.name].nestedFields
 
@@ -103,23 +103,23 @@ function CorrectionReasonFormComponent(props: IFullProps) {
       }
 
       if (field.nestedFields) {
-        Object.values(field.nestedFields).forEach((nestedFields) => {
-          nestedFields.forEach((nestedField) => {
+        for (const nestedFields of Object.values(field.nestedFields)) {
+          for (const nestedField of nestedFields) {
             if (
               nestedFieldErrors[nestedField.name] &&
               nestedFieldErrors[nestedField.name].length > 0
             ) {
               hasError = true
             }
-          })
-        })
+          }
+        }
       }
 
       if (hasError) {
         setShowError(true)
         return
       }
-    })
+    }
   }
 
   return (
