@@ -1079,14 +1079,13 @@ describe('when user is in the register form from review edit', () => {
     component = testComponent.component
   })
 
-  xit('should redirect to progress tab when close application button is clicked', async () => {
+  it('should redirect to progress tab when close application button is clicked', async () => {
     const menuButton = await waitForElement(
       component,
       '#eventToggleMenuToggleButton'
     )
     menuButton.hostNodes().simulate('click')
     component.update()
-
     const closeApplicationButton = await waitForElement(
       component,
       '#eventToggleMenuItem0'
