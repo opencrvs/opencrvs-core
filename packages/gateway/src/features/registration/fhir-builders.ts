@@ -782,14 +782,16 @@ function createActionTypesBuilder() {
         'input',
         fieldValue,
         'valueCode',
-        context
+        context,
+        'values'
       )
       setObjectPropInResourceArray(
         task,
         'output',
         fieldValue,
         'valueCode',
-        context
+        context,
+        'values'
       )
     },
     fieldName: (
@@ -803,14 +805,16 @@ function createActionTypesBuilder() {
         'input',
         fieldValue,
         'valueId',
-        context
+        context,
+        'values'
       )
       setObjectPropInResourceArray(
         task,
         'output',
         fieldValue,
         'valueId',
-        context
+        context,
+        'values'
       )
     },
     oldValue: (
@@ -819,13 +823,21 @@ function createActionTypesBuilder() {
       context: any
     ) => {
       const task = selectOrCreateTaskRefResource(fhirBundle, context)
-      setObjectPropInResourceArray(task, 'input', actionType, 'type', context)
+      setObjectPropInResourceArray(
+        task,
+        'input',
+        actionType,
+        'type',
+        context,
+        'values'
+      )
       setObjectPropInResourceArray(
         task,
         'input',
         fieldValue,
         'valueString',
-        context
+        context,
+        'values'
       )
     },
     newValue: (
@@ -834,13 +846,21 @@ function createActionTypesBuilder() {
       context: any
     ) => {
       const task = selectOrCreateTaskRefResource(fhirBundle, context)
-      setObjectPropInResourceArray(task, 'input', actionType, 'type', context)
       setObjectPropInResourceArray(
         task,
-        'input',
+        'output',
+        actionType,
+        'type',
+        context,
+        'values'
+      )
+      setObjectPropInResourceArray(
+        task,
+        'output',
         fieldValue,
         'valueString',
-        context
+        context,
+        'values'
       )
     }
   }

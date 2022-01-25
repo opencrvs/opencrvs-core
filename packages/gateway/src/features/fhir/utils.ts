@@ -819,15 +819,24 @@ export function setObjectPropInResourceArray(
   label: string,
   value: string | string[] | object,
   propName: string,
-  context: any
+  context: any,
+  contextProperty?: string
 ) {
   if (!resource[label]) {
     resource[label] = []
   }
-  if (!resource[label][context._index[label]]) {
-    resource[label][context._index[label]] = {}
+
+  if (contextProperty) {
+    if (!resource[label][context._index[contextProperty]]) {
+      resource[label][context._index[contextProperty]] = {}
+    }
+    resource[label][context._index[contextProperty]][propName] = value
+  } else {
+    if (!resource[label][context._index[label]]) {
+      resource[label][context._index[label]] = {}
+    }
+    resource[label][context._index[label]][propName] = value
   }
-  resource[label][context._index[label]][propName] = value
 }
 
 export function setArrayPropInResourceObject(
