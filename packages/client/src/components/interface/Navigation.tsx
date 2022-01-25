@@ -29,15 +29,12 @@ import {
   goToFieldAgentHomeTab as goToFieldAgentHomeTabAction,
   goToRegistrarHomeTab,
   goToConfig,
-  goToOperationalReport,
-  goToPerformanceHome,
-  goToTeamSearch,
   goToSettings,
-  goToTeamUserList
+  goToPerformanceView,
+  goToTeamView
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { COUNT_USER_WISE_APPLICATIONS } from '@client/search/queries'
-import { NATL_ADMIN_ROLES } from '@client/utils/constants'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
 import { EVENT_STATUS } from '@client/views/OfficeHome/OfficeHome'
@@ -46,7 +43,6 @@ import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavig
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
 import { Configuration } from '@opencrvs/components/lib/icons/Configuration'
 import { Expandable } from '@opencrvs/components/lib/icons/Expandable'
-import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { constantsMessages } from '@client/i18n/messages'
 import { Spinner } from '@opencrvs/components/lib/interface'
@@ -153,11 +149,9 @@ interface IDispatchProps {
   goToFieldAgentHomeTab: typeof goToFieldAgentHomeTabAction
   goToRegistrarHomeTab: typeof goToRegistrarHomeTab
   goToConfigAction: typeof goToConfig
-  goToPerformanceHomeAction: typeof goToPerformanceHome
-  goToOperationalReportAction: typeof goToOperationalReport
-  goToTeamSearchAction: typeof goToTeamSearch
-  goToTeamUserListAction: typeof goToTeamUserList
   redirectToAuthentication: typeof redirectToAuthentication
+  goToPerformanceViewAction: typeof goToPerformanceView
+  goToTeamViewAction: typeof goToTeamView
   goToSettings: typeof goToSettings
 }
 
@@ -192,46 +186,6 @@ const TAB_LABEL = {
   applicationSettings: 'Application Settings',
   settings: 'Settings',
   logout: 'Logout'
-}
-
-const goToPerformanceView = (props: IFullProps) => {
-  const {
-    userDetails,
-    goToPerformanceHomeAction,
-    goToOperationalReportAction
-  } = props
-
-  if (userDetails && userDetails.role) {
-    if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
-      return goToPerformanceHomeAction()
-    } else {
-      const locationId = getJurisdictionLocationIdFromUserDetails(userDetails)
-      return (
-        (locationId && goToOperationalReportAction(locationId)) ||
-        goToPerformanceHomeAction()
-      )
-    }
-  }
-}
-
-const goToTeamView = (props: IFullProps) => {
-  const { userDetails, goToTeamUserListAction, goToTeamSearchAction } = props
-  if (userDetails && userDetails.role) {
-    if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
-      return goToTeamSearchAction()
-    } else {
-      return goToTeamUserListAction(
-        {
-          id: (userDetails.primaryOffice && userDetails.primaryOffice.id) || '',
-          searchableText:
-            (userDetails.primaryOffice && userDetails.primaryOffice.name) || '',
-          displayLabel:
-            (userDetails.primaryOffice && userDetails.primaryOffice.name) || ''
-        },
-        true
-      )
-    }
-  }
 }
 
 const getSettingsAndLogout = (props: IFullProps) => {
@@ -282,8 +236,11 @@ export const NavigationView = (props: IFullProps) => {
     menuCollapse,
     userInfo
   } = props
-  const tabId =
-    match.params.tabId || activeMenuItem !== '' ? activeMenuItem : 'review'
+  const tabId = match.params.tabId
+    ? match.params.tabId
+    : activeMenuItem
+    ? activeMenuItem
+    : 'review'
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
   const { loading, error, data, initialSyncDone } = workqueue
   const filteredData = filterProcessingApplicationsFromQuery(
@@ -518,7 +475,9 @@ export const NavigationView = (props: IFullProps) => {
                       )}
                       id={`navigation_${TAB_ID.performance}`}
                       label={TAB_LABEL.performance}
-                      onClick={() => goToPerformanceView(props)}
+                      onClick={() =>
+                        props.goToPerformanceViewAction(userDetails)
+                      }
                       isSelected={
                         enableMenuSelection &&
                         activeMenuItem === TAB_ID.performance
@@ -533,7 +492,7 @@ export const NavigationView = (props: IFullProps) => {
                       )}
                       id={`navigation_${TAB_ID.team}`}
                       label={TAB_LABEL.team}
-                      onClick={() => goToTeamView(props)}
+                      onClick={() => props.goToTeamViewAction(userDetails)}
                       isSelected={
                         enableMenuSelection && activeMenuItem === TAB_ID.team
                       }
@@ -639,10 +598,8 @@ export const Navigation = connect<
   goToFieldAgentHomeTab: goToFieldAgentHomeTabAction,
   goToRegistrarHomeTab,
   goToConfigAction: goToConfig,
-  goToPerformanceHomeAction: goToPerformanceHome,
-  goToOperationalReportAction: goToOperationalReport,
-  goToTeamSearchAction: goToTeamSearch,
-  goToTeamUserListAction: goToTeamUserList,
+  goToPerformanceViewAction: goToPerformanceView,
+  goToTeamViewAction: goToTeamView,
   redirectToAuthentication,
   goToSettings
 })(injectIntl(withTheme(withRouter(NavigationView))))

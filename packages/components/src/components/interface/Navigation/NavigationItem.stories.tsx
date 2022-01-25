@@ -25,7 +25,7 @@ const Template: Story<INavigationItemProps> = (args) => (
 export const itemInProgress = Template.bind({})
 
 itemInProgress.args = {
-  icon: <LeftNavigationApplicationIcons />,
+  icon: () => <LeftNavigationApplicationIcons />,
   label: 'In progress',
   count: 6
 }
@@ -33,7 +33,7 @@ itemInProgress.args = {
 export const itemReadyForReview = Template.bind({})
 
 itemReadyForReview.args = {
-  icon: <LeftNavigationApplicationIcons color={'orange'} />,
+  icon: () => <LeftNavigationApplicationIcons color={'orange'} />,
   label: 'Ready for review',
   count: 23
 }
@@ -41,14 +41,14 @@ itemReadyForReview.args = {
 export const itemRequiresUpdates = Template.bind({})
 
 itemRequiresUpdates.args = {
-  icon: <LeftNavigationApplicationIcons color={'red'} />,
+  icon: () => <LeftNavigationApplicationIcons color={'red'} />,
   label: 'Requires updates'
 }
 
 export const itemReadyToPrint = Template.bind({})
 
 itemReadyToPrint.args = {
-  icon: <LeftNavigationApplicationIcons color={'green'} />,
+  icon: () => <LeftNavigationApplicationIcons color={'green'} />,
   label: 'Ready to print',
   count: 23
 }
@@ -56,21 +56,21 @@ itemReadyToPrint.args = {
 export const itemPerformance = Template.bind({})
 
 itemPerformance.args = {
-  icon: <Activity stroke={'#595C5F'} height={15} width={15} />,
+  icon: () => <Activity stroke={'#595C5F'} height={15} width={15} />,
   label: 'Performance'
 }
 
 export const itemTeam = Template.bind({})
 
 itemTeam.args = {
-  icon: <Users stroke={'#595C5F'} height={15} width={15} />,
+  icon: () => <Users stroke={'#595C5F'} height={15} width={15} />,
   label: 'Team'
 }
 
 export const itemConfiguration = Template.bind({})
 
 itemConfiguration.args = {
-  icon: <Configuration />,
+  icon: () => <Configuration />,
   label: 'Configuration',
   isSelected: true
 }
@@ -78,4 +78,4 @@ itemConfiguration.args = {
 export default {
   title: 'Components/Interface/NavigationItem',
   component: NavigationItem
-} as Meta
+}

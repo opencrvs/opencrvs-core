@@ -187,7 +187,7 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.informant'
   },
   applicationName: {
-    defaultMessage: 'Open CRVS',
+    defaultMessage: 'OpenCRVS',
     description: 'Application name of CRVS',
     id: 'constants.applicationName'
   },

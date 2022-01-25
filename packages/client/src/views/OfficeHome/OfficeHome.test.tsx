@@ -129,7 +129,7 @@ queries.fetchUserDetails = mockFetchUserDetails
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 
-const { store } = createStore()
+const { store, history } = createStore()
 const client = createClient(store)
 beforeAll(async () => {
   getItem.mockReturnValue(registerScopeToken)
@@ -139,7 +139,6 @@ beforeAll(async () => {
 describe('OfficeHome related tests', () => {
   it('sets loading state while waiting for data', async () => {
     const testComponent = await createTestComponent(
-      // @ts-ignore
       <OfficeHome
         match={{
           params: {
@@ -149,6 +148,12 @@ describe('OfficeHome related tests', () => {
           path: '',
           url: ''
         }}
+        staticContext={undefined}
+        history={history}
+        location={history.location}
+        id={'Test'}
+        buttonLabel={'Button Test'}
+        onSubmit={() => alert(`submitted`)}
       />,
       store
     )
@@ -174,8 +179,20 @@ describe('OfficeHome related tests', () => {
     })
     it('renders page with five tabs', async () => {
       const testComponent = await createTestComponentWithApolloClient(
-        // @ts-ignore
-        <OfficeHome match={{ params: { tabId: 'progress' } }} />,
+        <OfficeHome
+          match={{
+            params: { tabId: 'progress' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+          staticContext={undefined}
+          history={history}
+          location={history.location}
+          id={'Test'}
+          buttonLabel={'Button Test'}
+          onSubmit={() => alert(`submitted`)}
+        />,
         store,
         client
       )
@@ -196,8 +213,20 @@ describe('OfficeHome related tests', () => {
 
     it('renders tabs with count', async () => {
       const testComponent = await createTestComponentWithApolloClient(
-        // @ts-ignore
-        <OfficeHome match={{ params: { tabId: 'progress' } }} />,
+        <OfficeHome
+          match={{
+            params: { tabId: 'progress' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+          staticContext={undefined}
+          history={history}
+          location={history.location}
+          id={'Test'}
+          buttonLabel={'Button Test'}
+          onSubmit={() => alert(`submitted`)}
+        />,
         store,
         client
       )
@@ -243,8 +272,20 @@ describe('OfficeHome related tests', () => {
     })
     it('shows no-record message in inProgress drafts tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
-        // @ts-ignore
-        <OfficeHome match={{ params: { tabId: 'progress' } }} />,
+        <OfficeHome
+          match={{
+            params: { tabId: 'progress' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+          staticContext={undefined}
+          history={history}
+          location={history.location}
+          id={'Test'}
+          buttonLabel={'Button Test'}
+          onSubmit={() => alert(`submitted`)}
+        />,
         store,
         client
       )
@@ -256,7 +297,6 @@ describe('OfficeHome related tests', () => {
     })
     it('shows no-record message in inProgress fieldagent drafts tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
-        // @ts-ignore
         <OfficeHome
           match={{
             params: {
@@ -267,6 +307,12 @@ describe('OfficeHome related tests', () => {
             path: '',
             url: ''
           }}
+          staticContext={undefined}
+          history={history}
+          location={history.location}
+          id={'Test'}
+          buttonLabel={'Button Test'}
+          onSubmit={() => alert(`submitted`)}
         />,
         store,
         client
@@ -279,7 +325,6 @@ describe('OfficeHome related tests', () => {
     })
     it('shows no-record message in inProgress hospital drafts tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
-        // @ts-ignore
         <OfficeHome
           match={{
             params: {
@@ -290,6 +335,12 @@ describe('OfficeHome related tests', () => {
             path: '',
             url: ''
           }}
+          staticContext={undefined}
+          history={history}
+          location={history.location}
+          id={'Test'}
+          buttonLabel={'Button Test'}
+          onSubmit={() => alert(`submitted`)}
         />,
         store,
         client
@@ -302,8 +353,20 @@ describe('OfficeHome related tests', () => {
     })
     it('shows no-record message  in review tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
-        // @ts-ignore
-        <OfficeHome match={{ params: { tabId: 'review' } }} />,
+        <OfficeHome
+          match={{
+            params: { tabId: 'review' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+          staticContext={undefined}
+          history={history}
+          location={history.location}
+          id={'Test'}
+          buttonLabel={'Button Test'}
+          onSubmit={() => alert(`submitted`)}
+        />,
         store,
         client
       )
@@ -316,8 +379,20 @@ describe('OfficeHome related tests', () => {
     })
     it('shows no-record message  in reject tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
-        // @ts-ignore
-        <OfficeHome match={{ params: { tabId: 'updates' } }} />,
+        <OfficeHome
+          match={{
+            params: { tabId: 'updates' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+          staticContext={undefined}
+          history={history}
+          location={history.location}
+          id={'Test'}
+          buttonLabel={'Button Test'}
+          onSubmit={() => alert(`submitted`)}
+        />,
         store,
         client
       )
@@ -330,8 +405,20 @@ describe('OfficeHome related tests', () => {
     })
     it('shows no-record message  in approval tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
-        // @ts-ignore
-        <OfficeHome match={{ params: { tabId: 'approvals' } }} />,
+        <OfficeHome
+          match={{
+            params: { tabId: 'approvals' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+          staticContext={undefined}
+          history={history}
+          location={history.location}
+          id={'Test'}
+          buttonLabel={'Button Test'}
+          onSubmit={() => alert(`submitted`)}
+        />,
         store,
         client
       )
@@ -344,8 +431,20 @@ describe('OfficeHome related tests', () => {
     })
     it('shows no-record message  in print tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
-        // @ts-ignore
-        <OfficeHome match={{ params: { tabId: 'print' } }} />,
+        <OfficeHome
+          match={{
+            params: { tabId: 'print' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+          staticContext={undefined}
+          history={history}
+          location={history.location}
+          id={'Test'}
+          buttonLabel={'Button Test'}
+          onSubmit={() => alert(`submitted`)}
+        />,
         store,
         client
       )
@@ -359,8 +458,20 @@ describe('OfficeHome related tests', () => {
 
     it('shows no-record message  in externalValidation tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
-        // @ts-ignore
-        <OfficeHome match={{ params: { tabId: 'waitingValidation' } }} />,
+        <OfficeHome
+          match={{
+            params: { tabId: 'waitingValidation' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+          staticContext={undefined}
+          history={history}
+          location={history.location}
+          id={'Test'}
+          buttonLabel={'Button Test'}
+          onSubmit={() => alert(`submitted`)}
+        />,
         store,
         client
       )
@@ -383,7 +494,6 @@ describe('OfficeHome related tests', () => {
     })
     it('shows error message in inProgress fieldagent drafts tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
-        // @ts-ignore
         <OfficeHome
           match={{
             params: {
@@ -394,6 +504,12 @@ describe('OfficeHome related tests', () => {
             path: '',
             url: ''
           }}
+          staticContext={undefined}
+          history={history}
+          location={history.location}
+          id={'Test'}
+          buttonLabel={'Button Test'}
+          onSubmit={() => alert(`submitted`)}
         />,
         store,
         client
@@ -409,7 +525,6 @@ describe('OfficeHome related tests', () => {
     })
     it('shows error message in inProgress hospital drafts tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
-        // @ts-ignore
         <OfficeHome
           match={{
             params: {
@@ -420,6 +535,12 @@ describe('OfficeHome related tests', () => {
             path: '',
             url: ''
           }}
+          staticContext={undefined}
+          history={history}
+          location={history.location}
+          id={'Test'}
+          buttonLabel={'Button Test'}
+          onSubmit={() => alert(`submitted`)}
         />,
         store,
         client
@@ -435,8 +556,20 @@ describe('OfficeHome related tests', () => {
     })
     it('shows error message  in review tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
-        // @ts-ignore
-        <OfficeHome match={{ params: { tabId: 'review' } }} />,
+        <OfficeHome
+          match={{
+            params: { tabId: 'review' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+          staticContext={undefined}
+          history={history}
+          location={history.location}
+          id={'Test'}
+          buttonLabel={'Button Test'}
+          onSubmit={() => alert(`submitted`)}
+        />,
         store,
         client
       )
@@ -452,8 +585,20 @@ describe('OfficeHome related tests', () => {
     })
     it('shows error message  in reject tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
-        // @ts-ignore
-        <OfficeHome match={{ params: { tabId: 'updates' } }} />,
+        <OfficeHome
+          match={{
+            params: { tabId: 'updates' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+          staticContext={undefined}
+          history={history}
+          location={history.location}
+          id={'Test'}
+          buttonLabel={'Button Test'}
+          onSubmit={() => alert(`submitted`)}
+        />,
         store,
         client
       )
@@ -469,8 +614,20 @@ describe('OfficeHome related tests', () => {
     })
     it('shows error message  in approval tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
-        // @ts-ignore
-        <OfficeHome match={{ params: { tabId: 'approvals' } }} />,
+        <OfficeHome
+          match={{
+            params: { tabId: 'approvals' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+          staticContext={undefined}
+          history={history}
+          location={history.location}
+          id={'Test'}
+          buttonLabel={'Button Test'}
+          onSubmit={() => alert(`submitted`)}
+        />,
         store,
         client
       )
@@ -486,8 +643,20 @@ describe('OfficeHome related tests', () => {
     })
     it('shows error message  in print tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
-        // @ts-ignore
-        <OfficeHome match={{ params: { tabId: 'print' } }} />,
+        <OfficeHome
+          match={{
+            params: { tabId: 'print' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+          staticContext={undefined}
+          history={history}
+          location={history.location}
+          id={'Test'}
+          buttonLabel={'Button Test'}
+          onSubmit={() => alert(`submitted`)}
+        />,
         store,
         client
       )
@@ -503,8 +672,20 @@ describe('OfficeHome related tests', () => {
     })
     it('shows error message  in externalValidation tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
-        // @ts-ignore
-        <OfficeHome match={{ params: { tabId: 'waitingValidation' } }} />,
+        <OfficeHome
+          match={{
+            params: { tabId: 'waitingValidation' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+          staticContext={undefined}
+          history={history}
+          location={history.location}
+          id={'Test'}
+          buttonLabel={'Button Test'}
+          onSubmit={() => alert(`submitted`)}
+        />,
         store,
         client
       )
@@ -551,8 +732,20 @@ describe('OfficeHome related tests', () => {
         await store.dispatch(storeApplication(createApplication(Event.BIRTH)))
       }
       const testComponent = await createTestComponentWithApolloClient(
-        // @ts-ignore
-        <OfficeHome match={{ params: { tabId: 'progress' } }} />,
+        <OfficeHome
+          match={{
+            params: { tabId: 'progress' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+          staticContext={undefined}
+          history={history}
+          location={history.location}
+          id={'Test'}
+          buttonLabel={'Button Test'}
+          onSubmit={() => alert(`submitted`)}
+        />,
         store,
         client
       ) // wait for mocked data to load mockedProvider
@@ -570,8 +763,20 @@ describe('OfficeHome related tests', () => {
     })
     it('shows loadmore in review tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
-        // @ts-ignore
-        <OfficeHome match={{ params: { tabId: 'review' } }} />,
+        <OfficeHome
+          match={{
+            params: { tabId: 'review' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+          staticContext={undefined}
+          history={history}
+          location={history.location}
+          id={'Test'}
+          buttonLabel={'Button Test'}
+          onSubmit={() => alert(`submitted`)}
+        />,
         store,
         client
       )
@@ -589,8 +794,20 @@ describe('OfficeHome related tests', () => {
     })
     it('shows loadmore in reject tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
-        // @ts-ignore
-        <OfficeHome match={{ params: { tabId: 'updates' } }} />,
+        <OfficeHome
+          match={{
+            params: { tabId: 'updates' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+          staticContext={undefined}
+          history={history}
+          location={history.location}
+          id={'Test'}
+          buttonLabel={'Button Test'}
+          onSubmit={() => alert(`submitted`)}
+        />,
         store,
         client
       )
@@ -608,8 +825,20 @@ describe('OfficeHome related tests', () => {
     })
     it('shows loadmore in print tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
-        // @ts-ignore
-        <OfficeHome match={{ params: { tabId: 'print' } }} />,
+        <OfficeHome
+          match={{
+            params: { tabId: 'print' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+          staticContext={undefined}
+          history={history}
+          location={history.location}
+          id={'Test'}
+          buttonLabel={'Button Test'}
+          onSubmit={() => alert(`submitted`)}
+        />,
         store,
         client
       )
@@ -629,8 +858,20 @@ describe('OfficeHome related tests', () => {
 
     it('shows loadmore in externalValidation tab', async () => {
       const testComponent = await createTestComponentWithApolloClient(
-        // @ts-ignore
-        <OfficeHome match={{ params: { tabId: 'waitingValidation' } }} />,
+        <OfficeHome
+          match={{
+            params: { tabId: 'waitingValidation' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+          staticContext={undefined}
+          history={history}
+          location={history.location}
+          id={'Test'}
+          buttonLabel={'Button Test'}
+          onSubmit={() => alert(`submitted`)}
+        />,
         store,
         client
       )

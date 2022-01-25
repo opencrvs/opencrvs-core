@@ -154,9 +154,6 @@ interface IBaseRegistrationHomeProps {
   applications: IApplication[]
   workqueue: IWorkqueue
   storedApplications: IApplication[]
-  client: ApolloClient<{}>
-  dispatch: Dispatch
-  reviewStatuses: string[]
 }
 
 interface IRegistrationHomeState {
@@ -191,7 +188,7 @@ export const EVENT_STATUS = {
   REJECTED: 'REJECTED',
   WAITING_VALIDATION: 'WAITING_VALIDATION'
 }
-export class RegistrationHomeView extends React.Component<
+export class OfficeHomeView extends React.Component<
   IRegistrationHomeProps,
   IRegistrationHomeState
 > {
@@ -512,4 +509,4 @@ export const OfficeHome = connect(mapStateToProps, {
   goToReviewDuplicate,
   goToPrintCertificate,
   updateRegistrarWorkqueue
-})(injectIntl(RegistrationHomeView))
+})(injectIntl(OfficeHomeView))
