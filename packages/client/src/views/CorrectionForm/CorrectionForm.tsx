@@ -16,6 +16,7 @@ import { RouteComponentProps } from 'react-router'
 import { IApplication } from '@client/applications'
 import { CorrectorForm } from '@client/views/CorrectionForm'
 import { CorrectionSection } from '@client/forms'
+import { CorrectionReasonForm } from './CorrectionReasonForm'
 
 type IProps = IStateProps & IDispatchProps
 
@@ -23,6 +24,8 @@ function CorrectionFormComponent({ application, sectionId }: IProps) {
   switch (sectionId) {
     case CorrectionSection.Corrector:
       return <CorrectorForm application={application} />
+    case CorrectionSection.Reason:
+      return <CorrectionReasonForm application={application} />
   }
   return <></>
 }
