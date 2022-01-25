@@ -188,6 +188,10 @@ const ResponsiveDocumentViewer = styled.div<{ isRegisterScope: boolean }>`
   }
 `
 
+const FooterArea = styled.div`
+  padding-top: 20px;
+`
+
 const FormData = styled.div`
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
@@ -227,6 +231,7 @@ interface IProps {
   offlineResources: IOfflineData
   language: string
   onChangeReviewForm?: onChangeReviewForm
+  onContinue?: () => void
   writeApplication: typeof writeApplication
   registrationSection: IFormSection
   documentsSection: IFormSection
@@ -732,6 +737,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     return this.props.draft.submissionStatus === SUBMISSION_STATUS.DRAFT
   }
 
+  isCorrection() {
+    return this.props.draft.registrationStatus === SUBMISSION_STATUS.REGISTERED
+  }
+
   getFieldValueWithErrorMessage(
     section: IFormSection,
     field: IFormField,
@@ -767,7 +776,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         id: `btn_change_${section.id}_${fieldName}`,
         label: intl.formatMessage(buttonMessages.change),
         handler: () => {
-          if (this.isDraft()) {
+          if (this.isDraft() || this.isCorrection()) {
             this.editLinkClickHandlerForDraft(section.id, group.id, fieldName)
           } else {
             this.editLinkClickHandler(section.id, group.id, fieldName)
@@ -1314,7 +1323,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       registrationSection,
       documentsSection,
       offlineResources,
-      draft: { event }
+      draft: { event, registrationStatus },
+      onContinue
     } = this.props
     const formSections = this.getViewableSection(registerForm[event])
 
@@ -1374,11 +1384,13 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               }
             />
             <FormData>
-              <FormDataHeader>
-                {intl.formatMessage(messages.formDataHeader, {
-                  isDraft: draft
-                })}
-              </FormDataHeader>
+              {!this.isCorrection && (
+                <FormDataHeader>
+                  {intl.formatMessage(messages.formDataHeader, {
+                    isDraft: draft
+                  })}
+                </FormDataHeader>
+              )}
               {transformedSectionData.map((sec, index) => {
                 const { uploadedDocuments, selectOptions } =
                   this.prepSectionDocuments(application, sec.id)
@@ -1398,7 +1410,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   />
                 )
               })}
-              {event === BIRTH && (
+              {event === BIRTH && !this.isCorrection && (
                 <InputWrapper>
                   <InputField
                     id="additional_comments"
@@ -1410,18 +1422,31 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   </InputField>
                 </InputWrapper>
               )}
-              <ReviewAction
-                completeApplication={isComplete}
-                applicationToBeValidated={this.userHasValidateScope()}
-                applicationToBeRegistered={this.userHasRegisterScope()}
-                alreadyRejectedApplication={
-                  this.props.draft.registrationStatus === REJECTED
-                }
-                draftApplication={draft}
-                application={application}
-                submitApplicationAction={submitClickEvent}
-                rejectApplicationAction={rejectApplicationClickEvent}
-              />
+              {!this.isCorrection && (
+                <ReviewAction
+                  completeApplication={isComplete}
+                  applicationToBeValidated={this.userHasValidateScope()}
+                  applicationToBeRegistered={this.userHasRegisterScope()}
+                  alreadyRejectedApplication={
+                    this.props.draft.registrationStatus === REJECTED
+                  }
+                  draftApplication={draft}
+                  application={application}
+                  submitApplicationAction={submitClickEvent}
+                  rejectApplicationAction={rejectApplicationClickEvent}
+                />
+              )}
+              {this.isCorrection && (
+                <FooterArea>
+                  <PrimaryButton
+                    id="continue_button"
+                    onClick={onContinue}
+                    disabled={!isComplete}
+                  >
+                    {intl.formatMessage(buttonMessages.continueButton)}
+                  </PrimaryButton>
+                </FooterArea>
+              )}
             </FormData>
           </StyledColumn>
           <Column>

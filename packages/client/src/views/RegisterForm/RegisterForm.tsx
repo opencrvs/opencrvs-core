@@ -70,7 +70,9 @@ import {
   getVisibleSectionGroupsBasedOnConditions,
   getVisibleGroupFields,
   hasFormError,
-  getSectionFields
+  getSectionFields,
+  getNextSectionIds,
+  VIEW_TYPE
 } from '@client/forms/utils'
 import { messages } from '@client/i18n/messages/views/register'
 import { buttonMessages, formMessages } from '@client/i18n/messages'
@@ -143,56 +145,6 @@ const ErrorText = styled.div`
   text-align: center;
   margin-top: 100px;
 `
-const VIEW_TYPE = {
-  FORM: 'form',
-  REVIEW: 'review',
-  PREVIEW: 'preview',
-  HIDDEN: 'hidden'
-}
-
-function getNextSectionIds(
-  sections: IFormSection[],
-  fromSection: IFormSection,
-  fromSectionGroup: IFormSectionGroup,
-  application: IApplication
-): { [key: string]: string } | null {
-  const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
-    fromSection,
-    application.data[fromSection.id] || {},
-    application.data
-  )
-  const currentGroupIndex = visibleGroups.findIndex(
-    (group: IFormSectionGroup) => group.id === fromSectionGroup.id
-  )
-
-  if (currentGroupIndex === visibleGroups.length - 1) {
-    const visibleSections = sections.filter(
-      (section) =>
-        section.viewType !== VIEW_TYPE.HIDDEN &&
-        getVisibleSectionGroupsBasedOnConditions(
-          section,
-          application.data[fromSection.id] || {},
-          application.data
-        ).length > 0
-    )
-
-    const currentIndex = visibleSections.findIndex(
-      (section: IFormSection) => section.id === fromSection.id
-    )
-    if (currentIndex === visibleSections.length - 1) {
-      return null
-    }
-
-    return {
-      sectionId: visibleSections[currentIndex + 1].id,
-      groupId: visibleSections[currentIndex + 1].groups[0].id
-    }
-  }
-  return {
-    sectionId: fromSection.id,
-    groupId: visibleGroups[currentGroupIndex + 1].id
-  }
-}
 
 export interface IFormProps {
   application: IApplication
@@ -547,7 +499,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
       fieldsToShowValidationErrors,
       application,
       registerForm,
-
       duplicate,
       activeSection,
       activeSectionGroup
