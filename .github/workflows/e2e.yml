@@ -65,7 +65,7 @@ jobs:
 
       - name: Run Microservices
         run: |
-          bash -c 'LANGUAGES=en yarn start' &
+          bash -c 'LANGUAGES=en yarn start:prod' &
           wait-on -l tcp:4040 http://localhost:3000 http://localhost:3020 tcp:3030 tcp:2020 tcp:7070 tcp:5050 tcp:9090 tcp:1050
 
       - name: Running the Country specific resource package
@@ -76,7 +76,7 @@ jobs:
           yarn db:clear:all
           yarn db:backup:restore
 
-          bash -c 'CERT_PUBLIC_KEY_PATH=./../.secrets/public-key.pem yarn start' &
+          bash -c 'CERT_PUBLIC_KEY_PATH=./../.secrets/public-key.pem yarn start:prod' &
           wait-on -l tcp:3040
 
       - name: Running the E2E test
