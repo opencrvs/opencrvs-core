@@ -72,7 +72,7 @@ export const validateScopeToken = jwt.sign(
 export function flushPromises() {
   return new Promise((resolve) => setImmediate(resolve))
 }
-export const assign = window.location.assign as jest.Mock
+
 export const getItem = window.localStorage.getItem as jest.Mock
 export const setItem = window.localStorage.setItem as jest.Mock
 

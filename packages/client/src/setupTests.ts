@@ -113,12 +113,7 @@ const navigatorMock = {
   onLine: true
 }
 
-const location = window.location
-
-delete window.location
-;(window as any).location = { ...location, assign: jest.fn() }
 ;(window as any).navigator = navigatorMock
-;(window as any).location.reload = jest.fn()
 ;(window as any).scrollTo = noop
 ;(window as any).config = {
   API_GATEWAY_URL: 'http://localhost:7070/',
@@ -202,7 +197,6 @@ beforeEach(() => {
 
   storageGetItemMock.mockReset()
   storageSetItemMock.mockReset()
-  assign.mockClear()
   warn.mockReset()
   error.mockReset()
   debug.mockReset()
