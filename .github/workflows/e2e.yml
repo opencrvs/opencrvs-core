@@ -69,8 +69,8 @@ jobs:
 
       - name: Running the Country specific resource package
         run: |
-          git clone -b ocrvs-2339 --depth=1 https://github.com/opencrvs/opencrvs-zambia.git
-          cd opencrvs-zambia
+          git clone -b develop --depth=1 https://github.com/opencrvs/opencrvs-farajaland.git
+          cd opencrvs-farajaland
           yarn install
           yarn db:clear:all
           yarn db:backup:restore
