@@ -143,6 +143,16 @@ const navigatorMock = {
     pattern: /^[0-9]{9}$/,
     example: '4837281940',
     num: '9'
+  },
+  PHONE_NUMBER_PATTERN: {
+    pattern: /^01[1-9][0-9]{8}$/,
+    example: '01741234567',
+    start: '01',
+    num: '11',
+    mask: {
+      startForm: 5,
+      endBefore: 3
+    }
   }
 }
 
