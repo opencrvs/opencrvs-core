@@ -136,14 +136,6 @@ const RequiredField = styled.span`
     text-transform: uppercase;
   }
 `
-
-const DeletedEmpty = styled.span`
-  color: ${({ theme }) => theme.colors.error};
-`
-
-const Deleted = styled.del`
-  color: ${({ theme }) => theme.colors.error};
-`
 const Row = styled.div`
   display: flex;
   flex: 1;
@@ -809,41 +801,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       get(sectionErrors[section.id][field.name], 'errors') ||
       this.getErrorForNestedField(section, field, sectionErrors)
 
-    const value = renderValue(
-      draft.data,
-      section.id,
-      field,
-      intl,
-      offlineResources,
-      language
-    )
-
-    const previousValue =
-      draft.originalData &&
-      renderValue(
-        draft.originalData,
-        section.id,
-        field,
-        intl,
-        offlineResources,
-        language
-      )
-
-    const valueToRender =
-      !draft.originalData || value === previousValue ? (
-        value
-      ) : (
-        <>
-          {!previousValue && value ? (
-            <DeletedEmpty>-</DeletedEmpty>
-          ) : (
-            <Deleted>{previousValue}</Deleted>
-          )}
-          <br />
-          {value}
-        </>
-      )
-
     return errorsOnField.length > 0
       ? this.getFieldValueWithErrorMessage(section, field, errorsOnField[0])
       : field.nestedFields && !Boolean(ignoreNestedFieldWrapping)
@@ -874,34 +831,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 language
               )) ||
             ''
-          const previousNestedValue =
-            (draft.originalData &&
-              draft.originalData[section.id] &&
-              draft.originalData[section.id][field.name] &&
-              renderValue(
-                draft.originalData[section.id][field.name] as IFormData,
-                'nestedFields',
-                nestedField,
-                intl,
-                offlineResources,
-                language
-              )) ||
-            ''
-
-          const nestedValueToRender =
-            !draft.originalData || nestedValue === previousNestedValue ? (
-              nestedValue
-            ) : (
-              <>
-                {!previousNestedValue && nestedValue ? (
-                  <DeletedEmpty>-</DeletedEmpty>
-                ) : (
-                  <Deleted>{previousNestedValue}</Deleted>
-                )}
-                <br />
-                {nestedValue}
-              </>
-            )
           return (
             <>
               {groupedValues}
@@ -912,11 +841,18 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     field,
                     errorsOnNestedField[0]
                   )
-                : nestedValueToRender}
+                : nestedValue}
             </>
           )
-        }, valueToRender)
-      : valueToRender
+        }, <>{renderValue(draft.data, section.id, field, intl, offlineResources, language)}</>)
+      : renderValue(
+          draft.data,
+          section.id,
+          field,
+          intl,
+          offlineResources,
+          language
+        )
   }
 
   getNestedFieldValueOrError = (

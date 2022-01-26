@@ -156,7 +156,6 @@ export interface ITaskHistory {
 export interface IApplication {
   id: string
   data: IFormData
-  originalData?: IFormData
   savedOn?: number
   modifiedOn?: number
   eventType?: string
@@ -458,7 +457,6 @@ export function createReviewApplication(
   return {
     id: applicationId,
     data: formData,
-    originalData: formData,
     review: true,
     event,
     registrationStatus: status
