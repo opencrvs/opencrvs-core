@@ -428,6 +428,148 @@
       "autoRetryPeriodMinutes": 60,
       "requestBody": true,
       "responseBody": true,
+      "name": "Birth Request Correction",
+      "urlPattern": "^/events/birth/request-correction$",
+      "matchContentRegex": null,
+      "matchContentXpath": null,
+      "matchContentValue": null,
+      "matchContentJson": null,
+      "pollingSchedule": null,
+      "tcpHost": null,
+      "tcpPort": null,
+      "rewriteUrlsConfig": [],
+      "alerts": [],
+      "routes": [
+        {
+          "type": "http",
+          "status": "enabled",
+          "forwardAuthHeader": true,
+          "name": "Search -> Birth Request Correction",
+          "secured": false,
+          "host": "search",
+          "port": 9090,
+          "path": "",
+          "pathTransform": "",
+          "primary": true,
+          "username": "",
+          "password": ""
+        },
+        {
+          "type": "http",
+          "status": "enabled",
+          "forwardAuthHeader": true,
+          "name": "Metrics -> Birth Request Correction",
+          "secured": false,
+          "host": "metrics",
+          "port": 1050,
+          "path": "",
+          "pathTransform": "",
+          "primary": false,
+          "username": "",
+          "password": ""
+        }
+      ],
+      "priority": 1
+    },
+    {
+      "methods": [
+        "GET",
+        "POST",
+        "DELETE",
+        "PUT",
+        "OPTIONS",
+        "HEAD",
+        "TRACE",
+        "CONNECT",
+        "PATCH"
+      ],
+      "type": "http",
+      "allow": [],
+      "whitelist": [],
+      "authType": "public",
+      "matchContentTypes": [],
+      "properties": [],
+      "txViewAcl": [],
+      "txViewFullAcl": [],
+      "txRerunAcl": [],
+      "status": "enabled",
+      "rewriteUrls": false,
+      "addAutoRewriteRules": true,
+      "autoRetryEnabled": false,
+      "autoRetryPeriodMinutes": 60,
+      "requestBody": true,
+      "responseBody": true,
+      "name": "Death Request Correction",
+      "urlPattern": "^/events/death/request-correction$",
+      "matchContentRegex": null,
+      "matchContentXpath": null,
+      "matchContentValue": null,
+      "matchContentJson": null,
+      "pollingSchedule": null,
+      "tcpHost": null,
+      "tcpPort": null,
+      "rewriteUrlsConfig": [],
+      "alerts": [],
+      "routes": [
+        {
+          "type": "http",
+          "status": "enabled",
+          "forwardAuthHeader": true,
+          "name": "Search -> Death Request Correction",
+          "secured": false,
+          "host": "search",
+          "port": 9090,
+          "path": "",
+          "pathTransform": "",
+          "primary": true,
+          "username": "",
+          "password": ""
+        },
+        {
+          "type": "http",
+          "status": "enabled",
+          "forwardAuthHeader": true,
+          "name": "Metrics -> Death Request Correction",
+          "secured": false,
+          "host": "metrics",
+          "port": 1050,
+          "path": "",
+          "pathTransform": "",
+          "primary": false,
+          "username": "",
+          "password": ""
+        }
+      ],
+      "priority": 1
+    },
+    {
+      "methods": [
+        "GET",
+        "POST",
+        "DELETE",
+        "PUT",
+        "OPTIONS",
+        "HEAD",
+        "TRACE",
+        "CONNECT",
+        "PATCH"
+      ],
+      "type": "http",
+      "allow": [],
+      "whitelist": [],
+      "authType": "public",
+      "matchContentTypes": [],
+      "properties": [],
+      "txViewAcl": [],
+      "txViewFullAcl": [],
+      "txRerunAcl": [],
+      "status": "enabled",
+      "rewriteUrls": false,
+      "addAutoRewriteRules": true,
+      "autoRetryEnabled": false,
+      "autoRetryPeriodMinutes": 60,
+      "requestBody": true,
+      "responseBody": true,
       "name": "Birth New Waiting Validation",
       "urlPattern": "^/events/birth/new-waiting-validation$",
       "matchContentRegex": null,
@@ -1609,9 +1751,7 @@
       "name": "New Death InProgress"
     },
     {
-      "methods": [
-        "POST"
-      ],
+      "methods": ["POST"],
       "type": "http",
       "allow": [],
       "whitelist": [],
@@ -1662,9 +1802,7 @@
       "alerts": []
     },
     {
-      "methods": [
-        "POST"
-      ],
+      "methods": ["POST"],
       "type": "http",
       "allow": [],
       "whitelist": [],
@@ -1715,9 +1853,7 @@
       "alerts": []
     },
     {
-      "methods": [
-        "POST"
-      ],
+      "methods": ["POST"],
       "type": "http",
       "allow": [],
       "whitelist": [],
@@ -1768,9 +1904,7 @@
       "name": "DHIS2 death notification mediator"
     },
     {
-      "methods": [
-        "POST"
-      ],
+      "methods": ["POST"],
       "type": "http",
       "allow": [],
       "whitelist": [],
@@ -1817,9 +1951,7 @@
       "priority": 1
     },
     {
-      "methods": [
-        "GET"
-      ],
+      "methods": ["GET"],
       "type": "http",
       "allow": [],
       "whitelist": [],
@@ -1868,9 +2000,7 @@
     {
       "methods": [],
       "type": "polling",
-      "allow": [
-        "queue-trigger"
-      ],
+      "allow": ["queue-trigger"],
       "whitelist": [],
       "authType": "private",
       "matchContentTypes": [],
@@ -1921,9 +2051,7 @@
     {
       "methods": [],
       "type": "polling",
-      "allow": [
-        "queue-trigger"
-      ],
+      "allow": ["queue-trigger"],
       "whitelist": [],
       "authType": "private",
       "matchContentTypes": [],
@@ -1972,9 +2100,7 @@
       "priority": 1
     },
     {
-      "methods": [
-        "POST"
-      ],
+      "methods": ["POST"],
       "type": "http",
       "allow": [],
       "whitelist": [],
