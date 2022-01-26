@@ -128,6 +128,9 @@ import { DocumentListPreview } from '@client/components/form/DocumentUploadfield
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import { generateLocations } from '@client/utils/locationUtils'
 
+const Deleted = styled.del`
+  color: ${({ theme }) => theme.colors.error};
+`
 const RequiredField = styled.span`
   color: ${({ theme }) => theme.colors.error};
   display: inline-block;
@@ -791,12 +794,26 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
   getValueOrError = (
     section: IFormSection,
+    data: IFormData,
     field: IFormField,
     sectionErrors: IErrorsBySection,
-    ignoreNestedFieldWrapping?: boolean
+    ignoreNestedFieldWrapping?: boolean,
+    replaceEmpty?: boolean
   ) => {
-    const { intl, draft, offlineResources, language } = this.props
+    const { intl, offlineResources, language } = this.props
 
+    let value = renderValue(
+      data,
+      section.id,
+      field,
+      intl,
+      offlineResources,
+      language
+    )
+
+    if (replaceEmpty && !value) {
+      value = '-'
+    }
     const errorsOnField =
       get(sectionErrors[section.id][field.name], 'errors') ||
       this.getErrorForNestedField(section, field, sectionErrors)
@@ -805,12 +822,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       ? this.getFieldValueWithErrorMessage(section, field, errorsOnField[0])
       : field.nestedFields && !Boolean(ignoreNestedFieldWrapping)
       ? (
-          (draft.data[section.id] &&
-            draft.data[section.id][field.name] &&
-            (draft.data[section.id][field.name] as IFormSectionData).value &&
+          (data[section.id] &&
+            data[section.id][field.name] &&
+            (data[section.id][field.name] as IFormSectionData).value &&
             field.nestedFields[
-              (draft.data[section.id][field.name] as IFormSectionData)
-                .value as string
+              (data[section.id][field.name] as IFormSectionData).value as string
             ]) ||
           []
         ).reduce((groupedValues, nestedField) => {
@@ -820,10 +836,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             ] || []
           // Value of the parentField resembles with IFormData as a nested form
           const nestedValue =
-            (draft.data[section.id] &&
-              draft.data[section.id][field.name] &&
+            (data[section.id] &&
+              data[section.id][field.name] &&
               renderValue(
-                draft.data[section.id][field.name] as IFormData,
+                data[section.id][field.name] as IFormData,
                 'nestedFields',
                 nestedField,
                 intl,
@@ -844,15 +860,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 : nestedValue}
             </>
           )
-        }, <>{renderValue(draft.data, section.id, field, intl, offlineResources, language)}</>)
-      : renderValue(
-          draft.data,
-          section.id,
-          field,
-          intl,
-          offlineResources,
-          language
-        )
+        }, <>{value}</>)
+      : value
   }
 
   getNestedFieldValueOrError = (
@@ -892,6 +901,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     visitedTags: string[],
     errorsOnFields: IErrorsBySection
   ) {
+    const {
+      draft: { data, originalData }
+    } = this.props
+
     if (field.previewGroup && !visitedTags.includes(field.previewGroup)) {
       visitedTags.push(field.previewGroup)
 
@@ -923,7 +936,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           ) as IFormTag[])) ||
         []
       const values = taggedFields
-        .map((field) => this.getValueOrError(section, field, errorsOnFields))
+        .map((field) =>
+          this.getValueOrError(section, data, field, errorsOnFields)
+        )
         .filter((value) => value)
 
       let completeValue = values[0]
@@ -933,15 +948,59 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           (completeValue = (
             <>
               {completeValue}
-              <span
-                dangerouslySetInnerHTML={{
-                  __html: tagDef[0].delimiter || '<br />'
-                }}
-              ></span>
+              {tagDef[0].delimiter ? (
+                <span>{tagDef[0].delimiter}</span>
+              ) : (
+                <br />
+              )}
               {value}
             </>
           ))
       )
+
+      const hasAnyFieldChanged = taggedFields.reduce(
+        (accum, field) => accum || this.hasDataChanged(section, field),
+        false
+      )
+
+      if (originalData && hasAnyFieldChanged) {
+        const previousValues = taggedFields
+          .map((field, index) =>
+            this.getValueOrError(
+              section,
+              originalData,
+              field,
+              errorsOnFields,
+              undefined,
+              !index
+            )
+          )
+          .filter((value) => value)
+        let previousCompleteValue = <Deleted>{previousValues[0]}</Deleted>
+        previousValues.shift()
+        previousValues.forEach(
+          (previousValue) =>
+            (previousCompleteValue = (
+              <>
+                {previousCompleteValue}
+                {tagDef[0].delimiter ? (
+                  <span>{tagDef[0].delimiter}</span>
+                ) : (
+                  <br />
+                )}
+                <Deleted>{previousValue}</Deleted>
+              </>
+            ))
+        )
+
+        completeValue = (
+          <>
+            {previousCompleteValue}
+            <br />
+            {completeValue}
+          </>
+        )
+      }
 
       return this.getRenderableField(
         section,
@@ -954,6 +1013,52 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
   }
 
+  hasNestedDataChanged(section: IFormSection, field: IFormField) {
+    const {
+      draft: { data, originalData }
+    } = this.props
+    const nestedFieldData = data[section.id][field.name] as IFormData
+
+    const previousNestedFieldData = (originalData as IFormData)[section.id][
+      field.name
+    ] as IFormData
+    if (nestedFieldData.value === previousNestedFieldData.value) {
+      Object.keys(nestedFieldData.nestedFields).forEach((key) => {
+        if (
+          nestedFieldData.nestedFields[key] !==
+          previousNestedFieldData.nestedFields[key]
+        )
+          return true
+      })
+      return false
+    }
+    return false
+  }
+
+  hasDataChanged(section: IFormSection, field: IFormField) {
+    const {
+      draft: { data, originalData }
+    } = this.props
+    if (!originalData) return false
+    if (
+      data[section.id][field.name] &&
+      (data[section.id][field.name] as IFormData).value
+    ) {
+      return this.hasNestedDataChanged(section, field)
+    }
+    /*
+     * data section might have some values as empty string
+     * whereas original data section have them as undefined
+     */
+    if (
+      !originalData[section.id][field.name] &&
+      data[section.id][field.name] === ''
+    ) {
+      return false
+    }
+    return data[section.id][field.name] !== originalData[section.id][field.name]
+  }
+
   getSinglePreviewField(
     section: IFormSection,
     group: IFormSectionGroup,
@@ -961,12 +1066,36 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     sectionErrors: IErrorsBySection,
     ignoreNestedFieldWrapping?: boolean
   ) {
-    const value = this.getValueOrError(
+    const {
+      draft: { data, originalData }
+    } = this.props
+
+    let value = this.getValueOrError(
       section,
+      data,
       field,
       sectionErrors,
       ignoreNestedFieldWrapping
     )
+
+    if (originalData && this.hasDataChanged(section, field)) {
+      value = (
+        <>
+          <Deleted>
+            {this.getValueOrError(
+              section,
+              originalData,
+              field,
+              sectionErrors,
+              ignoreNestedFieldWrapping,
+              true
+            )}
+          </Deleted>
+          <br />
+          {value}
+        </>
+      )
+    }
 
     return this.getRenderableField(
       section,
