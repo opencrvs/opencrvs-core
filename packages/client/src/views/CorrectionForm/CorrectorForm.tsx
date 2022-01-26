@@ -14,9 +14,10 @@ import { modifyApplication, IApplication } from '@client/applications'
 import { getCorrectorSection } from '@client/forms/correction/corrector'
 import { connect } from 'react-redux'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
-import { goBack } from '@client/navigation'
+import { goBack, goToVerifyCorrector } from '@client/navigation'
 import {
   Event,
+  IFormData,
   IFormSection,
   IFormSectionData,
   IRadioGroupWithNestedFieldsFormField
@@ -49,6 +50,7 @@ type IProps = {
 
 type IDispatchProps = {
   goBack: typeof goBack
+  goToVerifyCorrector: typeof goToVerifyCorrector
   modifyApplication: typeof modifyApplication
 }
 
@@ -175,6 +177,13 @@ function CorrectorFormComponent(props: IFullProps) {
         setShowError(true)
         return
       }
+
+      props.goToVerifyCorrector(
+        application.id,
+        application.event,
+        (application.data.corrector.relationship as IFormSectionData)
+          .value as string
+      )
     })
   }
 
@@ -215,5 +224,6 @@ function CorrectorFormComponent(props: IFullProps) {
 
 export const CorrectorForm = connect(undefined, {
   goBack,
-  modifyApplication
+  modifyApplication,
+  goToVerifyCorrector
 })(injectIntl(CorrectorFormComponent))

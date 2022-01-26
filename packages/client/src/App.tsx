@@ -64,6 +64,7 @@ import { AppStore } from './store'
 import { ConfigHome } from './views/SysAdmin/Config/ConfigHome'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 import { CorrectionForm } from './views/CorrectionForm/CorrectionForm'
+import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -245,6 +246,11 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.VERIFY_COLLECTOR}
                                             component={VerifyCollector}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.VERIFY_CORRECTOR}
+                                            component={VerifyCorrector}
                                           />
                                           <ProtectedRoute
                                             path={routes.REVIEW_CERTIFICATE}

@@ -14,6 +14,7 @@ import { ILanguage } from '@client/i18n/reducer'
 import { ILocation } from '@client/offline/reducer'
 import { IPDFTemplate } from '@client/pdfRenderer/transformer/types'
 import { getToken } from '@client/utils/authUtils'
+import { ICertificateCorrectorDefinition } from '@client/views/CorrectionForm/VerifyCorrector'
 import { ICertificateCollectorDefinition } from '@client/views/PrintCertificate/VerifyCollector'
 
 export interface ILocationDataResponse {
@@ -29,6 +30,10 @@ export interface IDefinitionsResponse {
     certificateCollectorDefinition: {
       birth: ICertificateCollectorDefinition
       death: ICertificateCollectorDefinition
+    }
+    certificateCorrectorDefinition: {
+      birth: ICertificateCorrectorDefinition
+      death: ICertificateCorrectorDefinition
     }
     userForm: ISerializedForm
   }
