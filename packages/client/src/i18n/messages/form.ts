@@ -2141,6 +2141,13 @@ const messagesToDefine: IFormMessages = {
       'If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000. If the National ID number is 10 digits long ID, please use an older ID.',
     description: 'Helper text for nid input field',
     id: 'form.field.helpertext.nid'
+  },
+  CorrectorSupportDocumentSubtitle: {
+    id: 'form.field.label.corrector.supportDocumentSubtitle',
+    defaultMessage:
+      'For all record corrections at a minimum an affidavit must be provided. For material errors and omissions eg. in paternity cases, a court order must also be provided.',
+    description:
+      'Label for supportDocument form subtitle in certificate correction form'
   }
 }
 

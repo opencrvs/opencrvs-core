@@ -51,7 +51,8 @@ import {
   TEAM_USER_LIST,
   USER_PROFILE,
   CONFIG,
-  CERTIFICATE_CORRECTION
+  CERTIFICATE_CORRECTION,
+  VERIFY_CORRECTOR
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
@@ -300,6 +301,19 @@ export function goToApplicationContact(informant: string) {
   return push(
     formatUrl(DRAFT_BIRTH_APPLICANT_FORM, {
       informant: informant.toString()
+    })
+  )
+}
+export function goToVerifyCorrector(
+  registrationId: string,
+  event: string,
+  corrector: string
+) {
+  return push(
+    formatUrl(VERIFY_CORRECTOR, {
+      registrationId: registrationId.toString(),
+      eventType: event.toLowerCase().toString(),
+      corrector: corrector.toLowerCase().toString()
     })
   )
 }

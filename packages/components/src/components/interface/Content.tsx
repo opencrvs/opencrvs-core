@@ -113,11 +113,12 @@ export class Content extends React.Component<IProps> {
         </Header>
         {subtitle && <SubHeader>{subtitle}</SubHeader>}
         {children && <Body>{children}</Body>}
-        <Footer>
-          {bottomActionButtons && (
+
+        {bottomActionButtons && (
+          <Footer>
             <BottomActionBar>{bottomActionButtons}</BottomActionBar>
-          )}
-        </Footer>
+          </Footer>
+        )}
       </Container>
     )
   }

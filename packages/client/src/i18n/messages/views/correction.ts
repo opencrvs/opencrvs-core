@@ -95,6 +95,16 @@ const messagesToDefine: ICorrectionMessages = {
     id: 'correction.corrector.informant',
     defaultMessage: 'Informant',
     description: 'Label for informant option in certificate correction form'
+  },
+  CorrectCertificate: {
+    defaultMessage: 'Correct',
+    description: 'The title of Correct button in list expansion actions',
+    id: 'correct.certificate.SupportDocument.form.name'
+  },
+  correctRecordTitle: {
+    defaultMessage: 'Correct record',
+    description: 'The title of correct certificate action',
+    id: 'correct.certificate.section.title'
   }
 }
 

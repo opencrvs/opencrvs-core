@@ -48,6 +48,8 @@ export const REVIEW_DUPLICATES = '/duplicates/:applicationId'
 export const CONFIRMATION_SCREEN = '/confirm'
 export const CERTIFICATE_COLLECTOR =
   '/cert/collector/:registrationId/:eventType/:groupId'
+export const VERIFY_CORRECTOR =
+  '/correctRecord/check/:registrationId/:eventType/:corrector'
 export const VERIFY_COLLECTOR =
   '/print/check/:registrationId/:eventType/:collector'
 export const REVIEW_CERTIFICATE = '/review/:registrationId/:eventType'
