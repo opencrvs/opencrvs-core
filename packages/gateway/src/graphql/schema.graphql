@@ -391,11 +391,11 @@ type Role {
 }
 
 type CertificateSVG {
-  id: ID
+  _id: ID
   svgCode: String
   svgFilename: String
-  svgDateUpdated: Int
-  svgDateCreated: Int
+  svgDateUpdated: String
+  svgDateCreated: String
   user: String
   event: String
   status: String

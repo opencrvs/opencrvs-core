@@ -24,7 +24,9 @@ interface IConfigMessages
   birthTemplate: MessageDescriptor
   deathTemplate: MessageDescriptor
   birthDefaultTempDesc: MessageDescriptor
+  birthUpdatedTempDesc: MessageDescriptor
   deathDefaultTempDesc: MessageDescriptor
+  deathUpdatedTempDesc: MessageDescriptor
   listDetailsQsn: MessageDescriptor
 }
 
@@ -90,10 +92,35 @@ const messagesToDefine: IConfigMessages = {
     defaultMessage: 'Default birth certificate template',
     description: 'Label for default birth certificate template'
   },
+  birthUpdatedTempDesc: {
+    id: 'config.birthUpdatedTempDesc',
+    defaultMessage: 'Updated {birthLongDate}',
+    description: 'Label for updated birth certificate template'
+  },
   deathDefaultTempDesc: {
     id: 'config.deathDefaultTempDesc',
     defaultMessage: 'Default death certificate template',
     description: 'Label for default death certificate template'
+  },
+  deathUpdatedTempDesc: {
+    id: 'config.deathUpdatedTempDesc',
+    defaultMessage: 'Updated {deathLongDate}',
+    description: 'Label for updated death certificate template'
+  },
+  certificateUploading: {
+    id: 'config.certificate.certificateUploading',
+    defaultMessage: 'Uploading and validating {eventName} certificate.',
+    description: 'Certificate template message when uploading SVG'
+  },
+  certificateUpdated: {
+    id: 'config.certificate.certificateUpdated',
+    defaultMessage: '{eventName} certificate has been updated',
+    description: 'Certificate template change message on success'
+  },
+  certificateValidationError: {
+    id: 'config.certificate.certificateValidationError',
+    defaultMessage: 'Unable to read SVG. Please check',
+    description: 'Certificate template error message on failed'
   }
 }
 
