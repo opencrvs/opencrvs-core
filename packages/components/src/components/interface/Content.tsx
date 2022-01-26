@@ -29,6 +29,7 @@ const Container = styled.div<{ size: string }>`
 const Header = styled.div`
   display: flex;
   height: 72px;
+  border-bottom: 1px solid rgb(204, 207, 208);
   padding-top: 20px;
   padding-right: 32px;
   padding-left: 32px;
@@ -46,8 +47,8 @@ export const SubHeader = styled.div`
   padding-top: 20px;
   padding-right: 32px;
   padding-left: 32px;
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+  color: rgb(89, 92, 95);
+  ${({ theme }) => theme.fonts.bigBodyStyle};
 `
 export const Body = styled.div`
   padding-top: 20px;
@@ -83,7 +84,7 @@ interface IProps {
   icon?: () => React.ReactNode
   title?: string
   topActionButtons?: ReactElement[]
-  supportingCopy?: string
+  subtitle?: string
   children?: React.ReactNode
   bottomActionButtons?: ReactElement[]
   size?: 'normal' | 'large' | undefined
@@ -95,7 +96,7 @@ export class Content extends React.Component<IProps> {
       icon,
       title,
       topActionButtons,
-      supportingCopy,
+      subtitle,
       children,
       bottomActionButtons,
       size
@@ -110,7 +111,7 @@ export class Content extends React.Component<IProps> {
           </TitleContainer>
           {topActionButtons && <TopActionBar>{topActionButtons}</TopActionBar>}
         </Header>
-        {supportingCopy && <SubHeader>{supportingCopy}</SubHeader>}
+        {subtitle && <SubHeader>{subtitle}</SubHeader>}
         {children && <Body>{children}</Body>}
         <Footer>
           {bottomActionButtons && (
