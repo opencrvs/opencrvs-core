@@ -21,7 +21,7 @@ const languageFromProps = ({ language }: IPage) => language
 
 const StyledPage = styled.div<IPage>`
   ${({ theme }) => theme.gradients.gradientNightshade};
-  ${window.config.COUNTRY === 'zmb'
+  ${['ZMB', 'FAR'].includes(window.config.COUNTRY.toUpperCase())
     ? `background: url(${zambiaBackground});`
     : ''}
   min-height: 100vh;
