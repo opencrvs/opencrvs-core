@@ -23,6 +23,8 @@ import { roleQueries } from './forms/user/fieldDefinitions/query/queries'
 import { userQueries } from './user/queries'
 import debounce from 'lodash/debounce'
 
+import './tests/queryMock'
+
 if (process.env.CI) {
   jest.setTimeout(30000)
 }

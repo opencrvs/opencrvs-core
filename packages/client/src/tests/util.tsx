@@ -2784,7 +2784,14 @@ export async function createTestComponent(
   )
 
   const component = mount(
-    <MockedProvider mocks={graphqlMocks} addTypename={false}>
+    <MockedProvider
+      mocks={graphqlMocks}
+      addTypename={false}
+      defaultOptions={{
+        watchQuery: { fetchPolicy: 'no-cache' },
+        query: { fetchPolicy: 'no-cache' }
+      }}
+    >
       <Provider store={store}>
         <I18nContainer>
           <ThemeProvider theme={getTheme(getDefaultLanguage())}>

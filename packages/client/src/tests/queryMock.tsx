@@ -11,28 +11,24 @@
  */
 
 /*
- * Notice that this component is bypassed in tests!
- * Tests use packages/client/src/tests/queryMock.tsx instead
- * This is because at the time of writing, we are running a very old version
+ * This mock is added because at the time of writing, we are running a very old version
  * of apollo client & react apollo and fetchPolicy isn't working with MockedProvider
+ *
+ * Remove when these dependencies are upgraded
  */
 
 import * as React from 'react'
 import { ComponentProps } from '@client/utils/react'
 // eslint-disable-next-line no-restricted-imports
 import { Query as ApolloQuery } from 'react-apollo'
-// eslint-disable-next-line no-restricted-imports
-import * as Sentry from '@sentry/browser'
-
 type Props = ComponentProps<ApolloQuery>
 
-export function Query(props: Props) {
-  return (
-    <ApolloQuery
-      onError={(error: Error) => {
-        Sentry.captureException(error)
-      }}
-      {...props}
-    />
-  )
+const mockQuery = function Query(props: Props) {
+  const { fetchPolicy, ...propsWithoutFetchPolicy } = props
+
+  return <ApolloQuery {...propsWithoutFetchPolicy} />
 }
+
+jest.mock('@client/components/Query', () => ({
+  Query: mockQuery
+}))
