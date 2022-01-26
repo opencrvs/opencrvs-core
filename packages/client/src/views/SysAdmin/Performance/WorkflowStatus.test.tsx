@@ -207,7 +207,7 @@ describe('Workflow status tests', () => {
     beforeEach(async () => {
       const path = '/performance/operations/workflowStatus'
       const location = createLocation(path, {
-        sectionId: OPERATIONAL_REPORT_SECTION,
+        sectionId: OPERATIONAL_REPORT_SECTION.OPERATIONAL,
         timeStart,
         timeEnd
       })
@@ -354,7 +354,7 @@ describe('Workflow status tests', () => {
     beforeEach(async () => {
       const path = '/performance/operations/workflowStatus'
       const location = createLocation(path, {
-        sectionId: OPERATIONAL_REPORT_SECTION,
+        sectionId: OPERATIONAL_REPORT_SECTION.OPERATIONAL,
         timeStart,
         timeEnd
       })
