@@ -161,13 +161,28 @@ export const selectOption = (
 
   input.find('input').simulate('focus').update()
   input.find('.react-select__control').simulate('mousedown').update()
-  input
+
+  const availableOptions: string[] = []
+
+  const nodes = input
     .update()
     .find('.react-select__option')
-    .findWhere((el: ReactWrapper) => el.text() === option)
+    .findWhere((el: ReactWrapper) => {
+      const text = el.text()
+      availableOptions.push(text)
+      return text === option
+    })
     .hostNodes()
-    .simulate('click')
-    .update()
+
+  if (nodes.length === 0) {
+    throw new Error(
+      `Couldn't find an option "${option}" from select.\nAvailable options are:\n${availableOptions.join(
+        ',\n'
+      )}`
+    )
+  }
+
+  nodes.simulate('click').update()
 
   return input.find('.react-select__control')
 }
@@ -2783,26 +2798,28 @@ export async function createTestComponent(
     })
   )
 
-  const component = mount(
-    <MockedProvider
-      mocks={graphqlMocks}
-      addTypename={false}
-      defaultOptions={{
-        watchQuery: { fetchPolicy: 'no-cache' },
-        query: { fetchPolicy: 'no-cache' }
-      }}
-    >
-      <Provider store={store}>
-        <I18nContainer>
-          <ThemeProvider theme={getTheme(getDefaultLanguage())}>
-            {node}
-          </ThemeProvider>
-        </I18nContainer>
-      </Provider>
-    </MockedProvider>,
-    options
-  )
+  function PropProxy(props: Record<string, any>) {
+    return (
+      <MockedProvider
+        mocks={graphqlMocks}
+        addTypename={false}
+        defaultOptions={{
+          watchQuery: { fetchPolicy: 'no-cache' },
+          query: { fetchPolicy: 'no-cache' }
+        }}
+      >
+        <Provider store={store}>
+          <I18nContainer>
+            <ThemeProvider theme={getTheme(getDefaultLanguage())}>
+              <node.type {...node.props} {...props} />
+            </ThemeProvider>
+          </I18nContainer>
+        </Provider>
+      </MockedProvider>
+    )
+  }
 
+  const component = mount(<PropProxy {...node.props} />, options)
   return { component: component.update(), store }
 }
 

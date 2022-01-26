@@ -206,7 +206,7 @@ beforeEach(() => {
   debug.mockReset()
   hiddenMock.mockReset()
 
-  Date.now = jest.fn(() => 1487076708000)
+  Date.now = jest.fn(() => 1487076708000) // 2017-02-14
 
   /*
    * Assign sane defaults for everything
