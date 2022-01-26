@@ -2223,7 +2223,8 @@ export const builders: IFieldBuilders = {
         const certDocResource = selectOrCreateCertificateDocRefResource(
           fhirBundle,
           context,
-          EVENT_TYPE.BIRTH
+          EVENT_TYPE.BIRTH,
+          true
         )
         if (!certDocResource.content) {
           certDocResource.content = [
