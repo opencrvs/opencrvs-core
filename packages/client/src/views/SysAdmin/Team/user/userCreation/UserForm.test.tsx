@@ -65,12 +65,12 @@ describe('Create new user page tests', () => {
   })
 
   it('performs auto complete search among offline data', () => {
-    component
-      .find('#locationSearchInput')
-      .hostNodes()
-      .simulate('change', {
-        target: { value: 'Moktarpur', id: 'locationSearchInput' }
-      })
+    const locationInput = component.find(`input#registrationOffice`).hostNodes()
+
+    locationInput.simulate('change', {
+      target: { id: `input#registrationOffice`, value: 'moktarpur' }
+    })
+    locationInput.simulate('focus')
 
     const autoCompleteSuggestion = component
       .find('#locationOption0d8474da-0361-4d32-979e-af91f012340a')
@@ -80,12 +80,12 @@ describe('Create new user page tests', () => {
 
   it('clicking on autocomplete suggestion modifies draft', () => {
     expect(store.getState().userForm.userFormData).toEqual({})
-    component
-      .find('#locationSearchInput')
-      .hostNodes()
-      .simulate('change', {
-        target: { value: 'Moktarpur', id: 'locationSearchInput' }
-      })
+    const locationInput = component.find(`input#registrationOffice`).hostNodes()
+
+    locationInput.simulate('change', {
+      target: { id: `input#registrationOffice`, value: 'moktarpur' }
+    })
+    locationInput.simulate('focus')
 
     const autoCompleteSuggestion = component
       .find('#locationOption0d8474da-0361-4d32-979e-af91f012340a')
