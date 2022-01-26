@@ -415,97 +415,6 @@ describe('User list tests', () => {
 
         expect(component.find('div#row_4').children()).toHaveLength(2)
       })
-
-      it('renders 3 columns for midium devices', async () => {
-        Object.defineProperty(window, 'innerWidth', {
-          writable: true,
-          configurable: true,
-          value: 700
-        })
-        const testComponent = await createTestComponent(
-          <UserList
-            // @ts-ignore
-            location={{
-              search: stringify({
-                locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
-              })
-            }}
-          />,
-          store,
-          userListMock
-        )
-
-        // wait for mocked data to load mockedProvider
-        await new Promise((resolve) => {
-          setTimeout(resolve, 100)
-        })
-
-        testComponent.component.update()
-        component = testComponent.component
-
-        expect(component.find('div#row_4').children()).toHaveLength(3)
-      })
-
-      it('renders 4 columns for bigger devices on viewOnly mode', async () => {
-        Object.defineProperty(window, 'innerWidth', {
-          writable: true,
-          configurable: true,
-          value: 1100
-        })
-        const testComponent = await createTestComponent(
-          <UserList
-            // @ts-ignore
-            location={{
-              search: stringify({
-                locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
-                viewOnly: true
-              })
-            }}
-          />,
-          store,
-          userListMock
-        )
-
-        // wait for mocked data to load mockedProvider
-        await new Promise((resolve) => {
-          setTimeout(resolve, 100)
-        })
-
-        testComponent.component.update()
-        component = testComponent.component
-
-        expect(component.find('div#row_4').children()).toHaveLength(4)
-      })
-
-      it('renders 5 columns for bigger devices', async () => {
-        Object.defineProperty(window, 'innerWidth', {
-          writable: true,
-          configurable: true,
-          value: 1100
-        })
-        const testComponent = await createTestComponent(
-          <UserList
-            // @ts-ignore
-            location={{
-              search: stringify({
-                locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
-              })
-            }}
-          />,
-          store,
-          userListMock
-        )
-
-        // wait for mocked data to load mockedProvider
-        await new Promise((resolve) => {
-          setTimeout(resolve, 100)
-        })
-
-        testComponent.component.update()
-        component = testComponent.component
-
-        expect(component.find('div#row_4').children()).toHaveLength(5)
-      })
     })
 
     describe('when there is a result from query', () => {
@@ -608,6 +517,11 @@ describe('User list tests', () => {
       ]
 
       beforeEach(async () => {
+        Object.defineProperty(window, 'innerWidth', {
+          writable: true,
+          configurable: true,
+          value: 1100
+        })
         const testComponent = await createTestComponent(
           <UserList
             // @ts-ignore
