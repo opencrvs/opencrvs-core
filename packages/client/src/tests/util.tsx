@@ -22,7 +22,7 @@ import { ICertificateCollectorDefinition } from '@client/views/PrintCertificate/
 import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { InMemoryCache } from 'apollo-cache-inmemory'
-import ApolloClient from 'apollo-client'
+import ApolloClient, { NetworkStatus } from 'apollo-client'
 import { ApolloLink, Observable } from 'apollo-link'
 import {
   configure,
@@ -43,6 +43,7 @@ import { IntlShape } from 'react-intl'
 import { Provider } from 'react-redux'
 import { AnyAction, Store } from 'redux'
 import { waitForElement } from './wait-for-element'
+import { setUserDetails } from '@client/profile/profileActions'
 
 export const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -3052,4 +3053,57 @@ export function setPageVisibility(isVisible: boolean) {
   const evt = document.createEvent('HTMLEvents')
   evt.initEvent('visibilitychange', false, true)
   document.dispatchEvent(evt)
+}
+
+export function loginAsFieldAgent(store: AppStore) {
+  store.dispatch(
+    setUserDetails({
+      loading: false,
+      networkStatus: NetworkStatus.ready,
+      stale: false,
+      data: {
+        getUser: {
+          userMgntUserID: '5eba726866458970cf2e23c2',
+          practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+          mobile: '+8801711111111',
+          role: 'FIELD_AGENT',
+          type: 'CHA',
+          status: 'active',
+          name: [
+            {
+              use: 'en',
+              firstNames: 'Shakib',
+              familyName: 'Al Hasan'
+            }
+          ],
+          catchmentArea: [
+            {
+              id: '514cbc3a-cc99-4095-983f-535ea8cb6ac0',
+              name: 'Baniajan',
+              alias: ['বানিয়াজান'],
+              status: 'active',
+              identifier: [
+                {
+                  system: 'http://opencrvs.org/specs/id/a2i-internal-reference',
+                  value: 'division=9&district=30&upazila=233&union=4194'
+                }
+              ]
+            }
+          ],
+          primaryOffice: undefined,
+          localRegistrar: {
+            name: [
+              {
+                use: 'en',
+                firstNames: 'Mohammad',
+                familyName: 'Ashraful'
+              }
+            ],
+            role: 'LOCAL_REGISTRAR',
+            signature: undefined
+          }
+        }
+      }
+    })
+  )
 }
