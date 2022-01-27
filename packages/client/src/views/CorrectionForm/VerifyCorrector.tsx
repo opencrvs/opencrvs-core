@@ -146,7 +146,7 @@ class VerifyVerifyCorrectorComponent extends React.Component<IFullProps> {
     return (
       <ActionPageLight
         goBack={this.props.goBack}
-        title={intl.formatMessage(messages.correctRecordTitle)}
+        title={intl.formatMessage(messages.title)}
       >
         {hasNoInfo ? (
           <IDVerifier

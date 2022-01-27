@@ -54,14 +54,16 @@ const MenuTitle = styled.div`
   ${({ theme }) => theme.fonts.bigBodyBoldStyle};
 `
 
-const Container = styled.div`
+const Container = styled.div<{ hideBackground: boolean | undefined }>`
   ${({ theme }) => theme.fonts.bodyStyle};
-  ${({ theme }) => theme.shadows.mistyShadow};
+  ${({ theme, hideBackground }) =>
+    hideBackground ? '' : theme.shadows.mistyShadow};
   color: ${({ theme }) => theme.colors.copy};
   padding: 24px 32px 32px;
   margin: 32px auto 0;
   max-width: 940px;
-  background: ${({ theme }) => theme.colors.white};
+  background: ${({ theme, hideBackground }) =>
+    hideBackground ? '' : theme.colors.white};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin: 40px 54px;
     padding: 24px 32px;
@@ -76,6 +78,7 @@ const Container = styled.div`
 `
 interface IProps {
   title?: string
+  hideBackground?: boolean
   backLabel?: string
   icon?: () => React.ReactNode
   id?: string
@@ -87,7 +90,7 @@ export class ActionPageLight extends React.Component<
   }
 > {
   render() {
-    const { id, title, icon, goBack, backLabel } = this.props
+    const { id, title, icon, goBack, backLabel, hideBackground } = this.props
 
     return (
       <ActionContainer id={id}>
@@ -102,7 +105,9 @@ export class ActionPageLight extends React.Component<
             {title && <MenuTitle>{title}</MenuTitle>}
           </BodyContent>
         </HeaderContainer>
-        <Container>{this.props.children}</Container>
+        <Container hideBackground={hideBackground}>
+          {this.props.children}
+        </Container>
       </ActionContainer>
     )
   }

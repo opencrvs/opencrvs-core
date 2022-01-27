@@ -20,7 +20,7 @@ import {
 import { messages } from '@client/i18n/messages/views/correction'
 
 const birthCorrectorRelationGroup: IFormSectionGroup = {
-  id: 'corrector-relation',
+  id: 'correctorRelation',
   title: messages.whoRequestedCorrection,
   error: messages.correctorError,
   fields: [
@@ -29,6 +29,7 @@ const birthCorrectorRelationGroup: IFormSectionGroup = {
       type: RADIO_GROUP_WITH_NESTED_FIELDS,
       size: RadioSize.LARGE,
       label: messages.whoRequestedCorrection,
+      hideHeader: true,
       required: true,
       initialValue: '',
       validate: [],
@@ -63,7 +64,7 @@ const birthCorrectorRelationGroup: IFormSectionGroup = {
         REGISTRAR: [],
         OTHERS: [
           {
-            name: 'other-relationship',
+            name: 'otherRelationship',
             type: 'TEXT',
             label: {
               defaultMessage: 'Relationship to child',
@@ -87,7 +88,7 @@ const birthCorrectorRelationGroup: IFormSectionGroup = {
 }
 
 const deathCorrectorRelationGroup: IFormSectionGroup = {
-  id: 'recordCorrection',
+  id: 'correctorRelation',
   title: messages.whoRequestedCorrection,
   error: messages.correctorError,
   fields: [
@@ -96,6 +97,7 @@ const deathCorrectorRelationGroup: IFormSectionGroup = {
       type: RADIO_GROUP_WITH_NESTED_FIELDS,
       size: RadioSize.LARGE,
       label: messages.whoRequestedCorrection,
+      hideHeader: true,
       required: true,
       initialValue: '',
       validate: [],
@@ -121,7 +123,7 @@ const deathCorrectorRelationGroup: IFormSectionGroup = {
         ANOTHER_AGENT: [],
         OTHERS: [
           {
-            name: 'other-relationship',
+            name: 'otherRelationship',
             type: 'TEXT',
             label: {
               defaultMessage: 'Relationship to child',

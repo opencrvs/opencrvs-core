@@ -26,10 +26,10 @@ interface ICorrectionMessages
   court: MessageDescriptor
   others: MessageDescriptor
   informant: MessageDescriptor
-  correctRecordTitle: MessageDescriptor
   idCheckTitle: MessageDescriptor
   otherIdCheckTitle: MessageDescriptor
   idCheckVerify: MessageDescriptor
+  birthCorrectionNote: MessageDescriptor
 }
 
 const messagesToDefine: ICorrectionMessages = {
@@ -100,11 +100,6 @@ const messagesToDefine: ICorrectionMessages = {
     defaultMessage: 'Informant',
     description: 'Label for informant option in certificate correction form'
   },
-  correctRecordTitle: {
-    defaultMessage: 'Correct record',
-    description: 'The title of correct certificate action',
-    id: 'correct.certificate.section.title'
-  },
   idCheckTitle: {
     defaultMessage: 'Check proof of ID. Does it match the following details?',
     description: 'The title for id check component',
@@ -125,6 +120,12 @@ const messagesToDefine: ICorrectionMessages = {
     description:
       'The label for id check component action when does not verify details',
     id: 'correction.certificate.corrector.idCheckWithoutVerify.title'
+  },
+  birthCorrectionNote: {
+    id: 'correction.corrector.birth.note',
+    defaultMessage:
+      'Note: In the case that the child is now of legal age (18) then only they should be able to request a change to thier birth record.',
+    description: 'Birth correction note'
   }
 }
 

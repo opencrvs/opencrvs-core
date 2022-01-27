@@ -17,7 +17,6 @@ import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { goBack, goToVerifyCorrector } from '@client/navigation'
 import {
   Event,
-  IFormData,
   IFormSection,
   IFormSectionData,
   IRadioGroupWithNestedFieldsFormField
@@ -25,24 +24,12 @@ import {
 import { get, isEqual } from 'lodash'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
-import styled from '@client/styledComponents'
 import { FormFieldGenerator } from '@client/components/form'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
-import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
-import { getValidationErrorsForForm } from '@client/forms/validation'
-
-const FormSectionTitle = styled.h4`
-  ${({ theme }) => theme.fonts.h4Style};
-  color: ${({ theme }) => theme.colors.copy};
-  margin-top: 0px;
-  margin-bottom: 16px;
-`
-
-const ErrorWrapper = styled.div`
-  margin-top: -3px;
-  margin-bottom: 16px;
-`
+import { messages } from '@client/i18n/messages/views/correction'
+import { Content } from '@opencrvs/components/lib/interface/Content'
+import { sectionHasError } from './utils'
 
 type IProps = {
   application: IApplication
@@ -56,7 +43,10 @@ type IDispatchProps = {
 
 type IFullProps = IProps & IDispatchProps & IntlShapeProps
 
-function getGroup(section: IFormSection, application: IApplication) {
+function getGroupWithVisibleFields(
+  section: IFormSection,
+  application: IApplication
+) {
   const event = application.event
   if (event === Event.BIRTH) {
     const applicationData = application.data
@@ -81,19 +71,19 @@ function getGroup(section: IFormSection, application: IApplication) {
     if (!fatherDataExists) {
       ;(
         section.groups[0].fields[0] as IRadioGroupWithNestedFieldsFormField
-      ).options.splice(1, 1)
+      ).options.filter((option) => option.value !== 'FATHER')
     }
 
     if (!motherDataExists) {
       ;(
         section.groups[0].fields[0] as IRadioGroupWithNestedFieldsFormField
-      ).options.splice(0, 1)
+      ).options.filter((option) => option.value !== 'MOTHER')
     }
 
     if (!childDataExists) {
       ;(
         section.groups[0].fields[0] as IRadioGroupWithNestedFieldsFormField
-      ).options.splice(2, 1)
+      ).options.filter((option) => option.value !== 'CHILD')
     }
   } else if (event === Event.DEATH) {
     const applicationData = application && application.data
@@ -104,7 +94,7 @@ function getGroup(section: IFormSection, application: IApplication) {
     if (isInformantDataNull) {
       ;(
         section.groups[0].fields[0] as IRadioGroupWithNestedFieldsFormField
-      ).options.splice(0, 1)
+      ).options.filter((option) => option.value !== 'INFORMANT')
     }
   }
   const group = section.groups[0]
@@ -120,13 +110,11 @@ function getGroup(section: IFormSection, application: IApplication) {
 }
 
 function CorrectorFormComponent(props: IFullProps) {
-  const [showError, setShowError] = React.useState(false)
-
   const { application, intl, goBack } = props
 
   const section = getCorrectorSection(application.event)
 
-  const group = getGroup(section, application)
+  const group = getGroupWithVisibleFields(section, application)
 
   const modifyApplication = (
     sectionData: IFormSectionData,
@@ -145,78 +133,51 @@ function CorrectorFormComponent(props: IFullProps) {
     })
   }
   const continueButtonHandler = () => {
-    const errors = getValidationErrorsForForm(
-      group.fields,
-      application.data[section.id] || {}
+    props.goToVerifyCorrector(
+      application.id,
+      application.event,
+      (application.data.corrector.relationship as IFormSectionData)
+        .value as string
     )
-
-    group.fields.forEach((field) => {
-      const fieldErrors = errors[field.name].errors
-      const nestedFieldErrors = errors[field.name].nestedFields
-
-      let hasError = false
-
-      if (fieldErrors.length > 0) {
-        hasError = true
-      }
-
-      if (field.nestedFields) {
-        Object.values(field.nestedFields).forEach((nestedFields) => {
-          nestedFields.forEach((nestedField) => {
-            if (
-              nestedFieldErrors[nestedField.name] &&
-              nestedFieldErrors[nestedField.name].length > 0
-            ) {
-              hasError = true
-            }
-          })
-        })
-      }
-
-      if (hasError) {
-        setShowError(true)
-        return
-      }
-
-      props.goToVerifyCorrector(
-        application.id,
-        application.event,
-        (application.data.corrector.relationship as IFormSectionData)
-          .value as string
-      )
-    })
   }
+
+  const continueButton = (
+    <PrimaryButton
+      id="confirm_form"
+      onClick={continueButtonHandler}
+      disabled={sectionHasError(group, section, application)}
+    >
+      {intl.formatMessage(buttonMessages.continueButton)}
+    </PrimaryButton>
+  )
 
   return (
     <>
       <ActionPageLight
         id="corrector_form"
         title={intl.formatMessage(section.title)}
+        hideBackground
         goBack={goBack}
       >
-        <FormSectionTitle>
-          {group.fields.length === 1 && (group.fields[0].hideHeader = true)}
-          <> {(group.title && intl.formatMessage(group.title)) || ''} </>
-        </FormSectionTitle>
-        {showError && (
-          <ErrorWrapper>
-            <ErrorText id="form_error" ignoreMediaQuery={true}>
-              {(group.error && intl.formatMessage(group.error)) || ''}
-            </ErrorText>
-          </ErrorWrapper>
-        )}
-        <FormFieldGenerator
-          id={group.id}
-          onChange={(values) => {
-            modifyApplication(values, section, application)
-          }}
-          setAllFieldsDirty={false}
-          fields={group.fields}
-          draftData={application.data}
-        />
-        <PrimaryButton id="confirm_form" onClick={continueButtonHandler}>
-          {intl.formatMessage(buttonMessages.continueButton)}
-        </PrimaryButton>
+        <Content
+          title={group.title && intl.formatMessage(group.title)}
+          subtitle={
+            application.event === Event.BIRTH
+              ? intl.formatMessage(messages.birthCorrectionNote)
+              : undefined
+          }
+          bottomActionButtons={[continueButton]}
+        >
+          <FormFieldGenerator
+            id={group.id}
+            onChange={(values) => {
+              modifyApplication(values, section, application)
+            }}
+            setAllFieldsDirty={false}
+            fields={group.fields}
+            draftData={application.data}
+          />
+        </Content>
       </ActionPageLight>
     </>
   )
