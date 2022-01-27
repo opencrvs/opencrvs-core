@@ -13,9 +13,7 @@ import { getToken } from '@client/utils/authUtils'
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { resolve } from 'url'
 export interface ISendVerifyCodeData {
-  userId: string
   phoneNumber: string
-  scope: string[]
 }
 
 export interface ISendVerifyCodeResponse {

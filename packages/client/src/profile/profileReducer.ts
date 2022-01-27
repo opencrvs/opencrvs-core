@@ -209,11 +209,7 @@ export const profileReducer: LoopReducer<
       }
     case actions.SEND_VERIFY_CODE:
       const sendVerifyCodeDetails = action.payload
-      if (
-        state.tokenPayload &&
-        (!sendVerifyCodeDetails ||
-          sendVerifyCodeDetails.userId === state.tokenPayload.sub)
-      ) {
+      if (state.tokenPayload && sendVerifyCodeDetails) {
         return loop(
           {
             ...state

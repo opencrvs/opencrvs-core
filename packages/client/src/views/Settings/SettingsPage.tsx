@@ -42,8 +42,7 @@ import { getDefaultLanguage, getAvailableLanguages } from '@client/i18n/utils'
 import { IntlState } from '@client/i18n/reducer'
 import { PasswordChangeModal } from '@client/views/Settings/PasswordChangeModal'
 import { goToPhoneSettings } from '@client/navigation'
-import { RouteComponentProps } from 'react-router'
-import { findLastKey } from 'lodash-es'
+import { RouteComponentProps, StaticContext } from 'react-router'
 import { SETTINGS } from '@client/navigation/routes'
 import { AvatarChangeModal } from './AvatarChangeModal'
 import { ImageLoader } from './ImageLoader'
@@ -142,13 +141,18 @@ const CancelButton = styled(TertiaryButton)`
   }
 `
 type IProps = IntlShapeProps &
-  RouteComponentProps & {
+  RouteComponentProps<
+    {},
+    StaticContext,
+    {
+      phonedNumberUpdated: boolean
+    }
+  > & {
     language: string
     languages: IntlState['languages']
     userDetails: IUserDetails | null
     modifyUserDetails: typeof modifyUserDetailsAction
     goToPhoneSettingAction: typeof goToPhoneSettings
-    phonedNumberUpdated: boolean
   }
 
 enum NOTIFICATION_SUBJECT {
@@ -197,12 +201,12 @@ class SettingsView extends React.Component<IProps, IState> {
 
   componentDidMount() {
     let phonedNumberUpdated = false
-    const historyState = this.props.history.location.state as any
+    const historyState = this.props.history.location.state
     if (this.props.location.state) {
       phonedNumberUpdated = historyState.phonedNumberUpdated
       if (phonedNumberUpdated) {
         this.changePhoneNumber()
-        this.props.history.replace(SETTINGS, null)
+        this.props.history.replace(SETTINGS, historyState)
       }
     }
   }

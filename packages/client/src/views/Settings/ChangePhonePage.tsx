@@ -168,6 +168,8 @@ const Label = styled.label`
   margin-bottom: 8px;
 `
 const InvalidPhoneNumber = styled.div`
+  /* stylelint-disable-next-line opencrvs/no-font-styles */
+  font-family: ${({ theme }) => theme.fonts.semiBoldFont};
   ${({ theme }) => theme.fonts.semiBoldFont};
   color: ${({ theme }) => theme.colors.error};
   margin-top: 8px;
@@ -261,7 +263,7 @@ class ChangePhoneView extends React.Component<IProps & IDispatchProps, IState> {
   ) => {
     if (!phoneNumber) return
     if (VIEW_TYPE.CHANGE_NUMBER) {
-      this.props.sendVerifyCode(userId, phoneNumber, scope)
+      this.props.sendVerifyCode(phoneNumber)
       this.setState({
         view: VIEW_TYPE.VERIFY_NUMBER
       })

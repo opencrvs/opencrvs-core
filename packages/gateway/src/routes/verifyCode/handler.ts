@@ -13,6 +13,7 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import {
   CERT_PRIVATE_KEY_PATH,
+  CERT_PUBLIC_KEY_PATH,
   CONFIG_SMS_CODE_EXPIRY_SECONDS,
   CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS,
   CONFIG_TOKEN_EXPIRY_SECONDS,
@@ -30,6 +31,8 @@ import * as jwt from 'jsonwebtoken'
 import fetch from 'node-fetch'
 import { unauthorized } from '@hapi/boom'
 import { logger } from '@gateway/logger'
+const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
+import * as t from 'io-ts'
 
 interface ICodeDetails {
   code: string
@@ -40,7 +43,7 @@ type SixDigitVerificationCode = string
 
 const cert = readFileSync(CERT_PRIVATE_KEY_PATH)
 
-const sign = (promisify(jwt.sign) as unknown) as (
+const sign = promisify(jwt.sign) as unknown as (
   payload: string | Buffer | object,
   secretOrPrivateKey: jwt.Secret,
   options?: jwt.SignOptions
@@ -54,9 +57,7 @@ interface ISendVerifyCodeResponse {
 }
 
 interface ISendVerifyCodePayload {
-  userId: string
   phoneNumber: string
-  scope: string[]
 }
 
 export async function storeVerificationCode(nonce: string, code: string) {
@@ -117,10 +118,7 @@ export async function deleteUsedVerificationCode(
 }
 
 export function generateNonce() {
-  return crypto
-    .randomBytes(16)
-    .toString('base64')
-    .toString()
+  return crypto.randomBytes(16).toString('base64').toString()
 }
 
 export async function sendVerificationCode(
@@ -203,8 +201,11 @@ export default async function sendVerifyCodeHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ): Promise<ISendVerifyCodeResponse> {
+  const token = request.headers.authorization.replace('Bearer ', '') as string
+  const tokenDecoded = verifyToken(token)
   const payload = request.payload as ISendVerifyCodePayload
-  const { userId, phoneNumber, scope } = payload
+  const { phoneNumber } = payload
+  const { sub: userId, scope } = tokenDecoded
 
   const nonce = generateNonce()
   const response: ISendVerifyCodeResponse = {
@@ -218,9 +219,7 @@ export default async function sendVerifyCodeHandler(
 }
 
 export const requestSchema = Joi.object({
-  userId: Joi.string(),
-  phoneNumber: Joi.string(),
-  scope: Joi.array().items(Joi.string())
+  phoneNumber: Joi.string()
 })
 
 export const responseSchema = Joi.object({
@@ -229,3 +228,24 @@ export const responseSchema = Joi.object({
   mobile: Joi.string(),
   status: Joi.string()
 })
+
+/* tslint:disable */
+const TokenPayload = t.type({
+  sub: t.string,
+  scope: t.array(t.string),
+  iat: t.number,
+  exp: t.number,
+  aud: t.array(t.string)
+})
+
+export type ITokenPayload = t.TypeOf<typeof TokenPayload>
+
+export function verifyToken(token: string): ITokenPayload {
+  const decoded = jwt.verify(token, publicCert, {
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:gateway-user'
+  })
+  const result = TokenPayload.decode(decoded)
+  return result.value as ITokenPayload
+}
+/* tslint:enable */
