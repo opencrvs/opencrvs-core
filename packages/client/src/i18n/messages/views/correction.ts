@@ -26,6 +26,7 @@ interface ICorrectionMessages
   court: MessageDescriptor
   others: MessageDescriptor
   informant: MessageDescriptor
+  birthCorrectionNote: MessageDescriptor
 }
 
 const messagesToDefine: ICorrectionMessages = {
@@ -95,6 +96,12 @@ const messagesToDefine: ICorrectionMessages = {
     id: 'correction.corrector.informant',
     defaultMessage: 'Informant',
     description: 'Label for informant option in certificate correction form'
+  },
+  birthCorrectionNote: {
+    id: 'correction.corrector.birth.note',
+    defaultMessage:
+      'Note: In the case that the child is now of legal age (18) then only they should be able to request a change to thier birth record.',
+    description: 'Birth correction note'
   }
 }
 
