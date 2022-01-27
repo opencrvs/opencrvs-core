@@ -38,6 +38,9 @@ jobs:
       - name: Run linting
         run: yarn lint
 
+      - name: Build all packages
+        run: yarn build
+
       - name: Run Unit Test
         run: yarn test
 
