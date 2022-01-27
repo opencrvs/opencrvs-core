@@ -44,7 +44,8 @@ export const colorDictionary = {
   grey: '#1E2326',
   greyLight: '#595C5F',
   greyHover: '#F8F8F8',
-  borderBottom: '#d8dbde'
+  borderBottom: '#d8dbde',
+  grey500: '#CCCFD0'
 }
 
 export const gradients = {
@@ -85,6 +86,7 @@ export const colors = {
   greyLight: colorDictionary.greyLight,
   greyHover: colorDictionary.greyHover,
   border: colorDictionary.borderBottom,
+  grey500: colorDictionary.grey500,
 
   // Exceptions - Try to use one of the above before creating exceptions
   chartAreaGradientStart: colorDictionary.greySmoky,

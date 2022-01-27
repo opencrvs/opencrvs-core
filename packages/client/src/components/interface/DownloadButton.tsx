@@ -15,6 +15,7 @@ import styled from '@client/styledComponents'
 import { constantsMessages } from '@client/i18n/messages'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { Warning, Download } from '@opencrvs/components/lib/icons'
+import { DownloadGreen } from '@opencrvs/components/lib/icons/DownloadGreen'
 import { TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { connect } from 'react-redux'
 import {
@@ -78,6 +79,15 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
 
     props.downloadApplication(downloadableApplication, props.client)
   }
+  if (status === DOWNLOAD_STATUS.DOWNLOADED) {
+    return (
+      <DownloadAction
+        isFullHeight={false}
+        icon={() => <DownloadGreen />}
+        id={`download_button_${id}`}
+      />
+    )
+  }
 
   if (
     status === DOWNLOAD_STATUS.READY_TO_DOWNLOAD ||
@@ -85,8 +95,11 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
   ) {
     return (
       <StatusIndicator isLoading={true} className={className}>
-        {intl.formatMessage(constantsMessages.downloading)}
-        <Spinner id={`action-loading-${id}`} size={24} />
+        <Spinner
+          id={`action-loading-${id}`}
+          size={24}
+          downloadingApplication={true}
+        />
       </StatusIndicator>
     )
   }

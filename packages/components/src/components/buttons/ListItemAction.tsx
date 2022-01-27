@@ -47,8 +47,11 @@ const ListItemActionsContainer = styled.div<{
 `
 const ListItemSingleAction = styled(PrimaryButton)<{
   isFullHeight?: boolean
+  notDownloaded?: boolean
 }>`
   ${({ isFullHeight }) => isFullHeight && ` height: 100%;`}
+  background-color: ${({ notDownloaded, theme }) =>
+    notDownloaded && theme.colors.grey500} !important;
   max-height: 40px;
   text-transform: capitalize;
 `
@@ -100,6 +103,7 @@ export function ListItemAction(props: IListItemActionProps) {
                 id={`${id}-${action.label as string}`}
                 onClick={action.handler}
                 icon={action.icon}
+                notDownloaded={action.notDownloaded}
               >
                 {action.label}
               </ListItemSingleAction>

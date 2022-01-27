@@ -100,7 +100,13 @@ export const transformData = (
         modifiedAt:
           assignedReg.registration &&
           (assignedReg.registration.modifiedAt ||
-            assignedReg.registration.createdAt)
+            assignedReg.registration.createdAt),
+        status:
+          (assignedReg.registration &&
+            assignedReg.registration.status &&
+            assignedReg.registration.status[0] +
+              assignedReg.registration.status.toLowerCase().slice(1)) ||
+          ''
       }
     })
 }

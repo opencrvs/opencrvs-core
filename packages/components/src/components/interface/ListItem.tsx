@@ -29,6 +29,7 @@ export interface IActionObject {
   label: string
   handler: () => void
   icon?: () => React.ReactNode
+  notDownloaded?: boolean
 }
 
 export interface IActionComponent {
@@ -162,7 +163,7 @@ export class ListItem extends React.Component<IListItemProps, IListItemState> {
   }
 
   toggleExpanded = () => {
-    this.setState(state => ({
+    this.setState((state) => ({
       expanded: !state.expanded
     }))
   }

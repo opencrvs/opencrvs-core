@@ -26,7 +26,8 @@ import { Duplicate, Validate } from '@opencrvs/components/lib/icons'
 import {
   ColumnContentAlignment,
   GridTable,
-  IAction
+  IAction,
+  IActionComponent
 } from '@opencrvs/components/lib/interface'
 import { HomeContent } from '@opencrvs/components/lib/layout'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
@@ -113,35 +114,54 @@ class ReviewTabComponent extends React.Component<
     if (!data || !data.results) {
       return []
     }
+    console.log(data)
     const transformedData = transformData(data, this.props.intl)
+    console.log(transformedData)
     return transformedData.map((reg, index) => {
       const actions = [] as IAction[]
+      const downloadIcons = [] as IActionComponent[]
       const foundApplication = this.props.outboxApplications.find(
         (application) => application.id === reg.id
       )
       const downloadStatus =
         (foundApplication && foundApplication.downloadStatus) || undefined
       let icon: JSX.Element = <div />
-
       if (reg.duplicates && reg.duplicates.length > 0) {
+        downloadIcons.push({
+          actionComponent: (
+            <DownloadButton
+              downloadConfigs={{
+                event: reg.event,
+                compositionId: reg.id,
+                action: Action.LOAD_REVIEW_APPLICATION
+              }}
+              key={`DownloadButton-${index}`}
+              status={downloadStatus as DOWNLOAD_STATUS}
+            />
+          )
+        })
         if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
           actions.push({
-            actionComponent: (
-              <DownloadButton
-                downloadConfigs={{
-                  event: reg.event,
-                  compositionId: reg.id,
-                  action: Action.LOAD_REVIEW_APPLICATION
-                }}
-                key={`DownloadButton-${index}`}
-                status={downloadStatus as DOWNLOAD_STATUS}
-              />
-            )
+            // actionComponent: (
+            //   <DownloadButton
+            //     downloadConfigs={{
+            //       event: reg.event,
+            //       compositionId: reg.id,
+            //       action: Action.LOAD_REVIEW_APPLICATION
+            //     }}
+            //     key={`DownloadButton-${index}`}
+            //     status={downloadStatus as DOWNLOAD_STATUS}
+            //   />
+            // )
+            label: this.props.intl.formatMessage(constantsMessages.review),
+            handler: () => this.props.goToReviewDuplicate(reg.id),
+            notDownloaded: true
           })
         } else {
           actions.push({
             label: this.props.intl.formatMessage(constantsMessages.review),
-            handler: () => this.props.goToReviewDuplicate(reg.id)
+            handler: () => this.props.goToReviewDuplicate(reg.id),
+            notDownloaded: false
           })
         }
 
@@ -150,19 +170,35 @@ class ReviewTabComponent extends React.Component<
         if (reg.declarationStatus === EVENT_STATUS.VALIDATED) {
           icon = <Validate data-tip data-for="validateTooltip" />
         }
+        downloadIcons.push({
+          actionComponent: (
+            <DownloadButton
+              downloadConfigs={{
+                event: reg.event,
+                compositionId: reg.id,
+                action: Action.LOAD_REVIEW_APPLICATION
+              }}
+              key={`DownloadButton-${index}`}
+              status={downloadStatus as DOWNLOAD_STATUS}
+            />
+          )
+        })
         if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
           actions.push({
-            actionComponent: (
-              <DownloadButton
-                downloadConfigs={{
-                  event: reg.event,
-                  compositionId: reg.id,
-                  action: Action.LOAD_REVIEW_APPLICATION
-                }}
-                key={`DownloadButton-${index}`}
-                status={downloadStatus as DOWNLOAD_STATUS}
-              />
-            )
+            // actionComponent: (
+            //   <DownloadButton
+            //     downloadConfigs={{
+            //       event: reg.event,
+            //       compositionId: reg.id,
+            //       action: Action.LOAD_REVIEW_APPLICATION
+            //     }}
+            //     key={`DownloadButton-${index}`}
+            //     status={downloadStatus as DOWNLOAD_STATUS}
+            //   />
+            // )
+            label: this.props.intl.formatMessage(constantsMessages.review),
+            handler: () => this.props.goToReviewDuplicate(reg.id),
+            notDownloaded: true
           })
         } else {
           actions.push({
@@ -173,7 +209,8 @@ class ReviewTabComponent extends React.Component<
                 reg.id,
                 'review',
                 reg.event ? reg.event.toLowerCase() : ''
-              )
+              ),
+            notDownloaded: false
           })
         }
       }
@@ -192,9 +229,15 @@ class ReviewTabComponent extends React.Component<
               moment(reg.dateOfEvent.toString(), 'YYYY-MM-DD')
             )) ||
           '',
+        applicationLastUpdated:
+          (reg.modifiedAt &&
+            formattedDuration(moment(new Date(Number(reg.modifiedAt))))) ||
+          '',
         applicationTimeElapsed:
           (reg.createdAt && formattedDuration(moment(reg.createdAt))) || '',
+        status: reg.status,
         actions,
+        downloadIcons,
         icon,
         rowClickHandler: [
           {
@@ -211,25 +254,30 @@ class ReviewTabComponent extends React.Component<
       return [
         {
           label: this.props.intl.formatMessage(constantsMessages.type),
-          width: 14,
+          width: 10,
           key: 'event'
         },
         {
           label: this.props.intl.formatMessage(constantsMessages.name),
-          width: 22,
+          width: 20,
           key: 'name'
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.lastUpdated),
+          width: 17,
+          key: 'applicationLastUpdated'
         },
         {
           label: this.props.intl.formatMessage(
             messages.listItemApplicationDate
           ),
-          width: 19,
+          width: 17,
           key: 'applicationTimeElapsed'
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.eventDate),
-          width: 19,
-          key: 'eventTimeElapsed'
+          label: this.props.intl.formatMessage(constantsMessages.status),
+          width: 10,
+          key: 'status'
         },
         {
           width: 6,
@@ -237,11 +285,16 @@ class ReviewTabComponent extends React.Component<
           isIconColumn: true
         },
         {
-          label: this.props.intl.formatMessage(messages.listItemAction),
-          width: 20,
+          width: 16,
           key: 'actions',
           isActionColumn: true,
-          alignment: ColumnContentAlignment.CENTER
+          alignment: ColumnContentAlignment.RIGHT
+        },
+        {
+          width: 4,
+          key: 'downloadIcons',
+          isActionColumn: true,
+          alignment: ColumnContentAlignment.LEFT
         }
       ]
     } else {
@@ -289,14 +342,12 @@ class ReviewTabComponent extends React.Component<
         <GridTable
           content={this.transformDeclaredContent(data)}
           columns={this.getColumns()}
-          renderExpandedComponent={this.renderExpandedComponent}
           noResultText={intl.formatMessage(constantsMessages.noResults)}
           onPageChange={onPageChange}
           pageSize={this.pageSize}
           totalItems={(data && data.totalItems) || 0}
           currentPage={page}
-          expandable={this.getExpandable()}
-          clickable={!this.getExpandable()}
+          clickable={true}
           showPaginated={this.props.showPaginated}
           loading={this.props.loading}
           loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
