@@ -20,7 +20,7 @@ import {
 import { messages } from '@client/i18n/messages/views/correction'
 
 const birthCorrectorRelationGroup: IFormSectionGroup = {
-  id: 'corrector-relation',
+  id: 'correctorRelation',
   title: messages.whoRequestedCorrection,
   error: messages.correctorError,
   fields: [
@@ -63,7 +63,7 @@ const birthCorrectorRelationGroup: IFormSectionGroup = {
         REGISTRAR: [],
         OTHERS: [
           {
-            name: 'other-relationship',
+            name: 'otherRelationship',
             type: 'TEXT',
             label: {
               defaultMessage: 'Relationship to child',
@@ -87,7 +87,7 @@ const birthCorrectorRelationGroup: IFormSectionGroup = {
 }
 
 const deathCorrectorRelationGroup: IFormSectionGroup = {
-  id: 'recordCorrection',
+  id: 'correctorRelation',
   title: messages.whoRequestedCorrection,
   error: messages.correctorError,
   fields: [
@@ -121,7 +121,7 @@ const deathCorrectorRelationGroup: IFormSectionGroup = {
         ANOTHER_AGENT: [],
         OTHERS: [
           {
-            name: 'other-relationship',
+            name: 'otherRelationship',
             type: 'TEXT',
             label: {
               defaultMessage: 'Relationship to child',
