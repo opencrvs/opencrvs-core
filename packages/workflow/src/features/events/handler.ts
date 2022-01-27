@@ -56,6 +56,7 @@ export enum Events {
   BIRTH_NEW_VALIDATE = '/events/birth/new-validation', // Registration agent new application
   DEATH_NEW_VALIDATE = '/events/death/new-validation', // Registration agent new application
   EVENT_NOT_DUPLICATE = '/events/not-duplicate',
+  DOWNLOADED = '/events/downloaded',
   UNKNOWN = 'unknown'
 }
 
@@ -157,6 +158,10 @@ function detectEvent(request: Hapi.Request): Events {
 
   if (request.method === 'put' && request.path.includes('/fhir/Composition')) {
     return Events.EVENT_NOT_DUPLICATE
+  }
+
+  if (request.method === 'get' && request.path.includes('/fhir/Composition')) {
+    return Events.DOWNLOADED
   }
 
   return Events.UNKNOWN
@@ -359,6 +364,15 @@ export async function fhirWorkflowEventHandler(
       response = await forwardToHearth(request, h)
       await triggerEvent(
         Events.EVENT_NOT_DUPLICATE,
+        request.payload,
+        request.headers.authorization
+      )
+      break
+    case Events.DOWNLOADED:
+      // response = await markEventAsDownloadedHandler(request, h)
+      response = await forwardToHearth(request, h)
+      await triggerEvent(
+        Events.DOWNLOADED,
         request.payload,
         request.headers.authorization
       )

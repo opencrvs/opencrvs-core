@@ -210,6 +210,25 @@ export async function markBundleAsCertified(
   return bundle
 }
 
+export async function markBundleAsDownloaded(
+  bundle: fhir.Bundle,
+  token: string
+): Promise<fhir.Bundle> {
+  const taskResource = getTaskResource(bundle) as fhir.Task
+
+  const practitioner = await getLoggedInPractitionerResource(token)
+
+  /* setting lastRegLocation here */
+  await setupLastRegLocation(taskResource, practitioner)
+
+  /* setting lastRegUser here */
+  setupLastRegUser(taskResource, practitioner)
+
+  setupDownloadedextension(taskResource, practitioner)
+
+  return bundle
+}
+
 export function setTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
   let trackingId: string
   let trackingIdFhirName: string
@@ -387,6 +406,23 @@ export function setupLastRegUser(
     })
   }
   taskResource.lastModified = new Date().toISOString()
+  return taskResource
+}
+
+export function setupDownloadedextension(
+  taskResource: fhir.Task,
+  practitioner: fhir.Practitioner
+): fhir.Task {
+  if (!taskResource.extension) {
+    taskResource.extension = []
+  }
+  // const regDownloadedExtension = taskResource.extension.find((extension) => {
+  //   return (
+  //     extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/regDownloaded`
+  //   )
+  // })
+  // console.log(regDownloadedExtension)
+
   return taskResource
 }
 

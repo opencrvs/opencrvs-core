@@ -49,7 +49,8 @@ function getEventToScopeMap() {
       USER_SCOPE.VALIDATE,
       USER_SCOPE.REGISTER,
       USER_SCOPE.CERTIFY
-    ]
+    ],
+    [Events.DOWNLOADED]: [USER_SCOPE.VALIDATE, USER_SCOPE.CERTIFY]
   }
 }
 
@@ -63,7 +64,7 @@ export function isUserAuthorized(
   const eventToScopeMap = getEventToScopeMap()
 
   return scopes.some(
-    scope =>
+    (scope) =>
       eventToScopeMap[event] &&
       (eventToScopeMap[event] as string[]).includes(scope)
   )
