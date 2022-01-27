@@ -254,7 +254,7 @@ describe('create new user tests', () => {
     it('clicking on confirm button with unfilled required fields shows validation errors', async () => {
       await waitForElement(testComponent, '#confirm_form')
 
-      testComponent.update().find('#confirm_form').hostNodes().simulate('click')
+      testComponent.find('#confirm_form').hostNodes().simulate('click')
 
       await flushPromises()
       testComponent.update()
@@ -270,6 +270,7 @@ describe('create new user tests', () => {
 
     it('clicking on confirm button with complete data takes user to preview page', async () => {
       store.dispatch(modifyUserFormData(mockCompleteFormData))
+      await waitForElement(testComponent, '#confirm_form')
       testComponent.find('#confirm_form').hostNodes().simulate('click')
       await flushPromises()
 
@@ -277,12 +278,8 @@ describe('create new user tests', () => {
     })
 
     it('clicking on confirm by selecting registrar as role will go to signature form page', async () => {
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
-
       store.dispatch(modifyUserFormData(mockDataWithRegistarRoleSelected))
+      await waitForElement(testComponent, '#confirm_form')
       testComponent.find('#confirm_form').hostNodes().simulate('click')
       await flushPromises()
 
