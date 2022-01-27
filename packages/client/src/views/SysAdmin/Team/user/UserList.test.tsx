@@ -103,8 +103,7 @@ describe('User list tests', () => {
           // @ts-ignore
           location={{
             search: stringify({
-              locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
-              viewOnly: true
+              locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
             })
           }}
         />,
