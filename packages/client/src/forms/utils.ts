@@ -510,7 +510,6 @@ export const hasFormError = (
         (nestedFieldErrors) => nestedFieldErrors.length > 0
       )
   )
-
   return fieldListWithErrors && fieldListWithErrors.length > 0
 }
 

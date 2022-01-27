@@ -458,7 +458,7 @@ describe('when user is previewing the form data', () => {
     }
 
     const deathEventDetails = {
-      deathDate: '2019-01-01',
+      deathDate: '2017-01-01',
       manner: 'ACCIDENT',
       deathPlaceAddress: 'PERMANENT',
       country: 'BGD',
@@ -524,7 +524,7 @@ describe('when user is previewing the form data', () => {
           ]
         }
       }
-      // @ts-ignore
+
       customDraft = { id: uuid(), data, review: true, event: Event.DEATH }
       store.dispatch(storeApplication(customDraft))
       history.replace(
@@ -541,9 +541,9 @@ describe('when user is previewing the form data', () => {
     it('successfully submits the review form', async () => {
       jest.setMock('react-apollo', { default: ReactApollo })
 
-      app.find('#registerApplicationBtn').hostNodes().simulate('click')
+      app.update().find('#registerApplicationBtn').hostNodes().simulate('click')
 
-      app.find('#submit_confirm').hostNodes().simulate('click')
+      app.update().find('#submit_confirm').hostNodes().simulate('click')
     })
 
     it('rejecting application redirects to reject confirmation screen', async () => {

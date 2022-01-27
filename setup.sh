@@ -174,22 +174,6 @@ fi
 echo -e "\033[32m:::::::: Checking that you have nothing running on OpenCRVS ports ::::::::\033[0m"
 echo
 
-
-openCRVSPorts=( 3447 9200 5001 5000 9200 27017 6379 8086 3040 5050 2020 7070 9090 1050 3030 3000 3020 2525)
-for x in "${openCRVSPorts[@]}"
-do
-   :
-    if lsof -i:$x; then
-      echo -e "OpenCRVS thinks that port: $x is in use by another application.\r"
-      echo "You need to find out which application is using this port and quit the application."
-      echo "You can find out the application by running:"
-      echo "lsof -i:$x"
-      exit 1
-    else
-        echo -e "$x \033[32m port is available!\033[0m :)"
-    fi
-done
-
 echo -e "\033[32m:::::::: Checking that you have the required dependencies installed ::::::::\033[0m"
 echo
 #sleep 1
@@ -266,6 +250,28 @@ do
 done
 
 echo
+echo -e "\033[32m:::::::::: Stopping any currently running Docker containers ::::::::::\033[0m"
+echo
+if [[ $(docker ps -aq) ]] ; then docker stop $(docker ps -aq) ; fi
+
+
+echo
+openCRVSPorts=( 3447 9200 5001 5000 9200 27017 6379 8086 3040 5050 2020 7070 9090 1050 3030 3000 3020 2525)
+for x in "${openCRVSPorts[@]}"
+do
+   :
+    if lsof -i:$x; then
+      echo -e "OpenCRVS thinks that port: $x is in use by another application.\r"
+      echo "You need to find out which application is using this port and quit the application."
+      echo "You can find out the application by running:"
+      echo "lsof -i:$x"
+      exit 1
+    else
+        echo -e "$x \033[32m port is available!\033[0m :)"
+    fi
+done
+
+echo
 echo -e "\033[32m:::::: NOW WE NEED TO CHECK THAT YOUR NODE VERSION IS SUPPORTED ::::::\033[0m"
 echo
 #sleep 1
@@ -283,6 +289,11 @@ if [ "$versionTest" == "LOWER" ] ; then
     echo
 fi
 
+echo
+echo -e "\033[32m:::::::::::::::::::::: Initialising Docker ::::::::::::::::::::::\033[0m"
+
+echo
+
 if [ $OS == "UBUNTU" ]; then
   echo
   echo -e "\033[32m::::::::::::::::: Giving Docker user sudo privileges :::::::::::::::::\033[0m"
@@ -293,14 +304,7 @@ if [ $OS == "UBUNTU" ]; then
   sudo usermod -aG docker $USER
 fi
 
-echo
-echo -e "\033[32m:::::::::::::::::::::: Initialising Docker ::::::::::::::::::::::\033[0m"
-echo
-echo -e "\033[32m:::::::::: Stopping any currently running Docker containers ::::::::::\033[0m"
-echo
-if [[ $(docker ps -aq) ]] ; then docker stop $(docker ps -aq) ; fi
 
-echo
 echo -e "\033[32m:::::::::::::::::: Installing some Node dependencies ::::::::::::::::::\033[0m"
 echo
 if [ $(which wait-on 2>/dev/null) ]; then
