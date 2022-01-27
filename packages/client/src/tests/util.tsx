@@ -2070,6 +2070,90 @@ export const mockUserResponse = {
   }
 }
 
+export const mockLocalSysAdminUserResponse = {
+  data: {
+    getUser: {
+      userMgntUserID: '123',
+      catchmentArea: [
+        {
+          id: 'ddab090d-040e-4bef-9475-314a448a576a',
+          name: 'Dhaka',
+          status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/geo-id',
+              value: '3'
+            }
+          ],
+          __typename: 'Location'
+        },
+        {
+          id: 'f9ec1fdb-086c-4b3d-ba9f-5257f3638286',
+          name: 'GAZIPUR',
+          status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/geo-id',
+              value: '20'
+            }
+          ],
+          __typename: 'Location'
+        },
+        {
+          id: '825b17fb-4308-48cb-b77c-2f2cee4f14b9',
+          name: 'KALIGANJ',
+          status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/geo-id',
+              value: '165'
+            }
+          ],
+          __typename: 'Location'
+        },
+        {
+          id: '123456789',
+          name: 'BAKTARPUR',
+          status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/geo-id',
+              value: '3473'
+            }
+          ],
+          __typename: 'Location'
+        }
+      ],
+      primaryOffice: {
+        id: '0d8474da-0361-4d32-979e-af91f012340a',
+        name: 'Kaliganj Union Sub Center',
+        status: 'active',
+        __typename: 'Location'
+      },
+      role: 'LOCAL_SYSTEM_ADMIN',
+      signature: {
+        data: `data:image/png;base64,${validImageB64String}`,
+        type: 'image/png'
+      },
+      localRegistrar: {
+        role: 'LOCAL_SYSTEM_ADMIN',
+        signature: {
+          data: `data:image/png;base64,${validImageB64String}`,
+          type: 'image/png'
+        },
+        name: [
+          {
+            use: 'en',
+            given: ['Mohammad'],
+            family: 'Ashraful'
+          }
+        ]
+      },
+      __typename: 'User'
+    }
+  }
+}
+
 export const mockRegistrarUserResponse = {
   data: {
     getUser: {
