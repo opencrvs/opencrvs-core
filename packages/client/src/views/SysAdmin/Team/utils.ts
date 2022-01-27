@@ -536,6 +536,7 @@ export const transformRoleDataToDefinitions = (
 export async function alterRolesBasedOnUserRole(primaryOfficeId: string) {
   const roleData = await roleQueries.fetchRoles()
   const userData = await userQueries.searchUsers(primaryOfficeId)
+
   const roles = roleData.data.getRoles as Array<GQLRole>
   const users = userData.data.searchUsers.results as Array<GQLUser>
 
