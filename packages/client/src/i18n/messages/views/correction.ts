@@ -101,25 +101,25 @@ const messagesToDefine: ICorrectionMessages = {
     description: 'Label for informant option in certificate correction form'
   },
   idCheckTitle: {
+    id: 'correction.certificate.corrector.idCheck',
     defaultMessage: 'Check proof of ID. Does it match the following details?',
-    description: 'The title for id check component',
-    id: 'correction.certificate.corrector.idCheckTitle.title'
+    description: 'The title for id check component'
   },
   otherIdCheckTitle: {
+    id: 'correction.certificate.corrector.otherIdCheck',
     defaultMessage: 'Have you checked their proof of identification?',
-    description: 'The title for other id check component',
-    id: 'correction.certificate.corrector.otherIdCheck.title'
+    description: 'The title for other id check component'
   },
   idCheckVerify: {
+    id: 'correction.certificate.corrector.idCheckVerify',
     defaultMessage: 'Yes',
-    description: 'The label for id check component action when verify details',
-    id: 'correction.certificate.corrector.idCheckVerify.title'
+    description: 'The label for id check component action when verify details'
   },
   idCheckWithoutVerify: {
+    id: 'correction.certificate.corrector.idCheckWithoutVerify',
     defaultMessage: 'No',
     description:
-      'The label for id check component action when does not verify details',
-    id: 'correction.certificate.corrector.idCheckWithoutVerify.title'
+      'The label for id check component action when does not verify details'
   },
   birthCorrectionNote: {
     id: 'correction.corrector.birth.note',

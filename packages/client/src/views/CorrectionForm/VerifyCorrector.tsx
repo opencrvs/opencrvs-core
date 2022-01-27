@@ -65,25 +65,22 @@ type IOwnProps = RouteComponentProps<IMatchParams>
 
 type IFullProps = IStateProps & IDispatchProps & IOwnProps & IntlShapeProps
 
-class VerifyVerifyCorrectorComponent extends React.Component<IFullProps> {
-  handleVerification = () => {
-    const event = this.props.application.event
-    alert('Preview application to change')
-  }
+class VerifyCorrectorComponent extends React.Component<IFullProps> {
+  /*
+   * TODO: goto next form
+   */
+  handleVerification = () => {}
 
   handleNegativeVerification = () => {
     const { application } = this.props
-    const certificates = application.data.registration.certificates
-
-    const certificate = (certificates && certificates[0]) || {}
 
     this.props.modifyApplication({
       ...application,
       data: {
         ...application.data,
-        registration: {
-          ...application.data.registration,
-          certificates: [{ ...certificate, hasShowedVerifiedDocument: true }]
+        corrector: {
+          ...application.data.corrector,
+          hasShowedVerifiedDocument: true
         }
       }
     })
@@ -95,7 +92,7 @@ class VerifyVerifyCorrectorComponent extends React.Component<IFullProps> {
     const { intl, application, offlineResources } = this.props
     const info = application.data[corrector]
     //TODO :: we have to get form defination from new certificateCorrectorDefination
-    const showInfoFor = ['mother', 'father', 'child']
+    const showInfoFor = ['mother', 'father', 'child', 'informant']
     if (showInfoFor.includes(corrector)) {
       const fields =
         offlineResources.forms.certificateCorrectorDefinition[
@@ -209,4 +206,4 @@ const mapStateToProps = (
 export const VerifyCorrector = connect(mapStateToProps, {
   goBack,
   modifyApplication
-})(injectIntl(VerifyVerifyCorrectorComponent))
+})(injectIntl(VerifyCorrectorComponent))

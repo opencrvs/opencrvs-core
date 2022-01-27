@@ -92,10 +92,6 @@ describe('verify corrector tests', () => {
         .hostNodes()
         .simulate('click')
 
-      // await new Promise((resolve) => {
-      //   setTimeout(resolve, 500)
-      // })
-
       await flushPromises()
 
       testComponent.update()
