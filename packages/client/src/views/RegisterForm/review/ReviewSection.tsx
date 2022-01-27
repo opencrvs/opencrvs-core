@@ -958,12 +958,18 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           ))
       )
 
-      const hasAnyFieldChanged = taggedFields.reduce(
-        (accum, field) => accum || this.hasDataChanged(section, field),
+      const hasErrors = taggedFields.reduce(
+        (accum, field) =>
+          accum || this.fieldHasErrors(section, field, errorsOnFields),
         false
       )
 
-      if (originalData && hasAnyFieldChanged) {
+      const hasAnyFieldChanged = taggedFields.reduce(
+        (accum, field) => accum || this.hasFieldChanged(section, field),
+        false
+      )
+
+      if (originalData && hasAnyFieldChanged && !hasErrors) {
         const previousValues = taggedFields
           .map((field, index) =>
             this.getValueOrError(
@@ -1035,7 +1041,23 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     return false
   }
 
-  hasDataChanged(section: IFormSection, field: IFormField) {
+  fieldHasErrors(
+    section: IFormSection,
+    field: IFormField,
+    sectionErrors: IErrorsBySection
+  ) {
+    if (
+      (
+        get(sectionErrors[section.id][field.name], 'errors') ||
+        this.getErrorForNestedField(section, field, sectionErrors)
+      ).length > 0
+    ) {
+      return true
+    }
+    return false
+  }
+
+  hasFieldChanged(section: IFormSection, field: IFormField) {
     const {
       draft: { data, originalData }
     } = this.props
@@ -1078,7 +1100,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       ignoreNestedFieldWrapping
     )
 
-    if (originalData && this.hasDataChanged(section, field)) {
+    if (
+      originalData &&
+      this.hasFieldChanged(section, field) &&
+      !this.fieldHasErrors(section, field, sectionErrors)
+    ) {
       value = (
         <>
           <Deleted>
@@ -1388,7 +1414,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       registrationSection,
       documentsSection,
       offlineResources,
-      draft: { event, registrationStatus },
+      draft: { event },
       onContinue
     } = this.props
     const formSections = this.getViewableSection(registerForm[event])

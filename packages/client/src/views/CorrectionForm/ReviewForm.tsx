@@ -290,8 +290,14 @@ class CorrectionReviewFormComponent extends React.Component<IProps> {
       application
     )
 
+    /*
+     * TODO: go to previous form
+     */
     const goBack = () => {}
 
+    /*
+     * TODO: cancel the correction form
+     */
     const cancelCorrection = () => {}
 
     const backButton = (
@@ -319,7 +325,11 @@ class CorrectionReviewFormComponent extends React.Component<IProps> {
               pageRoute={pageRoute}
               draft={application}
               submitClickEvent={() => {}}
-              onChangeReviewForm={() => {}}
+              onChangeReviewForm={this.modifyApplication}
+              /*
+               * TODO: go to next form
+               */
+              onContinue={() => {}}
             />
           )}
           {activeSection.viewType === VIEW_TYPE.FORM && (
