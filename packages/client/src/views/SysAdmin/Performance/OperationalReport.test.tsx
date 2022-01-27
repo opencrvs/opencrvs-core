@@ -11,6 +11,7 @@
  */
 import { AppStore } from '@client/store'
 import {
+  createRouterProps,
   createTestComponent,
   createTestStore,
   loginAsFieldAgent
@@ -24,11 +25,9 @@ import {
   OPERATIONAL_REPORT_SECTION
 } from './OperationalReport'
 import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
-import { stringify, parse } from 'query-string'
+import { parse } from 'query-string'
 import { OPERATIONAL_REPORTS_METRICS } from './metricsQuery'
 import { GraphQLError } from 'graphql'
-import { NetworkStatus } from 'apollo-client'
-import { setUserDetails } from '@client/profile/profileActions'
 
 describe('OperationalReport tests', () => {
   let component: ReactWrapper<{}, {}>
@@ -90,16 +89,14 @@ describe('OperationalReport tests', () => {
     ]
     const testComponent = await createTestComponent(
       <OperationalReport
-        location={
-          {
-            search: stringify({
-              locationId: LOCATION_DHAKA_DIVISION.id,
-              sectionId: OPERATIONAL_REPORT_SECTION.OPERATIONAL,
-              timeEnd: new Date(1487076708000).toISOString(),
-              timeStart: new Date(1455454308000).toISOString()
-            })
-          } as any
-        }
+        {...createRouterProps('/', undefined, {
+          search: {
+            locationId: LOCATION_DHAKA_DIVISION.id,
+            sectionId: OPERATIONAL_REPORT_SECTION.OPERATIONAL,
+            timeEnd: new Date(1487076708000).toISOString(),
+            timeStart: new Date(1455454308000).toISOString()
+          }
+        })}
       />,
       store,
       graphqlMock
@@ -265,15 +262,14 @@ describe('OperationalReport reports tests', () => {
   beforeEach(async () => {
     const testComponent = await createTestComponent(
       <OperationalReport
-        // @ts-ignore
-        location={{
-          search: stringify({
+        {...createRouterProps('/', undefined, {
+          search: {
             locationId: LOCATION_DHAKA_DIVISION.id,
             sectionId: OPERATIONAL_REPORT_SECTION.REPORTS,
             timeEnd: new Date(1487076708000).toISOString(),
             timeStart: new Date(1455454308000).toISOString()
-          })
-        }}
+          }
+        })}
       />,
       store
     )
@@ -319,15 +315,14 @@ describe('Test error toast notification', () => {
     ]
     const testComponent = await createTestComponent(
       <OperationalReport
-        // @ts-ignore
-        location={{
-          search: stringify({
+        {...createRouterProps('/', undefined, {
+          search: {
             locationId: LOCATION_DHAKA_DIVISION.id,
             sectionId: OPERATIONAL_REPORT_SECTION.OPERATIONAL,
             timeEnd: new Date(1487076708000).toISOString(),
             timeStart: new Date(1455454308000).toISOString()
-          })
-        }}
+          }
+        })}
       />,
       store,
       graphqlMock
