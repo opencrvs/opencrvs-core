@@ -79,19 +79,19 @@ function getGroup(section: IFormSection, application: IApplication) {
     if (!fatherDataExists) {
       ;(
         section.groups[0].fields[0] as IRadioGroupWithNestedFieldsFormField
-      ).options.splice(1, 1)
+      ).options.filter((option) => option.value !== 'FATHER')
     }
 
     if (!motherDataExists) {
       ;(
         section.groups[0].fields[0] as IRadioGroupWithNestedFieldsFormField
-      ).options.splice(0, 1)
+      ).options.filter((option) => option.value !== 'MOTHER')
     }
 
     if (!childDataExists) {
       ;(
         section.groups[0].fields[0] as IRadioGroupWithNestedFieldsFormField
-      ).options.splice(2, 1)
+      ).options.filter((option) => option.value !== 'CHILD')
     }
   } else if (event === Event.DEATH) {
     const applicationData = application && application.data
@@ -102,7 +102,7 @@ function getGroup(section: IFormSection, application: IApplication) {
     if (isInformantDataNull) {
       ;(
         section.groups[0].fields[0] as IRadioGroupWithNestedFieldsFormField
-      ).options.splice(0, 1)
+      ).options.filter((option) => option.value !== 'INFORMANT')
     }
   }
   const group = section.groups[0]
