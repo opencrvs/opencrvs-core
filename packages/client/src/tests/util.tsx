@@ -22,7 +22,7 @@ import { ICertificateCollectorDefinition } from '@client/views/PrintCertificate/
 import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { InMemoryCache } from 'apollo-cache-inmemory'
-import ApolloClient from 'apollo-client'
+import ApolloClient, { NetworkStatus } from 'apollo-client'
 import { ApolloLink, Observable } from 'apollo-link'
 import {
   configure,
@@ -43,6 +43,14 @@ import { IntlShape } from 'react-intl'
 import { Provider } from 'react-redux'
 import { AnyAction, Store } from 'redux'
 import { waitForElement } from './wait-for-element'
+import { setUserDetails } from '@client/profile/profileActions'
+import {
+  createBrowserHistory,
+  createLocation,
+  createMemoryHistory
+} from 'history'
+import { stringify } from 'query-string'
+import { match as Match } from 'react-router'
 
 export const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -72,7 +80,7 @@ export const validateScopeToken = jwt.sign(
 export function flushPromises() {
   return new Promise((resolve) => setImmediate(resolve))
 }
-export const assign = window.location.assign as jest.Mock
+
 export const getItem = window.localStorage.getItem as jest.Mock
 export const setItem = window.localStorage.setItem as jest.Mock
 
@@ -161,13 +169,28 @@ export const selectOption = (
 
   input.find('input').simulate('focus').update()
   input.find('.react-select__control').simulate('mousedown').update()
-  input
+
+  const availableOptions: string[] = []
+
+  const nodes = input
     .update()
     .find('.react-select__option')
-    .findWhere((el: ReactWrapper) => el.text() === option)
+    .findWhere((el: ReactWrapper) => {
+      const text = el.text()
+      availableOptions.push(text)
+      return text === option
+    })
     .hostNodes()
-    .simulate('click')
-    .update()
+
+  if (nodes.length === 0) {
+    throw new Error(
+      `Couldn't find an option "${option}" from select.\nAvailable options are:\n${availableOptions.join(
+        ',\n'
+      )}`
+    )
+  }
+
+  nodes.simulate('click').update()
 
   return input.find('.react-select__control')
 }
@@ -2047,6 +2070,90 @@ export const mockUserResponse = {
   }
 }
 
+export const mockLocalSysAdminUserResponse = {
+  data: {
+    getUser: {
+      userMgntUserID: '123',
+      catchmentArea: [
+        {
+          id: 'ddab090d-040e-4bef-9475-314a448a576a',
+          name: 'Dhaka',
+          status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/geo-id',
+              value: '3'
+            }
+          ],
+          __typename: 'Location'
+        },
+        {
+          id: 'f9ec1fdb-086c-4b3d-ba9f-5257f3638286',
+          name: 'GAZIPUR',
+          status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/geo-id',
+              value: '20'
+            }
+          ],
+          __typename: 'Location'
+        },
+        {
+          id: '825b17fb-4308-48cb-b77c-2f2cee4f14b9',
+          name: 'KALIGANJ',
+          status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/geo-id',
+              value: '165'
+            }
+          ],
+          __typename: 'Location'
+        },
+        {
+          id: '123456789',
+          name: 'BAKTARPUR',
+          status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/geo-id',
+              value: '3473'
+            }
+          ],
+          __typename: 'Location'
+        }
+      ],
+      primaryOffice: {
+        id: '0d8474da-0361-4d32-979e-af91f012340a',
+        name: 'Kaliganj Union Sub Center',
+        status: 'active',
+        __typename: 'Location'
+      },
+      role: 'LOCAL_SYSTEM_ADMIN',
+      signature: {
+        data: `data:image/png;base64,${validImageB64String}`,
+        type: 'image/png'
+      },
+      localRegistrar: {
+        role: 'LOCAL_SYSTEM_ADMIN',
+        signature: {
+          data: `data:image/png;base64,${validImageB64String}`,
+          type: 'image/png'
+        },
+        name: [
+          {
+            use: 'en',
+            given: ['Mohammad'],
+            family: 'Ashraful'
+          }
+        ]
+      },
+      __typename: 'User'
+    }
+  }
+}
+
 export const mockRegistrarUserResponse = {
   data: {
     getUser: {
@@ -2783,19 +2890,28 @@ export async function createTestComponent(
     })
   )
 
-  const component = mount(
-    <MockedProvider mocks={graphqlMocks} addTypename={false}>
-      <Provider store={store}>
-        <I18nContainer>
-          <ThemeProvider theme={getTheme(getDefaultLanguage())}>
-            {node}
-          </ThemeProvider>
-        </I18nContainer>
-      </Provider>
-    </MockedProvider>,
-    options
-  )
+  function PropProxy(props: Record<string, any>) {
+    return (
+      <MockedProvider
+        mocks={graphqlMocks}
+        addTypename={false}
+        defaultOptions={{
+          watchQuery: { fetchPolicy: 'no-cache' },
+          query: { fetchPolicy: 'no-cache' }
+        }}
+      >
+        <Provider store={store}>
+          <I18nContainer>
+            <ThemeProvider theme={getTheme(getDefaultLanguage())}>
+              <node.type {...node.props} {...props} />
+            </ThemeProvider>
+          </I18nContainer>
+        </Provider>
+      </MockedProvider>
+    )
+  }
 
+  const component = mount(<PropProxy {...node.props} />, options)
   return { component: component.update(), store }
 }
 
@@ -3028,4 +3144,88 @@ export function setPageVisibility(isVisible: boolean) {
   const evt = document.createEvent('HTMLEvents')
   evt.initEvent('visibilitychange', false, true)
   document.dispatchEvent(evt)
+}
+
+export function loginAsFieldAgent(store: AppStore) {
+  return store.dispatch(
+    setUserDetails({
+      loading: false,
+      networkStatus: NetworkStatus.ready,
+      stale: false,
+      data: {
+        getUser: {
+          userMgntUserID: '5eba726866458970cf2e23c2',
+          practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+          mobile: '+8801711111111',
+          role: 'FIELD_AGENT',
+          type: 'CHA',
+          status: 'active',
+          name: [
+            {
+              use: 'en',
+              firstNames: 'Shakib',
+              familyName: 'Al Hasan'
+            }
+          ],
+          catchmentArea: [
+            {
+              id: '514cbc3a-cc99-4095-983f-535ea8cb6ac0',
+              name: 'Baniajan',
+              alias: ['বানিয়াজান'],
+              status: 'active',
+              identifier: [
+                {
+                  system: 'http://opencrvs.org/specs/id/a2i-internal-reference',
+                  value: 'division=9&district=30&upazila=233&union=4194'
+                }
+              ]
+            }
+          ],
+          primaryOffice: undefined,
+          localRegistrar: {
+            name: [
+              {
+                use: 'en',
+                firstNames: 'Mohammad',
+                familyName: 'Ashraful'
+              }
+            ],
+            role: 'LOCAL_REGISTRAR',
+            signature: undefined
+          }
+        }
+      }
+    })
+  )
+}
+
+export function createRouterProps<T, Params>(
+  path: string,
+  locationState: T,
+  {
+    search,
+    matchParams = {} as Params
+  }: { search?: Record<string, string>; matchParams?: Params }
+) {
+  const location = createLocation(path, locationState)
+
+  /*
+   * Uses memory history because goBack
+   * wasn't working in the test environment
+   */
+  const history = createMemoryHistory<T>({
+    initialEntries: [path]
+  })
+  history.location = location
+  if (search) {
+    location.search = stringify(search)
+  }
+  const match: Match<Params> = {
+    isExact: false,
+    path,
+    url: path,
+    params: matchParams
+  }
+
+  return { location, history, match }
 }

@@ -25,7 +25,7 @@ import { referenceApi } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations, getLocation } from '@client/utils/locationUtils'
 import { ISerializedForm } from '@client/forms'
-import { isOfflineDataLoaded, isSystemAdmin } from './selectors'
+import { isOfflineDataLoaded, isNationalSystemAdmin } from './selectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IPDFTemplate } from '@client/pdfRenderer/transformer/types'
 import { ICertificateCollectorDefinition } from '@client/views/PrintCertificate/VerifyCollector'
@@ -318,7 +318,7 @@ function reducer(
         LocationType.CRVS_OFFICE,
         {
           locationLevel: 'id',
-          locationId: isSystemAdmin(state.userDetails)
+          locationId: isNationalSystemAdmin(state.userDetails)
             ? undefined
             : state.userDetails &&
               state.userDetails.primaryOffice &&
