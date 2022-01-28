@@ -19,7 +19,8 @@ import {
   IFormField,
   IForm,
   IFormSectionGroup,
-  IFormSectionData
+  IFormSectionData,
+  CorrectionSection
 } from '@client/forms'
 import { EventTopBar, Spinner } from '@opencrvs/components/lib/interface'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
@@ -42,7 +43,12 @@ import {
 } from '@client/forms/utils'
 import { getScope } from '@client/profile/profileSelectors'
 import { Scope } from '@client/utils/authUtils'
-import { goBack, goToPageGroup } from '@client/navigation'
+import {
+  goBack,
+  goToPageGroup,
+  goToHomeTab,
+  goToCertificateCorrection
+} from '@client/navigation'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
 import { connect } from 'react-redux'
 import {
@@ -159,6 +165,8 @@ type IDispatchProps = {
   writeApplication: typeof writeApplication
   goToPageGroup: typeof goToPageGroup
   goBack: typeof goBack
+  goToHomeTab: typeof goToHomeTab
+  goToCertificateCorrection: typeof goToCertificateCorrection
 }
 
 type IProps = IStateProps & IDispatchProps & IntlShapeProps & RouteProps
@@ -270,6 +278,23 @@ class CorrectionReviewFormComponent extends React.Component<IProps> {
     this.props.application.visitedGroupIds = visitedGroups
   }
 
+  goBack() {
+    this.props.goToCertificateCorrection(
+      this.props.application.id,
+      CorrectionSection.Corrector
+    )
+  }
+
+  cancelCorrection() {
+    this.props.modifyApplication({
+      ...this.props.application,
+      data: {
+        ...this.props.application.originalData
+      }
+    })
+    this.props.goToHomeTab('review')
+  }
+
   render() {
     const {
       application,
@@ -290,16 +315,6 @@ class CorrectionReviewFormComponent extends React.Component<IProps> {
       application
     )
 
-    /*
-     * TODO: go to previous form
-     */
-    const goBack = () => {}
-
-    /*
-     * TODO: cancel the correction form
-     */
-    const cancelCorrection = () => {}
-
     const backButton = (
       <TertiaryButton
         align={ICON_ALIGNMENT.LEFT}
@@ -318,7 +333,7 @@ class CorrectionReviewFormComponent extends React.Component<IProps> {
               event: application.event
             })}
             pageIcon={backButton}
-            goHome={cancelCorrection}
+            goHome={this.cancelCorrection}
           />
           {activeSection.viewType === VIEW_TYPE.REVIEW && (
             <ReviewSection
@@ -562,5 +577,7 @@ export const CorrectionReviewForm = connect(mapStateToProps, {
   modifyApplication,
   writeApplication,
   goBack,
-  goToPageGroup
+  goToPageGroup,
+  goToHomeTab,
+  goToCertificateCorrection
 })(injectIntl(CorrectionReviewFormComponent))

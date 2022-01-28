@@ -14,7 +14,7 @@ import { modifyApplication, IApplication } from '@client/applications'
 import { getCorrectorSection } from '@client/forms/correction/corrector'
 import { connect } from 'react-redux'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
-import { goBack, goToVerifyCorrector } from '@client/navigation'
+import { goBack, goToVerifyCorrector, goToHomeTab } from '@client/navigation'
 import {
   Event,
   IFormSection,
@@ -39,6 +39,7 @@ type IDispatchProps = {
   goBack: typeof goBack
   goToVerifyCorrector: typeof goToVerifyCorrector
   modifyApplication: typeof modifyApplication
+  goToHomeTab: typeof goToHomeTab
 }
 
 type IFullProps = IProps & IDispatchProps & IntlShapeProps
@@ -141,6 +142,16 @@ function CorrectorFormComponent(props: IFullProps) {
     )
   }
 
+  const cancelCorrection = () => {
+    props.modifyApplication({
+      ...application,
+      data: {
+        ...application.originalData
+      }
+    })
+    props.goToHomeTab('review')
+  }
+
   const continueButton = (
     <PrimaryButton
       id="confirm_form"
@@ -158,6 +169,7 @@ function CorrectorFormComponent(props: IFullProps) {
         title={intl.formatMessage(section.title)}
         hideBackground
         goBack={goBack}
+        goHome={cancelCorrection}
       >
         <Content
           title={group.title && intl.formatMessage(group.title)}
@@ -186,5 +198,6 @@ function CorrectorFormComponent(props: IFullProps) {
 export const CorrectorForm = connect(undefined, {
   goBack,
   modifyApplication,
-  goToVerifyCorrector
+  goToVerifyCorrector,
+  goToHomeTab
 })(injectIntl(CorrectorFormComponent))

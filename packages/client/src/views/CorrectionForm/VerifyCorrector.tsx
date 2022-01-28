@@ -13,7 +13,7 @@ import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { IPrintableApplication, modifyApplication } from '@client/applications'
 import { Event, ReviewSection } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/correction'
-import { goBack, goToPageGroup } from '@client/navigation'
+import { goBack, goToPageGroup, goToHomeTab } from '@client/navigation'
 import { IStoreState } from '@client/store'
 import {
   IDVerifier,
@@ -61,6 +61,7 @@ interface IDispatchProps {
   goBack: typeof goBack
   modifyApplication: typeof modifyApplication
   goToPageGroup: typeof goToPageGroup
+  goToHomeTab: typeof goToHomeTab
 }
 
 type IOwnProps = RouteComponentProps<IMatchParams>
@@ -139,6 +140,16 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
     }
   }
 
+  cancelCorrection() {
+    this.props.modifyApplication({
+      ...this.props.application,
+      data: {
+        ...this.props.application.originalData
+      }
+    })
+    this.props.goToHomeTab('review')
+  }
+
   render() {
     const { corrector } = this.props.match.params
     const { intl } = this.props
@@ -150,6 +161,7 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
     return (
       <ActionPageLight
         goBack={this.props.goBack}
+        goHome={this.cancelCorrection}
         title={intl.formatMessage(messages.title)}
         hideBackground
       >
@@ -213,5 +225,6 @@ const mapStateToProps = (
 export const VerifyCorrector = connect(mapStateToProps, {
   goBack,
   modifyApplication,
-  goToPageGroup
+  goToPageGroup,
+  goToHomeTab
 })(injectIntl(VerifyCorrectorComponent))
