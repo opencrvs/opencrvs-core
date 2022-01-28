@@ -21,6 +21,7 @@ import {
   markEventAsCertifiedHandler,
   markEventAsValidatedHandler,
   markEventAsWaitingValidationHandler
+  // markEventAsDownloadedHandler
 } from '@workflow/features/registration/handler'
 import {
   getEventType,
@@ -369,7 +370,7 @@ export async function fhirWorkflowEventHandler(
       )
       break
     case Events.DOWNLOADED:
-      // response = await markEventAsDownloadedHandler(request, h)
+      // await markEventAsDownloadedHandler(request, h)
       response = await forwardToHearth(request, h)
       await triggerEvent(
         Events.DOWNLOADED,

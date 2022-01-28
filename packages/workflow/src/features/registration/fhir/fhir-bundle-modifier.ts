@@ -224,7 +224,8 @@ export async function markBundleAsDownloaded(
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
 
-  setupDownloadedextension(taskResource, practitioner)
+  /*  Setting Downloaded extension  */
+  setupDownloadedExtension(taskResource, practitioner)
 
   return bundle
 }
@@ -409,7 +410,7 @@ export function setupLastRegUser(
   return taskResource
 }
 
-export function setupDownloadedextension(
+export function setupDownloadedExtension(
   taskResource: fhir.Task,
   practitioner: fhir.Practitioner
 ): fhir.Task {

@@ -14,6 +14,7 @@ import { v4 as uuid } from 'uuid'
 import {
   createCompositionTemplate,
   updateTaskTemplate,
+  addDownloadExtensionToTaskTemplate,
   MOTHER_CODE,
   FATHER_CODE,
   CHILD_CODE,
@@ -642,7 +643,7 @@ function createOccupationBulder(resource: fhir.Patient, fieldValue: string) {
   }
 
   const hasOccupation = resource.extension.find(
-    extention =>
+    (extention) =>
       extention.url ===
       `${OPENCRVS_SPECIFICATION_URL}extension/patient-occupation`
   )
@@ -1862,7 +1863,7 @@ const builders: IFieldBuilders = {
         }
 
         const hasTimeLoggedMS = taskResource.extension.find(
-          extension =>
+          (extension) =>
             extension.url ===
             `${OPENCRVS_SPECIFICATION_URL}extension/timeLoggedMS`
         )
@@ -2140,7 +2141,7 @@ const builders: IFieldBuilders = {
               relatedPersonResource.extension = []
             }
             const hasAffidavit = relatedPersonResource.extension.find(
-              extention =>
+              (extention) =>
                 extention.url ===
                 `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`
             )
@@ -2172,7 +2173,7 @@ const builders: IFieldBuilders = {
               relatedPersonResource.extension = []
             }
             const hasAffidavit = relatedPersonResource.extension.find(
-              extention =>
+              (extention) =>
                 extention.url ===
                 `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`
             )
@@ -2303,7 +2304,7 @@ const builders: IFieldBuilders = {
           certDocResource.extension = []
         }
         const hasVerifiedExt = certDocResource.extension.find(
-          extention =>
+          (extention) =>
             extention.url ===
             `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`
         )
@@ -2965,6 +2966,16 @@ export async function updateFHIRTaskBundle(
 ) {
   const taskResource = taskEntry.resource as fhir.Task
   taskEntry.resource = updateTaskTemplate(taskResource, status, reason, comment)
+  const fhirBundle: ITaskBundle = {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: [taskEntry]
+  }
+  return fhirBundle
+}
+
+export function addDownloadedTaskExtension(taskEntry: ITaskBundleEntry) {
+  taskEntry.resource = addDownloadExtensionToTaskTemplate(taskEntry.resource)
   const fhirBundle: ITaskBundle = {
     resourceType: 'Bundle',
     type: 'document',

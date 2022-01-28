@@ -236,6 +236,16 @@ export function updateTaskTemplate(
   return task
 }
 
+export function addDownloadExtensionToTaskTemplate(task: fhir.Task): fhir.Task {
+  const url = 'http://opencrvs.org/specs/extension/regDownloaded'
+  const taskExtension = task.extension?.find((ext) => ext.url === url)
+  if (!taskExtension) {
+    const newExtension: fhir.Extension = { url }
+    task.extension?.push(newExtension)
+  }
+  return task
+}
+
 export function createPersonEntryTemplate(refUuid: string) {
   return {
     fullUrl: `urn:uuid:${refUuid}`,
