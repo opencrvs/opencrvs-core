@@ -56,7 +56,7 @@ describe('ReviewForm tests', () => {
   let store: AppStore
   let history: History
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     const testStore = await createTestStore()
     store = testStore.store
     history = testStore.history
@@ -1808,7 +1808,7 @@ describe('ReviewForm tests', () => {
     })
   })
   describe('ReviewForm tests for register scope', () => {
-    beforeAll(async () => {
+    beforeEach(async () => {
       getItem.mockReturnValue(declareScope)
       await store.dispatch(checkAuth({ '?token': declareScope }))
     })

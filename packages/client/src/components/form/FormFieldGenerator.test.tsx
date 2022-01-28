@@ -184,12 +184,12 @@ describe('when field definition has location search input', () => {
   })
 
   it('performs auto complete search among offline data', () => {
-    component
-      .find('#locationSearchInput')
-      .hostNodes()
-      .simulate('change', {
-        target: { value: 'Dholashadhukhan', id: 'locationSearchInput' }
-      })
+    const locationInput = component.find(`input#placeOfBirth`).hostNodes()
+
+    locationInput.simulate('change', {
+      target: { id: `input#placeOfBirth`, value: 'D' }
+    })
+    locationInput.simulate('focus')
 
     const autoCompleteSuggestion = component
       .find('#locationOption0d8474da-0361-4d32-979e-af91f020309e')
@@ -198,12 +198,12 @@ describe('when field definition has location search input', () => {
   })
 
   it('clicking on autocomplete suggestion modifies draft', () => {
-    component
-      .find('#locationSearchInput')
-      .hostNodes()
-      .simulate('change', {
-        target: { value: 'Dholashadhukhan', id: 'locationSearchInput' }
-      })
+    const locationInput = component.find(`input#placeOfBirth`).hostNodes()
+
+    locationInput.simulate('change', {
+      target: { id: `input#placeOfBirth`, value: 'D' }
+    })
+    locationInput.simulate('focus')
 
     const autoCompleteSuggestion = component
       .find('#locationOption0d8474da-0361-4d32-979e-af91f020309e')

@@ -242,15 +242,11 @@ export function goToOperationalReport(
   })
 }
 
-export function goToTeamUserList(
-  selectedLocation: ISearchLocation,
-  viewOnly?: boolean
-) {
+export function goToTeamUserList(selectedLocation: ISearchLocation) {
   return push({
     pathname: TEAM_USER_LIST,
     search: stringify({
-      locationId: selectedLocation.id,
-      viewOnly
+      locationId: selectedLocation.id
     })
   })
 }
