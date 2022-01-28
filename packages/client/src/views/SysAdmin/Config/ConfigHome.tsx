@@ -23,13 +23,18 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { Button } from '@opencrvs/components/lib/buttons'
+import {
+  Button,
+  PrimaryButton,
+  TertiaryButton
+} from '@opencrvs/components/lib/buttons'
 import { messages } from '@client/i18n/messages/views/config'
 import { messages as imageUploadMessages } from '@client/i18n/messages/views/imageUpload'
 import {
   DataSection,
   FloatingNotification,
   NOTIFICATION_TYPE,
+  ResponsiveModal,
   ToggleMenu,
   TopBar
 } from '@opencrvs/components/lib/interface'
@@ -49,49 +54,12 @@ import { certificateTemplateMutations } from '@client/certificate/mutations'
 import { GET_USER } from '@client/user/queries'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
+import { Event, IAttachmentValue, IFormFieldValue } from '@client/forms'
+import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 
-const SubMenuTab = styled(Button)<{ active: boolean }>`
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.subtitleStyle};
-  margin-left: 88px;
-  padding-top: 15px;
-  padding-bottom: 12px;
-  border-radius: 0;
-  flex-shrink: 0;
-  outline: none;
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin-left: 8px;
-  }
-  ${({ active }) =>
-    active
-      ? 'border-bottom: 3px solid #5E93ED'
-      : 'border-bottom: 3px solid transparent'};
-  & > div {
-    padding: 0 8px;
-  }
-  :first-child > div {
-    position: relative;
-    padding-left: 0;
-  }
-  & div > div {
-    margin-right: 8px;
-  }
-  &:focus {
-    outline: none;
-    background: ${({ theme }) => theme.colors.focus};
-    color: ${({ theme }) => theme.colors.copy};
-  }
-  &:not([data-focus-visible-added]) {
-    background: transparent;
-    outline: none;
-    color: ${({ theme }) => theme.colors.copy};
-  }
-`
 const HiddenInput = styled.input`
   display: none;
 `
-
 const ColoredDataSection = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
   width: 776px;
@@ -131,11 +99,16 @@ const ErrorText = styled.div`
 `
 export type Scope = string[]
 
+export enum SVGFile {
+  type = 'image/svg+xml'
+}
+
 type Props = WrappedComponentProps &
   Pick<RouteComponentProps, 'history'> & {
-    offlineCountryConfiguration: IOfflineData
     userDetails: IUserDetails | null
     scope: Scope | null
+    offlineResources: IOfflineData
+    offlineCountryConfiguration: IOfflineData
   }
 
 interface State {
@@ -143,44 +116,38 @@ interface State {
   imageUploading: boolean
   imageLoadingError: string
   showNotification: boolean
+  showPrompt: boolean
   eventName: string
+  previewImage: IAttachmentValue | null
 }
 
-const SUB_MENU_ID = {
-  certificatesConfig: 'Certificates'
+export function printFile(data: string, fileName: string) {
+  const html =
+    '<html><head><title>' +
+    fileName +
+    '</title></head><body style="text-align:center">' +
+    data +
+    '</body></html>'
+
+  const printWindow = window.open() as Window
+  printWindow.document.write(html)
+  printWindow.document.close()
+  printWindow.print()
+  setTimeout(function () {
+    printWindow.close()
+  }, 100)
 }
-function getMenuItems(
-  intl: IntlShape,
-  fileUploader: React.RefObject<HTMLInputElement>,
-  id: string
+
+export function downloadFile(
+  contentType: string,
+  data: string,
+  fileName: string
 ) {
-  const menuItems = [
-    {
-      label: intl.formatMessage(messages.previewTemplate),
-      handler: () => {
-        alert('Preview clicked')
-      }
-    },
-    {
-      label: intl.formatMessage(messages.printTemplate),
-      handler: () => {
-        alert('Print clicked')
-      }
-    },
-    {
-      label: intl.formatMessage(messages.downloadTemplate),
-      handler: () => {
-        alert('Download clicked')
-      }
-    },
-    {
-      label: intl.formatMessage(messages.uploadTemplate),
-      handler: () => {
-        fileUploader.current!.click()
-      }
-    }
-  ]
-  return menuItems
+  const linkSource = `data:${contentType};base64,${window.btoa(data)}`
+  const downloadLink = document.createElement('a')
+  downloadLink.setAttribute('href', linkSource)
+  downloadLink.setAttribute('download', fileName)
+  downloadLink.click()
 }
 class ConfigHomeComponent extends React.Component<Props, State> {
   birthCertificatefileUploader: React.RefObject<HTMLInputElement>
@@ -190,12 +157,63 @@ class ConfigHomeComponent extends React.Component<Props, State> {
     this.birthCertificatefileUploader = React.createRef()
     this.deathCertificatefileUploader = React.createRef()
     this.state = {
-      selectedSubMenuItem: '',
+      selectedSubMenuItem: this.SUB_MENU_ID.certificatesConfig,
       imageUploading: false,
       imageLoadingError: '',
       showNotification: false,
-      eventName: ''
+      showPrompt: false,
+      eventName: '',
+      previewImage: null
     }
+  }
+
+  SUB_MENU_ID = {
+    certificatesConfig: 'Certificates'
+  }
+
+  getMenuItems(
+    intl: IntlShape,
+    id: string,
+    event: string,
+    svgCode: string,
+    svgFilename: string
+  ) {
+    const menuItems = [
+      {
+        label: intl.formatMessage(messages.previewTemplate),
+        handler: () => {
+          const linkSource = `data:${SVGFile.type};base64,${window.btoa(
+            svgCode
+          )}`
+          this.setState({
+            eventName: event,
+            previewImage: { type: SVGFile.type, data: linkSource }
+          })
+        }
+      },
+      {
+        label: intl.formatMessage(messages.printTemplate),
+        handler: () => {
+          printFile(svgCode, svgFilename)
+        }
+      },
+      {
+        label: intl.formatMessage(messages.downloadTemplate),
+        handler: () => {
+          downloadFile(SVGFile.type, svgCode, svgFilename)
+        }
+      },
+      {
+        label: intl.formatMessage(messages.uploadTemplate),
+        handler: () => {
+          this.setState({
+            eventName: event
+          })
+          this.togglePrompt()
+        }
+      }
+    ]
+    return menuItems
   }
   handleSelectFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const { id, files } = event.target
@@ -205,8 +223,7 @@ class ConfigHomeComponent extends React.Component<Props, State> {
     const userMgntUserID =
       this.props.userDetails && this.props.userDetails.userMgntUserID
     this.setState({
-      imageUploading: true,
-      eventName: eventName[0].toUpperCase() + eventName.slice(1)
+      imageUploading: true
     })
     this.toggleNotification()
 
@@ -224,7 +241,7 @@ class ConfigHomeComponent extends React.Component<Props, State> {
         this.birthCertificatefileUploader.current!.value = ''
         this.deathCertificatefileUploader.current!.value = ''
       } catch (error) {
-        if (error.type === ERROR_TYPES.IMAGE_TYPE) {
+        if (error.message === ERROR_TYPES.IMAGE_TYPE) {
           this.setState(() => ({
             imageUploading: false,
             imageLoadingError: this.props.intl.formatMessage(
@@ -242,6 +259,22 @@ class ConfigHomeComponent extends React.Component<Props, State> {
     this.setState((state) => ({
       showNotification: !state.showNotification
     }))
+  }
+
+  togglePrompt = () => {
+    this.setState((prevState) => ({ showPrompt: !prevState.showPrompt }))
+  }
+
+  selectForPreview = (previewImage: IAttachmentValue) => {
+    this.setState({ previewImage: previewImage })
+  }
+
+  closePreviewSection = () => {
+    this.setState({ previewImage: null })
+  }
+
+  onDelete = (image: IFormFieldValue) => {
+    this.closePreviewSection()
   }
 
   async updateCertificateTemplate(
@@ -279,51 +312,20 @@ class ConfigHomeComponent extends React.Component<Props, State> {
   }
 
   render() {
-    const { intl } = this.props
+    const {
+      eventName,
+      selectedSubMenuItem,
+      imageUploading,
+      imageLoadingError,
+      showNotification,
+      showPrompt
+    } = this.state
 
-    const CertificateSection = {
-      title: intl.formatMessage(messages.listTitle),
-      items: [
-        {
-          id: 'birth',
-          label: intl.formatMessage(messages.birthTemplate),
-          value: intl.formatMessage(messages.birthDefaultTempDesc),
-          actionsMenu: (
-            <ToggleMenu
-              id={`template-birth-action-menu`}
-              toggleButton={<VerticalThreeDots />}
-              menuItems={getMenuItems(
-                intl,
-                this.birthCertificatefileUploader,
-                'birth'
-              )}
-            />
-          )
-        },
-        {
-          id: 'death',
-          label: intl.formatMessage(messages.deathTemplate),
-          value: intl.formatMessage(messages.deathDefaultTempDesc),
-          actionsMenu: (
-            <ToggleMenu
-              id={`template-death-action-menu`}
-              toggleButton={<VerticalThreeDots />}
-              menuItems={getMenuItems(
-                intl,
-                this.deathCertificatefileUploader,
-                'death'
-              )}
-            />
-          )
-        }
-      ]
-    }
-
+    const { intl, offlineCountryConfiguration } = this.props
     return (
       <Query query={GET_ACTIVE_CERTIFICATES} fetchPolicy={'cache-and-network'}>
-        {({ data, loading, error }) => {
+        {({ data, error }) => {
           if (error) {
-            console.log('error', error)
             return (
               <ErrorText id="user_loading_error">
                 {intl.formatMessage(errorMessages.userQueryError)}
@@ -342,7 +344,6 @@ class ConfigHomeComponent extends React.Component<Props, State> {
                 event: 'death'
               }
             )
-
             const birthLongDate =
               birthCertificateTemplate &&
               formatLongDate(
@@ -370,16 +371,19 @@ class ConfigHomeComponent extends React.Component<Props, State> {
                   value: intl.formatMessage(messages.birthDefaultTempDesc),
                   actionsMenu: (
                     <>
-                      <ToggleMenu
-                        id={`template-birth-action-menu`}
-                        toggleButton={<VerticalThreeDots />}
-                        menuItems={getMenuItems(
-                          intl,
-                          this.birthCertificatefileUploader,
-                          birthCertificateTemplate &&
-                            birthCertificateTemplate._id
-                        )}
-                      />
+                      {birthCertificateTemplate && (
+                        <ToggleMenu
+                          id={`template-birth-action-menu`}
+                          toggleButton={<VerticalThreeDots />}
+                          menuItems={this.getMenuItems(
+                            intl,
+                            birthCertificateTemplate._id,
+                            birthCertificateTemplate.event,
+                            birthCertificateTemplate.svgCode,
+                            birthCertificateTemplate.svgFilename
+                          )}
+                        />
+                      )}
                       <HiddenInput
                         ref={this.birthCertificatefileUploader}
                         id={`birth_file_uploader_field_${
@@ -401,16 +405,19 @@ class ConfigHomeComponent extends React.Component<Props, State> {
                   value: intl.formatMessage(messages.deathDefaultTempDesc),
                   actionsMenu: (
                     <>
-                      <ToggleMenu
-                        id={`template-death-action-menu`}
-                        toggleButton={<VerticalThreeDots />}
-                        menuItems={getMenuItems(
-                          intl,
-                          this.deathCertificatefileUploader,
-                          deathCertificateTemplate &&
-                            deathCertificateTemplate._id
-                        )}
-                      />
+                      {deathCertificateTemplate && (
+                        <ToggleMenu
+                          id={`template-death-action-menu`}
+                          toggleButton={<VerticalThreeDots />}
+                          menuItems={this.getMenuItems(
+                            intl,
+                            deathCertificateTemplate._id,
+                            deathCertificateTemplate.event,
+                            deathCertificateTemplate.svgCode,
+                            deathCertificateTemplate.svgFilename
+                          )}
+                        />
+                      )}
                       <HiddenInput
                         ref={this.deathCertificatefileUploader}
                         id={`death_file_uploader_field_${
@@ -446,33 +453,9 @@ class ConfigHomeComponent extends React.Component<Props, State> {
             )
             return (
               <>
-                <SysAdminContentWrapper
-                  subMenuComponent={
-                    <TopBarContainer>
-                      <TopBar id="top-bar">
-                        <SubMenuTab
-                          id={`tab_${SUB_MENU_ID.certificatesConfig}`}
-                          key={SUB_MENU_ID.certificatesConfig}
-                          active={
-                            this.state.selectedSubMenuItem ===
-                            SUB_MENU_ID.certificatesConfig
-                          }
-                          onClick={() =>
-                            this.setState({
-                              selectedSubMenuItem:
-                                SUB_MENU_ID.certificatesConfig
-                            })
-                          }
-                        >
-                          {SUB_MENU_ID.certificatesConfig}
-                        </SubMenuTab>
-                      </TopBar>
-                    </TopBarContainer>
-                  }
-                  isCertificatesConfigPage={true}
-                >
+                <SysAdminContentWrapper isCertificatesConfigPage={true}>
                   {this.state.selectedSubMenuItem ===
-                    SUB_MENU_ID.certificatesConfig && (
+                    this.SUB_MENU_ID.certificatesConfig && (
                     <ColoredDataSection>
                       <DataSection
                         title={CertificateSection.title}
@@ -491,15 +474,15 @@ class ConfigHomeComponent extends React.Component<Props, State> {
                   )}
                   <FloatingNotification
                     type={
-                      this.state.imageLoadingError
+                      imageLoadingError
                         ? NOTIFICATION_TYPE.ERROR
                         : this.state.imageUploading
                         ? NOTIFICATION_TYPE.IN_PROGRESS
                         : NOTIFICATION_TYPE.SUCCESS
                     }
-                    show={this.state.showNotification}
+                    show={showNotification}
                     callback={
-                      this.state.imageUploading
+                      imageUploading
                         ? undefined
                         : () => this.toggleNotification()
                     }
@@ -511,12 +494,65 @@ class ConfigHomeComponent extends React.Component<Props, State> {
                         ? messages.certificateValidationError
                         : messages.certificateUpdated)}
                       values={{
-                        eventName: this.state.imageUploading
-                          ? this.state.eventName.toLowerCase()
-                          : this.state.eventName
+                        eventName: !this.state.imageUploading
+                          ? eventName.toUpperCase()[0] +
+                            eventName.toLowerCase().slice(1)
+                          : eventName
                       }}
                     />
                   </FloatingNotification>
+                  <ResponsiveModal
+                    id="withoutVerificationPrompt"
+                    show={showPrompt}
+                    title={intl.formatMessage(
+                      messages.uploadCertificateDialogTitle
+                    )}
+                    contentHeight={96}
+                    handleClose={this.togglePrompt}
+                    actions={[
+                      <TertiaryButton
+                        id="cancel"
+                        key="cancel"
+                        onClick={this.togglePrompt}
+                      >
+                        {intl.formatMessage(
+                          messages.uploadCertificateDialogCancel
+                        )}
+                      </TertiaryButton>,
+                      <PrimaryButton
+                        id="send"
+                        key="continue"
+                        onClick={() => {
+                          this.togglePrompt()
+                          if (eventName === Event.BIRTH)
+                            this.birthCertificatefileUploader.current!.click()
+                          else if (eventName === Event.DEATH)
+                            this.deathCertificatefileUploader.current!.click()
+                        }}
+                      >
+                        {intl.formatMessage(
+                          messages.uploadCertificateDialogConfirm
+                        )}
+                      </PrimaryButton>
+                    ]}
+                  >
+                    {intl.formatMessage(
+                      messages.uploadCertificateDialogDescription
+                    )}
+                  </ResponsiveModal>
+                  {this.state.previewImage && (
+                    <DocumentPreview
+                      previewImage={this.state.previewImage}
+                      disableDelete={true}
+                      title={
+                        eventName === Event.BIRTH
+                          ? intl.formatMessage(messages.birthTemplate)
+                          : intl.formatMessage(messages.deathTemplate)
+                      }
+                      goBack={this.closePreviewSection}
+                      onDelete={this.onDelete}
+                    />
+                  )}
                 </SysAdminContentWrapper>
               </>
             )
@@ -529,9 +565,10 @@ class ConfigHomeComponent extends React.Component<Props, State> {
 
 function mapStateToProps(state: IStoreState) {
   return {
-    offlineCountryConfiguration: getOfflineData(state),
+    offlineResources: getOfflineData(state),
     userDetails: getUserDetails(state),
-    scope: getScope(state)
+    scope: getScope(state),
+    offlineCountryConfiguration: getOfflineData(state)
   }
 }
 

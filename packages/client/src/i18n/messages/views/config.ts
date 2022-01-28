@@ -121,6 +121,28 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.certificate.certificateValidationError',
     defaultMessage: 'Unable to read SVG. Please check',
     description: 'Certificate template error message on failed'
+  },
+  uploadCertificateDialogTitle: {
+    id: 'config.certificate.uploadCertificateDialogTitle',
+    defaultMessage: 'Upload new certificate?',
+    description: 'Upload certificate template modal title'
+  },
+  uploadCertificateDialogDescription: {
+    id: 'config.certificate.uploadCertificateDialogDescription',
+    defaultMessage:
+      'This will replace the current certificate template. We recommend downloading the existing certificate template as a reference.',
+    description:
+      'The description for the dialog when upload new certificate template'
+  },
+  uploadCertificateDialogConfirm: {
+    id: 'config.certificate.uploadCertificateDialogConfirm',
+    defaultMessage: 'Upload',
+    description: 'Confirm new certificate template upload button'
+  },
+  uploadCertificateDialogCancel: {
+    id: 'config.certificate.uploadCertificateDialogCancel',
+    defaultMessage: 'Cancel',
+    description: 'Cancel new certificate template upload button'
   }
 }
 
