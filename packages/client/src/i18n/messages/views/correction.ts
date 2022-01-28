@@ -26,6 +26,9 @@ interface ICorrectionMessages
   court: MessageDescriptor
   others: MessageDescriptor
   informant: MessageDescriptor
+  idCheckTitle: MessageDescriptor
+  otherIdCheckTitle: MessageDescriptor
+  idCheckVerify: MessageDescriptor
   birthCorrectionNote: MessageDescriptor
 }
 
@@ -96,6 +99,27 @@ const messagesToDefine: ICorrectionMessages = {
     id: 'correction.corrector.informant',
     defaultMessage: 'Informant',
     description: 'Label for informant option in certificate correction form'
+  },
+  idCheckTitle: {
+    id: 'correction.certificate.corrector.idCheck',
+    defaultMessage: 'Check proof of ID. Does it match the following details?',
+    description: 'The title for id check component'
+  },
+  otherIdCheckTitle: {
+    id: 'correction.certificate.corrector.otherIdCheck',
+    defaultMessage: 'Have you checked their proof of identification?',
+    description: 'The title for other id check component'
+  },
+  idCheckVerify: {
+    id: 'correction.certificate.corrector.idCheckVerify',
+    defaultMessage: 'Yes',
+    description: 'The label for id check component action when verify details'
+  },
+  idCheckWithoutVerify: {
+    id: 'correction.certificate.corrector.idCheckWithoutVerify',
+    defaultMessage: 'No',
+    description:
+      'The label for id check component action when does not verify details'
   },
   birthCorrectionNote: {
     id: 'correction.corrector.birth.note',

@@ -37,6 +37,8 @@ export const REVIEW_EVENT_PARENT_FORM_PAGE_GROUP =
   '/reviews/:applicationId/events/:event/parent/:pageId/group/:groupId'
 
 export const CERTIFICATE_CORRECTION = '/correction/:registrationId/:sectionId'
+export const VERIFY_CORRECTOR =
+  '/correctRecord/check/:registrationId/:eventType/:corrector'
 
 export const SAVED_REGISTRATION = '/saved'
 export const REJECTED_REGISTRATION = '/rejected'
