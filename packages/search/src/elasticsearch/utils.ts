@@ -36,6 +36,7 @@ const VALIDATED_STATUS = 'VALIDATED'
 const WAITING_VALIDATION_STATUS = 'WAITING_VALIDATION'
 const REGISTERED_STATUS = 'REGISTERED'
 const CERTIFIED_STATUS = 'CERTIFIED'
+const REQUESTED_CORRECTION = 'REQUESTED_CORRECTION'
 
 export const NOTIFICATION_TYPES = ['birth-notification', 'death-notification']
 export const NAME_EN = 'en'
@@ -168,7 +169,7 @@ export const createStatusHistory = async (
   authHeader: string
 ) => {
   if (!isValidOperationHistory(body)) {
-    return
+    throw new Error('Not a valid operation history')
   }
 
   const user: IUserModelData = await getUser(body.updatedBy || '', authHeader)
@@ -240,10 +241,10 @@ function findDuplicateIds(
   const hits = (results && results.body.hits.hits) || []
   return hits
     .filter(
-      hit =>
+      (hit) =>
         hit._id !== compositionIdentifier && hit._score > MATCH_SCORE_THRESHOLD
     )
-    .map(hit => hit._id)
+    .map((hit) => hit._id)
 }
 
 export function buildQuery(body: IBirthCompositionBody) {
@@ -409,7 +410,8 @@ export function isValidOperationHistory(body: IBirthCompositionBody) {
       VALIDATED_STATUS,
       WAITING_VALIDATION_STATUS
     ],
-    [CERTIFIED_STATUS]: [REGISTERED_STATUS, CERTIFIED_STATUS]
+    [CERTIFIED_STATUS]: [REGISTERED_STATUS, CERTIFIED_STATUS],
+    [REQUESTED_CORRECTION]: [REGISTERED_STATUS, CERTIFIED_STATUS]
   }
 
   const previousStatus = getPreviousStatus(body)
@@ -417,6 +419,7 @@ export function isValidOperationHistory(body: IBirthCompositionBody) {
 
   if (
     currentStatus &&
+    validStatusMapping[currentStatus] &&
     !validStatusMapping[currentStatus].includes(previousStatus)
   ) {
     return false
