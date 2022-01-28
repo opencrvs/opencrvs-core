@@ -753,12 +753,14 @@ export async function setPrimaryCaregiverReference(
 export function selectOrCreatePaymentReconciliationResource(
   fhirBundle: ITemplatedBundle,
   context: any,
-  eventType: string
+  eventType: string,
+  isCorrection?: boolean
 ): fhir.PaymentReconciliation {
   const docRef = selectOrCreateCertificateDocRefResource(
     fhirBundle,
     context,
-    eventType
+    eventType,
+    isCorrection
   )
   if (!docRef.extension) {
     docRef.extension = []

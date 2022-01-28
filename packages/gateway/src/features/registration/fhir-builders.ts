@@ -2035,7 +2035,8 @@ export const builders: IFieldBuilders = {
           const paymentResource = selectOrCreatePaymentReconciliationResource(
             fhirBundle,
             context,
-            EVENT_TYPE.BIRTH
+            context.event,
+            true
           )
           if (!paymentResource.identifier) {
             paymentResource.identifier = []
@@ -2053,7 +2054,8 @@ export const builders: IFieldBuilders = {
           const paymentResource = selectOrCreatePaymentReconciliationResource(
             fhirBundle,
             context,
-            EVENT_TYPE.BIRTH
+            context.event,
+            true
           )
           if (!paymentResource.detail) {
             paymentResource.detail = [
@@ -2077,7 +2079,8 @@ export const builders: IFieldBuilders = {
           const paymentResource = selectOrCreatePaymentReconciliationResource(
             fhirBundle,
             context,
-            EVENT_TYPE.BIRTH
+            context.event,
+            true
           )
           paymentResource.total = fieldValue as fhir.Money
         },
@@ -2089,7 +2092,8 @@ export const builders: IFieldBuilders = {
           const paymentResource = selectOrCreatePaymentReconciliationResource(
             fhirBundle,
             context,
-            EVENT_TYPE.BIRTH
+            context.event,
+            true
           )
           if (!paymentResource.detail) {
             paymentResource.detail = [
@@ -2113,7 +2117,8 @@ export const builders: IFieldBuilders = {
           const paymentResource = selectOrCreatePaymentReconciliationResource(
             fhirBundle,
             context,
-            EVENT_TYPE.BIRTH
+            EVENT_TYPE.BIRTH,
+            true
           )
           paymentResource.outcome = {
             coding: [{ code: fieldValue }]
@@ -2127,7 +2132,8 @@ export const builders: IFieldBuilders = {
           const paymentResource = selectOrCreatePaymentReconciliationResource(
             fhirBundle,
             context,
-            EVENT_TYPE.BIRTH
+            context.event,
+            true
           )
           if (!paymentResource.detail) {
             paymentResource.detail = [
@@ -2223,7 +2229,7 @@ export const builders: IFieldBuilders = {
         const certDocResource = selectOrCreateCertificateDocRefResource(
           fhirBundle,
           context,
-          EVENT_TYPE.BIRTH,
+          context.event,
           true
         )
         if (!certDocResource.content) {
