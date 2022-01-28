@@ -11,8 +11,8 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { BackArrowDeepBlue } from '../icons'
-import { Button, CircleButton } from '../buttons'
+import { BackArrowDeepBlue, Cross } from '../icons'
+import { CircleButton } from '../buttons'
 const ActionContainer = styled.div`
   width: 100%;
 `
@@ -23,24 +23,20 @@ const HeaderContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0 20px;
   position: relative;
 `
 const BodyContent = styled.div`
   width: 100%;
   height: 64px;
-  margin: 0 24px;
   padding: 24px 0px;
   display: flex;
   flex-direction: row;
   align-items: center;
 `
 const BackButtonContainer = styled.div`
-  margin-right: 8px;
+  margin-right: 16px;
   cursor: pointer;
-`
-const BackButton = styled(Button)`
-  justify-content: center;
-  height: auto;
 `
 
 const BackButtonText = styled.span`
@@ -82,6 +78,7 @@ interface IProps {
   backLabel?: string
   icon?: () => React.ReactNode
   id?: string
+  goHome?: () => void
 }
 
 export class ActionPageLight extends React.Component<
@@ -90,7 +87,8 @@ export class ActionPageLight extends React.Component<
   }
 > {
   render() {
-    const { id, title, icon, goBack, backLabel, hideBackground } = this.props
+    const { id, title, icon, goBack, goHome, backLabel, hideBackground } =
+      this.props
 
     return (
       <ActionContainer id={id}>
@@ -104,6 +102,11 @@ export class ActionPageLight extends React.Component<
             </BackButtonContainer>
             {title && <MenuTitle>{title}</MenuTitle>}
           </BodyContent>
+          {goHome && (
+            <CircleButton id="crcl-btn" onClick={goHome}>
+              <Cross color="currentColor" />
+            </CircleButton>
+          )}
         </HeaderContainer>
         <Container hideBackground={hideBackground}>
           {this.props.children}
