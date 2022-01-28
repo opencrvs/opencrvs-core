@@ -25,8 +25,6 @@ import { clone } from 'lodash'
 import { REGISTRAR_HOME } from '@client/navigation/routes'
 import { waitForElement, waitFor } from '@client/tests/wait-for-element'
 
-const assign = window.location.assign as jest.Mock
-
 describe('Review Duplicates component', () => {
   const graphqlMock = [
     {
@@ -871,85 +869,101 @@ describe('Review Duplicates component', () => {
         testComponent.component.find('#not_duplicate_confirm').hostNodes()
       ).toHaveLength(0)
     })
-
-    it('successfully redirects to Registration-Home if all duplicates removed', async () => {
-      const mock = clone(graphqlMock)
-      // @ts-ignore
-      mock.push({
-        request: {
-          query: notADuplicateMutation,
-          variables: {
-            id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
-            // @ts-ignore
-            duplicateId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
-          }
-        },
-        result: {
-          data: {
-            // @ts-ignore
-            notADuplicate: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
-          }
+    describe('redirects', () => {
+      const originalLocation = window.location
+      beforeEach(() => {
+        delete (window as { location?: Location }).location
+        window.location = {
+          ...originalLocation,
+          assign: jest.fn()
         }
       })
-      const { store } = createStore()
-      const testComponent = await createTestComponent(
-        <ReviewDuplicates
-          // @ts-ignore
-          match={{
-            params: {
-              applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
-            }
-          }}
-        />,
-        store,
-        mock
-      )
 
-      const link = await waitForElement(
-        testComponent.component,
-        '#not_duplicate_link_450ce5e3-b495-4868-bb6a-1183ffd0fee1'
-      )
-
-      link.hostNodes().simulate('click')
-
-      const confirm = await waitForElement(
-        testComponent.component,
-        '#not_duplicate_confirm'
-      )
-
-      confirm.hostNodes().simulate('click')
-
-      await waitFor(() => assign.mock.calls.length > 0)
-
-      expect(assign).toBeCalledWith(REGISTRAR_HOME)
-    })
-
-    it('successfully redirects to Registration-Home if no duplicates returned from fetch query', async () => {
-      const { store } = createStore()
-      const testComponent = await createTestComponent(
-        <ReviewDuplicates
-          // @ts-ignore
-          match={{
-            params: {
-              applicationId: '460ce5e3-b495-4868-bb6a-1183ffd0fee1'
-            }
-          }}
-        />,
-        store,
-        graphqlMock
-      )
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
+      afterEach(() => {
+        window.location = originalLocation
       })
-      testComponent.component.update()
 
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
+      it('successfully redirects to Registration-Home if all duplicates removed', async () => {
+        const mock = clone(graphqlMock)
+        // @ts-ignore
+        mock.push({
+          request: {
+            query: notADuplicateMutation,
+            variables: {
+              id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
+              // @ts-ignore
+              duplicateId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+            }
+          },
+          result: {
+            data: {
+              // @ts-ignore
+              notADuplicate: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+            }
+          }
+        })
+        const { store } = createStore()
+        const testComponent = await createTestComponent(
+          <ReviewDuplicates
+            // @ts-ignore
+            match={{
+              params: {
+                applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+              }
+            }}
+          />,
+          store,
+          mock
+        )
+
+        const link = await waitForElement(
+          testComponent.component,
+          '#not_duplicate_link_450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+        )
+
+        link.hostNodes().simulate('click')
+
+        const confirm = await waitForElement(
+          testComponent.component,
+          '#not_duplicate_confirm'
+        )
+
+        confirm.hostNodes().simulate('click')
+
+        await waitFor(
+          () => (window.location.assign as jest.Mock).mock.calls.length > 0
+        )
+
+        expect(window.location.assign).toBeCalledWith(REGISTRAR_HOME)
       })
-      testComponent.component.update()
 
-      expect(assign).toBeCalledWith(REGISTRAR_HOME)
+      it('successfully redirects to Registration-Home if no duplicates returned from fetch query', async () => {
+        const { store } = createStore()
+        const testComponent = await createTestComponent(
+          <ReviewDuplicates
+            // @ts-ignore
+            match={{
+              params: {
+                applicationId: '460ce5e3-b495-4868-bb6a-1183ffd0fee1'
+              }
+            }}
+          />,
+          store,
+          graphqlMock
+        )
+        await new Promise((resolve) => {
+          setTimeout(resolve, 100)
+        })
+        testComponent.component.update()
+
+        // wait for mocked data to load mockedProvider
+        await new Promise((resolve) => {
+          setTimeout(resolve, 100)
+        })
+        testComponent.component.update()
+
+        expect(window.location.assign).toBeCalledWith(REGISTRAR_HOME)
+      })
     })
   })
 })

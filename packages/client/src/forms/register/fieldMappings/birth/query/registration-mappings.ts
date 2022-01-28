@@ -108,10 +108,15 @@ export function getBirthRegistrationSectionTransformer(
 
 const convertToLocal = (
   mobileWithCountryCode: string,
-  countryCode: string,
+  country: string,
   codeReplacement?: string
 ) => {
-  countryCode = countryCode.toUpperCase()
+  /*
+   *  If country is the fictional demo country (Farajaland), use Zambian number format
+   */
+  const countryCode =
+    country.toUpperCase() === 'FAR' ? 'ZMB' : country.toUpperCase()
+
   return (
     mobileWithCountryCode &&
     mobileWithCountryCode.replace(

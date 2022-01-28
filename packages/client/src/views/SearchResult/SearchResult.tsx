@@ -483,6 +483,7 @@ export class SearchResultView extends React.Component<
                       />
                     )
                   }
+
                   if (error || !data.searchEvents) {
                     return (
                       <ErrorText id="search-result-error-text">

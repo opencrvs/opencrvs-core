@@ -411,6 +411,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
       mainWindowRightMargin
     } = this.state
     const role = userDetails && userDetails.role
+
     const { displayLabel: title, id: locationId } = selectedLocation
     return (
       <SysAdminContentWrapper

@@ -278,19 +278,13 @@ class HeaderComp extends React.Component<IProps, IState> {
       if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
         return goToTeamSearchAction()
       } else {
-        return goToTeamUserListAction(
-          {
-            id:
-              (userDetails.primaryOffice && userDetails.primaryOffice.id) || '',
-            searchableText:
-              (userDetails.primaryOffice && userDetails.primaryOffice.name) ||
-              '',
-            displayLabel:
-              (userDetails.primaryOffice && userDetails.primaryOffice.name) ||
-              ''
-          },
-          true
-        )
+        return goToTeamUserListAction({
+          id: (userDetails.primaryOffice && userDetails.primaryOffice.id) || '',
+          searchableText:
+            (userDetails.primaryOffice && userDetails.primaryOffice.name) || '',
+          displayLabel:
+            (userDetails.primaryOffice && userDetails.primaryOffice.name) || ''
+        })
       }
     }
   }
