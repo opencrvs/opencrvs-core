@@ -11,9 +11,9 @@
  */
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { IPrintableApplication, modifyApplication } from '@client/applications'
-import { Event } from '@client/forms'
+import { Event, ReviewSection } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/correction'
-import { goBack } from '@client/navigation'
+import { goBack, goToPageGroup } from '@client/navigation'
 import { IStoreState } from '@client/store'
 import {
   IDVerifier,
@@ -25,6 +25,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
+import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
 interface INameField {
   firstNamesField: string
   familyNameField: string
@@ -59,6 +60,7 @@ interface IStateProps {
 interface IDispatchProps {
   goBack: typeof goBack
   modifyApplication: typeof modifyApplication
+  goToPageGroup: typeof goToPageGroup
 }
 
 type IOwnProps = RouteComponentProps<IMatchParams>
@@ -66,10 +68,15 @@ type IOwnProps = RouteComponentProps<IMatchParams>
 type IFullProps = IStateProps & IDispatchProps & IOwnProps & IntlShapeProps
 
 class VerifyCorrectorComponent extends React.Component<IFullProps> {
-  /*
-   * TODO: goto next form
-   */
-  handleVerification = () => {}
+  handleVerification = () => {
+    this.props.goToPageGroup(
+      CERTIFICATE_CORRECTION_REVIEW,
+      this.props.application.id,
+      ReviewSection.Review,
+      'review-view-group',
+      this.props.application.event
+    )
+  }
 
   handleNegativeVerification = () => {
     const { application } = this.props
@@ -205,5 +212,6 @@ const mapStateToProps = (
 
 export const VerifyCorrector = connect(mapStateToProps, {
   goBack,
-  modifyApplication
+  modifyApplication,
+  goToPageGroup
 })(injectIntl(VerifyCorrectorComponent))
