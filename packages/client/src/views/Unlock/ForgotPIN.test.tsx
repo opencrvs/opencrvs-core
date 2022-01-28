@@ -194,40 +194,42 @@ describe('ForgotPIN tests', () => {
   })
 
   it('clicking on logout removes indexedDB entries', async () => {
-    const indexeddb = {
+    const indexeddb: Record<string, any> = {
       [SCREEN_LOCK]: true,
       [SECURITY_PIN_EXPIRED_AT]: 1234
     }
 
-    // @ts-ignore
     storage.removeItem = jest.fn((key: string) => {
-      // @ts-ignore
       delete indexeddb[key]
+      return Promise.resolve()
     })
 
     const logoutButton = await waitForElement(component, '#logout')
 
     logoutButton.hostNodes().simulate('click')
 
-    // @ts-ignore
     expect(indexeddb[SCREEN_LOCK]).toBeFalsy()
-    // @ts-ignore
+
     expect(indexeddb[SECURITY_PIN_EXPIRED_AT]).toBeFalsy()
   })
 
   it('clicking on forgot password logs out and redirects to forgot password screen of login app', async () => {
-    const indexeddb = {
+    const indexeddb: Record<string, any> = {
       [SCREEN_LOCK]: true,
       [SECURITY_PIN_EXPIRED_AT]: 1234
     }
 
-    // @ts-ignore
     storage.removeItem = jest.fn((key: string) => {
-      // @ts-ignore
       delete indexeddb[key]
+      return Promise.resolve()
     })
 
-    window.location.assign = jest.fn()
+    const originalLocation = window.location
+    delete (window as { location?: Location }).location
+    window.location = {
+      ...originalLocation,
+      assign: jest.fn()
+    }
 
     const forgotPasswordButton = await waitForElement(
       component,
@@ -236,12 +238,12 @@ describe('ForgotPIN tests', () => {
 
     forgotPasswordButton.hostNodes().simulate('click')
 
-    // @ts-ignore
     expect(indexeddb[SCREEN_LOCK]).toBeFalsy()
-    // @ts-ignore
+
     expect(indexeddb[SECURITY_PIN_EXPIRED_AT]).toBeFalsy()
     expect(window.location.assign).toBeCalledWith(
       'http://localhost:3020/forgotten-item'
     )
+    window.location = originalLocation
   })
 })

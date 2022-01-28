@@ -53,7 +53,7 @@ describe('location picker tests', () => {
       '#location-range-picker-action'
     )
 
-    expect(actionElement.hostNodes().text()).toBe('Baniajan Union Parishad')
+    expect(actionElement.hostNodes().text()).toBe('Baniajan Union')
   })
 
   it('focuses input on click action', async () => {

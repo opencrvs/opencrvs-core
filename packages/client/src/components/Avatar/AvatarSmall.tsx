@@ -33,7 +33,9 @@ export function AvatarSmall({ name, avatar, ...props }: IProps) {
         width={40}
         height={40}
         src={
-          avatar ? avatar.data : `${AVATAR_API}${name!.replaceAll(' ', '+')}`
+          avatar
+            ? avatar.data
+            : `${AVATAR_API}${encodeURIComponent(name!).replace(/%20/g, '+')}`
         }
         onError={() => setError(true)}
         {...props}

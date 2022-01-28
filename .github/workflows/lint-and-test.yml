@@ -1,0 +1,50 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+# graphic logo are (registered/a) trademark(s) of Plan International.
+
+name: Lint and run unit tests
+
+on:
+  push:
+    branches:
+      - '**'
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+
+    strategy:
+      matrix:
+        node-version: [14.17.0]
+
+    steps:
+      - name: Checking out git repo
+        uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Runs dependency installation
+        run: yarn
+
+      - name: Run linting
+        run: yarn lint
+
+      - name: Build components
+        run: yarn build:components
+
+      - name: Run Unit Test
+        run: yarn test
+
+      - name: Run code coverage
+        run: |
+          npm install codecov
+          ./node_modules/.bin/codecov
