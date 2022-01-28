@@ -11,7 +11,7 @@
  */
 
 import {
-  goToApplicationDetails,
+  goToApplicationRecordAudit,
   goToPrintCertificate
 } from '@client/navigation'
 import { transformData } from '@client/search/transformer'
@@ -29,7 +29,6 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { withTheme } from 'styled-components'
 import { LoadingIndicator } from '@client/views/RegistrationHome/LoadingIndicator'
-import { RowHistoryView } from '@client/views/RegistrationHome/RowHistoryView'
 import {
   buttonMessages,
   constantsMessages,
@@ -46,7 +45,7 @@ interface IBasePrintTabProps {
   theme: ITheme
   goToPrintCertificate: typeof goToPrintCertificate
   registrarLocationId: string | null
-  goToApplicationDetails: typeof goToApplicationDetails
+  goToApplicationRecordAudit: typeof goToApplicationRecordAudit
   outboxApplications: IApplication[]
   queryData: {
     data: GQLEventSearchResultSet
@@ -202,18 +201,11 @@ class PrintTabComponent extends React.Component<
         rowClickHandler: [
           {
             label: 'rowClickHandler',
-            handler: () => this.props.goToApplicationDetails(reg.id)
+            handler: () => this.props.goToApplicationRecordAudit(reg.id)
           }
         ]
       }
     })
-  }
-
-  renderExpandedComponent = (itemId: string) => {
-    const { results } = this.props.queryData && this.props.queryData.data
-    const eventDetails =
-      results && results.find((result) => result && result.id === itemId)
-    return <RowHistoryView eventDetails={eventDetails} />
   }
 
   render() {
@@ -225,14 +217,12 @@ class PrintTabComponent extends React.Component<
         <GridTable
           content={this.transformRegisteredContent(data)}
           columns={this.getColumns()}
-          renderExpandedComponent={this.renderExpandedComponent}
           noResultText={intl.formatMessage(constantsMessages.noResults)}
           onPageChange={onPageChange}
           pageSize={this.pageSize}
           totalItems={(data && data.totalItems) || 0}
           currentPage={page}
-          expandable={this.getExpandable()}
-          clickable={!this.getExpandable()}
+          clickable={true}
           showPaginated={this.props.showPaginated}
           loading={this.props.loading}
           loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
@@ -254,5 +244,5 @@ function mapStateToProps(state: IStoreState) {
 
 export const PrintTab = connect(mapStateToProps, {
   goToPrintCertificate,
-  goToApplicationDetails
+  goToApplicationRecordAudit
 })(injectIntl(withTheme(PrintTabComponent)))

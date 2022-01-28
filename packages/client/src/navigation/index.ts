@@ -50,7 +50,8 @@ import {
   WORKFLOW_STATUS,
   TEAM_USER_LIST,
   USER_PROFILE,
-  CONFIG
+  CONFIG,
+  APPLICATION_RECORD_AUDIT
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
@@ -280,6 +281,15 @@ export function goToApplicationDetails(
   forceDetailsQuery?: boolean
 ) {
   return push(formatUrl(APPLICATION_DETAIL, { applicationId }), {
+    forceDetailsQuery
+  })
+}
+
+export function goToApplicationRecordAudit(
+  applicationId: string,
+  forceDetailsQuery?: boolean
+) {
+  return push(formatUrl(APPLICATION_RECORD_AUDIT, { applicationId }), {
     forceDetailsQuery
   })
 }

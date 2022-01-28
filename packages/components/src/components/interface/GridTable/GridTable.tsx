@@ -184,7 +184,7 @@ export class GridTable extends React.Component<
       )
     } else {
       return (
-        <ActionWrapper key={key} width={width} alignment={alignment}>
+        <ActionWrapper key={idKey} width={width} alignment={alignment}>
           <ListItemAction id={`ListItemAction-${key}`} actions={actions} />
         </ActionWrapper>
       )

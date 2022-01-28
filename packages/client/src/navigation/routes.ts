@@ -59,6 +59,7 @@ export const SETTINGS = '/settings'
 export const CONFIG = '/config'
 
 export const APPLICATION_DETAIL = '/details/:applicationId'
+export const APPLICATION_RECORD_AUDIT = '/recordAudit/:applicationId'
 
 export const SYS_ADMIN_HOME = '/sys-admin-home'
 export const SYS_ADMIN_HOME_TAB = '/sys-admin-home/:tabId'
