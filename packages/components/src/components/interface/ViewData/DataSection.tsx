@@ -12,17 +12,30 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { IDataProps, DataRow } from './DataRow'
+import { LinkButton } from '../../buttons'
 
 const Container = styled.div`
   margin-top: 48px;
 `
 const Title = styled.div`
+  display: flex;
+  gap: 8px;
   ${({ theme }) => theme.fonts.h4Style};
   margin-bottom: 16px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     ${({ theme }) => theme.fonts.h5Style};
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0px;
   }
 `
+
+interface IAction {
+  id?: string
+  label: string
+  disabled?: boolean
+  handler: () => void
+}
 
 const ResponsiveContainer = styled.div`
   display: none;
@@ -35,15 +48,21 @@ interface IProps {
   title: string
   items: IDataProps[]
   responsiveContents?: React.ReactNode
+  action?: IAction
 }
 
 export class DataSection extends React.Component<IProps> {
   render() {
-    const { id, title, items, responsiveContents } = this.props
+    const { action, id, title, items, responsiveContents } = this.props
 
     return (
       <Container id={id}>
-        <Title>{title}</Title>
+        <Title>
+          {title}
+          {action && (
+            <LinkButton onClick={action.handler}>{action.label}</LinkButton>
+          )}
+        </Title>
         {responsiveContents && (
           <ResponsiveContainer>{responsiveContents}</ResponsiveContainer>
         )}
