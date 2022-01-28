@@ -10,6 +10,7 @@
     "test": "jest --coverage --silent --noStackTrace && yarn test:compilation",
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
+    "lint": "tslint --project ./tsconfig.json",
     "precommit": "tslint --project ./tsconfig.json && lint-staged",
     "generate-test-token": "NODE_PATH=. ts-node resources/generate-test-token",
     "request-token": "NODE_PATH=. ts-node resources/request-token",
