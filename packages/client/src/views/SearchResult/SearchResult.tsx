@@ -424,7 +424,19 @@ export class SearchResultView extends React.Component<
     const results = data && data.searchEvents && data.searchEvents.results
     const eventDetails =
       results && results.find((result) => result && result.id === itemId)
-    return <RowHistoryView eventDetails={eventDetails} />
+
+    const foundApplication = this.props.outboxApplications.find(
+      (application) => eventDetails && application.id === eventDetails.id
+    )
+    const downloadStatus =
+      (foundApplication && foundApplication.downloadStatus) || undefined
+
+    return (
+      <RowHistoryView
+        eventDetails={eventDetails}
+        showRecordCorrection={downloadStatus === DOWNLOAD_STATUS.DOWNLOADED}
+      />
+    )
   }
 
   onPageChange = (newPageNumber: number) => {
