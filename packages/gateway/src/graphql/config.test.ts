@@ -88,7 +88,7 @@ describe('Test apollo server config', () => {
         },
         h: {}
       })
-    ).rejects.toThrowError('AuthenticationError: Authentication failed')
+    ).rejects.toThrowError('Authentication failed')
   })
   it('throws authentication error when the token holder is not an active user', async () => {
     const deactivatedUser = cloneDeep(mockUser)
@@ -107,7 +107,7 @@ describe('Test apollo server config', () => {
         },
         h: {}
       })
-    ).rejects.toThrowError('AuthenticationError: Authentication failed')
+    ).rejects.toThrowError('Authentication failed')
   })
   it('throws authentication error when the token holder has different scope', async () => {
     const userWithDifferentScope = cloneDeep(mockUser)
@@ -129,7 +129,7 @@ describe('Test apollo server config', () => {
         },
         h: {}
       })
-    ).rejects.toThrowError('AuthenticationError: Authentication failed')
+    ).rejects.toThrowError('Authentication failed')
   })
   it('throws authentication for unexpected error in user detection', async () => {
     const config = getApolloConfig()

@@ -50,9 +50,9 @@ mockFetchUserDetails.mockReturnValue(mockUserResponse)
 queries.fetchUserDetails = mockFetchUserDetails
 
 describe('SearchResult tests', () => {
-  const { store } = createStore()
-
-  beforeAll(async () => {
+  let store: ReturnType<typeof createStore>['store']
+  beforeEach(async () => {
+    store = createStore().store
     getItem.mockReturnValue(registerScopeToken)
     await store.dispatch(checkAuth({ '?token': registerScopeToken }))
   })

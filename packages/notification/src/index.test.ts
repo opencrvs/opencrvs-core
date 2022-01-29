@@ -12,19 +12,18 @@
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { createServer } from '@notification/index'
-import {
-  createServerWithEnvironment,
-  translationsMock
-} from '@notification/tests/util'
+import { translationsMock } from '@notification/tests/util'
 import * as fetchMock from 'jest-fetch-mock'
 
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 
 describe('Route authorization', () => {
+  let server: any
+
+  beforeEach(async () => {
+    server = await createServer()
+  })
   it('health check', async () => {
-    const server = await createServerWithEnvironment({
-      NODE_ENV: 'development'
-    })
     const res = await server.server.inject({
       method: 'GET',
       url: '/ping'
@@ -34,7 +33,6 @@ describe('Route authorization', () => {
   })
 
   it('accepts requests with a valid token and valid user scope', async () => {
-    const server = await createServer()
     const token = jwt.sign(
       { scope: ['declare'] },
       readFileSync('../auth/test/cert.key'),
@@ -60,7 +58,6 @@ describe('Route authorization', () => {
     expect(res.statusCode).toBe(200)
   })
   it('blocks requests with a invalid user scope', async () => {
-    const server = await createServer()
     const token = jwt.sign(
       { scope: ['demo'] }, // required declare | register | certify
       readFileSync('../auth/test/cert.key'),
