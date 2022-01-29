@@ -200,13 +200,16 @@ class SettingsView extends React.Component<IProps, IState> {
   }
 
   componentDidMount() {
-    let phonedNumberUpdated = false
-    const historyState = this.props.history.location.state
-    if (this.props.location.state) {
+    if (this.props.history && this.props.history.location.state) {
+      let phonedNumberUpdated = false
+      const historyState = this.props.history.location.state
       phonedNumberUpdated = historyState.phonedNumberUpdated
       if (phonedNumberUpdated) {
         this.changePhoneNumber()
-        this.props.history.replace(SETTINGS, historyState)
+        this.props.history.replace({
+          pathname: SETTINGS,
+          state: { phonedNumberUpdated: false }
+        })
       }
     }
   }
