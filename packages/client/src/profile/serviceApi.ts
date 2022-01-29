@@ -12,6 +12,8 @@
 import { getToken } from '@client/utils/authUtils'
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { resolve } from 'url'
+// eslint-disable-next-line no-restricted-imports
+import * as Sentry from '@sentry/browser'
 export interface ISendVerifyCodeData {
   phoneNumber: string
 }
@@ -39,10 +41,9 @@ function request<T>(options: AxiosRequestConfig) {
     if (error.response) {
       // Request was made but server responded with something
       // other than 2xx
-      console.log('response.data', error)
     } else {
       // Something else happened while setting up the request
-      console.error('Error Message:', error.message)
+      Sentry.captureException(error)
     }
 
     throw error
