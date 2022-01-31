@@ -102,7 +102,7 @@ const messagesToDefine: IReviewMessages = {
   },
   headerSubjectWithName: {
     defaultMessage:
-      '{eventType, select, birth {Birth} death {Death}} Application for {name}',
+      '{eventType, select, birth {Birth} death {Death} other {Birth}} Application for {name}',
     description:
       'Header subject that shows which application type to review with applicant name',
     id: 'review.header.subject.subjectWitName'

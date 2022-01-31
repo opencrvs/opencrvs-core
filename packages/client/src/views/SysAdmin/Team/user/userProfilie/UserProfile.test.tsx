@@ -122,14 +122,11 @@ describe('User audit list tests', () => {
     }
   ]
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     Date.now = jest.fn(() => 1487076708000)
     const { store: testStore, history: testHistory } = await createTestStore()
     store = testStore
     history = testHistory
-  })
-
-  beforeEach(async () => {
     component = (
       await createTestComponent(
         // @ts-ignore
@@ -148,16 +145,10 @@ describe('User audit list tests', () => {
       )
     ).component
 
-    // wait for mocked data to load mockedProvider
-    await new Promise((resolve) => {
-      setTimeout(resolve, 100)
-    })
-
-    component.update()
+    expect(await waitForElement(component, '#user-profile')).toBeDefined()
   })
 
   it('renders without crashing', async () => {
-    expect(await waitForElement(component, '#user-profile')).toBeDefined()
     expect(await waitForElement(component, '#user-audit-list')).toBeDefined()
   })
   it('renders with a error toast for graphql error', async () => {

@@ -10,7 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { AppStore } from '@client/store'
-import { createTestComponent, createTestStore } from '@client/tests/util'
+import {
+  createRouterProps,
+  createTestComponent,
+  createTestStore,
+  loginAsFieldAgent
+} from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
@@ -20,7 +25,7 @@ import {
   OPERATIONAL_REPORT_SECTION
 } from './OperationalReport'
 import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
-import { stringify, parse } from 'query-string'
+import { parse } from 'query-string'
 import { OPERATIONAL_REPORTS_METRICS } from './metricsQuery'
 import { GraphQLError } from 'graphql'
 
@@ -35,14 +40,12 @@ describe('OperationalReport tests', () => {
     searchableText: 'Dhaka'
   }
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     Date.now = jest.fn(() => 1487076708000)
     const { store: testStore, history: testHistory } = await createTestStore()
     store = testStore
     history = testHistory
-  })
-
-  beforeEach(async () => {
+    loginAsFieldAgent(store)
     const graphqlMock = [
       {
         request: {
@@ -86,15 +89,14 @@ describe('OperationalReport tests', () => {
     ]
     const testComponent = await createTestComponent(
       <OperationalReport
-        // @ts-ignore
-        location={{
-          search: stringify({
+        {...createRouterProps('/', undefined, {
+          search: {
             locationId: LOCATION_DHAKA_DIVISION.id,
             sectionId: OPERATIONAL_REPORT_SECTION.OPERATIONAL,
             timeEnd: new Date(1487076708000).toISOString(),
             timeStart: new Date(1455454308000).toISOString()
-          })
-        }}
+          }
+        })}
       />,
       store,
       graphqlMock
@@ -260,15 +262,14 @@ describe('OperationalReport reports tests', () => {
   beforeEach(async () => {
     const testComponent = await createTestComponent(
       <OperationalReport
-        // @ts-ignore
-        location={{
-          search: stringify({
+        {...createRouterProps('/', undefined, {
+          search: {
             locationId: LOCATION_DHAKA_DIVISION.id,
             sectionId: OPERATIONAL_REPORT_SECTION.REPORTS,
             timeEnd: new Date(1487076708000).toISOString(),
             timeStart: new Date(1455454308000).toISOString()
-          })
-        }}
+          }
+        })}
       />,
       store
     )
@@ -314,15 +315,14 @@ describe('Test error toast notification', () => {
     ]
     const testComponent = await createTestComponent(
       <OperationalReport
-        // @ts-ignore
-        location={{
-          search: stringify({
+        {...createRouterProps('/', undefined, {
+          search: {
             locationId: LOCATION_DHAKA_DIVISION.id,
             sectionId: OPERATIONAL_REPORT_SECTION.OPERATIONAL,
             timeEnd: new Date(1487076708000).toISOString(),
             timeStart: new Date(1455454308000).toISOString()
-          })
-        }}
+          }
+        })}
       />,
       store,
       graphqlMock

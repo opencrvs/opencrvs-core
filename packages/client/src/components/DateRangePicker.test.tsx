@@ -25,7 +25,7 @@ describe('date picker tests', () => {
   let store: AppStore
   let onDatesChangeMock: jest.Mock
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     Date.now = jest.fn(() => 1592233232409)
     const appStore = await createTestStore()
     store = appStore.store

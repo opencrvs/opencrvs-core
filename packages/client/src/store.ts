@@ -82,8 +82,10 @@ export type AppStore = Store<IStoreState, AnyAction>
 
 const config = { DONT_LOG_ERRORS_ON_HANDLED_FAILURES: true }
 
-export const createStore = (): { store: AppStore; history: History } => {
-  const history = createBrowserHistory()
+export const createStore = <T>(
+  existingHistory?: History<T>
+): { store: AppStore; history: History } => {
+  const history = existingHistory || createBrowserHistory()
   const reducers = combineReducers<IStoreState>({
     profile: profileReducer,
     router: connectRouter(history) as any, // @todo

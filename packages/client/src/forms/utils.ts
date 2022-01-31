@@ -510,20 +510,30 @@ export const hasFormError = (
         (nestedFieldErrors) => nestedFieldErrors.length > 0
       )
   )
-
   return fieldListWithErrors && fieldListWithErrors.length > 0
 }
 
 export const convertToMSISDN = (phone: string) => {
+  /*
+   *  If country is the fictional demo country (Farajaland), use Zambian number format
+   */
   const countryCode =
-    callingCountries[window.config.COUNTRY.toUpperCase()].countryCallingCodes[0]
+    window.config.COUNTRY.toUpperCase() === 'FAR'
+      ? 'ZMB'
+      : window.config.COUNTRY.toUpperCase()
 
-  if (phone.startsWith(countryCode) || `+${phone}`.startsWith(countryCode)) {
+  const countryCallingCode =
+    callingCountries[countryCode].countryCallingCodes[0]
+
+  if (
+    phone.startsWith(countryCallingCode) ||
+    `+${phone}`.startsWith(countryCallingCode)
+  ) {
     return phone.startsWith('+') ? phone : `+${phone}`
   }
   return phone.startsWith('0')
-    ? `${countryCode}${phone.substring(1)}`
-    : `${countryCode}${phone}`
+    ? `${countryCallingCode}${phone.substring(1)}`
+    : `${countryCallingCode}${phone}`
 }
 
 export const conditionals: IConditionals = {

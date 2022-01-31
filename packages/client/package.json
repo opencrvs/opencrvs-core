@@ -37,7 +37,7 @@
     "history": "^4.7.2",
     "http-proxy-middleware": "^0.20.0",
     "jimp": "^0.16.1",
-    "jsdom-worker": "^0.1.0",
+    "jsdom-worker": "^0.2.1",
     "jwt-decode": "^2.2.0",
     "lint-staged": "^7.1.0",
     "localforage": "^1.7.2",
