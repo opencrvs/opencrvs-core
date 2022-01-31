@@ -26,6 +26,14 @@ interface ICorrectionMessages
   court: MessageDescriptor
   others: MessageDescriptor
   informant: MessageDescriptor
+  proofOfLegalDocuments: MessageDescriptor
+  docTypeAffidavitProof: MessageDescriptor
+  docTypeCourtDocument: MessageDescriptor
+  docTypeOther: MessageDescriptor
+  supportDocumentForCorrection: MessageDescriptor
+  selectPlaceholder: MessageDescriptor
+  attestToSeeCorrectionDocument: MessageDescriptor
+  noDocumentsRequiredForCorrection: MessageDescriptor
 }
 
 const messagesToDefine: ICorrectionMessages = {
@@ -96,15 +104,46 @@ const messagesToDefine: ICorrectionMessages = {
     defaultMessage: 'Informant',
     description: 'Label for informant option in certificate correction form'
   },
-  CorrectCertificate: {
-    defaultMessage: 'Correct',
-    description: 'The title of Correct button in list expansion actions',
-    id: 'correct.certificate.SupportDocument.form.name'
+  proofOfLegalDocuments: {
+    id: 'correction.supportingDocuments.proofOfLegalDocuments',
+    defaultMessage: 'Proof of legal correction documents',
+    description: 'Label for list item of legal proof'
   },
-  correctRecordTitle: {
-    defaultMessage: 'Correct record',
-    description: 'The title of correct certificate action',
-    id: 'correct.certificate.section.title'
+  docTypeAffidavitProof: {
+    id: 'correction.supportingDocuments.docTypeAffidavitProof',
+    defaultMessage: 'Affidavit',
+    description: 'Label for select option Affidavit'
+  },
+  docTypeCourtDocument: {
+    id: 'correction.supportingDocuments.docTypeCourtDocument',
+    defaultMessage: 'Court Document',
+    description: 'Label for select option Court Document'
+  },
+  docTypeOther: {
+    id: 'correction.supportingDocuments.docTypeOther',
+    defaultMessage: 'Other',
+    description: 'Label for select option Other'
+  },
+  supportDocumentForCorrection: {
+    id: 'correction.supportingDocuments.supportDocumentForCorrection',
+    defaultMessage: 'Check Supporting Document?',
+    description: 'Label for form field: Correction Supporting Document'
+  },
+  selectPlaceholder: {
+    id: 'correction.supportingDocuments.select.placeholder',
+    defaultMessage: 'Select',
+    description: 'Placeholder text for a select'
+  },
+  attestToSeeCorrectionDocument: {
+    id: 'correction.supportingDocuments.attestToSeeCorrectionDocument',
+    defaultMessage:
+      'I attest to seeing supporting documentation and have a copy filed at my office',
+    description: 'Option for form field: Manner of death'
+  },
+  noDocumentsRequiredForCorrection: {
+    id: 'correction.supportingDocuments.noDocumentsRequiredForCorrection',
+    defaultMessage: 'No supporting documents required',
+    description: 'Option for form field: Manner of death'
   }
 }
 

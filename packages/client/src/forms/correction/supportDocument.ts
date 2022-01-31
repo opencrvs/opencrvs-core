@@ -18,17 +18,13 @@ import {
 } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/correction'
 
-export const correctSupportDocumentSectionGroup: IFormSectionGroup = {
-  id: 'correction-documents-view-group',
+export const supportingDocumentsSectionGroup: IFormSectionGroup = {
+  id: 'correctionDocumentsViewGroup',
   fields: [
     {
       name: 'uploadDocForLegalProof',
       type: 'DOCUMENT_UPLOADER_WITH_OPTION',
-      label: {
-        defaultMessage: 'Proof of legal correction documents',
-        description: 'Label for list item of legal proof',
-        id: 'form.field.label.proofOfLegalDocuments'
-      },
+      label: messages.proofOfLegalDocuments,
       initialValue: '',
       hideHeader: true,
       hideAsterisk: true,
@@ -36,76 +32,47 @@ export const correctSupportDocumentSectionGroup: IFormSectionGroup = {
       options: [
         {
           value: 'Affidavit',
-          label: {
-            defaultMessage: 'Affidavit',
-            description: 'Label for select option Affidavit',
-            id: 'form.field.label.docTypeAffidavitProof'
-          }
+          label: messages.docTypeAffidavitProof
         },
         {
           value: 'Court Document',
-          label: {
-            defaultMessage: 'Court Document',
-            description: 'Label for select option Court Document',
-            id: 'form.field.label.docTypeCourtDocument'
-          }
+          label: messages.docTypeCourtDocument
         },
         {
           value: 'Other',
-          label: {
-            defaultMessage: 'Other',
-            description: 'Label for select option Other',
-            id: 'form.field.label.docTypeCorrectionOther'
-          }
+          label: messages.docTypeOther
         }
       ]
     },
     {
       name: 'supportDocumentRequiredForCorrection',
       type: RADIO_GROUP,
-      label: {
-        defaultMessage: 'Check Supporting Document?',
-        description: 'Label for form field: Correction Supporting Document',
-        id: 'form.field.label.supportDocumentForCorrection'
-      },
+      label: messages.supportDocumentForCorrection,
       hideHeader: true,
       hideAsterisk: true,
       required: true,
       initialValue: '',
       validate: [],
       size: RadioSize.LARGE,
-      placeholder: {
-        defaultMessage: 'Select',
-        description: 'Placeholder text for a select',
-        id: 'form.field.select.placeholder'
-      },
+      placeholder: messages.selectPlaceholder,
       options: [
         {
           value: true,
-          label: {
-            defaultMessage:
-              'I attest to seeing supporting documentation and have a copy filed at my office',
-            description: 'Option for form field: Manner of death',
-            id: 'form.field.label.attestToSeeCorrectionDocument'
-          }
+          label: messages.attestToSeeCorrectionDocument
         },
         {
           value: false,
-          label: {
-            defaultMessage: 'No supporting documents required',
-            description: 'Option for form field: Manner of death',
-            id: 'form.field.label.noDocumentsRequiredForCorrection'
-          }
+          label: messages.noDocumentsRequiredForCorrection
         }
       ]
     }
   ]
 }
 
-export const correctSupportDocumentSection: IFormSection = {
-  id: CorrectionSection.SupportDocument,
+export const supportingDocumentsSection: IFormSection = {
+  id: CorrectionSection.SupportingDocuments,
   viewType: 'form',
-  name: messages.CorrectCertificate,
-  title: messages.correctRecordTitle,
-  groups: [correctSupportDocumentSectionGroup]
+  name: messages.name,
+  title: messages.title,
+  groups: [supportingDocumentsSectionGroup]
 }

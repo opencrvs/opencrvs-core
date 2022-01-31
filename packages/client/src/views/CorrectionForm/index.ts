@@ -11,3 +11,4 @@
  */
 
 export * from '@client/views/CorrectionForm/CorrectorForm'
+export * from '@client/views/CorrectionForm/SupportingDocumentsForm'

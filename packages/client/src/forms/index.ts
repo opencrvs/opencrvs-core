@@ -821,7 +821,7 @@ export enum CertificateSection {
 
 export enum CorrectionSection {
   Corrector = 'corrector',
-  SupportDocument = 'supportDocument'
+  SupportingDocuments = 'supportingDocuments'
 }
 
 export enum PaymentSection {
