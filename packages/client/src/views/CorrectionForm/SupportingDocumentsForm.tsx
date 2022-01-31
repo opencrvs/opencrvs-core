@@ -45,6 +45,12 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
 
   const section = supportingDocumentsSection
   const group = section.groups[0]
+  if (
+    application.data[section.id] &&
+    application.data[section.id].uploadDocForLegalProof
+  ) {
+    group.fields[1].disabled = true
+  }
 
   const contentProps = {
     title: intl.formatMessage(messages.supportingDocumentsTitle),
