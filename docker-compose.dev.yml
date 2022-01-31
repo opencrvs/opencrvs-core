@@ -50,8 +50,10 @@ services:
   gateway:
     volumes:
       - ".secrets/public-key.pem:/secrets/public-key.pem"
+      - ".secrets/private-key.pem:/secrets/private-key.pem"
     environment:
       - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
+      - CERT_PRIVATE_KEY_PATH=/secrets/private-key.pem
     ports:
       - "7070:7070"
 
