@@ -172,11 +172,15 @@ class PrintTabComponent extends React.Component<
       } else {
         actions.push({
           label: this.props.intl.formatMessage(buttonMessages.print),
-          handler: () =>
+          handler: (
+            e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
+          ) => {
+            e && e.stopPropagation()
             this.props.goToPrintCertificate(
               reg.id,
               reg.event.toLocaleLowerCase() || ''
             )
+          }
         })
       }
       const event =

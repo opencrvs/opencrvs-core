@@ -294,13 +294,15 @@ export class InProgressTabComponent extends React.Component<
       const actions = [
         {
           label: this.props.intl.formatMessage(buttonMessages.update),
-          handler: () =>
+          handler: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+            e.stopPropagation()
             this.props.goToPage(
               pageRoute,
               draft.id,
               'preview',
               (draft.event && draft.event.toString()) || ''
             )
+          }
         }
       ]
       return {

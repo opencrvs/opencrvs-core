@@ -105,15 +105,12 @@ describe('Registrar home external validation tab tests', () => {
     expect(data[0].actions).toBeDefined()
   })
 
-  it('clicking on a row makes it expanded', async () => {
+  it('clicking on a row redirect to recordAudit page', async () => {
     const tableElement = await waitForElement(component, GridTable)
     const dataRow = tableElement.find('#row_0').hostNodes()
     dataRow.simulate('click')
-    const rowHistoryView = await waitForElement(component, RowHistoryView)
-    const eventDetails = rowHistoryView.prop('eventDetails')
-    expect(eventDetails.registration.modifiedAt).toBe(
-      SEND_FOR_VALIDATION_TIME.toString()
-    )
+    component.update()
+    expect(history.location.pathname).toContain('recordAudit')
   })
 
   describe('On devices with small viewport', () => {
@@ -127,7 +124,7 @@ describe('Registrar home external validation tab tests', () => {
       const dataRow = tableElement.find('#row_0').hostNodes()
       dataRow.simulate('click')
       component.update()
-      expect(history.location.pathname).toContain('details')
+      expect(history.location.pathname).toContain('recordAudit')
     })
   })
 })

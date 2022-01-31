@@ -177,18 +177,27 @@ class RejectTabComponent extends React.Component<
         if (reg.duplicates && reg.duplicates.length > 0) {
           actions.push({
             label: this.props.intl.formatMessage(constantsMessages.review),
-            handler: () => this.props.goToReviewDuplicate(reg.id)
+            handler: (
+              e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
+            ) => {
+              e && e.stopPropagation()
+              this.props.goToReviewDuplicate(reg.id)
+            }
           })
         } else {
           actions.push({
             label: this.props.intl.formatMessage(buttonMessages.update),
-            handler: () =>
+            handler: (
+              e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
+            ) => {
+              e && e.stopPropagation()
               this.props.goToPage(
                 REVIEW_EVENT_PARENT_FORM_PAGE,
                 reg.id,
                 'review',
                 reg.event ? reg.event.toLowerCase() : ''
               )
+            }
           })
         }
       }

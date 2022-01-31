@@ -572,7 +572,7 @@ describe('In Progress tab', () => {
         .simulate('click')
     })
 
-    it('renders expanded area for remote draft data', async () => {
+    it('redirects to recordAudit page when item is clicked', async () => {
       jest.clearAllMocks()
       const TIME_STAMP = '1562912635549'
       const drafts: IApplication[] = []
@@ -656,17 +656,16 @@ describe('In Progress tab', () => {
         setTimeout(resolve, 100)
       })
       testComponent.component.update()
+      testComponent.component.find('#row_0').hostNodes().simulate('click')
 
-      const instance = (
-        await waitForElement(testComponent.component, GridTable)
-      ).instance()
+      await new Promise((resolve) => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
 
-      instance.toggleExpanded('956281c9-1f47-4c26-948a-970dd23c4094')
-      const element = await waitForElement(
-        testComponent.component,
-        '#IN_PROGRESS-0'
+      expect(window.location.href).toContain(
+        '/recordAudit/956281c9-1f47-4c26-948a-970dd23c4094'
       )
-      expect(element.hostNodes().length).toBe(1)
     })
 
     describe('handles download status', () => {
@@ -940,7 +939,7 @@ describe('Tablet tests', () => {
     testComponent.component.update()
 
     expect(window.location.href).toContain(
-      '/details/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+      '/recordAudit/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
   })
 })
