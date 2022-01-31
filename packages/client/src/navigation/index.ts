@@ -599,16 +599,13 @@ export function goToTeamView(userDetails: IUserDetails) {
     if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
       return goToTeamSearch()
     } else {
-      return goToTeamUserList(
-        {
-          id: (userDetails.primaryOffice && userDetails.primaryOffice.id) || '',
-          searchableText:
-            (userDetails.primaryOffice && userDetails.primaryOffice.name) || '',
-          displayLabel:
-            (userDetails.primaryOffice && userDetails.primaryOffice.name) || ''
-        },
-        true
-      )
+      return goToTeamUserList({
+        id: (userDetails.primaryOffice && userDetails.primaryOffice.id) || '',
+        searchableText:
+          (userDetails.primaryOffice && userDetails.primaryOffice.name) || '',
+        displayLabel:
+          (userDetails.primaryOffice && userDetails.primaryOffice.name) || ''
+      })
     }
   }
 }

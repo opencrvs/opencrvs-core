@@ -31,7 +31,7 @@ const clearPassword = (component: ReactWrapper) => {
 }
 
 describe('Unlock page loads Properly', () => {
-  let testComponent: { component: ReactWrapper }
+  let testComponent: ReactWrapper
   const onForgetPinMock: jest.Mock = jest.fn()
   beforeEach(async () => {
     await flushPromises()
@@ -95,7 +95,7 @@ describe('Unlock page loads Properly', () => {
 })
 
 describe('For wrong inputs', () => {
-  let testComponent: { component: ReactWrapper }
+  let testComponent: ReactWrapper
   const onForgetPinMock: jest.Mock = jest.fn()
 
   beforeEach(async () => {
@@ -139,7 +139,7 @@ describe('For wrong inputs', () => {
 })
 
 describe('Pin locked session', () => {
-  let testComponent: { component: ReactWrapper }
+  let testComponent: ReactWrapper
   const onForgetPinMock: jest.Mock = jest.fn()
   beforeEach(async () => {
     await flushPromises()

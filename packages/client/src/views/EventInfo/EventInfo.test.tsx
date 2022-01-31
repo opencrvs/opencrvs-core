@@ -91,8 +91,8 @@ describe('EventInfo tests', () => {
       const continueButton = await waitForElement(component, '#continue')
       try {
         continueButton.hostNodes().simulate('click')
-      } catch (error: any) {
-        expect(error.message).toMatch(/Unknown eventType/)
+      } catch (error) {
+        expect((error as any).message).toMatch(/Unknown eventType/)
       }
     })
   })
