@@ -36,11 +36,17 @@ const VALIDATED_STATUS = 'VALIDATED'
 const WAITING_VALIDATION_STATUS = 'WAITING_VALIDATION'
 const REGISTERED_STATUS = 'REGISTERED'
 const CERTIFIED_STATUS = 'CERTIFIED'
-const REQUESTED_CORRECTION = 'REQUESTED_CORRECTION'
+const REQUESTED_CORRECTION_STATUS = 'REQUESTED_CORRECTION'
 
 export const NOTIFICATION_TYPES = ['birth-notification', 'death-notification']
 export const NAME_EN = 'en'
 
+export interface ICorrection {
+  section: string
+  fieldName: string
+  oldValue: string
+  newValue: string
+}
 export interface IOperationHistory {
   operationType: string
   operatedOn: string
@@ -55,6 +61,7 @@ export interface IOperationHistory {
   rejectComment?: string
   notificationFacilityName?: string
   notificationFacilityAlias?: string[]
+  correction?: ICorrection[]
 }
 
 export interface ICompositionBody {
@@ -214,6 +221,10 @@ export const createStatusHistory = async (
     )
     operationHistory.notificationFacilityName = facility?.name || ''
     operationHistory.notificationFacilityAlias = facility?.alias || []
+  }
+
+  if (isApplicationInStatus(body, REQUESTED_CORRECTION_STATUS)) {
+    updateOperationHistoryWithCorrection(operationHistory, task)
   }
   body.operationHistories = body.operationHistories || []
   body.operationHistories.push(operationHistory)
@@ -411,7 +422,11 @@ export function isValidOperationHistory(body: IBirthCompositionBody) {
       WAITING_VALIDATION_STATUS
     ],
     [CERTIFIED_STATUS]: [REGISTERED_STATUS, CERTIFIED_STATUS],
-    [REQUESTED_CORRECTION]: [REGISTERED_STATUS, CERTIFIED_STATUS]
+    [REQUESTED_CORRECTION_STATUS]: [
+      REGISTERED_STATUS,
+      CERTIFIED_STATUS,
+      REQUESTED_CORRECTION_STATUS
+    ]
   }
 
   const previousStatus = getPreviousStatus(body)
@@ -426,4 +441,33 @@ export function isValidOperationHistory(body: IBirthCompositionBody) {
   }
 
   return true
+}
+
+function updateOperationHistoryWithCorrection(
+  operationHistory: IOperationHistory,
+  task?: fhir.Task
+) {
+  if (
+    task?.input?.length &&
+    task?.output?.length &&
+    task.input.length === task.output.length
+  ) {
+    if (!operationHistory.correction) {
+      operationHistory.correction = []
+    }
+
+    for (let i = 0; i < task.input.length; i += 1) {
+      const section = task.input[i].valueCode || ''
+      const fieldName = task.input[i].valueId || ''
+      const oldValue = task.input[i].valueString || ''
+      const newValue = task.output[i].valueString || ''
+
+      operationHistory.correction?.push({
+        section,
+        fieldName,
+        oldValue,
+        newValue
+      })
+    }
+  }
 }
