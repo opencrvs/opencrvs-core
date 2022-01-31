@@ -234,7 +234,6 @@ export function goToOperationalReport(
   timeStart: Date = moment().subtract(1, 'years').toDate(),
   timeEnd: Date = moment().toDate()
 ) {
-  console.log('first')
   return push({
     pathname: OPERATIONAL_REPORT,
     search: stringify({

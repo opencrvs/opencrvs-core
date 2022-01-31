@@ -17,7 +17,6 @@ import {
   updateRegistrarWorkqueue
 } from '@client/applications'
 import { Header } from '@client/components/interface/Header/Header'
-import { IViewHeadingProps } from '@client/components/ViewHeading'
 import { messages as certificateMessage } from '@client/i18n/messages/views/certificate'
 import {
   goToEvents,
@@ -41,17 +40,14 @@ import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
 import { PAGE_TRANSITIONS_ENTER_TIME } from '@client/utils/constants'
 import {
   FloatingNotification,
-  ISearchInputProps,
   NOTIFICATION_TYPE,
   Spinner
 } from '@opencrvs/components/lib/interface'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
-import ApolloClient from 'apollo-client'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { Dispatch } from 'redux'
 import { ApprovalTab } from './tabs/approvals/approvalTab'
 import { InProgressTab } from './tabs/inProgress/inProgressTab'
 import { PrintTab } from './tabs/print/printTab'
@@ -65,7 +61,7 @@ export interface IProps extends IButtonProps {
   disabled?: boolean
   id: string
 }
-
+type IOwnProps = RouteComponentProps<{ tabId: string; selectorId?: string }>
 export interface IQueryData {
   inProgressTab: GQLEventSearchResultSet
   notificationTab: GQLEventSearchResultSet
@@ -138,15 +134,18 @@ const BodyContainer = styled.div`
   }
 `
 
-interface IBaseRegistrationHomeProps {
-  language: string
-  scope: Scope | null
+interface IDispatchProps {
   goToPage: typeof goToPage
   goToRegistrarHomeTab: typeof goToRegistrarHomeTab
   goToReviewDuplicate: typeof goToReviewDuplicate
   goToPrintCertificate: typeof goToPrintCertificate
   goToEvents: typeof goToEvents
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
+}
+
+interface IBaseOfficeHomeStateProps {
+  language: string
+  scope: Scope | null
   registrarLocationId: string
   tabId: string
   selectorId: string
@@ -156,7 +155,7 @@ interface IBaseRegistrationHomeProps {
   storedApplications: IApplication[]
 }
 
-interface IRegistrationHomeState {
+interface IOfficeHomeState {
   progressCurrentPage: number
   reviewCurrentPage: number
   updatesCurrentPage: number
@@ -166,10 +165,9 @@ interface IRegistrationHomeState {
   showCertificateToast: boolean
 }
 
-type IRegistrationHomeProps = IntlShapeProps &
-  IViewHeadingProps &
-  ISearchInputProps &
-  IBaseRegistrationHomeProps
+type IOfficeHomeProps = IntlShapeProps &
+  IDispatchProps &
+  IBaseOfficeHomeStateProps
 
 const TAB_ID = {
   inProgress: 'progress',
@@ -189,13 +187,13 @@ export const EVENT_STATUS = {
   WAITING_VALIDATION: 'WAITING_VALIDATION'
 }
 export class OfficeHomeView extends React.Component<
-  IRegistrationHomeProps,
-  IRegistrationHomeState
+  IOfficeHomeProps,
+  IOfficeHomeState
 > {
   pageSize = 10
   showPaginated = false
   interval: any = undefined
-  constructor(props: IRegistrationHomeProps) {
+  constructor(props: IOfficeHomeProps) {
     super(props)
     this.state = {
       progressCurrentPage: 1,
@@ -230,7 +228,9 @@ export class OfficeHomeView extends React.Component<
   }
 
   componentDidMount() {
-    setTimeout(() => this.syncWorkqueue(), PAGE_TRANSITIONS_ENTER_TIME)
+    setTimeout(() => {
+      this.syncWorkqueue()
+    }, PAGE_TRANSITIONS_ENTER_TIME)
     this.interval = setInterval(() => {
       this.syncWorkqueue()
     }, 300000)
@@ -240,10 +240,7 @@ export class OfficeHomeView extends React.Component<
     clearInterval(this.interval)
   }
 
-  componentDidUpdate(
-    prevProps: IRegistrationHomeProps,
-    prevState: IRegistrationHomeState
-  ) {
+  componentDidUpdate(prevProps: IOfficeHomeProps, prevState: IOfficeHomeState) {
     if (prevProps.tabId !== this.props.tabId) {
       this.setState({
         progressCurrentPage: 1,
@@ -475,7 +472,7 @@ export class OfficeHomeView extends React.Component<
 function mapStateToProps(
   state: IStoreState,
   props: RouteComponentProps<{ tabId: string; selectorId?: string }>
-) {
+): IBaseOfficeHomeStateProps {
   const { match } = props
   const userDetails = getUserDetails(state)
   const registrarLocationId =
@@ -501,8 +498,12 @@ function mapStateToProps(
       []
   }
 }
-
-export const OfficeHome = connect(mapStateToProps, {
+export const OfficeHome = connect<
+  IBaseOfficeHomeStateProps,
+  IDispatchProps,
+  IOwnProps,
+  IStoreState
+>(mapStateToProps, {
   goToEvents,
   goToPage,
   goToRegistrarHomeTab,

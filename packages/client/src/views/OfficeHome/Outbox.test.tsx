@@ -130,7 +130,7 @@ describe('OutBox tests', () => {
     'Rejecting...',
     'Waiting to retry'
   ]
-  const { store } = createStore()
+  const { store, history } = createStore()
 
   describe('When all the fields are fully provided', () => {
     it('renders texts in data rows for birth applications', async () => {
@@ -143,9 +143,9 @@ describe('OutBox tests', () => {
       )
       const comp = await createTestComponent(
         <OutBox application={applications} />,
-        store
+        { store, history }
       )
-      const testComp = comp.component
+      const testComp = comp
       for (let i = 0; i < 6; i++) {
         testComp
           .find(`#row_${i}`)
@@ -168,9 +168,9 @@ describe('OutBox tests', () => {
       )
       const comp = await createTestComponent(
         <OutBox application={applications} />,
-        store
+        { store, history }
       )
-      const testComp = comp.component
+      const testComp = comp
       for (let i = 0; i < 6; i++) {
         testComp
           .find(`#row_${i}`)
@@ -191,9 +191,9 @@ describe('OutBox tests', () => {
 
       const comp = await createTestComponent(
         <OutBox application={applications} />,
-        store
+        { store, history }
       )
-      const testComp = comp.component
+      const testComp = comp
       testComp
         .find(`#row_0`)
         .find('span')
@@ -211,9 +211,9 @@ describe('OutBox tests', () => {
       noFirstNameBirthApp.data.child.firstNamesEng = ''
       const comp = await createTestComponent(
         <OutBox application={[noFirstNameBirthApp]} />,
-        store
+        { store, history }
       )
-      const testComp = comp.component
+      const testComp = comp
       testComp
         .find('#row_0')
         .find('span')
@@ -229,9 +229,9 @@ describe('OutBox tests', () => {
       noLastNameDeathApp.data.deceased.familyNameEng = ''
       const comp = await createTestComponent(
         <OutBox application={[noLastNameDeathApp]} />,
-        store
+        { store, history }
       )
-      const testComp = comp.component
+      const testComp = comp
       testComp
         .find('#row_1')
         .find('span')
@@ -248,9 +248,9 @@ describe('OutBox tests', () => {
 
       const comp = await createTestComponent(
         <OutBox application={[noNameBirthApp]} />,
-        store
+        { store, history }
       )
-      const testComp = comp.component
+      const testComp = comp
       testComp
         .find('#row_1')
         .find('span')
@@ -261,8 +261,11 @@ describe('OutBox tests', () => {
         )
     })
     it('displays empty div if there is no application', async () => {
-      const comp = await createTestComponent(<OutBox application={[]} />, store)
-      const testComp = comp.component
+      const comp = await createTestComponent(<OutBox application={[]} />, {
+        store,
+        history
+      })
+      const testComp = comp
       expect(testComp.find('#row_0').exists()).toBeFalsy()
     })
   })
@@ -273,12 +276,10 @@ describe('OutBox tests', () => {
       applications.push(birthApp)
     }
     it('shows pagination bar when pagination is used', async () => {
-      const testComp = (
-        await createTestComponent(
-          <OutBox application={applications} showPaginated={true} />,
-          store
-        )
-      ).component
+      const testComp = await createTestComponent(
+        <OutBox application={applications} showPaginated={true} />,
+        { store, history }
+      )
       expect(testComp.exists('#pagination')).toBeTruthy()
       testComp
         .find('#pagination')
@@ -286,12 +287,10 @@ describe('OutBox tests', () => {
         .map((child) => child.simulate('click'))
     })
     it('shows loadmore button when loadmore is used', async () => {
-      const testComp = (
-        await createTestComponent(
-          <OutBox application={applications} showPaginated={false} />,
-          store
-        )
-      ).component
+      const testComp = await createTestComponent(
+        <OutBox application={applications} showPaginated={false} />,
+        { store, history }
+      )
       expect(testComp.exists('#load_more_button')).toBeTruthy()
       testComp
         .find('#load_more_button')

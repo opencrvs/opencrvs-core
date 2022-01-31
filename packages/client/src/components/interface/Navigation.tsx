@@ -101,6 +101,16 @@ const USER_SCOPE: IUSER_SCOPE = {
     GROUP_ID.applicationGroup,
     GROUP_ID.menuGroup
   ],
+  DISTRICT_REGISTRAR: [
+    TAB_ID.inProgress,
+    TAB_ID.readyForReview,
+    TAB_ID.sentForUpdates,
+    TAB_ID.readyToPrint,
+    TAB_ID.performance,
+    TAB_ID.team,
+    GROUP_ID.applicationGroup,
+    GROUP_ID.menuGroup
+  ],
   LOCAL_REGISTRAR: [
     TAB_ID.inProgress,
     TAB_ID.readyForReview,
@@ -247,6 +257,7 @@ export const NavigationView = (props: IFullProps) => {
     data,
     storedApplications
   )
+
   const fieldAgentLocationId = userDetails && getUserLocation(userDetails).id
 
   const applicationCount = {
@@ -268,6 +279,7 @@ export const NavigationView = (props: IFullProps) => {
         : filteredData.externalValidationTab.totalItems,
     readyToPrint: !initialSyncDone ? 0 : filteredData.printTab.totalItems
   }
+
   return (
     <LeftNavigation
       applicationName={intl.formatMessage(constantsMessages.applicationName)}
@@ -295,6 +307,9 @@ export const NavigationView = (props: IFullProps) => {
               data?: any
               error?: any
             }) => {
+              if (error) {
+                console.log(error)
+              }
               if (loading) {
                 return (
                   <StyledSpinner

@@ -20,18 +20,15 @@ import { checkAuth } from '@client/profile/profileActions'
 import { queries } from '@client/profile/queries'
 import { createStore } from '@client/store'
 import {
+  createRouterProps,
   createTestComponent,
-  createTestComponentWithApolloClient,
   mockUserResponse,
   resizeWindow
 } from '@client/tests/util'
 import { waitForElement, waitFor } from '@client/tests/wait-for-element'
 import { createClient } from '@client/utils/apolloClient'
 import { REGISTRATION_HOME_QUERY } from '@client/views/OfficeHome/queries'
-import {
-  RegistrationHome,
-  EVENT_STATUS
-} from '@client/views/OfficeHome/OfficeHome'
+import { OfficeHome, EVENT_STATUS } from '@client/views/OfficeHome/OfficeHome'
 import { Validate } from '@opencrvs/components/lib/icons'
 import { GridTable } from '@opencrvs/components/lib/interface'
 import ApolloClient from 'apollo-client'
@@ -229,10 +226,10 @@ const mockReviewTabData = {
   ]
 }
 
-describe('RegistrationHome sent for review tab related tests', () => {
+describe('OfficeHome sent for review tab related tests', () => {
   let store: ReturnType<typeof createStore>['store']
   let history: ReturnType<typeof createStore>['history']
-  let client: ApolloClient<{}>
+  let apolloClient: ApolloClient<{}>
 
   beforeEach(async () => {
     ;(queries.fetchUserDetails as jest.Mock).mockReturnValue(mockUserResponse)
@@ -240,7 +237,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
     store = createdStore.store
     history = createdStore.history
 
-    client = createClient(store)
+    apolloClient = createClient(store)
 
     getItem.mockReturnValue(registerScopeToken)
     await store.dispatch(checkAuth({ '?token': registerScopeToken }))
@@ -258,10 +255,10 @@ describe('RegistrationHome sent for review tab related tests', () => {
           data: mockReviewTabData
         }}
       />,
-      store
+      { store, history }
     )
 
-    const gridTable = await waitForElement(testComponent.component, GridTable)
+    const gridTable = await waitForElement(testComponent, GridTable)
 
     const data = gridTable.prop('content')
     const EXPECTED_DATE_OF_APPLICATION = formattedDuration(
@@ -292,10 +289,10 @@ describe('RegistrationHome sent for review tab related tests', () => {
           }
         }}
       />,
-      store
+      { store, history }
     )
 
-    const gridTable = await waitForElement(testComponent.component, GridTable)
+    const gridTable = await waitForElement(testComponent, GridTable)
     const data = gridTable.prop('content')
     expect(data.length).toBe(0)
   })
@@ -315,17 +312,14 @@ describe('RegistrationHome sent for review tab related tests', () => {
         }}
         showPaginated={true}
       />,
-      store
+      { store, history }
     )
 
-    const pagination = await waitForElement(
-      testComponent.component,
-      '#pagination'
-    )
+    const pagination = await waitForElement(testComponent, '#pagination')
 
     expect(pagination.hostNodes()).toHaveLength(1)
 
-    testComponent.component
+    testComponent
       .find('#pagination button')
       .last()
       .hostNodes()
@@ -346,21 +340,14 @@ describe('RegistrationHome sent for review tab related tests', () => {
         }}
         showPaginated={false}
       />,
-      store
+      { store, history }
     )
 
-    const loadmore = await waitForElement(
-      testComponent.component,
-      '#load_more_button'
-    )
+    const loadmore = await waitForElement(testComponent, '#load_more_button')
 
     expect(loadmore.hostNodes()).toHaveLength(1)
 
-    testComponent.component
-      .find('#load_more_button')
-      .last()
-      .hostNodes()
-      .simulate('click')
+    testComponent.find('#load_more_button').last().hostNodes().simulate('click')
   })
 
   it('renders expanded area for validated status', async () => {
@@ -455,19 +442,16 @@ describe('RegistrationHome sent for review tab related tests', () => {
           }
         }}
       />,
-      store
+      { store, history }
     )
 
     const gridTable = (
-      await waitForElement(testComponent.component, GridTable)
+      await waitForElement(testComponent, GridTable)
     ).instance()
 
     gridTable.toggleExpanded('bc09200d-0160-43b4-9e2b-5b9e90424e95')
 
-    const element = await waitForElement(
-      testComponent.component,
-      '#VALIDATED-0'
-    )
+    const element = await waitForElement(testComponent, '#VALIDATED-0')
 
     expect(element.hostNodes().length).toBe(1)
   })
@@ -564,23 +548,21 @@ describe('RegistrationHome sent for review tab related tests', () => {
           }
         }}
       />,
-      store
+      { store, history }
     )
 
-    const instance = (
-      await waitForElement(testComponent.component, GridTable)
-    ).instance()
+    const instance = (await waitForElement(testComponent, GridTable)).instance()
 
     instance.toggleExpanded('bc09200d-0160-43b4-9e2b-5b9e90424e95')
 
-    const element = await waitForElement(testComponent.component, '#DECLARED-0')
+    const element = await waitForElement(testComponent, '#DECLARED-0')
 
     expect(element.hostNodes().length).toBe(1)
   })
 
   describe('handles download status', () => {
     let testComponent: ReactWrapper<{}, {}>
-    let createdTestComponent: { component: ReactWrapper; store: Store }
+    let createdTestComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
       Date.now = jest.fn(() => 1554055200000)
 
@@ -706,16 +688,14 @@ describe('RegistrationHome sent for review tab related tests', () => {
             }
           }
         })
-      client.query = mockListSyncController
+      apolloClient.query = mockListSyncController
 
-      createdTestComponent = await createTestComponentWithApolloClient(
-        // @ts-ignore
-        <RegistrationHome />,
-        store,
-        client
+      createdTestComponent = await createTestComponent(
+        <OfficeHome {...createRouterProps('')} />,
+        { store, history, apolloClient }
       )
 
-      testComponent = createdTestComponent.component
+      testComponent = createdTestComponent
     })
 
     it('downloads application after clicking download button', async () => {
@@ -759,9 +739,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
         Action.LOAD_REVIEW_APPLICATION
       )
       downloadedApplication.downloadStatus = DOWNLOAD_STATUS.FAILED
-      createdTestComponent.store.dispatch(
-        storeApplication(downloadedApplication)
-      )
+      store.dispatch(storeApplication(downloadedApplication))
 
       testComponent.update()
 
@@ -840,20 +818,20 @@ describe('RegistrationHome sent for review tab related tests', () => {
           }
         }}
       />,
-      store
+      { store, history }
     )
 
-    const validate = await waitForElement(testComponent.component, Validate)
+    const validate = await waitForElement(testComponent, Validate)
 
     expect(validate).toHaveLength(1)
   })
 
   describe.skip('handles download status for possible duplicate application', () => {
     let testComponent: ReactWrapper<{}, {}>
-    let createdTestComponent: { component: ReactWrapper; store: Store }
+    let createdTestComponent: ReactWrapper<{}, {}>
     beforeAll(async () => {
       Date.now = jest.fn(() => 1554055200000)
-      const graphqlMock = [
+      const graphqlMocks = [
         {
           request: {
             query: REGISTRATION_HOME_QUERY,
@@ -885,16 +863,13 @@ describe('RegistrationHome sent for review tab related tests', () => {
 
       createdTestComponent = await createTestComponent(
         // @ts-ignore
-        <RegistrationHome />,
-        store,
-        graphqlMock
+        <OfficeHome />,
+        { store, history, graphqlMocks }
       )
 
       getItem.mockReturnValue(registerScopeToken)
-      await createdTestComponent.store.dispatch(
-        checkAuth({ '?token': registerScopeToken })
-      )
-      testComponent = createdTestComponent.component
+      await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+      testComponent = createdTestComponent
     })
 
     it('starts downloading after clicking download button', async () => {
@@ -918,9 +893,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
         Action.LOAD_REVIEW_APPLICATION
       )
       downloadedApplication.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
-      createdTestComponent.store.dispatch(
-        modifyApplication(downloadedApplication)
-      )
+      store.dispatch(modifyApplication(downloadedApplication))
 
       const action = await waitForElement(
         testComponent,
@@ -944,9 +917,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
         Action.LOAD_REVIEW_APPLICATION
       )
       downloadedApplication.downloadStatus = DOWNLOAD_STATUS.FAILED
-      createdTestComponent.store.dispatch(
-        modifyApplication(downloadedApplication)
-      )
+      store.dispatch(modifyApplication(downloadedApplication))
 
       testComponent.update()
 
@@ -961,9 +932,12 @@ describe('RegistrationHome sent for review tab related tests', () => {
 })
 
 describe('Tablet tests', () => {
-  const { store } = createStore()
+  let { store, history } = createStore()
 
   beforeAll(async () => {
+    const s = createStore()
+    store = s.store
+    history = s.history
     resizeWindow(800, 1280)
   })
 
@@ -1043,15 +1017,13 @@ describe('Tablet tests', () => {
           }
         }}
       />,
-      store
+      { store, history }
     )
 
     getItem.mockReturnValue(registerScopeToken)
-    await testComponent.store.dispatch(
-      checkAuth({ '?token': registerScopeToken })
-    )
+    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
-    const row = await waitForElement(testComponent.component, '#row_0')
+    const row = await waitForElement(testComponent, '#row_0')
     row.hostNodes().simulate('click')
 
     expect(window.location.href).toContain(

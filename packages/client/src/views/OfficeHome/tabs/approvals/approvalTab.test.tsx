@@ -29,6 +29,7 @@ import {
   GQLDeathEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
 import { formattedDuration } from '@client/utils/date-formatting'
+import { History } from 'history'
 
 const validateScopeToken = jwt.sign(
   { scope: ['validate'] },
@@ -138,8 +139,9 @@ const getItem = window.localStorage.getItem as jest.Mock
 
 describe('RegistrationHome sent for approval tab related tests', () => {
   let store: AppStore
+  let history: History
   beforeEach(async () => {
-    store = createStore().store
+    ;({ store, history } = createStore())
     getItem.mockReturnValue(validateScopeToken)
     await store.dispatch(checkAuth({ '?token': validateScopeToken }))
   })
@@ -216,11 +218,11 @@ describe('RegistrationHome sent for approval tab related tests', () => {
           }
         }}
       />,
-      store
+      { store, history }
     )
 
-    testComponent.component.update()
-    const data = testComponent.component.find(GridTable).prop('content')
+    testComponent.update()
+    const data = testComponent.find(GridTable).prop('content')
     const EXPECTED_DATE_OF_APPLICATION = formattedDuration(
       moment(
         moment(TIME_STAMP, 'x').format('YYYY-MM-DD HH:mm:ss'),
@@ -250,12 +252,12 @@ describe('RegistrationHome sent for approval tab related tests', () => {
           }
         }}
       />,
-      store
+      { store, history }
     )
 
-    const data = (
-      await waitForElement(testComponent.component, GridTable)
-    ).prop('content')
+    const data = (await waitForElement(testComponent, GridTable)).prop(
+      'content'
+    )
     expect(data.length).toBe(0)
   })
 
@@ -274,14 +276,12 @@ describe('RegistrationHome sent for approval tab related tests', () => {
         }}
         showPaginated={true}
       />,
-      store
+      { store, history }
     )
 
-    expect(
-      testComponent.component.find('#pagination').hostNodes()
-    ).toHaveLength(1)
+    expect(testComponent.find('#pagination').hostNodes()).toHaveLength(1)
 
-    testComponent.component
+    testComponent
       .find('#pagination button')
       .last()
       .hostNodes()
@@ -303,18 +303,12 @@ describe('RegistrationHome sent for approval tab related tests', () => {
         }}
         showPaginated={false}
       />,
-      store
+      { store, history }
     )
 
-    expect(
-      testComponent.component.find('#load_more_button').hostNodes()
-    ).toHaveLength(1)
+    expect(testComponent.find('#load_more_button').hostNodes()).toHaveLength(1)
 
-    testComponent.component
-      .find('#load_more_button')
-      .last()
-      .hostNodes()
-      .simulate('click')
+    testComponent.find('#load_more_button').last().hostNodes().simulate('click')
   })
 
   it('renders expanded area for validated status', async () => {
@@ -408,30 +402,28 @@ describe('RegistrationHome sent for approval tab related tests', () => {
           }
         }}
       />,
-      store
+      { store, history }
     )
 
     // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {
       setTimeout(resolve, 200)
     })
-    testComponent.component.update()
-    const instance = testComponent.component.find(GridTable).instance() as any
+    testComponent.update()
+    const instance = testComponent.find(GridTable).instance() as any
 
     instance.toggleExpanded('bc09200d-0160-43b4-9e2b-5b9e90424e95')
     // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
-    testComponent.component.update()
-    expect(
-      testComponent.component.find('#VALIDATED-0').hostNodes().length
-    ).toBe(1)
+    testComponent.update()
+    expect(testComponent.find('#VALIDATED-0').hostNodes().length).toBe(1)
   })
 })
 
 describe('Tablet tests', () => {
-  const { store } = createStore()
+  const { store, history } = createStore()
 
   beforeAll(async () => {
     getItem.mockReturnValue(validateScopeToken)
@@ -515,17 +507,17 @@ describe('Tablet tests', () => {
           }
         }}
       />,
-      store
+      { store, history }
     )
 
-    testComponent.component.update()
-    const element = await waitForElement(testComponent.component, '#row_0')
+    testComponent.update()
+    const element = await waitForElement(testComponent, '#row_0')
     element.hostNodes().simulate('click')
 
     await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
-    testComponent.component.update()
+    testComponent.update()
 
     expect(window.location.href).toContain(
       '/details/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'

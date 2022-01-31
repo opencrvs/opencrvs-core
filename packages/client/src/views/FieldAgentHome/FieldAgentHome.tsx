@@ -315,11 +315,13 @@ class FieldAgentHomeView extends React.Component<
       intl,
       applicationsReadyToSend
     } = this.props
+
     const tabId = match.params.tabId || TAB_ID.sentForReview
     const fieldAgentLocationId = userDetails && getUserLocation(userDetails).id
     const jurisdictionLocationId =
       userDetails && getJurisdictionLocationIdFromUserDetails(userDetails)
     const role = userDetails && userDetails.role
+
     return (
       <>
         {role && FIELD_AGENT_ROLES.includes(role) && (

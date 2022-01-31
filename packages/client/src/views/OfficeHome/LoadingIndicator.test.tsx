@@ -15,7 +15,7 @@ import { createTestComponent } from '@client/tests/util'
 import { createStore } from '@client/store'
 
 describe('LoadingIndicator test cases', () => {
-  const { store } = createStore()
+  const { store, history } = createStore()
 
   it('Should display the Loading text', async () => {
     // @ts-ignore
@@ -25,10 +25,9 @@ describe('LoadingIndicator test cases', () => {
         hasError={false}
         noApplication={false}
       />,
-      store
+      { store, history }
     )
-    const isShowingLoadingText =
-      testComponent.component.find('span#loading-text').length
+    const isShowingLoadingText = testComponent.find('span#loading-text').length
     expect(isShowingLoadingText).toBe(1)
   })
 
@@ -40,9 +39,9 @@ describe('LoadingIndicator test cases', () => {
         hasError={true}
         noApplication={false}
       />,
-      store
+      { store, history }
     )
-    const isShowingLoadingText = testComponent.component.find(
+    const isShowingLoadingText = testComponent.find(
       'div#search-result-error-text-count'
     ).length
     expect(isShowingLoadingText).toBe(1)
@@ -56,9 +55,9 @@ describe('LoadingIndicator test cases', () => {
         hasError={false}
         noApplication={true}
       />,
-      store
+      { store, history }
     )
-    const isShowingLoadingText = testComponent.component.find(
+    const isShowingLoadingText = testComponent.find(
       'span#no-application-text'
     ).length
     expect(isShowingLoadingText).toBe(1)

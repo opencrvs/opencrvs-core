@@ -21,13 +21,12 @@ import { storage } from '@client/storage'
 import { createStore } from '@client/store'
 import {
   createTestComponent,
-  createTestComponentWithApolloClient,
   mockUserResponse,
   resizeWindow
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { createClient } from '@client/utils/apolloClient'
-import { RegistrationHome } from '@client/views/OfficeHome/OfficeHome'
+import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { GridTable } from '@opencrvs/components/lib/interface'
 import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
@@ -312,10 +311,10 @@ describe('RegistrarHome ready to print tab related tests', () => {
           }
         }}
       />,
-      store
+      { store, history }
     )
 
-    const element = await waitForElement(testComponent.component, GridTable)
+    const element = await waitForElement(testComponent, GridTable)
     const data = element.prop('content')
     const EXPECTED_DATE_OF_APPLICATION = formattedDuration(
       moment(
@@ -343,11 +342,11 @@ describe('RegistrarHome ready to print tab related tests', () => {
           data: { totalItems: 0, results: [] }
         }}
       />,
-      store
+      { store, history }
     )
 
-    testComponent.component.update()
-    const data = testComponent.component.find(GridTable).prop('content')
+    testComponent.update()
+    const data = testComponent.find(GridTable).prop('content')
     expect(data.length).toBe(0)
   })
 
@@ -363,14 +362,14 @@ describe('RegistrarHome ready to print tab related tests', () => {
         }}
         showPaginated={true}
       />,
-      store
+      { store, history }
     )
 
-    const element = await waitForElement(testComponent.component, '#pagination')
+    const element = await waitForElement(testComponent, '#pagination')
 
     expect(element.hostNodes()).toHaveLength(1)
 
-    testComponent.component
+    testComponent
       .find('#pagination button')
       .last()
       .hostNodes()
@@ -388,21 +387,14 @@ describe('RegistrarHome ready to print tab related tests', () => {
         }}
         showPaginated={false}
       />,
-      store
+      { store, history }
     )
 
-    const element = await waitForElement(
-      testComponent.component,
-      '#load_more_button'
-    )
+    const element = await waitForElement(testComponent, '#load_more_button')
 
     expect(element.hostNodes()).toHaveLength(1)
 
-    testComponent.component
-      .find('#load_more_button')
-      .last()
-      .hostNodes()
-      .simulate('click')
+    testComponent.find('#load_more_button').last().hostNodes().simulate('click')
   })
 
   describe('When a row is expanded', () => {
@@ -419,19 +411,16 @@ describe('RegistrarHome ready to print tab related tests', () => {
             data: mockPrintTabData
           }}
         />,
-        store
+        { store, history }
       )
 
       const instance = (
-        await waitForElement(testComponent.component, GridTable)
+        await waitForElement(testComponent, GridTable)
       ).instance() as any
 
       instance.toggleExpanded('956281c9-1f47-4c26-948a-970dd23c4094')
 
-      expandedRow = await waitForElement(
-        testComponent.component,
-        '#REGISTERED-0'
-      )
+      expandedRow = await waitForElement(testComponent, '#REGISTERED-0')
     })
 
     it('renders expanded area for ready to print', async () => {
@@ -447,7 +436,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
   describe('handles download status', () => {
     let testComponent: ReactWrapper<{}, {}>
-    let createdTestComponent: { component: ReactWrapper; store: Store }
+    let createdTestComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
       Date.now = jest.fn(() => 1554055200000)
       mockListSyncController
@@ -715,13 +704,12 @@ describe('RegistrarHome ready to print tab related tests', () => {
         })
       client.query = mockListSyncController
 
-      createdTestComponent = await createTestComponentWithApolloClient(
+      createdTestComponent = await createTestComponent(
         // @ts-ignore
-        <RegistrationHome match={{ params: { tabId: 'print' } }} />,
-        store,
-        client
+        <OfficeHome match={{ params: { tabId: 'print' } }} />,
+        { store, history, apolloClient: client }
       )
-      testComponent = createdTestComponent.component
+      testComponent = createdTestComponent
     })
 
     it('downloads application after clicking download button', async () => {
@@ -765,9 +753,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
         Action.LOAD_CERTIFICATE_APPLICATION
       )
       downloadedApplication.downloadStatus = DOWNLOAD_STATUS.FAILED
-      createdTestComponent.store.dispatch(
-        storeApplication(downloadedApplication)
-      )
+      store.dispatch(storeApplication(downloadedApplication))
 
       testComponent.update()
 
@@ -782,7 +768,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 })
 
 describe('Tablet tests', () => {
-  const { store } = createStore()
+  const { store, history } = createStore()
 
   beforeAll(async () => {
     getItem.mockReturnValue(registerScopeToken)
@@ -805,17 +791,17 @@ describe('Tablet tests', () => {
           data: mockPrintTabData
         }}
       />,
-      store
+      { store, history }
     )
 
-    testComponent.component.update()
-    const element = await waitForElement(testComponent.component, '#row_0')
+    testComponent.update()
+    const element = await waitForElement(testComponent, '#row_0')
     element.hostNodes().simulate('click')
 
     await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
-    testComponent.component.update()
+    testComponent.update()
 
     expect(window.location.href).toContain(
       '/details/956281c9-1f47-4c26-948a-970dd23c4094'

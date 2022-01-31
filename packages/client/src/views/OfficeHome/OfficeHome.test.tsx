@@ -12,7 +12,8 @@
 import {
   createApplication,
   storeApplication,
-  IUserData
+  IUserData,
+  updateRegistrarWorkqueueSuccessActionCreator
 } from '@client/applications'
 import { Event } from '@client/forms'
 import { checkAuth } from '@client/profile/profileActions'
@@ -21,7 +22,6 @@ import { storage } from '@client/storage'
 import { createStore } from '@client/store'
 import {
   createTestComponent,
-  createTestComponentWithApolloClient,
   mockUserResponse,
   flushPromises
 } from '@client/tests/util'
@@ -31,7 +31,7 @@ import { Spinner } from '@opencrvs/components/lib/interface'
 import { merge } from 'lodash'
 import * as React from 'react'
 
-import { waitForElement } from '@client/tests/wait-for-element'
+import { waitFor, waitForElement } from '@client/tests/wait-for-element'
 import { SELECTOR_ID } from './tabs/inProgress/inProgressTab'
 
 const registerScopeToken =
@@ -129,9 +129,11 @@ queries.fetchUserDetails = mockFetchUserDetails
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 
-const { store, history } = createStore()
-const client = createClient(store)
-beforeAll(async () => {
+let { store, history } = createStore()
+let client = createClient(store)
+beforeEach(async () => {
+  ;({ store, history } = createStore())
+  client = createClient(store)
   getItem.mockReturnValue(registerScopeToken)
   await store.dispatch(checkAuth({ '?token': registerScopeToken }))
 })
@@ -151,15 +153,12 @@ describe('OfficeHome related tests', () => {
         staticContext={undefined}
         history={history}
         location={history.location}
-        id={'Test'}
-        buttonLabel={'Button Test'}
-        onSubmit={() => alert(`submitted`)}
       />,
-      store
+      { store, history }
     )
 
     // @ts-ignore
-    expect(testComponent.component.containsMatchingElement(Spinner)).toBe(true)
+    expect(testComponent.containsMatchingElement(Spinner)).toBe(true)
   })
 
   describe('should load data', () => {
@@ -178,7 +177,7 @@ describe('OfficeHome related tests', () => {
       client.query = mockListSyncController
     })
     it('renders page with five tabs', async () => {
-      const testComponent = await createTestComponentWithApolloClient(
+      const testComponent = await createTestComponent(
         <OfficeHome
           match={{
             params: { tabId: 'progress' },
@@ -189,30 +188,19 @@ describe('OfficeHome related tests', () => {
           staticContext={undefined}
           history={history}
           location={history.location}
-          id={'Test'}
-          buttonLabel={'Button Test'}
-          onSubmit={() => alert(`submitted`)}
         />,
-        store,
-        client
+        { store, history, apolloClient: client }
       )
 
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-
-      testComponent.component.update()
-      const app = testComponent.component
-      app.find('#tab_progress').hostNodes().simulate('click')
-      app.find('#tab_review').hostNodes().simulate('click')
-      app.find('#tab_updates').hostNodes().simulate('click')
-      app.find('#tab_print').hostNodes().simulate('click')
-      app.find('#tab_waitingValidation').hostNodes().simulate('click')
+      await waitForElement(testComponent, '#navigation_progress')
+      await waitForElement(testComponent, '#navigation_review')
+      await waitForElement(testComponent, '#navigation_updates')
+      await waitForElement(testComponent, '#navigation_print')
+      await waitForElement(testComponent, '#navigation_waitingValidation')
     })
 
     it('renders tabs with count', async () => {
-      const testComponent = await createTestComponentWithApolloClient(
+      const testComponent = await createTestComponent(
         <OfficeHome
           match={{
             params: { tabId: 'progress' },
@@ -223,35 +211,32 @@ describe('OfficeHome related tests', () => {
           staticContext={undefined}
           history={history}
           location={history.location}
-          id={'Test'}
-          buttonLabel={'Button Test'}
-          onSubmit={() => alert(`submitted`)}
         />,
-        store,
-        client
+        { store, history, apolloClient: client }
+      )
+      await flushPromises()
+
+      const app = testComponent
+      await waitForElement(app, '#navigation_progress')
+      await waitFor(() =>
+        app
+          .find('#navigation_progress')
+          .hostNodes()
+          .text()
+          .includes('In Progress7')
       )
 
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 600)
-      })
-
-      testComponent.component.update()
-      const app = testComponent.component
-      expect(app.find('#tab_progress').hostNodes().text()).toContain(
-        'In progress (7)'
+      expect(app.find('#navigation_review').hostNodes().text()).toContain(
+        'Ready for review3'
       )
-      expect(app.find('#tab_review').hostNodes().text()).toContain(
-        'Ready for review (3)'
+      expect(app.find('#navigation_updates').hostNodes().text()).toContain(
+        'Sent for updates4'
       )
-      expect(app.find('#tab_updates').hostNodes().text()).toContain(
-        'Sent for updates (4)'
-      )
-      expect(app.find('#tab_waitingValidation').hostNodes().text()).toContain(
-        'Waiting for BRIS (6)'
-      )
-      expect(app.find('#tab_print').hostNodes().text()).toContain(
-        'Ready to print (1)'
+      expect(
+        app.find('#navigation_waitingValidation').hostNodes().text()
+      ).toContain('In external Validation6')
+      expect(app.find('#navigation_print').hostNodes().text()).toContain(
+        'Ready to print 1'
       )
     })
   })
@@ -271,7 +256,7 @@ describe('OfficeHome related tests', () => {
       client.query = mockListSyncController
     })
     it('shows no-record message in inProgress drafts tab', async () => {
-      const testComponent = await createTestComponentWithApolloClient(
+      const testComponent = await createTestComponent(
         <OfficeHome
           match={{
             params: { tabId: 'progress' },
@@ -282,21 +267,17 @@ describe('OfficeHome related tests', () => {
           staticContext={undefined}
           history={history}
           location={history.location}
-          id={'Test'}
-          buttonLabel={'Button Test'}
-          onSubmit={() => alert(`submitted`)}
         />,
-        store,
-        client
+        { store, history, apolloClient: client }
       )
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      await waitForElement(testComponent.component, '#no-record')
+      await waitForElement(testComponent, '#no-record')
     })
     it('shows no-record message in inProgress fieldagent drafts tab', async () => {
-      const testComponent = await createTestComponentWithApolloClient(
+      const testComponent = await createTestComponent(
         <OfficeHome
           match={{
             params: {
@@ -310,21 +291,17 @@ describe('OfficeHome related tests', () => {
           staticContext={undefined}
           history={history}
           location={history.location}
-          id={'Test'}
-          buttonLabel={'Button Test'}
-          onSubmit={() => alert(`submitted`)}
         />,
-        store,
-        client
+        { store, history, apolloClient: client }
       )
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      await waitForElement(testComponent.component, '#no-record')
+      await waitForElement(testComponent, '#no-record')
     })
     it('shows no-record message in inProgress hospital drafts tab', async () => {
-      const testComponent = await createTestComponentWithApolloClient(
+      const testComponent = await createTestComponent(
         <OfficeHome
           match={{
             params: {
@@ -338,21 +315,17 @@ describe('OfficeHome related tests', () => {
           staticContext={undefined}
           history={history}
           location={history.location}
-          id={'Test'}
-          buttonLabel={'Button Test'}
-          onSubmit={() => alert(`submitted`)}
         />,
-        store,
-        client
+        { store, history, apolloClient: client }
       )
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      await waitForElement(testComponent.component, '#no-record')
+      await waitForElement(testComponent, '#no-record')
     })
     it('shows no-record message  in review tab', async () => {
-      const testComponent = await createTestComponentWithApolloClient(
+      const testComponent = await createTestComponent(
         <OfficeHome
           match={{
             params: { tabId: 'review' },
@@ -363,22 +336,18 @@ describe('OfficeHome related tests', () => {
           staticContext={undefined}
           history={history}
           location={history.location}
-          id={'Test'}
-          buttonLabel={'Button Test'}
-          onSubmit={() => alert(`submitted`)}
         />,
-        store,
-        client
+        { store, history, apolloClient: client }
       )
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      testComponent.component.update()
-      await waitForElement(testComponent.component, '#no-record')
+      testComponent.update()
+      await waitForElement(testComponent, '#no-record')
     })
     it('shows no-record message  in reject tab', async () => {
-      const testComponent = await createTestComponentWithApolloClient(
+      const testComponent = await createTestComponent(
         <OfficeHome
           match={{
             params: { tabId: 'updates' },
@@ -389,22 +358,18 @@ describe('OfficeHome related tests', () => {
           staticContext={undefined}
           history={history}
           location={history.location}
-          id={'Test'}
-          buttonLabel={'Button Test'}
-          onSubmit={() => alert(`submitted`)}
         />,
-        store,
-        client
+        { store, history, apolloClient: client }
       )
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      testComponent.component.update()
-      await waitForElement(testComponent.component, '#no-record')
+      testComponent.update()
+      await waitForElement(testComponent, '#no-record')
     })
     it('shows no-record message  in approval tab', async () => {
-      const testComponent = await createTestComponentWithApolloClient(
+      const testComponent = await createTestComponent(
         <OfficeHome
           match={{
             params: { tabId: 'approvals' },
@@ -415,22 +380,18 @@ describe('OfficeHome related tests', () => {
           staticContext={undefined}
           history={history}
           location={history.location}
-          id={'Test'}
-          buttonLabel={'Button Test'}
-          onSubmit={() => alert(`submitted`)}
         />,
-        store,
-        client
+        { store, history, apolloClient: client }
       )
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      testComponent.component.update()
-      await waitForElement(testComponent.component, '#no-record')
+      testComponent.update()
+      await waitForElement(testComponent, '#no-record')
     })
     it('shows no-record message  in print tab', async () => {
-      const testComponent = await createTestComponentWithApolloClient(
+      const testComponent = await createTestComponent(
         <OfficeHome
           match={{
             params: { tabId: 'print' },
@@ -441,23 +402,19 @@ describe('OfficeHome related tests', () => {
           staticContext={undefined}
           history={history}
           location={history.location}
-          id={'Test'}
-          buttonLabel={'Button Test'}
-          onSubmit={() => alert(`submitted`)}
         />,
-        store,
-        client
+        { store, history, apolloClient: client }
       )
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      testComponent.component.update()
-      await waitForElement(testComponent.component, '#no-record')
+      testComponent.update()
+      await waitForElement(testComponent, '#no-record')
     })
 
     it('shows no-record message  in externalValidation tab', async () => {
-      const testComponent = await createTestComponentWithApolloClient(
+      const testComponent = await createTestComponent(
         <OfficeHome
           match={{
             params: { tabId: 'waitingValidation' },
@@ -468,20 +425,16 @@ describe('OfficeHome related tests', () => {
           staticContext={undefined}
           history={history}
           location={history.location}
-          id={'Test'}
-          buttonLabel={'Button Test'}
-          onSubmit={() => alert(`submitted`)}
         />,
-        store,
-        client
+        { store, history, apolloClient: client }
       )
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
 
-      testComponent.component.update()
-      await waitForElement(testComponent.component, '#no-record')
+      testComponent.update()
+      await waitForElement(testComponent, '#no-record')
     })
   })
 
@@ -493,7 +446,7 @@ describe('OfficeHome related tests', () => {
       client.query = mockListSyncController
     })
     it('shows error message in inProgress fieldagent drafts tab', async () => {
-      const testComponent = await createTestComponentWithApolloClient(
+      const testComponent = await createTestComponent(
         <OfficeHome
           match={{
             params: {
@@ -507,24 +460,17 @@ describe('OfficeHome related tests', () => {
           staticContext={undefined}
           history={history}
           location={history.location}
-          id={'Test'}
-          buttonLabel={'Button Test'}
-          onSubmit={() => alert(`submitted`)}
         />,
-        store,
-        client
+        { store, history, apolloClient: client }
       )
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      await waitForElement(
-        testComponent.component,
-        '#search-result-error-text-count'
-      )
+      await waitForElement(testComponent, '#search-result-error-text-count')
     })
     it('shows error message in inProgress hospital drafts tab', async () => {
-      const testComponent = await createTestComponentWithApolloClient(
+      const testComponent = await createTestComponent(
         <OfficeHome
           match={{
             params: {
@@ -538,24 +484,17 @@ describe('OfficeHome related tests', () => {
           staticContext={undefined}
           history={history}
           location={history.location}
-          id={'Test'}
-          buttonLabel={'Button Test'}
-          onSubmit={() => alert(`submitted`)}
         />,
-        store,
-        client
+        { store, history, apolloClient: client }
       )
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      await waitForElement(
-        testComponent.component,
-        '#search-result-error-text-count'
-      )
+      await waitForElement(testComponent, '#search-result-error-text-count')
     })
     it('shows error message  in review tab', async () => {
-      const testComponent = await createTestComponentWithApolloClient(
+      const testComponent = await createTestComponent(
         <OfficeHome
           match={{
             params: { tabId: 'review' },
@@ -566,25 +505,18 @@ describe('OfficeHome related tests', () => {
           staticContext={undefined}
           history={history}
           location={history.location}
-          id={'Test'}
-          buttonLabel={'Button Test'}
-          onSubmit={() => alert(`submitted`)}
         />,
-        store,
-        client
+        { store, history, apolloClient: client }
       )
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      testComponent.component.update()
-      await waitForElement(
-        testComponent.component,
-        '#search-result-error-text-count'
-      )
+      testComponent.update()
+      await waitForElement(testComponent, '#search-result-error-text-count')
     })
     it('shows error message  in reject tab', async () => {
-      const testComponent = await createTestComponentWithApolloClient(
+      const testComponent = await createTestComponent(
         <OfficeHome
           match={{
             params: { tabId: 'updates' },
@@ -595,25 +527,18 @@ describe('OfficeHome related tests', () => {
           staticContext={undefined}
           history={history}
           location={history.location}
-          id={'Test'}
-          buttonLabel={'Button Test'}
-          onSubmit={() => alert(`submitted`)}
         />,
-        store,
-        client
+        { store, history, apolloClient: client }
       )
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      testComponent.component.update()
-      await waitForElement(
-        testComponent.component,
-        '#search-result-error-text-count'
-      )
+      testComponent.update()
+      await waitForElement(testComponent, '#search-result-error-text-count')
     })
     it('shows error message  in approval tab', async () => {
-      const testComponent = await createTestComponentWithApolloClient(
+      const testComponent = await createTestComponent(
         <OfficeHome
           match={{
             params: { tabId: 'approvals' },
@@ -624,25 +549,18 @@ describe('OfficeHome related tests', () => {
           staticContext={undefined}
           history={history}
           location={history.location}
-          id={'Test'}
-          buttonLabel={'Button Test'}
-          onSubmit={() => alert(`submitted`)}
         />,
-        store,
-        client
+        { store, history, apolloClient: client }
       )
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      testComponent.component.update()
-      await waitForElement(
-        testComponent.component,
-        '#search-result-error-text-count'
-      )
+      testComponent.update()
+      await waitForElement(testComponent, '#search-result-error-text-count')
     })
     it('shows error message  in print tab', async () => {
-      const testComponent = await createTestComponentWithApolloClient(
+      const testComponent = await createTestComponent(
         <OfficeHome
           match={{
             params: { tabId: 'print' },
@@ -653,25 +571,18 @@ describe('OfficeHome related tests', () => {
           staticContext={undefined}
           history={history}
           location={history.location}
-          id={'Test'}
-          buttonLabel={'Button Test'}
-          onSubmit={() => alert(`submitted`)}
         />,
-        store,
-        client
+        { store, history, apolloClient: client }
       )
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      testComponent.component.update()
-      await waitForElement(
-        testComponent.component,
-        '#search-result-error-text-count'
-      )
+      testComponent.update()
+      await waitForElement(testComponent, '#search-result-error-text-count')
     })
     it('shows error message  in externalValidation tab', async () => {
-      const testComponent = await createTestComponentWithApolloClient(
+      const testComponent = await createTestComponent(
         <OfficeHome
           match={{
             params: { tabId: 'waitingValidation' },
@@ -682,22 +593,15 @@ describe('OfficeHome related tests', () => {
           staticContext={undefined}
           history={history}
           location={history.location}
-          id={'Test'}
-          buttonLabel={'Button Test'}
-          onSubmit={() => alert(`submitted`)}
         />,
-        store,
-        client
+        { store, history, apolloClient: client }
       )
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      testComponent.component.update()
-      await waitForElement(
-        testComponent.component,
-        '#search-result-error-text-count'
-      )
+      testComponent.update()
+      await waitForElement(testComponent, '#search-result-error-text-count')
     })
   })
 
@@ -731,7 +635,7 @@ describe('OfficeHome related tests', () => {
       for (let i = 0; i < 12; i++) {
         await store.dispatch(storeApplication(createApplication(Event.BIRTH)))
       }
-      const testComponent = await createTestComponentWithApolloClient(
+      const testComponent = await createTestComponent(
         <OfficeHome
           match={{
             params: { tabId: 'progress' },
@@ -742,27 +646,23 @@ describe('OfficeHome related tests', () => {
           staticContext={undefined}
           history={history}
           location={history.location}
-          id={'Test'}
-          buttonLabel={'Button Test'}
-          onSubmit={() => alert(`submitted`)}
         />,
-        store,
-        client
+        { store, history, apolloClient: client }
       ) // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
 
-      testComponent.component.update()
-      await waitForElement(testComponent.component, '#load_more_button')
-      testComponent.component
+      testComponent.update()
+      await waitForElement(testComponent, '#load_more_button')
+      testComponent
         .find('#load_more_button')
         .last()
         .hostNodes()
         .simulate('click')
     })
     it('shows loadmore in review tab', async () => {
-      const testComponent = await createTestComponentWithApolloClient(
+      const testComponent = await createTestComponent(
         <OfficeHome
           match={{
             params: { tabId: 'review' },
@@ -773,27 +673,23 @@ describe('OfficeHome related tests', () => {
           staticContext={undefined}
           history={history}
           location={history.location}
-          id={'Test'}
-          buttonLabel={'Button Test'}
-          onSubmit={() => alert(`submitted`)}
         />,
-        store,
-        client
+        { store, history, apolloClient: client }
       )
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      testComponent.component.update()
-      await waitForElement(testComponent.component, '#load_more_button')
-      testComponent.component
+      testComponent.update()
+      await waitForElement(testComponent, '#load_more_button')
+      testComponent
         .find('#load_more_button')
         .last()
         .hostNodes()
         .simulate('click')
     })
     it('shows loadmore in reject tab', async () => {
-      const testComponent = await createTestComponentWithApolloClient(
+      const testComponent = await createTestComponent(
         <OfficeHome
           match={{
             params: { tabId: 'updates' },
@@ -804,27 +700,23 @@ describe('OfficeHome related tests', () => {
           staticContext={undefined}
           history={history}
           location={history.location}
-          id={'Test'}
-          buttonLabel={'Button Test'}
-          onSubmit={() => alert(`submitted`)}
         />,
-        store,
-        client
+        { store, history, apolloClient: client }
       )
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      testComponent.component.update()
-      await waitForElement(testComponent.component, '#load_more_button')
-      testComponent.component
+      testComponent.update()
+      await waitForElement(testComponent, '#load_more_button')
+      testComponent
         .find('#load_more_button')
         .last()
         .hostNodes()
         .simulate('click')
     })
     it('shows loadmore in print tab', async () => {
-      const testComponent = await createTestComponentWithApolloClient(
+      const testComponent = await createTestComponent(
         <OfficeHome
           match={{
             params: { tabId: 'print' },
@@ -835,20 +727,16 @@ describe('OfficeHome related tests', () => {
           staticContext={undefined}
           history={history}
           location={history.location}
-          id={'Test'}
-          buttonLabel={'Button Test'}
-          onSubmit={() => alert(`submitted`)}
         />,
-        store,
-        client
+        { store, history, apolloClient: client }
       )
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 600)
       })
-      testComponent.component.update()
-      await waitForElement(testComponent.component, '#load_more_button')
-      testComponent.component
+      testComponent.update()
+      await waitForElement(testComponent, '#load_more_button')
+      testComponent
         .find('#load_more_button')
         .last()
         .hostNodes()
@@ -857,7 +745,7 @@ describe('OfficeHome related tests', () => {
     })
 
     it('shows loadmore in externalValidation tab', async () => {
-      const testComponent = await createTestComponentWithApolloClient(
+      const testComponent = await createTestComponent(
         <OfficeHome
           match={{
             params: { tabId: 'waitingValidation' },
@@ -868,21 +756,17 @@ describe('OfficeHome related tests', () => {
           staticContext={undefined}
           history={history}
           location={history.location}
-          id={'Test'}
-          buttonLabel={'Button Test'}
-          onSubmit={() => alert(`submitted`)}
         />,
-        store,
-        client
+        { store, history, apolloClient: client }
       )
 
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      testComponent.component.update()
-      await waitForElement(testComponent.component, '#load_more_button')
-      testComponent.component
+      testComponent.update()
+      await waitForElement(testComponent, '#load_more_button')
+      testComponent
         .find('#load_more_button')
         .last()
         .hostNodes()

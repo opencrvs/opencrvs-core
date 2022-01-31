@@ -78,9 +78,10 @@ const countQueryGraphqlMock = {
 merge(mockUserResponse, nameObj)
 
 describe('FieldAgentHome tests', () => {
-  const { store } = createStore()
+  let { store, history } = createStore()
 
   beforeAll(async () => {
+    ;({ store, history } = createStore())
     ;(queries.fetchUserDetails as jest.Mock).mockReturnValue(mockUserResponse)
     getItem.mockReturnValue(fieldAgentScopeToken)
     await store.dispatch(checkAuth({ '?token': fieldAgentScopeToken }))
@@ -99,12 +100,15 @@ describe('FieldAgentHome tests', () => {
           url: ''
         }}
       />,
-      store,
-      [{ ...countQueryGraphqlMock, delay: 2000 }]
+      {
+        store,
+        history,
+        graphqlMocks: [{ ...countQueryGraphqlMock, delay: 2000 }]
+      }
     )
 
-    testComponent.component.update()
-    const app = testComponent.component
+    testComponent.update()
+    const app = testComponent
     const element = await waitForElement(app, '#field-agent-home-spinner')
 
     expect(element.hostNodes()).toHaveLength(1)
@@ -123,21 +127,14 @@ describe('FieldAgentHome tests', () => {
           url: ''
         }}
       />,
-      store,
-      [countQueryGraphqlMock]
+      { store, history, graphqlMocks: [countQueryGraphqlMock] }
     )
 
-    // wait for mocked data to load mockedProvider
-    await new Promise((resolve) => {
-      setTimeout(resolve, 100)
-    })
-
-    testComponent.component.update()
-    const app = testComponent.component
-    expect(app.find('#top-bar').hostNodes()).toHaveLength(1)
-    expect(app.find('#tab_progress').hostNodes()).toHaveLength(1)
-    expect(app.find('#tab_review').hostNodes()).toHaveLength(1)
-    expect(app.find('#tab_updates').hostNodes()).toHaveLength(1)
+    const app = testComponent
+    await waitForElement(app, '#navigation_progress')
+    expect(app.find('#navigation_progress').hostNodes()).toHaveLength(1)
+    expect(app.find('#navigation_review').hostNodes()).toHaveLength(1)
+    expect(app.find('#navigation_updates').hostNodes()).toHaveLength(1)
   })
 
   it('when user clicks the floating action button', async () => {
@@ -153,8 +150,7 @@ describe('FieldAgentHome tests', () => {
           url: ''
         }}
       />,
-      store,
-      [countQueryGraphqlMock]
+      { store, history, graphqlMocks: [countQueryGraphqlMock] }
     )
 
     // wait for mocked data to load mockedProvider
@@ -162,11 +158,8 @@ describe('FieldAgentHome tests', () => {
       setTimeout(resolve, 100)
     })
 
-    testComponent.component.update()
-    testComponent.component
-      .find('#new_event_declaration')
-      .hostNodes()
-      .simulate('click')
+    testComponent.update()
+    testComponent.find('#new_event_declaration').hostNodes().simulate('click')
 
     expect(window.location.href).toContain('event')
   })
@@ -288,8 +281,11 @@ describe('FieldAgentHome tests', () => {
           url: ''
         }}
       />,
-      store,
-      [countQueryGraphqlMock, requireUpdatesMock]
+      {
+        store,
+        history,
+        graphqlMocks: [countQueryGraphqlMock, requireUpdatesMock]
+      }
     )
 
     // wait for mocked data to load mockedProvider
@@ -297,8 +293,8 @@ describe('FieldAgentHome tests', () => {
       setTimeout(resolve, 100)
     })
 
-    testComponent.component.update()
-    const app = testComponent.component
+    testComponent.update()
+    const app = testComponent
     expect(app.find('#require_updates_list').hostNodes()).toHaveLength(1)
   })
 
@@ -419,8 +415,11 @@ describe('FieldAgentHome tests', () => {
           url: ''
         }}
       />,
-      store,
-      [countQueryGraphqlMock, requireUpdatesMock]
+      {
+        store,
+        history,
+        graphqlMocks: [countQueryGraphqlMock, requireUpdatesMock]
+      }
     )
 
     // wait for mocked data to load mockedProvider
@@ -428,8 +427,8 @@ describe('FieldAgentHome tests', () => {
       setTimeout(resolve, 100)
     })
 
-    testComponent.component.update()
-    testComponent.component.find('#row_0').hostNodes().simulate('click')
+    testComponent.update()
+    testComponent.find('#row_0').hostNodes().simulate('click')
 
     expect(window.location.href).toContain(
       'details/613da949-db8c-49ad-94b4-631ab0b7503e'
@@ -449,8 +448,7 @@ describe('FieldAgentHome tests', () => {
           url: ''
         }}
       />,
-      store,
-      [countQueryGraphqlMock]
+      { store, history, graphqlMocks: [countQueryGraphqlMock] }
     )
 
     // wait for mocked data to load mockedProvider
@@ -458,11 +456,11 @@ describe('FieldAgentHome tests', () => {
       setTimeout(resolve, 100)
     })
 
-    testComponent.component.update()
-    testComponent.component.find('#tab_review').hostNodes().simulate('click')
+    testComponent.update()
+    testComponent.find('#navigation_review').hostNodes().simulate('click')
     await flushPromises()
 
-    testComponent.component.update()
+    testComponent.update()
     expect(window.location.href).toContain('field-agent-home/review')
   })
 
@@ -479,8 +477,7 @@ describe('FieldAgentHome tests', () => {
           url: ''
         }}
       />,
-      store,
-      [countQueryGraphqlMock]
+      { store, history, graphqlMocks: [countQueryGraphqlMock] }
     )
 
     // wait for mocked data to load mockedProvider
@@ -488,11 +485,11 @@ describe('FieldAgentHome tests', () => {
       setTimeout(resolve, 100)
     })
 
-    testComponent.component.update()
-    testComponent.component.find('#tab_updates').hostNodes().simulate('click')
+    testComponent.update()
+    testComponent.find('#navigation_updates').hostNodes().simulate('click')
     await flushPromises()
 
-    testComponent.component.update()
+    testComponent.update()
     expect(window.location.href).toContain('field-agent-home/updates')
   })
 
@@ -509,8 +506,7 @@ describe('FieldAgentHome tests', () => {
           url: ''
         }}
       />,
-      store,
-      [countQueryGraphqlMock]
+      { store, history, graphqlMocks: [countQueryGraphqlMock] }
     )
 
     // wait for mocked data to load mockedProvider
@@ -518,11 +514,11 @@ describe('FieldAgentHome tests', () => {
       setTimeout(resolve, 100)
     })
 
-    testComponent.component.update()
-    testComponent.component.find('#tab_progress').hostNodes().simulate('click')
+    testComponent.update()
+    testComponent.find('#navigation_progress').hostNodes().simulate('click')
     await flushPromises()
 
-    testComponent.component.update()
+    testComponent.update()
     expect(window.location.href).toContain('field-agent-home/progress')
   })
 
@@ -530,26 +526,7 @@ describe('FieldAgentHome tests', () => {
     let component: ReactWrapper
 
     beforeEach(async () => {
-      component = (
-        await createTestComponent(
-          // @ts-ignore
-          <FieldAgentHome
-            match={{
-              params: {
-                tabId: 'review'
-              },
-              isExact: true,
-              path: '',
-              url: ''
-            }}
-          />,
-          store
-        )
-      ).component
-    })
-
-    it('renders no records text when no data in grid table', async () => {
-      const testComponent = await createTestComponent(
+      component = await createTestComponent(
         // @ts-ignore
         <FieldAgentHome
           match={{
@@ -561,11 +538,12 @@ describe('FieldAgentHome tests', () => {
             url: ''
           }}
         />,
-        store
+        { store, history, graphqlMocks: [countQueryGraphqlMock] }
       )
-      expect(
-        testComponent.component.find('#no-record').hostNodes()
-      ).toHaveLength(1)
+    })
+
+    it('renders no records text when no data in grid table', async () => {
+      expect(component.find('#no-record').hostNodes()).toHaveLength(1)
     })
 
     it('when online renders submission status', () => {
@@ -631,22 +609,20 @@ describe('FieldAgentHome tests', () => {
     let component: ReactWrapper
 
     beforeEach(async () => {
-      component = (
-        await createTestComponent(
-          // @ts-ignore
-          <FieldAgentHome
-            match={{
-              params: {
-                tabId: 'progress'
-              },
-              isExact: true,
-              path: '',
-              url: ''
-            }}
-          />,
-          store
-        )
-      ).component
+      component = await createTestComponent(
+        // @ts-ignore
+        <FieldAgentHome
+          match={{
+            params: {
+              tabId: 'progress'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        { store, history, graphqlMocks: [countQueryGraphqlMock] }
+      )
     })
 
     it('renders no records text when no data in grid table', () => {

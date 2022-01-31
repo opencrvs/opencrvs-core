@@ -16,22 +16,23 @@ import { EventInfo } from '@client/views/EventInfo/EventInfo'
 import { Event } from '@client/forms'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { History } from 'history'
+import { AppStore } from '@client/store'
 
 describe('EventInfo tests', () => {
   let component: ReactWrapper<{}, {}>
   let history: History<any>
+  let store: AppStore
 
   describe('For birth event', () => {
     beforeAll(async () => {
-      const { store: testStore, history: testHistory } = await createTestStore()
+      ;({ store, history } = await createTestStore())
 
       const testComponent = await createTestComponent(
         // @ts-ignore
         <EventInfo match={{ params: { eventType: Event.BIRTH } }} />,
-        testStore
+        { store, history }
       )
-      component = testComponent.component
-      history = testHistory
+      component = testComponent
     })
 
     it('renders birth bullet list items', async () => {
@@ -50,15 +51,14 @@ describe('EventInfo tests', () => {
 
   describe('For death event', () => {
     beforeAll(async () => {
-      const { store: testStore, history: testHistory } = await createTestStore()
+      ;({ store, history } = await createTestStore())
 
       const testComponent = await createTestComponent(
         // @ts-ignore
         <EventInfo match={{ params: { eventType: Event.DEATH } }} />,
-        testStore
+        { store, history }
       )
-      component = testComponent.component
-      history = testHistory
+      component = testComponent
     })
 
     it('renders death bullet list items', async () => {
@@ -77,22 +77,21 @@ describe('EventInfo tests', () => {
 
   describe('For unknown event', () => {
     beforeAll(async () => {
-      const { store: testStore, history: testHistory } = await createTestStore()
+      ;({ store, history } = await createTestStore())
 
       const testComponent = await createTestComponent(
         // @ts-ignore
         <EventInfo match={{ params: { eventType: 'unknwown' } }} />,
-        testStore
+        { store, history }
       )
-      component = testComponent.component
-      history = testHistory
+      component = testComponent
     })
 
     it('clicking on continue throws error', async () => {
       const continueButton = await waitForElement(component, '#continue')
       try {
         continueButton.hostNodes().simulate('click')
-      } catch (error) {
+      } catch (error: any) {
         expect(error.message).toMatch(/Unknown eventType/)
       }
     })

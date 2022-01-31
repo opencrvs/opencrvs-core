@@ -87,9 +87,9 @@ describe('Registrar home external validation tab tests', () => {
         registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         queryData={{ data: { totalItems: 1, results: [birthEventSearchSet] } }}
       />,
-      testStore
+      { store: testStore, history: testHistory }
     )
-    component = testComponent.component
+    component = testComponent
     history = testHistory
   })
 

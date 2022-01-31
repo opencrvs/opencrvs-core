@@ -104,7 +104,7 @@ describe('In Progress tab', () => {
           notificationData: {}
         }}
       />,
-      store
+      { store, history }
     )
 
     // wait for mocked data to load mockedProvider
@@ -112,8 +112,8 @@ describe('In Progress tab', () => {
       setTimeout(resolve, 100)
     })
 
-    testComponent.component.update()
-    const app = testComponent.component
+    testComponent.update()
+    const app = testComponent
 
     app.find(`#selector_${SELECTOR_ID.ownDrafts}`).hostNodes().simulate('click')
     await new Promise((resolve) => {
@@ -165,7 +165,7 @@ describe('In Progress tab', () => {
           notificationData: { totalItems: 3 }
         }}
       />,
-      store
+      { store, history }
     )
 
     // wait for mocked data to load mockedProvider
@@ -173,8 +173,8 @@ describe('In Progress tab', () => {
       setTimeout(resolve, 100)
     })
 
-    testComponent.component.update()
-    const app = testComponent.component
+    testComponent.update()
+    const app = testComponent
 
     expect(app.find('#selector_you').hostNodes().text()).toContain('Yours (2)')
     expect(app.find('#selector_field-agents').hostNodes().text()).toContain(
@@ -261,15 +261,15 @@ describe('In Progress tab', () => {
             notificationData: {}
           }}
         />,
-        store
+        { store, history }
       )
 
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      testComponent.component.update()
-      const data = testComponent.component.find(GridTable).prop('content')
+      testComponent.update()
+      const data = testComponent.find(GridTable).prop('content')
       const EXPECTED_DATE_OF_REJECTION = formattedDuration(moment(TIME_STAMP))
 
       expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
@@ -297,7 +297,7 @@ describe('In Progress tab', () => {
           }}
           showPaginated={true}
         />,
-        store
+        { store, history }
       )
 
       // wait for mocked data to load mockedProvider
@@ -305,11 +305,11 @@ describe('In Progress tab', () => {
         setTimeout(resolve, 100)
       })
 
-      testComponent.component.update()
-      const pagiBtn = testComponent.component.find('#pagination')
+      testComponent.update()
+      const pagiBtn = testComponent.find('#pagination')
 
       expect(pagiBtn.hostNodes()).toHaveLength(1)
-      testComponent.component
+      testComponent
         .find('#pagination button')
         .last()
         .hostNodes()
@@ -421,18 +421,18 @@ describe('In Progress tab', () => {
             notificationData: {}
           }}
         />,
-        store
+        { store, history }
       )
 
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      testComponent.component.update()
+      testComponent.update()
       expect(
-        testComponent.component.find('#ListItemAction-0-Update').hostNodes()
+        testComponent.find('#ListItemAction-0-Update').hostNodes()
       ).toHaveLength(1)
-      testComponent.component
+      testComponent
         .find('#ListItemAction-0-Update')
         .hostNodes()
         .simulate('click')
@@ -440,7 +440,7 @@ describe('In Progress tab', () => {
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      testComponent.component.update()
+      testComponent.update()
 
       expect(history.location.pathname).toContain(
         '/drafts/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
@@ -518,15 +518,15 @@ describe('In Progress tab', () => {
             notificationData: {}
           }}
         />,
-        store
+        { store, history }
       )
 
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      testComponent.component.update()
-      const data = testComponent.component.find(GridTable).prop('content')
+      testComponent.update()
+      const data = testComponent.find(GridTable).prop('content')
       const EXPECTED_DATE_OF_REJECTION = formattedDuration(
         moment(Number(TIME_STAMP))
       )
@@ -553,7 +553,7 @@ describe('In Progress tab', () => {
           }}
           showPaginated={true}
         />,
-        store
+        { store, history }
       )
 
       // wait for mocked data to load mockedProvider
@@ -561,11 +561,11 @@ describe('In Progress tab', () => {
         setTimeout(resolve, 100)
       })
 
-      testComponent.component.update()
-      const pagiBtn = testComponent.component.find('#pagination')
+      testComponent.update()
+      const pagiBtn = testComponent.find('#pagination')
 
       expect(pagiBtn.hostNodes()).toHaveLength(1)
-      testComponent.component
+      testComponent
         .find('#pagination button')
         .last()
         .hostNodes()
@@ -648,24 +648,21 @@ describe('In Progress tab', () => {
             }
           }}
         />,
-        store
+        { store, history }
       )
 
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      testComponent.component.update()
+      testComponent.update()
 
       const instance = (
-        await waitForElement(testComponent.component, GridTable)
+        await waitForElement(testComponent, GridTable)
       ).instance()
 
       instance.toggleExpanded('956281c9-1f47-4c26-948a-970dd23c4094')
-      const element = await waitForElement(
-        testComponent.component,
-        '#IN_PROGRESS-0'
-      )
+      const element = await waitForElement(testComponent, '#IN_PROGRESS-0')
       expect(element.hostNodes().length).toBe(1)
     })
 
@@ -711,11 +708,11 @@ describe('In Progress tab', () => {
         const testComponent = await createTestComponent(
           // @ts-ignore
           <InProgressTab {...inprogressProps} />,
-          store
+          { store, history }
         )
 
         expect(
-          testComponent.component.find('#ListItemAction-0-icon').hostNodes()
+          testComponent.find('#ListItemAction-0-icon').hostNodes()
         ).toHaveLength(1)
       })
       it('renders loading indicator when application is being downloaded', async () => {
@@ -729,13 +726,11 @@ describe('In Progress tab', () => {
         const testComponent = await createTestComponent(
           // @ts-ignore
           <InProgressTab {...inprogressProps} />,
-          store
+          { store, history }
         )
 
         expect(
-          testComponent.component
-            .find('#action-loading-ListItemAction-0')
-            .hostNodes()
+          testComponent.find('#action-loading-ListItemAction-0').hostNodes()
         ).toHaveLength(1)
       })
       it('renders update button when download succeeds', async () => {
@@ -749,14 +744,14 @@ describe('In Progress tab', () => {
         const testComponent = await createTestComponent(
           // @ts-ignore
           <InProgressTab {...inprogressProps} />,
-          store
+          { store, history }
         )
 
         expect(
-          testComponent.component.find('#ListItemAction-0-Update').hostNodes()
+          testComponent.find('#ListItemAction-0-Update').hostNodes()
         ).toHaveLength(1)
 
-        testComponent.component
+        testComponent
           .find('#ListItemAction-0-Update')
           .hostNodes()
           .simulate('click')
@@ -764,7 +759,7 @@ describe('In Progress tab', () => {
         await new Promise((resolve) => {
           setTimeout(resolve, 100)
         })
-        testComponent.component.update()
+        testComponent.update()
 
         expect(history.location.pathname).toContain(
           formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {
@@ -785,13 +780,11 @@ describe('In Progress tab', () => {
         const testComponent = await createTestComponent(
           // @ts-ignore
           <InProgressTab {...inprogressProps} />,
-          store
+          { store, history }
         )
 
         expect(
-          testComponent.component
-            .find('#action-error-ListItemAction-0')
-            .hostNodes()
+          testComponent.find('#action-error-ListItemAction-0').hostNodes()
         ).toHaveLength(1)
       })
     })
@@ -847,15 +840,15 @@ describe('In Progress tab', () => {
             inProgressData: {}
           }}
         />,
-        store
+        { store, history }
       )
 
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      testComponent.component.update()
-      const data = testComponent.component.find(GridTable).prop('content')
+      testComponent.update()
+      const data = testComponent.find(GridTable).prop('content')
       const EXPECTED_DATE_OF_REJECTION = formattedDuration(
         moment(Number(TIME_STAMP))
       )
@@ -919,25 +912,23 @@ describe('Tablet tests', () => {
           notificationData: {}
         }}
       />,
-      store
+      { store, history }
     )
 
     getItem.mockReturnValue(registerScopeToken)
-    await testComponent.store.dispatch(
-      checkAuth({ '?token': registerScopeToken })
-    )
+    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
     // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
-    testComponent.component.update()
-    testComponent.component.find('#row_0').hostNodes().simulate('click')
+    testComponent.update()
+    testComponent.find('#row_0').hostNodes().simulate('click')
 
     await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
-    testComponent.component.update()
+    testComponent.update()
 
     expect(window.location.href).toContain(
       '/details/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
