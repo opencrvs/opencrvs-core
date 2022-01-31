@@ -748,20 +748,11 @@ describe('User root resolvers', () => {
       }
     })
 
-    it('changes phone for loggedin user', async () => {
-      fetch.mockResponses(
-        [
-          JSON.stringify({
-            userId: 'ba7022f0ff4822'
-          }),
-          { status: 200 }
-        ],
-        [JSON.stringify({})]
-      )
-
+    it('changes phone number for loggedin user', async () => {
       const nonce = '12345'
       const mobile = '0711111111'
       const code = await generateVerificationCode(nonce, mobile)
+      fetch.mockResponseOnce(JSON.stringify({}), { status: 200 })
 
       const response = await resolvers.Mutation.changePhone(
         {},
@@ -785,49 +776,21 @@ describe('User root resolvers', () => {
 
       const nonce = '12345'
       const mobile = '0711111111'
+      const code = await generateVerificationCode(nonce, mobile)
 
       expect(
-        resolvers.Mutation.changePassword(
+        resolvers.Mutation.changePhone(
           {},
           {
             userId: 'ba7022f0ff4822',
             phoneNumber: mobile,
             nonce: nonce,
-            verifyCode: '000000'
+            verifyCode: code
           },
           authHeaderValidUser
         )
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't change user phone number"
-      )
-    })
-    it("throws error if any user (except sysadmin) tries to update some other user's password", async () => {
-      fetch.mockResponses(
-        [
-          JSON.stringify({
-            userId: 'ba7022f0ff4822'
-          }),
-          { status: 201 }
-        ],
-        [JSON.stringify({})]
-      )
-
-      const nonce = '12345'
-      const mobile = '0711111111'
-
-      expect(
-        resolvers.Mutation.changePassword(
-          {},
-          {
-            userId: 'ba7022f0ff4822',
-            phoneNumber: mobile,
-            nonce: nonce,
-            verifyCode: '000000'
-          },
-          authHeaderInValidUser
-        )
-      ).rejects.toThrowError(
-        'Change phone is not allowed. ba7022f0ff4822 is not the owner of the token'
       )
     })
   })
