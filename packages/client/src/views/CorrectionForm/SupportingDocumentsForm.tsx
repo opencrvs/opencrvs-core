@@ -14,7 +14,8 @@ import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { modifyApplication, IApplication } from '@client/applications'
 import { FormFieldGenerator } from '@client/components/form'
 import { IFormSection, IFormSectionData } from '@client/forms'
-import { buttonMessages, formMessages } from '@client/i18n/messages'
+import { buttonMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/correction'
 import { goBack } from '@client/navigation'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
@@ -46,9 +47,8 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
   const group = section.groups[0]
 
   const contentProps = {
-    title: formMessages.documentsTitle.defaultMessage as string,
-    subtitle: formMessages.CorrectorSupportDocumentSubtitle
-      .defaultMessage as string,
+    title: intl.formatMessage(messages.supportingDocumentsTitle),
+    subtitle: intl.formatMessage(messages.supportingDocumentsSubtitle),
     size: ContentSize.LARGE
   }
 

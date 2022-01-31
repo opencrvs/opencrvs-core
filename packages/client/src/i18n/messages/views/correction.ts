@@ -34,6 +34,8 @@ interface ICorrectionMessages
   selectPlaceholder: MessageDescriptor
   attestToSeeCorrectionDocument: MessageDescriptor
   noDocumentsRequiredForCorrection: MessageDescriptor
+  supportingDocumentsTitle: MessageDescriptor
+  supportingDocumentsSubtitle: MessageDescriptor
 }
 
 const messagesToDefine: ICorrectionMessages = {
@@ -138,12 +140,25 @@ const messagesToDefine: ICorrectionMessages = {
     id: 'correction.supportingDocuments.attestToSeeCorrectionDocument',
     defaultMessage:
       'I attest to seeing supporting documentation and have a copy filed at my office',
-    description: 'Option for form field: Manner of death'
+    description: 'Option for form field: Correction Supporting Document'
   },
   noDocumentsRequiredForCorrection: {
     id: 'correction.supportingDocuments.noDocumentsRequiredForCorrection',
     defaultMessage: 'No supporting documents required',
-    description: 'Option for form field: Manner of death'
+    description: 'Option for form field: Correction Supporting Document'
+  },
+  supportingDocumentsTitle: {
+    id: 'correction.supportingDocuments.title',
+    defaultMessage: 'Upload supporting documents',
+    description:
+      'Label for supportingDocuments form title in certificate correction form'
+  },
+  supportingDocumentsSubtitle: {
+    id: 'correction.supportingDocuments.subtitle',
+    defaultMessage:
+      'For all record corrections at a minimum an affidavit must be provided. For material errors and omissions eg. in paternity cases, a court order must also be provided.',
+    description:
+      'Label for supportingDocuments form subtitle in certificate correction form'
   }
 }
 
