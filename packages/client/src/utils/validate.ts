@@ -166,6 +166,16 @@ export const facilityMustBeSelected: Validation = (
   return isValid ? undefined : { message: messages.facilityMustBeSelected }
 }
 
+export const officeMustBeSelected: Validation = (
+  value: IFormFieldValue,
+  drafts,
+  resources
+) => {
+  const locationsList = getListOfLocations(resources as IOfflineData, 'offices')
+  const isValid = !value || locationsList[value as string]
+  return isValid ? undefined : { message: messages.officeMustBeSelected }
+}
+
 export const phoneNumberFormat: Validation = (value: IFormFieldValue) => {
   const { start, num } = window.config.PHONE_NUMBER_PATTERN
   const validationProps = { start, num }
