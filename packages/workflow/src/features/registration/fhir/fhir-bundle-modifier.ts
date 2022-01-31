@@ -210,7 +210,7 @@ export async function markBundleAsCertified(
   return bundle
 }
 
-export async function markBundleAsDownloaded(
+export async function touchBundle(
   bundle: fhir.Bundle,
   token: string
 ): Promise<fhir.Bundle> {
@@ -223,9 +223,6 @@ export async function markBundleAsDownloaded(
 
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
-
-  /*  Setting Downloaded extension  */
-  setupDownloadedExtension(taskResource, practitioner)
 
   return bundle
 }
@@ -407,23 +404,6 @@ export function setupLastRegUser(
     })
   }
   taskResource.lastModified = new Date().toISOString()
-  return taskResource
-}
-
-export function setupDownloadedExtension(
-  taskResource: fhir.Task,
-  practitioner: fhir.Practitioner
-): fhir.Task {
-  if (!taskResource.extension) {
-    taskResource.extension = []
-  }
-  // const regDownloadedExtension = taskResource.extension.find((extension) => {
-  //   return (
-  //     extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/regDownloaded`
-  //   )
-  // })
-  // console.log(regDownloadedExtension)
-
   return taskResource
 }
 

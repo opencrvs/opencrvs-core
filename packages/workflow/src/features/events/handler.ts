@@ -20,8 +20,8 @@ import {
   createRegistrationHandler,
   markEventAsCertifiedHandler,
   markEventAsValidatedHandler,
-  markEventAsWaitingValidationHandler
-  // markEventAsDownloadedHandler
+  markEventAsWaitingValidationHandler,
+  markEventAsDownloadedHandler
 } from '@workflow/features/registration/handler'
 import {
   getEventType,
@@ -161,9 +161,9 @@ function detectEvent(request: Hapi.Request): Events {
     return Events.EVENT_NOT_DUPLICATE
   }
 
-  if (request.method === 'get' && request.path.includes('/fhir/Composition')) {
-    return Events.DOWNLOADED
-  }
+  // if (request.method === 'get' && request.path.includes('/fhir/Composition')) {
+  //   return Events.DOWNLOADED
+  // }
 
   return Events.UNKNOWN
 }
@@ -370,8 +370,7 @@ export async function fhirWorkflowEventHandler(
       )
       break
     case Events.DOWNLOADED:
-      // await markEventAsDownloadedHandler(request, h)
-      response = await forwardToHearth(request, h)
+      await markEventAsDownloadedHandler(request, h)
       await triggerEvent(
         Events.DOWNLOADED,
         request.payload,

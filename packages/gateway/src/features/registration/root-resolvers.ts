@@ -530,7 +530,7 @@ async function markRecordAsDownloaded(id: string, authHeader: IAuthHeader) {
   if (!taskBundle || !taskBundle.entry || !taskBundle.entry[0]) {
     throw new Error('Task does not exist')
   }
-  doc = addDownloadedTaskExtension(taskBundle)
+  doc = addDownloadedTaskExtension(taskBundle.entry[0])
 
   await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
 

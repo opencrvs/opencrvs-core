@@ -20,7 +20,7 @@ import {
   markBundleAsWaitingValidation,
   invokeRegistrationValidation,
   updatePatientIdentifierWithRN,
-  markBundleAsDownloaded
+  touchBundle
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
   getEventInformantName,
@@ -376,7 +376,7 @@ export async function markEventAsDownloadedHandler(
   h: Hapi.ResponseToolkit
 ) {
   try {
-    const payload = await markBundleAsDownloaded(
+    const payload = await touchBundle(
       request.payload as fhir.Bundle,
       getToken(request)
     )
