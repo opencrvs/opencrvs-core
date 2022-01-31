@@ -27,7 +27,8 @@ export async function verifySecurityAnswer(
 
   const res = await fetch(url, {
     method: 'POST',
-    body: JSON.stringify({ userId, questionKey, answer })
+    body: JSON.stringify({ userId, questionKey, answer }),
+    headers: { 'Content-Type': 'application/json' }
   })
 
   if (res.status !== 200) {

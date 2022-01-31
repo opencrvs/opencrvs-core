@@ -46,8 +46,8 @@ function LanguageSelectComponent({
     async function loadLanguage() {
       const savedLanguage = await retrieveLanguage()
       if (
-        savedLanguage != selectedLanguage &&
-        getAvailableLanguages().some(language => language === savedLanguage)
+        savedLanguage !== selectedLanguage &&
+        getAvailableLanguages().some((language) => language === savedLanguage)
       )
         changeLanguage({ language: savedLanguage })
     }

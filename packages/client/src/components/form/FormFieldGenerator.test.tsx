@@ -134,20 +134,14 @@ describe('form component', () => {
         instance.resetDependentSelectValues('statePermanent')
       })
       it('resets dependent select fields', () => {
-        expect(
-          component
-            .find('#districtPermanent')
-            .hostNodes()
-            .text()
-        ).toEqual('Select')
+        expect(component.find('#districtPermanent').hostNodes().text()).toEqual(
+          'Select'
+        )
       })
       it('doesnt reset non dependent select fields', () => {
-        expect(
-          component
-            .find('#countryPermanent')
-            .hostNodes()
-            .text()
-        ).toEqual('Bangladesh')
+        expect(component.find('#countryPermanent').hostNodes().text()).toEqual(
+          'Bangladesh'
+        )
       })
     })
   })
@@ -190,12 +184,12 @@ describe('when field definition has location search input', () => {
   })
 
   it('performs auto complete search among offline data', () => {
-    component
-      .find('#locationSearchInput')
-      .hostNodes()
-      .simulate('change', {
-        target: { value: 'Dholashadhukhan', id: 'locationSearchInput' }
-      })
+    const locationInput = component.find(`input#placeOfBirth`).hostNodes()
+
+    locationInput.simulate('change', {
+      target: { id: `input#placeOfBirth`, value: 'D' }
+    })
+    locationInput.simulate('focus')
 
     const autoCompleteSuggestion = component
       .find('#locationOption0d8474da-0361-4d32-979e-af91f020309e')
@@ -204,12 +198,12 @@ describe('when field definition has location search input', () => {
   })
 
   it('clicking on autocomplete suggestion modifies draft', () => {
-    component
-      .find('#locationSearchInput')
-      .hostNodes()
-      .simulate('change', {
-        target: { value: 'Dholashadhukhan', id: 'locationSearchInput' }
-      })
+    const locationInput = component.find(`input#placeOfBirth`).hostNodes()
+
+    locationInput.simulate('change', {
+      target: { id: `input#placeOfBirth`, value: 'D' }
+    })
+    locationInput.simulate('focus')
 
     const autoCompleteSuggestion = component
       .find('#locationOption0d8474da-0361-4d32-979e-af91f020309e')
@@ -254,10 +248,7 @@ describe('when user is in the register section', () => {
   })
   it('renders registration phone type as tel', () => {
     expect(
-      component
-        .find('#registrationPhone')
-        .hostNodes()
-        .prop('type')
+      component.find('#registrationPhone').hostNodes().prop('type')
     ).toEqual('tel')
   })
 })
@@ -559,15 +550,9 @@ describe('when field definition has select field on mobile device', () => {
   it('triggers scroll up when focus so that soft keyboard does not block options', async () => {
     const input = component.find('#countryPermanent').hostNodes()
 
-    input
-      .find('input')
-      .simulate('focus')
-      .update()
+    input.find('input').simulate('focus').update()
 
-    input
-      .find('.react-select__control')
-      .simulate('mousedown')
-      .update()
+    input.find('.react-select__control').simulate('mousedown').update()
     await flushPromises()
     component.update()
     expect(scrollMock).toBeCalled()

@@ -25,7 +25,7 @@ describe('date picker tests', () => {
   let store: AppStore
   let onDatesChangeMock: jest.Mock
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     Date.now = jest.fn(() => 1592233232409)
     const appStore = await createTestStore()
     store = appStore.store
@@ -71,10 +71,7 @@ describe('date picker tests', () => {
 
     it('clicking on any preset item triggers onDatesChange with preset dates', async () => {
       const presetElement = await waitForElement(component, '#preset-small')
-      presetElement
-        .find('#last12Months')
-        .hostNodes()
-        .simulate('click')
+      presetElement.find('#last12Months').hostNodes().simulate('click')
       expect(onDatesChangeMock).toBeCalledWith({
         startDate: new Date(Date.parse('2019-06-15T15:00:32.409Z')),
         endDate: new Date(Date.parse('2020-06-15T15:00:32.409Z'))
@@ -83,10 +80,7 @@ describe('date picker tests', () => {
 
     it('clicking on custom date range navigates to from date and finally triggers onDatesChange on click month', async () => {
       const presetElement = await waitForElement(component, '#preset-small')
-      presetElement
-        .find('#customDateRangeNav')
-        .hostNodes()
-        .simulate('click')
+      presetElement.find('#customDateRangeNav').hostNodes().simulate('click')
 
       let startDatePrevNavButton = await waitForElement(
         component,
@@ -102,10 +96,7 @@ describe('date picker tests', () => {
       startDatePrevNavButton.hostNodes().simulate('click')
       component.update()
       expect(
-        component
-          .find('#start-date-small-year-label')
-          .hostNodes()
-          .text()
+        component.find('#start-date-small-year-label').hostNodes().text()
       ).toBe('2018')
       const startDateNextNavButton = await waitForElement(
         component,
@@ -113,31 +104,19 @@ describe('date picker tests', () => {
       )
       startDateNextNavButton.hostNodes().simulate('click')
       expect(
-        component
-          .find('#start-date-small-year-label')
-          .hostNodes()
-          .text()
+        component.find('#start-date-small-year-label').hostNodes().text()
       ).toBe('2019')
 
-      component
-        .find('#start-date-small-feb')
-        .hostNodes()
-        .simulate('click')
+      component.find('#start-date-small-feb').hostNodes().simulate('click')
 
       component.update()
 
       expect(
-        component
-          .find('#end-date-small-year-label')
-          .hostNodes()
-          .text()
+        component.find('#end-date-small-year-label').hostNodes().text()
       ).toBe('2020')
       component.update()
 
-      component
-        .find('#end-date-small-mar')
-        .hostNodes()
-        .simulate('click')
+      component.find('#end-date-small-mar').hostNodes().simulate('click')
 
       const [onDatesChangeHandlerArgs] = onDatesChangeMock.mock.calls
 

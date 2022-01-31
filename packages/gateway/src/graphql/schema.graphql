@@ -163,6 +163,7 @@ type Mutation {
     existingPassword: String!
     password: String!
   ): String
+  changeAvatar(userId: String!, avatar: AvatarInput!): String
   auditUser(
     userId: String!
     action: String!
@@ -305,6 +306,7 @@ type User {
   identifier: Identifier
   signature: Signature
   creationDate: String
+  avatar: Avatar
   device: String
 }
 
@@ -455,6 +457,11 @@ input SecurityQuestionAnswer {
   answer: String
 }
 
+input AvatarInput {
+  type: String!
+  data: String!
+}
+
 scalar Map
 
 type Registration {
@@ -503,7 +510,6 @@ enum AttendantType {
   LAYPERSON
   NONE
   OTHER
-  TRADITIONAL_BIRTH_ATTENDANT
 }
 
 enum BirthRegType {
@@ -533,7 +539,7 @@ enum MannerOfDeath {
   ACCIDENT
   SUICIDE
   HOMICIDE
-  MANNER_UNDETERMINED
+  UNDETERMINED
 }
 
 enum CauseOfDeathMethodType {
@@ -655,6 +661,11 @@ type LocalRegistrar {
 type Signature {
   data: String
   type: String
+}
+
+type Avatar {
+  type: String!
+  data: String!
 }
 
 type SearchFieldAgentResponse {

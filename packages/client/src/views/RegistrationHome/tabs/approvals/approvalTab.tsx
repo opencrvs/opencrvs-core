@@ -155,7 +155,7 @@ class ApprovalTabComponent extends React.Component<
     }
     const transformedData = transformData(data, this.props.intl)
 
-    return transformedData.map(reg => {
+    return transformedData.map((reg) => {
       const icon: JSX.Element = (
         <Validate data-tip data-for="validatedTooltip" />
       )
@@ -197,7 +197,7 @@ class ApprovalTabComponent extends React.Component<
   renderExpandedComponent = (itemId: string) => {
     const { results } = this.props.queryData && this.props.queryData.data
     const eventDetails =
-      results && results.find(result => result && result.id === itemId)
+      results && results.find((result) => result && result.id === itemId)
     return <RowHistoryView eventDetails={eventDetails} />
   }
 

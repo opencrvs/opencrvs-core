@@ -27,8 +27,8 @@ import { GridTable } from '@opencrvs/components/lib/interface'
 import { RowHistoryView } from '@client/views/RegistrationHome/RowHistoryView'
 import { History } from 'history'
 
-const EVENT_CREATION_TIME = 1583322631424
-const SEND_FOR_VALIDATION_TIME = 1582912800000
+const EVENT_CREATION_TIME = 1583322631424 // Wed Mar 04 2020 13:50:31 GMT+0200 (Eastern European Standard Time)
+const SEND_FOR_VALIDATION_TIME = 1582912800000 // Fri Feb 28 2020 20:00:00 GMT+0200 (Eastern European Standard Time)
 
 export const registerScopeToken = jwt.sign(
   { scope: ['register'] },
@@ -75,7 +75,7 @@ describe('Registrar home external validation tab tests', () => {
   let history: History<any>
 
   beforeEach(async () => {
-    const CURRENT_TIME = 1583322631424
+    const CURRENT_TIME = 1583322631424 // Wed Mar 04 2020 13:50:31 GMT+0200 (Eastern European Standard Time)
     Date.now = jest.fn(() => CURRENT_TIME)
     const { store: testStore, history: testHistory } = await createTestStore()
     getItem.mockReturnValue(registerScopeToken)
@@ -99,7 +99,7 @@ describe('Registrar home external validation tab tests', () => {
 
     expect(data.length).toBe(1)
     expect(data[0].id).toBe('956281c9-1f47-4c26-948a-970dd23c4094')
-    expect(data[0].waitingTimeElapsed).toBe('5 days ago')
+    expect(data[0].waitingTimeElapsed).toBe('4 days ago')
     expect(data[0].eventTimeElapsed).toBe('9 years ago')
     expect(data[0].event).toBe('Birth')
     expect(data[0].actions).toBeDefined()

@@ -105,7 +105,7 @@ class CreatePinComponent extends React.Component<IProps> {
   sameDigits = (pin: string) => pin && Number(pin) % 1111 === 0
 
   sequential = (pin: string) => {
-    const d = pin.split('').map(i => Number(i))
+    const d = pin.split('').map((i) => Number(i))
     return d[0] + 1 === d[1] && d[1] + 1 === d[2] && d[2] + 1 === d[3]
   }
 
@@ -117,7 +117,7 @@ class CreatePinComponent extends React.Component<IProps> {
     const userData = (await storage.getItem('USER_DATA')) || '[]'
     const allUserData = JSON.parse(userData) as IUserData[]
     const currentUserData = allUserData.find(
-      user => user.userID === currentUserID
+      (user) => user.userID === currentUserID
     )
     if (currentUserData) {
       currentUserData.userPIN = hash
@@ -133,13 +133,8 @@ class CreatePinComponent extends React.Component<IProps> {
   }
 
   render() {
-    const {
-      pin,
-      pinMatchError,
-      pinHasSameDigits,
-      pinHasSeqDigits,
-      refresher
-    } = this.state
+    const { pin, pinMatchError, pinHasSameDigits, pinHasSeqDigits, refresher } =
+      this.state
     const { intl } = this.props
 
     return (

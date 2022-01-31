@@ -201,8 +201,7 @@ describe('fhirUtils', () => {
             ],
             extension: [
               {
-                url:
-                  'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+                url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
                 extension: [
                   {
                     url: 'code',
@@ -354,8 +353,7 @@ describe('fhirUtils', () => {
             ],
             extension: [
               {
-                url:
-                  'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+                url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
                 extension: [
                   {
                     url: 'code',
@@ -857,8 +855,7 @@ describe('fhirUtils', () => {
           valueString: ''
         },
         {
-          url:
-            'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
           valueString: '+8801916543214'
         },
         {
@@ -962,8 +959,7 @@ describe('fhirUtils', () => {
           valueString: ''
         },
         {
-          url:
-            'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
           valueString: '+8801916543214'
         },
         {

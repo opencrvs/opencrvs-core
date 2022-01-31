@@ -18,7 +18,7 @@ import {
   flushPromises
 } from '@client/tests/util'
 import { AppStore } from '@client/store'
-import { waitForElement } from '@client/tests/wait-for-element'
+import { waitFor, waitForElement } from '@client/tests/wait-for-element'
 import { USER_AUDIT_ACTION } from '@client/user/queries'
 import { GraphQLError } from 'graphql'
 
@@ -144,19 +144,19 @@ describe('user audit action modal tests', () => {
   let store: AppStore
   let onCloseMock: jest.Mock
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     const testStore = await createTestStore()
     store = testStore.store
     onCloseMock = jest.fn()
   })
 
-  afterAll(() => {
+  afterEach(() => {
     onCloseMock.mockClear()
   })
 
   describe('in case of successful deactivate audit action', () => {
     beforeEach(async () => {
-      let [successMock] = graphqlMocksOfDeactivate
+      const [successMock] = graphqlMocksOfDeactivate
       const testComponent = await createTestComponent(
         <UserAuditActionModal
           show={true}
@@ -167,12 +167,6 @@ describe('user audit action modal tests', () => {
         [successMock]
       )
       component = testComponent.component
-
-      // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
-        setTimeout(resolve, 100)
-      })
-      component.update()
     })
 
     it('renders responsive modal', async () => {
@@ -225,7 +219,7 @@ describe('user audit action modal tests', () => {
 
   describe('in case of failed deactivate audit action', () => {
     beforeEach(async () => {
-      let [errorMock] = graphqlMocksOfDeactivate
+      const [_, errorMock] = graphqlMocksOfDeactivate
       component = (
         await createTestComponent(
           <UserAuditActionModal
@@ -237,12 +231,6 @@ describe('user audit action modal tests', () => {
           [errorMock]
         )
       ).component
-
-      // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
-        setTimeout(resolve, 100)
-      })
-      component.update()
     })
 
     describe('after filling mandatory data', () => {
@@ -260,7 +248,6 @@ describe('user audit action modal tests', () => {
           '#deactivate-action'
         )
         confirmButton.hostNodes().simulate('click')
-
         await flushPromises()
         expect(store.getState().notification.submitFormErrorToast).toBe(
           'userFormFail'
@@ -271,7 +258,7 @@ describe('user audit action modal tests', () => {
 
   describe('in case of successful reactivate audit action', () => {
     beforeEach(async () => {
-      let [successMock] = graphqlMocksOfReactivate
+      const [successMock] = graphqlMocksOfReactivate
       const testComponent = await createTestComponent(
         <UserAuditActionModal
           show={true}
@@ -282,12 +269,6 @@ describe('user audit action modal tests', () => {
         [successMock]
       )
       component = testComponent.component
-
-      // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
-        setTimeout(resolve, 100)
-      })
-      component.update()
     })
 
     it('renders title for reactivation', async () => {
@@ -317,17 +298,17 @@ describe('user audit action modal tests', () => {
           '#reactivate-action'
         )
         confirmButton.hostNodes().simulate('click')
-        await flushPromises()
-        expect(
-          store.getState().notification.userAuditSuccessToast.visible
-        ).toBe(true)
+
+        waitFor(
+          () => store.getState().notification.userAuditSuccessToast.visible
+        )
       })
     })
   })
 
   describe('in case of failed reactivate audit action', () => {
     beforeEach(async () => {
-      let [errorMock] = graphqlMocksOfReactivate
+      const [_, errorMock] = graphqlMocksOfReactivate
       component = (
         await createTestComponent(
           <UserAuditActionModal
@@ -339,12 +320,6 @@ describe('user audit action modal tests', () => {
           [errorMock]
         )
       ).component
-
-      // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
-        setTimeout(resolve, 100)
-      })
-      component.update()
     })
 
     describe('after filling mandatory data', () => {

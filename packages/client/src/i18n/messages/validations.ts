@@ -258,6 +258,5 @@ const messagesToDefine: IValidationMessages = {
   }
 }
 
-export const validationMessages: IValidationMessages = defineMessages(
-  messagesToDefine
-)
+export const validationMessages: IValidationMessages =
+  defineMessages(messagesToDefine)

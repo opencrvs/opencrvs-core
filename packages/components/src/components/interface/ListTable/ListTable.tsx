@@ -21,14 +21,12 @@ const Wrapper = styled.div<{
   isFullPage?: boolean
   fixedWidth: number | undefined
 }>`
- 
   ${({ fixedWidth }) =>
     fixedWidth ? `width: ${fixedWidth}px;` : `width: 100%`}
 
-
-    @media (max-width: ${({ fixedWidth, theme }) => fixedWidth}px) {
-      width: 100%;
-    }
+  @media (max-width: ${({ fixedWidth, theme }) => fixedWidth}px) {
+    width: 100%;
+  }
   background: ${({ theme }) => theme.colors.white};
   ${({ hideBoxShadow, isFullPage, theme }) =>
     isFullPage
@@ -50,9 +48,8 @@ const TableHeader = styled.div<{
   totalWidth?: number
   fixedWidth?: number
 }>`
-
-${({ fixedWidth, totalWidth }) =>
-  fixedWidth ? `width: ${fixedWidth}px;` : `width: ${totalWidth || 100}%;`}
+  ${({ fixedWidth, totalWidth }) =>
+    fixedWidth ? `width: ${fixedWidth}px;` : `width: ${totalWidth || 100}%;`}
   border-bottom: 1px solid ${({ theme }) => theme.colors.disabled};
   color: ${({ theme }) => theme.colors.copy};
   padding: 10px 0px;
@@ -113,7 +110,7 @@ const RowWrapper = styled.div<{
         horizontalPadding
           ? `padding-left:${horizontalPadding.md}px;`
           : `padding-left: 12px;`}
-  }
+    }
   }
 
   & span:last-child {

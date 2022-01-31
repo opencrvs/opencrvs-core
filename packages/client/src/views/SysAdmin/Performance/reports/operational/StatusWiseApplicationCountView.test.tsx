@@ -31,7 +31,6 @@ describe('Status wise registration count', () => {
         loading={true}
         locationId={'c879ce5c-545b-4042-98a6-77015b0e13df'}
         statusMapping={StatusMapping}
-        disableApplicationLink={true}
         onClickStatusDetails={jest.fn()}
       />,
       store
@@ -62,7 +61,6 @@ describe('Status wise registration count', () => {
             data={data}
             locationId={'c879ce5c-545b-4042-98a6-77015b0e13df'}
             statusMapping={StatusMapping}
-            disableApplicationLink={false}
             onClickStatusDetails={onClickStatusDetailsMock}
           />,
           store

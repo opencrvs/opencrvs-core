@@ -56,6 +56,5 @@ const messagesToDefine: ISelectInformantMessages = {
   }
 }
 
-export const messages: ISelectInformantMessages = defineMessages(
-  messagesToDefine
-)
+export const messages: ISelectInformantMessages =
+  defineMessages(messagesToDefine)

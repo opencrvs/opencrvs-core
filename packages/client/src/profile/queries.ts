@@ -13,7 +13,7 @@ import gql from 'graphql-tag'
 import { client } from '@client/utils/apolloClient'
 
 export const FETCH_USER = gql`
-  query($userId: String!) {
+  query ($userId: String!) {
     getUser(userId: $userId) {
       userMgntUserID
       practitionerId
@@ -53,6 +53,10 @@ export const FETCH_USER = gql`
           data
           type
         }
+      }
+      avatar {
+        type
+        data
       }
     }
   }

@@ -52,7 +52,7 @@ export const mockIncompleteFormData = {
   familyNameEng: 'Hossain',
   firstNames: '',
   firstNamesEng: '',
-  nid: '1014881922',
+  nid: '101488192',
   phoneNumber: '',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
   role: 'FIELD_AGENT',
@@ -68,7 +68,7 @@ export const mockCompleteFormData = {
   familyNameEng: 'Hossain',
   firstNames: '',
   firstNamesEng: '',
-  nid: '1234567896',
+  nid: '123456789',
   phoneNumber: '01662132132',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
   role: 'FIELD_AGENT',
@@ -85,7 +85,7 @@ export const mockDataWithRegistarRoleSelected = {
   familyNameEng: 'Hossain',
   firstNames: '',
   firstNamesEng: '',
-  nid: '1014881922',
+  nid: '101488192',
   phoneNumber: '01662132132',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
   role: 'LOCAL_REGISTRAR',
@@ -94,8 +94,7 @@ export const mockDataWithRegistarRoleSelected = {
   username: '',
   signature: {
     type: 'image/png',
-    data:
-      'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUt'
+    data: 'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUt'
   }
 }
 
@@ -504,12 +503,12 @@ export const transformRoleDataToDefinitions = (
 ): IFormField[] => {
   const roles = data as Array<any>
   const transformTypes = (types: string[]) =>
-    types.map(type => ({
+    types.map((type) => ({
       label: userMessages[type],
       value: type
     }))
 
-  return fields.map(field => {
+  return fields.map((field) => {
     if (field.name === 'role') {
       if (userFormData && userFormData.role) {
         userFormData.role = ''
@@ -525,13 +524,14 @@ export const transformRoleDataToDefinitions = (
       if (userFormData && userFormData.type) {
         userFormData.type = ''
       }
-      ;(field as ISelectFormFieldWithDynamicOptions).dynamicOptions.options = roles.reduce(
-        (options, { value, types }) => ({
-          ...options,
-          [value]: transformTypes(types)
-        }),
-        {}
-      )
+      ;(field as ISelectFormFieldWithDynamicOptions).dynamicOptions.options =
+        roles.reduce(
+          (options, { value, types }) => ({
+            ...options,
+            [value]: transformTypes(types)
+          }),
+          {}
+        )
       return field
     } else return field
   })
@@ -540,17 +540,18 @@ export const transformRoleDataToDefinitions = (
 export async function alterRolesBasedOnUserRole(primaryOfficeId: string) {
   const roleData = await roleQueries.fetchRoles()
   const userData = await userQueries.searchUsers(primaryOfficeId)
+
   const roles = roleData.data.getRoles as Array<GQLRole>
   const users = userData.data.searchUsers.results as Array<GQLUser>
 
-  const hasSecretary = users.some(user => user.type === ROLE_TYPE_SECRETARY)
-  const hasMayor = users.some(user => user.type === ROLE_TYPE_MAYOR)
-  const hasChariman = users.some(user => user.type === ROLE_TYPE_CHAIRMAN)
+  const hasSecretary = users.some((user) => user.type === ROLE_TYPE_SECRETARY)
+  const hasMayor = users.some((user) => user.type === ROLE_TYPE_MAYOR)
+  const hasChariman = users.some((user) => user.type === ROLE_TYPE_CHAIRMAN)
 
   const roleList = [] as Array<GQLRole>
 
   /* eslint-disable array-callback-return */
-  roles.map(role => {
+  roles.map((role) => {
     if (
       role.value === ROLE_FIELD_AGENT ||
       role.value === ROLE_REGISTRATION_AGENT

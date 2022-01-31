@@ -28,13 +28,8 @@ import {
   createReviewApplication,
   storeApplication,
   setInitialApplications,
-  IUserData,
-  getCurrentUserID,
-  getApplicationsOfCurrentUser,
-  writeApplicationByUser,
-  deleteApplicationByUser,
-  IApplication,
-  SUBMISSION_STATUS
+  SUBMISSION_STATUS,
+  modifyApplication
 } from '@client/applications'
 import { v4 as uuid } from 'uuid'
 import { AppStore } from '@client/store'
@@ -53,8 +48,6 @@ import { IForm } from '@client/forms'
 import { clone, cloneDeep } from 'lodash'
 import { FETCH_REGISTRATION } from '@opencrvs/client/src/forms/register/queries/registration'
 import { FETCH_PERSON_NID } from '@opencrvs/client/src/forms/register/queries/person'
-import { storage } from '@client/storage'
-import { IUserDetails } from '@client/utils/userUtils'
 
 import { formMessages as messages } from '@client/i18n/messages'
 import * as profileSelectors from '@client/profile/profileSelectors'
@@ -62,162 +55,8 @@ import { getRegisterForm } from '@client/forms/register/application-selectors'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { History } from 'history'
 import { DECLARED } from '@client/utils/constants'
-
-describe('when user logs in', () => {
-  // Some mock data
-
-  const draft1 = createApplication(Event.BIRTH)
-  const draft2 = createApplication(Event.DEATH)
-  const draft3 = createApplication(Event.BIRTH)
-
-  const currentUserData: IUserData = {
-    userID: 'shakib75',
-    applications: [draft1, draft2]
-  }
-
-  const anotherUserData: IUserData = {
-    userID: 'mortaza',
-    applications: [draft3]
-  }
-
-  const currentUserDetails: IUserDetails = {
-    language: 'en',
-    userMgntUserID: 'shakib75',
-    localRegistrar: { name: [] }
-  }
-
-  const indexedDB = {
-    USER_DATA: JSON.stringify([currentUserData, anotherUserData]),
-    USER_DETAILS: JSON.stringify(currentUserDetails)
-  }
-
-  // Mocking storage reading
-  // @ts-ignore
-  storage.getItem = jest.fn((key: string) => {
-    switch (key) {
-      case 'USER_DATA':
-      case 'USER_DETAILS':
-        return indexedDB[key]
-      default:
-        return undefined
-    }
-  })
-
-  // Mocking storage writing
-  // @ts-ignore
-  storage.setItem = jest.fn((key: string, value: string) => {
-    switch (key) {
-      case 'USER_DATA':
-      case 'USER_DETAILS':
-        indexedDB[key] = value
-        break
-      default:
-        break
-    }
-  })
-
-  it('should read userID correctly', async () => {
-    const uID = await getCurrentUserID() // reads from USER_DETAILS and returns the userMgntUserID, if exists
-    expect(uID).toEqual('shakib75')
-  })
-
-  it('should read only the drafts of the currently logged-in user', async () => {
-    const details = await getApplicationsOfCurrentUser()
-    const currentUserDrafts = (JSON.parse(details) as IUserData).applications
-    expect(currentUserDrafts.length).toBe(2)
-    expect(currentUserDrafts[0]).toEqual(draft1)
-    expect(currentUserDrafts[1]).toEqual(draft2)
-    expect(currentUserDrafts.find(draft => draft.id === draft3.id)).toBeFalsy()
-  })
-
-  describe('Application in index db', () => {
-    let draft: IApplication
-
-    beforeAll(async () => {
-      draft = createApplication(Event.DEATH)
-      const { store } = await createTestStore()
-      await writeApplicationByUser(
-        store.getState,
-        currentUserData.userID,
-        draft
-      )
-    })
-
-    it("should save the draft inside the current user's array of drafts", async () => {
-      // Now, let's check if the new draft is added
-      const details = await getApplicationsOfCurrentUser()
-      const currentUserDrafts = (JSON.parse(details) as IUserData).applications
-      expect(currentUserDrafts.length).toBe(3)
-      expect(currentUserDrafts[0]).toBeTruthy()
-    })
-
-    it("should delete the draft from the current user's array of applications", async () => {
-      await deleteApplicationByUser(currentUserData.userID, draft)
-
-      // Now, let's check if the new draft is added
-      const details = await getApplicationsOfCurrentUser()
-      const currentUserDrafts = (JSON.parse(details) as IUserData).applications
-      expect(currentUserDrafts.length).toBe(2)
-      expect(
-        currentUserDrafts.find(cDraft => cDraft.id === draft.id)
-      ).toBeFalsy()
-    })
-  })
-})
-
-describe('when there is no user-data saved', () => {
-  it('should return an empty array', async () => {
-    // Mocking storage reading
-    // @ts-ignore
-    storage.getItem = jest.fn((key: string): string => {
-      switch (key) {
-        case 'USER_DATA':
-          return '[]'
-        case 'USER_DETAILS':
-          return '{ "userMgntUserID": "tamimIq" }'
-        default:
-          return ''
-      }
-    })
-    const str = await getApplicationsOfCurrentUser()
-    const drafts = (JSON.parse(str) as IUserData).applications
-    expect(drafts.length).toBe(0)
-  })
-})
-
-describe('when user is in the register form before initial draft load', () => {
-  it('throws error when draft not found after initial drafts load', async () => {
-    const { store, history } = await createTestStore()
-
-    const mock: any = jest.fn()
-    const draft = createApplication(Event.BIRTH)
-    const form = await getRegisterFormFromStore(store, Event.BIRTH)
-
-    try {
-      await createTestComponent(
-        // @ts-ignore
-        <RegisterForm
-          location={mock}
-          scope={mock}
-          history={history}
-          staticContext={mock}
-          registerForm={form}
-          application={draft}
-          pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
-          match={{
-            params: { applicationId: '', pageId: '', groupId: '' },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        store
-      )
-    } catch (error) {
-      expect(error).toBeInstanceOf(Error)
-    }
-  })
-})
+import debounce from 'lodash/debounce'
+jest.mock('lodash/debounce', () => jest.fn((fn) => fn))
 
 describe('when user is in the register form for birth event', () => {
   let component: ReactWrapper<{}, {}>
@@ -227,6 +66,7 @@ describe('when user is in the register form for birth event', () => {
 
   describe('when user is in the mother section', () => {
     beforeEach(async () => {
+      ;(debounce as jest.Mock).mockImplementation((fn) => fn)
       const storeContext = await createTestStore()
       store = storeContext.store
       history = storeContext.history
@@ -242,7 +82,6 @@ describe('when user is in the register form for birth event', () => {
         // @ts-ignore
         <RegisterForm
           location={mock}
-          scope={mock}
           history={history}
           staticContext={mock}
           registerForm={form}
@@ -281,10 +120,7 @@ describe('when user is in the register form for birth event', () => {
         (key: string) =>
           'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJkZWNsYXJlIiwiZGVtbyJdLCJpYXQiOjE1NjMyNTYyNDIsImV4cCI6MTU2Mzg2MTA0MiwiYXVkIjpbIm9wZW5jcnZzOmF1dGgtdXNlciIsIm9wZW5jcnZzOnVzZXItbWdudC11c2VyIiwib3BlbmNydnM6aGVhcnRoLXVzZXIiLCJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJvcGVuY3J2czpub3RpZmljYXRpb24tdXNlciIsIm9wZW5jcnZzOndvcmtmbG93LXVzZXIiLCJvcGVuY3J2czpzZWFyY2gtdXNlciIsIm9wZW5jcnZzOm1ldHJpY3MtdXNlciIsIm9wZW5jcnZzOnJlc291cmNlcy11c2VyIl0sImlzcyI6Im9wZW5jcnZzOmF1dGgtc2VydmljZSIsInN1YiI6IjVkMWM1YTJhNTgxNjM0MDBlZjFkMDEyOSJ9.hZu0em2JA0sl-5uzck4mn4HfYdzxSmgoERA8SbWRPXEmriSYjs4PEPk9StXF_Ed5kd53VlNF9xf39DDGWqyyn76gpcMPbHJAL8nqLV82hot8fgU1WtEk865U8-9oAxaVmxAsjpHayiuD6zfKuR-ixrLFdoRKP13LdORktFCQe5e7To2w7vXArjUb6SDpSHST4Fbkhg8vzOcykweSGiNlmoEVtLzkpamS6fcTGRHkNpb_Wk_AQW9TAdw6NqG5lDEAO10auNgJpKxO8X-DQKhvEfY5TbpblR51L_U8pUXpDCAvGegMLnwmfAIoH1hMj--Wd2JhqgUvj0YrlDKI99fntA'
       )
-      component
-        .find('#save_draft')
-        .hostNodes()
-        .simulate('click')
+      component.find('#save_draft').hostNodes().simulate('click')
       await flushPromises()
       expect(history.location.pathname).toEqual('/field-agent-home/progress')
     })
@@ -293,10 +129,7 @@ describe('when user is in the register form for birth event', () => {
         (key: string) =>
           'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsInBlcmZvcm1hbmNlIiwiY2VydGlmeSIsImRlbW8iXSwiaWF0IjoxNTYzOTcyOTQ0LCJleHAiOjE1NjQ1Nzc3NDQsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpyZXNvdXJjZXMtdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1ZDFjNWEyYTU4MTYzNDAwZWYxZDAxMmIifQ.VrH31goeitKvLHQchy5HQJkQWjhK-cWisxSgQUXChK4MZQis9Ufzn7dWK3s2s0dSpnFqk-0Yj5cVlq7JgQVcniO26WhnSyXHYQk7DG-TSA5FXGYoKMhjMZCh5qOZTRaVI6yvnEsLKTYeNvkXKJ2wb6M9U5OWjUh1KGPexd9mSjUsUwZ5BDTvI0WjnBTgQ_a0-KhxjjypT8Y_VXiiY-KWLxuOpVGalv3P3nbH8dAUzEuzKsrq6q0MJsaJkgDliaz2pZd10JxnJE1VYUob2SNHFnmJnz8Llwe1lH4xa8rluIA6YBmxdkrU2VkhCBPD6VxGYRHrD3LKRa3Cgm1X0qNQTw'
       )
-      component
-        .find('#save_draft')
-        .hostNodes()
-        .simulate('click')
+      component.find('#save_draft').hostNodes().simulate('click')
       await flushPromises()
       expect(
         history.location.pathname.includes('/registration-home/progress')
@@ -318,7 +151,7 @@ describe('when user is in the register form for death event', () => {
     const testStore = await createTestStore()
     store = testStore.store
     history = testStore.history
-
+    const mock: any = jest.fn()
     draft = createApplication(Event.DEATH)
     store.dispatch(setInitialApplications())
     store.dispatch(storeApplication(draft))
@@ -330,18 +163,22 @@ describe('when user is in the register form for death event', () => {
       clonedForm.sections[2].optional = true
       clonedForm.sections[2].notice = messages.causeOfDeathNotice
       clonedForm.sections[2].groups[0].ignoreSingleFieldView = true
+      const mock: any = jest.fn()
       const testComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
           location={mock}
-          scope={mock}
           history={history}
           staticContext={mock}
           registerForm={clonedForm}
           application={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
-            params: { applicationId: draft.id, pageId: 'causeOfDeath' },
+            params: {
+              applicationId: draft.id,
+              pageId: 'causeOfDeath',
+              groupId: 'causeOfDeath-causeOfDeathEstablished'
+            },
             isExact: true,
             path: '',
             url: ''
@@ -362,19 +199,25 @@ describe('when user is in the register form for death event', () => {
   })
 
   describe('when user is in deceased section', () => {
+    beforeEach(async () => {
+      ;(debounce as jest.Mock).mockImplementation((fn) => fn)
+    })
     it('renders loader button when idType is Birth Registration Number', async () => {
       const testComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
           location={mock}
-          scope={mock}
           history={history}
           staticContext={mock}
           registerForm={form}
           application={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
-            params: { applicationId: draft.id, pageId: 'deceased' },
+            params: {
+              applicationId: draft.id,
+              pageId: 'deceased',
+              groupId: 'deceased-view-group'
+            },
             isExact: true,
             path: '',
             url: ''
@@ -389,19 +232,21 @@ describe('when user is in the register form for death event', () => {
   })
 
   describe('when user is in contact point page', () => {
+    beforeEach(async () => {
+      ;(debounce as jest.Mock).mockImplementation((fn) => fn)
+    })
     it('shows error if click continue without any value', async () => {
       const testComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
           location={mock}
-          scope={mock}
           history={history}
           staticContext={mock}
           registerForm={form}
           application={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
-            params: { applicationId: draft.id, pageId: '' },
+            params: { applicationId: draft.id, pageId: '', groupId: '' },
             isExact: true,
             path: '',
             url: ''
@@ -410,18 +255,12 @@ describe('when user is in the register form for death event', () => {
         store
       )
       component = testComponent.component
-      component
-        .find('#next_section')
-        .hostNodes()
-        .simulate('click')
+      component.find('#next_section').hostNodes().simulate('click')
 
       await waitForElement(component, '#contactPoint_error')
-      expect(
-        component
-          .find('#contactPoint_error')
-          .hostNodes()
-          .text()
-      ).toBe('Required for registration')
+      expect(component.find('#contactPoint_error').hostNodes().text()).toBe(
+        'Required for registration'
+      )
     })
 
     it('after clicking exit, takes back home', async () => {
@@ -429,14 +268,13 @@ describe('when user is in the register form for death event', () => {
         // @ts-ignore
         <RegisterForm
           location={mock}
-          scope={mock}
           history={history}
           staticContext={mock}
           registerForm={form}
           application={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
-            params: { applicationId: draft.id, pageId: '' },
+            params: { applicationId: draft.id, pageId: '', groupId: '' },
             isExact: true,
             path: '',
             url: ''
@@ -445,10 +283,7 @@ describe('when user is in the register form for death event', () => {
         store
       )
       component = testComponent.component
-      component
-        .find('#exit_top_bar')
-        .hostNodes()
-        .simulate('click')
+      component.find('#exit_top_bar').hostNodes().simulate('click')
 
       component.update()
 
@@ -460,14 +295,17 @@ describe('when user is in the register form for death event', () => {
         // @ts-ignore
         <RegisterForm
           location={mock}
-          scope={mock}
           history={history}
           staticContext={mock}
           registerForm={form}
           application={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
-            params: { applicationId: draft.id, pageId: 'deceased' },
+            params: {
+              applicationId: draft.id,
+              pageId: 'deceased',
+              groupId: 'deceased-view-group'
+            },
             isExact: true,
             path: '',
             url: ''
@@ -519,14 +357,17 @@ describe('when user is in the register form for death event', () => {
         // @ts-ignore
         <RegisterForm
           location={mock}
-          scope={mock}
           history={history}
           staticContext={mock}
           registerForm={form}
           application={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
-            params: { applicationId: draft.id, pageId: 'deceased' },
+            params: {
+              applicationId: draft.id,
+              pageId: 'deceased',
+              groupId: 'deceased-view-group'
+            },
             isExact: true,
             path: '',
             url: ''
@@ -536,7 +377,7 @@ describe('when user is in the register form for death event', () => {
         graphqlMock
       )
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       component = testComponent.component
@@ -547,11 +388,11 @@ describe('when user is in the register form for death event', () => {
       })
 
       component.update()
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 200)
       })
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 200)
       })
       component.update()
@@ -597,14 +438,17 @@ describe('when user is in the register form for death event', () => {
         // @ts-ignore
         <RegisterForm
           location={mock}
-          scope={mock}
           history={history}
           staticContext={mock}
           registerForm={form}
           application={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
-            params: { applicationId: draft.id, pageId: 'deceased' },
+            params: {
+              applicationId: draft.id,
+              pageId: 'deceased',
+              groupId: 'deceased-view-group'
+            },
             isExact: true,
             path: '',
             url: ''
@@ -614,7 +458,7 @@ describe('when user is in the register form for death event', () => {
         graphqlMock
       )
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       component = testComponent.component
@@ -637,7 +481,7 @@ describe('when user is in the register form for death event', () => {
       })
 
       component.update()
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 200)
       })
       component
@@ -648,7 +492,7 @@ describe('when user is in the register form for death event', () => {
         .childAt(0)
         .simulate('click')
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 200)
       })
       component.update()
@@ -694,14 +538,17 @@ describe('when user is in the register form for death event', () => {
         // @ts-ignore
         <RegisterForm
           location={mock}
-          scope={mock}
           history={history}
           staticContext={mock}
           registerForm={form}
           application={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
-            params: { applicationId: draft.id, pageId: 'informant' },
+            params: {
+              applicationId: draft.id,
+              pageId: 'informant',
+              groupId: 'informant-view-group'
+            },
             isExact: true,
             path: '',
             url: ''
@@ -711,7 +558,7 @@ describe('when user is in the register form for death event', () => {
         graphqlMock
       )
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       component = testComponent.component
@@ -734,7 +581,7 @@ describe('when user is in the register form for death event', () => {
       })
 
       component.update()
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 200)
       })
       component
@@ -745,7 +592,7 @@ describe('when user is in the register form for death event', () => {
         .childAt(0)
         .simulate('click')
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 200)
       })
       component.update()
@@ -771,14 +618,17 @@ describe('when user is in the register form for death event', () => {
         // @ts-ignore
         <RegisterForm
           location={mock}
-          scope={mock}
           history={history}
           staticContext={mock}
           registerForm={form}
           application={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
-            params: { applicationId: draft.id, pageId: 'deceased' },
+            params: {
+              applicationId: draft.id,
+              pageId: 'deceased',
+              groupId: 'deceased-view-group'
+            },
             isExact: true,
             path: '',
             url: ''
@@ -788,7 +638,7 @@ describe('when user is in the register form for death event', () => {
         graphqlMock
       )
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
       component = testComponent.component
@@ -843,14 +693,17 @@ describe('when user is in the register form for death event', () => {
         // @ts-ignore
         <RegisterForm
           location={mock}
-          scope={mock}
           history={history}
           staticContext={mock}
           registerForm={form}
           application={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
-            params: { applicationId: draft.id, pageId: 'deceased' },
+            params: {
+              applicationId: draft.id,
+              pageId: 'deceased',
+              groupId: 'deceased-view-group'
+            },
             isExact: true,
             path: '',
             url: ''
@@ -918,14 +771,17 @@ describe('when user is in the register form for death event', () => {
         // @ts-ignore
         <RegisterForm
           location={mock}
-          scope={mock}
           history={history}
           staticContext={mock}
           registerForm={form}
           application={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
-            params: { applicationId: draft.id, pageId: 'deceased' },
+            params: {
+              applicationId: draft.id,
+              pageId: 'deceased',
+              groupId: 'deceased-view-group'
+            },
             isExact: true,
             path: '',
             url: ''
@@ -981,14 +837,17 @@ describe('when user is in the register form for death event', () => {
         // @ts-ignore
         <RegisterForm
           location={mock}
-          scope={mock}
           history={history}
           staticContext={mock}
           registerForm={form}
           application={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
-            params: { applicationId: draft.id, pageId: 'deathEvent' },
+            params: {
+              applicationId: draft.id,
+              pageId: 'deathEvent',
+              groupId: 'deathEvent-deathDate'
+            },
             isExact: true,
             path: '',
             url: ''
@@ -1028,7 +887,11 @@ describe('when user is in the register form preview section', () => {
         application={draft}
         pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
         match={{
-          params: { applicationId: draft.id, pageId: 'preview' },
+          params: {
+            applicationId: draft.id,
+            pageId: 'preview',
+            groupId: 'preview-view-group'
+          },
           isExact: true,
           path: '',
           url: ''
@@ -1040,19 +903,13 @@ describe('when user is in the register form preview section', () => {
   })
 
   it('submit button will be enabled when even if form is not fully filled-up', () => {
-    expect(
-      component
-        .find('#submit_form')
-        .hostNodes()
-        .prop('disabled')
-    ).toBe(false)
+    expect(component.find('#submit_form').hostNodes().prop('disabled')).toBe(
+      false
+    )
   })
 
   it('Displays submit confirm modal when submit button is clicked', () => {
-    component
-      .find('#submit_form')
-      .hostNodes()
-      .simulate('click')
+    component.find('#submit_form').hostNodes().simulate('click')
 
     expect(component.find('#submit_confirm').hostNodes()).toHaveLength(1)
   })
@@ -1078,12 +935,15 @@ describe('when user is in the register form preview section', () => {
           application={nApplication}
           pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
           match={{
-            params: { applicationId: nApplication.id, pageId: 'preview' },
+            params: {
+              applicationId: nApplication.id,
+              pageId: 'preview',
+              groupId: 'preview-view-group'
+            },
             isExact: true,
             path: '',
             url: ''
           }}
-          scope={[]}
         />,
         store
       )
@@ -1091,10 +951,7 @@ describe('when user is in the register form preview section', () => {
     })
 
     it('should be able to submit the form', () => {
-      component
-        .find('#submit_form')
-        .hostNodes()
-        .simulate('click')
+      component.find('#submit_form').hostNodes().simulate('click')
       component.update()
 
       const cancelBtn = component.find('#cancel-btn').hostNodes()
@@ -1106,10 +963,7 @@ describe('when user is in the register form preview section', () => {
       expect(component.find('#submit_confirm').hostNodes().length).toEqual(0)
       expect(component.find('#submit_form').hostNodes().length).toEqual(1)
 
-      component
-        .find('#submit_form')
-        .hostNodes()
-        .simulate('click')
+      component.find('#submit_form').hostNodes().simulate('click')
       component.update()
 
       const confirmBtn = component.find('#submit_confirm').hostNodes()
@@ -1144,7 +998,6 @@ describe('when user is in the register form review section', () => {
       // @ts-ignore
       <RegisterForm
         location={mock}
-        scope={mock}
         history={history}
         staticContext={mock}
         registerForm={form}
@@ -1153,7 +1006,8 @@ describe('when user is in the register form review section', () => {
         match={{
           params: {
             applicationId: application.id,
-            pageId: 'review'
+            pageId: 'review',
+            groupId: 'review-view-group'
           },
           isExact: true,
           path: '',
@@ -1166,10 +1020,7 @@ describe('when user is in the register form review section', () => {
   })
 
   it('clicking the reject button launches the reject form action page', async () => {
-    component
-      .find('#rejectApplicationBtn')
-      .hostNodes()
-      .simulate('click')
+    component.find('#rejectApplicationBtn').hostNodes().simulate('click')
 
     await waitForElement(component, '#reject-registration-form-container')
     expect(
@@ -1199,7 +1050,6 @@ describe('when user is in the register form from review edit', () => {
       // @ts-ignore
       <RegisterForm
         location={mock}
-        scope={mock}
         history={history}
         staticContext={mock}
         registerForm={form}
@@ -1208,7 +1058,8 @@ describe('when user is in the register form from review edit', () => {
         match={{
           params: {
             applicationId: application.id,
-            pageId: 'mother'
+            pageId: 'mother',
+            groupId: 'mother-view-group'
           },
           isExact: true,
           path: '',
@@ -1227,14 +1078,12 @@ describe('when user is in the register form from review edit', () => {
     )
     menuButton.hostNodes().simulate('click')
     component.update()
-
     const closeApplicationButton = await waitForElement(
       component,
       '#eventToggleMenuItem0'
     )
     closeApplicationButton.hostNodes().simulate('click')
     component.update()
-
     expect(window.location.href).toContain('/progress')
   })
 })
@@ -1243,6 +1092,7 @@ describe('when user is in the register form from sent for review edit', () => {
   let component: ReactWrapper<{}, {}>
   let testAppStore: AppStore
   beforeEach(async () => {
+    ;(debounce as jest.Mock).mockImplementation((fn) => fn)
     Date.now = jest.fn(() => 1582525224324)
     const { store, history } = await createTestStore()
     // @ts-ignore
@@ -1263,7 +1113,6 @@ describe('when user is in the register form from sent for review edit', () => {
       // @ts-ignore
       <RegisterForm
         location={mock}
-        scope={mock}
         history={history}
         staticContext={mock}
         registerForm={form}
@@ -1272,7 +1121,8 @@ describe('when user is in the register form from sent for review edit', () => {
         match={{
           params: {
             applicationId: application.id,
-            pageId: 'mother'
+            pageId: 'mother',
+            groupId: 'mother-view-group'
           },
           isExact: true,
           path: '',
@@ -1319,8 +1169,8 @@ describe('when user is in the register form from sent for review edit', () => {
       .simulate('click')
     component.update()
 
-    const modifyTime = testAppStore.getState().applicationsState.applications[0]
-      .modifiedOn
+    const modifyTime =
+      testAppStore.getState().applicationsState.applications[0].modifiedOn
 
     expect(modifyTime).toBe(DRAFT_MODIFY_TIME)
   })
@@ -1368,12 +1218,15 @@ describe('When user is in Preview section death event', () => {
         application={deathDraft}
         pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
         match={{
-          params: { applicationId: deathDraft.id, pageId: 'preview' },
+          params: {
+            applicationId: deathDraft.id,
+            pageId: 'preview',
+            groupId: 'preview-view-group'
+          },
           isExact: true,
           path: '',
           url: ''
         }}
-        scope={[]}
       />,
       store
     )
@@ -1395,10 +1248,7 @@ describe('When user is in Preview section death event', () => {
   })
 
   it('Should be able to submit the form', () => {
-    component
-      .find('#submit_form')
-      .hostNodes()
-      .simulate('click')
+    component.find('#submit_form').hostNodes().simulate('click')
 
     const confirmBtn = component.find('#submit_confirm').hostNodes()
     expect(confirmBtn.length).toEqual(1)
@@ -1521,12 +1371,15 @@ describe('When user is in Preview section death event in offline mode', () => {
         application={deathDraft}
         pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
         match={{
-          params: { applicationId: deathDraft.id, pageId: 'preview' },
+          params: {
+            applicationId: deathDraft.id,
+            pageId: 'preview',
+            groupId: 'preview-view-group'
+          },
           isExact: true,
           path: '',
           url: ''
         }}
-        scope={[]}
       />,
       store
     )
@@ -1534,10 +1387,7 @@ describe('When user is in Preview section death event in offline mode', () => {
   })
 
   it('Should be able to submit the form', async () => {
-    component
-      .find('#submit_form')
-      .hostNodes()
-      .simulate('click')
+    component.find('#submit_form').hostNodes().simulate('click')
 
     const confirmBtn = component.find('#submit_confirm').hostNodes()
     expect(confirmBtn.length).toEqual(1)

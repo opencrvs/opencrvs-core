@@ -11,7 +11,7 @@ import SingleValue from 'react-select/lib/components/SingleValue'
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-const colorDictionary = {
+export const colorDictionary = {
   blackStormy: '#35495D',
   blueDeepSea: '#4C68C1',
   blueDeepSeaLight: '#F1F3FA',
@@ -84,6 +84,7 @@ export const colors = {
   chartAreaGradientStart: colorDictionary.greySmoky,
   chartAreaGradientEnd: colorDictionary.blueHover,
   dropdownHover: colorDictionary.blueHover,
+  loadingImage: colorDictionary.blueHover,
   menuBackground: colorDictionary.blackStormy,
   gradientDark: colorDictionary.nightshadeDark,
   gradientLight: colorDictionary.nightshadeLight,

@@ -311,7 +311,7 @@ export class SearchResultView extends React.Component<
     const transformedData = transformData(data, this.props.intl)
     return transformedData.map((reg, index) => {
       const foundApplication = this.props.outboxApplications.find(
-        application => application.id === reg.id
+        (application) => application.id === reg.id
       )
       const actions: IAction[] = []
       const downloadStatus =
@@ -423,7 +423,7 @@ export class SearchResultView extends React.Component<
   renderExpandedComponent = (itemId: string, data: GQLQuery) => {
     const results = data && data.searchEvents && data.searchEvents.results
     const eventDetails =
-      results && results.find(result => result && result.id === itemId)
+      results && results.find((result) => result && result.id === itemId)
     return <RowHistoryView eventDetails={eventDetails} />
   }
 
@@ -483,6 +483,7 @@ export class SearchResultView extends React.Component<
                       />
                     )
                   }
+
                   if (error || !data.searchEvents) {
                     return (
                       <ErrorText id="search-result-error-text">

@@ -120,7 +120,7 @@ const statusOptions = [
   }
 ].concat(
   Object.entries(StatusMapping)
-    .filter(item => checkExternalValidationStatus(item[0]))
+    .filter((item) => checkExternalValidationStatus(item[0]))
     .map(([status, { labelDescriptor: label }]) => ({
       label,
       value: status
@@ -148,16 +148,20 @@ interface ISearchParams {
   status?: keyof IStatusMapping
   event?: Event
 }
-
+export interface IHistoryStateProps {
+  sectionId: OPERATIONAL_REPORT_SECTION
+  timeStart: Date | string
+  timeEnd: Date | string
+}
 interface WorkflowStatusProps
-  extends RouteComponentProps,
+  extends RouteComponentProps<{}, {}, IHistoryStateProps>,
     DispatchProps,
     WrappedComponentProps {}
 function WorkflowStatusComponent(props: WorkflowStatusProps) {
   const { intl } = props
-  const { locationId, status, event } = (parse(
+  const { locationId, status, event } = parse(
     props.location.search
-  ) as unknown) as ISearchParams
+  ) as unknown as ISearchParams
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
   const [columnToBeSort, setColumnToBeSort] = useState<keyof SortMap>(
@@ -165,11 +169,9 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
   )
   const recordCount = DEFAULT_APPLICATION_STATUS_PAGE_SIZE * currentPageNumber
   let sectionId = OPERATIONAL_REPORT_SECTION.OPERATIONAL
-  let timeStart = moment()
-    .subtract(1, 'years')
-    .toDate()
-  let timeEnd = moment().toDate()
-  const historyState = props.history.location.state as any
+  let timeStart: string | Date = moment().subtract(1, 'years').toDate()
+  let timeEnd: string | Date = moment().toDate()
+  const historyState = props.history.location.state
 
   if (props.location.state) {
     sectionId = historyState.sectionId
@@ -338,7 +340,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         isSorted: columnToBeSort === 'timeLoggedRegistered' ? true : false
       }
     ] as IColumn[]
-    return keys.filter(item => {
+    return keys.filter((item) => {
       return !(!checkIfLocalLanguageProvided() && item.key === 'nameLocal')
     })
   }
@@ -577,7 +579,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
     return orderBy(
       content,
       columnToBeSort === 'nameIntl'
-        ? [content => content[columnToBeSort]!.toString().toLowerCase()]
+        ? [(content) => content[columnToBeSort]!.toString().toLowerCase()]
         : columnToBeSort === 'applicationStartedOn'
         ? ['applicationStartedOnTime']
         : [columnToBeSort],
@@ -671,7 +673,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
             id="event-select"
             withLightTheme={true}
             defaultWidth={175}
-            value={((event as unknown) as EVENT_OPTIONS) || EVENT_OPTIONS.ALL}
+            value={(event as unknown as EVENT_OPTIONS) || EVENT_OPTIONS.ALL}
             options={[
               {
                 label: intl.formatMessage(constantsMessages.allEvents),
@@ -702,7 +704,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
             withLightTheme={true}
             defaultWidth={175}
             value={(status as string) || ''}
-            options={statusOptions.map(option => ({
+            options={statusOptions.map((option) => ({
               ...option,
               label: intl.formatMessage(option.label)
             }))}

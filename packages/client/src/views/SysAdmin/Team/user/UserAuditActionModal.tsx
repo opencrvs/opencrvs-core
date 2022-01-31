@@ -230,7 +230,7 @@ function UserAuditActionModalComponent(
       <FormFieldGenerator
         id="user-audit-form"
         fields={form.fields}
-        onChange={values => setFormValues({ ...formValues, ...values })}
+        onChange={(values) => setFormValues({ ...formValues, ...values })}
         setAllFieldsDirty={false}
         draftData={{ formValues }}
       />

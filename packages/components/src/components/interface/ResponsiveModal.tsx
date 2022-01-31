@@ -35,13 +35,19 @@ const ScreenBlocker = styled.div`
   background-color: ${({ theme }) => theme.colors.menuBackground};
   opacity: 0.8;
 `
-const ModalContent = styled.div<{ width?: number; responsive?: boolean }>`
+const ModalContent = styled.div<{
+  width?: number
+  responsive?: boolean
+  fullscreen?: boolean
+}>`
   ${({ theme }) => theme.fonts.bodyStyle};
   color: ${({ theme }) => theme.colors.copy};
   background-color: ${({ theme }) => theme.colors.white};
   width: ${({ width }) => (width ? width : 448)}px;
+  height: ${({ fullscreen }) => (fullscreen ? '100vh' : 'auto')};
   display: flex;
   flex-direction: column;
+  flex-grow: ${({ fullscreen }) => (fullscreen ? 1 : 0)};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     flex-grow: 1;
   }
@@ -77,6 +83,7 @@ const Body = styled.div<{
   autoHeight?: boolean
   scrollableY?: boolean
   responsive?: boolean
+  fullscreen?: boolean
 }>`
   ${({ theme }) => theme.fonts.bodyStyle};
   height: ${({ height }) => (height ? height : 250)}px;
@@ -85,6 +92,7 @@ const Body = styled.div<{
   padding: 0 24px 16px;
   display: flex;
   flex-direction: column;
+  flex-grow: ${({ fullscreen }) => (fullscreen ? 1 : 0)};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     flex-grow: 1;
   }
@@ -129,6 +137,7 @@ interface IProps {
   contentHeight?: number
   autoHeight?: boolean
   contentScrollableY?: boolean
+  fullscreen?: boolean
   actions: JSX.Element[]
   handleClose?: () => void
   hideHeaderBoxShadow?: boolean
@@ -157,6 +166,7 @@ export class ResponsiveModal extends React.Component<IProps> {
       actions,
       width,
       contentHeight,
+      fullscreen,
       autoHeight,
       contentScrollableY,
       hideHeaderBoxShadow
@@ -170,7 +180,11 @@ export class ResponsiveModal extends React.Component<IProps> {
     return (
       <ModalContainer id={id}>
         <ScreenBlocker />
-        <ModalContent width={width} responsive={responsive}>
+        <ModalContent
+          width={width}
+          responsive={responsive}
+          fullscreen={fullscreen}
+        >
           <Header responsive={responsive} hideBoxShadow={hideHeaderBoxShadow}>
             <Title>{title}</Title>
             <CircleButton id="close-btn" type="button" onClick={handleClose}>
@@ -179,8 +193,9 @@ export class ResponsiveModal extends React.Component<IProps> {
           </Header>
           <Body
             height={contentHeight}
-            autoHeight={autoHeight}
             scrollableY={contentScrollableY}
+            fullscreen={fullscreen}
+            autoHeight={autoHeight}
           >
             {this.props.children}
           </Body>

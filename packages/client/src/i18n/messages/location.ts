@@ -22,6 +22,16 @@ interface ILocationMessages
 }
 
 const messagesToDefine: ILocationMessages = {
+  UNION: {
+    id: 'location.jurisdictionType.UNION',
+    defaultMessage: 'Union',
+    description: 'Label for Union'
+  },
+  DIVISION: {
+    id: 'location.jurisdictionType.DIVISION',
+    defaultMessage: 'Division',
+    description: 'Label for Division'
+  },
   DISTRICT: {
     id: 'location.jurisdictionType.DISTRICT',
     defaultMessage: 'District',
@@ -54,6 +64,5 @@ const messagesToDefine: ILocationMessages = {
   }
 }
 
-export const locationMessages: ILocationMessages = defineMessages(
-  messagesToDefine
-)
+export const locationMessages: ILocationMessages =
+  defineMessages(messagesToDefine)

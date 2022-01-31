@@ -142,7 +142,7 @@ describe('User audit list tests', () => {
     ).component
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
@@ -187,19 +187,13 @@ describe('User audit list tests', () => {
       component,
       '#auditTime-label'
     )
-    const firstTrackingId = firstRowElement
-      .hostNodes()
-      .childAt(2)
-      .text()
+    const firstTrackingId = firstRowElement.hostNodes().childAt(2).text()
 
     toggleSortActionElement.hostNodes().simulate('click')
     const firstRowElementAfterSort = await waitForElement(component, '#row_0')
-    expect(
-      firstRowElementAfterSort
-        .hostNodes()
-        .childAt(2)
-        .text()
-    ).not.toEqual(firstTrackingId)
+    expect(firstRowElementAfterSort.hostNodes().childAt(2).text()).not.toEqual(
+      firstTrackingId
+    )
   })
 
   it('renders next page of audits after clicking load more link', async () => {
@@ -258,7 +252,7 @@ describe('User audit list tests', () => {
     )
     expect(loadMoreLink.hostNodes()).toHaveLength(1)
     loadMoreLink.hostNodes().simulate('click')
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     testComponent.update()

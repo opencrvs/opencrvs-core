@@ -11,9 +11,11 @@
  */
 import { AppStore } from '@client/store'
 import {
+  mockLocalSysAdminUserResponse,
   createTestComponent,
   createTestStore,
-  flushPromises
+  flushPromises,
+  mockOfflineData
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { SEARCH_USERS } from '@client/user/queries'
@@ -23,6 +25,8 @@ import { stringify } from 'query-string'
 import * as React from 'react'
 import { UserList } from './UserList'
 import { userMutations } from '@client/user/mutations'
+import * as actions from '@client/profile/profileActions'
+import { offlineDataReady } from '@client/offline/actions'
 
 describe('User list tests', () => {
   let store: AppStore
@@ -33,6 +37,24 @@ describe('User list tests', () => {
     const { store: testStore, history: testHistory } = await createTestStore()
     store = testStore
     history = testHistory
+
+    const action = {
+      type: actions.SET_USER_DETAILS,
+      payload: mockLocalSysAdminUserResponse
+    }
+    await store.dispatch(action)
+    await store.dispatch(
+      offlineDataReady({
+        languages: mockOfflineData.languages,
+        forms: mockOfflineData.forms,
+        templates: mockOfflineData.templates,
+        locations: mockOfflineData.locations,
+        facilities: mockOfflineData.facilities,
+        pilotLocations: mockOfflineData.pilotLocations,
+        offices: mockOfflineData.offices,
+        assets: mockOfflineData.assets
+      })
+    )
   })
 
   describe('Header test', () => {
@@ -42,7 +64,7 @@ describe('User list tests', () => {
           request: {
             query: SEARCH_USERS,
             variables: {
-              primaryOfficeId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+              primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
               count: 10
             }
           },
@@ -61,7 +83,7 @@ describe('User list tests', () => {
           // @ts-ignore
           location={{
             search: stringify({
-              locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
+              locationId: '0d8474da-0361-4d32-979e-af91f012340a'
             })
           }}
         />,
@@ -70,18 +92,13 @@ describe('User list tests', () => {
       )
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 200)
       })
 
       testComponent.component.update()
       const app = testComponent.component
-      expect(
-        app
-          .find('#user_list')
-          .hostNodes()
-          .html()
-      ).toContain('0 users')
+      expect(app.find('#user_list').hostNodes().html()).toContain('0 users')
     })
     it('load user list in view only mode', async () => {
       const userListMock = [
@@ -89,7 +106,7 @@ describe('User list tests', () => {
           request: {
             query: SEARCH_USERS,
             variables: {
-              primaryOfficeId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+              primaryOfficeId: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
               count: 10
             }
           },
@@ -108,8 +125,7 @@ describe('User list tests', () => {
           // @ts-ignore
           location={{
             search: stringify({
-              locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
-              viewOnly: true
+              locationId: '0d8474da-0361-4d32-979e-af91f012340a'
             })
           }}
         />,
@@ -166,7 +182,7 @@ describe('User list tests', () => {
           request: {
             query: SEARCH_USERS,
             variables: {
-              primaryOfficeId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+              primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
               count: 10
             }
           },
@@ -185,7 +201,7 @@ describe('User list tests', () => {
           // @ts-ignore
           location={{
             search: stringify({
-              locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
+              locationId: '0d8474da-0361-4d32-979e-af91f012340a'
             })
           }}
         />,
@@ -210,7 +226,7 @@ describe('User list tests', () => {
           request: {
             query: SEARCH_USERS,
             variables: {
-              primaryOfficeId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+              primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
               count: 10
             }
           },
@@ -230,7 +246,7 @@ describe('User list tests', () => {
           // @ts-ignore
           location={{
             search: stringify({
-              locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
+              locationId: '0d8474da-0361-4d32-979e-af91f012340a'
             })
           }}
         />,
@@ -239,7 +255,7 @@ describe('User list tests', () => {
       )
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
 
@@ -255,7 +271,7 @@ describe('User list tests', () => {
           request: {
             query: SEARCH_USERS,
             variables: {
-              primaryOfficeId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+              primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
               count: 10
             }
           },
@@ -359,7 +375,7 @@ describe('User list tests', () => {
             // @ts-ignore
             location={{
               search: stringify({
-                locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
+                locationId: '0d8474da-0361-4d32-979e-af91f012340a'
               })
             }}
           />,
@@ -368,7 +384,7 @@ describe('User list tests', () => {
         )
 
         // wait for mocked data to load mockedProvider
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
           setTimeout(resolve, 100)
         })
 
@@ -381,7 +397,7 @@ describe('User list tests', () => {
           .simulate('click')
 
         // wait for mocked data to load mockedProvider
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
           setTimeout(resolve, 100)
         })
 
@@ -402,7 +418,7 @@ describe('User list tests', () => {
             // @ts-ignore
             location={{
               search: stringify({
-                locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
+                locationId: '0d8474da-0361-4d32-979e-af91f012340a'
               })
             }}
           />,
@@ -411,7 +427,7 @@ describe('User list tests', () => {
         )
 
         // wait for mocked data to load mockedProvider
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
           setTimeout(resolve, 100)
         })
 
@@ -419,97 +435,6 @@ describe('User list tests', () => {
         component = testComponent.component
 
         expect(component.find('div#row_4').children()).toHaveLength(2)
-      })
-
-      it('renders 3 columns for midium devices', async () => {
-        Object.defineProperty(window, 'innerWidth', {
-          writable: true,
-          configurable: true,
-          value: 700
-        })
-        const testComponent = await createTestComponent(
-          <UserList
-            // @ts-ignore
-            location={{
-              search: stringify({
-                locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
-              })
-            }}
-          />,
-          store,
-          userListMock
-        )
-
-        // wait for mocked data to load mockedProvider
-        await new Promise(resolve => {
-          setTimeout(resolve, 100)
-        })
-
-        testComponent.component.update()
-        component = testComponent.component
-
-        expect(component.find('div#row_4').children()).toHaveLength(3)
-      })
-
-      it('renders 4 columns for bigger devices on viewOnly mode', async () => {
-        Object.defineProperty(window, 'innerWidth', {
-          writable: true,
-          configurable: true,
-          value: 1100
-        })
-        const testComponent = await createTestComponent(
-          <UserList
-            // @ts-ignore
-            location={{
-              search: stringify({
-                locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
-                viewOnly: true
-              })
-            }}
-          />,
-          store,
-          userListMock
-        )
-
-        // wait for mocked data to load mockedProvider
-        await new Promise(resolve => {
-          setTimeout(resolve, 100)
-        })
-
-        testComponent.component.update()
-        component = testComponent.component
-
-        expect(component.find('div#row_4').children()).toHaveLength(4)
-      })
-
-      it('renders 5 columns for bigger devices', async () => {
-        Object.defineProperty(window, 'innerWidth', {
-          writable: true,
-          configurable: true,
-          value: 1100
-        })
-        const testComponent = await createTestComponent(
-          <UserList
-            // @ts-ignore
-            location={{
-              search: stringify({
-                locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
-              })
-            }}
-          />,
-          store,
-          userListMock
-        )
-
-        // wait for mocked data to load mockedProvider
-        await new Promise(resolve => {
-          setTimeout(resolve, 100)
-        })
-
-        testComponent.component.update()
-        component = testComponent.component
-
-        expect(component.find('div#row_4').children()).toHaveLength(5)
       })
     })
 
@@ -521,7 +446,7 @@ describe('User list tests', () => {
           request: {
             query: SEARCH_USERS,
             variables: {
-              primaryOfficeId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+              primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
               count: 10
             }
           },
@@ -613,12 +538,17 @@ describe('User list tests', () => {
       ]
 
       beforeEach(async () => {
+        Object.defineProperty(window, 'innerWidth', {
+          writable: true,
+          configurable: true,
+          value: 1100
+        })
         const testComponent = await createTestComponent(
           <UserList
             // @ts-ignore
             location={{
               search: stringify({
-                locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
+                locationId: '0d8474da-0361-4d32-979e-af91f012340a'
               })
             }}
           />,
@@ -627,7 +557,7 @@ describe('User list tests', () => {
         )
 
         // wait for mocked data to load mockedProvider
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
           setTimeout(resolve, 100)
         })
 
@@ -765,7 +695,7 @@ describe('User list tests', () => {
           request: {
             query: SEARCH_USERS,
             variables: {
-              primaryOfficeId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+              primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
               count: 10
             }
           },
@@ -860,7 +790,7 @@ describe('User list tests', () => {
           // @ts-ignore
           location={{
             search: stringify({
-              locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
+              locationId: '0d8474da-0361-4d32-979e-af91f012340a'
             })
           }}
         />,
@@ -869,7 +799,7 @@ describe('User list tests', () => {
       )
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
 
@@ -883,7 +813,7 @@ describe('User list tests', () => {
           request: {
             query: SEARCH_USERS,
             variables: {
-              primaryOfficeId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+              primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
               count: 10
             }
           },
@@ -1053,7 +983,7 @@ describe('User list tests', () => {
           // @ts-ignore
           location={{
             search: stringify({
-              locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
+              locationId: '0d8474da-0361-4d32-979e-af91f012340a'
             })
           }}
         />,
@@ -1062,18 +992,15 @@ describe('User list tests', () => {
       )
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
 
       testComponent.component.update()
       const app = testComponent.component
-      expect(
-        app
-          .find('#load_more_button')
-          .hostNodes()
-          .text()
-      ).toContain('Show next 10')
+      expect(app.find('#load_more_button').hostNodes().text()).toContain(
+        'Show next 10'
+      )
     })
     it('renders next page of the user list when the next page button is pressed', async () => {
       const userListMock = [
@@ -1081,7 +1008,7 @@ describe('User list tests', () => {
           request: {
             query: SEARCH_USERS,
             variables: {
-              primaryOfficeId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+              primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
               count: 10
             }
           },
@@ -1249,7 +1176,7 @@ describe('User list tests', () => {
           request: {
             query: SEARCH_USERS,
             variables: {
-              primaryOfficeId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+              primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
               count: 20
             }
           },
@@ -1479,7 +1406,7 @@ describe('User list tests', () => {
           // @ts-ignore
           location={{
             search: stringify({
-              locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
+              locationId: '0d8474da-0361-4d32-979e-af91f012340a'
             })
           }}
         />,
@@ -1488,7 +1415,7 @@ describe('User list tests', () => {
       )
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
 
@@ -1496,11 +1423,8 @@ describe('User list tests', () => {
       const app = testComponent.component
       expect(app.find('#load_more_button').hostNodes()).toHaveLength(1)
 
-      app
-        .find('#load_more_button')
-        .hostNodes()
-        .simulate('click')
-      await new Promise(resolve => {
+      app.find('#load_more_button').hostNodes().simulate('click')
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
 

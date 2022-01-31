@@ -213,9 +213,9 @@ class OperationalReportComponent extends React.Component<Props, State> {
       locations,
       offices
     } = props
-    const { timeStart, timeEnd, locationId, sectionId } = (parse(
+    const { timeStart, timeEnd, locationId, sectionId } = parse(
       search
-    ) as unknown) as ISearchParams
+    ) as unknown as ISearchParams
     const searchableLocations = generateLocations(
       { ...locations, ...offices },
       props.intl
@@ -270,8 +270,8 @@ class OperationalReportComponent extends React.Component<Props, State> {
         Authorization: `Bearer ${getToken()}`
       }
     })
-      .then(resp => resp.blob())
-      .then(blob => {
+      .then((resp) => resp.blob())
+      .then((blob) => {
         const url = window.URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = url
@@ -297,8 +297,8 @@ class OperationalReportComponent extends React.Component<Props, State> {
 
   getContent(eventType: Event) {
     moment.locale(this.props.intl.locale)
-    let content = []
-    let currentYear = this.state.timeStart.year()
+    const content = []
+    const currentYear = this.state.timeStart.year()
     let currentMonth = this.state.timeStart.month() + 1
     const startMonth =
       this.state.timeStart.month() + this.state.timeStart.year() * 12
@@ -411,6 +411,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
       mainWindowRightMargin
     } = this.state
     const role = userDetails && userDetails.role
+
     const { displayLabel: title, id: locationId } = selectedLocation
     return (
       <SysAdminContentWrapper
@@ -432,7 +433,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
           <ActionContainer>
             <FilterContainer id="operational-report-view">
               <PerformanceSelect
-                onChange={option => {
+                onChange={(option) => {
                   this.props.goToOperationalReport(
                     selectedLocation.id,
                     option.value as OPERATIONAL_REPORT_SECTION,

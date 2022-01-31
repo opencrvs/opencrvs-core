@@ -71,7 +71,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
   function initiateDownload() {
     const { event, compositionId, action } = props.downloadConfigs
     const downloadableApplication = makeApplicationReadyToDownload(
-      (event.toLowerCase() as unknown) as Event,
+      event.toLowerCase() as unknown as Event,
       compositionId,
       action
     )
@@ -101,7 +101,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
         <DownloadAction
           isFullHeight={false}
           id={`${id}-icon`}
-          onClick={e => {
+          onClick={(e) => {
             initiateDownload()
             e.stopPropagation()
           }}
@@ -115,7 +115,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
     <DownloadAction
       isFullHeight={false}
       id={`${id}-icon`}
-      onClick={e => {
+      onClick={(e) => {
         initiateDownload()
         e.stopPropagation()
       }}
