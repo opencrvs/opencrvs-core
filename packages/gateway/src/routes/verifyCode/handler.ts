@@ -229,8 +229,7 @@ export const responseSchema = Joi.object({
   status: Joi.string()
 })
 
-/* tslint:disable */
-const TokenPayload = t.type({
+const tokenPayload = t.type({
   sub: t.string,
   scope: t.array(t.string),
   iat: t.number,
@@ -238,14 +237,13 @@ const TokenPayload = t.type({
   aud: t.array(t.string)
 })
 
-export type ITokenPayload = t.TypeOf<typeof TokenPayload>
+export type ITokenPayload = t.TypeOf<typeof tokenPayload>
 
 export function verifyToken(token: string): ITokenPayload {
   const decoded = jwt.verify(token, publicCert, {
     issuer: 'opencrvs:auth-service',
     audience: 'opencrvs:gateway-user'
   })
-  const result = TokenPayload.decode(decoded)
+  const result = tokenPayload.decode(decoded)
   return result.value as ITokenPayload
 }
-/* tslint:enable */

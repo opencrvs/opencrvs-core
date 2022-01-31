@@ -24,17 +24,15 @@ const mock: IDatabaseConnector = {
   setex: jest.fn().mockImplementation(async (key, ttl, value) => {
     database[key] = value
   }),
-  get: jest.fn().mockImplementation(async key => {
+  get: jest.fn().mockImplementation(async (key) => {
     return database[key] || null
   }),
-  del: jest.fn().mockImplementation(async key => {
+  del: jest.fn().mockImplementation(async (key) => {
     const keyExists = !!database[key]
     delete database[key]
     return keyExists ? 1 : 0
   }),
-  // tslint:disable-next-line no-empty
   start: jest.fn(),
-  // tslint:disable-next-line no-empty
   stop: jest.fn()
 }
 
