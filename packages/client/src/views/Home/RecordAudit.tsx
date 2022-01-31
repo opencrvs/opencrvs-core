@@ -10,14 +10,15 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { Header } from '@client/components/interface/Header/Header'
 import React from 'react'
+import { Header } from '@client/components/interface/Header/Header'
+import { Content } from '@opencrvs/components/lib/interface/Content'
 
 export const RecordAudit = () => {
   return (
     <>
       <Header />
-      <div>RecordAudit Page</div>
+      <Content title={'demo title'}>Demo Record Audit Body</Content>
     </>
   )
 }
