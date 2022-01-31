@@ -15,6 +15,8 @@ import Certificate, {
 } from '@config/models/Certificate'
 import * as fetchMock from 'jest-fetch-mock'
 import mockingoose from 'mockingoose'
+import * as jwt from 'jsonwebtoken'
+import { readFileSync } from 'fs'
 
 export enum Event {
   BIRTH = 'birth',
@@ -24,6 +26,16 @@ export enum Status {
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE'
 }
+
+const token = jwt.sign(
+  { scope: ['natlsysadmin'] },
+  readFileSync('../auth/test/cert.key'),
+  {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:config-user'
+  }
+)
 
 const fetch = fetchMock as fetchMock.FetchMock
 
@@ -129,6 +141,9 @@ describe('createCertificate handler', () => {
         user: 'dde0846b-4b0f-4732-80e7-b0f06444fef5',
         event: 'birth',
         status: 'ACTIVE'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
       }
     })
     expect(res.statusCode).toBe(201)
@@ -146,6 +161,9 @@ describe('createCertificate handler', () => {
         user: 'dde0846b-4b0f-4732-80e7-b0f06444fef5',
         event: 'birth',
         status: 'ACTIVE'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
       }
     })
     expect(res.statusCode).toBe(400)
@@ -170,6 +188,9 @@ describe('getCertificate handler', () => {
       payload: {
         status: 'ACTIVE',
         event: 'birth'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
       }
     })
     expect(res.statusCode).toBe(200)
@@ -184,6 +205,9 @@ describe('getCertificate handler', () => {
       payload: {
         status: 'ACTIVE',
         event: 'death'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
       }
     })
 
@@ -205,7 +229,10 @@ describe('getActiveCertificates handler', () => {
 
     const res = await server.server.inject({
       method: 'GET',
-      url: '/getActiveCertificates'
+      url: '/getActiveCertificates',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     })
     expect(res.statusCode).toBe(200)
   })
@@ -231,6 +258,9 @@ describe('updateCertificate handler', () => {
       payload: {
         id: '61c4664e663fc6af203b63b8',
         status: 'INACTIVE'
+      },
+      headers: {
+        Authorization: `${token}`
       }
     })
     expect(res.statusCode).toBe(201)
@@ -246,6 +276,9 @@ describe('updateCertificate handler', () => {
       payload: {
         id: '61c4664e663fc6af203b63b8',
         svgFilename: 1234
+      },
+      headers: {
+        Authorization: `${token}`
       }
     })
 
@@ -268,7 +301,10 @@ describe('deleteCertificate handler', () => {
 
     const res = await server.server.inject({
       method: 'DELETE',
-      url: '/certificate/61c4664e663fc6af203b63b8'
+      url: '/certificate/61c4664e663fc6af203b63b8',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     })
     expect(res.statusCode).toBe(204)
   })
