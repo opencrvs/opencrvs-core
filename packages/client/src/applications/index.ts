@@ -210,8 +210,21 @@ type Relation =
   | 'INFORMANT'
   | 'PRINT_IN_ADVANCE'
 
+type RelationForCertificateCorrection =
+  | 'FATHER'
+  | 'MOTHER'
+  | 'SPOUSE'
+  | 'SON'
+  | 'DAUGHTER'
+  | 'EXTENDED_FAMILY'
+  | 'OTHER'
+  | 'INFORMANT'
+  | 'PRINT_IN_ADVANCE'
+  | 'CHILD'
+
 export type ICertificate = {
   collector?: Partial<{ type: Relation }>
+  corrector?: Partial<{ type: RelationForCertificateCorrection }>
   hasShowedVerifiedDocument?: boolean
   payments?: Payment
   data?: string

@@ -30,6 +30,16 @@ interface ICorrectionMessages
   otherIdCheckTitle: MessageDescriptor
   idCheckVerify: MessageDescriptor
   birthCorrectionNote: MessageDescriptor
+  proofOfLegalDocuments: MessageDescriptor
+  docTypeAffidavitProof: MessageDescriptor
+  docTypeCourtDocument: MessageDescriptor
+  docTypeOther: MessageDescriptor
+  supportDocumentForCorrection: MessageDescriptor
+  selectPlaceholder: MessageDescriptor
+  attestToSeeCorrectionDocument: MessageDescriptor
+  noDocumentsRequiredForCorrection: MessageDescriptor
+  supportingDocumentsTitle: MessageDescriptor
+  supportingDocumentsSubtitle: MessageDescriptor
 }
 
 const messagesToDefine: ICorrectionMessages = {
@@ -126,6 +136,60 @@ const messagesToDefine: ICorrectionMessages = {
     defaultMessage:
       'Note: In the case that the child is now of legal age (18) then only they should be able to request a change to thier birth record.',
     description: 'Birth correction note'
+  },
+  proofOfLegalDocuments: {
+    id: 'correction.supportingDocuments.proofOfLegalDocuments',
+    defaultMessage: 'Proof of legal correction documents',
+    description: 'Label for list item of legal proof'
+  },
+  docTypeAffidavitProof: {
+    id: 'correction.supportingDocuments.docTypeAffidavitProof',
+    defaultMessage: 'Affidavit',
+    description: 'Label for select option Affidavit'
+  },
+  docTypeCourtDocument: {
+    id: 'correction.supportingDocuments.docTypeCourtDocument',
+    defaultMessage: 'Court Document',
+    description: 'Label for select option Court Document'
+  },
+  docTypeOther: {
+    id: 'correction.supportingDocuments.docTypeOther',
+    defaultMessage: 'Other',
+    description: 'Label for select option Other'
+  },
+  supportDocumentForCorrection: {
+    id: 'correction.supportingDocuments.supportDocumentForCorrection',
+    defaultMessage: 'Check Supporting Document?',
+    description: 'Label for form field: Correction Supporting Document'
+  },
+  selectPlaceholder: {
+    id: 'correction.supportingDocuments.select.placeholder',
+    defaultMessage: 'Select',
+    description: 'Placeholder text for a select'
+  },
+  attestToSeeCorrectionDocument: {
+    id: 'correction.supportingDocuments.attestToSeeCorrectionDocument',
+    defaultMessage:
+      'I attest to seeing supporting documentation and have a copy filed at my office',
+    description: 'Option for form field: Correction Supporting Document'
+  },
+  noDocumentsRequiredForCorrection: {
+    id: 'correction.supportingDocuments.noDocumentsRequiredForCorrection',
+    defaultMessage: 'No supporting documents required',
+    description: 'Option for form field: Correction Supporting Document'
+  },
+  supportingDocumentsTitle: {
+    id: 'correction.supportingDocuments.title',
+    defaultMessage: 'Upload supporting documents',
+    description:
+      'Label for supportingDocuments form title in certificate correction form'
+  },
+  supportingDocumentsSubtitle: {
+    id: 'correction.supportingDocuments.subtitle',
+    defaultMessage:
+      'For all record corrections at a minimum an affidavit must be provided. For material errors and omissions eg. in paternity cases, a court order must also be provided.',
+    description:
+      'Label for supportingDocuments form subtitle in certificate correction form'
   }
 }
 
