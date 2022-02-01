@@ -30,7 +30,7 @@ export const correctRecordReasonSectionGroup: IFormSectionGroup = {
       type: RADIO_GROUP_WITH_NESTED_FIELDS,
       size: RadioSize.LARGE,
       label: messages.whatWasTheReasonForCorrection,
-      required: false,
+      required: true,
       hideHeader: true,
       initialValue: '',
       validate: [],

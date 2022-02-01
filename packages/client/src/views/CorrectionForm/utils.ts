@@ -23,28 +23,27 @@ export function sectionHasError(
     application.data[section.id] || {}
   )
 
-  let error = false
-
-  group.fields.forEach((field) => {
+  for (const field of group.fields) {
     const fieldErrors = errors[field.name].errors
     const nestedFieldErrors = errors[field.name].nestedFields
 
     if (fieldErrors.length > 0) {
-      error = true
+      return true
     }
 
     if (field.nestedFields) {
-      Object.values(field.nestedFields).forEach((nestedFields) => {
-        nestedFields.forEach((nestedField) => {
+      for (const nestedFields of Object.values(field.nestedFields)) {
+        for (const nestedField of nestedFields) {
           if (
             nestedFieldErrors[nestedField.name] &&
             nestedFieldErrors[nestedField.name].length > 0
           ) {
-            error = true
+            return true
           }
-        })
-      })
+        }
+      }
     }
-  })
-  return error
+  }
+
+  return false
 }
