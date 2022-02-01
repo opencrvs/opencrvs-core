@@ -278,14 +278,14 @@ class CorrectionReviewFormComponent extends React.Component<IProps> {
     this.props.application.visitedGroupIds = visitedGroups
   }
 
-  goBack() {
+  goBack = () => {
     this.props.goToCertificateCorrection(
       this.props.application.id,
       CorrectionSection.Corrector
     )
   }
 
-  cancelCorrection() {
+  cancelCorrection = () => {
     this.props.modifyApplication({
       ...this.props.application,
       data: {
@@ -319,7 +319,7 @@ class CorrectionReviewFormComponent extends React.Component<IProps> {
       <TertiaryButton
         align={ICON_ALIGNMENT.LEFT}
         icon={() => <BackArrow />}
-        onClick={goBack}
+        onClick={this.goBack}
       />
     )
     return (

@@ -62,15 +62,15 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
 
   const modifyApplication = (
     sectionData: IFormSectionData,
-    activeSection: IFormSection,
+    section: IFormSection,
     application: IApplication
   ) => {
     props.modifyApplication({
       ...application,
       data: {
         ...application.data,
-        [activeSection.id]: {
-          ...application.data[activeSection.id],
+        [section.id]: {
+          ...application.data[section.id],
           ...sectionData
         }
       }

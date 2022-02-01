@@ -96,7 +96,7 @@ function getGroupWithVisibleFields(
 }
 
 function CorrectorFormComponent(props: IFullProps) {
-  const { application, intl, goBack } = props
+  const { application, intl } = props
 
   const section = getCorrectorSection(application.event)
 
@@ -104,15 +104,15 @@ function CorrectorFormComponent(props: IFullProps) {
 
   const modifyApplication = (
     sectionData: IFormSectionData,
-    activeSection: IFormSection,
+    section: IFormSection,
     application: IApplication
   ) => {
     props.modifyApplication({
       ...application,
       data: {
         ...application.data,
-        [activeSection.id]: {
-          ...application.data[activeSection.id],
+        [section.id]: {
+          ...application.data[section.id],
           ...sectionData
         }
       }
@@ -121,7 +121,6 @@ function CorrectorFormComponent(props: IFullProps) {
   const continueButtonHandler = () => {
     props.goToVerifyCorrector(
       application.id,
-      application.event,
       (application.data.corrector.relationship as IFormSectionData)
         .value as string
     )
@@ -140,6 +139,7 @@ function CorrectorFormComponent(props: IFullProps) {
   const continueButton = (
     <PrimaryButton
       id="confirm_form"
+      key="confirm_form"
       onClick={continueButtonHandler}
       disabled={sectionHasError(group, section, application)}
     >
@@ -153,7 +153,7 @@ function CorrectorFormComponent(props: IFullProps) {
         id="corrector_form"
         title={intl.formatMessage(section.title)}
         hideBackground
-        goBack={goBack}
+        goBack={props.goBack}
         goHome={cancelCorrection}
       >
         <Content

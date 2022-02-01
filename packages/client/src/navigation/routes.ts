@@ -41,8 +41,7 @@ export const CERTIFICATE_CORRECTION = '/correction/:applicationId/:pageId'
 export const CERTIFICATE_CORRECTION_REVIEW =
   '/correction/:applicationId/:pageId/:groupId'
 
-export const VERIFY_CORRECTOR =
-  '/correctRecord/check/:registrationId/:eventType/:corrector'
+export const VERIFY_CORRECTOR = '/correction/:applicationId/verify/:corrector'
 
 export const SAVED_REGISTRATION = '/saved'
 export const REJECTED_REGISTRATION = '/rejected'

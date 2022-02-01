@@ -150,6 +150,7 @@ class IDVerifierComponent extends React.Component<
     const positiveActionButton = (
       <SuccessButton
         id="verifyPositive"
+        key="verifyPositive"
         onClick={positiveAction.handler}
         icon={() => <Check />}
         align={ICON_ALIGNMENT.LEFT}
@@ -161,6 +162,7 @@ class IDVerifierComponent extends React.Component<
     const negativeActionButton = (
       <DangerButton
         id="verifyNegative"
+        key="verifyNegative"
         onClick={this.togglePrompt}
         icon={() => <Cross color="currentColor" />}
         align={ICON_ALIGNMENT.LEFT}

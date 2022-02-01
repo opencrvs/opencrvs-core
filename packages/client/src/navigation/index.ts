@@ -339,15 +339,10 @@ export function goToCertificateCorrection(
   )
 }
 
-export function goToVerifyCorrector(
-  registrationId: string,
-  event: string,
-  corrector: string
-) {
+export function goToVerifyCorrector(applicationId: string, corrector: string) {
   return push(
     formatUrl(VERIFY_CORRECTOR, {
-      registrationId: registrationId.toString(),
-      eventType: event.toLowerCase().toString(),
+      applicationId: applicationId.toString(),
       corrector: corrector.toLowerCase().toString()
     })
   )

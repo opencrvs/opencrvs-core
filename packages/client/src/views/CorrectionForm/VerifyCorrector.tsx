@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
-import { IPrintableApplication, modifyApplication } from '@client/applications'
-import { Event, ReviewSection } from '@client/forms'
+import { modifyApplication, IApplication } from '@client/applications'
+import { ReviewSection } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/correction'
 import { goBack, goToPageGroup, goToHomeTab } from '@client/navigation'
 import { IStoreState } from '@client/store'
@@ -48,13 +48,12 @@ export interface ICertificateCorrectorDefinition {
 }
 
 interface IMatchParams {
-  registrationId: string
-  eventType: Event
+  applicationId: string
   corrector: string
 }
 
 interface IStateProps {
-  application: IPrintableApplication
+  application: IApplication
   offlineResources: IOfflineData
 }
 interface IDispatchProps {
@@ -140,7 +139,7 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
     }
   }
 
-  cancelCorrection() {
+  cancelCorrection = () => {
     this.props.modifyApplication({
       ...this.props.application,
       data: {
@@ -210,11 +209,15 @@ const mapStateToProps = (
   state: IStoreState,
   ownProps: IOwnProps
 ): IStateProps => {
-  const { registrationId } = ownProps.match.params
+  const { applicationId } = ownProps.match.params
 
   const application = state.applicationsState.applications.find(
-    (draft) => draft.id === registrationId
-  ) as IPrintableApplication
+    (draft) => draft.id === applicationId
+  )
+
+  if (!application) {
+    throw new Error(`Draft "${applicationId}" missing!`)
+  }
 
   return {
     application,
