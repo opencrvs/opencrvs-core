@@ -1473,7 +1473,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               }
             />
             <FormData>
-              {!this.isCorrection && (
+              {!this.isCorrection() && (
                 <FormDataHeader>
                   {intl.formatMessage(messages.formDataHeader, {
                     isDraft: draft
@@ -1499,7 +1499,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   />
                 )
               })}
-              {event === BIRTH && !this.isCorrection && (
+              {event === BIRTH && !this.isCorrection() && (
                 <InputWrapper>
                   <InputField
                     id="additional_comments"
@@ -1511,7 +1511,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   </InputField>
                 </InputWrapper>
               )}
-              {!this.isCorrection && (
+              {!this.isCorrection() && (
                 <ReviewAction
                   completeApplication={isComplete}
                   applicationToBeValidated={this.userHasValidateScope()}
@@ -1525,7 +1525,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   rejectApplicationAction={rejectApplicationClickEvent}
                 />
               )}
-              {this.isCorrection && (
+              {this.isCorrection() && (
                 <FooterArea>
                   <PrimaryButton
                     id="continue_button"
