@@ -112,7 +112,6 @@ class SimpleDocumentUploaderComponent extends React.Component<
   }
 
   selectForPreview = (previewImage: IFormFieldValue) => {
-    console.log('previewImage', previewImage)
     this.setState({ previewImage: previewImage as IAttachmentValue })
   }
 
