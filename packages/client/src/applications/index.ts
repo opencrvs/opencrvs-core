@@ -156,6 +156,7 @@ export interface ITaskHistory {
 export interface IApplication {
   id: string
   data: IFormData
+  originalData?: IFormData
   savedOn?: number
   modifiedOn?: number
   eventType?: string
@@ -209,8 +210,21 @@ type Relation =
   | 'INFORMANT'
   | 'PRINT_IN_ADVANCE'
 
+type RelationForCertificateCorrection =
+  | 'FATHER'
+  | 'MOTHER'
+  | 'SPOUSE'
+  | 'SON'
+  | 'DAUGHTER'
+  | 'EXTENDED_FAMILY'
+  | 'OTHER'
+  | 'INFORMANT'
+  | 'PRINT_IN_ADVANCE'
+  | 'CHILD'
+
 export type ICertificate = {
   collector?: Partial<{ type: Relation }>
+  corrector?: Partial<{ type: RelationForCertificateCorrection }>
   hasShowedVerifiedDocument?: boolean
   payments?: Payment
   data?: string
@@ -457,6 +471,7 @@ export function createReviewApplication(
   return {
     id: applicationId,
     data: formData,
+    originalData: formData,
     review: true,
     event,
     registrationStatus: status

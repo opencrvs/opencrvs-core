@@ -131,7 +131,7 @@ type IProps = {
 }
 
 type IFullProps = IntlShapeProps &
-  RouteComponentProps<{}> &
+  RouteComponentProps<{}, {}, { isNavigatedInsideApp: boolean }> &
   IProps & { drafts: IApplicationsState }
 
 class ReviewCertificateActionComponent extends React.Component<
@@ -238,11 +238,12 @@ class ReviewCertificateActionComponent extends React.Component<
   }
 
   goBack = () => {
-    const historyState = this.props.location.state as any
-    const naviagatedFromInsideApp = Boolean(
+    const historyState = this.props.location.state
+    const navigatedFromInsideApp = Boolean(
       historyState && historyState.isNavigatedInsideApp
     )
-    if (naviagatedFromInsideApp) {
+
+    if (navigatedFromInsideApp) {
       this.props.goBack()
     } else {
       this.props.goToRegistrarHomeTabAction(TAB_ID.readyForPrint)

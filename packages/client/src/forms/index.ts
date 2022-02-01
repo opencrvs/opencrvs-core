@@ -821,7 +821,8 @@ export enum CertificateSection {
 
 export enum CorrectionSection {
   Corrector = 'corrector',
-  Reason = 'reason'
+  Reason = 'reason',
+  SupportingDocuments = 'supportingDocuments'
 }
 
 export enum PaymentSection {
@@ -844,6 +845,7 @@ export type Section =
 export interface IFormSection {
   id: Section
   viewType: ViewType
+  replaceable?: boolean
   name: MessageDescriptor
   title: MessageDescriptor
   groups: IFormSectionGroup[]

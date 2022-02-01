@@ -51,7 +51,8 @@ import {
   TEAM_USER_LIST,
   USER_PROFILE,
   CONFIG,
-  CERTIFICATE_CORRECTION
+  CERTIFICATE_CORRECTION,
+  VERIFY_CORRECTOR
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
@@ -243,15 +244,11 @@ export function goToOperationalReport(
   })
 }
 
-export function goToTeamUserList(
-  selectedLocation: ISearchLocation,
-  viewOnly?: boolean
-) {
+export function goToTeamUserList(selectedLocation: ISearchLocation) {
   return push({
     pathname: TEAM_USER_LIST,
     search: stringify({
-      locationId: selectedLocation.id,
-      viewOnly
+      locationId: selectedLocation.id
     })
   })
 }
@@ -331,13 +328,22 @@ export function goToPrintCertificate(
 }
 
 export function goToCertificateCorrection(
-  registrationId: string,
-  sectionId: CorrectionSection
+  applicationId: string,
+  pageId: CorrectionSection
 ) {
   return push(
     formatUrl(CERTIFICATE_CORRECTION, {
-      registrationId: registrationId.toString(),
-      sectionId: sectionId.toString()
+      applicationId: applicationId.toString(),
+      pageId: pageId.toString()
+    })
+  )
+}
+
+export function goToVerifyCorrector(applicationId: string, corrector: string) {
+  return push(
+    formatUrl(VERIFY_CORRECTOR, {
+      applicationId: applicationId.toString(),
+      corrector: corrector.toLowerCase().toString()
     })
   )
 }

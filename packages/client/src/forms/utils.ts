@@ -64,6 +64,14 @@ import { IRadioOption as CRadioOption } from '@opencrvs/components/lib/forms'
 import { IDynamicValues } from '@client/navigation'
 import { generateLocations } from '@client/utils/locationUtils'
 import { callingCountries } from 'country-data'
+import { IApplication } from '@client/applications'
+
+export const VIEW_TYPE = {
+  FORM: 'form',
+  REVIEW: 'review',
+  PREVIEW: 'preview',
+  HIDDEN: 'hidden'
+}
 
 interface IRange {
   start: number
@@ -238,6 +246,50 @@ export const getFieldValidation = (
   }
 
   return validate
+}
+
+export function getNextSectionIds(
+  sections: IFormSection[],
+  fromSection: IFormSection,
+  fromSectionGroup: IFormSectionGroup,
+  application: IApplication
+): { [key: string]: string } | null {
+  const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
+    fromSection,
+    application.data[fromSection.id] || {},
+    application.data
+  )
+  const currentGroupIndex = visibleGroups.findIndex(
+    (group: IFormSectionGroup) => group.id === fromSectionGroup.id
+  )
+
+  if (currentGroupIndex === visibleGroups.length - 1) {
+    const visibleSections = sections.filter(
+      (section) =>
+        section.viewType !== VIEW_TYPE.HIDDEN &&
+        getVisibleSectionGroupsBasedOnConditions(
+          section,
+          application.data[fromSection.id] || {},
+          application.data
+        ).length > 0
+    )
+
+    const currentIndex = visibleSections.findIndex(
+      (section: IFormSection) => section.id === fromSection.id
+    )
+    if (currentIndex === visibleSections.length - 1) {
+      return null
+    }
+
+    return {
+      sectionId: visibleSections[currentIndex + 1].id,
+      groupId: visibleSections[currentIndex + 1].groups[0].id
+    }
+  }
+  return {
+    sectionId: fromSection.id,
+    groupId: visibleGroups[currentGroupIndex + 1].id
+  }
 }
 
 export const getVisibleGroupFields = (group: IFormSectionGroup) => {
@@ -510,20 +562,30 @@ export const hasFormError = (
         (nestedFieldErrors) => nestedFieldErrors.length > 0
       )
   )
-
   return fieldListWithErrors && fieldListWithErrors.length > 0
 }
 
 export const convertToMSISDN = (phone: string) => {
+  /*
+   *  If country is the fictional demo country (Farajaland), use Zambian number format
+   */
   const countryCode =
-    callingCountries[window.config.COUNTRY.toUpperCase()].countryCallingCodes[0]
+    window.config.COUNTRY.toUpperCase() === 'FAR'
+      ? 'ZMB'
+      : window.config.COUNTRY.toUpperCase()
 
-  if (phone.startsWith(countryCode) || `+${phone}`.startsWith(countryCode)) {
+  const countryCallingCode =
+    callingCountries[countryCode].countryCallingCodes[0]
+
+  if (
+    phone.startsWith(countryCallingCode) ||
+    `+${phone}`.startsWith(countryCallingCode)
+  ) {
     return phone.startsWith('+') ? phone : `+${phone}`
   }
   return phone.startsWith('0')
-    ? `${countryCode}${phone.substring(1)}`
-    : `${countryCode}${phone}`
+    ? `${countryCallingCode}${phone.substring(1)}`
+    : `${countryCallingCode}${phone}`
 }
 
 export const conditionals: IConditionals = {

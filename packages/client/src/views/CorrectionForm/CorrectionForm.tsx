@@ -14,31 +14,37 @@ import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { RouteComponentProps } from 'react-router'
 import { IApplication } from '@client/applications'
-import { CorrectorForm } from '@client/views/CorrectionForm'
+import {
+  CorrectorForm,
+  SupportingDocumentsForm
+} from '@client/views/CorrectionForm'
 import { CorrectionSection } from '@client/forms'
 import { CorrectionReasonForm } from './CorrectionReasonForm'
 
 type IProps = IStateProps & IDispatchProps
 
-function CorrectionFormComponent({ application, sectionId }: IProps) {
+function CorrectionFormComponent({ sectionId, ...props }: IProps) {
   switch (sectionId) {
     case CorrectionSection.Corrector:
-      return <CorrectorForm application={application} />
+      return <CorrectorForm {...props} />
     case CorrectionSection.Reason:
-      return <CorrectionReasonForm application={application} />
+      return <CorrectionReasonForm {...props} />
+    case CorrectionSection.SupportingDocuments:
+      return <SupportingDocumentsForm {...props} />
   }
   return <></>
 }
 
 function mapStateToProps(state: IStoreState, props: IRouteProps) {
-  const { registrationId, sectionId } = props.match.params
+  const { applicationId, pageId: sectionId } = props.match.params
   const application = state.applicationsState.applications.find(
-    ({ id }) => id === registrationId
+    ({ id }) => id === applicationId
   )
 
   if (!application) {
-    throw new Error(`Draft "${registrationId}" missing!`)
+    throw new Error(`Draft "${applicationId}" missing!`)
   }
+
   return {
     application,
     sectionId
@@ -53,8 +59,8 @@ type IStateProps = {
 type IDispatchProps = {}
 
 type IRouteProps = RouteComponentProps<{
-  registrationId: string
-  sectionId: string
+  applicationId: string
+  pageId: string
 }>
 
 export const CorrectionForm = connect<

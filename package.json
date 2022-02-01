@@ -26,7 +26,7 @@
     "compose:down:deps": "docker-compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev-deps.yml down",
     "compose:build": "yarn build:image && docker-compose build",
     "compose:push": "yarn compose:build && docker-compose push && yarn compose:push:version",
-    "compose:push:version": "lerna run build --scope @opencrvs/commons && export VERSION=`git log -1 --pretty=format:%h` && yarn compose:build && docker-compose push && unset VERSION",
+    "compose:push:version": "export VERSION=`git log -1 --pretty=format:%h` && yarn compose:build && docker-compose push && unset VERSION",
     "compose:push:release": "export VERSION=`git describe --tags --abbrev=0` && git checkout -b release-`git describe --tags --abbrev=0` && yarn compose:build && docker-compose push && unset VERSION",
     "deploy:staging": "bash deploy.sh --clear-data=yes --restore-metadata=yes --update-metadata=no development",
     "deploy:qa": "bash deploy.sh --clear-data=no --restore-metadata=no --update-metadata=no qa",
@@ -38,7 +38,8 @@
     "build:image": "export VERSION=`git log -1 --pretty=format:%h` && docker build --build-arg VERSION=${VERSION} -t opencrvs-build . && unset VERSION",
     "build:clean": "lerna run build:clean",
     "check:license": "license-check-and-add check -f infrastructure/license-config.json",
-    "add:license": "license-check-and-add add -f infrastructure/license-config.json"
+    "add:license": "license-check-and-add add -f infrastructure/license-config.json",
+    "build:components": "lerna run build --scope @opencrvs/components"
   },
   "devDependencies": {
     "@types/dotenv": "^6.1.0",

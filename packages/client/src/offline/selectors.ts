@@ -12,7 +12,7 @@
 import { IOfflineDataState, IOfflineData } from '@client/offline/reducer'
 import { IStoreState } from '@client/store'
 import { IUserDetails } from '@client/utils/userUtils'
-import { SYS_ADMIN_ROLES } from '@client/utils/constants'
+import { NATL_ADMIN_ROLES, SYS_ADMIN_ROLES } from '@client/utils/constants'
 
 export const getOfflineState = (store: IStoreState): IOfflineDataState =>
   store.offline
@@ -30,6 +30,7 @@ export function isOfflineDataLoaded(
     state.forms &&
     state.forms.registerForm &&
     state.forms.certificateCollectorDefinition &&
+    state.forms.certificateCorrectorDefinition &&
     state.forms.userForm &&
     state.languages &&
     state.assets &&
@@ -43,6 +44,14 @@ export function isSystemAdmin(userDetails: IUserDetails | undefined) {
     userDetails &&
     userDetails.role &&
     SYS_ADMIN_ROLES.includes(userDetails.role)
+  )
+}
+
+export function isNationalSystemAdmin(userDetails: IUserDetails | undefined) {
+  return (
+    userDetails &&
+    userDetails.role &&
+    NATL_ADMIN_ROLES.includes(userDetails.role)
   )
 }
 

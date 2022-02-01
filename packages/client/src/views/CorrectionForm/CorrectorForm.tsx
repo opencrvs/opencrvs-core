@@ -14,7 +14,7 @@ import { modifyApplication, IApplication } from '@client/applications'
 import { getCorrectorSection } from '@client/forms/correction/corrector'
 import { connect } from 'react-redux'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
-import { goBack } from '@client/navigation'
+import { goBack, goToVerifyCorrector, goToHomeTab } from '@client/navigation'
 import {
   Event,
   IFormSection,
@@ -24,24 +24,12 @@ import {
 import { get, isEqual } from 'lodash'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
-import styled from '@client/styledComponents'
 import { FormFieldGenerator } from '@client/components/form'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
-import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
-import { getValidationErrorsForForm } from '@client/forms/validation'
-
-const FormSectionTitle = styled.h4`
-  ${({ theme }) => theme.fonts.h4Style};
-  color: ${({ theme }) => theme.colors.copy};
-  margin-top: 0px;
-  margin-bottom: 16px;
-`
-
-const ErrorWrapper = styled.div`
-  margin-top: -3px;
-  margin-bottom: 16px;
-`
+import { messages } from '@client/i18n/messages/views/correction'
+import { Content } from '@opencrvs/components/lib/interface/Content'
+import { sectionHasError } from './utils'
 
 type IProps = {
   application: IApplication
@@ -49,13 +37,20 @@ type IProps = {
 
 type IDispatchProps = {
   goBack: typeof goBack
+  goToVerifyCorrector: typeof goToVerifyCorrector
   modifyApplication: typeof modifyApplication
+  goToHomeTab: typeof goToHomeTab
 }
 
 type IFullProps = IProps & IDispatchProps & IntlShapeProps
 
-function getGroup(section: IFormSection, application: IApplication) {
+function getGroupWithVisibleFields(
+  section: IFormSection,
+  application: IApplication
+) {
   const event = application.event
+  const group = section.groups[0]
+  const field = group.fields[0] as IRadioGroupWithNestedFieldsFormField
   if (event === Event.BIRTH) {
     const applicationData = application.data
 
@@ -72,40 +67,23 @@ function getGroup(section: IFormSection, application: IApplication) {
       applicationData && applicationData.mother && !isMotherDeceased
 
     const fatherDataExists =
-      applicationData && applicationData.father && !isFatherDeceased
-
-    const childDataExists = applicationData && applicationData.child
+      applicationData &&
+      applicationData.father &&
+      applicationData.father.fathersDetailsExist &&
+      !isFatherDeceased
 
     if (!fatherDataExists) {
-      ;(
-        section.groups[0].fields[0] as IRadioGroupWithNestedFieldsFormField
-      ).options.splice(1, 1)
+      field.options = field.options.filter(
+        (option) => option.value !== 'FATHER'
+      )
     }
 
     if (!motherDataExists) {
-      ;(
-        section.groups[0].fields[0] as IRadioGroupWithNestedFieldsFormField
-      ).options.splice(0, 1)
-    }
-
-    if (!childDataExists) {
-      ;(
-        section.groups[0].fields[0] as IRadioGroupWithNestedFieldsFormField
-      ).options.splice(2, 1)
-    }
-  } else if (event === Event.DEATH) {
-    const applicationData = application && application.data
-    const isInformantDataNull = isEqual(
-      get(applicationData, 'informant.relationship'),
-      null
-    )
-    if (isInformantDataNull) {
-      ;(
-        section.groups[0].fields[0] as IRadioGroupWithNestedFieldsFormField
-      ).options.splice(0, 1)
+      field.options = field.options.filter(
+        (option) => option.value !== 'MOTHER'
+      )
     }
   }
-  const group = section.groups[0]
 
   return {
     ...group,
@@ -118,96 +96,85 @@ function getGroup(section: IFormSection, application: IApplication) {
 }
 
 function CorrectorFormComponent(props: IFullProps) {
-  const [showError, setShowError] = React.useState(false)
-
-  const { application, intl, goBack } = props
+  const { application, intl } = props
 
   const section = getCorrectorSection(application.event)
 
-  const group = getGroup(section, application)
+  const group = getGroupWithVisibleFields(section, application)
 
   const modifyApplication = (
     sectionData: IFormSectionData,
-    activeSection: IFormSection,
+    section: IFormSection,
     application: IApplication
   ) => {
     props.modifyApplication({
       ...application,
       data: {
         ...application.data,
-        [activeSection.id]: {
-          ...application.data[activeSection.id],
+        [section.id]: {
+          ...application.data[section.id],
           ...sectionData
         }
       }
     })
   }
   const continueButtonHandler = () => {
-    const errors = getValidationErrorsForForm(
-      group.fields,
-      application.data[section.id] || {}
+    props.goToVerifyCorrector(
+      application.id,
+      (application.data.corrector.relationship as IFormSectionData)
+        .value as string
     )
+  }
 
-    group.fields.forEach((field) => {
-      const fieldErrors = errors[field.name].errors
-      const nestedFieldErrors = errors[field.name].nestedFields
-
-      let hasError = false
-
-      if (fieldErrors.length > 0) {
-        hasError = true
-      }
-
-      if (field.nestedFields) {
-        Object.values(field.nestedFields).forEach((nestedFields) => {
-          nestedFields.forEach((nestedField) => {
-            if (
-              nestedFieldErrors[nestedField.name] &&
-              nestedFieldErrors[nestedField.name].length > 0
-            ) {
-              hasError = true
-            }
-          })
-        })
-      }
-
-      if (hasError) {
-        setShowError(true)
-        return
+  const cancelCorrection = () => {
+    props.modifyApplication({
+      ...application,
+      data: {
+        ...application.originalData
       }
     })
+    props.goToHomeTab('review')
   }
+
+  const continueButton = (
+    <PrimaryButton
+      id="confirm_form"
+      key="confirm_form"
+      onClick={continueButtonHandler}
+      disabled={sectionHasError(group, section, application)}
+    >
+      {intl.formatMessage(buttonMessages.continueButton)}
+    </PrimaryButton>
+  )
 
   return (
     <>
       <ActionPageLight
         id="corrector_form"
         title={intl.formatMessage(section.title)}
-        goBack={goBack}
+        hideBackground
+        goBack={props.goBack}
+        goHome={cancelCorrection}
       >
-        <FormSectionTitle>
-          {group.fields.length === 1 && (group.fields[0].hideHeader = true)}
-          <> {(group.title && intl.formatMessage(group.title)) || ''} </>
-        </FormSectionTitle>
-        {showError && (
-          <ErrorWrapper>
-            <ErrorText id="form_error" ignoreMediaQuery={true}>
-              {(group.error && intl.formatMessage(group.error)) || ''}
-            </ErrorText>
-          </ErrorWrapper>
-        )}
-        <FormFieldGenerator
-          id={group.id}
-          onChange={(values) => {
-            modifyApplication(values, section, application)
-          }}
-          setAllFieldsDirty={false}
-          fields={group.fields}
-          draftData={application.data}
-        />
-        <PrimaryButton id="confirm_form" onClick={continueButtonHandler}>
-          {intl.formatMessage(buttonMessages.continueButton)}
-        </PrimaryButton>
+        <Content
+          title={group.title && intl.formatMessage(group.title)}
+          subtitle={
+            application.event === Event.BIRTH
+              ? intl.formatMessage(messages.birthCorrectionNote)
+              : undefined
+          }
+          bottomActionButtons={[continueButton]}
+        >
+          <FormFieldGenerator
+            id={group.id}
+            onChange={(values) => {
+              modifyApplication(values, section, application)
+            }}
+            setAllFieldsDirty={false}
+            fields={group.fields}
+            draftData={application.data}
+          />
+        </Content>
       </ActionPageLight>
     </>
   )
@@ -215,5 +182,7 @@ function CorrectorFormComponent(props: IFullProps) {
 
 export const CorrectorForm = connect(undefined, {
   goBack,
-  modifyApplication
+  modifyApplication,
+  goToVerifyCorrector,
+  goToHomeTab
 })(injectIntl(CorrectorFormComponent))

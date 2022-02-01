@@ -208,6 +208,7 @@ function formatRoleCode(str: string) {
 
 type IProps = IntlShapeProps & {
   theme: ITheme
+  showRecordCorrection?: boolean
   eventDetails?: GQLEventSearchSet | null
   goToCertificateCorrection: typeof goToCertificateCorrection
 }
@@ -452,39 +453,40 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                         <ValuesWithSeparator
                           strings={this.getValueSepartorsProp(operationHistory)}
                         />
-                        {type === 'REGISTERED' && (
-                          <RecordCorrectionButton
-                            align={ICON_ALIGNMENT.LEFT}
-                            onClick={() =>
-                              this.props.goToCertificateCorrection(
-                                eventDetails.id,
-                                CorrectionSection.Corrector
-                              )
-                            }
-                            icon={() => (
-                              <EditIcon>
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-6 w-6"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                                  />
-                                </svg>
-                              </EditIcon>
-                            )}
-                          >
-                            <RecordCorrectionText>
-                              {intl.formatMessage(correctionMessages.title)}
-                            </RecordCorrectionText>
-                          </RecordCorrectionButton>
-                        )}
+                        {type === 'REGISTERED' &&
+                          this.props.showRecordCorrection && (
+                            <RecordCorrectionButton
+                              align={ICON_ALIGNMENT.LEFT}
+                              onClick={() =>
+                                this.props.goToCertificateCorrection(
+                                  eventDetails.id,
+                                  CorrectionSection.Corrector
+                                )
+                              }
+                              icon={() => (
+                                <EditIcon>
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-6 w-6"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                    />
+                                  </svg>
+                                </EditIcon>
+                              )}
+                            >
+                              <RecordCorrectionText>
+                                {intl.formatMessage(correctionMessages.title)}
+                              </RecordCorrectionText>
+                            </RecordCorrectionButton>
+                          )}
                       </ValueContainer>
                       {rejectReasons && (
                         <>
