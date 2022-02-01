@@ -151,7 +151,7 @@ const registrarDefaultStatus = {
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 
-describe('Field Agnet tests', () => {
+describe('Field Agent tests', () => {
   const { store } = createStore()
 
   beforeAll(async () => {

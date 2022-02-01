@@ -10,15 +10,17 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import React from 'react'
-import { Header } from '@client/components/interface/Header/Header'
-import { Content } from '@opencrvs/components/lib/interface/Content'
+import * as React from 'react'
+import { createTestComponent } from '@client/tests/util'
+import { RecordAudit } from './RecordAudit'
+import { createStore } from '@client/store'
 
-export const RecordAudit = () => {
-  return (
-    <div id={'recordAudit'}>
-      <Header />
-      <Content title={'demo title'}>Demo Record Audit Body</Content>
-    </div>
-  )
-}
+describe('Record Audit tests', () => {
+  const { store } = createStore()
+  it('Record Audit page loads properly', async () => {
+    const testComponent = await createTestComponent(<RecordAudit />, store)
+    expect(
+      testComponent.component.find('#recordAudit').hostNodes()
+    ).toHaveLength(1)
+  })
+})
