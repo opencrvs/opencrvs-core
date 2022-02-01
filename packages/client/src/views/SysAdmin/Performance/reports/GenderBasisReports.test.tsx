@@ -16,7 +16,7 @@ import { GenderBasisReports } from './GenderBasisReports'
 import { Event } from '@client/forms'
 
 describe('Gender basis report tests', () => {
-  const { store } = createStore()
+  const { store, history } = createStore()
   const genderBasisMetrics = {
     details: [
       {
@@ -44,10 +44,10 @@ describe('Gender basis report tests', () => {
         genderBasisMetrics={genderBasisMetrics}
         loading={false}
       />,
-      store
+      { store, history }
     )
 
-    const total = testComponent.component.find('#row_0').find('span').at(6)
+    const total = testComponent.find('#row_0').find('span').at(6)
 
     expect(total.text()).toBe('20')
   })

@@ -54,8 +54,11 @@ import {
   CONFIG
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
+import { NATL_ADMIN_ROLES } from '@client/utils/constants'
+import { IUserDetails } from '@client/utils/userUtils'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
 import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseApplicationCountView'
+import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
 import { goBack as back, push, replace } from 'connected-react-router'
 import moment from 'moment'
@@ -586,6 +589,36 @@ export function goToPage(
       fieldNameHash,
       pageRoute,
       historyState
+    }
+  }
+}
+
+export function goToPerformanceView(userDetails: IUserDetails) {
+  if (userDetails && userDetails.role) {
+    if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
+      return goToPerformanceHome()
+    } else {
+      const locationId = getJurisdictionLocationIdFromUserDetails(userDetails)
+      return (
+        (locationId && goToOperationalReport(locationId)) ||
+        goToPerformanceHome()
+      )
+    }
+  }
+}
+
+export function goToTeamView(userDetails: IUserDetails) {
+  if (userDetails && userDetails.role) {
+    if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
+      return goToTeamSearch()
+    } else {
+      return goToTeamUserList({
+        id: (userDetails.primaryOffice && userDetails.primaryOffice.id) || '',
+        searchableText:
+          (userDetails.primaryOffice && userDetails.primaryOffice.name) || '',
+        displayLabel:
+          (userDetails.primaryOffice && userDetails.primaryOffice.name) || ''
+      })
     }
   }
 }

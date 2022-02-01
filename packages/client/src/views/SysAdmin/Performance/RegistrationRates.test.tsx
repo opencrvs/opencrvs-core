@@ -127,28 +127,25 @@ describe('Registraion Rates tests', () => {
   })
 
   beforeEach(async () => {
-    component = (
-      await createTestComponent(
-        <RegistrationRates
-          match={{
-            params: { eventType: 'birth' },
-            isExact: true,
-            path: EVENT_REGISTRATION_RATES,
-            url: ''
-          }}
-          // @ts-ignore
-          location={{
-            search: stringify({
-              locationId: LOCATION_DHAKA_DIVISION.id,
-              timeEnd: new Date(1487076708000).toISOString(),
-              timeStart: new Date(1455454308000).toISOString()
-            })
-          }}
-        />,
-        store,
-        graphqlMocks
-      )
-    ).component
+    component = await createTestComponent(
+      <RegistrationRates
+        match={{
+          params: { eventType: 'birth' },
+          isExact: true,
+          path: EVENT_REGISTRATION_RATES,
+          url: ''
+        }}
+        // @ts-ignore
+        location={{
+          search: stringify({
+            locationId: LOCATION_DHAKA_DIVISION.id,
+            timeEnd: new Date(1487076708000).toISOString(),
+            timeStart: new Date(1455454308000).toISOString()
+          })
+        }}
+      />,
+      { store, history, graphqlMocks: graphqlMocks }
+    )
 
     // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {
@@ -311,33 +308,31 @@ describe('Registraion Rates error state tests', () => {
   ]
   let component: ReactWrapper<{}, {}>
   let store: AppStore
+  let history: History
 
   beforeEach(async () => {
     Date.now = jest.fn(() => 1487076708000)
-    const { store: testStore } = await createTestStore()
-    store = testStore
-    component = (
-      await createTestComponent(
-        <RegistrationRates
-          match={{
-            params: { eventType: 'birth' },
-            isExact: true,
-            path: EVENT_REGISTRATION_RATES,
-            url: ''
-          }}
-          // @ts-ignore
-          location={{
-            search: stringify({
-              locationId: LOCATION_DHAKA_DIVISION.id,
-              timeEnd: new Date(1487076708000).toISOString(),
-              timeStart: new Date(1455454308000).toISOString()
-            })
-          }}
-        />,
-        store,
-        graphqlMocks
-      )
-    ).component
+    ;({ store, history } = await createTestStore())
+
+    component = await createTestComponent(
+      <RegistrationRates
+        match={{
+          params: { eventType: 'birth' },
+          isExact: true,
+          path: EVENT_REGISTRATION_RATES,
+          url: ''
+        }}
+        // @ts-ignore
+        location={{
+          search: stringify({
+            locationId: LOCATION_DHAKA_DIVISION.id,
+            timeEnd: new Date(1487076708000).toISOString(),
+            timeStart: new Date(1455454308000).toISOString()
+          })
+        }}
+      />,
+      { store, history, graphqlMocks: graphqlMocks }
+    )
 
     // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {

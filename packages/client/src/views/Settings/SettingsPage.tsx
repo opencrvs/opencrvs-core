@@ -44,6 +44,7 @@ import { PasswordChangeModal } from '@client/views/Settings/PasswordChangeModal'
 import { goToPhoneSettings } from '@client/navigation'
 import { RouteComponentProps, StaticContext } from 'react-router'
 import { SETTINGS } from '@client/navigation/routes'
+import { Navigation } from '@client/components/interface/Navigation'
 import { AvatarChangeModal } from './AvatarChangeModal'
 import { ImageLoader } from './ImageLoader'
 import { IImage } from '@client/utils/imageUtils'
@@ -62,6 +63,13 @@ const Container = styled.div`
     min-height: 100vh;
     margin-top: 0;
     box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  }
+`
+
+const BodyContainer = styled.div`
+  margin-left: 0px;
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    margin-left: 249px;
   }
 `
 
@@ -400,42 +408,45 @@ class SettingsView extends React.Component<IProps, IState> {
     return (
       <>
         <Header title={intl.formatMessage(messages.settingsTitle)} />
-        <Container>
-          <SettingsTitle>
-            {intl.formatMessage(messages.settingsTitle)}
-          </SettingsTitle>
-          <Content>
-            <Left>
-              {sections.map((sec, index: number) => (
-                <DataSection key={index} {...sec} />
-              ))}
-              <Version>
-                <span>OpenCRVS v1.1.0</span>
-                <span>{process.env.REACT_APP_VERSION || 'development'}</span>
-              </Version>
-            </Left>
-            <Right>
-              <ImageLoader
-                onImageLoaded={this.handleImageLoaded}
-                onLoadingStarted={this.toggleAvatarChangeModal}
-                onError={(imageLoadingError) =>
-                  this.setState({ imageLoadingError })
-                }
-              >
-                <Avatar
-                  className="tablet clickable"
-                  avatar={userDetails?.avatar}
-                  name={englishName}
-                />
-                <AvatarLarge
-                  className="desktop clickable"
-                  avatar={userDetails?.avatar}
-                  name={englishName}
-                />
-              </ImageLoader>
-            </Right>
-          </Content>
-        </Container>
+        <Navigation />
+        <BodyContainer>
+          <Container>
+            <SettingsTitle>
+              {intl.formatMessage(messages.settingsTitle)}
+            </SettingsTitle>
+            <Content>
+              <Left>
+                {sections.map((sec, index: number) => (
+                  <DataSection key={index} {...sec} />
+                ))}
+                <Version>
+                  <span>OpenCRVS v1.1.0</span>
+                  <span>{process.env.REACT_APP_VERSION || 'development'}</span>
+                </Version>
+              </Left>
+              <Right>
+                <ImageLoader
+                  onImageLoaded={this.handleImageLoaded}
+                  onLoadingStarted={this.toggleAvatarChangeModal}
+                  onError={(imageLoadingError) =>
+                    this.setState({ imageLoadingError })
+                  }
+                >
+                  <Avatar
+                    className="tablet clickable"
+                    avatar={userDetails?.avatar}
+                    name={englishName}
+                  />
+                  <AvatarLarge
+                    className="desktop clickable"
+                    avatar={userDetails?.avatar}
+                    name={englishName}
+                  />
+                </ImageLoader>
+              </Right>
+            </Content>
+          </Container>
+        </BodyContainer>
         <ResponsiveModal
           id="ChangeLanguageModal"
           title={intl.formatMessage(messages.changeLanguageTitle)}
