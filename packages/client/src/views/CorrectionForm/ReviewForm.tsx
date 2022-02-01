@@ -341,10 +341,12 @@ class CorrectionReviewFormComponent extends React.Component<IProps> {
               draft={application}
               submitClickEvent={() => {}}
               onChangeReviewForm={this.modifyApplication}
-              /*
-               * TODO: go to next form
-               */
-              onContinue={() => {}}
+              onContinue={() => {
+                this.props.goToCertificateCorrection(
+                  application.id,
+                  CorrectionSection.SupportingDocuments
+                )
+              }}
             />
           )}
           {activeSection.viewType === VIEW_TYPE.FORM && (

@@ -16,7 +16,7 @@ import { FormFieldGenerator } from '@client/components/form'
 import { IFormSection, IFormSectionData } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/correction'
-import { goBack } from '@client/navigation'
+import { goBack, goToHomeTab } from '@client/navigation'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
@@ -33,6 +33,8 @@ type IProps = {
 }
 
 type IDispatchProps = {
+  goBack: typeof goBack
+  goToHomeTab: typeof goToHomeTab
   modifyApplication: typeof modifyApplication
 }
 
@@ -74,6 +76,16 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
       }
     })
   }
+
+  const cancelCorrection = () => {
+    props.modifyApplication({
+      ...application,
+      data: {
+        ...application.originalData
+      }
+    })
+    props.goToHomeTab('review')
+  }
   /*
    * TODO: go to next form
    */
@@ -84,8 +96,9 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
       <ActionPageLight
         id="corrector_form"
         title={intl.formatMessage(section.title)}
-        goBack={goBack}
-        hideBackground={true}
+        hideBackground
+        goBack={props.goBack}
+        goHome={cancelCorrection}
       >
         <Content
           {...contentProps}
@@ -124,5 +137,6 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
 
 export const SupportingDocumentsForm = connect(undefined, {
   goBack,
+  goToHomeTab,
   modifyApplication
 })(injectIntl(SupportingDocumentsFormComoponent))
