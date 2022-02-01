@@ -49,6 +49,8 @@ function getGroupWithVisibleFields(
   application: IApplication
 ) {
   const event = application.event
+  const group = section.groups[0]
+  const field = group.fields[0] as IRadioGroupWithNestedFieldsFormField
   if (event === Event.BIRTH) {
     const applicationData = application.data
 
@@ -65,40 +67,23 @@ function getGroupWithVisibleFields(
       applicationData && applicationData.mother && !isMotherDeceased
 
     const fatherDataExists =
-      applicationData && applicationData.father && !isFatherDeceased
-
-    const childDataExists = applicationData && applicationData.child
+      applicationData &&
+      applicationData.father &&
+      applicationData.father.fathersDetailsExist &&
+      !isFatherDeceased
 
     if (!fatherDataExists) {
-      ;(
-        section.groups[0].fields[0] as IRadioGroupWithNestedFieldsFormField
-      ).options.filter((option) => option.value !== 'FATHER')
+      field.options = field.options.filter(
+        (option) => option.value !== 'FATHER'
+      )
     }
 
     if (!motherDataExists) {
-      ;(
-        section.groups[0].fields[0] as IRadioGroupWithNestedFieldsFormField
-      ).options.filter((option) => option.value !== 'MOTHER')
-    }
-
-    if (!childDataExists) {
-      ;(
-        section.groups[0].fields[0] as IRadioGroupWithNestedFieldsFormField
-      ).options.filter((option) => option.value !== 'CHILD')
-    }
-  } else if (event === Event.DEATH) {
-    const applicationData = application && application.data
-    const isInformantDataNull = isEqual(
-      get(applicationData, 'informant.relationship'),
-      null
-    )
-    if (isInformantDataNull) {
-      ;(
-        section.groups[0].fields[0] as IRadioGroupWithNestedFieldsFormField
-      ).options.filter((option) => option.value !== 'INFORMANT')
+      field.options = field.options.filter(
+        (option) => option.value !== 'MOTHER'
+      )
     }
   }
-  const group = section.groups[0]
 
   return {
     ...group,
