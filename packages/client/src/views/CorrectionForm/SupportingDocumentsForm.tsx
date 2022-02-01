@@ -13,20 +13,26 @@ import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { modifyApplication, IApplication } from '@client/applications'
 import { FormFieldGenerator } from '@client/components/form'
-import { IFormSection, IFormSectionData } from '@client/forms'
+import {
+  IFormSection,
+  IFormSectionData,
+  CorrectionSection
+} from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/correction'
-import { goBack, goToHomeTab } from '@client/navigation'
+import {
+  goBack,
+  goToHomeTab,
+  goToCertificateCorrection
+} from '@client/navigation'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { supportingDocumentsSection } from '@client/forms/correction/supportDocument'
-import { Content } from '@opencrvs/components/lib/interface/Content'
-
-enum ContentSize {
-  NORMAL = 'normal',
-  LARGE = 'large'
-}
+import {
+  Content,
+  ContentSize
+} from '@opencrvs/components/lib/interface/Content'
 
 type IProps = {
   application: IApplication
@@ -35,6 +41,7 @@ type IProps = {
 type IDispatchProps = {
   goBack: typeof goBack
   goToHomeTab: typeof goToHomeTab
+  goToCertificateCorrection: typeof goToCertificateCorrection
   modifyApplication: typeof modifyApplication
 }
 
@@ -86,10 +93,10 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
     })
     props.goToHomeTab('review')
   }
-  /*
-   * TODO: go to next form
-   */
-  const continueButtonHandler = () => {}
+
+  const continueButtonHandler = () => {
+    props.goToCertificateCorrection(application.id, CorrectionSection.Reason)
+  }
 
   return (
     <>
@@ -138,5 +145,6 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
 export const SupportingDocumentsForm = connect(undefined, {
   goBack,
   goToHomeTab,
+  goToCertificateCorrection,
   modifyApplication
 })(injectIntl(SupportingDocumentsFormComoponent))
