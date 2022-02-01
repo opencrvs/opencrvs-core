@@ -208,6 +208,7 @@ const Name = styled(LinkButton)`
 const RoleType = styled.div`
   ${({ theme }) => theme.fonts.chartLegendStyle}
   color: ${({ theme }) => theme.colors.waitingForExternalValidation};
+  text-align: left;
 `
 
 interface ISearchParams {
