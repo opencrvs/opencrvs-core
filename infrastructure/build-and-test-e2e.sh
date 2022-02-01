@@ -21,8 +21,8 @@ yarn build:image && docker-compose -p opencrvs -f docker-compose.yml -f docker-c
 
 
 # Setup metadata
-git clone https://github.com/opencrvs/opencrvs-zambia.git
-cd opencrvs-zambia
+git clone https://github.com/opencrvs/opencrvs-farajaland.git
+cd opencrvs-farajaland
 yarn install
 yarn db:clear:all
 yarn db:backup:restore

@@ -216,7 +216,7 @@ interface IProps {
     downloadStatus?: string
   ) => void
   scope: Scope | null
-  offlineResources: IOfflineData
+  offlineCountryConfiguration: IOfflineData
   language: string
   onChangeReviewForm?: onChangeReviewForm
   writeApplication: typeof writeApplication
@@ -252,7 +252,7 @@ export function renderSelectDynamicLabel(
   options: IDynamicOptions,
   draftData: IFormSectionData,
   intl: IntlShape,
-  resources: IOfflineData,
+  offlineCountryConfig: IOfflineData,
   language: string
 ) {
   if (!options.resource) {
@@ -271,9 +271,11 @@ export function renderSelectDynamicLabel(
       let selectedLocation: ILocation
       const locationId = value as string
       if (options.resource === 'locations') {
-        selectedLocation = resources[OFFLINE_LOCATIONS_KEY][locationId]
+        selectedLocation =
+          offlineCountryConfig[OFFLINE_LOCATIONS_KEY][locationId]
       } else {
-        selectedLocation = resources[OFFLINE_FACILITIES_KEY][locationId]
+        selectedLocation =
+          offlineCountryConfig[OFFLINE_FACILITIES_KEY][locationId]
       }
 
       if (selectedLocation) {
@@ -330,7 +332,7 @@ const renderValue = (
   sectionId: string,
   field: IFormField,
   intl: IntlShape,
-  offlineResources: IOfflineData,
+  offlineCountryConfiguration: IOfflineData,
   language: string
 ) => {
   const value: IFormFieldValue = getFormFieldValue(draftData, sectionId, field)
@@ -344,7 +346,7 @@ const renderValue = (
       field.dynamicOptions,
       sectionData,
       intl,
-      offlineResources,
+      offlineCountryConfiguration,
       language
     )
   }
@@ -383,7 +385,7 @@ const renderValue = (
 
   if (value && field.type === LOCATION_SEARCH_INPUT) {
     const searchableListOfLocations = generateLocations(
-      getListOfLocations(offlineResources, field.searchableResource),
+      getListOfLocations(offlineCountryConfiguration, field.searchableResource),
       intl
     )
     const selectedLocation = searchableListOfLocations.find(
@@ -405,7 +407,7 @@ const renderValue = (
 
 const getErrorsOnFieldsBySection = (
   formSections: IFormSection[],
-  resources: IOfflineData,
+  offlineCountryConfig: IOfflineData,
   draft: IApplication
 ): IErrorsBySection => {
   return formSections.reduce((sections, section: IFormSection) => {
@@ -418,7 +420,7 @@ const getErrorsOnFieldsBySection = (
     const errors = getValidationErrorsForForm(
       fields,
       draft.data[section.id] || {},
-      resources,
+      offlineCountryConfig,
       draft.data
     )
 
@@ -687,11 +689,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   isVisibleField(field: IFormField, section: IFormSection) {
-    const { draft, offlineResources } = this.props
+    const { draft, offlineCountryConfiguration } = this.props
     const conditionalActions = getConditionalActionsForField(
       field,
       draft.data[section.id] || {},
-      offlineResources,
+      offlineCountryConfiguration,
       draft.data
     )
     return (
@@ -772,7 +774,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     sectionErrors: IErrorsBySection,
     ignoreNestedFieldWrapping?: boolean
   ) => {
-    const { intl, draft, offlineResources, language } = this.props
+    const { intl, draft, offlineCountryConfiguration, language } = this.props
 
     const errorsOnField =
       get(sectionErrors[section.id][field.name], 'errors') ||
@@ -804,7 +806,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 'nestedFields',
                 nestedField,
                 intl,
-                offlineResources,
+                offlineCountryConfiguration,
                 language
               )) ||
             ''
@@ -821,13 +823,13 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 : nestedValue}
             </>
           )
-        }, <>{renderValue(draft.data, section.id, field, intl, offlineResources, language)}</>)
+        }, <>{renderValue(draft.data, section.id, field, intl, offlineCountryConfiguration, language)}</>)
       : renderValue(
           draft.data,
           section.id,
           field,
           intl,
-          offlineResources,
+          offlineCountryConfiguration,
           language
         )
   }
@@ -838,7 +840,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     nestedField: IFormField,
     parentFieldErrors: IFieldErrors
   ) => {
-    const { intl, offlineResources, language } = this.props
+    const { intl, offlineCountryConfiguration, language } = this.props
     const errorsOnNestedField =
       parentFieldErrors.nestedFields[nestedField.name] || []
 
@@ -855,7 +857,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               'nestedFields',
               nestedField,
               intl,
-              offlineResources,
+              offlineCountryConfiguration,
               language
             )}
       </>
@@ -1019,7 +1021,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           .map((group) => {
             return group.fields
               .map((field) => {
-                const { draft, offlineResources } = this.props
+                const { draft, offlineCountryConfiguration } = this.props
                 const tempField = clone(field)
                 const residingSection =
                   get(field.reviewOverrides, 'residingSection') || ''
@@ -1031,7 +1033,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 const isVisible = !getConditionalActionsForField(
                   tempField,
                   draft.data[residingSection] || {},
-                  offlineResources,
+                  offlineCountryConfiguration,
                   draft.data
                 ).includes('hide')
 
@@ -1227,14 +1229,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       submitClickEvent,
       registrationSection,
       documentsSection,
-      offlineResources,
+      offlineCountryConfiguration,
       draft: { event }
     } = this.props
     const formSections = this.getViewableSection(registerForm[event])
 
     const errorsOnFields = getErrorsOnFieldsBySection(
       formSections,
-      offlineResources,
+      offlineCountryConfiguration,
       application
     )
 
@@ -1272,7 +1274,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           <StyledColumn>
             <ReviewHeader
               id="review_header"
-              logoSource={offlineResources.assets.logo}
+              logoSource={offlineCountryConfiguration.assets.logo}
               title={intl.formatMessage(messages.govtName)}
               subject={
                 applicantName
@@ -1418,7 +1420,7 @@ export const ReviewSection = connect(
     registrationSection: getBirthSection(state, BirthSection.Registration),
     documentsSection: getBirthSection(state, BirthSection.Documents),
     scope: getScope(state),
-    offlineResources: getOfflineData(state),
+    offlineCountryConfiguration: getOfflineData(state),
     language: getLanguage(state)
   }),
   { goToPageGroup, writeApplication }

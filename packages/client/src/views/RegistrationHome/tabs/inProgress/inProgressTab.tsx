@@ -144,7 +144,7 @@ interface IRegistrarHomeState {
 }
 
 interface IProps {
-  resources: IOfflineData
+  offlineCountryConfig: IOfflineData
   showPaginated?: boolean
   loading?: boolean
   error?: boolean
@@ -199,7 +199,7 @@ export class InProgressTabComponent extends React.Component<
       const pageRoute = REVIEW_EVENT_PARENT_FORM_PAGE
       const eventLocationId = get(reg, 'registration.eventLocationId') || ''
       const facility =
-        get(this.props.resources.facilities, eventLocationId) || {}
+        get(this.props.offlineCountryConfig.facilities, eventLocationId) || {}
       const startedBy = facility.name || ''
 
       let name
@@ -735,7 +735,7 @@ export class InProgressTabComponent extends React.Component<
 function mapStateToProps(state: IStoreState) {
   return {
     outboxApplications: state.applicationsState.applications,
-    resources: getOfflineData(state)
+    offlineCountryConfig: getOfflineData(state)
   }
 }
 

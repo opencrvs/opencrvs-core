@@ -53,7 +53,7 @@ entryPoint = "http"
     "login.{{hostname}}",
     "auth.{{hostname}}",
     "gateway.{{hostname}}",
-    "resources.{{hostname}}",
+    "countryconfig.{{hostname}}",
     "openhim-api.{{hostname}}",
     "api.{{hostname}}",
     "openhim.{{hostname}}",

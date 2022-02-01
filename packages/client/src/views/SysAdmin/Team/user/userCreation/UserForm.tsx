@@ -60,7 +60,7 @@ type IProps = {
   activeGroup: IFormSectionGroup
   nextSectionId: string
   nextGroupId: string
-  resources: IOfflineData
+  offlineCountryConfig: IOfflineData
 }
 
 type IState = {
@@ -86,8 +86,8 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
   }
 
   handleFormAction = () => {
-    const { formData, activeGroup, resources } = this.props
-    if (hasFormError(activeGroup.fields, formData, resources)) {
+    const { formData, activeGroup, offlineCountryConfig } = this.props
+    if (hasFormError(activeGroup.fields, formData, offlineCountryConfig)) {
       this.showAllValidationErrors()
     } else {
       this.props.userId
@@ -176,9 +176,11 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
   }
 }
 
-const mapStateToProps = (state: IStoreState): { resources: IOfflineData } => {
+const mapStateToProps = (
+  state: IStoreState
+): { offlineCountryConfig: IOfflineData } => {
   return {
-    resources: getOfflineData(state)
+    offlineCountryConfig: getOfflineData(state)
   }
 }
 
