@@ -33,6 +33,7 @@ import {
   Content,
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
+import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 
 type IProps = {
   application: IApplication
@@ -48,12 +49,22 @@ type IDispatchProps = {
 type IFullProps = IProps & IDispatchProps & IntlShapeProps
 
 function SupportingDocumentsFormComoponent(props: IFullProps) {
-  const [hasUploadDocOrSelectOption, setHasUploadDocOrSelectOption] =
-    React.useState(false)
   const { intl, application } = props
 
   const section = supportingDocumentsSection
-  const group = section.groups[0]
+  const group = {
+    ...section.groups[0],
+    fields: replaceInitialValues(
+      section.groups[0].fields,
+      application.data[section.id] || {},
+      application.data
+    )
+  }
+  const hasUploadDocOrSelectOption =
+    application.data[section.id] &&
+    (application.data[section.id].uploadDocForLegalProof ||
+      application.data[section.id].supportDocumentRequiredForCorrection)
+
   if (
     application.data[section.id] &&
     application.data[section.id].uploadDocForLegalProof
@@ -123,13 +134,6 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
           <FormFieldGenerator
             id={group.id}
             onChange={(values) => {
-              if (
-                (values &&
-                  values.supportDocumentRequiredForCorrection !== undefined) ||
-                values.uploadDocForLegalProof !== undefined
-              ) {
-                setHasUploadDocOrSelectOption(true)
-              }
               modifyApplication(values, section, application)
             }}
             setAllFieldsDirty={false}
