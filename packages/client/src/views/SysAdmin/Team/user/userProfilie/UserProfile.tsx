@@ -337,6 +337,7 @@ class UserProfileComponent extends React.Component<Props, State> {
               return this.getLoadingUserProfileView(!!error)
             } else {
               const user = this.transformUserQueryResult(data && data.getUser)
+
               return (
                 <SysAdminContentWrapper
                   id="user-profile"

@@ -1239,11 +1239,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     )
 
     const isComplete =
-      flatten(
-        // @ts-ignore
-        Object.values(errorsOnFields).map(Object.values)
-        // @ts-ignore
-      ).filter((errors) => errors.errors.length > 0).length === 0
+      flatten(Object.values(errorsOnFields).map(Object.values)).filter(
+        (errors) => errors.errors.length > 0
+      ).length === 0
 
     const textAreaProps = {
       id: 'additional_comments',

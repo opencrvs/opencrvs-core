@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createStore } from '@client/store'
+import { AppStore, createStore } from '@client/store'
 import { SubmissionController } from '@client/SubmissionController'
 import { SUBMISSION_STATUS } from '@client/applications'
 import { Action } from './forms'
@@ -21,16 +21,23 @@ import {
   REJECT_BIRTH_APPLICATION
 } from '@client/views/DataProvider/birth/mutations'
 import { ApolloError } from 'apollo-client'
+import { flushPromises } from './tests/util'
+
+beforeEach(() => {
+  Date.now = jest.fn(() => 1572408000000 + 2000000)
+})
 
 describe('Submission Controller', () => {
   it('starts the interval', () => {
+    const originalInterval = window.setInterval
     window.setInterval = jest.fn()
     const { store } = createStore()
     new SubmissionController(store).start()
     expect(setInterval).toBeCalled()
+    window.setInterval = originalInterval
   })
 
-  it('does nothing if sync is already running', () => {
+  it('does nothing if sync is already running', async () => {
     const store = {
       getState: () => ({
         applicationsState: {
@@ -47,10 +54,11 @@ describe('Submission Controller', () => {
       dispatch: jest.fn()
     }
 
-    // @ts-ignore
-    const subCon = new SubmissionController(store)
+    const subCon = new SubmissionController(store as unknown as AppStore)
     subCon.syncRunning = true
     subCon.sync()
+
+    await flushPromises()
 
     expect(store.dispatch).not.toBeCalled()
   })
@@ -72,8 +80,8 @@ describe('Submission Controller', () => {
       }),
       dispatch: jest.fn()
     }
-    // @ts-ignore
-    const subCon = new SubmissionController(store)
+
+    const subCon = new SubmissionController(store as unknown as AppStore)
     await subCon.requeueHangingApplications()
 
     expect(store.dispatch).toHaveBeenCalledTimes(2)

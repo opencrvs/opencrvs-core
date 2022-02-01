@@ -10,6 +10,7 @@ Object {
   "tags": Object {
     "eventType": "BIRTH",
     "locationLevel5": "Location/fb5b7377-0c00-407d-97a1-0a7f08ed727b",
+    "officeLocation": "Location/fb5b7377-0c00-407d-97a1-0a7f08ed727b",
   },
 }
 `;
@@ -159,6 +160,7 @@ Object {
   "tags": Object {
     "eventType": "BIRTH",
     "locationLevel5": "Location/acb24f46-83ec-45c3-b00f-5ded939ecfd8",
+    "officeLocation": "Location/2a520dc1-0a9a-48a1-a4b8-66f3075a9155",
     "startedBy": "4bb03541-116e-4ce2-8ea4-407f307f7579",
   },
 }

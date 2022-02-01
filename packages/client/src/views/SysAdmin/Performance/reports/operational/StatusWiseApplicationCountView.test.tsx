@@ -20,20 +20,20 @@ import * as locationUtils from '@client/utils/locationUtils'
 import { waitForElement } from '@client/tests/wait-for-element'
 
 describe('Status wise registration count', () => {
-  const { store } = createStore()
+  const { store, history } = createStore()
   beforeEach(async () => {
     jest.spyOn(locationUtils, 'getJurisidictionType').mockReturnValue('UNION')
   })
 
   it('renders loading indicator', async () => {
-    const { component } = await createTestComponent(
+    const component = await createTestComponent(
       <StatusWiseApplicationCountView
         loading={true}
         locationId={'c879ce5c-545b-4042-98a6-77015b0e13df'}
         statusMapping={StatusMapping}
         onClickStatusDetails={jest.fn()}
       />,
-      store
+      { store, history }
     )
 
     expect(component.find('#status-header-loader').hostNodes()).toHaveLength(1)
@@ -55,18 +55,15 @@ describe('Status wise registration count', () => {
         ],
         total: 15
       }
-      component = (
-        await createTestComponent(
-          <StatusWiseApplicationCountView
-            data={data}
-            locationId={'c879ce5c-545b-4042-98a6-77015b0e13df'}
-            statusMapping={StatusMapping}
-            disableApplicationLink={false}
-            onClickStatusDetails={onClickStatusDetailsMock}
-          />,
-          store
-        )
-      ).component
+      component = await createTestComponent(
+        <StatusWiseApplicationCountView
+          data={data}
+          locationId={'c879ce5c-545b-4042-98a6-77015b0e13df'}
+          statusMapping={StatusMapping}
+          onClickStatusDetails={onClickStatusDetailsMock}
+        />,
+        { store, history }
+      )
     })
     it('renders status count view with progress bars', async () => {
       expect(component.find('#status-header-loader').hostNodes()).toHaveLength(

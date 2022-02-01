@@ -38,8 +38,10 @@ describe('Team search test', () => {
     let app: ReactWrapper
 
     beforeAll(async () => {
-      app = (await createTestComponent(<TeamSearch history={history} />, store))
-        .component
+      app = await createTestComponent(<TeamSearch history={history} />, {
+        store,
+        history
+      })
       app.update()
     })
 
@@ -50,12 +52,13 @@ describe('Team search test', () => {
     })
 
     it('loads the selected location in search input box', () => {
-      app
-        .find('#locationSearchInput')
-        .hostNodes()
-        .simulate('change', {
-          target: { id: 'locationSearchInput', value: 'moktarpur' }
-        })
+      const locationInput = app.find(`input#locationSearchInput`).hostNodes()
+
+      locationInput.simulate('change', {
+        target: { id: `input#locationSearchInput`, value: 'moktarpur' }
+      })
+      locationInput.simulate('focus')
+
       app.update()
 
       app
