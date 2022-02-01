@@ -52,25 +52,29 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
   const { intl, application } = props
 
   const section = supportingDocumentsSection
-  const group = {
-    ...section.groups[0],
-    fields: replaceInitialValues(
-      section.groups[0].fields,
-      application.data[section.id] || {},
-      application.data
-    )
-  }
+  const group = React.useMemo(
+    () => ({
+      ...section.groups[0],
+      fields: replaceInitialValues(
+        section.groups[0].fields,
+        application.data[section.id] || {},
+        application.data
+      )
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
+
   const hasUploadDocOrSelectOption =
     application.data[section.id] &&
     (application.data[section.id].uploadDocForLegalProof ||
       application.data[section.id].supportDocumentRequiredForCorrection)
 
-  if (
+  group.fields[1].disabled =
     application.data[section.id] &&
     application.data[section.id].uploadDocForLegalProof
-  ) {
-    group.fields[1].disabled = true
-  }
+      ? true
+      : false
 
   const contentProps = {
     title: intl.formatMessage(messages.supportingDocumentsTitle),

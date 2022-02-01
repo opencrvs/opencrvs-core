@@ -100,7 +100,11 @@ function CorrectorFormComponent(props: IFullProps) {
 
   const section = getCorrectorSection(application.event)
 
-  const group = getGroupWithVisibleFields(section, application)
+  const group = React.useMemo(
+    () => getGroupWithVisibleFields(section, application),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
   const modifyApplication = (
     sectionData: IFormSectionData,

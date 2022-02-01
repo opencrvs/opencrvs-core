@@ -21,7 +21,10 @@ import { FormFieldGenerator } from '@client/components/form'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
 import { correctReasonSection } from '@client/forms/correction/reason'
-import { Content } from '@opencrvs/components/lib/interface/Content'
+import {
+  Content,
+  ContentSize
+} from '@opencrvs/components/lib/interface/Content'
 import { sectionHasError } from './utils'
 
 type IProps = {
@@ -36,7 +39,10 @@ type IDispatchProps = {
 
 type IFullProps = IProps & IDispatchProps & IntlShapeProps
 
-function getGroup(section: IFormSection, application: IApplication) {
+function getGroupWithInitialValues(
+  section: IFormSection,
+  application: IApplication
+) {
   const group = section.groups[0]
 
   return {
@@ -54,7 +60,11 @@ function CorrectionReasonFormComponent(props: IFullProps) {
 
   const section = correctReasonSection
 
-  const group = getGroup(section, application)
+  const group = React.useMemo(
+    () => getGroupWithInitialValues(section, application),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
   const modifyApplication = (
     sectionData: IFormSectionData,
@@ -110,6 +120,7 @@ function CorrectionReasonFormComponent(props: IFullProps) {
         <Content
           title={group.title && intl.formatMessage(group.title)}
           bottomActionButtons={[continueButton]}
+          size={ContentSize.LARGE}
         >
           <FormFieldGenerator
             id={group.id}

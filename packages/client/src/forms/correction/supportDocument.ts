@@ -53,7 +53,6 @@ export const supportingDocumentsSectionGroup: IFormSectionGroup = {
       required: true,
       initialValue: '',
       validate: [],
-      size: RadioSize.LARGE,
       placeholder: messages.selectPlaceholder,
       options: [
         {
