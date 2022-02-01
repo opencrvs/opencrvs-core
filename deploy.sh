@@ -10,13 +10,14 @@
 set -e
 
 print_usage_and_exit () {
-    echo 'Usage: ./deploy.sh --clear-data=yes|no --restore-metadata=yes|no --update-metadata=yes|no HOST ENV VERSION RESOURCES_PATH'
+    echo 'Usage: ./deploy.sh --clear-data=yes|no --restore-metadata=yes|no --update-metadata=yes|no HOST ENV VERSION COUNTRY_CONFIG_VERSION RESOURCES_PATH'
     echo "  --clear-data must have a value of 'yes' or 'no' set e.g. --clear-data=yes"
     echo "  --restore-metadata must have a value of 'yes' or 'no' set e.g. --restore-metadata=yes"
     echo "  --update-metadata must have a value of 'yes' or 'no' set e.g. --update-metadata=yes"
     echo "  ENV can be 'production' or 'development' or 'qa'"
     echo '  HOST    is the server to deploy to'
-    echo "  VERSION can be any docker image tag or 'latest'"
+    echo "  VERSION can be any OpenCRVS Core docker image tag or 'latest'"
+    echo "  COUNTRY_CONFIG_VERSION can be any OpenCRVS Country Configuration docker image tag or 'latest'"
     echo "  RESOURCES_PATH path to where your resources package is located"
     exit 1
 }
@@ -51,7 +52,13 @@ if [ -z "$6" ] ; then
     print_usage_and_exit
 fi
 
+
 if [ -z "$7" ] ; then
+    echo 'Error: Argument COUNTRY_CONFIG_VERSION is required in position 7.'
+    print_usage_and_exit
+fi
+
+if [ -z "$8" ] ; then
     echo 'Error: Argument RESOURCES_PATH is required in position 7.'
     print_usage_and_exit
 fi
@@ -59,6 +66,7 @@ fi
 ENV=$4
 HOST=$5
 VERSION=$6
+COUNTRY_CONFIG_VERSION=$7
 RESOURCES_PATH=$7
 SSH_USER=${SSH_USER:-root}
 SSH_HOST=${SSH_HOST:-$HOST}
@@ -72,7 +80,9 @@ NETDATA_USER_DETAILS_BASE64=`echo $(htpasswd -nb $NETDATA_USER $NETDATA_PASSWORD
 echo $NETDATA_USER $NETDATA_PASSWORD $NETDATA_USER_DETAILS_BASE64
 
 echo
-echo "Deploying version $VERSION to $SSH_HOST..."
+echo "Deploying VERSION $VERSION to $SSH_HOST..."
+echo
+echo "Deploying COUNTRY_CONFIG_VERSION $COUNTRY_CONFIG_VERSION to $SSH_HOST..."
 echo
 
 mkdir -p /tmp/compose/infrastructure/default_backups
@@ -109,19 +119,19 @@ ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/setup-deploy-config.sh '$HO
 
 # Deploy the OpenCRVS stack onto the swarm
 if [[ "$ENV" = "development" ]]; then
-    ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && HOSTNAME='$HOST' VERSION='$VERSION' PAPERTRAIL='$PAPERTRAIL' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.resources.deploy.yml --with-registry-auth opencrvs'
+    ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && HOSTNAME='$HOST' VERSION='$VERSION' COUNTRY_CONFIG_VERSION='$COUNTRY_CONFIG_VERSION' PAPERTRAIL='$PAPERTRAIL' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.resources.deploy.yml --with-registry-auth opencrvs'
 elif [[ "$ENV" = "qa" ]]; then
-    ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && HOSTNAME='$HOST' VERSION='$VERSION' PAPERTRAIL='$PAPERTRAIL' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.qa-deploy.yml -c docker-compose.resources.deploy.yml -c docker-compose.resources.qa-deploy.yml --with-registry-auth opencrvs'
+    ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && HOSTNAME='$HOST' VERSION='$VERSION' COUNTRY_CONFIG_VERSION='$COUNTRY_CONFIG_VERSION' PAPERTRAIL='$PAPERTRAIL' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.qa-deploy.yml -c docker-compose.resources.deploy.yml -c docker-compose.resources.qa-deploy.yml --with-registry-auth opencrvs'
 else
-    ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && HOSTNAME='$HOST' VERSION='$VERSION' PAPERTRAIL='$PAPERTRAIL' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.prod-deploy.yml -c docker-compose.resources.deploy.yml --with-registry-auth opencrvs'
+    ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && HOSTNAME='$HOST' VERSION='$VERSION' COUNTRY_CONFIG_VERSION='$COUNTRY_CONFIG_VERSION' PAPERTRAIL='$PAPERTRAIL' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.prod-deploy.yml -c docker-compose.resources.deploy.yml --with-registry-auth opencrvs'
 fi
 
-if [ $1 == "--clear-data=yes" ] || [ $2 == "--restore-metadata=yes" ] || [ $3 == "--update-metadata=yes" ] ; then
-    echo
-    echo "Waiting 2 mins for stack to deploy before working with data..."
-    echo
-    sleep 120
-fi
+
+echo
+echo "Waiting 2 mins for stack to deploy before working with data..."
+echo
+sleep 120
+
 
 if [ $1 == "--clear-data=yes" ] ; then
     echo
