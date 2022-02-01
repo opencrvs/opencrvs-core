@@ -12,7 +12,8 @@
 import {
   detectDuplicates,
   buildQuery,
-  createStatusHistory
+  createStatusHistory,
+  IBirthCompositionBody
 } from '@search/elasticsearch/utils'
 import {
   mockSearchResponse,
@@ -20,7 +21,8 @@ import {
   mockBirthFhirBundle,
   mockUserModelResponse,
   mockLocationResponse,
-  mockFacilityResponse
+  mockFacilityResponse,
+  mockTaskBirthCorrectionBundle
 } from '@search/test/utils'
 import { searchComposition } from '@search/elasticsearch/dbhelper'
 import * as fetchAny from 'jest-fetch-mock'
@@ -95,5 +97,42 @@ describe('elastic search utils', () => {
       'Bearer abc'
     )
     expect(mockNotificationBody.operationHistories.length).toEqual(1)
+  })
+
+  it('should create correction data in operation history when requested for correction', async () => {
+    fetch.mockResponses(
+      [JSON.stringify(mockUserModelResponse), { status: 200 }],
+      [JSON.stringify(mockLocationResponse), { status: 200 }],
+      [JSON.stringify(mockFacilityResponse), { status: 200 }]
+    )
+    const compositionBody: IBirthCompositionBody = {
+      ...mockCompositionBody,
+      type: 'REQUESTED_CORRECTION',
+      operationHistories: [
+        {
+          operatedOn: '2022-01-26T10:59:00.588Z',
+          operatorFirstNames: 'Kennedy',
+          rejectReason: '',
+          operatorFamilyNameLocale: '',
+          operatorFamilyName: 'Mweene',
+          operatorFirstNamesLocale: '',
+          rejectComment: '',
+          operatorOfficeName: 'Lusaka DNRPC District Office',
+          operatorOfficeAlias: ['Lusaka DNRPC District Office'],
+          operationType: 'REGISTERED',
+          operatorRole: 'LOCAL_REGISTRAR'
+        }
+      ]
+    }
+    await createStatusHistory(
+      compositionBody,
+      mockTaskBirthCorrectionBundle.entry[0].resource,
+      {}
+    )
+
+    expect(compositionBody).toHaveProperty('operationHistories')
+    expect(compositionBody.operationHistories).toHaveLength(2)
+    expect(compositionBody.operationHistories[1]).toHaveProperty('correction')
+    expect(compositionBody.operationHistories[1].correction).toHaveLength(1)
   })
 })

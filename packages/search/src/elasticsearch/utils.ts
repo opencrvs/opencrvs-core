@@ -176,7 +176,7 @@ export const createStatusHistory = async (
   authHeader: string
 ) => {
   if (!isValidOperationHistory(body)) {
-    throw new Error('Not a valid operation history')
+    return
   }
 
   const user: IUserModelData = await getUser(body.updatedBy || '', authHeader)
@@ -422,11 +422,7 @@ export function isValidOperationHistory(body: IBirthCompositionBody) {
       WAITING_VALIDATION_STATUS
     ],
     [CERTIFIED_STATUS]: [REGISTERED_STATUS, CERTIFIED_STATUS],
-    [REQUESTED_CORRECTION_STATUS]: [
-      REGISTERED_STATUS,
-      CERTIFIED_STATUS,
-      REQUESTED_CORRECTION_STATUS
-    ]
+    [REQUESTED_CORRECTION_STATUS]: [REGISTERED_STATUS, CERTIFIED_STATUS]
   }
 
   const previousStatus = getPreviousStatus(body)
