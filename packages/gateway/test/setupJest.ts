@@ -32,10 +32,13 @@ const mock: IDatabaseConnector = {
     delete database[key]
     return keyExists ? 1 : 0
   }),
+  // tslint:disable-next-line no-empty
   start: jest.fn(),
+  // tslint:disable-next-line no-empty
   stop: jest.fn()
 }
 
-jest.setMock('src/features/user/database', mock)
+jest.setMock('src/database', mock)
 
+process.env.CERT_PRIVATE_KEY_PATH = join(__dirname, './cert.key')
 process.env.CERT_PUBLIC_KEY_PATH = join(__dirname, './cert.key.pub')
