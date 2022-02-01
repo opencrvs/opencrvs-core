@@ -134,6 +134,55 @@ Object {
 }
 `;
 
+exports[`When an existing application requested correction a birth application writes the payment total to influxdb 1`] = `
+Object {
+  "fields": Object {
+    "compositionId": "c41a95b6-4439-4fc7-9d56-6d3a8ea0f80b",
+    "total": undefined,
+  },
+  "measurement": "certification_payment",
+  "tags": Object {
+    "eventType": "BIRTH",
+    "locationLevel5": "Location/976c4871-c4d1-46f7-b50b-09f346e05d55",
+    "officeLocation": "Location/fe68d322-4d98-4cdf-a320-2db9653f781d",
+  },
+}
+`;
+
+exports[`When an existing application requested correction a death application writes the delta between REGISTERED and CERTIFIED states to influxdb 1`] = `
+Object {
+  "fields": Object {
+    "compositionId": "62168b7e-7f80-4e2a-a7b0-1d33759c9d71",
+    "currentTaskId": "75ba4bd8-009e-4a02-896c-148979dde09a",
+    "durationInSeconds": 3564388,
+    "previousTaskId": "e172627c-8490-44da-a702-80a082f978f5",
+  },
+  "measurement": "application_event_duration",
+  "tags": Object {
+    "currentStatus": "CERTIFIED",
+    "eventType": "DEATH",
+    "previousStatus": "REGISTERED",
+  },
+}
+`;
+
+exports[`When an existing application requested correction writes the delta between REGISTERED and REQUESTED_FOR_CORRECTION states to influxdb 1`] = `
+Object {
+  "fields": Object {
+    "compositionId": "c41a95b6-4439-4fc7-9d56-6d3a8ea0f80b",
+    "currentTaskId": "15d78710-8809-4a23-81db-45f917c15ac4",
+    "durationInSeconds": 73186871,
+    "previousTaskId": "e172627c-8490-44da-a702-80a082f978f5",
+  },
+  "measurement": "application_event_duration",
+  "tags": Object {
+    "currentStatus": "REQUESTED_CORRECTION",
+    "eventType": "BIRTH",
+    "previousStatus": "REGISTERED",
+  },
+}
+`;
+
 exports[`When an in-progress application is received writes the in complete field points to influxdb 1`] = `
 Object {
   "fields": Object {

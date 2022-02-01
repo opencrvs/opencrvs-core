@@ -390,7 +390,7 @@ export async function requestCorrectionHandler(
       }),
       generateEventDurationPoint(
         request.payload as fhir.Bundle,
-        ['REQUESTED_CORRECTION'],
+        ['REGISTERED', 'CERTIFIED'],
         {
           Authorization: request.headers.authorization
         }
