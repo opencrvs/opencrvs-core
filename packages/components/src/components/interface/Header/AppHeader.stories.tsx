@@ -13,7 +13,6 @@ import { Meta, Story } from '@storybook/react'
 import { Hamburger, SearchDark } from '../../icons'
 import { AppHeader } from './AppHeader'
 import { IRightMenu } from './Desktop/DesktopHeader'
-import { IMenuItem } from './Desktop/Menu'
 import React from 'react'
 
 export default {
@@ -26,7 +25,6 @@ interface IMenuAction {
   handler: () => void
 }
 interface IProps {
-  menuItems: IMenuItem[]
   desktopRightMenu?: IRightMenu[]
   id?: string
   mobileLeft?: IMenuAction
@@ -35,25 +33,9 @@ interface IProps {
   mobileRight?: IMenuAction
 }
 
-const menuItems = [
-  {
-    key: 'application',
-    title: 'Application',
-    selected: true,
-    onClick: () => alert('application')
-  },
-  {
-    key: 'performance',
-    title: 'Performance',
-    selected: false,
-    onClick: () => alert('performance')
-  }
-]
-
 const Template: Story<IProps> = (args) => <AppHeader {...args} />
 export const AppHeaderView = Template.bind({})
 AppHeaderView.args = {
-  menuItems,
   id: 'register_app_header',
   mobileLeft: {
     icon: () => <Hamburger />,

@@ -16,11 +16,12 @@ import { RecordAudit } from './RecordAudit'
 import { createStore } from '@client/store'
 
 describe('Record Audit tests', () => {
-  const { store } = createStore()
+  const { store, history } = createStore()
   it('Record Audit page loads properly', async () => {
-    const testComponent = await createTestComponent(<RecordAudit />, store)
-    expect(
-      testComponent.component.find('#recordAudit').hostNodes()
-    ).toHaveLength(1)
+    const testComponent = await createTestComponent(<RecordAudit />, {
+      store,
+      history
+    })
+    expect(testComponent.find('#recordAudit').hostNodes()).toHaveLength(1)
   })
 })

@@ -13,12 +13,24 @@
 import React from 'react'
 import { Header } from '@client/components/interface/Header/Header'
 import { Content } from '@opencrvs/components/lib/interface/Content'
+import { Navigation } from '@client/components/interface/Navigation'
+import styled from '@client/styledComponents'
+
+export const BodyContainer = styled.div`
+  margin-left: 0px;
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    margin-left: 265px;
+  }
+`
 
 export const RecordAudit = () => {
   return (
     <div id={'recordAudit'}>
       <Header />
-      <Content title={'demo title'}>Demo Record Audit Body</Content>
+      <Navigation />
+      <BodyContainer>
+        <Content title={'demo title'}>Demo Record Audit Body</Content>
+      </BodyContainer>
     </div>
   )
 }
