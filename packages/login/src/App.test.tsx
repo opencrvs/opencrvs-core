@@ -50,7 +50,6 @@ describe('Login app step one', () => {
   })
 
   it('renders a phone number and a password field on startup', async () => {
-    console.log(app.debug())
     expect(app.find('input')).toHaveLength(2)
   })
 
