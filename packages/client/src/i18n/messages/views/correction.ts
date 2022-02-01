@@ -26,6 +26,14 @@ interface ICorrectionMessages
   court: MessageDescriptor
   others: MessageDescriptor
   informant: MessageDescriptor
+  whatWasTheReasonForCorrection: MessageDescriptor
+  reasonForChange: MessageDescriptor
+  additionalComment: MessageDescriptor
+  clericalError: MessageDescriptor
+  materialError: MessageDescriptor
+  materialOmission: MessageDescriptor
+  judicialOrder: MessageDescriptor
+  reasonForChangeError: MessageDescriptor
   idCheckTitle: MessageDescriptor
   otherIdCheckTitle: MessageDescriptor
   idCheckVerify: MessageDescriptor
@@ -109,6 +117,47 @@ const messagesToDefine: ICorrectionMessages = {
     id: 'correction.corrector.informant',
     defaultMessage: 'Informant',
     description: 'Label for informant option in certificate correction form'
+  },
+  whatWasTheReasonForCorrection: {
+    id: 'correction.reason.title',
+    defaultMessage: 'What was the reason for making a correction?',
+    description: 'The title for the correction reason form'
+  },
+  reasonForChange: {
+    id: 'correction.reason.reasonForChange',
+    defaultMessage: 'Reason for change',
+    description: 'Label for other reason for correction reason form'
+  },
+  additionalComment: {
+    id: 'correction.reason.additionalComment',
+    defaultMessage: 'Any additional comment?',
+    description: 'Label for any additional comment for correction reason form'
+  },
+  clericalError: {
+    id: 'correction.reason.clericalError',
+    defaultMessage: 'Myself or an agent made a mistake (Clerical error)',
+    description: 'Label for clerical error for correction reason form'
+  },
+  materialError: {
+    id: 'correction.reason.materialError',
+    defaultMessage: 'Applicant provided incorrect information (Material error)',
+    description: 'Label for material error for correction reason form'
+  },
+  materialOmission: {
+    id: 'correction.reason.materialOmission',
+    defaultMessage:
+      'Applicant did not provide this information (Material omission)',
+    description: 'Label for material omission for correction reason form'
+  },
+  judicialOrder: {
+    id: 'correction.reason.judicialOrder',
+    defaultMessage: 'Requested to do so by the court (Judicial order)',
+    description: 'Label for judicial order for correction reason form'
+  },
+  reasonForChangeError: {
+    id: 'correction.reason.error',
+    defaultMessage: 'Please type the reason for change',
+    description: 'Error for reason form'
   },
   idCheckTitle: {
     id: 'correction.certificate.corrector.idCheck',

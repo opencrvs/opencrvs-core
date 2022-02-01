@@ -821,6 +821,7 @@ export enum CertificateSection {
 
 export enum CorrectionSection {
   Corrector = 'corrector',
+  Reason = 'reason',
   SupportingDocuments = 'supportingDocuments'
 }
 
