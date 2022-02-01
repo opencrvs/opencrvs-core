@@ -12,12 +12,8 @@
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import {
-  CERT_PRIVATE_KEY_PATH,
   CERT_PUBLIC_KEY_PATH,
   CONFIG_SMS_CODE_EXPIRY_SECONDS,
-  CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS,
-  CONFIG_TOKEN_EXPIRY_SECONDS,
-  JWT_ISSUER,
   NOTIFICATION_URL,
   PRODUCTION,
   QA_ENV
@@ -26,7 +22,6 @@ import { set, get, del } from '@gateway/features/user/database'
 import * as crypto from 'crypto'
 import { resolve } from 'url'
 import { readFileSync } from 'fs'
-import { promisify } from 'util'
 import * as jwt from 'jsonwebtoken'
 import fetch from 'node-fetch'
 import { unauthorized } from '@hapi/boom'
@@ -40,14 +35,6 @@ interface ICodeDetails {
 }
 
 type SixDigitVerificationCode = string
-
-const cert = readFileSync(CERT_PRIVATE_KEY_PATH)
-
-const sign = promisify(jwt.sign) as unknown as (
-  payload: string | Buffer | object,
-  secretOrPrivateKey: jwt.Secret,
-  options?: jwt.SignOptions
-) => Promise<string>
 
 interface ISendVerifyCodeResponse {
   userId: string
@@ -123,7 +110,8 @@ export function generateNonce() {
 
 export async function sendVerificationCode(
   mobile: string,
-  verificationCode: string
+  verificationCode: string,
+  token: string
 ): Promise<void> {
   const params = {
     msisdn: mobile,
@@ -134,43 +122,18 @@ export async function sendVerificationCode(
     method: 'POST',
     body: JSON.stringify(params),
     headers: {
-      Authorization: `Bearer ${await createToken(
-        'auth',
-        ['service'],
-        ['opencrvs:notification-user'],
-        JWT_ISSUER
-      )}`
+      Authorization: `Bearer ${token}`
     }
   })
 
   return undefined
 }
 
-export async function createToken(
-  userId: string,
-  scope: string[],
-  audience: string[],
-  issuer: string,
-  system?: boolean
-): Promise<string> {
-  if (typeof userId === undefined) {
-    throw new Error('Invalid userId found for token creation')
-  }
-  return sign({ scope }, cert, {
-    subject: userId,
-    algorithm: 'RS256',
-    expiresIn: system
-      ? CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS
-      : CONFIG_TOKEN_EXPIRY_SECONDS,
-    audience,
-    issuer
-  })
-}
-
 export async function generateAndSendVerificationCode(
   nonce: string,
   mobile: string,
-  scope: string[]
+  scope: string[],
+  token: string
 ) {
   const isDemoUser = scope.indexOf('demo') > -1
   logger.info('isDemoUser', {
@@ -192,7 +155,7 @@ export async function generateAndSendVerificationCode(
     if (isDemoUser) {
       throw unauthorized()
     } else {
-      await sendVerificationCode(mobile, verificationCode)
+      await sendVerificationCode(mobile, verificationCode, token)
     }
   }
 }
@@ -214,7 +177,7 @@ export default async function sendVerifyCodeHandler(
     mobile: phoneNumber,
     status: 'Success'
   }
-  await generateAndSendVerificationCode(nonce, phoneNumber, scope)
+  await generateAndSendVerificationCode(nonce, phoneNumber, scope, token)
   return response
 }
 

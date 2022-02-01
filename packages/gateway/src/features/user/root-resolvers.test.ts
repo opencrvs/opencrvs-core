@@ -793,6 +793,26 @@ describe('User root resolvers', () => {
         "Something went wrong on user-mgnt service. Couldn't change user phone number"
       )
     })
+    it("throws error if any user tries to update some other user's phonenumber", async () => {
+      const nonce = '12345'
+      const mobile = '0711111111'
+      const code = await generateVerificationCode(nonce, mobile)
+
+      expect(
+        resolvers.Mutation.changePhone(
+          {},
+          {
+            userId: 'ba7022f0ff4822',
+            phoneNumber: mobile,
+            nonce: nonce,
+            verifyCode: code
+          },
+          authHeaderInValidUser
+        )
+      ).rejects.toThrowError(
+        'Change phone is not allowed. ba7022f0ff4822 is not the owner of the token'
+      )
+    })
   })
 
   describe('changeAvatar mutation', () => {
