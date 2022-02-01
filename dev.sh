@@ -43,7 +43,7 @@ echo
 echo -e "\033[32m:::::::::: PLEASE WAIT for @opencrvs/client ::::::::::\033[0m"
 echo
 sleep 10
-export LANGUAGES=$1
+export LANGUAGES="en"
 if [ $OS == "UBUNTU" ]; then
   yarn dev:secrets:gen && concurrently "yarn run start" "yarn run compose:deps"
   else

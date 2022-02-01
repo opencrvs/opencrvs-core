@@ -101,9 +101,7 @@ describe('PDFUtils related tests', () => {
         userDetails,
         mockOfflineData
       )
-    ).toThrowError(
-      'Given value key structure is not valid: deathEvent.deathDate'
-    )
+    ).toThrowError('No countries found for this transformer')
   })
   it('Throws exception if invalid userDetails found for printCertificate', () => {
     const deathApplication = omit(mockDeathApplicationData, 'deathEvent')

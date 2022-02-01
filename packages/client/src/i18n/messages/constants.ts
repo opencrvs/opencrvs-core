@@ -23,6 +23,7 @@ interface IConstantsMessages
   applicationCollectedOn: MessageDescriptor
   applicationFailedOn: MessageDescriptor
   applicationInformantLabel: MessageDescriptor
+  applicationName: MessageDescriptor
   applicationRegisteredOn: MessageDescriptor
   applicationRejectedOn: MessageDescriptor
   applicationStarted: MessageDescriptor
@@ -184,6 +185,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Informant',
     description: 'Informant Label',
     id: 'constants.informant'
+  },
+  applicationName: {
+    defaultMessage: 'OpenCRVS',
+    description: 'Application name of CRVS',
+    id: 'constants.applicationName'
   },
   applicationRegisteredOn: {
     defaultMessage: 'Application registered on',
@@ -1309,6 +1315,11 @@ const countryMessagesToDefine: Record<
     id: 'countries.FLK',
     defaultMessage: 'Falkland Islands (Malvinas)',
     description: 'ISO Country: FLK'
+  },
+  FAR: {
+    id: 'countries.FAR',
+    defaultMessage: 'Farajaland',
+    description: 'Fictional country for OpenCRSV demo'
   },
   FRO: {
     id: 'countries.FRO',

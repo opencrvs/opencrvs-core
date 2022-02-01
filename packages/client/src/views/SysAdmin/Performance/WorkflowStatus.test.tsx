@@ -11,15 +11,19 @@
  */
 import * as React from 'react'
 import { createTestComponent, createTestStore } from '@client/tests/util'
-import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatus'
+import {
+  WorkflowStatus,
+  IHistoryStateProps
+} from '@client/views/SysAdmin/Performance/WorkflowStatus'
 import { AppStore } from '@client/store'
-import { History } from 'history'
+import { createBrowserHistory, createLocation, History } from 'history'
 import { ReactWrapper } from 'enzyme'
 import { stringify, parse } from 'query-string'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
 import { OPERATIONAL_REPORT_SECTION } from './OperationalReport'
 import { GraphQLError } from 'graphql'
+import { match } from 'react-router'
 
 describe('Workflow status tests', () => {
   let store: AppStore
@@ -44,7 +48,7 @@ describe('Workflow status tests', () => {
           variables: {
             count: 25,
             skip: 0,
-            parentLocationId: locationId,
+            locationId: locationId,
             status: ['REGISTERED'],
             type: ['birth-application']
           }
@@ -201,33 +205,33 @@ describe('Workflow status tests', () => {
     ]
 
     beforeEach(async () => {
+      const path = '/performance/operations/workflowStatus'
+      const location = createLocation(path, {
+        sectionId: OPERATIONAL_REPORT_SECTION.OPERATIONAL,
+        timeStart,
+        timeEnd
+      })
+      const history = createBrowserHistory<IHistoryStateProps>()
+      history.location = location
+      location.search = stringify({
+        locationId,
+        event: 'BIRTH',
+        status: 'REGISTERED'
+      })
+      const match: match = {
+        isExact: false,
+        path,
+        url: path,
+        params: {}
+      }
       const testComponent = await createTestComponent(
-        <WorkflowStatus
-          // @ts-ignore
-          location={{
-            search: stringify({
-              locationId,
-              event: 'BIRTH',
-              status: 'REGISTERED'
-            }),
-            state: {
-              sectionId: OPERATIONAL_REPORT_SECTION,
-              timeStart,
-              timeEnd
-            }
-          }}
-        />,
-        store,
-        graphqlMocks
+        <WorkflowStatus match={match} history={history} location={location} />,
+        { store, history, graphqlMocks }
       )
 
-      component = testComponent.component
+      component = testComponent
 
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-
+      await waitForElement(component, '#application-status-list')
       component.update()
     })
 
@@ -251,6 +255,7 @@ describe('Workflow status tests', () => {
         component,
         '#application-status-list'
       )
+
       expect(listTable.find('div#row_1').hostNodes()).toHaveLength(1)
     })
 
@@ -346,38 +351,37 @@ describe('Workflow status tests', () => {
     ]
 
     beforeEach(async () => {
+      const path = '/performance/operations/workflowStatus'
+      const location = createLocation(path, {
+        sectionId: OPERATIONAL_REPORT_SECTION.OPERATIONAL,
+        timeStart,
+        timeEnd
+      })
+      const history = createBrowserHistory<IHistoryStateProps>()
+      history.location = location
+      location.search = stringify({
+        locationId,
+        event: 'BIRTH',
+        status: 'REGISTERED'
+      })
+      const match: match = {
+        isExact: false,
+        path,
+        url: path,
+        params: {}
+      }
       const testComponent = await createTestComponent(
-        <WorkflowStatus
-          // @ts-ignore
-          location={{
-            search: stringify({
-              locationId
-            }),
-            state: {
-              sectionId: OPERATIONAL_REPORT_SECTION,
-              timeStart,
-              timeEnd
-            }
-          }}
-        />,
-        store,
-        graphqlMocksWithError
+        <WorkflowStatus match={match} history={history} location={location} />,
+        { store, history, graphqlMocks: graphqlMocksWithError }
       )
 
-      component = testComponent.component
-
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-
-      component.update()
+      component = testComponent
     })
 
     it('renders error notification toast', async () => {
       const notificationToast = await waitForElement(component, '#error-toast')
       expect(notificationToast.hostNodes().text()).toBe(
-        "Sorry, we couldn't laod the content for this pageRetry"
+        "Sorry, we couldn't load the content for this pageRetry"
       )
     })
   })

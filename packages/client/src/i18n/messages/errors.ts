@@ -124,7 +124,7 @@ const messagesToDefine: IErrorMessages = {
     id: 'search.waitingForConnection'
   },
   pageLoadFailed: {
-    defaultMessage: "Sorry, we couldn't laod the content for this page",
+    defaultMessage: "Sorry, we couldn't load the content for this page",
     description: 'Error message when page failed to load',
     id: 'error.page.load.failed'
   },

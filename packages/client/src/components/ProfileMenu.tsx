@@ -18,11 +18,8 @@ import {
   IntlShape
 } from 'react-intl'
 import { IToggleMenuItem, ToggleMenu } from '@opencrvs/components/lib/interface'
-import {
-  SettingsBlack,
-  LogoutBlack,
-  AvatarSmall
-} from '@opencrvs/components/lib/icons'
+import { SettingsBlack, LogoutBlack } from '@opencrvs/components/lib/icons'
+import { AvatarSmall } from '@client/components/Avatar'
 import { IStoreState } from '@client/store'
 import { IUserDetails, getIndividualNameObj } from '@client/utils/userUtils'
 import { getLanguage } from '@client/i18n/selectors'
@@ -72,13 +69,11 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
     return items
   }
 
-  getMenuHeader = (
-    intl: IntlShape,
+  getUserName = (
     language: string,
     userDetails: IUserDetails | null
-  ): JSX.Element => {
-    let userName
-    let userRole
+  ): string => {
+    let userName = ''
 
     if (userDetails && userDetails.name) {
       const nameObj = getIndividualNameObj(userDetails.name, language)
@@ -86,14 +81,28 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
       if (nameObj) {
         userName = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
       }
-
-      userRole =
-        userDetails.role &&
-        intl.formatMessage(userMessages[userDetails.role as string])
-    } else {
-      userName = ''
-      userRole = ''
     }
+
+    return userName
+  }
+
+  getUserRole = (intl: IntlShape, userDetails: IUserDetails | null): string => {
+    let userRole = ''
+
+    if (userDetails && userDetails.role) {
+      userRole = intl.formatMessage(userMessages[userDetails.role as string])
+    }
+
+    return userRole
+  }
+
+  getMenuHeader = (
+    intl: IntlShape,
+    language: string,
+    userDetails: IUserDetails | null
+  ): JSX.Element => {
+    const userName = this.getUserName(language, userDetails)
+    const userRole = this.getUserRole(intl, userDetails)
 
     return (
       <>
@@ -110,7 +119,12 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
       <>
         <ToggleMenu
           id="ProfileMenu"
-          toggleButton={<AvatarSmall />}
+          toggleButton={
+            <AvatarSmall
+              name={this.getUserName(language, userDetails)}
+              avatar={userDetails?.avatar}
+            />
+          }
           menuHeader={this.getMenuHeader(intl, language, userDetails)}
           menuItems={this.getMenuItems(intl)}
           hasFocusRing={true}

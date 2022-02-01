@@ -163,40 +163,36 @@ describe('Report page', () => {
   beforeEach(async () => {
     const mock: any = jest.fn()
 
-    testComponent = (
-      await createTestComponent(
-        // @ts-ignore
-        <Report
-          history={history}
-          staticContext={mock}
-          match={{
-            params: {},
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          location={{
-            pathname: '',
-            search: '',
-            hash: '',
-            state: {
-              selectedLocation: {
-                id: '8cbc862a-b817-4c29-a490-4a8767ff023c',
-                displayLabel: 'Chittagong Divison',
-                searchableText: 'Chittagong'
-              },
-              eventType: Event.BIRTH,
-              timeRange: {
-                start: timeStart,
-                end: timeEnd
-              }
+    testComponent = await createTestComponent(
+      <Report
+        history={history as any}
+        staticContext={mock}
+        match={{
+          params: {},
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+        location={{
+          pathname: '',
+          search: '',
+          hash: '',
+          state: {
+            selectedLocation: {
+              id: '8cbc862a-b817-4c29-a490-4a8767ff023c',
+              displayLabel: 'Chittagong Divison',
+              searchableText: 'Chittagong'
+            },
+            eventType: Event.BIRTH,
+            timeRange: {
+              start: timeStart,
+              end: timeEnd
             }
-          }}
-        />,
-        store,
-        graphqlMock
-      )
-    ).component
+          }
+        }}
+      />,
+      { store, history, graphqlMocks: graphqlMock }
+    )
   })
 
   it('loads with page title from given time range from props', () => {

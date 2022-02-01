@@ -191,7 +191,8 @@ describe('validate', () => {
         },
         props: {
           min: 10,
-          max: 17
+          max: 17,
+          validLength: '9'
         }
       }
       expect(validIDNumber(typeOfID)(badValue)).toEqual(response)
@@ -209,13 +210,14 @@ describe('validate', () => {
         },
         props: {
           min: 10,
-          max: 17
+          max: 17,
+          validLength: '9'
         }
       }
       expect(validIDNumber(typeOfID)(badValue)).toEqual(response)
     })
     it('Should pass when supplied a good value as National ID.', () => {
-      const goodValue = '20197839489459632'
+      const goodValue = '123456789'
       const typeOfID = 'NATIONAL_ID'
       const response = undefined
       expect(validIDNumber(typeOfID)(goodValue)).toEqual(response)

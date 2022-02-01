@@ -27,6 +27,11 @@ interface IAuditHistory {
   comment?: string
 }
 
+interface IAvatar {
+  type: string
+  data: string
+}
+
 export interface IUserModelData {
   _id: string
   username: string
@@ -48,6 +53,7 @@ export interface IUserModelData {
   identifiers: GQLIdentifier[]
   device: string
   auditHistory?: IAuditHistory[]
+  avatar?: IAvatar
 }
 
 export interface IUserPayload

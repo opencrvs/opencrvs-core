@@ -56,7 +56,7 @@ describe('ReviewForm tests', () => {
   let store: AppStore
   let history: History
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     const testStore = await createTestStore()
     store = testStore.store
     history = testStore.history
@@ -111,22 +111,17 @@ describe('ReviewForm tests', () => {
         }}
         applicationId={application.id}
       />,
-      store,
-      graphqlMock
+      { store, history, graphqlMocks: graphqlMock }
     )
     // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {
       setTimeout(resolve, 0)
     })
 
-    testComponent.component.update()
+    testComponent.update()
 
     expect(
-      testComponent.component
-        .find('#review-error-text')
-        .children()
-        .hostNodes()
-        .text()
+      testComponent.find('#review-error-text').children().hostNodes().text()
     ).toBe('An error occurred while fetching birth registration')
   })
   it('it returns birth registration', async () => {
@@ -279,16 +274,15 @@ describe('ReviewForm tests', () => {
         }}
         applicationId={application.id}
       />,
-      store,
-      graphqlMock
+      { store, history, graphqlMocks: graphqlMock }
     )
     // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {
       setTimeout(resolve, 0)
     })
 
-    testComponent.component.update()
-    const data = testComponent.component
+    testComponent.update()
+    const data = testComponent
       .find(RegisterForm)
       .prop('application') as IApplication
     expect(data.data.child).toEqual({
@@ -445,16 +439,15 @@ describe('ReviewForm tests', () => {
         }}
         applicationId={application.id}
       />,
-      store,
-      graphqlMock
+      { store, history, graphqlMocks: graphqlMock }
     )
     // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {
       setTimeout(resolve, 0)
     })
-    testComponent.component.update()
+    testComponent.update()
 
-    const data = testComponent.component
+    const data = testComponent
       .find(RegisterForm)
       .prop('application') as IApplication
     expect(
@@ -553,17 +546,16 @@ describe('ReviewForm tests', () => {
         }}
         applicationId={application.id}
       />,
-      store,
-      graphqlMock
+      { store, history, graphqlMocks: graphqlMock }
     )
     // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {
       setTimeout(resolve, 0)
     })
 
-    testComponent.component.update()
+    testComponent.update()
 
-    const data = testComponent.component
+    const data = testComponent
       .find(RegisterForm)
       .prop('application') as IApplication
 
@@ -717,17 +709,16 @@ describe('ReviewForm tests', () => {
         }}
         applicationId={application.id}
       />,
-      store,
-      graphqlMock
+      { store, history, graphqlMocks: graphqlMock }
     )
     // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {
       setTimeout(resolve, 0)
     })
 
-    testComponent.component.update()
+    testComponent.update()
 
-    const data = testComponent.component
+    const data = testComponent
       .find(RegisterForm)
       .prop('application') as IApplication
     expect(data.data.registration).toEqual({
@@ -806,14 +797,11 @@ describe('ReviewForm tests', () => {
         }}
         applicationId={application.id}
       />,
-      store
+      { store, history }
     )
-    const exitButton = await waitForElement(
-      testComponent.component,
-      '#save_draft'
-    )
+    const exitButton = await waitForElement(testComponent, '#save_draft')
     exitButton.hostNodes().simulate('click')
-    testComponent.component.update()
+    testComponent.update()
     expect(window.location.href).toContain('/progress')
   })
 
@@ -875,14 +863,11 @@ describe('ReviewForm tests', () => {
         }}
         applicationId={application.id}
       />,
-      store
+      { store, history }
     )
-    const exitButton = await waitForElement(
-      testComponent.component,
-      '#save_draft'
-    )
+    const exitButton = await waitForElement(testComponent, '#save_draft')
     exitButton.hostNodes().simulate('click')
-    testComponent.component.update()
+    testComponent.update()
     expect(window.location.href).toContain('/review')
   })
 
@@ -944,14 +929,11 @@ describe('ReviewForm tests', () => {
         }}
         applicationId={application.id}
       />,
-      store
+      { store, history }
     )
-    const exitButton = await waitForElement(
-      testComponent.component,
-      '#save_draft'
-    )
+    const exitButton = await waitForElement(testComponent, '#save_draft')
     exitButton.hostNodes().simulate('click')
-    testComponent.component.update()
+    testComponent.update()
     expect(window.location.href).toContain('/review')
   })
 
@@ -1013,14 +995,11 @@ describe('ReviewForm tests', () => {
         }}
         applicationId={application.id}
       />,
-      store
+      { store, history }
     )
-    const exitButton = await waitForElement(
-      testComponent.component,
-      '#save_draft'
-    )
+    const exitButton = await waitForElement(testComponent, '#save_draft')
     exitButton.hostNodes().simulate('click')
-    testComponent.component.update()
+    testComponent.update()
     expect(window.location.href).toContain('/updates')
   })
 
@@ -1077,14 +1056,11 @@ describe('ReviewForm tests', () => {
         }}
         applicationId={application.id}
       />,
-      store
+      { store, history }
     )
-    const exitButton = await waitForElement(
-      testComponent.component,
-      '#save_draft'
-    )
+    const exitButton = await waitForElement(testComponent, '#save_draft')
     exitButton.hostNodes().simulate('click')
-    testComponent.component.update()
+    testComponent.update()
     expect(window.location.href).toContain('/progress')
   })
 
@@ -1112,28 +1088,28 @@ describe('ReviewForm tests', () => {
         }}
         applicationId={application.id}
       />,
-      store
+      { store, history }
     )
     // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {
       setTimeout(resolve, 0)
     })
 
-    testComponent.component.update()
+    testComponent.update()
 
     const menuButton = await waitForElement(
-      testComponent.component,
+      testComponent,
       '#eventToggleMenuToggleButton'
     )
     menuButton.hostNodes().simulate('click')
-    testComponent.component.update()
+    testComponent.update()
 
     const closeApplicationButton = await waitForElement(
-      testComponent.component,
+      testComponent,
       '#eventToggleMenuItem0'
     )
     closeApplicationButton.hostNodes().simulate('click')
-    testComponent.component.update()
+    testComponent.update()
 
     expect(window.location.href).toContain('/progress')
   })
@@ -1191,15 +1167,15 @@ describe('ReviewForm tests', () => {
         }}
         applicationId={application.id}
       />,
-      store
+      { store, history }
     )
     // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {
       setTimeout(resolve, 0)
     })
 
-    testComponent.component.update()
-    const data = testComponent.component
+    testComponent.update()
+    const data = testComponent
       .find(RegisterForm)
       .prop('application') as IApplication
 
@@ -1474,16 +1450,15 @@ describe('ReviewForm tests', () => {
           }}
           applicationId={application.id}
         />,
-        store,
-        graphqlMock
+        { store, history, graphqlMocks: graphqlMock }
       )
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 0)
       })
 
-      testComponent.component.update()
-      const data = testComponent.component
+      testComponent.update()
+      const data = testComponent
         .find(RegisterForm)
         .prop('application') as IApplication
 
@@ -1788,16 +1763,15 @@ describe('ReviewForm tests', () => {
           }}
           applicationId={application.id}
         />,
-        store,
-        graphqlMock
+        { store, history, graphqlMocks: graphqlMock }
       )
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 0)
       })
 
-      testComponent.component.update()
-      const data = testComponent.component
+      testComponent.update()
+      const data = testComponent
         .find(RegisterForm)
         .prop('application') as IApplication
 
@@ -1808,7 +1782,7 @@ describe('ReviewForm tests', () => {
     })
   })
   describe('ReviewForm tests for register scope', () => {
-    beforeAll(async () => {
+    beforeEach(async () => {
       getItem.mockReturnValue(declareScope)
       await store.dispatch(checkAuth({ '?token': declareScope }))
     })
@@ -1881,17 +1855,16 @@ describe('ReviewForm tests', () => {
           }}
           applicationId={application.id}
         />,
-        store,
-        graphqlMock
+        { store, history, graphqlMocks: graphqlMock }
       )
       await new Promise((resolve) => {
         setTimeout(resolve, 0)
       })
 
-      testComponent.component.update()
+      testComponent.update()
 
       expect(
-        testComponent.component
+        testComponent
           .find('#review-unauthorized-error-text')
           .children()
           .hostNodes()

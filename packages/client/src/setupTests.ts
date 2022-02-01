@@ -21,6 +21,9 @@ import 'core-js/features/array/flat'
 import 'jsdom-worker'
 import { roleQueries } from './forms/user/fieldDefinitions/query/queries'
 import { userQueries } from './user/queries'
+import debounce from 'lodash/debounce'
+
+import './tests/queryMock'
 
 if (process.env.CI) {
   jest.setTimeout(30000)
@@ -86,15 +89,6 @@ console.warn = warn
 console.error = error
 console.debug = debug
 
-const log = console.log.bind(console)
-
-const BLOCKED_MESSAGES = ['Warning: Setting up fake worker.']
-console.log = jest.fn().mockImplementation((...messages) => {
-  if (BLOCKED_MESSAGES.includes(messages.join(' '))) {
-    return
-  }
-  log(...messages)
-})
 /* eslint-enable no-console */
 /*
  * GraphQL Queries
@@ -113,12 +107,7 @@ const navigatorMock = {
   onLine: true
 }
 
-const location = window.location
-
-delete window.location
-;(window as any).location = { ...location, assign: jest.fn() }
 ;(window as any).navigator = navigatorMock
-;(window as any).location.reload = jest.fn()
 ;(window as any).scrollTo = noop
 ;(window as any).config = {
   API_GATEWAY_URL: 'http://localhost:7070/',
@@ -143,7 +132,22 @@ delete window.location
   CERTIFICATE_PRINT_LOWEST_CHARGE: 25,
   CERTIFICATE_PRINT_HIGHEST_CHARGE: 50,
   SENTRY: 'https://2ed906a0ba1c4de2ae3f3f898ec9df0b@sentry.io/1774551',
-  LOGROCKET: 'opencrvs-foundation/opencrvs-bangladesh'
+  LOGROCKET: 'opencrvs-foundation/opencrvs-bangladesh',
+  NID_NUMBER_PATTERN: {
+    pattern: /^[0-9]{9}$/,
+    example: '4837281940',
+    num: '9'
+  },
+  PHONE_NUMBER_PATTERN: {
+    pattern: /^01[1-9][0-9]{8}$/,
+    example: '01741234567',
+    start: '01',
+    num: '11',
+    mask: {
+      startForm: 5,
+      endBefore: 3
+    }
+  }
 }
 
 /*
@@ -155,8 +159,7 @@ const {
   mockOfflineData,
   userDetails,
   validToken,
-  getItem,
-  assign
+  getItem
 } = require('./tests/util')
 
 jest.mock(
@@ -195,13 +198,15 @@ beforeEach(() => {
    * Reset all mocks
    */
 
+  ;(debounce as jest.Mock).mockImplementation((fn) => fn)
   storageGetItemMock.mockReset()
   storageSetItemMock.mockReset()
-  assign.mockClear()
   warn.mockReset()
   error.mockReset()
   debug.mockReset()
   hiddenMock.mockReset()
+
+  Date.now = jest.fn(() => 1487076708000) // 2017-02-14
 
   /*
    * Assign sane defaults for everything

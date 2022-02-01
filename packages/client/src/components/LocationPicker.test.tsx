@@ -11,36 +11,33 @@
  */
 import React from 'react'
 import { ReactWrapper } from 'enzyme'
-import {
-  createTestComponent,
-  createTestStore,
-  flushPromises
-} from '@client/tests/util'
+import { createTestComponent, flushPromises } from '@client/tests/util'
 import { LocationPicker } from './LocationPicker'
-import { AppStore } from '@client/store'
+import { AppStore, createStore } from '@client/store'
 import { waitForElement } from '@client/tests/wait-for-element'
+import { History } from 'history'
 
 describe('location picker tests', () => {
   let store: AppStore
+  let history: History
   let component: ReactWrapper
   const onChangeLocationMock = jest.fn()
 
   beforeAll(async () => {
-    store = (await createTestStore()).store
+    const appStore = createStore()
+    store = appStore.store
+    history = appStore.history
   })
 
   beforeEach(async () => {
-    component = (
-      await createTestComponent(
-        <LocationPicker
-          selectedLocationId="bfe8306c-0910-48fe-8bf5-0db906cf3155"
-          onChangeLocation={onChangeLocationMock}
-        />,
-        store,
-        null,
-        { attachTo: document.body }
-      )
-    ).component
+    component = await createTestComponent(
+      <LocationPicker
+        selectedLocationId="bfe8306c-0910-48fe-8bf5-0db906cf3155"
+        onChangeLocation={onChangeLocationMock}
+      />,
+      { store, history },
+      { attachTo: document.body }
+    )
   })
 
   afterEach(() => {
@@ -53,7 +50,7 @@ describe('location picker tests', () => {
       '#location-range-picker-action'
     )
 
-    expect(actionElement.hostNodes().text()).toBe('Baniajan Union Parishad')
+    expect(actionElement.hostNodes().text()).toBe('Baniajan Union')
   })
 
   it('focuses input on click action', async () => {

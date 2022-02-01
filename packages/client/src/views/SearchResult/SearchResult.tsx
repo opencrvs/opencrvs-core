@@ -46,7 +46,7 @@ import {
   TRACKING_ID_TEXT
 } from '@client/utils/constants'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
-import { RowHistoryView } from '@opencrvs/client/src/views/RegistrationHome/RowHistoryView'
+import { RowHistoryView } from '@opencrvs/client/src/views/OfficeHome/RowHistoryView'
 import { Duplicate, Validate } from '@opencrvs/components/lib/icons'
 import {
   ColumnContentAlignment,
@@ -483,6 +483,7 @@ export class SearchResultView extends React.Component<
                       />
                     )
                   }
+
                   if (error || !data.searchEvents) {
                     return (
                       <ErrorText id="search-result-error-text">
