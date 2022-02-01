@@ -32,7 +32,9 @@ const mock: IDatabaseConnector = {
     delete database[key]
     return keyExists ? 1 : 0
   }),
+  // tslint:disable-next-line no-empty
   start: jest.fn(),
+  // tslint:disable-next-line no-empty
   stop: jest.fn()
 }
 
