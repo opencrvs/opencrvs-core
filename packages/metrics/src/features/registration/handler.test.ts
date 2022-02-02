@@ -1375,12 +1375,12 @@ describe('When an existing application requested correction', () => {
     expect(applicationEventPoint).toMatchSnapshot()
   })
   describe('a death application', () => {
-    it('writes the delta between REGISTERED and CERTIFIED states to influxdb', async () => {
+    it('writes the delta between REGISTERED and REQUESTED_FOR_CORRECTION states to influxdb', async () => {
       const influxClient = require('@metrics/influxdb/client')
-      const payload = require('./test-data/mark-death-certified-request.json')
+      const payload = require('./test-data/request-correction-death-request.json')
       const res = await server.server.inject({
         method: 'POST',
-        url: '/events/death/mark-certified',
+        url: '/events/death/request-correction',
         headers: {
           Authorization: `Bearer ${token}`
         },

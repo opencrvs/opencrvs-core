@@ -230,7 +230,8 @@ const generatePointLocations = async (
 
 export async function generatePaymentPoint(
   payload: fhir.Bundle,
-  authHeader: IAuthHeader
+  authHeader: IAuthHeader,
+  measurement = 'certification_payment'
 ): Promise<IPaymentPoints> {
   const reconciliation = getPaymentReconciliation(payload)
   const composition = getComposition(payload)
@@ -259,7 +260,7 @@ export async function generatePaymentPoint(
   }
 
   return {
-    measurement: 'certification_payment',
+    measurement,
     tags,
     fields
   }

@@ -385,9 +385,13 @@ export async function requestCorrectionHandler(
 ) {
   try {
     const points = await Promise.all([
-      generatePaymentPoint(request.payload as fhir.Bundle, {
-        Authorization: request.headers.authorization
-      }),
+      generatePaymentPoint(
+        request.payload as fhir.Bundle,
+        {
+          Authorization: request.headers.authorization
+        },
+        'correction_payment'
+      ),
       generateEventDurationPoint(
         request.payload as fhir.Bundle,
         ['REGISTERED', 'CERTIFIED'],
