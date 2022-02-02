@@ -17,6 +17,7 @@
     "gen:schema:watch": "nodemon --on-change-only -e graphql -i src/graphql/schema.graphql -x 'yarn gen:schema'",
     "gen:types:watch": "nodemon --on-change-only -w src/graphql/schema.graphql -x 'yarn gen:types'",
     "open:cov": "yarn test && opener coverage/index.html",
+    "lint": "tslint --project ./tsconfig.json",
     "precommit": "tslint --project ./tsconfig.json && lint-staged"
   },
   "dependencies": {
@@ -51,7 +52,7 @@
     "jsonwebtoken": "^8.3.0",
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.10",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^2.6.7",
     "pino": "^6.0.0",
     "ts-node": "^6.1.1",
     "tsconfig-paths": "^3.8.0",
@@ -72,7 +73,7 @@
     "@types/jwt-decode": "^2.2.1",
     "@types/lodash": "^4.14.108",
     "@types/node": "^10.12.5",
-    "@types/node-fetch": "^2.3.4",
+    "@types/node-fetch": "^2.5.12",
     "@types/uuid": "^3.4.3",
     "concurrently": "^3.5.1",
     "copyfiles": "^2.1.1",

@@ -21,12 +21,10 @@ describe('No report data test', () => {
     let app: ReactWrapper
 
     beforeAll(async () => {
-      app = (
-        await createTestComponent(
-          <NoResultMessage id={'123'} searchedLocation={'Sample location'} />,
-          store
-        )
-      ).component
+      app = await createTestComponent(
+        <NoResultMessage id={'123'} searchedLocation={'Sample location'} />,
+        { store, history }
+      )
       app.update()
     })
 

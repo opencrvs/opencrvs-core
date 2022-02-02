@@ -38,10 +38,7 @@ import { DECLARED_APPLICATION_SEARCH_QUERY_COUNT } from '@client/utils/constants
 import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
 import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
-import {
-  EVENT_STATUS,
-  IQueryData
-} from '@client/views/RegistrationHome/RegistrationHome'
+import { EVENT_STATUS, IQueryData } from '@client/views/OfficeHome/OfficeHome'
 import {
   GQLEventSearchResultSet,
   GQLEventSearchSet,

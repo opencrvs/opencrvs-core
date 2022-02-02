@@ -11,13 +11,19 @@
  */
 import * as React from 'react'
 
+interface IPropsActivity {
+  stroke?: string
+  height?: number
+  width?: number
+}
+
 export function Activity(
-  props: React.HTMLAttributes<SVGElement> & { stroke?: string }
+  props: React.HTMLAttributes<SVGElement> & IPropsActivity
 ) {
   return (
     <svg
-      width={24}
-      height={24}
+      width={props.width ? props.width : 24}
+      height={props.height ? props.height : 24}
       viewBox="0 0 24 24"
       fill="none"
       stroke={props.stroke ? props.stroke : '#4C68C1'}

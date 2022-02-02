@@ -109,9 +109,9 @@ describe('when in device of large viewport', () => {
           submitClickEvent={mockHandler}
           onChangeReviewForm={mockHandler}
         />,
-        store
+        { store, history }
       )
-      reviewSectionComponent = testComponent.component
+      reviewSectionComponent = testComponent
       await waitForElement(reviewSectionComponent, '#review_header')
     })
 
@@ -221,9 +221,9 @@ describe('when in device of large viewport', () => {
           rejectApplicationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
         />,
-        store
+        { store, history }
       )
-      reviewSectionComponent = testComponent.component
+      reviewSectionComponent = testComponent
     })
 
     it('Should not click the Reject Application', async () => {
@@ -244,9 +244,9 @@ describe('when in device of large viewport', () => {
           rejectApplicationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
         />,
-        store
+        { store, history }
       )
-      reviewSectionComponent = testComponent.component
+      reviewSectionComponent = testComponent
     })
 
     it('Should not click the Reject Application', async () => {
@@ -268,9 +268,9 @@ describe('when in device of large viewport', () => {
           rejectApplicationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
         />,
-        store
+        { store, history }
       )
-      reviewSectionComponent = testComponent.component
+      reviewSectionComponent = testComponent
     })
 
     it('Should click the Validate Application Button', async () => {
@@ -474,9 +474,9 @@ describe('when in device of large viewport', () => {
           rejectApplicationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
         />,
-        store
+        { store, history }
       )
-      reviewSectionComponent = testComponent.component
+      reviewSectionComponent = testComponent
     })
 
     it('renders values in review section', () => {
@@ -568,9 +568,9 @@ describe('when in device of large viewport', () => {
           rejectApplicationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
         />,
-        store
+        { store, history }
       )
-      reviewSectionComponent = testComponent.component
+      reviewSectionComponent = testComponent
     })
 
     it('renders selected location label', () => {
@@ -693,10 +693,10 @@ describe('when in device of small viewport', () => {
         submitClickEvent={mockHandler}
         onChangeReviewForm={mockHandler}
       />,
-      store
+      { store, history }
     )
 
-    reviewSectionComponent = testComponent.component
+    reviewSectionComponent = testComponent
   })
 
   it('renders without preview list of documents', () => {
