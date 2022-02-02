@@ -68,7 +68,19 @@ type IOwnProps = RouteComponentProps<IMatchParams>
 type IFullProps = IStateProps & IDispatchProps & IOwnProps & IntlShapeProps
 
 class VerifyCorrectorComponent extends React.Component<IFullProps> {
-  handleVerification = () => {
+  handleVerification = (hasShowedVerifiedDocument: boolean) => {
+    const application = this.props.application
+    this.props.modifyApplication({
+      ...application,
+      data: {
+        ...application.data,
+        corrector: {
+          ...application.data.corrector,
+          hasShowedVerifiedDocument
+        }
+      }
+    })
+
     this.props.goToPageGroup(
       CERTIFICATE_CORRECTION_REVIEW,
       this.props.application.id,
@@ -76,23 +88,6 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
       'review-view-group',
       this.props.application.event
     )
-  }
-
-  handleNegativeVerification = () => {
-    const { application } = this.props
-
-    this.props.modifyApplication({
-      ...application,
-      data: {
-        ...application.data,
-        corrector: {
-          ...application.data.corrector,
-          hasShowedVerifiedDocument: true
-        }
-      }
-    })
-
-    this.handleVerification()
   }
 
   getGenericCorrectorInfo = (corrector: string): ICorrectorInfo => {
@@ -175,11 +170,15 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
             actionProps={{
               positiveAction: {
                 label: intl.formatMessage(messages.idCheckVerify),
-                handler: this.handleVerification
+                handler: () => {
+                  this.handleVerification(false)
+                }
               },
               negativeAction: {
                 label: intl.formatMessage(messages.idCheckWithoutVerify),
-                handler: this.handleNegativeVerification
+                handler: () => {
+                  this.handleVerification(true)
+                }
               }
             }}
           />
@@ -191,11 +190,15 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
             actionProps={{
               positiveAction: {
                 label: intl.formatMessage(messages.idCheckVerify),
-                handler: this.handleVerification
+                handler: () => {
+                  this.handleVerification(false)
+                }
               },
               negativeAction: {
                 label: intl.formatMessage(messages.idCheckWithoutVerify),
-                handler: this.handleNegativeVerification
+                handler: () => {
+                  this.handleVerification(true)
+                }
               }
             }}
           />

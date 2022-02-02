@@ -13,8 +13,16 @@ import * as React from 'react'
 import { modifyApplication, IApplication } from '@client/applications'
 import { connect } from 'react-redux'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
-import { goBack, goToHomeTab } from '@client/navigation'
-import { IFormSection, IFormSectionData } from '@client/forms'
+import {
+  goBack,
+  goToCertificateCorrection,
+  goToHomeTab
+} from '@client/navigation'
+import {
+  CorrectionSection,
+  IFormSection,
+  IFormSectionData
+} from '@client/forms'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { FormFieldGenerator } from '@client/components/form'
@@ -34,6 +42,7 @@ type IProps = {
 type IDispatchProps = {
   goBack: typeof goBack
   goToHomeTab: typeof goToHomeTab
+  goToCertificateCorrection: typeof goToCertificateCorrection
   modifyApplication: typeof modifyApplication
 }
 
@@ -82,10 +91,10 @@ function CorrectionReasonFormComponent(props: IFullProps) {
       }
     })
   }
-  /*
-   * TODO: goto next form
-   */
-  const continueButtonHandler = () => {}
+
+  const continueButtonHandler = () => {
+    props.goToCertificateCorrection(application.id, CorrectionSection.Summary)
+  }
 
   const cancelCorrection = () => {
     props.modifyApplication({
@@ -140,5 +149,6 @@ function CorrectionReasonFormComponent(props: IFullProps) {
 export const CorrectionReasonForm = connect(undefined, {
   goBack,
   goToHomeTab,
-  modifyApplication
+  modifyApplication,
+  goToCertificateCorrection
 })(injectIntl(CorrectionReasonFormComponent))
