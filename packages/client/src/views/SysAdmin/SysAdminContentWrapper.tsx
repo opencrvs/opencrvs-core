@@ -16,6 +16,7 @@ import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 import { LoadingGrey } from '@opencrvs/components/lib/interface'
 import * as React from 'react'
 import styled from 'styled-components'
+import { Navigation } from '@client/components/interface/Navigation'
 
 const DynamicContainer = styled.div<{
   marginLeft?: number
@@ -28,11 +29,25 @@ const DynamicContainer = styled.div<{
     fixedWidth ? `width: ${fixedWidth}px;` : `width: 100%`}
 `
 
-const Content = styled(BodyContent)`
+interface IprofilePageStyle {
+  paddingTopMd: number
+  horizontalPaddingMd: number
+}
+
+const Content = styled(BodyContent)<{
+  profilePageStyle?: IprofilePageStyle
+}>`
   padding: 0px 24px;
   margin: 32px auto 0;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     padding: 0px 16px;
+
+    ${({ profilePageStyle }) =>
+      profilePageStyle &&
+      `
+      margin: ${profilePageStyle.paddingTopMd}px auto ${0};
+      padding: ${0}px ${profilePageStyle.horizontalPaddingMd}px
+    `}
   }
 `
 const SubPageContent = styled(Content)`
@@ -52,6 +67,7 @@ interface BasePage {
   marginRight?: number
   fixedWidth?: number
   mapPinClickHandler?: () => void
+  profilePageStyle?: IprofilePageStyle
 }
 
 interface DefaultPage extends BasePage {
@@ -126,6 +142,13 @@ const HeaderText = styled.span`
   overflow: hidden;
   text-overflow: ellipsis;
 `
+const BodyContainer = styled.div`
+  margin-left: 0px;
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    margin-left: 249px;
+  }
+`
+
 function SubPageHeader(props: HeaderProps) {
   return (
     <SubPageHeaderContainer id="sub-page-header">
@@ -187,19 +210,26 @@ export function SysAdminContentWrapper(props: SysAdminPage) {
         marginRight={props.marginRight}
         fixedWidth={props.fixedWidth}
       >
-        <Content>{props.children}</Content>
+        <Content profilePageStyle={props.profilePageStyle}>
+          {props.children}
+        </Content>
       </DynamicContainer>
     )
   } else {
     pageHeader = <Header mapPinClickHandler={props.mapPinClickHandler} />
     pageContent = (
-      <DynamicContainer
-        marginLeft={props.marginLeft}
-        marginRight={props.marginRight}
-        fixedWidth={props.fixedWidth}
-      >
-        <Content>{props.children}</Content>
-      </DynamicContainer>
+      <>
+        <Navigation />
+        <BodyContainer>
+          <DynamicContainer
+            marginLeft={props.marginLeft}
+            marginRight={props.marginRight}
+            fixedWidth={props.fixedWidth}
+          >
+            <Content>{props.children}</Content>
+          </DynamicContainer>
+        </BodyContainer>
+      </>
     )
   }
 

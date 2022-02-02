@@ -29,17 +29,23 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { withTheme } from '@client/styledComponents'
 import { SEARCH_USERS } from '@client/user/queries'
-import { LANG_EN } from '@client/utils/constants'
+import {
+  LANG_EN,
+  NATL_ADMIN_ROLES,
+  SYS_ADMIN_ROLES
+} from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { UserStatus } from '@client/views/SysAdmin/Team/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { IAvatar, IUserDetails } from '@client/utils/userUtils'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import {
   AddUser,
-  AvatarSmall,
   VerticalThreeDots,
   SearchRed
 } from '@opencrvs/components/lib/icons'
+import { AvatarSmall } from '@client/components/Avatar'
 import {
   ColumnContentAlignment,
   ListTable,
@@ -66,6 +72,7 @@ import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { userMutations } from '@client/user/mutations'
+import { userDetails } from '@client/tests/util'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const { useState, useEffect } = React
@@ -86,20 +93,19 @@ const TableHeader = styled.div`
   padding: 8px 18px;
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.subtitleStyle};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
   border-bottom: 1px solid ${({ theme }) => theme.colors.silverSand};
 `
-
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors};
   ${({ theme }) => theme.fonts.bodyStyle};
   text-align: center;
   margin-top: 100px;
 `
-
-const StatusBox = styled.span`
-  padding: 2px 6px 4px 6px;
-  border-radius: 4px;
+const StatusBox = styled.div`
+  padding: 4px 8px;
+  ${({ theme }) => theme.fonts.captionBold};
+  border-radius: 2px;
   height: 30px;
   text-align: center;
   margin-left: 4px;
@@ -111,7 +117,7 @@ const DeactivatedStatusBox = styled(StatusBox)`
   background: rgba(245, 209, 209, 1);
 `
 const PendingStatusBox = styled(StatusBox)`
-  background: rgba(255, 255, 153, 1);
+  background: rgba(252, 236, 217, 1);
 `
 const DisabledStatusBox = styled(StatusBox)`
   background: rgba(206, 206, 206, 0.3);
@@ -150,6 +156,14 @@ const HeaderContainer = styled.div`
   }
 `
 
+const PhotoNameRoleContainer = styled.div`
+  display: flex;
+`
+
+const MarginPhotoRight = styled.span`
+  margin-right: 16px;
+`
+
 const LocationInfo = styled.div`
   padding: 8px 0px;
 `
@@ -176,8 +190,14 @@ const ChangeButton = styled(LinkButton)`
 `
 
 const NameRoleTypeContainer = styled.div`
+  margin-right: auto;
   display: flex;
   flex-direction: column;
+`
+
+const StatusMenu = styled.div`
+  display: flex;
+  align-items: center;
 `
 
 const Name = styled(LinkButton)`
@@ -186,18 +206,19 @@ const Name = styled(LinkButton)`
 `
 
 const RoleType = styled.div`
-  ${({ theme }) => theme.fonts.captionStyle}
+  ${({ theme }) => theme.fonts.chartLegendStyle}
   color: ${({ theme }) => theme.colors.waitingForExternalValidation};
+  text-align: left;
 `
 
 interface ISearchParams {
   locationId: string
-  viewOnly?: boolean
 }
 
 type BaseProps = {
   theme: ITheme
   offlineOffices: ILocation[]
+  userDetails: IUserDetails | null
   goToCreateNewUser: typeof goToCreateNewUser
   goToCreateNewUserWithLocationId: typeof goToCreateNewUserWithLocationId
   goToReviewUserDetails: typeof goToReviewUserDetails
@@ -233,13 +254,13 @@ export const Status = (statusProps: IStatusProps) => {
 }
 
 function UserListComponent(props: IProps) {
-  const [showResendSMSSuccess, setShowResendSMSSuccess] = useState<boolean>(
-    false
-  )
+  const [showResendSMSSuccess, setShowResendSMSSuccess] =
+    useState<boolean>(false)
   const [showResendSMSError, setShowResendSMSError] = useState<boolean>(false)
 
   const {
     intl,
+    userDetails,
     goToReviewUserDetails,
     goToCreateNewUser,
     goToCreateNewUserWithLocationId,
@@ -249,14 +270,12 @@ function UserListComponent(props: IProps) {
     location: { search }
   } = props
 
-  const { locationId, viewOnly } = (parse(search) as unknown) as ISearchParams
-
-  const [toggleActivation, setToggleActivation] = useState<
-    ToggleUserActivation
-  >({
-    modalVisible: false,
-    selectedUser: null
-  })
+  const { locationId } = parse(search) as unknown as ISearchParams
+  const [toggleActivation, setToggleActivation] =
+    useState<ToggleUserActivation>({
+      modalVisible: false,
+      selectedUser: null
+    })
 
   const [viewportWidth, setViewportWidth] = useState<number>(window.innerWidth)
   useEffect(() => {
@@ -369,12 +388,99 @@ function UserListComponent(props: IProps) {
     )
   }
 
+  function getPhotoNameRoleType(
+    id: string,
+    name: string,
+    role: string,
+    type: string,
+    avatar: IAvatar | undefined
+  ) {
+    return (
+      <PhotoNameRoleContainer>
+        <AvatarSmall name={name} avatar={avatar} />
+        <MarginPhotoRight />
+        <NameRoleTypeContainer>
+          <Name
+            id={`name-role-type-link-${id}`}
+            onClick={() => goToUserProfile(id)}
+          >
+            {name}
+          </Name>
+          <RoleType>{getRoleType(role, type)}</RoleType>
+        </NameRoleTypeContainer>
+      </PhotoNameRoleContainer>
+    )
+  }
+
+  function getPhotoNameType(
+    id: string,
+    name: string,
+    avatar: IAvatar | undefined
+  ) {
+    return (
+      <>
+        <AvatarSmall name={name} avatar={avatar} />
+        <MarginPhotoRight />
+        <LinkButton
+          id={`name-link-${id}`}
+          onClick={() => goToUserProfile(id || '')}
+        >
+          {name}
+        </LinkButton>
+      </>
+    )
+  }
+
   function renderStatus(status?: string, underInvestigation?: boolean) {
     return (
       <>
         {underInvestigation && <SearchRed />}
         <Status status={status || 'pending'} />
       </>
+    )
+  }
+
+  function getViewOnly(
+    locationId: string,
+    userDetails: IUserDetails | null,
+    onlyNational: boolean
+  ) {
+    if (
+      userDetails &&
+      userDetails.role &&
+      userDetails.primaryOffice &&
+      SYS_ADMIN_ROLES.includes(userDetails.role) &&
+      locationId === userDetails.primaryOffice.id &&
+      !onlyNational
+    ) {
+      return false
+    } else if (
+      userDetails &&
+      userDetails.role &&
+      NATL_ADMIN_ROLES.includes(userDetails.role)
+    ) {
+      return false
+    } else {
+      return true
+    }
+  }
+
+  function getStatusMenuType(
+    user: GQLUser,
+    index: number,
+    status?: string,
+    underInvestigation?: boolean
+  ) {
+    const statusDetails = renderStatus(status, underInvestigation)
+    return (
+      <StatusMenu>
+        {statusDetails}
+        <ToggleMenu
+          id={`user-item-${index}-menu`}
+          toggleButton={<VerticalThreeDots />}
+          menuItems={getMenuItems(user)}
+        />
+      </StatusMenu>
     )
   }
 
@@ -401,25 +507,25 @@ function UserListComponent(props: IProps) {
           const type =
             (user.type && intl.formatMessage(userMessages[user.type])) || '-'
 
+          const avatar = user.avatar
+
           return {
-            photo: <AvatarSmall />,
-            name: (
-              <LinkButton
-                id={`name-link-${user.id}`}
-                onClick={() => goToUserProfile(user.id || '')}
-              >
-                {name}
-              </LinkButton>
-            ),
+            photoNameType: getPhotoNameType(user.id || '', name, avatar),
             nameRoleType: getNameRoleType(user.id || '', name, role, type),
+            photoNameRoleType: getPhotoNameRoleType(
+              user.id || '',
+              name,
+              role,
+              type,
+              avatar
+            ),
             roleType: getRoleType(role, type),
             status: renderStatus(user.status, user.underInvestigation),
-            menu: (
-              <ToggleMenu
-                id={`user-item-${index}-menu`}
-                toggleButton={<VerticalThreeDots />}
-                menuItems={getMenuItems(user)}
-              />
+            statusMenu: getStatusMenuType(
+              user,
+              index,
+              user.status,
+              user.underInvestigation
             )
           }
         }
@@ -446,29 +552,13 @@ function UserListComponent(props: IProps) {
     )
   }
 
-  function renderUserList() {
+  function renderUserList(
+    locationId: string,
+    userDetails: IUserDetails | null
+  ) {
     let columns: IColumn[] = []
     if (viewportWidth <= props.theme.grid.breakpoints.md) {
       columns = columns.concat([
-        {
-          label: intl.formatMessage(constantsMessages.name),
-          width: 70,
-          key: 'nameRoleType'
-        },
-        {
-          label: intl.formatMessage(constantsMessages.status),
-          width: 30,
-          alignment: ColumnContentAlignment.RIGHT,
-          key: 'status'
-        }
-      ])
-    } else if (viewportWidth <= props.theme.grid.breakpoints.lg) {
-      columns = columns.concat([
-        {
-          label: '',
-          width: 10,
-          key: 'photo'
-        },
         {
           label: intl.formatMessage(constantsMessages.name),
           width: 65,
@@ -476,47 +566,51 @@ function UserListComponent(props: IProps) {
         },
         {
           label: intl.formatMessage(constantsMessages.status),
-          width: 25,
+          width: 35,
           alignment: ColumnContentAlignment.RIGHT,
-          key: 'status'
+          key: 'statusMenu'
+        }
+      ])
+    } else if (viewportWidth <= props.theme.grid.breakpoints.lg) {
+      columns = columns.concat([
+        {
+          label: intl.formatMessage(constantsMessages.name),
+          width: 70,
+          key: 'photoNameRoleType'
+        },
+        {
+          label: intl.formatMessage(constantsMessages.status),
+          width: 30,
+          alignment: ColumnContentAlignment.RIGHT,
+          key: 'statusMenu'
         }
       ])
     } else {
-      if (viewOnly) {
+      if (getViewOnly(locationId, userDetails, false)) {
         columns = columns.concat([
           {
-            label: '',
-            width: 8,
-            key: 'photo'
-          },
-          {
             label: intl.formatMessage(constantsMessages.name),
-            width: 27,
-            key: 'name'
+            width: 35,
+            key: 'photoNameType'
           },
           {
             label: intl.formatMessage(constantsMessages.labelRole),
-            width: 50,
+            width: 45,
             key: 'roleType'
           },
           {
             label: intl.formatMessage(constantsMessages.status),
-            width: 15,
+            width: 20,
             alignment: ColumnContentAlignment.RIGHT,
-            key: 'status'
+            key: 'statusMenu'
           }
         ])
       } else {
         columns = columns.concat([
           {
-            label: '',
-            width: 8,
-            key: 'photo'
-          },
-          {
             label: intl.formatMessage(constantsMessages.name),
-            width: 27,
-            key: 'name'
+            width: 35,
+            key: 'photoNameType'
           },
           {
             label: intl.formatMessage(constantsMessages.labelRole),
@@ -525,14 +619,9 @@ function UserListComponent(props: IProps) {
           },
           {
             label: intl.formatMessage(constantsMessages.status),
-            width: 20,
+            width: 25,
             alignment: ColumnContentAlignment.RIGHT,
-            key: 'status'
-          },
-          {
-            label: '',
-            width: 5,
-            key: 'menu'
+            key: 'statusMenu'
           }
         ])
       }
@@ -559,7 +648,7 @@ function UserListComponent(props: IProps) {
               <TableHeader>
                 {(data && data.searchUsers && data.searchUsers.totalItems) || 0}{' '}
                 users
-                {!viewOnly && (
+                {!getViewOnly(locationId, userDetails, false) && (
                   <AddUserContainer id="add-user" onClick={onClickAddUser}>
                     <AddUserIcon />
                     {' New user'}
@@ -585,6 +674,16 @@ function UserListComponent(props: IProps) {
                 hideBoxShadow={true}
                 hideTableHeader={true}
                 disableScrollOnOverflow
+                rowStyle={{
+                  height: {
+                    lg: 56,
+                    md: 80
+                  },
+                  horizontalPadding: {
+                    lg: 8,
+                    md: 16
+                  }
+                }}
               />
               <UserAuditActionModal
                 show={toggleActivation.modalVisible}
@@ -609,13 +708,16 @@ function UserListComponent(props: IProps) {
 
   return (
     <SysAdminContentWrapper
-      mapPinClickHandler={(!viewOnly && onChangeLocation) || undefined}
+      mapPinClickHandler={
+        (!getViewOnly(locationId, userDetails, true) && onChangeLocation) ||
+        undefined
+      }
     >
       <HeaderContainer>
         <Header id="header">
           {(searchedLocation && searchedLocation.name) || ''}
         </Header>
-        {!viewOnly && (
+        {!getViewOnly(locationId, userDetails, true) && (
           <ChangeButton id="chng-loc" onClick={onChangeLocation}>
             {intl.formatMessage(buttonMessages.change)}
           </ChangeButton>
@@ -633,7 +735,7 @@ function UserListComponent(props: IProps) {
           </LocationInfoEmptyValue>
         )}
       </LocationInfo>
-      {renderUserList()}
+      {renderUserList(locationId, userDetails)}
       {showResendSMSSuccess && (
         <FloatingNotification
           id="resend_invite_success"
@@ -660,7 +762,8 @@ function UserListComponent(props: IProps) {
 
 export const UserList = connect(
   (state: IStoreState) => ({
-    offlineOffices: Object.values(getOfflineData(state).offices)
+    offlineOffices: Object.values(getOfflineData(state).offices),
+    userDetails: getUserDetails(state)
   }),
   {
     goToCreateNewUser,

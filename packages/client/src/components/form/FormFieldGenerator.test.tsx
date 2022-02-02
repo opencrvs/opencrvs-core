@@ -11,10 +11,10 @@
  */
 import * as React from 'react'
 import {
-  createTestComponent,
   selectOption,
   flushPromises,
-  resizeWindow
+  resizeWindow,
+  createTestComponent
 } from '@client/tests/util'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { ReactWrapper } from 'enzyme'
@@ -46,11 +46,11 @@ describe('form component', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
-    const { store } = createStore()
+    const { store, history } = createStore()
     const draft = createApplication(Event.BIRTH)
     store.dispatch(storeApplication(draft))
     const modifyDraft = jest.fn()
-    const testComponent = await createTestComponent(
+    component = await createTestComponent(
       <FormFieldGenerator
         id="mother"
         onChange={modifyDraft}
@@ -108,9 +108,11 @@ describe('form component', () => {
           }
         ]}
       />,
-      store
+      {
+        store,
+        history
+      }
     )
-    component = testComponent.component
   })
   describe('when user is in the moth​​er section', () => {
     it('renders the page', async () => {
@@ -134,20 +136,14 @@ describe('form component', () => {
         instance.resetDependentSelectValues('statePermanent')
       })
       it('resets dependent select fields', () => {
-        expect(
-          component
-            .find('#districtPermanent')
-            .hostNodes()
-            .text()
-        ).toEqual('Select')
+        expect(component.find('#districtPermanent').hostNodes().text()).toEqual(
+          'Select'
+        )
       })
       it('doesnt reset non dependent select fields', () => {
-        expect(
-          component
-            .find('#countryPermanent')
-            .hostNodes()
-            .text()
-        ).toEqual('Bangladesh')
+        expect(component.find('#countryPermanent').hostNodes().text()).toEqual(
+          'Bangladesh'
+        )
       })
     })
   })
@@ -158,8 +154,8 @@ describe('when field definition has location search input', () => {
   const modifyDraft = jest.fn()
 
   beforeEach(async () => {
-    const { store } = createStore()
-    const testComponent = await createTestComponent(
+    const { store, history } = createStore()
+    component = await createTestComponent(
       <FormFieldGenerator
         id="locationForm"
         setAllFieldsDirty={false}
@@ -178,10 +174,8 @@ describe('when field definition has location search input', () => {
           }
         ]}
       />,
-      store
+      { store, history }
     )
-
-    component = testComponent.component
   })
 
   it('renders location search input without crashing', async () => {
@@ -190,12 +184,12 @@ describe('when field definition has location search input', () => {
   })
 
   it('performs auto complete search among offline data', () => {
-    component
-      .find('#locationSearchInput')
-      .hostNodes()
-      .simulate('change', {
-        target: { value: 'Dholashadhukhan', id: 'locationSearchInput' }
-      })
+    const locationInput = component.find(`input#placeOfBirth`).hostNodes()
+
+    locationInput.simulate('change', {
+      target: { id: `input#placeOfBirth`, value: 'D' }
+    })
+    locationInput.simulate('focus')
 
     const autoCompleteSuggestion = component
       .find('#locationOption0d8474da-0361-4d32-979e-af91f020309e')
@@ -204,12 +198,12 @@ describe('when field definition has location search input', () => {
   })
 
   it('clicking on autocomplete suggestion modifies draft', () => {
-    component
-      .find('#locationSearchInput')
-      .hostNodes()
-      .simulate('change', {
-        target: { value: 'Dholashadhukhan', id: 'locationSearchInput' }
-      })
+    const locationInput = component.find(`input#placeOfBirth`).hostNodes()
+
+    locationInput.simulate('change', {
+      target: { id: `input#placeOfBirth`, value: 'D' }
+    })
+    locationInput.simulate('focus')
 
     const autoCompleteSuggestion = component
       .find('#locationOption0d8474da-0361-4d32-979e-af91f020309e')
@@ -224,11 +218,11 @@ describe('when field definition has location search input', () => {
 describe('when user is in the register section', () => {
   let component: ReactWrapper<{}, {}>
   beforeEach(async () => {
-    const { store } = createStore()
+    const { store, history } = createStore()
     const draft = createApplication(Event.BIRTH)
     store.dispatch(storeApplication(draft))
     const modifyDraft = jest.fn()
-    const testComponent = await createTestComponent(
+    component = await createTestComponent(
       <FormFieldGenerator
         id="registration"
         onChange={modifyDraft}
@@ -248,16 +242,15 @@ describe('when user is in the register section', () => {
           }
         ]}
       />,
-      store
+      {
+        store,
+        history
+      }
     )
-    component = testComponent.component
   })
   it('renders registration phone type as tel', () => {
     expect(
-      component
-        .find('#registrationPhone')
-        .hostNodes()
-        .prop('type')
+      component.find('#registrationPhone').hostNodes().prop('type')
     ).toEqual('tel')
   })
 })
@@ -266,11 +259,11 @@ describe('when field definition has nested fields', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
-    const { store } = createStore()
+    const { store, history } = createStore()
     const draft = createApplication(Event.BIRTH)
     store.dispatch(storeApplication(draft))
     const modifyDraft = jest.fn()
-    const testComponent = await createTestComponent(
+    component = await createTestComponent(
       <FormFieldGenerator
         id="registration"
         onChange={modifyDraft}
@@ -338,10 +331,11 @@ describe('when field definition has nested fields', () => {
           }
         ]}
       />,
-      store
+      {
+        store,
+        history
+      }
     )
-
-    component = testComponent.component
   })
 
   it('renders radio group with nested fields', () => {
@@ -443,8 +437,8 @@ describe('when field definition has date field', () => {
 
   describe('in case of static date field', () => {
     beforeEach(async () => {
-      const { store } = createStore()
-      const testComponent = await createTestComponent(
+      const { store, history } = createStore()
+      component = await createTestComponent(
         <FormFieldGenerator
           id="locationForm"
           setAllFieldsDirty={false}
@@ -460,10 +454,8 @@ describe('when field definition has date field', () => {
             }
           ]}
         />,
-        store
+        { store, history }
       )
-
-      component = testComponent.component
     })
 
     it('shows validation errors for invalid date', async () => {
@@ -481,8 +473,8 @@ describe('when field definition has number field', () => {
   const modifyDraftMock = jest.fn()
 
   beforeEach(async () => {
-    const { store } = createStore()
-    const testComponent = await createTestComponent(
+    const { store, history } = createStore()
+    component = await createTestComponent(
       <FormFieldGenerator
         id="numberForm"
         setAllFieldsDirty={false}
@@ -498,10 +490,11 @@ describe('when field definition has number field', () => {
           }
         ]}
       />,
-      store
+      {
+        store,
+        history
+      }
     )
-
-    component = testComponent.component
   })
 
   it('field does not take input of non numeric characters', async () => {
@@ -530,8 +523,8 @@ describe('when field definition has select field on mobile device', () => {
 
   beforeEach(async () => {
     window.HTMLElement.prototype.scrollIntoView = scrollMock
-    const { store } = createStore()
-    const testComponent = await createTestComponent(
+    const { store, history } = createStore()
+    component = await createTestComponent(
       <FormFieldGenerator
         id="numberForm"
         setAllFieldsDirty={false}
@@ -548,26 +541,20 @@ describe('when field definition has select field on mobile device', () => {
           }
         ]}
       />,
-      store,
-      null,
+      {
+        store,
+        history
+      },
       { attachTo: document.body }
     )
-
-    component = testComponent.component
   })
 
   it('triggers scroll up when focus so that soft keyboard does not block options', async () => {
     const input = component.find('#countryPermanent').hostNodes()
 
-    input
-      .find('input')
-      .simulate('focus')
-      .update()
+    input.find('input').simulate('focus').update()
 
-    input
-      .find('.react-select__control')
-      .simulate('mousedown')
-      .update()
+    input.find('.react-select__control').simulate('mousedown').update()
     await flushPromises()
     component.update()
     expect(scrollMock).toBeCalled()

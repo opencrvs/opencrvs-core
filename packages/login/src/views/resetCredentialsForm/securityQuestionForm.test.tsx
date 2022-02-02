@@ -41,13 +41,9 @@ describe('Test phone number verification form', () => {
         securityQuestionKey
       })
 
-      expect(
-        app
-          .update()
-          .find('#page-title')
-          .hostNodes()
-          .text()
-      ).toContain('ব্যবহারকারীর নাম পুনরুদ্ধারের অনুরোধ')
+      expect(app.update().find('#page-title').hostNodes().text()).toContain(
+        'ব্যবহারকারীর নাম পুনরুদ্ধারের অনুরোধ'
+      )
     })
 
     it('loads title when password is chosen as the forgotten item', async () => {
@@ -57,13 +53,9 @@ describe('Test phone number verification form', () => {
         securityQuestionKey
       })
 
-      expect(
-        app
-          .update()
-          .find('#page-title')
-          .hostNodes()
-          .text()
-      ).toContain('পাসওয়ার্ড পুনরায় সেট করুন')
+      expect(app.update().find('#page-title').hostNodes().text()).toContain(
+        'পাসওয়ার্ড পুনরায় সেট করুন'
+      )
     })
   })
 
@@ -94,7 +86,7 @@ describe('Test phone number verification form', () => {
       moxios.uninstall(client)
     })
 
-    it('redirects to success page for a valid submission when username is chosen as forgotten item', done => {
+    it('redirects to success page for a valid submission when username is chosen as forgotten item', (done) => {
       history.replace(routes.SECURITY_QUESTION, {
         forgottenItem: FORGOTTEN_ITEMS.USERNAME,
         nonce,
@@ -105,10 +97,7 @@ describe('Test phone number verification form', () => {
         .find('#security-answer-input')
         .hostNodes()
         .simulate('change', { target: { value: 'Gotham' } })
-      app
-        .find('#continue')
-        .hostNodes()
-        .simulate('submit')
+      app.find('#continue').hostNodes().simulate('submit')
       moxios.wait(() => {
         const request = moxios.requests.mostRecent()
         request
@@ -135,7 +124,7 @@ describe('Test phone number verification form', () => {
       })
     })
 
-    it('redirects to password update for for a valid submission when password is chosen as forgotten item', done => {
+    it('redirects to password update for for a valid submission when password is chosen as forgotten item', (done) => {
       history.replace(routes.SECURITY_QUESTION, {
         forgottenItem: FORGOTTEN_ITEMS.PASSWORD,
         nonce,
@@ -146,10 +135,7 @@ describe('Test phone number verification form', () => {
         .find('#security-answer-input')
         .hostNodes()
         .simulate('change', { target: { value: 'Gotham' } })
-      app
-        .find('#continue')
-        .hostNodes()
-        .simulate('submit')
+      app.find('#continue').hostNodes().simulate('submit')
       moxios.wait(() => {
         const request = moxios.requests.mostRecent()
         request
@@ -167,7 +153,7 @@ describe('Test phone number verification form', () => {
       })
     })
 
-    it('updates header as the answer for the given question is wrong and another question key is sent as response', done => {
+    it('updates header as the answer for the given question is wrong and another question key is sent as response', (done) => {
       history.replace(routes.SECURITY_QUESTION, {
         forgottenItem: FORGOTTEN_ITEMS.USERNAME,
         nonce,
@@ -176,10 +162,7 @@ describe('Test phone number verification form', () => {
 
       app.update()
 
-      app
-        .find('#continue')
-        .hostNodes()
-        .simulate('submit')
+      app.find('#continue').hostNodes().simulate('submit')
 
       moxios.wait(() => {
         const request = moxios.requests.mostRecent()

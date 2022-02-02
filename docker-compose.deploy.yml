@@ -200,6 +200,19 @@ services:
     networks:
       - overlay_net
 
+  components:
+    deploy:
+      labels:
+        - 'traefik.enable=true'
+        - 'traefik.frontend.rule=Host: styleguide.{{hostname}},{{hostname}}'
+        - 'traefik.frontend.redirect.regex=^https?://{{hostname}}/(.*)'
+        - 'traefik.frontend.redirect.replacement=https://styleguide.{{hostname}}/$${1}'
+        - 'traefik.port=80'
+        - 'traefik.docker.network=opencrvs_overlay_net'
+      replicas: 2
+    networks:
+      - overlay_net
+
   resources:
     deploy:
       labels:

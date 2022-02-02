@@ -12,11 +12,12 @@
 import { FormFieldGenerator } from '@client/components/form'
 import { roleQueries } from '@client/forms/user/fieldDefinitions/query/queries'
 import { offlineDataReady } from '@client/offline/actions'
-import { createStore } from '@client/store'
+import { AppStore, createStore } from '@client/store'
 import { userQueries, GET_USER } from '@client/user/queries'
 import {
   createTestComponent,
   flushPromises,
+  loginAsFieldAgent,
   mockOfflineData
 } from '@client/tests/util'
 import { modifyUserFormData, processRoles } from '@client/user/userReducer'
@@ -35,6 +36,7 @@ import {
 import { UserSection } from '@client/forms'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
+import { History } from 'history'
 export const mockRoles = {
   data: {
     getRoles: [
@@ -212,59 +214,45 @@ export const mockUsers = {
     }
   }
 }
-;(roleQueries.fetchRoles as jest.Mock).mockReturnValue(mockRoles)
-;(userQueries.searchUsers as jest.Mock).mockReturnValue(mockUsers)
 
 describe('create new user tests', () => {
-  const { store, history } = createStore()
+  let store: AppStore
+  let history: History
   let testComponent: ReactWrapper
 
   beforeEach(async () => {
-    await store.dispatch(
-      offlineDataReady({
-        languages: mockOfflineData.languages,
-        forms: mockOfflineData.forms,
-        templates: mockOfflineData.templates,
-        locations: mockOfflineData.locations,
-        facilities: mockOfflineData.facilities,
-        pilotLocations: mockOfflineData.pilotLocations,
-        offices: mockOfflineData.offices,
-        assets: mockOfflineData.assets
-      })
-    )
+    ;(roleQueries.fetchRoles as jest.Mock).mockReturnValue(mockRoles)
+    ;(userQueries.searchUsers as jest.Mock).mockReturnValue(mockUsers)
+    const s = createStore()
+    store = s.store
+    history = s.history
   })
 
   describe('when user is in create new user form', () => {
     beforeEach(async () => {
-      testComponent = (
-        await createTestComponent(
-          <CreateNewUser
-            match={{
-              // @ts-ignore
-              params: {
-                locationId: '0d8474da-0361-4d32-979e-af91f012340a',
-                sectionId: mockOfflineData.forms.userForm.sections[0].id
-              },
-              isExact: true,
-              path: '/createUser',
-              url: ''
-            }}
-          />,
-          store
-        )
-      ).component
+      testComponent = await createTestComponent(
+        <CreateNewUser
+          match={{
+            // @ts-ignore
+            params: {
+              locationId: '0d8474da-0361-4d32-979e-af91f012340a',
+              sectionId: mockOfflineData.forms.userForm.sections[0].id
+            },
+            isExact: true,
+            path: '/createUser',
+            url: ''
+          }}
+        />,
+        { store, history }
+      )
+
+      loginAsFieldAgent(store)
     })
 
     it('clicking on confirm button with unfilled required fields shows validation errors', async () => {
-      await new Promise(resolve => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
-      store.dispatch(modifyUserFormData(mockIncompleteFormData))
-      testComponent
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
+      await waitForElement(testComponent, '#confirm_form')
+
+      testComponent.find('#confirm_form').hostNodes().simulate('click')
 
       await flushPromises()
       testComponent.update()
@@ -279,32 +267,18 @@ describe('create new user tests', () => {
     })
 
     it('clicking on confirm button with complete data takes user to preview page', async () => {
-      await new Promise(resolve => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
-
       store.dispatch(modifyUserFormData(mockCompleteFormData))
-      testComponent
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
+      await waitForElement(testComponent, '#confirm_form')
+      testComponent.find('#confirm_form').hostNodes().simulate('click')
       await flushPromises()
 
       expect(history.location.pathname).toContain('preview')
     })
 
     it('clicking on confirm by selecting registrar as role will go to signature form page', async () => {
-      await new Promise(resolve => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
-
       store.dispatch(modifyUserFormData(mockDataWithRegistarRoleSelected))
-      testComponent
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
+      await waitForElement(testComponent, '#confirm_form')
+      testComponent.find('#confirm_form').hostNodes().simulate('click')
       await flushPromises()
 
       expect(history.location.pathname).toContain(
@@ -317,32 +291,27 @@ describe('create new user tests', () => {
     beforeEach(async () => {
       store.dispatch(modifyUserFormData(mockCompleteFormData))
       store.dispatch(processRoles(mockCompleteFormData.registrationOffice))
-      testComponent = (
-        await createTestComponent(
-          // @ts-ignore
-          <CreateNewUser
-            match={{
-              params: {
-                sectionId: mockOfflineData.forms.userForm.sections[1].id,
-                groupId: mockOfflineData.forms.userForm.sections[1].groups[0].id
-              },
-              isExact: true,
-              path: '/createUser',
-              url: ''
-            }}
-          />,
-          store
-        )
-      ).component
+      testComponent = await createTestComponent(
+        // @ts-ignore
+        <CreateNewUser
+          match={{
+            params: {
+              sectionId: mockOfflineData.forms.userForm.sections[1].id,
+              groupId: mockOfflineData.forms.userForm.sections[1].groups[0].id
+            },
+            isExact: true,
+            path: '/createUser',
+            url: ''
+          }}
+        />,
+        { store, history }
+      )
     })
 
     it('renders review header', () => {
-      expect(
-        testComponent
-          .find('#preview_title')
-          .hostNodes()
-          .text()
-      ).toBe('Please review the new users details')
+      expect(testComponent.find('#preview_title').hostNodes().text()).toBe(
+        'Please review the new users details'
+      )
     })
 
     it('clicking change button on a field takes user back to form', async () => {
@@ -356,10 +325,7 @@ describe('create new user tests', () => {
     })
 
     it('clicking submit button submits the form data', async () => {
-      testComponent
-        .find('#submit_user_form')
-        .hostNodes()
-        .simulate('click')
+      testComponent.find('#submit_user_form').hostNodes().simulate('click')
 
       await flushPromises()
 
@@ -401,7 +367,7 @@ describe('edit user tests', () => {
             mobile: '+8801662132163',
             identifier: {
               system: 'NATIONAL_ID',
-              value: '1014881922',
+              value: '101488192',
               __typename: 'Identifier'
             },
             role: 'API_USER',
@@ -432,6 +398,8 @@ describe('edit user tests', () => {
   ]
 
   beforeEach(() => {
+    ;(roleQueries.fetchRoles as jest.Mock).mockReturnValue(mockRoles)
+    ;(userQueries.searchUsers as jest.Mock).mockReturnValue(mockUsers)
     store.dispatch(
       offlineDataReady({
         languages: mockOfflineData.languages,
@@ -462,16 +430,10 @@ describe('edit user tests', () => {
             url: ''
           }}
         />,
-        store,
-        graphqlMocks
+        { store, history, graphqlMocks: graphqlMocks }
       )
 
-      // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.component.update()
-      component = testComponent.component
+      component = testComponent
     })
 
     it('clicking on continue button takes user review details page', async () => {
@@ -512,15 +474,14 @@ describe('edit user tests', () => {
             url: ''
           }}
         />,
-        store,
-        graphqlMocks
+        { store, history, graphqlMocks }
       )
 
       // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      component = testComponent.component
+      component = testComponent
       component.update()
     })
 

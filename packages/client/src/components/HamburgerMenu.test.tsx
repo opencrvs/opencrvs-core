@@ -16,7 +16,7 @@ import { ReactWrapper } from 'enzyme'
 import { createStore } from '@client/store'
 
 describe('when user is in the menu page', () => {
-  const { store } = createStore()
+  const { store, history } = createStore()
   let hamburgerComponent: ReactWrapper<{}, {}>
   const menuTitle = 'Menu'
   const menuItems = [
@@ -60,11 +60,10 @@ describe('when user is in the menu page', () => {
   const menuTitleTextSelector = `#sub-menu-wrapper`
 
   beforeEach(async () => {
-    const testComponent = await createTestComponent(
+    hamburgerComponent = await createTestComponent(
       <HamburgerMenu menuTitle={menuTitle} menuItems={menuItems} />,
-      store
+      { store, history }
     )
-    hamburgerComponent = testComponent.component
   })
   it('renders main menu title', () => {
     const menuName = hamburgerComponent

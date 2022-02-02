@@ -11,12 +11,8 @@
  */
 import React from 'react'
 import { ReactWrapper } from 'enzyme'
-import { AppStore } from '@client/store'
-import {
-  createTestStore,
-  createTestComponent,
-  flushPromises
-} from '@client/tests/util'
+import { AppStore, createStore } from '@client/store'
+import { createTestComponent, flushPromises } from '@client/tests/util'
 import { ForgotPIN } from '@client/views/Unlock/ForgotPIN'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { setUserDetails } from '@client/profile/profileActions'
@@ -25,17 +21,18 @@ import { userQueries } from '@client/user/queries'
 import { storage } from '@client/storage'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
+import { History } from 'history'
 
 describe('ForgotPIN tests', () => {
   let component: ReactWrapper
   let store: AppStore
+  let history: History
   const goBackMock: jest.Mock = jest.fn()
   const onVerifyPasswordMock = jest.fn()
   userQueries.verifyPasswordById = jest.fn()
 
   beforeAll(async () => {
-    const testStore = await createTestStore()
-    store = testStore.store
+    ;({ store, history } = await createStore())
 
     store.dispatch(
       setUserDetails({
@@ -91,18 +88,13 @@ describe('ForgotPIN tests', () => {
   })
 
   beforeEach(async () => {
-    component = (
-      await createTestComponent(
-        <ForgotPIN
-          goBack={goBackMock}
-          onVerifyPassword={onVerifyPasswordMock}
-        />,
-        store
-      )
-    ).component
+    component = await createTestComponent(
+      <ForgotPIN goBack={goBackMock} onVerifyPassword={onVerifyPasswordMock} />,
+      { store, history }
+    )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
@@ -194,40 +186,42 @@ describe('ForgotPIN tests', () => {
   })
 
   it('clicking on logout removes indexedDB entries', async () => {
-    const indexeddb = {
+    const indexeddb: Record<string, any> = {
       [SCREEN_LOCK]: true,
       [SECURITY_PIN_EXPIRED_AT]: 1234
     }
 
-    // @ts-ignore
     storage.removeItem = jest.fn((key: string) => {
-      // @ts-ignore
       delete indexeddb[key]
+      return Promise.resolve()
     })
 
     const logoutButton = await waitForElement(component, '#logout')
 
     logoutButton.hostNodes().simulate('click')
 
-    // @ts-ignore
     expect(indexeddb[SCREEN_LOCK]).toBeFalsy()
-    // @ts-ignore
+
     expect(indexeddb[SECURITY_PIN_EXPIRED_AT]).toBeFalsy()
   })
 
   it('clicking on forgot password logs out and redirects to forgot password screen of login app', async () => {
-    const indexeddb = {
+    const indexeddb: Record<string, any> = {
       [SCREEN_LOCK]: true,
       [SECURITY_PIN_EXPIRED_AT]: 1234
     }
 
-    // @ts-ignore
     storage.removeItem = jest.fn((key: string) => {
-      // @ts-ignore
       delete indexeddb[key]
+      return Promise.resolve()
     })
 
-    window.location.assign = jest.fn()
+    const originalLocation = window.location
+    delete (window as { location?: Location }).location
+    window.location = {
+      ...originalLocation,
+      assign: jest.fn()
+    }
 
     const forgotPasswordButton = await waitForElement(
       component,
@@ -236,12 +230,12 @@ describe('ForgotPIN tests', () => {
 
     forgotPasswordButton.hostNodes().simulate('click')
 
-    // @ts-ignore
     expect(indexeddb[SCREEN_LOCK]).toBeFalsy()
-    // @ts-ignore
+
     expect(indexeddb[SECURITY_PIN_EXPIRED_AT]).toBeFalsy()
     expect(window.location.assign).toBeCalledWith(
       'http://localhost:3020/forgotten-item'
     )
+    window.location = originalLocation
   })
 })

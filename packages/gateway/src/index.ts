@@ -25,7 +25,10 @@ import {
 } from '@gateway/constants'
 import { readFileSync } from 'fs'
 import { validateFunc } from '@opencrvs/commons'
-import { ApolloServer } from 'apollo-server-hapi'
+import {
+  ApolloServer,
+  ApolloServerPluginStopHapiServer
+} from 'apollo-server-hapi'
 import { getApolloConfig } from '@gateway/graphql/config'
 
 DotEnv.config({
@@ -35,7 +38,6 @@ DotEnv.config({
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
 export async function createServer() {
-  const apolloServer = new ApolloServer(getApolloConfig())
   const app = new Hapi.Server({
     host: HOST,
     port: PORT,
@@ -47,6 +49,10 @@ export async function createServer() {
   const plugins = getPlugins()
 
   await app.register(plugins)
+  const apolloServer = new ApolloServer({
+    ...getApolloConfig(),
+    plugins: [ApolloServerPluginStopHapiServer({ hapiServer: app })]
+  })
   app.auth.strategy('jwt', 'jwt', {
     key: publicCert,
     verifyOptions: {
@@ -60,10 +66,6 @@ export async function createServer() {
 
   app.auth.default('jwt')
 
-  await apolloServer.applyMiddleware({
-    app
-  })
-
   const routes = getRoutes()
   app.route(routes)
 
@@ -73,13 +75,17 @@ export async function createServer() {
    * https://github.com/hapijs/good/search?q=request&type=Issues
    */
   if (process.env.NODE_ENV !== 'production') {
-    app.events.on('response', request => {
+    app.events.on('response', (request) => {
       app.log('info', JSON.stringify(request.payload))
     })
   }
 
   async function start() {
+    await apolloServer.start()
     await app.start()
+    await apolloServer.applyMiddleware({
+      app
+    })
     app.log('info', `server started on port ${PORT}`)
   }
 
@@ -92,5 +98,7 @@ export async function createServer() {
 }
 
 if (require.main === module) {
-  createServer().then(app => app.start())
+  createServer().then((app) => {
+    app.start()
+  })
 }

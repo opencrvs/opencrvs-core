@@ -14,8 +14,10 @@ window.config = {
   COUNTRY: 'bgd',
   COUNTRY_LOGO_FILE: 'logo.png',
   DESKTOP_TIME_OUT_MILLISECONDS: 900000, // 15 mins
+  /**
+   * @deprecated HEALTH_FACILITY_FILTER is no longer used
+   */
   HEALTH_FACILITY_FILTER: 'UPAZILA',
-  LANGUAGES: 'en,bn',
   LOGIN_URL: 'http://localhost:3020',
   AUTH_URL: 'http://localhost:4040',
   API_GATEWAY_URL: 'http://localhost:7070/',

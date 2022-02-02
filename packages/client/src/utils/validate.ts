@@ -28,7 +28,7 @@ import {
   DRIVING_LICENSE
 } from '@client/forms/identity'
 import moment from 'moment'
-import { IOfflineData, LocationType } from '@client/offline/reducer'
+import { IOfflineData } from '@client/offline/reducer'
 import { getListOfLocations } from '@client/forms/utils'
 
 export interface IValidationResult {
@@ -79,10 +79,7 @@ export const isAValidDateFormat = (value: string): boolean => {
     }
   }
 
-  const valueISOString = value
-    .split(/-/g)
-    .map(pad(2))
-    .join('-')
+  const valueISOString = value.split(/-/g).map(pad(2)).join('-')
 
   const givenDate = new Date(valueISOString)
 
@@ -92,17 +89,17 @@ export const isAValidDateFormat = (value: string): boolean => {
 export const requiredSymbol: Validation = (value: IFormFieldValue) =>
   value ? undefined : { message: messages.requiredSymbol }
 
-export const required = (
-  message: MessageDescriptor = messages.required
-): Validation => (value: IFormFieldValue) => {
-  if (typeof value === 'string') {
-    return value !== '' ? undefined : { message }
+export const required =
+  (message: MessageDescriptor = messages.required): Validation =>
+  (value: IFormFieldValue) => {
+    if (typeof value === 'string') {
+      return value !== '' ? undefined : { message }
+    }
+    if (isArray(value)) {
+      return value.length > 0 ? undefined : { message }
+    }
+    return value !== undefined && value !== null ? undefined : { message }
   }
-  if (isArray(value)) {
-    return value.length > 0 ? undefined : { message }
-  }
-  return value !== undefined && value !== null ? undefined : { message }
-}
 
 export const minLength = (min: number) => (value: string) => {
   return value && value.length < min
@@ -123,13 +120,12 @@ const isLessOrEqual = (value: string, max: number) => {
   return value && value.toString().length <= max
 }
 
-export const maxLength: MaxLengthValidation = (max: number) => (
-  value: IFormFieldValue
-) => {
-  return isLessOrEqual(value as string, max)
-    ? undefined
-    : { message: messages.maxLength, props: { max } }
-}
+export const maxLength: MaxLengthValidation =
+  (max: number) => (value: IFormFieldValue) => {
+    return isLessOrEqual(value as string, max)
+      ? undefined
+      : { message: messages.maxLength, props: { max } }
+  }
 
 const isNumber = (value: string): boolean => !value || !isNaN(Number(value))
 
@@ -164,11 +160,9 @@ export const facilityMustBeSelected: Validation = (
 ) => {
   const locationsList = getListOfLocations(
     resources as IOfflineData,
-    'facilities',
-    LocationType.HEALTH_FACILITY
+    'facilities'
   )
-  const isValid =
-    !value || locationsList.some(location => location.id === value)
+  const isValid = !value || locationsList[value as string]
   return isValid ? undefined : { message: messages.facilityMustBeSelected }
 }
 
@@ -284,116 +278,115 @@ export const isValidChildBirthDate: Validation = (value: IFormFieldValue) => {
     : { message: messages.isValidBirthDate }
 }
 
-export const isValidParentsBirthDate = (minAgeGap: number): Validation => (
-  value: IFormFieldValue,
-  drafts
-) => {
-  const parentsBirthDate = value as string
-  const childBirthDate =
-    drafts && drafts.child && (drafts.child.childBirthDate as string)
+export const isValidParentsBirthDate =
+  (minAgeGap: number): Validation =>
+  (value: IFormFieldValue, drafts) => {
+    const parentsBirthDate = value as string
+    const childBirthDate =
+      drafts && drafts.child && (drafts.child.childBirthDate as string)
 
-  return parentsBirthDate &&
-    isAValidDateFormat(parentsBirthDate) &&
-    isDateNotInFuture(parentsBirthDate)
-    ? childBirthDate
-      ? minAgeGapExist(childBirthDate, parentsBirthDate, minAgeGap)
-        ? undefined
-        : {
-            message: messages.isValidBirthDate
-          }
-      : undefined
-    : {
-        message: messages.isValidBirthDate
+    return parentsBirthDate &&
+      isAValidDateFormat(parentsBirthDate) &&
+      isDateNotInFuture(parentsBirthDate)
+      ? childBirthDate
+        ? minAgeGapExist(childBirthDate, parentsBirthDate, minAgeGap)
+          ? undefined
+          : {
+              message: messages.isValidBirthDate
+            }
+        : undefined
+      : {
+          message: messages.isValidBirthDate
+        }
+  }
+
+export const checkBirthDate =
+  (marriageDate: string): Validation =>
+  (value: IFormFieldValue) => {
+    const cast = value as string
+    if (!isAValidDateFormat(cast)) {
+      return {
+        message: messages.dateFormat
       }
-}
-
-export const checkBirthDate = (marriageDate: string): Validation => (
-  value: IFormFieldValue
-) => {
-  const cast = value as string
-  if (!isAValidDateFormat(cast)) {
-    return {
-      message: messages.dateFormat
     }
-  }
 
-  const bDate = new Date(cast)
-  // didn't call `isDateNotInFuture(value)`, because no need to call `new Date(value)` twice
-  if (bDate > new Date()) {
-    return {
-      message: messages.dateFormat
+    const bDate = new Date(cast)
+    // didn't call `isDateNotInFuture(value)`, because no need to call `new Date(value)` twice
+    if (bDate > new Date()) {
+      return {
+        message: messages.dateFormat
+      }
     }
-  }
 
-  if (!marriageDate || !isAValidDateFormat(marriageDate)) {
-    return undefined
-  }
-
-  return bDate < new Date(marriageDate)
-    ? undefined
-    : {
-        message: messages.dobEarlierThanDom
-      }
-}
-
-export const checkMarriageDate = (birthDate: string): Validation => (
-  value: IFormFieldValue
-) => {
-  const cast = value as string
-  if (!isAValidDateFormat(cast)) {
-    return {
-      message: messages.dateFormat
+    if (!marriageDate || !isAValidDateFormat(marriageDate)) {
+      return undefined
     }
+
+    return bDate < new Date(marriageDate)
+      ? undefined
+      : {
+          message: messages.dobEarlierThanDom
+        }
   }
 
-  const mDate = new Date(cast)
-  // didn't call `isDateNotInFuture(value)`, because no need to call `new Date(value)` twice
-  if (mDate > new Date()) {
-    return {
-      message: messages.dateFormat
+export const checkMarriageDate =
+  (birthDate: string): Validation =>
+  (value: IFormFieldValue) => {
+    const cast = value as string
+    if (!isAValidDateFormat(cast)) {
+      return {
+        message: messages.dateFormat
+      }
     }
-  }
 
-  if (!birthDate || !isAValidDateFormat(birthDate)) {
-    return undefined
-  }
-
-  return mDate > new Date(birthDate)
-    ? undefined
-    : {
-        message: messages.domLaterThanDob
+    const mDate = new Date(cast)
+    // didn't call `isDateNotInFuture(value)`, because no need to call `new Date(value)` twice
+    if (mDate > new Date()) {
+      return {
+        message: messages.dateFormat
       }
-}
+    }
 
-export const dateGreaterThan = (previousDate: string): Validation => (
-  value: IFormFieldValue
-) => {
-  const cast = value as string
-  if (!previousDate || !isAValidDateFormat(previousDate)) {
-    return undefined
+    if (!birthDate || !isAValidDateFormat(birthDate)) {
+      return undefined
+    }
+
+    return mDate > new Date(birthDate)
+      ? undefined
+      : {
+          message: messages.domLaterThanDob
+        }
   }
 
-  return new Date(cast) > new Date(previousDate)
-    ? undefined
-    : {
-        message: messages.domLaterThanDob
-      }
-}
+export const dateGreaterThan =
+  (previousDate: string): Validation =>
+  (value: IFormFieldValue) => {
+    const cast = value as string
+    if (!previousDate || !isAValidDateFormat(previousDate)) {
+      return undefined
+    }
 
-export const dateLessThan = (laterDate: string): Validation => (
-  value: IFormFieldValue
-) => {
-  const cast = value as string
-  if (!laterDate || !isAValidDateFormat(laterDate)) {
-    return undefined
+    return new Date(cast) > new Date(previousDate)
+      ? undefined
+      : {
+          message: messages.domLaterThanDob
+        }
   }
 
-  return new Date(cast) < new Date(laterDate)
-    ? undefined
-    : {
-        message: messages.dobEarlierThanDom
-      }
-}
+export const dateLessThan =
+  (laterDate: string): Validation =>
+  (value: IFormFieldValue) => {
+    const cast = value as string
+    if (!laterDate || !isAValidDateFormat(laterDate)) {
+      return undefined
+    }
+
+    return new Date(cast) < new Date(laterDate)
+      ? undefined
+      : {
+          message: messages.dobEarlierThanDom
+        }
+  }
 
 export const dateNotInFuture = (): Validation => (value: IFormFieldValue) => {
   const cast = value as string
@@ -445,10 +438,12 @@ export const dateFormatIsCorrect = (): Validation => (value: IFormFieldValue) =>
 
 export const isValidBengaliWord = (value: string): boolean => {
   const bengaliRe = XRegExp.cache(
-    '(^[\\p{Bengali}.-]*\\([\\p{Bengali}.-]+\\)[\\p{Bengali}.-]*$)|(^[\\p{Bengali}.-]+$)'
+    '(^[\\p{Bengali}.-]*\\([\\p{Bengali}.-]+\\)[\\p{Bengali}.-]*$)|(^[\\p{Bengali}.-]+$)',
+    ''
   )
   const lettersRe = XRegExp.cache(
-    '(^[\\pL\\pM.-]*\\([\\pL\\pM.-]+\\)[\\pL\\pM.-]*$)|(^[\\pL\\pM.-]+$)'
+    '(^[\\pL\\pM.-]*\\([\\pL\\pM.-]+\\)[\\pL\\pM.-]*$)|(^[\\pL\\pM.-]+$)',
+    ''
   )
 
   return bengaliRe.test(value) && lettersRe.test(value)
@@ -460,7 +455,8 @@ export const isValidBengaliWord = (value: string): boolean => {
 export const isValidEnglishWord = (value: string): boolean => {
   // Still using XRegExp for its caching ability
   const englishRe = XRegExp.cache(
-    '(^[\\p{Latin}.-]*\\([\\p{Latin}.-]+\\)[\\p{Latin}.-]*$)|(^[\\p{Latin}.-]+$)'
+    '(^[\\p{Latin}.-]*\\([\\p{Latin}.-]+\\)[\\p{Latin}.-]*$)|(^[\\p{Latin}.-]+$)',
+    ''
   )
 
   return englishRe.test(value)
@@ -493,11 +489,11 @@ export const isValidEnglishName = (value: string): boolean => {
 export const isLengthWithinRange = (value: string, min: number, max: number) =>
   !value || (value.length >= min && value.length <= max)
 
-export const isValueWithinRange = (min: number, max: number) => (
-  value: number
-): boolean => {
-  return !isNaN(value) && value >= min && value <= max
-}
+export const isValueWithinRange =
+  (min: number, max: number) =>
+  (value: number): boolean => {
+    return !isNaN(value) && value >= min && value <= max
+  }
 
 export const bengaliOnlyNameFormat: Validation = (value: IFormFieldValue) => {
   const cast = value as string
@@ -513,85 +509,94 @@ export const englishOnlyNameFormat: Validation = (value: IFormFieldValue) => {
     : { message: messages.englishOnlyNameFormat }
 }
 
-export const range: RangeValidation = (min: number, max: number) => (
-  value: IFormFieldValue
-) => {
-  const cast = value as string
-  return isValueWithinRange(min, max)(parseFloat(cast))
-    ? undefined
-    : { message: messages.range, props: { min, max } }
-}
+export const range: RangeValidation =
+  (min: number, max: number) => (value: IFormFieldValue) => {
+    const cast = value as string
+    return isValueWithinRange(min, max)(parseFloat(cast))
+      ? undefined
+      : { message: messages.range, props: { min, max } }
+  }
 
 const hasValidLength = (value: string, length: number): boolean =>
   !value || value.length === length
 
-export const validIDNumber = (typeOfID: string): Validation => (value: any) => {
-  const validNationalIDLengths = [10, 17]
-  const validBirthRegistrationNumberLength = 17
-  const validDeathRegistrationNumberLength = 18
-  const validPassportLength = 9
-  const validDrivingLicenseLength = 15
-  value = (value && value.toString()) || ''
-  switch (typeOfID) {
-    case NATIONAL_ID:
-      const containsOnlyNumbers = value.match(/^[0-9]+$/)
-
-      if (
-        validNationalIDLengths.includes(value.length) &&
-        containsOnlyNumbers
-      ) {
-        return undefined
-      }
-      return {
-        message: messages.validNationalId,
-        props: {
-          min: validNationalIDLengths[0],
-          max: validNationalIDLengths[1]
-        }
-      }
-
-    case BIRTH_REGISTRATION_NUMBER:
-      return hasValidLength(
-        value.toString(),
-        validBirthRegistrationNumberLength
-      )
-        ? undefined
-        : {
-            message: messages.validBirthRegistrationNumber,
-            props: { validLength: validBirthRegistrationNumberLength }
-          }
-
-    case DEATH_REGISTRATION_NUMBER:
-      return hasValidLength(
-        value.toString(),
-        validDeathRegistrationNumberLength
-      )
-        ? undefined
-        : {
-            message: messages.validDeathRegistrationNumber,
-            props: { validLength: validDeathRegistrationNumberLength }
-          }
-
-    case PASSPORT:
-      return hasValidLength(value.toString(), validPassportLength) &&
-        isRegexpMatched(value, REGEXP_ALPHA_NUMERIC)
-        ? undefined
-        : {
-            message: messages.validPassportNumber,
-            props: { validLength: validPassportLength }
-          }
-    case DRIVING_LICENSE:
-      return hasValidLength(value, validDrivingLicenseLength) &&
-        isRegexpMatched(value, REGEXP_ALPHA_NUMERIC)
-        ? undefined
-        : {
-            message: messages.validDrivingLicenseNumber,
-            props: { validLength: validDrivingLicenseLength }
-          }
-    default:
-      return undefined
-  }
+export const isAValidNIDNumberFormat = (value: string): boolean => {
+  const { pattern } = window.config.NID_NUMBER_PATTERN
+  return pattern.test(value)
 }
+
+export const validIDNumber =
+  (typeOfID: string): Validation =>
+  (value: any) => {
+    const validNationalIDLengths = [10, 17]
+    const validBirthRegistrationNumberLength = 17
+    const validDeathRegistrationNumberLength = 18
+    const validPassportLength = 9
+    const validDrivingLicenseLength = 15
+    value = (value && value.toString()) || ''
+    switch (typeOfID) {
+      case NATIONAL_ID:
+        const { num } = window.config.NID_NUMBER_PATTERN
+
+        const cast = value as string
+        const trimmedValue =
+          cast === undefined || cast === null ? '' : cast.trim()
+
+        if (isAValidNIDNumberFormat(trimmedValue) || !trimmedValue) {
+          return undefined
+        }
+
+        return {
+          message: messages.validNationalId,
+          props: {
+            min: validNationalIDLengths[0],
+            max: validNationalIDLengths[1],
+            validLength: num
+          }
+        }
+
+      case BIRTH_REGISTRATION_NUMBER:
+        return hasValidLength(
+          value.toString(),
+          validBirthRegistrationNumberLength
+        )
+          ? undefined
+          : {
+              message: messages.validBirthRegistrationNumber,
+              props: { validLength: validBirthRegistrationNumberLength }
+            }
+
+      case DEATH_REGISTRATION_NUMBER:
+        return hasValidLength(
+          value.toString(),
+          validDeathRegistrationNumberLength
+        )
+          ? undefined
+          : {
+              message: messages.validDeathRegistrationNumber,
+              props: { validLength: validDeathRegistrationNumberLength }
+            }
+
+      case PASSPORT:
+        return hasValidLength(value.toString(), validPassportLength) &&
+          isRegexpMatched(value, REGEXP_ALPHA_NUMERIC)
+          ? undefined
+          : {
+              message: messages.validPassportNumber,
+              props: { validLength: validPassportLength }
+            }
+      case DRIVING_LICENSE:
+        return hasValidLength(value, validDrivingLicenseLength) &&
+          isRegexpMatched(value, REGEXP_ALPHA_NUMERIC)
+          ? undefined
+          : {
+              message: messages.validDrivingLicenseNumber,
+              props: { validLength: validDrivingLicenseLength }
+            }
+      default:
+        return undefined
+    }
+  }
 
 export const isValidDeathOccurrenceDate: Validation = (
   value: IFormFieldValue,
@@ -681,11 +686,11 @@ export const greaterThanZero: Validation = (value: IFormFieldValue) => {
     : { message: messages.greaterThanZero }
 }
 
-export const notGreaterThan = (maxValue: number): Validation => (
-  value: IFormFieldValue
-) => {
-  const numericValue = Number.parseInt(value as string)
-  return value && !Number.isNaN(numericValue) && numericValue <= maxValue
-    ? undefined
-    : { message: messages.notGreaterThan, props: { maxValue } }
-}
+export const notGreaterThan =
+  (maxValue: number): Validation =>
+  (value: IFormFieldValue) => {
+    const numericValue = Number.parseInt(value as string)
+    return value && !Number.isNaN(numericValue) && numericValue <= maxValue
+      ? undefined
+      : { message: messages.notGreaterThan, props: { maxValue } }
+  }

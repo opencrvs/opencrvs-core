@@ -37,7 +37,7 @@ import { ReviewCertificateAction } from '@client/views/PrintCertificate/ReviewCe
 import { VerifyCollector } from '@client/views/PrintCertificate/VerifyCollector'
 import { ApplicationForm } from '@client/views/RegisterForm/ApplicationForm'
 import { ReviewForm } from '@client/views/RegisterForm/ReviewForm'
-import { RegistrationHome } from '@client/views/RegistrationHome/RegistrationHome'
+import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { SearchResult } from '@client/views/SearchResult/SearchResult'
 import { SelectInformant } from '@client/views/SelectInformant/SelectInformant'
 import { SelectPrimaryApplicant } from '@client/views/SelectPrimaryApplicant/SelectPrimaryApplicant'
@@ -61,6 +61,7 @@ import { ApolloProvider } from 'react-apollo'
 import { Provider } from 'react-redux'
 import { Switch } from 'react-router'
 import { AppStore } from './store'
+import { ConfigHome } from './views/SysAdmin/Config/ConfigHome'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 
 interface IAppProps {
@@ -210,12 +211,17 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             path={routes.REGISTRAR_HOME}
-                                            component={RegistrationHome}
+                                            component={OfficeHome}
                                           />
                                           <ProtectedRoute
                                             exact
                                             path={routes.REGISTRAR_HOME_TAB}
-                                            component={RegistrationHome}
+                                            component={OfficeHome}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.CONFIG}
+                                            component={ConfigHome}
                                           />
                                           <ProtectedRoute
                                             path={routes.SEARCH}

@@ -20,6 +20,7 @@ const InputHeader = styled.div`
 `
 const ComponentWrapper = styled.span`
   display: flex;
+  max-width: 344px;
 `
 
 const Padding = styled.span`
@@ -28,6 +29,14 @@ const Padding = styled.span`
   align-items: center;
   ${({ theme }) => theme.fonts.bodyStyle};
   color: ${({ theme }) => theme.colors.secondary};
+`
+
+const PostFixPadding = styled.span`
+  padding: 0 8px;
+  display: inline-flex;
+  align-items: center;
+  ${({ theme }) => theme.fonts.bodyStyle};
+  color: ${({ theme }) => theme.colors.menuBackground};
 `
 
 const InputDescription = styled.p<{
@@ -39,7 +48,7 @@ const InputDescription = styled.p<{
   ${({ ignoreMediaQuery, theme }) => {
     return !ignoreMediaQuery
       ? `@media (min-width: ${theme.grid.breakpoints.md}px) {
-        width: 515px;
+        width: 344px;
       }`
       : ''
   }}
@@ -130,7 +139,7 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
         <ComponentWrapper>
           {prefix && <Padding>{prefix}</Padding>}
           {children}
-          {postfix && <Padding>{postfix}</Padding>}
+          {postfix && <PostFixPadding>{postfix}</PostFixPadding>}
         </ComponentWrapper>
 
         {error && touched && !hideErrorLabel && (

@@ -31,11 +31,14 @@ import {
   CancelableArea
 } from '@client/components/DateRangePicker'
 import styled from '@client/styledComponents'
+import { ILocation } from '@client/offline/reducer'
 
 const { useState, useEffect } = React
 
 interface IConnectProps {
-  searchableLocations: ISearchLocation[]
+  offlineLocations: { [key: string]: ILocation }
+  offlineOffices: { [key: string]: ILocation }
+  jurisidictionTypeFilter: string[] | undefined
 }
 
 interface IBaseProps {
@@ -95,8 +98,28 @@ const StyledLocationSearch = styled(LocationSearch)`
 `
 
 function LocationPickerComponent(props: LocationPickerProps) {
-  const { searchableLocations, selectedLocationId, intl } = props
+  const {
+    offlineLocations,
+    offlineOffices,
+    jurisidictionTypeFilter,
+    selectedLocationId,
+    intl
+  } = props
   const [modalVisible, setModalVisible] = useState<boolean>(false)
+
+  const offlineSearchableLocations = generateLocations(
+    offlineLocations,
+    intl,
+    jurisidictionTypeFilter
+  )
+
+  const offlineSearchableOffices = generateLocations(offlineOffices, intl)
+
+  const searchableLocations = [
+    ...offlineSearchableLocations,
+    ...offlineSearchableOffices
+  ]
+
   const selectedSearchedLocation = searchableLocations.find(
     ({ id }) => id === selectedLocationId
   ) as ISearchLocation
@@ -166,16 +189,15 @@ function LocationPickerComponent(props: LocationPickerProps) {
 
 function mapStateToProps(state: IStoreState, props: IBaseProps): IConnectProps {
   const offlineLocations = getOfflineData(state).locations
+  const offlineOffices = getOfflineData(state).offices
   const jurisidictionTypeFilter =
     (props.requiredJurisdictionTypes &&
       props.requiredJurisdictionTypes.split(',')) ||
     undefined
-  const offlineSearchableLocations = generateLocations(
-    offlineLocations,
-    jurisidictionTypeFilter
-  )
   return {
-    searchableLocations: offlineSearchableLocations
+    offlineLocations,
+    offlineOffices,
+    jurisidictionTypeFilter
   }
 }
 

@@ -16,6 +16,13 @@ services:
       context: .
       dockerfile: ./packages/client/Dockerfile
     restart: unless-stopped
+
+  components:
+    image: opencrvs/ocrvs-components:${VERSION:-latest}
+    build:
+      context: .
+      dockerfile: ./packages/components/Dockerfile
+    restart: unless-stopped
   login:
     image: opencrvs/ocrvs-login:${VERSION:-latest}
     build:

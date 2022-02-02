@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createStore } from '@client/store'
+import { AppStore, createStore } from '@client/store'
 import {
   createTestComponent,
   selectOption,
@@ -21,11 +21,23 @@ import { GET_DEATH_REGISTRATION_FOR_CERTIFICATION } from '@client/views/DataProv
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { CollectorForm } from './CollectorForm'
-import { waitForElement } from '@client/tests/wait-for-element'
+import { waitFor, waitForElement } from '@client/tests/wait-for-element'
+import { createLocation, History } from 'history'
+import { merge } from 'lodash'
+
+let store: AppStore
+let history: History
+let location = createLocation('/')
+
+beforeEach(() => {
+  const s = createStore()
+  store = s.store
+  history = s.history
+  location = createLocation('/')
+  history.location = location
+})
 
 describe('Certificate collector test for a birth registration without father details', () => {
-  const { store, history } = createStore()
-  const mockLocation: any = jest.fn()
   const graphqlMock = [
     {
       request: {
@@ -183,7 +195,7 @@ describe('Certificate collector test for a birth registration without father det
     beforeEach(async () => {
       const testComponent = await createTestComponent(
         <CollectorForm
-          location={mockLocation}
+          location={location}
           history={history}
           match={{
             params: {
@@ -196,10 +208,9 @@ describe('Certificate collector test for a birth registration without father det
             url: ''
           }}
         />,
-        store,
-        graphqlMock
+        { history, store, graphqlMocks: graphqlMock }
       )
-      component = testComponent.component
+      component = testComponent
       await waitForElement(component, '#collector_form')
     })
 
@@ -208,19 +219,13 @@ describe('Certificate collector test for a birth registration without father det
     })
 
     it('prompt error when no option is selected', async () => {
-      component
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
+      component.find('#confirm_form').hostNodes().simulate('click')
 
       await waitForElement(component, '#form_error')
 
-      expect(
-        component
-          .find('#form_error')
-          .hostNodes()
-          .text()
-      ).toBe('Please select who is collecting the certificate')
+      expect(component.find('#form_error').hostNodes().text()).toBe(
+        'Please select who is collecting the certificate'
+      )
     })
 
     it('redirects to id check component upon MOTHER option selection', async () => {
@@ -229,17 +234,14 @@ describe('Certificate collector test for a birth registration without father det
         .hostNodes()
         .simulate('change', { target: { value: 'MOTHER' } })
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()
 
-      component
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
+      component.find('#confirm_form').hostNodes().simulate('click')
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()
@@ -255,37 +257,28 @@ describe('Certificate collector test for a birth registration without father det
         .hostNodes()
         .simulate('change', { target: { value: 'MOTHER' } })
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()
 
-      component
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
+      component.find('#confirm_form').hostNodes().simulate('click')
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()
 
-      component
-        .find('#action_page_back_button')
-        .hostNodes()
-        .simulate('click')
+      component.find('#action_page_back_button').hostNodes().simulate('click')
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()
 
-      expect(
-        component
-          .find('#type_MOTHER')
-          .hostNodes()
-          .props().checked
-      ).toBe(true)
+      expect(component.find('#type_MOTHER').hostNodes().props().checked).toBe(
+        true
+      )
     })
 
     it('redirects to user form for other collector upon Someone else option selection', async () => {
@@ -294,17 +287,14 @@ describe('Certificate collector test for a birth registration without father det
         .hostNodes()
         .simulate('change', { target: { value: 'OTHER' } })
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()
 
-      component
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
+      component.find('#confirm_form').hostNodes().simulate('click')
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()
@@ -319,212 +309,180 @@ describe('Certificate collector test for a birth registration without father det
     let component: ReactWrapper<{}, {}>
 
     beforeEach(async () => {
-      const testComponent = await createTestComponent(
+      /*
+       * Who is collecting the certificate?
+       */
+      component = await createTestComponent(
         <CollectorForm
-          location={mockLocation}
+          location={location}
           history={history}
           match={{
             params: {
               registrationId: '6a5fd35d-01ec-4c37-976e-e055107a74a1',
               eventType: 'birth',
+              groupId: 'certCollector'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        { store, history, graphqlMocks: graphqlMock }
+      )
+
+      const form = await waitForElement(component, '#collector_form')
+
+      // Set collector to someone else
+      // done manually so the store is correctly updated
+      form
+        .find('#type_OTHER')
+        .hostNodes()
+        .simulate('change', { target: { value: 'OTHER' } })
+
+      // Continue
+      form.find('#confirm_form').hostNodes().simulate('click')
+
+      /*
+       * Change view manually
+       */
+      component.setProps(
+        merge({}, component.props(), {
+          match: {
+            params: {
               groupId: 'otherCertCollector'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        store,
-        graphqlMock
-      )
-
-      component = testComponent.component
-    })
-
-    it('show form level error when the mandatory fields are not filled', async () => {
-      component
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
-
-      await waitForElement(component, '#form_error')
-
-      expect(
-        component
-          .find('#form_error')
-          .hostNodes()
-          .text()
-      ).toBe('Complete all the mandatory fields')
-    })
-
-    it('continue to next group when the mandatory fields are filled', async () => {
-      selectOption(component, '#iDType', 'National ID number')
-
-      component
-        .find('#iD')
-        .hostNodes()
-        .simulate('change', { target: { value: '1234567890', id: 'iD' } })
-
-      component
-        .find('#firstName')
-        .hostNodes()
-        .simulate('change', { target: { value: 'Jon', id: 'firstName' } })
-
-      component
-        .find('#lastName')
-        .hostNodes()
-        .simulate('change', { target: { value: 'Doe', id: 'lastName' } })
-
-      component
-        .find('#relationship')
-        .hostNodes()
-        .simulate('change', { target: { value: 'Uncle', id: 'relationship' } })
-
-      await new Promise(resolve => {
-        setTimeout(resolve, 500)
-      })
-      component.update()
-
-      component
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
-
-      await new Promise(resolve => {
-        setTimeout(resolve, 500)
-      })
-      component.update()
-
-      expect(history.location.pathname).toBe(
-        '/cert/collector/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth/affidavit'
-      )
-    })
-  })
-
-  describe('Test affidavit group', () => {
-    let component: ReactWrapper<{}, {}>
-
-    beforeEach(async () => {
-      const testComponent = await createTestComponent(
-        <CollectorForm
-          location={mockLocation}
-          history={history}
-          match={{
-            params: {
-              registrationId: '6a5fd35d-01ec-4c37-976e-e055107a74a1',
-              eventType: 'birth',
-              groupId: 'affidavit'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        store,
-        graphqlMock
-      )
-
-      component = testComponent.component
-    })
-
-    it('show form level error when the mandatory fields are not filled', async () => {
-      component
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
-
-      await waitForElement(component, '#form_error')
-
-      expect(
-        component
-          .find('#form_error')
-          .hostNodes()
-          .text()
-      ).toBe(
-        'Attach a signed affidavit or click the checkbox if they do not have one.'
-      )
-    })
-
-    it('continue to payment section when the mandatory fields are filled and birth event is between 45 days and 5 years', async () => {
-      component
-        .find('#noAffidavitAgreementAFFIDAVIT')
-        .hostNodes()
-        .simulate('change', {
-          checked: true
-        })
-
-      await new Promise(resolve => {
-        setTimeout(resolve, 500)
-      })
-      component.update()
-
-      component
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
-
-      await new Promise(resolve => {
-        setTimeout(resolve, 500)
-      })
-      component.update()
-
-      expect(
-        component.find('#noAffidavitAgreementConfirmationModal').hostNodes()
-      ).toHaveLength(1)
-
-      component
-        .find('#submit_confirm')
-        .hostNodes()
-        .simulate('click')
-      await new Promise(resolve => {
-        setTimeout(resolve, 500)
-      })
-      component.update()
-
-      expect(history.location.pathname).toBe(
-        '/payment/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
-      )
-    })
-
-    it('should hide form level error while uploading valid file', async () => {
-      component
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
-
-      await new Promise(resolve => {
-        setTimeout(resolve, 500)
-      })
-      component.update()
-
-      component
-        .find('#image_file_uploader_field')
-        .hostNodes()
-        .simulate('change', {
-          target: {
-            files: [
-              getFileFromBase64String(
-                validImageB64String,
-                'index.png',
-                'image/png'
-              )
-            ]
+            }
           }
         })
+      )
 
-      await new Promise(resolve => {
-        setTimeout(resolve, 500)
+      // Wait until next view is loaded
+      await waitForElement(component, '#iDType')
+    })
+
+    it('show form level error when the mandatory fields are not filled', async () => {
+      component.find('#confirm_form').hostNodes().simulate('click')
+
+      await waitForElement(component, '#form_error')
+
+      expect(component.find('#form_error').hostNodes().text()).toBe(
+        'Complete all the mandatory fields'
+      )
+    })
+
+    describe('After user submits all other collector details', () => {
+      beforeEach(async () => {
+        await selectOption(
+          component,
+          '#iDType',
+          'National ID number (in English)'
+        )
+
+        component
+          .find('#iD')
+          .hostNodes()
+          .simulate('change', { target: { value: '123456789', id: 'iD' } })
+
+        component
+          .find('#firstName')
+          .hostNodes()
+          .simulate('change', { target: { value: 'Jon', id: 'firstName' } })
+
+        component
+          .find('#lastName')
+          .hostNodes()
+          .simulate('change', { target: { value: 'Doe', id: 'lastName' } })
+
+        component
+          .find('#relationship')
+          .hostNodes()
+          .simulate('change', {
+            target: { value: 'Uncle', id: 'relationship' }
+          })
+
+        const $confirm = await waitForElement(component, '#confirm_form')
+        $confirm.hostNodes().simulate('click')
+
+        component.setProps(
+          merge({}, component.props(), {
+            match: {
+              params: {
+                groupId: 'affidavit'
+              }
+            }
+          })
+        )
+        await waitForElement(component, '#image_file_uploader_field')
       })
-      component.update()
+      it('takes the user to affedavit view', async () => {
+        expect(history.location.pathname).toBe(
+          '/cert/collector/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth/affidavit'
+        )
+      })
 
-      expect(component.find('#form_error').hostNodes()).toHaveLength(0)
+      it('show form level error when the mandatory fields are not filled', async () => {
+        component.find('#confirm_form').hostNodes().simulate('click')
+
+        await waitForElement(component, '#form_error')
+
+        expect(component.find('#form_error').hostNodes().text()).toBe(
+          'Attach a signed affidavit or click the checkbox if they do not have one.'
+        )
+      })
+
+      it('continue to payment section when the mandatory fields are filled and birth event is between 45 days and 5 years', async () => {
+        Date.now = jest.fn(() => 1538352000000) // 2018-10-01
+        await waitForElement(component, '#noAffidavitAgreementAFFIDAVIT')
+        component
+          .find('#noAffidavitAgreementAFFIDAVIT')
+          .hostNodes()
+          .simulate('change', {
+            checked: true
+          })
+
+        await waitForElement(component, '#confirm_form')
+
+        component.find('#confirm_form').hostNodes().simulate('click')
+
+        await waitForElement(
+          component,
+          '#noAffidavitAgreementConfirmationModal'
+        )
+        expect(
+          component.find('#noAffidavitAgreementConfirmationModal').hostNodes()
+        ).toHaveLength(1)
+
+        component.find('#submit_confirm').hostNodes().simulate('click')
+
+        expect(history.location.pathname).toBe(
+          '/payment/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
+        )
+      })
+
+      it('should hide form level error while uploading valid file', async () => {
+        const $confirm = await waitForElement(component, '#confirm_form')
+        $confirm.hostNodes().simulate('click')
+        await waitForElement(component, '#form_error')
+        component
+          .find('#image_file_uploader_field')
+          .hostNodes()
+          .simulate('change', {
+            target: {
+              files: [
+                getFileFromBase64String(
+                  validImageB64String,
+                  'index.png',
+                  'image/png'
+                )
+              ]
+            }
+          })
+        waitFor(() => component.find('#form_error').hostNodes().length === 0)
+      })
     })
   })
 })
 
 describe('Test for a free birth registration', () => {
-  const { store, history } = createStore()
-  const mockLocation: any = jest.fn()
   const graphqlMock = [
     {
       request: {
@@ -684,7 +642,7 @@ describe('Test for a free birth registration', () => {
     beforeEach(async () => {
       const testComponent = await createTestComponent(
         <CollectorForm
-          location={mockLocation}
+          location={location}
           history={history}
           match={{
             params: {
@@ -697,11 +655,10 @@ describe('Test for a free birth registration', () => {
             url: ''
           }}
         />,
-        store,
-        graphqlMock
+        { store, history, graphqlMocks: graphqlMock }
       )
 
-      component = testComponent.component
+      component = testComponent
     })
 
     it('continue to review section when the mandatory fields are filled and birth event is before 45 days', async () => {
@@ -711,24 +668,18 @@ describe('Test for a free birth registration', () => {
           checked: true
         })
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()
 
-      component
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
+      component.find('#confirm_form').hostNodes().simulate('click')
 
       expect(
         component.find('#noAffidavitAgreementConfirmationModal').hostNodes()
       ).toHaveLength(1)
 
-      component
-        .find('#submit_confirm')
-        .hostNodes()
-        .simulate('click')
+      component.find('#submit_confirm').hostNodes().simulate('click')
 
       expect(history.location.pathname).toBe(
         '/review/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
@@ -975,11 +926,10 @@ describe('Certificate collector test for a birth registration with father detail
             url: ''
           }}
         />,
-        store,
-        graphqlMock
+        { store, history, graphqlMocks: graphqlMock }
       )
 
-      component = testComponent.component
+      component = testComponent
     })
 
     it('father option will be available', async () => {
@@ -990,8 +940,6 @@ describe('Certificate collector test for a birth registration with father detail
 })
 
 describe('Certificate collector test for a death registration', () => {
-  const { store, history } = createStore()
-  const mockLocation: any = jest.fn()
   const graphqlMock = [
     {
       request: {
@@ -1213,7 +1161,7 @@ describe('Certificate collector test for a death registration', () => {
     beforeEach(async () => {
       const testComponent = await createTestComponent(
         <CollectorForm
-          location={mockLocation}
+          location={location}
           history={history}
           match={{
             params: {
@@ -1226,11 +1174,10 @@ describe('Certificate collector test for a death registration', () => {
             url: ''
           }}
         />,
-        store,
-        graphqlMock
+        { store, history, graphqlMocks: graphqlMock }
       )
 
-      component = testComponent.component
+      component = testComponent
     })
 
     it('applicant will be available', async () => {
@@ -1239,25 +1186,16 @@ describe('Certificate collector test for a death registration', () => {
     })
 
     it('redirects to review certificate for print in advance option', async () => {
-      component
-        .find('#type_PRINT_IN_ADVANCE')
+      const $printInAdvance = await waitForElement(
+        component,
+        '#type_PRINT_IN_ADVANCE'
+      )
+      $printInAdvance
         .hostNodes()
         .simulate('change', { target: { value: 'PRINT_IN_ADVANCE' } })
 
-      await new Promise(resolve => {
-        setTimeout(resolve, 500)
-      })
-      component.update()
-
-      component
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
-
-      await new Promise(resolve => {
-        setTimeout(resolve, 500)
-      })
-      component.update()
+      const $confirm = await waitForElement(component, '#confirm_form')
+      $confirm.hostNodes().simulate('click')
 
       expect(history.location.pathname).toBe(
         '/review/16ff35e1-3f92-4db3-b812-c402e609fb00/death'
@@ -1267,8 +1205,6 @@ describe('Certificate collector test for a death registration', () => {
 })
 
 describe('Certificate collector test for a birth registration without father and mother details', () => {
-  const { store, history } = createStore()
-  const mockLocation: any = jest.fn()
   const graphqlMock = [
     {
       request: {
@@ -1528,7 +1464,7 @@ describe('Certificate collector test for a birth registration without father and
     beforeEach(async () => {
       const testComponent = await createTestComponent(
         <CollectorForm
-          location={mockLocation}
+          location={location}
           history={history}
           match={{
             params: {
@@ -1541,10 +1477,9 @@ describe('Certificate collector test for a birth registration without father and
             url: ''
           }}
         />,
-        store,
-        graphqlMock
+        { store, history, graphqlMocks: graphqlMock }
       )
-      component = testComponent.component
+      component = testComponent
       await waitForElement(component, '#collector_form')
     })
 

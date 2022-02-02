@@ -22,12 +22,13 @@ import { IUserDetails } from '@client/utils/userUtils'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import styled from '@client/styledComponents'
 import { Header } from '@client/components/interface/Header/Header'
-import { AvatarLarge, Avatar } from '@opencrvs/components/lib/icons'
+import { AvatarLarge, Avatar } from '@client/components/Avatar'
 import { DataSection } from '@opencrvs/components/lib/interface/ViewData'
 import {
   ResponsiveModal,
   NOTIFICATION_TYPE,
-  Notification
+  Notification,
+  FloatingNotification
 } from '@opencrvs/components/lib/interface'
 import { Select } from '@opencrvs/components/lib/forms'
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
@@ -40,6 +41,10 @@ import { modifyUserDetails as modifyUserDetailsAction } from '@client/profile/pr
 import { getDefaultLanguage, getAvailableLanguages } from '@client/i18n/utils'
 import { IntlState } from '@client/i18n/reducer'
 import { PasswordChangeModal } from '@client/views/Settings/PasswordChangeModal'
+import { Navigation } from '@client/components/interface/Navigation'
+import { AvatarChangeModal } from './AvatarChangeModal'
+import { ImageLoader } from './ImageLoader'
+import { IImage } from '@client/utils/imageUtils'
 
 const Container = styled.div`
   ${({ theme }) => theme.shadows.mistyShadow};
@@ -55,6 +60,13 @@ const Container = styled.div`
     min-height: 100vh;
     margin-top: 0;
     box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  }
+`
+
+const BodyContainer = styled.div`
+  margin-left: 0px;
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    margin-left: 249px;
   }
 `
 
@@ -133,6 +145,7 @@ const CancelButton = styled(TertiaryButton)`
     padding: 0;
   }
 `
+
 type IProps = IntlShapeProps & {
   language: string
   languages: IntlState['languages']
@@ -142,6 +155,7 @@ type IProps = IntlShapeProps & {
 
 enum NOTIFICATION_SUBJECT {
   LANGUAGE,
+  AVATAR,
   PASSWORD
 }
 
@@ -150,7 +164,12 @@ interface IState {
   selectedLanguage: string
   showSuccessNotification: boolean
   showPasswordChange: boolean
+  showChangeAvatar: boolean
   notificationSubject: NOTIFICATION_SUBJECT | null
+  image: IImage
+  imageLoadingError: string
+  imageUploading: boolean
+  showAvatarNotification: boolean
 }
 
 interface ILanguageOptions {
@@ -165,32 +184,52 @@ class SettingsView extends React.Component<IProps, IState> {
       showSuccessNotification: false,
       selectedLanguage: this.props.language,
       showPasswordChange: false,
+      showChangeAvatar: false,
+      image: {
+        type: '',
+        data: ''
+      },
+      imageLoadingError: '',
+      imageUploading: false,
+      showAvatarNotification: false,
       notificationSubject: null
     }
   }
 
   toggleLanguageSettingsModal = () => {
-    this.setState(state => ({
+    this.setState((state) => ({
       showLanguageSettings: !state.showLanguageSettings
     }))
   }
 
   toggleSuccessNotification = (subject: NOTIFICATION_SUBJECT | null = null) => {
-    this.setState(state => ({
+    this.setState((state) => ({
       showSuccessNotification: !state.showSuccessNotification,
       notificationSubject: subject
     }))
   }
 
+  toggleAvatarNotification = () => {
+    this.setState((state) => ({
+      showAvatarNotification: !state.showAvatarNotification
+    }))
+  }
+
+  toggleAvatarChangeModal = () => {
+    this.setState((state) => ({
+      showChangeAvatar: !state.showChangeAvatar
+    }))
+  }
+
   cancelLanguageSettings = () => {
-    this.setState(state => ({
+    this.setState((state) => ({
       selectedLanguage: this.props.language,
       showLanguageSettings: !state.showLanguageSettings
     }))
   }
 
   togglePasswordChangeModal = () => {
-    this.setState(state => ({
+    this.setState((state) => ({
       showPasswordChange: !state.showPasswordChange
     }))
   }
@@ -204,9 +243,30 @@ class SettingsView extends React.Component<IProps, IState> {
       this.toggleSuccessNotification(NOTIFICATION_SUBJECT.LANGUAGE)
     }
   }
+
   changePassword = () => {
     this.togglePasswordChangeModal()
     this.toggleSuccessNotification(NOTIFICATION_SUBJECT.PASSWORD)
+  }
+
+  handleConfirmAvatarChange = () => {
+    this.setState({ imageUploading: true })
+    this.toggleAvatarChangeModal()
+    this.toggleAvatarNotification()
+  }
+
+  changeAvatar = (avatar: IImage) => {
+    if (this.props.userDetails) {
+      this.setState({ imageUploading: false })
+      this.props.userDetails.avatar = avatar
+      this.props.modifyUserDetails(this.props.userDetails)
+    }
+  }
+
+  handleImageLoaded = (image: IImage) => {
+    this.setState({
+      image
+    })
   }
 
   render() {
@@ -317,26 +377,45 @@ class SettingsView extends React.Component<IProps, IState> {
     return (
       <>
         <Header title={intl.formatMessage(messages.settingsTitle)} />
-        <Container>
-          <SettingsTitle>
-            {intl.formatMessage(messages.settingsTitle)}
-          </SettingsTitle>
-          <Content>
-            <Left>
-              {sections.map((sec, index: number) => (
-                <DataSection key={index} {...sec} />
-              ))}
-              <Version>
-                <span>OpenCRVS v1.1.0</span>
-                <span>{process.env.REACT_APP_VERSION || 'development'}</span>
-              </Version>
-            </Left>
-            <Right>
-              <Avatar className="tablet" />
-              <AvatarLarge className="desktop" />
-            </Right>
-          </Content>
-        </Container>
+        <Navigation />
+        <BodyContainer>
+          <Container>
+            <SettingsTitle>
+              {intl.formatMessage(messages.settingsTitle)}
+            </SettingsTitle>
+            <Content>
+              <Left>
+                {sections.map((sec, index: number) => (
+                  <DataSection key={index} {...sec} />
+                ))}
+                <Version>
+                  <span>OpenCRVS v1.1.0</span>
+                  <span>{process.env.REACT_APP_VERSION || 'development'}</span>
+                </Version>
+              </Left>
+              <Right>
+                <ImageLoader
+                  onImageLoaded={this.handleImageLoaded}
+                  onLoadingStarted={this.toggleAvatarChangeModal}
+                  onError={(imageLoadingError) =>
+                    this.setState({ imageLoadingError })
+                  }
+                >
+                  <Avatar
+                    className="tablet clickable"
+                    avatar={userDetails?.avatar}
+                    name={englishName}
+                  />
+                  <AvatarLarge
+                    className="desktop clickable"
+                    avatar={userDetails?.avatar}
+                    name={englishName}
+                  />
+                </ImageLoader>
+              </Right>
+            </Content>
+          </Container>
+        </BodyContainer>
         <ResponsiveModal
           id="ChangeLanguageModal"
           title={intl.formatMessage(messages.changeLanguageTitle)}
@@ -377,6 +456,18 @@ class SettingsView extends React.Component<IProps, IState> {
             placeholder=""
           />
         </ResponsiveModal>
+        <AvatarChangeModal
+          cancelAvatarChangeModal={this.toggleAvatarChangeModal}
+          showChangeAvatar={this.state.showChangeAvatar}
+          imgSrc={this.state.image}
+          onImgSrcChanged={(image) => this.setState({ image })}
+          error={this.state.imageLoadingError}
+          onErrorChanged={(imageLoadingError) =>
+            this.setState({ imageLoadingError })
+          }
+          onConfirmAvatarChange={this.handleConfirmAvatarChange}
+          onAvatarChanged={this.changeAvatar}
+        />
         <PasswordChangeModal
           togglePasswordChangeModal={this.togglePasswordChangeModal}
           showPasswordChange={this.state.showPasswordChange}
@@ -402,6 +493,25 @@ class SettingsView extends React.Component<IProps, IState> {
             <FormattedMessage {...messages.passwordUpdated} />
           )}
         </Notification>
+        <FloatingNotification
+          type={
+            this.state.imageUploading
+              ? NOTIFICATION_TYPE.IN_PROGRESS
+              : NOTIFICATION_TYPE.SUCCESS
+          }
+          show={this.state.showAvatarNotification}
+          callback={
+            this.state.imageUploading
+              ? undefined
+              : () => this.toggleAvatarNotification()
+          }
+        >
+          <FormattedMessage
+            {...(this.state.imageUploading
+              ? messages.avatarUpdating
+              : messages.avatarUpdated)}
+          />
+        </FloatingNotification>
       </>
     )
   }

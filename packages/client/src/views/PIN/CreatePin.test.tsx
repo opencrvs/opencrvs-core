@@ -22,13 +22,13 @@ describe('Create PIN view', () => {
   let c: ReactWrapper
 
   beforeEach(async () => {
-    const { store } = createStore()
+    const { store, history } = createStore()
     const testComponent = await createTestComponent(
       <CreatePin onComplete={() => null} />,
-      store
+      { store, history }
     )
 
-    c = testComponent.component
+    c = testComponent
   })
 
   it("shows and error when PINs don't match", async () => {
@@ -37,7 +37,7 @@ describe('Create PIN view', () => {
     c.find('span#keypad-1').simulate('click')
     c.find('span#keypad-2').simulate('click')
 
-    await new Promise(resolve => {
+    await new Promise<void>((resolve) => {
       setTimeout(() => {
         resolve()
       }, 50)
@@ -50,7 +50,7 @@ describe('Create PIN view', () => {
     c.find('span#keypad-3').simulate('click')
     c.find('span#keypad-2').simulate('click')
 
-    await new Promise(resolve => {
+    await new Promise<void>((resolve) => {
       setTimeout(() => {
         resolve()
       }, 50)
@@ -68,7 +68,7 @@ describe('Create PIN view', () => {
     c.find('span#keypad-backspace').simulate('click')
     c.find('span#keypad-1').simulate('click')
 
-    await new Promise(resolve => {
+    await new Promise<void>((resolve) => {
       setTimeout(() => {
         resolve()
       }, 50)
@@ -80,7 +80,7 @@ describe('Create PIN view', () => {
 
     c.find('span#keypad-2').simulate('click')
 
-    await new Promise(resolve => {
+    await new Promise<void>((resolve) => {
       setTimeout(() => {
         resolve()
       }, 50)
@@ -97,7 +97,7 @@ describe('Create PIN view', () => {
     c.find('span#keypad-1').simulate('click')
     c.find('span#keypad-1').simulate('click')
 
-    await new Promise(resolve => {
+    await new Promise<void>((resolve) => {
       setTimeout(() => {
         resolve()
       }, 50)
@@ -116,7 +116,7 @@ describe('Create PIN view', () => {
     c.find('span#keypad-3').simulate('click')
     c.find('span#keypad-4').simulate('click')
 
-    await new Promise(resolve => {
+    await new Promise<void>((resolve) => {
       setTimeout(() => {
         resolve()
       }, 50)
@@ -135,7 +135,7 @@ describe('Create PIN view', () => {
     c.find('span#keypad-1').simulate('click')
     c.find('span#keypad-2').simulate('click')
 
-    await new Promise(resolve => {
+    await new Promise<void>((resolve) => {
       setTimeout(() => {
         resolve()
       }, 50)
@@ -148,7 +148,7 @@ describe('Create PIN view', () => {
     c.find('span#keypad-1').simulate('click')
     c.find('span#keypad-2').simulate('click')
 
-    await new Promise(resolve => {
+    await new Promise<void>((resolve) => {
       setTimeout(() => {
         resolve()
       }, 50)

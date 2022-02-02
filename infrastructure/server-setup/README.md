@@ -1,7 +1,12 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-- [OpenCRVS server setup](#opencrvs-server-setup)
+- [Setting up a hosting environment for deploying OpenCRVS](#setting-up-a-hosting-environment-for-deploying-opencrvs)
+  - [How can I install and manage an OpenCRVS server cluster?](#how-can-i-install-and-manage-an-opencrvs-server-cluster)
+    - [8 GB Memory (preferrably 16 GB) / 160 GB Disk / Ubuntu 18.04.3 (LTS) x64](#8-gb-memory-preferrably-16-gb--160-gb-disk--ubuntu-18043-lts-x64)
+  - [How can I deploy to a staging environment cluster?](#how-can-i-deploy-to-a-staging-environment-cluster)
+  - [How can I deploy to a QA environment cluster?](#how-can-i-deploy-to-a-qa-environment-cluster)
+  - [How can I deploy to production?](#how-can-i-deploy-to-production)
   - [Enabling encryption](#enabling-encryption)
   - [Enabling Mongo replica sets](#enabling-mongo-replica-sets)
   - [Emergency Backup & Restore](#emergency-backup--restore)
@@ -16,10 +21,49 @@
     - [You need to run commands inside a container](#you-need-to-run-commands-inside-a-container)
     - [You need to inspect a container to see networking and all other information](#you-need-to-inspect-a-container-to-see-networking-and-all-other-information)
     - [You need to rollback the changes made to a service](#you-need-to-rollback-the-changes-made-to-a-service)
+  - [Why Docker Swarm? ...and is there Kubernetes support?](#why-docker-swarm-and-is-there-kubernetes-support)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# OpenCRVS server setup
+# Setting up a hosting environment for deploying OpenCRVS
+
+This README outlines the process to setup and deploy OpenCRVS on a remote server environment. The documentation is in progress and will be finalised for the public Beta release scheduled for June 2022.
+
+### How can I install and manage an OpenCRVS server cluster?
+
+OpenCRVS should be deployed on a minimum cluster of 3 nodes, each with the following minimm specification:
+
+#### 8 GB Memory (preferrably 16 GB) / 160 GB Disk / Ubuntu 18.04.3 (LTS) x64
+
+To prepare your server cluster and manage the Docker Swarm, some pre-requisites and instructions are documented [here](https://github.com/opencrvs/opencrvs-core/tree/master/infrastructure/server-setup)
+
+An [Ansible](https://www.ansible.com/) playbook script is provided [here](https://github.com/opencrvs/opencrvs-core/blob/master/infrastructure/server-setup/playbook.yml) to automate the vast majority of your server cluster setup.
+
+## How can I deploy to a staging environment cluster?
+
+To deploy to a staging environment we combine docker-compose files that are used in the docker setup above with a few others to configure the stack.
+
+The deployment uses Docker Swarm and sets up an OpenCRVS stack containing each service with a number of replicas defined in the docker compose files. **Note:** This deployment is currently automated so that every time we push to master the build will be deployed during the CI process.
+
+The deploy is easily executed by just running: `yarn deploy:staging --clear-data=yes --restore-metadata=yes <<insert host>> <<insert version>>` - you will need ssh access to the server for this to work.
+
+<br>
+
+## How can I deploy to a QA environment cluster?
+
+Deploying to QA is much the same as above, however you may specify a version to deploy. The version can be any docker image tag. Each time master is build on CI docker images are created for that commit hash. Any of these hashes may be used as the version. In addition any time a git tag is created and pushed all the docker images will automatically build. Once complete the name of this tag can be used to deploy to the QA environment as well.
+
+`yarn deploy:qa --clear-data=yes --restore-metadata=yes <<insert host>> <<insert version>>`
+
+<br>
+
+## How can I deploy to production?
+
+Deploying to Production is much the same as deploying to QA.
+
+`yarn deploy:prod --clear-data=yes --restore-metadata=yes <<insert host>> <<insert version>>`
+
+<br>
 
 This folder contains script to setup a new set of servers for OpenCRVS. It sets up docker swarm and configures the servers to prepare them for a deployment for OpenCRVS.
 
@@ -57,9 +101,9 @@ Edit the automatic cron job backup to suit your external server set-up on line 6
 job: 'cd ~/ && bash /tmp/compose/infrastructure/emergency-backup-metadata.sh <ssh-user> <external-server-for-remote-backup-host> <ssh-port> <your-production-environment-manger-node-host> <path-to-encrypted-volume-on-external-server> >> /var/log/opencrvs-backup.log 2>&1'
 ```
 
-Ensure your external server also allows SSH from the OpenCRVS manager node. Follow the same process as per the workers
+Ensure your external backup server also allows SSH from the OpenCRVS manager node. Follow the same process as per the workers
 
-Run the Ansible playbook configuration script from your client computer (You must have Ansible installed, a Dockerhub account & a Papertrail account - remove Papertrail config from playbook if you do not wish to use the logging service. We recommend you use an external Logging service to have live access to logs):
+Run the Ansible playbook configuration script from your client computer (You must have Ansible installed, a Dockerhub account & a Papertrail account - leave "papertrail_token" variable undefined if you do not wish to use the logging service. We recommend you use an external Logging service to have live access to logs):
 
 ```
 ansible-playbook -i <inventory_file> playbook.yml -e "dockerhub_username=your_username dockerhub_password=your_password papertrail_token=your_papertrail_token external_backup_server_ip=your_external_backup_server_ip external_backup_server_user=your_external_backup_server_user external_backup_server_ssh_port=your_external_backup_server_ssh_port manager_production_server_ip=your_manager_production_server_ip external_backup_server_remote_directory=your_external_backup_server_remote_directory"
@@ -82,7 +126,7 @@ Before the deployment can be done a few secrets need to be manually added to the
 ssh into the leader manager and run the following, replacing the values with the actual secrets:
 
 ```sh
-# For API integration medaitors, allows API access to the OpenHIM
+# For API integration mediators, allows API access to the OpenHIM
 printf "<openhim-user>" | docker secret create openhim-user -
 printf "<openhim-password>" | docker secret create openhim-password -
 ```
@@ -102,7 +146,7 @@ printf "<infobip-sender-id>" | docker secret create infobip-sender-id -
 
 ```
 
-After creating the secrets make sure the commands are removed from the shell history
+After creating the secrets make sure the commands are removed from the shell history by running `history -c`
 
 Also, if you can't ssh into the manager as root you will need to add your ssh user to be able to run docker commands:
 
@@ -126,25 +170,25 @@ resources.<your_domain>
 styleguide.<your_domain>
 monitor.<your_domain>
 
-Now, in the package.json file in the root folder of the repository, amend the deployment script appropriately:
-
-```
-"deploy": "SSH_USER=<<your_ssh_username>> SSH_HOST=<<your_swarm_manager_node_ip>> bash deploy.sh",
-```
-
-You may also add the following variables to the above that will change the username and password for monitoring service, Netdata, away from the default of monitor:monitor-password. `NETDATA_USER=<username> NETDATA_PASSWORD=<password>`
-
 Then, run the deployment like so:
 
 ```
-yarn deploy <<insert country code>> --clear-data=yes --restore-metadata=yes <<insert host domain e.g.: opencrvs.your_country.org>> <<insert version e.g.: latest>>
+SSH_USER=<<your_ssh_username>> SSH_HOST=<<your_swarm_manager_node_ip>> yarn deploy <<insert country code>> --clear-data=yes --restore-metadata=yes <<insert host domain e.g.: opencrvs.your_country.org>> <<insert version e.g.: latest>>
 ```
 
 Version can be any git commit hash, git tag, dockerhub tag or 'latest'
 
+You may also use the following environment variables variables to the above that will change the username and password for monitoring service,
+Netdata, away from the default of monitor:monitor-password.
+
+```
+NETDATA_USER=<username>
+NETDATA_PASSWORD=<password>
+```
+
 ## Enabling Mongo replica sets
 
-Mongo is enabled with replica sets in order to provide backup in case a node fails. When the deploy script runs, the mongo-rs-init container waits 20s before trying to setup the replica set. If the mongo instances aren't up by then then there is a chance that the deployment will fail. You can recognise this by the following error in the opencrvs_mongo service logs `Unable to reach primary for set rs0`. Run `docker service ls` to see if the replicas have scaled or not. Running the following commands manually scales the replica set, and allows you to continue.
+Mongo is enabled with replica sets in order to provide backup in case a node fails. When the deploy script runs, the mongo-rs-init container waits 20s before trying to setup the replica set. If the mongo instances aren't up by then, then there is a chance that the deployment will fail. You can recognise this by the following error in the opencrvs_mongo service logs `Unable to reach primary for set rs0`. Run `docker service ls` to see if the replicas have scaled or not. Running the following commands manually scales the replica set, and allows you to continue.
 
 ```
 docker service scale opencrvs_mongo-rs-init=0
@@ -295,3 +339,15 @@ docker inspect <container id e.g. "opencrvs_user-mgnt.1.t0178z73i4tjcll68a7r72en
 ### You need to rollback the changes made to a service
 
 docker service rollback opencrvs_user-mgnt
+
+## Why Docker Swarm? ...and is there Kubernetes support?
+
+[Docker Swarm](https://docs.docker.com/engine/swarm/) was chosen for it's simplicity, so that previously unskilled system administrators can quickly up-skill in the techniques of private and public cloud infrastructure management. We wanted to democratise the containerisation benefits of AWS/Kubernetes style public cloud deployments for developing nations.
+
+Some nations may be located far from a developed world datacentre. Many nations may not be able to legally support international data storage of citizen data. Often getting the legal approval requires regulatory change which obviously can take some time. In the short term, these nations may not have access to the development skills necessary to manage a complicated distributed cloud deployment, so ease-of-use is paramount.
+
+Docker Swarm makes it easy to commence service distribution privately and then migrate publically when an organisation is ready to do so. Docker Swarm automatically configures a "round robin" load balanced cluster, and provides Service Discovery out-the-box.
+
+We are working on a [Kubernetes](https://kubernetes.io/) Software-As-A-Service solution, so that smaller nations can hand over system administration to a 3rd party to manage solely in the public cloud, if these nations can get regulatory approval.
+
+<br>

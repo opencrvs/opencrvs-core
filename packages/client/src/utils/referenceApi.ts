@@ -167,9 +167,9 @@ async function loadPilotLocations(): Promise<ILocationDataResponse> {
 
 const toDataURL = (url: string) =>
   fetch(url)
-    .then(response => response.blob())
+    .then((response) => response.blob())
     .then(
-      blob =>
+      (blob) =>
         new Promise((resolve, reject) => {
           const reader = new FileReader()
           reader.onloadend = () => resolve(reader.result)
@@ -181,7 +181,7 @@ const toDataURL = (url: string) =>
 async function loadAssets(): Promise<IAssetResponse> {
   const url = `${window.config.RESOURCES_URL}/assets/${window.config.COUNTRY_LOGO_FILE}`
 
-  return toDataURL(url).then(dataUrl => {
+  return toDataURL(url).then((dataUrl) => {
     return {
       logo: `${dataUrl}`
     }

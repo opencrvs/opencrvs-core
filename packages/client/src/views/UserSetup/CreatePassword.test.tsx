@@ -15,7 +15,7 @@ import { createStore } from '@client/store'
 import { CreatePassword } from './CreatePassword'
 import { ReactWrapper } from 'enzyme'
 
-const { store } = createStore()
+const { store, history } = createStore()
 
 describe('CreatePassword page tests', () => {
   let component: ReactWrapper
@@ -23,10 +23,10 @@ describe('CreatePassword page tests', () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
       <CreatePassword goToStep={() => {}} setupData={{ userId: '123' }} />,
-      store
+      { store, history }
     )
 
-    component = testComponent.component
+    component = testComponent
   })
 
   it('it shows passwords missmatch error when Continue button is pressed', async () => {
@@ -37,12 +37,9 @@ describe('CreatePassword page tests', () => {
       target: { id: 'ConfirmPassword', value: 'missmatch' }
     })
     component.find('button#Continue').simulate('click')
-    expect(
-      component
-        .find('#GlobalError')
-        .hostNodes()
-        .text()
-    ).toEqual('Passwords do not match')
+    expect(component.find('#GlobalError').hostNodes().text()).toEqual(
+      'Passwords do not match'
+    )
   })
   it('it passes validations', () => {
     component.find('input#NewPassword').simulate('change', {
@@ -55,11 +52,8 @@ describe('CreatePassword page tests', () => {
   })
   it('it shows passwords required error when Continue button is pressed', () => {
     component.find('button#Continue').simulate('click')
-    expect(
-      component
-        .find('#GlobalError')
-        .hostNodes()
-        .text()
-    ).toEqual('New password is not valid')
+    expect(component.find('#GlobalError').hostNodes().text()).toEqual(
+      'New password is not valid'
+    )
   })
 })
