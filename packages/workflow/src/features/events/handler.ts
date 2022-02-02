@@ -9,12 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { HEARTH_URL, OPENHIM_URL } from '@workflow/constants'
+import { OPENHIM_URL } from '@workflow/constants'
 import { isUserAuthorized } from '@workflow/features/events/auth'
 import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
 import {
   hasBirthRegistrationNumber,
-  hasDeathRegistrationNumber
+  hasDeathRegistrationNumber,
+  forwardToHearth
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   createRegistrationHandler,
@@ -31,7 +32,7 @@ import updateTaskHandler from '@workflow/features/task/handler'
 import { logger } from '@workflow/logger'
 import { hasRegisterScope, hasValidateScope } from '@workflow/utils/authUtils'
 import * as Hapi from '@hapi/hapi'
-import fetch, { RequestInit } from 'node-fetch'
+import fetch from 'node-fetch'
 
 // TODO: Change these event names to be closer in definition to the comments
 // https://jembiprojects.jira.com/browse/OCRVS-2767
@@ -128,6 +129,10 @@ function detectEvent(request: Hapi.Request): Events {
         }
       }
       if (firstEntry.resourceType === 'Task' && firstEntry.id) {
+        if (fhirBundle?.signature?.type[0]?.code === 'downloaded') {
+          return Events.DOWNLOADED
+        }
+
         const eventType = getEventType(fhirBundle)
         if (eventType === EVENT_TYPE.BIRTH) {
           if (hasValidateScope(request)) {
@@ -161,41 +166,7 @@ function detectEvent(request: Hapi.Request): Events {
     return Events.EVENT_NOT_DUPLICATE
   }
 
-  // if (request.method === 'get' && request.path.includes('/fhir/Composition')) {
-  //   return Events.DOWNLOADED
-  // }
-
   return Events.UNKNOWN
-}
-
-async function forwardToHearth(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-  logger.info(
-    `Forwarding to Hearth unchanged: ${request.method} ${request.path}`
-  )
-
-  const requestOpts: RequestInit = {
-    method: request.method,
-    headers: {
-      'Content-Type': 'application/fhir+json'
-    }
-  }
-
-  let path = request.path
-  if (request.method === 'post' || request.method === 'put') {
-    requestOpts.body = JSON.stringify(request.payload)
-  } else if (request.method === 'get') {
-    path = `${request.path}${request.url.search}`
-  }
-  const res = await fetch(HEARTH_URL + path.replace('/fhir', ''), requestOpts)
-  const resBody = await res.text()
-  const response = h.response(resBody)
-
-  response.code(res.status)
-  res.headers.forEach((headerVal, headerName) => {
-    response.header(headerName, headerVal)
-  })
-
-  return response
 }
 
 export async function fhirWorkflowEventHandler(
@@ -370,7 +341,7 @@ export async function fhirWorkflowEventHandler(
       )
       break
     case Events.DOWNLOADED:
-      await markEventAsDownloadedHandler(request, h)
+      response = await markEventAsDownloadedHandler(request, h)
       await triggerEvent(
         Events.DOWNLOADED,
         request.payload,

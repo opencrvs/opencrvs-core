@@ -2979,7 +2979,15 @@ export function addDownloadedTaskExtension(taskEntry: ITaskBundleEntry) {
   const fhirBundle: ITaskBundle = {
     resourceType: 'Bundle',
     type: 'document',
-    entry: [taskEntry]
+    entry: [taskEntry],
+    signature: {
+      type: [
+        {
+          code: 'downloaded'
+        }
+      ],
+      when: Date().toString()
+    }
   }
   return fhirBundle
 }
