@@ -141,10 +141,11 @@ describe('verify corrector tests', () => {
       expect(history.location.pathname).toBe('/')
     })
 
-    describe('when father is corrector', () => {
+    describe('when father is collector', () => {
       let testComponent: ReactWrapper
       beforeEach(async () => {
         testComponent = await createTestComponent(
+          // @ts-ignore
           <VerifyCorrector
             history={history}
             location={history.location}
@@ -164,6 +165,21 @@ describe('verify corrector tests', () => {
 
       it('renders idVerifier compomnent', () => {
         expect(testComponent.find('#idVerifier').hostNodes()).toHaveLength(1)
+      })
+
+      it('clicking on yes button takes user to review certificate', () => {
+        Date.now = jest.fn(() => 243885600000)
+        console.log(testComponent.debug())
+
+        testComponent
+          .find('#idVerifier')
+          .find('#verifyPositive')
+          .hostNodes()
+          .simulate('click')
+
+        testComponent.update()
+
+        expect(history.location.pathname).not.toContain('/verify')
       })
 
       it('clicking on no button shows up modal', () => {
