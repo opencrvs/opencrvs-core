@@ -48,7 +48,7 @@ const CONFIG_CMD = Cmd.run<
 const RETRY_TIMEOUT = 5000
 function delay(cmd: RunCmd<any>, time: number) {
   return Cmd.list(
-    [Cmd.run(() => new Promise(resolve => setTimeout(resolve, time))), cmd],
+    [Cmd.run(() => new Promise((resolve) => setTimeout(resolve, time))), cmd],
     { sequence: true }
   )
 }

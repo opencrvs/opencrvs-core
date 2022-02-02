@@ -22,7 +22,7 @@ export default async function applicationHandler(
   try {
     // tslint:disable-next-line
     const appConfig: IApplicationConfigurationModel | null =
-      await ApplicationConfig.findOne({})
+      await ApplicationConfig.findOne({}).exec()
     return appConfig || 'no configuration'
   } catch (ex) {
     logger.error(ex)
