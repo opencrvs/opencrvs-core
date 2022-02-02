@@ -447,13 +447,10 @@ describe('OfficeHome sent for review tab related tests', () => {
     const element = await waitForElement(testComponent, '#row_0')
     element.hostNodes().simulate('click')
 
-    await new Promise((resolve) => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.update()
-
-    expect(window.location.href).toContain(
-      '/recordAudit/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+    await waitFor(() =>
+      window.location.href.includes(
+        '/recordAudit/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+      )
     )
   })
 

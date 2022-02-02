@@ -413,9 +413,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
       )
 
       // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
+      await waitForElement(testComponent, '#row_0')
 
       testComponent.update()
       testComponent.find('#row_0').hostNodes().simulate('click')

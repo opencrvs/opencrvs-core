@@ -32,7 +32,8 @@ import { createStore } from '@client/store'
 import {
   createTestComponent,
   mockUserResponse,
-  resizeWindow
+  resizeWindow,
+  flushPromises
 } from '@client/tests/util'
 import { merge } from 'lodash'
 import moment from 'moment'
@@ -658,9 +659,7 @@ describe('In Progress tab', () => {
       testComponent.update()
       testComponent.find('#row_0').hostNodes().simulate('click')
 
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
+      await flushPromises()
       testComponent.update()
 
       expect(window.location.href).toContain(
