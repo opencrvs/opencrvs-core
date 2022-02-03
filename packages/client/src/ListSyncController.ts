@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { client } from '@client/utils/apolloClient'
-import { REGISTRATION_HOME_QUERY } from '@client/views/OfficeHome/queries'
+import { REGISTRATION_HOME_QUERY } from '@client/views/RegistrationHome/queries'
 
 export async function syncRegistrarWorkqueue(
   locationId: string,

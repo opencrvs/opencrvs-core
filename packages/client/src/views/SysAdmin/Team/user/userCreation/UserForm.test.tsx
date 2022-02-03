@@ -19,7 +19,7 @@ import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { waitForElement } from '@client/tests/wait-for-element'
 
-const { store, history } = createStore()
+const { store } = createStore()
 
 describe('Create new user page tests', () => {
   let component: ReactWrapper
@@ -49,9 +49,9 @@ describe('Create new user page tests', () => {
         nextGroupId="preview-user-view-group"
         nextSectionId="preview"
       />,
-      { store, history }
+      store
     )
-    component = testComponent
+    component = testComponent.component
   })
 
   it('it checks component has loaded', () => {

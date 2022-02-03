@@ -26,7 +26,9 @@ describe('Field agent list tests', () => {
 
   beforeAll(async () => {
     Date.now = jest.fn(() => 1487076708000)
-    ;({ store, history } = await createTestStore())
+    const { store: testStore, history: testHistory } = await createTestStore()
+    store = testStore
+    history = testHistory
   })
 
   beforeEach(async () => {
@@ -90,9 +92,10 @@ describe('Field agent list tests', () => {
           })
         }}
       />,
-      { store, history, graphqlMocks: graphqlMock }
+      store,
+      graphqlMock
     )
-    component = testComponent
+    component = testComponent.component
   })
 
   it('renders without crashing', async () => {
@@ -149,8 +152,11 @@ describe('Field agent list tests', () => {
           })
         }}
       />,
-      { store, history }
+      store
     )
-    await waitForElement(testErrorComponent, '#field-agent-error-list')
+    await waitForElement(
+      testErrorComponent.component,
+      '#field-agent-error-list'
+    )
   })
 })

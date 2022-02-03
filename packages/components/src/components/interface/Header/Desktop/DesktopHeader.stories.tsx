@@ -18,5 +18,25 @@ export default {
   component: DesktopHeader
 } as Meta
 
-const Template: Story<IDesktopHeaderProps> = (args) => <DesktopHeader />
+const menuItems = [
+  {
+    key: 'application',
+    title: 'Application',
+    selected: true,
+    onClick: () => alert('application')
+  },
+  {
+    key: 'performance',
+    title: 'Performance',
+    selected: false,
+    onClick: () => alert('performance')
+  }
+]
+
+const Template: Story<IDesktopHeaderProps> = (args) => (
+  <DesktopHeader {...args} />
+)
 export const DesktopHeaderView = Template.bind({})
+DesktopHeaderView.args = {
+  menuItems
+}

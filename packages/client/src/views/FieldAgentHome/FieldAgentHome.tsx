@@ -33,7 +33,10 @@ import {
   REGISTRAR_HOME
 } from '@client/navigation/routes'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { SEARCH_APPLICATIONS_USER_WISE } from '@client/search/queries'
+import {
+  COUNT_USER_WISE_APPLICATIONS,
+  SEARCH_APPLICATIONS_USER_WISE
+} from '@client/search/queries'
 import styled, { ITheme, withTheme } from '@client/styledComponents'
 import {
   EMPTY_STRING,
@@ -56,19 +59,28 @@ import {
   LoadingIndicator,
   IOnlineStatusProps,
   withOnlineStatus
-} from '@client/views/OfficeHome/LoadingIndicator'
-import { EVENT_STATUS } from '@client/views/OfficeHome/OfficeHome'
+} from '@client/views/RegistrationHome/LoadingIndicator'
+import { EVENT_STATUS } from '@client/views/RegistrationHome/RegistrationHome'
 import { getLanguage } from '@opencrvs/client/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
-import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
+import {
+  Button,
+  FloatingActionButton,
+  ICON_ALIGNMENT
+} from '@opencrvs/components/lib/buttons'
 import {
   ApplicationsOrangeAmber,
-  PlusTransparentWhite
+  PlusTransparentWhite,
+  StatusOrange,
+  StatusProgress,
+  StatusRejected
 } from '@opencrvs/components/lib/icons'
 import {
   GridTable,
   ISearchInputProps,
-  Loader
+  Loader,
+  Spinner,
+  TopBar
 } from '@opencrvs/components/lib/interface'
 import { HomeContent } from '@opencrvs/components/lib/layout'
 import {
@@ -85,8 +97,48 @@ import { connect } from 'react-redux'
 import { Redirect, RouteComponentProps } from 'react-router'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
-import { Navigation } from '@client/components/interface/Navigation'
 
+const IconTab = styled(Button)<{ active: boolean }>`
+  color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.subtitleStyle};
+  padding-left: 0;
+  padding-right: 0;
+  border-radius: 0;
+  flex-shrink: 0;
+  outline: none;
+  margin-left: 16px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin-left: 8px;
+  }
+  ${({ active }) =>
+    active
+      ? 'border-bottom: 3px solid #5E93ED'
+      : 'border-bottom: 3px solid transparent'};
+  & > div {
+    padding: 0 8px;
+  }
+  :first-child {
+    margin-left: 0;
+  }
+
+  :first-child > div {
+    position: relative;
+    padding-left: 0;
+  }
+  & div > div {
+    margin-right: 8px;
+  }
+  &:focus {
+    outline: none;
+    background: ${({ theme }) => theme.colors.focus};
+    color: ${({ theme }) => theme.colors.copy};
+  }
+  &:not([data-focus-visible-added]) {
+    background: transparent;
+    outline: none;
+    color: ${({ theme }) => theme.colors.copy};
+  }
+`
 const FABContainer = styled.div`
   position: fixed;
   right: 40px;
@@ -95,11 +147,8 @@ const FABContainer = styled.div`
     display: none;
   }
 `
-const BodyContainer = styled.div`
-  margin-left: 0px;
-  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-left: 265px;
-  }
+const StyledSpinner = styled(Spinner)`
+  margin: 20% auto;
 `
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors};
@@ -313,134 +362,216 @@ class FieldAgentHomeView extends React.Component<
       userDetails,
       match,
       intl,
-      applicationsReadyToSend
+      applicationsReadyToSend,
+      theme
     } = this.props
-
     const tabId = match.params.tabId || TAB_ID.sentForReview
     const fieldAgentLocationId = userDetails && getUserLocation(userDetails).id
     const jurisdictionLocationId =
       userDetails && getJurisdictionLocationIdFromUserDetails(userDetails)
+    let parentQueryLoading = false
     const role = userDetails && userDetails.role
-
     return (
       <>
         {role && FIELD_AGENT_ROLES.includes(role) && (
           <>
-            <Header />
-            <Navigation />
-            <BodyContainer>
-              {tabId === TAB_ID.inProgress && (
-                <InProgress
-                  draftApplications={draftApplications}
-                  showPaginated={this.showPaginated}
-                />
-              )}
-              {tabId === TAB_ID.sentForReview && (
-                <SentForReview
-                  applicationsReadyToSend={applicationsReadyToSend}
-                  showPaginated={this.showPaginated}
-                />
-              )}
-              {tabId === TAB_ID.requireUpdates && (
-                <Query
-                  query={SEARCH_APPLICATIONS_USER_WISE} // TODO can this be changed to use SEARCH_EVENTS
-                  variables={{
-                    userId: userDetails!.practitionerId,
-                    status: [EVENT_STATUS.REJECTED],
-                    locationIds: fieldAgentLocationId
-                      ? [fieldAgentLocationId]
-                      : [],
-                    count: this.showPaginated
-                      ? this.pageSize
-                      : this.pageSize * this.state.requireUpdatesPage,
-                    skip: this.showPaginated
-                      ? (this.state.requireUpdatesPage - 1) * this.pageSize
-                      : 0
-                  }}
-                >
-                  {({
-                    loading,
-                    error,
-                    data
-                  }: {
-                    loading: any
-                    data?: any
-                    error?: any
-                  }) => {
-                    if (loading) {
-                      return (
-                        <Loader
-                          id="require_updates_loader"
-                          marginPercent={20}
-                          loadingText={intl.formatMessage(
-                            messages.requireUpdatesLoading
-                          )}
-                        />
-                      )
-                    }
-                    if (error) {
-                      return (
-                        <ErrorText id="require_updates_loading_error">
-                          {intl.formatMessage(
-                            errorMessages.fieldAgentQueryError
-                          )}
-                        </ErrorText>
-                      )
-                    }
+            <Query
+              query={COUNT_USER_WISE_APPLICATIONS}
+              variables={{
+                userId: userDetails ? userDetails.practitionerId : '',
+                status: [EVENT_STATUS.REJECTED],
+                locationIds: fieldAgentLocationId ? [fieldAgentLocationId] : []
+              }}
+            >
+              {({
+                loading,
+                error,
+                data
+              }: {
+                loading: any
+                data?: any
+                error?: any
+              }) => {
+                if (loading) {
+                  parentQueryLoading = true
+                  return (
+                    <StyledSpinner
+                      id="field-agent-home-spinner"
+                      baseColor={theme.colors.background}
+                    />
+                  )
+                }
+                return (
+                  <>
+                    <Header />
+                    <TopBar id="top-bar">
+                      <IconTab
+                        id={`tab_${TAB_ID.inProgress}`}
+                        key={TAB_ID.inProgress}
+                        active={tabId === TAB_ID.inProgress}
+                        align={ICON_ALIGNMENT.LEFT}
+                        icon={() => <StatusProgress />}
+                        onClick={() =>
+                          this.props.goToFieldAgentHomeTab(TAB_ID.inProgress)
+                        }
+                      >
+                        {intl.formatMessage(messages.inProgressCount, {
+                          total: draftApplications.length
+                        })}
+                      </IconTab>
+                      <IconTab
+                        id={`tab_${TAB_ID.sentForReview}`}
+                        key={TAB_ID.sentForReview}
+                        active={tabId === TAB_ID.sentForReview}
+                        align={ICON_ALIGNMENT.LEFT}
+                        icon={() => <StatusOrange />}
+                        onClick={() =>
+                          this.props.goToFieldAgentHomeTab(TAB_ID.sentForReview)
+                        }
+                      >
+                        {intl.formatMessage(messages.sentForReviewCount, {
+                          total: applicationsReadyToSend.length
+                        })}
+                      </IconTab>
+                      <IconTab
+                        id={`tab_${TAB_ID.requireUpdates}`}
+                        key={TAB_ID.requireUpdates}
+                        active={tabId === TAB_ID.requireUpdates}
+                        align={ICON_ALIGNMENT.LEFT}
+                        icon={() => <StatusRejected />}
+                        onClick={() =>
+                          this.props.goToFieldAgentHomeTab(
+                            TAB_ID.requireUpdates
+                          )
+                        }
+                      >
+                        {intl.formatMessage(messages.requireUpdates, {
+                          total:
+                            navigator.onLine && data
+                              ? data.searchEvents.totalItems
+                              : '?'
+                        })}
+                      </IconTab>
+                    </TopBar>
+                  </>
+                )
+              }}
+            </Query>
+
+            {tabId === TAB_ID.inProgress && (
+              <InProgress
+                draftApplications={draftApplications}
+                showPaginated={this.showPaginated}
+              />
+            )}
+
+            {tabId === TAB_ID.sentForReview && (
+              <SentForReview
+                applicationsReadyToSend={applicationsReadyToSend}
+                showPaginated={this.showPaginated}
+              />
+            )}
+
+            {tabId === TAB_ID.requireUpdates && (
+              <Query
+                query={SEARCH_APPLICATIONS_USER_WISE} // TODO can this be changed to use SEARCH_EVENTS
+                variables={{
+                  userId: userDetails!.practitionerId,
+                  status: [EVENT_STATUS.REJECTED],
+                  locationIds: fieldAgentLocationId
+                    ? [fieldAgentLocationId]
+                    : [],
+                  count: this.showPaginated
+                    ? this.pageSize
+                    : this.pageSize * this.state.requireUpdatesPage,
+                  skip: this.showPaginated
+                    ? (this.state.requireUpdatesPage - 1) * this.pageSize
+                    : 0
+                }}
+              >
+                {({
+                  loading,
+                  error,
+                  data
+                }: {
+                  loading: any
+                  data?: any
+                  error?: any
+                }) => {
+                  if (loading) {
                     return (
                       <>
-                        {data && data.searchEvents.totalItems > 0 && (
-                          <HomeContent id="require_updates_list">
-                            <GridTable
-                              content={this.transformRejectedContent(data)}
-                              columns={this.getRejectedColumns()}
-                              noResultText={EMPTY_STRING}
-                              onPageChange={(currentPage: number) => {
-                                this.onPageChange(currentPage)
-                              }}
-                              pageSize={this.pageSize}
-                              totalItems={
-                                data.searchEvents &&
-                                data.searchEvents.totalItems
-                              }
-                              currentPage={this.state.requireUpdatesPage}
-                              clickable={this.props.isOnline}
-                              showPaginated={this.showPaginated}
-                              loading={loading}
-                              loadMoreText={intl.formatMessage(
-                                constantsMessages.loadMore
-                              )}
-                            />
-                            <LoadingIndicator
-                              loading={loading}
-                              hasError={error}
-                            />
-                          </HomeContent>
-                        )}
-                        {data && data.searchEvents.totalItems === 0 && (
-                          <ZeroUpdatesContainer>
-                            <ApplicationsOrangeAmber />
-                            <ZeroUpdatesText>
-                              {intl.formatMessage(messages.zeroUpdatesText)}
-                            </ZeroUpdatesText>
-                            <AllUpdatesText>
-                              {intl.formatMessage(messages.allUpdatesText)}
-                            </AllUpdatesText>
-                          </ZeroUpdatesContainer>
+                        {!parentQueryLoading && (
+                          <Loader
+                            id="require_updates_loader"
+                            marginPercent={20}
+                            loadingText={intl.formatMessage(
+                              messages.requireUpdatesLoading
+                            )}
+                          />
                         )}
                       </>
                     )
-                  }}
-                </Query>
-              )}
-              <FABContainer>
-                <FloatingActionButton
-                  id="new_event_declaration"
-                  onClick={this.props.goToEvents}
-                  icon={() => <PlusTransparentWhite />}
-                />
-              </FABContainer>
-            </BodyContainer>
+                  }
+                  if (error) {
+                    return (
+                      <ErrorText id="require_updates_loading_error">
+                        {intl.formatMessage(errorMessages.fieldAgentQueryError)}
+                      </ErrorText>
+                    )
+                  }
+                  return (
+                    <>
+                      {data && data.searchEvents.totalItems > 0 && (
+                        <HomeContent id="require_updates_list">
+                          <GridTable
+                            content={this.transformRejectedContent(data)}
+                            columns={this.getRejectedColumns()}
+                            noResultText={EMPTY_STRING}
+                            onPageChange={(currentPage: number) => {
+                              this.onPageChange(currentPage)
+                            }}
+                            pageSize={this.pageSize}
+                            totalItems={
+                              data.searchEvents && data.searchEvents.totalItems
+                            }
+                            currentPage={this.state.requireUpdatesPage}
+                            clickable={this.props.isOnline}
+                            showPaginated={this.showPaginated}
+                            loading={loading}
+                            loadMoreText={intl.formatMessage(
+                              constantsMessages.loadMore
+                            )}
+                          />
+                          <LoadingIndicator
+                            loading={loading}
+                            hasError={error}
+                          />
+                        </HomeContent>
+                      )}
+                      {data && data.searchEvents.totalItems === 0 && (
+                        <ZeroUpdatesContainer>
+                          <ApplicationsOrangeAmber />
+                          <ZeroUpdatesText>
+                            {intl.formatMessage(messages.zeroUpdatesText)}
+                          </ZeroUpdatesText>
+                          <AllUpdatesText>
+                            {intl.formatMessage(messages.allUpdatesText)}
+                          </AllUpdatesText>
+                        </ZeroUpdatesContainer>
+                      )}
+                    </>
+                  )
+                }}
+              </Query>
+            )}
+            <FABContainer>
+              <FloatingActionButton
+                id="new_event_declaration"
+                onClick={this.props.goToEvents}
+                icon={() => <PlusTransparentWhite />}
+              />
+            </FABContainer>
           </>
         )}
         {role && NATL_ADMIN_ROLES.includes(role) && (

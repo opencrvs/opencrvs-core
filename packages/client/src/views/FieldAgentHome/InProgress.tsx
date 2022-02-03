@@ -23,7 +23,7 @@ import {
   dynamicConstantsMessages
 } from '@client/i18n/messages'
 import { getDraftApplicantFullName } from '@client/utils/draftUtils'
-import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
+import { LoadingIndicator } from '@client/views/RegistrationHome/LoadingIndicator'
 import { formattedDuration } from '@client/utils/date-formatting'
 
 interface IInProgressProps {

@@ -208,9 +208,10 @@ describe('Certificate collector test for a birth registration without father det
             url: ''
           }}
         />,
-        { history, store, graphqlMocks: graphqlMock }
+        store,
+        graphqlMock
       )
-      component = testComponent
+      component = testComponent.component
       await waitForElement(component, '#collector_form')
     })
 
@@ -312,23 +313,26 @@ describe('Certificate collector test for a birth registration without father det
       /*
        * Who is collecting the certificate?
        */
-      component = await createTestComponent(
-        <CollectorForm
-          location={location}
-          history={history}
-          match={{
-            params: {
-              registrationId: '6a5fd35d-01ec-4c37-976e-e055107a74a1',
-              eventType: 'birth',
-              groupId: 'certCollector'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history, graphqlMocks: graphqlMock }
-      )
+      component = (
+        await createTestComponent(
+          <CollectorForm
+            location={location}
+            history={history}
+            match={{
+              params: {
+                registrationId: '6a5fd35d-01ec-4c37-976e-e055107a74a1',
+                eventType: 'birth',
+                groupId: 'certCollector'
+              },
+              isExact: true,
+              path: '',
+              url: ''
+            }}
+          />,
+          store,
+          graphqlMock
+        )
+      ).component
 
       const form = await waitForElement(component, '#collector_form')
 
@@ -655,10 +659,11 @@ describe('Test for a free birth registration', () => {
             url: ''
           }}
         />,
-        { store, history, graphqlMocks: graphqlMock }
+        store,
+        graphqlMock
       )
 
-      component = testComponent
+      component = testComponent.component
     })
 
     it('continue to review section when the mandatory fields are filled and birth event is before 45 days', async () => {
@@ -926,10 +931,11 @@ describe('Certificate collector test for a birth registration with father detail
             url: ''
           }}
         />,
-        { store, history, graphqlMocks: graphqlMock }
+        store,
+        graphqlMock
       )
 
-      component = testComponent
+      component = testComponent.component
     })
 
     it('father option will be available', async () => {
@@ -1174,10 +1180,11 @@ describe('Certificate collector test for a death registration', () => {
             url: ''
           }}
         />,
-        { store, history, graphqlMocks: graphqlMock }
+        store,
+        graphqlMock
       )
 
-      component = testComponent
+      component = testComponent.component
     })
 
     it('applicant will be available', async () => {
@@ -1477,9 +1484,10 @@ describe('Certificate collector test for a birth registration without father and
             url: ''
           }}
         />,
-        { store, history, graphqlMocks: graphqlMock }
+        store,
+        graphqlMock
       )
-      component = testComponent
+      component = testComponent.component
       await waitForElement(component, '#collector_form')
     })
 

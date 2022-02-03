@@ -15,6 +15,7 @@ import { storeApplication, IApplication } from '@client/applications'
 import {
   createTestComponent,
   mockApplicationData,
+  mockUserResponse,
   mockDeathApplicationData,
   flushPromises,
   loginAsFieldAgent,
@@ -51,14 +52,16 @@ describe('when user wants to review death certificate', () => {
         event: Event.DEATH
       } as IApplication)
     )
-    component = await createTestComponent(
-      <ReviewCertificateAction
-        location={location}
-        history={history}
-        match={match}
-      />,
-      { store, history }
-    )
+    component = (
+      await createTestComponent(
+        <ReviewCertificateAction
+          location={location}
+          history={history}
+          match={match}
+        />,
+        store
+      )
+    ).component
   })
 
   it('displays have the Continue and print Button', async () => {
@@ -99,14 +102,16 @@ describe('when user wants to review birth certificate', () => {
       } as IApplication)
     )
 
-    component = await createTestComponent(
-      <ReviewCertificateAction
-        location={location}
-        history={history}
-        match={match}
-      />,
-      { store, history }
-    )
+    component = (
+      await createTestComponent(
+        <ReviewCertificateAction
+          location={location}
+          history={history}
+          match={match}
+        />,
+        store
+      )
+    ).component
   })
 
   it('displays have the Continue and print Button', () => {
@@ -173,14 +178,16 @@ describe('back button behavior tests of review certificate action', () => {
         event: Event.BIRTH
       } as IApplication)
     )
-    component = await createTestComponent(
-      <ReviewCertificateAction
-        location={location}
-        history={history}
-        match={match}
-      />,
-      { store, history }
-    )
+    component = (
+      await createTestComponent(
+        <ReviewCertificateAction
+          location={location}
+          history={history}
+          match={match}
+        />,
+        store
+      )
+    ).component
 
     component.find('#action_page_back_button').hostNodes().simulate('click')
     expect(history.location.pathname).toBe('/previous-route')
@@ -207,14 +214,16 @@ describe('back button behavior tests of review certificate action', () => {
         event: Event.BIRTH
       } as IApplication)
     )
-    component = await createTestComponent(
-      <ReviewCertificateAction
-        location={location}
-        history={history}
-        match={match}
-      />,
-      { store, history }
-    )
+    component = (
+      await createTestComponent(
+        <ReviewCertificateAction
+          location={location}
+          history={history}
+          match={match}
+        />,
+        store
+      )
+    ).component
 
     component.find('#action_page_back_button').hostNodes().simulate('click')
     await flushPromises()

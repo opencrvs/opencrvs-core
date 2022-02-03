@@ -16,29 +16,9 @@ import { SettingsPage } from '@client/views/Settings/SettingsPage'
 import { getStorageUserDetailsSuccess } from '@opencrvs/client/src/profile/profileActions'
 import { DataSection } from '@opencrvs/components/lib/interface'
 import { ReactWrapper } from 'enzyme'
-import { COUNT_USER_WISE_APPLICATIONS } from '@client/search/queries'
-
-const graphqlMocks = [
-  {
-    request: {
-      query: COUNT_USER_WISE_APPLICATIONS,
-      variables: {
-        status: ['REJECTED'],
-        locationIds: ['6327dbd9-e118-4dbe-9246-cb0f7649a666']
-      }
-    },
-    result: {
-      data: {
-        searchEvents: {
-          totalItems: 1
-        }
-      }
-    }
-  }
-]
 
 describe('Settings page tests', () => {
-  const { store, history } = createStore()
+  const { store } = createStore()
   let component: ReactWrapper
   beforeEach(async () => {
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
@@ -46,9 +26,9 @@ describe('Settings page tests', () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
       <SettingsPage />,
-      { store, history, graphqlMocks }
+      store
     )
-    component = testComponent
+    component = testComponent.component
   })
   it('shows nothing', async () => {
     const { store } = createStore()
@@ -56,21 +36,17 @@ describe('Settings page tests', () => {
       getStorageUserDetailsSuccess(
         JSON.stringify({
           language: 'en',
-          catchmentArea: [],
-          primaryOffice: {
-            id: '6327dbd9-e118-4dbe-9246-cb0f7649a666',
-            name: 'Kaliganj Union Sub Center',
-            alias: ['কালিগাঞ্জ ইউনিয়ন পরিষদ'],
-            status: 'active'
-          }
+          catchmentArea: []
         })
       )
     )
-    const comp = await createTestComponent(
-      // @ts-ignore
-      <SettingsPage />,
-      { store, history, graphqlMocks }
-    )
+    const comp = (
+      await createTestComponent(
+        // @ts-ignore
+        <SettingsPage />,
+        store
+      )
+    ).component
     expect(comp.find('#English-name').first().text()).toBe('English nameChange')
     expect(comp.find('#Phone-number').first().text()).toBe('Phone numberChange')
   })

@@ -11,33 +11,36 @@
  */
 import React from 'react'
 import { ReactWrapper } from 'enzyme'
-import { createTestComponent, flushPromises } from '@client/tests/util'
+import {
+  createTestComponent,
+  createTestStore,
+  flushPromises
+} from '@client/tests/util'
 import { LocationPicker } from './LocationPicker'
-import { AppStore, createStore } from '@client/store'
+import { AppStore } from '@client/store'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { History } from 'history'
 
 describe('location picker tests', () => {
   let store: AppStore
-  let history: History
   let component: ReactWrapper
   const onChangeLocationMock = jest.fn()
 
   beforeAll(async () => {
-    const appStore = createStore()
-    store = appStore.store
-    history = appStore.history
+    store = (await createTestStore()).store
   })
 
   beforeEach(async () => {
-    component = await createTestComponent(
-      <LocationPicker
-        selectedLocationId="bfe8306c-0910-48fe-8bf5-0db906cf3155"
-        onChangeLocation={onChangeLocationMock}
-      />,
-      { store, history },
-      { attachTo: document.body }
-    )
+    component = (
+      await createTestComponent(
+        <LocationPicker
+          selectedLocationId="bfe8306c-0910-48fe-8bf5-0db906cf3155"
+          onChangeLocation={onChangeLocationMock}
+        />,
+        store,
+        null,
+        { attachTo: document.body }
+      )
+    ).component
   })
 
   afterEach(() => {

@@ -98,9 +98,9 @@ describe('when user is in the register form for birth event', () => {
             url: ''
           }}
         />,
-        { store, history }
+        store
       )
-      component = testComponent
+      component = testComponent.component
     })
     it('renders the page', () => {
       expect(
@@ -184,9 +184,9 @@ describe('when user is in the register form for death event', () => {
             url: ''
           }}
         />,
-        { store, history }
+        store
       )
-      component = testComponent
+      component = testComponent.component
     })
 
     it('renders the optional label', () => {
@@ -223,9 +223,9 @@ describe('when user is in the register form for death event', () => {
             url: ''
           }}
         />,
-        { store, history }
+        store
       )
-      component = testComponent
+      component = testComponent.component
       selectOption(component, '#iDType', 'Birth registration number')
       expect(component.find('#fetchButton').hostNodes()).toHaveLength(0)
     })
@@ -252,9 +252,9 @@ describe('when user is in the register form for death event', () => {
             url: ''
           }}
         />,
-        { store, history }
+        store
       )
-      component = testComponent
+      component = testComponent.component
       component.find('#next_section').hostNodes().simulate('click')
 
       await waitForElement(component, '#contactPoint_error')
@@ -280,9 +280,9 @@ describe('when user is in the register form for death event', () => {
             url: ''
           }}
         />,
-        { store, history }
+        store
       )
-      component = testComponent
+      component = testComponent.component
       component.find('#exit_top_bar').hostNodes().simulate('click')
 
       component.update()
@@ -311,9 +311,9 @@ describe('when user is in the register form for death event', () => {
             url: ''
           }}
         />,
-        { store, history }
+        store
       )
-      component = testComponent
+      component = testComponent.component
       selectOption(component, '#iDType', 'National ID number')
       expect(component.find('#fetchButton').hostNodes()).toHaveLength(1)
     })
@@ -373,13 +373,14 @@ describe('when user is in the register form for death event', () => {
             url: ''
           }}
         />,
-        { store, history, graphqlMocks: graphqlMock }
+        store,
+        graphqlMock
       )
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      component = testComponent
+      component = testComponent.component
       selectOption(component, '#iDType', 'Birth registration number')
 
       component.find('input#iD').simulate('change', {
@@ -453,13 +454,14 @@ describe('when user is in the register form for death event', () => {
             url: ''
           }}
         />,
-        { store, history, graphqlMocks: graphqlMock }
+        store,
+        graphqlMock
       )
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      component = testComponent
+      component = testComponent.component
       selectOption(component, '#iDType', 'National ID number')
 
       component.find('input#iD').simulate('change', {
@@ -552,13 +554,14 @@ describe('when user is in the register form for death event', () => {
             url: ''
           }}
         />,
-        { store, history, graphqlMocks: graphqlMock }
+        store,
+        graphqlMock
       )
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      component = testComponent
+      component = testComponent.component
       selectOption(component, '#iDType', 'National ID number')
 
       component.find('input#applicantID').simulate('change', {
@@ -631,13 +634,14 @@ describe('when user is in the register form for death event', () => {
             url: ''
           }}
         />,
-        { store, history, graphqlMocks: graphqlMock }
+        store,
+        graphqlMock
       )
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      component = testComponent
+      component = testComponent.component
       selectOption(component, '#iDType', 'Birth registration number')
 
       const input = component.find('input#iD')
@@ -705,10 +709,11 @@ describe('when user is in the register form for death event', () => {
             url: ''
           }}
         />,
-        { store, history, graphqlMocks: graphqlMock as any }
+        store,
+        graphqlMock
       )
 
-      component = testComponent
+      component = testComponent.component
       await waitForElement(component, '#iDType')
       selectOption(component, '#iDType', 'National ID number')
 
@@ -782,10 +787,11 @@ describe('when user is in the register form for death event', () => {
             url: ''
           }}
         />,
-        { store, history, graphqlMocks: graphqlMock }
+        store,
+        graphqlMock
       )
 
-      component = testComponent
+      component = testComponent.component
       await waitForElement(component, '#iDType')
       selectOption(component, '#iDType', 'National ID number')
 
@@ -847,11 +853,11 @@ describe('when user is in the register form for death event', () => {
             url: ''
           }}
         />,
-        { store, history }
+        store
       )
-      expect(testComponent.find('#deathDate_notice').hostNodes()).toHaveLength(
-        1
-      )
+      expect(
+        testComponent.component.find('#deathDate_notice').hostNodes()
+      ).toHaveLength(1)
     })
   })
 })
@@ -891,9 +897,9 @@ describe('when user is in the register form preview section', () => {
           url: ''
         }}
       />,
-      { store, history }
+      store
     )
-    component = testComponent
+    component = testComponent.component
   })
 
   it('submit button will be enabled when even if form is not fully filled-up', () => {
@@ -939,9 +945,9 @@ describe('when user is in the register form preview section', () => {
             url: ''
           }}
         />,
-        { store, history }
+        store
       )
-      component = nTestComponent
+      component = nTestComponent.component
     })
 
     it('should be able to submit the form', () => {
@@ -1008,9 +1014,9 @@ describe('when user is in the register form review section', () => {
           url: ''
         }}
       />,
-      { store, history }
+      store
     )
-    component = testComponent
+    component = testComponent.component
   })
 
   it('clicking the reject button launches the reject form action page', async () => {
@@ -1060,9 +1066,9 @@ describe('when user is in the register form from review edit', () => {
           url: ''
         }}
       />,
-      { store, history }
+      store
     )
-    component = testComponent
+    component = testComponent.component
   })
 
   it('should redirect to progress tab when close application button is clicked', async () => {
@@ -1123,10 +1129,10 @@ describe('when user is in the register form from sent for review edit', () => {
           url: ''
         }}
       />,
-      { store, history }
+      store
     )
-    component = testComponent
-    testAppStore = store
+    component = testComponent.component
+    testAppStore = testComponent.store
   })
 
   it('clicking on save draft opens modal', async () => {
@@ -1222,9 +1228,9 @@ describe('When user is in Preview section death event', () => {
           url: ''
         }}
       />,
-      { store, history }
+      store
     )
-    component = nTestComponent
+    component = nTestComponent.component
   })
 
   it('Check if death location type is parsed properly', () => {
@@ -1375,9 +1381,9 @@ describe('When user is in Preview section death event in offline mode', () => {
           url: ''
         }}
       />,
-      { store, history }
+      store
     )
-    component = nTestComponent
+    component = nTestComponent.component
   })
 
   it('Should be able to submit the form', async () => {

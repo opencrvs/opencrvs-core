@@ -226,10 +226,11 @@ describe('Workflow status tests', () => {
       }
       const testComponent = await createTestComponent(
         <WorkflowStatus match={match} history={history} location={location} />,
-        { store, history, graphqlMocks }
+        store,
+        graphqlMocks
       )
 
-      component = testComponent
+      component = testComponent.component
 
       await waitForElement(component, '#application-status-list')
       component.update()
@@ -372,10 +373,11 @@ describe('Workflow status tests', () => {
       }
       const testComponent = await createTestComponent(
         <WorkflowStatus match={match} history={history} location={location} />,
-        { store, history, graphqlMocks: graphqlMocksWithError }
+        store,
+        graphqlMocksWithError
       )
 
-      component = testComponent
+      component = testComponent.component
     })
 
     it('renders error notification toast', async () => {

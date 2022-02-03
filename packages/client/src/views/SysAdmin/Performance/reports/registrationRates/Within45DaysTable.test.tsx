@@ -11,19 +11,17 @@
  */
 
 import * as React from 'react'
-import { AppStore, createStore } from '@client/store'
+import { AppStore } from '@client/store'
 import { ReactWrapper } from 'enzyme'
-import { createTestComponent } from '@client/tests/util'
+import { createTestStore, createTestComponent } from '@client/tests/util'
 import { Within45DaysTable } from '@client/views/SysAdmin/Performance/reports/registrationRates/Within45DaysTable'
 import { Event } from '@client/forms'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { REG_RATE_BASE } from '@client/views/SysAdmin/Performance/RegistrationRates'
-import { History } from 'history'
 
 describe('Within45DaysTable tests for over time option', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
-  let history: History
 
   const mockData = {
     details: [
@@ -55,19 +53,21 @@ describe('Within45DaysTable tests for over time option', () => {
   }
 
   beforeAll(async () => {
-    ;({ history, store } = createStore())
+    store = (await createTestStore()).store
   })
 
   beforeEach(async () => {
-    component = await createTestComponent(
-      <Within45DaysTable
-        loading={false}
-        base={{ baseType: REG_RATE_BASE.TIME }}
-        eventType={Event.BIRTH}
-        data={mockData}
-      />,
-      { store, history }
-    )
+    component = (
+      await createTestComponent(
+        <Within45DaysTable
+          loading={false}
+          base={{ baseType: REG_RATE_BASE.TIME }}
+          eventType={Event.BIRTH}
+          data={mockData}
+        />,
+        store
+      )
+    ).component
   })
 
   it('runs without crashing', async () => {
@@ -91,7 +91,6 @@ describe('Within45DaysTable tests for over time option', () => {
 describe('Within45DaysTable tests for by location option', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
-  let history: History
 
   const mockData = {
     details: [
@@ -121,22 +120,24 @@ describe('Within45DaysTable tests for by location option', () => {
   }
 
   beforeAll(async () => {
-    ;({ history, store } = createStore())
+    store = (await createTestStore()).store
   })
 
   beforeEach(async () => {
-    component = await createTestComponent(
-      <Within45DaysTable
-        loading={false}
-        base={{
-          baseType: REG_RATE_BASE.LOCATION,
-          locationJurisdictionType: 'UNION'
-        }}
-        eventType={Event.BIRTH}
-        data={mockData}
-      />,
-      { store, history }
-    )
+    component = (
+      await createTestComponent(
+        <Within45DaysTable
+          loading={false}
+          base={{
+            baseType: REG_RATE_BASE.LOCATION,
+            locationJurisdictionType: 'UNION'
+          }}
+          eventType={Event.BIRTH}
+          data={mockData}
+        />,
+        store
+      )
+    ).component
   })
 
   it('runs without crashing', async () => {
