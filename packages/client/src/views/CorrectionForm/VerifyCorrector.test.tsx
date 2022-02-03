@@ -141,11 +141,10 @@ describe('verify corrector tests', () => {
       expect(history.location.pathname).toBe('/')
     })
 
-    describe('when father is collector', () => {
+    describe('when father is corrector', () => {
       let testComponent: ReactWrapper
       beforeEach(async () => {
         testComponent = await createTestComponent(
-          // @ts-ignore
           <VerifyCorrector
             history={history}
             location={history.location}
