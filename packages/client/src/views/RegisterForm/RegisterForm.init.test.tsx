@@ -181,7 +181,7 @@ describe('when user is in the register form before initial draft load', () => {
             url: ''
           }}
         />,
-        { store, history }
+        store
       )
     } catch (error) {
       expect(error).toBeInstanceOf(Error)

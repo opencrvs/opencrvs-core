@@ -27,7 +27,6 @@ import {
 } from '@client/profile/profileActions'
 import { UserSetupPage } from '@client/views/UserSetup/UserSetupPage'
 import { ProtectedAccount } from '@client/components/ProtectedAccount'
-import { History } from 'history'
 
 const nameObj = {
   data: {
@@ -52,9 +51,8 @@ merge(mockUserResponse, nameObj)
 
 describe('UserSetupPage tests', () => {
   let store: AppStore
-  let history: History
   beforeEach(() => {
-    ;({ history, store } = createStore())
+    store = createStore().store
   })
   it('renders page successfully without type', async () => {
     await store.dispatch(
@@ -63,10 +61,10 @@ describe('UserSetupPage tests', () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
       <UserSetupPage />,
-      { store, history }
+      store
     )
 
-    const app = testComponent
+    const app = testComponent.component
     expect(app.find('#user-setup-landing-page').hostNodes()).toHaveLength(1)
     expect(app.find('#user-setup-name-holder').hostNodes().text()).toEqual(
       'Shakib Al Hasan'
@@ -76,9 +74,9 @@ describe('UserSetupPage tests', () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
       <ProtectedAccount />,
-      { store, history }
+      store
     )
-    const app = testComponent
+    const app = testComponent.component
 
     app.find('#user-setup-start-button').hostNodes().simulate('click')
     await flushPromises()
@@ -90,9 +88,9 @@ describe('UserSetupPage tests', () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
       <UserSetupPage goToStep={() => {}} />,
-      { store, history }
+      store
     )
-    const app = testComponent
+    const app = testComponent.component
 
     app.find('#user-setup-start-button').hostNodes().simulate('click')
     await flushPromises()

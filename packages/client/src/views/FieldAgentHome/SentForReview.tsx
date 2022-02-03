@@ -39,7 +39,7 @@ import {
 import { getDefaultLanguage } from '@client/i18n/utils'
 import { withTheme, ITheme } from '@client/styledComponents'
 import { getDraftApplicantFullName } from '@client/utils/draftUtils'
-import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
+import { LoadingIndicator } from '@client/views/RegistrationHome/LoadingIndicator'
 
 const APPLICATIONS_DAY_LIMIT = 7
 

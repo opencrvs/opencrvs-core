@@ -18,16 +18,16 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { ReactWrapper } from 'enzyme'
 
 describe('Registration rates report', () => {
-  const { store, history } = createStore()
+  const { store } = createStore()
   const onDetailsClickMock: jest.Mock = jest.fn()
 
   it('renders loading indicator', async () => {
-    const component = await createTestComponent(
+    const { component } = await createTestComponent(
       <RegistrationRatesReport
         loading={true}
         onClickEventDetails={onDetailsClickMock}
       />,
-      { store, history }
+      store
     )
 
     expect(
@@ -57,13 +57,15 @@ describe('Registration rates report', () => {
           femalePercentage: 0
         }
       }
-      component = await createTestComponent(
-        <RegistrationRatesReport
-          data={data}
-          onClickEventDetails={onDetailsClickMock}
-        />,
-        { store, history }
-      )
+      component = (
+        await createTestComponent(
+          <RegistrationRatesReport
+            data={data}
+            onClickEventDetails={onDetailsClickMock}
+          />,
+          store
+        )
+      ).component
     })
     it('renders reports', async () => {
       expect(

@@ -11,10 +11,10 @@
  */
 import * as React from 'react'
 import {
+  createTestComponent,
   selectOption,
   flushPromises,
-  resizeWindow,
-  createTestComponent
+  resizeWindow
 } from '@client/tests/util'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { ReactWrapper } from 'enzyme'
@@ -46,11 +46,11 @@ describe('form component', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
-    const { store, history } = createStore()
+    const { store } = createStore()
     const draft = createApplication(Event.BIRTH)
     store.dispatch(storeApplication(draft))
     const modifyDraft = jest.fn()
-    component = await createTestComponent(
+    const testComponent = await createTestComponent(
       <FormFieldGenerator
         id="mother"
         onChange={modifyDraft}
@@ -108,11 +108,9 @@ describe('form component', () => {
           }
         ]}
       />,
-      {
-        store,
-        history
-      }
+      store
     )
+    component = testComponent.component
   })
   describe('when user is in the moth​​er section', () => {
     it('renders the page', async () => {
@@ -154,8 +152,8 @@ describe('when field definition has location search input', () => {
   const modifyDraft = jest.fn()
 
   beforeEach(async () => {
-    const { store, history } = createStore()
-    component = await createTestComponent(
+    const { store } = createStore()
+    const testComponent = await createTestComponent(
       <FormFieldGenerator
         id="locationForm"
         setAllFieldsDirty={false}
@@ -174,8 +172,10 @@ describe('when field definition has location search input', () => {
           }
         ]}
       />,
-      { store, history }
+      store
     )
+
+    component = testComponent.component
   })
 
   it('renders location search input without crashing', async () => {
@@ -218,11 +218,11 @@ describe('when field definition has location search input', () => {
 describe('when user is in the register section', () => {
   let component: ReactWrapper<{}, {}>
   beforeEach(async () => {
-    const { store, history } = createStore()
+    const { store } = createStore()
     const draft = createApplication(Event.BIRTH)
     store.dispatch(storeApplication(draft))
     const modifyDraft = jest.fn()
-    component = await createTestComponent(
+    const testComponent = await createTestComponent(
       <FormFieldGenerator
         id="registration"
         onChange={modifyDraft}
@@ -242,11 +242,9 @@ describe('when user is in the register section', () => {
           }
         ]}
       />,
-      {
-        store,
-        history
-      }
+      store
     )
+    component = testComponent.component
   })
   it('renders registration phone type as tel', () => {
     expect(
@@ -259,11 +257,11 @@ describe('when field definition has nested fields', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
-    const { store, history } = createStore()
+    const { store } = createStore()
     const draft = createApplication(Event.BIRTH)
     store.dispatch(storeApplication(draft))
     const modifyDraft = jest.fn()
-    component = await createTestComponent(
+    const testComponent = await createTestComponent(
       <FormFieldGenerator
         id="registration"
         onChange={modifyDraft}
@@ -331,11 +329,10 @@ describe('when field definition has nested fields', () => {
           }
         ]}
       />,
-      {
-        store,
-        history
-      }
+      store
     )
+
+    component = testComponent.component
   })
 
   it('renders radio group with nested fields', () => {
@@ -437,8 +434,8 @@ describe('when field definition has date field', () => {
 
   describe('in case of static date field', () => {
     beforeEach(async () => {
-      const { store, history } = createStore()
-      component = await createTestComponent(
+      const { store } = createStore()
+      const testComponent = await createTestComponent(
         <FormFieldGenerator
           id="locationForm"
           setAllFieldsDirty={false}
@@ -454,8 +451,10 @@ describe('when field definition has date field', () => {
             }
           ]}
         />,
-        { store, history }
+        store
       )
+
+      component = testComponent.component
     })
 
     it('shows validation errors for invalid date', async () => {
@@ -473,8 +472,8 @@ describe('when field definition has number field', () => {
   const modifyDraftMock = jest.fn()
 
   beforeEach(async () => {
-    const { store, history } = createStore()
-    component = await createTestComponent(
+    const { store } = createStore()
+    const testComponent = await createTestComponent(
       <FormFieldGenerator
         id="numberForm"
         setAllFieldsDirty={false}
@@ -490,11 +489,10 @@ describe('when field definition has number field', () => {
           }
         ]}
       />,
-      {
-        store,
-        history
-      }
+      store
     )
+
+    component = testComponent.component
   })
 
   it('field does not take input of non numeric characters', async () => {
@@ -523,8 +521,8 @@ describe('when field definition has select field on mobile device', () => {
 
   beforeEach(async () => {
     window.HTMLElement.prototype.scrollIntoView = scrollMock
-    const { store, history } = createStore()
-    component = await createTestComponent(
+    const { store } = createStore()
+    const testComponent = await createTestComponent(
       <FormFieldGenerator
         id="numberForm"
         setAllFieldsDirty={false}
@@ -541,12 +539,12 @@ describe('when field definition has select field on mobile device', () => {
           }
         ]}
       />,
-      {
-        store,
-        history
-      },
+      store,
+      null,
       { attachTo: document.body }
     )
+
+    component = testComponent.component
   })
 
   it('triggers scroll up when focus so that soft keyboard does not block options', async () => {

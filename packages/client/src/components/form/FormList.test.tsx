@@ -15,12 +15,10 @@ import { FormList } from '@client/components/form/FormList'
 import { ReactWrapper } from 'enzyme'
 import * as actions from '@client/i18n/actions'
 import { createStore, AppStore } from '@client/store'
-import { History } from 'history'
 
 describe('when user is in the document upload page', () => {
-  let component: ReactWrapper<{}, {}>
+  let formListComponent: ReactWrapper<{}, {}>
   let store: AppStore
-  let history: History
   const listItems = [
     {
       id: 'form.section.documents.list.informantAttestation',
@@ -47,24 +45,25 @@ describe('when user is in the document upload page', () => {
   ]
 
   beforeEach(async () => {
-    ;({ store, history } = createStore())
+    store = createStore().store
+    const testComponent = await createTestComponent(
+      <FormList list={listItems} />,
+      store
+    )
 
-    component = await createTestComponent(<FormList list={listItems} />, {
-      store,
-      history
-    })
+    formListComponent = testComponent.component
   })
   it('renders the whole list', () => {
-    const items = component.find('ul li')
+    const items = formListComponent.find('ul li')
     expect(items.length).toBe(listItems.length)
   })
   it('check first list item', () => {
-    const firstItem = component.find('ul li').first()
+    const firstItem = formListComponent.find('ul li').first()
 
     expect(firstItem.text()).toBe(listItems[0].defaultMessage)
   })
   it('check last list item', () => {
-    const lastItem = component.find('ul li').last()
+    const lastItem = formListComponent.find('ul li').last()
 
     expect(lastItem.text()).toBe(listItems[listItems.length - 1].defaultMessage)
   })
@@ -72,7 +71,7 @@ describe('when user is in the document upload page', () => {
     const action = actions.changeLanguage({ language: 'bn' })
     await store.dispatch(action)
 
-    const firstItem = component.find('ul li').first()
+    const firstItem = formListComponent.find('ul li').first()
 
     // No clue if this is what it should say..
     expect(firstItem.update().text()).toBe(
@@ -83,13 +82,13 @@ describe('when user is in the document upload page', () => {
     const action = actions.changeLanguage({ language: 'bn' })
     store.dispatch(action)
 
-    const lastItem = component.update().find('ul li').last()
+    const lastItem = formListComponent.update().find('ul li').last()
     expect(lastItem.text()).toBe(
       'রেজিস্টারের চাহিদা মোতাবেক অন্যান্য কাগজপত্রের সত্যায়িত অনুলিপি'
     )
   })
   it('check for zero list item', () => {
-    const items = component.find('ul li')
+    const items = formListComponent.find('ul li')
     expect(items.length).toBeTruthy()
   })
 })

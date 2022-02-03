@@ -11,7 +11,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IOfficeHomeMessages
+interface IregistrationHomeMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   certified: MessageDescriptor
   dataTableResults: MessageDescriptor
@@ -33,7 +33,7 @@ interface IOfficeHomeMessages
   waitingForExternalValidation: MessageDescriptor
 }
 
-const messagesToDefine: IOfficeHomeMessages = {
+const messagesToDefine: IregistrationHomeMessages = {
   certified: {
     defaultMessage: 'Certified',
     description: 'Label for registration status certified',
@@ -126,4 +126,5 @@ const messagesToDefine: IOfficeHomeMessages = {
   }
 }
 
-export const messages: IOfficeHomeMessages = defineMessages(messagesToDefine)
+export const messages: IregistrationHomeMessages =
+  defineMessages(messagesToDefine)

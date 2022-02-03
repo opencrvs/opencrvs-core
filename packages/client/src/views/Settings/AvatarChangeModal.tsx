@@ -32,7 +32,7 @@ import { getCroppedImage, IImage } from '@client/utils/imageUtils'
 import {
   withOnlineStatus,
   IOnlineStatusProps
-} from '@client/views/OfficeHome/LoadingIndicator'
+} from '@client/views/RegistrationHome/LoadingIndicator'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { withTheme } from 'styled-components'
 

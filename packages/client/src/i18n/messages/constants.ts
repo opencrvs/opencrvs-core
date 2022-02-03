@@ -23,7 +23,6 @@ interface IConstantsMessages
   applicationCollectedOn: MessageDescriptor
   applicationFailedOn: MessageDescriptor
   applicationInformantLabel: MessageDescriptor
-  applicationName: MessageDescriptor
   applicationRegisteredOn: MessageDescriptor
   applicationRejectedOn: MessageDescriptor
   applicationStarted: MessageDescriptor
@@ -185,11 +184,6 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Informant',
     description: 'Informant Label',
     id: 'constants.informant'
-  },
-  applicationName: {
-    defaultMessage: 'OpenCRVS',
-    description: 'Application name of CRVS',
-    id: 'constants.applicationName'
   },
   applicationRegisteredOn: {
     defaultMessage: 'Application registered on',

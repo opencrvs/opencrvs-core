@@ -19,12 +19,12 @@ describe('Login app > Secure Account Page', () => {
   let component: ReactWrapper
 
   beforeEach(async () => {
-    const { store, history } = createStore()
+    const { store } = createStore()
     const testComponent = await createTestComponent(
       <SecureAccount onComplete={() => null} />,
-      { store, history }
+      store
     )
-    component = testComponent
+    component = testComponent.component
   })
   it('Renders the secure account page successfully', () => {
     const elem = component.find('#createPinBtn').hostNodes()
@@ -32,7 +32,7 @@ describe('Login app > Secure Account Page', () => {
   })
   it('Create pin button click takes user to create pin screen', async () => {
     component.find('#createPinBtn').hostNodes().simulate('click')
-    await new Promise<void>((resolve) => {
+    await new Promise((resolve) => {
       setTimeout(() => {
         resolve()
       }, 50)

@@ -11,11 +11,14 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
+import { IMenuItem, Menu } from './Menu'
+import { HeaderLogo } from '../../../icons'
 
 export interface IRightMenu {
   element: JSX.Element
 }
 export interface IDesktopHeaderProps {
+  menuItems: IMenuItem[]
   desktopRightMenu?: IRightMenu[]
 }
 
@@ -28,12 +31,13 @@ const HeaderContainer = styled.div`
   align-items: center;
   position: sticky;
   top: 0;
-  margin-left: 249px;
   z-index: 2;
   ${({ theme }) => theme.gradients.gradientNightshade};
 `
+const HeaderLeft = styled.div`
+  display: flex;
+`
 const HeaderRight = styled.div`
-  margin-left: auto;
   display: flex;
   & > * {
     margin-left: 8px;
@@ -42,10 +46,14 @@ const HeaderRight = styled.div`
 
 export class DesktopHeader extends React.Component<IDesktopHeaderProps> {
   render() {
-    const { desktopRightMenu } = this.props
+    const { menuItems, desktopRightMenu } = this.props
 
     return (
       <HeaderContainer>
+        <HeaderLeft>
+          <HeaderLogo />
+          <Menu menuItems={menuItems} />
+        </HeaderLeft>
         <HeaderRight>
           {desktopRightMenu &&
             desktopRightMenu.map((item: IRightMenu) => item.element)}
