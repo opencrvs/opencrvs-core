@@ -28,6 +28,8 @@ import { RegistrationRatesReport } from './reports/operational/RegistrationRates
 import { parse } from 'query-string'
 import { OPERATIONAL_REPORTS_METRICS } from './metricsQuery'
 import { GraphQLError } from 'graphql'
+import { SEARCH_EVENTS } from '@client/views/OfficeHome/queries'
+import { COUNT_USER_WISE_APPLICATIONS } from '@client/search/queries'
 
 describe('OperationalReport tests', () => {
   let component: ReactWrapper<{}, {}>
@@ -42,11 +44,27 @@ describe('OperationalReport tests', () => {
 
   beforeEach(async () => {
     Date.now = jest.fn(() => 1487076708000)
-    const { store: testStore, history: testHistory } = await createTestStore()
-    store = testStore
-    history = testHistory
+    ;({ store, history } = await createTestStore())
+
     loginAsFieldAgent(store)
     const graphqlMock = [
+      {
+        request: {
+          query: COUNT_USER_WISE_APPLICATIONS,
+          variables: {
+            userId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+            status: ['REJECTED'],
+            locationIds: ['0d8474da-0361-4d32-979e-af91f012340a']
+          }
+        },
+        result: {
+          data: {
+            searchEvents: {
+              totalItems: 1
+            }
+          }
+        }
+      },
       {
         request: {
           query: OPERATIONAL_REPORTS_METRICS,
@@ -98,10 +116,9 @@ describe('OperationalReport tests', () => {
           }
         })}
       />,
-      store,
-      graphqlMock
+      { store, history, graphqlMocks: graphqlMock }
     )
-    component = testComponent.component
+    component = testComponent
   })
 
   it('renders without crashing', async () => {
@@ -246,7 +263,7 @@ describe('OperationalReport tests', () => {
 describe('OperationalReport reports tests', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
-
+  let history: History
   const LOCATION_DHAKA_DIVISION = {
     displayLabel: 'Dhaka Division',
     id: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
@@ -255,8 +272,7 @@ describe('OperationalReport reports tests', () => {
 
   beforeAll(async () => {
     Date.now = jest.fn(() => 1487076708000)
-    const { store: testStore } = await createTestStore()
-    store = testStore
+    ;({ store, history } = await createTestStore())
   })
 
   beforeEach(async () => {
@@ -271,9 +287,9 @@ describe('OperationalReport reports tests', () => {
           }
         })}
       />,
-      store
+      { store, history }
     )
-    component = testComponent.component
+    component = testComponent
   })
 
   it('renders report lists', async () => {
@@ -284,6 +300,7 @@ describe('OperationalReport reports tests', () => {
 describe('Test error toast notification', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
+  let history: History
 
   const LOCATION_DHAKA_DIVISION = {
     displayLabel: 'Dhaka Division',
@@ -293,8 +310,7 @@ describe('Test error toast notification', () => {
 
   beforeAll(async () => {
     Date.now = jest.fn(() => 1487076708000)
-    const { store: testStore } = await createTestStore()
-    store = testStore
+    ;({ store, history } = await createTestStore())
   })
 
   beforeEach(async () => {
@@ -324,10 +340,9 @@ describe('Test error toast notification', () => {
           }
         })}
       />,
-      store,
-      graphqlMock
+      { store, history, graphqlMocks: graphqlMock }
     )
-    component = testComponent.component
+    component = testComponent
   })
 
   it('renders the error toast notification and component loader', async () => {

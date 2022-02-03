@@ -53,24 +53,22 @@ describe('verify collector tests', () => {
     })
 
     it('when mother is collector renders Payment component', async () => {
-      const testComponent = (
-        await createTestComponent(
-          <Payment
-            history={history}
-            location={mockLocation}
-            match={{
-              params: {
-                registrationId: 'mockBirth1234',
-                eventType: Event.BIRTH
-              },
-              isExact: true,
-              path: '',
-              url: ''
-            }}
-          />,
-          store
-        )
-      ).component
+      const testComponent = await createTestComponent(
+        <Payment
+          history={history}
+          location={mockLocation}
+          match={{
+            params: {
+              registrationId: 'mockBirth1234',
+              eventType: Event.BIRTH
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        { store, history }
+      )
 
       expect(testComponent.find('#service').hostNodes().text()).toContain(
         'Birth'
@@ -85,24 +83,22 @@ describe('verify collector tests', () => {
 
     it('print payment receipt', async () => {
       const printMoneyReceiptSpy = jest.spyOn(PDFUtils, 'printMoneyReceipt')
-      const testComponent = (
-        await createTestComponent(
-          <Payment
-            location={mockLocation}
-            history={history}
-            match={{
-              params: {
-                registrationId: 'mockBirth1234',
-                eventType: Event.BIRTH
-              },
-              isExact: true,
-              path: '',
-              url: ''
-            }}
-          />,
-          store
-        )
-      ).component
+      const testComponent = await createTestComponent(
+        <Payment
+          location={mockLocation}
+          history={history}
+          match={{
+            params: {
+              registrationId: 'mockBirth1234',
+              eventType: Event.BIRTH
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        { store, history }
+      )
 
       testComponent.find('#print-receipt').hostNodes().simulate('click')
 
@@ -125,7 +121,7 @@ describe('verify collector tests', () => {
               url: ''
             }}
           />,
-          store
+          { store, history }
         )
       ).rejects.toEqual(new Error('Application "mockBirth" missing!'))
     })
@@ -137,24 +133,22 @@ describe('verify collector tests', () => {
     })
 
     it('when informant is collector', async () => {
-      const testComponent = (
-        await createTestComponent(
-          <Payment
-            location={mockLocation}
-            history={history}
-            match={{
-              params: {
-                registrationId: 'mockDeath1234',
-                eventType: Event.DEATH
-              },
-              isExact: true,
-              path: '',
-              url: ''
-            }}
-          />,
-          store
-        )
-      ).component
+      const testComponent = await createTestComponent(
+        <Payment
+          location={mockLocation}
+          history={history}
+          match={{
+            params: {
+              registrationId: 'mockDeath1234',
+              eventType: Event.DEATH
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        { store, history }
+      )
 
       expect(testComponent.find('#service').hostNodes().text()).toContain(
         'Death'
