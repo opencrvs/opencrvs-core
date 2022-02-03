@@ -47,10 +47,13 @@ jobs:
       - name: Deploy to development
         run: |
           yarn deploy:staging farajaland-staging.opencrvs.org $(git rev-parse --short HEAD) ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland
+      - name: Navigate into farajaland directory
+        run: |
+          cd opencrvs-farajaland
       - name: Run Cypress tests
         uses: cypress-io/github-action@v2
         with:
-          project: ./opencrvs-farajaland/cypress
+          project: ./cypress
           browser: chrome
           headless: true
           record: false
