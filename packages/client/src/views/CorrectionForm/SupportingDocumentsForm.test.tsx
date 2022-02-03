@@ -11,6 +11,7 @@
  */
 import { createStore } from '@client/store'
 import {
+  createRouterProps,
   createTestComponent,
   flushPromises,
   mockApplicationData,
@@ -19,9 +20,12 @@ import {
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { Event } from '@client/forms'
-import { IApplication } from '@client/applications'
+import { CorrectionSection, Event } from '@client/forms'
+import { IApplication, storeApplication } from '@client/applications'
 import { SupportingDocumentsForm } from './SupportingDocumentsForm'
+import { formatUrl } from '@client/navigation'
+import { CERTIFICATE_CORRECTION } from '@client/navigation/routes'
+import { CorrectionForm } from './CorrectionForm'
 
 let wrapper: ReactWrapper<{}, {}>
 
@@ -39,10 +43,25 @@ const deathApplication: IApplication = {
 
 const { store, history } = createStore()
 
-describe('First time on corrector supporting document', () => {
+describe('for an application', () => {
   beforeEach(async () => {
+    store.dispatch(storeApplication(birthApplication))
     wrapper = await createTestComponent(
-      <SupportingDocumentsForm application={birthApplication} />,
+      <CorrectionForm
+        {...createRouterProps(
+          formatUrl(CERTIFICATE_CORRECTION, {
+            applicationId: birthApplication.id,
+            pageId: CorrectionSection.SupportingDocuments
+          }),
+          { isNavigatedInsideApp: false },
+          {
+            matchParams: {
+              applicationId: birthApplication.id,
+              pageId: CorrectionSection.SupportingDocuments
+            }
+          }
+        )}
+      />,
       {
         store,
         history
@@ -50,35 +69,26 @@ describe('First time on corrector supporting document', () => {
     )
     await waitForElement(wrapper, '#corrector_form')
   })
+
   it('should disable the continue button', () => {
     expect(
       wrapper.find('#confirm_form').hostNodes().props().disabled
     ).toBeTruthy()
   })
-})
-describe('When select any radio option', () => {
-  beforeEach(async () => {
-    const application: IApplication = {
-      ...birthApplication,
-      data: {
-        ...birthApplication.data,
-        supportingDocuments: {
-          supportDocumentRequiredForCorrection: true
-        }
-      }
-    }
-    wrapper = await createTestComponent(
-      <SupportingDocumentsForm application={application} />,
-      {
-        store,
-        history
-      }
-    )
-    await waitForElement(wrapper, '#corrector_form')
-  })
-  it('should not disable the continue button', () => {
+
+  it('should enable the continue button if any radio button is selected', () => {
+    wrapper
+      .find('#supportDocumentRequiredForCorrection_true')
+      .hostNodes()
+      .simulate('change', { target: { checked: true } })
+    wrapper.update()
     expect(
       wrapper.find('#confirm_form').hostNodes().props().disabled
     ).toBeFalsy()
+  })
+  it('should goto home if cross button is pressed', () => {
+    wrapper.find('#crcl-btn').hostNodes().simulate('click')
+    wrapper.update()
+    expect(history.location.pathname).toContain('/review')
   })
 })
