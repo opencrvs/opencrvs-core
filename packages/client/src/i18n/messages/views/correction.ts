@@ -57,6 +57,8 @@ interface ICorrectionMessages
   correctionSummaryReasonForRequest: MessageDescriptor
   correctionSummaryComments: MessageDescriptor
   correctionSummaryAddComments: MessageDescriptor
+  correctionSummaryFeesRequired: MessageDescriptor
+  correctionSummaryProofOfPaymentRequired: MessageDescriptor
 }
 
 const messagesToDefine: ICorrectionMessages = {
@@ -302,6 +304,17 @@ const messagesToDefine: ICorrectionMessages = {
     defaultMessage: 'Supporting documents',
     description:
       'Supporting documents header for certificate correction summary'
+  },
+  correctionSummaryFeesRequired: {
+    id: 'correction.summary.feesRequired',
+    defaultMessage: 'Fees required?',
+    description: 'Fees required for certificate correction summary'
+  },
+  correctionSummaryProofOfPaymentRequired: {
+    id: 'correction.summary.proofOfPayment',
+    defaultMessage: 'Proof of payment is required',
+    description:
+      'Validation for proof of payment document for certificate correction summary'
   }
 }
 

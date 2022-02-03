@@ -25,6 +25,7 @@ import {
 } from '@client/navigation'
 import { messages as registerMessages } from '@client/i18n/messages/views/register'
 import { messages } from '@client/i18n/messages/views/correction'
+import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import {
   buttonMessages,
   constantsMessages,
@@ -56,7 +57,10 @@ import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
 import styled from 'styled-components'
 import { FormFieldGenerator } from '@client/components/form'
 import { group } from 'console'
-import { correctionFeesPayment } from '@client/forms/correction/payment'
+import {
+  correctionFeesPayment,
+  correctionFeesPaymentSection
+} from '@client/forms/correction/payment'
 
 const SupportingDocument = styled.div`
   display: flex;
@@ -80,6 +84,9 @@ type IProps = IStateProps & IDispatchProps & IntlShapeProps
 class CorrectionSummaryComponent extends React.Component<IProps> {
   render() {
     const { application, intl, goBack } = this.props
+
+    const section = correctionFeesPaymentSection
+    const group = section.groups[0]
 
     const backToReviewButton = (
       <SecondaryButton
@@ -251,10 +258,40 @@ class CorrectionSummaryComponent extends React.Component<IProps> {
               ]}
               noResultText={intl.formatMessage(constantsMessages.noResults)}
             ></ListTable>
+            <FormFieldGenerator
+              id={group.id}
+              onChange={(values) => {
+                this.modifyApplication(
+                  values,
+                  correctionFeesPaymentSection,
+                  application
+                )
+              }}
+              setAllFieldsDirty={false}
+              fields={group.fields}
+              draftData={application.data}
+            />
           </Content>
         </ActionPageLight>
       </>
     )
+  }
+
+  modifyApplication = (
+    sectionData: IFormSectionData,
+    activeSection: IFormSection,
+    application: IApplication
+  ) => {
+    this.props.modifyApplication({
+      ...application,
+      data: {
+        ...application.data,
+        [activeSection.id]: {
+          ...application.data[activeSection.id],
+          ...sectionData
+        }
+      }
+    })
   }
 
   getName = (person: IFormSectionData) => {
@@ -382,15 +419,16 @@ class CorrectionSummaryComponent extends React.Component<IProps> {
 
     return (
       <div>
-        {supportingDocuments.map((proof) => {
-          const doc = proof.optionValues as IFormSectionData[]
-          return (
-            <SupportingDocument>
-              <PaperClip />
-              {doc[1]}
-            </SupportingDocument>
-          )
-        })}
+        {supportingDocuments &&
+          supportingDocuments.map((proof) => {
+            const doc = proof.optionValues as IFormSectionData[]
+            return (
+              <SupportingDocument>
+                <PaperClip />
+                {doc[1]}
+              </SupportingDocument>
+            )
+          })}
         <LinkButton
           id="birth-registration-detalis-link"
           onClick={() =>

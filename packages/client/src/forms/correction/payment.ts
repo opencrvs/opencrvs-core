@@ -22,24 +22,23 @@ import { messages } from '@client/i18n/messages/views/correction'
 
 export const correctionFeesPayment: IFormSectionGroup = {
   id: 'correctionFeesPayment',
-  title: messages.whatWasTheReasonForCorrection,
-  error: messages.reasonForChangeError,
+  title: messages.correctionSummaryFeesRequired,
+  error: messages.correctionSummaryProofOfPaymentRequired,
   fields: [
     {
-      name: 'fees',
+      name: 'correctionFees',
       type: RADIO_GROUP_WITH_NESTED_FIELDS,
       size: RadioSize.LARGE,
-      label: messages.whatWasTheReasonForCorrection,
+      label: messages.correctionSummaryFeesRequired,
       required: true,
-      hideHeader: true,
       initialValue: '',
       validate: [],
       options: [
-        { value: 'REQUIRED', label: messages.clericalError },
-        { value: 'NOT_REQUIRED', label: messages.materialError }
+        { value: 'REQUIRED', label: messages.idCheckVerify },
+        { value: 'NOT_REQUIRED', label: messages.idCheckWithoutVerify }
       ],
       nestedFields: {
-        NOT_REQUIRED: [
+        REQUIRED: [
           {
             name: 'totalFees',
             type: 'TEXT',
@@ -55,7 +54,7 @@ export const correctionFeesPayment: IFormSectionGroup = {
           },
           {
             name: 'proofOfPayment',
-            type: 'LINK',
+            type: 'SIMPLE_DOCUMENT_UPLOADER',
             label: {
               defaultMessage: 'Proof of payment',
               id: 'form.field.label.proofOfPayment',
@@ -68,15 +67,6 @@ export const correctionFeesPayment: IFormSectionGroup = {
           }
         ]
       }
-    },
-    {
-      name: 'additionalComment',
-      type: TEXTAREA,
-      label: messages.additionalComment,
-      initialValue: '',
-      validate: [],
-      required: false,
-      maxLength: 500
     }
   ]
 }
