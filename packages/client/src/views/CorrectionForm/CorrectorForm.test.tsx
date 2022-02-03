@@ -13,14 +13,18 @@ import { createStore } from '@client/store'
 import {
   createTestComponent,
   mockApplicationData,
-  mockDeathApplicationData
+  mockDeathApplicationData,
+  createRouterProps
 } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { CorrectorForm } from './CorrectorForm'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { Event } from '@client/forms'
-import { IApplication } from '@client/applications'
+import { Event, CorrectionSection } from '@client/forms'
+import { IApplication, storeApplication } from '@client/applications'
+import { CorrectionForm } from './CorrectionForm'
+import { formatUrl } from '@client/navigation'
+import { CERTIFICATE_CORRECTION } from '@client/navigation/routes'
 
 let wrapper: ReactWrapper<{}, {}>
 
@@ -41,45 +45,46 @@ const { store, history } = createStore()
 describe('Corrector form', () => {
   describe('for a birth registration', () => {
     beforeEach(async () => {
+      store.dispatch(storeApplication(birthApplication))
       wrapper = await createTestComponent(
-        <CorrectorForm application={birthApplication} />,
+        <CorrectionForm
+          {...createRouterProps(
+            formatUrl(CERTIFICATE_CORRECTION, {
+              applicationId: birthApplication.id,
+              pageId: CorrectionSection.Corrector
+            }),
+            { isNavigatedInsideApp: false },
+            {
+              matchParams: {
+                applicationId: birthApplication.id,
+                pageId: CorrectionSection.Corrector
+              }
+            }
+          )}
+        />,
         {
           store,
           history
         }
       )
-
       await waitForElement(wrapper, '#corrector_form')
     })
 
-    it('should show the child option', () => {
-      expect(wrapper.find('#relationship_CHILD').hostNodes()).toHaveLength(1)
-    })
-
-    it('should show the legal guardian option', () => {
+    it('should disable the continue button if no option is selected', () => {
       expect(
-        wrapper.find('#relationship_LEGAL_GUARDIAN').hostNodes()
-      ).toHaveLength(1)
+        wrapper.find('#confirm_form').hostNodes().props().disabled
+      ).toBeTruthy()
     })
 
-    it('should show the another agent option', () => {
+    it('should not disable the continue button if an option is selected', () => {
+      wrapper
+        .find('#relationship_MOTHER')
+        .hostNodes()
+        .simulate('change', { target: { checked: true } })
+      wrapper.update()
       expect(
-        wrapper.find('#relationship_ANOTHER_AGENT').hostNodes()
-      ).toHaveLength(1)
-    })
-
-    it('should show the registrar option', () => {
-      expect(wrapper.find('#relationship_REGISTRAR').hostNodes()).toHaveLength(
-        1
-      )
-    })
-
-    it('should show the registrar option', () => {
-      expect(wrapper.find('#relationship_COURT').hostNodes()).toHaveLength(1)
-    })
-
-    it('should show the others option', () => {
-      expect(wrapper.find('#relationship_OTHERS').hostNodes()).toHaveLength(1)
+        wrapper.find('#confirm_form').hostNodes().props().disabled
+      ).toBeFalsy()
     })
   })
   describe('for a birth registration with father details', () => {
@@ -192,51 +197,114 @@ describe('Corrector form', () => {
 
   describe('for a death registration', () => {
     beforeEach(async () => {
-      const application: IApplication = {
-        ...deathApplication,
-        data: {
-          ...birthApplication.data,
-          primaryCaregiver: {
-            ...birthApplication.data.primaryCaregiver,
-            motherIsDeceased: ['deceased']
-          }
-        }
-      }
+      store.dispatch(storeApplication(deathApplication))
       wrapper = await createTestComponent(
-        <CorrectorForm application={application} />,
+        <CorrectionForm
+          {...createRouterProps(
+            formatUrl(CERTIFICATE_CORRECTION, {
+              applicationId: deathApplication.id,
+              pageId: CorrectionSection.Corrector
+            }),
+            { isNavigatedInsideApp: false },
+            {
+              matchParams: {
+                applicationId: deathApplication.id,
+                pageId: CorrectionSection.Corrector
+              }
+            }
+          )}
+        />,
         {
           store,
           history
         }
       )
-
       await waitForElement(wrapper, '#corrector_form')
     })
 
-    it('should show the informant option', () => {
-      expect(wrapper.find('#relationship_INFORMANT').hostNodes()).toHaveLength(
-        1
-      )
-    })
-
-    it('should show the another agent option', () => {
+    it('should disable the continue button if no option is selected', () => {
       expect(
-        wrapper.find('#relationship_ANOTHER_AGENT').hostNodes()
-      ).toHaveLength(1)
+        wrapper.find('#confirm_form').hostNodes().props().disabled
+      ).toBeTruthy()
     })
 
-    it('should show the registrar option', () => {
-      expect(wrapper.find('#relationship_REGISTRAR').hostNodes()).toHaveLength(
-        1
+    it('should not disable the continue button if an option is selected', () => {
+      wrapper
+        .find('#relationship_INFORMANT')
+        .hostNodes()
+        .simulate('change', { target: { checked: true } })
+      wrapper.update()
+      expect(
+        wrapper.find('#confirm_form').hostNodes().props().disabled
+      ).toBeFalsy()
+    })
+  })
+
+  describe('for an application', () => {
+    beforeEach(async () => {
+      store.dispatch(storeApplication(birthApplication))
+      wrapper = await createTestComponent(
+        <CorrectionForm
+          {...createRouterProps(
+            formatUrl(CERTIFICATE_CORRECTION, {
+              applicationId: birthApplication.id,
+              pageId: CorrectionSection.Corrector
+            }),
+            { isNavigatedInsideApp: false },
+            {
+              matchParams: {
+                applicationId: birthApplication.id,
+                pageId: CorrectionSection.Corrector
+              }
+            }
+          )}
+        />,
+        {
+          store,
+          history
+        }
       )
+      await waitForElement(wrapper, '#corrector_form')
     })
 
-    it('should show the court option', () => {
-      expect(wrapper.find('#relationship_COURT').hostNodes()).toHaveLength(1)
+    it('should disable the continue button if others option is selected without specifying the relationship', () => {
+      wrapper
+        .find('#relationship_OTHERS')
+        .hostNodes()
+        .simulate('change', { target: { checked: true } })
+      wrapper.update()
+      expect(
+        wrapper.find('#confirm_form').hostNodes().props().disabled
+      ).toBeTruthy()
     })
 
-    it('should show the others option', () => {
-      expect(wrapper.find('#relationship_OTHERS').hostNodes()).toHaveLength(1)
+    it('should disable the continue button if others option is selected with the relationship specified', () => {
+      wrapper
+        .find('#relationship_OTHERS')
+        .hostNodes()
+        .simulate('change', { target: { checked: true } })
+      wrapper.update()
+
+      wrapper
+        .find('input[name="relationship.nestedFields.otherRelationship"]')
+        .simulate('change', {
+          target: {
+            name: 'relationship.nestedFields.otherRelationship',
+            value: 'Grandma'
+          }
+        })
+      wrapper.update()
+
+      expect(
+        wrapper.find('#confirm_form').hostNodes().props().disabled
+      ).toBeFalsy()
+    })
+
+    it('should cancel the correction when the cross button is pressed', () => {
+      wrapper.find('#crcl-btn').hostNodes().simulate('click')
+      wrapper.update()
+
+      expect(history.location.pathname).toContain('/review')
     })
   })
 })
