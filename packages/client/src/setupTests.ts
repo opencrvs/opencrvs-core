@@ -122,7 +122,7 @@ const navigatorMock = {
     'WARD,UNION,CITY_CORPORATION,MUNICIPALITY,UPAZILA',
   APPLICATION_AUDIT_LOCATIONS: 'WARD,UNION',
   LOGIN_URL: 'http://localhost:3020',
-  RESOURCES_URL: 'http://localhost:3040/bgd',
+  COUNTRY_CONFIG_URL: 'http://localhost:3040/bgd',
   /**
    * @deprecated HEALTH_FACILITY_FILTER is no longer used
    */
