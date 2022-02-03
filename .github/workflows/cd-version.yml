@@ -7,12 +7,12 @@
 #
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
-name: Continuous Delievery And E2E Tests Performed On Staging
+name: Continuous Delivery And E2E Tests Performed On Staging
 
 on:
   push:
     branches:
-      - 'develop/'
+      - 'develop'
 
 jobs:
   push-deploy-e2e:
@@ -26,10 +26,10 @@ jobs:
         uses: actions/checkout@v2
       - name: Checking out the country config repo
         run: |
-          git clone https://github.com/opencrvs/opencrvs-zambia.git
+          git clone https://github.com/opencrvs/opencrvs-farajaland.git
       - name: Get COUNTRY_CONFIG_VERSION
         run: |
-          cd opencrvs-zambia
+          cd opencrvs-farajaland
           export COUNTRY_CONFIG_VERSION=$(git rev-parse --short HEAD)
           echo "::set-env name=COUNTRY_CONFIG_VERSION::$COUNTRY_CONFIG_VERSION"
           cd ../
@@ -47,15 +47,15 @@ jobs:
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
       - name: Deploy to development
         run: |
-          yarn deploy:staging zambia-uat.newlegacy.digital $(git rev-parse --short HEAD) $COUNTRY_CONFIG_VERSION opencrvs-zambia
+          yarn deploy:staging farajaland-staging.opencrvs.org $(git rev-parse --short HEAD) $COUNTRY_CONFIG_VERSION opencrvs-farajaland
       - name: Run Cypress tests
         uses: cypress-io/github-action@v2
         with:
-          project: ./opencrvs-zambia/cypress
+          project: ./opencrvs-farajaland/cypress
           browser: chrome
           headless: true
           record: false
         env:
-          CYPRESS_LOGIN_URL: https://login.zambia-uat.newlegacy.digital/
-          CYPRESS_CLIENT_URL: https://client.zambia-uat.newlegacy.digital/
-          CYPRESS_AUTH_URL: https://auth.zambia-uat.newlegacy.digital/
+          CYPRESS_LOGIN_URL: https://login.farajaland-staging.opencrvs.org/
+          CYPRESS_CLIENT_URL: https://client.farajaland-staging.opencrvs.org/
+          CYPRESS_AUTH_URL: https://auth.farajaland-staging.opencrvs.org/
