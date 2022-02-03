@@ -55,11 +55,8 @@ export const correctionFeesPayment: IFormSectionGroup = {
           {
             name: 'proofOfPayment',
             type: 'SIMPLE_DOCUMENT_UPLOADER',
-            label: {
-              defaultMessage: 'Proof of payment',
-              id: 'form.field.label.proofOfPayment',
-              description: 'Label for input Reason for Change'
-            },
+            label: messages.correctionSummaryProofOfPayment,
+            description: messages.correctionSummaryProofOfPayment,
             required: true,
             initialValue: '',
             validate: [],

@@ -64,7 +64,7 @@ import {
 
 const SupportingDocument = styled.div`
   display: flex;
-  margin: 4px 0;
+  margin: 8px 0;
 `
 
 type IStateProps = {
@@ -82,11 +82,22 @@ type IDispatchProps = {
 type IProps = IStateProps & IDispatchProps & IntlShapeProps
 
 class CorrectionSummaryComponent extends React.Component<IProps> {
+  section = correctionFeesPaymentSection
+  group = this.section.groups[0]
+
+  componentDidMount() {
+    this.group = {
+      ...this.group,
+      fields: replaceInitialValues(
+        this.group.fields,
+        this.props.application.data[this.section.id] || {},
+        this.props.application.data
+      )
+    }
+  }
+
   render() {
     const { application, intl, goBack } = this.props
-
-    const section = correctionFeesPaymentSection
-    const group = section.groups[0]
 
     const backToReviewButton = (
       <SecondaryButton
@@ -138,7 +149,7 @@ class CorrectionSummaryComponent extends React.Component<IProps> {
                 {
                   label: intl.formatMessage(messages.correctionSummaryItem),
                   alignment: ColumnContentAlignment.LEFT,
-                  width: 33,
+                  width: 34,
                   key: 'item'
                 },
                 {
@@ -259,7 +270,7 @@ class CorrectionSummaryComponent extends React.Component<IProps> {
               noResultText={intl.formatMessage(constantsMessages.noResults)}
             ></ListTable>
             <FormFieldGenerator
-              id={group.id}
+              id={this.group.id}
               onChange={(values) => {
                 this.modifyApplication(
                   values,
@@ -268,7 +279,7 @@ class CorrectionSummaryComponent extends React.Component<IProps> {
                 )
               }}
               setAllFieldsDirty={false}
-              fields={group.fields}
+              fields={this.group.fields}
               draftData={application.data}
             />
           </Content>
