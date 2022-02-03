@@ -127,20 +127,23 @@ describe('User audit list tests', () => {
     const { store: testStore, history: testHistory } = await createTestStore()
     store = testStore
     history = testHistory
-    component = await createTestComponent(
-      // @ts-ignore
-      <UserProfile
-        match={{
-          params: {
-            userId: '5d08e102542c7a19fc55b790'
-          },
-          isExact: true,
-          path: USER_PROFILE,
-          url: ''
-        }}
-      />,
-      { store, history, graphqlMocks: graphqlMock }
-    )
+    component = (
+      await createTestComponent(
+        // @ts-ignore
+        <UserProfile
+          match={{
+            params: {
+              userId: '5d08e102542c7a19fc55b790'
+            },
+            isExact: true,
+            path: USER_PROFILE,
+            url: ''
+          }}
+        />,
+        store,
+        graphqlMock
+      )
+    ).component
 
     expect(await waitForElement(component, '#user-profile')).toBeDefined()
   })
@@ -149,20 +152,22 @@ describe('User audit list tests', () => {
     expect(await waitForElement(component, '#user-audit-list')).toBeDefined()
   })
   it('renders with a error toast for graphql error', async () => {
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <UserProfile
-        match={{
-          params: {
-            userId: '5d08e102542c7a19fc55b790'
-          },
-          isExact: true,
-          path: USER_PROFILE,
-          url: ''
-        }}
-      />,
-      { store, history }
-    )
+    const testComponent = (
+      await createTestComponent(
+        // @ts-ignore
+        <UserProfile
+          match={{
+            params: {
+              userId: '5d08e102542c7a19fc55b790'
+            },
+            isExact: true,
+            path: USER_PROFILE,
+            url: ''
+          }}
+        />,
+        store
+      )
+    ).component
     expect(await waitForElement(testComponent, '#error-toast')).toBeDefined()
   })
   it('redirects to edit user view on clicking edit details menu option', async () => {
@@ -262,20 +267,23 @@ describe('User audit list tests', () => {
   it('opens activation modal on clicking deactivate menu option', async () => {
     // @ts-ignore
     graphqlMock[0].result.data.getUser.status = 'deactivated'
-    component = await createTestComponent(
-      // @ts-ignore
-      <UserProfile
-        match={{
-          params: {
-            userId: '5d08e102542c7a19fc55b790'
-          },
-          isExact: true,
-          path: USER_PROFILE,
-          url: ''
-        }}
-      />,
-      { store, history, graphqlMocks: graphqlMock }
-    )
+    component = (
+      await createTestComponent(
+        // @ts-ignore
+        <UserProfile
+          match={{
+            params: {
+              userId: '5d08e102542c7a19fc55b790'
+            },
+            isExact: true,
+            path: USER_PROFILE,
+            url: ''
+          }}
+        />,
+        store,
+        graphqlMock
+      )
+    ).component
 
     // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {

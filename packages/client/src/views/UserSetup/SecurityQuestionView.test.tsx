@@ -19,7 +19,7 @@ import { SecurityQuestion } from '@client/views/UserSetup/SecurityQuestionView'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 
-const { store, history } = createStore()
+const { store } = createStore()
 
 describe('Security Question Page', () => {
   let component: ReactWrapper
@@ -27,9 +27,9 @@ describe('Security Question Page', () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
       <SecurityQuestion setupData={{ securityQuestionAnswers: [] }} />,
-      { store, history }
+      store
     )
-    component = testComponent
+    component = testComponent.component
     component.find('button#submit-security-question').simulate('click')
   })
 

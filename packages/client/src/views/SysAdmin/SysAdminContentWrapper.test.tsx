@@ -19,20 +19,22 @@ import {
 } from './SysAdminContentWrapper'
 
 describe('Performance content wrapper', () => {
-  const { store, history } = createStore()
+  const { store } = createStore()
 
   describe('Tab menu', () => {
     let app: ReactWrapper
 
     beforeAll(async () => {
-      app = await createTestComponent(
-        <SysAdminContentWrapper
-          type={SysAdminPageVariant.SUBPAGE}
-          headerTitle="Subpage"
-          backActionHandler={() => {}}
-        />,
-        { store, history }
-      )
+      app = (
+        await createTestComponent(
+          <SysAdminContentWrapper
+            type={SysAdminPageVariant.SUBPAGE}
+            headerTitle="Subpage"
+            backActionHandler={() => {}}
+          />,
+          store
+        )
+      ).component
       app.update()
     })
 

@@ -16,7 +16,7 @@ import { createStore } from '@client/store'
 import { UserSetupReview } from './SetupReviewPage'
 import { activateUserMutation } from './queries'
 
-const { store, history } = createStore()
+const { store } = createStore()
 
 describe('SetupReviewPage page tests', () => {
   beforeEach(async () => {
@@ -40,10 +40,10 @@ describe('SetupReviewPage page tests', () => {
         }}
         goToStep={() => {}}
       />,
-      { store, history }
+      store
     )
 
-    expect(testComponent.find('#UserSetupData')).toBeDefined()
+    expect(testComponent.component.find('#UserSetupData')).toBeDefined()
   })
   it('render page without type', async () => {
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
@@ -59,9 +59,12 @@ describe('SetupReviewPage page tests', () => {
         }}
         goToStep={() => {}}
       />,
-      { store, history }
+      store
     )
-    const role = testComponent.find('#RoleType_value').hostNodes().text()
+    const role = testComponent.component
+      .find('#RoleType_value')
+      .hostNodes()
+      .text()
     expect(role).toEqual('Field Agent')
   })
   it('clicks question to change', async () => {
@@ -77,10 +80,10 @@ describe('SetupReviewPage page tests', () => {
         }}
         goToStep={() => {}}
       />,
-      { store, history }
+      store
     )
 
-    testComponent
+    testComponent.component
       .find('#Question_Action_BIRTH_TOWN')
       .hostNodes()
       .simulate('click')
@@ -114,10 +117,11 @@ describe('SetupReviewPage page tests', () => {
           ]
         }}
       />,
-      { store, history, graphqlMocks: mock }
+      store,
+      mock
     )
 
-    testComponent.find('button#Confirm').simulate('click')
+    testComponent.component.find('button#Confirm').simulate('click')
   })
 
   it('it shows error if error occurs', async () => {
@@ -148,18 +152,19 @@ describe('SetupReviewPage page tests', () => {
           ]
         }}
       />,
-      { store, history, graphqlMocks: graphqlErrorMock }
+      store,
+      graphqlErrorMock
     )
 
-    testComponent.find('button#Confirm').simulate('click')
+    testComponent.component.find('button#Confirm').simulate('click')
 
     await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
-    testComponent.update()
-    expect(testComponent.find('#GlobalError').hostNodes().text()).toBe(
-      'An error occurred. Please try again.'
-    )
+    testComponent.component.update()
+    expect(
+      testComponent.component.find('#GlobalError').hostNodes().text()
+    ).toBe('An error occurred. Please try again.')
   })
 
   it('shows nothing for undefined fields of userDetails', async () => {
@@ -202,22 +207,22 @@ describe('SetupReviewPage page tests', () => {
           ]
         }}
       />,
-      { store, history }
+      store
     )
 
     await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
-    testComponent.update()
+    testComponent.component.update()
 
-    expect(testComponent.find('div#BengaliName').hostNodes().text()).toBe(
-      'Bengali nameChange'
-    )
-    expect(testComponent.find('div#EnglishName').hostNodes().text()).toBe(
-      'English nameChange'
-    )
-    expect(testComponent.find('div#UserPhone').hostNodes().text()).toBe(
-      'Phone numberChange'
-    )
+    expect(
+      testComponent.component.find('div#BengaliName').hostNodes().text()
+    ).toBe('Bengali nameChange')
+    expect(
+      testComponent.component.find('div#EnglishName').hostNodes().text()
+    ).toBe('English nameChange')
+    expect(
+      testComponent.component.find('div#UserPhone').hostNodes().text()
+    ).toBe('Phone numberChange')
   })
 })

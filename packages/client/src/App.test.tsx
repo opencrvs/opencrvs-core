@@ -12,9 +12,9 @@
 import * as React from 'react'
 import {
   createTestApp,
+  createTestComponent,
   getItem,
-  flushPromises,
-  createTestComponent
+  flushPromises
 } from '@client/tests/util'
 
 import { createClient } from '@client/utils/apolloClient'
@@ -128,8 +128,8 @@ describe('when user has a valid token in local storage', () => {
 })
 
 describe('it handles react errors', () => {
+  const { store } = createStore()
   it('displays react error page', async () => {
-    const { store, history } = createStore()
     function Problem(): JSX.Element {
       throw new Error('Error thrown.')
     }
@@ -137,16 +137,18 @@ describe('it handles react errors', () => {
       <StyledErrorBoundary>
         <Problem />
       </StyledErrorBoundary>,
-      { store, history }
+      store
     )
-
-    expect(testComponent.find('#GoToHomepage').hostNodes()).toHaveLength(1)
+    // @ts-ignore
+    expect(
+      testComponent.component.find('#GoToHomepage').hostNodes()
+    ).toHaveLength(1)
   })
 })
 
 describe('it handles react unauthorized errors', () => {
+  const { store } = createStore()
   it('displays react error page', async () => {
-    const { store, history } = createStore()
     function Problem(): JSX.Element {
       throw new Error('401')
     }
@@ -154,11 +156,13 @@ describe('it handles react unauthorized errors', () => {
       <StyledErrorBoundary>
         <Problem />
       </StyledErrorBoundary>,
-      { store, history }
+      store
     )
 
-    expect(testComponent.find('#GoToHomepage').hostNodes()).toHaveLength(1)
+    expect(
+      testComponent.component.find('#GoToHomepage').hostNodes()
+    ).toHaveLength(1)
 
-    testComponent.find('#GoToHomepage').hostNodes().simulate('click')
+    testComponent.component.find('#GoToHomepage').hostNodes().simulate('click')
   })
 })

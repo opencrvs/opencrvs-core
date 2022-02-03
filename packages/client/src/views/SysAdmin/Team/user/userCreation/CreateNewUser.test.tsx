@@ -230,21 +230,23 @@ describe('create new user tests', () => {
 
   describe('when user is in create new user form', () => {
     beforeEach(async () => {
-      testComponent = await createTestComponent(
-        <CreateNewUser
-          match={{
-            // @ts-ignore
-            params: {
-              locationId: '0d8474da-0361-4d32-979e-af91f012340a',
-              sectionId: mockOfflineData.forms.userForm.sections[0].id
-            },
-            isExact: true,
-            path: '/createUser',
-            url: ''
-          }}
-        />,
-        { store, history }
-      )
+      testComponent = (
+        await createTestComponent(
+          <CreateNewUser
+            match={{
+              // @ts-ignore
+              params: {
+                locationId: '0d8474da-0361-4d32-979e-af91f012340a',
+                sectionId: mockOfflineData.forms.userForm.sections[0].id
+              },
+              isExact: true,
+              path: '/createUser',
+              url: ''
+            }}
+          />,
+          store
+        )
+      ).component
 
       loginAsFieldAgent(store)
     })
@@ -291,21 +293,23 @@ describe('create new user tests', () => {
     beforeEach(async () => {
       store.dispatch(modifyUserFormData(mockCompleteFormData))
       store.dispatch(processRoles(mockCompleteFormData.registrationOffice))
-      testComponent = await createTestComponent(
-        // @ts-ignore
-        <CreateNewUser
-          match={{
-            params: {
-              sectionId: mockOfflineData.forms.userForm.sections[1].id,
-              groupId: mockOfflineData.forms.userForm.sections[1].groups[0].id
-            },
-            isExact: true,
-            path: '/createUser',
-            url: ''
-          }}
-        />,
-        { store, history }
-      )
+      testComponent = (
+        await createTestComponent(
+          // @ts-ignore
+          <CreateNewUser
+            match={{
+              params: {
+                sectionId: mockOfflineData.forms.userForm.sections[1].id,
+                groupId: mockOfflineData.forms.userForm.sections[1].groups[0].id
+              },
+              isExact: true,
+              path: '/createUser',
+              url: ''
+            }}
+          />,
+          store
+        )
+      ).component
     })
 
     it('renders review header', () => {
@@ -430,10 +434,11 @@ describe('edit user tests', () => {
             url: ''
           }}
         />,
-        { store, history, graphqlMocks: graphqlMocks }
+        store,
+        graphqlMocks
       )
 
-      component = testComponent
+      component = testComponent.component
     })
 
     it('clicking on continue button takes user review details page', async () => {
@@ -474,14 +479,15 @@ describe('edit user tests', () => {
             url: ''
           }}
         />,
-        { store, history, graphqlMocks }
+        store,
+        graphqlMocks
       )
 
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      component = testComponent
+      component = testComponent.component
       component.update()
     })
 

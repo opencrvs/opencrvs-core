@@ -16,7 +16,7 @@ import { TimeFrameReports } from '@client/views/SysAdmin/Performance/reports/Tim
 import { Event } from '@client/forms'
 
 describe('Time frame report tests', () => {
-  const { store, history } = createStore()
+  const { store } = createStore()
   const timeFramesData = {
     details: [
       {
@@ -44,10 +44,10 @@ describe('Time frame report tests', () => {
         data={timeFramesData}
         loading={false}
       />,
-      { store, history }
+      store
     )
 
-    const columnValueOfRegOver5Year = testComponent
+    const columnValueOfRegOver5Year = testComponent.component
       .find('#row_0')
       .find('span')
       .at(5)

@@ -15,35 +15,38 @@ import { ReactWrapper } from 'enzyme'
 import { createStore } from '@client/store'
 import { createTestComponent } from '@client/tests/util'
 
-const { store, history } = createStore()
+const { store } = createStore()
 const mockHandleYes = jest.fn()
 const mockHandleClose = jest.fn()
 
 describe('when user opens the log out modal', () => {
-  let component: ReactWrapper<{}, {}>
+  let logoutComponent: ReactWrapper<{}, {}>
   beforeEach(async () => {
-    component = await createTestComponent(
+    const testComponent = await createTestComponent(
       <NotDuplicateConfirmation
         show={true}
         handleYes={mockHandleYes}
         handleClose={mockHandleClose}
       />,
-      { store, history }
+      store
     )
+    logoutComponent = testComponent.component
   })
 
   it('renders not a duplicate confirmation dialog', () => {
-    expect(component.find('#not_duplicate_confirm').hostNodes()).toHaveLength(1)
+    expect(
+      logoutComponent.find('#not_duplicate_confirm').hostNodes()
+    ).toHaveLength(1)
   })
 
   it('calls yes button handler', () => {
-    component.find('#not_duplicate_confirm').hostNodes().simulate('click')
+    logoutComponent.find('#not_duplicate_confirm').hostNodes().simulate('click')
 
     expect(mockHandleYes).toHaveBeenCalled()
   })
 
   it('calls no button handler', () => {
-    component.find('#not_duplicate_close').hostNodes().simulate('click')
+    logoutComponent.find('#not_duplicate_close').hostNodes().simulate('click')
 
     expect(mockHandleClose).toHaveBeenCalled()
   })

@@ -11,8 +11,12 @@
  */
 import React from 'react'
 import { ReactWrapper } from 'enzyme'
-import { AppStore, createStore } from '@client/store'
-import { createTestComponent, flushPromises } from '@client/tests/util'
+import { AppStore } from '@client/store'
+import {
+  createTestStore,
+  createTestComponent,
+  flushPromises
+} from '@client/tests/util'
 import { ForgotPIN } from '@client/views/Unlock/ForgotPIN'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { setUserDetails } from '@client/profile/profileActions'
@@ -21,18 +25,17 @@ import { userQueries } from '@client/user/queries'
 import { storage } from '@client/storage'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
-import { History } from 'history'
 
 describe('ForgotPIN tests', () => {
   let component: ReactWrapper
   let store: AppStore
-  let history: History
   const goBackMock: jest.Mock = jest.fn()
   const onVerifyPasswordMock = jest.fn()
   userQueries.verifyPasswordById = jest.fn()
 
   beforeAll(async () => {
-    ;({ store, history } = await createStore())
+    const testStore = await createTestStore()
+    store = testStore.store
 
     store.dispatch(
       setUserDetails({
@@ -88,10 +91,15 @@ describe('ForgotPIN tests', () => {
   })
 
   beforeEach(async () => {
-    component = await createTestComponent(
-      <ForgotPIN goBack={goBackMock} onVerifyPassword={onVerifyPasswordMock} />,
-      { store, history }
-    )
+    component = (
+      await createTestComponent(
+        <ForgotPIN
+          goBack={goBackMock}
+          onVerifyPassword={onVerifyPasswordMock}
+        />,
+        store
+      )
+    ).component
 
     // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {

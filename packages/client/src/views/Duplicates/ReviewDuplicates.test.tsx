@@ -510,7 +510,7 @@ describe('Review Duplicates component', () => {
   ]
 
   it('query gateway correctly and displays the returned duplicates correctly', async () => {
-    const { store, history } = createStore()
+    const { store } = createStore()
     const testComponent = await createTestComponent(
       <ReviewDuplicates
         // @ts-ignore
@@ -520,15 +520,19 @@ describe('Review Duplicates component', () => {
           }
         }}
       />,
-      { store, history, graphqlMocks: graphqlMock }
+      store,
+      graphqlMock
     )
 
-    const details = await waitForElement(testComponent, DuplicateDetails)
+    const details = await waitForElement(
+      testComponent.component,
+      DuplicateDetails
+    )
     expect(details).toHaveLength(2)
   })
 
   it('query gateway correctly and displays the returned duplicates correctly in case of minimal data', async () => {
-    const { store, history } = createStore()
+    const { store } = createStore()
     const testComponent = await createTestComponent(
       <ReviewDuplicates
         // @ts-ignore
@@ -538,10 +542,14 @@ describe('Review Duplicates component', () => {
           }
         }}
       />,
-      { store, history, graphqlMocks: graphqlMockMinimal }
+      store,
+      graphqlMockMinimal
     )
 
-    const details = await waitForElement(testComponent, DuplicateDetails)
+    const details = await waitForElement(
+      testComponent.component,
+      DuplicateDetails
+    )
 
     expect(details).toHaveLength(2)
   })
@@ -582,7 +590,7 @@ describe('Review Duplicates component', () => {
       }
     ]
 
-    const { store, history } = createStore()
+    const { store } = createStore()
     const testComponent = await createTestComponent(
       <ReviewDuplicates
         // @ts-ignore
@@ -592,10 +600,14 @@ describe('Review Duplicates component', () => {
           }
         }}
       />,
-      { store, history, graphqlMocks: graphqlErrorMock }
+      store,
+      graphqlErrorMock
     )
 
-    const error = await waitForElement(testComponent, '#duplicates-error-text')
+    const error = await waitForElement(
+      testComponent.component,
+      '#duplicates-error-text'
+    )
 
     expect(error.children().hostNodes().text()).toBe(
       'An error occurred while fetching data'
@@ -615,7 +627,7 @@ describe('Review Duplicates component', () => {
       }
     ]
 
-    const { store, history } = createStore()
+    const { store } = createStore()
     const testComponent = await createTestComponent(
       <ReviewDuplicates
         // @ts-ignore
@@ -625,10 +637,14 @@ describe('Review Duplicates component', () => {
           }
         }}
       />,
-      { store, history, graphqlMocks: graphqlErrorMock }
+      store,
+      graphqlErrorMock
     )
 
-    const error = await waitForElement(testComponent, '#duplicates-error-text')
+    const error = await waitForElement(
+      testComponent.component,
+      '#duplicates-error-text'
+    )
 
     expect(error.children().hostNodes().text()).toBe(
       'An error occurred while fetching data'
@@ -637,7 +653,7 @@ describe('Review Duplicates component', () => {
   describe('reject for duplication', () => {
     let component: ReactWrapper<{}, {}>
     beforeEach(async () => {
-      const { store, history } = createStore()
+      const { store } = createStore()
       const testComponent = await createTestComponent(
         <ReviewDuplicates
           // @ts-ignore
@@ -647,9 +663,10 @@ describe('Review Duplicates component', () => {
             }
           }}
         />,
-        { store, history, graphqlMocks: graphqlMock }
+        store,
+        graphqlMock
       )
-      component = testComponent
+      component = testComponent.component
       await waitForElement(component, '#review-duplicates-grid')
     })
     it('detail boxes are loaded properly', () => {
@@ -704,7 +721,7 @@ describe('Review Duplicates component', () => {
           }
         }
       })
-      const { store, history } = createStore()
+      const { store } = createStore()
       const testComponent = await createTestComponent(
         <ReviewDuplicates
           // @ts-ignore
@@ -714,34 +731,40 @@ describe('Review Duplicates component', () => {
             }
           }}
         />,
-        { store, history, graphqlMocks: mock }
+        store,
+        mock
       )
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      testComponent.update()
+      testComponent.component.update()
 
-      testComponent
+      testComponent.component
         .find('#reject_link_450ce5e3-b495-4868-bb6a-1183ffd0fee1')
         .hostNodes()
         .simulate('click')
-      testComponent.update()
+      testComponent.component.update()
 
-      testComponent.find('#reject_confirm').hostNodes().simulate('click')
+      testComponent.component
+        .find('#reject_confirm')
+        .hostNodes()
+        .simulate('click')
 
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      testComponent.update()
+      testComponent.component.update()
 
-      expect(testComponent.find('#reject_confirm').hostNodes()).toHaveLength(0)
+      expect(
+        testComponent.component.find('#reject_confirm').hostNodes()
+      ).toHaveLength(0)
     })
   })
   describe('remove duplication mark', () => {
     let component: ReactWrapper<{}, {}>
     beforeEach(async () => {
-      const { store, history } = createStore()
+      const { store } = createStore()
       const testComponent = await createTestComponent(
         <ReviewDuplicates
           // @ts-ignore
@@ -751,9 +774,10 @@ describe('Review Duplicates component', () => {
             }
           }}
         />,
-        { store, history, graphqlMocks: graphqlMock }
+        store,
+        graphqlMock
       )
-      component = testComponent
+      component = testComponent.component
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
@@ -806,7 +830,7 @@ describe('Review Duplicates component', () => {
           }
         }
       })
-      const { store, history } = createStore()
+      const { store } = createStore()
       const testComponent = await createTestComponent(
         <ReviewDuplicates
           // @ts-ignore
@@ -816,29 +840,33 @@ describe('Review Duplicates component', () => {
             }
           }}
         />,
-        { store, history, graphqlMocks: mock }
+        store,
+        mock
       )
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      testComponent.update()
+      testComponent.component.update()
 
-      testComponent
+      testComponent.component
         .find('#not_duplicate_link_450ce5e3-b495-4868-bb6a-1183ffd0fee1')
         .hostNodes()
         .simulate('click')
-      testComponent.update()
+      testComponent.component.update()
 
-      testComponent.find('#not_duplicate_confirm').hostNodes().simulate('click')
+      testComponent.component
+        .find('#not_duplicate_confirm')
+        .hostNodes()
+        .simulate('click')
 
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      testComponent.update()
+      testComponent.component.update()
 
       expect(
-        testComponent.find('#not_duplicate_confirm').hostNodes()
+        testComponent.component.find('#not_duplicate_confirm').hostNodes()
       ).toHaveLength(0)
     })
     describe('redirects', () => {
@@ -874,7 +902,7 @@ describe('Review Duplicates component', () => {
             }
           }
         })
-        const { store, history } = createStore()
+        const { store } = createStore()
         const testComponent = await createTestComponent(
           <ReviewDuplicates
             // @ts-ignore
@@ -884,18 +912,19 @@ describe('Review Duplicates component', () => {
               }
             }}
           />,
-          { store, history, graphqlMocks: mock }
+          store,
+          mock
         )
 
         const link = await waitForElement(
-          testComponent,
+          testComponent.component,
           '#not_duplicate_link_450ce5e3-b495-4868-bb6a-1183ffd0fee1'
         )
 
         link.hostNodes().simulate('click')
 
         const confirm = await waitForElement(
-          testComponent,
+          testComponent.component,
           '#not_duplicate_confirm'
         )
 
@@ -909,7 +938,7 @@ describe('Review Duplicates component', () => {
       })
 
       it('successfully redirects to Registration-Home if no duplicates returned from fetch query', async () => {
-        const { store, history } = createStore()
+        const { store } = createStore()
         const testComponent = await createTestComponent(
           <ReviewDuplicates
             // @ts-ignore
@@ -919,18 +948,19 @@ describe('Review Duplicates component', () => {
               }
             }}
           />,
-          { store, history, graphqlMocks: graphqlMock }
+          store,
+          graphqlMock
         )
         await new Promise((resolve) => {
           setTimeout(resolve, 100)
         })
-        testComponent.update()
+        testComponent.component.update()
 
         // wait for mocked data to load mockedProvider
         await new Promise((resolve) => {
           setTimeout(resolve, 100)
         })
-        testComponent.update()
+        testComponent.component.update()
 
         expect(window.location.assign).toBeCalledWith(REGISTRAR_HOME)
       })

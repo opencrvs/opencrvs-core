@@ -51,9 +51,8 @@ queries.fetchUserDetails = mockFetchUserDetails
 
 describe('SearchResult tests', () => {
   let store: ReturnType<typeof createStore>['store']
-  let history: ReturnType<typeof createStore>['history']
   beforeEach(async () => {
-    ;({ store, history } = createStore())
+    store = createStore().store
     getItem.mockReturnValue(registerScopeToken)
     await store.dispatch(checkAuth({ '?token': registerScopeToken }))
   })
@@ -72,11 +71,11 @@ describe('SearchResult tests', () => {
           url: ''
         }}
       />,
-      { store, history }
+      store
     )
 
     // @ts-ignore
-    expect(testComponent.containsMatchingElement(Spinner)).toBe(true)
+    expect(testComponent.component.containsMatchingElement(Spinner)).toBe(true)
   })
 
   it('renders all items returned from graphql query', async () => {
@@ -310,15 +309,16 @@ describe('SearchResult tests', () => {
           url: ''
         }}
       />,
-      { store, history, graphqlMocks: graphqlMock as any }
+      store,
+      graphqlMock
     )
 
     // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
-    testComponent.update()
-    const data = testComponent.find(GridTable).prop('content')
+    testComponent.component.update()
+    const data = testComponent.component.find(GridTable).prop('content')
     expect(data.length).toEqual(6)
   })
 
@@ -352,7 +352,8 @@ describe('SearchResult tests', () => {
           url: ''
         }}
       />,
-      { store, history, graphqlMocks: graphqlMock as any }
+      store,
+      graphqlMock
     )
 
     // wait for mocked data to load mockedProvider
@@ -360,17 +361,22 @@ describe('SearchResult tests', () => {
       setTimeout(resolve, 100)
     })
 
-    testComponent.update()
+    testComponent.component.update()
     expect(
-      testComponent.find('#search-result-error-text').hostNodes().text()
+      testComponent.component
+        .find('#search-result-error-text')
+        .hostNodes()
+        .text()
     ).toBe('An error occurred while searching')
   })
   it('renders empty search page with a header in small devices', async () => {
-    const testSearchResultComponent = await createTestComponent(
-      // @ts-ignore
-      <SearchResult match={{ params: {} }} />,
-      { store, history }
-    )
+    const testSearchResultComponent = (
+      await createTestComponent(
+        // @ts-ignore
+        <SearchResult match={{ params: {} }} />,
+        store
+      )
+    ).component
 
     Object.defineProperty(window, 'innerWidth', {
       writable: true,
@@ -467,7 +473,8 @@ describe('SearchResult tests', () => {
           url: ''
         }}
       />,
-      { store, history, graphqlMocks: graphqlMock as any }
+      store,
+      graphqlMock
     )
 
     // wait for mocked data to load mockedProvider
@@ -475,11 +482,16 @@ describe('SearchResult tests', () => {
       setTimeout(resolve, 100)
     })
 
-    testComponent.update()
-    testComponent.find('#ListItemAction-0-icon').hostNodes().simulate('click')
+    testComponent.component.update()
+    testComponent.component
+      .find('#ListItemAction-0-icon')
+      .hostNodes()
+      .simulate('click')
 
     expect(
-      testComponent.find('#action-loading-ListItemAction-0').hostNodes()
+      testComponent.component
+        .find('#action-loading-ListItemAction-0')
+        .hostNodes()
     ).toHaveLength(1)
   })
 
@@ -565,7 +577,8 @@ describe('SearchResult tests', () => {
           url: ''
         }}
       />,
-      { store, history, graphqlMocks: graphqlMock as any }
+      store,
+      graphqlMock
     )
 
     // wait for mocked data to load mockedProvider
@@ -573,10 +586,10 @@ describe('SearchResult tests', () => {
       setTimeout(resolve, 100)
     })
 
-    testComponent.update()
+    testComponent.component.update()
 
     const reviewButton = await waitForElement(
-      testComponent,
+      testComponent.component,
       '#ListItemAction-0-Review'
     )
 
@@ -665,7 +678,8 @@ describe('SearchResult tests', () => {
           url: ''
         }}
       />,
-      { store, history, graphqlMocks: graphqlMock as any }
+      store,
+      graphqlMock
     )
 
     // wait for mocked data to load mockedProvider
@@ -673,10 +687,10 @@ describe('SearchResult tests', () => {
       setTimeout(resolve, 100)
     })
 
-    testComponent.update()
+    testComponent.component.update()
 
     const updateButton = await waitForElement(
-      testComponent,
+      testComponent.component,
       '#ListItemAction-0-Update'
     )
 
@@ -770,7 +784,8 @@ describe('SearchResult tests', () => {
           url: ''
         }}
       />,
-      { store, history, graphqlMocks: graphqlMock as any }
+      store,
+      graphqlMock
     )
 
     // wait for mocked data to load mockedProvider
@@ -778,10 +793,10 @@ describe('SearchResult tests', () => {
       setTimeout(resolve, 100)
     })
 
-    testComponent.update()
+    testComponent.component.update()
 
     const printButton = await waitForElement(
-      testComponent,
+      testComponent.component,
       '#ListItemAction-0-Print'
     )
 
@@ -876,7 +891,8 @@ describe('SearchResult tests', () => {
           url: ''
         }}
       />,
-      { store, history, graphqlMocks: graphqlMock as any }
+      store,
+      graphqlMock
     )
 
     // wait for mocked data to load mockedProvider
@@ -884,10 +900,10 @@ describe('SearchResult tests', () => {
       setTimeout(resolve, 100)
     })
 
-    testComponent.update()
+    testComponent.component.update()
 
     const duplicateButton = await waitForElement(
-      testComponent,
+      testComponent.component,
       '#ListItemAction-0-Review'
     )
 
@@ -982,7 +998,8 @@ describe('SearchResult tests', () => {
           url: ''
         }}
       />,
-      { store, history, graphqlMocks: graphqlMock as any }
+      store,
+      graphqlMock
     )
 
     // wait for mocked data to load mockedProvider
@@ -990,10 +1007,10 @@ describe('SearchResult tests', () => {
       setTimeout(resolve, 100)
     })
 
-    testComponent.update()
+    testComponent.component.update()
 
     const reviewButton = await waitForElement(
-      testComponent,
+      testComponent.component,
       '#ListItemAction-0-Review'
     )
 

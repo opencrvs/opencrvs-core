@@ -38,10 +38,8 @@ describe('Team search test', () => {
     let app: ReactWrapper
 
     beforeAll(async () => {
-      app = await createTestComponent(<TeamSearch history={history} />, {
-        store,
-        history
-      })
+      app = (await createTestComponent(<TeamSearch history={history} />, store))
+        .component
       app.update()
     })
 
