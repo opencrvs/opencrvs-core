@@ -166,6 +166,20 @@ describe('verify corrector tests', () => {
         expect(testComponent.find('#idVerifier').hostNodes()).toHaveLength(1)
       })
 
+      it('clicking on yes button takes user to review certificate', () => {
+        Date.now = jest.fn(() => 243885600000)
+
+        testComponent
+          .find('#idVerifier')
+          .find('#verifyPositive')
+          .hostNodes()
+          .simulate('click')
+
+        testComponent.update()
+
+        expect(history.location.pathname).not.toContain('/verify')
+      })
+
       it('clicking on no button shows up modal', () => {
         testComponent
           .find('#idVerifier')
