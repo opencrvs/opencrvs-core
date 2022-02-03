@@ -17,7 +17,7 @@ on:
 jobs:
   push-deploy-e2e:
     runs-on: ubuntu-20.04
-    timeout-minutes: 30
+    timeout-minutes: 60
     strategy:
       matrix:
         node-version: [14.17.0]
