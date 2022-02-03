@@ -62,7 +62,7 @@ import {
   isFreeOfCost,
   isCertificateForPrintInAdvance
 } from '@client/views/PrintCertificate/utils'
-import { StyledSpinner } from '@client/views/RegistrationHome/RegistrationHome'
+import { StyledSpinner } from '@client/views/OfficeHome/OfficeHome'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
 import { flatten, cloneDeep, get, isEqual } from 'lodash'
