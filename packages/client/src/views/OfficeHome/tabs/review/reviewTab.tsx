@@ -266,7 +266,6 @@ class ReviewTabComponent extends React.Component<
   render() {
     const { intl, queryData, page, onPageChange } = this.props
     const { data } = queryData
-
     return (
       <HomeContent>
         <ReactTooltip id="validateTooltip">

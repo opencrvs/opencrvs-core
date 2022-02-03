@@ -106,7 +106,7 @@ export class Content extends React.Component<IProps> {
       <Container size={size as string}>
         <Header>
           <TitleContainer>
-            {icon && <Icon>{icon}</Icon>}
+            {icon && <Icon>{icon()}</Icon>}
             {title && <Title>{title}</Title>}
           </TitleContainer>
           {topActionButtons && <TopActionBar>{topActionButtons}</TopActionBar>}

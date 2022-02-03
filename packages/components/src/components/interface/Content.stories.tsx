@@ -33,7 +33,7 @@ const Template: Story<IProps> = (args) => (
 )
 export const ContentView = Template.bind({})
 ContentView.args = {
-  icon: <ApplicationIcon />,
+  icon: () => <ApplicationIcon />,
   title: 'Register',
   topActionButtons: [
     <SecondaryButton

@@ -250,7 +250,7 @@ export const NavigationView = (props: IFullProps) => {
     ? match.params.tabId
     : activeMenuItem
     ? activeMenuItem
-    : 'review'
+    : !window.location.href.includes('recordAudit') && 'review'
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
   const { loading, error, data, initialSyncDone } = workqueue
   const filteredData = filterProcessingApplicationsFromQuery(

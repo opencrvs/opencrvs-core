@@ -76,7 +76,8 @@ import {
   GQLDeathEventSearchSet,
   GQLEventSearchSet,
   GQLHumanName,
-  GQLQuery
+  GQLQuery,
+  GQLEventSearchResultSet
 } from '@opencrvs/gateway/src/graphql/schema'
 import moment from 'moment'
 import * as React from 'react'

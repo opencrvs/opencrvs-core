@@ -373,7 +373,7 @@ type EventRegResultSet {
 }
 
 type EventSearchResultSet {
-  results: [EventSearchSet]
+  results: [DeathEventSearchSet | BirthEventSearchSet]
   totalItems: Int
 }
 
