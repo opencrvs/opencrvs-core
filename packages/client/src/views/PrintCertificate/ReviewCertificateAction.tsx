@@ -120,7 +120,7 @@ type IProps = {
   userDetails: IUserDetails | null
   countries: IAvailableCountries[]
   registerForm: IForm
-  resources: IOfflineData
+  offlineCountryConfig: IOfflineData
   goBack: typeof goBack
   modifyApplication: typeof modifyApplication
   writeApplication: typeof writeApplication
@@ -149,7 +149,7 @@ class ReviewCertificateActionComponent extends React.Component<
         this.props.intl,
         this.props.draft,
         this.props.userDetails,
-        this.props.resources,
+        this.props.offlineCountryConfig,
         (base64PDF: string) => {
           this.setState({
             certificatePdf: base64PDF
@@ -206,7 +206,7 @@ class ReviewCertificateActionComponent extends React.Component<
       this.props.intl,
       draft,
       this.props.userDetails,
-      this.props.resources,
+      this.props.offlineCountryConfig,
       this.props.countries
     )
     this.props.modifyApplication(draft)
@@ -343,7 +343,7 @@ function mapStatetoProps(
     countries: getCountryTranslations(state.i18n.languages, countries),
     drafts: state.applicationsState,
     userDetails: getUserDetails(state),
-    resources: getOfflineData(state),
+    offlineCountryConfig: getOfflineData(state),
     registerForm: getEventRegisterForm(state, event)
   }
 }

@@ -11,7 +11,7 @@ set -e
 
 yarn global add wait-on
 echo "wait-on https://register.opencrvs-staging.jembi.org/" && wait-on -l https://register.opencrvs-staging.jembi.org/
-git clone https://github.com/opencrvs/opencrvs-zambia.git
-cd opencrvs-zambia
+git clone https://github.com/opencrvs/opencrvs-farajaland.git
+cd opencrvs-farajaland
 yarn install
 yarn e2e --record false

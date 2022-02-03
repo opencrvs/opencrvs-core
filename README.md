@@ -54,6 +54,8 @@
 
 ## Important! Please read
 
+The following instructions will guide you on how to set up a **local, demo development environment of OpenCRVS** using our fictional country configuration: "Farajaland".
+
 In order to run OpenCRVS, we expect that you have a working knowledge of Linux / Unix operating systems and can run terminal commands.
 
 OpenCRVS consists of multiple servers which run in Docker containers and requires Node JS. You should be familiar with the concepts of Docker and Node JS web application software development.
@@ -76,20 +78,22 @@ Dependencies are required. Ensure you have satisfied all the following requireme
 
 ## Install OpenCRVS
 
+The following instructions will guide you on how to set up a **local, demo development environment of OpenCRVS** using our fictional country configuration: "Farajaland". To deploy OpenCRVS onto a publicly accessible server, follow [these instructions](https://github.com/opencrvs/opencrvs-core/tree/develop/infrastructure/server-setup).
+
 1. Check you have installed all the dependencies. See above.
-2. Run `git clone[https://github.com/opencrvs/opencrvs-core.git](https://github.com/opencrvs/opencrvs-core.git)`
-3. Run `git checkout master`
-4. Run `cd opencrvs-core`
+2. Run `git clone https://github.com/opencrvs/opencrvs-core.git`
+3. Run `cd opencrvs-core`
+4. Run `git checkout master`
 5. Run `bash setup.sh` (takes 10-15 minutes)
 
    This installer script will:
 
    - Tests your dependencies
-   - Checks that required ports are available. NOTE: Latest Macbooks run AirPlay on port 5000. Some Mac users need to disable AirPlay when running OpenCRVS.
+   - Checks that required ports are available. **NOTE: MacOS Monterey runs AirPlay on port 5000. Mac Monterey users need to disable AirPlay in System Preferences in order to run OpenCRVS.**
    - Download and install all Docker images
    - Check out the example OpenCRVS country configuration
    - Runs all OpenCRVS Core microservices
-   - Run the OpenCRVS Zambia country configuration and populate local databases with Zambia country configuration reference data
+   - Run the OpenCRVS fictional country configuration, "Farajaland" and populate local databases with Farajaland reference data
    - If there are any missing dependencies the script will exit and display instructions. Once the dependency is satisfied, you can try again.
 
 6. On completion you will see the OpenCRVS logo
@@ -126,7 +130,7 @@ Username: **jonathan.campbell** / Password: **test** / SMS code: **000000**
 
 ## Starting and stopping OpenCRVS
 
-After you have installed OpenCRVS. The setup script will have installed the [opencrvs-zambia country configuration](https://github.com/opencrvs/opencrvs-zambia) in a directory alongside opencrvs-core. The country configuration is a separate server that must be started and stopped alongside opencrvs-core.
+After you have installed OpenCRVS. The setup script will have installed the [opencrvs-farajaland country configuration](https://github.com/opencrvs/opencrvs-farajaland) in a directory alongside opencrvs-core. The country configuration is a separate server that must be started and stopped alongside opencrvs-core.
 
 To start and stop opencrvs-core and the country configuration server, use the following commands.
 
@@ -144,13 +148,13 @@ To start and stop opencrvs-core and the country configuration server, use the fo
    Wait for the OpenCRVS client app to build completely (output will stop and you will see the message: @opencrvs/client: Compiled with warnings. Along with TypeScript/Node dependency warnings... ), then OpenCRVS Core will be available.
 
 5. Open a new terminal window
-6. Run `cd ../opencrvs-zambia`
+6. Run `cd ../opencrvs-farajaland`
 7. Run `yarn dev <!-- paste in the absolute path to your opencrvs-core directory here -->` to start the country configuration server
 
 ### Stopping
 
 1. Press Ctrl+c in the opencrvs-core terminal
-2. Press Ctrl+c in the opencrvs-zambia terminal
+2. Press Ctrl+c in the opencrvs-farajaland terminal
 
 ## Other servers
 
@@ -179,7 +183,7 @@ OpenHIM is designed to ease interoperability between OpenCRVS and external syste
 
 ## Configuring OpenCRVS
 
-A companion example country configuration for Zambia is checked out for you automatically using our setup script above. This country configuration server runs alongside opencrvs-core and serves languages, form configuration, logo files, adminisrative structure (jurisdictions and offices) etc. To see the code, learn more and fork for your requirements, visit the repo. [opencrvs-zambia](https://github.com/opencrvs/opencrvs-zambia).
+A companion example country configuration for Farajaland is checked out for you automatically using our setup script above. This country configuration server runs alongside opencrvs-core and serves languages, form configuration, logo files, adminisrative structure (jurisdictions and offices) etc. To see the code, learn more and fork for your requirements, visit the repo. [opencrvs-farajaland](https://github.com/opencrvs/opencrvs-farajaland).
 
 ## What are the key OpenSource dependencies of OpenCRVS?
 
@@ -338,7 +342,7 @@ In remote areas, registrars can save a configurable number of registrations offl
 
 Besides the thorough Jest unit testing coverage on opencrvs-core, we supply e2e UI test scripts using [Cypress](https://www.cypress.io/).
 
-Because the OpenCRVS UI is completely configurable to your country, the end-to-end testing scripts are located in the [example country configuration server for Zambia.](https://github.com/opencrvs/opencrvs-zambia/tree/master/cypress)
+Because the OpenCRVS UI is completely configurable to your country, the end-to-end testing scripts are located in the [example country configuration server for Farajaland.](https://github.com/opencrvs/opencrvs-farajaland/tree/master/cypress)
 
 <br>
 

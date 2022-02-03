@@ -11,7 +11,7 @@
  */
 import fetch from 'node-fetch'
 import { IAuthHeader } from '@metrics/features/registration'
-import { fhirUrl, RESOURCE_URL, SEARCH_URL } from '@metrics/constants'
+import { fhirUrl, COUNTRY_CONFIG_URL, SEARCH_URL } from '@metrics/constants'
 
 export function fetchFHIR<T = any>(
   suffix: string,
@@ -28,10 +28,10 @@ export function fetchFHIR<T = any>(
     },
     body
   })
-    .then(response => {
+    .then((response) => {
       return response.json() as Promise<T>
     })
-    .catch(error => {
+    .catch((error) => {
       return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
     })
 }
@@ -88,7 +88,7 @@ export function fetchFromResource(
   method: string = 'GET',
   body?: string
 ) {
-  const url = [RESOURCE_URL.replace(/\/$/, ''), suffix].join('/')
+  const url = [COUNTRY_CONFIG_URL.replace(/\/$/, ''), suffix].join('/')
   return fetch(url, {
     method,
     headers: {
@@ -96,10 +96,10 @@ export function fetchFromResource(
     },
     body
   })
-    .then(response => {
+    .then((response) => {
       return response.json()
     })
-    .catch(error => {
+    .catch((error) => {
       return Promise.reject(
         new Error(`RESOURCE request failed: ${error.message}`)
       )
@@ -114,10 +114,10 @@ export function fetchAllFromSearch(authHeader: IAuthHeader) {
       ...authHeader
     }
   })
-    .then(response => {
+    .then((response) => {
       return response.json()
     })
-    .catch(error => {
+    .catch((error) => {
       return Promise.reject(
         new Error(`Search request failed: ${error.message}`)
       )

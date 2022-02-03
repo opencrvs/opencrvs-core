@@ -27,7 +27,7 @@ import { IFooterFColumn } from '@opencrvs/components/lib/interface/GridTable/typ
 import { get } from 'lodash'
 
 interface IStateProps {
-  offlineResources: IOfflineData
+  offlineCountryConfiguration: IOfflineData
 }
 
 type FullProps = {
@@ -44,7 +44,7 @@ class Estimated45DayRegistrationReportComponent extends React.Component<FullProp
         this.props.data.details.map((registrationIn45Day) => {
           const location = getLocationFromPartOfLocationId(
             registrationIn45Day.locationId,
-            this.props.offlineResources
+            this.props.offlineCountryConfiguration
           ).name
           return !registrationIn45Day.estimatedRegistration ||
             registrationIn45Day.estimatedRegistration <= 0
@@ -149,7 +149,7 @@ class Estimated45DayRegistrationReportComponent extends React.Component<FullProp
 export const Estimated45DayRegistrationReports = connect(
   (store: IStoreState) => {
     return {
-      offlineResources: getOfflineData(store)
+      offlineCountryConfiguration: getOfflineData(store)
     }
   },
   {}

@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 const proxy = require('http-proxy-middleware')
-module.exports = function(app) {
+module.exports = function (app) {
   app.use(
     '/gateway',
     proxy({
@@ -22,12 +22,12 @@ module.exports = function(app) {
     })
   )
   app.use(
-    '/resources',
+    '/countryconfig',
     proxy({
       target: 'http://localhost:3040/bgd',
       changeOrigin: true,
       pathRewrite: {
-        '^/resources': '/'
+        '^/countryconfig': '/'
       }
     })
   )
