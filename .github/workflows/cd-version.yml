@@ -30,8 +30,7 @@ jobs:
       - name: Get COUNTRY_CONFIG_VERSION
         run: |
           cd opencrvs-farajaland
-          export COUNTRY_CONFIG_VERSION=$(git rev-parse --short HEAD)
-          echo "::set-env name=COUNTRY_CONFIG_VERSION::$COUNTRY_CONFIG_VERSION"
+          echo "COUNTRY_CONFIG_VERSION=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
           cd ../
       - name: Login to DockerHub
         uses: docker/login-action@v1
@@ -47,7 +46,7 @@ jobs:
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
       - name: Deploy to development
         run: |
-          yarn deploy:staging farajaland-staging.opencrvs.org $(git rev-parse --short HEAD) $COUNTRY_CONFIG_VERSION opencrvs-farajaland
+          yarn deploy:staging farajaland-staging.opencrvs.org $(git rev-parse --short HEAD) ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland
       - name: Run Cypress tests
         uses: cypress-io/github-action@v2
         with:
