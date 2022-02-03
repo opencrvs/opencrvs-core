@@ -169,7 +169,6 @@ describe('verify corrector tests', () => {
 
       it('clicking on yes button takes user to review certificate', () => {
         Date.now = jest.fn(() => 243885600000)
-        console.log(testComponent.debug())
 
         testComponent
           .find('#idVerifier')
