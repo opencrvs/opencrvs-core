@@ -15,7 +15,7 @@ import { ReactWrapper } from 'enzyme'
 import { createStore } from '@client/store'
 import { createTestComponent } from '@client/tests/util'
 
-const { store } = createStore()
+const { store, history } = createStore()
 const mockHandleEdit = jest.fn()
 const mockHandleClose = jest.fn()
 
@@ -28,9 +28,9 @@ describe('when user is in the review page', () => {
         handleEdit={mockHandleEdit}
         handleClose={mockHandleClose}
       />,
-      store
+      { store, history }
     )
-    editComponent = testComponent.component
+    editComponent = testComponent
   })
 
   it('renders edit confirmation dialog', () => {

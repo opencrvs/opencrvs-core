@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
+import { Hamburger } from '../../../icons/Hamburger'
 import styled from 'styled-components'
 import { CircleButton } from '../../../buttons'
 
@@ -78,8 +79,9 @@ class MobileHeader extends React.Component<IMobileHeaderProps> {
               dark={true}
               color="#fff"
             >
-              {mobileLeft.icon()}
+              <Hamburger />
             </CircleButton>
+            {mobileLeft.icon()}
           </EndComponentContainer>
         )}
 
