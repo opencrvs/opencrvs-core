@@ -10,24 +10,15 @@
 set -e
 
 print_usage_and_exit () {
-<<<<<<< HEAD
-    echo 'Usage: ./deploy.sh --clear-data=yes|no --restore-metadata=yes|no --update-metadata=yes|no HOST ENV VERSION COUNTRY_CONFIG_VERSION RESOURCES_PATH'
-=======
-    echo 'Usage: ./deploy.sh --clear-data=yes|no --restore-metadata=yes|no --update-metadata=yes|no HOST ENV VERSION COUNTRY_CONFIG_PATH'
->>>>>>> develop
+    echo 'Usage: ./deploy.sh --clear-data=yes|no --restore-metadata=yes|no --update-metadata=yes|no HOST ENV VERSION COUNTRY_CONFIG_VERSION COUNTRY_CONFIG_PATH'
     echo "  --clear-data must have a value of 'yes' or 'no' set e.g. --clear-data=yes"
     echo "  --restore-metadata must have a value of 'yes' or 'no' set e.g. --restore-metadata=yes"
     echo "  --update-metadata must have a value of 'yes' or 'no' set e.g. --update-metadata=yes"
     echo "  ENV can be 'production' or 'development' or 'qa'"
     echo '  HOST    is the server to deploy to'
-<<<<<<< HEAD
     echo "  VERSION can be any OpenCRVS Core docker image tag or 'latest'"
     echo "  COUNTRY_CONFIG_VERSION can be any OpenCRVS Country Configuration docker image tag or 'latest'"
-    echo "  RESOURCES_PATH path to where your resources package is located"
-=======
-    echo "  VERSION can be any docker image tag or 'latest'"
-    echo "  COUNTRY_CONFIG_PATH path to where your configuration package is located"
->>>>>>> develop
+    echo "  COUNTRY_CONFIG_PATH path to where your resources package is located"
     exit 1
 }
 
