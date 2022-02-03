@@ -1061,7 +1061,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const {
       draft: { data, originalData }
     } = this.props
-    if (!originalData) return false
+    if (!originalData || !data[section.id] || !originalData[section.id]) {
+      return false
+    }
     if (
       data[section.id][field.name] &&
       (data[section.id][field.name] as IFormData).value
