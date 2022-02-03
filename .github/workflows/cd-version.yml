@@ -54,7 +54,7 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           project: ./cypress
-          command-prefix: yarn dlx
+          command-prefix: yarn
           browser: chrome
           headless: true
           record: false
