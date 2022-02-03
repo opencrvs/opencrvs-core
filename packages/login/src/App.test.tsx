@@ -24,6 +24,7 @@ describe('Login app step one', () => {
     app = appBundle.app
     window.config = {
       AUTH_API_URL: 'http://localhost:4040/',
+      CONFIG_API_URL: 'http://localhost:2021/',
       COUNTRY: 'zmb',
       LANGUAGES: 'en',
       CLIENT_APP_URL: 'http://localhost:3000/',
