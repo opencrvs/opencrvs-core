@@ -9,6 +9,11 @@
 # graphic logo are (registered/a) trademark(s) of Plan International.
 name: Continuous Delivery And E2E Tests Performed On Staging
 
+env:
+  CYPRESS_LOGIN_URL: https://login.farajaland-staging.opencrvs.org/
+  CYPRESS_CLIENT_URL: https://client.farajaland-staging.opencrvs.org/
+  CYPRESS_AUTH_URL: https://auth.farajaland-staging.opencrvs.org/
+
 on:
   push:
     branches:
@@ -52,4 +57,4 @@ jobs:
           cd opencrvs-farajaland
           yarn install
           npm install -g cypress
-          cypress run --env CYPRESS_LOGIN_URL=https://login.farajaland-staging.opencrvs.org/,CYPRESS_CLIENT_URL=https://client.farajaland-staging.opencrvs.org/,CYPRESS_AUTH_URL=https://auth.farajaland-staging.opencrvs.org/ --headless --browser chrome
+          cypress run --headless --browser chrome
