@@ -307,9 +307,6 @@ export const NavigationView = (props: IFullProps) => {
               data?: any
               error?: any
             }) => {
-              if (error) {
-                console.log(error)
-              }
               if (loading) {
                 return (
                   <StyledSpinner
