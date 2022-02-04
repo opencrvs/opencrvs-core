@@ -13,16 +13,12 @@ import { createStore } from '@client/store'
 import {
   createRouterProps,
   createTestComponent,
-  flushPromises,
-  mockApplicationData,
-  mockDeathApplicationData
+  mockApplicationData
 } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
-import { waitForElement } from '@client/tests/wait-for-element'
 import { CorrectionSection, Event } from '@client/forms'
 import { IApplication, storeApplication } from '@client/applications'
-import { SupportingDocumentsForm } from './SupportingDocumentsForm'
 import { formatUrl } from '@client/navigation'
 import { CERTIFICATE_CORRECTION } from '@client/navigation/routes'
 import { CorrectionForm } from './CorrectionForm'
@@ -33,12 +29,6 @@ const birthApplication: IApplication = {
   id: '72c18939-70c1-40b4-9b80-b162c4871160',
   data: mockApplicationData,
   event: Event.BIRTH
-}
-
-const deathApplication: IApplication = {
-  id: '72c18939-70c1-40b4-9b80-b162c4871161',
-  data: mockDeathApplicationData,
-  event: Event.DEATH
 }
 
 const { store, history } = createStore()
@@ -67,7 +57,6 @@ describe('for an application', () => {
         history
       }
     )
-    await waitForElement(wrapper, '#corrector_form')
   })
 
   it('should disable the continue button', () => {

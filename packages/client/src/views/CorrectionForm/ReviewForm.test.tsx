@@ -9,15 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createStore, IStoreState, AppStore } from '@client/store'
-import {
-  createTestComponent,
-  mockApplicationData,
-  createRouterProps,
-  createTestApp
-} from '@client/tests/util'
+import { mockApplicationData, createTestApp } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
-import * as React from 'react'
 import { Event, ReviewSection } from '@client/forms'
 import {
   IApplication,

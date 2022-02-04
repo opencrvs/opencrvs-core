@@ -19,7 +19,6 @@ import {
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { CorrectorForm } from './CorrectorForm'
-import { waitForElement } from '@client/tests/wait-for-element'
 import { Event, CorrectionSection } from '@client/forms'
 import { IApplication, storeApplication } from '@client/applications'
 import { CorrectionForm } from './CorrectionForm'
@@ -67,7 +66,6 @@ describe('Corrector form', () => {
           history
         }
       )
-      await waitForElement(wrapper, '#corrector_form')
     })
 
     it('should disable the continue button if no option is selected', () => {
@@ -106,8 +104,6 @@ describe('Corrector form', () => {
           history
         }
       )
-
-      await waitForElement(wrapper, '#corrector_form')
     })
     it('should show the father option', () => {
       expect(wrapper.find('#relationship_FATHER').hostNodes()).toHaveLength(1)
@@ -133,8 +129,6 @@ describe('Corrector form', () => {
           history
         }
       )
-
-      await waitForElement(wrapper, '#corrector_form')
     })
     it('should not show the father option', () => {
       expect(wrapper.exists('#relationship_FATHER')).toBeFalsy()
@@ -160,8 +154,6 @@ describe('Corrector form', () => {
           history
         }
       )
-
-      await waitForElement(wrapper, '#corrector_form')
     })
     it('should not show the father option', () => {
       expect(wrapper.exists('#relationship_FATHER')).toBeFalsy()
@@ -187,8 +179,6 @@ describe('Corrector form', () => {
           history
         }
       )
-
-      await waitForElement(wrapper, '#corrector_form')
     })
     it('should not show the mother option', () => {
       expect(wrapper.exists('#relationship_MOTHER')).toBeFalsy()
@@ -219,7 +209,6 @@ describe('Corrector form', () => {
           history
         }
       )
-      await waitForElement(wrapper, '#corrector_form')
     })
 
     it('should disable the continue button if no option is selected', () => {
@@ -264,7 +253,6 @@ describe('Corrector form', () => {
           history
         }
       )
-      await waitForElement(wrapper, '#corrector_form')
     })
 
     it('should disable the continue button if others option is selected without specifying the relationship', () => {
@@ -278,7 +266,7 @@ describe('Corrector form', () => {
       ).toBeTruthy()
     })
 
-    it('should disable the continue button if others option is selected with the relationship specified', () => {
+    it('should not disable the continue button if others option is selected with the relationship specified', () => {
       wrapper
         .find('#relationship_OTHERS')
         .hostNodes()
