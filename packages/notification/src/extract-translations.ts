@@ -31,26 +31,26 @@ function existsInContentful(obj: any, value: string): boolean {
 }
 
 async function extractMessages() {
-  const RESOURCES_PATH = process.argv[2]
+  const COUNTRY_CONFIG_PATH = process.argv[2]
   const COUNTRY_CODE = process.argv[3]
   const notification = JSON.parse(
     fs
       .readFileSync(
-        `${RESOURCES_PATH}/src/${COUNTRY_CODE}/features/languages/generated/notification/notification.json`
+        `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/notification/notification.json`
       )
       .toString()
   )
   const contentfulIds = JSON.parse(
     fs
       .readFileSync(
-        `${RESOURCES_PATH}/src/${COUNTRY_CODE}/features/languages/generated/notification/contentful-ids.json`
+        `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/notification/contentful-ids.json`
       )
       .toString()
   )
   const descriptions: IMessageDescriptions = JSON.parse(
     fs
       .readFileSync(
-        `${RESOURCES_PATH}/src/${COUNTRY_CODE}/features/languages/generated/notification/descriptions.json`
+        `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/notification/descriptions.json`
       )
       .toString()
   )
@@ -63,7 +63,7 @@ async function extractMessages() {
     console.log(
       `${chalk.yellow('Checking translations in notification service ...')}`
     )
-    Object.keys(messageKeys).forEach(messageKey => {
+    Object.keys(messageKeys).forEach((messageKey) => {
       const contentfulKeysToMigrate: string[] = []
 
       let missingKeys = false
@@ -76,7 +76,7 @@ async function extractMessages() {
             `No English translation key exists for messageKey.  Remeber to translate and add for all locales!!!: ${chalk.white(
               messageKey
             )} in ${chalk.white(
-              `${RESOURCES_PATH}/src/${COUNTRY_CODE}/features/languages/generated/notification/notification.json`
+              `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/notification/notification.json`
             )}`
           )}`
         )
@@ -95,7 +95,7 @@ async function extractMessages() {
           `${chalk.yellow(
             'This key must be migrated into your Contentful CMS.  Saving to ...'
           )} in ${chalk.white(
-            `${RESOURCES_PATH}/src/${COUNTRY_CODE}/features/languages/generated/notification/contentful-keys-to-migrate.json`
+            `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/notification/contentful-keys-to-migrate.json`
           )}`
         )
         contentfulKeysToMigrate.push(messageKey)
@@ -108,7 +108,7 @@ async function extractMessages() {
             `No description exists for messageKey: ${chalk.white(
               messageKey
             )} in ${chalk.white(
-              `${RESOURCES_PATH}/src/${COUNTRY_CODE}/features/languages/generated/notification/descriptions.json`
+              `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/notification/descriptions.json`
             )}`
           )}`
         )
@@ -126,7 +126,7 @@ async function extractMessages() {
       }
 
       fs.writeFileSync(
-        `${RESOURCES_PATH}/src/${COUNTRY_CODE}/features/languages/generated/notification/contentful-keys-to-migrate.json`,
+        `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/notification/contentful-keys-to-migrate.json`,
         JSON.stringify(contentfulKeysToMigrate, null, 2)
       )
     })
