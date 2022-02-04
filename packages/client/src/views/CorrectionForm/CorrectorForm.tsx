@@ -29,7 +29,7 @@ import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/correction'
 import { Content } from '@opencrvs/components/lib/interface/Content'
-import { sectionHasError } from './utils'
+import { groupHasError } from './utils'
 
 type IProps = {
   application: IApplication
@@ -145,7 +145,7 @@ function CorrectorFormComponent(props: IFullProps) {
       id="confirm_form"
       key="confirm_form"
       onClick={continueButtonHandler}
-      disabled={sectionHasError(group, section, application)}
+      disabled={groupHasError(group, application.data[section.id])}
     >
       {intl.formatMessage(buttonMessages.continueButton)}
     </PrimaryButton>

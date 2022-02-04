@@ -1,7 +1,3 @@
-import { IFormSectionGroup, IFormSection } from '@client/forms'
-import { IApplication } from '@client/applications'
-import { getValidationErrorsForForm } from '@client/forms/validation'
-
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -13,15 +9,15 @@ import { getValidationErrorsForForm } from '@client/forms/validation'
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export function sectionHasError(
+import { IFormSectionGroup, IFormSectionData } from '@client/forms'
+import { IApplication, SUBMISSION_STATUS } from '@client/applications'
+import { getValidationErrorsForForm } from '@client/forms/validation'
+
+export function groupHasError(
   group: IFormSectionGroup,
-  section: IFormSection,
-  application: IApplication
+  sectionData: IFormSectionData
 ) {
-  const errors = getValidationErrorsForForm(
-    group.fields,
-    application.data[section.id] || {}
-  )
+  const errors = getValidationErrorsForForm(group.fields, sectionData || {})
 
   for (const field of group.fields) {
     const fieldErrors = errors[field.name].errors
@@ -46,4 +42,8 @@ export function sectionHasError(
   }
 
   return false
+}
+
+export function isCorrection(application: IApplication) {
+  return application.registrationStatus === SUBMISSION_STATUS.REGISTERED
 }
