@@ -50,23 +50,21 @@ describe('signature upload tests', () => {
 
   describe('when user is in signature upload form page', () => {
     beforeEach(async () => {
-      testComponent = (
-        await createTestComponent(
-          // @ts-ignore
-          <CreateNewUser
-            match={{
-              params: {
-                sectionId: mockOfflineData.forms.userForm.sections[0].id,
-                groupId: mockOfflineData.forms.userForm.sections[0].groups[2].id
-              },
-              isExact: true,
-              path: '/createUser',
-              url: ''
-            }}
-          />,
-          store
-        )
-      ).component
+      testComponent = await createTestComponent(
+        // @ts-ignore
+        <CreateNewUser
+          match={{
+            params: {
+              sectionId: mockOfflineData.forms.userForm.sections[0].id,
+              groupId: mockOfflineData.forms.userForm.sections[0].groups[2].id
+            },
+            isExact: true,
+            path: '/createUser',
+            url: ''
+          }}
+        />,
+        { store, history }
+      )
     })
 
     it('show the signature form page', async () => {
@@ -140,24 +138,28 @@ describe('signature upload tests', () => {
   describe('when user in review page', () => {
     beforeEach(async () => {
       store.dispatch(modifyUserFormData(mockDataWithRegistarRoleSelected))
-      testComponent = (
-        await createTestComponent(
-          // @ts-ignore
-          <CreateNewUser
-            match={{
-              params: {
-                sectionId: mockOfflineData.forms.userForm.sections[1].id,
-                groupId: mockOfflineData.forms.userForm.sections[1].groups[0].id
-              },
-              isExact: true,
-              path: '/createUser',
-              url: ''
-            }}
-          />,
+      testComponent = await createTestComponent(
+        // @ts-ignore
+        <CreateNewUser
+          match={{
+            params: {
+              sectionId: mockOfflineData.forms.userForm.sections[1].id,
+              groupId: mockOfflineData.forms.userForm.sections[1].groups[0].id
+            },
+            isExact: true,
+            path: '/createUser',
+            url: ''
+          }}
+        />,
+        {
           store,
-          [mockFetchRoleGraphqlOperation, mockUserGraphqlOperation]
-        )
-      ).component
+          history,
+          graphqlMocks: [
+            mockFetchRoleGraphqlOperation,
+            mockUserGraphqlOperation
+          ]
+        }
+      )
     })
 
     it('renders review header', () => {

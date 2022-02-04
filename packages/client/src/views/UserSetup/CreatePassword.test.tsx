@@ -15,7 +15,7 @@ import { createStore } from '@client/store'
 import { CreatePassword } from './CreatePassword'
 import { ReactWrapper } from 'enzyme'
 
-const { store } = createStore()
+const { store, history } = createStore()
 
 describe('CreatePassword page tests', () => {
   let component: ReactWrapper
@@ -23,10 +23,10 @@ describe('CreatePassword page tests', () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
       <CreatePassword goToStep={() => {}} setupData={{ userId: '123' }} />,
-      store
+      { store, history }
     )
 
-    component = testComponent.component
+    component = testComponent
   })
 
   it('it shows passwords missmatch error when Continue button is pressed', async () => {

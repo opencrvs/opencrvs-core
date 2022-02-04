@@ -29,9 +29,10 @@ describe('Performance home test', () => {
     let app: ReactWrapper
 
     beforeAll(async () => {
-      app = (
-        await createTestComponent(<PerformanceHome history={history} />, store)
-      ).component
+      app = await createTestComponent(<PerformanceHome history={history} />, {
+        store,
+        history
+      })
       app.update()
     })
 
