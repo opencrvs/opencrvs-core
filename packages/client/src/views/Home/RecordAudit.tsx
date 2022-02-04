@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Header } from '@client/components/interface/Header/Header'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import { Navigation } from '@client/components/interface/Navigation'
@@ -20,29 +20,33 @@ import { connect } from 'react-redux'
 import { goToApplicationDetails } from '@client/navigation'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import {
-  IWorkqueue,
-  updateRegistrarWorkqueue,
-  IApplication,
-  SUBMISSION_STATUS
-} from '@client/applications'
+import { IWorkqueue, IApplication } from '@client/applications'
 import { IStoreState } from '@client/store'
 import {
   GQLEventSearchSet,
   GQLBirthEventSearchSet,
-  GQLDeathEventSearchSet
+  GQLDeathEventSearchSet,
+  GQLHumanName
 } from '@opencrvs/gateway/src/graphql/schema'
 import moment from 'moment'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { get } from 'lodash'
-import { IFormSectionData } from '@client/forms'
+import { IFormSectionData, IContactPoint } from '@client/forms'
+import { client } from '@client/utils/apolloClient'
+import { FETCH_APPLICATION_SHORT_INFO } from '@client/views/Home/queries'
+import { Query } from '@client/components/Query'
+import { Spinner } from '@opencrvs/components/lib/interface'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin-left: 265px;
   }
+`
+
+const StyledSpinner = styled(Spinner)`
+  margin: 20% auto;
 `
 
 const InfoContainer = styled.div`
@@ -59,22 +63,27 @@ const KeyContainer = styled.div`
   ${({ theme }) => theme.fonts.bodyBoldStyle}
 `
 
-const ValueContainer = styled.div<{ value: boolean }>`
+const ValueContainer = styled.div<{ value: undefined | string }>`
   width: 325px;
   color: ${({ theme, value }) =>
     value ? theme.colors.grey : theme.colors.grey600};
   ${({ theme }) => theme.fonts.captionBigger};
 `
 
+const GreyedInfo = styled.div`
+  height: 26px;
+  background-color: ${({ theme }) => theme.colors.greyInfo};
+  max-width: 330px;
+`
+
 interface IStateProps {
   workqueue: IWorkqueue
   resources: IOfflineData
-  drafts: IApplication[]
+  savedApplications: IApplication[]
 }
 
 interface IDispatchProps {
   goToApplicationDetails: typeof goToApplicationDetails
-  updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
 }
 
 type IFullProps = IDispatchProps &
@@ -85,19 +94,33 @@ type IFullProps = IDispatchProps &
   }>
 
 interface ILabel {
-  [key: string]: string | false | undefined
+  [key: string]: string | undefined
 }
 
 interface IApplicationData {
   id: string
-  childName?: string
+  name?: string
   status?: string
   trackingId?: string
   type?: string
   dateOfBirth?: string
+  dateOfDeath?: string
   placeOfBirth?: string
+  placeOfDeath?: string
   informant?: string
   informantContact?: string
+  brnDrn?: string
+}
+
+interface IGQLApplication {
+  id: string
+  child?: { name: GQLHumanName[] }
+  deceased?: { name: GQLHumanName[] }
+  registration?: {
+    trackingId: string
+    type: string
+    status: { type: string }[]
+  }
 }
 
 const KEY_LABEL: ILabel = {
@@ -105,8 +128,12 @@ const KEY_LABEL: ILabel = {
   type: 'Event',
   trackingId: 'Tracking ID',
   dateOfBirth: 'Date of birth',
+  dateOfDeath: 'Date of death',
   placeOfBirth: 'Place of birth',
-  informant: 'Informant'
+  placeOfDeath: 'Place of death',
+  informant: 'Informant',
+  brn: 'BRN',
+  drn: 'DRN'
 }
 
 const NO_DATA_LABEL: ILabel = {
@@ -114,68 +141,141 @@ const NO_DATA_LABEL: ILabel = {
   type: 'No event',
   trackingId: 'No tracking id',
   dateOfBirth: 'No date of birth',
+  dateOfDeath: 'No date of death',
   placeOfBirth: 'No place of birth',
+  placeOfDeath: 'No place of death',
   informant: 'No informant'
 }
 
-const isBirthApplication = (
-  reg: GQLEventSearchSet | null
-): reg is GQLBirthEventSearchSet => {
-  return (reg && reg.type === 'Birth') || false
+const getCaptitalizedword = (word: string | undefined): string => {
+  word = word && word.toUpperCase()[0] + word.toLowerCase().slice(1)
+  return word || ''
 }
 
-const getDraftApplications = (props: IFullProps): IApplicationData[] => {
-  const drafts = props.drafts
-  console.log(drafts)
+const isBirthApplication = (
+  application: GQLEventSearchSet | null
+): application is GQLBirthEventSearchSet => {
+  return (application && application.type === 'Birth') || false
+}
+
+const isDeathApplication = (
+  application: GQLEventSearchSet | null
+): application is GQLDeathEventSearchSet => {
+  return (application && application.type == 'Death') || false
+}
+
+const getDraftApplicationName = (application: IApplication): string => {
+  let name = ''
+  const applicationName = application.data.child || application.data.deceased
+  if (applicationName) {
+    if (applicationName.firstNamesEng && applicationName.familyNameEng) {
+      name = applicationName.firstNamesEng + ' ' + applicationName.familyNameEng
+    } else {
+      name =
+        (applicationName.firstNamesEng as string) ||
+        (applicationName.familyNameEng as string) ||
+        ''
+    }
+  }
+  return name
+}
+
+const getWQApplicationName = (application: GQLEventSearchSet): string => {
+  let name = ''
+  const applicationName =
+    (isBirthApplication(application) &&
+      application.childName &&
+      application.childName[0]) ||
+    (isDeathApplication(application) &&
+      application.deceasedName &&
+      application.deceasedName[0])
+
+  if (applicationName) {
+    if (applicationName.firstNames && applicationName.familyName) {
+      name = applicationName.firstNames + ' ' + applicationName.familyName
+    } else {
+      name = applicationName.familyName || applicationName.firstNames || ''
+    }
+  }
+  return name
+}
+
+const getGQLApplicationName = (application: IGQLApplication): string => {
+  let name = ''
+  const applicationName =
+    application && application.child && application.child.name
+      ? application.child.name[0]
+      : application.deceased &&
+        application.deceased.name &&
+        application.deceased.name[0]
+  if (applicationName) {
+    if (
+      (applicationName as GQLHumanName).firstNames &&
+      (applicationName as GQLHumanName).familyName
+    ) {
+      name =
+        (applicationName as GQLHumanName).firstNames +
+        ' ' +
+        (applicationName as GQLHumanName).familyName
+    } else {
+      name =
+        (applicationName as GQLHumanName).familyName ||
+        (applicationName as GQLHumanName).firstNames ||
+        ''
+    }
+  }
+  return name
+}
+
+const getSavedApplications = (props: IFullProps): IApplicationData => {
+  const savedApplications = props.savedApplications
   const applicationId = props.match.params.applicationId
 
-  const applications = drafts
+  const applications = savedApplications
     .filter((application: IApplication) => {
       return application.id === applicationId
     })
     .map((application) => {
-      let name = ''
-      if (application.data.child) {
-        if (
-          application.data.child.firstNamesEng &&
-          application.data.child.familyNameEng
-        ) {
-          name =
-            application.data.child.firstNamesEng +
-            ' ' +
-            application.data.child.familyNameEng
-        } else if (application.data.child.familyNameEng) {
-          name = application.data.child.familyNameEng as string
-        } else if (application.data.child.firstNamesEng) {
-          name = application.data.child.firstNamesEng as string
-        }
-      }
-
+      const name = getDraftApplicationName(application)
       return {
         id: application.id,
-        childName: name,
+        name: name,
         status:
-          (application.data.submissionStatus &&
-            application.data.submissionStatus.toString()) ||
-          (application.data.registrationStatus &&
-            application.data.registrationStatus.toString()) ||
+          (application.submissionStatus &&
+            application.submissionStatus.toString()) ||
+          (application.registrationStatus &&
+            application.registrationStatus.toString()) ||
           '',
-        type:
-          (application.data.event && application.data.event.toString()) || '',
+        type: application.event || '',
+        brnDrn:
+          (application.data.registration &&
+            application.data.registration.registrationNumber &&
+            application.data.registration.registrationNumber.toString()) ||
+          '',
         trackingId:
-          (application.data.contactPoint &&
-            application.data.contactPoint.trackingId &&
-            application.data.contactPoint.trackingId.toString()) ||
+          (application.data.registration &&
+            application.data.registration.trackingId &&
+            application.data.registration.trackingId.toString()) ||
           '',
         dateOfBirth:
           (application.data.child &&
             application.data.child.childBirthDate &&
             application.data.child.childBirthDate.toString()) ||
           '',
+        dateOfDeath:
+          (application.data.deathEvent &&
+            application.data.deathEvent.deathDate &&
+            application.data.deathEvent.deathDate.toString()) ||
+          '',
         placeOfBirth:
           (application.data.child &&
             application.data.child.birthLocation &&
             application.data.child.birthLocation.toString()) ||
+          '',
+        placeOfDeath:
+          (application.data.deathEvent &&
+            application.data.deathEvent.deathLocation &&
+            application.data.deathEvent.deathLocation.toString()) ||
           '',
         informant:
           (application.data.registration &&
@@ -183,14 +283,21 @@ const getDraftApplications = (props: IFullProps): IApplicationData[] => {
             (
               application.data.registration.contactPoint as IFormSectionData
             ).value.toString()) ||
+          '',
+        informantContact:
+          (application.data.registration &&
+            application.data.registration.contactPoint &&
+            ((application.data.registration.contactPoint as IFormSectionData)
+              .nestedFields as IContactPoint) &&
+            (
+              (application.data.registration.contactPoint as IFormSectionData)
+                .nestedFields as IContactPoint
+            ).registrationPhone.toString()) ||
           ''
-        //   informantContact: application.data.registration &&
-        //   application.data.registration.contactPoint &&
-        //   application.data.registration.contactPoint.toString() || '',
       }
     })
-
-  return applications
+  console.log(applications[0])
+  return applications[0]
 }
 
 const getWQApplication = (props: IFullProps): IApplicationData | null => {
@@ -222,81 +329,116 @@ const getWQApplication = (props: IFullProps): IApplicationData | null => {
   })[0]
 
   let applicationData: IApplicationData | null = null
-  let name = ''
   if (specificApplication) {
-    if (
-      isBirthApplication(specificApplication) &&
-      specificApplication.childName &&
-      specificApplication.childName[0]
-    ) {
-      if (
-        specificApplication.childName[0].firstNames &&
-        specificApplication.childName[0].familyName
-      ) {
-        name =
-          specificApplication.childName[0].firstNames +
-          ' ' +
-          specificApplication.childName[0].familyName
-      } else if (specificApplication.childName[0].familyName) {
-        name = specificApplication.childName[0].familyName
-      }
-    }
+    const name = getWQApplicationName(specificApplication)
 
     applicationData = {
       id: specificApplication.id,
-      childName: name,
+      name: name,
       type: (specificApplication.type && specificApplication.type) || '',
-      status: 'In review',
+      status: specificApplication.registration?.status || '',
       trackingId: specificApplication.registration?.trackingId || '',
-      dateOfBirth:
-        (isBirthApplication(specificApplication) &&
-          specificApplication.dateOfBirth) ||
-        '',
-      placeOfBirth:
-        (specificApplication.registration &&
-          specificApplication.registration.eventLocationId &&
-          specificApplication.registration.eventLocationId) ||
-        '',
-      informant:
-        (specificApplication.registration &&
-          specificApplication.registration.contactRelationship +
-            ' . ' +
-            specificApplication.registration.contactNumber) ||
-        ''
+      dateOfBirth: '',
+      placeOfBirth: '',
+      informant: ''
     }
   }
 
   return applicationData
 }
 
+const getGQLApplication = (data: IGQLApplication): IApplicationData => {
+  const application: IApplicationData = {
+    id: data.id,
+    type: data.registration?.type,
+    status: data.registration?.status[0].type,
+    trackingId: data.registration?.trackingId,
+    dateOfBirth: '',
+    placeOfBirth: '',
+    informant: ''
+  }
+  return application
+}
+
 const getApplicationInfo = (
   props: IFullProps,
-  application: IApplicationData
+  application: IApplicationData,
+  isDownloaded: boolean
 ) => {
-  const facility =
-    get(props.resources.facilities, application.placeOfBirth || '') || {}
+  console.log(application.placeOfBirth, application.placeOfDeath)
+  let facility =
+    get(
+      props.resources.facilities,
+      application.placeOfBirth || application.placeOfDeath || ''
+    ) || ''
+  console.log(facility)
+  if (!facility) {
+    facility =
+      get(
+        props.resources.locations,
+        application.placeOfBirth || application.placeOfDeath || ''
+      ) || ''
+  }
+  console.log(facility)
+  let informant =
+    application.informant && getCaptitalizedword(application.informant)
 
-  const info: ILabel = {
-    status: 'In review',
-    type: application.type && application.type,
-    trackingId: application.trackingId,
-    dateOfBirth: application.dateOfBirth,
-    placeOfBirth: facility.alias,
-    informant: application.informant
+  if (application.informantContact) {
+    informant =
+      informant + ' . ' + getCaptitalizedword(application.informantContact)
   }
 
+  let info: ILabel = {
+    status: application.status && getCaptitalizedword(application.status),
+    type: application.type && getCaptitalizedword(application.type),
+    trackingId: application.trackingId
+  }
+
+  if (info.type === 'Birth') {
+    if (application.brnDrn) {
+      info = {
+        ...info,
+        brn: application.brnDrn
+      }
+    }
+    info = {
+      ...info,
+      dateOfBirth: application.dateOfBirth,
+      placeOfBirth: facility.alias,
+      informant: informant
+    }
+  } else if (info.type === 'Death') {
+    if (application.brnDrn) {
+      info = {
+        ...info,
+        drn: application.brnDrn
+      }
+    }
+    info = {
+      ...info,
+      dateOfDeath: application.dateOfDeath,
+      placeOfDeath: facility.alias,
+      informant: informant
+    }
+  }
   return (
     <>
       {Object.entries(info).map(([key, value]) => {
         return (
           <InfoContainer key={key}>
             <KeyContainer>{KEY_LABEL[key]}</KeyContainer>
-            <ValueContainer value={value as boolean}>
-              {value
-                ? key === 'dateOfBirth'
-                  ? moment(new Date(value)).format('MMMM DD, YYYY')
-                  : value
-                : NO_DATA_LABEL[key]}
+            <ValueContainer value={value}>
+              {value ? (
+                key === 'dateOfBirth' || key === 'dateOfDeath' ? (
+                  moment(new Date(value)).format('MMMM DD, YYYY')
+                ) : (
+                  value
+                )
+              ) : isDownloaded ? (
+                NO_DATA_LABEL[key]
+              ) : (
+                <GreyedInfo />
+              )}
             </ValueContainer>
           </InfoContainer>
         )
@@ -306,15 +448,12 @@ const getApplicationInfo = (
 }
 
 export const ShowRecordAudit = (props: IFullProps) => {
-  useEffect(() => {
-    props.updateRegistrarWorkqueue()
-  }, [])
-
+  const applicationId = props.match.params.applicationId
   let application: IApplicationData | null
-  application = getWQApplication(props)
-
-  if (!application) {
-    application = getDraftApplications(props)[0]
+  application = getSavedApplications(props)
+  const isDownloaded = application ? true : false
+  if (!isDownloaded) {
+    application = getWQApplication(props)
   }
 
   return (
@@ -322,14 +461,58 @@ export const ShowRecordAudit = (props: IFullProps) => {
       <Header />
       <Navigation />
       <BodyContainer>
-        {application && (
+        {application ? (
           <Content
-            title={application.childName}
+            title={application.name}
             size={'large'}
             icon={() => <ApplicationIcon />}
           >
-            {getApplicationInfo(props, application)}
+            {getApplicationInfo(props, application, isDownloaded)}
           </Content>
+        ) : (
+          <Query
+            query={FETCH_APPLICATION_SHORT_INFO}
+            variables={{
+              id: applicationId
+            }}
+          >
+            {({
+              loading,
+              error,
+              data
+            }: {
+              loading: any
+              data?: any
+              error?: any
+            }) => {
+              if (error) {
+                console.log(error)
+              }
+              if (loading) {
+                return (
+                  <StyledSpinner
+                    id="field-agent-home-spinner"
+                    baseColor={props.theme.colors.background}
+                  />
+                )
+              }
+              return (
+                <>
+                  <Content
+                    title={getGQLApplicationName(data.fetchRegistration)}
+                    size={'large'}
+                    icon={() => <ApplicationIcon />}
+                  >
+                    {getApplicationInfo(
+                      props,
+                      getGQLApplication(data.fetchRegistration),
+                      isDownloaded
+                    )}
+                  </Content>
+                </>
+              )
+            }}
+          </Query>
         )}
       </BodyContainer>
     </div>
@@ -340,14 +523,9 @@ function mapStateToProps(state: IStoreState): IStateProps {
   return {
     workqueue: state.workqueueState.workqueue,
     resources: getOfflineData(state),
-    drafts:
-      (state.applicationsState.applications &&
-        state.applicationsState.applications.filter(
-          (application: IApplication) =>
-            application.submissionStatus ===
-            SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-        )) ||
-      []
+    savedApplications:
+      state.applicationsState.applications &&
+      state.applicationsState.applications
   }
 }
 
@@ -357,6 +535,5 @@ export const RecordAudit = connect<
   {},
   IStoreState
 >(mapStateToProps, {
-  goToApplicationDetails,
-  updateRegistrarWorkqueue
+  goToApplicationDetails
 })(injectIntl(withTheme(withRouter(ShowRecordAudit))))
