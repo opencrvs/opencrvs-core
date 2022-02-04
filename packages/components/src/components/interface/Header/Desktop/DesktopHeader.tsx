@@ -30,14 +30,11 @@ const HeaderContainer = styled.div`
   top: 0;
   margin-left: 249px;
   z-index: 2;
-  ${({ theme }) => theme.gradients.gradientNightshade};
+  background: ${({ theme }) => theme.colors.white};
 `
 const HeaderRight = styled.div`
-  margin-left: auto;
+  margin: 0 auto;
   display: flex;
-  & > * {
-    margin-left: 8px;
-  }
 `
 
 export class DesktopHeader extends React.Component<IDesktopHeaderProps> {
@@ -46,10 +43,8 @@ export class DesktopHeader extends React.Component<IDesktopHeaderProps> {
 
     return (
       <HeaderContainer>
-        <HeaderRight>
-          {desktopRightMenu &&
-            desktopRightMenu.map((item: IRightMenu) => item.element)}
-        </HeaderRight>
+        {desktopRightMenu &&
+          desktopRightMenu.map((item: IRightMenu) => item.element)}
       </HeaderContainer>
     )
   }

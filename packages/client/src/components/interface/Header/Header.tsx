@@ -14,6 +14,8 @@ import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { constantsMessages, userMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/header'
 import {
+  goBack,
+  goForward,
   goToConfig,
   goToEvents as goToEventsAction,
   goToHome,
@@ -39,9 +41,11 @@ import {
   TRACKING_ID_TEXT
 } from '@client/utils/constants'
 import { getIndividualNameObj, IUserDetails } from '@client/utils/userUtils'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { CircleButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import {
   ArrowBack,
+  BackArrowDeepBlue,
+  ForwardArrowDeepBlue,
   BRN,
   Location,
   Phone,
@@ -74,6 +78,8 @@ type IProps = IntlShapeProps & {
   goToEvents: typeof goToEventsAction
   goToSearch: typeof goToSearch
   goToSettings: typeof goToSettings
+  goBack: typeof goBack
+  goForward: typeof goForward
   goToHomeAction: typeof goToHome
   goToConfigAction: typeof goToConfig
   goToPerformanceHomeAction: typeof goToPerformanceHome
@@ -106,11 +112,45 @@ const StyledPrimaryButton = styled(PrimaryButton)`
   ${({ theme }) => theme.shadows.mistyShadow};
   width: 42px;
   height: 42px;
+  border-radius: 100%;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
 `
 
+const SearchBox = styled.div`
+  position: static;
+  width: 624px;
+  height: 40px;
+  left: calc(50% - 624px / 2 + 24px);
+  top: calc(50% - 40px / 2);
+  background: ${({ theme }) => theme.colors.grey300};
+  box-sizing: border-box;
+  border-radius: 100px;
+  margin: 0px 12px;
+`
+const HeaderCenter = styled.div`
+  padding: 8px 16px;
+  height: 64px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background: ${({ theme }) => theme.colors.white};
+`
+const HeaderLeft = styled.div`
+  padding: 8px 16px;
+  height: 64px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+  background: ${({ theme }) => theme.colors.white};
+`
+const HeaderRight = styled.div`
+  padding: 8px 16px;
+  height: 64px;
+  background: ${({ theme }) => theme.colors.white};
+`
 class HeaderComp extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props)
@@ -259,16 +299,18 @@ class HeaderComp extends React.Component<IProps, IState> {
     ]
 
     return (
-      <SearchTool
-        key="searchMenu"
-        language={language}
-        searchText={searchText}
-        selectedSearchType={selectedSearchType}
-        searchTypeList={searchTypeList}
-        searchHandler={(text, type) =>
-          props.goToSearchResult(text, type, isMobile)
-        }
-      />
+      <SearchBox>
+        <SearchTool
+          key="searchMenu"
+          language={language}
+          searchText={searchText}
+          selectedSearchType={selectedSearchType}
+          searchTypeList={searchTypeList}
+          searchHandler={(text, type) =>
+            props.goToSearchResult(text, type, isMobile)
+          }
+        />
+      </SearchBox>
     )
   }
 
@@ -326,19 +368,35 @@ class HeaderComp extends React.Component<IProps, IState> {
     let rightMenu = [
       {
         element: (
-          <StyledPrimaryButton
-            key="newEvent"
-            id="header_new_event"
-            onClick={this.props.goToEvents}
-            icon={() => <Plus />}
-          />
+          <HeaderLeft>
+            <CircleButton onClick={() => this.props.goBack()}>
+              <BackArrowDeepBlue />
+            </CircleButton>
+            <CircleButton onClick={() => this.props.goForward()}>
+              <ForwardArrowDeepBlue />
+            </CircleButton>
+          </HeaderLeft>
         )
       },
       {
-        element: this.renderSearchInput(this.props)
+        element: (
+          <HeaderCenter>
+            <StyledPrimaryButton
+              key="newEvent"
+              id="header_new_event"
+              onClick={this.props.goToEvents}
+              icon={() => <Plus />}
+            />
+            {this.renderSearchInput(this.props)}
+          </HeaderCenter>
+        )
       },
       {
-        element: <ProfileMenu key="profileMenu" />
+        element: (
+          <HeaderRight>
+            <ProfileMenu key="profileMenu" />
+          </HeaderRight>
+        )
       }
     ]
 
@@ -383,6 +441,8 @@ export const Header = connect(
     goToSearchResult,
     goToSearch,
     goToSettings,
+    goBack,
+    goForward,
     goToEvents: goToEventsAction,
     goToHomeAction: goToHome,
     goToConfigAction: goToConfig,

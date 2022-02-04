@@ -59,7 +59,12 @@ import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/O
 import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseApplicationCountView'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
-import { goBack as back, push, replace } from 'connected-react-router'
+import {
+  goBack as back,
+  push,
+  replace,
+  goForward as forward
+} from 'connected-react-router'
 import moment from 'moment'
 import { stringify } from 'query-string'
 import { Cmd, loop } from 'redux-loop'
@@ -178,6 +183,10 @@ export function goToEvents() {
 
 export function goBack() {
   return back()
+}
+
+export function goForward() {
+  return forward()
 }
 
 export function goToHome() {

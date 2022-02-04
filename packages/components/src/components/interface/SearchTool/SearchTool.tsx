@@ -16,7 +16,6 @@ import styled from 'styled-components'
 
 const Wrapper = styled.form`
   align-items: center;
-  background: ${({ theme }) => theme.colors.white};
   border-radius: 2px;
   display: flex;
   ${({ theme }) => theme.fonts.bodyStyle};
@@ -37,6 +36,8 @@ const SearchTextInput = styled.input`
     -webkit-box-shadow: 0 0 0px 1000px ${({ theme }) => theme.colors.white}
       inset;
   }
+  background-color: ${({ theme }) => theme.colors.grey300};
+
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin: 0px 4px;
     width: 40%;
@@ -57,7 +58,7 @@ const DropDownWrapper = styled.ul`
   cursor: pointer;
 `
 
-export const IconRingButton = styled(props => <CircleButton {...props} />)`
+export const IconRingButton = styled((props) => <CircleButton {...props} />)`
   background: transparent;
   border: none;
   height: 24px;
@@ -133,7 +134,7 @@ const DropDown = styled.div`
     margin-left: auto;
   }
 `
-const ClearTextIcon = styled(props => <ClearText {...props} />)`
+const ClearTextIcon = styled((props) => <ClearText {...props} />)`
   margin: 0 5px;
 `
 export interface ISearchType {
@@ -211,7 +212,7 @@ export class SearchTool extends React.Component<IProps, IState> {
     return (
       this.state.dropDownIsVisible && (
         <DropDownWrapper>
-          {this.props.searchTypeList.map(item => {
+          {this.props.searchTypeList.map((item) => {
             return (
               <DropDownItem
                 id={item.value}
@@ -228,7 +229,7 @@ export class SearchTool extends React.Component<IProps, IState> {
     )
   }
   dropDownItemSelect = (item: ISearchType) => {
-    this.setState(_ => ({
+    this.setState((_) => ({
       selectedSearchType: item,
       dropDownIsVisible: false
     }))
@@ -242,7 +243,7 @@ export class SearchTool extends React.Component<IProps, IState> {
       document.addEventListener('click', handler)
     }
 
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       dropDownIsVisible: !prevState.dropDownIsVisible
     }))
   }
