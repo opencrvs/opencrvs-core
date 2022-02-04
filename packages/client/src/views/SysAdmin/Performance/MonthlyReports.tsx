@@ -38,7 +38,7 @@ import { RouteComponentProps } from 'react-router'
 
 interface ReportProps {
   goToPerformanceReport: typeof goToPerformanceReport
-  offlineResources: IOfflineData
+  offlineCountryConfiguration: IOfflineData
 }
 
 const Actions = styled.div`
@@ -143,7 +143,7 @@ class MonthlyReportsComponent extends React.Component<Props, IState> {
   }
 
   render() {
-    const { intl, offlineResources } = this.props
+    const { intl, offlineCountryConfiguration } = this.props
 
     return (
       <>
@@ -151,7 +151,10 @@ class MonthlyReportsComponent extends React.Component<Props, IState> {
 
         <LocationSearch
           selectedLocation={this.state.selectedLocation}
-          locationList={generateLocations(offlineResources.locations, intl)}
+          locationList={generateLocations(
+            offlineCountryConfiguration.locations,
+            intl
+          )}
           searchHandler={this.onClickSearchResult}
         />
 
@@ -213,7 +216,7 @@ class MonthlyReportsComponent extends React.Component<Props, IState> {
 
 function mapStateToProps(state: IStoreState) {
   return {
-    offlineResources: getOfflineData(state)
+    offlineCountryConfiguration: getOfflineData(state)
   }
 }
 

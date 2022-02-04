@@ -642,7 +642,7 @@ function createOccupationBulder(resource: fhir.Patient, fieldValue: string) {
   }
 
   const hasOccupation = resource.extension.find(
-    extention =>
+    (extention) =>
       extention.url ===
       `${OPENCRVS_SPECIFICATION_URL}extension/patient-occupation`
   )
@@ -1860,7 +1860,7 @@ const builders: IFieldBuilders = {
         }
 
         const hasTimeLoggedMS = taskResource.extension.find(
-          extension =>
+          (extension) =>
             extension.url ===
             `${OPENCRVS_SPECIFICATION_URL}extension/timeLoggedMS`
         )
@@ -2138,7 +2138,7 @@ const builders: IFieldBuilders = {
               relatedPersonResource.extension = []
             }
             const hasAffidavit = relatedPersonResource.extension.find(
-              extention =>
+              (extention) =>
                 extention.url ===
                 `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`
             )
@@ -2170,7 +2170,7 @@ const builders: IFieldBuilders = {
               relatedPersonResource.extension = []
             }
             const hasAffidavit = relatedPersonResource.extension.find(
-              extention =>
+              (extention) =>
                 extention.url ===
                 `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`
             )
@@ -2301,7 +2301,7 @@ const builders: IFieldBuilders = {
           certDocResource.extension = []
         }
         const hasVerifiedExt = certDocResource.extension.find(
-          extention =>
+          (extention) =>
             extention.url ===
             `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`
         )
