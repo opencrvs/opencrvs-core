@@ -11,7 +11,7 @@ name: Continuous Delivery And E2E Tests Performed On Staging
 
 env:
   CYPRESS_LOGIN_URL: https://login.farajaland-staging.opencrvs.org/
-  CYPRESS_CLIENT_URL: https://client.farajaland-staging.opencrvs.org/
+  CYPRESS_CLIENT_URL: https://client.farajaland-staging.opencrvs.org
   CYPRESS_AUTH_URL: https://auth.farajaland-staging.opencrvs.org/
 
 on:
