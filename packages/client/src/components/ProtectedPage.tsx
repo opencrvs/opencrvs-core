@@ -131,7 +131,7 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     }
 
     // App was in the background and now we need to make sure
-    // both global configuration and resources data is up-to-date
+    // both global configuration and offlineCountryConfig data is up-to-date
     if (isVisible) {
       this.props.onNumPadVisible()
     }

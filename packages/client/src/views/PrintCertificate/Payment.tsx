@@ -91,7 +91,7 @@ interface IProps {
   goToReviewCertificate: typeof goToReviewCertificateAction
   goBack: typeof goBackAction
   userDetails: IUserDetails | null
-  resources: IOfflineData
+  offlineCountryConfig: IOfflineData
 }
 
 type IFullProps = IProps & IntlShapeProps
@@ -169,7 +169,7 @@ class PaymentComponent extends React.Component<IFullProps> {
                   this.props.intl,
                   this.props.application,
                   this.props.userDetails,
-                  this.props.resources
+                  this.props.offlineCountryConfig
                 )
               }
             >
@@ -220,7 +220,7 @@ function mapStatetoProps(
     language: state.i18n.language,
     application,
     userDetails: getUserDetails(state),
-    resources: getOfflineData(state)
+    offlineCountryConfig: getOfflineData(state)
   }
 }
 
