@@ -143,7 +143,7 @@ describe('when user is previewing the form data', () => {
       contactPoint: {
         value: 'OTHER',
         nestedFields: {
-          registrationPhone: '01717000000',
+          registrationPhone: '0799999999',
           contactRelationshipOther: 'grandma'
         }
       }
@@ -482,7 +482,7 @@ describe('when user is previewing the form data', () => {
       contactPoint: {
         value: 'OTHER',
         nestedFields: {
-          registrationPhone: '01717000000',
+          registrationPhone: '0799999999',
           contactRelationshipOther: 'grandma'
         }
       },
@@ -540,7 +540,7 @@ describe('when user is previewing the form data', () => {
 
     it('successfully submits the review form', async () => {
       jest.setMock('react-apollo', { default: ReactApollo })
-
+      console.log(app.update().debug())
       app.update().find('#registerApplicationBtn').hostNodes().simulate('click')
 
       app.update().find('#submit_confirm').hostNodes().simulate('click')
