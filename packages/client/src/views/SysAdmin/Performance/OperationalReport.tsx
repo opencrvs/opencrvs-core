@@ -654,10 +654,10 @@ class OperationalReportComponent extends React.Component<Props, State> {
 }
 
 function mapStateToProps(state: IStoreState) {
-  const offlineResources = getOfflineData(state)
+  const offlineCountryConfiguration = getOfflineData(state)
   return {
-    locations: offlineResources.locations,
-    offices: offlineResources.offices,
+    locations: offlineCountryConfiguration.locations,
+    offices: offlineCountryConfiguration.offices,
     userDetails: getUserDetails(state)
   }
 }

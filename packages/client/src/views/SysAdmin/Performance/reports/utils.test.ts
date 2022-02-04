@@ -35,11 +35,11 @@ describe('reports utils tests', () => {
   })
   describe('getLocationFromPartOfLocationId tests', () => {
     it('returns location name for a valid location', () => {
-      const offlineResources = mockOfflineData
+      const offlineCountryConfiguration = mockOfflineData
       const locationId = 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
 
       expect(
-        getLocationFromPartOfLocationId(locationId, offlineResources)
+        getLocationFromPartOfLocationId(locationId, offlineCountryConfiguration)
       ).toEqual({
         id: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
         name: 'Barisal',
@@ -51,11 +51,11 @@ describe('reports utils tests', () => {
       })
     })
     it('returns office name for a valid office', () => {
-      const offlineResources = mockOfflineData
+      const offlineCountryConfiguration = mockOfflineData
       const locationId = 'Location/0d8474da-0361-4d32-979e-af91f012340a'
 
       expect(
-        getLocationFromPartOfLocationId(locationId, offlineResources)
+        getLocationFromPartOfLocationId(locationId, offlineCountryConfiguration)
       ).toEqual({
         id: '0d8474da-0361-4d32-979e-af91f012340a',
         name: 'Moktarpur Union Parishad',
@@ -66,11 +66,11 @@ describe('reports utils tests', () => {
       })
     })
     it('returns empty string for an invalid office/location', () => {
-      const offlineResources = mockOfflineData
+      const offlineCountryConfiguration = mockOfflineData
       const locationId = 'Location/0'
 
       expect(
-        getLocationFromPartOfLocationId(locationId, offlineResources)
+        getLocationFromPartOfLocationId(locationId, offlineCountryConfiguration)
       ).toEqual({ name: '' })
     })
   })
