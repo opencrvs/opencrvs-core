@@ -11,6 +11,9 @@
  */
 // tslint:disable-next-line no-var-requires
 require('app-module-path').addPath(require('path').join(__dirname, '../'))
+require('dotenv').config({
+  path: `${process.cwd()}/.env`
+})
 
 import * as Hapi from '@hapi/hapi'
 import {
