@@ -30,7 +30,7 @@ import { IFooterFColumn } from '@opencrvs/components/lib/interface/GridTable/typ
 import { get } from 'lodash'
 
 interface IStateProps {
-  offlineResources: IOfflineData
+  offlineCountryConfiguration: IOfflineData
 }
 
 type FullProps = {
@@ -48,7 +48,7 @@ class GenderBasisComponent extends React.Component<FullProps> {
           return {
             location: getLocationFromPartOfLocationId(
               content.location,
-              this.props.offlineResources
+              this.props.offlineCountryConfiguration
             ).name,
             femaleOver18: getValueWithPercentageString(
               content.femaleOver18,
@@ -169,6 +169,6 @@ class GenderBasisComponent extends React.Component<FullProps> {
 
 export const GenderBasisReports = connect((store: IStoreState) => {
   return {
-    offlineResources: getOfflineData(store)
+    offlineCountryConfiguration: getOfflineData(store)
   }
 }, {})(injectIntl(GenderBasisComponent))

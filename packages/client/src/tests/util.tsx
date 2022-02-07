@@ -121,14 +121,14 @@ export function waitForReady(app: ReactWrapper) {
 }
 
 export async function createTestApp(
-  config = { waitUntilResourcesLoaded: true }
+  config = { waitUntilOfflineCountryConfigLoaded: true }
 ) {
   const { store, history } = createStore()
   const app = mount(
     <App store={store} history={history} client={createGraphQLClient()} />
   )
 
-  if (config.waitUntilResourcesLoaded) {
+  if (config.waitUntilOfflineCountryConfigLoaded) {
     await waitForReady(app)
   }
   return { history, app, store }

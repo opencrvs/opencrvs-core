@@ -55,7 +55,7 @@ export const WEB_USER_JWT_AUDIENCES = [
   'opencrvs:workflow-user',
   'opencrvs:search-user',
   'opencrvs:metrics-user',
-  'opencrvs:resources-user',
+  'opencrvs:countryconfig-user',
   'opencrvs:webhooks-user'
 ]
 export const NOTIFICATION_API_USER_AUDIENCE = 'opencrvs:notification-api-user'
