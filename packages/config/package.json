@@ -18,12 +18,12 @@
   },
   "dependencies": {
     "@hapi/hapi": "^20.2.1",
-    "@types/hapi-pino": "^6.3.0",
-    "@types/pino": "^5.14.0",
-    "hapi-pino": "^6.3.0",
+    "@types/hapi-pino": "^8.0.5",
+    "@types/pino": "^6.3.12",
+    "hapi-pino": "^8.5.0",
     "hapi-sentry": "^3.2.0",
     "mongoose": "^5.11.0",
-    "pino": "^5.14.0"
+    "pino": "^6.0.0"
   },
   "devDependencies": {
     "@types/mongoose": "^5.0.16",
