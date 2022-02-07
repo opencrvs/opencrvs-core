@@ -27,3 +27,6 @@ docker run --rm -v $DIR/default_backups:/default_backups --network=$NETWORK mong
 
 docker run --rm -v $DIR/default_backups:/default_backups --network=$NETWORK mongo:3.6 bash \
  -c "mongorestore --host $HOST --drop --gzip --archive=/default_backups/user-mgnt.gz"
+
+docker run --rm -v $DIR/default_backups:/default_backups --network=$NETWORK mongo:3.6 bash \
+ -c "mongorestore --host $HOST --drop --gzip --archive=/default_backups/application-config.gz"

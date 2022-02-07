@@ -26,7 +26,7 @@ describe('verifyCode service', () => {
   describe('generateVerificationCode', () => {
     it('generates a pseudo random 6 digit code', async () => {
       const code = expect.stringMatching(/^\d{6}$/)
-      return generateVerificationCode(nonce, mobile).then(data => {
+      return generateVerificationCode(nonce, mobile).then((data) => {
         expect(data).toEqual(code)
       })
     })

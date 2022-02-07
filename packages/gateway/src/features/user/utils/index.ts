@@ -77,7 +77,7 @@ export function hasScope(authHeader: IAuthHeader, scope: string) {
 }
 
 export function inScope(authHeader: IAuthHeader, scopes: string[]) {
-  const matchedScope = scopes.find(scope => hasScope(authHeader, scope))
+  const matchedScope = scopes.find((scope) => hasScope(authHeader, scope))
   return !!matchedScope
 }
 
@@ -110,6 +110,6 @@ export const getUserId = (authHeader: IAuthHeader): string => {
 }
 
 export function getFullName(user: IUserModelData, language: string) {
-  const localName = user.name.find(name => name.use === language)
+  const localName = user.name.find((name) => name.use === language)
   return `${localName?.given.join(' ') || ''} ${localName?.family || ''}`.trim()
 }

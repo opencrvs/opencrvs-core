@@ -146,3 +146,13 @@ services:
       - HOST=0.0.0.0
       - CHECK_INVALID_TOKEN=true
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
+  config:
+    image: opencrvs/ocrvs-config:${VERSION:-latest}
+    build:
+      context: .
+      dockerfile: ./packages/config/Dockerfile
+    restart: unless-stopped
+    environment:
+      - HOST=0.0.0.0
+      - PORT=2021
+      - MONGO_URL=mongodb://mongo1/application-config
