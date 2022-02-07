@@ -69,10 +69,10 @@ interface IUserMessages
   changePassword: MessageDescriptor
   changePasswordMessage: MessageDescriptor
   changePhoneTitle: MessageDescriptor
-  VerifyPhoneTitle: MessageDescriptor
+  verifyPhoneTitle: MessageDescriptor
   changePhoneLabel: MessageDescriptor
-  VerifyPhoneLabel: MessageDescriptor
-  ConfirmationPhoneMsg: MessageDescriptor
+  verifyPhoneLabel: MessageDescriptor
+  confirmationPhoneMsg: MessageDescriptor
   phoneNumberChangeFormValidationMsg: MessageDescriptor
   changeAvatar: MessageDescriptor
   changeImage: MessageDescriptor
@@ -337,7 +337,7 @@ const messagesToDefine: IUserMessages = {
     description: 'Change phone number title',
     id: 'settings.changePhone'
   },
-  VerifyPhoneTitle: {
+  verifyPhoneTitle: {
     defaultMessage: 'Verify phone number',
     description: 'Verify phone number title',
     id: 'settings.verifyPhone'
@@ -347,12 +347,12 @@ const messagesToDefine: IUserMessages = {
     description: 'Change phone number label',
     id: 'phone.label.changeNumber'
   },
-  VerifyPhoneLabel: {
+  verifyPhoneLabel: {
     defaultMessage: 'Enter 6 digit verification code',
     description: 'Verify phone number label',
     id: 'phone.label.verify'
   },
-  ConfirmationPhoneMsg: {
+  confirmationPhoneMsg: {
     defaultMessage: 'A confirmational SMS has been sent to {num}',
     description: 'Confirmation phone number message',
     id: 'phone.label.confirmation'

@@ -11,59 +11,32 @@
  */
 import * as React from 'react'
 import { connect } from 'react-redux'
-import {
-  injectIntl,
-  WrappedComponentProps as IntlShapeProps,
-  FormattedMessage
-} from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { IStoreState } from '@client/store'
 import { getUserDetails, getUserNonce } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import styled from '@client/styledComponents'
-import { Header } from '@client/components/interface/Header/Header'
 import {
-  EventTopBar,
-  ResponsiveModal,
-  NOTIFICATION_TYPE,
-  Notification
-} from '@opencrvs/components/lib/interface'
-import {
-  Select,
   ErrorMessage,
   InputField,
   TextInput
 } from '@opencrvs/components/lib/forms'
-import {
-  ICON_ALIGNMENT,
-  PrimaryButton,
-  TertiaryButton,
-  LinkButton
-} from '@opencrvs/components/lib/buttons'
-import {
-  userMessages as messages,
-  buttonMessages,
-  constantsMessages
-} from '@client/i18n/messages'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { userMessages as messages, buttonMessages } from '@client/i18n/messages'
 import {
   sendVerifyCode as SendVerifyCodeAction,
   modifyUserDetails as modifyUserDetailsAction
 } from '@client/profile/profileActions'
-import { getDefaultLanguage, getAvailableLanguages } from '@client/i18n/utils'
-import { IntlState } from '@client/i18n/reducer'
 import {
   goToSettingsWithPhoneSuccessMsg as goToSettingsWithPhoneSuccessMsgAction,
   goBack as goBackAction
 } from '@client/navigation'
-import { BackArrow } from '@opencrvs/components/lib/icons'
 import {
   SysAdminContentWrapper,
   SysAdminPageVariant
 } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { EMPTY_STRING } from '@client/utils/constants'
-import {
-  isAValidPhoneNumberFormat,
-  phoneNumberFormat
-} from '@client/utils/validate'
+import { isAValidPhoneNumberFormat } from '@client/utils/validate'
 import { Mutation } from 'react-apollo'
 import gql from 'graphql-tag'
 import { get } from 'lodash'
@@ -109,52 +82,13 @@ const FormSectionTitle = styled.h4`
   margin-bottom: 16px;
 `
 
-const SettingsTitle = styled.div`
-  ${({ theme }) => theme.fonts.h1Style};
-  height: 72px;
-  margin-left: 16px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: none;
-  }
-`
-
 const Content = styled.div`
   display: flex;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     flex-direction: column-reverse;
   }
 `
-const Left = styled.div`
-  margin: 0 16px;
-  flex-grow: 1;
-`
-const Right = styled.div`
-  display: flex;
-  padding-top: 80px;
-  margin-left: 112px;
-  & .desktop {
-    display: block;
-  }
-  & .tablet {
-    display: none;
-  }
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    padding-top: 0;
-    margin-left: 24px;
-    & .desktop {
-      display: none;
-    }
-    & .tablet {
-      display: block;
-    }
-  }
-`
-const Row = styled.div`
-  display: flex;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-bottom: 20px;
-  }
-`
+
 const Field = styled.div`
   margin-bottom: 30px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -163,10 +97,10 @@ const Field = styled.div`
 `
 const Message = styled.div`
   margin-bottom: 16px;
+  ${({ theme }) => theme.fonts.bodyStyle};
+  color: ${({ theme }) => theme.colors.copy};
 `
-const Label = styled.label`
-  margin-bottom: 8px;
-`
+
 const InvalidPhoneNumber = styled.div`
   /* stylelint-disable-next-line opencrvs/no-font-styles */
   font-family: ${({ theme }) => theme.fonts.semiBoldFont};
@@ -175,6 +109,8 @@ const InvalidPhoneNumber = styled.div`
   margin-top: 8px;
 `
 const BoxedError = styled.div`
+  margin-top: -10px;
+  ${({ theme }) => theme.fonts.bodyStyle};
   margin-bottom: 10px;
   display: flex;
 `
@@ -313,17 +249,9 @@ class ChangePhoneView extends React.Component<IProps & IDispatchProps, IState> {
           headerTitle={
             this.state.view === VIEW_TYPE.CHANGE_NUMBER
               ? intl.formatMessage(messages.changePhoneTitle)
-              : intl.formatMessage(messages.VerifyPhoneTitle)
+              : intl.formatMessage(messages.verifyPhoneTitle)
           }
         >
-          {this.state.errorOccured && (
-            <BoxedError>
-              <ErrorMessage>
-                {intl.formatMessage(messages.incorrectVerifyCode)}
-              </ErrorMessage>
-            </BoxedError>
-          )}
-
           {this.state.view === VIEW_TYPE.CHANGE_NUMBER && (
             <Container>
               <Content>
@@ -395,12 +323,12 @@ class ChangePhoneView extends React.Component<IProps & IDispatchProps, IState> {
             <Container>
               <Content>
                 <FormSectionTitle>
-                  <>{intl.formatMessage(messages.VerifyPhoneLabel)}</>
+                  <>{intl.formatMessage(messages.verifyPhoneLabel)}</>
                 </FormSectionTitle>
               </Content>
               <Content>
                 <Message>
-                  {intl.formatMessage(messages.ConfirmationPhoneMsg, {
+                  {intl.formatMessage(messages.confirmationPhoneMsg, {
                     num: intl.formatMessage({
                       defaultMessage: this.state.phoneNumber,
                       description: 'Phone confirmation number',
@@ -409,6 +337,15 @@ class ChangePhoneView extends React.Component<IProps & IDispatchProps, IState> {
                   })}
                 </Message>
               </Content>
+              {this.state.errorOccured && (
+                <Content>
+                  <BoxedError>
+                    <ErrorMessage>
+                      {intl.formatMessage(messages.incorrectVerifyCode)}
+                    </ErrorMessage>
+                  </BoxedError>
+                </Content>
+              )}
               <Content>
                 <Field>
                   <InputField
@@ -418,7 +355,7 @@ class ChangePhoneView extends React.Component<IProps & IDispatchProps, IState> {
                     optionalLabel=""
                   >
                     <HalfWidthInput
-                      id="VerifyCode"
+                      id="verifyCode"
                       type="text"
                       touched={true}
                       error={this.state.isInvalidPhoneNumber}
