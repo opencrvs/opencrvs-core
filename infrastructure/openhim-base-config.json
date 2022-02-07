@@ -1609,9 +1609,7 @@
       "name": "New Death InProgress"
     },
     {
-      "methods": [
-        "POST"
-      ],
+      "methods": ["POST"],
       "type": "http",
       "allow": [],
       "whitelist": [],
@@ -1662,9 +1660,7 @@
       "alerts": []
     },
     {
-      "methods": [
-        "POST"
-      ],
+      "methods": ["POST"],
       "type": "http",
       "allow": [],
       "whitelist": [],
@@ -1715,9 +1711,7 @@
       "alerts": []
     },
     {
-      "methods": [
-        "POST"
-      ],
+      "methods": ["POST"],
       "type": "http",
       "allow": [],
       "whitelist": [],
@@ -1768,9 +1762,7 @@
       "name": "DHIS2 death notification mediator"
     },
     {
-      "methods": [
-        "POST"
-      ],
+      "methods": ["POST"],
       "type": "http",
       "allow": [],
       "whitelist": [],
@@ -1817,9 +1809,7 @@
       "priority": 1
     },
     {
-      "methods": [
-        "GET"
-      ],
+      "methods": ["GET"],
       "type": "http",
       "allow": [],
       "whitelist": [],
@@ -1868,9 +1858,7 @@
     {
       "methods": [],
       "type": "polling",
-      "allow": [
-        "queue-trigger"
-      ],
+      "allow": ["queue-trigger"],
       "whitelist": [],
       "authType": "private",
       "matchContentTypes": [],
@@ -1921,9 +1909,7 @@
     {
       "methods": [],
       "type": "polling",
-      "allow": [
-        "queue-trigger"
-      ],
+      "allow": ["queue-trigger"],
       "whitelist": [],
       "authType": "private",
       "matchContentTypes": [],
@@ -1972,9 +1958,7 @@
       "priority": 1
     },
     {
-      "methods": [
-        "POST"
-      ],
+      "methods": ["POST"],
       "type": "http",
       "allow": [],
       "whitelist": [],
@@ -2070,7 +2054,7 @@
       "responseBody": true,
       "rewriteUrlsConfig": [],
       "name": "Application Configuration",
-      "urlPattern": "^/getConfig(/)?$",
+      "urlPattern": "^/config(/)?$",
       "matchContentRegex": null,
       "matchContentXpath": null,
       "matchContentValue": null,

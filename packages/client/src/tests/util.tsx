@@ -2851,7 +2851,6 @@ export const mockOfflineData = {
     COUNTRY_LOGO_RENDER_WIDTH: 104,
     COUNTRY_LOGO_RENDER_HEIGHT: 104,
     DESKTOP_TIME_OUT_MILLISECONDS: 900000,
-    HEALTH_FACILITY_FILTER: 'DISTRICT',
     LANGUAGES: 'en',
     CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 36500,
     CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 36500,
@@ -2874,6 +2873,11 @@ export const mockOfflineData = {
       example: '0970545855',
       start: '0[7|9]',
       num: '10'
+    },
+    NID_NUMBER_PATTERN: {
+      pattern: /^[0-9]{9}$/,
+      example: '4837281940',
+      num: '9'
     },
     SENTRY: 'https://sentry.com',
     LOGROCKET: 'opencrvs-foundation/opencrvs-zambia'

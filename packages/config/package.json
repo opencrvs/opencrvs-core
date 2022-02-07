@@ -1,7 +1,7 @@
 {
   "name": "@opencrvs/config",
-  "version": "1.0.0-alpha.3.0",
-  "description": "OpenCRVS API Gateway with GraphQL",
+  "version": "1.0.0-alpha.3.1",
+  "description": "OpenCRVS public configuration microservice",
   "license": "MPL-2.0",
   "scripts": {
     "start": "cross-env NODE_ENV=development nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",

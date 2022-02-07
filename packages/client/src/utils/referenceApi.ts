@@ -55,6 +55,12 @@ interface IPhoneNumberPattern {
   }
 }
 
+interface INIDNumberPattern {
+  pattern: RegExp
+  example: string
+  num: string
+}
+
 export interface IApplicationConfig {
   BACKGROUND_SYNC_BROADCAST_CHANNEL: string
   COUNTRY: string
@@ -62,7 +68,6 @@ export interface IApplicationConfig {
   COUNTRY_LOGO_RENDER_WIDTH: number
   COUNTRY_LOGO_RENDER_HEIGHT: number
   DESKTOP_TIME_OUT_MILLISECONDS: number
-  HEALTH_FACILITY_FILTER: string
   LANGUAGES: string
   CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: number
   CERTIFICATE_PRINT_CHARGE_UP_LIMIT: number
@@ -77,10 +82,11 @@ export interface IApplicationConfig {
   SENTRY: string
   LOGROCKET: string
   PHONE_NUMBER_PATTERN: IPhoneNumberPattern
+  NID_NUMBER_PATTERN: INIDNumberPattern
 }
 
 async function loadConfig(): Promise<IApplicationConfig> {
-  const url = `${window.config.CONFIG_API_URL}/getConfig`
+  const url = `${window.config.CONFIG_API_URL}/config`
 
   const res = await fetch(url, {
     method: 'GET'
