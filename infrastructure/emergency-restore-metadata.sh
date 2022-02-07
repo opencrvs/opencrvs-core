@@ -60,6 +60,7 @@ fi
 docker run --rm --network=$NETWORK mongo:3.6 mongo hearth-dev --host $HOST --eval "db.dropDatabase()"
 docker run --rm --network=$NETWORK mongo:3.6 mongo openhim-dev --host $HOST --eval "db.dropDatabase()"
 docker run --rm --network=$NETWORK mongo:3.6 mongo user-mgnt --host $HOST --eval "db.dropDatabase()"
+docker run --rm --network=$NETWORK mongo:3.6 mongo application-config --host $HOST --eval "db.dropDatabase()"
 
 # Delete all data from search
 #----------------------------
@@ -78,6 +79,8 @@ docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mo
  -c "mongorestore --host $HOST --drop --gzip --archive=/data/backups/mongo/openhim-dev-$1.gz"
 docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:3.6 bash \
  -c "mongorestore --host $HOST --drop --gzip --archive=/data/backups/mongo/user-mgnt-$1.gz"
+docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:3.6 bash \
+ -c "mongorestore --host $HOST --drop --gzip --archive=/data/backups/mongo/application-config-$1.gz"
 
 # Restore all data from a backup into search
 #-------------------------------------------
@@ -91,7 +94,7 @@ INFLUXDB_HOSTNAME=`echo $(docker service ps -f "desired-state=running" opencrvs_
 INFLUXDB_HOST=$(docker node inspect --format '{{.Status.Addr}}' "$HOSTNAME")
 INFLUXDB_SSH_USER=${INFLUXDB_SSH_USER:-root}
 
-# If required, SSH into the node running the opencrvs_metrics container and restore the metrics data from an influxdb subfolder 
+# If required, SSH into the node running the opencrvs_metrics container and restore the metrics data from an influxdb subfolder
 #------------------------------------------------------------------------------------------------------------------------------
 OWN_IP=`echo $(hostname -I | cut -d' ' -f1)`
 if [[ "$OWN_IP" = "$INFLUXDB_HOST" ]]; then
