@@ -78,7 +78,7 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
       ...application,
       data: {
         ...application.data,
-        corrector: {
+        correction: {
           ...application.data.corrector,
           hasShowedVerifiedDocument
         }

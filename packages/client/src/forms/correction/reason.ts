@@ -19,6 +19,7 @@ import {
 } from '@client/forms'
 import { formMessages } from '@client/i18n/messages/form'
 import { messages } from '@client/i18n/messages/views/correction'
+import { fieldValueSectionExchangeTransformer } from '@client/forms/mappings/mutation'
 
 export enum CorrectionReason {
   CLERICAL_ERROR = 'CLERICAL_ERROR',
@@ -80,6 +81,9 @@ export const correctRecordReasonSectionGroup: IFormSectionGroup = {
             mapping: {}
           }
         ]
+      },
+      mapping: {
+        mutation: fieldValueSectionExchangeTransformer('correction', 'reason')
       }
     },
     {
@@ -89,7 +93,10 @@ export const correctRecordReasonSectionGroup: IFormSectionGroup = {
       initialValue: '',
       validate: [],
       required: false,
-      maxLength: 500
+      maxLength: 500,
+      mapping: {
+        mutation: fieldValueSectionExchangeTransformer('correction', 'note')
+      }
     }
   ]
 }
