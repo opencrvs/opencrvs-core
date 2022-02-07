@@ -33,12 +33,12 @@ const HeaderContainer = styled.div`
 `
 type Props = WrappedComponentProps &
   Pick<RouteComponentProps, 'history'> & {
-    offlineResources: IOfflineData
+    offlineCountryConfiguration: IOfflineData
   }
 
 class ConfigHomeComponent extends React.Component<Props> {
   render() {
-    const { intl, offlineResources } = this.props
+    const { intl, offlineCountryConfiguration } = this.props
     return (
       <SysAdminContentWrapper>
         <Container>
@@ -66,7 +66,7 @@ class ConfigHomeComponent extends React.Component<Props> {
 
 function mapStateToProps(state: IStoreState) {
   return {
-    offlineResources: getOfflineData(state)
+    offlineCountryConfiguration: getOfflineData(state)
   }
 }
 

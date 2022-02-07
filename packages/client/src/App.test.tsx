@@ -48,10 +48,10 @@ afterAll(() => {
 })
 
 it('renders without crashing', () =>
-  createTestApp({ waitUntilResourcesLoaded: false }))
+  createTestApp({ waitUntilOfflineCountryConfigLoaded: false }))
 
 it("redirects user to SSO if user doesn't have a token", async () => {
-  await createTestApp({ waitUntilResourcesLoaded: false })
+  await createTestApp({ waitUntilOfflineCountryConfigLoaded: false })
   await waitFor(() => assign.mock.calls[0][0] === window.config.LOGIN_URL)
 })
 
@@ -82,7 +82,9 @@ describe('when session expired', () => {
   let store: AppStore
 
   beforeEach(async () => {
-    const testApp = await createTestApp({ waitUntilResourcesLoaded: false })
+    const testApp = await createTestApp({
+      waitUntilOfflineCountryConfigLoaded: false
+    })
     app = testApp.app
     store = testApp.store
   })

@@ -246,9 +246,9 @@ export const getVisibleGroupFields = (group: IFormSectionGroup) => {
 export const getFieldOptions = (
   field: ISelectFormFieldWithDynamicOptions,
   values: IFormSectionData,
-  resources: IOfflineData
+  offlineCountryConfig: IOfflineData
 ) => {
-  const locations = resources[OFFLINE_LOCATIONS_KEY]
+  const locations = offlineCountryConfig[OFFLINE_LOCATIONS_KEY]
   const dependencyVal = values[field.dynamicOptions.dependency] as string
   if (field.dynamicOptions.jurisdictionType) {
     return generateOptions(
@@ -260,7 +260,7 @@ export const getFieldOptions = (
       'location'
     )
   } else if (
-    resources &&
+    offlineCountryConfig &&
     field.dynamicOptions.resource === OFFLINE_LOCATIONS_KEY
   ) {
     if (!dependencyVal) {
@@ -279,10 +279,10 @@ export const getFieldOptions = (
       'location'
     )
   } else if (
-    resources &&
+    offlineCountryConfig &&
     field.dynamicOptions.resource === OFFLINE_FACILITIES_KEY
   ) {
-    const facilities = resources[OFFLINE_FACILITIES_KEY]
+    const facilities = offlineCountryConfig[OFFLINE_FACILITIES_KEY]
     return generateOptions(Object.values(facilities), 'facility')
   } else {
     let options
@@ -425,7 +425,7 @@ export const getConditionalActionsForField = (
    * These are used in the eval expression
    */
   values: IFormSectionData,
-  resources?: IOfflineData,
+  offlineCountryConfig?: IOfflineData,
   draftData?: IFormData
 ): string[] => {
   if (!field.conditionals) {
@@ -652,22 +652,22 @@ export const conditionals: IConditionals = {
   isNotCityLocation: {
     action: 'hide',
     expression:
-      '(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))'
+      '(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))'
   },
   isCityLocation: {
     action: 'hide',
     expression:
-      '!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))'
+      '!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))'
   },
   isNotCityLocationPermanent: {
     action: 'hide',
     expression:
-      '(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))'
+      '(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Permanent))'
   },
   isCityLocationPermanent: {
     action: 'hide',
     expression:
-      '!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))'
+      '!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Permanent))'
   },
   iDAvailable: {
     action: 'hide',
