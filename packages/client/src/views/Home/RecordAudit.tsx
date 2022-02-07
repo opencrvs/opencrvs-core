@@ -39,8 +39,10 @@ import { Spinner } from '@opencrvs/components/lib/interface'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
+  margin-top: 0px;
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin-left: 265px;
+    margin-top: 28px;
   }
 `
 
@@ -122,6 +124,16 @@ interface IGQLApplication {
   }
 }
 
+const STATUSTOCOLOR: { [key: string]: string } = {
+  DRAFT: 'violet',
+  DECLARED: 'orange',
+  REJECTED: 'red',
+  VALIDATED: 'orange',
+  REGISTERED: 'green',
+  CERTIFIED: 'green',
+  WAITING_VALIDATION: 'teal'
+}
+
 const KEY_LABEL: ILabel = {
   status: 'Status',
   type: 'Event',
@@ -147,6 +159,7 @@ const NO_DATA_LABEL: ILabel = {
 }
 
 const getCaptitalizedword = (word: string | undefined): string => {
+  console.log(word)
   word = word && word.toUpperCase()[0] + word.toLowerCase().slice(1)
   return word || ''
 }
@@ -414,21 +427,12 @@ const getApplicationInfo = (
   application: IApplicationData,
   isDownloaded: boolean
 ) => {
-  let facility =
-    get(
-      props.resources.facilities,
-      application.placeOfBirth || application.placeOfDeath || ''
-    ) || ''
-  if (!facility) {
-    facility =
-      get(
-        props.resources.locations,
-        application.placeOfBirth || application.placeOfDeath || ''
-      ) || ''
-  }
-
   let informant =
     application.informant && getCaptitalizedword(application.informant)
+
+  const status = getCaptitalizedword(application.status).split('_')
+  let finalStatus = status[0]
+  if (status[1]) finalStatus += ' ' + status[1]
 
   if (application.informantContact) {
     informant =
@@ -436,7 +440,7 @@ const getApplicationInfo = (
   }
 
   let info: ILabel = {
-    status: application.status && getCaptitalizedword(application.status),
+    status: application.status && finalStatus,
     type: application.type && getCaptitalizedword(application.type),
     trackingId: application.trackingId
   }
@@ -502,7 +506,6 @@ export const ShowRecordAudit = (props: IFullProps) => {
   if (!isDownloaded) {
     application = getWQApplication(props)
   }
-
   return (
     <div id={'recordAudit'}>
       <Header />
@@ -510,9 +513,16 @@ export const ShowRecordAudit = (props: IFullProps) => {
       <BodyContainer>
         {application ? (
           <Content
-            title={application.name}
+            title={application.name || 'No name provided'}
+            titleColor={application.name ? 'copy' : 'grey600'}
             size={'large'}
-            icon={() => <ApplicationIcon />}
+            icon={() => (
+              <ApplicationIcon
+                color={
+                  STATUSTOCOLOR[(application && application.status) || 'DRAFT']
+                }
+              />
+            )}
           >
             {getApplicationInfo(props, application, isDownloaded)}
           </Content>
@@ -548,7 +558,16 @@ export const ShowRecordAudit = (props: IFullProps) => {
                   <Content
                     title={getGQLApplicationName(data.fetchRegistration)}
                     size={'large'}
-                    icon={() => <ApplicationIcon />}
+                    icon={() => (
+                      <ApplicationIcon
+                        color={
+                          STATUSTOCOLOR[
+                            getGQLApplication(data.fetchRegistration).status ||
+                              'DRAFT'
+                          ]
+                        }
+                      />
+                    )}
                   >
                     {getApplicationInfo(
                       props,

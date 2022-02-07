@@ -11,8 +11,8 @@
  */
 import * as React from 'react'
 import { ReactElement } from 'react'
-import styled from 'styled-components'
-
+import styled, { ThemeConsumer } from 'styled-components'
+import { colors } from '../colors'
 const Container = styled.div<{ size: string }>`
   z-index: 1;
   position: relative;
@@ -67,10 +67,11 @@ const BottomActionBar = styled.div`
   gap: 28px;
   margin-right: auto;
 `
-const TitleContainer = styled.div`
+const TitleContainer = styled.div<{ titleColor?: keyof typeof colors }>`
   display: flex;
   gap: 10px;
   margin-right: auto;
+  color: ${({ theme, titleColor }) => titleColor && theme.colors[titleColor]};
 `
 
 const Title = styled.div`
@@ -88,6 +89,7 @@ interface IProps {
   children?: React.ReactNode
   bottomActionButtons?: ReactElement[]
   size?: 'normal' | 'large' | undefined
+  titleColor?: keyof typeof colors
 }
 
 export class Content extends React.Component<IProps> {
@@ -95,6 +97,7 @@ export class Content extends React.Component<IProps> {
     const {
       icon,
       title,
+      titleColor,
       topActionButtons,
       subtitle,
       children,
@@ -105,7 +108,7 @@ export class Content extends React.Component<IProps> {
     return (
       <Container size={size as string}>
         <Header>
-          <TitleContainer>
+          <TitleContainer titleColor={titleColor}>
             {icon && <Icon>{icon()}</Icon>}
             {title && <Title>{title}</Title>}
           </TitleContainer>

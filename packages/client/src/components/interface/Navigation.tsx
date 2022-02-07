@@ -186,7 +186,7 @@ const TAB_LABEL = {
   requiresUpdate: 'Requires Updates',
   sentForUpdates: 'Sent for updates',
   sentForApproval: 'Sent for approval',
-  externalValidation: 'In external Validation',
+  externalValidation: 'Waiting for validation',
   readyToPrint: 'Ready to print ',
   application: 'Application',
   performance: 'Performance',
