@@ -33,7 +33,6 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { get } from 'lodash'
 import { IFormSectionData, IContactPoint } from '@client/forms'
-import { client } from '@client/utils/apolloClient'
 import { FETCH_APPLICATION_SHORT_INFO } from '@client/views/Home/queries'
 import { Query } from '@client/components/Query'
 import { Spinner } from '@opencrvs/components/lib/interface'
@@ -227,6 +226,65 @@ const getGQLApplicationName = (application: IGQLApplication): string => {
   return name
 }
 
+const getLocation = (application: IApplication, props: IFullProps) => {
+  let locationType = ''
+  let locationId = ''
+  let locationDistrict = ''
+  let locationPermanent = ''
+  if (
+    application.event === 'death' &&
+    application.data &&
+    application.data.deathEvent
+  ) {
+    locationType =
+      (application.data.deathEvent.deathPlaceAddress &&
+        application.data.deathEvent.deathPlaceAddress.toString()) ||
+      ''
+    locationId =
+      (application.data.deathEvent.deathLocation &&
+        application.data.deathEvent.deathLocation.toString()) ||
+      ''
+    locationDistrict =
+      (application.data.deathEvent.district &&
+        application.data.deathEvent.district.toString()) ||
+      ''
+    locationPermanent =
+      (application.data.deceased &&
+        application.data.deceased.districtPermanent &&
+        application.data.deceased.districtPermanent.toString()) ||
+      ''
+  } else if (application.data) {
+    locationType =
+      (application.data.child &&
+        application.data.child.placeOfBirth.toString()) ||
+      ''
+    locationId =
+      (application.data.child &&
+        application.data.child.birthLocation &&
+        application.data.child.birthLocation.toString()) ||
+      ''
+    locationDistrict =
+      (application.data.child &&
+        application.data.child.district &&
+        application.data.child.district.toString()) ||
+      ''
+  }
+
+  if (locationType === 'HEALTH_FACILITY') {
+    const facility = get(props.resources.facilities, locationId) || ''
+    return facility.alias
+  }
+  if (locationType === 'OTHER' || locationType === 'PRIVATE_HOME') {
+    const location = get(props.resources.locations, locationDistrict) || ''
+    return location.alias + ' District'
+  }
+  if (locationType === 'PERMANENT') {
+    const district = get(props.resources.locations, locationPermanent) || ''
+    return district.alias + ' District'
+  }
+  return ''
+}
+
 const getSavedApplications = (props: IFullProps): IApplicationData => {
   const savedApplications = props.savedApplications
   const applicationId = props.match.params.applicationId
@@ -267,16 +325,8 @@ const getSavedApplications = (props: IFullProps): IApplicationData => {
             application.data.deathEvent.deathDate &&
             application.data.deathEvent.deathDate.toString()) ||
           '',
-        placeOfBirth:
-          (application.data.child &&
-            application.data.child.birthLocation &&
-            application.data.child.birthLocation.toString()) ||
-          '',
-        placeOfDeath:
-          (application.data.deathEvent &&
-            application.data.deathEvent.deathLocation &&
-            application.data.deathEvent.deathLocation.toString()) ||
-          '',
+        placeOfBirth: getLocation(application, props) || '',
+        placeOfDeath: getLocation(application, props) || '',
         informant:
           (application.data.registration &&
             application.data.registration.contactPoint &&
@@ -296,7 +346,6 @@ const getSavedApplications = (props: IFullProps): IApplicationData => {
           ''
       }
     })
-  console.log(applications[0])
   return applications[0]
 }
 
@@ -365,13 +414,11 @@ const getApplicationInfo = (
   application: IApplicationData,
   isDownloaded: boolean
 ) => {
-  console.log(application.placeOfBirth, application.placeOfDeath)
   let facility =
     get(
       props.resources.facilities,
       application.placeOfBirth || application.placeOfDeath || ''
     ) || ''
-  console.log(facility)
   if (!facility) {
     facility =
       get(
@@ -379,7 +426,7 @@ const getApplicationInfo = (
         application.placeOfBirth || application.placeOfDeath || ''
       ) || ''
   }
-  console.log(facility)
+
   let informant =
     application.informant && getCaptitalizedword(application.informant)
 
@@ -404,7 +451,7 @@ const getApplicationInfo = (
     info = {
       ...info,
       dateOfBirth: application.dateOfBirth,
-      placeOfBirth: facility.alias,
+      placeOfBirth: application.placeOfBirth,
       informant: informant
     }
   } else if (info.type === 'Death') {
@@ -417,7 +464,7 @@ const getApplicationInfo = (
     info = {
       ...info,
       dateOfDeath: application.dateOfDeath,
-      placeOfDeath: facility.alias,
+      placeOfDeath: application.placeOfDeath,
       informant: informant
     }
   }
