@@ -21,7 +21,7 @@ window.config = {
   LOGIN_URL: 'http://localhost:3020',
   AUTH_URL: 'http://localhost:4040',
   API_GATEWAY_URL: 'http://localhost:7070/',
-  RESOURCES_URL: 'http://localhost:3040/bgd',
+  COUNTRY_CONFIG_URL: 'http://localhost:3040/bgd',
   CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 45, // days
   CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 1825, // 5 years =  (5 * 365) days
   CERTIFICATE_PRINT_LOWEST_CHARGE: 25, // taka
