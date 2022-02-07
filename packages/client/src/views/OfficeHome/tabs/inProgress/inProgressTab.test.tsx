@@ -317,7 +317,7 @@ describe('In Progress tab', () => {
         .simulate('click')
     })
 
-    it('redirects user to draft preview page on update click', async () => {
+    it('redirects user to recordAudit page on update click', async () => {
       const TIME_STAMP = 1562912635549
       const drafts: IApplication[] = [
         {
@@ -875,7 +875,7 @@ describe('Tablet tests', () => {
     resizeWindow(1024, 768)
   })
 
-  it('redirects to detail page if item is clicked', async () => {
+  it('redirects to recordAudit page if item is clicked', async () => {
     jest.clearAllMocks()
     const TIME_STAMP = '1562912635549'
     const drafts: IApplication[] = []

@@ -431,7 +431,7 @@ describe('FieldAgentHome tests', () => {
     testComponent.find('#row_0').hostNodes().simulate('click')
 
     expect(window.location.href).toContain(
-      'details/613da949-db8c-49ad-94b4-631ab0b7503e'
+      'recordAudit/613da949-db8c-49ad-94b4-631ab0b7503e'
     )
   })
 

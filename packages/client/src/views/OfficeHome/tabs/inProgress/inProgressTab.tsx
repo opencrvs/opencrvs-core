@@ -44,8 +44,6 @@ import {
   IntlShape
 } from 'react-intl'
 import { connect } from 'react-redux'
-import { LocalInProgressDataDetails } from './localInProgressDataDetails'
-import { RowHistoryView } from '@client/views/OfficeHome/RowHistoryView'
 import {
   buttonMessages,
   constantsMessages,
@@ -428,32 +426,6 @@ export class InProgressTabComponent extends React.Component<
         )}
       </TabGroup>
     )
-  }
-
-  renderDraftDataExpandedComponent = (itemId: string) => {
-    return <LocalInProgressDataDetails eventId={itemId} />
-  }
-
-  renderFieldAgentDataExpandedComponent = (itemId: string) => {
-    return this.renderInProgressDataExpandedComponent(itemId, 'inProgressData')
-  }
-
-  renderHospitalDataExpandedComponent = (itemId: string) => {
-    return this.renderInProgressDataExpandedComponent(
-      itemId,
-      'notificationData'
-    )
-  }
-
-  renderInProgressDataExpandedComponent = (
-    itemId: string,
-    queryDataKey: QueryDataKey
-  ) => {
-    const { results } =
-      this.props.queryData && this.props.queryData[queryDataKey]
-    const eventDetails =
-      results && results.find((result) => result && result.id === itemId)
-    return <RowHistoryView eventDetails={eventDetails} />
   }
 
   renderFieldAgentTable = (
