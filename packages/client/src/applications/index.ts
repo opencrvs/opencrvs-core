@@ -762,7 +762,7 @@ async function updateWorkqueueData(
   const transformedApplication = draftToGqlTransformer(
     // transforming required section only
     { sections: sectionDefinition ? [sectionDefinition] : [] },
-    application.data
+    application
   )
   const transformedName =
     (transformedApplication &&

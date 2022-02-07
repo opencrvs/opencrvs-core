@@ -63,6 +63,7 @@ import { Dispatch } from 'redux'
 import { RouteComponentProps } from 'react-router'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { Check } from '@opencrvs/components/lib/icons'
+import { IApplication } from '@client/applications'
 
 export interface IUserReviewFormProps {
   userId?: string
@@ -230,10 +231,9 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
     goBack: () => dispatch(goBack()),
     modify: (values: IFormSectionData) => dispatch(modifyUserFormData(values)),
     submitForm: (userFormSection: IFormSection) => {
-      const variables = draftToGqlTransformer(
-        { sections: [userFormSection] },
-        { user: props.formData }
-      )
+      const variables = draftToGqlTransformer({ sections: [userFormSection] }, {
+        data: { user: props.formData }
+      } as unknown as IApplication)
       if (variables.user._fhirID) {
         variables.user.id = variables.user._fhirID
         delete variables.user._fhirID
