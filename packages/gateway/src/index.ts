@@ -30,6 +30,7 @@ import {
   ApolloServerPluginStopHapiServer
 } from 'apollo-server-hapi'
 import { getApolloConfig } from '@gateway/graphql/config'
+import * as database from '@gateway/features/user/database'
 
 DotEnv.config({
   path: `${process.cwd()}/.env`
@@ -83,6 +84,7 @@ export async function createServer() {
   async function start() {
     await apolloServer.start()
     await app.start()
+    await database.start()
     await apolloServer.applyMiddleware({
       app
     })
@@ -91,6 +93,7 @@ export async function createServer() {
 
   async function stop() {
     await app.stop()
+    await database.stop()
     app.log('info', 'server stopped')
   }
 

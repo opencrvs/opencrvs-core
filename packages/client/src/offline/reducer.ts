@@ -121,7 +121,7 @@ function checkIfDone(
 
   if (
     /*
-     * Data was updated with a fresh version from resources
+     * Data was updated with a fresh version from offlineCountryConfig
      */
     isOfflineDataLoaded(oldState.offlineData) &&
     isOfflineDataLoaded(newState.offlineData) &&

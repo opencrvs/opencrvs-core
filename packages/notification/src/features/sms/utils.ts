@@ -9,7 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { NON_UNICODED_LANGUAGES, RESOURCES_URL } from '@notification/constants'
+import {
+  NON_UNICODED_LANGUAGES,
+  COUNTRY_CONFIG_URL
+} from '@notification/constants'
 import { internal } from '@hapi/boom'
 import { sendSMS } from '@notification/features/sms/service'
 import fetch from 'node-fetch'
@@ -53,7 +56,7 @@ export async function getTranslations(
   messagePayload: ISendSMSPayload,
   locale: string
 ): Promise<string> {
-  const url = `${RESOURCES_URL}/definitions/notification`
+  const url = `${COUNTRY_CONFIG_URL}/definitions/notification`
   const res: ITranslationsResponse = await fetch(url, {
     method: 'GET',
     headers: {
@@ -61,14 +64,14 @@ export async function getTranslations(
       ...authHeader
     }
   })
-    .then(response => {
+    .then((response) => {
       return response.json()
     })
-    .catch(error => {
+    .catch((error) => {
       return Promise.reject(new Error(` request failed: ${error.message}`))
     })
 
-  const language: ILanguage = res.languages.filter(obj => {
+  const language: ILanguage = res.languages.filter((obj) => {
     return obj.lang === locale
   })[0]
   const template = Handlebars.compile(language.messages[messageKey])

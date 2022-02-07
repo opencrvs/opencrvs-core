@@ -40,7 +40,7 @@ describe('Login app step one', () => {
         }
       },
       SENTRY: 'https://f892d643aab642108f44e2d1795706bc@sentry.io/1774604',
-      LOGROCKET: 'opencrvs-foundation/opencrvs-zambia'
+      LOGROCKET: 'opencrvs-foundation/opencrvs-farajaland'
     }
   })
 

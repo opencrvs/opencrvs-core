@@ -115,7 +115,28 @@ const navigatorMock = {
   AUTH_URL: 'http://localhost:4040',
   COUNTRY_CONFIG_URL: 'http://localhost:3040',
   COUNTRY: 'FAR',
-  LANGUAGES: 'en'
+  LANGUAGES: 'en',
+  CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 45,
+  CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 1825,
+  CERTIFICATE_PRINT_LOWEST_CHARGE: 25,
+  CERTIFICATE_PRINT_HIGHEST_CHARGE: 50,
+  SENTRY: 'https://2ed906a0ba1c4de2ae3f3f898ec9df0b@sentry.io/1774551',
+  LOGROCKET: 'opencrvs-foundation/opencrvs-bangladesh',
+  NID_NUMBER_PATTERN: {
+    pattern: /^[0-9]{9}$/,
+    example: '4837281940',
+    num: '9'
+  },
+  PHONE_NUMBER_PATTERN: {
+    pattern: /^01[1-9][0-9]{8}$/,
+    example: '01741234567',
+    start: '01',
+    num: '11',
+    mask: {
+      startForm: 5,
+      endBefore: 3
+    }
+  }
 }
 
 /*
