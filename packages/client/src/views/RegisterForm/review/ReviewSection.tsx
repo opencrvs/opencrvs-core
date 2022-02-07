@@ -975,7 +975,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               field,
               errorsOnFields,
               undefined,
-              !index
+              !!index
             )
           )
           .filter((value) => value)
@@ -1035,7 +1035,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       })
       return false
     }
-    return false
+    return true
   }
 
   fieldHasErrors(
