@@ -143,7 +143,7 @@ describe('when user is previewing the form data', () => {
       contactPoint: {
         value: 'OTHER',
         nestedFields: {
-          registrationPhone: '0799999999',
+          registrationPhone: '01717000000',
           contactRelationshipOther: 'grandma'
         }
       }

@@ -179,7 +179,7 @@ describe('when user has starts a new application', () => {
           .simulate('change', {
             target: {
               name: 'contactPoint.nestedFields.registrationPhone',
-              value: '0799999999'
+              value: '01999999999'
             }
           })
         app.find('#next_section').hostNodes().simulate('click')
