@@ -2,8 +2,8 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 - [Setting up a hosting environment for deploying OpenCRVS](#setting-up-a-hosting-environment-for-deploying-opencrvs)
-  - [How can I install and manage an OpenCRVS server cluster?](#how-can-i-install-and-manage-an-opencrvs-server-cluster)
-    - [8 GB Memory (preferrably 16 GB) / 160 GB Disk / Ubuntu 18.04.3 (LTS) x64](#8-gb-memory-preferrably-16-gb--160-gb-disk--ubuntu-18043-lts-x64)
+    - [How can I install and manage an OpenCRVS server cluster?](#how-can-i-install-and-manage-an-opencrvs-server-cluster)
+      - [8 GB Memory (preferrably 16 GB) / 160 GB Disk / Ubuntu 18.04.3 (LTS) x64](#8-gb-memory-preferrably-16-gb--160-gb-disk--ubuntu-18043-lts-x64)
   - [How can I deploy to a staging environment cluster?](#how-can-i-deploy-to-a-staging-environment-cluster)
   - [How can I deploy to a QA environment cluster?](#how-can-i-deploy-to-a-qa-environment-cluster)
   - [How can I deploy to production?](#how-can-i-deploy-to-production)
@@ -134,12 +134,12 @@ printf "<openhim-password>" | docker secret create openhim-password -
 ssh into the leader manager and run the following, replacing the following values with the actual secrets for your SMS provider of choice:
 
 ```sh
-# For Zambia we use Clickatell, we have found good Telco coverage in Africa with this provider
+# In Zambia we have used Clickatell, we have found good Telco coverage in Africa with this provider
 printf "<clickatell-user>" | docker secret create clickatell-user -
 printf "<clickatell-password>" | docker secret create clickatell-password -
 printf "<clickatell-api-id>" | docker secret create clickatell-api-id -
 
-# For Bangladesh we use Infobip, we have found good Telco coverage in Asia with this provider
+# For Bangladesh we used Infobip, we have found good Telco coverage in Asia with this provider
 printf "<infobip-gateway-endpoint>" | docker secret create infobip-gateway-endpoint -
 printf "<infobip-api-key>" | docker secret create infobip-api-key -
 printf "<infobip-sender-id>" | docker secret create infobip-sender-id -
@@ -166,7 +166,7 @@ login.<your_domain>
 openhim.<your_domain>
 openhim-api.<your_domain>
 register.<your_domain>
-resources.<your_domain>
+countryconfig.<your_domain>
 styleguide.<your_domain>
 monitor.<your_domain>
 

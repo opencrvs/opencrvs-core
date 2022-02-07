@@ -12,9 +12,9 @@
 import * as React from 'react'
 import {
   createTestApp,
-  createTestComponent,
   getItem,
-  flushPromises
+  flushPromises,
+  createTestComponent
 } from '@client/tests/util'
 
 import { createClient } from '@client/utils/apolloClient'
@@ -48,10 +48,10 @@ afterAll(() => {
 })
 
 it('renders without crashing', () =>
-  createTestApp({ waitUntilResourcesLoaded: false }))
+  createTestApp({ waitUntilOfflineCountryConfigLoaded: false }))
 
 it("redirects user to SSO if user doesn't have a token", async () => {
-  await createTestApp({ waitUntilResourcesLoaded: false })
+  await createTestApp({ waitUntilOfflineCountryConfigLoaded: false })
   await waitFor(() => assign.mock.calls[0][0] === window.config.LOGIN_URL)
 })
 
@@ -82,7 +82,9 @@ describe('when session expired', () => {
   let store: AppStore
 
   beforeEach(async () => {
-    const testApp = await createTestApp({ waitUntilResourcesLoaded: false })
+    const testApp = await createTestApp({
+      waitUntilOfflineCountryConfigLoaded: false
+    })
     app = testApp.app
     store = testApp.store
   })
@@ -126,8 +128,8 @@ describe('when user has a valid token in local storage', () => {
 })
 
 describe('it handles react errors', () => {
-  const { store } = createStore()
   it('displays react error page', async () => {
+    const { store, history } = createStore()
     function Problem(): JSX.Element {
       throw new Error('Error thrown.')
     }
@@ -135,18 +137,16 @@ describe('it handles react errors', () => {
       <StyledErrorBoundary>
         <Problem />
       </StyledErrorBoundary>,
-      store
+      { store, history }
     )
-    // @ts-ignore
-    expect(
-      testComponent.component.find('#GoToHomepage').hostNodes()
-    ).toHaveLength(1)
+
+    expect(testComponent.find('#GoToHomepage').hostNodes()).toHaveLength(1)
   })
 })
 
 describe('it handles react unauthorized errors', () => {
-  const { store } = createStore()
   it('displays react error page', async () => {
+    const { store, history } = createStore()
     function Problem(): JSX.Element {
       throw new Error('401')
     }
@@ -154,13 +154,11 @@ describe('it handles react unauthorized errors', () => {
       <StyledErrorBoundary>
         <Problem />
       </StyledErrorBoundary>,
-      store
+      { store, history }
     )
 
-    expect(
-      testComponent.component.find('#GoToHomepage').hostNodes()
-    ).toHaveLength(1)
+    expect(testComponent.find('#GoToHomepage').hostNodes()).toHaveLength(1)
 
-    testComponent.component.find('#GoToHomepage').hostNodes().simulate('click')
+    testComponent.find('#GoToHomepage').hostNodes().simulate('click')
   })
 })

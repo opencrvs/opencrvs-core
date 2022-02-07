@@ -53,7 +53,7 @@ interface BaseProps {
 type Props = BaseProps &
   WrappedComponentProps &
   Pick<RouteComponentProps, 'history'> & {
-    offlineResources: IOfflineData
+    offlineCountryConfiguration: IOfflineData
   }
 
 interface State {
@@ -86,15 +86,16 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
 
   renderPilotLocations(intl: IntlShape) {
     return (
-      (this.props.offlineResources.pilotLocations &&
-        Object.keys(this.props.offlineResources.pilotLocations).length > 0 && (
+      (this.props.offlineCountryConfiguration.pilotLocations &&
+        Object.keys(this.props.offlineCountryConfiguration.pilotLocations)
+          .length > 0 && (
           <MessageContainer>
             <MessageHeader>
               {this.props.intl.formatMessage(messages.pilotAreaListHeader)}
             </MessageHeader>
             {generatePilotLocations(
-              this.props.offlineResources.pilotLocations,
-              this.props.offlineResources.locations,
+              this.props.offlineCountryConfiguration.pilotLocations,
+              this.props.offlineCountryConfiguration.locations,
               intl
             ).map((pilotLocation, index) => (
               <MessageRow key={index}>
@@ -119,11 +120,17 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
   }
 
   render() {
-    const { intl, offlineResources } = this.props
+    const { intl, offlineCountryConfiguration } = this.props
 
-    const offlineLocations = generateLocations(offlineResources.locations, intl)
+    const offlineLocations = generateLocations(
+      offlineCountryConfiguration.locations,
+      intl
+    )
 
-    const offlineOffices = generateLocations(offlineResources.offices, intl)
+    const offlineOffices = generateLocations(
+      offlineCountryConfiguration.offices,
+      intl
+    )
 
     return (
       <SysAdminContentWrapper>
@@ -147,7 +154,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
 
 function mapStateToProps(state: IStoreState) {
   return {
-    offlineResources: getOfflineData(state)
+    offlineCountryConfiguration: getOfflineData(state)
   }
 }
 

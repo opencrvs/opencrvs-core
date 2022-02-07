@@ -102,8 +102,7 @@ const ErrorText = styled.div`
   text-align: center;
   margin-top: 100px;
 `
-
-const StatusBox = styled.span`
+const StatusBox = styled.div`
   padding: 4px 8px;
   ${({ theme }) => theme.fonts.captionBold};
   border-radius: 2px;
@@ -209,6 +208,7 @@ const Name = styled(LinkButton)`
 const RoleType = styled.div`
   ${({ theme }) => theme.fonts.chartLegendStyle}
   color: ${({ theme }) => theme.colors.waitingForExternalValidation};
+  text-align: left;
 `
 
 interface ISearchParams {
@@ -561,28 +561,28 @@ function UserListComponent(props: IProps) {
       columns = columns.concat([
         {
           label: intl.formatMessage(constantsMessages.name),
-          width: 70,
+          width: 65,
           key: 'nameRoleType'
         },
         {
           label: intl.formatMessage(constantsMessages.status),
-          width: 30,
+          width: 35,
           alignment: ColumnContentAlignment.RIGHT,
-          key: 'status'
+          key: 'statusMenu'
         }
       ])
     } else if (viewportWidth <= props.theme.grid.breakpoints.lg) {
       columns = columns.concat([
         {
           label: intl.formatMessage(constantsMessages.name),
-          width: 75,
+          width: 70,
           key: 'photoNameRoleType'
         },
         {
           label: intl.formatMessage(constantsMessages.status),
-          width: 25,
+          width: 30,
           alignment: ColumnContentAlignment.RIGHT,
-          key: 'status'
+          key: 'statusMenu'
         }
       ])
     } else {
@@ -595,14 +595,14 @@ function UserListComponent(props: IProps) {
           },
           {
             label: intl.formatMessage(constantsMessages.labelRole),
-            width: 50,
+            width: 45,
             key: 'roleType'
           },
           {
             label: intl.formatMessage(constantsMessages.status),
-            width: 15,
+            width: 20,
             alignment: ColumnContentAlignment.RIGHT,
-            key: 'status'
+            key: 'statusMenu'
           }
         ])
       } else {

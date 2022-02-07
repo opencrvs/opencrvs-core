@@ -45,7 +45,7 @@ export interface IAssetResponse {
 }
 
 async function loadDefinitions(): Promise<IDefinitionsResponse> {
-  const url = `${window.config.RESOURCES_URL}/definitions/client`
+  const url = `${window.config.COUNTRY_CONFIG_URL}/definitions/client`
 
   const res = await fetch(url, {
     method: 'GET',
@@ -63,7 +63,7 @@ async function loadDefinitions(): Promise<IDefinitionsResponse> {
 }
 
 async function loadLocations(): Promise<ILocationDataResponse> {
-  const url = `${window.config.RESOURCES_URL}/locations`
+  const url = `${window.config.COUNTRY_CONFIG_URL}/locations`
 
   const res = await fetch(url, {
     method: 'GET',
@@ -81,7 +81,7 @@ async function loadLocations(): Promise<ILocationDataResponse> {
 }
 
 async function loadFacilities(): Promise<IFacilitiesDataResponse> {
-  const url = `${window.config.RESOURCES_URL}/facilities`
+  const url = `${window.config.COUNTRY_CONFIG_URL}/facilities`
   const res = await fetch(url, {
     method: 'GET',
     headers: {
@@ -98,7 +98,7 @@ async function loadFacilities(): Promise<IFacilitiesDataResponse> {
 }
 
 async function loadPilotLocations(): Promise<ILocationDataResponse> {
-  const url = `${window.config.RESOURCES_URL}/pilotLocations`
+  const url = `${window.config.COUNTRY_CONFIG_URL}/pilotLocations`
 
   const res = await fetch(url, {
     method: 'GET',
@@ -129,7 +129,7 @@ const toDataURL = (url: string) =>
     )
 
 async function loadAssets(): Promise<IAssetResponse> {
-  const url = `${window.config.RESOURCES_URL}/assets/${window.config.COUNTRY_LOGO_FILE}`
+  const url = `${window.config.COUNTRY_CONFIG_URL}/assets/${window.config.COUNTRY_LOGO_FILE}`
 
   return toDataURL(url).then((dataUrl) => {
     return {

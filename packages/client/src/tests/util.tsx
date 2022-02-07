@@ -47,10 +47,12 @@ import { setUserDetails } from '@client/profile/profileActions'
 import {
   createBrowserHistory,
   createLocation,
-  createMemoryHistory
+  createMemoryHistory,
+  History
 } from 'history'
 import { stringify } from 'query-string'
 import { match as Match } from 'react-router'
+import { ConnectedRouter } from 'connected-react-router'
 
 export const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -119,14 +121,14 @@ export function waitForReady(app: ReactWrapper) {
 }
 
 export async function createTestApp(
-  config = { waitUntilResourcesLoaded: true }
+  config = { waitUntilOfflineCountryConfigLoaded: true }
 ) {
   const { store, history } = createStore()
   const app = mount(
     <App store={store} history={history} client={createGraphQLClient()} />
   )
 
-  if (config.waitUntilResourcesLoaded) {
+  if (config.waitUntilOfflineCountryConfigLoaded) {
     await waitForReady(app)
   }
   return { history, app, store }
@@ -2866,17 +2868,19 @@ export async function createTestStore() {
 
 export async function createTestComponent(
   node: React.ReactElement<ITestView>,
-  store: AppStore,
-  graphqlMocks: any = null,
+  {
+    store,
+    history,
+    graphqlMocks,
+    apolloClient
+  }: {
+    store: AppStore
+    history: History
+    graphqlMocks?: MockedProvider['props']['mocks']
+    apolloClient?: ApolloClient<any>
+  },
   options?: MountRendererProps
 ) {
-  /*
-   * Would it work to replace this fn with createTestApp()
-   * call send return only the component that requires testing..
-   *
-   * Feels odd the whole boilerplate has to be recreated
-   */
-
   await store.dispatch(
     offlineDataReady({
       languages: mockOfflineData.languages,
@@ -2890,7 +2894,11 @@ export async function createTestComponent(
     })
   )
 
-  function PropProxy(props: Record<string, any>) {
+  const withGraphQL = (node: JSX.Element) => {
+    if (apolloClient) {
+      return <ApolloProvider client={apolloClient}>{node}</ApolloProvider>
+    }
+
     return (
       <MockedProvider
         mocks={graphqlMocks}
@@ -2900,59 +2908,26 @@ export async function createTestComponent(
           query: { fetchPolicy: 'no-cache' }
         }}
       >
-        <Provider store={store}>
+        {node}
+      </MockedProvider>
+    )
+  }
+
+  function PropProxy(props: Record<string, any>) {
+    return withGraphQL(
+      <Provider store={store}>
+        <ConnectedRouter noInitialPop={true} history={history}>
           <I18nContainer>
             <ThemeProvider theme={getTheme(getDefaultLanguage())}>
               <node.type {...node.props} {...props} />
             </ThemeProvider>
           </I18nContainer>
-        </Provider>
-      </MockedProvider>
+        </ConnectedRouter>
+      </Provider>
     )
   }
 
-  const component = mount(<PropProxy {...node.props} />, options)
-  return { component: component.update(), store }
-}
-
-export async function createTestComponentWithApolloClient(
-  node: React.ReactElement<ITestView>,
-  store: AppStore,
-  client: ApolloClient<{}>
-) {
-  /*
-   * Would it work to replace this fn with createTestApp()
-   * call send return only the component that requires testing..
-   *
-   * Feels odd the whole boilerplate has to be recreated
-   */
-
-  await store.dispatch(
-    offlineDataReady({
-      languages: mockOfflineData.languages,
-      forms: mockOfflineData.forms,
-      templates: mockOfflineData.templates,
-      locations: mockOfflineData.locations,
-      facilities: mockOfflineData.facilities,
-      pilotLocations: mockOfflineData.pilotLocations,
-      offices: mockOfflineData.offices,
-      assets: mockOfflineData.assets
-    })
-  )
-
-  const component = mount(
-    <ApolloProvider client={client}>
-      <Provider store={store}>
-        <I18nContainer>
-          <ThemeProvider theme={getTheme(getDefaultLanguage())}>
-            {node}
-          </ThemeProvider>
-        </I18nContainer>
-      </Provider>
-    </ApolloProvider>
-  )
-
-  return { component: component.update(), store }
+  return mount(<PropProxy {...node.props} />, options)
 }
 
 export const mockDeathApplicationDataWithoutFirstNames = {
@@ -3181,7 +3156,11 @@ export function loginAsFieldAgent(store: AppStore) {
               ]
             }
           ],
-          primaryOffice: undefined,
+          primaryOffice: {
+            id: '0d8474da-0361-4d32-979e-af91f012340a',
+            name: 'Kaliganj Union Sub Center',
+            status: 'active'
+          },
           localRegistrar: {
             name: [
               {
@@ -3201,11 +3180,11 @@ export function loginAsFieldAgent(store: AppStore) {
 
 export function createRouterProps<T, Params>(
   path: string,
-  locationState: T,
+  locationState?: T,
   {
     search,
     matchParams = {} as Params
-  }: { search?: Record<string, string>; matchParams?: Params }
+  }: { search?: Record<string, string>; matchParams?: Params } = {}
 ) {
   const location = createLocation(path, locationState)
 

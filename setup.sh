@@ -96,7 +96,7 @@ echo
 echo "Installing Docker and Node for example, is outside the scope of this script."
 sleep 10
 echo
-echo "As part of this script, we checkout another GIT repo: The Zambia country configuration resources into the folder next to this one called: 'opencrvs-zambia'. We do this to make it easy for you to try OpenCRVS.  If you are developing your own country configuration, you should delete this folder and fork the config resources repo somewhere else."
+echo "As part of this script, we checkout another GIT repo: The fictional Farajaland country configuration module into the folder next to this one called: 'opencrvs-farajaland'. We do this to make it easy for you to try OpenCRVS.  If you are developing your own country configuration, you should delete this folder and fork the config repo somewhere else."
 sleep 10
 echo
 echo -e "\033[32m:::::::::::::::: PLEASE WAIT FOR THE OPEN CRVS LOGO TO APPEAR ::::::::::::::::\033[0m"
@@ -356,9 +356,9 @@ if [ $OS == "UBUNTU" ]; then
 fi
 tmux set -p @mytitle "opencrvs-core"
 tmux split-window -v
-tmux set -p @mytitle "opencrvs-zambia"
+tmux set -p @mytitle "opencrvs-farajaland"
 DIR=$(cd "$(dirname "$0")"; pwd)
-tmux send-keys -t opencrvs "bash setup-scripts/setup-resources.sh $DIR" C-m
+tmux send-keys -t opencrvs "bash setup-scripts/setup-countryconfig.sh $DIR" C-m
 tmux setw -g mouse on
 tmux attach -t opencrvs
 
