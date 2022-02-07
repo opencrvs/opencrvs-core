@@ -3642,6 +3642,7 @@ export const mockFacilityResponse = {
 export const mockTaskBirthCorrectionBundle = {
   resourceType: 'Bundle',
   type: 'document',
+  intent: '',
   entry: [
     {
       fullUrl:
