@@ -1038,7 +1038,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       })
       return false
     }
-    return false
+    return true
   }
 
   fieldHasErrors(

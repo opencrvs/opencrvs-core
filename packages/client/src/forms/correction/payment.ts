@@ -22,14 +22,13 @@ import { messages } from '@client/i18n/messages/views/correction'
 
 export const correctionFeesPayment: IFormSectionGroup = {
   id: 'correctionFeesPayment',
-  title: messages.correctionSummaryFeesRequired,
-  error: messages.correctionSummaryProofOfPaymentRequired,
   fields: [
     {
       name: 'correctionFees',
       type: RADIO_GROUP_WITH_NESTED_FIELDS,
       size: RadioSize.LARGE,
       label: messages.correctionSummaryFeesRequired,
+      hideAsterisk: true,
       required: true,
       initialValue: '',
       validate: [],

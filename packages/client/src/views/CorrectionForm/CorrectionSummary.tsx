@@ -12,10 +12,11 @@
 import * as React from 'react'
 import { modifyApplication, IApplication } from '@client/applications'
 import { connect } from 'react-redux'
+import { flatten, isArray, flattenDeep, get, clone } from 'lodash'
 import {
   WrappedComponentProps as IntlShapeProps,
   injectIntl,
-  MessageDescriptor
+  IntlShape
 } from 'react-intl'
 import {
   goBack,
@@ -26,11 +27,7 @@ import {
 import { messages as registerMessages } from '@client/i18n/messages/views/register'
 import { messages } from '@client/i18n/messages/views/correction'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
-import {
-  buttonMessages,
-  constantsMessages,
-  formMessages
-} from '@client/i18n/messages'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import {
   IFormSection,
   IFormField,
@@ -38,8 +35,12 @@ import {
   IFormSectionGroup,
   IFormSectionData,
   CorrectionSection,
-  ReviewSection
+  ReviewSection,
+  IFormData,
+  IFormTag,
+  REVIEW_OVERRIDE_POSITION
 } from '@client/forms'
+
 import {
   ActionPageLight,
   ColumnContentAlignment,
@@ -56,16 +57,40 @@ import { Check, PaperClip } from '@opencrvs/components/lib/icons'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
 import styled from 'styled-components'
 import { FormFieldGenerator } from '@client/components/form'
-import { group } from 'console'
+import { correctionFeesPaymentSection } from '@client/forms/correction/payment'
 import {
-  correctionFeesPayment,
-  correctionFeesPaymentSection
-} from '@client/forms/correction/payment'
+  getNestedFieldValue,
+  getOverriddenFieldsListForPreview,
+  getRenderableField,
+  getViewableSection,
+  hasFieldChanged,
+  isViewOnly,
+  isVisibleField,
+  renderValue,
+  sectionHasError
+} from './utils'
+import { IStoreState } from '@client/store'
+import { getRegisterForm } from '@client/forms/register/application-selectors'
+import { getLanguage } from '@client/i18n/selectors'
+import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
+import { getOfflineData } from '@client/offline/selectors'
+import { IOfflineData } from '@client/offline/reducer'
 
 const SupportingDocument = styled.div`
   display: flex;
   margin: 8px 0;
 `
+interface Correction {
+  item: string
+  original: string
+  correction: string
+}
+
+interface IProps {
+  registerForm: { [key: string]: IForm }
+  offlineResources: IOfflineData
+  language: string
+}
 
 type IStateProps = {
   application: IApplication
@@ -79,9 +104,9 @@ type IDispatchProps = {
   goToHomeTab: typeof goToHomeTab
 }
 
-type IProps = IStateProps & IDispatchProps & IntlShapeProps
+type IFullProps = IProps & IStateProps & IDispatchProps & IntlShapeProps
 
-class CorrectionSummaryComponent extends React.Component<IProps> {
+class CorrectionSummaryComponent extends React.Component<IFullProps> {
   section = correctionFeesPaymentSection
   group = this.section.groups[0]
 
@@ -97,7 +122,14 @@ class CorrectionSummaryComponent extends React.Component<IProps> {
   }
 
   render() {
-    const { application, intl, goBack } = this.props
+    const {
+      registerForm,
+      application,
+      intl,
+      goBack,
+      application: { event }
+    } = this.props
+    const formSections = getViewableSection(registerForm[event], application)
 
     const backToReviewButton = (
       <SecondaryButton
@@ -114,6 +146,7 @@ class CorrectionSummaryComponent extends React.Component<IProps> {
         id="make_correction"
         key="make_correction"
         onClick={this.makeCorrection}
+        disabled={sectionHasError(this.group, this.section, application)}
         icon={() => <Check />}
         align={ICON_ALIGNMENT.LEFT}
       >
@@ -137,14 +170,9 @@ class CorrectionSummaryComponent extends React.Component<IProps> {
           >
             <ListTable
               isLoading={false}
-              content={[
-                {
-                  item: 'Date of death',
-                  original: '2021-22-22',
-                  correction: '2022-22-22'
-                }
-              ]}
+              content={this.getChanges(formSections)}
               hideBoxShadow={true}
+              hideTableBottomBorder={true}
               columns={[
                 {
                   label: intl.formatMessage(messages.correctionSummaryItem),
@@ -164,12 +192,13 @@ class CorrectionSummaryComponent extends React.Component<IProps> {
                   ),
                   width: 33,
                   alignment: ColumnContentAlignment.LEFT,
-                  key: 'correction'
+                  key: 'changed'
                 }
               ]}
               noResultText={intl.formatMessage(constantsMessages.noResults)}
             ></ListTable>
             <ListTable
+              hideTableBottomBorder={true}
               isLoading={false}
               content={[
                 {
@@ -191,6 +220,7 @@ class CorrectionSummaryComponent extends React.Component<IProps> {
             ></ListTable>
 
             <ListTable
+              hideTableBottomBorder={true}
               isLoading={false}
               content={[
                 {
@@ -210,6 +240,7 @@ class CorrectionSummaryComponent extends React.Component<IProps> {
             ></ListTable>
 
             <ListTable
+              hideTableBottomBorder={true}
               isLoading={false}
               content={[
                 {
@@ -231,6 +262,7 @@ class CorrectionSummaryComponent extends React.Component<IProps> {
             ></ListTable>
 
             <ListTable
+              hideTableBottomBorder={true}
               isLoading={false}
               content={[
                 {
@@ -286,6 +318,367 @@ class CorrectionSummaryComponent extends React.Component<IProps> {
         </ActionPageLight>
       </>
     )
+  }
+
+  getFieldValue = (
+    section: IFormSection,
+    data: IFormData,
+    field: IFormField,
+    intl: IntlShape,
+    offlineResources: IOfflineData,
+    language: string,
+    ignoreNestedFieldWrapping?: boolean,
+    replaceEmpty?: boolean
+  ) => {
+    let value = renderValue(
+      data,
+      section.id,
+      field,
+      intl,
+      offlineResources,
+      language
+    )
+
+    if (replaceEmpty && !value) {
+      value = '-'
+    }
+
+    return field.nestedFields && !Boolean(ignoreNestedFieldWrapping)
+      ? (
+          (data[section.id] &&
+            data[section.id][field.name] &&
+            (data[section.id][field.name] as IFormSectionData).value &&
+            field.nestedFields[
+              (data[section.id][field.name] as IFormSectionData).value as string
+            ]) ||
+          []
+        ).reduce((groupedValues, nestedField) => {
+          // Value of the parentField resembles with IFormData as a nested form
+          const nestedValue =
+            (data[section.id] &&
+              data[section.id][field.name] &&
+              renderValue(
+                data[section.id][field.name] as IFormData,
+                'nestedFields',
+                nestedField,
+                intl,
+                offlineResources,
+                language
+              )) ||
+            ''
+          return (
+            <>
+              {groupedValues}
+              {nestedValue && <br />}
+              {nestedValue}
+            </>
+          )
+        }, <>{value}</>)
+      : value
+  }
+
+  getSinglePreviewField = (
+    section: IFormSection,
+    group: IFormSectionGroup,
+    field: IFormField,
+    ignoreNestedFieldWrapping?: boolean
+  ) => {
+    const { application, intl, offlineResources, language } = this.props
+    if (
+      application.originalData &&
+      hasFieldChanged(section, field, application)
+    ) {
+      const changed = this.getFieldValue(
+        section,
+        application.data,
+        field,
+        intl,
+        offlineResources,
+        language,
+        ignoreNestedFieldWrapping
+      )
+      const original = this.getFieldValue(
+        section,
+        application.originalData,
+        field,
+        intl,
+        offlineResources,
+        language,
+        ignoreNestedFieldWrapping,
+        true
+      )
+
+      return getRenderableField(section, field, original, changed, intl)
+    }
+  }
+
+  getPreviewGroupsField = (
+    section: IFormSection,
+    group: IFormSectionGroup,
+    field: IFormField,
+    visitedTags: string[]
+  ) => {
+    const { application, intl, offlineResources, language } = this.props
+    if (field.previewGroup && !visitedTags.includes(field.previewGroup)) {
+      visitedTags.push(field.previewGroup)
+
+      const baseTag = field.previewGroup
+      const taggedFields: IFormField[] = []
+      group.fields.forEach((field) => {
+        if (
+          isVisibleField(field, section, application, offlineResources) &&
+          !isViewOnly(field)
+        ) {
+          if (field.previewGroup === baseTag) {
+            taggedFields.push(field)
+          }
+          for (const index in field.nestedFields) {
+            field.nestedFields[index].forEach((tempField) => {
+              if (
+                isVisibleField(
+                  tempField,
+                  section,
+                  application,
+                  offlineResources
+                ) &&
+                !isViewOnly(tempField) &&
+                tempField.previewGroup === baseTag
+              ) {
+                taggedFields.push(tempField)
+              }
+            })
+          }
+        }
+      })
+
+      const tagDef =
+        (group.previewGroups &&
+          (group.previewGroups.filter(
+            (previewGroup) => previewGroup.id === baseTag
+          ) as IFormTag[])) ||
+        []
+      const values = taggedFields
+        .map((field) =>
+          this.getFieldValue(
+            section,
+            application.data,
+            field,
+            intl,
+            offlineResources,
+            language
+          )
+        )
+        .filter((value) => value)
+
+      let completeValue = <div>{values[0]}</div>
+      values.shift()
+      values.forEach(
+        (value) =>
+          (completeValue = (
+            <>
+              {completeValue}
+              {tagDef[0].delimiter && <span>{tagDef[0].delimiter}</span>}
+              <div>{value}</div>
+            </>
+          ))
+      )
+
+      const hasAnyFieldChanged = taggedFields.reduce(
+        (accum, field) => accum || hasFieldChanged(section, field, application),
+        false
+      )
+
+      const originalData = application.originalData
+      if (originalData && hasAnyFieldChanged) {
+        const previousValues = taggedFields
+          .map((field, index) =>
+            this.getFieldValue(
+              section,
+              originalData,
+              field,
+              intl,
+              offlineResources,
+              language,
+              undefined,
+              !index
+            )
+          )
+          .filter((value) => value)
+        let previousCompleteValue = <div>{previousValues[0]}</div>
+        previousValues.shift()
+        previousValues.forEach(
+          (previousValue) =>
+            (previousCompleteValue = (
+              <>
+                {previousCompleteValue}
+                {tagDef[0].delimiter && <span>{tagDef[0].delimiter}</span>}
+                <div>{previousValue}</div>
+              </>
+            ))
+        )
+        // console.log(previousCompleteValue)
+        return getRenderableField(
+          section,
+          field,
+          previousCompleteValue,
+          completeValue,
+          intl
+        )
+      }
+    }
+  }
+
+  getNestedPreviewField = (
+    section: IFormSection,
+    group: IFormSectionGroup,
+    field: IFormField
+  ) => {
+    const { application, intl, offlineResources, language } = this.props
+    const visitedTags: string[] = []
+    const nestedItems: any[] = []
+    // parent field
+    let item: any
+    item = this.getSinglePreviewField(section, group, field, true)
+
+    item && nestedItems.push(item)
+    ;(
+      (field.nestedFields &&
+        application.data[section.id] &&
+        application.data[section.id][field.name] &&
+        (application.data[section.id][field.name] as IFormSectionData).value &&
+        field.nestedFields[
+          (application.data[section.id][field.name] as IFormSectionData)
+            .value as string
+        ]) ||
+      []
+    ).forEach((nestedField) => {
+      if (nestedField.previewGroup) {
+        item = this.getPreviewGroupsField(
+          section,
+          group,
+          nestedField,
+          visitedTags
+        )
+
+        item && nestedItems.push(item)
+      } else {
+        item = getNestedFieldValue(
+          section,
+          application.data[section.id][field.name] as IFormData,
+          nestedField,
+          intl,
+          offlineResources,
+          language
+        )
+        item && nestedItems.push(item)
+      }
+    })
+    return nestedItems
+  }
+
+  getOverRiddenPreviewField = (
+    section: IFormSection,
+    group: IFormSectionGroup,
+    overriddenField: IFormField,
+    field: IFormField,
+    items: any[],
+    item: any,
+    deathForm: IForm
+  ) => {
+    const { application, intl, offlineResources, language } = this.props
+    overriddenField.label =
+      get(overriddenField, 'reviewOverrides.labelAs') || overriddenField.label
+    const residingSectionId = get(
+      overriddenField,
+      'reviewOverrides.residingSection'
+    )
+    const residingSection = deathForm.sections.find(
+      (section) => section.id === residingSectionId
+    ) as IFormSection
+
+    const result = this.getSinglePreviewField(
+      residingSection,
+      group,
+      overriddenField
+    )
+
+    const { sectionID, groupID, fieldName } =
+      overriddenField!.reviewOverrides!.reference
+    if (
+      sectionID === section.id &&
+      groupID === group.id &&
+      fieldName === field.name
+    ) {
+      if (
+        overriddenField!.reviewOverrides!.position ===
+        REVIEW_OVERRIDE_POSITION.BEFORE
+      ) {
+        items = items.concat(result)
+        items = items.concat(item)
+      } else {
+        items = items.concat(item)
+        items = items.concat(result)
+      }
+      return items
+    }
+
+    items = items.concat(item)
+    return items
+  }
+
+  getChanges = (formSections: IFormSection[]) => {
+    const { application, intl, offlineResources, language } = this.props
+    const overriddenFields = getOverriddenFieldsListForPreview(
+      formSections,
+      application,
+      offlineResources
+    )
+    let tempItem: any
+    // console.log(application)
+
+    let items: any[] = []
+    formSections.forEach((section) => {
+      const visitedTags: string[] = []
+      const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
+        section,
+        application.data[section.id] || {},
+        application.data
+      )
+      visibleGroups.forEach((group) => {
+        group.fields
+          .filter(
+            (field) =>
+              isVisibleField(field, section, application, offlineResources) &&
+              !isViewOnly(field)
+          )
+          .filter((field) => !Boolean(field.hideInPreview))
+          .filter((field) => !Boolean(field.reviewOverrides))
+          .forEach((field) => {
+            tempItem = field.previewGroup
+              ? this.getPreviewGroupsField(section, group, field, visitedTags)
+              : field.nestedFields && field.ignoreNestedFieldWrappingInPreview
+              ? this.getNestedPreviewField(section, group, field)
+              : this.getSinglePreviewField(section, group, field)
+
+            overriddenFields.forEach((overriddenField) => {
+              items = this.getOverRiddenPreviewField(
+                section,
+                group,
+                overriddenField as IFormField,
+                field,
+                items,
+                tempItem,
+                this.props.registerForm.death
+              )
+            })
+
+            if (!overriddenFields.length) {
+              items = items.concat(tempItem)
+            }
+          })
+      })
+    })
+    return items.filter((item) => item)
   }
 
   modifyApplication = (
@@ -384,7 +777,7 @@ class CorrectionSummaryComponent extends React.Component<IProps> {
       <div>
         <div>{message}</div>
         <LinkButton
-          id="birth-registration-detalis-link"
+          id="change-reason-link"
           onClick={() =>
             this.props.goToCertificateCorrection(
               this.props.application.id,
@@ -406,7 +799,7 @@ class CorrectionSummaryComponent extends React.Component<IProps> {
       <div>
         <div>{comments}</div>
         <LinkButton
-          id="birth-registration-detalis-link"
+          id="change-comment-link"
           onClick={() =>
             this.props.goToCertificateCorrection(
               this.props.application.id,
@@ -441,7 +834,7 @@ class CorrectionSummaryComponent extends React.Component<IProps> {
             )
           })}
         <LinkButton
-          id="birth-registration-detalis-link"
+          id="upload-supporting-doc-link"
           onClick={() =>
             this.props.goToCertificateCorrection(
               this.props.application.id,
@@ -480,10 +873,17 @@ class CorrectionSummaryComponent extends React.Component<IProps> {
   }
 }
 
-export const CorrectionSummary = connect(undefined, {
-  modifyApplication,
-  goBack,
-  goToPageGroup,
-  goToCertificateCorrection,
-  goToHomeTab
-})(injectIntl(CorrectionSummaryComponent))
+export const CorrectionSummary = connect(
+  (state: IStoreState) => ({
+    registerForm: getRegisterForm(state),
+    offlineResources: getOfflineData(state),
+    language: getLanguage(state)
+  }),
+  {
+    modifyApplication,
+    goBack,
+    goToPageGroup,
+    goToCertificateCorrection,
+    goToHomeTab
+  }
+)(injectIntl(CorrectionSummaryComponent))
