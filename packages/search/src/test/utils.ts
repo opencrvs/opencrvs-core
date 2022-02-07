@@ -3642,7 +3642,6 @@ export const mockFacilityResponse = {
 export const mockTaskBirthCorrectionBundle = {
   resourceType: 'Bundle',
   type: 'document',
-  intent: '',
   entry: [
     {
       fullUrl:
@@ -3650,8 +3649,17 @@ export const mockTaskBirthCorrectionBundle = {
       resource: {
         resourceType: 'Task',
         status: 'requested',
+        intent: '',
         input: [
           {
+            type: {
+              coding: [
+                {
+                  system: 'http://terminology.hl7.org/CodeSystem/action-type',
+                  code: 'update'
+                }
+              ]
+            },
             valueCode: 'child',
             valueId: 'name',
             valueString: 'Old name'
@@ -3659,6 +3667,14 @@ export const mockTaskBirthCorrectionBundle = {
         ],
         output: [
           {
+            type: {
+              coding: [
+                {
+                  system: 'http://terminology.hl7.org/CodeSystem/action-type',
+                  code: 'update'
+                }
+              ]
+            },
             valueCode: 'child',
             valueId: 'name',
             valueString: 'New name'

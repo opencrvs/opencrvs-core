@@ -127,12 +127,12 @@ describe('elastic search utils', () => {
     await createStatusHistory(
       compositionBody,
       mockTaskBirthCorrectionBundle.entry[0].resource,
-      {}
+      'Bearer abc'
     )
 
     expect(compositionBody).toHaveProperty('operationHistories')
     expect(compositionBody.operationHistories).toHaveLength(2)
-    expect(compositionBody.operationHistories[1]).toHaveProperty('correction')
-    expect(compositionBody.operationHistories[1].correction).toHaveLength(1)
+    expect(compositionBody.operationHistories?.[1]).toHaveProperty('correction')
+    expect(compositionBody.operationHistories?.[1]?.correction).toHaveLength(1)
   })
 })
