@@ -1215,7 +1215,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       }
     })
 
-    return initialTransformedSection
+    return initialTransformedSection.map((sec) => {
+      if (sec.id === 'father' && sec.items[0].value === 'No') {
+        return { ...sec, items: [sec.items[0]] }
+      } else return { ...sec }
+    })
   }
 
   render() {
@@ -1266,6 +1270,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       formSections,
       errorsOnFields
     )
+
     return (
       <FullBodyContent>
         <Row>
