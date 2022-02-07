@@ -121,13 +121,24 @@ const StyledPrimaryButton = styled(PrimaryButton)`
 const SearchBox = styled.div`
   position: static;
   width: 624px;
-  height: 40px;
+  height: 42px;
   left: calc(50% - 624px / 2 + 24px);
   top: calc(50% - 40px / 2);
   background: ${({ theme }) => theme.colors.grey300};
   box-sizing: border-box;
   border-radius: 100px;
   margin: 0px 12px;
+  margin-right: 96px;
+  &:focus-within {
+    border: 1px solid ${({ theme }) => theme.colors.grey800};
+    background: ${({ theme }) => theme.colors.white};
+  }
+  &:focus-within input {
+    background: ${({ theme }) => theme.colors.white};
+  }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.xl}px) {
+    width: 507.87px;
+  }
 `
 const HeaderCenter = styled.div`
   padding: 8px 16px;

@@ -130,6 +130,7 @@ export const colors = {
   ronchi: colorDictionary.ronchi,
 
   // new color code
+  blue500: colorDictionary.blueCrystal,
   grey800: colorDictionary.grey800,
   grey300: colorDictionary.grey300
 }

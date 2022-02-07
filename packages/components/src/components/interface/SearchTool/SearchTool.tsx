@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { SearchBlue, ArrowDownBlue, ClearText } from '../../icons'
-import { CircleButton } from '../../buttons'
+import { SearchBlue, ClearText } from '../../icons'
+import { Button, CircleButton } from '../../buttons'
 import styled from 'styled-components'
 
 const Wrapper = styled.form`
@@ -28,21 +28,32 @@ const SearchTextInput = styled.input`
   border: none;
   margin: 0px 10px;
   ${({ theme }) => theme.fonts.bodyStyle};
+  background-color: ${({ theme }) => theme.colors.grey300};
   flex-grow: 1;
   &:focus {
     outline: none;
+    background-color: ${({ theme }) => theme.colors.white};
   }
+
   &:-webkit-autofill {
     -webkit-box-shadow: 0 0 0px 1000px ${({ theme }) => theme.colors.white}
       inset;
   }
-  background-color: ${({ theme }) => theme.colors.grey300};
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin: 0px 4px;
     width: 40%;
   }
 `
+export const LabelButton = styled(Button)`
+  width: auto;
+  height: auto;
+  background: ${({ theme }) => theme.colors.gray300};
+  border-radius: 2px;
+  color: ${({ theme }) => theme.colors.secondary};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
+`
+
 const DropDownWrapper = styled.ul`
   background: ${({ theme }) => theme.colors.white};
   border-radius: 2px;
@@ -57,34 +68,6 @@ const DropDownWrapper = styled.ul`
   margin: 3px 0px;
   cursor: pointer;
 `
-
-export const IconRingButton = styled((props) => <CircleButton {...props} />)`
-  background: transparent;
-  border: none;
-  height: 24px;
-  width: 24px;
-  margin: 0 5px;
-  padding: 0;
-  & > svg {
-    display: block;
-    margin: 0 auto;
-  }
-  &:focus {
-    outline: none;
-    border: 3px solid ${({ theme }) => theme.colors.focus};
-    background: transparent;
-  }
-  &:not([data-focus-visible-added]) {
-    background: transparent;
-    outline: none;
-    border: none;
-  }
-  &:active:not([data-focus-visible-added]) {
-    border: 3px solid ${({ theme }) => theme.colors.focus};
-    background: transparent;
-    outline: none;
-  }
-`
 const DropDownItem = styled.li`
   display: flex;
   align-items: center;
@@ -95,7 +78,13 @@ const DropDownItem = styled.li`
     border-bottom: none;
   }
   &:hover {
-    background: ${({ theme }) => theme.colors.dropdownHover};
+    background: ${({ theme }) => theme.colors.blue500};
+  }
+  &:hover span {
+    color: ${({ theme }) => theme.colors.white};
+  }
+  &:hover svg path {
+    stroke: ${({ theme }) => theme.colors.white};
   }
 `
 const IconWrapper = styled.span`
@@ -107,11 +96,11 @@ const Label = styled.span`
   color: ${({ theme }) => theme.colors.copy};
 `
 const SelectedSearchCriteria = styled.span`
-  background: ${({ theme }) => theme.colors.secondary};
+  background: ${({ theme }) => theme.colors.gray300};
   border-radius: 2px;
   padding: 5px 10px;
-  color: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.captionStyle};
+  color: ${({ theme }) => theme.colors.secondary};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
   display: flex;
   & .selected-icon {
     display: none;
@@ -280,13 +269,10 @@ export class SearchTool extends React.Component<IProps, IState> {
             <span className="selected-icon">
               {this.state.selectedSearchType.invertIcon}
             </span>
-            <span className="selected-label">
+            <LabelButton className="selected-label">
               {this.state.selectedSearchType.label}
-            </span>
+            </LabelButton>
           </SelectedSearchCriteria>
-          <IconRingButton>
-            <ArrowDownBlue />
-          </IconRingButton>
         </DropDown>
         {this.dropdown()}
       </Wrapper>
