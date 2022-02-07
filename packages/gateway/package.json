@@ -21,6 +21,7 @@
     "precommit": "tslint --project ./tsconfig.json && lint-staged"
   },
   "dependencies": {
+    "redis": "^3.1.1",
     "@elastic/elasticsearch": "6",
     "@graphql-tools/graphql-file-loader": "^6.0.9",
     "@graphql-tools/load": "^6.0.9",

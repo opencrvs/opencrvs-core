@@ -16,7 +16,6 @@ import { logger } from '@gateway/logger'
 import { callingCountries } from 'country-data'
 import * as decode from 'jwt-decode'
 import fetch from 'node-fetch'
-
 export interface ITokenPayload {
   sub: string
   exp: string

@@ -62,6 +62,7 @@ export interface GQLMutation {
   createOrUpdateUser: GQLUser
   activateUser?: string
   changePassword?: string
+  changePhone?: string
   changeAvatar?: string
   auditUser?: string
   resendSMSInvite?: string
@@ -1788,6 +1789,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   createOrUpdateUser?: MutationToCreateOrUpdateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
   changePassword?: MutationToChangePasswordResolver<TParent>
+  changePhone?: MutationToChangePhoneResolver<TParent>
   changeAvatar?: MutationToChangeAvatarResolver<TParent>
   auditUser?: MutationToAuditUserResolver<TParent>
   resendSMSInvite?: MutationToResendSMSInviteResolver<TParent>
@@ -2084,6 +2086,21 @@ export interface MutationToChangePasswordResolver<
   (
     parent: TParent,
     args: MutationToChangePasswordArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToChangePhoneArgs {
+  userId: string
+  phoneNumber: string
+  nonce: string
+  verifyCode: string
+}
+export interface MutationToChangePhoneResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToChangePhoneArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
