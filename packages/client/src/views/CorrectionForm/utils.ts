@@ -262,43 +262,31 @@ export const renderValue = (
 }
 
 export function hasFieldChanged(
-  section: IFormSection,
   field: IFormField,
-  draft: IApplication
+  data: IFormSectionData,
+  originalData?: IFormSectionData
 ) {
-  if (!draft.originalData) return false
-  if (
-    draft.data[section.id][field.name] &&
-    (draft.data[section.id][field.name] as IFormData).value
-  ) {
-    return hasNestedDataChanged(section, field, draft)
+  if (!originalData) return false
+  if (data[field.name] && (data[field.name] as IFormData).value) {
+    return hasNestedDataChanged(
+      data[field.name] as IFormData,
+      originalData[field.name] as IFormData
+    )
   }
   /*
    * data section might have some values as empty string
    * whereas original data section have them as undefined
    */
-  if (
-    !draft.originalData[section.id][field.name] &&
-    draft.data[section.id][field.name] === ''
-  ) {
+  if (!originalData[field.name] && data[field.name] === '') {
     return false
   }
-  return (
-    draft.data[section.id][field.name] !==
-    draft.originalData[section.id][field.name]
-  )
+  return data[field.name] !== originalData[field.name]
 }
 
 export function hasNestedDataChanged(
-  section: IFormSection,
-  field: IFormField,
-  draft: IApplication
+  nestedFieldData: IFormData,
+  previousNestedFieldData: IFormData
 ) {
-  const nestedFieldData = draft.data[section.id][field.name] as IFormData
-
-  const previousNestedFieldData = (draft.originalData as IFormData)[section.id][
-    field.name
-  ] as IFormData
   if (nestedFieldData.value === previousNestedFieldData.value) {
     Object.keys(nestedFieldData.nestedFields).forEach((key) => {
       if (
@@ -314,17 +302,17 @@ export function hasNestedDataChanged(
 
 export function getRenderableField(
   section: IFormSection,
-  field: IFormField,
+  fieldLabel: MessageDescriptor,
   original: IFormFieldValue | JSX.Element | undefined,
   changed: IFormFieldValue | JSX.Element | undefined,
   intl: IntlShape
 ) {
-  let item = intl.formatMessage(field.label)
+  let item = intl.formatMessage(fieldLabel)
   if (section && section.name) {
     item = `${item} (${intl.formatMessage(section.name)})`
   }
   return {
-    item: item,
+    item,
     original,
     changed
   }

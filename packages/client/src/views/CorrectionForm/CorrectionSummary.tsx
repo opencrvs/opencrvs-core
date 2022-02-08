@@ -386,7 +386,11 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
     const { application, intl, offlineResources, language } = this.props
     if (
       application.originalData &&
-      hasFieldChanged(section, field, application)
+      hasFieldChanged(
+        field,
+        application.data[section.id],
+        application.originalData[section.id]
+      )
     ) {
       const changed = this.getFieldValue(
         section,
@@ -408,7 +412,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
         true
       )
 
-      return getRenderableField(section, field, original, changed, intl)
+      return getRenderableField(section, field.label, original, changed, intl)
     }
   }
 
@@ -416,7 +420,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
     section: IFormSection,
     group: IFormSectionGroup,
     field: IFormField,
-    visitedTags: string[]
+    visitedTags: string[],
+    data: IFormSectionData,
+    originalData?: IFormSectionData
   ) => {
     const { application, intl, offlineResources, language } = this.props
     if (field.previewGroup && !visitedTags.includes(field.previewGroup)) {
@@ -470,31 +476,31 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
         )
         .filter((value) => value)
 
-      let completeValue = <div>{values[0]}</div>
+      let completeValue = values[0]
       values.shift()
       values.forEach(
         (value) =>
           (completeValue = (
             <>
               {completeValue}
-              {tagDef[0].delimiter && <span>{tagDef[0].delimiter}</span>}
-              <div>{value}</div>
+              {tagDef[0].delimiter ? tagDef[0].delimiter : <div></div>}
+              {value}
             </>
           ))
       )
 
       const hasAnyFieldChanged = taggedFields.reduce(
-        (accum, field) => accum || hasFieldChanged(section, field, application),
+        (accum, field) => accum || hasFieldChanged(field, data, originalData),
         false
       )
 
-      const originalData = application.originalData
-      if (originalData && hasAnyFieldChanged) {
+      const applicationOriginalData = application.originalData
+      if (applicationOriginalData && hasAnyFieldChanged) {
         const previousValues = taggedFields
           .map((field, index) =>
             this.getFieldValue(
               section,
-              originalData,
+              applicationOriginalData,
               field,
               intl,
               offlineResources,
@@ -504,22 +510,22 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
             )
           )
           .filter((value) => value)
-        let previousCompleteValue = <div>{previousValues[0]}</div>
+        let previousCompleteValue = previousValues[0]
         previousValues.shift()
         previousValues.forEach(
           (previousValue) =>
             (previousCompleteValue = (
               <>
                 {previousCompleteValue}
-                {tagDef[0].delimiter && <span>{tagDef[0].delimiter}</span>}
-                <div>{previousValue}</div>
+                {tagDef[0].delimiter ? tagDef[0].delimiter : <div></div>}
+                {previousValue}
               </>
             ))
         )
         // console.log(previousCompleteValue)
         return getRenderableField(
           section,
-          field,
+          (tagDef[0] && tagDef[0].label) || field.label,
           previousCompleteValue,
           completeValue,
           intl
@@ -533,7 +539,12 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
     group: IFormSectionGroup,
     field: IFormField
   ) => {
-    const { application, intl, offlineResources, language } = this.props
+    const {
+      application: { data, originalData },
+      intl,
+      offlineResources,
+      language
+    } = this.props
     const visitedTags: string[] = []
     const nestedItems: any[] = []
     // parent field
@@ -543,12 +554,11 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
     item && nestedItems.push(item)
     ;(
       (field.nestedFields &&
-        application.data[section.id] &&
-        application.data[section.id][field.name] &&
-        (application.data[section.id][field.name] as IFormSectionData).value &&
+        data[section.id] &&
+        data[section.id][field.name] &&
+        (data[section.id][field.name] as IFormSectionData).value &&
         field.nestedFields[
-          (application.data[section.id][field.name] as IFormSectionData)
-            .value as string
+          (data[section.id][field.name] as IFormSectionData).value as string
         ]) ||
       []
     ).forEach((nestedField) => {
@@ -557,14 +567,18 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
           section,
           group,
           nestedField,
-          visitedTags
+          visitedTags,
+          (data[section.id][field.name] as IFormData).nestedFields,
+          (originalData &&
+            (originalData[section.id][field.name] as IFormData).nestedFields) ||
+            undefined
         )
 
         item && nestedItems.push(item)
       } else {
         item = getNestedFieldValue(
           section,
-          application.data[section.id][field.name] as IFormData,
+          data[section.id][field.name] as IFormData,
           nestedField,
           intl,
           offlineResources,
@@ -627,7 +641,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
   }
 
   getChanges = (formSections: IFormSection[]) => {
-    const { application, intl, offlineResources, language } = this.props
+    const { application, offlineResources, language } = this.props
     const overriddenFields = getOverriddenFieldsListForPreview(
       formSections,
       application,
@@ -655,7 +669,15 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
           .filter((field) => !Boolean(field.reviewOverrides))
           .forEach((field) => {
             tempItem = field.previewGroup
-              ? this.getPreviewGroupsField(section, group, field, visitedTags)
+              ? this.getPreviewGroupsField(
+                  section,
+                  group,
+                  field,
+                  visitedTags,
+                  application.data[section.id],
+                  application.originalData &&
+                    application.originalData[section.id]
+                )
               : field.nestedFields && field.ignoreNestedFieldWrappingInPreview
               ? this.getNestedPreviewField(section, group, field)
               : this.getSinglePreviewField(section, group, field)
@@ -852,7 +874,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
     alert('correction made')
   }
 
-  cancelCorrection() {
+  cancelCorrection = () => {
     this.props.modifyApplication({
       ...this.props.application,
       data: {
