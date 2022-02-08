@@ -33,7 +33,7 @@ interface BaseProps {
 type Props = BaseProps &
   WrappedComponentProps &
   Pick<RouteComponentProps, 'history'> & {
-    offlineResources: IOfflineData
+    offlineCountryConfiguration: IOfflineData
   }
 
 interface State {
@@ -62,7 +62,7 @@ class TeamSearchComponent extends React.Component<Props, State> {
   }
 
   render() {
-    const { intl, offlineResources } = this.props
+    const { intl, offlineCountryConfiguration } = this.props
 
     return (
       <SysAdminContentWrapper>
@@ -70,7 +70,7 @@ class TeamSearchComponent extends React.Component<Props, State> {
 
         <LocationSearch
           selectedLocation={this.state.selectedLocation}
-          locationList={Object.values(offlineResources.offices).map(
+          locationList={Object.values(offlineCountryConfiguration.offices).map(
             (location: ILocation) => {
               return {
                 id: location.id,
@@ -90,7 +90,7 @@ class TeamSearchComponent extends React.Component<Props, State> {
 
 function mapStateToProps(state: IStoreState) {
   return {
-    offlineResources: getOfflineData(state)
+    offlineCountryConfiguration: getOfflineData(state)
   }
 }
 

@@ -51,7 +51,8 @@ import {
   TEAM_USER_LIST,
   USER_PROFILE,
   CONFIG,
-  APPLICATION_RECORD_AUDIT
+  APPLICATION_RECORD_AUDIT,
+  CHANGE_PHONE
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
 import { NATL_ADMIN_ROLES } from '@client/utils/constants'
@@ -403,6 +404,18 @@ export function goToSysAdminHomeTab(tabId: string) {
 
 export function goToSettings() {
   return push(SETTINGS)
+}
+export function goToPhoneSettings() {
+  return push(CHANGE_PHONE)
+}
+
+export function goToSettingsWithPhoneSuccessMsg(phonedNumberUpdated: boolean) {
+  return push({
+    pathname: SETTINGS,
+    state: {
+      phonedNumberUpdated
+    }
+  })
 }
 
 export function goToCreateNewUser() {

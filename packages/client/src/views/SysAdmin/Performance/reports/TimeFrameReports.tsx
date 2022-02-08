@@ -30,7 +30,7 @@ import { IFooterFColumn } from '@opencrvs/components/lib/interface/GridTable/typ
 import { get } from 'lodash'
 
 interface IStateProps {
-  offlineResources: IOfflineData
+  offlineCountryConfiguration: IOfflineData
 }
 
 type FullProps = {
@@ -47,7 +47,7 @@ class TimeFrameComponent extends React.Component<FullProps> {
         this.props.data.details.map((timeFrame) => ({
           location: getLocationFromPartOfLocationId(
             timeFrame.locationId,
-            this.props.offlineResources
+            this.props.offlineCountryConfiguration
           ).name,
           regWithin45d: getValueWithPercentageString(
             timeFrame.regWithin45d,
@@ -167,6 +167,6 @@ class TimeFrameComponent extends React.Component<FullProps> {
 
 export const TimeFrameReports = connect((store: IStoreState) => {
   return {
-    offlineResources: getOfflineData(store)
+    offlineCountryConfiguration: getOfflineData(store)
   }
 }, {})(injectIntl(TimeFrameComponent))

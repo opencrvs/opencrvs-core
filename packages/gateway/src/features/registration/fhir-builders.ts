@@ -642,7 +642,7 @@ function createOccupationBulder(resource: fhir.Patient, fieldValue: string) {
   }
 
   const hasOccupation = resource.extension.find(
-    extention =>
+    (extention) =>
       extention.url ===
       `${OPENCRVS_SPECIFICATION_URL}extension/patient-occupation`
   )
@@ -870,12 +870,16 @@ const builders: IFieldBuilders = {
       }
     }
   },
-  createdAt: (fhirBundle, fieldValue) => {
+  createdAt: (fhirBundle, fieldValue, context) => {
     if (!fhirBundle.meta) {
       fhirBundle.meta = {}
     }
     fhirBundle.meta.lastUpdated = fieldValue
     fhirBundle.entry[0].resource.date = fieldValue
+
+    const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+    taskResource.lastModified = fieldValue as string
+    return
   },
   mother: {
     _fhirID: (fhirBundle, fieldValue) => {
@@ -1841,13 +1845,7 @@ const builders: IFieldBuilders = {
           )
         }
       },
-      timestamp: (
-        fhirBundle: ITemplatedBundle,
-        fieldValue: string,
-        context: any
-      ) => {
-        const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-        taskResource.lastModified = fieldValue
+      timestamp: () => {
         return
       },
       timeLoggedMS: (
@@ -1862,7 +1860,7 @@ const builders: IFieldBuilders = {
         }
 
         const hasTimeLoggedMS = taskResource.extension.find(
-          extension =>
+          (extension) =>
             extension.url ===
             `${OPENCRVS_SPECIFICATION_URL}extension/timeLoggedMS`
         )
@@ -2140,7 +2138,7 @@ const builders: IFieldBuilders = {
               relatedPersonResource.extension = []
             }
             const hasAffidavit = relatedPersonResource.extension.find(
-              extention =>
+              (extention) =>
                 extention.url ===
                 `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`
             )
@@ -2172,7 +2170,7 @@ const builders: IFieldBuilders = {
               relatedPersonResource.extension = []
             }
             const hasAffidavit = relatedPersonResource.extension.find(
-              extention =>
+              (extention) =>
                 extention.url ===
                 `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`
             )
@@ -2303,7 +2301,7 @@ const builders: IFieldBuilders = {
           certDocResource.extension = []
         }
         const hasVerifiedExt = certDocResource.extension.find(
-          extention =>
+          (extention) =>
             extention.url ===
             `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`
         )

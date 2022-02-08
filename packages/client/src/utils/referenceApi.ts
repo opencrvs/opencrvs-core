@@ -44,8 +44,64 @@ export interface IAssetResponse {
   logo: string
 }
 
+interface IPhoneNumberPattern {
+  pattern: RegExp
+  example: string
+  start: string
+  num: string
+  mask: {
+    startForm: number
+    endBefore: number
+  }
+}
+
+interface INIDNumberPattern {
+  pattern: RegExp
+  example: string
+  num: string
+}
+
+export interface IApplicationConfig {
+  BACKGROUND_SYNC_BROADCAST_CHANNEL: string
+  COUNTRY: string
+  COUNTRY_LOGO_FILE: string
+  COUNTRY_LOGO_RENDER_WIDTH: number
+  COUNTRY_LOGO_RENDER_HEIGHT: number
+  DESKTOP_TIME_OUT_MILLISECONDS: number
+  LANGUAGES: string
+  CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: number
+  CERTIFICATE_PRINT_CHARGE_UP_LIMIT: number
+  CERTIFICATE_PRINT_LOWEST_CHARGE: number
+  CERTIFICATE_PRINT_HIGHEST_CHARGE: number
+  UI_POLLING_INTERVAL: number
+  FIELD_AGENT_AUDIT_LOCATIONS: string
+  APPLICATION_AUDIT_LOCATIONS: string
+  INFORMANT_MINIMUM_AGE: number
+  HIDE_EVENT_REGISTER_INFORMATION: boolean
+  EXTERNAL_VALIDATION_WORKQUEUE: boolean
+  SENTRY: string
+  LOGROCKET: string
+  PHONE_NUMBER_PATTERN: IPhoneNumberPattern
+  NID_NUMBER_PATTERN: INIDNumberPattern
+}
+
+async function loadConfig(): Promise<IApplicationConfig> {
+  const url = `${window.config.CONFIG_API_URL}/config`
+
+  const res = await fetch(url, {
+    method: 'GET'
+  })
+
+  if (res && res.status !== 200) {
+    throw Error(res.statusText)
+  }
+
+  const response = await res.json()
+  return response
+}
+
 async function loadDefinitions(): Promise<IDefinitionsResponse> {
-  const url = `${window.config.RESOURCES_URL}/definitions/client`
+  const url = `${window.config.COUNTRY_CONFIG_URL}/definitions/client`
 
   const res = await fetch(url, {
     method: 'GET',
@@ -63,7 +119,7 @@ async function loadDefinitions(): Promise<IDefinitionsResponse> {
 }
 
 async function loadLocations(): Promise<ILocationDataResponse> {
-  const url = `${window.config.RESOURCES_URL}/locations`
+  const url = `${window.config.COUNTRY_CONFIG_URL}/locations`
 
   const res = await fetch(url, {
     method: 'GET',
@@ -81,7 +137,7 @@ async function loadLocations(): Promise<ILocationDataResponse> {
 }
 
 async function loadFacilities(): Promise<IFacilitiesDataResponse> {
-  const url = `${window.config.RESOURCES_URL}/facilities`
+  const url = `${window.config.COUNTRY_CONFIG_URL}/facilities`
   const res = await fetch(url, {
     method: 'GET',
     headers: {
@@ -98,7 +154,7 @@ async function loadFacilities(): Promise<IFacilitiesDataResponse> {
 }
 
 async function loadPilotLocations(): Promise<ILocationDataResponse> {
-  const url = `${window.config.RESOURCES_URL}/pilotLocations`
+  const url = `${window.config.COUNTRY_CONFIG_URL}/pilotLocations`
 
   const res = await fetch(url, {
     method: 'GET',
@@ -129,7 +185,7 @@ const toDataURL = (url: string) =>
     )
 
 async function loadAssets(): Promise<IAssetResponse> {
-  const url = `${window.config.RESOURCES_URL}/assets/${window.config.COUNTRY_LOGO_FILE}`
+  const url = `${window.config.COUNTRY_CONFIG_URL}/assets/${window.config.COUNTRY_LOGO_FILE}`
 
   return toDataURL(url).then((dataUrl) => {
     return {
@@ -143,5 +199,6 @@ export const referenceApi = {
   loadFacilities,
   loadPilotLocations,
   loadDefinitions,
-  loadAssets
+  loadAssets,
+  loadConfig
 }

@@ -127,10 +127,10 @@ test('should build a minimal FHIR registration document without error', async ()
             comments: [
               {
                 comment: 'This is just a test data',
-                createdAt: '2018-10-31T09:45:05+10:00'
+                createdAt: '2018-10-31T09:40:05+10:00'
               }
             ],
-            timestamp: '2018-10-31T09:45:05+10:00',
+            timestamp: '2018-10-31T09:40:05+10:00',
             timeLoggedMS: 1234
           }
         ],
@@ -211,7 +211,7 @@ test('should build a minimal FHIR registration document without error', async ()
       childrenBornAliveToMother: 2,
       foetalDeathsToMother: 0,
       lastPreviousLiveBirth: '2014-01-28',
-      createdAt: new Date(),
+      createdAt: '2018-10-31T09:45:05+10:00',
       _fhirIDMap: {
         composition: '8f18a6ea-89d1-4b03-80b3-57509a7eebcedsd',
         encounter: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dsakelske',
@@ -387,7 +387,7 @@ test('should build a minimal FHIR registration document without error', async ()
   )
   expect(fhir.entry[5].resource.note[0]).toEqual({
     text: 'This is just a test data',
-    time: '2018-10-31T09:45:05+10:00'
+    time: '2018-10-31T09:40:05+10:00'
   })
   expect(fhir.entry[5].resource.identifier).toEqual([
     { system: 'http://opencrvs.org/specs/id/paper-form-id', value: '12345678' },
@@ -809,10 +809,10 @@ test('creates task with contact other relationship', async () => {
             comments: [
               {
                 comment: 'This is just a test data',
-                createdAt: '2018-10-31T09:45:05+10:00'
+                createdAt: '2018-10-31T09:40:05+10:00'
               }
             ],
-            timestamp: '2018-10-31T09:45:05+10:00',
+            timestamp: '2018-10-31T09:40:05+10:00',
             timeLoggedMS: 1234
           }
         ],
@@ -873,13 +873,15 @@ test('creates task with contact other relationship', async () => {
 
   expect(simpleFhir).toBeDefined()
 
-  const taskResource = (simpleFhir.entry.find(
-    ({ resource }) => resource.resourceType === 'Task'
-  ) as fhir.BundleEntry).resource as fhir.Task
+  const taskResource = (
+    simpleFhir.entry.find(
+      ({ resource }) => resource.resourceType === 'Task'
+    ) as fhir.BundleEntry
+  ).resource as fhir.Task
 
   expect(taskResource).toBeDefined()
   expect(
-    taskResource.extension.some(taskExtension =>
+    taskResource.extension.some((taskExtension) =>
       _.isEqual(taskExtension, {
         url: 'http://opencrvs.org/specs/extension/contact-person',
         valueString: 'OTHER'
@@ -888,7 +890,7 @@ test('creates task with contact other relationship', async () => {
   ).toBe(true)
 
   expect(
-    taskResource.extension.some(taskExtension =>
+    taskResource.extension.some((taskExtension) =>
       _.isEqual(taskExtension, {
         url: 'http://opencrvs.org/specs/extension/contact-relationship',
         valueString: 'Friend'

@@ -24,6 +24,7 @@ describe('Login app step one', () => {
     app = appBundle.app
     window.config = {
       AUTH_API_URL: 'http://localhost:4040/',
+      CONFIG_API_URL: 'http://localhost:2021/',
       COUNTRY: 'zmb',
       LANGUAGES: 'en',
       CLIENT_APP_URL: 'http://localhost:3000/',
@@ -39,7 +40,7 @@ describe('Login app step one', () => {
         }
       },
       SENTRY: 'https://f892d643aab642108f44e2d1795706bc@sentry.io/1774604',
-      LOGROCKET: 'opencrvs-foundation/opencrvs-zambia'
+      LOGROCKET: 'opencrvs-foundation/opencrvs-farajaland'
     }
   })
 

@@ -1,8 +1,8 @@
 FROM nginx
 ARG HOST
-ARG RESOURCES_URL
+ARG COUNTRY_CONFIG_URL
 ENV HOST=$HOST
-ENV RESOURCES_URL=$RESOURCES_URL
+ENV COUNTRY_CONFIG_URL=$COUNTRY_CONFIG_URL
 COPY infrastructure/nginx-default.conf /etc/nginx/conf.d/default.conf
 COPY --from=opencrvs-build /packages/login/build /usr/share/nginx/html
 

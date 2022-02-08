@@ -62,6 +62,7 @@ import { Provider } from 'react-redux'
 import { Switch } from 'react-router'
 import { AppStore } from './store'
 import { RecordAudit } from './views/Home/RecordAudit'
+import { ChangePhonePage } from './views/Settings/ChangePhonePage'
 import { ConfigHome } from './views/SysAdmin/Config/ConfigHome'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 
@@ -257,8 +258,14 @@ export class App extends React.Component<IAppProps> {
                                             component={Payment}
                                           />
                                           <ProtectedRoute
+                                            exact
                                             path={routes.SETTINGS}
                                             component={SettingsPage}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.CHANGE_PHONE}
+                                            component={ChangePhonePage}
                                           />
                                           <ProtectedRoute
                                             path={routes.APPLICATION_DETAIL}

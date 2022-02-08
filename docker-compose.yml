@@ -36,13 +36,16 @@ services:
       dockerfile: ./packages/gateway/Dockerfile
     restart: unless-stopped
     environment:
+      - REDIS_HOST=redis://redis:6379
+      - CONFIG_SMS_CODE_EXPIRY_SECONDS=600
+      - CONFIG_TOKEN_EXPIRY_SECONDS=604800
       - NODE_ENV=development
       - FHIR_URL=http://openhim-core:5001/fhir
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - SEARCH_URL=http://search:9090/
       - METRICS_URL=http://metrics:1050
       - AUTH_URL=http://auth:4040
-      - RESOURCES_URL=http://resources:3040
+      - COUNTRY_CONFIG_URL=http://countryconfig:3040
       - NOTIFICATION_URL=http://notification:2020/
       - WORKFLOW_URL=http://workflow:5050/
       - CHECK_INVALID_TOKEN=true
@@ -57,7 +60,7 @@ services:
       - NODE_ENV=development
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
-      - RESOURCE_SERVICE_URL=http://resources:3040/
+      - RESOURCE_SERVICE_URL=http://countryconfig:3040/
       - HEARTH_URL=http://hearth:3447/fhir
       - OPENHIM_URL=http://openhim-core:5001
       - COUNTRY=${COUNTRY:-bgd} # PEN_TEST change to gbr
@@ -87,7 +90,7 @@ services:
       - INFLUX_PORT=8086
       - INFLUX_DB=ocrvs
       - AUTH_URL=http://auth:4040
-      - RESOURCE_URL=http://resources:3040/
+      - COUNTRY_CONFIG_URL=http://countryconfig:3040/
       - FHIR_URL=http://openhim-core:5001/fhir
       - SEARCH_URL=http://search:9090/
       - CHECK_INVALID_TOKEN=true
@@ -142,4 +145,14 @@ services:
       - COUNTRY=${COUNTRY:-bgd}
       - HOST=0.0.0.0
       - CHECK_INVALID_TOKEN=true
-      - RESOURCES_URL=http://resources:3040
+      - COUNTRY_CONFIG_URL=http://countryconfig:3040
+  config:
+    image: opencrvs/ocrvs-config:${VERSION:-latest}
+    build:
+      context: .
+      dockerfile: ./packages/config/Dockerfile
+    restart: unless-stopped
+    environment:
+      - HOST=0.0.0.0
+      - PORT=2021
+      - MONGO_URL=mongodb://mongo1/application-config
