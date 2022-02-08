@@ -35,7 +35,8 @@ async function transformField(
   sourceVal: any,
   targetObj: any,
   fieldBuilderForVal: IFieldBuilderFunction | IFieldBuilders,
-  context: any
+  context: any,
+  currentPropName: string
 ) {
   if (!(sourceVal instanceof Date) && typeof sourceVal === 'object') {
     if (isFieldBuilder(fieldBuilderForVal)) {
@@ -46,7 +47,7 @@ async function transformField(
     throw new Error(
       `Expected ${JSON.stringify(
         fieldBuilderForVal
-      )} to be a FieldBuilder object. The current field value is ${JSON.stringify(
+      )} to be a FieldBuilder object for field name ${currentPropName}. The current field value is ${JSON.stringify(
         sourceVal
       )}.`
     )
@@ -61,7 +62,7 @@ async function transformField(
   throw new Error(
     `Expected ${JSON.stringify(
       fieldBuilderForVal
-    )} to be a FieldBuilderFunction. The current field value is ${JSON.stringify(
+    )} to be a FieldBuilderFunction for field name ${currentPropName}. The current field value is ${JSON.stringify(
       sourceVal
     )}.`
   )
@@ -86,11 +87,13 @@ export default async function transformObj(
           /* context._index = {
             [currentPropName]: index
           } */
+
           await transformField(
             arrayVal,
             targetObj,
             fieldBuilders[currentPropName],
-            context
+            context,
+            currentPropName
           )
         }
 
@@ -101,7 +104,8 @@ export default async function transformObj(
         sourceObj[currentPropName],
         targetObj,
         fieldBuilders[currentPropName],
-        context
+        context,
+        currentPropName
       )
     }
   }
