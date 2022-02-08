@@ -14,6 +14,7 @@ import * as Sentry from 'hapi-sentry'
 import { SENTRY_DSN } from '@config/config/constants'
 import * as JWT from 'hapi-auth-jwt2'
 import { logger } from '@config/config/logger'
+import * as JWT from 'hapi-auth-jwt2'
 
 export default function getPlugins() {
   const plugins: any[] = [

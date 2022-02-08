@@ -29,14 +29,14 @@ type CertificateSVG {
 }
 
 input CertificateSVGInput {
-  id: ID
-  svgCode: String
-  svgFilename: String
-  svgDateUpdated: Int
-  svgDateCreated: Int
-  user: String
-  event: String
-  status: String
+  id: ID!
+  svgCode: String!
+  svgFilename: String!
+  svgDateUpdated: Int!
+  svgDateCreated: Int!
+  user: String!
+  event: String!
+  status: String!
 }
 
 type Query {

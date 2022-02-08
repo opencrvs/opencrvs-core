@@ -64,25 +64,3 @@ export async function previewCertificate(
   const url = URL.createObjectURL(blob)
   callBack(url)
 }
-
-export function printCertificate(
-  intl: IntlShape,
-  application: IApplication,
-  userDetails: IUserDetails | null,
-  offlineResource: IOfflineData,
-  optionalData?: OptionalData
-) {
-  if (!userDetails) {
-    throw new Error('No user details found')
-  }
-  // printPDF(
-  //   application.event === Event.BIRTH
-  //     ? offlineResource.templates.certificates.birth
-  //     : offlineResource.templates.certificates.death,
-  //   application,
-  //   userDetails,
-  //   offlineResource,
-  //   intl,
-  //   optionalData
-  // )
-}

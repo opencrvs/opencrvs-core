@@ -53,11 +53,11 @@ export const getFileAsTextString = (file: File) => {
 
 export const validateImage = async (uploadedImage: File) => {
   if (!ALLOWED_IMAGE_TYPE.includes(uploadedImage.type)) {
-    throw new ErrorEvent(ERROR_TYPES.IMAGE_TYPE)
+    throw new Error(ERROR_TYPES.IMAGE_TYPE)
   }
 
   if (uploadedImage.size > 5242880) {
-    throw new ErrorEvent(ERROR_TYPES.OVERSIZED)
+    throw new Error(ERROR_TYPES.OVERSIZED)
   }
 
   const fileAsBase64 = await getBase64String(uploadedImage)
@@ -68,7 +68,7 @@ export const validateCertificateTemplate = async (uploadedImage: File) => {
   if (
     !ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE.includes(uploadedImage.type)
   ) {
-    throw new ErrorEvent(ERROR_TYPES.IMAGE_TYPE)
+    throw new Error(ERROR_TYPES.IMAGE_TYPE)
   }
   const fileAsText = await getFileAsTextString(uploadedImage)
   return fileAsText.toString()

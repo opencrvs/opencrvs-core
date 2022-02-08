@@ -15,11 +15,9 @@ import { logger } from '@config/config/logger'
 
 jest.mock('mongoose', () => ({
   connection: {
-    // tslint:disable-next-line no-empty
     on: jest.fn()
   },
   connect: () => Promise.reject(),
-  // tslint:disable-next-line no-empty
   disconnect: () => {}
 }))
 const wait = (time: number) =>

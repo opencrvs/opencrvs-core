@@ -383,14 +383,14 @@ export interface GQLAvatarInput {
 }
 
 export interface GQLCertificateSVGInput {
-  id?: string
-  svgCode?: string
-  svgFilename?: string
-  svgDateUpdated?: number
-  svgDateCreated?: number
-  user?: string
-  event?: string
-  status?: string
+  id: string
+  svgCode: string
+  svgFilename: string
+  svgDateUpdated: number
+  svgDateCreated: number
+  user: string
+  event: string
+  status: string
 }
 
 export type GQLMap = any

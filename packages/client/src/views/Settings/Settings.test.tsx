@@ -151,4 +151,38 @@ describe('Settings page tests', () => {
       expect(modalIsClosed).toBe(true)
     })
   })
+
+  describe('When user changes profile image', () => {
+    const file = new File(['(⌐□_□)'], 'chucknorris.png', { type: 'image/png' })
+
+    it('Should display apply change modal', async () => {
+      component
+        .find('#image_file_uploader_field')
+        .hostNodes()
+        .simulate('change', { target: { files: [file] } })
+
+      component.update()
+      expect(component.find('#apply_change').hostNodes().length).toEqual(1)
+    })
+
+    it('Should close change avater modal', () => {
+      component
+        .find('#image_file_uploader_field')
+        .hostNodes()
+        .simulate('change', {
+          target: {
+            files: [file]
+          }
+        })
+
+      component.update()
+      component.find('#close-btn').hostNodes().simulate('click')
+      component.update()
+
+      const modalIsClosed = !Boolean(
+        component.find('#ChangeAvatarModal').hostNodes().length
+      )
+      expect(modalIsClosed).toBe(true)
+    })
+  })
 })

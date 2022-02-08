@@ -56,7 +56,7 @@ export interface IAssetResponse {
   logo: string
 }
 
-interface IPhoneNumberPattern {
+export interface IPhoneNumberPattern {
   pattern: RegExp
   example: string
   start: string
@@ -67,10 +67,21 @@ interface IPhoneNumberPattern {
   }
 }
 
-interface INIDNumberPattern {
+export interface INIDNumberPattern {
   pattern: RegExp
   example: string
   num: string
+}
+
+export interface ICertificateTemplateData {
+  event: string
+  status: string
+  svgCode: string
+  svgDateCreated: number
+  svgDateUpdated: number
+  svgFilename: string
+  user: string
+  _id: string
 }
 
 export interface IApplicationConfig {
@@ -129,12 +140,12 @@ async function loadCertificatesTemplatesDefinitions(): Promise<
   }
   const response = await res.json()
 
-  const birthCertificateTemplate: any = _.find(response, {
+  const birthCertificateTemplate: ICertificateTemplateData = _.find(response, {
     event: 'birth',
     status: 'ACTIVE'
   })
 
-  const deathCertificateTemplate: any = _.find(response, {
+  const deathCertificateTemplate: ICertificateTemplateData = _.find(response, {
     event: 'death',
     status: 'ACTIVE'
   })
@@ -252,5 +263,6 @@ export const referenceApi = {
   loadPilotLocations,
   loadDefinitions,
   loadAssets,
-  loadConfig
+  loadConfig,
+  loadCertificatesTemplatesDefinitions
 }

@@ -40,10 +40,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
-import {
-  previewCertificate,
-  printCertificate
-} from '@client/views/PrintCertificate/PDFUtils'
+import { previewCertificate } from '@client/views/PrintCertificate/PDFUtils'
 import { getEventRegisterForm } from '@client/forms/register/application-selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import {
