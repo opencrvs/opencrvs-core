@@ -16,6 +16,7 @@ import {
   draftToGqlTransformer,
   appendGqlMetadataFromDraft
 } from '@client/transformer'
+import { REQUEST_BIRTH_REG_CORRECTION } from '@client/forms/correction/mutations'
 
 export const SUBMIT_BIRTH_APPLICATION = gql`
   mutation submitMutation($details: BirthRegistrationInput!) {
@@ -134,6 +135,15 @@ export function getBirthMutationMappings(
           details: gqlDetails
         },
         dataKey: 'markBirthAsCertified'
+      }
+    case Action.REQUEST_CORRECTION_APPLICATION:
+      return {
+        mutation: REQUEST_BIRTH_REG_CORRECTION,
+        variables: {
+          id: draft && draft.id,
+          details: gqlDetails
+        },
+        dataKey: 'requestBirthRegistrationCorrection'
       }
     default:
       return null
