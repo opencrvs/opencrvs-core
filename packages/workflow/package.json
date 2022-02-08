@@ -29,6 +29,7 @@
     "hapi-pino": "^8.5.0",
     "hapi-sentry": "^3.1.0",
     "joi": "^17.3.0",
+    "dotenv": "^6.1.0",
     "jsonwebtoken": "^8.3.0",
     "jwt-decode": "^2.2.0",
     "node-fetch": "^2.6.7",

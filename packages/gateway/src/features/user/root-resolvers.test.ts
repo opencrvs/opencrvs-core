@@ -505,10 +505,10 @@ describe('User root resolvers', () => {
         }
       ])
     })
-    it('should return error if invalid data received from user-mgnt endpoint', async () => {
+    it('returns empty results if invalid data received from user-mgnt endpoint', () => {
       fetch.mockResponseOnce(JSON.stringify({}))
 
-      expect(
+      return expect(
         resolvers.Query.searchFieldAgents(
           {},
           {
@@ -518,12 +518,15 @@ describe('User root resolvers', () => {
           },
           authHeaderSysAdmin
         )
-      ).rejects.toThrow('Invalid result found from search user endpoint')
+      ).resolves.toStrictEqual({
+        totalItems: 0,
+        results: []
+      })
     })
-    it('should return error if no locationId or primaryOfficeId is provided', async () => {
+    it('returns empty results if no locationId or primaryOfficeId is provided', () => {
       fetch.mockResponseOnce(JSON.stringify({}))
 
-      expect(
+      return expect(
         resolvers.Query.searchFieldAgents(
           {},
           {
@@ -532,7 +535,10 @@ describe('User root resolvers', () => {
           },
           authHeaderSysAdmin
         )
-      ).rejects.toThrow('No location provided')
+      ).resolves.toStrictEqual({
+        totalItems: 0,
+        results: []
+      })
     })
   })
 

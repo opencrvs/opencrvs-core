@@ -48,7 +48,7 @@ describe('Verify point generation', () => {
       'mark-existing-application-registered',
       AUTH_HEADER
     )
-    expect(point).toEqual({
+    expect(point).toMatchObject({
       measurement: 'birth_reg',
       tags: {
         regStatus: 'mark-existing-application-registered',
@@ -90,7 +90,7 @@ describe('Verify point generation', () => {
       'mark-existing-application-registered',
       AUTH_HEADER
     )
-    expect(point).toEqual({
+    expect(point).toMatchObject({
       measurement: 'birth_reg',
       tags: {
         regStatus: 'mark-existing-application-registered',
@@ -115,7 +115,7 @@ describe('Verify point generation', () => {
       'mark-existing-application-registered',
       AUTH_HEADER
     )
-    expect(point).toEqual({
+    expect(point).toMatchObject({
       measurement: 'birth_reg',
       tags: {
         regStatus: 'mark-existing-application-registered',
@@ -156,7 +156,7 @@ describe('Verify point generation', () => {
       'mark-existing-application-registered',
       AUTH_HEADER
     )
-    expect(point).toEqual({
+    expect(point).toMatchObject({
       measurement: 'death_reg',
       tags: {
         regStatus: 'mark-existing-application-registered',
@@ -193,7 +193,7 @@ describe('Verify point generation', () => {
       cloneDeep(testDeathCertPayload),
       AUTH_HEADER
     )
-    expect(point).toEqual({
+    expect(point).toMatchObject({
       measurement: 'certification_payment',
       tags: {
         eventType: 'DEATH',
@@ -233,7 +233,7 @@ describe('Verify point generation', () => {
       AUTH_HEADER,
       Events.NEW_DEC
     )
-    expect(point).toEqual({
+    expect(point).toMatchObject({
       measurement: 'applications_started',
       tags: {
         eventType: 'BIRTH',
@@ -262,7 +262,7 @@ describe('Verify point generation', () => {
       AUTH_HEADER,
       Events.NEW_VALIDATE
     )
-    expect(point).toEqual({
+    expect(point).toMatchObject({
       measurement: 'applications_started',
       tags: {
         eventType: 'BIRTH',
@@ -291,7 +291,7 @@ describe('Verify point generation', () => {
       AUTH_HEADER,
       Events.NEW_WAITING_VALIDATION
     )
-    expect(point).toEqual({
+    expect(point).toMatchObject({
       measurement: 'applications_started',
       tags: {
         eventType: 'BIRTH',
@@ -320,7 +320,7 @@ describe('Verify point generation', () => {
       AUTH_HEADER,
       Events.IN_PROGRESS_DEC
     )
-    expect(point).toEqual({
+    expect(point).toMatchObject({
       measurement: 'applications_started',
       tags: {
         eventType: 'BIRTH',
@@ -352,7 +352,7 @@ describe('Verify point generation', () => {
       AUTH_HEADER,
       Events.IN_PROGRESS_DEC
     )
-    expect(point).toEqual({
+    expect(point).toMatchObject({
       measurement: 'applications_started',
       tags: {
         eventType: 'BIRTH',
@@ -381,7 +381,7 @@ describe('Verify point generation', () => {
       .mockResolvedValueOnce('Location/3')
       .mockResolvedValueOnce('Location/2')
     const point = await generateRejectedPoints(payload, AUTH_HEADER)
-    expect(point).toEqual({
+    expect(point).toMatchObject({
       measurement: 'applications_rejected',
       tags: {
         eventType: 'BIRTH',
