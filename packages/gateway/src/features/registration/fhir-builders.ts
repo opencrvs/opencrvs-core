@@ -2976,6 +2976,10 @@ export async function updateFHIRTaskBundle(
 
 export function addDownloadedTaskExtension(taskEntry: ITaskBundleEntry) {
   taskEntry.resource = addDownloadExtensionToTaskTemplate(taskEntry.resource)
+  taskEntry.request = {
+    method: 'PUT',
+    url: `Task/${taskEntry.resource.id}`
+  } as fhir.BundleEntryRequest
   const fhirBundle: ITaskBundle = {
     resourceType: 'Bundle',
     type: 'document',
