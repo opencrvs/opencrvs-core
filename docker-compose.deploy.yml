@@ -328,6 +328,11 @@ services:
     environment:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
+      labels:
+        - 'traefik.enable=true'
+        - 'traefik.frontend.rule=Host: config.{{hostname}}'
+        - 'traefik.port=2021'
+        - 'traefik.docker.network=opencrvs_overlay_net'
       replicas: 2
     networks:
       - overlay_net
