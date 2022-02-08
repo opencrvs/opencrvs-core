@@ -35,7 +35,7 @@ import { buttonMessages } from '@client/i18n/messages'
 export const PageWrapper = styled.div`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
   ${({ theme }) => theme.gradients.gradientNightshade};
-  ${window.config.COUNTRY === 'zmb'
+  ${['ZMB', 'FAR'].includes(window.config.COUNTRY.toUpperCase())
     ? `background: url(${zambiaBackground});`
     : ''}
   height: 100vh;
@@ -136,10 +136,11 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
           // @ts-ignore
           (storedName: GQLHumanName) => storedName.use === 'en'
         ) as GQLHumanName)) ||
-      {}
-    const fullName = `${String(nameObj.firstNames)} ${String(
-      nameObj.familyName
-    )}`
+      null
+    const fullName =
+      (nameObj &&
+        `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`) ||
+      ''
     return <Name>{fullName}</Name>
   }
 
@@ -168,7 +169,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
 
     if (this.state.attempt === MAX_ALLOWED_ATTEMPT && !pinMatched) {
       await storage.setItem(SECURITY_PIN_EXPIRED_AT, moment.now().toString())
-      this.setState(prevState => {
+      this.setState((prevState) => {
         return {
           attempt: prevState.attempt + 1
         }
@@ -178,7 +179,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
     }
 
     if (this.state.attempt < MAX_ALLOWED_ATTEMPT - 1 && !pinMatched) {
-      this.setState(preState => ({
+      this.setState((preState) => ({
         attempt: preState.attempt + 1,
         errorMessage: intl.formatMessage(messages.incorrect),
         resetKey: Date.now()
@@ -187,7 +188,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
     }
 
     if (this.state.attempt === MAX_ALLOWED_ATTEMPT - 1 && !pinMatched) {
-      this.setState(preState => ({
+      this.setState((preState) => ({
         attempt: preState.attempt + 1,
         errorMessage: intl.formatMessage(messages.lastTry),
         resetKey: Date.now()
@@ -218,7 +219,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
           if (this.state.attempt === MAX_ALLOWED_ATTEMPT + 2) {
             return
           }
-          this.setState(prevState => ({
+          this.setState((prevState) => ({
             attempt: MAX_ALLOWED_ATTEMPT + 2,
             errorMessage: intl.formatMessage(messages.locked)
           }))

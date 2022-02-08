@@ -1302,7 +1302,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     }
                   ],
                   "mapping": {
@@ -1351,7 +1351,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     }
                   ],
                   "mapping": {
@@ -1445,7 +1445,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     }
                   ],
                   "mapping": {
@@ -1494,7 +1494,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     }
                   ],
                   "mapping": {
@@ -2868,7 +2868,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))"
+                      "expression": "(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Permanent))"
                     }
                   ],
                   "mapping": {
@@ -2926,7 +2926,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Permanent))"
                     }
                   ],
                   "mapping": {
@@ -3038,7 +3038,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Permanent))"
                     }
                   ],
                   "mapping": {
@@ -3104,7 +3104,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Permanent))"
                     }
                   ],
                   "mapping": {
@@ -3899,7 +3899,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     },
                     {
                       "action": "hide",
@@ -3965,7 +3965,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     },
                     {
                       "action": "hide",
@@ -4089,7 +4089,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     },
                     {
                       "action": "hide",
@@ -4163,7 +4163,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     },
                     {
                       "action": "hide",
@@ -6205,7 +6205,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))"
+                      "expression": "(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Permanent))"
                     }
                   ],
                   "mapping": {
@@ -6250,7 +6250,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Permanent))"
                     }
                   ],
                   "mapping": {
@@ -6336,7 +6336,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Permanent))"
                     }
                   ],
                   "mapping": {
@@ -6389,7 +6389,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Permanent))"
                     }
                   ],
                   "mapping": {
@@ -6981,7 +6981,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     }
                   ],
                   "mapping": {
@@ -7030,7 +7030,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     }
                   ],
                   "mapping": {
@@ -7124,7 +7124,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     }
                   ],
                   "mapping": {
@@ -7181,7 +7181,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     }
                   ],
                   "mapping": {
@@ -8576,7 +8576,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     }
                   ],
                   "mapping": {
@@ -8625,7 +8625,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     }
                   ],
                   "mapping": {
@@ -8715,7 +8715,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     },
                     {
                       "action": "hide",
@@ -8776,7 +8776,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     }
                   ],
                   "mapping": {
@@ -9440,7 +9440,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))"
+                      "expression": "(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Permanent))"
                     }
                   ],
                   "mapping": {
@@ -9489,7 +9489,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Permanent))"
                     }
                   ],
                   "mapping": {
@@ -9583,7 +9583,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Permanent))"
                     }
                   ],
                   "mapping": {
@@ -9640,7 +9640,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Permanent))"
                     }
                   ],
                   "mapping": {
@@ -11678,7 +11678,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))"
+                      "expression": "(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Permanent))"
                     }
                   ],
                   "mapping": {
@@ -11723,7 +11723,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Permanent))"
                     }
                   ],
                   "mapping": {
@@ -11809,7 +11809,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Permanent))"
                     }
                   ],
                   "mapping": {
@@ -11862,7 +11862,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Permanent))"
                     }
                   ],
                   "mapping": {
@@ -12447,7 +12447,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     },
                     {
                       "action": "hide",
@@ -12500,7 +12500,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     }
                   ],
                   "mapping": {
@@ -12594,7 +12594,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     }
                   ],
                   "mapping": {
@@ -12651,7 +12651,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     }
                   ],
                   "mapping": {
@@ -13532,7 +13532,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     }
                   ],
                   "mapping": {
@@ -13577,7 +13577,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     }
                   ],
                   "mapping": {
@@ -13663,7 +13663,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     }
                   ],
                   "mapping": {
@@ -13708,7 +13708,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     }
                   ],
                   "mapping": {
@@ -14294,7 +14294,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     }
                   ],
                   "mapping": {
@@ -14339,7 +14339,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     }
                   ],
                   "mapping": {
@@ -14425,7 +14425,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     }
                   ],
                   "mapping": {
@@ -14470,7 +14470,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     }
                   ],
                   "mapping": {
@@ -15858,7 +15858,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     }
                   ],
                   "mapping": {
@@ -15920,7 +15920,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     }
                   ],
                   "mapping": {
@@ -16036,7 +16036,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     }
                   ],
                   "mapping": {
@@ -16106,7 +16106,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))"
                     }
                   ],
                   "mapping": {
@@ -16888,7 +16888,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))"
+                      "expression": "(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Permanent))"
                     },
                     {
                       "action": "hide",
@@ -16950,7 +16950,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Permanent))"
                     }
                   ],
                   "mapping": {
@@ -17066,7 +17066,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Permanent))"
                     }
                   ],
                   "mapping": {
@@ -17132,7 +17132,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))"
+                      "expression": "!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Permanent))"
                     }
                   ],
                   "mapping": {
@@ -18702,11 +18702,11 @@
                 "initialValue": "",
                 "searchableResource": "offices",
                 "searchableType": "CRVS_OFFICE",
-                "dispatchOptions": {
-                  "action": "USER_FORM/PROCESS_ROLES",
-                  "payloadKey": "primaryOfficeId"
-                },
-                "validate": [],
+                "validate": [
+                  {
+                    "operation": "officeMustBeSelected"
+                  }
+                ],
                 "mapping": {
                   "mutation": {
                     "operation": "fieldNameTransformer",
@@ -19038,11 +19038,11 @@
                 "initialValue": "",
                 "searchableResource": "facilities",
                 "searchableType": "CRVS_OFFICE",
-                "dispatchOptions": {
-                  "action": "USER_FORM/PROCESS_ROLES",
-                  "payloadKey": "primaryOfficeId"
-                },
-                "validate": [],
+                "validate": [
+                  {
+                    "operation": "officeMustBeSelected"
+                  }
+                ],
                 "mapping": {
                   "mutation": {
                     "operation": "fieldNameTransformer",

@@ -152,9 +152,8 @@ describe('draftUtils tests', () => {
           ]
         }
 
-        const transformedDraftApplication = transformSearchQueryDataToDraft(
-          queryData
-        )
+        const transformedDraftApplication =
+          transformSearchQueryDataToDraft(queryData)
         expect(transformedDraftApplication).toEqual({
           id: '1',
           data: {
@@ -245,9 +244,8 @@ describe('draftUtils tests', () => {
           ]
         }
 
-        const transformedDraftApplication = transformSearchQueryDataToDraft(
-          queryData
-        )
+        const transformedDraftApplication =
+          transformSearchQueryDataToDraft(queryData)
         expect(transformedDraftApplication).toEqual({
           id: '1',
           data: {

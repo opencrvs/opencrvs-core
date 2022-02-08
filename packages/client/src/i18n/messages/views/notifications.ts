@@ -98,7 +98,7 @@ const messagesToDefine: INotificationsMessages = {
   },
   userAuditSuccess: {
     defaultMessage:
-      '{name} was {action, select, DEACTIVATE {deactivated} REACTIVATE {reactivated}}',
+      '{name} was {action, select, DEACTIVATE {deactivated} REACTIVATE {reactivated} other {deactivated}}',
     description: 'Label for user audit success notification',
     id: 'misc.notif.userAuditSuccess'
   },

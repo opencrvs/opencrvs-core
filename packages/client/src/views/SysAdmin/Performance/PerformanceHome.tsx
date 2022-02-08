@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { messages } from '@client/i18n/messages/views/performance'
+import { messages as messagesSearch } from '@client/i18n/messages/views/search'
 import { goToOperationalReport } from '@client/navigation'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
@@ -23,7 +24,7 @@ import {
   LocationSearch
 } from '@opencrvs/components/lib/interface'
 import * as React from 'react'
-import { injectIntl, WrappedComponentProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps, IntlShape } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
@@ -52,7 +53,7 @@ interface BaseProps {
 type Props = BaseProps &
   WrappedComponentProps &
   Pick<RouteComponentProps, 'history'> & {
-    offlineResources: IOfflineData
+    offlineCountryConfiguration: IOfflineData
   }
 
 interface State {
@@ -83,17 +84,19 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
       )
   }
 
-  renderPilotLocations() {
+  renderPilotLocations(intl: IntlShape) {
     return (
-      (this.props.offlineResources.pilotLocations &&
-        Object.keys(this.props.offlineResources.pilotLocations).length > 0 && (
+      (this.props.offlineCountryConfiguration.pilotLocations &&
+        Object.keys(this.props.offlineCountryConfiguration.pilotLocations)
+          .length > 0 && (
           <MessageContainer>
             <MessageHeader>
               {this.props.intl.formatMessage(messages.pilotAreaListHeader)}
             </MessageHeader>
             {generatePilotLocations(
-              this.props.offlineResources.pilotLocations,
-              this.props.offlineResources.locations
+              this.props.offlineCountryConfiguration.pilotLocations,
+              this.props.offlineCountryConfiguration.locations,
+              intl
             ).map((pilotLocation, index) => (
               <MessageRow key={index}>
                 <LinkButton
@@ -117,7 +120,17 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
   }
 
   render() {
-    const { intl, offlineResources } = this.props
+    const { intl, offlineCountryConfiguration } = this.props
+
+    const offlineLocations = generateLocations(
+      offlineCountryConfiguration.locations,
+      intl
+    )
+
+    const offlineOffices = generateLocations(
+      offlineCountryConfiguration.offices,
+      intl
+    )
 
     return (
       <SysAdminContentWrapper>
@@ -127,12 +140,13 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
 
         <LocationSearch
           selectedLocation={this.state.selectedLocation}
-          locationList={generateLocations(offlineResources.locations)}
+          locationList={[...offlineLocations, ...offlineOffices]}
           searchHandler={this.searchHandler}
           searchButtonHandler={this.searchButtonHandler}
+          errorMessage={intl.formatMessage(messagesSearch.locationNotFound)}
         />
 
-        {this.renderPilotLocations()}
+        {this.renderPilotLocations(intl)}
       </SysAdminContentWrapper>
     )
   }
@@ -140,7 +154,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
 
 function mapStateToProps(state: IStoreState) {
   return {
-    offlineResources: getOfflineData(state)
+    offlineCountryConfiguration: getOfflineData(state)
   }
 }
 

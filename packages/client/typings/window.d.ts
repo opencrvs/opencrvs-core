@@ -12,7 +12,11 @@
 interface Window {
   config: {
     API_GATEWAY_URL: string
+<<<<<<< HEAD
     CONFIG_API_URL: String
+=======
+    CONFIG_API_URL: string
+>>>>>>> develop
     BACKGROUND_SYNC_BROADCAST_CHANNEL: string
     COUNTRY: string
     COUNTRY_LOGO_FILE: string
@@ -22,7 +26,8 @@ interface Window {
     LANGUAGES: string
     LOGIN_URL: string
     AUTH_URL: string
-    RESOURCES_URL: string
+    COUNTRY_CONFIG_URL: string
+    SHOW_FARAJALAND_IN_COUNTRY_LISTS: boolean
     /**
      * @deprecated HEALTH_FACILITY_FILTER is no longer used
      */

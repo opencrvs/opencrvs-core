@@ -186,7 +186,7 @@ services:
   # Configure webapps and add traefik config
   client:
     environment:
-      - RESOURCES_URL=https://resources.{{hostname}}
+      - COUNTRY_CONFIG_URL=https://countryconfig.{{hostname}}
       - HOST={{hostname}}
     deploy:
       labels:
@@ -200,11 +200,24 @@ services:
     networks:
       - overlay_net
 
-  resources:
+  components:
     deploy:
       labels:
         - 'traefik.enable=true'
-        - 'traefik.frontend.rule=Host: resources.{{hostname}}'
+        - 'traefik.frontend.rule=Host: styleguide.{{hostname}},{{hostname}}'
+        - 'traefik.frontend.redirect.regex=^https?://{{hostname}}/(.*)'
+        - 'traefik.frontend.redirect.replacement=https://styleguide.{{hostname}}/$${1}'
+        - 'traefik.port=80'
+        - 'traefik.docker.network=opencrvs_overlay_net'
+      replicas: 2
+    networks:
+      - overlay_net
+
+  countryconfig:
+    deploy:
+      labels:
+        - 'traefik.enable=true'
+        - 'traefik.frontend.rule=Host: countryconfig.{{hostname}}'
         - 'traefik.port=3040'
         - 'traefik.docker.network=opencrvs_overlay_net'
       replicas: 2
@@ -213,7 +226,7 @@ services:
 
   login:
     environment:
-      - RESOURCES_URL=https://resources.{{hostname}}
+      - COUNTRY_CONFIG_URL=https://countryconfig.{{hostname}}
       - HOST={{hostname}}
     deploy:
       labels:
@@ -314,7 +327,17 @@ services:
       - jwt-public-key.{{ts}}
     environment:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
+<<<<<<< HEAD
     deploy:
+=======
+      - MONGO_URL=mongodb://mongo1,mongo2,mongo3/application-config?replicaSet=rs0
+    deploy:
+      labels:
+        - 'traefik.enable=true'
+        - 'traefik.frontend.rule=Host: config.{{hostname}}'
+        - 'traefik.port=2021'
+        - 'traefik.docker.network=opencrvs_overlay_net'
+>>>>>>> develop
       replicas: 2
     networks:
       - overlay_net

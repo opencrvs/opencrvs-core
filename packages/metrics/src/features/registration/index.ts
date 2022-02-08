@@ -40,6 +40,7 @@ export interface IAuthHeader {
 export interface IBirthRegistrationTags {
   regStatus: string
   gender: string | undefined
+  officeLocation?: string
   locationLevel5?: string
   locationLevel4?: string
   locationLevel3?: string
@@ -51,6 +52,7 @@ export interface IDeathRegistrationTags {
   gender: string | undefined
   mannerOfDeath: string
   causeOfDeath: string
+  officeLocation?: string
   locationLevel5?: string
   locationLevel4?: string
   locationLevel3?: string
@@ -67,6 +69,7 @@ export interface IInProgressApplicationTags {
   missingFieldGroupId: string
   missingFieldId: string
   eventType: string
+  officeLocation?: string
   locationLevel5?: string
   locationLevel4?: string
   locationLevel3?: string
@@ -74,6 +77,7 @@ export interface IInProgressApplicationTags {
 }
 
 export interface ILocationTags {
+  officeLocation?: string
   locationLevel5?: string
   locationLevel4?: string
   locationLevel3?: string
@@ -89,6 +93,7 @@ export interface ITimeLoggedTags {
   currentStatus: string
   trackingId: string
   eventType: string
+  officeLocation?: string
   practitionerId?: string
   locationLevel5?: string
   locationLevel4?: string
@@ -112,36 +117,42 @@ export interface IDurationPoints {
   measurement: string
   tags: IDurationTags
   fields: IDurationFields
+  timestamp: number | undefined
 }
 
 export interface ITimeLoggedPoints {
   measurement: string
   tags: ITimeLoggedTags
   fields: ITimeLoggedFields
+  timestamp: number | undefined
 }
 
 export interface IInProgressApplicationPoints {
   measurement: string
   tags: IInProgressApplicationTags
   fields: IInProgressApplicationFields
+  timestamp: number | undefined
 }
 
 export interface IDeathRegistrationPoints {
   measurement: string
   tags: IDeathRegistrationTags
   fields: IDeathRegistrationFields
+  timestamp: number | undefined
 }
 
 export interface IBirthRegistrationPoints {
   measurement: string
   tags: IBirthRegistrationTags
   fields: IBirthRegistrationFields
+  timestamp: number | undefined
 }
 
 export interface IPaymentPoints {
   measurement: string
-  tags: IPointLocation
+  tags: ILocationTags
   fields: IPaymentFields
+  timestamp: number | undefined
 }
 
 export interface IPaymentFields {
@@ -151,8 +162,9 @@ export interface IPaymentFields {
 
 export interface IApplicationsStartedPoints {
   measurement: string
-  tags: IPointLocation
+  tags: ILocationTags
   fields: IApplicationsStartedFields
+  timestamp: number | undefined
 }
 
 export interface IApplicationsStartedFields {
@@ -167,8 +179,9 @@ export interface IRejectedFields {
 
 export interface IRejectedPoints {
   measurement: string
-  tags: IPointLocation
+  tags: ILocationTags
   fields: IRejectedFields
+  timestamp: number | undefined
 }
 
 export type IPoints =

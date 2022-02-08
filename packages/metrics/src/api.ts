@@ -14,7 +14,7 @@ import { IAuthHeader } from '@metrics/features/registration'
 import {
   CONFIG_API_URL,
   fhirUrl,
-  RESOURCE_URL,
+  COUNTRY_CONFIG_URL,
   SEARCH_URL
 } from '@metrics/constants'
 
@@ -33,10 +33,10 @@ export function fetchFHIR<T = any>(
     },
     body
   })
-    .then(response => {
+    .then((response) => {
       return response.json() as Promise<T>
     })
-    .catch(error => {
+    .catch((error) => {
       return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
     })
 }
@@ -93,7 +93,7 @@ export function fetchFromResource(
   method: string = 'GET',
   body?: string
 ) {
-  const url = [RESOURCE_URL.replace(/\/$/, ''), suffix].join('/')
+  const url = [COUNTRY_CONFIG_URL.replace(/\/$/, ''), suffix].join('/')
   return fetch(url, {
     method,
     headers: {
@@ -101,10 +101,10 @@ export function fetchFromResource(
     },
     body
   })
-    .then(response => {
+    .then((response) => {
       return response.json()
     })
-    .catch(error => {
+    .catch((error) => {
       return Promise.reject(
         new Error(`RESOURCE request failed: ${error.message}`)
       )
@@ -119,10 +119,10 @@ export function fetchAllFromSearch(authHeader: IAuthHeader) {
       ...authHeader
     }
   })
-    .then(response => {
+    .then((response) => {
       return response.json()
     })
-    .catch(error => {
+    .catch((error) => {
       return Promise.reject(
         new Error(`Search request failed: ${error.message}`)
       )
@@ -202,10 +202,10 @@ export async function getApplicationConfig(): Promise<IApplicationConfig> {
       'Content-Type': 'application/json'
     }
   })
-    .then(response => {
+    .then((response) => {
       return response.json()
     })
-    .catch(error => {
+    .catch((error) => {
       return Promise.reject(
         new Error(`Application config request failed: ${error.message}`)
       )

@@ -10,16 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 window.config = {
-  BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
-  COUNTRY: 'bgd',
-  COUNTRY_LOGO_FILE: 'logo.png',
-  DESKTOP_TIME_OUT_MILLISECONDS: 900000, // 15 mins
-  /**
-   * @deprecated HEALTH_FACILITY_FILTER is no longer used
-   */
-  HEALTH_FACILITY_FILTER: 'UPAZILA',
+  API_GATEWAY_URL: 'http://localhost:7070/',
+  CONFIG_API_URL: 'http://localhost:2021',
   LOGIN_URL: 'http://localhost:3020',
   AUTH_URL: 'http://localhost:4040',
+<<<<<<< HEAD
   API_GATEWAY_URL: 'http://localhost:7070/',
   RESOURCES_URL: 'http://localhost:3040/bgd',
   CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 45, // days
@@ -47,4 +42,9 @@ window.config = {
   LOGROCKET: 'opencrvs-foundation/opencrvs-bangladesh',
   BIRTH_REGISTRATION_TARGET: 45,
   DEATH_REGISTRATION_TARGET: 45
+=======
+  COUNTRY_CONFIG_URL: 'http://localhost:3040',
+  COUNTRY: 'FAR',
+  LANGUAGES: 'en'
+>>>>>>> develop
 }

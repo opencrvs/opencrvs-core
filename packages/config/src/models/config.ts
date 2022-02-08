@@ -22,6 +22,12 @@ interface IPhoneNumberPattern {
   }
 }
 
+interface INIDNumberPattern {
+  pattern: RegExp
+  example: string
+  num: string
+}
+
 export interface IApplicationConfigurationModel extends Document {
   BACKGROUND_SYNC_BROADCAST_CHANNEL: string
   COUNTRY: string
@@ -29,7 +35,6 @@ export interface IApplicationConfigurationModel extends Document {
   COUNTRY_LOGO_RENDER_WIDTH: number
   COUNTRY_LOGO_RENDER_HEIGHT: number
   DESKTOP_TIME_OUT_MILLISECONDS: number
-  HEALTH_FACILITY_FILTER: string
   LANGUAGES: string
   CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: number
   CERTIFICATE_PRINT_CHARGE_UP_LIMIT: number
@@ -46,7 +51,14 @@ export interface IApplicationConfigurationModel extends Document {
   PHONE_NUMBER_PATTERN: IPhoneNumberPattern
   BIRTH_REGISTRATION_TARGET: number
   DEATH_REGISTRATION_TARGET: number
+  NID_NUMBER_PATTERN: INIDNumberPattern
 }
+
+const nidPatternSchema = new Schema<INIDNumberPattern>({
+  pattern: { type: String },
+  example: String,
+  num: String
+})
 
 const phoneNumberSchema = new Schema<IPhoneNumberPattern>({
   pattern: { type: String },
@@ -69,11 +81,6 @@ const systemSchema = new Schema({
     type: Number,
     required: false,
     default: 900000
-  },
-  HEALTH_FACILITY_FILTER: {
-    type: String,
-    required: false,
-    default: 'DISTRICT'
   },
   LANGUAGES: { type: String, required: false, default: 'en' },
   CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: {
@@ -119,8 +126,6 @@ const systemSchema = new Schema({
     default: false
   },
   PHONE_NUMBER_PATTERN: { type: phoneNumberSchema, required: false },
-  SENTRY: { type: String, required: false },
-  LOGROCKET: { type: String, required: false },
   BIRTH_REGISTRATION_TARGET: {
     type: Number,
     required: false,
@@ -130,7 +135,10 @@ const systemSchema = new Schema({
     type: Number,
     required: false,
     default: 45
-  }
+  },
+  NID_NUMBER_PATTERN: { type: nidPatternSchema, required: false },
+  SENTRY: { type: String, required: false },
+  LOGROCKET: { type: String, required: false }
 })
 
 export default model<IApplicationConfigurationModel>('Config', systemSchema)

@@ -80,8 +80,12 @@ const enhancedCreateStore = createReduxStore as StoreCreator
 
 export type AppStore = Store<IStoreState, AnyAction>
 
-export const createStore = (): { store: AppStore; history: History } => {
-  const history = createBrowserHistory()
+const config = { DONT_LOG_ERRORS_ON_HANDLED_FAILURES: true }
+
+export const createStore = <T>(
+  existingHistory?: History<T>
+): { store: AppStore; history: History } => {
+  const history = existingHistory || createBrowserHistory()
   const reducers = combineReducers<IStoreState>({
     profile: profileReducer,
     router: connectRouter(history) as any, // @todo
@@ -98,7 +102,7 @@ export const createStore = (): { store: AppStore; history: History } => {
     workqueueState: registrarWorkqueueReducer
   })
   const enhancer = compose(
-    install(),
+    install(config),
     applyMiddleware(routerMiddleware(history)),
     // @ts-ignore types are not correct for this module yet
     applyMiddleware(createSentryMiddleware(Sentry)),

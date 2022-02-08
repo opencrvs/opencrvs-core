@@ -79,7 +79,7 @@ async function init() {
     clientConfig
       .toString()
       .replace(/(API_GATEWAY_URL: ).*,/, `$1 '/gateway/',`)
-      .replace(/(RESOURCES_URL: ).*,/, `$1 '/resources',`)
+      .replace(/(COUNTRY_CONFIG_URL: ).*,/, `$1 '/countryconfig',`)
   )
 
   console.log('Proxy is running:', url)

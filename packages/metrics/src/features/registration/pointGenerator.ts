@@ -48,7 +48,8 @@ import {
   MANNER_OF_DEATH_CODE,
   CAUSE_OF_DEATH_CODE,
   getPractionerIdFromTask,
-  getTrackingId
+  getTrackingId,
+  getRegLastOffice
 } from '@metrics/features/registration/fhirUtils'
 import {
   getAgeInDays,
@@ -72,7 +73,7 @@ export const generateInCompleteFieldPoints = async (
     task &&
     task.extension &&
     task.extension.find(
-      extension =>
+      (extension) =>
         extension.url ===
         `${OPENCRVS_SPECIFICATION_URL}extension/in-complete-fields`
     )
@@ -101,22 +102,32 @@ export const generateInCompleteFieldPoints = async (
     authHeader
   )
 
-  return inCompleteFieldExtension.valueString.split(',').map(missingFieldId => {
-    const missingFieldIds = missingFieldId.split('/')
-    const tags: IInProgressApplicationTags = {
-      missingFieldSectionId: missingFieldIds[0],
-      missingFieldGroupId: missingFieldIds[1],
-      missingFieldId: missingFieldIds[2],
-      eventType: getApplicationType(task) as string,
-      regStatus: 'IN_PROGESS',
-      ...locationTags
-    }
-    return {
-      measurement: 'in_complete_fields',
-      tags,
-      fields
-    }
-  })
+  return inCompleteFieldExtension.valueString
+    .split(',')
+    .map((missingFieldId) => {
+      const missingFieldIds = missingFieldId.split('/')
+      const tags: IInProgressApplicationTags = {
+        missingFieldSectionId: missingFieldIds[0],
+        missingFieldGroupId: missingFieldIds[1],
+        missingFieldId: missingFieldIds[2],
+        eventType: getApplicationType(task) as string,
+        regStatus: 'IN_PROGESS',
+        ...locationTags
+      }
+      return {
+        measurement: 'in_complete_fields',
+        tags,
+        fields,
+        timestamp: toInfluxTimestamp(task.lastModified)
+      }
+    })
+}
+
+function toInfluxTimestamp(date?: Date | string) {
+  if (!date) {
+    return undefined
+  }
+  return new Date(date).valueOf() * 1000000
 }
 
 export const generateBirthRegPoint = async (
@@ -142,13 +153,15 @@ export const generateBirthRegPoint = async (
   const tags: IBirthRegistrationTags = {
     regStatus: regStatus,
     gender: child.gender,
+    officeLocation: getRegLastOffice(payload),
     ...(await generatePointLocations(payload, authHeader))
   }
 
   const point = {
     measurement: 'birth_reg',
     tags,
-    fields
+    fields,
+    timestamp: toInfluxTimestamp(composition.date)
   }
 
   return point
@@ -187,13 +200,15 @@ export const generateDeathRegPoint = async (
     gender: deceased.gender,
     mannerOfDeath: getObservationValueByCode(payload, MANNER_OF_DEATH_CODE),
     causeOfDeath: getObservationValueByCode(payload, CAUSE_OF_DEATH_CODE),
+    officeLocation: getRegLastOffice(payload),
     ...(await generatePointLocations(payload, authHeader))
   }
 
   const point = {
     measurement: 'death_reg',
     tags,
-    fields
+    fields,
+    timestamp: new Date(composition.date).valueOf() * 1000000
   }
 
   return point
@@ -249,13 +264,15 @@ export async function generatePaymentPoint(
 
   const tags = {
     eventType: getApplicationType(task),
+    officeLocation: getRegLastOffice(payload),
     ...(await generatePointLocations(payload, authHeader))
   }
 
   return {
     measurement: 'certification_payment',
     tags,
-    fields
+    fields,
+    timestamp: toInfluxTimestamp(reconciliation.created)
   }
 }
 
@@ -313,7 +330,8 @@ export async function generateEventDurationPoint(
   return {
     measurement: 'application_event_duration',
     tags,
-    fields
+    fields,
+    timestamp: toInfluxTimestamp(currentTask.lastModified)
   }
 }
 
@@ -324,15 +342,18 @@ export async function generateTimeLoggedPoint(
 ): Promise<IPoints> {
   const currentTask = getTask(payload)
   let compositionId
+  let timestamp
   if (!fromTask) {
     const composition = getComposition(payload)
     if (!composition) {
       throw new Error('composition not found')
     }
     compositionId = composition.id
+    timestamp = composition.date
   } else {
     if (currentTask && currentTask.focus && currentTask.focus.reference) {
       compositionId = currentTask.focus.reference.split('/')[1]
+      timestamp = currentTask.meta?.lastUpdated
     }
   }
 
@@ -357,13 +378,15 @@ export async function generateTimeLoggedPoint(
     trackingId: getTrackingId(currentTask) as string,
     eventType: getApplicationType(currentTask) as string,
     practitionerId: getPractionerIdFromTask(currentTask),
+    officeLocation: getRegLastOffice(payload),
     ...(await generatePointLocations(payload, authHeader))
   }
 
   return {
     measurement: 'application_time_logged',
     tags,
-    fields
+    fields,
+    timestamp: toInfluxTimestamp(timestamp)
   }
 }
 
@@ -410,13 +433,15 @@ export async function generateApplicationStartedPoint(
   const tags = {
     eventType: getApplicationType(task),
     practitionerId: getPractionerIdFromTask(task),
+    officeLocation: getRegLastOffice(payload),
     ...(await generatePointLocations(payload, authHeader))
   }
 
   return {
     measurement: 'applications_started',
     tags,
-    fields
+    fields,
+    timestamp: toInfluxTimestamp(task.lastModified)
   }
 }
 
@@ -444,12 +469,14 @@ export async function generateRejectedPoints(
   const tags = {
     eventType: getApplicationType(task),
     startedBy: getStartedByFieldAgent(taskHistory),
+    officeLocation: getRegLastOffice(payload),
     ...(await generatePointLocations(payload, authHeader))
   }
 
   return {
     measurement: 'applications_rejected',
     tags,
-    fields
+    fields,
+    timestamp: toInfluxTimestamp(task.lastModified)
   }
 }

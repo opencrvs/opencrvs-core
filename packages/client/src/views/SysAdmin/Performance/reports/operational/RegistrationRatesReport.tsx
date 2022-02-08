@@ -152,12 +152,8 @@ class RegistrationRatesReportComponent extends React.Component<Props, States> {
   }
 
   getReport(data: GQLEventEstimationMetrics) {
-    const {
-      intl,
-      reportTimeFrom,
-      reportTimeTo,
-      onClickEventDetails
-    } = this.props
+    const { intl, reportTimeFrom, reportTimeTo, onClickEventDetails } =
+      this.props
     const { birthTargetDayMetrics, deathTargetDayMetrics } = data
     const birthReportHeader = intl.formatMessage(
       messages.birthRegistrationRatesReportHeader,
@@ -196,9 +192,11 @@ class RegistrationRatesReportComponent extends React.Component<Props, States> {
               {birthReportHeader}
             </LinkButton>
             <KeyNumber>
-              {`${(birthTargetDayMetrics &&
-                birthTargetDayMetrics.estimatedPercentage) ||
-                0}%`}
+              {`${
+                (birthTargetDayMetrics &&
+                  birthTargetDayMetrics.estimatedPercentage) ||
+                0
+              }%`}
             </KeyNumber>
             <KeyNumberDescription>
               {intl.formatMessage(messages.registrationRatesReportDescription, {
@@ -215,15 +213,19 @@ class RegistrationRatesReportComponent extends React.Component<Props, States> {
             </KeyNumberDescription>
             {this.getLabelValuePair(
               intl.formatMessage(dynamicConstantsMessages.male),
-              `${(birthTargetDayMetrics &&
-                birthTargetDayMetrics.malePercentage) ||
-                0}%`
+              `${
+                (birthTargetDayMetrics &&
+                  birthTargetDayMetrics.malePercentage) ||
+                0
+              }%`
             )}
             {this.getLabelValuePair(
               intl.formatMessage(dynamicConstantsMessages.female),
-              `${(birthTargetDayMetrics &&
-                birthTargetDayMetrics.femalePercentage) ||
-                0}%`
+              `${
+                (birthTargetDayMetrics &&
+                  birthTargetDayMetrics.femalePercentage) ||
+                0
+              }%`
             )}
           </Report>
           <Report>
@@ -236,9 +238,11 @@ class RegistrationRatesReportComponent extends React.Component<Props, States> {
               {deathReportHeader}
             </LinkButton>
             <KeyNumber>
-              {`${(deathTargetDayMetrics &&
-                deathTargetDayMetrics.estimatedPercentage) ||
-                0}%`}
+              {`${
+                (deathTargetDayMetrics &&
+                  deathTargetDayMetrics.estimatedPercentage) ||
+                0
+              }%`}
             </KeyNumber>
             <KeyNumberDescription>
               {intl.formatMessage(messages.registrationRatesReportDescription, {
@@ -255,15 +259,19 @@ class RegistrationRatesReportComponent extends React.Component<Props, States> {
             </KeyNumberDescription>
             {this.getLabelValuePair(
               intl.formatMessage(dynamicConstantsMessages.male),
-              `${(deathTargetDayMetrics &&
-                deathTargetDayMetrics.malePercentage) ||
-                0}%`
+              `${
+                (deathTargetDayMetrics &&
+                  deathTargetDayMetrics.malePercentage) ||
+                0
+              }%`
             )}
             {this.getLabelValuePair(
               intl.formatMessage(dynamicConstantsMessages.female),
-              `${(deathTargetDayMetrics &&
-                deathTargetDayMetrics.femalePercentage) ||
-                0}%`
+              `${
+                (deathTargetDayMetrics &&
+                  deathTargetDayMetrics.femalePercentage) ||
+                0
+              }%`
             )}
           </Report>
         </Reports>

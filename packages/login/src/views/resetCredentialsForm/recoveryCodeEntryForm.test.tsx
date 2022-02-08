@@ -61,11 +61,8 @@ describe('Test recvery code entry form', () => {
     })
 
     describe('When recovery code is resent', () => {
-      it('loads valid header', done => {
-        app
-          .find('#retrieve-login-mobile-resend')
-          .hostNodes()
-          .simulate('click')
+      it('loads valid header', (done) => {
+        app.find('#retrieve-login-mobile-resend').hostNodes().simulate('click')
         moxios.wait(() => {
           const request = moxios.requests.mostRecent()
           request
@@ -79,11 +76,8 @@ describe('Test recvery code entry form', () => {
         })
       })
 
-      it('loads valid subheader', done => {
-        app
-          .find('#retrieve-login-mobile-resend')
-          .hostNodes()
-          .simulate('click')
+      it('loads valid subheader', (done) => {
+        app.find('#retrieve-login-mobile-resend').hostNodes().simulate('click')
         moxios.wait(() => {
           const request = moxios.requests.mostRecent()
           request
@@ -134,15 +128,12 @@ describe('Test recvery code entry form', () => {
       app.update()
     })
 
-    it('redirects to security question form when valid recovery code is given', done => {
+    it('redirects to security question form when valid recovery code is given', (done) => {
       app
         .find('#recovery-code-input')
         .hostNodes()
         .simulate('change', { target: { value: '000000' } })
-      app
-        .find('#continue')
-        .hostNodes()
-        .simulate('submit')
+      app.find('#continue').hostNodes().simulate('submit')
       moxios.wait(() => {
         const request = moxios.requests.mostRecent()
         request
@@ -160,15 +151,12 @@ describe('Test recvery code entry form', () => {
       })
     })
 
-    it('does not redirect to sucerity quetion form when invalid recovery code is given', done => {
+    it('does not redirect to sucerity quetion form when invalid recovery code is given', (done) => {
       app
         .find('#recovery-code-input')
         .hostNodes()
         .simulate('change', { target: { value: '123456' } })
-      app
-        .find('#continue')
-        .hostNodes()
-        .simulate('submit')
+      app.find('#continue').hostNodes().simulate('submit')
       moxios.wait(() => {
         const request = moxios.requests.mostRecent()
         request

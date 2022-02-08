@@ -152,7 +152,7 @@ storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 
 describe('Field Agnet tests', () => {
-  const { store } = createStore()
+  const { store, history } = createStore()
 
   beforeAll(async () => {
     merge(mockUserResponse, nameObj)
@@ -186,14 +186,14 @@ describe('Field Agnet tests', () => {
           }
         }}
       />,
-      store
+      { store, history }
     )
 
     expect(
-      testComponent.component.find('#history_row_0_DRAFT_STARTED').hostNodes()
+      testComponent.find('#history_row_0_DRAFT_STARTED').hostNodes()
     ).toHaveLength(1)
     expect(
-      testComponent.component.find('#history_row_1_DRAFT_MODIFIED').hostNodes()
+      testComponent.find('#history_row_1_DRAFT_MODIFIED').hostNodes()
     ).toHaveLength(0)
   })
 
@@ -226,14 +226,14 @@ describe('Field Agnet tests', () => {
           }
         }}
       />,
-      store
+      { store, history }
     )
 
     expect(
-      testComponent.component.find('#history_row_0_DRAFT_MODIFIED').hostNodes()
+      testComponent.find('#history_row_0_DRAFT_MODIFIED').hostNodes()
     ).toHaveLength(1)
     expect(
-      testComponent.component.find('#history_row_1_DRAFT_STARTED').hostNodes()
+      testComponent.find('#history_row_1_DRAFT_STARTED').hostNodes()
     ).toHaveLength(1)
   })
   it('loads properly for submitted draft application', async () => {
@@ -299,11 +299,11 @@ describe('Field Agnet tests', () => {
           }
         }}
       />,
-      store
+      { store, history }
     )
 
     expect(
-      testComponent.component.find('#history_row_0_DECLARED').hostNodes()
+      testComponent.find('#history_row_0_DECLARED').hostNodes()
     ).toHaveLength(1)
   })
   it('loads properly for failed application', async () => {
@@ -336,15 +336,13 @@ describe('Field Agnet tests', () => {
           }
         }}
       />,
-      store
+      { store, history }
     )
 
     expect(
-      testComponent.component.find('#history_row_0_FAILED').hostNodes()
+      testComponent.find('#history_row_0_FAILED').hostNodes()
     ).toHaveLength(1)
-    expect(
-      testComponent.component.find('#failed_retry').hostNodes()
-    ).toHaveLength(1)
+    expect(testComponent.find('#failed_retry').hostNodes()).toHaveLength(1)
   })
   it('loads properly for sent_for_review application', async () => {
     const graphqlMock = [
@@ -397,8 +395,7 @@ describe('Field Agnet tests', () => {
                 contactPhoneNumber: '01622688231',
                 status: [
                   {
-                    id:
-                      '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
+                    id: '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
                     timestamp: '2019-04-03T07:08:24.936Z',
                     user: {
                       id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
@@ -460,17 +457,16 @@ describe('Field Agnet tests', () => {
           }
         }}
       />,
-      store,
-      graphqlMock
+      { store, history, graphqlMocks: graphqlMock }
     )
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
-    testComponent.component.update()
+    testComponent.update()
     expect(
-      testComponent.component.find('#history_row_0_DECLARED').hostNodes()
+      testComponent.find('#history_row_0_DECLARED').hostNodes()
     ).toHaveLength(1)
   })
   it('loads properly for required update application, and does not show update button for a field agent', async () => {
@@ -571,23 +567,20 @@ describe('Field Agnet tests', () => {
           }
         }}
       />,
-      store,
-      graphqlMock
+      { store, history, graphqlMocks: graphqlMock }
     )
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
-    testComponent.component.update()
+    testComponent.update()
     expect(
-      testComponent.component.find('#history_row_0_REJECTED').hostNodes()
+      testComponent.find('#history_row_0_REJECTED').hostNodes()
     ).toHaveLength(1)
+    expect(testComponent.find('#registrar_update').hostNodes()).toHaveLength(0)
     expect(
-      testComponent.component.find('#registrar_update').hostNodes()
-    ).toHaveLength(0)
-    expect(
-      testComponent.component.find('#history_row_1_APPLICATION').hostNodes()
+      testComponent.find('#history_row_1_APPLICATION').hostNodes()
     ).toHaveLength(1)
   })
   it('loads history properly for all statuses of an application', async () => {
@@ -695,31 +688,28 @@ describe('Field Agnet tests', () => {
           }
         }}
       />,
-      store,
-      graphqlMock
+      { store, history, graphqlMocks: graphqlMock }
     )
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
-    testComponent.component.update()
+    testComponent.update()
     expect(
-      testComponent.component.find('#history_row_4_DECLARED').hostNodes()
+      testComponent.find('#history_row_4_DECLARED').hostNodes()
     ).toHaveLength(1)
     expect(
-      testComponent.component.find('#history_row_3_VALIDATED').hostNodes()
+      testComponent.find('#history_row_3_VALIDATED').hostNodes()
     ).toHaveLength(1)
     expect(
-      testComponent.component
-        .find('#history_row_2_WAITING_VALIDATION')
-        .hostNodes()
+      testComponent.find('#history_row_2_WAITING_VALIDATION').hostNodes()
     ).toHaveLength(1)
     expect(
-      testComponent.component.find('#history_row_1_REGISTERED').hostNodes()
+      testComponent.find('#history_row_1_REGISTERED').hostNodes()
     ).toHaveLength(1)
     expect(
-      testComponent.component.find('#history_row_0_CERTIFIED').hostNodes()
+      testComponent.find('#history_row_0_CERTIFIED').hostNodes()
     ).toHaveLength(1)
   })
   it('loads successfuly with empty history ', async () => {
@@ -777,17 +767,16 @@ describe('Field Agnet tests', () => {
           }
         }}
       />,
-      store,
-      graphqlMock
+      { store, history, graphqlMocks: graphqlMock }
     )
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
-    testComponent.component.update()
+    testComponent.update()
     expect(
-      testComponent.component.find('#sub_page_back_button').hostNodes()
+      testComponent.find('#sub_page_back_button').hostNodes()
     ).toHaveLength(1)
   })
 })
@@ -813,8 +802,7 @@ describe('Registrar tests', () => {
               certificates: null,
               status: [
                 {
-                  id:
-                    '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
+                  id: '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
                   timestamp: '2019-04-03T07:08:24.936Z',
                   user: {
                     id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
@@ -1007,8 +995,7 @@ describe('Registrar tests', () => {
               certificates: null,
               status: [
                 {
-                  id:
-                    '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
+                  id: '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
                   timestamp: '2019-04-03T07:08:24.936Z',
                   user: {
                     id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
@@ -1106,43 +1093,40 @@ describe('Registrar tests', () => {
           }
         }}
       />,
-      store,
-      graphqlMock
+      { store, history, graphqlMocks: graphqlMock }
     )
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
-    testComponent.component.update()
-    const downloadButton = testComponent.component.find('#reviewDownload-icon')
+    testComponent.update()
+    const downloadButton = testComponent.find('#reviewDownload-icon')
     expect(downloadButton.hostNodes()).toHaveLength(1)
     downloadButton.hostNodes().simulate('click')
 
-    testComponent.component.update()
+    testComponent.update()
     expect(
-      testComponent.component.find('#action-loading-reviewDownload').hostNodes()
+      testComponent.find('#action-loading-reviewDownload').hostNodes()
     ).toHaveLength(1)
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
-    testComponent.component.update()
+    testComponent.update()
 
-    expect(
-      testComponent.component.find('#registrar_update').hostNodes()
-    ).toHaveLength(1)
+    expect(testComponent.find('#registrar_update').hostNodes()).toHaveLength(1)
   })
 
   it('Shows error icon if download fails', async () => {
@@ -1166,42 +1150,41 @@ describe('Registrar tests', () => {
           }
         }}
       />,
-      store,
-      graphqlErrorMock
+      { store, history, graphqlMocks: graphqlErrorMock as any }
     )
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
-    testComponent.component.update()
-    const downloadButton = testComponent.component.find('#reviewDownload-icon')
+    testComponent.update()
+    const downloadButton = testComponent.find('#reviewDownload-icon')
     expect(downloadButton.hostNodes()).toHaveLength(1)
     downloadButton.hostNodes().simulate('click')
 
-    testComponent.component.update()
+    testComponent.update()
     expect(
-      testComponent.component.find('#action-loading-reviewDownload').hostNodes()
+      testComponent.find('#action-loading-reviewDownload').hostNodes()
     ).toHaveLength(1)
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
-    testComponent.component.update()
+    testComponent.update()
 
     expect(
-      testComponent.component.find('#action-error-reviewDownload').hostNodes()
+      testComponent.find('#action-error-reviewDownload').hostNodes()
     ).toHaveLength(1)
   })
 
@@ -1605,51 +1588,43 @@ describe('Registrar tests', () => {
           }
         }}
       />,
-      store,
-      graphqlMock
+      { store, history, graphqlMocks: graphqlMock }
     )
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     getItem.mockReturnValue(registerScopeToken)
-    await testComponent.store.dispatch(
-      checkAuth({ '?token': registerScopeToken })
-    )
+    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
-    testComponent.component.update()
-    const downloadButton = testComponent.component.find('#printDownload-icon')
+    testComponent.update()
+    const downloadButton = testComponent.find('#printDownload-icon')
     expect(downloadButton.hostNodes()).toHaveLength(1)
     downloadButton.hostNodes().simulate('click')
 
-    testComponent.component.update()
+    testComponent.update()
     expect(
-      testComponent.component.find('#action-loading-printDownload').hostNodes()
+      testComponent.find('#action-loading-printDownload').hostNodes()
     ).toHaveLength(1)
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
-    testComponent.component.update()
-    expect(
-      testComponent.component.find('#registrar_print').hostNodes()
-    ).toHaveLength(1)
+    testComponent.update()
+    expect(testComponent.find('#registrar_print').hostNodes()).toHaveLength(1)
 
-    testComponent.component
-      .find('#registrar_print')
-      .hostNodes()
-      .simulate('click')
+    testComponent.find('#registrar_print').hostNodes().simulate('click')
     expect(history.location.pathname).toContain('cert')
   })
 
@@ -1684,8 +1659,7 @@ describe('Registrar tests', () => {
             state: {}
           }}
         />,
-        store,
-        graphqlMock
+        { store, history, graphqlMocks: graphqlMock }
       )
     } catch (error) {
       expect(error).toBeInstanceOf(Error)

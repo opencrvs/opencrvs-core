@@ -16,7 +16,8 @@ export const CERT_PUBLIC_KEY_PATH =
   (process.env.CERT_PUBLIC_KEY_PATH as string) ||
   '../../.secrets/public-key.pem'
 export const AUTH_URL = process.env.AUTH_URL || 'http://localhost:4040'
-export const RESOURCE_URL = process.env.RESOURCE_URL || 'http://localhost:3040'
+export const COUNTRY_CONFIG_URL =
+  process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
 export const SENTRY_DSN =
   process.env.SENTRY_DSN ||
   'https://2ed906a0ba1c4de2ae3f3f898ec9df0b@sentry.io/1774551'

@@ -70,7 +70,8 @@ export async function authenticate(
 
   const res = await fetch(url, {
     method: 'POST',
-    body: JSON.stringify({ username, password })
+    body: JSON.stringify({ username, password }),
+    headers: { 'Content-Type': 'application/json' }
   })
 
   if (res.status !== 200) {
@@ -96,7 +97,8 @@ export async function authenticateSystem(
 
   const res = await fetch(url, {
     method: 'POST',
-    body: JSON.stringify({ client_id, client_secret })
+    body: JSON.stringify({ client_id, client_secret }),
+    headers: { 'Content-Type': 'application/json' }
   })
 
   if (res.status !== 200) {
@@ -182,8 +184,7 @@ export async function generateAndSendVerificationCode(
   }
 }
 
-/* tslint:disable */
-const TokenPayload = t.type({
+const tokenPayload = t.type({
   sub: t.string,
   scope: t.array(t.string),
   iat: t.number,
@@ -191,15 +192,14 @@ const TokenPayload = t.type({
   aud: t.array(t.string)
 })
 
-export type ITokenPayload = t.TypeOf<typeof TokenPayload>
+export type ITokenPayload = t.TypeOf<typeof tokenPayload>
 
 export function verifyToken(token: string): ITokenPayload {
   const decoded = jwt.verify(token, publicCert, {
     issuer: 'opencrvs:auth-service',
     audience: 'opencrvs:auth-user'
   })
-  const result = TokenPayload.decode(decoded)
+  const result = tokenPayload.decode(decoded)
   ThrowReporter.report(result)
   return result.value as ITokenPayload
 }
-/* tslint:enable */

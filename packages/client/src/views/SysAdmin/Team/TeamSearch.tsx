@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { messages } from '@client/i18n/messages/views/performance'
+import { messages as messagesSearch } from '@client/i18n/messages/views/search'
 import { goToTeamUserList } from '@client/navigation'
 import { IOfflineData, ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
@@ -32,7 +33,7 @@ interface BaseProps {
 type Props = BaseProps &
   WrappedComponentProps &
   Pick<RouteComponentProps, 'history'> & {
-    offlineResources: IOfflineData
+    offlineCountryConfiguration: IOfflineData
   }
 
 interface State {
@@ -61,7 +62,7 @@ class TeamSearchComponent extends React.Component<Props, State> {
   }
 
   render() {
-    const { intl, offlineResources } = this.props
+    const { intl, offlineCountryConfiguration } = this.props
 
     return (
       <SysAdminContentWrapper>
@@ -69,7 +70,7 @@ class TeamSearchComponent extends React.Component<Props, State> {
 
         <LocationSearch
           selectedLocation={this.state.selectedLocation}
-          locationList={Object.values(offlineResources.offices).map(
+          locationList={Object.values(offlineCountryConfiguration.offices).map(
             (location: ILocation) => {
               return {
                 id: location.id,
@@ -80,6 +81,7 @@ class TeamSearchComponent extends React.Component<Props, State> {
           )}
           searchHandler={this.searchHandler}
           searchButtonHandler={this.searchButtonHandler}
+          errorMessage={intl.formatMessage(messagesSearch.locationNotFound)}
         />
       </SysAdminContentWrapper>
     )
@@ -88,7 +90,7 @@ class TeamSearchComponent extends React.Component<Props, State> {
 
 function mapStateToProps(state: IStoreState) {
   return {
-    offlineResources: getOfflineData(state)
+    offlineCountryConfiguration: getOfflineData(state)
   }
 }
 

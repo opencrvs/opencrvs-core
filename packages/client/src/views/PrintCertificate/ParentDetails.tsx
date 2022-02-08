@@ -48,7 +48,7 @@ type Identifier = {
   id: string
   type: string
 }
-export type ParentDetails = {
+export type IParentDetails = {
   name: Name[]
   birthDate: string
   nationality: [string]
@@ -56,7 +56,7 @@ export type ParentDetails = {
 }
 
 interface IProps {
-  information: ParentDetails
+  information: IParentDetails
 }
 
 function ParentDetailsComponent({
@@ -64,11 +64,11 @@ function ParentDetailsComponent({
   information
 }: IProps & IntlShapeProps) {
   information = information || { nationality: '', name: [] }
-  const nationalities = countries.filter(country =>
+  const nationalities = countries.filter((country) =>
     information.nationality.includes(country.value)
   )
   const i18nNationality = nationalities
-    .map(nationality => intl.formatMessage(nationality.label))
+    .map((nationality) => intl.formatMessage(nationality.label))
     .join(', ')
 
   return (

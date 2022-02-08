@@ -62,6 +62,8 @@ export interface GQLMutation {
   createOrUpdateUser: GQLUser
   activateUser?: string
   changePassword?: string
+  changePhone?: string
+  changeAvatar?: string
   auditUser?: string
   resendSMSInvite?: string
 }
@@ -120,8 +122,8 @@ export interface GQLDeathRegistration extends GQLEventRegistration {
   mannerOfDeath?: GQLMannerOfDeath
   causeOfDeathMethod?: GQLCauseOfDeathMethodType
   causeOfDeath?: string
-  maleDependentsOfDeceased?: string
-  femaleDependentsOfDeceased?: string
+  maleDependentsOfDeceased?: number
+  femaleDependentsOfDeceased?: number
   medicalPractitioner?: GQLMedicalPractitioner
   createdAt?: GQLDate
   updatedAt?: GQLDate
@@ -210,6 +212,7 @@ export interface GQLUser {
   identifier?: GQLIdentifier
   signature?: GQLSignature
   creationDate?: string
+  avatar?: GQLAvatar
   device?: string
 }
 
@@ -333,8 +336,8 @@ export interface GQLDeathRegistrationInput {
   mannerOfDeath?: GQLMannerOfDeath
   causeOfDeathMethod?: GQLCauseOfDeathMethodType
   causeOfDeath?: string
-  maleDependentsOfDeceased?: string
-  femaleDependentsOfDeceased?: string
+  maleDependentsOfDeceased?: number
+  femaleDependentsOfDeceased?: number
   medicalPractitioner?: GQLMedicalPractitionerInput
   createdAt?: GQLDate
   updatedAt?: GQLDate
@@ -358,6 +361,11 @@ export interface GQLUserInput {
 export interface GQLSecurityQuestionAnswer {
   questionKey?: string
   answer?: string
+}
+
+export interface GQLAvatarInput {
+  type: string
+  data: string
 }
 
 export type GQLMap = any
@@ -559,6 +567,11 @@ export interface GQLLocalRegistrar {
 export interface GQLSignature {
   data?: string
   type?: string
+}
+
+export interface GQLAvatar {
+  type: string
+  data: string
 }
 
 export interface GQLSearchFieldAgentResponse {
@@ -915,7 +928,9 @@ export const enum GQLAttachmentSubject {
   APPLICANT_ATHORITY_TO_APPLY_PROOF = 'APPLICANT_ATHORITY_TO_APPLY_PROOF',
   LEGAL_GUARDIAN_PROOF = 'LEGAL_GUARDIAN_PROOF',
   ASSIGNED_RESPONSIBILITY_PROOF = 'ASSIGNED_RESPONSIBILITY_PROOF',
-  WARD_COUNCILLOR_PROOF = 'WARD_COUNCILLOR_PROOF'
+  WARD_COUNCILLOR_PROOF = 'WARD_COUNCILLOR_PROOF',
+  CAUSE_OF_DEATH = 'CAUSE_OF_DEATH',
+  CORONERS_REPORT = 'CORONERS_REPORT'
 }
 
 export interface GQLGenderBasisDetailsMetrics {
@@ -1214,6 +1229,7 @@ export interface GQLResolver {
   Identifier?: GQLIdentifierTypeResolver
   LocalRegistrar?: GQLLocalRegistrarTypeResolver
   Signature?: GQLSignatureTypeResolver
+  Avatar?: GQLAvatarTypeResolver
   SearchFieldAgentResponse?: GQLSearchFieldAgentResponseTypeResolver
   RegistrationGenderBasisMetrics?: GQLRegistrationGenderBasisMetricsTypeResolver
   RegistrationTimeFrameMetrics?: GQLRegistrationTimeFrameMetricsTypeResolver
@@ -1253,20 +1269,14 @@ export interface GQLQueryTypeResolver<TParent = any> {
   fetchBirthRegistration?: QueryToFetchBirthRegistrationResolver<TParent>
   searchBirthRegistrations?: QueryToSearchBirthRegistrationsResolver<TParent>
   searchDeathRegistrations?: QueryToSearchDeathRegistrationsResolver<TParent>
-  queryRegistrationByIdentifier?: QueryToQueryRegistrationByIdentifierResolver<
-    TParent
-  >
+  queryRegistrationByIdentifier?: QueryToQueryRegistrationByIdentifierResolver<TParent>
   queryPersonByIdentifier?: QueryToQueryPersonByIdentifierResolver<TParent>
   listBirthRegistrations?: QueryToListBirthRegistrationsResolver<TParent>
   fetchDeathRegistration?: QueryToFetchDeathRegistrationResolver<TParent>
   fetchEventRegistration?: QueryToFetchEventRegistrationResolver<TParent>
   fetchRegistration?: QueryToFetchRegistrationResolver<TParent>
-  queryPersonByNidIdentifier?: QueryToQueryPersonByNidIdentifierResolver<
-    TParent
-  >
-  fetchRegistrationCountByStatus?: QueryToFetchRegistrationCountByStatusResolver<
-    TParent
-  >
+  queryPersonByNidIdentifier?: QueryToQueryPersonByNidIdentifierResolver<TParent>
+  fetchRegistrationCountByStatus?: QueryToFetchRegistrationCountByStatusResolver<TParent>
   locationsByParent?: QueryToLocationsByParentResolver<TParent>
   locationById?: QueryToLocationByIdResolver<TParent>
   hasChildLocation?: QueryToHasChildLocationResolver<TParent>
@@ -1276,18 +1286,10 @@ export interface GQLQueryTypeResolver<TParent = any> {
   verifyPasswordById?: QueryToVerifyPasswordByIdResolver<TParent>
   fetchRegistrationMetrics?: QueryToFetchRegistrationMetricsResolver<TParent>
   getEventEstimationMetrics?: QueryToGetEventEstimationMetricsResolver<TParent>
-  getApplicationsStartedMetrics?: QueryToGetApplicationsStartedMetricsResolver<
-    TParent
-  >
-  fetchMonthWiseEventMetrics?: QueryToFetchMonthWiseEventMetricsResolver<
-    TParent
-  >
-  fetchLocationWiseEventMetrics?: QueryToFetchLocationWiseEventMetricsResolver<
-    TParent
-  >
-  fetchTimeLoggedMetricsByPractitioner?: QueryToFetchTimeLoggedMetricsByPractitionerResolver<
-    TParent
-  >
+  getApplicationsStartedMetrics?: QueryToGetApplicationsStartedMetricsResolver<TParent>
+  fetchMonthWiseEventMetrics?: QueryToFetchMonthWiseEventMetricsResolver<TParent>
+  fetchLocationWiseEventMetrics?: QueryToFetchLocationWiseEventMetricsResolver<TParent>
+  fetchTimeLoggedMetricsByPractitioner?: QueryToFetchTimeLoggedMetricsByPractitionerResolver<TParent>
   searchEvents?: QueryToSearchEventsResolver<TParent>
   getEventsWithProgress?: QueryToGetEventsWithProgressResolver<TParent>
   getRoles?: QueryToGetRolesResolver<TParent>
@@ -1561,7 +1563,8 @@ export interface QueryToSearchUsersResolver<TParent = any, TResult = any> {
 }
 
 export interface QueryToSearchFieldAgentsArgs {
-  locationId: string
+  locationId?: string
+  primaryOfficeId?: string
   status?: string
   language?: string
   timeStart: string
@@ -1730,7 +1733,7 @@ export interface QueryToSearchEventsResolver<TParent = any, TResult = any> {
 }
 
 export interface QueryToGetEventsWithProgressArgs {
-  parentLocationId?: string
+  locationId?: string
   count?: number
   skip?: number
   sort?: string
@@ -1786,6 +1789,8 @@ export interface GQLMutationTypeResolver<TParent = any> {
   createOrUpdateUser?: MutationToCreateOrUpdateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
   changePassword?: MutationToChangePasswordResolver<TParent>
+  changePhone?: MutationToChangePhoneResolver<TParent>
+  changeAvatar?: MutationToChangeAvatarResolver<TParent>
   auditUser?: MutationToAuditUserResolver<TParent>
   resendSMSInvite?: MutationToResendSMSInviteResolver<TParent>
 }
@@ -2086,6 +2091,34 @@ export interface MutationToChangePasswordResolver<
   ): TResult
 }
 
+export interface MutationToChangePhoneArgs {
+  userId: string
+  phoneNumber: string
+  nonce: string
+  verifyCode: string
+}
+export interface MutationToChangePhoneResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToChangePhoneArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToChangeAvatarArgs {
+  userId: string
+  avatar: GQLAvatarInput
+}
+export interface MutationToChangeAvatarResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToChangeAvatarArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface MutationToAuditUserArgs {
   userId: string
   action: string
@@ -2179,27 +2212,13 @@ export interface GQLBirthRegistrationTypeResolver<TParent = any> {
   birthType?: BirthRegistrationToBirthTypeResolver<TParent>
   weightAtBirth?: BirthRegistrationToWeightAtBirthResolver<TParent>
   attendantAtBirth?: BirthRegistrationToAttendantAtBirthResolver<TParent>
-  otherAttendantAtBirth?: BirthRegistrationToOtherAttendantAtBirthResolver<
-    TParent
-  >
-  birthRegistrationType?: BirthRegistrationToBirthRegistrationTypeResolver<
-    TParent
-  >
-  presentAtBirthRegistration?: BirthRegistrationToPresentAtBirthRegistrationResolver<
-    TParent
-  >
-  otherPresentAtBirthRegistration?: BirthRegistrationToOtherPresentAtBirthRegistrationResolver<
-    TParent
-  >
-  childrenBornAliveToMother?: BirthRegistrationToChildrenBornAliveToMotherResolver<
-    TParent
-  >
-  foetalDeathsToMother?: BirthRegistrationToFoetalDeathsToMotherResolver<
-    TParent
-  >
-  lastPreviousLiveBirth?: BirthRegistrationToLastPreviousLiveBirthResolver<
-    TParent
-  >
+  otherAttendantAtBirth?: BirthRegistrationToOtherAttendantAtBirthResolver<TParent>
+  birthRegistrationType?: BirthRegistrationToBirthRegistrationTypeResolver<TParent>
+  presentAtBirthRegistration?: BirthRegistrationToPresentAtBirthRegistrationResolver<TParent>
+  otherPresentAtBirthRegistration?: BirthRegistrationToOtherPresentAtBirthRegistrationResolver<TParent>
+  childrenBornAliveToMother?: BirthRegistrationToChildrenBornAliveToMotherResolver<TParent>
+  foetalDeathsToMother?: BirthRegistrationToFoetalDeathsToMotherResolver<TParent>
+  lastPreviousLiveBirth?: BirthRegistrationToLastPreviousLiveBirthResolver<TParent>
   primaryCaregiver?: BirthRegistrationToPrimaryCaregiverResolver<TParent>
   createdAt?: BirthRegistrationToCreatedAtResolver<TParent>
   updatedAt?: BirthRegistrationToUpdatedAtResolver<TParent>
@@ -2362,12 +2381,8 @@ export interface GQLDeathRegistrationTypeResolver<TParent = any> {
   mannerOfDeath?: DeathRegistrationToMannerOfDeathResolver<TParent>
   causeOfDeathMethod?: DeathRegistrationToCauseOfDeathMethodResolver<TParent>
   causeOfDeath?: DeathRegistrationToCauseOfDeathResolver<TParent>
-  maleDependentsOfDeceased?: DeathRegistrationToMaleDependentsOfDeceasedResolver<
-    TParent
-  >
-  femaleDependentsOfDeceased?: DeathRegistrationToFemaleDependentsOfDeceasedResolver<
-    TParent
-  >
+  maleDependentsOfDeceased?: DeathRegistrationToMaleDependentsOfDeceasedResolver<TParent>
+  femaleDependentsOfDeceased?: DeathRegistrationToFemaleDependentsOfDeceasedResolver<TParent>
   medicalPractitioner?: DeathRegistrationToMedicalPractitionerResolver<TParent>
   createdAt?: DeathRegistrationToCreatedAtResolver<TParent>
   updatedAt?: DeathRegistrationToUpdatedAtResolver<TParent>
@@ -2720,6 +2735,8 @@ export interface GQLUserTypeResolver<TParent = any> {
   identifier?: UserToIdentifierResolver<TParent>
   signature?: UserToSignatureResolver<TParent>
   creationDate?: UserToCreationDateResolver<TParent>
+  avatar?: UserToAvatarResolver<TParent>
+  device?: UserToDeviceResolver<TParent>
 }
 
 export interface UserToIdResolver<TParent = any, TResult = any> {
@@ -2790,6 +2807,14 @@ export interface UserToSignatureResolver<TParent = any, TResult = any> {
 }
 
 export interface UserToCreationDateResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserToAvatarResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserToDeviceResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -2877,9 +2902,7 @@ export interface VerifyPasswordResultToIdResolver<
 export interface GQLRegistrationMetricsTypeResolver<TParent = any> {
   genderBasisMetrics?: RegistrationMetricsToGenderBasisMetricsResolver<TParent>
   timeFrames?: RegistrationMetricsToTimeFramesResolver<TParent>
-  estimatedTargetDayMetrics?: RegistrationMetricsToEstimatedTargetDayMetricsResolver<
-    TParent
-  >
+  estimatedTargetDayMetrics?: RegistrationMetricsToEstimatedTargetDayMetricsResolver<TParent>
   payments?: RegistrationMetricsToPaymentsResolver<TParent>
 }
 
@@ -2912,12 +2935,8 @@ export interface RegistrationMetricsToPaymentsResolver<
 }
 
 export interface GQLEventEstimationMetricsTypeResolver<TParent = any> {
-  birthTargetDayMetrics?: EventEstimationMetricsToBirthTargetDayMetricsResolver<
-    TParent
-  >
-  deathTargetDayMetrics?: EventEstimationMetricsToDeathTargetDayMetricsResolver<
-    TParent
-  >
+  birthTargetDayMetrics?: EventEstimationMetricsToBirthTargetDayMetricsResolver<TParent>
+  deathTargetDayMetrics?: EventEstimationMetricsToDeathTargetDayMetricsResolver<TParent>
 }
 
 export interface EventEstimationMetricsToBirthTargetDayMetricsResolver<
@@ -2935,15 +2954,9 @@ export interface EventEstimationMetricsToDeathTargetDayMetricsResolver<
 }
 
 export interface GQLApplicationsStartedMetricsTypeResolver<TParent = any> {
-  fieldAgentApplications?: ApplicationsStartedMetricsToFieldAgentApplicationsResolver<
-    TParent
-  >
-  hospitalApplications?: ApplicationsStartedMetricsToHospitalApplicationsResolver<
-    TParent
-  >
-  officeApplications?: ApplicationsStartedMetricsToOfficeApplicationsResolver<
-    TParent
-  >
+  fieldAgentApplications?: ApplicationsStartedMetricsToFieldAgentApplicationsResolver<TParent>
+  hospitalApplications?: ApplicationsStartedMetricsToHospitalApplicationsResolver<TParent>
+  officeApplications?: ApplicationsStartedMetricsToOfficeApplicationsResolver<TParent>
 }
 
 export interface ApplicationsStartedMetricsToFieldAgentApplicationsResolver<
@@ -3598,6 +3611,19 @@ export interface SignatureToTypeResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLAvatarTypeResolver<TParent = any> {
+  type?: AvatarToTypeResolver<TParent>
+  data?: AvatarToDataResolver<TParent>
+}
+
+export interface AvatarToTypeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface AvatarToDataResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLSearchFieldAgentResponseTypeResolver<TParent = any> {
   practitionerId?: SearchFieldAgentResponseToPractitionerIdResolver<TParent>
   fullName?: SearchFieldAgentResponseToFullNameResolver<TParent>
@@ -3605,18 +3631,10 @@ export interface GQLSearchFieldAgentResponseTypeResolver<TParent = any> {
   status?: SearchFieldAgentResponseToStatusResolver<TParent>
   primaryOfficeId?: SearchFieldAgentResponseToPrimaryOfficeIdResolver<TParent>
   creationDate?: SearchFieldAgentResponseToCreationDateResolver<TParent>
-  totalNumberOfApplicationStarted?: SearchFieldAgentResponseToTotalNumberOfApplicationStartedResolver<
-    TParent
-  >
-  totalNumberOfInProgressAppStarted?: SearchFieldAgentResponseToTotalNumberOfInProgressAppStartedResolver<
-    TParent
-  >
-  totalNumberOfRejectedApplications?: SearchFieldAgentResponseToTotalNumberOfRejectedApplicationsResolver<
-    TParent
-  >
-  averageTimeForDeclaredApplications?: SearchFieldAgentResponseToAverageTimeForDeclaredApplicationsResolver<
-    TParent
-  >
+  totalNumberOfApplicationStarted?: SearchFieldAgentResponseToTotalNumberOfApplicationStartedResolver<TParent>
+  totalNumberOfInProgressAppStarted?: SearchFieldAgentResponseToTotalNumberOfInProgressAppStartedResolver<TParent>
+  totalNumberOfRejectedApplications?: SearchFieldAgentResponseToTotalNumberOfRejectedApplicationsResolver<TParent>
+  averageTimeForDeclaredApplications?: SearchFieldAgentResponseToAverageTimeForDeclaredApplicationsResolver<TParent>
 }
 
 export interface SearchFieldAgentResponseToPractitionerIdResolver<
@@ -3769,9 +3787,7 @@ export interface CertificationPaymentMetricsToTotalResolver<
 
 export interface GQLEstimationMetricsTypeResolver<TParent = any> {
   actualRegistration?: EstimationMetricsToActualRegistrationResolver<TParent>
-  estimatedRegistration?: EstimationMetricsToEstimatedRegistrationResolver<
-    TParent
-  >
+  estimatedRegistration?: EstimationMetricsToEstimatedRegistrationResolver<TParent>
   estimatedPercentage?: EstimationMetricsToEstimatedPercentageResolver<TParent>
   malePercentage?: EstimationMetricsToMalePercentageResolver<TParent>
   femalePercentage?: EstimationMetricsToFemalePercentageResolver<TParent>
@@ -3813,18 +3829,10 @@ export interface EstimationMetricsToFemalePercentageResolver<
 }
 
 export interface GQLMonthWiseTargetDayEstimationTypeResolver<TParent = any> {
-  actualTotalRegistration?: MonthWiseTargetDayEstimationToActualTotalRegistrationResolver<
-    TParent
-  >
-  actualTargetDayRegistration?: MonthWiseTargetDayEstimationToActualTargetDayRegistrationResolver<
-    TParent
-  >
-  estimatedRegistration?: MonthWiseTargetDayEstimationToEstimatedRegistrationResolver<
-    TParent
-  >
-  estimatedTargetDayPercentage?: MonthWiseTargetDayEstimationToEstimatedTargetDayPercentageResolver<
-    TParent
-  >
+  actualTotalRegistration?: MonthWiseTargetDayEstimationToActualTotalRegistrationResolver<TParent>
+  actualTargetDayRegistration?: MonthWiseTargetDayEstimationToActualTargetDayRegistrationResolver<TParent>
+  estimatedRegistration?: MonthWiseTargetDayEstimationToEstimatedRegistrationResolver<TParent>
+  estimatedTargetDayPercentage?: MonthWiseTargetDayEstimationToEstimatedTargetDayPercentageResolver<TParent>
   month?: MonthWiseTargetDayEstimationToMonthResolver<TParent>
   year?: MonthWiseTargetDayEstimationToYearResolver<TParent>
   startOfMonth?: MonthWiseTargetDayEstimationToStartOfMonthResolver<TParent>
@@ -3888,18 +3896,10 @@ export interface MonthWiseTargetDayEstimationToEndOfMonthResolver<
 }
 
 export interface GQLEventInTargetDayEstimationCountTypeResolver<TParent = any> {
-  actualTotalRegistration?: EventInTargetDayEstimationCountToActualTotalRegistrationResolver<
-    TParent
-  >
-  actualTargetDayRegistration?: EventInTargetDayEstimationCountToActualTargetDayRegistrationResolver<
-    TParent
-  >
-  estimatedRegistration?: EventInTargetDayEstimationCountToEstimatedRegistrationResolver<
-    TParent
-  >
-  estimatedTargetDayPercentage?: EventInTargetDayEstimationCountToEstimatedTargetDayPercentageResolver<
-    TParent
-  >
+  actualTotalRegistration?: EventInTargetDayEstimationCountToActualTotalRegistrationResolver<TParent>
+  actualTargetDayRegistration?: EventInTargetDayEstimationCountToActualTargetDayRegistrationResolver<TParent>
+  estimatedRegistration?: EventInTargetDayEstimationCountToEstimatedRegistrationResolver<TParent>
+  estimatedTargetDayPercentage?: EventInTargetDayEstimationCountToEstimatedTargetDayPercentageResolver<TParent>
 }
 
 export interface EventInTargetDayEstimationCountToActualTotalRegistrationResolver<
@@ -3931,18 +3931,10 @@ export interface EventInTargetDayEstimationCountToEstimatedTargetDayPercentageRe
 }
 
 export interface GQLLocationWiseTargetDayEstimationTypeResolver<TParent = any> {
-  actualTotalRegistration?: LocationWiseTargetDayEstimationToActualTotalRegistrationResolver<
-    TParent
-  >
-  actualTargetDayRegistration?: LocationWiseTargetDayEstimationToActualTargetDayRegistrationResolver<
-    TParent
-  >
-  estimatedRegistration?: LocationWiseTargetDayEstimationToEstimatedRegistrationResolver<
-    TParent
-  >
-  estimatedTargetDayPercentage?: LocationWiseTargetDayEstimationToEstimatedTargetDayPercentageResolver<
-    TParent
-  >
+  actualTotalRegistration?: LocationWiseTargetDayEstimationToActualTotalRegistrationResolver<TParent>
+  actualTargetDayRegistration?: LocationWiseTargetDayEstimationToActualTargetDayRegistrationResolver<TParent>
+  estimatedRegistration?: LocationWiseTargetDayEstimationToEstimatedRegistrationResolver<TParent>
+  estimatedTargetDayPercentage?: LocationWiseTargetDayEstimationToEstimatedTargetDayPercentageResolver<TParent>
   locationId?: LocationWiseTargetDayEstimationToLocationIdResolver<TParent>
   locationName?: LocationWiseTargetDayEstimationToLocationNameResolver<TParent>
 }
@@ -4143,9 +4135,7 @@ export interface RegWorkflowToTimeLoggedResolver<TParent = any, TResult = any> {
 
 export interface GQLCertificateTypeResolver<TParent = any> {
   collector?: CertificateToCollectorResolver<TParent>
-  hasShowedVerifiedDocument?: CertificateToHasShowedVerifiedDocumentResolver<
-    TParent
-  >
+  hasShowedVerifiedDocument?: CertificateToHasShowedVerifiedDocumentResolver<TParent>
   payments?: CertificateToPaymentsResolver<TParent>
   data?: CertificateToDataResolver<TParent>
 }
@@ -4170,9 +4160,7 @@ export interface CertificateToDataResolver<TParent = any, TResult = any> {
 }
 
 export interface GQLReasonsNotApplyingTypeResolver<TParent = any> {
-  primaryCaregiverType?: ReasonsNotApplyingToPrimaryCaregiverTypeResolver<
-    TParent
-  >
+  primaryCaregiverType?: ReasonsNotApplyingToPrimaryCaregiverTypeResolver<TParent>
   reasonNotApplying?: ReasonsNotApplyingToReasonNotApplyingResolver<TParent>
   isDeceased?: ReasonsNotApplyingToIsDeceasedResolver<TParent>
 }
@@ -4388,19 +4376,11 @@ export interface TimeFrameTotalCountToTotalResolver<
 
 export interface GQLEstimatedTargetDayMetricsTypeResolver<TParent = any> {
   locationId?: EstimatedTargetDayMetricsToLocationIdResolver<TParent>
-  estimatedRegistration?: EstimatedTargetDayMetricsToEstimatedRegistrationResolver<
-    TParent
-  >
-  registrationInTargetDay?: EstimatedTargetDayMetricsToRegistrationInTargetDayResolver<
-    TParent
-  >
+  estimatedRegistration?: EstimatedTargetDayMetricsToEstimatedRegistrationResolver<TParent>
+  registrationInTargetDay?: EstimatedTargetDayMetricsToRegistrationInTargetDayResolver<TParent>
   estimationYear?: EstimatedTargetDayMetricsToEstimationYearResolver<TParent>
-  estimationLocationLevel?: EstimatedTargetDayMetricsToEstimationLocationLevelResolver<
-    TParent
-  >
-  estimationPercentage?: EstimatedTargetDayMetricsToEstimationPercentageResolver<
-    TParent
-  >
+  estimationLocationLevel?: EstimatedTargetDayMetricsToEstimationLocationLevelResolver<TParent>
+  estimationPercentage?: EstimatedTargetDayMetricsToEstimationPercentageResolver<TParent>
 }
 
 export interface EstimatedTargetDayMetricsToLocationIdResolver<
@@ -4446,15 +4426,9 @@ export interface EstimatedTargetDayMetricsToEstimationPercentageResolver<
 }
 
 export interface GQLEstimateTargetDayTotalCountTypeResolver<TParent = any> {
-  estimatedRegistration?: EstimateTargetDayTotalCountToEstimatedRegistrationResolver<
-    TParent
-  >
-  registrationInTargetDay?: EstimateTargetDayTotalCountToRegistrationInTargetDayResolver<
-    TParent
-  >
-  estimationPercentage?: EstimateTargetDayTotalCountToEstimationPercentageResolver<
-    TParent
-  >
+  estimatedRegistration?: EstimateTargetDayTotalCountToEstimatedRegistrationResolver<TParent>
+  registrationInTargetDay?: EstimateTargetDayTotalCountToRegistrationInTargetDayResolver<TParent>
+  estimationPercentage?: EstimateTargetDayTotalCountToEstimationPercentageResolver<TParent>
 }
 
 export interface EstimateTargetDayTotalCountToEstimatedRegistrationResolver<
@@ -4513,18 +4487,12 @@ export interface CertificationPaymentTotalCountToTotalResolver<
 export interface GQLRegistrationSearchSetTypeResolver<TParent = any> {
   status?: RegistrationSearchSetToStatusResolver<TParent>
   contactNumber?: RegistrationSearchSetToContactNumberResolver<TParent>
-  contactRelationship?: RegistrationSearchSetToContactRelationshipResolver<
-    TParent
-  >
+  contactRelationship?: RegistrationSearchSetToContactRelationshipResolver<TParent>
   dateOfApplication?: RegistrationSearchSetToDateOfApplicationResolver<TParent>
   trackingId?: RegistrationSearchSetToTrackingIdResolver<TParent>
-  registrationNumber?: RegistrationSearchSetToRegistrationNumberResolver<
-    TParent
-  >
+  registrationNumber?: RegistrationSearchSetToRegistrationNumberResolver<TParent>
   eventLocationId?: RegistrationSearchSetToEventLocationIdResolver<TParent>
-  registeredLocationId?: RegistrationSearchSetToRegisteredLocationIdResolver<
-    TParent
-  >
+  registeredLocationId?: RegistrationSearchSetToRegisteredLocationIdResolver<TParent>
   reason?: RegistrationSearchSetToReasonResolver<TParent>
   comment?: RegistrationSearchSetToCommentResolver<TParent>
   duplicates?: RegistrationSearchSetToDuplicatesResolver<TParent>
@@ -4628,18 +4596,10 @@ export interface GQLOperationHistorySearchSetTypeResolver<TParent = any> {
   operatedOn?: OperationHistorySearchSetToOperatedOnResolver<TParent>
   operatorRole?: OperationHistorySearchSetToOperatorRoleResolver<TParent>
   operatorName?: OperationHistorySearchSetToOperatorNameResolver<TParent>
-  operatorOfficeName?: OperationHistorySearchSetToOperatorOfficeNameResolver<
-    TParent
-  >
-  operatorOfficeAlias?: OperationHistorySearchSetToOperatorOfficeAliasResolver<
-    TParent
-  >
-  notificationFacilityName?: OperationHistorySearchSetToNotificationFacilityNameResolver<
-    TParent
-  >
-  notificationFacilityAlias?: OperationHistorySearchSetToNotificationFacilityAliasResolver<
-    TParent
-  >
+  operatorOfficeName?: OperationHistorySearchSetToOperatorOfficeNameResolver<TParent>
+  operatorOfficeAlias?: OperationHistorySearchSetToOperatorOfficeAliasResolver<TParent>
+  notificationFacilityName?: OperationHistorySearchSetToNotificationFacilityNameResolver<TParent>
+  notificationFacilityAlias?: OperationHistorySearchSetToNotificationFacilityAliasResolver<TParent>
   rejectReason?: OperationHistorySearchSetToRejectReasonResolver<TParent>
   rejectComment?: OperationHistorySearchSetToRejectCommentResolver<TParent>
 }
@@ -4812,18 +4772,10 @@ export interface DeathEventSearchSetToOperationHistoriesResolver<
 
 export interface GQLEventProgressDataTypeResolver<TParent = any> {
   timeInProgress?: EventProgressDataToTimeInProgressResolver<TParent>
-  timeInReadyForReview?: EventProgressDataToTimeInReadyForReviewResolver<
-    TParent
-  >
-  timeInRequiresUpdates?: EventProgressDataToTimeInRequiresUpdatesResolver<
-    TParent
-  >
-  timeInWaitingForApproval?: EventProgressDataToTimeInWaitingForApprovalResolver<
-    TParent
-  >
-  timeInWaitingForBRIS?: EventProgressDataToTimeInWaitingForBRISResolver<
-    TParent
-  >
+  timeInReadyForReview?: EventProgressDataToTimeInReadyForReviewResolver<TParent>
+  timeInRequiresUpdates?: EventProgressDataToTimeInRequiresUpdatesResolver<TParent>
+  timeInWaitingForApproval?: EventProgressDataToTimeInWaitingForApprovalResolver<TParent>
+  timeInWaitingForBRIS?: EventProgressDataToTimeInWaitingForBRISResolver<TParent>
   timeInReadyToPrint?: EventProgressDataToTimeInReadyToPrintResolver<TParent>
 }
 

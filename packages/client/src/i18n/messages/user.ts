@@ -68,6 +68,15 @@ interface IUserMessages
   currentPassword: MessageDescriptor
   changePassword: MessageDescriptor
   changePasswordMessage: MessageDescriptor
+  changePhoneTitle: MessageDescriptor
+  verifyPhoneTitle: MessageDescriptor
+  changePhoneLabel: MessageDescriptor
+  verifyPhoneLabel: MessageDescriptor
+  confirmationPhoneMsg: MessageDescriptor
+  phoneNumberChangeFormValidationMsg: MessageDescriptor
+  changeAvatar: MessageDescriptor
+  changeImage: MessageDescriptor
+  resizeAvatar: MessageDescriptor
   newPasswordLabel: MessageDescriptor
   passwordUpdateFormValidationMsg: MessageDescriptor
   passwordLengthCharacteristicsForPasswordUpdateForm: MessageDescriptor
@@ -79,7 +88,11 @@ interface IUserMessages
   confirmButtonLabel: MessageDescriptor
   requiredfield: MessageDescriptor
   incorrectPassword: MessageDescriptor
+  incorrectVerifyCode: MessageDescriptor
   passwordUpdated: MessageDescriptor
+  phoneNumberUpdated: MessageDescriptor
+  avatarUpdating: MessageDescriptor
+  avatarUpdated: MessageDescriptor
 }
 
 interface IDynamicUserMessages
@@ -142,6 +155,11 @@ const messagesToDefine: IUserMessages = {
     defaultMessage: 'District Registrar',
     description: 'The description for DISTRICT_REGISTRAR role',
     id: 'constants.districtRegistrar'
+  },
+  DNRPC: {
+    defaultMessage: 'DNRPC',
+    description: 'The description for DNRPC type',
+    id: 'constants.dnrpc'
   },
   ENTREPENEUR: {
     defaultMessage: 'Entrepeneur',
@@ -314,6 +332,52 @@ const messagesToDefine: IUserMessages = {
     description: 'Password change message',
     id: 'misc.newPass.instruction'
   },
+  changePhoneTitle: {
+    defaultMessage: 'Change phone number',
+    description: 'Change phone number title',
+    id: 'settings.changePhone'
+  },
+  verifyPhoneTitle: {
+    defaultMessage: 'Verify phone number',
+    description: 'Verify phone number title',
+    id: 'settings.verifyPhone'
+  },
+  changePhoneLabel: {
+    defaultMessage: 'What is your new number?',
+    description: 'Change phone number label',
+    id: 'phone.label.changeNumber'
+  },
+  verifyPhoneLabel: {
+    defaultMessage: 'Enter 6 digit verification code',
+    description: 'Verify phone number label',
+    id: 'phone.label.verify'
+  },
+  confirmationPhoneMsg: {
+    defaultMessage: 'A confirmational SMS has been sent to {num}',
+    description: 'Confirmation phone number message',
+    id: 'phone.label.confirmation'
+  },
+  phoneNumberChangeFormValidationMsg: {
+    id: 'changePhone.validation.msg',
+    defaultMessage:
+      'Must be a valid {num} digit number that starts with {start}',
+    description: 'Phone number validation message'
+  },
+  changeAvatar: {
+    id: 'settings.changeAvatar',
+    defaultMessage: 'Change profile image',
+    description: 'Avatar change modal header'
+  },
+  changeImage: {
+    id: 'settings.changeAvatar.changeImage',
+    defaultMessage: 'Change image',
+    description: 'Change image label'
+  },
+  resizeAvatar: {
+    id: 'settings.changeAvatar.resizeAvatar',
+    defaultMessage: 'Resize and position the chosen image.',
+    description: 'Avatar resize and position message'
+  },
   newPasswordLabel: {
     id: 'password.label.new',
     defaultMessage: 'New password:',
@@ -369,13 +433,33 @@ const messagesToDefine: IUserMessages = {
     defaultMessage: 'Current password incorrect. Please try again.',
     description: 'Response message for incorrect password for password change'
   },
+  incorrectVerifyCode: {
+    id: 'system.user.settings.incorrectVerifyCode',
+    defaultMessage: 'Verify code incorrect. Please try again.',
+    description:
+      'Response message for incorrect Verify code for phone number change'
+  },
   passwordUpdated: {
     id: 'system.user.settings.passwordUpdated',
     defaultMessage: 'Password was successfully changed',
     description: 'Password change message on success'
+  },
+  phoneNumberUpdated: {
+    id: 'system.user.settings.phonedNumberUpdated',
+    defaultMessage: 'Phone number updated',
+    description: 'Phone change message on success'
+  },
+  avatarUpdating: {
+    id: 'system.user.settings.avatarUpdating',
+    defaultMessage: 'Updating profile image',
+    description: 'Profile image message when uploading'
+  },
+  avatarUpdated: {
+    id: 'system.user.settings.avatarUpdated',
+    defaultMessage: 'Profile image successfully updated',
+    description: 'Profile image change message on success'
   }
 }
 
-export const userMessages:
-  | IUserMessages
-  | IDynamicUserMessages = defineMessages(messagesToDefine)
+export const userMessages: IUserMessages | IDynamicUserMessages =
+  defineMessages(messagesToDefine)

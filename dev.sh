@@ -8,16 +8,47 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 set -e
+DIR=$(cd "$(dirname "$0")"; pwd)
 
-print_usage_and_exit () {
-    echo 'Usage: ./dev.sh LANGUAGES'
-    echo "LANGUAGES must have a value of either 'bn,en' or 'en'"
-    exit 1
+# Retrieve 2-step verification to continue
+#-----------------------------------------
+function ask_yes_or_no() {
+    read -p "$1 ([y]es or [N]o): "
+    case $(echo $REPLY | tr '[A-Z]' '[a-z]') in
+        y|yes) echo "yes" ;;
+        *)     echo "no" ;;
+    esac
 }
-
-if [ -z "$1" ] || { [ $1 != 'bn,en' ] && [ $1 != 'en' ] ;} ; then
-    echo 'Error: Argument LANGUAGES is required in position 1.'
-    print_usage_and_exit
+if [[ "no" == $(ask_yes_or_no "This command starts the OpenCRVS Core development environment.  You must run the country config server separately.  If your country config is already running, type: yes to continue.  If you dont know, type: no to exit.") ]]
+then
+    echo -e "\n\nExiting OpenCRVS. \n\nIf you ran our setup command, the fictional Farajaland country configuration exists in the directory opencrvs-farajaland alongside this one, otherwise you may have cloned or forked it somewhere else.\n\n1. Create another terminal window.\n\n2. cd into your config directory and type: \n\n\033[32myarn dev $DIR\033[0m\n\nWhen your country config is running, return to this terminal window and try again: \n\n\033[32myarn dev\033[0m\n\n"
+    exit 0
 fi
-export LANGUAGES=$1
-yarn dev:secrets:gen && concurrently "yarn run start" "yarn run compose:deps"
+
+echo
+echo -e "\033[32m:::::::::: Stopping any currently running Docker containers ::::::::::\033[0m"
+echo
+if [[ $(docker ps -aq) ]] ; then docker stop $(docker ps -aq) ; fi
+
+if [  -n "$(uname -a | grep Ubuntu)" ]; then
+  OS="UBUNTU"
+  else
+  OS="MAC"
+fi
+echo
+echo -e "\033[32m:::::::::: STARTING OPENCRVS ::::::::::\033[0m"
+echo
+echo "If you did not previously run our setup command, Docker is downloading Mongo DB, ElasticSearch, OpenHIM and Hearth docker images.  These are large files.  Then docker will build them.  If you did run our setup command, OpenCRVS will start much faster. Wait for the OpenCRVS client app to build completely (output will stop and you will see the message: @opencrvs/client: Compiled with warnings.), then OpenCRVS Core will be available."
+echo
+echo -e "\033[32m:::::::::: PLEASE WAIT for @opencrvs/client ::::::::::\033[0m"
+echo
+sleep 10
+export LANGUAGES="en"
+if [ $OS == "UBUNTU" ]; then
+  yarn dev:secrets:gen && concurrently "yarn run start" "yarn run compose:deps"
+  else
+  export LOCAL_IP=$(ipconfig getifaddr en0)
+  yarn dev:secrets:gen && concurrently "yarn run start" "yarn run compose:deps"
+fi
+
+

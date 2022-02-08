@@ -69,7 +69,7 @@ function WithinTargetDaysTableComponent(props: ITableProps) {
   const content =
     (props.data &&
       props.data.details &&
-      props.data.details.map(item => ({
+      props.data.details.map((item) => ({
         location: item.locationName,
         startTime: item.startOfMonth,
         month: `${item.month} ${item.year}`,

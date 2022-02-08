@@ -59,7 +59,7 @@ interface IMatchParams {
 
 interface IStateProps {
   application: IPrintableApplication
-  offlineResources: IOfflineData
+  offlineCountryConfiguration: IOfflineData
 }
 interface IDispatchProps {
   goBack: typeof goBack
@@ -111,12 +111,12 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
   }
 
   getGenericCollectorInfo = (collector: string): ICollectorInfo => {
-    const { intl, application, offlineResources } = this.props
+    const { intl, application, offlineCountryConfiguration } = this.props
     const info = application.data[collector]
     const fields =
-      offlineResources.forms.certificateCollectorDefinition[application.event][
-        collector
-      ]
+      offlineCountryConfiguration.forms.certificateCollectorDefinition[
+        application.event
+      ][collector]
     const iD = info[fields.identifierField] as string
     const iDType = (info[fields.identifierTypeField] ||
       info[fields.identifierOtherTypeField]) as string
@@ -176,12 +176,12 @@ const mapStateToProps = (
   const { registrationId } = ownProps.match.params
 
   const application = state.applicationsState.applications.find(
-    draft => draft.id === registrationId
+    (draft) => draft.id === registrationId
   ) as IPrintableApplication
 
   return {
     application,
-    offlineResources: getOfflineData(state)
+    offlineCountryConfiguration: getOfflineData(state)
   }
 }
 

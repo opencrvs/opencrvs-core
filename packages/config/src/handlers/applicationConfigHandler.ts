@@ -20,9 +20,9 @@ export default async function applicationHandler(
   h: Hapi.ResponseToolkit
 ) {
   try {
+    let appConfig: IApplicationConfigurationModel | null
     // tslint:disable-next-line
-    const appConfig: IApplicationConfigurationModel | null =
-      await ApplicationConfig.findOne({})
+    appConfig = await ApplicationConfig.findOne({})
     return appConfig || 'no configuration'
   } catch (ex) {
     logger.error(ex)

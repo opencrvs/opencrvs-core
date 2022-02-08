@@ -26,9 +26,7 @@ describe('Field agent list tests', () => {
 
   beforeAll(async () => {
     Date.now = jest.fn(() => 1487076708000)
-    const { store: testStore, history: testHistory } = await createTestStore()
-    store = testStore
-    history = testHistory
+    ;({ store, history } = await createTestStore())
   })
 
   beforeEach(async () => {
@@ -92,10 +90,9 @@ describe('Field agent list tests', () => {
           })
         }}
       />,
-      store,
-      graphqlMock
+      { store, history, graphqlMocks: graphqlMock }
     )
-    component = testComponent.component
+    component = testComponent
   })
 
   it('renders without crashing', async () => {
@@ -107,21 +104,11 @@ describe('Field agent list tests', () => {
       component,
       '#totalApplications-label'
     )
-    expect(
-      firstRowElement
-        .hostNodes()
-        .childAt(0)
-        .text()
-    ).toBe('Sakib Al Hasan')
+    expect(firstRowElement.hostNodes().childAt(0).text()).toBe('Sakib Al Hasan')
 
     toggleSortActionElement.hostNodes().simulate('click')
 
-    expect(
-      firstRowElement
-        .hostNodes()
-        .childAt(0)
-        .text()
-    ).toBe('Naeem Hossain')
+    expect(firstRowElement.hostNodes().childAt(0).text()).toBe('Naeem Hossain')
   })
 
   it('changing location id from location picker updates the query params', async () => {
@@ -162,11 +149,8 @@ describe('Field agent list tests', () => {
           })
         }}
       />,
-      store
+      { store, history }
     )
-    await waitForElement(
-      testErrorComponent.component,
-      '#field-agent-error-list'
-    )
+    await waitForElement(testErrorComponent, '#field-agent-error-list')
   })
 })

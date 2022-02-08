@@ -27,7 +27,7 @@ import { IFooterFColumn } from '@opencrvs/components/lib/interface/GridTable/typ
 import { get } from 'lodash'
 
 interface IStateProps {
-  offlineResources: IOfflineData
+  offlineCountryConfiguration: IOfflineData
 }
 
 type FullProps = {
@@ -37,16 +37,14 @@ type FullProps = {
 } & IStateProps &
   WrappedComponentProps
 
-class EstimatedTargetDayRegistrationReportComponent extends React.Component<
-  FullProps
-> {
+class EstimatedTargetDayRegistrationReportComponent extends React.Component<FullProps> {
   getContent = () => {
     return (
       (this.props.data.details &&
-        this.props.data.details.map(registrationInTargetDay => {
+        this.props.data.details.map((registrationInTargetDay) => {
           const location = getLocationFromPartOfLocationId(
             registrationInTargetDay.locationId,
-            this.props.offlineResources
+            this.props.offlineCountryConfiguration
           ).name
           return !registrationInTargetDay.estimatedRegistration ||
             registrationInTargetDay.estimatedRegistration <= 0
@@ -54,7 +52,8 @@ class EstimatedTargetDayRegistrationReportComponent extends React.Component<
                 location,
                 estimation: 'No data',
                 estimationYear: String(registrationInTargetDay.estimationYear),
-                estimationLevel: registrationInTargetDay.estimationLocationLevel.toLowerCase(),
+                estimationLevel:
+                  registrationInTargetDay.estimationLocationLevel.toLowerCase(),
                 registrationInTargetDay: 'No data',
                 percentage: 'No data'
               }
@@ -64,7 +63,8 @@ class EstimatedTargetDayRegistrationReportComponent extends React.Component<
                   registrationInTargetDay.estimatedRegistration
                 ),
                 estimationYear: String(registrationInTargetDay.estimationYear),
-                estimationLevel: registrationInTargetDay.estimationLocationLevel.toLowerCase(),
+                estimationLevel:
+                  registrationInTargetDay.estimationLocationLevel.toLowerCase(),
                 registrationInTargetDay: String(
                   registrationInTargetDay.registrationInTargetDay
                 ),
@@ -108,8 +108,10 @@ class EstimatedTargetDayRegistrationReportComponent extends React.Component<
           {
             registrationTargetDays:
               this.props.eventType === Event.BIRTH
-                ? this.props.offlineResources.config.BIRTH_REGISTRATION_TARGET
-                : this.props.offlineResources.config.DEATH_REGISTRATION_TARGET
+                ? this.props.offlineCountryConfiguration.config
+                    .BIRTH_REGISTRATION_TARGET
+                : this.props.offlineCountryConfiguration.config
+                    .DEATH_REGISTRATION_TARGET
           }
         )}
         fixedWidth={1074}
@@ -137,9 +139,9 @@ class EstimatedTargetDayRegistrationReportComponent extends React.Component<
               {
                 registrationTargetDays:
                   this.props.eventType === Event.BIRTH
-                    ? this.props.offlineResources.config
+                    ? this.props.offlineCountryConfiguration.config
                         .BIRTH_REGISTRATION_TARGET
-                    : this.props.offlineResources.config
+                    : this.props.offlineCountryConfiguration.config
                         .DEATH_REGISTRATION_TARGET
               }
             ),
@@ -165,7 +167,7 @@ class EstimatedTargetDayRegistrationReportComponent extends React.Component<
 export const EstimatedTargetDayRegistrationReports = connect(
   (store: IStoreState) => {
     return {
-      offlineResources: getOfflineData(store)
+      offlineCountryConfiguration: getOfflineData(store)
     }
   },
   {}

@@ -34,7 +34,7 @@ import {
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
-import { TAB_ID } from '@client/views/RegistrationHome/tabs/inProgress/inProgressTab'
+import { TAB_ID } from '@client/views/OfficeHome/tabs/inProgress/inProgressTab'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
@@ -120,7 +120,7 @@ type IProps = {
   userDetails: IUserDetails | null
   countries: IAvailableCountries[]
   registerForm: IForm
-  resources: IOfflineData
+  offlineCountryConfig: IOfflineData
   goBack: typeof goBack
   modifyApplication: typeof modifyApplication
   writeApplication: typeof writeApplication
@@ -129,7 +129,7 @@ type IProps = {
 }
 
 type IFullProps = IntlShapeProps &
-  RouteComponentProps<{}> &
+  RouteComponentProps<{}, {}, { isNavigatedInsideApp: boolean }> &
   IProps & { drafts: IApplicationsState }
 
 class ReviewCertificateActionComponent extends React.Component<
@@ -149,7 +149,7 @@ class ReviewCertificateActionComponent extends React.Component<
         this.props.intl,
         this.props.draft,
         this.props.userDetails,
-        this.props.resources,
+        this.props.offlineCountryConfig,
         (base64PDF: string) => {
           this.setState({
             certificatePdf: base64PDF
@@ -206,7 +206,7 @@ class ReviewCertificateActionComponent extends React.Component<
       this.props.intl,
       draft,
       this.props.userDetails,
-      this.props.resources,
+      this.props.offlineCountryConfig,
       this.props.countries
     )
     this.props.modifyApplication(draft)
@@ -218,7 +218,6 @@ class ReviewCertificateActionComponent extends React.Component<
   getTitle = () => {
     const { intl, event } = this.props
     let eventName = intl.formatMessage(constantsMessages.birth).toLowerCase()
-    console.log('')
     switch (event) {
       case Event.BIRTH:
         return intl.formatMessage(certificateMessages.reviewTitle, {
@@ -237,11 +236,12 @@ class ReviewCertificateActionComponent extends React.Component<
   }
 
   goBack = () => {
-    const historyState = this.props.location.state as any
-    const naviagatedFromInsideApp = Boolean(
+    const historyState = this.props.location.state
+    const navigatedFromInsideApp = Boolean(
       historyState && historyState.isNavigatedInsideApp
     )
-    if (naviagatedFromInsideApp) {
+
+    if (navigatedFromInsideApp) {
       this.props.goBack()
     } else {
       this.props.goToRegistrarHomeTabAction(TAB_ID.readyForPrint)
@@ -318,7 +318,7 @@ const getDraft = (
   registrationId: string,
   eventType: string
 ) =>
-  drafts.find(draftItem => draftItem.id === registrationId) ||
+  drafts.find((draftItem) => draftItem.id === registrationId) ||
   ({
     id: '',
     data: {},
@@ -343,7 +343,7 @@ function mapStatetoProps(
     countries: getCountryTranslations(state.i18n.languages, countries),
     drafts: state.applicationsState,
     userDetails: getUserDetails(state),
-    resources: getOfflineData(state),
+    offlineCountryConfig: getOfflineData(state),
     registerForm: getEventRegisterForm(state, event)
   }
 }

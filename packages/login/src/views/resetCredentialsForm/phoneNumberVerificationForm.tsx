@@ -160,7 +160,7 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
                   name="phoneNumberInput"
                   isSmallSized={true}
                   value={this.state.phone}
-                  onChange={e => this.handleChange(e.target.value)}
+                  onChange={(e) => this.handleChange(e.target.value)}
                   touched={this.state.touched}
                   error={responseError}
                 />

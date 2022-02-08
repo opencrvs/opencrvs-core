@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { ITextInputProps, TextInput } from './TextInput'
+import { ITextInputProps, IRef, TextInput } from './TextInput'
 import { InputLabel } from './InputField/InputLabel'
 import { Omit } from '../omit'
 
@@ -53,9 +53,9 @@ const DateSegment = styled(TextInput)`
 `
 
 export class DateField extends React.Component<IDateFieldProps, IState> {
-  private dd: React.RefObject<TextInput>
-  private mm: React.RefObject<TextInput>
-  private yyyy: React.RefObject<TextInput>
+  private dd: React.RefObject<IRef>
+  private mm: React.RefObject<IRef>
+  private yyyy: React.RefObject<IRef>
 
   constructor(props: IDateFieldProps) {
     super(props)
@@ -145,14 +145,8 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
   }
 
   render() {
-    const {
-      id,
-      meta,
-      focusInput,
-      notice,
-      ignorePlaceHolder,
-      ...props
-    } = this.props
+    const { id, meta, focusInput, notice, ignorePlaceHolder, ...props } =
+      this.props
 
     return (
       <>

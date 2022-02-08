@@ -101,7 +101,7 @@ export const FETCH_STATUS_WISE_REGISTRATION_COUNT = gql`
 
 export const FETCH_EVENTS_WITH_PROGRESS = gql`
   query data(
-    $parentLocationId: String!
+    $locationId: String!
     $count: Int
     $skip: Int
     $status: [String]
@@ -110,7 +110,7 @@ export const FETCH_EVENTS_WITH_PROGRESS = gql`
     getEventsWithProgress(
       count: $count
       skip: $skip
-      parentLocationId: $parentLocationId
+      locationId: $locationId
       status: $status
       type: $type
     ) {
@@ -158,7 +158,8 @@ export const FETCH_EVENTS_WITH_PROGRESS = gql`
 `
 export const FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA = gql`
   query data(
-    $locationId: String!
+    $locationId: String
+    $primaryOfficeId: String
     $timeStart: String!
     $timeEnd: String!
     $event: String
@@ -172,6 +173,7 @@ export const FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA = gql`
       timeStart: $timeStart
       timeEnd: $timeEnd
       locationId: $locationId
+      primaryOfficeId: $primaryOfficeId
       event: $event
       status: $status
       language: $language

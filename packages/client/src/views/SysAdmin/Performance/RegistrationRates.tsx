@@ -119,9 +119,9 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
     },
     goToOperationalReport
   } = props
-  const { locationId, timeStart, timeEnd, title } = (parse(
+  const { locationId, timeStart, timeEnd, title } = parse(
     search
-  ) as unknown) as ISearchParams
+  ) as unknown as ISearchParams
 
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
@@ -142,7 +142,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
       toolbarComponent={
         <Query query={HAS_CHILD_LOCATION} variables={{ parentId: locationId }}>
           {({ data, loading, error }) => {
-            let options: IPerformanceSelectOption[] = [
+            const options: IPerformanceSelectOption[] = [
               {
                 label: intl.formatMessage(messages.overTime),
                 value: REG_RATE_BASE.TIME
@@ -172,7 +172,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
                   id="base-select"
                   value={base.baseType}
                   options={options}
-                  onChange={option =>
+                  onChange={(option) =>
                     setBase({
                       baseType: option.value as REG_RATE_BASE,
                       locationJurisdictionType: option.type
@@ -181,7 +181,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
                 />
                 <LocationPicker
                   selectedLocationId={locationId}
-                  onChangeLocation={newLocationId => {
+                  onChangeLocation={(newLocationId) => {
                     props.goToRegistrationRates(
                       eventType as Event,
                       title,

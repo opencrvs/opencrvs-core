@@ -65,7 +65,7 @@ export enum EVENT_TYPE {
 
 const EXPECTED_BIRTH_REGISTRATION_IN_DAYS = getRegistrationTargetDays(
   'BIRTH'
-).then(data => data)
+).then((data) => data)
 
 export type Location = fhir.Location & { id: string }
 
@@ -138,9 +138,6 @@ export const fetchEstimateByLocation = async (
   let crudRate: number = 0
   let totalPopulation: number = 0
 
-  if (!locationData.extension) {
-    throw new Error('Invalid location data found')
-  }
   const estimationForDays = Math.ceil(
     Math.abs(new Date(timeTo).getTime() - new Date(timeFrom).getTime()) /
       (1000 * 60 * 60 * 24)
@@ -151,7 +148,19 @@ export const fetchEstimateByLocation = async (
   let selectedPopYear = new Date(timeTo).getFullYear()
   let malePopulationArray: [] = []
   let femalePopulationArray: [] = []
-  locationData.extension.forEach(extension => {
+
+  if (!locationData.extension) {
+    return {
+      totalEstimation: 0,
+      maleEstimation: 0,
+      femaleEstimation: 0,
+      locationId: locationData.id,
+      estimationYear: toYear,
+      locationLevel: getLocationLevelFromLocationData(locationData)
+    }
+  }
+
+  locationData.extension.forEach((extension) => {
     if (
       extension.url === OPENCRVS_SPECIFICATION_URL + CRUD_BIRTH_RATE_SEC &&
       event === EVENT_TYPE.BIRTH
@@ -162,7 +171,7 @@ export const fetchEstimateByLocation = async (
       // have any estimation data for recent years
       // tslint:disable-next-line
       for (let key = toYear; key > 1; key--) {
-        valueArray.forEach(data => {
+        valueArray.forEach((data) => {
           if (key in data) {
             crudRate = data[key]
             selectedCrudYear = key
@@ -180,7 +189,7 @@ export const fetchEstimateByLocation = async (
       const valueArray: [] = JSON.parse(extension.valueString as string)
       // tslint:disable-next-line
       for (let key = toYear; key > 1; key--) {
-        valueArray.forEach(data => {
+        valueArray.forEach((data) => {
           if (key in data) {
             totalPopulation = data[key]
             selectedPopYear = key
@@ -220,16 +229,16 @@ export const fetchEstimateByLocation = async (
     crudRate = crudeDeathRateResponse.crudeDeathRate
   }
   let populationData =
-    malePopulationArray?.find(data => data[selectedPopYear] !== undefined)?.[
+    malePopulationArray?.find((data) => data[selectedPopYear] !== undefined)?.[
       selectedPopYear
     ] ?? ''
   const malePopulation: number =
     populationData === '' ? totalPopulation / 2 : Number(populationData)
 
   populationData =
-    femalePopulationArray?.find(data => data[selectedPopYear] !== undefined)?.[
-      selectedPopYear
-    ] ?? ''
+    femalePopulationArray?.find(
+      (data) => data[selectedPopYear] !== undefined
+    )?.[selectedPopYear] ?? ''
   const femalePopulation: number =
     populationData === '' ? totalPopulation / 2 : Number(populationData)
 
@@ -252,7 +261,7 @@ export const fetchEstimateByLocation = async (
 export const getLocationLevelFromLocationData = (locationData: Location) => {
   return (
     locationData?.identifier?.find(
-      identifier =>
+      (identifier) =>
         identifier.system ===
         OPENCRVS_SPECIFICATION_URL + JURISDICTION_TYPE_IDENTIFIER
     )?.value ?? ''
@@ -312,7 +321,7 @@ function getLocationType(locationBundle: fhir.Location) {
     locationBundle &&
     locationBundle.identifier &&
     locationBundle.identifier.find(
-      identifier =>
+      (identifier) =>
         identifier.system === OPENCRVS_SPECIFICATION_URL + JURISDICTION_TYPE_SEC
     )
   )
@@ -326,7 +335,7 @@ export function fillEmptyDataArrayByKey(
   const result: Array<any> = []
   for (const eachItem of emptyDataArray) {
     const itemInArray = dataArray.find(
-      itemInDataArray => itemInDataArray[key] === eachItem[key]
+      (itemInDataArray) => itemInDataArray[key] === eachItem[key]
     )
 
     result.push(itemInArray || eachItem)

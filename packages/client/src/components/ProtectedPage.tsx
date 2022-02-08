@@ -113,8 +113,8 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
   async handleVisibilityChange(isVisible: boolean) {
     const alreadyLocked = isVisible || (await storage.getItem(SCREEN_LOCK))
 
-    const onUnprotectedPage = this.props.unprotectedRouteElements.some(route =>
-      this.props.location.pathname.includes(route)
+    const onUnprotectedPage = this.props.unprotectedRouteElements.some(
+      (route) => this.props.location.pathname.includes(route)
     )
 
     const newState = { ...this.state }
@@ -131,7 +131,7 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     }
 
     // App was in the background and now we need to make sure
-    // both global configuration and resources data is up-to-date
+    // both global configuration and offlineCountryConfig data is up-to-date
     if (isVisible) {
       this.props.onNumPadVisible()
     }
@@ -159,7 +159,7 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
       return ''
     }
     const currentUserData = allUserData.find(
-      user => user.userID === currentUserID
+      (user) => user.userID === currentUserID
     )
     return (currentUserData && currentUserData.userPIN) || ''
   }

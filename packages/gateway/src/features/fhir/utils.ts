@@ -93,7 +93,7 @@ export function findCompositionSection(
       if (!section.code || !section.code.coding || !section.code.coding.some) {
         return false
       }
-      return section.code.coding.some(coding => coding.code === code)
+      return section.code.coding.some((coding) => coding.code === code)
     })
   )
 }
@@ -120,7 +120,7 @@ export function selectOrCreatePersonResource(
     }
     const personSectionEntry = section.entry[0]
     personEntry = fhirBundle.entry.find(
-      entry => entry.fullUrl === personSectionEntry.reference
+      (entry) => entry.fullUrl === personSectionEntry.reference
     )
   }
 
@@ -160,7 +160,7 @@ export function selectOrCreateEncounterResource(
     }
     const encounterSectionEntry = section.entry[0]
     encounterEntry = fhirBundle.entry.find(
-      entry => entry.fullUrl === encounterSectionEntry.reference
+      (entry) => entry.fullUrl === encounterSectionEntry.reference
     )
   }
 
@@ -182,7 +182,7 @@ export function selectOrCreateObservationResource(
   fhirBundle: ITemplatedBundle,
   context: any
 ): fhir.Observation {
-  let observation = fhirBundle.entry.find(entry => {
+  let observation = fhirBundle.entry.find((entry) => {
     if (
       !entry ||
       !entry.resource ||
@@ -195,7 +195,7 @@ export function selectOrCreateObservationResource(
       observationEntry.code &&
       observationEntry.code.coding &&
       observationEntry.code.coding.find(
-        obCode => obCode.code === observationCode
+        (obCode) => obCode.code === observationCode
       )
     if (obCoding) {
       return true
@@ -255,7 +255,7 @@ export function selectObservationResource(
   fhirBundle: ITemplatedBundle
 ): fhir.Observation | undefined {
   let observation
-  fhirBundle.entry.forEach(entry => {
+  fhirBundle.entry.forEach((entry) => {
     if (
       !entry ||
       !entry.resource ||
@@ -266,7 +266,7 @@ export function selectObservationResource(
         observationEntry.code &&
         observationEntry.code.coding &&
         observationEntry.code.coding.find(
-          obCode => obCode.code === observationCode
+          (obCode) => obCode.code === observationCode
         )
       if (obCoding) {
         observation = observationEntry
@@ -292,7 +292,7 @@ export async function removeObservationResource(
         observationEntry.code &&
         observationEntry.code.coding &&
         observationEntry.code.coding.find(
-          obCode => obCode.code === observationCode
+          (obCode) => obCode.code === observationCode
         )
       if (obCoding) {
         fhirBundle.entry.splice(index, 1)
@@ -336,7 +336,7 @@ export function createObservationResource(
   }
   const encounterSectionEntry = section.entry[0]
   const encounterEntry = fhirBundle.entry.find(
-    entry => entry.fullUrl === encounterSectionEntry.reference
+    (entry) => entry.fullUrl === encounterSectionEntry.reference
   )
   if (encounterEntry && encounter) {
     observationEntry.resource.context = {
@@ -372,7 +372,7 @@ export function selectOrCreateLocationRefResource(
     }
     const locationElement = encounter.location[0]
     locationEntry = fhirBundle.entry.find(
-      entry => entry.fullUrl === locationElement.location.reference
+      (entry) => entry.fullUrl === locationElement.location.reference
     )
   }
 
@@ -417,7 +417,7 @@ export function selectOrCreateEncounterPartitioner(
     fhirBundle.entry.push(practitioner)
   } else {
     practitioner = fhirBundle.entry.find(
-      entry => entry.fullUrl === encounterParticipant.individual?.reference
+      (entry) => entry.fullUrl === encounterParticipant.individual?.reference
     )
     if (!practitioner) {
       throw new Error(
@@ -484,7 +484,7 @@ export function selectOrCreateDocRefResource(
       fhirBundle.entry.push(docRef)
     } else {
       docRef = fhirBundle.entry.find(
-        entry => entry.fullUrl === docSectionEntry.reference
+        (entry) => entry.fullUrl === docSectionEntry.reference
       )
       if (!docRef) {
         const ref = uuid()
@@ -547,7 +547,7 @@ export function selectOrCreateInformantSection(
     }
     const personSectionEntry = section.entry[0]
     informantEntry = fhirBundle.entry.find(
-      entry => entry.fullUrl === personSectionEntry.reference
+      (entry) => entry.fullUrl === personSectionEntry.reference
     )
   }
 
@@ -579,7 +579,7 @@ export function selectOrCreateInformantResource(
     return personEntry.resource as fhir.Patient
   } else {
     const personEntry = fhirBundle.entry.find(
-      entry => entry.fullUrl === patientRef
+      (entry) => entry.fullUrl === patientRef
     )
     if (!personEntry) {
       throw new Error(
@@ -604,7 +604,7 @@ export function selectOrCreateRelatedPersonResource(
     docRef.extension = []
   }
   const relatedPersonExt = docRef.extension.find(
-    extention =>
+    (extention) =>
       extention.url === `${OPENCRVS_SPECIFICATION_URL}extension/collector`
   )
   if (!relatedPersonExt) {
@@ -618,7 +618,7 @@ export function selectOrCreateRelatedPersonResource(
     })
     return relatedPersonEntry.resource
   } else {
-    const relatedPersonEntry = fhirBundle.entry.find(entry => {
+    const relatedPersonEntry = fhirBundle.entry.find((entry) => {
       if (!relatedPersonExt.valueReference) {
         return false
       }
@@ -652,7 +652,7 @@ export function selectOrCreateCollectorPersonResource(
     return personEntry.resource as fhir.Patient
   } else {
     const personEntry = fhirBundle.entry.find(
-      entry => entry.fullUrl === patientRef
+      (entry) => entry.fullUrl === patientRef
     )
     if (!personEntry) {
       throw new Error(
@@ -673,7 +673,7 @@ export async function setCertificateCollectorReference(
   if (section && section.entry) {
     const personSectionEntry = section.entry[0]
     const personEntry = fhirBundle.entry.find(
-      entry => entry.fullUrl === personSectionEntry.reference
+      (entry) => entry.fullUrl === personSectionEntry.reference
     )
     if (!personEntry) {
       throw new Error('Expected person entry not found on the bundle')
@@ -705,7 +705,7 @@ export async function setPrimaryCaregiverReference(
   if (section && section.entry) {
     const personSectionEntry = section.entry[0]
     const personEntry = fhirBundle.entry.find(
-      entry => entry.fullUrl === personSectionEntry.reference
+      (entry) => entry.fullUrl === personSectionEntry.reference
     )
     if (!personEntry) {
       throw new Error('Expected person entry not found on the bundle')
@@ -730,7 +730,7 @@ export function selectOrCreatePaymentReconciliationResource(
     docRef.extension = []
   }
   const paymentExt = docRef.extension.find(
-    extention =>
+    (extention) =>
       extention.url === `${OPENCRVS_SPECIFICATION_URL}extension/payment`
   )
   if (!paymentExt) {
@@ -744,7 +744,7 @@ export function selectOrCreatePaymentReconciliationResource(
     })
     return paymentEntry.resource
   } else {
-    const paymentEntry = fhirBundle.entry.find(entry => {
+    const paymentEntry = fhirBundle.entry.find((entry) => {
       if (!paymentExt.valueReference) {
         return false
       }
@@ -763,7 +763,7 @@ export function selectOrCreateTaskRefResource(
 ): fhir.Task {
   let taskEntry =
     fhirBundle.entry &&
-    fhirBundle.entry.find(entry => {
+    fhirBundle.entry.find((entry) => {
       if (entry.resource && entry.resource.resourceType === 'Task') {
         return true
       }
@@ -880,10 +880,10 @@ export const fetchFHIR = (
     },
     body
   })
-    .then(response => {
+    .then((response) => {
       return response.json()
     })
-    .catch(error => {
+    .catch((error) => {
       return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
     })
 }
@@ -900,10 +900,10 @@ export const postSearch = (
     },
     body: JSON.stringify(criteria)
   })
-    .then(response => {
+    .then((response) => {
       return response.json()
     })
-    .catch(error => {
+    .catch((error) => {
       return Promise.reject(
         new Error(`Search request failed: ${error.message}`)
       )
@@ -925,10 +925,10 @@ export const getMetrics = (
       }
     }
   )
-    .then(response => {
+    .then((response) => {
       return response.json()
     })
-    .catch(error => {
+    .catch((error) => {
       return Promise.reject(
         new Error(`Metrics request failed: ${error.message}`)
       )
@@ -944,13 +944,14 @@ export const postMetrics = (
     method: 'POST',
     body: JSON.stringify(payload),
     headers: {
+      'Content-Type': 'application/json',
       ...authHeader
     }
   })
-    .then(response => {
+    .then((response) => {
       return response.json()
     })
-    .catch(error => {
+    .catch((error) => {
       return Promise.reject(
         new Error(`Metrics request failed: ${error.message}`)
       )
@@ -969,10 +970,10 @@ export const getTimeLoggedFromMetrics = async (
       ...authHeader
     }
   })
-    .then(response => {
+    .then((response) => {
       return response.json()
     })
-    .catch(error => {
+    .catch((error) => {
       return Promise.reject(
         new Error(`Time logged from metrics request failed: ${error.message}`)
       )
@@ -990,10 +991,10 @@ export const getEventDurationsFromMetrics = async (
       ...authHeader
     }
   })
-    .then(response => {
+    .then((response) => {
       return response.json()
     })
-    .catch(error => {
+    .catch((error) => {
       return Promise.reject(
         new Error(
           `Event Durations from metrics request failed: ${error.message}`
@@ -1120,7 +1121,7 @@ export async function setInformantReference(
   if (section && section.entry) {
     const personSectionEntry = section.entry[0]
     const personEntry = fhirBundle.entry.find(
-      entry => entry.fullUrl === personSectionEntry.reference
+      (entry) => entry.fullUrl === personSectionEntry.reference
     )
     if (!personEntry) {
       logger.error('Expected person entry not found on the bundle')
