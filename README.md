@@ -16,8 +16,8 @@
 - [Install dependencies](#install-dependencies)
 - [Install OpenCRVS](#install-opencrvs)
 - [Log into OpenCRVS](#log-into-opencrvs)
-  - [**Field Agent**](#field-agent)
-  - [**Registration Agent**](#registration-agent)
+  - [Field Agent](#field-agent)
+  - [Registration Agent](#registration-agent)
   - [Registrar](#registrar)
   - [Local System Admin](#local-system-admin)
   - [National System Admin](#national-system-admin)
@@ -26,7 +26,7 @@
   - [Stopping](#stopping)
 - [Other servers](#other-servers)
   - [React Storybook](#react-storybook)
-  - [**OpenHIM**](#openhim)
+  - [OpenHIM](#openhim)
 - [Configuring OpenCRVS](#configuring-opencrvs)
 - [What are the key OpenSource dependencies of OpenCRVS?](#what-are-the-key-opensource-dependencies-of-opencrvs)
   - [Hearth MongoDB Database layer](#hearth-mongodb-database-layer)
@@ -256,7 +256,7 @@ Each microservice in OpenCRVS has no knowledge of other services or business req
 
 Microservices:
 
-1. [auth](https://github.com/opencrvs/opencrvs-core/tree/master/packages/auth) - the authentication microservice for OpenCRVS, [JWT](https://jwt.io/) token generation and management in [Redis](https://www.redislabs.com/).
+- [auth](https://github.com/opencrvs/opencrvs-core/tree/master/packages/auth) - the authentication microservice for OpenCRVS, [JWT](https://jwt.io/) token generation and management in [Redis](https://www.redislabs.com/).
 
 ⋅⋅⋅Our client applications are protected by SMS [2-Factor Authentication](https://en.wikipedia.org/wiki/Multi-factor_authentication). Our apps and microservices utilise [OAuth best practices](https://tools.ietf.org/id/draft-ietf-oauth-jwt-bcp-02.html) for JWT tokens.
 
@@ -264,9 +264,11 @@ Microservices:
 <img src="https://static.wixstatic.com/media/93440e_297d9c18fc9e48e78b39e885bbfdaa13~mv2_d_1200_1204_s_2.png/v1/fill/w_70,h_70,al_c,q_80,usm_0.66_1.00_0.01/OAuth_svg.webp" width="70" height="70">
 </p>
 
-2. [commons](https://github.com/opencrvs/opencrvs-core/tree/master/packages/commons) - a shared library package that all microservoce pa
+- [commons](https://github.com/opencrvs/opencrvs-core/tree/master/packages/commons) - a shared library package that all microservices use in order to validate JWTs
 
-3. [gateway](https://github.com/opencrvs/opencrvs-core/tree/master/packages/gateway) - the [GraphQL](https://graphql.org/) and [Apollo](https://www.apollographql.com/) API gateway for the OpenCRVS client.
+- [config](https://github.com/opencrvs/opencrvs-core/tree/master/packages/config) - an application configuration microservice to serve country configuration settings in the upcoming Beta release scheduled for June 2022
+
+- [gateway](https://github.com/opencrvs/opencrvs-core/tree/master/packages/gateway) - the [GraphQL](https://graphql.org/) and [Apollo](https://www.apollographql.com/) API gateway for the OpenCRVS client.
 
 <br>
 <p align="left">

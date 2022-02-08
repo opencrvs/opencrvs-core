@@ -256,7 +256,7 @@ if [[ $(docker ps -aq) ]] ; then docker stop $(docker ps -aq) ; fi
 
 
 echo
-openCRVSPorts=( 3447 9200 5001 5000 9200 27017 6379 8086 3040 5050 2020 7070 9090 1050 3030 3000 3020 2525)
+openCRVSPorts=( 3447 9200 5001 5000 9200 27017 6379 8086 3040 5050 2020 7070 9090 1050 3030 3000 3020 2525 2021)
 for x in "${openCRVSPorts[@]}"
 do
    :

@@ -41,6 +41,9 @@ import { modifyUserDetails as modifyUserDetailsAction } from '@client/profile/pr
 import { getDefaultLanguage, getAvailableLanguages } from '@client/i18n/utils'
 import { IntlState } from '@client/i18n/reducer'
 import { PasswordChangeModal } from '@client/views/Settings/PasswordChangeModal'
+import { goToPhoneSettings } from '@client/navigation'
+import { RouteComponentProps, StaticContext } from 'react-router'
+import { SETTINGS } from '@client/navigation/routes'
 import { Navigation } from '@client/components/interface/Navigation'
 import { AvatarChangeModal } from './AvatarChangeModal'
 import { ImageLoader } from './ImageLoader'
@@ -145,18 +148,26 @@ const CancelButton = styled(TertiaryButton)`
     padding: 0;
   }
 `
-
-type IProps = IntlShapeProps & {
-  language: string
-  languages: IntlState['languages']
-  userDetails: IUserDetails | null
-  modifyUserDetails: typeof modifyUserDetailsAction
-}
+type IProps = IntlShapeProps &
+  RouteComponentProps<
+    {},
+    StaticContext,
+    {
+      phonedNumberUpdated: boolean
+    }
+  > & {
+    language: string
+    languages: IntlState['languages']
+    userDetails: IUserDetails | null
+    modifyUserDetails: typeof modifyUserDetailsAction
+    goToPhoneSettingAction: typeof goToPhoneSettings
+  }
 
 enum NOTIFICATION_SUBJECT {
   LANGUAGE,
+  PASSWORD,
   AVATAR,
-  PASSWORD
+  PHONE
 }
 
 interface IState {
@@ -193,6 +204,21 @@ class SettingsView extends React.Component<IProps, IState> {
       imageUploading: false,
       showAvatarNotification: false,
       notificationSubject: null
+    }
+  }
+
+  componentDidMount() {
+    if (this.props.history && this.props.history.location.state) {
+      let phonedNumberUpdated = false
+      const historyState = this.props.history.location.state
+      phonedNumberUpdated = historyState.phonedNumberUpdated
+      if (phonedNumberUpdated) {
+        this.changePhoneNumber()
+        this.props.history.replace({
+          pathname: SETTINGS,
+          state: { phonedNumberUpdated: false }
+        })
+      }
     }
   }
 
@@ -248,6 +274,9 @@ class SettingsView extends React.Component<IProps, IState> {
     this.togglePasswordChangeModal()
     this.toggleSuccessNotification(NOTIFICATION_SUBJECT.PASSWORD)
   }
+  changePhoneNumber = () => {
+    this.toggleSuccessNotification(NOTIFICATION_SUBJECT.PHONE)
+  }
 
   handleConfirmAvatarChange = () => {
     this.setState({ imageUploading: true })
@@ -270,7 +299,8 @@ class SettingsView extends React.Component<IProps, IState> {
   }
 
   render() {
-    const { userDetails, intl, languages } = this.props
+    const { userDetails, intl, languages, goToPhoneSettingAction } = this.props
+
     const langChoice = [] as ILanguageOptions[]
     const availableLangs = getAvailableLanguages()
     availableLangs.forEach((lang: string) => {
@@ -319,7 +349,8 @@ class SettingsView extends React.Component<IProps, IState> {
             value: mobile,
             action: {
               label: intl.formatMessage(buttonMessages.change),
-              disabled: true
+              disabled: false,
+              handler: goToPhoneSettingAction
             }
           }
         ]
@@ -488,9 +519,13 @@ class SettingsView extends React.Component<IProps, IState> {
             />
           )}
 
-          {/* Success notification message for Password Change */}
           {this.state.notificationSubject === NOTIFICATION_SUBJECT.PASSWORD && (
             <FormattedMessage {...messages.passwordUpdated} />
+          )}
+
+          {/* Success notification message for Password Change */}
+          {this.state.notificationSubject === NOTIFICATION_SUBJECT.PHONE && (
+            <FormattedMessage {...messages.phoneNumberUpdated} />
           )}
         </Notification>
         <FloatingNotification
@@ -524,6 +559,7 @@ export const SettingsPage = connect(
     userDetails: getUserDetails(store)
   }),
   {
-    modifyUserDetails: modifyUserDetailsAction
+    modifyUserDetails: modifyUserDetailsAction,
+    goToPhoneSettingAction: goToPhoneSettings
   }
 )(injectIntl(SettingsView))

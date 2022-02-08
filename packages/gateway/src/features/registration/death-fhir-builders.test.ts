@@ -112,10 +112,11 @@ test('should build a minimal FHIR registration document without error', async ()
             comments: [
               {
                 comment: 'This is just a test data',
-                createdAt: '2018-10-31T09:45:05+10:00'
+                createdAt: '2018-10-31T09:40:05+10:00'
               }
             ],
-            timestamp: '2018-10-31T09:45:05+10:00'
+            timestamp: '2018-10-31T09:40:05+10:00',
+            timeLoggedMS: 1234
           }
         ],
         attachments: [
@@ -188,7 +189,7 @@ test('should build a minimal FHIR registration document without error', async ()
       causeOfDeath: 'age',
       maleDependentsOfDeceased: 1,
       femaleDependentsOfDeceased: 1,
-      createdAt: new Date(),
+      createdAt: '2018-10-31T09:45:05+10:00',
       _fhirIDMap: {
         composition: '8f18a6ea-89d1-4b03-80b3-57509a7eebcedsd',
         encounter: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dsakelske'
