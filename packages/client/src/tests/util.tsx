@@ -2846,6 +2846,44 @@ export const mockOfflineData = {
   ),
   assets: {
     logo: `data:image;base64,${validImageB64String}`
+  },
+  config: {
+    COUNTRY_LOGO_RENDER_WIDTH: 104,
+    COUNTRY_LOGO_RENDER_HEIGHT: 104,
+    DESKTOP_TIME_OUT_MILLISECONDS: 900000,
+    LANGUAGES: 'en,bn',
+    CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 36500,
+    CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 36500,
+    CERTIFICATE_PRINT_LOWEST_CHARGE: 0,
+    CERTIFICATE_PRINT_HIGHEST_CHARGE: 0,
+    UI_POLLING_INTERVAL: 5000,
+    FIELD_AGENT_AUDIT_LOCATIONS:
+      'WARD,UNION,CITY_CORPORATION,MUNICIPALITY,UPAZILA',
+    APPLICATION_AUDIT_LOCATIONS: 'WARD,UNION',
+    INFORMANT_MINIMUM_AGE: 16,
+    HIDE_EVENT_REGISTER_INFORMATION: false,
+    EXTERNAL_VALIDATION_WORKQUEUE: true,
+    _id: '61a8c105c04ac94fe46ceb27',
+    BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
+    COUNTRY: 'bgd',
+    COUNTRY_LOGO_FILE: 'logo.png',
+    PHONE_NUMBER_PATTERN: {
+      pattern: /^01[1-9][0-9]{8}$/,
+      example: '01741234567',
+      start: '01',
+      num: '11',
+      mask: {
+        startForm: 5,
+        endBefore: 3
+      }
+    },
+    NID_NUMBER_PATTERN: {
+      pattern: /^[0-9]{9}$/,
+      example: '4837281940',
+      num: '9'
+    },
+    SENTRY: 'https://sentry.com',
+    LOGROCKET: 'opencrvs-foundation/opencrvs-zambia'
   }
 }
 
@@ -2860,7 +2898,8 @@ export async function createTestStore() {
       facilities: mockOfflineData.facilities,
       pilotLocations: mockOfflineData.pilotLocations,
       offices: mockOfflineData.offices,
-      assets: mockOfflineData.assets
+      assets: mockOfflineData.assets,
+      config: mockOfflineData.config
     })
   )
   return { store, history }
@@ -2890,7 +2929,8 @@ export async function createTestComponent(
       facilities: mockOfflineData.facilities,
       pilotLocations: mockOfflineData.pilotLocations,
       offices: mockOfflineData.offices,
-      assets: mockOfflineData.assets
+      assets: mockOfflineData.assets,
+      config: mockOfflineData.config
     })
   )
 

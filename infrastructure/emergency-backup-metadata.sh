@@ -73,7 +73,8 @@ docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mo
  -c "mongodump --host $HOST -d openhim-dev --gzip --archive=/data/backups/mongo/openhim-dev-$BACKUP_DATE.gz"
 docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:3.6 bash \
  -c "mongodump --host $HOST -d user-mgnt --gzip --archive=/data/backups/mongo/user-mgnt-$BACKUP_DATE.gz"
-
+docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:3.6 bash \
+ -c "mongodump --host $HOST -d application-config --gzip --archive=/data/backups/mongo/application-config-$BACKUP_DATE.gz"
 # Register backup folder as an Elasticsearch repository for backing up the search data
 #-------------------------------------------------------------------------------------
 docker run --rm --network=$NETWORK appropriate/curl curl -XPUT -H "Content-Type: application/json;charset=UTF-8" 'http://elasticsearch:9200/_snapshot/ocrvs' -d '{ "type": "fs", "settings": { "location": "/data/backups/elasticsearch", "compress": true }}'
@@ -90,7 +91,7 @@ INFLUXDB_HOSTNAME=`echo $(docker service ps -f "desired-state=running" opencrvs_
 INFLUXDB_HOST=$(docker node inspect --format '{{.Status.Addr}}' "$HOSTNAME")
 INFLUXDB_SSH_USER=${INFLUXDB_SSH_USER:-root}
 
-# If required, SSH into the node running the opencrvs_metrics container and backup the metrics data into an influxdb subfolder 
+# If required, SSH into the node running the opencrvs_metrics container and backup the metrics data into an influxdb subfolder
 #-----------------------------------------------------------------------------------------------------------------------------
 mkdir -p /data/backups/influxdb/$BACKUP_DATE
 OWN_IP=$(hostname -I | cut -d' ' -f1)
@@ -105,7 +106,7 @@ else
   scp -r $INFLUXDB_SSH_USER@$INFLUXDB_HOST:/data/backups/influxdb /data/backups/influxdb
 fi
 
-# Copy the backups to an offsite server in production 
+# Copy the backups to an offsite server in production
 #----------------------------------------------------
 if [[ "$OWN_IP" = "$PRODUCTION_IP" ]]; then
   script -q -c "scp -v -r -P $SSH_PORT /data/backups/elasticsearch/ $SSH_USER@$SSH_HOST:$REMOTE_DIR" && echo "Copied elasticsearch backup files to remote server."
@@ -113,6 +114,7 @@ if [[ "$OWN_IP" = "$PRODUCTION_IP" ]]; then
   script -q -c "scp -v -r -P $SSH_PORT /data/backups/mongo/hearth-dev-$BACKUP_DATE.gz $SSH_USER@$SSH_HOST:$REMOTE_DIR/mongo" && echo "Copied hearth backup files to remote server."
   script -q -c "scp -v -r -P $SSH_PORT /data/backups/mongo/user-mgnt-$BACKUP_DATE.gz $SSH_USER@$SSH_HOST:$REMOTE_DIR/mongo" && echo "Copied user backup files to remote server."
   script -q -c "scp -v -r -P $SSH_PORT /data/backups/mongo/openhim-dev-$BACKUP_DATE.gz $SSH_USER@$SSH_HOST:$REMOTE_DIR/mongo" && echo "Copied openhim backup files to remote server."
+  script -q -c "scp -v -r -P $SSH_PORT /data/backups/mongo/application-config-$BACKUP_DATE.gz $SSH_USER@$SSH_HOST:$REMOTE_DIR/mongo" && echo "Copied application config backup files to remote server."
 fi
 
 # Cleanup any old backups from influx or mongo. Keep previous 7 days of data and all elastic data

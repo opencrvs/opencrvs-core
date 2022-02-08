@@ -36,6 +36,9 @@ services:
       dockerfile: ./packages/gateway/Dockerfile
     restart: unless-stopped
     environment:
+      - REDIS_HOST=redis://redis:6379
+      - CONFIG_SMS_CODE_EXPIRY_SECONDS=600
+      - CONFIG_TOKEN_EXPIRY_SECONDS=604800
       - NODE_ENV=development
       - FHIR_URL=http://openhim-core:5001/fhir
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
@@ -143,3 +146,13 @@ services:
       - HOST=0.0.0.0
       - CHECK_INVALID_TOKEN=true
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
+  config:
+    image: opencrvs/ocrvs-config:${VERSION:-latest}
+    build:
+      context: .
+      dockerfile: ./packages/config/Dockerfile
+    restart: unless-stopped
+    environment:
+      - HOST=0.0.0.0
+      - PORT=2021
+      - MONGO_URL=mongodb://mongo1/application-config
