@@ -68,7 +68,7 @@ const hasNestedDataChanged = (
     })
     return false
   }
-  return false
+  return true
 }
 
 const hasFieldChanged = (
@@ -147,15 +147,19 @@ export const draftToGqlTransformer = (
         }
         if (application.originalData) {
           if (hasFieldChanged(application, section, fieldDef)) {
+            if (!transformedData.registration) {
+              transformedData.registration = {}
+            }
+
             if (!transformedData.correction) {
-              transformedData.correction = {}
+              transformedData.registration.correction = {}
             }
 
-            if (!transformedData.correction.values) {
-              transformedData.correction.values = []
+            if (!transformedData.registration.correction.values) {
+              transformedData.registration.correction.values = []
             }
 
-            transformedData.correction.values.push({
+            transformedData.registration.correction.values.push({
               newValue: draftData[section.id][fieldDef.name],
               oldValue: application.originalData[section.id][fieldDef.name]
             })

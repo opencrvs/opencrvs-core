@@ -38,7 +38,14 @@ import {
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
 import { groupHasError } from './utils'
+import { draftToGqlTransformer } from '@client/transformer'
+import { getCorrectorSection } from '@client/forms/correction/corrector'
+import { IStoreState } from '@client/store'
 
+type IConnectProps = {
+  form: IForm
+  primaryOffice?: string
+}
 type IProps = {
   application: IApplication
 }
@@ -51,7 +58,7 @@ type IDispatchProps = {
   modifyApplication: typeof modifyApplication
 }
 
-type IFullProps = IProps & IDispatchProps & IntlShapeProps
+type IFullProps = IProps & IDispatchProps & IntlShapeProps & IConnectProps
 
 function getGroupWithInitialValues(
   section: IFormSection,
