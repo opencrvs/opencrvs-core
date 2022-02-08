@@ -11,17 +11,240 @@
  */
 
 import * as React from 'react'
-import { createTestComponent } from '@client/tests/util'
+import {
+  createTestComponent,
+  mockApplicationData,
+  createRouterProps,
+  flushPromises
+} from '@client/tests/util'
 import { RecordAudit } from './RecordAudit'
 import { createStore } from '@client/store'
+import { ReactWrapper } from 'enzyme'
+import {
+  createApplication,
+  storeApplication,
+  IApplication
+} from '@client/applications'
+import { Event } from '@client/forms'
+import { formatUrl } from '@client/navigation'
+import { APPLICATION_RECORD_AUDIT } from '@client/navigation/routes'
+import { waitForElement } from '@client/tests/wait-for-element'
+import { FETCH_APPLICATION_SHORT_INFO } from './queries'
+import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
 
-describe('Record Audit tests', () => {
-  const { store, history } = createStore()
+const application: IApplication = createApplication(
+  Event.BIRTH,
+  mockApplicationData
+)
+application.data.registration = {
+  ...application.data.registration,
+  presentAtBirthRegistration: 'MOTHER',
+  contactPoint: {
+    value: 'MOTHER',
+    nestedFields: { registrationPhone: '01557394986' }
+  }
+}
+
+describe('Record audit summary for applicationState', () => {
+  let component: ReactWrapper<{}, {}>
+
+  beforeEach(async () => {
+    const { store, history } = createStore()
+    store.dispatch(storeApplication(application))
+    component = await createTestComponent(
+      <RecordAudit
+        {...createRouterProps(
+          formatUrl(APPLICATION_RECORD_AUDIT, {
+            applicationId: application.id
+          }),
+          { isNavigatedInsideApp: false },
+          {
+            matchParams: {
+              applicationId: application.id
+            }
+          }
+        )}
+      />,
+      { store, history }
+    )
+  })
+
   it('Record Audit page loads properly', async () => {
-    const testComponent = await createTestComponent(<RecordAudit />, {
-      store,
-      history
-    })
-    expect(testComponent.find('#recordAudit').hostNodes()).toHaveLength(1)
+    expect(component.find('#recordAudit').hostNodes()).toHaveLength(1)
+    expect(component.find('#summary').length).toEqual(14)
+  })
+  it('Check values for saved applications', async () => {
+    expect(component.find('#status_value').hostNodes().text()).toBe('Draft')
+    expect(component.find('#type_value').hostNodes().text()).toBe('Birth')
+    expect(component.find('#brn_value').hostNodes().text()).toBe(
+      '201908122365BDSS0SE1'
+    )
+    expect(component.find('#placeOfBirth_value').hostNodes()).toHaveLength(1)
+  })
+})
+
+describe('Record audit summary for WorkQueue Applications', () => {
+  let component: ReactWrapper<{}, {}>
+
+  beforeEach(async () => {
+    const { store, history } = createStore()
+
+    store.getState().workqueueState.workqueue.data.inProgressTab.results = [
+      {
+        id: 'db097901-feba-4f71-a1ae-d3d46289d2d5',
+        type: 'Birth',
+        registration: {
+          status: 'DRAFT',
+          contactNumber: '+8801622688231',
+          trackingId: 'BN99CGM',
+          registeredLocationId: '425b9cab-6ec3-47b3-bb8b-aee1b1afe4fc',
+          createdAt: '1597657903690'
+        },
+        operationHistories: [
+          {
+            operationType: 'DRAFT',
+            operatedOn: '2020-08-17T09:51:43.350Z',
+            operatorRole: 'FIELD_AGENT',
+            operatorName: [
+              {
+                firstNames: 'Shakib',
+                familyName: 'Al Hasan',
+                use: 'en'
+              },
+              {
+                firstNames: 'সাকিব',
+                familyName: 'হাসান',
+                use: 'bn'
+              }
+            ],
+            operatorOfficeName: 'Baniajan Union Parishad',
+            operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ']
+          }
+        ],
+        childName: [
+          {
+            firstNames: 'Shakib',
+            familyName: 'Al Hasan',
+            use: 'en'
+          },
+          {
+            firstNames: 'সাকিব',
+            familyName: 'হাসান',
+            use: 'bn'
+          }
+        ]
+      } as GQLBirthEventSearchSet
+    ]
+
+    component = await createTestComponent(
+      <RecordAudit
+        {...createRouterProps(
+          formatUrl(APPLICATION_RECORD_AUDIT, {
+            applicationId: 'db097901-feba-4f71-a1ae-d3d46289d2d5'
+          }),
+          { isNavigatedInsideApp: false },
+          {
+            matchParams: {
+              applicationId: 'db097901-feba-4f71-a1ae-d3d46289d2d5'
+            }
+          }
+        )}
+      />,
+      { store, history }
+    )
+  })
+
+  it('Record Audit page loads properly', async () => {
+    expect(component.find('#recordAudit').hostNodes()).toHaveLength(1)
+    expect(component.find('#summary').length).toEqual(12)
+  })
+
+  it('Check values for WQ applications', async () => {
+    expect(component.find('#status_value').hostNodes().text()).toBe('Draft')
+    expect(component.find('#type_value').hostNodes().text()).toBe('Birth')
+    expect(component.find('#content-name').hostNodes().text()).toBe(
+      'Shakib Al Hasan'
+    )
+    expect(component.find('#placeOfBirth_grey').hostNodes()).toHaveLength(1)
+    expect(component.find('#placeOfDeath_grey').hostNodes()).toHaveLength(0)
+  })
+})
+
+describe('Record audit summary for GQLQuery', () => {
+  let component: ReactWrapper<{}, {}>
+
+  beforeEach(async () => {
+    const { store, history } = createStore()
+
+    const mocks = [
+      {
+        request: {
+          query: FETCH_APPLICATION_SHORT_INFO,
+          variables: {
+            id: '956281c9-1f47-4c26-948a-970dd23c4094'
+          }
+        },
+        result: {
+          data: {
+            fetchRegistration: {
+              id: '956281c9-1f47-4c26-948a-970dd23c4094',
+              registration: {
+                type: 'DEATH',
+                trackingId: 'DG6PECX',
+                status: [
+                  {
+                    type: 'REGISTERED'
+                  }
+                ]
+              },
+              deceased: {
+                name: [
+                  {
+                    use: 'bn',
+                    firstNames: 'ক ম আব্দুল্লাহ আল আমিন ',
+                    familyName: 'খান'
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    ]
+
+    component = await createTestComponent(
+      <RecordAudit
+        {...createRouterProps(
+          formatUrl(APPLICATION_RECORD_AUDIT, {
+            applicationId: '956281c9-1f47-4c26-948a-970dd23c4094'
+          }),
+          { isNavigatedInsideApp: false },
+          {
+            matchParams: {
+              applicationId: '956281c9-1f47-4c26-948a-970dd23c4094'
+            }
+          }
+        )}
+      />,
+      { store, history, graphqlMocks: mocks }
+    )
+
+    await flushPromises()
+    component.update()
+  })
+
+  it('Record Audit page loads properly', async () => {
+    await waitForElement(component, '#recordAudit')
+    expect(component.find('#recordAudit').hostNodes()).toHaveLength(1)
+    expect(component.find('#summary').length).toEqual(12)
+  })
+
+  it('Check values for GQL applications', async () => {
+    expect(component.find('#status_value').hostNodes().text()).toBe(
+      'Registered'
+    )
+    expect(component.find('#type_value').hostNodes().text()).toBe('Death')
+    expect(component.find('#placeOfBirth_grey').hostNodes()).toHaveLength(0)
+    expect(component.find('#placeOfDeath_grey').hostNodes()).toHaveLength(1)
   })
 })

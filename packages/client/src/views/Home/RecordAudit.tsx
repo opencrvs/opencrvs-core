@@ -159,7 +159,6 @@ const NO_DATA_LABEL: ILabel = {
 }
 
 const getCaptitalizedword = (word: string | undefined): string => {
-  console.log(word)
   word = word && word.toUpperCase()[0] + word.toLowerCase().slice(1)
   return word || ''
 }
@@ -476,9 +475,9 @@ const getApplicationInfo = (
     <>
       {Object.entries(info).map(([key, value]) => {
         return (
-          <InfoContainer key={key}>
-            <KeyContainer>{KEY_LABEL[key]}</KeyContainer>
-            <ValueContainer value={value}>
+          <InfoContainer id={'summary'} key={key}>
+            <KeyContainer id={`${key}`}>{KEY_LABEL[key]}</KeyContainer>
+            <ValueContainer id={`${key}_value`} value={value}>
               {value ? (
                 key === 'dateOfBirth' || key === 'dateOfDeath' ? (
                   moment(new Date(value)).format('MMMM DD, YYYY')
@@ -488,7 +487,7 @@ const getApplicationInfo = (
               ) : isDownloaded ? (
                 NO_DATA_LABEL[key]
               ) : (
-                <GreyedInfo />
+                <GreyedInfo id={`${key}_grey`} />
               )}
             </ValueContainer>
           </InfoContainer>
@@ -506,6 +505,7 @@ export const ShowRecordAudit = (props: IFullProps) => {
   if (!isDownloaded) {
     application = getWQApplication(props)
   }
+
   return (
     <div id={'recordAudit'}>
       <Header />
@@ -553,10 +553,13 @@ export const ShowRecordAudit = (props: IFullProps) => {
                   />
                 )
               }
+
               return (
                 <>
                   <Content
-                    title={getGQLApplicationName(data.fetchRegistration)}
+                    title={getGQLApplicationName(
+                      data && data.fetchRegistration
+                    )}
                     size={'large'}
                     icon={() => (
                       <ApplicationIcon
@@ -598,8 +601,8 @@ function mapStateToProps(state: IStoreState): IStateProps {
 export const RecordAudit = connect<
   IStateProps,
   IDispatchProps,
-  {},
+  RouteComponentProps<{ applicationId: string }>,
   IStoreState
 >(mapStateToProps, {
   goToApplicationDetails
-})(injectIntl(withTheme(withRouter(ShowRecordAudit))))
+})(injectIntl(withTheme(ShowRecordAudit)))

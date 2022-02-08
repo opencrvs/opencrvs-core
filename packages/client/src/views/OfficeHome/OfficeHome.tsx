@@ -72,43 +72,6 @@ export interface IQueryData {
   externalValidationTab: GQLEventSearchResultSet
 }
 
-export const IconTab = styled(Button)<IProps>`
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.subtitleStyle};
-  padding-left: 0;
-  padding-right: 0;
-  border-radius: 0;
-  flex-shrink: 0;
-  outline: none;
-  margin-left: 16px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin-left: 8px;
-  }
-  ${({ active }) =>
-    active
-      ? 'border-bottom: 3px solid #5E93ED'
-      : 'border-bottom: 3px solid transparent'};
-  & > div {
-    padding: 0 8px;
-  }
-  :first-child > div {
-    position: relative;
-    padding-left: 0;
-  }
-  & div > div {
-    margin-right: 8px;
-  }
-  &:focus {
-    outline: none;
-    background: ${({ theme }) => theme.colors.focus};
-    color: ${({ theme }) => theme.colors.copy};
-  }
-  &:not([data-focus-visible-added]) {
-    background: transparent;
-    outline: none;
-    color: ${({ theme }) => theme.colors.copy};
-  }
-`
 export const StyledSpinner = styled(Spinner)`
   margin: 20% auto;
 `
