@@ -33,7 +33,7 @@ import {
   Content,
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
-import { sectionHasError } from './utils'
+import { groupHasError } from './utils'
 
 type IProps = {
   application: IApplication
@@ -111,7 +111,7 @@ function CorrectionReasonFormComponent(props: IFullProps) {
       id="confirm_form"
       key="confirm_form"
       onClick={continueButtonHandler}
-      disabled={sectionHasError(group, section, application)}
+      disabled={groupHasError(group, application.data[section.id])}
     >
       {intl.formatMessage(buttonMessages.continueButton)}
     </PrimaryButton>

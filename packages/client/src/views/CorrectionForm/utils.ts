@@ -37,7 +37,7 @@ import {
   WARNING,
   LOCATION_SEARCH_INPUT
 } from '@client/forms'
-import { IApplication } from '@client/applications'
+import { IApplication, SUBMISSION_STATUS } from '@client/applications'
 import { Errors, getValidationErrorsForForm } from '@client/forms/validation'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -57,8 +57,39 @@ import {
 import { buttonMessages } from '@client/i18n/messages'
 import { flattenDeep, get, clone } from 'lodash'
 
-interface IErrorsBySection {
-  [sectionId: string]: Errors
+export function groupHasError(
+  group: IFormSectionGroup,
+  sectionData: IFormSectionData
+) {
+  const errors = getValidationErrorsForForm(group.fields, sectionData || {})
+
+  for (const field of group.fields) {
+    const fieldErrors = errors[field.name].errors
+    const nestedFieldErrors = errors[field.name].nestedFields
+
+    if (fieldErrors.length > 0) {
+      return true
+    }
+
+    if (field.nestedFields) {
+      for (const nestedFields of Object.values(field.nestedFields)) {
+        for (const nestedField of nestedFields) {
+          if (
+            nestedFieldErrors[nestedField.name] &&
+            nestedFieldErrors[nestedField.name].length > 0
+          ) {
+            return true
+          }
+        }
+      }
+    }
+  }
+
+  return false
+}
+
+export function isCorrection(application: IApplication) {
+  return application.registrationStatus === SUBMISSION_STATUS.REGISTERED
 }
 
 export function sectionHasError(

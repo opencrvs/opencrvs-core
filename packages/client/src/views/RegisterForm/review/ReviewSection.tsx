@@ -127,6 +127,7 @@ import { IValidationResult } from '@client/utils/validate'
 import { DocumentListPreview } from '@client/components/form/DocumentUploadfield/DocumentListPreview'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import { generateLocations } from '@client/utils/locationUtils'
+import { isCorrection } from '@client/views/CorrectionForm/utils'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.error};
@@ -732,10 +733,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     return this.props.draft.submissionStatus === SUBMISSION_STATUS.DRAFT
   }
 
-  isCorrection() {
-    return this.props.draft.registrationStatus === SUBMISSION_STATUS.REGISTERED
-  }
-
   getFieldValueWithErrorMessage(
     section: IFormSection,
     field: IFormField,
@@ -762,7 +759,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     value: IFormFieldValue | JSX.Element | undefined,
     ignoreAction = false
   ) {
-    const { intl } = this.props
+    const { draft: application, intl } = this.props
 
     return {
       label: intl.formatMessage(fieldLabel),
@@ -771,7 +768,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         id: `btn_change_${section.id}_${fieldName}`,
         label: intl.formatMessage(buttonMessages.change),
         handler: () => {
-          if (this.isDraft() || this.isCorrection()) {
+          if (this.isDraft() || isCorrection(application)) {
             this.editLinkClickHandlerForDraft(section.id, group.id, fieldName)
           } else {
             this.editLinkClickHandler(section.id, group.id, fieldName)
@@ -979,7 +976,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               field,
               errorsOnFields,
               undefined,
-              !index
+              !!index
             )
           )
           .filter((value) => value)
@@ -1491,7 +1488,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               }
             />
             <FormData>
-              {!this.isCorrection() && (
+              {!isCorrection(application) && (
                 <FormDataHeader>
                   {intl.formatMessage(messages.formDataHeader, {
                     isDraft: draft
@@ -1517,7 +1514,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   />
                 )
               })}
-              {event === BIRTH && !this.isCorrection() && (
+              {event === BIRTH && !isCorrection(application) && (
                 <InputWrapper>
                   <InputField
                     id="additional_comments"
@@ -1529,7 +1526,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   </InputField>
                 </InputWrapper>
               )}
-              {!this.isCorrection() && (
+              {!isCorrection(application) && (
                 <ReviewAction
                   completeApplication={isComplete}
                   applicationToBeValidated={this.userHasValidateScope()}
@@ -1543,7 +1540,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   rejectApplicationAction={rejectApplicationClickEvent}
                 />
               )}
-              {this.isCorrection() && (
+              {isCorrection(application) && (
                 <FooterArea>
                   <PrimaryButton
                     id="continue_button"

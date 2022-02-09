@@ -469,7 +469,7 @@ export class ListTable extends React.Component<
                           highlight={highlightRowOnMouseOver}
                           height={rowStyle?.height}
                           horizontalPadding={rowStyle?.horizontalPadding}
-                          hideTableBottomBorder={hideTableBottomBorder}
+                          hideTableBottomBorder={hideTableBottomBorder || false}
                           alignItemCenter={alignItemCenter}
                         >
                           {columns.map((preference, indx) => {

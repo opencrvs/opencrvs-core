@@ -37,55 +37,97 @@ describe('verify corrector tests', () => {
     event: Event.DEATH
   }
 
+  describe('in case of death application', () => {
+    beforeAll(async () => {
+      store.dispatch(storeApplication(deathApplication))
+    })
+
+    it('when informant is corrector renders idVerifier component', async () => {
+      const testComponent = await createTestComponent(
+        <VerifyCorrector
+          history={history}
+          location={history.location}
+          match={{
+            params: {
+              applicationId: 'mockDeath1234',
+              corrector: 'informant'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        { store, history }
+      )
+
+      expect(testComponent.find('#idVerifier').hostNodes()).toHaveLength(1)
+    })
+  })
+
   describe('in case of birth application', () => {
     beforeAll(async () => {
       store.dispatch(storeApplication(birthApplication))
     })
 
     it('when mother is corrector renders idVerifier component', async () => {
-      const testComponent = (
-        await createTestComponent(
-          <VerifyCorrector
-            history={history}
-            location={history.location}
-            match={{
-              params: {
-                registrationId: 'mockBirth1234',
-                eventType: Event.BIRTH,
-                corrector: 'mother'
-              },
-              isExact: true,
-              path: '',
-              url: ''
-            }}
-          />,
-          store
-        )
-      ).component
+      const testComponent = await createTestComponent(
+        <VerifyCorrector
+          history={history}
+          location={history.location}
+          match={{
+            params: {
+              applicationId: 'mockBirth1234',
+              corrector: 'mother'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        { store, history }
+      )
+
+      expect(testComponent.find('#idVerifier').hostNodes()).toHaveLength(1)
+    })
+
+    it('when child is corrector renders idVerifier component', async () => {
+      const testComponent = await createTestComponent(
+        <VerifyCorrector
+          history={history}
+          location={history.location}
+          match={{
+            params: {
+              applicationId: 'mockBirth1234',
+              corrector: 'child'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        { store, history }
+      )
 
       expect(testComponent.find('#idVerifier').hostNodes()).toHaveLength(1)
     })
 
     it('should takes user go back', async () => {
-      const testComponent = (
-        await createTestComponent(
-          <VerifyCorrector
-            history={history}
-            location={history.location}
-            match={{
-              params: {
-                registrationId: 'mockBirth1234',
-                eventType: Event.BIRTH,
-                corrector: 'mother'
-              },
-              isExact: true,
-              path: '',
-              url: ''
-            }}
-          />,
-          store
-        )
-      ).component
+      const testComponent = await createTestComponent(
+        <VerifyCorrector
+          history={history}
+          location={history.location}
+          match={{
+            params: {
+              applicationId: 'mockBirth1234',
+              corrector: 'mother'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        { store, history }
+      )
 
       testComponent
         .find('#action_page_back_button')
@@ -102,29 +144,40 @@ describe('verify corrector tests', () => {
     describe('when father is corrector', () => {
       let testComponent: ReactWrapper
       beforeEach(async () => {
-        testComponent = (
-          await createTestComponent(
-            <VerifyCorrector
-              history={history}
-              location={history.location}
-              match={{
-                params: {
-                  registrationId: 'mockBirth1234',
-                  eventType: Event.BIRTH,
-                  corrector: 'father'
-                },
-                isExact: true,
-                path: '',
-                url: ''
-              }}
-            />,
-            store
-          )
-        ).component
+        testComponent = await createTestComponent(
+          <VerifyCorrector
+            history={history}
+            location={history.location}
+            match={{
+              params: {
+                applicationId: 'mockBirth1234',
+                corrector: 'father'
+              },
+              isExact: true,
+              path: '',
+              url: ''
+            }}
+          />,
+          { store, history }
+        )
       })
 
       it('renders idVerifier compomnent', () => {
         expect(testComponent.find('#idVerifier').hostNodes()).toHaveLength(1)
+      })
+
+      it('clicking on yes button takes user to review certificate', () => {
+        Date.now = jest.fn(() => 243885600000)
+
+        testComponent
+          .find('#idVerifier')
+          .find('#verifyPositive')
+          .hostNodes()
+          .simulate('click')
+
+        testComponent.update()
+
+        expect(history.location.pathname).not.toContain('/verify')
       })
 
       it('clicking on no button shows up modal', () => {

@@ -68,7 +68,8 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
   const hasUploadDocOrSelectOption =
     application.data[section.id] &&
     (application.data[section.id].uploadDocForLegalProof ||
-      application.data[section.id].supportDocumentRequiredForCorrection)
+      application.data[section.id].supportDocumentRequiredForCorrection !==
+        undefined)
 
   group.fields[1].disabled =
     application.data[section.id] &&
