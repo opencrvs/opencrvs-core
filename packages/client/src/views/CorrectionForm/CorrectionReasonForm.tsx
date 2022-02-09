@@ -25,7 +25,8 @@ import {
 import {
   CorrectionSection,
   IFormSection,
-  IFormSectionData
+  IFormSectionData,
+  IForm
 } from '@client/forms'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
@@ -37,14 +38,17 @@ import {
   Content,
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
-import { groupHasError } from './utils'
+import {
+  groupHasError,
+  updateApplicationRegistrationWithCorrection
+} from './utils'
 import { draftToGqlTransformer } from '@client/transformer'
 import { getCorrectorSection } from '@client/forms/correction/corrector'
 import { IStoreState } from '@client/store'
 
 type IConnectProps = {
   form: IForm
-  primaryOffice?: string
+  userPrimaryOffice?: string
 }
 type IProps = {
   application: IApplication

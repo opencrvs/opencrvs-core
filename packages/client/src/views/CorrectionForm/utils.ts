@@ -35,7 +35,8 @@ import {
   SUBSECTION,
   TEXTAREA,
   WARNING,
-  LOCATION_SEARCH_INPUT
+  LOCATION_SEARCH_INPUT,
+  IAttachmentValue
 } from '@client/forms'
 import { IApplication, SUBMISSION_STATUS } from '@client/applications'
 import { Errors, getValidationErrorsForForm } from '@client/forms/validation'
@@ -455,4 +456,67 @@ const getVisibleSections = (
         draft.data
       ).length > 0
   )
+}
+
+export function updateApplicationRegistrationWithCorrection(
+  application: IApplication,
+  meta?: { userPrimaryOffice?: string }
+): void {
+  const correctionValues: Record<string, any> = {}
+  const { data } = application
+
+  if (data.corrector && data.corrector.relationship) {
+    let requester = ''
+    requester = ((data.corrector.relationship as IFormSectionData).value ||
+      data.corrector.relationship) as string
+    correctionValues.requester = requester
+  }
+
+  if (data.reason) {
+    let reason = ''
+    if (data.reason.type) {
+      reason = ((data.reason.type as IFormSectionData).value ||
+        data.reason.type) as string
+    }
+
+    correctionValues.reason = reason
+
+    if (data.reason.additionalComment) {
+      correctionValues.note = data.reason.additionalComment
+    }
+  }
+
+  if (data.supportingDocuments) {
+    if (
+      typeof data.supportingDocuments.supportDocumentRequiredForCorrection ===
+      'boolean'
+    ) {
+      if (data.supportingDocuments.supportDocumentRequiredForCorrection) {
+        correctionValues.hasShowedVerifiedDocument = true
+      } else {
+        correctionValues.noSupportingDocumentationRequired = true
+      }
+    }
+
+    if (data.supportingDocuments.uploadDocForLegalProof) {
+      correctionValues.data = (
+        data.supportingDocuments.uploadDocForLegalProof as IAttachmentValue
+      ).data
+    }
+  }
+
+  if (meta) {
+    if (meta.userPrimaryOffice) {
+      correctionValues.location = {
+        _fhirID: meta.userPrimaryOffice
+      }
+    }
+  }
+
+  data.registration.correction = data.registration.correction
+    ? {
+        ...(data.registration.correction as IFormSectionData),
+        ...correctionValues
+      }
+    : correctionValues
 }

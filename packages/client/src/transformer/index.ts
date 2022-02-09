@@ -24,6 +24,7 @@ import {
   getVisibleSectionGroupsBasedOnConditions
 } from '@client/forms/utils'
 import { IApplication } from '@client/applications'
+import { isEqual } from 'lodash'
 
 const nestedFieldsMapping = (
   transformedData: TransformedData,
@@ -94,6 +95,14 @@ const hasFieldChanged = (
   ) {
     return false
   }
+
+  if (
+    Array.isArray(data[section.id][field.name]) &&
+    isEqual(data[section.id][field.name], originalData[section.id][field.name])
+  ) {
+    return false
+  }
+
   return data[section.id][field.name] !== originalData[section.id][field.name]
 }
 
@@ -160,6 +169,8 @@ export const draftToGqlTransformer = (
             }
 
             transformedData.registration.correction.values.push({
+              section: section.id,
+              fieldName: fieldDef.name,
               newValue: draftData[section.id][fieldDef.name],
               oldValue: application.originalData[section.id][fieldDef.name]
             })
