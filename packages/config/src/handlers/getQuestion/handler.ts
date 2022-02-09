@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as Hapi from '@hapi/hapi'
-import Question, { IQuestion } from '@config/models/Question'
+import Question, { IQuestion } from '@config/models/question'
 import { internal, notFound } from '@hapi/boom'
 
 export default async function getQuestion(

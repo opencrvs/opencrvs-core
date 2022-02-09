@@ -36,7 +36,7 @@ const messageDescriptorSchema = Joi.object({
 
 export const requestSchema = Joi.object({
   fieldId: Joi.string().required(),
-  fhirSectionCode: Joi.string().required(),
+  fhirSectionCode: Joi.string(),
   fhirResource: {
     type: Joi.string().required(),
     code: Joi.string(),

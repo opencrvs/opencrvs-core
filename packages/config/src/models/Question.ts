@@ -48,11 +48,17 @@ export interface IOptions {
   value: string
 }
 
+export interface IMessageDescriptor {
+  id: string
+  description: string
+  defaultMessage: string
+}
+
 export interface IQuestion {
   fieldId: string
   fhirSectionCode: string
   fhirResource: IFhirResource
-  label: typeof messageDescriptor
+  label: IMessageDescriptor
   placeholder?: string
   maxLength?: number
   options?: IOptions[]
@@ -121,8 +127,8 @@ const fhirResourceSchema = new Schema({
 
 const questionSchema = new Schema({
   fieldId: { type: String, unique: true, required: true },
-  fhirSectionCode: { type: String, required: true }, // "birth-encounter",
-  fhirResource: { type: fhirResourceSchema, required: true },
+  fhirSectionCode: { type: String }, // "birth-encounter",
+  fhirResource: { type: fhirResourceSchema },
   label: { type: messageDescriptor, required: true },
   placeholder: { type: String, required: false },
   maxLength: { type: Number, required: false },
