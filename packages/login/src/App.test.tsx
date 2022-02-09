@@ -50,7 +50,7 @@ describe('Login app step one', () => {
   })
 
   it('renders a phone number and a password field on startup', async () => {
-    expect(app.find('input')).toHaveLength(2)
+    expect(app.find('input')).toHaveLength(3)
   })
 
   it('fills credentials form', async () => {

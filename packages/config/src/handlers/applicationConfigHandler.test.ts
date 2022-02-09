@@ -57,7 +57,7 @@ describe('applicationHandler', () => {
 
     const res = await server.server.inject({
       method: 'GET',
-      url: '/getConfig'
+      url: '/config'
     })
     expect(res.statusCode).toBe(200)
   })
