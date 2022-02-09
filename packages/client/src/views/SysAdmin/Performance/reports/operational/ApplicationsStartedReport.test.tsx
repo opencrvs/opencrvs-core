@@ -18,21 +18,20 @@ import * as locationUtils from '@client/utils/locationUtils'
 import moment from 'moment'
 
 describe('Registration rates report', () => {
-  const { store } = createStore()
+  const { store, history } = createStore()
   beforeEach(async () => {
     jest.spyOn(locationUtils, 'getJurisidictionType').mockReturnValue('UNION')
   })
 
   it('renders loading indicator', async () => {
-    const { component } = await createTestComponent(
+    const component = await createTestComponent(
       <ApplicationsStartedReport
         loading={true}
         locationId={'c879ce5c-545b-4042-98a6-77015b0e13df'}
-        disableFieldAgentLink={false}
         reportTimeFrom={moment(new Date())}
         reportTimeTo={moment(new Date())}
       />,
-      store
+      { store, history }
     )
     expect(
       component.find('#applications-started-reports-loader').hostNodes()
@@ -48,15 +47,14 @@ describe('Registration rates report', () => {
       hospitalApplications: 1,
       officeApplications: 2
     }
-    const { component } = await createTestComponent(
+    const component = await createTestComponent(
       <ApplicationsStartedReport
         data={data}
         locationId={'c879ce5c-545b-4042-98a6-77015b0e13df'}
-        disableFieldAgentLink={true}
         reportTimeFrom={moment(new Date())}
         reportTimeTo={moment(new Date())}
       />,
-      store
+      { store, history }
     )
 
     expect(
@@ -65,17 +63,9 @@ describe('Registration rates report', () => {
     expect(
       component.find('#applications-started-reports').hostNodes()
     ).toHaveLength(1)
-    expect(
-      component
-        .find('#total-applications')
-        .hostNodes()
-        .text()
-    ).toBe('5')
-    expect(
-      component
-        .find('#field-agent-percentage')
-        .hostNodes()
-        .text()
-    ).toBe('(40%)')
+    expect(component.find('#total-applications').hostNodes().text()).toBe('5')
+    expect(component.find('#field-agent-percentage').hostNodes().text()).toBe(
+      '(40%)'
+    )
   })
 })

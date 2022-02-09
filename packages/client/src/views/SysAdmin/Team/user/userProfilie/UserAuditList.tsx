@@ -71,6 +71,10 @@ const AuditDescTimeContainer = styled.div`
 const RecentActionsHolder = styled.div`
   margin-top: 40px;
   padding-top: 30px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin-top: 24px;
+    padding-top: 24px;
+  }
   border-top: 1px solid ${({ theme }) => theme.colors.dividerDark};
 `
 
@@ -205,6 +209,7 @@ class UserAuditListComponent extends React.Component<Props, State> {
           width: 22,
           key: 'auditTime',
           isSortable: true,
+          isSorted: true,
           icon: <ArrowDownBlue />,
           alignment: ColumnContentAlignment.RIGHT,
           sortFunction: () => this.toggleAuditListSortOrder()

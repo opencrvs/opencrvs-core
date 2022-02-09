@@ -43,15 +43,16 @@ interface DispatchProps {
 type Props = NoResultMessageProps &
   WrappedComponentProps &
   DispatchProps & {
-    offlineResources: IOfflineData
+    offlineCountryConfiguration: IOfflineData
   }
 
 class NoResultMessageComponent extends React.Component<Props> {
   render() {
-    const { id, intl, searchedLocation, offlineResources } = this.props
+    const { id, intl, searchedLocation, offlineCountryConfiguration } =
+      this.props
     return (
-      (offlineResources.pilotLocations &&
-        Object.keys(offlineResources.pilotLocations).length > 0 && (
+      (offlineCountryConfiguration.pilotLocations &&
+        Object.keys(offlineCountryConfiguration.pilotLocations).length > 0 && (
           <MessageContainer>
             <StyledHeader id={`noResults-${id}`}>
               {intl.formatMessage(messages.noResultForLocation, {
@@ -59,8 +60,9 @@ class NoResultMessageComponent extends React.Component<Props> {
               })}
             </StyledHeader>
             {generatePilotLocations(
-              offlineResources.pilotLocations,
-              offlineResources.locations
+              offlineCountryConfiguration.pilotLocations,
+              offlineCountryConfiguration.locations,
+              intl
             ).map((pilotLocation, index) => (
               <MessageRow key={index}>
                 <LinkButton
@@ -94,7 +96,7 @@ class NoResultMessageComponent extends React.Component<Props> {
 
 function mapStateToProps(state: IStoreState) {
   return {
-    offlineResources: getOfflineData(state)
+    offlineCountryConfiguration: getOfflineData(state)
   }
 }
 

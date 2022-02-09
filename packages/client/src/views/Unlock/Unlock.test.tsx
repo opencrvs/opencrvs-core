@@ -31,8 +31,8 @@ const clearPassword = (component: ReactWrapper) => {
 }
 
 describe('Unlock page loads Properly', () => {
-  let testComponent: { component: ReactWrapper }
-  let onForgetPinMock: jest.Mock = jest.fn()
+  let testComponent: ReactWrapper
+  const onForgetPinMock: jest.Mock = jest.fn()
   beforeEach(async () => {
     await flushPromises()
 
@@ -49,7 +49,6 @@ describe('Unlock page loads Properly', () => {
       ]),
       screenLock: undefined,
       USER_ID: 'shakib75',
-      // eslint-disable-next-line @typescript-eslint/camelcase
       locked_time: undefined
     }
 
@@ -63,90 +62,85 @@ describe('Unlock page loads Properly', () => {
       async (key: string, value: string) => (indexedDB[key] = value)
     )
 
-    const { store } = createStore()
+    const { store, history } = createStore()
     testComponent = await createTestComponent(
       <Unlock onCorrectPinMatch={() => null} onForgetPin={onForgetPinMock} />,
-      store
+      { store, history }
     )
   })
 
   it('Should load the Unlock page properly', () => {
-    const elem = testComponent.component.find('#unlockPage').hostNodes().length
+    const elem = testComponent.find('#unlockPage').hostNodes().length
     expect(elem).toBe(1)
   })
 
   it('There should be no error message after providing successfull Pin', () => {
-    clearPassword(testComponent.component)
-    const numberElem = testComponent.component.find('#keypad-0').hostNodes()
+    clearPassword(testComponent)
+    const numberElem = testComponent.find('#keypad-0').hostNodes()
 
     numberElem.simulate('click')
     numberElem.simulate('click')
     numberElem.simulate('click')
     numberElem.simulate('click')
-    testComponent.component.update()
+    testComponent.update()
 
-    expect(testComponent.component.find('#errorMsg').hostNodes()).toHaveLength(
-      0
-    )
+    expect(testComponent.find('#errorMsg').hostNodes()).toHaveLength(0)
   })
 
   it('Should trigger onForgetPin when click on forgotten pin link', () => {
-    const forgottenPinElement = testComponent.component.find('#forgotten_pin')
+    const forgottenPinElement = testComponent.find('#forgotten_pin')
     forgottenPinElement.hostNodes().simulate('click')
     expect(onForgetPinMock).toBeCalledTimes(1)
   })
 })
 
 describe('For wrong inputs', () => {
-  let testComponent: { component: ReactWrapper }
-  let onForgetPinMock: jest.Mock = jest.fn()
+  let testComponent: ReactWrapper
+  const onForgetPinMock: jest.Mock = jest.fn()
 
   beforeEach(async () => {
     await flushPromises()
     jest.clearAllMocks()
-    const { store } = createStore()
+    const { store, history } = createStore()
     testComponent = await createTestComponent(
       <Unlock onCorrectPinMatch={() => null} onForgetPin={onForgetPinMock} />,
-      store
+      { store, history }
     )
 
     // These tests are only for wrong inputs, so this mock fn only returns a promise of false
-    pinValidator.isValidPin = jest.fn(async pin => Promise.resolve(false))
+    pinValidator.isValidPin = jest.fn(async (pin) => Promise.resolve(false))
   })
   it('Should Display Incorrect error message', async () => {
-    const numberElem = testComponent.component.find('#keypad-1').hostNodes()
+    const numberElem = testComponent.find('#keypad-1').hostNodes()
     numberElem.simulate('click')
     numberElem.simulate('click')
     numberElem.simulate('click')
     numberElem.simulate('click')
-    testComponent.component.update()
+    testComponent.update()
 
-    const errorMsg = await waitForElement(testComponent.component, '#errorMsg')
+    const errorMsg = await waitForElement(testComponent, '#errorMsg')
 
     expect(errorMsg.hostNodes().text()).toBe('Incorrect pin. Please try again')
   })
 
   it('Should display the Last try message', async () => {
-    testComponent.component
-      .find('UnlockView')
-      .instance()
-      .setState({ attempt: 2 })
+    testComponent.find('UnlockView').instance().setState({ attempt: 2 })
 
-    const numberElem = testComponent.component.find('#keypad-1').hostNodes()
+    const numberElem = testComponent.find('#keypad-1').hostNodes()
     numberElem.simulate('click')
     numberElem.simulate('click')
     numberElem.simulate('click')
     numberElem.simulate('click')
 
-    const errorMsg = await waitForElement(testComponent.component, '#errorMsg')
+    const errorMsg = await waitForElement(testComponent, '#errorMsg')
 
     expect(errorMsg.hostNodes().text()).toBe('Last Try')
   })
 })
 
 describe('Pin locked session', () => {
-  let testComponent: { component: ReactWrapper }
-  let onForgetPinMock: jest.Mock = jest.fn()
+  let testComponent: ReactWrapper
+  const onForgetPinMock: jest.Mock = jest.fn()
   beforeEach(async () => {
     await flushPromises()
     jest.clearAllMocks()
@@ -165,7 +159,6 @@ describe('Pin locked session', () => {
       ]),
       screenLock: undefined,
       USER_ID: 'shakib75',
-      // eslint-disable-next-line @typescript-eslint/camelcase
       locked_time: '1578308927392'
     }
 
@@ -179,26 +172,23 @@ describe('Pin locked session', () => {
       async (key: string, value: string) => (indexedDB[key] = value)
     )
 
-    const { store } = createStore()
+    const { store, history } = createStore()
     testComponent = await createTestComponent(
       <Unlock onCorrectPinMatch={() => null} onForgetPin={onForgetPinMock} />,
-      store
+      { store, history }
     )
   })
 
   it('Should not accept correct pin while the account is locked', async () => {
-    testComponent.component
-      .find('UnlockView')
-      .instance()
-      .setState({ attempt: 4 })
+    testComponent.find('UnlockView').instance().setState({ attempt: 4 })
 
-    const numberElem = testComponent.component.find('#keypad-0').hostNodes()
+    const numberElem = testComponent.find('#keypad-0').hostNodes()
     numberElem.simulate('click')
     numberElem.simulate('click')
     numberElem.simulate('click')
     numberElem.simulate('click')
 
-    const errorMsg = await waitForElement(testComponent.component, '#errorMsg')
+    const errorMsg = await waitForElement(testComponent, '#errorMsg')
 
     expect(errorMsg.hostNodes().text()).toBe(
       'Your account has been locked. Please try again in 1 minute.'
@@ -207,17 +197,17 @@ describe('Pin locked session', () => {
 })
 
 describe('Logout Sequence', () => {
-  let onForgetPinMock: jest.Mock = jest.fn()
+  const onForgetPinMock: jest.Mock = jest.fn()
 
   it('should clear lock-related indexeddb entries upon logout', async () => {
-    const { store } = createStore()
+    const { store, history } = createStore()
     const redirect = jest.fn()
     const testComponent = await createTestComponent(
       <Unlock
         onCorrectPinMatch={() => redirect}
         onForgetPin={onForgetPinMock}
       />,
-      store
+      { store, history }
     )
     const indexeddb = {
       SCREEN_LOCK: true,
@@ -228,11 +218,8 @@ describe('Logout Sequence', () => {
       // @ts-ignore
       delete indexeddb[key]
     })
-    testComponent.component
-      .find('#logout')
-      .hostNodes()
-      .simulate('click')
-    testComponent.component.update()
+    testComponent.find('#logout').hostNodes().simulate('click')
+    testComponent.update()
     // @ts-ignore
     expect(indexeddb[SCREEN_LOCK]).toBeFalsy()
     // @ts-ignore

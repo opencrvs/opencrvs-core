@@ -22,7 +22,7 @@ import { ICertificateCollectorDefinition } from '@client/views/PrintCertificate/
 import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { InMemoryCache } from 'apollo-cache-inmemory'
-import ApolloClient from 'apollo-client'
+import ApolloClient, { NetworkStatus } from 'apollo-client'
 import { ApolloLink, Observable } from 'apollo-link'
 import {
   configure,
@@ -43,6 +43,16 @@ import { IntlShape } from 'react-intl'
 import { Provider } from 'react-redux'
 import { AnyAction, Store } from 'redux'
 import { waitForElement } from './wait-for-element'
+import { setUserDetails } from '@client/profile/profileActions'
+import {
+  createBrowserHistory,
+  createLocation,
+  createMemoryHistory,
+  History
+} from 'history'
+import { stringify } from 'query-string'
+import { match as Match } from 'react-router'
+import { ConnectedRouter } from 'connected-react-router'
 
 export const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -70,9 +80,9 @@ export const validateScopeToken = jwt.sign(
 )
 
 export function flushPromises() {
-  return new Promise(resolve => setImmediate(resolve))
+  return new Promise((resolve) => setImmediate(resolve))
 }
-export const assign = window.location.assign as jest.Mock
+
 export const getItem = window.localStorage.getItem as jest.Mock
 export const setItem = window.localStorage.setItem as jest.Mock
 
@@ -83,12 +93,12 @@ function createGraphQLClient() {
 
   return new ApolloClient({
     cache: new InMemoryCache(),
-    link: new ApolloLink(operation => {
-      return new Observable(observer => {
+    link: new ApolloLink((operation) => {
+      return new Observable((observer) => {
         const { query, operationName, variables } = operation
 
         graphql(schema, print(query), null, null, variables, operationName)
-          .then(result => {
+          .then((result) => {
             observer.next(result)
             observer.complete()
           })
@@ -111,14 +121,14 @@ export function waitForReady(app: ReactWrapper) {
 }
 
 export async function createTestApp(
-  config = { waitUntilResourcesLoaded: true }
+  config = { waitUntilOfflineCountryConfigLoaded: true }
 ) {
   const { store, history } = createStore()
   const app = mount(
     <App store={store} history={history} client={createGraphQLClient()} />
   )
 
-  if (config.waitUntilResourcesLoaded) {
+  if (config.waitUntilOfflineCountryConfigLoaded) {
     await waitForReady(app)
   }
   return { history, app, store }
@@ -134,7 +144,7 @@ export function createShallowRenderedComponent(
   return shallow(node)
 }
 
-export const wait = () => new Promise(res => process.nextTick(res))
+export const wait = () => new Promise((res) => process.nextTick(res))
 
 export const resizeWindow = (width: number, height: number) => {
   const resizeEvent = document.createEvent('Event')
@@ -159,21 +169,30 @@ export const selectOption = (
 ): ReactWrapper => {
   const input = wrapper.find(selector).hostNodes()
 
-  input
-    .find('input')
-    .simulate('focus')
-    .update()
-  input
-    .find('.react-select__control')
-    .simulate('mousedown')
-    .update()
-  input
+  input.find('input').simulate('focus').update()
+  input.find('.react-select__control').simulate('mousedown').update()
+
+  const availableOptions: string[] = []
+
+  const nodes = input
     .update()
     .find('.react-select__option')
-    .findWhere((el: ReactWrapper) => el.text() === option)
+    .findWhere((el: ReactWrapper) => {
+      const text = el.text()
+      availableOptions.push(text)
+      return text === option
+    })
     .hostNodes()
-    .simulate('click')
-    .update()
+
+  if (nodes.length === 0) {
+    throw new Error(
+      `Couldn't find an option "${option}" from select.\nAvailable options are:\n${availableOptions.join(
+        ',\n'
+      )}`
+    )
+  }
+
+  nodes.simulate('click').update()
 
   return input.find('.react-select__control')
 }
@@ -2053,6 +2072,90 @@ export const mockUserResponse = {
   }
 }
 
+export const mockLocalSysAdminUserResponse = {
+  data: {
+    getUser: {
+      userMgntUserID: '123',
+      catchmentArea: [
+        {
+          id: 'ddab090d-040e-4bef-9475-314a448a576a',
+          name: 'Dhaka',
+          status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/geo-id',
+              value: '3'
+            }
+          ],
+          __typename: 'Location'
+        },
+        {
+          id: 'f9ec1fdb-086c-4b3d-ba9f-5257f3638286',
+          name: 'GAZIPUR',
+          status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/geo-id',
+              value: '20'
+            }
+          ],
+          __typename: 'Location'
+        },
+        {
+          id: '825b17fb-4308-48cb-b77c-2f2cee4f14b9',
+          name: 'KALIGANJ',
+          status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/geo-id',
+              value: '165'
+            }
+          ],
+          __typename: 'Location'
+        },
+        {
+          id: '123456789',
+          name: 'BAKTARPUR',
+          status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/geo-id',
+              value: '3473'
+            }
+          ],
+          __typename: 'Location'
+        }
+      ],
+      primaryOffice: {
+        id: '0d8474da-0361-4d32-979e-af91f012340a',
+        name: 'Kaliganj Union Sub Center',
+        status: 'active',
+        __typename: 'Location'
+      },
+      role: 'LOCAL_SYSTEM_ADMIN',
+      signature: {
+        data: `data:image/png;base64,${validImageB64String}`,
+        type: 'image/png'
+      },
+      localRegistrar: {
+        role: 'LOCAL_SYSTEM_ADMIN',
+        signature: {
+          data: `data:image/png;base64,${validImageB64String}`,
+          type: 'image/png'
+        },
+        name: [
+          {
+            use: 'en',
+            given: ['Mohammad'],
+            family: 'Ashraful'
+          }
+        ]
+      },
+      __typename: 'User'
+    }
+  }
+}
+
 export const mockRegistrarUserResponse = {
   data: {
     getUser: {
@@ -2695,6 +2798,24 @@ export const mockOfflineData = {
       partOf: 'Location/8f1aae72-2f90-4585-b853-e8c37f4be764',
       physicalType: 'Jurisdiction',
       type: 'ADMIN_STRUCTURE'
+    },
+    '473ed705-13e8-4ec1-9836-69bc269f7fad': {
+      alias: '',
+      id: '473ed705-13e8-4ec1-9836-69bc269f7fad',
+      jurisdictionType: 'STATE',
+      name: 'Lusaka',
+      partOf: 'Location/0',
+      physicalType: 'Jurisdiction',
+      type: 'ADMIN_STRUCTURE'
+    },
+    '81317429-1d89-42ac-8abc-7a92f268273c': {
+      alias: '',
+      id: '81317429-1d89-42ac-8abc-7a92f268273c',
+      jurisdictionType: 'DISTRICT',
+      name: 'Lusaka',
+      partOf: 'Location/473ed705-13e8-4ec1-9836-69bc269f7fad',
+      physicalType: 'Jurisdiction',
+      type: 'ADMIN_STRUCTURE'
     }
   },
   pilotLocations: {
@@ -2730,29 +2851,36 @@ export const mockOfflineData = {
     COUNTRY_LOGO_RENDER_WIDTH: 104,
     COUNTRY_LOGO_RENDER_HEIGHT: 104,
     DESKTOP_TIME_OUT_MILLISECONDS: 900000,
-    HEALTH_FACILITY_FILTER: 'DISTRICT',
-    LANGUAGES: 'en',
+    LANGUAGES: 'en,bn',
     CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 36500,
     CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 36500,
     CERTIFICATE_PRINT_LOWEST_CHARGE: 0,
     CERTIFICATE_PRINT_HIGHEST_CHARGE: 0,
     UI_POLLING_INTERVAL: 5000,
-    FIELD_AGENT_AUDIT_LOCATIONS: 'DISTRICT',
-    APPLICATION_AUDIT_LOCATIONS: 'DISTRICT',
+    FIELD_AGENT_AUDIT_LOCATIONS:
+      'WARD,UNION,CITY_CORPORATION,MUNICIPALITY,UPAZILA',
+    APPLICATION_AUDIT_LOCATIONS: 'WARD,UNION',
     INFORMANT_MINIMUM_AGE: 16,
     HIDE_EVENT_REGISTER_INFORMATION: false,
-    EXTERNAL_VALIDATION_WORKQUEUE: false,
+    EXTERNAL_VALIDATION_WORKQUEUE: true,
     _id: '61a8c105c04ac94fe46ceb27',
     BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
-    COUNTRY: 'zmb',
+    COUNTRY: 'bgd',
     COUNTRY_LOGO_FILE: 'logo.png',
     PHONE_NUMBER_PATTERN: {
-      mask: { startForm: 4, endBefore: 2 },
-      _id: '61af0ebac7f0222926a50e9c',
-      pattern: /^0(7|9)[0-9]{1}[0-9]{7}$/,
-      example: '0970545855',
-      start: '0[7|9]',
-      num: '10'
+      pattern: /^01[1-9][0-9]{8}$/,
+      example: '01741234567',
+      start: '01',
+      num: '11',
+      mask: {
+        startForm: 5,
+        endBefore: 3
+      }
+    },
+    NID_NUMBER_PATTERN: {
+      pattern: /^[0-9]{9}$/,
+      example: '4837281940',
+      num: '9'
     },
     SENTRY: 'https://sentry.com',
     LOGROCKET: 'opencrvs-foundation/opencrvs-zambia'
@@ -2779,17 +2907,19 @@ export async function createTestStore() {
 
 export async function createTestComponent(
   node: React.ReactElement<ITestView>,
-  store: AppStore,
-  graphqlMocks: any = null,
+  {
+    store,
+    history,
+    graphqlMocks,
+    apolloClient
+  }: {
+    store: AppStore
+    history: History
+    graphqlMocks?: MockedProvider['props']['mocks']
+    apolloClient?: ApolloClient<any>
+  },
   options?: MountRendererProps
 ) {
-  /*
-   * Would it work to replace this fn with createTestApp()
-   * call send return only the component that requires testing..
-   *
-   * Feels odd the whole boilerplate has to be recreated
-   */
-
   await store.dispatch(
     offlineDataReady({
       languages: mockOfflineData.languages,
@@ -2804,61 +2934,40 @@ export async function createTestComponent(
     })
   )
 
-  const component = mount(
-    <MockedProvider mocks={graphqlMocks} addTypename={false}>
+  const withGraphQL = (node: JSX.Element) => {
+    if (apolloClient) {
+      return <ApolloProvider client={apolloClient}>{node}</ApolloProvider>
+    }
+
+    return (
+      <MockedProvider
+        mocks={graphqlMocks}
+        addTypename={false}
+        defaultOptions={{
+          watchQuery: { fetchPolicy: 'no-cache' },
+          query: { fetchPolicy: 'no-cache' }
+        }}
+      >
+        {node}
+      </MockedProvider>
+    )
+  }
+
+  function PropProxy(props: Record<string, any>) {
+    return withGraphQL(
       <Provider store={store}>
-        <I18nContainer>
-          <ThemeProvider theme={getTheme(getDefaultLanguage())}>
-            {node}
-          </ThemeProvider>
-        </I18nContainer>
+        <ConnectedRouter noInitialPop={true} history={history}>
+          <I18nContainer>
+            <ThemeProvider theme={getTheme(getDefaultLanguage())}>
+              <node.type {...node.props} {...props} />
+            </ThemeProvider>
+          </I18nContainer>
+        </ConnectedRouter>
       </Provider>
-    </MockedProvider>,
-    options
-  )
+    )
+  }
 
-  return { component: component.update(), store }
-}
-
-export async function createTestComponentWithApolloClient(
-  node: React.ReactElement<ITestView>,
-  store: AppStore,
-  client: ApolloClient<{}>
-) {
-  /*
-   * Would it work to replace this fn with createTestApp()
-   * call send return only the component that requires testing..
-   *
-   * Feels odd the whole boilerplate has to be recreated
-   */
-
-  await store.dispatch(
-    offlineDataReady({
-      languages: mockOfflineData.languages,
-      forms: mockOfflineData.forms,
-      templates: mockOfflineData.templates,
-      locations: mockOfflineData.locations,
-      facilities: mockOfflineData.facilities,
-      pilotLocations: mockOfflineData.pilotLocations,
-      offices: mockOfflineData.offices,
-      assets: mockOfflineData.assets,
-      config: mockOfflineData.config
-    })
-  )
-
-  const component = mount(
-    <ApolloProvider client={client}>
-      <Provider store={store}>
-        <I18nContainer>
-          <ThemeProvider theme={getTheme(getDefaultLanguage())}>
-            {node}
-          </ThemeProvider>
-        </I18nContainer>
-      </Provider>
-    </ApolloProvider>
-  )
-
-  return { component: component.update(), store }
+  return mount(<PropProxy {...node.props} />, options)
 }
 
 export const mockDeathApplicationDataWithoutFirstNames = {
@@ -2986,10 +3095,7 @@ export const getFileFromBase64String = (
 
 export async function goToSection(component: ReactWrapper, nth: number) {
   for (let i = 0; i < nth; i++) {
-    component
-      .find('#next_section')
-      .hostNodes()
-      .simulate('click')
+    component.find('#next_section').hostNodes().simulate('click')
 
     await flushPromises()
     component.update()
@@ -3035,10 +3141,7 @@ export async function getReviewFormFromStore(
 }
 
 export async function setPinCode(component: ReactWrapper) {
-  component
-    .find('#createPinBtn')
-    .hostNodes()
-    .simulate('click')
+  component.find('#createPinBtn').hostNodes().simulate('click')
 
   for (let i = 1; i <= 8; i++) {
     component
@@ -3056,4 +3159,92 @@ export function setPageVisibility(isVisible: boolean) {
   const evt = document.createEvent('HTMLEvents')
   evt.initEvent('visibilitychange', false, true)
   document.dispatchEvent(evt)
+}
+
+export function loginAsFieldAgent(store: AppStore) {
+  return store.dispatch(
+    setUserDetails({
+      loading: false,
+      networkStatus: NetworkStatus.ready,
+      stale: false,
+      data: {
+        getUser: {
+          userMgntUserID: '5eba726866458970cf2e23c2',
+          practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+          mobile: '+8801711111111',
+          role: 'FIELD_AGENT',
+          type: 'CHA',
+          status: 'active',
+          name: [
+            {
+              use: 'en',
+              firstNames: 'Shakib',
+              familyName: 'Al Hasan'
+            }
+          ],
+          catchmentArea: [
+            {
+              id: '514cbc3a-cc99-4095-983f-535ea8cb6ac0',
+              name: 'Baniajan',
+              alias: ['বানিয়াজান'],
+              status: 'active',
+              identifier: [
+                {
+                  system: 'http://opencrvs.org/specs/id/a2i-internal-reference',
+                  value: 'division=9&district=30&upazila=233&union=4194'
+                }
+              ]
+            }
+          ],
+          primaryOffice: {
+            id: '0d8474da-0361-4d32-979e-af91f012340a',
+            name: 'Kaliganj Union Sub Center',
+            status: 'active'
+          },
+          localRegistrar: {
+            name: [
+              {
+                use: 'en',
+                firstNames: 'Mohammad',
+                familyName: 'Ashraful'
+              }
+            ],
+            role: 'LOCAL_REGISTRAR',
+            signature: undefined
+          }
+        }
+      }
+    })
+  )
+}
+
+export function createRouterProps<T, Params>(
+  path: string,
+  locationState?: T,
+  {
+    search,
+    matchParams = {} as Params
+  }: { search?: Record<string, string>; matchParams?: Params } = {}
+) {
+  const location = createLocation(path, locationState)
+
+  /*
+   * Uses memory history because goBack
+   * wasn't working in the test environment
+   */
+  const history = createMemoryHistory<T>({
+    initialEntries: [path]
+  })
+  history.location = location
+  if (search) {
+    location.search = stringify(search)
+  }
+  const match: Match<Params> = {
+    isExact: false,
+    path,
+    url: path,
+    params: matchParams
+  }
+
+  return { location, history, match }
 }

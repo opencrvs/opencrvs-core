@@ -69,7 +69,7 @@ function Within45DaysTableComponent(props: ITableProps) {
   const content =
     (props.data &&
       props.data.details &&
-      props.data.details.map(item => ({
+      props.data.details.map((item) => ({
         location: item.locationName,
         startTime: item.startOfMonth,
         month: `${item.month} ${item.year}`,
@@ -159,7 +159,8 @@ function Within45DaysTableComponent(props: ITableProps) {
           width: 40,
           isSortable: true,
           sortFunction: () => toggleSort(firstColProp.sortKey),
-          icon: <ArrowDownBlue />
+          icon: <ArrowDownBlue />,
+          isSorted: true
         },
         {
           key: 'totalRegistered',

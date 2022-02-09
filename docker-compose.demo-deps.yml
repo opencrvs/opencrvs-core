@@ -1,0 +1,108 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+# graphic logo are (registered/a) trademark(s) of Plan International.
+version: '3.3'
+
+services:
+  # For dependencies, expose ports locally for dev
+  mongo1:
+    ports:
+      - '27017:27017'
+    volumes:
+      - './data/mongo:/data/db'
+    logging:
+      driver: 'none'
+
+  redis:
+    ports:
+      - '6379:6379'
+    logging:
+      driver: 'none'
+
+  elasticsearch:
+    ports:
+      - '9200:9200'
+      - '9300:9300'
+    volumes:
+      - './data/elasticsearch:/usr/share/elasticsearch/data'
+    logging:
+      driver: 'none'
+    environment:
+      - 'cluster.routing.allocation.disk.threshold_enabled=false'
+      - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
+      #- discovery.type=single-node
+      #- http.port=9200
+      #- http.cors.enabled=true
+      #- http.cors.allow-origin=http://localhost:1358,http://127.0.0.1:1358
+      #- http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
+      #- http.cors.allow-credentials=true
+      #- bootstrap.memory_lock=true
+      #- "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+
+  # elasticsearch browser.  Uncomment during development, along with the environment variables for elastic above, to browse Elastic via a GUI at http://localhost:1358/
+  #dejavu:
+  #image: appbaseio/dejavu:3.2.3
+  #container_name: dejavu
+  #ports:
+  #  - "1358:1358"
+  #links:
+  #  - elasticsearch
+
+  # grafana browser.  Uncomment during development, to browse Influxdb via a GUI at http://localhost:4000/
+  # influx will be running on http://influxdb:8086
+  #grafana:
+  #image: grafana/grafana:5.1.0
+  #ports:
+  #  - "4000:3000"
+  #volumes:
+  #  - ./grafana:/var/lib/grafana
+
+  influxdb:
+    ports:
+      - '8086:8086'
+    volumes:
+      - './data/influxdb:/var/lib/influxdb'
+    logging:
+      driver: 'none'
+
+  # Expose dev secrets as a plain volume - these will use docker secrets in staging and prod
+  hearth:
+    volumes:
+      - '.secrets/public-key.pem:/secrets/public-key.pem'
+      - './infrastructure/hearth-plugins/checkDuplicateTask.js:/src/hearth/lib/plugins/checkDuplicateTask.js'
+      - './infrastructure/hearth-queryparam-extensions.json:/src/hearth/config/queryparam-extensions.json'
+    logging:
+      driver: 'none'
+    ports:
+      - '3447:3447'
+
+  # Expose config as a plain volume - these will use docker config in staging and prod
+  openhim-console:
+    volumes:
+      - './infrastructure/openhim-console-config.json:/usr/share/nginx/html/config/default.json'
+    logging:
+      driver: 'none'
+    ports:
+      - '8888:80'
+
+  openhim-core:
+    ports:
+      - '8080:8080'
+      - '5000:5000'
+      - '5001:5001'
+    extra_hosts:
+      - 'gateway:${LOCAL_IP-172.17.0.1}'
+      - 'workflow:${LOCAL_IP-172.17.0.1}'
+      - 'search:${LOCAL_IP-172.17.0.1}'
+      - 'auth:${LOCAL_IP-172.17.0.1}'
+      - 'user-mgnt:${LOCAL_IP-172.17.0.1}'
+      - 'notification:${LOCAL_IP-172.17.0.1}'
+      - 'metrics:${LOCAL_IP-172.17.0.1}'
+      - 'bgd-dhis2-mediator:${LOCAL_IP-172.17.0.1}'
+      - 'age-verification-mediator:${LOCAL_IP-172.17.0.1}'

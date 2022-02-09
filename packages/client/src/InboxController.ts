@@ -56,7 +56,7 @@ export class InboxController {
   public client: ApolloClient<{}> & {
     setRequestHandler: (query: DocumentNode, handler: RequestHandler) => void // used for mocking in tests
   }
-  public syncRunning: boolean = false
+  public syncRunning = false
 
   constructor(store: AppStore) {
     this.store = store

@@ -13,7 +13,7 @@ import gql from 'graphql-tag'
 import { client } from '@client/utils/apolloClient'
 
 export const SEARCH_USERS = gql`
-  query($count: Int, $skip: Int, $primaryOfficeId: String) {
+  query ($count: Int, $skip: Int, $primaryOfficeId: String) {
     searchUsers(count: $count, skip: $skip, primaryOfficeId: $primaryOfficeId) {
       totalItems
       results {
@@ -28,13 +28,17 @@ export const SEARCH_USERS = gql`
         type
         status
         underInvestigation
+        avatar {
+          type
+          data
+        }
       }
     }
   }
 `
 
 export const GET_USER = gql`
-  query($userId: String) {
+  query ($userId: String) {
     getUser(userId: $userId) {
       id
       name {
@@ -72,12 +76,21 @@ export const GET_USER = gql`
         data
       }
       creationDate
+      avatar {
+        type
+        data
+      }
+      device
+      avatar {
+        type
+        data
+      }
     }
   }
 `
 
 export const FETCH_TIME_LOGGED_METRICS_FOR_PRACTITIONER = gql`
-  query(
+  query (
     $timeStart: String!
     $timeEnd: String!
     $practitionerId: String!

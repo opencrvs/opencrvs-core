@@ -28,19 +28,19 @@ function existsInContentful(obj: any, value: string): boolean {
 }
 
 async function extractMessages() {
-  const RESOURCES_PATH = process.argv[2]
+  const COUNTRY_CONFIG_PATH = process.argv[2]
   const COUNTRY_CODE = process.argv[3]
   const client = JSON.parse(
     fs
       .readFileSync(
-        `${RESOURCES_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/client.json`
+        `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/client.json`
       )
       .toString()
   )
   const contentfulIds = JSON.parse(
     fs
       .readFileSync(
-        `${RESOURCES_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/contentful-ids.json`
+        `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/contentful-ids.json`
       )
       .toString()
   )
@@ -54,13 +54,13 @@ async function extractMessages() {
         throw new Error(err)
       }
       let res: Message[]
-      files.forEach(f => {
+      files.forEach((f) => {
         const contents = fs.readFileSync(f).toString()
         var res = main(contents)
         results = results.concat(res)
       })
       const reactIntlDescriptions: IReactIntlDescriptions = {}
-      results.forEach(r => {
+      results.forEach((r) => {
         reactIntlDescriptions[r.id] = r.description
       })
       const contentfulKeysToMigrate: string[] = []
@@ -69,7 +69,7 @@ async function extractMessages() {
       ).messages
       let missingKeys = false
 
-      Object.keys(reactIntlDescriptions).forEach(key => {
+      Object.keys(reactIntlDescriptions).forEach((key) => {
         if (!englishTranslations.hasOwnProperty(key)) {
           missingKeys = true
           // eslint-disable-line no-console
@@ -78,7 +78,7 @@ async function extractMessages() {
               `No English translation key exists for message id.  Remeber to translate and add for all locales!!!: ${chalk.white(
                 key
               )} in ${chalk.white(
-                `${RESOURCES_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/client.json`
+                `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/client.json`
               )}`
             )}`
           )
@@ -96,7 +96,7 @@ async function extractMessages() {
             `${chalk.yellow(
               'This key must be migrated into your Contentful CMS.  Saving to ...'
             )} in ${chalk.white(
-              `${RESOURCES_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/contentful-keys-to-migrate.json`
+              `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/contentful-keys-to-migrate.json`
             )}`
           )
           contentfulKeysToMigrate.push(key)
@@ -115,11 +115,11 @@ async function extractMessages() {
       }
 
       fs.writeFileSync(
-        `${RESOURCES_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/descriptions.json`,
+        `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/descriptions.json`,
         JSON.stringify({ data: reactIntlDescriptions }, null, 2)
       )
       fs.writeFileSync(
-        `${RESOURCES_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/contentful-keys-to-migrate.json`,
+        `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/contentful-keys-to-migrate.json`,
         JSON.stringify(contentfulKeysToMigrate, null, 2)
       )
     })

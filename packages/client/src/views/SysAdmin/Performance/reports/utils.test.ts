@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { getValueWithPercentageString } from './utils'
+import {
+  getValueWithPercentageString,
+  getLocationFromPartOfLocationId
+} from './utils'
+import { mockOfflineData } from '@client/tests/util'
 
 describe('reports utils tests', () => {
   describe('getValueWithPercentage tests', () => {
@@ -27,6 +31,47 @@ describe('reports utils tests', () => {
       const expectedResult = '0 (0%)'
 
       expect(getValueWithPercentageString(value, total)).toBe(expectedResult)
+    })
+  })
+  describe('getLocationFromPartOfLocationId tests', () => {
+    it('returns location name for a valid location', () => {
+      const offlineCountryConfiguration = mockOfflineData
+      const locationId = 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
+
+      expect(
+        getLocationFromPartOfLocationId(locationId, offlineCountryConfiguration)
+      ).toEqual({
+        id: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
+        name: 'Barisal',
+        alias: 'বরিশাল',
+        physicalType: 'Jurisdiction',
+        jurisdictionType: 'DIVISION',
+        type: 'ADMIN_STRUCTURE',
+        partOf: 'Location/0'
+      })
+    })
+    it('returns office name for a valid office', () => {
+      const offlineCountryConfiguration = mockOfflineData
+      const locationId = 'Location/0d8474da-0361-4d32-979e-af91f012340a'
+
+      expect(
+        getLocationFromPartOfLocationId(locationId, offlineCountryConfiguration)
+      ).toEqual({
+        id: '0d8474da-0361-4d32-979e-af91f012340a',
+        name: 'Moktarpur Union Parishad',
+        alias: 'মোক্তারপুর ইউনিয়ন পরিষদ',
+        physicalType: 'Building',
+        type: 'CRVS_OFFICE',
+        partOf: 'Location/7a18cb4c-38f3-449f-b3dc-508473d485f3'
+      })
+    })
+    it('returns empty string for an invalid office/location', () => {
+      const offlineCountryConfiguration = mockOfflineData
+      const locationId = 'Location/0'
+
+      expect(
+        getLocationFromPartOfLocationId(locationId, offlineCountryConfiguration)
+      ).toEqual({ name: '' })
     })
   })
 })

@@ -11,16 +11,17 @@
  */
 import { createStore } from '@client/store'
 import { createTestComponent } from '@client/tests/util'
+
 import * as React from 'react'
 import { NOTIFICATION_TYPE, ToastNotification } from './ToastNotification'
 
 describe('Test toast notification', () => {
-  const { store } = createStore()
+  const { store, history } = createStore()
 
   it('checks if the appropriate toast is rendered', async () => {
-    const { component } = await createTestComponent(
+    const component = await createTestComponent(
       <ToastNotification type={NOTIFICATION_TYPE.ERROR} />,
-      store
+      { store, history }
     )
 
     expect(component.find('#error-toast').hostNodes()).toHaveLength(1)

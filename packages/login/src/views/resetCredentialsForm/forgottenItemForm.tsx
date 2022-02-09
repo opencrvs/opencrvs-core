@@ -95,7 +95,7 @@ class ForgottenItemComponent extends React.Component<Props, State> {
                   {intl.formatMessage(messages.error)}
                 </ErrorText>
               )}
-              {forgottenItems.map(item => {
+              {forgottenItems.map((item) => {
                 return (
                   <RadioButton
                     id={item.id}

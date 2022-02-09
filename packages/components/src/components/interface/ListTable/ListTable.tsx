@@ -21,14 +21,12 @@ const Wrapper = styled.div<{
   isFullPage?: boolean
   fixedWidth: number | undefined
 }>`
- 
   ${({ fixedWidth }) =>
     fixedWidth ? `width: ${fixedWidth}px;` : `width: 100%`}
 
-
-    @media (max-width: ${({ fixedWidth, theme }) => fixedWidth}px) {
-      width: 100%;
-    }
+  @media (max-width: ${({ fixedWidth, theme }) => fixedWidth}px) {
+    width: 100%;
+  }
   background: ${({ theme }) => theme.colors.white};
   ${({ hideBoxShadow, isFullPage, theme }) =>
     isFullPage
@@ -50,9 +48,8 @@ const TableHeader = styled.div<{
   totalWidth?: number
   fixedWidth?: number
 }>`
-
-${({ fixedWidth, totalWidth }) =>
-  fixedWidth ? `width: ${fixedWidth}px;` : `width: ${totalWidth || 100}%;`}
+  ${({ fixedWidth, totalWidth }) =>
+    fixedWidth ? `width: ${fixedWidth}px;` : `width: ${totalWidth || 100}%;`}
   border-bottom: 1px solid ${({ theme }) => theme.colors.disabled};
   color: ${({ theme }) => theme.colors.copy};
   padding: 10px 0px;
@@ -70,10 +67,10 @@ ${({ fixedWidth, totalWidth }) =>
 `
 
 const TableHeaderText = styled.div<{
-  isSortable?: boolean
+  isSorted?: boolean
 }>`
-  ${({ isSortable, theme }) =>
-    isSortable ? theme.fonts.bodyBoldStyle : theme.fonts.bodyStyle}
+  ${({ isSorted, theme }) =>
+    isSorted ? theme.fonts.bodyBoldStyle : theme.fonts.bodyStyle}
 `
 
 const TableBody = styled.div<{ footerColumns: boolean }>`
@@ -83,21 +80,57 @@ const TableBody = styled.div<{ footerColumns: boolean }>`
     ${({ footerColumns }) => (footerColumns ? 'border-bottom: none;' : '')};
   }
 `
-const RowWrapper = styled.div<{ totalWidth: number; highlight?: boolean }>`
+const RowWrapper = styled.div<{
+  totalWidth: number
+  highlight?: boolean
+  height?: IBreakpoint
+  horizontalPadding?: IBreakpoint
+}>`
   width: 100%;
+  min-height: 48px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.disabled};
   display: flex;
   align-items: center;
-  min-height: 48px;
+  ${({ height }) =>
+    height ? `min-height:${height.lg}px;` : `min-height: 48px)`};
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    ${({ height }) =>
+      height ? `min-height:${height.md}px` : `min-height: 48px)`};
+  }
   ${({ highlight, theme }) =>
     highlight && `:hover { background-color: ${theme.colors.dropdownHover};}`}
+
   & span:first-child {
-    padding-left: 12px;
+    ${({ horizontalPadding }) =>
+      horizontalPadding
+        ? `padding-left:${horizontalPadding.lg}px;`
+        : `padding-left: 12px;`}
   }
 
   & span:last-child {
     text-align: right;
-    padding-right: 12px;
+    ${({ horizontalPadding }) =>
+      horizontalPadding
+        ? `padding-right:${horizontalPadding.lg}px;`
+        : `padding-right: 12px;`}
+  }
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    & span:first-child {
+      text-align: right;
+      ${({ horizontalPadding }) =>
+        horizontalPadding
+          ? `padding-left:${horizontalPadding.md}px;`
+          : `padding-left: 12px;`}
+    }
+
+    & span:last-child {
+      text-align: right;
+      ${({ horizontalPadding }) =>
+        horizontalPadding
+          ? `padding-right:${horizontalPadding.md}px;`
+          : `padding-right: 12px;`}
+    }
   }
 `
 const TableFooter = styled(RowWrapper)`
@@ -141,7 +174,7 @@ const ValueWrapper = styled.span<{
   flex-shrink: 0;
   margin: auto 0;
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
-  padding-right: 10px;
+  padding-right: 8px;
   ${({ color }) => color && `color: ${color};`}
 `
 const Error = styled.span`
@@ -240,6 +273,10 @@ interface IListTableProps {
   footerColumns?: IFooterFColumn[]
   noResultText: string
   tableHeight?: number
+  rowStyle?: {
+    height: IBreakpoint
+    horizontalPadding: IBreakpoint
+  }
   onPageChange?: (currentPage: number) => void
   disableScrollOnOverflow?: boolean
   pageSize?: number
@@ -259,6 +296,11 @@ interface IListTableState {
   sortIconInverted: boolean
   sortKey: string | null
   tableOffsetTop: number
+}
+
+interface IBreakpoint {
+  lg: number
+  md: number
 }
 
 export class ListTable extends React.Component<
@@ -328,6 +370,7 @@ export class ListTable extends React.Component<
       isLoading = false,
       tableTitle,
       tableHeight,
+      rowStyle,
       hideBoxShadow,
       hideTableHeader,
       footerColumns,
@@ -372,7 +415,7 @@ export class ListTable extends React.Component<
                           preference.sortFunction(preference.key)
                         }
                       >
-                        <TableHeaderText isSortable={preference.isSortable}>
+                        <TableHeaderText isSorted={preference.isSorted}>
                           {preference.label}
                           <ToggleSortIcon
                             toggle={
@@ -408,6 +451,8 @@ export class ListTable extends React.Component<
                           key={index}
                           totalWidth={totalWidth}
                           highlight={highlightRowOnMouseOver}
+                          height={rowStyle?.height}
+                          horizontalPadding={rowStyle?.horizontalPadding}
                         >
                           {columns.map((preference, indx) => {
                             return (

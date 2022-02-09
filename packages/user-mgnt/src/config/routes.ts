@@ -15,6 +15,9 @@ import activateUser, {
 import changePasswordHandler, {
   changePasswordRequestSchema
 } from '@user-mgnt/features/changePassword/handler'
+import changeAvatarHandler, {
+  changeAvatarRequestSchema
+} from '@user-mgnt/features/changeAvatar/handler'
 import createUser from '@user-mgnt/features/createUser/handler'
 import getRoles, {
   searchRoleSchema
@@ -68,6 +71,9 @@ import * as Hapi from '@hapi/hapi'
 import resendSMSInviteHandler, {
   requestSchema as resendSMSRequestSchema
 } from '@user-mgnt/features/resendSMSInvite/handler'
+import changePhoneHandler, {
+  changePhoneRequestSchema
+} from '@user-mgnt/features/changePhone/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -189,6 +195,56 @@ export const getRoutes = () => {
         },
         validate: {
           payload: changePasswordRequestSchema
+        },
+        response: {
+          schema: false
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/changeUserPhone',
+      handler: changePhoneHandler,
+      config: {
+        tags: ['api'],
+        description: 'Changes password for logged-in user',
+        auth: {
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN,
+            RouteScope.VALIDATE
+          ]
+        },
+        validate: {
+          payload: changePhoneRequestSchema
+        },
+        response: {
+          schema: false
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/changeUserAvatar',
+      handler: changeAvatarHandler,
+      config: {
+        tags: ['api'],
+        description: 'Changes avatar for logged-in user',
+        auth: {
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN,
+            RouteScope.VALIDATE
+          ]
+        },
+        validate: {
+          payload: changeAvatarRequestSchema
         },
         response: {
           schema: false

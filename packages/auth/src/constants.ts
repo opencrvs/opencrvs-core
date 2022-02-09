@@ -55,12 +55,12 @@ export const WEB_USER_JWT_AUDIENCES = [
   'opencrvs:workflow-user',
   'opencrvs:search-user',
   'opencrvs:metrics-user',
-  'opencrvs:resources-user',
+  'opencrvs:countryconfig-user',
   'opencrvs:webhooks-user'
 ]
 export const NOTIFICATION_API_USER_AUDIENCE = 'opencrvs:notification-api-user'
 export const VALIDATOR_API_USER_AUDIENCE = 'opencrvs:validator-api-user'
-export const CHATBOT_API_USER_AUDIENCE = 'opencrvs:chatbot-api-user'
+export const AGE_VERIFICATION_USER_AUDIENCE = 'opencrvs:age-verification-user'
 export const NATIONAL_ID_USER_AUDIENCE = 'opencrvs:nationalId-api-user'
 export const JWT_ISSUER = 'opencrvs:auth-service'
 export const INVALID_TOKEN_NAMESPACE = 'invalidToken'

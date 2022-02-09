@@ -167,7 +167,7 @@ function getNextSectionIds(
 
   if (currentGroupIndex === visibleGroups.length - 1) {
     const visibleSections = sections.filter(
-      section =>
+      (section) =>
         section.viewType !== VIEW_TYPE.HIDDEN &&
         getVisibleSectionGroupsBasedOnConditions(
           section,
@@ -201,6 +201,12 @@ export interface IFormProps {
   duplicate?: boolean
 }
 
+export type RouteProps = RouteComponentProps<{
+  pageId: string
+  groupId: string
+  applicationId: string
+}>
+
 type DispatchProps = {
   goToPageGroup: typeof goToPageGroupAction
   goBack: typeof goBackAction
@@ -218,16 +224,14 @@ type Props = {
   setAllFieldsDirty: boolean
   fieldsToShowValidationErrors?: IFormField[]
   isWritingDraft: boolean
+  scope: Scope | null
 }
 
 export type FullProps = IFormProps &
   Props &
   DispatchProps &
-  IntlShapeProps & { scope: Scope } & RouteComponentProps<{
-    pageId: string
-    groupId?: string
-    applicationId: string
-  }>
+  IntlShapeProps &
+  RouteProps
 
 type State = {
   isDataAltered: boolean
@@ -370,13 +374,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   toggleRejectForm = () => {
-    this.setState(state => ({
+    this.setState((state) => ({
       rejectFormOpen: !state.rejectFormOpen
     }))
   }
 
   toggleConfirmationModal = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       showConfirmationModal: !prevState.showConfirmationModal
     }))
   }
@@ -440,9 +444,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
         groupHasError = true
       } else {
         const activeSectionFields = this.props.activeSectionGroup.fields
-        const activeSectionValues = this.props.application.data[
-          this.props.activeSection.id
-        ]
+        const activeSectionValues =
+          this.props.application.data[this.props.activeSection.id]
         groupHasError = hasFormError(activeSectionFields, activeSectionValues)
       }
       if (groupHasError) {
@@ -451,8 +454,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
       }
     }
 
+    this.updateVisitedGroups()
+
     this.props.writeApplication(this.props.application, () => {
-      this.updateVisitedGroups()
       this.props.goToPageGroup(pageRoute, applicationId, pageId, groupId, event)
     })
   }
@@ -461,7 +465,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const visitedGroups = this.props.application.visitedGroupIds || []
     if (
       visitedGroups.findIndex(
-        visitedGroup =>
+        (visitedGroup) =>
           visitedGroup.sectionId === this.props.activeSection.id &&
           visitedGroup.groupId === this.props.activeSectionGroup.id
       ) === -1
@@ -674,7 +678,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
                             activeSectionGroup.fields.length === 1 && (
                               <>
                                 {
-                                  (activeSectionGroup.fields[0].hideHeader = true)
+                                  (activeSectionGroup.fields[0].hideHeader =
+                                    true)
                                 }
                                 {intl.formatMessage(
                                   activeSectionGroup.fields[0].label
@@ -728,7 +733,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                         >
                           <FormFieldGenerator
                             id={activeSectionGroup.id}
-                            onChange={values => {
+                            onChange={(values) => {
                               debouncedModifyApplication(
                                 values,
                                 activeSection,
@@ -741,7 +746,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                             }
                             fields={getVisibleGroupFields(activeSectionGroup)}
                             draftData={application.data}
-                            onSetTouched={setTouchedFunc => {
+                            onSetTouched={(setTouchedFunc) => {
                               this.setAllFormFieldsTouched = setTouchedFunc
                             }}
                           />
@@ -860,7 +865,7 @@ export function replaceInitialValues(
   sectionValues: any,
   data?: IFormData
 ) {
-  return fields.map(field => ({
+  return fields.map((field) => ({
     ...field,
     initialValue:
       isUndefined(sectionValues[field.name]) ||
@@ -874,22 +879,13 @@ function firstVisibleSection(form: IForm) {
   return form.sections.filter(({ viewType }) => viewType !== 'hidden')[0]
 }
 
-function mapStateToProps(
-  state: IStoreState,
-  props: IFormProps &
-    Props &
-    RouteComponentProps<{
-      pageId: string
-      groupId?: string
-      applicationId: string
-    }>
-) {
+function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
   const { match, registerForm, application } = props
 
   const sectionId = match.params.pageId || firstVisibleSection(registerForm).id
 
   const activeSection = registerForm.sections.find(
-    section => section.id === sectionId
+    (section) => section.id === sectionId
   )
   if (!activeSection) {
     throw new Error(`Configuration for tab "${match.params.pageId}" missing!`)
@@ -902,7 +898,7 @@ function mapStateToProps(
       application.data
     )[0].id
   const activeSectionGroup = activeSection.groups.find(
-    group => group.id === groupId
+    (group) => group.id === groupId
   )
   if (!activeSectionGroup) {
     throw new Error(
@@ -917,7 +913,7 @@ function mapStateToProps(
   const setAllFieldsDirty =
     (application.visitedGroupIds &&
       application.visitedGroupIds.findIndex(
-        visitedGroup =>
+        (visitedGroup) =>
           visitedGroup.sectionId === activeSection.id &&
           visitedGroup.groupId === activeSectionGroup.id
       ) > -1) ||
@@ -938,24 +934,22 @@ function mapStateToProps(
   }
 
   return {
-    registerForm,
-    scope: getScope(state),
-    isWritingDraft: state.applicationsState.isWritingDraft,
-    setAllFieldsDirty,
-    fieldsToShowValidationErrors: updatedFields,
     activeSection,
     activeSectionGroup: {
       ...activeSectionGroup,
       fields
     },
-    application
+    setAllFieldsDirty,
+    fieldsToShowValidationErrors: updatedFields,
+    isWritingDraft: state.applicationsState.isWritingDraft,
+    scope: getScope(state)
   }
 }
 
 export const RegisterForm = connect<
   Props,
   DispatchProps,
-  FullProps,
+  IFormProps & RouteProps,
   IStoreState
 >(mapStateToProps, {
   writeApplication,

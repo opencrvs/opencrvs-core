@@ -31,16 +31,18 @@ if (
   })
 
   // setup log rocket to ship log messages and record user errors
-  LogRocket.init(window.config.LOGROCKET)
+  if (window.config.LOGROCKET) {
+    LogRocket.init(window.config.LOGROCKET)
+  }
 
   // Integrate the two
-  Sentry.configureScope(scope => {
-    scope.addEventProcessor(async event => {
+  Sentry.configureScope((scope) => {
+    scope.addEventProcessor(async (event) => {
       if (!event.extra) {
         event.extra = {}
       }
-      const sessionUrl = await new Promise(resolve => {
-        LogRocket.getSessionURL(url => {
+      const sessionUrl = await new Promise((resolve) => {
+        LogRocket.getSessionURL((url) => {
           resolve(url)
         })
       })

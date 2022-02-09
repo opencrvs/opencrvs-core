@@ -29,7 +29,8 @@ services:
       - './data/elasticsearch:/usr/share/elasticsearch/data'
     environment:
       - 'cluster.routing.allocation.disk.threshold_enabled=false'
-      - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
+      - 'ES_JAVA_OPTS=-Xms1024m -Xmx1024m -XX:UseSSE=2'
+      - bootstrap.system_call_filter=false
       #- discovery.type=single-node
       #- http.port=9200
       #- http.cors.enabled=true
@@ -93,4 +94,4 @@ services:
       - 'notification:${LOCAL_IP-172.17.0.1}'
       - 'metrics:${LOCAL_IP-172.17.0.1}'
       - 'bgd-dhis2-mediator:${LOCAL_IP-172.17.0.1}'
-      - 'ocrvs-chatbot-mediator:${LOCAL_IP-172.17.0.1}'
+      - 'age-verification-mediator:${LOCAL_IP-172.17.0.1}'

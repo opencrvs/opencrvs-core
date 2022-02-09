@@ -307,7 +307,7 @@ class ReviewActionComponent extends React.Component<
 > {
   state = { showSubmitModal: false }
   toggleSubmitModalOpen = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       showSubmitModal: !prevState.showSubmitModal
     }))
   }
@@ -412,7 +412,7 @@ class ReviewActionComponent extends React.Component<
               event: application.event
             })}
             responsive={false}
-            contentHeight={96}
+            autoHeight={true}
             actions={[
               <TertiaryButton
                 id="cancel-btn"

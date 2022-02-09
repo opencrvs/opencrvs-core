@@ -105,13 +105,13 @@ const messagesToDefine = {
   successPageTitle: {
     id: 'resetCredentials.success.page.title',
     defaultMessage:
-      '{forgottenItem, select, username {Username reminder sent} password {Passowrd reset successful}}',
+      '{forgottenItem, select, username {Username reminder sent} password {Passowrd reset successful} other {}}',
     description: 'Title for success page'
   },
   successPageSubtitle: {
     id: 'resetCredentials.success.page.subtitle',
     defaultMessage:
-      '{forgottenItem, select, username {Check your phone for a reminder of your username} password {You can now login with your new password}}',
+      '{forgottenItem, select, username {Check your phone for a reminder of your username} password {You can now login with your new password}} other {}',
     description: 'Subtitle for success page'
   },
 
@@ -128,7 +128,7 @@ const messagesToDefine = {
   credentialsResetFormTitle: {
     id: 'resetCredentials.form.title',
     defaultMessage:
-      '{forgottenItem, select, username {Username reminder request} password {Password reset}}',
+      '{forgottenItem, select, username {Username reminder request} password {Password reset} other {}} ',
     description: 'Title used reset credentials forms'
   },
   phoneNumberFieldLabel: {

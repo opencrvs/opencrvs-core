@@ -24,7 +24,7 @@ import {
   findPersonEntry,
   getSectionEntryBySectionCode
 } from '@workflow/features/registration/fhir/fhir-template'
-import { ITokenPayload, USER_SCOPE } from '@workflow/utils/authUtils.ts'
+import { ITokenPayload, USER_SCOPE } from '@workflow/utils/authUtils'
 import fetch from 'node-fetch'
 import { getEventType } from '@workflow/features/registration/utils'
 
@@ -73,7 +73,7 @@ export async function getCRVSOfficeName(fhirBundle: fhir.Bundle) {
   }
   const taskResource = getTaskResource(fhirBundle) as fhir.Task
   const regLastOfficeExt = taskResource?.extension?.find(
-    ext => ext.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`
+    (ext) => ext.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`
   )
   if (!regLastOfficeExt || !regLastOfficeExt.valueReference) {
     throw new Error('No last registration office found on the bundle')
@@ -115,7 +115,7 @@ export function getTrackingIdFromTaskResource(taskResource: fhir.Task) {
   const trackingIdentifier =
     taskResource &&
     taskResource.identifier &&
-    taskResource.identifier.find(identifier => {
+    taskResource.identifier.find((identifier) => {
       return (
         identifier.system ===
           `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id` ||
@@ -133,7 +133,7 @@ export function getBirthRegistrationNumber(taskResource: fhir.Task) {
   const brnIdentifier =
     taskResource &&
     taskResource.identifier &&
-    taskResource.identifier.find(identifier => {
+    taskResource.identifier.find((identifier) => {
       return (
         identifier.system ===
         `${OPENCRVS_SPECIFICATION_URL}id/birth-registration-number`
@@ -148,7 +148,7 @@ export function getDeathRegistrationNumber(taskResource: fhir.Task) {
   const drnIdentifier =
     taskResource &&
     taskResource.identifier &&
-    taskResource.identifier.find(identifier => {
+    taskResource.identifier.find((identifier) => {
       return (
         identifier.system ===
         `${OPENCRVS_SPECIFICATION_URL}id/death-registration-number`
@@ -181,7 +181,7 @@ export function getPaperFormID(taskResource: fhir.Task) {
   const paperFormIdentifier =
     taskResource &&
     taskResource.identifier &&
-    taskResource.identifier.find(identifier => {
+    taskResource.identifier.find((identifier) => {
       return (
         identifier.system === `${OPENCRVS_SPECIFICATION_URL}id/paper-form-id`
       )
@@ -224,10 +224,10 @@ export const getFromFhir = (suffix: string) => {
       'Content-Type': 'application/json+fhir'
     }
   })
-    .then(response => {
+    .then((response) => {
       return response.json()
     })
-    .catch(error => {
+    .catch((error) => {
       return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
     })
 }
@@ -280,7 +280,7 @@ export async function getPhoneNo(
     const phoneExtension =
       taskResource &&
       taskResource.extension &&
-      taskResource.extension.find(extension => {
+      taskResource.extension.find((extension) => {
         return (
           extension.url ===
           `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-phone-number`

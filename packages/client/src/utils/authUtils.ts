@@ -95,8 +95,8 @@ export function refreshToken() {
         token
       })
     })
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         removeToken()
         storeToken(data.token)
       })

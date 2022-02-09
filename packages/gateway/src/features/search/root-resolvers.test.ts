@@ -377,28 +377,17 @@ describe('Search root resolvers', () => {
       }
     })
     it('returns an array of results for an authorized user', async () => {
-      fetch.mockResponses(
-        [
-          JSON.stringify({
-            entry: [
-              { resource: { id: 'dummy_loc_id1' } },
-              { resource: { id: 'dummy_loc_id2' } }
-            ]
-          }),
-          { status: 200 }
-        ],
-        [
-          JSON.stringify({
-            body: {
-              hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
-            }
-          })
-        ]
+      fetch.mockResponse(
+        JSON.stringify({
+          body: {
+            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          }
+        })
       )
       const result = await resolvers.Query.getEventsWithProgress(
         {},
         {
-          parentLocationId: 'dummy_loc_id_parent',
+          locationId: 'dummy_loc_id_parent',
           count: 25,
           skip: 25,
           type: ['birth-application'],
@@ -426,7 +415,7 @@ describe('Search root resolvers', () => {
       )
       const result = await resolvers.Query.getEventsWithProgress(
         {},
-        { parentLocationId: null },
+        { locationId: null },
         authorizedUser
       )
       expect(result.totalItems).toBe(0)

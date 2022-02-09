@@ -14,22 +14,24 @@ import { REGISTRATION_SECTION } from '@client/forms/register/fieldMappings/death
 import { GQLRegWorkflow } from '@opencrvs/gateway/src/graphql/schema'
 import { transformStatusData } from '@client/forms/register/fieldMappings/birth/query/registration-mappings'
 
-export const deceasedDateToFieldTransformation = (
-  alternativeSectionId?: string
-) => (
-  transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
-  field: IFormField
-) => {
-  const fromSectionId = alternativeSectionId ? alternativeSectionId : sectionId
-  if (!queryData[fromSectionId] || !queryData[fromSectionId].deceased) {
+export const deceasedDateToFieldTransformation =
+  (alternativeSectionId?: string) =>
+  (
+    transformedData: IFormData,
+    queryData: any,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    const fromSectionId = alternativeSectionId
+      ? alternativeSectionId
+      : sectionId
+    if (!queryData[fromSectionId] || !queryData[fromSectionId].deceased) {
+      return transformedData
+    }
+    transformedData[sectionId][field.name] =
+      queryData[fromSectionId].deceased.deathDate
     return transformedData
   }
-  transformedData[sectionId][field.name] =
-    queryData[fromSectionId].deceased.deathDate
-  return transformedData
-}
 
 export const deathPlaceToFieldTransformer = (
   transformedData: IFormData,

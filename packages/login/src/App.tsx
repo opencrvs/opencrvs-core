@@ -31,6 +31,7 @@ import { RecoveryCodeEntry } from './views/resetCredentialsForm/recoveryCodeEntr
 import { SecurityQuestion } from './views/resetCredentialsForm/securityQuestionForm'
 import { UpdatePassword } from './views/resetCredentialsForm/updatePasswordForm'
 import { Page } from './Page'
+import { LanguageSelect } from './i18n/components/LanguageSelect'
 
 export const { store, history } = createStore()
 
@@ -60,9 +61,11 @@ export class App extends React.Component<IAppProps> {
                 <Page>
                   <Switch>
                     <Route exact path={routes.STEP_ONE}>
-                      <DarkPageContainer>
-                        <StepOneContainer />
-                      </DarkPageContainer>
+                      <LanguageSelect>
+                        <DarkPageContainer>
+                          <StepOneContainer />
+                        </DarkPageContainer>
+                      </LanguageSelect>
                     </Route>
                     <Route exact path={routes.STEP_TWO}>
                       <DarkPageContainer>

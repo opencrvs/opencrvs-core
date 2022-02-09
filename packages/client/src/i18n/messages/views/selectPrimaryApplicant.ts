@@ -43,6 +43,5 @@ const messagesToDefine: ISelectPrimaryApplicantMessages = {
   }
 }
 
-export const messages: ISelectPrimaryApplicantMessages = defineMessages(
-  messagesToDefine
-)
+export const messages: ISelectPrimaryApplicantMessages =
+  defineMessages(messagesToDefine)

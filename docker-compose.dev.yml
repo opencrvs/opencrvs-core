@@ -71,8 +71,8 @@ services:
     ports:
       - '9090:9090'
 
-  resources:
-    image: opencrvs/ocrvs-zambia:latest
+  countryconfig:
+    image: opencrvs/ocrvs-farajaland:latest
     volumes:
       - '.secrets/public-key.pem:/secrets/public-key.pem'
     environment:

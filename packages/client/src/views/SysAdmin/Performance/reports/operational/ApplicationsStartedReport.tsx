@@ -14,7 +14,9 @@ import {
   Description,
   SubHeader,
   ReportHeader,
-  getJurisdictionLocationIdFromUserDetails
+  getJurisdictionLocationIdFromUserDetails,
+  isUnderJurisdictionOfUser,
+  getPrimaryLocationIdOfOffice
 } from '@opencrvs/client/src/views/SysAdmin/Performance/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { GQLApplicationsStartedMetrics } from '@opencrvs/gateway/src/graphql/schema'
@@ -44,8 +46,11 @@ const Report = styled.div<{
   }
 `
 
-const ApplicationsStartedReportHeader = styled(ReportHeader)`
-  border-top: 1px solid ${({ theme }) => theme.colors.dividerDark};
+const ApplicationsStartedReportHeader = styled(ReportHeader)<
+  Pick<IStateProps, 'isOfficeSelected'>
+>`
+  border-top: ${({ isOfficeSelected }) => (!isOfficeSelected ? '1' : '0')}px
+    solid ${({ theme }) => theme.colors.dividerDark};
 `
 
 const ApplicationsStartedSubHeader = styled(SubHeader)`
@@ -87,7 +92,7 @@ const KeyPercentage = styled.span`
 
 const PerformanceLink = styled(LinkButton)<{ disabled: boolean }>`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
-  ${({ disabled, theme }) =>
+  ${({ disabled }) =>
     disabled
       ? `
     cursor: default;
@@ -117,15 +122,19 @@ const LoaderBox = styled.span<{
   width: ${({ width }) => (width ? `${width}%` : '100%')};
 `
 
-type Props = WrappedComponentProps & BaseProps & IDispatchProps
+type Props = WrappedComponentProps & BaseProps & IStateProps & IDispatchProps
 
 interface BaseProps {
   data?: GQLApplicationsStartedMetrics
   loading?: boolean
   reportTimeFrom: moment.Moment
   reportTimeTo: moment.Moment
-  disableFieldAgentLink?: boolean
   locationId: string
+}
+
+interface IStateProps {
+  disableFieldAgentLink: boolean
+  isOfficeSelected: boolean
 }
 
 interface IDispatchProps {
@@ -210,16 +219,14 @@ class ApplicationsStartedReportComponent extends React.Component<
       reportTimeFrom,
       reportTimeTo,
       disableFieldAgentLink,
+      isOfficeSelected,
       locationId
     } = this.props
-    const {
-      fieldAgentApplications,
-      hospitalApplications,
-      officeApplications
-    } = data
+    const { fieldAgentApplications, hospitalApplications, officeApplications } =
+      data
     return (
       <>
-        <ApplicationsStartedReportHeader>
+        <ApplicationsStartedReportHeader isOfficeSelected={isOfficeSelected}>
           <ApplicationsStartedSubHeader>
             {intl.formatMessage(messages.applicationsStartedTitle)}
           </ApplicationsStartedSubHeader>
@@ -310,11 +317,23 @@ class ApplicationsStartedReportComponent extends React.Component<
   }
 }
 
-export const ApplicationsStartedReport = connect(
+export const ApplicationsStartedReport = connect<
+  IStateProps,
+  IDispatchProps,
+  BaseProps,
+  IStoreState
+>(
   (state: IStoreState, ownProps: BaseProps) => {
     const offlineLocations = getOfflineData(state).locations
-    let disableFieldAgentLink = !window.config.FIELD_AGENT_AUDIT_LOCATIONS.includes(
-      getJurisidictionType(offlineLocations, ownProps.locationId) as string
+    const offlineOffices = getOfflineData(state).offices
+
+    const isOfficeSelected = !!offlineOffices[ownProps.locationId]
+
+    let disableFieldAgentLink = !(
+      isOfficeSelected ||
+      window.config.FIELD_AGENT_AUDIT_LOCATIONS.includes(
+        getJurisidictionType(offlineLocations, ownProps.locationId) as string
+      )
     )
     const userDetails = getUserDetails(state)
     if (
@@ -322,12 +341,21 @@ export const ApplicationsStartedReport = connect(
       userDetails.role &&
       !SYS_ADMIN_ROLES.includes(userDetails.role)
     ) {
-      disableFieldAgentLink =
-        ownProps.locationId !==
+      const jurisdictionLocation =
         getJurisdictionLocationIdFromUserDetails(userDetails)
+      disableFieldAgentLink = !isUnderJurisdictionOfUser(
+        offlineLocations,
+        isOfficeSelected
+          ? getPrimaryLocationIdOfOffice(
+              offlineLocations,
+              offlineOffices[ownProps.locationId]
+            )
+          : ownProps.locationId,
+        jurisdictionLocation
+      )
     }
     return {
-      ...ownProps,
+      isOfficeSelected: isOfficeSelected,
       disableFieldAgentLink
     }
   },
