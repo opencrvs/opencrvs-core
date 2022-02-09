@@ -19,7 +19,9 @@ import { getEventType } from '@workflow/features/registration/utils'
 
 export const INFORMANT_CODE = 'informant-details'
 
-function isTask(resource: fhir.Resource | undefined): resource is fhir.Task {
+export function isTask(
+  resource: fhir.Resource | undefined
+): resource is fhir.Task {
   return resource?.resourceType === 'Task'
 }
 
