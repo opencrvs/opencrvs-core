@@ -19,6 +19,10 @@ import { getEventType } from '@workflow/features/registration/utils'
 
 export const INFORMANT_CODE = 'informant-details'
 
+function isTask(resource: fhir.Resource | undefined): resource is fhir.Task {
+  return resource?.resourceType === 'Task'
+}
+
 export function getTaskResource(bundle: fhir.Bundle & fhir.BundleEntry) {
   if (
     !bundle ||
@@ -31,7 +35,7 @@ export function getTaskResource(bundle: fhir.Bundle & fhir.BundleEntry) {
 
   if (bundle.entry[0].resource.resourceType === 'Composition') {
     return selectOrCreateTaskRefResource(bundle as fhir.Bundle)
-  } else if (bundle.entry[0].resource.resourceType === 'Task') {
+  } else if (isTask(bundle.entry[0].resource)) {
     return bundle.entry[0].resource
   } else {
     throw new Error('Unable to find Task Bundle from the provided data')
@@ -58,7 +62,7 @@ export function selectOrCreateTaskRefResource(fhirBundle: fhir.Bundle) {
 export function getTaskResourceFromFhirBundle(fhirBundle: fhir.Bundle) {
   const taskEntry =
     fhirBundle.entry &&
-    fhirBundle.entry.find(entry => {
+    fhirBundle.entry.find((entry) => {
       if (entry.resource && entry.resource.resourceType === 'Task') {
         return true
       }
@@ -136,7 +140,7 @@ export async function findPersonEntryByComposition(
   const personEntry =
     fhirBundle.entry &&
     fhirBundle.entry.find(
-      entry => entry.fullUrl === personSectionEntry.reference
+      (entry) => entry.fullUrl === personSectionEntry.reference
     )
 
   if (!personEntry) {
@@ -178,7 +182,7 @@ export function getSectionEntryBySectionCode(
       if (!section.code || !section.code.coding) {
         return false
       }
-      return section.code.coding.some(coding => coding.code === sectionCode)
+      return section.code.coding.some((coding) => coding.code === sectionCode)
     })
 
   if (!personSection || !personSection.entry) {
@@ -204,7 +208,9 @@ export function selectInformantResource(
       if (!section.code || !section.code.coding || !section.code.coding.some) {
         return false
       }
-      return section.code.coding.some(coding => coding.code === INFORMANT_CODE)
+      return section.code.coding.some(
+        (coding) => coding.code === INFORMANT_CODE
+      )
     })
 
   const informantSectionEntry =
@@ -215,7 +221,7 @@ export function selectInformantResource(
     fhirBundle &&
     fhirBundle.entry &&
     fhirBundle.entry.find(
-      entry => entry.fullUrl === informantSectionEntry.reference
+      (entry) => entry.fullUrl === informantSectionEntry.reference
     )
 
   const informantEntry =
@@ -223,7 +229,7 @@ export function selectInformantResource(
     fhirBundle &&
     fhirBundle.entry &&
     fhirBundle.entry.find(
-      entry =>
+      (entry) =>
         entry.fullUrl ===
         (relatedPersonEntry.resource as fhir.RelatedPerson).patient.reference
     )
