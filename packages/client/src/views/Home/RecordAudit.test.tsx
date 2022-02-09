@@ -248,3 +248,48 @@ describe('Record audit summary for GQLQuery', () => {
     expect(component.find('#placeOfDeath_grey').hostNodes()).toHaveLength(1)
   })
 })
+
+describe('Record audit summary for unsuccesful GQLQuery', () => {
+  let component: ReactWrapper<{}, {}>
+
+  beforeEach(async () => {
+    const { store, history } = createStore()
+
+    const mocks = [
+      {
+        request: {
+          query: FETCH_APPLICATION_SHORT_INFO,
+          variables: {
+            id: '956281c9-1f47-4c26-948a-970dd23c4094'
+          }
+        }
+      }
+    ]
+
+    component = await createTestComponent(
+      <RecordAudit
+        {...createRouterProps(
+          formatUrl(APPLICATION_RECORD_AUDIT, {
+            applicationId: '956281c9-1f47-4c26-948a-970dd23c4094'
+          }),
+          { isNavigatedInsideApp: false },
+          {
+            matchParams: {
+              applicationId: '956281c9-1f47-4c26-948a-970dd23c4094'
+            }
+          }
+        )}
+      />,
+      { store, history, graphqlMocks: mocks }
+    )
+
+    await flushPromises()
+    component.update()
+  })
+
+  it('Redirect to review page', async () => {
+    await flushPromises()
+    console.log(window.location.href)
+    expect(window.location.href).toContain('/review')
+  })
+})

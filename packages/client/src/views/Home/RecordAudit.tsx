@@ -17,8 +17,12 @@ import { Navigation } from '@client/components/interface/Navigation'
 import styled, { ITheme, withTheme } from '@client/styledComponents'
 import { ApplicationIcon } from '@opencrvs/components/lib/icons'
 import { connect } from 'react-redux'
-import { goToApplicationDetails } from '@client/navigation'
-import { RouteComponentProps, withRouter } from 'react-router'
+import {
+  goToApplicationDetails,
+  goBack as goBackAction,
+  goToRegistrarHomeTab
+} from '@client/navigation'
+import { RouteComponentProps } from 'react-router'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { IWorkqueue, IApplication } from '@client/applications'
 import { IStoreState } from '@client/store'
@@ -84,14 +88,20 @@ interface IStateProps {
 
 interface IDispatchProps {
   goToApplicationDetails: typeof goToApplicationDetails
+  goBack: typeof goBackAction
+  goToRegistrarHomeTab: typeof goToRegistrarHomeTab
 }
 
 type IFullProps = IDispatchProps &
   IStateProps &
   IDispatchProps &
-  IntlShapeProps & { theme: ITheme } & RouteComponentProps<{
-    applicationId: string
-  }>
+  IntlShapeProps & { theme: ITheme } & RouteComponentProps<
+    {
+      applicationId: string
+    },
+    {},
+    { isNavigatedInsideApp: boolean }
+  >
 
 interface ILabel {
   [key: string]: string | undefined
@@ -171,7 +181,20 @@ const isBirthApplication = (
 const isDeathApplication = (
   application: GQLEventSearchSet | null
 ): application is GQLDeathEventSearchSet => {
-  return (application && application.type == 'Death') || false
+  return (application && application.type === 'Death') || false
+}
+
+const goBack = (props: IFullProps) => {
+  const historyState = props.location.state
+  const navigatedFromInsideApp = Boolean(
+    historyState && historyState.isNavigatedInsideApp
+  )
+
+  if (navigatedFromInsideApp) {
+    props.goBack()
+  } else {
+    props.goToRegistrarHomeTab('review')
+  }
 }
 
 const getDraftApplicationName = (application: IApplication): string => {
@@ -357,10 +380,10 @@ const getWQApplication = (props: IFullProps): IApplicationData | null => {
 
 const getGQLApplication = (data: IGQLApplication): IApplicationData => {
   const application: IApplicationData = {
-    id: data.id,
-    type: data.registration?.type,
-    status: data.registration?.status[0].type,
-    trackingId: data.registration?.trackingId,
+    id: data?.id,
+    type: data?.registration?.type,
+    status: data?.registration?.status[0].type,
+    trackingId: data?.registration?.trackingId,
     dateOfBirth: '',
     placeOfBirth: '',
     informant: ''
@@ -373,26 +396,25 @@ const getApplicationInfo = (
   application: IApplicationData,
   isDownloaded: boolean
 ) => {
-  let informant =
-    application.informant && getCaptitalizedWord(application.informant)
+  let informant = getCaptitalizedWord(application?.informant)
 
-  const status = getCaptitalizedWord(application.status).split('_')
+  const status = getCaptitalizedWord(application?.status).split('_')
   let finalStatus = status[0]
   if (status[1]) finalStatus += ' ' + status[1]
 
-  if (application.informantContact) {
+  if (application?.informantContact) {
     informant =
       informant + ' . ' + getCaptitalizedWord(application.informantContact)
   }
 
   let info: ILabel = {
-    status: application.status && finalStatus,
-    type: application.type && getCaptitalizedWord(application.type),
-    trackingId: application.trackingId
+    status: application?.status && finalStatus,
+    type: getCaptitalizedWord(application?.type),
+    trackingId: application?.trackingId
   }
 
   if (info.type === 'Birth') {
-    if (application.brnDrn) {
+    if (application?.brnDrn) {
       info = {
         ...info,
         brn: application.brnDrn
@@ -400,12 +422,12 @@ const getApplicationInfo = (
     }
     info = {
       ...info,
-      dateOfBirth: application.dateOfBirth,
-      placeOfBirth: application.placeOfBirth,
+      dateOfBirth: application?.dateOfBirth,
+      placeOfBirth: application?.placeOfBirth,
       informant: informant
     }
   } else if (info.type === 'Death') {
-    if (application.brnDrn) {
+    if (application?.brnDrn) {
       info = {
         ...info,
         drn: application.brnDrn
@@ -413,8 +435,8 @@ const getApplicationInfo = (
     }
     info = {
       ...info,
-      dateOfDeath: application.dateOfDeath,
-      placeOfDeath: application.placeOfDeath,
+      dateOfDeath: application?.dateOfDeath,
+      placeOfDeath: application?.placeOfDeath,
       informant: informant
     }
   }
@@ -490,7 +512,7 @@ export const ShowRecordAudit = (props: IFullProps) => {
               error?: any
             }) => {
               if (error) {
-                console.log(error)
+                goBack(props)
               }
               if (loading) {
                 return (
@@ -500,7 +522,6 @@ export const ShowRecordAudit = (props: IFullProps) => {
                   />
                 )
               }
-
               return (
                 <>
                   <Content
@@ -512,7 +533,7 @@ export const ShowRecordAudit = (props: IFullProps) => {
                       <ApplicationIcon
                         color={
                           STATUSTOCOLOR[
-                            getGQLApplication(data.fetchRegistration).status ||
+                            getGQLApplication(data?.fetchRegistration).status ||
                               'DRAFT'
                           ]
                         }
@@ -521,7 +542,7 @@ export const ShowRecordAudit = (props: IFullProps) => {
                   >
                     {getApplicationInfo(
                       props,
-                      getGQLApplication(data.fetchRegistration),
+                      data && getGQLApplication(data.fetchRegistration),
                       isDownloaded
                     )}
                   </Content>
@@ -551,5 +572,7 @@ export const RecordAudit = connect<
   RouteComponentProps<{ applicationId: string }>,
   IStoreState
 >(mapStateToProps, {
-  goToApplicationDetails
+  goToApplicationDetails,
+  goBack: goBackAction,
+  goToRegistrarHomeTab
 })(injectIntl(withTheme(ShowRecordAudit)))
