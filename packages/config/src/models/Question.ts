@@ -43,6 +43,29 @@ export enum FieldType {
 
 export const validFieldType = Object.values(FieldType)
 
+export interface IOptions {
+  label: string
+  value: string
+}
+
+export interface IQuestion {
+  fieldId: string
+  fhirSectionCode: string
+  fhirResource: IFhirResource
+  label: typeof messageDescriptor
+  placeholder?: string
+  maxLength?: number
+  options?: IOptions[]
+  fieldName: string
+  fieldType: FieldType
+  sectionPositionForField: number
+  enabled: boolean
+  required: boolean
+  custom: boolean
+}
+
+export interface IQuestionModel extends IQuestion, Document {}
+
 export const messageDescriptor = new Schema({
   id: { type: String, required: true },
   description: { type: String },
@@ -53,23 +76,53 @@ export const dropdownOption = new Schema({
   label: { type: messageDescriptor, required: true },
   value: { type: String, required: true }
 })
-export interface IQuestion {
-  label: typeof messageDescriptor
-  placeholder: string
-  maxLength?: number
-  required: boolean
-  fieldName: string
-  fieldType: FieldType
-  fieldId: string
-  sectionPositionForField: number
-  fhirSchema: string
-  enabled: boolean
-  custom: boolean
+
+export interface IFhirResourceDataValueQuantity {
+  unit?: string
+  system?: string
+  code?: string
+  value?: string
 }
 
-export interface IQuestionModel extends IQuestion, Document {}
+const fhirResourceDataValueQuantitySchema = new Schema({
+  unit: { type: String },
+  system: { type: String },
+  code: { type: String },
+  value: { type: String }
+})
+
+export interface IFhirResourceData {
+  valueQuantity: IFhirResourceDataValueQuantity
+}
+
+const fhirResourceDataSchema = new Schema({
+  valueQuantity: { type: fhirResourceDataValueQuantitySchema, required: true }
+})
+
+export interface IFhirResource {
+  type: string
+  code?: string
+  description?: string
+  categoryCode?: string
+  categoryDescription?: string
+  data: IFhirResourceData
+  valueField: string // valueField defines the path in the data object where the field value is written
+}
+
+const fhirResourceSchema = new Schema({
+  type: { type: String, required: true },
+  code: { type: String },
+  description: { type: String },
+  categoryCode: { type: String },
+  categoryDescription: { type: String },
+  data: { type: fhirResourceDataSchema, required: true },
+  valueField: { type: String, required: true } // valueField defines the path in the data object where the field value is written
+})
 
 const questionSchema = new Schema({
+  fieldId: { type: String, unique: true, required: true },
+  fhirSectionCode: { type: String, required: true }, // "birth-encounter",
+  fhirResource: { type: fhirResourceSchema, required: true },
   label: { type: messageDescriptor, required: true },
   placeholder: { type: String, required: false },
   maxLength: { type: Number, required: false },
@@ -81,9 +134,8 @@ const questionSchema = new Schema({
     enum: validFieldType,
     default: FieldType.TEXT
   },
-  fieldId: { type: String, unique: true, required: true },
   sectionPositionForField: { type: Number, required: true },
-  fhirSchema: { type: String, required: true },
+  required: { type: Boolean, required: true },
   enabled: { type: Boolean, required: true },
   custom: { type: Boolean }
 })

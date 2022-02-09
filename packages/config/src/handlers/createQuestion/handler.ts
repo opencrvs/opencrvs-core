@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import Question, { IQuestion, validFieldType } from '@config/models/Question'
+import Question, { IQuestion, validFieldType } from '@config/models/question'
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { internal } from '@hapi/boom'
@@ -35,25 +35,41 @@ const messageDescriptorSchema = Joi.object({
 })
 
 export const requestSchema = Joi.object({
+  fieldId: Joi.string().required(),
+  fhirSectionCode: Joi.string().required(),
+  fhirResource: {
+    type: Joi.string().required(),
+    code: Joi.string(),
+    description: Joi.string(),
+    categoryCode: Joi.string(),
+    categoryDescription: Joi.string(),
+    data: {
+      valueQuantity: {
+        unit: Joi.string(),
+        system: Joi.string(),
+        code: Joi.string(),
+        value: Joi.string()
+      }
+    },
+    valueField: Joi.string().required() // valueField defines the path in the data object where the field value is written
+  },
   label: messageDescriptorSchema.required(),
+  placeholder: Joi.string(),
+  maxLength: Joi.number(),
   options: Joi.array().items(
     Joi.object({
       label: messageDescriptorSchema.required(),
       value: Joi.string().required()
     })
   ),
-  placeholder: Joi.string().allow(''),
   fieldName: Joi.string().required(),
   fieldType: Joi.string()
     .valid(...validFieldType)
     .required(),
-  fieldId: Joi.string().required(),
   sectionPositionForField: Joi.number().required(),
-  fhirSchema: Joi.string().required(),
   enabled: Joi.boolean().required(),
-  custom: Joi.boolean(),
   required: Joi.boolean().required(),
-  maxLength: Joi.number().optional()
+  custom: Joi.boolean()
 })
 
 export const responseSchema = Joi.object({})
