@@ -386,8 +386,8 @@ export interface GQLCertificateSVGInput {
   id: string
   svgCode: string
   svgFilename: string
-  svgDateUpdated: number
-  svgDateCreated: number
+  svgDateUpdated?: number
+  svgDateCreated?: number
   user: string
   event: string
   status: string
