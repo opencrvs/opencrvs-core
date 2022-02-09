@@ -356,6 +356,8 @@ export async function markEventAsWaitingValidationHandler(
         getToken(request)
       )
       await postToHearth(payload)
+      delete taskResource.input
+      delete taskResource.output
     }
 
     payload = await markBundleAsWaitingValidation(
