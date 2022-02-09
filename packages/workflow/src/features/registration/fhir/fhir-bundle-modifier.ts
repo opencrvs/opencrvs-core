@@ -17,7 +17,8 @@ import {
   REG_STATUS_IN_PROGRESS,
   REG_STATUS_VALIDATED,
   REG_STATUS_WAITING_VALIDATION,
-  REG_STATUS_REGISTERED
+  REG_STATUS_REGISTERED,
+  REG_STATUS_DECLARATION_UPDATED
 } from '@workflow/features/registration/fhir/constants'
 import {
   getTaskResource,
@@ -96,7 +97,7 @@ export async function markBundleAsValidated(
   bundle: fhir.Bundle & fhir.BundleEntry,
   token: string
 ): Promise<fhir.Bundle & fhir.BundleEntry> {
-  const taskResource = getTaskResource(bundle) as fhir.Task
+  const taskResource = getTaskResource(bundle)
 
   const practitioner = await getLoggedInPractitionerResource(token)
 
@@ -135,7 +136,7 @@ export async function markBundleAsWaitingValidation(
   bundle: fhir.Bundle & fhir.BundleEntry,
   token: string
 ): Promise<fhir.Bundle & fhir.BundleEntry> {
-  const taskResource = getTaskResource(bundle) as fhir.Task
+  const taskResource = getTaskResource(bundle)
 
   const practitioner = await getLoggedInPractitionerResource(token)
 
@@ -144,6 +145,30 @@ export async function markBundleAsWaitingValidation(
     taskResource,
     getTokenPayload(token),
     REG_STATUS_WAITING_VALIDATION
+  )
+
+  /* setting lastRegLocation here */
+  await setupLastRegLocation(taskResource, practitioner)
+
+  /* setting lastRegUser here */
+  setupLastRegUser(taskResource, practitioner)
+
+  return bundle
+}
+
+export async function markBundleAsDeclarationUpdated(
+  bundle: fhir.Bundle & fhir.BundleEntry,
+  token: string
+): Promise<fhir.Bundle & fhir.BundleEntry> {
+  const taskResource = getTaskResource(bundle)
+
+  const practitioner = await getLoggedInPractitionerResource(token)
+
+  /* setting registration workflow status here */
+  await setupRegistrationWorkflow(
+    taskResource,
+    getTokenPayload(token),
+    REG_STATUS_DECLARATION_UPDATED
   )
 
   /* setting lastRegLocation here */
@@ -190,7 +215,7 @@ export async function markBundleAsCertified(
   bundle: fhir.Bundle,
   token: string
 ): Promise<fhir.Bundle> {
-  const taskResource = getTaskResource(bundle) as fhir.Task
+  const taskResource = getTaskResource(bundle)
 
   const practitioner = await getLoggedInPractitionerResource(token)
 

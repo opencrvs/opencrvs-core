@@ -19,7 +19,8 @@ import {
   setTrackingId,
   markBundleAsWaitingValidation,
   invokeRegistrationValidation,
-  updatePatientIdentifierWithRN
+  updatePatientIdentifierWithRN,
+  markBundleAsDeclarationUpdated
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
   getEventInformantName,
@@ -33,7 +34,8 @@ import {
   getTaskEventType,
   sendEventNotification,
   sendRegisteredNotification,
-  isEventNonNotifiable
+  isEventNonNotifiable,
+  taskHasInput
 } from '@workflow/features/registration/utils'
 import { logger } from '@workflow/logger'
 import { getToken } from '@workflow/utils/authUtils'
@@ -46,6 +48,7 @@ import {
   BIRTH_REG_NUMBER_SYSTEM,
   DEATH_REG_NUMBER_SYSTEM
 } from '@workflow/features/registration/fhir/constants'
+import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
 
 interface IEventRegistrationCallbackPayload {
   trackingId: string
@@ -341,7 +344,21 @@ export async function markEventAsWaitingValidationHandler(
   event: Events
 ) {
   try {
-    const payload = await markBundleAsWaitingValidation(
+    let payload: fhir.Bundle & fhir.BundleEntry
+
+    const taskResource = getTaskResource(
+      request.payload as fhir.Bundle & fhir.BundleEntry
+    )
+
+    if (taskHasInput(taskResource)) {
+      payload = await markBundleAsDeclarationUpdated(
+        request.payload as fhir.Bundle & fhir.BundleEntry,
+        getToken(request)
+      )
+      await postToHearth(payload)
+    }
+
+    payload = await markBundleAsWaitingValidation(
       request.payload as fhir.Bundle & fhir.BundleEntry,
       getToken(request)
     )

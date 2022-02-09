@@ -81,7 +81,7 @@ export async function sendEventNotification(
         name: await getInformantName(fhirBundle, CHILD_SECTION_CODE),
         trackingId: getTrackingId(fhirBundle),
         registrationNumber: getBirthRegistrationNumber(
-          getTaskResource(fhirBundle) as fhir.Task
+          getTaskResource(fhirBundle)
         )
       })
       break
@@ -109,7 +109,7 @@ export async function sendEventNotification(
         name: await getInformantName(fhirBundle, DECEASED_SECTION_CODE),
         trackingId: getTrackingId(fhirBundle),
         registrationNumber: getDeathRegistrationNumber(
-          getTaskResource(fhirBundle) as fhir.Task
+          getTaskResource(fhirBundle)
         )
       })
       break
@@ -213,6 +213,10 @@ export function getEventType(fhirBundle: fhir.Bundle) {
     }
   }
   throw new Error('Invalid FHIR bundle found')
+}
+
+export function taskHasInput(taskResource: fhir.Task) {
+  return !!(taskResource.input && taskResource.input.length > 0)
 }
 
 export function isInProgressApplication(fhirBundle: fhir.Bundle) {
