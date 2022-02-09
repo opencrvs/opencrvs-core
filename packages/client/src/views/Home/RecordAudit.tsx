@@ -31,7 +31,6 @@ import {
 import moment from 'moment'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
-import { get } from 'lodash'
 import { IFormSectionData, IContactPoint } from '@client/forms'
 import { FETCH_APPLICATION_SHORT_INFO } from '@client/views/Home/queries'
 import { Query } from '@client/components/Query'
@@ -128,7 +127,7 @@ const STATUSTOCOLOR: { [key: string]: string } = {
   DRAFT: 'violet',
   DECLARED: 'orange',
   REJECTED: 'red',
-  VALIDATED: 'orange',
+  VALIDATED: 'grey',
   REGISTERED: 'green',
   CERTIFIED: 'green',
   WAITING_VALIDATION: 'teal'
@@ -158,9 +157,9 @@ const NO_DATA_LABEL: ILabel = {
   informant: 'No informant'
 }
 
-const getCaptitalizedword = (word: string | undefined): string => {
-  word = word && word.toUpperCase()[0] + word.toLowerCase().slice(1)
-  return word || ''
+const getCaptitalizedWord = (word: string | undefined): string => {
+  if (!word) return ''
+  return word.toUpperCase()[0] + word.toLowerCase().slice(1)
 }
 
 const isBirthApplication = (
@@ -177,16 +176,17 @@ const isDeathApplication = (
 
 const getDraftApplicationName = (application: IApplication): string => {
   let name = ''
-  const applicationName = application.data.child || application.data.deceased
+  let applicationName
+  if (application.event === 'birth') {
+    applicationName = application.data?.child
+  } else {
+    applicationName = application.data?.deceased
+  }
+
   if (applicationName) {
-    if (applicationName.firstNamesEng && applicationName.familyNameEng) {
-      name = applicationName.firstNamesEng + ' ' + applicationName.familyNameEng
-    } else {
-      name =
-        (applicationName.firstNamesEng as string) ||
-        (applicationName.familyNameEng as string) ||
-        ''
-    }
+    name = [applicationName.firstNamesEng, applicationName.familyNameEng]
+      .filter((part) => Boolean(part))
+      .join(' ')
   }
   return name
 }
@@ -202,11 +202,9 @@ const getWQApplicationName = (application: GQLEventSearchSet): string => {
       application.deceasedName[0])
 
   if (applicationName) {
-    if (applicationName.firstNames && applicationName.familyName) {
-      name = applicationName.firstNames + ' ' + applicationName.familyName
-    } else {
-      name = applicationName.familyName || applicationName.firstNames || ''
-    }
+    name = [applicationName.firstNames, applicationName.familyName]
+      .filter((part) => Boolean(part))
+      .join(' ')
   }
   return name
 }
@@ -214,26 +212,15 @@ const getWQApplicationName = (application: GQLEventSearchSet): string => {
 const getGQLApplicationName = (application: IGQLApplication): string => {
   let name = ''
   const applicationName =
-    application && application.child && application.child.name
-      ? application.child.name[0]
-      : application.deceased &&
-        application.deceased.name &&
-        application.deceased.name[0]
+    application?.child?.name[0] || application?.deceased?.name[0]
+
   if (applicationName) {
-    if (
-      (applicationName as GQLHumanName).firstNames &&
+    name = [
+      (applicationName as GQLHumanName).firstNames,
       (applicationName as GQLHumanName).familyName
-    ) {
-      name =
-        (applicationName as GQLHumanName).firstNames +
-        ' ' +
-        (applicationName as GQLHumanName).familyName
-    } else {
-      name =
-        (applicationName as GQLHumanName).familyName ||
-        (applicationName as GQLHumanName).firstNames ||
-        ''
-    }
+    ]
+      .filter((part) => Boolean(part))
+      .join(' ')
   }
   return name
 }
@@ -243,56 +230,30 @@ const getLocation = (application: IApplication, props: IFullProps) => {
   let locationId = ''
   let locationDistrict = ''
   let locationPermanent = ''
-  if (
-    application.event === 'death' &&
-    application.data &&
-    application.data.deathEvent
-  ) {
+  if (application.event === 'death') {
     locationType =
-      (application.data.deathEvent.deathPlaceAddress &&
-        application.data.deathEvent.deathPlaceAddress.toString()) ||
-      ''
-    locationId =
-      (application.data.deathEvent.deathLocation &&
-        application.data.deathEvent.deathLocation.toString()) ||
-      ''
-    locationDistrict =
-      (application.data.deathEvent.district &&
-        application.data.deathEvent.district.toString()) ||
-      ''
+      application.data?.deathEvent?.deathPlaceAddress?.toString() || ''
+    locationId = application.data?.deathEvent?.deathLocation?.toString() || ''
+    locationDistrict = application.data?.deathEvent?.district?.toString() || ''
     locationPermanent =
-      (application.data.deceased &&
-        application.data.deceased.districtPermanent &&
-        application.data.deceased.districtPermanent.toString()) ||
-      ''
-  } else if (application.data) {
-    locationType =
-      (application.data.child &&
-        application.data.child.placeOfBirth.toString()) ||
-      ''
-    locationId =
-      (application.data.child &&
-        application.data.child.birthLocation &&
-        application.data.child.birthLocation.toString()) ||
-      ''
-    locationDistrict =
-      (application.data.child &&
-        application.data.child.district &&
-        application.data.child.district.toString()) ||
-      ''
+      application.data?.deceased?.districtPermanent?.toString() || ''
+  } else {
+    locationType = application.data?.child?.placeOfBirth?.toString() || ''
+    locationId = application.data?.child?.birthLocation?.toString() || ''
+    locationDistrict = application.data?.child?.district?.toString() || ''
   }
 
   if (locationType === 'HEALTH_FACILITY') {
-    const facility = get(props.resources.facilities, locationId) || ''
-    return facility.alias
+    const facility = props.resources.facilities[locationId] || ''
+    return facility?.alias + ' District'
   }
   if (locationType === 'OTHER' || locationType === 'PRIVATE_HOME') {
-    const location = get(props.resources.locations, locationDistrict) || ''
-    return location.alias + ' District'
+    const location = props.resources.locations[locationDistrict] || ''
+    return location?.alias + ' District'
   }
   if (locationType === 'PERMANENT') {
-    const district = get(props.resources.locations, locationPermanent) || ''
-    return district.alias + ' District'
+    const district = props.resources.locations[locationPermanent] || ''
+    return district?.alias + ' District'
   }
   return ''
 }
@@ -303,7 +264,10 @@ const getSavedApplications = (props: IFullProps): IApplicationData => {
 
   const applications = savedApplications
     .filter((application: IApplication) => {
-      return application.id === applicationId
+      return (
+        application.id === applicationId ||
+        application.compositionId === applicationId
+      )
     })
     .map((application) => {
       const name = getDraftApplicationName(application)
@@ -311,51 +275,27 @@ const getSavedApplications = (props: IFullProps): IApplicationData => {
         id: application.id,
         name: name,
         status:
-          (application.submissionStatus &&
-            application.submissionStatus.toString()) ||
-          (application.registrationStatus &&
-            application.registrationStatus.toString()) ||
+          application.submissionStatus?.toString() ||
+          application.registrationStatus?.toString() ||
           '',
         type: application.event || '',
         brnDrn:
-          (application.data.registration &&
-            application.data.registration.registrationNumber &&
-            application.data.registration.registrationNumber.toString()) ||
-          '',
+          application.data?.registration?.registrationNumber?.toString() || '',
         trackingId:
-          (application.data.registration &&
-            application.data.registration.trackingId &&
-            application.data.registration.trackingId.toString()) ||
-          '',
-        dateOfBirth:
-          (application.data.child &&
-            application.data.child.childBirthDate &&
-            application.data.child.childBirthDate.toString()) ||
-          '',
-        dateOfDeath:
-          (application.data.deathEvent &&
-            application.data.deathEvent.deathDate &&
-            application.data.deathEvent.deathDate.toString()) ||
-          '',
+          application.data?.registration?.trackingId?.toString() || '',
+        dateOfBirth: application.data?.child?.childBirthDate?.toString() || '',
+        dateOfDeath: application.data?.deathEvent?.deathDate?.toString() || '',
         placeOfBirth: getLocation(application, props) || '',
         placeOfDeath: getLocation(application, props) || '',
         informant:
-          (application.data.registration &&
-            application.data.registration.contactPoint &&
-            (
-              application.data.registration.contactPoint as IFormSectionData
-            ).value.toString()) ||
-          '',
+          (
+            application.data?.registration?.contactPoint as IFormSectionData
+          )?.value.toString() || '',
         informantContact:
-          (application.data.registration &&
-            application.data.registration.contactPoint &&
-            ((application.data.registration.contactPoint as IFormSectionData)
-              .nestedFields as IContactPoint) &&
-            (
-              (application.data.registration.contactPoint as IFormSectionData)
-                .nestedFields as IContactPoint
-            ).registrationPhone.toString()) ||
-          ''
+          (
+            (application.data?.registration?.contactPoint as IFormSectionData)
+              ?.nestedFields as IContactPoint
+          )?.registrationPhone.toString() || ''
       }
     })
   return applications[0]
@@ -370,24 +310,31 @@ const getWQApplication = (props: IFullProps): IApplicationData | null => {
     GQLBirthEventSearchSet | GQLDeathEventSearchSet | null
   > = []
 
-  if (workqueue.approvalTab.results)
+  if (workqueue.approvalTab.results) {
     applications = applications.concat(workqueue.approvalTab.results)
-  if (workqueue.printTab.results)
+  }
+  if (workqueue.printTab.results) {
     applications = applications.concat(workqueue.printTab.results)
-  if (workqueue.inProgressTab.results)
+  }
+  if (workqueue.inProgressTab.results) {
     applications = applications.concat(workqueue.inProgressTab.results)
-  if (workqueue.externalValidationTab.results)
+  }
+  if (workqueue.externalValidationTab.results) {
     applications = applications.concat(workqueue.externalValidationTab.results)
-  if (workqueue.rejectTab.results)
+  }
+  if (workqueue.rejectTab.results) {
     applications = applications.concat(workqueue.rejectTab.results)
-  if (workqueue.reviewTab.results)
+  }
+  if (workqueue.reviewTab.results) {
     applications = applications.concat(workqueue.reviewTab.results)
-  if (workqueue.notificationTab.results)
+  }
+  if (workqueue.notificationTab.results) {
     applications = applications.concat(workqueue.notificationTab.results)
+  }
 
-  const specificApplication = applications.filter((application) => {
+  const specificApplication = applications.find((application) => {
     return application && application.id === applicationId
-  })[0]
+  })
 
   let applicationData: IApplicationData | null = null
   if (specificApplication) {
@@ -427,20 +374,20 @@ const getApplicationInfo = (
   isDownloaded: boolean
 ) => {
   let informant =
-    application.informant && getCaptitalizedword(application.informant)
+    application.informant && getCaptitalizedWord(application.informant)
 
-  const status = getCaptitalizedword(application.status).split('_')
+  const status = getCaptitalizedWord(application.status).split('_')
   let finalStatus = status[0]
   if (status[1]) finalStatus += ' ' + status[1]
 
   if (application.informantContact) {
     informant =
-      informant + ' . ' + getCaptitalizedword(application.informantContact)
+      informant + ' . ' + getCaptitalizedWord(application.informantContact)
   }
 
   let info: ILabel = {
     status: application.status && finalStatus,
-    type: application.type && getCaptitalizedword(application.type),
+    type: application.type && getCaptitalizedWord(application.type),
     trackingId: application.trackingId
   }
 
@@ -509,7 +456,7 @@ export const ShowRecordAudit = (props: IFullProps) => {
   return (
     <div id={'recordAudit'}>
       <Header />
-      <Navigation />
+      <Navigation deselectAllTabs={true} />
       <BodyContainer>
         {application ? (
           <Content

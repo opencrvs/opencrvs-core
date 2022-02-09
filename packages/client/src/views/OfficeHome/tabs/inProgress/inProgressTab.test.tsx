@@ -317,7 +317,7 @@ describe('In Progress tab', () => {
         .simulate('click')
     })
 
-    it('redirects user to recordAudit page on update click', async () => {
+    it('redirects user to detail page on update click', async () => {
       const TIME_STAMP = 1562912635549
       const drafts: IApplication[] = [
         {
@@ -663,7 +663,7 @@ describe('In Progress tab', () => {
       testComponent.update()
 
       expect(window.location.href).toContain(
-        '/recordAudit/956281c9-1f47-4c26-948a-970dd23c4094'
+        '/record-audit/956281c9-1f47-4c26-948a-970dd23c4094'
       )
     })
 
@@ -932,7 +932,7 @@ describe('Tablet tests', () => {
     testComponent.update()
 
     expect(window.location.href).toContain(
-      '/recordAudit/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+      '/record-audit/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
   })
 })

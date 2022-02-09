@@ -424,7 +424,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
       testComponent.update()
 
       expect(window.location.href).toContain(
-        '/recordAudit/956281c9-1f47-4c26-948a-970dd23c4094'
+        '/record-audit/956281c9-1f47-4c26-948a-970dd23c4094'
       )
     })
   })
@@ -799,7 +799,7 @@ describe('Tablet tests', () => {
     testComponent.update()
 
     expect(window.location.href).toContain(
-      '/recordAudit/956281c9-1f47-4c26-948a-970dd23c4094'
+      '/record-audit/956281c9-1f47-4c26-948a-970dd23c4094'
     )
   })
 })

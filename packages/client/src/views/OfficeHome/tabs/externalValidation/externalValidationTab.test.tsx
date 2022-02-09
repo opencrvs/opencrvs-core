@@ -109,7 +109,7 @@ describe('Registrar home external validation tab tests', () => {
     const dataRow = tableElement.find('#row_0').hostNodes()
     dataRow.simulate('click')
     component.update()
-    expect(history.location.pathname).toContain('recordAudit')
+    expect(history.location.pathname).toContain('record-audit')
   })
 
   describe('On devices with small viewport', () => {
@@ -123,7 +123,7 @@ describe('Registrar home external validation tab tests', () => {
       const dataRow = tableElement.find('#row_0').hostNodes()
       dataRow.simulate('click')
       component.update()
-      expect(history.location.pathname).toContain('recordAudit')
+      expect(history.location.pathname).toContain('record-audit')
     })
   })
 })
