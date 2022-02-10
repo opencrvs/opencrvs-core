@@ -39,17 +39,17 @@ const messagesToDefine: IHeaderMessages = {
   },
   placeHolderTrackingId: {
     id: 'home.header.placeHolderTrackingId',
-    defaultMessage: 'Enter Tracking ID',
+    defaultMessage: 'Search for a tracking ID',
     description: 'Search menu tracking id place holder'
   },
   placeHolderBrnDrn: {
     id: 'home.header.placeHolderBrnDrn',
-    defaultMessage: 'Enter BRN/DRN',
+    defaultMessage: 'Search for a BRN/DRN',
     description: 'Search menu brn drn place holder'
   },
   placeHolderPhone: {
     id: 'home.header.placeHolderPhone',
-    defaultMessage: 'Enter Phone No.',
+    defaultMessage: 'Search for a phone No.',
     description: 'Search menu phone no place holder'
   },
   systemTitle: {
@@ -79,7 +79,7 @@ const messagesToDefine: IHeaderMessages = {
   },
   placeholderName: {
     id: 'home.header.placeholderName',
-    defaultMessage: 'Enter name',
+    defaultMessage: 'Search for a name',
     description: 'Search menu name placeholder'
   }
 }

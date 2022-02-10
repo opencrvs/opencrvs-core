@@ -36,6 +36,7 @@ const SearchTextInput = styled.input`
   }
 
   &:-webkit-autofill {
+    background-color: ${({ theme }) => theme.colors.white};
     -webkit-box-shadow: 0 0 0px 1000px ${({ theme }) => theme.colors.white}
       inset;
   }
@@ -107,6 +108,7 @@ const SelectedSearchCriteria = styled.span`
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     padding: 2px;
+    padding-right: 7px;
     & .selected-icon {
       display: flex;
     }
@@ -269,9 +271,9 @@ export class SearchTool extends React.Component<IProps, IState> {
             <span className="selected-icon">
               {this.state.selectedSearchType.invertIcon}
             </span>
-            <LabelButton className="selected-label">
+            <span className="selected-label">
               {this.state.selectedSearchType.label}
-            </LabelButton>
+            </span>
           </SelectedSearchCriteria>
         </DropDown>
         {this.dropdown()}

@@ -32,11 +32,6 @@ const HeaderContainer = styled.div`
   z-index: 2;
   background: ${({ theme }) => theme.colors.white};
 `
-const HeaderRight = styled.div`
-  margin: 0 auto;
-  display: flex;
-`
-
 export class DesktopHeader extends React.Component<IDesktopHeaderProps> {
   render() {
     const { desktopRightMenu } = this.props

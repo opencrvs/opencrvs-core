@@ -46,7 +46,10 @@ export const colorDictionary = {
   greyHover: '#F8F8F8',
   borderBottom: '#d8dbde',
   grey800: '#1E2326',
-  grey300: '#F1F2F3'
+  grey300: '#F1F2F3',
+  indigo500: '#4972BB',
+  indigo600: '##42639C',
+  yellow500: '#EDC55E'
 }
 
 export const gradients = {
@@ -132,5 +135,8 @@ export const colors = {
   // new color code
   blue500: colorDictionary.blueCrystal,
   grey800: colorDictionary.grey800,
-  grey300: colorDictionary.grey300
+  grey300: colorDictionary.grey300,
+  indigo500: colorDictionary.indigo500,
+  indigo600: colorDictionary.indigo600,
+  yellow500: colorDictionary.yellow500
 }

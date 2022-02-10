@@ -116,11 +116,21 @@ const StyledPrimaryButton = styled(PrimaryButton)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
+  &:hover {
+    background: ${({ theme }) => theme.colors.indigo600};
+  }
+  &:focus {
+    background: ${({ theme }) => theme.colors.yellow500};
+  }
+  &:active {
+    background: ${({ theme }) => theme.colors.indigo600};
+  }
 `
 
 const SearchBox = styled.div`
   position: static;
   width: 624px;
+  min-width: 220px;
   height: 42px;
   left: calc(50% - 624px / 2 + 24px);
   top: calc(50% - 40px / 2);
@@ -133,11 +143,20 @@ const SearchBox = styled.div`
     border: 1px solid ${({ theme }) => theme.colors.grey800};
     background: ${({ theme }) => theme.colors.white};
   }
+  &:active {
+    border: 1px solid ${({ theme }) => theme.colors.yellow500};
+  }
   &:focus-within input {
     background: ${({ theme }) => theme.colors.white};
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.xl}px) {
-    width: 507.87px;
+    width: 100%;
+    max-width: 507.87px;
+  }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    width: 100%;
+    max-width: 334px;
+    margin: auto;
   }
 `
 const HeaderCenter = styled.div`
@@ -282,7 +301,7 @@ class HeaderComp extends React.Component<IProps, IState> {
         label: intl.formatMessage(constantsMessages.trackingId),
         value: TRACKING_ID_TEXT,
         icon: <TrackingID />,
-        invertIcon: <TrackingID color="invert" />,
+        invertIcon: <TrackingID color="#4972BB" />,
         placeHolderText: intl.formatMessage(messages.placeHolderTrackingId),
         isDefault: true
       },
@@ -290,21 +309,21 @@ class HeaderComp extends React.Component<IProps, IState> {
         label: intl.formatMessage(messages.typeBrnDrn),
         value: BRN_DRN_TEXT,
         icon: <BRN />,
-        invertIcon: <BRN color="invert" />,
+        invertIcon: <BRN color="#4972BB" />,
         placeHolderText: intl.formatMessage(messages.placeHolderBrnDrn)
       },
       {
         label: intl.formatMessage(messages.typePhone),
         value: PHONE_TEXT,
         icon: <Phone />,
-        invertIcon: <Phone color="invert" />,
+        invertIcon: <Phone color="#4972BB" />,
         placeHolderText: intl.formatMessage(messages.placeHolderPhone)
       },
       {
         label: intl.formatMessage(messages.typeName),
         value: NAME_TEXT,
         icon: <User />,
-        invertIcon: <User color="invert" />,
+        invertIcon: <User color="#4972BB" />,
         placeHolderText: intl.formatMessage(messages.placeholderName)
       }
     ]
