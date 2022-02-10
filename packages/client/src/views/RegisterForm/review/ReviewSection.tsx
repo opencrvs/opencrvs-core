@@ -468,6 +468,8 @@ const SECTION_TITLE = {
 }
 
 class ReviewSectionComp extends React.Component<FullProps, State> {
+  hasChangesBeenMade = false
+
   constructor(props: FullProps) {
     super(props)
 
@@ -479,6 +481,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       activeSection: null,
       previewImage: null
     }
+  }
+
+  componentWillUpdate() {
+    this.hasChangesBeenMade = false
   }
 
   componentDidMount() {
@@ -1021,24 +1027,19 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     nestedFieldData: IFormData,
     previousNestedFieldData: IFormData
   ) {
-    // const {
-    //   draft: { data, originalData }
-    // } = this.props
-    // const nestedFieldData = data[section.id][field.name] as IFormData
-
-    // const previousNestedFieldData = (originalData as IFormData)[section.id][
-    //   field.name
-    // ] as IFormData
     if (nestedFieldData.value === previousNestedFieldData.value) {
-      Object.keys(nestedFieldData.nestedFields).forEach((key) => {
+      for (const key in nestedFieldData.nestedFields) {
         if (
           nestedFieldData.nestedFields[key] !==
           previousNestedFieldData.nestedFields[key]
-        )
+        ) {
+          this.hasChangesBeenMade = true
           return true
-      })
+        }
+      }
       return false
     }
+    this.hasChangesBeenMade = true
     return true
   }
 
@@ -1080,7 +1081,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     if (!originalData[field.name] && data[field.name] === '') {
       return false
     }
-    return data[field.name] !== originalData[field.name]
+    const hasChanged = data[field.name] !== originalData[field.name]
+    this.hasChangesBeenMade = this.hasChangesBeenMade || hasChanged
+    return hasChanged
   }
 
   getSinglePreviewField(
@@ -1545,7 +1548,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   <PrimaryButton
                     id="continue_button"
                     onClick={onContinue}
-                    disabled={!isComplete}
+                    disabled={!isComplete || !this.hasChangesBeenMade}
                   >
                     {intl.formatMessage(buttonMessages.continueButton)}
                   </PrimaryButton>
