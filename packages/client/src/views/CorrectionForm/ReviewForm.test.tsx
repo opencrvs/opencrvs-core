@@ -80,6 +80,7 @@ describe('Review form for an application', () => {
       })
     )
     wrapper.update()
+
     expect(
       wrapper.find('#continue_button').hostNodes().props().disabled
     ).toBeTruthy()
@@ -92,7 +93,45 @@ describe('Review form for an application', () => {
     expect(history.location.pathname).toContain('/review')
   })
 
+  it('should disable the continue button if no changes have been made', () => {
+    expect(
+      wrapper.find('#continue_button').hostNodes().props().disabled
+    ).toBeTruthy()
+  })
+
+  it('should not disable the continue button if changes have been made', () => {
+    store.dispatch(
+      modifyApplication({
+        ...application,
+        data: {
+          ...application.data,
+          mother: {
+            ...application.data.mother,
+            iD: '122456789'
+          }
+        }
+      })
+    )
+    wrapper.update()
+
+    expect(
+      wrapper.find('#continue_button').hostNodes().props().disabled
+    ).toBeFalsy()
+  })
+
   it('should go to supporting documents form when continue is pressed', () => {
+    store.dispatch(
+      modifyApplication({
+        ...application,
+        data: {
+          ...application.data,
+          mother: {
+            ...application.data.mother,
+            iD: '122456789'
+          }
+        }
+      })
+    )
     wrapper.update()
     wrapper.find('#continue_button').hostNodes().simulate('click')
     wrapper.update()
