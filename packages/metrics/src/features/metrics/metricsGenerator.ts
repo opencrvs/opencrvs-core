@@ -153,17 +153,17 @@ const birthRegWithinTimeFramesQuery = (
   const EXPECTED_BIRTH_REGISTRATION_IN_DAYS = birthRegistrationTargetInDays
   return `SELECT
   SUM(withinTargetDays) AS regWithinTargetd,
-  SUM(within45DTo1Yr) AS regWithinTargetdTo1yr,
+  SUM(withinTargetDTo1Yr) AS regWithinTargetdTo1yr,
   SUM(within1YrTo5Yr) AS regWithin1yrTo5yr,
   SUM(over5Yr) AS regOver5yr
  FROM (
-   SELECT withinTargetDays, within45DTo1Yr, within1YrTo5Yr, over5Yr, ${lowerLocationLevel}
+   SELECT withinTargetDays, withinTargetDTo1Yr, within1YrTo5Yr, over5Yr, ${lowerLocationLevel}
    FROM (
     SELECT COUNT(ageInDays) AS withinTargetDays FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
   AND ageInDays > -1 AND ageInDays <= ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} AND ${currentLocationLevel}='${locationId}'
     GROUP BY ${lowerLocationLevel}
    ), (
-    SELECT COUNT(ageInDays) AS within45DTo1Yr FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+    SELECT COUNT(ageInDays) AS withinTargetDTo1Yr FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
   AND ageInDays > ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} AND ageInDays <= 365 AND ${currentLocationLevel}='${locationId}'
     GROUP BY ${lowerLocationLevel}
    ), (
@@ -190,17 +190,17 @@ const deathRegWithinTimeFramesQuery = (
   const EXPECTED_BIRTH_REGISTRATION_IN_DAYS = deathRegistrationTargetInDays
   return `SELECT
   SUM(withinTargetDays) AS regWithinTargetd,
-  SUM(within45DTo1Yr) AS regWithinTargetdTo1yr,
+  SUM(withinTargetDTo1Yr) AS regWithinTargetdTo1yr,
   SUM(within1YrTo5Yr) AS regWithin1yrTo5yr,
   SUM(over5Yr) AS regOver5yr
  FROM (
-   SELECT withinTargetDays, within45DTo1Yr, within1YrTo5Yr, over5Yr, ${lowerLocationLevel}
+   SELECT withinTargetDays, withinTargetDTo1Yr, within1YrTo5Yr, over5Yr, ${lowerLocationLevel}
    FROM (
     SELECT COUNT(deathDays) AS withinTargetDays FROM death_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
   AND deathDays > -1 AND deathDays <= ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} AND ${currentLocationLevel}='${locationId}'
     GROUP BY ${lowerLocationLevel}
    ), (
-    SELECT COUNT(deathDays) AS within45DTo1Yr FROM death_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+    SELECT COUNT(deathDays) AS withinTargetDTo1Yr FROM death_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
   AND deathDays > ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} AND deathDays <= 365 AND ${currentLocationLevel}='${locationId}'
     GROUP BY ${lowerLocationLevel}
    ), (
