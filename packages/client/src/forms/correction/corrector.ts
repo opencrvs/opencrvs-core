@@ -113,7 +113,7 @@ const deathCorrectorRelationGroup: IFormSectionGroup = {
           label: messages.court
         },
         {
-          value: 'OTHERS',
+          value: 'OTHER',
           label: messages.others
         }
       ],
@@ -121,7 +121,7 @@ const deathCorrectorRelationGroup: IFormSectionGroup = {
         INFORMANT: [],
         REGISTRAR: [],
         ANOTHER_AGENT: [],
-        OTHERS: [
+        OTHER: [
           {
             name: 'otherRelationship',
             type: 'TEXT',

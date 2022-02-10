@@ -38,7 +38,8 @@ import {
   ReviewSection,
   IFormData,
   IFormTag,
-  REVIEW_OVERRIDE_POSITION
+  REVIEW_OVERRIDE_POSITION,
+  IFormFieldValue
 } from '@client/forms'
 
 import {
@@ -130,7 +131,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
       application: { event }
     } = this.props
     const formSections = getViewableSection(registerForm[event], application)
-
+    console.log(application)
     const backToReviewButton = (
       <SecondaryButton
         id="back_to_review"
@@ -750,8 +751,11 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
       case 'COURT':
         return this.props.intl.formatMessage(messages.court)
       case 'OTHER':
-        return (corrector.nestedFields as IFormSectionData)
-          .otherRelationship as string
+        return (
+          (corrector.relationship as IFormSectionData)
+            .nestedFields as IFormSectionData
+        ).otherRelationship as string
+
       default:
         return '-'
     }
