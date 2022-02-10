@@ -466,20 +466,16 @@ export function updateApplicationRegistrationWithCorrection(
   const { data } = application
 
   if (data.corrector && data.corrector.relationship) {
-    let requester = ''
-    requester = ((data.corrector.relationship as IFormSectionData).value ||
-      data.corrector.relationship) as string
-    correctionValues.requester = requester
+    correctionValues.requester = ((
+      data.corrector.relationship as IFormSectionData
+    ).value || data.corrector.relationship) as string
   }
 
   if (data.reason) {
-    let reason = ''
     if (data.reason.type) {
-      reason = ((data.reason.type as IFormSectionData).value ||
+      correctionValues.reason = ((data.reason.type as IFormSectionData).value ||
         data.reason.type) as string
     }
-
-    correctionValues.reason = reason
 
     if (data.reason.additionalComment) {
       correctionValues.note = data.reason.additionalComment
