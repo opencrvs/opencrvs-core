@@ -12,11 +12,7 @@
 interface Window {
   config: {
     API_GATEWAY_URL: string
-<<<<<<< HEAD
-    CONFIG_API_URL: String
-=======
     CONFIG_API_URL: string
->>>>>>> develop
     BACKGROUND_SYNC_BROADCAST_CHANNEL: string
     COUNTRY: string
     COUNTRY_LOGO_FILE: string

@@ -30,8 +30,8 @@ describe('fetch birth registration metrics', () => {
         timeFrames: [
           {
             locationId: 'fake',
-            regWithin45d: 0,
-            regWithin45dTo1yr: 0,
+            regWithinTargetd: 0,
+            regWithinTargetdTo1yr: 0,
             regWithin1yrTo5yr: 0,
             regOver5yr: 0,
             total: 0

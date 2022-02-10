@@ -50,7 +50,7 @@ import {
   FETCH_MONTH_WISE_EVENT_ESTIMATIONS,
   HAS_CHILD_LOCATION
 } from './queries'
-import { WithinTargetDaysTable } from './reports/registrationRates/Within45DaysTable'
+import { WithinTargetDaysTable } from './reports/registrationRates/WithinTargetDaysTable'
 import moment from 'moment'
 const { useState } = React
 

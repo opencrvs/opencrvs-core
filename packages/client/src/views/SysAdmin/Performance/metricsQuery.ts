@@ -27,15 +27,15 @@ export const PERFORMANCE_METRICS = gql`
       timeFrames {
         details {
           locationId
-          regWithin45d
-          regWithin45dTo1yr
+          regWithinTargetd
+          regWithinTargetdTo1yr
           regWithin1yrTo5yr
           regOver5yr
           total
         }
         total {
-          regWithin45d
-          regWithin45dTo1yr
+          regWithinTargetd
+          regWithinTargetdTo1yr
           regWithin1yrTo5yr
           regOver5yr
           total

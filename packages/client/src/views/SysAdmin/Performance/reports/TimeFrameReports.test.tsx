@@ -21,16 +21,16 @@ describe('Time frame report tests', () => {
     details: [
       {
         locationId: 'Location/d5ccd1d1-ca47-435b-93db-36c626ad2dfa',
-        regWithin45d: 0,
-        regWithin45dTo1yr: 0,
+        regWithinTargetd: 0,
+        regWithinTargetdTo1yr: 0,
         regWithin1yrTo5yr: 0,
         regOver5yr: 2,
         total: 2
       }
     ],
     total: {
-      regWithin45d: 0,
-      regWithin45dTo1yr: 0,
+      regWithinTargetd: 0,
+      regWithinTargetdTo1yr: 0,
       regWithin1yrTo5yr: 0,
       regOver5yr: 2,
       total: 2

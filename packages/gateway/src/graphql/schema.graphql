@@ -1041,16 +1041,16 @@ type GenderBasisTotalCount {
 
 type TimeFrameDetailMetrics {
   locationId: String!
-  regWithin45d: Int!
-  regWithin45dTo1yr: Int!
+  regWithinTargetd: Int!
+  regWithinTargetdTo1yr: Int!
   regWithin1yrTo5yr: Int!
   regOver5yr: Int!
   total: Int!
 }
 
 type TimeFrameTotalCount {
-  regWithin45d: Int!
-  regWithin45dTo1yr: Int!
+  regWithinTargetd: Int!
+  regWithinTargetdTo1yr: Int!
   regWithin1yrTo5yr: Int!
   regOver5yr: Int!
   total: Int!

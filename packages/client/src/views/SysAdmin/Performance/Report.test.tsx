@@ -41,16 +41,16 @@ describe('Report page', () => {
               details: [
                 {
                   locationId: 'Location/db5faba3-8143-4924-a44a-8562ed5e0437',
-                  regWithin45d: 0,
-                  regWithin45dTo1yr: 0,
+                  regWithinTargetd: 0,
+                  regWithinTargetdTo1yr: 0,
                   regWithin1yrTo5yr: 0,
                   regOver5yr: 2,
                   total: 2
                 }
               ],
               total: {
-                regWithin45d: 0,
-                regWithin45dTo1yr: 0,
+                regWithinTargetd: 0,
+                regWithinTargetdTo1yr: 0,
                 regWithin1yrTo5yr: 0,
                 regOver5yr: 2,
                 total: 2
@@ -123,8 +123,8 @@ describe('Report page', () => {
             timeFrames: {
               details: [],
               total: {
-                regWithin45d: 0,
-                regWithin45dTo1yr: 0,
+                regWithinTargetd: 0,
+                regWithinTargetdTo1yr: 0,
                 regWithin1yrTo5yr: 0,
                 regOver5yr: 0,
                 total: 0
