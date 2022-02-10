@@ -44,6 +44,8 @@ function mapStatetoProps(state: IStoreState, props: RouteProps) {
     ({ id }) => id === match.params.applicationId
   )
 
+  console.log(application)
+
   if (!application) {
     throw new Error(`Draft "${match.params.applicationId}" missing!`)
   }
