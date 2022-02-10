@@ -1267,69 +1267,6 @@ describe('markEventAsRegisteredCallbackHandler', () => {
 describe('markEventAsWaitingValidationHandler', () => {
   let server: any
 
-  const response = {
-    resourceType: 'Bundle',
-    entry: [
-      {
-        response: {
-          status: '201',
-          location:
-            '/fhir/Composition/d10947db-51e1-4f47-a5e1-3f9d1b58eee8/_history/38f489b2-7ebe-41bc-a2d3-27b55f3c20fe'
-        }
-      },
-      {
-        response: {
-          status: '201',
-          location:
-            '/fhir/Task/fb4a19b4-8f5f-4660-98a5-0a149d1580b3/_history/8c6a106a-34b3-4712-a54b-baa750ce1050'
-        }
-      },
-      {
-        response: {
-          status: '201',
-          location:
-            '/fhir/Patient/f814a8d6-abd4-4ccd-8ed9-235e0908edfc/_history/c3899d1d-4bd9-45af-a010-82ca55b83dfb'
-        }
-      },
-      {
-        response: {
-          status: '201',
-          location:
-            '/fhir/Patient/5de966c5-cc82-47a4-9676-4ea66285c3be/_history/808527d8-025b-4602-80a9-6bd0dac25670'
-        }
-      },
-      {
-        response: {
-          status: '201',
-          location:
-            '/fhir/RelatedPerson/da0f5fb7-4e63-4dcf-8220-dd13e663bb6a/_history/e38d8be2-7b50-4927-9c37-3a992e792eb0'
-        }
-      },
-      {
-        response: {
-          status: '201',
-          location:
-            '/fhir/Encounter/d3b9f408-a16a-42c2-9cfe-53ad2fbfda99/_history/e0bc842e-5a82-4bd7-812f-2977932f494e'
-        }
-      },
-      {
-        response: {
-          status: '201',
-          location:
-            '/fhir/Location/26094c60-01b6-4b42-aa1c-d5513b1a610e/_history/69f7fcb4-74d0-4597-a253-faca7307e044'
-        }
-      },
-      {
-        response: {
-          status: '201',
-          location:
-            '/fhir/Observation/d617505b-047f-459f-b486-9eb7c3fb0a82/_history/6eb5901a-9b7f-4272-9927-da3732f78cb5'
-        }
-      }
-    ],
-    type: 'transaction-response'
-  }
-
   const input = [
     {
       valueCode: 'child',
@@ -1398,38 +1335,29 @@ describe('markEventAsWaitingValidationHandler', () => {
   bundleWithInputOutput.entry[1].resource.output = output
   bundleWithInputOutputDeath.entry[1].resource.output = output
 
+  const getMarkBundleAndPostToHearthMockResponses = [
+    [userMock, { status: 200 }],
+    [fieldAgentPractitionerMock, { status: 200 }],
+    [taskResouceMock, { status: 200 }],
+    [fieldAgentPractitionerRoleMock, { status: 200 }],
+    [districtMock, { status: 200 }],
+    [upazilaMock, { status: 200 }],
+    [unionMock, { status: 200 }],
+    [officeMock, { status: 200 }],
+    [fieldAgentPractitionerRoleMock, { status: 200 }],
+    [districtMock, { status: 200 }],
+    [upazilaMock, { status: 200 }],
+    [unionMock, { status: 200 }],
+    [officeMock, { status: 200 }],
+    [hearthResponseMock, { status: 200 }]
+  ]
+
   beforeEach(async () => {
     fetch.resetMocks()
     server = await createServer()
     fetch.mockResponses(
-      [userMock, { status: 200 }],
-      [fieldAgentPractitionerMock, { status: 200 }],
-      [taskResouceMock, { status: 200 }],
-      [fieldAgentPractitionerRoleMock, { status: 200 }],
-      [districtMock, { status: 200 }],
-      [upazilaMock, { status: 200 }],
-      [unionMock, { status: 200 }],
-      [officeMock, { status: 200 }],
-      [fieldAgentPractitionerRoleMock, { status: 200 }],
-      [districtMock, { status: 200 }],
-      [upazilaMock, { status: 200 }],
-      [unionMock, { status: 200 }],
-      [officeMock, { status: 200 }],
-      [JSON.stringify(response), { status: 200 }],
-      [userMock, { status: 200 }],
-      [fieldAgentPractitionerMock, { status: 200 }],
-      [taskResouceMock, { status: 200 }],
-      [fieldAgentPractitionerRoleMock, { status: 200 }],
-      [districtMock, { status: 200 }],
-      [upazilaMock, { status: 200 }],
-      [unionMock, { status: 200 }],
-      [officeMock, { status: 200 }],
-      [fieldAgentPractitionerRoleMock, { status: 200 }],
-      [districtMock, { status: 200 }],
-      [upazilaMock, { status: 200 }],
-      [unionMock, { status: 200 }],
-      [officeMock, { status: 200 }],
-      [JSON.stringify(response), { status: 200 }]
+      ...getMarkBundleAndPostToHearthMockResponses,
+      ...getMarkBundleAndPostToHearthMockResponses
     )
   })
 
