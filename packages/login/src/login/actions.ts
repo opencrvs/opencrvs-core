@@ -12,6 +12,7 @@
 import { AxiosError } from 'axios'
 import { RouterAction, push, goBack as back } from 'connected-react-router'
 import {
+  IApplicationConfig,
   IAuthenticateResponse,
   IAuthenticationData,
   ITokenResponse
@@ -25,6 +26,10 @@ import {
   STEP_ONE,
   SUCCESS
 } from '@login/navigation/routes'
+
+export const CONFIG_LOAD = 'login/CONFIG_LOAD'
+export const CONFIG_LOADED = 'login/CONFIG_LOADED'
+export const CONFIG_LOAD_ERROR = 'login/CONFIG_LOAD_ERROR'
 
 export const AUTHENTICATE = 'login/AUTHENTICATE'
 export const AUTHENTICATION_COMPLETED = 'login/AUTHENTICATION_COMPLETED'
@@ -43,6 +48,20 @@ export const GOTO_APP = 'login/GOTO_APP'
 export enum FORGOTTEN_ITEMS {
   USERNAME = 'username',
   PASSWORD = 'password'
+}
+
+export type ApplicationConfigAction = {
+  type: typeof CONFIG_LOAD
+}
+
+export type ApplicationConfigLoaded = {
+  type: typeof CONFIG_LOADED
+  payload: IApplicationConfig
+}
+
+export type ApplicationConfigFailed = {
+  type: typeof CONFIG_LOAD_ERROR
+  payload: Error
 }
 
 export type AuthenticationDataAction = {
@@ -100,6 +119,9 @@ export type GoToAppAction = {
 
 export type Action =
   | RouterAction
+  | ApplicationConfigAction
+  | ApplicationConfigLoaded
+  | ApplicationConfigFailed
   | AuthenticationDataAction
   | AuthenticateResponseAction
   | AuthenticationFailedAction
@@ -111,6 +133,24 @@ export type Action =
   | VerifyCodeFailedAction
   | GoToAppAction
   | AuthenticationFieldValidationAction
+
+export const applicationConfigLoadAction = (): ApplicationConfigAction => ({
+  type: CONFIG_LOAD
+})
+
+export const applicationConfigLoadedAction = (
+  response: IApplicationConfig
+): ApplicationConfigLoaded => ({
+  type: CONFIG_LOADED,
+  payload: response
+})
+
+export const applicationConfigFailedAction = (
+  error: Error
+): ApplicationConfigFailed => ({
+  type: CONFIG_LOAD_ERROR,
+  payload: error
+})
 
 export const authenticate = (
   values: IAuthenticationData

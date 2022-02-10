@@ -407,7 +407,7 @@ describe('when user is in the register form for death event', () => {
           request: {
             query: FETCH_PERSON_NID,
             variables: {
-              nid: '1234567898',
+              nid: '123456789',
               dob: '1992-10-10',
               country: 'bgd'
             }
@@ -463,7 +463,7 @@ describe('when user is in the register form for death event', () => {
       selectOption(component, '#iDType', 'National ID number')
 
       component.find('input#iD').simulate('change', {
-        target: { id: 'iD', value: '1234567898' }
+        target: { id: 'iD', value: '123456789' }
       })
 
       component.find('input#birthDate-dd').simulate('change', {
@@ -494,7 +494,6 @@ describe('when user is in the register form for death event', () => {
         setTimeout(resolve, 200)
       })
       component.update()
-
       expect(component.find('#loader-button-success').hostNodes()).toHaveLength(
         1
       )

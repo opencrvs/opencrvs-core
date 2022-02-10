@@ -54,6 +54,10 @@ coverage:
         paths:
           - packages/metrics
         threshold: 0.5
+      config:
+        paths:
+          - packages/config
+        threshold: 0.5
 
 ignore:
   - 'packages/client/src/extract-translations.ts'
