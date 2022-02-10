@@ -252,10 +252,19 @@ type RegWorkflow { # Task
   timeLogged: Int # -> from metrics
 }
 
+type History {
+  user: User
+  date: Date
+  action: String
+  location: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastLocation').valueReference
+  office: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastOffice').valueReference
+}
+
 interface EventRegistration {
   id: ID! # long uuid
   registration: Registration
   createdAt: Date
+  history: [History]
 }
 
 input BirthRegistrationInput {
