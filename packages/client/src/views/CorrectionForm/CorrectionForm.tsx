@@ -43,7 +43,7 @@ function mapStateToProps(state: IStoreState, props: IRouteProps) {
   const application = state.applicationsState.applications.find(
     ({ id }) => id === applicationId
   )
-  console.log(application)
+
   if (!application) {
     throw new Error(`Draft "${applicationId}" missing!`)
   }

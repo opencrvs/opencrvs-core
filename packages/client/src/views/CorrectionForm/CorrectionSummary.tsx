@@ -369,7 +369,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
           return (
             <>
               {groupedValues}
-              {nestedValue && <br />}
+              {nestedValue && <div></div>}
               {nestedValue}
             </>
           )
@@ -522,7 +522,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
               </>
             ))
         )
-        // console.log(previousCompleteValue)
+
         return getRenderableField(
           section,
           (tagDef[0] && tagDef[0].label) || field.label,
@@ -648,7 +648,6 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
       offlineResources
     )
     let tempItem: any
-    // console.log(application)
 
     let items: any[] = []
     formSections.forEach((section) => {
@@ -729,8 +728,10 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
 
   getRequestedBy = () => {
     const corrector = this.props.application.data.corrector as IFormSectionData
-    const relationship = (corrector.relationship as IFormSectionData)
-      .value as string
+
+    const relationship =
+      corrector &&
+      ((corrector.relationship as IFormSectionData).value as string)
     switch (relationship) {
       case 'MOTHER':
         return this.getName(this.props.application.data.mother)
@@ -757,17 +758,19 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
   }
 
   getIdCheck = () => {
-    const idChecked = (
-      this.props.application.data.corrector as IFormSectionData
-    ).hasShowedVerifiedDocument as boolean
+    const corrector = this.props.application.data.corrector as IFormSectionData
+    const idChecked =
+      corrector &&
+      ((corrector as IFormSectionData).hasShowedVerifiedDocument as boolean)
     return idChecked
       ? this.props.intl.formatMessage(messages.idCheckWithoutVerify)
       : this.props.intl.formatMessage(messages.idCheckVerify)
   }
 
   getReasonForRequest = () => {
-    const reason = this.props.application.data.reason.type as IFormSectionData
-    const reasonValue = reason.value as string
+    const reason = this.props.application.data.reason as IFormSectionData
+    const reasonType = reason && (reason.type as IFormSectionData)
+    const reasonValue = reasonType && (reasonType.value as string)
     switch (reasonValue) {
       case 'CLERICAL_ERROR':
         return this.getReason(
@@ -787,7 +790,8 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
         )
       case 'OTHER':
         return this.getReason(
-          (reason.nestedFields as IFormSectionData).reasonForChange as string
+          (reasonType.nestedFields as IFormSectionData)
+            .reasonForChange as string
         )
       default:
         return '-'
@@ -814,8 +818,8 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
   }
 
   getComments = () => {
-    const comments = this.props.application.data.reason
-      .additionalComment as string
+    const reason = this.props.application.data.reason as IFormSectionData
+    const comments = reason && (reason.additionalComment as string)
 
     return (
       <div>
@@ -840,13 +844,16 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
   }
 
   getSupportingDocuments = () => {
-    const supportingDocuments = this.props.application.data.supportingDocuments
-      .uploadDocForLegalProof as IFormSectionData[]
+    const supportingDocuments = this.props.application.data
+      .supportingDocuments as IFormSectionData
+    const proofOfDoc =
+      supportingDocuments &&
+      (supportingDocuments.uploadDocForLegalProof as IFormSectionData[])
 
     return (
       <div>
-        {supportingDocuments &&
-          supportingDocuments.map((proof) => {
+        {proofOfDoc &&
+          proofOfDoc.map((proof) => {
             const doc = proof.optionValues as IFormSectionData[]
             return (
               <SupportingDocument>
