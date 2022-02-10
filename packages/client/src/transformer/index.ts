@@ -17,7 +17,8 @@ import {
   IFormFieldMapping,
   IFormFieldMutationMapFunction,
   IFormFieldQueryMapFunction,
-  IFormSection
+  IFormSection,
+  IFormSectionData
 } from '@client/forms'
 import {
   getConditionalActionsForField,
@@ -159,20 +160,22 @@ export const draftToGqlTransformer = (
             if (!transformedData.registration) {
               transformedData.registration = {}
             }
-
-            if (!transformedData.correction) {
-              transformedData.registration.correction = {}
+            if (!transformedData.registration.correction) {
+              transformedData.registration.correction = draftData.registration
+                .correction
+                ? { ...(draftData.registration.correction as IFormSectionData) }
+                : {}
             }
-
             if (!transformedData.registration.correction.values) {
               transformedData.registration.correction.values = []
             }
-
             transformedData.registration.correction.values.push({
               section: section.id,
               fieldName: fieldDef.name,
-              newValue: draftData[section.id][fieldDef.name],
-              oldValue: application.originalData[section.id][fieldDef.name]
+              newValue: draftData[section.id][fieldDef.name].toString(),
+              oldValue: (
+                application.originalData[section.id][fieldDef.name] || ''
+              ).toString()
             })
           }
         }

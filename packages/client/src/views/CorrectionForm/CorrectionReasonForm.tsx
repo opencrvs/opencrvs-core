@@ -42,8 +42,6 @@ import {
   groupHasError,
   updateApplicationRegistrationWithCorrection
 } from './utils'
-import { draftToGqlTransformer } from '@client/transformer'
-import { getCorrectorSection } from '@client/forms/correction/corrector'
 import { IStoreState } from '@client/store'
 
 type IConnectProps = {
