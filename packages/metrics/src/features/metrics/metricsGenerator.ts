@@ -152,8 +152,8 @@ const birthRegWithinTimeFramesQuery = (
 ): string => {
   const EXPECTED_BIRTH_REGISTRATION_IN_DAYS = birthRegistrationTargetInDays
   return `SELECT
-  SUM(withinTargetDays) AS regWithin45d,
-  SUM(within45DTo1Yr) AS regWithin45dTo1yr,
+  SUM(withinTargetDays) AS regWithinTargetd,
+  SUM(within45DTo1Yr) AS regWithinTargetdTo1yr,
   SUM(within1YrTo5Yr) AS regWithin1yrTo5yr,
   SUM(over5Yr) AS regOver5yr
  FROM (
@@ -189,8 +189,8 @@ const deathRegWithinTimeFramesQuery = (
 ): string => {
   const EXPECTED_BIRTH_REGISTRATION_IN_DAYS = deathRegistrationTargetInDays
   return `SELECT
-  SUM(withinTargetDays) AS regWithin45d,
-  SUM(within45DTo1Yr) AS regWithin45dTo1yr,
+  SUM(withinTargetDays) AS regWithinTargetd,
+  SUM(within45DTo1Yr) AS regWithinTargetdTo1yr,
   SUM(within1YrTo5Yr) AS regWithin1yrTo5yr,
   SUM(over5Yr) AS regOver5yr
  FROM (
@@ -251,14 +251,18 @@ export async function fetchRegWithinTimeFrames(
   const timeFramePoints = await query(queryString)
 
   const dataFromInflux = timeFramePoints.map((point: any) => {
-    const { regWithin45d, regWithin45dTo1yr, regWithin1yrTo5yr, regOver5yr } =
-      point
+    const {
+      regWithinTargetd,
+      regWithinTargetdTo1yr,
+      regWithin1yrTo5yr,
+      regOver5yr
+    } = point
     const total =
-      regWithin45d + regWithin45dTo1yr + regWithin1yrTo5yr + regOver5yr
+      regWithinTargetd + regWithinTargetdTo1yr + regWithin1yrTo5yr + regOver5yr
     return {
       locationId: point[lowerLocationLevel],
-      regWithin45d,
-      regWithin45dTo1yr,
+      regWithinTargetd,
+      regWithinTargetdTo1yr,
       regWithin1yrTo5yr,
       regOver5yr,
       total
@@ -267,8 +271,8 @@ export async function fetchRegWithinTimeFrames(
 
   const placeholder = {
     total: 0,
-    regWithin45d: 0,
-    regWithin45dTo1yr: 0,
+    regWithinTargetd: 0,
+    regWithinTargetdTo1yr: 0,
     regWithin1yrTo5yr: 0,
     regOver5yr: 0
   }

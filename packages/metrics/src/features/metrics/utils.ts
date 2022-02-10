@@ -26,12 +26,8 @@ import {
   JURISDICTION_TYPE_IDENTIFIER
 } from '@metrics/features/metrics/constants'
 import { IAuthHeader } from '@metrics/features/registration'
-import {
-  fetchLocation,
-  fetchFromResource,
-  fetchFHIR,
-  getApplicationConfig
-} from '@metrics/api'
+import { fetchLocation, fetchFromResource, fetchFHIR } from '@metrics/api'
+import { getApplicationConfig } from '@metrics/configApi'
 export const YEARLY_INTERVAL = '365d'
 export const MONTHLY_INTERVAL = '30d'
 export const WEEKLY_INTERVAL = '7d'
