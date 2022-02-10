@@ -56,8 +56,8 @@ export interface IMessageDescriptor {
 
 export interface IQuestion {
   fieldId: string
-  fhirSectionCode: string
-  fhirResource: IFhirResource
+  fhirSectionCode?: string
+  fhirResource?: IFhirResource
   label: IMessageDescriptor
   placeholder?: string
   maxLength?: number
@@ -68,6 +68,7 @@ export interface IQuestion {
   enabled: boolean
   required: boolean
   custom: boolean
+  conditionals?: string
 }
 
 export interface IQuestionModel extends IQuestion, Document {}
@@ -83,46 +84,24 @@ export const dropdownOption = new Schema({
   value: { type: String, required: true }
 })
 
-export interface IFhirResourceDataValueQuantity {
-  unit?: string
-  system?: string
-  code?: string
-  value?: string
-}
-
-const fhirResourceDataValueQuantitySchema = new Schema({
-  unit: { type: String },
-  system: { type: String },
-  code: { type: String },
-  value: { type: String }
-})
-
-export interface IFhirResourceData {
-  valueQuantity: IFhirResourceDataValueQuantity
-}
-
-const fhirResourceDataSchema = new Schema({
-  valueQuantity: { type: fhirResourceDataValueQuantitySchema, required: true }
-})
-
 export interface IFhirResource {
-  type: string
-  code?: string
-  description?: string
+  type: string // dot notation of the parent fhir resource type, followed by the prop, or comma delimeted props, in the resource to be updated with the fieldValue
+  observationCode?: string
+  observationDescription?: string
   categoryCode?: string
   categoryDescription?: string
-  data: IFhirResourceData
-  valueField: string // valueField defines the path in the data object where the field value is written
+  fhirRepresentation: string // the fhir resource that must be run with safe-eval to replace the instance of fieldValue with the actual value
+  customFhirFunction?: string // used for referring to random extra functions used when building fhir such as setPrimaryCaregiverReference
 }
 
 const fhirResourceSchema = new Schema({
-  type: { type: String, required: true },
-  code: { type: String },
-  description: { type: String },
+  type: { type: String, required: true }, // dot notation of the parent fhir resource type, followed by the prop, or comma delimeted props, in the resource to be updated with the fieldValue
+  observationCode: { type: String },
+  observationDescription: { type: String },
   categoryCode: { type: String },
   categoryDescription: { type: String },
-  data: { type: fhirResourceDataSchema, required: true },
-  valueField: { type: String, required: true } // valueField defines the path in the data object where the field value is written
+  fhirRepresentation: { type: String, required: true }, // the fhir resource that must be run with safe-eval to replace the instance of fieldValue with the actual value
+  customFhirFunction: { type: String } // used for referring to random extra functions used when building fhir such as setPrimaryCaregiverReference
 })
 
 const questionSchema = new Schema({
@@ -143,7 +122,8 @@ const questionSchema = new Schema({
   sectionPositionForField: { type: Number, required: true },
   required: { type: Boolean, required: true },
   enabled: { type: Boolean, required: true },
-  custom: { type: Boolean }
+  custom: { type: Boolean },
+  conditionals: { type: String }
 })
 
 export default model<IQuestionModel>('Question', questionSchema)

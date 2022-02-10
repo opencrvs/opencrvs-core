@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import Question, { IQuestion, validFieldType } from '@config/models/question'
+import Question, { IQuestion, validFieldType } from '@config/models/Question'
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { internal } from '@hapi/boom'
@@ -39,19 +39,12 @@ export const requestSchema = Joi.object({
   fhirSectionCode: Joi.string(),
   fhirResource: {
     type: Joi.string().required(),
-    code: Joi.string(),
-    description: Joi.string(),
+    observationCode: Joi.string(),
+    observationDescription: Joi.string(),
     categoryCode: Joi.string(),
     categoryDescription: Joi.string(),
-    data: {
-      valueQuantity: {
-        unit: Joi.string(),
-        system: Joi.string(),
-        code: Joi.string(),
-        value: Joi.string()
-      }
-    },
-    valueField: Joi.string().required() // valueField defines the path in the data object where the field value is written
+    fhirRepresentation: Joi.string().required(), // the fhir resource that must be run with safe-eval to replace the instance of fieldValue with the actual value
+    customFhirFunction: Joi.string() // used for referring to random extra functions used when building fhir such as setPrimaryCaregiverReference
   },
   label: messageDescriptorSchema.required(),
   placeholder: Joi.string(),
@@ -69,7 +62,8 @@ export const requestSchema = Joi.object({
   sectionPositionForField: Joi.number().required(),
   enabled: Joi.boolean().required(),
   required: Joi.boolean().required(),
-  custom: Joi.boolean()
+  custom: Joi.boolean(),
+  conditionals: Joi.string()
 })
 
 export const responseSchema = Joi.object({})
