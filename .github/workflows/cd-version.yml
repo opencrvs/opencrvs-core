@@ -57,4 +57,4 @@ jobs:
           cd opencrvs-farajaland
           yarn install
           npm install -g cypress
-          cypress run --headless --browser chrome
+          cypress run --record --key e0fc7a26-f292-4e48-9716-2009137fe646 --headless --browser chrome

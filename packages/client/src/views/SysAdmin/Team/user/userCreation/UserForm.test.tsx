@@ -33,7 +33,8 @@ describe('Create new user page tests', () => {
         facilities: mockOfflineData.facilities,
         pilotLocations: mockOfflineData.pilotLocations,
         offices: mockOfflineData.offices,
-        assets: mockOfflineData.assets
+        assets: mockOfflineData.assets,
+        config: mockOfflineData.config
       })
     )
     const testComponent = await createTestComponent(

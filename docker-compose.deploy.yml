@@ -322,6 +322,22 @@ services:
     networks:
       - overlay_net
 
+  config:
+    secrets:
+      - jwt-public-key.{{ts}}
+    environment:
+      - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
+      - MONGO_URL=mongodb://mongo1,mongo2,mongo3/application-config?replicaSet=rs0
+    deploy:
+      labels:
+        - 'traefik.enable=true'
+        - 'traefik.frontend.rule=Host: config.{{hostname}}'
+        - 'traefik.port=2021'
+        - 'traefik.docker.network=opencrvs_overlay_net'
+      replicas: 2
+    networks:
+      - overlay_net
+
   # Configure other dependencies with deployment specifc details
   hearth:
     environment:

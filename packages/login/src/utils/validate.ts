@@ -68,7 +68,7 @@ export const messages: {
 
 export const isAValidPhoneNumberFormat = (value: string): boolean => {
   const { pattern } = window.config.PHONE_NUMBER_PATTERN
-  return pattern.test(value)
+  return new RegExp(pattern).test(value)
 }
 
 export const requiredSymbol: Validation = (value: string) =>

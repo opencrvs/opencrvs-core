@@ -91,7 +91,7 @@ export class DocumentViewer extends React.Component<IProps, IState> {
               color="inherit"
               value={this.state.selectedOption as string}
               onChange={(val: string) => {
-                const imgArray = options.documentOptions.filter((doc) => {
+                const imgArray = options.documentOptions.filter(doc => {
                   return doc.label === val
                 })
                 if (imgArray[0]) {
