@@ -72,6 +72,7 @@ const UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_SUCCESS =
   'APPLICATION/UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_SUCCESS'
 const UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_FAIL =
   'APPLICATION/UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_FAIL'
+const CLEAR_CORRECTION_CHANGE = 'CLEAR_CORRECTION_CHANGE'
 
 export enum SUBMISSION_STATUS {
   DRAFT = 'DRAFT',
@@ -275,6 +276,12 @@ interface IModifyApplicationAction {
   }
 }
 
+interface IClearCorrectionChange {
+  type: typeof CLEAR_CORRECTION_CHANGE
+  payload: {
+    applicationId: string
+  }
+}
 export interface IWriteApplicationAction {
   type: typeof WRITE_APPLICATION
   payload: {
@@ -376,6 +383,7 @@ interface UpdateFieldAgentDeclaredApplicationsFailAction {
 export type Action =
   | IStoreApplicationAction
   | IModifyApplicationAction
+  | IClearCorrectionChange
   | ISetInitialApplicationsAction
   | IWriteApplicationAction
   | NavigationAction
@@ -497,6 +505,12 @@ export function modifyApplication(
 ): IModifyApplicationAction {
   application.modifiedOn = Date.now()
   return { type: MODIFY_APPLICATION, payload: { application } }
+}
+
+export function clearCorrectionChange(
+  applicationId: string
+): IClearCorrectionChange {
+  return { type: CLEAR_CORRECTION_CHANGE, payload: { applicationId } }
 }
 export function setInitialApplications() {
   return { type: SET_INITIAL_APPLICATION }
@@ -1253,10 +1267,28 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
         (application) => application.id === action.payload.application.id
       )
       newApplications[currentApplicationIndex] = action.payload.application
+
       return {
         ...state,
         applications: newApplications
       }
+    case CLEAR_CORRECTION_CHANGE: {
+      const applicationIndex = state.applications.findIndex(
+        (application) => application.id === action.payload.applicationId
+      )
+
+      const correction = state.applications[applicationIndex]
+
+      const orignalAppliation: IApplication = {
+        ...correction,
+        data: {
+          ...correction.originalData
+        }
+      }
+
+      return loop(state, Cmd.action(writeApplication(orignalAppliation)))
+    }
+
     case WRITE_APPLICATION:
       return loop(
         {

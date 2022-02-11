@@ -607,7 +607,7 @@ const birthApplication: IApplication = {
 const { store, history } = createStore()
 
 describe('Correction summary', () => {
-  describe('for an application', () => {
+  describe('for a birth application', () => {
     beforeEach(async () => {
       store.dispatch(storeApplication(birthApplication))
       wrapper = await createTestComponent(
@@ -810,13 +810,39 @@ describe('Correction summary', () => {
 
       expect(history.location.pathname).toContain('/review')
     })
-
-    it('should death application', () => {
+  })
+  describe('for a death application', () => {
+    beforeEach(async () => {
+      // ;(deathApplication.data.corrector.relationship as any).value = 'INFORMANT'
       store.dispatch(storeApplication(deathApplication))
+      wrapper = await createTestComponent(
+        <CorrectionForm
+          {...createRouterProps(
+            formatUrl(CERTIFICATE_CORRECTION, {
+              applicationId: deathApplication.id,
+              pageId: CorrectionSection.Summary
+            }),
+            { isNavigatedInsideApp: false },
+            {
+              matchParams: {
+                applicationId: deathApplication.id,
+                pageId: CorrectionSection.Summary
+              }
+            }
+          )}
+        />,
+        {
+          store,
+          history
+        }
+      )
+    })
+    it('should return corrector informat', () => {
       const instance = wrapper
         .find('CorrectionSummaryComponent')
         .instance() as any
-      expect(instance).toBeDefined()
+      const corrector = instance.getRequestedBy()
+      expect(corrector).toEqual('First Last')
     })
   })
 })

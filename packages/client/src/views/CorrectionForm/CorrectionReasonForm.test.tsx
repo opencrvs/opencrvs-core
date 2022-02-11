@@ -76,6 +76,17 @@ describe('Correction reason form', () => {
       ).toBeFalsy()
     })
 
+    it('should to go summary page', () => {
+      wrapper
+        .find('#type_CLERICAL_ERROR')
+        .hostNodes()
+        .simulate('change', { target: { checked: true } })
+      wrapper.update()
+      expect(
+        wrapper.find('#confirm_form').hostNodes().props().disabled
+      ).toBeFalsy()
+    })
+
     it('should disable the continue button if other option is selected without specifying the reason', () => {
       wrapper
         .find('#type_OTHER')

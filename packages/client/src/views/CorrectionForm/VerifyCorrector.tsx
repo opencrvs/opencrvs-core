@@ -10,7 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
-import { modifyApplication, IApplication } from '@client/applications'
+import {
+  modifyApplication,
+  IApplication,
+  writeApplication
+} from '@client/applications'
 import { ReviewSection } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/correction'
 import { goBack, goToPageGroup, goToHomeTab } from '@client/navigation'
@@ -58,6 +62,7 @@ interface IStateProps {
 interface IDispatchProps {
   goBack: typeof goBack
   modifyApplication: typeof modifyApplication
+  writeApplication: typeof writeApplication
   goToPageGroup: typeof goToPageGroup
   goToHomeTab: typeof goToHomeTab
 }
@@ -69,7 +74,7 @@ type IFullProps = IStateProps & IDispatchProps & IOwnProps & IntlShapeProps
 class VerifyCorrectorComponent extends React.Component<IFullProps> {
   handleVerification = (hasShowedVerifiedDocument: boolean) => {
     const application = this.props.application
-    this.props.modifyApplication({
+    const changed = {
       ...application,
       data: {
         ...application.data,
@@ -78,7 +83,10 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
           hasShowedVerifiedDocument
         }
       }
-    })
+    }
+    this.props.modifyApplication(changed)
+
+    this.props.writeApplication(changed)
 
     this.props.goToPageGroup(
       CERTIFICATE_CORRECTION_REVIEW,
@@ -134,16 +142,6 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
     }
   }
 
-  cancelCorrection = () => {
-    this.props.modifyApplication({
-      ...this.props.application,
-      data: {
-        ...this.props.application.originalData
-      }
-    })
-    this.props.goToHomeTab('review')
-  }
-
   render() {
     const { corrector } = this.props.match.params
     const { intl } = this.props
@@ -155,11 +153,11 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
     return (
       <ActionPageLight
         goBack={this.props.goBack}
-        goHome={this.cancelCorrection}
+        goHome={() => this.props.goToHomeTab('review')}
         title={intl.formatMessage(messages.title)}
         hideBackground
       >
-        {hasNoInfo ? (
+        {
           <IDVerifier
             id="idVerifier"
             title={
@@ -167,6 +165,7 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
                 ? intl.formatMessage(messages.otherIdCheckTitle)
                 : intl.formatMessage(messages.idCheckTitle)
             }
+            correctorInformation={(!hasNoInfo && correctorInfo) || undefined}
             actionProps={{
               positiveAction: {
                 label: intl.formatMessage(messages.idCheckVerify),
@@ -182,27 +181,7 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
               }
             }}
           />
-        ) : (
-          <IDVerifier
-            id="idVerifier"
-            title={intl.formatMessage(messages.idCheckTitle)}
-            correctorInformation={correctorInfo}
-            actionProps={{
-              positiveAction: {
-                label: intl.formatMessage(messages.idCheckVerify),
-                handler: () => {
-                  this.handleVerification(false)
-                }
-              },
-              negativeAction: {
-                label: intl.formatMessage(messages.idCheckWithoutVerify),
-                handler: () => {
-                  this.handleVerification(true)
-                }
-              }
-            }}
-          />
-        )}
+        }
       </ActionPageLight>
     )
   }
@@ -231,6 +210,7 @@ const mapStateToProps = (
 export const VerifyCorrector = connect(mapStateToProps, {
   goBack,
   modifyApplication,
+  writeApplication,
   goToPageGroup,
   goToHomeTab
 })(injectIntl(VerifyCorrectorComponent))

@@ -10,7 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { modifyApplication, IApplication } from '@client/applications'
+import {
+  modifyApplication,
+  IApplication,
+  writeApplication
+} from '@client/applications'
 import { getCorrectorSection } from '@client/forms/correction/corrector'
 import { connect } from 'react-redux'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
@@ -39,6 +43,7 @@ type IDispatchProps = {
   goBack: typeof goBack
   goToVerifyCorrector: typeof goToVerifyCorrector
   modifyApplication: typeof modifyApplication
+  writeApplication: typeof writeApplication
   goToHomeTab: typeof goToHomeTab
 }
 
@@ -123,21 +128,12 @@ function CorrectorFormComponent(props: IFullProps) {
     })
   }
   const continueButtonHandler = () => {
+    props.writeApplication(application)
     props.goToVerifyCorrector(
       application.id,
       (application.data.corrector.relationship as IFormSectionData)
         .value as string
     )
-  }
-
-  const cancelCorrection = () => {
-    props.modifyApplication({
-      ...application,
-      data: {
-        ...application.originalData
-      }
-    })
-    props.goToHomeTab('review')
   }
 
   const continueButton = (
@@ -158,7 +154,7 @@ function CorrectorFormComponent(props: IFullProps) {
         title={intl.formatMessage(section.title)}
         hideBackground
         goBack={props.goBack}
-        goHome={cancelCorrection}
+        goHome={() => props.goToHomeTab('review')}
       >
         <Content
           title={group.title && intl.formatMessage(group.title)}
@@ -187,6 +183,7 @@ function CorrectorFormComponent(props: IFullProps) {
 export const CorrectorForm = connect(undefined, {
   goBack,
   modifyApplication,
+  writeApplication,
   goToVerifyCorrector,
   goToHomeTab
 })(injectIntl(CorrectorFormComponent))

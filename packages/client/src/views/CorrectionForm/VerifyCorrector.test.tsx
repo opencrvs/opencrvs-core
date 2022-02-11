@@ -215,6 +215,88 @@ describe('verify corrector tests', () => {
           testComponent.find('#withoutVerificationPrompt').hostNodes()
         ).toHaveLength(0)
       })
+
+      it('clicking on Confirm button and go to review', () => {
+        testComponent
+          .find('#idVerifier')
+          .find('#verifyNegative')
+          .hostNodes()
+          .simulate('click')
+
+        testComponent.update()
+
+        testComponent
+          .find('#withoutVerificationPrompt')
+          .find('#send')
+          .hostNodes()
+          .simulate('click')
+
+        testComponent.update()
+
+        expect(history.location.pathname).toContain('/review-view-group')
+      })
+
+      it('go to review page', () => {
+        testComponent.find('#crcl-btn').hostNodes().simulate('click')
+
+        testComponent.update()
+
+        expect(history.location.pathname).toContain('/review')
+      })
+    })
+  })
+
+  describe('in case correction is not father, mother, child or informant', () => {
+    let testComponent: ReactWrapper
+    beforeEach(async () => {
+      testComponent = await createTestComponent(
+        <VerifyCorrector
+          history={history}
+          location={history.location}
+          match={{
+            params: {
+              applicationId: 'mockBirth1234',
+              corrector: 'other'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        { store, history }
+      )
+    })
+
+    it('renders idVerifier compomnent', () => {
+      expect(testComponent.find('#idVerifier').hostNodes()).toHaveLength(1)
+    })
+
+    it('clicking on yes button takes user to review certificate', () => {
+      Date.now = jest.fn(() => 243885600000)
+
+      testComponent
+        .find('#idVerifier')
+        .find('#verifyPositive')
+        .hostNodes()
+        .simulate('click')
+
+      testComponent.update()
+
+      expect(history.location.pathname).not.toContain('/verify')
+    })
+
+    it('clicking on no button shows up modal', () => {
+      testComponent
+        .find('#idVerifier')
+        .find('#verifyNegative')
+        .hostNodes()
+        .simulate('click')
+
+      testComponent.update()
+
+      expect(
+        testComponent.find('#withoutVerificationPrompt').hostNodes()
+      ).toHaveLength(1)
     })
   })
 })

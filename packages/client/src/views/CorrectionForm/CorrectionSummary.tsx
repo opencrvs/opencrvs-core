@@ -131,7 +131,6 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
       application: { event }
     } = this.props
     const formSections = getViewableSection(registerForm[event], application)
-    console.log(application)
     const backToReviewButton = (
       <SecondaryButton
         id="back_to_review"
@@ -162,7 +161,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
           title={intl.formatMessage(messages.title)}
           hideBackground
           goBack={goBack}
-          goHome={this.cancelCorrection}
+          goHome={() => this.props.goToHomeTab('review')}
         >
           <Content
             title={intl.formatMessage(messages.correctionSummaryTitle)}
@@ -507,7 +506,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
               offlineResources,
               language,
               undefined,
-              !index
+              !!index
             )
           )
           .filter((value) => value)
@@ -883,16 +882,6 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
 
   makeCorrection = () => {
     alert('correction made')
-  }
-
-  cancelCorrection = () => {
-    this.props.modifyApplication({
-      ...this.props.application,
-      data: {
-        ...this.props.application.originalData
-      }
-    })
-    this.props.goToHomeTab('review')
   }
 
   gotoReviewPage = () => {

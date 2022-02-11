@@ -10,7 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { modifyApplication, IApplication } from '@client/applications'
+import {
+  modifyApplication,
+  IApplication,
+  writeApplication
+} from '@client/applications'
 import { connect } from 'react-redux'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import {
@@ -43,6 +47,7 @@ type IDispatchProps = {
   goBack: typeof goBack
   goToHomeTab: typeof goToHomeTab
   goToCertificateCorrection: typeof goToCertificateCorrection
+  writeApplication: typeof writeApplication
   modifyApplication: typeof modifyApplication
 }
 
@@ -93,17 +98,8 @@ function CorrectionReasonFormComponent(props: IFullProps) {
   }
 
   const continueButtonHandler = () => {
+    props.writeApplication(application)
     props.goToCertificateCorrection(application.id, CorrectionSection.Summary)
-  }
-
-  const cancelCorrection = () => {
-    props.modifyApplication({
-      ...application,
-      data: {
-        ...application.originalData
-      }
-    })
-    props.goToHomeTab('review')
   }
 
   const continueButton = (
@@ -124,7 +120,7 @@ function CorrectionReasonFormComponent(props: IFullProps) {
         title={intl.formatMessage(section.title)}
         hideBackground
         goBack={props.goBack}
-        goHome={cancelCorrection}
+        goHome={() => props.goToHomeTab('review')}
       >
         <Content
           title={group.title && intl.formatMessage(group.title)}
@@ -150,5 +146,6 @@ export const CorrectionReasonForm = connect(undefined, {
   goBack,
   goToHomeTab,
   modifyApplication,
-  goToCertificateCorrection
+  goToCertificateCorrection,
+  writeApplication
 })(injectIntl(CorrectionReasonFormComponent))

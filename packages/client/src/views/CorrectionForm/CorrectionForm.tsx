@@ -21,10 +21,29 @@ import {
 import { CorrectionSection } from '@client/forms'
 import { CorrectionReasonForm } from './CorrectionReasonForm'
 import { CorrectionSummary } from './CorrectionSummary'
+import { Spinner } from '@opencrvs/components/lib/interface'
+import styled from '@client/styledComponents'
+
+const SpinnerWrapper = styled.div`
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+`
 
 type IProps = IStateProps & IDispatchProps
 
 function CorrectionFormComponent({ sectionId, ...props }: IProps) {
+  if (props.isWritingDraft) {
+    return (
+      <SpinnerWrapper>
+        <Spinner id="draft_write_loading" />
+      </SpinnerWrapper>
+    )
+  }
+
   switch (sectionId) {
     case CorrectionSection.Corrector:
       return <CorrectorForm {...props} />
@@ -50,13 +69,15 @@ function mapStateToProps(state: IStoreState, props: IRouteProps) {
 
   return {
     application,
-    sectionId
+    sectionId,
+    isWritingDraft: state.applicationsState.isWritingDraft
   }
 }
 
 type IStateProps = {
   application: IApplication
   sectionId: string
+  isWritingDraft: boolean
 }
 
 type IDispatchProps = {}
