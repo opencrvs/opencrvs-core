@@ -108,179 +108,6 @@ export interface IInformantField {
   disabled: boolean
 }
 
-// const setInformantFields = (
-//   intl: IntlShape,
-//   event: string
-// ): IInformantField[] => {
-//   if (event === Event.BIRTH) {
-//     return [
-//       {
-//         id: `select_informant_${INFORMANT.MOTHER}`,
-//         option: {
-//           label: intl.formatMessage(formMessages.mother),
-//           value: INFORMANT.MOTHER
-//         },
-//         disabled: false
-//       },
-//       {
-//         id: `select_informant_${INFORMANT.FATHER}`,
-//         option: {
-//           label: intl.formatMessage(formMessages.father),
-//           value: INFORMANT.FATHER
-//         },
-//         disabled: false
-//       },
-//       {
-//         id: `select_informant_${INFORMANT.GRANDFATHER}`,
-//         option: {
-//           label: intl.formatMessage(formMessages.grandfather),
-//           value: INFORMANT.GRANDFATHER
-//         },
-//         disabled: false
-//       },
-//       {
-//         id: `select_informant_${INFORMANT.GRANDMOTHER}`,
-//         option: {
-//           label: intl.formatMessage(formMessages.grandmother),
-//           value: INFORMANT.GRANDMOTHER
-//         },
-//         disabled: false
-//       },
-//       {
-//         id: `select_informant_${INFORMANT.BROTHER}`,
-//         option: {
-//           label: intl.formatMessage(formMessages.brother),
-//           value: INFORMANT.BROTHER
-//         },
-//         disabled: false
-//       },
-//       {
-//         id: `select_informant_${INFORMANT.SISTER}`,
-//         option: {
-//           label: intl.formatMessage(formMessages.sister),
-//           value: INFORMANT.SISTER
-//         },
-//         disabled: false
-//       },
-//       {
-//         id: `select_informant_${INFORMANT.LEGAL_GUARDIAN}`,
-//         option: {
-//           label: intl.formatMessage(formMessages.legalGuardian),
-//           value: INFORMANT.LEGAL_GUARDIAN
-//         },
-//         disabled: false
-//       }
-// {
-//   id: `select_informant_${INFORMANT.BOTH_PARENTS}`,
-//   option: {
-//     label: intl.formatMessage(messages.parents),
-//     value: INFORMANT.BOTH_PARENTS
-//   },
-//   disabled: false
-// },
-// {
-//   id: `select_informant_${INFORMANT.SOMEONE_ELSE}`,
-//   option: {
-//     label: intl.formatMessage(formMessages.someoneElse),
-//     value: INFORMANT.SOMEONE_ELSE
-//   },
-//   disabled: false
-// },
-// {
-//   id: `select_informant_${INFORMANT.SELF}`,
-//   option: {
-//     label: intl.formatMessage(formMessages.self),
-//     value: INFORMANT.SELF
-//   },
-//   disabled: true
-// }
-//     ]
-//   } else {
-//     return [
-//       {
-//         id: `select_informant_${INFORMANT.SPOUSE}`,
-//         option: {
-//           label: intl.formatMessage(formMessages.spouse),
-//           value: INFORMANT.SPOUSE
-//         },
-//         disabled: false
-//       },
-//       {
-//         id: `select_informant_${INFORMANT.SON}`,
-//         option: {
-//           label: intl.formatMessage(formMessages.son),
-//           value: INFORMANT.SON
-//         },
-//         disabled: false
-//       },
-//       {
-//         id: `select_informant_${INFORMANT.DAUGHTER}`,
-//         option: {
-//           label: intl.formatMessage(formMessages.daughter),
-//           value: INFORMANT.DAUGHTER
-//         },
-//         disabled: false
-//       },
-//       {
-//         id: `select_informant_${INFORMANT.SON_IN_LAW}`,
-//         option: {
-//           label: intl.formatMessage(formMessages.sonInLaw),
-//           value: INFORMANT.SON_IN_LAW
-//         },
-//         disabled: false
-//       },
-//       {
-//         id: `select_informant_${INFORMANT.DAUGHTER_IN_LAW}`,
-//         option: {
-//           label: intl.formatMessage(formMessages.daughterInLaw),
-//           value: INFORMANT.DAUGHTER_IN_LAW
-//         },
-//         disabled: false
-//       },
-//       {
-//         id: `select_informant_${INFORMANT.FATHER}`,
-//         option: {
-//           label: intl.formatMessage(formMessages.father),
-//           value: INFORMANT.FATHER
-//         },
-//         disabled: false
-//       },
-//       {
-//         id: `select_informant_${INFORMANT.MOTHER}`,
-//         option: {
-//           label: intl.formatMessage(formMessages.mother),
-//           value: INFORMANT.MOTHER
-//         },
-//         disabled: false
-//       },
-//       {
-//         id: `select_informant_${INFORMANT.GRANDSON}`,
-//         option: {
-//           label: intl.formatMessage(formMessages.grandson),
-//           value: INFORMANT.GRANDSON
-//         },
-//         disabled: false
-//       },
-//       {
-//         id: `select_informant_${INFORMANT.GRANDDAUGHTER}`,
-//         option: {
-//           label: intl.formatMessage(formMessages.granddaughter),
-//           value: INFORMANT.GRANDDAUGHTER
-//         },
-//         disabled: false
-//       },
-//       {
-//         id: `select_informant_${INFORMANT.SOMEONE_ELSE}`,
-//         option: {
-//           label: intl.formatMessage(formMessages.someoneElse),
-//           value: INFORMANT.SOMEONE_ELSE
-//         },
-//         disabled: false
-//       }
-//     ]
-//   }
-// }
-
 interface IMatchProps {
   applicationId: string
 }
@@ -374,78 +201,19 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
             (sectionData[activeSection.id] as IFormSectionData)
               ?.nestedFields as IFormSectionData
           )?.otherRelationship
-    // this.props.modifyApplication({
-    //   ...application,
-    //   data: {
-    //     ...application?.data,
-    //     [activeSection.id]: {
-    //       ...application?.data[activeSection.id],
-    //       ...sectionData
-    //     }
-    //   }
-    // })
     const event = this.props.location.pathname.includes(Event.BIRTH)
       ? Event.BIRTH
       : Event.DEATH
-
-    // if (
-    //   this.state.informant &&
-    //   this.state.informant !== 'error' &&
-    //   this.state.informant === INFORMANT.BOTH_PARENTS
-    // ) {
-    //   const {
-    //     application,
-    //     goToPrimaryApplicant,
-    //     registrationSection,
-    //     goToBirthRegistrationAsParent
-    //   } = this.props
-    //   this.props.modifyApplication({
-    //     ...application,
-    //     data: {
-    //       ...application.data,
-    //       registration: {
-    //         ...application.data[registrationSection.id],
-    //         ...{
-    //           presentAtBirthRegistration: this.state.informant,
-    //           applicant: {
-    //             value:
-    //               (this.props.application &&
-    //                 this.props.application.data &&
-    //                 this.props.application.data[registrationSection.id] &&
-    //                 this.props.application.data[registrationSection.id]
-    //                   .applicant &&
-    //                 (
-    //                   this.props.application.data[registrationSection.id]
-    //                     .applicant as IFormSectionData
-    //                 ).value) ||
-    //               '',
-    //             nestedFields: {}
-    //           }
-    //         }
-    //       }
-    //     }
-    //   })
-    //   event === Event.BIRTH
-    //     ? goToBirthRegistrationAsParent(this.props.match.params.applicationId)
-    //     : goToPrimaryApplicant(this.props.match.params.applicationId)
-    // }
-
-    const {
-      application,
-      goToBirthRegistrationAsParent,
-      goToDeathRegistration,
-      registrationSection,
-      applicantsSection
-    } = this.props
+    const { application, registrationSection, applicantsSection } = this.props
     const newApplication = {
       ...application,
       data: {
-        ...application.data
+        ...application?.data
       }
     }
     if (event === Event.BIRTH) {
       newApplication.data[registrationSection.id] = {
-        ...application.data[registrationSection.id],
+        ...application?.data[registrationSection.id],
         ...{
           presentAtBirthRegistration: applicant,
           applicant: {
@@ -466,106 +234,23 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       }
     }
     this.props.modifyApplication(newApplication)
-
-    // this.props.location.pathname.includes(Event.BIRTH)
-    //   ? goToBirthRegistrationAsParent(this.props.match.params.applicationId)
-    //   : goToDeathRegistration(this.props.match.params.applicationId)
-    // else if (
-    //   event === Event.DEATH &&
-    //   this.state.informant &&
-    //   this.state.informant !== 'error' &&
-    //   this.state.informant === INFORMANT.SOMEONE_ELSE
-    // ) {
-    //   const { application, goToDeathRegistration, applicantsSection } =
-    //     this.props
-    //   this.props.modifyApplication({
-    //     ...application,
-    //     data: {
-    //       ...application.data,
-    //       [applicantsSection.id]: {
-    //         ...application.data[applicantsSection.id],
-    //         ...{
-    //           relationship: this.state.informant
-    //         }
-    //       }
-    //     }
-    //   })
-
-    //   goToDeathRegistration(this.props.match.params.applicationId)
-    // } else if (
-    //   event === Event.BIRTH &&
-    //   this.state.informant &&
-    //   this.state.informant !== 'error' &&
-    //   this.state.informant === INFORMANT.SOMEONE_ELSE
-    // ) {
-    //   const {
-    //     application,
-    //     registrationSection,
-    //     goToBirthRegistrationAsParent
-    //   } = this.props
-
-    //   const modifiedApplicationData = {
-    //     ...application,
-    //     data: {
-    //       ...application.data,
-    //       [registrationSection.id]: {
-    //         ...application.data[registrationSection.id],
-    //         ...{
-    //           presentAtBirthRegistration: this.state.informant,
-    //           applicant: {
-    //             value:
-    //               (this.props.application &&
-    //                 this.props.application.data &&
-    //                 this.props.application.data[registrationSection.id] &&
-    //                 this.props.application.data[registrationSection.id]
-    //                   .applicant &&
-    //                 (
-    //                   this.props.application.data[registrationSection.id]
-    //                     .applicant as IFormSectionData
-    //                 ).value) ||
-    //               '',
-    //             nestedFields:
-    //               (this.props.application &&
-    //                 this.props.application.data &&
-    //                 this.props.application.data[registrationSection.id] &&
-    //                 this.props.application.data[registrationSection.id]
-    //                   .applicant &&
-    //                 (
-    //                   this.props.application.data[registrationSection.id]
-    //                     .applicant as IFormSectionData
-    //                 ).nestedFields) ||
-    //               {}
-    //           }
-    //         }
-    //       }
-    //     }
-    //   }
-    //   this.props.modifyApplication(modifiedApplicationData)
-    //   goToBirthRegistrationAsParent(this.props.match.params.applicationId)
-    // } else {
-    //   this.setState({ informant: 'error' })
-    // }
   }
 
   handleContinue = () => {
-    console.log('first')
     const event = this.props.location.pathname.includes(Event.BIRTH)
       ? Event.BIRTH
       : Event.DEATH
-    // console.log(event)
-    // event ===
     event === Event.BIRTH
       ? this.props.goToBirthRegistrationAsParent(
           this.props.match.params.applicationId
         )
-      : this.props.goToPrimaryApplicant(this.props.match.params.applicationId)
+      : this.props.goToDeathRegistration(this.props.match.params.applicationId)
   }
   render() {
     const { intl } = this.props
     const event = this.props.location.pathname.includes(Event.BIRTH)
       ? Event.BIRTH
       : Event.DEATH
-    // const informantFields = setInformantFields(intl, event)
 
     let titleMessage
     switch (event) {
@@ -620,29 +305,6 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
               fields={this.group.fields}
               draftData={this.props.application?.data}
             />
-            {/* {informantFields.map((informantField: IInformantField) => {
-              return (
-                <RadioButton
-                  size={RADIO_BUTTON_LARGE_STRING}
-                  key={informantField.id}
-                  name={INFORMANT_FIELD_STRING}
-                  label={informantField.option.label}
-                  value={informantField.option.value}
-                  id={informantField.id}
-                  selected={
-                    this.state.informant === informantField.option.value
-                      ? informantField.option.value
-                      : ''
-                  }
-                  onChange={() =>
-                    this.setState({
-                      informant: informantField.option.value as string
-                    })
-                  }
-                  disabled={informantField.disabled}
-                />
-              )
-            })} */}
           </Actions>
           <PrimaryButton id="continue" onClick={this.handleContinue}>
             {intl.formatMessage(buttonMessages.continueButton)}

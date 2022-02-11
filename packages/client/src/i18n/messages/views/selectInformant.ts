@@ -24,6 +24,13 @@ interface IFormMessages
   sister: MessageDescriptor
   legalGuardian: MessageDescriptor
   informantError: MessageDescriptor
+  spouse: MessageDescriptor
+  son: MessageDescriptor
+  sonInLaw: MessageDescriptor
+  grandson: MessageDescriptor
+  daughter: MessageDescriptor
+  daughterInLaw: MessageDescriptor
+  granddaughter: MessageDescriptor
 }
 
 const messagesToDefine: IFormMessages = {
@@ -101,6 +108,41 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Who is applying for death registration?',
     description: 'Who is applying for death registration',
     id: 'register.selectInformant.deathInformantTitle'
+  },
+  spouse: {
+    defaultMessage: 'Spouse',
+    description: 'Label for option Spouse',
+    id: 'form.field.label.applicantRelation.spouse'
+  },
+  son: {
+    defaultMessage: 'Son',
+    description: 'Label for option Son',
+    id: 'form.field.label.applicantRelation.son'
+  },
+  sonInLaw: {
+    defaultMessage: 'Son in law',
+    description: 'Label for option Son in law',
+    id: 'form.field.label.applicantRelation.sonInLaw'
+  },
+  grandson: {
+    defaultMessage: 'Grandson',
+    description: 'Label for option Grandson',
+    id: 'form.field.label.applicantRelation.grandson'
+  },
+  daughter: {
+    defaultMessage: 'Daughter',
+    description: 'Label for option Daughter',
+    id: 'form.field.label.applicantRelation.daughter'
+  },
+  daughterInLaw: {
+    defaultMessage: 'Daughter in law',
+    description: 'Label for option Daughter in law',
+    id: 'form.field.label.applicantRelation.daughterInLaw'
+  },
+  granddaughter: {
+    defaultMessage: 'Granddaughter',
+    description: 'Label for option Granddaughter',
+    id: 'form.field.label.applicantRelation.granddaughter'
   }
 }
 

@@ -173,7 +173,7 @@ type BirthRegistration implements EventRegistration {
   attendantAtBirth: AttendantType
   otherAttendantAtBirth: String
   birthRegistrationType: BirthRegType
-  presentAtBirthRegistration: BirthRegPresence
+  presentAtBirthRegistration: String
   otherPresentAtBirthRegistration: String
   childrenBornAliveToMother: Int
   foetalDeathsToMother: Int
@@ -200,7 +200,7 @@ input BirthRegistrationInput {
   attendantAtBirth: AttendantType
   otherAttendantAtBirth: String
   birthRegistrationType: BirthRegType
-  presentAtBirthRegistration: BirthRegPresence
+  presentAtBirthRegistration: String
   otherPresentAtBirthRegistration: String
   childrenBornAliveToMother: Int
   foetalDeathsToMother: Int

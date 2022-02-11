@@ -106,24 +106,17 @@ const deathInformantRelationGroup: IFormSectionGroup = {
       initialValue: '',
       validate: [],
       options: [
-        { value: 'MOTHER', label: formMessages.mother },
+        { value: 'SPOUSE', label: formMessages.spouse },
+        { value: 'SON', label: formMessages.son },
+        { value: 'DAUGHTER', label: formMessages.daughter },
+        { value: 'SON_IN_LAW', label: formMessages.sonInLaw },
+        { value: 'DAUGHTER_IN_LAW', label: formMessages.daughterInLaw },
         { value: 'FATHER', label: formMessages.father },
-        { value: 'GRANDFATHER', label: formMessages.grandfather },
+        { value: 'MOTHER', label: formMessages.mother },
+        { value: 'GRANDSON', label: formMessages.grandson },
         {
-          value: 'GRANDMOTHER',
-          label: formMessages.grandmother
-        },
-        {
-          value: 'BROTHER',
-          label: formMessages.brother
-        },
-        {
-          value: 'SISTER',
-          label: formMessages.sister
-        },
-        {
-          value: 'LEGAL_GUARDIAN',
-          label: formMessages.legalGuardian
+          value: 'GRANDDAUGHTER',
+          label: formMessages.granddaughter
         },
         {
           value: 'SOMEONE_ELSE',
@@ -131,19 +124,23 @@ const deathInformantRelationGroup: IFormSectionGroup = {
         }
       ],
       nestedFields: {
-        MOTHER: [],
+        SPOUSE: [],
+        SON: [],
+        DAUGHTER: [],
+        SON_IN_LAW: [],
+        DAUGHTER_IN_LAW: [],
         FATHER: [],
-        GRANDFATHER: [],
-        GRANDMOTHER: [],
-        LEGAL_GUARDIAN: [],
+        MOTHER: [],
+        GRANDSON: [],
+        GRANDDAUGHTER: [],
         SOMEONE_ELSE: [
           {
             name: 'otherRelationship',
             type: 'TEXT',
             label: {
-              defaultMessage: 'Relationship to child',
-              id: 'form.field.label.applicantsRelationWithChild',
-              description: 'Label for input Relationship to child'
+              defaultMessage: 'Relationship to deceased',
+              id: 'form.field.label.applicantsRelationWithDeceased',
+              description: 'Label for input Relationship to deceased'
             },
             placeholder: {
               defaultMessage: 'eg. Uncle',
