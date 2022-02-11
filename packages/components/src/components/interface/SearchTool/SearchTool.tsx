@@ -112,6 +112,12 @@ const SelectedSearchCriteria = styled.span`
     & .selected-icon {
       display: flex;
     }
+    & .selected-icon:focus {
+      background: 2px solid ${({ theme }) => theme.colors.yellow500};
+    }
+    & .selected-icon:active {
+      background: 2px solid ${({ theme }) => theme.colors.yellow500};
+    }
     & .selected-label {
       display: none;
     }

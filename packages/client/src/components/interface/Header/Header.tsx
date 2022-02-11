@@ -130,7 +130,6 @@ const StyledPrimaryButton = styled(PrimaryButton)`
 const SearchBox = styled.div`
   position: static;
   width: 624px;
-  min-width: 220px;
   height: 42px;
   left: calc(50% - 624px / 2 + 24px);
   top: calc(50% - 40px / 2);
@@ -432,6 +431,18 @@ class HeaderComp extends React.Component<IProps, IState> {
 
     if (activeMenuItem !== ACTIVE_MENU_ITEM.APPLICATIONS) {
       rightMenu = [
+        {
+          element: (
+            <HeaderLeft>
+              <CircleButton onClick={() => this.props.goBack()}>
+                <BackArrowDeepBlue />
+              </CircleButton>
+              <CircleButton onClick={() => this.props.goForward()}>
+                <ForwardArrowDeepBlue />
+              </CircleButton>
+            </HeaderLeft>
+          )
+        },
         {
           element: <ProfileMenu key="profileMenu" />
         }
