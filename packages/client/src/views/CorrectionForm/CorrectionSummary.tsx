@@ -10,7 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { modifyApplication, IApplication } from '@client/applications'
+import {
+  modifyApplication,
+  IApplication,
+  SUBMISSION_STATUS
+} from '@client/applications'
 import { connect } from 'react-redux'
 import { flatten, isArray, flattenDeep, get, clone } from 'lodash'
 import {
@@ -39,7 +43,7 @@ import {
   IFormData,
   IFormTag,
   REVIEW_OVERRIDE_POSITION,
-  IFormFieldValue
+  Action
 } from '@client/forms'
 
 import {
@@ -68,7 +72,8 @@ import {
   isViewOnly,
   isVisibleField,
   renderValue,
-  sectionHasError
+  sectionHasError,
+  updateApplicationRegistrationWithCorrection
 } from './utils'
 import { IStoreState } from '@client/store'
 import { getRegisterForm } from '@client/forms/register/application-selectors'
@@ -78,6 +83,8 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { CorrectorRelationship } from '@client/forms/correction/corrector'
 import { CorrectionReason } from '@client/forms/correction/reason'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { IGQLLocation } from '@client/utils/userUtils'
 
 const SupportingDocument = styled.div`
   display: flex;
@@ -87,6 +94,7 @@ const SupportingDocument = styled.div`
   }
 `
 interface IProps {
+  userPrimaryOffice?: IGQLLocation
   registerForm: { [key: string]: IForm }
   offlineResources: IOfflineData
   language: string
@@ -880,7 +888,12 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
   }
 
   makeCorrection = () => {
-    alert('correction made')
+    const application = this.props.application
+    application.action = Action.REQUEST_CORRECTION_APPLICATION
+    application.submissionStatus = SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION
+    updateApplicationRegistrationWithCorrection(application, {
+      userPrimaryOffice: this.props.userPrimaryOffice
+    })
   }
 
   gotoReviewPage = () => {
@@ -898,7 +911,8 @@ export const CorrectionSummary = connect(
   (state: IStoreState) => ({
     registerForm: getRegisterForm(state),
     offlineResources: getOfflineData(state),
-    language: getLanguage(state)
+    language: getLanguage(state),
+    userPrimaryOffice: getUserDetails(state)?.primaryOffice
   }),
   {
     modifyApplication,
