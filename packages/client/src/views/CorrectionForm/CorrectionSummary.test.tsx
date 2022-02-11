@@ -16,7 +16,8 @@ import {
   createRouterProps,
   getFileFromBase64String,
   validImageB64String,
-  flushPromises
+  flushPromises,
+  mockDeathApplicationData
 } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
@@ -31,112 +32,10 @@ let wrapper: ReactWrapper<{}, {}>
 const deathApplication: IApplication = {
   id: '85bccf72-6117-4cab-827d-47728becb0c1',
   data: {
-    registration: {
-      relationship: {
-        value: 'SON',
-        nestedFields: {
-          otherRelationship: ''
-        }
-      },
-      contactPoint: {
-        value: 'APPLICANT',
-        nestedFields: {
-          registrationPhone: '0712345678',
-          contactRelationship: ''
-        }
-      },
-      _fhirID: '7add91d4-93c6-4357-96d8-a05b2a8ad333',
-      trackingId: 'DVSXZBQ',
-      registrationNumber: '2022DVSXZBQ',
-      type: 'death',
-      commentsOrNotes: '',
-      regStatus: {
-        type: 'REGISTERED',
-        statusDate: '2022-02-01T10:33:51.600Z',
-        officeName: 'Lusaka DNRPC District Office',
-        officeAlias: 'Lusaka DNRPC District Office',
-        officeAddressLevel3: 'Lusaka District',
-        officeAddressLevel4: 'Lusaka Province'
-      }
-    },
-    deceased: {
-      iD: 123456781,
-      socialSecurityNo: '123345',
-      nationality: 'ZMB',
-      firstNamesEng: 'First',
-      familyNameEng: 'Last',
-      birthDate: '2012-12-12',
-      gender: 'male',
-      maritalStatus: 'MARRIED',
-      countryPermanent: 'ZMB',
-      statePermanent: '0d6f7c82-d653-40c8-a003-bb14678ea64b',
-      districtPermanent: '1664ae88-d1ef-4f02-b466-31aa6e7fac8b',
-      ruralOrUrbanPermanent: 'RURAL',
-      addressChiefPermanent: 'Chief',
-      addressLine4CityOptionPermanent: '',
-      addressLine3CityOptionPermanent: '',
-      addressLine2CityOptionPermanent: '',
-      numberOptionPermanent: '',
-      addressLine1Permanent: 'Village',
-      internationalStatePermanent: '0d6f7c82-d653-40c8-a003-bb14678ea64b',
-      internationalDistrictPermanent: '1664ae88-d1ef-4f02-b466-31aa6e7fac8b',
-      internationalCityPermanent: '',
-      internationalAddressLine1Permanent: '',
-      internationalAddressLine2Permanent: '',
-      internationalAddressLine3Permanent: '',
-      internationalPostcodePermanent: '',
-      _fhirID: '3a344aa4-00cf-4882-ae3e-9a8f1dbaf2ca',
-      seperator: '',
-      occupation: '',
-      permanentAddress: ''
-    },
-    deathEvent: {
-      deathDate: '2021-12-12',
-      manner: 'NATURAL_CAUSES',
-      deathPlaceAddress: 'HEALTH_FACILITY',
-      deathLocation: 'a1836374-00aa-477a-819f-7a40866674f7'
-    },
-    causeOfDeath: {
-      causeOfDeathEstablished: true,
-      causeOfDeathCode: 'age'
-    },
+    ...mockDeathApplicationData,
     informant: {
-      nationality: 'ZMB',
-      applicantID: 123456780,
-      firstNamesEng: 'First',
-      familyNameEng: 'Last',
-      relationship: 'SON',
-      countryPermanent: 'ZMB',
-      statePermanent: 'ec34cfe2-b566-4140-af22-71ff17d832d6',
-      districtPermanent: '9cedaf28-8c0f-4d5f-b1c1-c96c437b0ba7',
-      ruralOrUrbanPermanent: 'URBAN',
-      addressChiefPermanent: '',
-      addressLine4CityOptionPermanent: '',
-      addressLine3CityOptionPermanent: '',
-      addressLine2CityOptionPermanent: '',
-      numberOptionPermanent: '',
-      addressLine1Permanent: '',
-      _fhirID: '9e9d8fec-74ce-465c-a1c7-a9f9d4c01e18',
-      _fhirIDMap: {
-        relatedPerson: '9e9d8fec-74ce-465c-a1c7-a9f9d4c01e18',
-        individual: '0ce2264a-c3fe-416d-b585-b6f3fd5c36d8'
-      },
-      permanentAddress: '',
-      internationalState: '',
-      internationalDistrict: '',
-      internationalCity: '',
-      internationalAddressLine1: '',
-      internationalAddressLine2: '',
-      internationalAddressLine3: '',
-      internationalPostcode: ''
-    },
-    father: {
-      fatherFamilyNameEng: 'Last',
-      _fhirID: '32dcfa2c-6313-4ebb-b03c-7fb243702e73'
-    },
-    mother: {
-      motherFamilyNameEng: 'Last',
-      _fhirID: '5491b237-10d6-4b22-bfc0-9ee9663bd4f2'
+      firstNamesEng: 'John',
+      familyNameEng: 'Millar'
     },
     spouse: {
       hasDetails: {
@@ -179,118 +78,7 @@ const deathApplication: IApplication = {
       additionalComment: ''
     }
   },
-  originalData: {
-    registration: {
-      relationship: {
-        value: 'SON',
-        nestedFields: {
-          otherRelationship: ''
-        }
-      },
-      contactPoint: {
-        value: 'APPLICANT',
-        nestedFields: {
-          registrationPhone: '0712345678',
-          contactRelationship: ''
-        }
-      },
-      _fhirID: '7add91d4-93c6-4357-96d8-a05b2a8ad333',
-      trackingId: 'DVSXZBQ',
-      registrationNumber: '2022DVSXZBQ',
-      type: 'death',
-      commentsOrNotes: '',
-      regStatus: {
-        type: 'REGISTERED',
-        statusDate: '2022-02-01T10:33:51.600Z',
-        officeName: 'Lusaka DNRPC District Office',
-        officeAlias: 'Lusaka DNRPC District Office',
-        officeAddressLevel3: 'Lusaka District',
-        officeAddressLevel4: 'Lusaka Province'
-      }
-    },
-    deceased: {
-      iD: '123456789',
-      socialSecurityNo: '123345',
-      nationality: 'ZMB',
-      firstNamesEng: 'First',
-      familyNameEng: 'Last',
-      birthDate: '2012-12-12',
-      gender: 'male',
-      maritalStatus: 'MARRIED',
-      countryPermanent: 'ZMB',
-      statePermanent: '0d6f7c82-d653-40c8-a003-bb14678ea64b',
-      districtPermanent: '1664ae88-d1ef-4f02-b466-31aa6e7fac8b',
-      ruralOrUrbanPermanent: 'URBAN',
-      addressChiefPermanent: '',
-      addressLine4CityOptionPermanent: '',
-      addressLine3CityOptionPermanent: '',
-      addressLine2CityOptionPermanent: '',
-      numberOptionPermanent: '',
-      addressLine1Permanent: '',
-      internationalStatePermanent: '0d6f7c82-d653-40c8-a003-bb14678ea64b',
-      internationalDistrictPermanent: '1664ae88-d1ef-4f02-b466-31aa6e7fac8b',
-      internationalCityPermanent: '',
-      internationalAddressLine1Permanent: '',
-      internationalAddressLine2Permanent: '',
-      internationalAddressLine3Permanent: '',
-      internationalPostcodePermanent: '',
-      _fhirID: '3a344aa4-00cf-4882-ae3e-9a8f1dbaf2ca'
-    },
-    deathEvent: {
-      deathDate: '2021-12-12',
-      manner: 'NATURAL_CAUSES',
-      deathPlaceAddress: 'HEALTH_FACILITY',
-      deathLocation: 'a1836374-00aa-477a-819f-7a40866674f7'
-    },
-    causeOfDeath: {
-      causeOfDeathEstablished: true,
-      causeOfDeathCode: 'age'
-    },
-    informant: {
-      nationality: 'ZMB',
-      applicantID: '123456789',
-      firstNamesEng: 'First',
-      familyNameEng: 'Last',
-      relationship: 'SON',
-      countryPermanent: 'ZMB',
-      statePermanent: 'ec34cfe2-b566-4140-af22-71ff17d832d6',
-      districtPermanent: '9cedaf28-8c0f-4d5f-b1c1-c96c437b0ba7',
-      ruralOrUrbanPermanent: 'URBAN',
-      addressChiefPermanent: '',
-      addressLine4CityOptionPermanent: '',
-      addressLine3CityOptionPermanent: '',
-      addressLine2CityOptionPermanent: '',
-      numberOptionPermanent: '',
-      addressLine1Permanent: '',
-      _fhirID: '9e9d8fec-74ce-465c-a1c7-a9f9d4c01e18',
-      _fhirIDMap: {
-        relatedPerson: '9e9d8fec-74ce-465c-a1c7-a9f9d4c01e18',
-        individual: '0ce2264a-c3fe-416d-b585-b6f3fd5c36d8'
-      }
-    },
-    father: {
-      fatherFamilyNameEng: 'Last',
-      _fhirID: '32dcfa2c-6313-4ebb-b03c-7fb243702e73'
-    },
-    mother: {
-      motherFamilyNameEng: 'Last',
-      _fhirID: '5491b237-10d6-4b22-bfc0-9ee9663bd4f2'
-    },
-    spouse: {
-      hasDetails: {
-        value: 'No',
-        nestedFields: {}
-      }
-    },
-    documents: {
-      uploadDocForDeceased: [],
-      uploadDocForApplicant: [],
-      uploadDocForDeceasedDeath: []
-    },
-    _fhirIDMap: {
-      composition: '85bccf72-6117-4cab-827d-47728becb0c1'
-    }
-  },
+  originalData: mockDeathApplicationData,
   review: true,
   event: Event.DEATH,
   registrationStatus: 'REGISTERED',
@@ -324,152 +112,7 @@ const deathApplication: IApplication = {
 const birthApplication: IApplication = {
   id: '31a78be1-5ab3-42c7-8f64-7678cb294508',
   data: {
-    registration: {
-      applicant: {
-        nestedFields: {}
-      },
-      presentAtBirthRegistration: 'MOTHER',
-      contactPoint: {
-        value: 'MOTHER',
-        nestedFields: {
-          registrationPhone: '0712345678'
-        }
-      },
-      _fhirID: 'd1bf168b-d2b9-4288-977c-ef368e1ec1d5',
-      trackingId: 'BYMWBUG',
-      registrationNumber: '2022BYMWBUG',
-      commentsOrNotes: '',
-      regStatus: {
-        type: 'REGISTERED',
-        statusDate: '2022-02-03T04:24:51.831Z',
-        officeName: 'Lusaka DNRPC District Office',
-        officeAlias: 'Lusaka DNRPC District Office',
-        officeAddressLevel3: 'Lusaka District',
-        officeAddressLevel4: 'Lusaka Province'
-      }
-    },
-    child: {
-      firstNamesEng: 'Alan',
-      familyNameEng: 'Bush',
-      gender: 'female',
-      childBirthDate: '2010-10-10',
-      multipleBirth: 1,
-      placeOfBirth: 'HEALTH_FACILITY',
-      birthLocation: '08ce1fa5-6e0b-4dd6-b9a4-8fb76777527a',
-      _fhirID: 'f1378dfc-eb17-4ba3-aa8c-533133ce28ac'
-    },
-    mother: {
-      nationality: 'ZMB',
-      iD: '123456789',
-      socialSecurityNo: '',
-      firstNamesEng: 'first name',
-      familyNameEng: 'last name',
-      maritalStatus: 'MARRIED',
-      countryPlaceOfHeritage: 'ZMB',
-      statePlaceOfHeritage: '7b261ee2-9070-4b5d-85c4-0a30115c7ec7',
-      districtPlaceOfHeritage: '8b52e805-27af-4bbc-8273-985f4c3ef65f',
-      addressChiefPlaceOfHeritage: '',
-      addressLine1PlaceOfHeritage: '',
-      countryPermanent: 'ZMB',
-      statePermanent: '53975eaf-b2e1-431d-9f85-9fd52e734760',
-      districtPermanent: '361edbd5-432a-4429-88a2-7de81bc0e86c',
-      ruralOrUrbanPermanent: 'URBAN',
-      addressChiefPermanent: '',
-      addressLine4CityOptionPermanent: '',
-      addressLine3CityOptionPermanent: '',
-      addressLine2CityOptionPermanent: '',
-      numberOptionPermanent: '',
-      addressLine1Permanent: '',
-      currentAddressSameAsPermanent: true,
-      country: 'ZMB',
-      state: '53975eaf-b2e1-431d-9f85-9fd52e734760',
-      district: '361edbd5-432a-4429-88a2-7de81bc0e86c',
-      ruralOrUrban: 'URBAN',
-      addressChief: '',
-      addressLine4CityOption: '',
-      addressLine3CityOption: '',
-      addressLine2CityOption: '',
-      numberOption: '',
-      addressLine1: '',
-      _fhirID: 'b610e43c-1db3-4b01-aae2-83dd2603c322',
-      motherBirthDate: '',
-      seperator: '',
-      occupation: '',
-      educationalAttainment: '',
-      placeOfHeritage: '',
-      internationalStatePlaceOfHeritage: '',
-      internationalDistrictPlaceOfHeritage: '',
-      internationalCityPlaceOfHeritage: '',
-      internationalAddressLine1PlaceOfHeritage: '',
-      internationalAddressLine2PlaceOfHeritage: '',
-      internationalAddressLine3PlaceOfHeritage: '',
-      internationalPostcodePlaceOfHeritage: '',
-      permanentAddress: '',
-      internationalStatePermanent: '',
-      internationalDistrictPermanent: '',
-      internationalCityPermanent: '',
-      internationalAddressLine1Permanent: '',
-      internationalAddressLine2Permanent: '',
-      internationalAddressLine3Permanent: '',
-      internationalPostcodePermanent: '',
-      currentAddress: '',
-      internationalState: '',
-      internationalDistrict: '',
-      internationalCity: '',
-      internationalAddressLine1: '',
-      internationalAddressLine2: '',
-      internationalAddressLine3: '',
-      internationalPostcode: ''
-    },
-    father: {
-      fathersDetailsExist: true,
-      permanentAddressSameAsMother: true,
-      addressSameAsMother: true,
-      iD: 123456789,
-      socialSecurityNo: '',
-      nationality: 'ZMB',
-      firstNamesEng: 'Father',
-      familyNameEng: 'Name',
-      fatherBirthDate: '1930-12-12',
-      seperator: '',
-      maritalStatus: 'MARRIED',
-      occupation: '',
-      educationalAttainment: '',
-      permanentAddress: '',
-      countryPermanent: 'ZMB',
-      statePermanent: '',
-      districtPermanent: '',
-      ruralOrUrbanPermanent: 'URBAN',
-      addressChiefPermanent: '',
-      addressLine4CityOptionPermanent: '',
-      addressLine3CityOptionPermanent: '',
-      addressLine2CityOptionPermanent: '',
-      numberOptionPermanent: '',
-      addressLine1Permanent: '',
-      internationalStatePermanent: '',
-      internationalDistrictPermanent: '',
-      internationalCityPermanent: '',
-      internationalAddressLine1Permanent: '',
-      internationalAddressLine2Permanent: '',
-      internationalAddressLine3Permanent: '',
-      internationalPostcodePermanent: ''
-    },
-    documents: {
-      uploadDocForChildDOB: [],
-      uploadDocForMother: [],
-      uploadDocForFather: [],
-      uploadDocForApplicant: [],
-      uploadDocForProofOfLegarGuardian: [],
-      uploadDocForProofOfAssignedResponsibility: []
-    },
-    _fhirIDMap: {
-      composition: '31a78be1-5ab3-42c7-8f64-7678cb294508',
-      encounter: 'dbf6dc8e-c5bb-421f-a0b1-a6c5c61d1842',
-      eventLocation: '08ce1fa5-6e0b-4dd6-b9a4-8fb76777527a',
-      observation: {
-        presentAtBirthRegistration: 'dd94ab22-00c9-42fa-8219-1c30ade60e81'
-      }
-    },
+    ...mockApplicationData,
     corrector: {
       relationship: {
         value: 'MOTHER',
@@ -494,98 +137,7 @@ const birthApplication: IApplication = {
       additionalComment: 'Comment'
     }
   },
-  originalData: {
-    registration: {
-      applicant: {
-        nestedFields: {}
-      },
-      presentAtBirthRegistration: 'MOTHER',
-      contactPoint: {
-        value: 'MOTHER',
-        nestedFields: {
-          registrationPhone: '0712345678'
-        }
-      },
-      _fhirID: 'd1bf168b-d2b9-4288-977c-ef368e1ec1d5',
-      trackingId: 'BYMWBUG',
-      registrationNumber: '2022BYMWBUG',
-      commentsOrNotes: '',
-      regStatus: {
-        type: 'REGISTERED',
-        statusDate: '2022-02-03T04:24:51.831Z',
-        officeName: 'Lusaka DNRPC District Office',
-        officeAlias: 'Lusaka DNRPC District Office',
-        officeAddressLevel3: 'Lusaka District',
-        officeAddressLevel4: 'Lusaka Province'
-      }
-    },
-    child: {
-      firstNamesEng: 'CF',
-      familyNameEng: 'CL',
-      gender: 'female',
-      childBirthDate: '2010-10-10',
-      multipleBirth: 1,
-      placeOfBirth: 'HEALTH_FACILITY',
-      birthLocation: '08ce1fa5-6e0b-4dd6-b9a4-8fb76777527a',
-      _fhirID: 'f1378dfc-eb17-4ba3-aa8c-533133ce28ac'
-    },
-    mother: {
-      nationality: 'ZMB',
-      iD: '123456789',
-      socialSecurityNo: '',
-      firstNamesEng: 'Mother',
-      familyNameEng: 'Name',
-      maritalStatus: 'MARRIED',
-      countryPlaceOfHeritage: 'ZMB',
-      statePlaceOfHeritage: '7b261ee2-9070-4b5d-85c4-0a30115c7ec7',
-      districtPlaceOfHeritage: '8b52e805-27af-4bbc-8273-985f4c3ef65f',
-      addressChiefPlaceOfHeritage: '',
-      addressLine1PlaceOfHeritage: '',
-      countryPermanent: 'ZMB',
-      statePermanent: '53975eaf-b2e1-431d-9f85-9fd52e734760',
-      districtPermanent: '361edbd5-432a-4429-88a2-7de81bc0e86c',
-      ruralOrUrbanPermanent: 'URBAN',
-      addressChiefPermanent: '',
-      addressLine4CityOptionPermanent: '',
-      addressLine3CityOptionPermanent: '',
-      addressLine2CityOptionPermanent: '',
-      numberOptionPermanent: '',
-      addressLine1Permanent: '',
-      currentAddressSameAsPermanent: true,
-      country: 'ZMB',
-      state: '53975eaf-b2e1-431d-9f85-9fd52e734760',
-      district: '361edbd5-432a-4429-88a2-7de81bc0e86c',
-      ruralOrUrban: 'URBAN',
-      addressChief: '',
-      addressLine4CityOption: '',
-      addressLine3CityOption: '',
-      addressLine2CityOption: '',
-      numberOption: '',
-      addressLine1: '',
-      _fhirID: 'b610e43c-1db3-4b01-aae2-83dd2603c322'
-    },
-    father: {
-      fathersDetailsExist: false,
-      permanentAddressSameAsMother: true,
-      addressSameAsMother: true
-    },
-    documents: {
-      uploadDocForChildDOB: [],
-      uploadDocForMother: [],
-      uploadDocForFather: [],
-      uploadDocForApplicant: [],
-      uploadDocForProofOfLegarGuardian: [],
-      uploadDocForProofOfAssignedResponsibility: []
-    },
-    _fhirIDMap: {
-      composition: '31a78be1-5ab3-42c7-8f64-7678cb294508',
-      encounter: 'dbf6dc8e-c5bb-421f-a0b1-a6c5c61d1842',
-      eventLocation: '08ce1fa5-6e0b-4dd6-b9a4-8fb76777527a',
-      observation: {
-        presentAtBirthRegistration: 'dd94ab22-00c9-42fa-8219-1c30ade60e81'
-      }
-    }
-  },
+  originalData: mockApplicationData,
   review: true,
   event: Event.BIRTH,
   registrationStatus: 'REGISTERED',
@@ -645,7 +197,7 @@ describe('Correction summary', () => {
         .find('CorrectionSummaryComponent')
         .instance() as any
       const msg = instance.getRequestedBy()
-      expect(msg).toEqual('Alan Bush')
+      expect(msg).toEqual('Mike Test')
     })
 
     it('should match corrector with Father name', () => {
@@ -655,7 +207,7 @@ describe('Correction summary', () => {
         .find('CorrectionSummaryComponent')
         .instance() as any
       const msg = instance.getRequestedBy()
-      expect(msg).toEqual('Father Name')
+      expect(msg).toEqual('Jeff Test')
     })
 
     it('should match corrector with LEGAL_GUARDIAN', () => {
@@ -814,6 +366,7 @@ describe('Correction summary', () => {
   describe('for a death application', () => {
     beforeEach(async () => {
       // ;(deathApplication.data.corrector.relationship as any).value = 'INFORMANT'
+
       store.dispatch(storeApplication(deathApplication))
       wrapper = await createTestComponent(
         <CorrectionForm
@@ -842,7 +395,7 @@ describe('Correction summary', () => {
         .find('CorrectionSummaryComponent')
         .instance() as any
       const corrector = instance.getRequestedBy()
-      expect(corrector).toEqual('First Last')
+      expect(corrector).toEqual('John Millar')
     })
   })
 })
