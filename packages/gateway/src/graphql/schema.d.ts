@@ -379,7 +379,7 @@ export interface GQLRegistration {
   paperFormID?: string
   page?: string
   book?: string
-  contact?: GQLRegistrationContactType
+  contact?: string
   contactRelationship?: string
   contactPhoneNumber?: string
   status?: Array<GQLRegWorkflow | null>
@@ -715,7 +715,7 @@ export interface GQLRegistrationInput {
   paperFormID?: string
   page?: string
   book?: string
-  contact?: GQLRegistrationContactType
+  contact?: string
   contactRelationship?: string
   contactPhoneNumber?: string
   status?: Array<GQLRegWorkflowInput | null>
@@ -762,14 +762,6 @@ export interface GQLUserIdentifierInput {
 export interface GQLSignatureInput {
   data?: string
   type?: string
-}
-
-export const enum GQLRegistrationContactType {
-  BOTH = 'BOTH',
-  MOTHER = 'MOTHER',
-  FATHER = 'FATHER',
-  OTHER = 'OTHER',
-  APPLICANT = 'APPLICANT'
 }
 
 export interface GQLRegWorkflow {

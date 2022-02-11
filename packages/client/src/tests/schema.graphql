@@ -681,7 +681,7 @@ type Registration {
   paperFormID: String
   page: String
   book: String
-  contact: RegistrationContactType
+  contact: String
   contactPhoneNumber: String
   status: [RegWorkflow]
   type: RegistrationType
@@ -708,7 +708,7 @@ input RegistrationInput {
   paperFormID: String
   page: String
   book: String
-  contact: RegistrationContactType
+  contact: String
   contactPhoneNumber: String
   status: [RegWorkflowInput]
   type: RegistrationType

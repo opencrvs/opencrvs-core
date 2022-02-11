@@ -479,7 +479,7 @@ type Registration {
   paperFormID: String
   page: String
   book: String
-  contact: RegistrationContactType
+  contact: String
   contactRelationship: String
   contactPhoneNumber: String
   status: [RegWorkflow]
@@ -804,7 +804,7 @@ input RegistrationInput {
   paperFormID: String
   page: String
   book: String
-  contact: RegistrationContactType
+  contact: String
   contactRelationship: String
   contactPhoneNumber: String
   status: [RegWorkflowInput]
@@ -851,14 +851,6 @@ input UserIdentifierInput {
 input SignatureInput {
   data: String
   type: String
-}
-
-enum RegistrationContactType {
-  BOTH
-  MOTHER
-  FATHER
-  OTHER
-  APPLICANT
 }
 
 type RegWorkflow {

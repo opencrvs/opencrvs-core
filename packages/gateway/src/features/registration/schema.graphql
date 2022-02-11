@@ -357,7 +357,7 @@ input RegistrationInput {
   paperFormID: String
   page: String
   book: String
-  contact: RegistrationContactType # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
+  contact: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
   contactRelationship: String # -> extension(url='http://opencrvs.org/specs/extension/contact-relationship').valueString
   contactPhoneNumber: String
   status: [RegWorkflowInput]
@@ -379,7 +379,7 @@ type Registration { # -> Task
   paperFormID: String # -> .identifier
   page: String # -> .identifier
   book: String # -> .identifier
-  contact: RegistrationContactType # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
+  contact: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
   contactRelationship: String # -> extension(url='http://opencrvs.org/specs/extension/contact-relationship').valueString
   contactPhoneNumber: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person-phone-number').valueString
   status: [RegWorkflow] # -> Task.*

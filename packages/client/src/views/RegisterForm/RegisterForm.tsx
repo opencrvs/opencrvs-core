@@ -718,6 +718,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                             </>
                           )}
                         </FormSectionTitle>
+                        {console.log('hello', activeSectionGroup)}
                         {activeSection.notice && (
                           <Notice
                             id={`form_section_notice_${activeSectionGroup.id}`}
