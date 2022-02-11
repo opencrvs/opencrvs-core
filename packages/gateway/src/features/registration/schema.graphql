@@ -264,7 +264,6 @@ interface EventRegistration {
   id: ID! # long uuid
   registration: Registration
   createdAt: Date
-  history: [History]
 }
 
 input BirthRegistrationInput {
@@ -312,6 +311,7 @@ type BirthRegistration implements EventRegistration { # -> Composition
   primaryCaregiver: PrimaryCaregiver
   createdAt: Date # -> .date($first)
   updatedAt: Date # -> .date
+  history: [History]
 }
 
 input DeathRegistrationInput {

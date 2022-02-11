@@ -106,6 +106,7 @@ export interface GQLBirthRegistration extends GQLEventRegistration {
   primaryCaregiver?: GQLPrimaryCaregiver
   createdAt?: GQLDate
   updatedAt?: GQLDate
+  history?: Array<GQLHistory | null>
 }
 
 export interface GQLDeathRegistration extends GQLEventRegistration {
@@ -437,6 +438,14 @@ export interface GQLPrimaryCaregiver {
   primaryCaregiver?: GQLPerson
   reasonsNotApplying?: Array<GQLReasonsNotApplying | null>
   parentDetailsType?: GQLParentDetailsType
+}
+
+export interface GQLHistory {
+  user?: GQLUser
+  date?: GQLDate
+  action?: string
+  location?: GQLLocation
+  office?: GQLLocation
 }
 
 export const enum GQLMannerOfDeath {
@@ -1217,6 +1226,7 @@ export interface GQLResolver {
   Registration?: GQLRegistrationTypeResolver
   RelatedPerson?: GQLRelatedPersonTypeResolver
   PrimaryCaregiver?: GQLPrimaryCaregiverTypeResolver
+  History?: GQLHistoryTypeResolver
   MedicalPractitioner?: GQLMedicalPractitionerTypeResolver
   IdentityType?: GQLIdentityTypeTypeResolver
   HumanName?: GQLHumanNameTypeResolver
@@ -2205,6 +2215,7 @@ export interface GQLBirthRegistrationTypeResolver<TParent = any> {
   primaryCaregiver?: BirthRegistrationToPrimaryCaregiverResolver<TParent>
   createdAt?: BirthRegistrationToCreatedAtResolver<TParent>
   updatedAt?: BirthRegistrationToUpdatedAtResolver<TParent>
+  history?: BirthRegistrationToHistoryResolver<TParent>
 }
 
 export interface BirthRegistrationToIdResolver<TParent = any, TResult = any> {
@@ -2345,6 +2356,13 @@ export interface BirthRegistrationToCreatedAtResolver<
 }
 
 export interface BirthRegistrationToUpdatedAtResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthRegistrationToHistoryResolver<
   TParent = any,
   TResult = any
 > {
@@ -3294,6 +3312,34 @@ export interface PrimaryCaregiverToParentDetailsTypeResolver<
   TParent = any,
   TResult = any
 > {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLHistoryTypeResolver<TParent = any> {
+  user?: HistoryToUserResolver<TParent>
+  date?: HistoryToDateResolver<TParent>
+  action?: HistoryToActionResolver<TParent>
+  location?: HistoryToLocationResolver<TParent>
+  office?: HistoryToOfficeResolver<TParent>
+}
+
+export interface HistoryToUserResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToDateResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToActionResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToLocationResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToOfficeResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

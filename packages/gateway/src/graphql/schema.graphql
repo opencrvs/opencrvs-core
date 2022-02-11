@@ -212,6 +212,7 @@ type BirthRegistration implements EventRegistration {
   primaryCaregiver: PrimaryCaregiver
   createdAt: Date
   updatedAt: Date
+  history: [History]
 }
 
 type DeathRegistration implements EventRegistration {
@@ -263,7 +264,6 @@ interface EventRegistration {
   id: ID!
   registration: Registration
   createdAt: Date
-  history: [History]
 }
 
 type RegistrationCountResult {
@@ -535,6 +535,14 @@ type PrimaryCaregiver {
   parentDetailsType: ParentDetailsType
 }
 
+type History {
+  user: User
+  date: Date
+  action: String
+  location: Location
+  office: Location
+}
+
 enum MannerOfDeath {
   NATURAL_CAUSES
   ACCIDENT
@@ -626,14 +634,6 @@ enum EducationType {
   FIRST_STAGE_TERTIARY_ISCED_5
   SECOND_STAGE_TERTIARY_ISCED_6
   NOT_STATED
-}
-
-type History {
-  user: User
-  date: Date
-  action: String
-  location: Location
-  office: Location
 }
 
 type StatusWiseRegistrationCount {
