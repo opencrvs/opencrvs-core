@@ -16,14 +16,16 @@ import {
   IFormField,
   IFormFieldMapping,
   IFormFieldMutationMapFunction,
-  IFormFieldQueryMapFunction
+  IFormFieldQueryMapFunction,
+  IFormSectionData
 } from '@client/forms'
 import {
   getConditionalActionsForField,
-  getVisibleSectionGroupsBasedOnConditions
+  getVisibleSectionGroupsBasedOnConditions,
+  stringifyFieldValue
 } from '@client/forms/utils'
 import { IApplication } from '@client/applications'
-import { isEqual } from 'lodash'
+import { hasFieldChanged } from '@client/views/CorrectionForm/utils'
 
 const nestedFieldsMapping = (
   transformedData: TransformedData,
@@ -51,7 +53,8 @@ const nestedFieldsMapping = (
 export const draftToGqlTransformer = (
   formDefinition: IForm,
   draftData: IFormData,
-  draftId?: string
+  draftId?: string,
+  originalDraftData: IFormData = {}
 ) => {
   if (!formDefinition.sections) {
     throw new Error('Sections are missing in form definition')
@@ -95,6 +98,37 @@ export const draftToGqlTransformer = (
           )
           return
         }
+        if (Object.keys(originalDraftData)) {
+          if (hasFieldChanged(fieldDef, draftData, originalDraftData)) {
+            if (!transformedData.registration) {
+              transformedData.registration = {}
+            }
+            if (!transformedData.registration.correction) {
+              transformedData.registration.correction = draftData.registration
+                .correction
+                ? { ...(draftData.registration.correction as IFormSectionData) }
+                : {}
+            }
+            if (!transformedData.registration.correction.values) {
+              transformedData.registration.correction.values = []
+            }
+            transformedData.registration.correction.values.push({
+              section: section.id,
+              fieldName: fieldDef.name,
+              newValue: stringifyFieldValue(
+                fieldDef,
+                draftData[section.id][fieldDef.name],
+                draftData[section.id]
+              ),
+              oldValue: stringifyFieldValue(
+                fieldDef,
+                originalDraftData[section.id][fieldDef.name],
+                originalDraftData[section.id]
+              )
+            })
+          }
+        }
+
         if (
           draftData[section.id][fieldDef.name] !== null &&
           draftData[section.id][fieldDef.name] !== undefined &&

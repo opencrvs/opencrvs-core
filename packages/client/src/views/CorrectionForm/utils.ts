@@ -56,7 +56,7 @@ import {
   getVisibleSectionGroupsBasedOnConditions
 } from '@client/forms/utils'
 import { buttonMessages } from '@client/i18n/messages'
-import { flattenDeep, get, clone } from 'lodash'
+import { flattenDeep, get, clone, isEqual } from 'lodash'
 
 export function groupHasError(
   group: IFormSectionGroup,
@@ -311,6 +311,10 @@ export function hasFieldChanged(
    */
   if (!originalData[field.name] && data[field.name] === '') {
     return false
+  }
+
+  if (Array.isArray(data[field.name])) {
+    return !isEqual(data[field.name], originalData[field.name])
   }
   return data[field.name] !== originalData[field.name]
 }
