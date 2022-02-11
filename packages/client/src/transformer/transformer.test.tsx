@@ -219,11 +219,7 @@ describe('when draft data is transformed to graphql', () => {
       expect(
         draftToGqlTransformer(
           form,
-          {
-            id: '9633042c-ca34-4b9f-959b-9d16909fd85c',
-            data,
-            event: Event.BIRTH
-          },
+          data,
           '9633042c-ca34-4b9f-959b-9d16909fd85c'
         ).eventLocation.type
       ).toBe('PRIVATE_HOME')
@@ -240,11 +236,7 @@ describe('when draft data is transformed to graphql', () => {
         documents: { imageUploader: '' }
       }
       expect(
-        draftToGqlTransformer(form, {
-          id: '9633042c-ca34-4b9f-959b-9d16909fd85c',
-          event: Event.BIRTH,
-          data
-        }).registration.contactPhoneNumber
+        draftToGqlTransformer(form, data).registration.contactPhoneNumber
       ).toBe('+8801736478884')
     })
     it('Pass false as fathersDetailsExist on father section', () => {
@@ -260,19 +252,9 @@ describe('when draft data is transformed to graphql', () => {
         documents: { imageUploader: '' }
       }
 
+      expect(draftToGqlTransformer(form, data).father).toBeUndefined()
       expect(
-        draftToGqlTransformer(form, {
-          id: '9633042c-ca34-4b9f-959b-9d16909fd85c',
-          data,
-          event: Event.BIRTH
-        }).father
-      ).toBeUndefined()
-      expect(
-        draftToGqlTransformer(form, {
-          id: '9633042c-ca34-4b9f-959b-9d16909fd85c',
-          data,
-          event: Event.BIRTH
-        }).registration.inCompleteFields
+        draftToGqlTransformer(form, data).registration.inCompleteFields
       ).toBeUndefined()
     })
     it('Sends inCompleteFields if in-complete data is given', () => {
@@ -289,11 +271,7 @@ describe('when draft data is transformed to graphql', () => {
         documents: {}
       }
       expect(
-        draftToGqlTransformer(form, {
-          id: '9633042c-ca34-4b9f-959b-9d16909fd85c',
-          event: Event.BIRTH,
-          data
-        }).registration.inCompleteFields
+        draftToGqlTransformer(form, data).registration.inCompleteFields
       ).toContain('child/child-view-group/placeOfBirth')
     })
     it('Sends inCompleteFields when registration data is also missing', () => {
@@ -306,11 +284,7 @@ describe('when draft data is transformed to graphql', () => {
         primaryCaregiver: {}
       }
       expect(
-        draftToGqlTransformer(form, {
-          id: '9633042c-ca34-4b9f-959b-9d16909fd85c',
-          event: Event.BIRTH,
-          data
-        }).registration.inCompleteFields
+        draftToGqlTransformer(form, data).registration.inCompleteFields
       ).toBeDefined()
     })
 
@@ -372,13 +346,9 @@ describe('when draft data is transformed to graphql', () => {
         ]
       }
 
-      expect(
-        draftToGqlTransformer(form, {
-          id: '9633042c-ca34-4b9f-959b-9d16909fd85c',
-          event: Event.BIRTH,
-          data
-        }).primaryCaregiver
-      ).toEqual(transformedData)
+      expect(draftToGqlTransformer(form, data).primaryCaregiver).toEqual(
+        transformedData
+      )
     })
 
     it('transform gql data to primary caregiver form data', () => {

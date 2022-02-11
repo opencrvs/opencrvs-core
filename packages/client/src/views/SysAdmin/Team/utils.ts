@@ -36,7 +36,6 @@ import {
 import { GQLRole, GQLUser } from '@opencrvs/gateway/src/graphql/schema'
 import { MessageDescriptor } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/userSetup'
-import { IApplication } from '@client/applications'
 
 export enum UserStatus {
   ACTIVE,
@@ -435,7 +434,7 @@ export const mockUserGraphqlOperation = {
           })
         ]
       },
-      { data: { user: mockCompleteFormData } } as unknown as IApplication
+      { user: mockCompleteFormData }
     )
   },
   result: {

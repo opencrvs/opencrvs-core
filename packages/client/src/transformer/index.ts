@@ -16,9 +16,7 @@ import {
   IFormField,
   IFormFieldMapping,
   IFormFieldMutationMapFunction,
-  IFormFieldQueryMapFunction,
-  IFormSection,
-  IFormSectionData
+  IFormFieldQueryMapFunction
 } from '@client/forms'
 import {
   getConditionalActionsForField,
@@ -49,70 +47,12 @@ const nestedFieldsMapping = (
     }
   }
 }
-const hasNestedDataChanged = (
-  draft: IApplication,
-  section: IFormSection,
-  field: IFormField
-) => {
-  const { data, originalData } = draft
-  const nestedFieldData = data[section.id][field.name] as IFormData
-
-  const previousNestedFieldData = (originalData as IFormData)[section.id][
-    field.name
-  ] as IFormData
-  if (nestedFieldData.value === previousNestedFieldData.value) {
-    Object.keys(nestedFieldData.nestedFields).forEach((key) => {
-      if (
-        nestedFieldData.nestedFields[key] !==
-        previousNestedFieldData.nestedFields[key]
-      )
-        return true
-    })
-    return false
-  }
-  return true
-}
-
-const hasFieldChanged = (
-  draft: IApplication,
-  section: IFormSection,
-  field: IFormField
-) => {
-  const { data, originalData } = draft
-  if (!originalData) return false
-  if (
-    data[section.id][field.name] &&
-    (data[section.id][field.name] as IFormData).value
-  ) {
-    return hasNestedDataChanged(draft, section, field)
-  }
-  /*
-   * data section might have some values as empty string
-   * whereas original data section have them as undefined
-   */
-  if (
-    !originalData[section.id][field.name] &&
-    data[section.id][field.name] === ''
-  ) {
-    return false
-  }
-
-  if (
-    Array.isArray(data[section.id][field.name]) &&
-    isEqual(data[section.id][field.name], originalData[section.id][field.name])
-  ) {
-    return false
-  }
-
-  return data[section.id][field.name] !== originalData[section.id][field.name]
-}
 
 export const draftToGqlTransformer = (
   formDefinition: IForm,
-  application: IApplication,
+  draftData: IFormData,
   draftId?: string
 ) => {
-  const draftData = application.data
   if (!formDefinition.sections) {
     throw new Error('Sections are missing in form definition')
   }
@@ -154,30 +94,6 @@ export const draftToGqlTransformer = (
             `${section.id}/${groupDef.id}/${fieldDef.name}`
           )
           return
-        }
-        if (application.originalData) {
-          if (hasFieldChanged(application, section, fieldDef)) {
-            if (!transformedData.registration) {
-              transformedData.registration = {}
-            }
-            if (!transformedData.registration.correction) {
-              transformedData.registration.correction = draftData.registration
-                .correction
-                ? { ...(draftData.registration.correction as IFormSectionData) }
-                : {}
-            }
-            if (!transformedData.registration.correction.values) {
-              transformedData.registration.correction.values = []
-            }
-            transformedData.registration.correction.values.push({
-              section: section.id,
-              fieldName: fieldDef.name,
-              newValue: draftData[section.id][fieldDef.name].toString(),
-              oldValue: (
-                application.originalData[section.id][fieldDef.name] || ''
-              ).toString()
-            })
-          }
         }
         if (
           draftData[section.id][fieldDef.name] !== null &&
