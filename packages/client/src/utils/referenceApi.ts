@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { certificateQueries } from '@client/certificate/queries'
 import { ISerializedForm } from '@client/forms'
 import { ILanguage } from '@client/i18n/reducer'
 import { ILocation } from '@client/offline/reducer'
@@ -123,23 +124,8 @@ async function loadConfig(): Promise<IApplicationConfig> {
   return response
 }
 
-async function loadCertificatesTemplatesDefinitions(): Promise<
-  ICertificateResponse
-> {
-  const url = `${window.config.CONFIG_API_URL}/getActiveCertificates`
-
-  const res = await fetch(url, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${getToken()}`
-    }
-  })
-
-  if (res && res.status !== 200) {
-    throw Error(res.statusText)
-  }
-  const response = await res.json()
-
+async function loadCertificatesTemplatesDefinitions(): Promise<ICertificateResponse> {
+  const response = await certificateQueries.getActiveCertificatesSVG()
   const birthCertificateTemplate: ICertificateTemplateData = _.find(response, {
     event: 'birth',
     status: 'ACTIVE'
