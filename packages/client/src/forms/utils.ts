@@ -623,15 +623,18 @@ export const stringifyFieldValue = (
     return ''
   }
 
-  if (isRadioGroupWithNestedField(field)) {
-    return (fieldValue as IFormSectionData).value.toString()
-  }
-
   if (isDateField(field, sectionData)) {
     return (fieldValue as Date).toISOString()
   }
 
   return fieldValue.toString()
+}
+
+export const getSelectedRadioOptionWithNestedFields = (
+  field: IRadioGroupWithNestedFieldsFormField,
+  sectionData: IFormSectionData
+): string | undefined => {
+  return (sectionData[field.name] as IFormSectionData).value as string
 }
 
 export const conditionals: IConditionals = {

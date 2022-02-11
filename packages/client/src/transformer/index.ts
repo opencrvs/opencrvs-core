@@ -17,15 +17,19 @@ import {
   IFormFieldMapping,
   IFormFieldMutationMapFunction,
   IFormFieldQueryMapFunction,
-  IFormSectionData
+  IFormSectionData,
+  IFormSection
 } from '@client/forms'
 import {
   getConditionalActionsForField,
   getVisibleSectionGroupsBasedOnConditions,
-  stringifyFieldValue
+  stringifyFieldValue,
+  isRadioGroupWithNestedField,
+  getSelectedRadioOptionWithNestedFields
 } from '@client/forms/utils'
 import { IApplication } from '@client/applications'
 import { hasFieldChanged } from '@client/views/CorrectionForm/utils'
+import { get } from 'lodash'
 
 const nestedFieldsMapping = (
   transformedData: TransformedData,
@@ -50,6 +54,76 @@ const nestedFieldsMapping = (
   }
 }
 
+export const transformRegistrationCorrection = (
+  section: IFormSection,
+  fieldDef: IFormField,
+  draftData: IFormData,
+  originalDraftData: IFormData,
+  transformedData: TransformedData,
+  nestedFieldDef: IFormField | null = null
+): void => {
+  if (!transformedData.registration) {
+    transformedData.registration = {}
+  }
+  if (!transformedData.registration.correction) {
+    transformedData.registration.correction = draftData.registration.correction
+      ? { ...(draftData.registration.correction as IFormSectionData) }
+      : {}
+  }
+  if (!transformedData.registration.correction.values) {
+    transformedData.registration.correction.values = []
+  }
+
+  if (isRadioGroupWithNestedField(fieldDef)) {
+    const selectedRadioOption = getSelectedRadioOptionWithNestedFields(
+      fieldDef,
+      draftData
+    )
+    if (selectedRadioOption) {
+      for (const nestedFieldDef of fieldDef.nestedFields[selectedRadioOption]) {
+        transformRegistrationCorrection(
+          section,
+          fieldDef,
+          draftData,
+          originalDraftData,
+          transformedData,
+          nestedFieldDef
+        )
+      }
+    }
+  } else if (nestedFieldDef) {
+    const valuePath = `${fieldDef.name}.nestedFields.${nestedFieldDef.name}`
+    transformedData.registration.correction.values.push({
+      section: section.id,
+      fieldName: valuePath,
+      newValue: stringifyFieldValue(
+        fieldDef,
+        get(draftData[section.id], valuePath),
+        draftData[section.id]
+      ),
+      oldValue: stringifyFieldValue(
+        fieldDef,
+        get(originalDraftData[section.id], valuePath),
+        originalDraftData[section.id]
+      )
+    })
+  } else {
+    transformedData.registration.correction.values.push({
+      section: section.id,
+      fieldName: fieldDef.name,
+      newValue: stringifyFieldValue(
+        fieldDef,
+        draftData[section.id][fieldDef.name],
+        draftData[section.id]
+      ),
+      oldValue: stringifyFieldValue(
+        fieldDef,
+        originalDraftData[section.id][fieldDef.name],
+        originalDraftData[section.id]
+      )
+    })
+  }
+}
 export const draftToGqlTransformer = (
   formDefinition: IForm,
   draftData: IFormData,
@@ -100,32 +174,13 @@ export const draftToGqlTransformer = (
         }
         if (Object.keys(originalDraftData)) {
           if (hasFieldChanged(fieldDef, draftData, originalDraftData)) {
-            if (!transformedData.registration) {
-              transformedData.registration = {}
-            }
-            if (!transformedData.registration.correction) {
-              transformedData.registration.correction = draftData.registration
-                .correction
-                ? { ...(draftData.registration.correction as IFormSectionData) }
-                : {}
-            }
-            if (!transformedData.registration.correction.values) {
-              transformedData.registration.correction.values = []
-            }
-            transformedData.registration.correction.values.push({
-              section: section.id,
-              fieldName: fieldDef.name,
-              newValue: stringifyFieldValue(
-                fieldDef,
-                draftData[section.id][fieldDef.name],
-                draftData[section.id]
-              ),
-              oldValue: stringifyFieldValue(
-                fieldDef,
-                originalDraftData[section.id][fieldDef.name],
-                originalDraftData[section.id]
-              )
-            })
+            transformRegistrationCorrection(
+              section,
+              fieldDef,
+              draftData,
+              originalDraftData,
+              transformedData
+            )
           }
         }
 
