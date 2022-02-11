@@ -23,9 +23,8 @@ import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { getOfflineData } from '@client/offline/selectors'
-import { IOfflineData } from '@client/offline/reducer'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
+import { getVerifyCorrectorDefinition } from '@client/forms/correction/verifyCorrector'
 interface INameField {
   firstNamesField: string
   familyNameField: string
@@ -39,8 +38,8 @@ export interface ICertificateCorrectorField {
   identifierOtherTypeField: string
   identifierField: string
   nameFields: INameFields
-  birthDateField: string
-  nationalityField: string
+  birthDateField?: string
+  nationalityField?: string
 }
 
 export interface ICertificateCorrectorDefinition {
@@ -54,7 +53,7 @@ interface IMatchParams {
 
 interface IStateProps {
   application: IApplication
-  offlineResources: IOfflineData
+  form: ICertificateCorrectorDefinition
 }
 interface IDispatchProps {
   goBack: typeof goBack
@@ -91,15 +90,12 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
   }
 
   getGenericCorrectorInfo = (corrector: string): ICorrectorInfo => {
-    const { intl, application, offlineResources } = this.props
+    const { intl, application, form } = this.props
     const info = application.data[corrector]
     //TODO :: we have to get form defination from new certificateCorrectorDefination
     const showInfoFor = ['mother', 'father', 'child', 'informant']
     if (showInfoFor.includes(corrector)) {
-      const fields =
-        offlineResources.forms.certificateCorrectorDefinition[
-          application.event
-        ][corrector]
+      const fields = form[corrector]
       const iD = info[fields.identifierField] as string
       const iDType = (info[fields.identifierTypeField] ||
         info[fields.identifierOtherTypeField]) as string
@@ -111,8 +107,12 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
         fields.nameFields[intl.locale].familyNameField
       ] as string
 
-      const birthDate = info[fields.birthDateField] as string
-      const nationality = info[fields.nationalityField] as string
+      const birthDate =
+        (fields.birthDateField && (info[fields.birthDateField] as string)) || ''
+      const nationality =
+        (fields.nationalityField &&
+          (info[fields.nationalityField] as string)) ||
+        ''
 
       return {
         iD,
@@ -224,7 +224,7 @@ const mapStateToProps = (
 
   return {
     application,
-    offlineResources: getOfflineData(state)
+    form: getVerifyCorrectorDefinition(application.event)
   }
 }
 
