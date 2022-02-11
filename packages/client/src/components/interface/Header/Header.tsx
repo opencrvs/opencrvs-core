@@ -143,7 +143,7 @@ const SearchBox = styled.div`
     background: ${({ theme }) => theme.colors.white};
   }
   &:active {
-    border: 1px solid ${({ theme }) => theme.colors.yellow500};
+    outline: 3px solid ${({ theme }) => theme.colors.yellow500};
   }
   &:focus-within input {
     background: ${({ theme }) => theme.colors.white};

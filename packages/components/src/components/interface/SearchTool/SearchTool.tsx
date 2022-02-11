@@ -34,10 +34,11 @@ const SearchTextInput = styled.input`
     outline: none;
     background-color: ${({ theme }) => theme.colors.white};
   }
-
   &:-webkit-autofill {
     background-color: ${({ theme }) => theme.colors.white};
-    -webkit-box-shadow: 0 0 0px 1000px ${({ theme }) => theme.colors.white}
+    border-radius: 50px;
+    padding-left: 15px;
+    -webkit-box-shadow: 0 0 0px 1000px ${({ theme }) => theme.colors.grey300}
       inset;
   }
 
@@ -106,17 +107,19 @@ const SelectedSearchCriteria = styled.span`
   & .selected-icon {
     display: none;
   }
+  & .selected-label {
+    border-radius: 50px;
+    text-align: center;
+    width: 110px;
+  }
+  & .selected-label:hover {
+    background: ${({ theme }) => theme.colors.grey300};
+  }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     padding: 2px;
     padding-right: 7px;
     & .selected-icon {
       display: flex;
-    }
-    & .selected-icon:focus {
-      background: 2px solid ${({ theme }) => theme.colors.yellow500};
-    }
-    & .selected-icon:active {
-      background: 2px solid ${({ theme }) => theme.colors.yellow500};
     }
     & .selected-label {
       display: none;

@@ -22,15 +22,15 @@ interface IProps extends React.HTMLAttributes<Element> {
 
 const AvatarImage = styled.img`
   border-radius: 50%;
-  border: solid 2px transparent;
+  /* border: solid 2px transparent; */
   &:hover {
-    border: 2px solid ${({ theme }) => theme.colors.grey300};
+    outline: 2px solid ${({ theme }) => theme.colors.grey300};
   }
   &:focus {
-    border: 2px solid ${({ theme }) => theme.colors.yellow500};
+    outline: 2px solid ${({ theme }) => theme.colors.yellow500};
   }
   &:active {
-    border: 2px solid ${({ theme }) => theme.colors.grey300};
+    outline: 2px solid ${({ theme }) => theme.colors.grey300};
   }
 `
 
