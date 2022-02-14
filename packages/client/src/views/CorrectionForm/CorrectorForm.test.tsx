@@ -257,7 +257,7 @@ describe('Corrector form', () => {
 
     it('should disable the continue button if others option is selected without specifying the relationship', () => {
       wrapper
-        .find('#relationship_OTHERS')
+        .find('#relationship_OTHER')
         .hostNodes()
         .simulate('change', { target: { checked: true } })
       wrapper.update()
@@ -268,7 +268,7 @@ describe('Corrector form', () => {
 
     it('should not disable the continue button if others option is selected with the relationship specified', () => {
       wrapper
-        .find('#relationship_OTHERS')
+        .find('#relationship_OTHER')
         .hostNodes()
         .simulate('change', { target: { checked: true } })
       wrapper.update()
