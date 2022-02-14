@@ -49,6 +49,7 @@ describe('when user is selecting the informant', () => {
   })
   describe('when selects "Parent"', () => {
     it('takes user to the birth registration contact view', () => {
+      console.log(app.debug())
       app.find('#select_informant_MOTHER').hostNodes().simulate('change')
 
       app.find('#continue').hostNodes().simulate('click')

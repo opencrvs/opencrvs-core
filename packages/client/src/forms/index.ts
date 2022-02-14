@@ -824,7 +824,7 @@ export enum ReviewSection {
 }
 
 export enum InformantSection {
-  Applicant = 'applicant'
+  Registration = 'registration'
 }
 
 export type Section =

@@ -16,8 +16,7 @@ import {
   IFormSectionGroup,
   RADIO_GROUP_WITH_NESTED_FIELDS,
   Event,
-  InformantSection,
-  IForm
+  InformantSection
 } from '@client/forms'
 import { formMessages } from '@client/i18n/messages/views/selectInformant'
 
@@ -97,7 +96,7 @@ const deathInformantRelationGroup: IFormSectionGroup = {
   error: formMessages.informantError,
   fields: [
     {
-      name: 'applicant',
+      name: 'relationship',
       type: RADIO_GROUP_WITH_NESTED_FIELDS,
       size: RadioSize.LARGE,
       label: formMessages.whoIsDeathInformant,
@@ -159,7 +158,7 @@ const deathInformantRelationGroup: IFormSectionGroup = {
 }
 
 const birthInformantSection: IFormSection = {
-  id: InformantSection.Applicant,
+  id: InformantSection.Registration,
   viewType: 'form',
   name: formMessages.name,
   title: formMessages.title,
@@ -167,7 +166,7 @@ const birthInformantSection: IFormSection = {
 }
 
 const deathInformantSection: IFormSection = {
-  id: InformantSection.Applicant,
+  id: InformantSection.Registration,
   viewType: 'form',
   name: formMessages.name,
   title: formMessages.title,

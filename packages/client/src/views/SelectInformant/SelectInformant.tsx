@@ -30,7 +30,8 @@ import {
   Event,
   IFormSection,
   IFormSectionData,
-  IFormFieldValue
+  IFormFieldValue,
+  IFormData
 } from '@client/forms'
 import {
   getBirthSection,
@@ -65,6 +66,7 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { getInformantSection } from './SelectInformantSection'
 import { FormFieldGenerator } from '@client/components/form'
+import { getValidationErrorsForForm } from '@client/forms/validation'
 
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -79,6 +81,11 @@ const Actions = styled.div`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding-bottom: 16px;
   }
+`
+
+const ErrorWrapper = styled.div`
+  margin-top: -50px;
+  margin-bottom: 16px;
 `
 
 enum INFORMANT {
@@ -131,7 +138,7 @@ type IFullProps = {
 interface IState {
   informant: string
   touched: boolean
-  isError: boolean
+  showError: boolean
 }
 
 function getGroupWithInitialValues(
@@ -168,7 +175,7 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
             .applicantsRelationToDeceased as string)) ||
         '',
       touched: false,
-      isError: false
+      showError: false
     }
   }
   section = getInformantSection(
@@ -177,7 +184,6 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       : Event.DEATH
   )
   group = getGroupWithInitialValues(this.section, this.props.application)
-
   componentDidMount() {
     this.group = {
       ...this.group,
@@ -193,14 +199,23 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
     sectionData: IFormSectionData,
     activeSection: IFormSection
   ) => {
+    console.log(activeSection.groups[0].fields[0].name)
     const applicant =
-      (sectionData[activeSection.id] as IFormSectionData)?.value !==
-      'SOMEONE_ELSE'
-        ? (sectionData[activeSection.id] as IFormSectionData)?.value
+      (sectionData[activeSection.groups[0].fields[0].name] as IFormSectionData)
+        ?.value !== 'SOMEONE_ELSE'
+        ? (
+            sectionData[
+              activeSection.groups[0].fields[0].name
+            ] as IFormSectionData
+          )?.value
         : (
-            (sectionData[activeSection.id] as IFormSectionData)
-              ?.nestedFields as IFormSectionData
+            (
+              sectionData[
+                activeSection.groups[0].fields[0].name
+              ] as IFormSectionData
+            )?.nestedFields as IFormSectionData
           )?.otherRelationship
+    console.log(applicant)
     const event = this.props.location.pathname.includes(Event.BIRTH)
       ? Event.BIRTH
       : Event.DEATH
@@ -232,19 +247,71 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
           relationship: applicant
         }
       }
+      newApplication.data[registrationSection.id] = {
+        ...application?.data[registrationSection.id],
+        ...{
+          presentAtBirthRegistration: applicant,
+          relationship: {
+            value: applicant,
+            nestedFields: {}
+          }
+        }
+      }
     }
+    console.log('aaa', applicantsSection)
+    console.log('rrr', registrationSection)
+    console.log(newApplication)
     this.props.modifyApplication(newApplication)
   }
 
   handleContinue = () => {
-    const event = this.props.location.pathname.includes(Event.BIRTH)
-      ? Event.BIRTH
-      : Event.DEATH
-    event === Event.BIRTH
-      ? this.props.goToBirthRegistrationAsParent(
-          this.props.match.params.applicationId
-        )
-      : this.props.goToDeathRegistration(this.props.match.params.applicationId)
+    console.log(this.section)
+    const errors = getValidationErrorsForForm(
+      this.group.fields,
+      this.props.application.data[this.section.id] || {}
+    )
+    console.log(errors)
+
+    let hasError = false
+    this.group.fields.forEach((field) => {
+      const fieldErrors = errors[field.name].errors
+      const nestedFieldErrors = errors[field.name].nestedFields
+
+      if (fieldErrors.length > 0) {
+        hasError = true
+      }
+
+      if (field.nestedFields) {
+        Object.values(field.nestedFields).forEach((nestedFields) => {
+          nestedFields.forEach((nestedField) => {
+            if (
+              nestedFieldErrors[nestedField.name] &&
+              nestedFieldErrors[nestedField.name].length > 0
+            ) {
+              hasError = true
+            }
+          })
+        })
+      }
+    })
+    if (hasError) {
+      this.setState({
+        ...this.state,
+        showError: true
+      })
+      return
+    } else {
+      const event = this.props.location.pathname.includes(Event.BIRTH)
+        ? Event.BIRTH
+        : Event.DEATH
+      event === Event.BIRTH
+        ? this.props.goToBirthRegistrationAsParent(
+            this.props.match.params.applicationId
+          )
+        : this.props.goToDeathRegistration(
+            this.props.match.params.applicationId
+          )
+    }
   }
   render() {
     const { intl } = this.props
@@ -306,6 +373,20 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
               draftData={this.props.application?.data}
             />
           </Actions>
+          {this.state.showError && (
+            // <ErrorWrapper>
+            //   <ErrorText id="form_error" ignoreMediaQuery={true}>
+            //     {(group.error && intl.formatMessage(group.error)) || ''}
+            //   </ErrorText>
+            // </ErrorWrapper>
+            <ErrorWrapper>
+              <ErrorText id="error_text">
+                {event === Event.BIRTH
+                  ? intl.formatMessage(formMessages.birthErrorMessage)
+                  : intl.formatMessage(formMessages.deathErrorMessage)}
+              </ErrorText>
+            </ErrorWrapper>
+          )}
           <PrimaryButton id="continue" onClick={this.handleContinue}>
             {intl.formatMessage(buttonMessages.continueButton)}
           </PrimaryButton>
