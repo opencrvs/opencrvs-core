@@ -68,8 +68,6 @@ interface BasePage {
   fixedWidth?: number
   mapPinClickHandler?: () => void
   profilePageStyle?: IprofilePageStyle
-  subMenuComponent?: React.ReactNode
-  isCertificatesConfigPage?: boolean
 }
 
 interface DefaultPage extends BasePage {
@@ -236,9 +234,8 @@ export function SysAdminContentWrapper(props: SysAdminPage) {
   }
 
   return (
-    <Container isCertificatesConfigPage={props.isCertificatesConfigPage}>
+    <Container>
       {pageHeader}
-      {props.subMenuComponent && props.subMenuComponent}
       {pageContent}
     </Container>
   )

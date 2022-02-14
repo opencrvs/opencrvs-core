@@ -62,10 +62,6 @@ const NotificationContainer = styled.div`
     bottom: 100px;
   }
 
-  &.hide {
-    display: none;
-  }
-
   &.success {
     background: ${({ theme }) => theme.colors.success};
   }
@@ -120,9 +116,7 @@ class FloatingNotificationComp extends React.Component<FullProps> {
     return (
       <NotificationContainer
         id={id}
-        className={
-          (type ? type : '') + (show ? ' show' : ' hide') + ' ' + className
-        }
+        className={(type ? type : '') + (show ? ' show' : '') + ' ' + className}
       >
         <Content>
           {type === NOTIFICATION_TYPE.SUCCESS && <Success />}

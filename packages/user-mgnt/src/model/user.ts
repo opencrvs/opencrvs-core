@@ -23,10 +23,7 @@ export enum AUDIT_REASON {
 
 export enum AUDIT_ACTION {
   DEACTIVATE,
-  REACTIVATE,
-  CERTIFICATE_CREATED,
-  CERTIFICATE_UPDATED,
-  CERTIFICATE_DELETED
+  REACTIVATE
 }
 
 export interface IUserName {
@@ -124,13 +121,7 @@ const AuditHistory = new Schema(
     },
     action: {
       type: String,
-      enum: [
-        AUDIT_ACTION.DEACTIVATE,
-        AUDIT_ACTION.REACTIVATE,
-        AUDIT_ACTION.CERTIFICATE_CREATED,
-        AUDIT_ACTION.CERTIFICATE_UPDATED,
-        AUDIT_ACTION.CERTIFICATE_DELETED
-      ],
+      enum: [AUDIT_ACTION.DEACTIVATE, AUDIT_ACTION.REACTIVATE],
       default: AUDIT_ACTION.DEACTIVATE
     },
     reason: {

@@ -55,22 +55,7 @@ export async function userAuditHandler(
     updatedUserStatus = user.status
   }
 
-  let isCertificateActionOccur = false
-  if (
-    AUDIT_ACTION[auditUserPayload.action] === AUDIT_ACTION.CERTIFICATE_CREATED
-  ) {
-    isCertificateActionOccur = true
-  } else if (
-    AUDIT_ACTION[auditUserPayload.action] === AUDIT_ACTION.CERTIFICATE_CREATED
-  ) {
-    isCertificateActionOccur = true
-  } else if (
-    AUDIT_ACTION[auditUserPayload.action] === AUDIT_ACTION.CERTIFICATE_DELETED
-  ) {
-    isCertificateActionOccur = true
-  }
-
-  if (updatedUserStatus !== user.status || isCertificateActionOccur) {
+  if (updatedUserStatus !== user.status) {
     user.status = updatedUserStatus
 
     const auditData: IAuditHistory = {

@@ -10,10 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Area } from 'react-easy-crop/types'
-import {
-  ALLOWED_IMAGE_TYPE,
-  ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE
-} from '@client/utils/constants'
+import { ALLOWED_IMAGE_TYPE } from '@client/utils/constants'
 
 export type IImage = {
   type: string
@@ -38,40 +35,18 @@ export const getBase64String = (file: File) => {
   })
 }
 
-export const getFileAsTextString = (file: File) => {
-  return new Promise<string | ArrayBuffer>((resolve, reject) => {
-    const reader = new FileReader()
-    reader.readAsText(file)
-    reader.onload = () => {
-      if (reader.result) {
-        return resolve(reader.result)
-      }
-    }
-    reader.onerror = (error) => reject(error)
-  })
-}
-
 export const validateImage = async (uploadedImage: File) => {
   if (!ALLOWED_IMAGE_TYPE.includes(uploadedImage.type)) {
-    throw new Error(ERROR_TYPES.IMAGE_TYPE)
+    throw new ErrorEvent(ERROR_TYPES.IMAGE_TYPE)
   }
 
   if (uploadedImage.size > 5242880) {
-    throw new Error(ERROR_TYPES.OVERSIZED)
+    throw new ErrorEvent(ERROR_TYPES.OVERSIZED)
   }
 
   const fileAsBase64 = await getBase64String(uploadedImage)
 
   return fileAsBase64.toString()
-}
-export const validateCertificateTemplate = async (uploadedImage: File) => {
-  if (
-    !ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE.includes(uploadedImage.type)
-  ) {
-    throw new Error(ERROR_TYPES.IMAGE_TYPE)
-  }
-  const fileAsText = await getFileAsTextString(uploadedImage)
-  return fileAsText.toString()
 }
 
 const createImage = (src: string): Promise<HTMLImageElement> =>

@@ -156,4 +156,3 @@ services:
       - HOST=0.0.0.0
       - PORT=2021
       - MONGO_URL=mongodb://mongo1/application-config
-      - CHECK_INVALID_TOKEN=true

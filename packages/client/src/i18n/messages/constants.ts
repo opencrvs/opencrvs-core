@@ -299,7 +299,7 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.comment'
   },
   configTitle: {
-    defaultMessage: 'Configuration',
+    defaultMessage: 'Config',
     description: 'Config title',
     id: 'constants.config'
   },

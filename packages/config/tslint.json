@@ -15,7 +15,7 @@
     "semicolon": [false, "never"],
     "ordered-imports": false,
     "import-name": false,
-    "await-promise": [true, "DocumentQuery", "Query"],
+    "await-promise": [true, "DocumentQuery"],
     "match-default-export-name": false,
     "no-require-imports": false,
     "no-unsafe-any": false,
