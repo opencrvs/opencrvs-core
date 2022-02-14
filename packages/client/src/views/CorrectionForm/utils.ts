@@ -319,13 +319,14 @@ export function hasNestedDataChanged(
   previousNestedFieldData: IFormData
 ) {
   if (nestedFieldData.value === previousNestedFieldData.value) {
-    Object.keys(nestedFieldData.nestedFields).forEach((key) => {
+    for (const key of Object.keys(nestedFieldData.nestedFields)) {
       if (
         nestedFieldData.nestedFields[key] !==
         previousNestedFieldData.nestedFields[key]
-      )
+      ) {
         return true
-    })
+      }
+    }
     return false
   }
   return true
