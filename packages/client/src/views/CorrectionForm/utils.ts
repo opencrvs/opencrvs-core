@@ -137,6 +137,26 @@ export function updateApplicationRegistrationWithCorrection(
     }
   }
 
+  if (data.currectionFeesPayment) {
+    if (
+      (data.currectionFeesPayment.correctionFees as IFormSectionData)?.value &&
+      (data.currectionFeesPayment.correctionFees as IFormSectionData).value ===
+        'REQUIRED'
+    ) {
+      const { nestedFields }: { nestedFields?: IFormSectionData } = data
+        .currectionFeesPayment.correctionFees as IFormSectionData
+      correctionValues.payment = {
+        total: nestedFields?.totalFees,
+        type: 'MANUAL'
+      }
+      if (nestedFields?.proofOfPayment) {
+        correctionValues.payment.data = (
+          nestedFields?.proofOfPayment as IFileValue
+        ).data
+      }
+    }
+  }
+
   if (meta) {
     if (meta.userPrimaryOffice) {
       correctionValues.location = {

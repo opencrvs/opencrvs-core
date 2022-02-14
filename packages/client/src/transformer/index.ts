@@ -74,24 +74,7 @@ export const transformRegistrationCorrection = (
     transformedData.registration.correction.values = []
   }
 
-  if (isRadioGroupWithNestedField(fieldDef)) {
-    const selectedRadioOption = getSelectedRadioOptionWithNestedFields(
-      fieldDef,
-      draftData
-    )
-    if (selectedRadioOption) {
-      for (const nestedFieldDef of fieldDef.nestedFields[selectedRadioOption]) {
-        transformRegistrationCorrection(
-          section,
-          fieldDef,
-          draftData,
-          originalDraftData,
-          transformedData,
-          nestedFieldDef
-        )
-      }
-    }
-  } else if (nestedFieldDef) {
+  if (nestedFieldDef) {
     const valuePath = `${fieldDef.name}.nestedFields.${nestedFieldDef.name}`
     transformedData.registration.correction.values.push({
       section: section.id,
@@ -107,6 +90,23 @@ export const transformRegistrationCorrection = (
         originalDraftData[section.id]
       )
     })
+  } else if (isRadioGroupWithNestedField(fieldDef)) {
+    const selectedRadioOption = getSelectedRadioOptionWithNestedFields(
+      fieldDef,
+      draftData[section.id]
+    )
+    if (selectedRadioOption) {
+      for (const nestedFieldDef of fieldDef.nestedFields[selectedRadioOption]) {
+        transformRegistrationCorrection(
+          section,
+          fieldDef,
+          draftData,
+          originalDraftData,
+          transformedData,
+          nestedFieldDef
+        )
+      }
+    }
   } else {
     transformedData.registration.correction.values.push({
       section: section.id,
@@ -172,8 +172,14 @@ export const draftToGqlTransformer = (
           )
           return
         }
-        if (Object.keys(originalDraftData)) {
-          if (hasFieldChanged(fieldDef, draftData, originalDraftData)) {
+        if (Object.keys(originalDraftData).length) {
+          if (
+            hasFieldChanged(
+              fieldDef,
+              draftData[section.id],
+              originalDraftData[section.id]
+            )
+          ) {
             transformRegistrationCorrection(
               section,
               fieldDef,
