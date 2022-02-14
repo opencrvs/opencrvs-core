@@ -80,6 +80,9 @@ import { IOfflineData } from '@client/offline/reducer'
 const SupportingDocument = styled.div`
   display: flex;
   margin: 8px 0;
+  & span:last-child {
+    padding-left: 8px;
+  }
 `
 interface Correction {
   item: string
@@ -861,7 +864,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
             return (
               <SupportingDocument>
                 <PaperClip />
-                {doc[1]}
+                <span>{doc[1]}</span>
               </SupportingDocument>
             )
           })}
