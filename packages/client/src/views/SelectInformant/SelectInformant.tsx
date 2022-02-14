@@ -29,9 +29,7 @@ import {
   DeathSection,
   Event,
   IFormSection,
-  IFormSectionData,
-  IFormFieldValue,
-  IFormData
+  IFormSectionData
 } from '@client/forms'
 import {
   getBirthSection,
@@ -46,21 +44,12 @@ import {
   goToBirthRegistrationAsParent,
   goToDeathContactPoint,
   goToDeathRegistration,
-  goToHome,
-  goToPrimaryApplicant
+  goToHome
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
-import {
-  INFORMANT_FIELD_STRING,
-  RADIO_BUTTON_LARGE_STRING
-} from '@client/utils/constants'
 import * as React from 'react'
-import {
-  injectIntl,
-  IntlShape,
-  WrappedComponentProps as IntlShapeProps
-} from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
@@ -88,27 +77,6 @@ const ErrorWrapper = styled.div`
   margin-bottom: 16px;
 `
 
-enum INFORMANT {
-  FATHER = 'FATHER',
-  MOTHER = 'MOTHER',
-  BOTH_PARENTS = 'BOTH_PARENTS',
-  SELF = 'SELF',
-  SOMEONE_ELSE = 'OTHER',
-  SPOUSE = 'SPOUSE',
-  SON = 'SON',
-  DAUGHTER = 'DAUGHTER',
-  SON_IN_LAW = 'SON_IN_LAW',
-  DAUGHTER_IN_LAW = 'DAUGHTER_IN_LAW',
-  GRANDSON = 'GRANDSON',
-  GRANDDAUGHTER = 'GRANDDAUGHTER',
-  EXTENDED_FAMILY = 'EXTENDED_FAMILY',
-  GRANDFATHER = 'GRANDFATHER',
-  GRANDMOTHER = 'GRANDMOTHER',
-  BROTHER = 'BROTHER',
-  SISTER = 'SISTER',
-  LEGAL_GUARDIAN = 'LEGAL_GUARDIAN'
-}
-
 export interface IInformantField {
   id: string
   option: RadioComponentOption
@@ -129,7 +97,6 @@ type IFullProps = {
   goToDeathContactPoint: typeof goToDeathContactPoint
   goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
   goToDeathRegistration: typeof goToDeathRegistration
-  goToPrimaryApplicant: typeof goToPrimaryApplicant
   registrationSection: IFormSection
   applicantsSection: IFormSection
 } & IntlShapeProps &
@@ -199,7 +166,6 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
     sectionData: IFormSectionData,
     activeSection: IFormSection
   ) => {
-    console.log(activeSection.groups[0].fields[0].name)
     const applicant =
       (sectionData[activeSection.groups[0].fields[0].name] as IFormSectionData)
         ?.value !== 'SOMEONE_ELSE'
@@ -215,7 +181,6 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
               ] as IFormSectionData
             )?.nestedFields as IFormSectionData
           )?.otherRelationship
-    console.log(applicant)
     const event = this.props.location.pathname.includes(Event.BIRTH)
       ? Event.BIRTH
       : Event.DEATH
@@ -258,19 +223,14 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
         }
       }
     }
-    console.log('aaa', applicantsSection)
-    console.log('rrr', registrationSection)
-    console.log(newApplication)
     this.props.modifyApplication(newApplication)
   }
 
   handleContinue = () => {
-    console.log(this.section)
     const errors = getValidationErrorsForForm(
       this.group.fields,
       this.props.application.data[this.section.id] || {}
     )
-    console.log(errors)
 
     let hasError = false
     this.group.fields.forEach((field) => {
@@ -355,13 +315,6 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
               ? intl.formatMessage(formMessages.birthInformantTitle)
               : intl.formatMessage(formMessages.deathInformantTitle)}
           </Title>
-          {/* {this.state.informant === 'error' && (
-            <ErrorText id="error_text">
-              {event === Event.BIRTH
-                ? intl.formatMessage(formMessages.birthErrorMessage)
-                : intl.formatMessage(formMessages.deathErrorMessage)}
-            </ErrorText>
-          )} */}
           <Actions id="select_parent_informant">
             <FormFieldGenerator
               id={this.group.id}
@@ -374,11 +327,6 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
             />
           </Actions>
           {this.state.showError && (
-            // <ErrorWrapper>
-            //   <ErrorText id="form_error" ignoreMediaQuery={true}>
-            //     {(group.error && intl.formatMessage(group.error)) || ''}
-            //   </ErrorText>
-            // </ErrorWrapper>
             <ErrorWrapper>
               <ErrorText id="error_text">
                 {event === Event.BIRTH
@@ -417,7 +365,6 @@ export const SelectInformant = withRouter(
     goToBirthContactPoint,
     goToDeathContactPoint,
     goToBirthRegistrationAsParent,
-    goToPrimaryApplicant,
     goToDeathRegistration,
     modifyApplication,
     deleteApplication

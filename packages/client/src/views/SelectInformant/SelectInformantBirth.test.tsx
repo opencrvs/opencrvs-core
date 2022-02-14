@@ -49,8 +49,7 @@ describe('when user is selecting the informant', () => {
   })
   describe('when selects "Parent"', () => {
     it('takes user to the birth registration contact view', () => {
-      console.log(app.debug())
-      app.find('#select_informant_MOTHER').hostNodes().simulate('change')
+      app.find('#applicant_GRANDFATHER').hostNodes().simulate('change')
 
       app.find('#continue').hostNodes().simulate('click')
 
@@ -70,38 +69,20 @@ describe('when user is selecting the informant', () => {
 
   describe('when traverse list then continue', () => {
     it('takes user to the birth registration by parent informant view', () => {
-      app.find('#select_informant_BOTH_PARENTS').hostNodes().simulate('change')
-      app.find('#select_informant_FATHER').hostNodes().simulate('change')
+      app.find('#applicant_MOTHER').hostNodes().simulate('change')
+      app.find('#applicant_FATHER').hostNodes().simulate('change')
 
-      app.find('#select_informant_SELF').hostNodes().simulate('change')
-      app.find('#select_informant_MOTHER').hostNodes().simulate('change')
+      app.find('#applicant_GRANDFATHER').hostNodes().simulate('change')
+      app.find('#applicant_GRANDMOTHER').hostNodes().simulate('change')
+      app.find('#applicant_BROTHER').hostNodes().simulate('change')
+      app.find('#applicant_SISTER').hostNodes().simulate('change')
+      app.find('#applicant_LEGAL_GUARDIAN').hostNodes().simulate('change')
+      app.find('#applicant_SOMEONE_ELSE').hostNodes().simulate('change')
+
       app.find('#continue').hostNodes().simulate('click')
 
       const expectation = `/drafts/${draft.id}/events/birth`
       expect(window.location.pathname).toContain(expectation)
-    })
-  })
-
-  describe('when select both parents', () => {
-    it('takes user to the select primary applicant view', () => {
-      app.find('#select_informant_BOTH_PARENTS').hostNodes().simulate('change')
-      app.find('#continue').hostNodes().simulate('click')
-
-      expect(
-        app.find('#form_section_id_primary-applicant').hostNodes()
-      ).toHaveLength(1)
-    })
-  })
-
-  describe('when select someone else', () => {
-    it('takes user to the select applicant relationship view', () => {
-      app.find('#select_informant_OTHER').hostNodes().simulate('change')
-
-      app.find('#continue').hostNodes().simulate('click')
-
-      expect(
-        app.find('#form_section_id_applicant-relation').hostNodes()
-      ).toHaveLength(1)
     })
   })
 
@@ -123,16 +104,17 @@ describe('when select informant page loads with existing data', () => {
     const draft = createApplication(Event.BIRTH, {
       registration: {
         presentAtBirthRegistration: 'MOTHER',
-        registrationPhone: '01622688231'
+        registrationPhone: '01622688231',
+        applicant: {
+          value: 'MOTHER',
+          nestedFields: {}
+        }
       }
     })
     store.dispatch(storeApplication(draft))
     history.replace(SELECT_BIRTH_INFORMANT.replace(':applicationId', draft.id))
 
     await setPinCode(app)
-
-    expect(
-      app.find('#select_informant_MOTHER').hostNodes().props().checked
-    ).toBe(true)
+    expect(app.find('#applicant_MOTHER').hostNodes().props().checked).toBe(true)
   })
 })
