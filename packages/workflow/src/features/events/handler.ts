@@ -26,13 +26,15 @@ import {
 import {
   getEventType,
   hasCorrectionEncounterSection,
-  isInProgressApplication
+  isInProgressApplication,
+  isArchiveTask
 } from '@workflow/features/registration/utils'
 import updateTaskHandler from '@workflow/features/task/handler'
 import { logger } from '@workflow/logger'
 import { hasRegisterScope, hasValidateScope } from '@workflow/utils/authUtils'
 import * as Hapi from '@hapi/hapi'
 import fetch, { RequestInit } from 'node-fetch'
+import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
 
 // TODO: Change these event names to be closer in definition to the comments
 // https://jembiprojects.jira.com/browse/OCRVS-2767
@@ -46,6 +48,7 @@ export enum Events {
   BIRTH_MARK_VALID = '/events/birth/mark-validated',
   BIRTH_MARK_CERT = '/events/birth/mark-certified',
   BIRTH_MARK_VOID = '/events/birth/mark-voided',
+  BIRTH_MARK_ARCHIVED = '/events/birth/mark-archived',
   BIRTH_REQUEST_CORRECTION = '/events/birth/request-correction',
   DEATH_IN_PROGRESS_DEC = '/events/death/in-progress-declaration', /// Field agent or DHIS2in progress application
   DEATH_NEW_DEC = '/events/death/new-declaration', // Field agent completed application
@@ -56,6 +59,7 @@ export enum Events {
   DEATH_MARK_VALID = '/events/death/mark-validated',
   DEATH_MARK_CERT = '/events/death/mark-certified',
   DEATH_MARK_VOID = '/events/death/mark-voided',
+  DEATH_MARK_ARCHIVED = '/events/death/mark-archived',
   DEATH_REQUEST_CORRECTION = '/events/death/request-correction',
   BIRTH_NEW_VALIDATE = '/events/birth/new-validation', // Registration agent new application
   DEATH_NEW_VALIDATE = '/events/death/new-validation', // Registration agent new application
@@ -64,11 +68,11 @@ export enum Events {
 }
 
 function detectEvent(request: Hapi.Request): Events {
+  const fhirBundle = request.payload as fhir.Bundle
   if (
     request.method === 'post' &&
     (request.path === '/fhir' || request.path === '/fhir/')
   ) {
-    const fhirBundle = request.payload as fhir.Bundle
     if (
       fhirBundle.entry &&
       fhirBundle.entry[0] &&
@@ -165,10 +169,17 @@ function detectEvent(request: Hapi.Request): Events {
   }
 
   if (request.method === 'put' && request.path.includes('/fhir/Task')) {
-    const eventType = getEventType(request.payload as fhir.Bundle)
+    const taskResource = getTaskResource(fhirBundle)
+    const eventType = getEventType(fhirBundle)
     if (eventType === EVENT_TYPE.BIRTH) {
+      if (isArchiveTask(taskResource)) {
+        return Events.BIRTH_MARK_ARCHIVED
+      }
       return Events.BIRTH_MARK_VOID
     } else if (eventType === EVENT_TYPE.DEATH) {
+      if (isArchiveTask(taskResource)) {
+        return Events.DEATH_MARK_ARCHIVED
+      }
       return Events.DEATH_MARK_VOID
     }
   }
@@ -388,6 +399,10 @@ export async function fhirWorkflowEventHandler(
         request.payload,
         request.headers.authorization
       )
+      break
+    case Events.BIRTH_MARK_ARCHIVED:
+    case Events.DEATH_MARK_ARCHIVED:
+      response = await updateTaskHandler(request, h, event)
       break
     case Events.EVENT_NOT_DUPLICATE:
       response = await forwardToHearth(request, h)
