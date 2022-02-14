@@ -55,6 +55,7 @@ export interface GQLMutation {
   markBirthAsCertified: string
   requestBirthRegistrationCorrection: string
   markEventAsVoided: string
+  markApplicationAsReinstated: string
   notADuplicate: string
   createDeathRegistration: GQLCreatedIds
   updateDeathRegistration: string
@@ -1809,6 +1810,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markBirthAsCertified?: MutationToMarkBirthAsCertifiedResolver<TParent>
   requestBirthRegistrationCorrection?: MutationToRequestBirthRegistrationCorrectionResolver<TParent>
   markEventAsVoided?: MutationToMarkEventAsVoidedResolver<TParent>
+  markApplicationAsReinstated?: MutationToMarkApplicationAsReinstatedResolver<TParent>
   notADuplicate?: MutationToNotADuplicateResolver<TParent>
   createDeathRegistration?: MutationToCreateDeathRegistrationResolver<TParent>
   updateDeathRegistration?: MutationToUpdateDeathRegistrationResolver<TParent>
@@ -1980,6 +1982,21 @@ export interface MutationToMarkEventAsVoidedResolver<
   (
     parent: TParent,
     args: MutationToMarkEventAsVoidedArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToMarkApplicationAsReinstatedArgs {
+  id: string
+}
+export interface MutationToMarkApplicationAsReinstatedResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToMarkApplicationAsReinstatedArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult

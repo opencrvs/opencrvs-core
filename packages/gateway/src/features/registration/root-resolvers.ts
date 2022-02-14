@@ -26,6 +26,7 @@ import {
 } from '@gateway/features/registration/fhir-builders'
 import { hasScope } from '@gateway/features/user/utils'
 import {
+  GQLRegStatus,
   GQLResolver,
   GQLStatusWiseRegistrationCount
 } from '@gateway/graphql/schema'
@@ -326,6 +327,71 @@ export const resolvers: GQLResolver = {
         )
         // return the taskId
         return taskEntry.resource.id
+      } else {
+        return await Promise.reject(
+          new Error('User does not have a register or validate scope')
+        )
+      }
+    },
+    async markApplicationAsReinstated(_, { id }, authHeader) {
+      if (
+        hasScope(authHeader, 'register') ||
+        hasScope(authHeader, 'validate')
+      ) {
+        const taskBundle = await fetchFHIR(
+          `/Task?focus=Composition/${id}`,
+          authHeader
+        )
+
+        const taskEntryData = taskBundle.entry[0]
+        if (!taskEntryData) {
+          throw new Error('Task does not exist')
+        }
+
+        const taskEntryResourceID =
+          taskBundle.entry && taskBundle.entry[0].resource.id
+
+        const taskHistoryBundle: fhir.Bundle = await fetchFHIR(
+          `/Task/${taskEntryResourceID}/_history`,
+          authHeader
+        )
+
+        const taskHistory =
+          taskHistoryBundle.entry &&
+          taskHistoryBundle.entry.map((taskEntry: fhir.BundleEntry, i) => {
+            const historicalTask = taskEntry.resource
+            // all these tasks will have the same id, make it more specific to keep apollo-client's cache happy
+            if (historicalTask && historicalTask.meta) {
+              historicalTask.id = `${historicalTask.id}/_history/${historicalTask.meta.versionId}`
+            }
+            return historicalTask as fhir.Task
+          })
+
+        const taskHistoryEntry = taskHistory && taskHistory.length > 1
+        if (!taskHistoryEntry) {
+          throw new Error('Task has no history')
+        }
+
+        const regStatusCode =
+          taskHistory &&
+          taskHistory[1].businessStatus &&
+          taskHistory[1].businessStatus.coding?.find((code) => {
+            return code.system === 'http://opencrvs.org/specs/reg-status'
+          })
+
+        if (!regStatusCode) {
+          return await Promise.reject(new Error('Task has no reg-status code'))
+        }
+
+        const status = regStatusCode.code as GQLRegStatus
+        const newTaskBundle = await updateFHIRTaskBundle(taskEntryData, status)
+        await fetchFHIR(
+          '/Task',
+          authHeader,
+          'PUT',
+          JSON.stringify(newTaskBundle)
+        )
+        return taskEntryData.resource.id
       } else {
         return await Promise.reject(
           new Error('User does not have a register or validate scope')

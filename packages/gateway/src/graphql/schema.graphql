@@ -145,6 +145,7 @@ type Mutation {
     details: BirthRegistrationInput!
   ): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID!
+  markApplicationAsReinstated(id: String!): ID!
   notADuplicate(id: String!, duplicateId: String!): ID!
   createDeathRegistration(details: DeathRegistrationInput!): CreatedIds!
   updateDeathRegistration(id: ID!, details: DeathRegistrationInput!): ID!
