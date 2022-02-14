@@ -48,7 +48,7 @@ export function ImageLoaderComp({
         onImageLoaded({ type: files[0].type, data: image })
         fileUploader.current!.value = ''
       } catch (error) {
-        if (error.message === ERROR_TYPES.OVERSIZED) {
+        if (error.type === ERROR_TYPES.OVERSIZED) {
           onError(intl.formatMessage(messages.overSized))
         } else {
           onError(intl.formatMessage(messages.imageFormat))

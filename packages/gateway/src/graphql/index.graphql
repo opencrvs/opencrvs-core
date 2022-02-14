@@ -17,8 +17,6 @@
 # import Query.* from '../features/metrics/schema.graphql'
 # import Query.* from '../features/search/schema.graphql'
 # import Query.* from '../features/role/schema.graphql'
-# import Query.* from '../features/certificate/schema.graphql'
-# import Mutation.* from '../features/certificate/schema.graphql'
 # import * from 'common.graphql'
 
 # TODO

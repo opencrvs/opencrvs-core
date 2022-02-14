@@ -11,7 +11,8 @@
  */
 import {
   printMoneyReceipt,
-  previewCertificate
+  previewCertificate,
+  printCertificate
 } from '@client/views/PrintCertificate/PDFUtils'
 import {
   mockApplicationData,
@@ -86,6 +87,36 @@ describe('PDFUtils related tests', () => {
         faultyOfflineData
       )
     ).toThrowError('Money reciept template is misssing in offline data')
+  })
+  it('Throws exception if invalid key is provided', () => {
+    const deathApplication = omit(mockDeathApplicationData, 'deathEvent')
+    expect(() =>
+      printCertificate(
+        intl,
+        {
+          id: 'asdhdqe2472487jsdfsdf',
+          data: deathApplication,
+          event: Event.DEATH
+        },
+        userDetails,
+        mockOfflineData
+      )
+    ).toThrowError('No countries found for this transformer')
+  })
+  it('Throws exception if invalid userDetails found for printCertificate', () => {
+    const deathApplication = omit(mockDeathApplicationData, 'deathEvent')
+    expect(() =>
+      printCertificate(
+        intl,
+        {
+          id: 'asdhdqe2472487jsdfsdf',
+          data: deathApplication,
+          event: Event.DEATH
+        },
+        null,
+        mockOfflineData
+      )
+    ).toThrowError('No user details found')
   })
   it('Throws exception if invalid userDetails found for previewCertificate', () => {
     const deathApplication = omit(mockDeathApplicationData, 'deathEvent')

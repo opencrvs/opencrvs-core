@@ -9,27 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  createCertificateHandler,
-  deleteCertificateHandler,
-  getActiveCertificatesHandler,
-  getCertificateHandler,
-  requestActiveCertificate,
-  requestNewCertificate,
-  updateCertificate,
-  updateCertificateHandler
-} from '@config/handlers/applicationCertificateHandler'
 import applicationConfigHandler from '@config/handlers/applicationConfigHandler'
-
-const enum RouteScope {
-  DECLARE = 'declare',
-  REGISTER = 'register',
-  CERTIFY = 'certify',
-  PERFORMANCE = 'performance',
-  SYSADMIN = 'sysadmin',
-  VALIDATE = 'validate',
-  NATLSYSADMIN = 'natlsysadmin'
-}
 
 export default function getRoutes() {
   return [
@@ -57,83 +37,6 @@ export default function getRoutes() {
         auth: false,
         tags: ['api'],
         description: 'Retrieve Application configuration'
-      }
-    },
-    {
-      method: 'POST',
-      path: '/getCertificate',
-      handler: getCertificateHandler,
-      config: {
-        tags: ['api'],
-        description: 'Retrieves certificate',
-        auth: {
-          scope: [RouteScope.NATLSYSADMIN]
-        },
-        validate: {
-          payload: requestActiveCertificate
-        }
-      }
-    },
-    {
-      method: 'GET',
-      path: '/getActiveCertificates',
-      handler: getActiveCertificatesHandler,
-      config: {
-        tags: ['api'],
-        description: 'Retrieves active certificates for birth and death',
-        auth: {
-          scope: [
-            RouteScope.NATLSYSADMIN,
-            RouteScope.DECLARE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY,
-            RouteScope.PERFORMANCE,
-            RouteScope.SYSADMIN,
-            RouteScope.VALIDATE
-          ]
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/createCertificate',
-      handler: createCertificateHandler,
-      config: {
-        tags: ['api'],
-        description: 'Creates a new Certificate',
-        auth: {
-          scope: [RouteScope.NATLSYSADMIN]
-        },
-        validate: {
-          payload: requestNewCertificate
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/updateCertificate',
-      handler: updateCertificateHandler,
-      config: {
-        tags: ['api'],
-        description: 'Updates an existing Certificate',
-        auth: {
-          scope: [RouteScope.NATLSYSADMIN]
-        },
-        validate: {
-          payload: updateCertificate
-        }
-      }
-    },
-    {
-      method: 'DELETE',
-      path: '/certificate/{certificateId}',
-      handler: deleteCertificateHandler,
-      config: {
-        tags: ['api'],
-        description: 'Delete certificate',
-        auth: {
-          scope: [RouteScope.NATLSYSADMIN]
-        }
       }
     }
   ]

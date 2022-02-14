@@ -1170,18 +1170,7 @@
         "form.field.label.relationHouseOwner": "Owner of the house or building where the birth occurred",
         "form.field.label.relationOperator": "Driver or operator of the land or water vehicle or aircraft where the birth occurred",
         "form.field.label.relationOfficeInCharge": "Officer-in-charge of the Thana of a road or public space where the birth occurred",
-        "form.field.label.relationSomeoneElse": "Someone else",
-        "config.previewTemplate": "Preview",
-        "config.printTemplate": "Print",
-        "config.downloadTemplate": "Download",
-        "config.uploadTemplate": "Upload",
-        "config.listTitle": "Certificates templates",
-        "config.birthTemplate": "Birth certificate",
-        "config.deathTemplate": "Death certificate",
-        "config.birthDefaultTempDesc": "Default birth certificate template",
-        "config.deathDefaultTempDesc": "Default death certificate template",
-        "config.listDetails": "To learn how to edit an SVG and upload a certificate to suite your country requirements please refer to this detailed guide. ",
-        "config.listDetailsQsn": "How to configure a certificate?"
+        "form.field.label.relationSomeoneElse": "Someone else"
       }
     },
     {
