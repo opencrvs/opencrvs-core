@@ -61,6 +61,7 @@ interface IButtonsMessages
   yes: MessageDescriptor
   approve: MessageDescriptor
   editRecord: MessageDescriptor
+  makeCorrection: MessageDescriptor
 }
 
 const messagesToDefine: IButtonsMessages = {
@@ -303,6 +304,11 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.editRecord',
     defaultMessage: 'Edit record',
     description: 'Edit record button text on review certificate'
+  },
+  makeCorrection: {
+    id: 'buttons.makeCorrection',
+    defaultMessage: 'Make correction',
+    description: 'Make correction button text on correction summary'
   }
 }
 

@@ -65,10 +65,6 @@ export interface IOfflineData {
       birth: ICertificateCollectorDefinition
       death: ICertificateCollectorDefinition
     }
-    certificateCorrectorDefinition: {
-      birth: ICertificateCollectorDefinition
-      death: ICertificateCollectorDefinition
-    }
     userForm: ISerializedForm
   }
   templates: {

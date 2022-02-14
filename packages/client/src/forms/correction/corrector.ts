@@ -19,6 +19,21 @@ import {
 } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/correction'
 
+export enum CorrectorRelationship {
+  //death
+  INFORMANT = 'INFORMANT',
+  //birth
+  MOTHER = 'MOTHER',
+  FATHER = 'FATHER',
+  CHILD = 'CHILD',
+  LEGAL_GUARDIAN = 'LEGAL_GUARDIAN',
+  //common
+  ANOTHER_AGENT = 'ANOTHER_AGENT',
+  REGISTRAR = 'REGISTRAR',
+  COURT = 'COURT',
+  OTHER = 'OTHER'
+}
+
 const birthCorrectorRelationGroup: IFormSectionGroup = {
   id: 'correctorRelation',
   title: messages.whoRequestedCorrection,
@@ -34,24 +49,27 @@ const birthCorrectorRelationGroup: IFormSectionGroup = {
       initialValue: '',
       validate: [],
       options: [
-        { value: 'MOTHER', label: messages.mother },
-        { value: 'FATHER', label: messages.father },
-        { value: 'CHILD', label: messages.child },
+        { value: CorrectorRelationship.MOTHER, label: messages.mother },
+        { value: CorrectorRelationship.FATHER, label: messages.father },
+        { value: CorrectorRelationship.CHILD, label: messages.child },
         {
-          value: 'LEGAL_GUARDIAN',
+          value: CorrectorRelationship.LEGAL_GUARDIAN,
           label: messages.legalGuardian
         },
-        { value: 'ANOTHER_AGENT', label: messages.anotherRegOrFieldAgent },
         {
-          value: 'REGISTRAR',
+          value: CorrectorRelationship.ANOTHER_AGENT,
+          label: messages.anotherRegOrFieldAgent
+        },
+        {
+          value: CorrectorRelationship.REGISTRAR,
           label: messages.me
         },
         {
-          value: 'COURT',
+          value: CorrectorRelationship.COURT,
           label: messages.court
         },
         {
-          value: 'OTHERS',
+          value: CorrectorRelationship.OTHER,
           label: messages.others
         }
       ],
@@ -62,7 +80,7 @@ const birthCorrectorRelationGroup: IFormSectionGroup = {
         LEGAL_GUARDIAN: [],
         ANOTHER_AGENT: [],
         REGISTRAR: [],
-        OTHERS: [
+        OTHER: [
           {
             name: 'otherRelationship',
             type: 'TEXT',
@@ -113,7 +131,7 @@ const deathCorrectorRelationGroup: IFormSectionGroup = {
           label: messages.court
         },
         {
-          value: 'OTHERS',
+          value: 'OTHER',
           label: messages.others
         }
       ],
@@ -121,7 +139,7 @@ const deathCorrectorRelationGroup: IFormSectionGroup = {
         INFORMANT: [],
         REGISTRAR: [],
         ANOTHER_AGENT: [],
-        OTHERS: [
+        OTHER: [
           {
             name: 'otherRelationship',
             type: 'TEXT',

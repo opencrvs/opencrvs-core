@@ -52,7 +52,6 @@ import {
 } from 'history'
 import { stringify } from 'query-string'
 import { match as Match } from 'react-router'
-import { ICertificateCorrectorDefinition } from '@client/views/CorrectionForm/VerifyCorrector'
 import { ConnectedRouter } from 'connected-react-router'
 
 export const registerScopeToken =
@@ -2545,10 +2544,6 @@ export const mockOfflineData = {
     certificateCollectorDefinition: {
       birth: ICertificateCollectorDefinition
       death: ICertificateCollectorDefinition
-    }
-    certificateCorrectorDefinition: {
-      birth: ICertificateCorrectorDefinition
-      death: ICertificateCorrectorDefinition
     }
     userForm: ISerializedForm
   },

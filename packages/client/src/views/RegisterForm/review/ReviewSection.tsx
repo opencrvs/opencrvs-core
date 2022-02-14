@@ -468,6 +468,8 @@ const SECTION_TITLE = {
 }
 
 class ReviewSectionComp extends React.Component<FullProps, State> {
+  hasChangesBeenMade = false
+
   constructor(props: FullProps) {
     super(props)
 
@@ -479,6 +481,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       activeSection: null,
       previewImage: null
     }
+  }
+
+  componentWillUpdate() {
+    this.hasChangesBeenMade = false
   }
 
   componentDidMount() {
@@ -896,11 +902,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     group: IFormSectionGroup,
     field: IFormField,
     visitedTags: string[],
-    errorsOnFields: IErrorsBySection
+    errorsOnFields: IErrorsBySection,
+    data: IFormSectionData,
+    originalData?: IFormSectionData
   ) {
-    const {
-      draft: { data, originalData }
-    } = this.props
+    const { draft } = this.props
 
     if (field.previewGroup && !visitedTags.includes(field.previewGroup)) {
       visitedTags.push(field.previewGroup)
@@ -934,7 +940,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         []
       const values = taggedFields
         .map((field) =>
-          this.getValueOrError(section, data, field, errorsOnFields)
+          this.getValueOrError(section, draft.data, field, errorsOnFields)
         )
         .filter((value) => value)
 
@@ -962,16 +968,17 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       )
 
       const hasAnyFieldChanged = taggedFields.reduce(
-        (accum, field) => accum || this.hasFieldChanged(section, field),
+        (accum, field) =>
+          accum || this.hasFieldChanged(field, data, originalData),
         false
       )
-
-      if (originalData && hasAnyFieldChanged && !hasErrors) {
+      const draftOriginalData = draft.originalData
+      if (draftOriginalData && hasAnyFieldChanged && !hasErrors) {
         const previousValues = taggedFields
           .map((field, index) =>
             this.getValueOrError(
               section,
-              originalData,
+              draftOriginalData,
               field,
               errorsOnFields,
               undefined,
@@ -1016,25 +1023,23 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
   }
 
-  hasNestedDataChanged(section: IFormSection, field: IFormField) {
-    const {
-      draft: { data, originalData }
-    } = this.props
-    const nestedFieldData = data[section.id][field.name] as IFormData
-
-    const previousNestedFieldData = (originalData as IFormData)[section.id][
-      field.name
-    ] as IFormData
+  hasNestedDataChanged(
+    nestedFieldData: IFormData,
+    previousNestedFieldData: IFormData
+  ) {
     if (nestedFieldData.value === previousNestedFieldData.value) {
-      Object.keys(nestedFieldData.nestedFields).forEach((key) => {
+      for (const key in nestedFieldData.nestedFields) {
         if (
           nestedFieldData.nestedFields[key] !==
           previousNestedFieldData.nestedFields[key]
-        )
+        ) {
+          this.hasChangesBeenMade = true
           return true
-      })
+        }
+      }
       return false
     }
+    this.hasChangesBeenMade = true
     return true
   }
 
@@ -1054,30 +1059,31 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     return false
   }
 
-  hasFieldChanged(section: IFormSection, field: IFormField) {
-    const {
-      draft: { data, originalData }
-    } = this.props
-    if (!originalData || !data[section.id] || !originalData[section.id]) {
-      return false
-    }
-    if (
-      data[section.id][field.name] &&
-      (data[section.id][field.name] as IFormData).value
-    ) {
-      return this.hasNestedDataChanged(section, field)
+  hasFieldChanged(
+    field: IFormField,
+    data: IFormSectionData,
+    originalData?: IFormSectionData
+  ) {
+    // const {
+    //   draft: { data, originalData }
+    // } = this.props
+    if (!originalData) return false
+    if (data[field.name] && (data[field.name] as IFormData).value) {
+      return this.hasNestedDataChanged(
+        data[field.name] as IFormData,
+        originalData[field.name] as IFormData
+      )
     }
     /*
      * data section might have some values as empty string
      * whereas original data section have them as undefined
      */
-    if (
-      !originalData[section.id][field.name] &&
-      data[section.id][field.name] === ''
-    ) {
+    if (!originalData[field.name] && data[field.name] === '') {
       return false
     }
-    return data[section.id][field.name] !== originalData[section.id][field.name]
+    const hasChanged = data[field.name] !== originalData[field.name]
+    this.hasChangesBeenMade = this.hasChangesBeenMade || hasChanged
+    return hasChanged
   }
 
   getSinglePreviewField(
@@ -1101,7 +1107,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
     if (
       originalData &&
-      this.hasFieldChanged(section, field) &&
+      this.hasFieldChanged(field, data[section.id], originalData[section.id]) &&
       !this.fieldHasErrors(section, field, sectionErrors)
     ) {
       value = (
@@ -1163,7 +1169,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             group,
             nestedField,
             visitedTags,
-            sectionErrors
+            sectionErrors,
+            (draft.data[section.id][field.name] as IFormData).nestedFields,
+            (draft.originalData &&
+              (draft.originalData[section.id][field.name] as IFormData)
+                .nestedFields) ||
+              undefined
           )
         )
       } else {
@@ -1353,7 +1364,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   group,
                   field,
                   visitedTags,
-                  errorsOnFields
+                  errorsOnFields,
+                  draft.data[section.id],
+                  (draft.originalData && draft.originalData[section.id]) ||
+                    undefined
                 )
               : field.nestedFields && field.ignoreNestedFieldWrappingInPreview
               ? this.getNestedPreviewField(
@@ -1534,7 +1548,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   <PrimaryButton
                     id="continue_button"
                     onClick={onContinue}
-                    disabled={!isComplete}
+                    disabled={!isComplete || !this.hasChangesBeenMade}
                   >
                     {intl.formatMessage(buttonMessages.continueButton)}
                   </PrimaryButton>

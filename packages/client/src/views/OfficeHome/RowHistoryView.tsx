@@ -48,6 +48,7 @@ import {
 import { goToCertificateCorrection } from '@client/navigation'
 import { connect } from 'react-redux'
 import { CorrectionSection } from '@client/forms'
+import { clearCorrectionChange } from '@client/applications'
 
 const ExpansionContent = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -211,6 +212,7 @@ type IProps = IntlShapeProps & {
   showRecordCorrection?: boolean
   eventDetails?: GQLEventSearchSet | null
   goToCertificateCorrection: typeof goToCertificateCorrection
+  clearCorrectionChange: typeof clearCorrectionChange
 }
 
 type ISODateString = string
@@ -457,12 +459,15 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                           this.props.showRecordCorrection && (
                             <RecordCorrectionButton
                               align={ICON_ALIGNMENT.LEFT}
-                              onClick={() =>
+                              onClick={() => {
+                                this.props.clearCorrectionChange(
+                                  eventDetails.id
+                                )
                                 this.props.goToCertificateCorrection(
                                   eventDetails.id,
                                   CorrectionSection.Corrector
                                 )
-                              }
+                              }}
                               icon={() => (
                                 <EditIcon>
                                   <svg
@@ -527,5 +532,6 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
 }
 
 export const RowHistoryView = connect(undefined, {
-  goToCertificateCorrection: goToCertificateCorrection
+  clearCorrectionChange,
+  goToCertificateCorrection
 })(injectIntl(withTheme(RowHistoryViewComponent)))

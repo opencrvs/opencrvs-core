@@ -48,6 +48,18 @@ interface ICorrectionMessages
   noDocumentsRequiredForCorrection: MessageDescriptor
   supportingDocumentsTitle: MessageDescriptor
   supportingDocumentsSubtitle: MessageDescriptor
+  correctionSummaryTitle: MessageDescriptor
+  correctionSummaryItem: MessageDescriptor
+  correctionSummaryOriginal: MessageDescriptor
+  correctionSummaryCorrection: MessageDescriptor
+  correctionSummaryRequestedBy: MessageDescriptor
+  correctionSummaryIdCheck: MessageDescriptor
+  correctionSummaryReasonForRequest: MessageDescriptor
+  correctionSummaryComments: MessageDescriptor
+  correctionSummaryAddComments: MessageDescriptor
+  correctionSummaryFeesRequired: MessageDescriptor
+  correctionSummaryProofOfPaymentRequired: MessageDescriptor
+  correctionSummaryProofOfPayment: MessageDescriptor
 }
 
 const messagesToDefine: ICorrectionMessages = {
@@ -239,6 +251,76 @@ const messagesToDefine: ICorrectionMessages = {
       'For all record corrections at a minimum an affidavit must be provided. For material errors and omissions eg. in paternity cases, a court order must also be provided.',
     description:
       'Label for supportingDocuments form subtitle in certificate correction form'
+  },
+  correctionSummaryTitle: {
+    id: 'correction.summary.title',
+    defaultMessage: 'Correction summary',
+    description: 'Title for certificate correction summary'
+  },
+  correctionSummaryItem: {
+    id: 'correction.summary.item',
+    defaultMessage: 'Item',
+    description:
+      'Corrected item table header for certificate correction summary'
+  },
+  correctionSummaryOriginal: {
+    id: 'correction.summary.original',
+    defaultMessage: 'Original',
+    description:
+      'Original value table header for certificate correction summary'
+  },
+  correctionSummaryCorrection: {
+    id: 'correction.summary.correction',
+    defaultMessage: 'Correction',
+    description:
+      'Correction value table header for certificate correction summary'
+  },
+  correctionSummaryRequestedBy: {
+    id: 'correction.summary.requestedBy',
+    defaultMessage: 'Requested by',
+    description: 'Requested by header for certificate correction summary'
+  },
+  correctionSummaryIdCheck: {
+    id: 'correction.summary.idCheck',
+    defaultMessage: 'ID check',
+    description: 'ID check header for certificate correction summary'
+  },
+  correctionSummaryReasonForRequest: {
+    id: 'correction.summary.reasonForRequest',
+    defaultMessage: 'Reason for request',
+    description: 'Reason for request header for certificate correction summary'
+  },
+  correctionSummaryComments: {
+    id: 'correction.summary.comments',
+    defaultMessage: 'Comments',
+    description: 'Comments header for certificate correction summary'
+  },
+  correctionSummaryAddComments: {
+    id: 'correction.summary.addComments',
+    defaultMessage: 'Add Comments',
+    description: 'Add Comments header for certificate correction summary'
+  },
+  correctionSummarySupportingDocuments: {
+    id: 'correction.summary.supportingDocuments',
+    defaultMessage: 'Supporting documents',
+    description:
+      'Supporting documents header for certificate correction summary'
+  },
+  correctionSummaryFeesRequired: {
+    id: 'correction.summary.feesRequired',
+    defaultMessage: 'Fees required?',
+    description: 'Fees required for certificate correction summary'
+  },
+  correctionSummaryProofOfPaymentRequired: {
+    id: 'correction.summary.proofOfPaymentRequired',
+    defaultMessage: 'Proof of payment is required',
+    description:
+      'Validation for proof of payment document for certificate correction summary'
+  },
+  correctionSummaryProofOfPayment: {
+    id: 'correction.summary.proofOfPayment',
+    defaultMessage: 'Proof of payment',
+    description: 'Proof of payment label fees payment document'
   }
 }
 

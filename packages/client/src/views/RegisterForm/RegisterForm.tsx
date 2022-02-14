@@ -472,20 +472,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
       />
     )
 
-    const cancelCorrection = () => {
-      this.props.modifyApplication({
-        ...application,
-        data: {
-          ...application.originalData
-        }
-      })
-      this.props.goToHomeTab('review')
-    }
-
     return {
       title: intl.formatMessage(correctionMessages.title),
       pageIcon: backButton,
-      goHome: cancelCorrection
+      goHome: () => this.props.goToHomeTab('review')
     }
   }
 

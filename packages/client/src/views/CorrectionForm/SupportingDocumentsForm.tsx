@@ -11,7 +11,11 @@
  */
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
-import { modifyApplication, IApplication } from '@client/applications'
+import {
+  modifyApplication,
+  IApplication,
+  writeApplication
+} from '@client/applications'
 import { FormFieldGenerator } from '@client/components/form'
 import {
   IFormSection,
@@ -43,6 +47,7 @@ type IDispatchProps = {
   goBack: typeof goBack
   goToHomeTab: typeof goToHomeTab
   goToCertificateCorrection: typeof goToCertificateCorrection
+  writeApplication: typeof writeApplication
   modifyApplication: typeof modifyApplication
 }
 
@@ -100,17 +105,8 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
     })
   }
 
-  const cancelCorrection = () => {
-    props.modifyApplication({
-      ...application,
-      data: {
-        ...application.originalData
-      }
-    })
-    props.goToHomeTab('review')
-  }
-
   const continueButtonHandler = () => {
+    props.writeApplication(application)
     props.goToCertificateCorrection(application.id, CorrectionSection.Reason)
   }
 
@@ -121,7 +117,7 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
         title={intl.formatMessage(section.title)}
         hideBackground
         goBack={props.goBack}
-        goHome={cancelCorrection}
+        goHome={() => props.goToHomeTab('review')}
       >
         <Content
           {...contentProps}
@@ -155,5 +151,6 @@ export const SupportingDocumentsForm = connect(undefined, {
   goBack,
   goToHomeTab,
   goToCertificateCorrection,
-  modifyApplication
+  modifyApplication,
+  writeApplication
 })(injectIntl(SupportingDocumentsFormComoponent))
