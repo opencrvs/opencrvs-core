@@ -332,6 +332,35 @@ export const resolvers: GQLResolver = {
         )
       }
     },
+    async markEventAsArchived(_, { id }, authHeader) {
+      if (
+        hasScope(authHeader, 'register') ||
+        hasScope(authHeader, 'validate')
+      ) {
+        const taskBundle = await fetchFHIR(
+          `/Task?focus=Composition/${id}`,
+          authHeader
+        )
+        const taskEntry = taskBundle.entry[0]
+        if (!taskEntry) {
+          throw new Error('Task does not exist')
+        }
+        const status = 'ARCHIVED'
+        const newTaskBundle = await updateFHIRTaskBundle(taskEntry, status)
+        await fetchFHIR(
+          '/Task',
+          authHeader,
+          'PUT',
+          JSON.stringify(newTaskBundle)
+        )
+        // return the taskId
+        return taskEntry.resource.id
+      } else {
+        return await Promise.reject(
+          new Error('User does not have a register or validate scope')
+        )
+      }
+    },
     async markBirthAsCertified(_, { details }, authHeader) {
       if (hasScope(authHeader, 'certify')) {
         return await markEventAsCertified(details, authHeader, EVENT_TYPE.BIRTH)
