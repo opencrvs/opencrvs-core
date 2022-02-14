@@ -11,9 +11,6 @@
 name: Lint and run unit tests
 
 on: [pull_request]
-  push:
-    branches:
-      - '**'
 jobs:
   test:
     runs-on: ubuntu-20.04
