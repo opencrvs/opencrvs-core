@@ -82,7 +82,7 @@ export function createSVG(
   pdfMake.vfs = { ...commonVFS, ...template.vfs }
   let definitionString = JSON.stringify(template.definition)
   if (template.transformers && template.transformers.length > 0) {
-    template.transformers.forEach(transformerDef => {
+    template.transformers.forEach((transformerDef) => {
       const transformFunction = transformers[transformerDef.operation]
       if (!transformFunction) {
         throw new Error(

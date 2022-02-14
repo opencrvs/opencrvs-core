@@ -158,7 +158,7 @@ async function loadDefinitions(): Promise<IDefinitionsResponse> {
   }
 
   const certificateTemplates = await loadCertificatesTemplatesDefinitions()
-  let response = await res.json()
+  const response = await res.json()
 
   response.templates.certificates.birth.definition =
     certificateTemplates.birth.svgCode

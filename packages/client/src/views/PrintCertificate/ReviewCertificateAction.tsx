@@ -209,7 +209,6 @@ class ReviewCertificateActionComponent extends React.Component<
       ]
     }
 
-
     printSvgCertificate()
     this.props.modifyApplication(draft)
     this.props.writeApplication(draft)
