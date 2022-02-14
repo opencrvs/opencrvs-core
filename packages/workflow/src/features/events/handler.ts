@@ -27,7 +27,8 @@ import {
   getEventType,
   hasCorrectionEncounterSection,
   isInProgressApplication,
-  isRejectedTask
+  isRejectedTask,
+  isArchiveTask
 } from '@workflow/features/registration/utils'
 import updateTaskHandler from '@workflow/features/task/handler'
 import { logger } from '@workflow/logger'
@@ -48,6 +49,7 @@ export enum Events {
   BIRTH_MARK_VALID = '/events/birth/mark-validated',
   BIRTH_MARK_CERT = '/events/birth/mark-certified',
   BIRTH_MARK_VOID = '/events/birth/mark-voided',
+  BIRTH_MARK_ARCHIVED = '/events/birth/mark-archived',
   BIRTH_REQUEST_CORRECTION = '/events/birth/request-correction',
   BIRTH_MARK_REINSTATED = '/events/birth/mark-reinstated',
   DEATH_IN_PROGRESS_DEC = '/events/death/in-progress-declaration', /// Field agent or DHIS2in progress application
@@ -59,6 +61,7 @@ export enum Events {
   DEATH_MARK_VALID = '/events/death/mark-validated',
   DEATH_MARK_CERT = '/events/death/mark-certified',
   DEATH_MARK_VOID = '/events/death/mark-voided',
+  DEATH_MARK_ARCHIVED = '/events/death/mark-archived',
   DEATH_REQUEST_CORRECTION = '/events/death/request-correction',
   DEATH_MARK_REINSTATED = '/events/death/mark-reinstated',
   BIRTH_NEW_VALIDATE = '/events/birth/new-validation', // Registration agent new application
@@ -175,10 +178,16 @@ function detectEvent(request: Hapi.Request): Events {
       if (isRejectedTask(taskResource)) {
         return Events.BIRTH_MARK_VOID
       }
+      if (isArchiveTask(taskResource)) {
+        return Events.BIRTH_MARK_ARCHIVED
+      }
       return Events.BIRTH_MARK_REINSTATED
     } else if (eventType === EVENT_TYPE.DEATH) {
       if (isRejectedTask(taskResource)) {
         return Events.DEATH_MARK_VOID
+      }
+      if (isArchiveTask(taskResource)) {
+        return Events.DEATH_MARK_ARCHIVED
       }
       return Events.DEATH_MARK_REINSTATED
     }
@@ -407,6 +416,10 @@ export async function fhirWorkflowEventHandler(
         request.payload,
         request.headers.authorization
       )
+      break
+    case Events.BIRTH_MARK_ARCHIVED:
+    case Events.DEATH_MARK_ARCHIVED:
+      response = await updateTaskHandler(request, h, event)
       break
     case Events.EVENT_NOT_DUPLICATE:
       response = await forwardToHearth(request, h)

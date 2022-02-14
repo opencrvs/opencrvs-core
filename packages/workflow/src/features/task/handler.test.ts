@@ -24,6 +24,7 @@ import {
   taskResouceMock,
   testDeathFhirTaskBundle
 } from '@workflow/test/utils'
+import { cloneDeep } from 'lodash'
 
 import { cloneDeep } from 'lodash'
 import * as fetchAny from 'jest-fetch-mock'
@@ -119,6 +120,88 @@ describe('Verify handler', () => {
     })
     expect(res.statusCode).toBe(200)
   })
+
+  it('updateTaskHandler returns OK for an archived task for birth', async () => {
+    fetch.mockResponses(
+      [
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              response: { resourceType: 'Task' }
+            }
+          ]
+        })
+      ],
+      [JSON.stringify('')]
+    )
+
+    const token = jwt.sign(
+      { scope: ['register'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:workflow-user'
+      }
+    )
+
+    const taskBundle = cloneDeep(testFhirTaskBundle)
+
+    taskBundle.entry[0].resource.businessStatus.coding[0].code = 'ARCHIVED'
+
+    const res = await server.server.inject({
+      method: 'PUT',
+      url: '/fhir/Task/123',
+      payload: taskBundle,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(200)
+  })
+
+  it('updateTaskHandler returns OK for an archived task for death', async () => {
+    fetch.mockResponses(
+      [
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              response: { resourceType: 'Task' }
+            }
+          ]
+        })
+      ],
+      [JSON.stringify('')]
+    )
+
+    const token = jwt.sign(
+      { scope: ['register'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:workflow-user'
+      }
+    )
+
+    const taskBundle = cloneDeep(testFhirTaskBundle)
+
+    taskBundle.entry[0].resource.businessStatus.coding[0].code = 'ARCHIVED'
+    taskBundle.entry[0].resource.code.coding[0].code = 'DEATH'
+
+    const res = await server.server.inject({
+      method: 'PUT',
+      url: '/fhir/Task/123',
+      payload: taskBundle,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(200)
+  })
+
   it('updateTaskHandler throws error if invalid fhir data is provided', async () => {
     fetch.mockResponse(
       JSON.stringify({

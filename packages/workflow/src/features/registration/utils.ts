@@ -213,6 +213,10 @@ export function isRejectedTask(taskResource: fhir.Task) {
   return getTaskBusinessStatus(taskResource) === 'REJECTED'
 }
 
+export function isArchiveTask(taskResource: fhir.Task) {
+  return getTaskBusinessStatus(taskResource) === 'ARCHIVED'
+}
+
 export function getEventType(fhirBundle: fhir.Bundle) {
   if (fhirBundle.entry && fhirBundle.entry[0] && fhirBundle.entry[0].resource) {
     const firstEntry = fhirBundle.entry[0].resource
