@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
+import { resolvers as certificateResolvers } from '@gateway/features/certificate/root-resolvers'
 import { resolvers as locationRootResolvers } from '@gateway/features/location/root-resolvers'
 import { resolvers as metricsRootResolvers } from '@gateway/features/metrics/root-resolvers'
 import { resolvers as notificationRootResolvers } from '@gateway/features/notification/root-resolvers'
@@ -57,7 +58,8 @@ const resolvers: StringIndexed<IResolvers> = merge(
   searchRootResolvers as IResolvers,
   searchTypeResolvers as IResolvers,
   roleRootResolvers as IResolvers,
-  roleTypeResolvers as IResolvers
+  roleTypeResolvers as IResolvers,
+  certificateResolvers as IResolvers
 )
 
 export const getExecutableSchema = (): GraphQLSchema => {

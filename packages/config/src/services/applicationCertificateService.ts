@@ -9,9 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { join } from 'path'
-import * as fetch from 'jest-fetch-mock'
+import isSvg from 'is-svg'
 
-jest.setMock('node-fetch', { default: fetch })
-
-process.env.CERT_PUBLIC_KEY_PATH = join(__dirname, './cert.key.pub')
+export async function isValidSVGCode(svgCode: string): Promise<boolean> {
+  return isSvg(svgCode)
+}

@@ -35,7 +35,8 @@ const optionList = [
       'opencrvs:auth-user',
       'opencrvs:user-mgnt-user',
       'opencrvs:hearth-user',
-      'opencrvs:gateway-user'
+      'opencrvs:gateway-user',
+      'opencrvs:config-user'
     ]
   },
   { name: 'help', type: Boolean, description: 'Show this menu' }

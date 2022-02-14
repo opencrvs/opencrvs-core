@@ -9,12 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { certificateQueries } from '@client/certificate/queries'
 import { ISerializedForm } from '@client/forms'
 import { ILanguage } from '@client/i18n/reducer'
 import { ILocation } from '@client/offline/reducer'
-import { IPDFTemplate } from '@client/pdfRenderer/transformer/types'
+import {
+  IPDFTemplate,
+  ISVGTemplate
+} from '@client/pdfRenderer/transformer/types'
 import { getToken } from '@client/utils/authUtils'
 import { ICertificateCollectorDefinition } from '@client/views/PrintCertificate/VerifyCollector'
+import _ from 'lodash'
 
 export interface ILocationDataResponse {
   [locationId: string]: ILocation
@@ -35,16 +40,24 @@ export interface IDefinitionsResponse {
   templates: {
     receipt?: IPDFTemplate
     certificates: {
-      birth: IPDFTemplate
-      death: IPDFTemplate
+      birth: ISVGTemplate
+      death: ISVGTemplate
     }
+  }
+}
+export interface ICertificateResponse {
+  birth: {
+    svgCode: string
+  }
+  death: {
+    svgCode: string
   }
 }
 export interface IAssetResponse {
   logo: string
 }
 
-interface IPhoneNumberPattern {
+export interface IPhoneNumberPattern {
   pattern: RegExp
   example: string
   start: string
@@ -55,10 +68,21 @@ interface IPhoneNumberPattern {
   }
 }
 
-interface INIDNumberPattern {
+export interface INIDNumberPattern {
   pattern: RegExp
   example: string
   num: string
+}
+
+export interface ICertificateTemplateData {
+  event: string
+  status: string
+  svgCode: string
+  svgDateCreated: number
+  svgDateUpdated: number
+  svgFilename: string
+  user: string
+  _id: string
 }
 
 export interface IApplicationConfig {
@@ -100,6 +124,25 @@ async function loadConfig(): Promise<IApplicationConfig> {
   return response
 }
 
+async function loadCertificatesTemplatesDefinitions(): Promise<ICertificateResponse> {
+  const response = await certificateQueries.getActiveCertificatesSVG()
+  const birthCertificateTemplate: ICertificateTemplateData = _.find(response, {
+    event: 'birth',
+    status: 'ACTIVE'
+  })
+
+  const deathCertificateTemplate: ICertificateTemplateData = _.find(response, {
+    event: 'death',
+    status: 'ACTIVE'
+  })
+
+  const certificatesTemplates = {
+    birth: { svgCode: birthCertificateTemplate.svgCode },
+    death: { svgCode: deathCertificateTemplate.svgCode }
+  } as ICertificateResponse
+
+  return certificatesTemplates
+}
 async function loadDefinitions(): Promise<IDefinitionsResponse> {
   const url = `${window.config.COUNTRY_CONFIG_URL}/definitions/client`
 
@@ -114,7 +157,13 @@ async function loadDefinitions(): Promise<IDefinitionsResponse> {
     throw Error(res.statusText)
   }
 
+  const certificateTemplates = await loadCertificatesTemplatesDefinitions()
   const response = await res.json()
+
+  response.templates.certificates.birth.definition =
+    certificateTemplates.birth.svgCode
+  response.templates.certificates.death.definition =
+    certificateTemplates.death.svgCode
   return response
 }
 
@@ -200,5 +249,6 @@ export const referenceApi = {
   loadPilotLocations,
   loadDefinitions,
   loadAssets,
-  loadConfig
+  loadConfig,
+  loadCertificatesTemplatesDefinitions
 }
