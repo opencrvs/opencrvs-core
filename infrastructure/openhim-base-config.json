@@ -2054,11 +2054,7 @@
       "responseBody": true,
       "rewriteUrlsConfig": [],
       "name": "Application Configuration",
-<<<<<<< HEAD
-      "urlPattern": "^/getConfig(/)?$",
-=======
       "urlPattern": "^/config(/)?$",
->>>>>>> develop
       "matchContentRegex": null,
       "matchContentXpath": null,
       "matchContentValue": null,
