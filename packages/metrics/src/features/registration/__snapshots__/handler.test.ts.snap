@@ -158,6 +158,7 @@ Object {
     "eventType": "DEATH",
     "previousStatus": "REGISTERED",
   },
+  "timestamp": 1643790745825000000,
 }
 `;
 
@@ -175,6 +176,7 @@ Object {
     "eventType": "BIRTH",
     "previousStatus": "REGISTERED",
   },
+  "timestamp": 1643705998544000000,
 }
 `;
 
