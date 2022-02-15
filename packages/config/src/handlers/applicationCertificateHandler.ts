@@ -39,12 +39,12 @@ export async function getActiveCertificatesHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const activeCertificats = await Certificate.find({
+  const activeCertificates = await Certificate.find({
     status: Status.ACTIVE,
     event: { $in: [Event.BIRTH, Event.DEATH] }
   })
 
-  return activeCertificats
+  return activeCertificates
 }
 
 export async function createCertificateHandler(

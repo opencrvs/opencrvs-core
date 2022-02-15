@@ -12,7 +12,6 @@
 import { IOfflineDataState, IOfflineData } from '@client/offline/reducer'
 import { IStoreState } from '@client/store'
 import { IUserDetails } from '@client/utils/userUtils'
-import { merge } from 'lodash'
 import { NATL_ADMIN_ROLES, SYS_ADMIN_ROLES } from '@client/utils/constants'
 
 export const getOfflineState = (store: IStoreState): IOfflineDataState =>
@@ -38,7 +37,7 @@ export function isOfflineDataLoaded(
     state.config
 
   const isOfflineDataLoaded = Boolean(hasAllRequiredData)
-  if (isOfflineDataLoaded) merge(window.config, state.config)
+
   return isOfflineDataLoaded
 }
 

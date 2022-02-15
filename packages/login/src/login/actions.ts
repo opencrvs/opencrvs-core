@@ -12,6 +12,7 @@
 import { AxiosError } from 'axios'
 import { RouterAction, push, goBack as back } from 'connected-react-router'
 import {
+  IApplicationConfigResponse,
   IApplicationConfig,
   IAuthenticateResponse,
   IAuthenticationData,
@@ -139,10 +140,10 @@ export const applicationConfigLoadAction = (): ApplicationConfigAction => ({
 })
 
 export const applicationConfigLoadedAction = (
-  response: IApplicationConfig
+  response: IApplicationConfigResponse
 ): ApplicationConfigLoaded => ({
   type: CONFIG_LOADED,
-  payload: response
+  payload: response.config
 })
 
 export const applicationConfigFailedAction = (

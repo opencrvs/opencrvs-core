@@ -14,16 +14,21 @@ import ApplicationConfig, {
   IApplicationConfigurationModel
 } from '@config/models/config' //   IApplicationConfigurationModel
 import { logger } from '@config/config/logger'
+import { getActiveCertificatesHandler } from '@config/handlers/applicationCertificateHandler'
 
 export default async function applicationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   try {
+    const certificateResponse = await getActiveCertificatesHandler(request, h)
     let appConfig: IApplicationConfigurationModel | null
     // tslint:disable-next-line
     appConfig = await ApplicationConfig.findOne({})
-    return appConfig || 'no configuration'
+    return {
+      config: appConfig,
+      certificates: certificateResponse
+    }
   } catch (ex) {
     logger.error(ex)
     return {}
