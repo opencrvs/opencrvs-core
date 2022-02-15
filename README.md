@@ -16,8 +16,8 @@
 - [Install dependencies](#install-dependencies)
 - [Install OpenCRVS](#install-opencrvs)
 - [Log into OpenCRVS](#log-into-opencrvs)
-  - [**Field Agent**](#field-agent)
-  - [**Registration Agent**](#registration-agent)
+  - [Field Agent](#field-agent)
+  - [Registration Agent](#registration-agent)
   - [Registrar](#registrar)
   - [Local System Admin](#local-system-admin)
   - [National System Admin](#national-system-admin)
@@ -26,7 +26,7 @@
   - [Stopping](#stopping)
 - [Other servers](#other-servers)
   - [React Storybook](#react-storybook)
-  - [**OpenHIM**](#openhim)
+  - [OpenHIM](#openhim)
 - [Configuring OpenCRVS](#configuring-opencrvs)
 - [What are the key OpenSource dependencies of OpenCRVS?](#what-are-the-key-opensource-dependencies-of-opencrvs)
   - [Hearth MongoDB Database layer](#hearth-mongodb-database-layer)
@@ -69,6 +69,7 @@ Read review our [documentation](http://documentation.opencrvs.org/opencrvs-core/
 Dependencies are required. Ensure you have satisfied all the following requirements before continuing:
 
 - **Operation system**: Linux or Unix operating system is required: e.g. Ubuntu or Mac OSX: If you do not have Ubuntu or MacOSX, investigate installing a [virtual](https://www.virtualbox.org/) [Ubuntu](https://ubuntu.com/download/desktop) environment on your computer.
+- **Admin rights**: You must have admin rights over your computer and a sudo password
 - **Disk space and RAM:** A minimum of 10GB of hard drive space available and at least 8GB of RAM. If you are using virtualisation, ensure this is dedicated to the environment.
 - **Docker**: On Ubuntu, install [Docker](https://docs.docker.com/engine/install/ubuntu/) & [Docker Compose](https://docs.docker.com/compose/install/). On Mac, install [Docker for Mac](https://docs.docker.com/desktop/mac/install/). On Mac, in Docker for Mac preferences, assign 4 CPUs, at least 8GB Memory or more, Swap 4GB and 4 CPUs if your system allows. Elastic search needs a lot of memory to run. On Ubuntu we set enough RAM automatically.
 - **Nodejs:** Install [Node](https://nodejs.org/en/download/) v.14.15.0, v14.15.4, 14.17.0 or v14.18.1 (this release has been tested on those versions). You can manage the Node version of your choice using [Node Version Manager](https://nodejs.org/en/download/package-manager/#nvm).
@@ -108,11 +109,11 @@ Open the url **[`http://localhost:3020/`](http://localhost:3020/)**
 
 Use one of the following authentication details for your user of choice. To learn about these user roles and to perform civil registration tasks, read our [documentation](http://documentation.opencrvs.org/)
 
-### **Field Agent**
+### Field Agent
 
 Username: **kalusha.bwalya** / Password: **test** / SMS code: **000000**
 
-### **Registration Agent**
+### Registration Agent
 
 Username: **felix.katongo** / Password: **test** / SMS code: **000000**
 
@@ -166,7 +167,7 @@ Our UI component styleguide, available here: **[http://localhost:6060/](http://l
 
 This is a work in progress
 
-### **OpenHIM**
+### OpenHIM
 
 OpenHIM is designed to ease interoperability between OpenCRVS and external systems such as Health & National ID. It provides external access to the system via secure APIs. OpenHIM channels and governs internal transactions, routing, orchestrating and translating requests into [FHIR](https://www.hl7.org/fhir/) between services and the database layer.
 
