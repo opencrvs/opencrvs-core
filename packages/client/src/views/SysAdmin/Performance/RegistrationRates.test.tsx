@@ -87,18 +87,18 @@ describe('Registraion Rates tests', () => {
             details: [
               {
                 actualTotalRegistration: 20,
-                actual45DayRegistration: 9,
+                actualTargetDayRegistration: 9,
                 estimatedRegistration: 45,
-                estimated45DayPercentage: 4.5,
+                estimatedTargetDayPercentage: 4.5,
                 month: 'April',
                 year: '2020',
                 startOfMonth: '2020-03-30T18:00:00.000Z'
               },
               {
                 actualTotalRegistration: 10,
-                actual45DayRegistration: 0,
+                actualTargetDayRegistration: 0,
                 estimatedRegistration: 45,
-                estimated45DayPercentage: 0,
+                estimatedTargetDayPercentage: 0,
                 month: 'March',
                 year: '2020',
                 startOfMonth: '2020-02-29T18:00:00.000Z'
@@ -106,9 +106,9 @@ describe('Registraion Rates tests', () => {
             ],
             total: {
               actualTotalRegistration: 30,
-              actual45DayRegistration: 9,
+              actualTargetDayRegistration: 9,
               estimatedRegistration: 45,
-              estimated45DayPercentage: 2.25
+              estimatedTargetDayPercentage: 2.25
             }
           }
         }

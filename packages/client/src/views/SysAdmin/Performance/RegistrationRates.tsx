@@ -33,7 +33,7 @@ import {
   SysAdminPageVariant
 } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import {
-  GQLMonthWise45DayEstimation,
+  GQLMonthWiseTargetDayEstimation,
   GQLMonthWiseEstimationMetrics
 } from '@opencrvs/gateway/src/graphql/schema'
 import { parse } from 'query-string'
@@ -50,7 +50,7 @@ import {
   FETCH_MONTH_WISE_EVENT_ESTIMATIONS,
   HAS_CHILD_LOCATION
 } from './queries'
-import { Within45DaysTable } from './reports/registrationRates/Within45DaysTable'
+import { WithinTargetDaysTable } from './reports/registrationRates/WithinTargetDaysTable'
 import moment from 'moment'
 const { useState } = React
 
@@ -84,7 +84,7 @@ function prepareChartData(data: GQLMonthWiseEstimationMetrics) {
     data.details.reduce(
       (
         chartData: any[],
-        dataDetails: GQLMonthWise45DayEstimation | null,
+        dataDetails: GQLMonthWiseTargetDayEstimation | null,
         index
       ) => {
         if (dataDetails !== null) {
@@ -93,10 +93,10 @@ function prepareChartData(data: GQLMonthWiseEstimationMetrics) {
               moment.months().indexOf(dataDetails.month) === 0 && index > 0
                 ? `${dataDetails.month.slice(0, 3)} ${dataDetails.year}`
                 : `${dataDetails.month.slice(0, 3)}`,
-            registeredIn45Days: dataDetails.actual45DayRegistration,
+            registeredInTargetDays: dataDetails.actualTargetDayRegistration,
             totalRegistered: dataDetails.actualTotalRegistration,
             totalEstimate: dataDetails.estimatedRegistration,
-            registrationPercentage: `${dataDetails.estimated45DayPercentage}%`
+            registrationPercentage: `${dataDetails.estimatedTargetDayPercentage}%`
           })
         }
         return chartData
@@ -231,7 +231,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
                 {base.baseType === REG_RATE_BASE.TIME && (
                   <RegRatesLineChart loading={true} />
                 )}
-                <Within45DaysTable loading={true} />
+                <WithinTargetDaysTable loading={true} />
                 <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
               </>
             )
@@ -247,7 +247,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
                     eventType={eventType as Event}
                   />
                 )}
-                <Within45DaysTable
+                <WithinTargetDaysTable
                   loading={loading}
                   base={base}
                   data={

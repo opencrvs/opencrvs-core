@@ -173,7 +173,7 @@ type BirthRegistration implements EventRegistration {
   attendantAtBirth: AttendantType
   otherAttendantAtBirth: String
   birthRegistrationType: BirthRegType
-  presentAtBirthRegistration: BirthRegPresence
+  presentAtBirthRegistration: String
   otherPresentAtBirthRegistration: String
   childrenBornAliveToMother: Int
   foetalDeathsToMother: Int
@@ -200,7 +200,7 @@ input BirthRegistrationInput {
   attendantAtBirth: AttendantType
   otherAttendantAtBirth: String
   birthRegistrationType: BirthRegType
-  presentAtBirthRegistration: BirthRegPresence
+  presentAtBirthRegistration: String
   otherPresentAtBirthRegistration: String
   childrenBornAliveToMother: Int
   foetalDeathsToMother: Int
@@ -212,10 +212,10 @@ input BirthRegistrationInput {
 type BirthRegistrationMetrics {
   keyFigures: [BirthKeyFigures]
   regByAge: [BirthRegistrationByAgeMetrics]
-  regWithin45d: [BirthRegistrationWithIn45D]
+  regWithinTargetd: [BirthRegistrationWithInTargetD]
 }
 
-type BirthRegistrationWithIn45D {
+type BirthRegistrationWithInTargetD {
   label: String
   value: Int
   totalEstimate: Int
@@ -681,7 +681,7 @@ type Registration {
   paperFormID: String
   page: String
   book: String
-  contact: RegistrationContactType
+  contact: String
   contactPhoneNumber: String
   status: [RegWorkflow]
   type: RegistrationType
@@ -708,7 +708,7 @@ input RegistrationInput {
   paperFormID: String
   page: String
   book: String
-  contact: RegistrationContactType
+  contact: String
   contactPhoneNumber: String
   status: [RegWorkflowInput]
   type: RegistrationType

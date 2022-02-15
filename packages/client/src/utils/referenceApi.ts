@@ -106,6 +106,8 @@ export interface IApplicationConfig {
   SENTRY: string
   LOGROCKET: string
   PHONE_NUMBER_PATTERN: IPhoneNumberPattern
+  BIRTH_REGISTRATION_TARGET: number
+  DEATH_REGISTRATION_TARGET: number
   NID_NUMBER_PATTERN: INIDNumberPattern
 }
 

@@ -122,6 +122,21 @@ export const influx = new Influx.InfluxDB({
       ]
     },
     {
+      measurement: 'correction_payment',
+      fields: {
+        total: Influx.FieldType.FLOAT,
+        compositionId: Influx.FieldType.STRING
+      },
+      tags: [
+        'eventType',
+        'officeLocation',
+        'locationLevel5',
+        'locationLevel4',
+        'locationLevel3',
+        'locationLevel2'
+      ]
+    },
+    {
       measurement: 'applications_started',
       fields: {
         role: Influx.FieldType.STRING,

@@ -140,6 +140,10 @@ type Mutation {
     details: BirthRegistrationInput
   ): BirthRegistration!
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
+  requestBirthRegistrationCorrection(
+    id: ID!
+    details: BirthRegistrationInput!
+  ): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID!
   notADuplicate(id: String!, duplicateId: String!): ID!
   createDeathRegistration(details: DeathRegistrationInput!): CreatedIds!
@@ -154,6 +158,10 @@ type Mutation {
     details: DeathRegistrationInput
   ): DeathRegistration!
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID!
+  requestDeathRegistrationCorrection(
+    id: ID!
+    details: DeathRegistrationInput!
+  ): ID!
   createOrUpdateUser(user: UserInput!): User!
   activateUser(
     userId: String!
@@ -215,7 +223,7 @@ type BirthRegistration implements EventRegistration {
   attendantAtBirth: AttendantType
   otherAttendantAtBirth: String
   birthRegistrationType: BirthRegType
-  presentAtBirthRegistration: BirthRegPresence
+  presentAtBirthRegistration: String
   otherPresentAtBirthRegistration: String
   childrenBornAliveToMother: Int
   foetalDeathsToMother: Int
@@ -342,13 +350,13 @@ type VerifyPasswordResult {
 type RegistrationMetrics {
   genderBasisMetrics: RegistrationGenderBasisMetrics
   timeFrames: RegistrationTimeFrameMetrics
-  estimated45DayMetrics: Registration45DayEstimatedMetrics
+  estimatedTargetDayMetrics: RegistrationTargetDayEstimatedMetrics
   payments: CertificationPaymentMetrics
 }
 
 type EventEstimationMetrics {
-  birth45DayMetrics: EstimationMetrics
-  death45DayMetrics: EstimationMetrics
+  birthTargetDayMetrics: EstimationMetrics
+  deathTargetDayMetrics: EstimationMetrics
 }
 
 type ApplicationsStartedMetrics {
@@ -358,13 +366,13 @@ type ApplicationsStartedMetrics {
 }
 
 type MonthWiseEstimationMetrics {
-  details: [MonthWise45DayEstimation]
-  total: EventIn45DayEstimationCount
+  details: [MonthWiseTargetDayEstimation]
+  total: EventInTargetDayEstimationCount
 }
 
 type LocationWiseEstimationMetrics {
-  details: [LocationWise45DayEstimation]
-  total: EventIn45DayEstimationCount
+  details: [LocationWiseTargetDayEstimation]
+  total: EventInTargetDayEstimationCount
 }
 
 type TimeLoggedMetricsResultSet {
@@ -430,7 +438,7 @@ input BirthRegistrationInput {
   attendantAtBirth: AttendantType
   otherAttendantAtBirth: String
   birthRegistrationType: BirthRegType
-  presentAtBirthRegistration: BirthRegPresence
+  presentAtBirthRegistration: String
   otherPresentAtBirthRegistration: String
   childrenBornAliveToMother: Int
   foetalDeathsToMother: Int
@@ -506,7 +514,7 @@ type Registration {
   paperFormID: String
   page: String
   book: String
-  contact: RegistrationContactType
+  contact: String
   contactRelationship: String
   contactPhoneNumber: String
   status: [RegWorkflow]
@@ -520,7 +528,7 @@ type Registration {
 type RelatedPerson {
   id: ID
   _fhirID: ID
-  relationship: RelationshipType
+  relationship: String
   otherRelationship: String
   affidavit: [Attachment]
   individual: Person
@@ -551,14 +559,6 @@ enum BirthRegType {
   INFORMANT_ONLY
   MOTHER_ONLY
   FATHER_ONLY
-}
-
-enum BirthRegPresence {
-  BOTH_PARENTS
-  INFORMANT
-  MOTHER
-  FATHER
-  OTHER
 }
 
 type PrimaryCaregiver {
@@ -724,9 +724,9 @@ type RegistrationTimeFrameMetrics {
   total: TimeFrameTotalCount
 }
 
-type Registration45DayEstimatedMetrics {
-  details: [Estimated45DayMetrics!]
-  total: Estimate45DayTotalCount
+type RegistrationTargetDayEstimatedMetrics {
+  details: [EstimatedTargetDayMetrics!]
+  total: EstimateTargetDayTotalCount
 }
 
 type CertificationPaymentMetrics {
@@ -742,29 +742,29 @@ type EstimationMetrics {
   femalePercentage: Float!
 }
 
-type MonthWise45DayEstimation {
+type MonthWiseTargetDayEstimation {
   actualTotalRegistration: Int!
-  actual45DayRegistration: Int!
+  actualTargetDayRegistration: Int!
   estimatedRegistration: Float!
-  estimated45DayPercentage: Float!
+  estimatedTargetDayPercentage: Float!
   month: String!
   year: String!
   startOfMonth: String!
   endOfMonth: String!
 }
 
-type EventIn45DayEstimationCount {
+type EventInTargetDayEstimationCount {
   actualTotalRegistration: Int!
-  actual45DayRegistration: Int!
+  actualTargetDayRegistration: Int!
   estimatedRegistration: Float!
-  estimated45DayPercentage: Float!
+  estimatedTargetDayPercentage: Float!
 }
 
-type LocationWise45DayEstimation {
+type LocationWiseTargetDayEstimation {
   actualTotalRegistration: Int!
-  actual45DayRegistration: Int!
+  actualTargetDayRegistration: Int!
   estimatedRegistration: Float!
-  estimated45DayPercentage: Float!
+  estimatedTargetDayPercentage: Float!
   locationId: String!
   locationName: String!
 }
@@ -839,7 +839,7 @@ input RegistrationInput {
   paperFormID: String
   page: String
   book: String
-  contact: RegistrationContactType
+  contact: String
   contactRelationship: String
   contactPhoneNumber: String
   status: [RegWorkflowInput]
@@ -848,12 +848,13 @@ input RegistrationInput {
   attachments: [AttachmentInput]
   certificates: [CertificateInput]
   location: LocationInput
+  correction: CorrectionInput
 }
 
 input RelatedPersonInput {
   id: ID
   _fhirID: ID
-  relationship: RelationshipType
+  relationship: String
   otherRelationship: String
   affidavit: [AttachmentInput]
   individual: PersonInput
@@ -888,14 +889,6 @@ input SignatureInput {
   type: String
 }
 
-enum RegistrationContactType {
-  BOTH
-  MOTHER
-  FATHER
-  OTHER
-  APPLICANT
-}
-
 type RegWorkflow {
   id: ID!
   type: RegStatus
@@ -918,36 +911,6 @@ type Certificate {
   hasShowedVerifiedDocument: Boolean
   payments: [Payment]
   data: String
-}
-
-enum RelationshipType {
-  FATHER
-  MOTHER
-  SPOUSE
-  SON
-  DAUGHTER
-  SON_IN_LAW
-  DAUGHTER_IN_LAW
-  EXTENDED_FAMILY
-  OTHER
-  INFORMANT
-  GRANDFATHER
-  GRANDMOTHER
-  GRANDSON
-  GRANDDAUGHTER
-  BROTHER
-  SISTER
-  OTHER_FAMILY_MEMBER
-  INSTITUTION_HEAD_PLACE_OF_BIRTH
-  HOUSE_OWNER
-  OPERATOR
-  OFFICE_IN_CHARGE
-  LEGAL_GUARDIAN
-  BOTH_PARENTS
-  HEAD_OF_THE_INSTITUTE
-  OWNER_OF_THE_HOUSE
-  DRIVER_OF_THE_VEHICLE
-  OFFICER_IN_CHARGE
 }
 
 type ReasonsNotApplying {
@@ -1068,33 +1031,33 @@ type GenderBasisTotalCount {
 
 type TimeFrameDetailMetrics {
   locationId: String!
-  regWithin45d: Int!
-  regWithin45dTo1yr: Int!
+  regWithinTargetd: Int!
+  regWithinTargetdTo1yr: Int!
   regWithin1yrTo5yr: Int!
   regOver5yr: Int!
   total: Int!
 }
 
 type TimeFrameTotalCount {
-  regWithin45d: Int!
-  regWithin45dTo1yr: Int!
+  regWithinTargetd: Int!
+  regWithinTargetdTo1yr: Int!
   regWithin1yrTo5yr: Int!
   regOver5yr: Int!
   total: Int!
 }
 
-type Estimated45DayMetrics {
+type EstimatedTargetDayMetrics {
   locationId: String!
   estimatedRegistration: Float!
-  registrationIn45Day: Int!
+  registrationInTargetDay: Int!
   estimationYear: Int!
   estimationLocationLevel: String!
   estimationPercentage: Float!
 }
 
-type Estimate45DayTotalCount {
+type EstimateTargetDayTotalCount {
   estimatedRegistration: Float!
-  registrationIn45Day: Int!
+  registrationInTargetDay: Int!
   estimationPercentage: Float!
 }
 
@@ -1224,6 +1187,19 @@ input CertificateInput {
   data: String
 }
 
+input CorrectionInput {
+  requester: ID
+  hasShowedVerifiedDocument: Boolean
+  attestedAndCopied: Boolean
+  noSupportingDocumentationRequired: Boolean
+  payments: [PaymentInput]
+  values: [CorrectionValueInput]
+  location: LocationInput
+  data: String
+  reason: String
+  note: String
+}
+
 input ReasonsNotApplyingInput {
   primaryCaregiverType: PrimaryCaregiverType
   reasonNotApplying: String
@@ -1278,6 +1254,14 @@ input PaymentInput {
   amount: Float
   outcome: PaymentOutcomeType
   date: Date
+  data: String
+}
+
+input CorrectionValueInput {
+  section: String
+  fieldName: String
+  oldValue: String
+  newValue: String
 }
 
 enum PaymentType {
