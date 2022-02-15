@@ -36,7 +36,7 @@ services:
       dockerfile: ./packages/gateway/Dockerfile
     restart: unless-stopped
     environment:
-      - REDIS_HOST=redis://redis:6379
+      - REDIS_HOST=redis
       - CONFIG_SMS_CODE_EXPIRY_SECONDS=600
       - CONFIG_TOKEN_EXPIRY_SECONDS=604800
       - NODE_ENV=development

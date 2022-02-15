@@ -17,7 +17,7 @@ COPY --from=opencrvs-build /packages/config packages/config
 # Copy dependant package(s) source
 COPY --from=opencrvs-build packages/commons packages/commons
 
-EXPOSE 1050
+EXPOSE 2021
 WORKDIR /usr/src/app/packages/config
 
 CMD yarn start:prod
