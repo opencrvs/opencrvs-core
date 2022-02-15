@@ -1142,6 +1142,13 @@ export interface GQLCorrectionValueInput {
   newValue?: string
 }
 
+export interface GQLCorrectionValueInput {
+  section?: string
+  fieldName?: string
+  oldValue?: string
+  newValue?: string
+}
+
 export const enum GQLPaymentType {
   MANUAL = 'MANUAL'
 }
