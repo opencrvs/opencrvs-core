@@ -169,9 +169,7 @@ jest.mock(
           templates: mockOfflineData.templates
         }),
       loadAssets: () => Promise.resolve(mockOfflineData.assets),
-      loadConfig: () => Promise.resolve(mockOfflineData.config),
-      loadCertificatesTemplatesDefinitions: () =>
-        Promise.resolve(mockOfflineData.certificatesTemplatesDefinition)
+      loadConfig: () => Promise.resolve(mockOfflineData.config)
     }
   })
 )
