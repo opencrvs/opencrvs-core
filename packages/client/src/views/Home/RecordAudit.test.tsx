@@ -23,12 +23,18 @@ import { ReactWrapper } from 'enzyme'
 import {
   createApplication,
   storeApplication,
-  IApplication
+  IApplication,
+  modifyApplication
 } from '@client/applications'
 import { Event } from '@client/forms'
 import { formatUrl } from '@client/navigation'
 import { APPLICATION_RECORD_AUDIT } from '@client/navigation/routes'
 import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
+import { checkAuth } from '@client/profile/profileActions'
+const registerScopeToken =
+  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
+const getItem = window.localStorage.getItem as jest.Mock
+const mockFetchUserDetails = jest.fn()
 
 const application: IApplication = createApplication(
   Event.BIRTH,
@@ -165,5 +171,42 @@ describe('Record audit summary for WorkQueue Applications', () => {
     )
     expect(component.find('#placeOfBirth_grey').hostNodes()).toHaveLength(1)
     expect(component.find('#placeOfDeath_grey').hostNodes()).toHaveLength(0)
+  })
+})
+
+describe('Record audit reinstated button', () => {
+  let component: ReactWrapper<{}, {}>
+
+  beforeEach(async () => {
+    const { store, history } = createStore()
+    getItem.mockReturnValue(registerScopeToken)
+    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    store.dispatch(storeApplication(application))
+    application.registrationStatus = 'ARCHIVED'
+    application.submissionStatus = 'ARCHIVED'
+    store.dispatch(modifyApplication(application))
+    component = await createTestComponent(
+      <RecordAudit
+        {...createRouterProps(
+          formatUrl(APPLICATION_RECORD_AUDIT, {
+            applicationId: application.id
+          }),
+          { isNavigatedInsideApp: false },
+          {
+            matchParams: {
+              applicationId: application.id
+            }
+          }
+        )}
+      />,
+      { store, history }
+    )
+    component.update()
+  })
+
+  it('Should show reinstated button', async () => {
+    await flushPromises()
+
+    expect(component.find('#reinstate_button').hostNodes()).toHaveLength(1)
   })
 })

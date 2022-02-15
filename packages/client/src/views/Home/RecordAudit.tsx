@@ -15,7 +15,7 @@ import { Header } from '@client/components/interface/Header/Header'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import { Navigation } from '@client/components/interface/Navigation'
 import styled, { ITheme, withTheme } from '@client/styledComponents'
-import { ApplicationIcon } from '@opencrvs/components/lib/icons'
+import { ApplicationIcon, RotateLeft } from '@opencrvs/components/lib/icons'
 import { connect } from 'react-redux'
 import {
   goToApplicationDetails,
@@ -37,6 +37,14 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { IFormSectionData, IContactPoint } from '@client/forms'
 import { Spinner } from '@opencrvs/components/lib/interface'
+import {
+  ICON_ALIGNMENT,
+  TertiaryButton
+} from '@opencrvs/components/lib/buttons'
+import { buttonMessages } from '@client/i18n/messages'
+import { getScope } from '@client/profile/profileSelectors'
+import { Scope } from '@client/utils/authUtils'
+import { ARCHIVED } from '@client/utils/constants'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -81,6 +89,7 @@ const GreyedInfo = styled.div`
 interface IStateProps {
   workqueue: IWorkqueue
   resources: IOfflineData
+  scope: Scope
   savedApplications: IApplication[]
 }
 
@@ -436,12 +445,36 @@ const getApplicationInfo = (
 }
 
 export const ShowRecordAudit = (props: IFullProps) => {
+  const { intl, scope } = props
   const applicationId = props.match.params.applicationId
+  const userHasRegisterScope = scope && scope.includes('register')
+  const userHasValidateScope = scope && scope.includes('validate')
   let application: IApplicationData | null
   application = getSavedApplications(props)
   const isDownloaded = application ? true : false
   if (!isDownloaded) {
     application = getWQApplication(props)
+  }
+
+  const topActionButtons: React.ReactElement[] = []
+  const reinstateButton = (
+    <TertiaryButton
+      align={ICON_ALIGNMENT.LEFT}
+      id="reinstate_button"
+      key="reinstate_button"
+      icon={() => <RotateLeft />}
+      onClick={() => {}}
+    >
+      {intl.formatMessage(buttonMessages.reinstate)}
+    </TertiaryButton>
+  )
+
+  if (
+    (userHasValidateScope || userHasRegisterScope) &&
+    application?.status &&
+    ARCHIVED.includes(application.status)
+  ) {
+    topActionButtons.push(reinstateButton)
   }
 
   return (
@@ -461,6 +494,7 @@ export const ShowRecordAudit = (props: IFullProps) => {
                 }
               />
             )}
+            topActionButtons={topActionButtons}
           >
             {getApplicationInfo(props, application, isDownloaded)}
           </Content>
@@ -474,6 +508,7 @@ function mapStateToProps(state: IStoreState): IStateProps {
   return {
     workqueue: state.workqueueState.workqueue,
     resources: getOfflineData(state),
+    scope: getScope(state) as Scope,
     savedApplications:
       state.applicationsState.applications &&
       state.applicationsState.applications

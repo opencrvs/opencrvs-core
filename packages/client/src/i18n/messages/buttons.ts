@@ -178,6 +178,11 @@ const messagesToDefine: IButtonsMessages = {
     description: 'Print button text',
     id: 'buttons.print'
   },
+  reinstate: {
+    defaultMessage: 'Reinstate',
+    description: 'Label for reinstate button',
+    id: 'buttons.reinstate'
+  },
   register: {
     defaultMessage: 'Register',
     description: 'Label for button on register confirmation modal',
