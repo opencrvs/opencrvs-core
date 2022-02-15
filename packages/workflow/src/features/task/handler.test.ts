@@ -25,6 +25,7 @@ import {
   testDeathFhirTaskBundle
 } from '@workflow/test/utils'
 
+import { cloneDeep } from 'lodash'
 import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any
@@ -67,7 +68,7 @@ describe('Verify handler', () => {
     )
 
     const token = jwt.sign(
-      { scope: ['declare'] },
+      { scope: ['register'] },
       readFileSync('../auth/test/cert.key'),
       {
         algorithm: 'RS256',
@@ -154,7 +155,7 @@ describe('Verify handler', () => {
     fetch.mockImplementation(() => new Error('boom'))
 
     const token = jwt.sign(
-      { scope: ['declare'] },
+      { scope: ['register'] },
       readFileSync('../auth/test/cert.key'),
       {
         algorithm: 'RS256',
@@ -172,5 +173,87 @@ describe('Verify handler', () => {
       }
     })
     expect(res.statusCode).toBe(500)
+  })
+  it('updateTaskHandler returns OK for REINSTATED a task for birth', async () => {
+    fetch.mockResponses(
+      [
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              response: { resourceType: 'Task' }
+            }
+          ]
+        })
+      ],
+      [JSON.stringify('')]
+    )
+
+    const token = jwt.sign(
+      { scope: ['register'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:workflow-user'
+      }
+    )
+
+    const taskBundle = cloneDeep(testFhirTaskBundle)
+
+    taskBundle.entry[0].resource.businessStatus.coding[0].code =
+      'WAITING_FOR_VERIFICATION'
+
+    const res = await server.server.inject({
+      method: 'PUT',
+      url: '/fhir/Task/123',
+      payload: taskBundle,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(200)
+  })
+
+  it('updateTaskHandler returns OK for REINSTATED a task for death', async () => {
+    fetch.mockResponses(
+      [
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              response: { resourceType: 'Task' }
+            }
+          ]
+        })
+      ],
+      [JSON.stringify('')]
+    )
+
+    const token = jwt.sign(
+      { scope: ['register'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:workflow-user'
+      }
+    )
+
+    const taskBundle = cloneDeep(testFhirTaskBundle)
+
+    taskBundle.entry[0].resource.businessStatus.coding[0].code =
+      'WAITING_FOR_VERIFICATION'
+    taskBundle.entry[0].resource.code.coding[0].code = 'DEATH'
+
+    const res = await server.server.inject({
+      method: 'PUT',
+      url: '/fhir/Task/123',
+      payload: taskBundle,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(200)
   })
 })
