@@ -977,12 +977,16 @@ export const builders: IFieldBuilders = {
       }
     }
   },
-  createdAt: (fhirBundle, fieldValue) => {
+  createdAt: (fhirBundle, fieldValue, context) => {
     if (!fhirBundle.meta) {
       fhirBundle.meta = {}
     }
     fhirBundle.meta.lastUpdated = fieldValue
     fhirBundle.entry[0].resource.date = fieldValue
+
+    const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+    taskResource.lastModified = fieldValue as string
+    return
   },
   mother: {
     _fhirID: (fhirBundle, fieldValue) => {
@@ -2148,6 +2152,28 @@ export const builders: IFieldBuilders = {
           } else {
             paymentResource.detail[0].date = fieldValue
           }
+        },
+        data: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const certDocResource = selectOrCreateCertificateDocRefResource(
+            fhirBundle,
+            context,
+            context.event,
+            true
+          )
+          if (!certDocResource.content) {
+            certDocResource.content = []
+          }
+
+          certDocResource.content.push({
+            attachment: {
+              contentType: 'image/jpg',
+              data: fieldValue
+            }
+          })
         }
       },
       location: {
@@ -2233,15 +2259,15 @@ export const builders: IFieldBuilders = {
           true
         )
         if (!certDocResource.content) {
-          certDocResource.content = [
-            {
-              attachment: {
-                contentType: 'application/pdf'
-              }
-            }
-          ]
+          certDocResource.content = []
         }
-        certDocResource.content[0].attachment.data = fieldValue
+
+        certDocResource.content.push({
+          attachment: {
+            contentType: 'application/pdf',
+            data: fieldValue
+          }
+        })
       },
       reason: (
         fhirBundle: ITemplatedBundle,
@@ -2301,13 +2327,7 @@ export const builders: IFieldBuilders = {
           )
         }
       },
-      timestamp: (
-        fhirBundle: ITemplatedBundle,
-        fieldValue: string,
-        context: any
-      ) => {
-        const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-        taskResource.lastModified = fieldValue
+      timestamp: () => {
         return
       },
       timeLoggedMS: (

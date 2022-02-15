@@ -154,6 +154,7 @@ input PaymentInput {
   amount: Float
   outcome: PaymentOutcomeType
   date: Date
+  data: String
 }
 
 type Payment { # -> PaymentReconciliation
@@ -271,7 +272,7 @@ input BirthRegistrationInput {
   attendantAtBirth: AttendantType # Not in BDRIS2
   otherAttendantAtBirth: String
   birthRegistrationType: BirthRegType
-  presentAtBirthRegistration: BirthRegPresence # Informant in BDRIS2
+  presentAtBirthRegistration: String # Informant in BDRIS2
   otherPresentAtBirthRegistration: String
   childrenBornAliveToMother: Int # Not in BDRIS2
   foetalDeathsToMother: Int # Not in BDRIS2
@@ -295,7 +296,7 @@ type BirthRegistration implements EventRegistration { # -> Composition
   attendantAtBirth: AttendantType # -> Observation.valueString
   otherAttendantAtBirth: String
   birthRegistrationType: BirthRegType # -> Observation.valueString
-  presentAtBirthRegistration: BirthRegPresence # -> Observation.valueString
+  presentAtBirthRegistration: String # -> Observation.valueString
   otherPresentAtBirthRegistration: String
   childrenBornAliveToMother: Int # -> Observation.valueInteger
   foetalDeathsToMother: Int # -> Observation.valueInteger
@@ -377,7 +378,7 @@ input RegistrationInput {
   paperFormID: String
   page: String
   book: String
-  contact: RegistrationContactType # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
+  contact: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
   contactRelationship: String # -> extension(url='http://opencrvs.org/specs/extension/contact-relationship').valueString
   contactPhoneNumber: String
   status: [RegWorkflowInput]
@@ -400,7 +401,7 @@ type Registration { # -> Task
   paperFormID: String # -> .identifier
   page: String # -> .identifier
   book: String # -> .identifier
-  contact: RegistrationContactType # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
+  contact: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
   contactRelationship: String # -> extension(url='http://opencrvs.org/specs/extension/contact-relationship').valueString
   contactPhoneNumber: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person-phone-number').valueString
   status: [RegWorkflow] # -> Task.*

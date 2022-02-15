@@ -63,6 +63,10 @@ echo "wait-on user-mgnt microservice" && wait-on -l tcp:3030
 echo
 echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
 echo
+echo "wait-on application config microservice" && wait-on -l tcp:2021
+echo
+echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
+echo
 echo "wait-on OpenCRVS client.  This takes the longest time to build" && wait-on -l http://localhost:3000
 echo
 echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"

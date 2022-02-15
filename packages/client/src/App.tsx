@@ -40,7 +40,6 @@ import { ReviewForm } from '@client/views/RegisterForm/ReviewForm'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { SearchResult } from '@client/views/SearchResult/SearchResult'
 import { SelectInformant } from '@client/views/SelectInformant/SelectInformant'
-import { SelectPrimaryApplicant } from '@client/views/SelectPrimaryApplicant/SelectPrimaryApplicant'
 import { SelectVitalEvent } from '@client/views/SelectVitalEvent/SelectVitalEvent'
 import { SettingsPage } from '@client/views/Settings/SettingsPage'
 import { OperationalReport } from '@client/views/SysAdmin/Performance/OperationalReport'
@@ -61,6 +60,7 @@ import { ApolloProvider } from 'react-apollo'
 import { Provider } from 'react-redux'
 import { Switch } from 'react-router'
 import { AppStore } from './store'
+import { ChangePhonePage } from './views/Settings/ChangePhonePage'
 import { ConfigHome } from './views/SysAdmin/Config/ConfigHome'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 
@@ -138,13 +138,6 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.EVENT_INFO}
                                             component={EventInfo}
-                                          />
-                                          <ProtectedRoute
-                                            exact
-                                            path={
-                                              routes.SELECT_BIRTH_PRIMARY_APPLICANT
-                                            }
-                                            component={SelectPrimaryApplicant}
                                           />
                                           <ProtectedRoute
                                             exact
@@ -256,8 +249,14 @@ export class App extends React.Component<IAppProps> {
                                             component={Payment}
                                           />
                                           <ProtectedRoute
+                                            exact
                                             path={routes.SETTINGS}
                                             component={SettingsPage}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.CHANGE_PHONE}
+                                            component={ChangePhonePage}
                                           />
                                           <ProtectedRoute
                                             path={routes.APPLICATION_DETAIL}

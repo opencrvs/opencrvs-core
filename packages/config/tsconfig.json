@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "paths": { "@config/*": ["./*"] },
+    "target": "es6",
+    "module": "commonjs",
+    "rootDir": ".",
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "outDir": "build/dist",
+    "lib": ["esnext.asynciterable", "es6", "es2017"],
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "noUnusedLocals": true,
+    "types": ["fhir", "jest"]
+  },
+  "include": ["src/**/*.ts", "typings", "tslint-rules"],
+  "exclude": [
+    "node_modules",
+    "build",
+    "scripts",
+    "acceptance-tests",
+    "src/setupTests.ts",
+    "src/**/*.test.ts"
+  ]
+}
