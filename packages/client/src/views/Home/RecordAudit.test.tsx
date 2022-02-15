@@ -15,6 +15,8 @@ import {
   createTestComponent,
   mockApplicationData,
   createRouterProps,
+  registerScopeToken,
+  getItem,
   flushPromises
 } from '@client/tests/util'
 import { RecordAudit } from './RecordAudit'
@@ -24,21 +26,19 @@ import {
   createApplication,
   storeApplication,
   IApplication,
-  modifyApplication,
+  SUBMISSION_STATUS,
+  getApplicationsOfCurrentUser,
   IUserData,
-  getApplicationsOfCurrentUser
+  modifyApplication
 } from '@client/applications'
 import { Event } from '@client/forms'
 import { formatUrl } from '@client/navigation'
 import { APPLICATION_RECORD_AUDIT } from '@client/navigation/routes'
 import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
 import { checkAuth } from '@client/profile/profileActions'
-import { IUserDetails } from '@client/utils/userUtils'
 import { REINSTATE_BIRTH_APPLICATION } from '@client/views/DataProvider/birth/mutations'
+import { IUserDetails } from '@client/utils/userUtils'
 import { storage } from '@client/storage'
-const registerScopeToken =
-  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
-const getItem = window.localStorage.getItem as jest.Mock
 
 const application: IApplication = createApplication(
   Event.BIRTH,
@@ -178,6 +178,62 @@ describe('Record audit summary for WorkQueue Applications', () => {
   })
 })
 
+describe('Record audit', () => {
+  let component: ReactWrapper<{}, {}>
+
+  beforeEach(async () => {
+    const { store, history } = createStore()
+
+    getItem.mockReturnValue(registerScopeToken)
+
+    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+
+    application.submissionStatus = SUBMISSION_STATUS.DECLARED
+    store.dispatch(storeApplication(application))
+
+    component = await createTestComponent(
+      <RecordAudit
+        {...createRouterProps(
+          formatUrl(APPLICATION_RECORD_AUDIT, {
+            applicationId: application.id
+          }),
+          { isNavigatedInsideApp: false },
+          {
+            matchParams: {
+              applicationId: application.id
+            }
+          }
+        )}
+      />,
+      { store, history }
+    )
+  })
+
+  it('should show the archive button', async () => {
+    expect(component.exists('#archive_button')).toBeTruthy()
+  })
+
+  it('should show the confirmation modal when archive button is clicked', async () => {
+    component.find('#archive_button').hostNodes().simulate('click')
+
+    component.update()
+
+    expect(component.find('ResponsiveModal').prop('show')).toBeTruthy()
+  })
+
+  it('should close the confirmation modal when cancel button is clicked', async () => {
+    component.find('#archive_button').hostNodes().simulate('click')
+
+    component.update()
+
+    component.find('#cancel-btn').hostNodes().simulate('click')
+
+    component.update()
+
+    expect(component.find('ResponsiveModal').prop('show')).toBe(false)
+  })
+})
+
 describe('Record audit reinstated button', () => {
   const currentUserData: IUserData = {
     userID: '123',
@@ -185,18 +241,15 @@ describe('Record audit reinstated button', () => {
       { ...createApplication(Event.BIRTH), submissionStatus: 'ARCHIVED' }
     ]
   }
-
   const currentUserDetails: IUserDetails = {
     language: 'en',
     userMgntUserID: '123',
     localRegistrar: { name: [] }
   }
-
   const indexedDB = {
     USER_DATA: JSON.stringify([currentUserData]),
     USER_DETAILS: JSON.stringify(currentUserDetails)
   }
-
   beforeEach(() => {
     // Mocking storage reading
     // @ts-ignore
@@ -209,7 +262,6 @@ describe('Record audit reinstated button', () => {
           return undefined
       }
     })
-
     // Mocking storage writing
     // @ts-ignore
     storage.setItem = jest.fn((key: string, value: string) => {
@@ -223,7 +275,6 @@ describe('Record audit reinstated button', () => {
       }
     })
   })
-
   const graphqlMock = [
     {
       request: {
@@ -240,9 +291,7 @@ describe('Record audit reinstated button', () => {
       }
     }
   ]
-
   let component: ReactWrapper<{}, {}>
-
   beforeEach(async () => {
     const { store, history } = createStore()
     getItem.mockReturnValue(registerScopeToken)
@@ -269,30 +318,28 @@ describe('Record audit reinstated button', () => {
     component.update()
     await flushPromises()
   })
-
   it('Should show reinstated button', async () => {
     expect(component.find('#reinstate_button').hostNodes()).toHaveLength(1)
   })
-
   it('Should show modal if click on reinstated button', async () => {
     component.find('#reinstate_button').hostNodes().simulate('click')
     component.update()
     expect(component.find('ResponsiveModal').prop('show')).toBe(true)
   })
-
   it('Should close the modal if click on cancel button', async () => {
     component.find('#reinstate_button').hostNodes().simulate('click')
     component.update()
-    component.find('#cancel').hostNodes().simulate('click')
+    component.find('#cancel-btn').hostNodes().simulate('click')
     component.update()
     expect(component.find('ResponsiveModal').prop('show')).toBe(false)
   })
-
   it('Should reinstate application if click on confirm button', async () => {
     component.find('#reinstate_button').hostNodes().simulate('click')
     component.update()
     component.find('#continue').hostNodes().simulate('click')
     component.update()
     const details = await getApplicationsOfCurrentUser()
+    const currentUserDrafts = (JSON.parse(details) as IUserData).applications
+    expect(currentUserDrafts.length).toBe(1)
   })
 })
