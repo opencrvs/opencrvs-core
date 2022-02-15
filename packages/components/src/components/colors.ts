@@ -44,6 +44,7 @@ export const colorDictionary = {
   grey: '#1E2326',
   greyLight: '#595C5F',
   greyHover: '#F8F8F8',
+  tableRowDivider: '#F1F2F3',
   borderBottom: '#d8dbde'
 }
 
@@ -125,5 +126,6 @@ export const colors = {
   silverSand: colorDictionary.silverSand,
   swansDown: colorDictionary.swansDown,
   fountainBlue: colorDictionary.fountainBlue,
-  ronchi: colorDictionary.ronchi
+  ronchi: colorDictionary.ronchi,
+  tableRowDivider: colorDictionary.tableRowDivider
 }
