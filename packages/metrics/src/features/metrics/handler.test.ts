@@ -17,6 +17,16 @@ import * as fetchMock from 'jest-fetch-mock'
 
 const readPoints = influx.query as jest.Mock
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
+
+jest.mock('./utils', () => {
+  const originalModule = jest.requireActual('./utils')
+  return {
+    __esModule: true,
+    ...originalModule,
+    getRegistrationTargetDays: () => 45
+  }
+})
+
 const mockLocationBundle = {
   entry: [{ resource: { id: '1490d3dd-71a9-47e8-b143-f9fc64f71294' } }]
 }
@@ -48,8 +58,8 @@ describe('verify metrics handler', () => {
 
     readPoints.mockResolvedValueOnce([
       {
-        regWithin45d: 1,
-        regWithin45dTo1yr: 3,
+        regWithinTargetd: 1,
+        regWithinTargetdTo1yr: 3,
         regWithin1yrTo5yr: 0,
         regOver5yr: 3,
         locationLevel3: 'Location/94429795-0a09-4de8-8e1e-27dab01877d2'
@@ -91,8 +101,7 @@ describe('verify metrics handler', () => {
 
     const res = await server.server.inject({
       method: 'GET',
-      url:
-        '/metrics?timeStart=1552469068679&timeEnd=1554814894419&locationId=1490d3dd-71a9-47e8-b143-f9fc64f71294&event=birth',
+      url: '/metrics?timeStart=1552469068679&timeEnd=1554814894419&locationId=1490d3dd-71a9-47e8-b143-f9fc64f71294&event=birth',
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -111,8 +120,8 @@ describe('verify metrics handler', () => {
 
     readPoints.mockResolvedValueOnce([
       {
-        regWithin45d: 1,
-        regWithin45dTo1yr: 3,
+        regWithinTargetd: 1,
+        regWithinTargetdTo1yr: 3,
         regWithin1yrTo5yr: 0,
         regOver5yr: 3,
         locationLevel3: 'Location/94429795-0a09-4de8-8e1e-27dab01877d2'
@@ -153,8 +162,7 @@ describe('verify metrics handler', () => {
 
     const res = await server.server.inject({
       method: 'GET',
-      url:
-        '/metrics?timeStart=1552469068679&timeEnd=1554814894419&locationId=1490d3dd-71a9-47e8-b143-f9fc64f71294&event=death',
+      url: '/metrics?timeStart=1552469068679&timeEnd=1554814894419&locationId=1490d3dd-71a9-47e8-b143-f9fc64f71294&event=death',
       headers: {
         Authorization: `Bearer ${token}`
       }

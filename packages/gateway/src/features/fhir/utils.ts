@@ -1149,8 +1149,8 @@ export function timeFrameTotalCalculator(
   timeFrameMetrics: Array<GQLTimeFrameDetailMetrics>
 ): GQLTimeFrameTotalCount {
   const initialValue: GQLTimeFrameTotalCount = {
-    regWithin45d: 0,
-    regWithin45dTo1yr: 0,
+    regWithinTargetd: 0,
+    regWithinTargetdTo1yr: 0,
     regWithin1yrTo5yr: 0,
     regOver5yr: 0,
     total: 0
@@ -1158,19 +1158,24 @@ export function timeFrameTotalCalculator(
   return reduce(
     timeFrameMetrics,
     (accumulator, item) => {
-      const regWithin45d = accumulator.regWithin45d + item.regWithin45d
-      const regWithin45dTo1yr =
-        accumulator.regWithin45dTo1yr + item.regWithin45dTo1yr
+      const regWithinTargetd =
+        accumulator.regWithinTargetd + item.regWithinTargetd
+      const regWithinTargetdTo1yr =
+        accumulator.regWithinTargetdTo1yr + item.regWithinTargetdTo1yr
       const regWithin1yrTo5yr =
         accumulator.regWithin1yrTo5yr + item.regWithin1yrTo5yr
       const regOver5yr = accumulator.regOver5yr + item.regOver5yr
 
       return {
-        regWithin45d,
-        regWithin45dTo1yr,
+        regWithinTargetd,
+        regWithinTargetdTo1yr,
         regWithin1yrTo5yr,
         regOver5yr,
-        total: regWithin45d + regWithin45dTo1yr + regWithin1yrTo5yr + regOver5yr
+        total:
+          regWithinTargetd +
+          regWithinTargetdTo1yr +
+          regWithin1yrTo5yr +
+          regOver5yr
       }
     },
     initialValue

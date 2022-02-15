@@ -952,16 +952,16 @@ export interface GQLGenderBasisTotalCount {
 
 export interface GQLTimeFrameDetailMetrics {
   locationId: string
-  regWithin45d: number
-  regWithin45dTo1yr: number
+  regWithinTargetd: number
+  regWithinTargetdTo1yr: number
   regWithin1yrTo5yr: number
   regOver5yr: number
   total: number
 }
 
 export interface GQLTimeFrameTotalCount {
-  regWithin45d: number
-  regWithin45dTo1yr: number
+  regWithinTargetd: number
+  regWithinTargetdTo1yr: number
   regWithin1yrTo5yr: number
   regOver5yr: number
   total: number
@@ -4282,8 +4282,8 @@ export interface GenderBasisTotalCountToTotalResolver<
 
 export interface GQLTimeFrameDetailMetricsTypeResolver<TParent = any> {
   locationId?: TimeFrameDetailMetricsToLocationIdResolver<TParent>
-  regWithin45d?: TimeFrameDetailMetricsToRegWithin45dResolver<TParent>
-  regWithin45dTo1yr?: TimeFrameDetailMetricsToRegWithin45dTo1yrResolver<TParent>
+  regWithinTargetd?: TimeFrameDetailMetricsToRegWithinTargetdResolver<TParent>
+  regWithinTargetdTo1yr?: TimeFrameDetailMetricsToRegWithinTargetdTo1yrResolver<TParent>
   regWithin1yrTo5yr?: TimeFrameDetailMetricsToRegWithin1yrTo5yrResolver<TParent>
   regOver5yr?: TimeFrameDetailMetricsToRegOver5yrResolver<TParent>
   total?: TimeFrameDetailMetricsToTotalResolver<TParent>
@@ -4296,14 +4296,14 @@ export interface TimeFrameDetailMetricsToLocationIdResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface TimeFrameDetailMetricsToRegWithin45dResolver<
+export interface TimeFrameDetailMetricsToRegWithinTargetdResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface TimeFrameDetailMetricsToRegWithin45dTo1yrResolver<
+export interface TimeFrameDetailMetricsToRegWithinTargetdTo1yrResolver<
   TParent = any,
   TResult = any
 > {
@@ -4332,21 +4332,21 @@ export interface TimeFrameDetailMetricsToTotalResolver<
 }
 
 export interface GQLTimeFrameTotalCountTypeResolver<TParent = any> {
-  regWithin45d?: TimeFrameTotalCountToRegWithin45dResolver<TParent>
-  regWithin45dTo1yr?: TimeFrameTotalCountToRegWithin45dTo1yrResolver<TParent>
+  regWithinTargetd?: TimeFrameTotalCountToRegWithinTargetdResolver<TParent>
+  regWithinTargetdTo1yr?: TimeFrameTotalCountToRegWithinTargetdTo1yrResolver<TParent>
   regWithin1yrTo5yr?: TimeFrameTotalCountToRegWithin1yrTo5yrResolver<TParent>
   regOver5yr?: TimeFrameTotalCountToRegOver5yrResolver<TParent>
   total?: TimeFrameTotalCountToTotalResolver<TParent>
 }
 
-export interface TimeFrameTotalCountToRegWithin45dResolver<
+export interface TimeFrameTotalCountToRegWithinTargetdResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface TimeFrameTotalCountToRegWithin45dTo1yrResolver<
+export interface TimeFrameTotalCountToRegWithinTargetdTo1yrResolver<
   TParent = any,
   TResult = any
 > {

@@ -100,12 +100,15 @@ export async function monthlyExportHandler(
       stream.push({
         Location: loc.name,
         [`Within ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} days`]: `${
-          timeFrameData.regWithin45d
-        } (${getPercentage(timeFrameData.regWithin45d, timeFrameData.total)}%)`,
-        [`${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} days - 1 year`]: `${
-          timeFrameData.regWithin45dTo1yr
+          timeFrameData.regWithinTargetd
         } (${getPercentage(
-          timeFrameData.regWithin45dTo1yr,
+          timeFrameData.regWithinTargetd,
+          timeFrameData.total
+        )}%)`,
+        [`${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} days - 1 year`]: `${
+          timeFrameData.regWithinTargetdTo1yr
+        } (${getPercentage(
+          timeFrameData.regWithinTargetdTo1yr,
           timeFrameData.total
         )}%)`,
         '1 year to 5 years': `${
@@ -137,7 +140,8 @@ export async function monthlyExportHandler(
         Location: loc.name,
         'Estimated no. of registrations':
           estimatedTargetDayData.estimatedRegistration,
-        [`Total registered in ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} days`]: estimatedTargetDayData.registrationInTargetDay,
+        [`Total registered in ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} days`]:
+          estimatedTargetDayData.registrationInTargetDay,
         'Percentage of estimate': `${estimatedTargetDayData.estimationPercentage}%`
       })
     }

@@ -15,6 +15,14 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 
 const readPoints = influx.query as jest.Mock
+jest.mock('../metrics/utils', () => {
+  const originalModule = jest.requireActual('../metrics//utils')
+  return {
+    __esModule: true,
+    ...originalModule,
+    getRegistrationTargetDays: () => 45
+  }
+})
 
 describe('verify monthWiseEventEstimations handler', () => {
   let server: any

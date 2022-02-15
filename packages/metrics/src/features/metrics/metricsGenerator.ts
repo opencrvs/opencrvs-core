@@ -152,18 +152,18 @@ const birthRegWithinTimeFramesQuery = (
 ): string => {
   const EXPECTED_BIRTH_REGISTRATION_IN_DAYS = birthRegistrationTargetInDays
   return `SELECT
-  SUM(withinTargetDays) AS regWithin45d,
-  SUM(within45DTo1Yr) AS regWithin45dTo1yr,
+  SUM(withinTargetDays) AS regWithinTargetd,
+  SUM(withinTargetDTo1Yr) AS regWithinTargetdTo1yr,
   SUM(within1YrTo5Yr) AS regWithin1yrTo5yr,
   SUM(over5Yr) AS regOver5yr
  FROM (
-   SELECT withinTargetDays, within45DTo1Yr, within1YrTo5Yr, over5Yr, ${lowerLocationLevel}
+   SELECT withinTargetDays, withinTargetDTo1Yr, within1YrTo5Yr, over5Yr, ${lowerLocationLevel}
    FROM (
     SELECT COUNT(ageInDays) AS withinTargetDays FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
   AND ageInDays > -1 AND ageInDays <= ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} AND ${currentLocationLevel}='${locationId}'
     GROUP BY ${lowerLocationLevel}
    ), (
-    SELECT COUNT(ageInDays) AS within45DTo1Yr FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+    SELECT COUNT(ageInDays) AS withinTargetDTo1Yr FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
   AND ageInDays > ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} AND ageInDays <= 365 AND ${currentLocationLevel}='${locationId}'
     GROUP BY ${lowerLocationLevel}
    ), (
@@ -189,18 +189,18 @@ const deathRegWithinTimeFramesQuery = (
 ): string => {
   const EXPECTED_BIRTH_REGISTRATION_IN_DAYS = deathRegistrationTargetInDays
   return `SELECT
-  SUM(withinTargetDays) AS regWithin45d,
-  SUM(within45DTo1Yr) AS regWithin45dTo1yr,
+  SUM(withinTargetDays) AS regWithinTargetd,
+  SUM(withinTargetDTo1Yr) AS regWithinTargetdTo1yr,
   SUM(within1YrTo5Yr) AS regWithin1yrTo5yr,
   SUM(over5Yr) AS regOver5yr
  FROM (
-   SELECT withinTargetDays, within45DTo1Yr, within1YrTo5Yr, over5Yr, ${lowerLocationLevel}
+   SELECT withinTargetDays, withinTargetDTo1Yr, within1YrTo5Yr, over5Yr, ${lowerLocationLevel}
    FROM (
     SELECT COUNT(deathDays) AS withinTargetDays FROM death_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
   AND deathDays > -1 AND deathDays <= ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} AND ${currentLocationLevel}='${locationId}'
     GROUP BY ${lowerLocationLevel}
    ), (
-    SELECT COUNT(deathDays) AS within45DTo1Yr FROM death_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+    SELECT COUNT(deathDays) AS withinTargetDTo1Yr FROM death_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
   AND deathDays > ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} AND deathDays <= 365 AND ${currentLocationLevel}='${locationId}'
     GROUP BY ${lowerLocationLevel}
    ), (
@@ -251,14 +251,18 @@ export async function fetchRegWithinTimeFrames(
   const timeFramePoints = await query(queryString)
 
   const dataFromInflux = timeFramePoints.map((point: any) => {
-    const { regWithin45d, regWithin45dTo1yr, regWithin1yrTo5yr, regOver5yr } =
-      point
+    const {
+      regWithinTargetd,
+      regWithinTargetdTo1yr,
+      regWithin1yrTo5yr,
+      regOver5yr
+    } = point
     const total =
-      regWithin45d + regWithin45dTo1yr + regWithin1yrTo5yr + regOver5yr
+      regWithinTargetd + regWithinTargetdTo1yr + regWithin1yrTo5yr + regOver5yr
     return {
       locationId: point[lowerLocationLevel],
-      regWithin45d,
-      regWithin45dTo1yr,
+      regWithinTargetd,
+      regWithinTargetdTo1yr,
       regWithin1yrTo5yr,
       regOver5yr,
       total
@@ -267,8 +271,8 @@ export async function fetchRegWithinTimeFrames(
 
   const placeholder = {
     total: 0,
-    regWithin45d: 0,
-    regWithin45dTo1yr: 0,
+    regWithinTargetd: 0,
+    regWithinTargetdTo1yr: 0,
     regWithin1yrTo5yr: 0,
     regOver5yr: 0
   }

@@ -212,10 +212,10 @@ input BirthRegistrationInput {
 type BirthRegistrationMetrics {
   keyFigures: [BirthKeyFigures]
   regByAge: [BirthRegistrationByAgeMetrics]
-  regWithin45d: [BirthRegistrationWithIn45D]
+  regWithinTargetd: [BirthRegistrationWithInTargetD]
 }
 
-type BirthRegistrationWithIn45D {
+type BirthRegistrationWithInTargetD {
   label: String
   value: Int
   totalEstimate: Int
