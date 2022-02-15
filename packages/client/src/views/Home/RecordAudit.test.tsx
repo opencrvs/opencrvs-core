@@ -15,7 +15,6 @@ import {
   createTestComponent,
   mockApplicationData,
   createRouterProps,
-  mockRegistrarUserResponse,
   registerScopeToken,
   getItem
 } from '@client/tests/util'
@@ -32,7 +31,6 @@ import { Event } from '@client/forms'
 import { formatUrl } from '@client/navigation'
 import { APPLICATION_RECORD_AUDIT } from '@client/navigation/routes'
 import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
-import { queries } from '@client/profile/queries'
 import { checkAuth } from '@client/profile/profileActions'
 
 const application: IApplication = createApplication(
@@ -179,13 +177,9 @@ describe('Record audit', () => {
   beforeEach(async () => {
     const { store, history } = createStore()
 
-    const mockFetchUserDetails = jest.fn()
-    mockFetchUserDetails.mockReturnValue(mockRegistrarUserResponse)
-    queries.fetchUserDetails = mockFetchUserDetails
-
     getItem.mockReturnValue(registerScopeToken)
 
-    store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
     application.submissionStatus = SUBMISSION_STATUS.DECLARED
     store.dispatch(storeApplication(application))
@@ -210,5 +204,13 @@ describe('Record audit', () => {
 
   it('should show the archive button', async () => {
     expect(component.exists('#archive_button')).toBeTruthy()
+  })
+
+  it('should show the confirmation modal when archive button is clicked', async () => {
+    component.find('#archive_button').hostNodes().simulate('click')
+
+    component.update()
+
+    expect(component.find('ResponsiveModal').prop('show')).toBeTruthy()
   })
 })

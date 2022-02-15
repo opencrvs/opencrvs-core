@@ -29,21 +29,22 @@ import { IStoreState } from '@client/store'
 import {
   GQLEventSearchSet,
   GQLBirthEventSearchSet,
-  GQLDeathEventSearchSet,
-  GQLHumanName
+  GQLDeathEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
 import moment from 'moment'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { IFormSectionData, IContactPoint } from '@client/forms'
-import { Spinner } from '@opencrvs/components/lib/interface'
+import { ResponsiveModal } from '@opencrvs/components/lib/interface'
 import { getScope } from '@client/profile/profileSelectors'
 import { Scope } from '@client/utils/authUtils'
 import {
   TertiaryButton,
-  ICON_ALIGNMENT
+  ICON_ALIGNMENT,
+  DangerButton
 } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages/buttons'
+import { messages } from '@client/i18n/messages/views/archive'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -52,10 +53,6 @@ const BodyContainer = styled.div`
     margin-left: 265px;
     margin-top: 28px;
   }
-`
-
-const StyledSpinner = styled(Spinner)`
-  margin: 20% auto;
 `
 
 const InfoContainer = styled.div`
@@ -128,17 +125,6 @@ interface IApplicationData {
   brnDrn?: string
 }
 
-interface IGQLApplication {
-  id: string
-  child?: { name: GQLHumanName[] }
-  deceased?: { name: GQLHumanName[] }
-  registration?: {
-    trackingId: string
-    type: string
-    status: { type: string }[]
-  }
-}
-
 const STATUSTOCOLOR: { [key: string]: string } = {
   DRAFT: 'violet',
   DECLARED: 'orange',
@@ -190,19 +176,6 @@ const isDeathApplication = (
   application: GQLEventSearchSet | null
 ): application is GQLDeathEventSearchSet => {
   return (application && application.type === 'Death') || false
-}
-
-const goBack = (props: IFullProps) => {
-  const historyState = props.location.state
-  const navigatedFromInsideApp = Boolean(
-    historyState && historyState.isNavigatedInsideApp
-  )
-
-  if (navigatedFromInsideApp) {
-    props.goBack()
-  } else {
-    props.goToRegistrarHomeTab('review')
-  }
 }
 
 const getDraftApplicationName = (application: IApplication): string => {
@@ -446,6 +419,7 @@ const getApplicationInfo = (
 }
 
 export const ShowRecordAudit = (props: IFullProps) => {
+  const [showDialog, setShowDialog] = React.useState(false)
   const { intl, scope } = props
   const applicationId = props.match.params.applicationId
   let application: IApplicationData | null
@@ -460,13 +434,15 @@ export const ShowRecordAudit = (props: IFullProps) => {
 
   const topActionButtons: React.ReactElement[] = []
 
+  const toggleDisplayDialog = () => setShowDialog((prevValue) => !prevValue)
+
   const archiveButton = (
     <TertiaryButton
       align={ICON_ALIGNMENT.LEFT}
       id="archive_button"
       key="archive_button"
       icon={() => <Archive />}
-      onClick={() => {}}
+      onClick={toggleDisplayDialog}
     >
       {intl.formatMessage(buttonMessages.archive)}
     </TertiaryButton>
@@ -503,6 +479,27 @@ export const ShowRecordAudit = (props: IFullProps) => {
           </Content>
         )}
       </BodyContainer>
+      <ResponsiveModal
+        title={intl.formatMessage(messages.confirmationTitle)}
+        contentHeight={96}
+        responsive={false}
+        actions={[
+          <TertiaryButton
+            id="cancel-btn"
+            key="cancel"
+            onClick={toggleDisplayDialog}
+          >
+            {intl.formatMessage(buttonMessages.cancel)}
+          </TertiaryButton>,
+          <DangerButton id="edit_confirm" key="submit" onClick={() => {}}>
+            {intl.formatMessage(buttonMessages.archive)}
+          </DangerButton>
+        ]}
+        show={showDialog}
+        handleClose={toggleDisplayDialog}
+      >
+        {intl.formatMessage(messages.confirmationBody)}
+      </ResponsiveModal>
     </div>
   )
 }
