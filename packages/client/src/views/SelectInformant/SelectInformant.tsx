@@ -29,7 +29,8 @@ import {
   DeathSection,
   Event,
   IFormSection,
-  IFormSectionData
+  IFormSectionData,
+  FieldValueMap
 } from '@client/forms'
 import {
   getBirthSection,
@@ -166,21 +167,23 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
     sectionData: IFormSectionData,
     activeSection: IFormSection
   ) => {
-    const applicant =
+    const applicant = (
+      sectionData[activeSection.groups[0].fields[0].name] as IFormSectionData
+    )?.value
+
+    const nestedFieldValue = (
       (sectionData[activeSection.groups[0].fields[0].name] as IFormSectionData)
-        ?.value !== 'SOMEONE_ELSE'
-        ? (
-            sectionData[
-              activeSection.groups[0].fields[0].name
-            ] as IFormSectionData
-          )?.value
-        : (
-            (
-              sectionData[
-                activeSection.groups[0].fields[0].name
-              ] as IFormSectionData
-            )?.nestedFields as IFormSectionData
-          )?.otherRelationship
+        ?.nestedFields as IFormSectionData
+    )?.otherRelationship
+
+    const nestedField = nestedFieldValue
+      ? ({
+          otherRelationship: nestedFieldValue
+        } as FieldValueMap)
+      : {}
+
+    const applicantValue = nestedFieldValue ? nestedFieldValue : applicant
+
     const event = this.props.location.pathname.includes(Event.BIRTH)
       ? Event.BIRTH
       : Event.DEATH
@@ -195,10 +198,10 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       newApplication.data[registrationSection.id] = {
         ...application?.data[registrationSection.id],
         ...{
-          presentAtBirthRegistration: applicant,
+          presentAtBirthRegistration: applicantValue,
           applicant: {
             value: applicant,
-            nestedFields: {}
+            nestedFields: nestedField
           }
         }
       }
@@ -209,16 +212,15 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
           // Need to empty those because next screen will fill this up
           // TODO: currently contact point is the informant,
           // need to define the difference between informant and contact point on death schema
-          relationship: applicant
+          relationship: applicantValue
         }
       }
       newApplication.data[registrationSection.id] = {
         ...application?.data[registrationSection.id],
         ...{
-          presentAtBirthRegistration: applicant,
           relationship: {
             value: applicant,
-            nestedFields: {}
+            nestedFields: nestedField
           }
         }
       }
