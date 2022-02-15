@@ -443,7 +443,7 @@ export interface GQLPrimaryCaregiver {
 export interface GQLHistory {
   user?: GQLUser
   date?: GQLDate
-  action?: string
+  action?: GQLRegStatus
   location?: GQLLocation
   office?: GQLLocation
 }
@@ -855,6 +855,17 @@ export const enum GQLParentDetailsType {
   NONE = 'NONE'
 }
 
+export const enum GQLRegStatus {
+  IN_PROGRESS = 'IN_PROGRESS',
+  DECLARED = 'DECLARED',
+  WAITING_VALIDATION = 'WAITING_VALIDATION',
+  VALIDATED = 'VALIDATED',
+  REGISTERED = 'REGISTERED',
+  CERTIFIED = 'CERTIFIED',
+  REJECTED = 'REJECTED',
+  DOWNLOADED = 'DOWNLOADED'
+}
+
 export const enum GQLIdentityIDType {
   PASSPORT = 'PASSPORT',
   NATIONAL_ID = 'NATIONAL_ID',
@@ -1120,16 +1131,6 @@ export interface GQLReasonsNotApplyingInput {
   primaryCaregiverType?: GQLPrimaryCaregiverType
   reasonNotApplying?: string
   isDeceased?: boolean
-}
-
-export const enum GQLRegStatus {
-  IN_PROGRESS = 'IN_PROGRESS',
-  DECLARED = 'DECLARED',
-  WAITING_VALIDATION = 'WAITING_VALIDATION',
-  VALIDATED = 'VALIDATED',
-  REGISTERED = 'REGISTERED',
-  CERTIFIED = 'CERTIFIED',
-  REJECTED = 'REJECTED'
 }
 
 export interface GQLComment {

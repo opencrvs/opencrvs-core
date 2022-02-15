@@ -538,7 +538,7 @@ type PrimaryCaregiver {
 type History {
   user: User
   date: Date
-  action: String
+  action: RegStatus
   location: Location
   office: Location
 }
@@ -939,6 +939,17 @@ enum ParentDetailsType {
   NONE
 }
 
+enum RegStatus {
+  IN_PROGRESS
+  DECLARED
+  WAITING_VALIDATION
+  VALIDATED
+  REGISTERED
+  CERTIFIED
+  REJECTED
+  DOWNLOADED
+}
+
 enum IdentityIDType {
   PASSPORT
   NATIONAL_ID
@@ -1204,16 +1215,6 @@ input ReasonsNotApplyingInput {
   primaryCaregiverType: PrimaryCaregiverType
   reasonNotApplying: String
   isDeceased: Boolean
-}
-
-enum RegStatus {
-  IN_PROGRESS
-  DECLARED
-  WAITING_VALIDATION
-  VALIDATED
-  REGISTERED
-  CERTIFIED
-  REJECTED
 }
 
 type Comment {

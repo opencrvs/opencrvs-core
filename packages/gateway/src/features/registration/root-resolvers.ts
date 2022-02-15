@@ -92,7 +92,7 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'validate') ||
         hasScope(authHeader, 'declare')
       ) {
-        return await fetchFHIR(`/Composition/${id}`, authHeader)
+        return await markRecordAsDownloaded(`/Composition/${id}`, authHeader)
       } else {
         return await Promise.reject(
           new Error('User does not have a register or validate scope')

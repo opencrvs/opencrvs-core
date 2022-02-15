@@ -15,6 +15,7 @@ import {
   fetchFHIR,
   getTimeLoggedFromMetrics,
   getStatusFromTask,
+  getDownloadedExtensionStatus,
   ITimeLoggedResponse
 } from '@gateway/features/fhir/utils'
 import {
@@ -748,6 +749,64 @@ export const typeResolvers: GQLResolver = {
     }
   },
 
+  History: {
+    action: async (task) => {
+      const businessStatus = getStatusFromTask(task)
+      const extensionStatusWhileDownloaded = getDownloadedExtensionStatus(task)
+      if (businessStatus === extensionStatusWhileDownloaded) {
+        return 'DOWNLOADED'
+      }
+      return businessStatus
+    },
+    date: (task) => task.lastModified,
+    user: async (task, _, authHeader) => {
+      const user = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
+        task.extension
+      )
+      if (!user || !user.valueReference || !user.valueReference.reference) {
+        return null
+      }
+      const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
+        method: 'POST',
+        body: JSON.stringify({
+          practitionerId: user.valueReference.reference.split('/')[1]
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+      return await res.json()
+    },
+    location: async (task, _, authHeader) => {
+      const taskLocation = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
+        task.extension
+      )
+      if (!taskLocation || !taskLocation.valueReference) {
+        return null
+      }
+      return await fetchFHIR(
+        `/${taskLocation.valueReference.reference}`,
+        authHeader
+      )
+    },
+    office: async (task, _, authHeader) => {
+      const taskLocation = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
+        task.extension
+      )
+      if (!taskLocation || !taskLocation.valueReference) {
+        return null
+      }
+      return await fetchFHIR(
+        `/${taskLocation.valueReference.reference}`,
+        authHeader
+      )
+    }
+  },
+
   DeathRegistration: {
     // tslint:disable-next-line
     async _fhirIDMap(composition: ITemplatedComposition, _, authHeader) {
@@ -1336,23 +1395,16 @@ export const typeResolvers: GQLResolver = {
         authHeader
       )
 
+      if (!taskHistory.entry[0] || !taskHistory.entry[0].resource) {
+        return null
+      }
+
       return taskHistory?.entry?.map(
         (item: {
           resource: { extension: any }
           extension: fhir.Extension[]
         }) => {
-          const action = findExtension(
-            `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
-            item.resource.extension
-          )?.valueReference?.reference
-
-          return {
-            user: null,
-            date: new Date(),
-            action: action,
-            location: null,
-            office: null
-          }
+          return item.resource
         }
       )
     }

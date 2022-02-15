@@ -15,6 +15,7 @@ enum RegStatus {
   REGISTERED
   CERTIFIED
   REJECTED
+  DOWNLOADED
 }
 
 enum BirthRegType {
@@ -255,7 +256,7 @@ type RegWorkflow { # Task
 type History {
   user: User
   date: Date
-  action: String
+  action: RegStatus
   location: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastLocation').valueReference
   office: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastOffice').valueReference
 }
