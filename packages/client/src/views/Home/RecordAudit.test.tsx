@@ -15,7 +15,9 @@ import {
   createTestComponent,
   mockApplicationData,
   createRouterProps,
-  flushPromises
+  mockRegistrarUserResponse,
+  registerScopeToken,
+  getItem
 } from '@client/tests/util'
 import { RecordAudit } from './RecordAudit'
 import { createStore } from '@client/store'
@@ -23,12 +25,15 @@ import { ReactWrapper } from 'enzyme'
 import {
   createApplication,
   storeApplication,
-  IApplication
+  IApplication,
+  SUBMISSION_STATUS
 } from '@client/applications'
 import { Event } from '@client/forms'
 import { formatUrl } from '@client/navigation'
 import { APPLICATION_RECORD_AUDIT } from '@client/navigation/routes'
 import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
+import { queries } from '@client/profile/queries'
+import { checkAuth } from '@client/profile/profileActions'
 
 const application: IApplication = createApplication(
   Event.BIRTH,
@@ -165,5 +170,45 @@ describe('Record audit summary for WorkQueue Applications', () => {
     )
     expect(component.find('#placeOfBirth_grey').hostNodes()).toHaveLength(1)
     expect(component.find('#placeOfDeath_grey').hostNodes()).toHaveLength(0)
+  })
+})
+
+describe('Record audit', () => {
+  let component: ReactWrapper<{}, {}>
+
+  beforeEach(async () => {
+    const { store, history } = createStore()
+
+    const mockFetchUserDetails = jest.fn()
+    mockFetchUserDetails.mockReturnValue(mockRegistrarUserResponse)
+    queries.fetchUserDetails = mockFetchUserDetails
+
+    getItem.mockReturnValue(registerScopeToken)
+
+    store.dispatch(checkAuth({ '?token': registerScopeToken }))
+
+    application.submissionStatus = SUBMISSION_STATUS.DECLARED
+    store.dispatch(storeApplication(application))
+
+    component = await createTestComponent(
+      <RecordAudit
+        {...createRouterProps(
+          formatUrl(APPLICATION_RECORD_AUDIT, {
+            applicationId: application.id
+          }),
+          { isNavigatedInsideApp: false },
+          {
+            matchParams: {
+              applicationId: application.id
+            }
+          }
+        )}
+      />,
+      { store, history }
+    )
+  })
+
+  it('should show the archive button', async () => {
+    expect(component.exists('#archive_button')).toBeTruthy()
   })
 })
