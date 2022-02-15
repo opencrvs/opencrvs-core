@@ -15,7 +15,7 @@ import { Header } from '@client/components/interface/Header/Header'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import { Navigation } from '@client/components/interface/Navigation'
 import styled, { ITheme, withTheme } from '@client/styledComponents'
-import { ApplicationIcon } from '@opencrvs/components/lib/icons'
+import { Archive, ApplicationIcon } from '@opencrvs/components/lib/icons'
 import { connect } from 'react-redux'
 import {
   goToApplicationDetails,
@@ -37,6 +37,13 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { IFormSectionData, IContactPoint } from '@client/forms'
 import { Spinner } from '@opencrvs/components/lib/interface'
+import { getScope } from '@client/profile/profileSelectors'
+import { Scope } from '@client/utils/authUtils'
+import {
+  TertiaryButton,
+  ICON_ALIGNMENT
+} from '@opencrvs/components/lib/buttons'
+import { buttonMessages } from '@client/i18n/messages/buttons'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -81,6 +88,7 @@ const GreyedInfo = styled.div`
 interface IStateProps {
   workqueue: IWorkqueue
   resources: IOfflineData
+  scope: Scope | null
   savedApplications: IApplication[]
 }
 
@@ -140,6 +148,8 @@ const STATUSTOCOLOR: { [key: string]: string } = {
   CERTIFIED: 'green',
   WAITING_VALIDATION: 'teal'
 }
+
+const ARCHIVABLE_STATUSES = ['DECLARED', 'REJECTED', 'VALIDATED']
 
 const KEY_LABEL: ILabel = {
   status: 'Status',
@@ -436,12 +446,38 @@ const getApplicationInfo = (
 }
 
 export const ShowRecordAudit = (props: IFullProps) => {
+  const { intl, scope } = props
   const applicationId = props.match.params.applicationId
   let application: IApplicationData | null
   application = getSavedApplications(props)
   const isDownloaded = application ? true : false
   if (!isDownloaded) {
     application = getWQApplication(props)
+  }
+
+  const userHasRegisterScope = scope && scope.includes('register')
+  const userHasValidateScope = scope && scope.includes('validate')
+
+  const topActionButtons: React.ReactElement[] = []
+
+  const archiveButton = (
+    <TertiaryButton
+      align={ICON_ALIGNMENT.LEFT}
+      id="archive_button"
+      key="archive_button"
+      icon={() => <Archive />}
+      onClick={() => {}}
+    >
+      {intl.formatMessage(buttonMessages.archive)}
+    </TertiaryButton>
+  )
+
+  if (
+    (userHasValidateScope || userHasRegisterScope) &&
+    application?.status &&
+    ARCHIVABLE_STATUSES.includes(application.status)
+  ) {
+    topActionButtons.push(archiveButton)
   }
 
   return (
@@ -453,6 +489,7 @@ export const ShowRecordAudit = (props: IFullProps) => {
           <Content
             title={application.name || 'No name provided'}
             titleColor={application.name ? 'copy' : 'grey600'}
+            topActionButtons={topActionButtons}
             size={'large'}
             icon={() => (
               <ApplicationIcon
@@ -474,6 +511,7 @@ function mapStateToProps(state: IStoreState): IStateProps {
   return {
     workqueue: state.workqueueState.workqueue,
     resources: getOfflineData(state),
+    scope: getScope(state),
     savedApplications:
       state.applicationsState.applications &&
       state.applicationsState.applications
