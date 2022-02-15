@@ -23,7 +23,7 @@ import {
   dynamicConstantsMessages
 } from '@client/i18n/messages'
 import { getDraftApplicantFullName } from '@client/utils/draftUtils'
-import { LoadingIndicator } from '@client/views/RegistrationHome/LoadingIndicator'
+import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { formattedDuration } from '@client/utils/date-formatting'
 
 interface IInProgressProps {
@@ -80,8 +80,10 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
         event: event,
         name: name || '',
         dateOfModification:
-          `${intl.formatMessage(messages.lastUpdated)} ${lastModificationDate &&
-            formattedDuration(moment(lastModificationDate))}` || '',
+          `${intl.formatMessage(messages.lastUpdated)} ${
+            lastModificationDate &&
+            formattedDuration(moment(lastModificationDate))
+          }` || '',
         rowClickHandler: [
           {
             label: 'rowClickHandler',

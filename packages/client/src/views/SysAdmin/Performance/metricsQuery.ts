@@ -27,15 +27,15 @@ export const PERFORMANCE_METRICS = gql`
       timeFrames {
         details {
           locationId
-          regWithin45d
-          regWithin45dTo1yr
+          regWithinTargetd
+          regWithinTargetdTo1yr
           regWithin1yrTo5yr
           regOver5yr
           total
         }
         total {
-          regWithin45d
-          regWithin45dTo1yr
+          regWithinTargetd
+          regWithinTargetdTo1yr
           regWithin1yrTo5yr
           regOver5yr
           total
@@ -58,18 +58,18 @@ export const PERFORMANCE_METRICS = gql`
           total
         }
       }
-      estimated45DayMetrics {
+      estimatedTargetDayMetrics {
         details {
           locationId
           estimatedRegistration
-          registrationIn45Day
+          registrationInTargetDay
           estimationYear
           estimationLocationLevel
           estimationPercentage
         }
         total {
           estimatedRegistration
-          registrationIn45Day
+          registrationInTargetDay
           estimationPercentage
         }
       }
@@ -85,6 +85,19 @@ export const PERFORMANCE_METRICS = gql`
     }
   }
 `
+export const OPERATIONAL_REPORTS_METRICS_FOR_OFFICE = gql`
+  query data($timeStart: String!, $timeEnd: String!, $locationId: String!) {
+    getApplicationsStartedMetrics(
+      timeStart: $timeStart
+      timeEnd: $timeEnd
+      locationId: $locationId
+    ) {
+      fieldAgentApplications
+      hospitalApplications
+      officeApplications
+    }
+  }
+`
 export const OPERATIONAL_REPORTS_METRICS = gql`
   query data($timeStart: String!, $timeEnd: String!, $locationId: String!) {
     getEventEstimationMetrics(
@@ -92,14 +105,14 @@ export const OPERATIONAL_REPORTS_METRICS = gql`
       timeEnd: $timeEnd
       locationId: $locationId
     ) {
-      birth45DayMetrics {
+      birthTargetDayMetrics {
         actualRegistration
         estimatedRegistration
         estimatedPercentage
         malePercentage
         femalePercentage
       }
-      death45DayMetrics {
+      deathTargetDayMetrics {
         actualRegistration
         estimatedRegistration
         estimatedPercentage

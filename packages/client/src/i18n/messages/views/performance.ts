@@ -150,17 +150,19 @@ const messagesToDefine: IPerformanceReportsMessages = {
   registrationRatesReportDescription: {
     id: 'performance.report.registration.rates.description',
     defaultMessage:
-      '{totalRegistrationNumber} registered within 45 days out of estimated {estimatedRegistrationNumber}',
+      '{totalRegistrationNumber} registered within {registrationTarget} days out of estimated {estimatedRegistrationNumber}',
     description: 'Event registration rate report description'
   },
   birthRegistrationRatesReportHeader: {
     id: 'performance.report.regrates.birth.head',
-    defaultMessage: 'Birth registration rate within 45 days of event',
+    defaultMessage:
+      'Birth registration rate within {birthRegistrationTarget} days of event',
     description: 'Header for birth registration rates report'
   },
   deathRegistrationRatesReportHeader: {
     id: 'performance.report.regrates.death.head',
-    defaultMessage: 'Death registration rate within 45 days of event',
+    defaultMessage:
+      'Death registration rate within {deathRegistrationTarget} days of event',
     description: 'Header for death registration rates report'
   },
   overTime: {
@@ -284,6 +286,5 @@ const messagesToDefine: IPerformanceReportsMessages = {
   }
 }
 
-export const messages: IPerformanceReportsMessages = defineMessages(
-  messagesToDefine
-)
+export const messages: IPerformanceReportsMessages =
+  defineMessages(messagesToDefine)

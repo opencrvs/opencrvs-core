@@ -30,6 +30,7 @@ export async function getCertificateHandler(
 ) {
   const { status, event } = request.payload as IActivePayload
   const certificate: IApplicationCertificateModel | null =
+    // tslint:disable-next-line
     await Certificate.findOne({ status: status, event: event })
 
   return certificate
@@ -40,6 +41,7 @@ export async function getActiveCertificatesHandler(
   h: Hapi.ResponseToolkit
 ) {
   const activeCertificats: IApplicationCertificateModel | {} =
+    // tslint:disable-next-line
     await Certificate.find({
       status: Status.ACTIVE,
       event: { $in: [Event.BIRTH, Event.DEATH] }
@@ -64,6 +66,7 @@ export async function createCertificateHandler(
     // save new certificate
     let certificateResponse
     try {
+      // tslint:disable-next-line
       certificateResponse = await Certificate.create(newCertificate)
     } catch (err) {
       logger.error(err)
@@ -82,6 +85,7 @@ export async function updateCertificateHandler(
   try {
     const certificate = request.payload as IApplicationCertificateModel
     const existingCertificate: IApplicationCertificateModel | null =
+      // tslint:disable-next-line
       await Certificate.findOne({ _id: certificate.id })
     if (!existingCertificate) {
       throw badRequest(`No certificate found by given id: ${certificate.id}`)
@@ -93,6 +97,7 @@ export async function updateCertificateHandler(
     existingCertificate.user = certificate.user
     existingCertificate.event = certificate.event
     existingCertificate.status = certificate.status
+    // tslint:disable-next-line
     await Certificate.update(
       { _id: existingCertificate._id },
       existingCertificate
@@ -114,6 +119,7 @@ export async function deleteCertificateHandler(
     return h.response('No certificate id in URL params').code(404)
   }
   try {
+    // tslint:disable-next-line
     await Certificate.findOneAndRemove({ _id: certificateId })
   } catch (err) {
     return h

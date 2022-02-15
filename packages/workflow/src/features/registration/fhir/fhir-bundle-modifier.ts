@@ -17,7 +17,8 @@ import {
   REG_STATUS_IN_PROGRESS,
   REG_STATUS_VALIDATED,
   REG_STATUS_WAITING_VALIDATION,
-  REG_STATUS_REGISTERED
+  REG_STATUS_REGISTERED,
+  REG_STATUS_REQUESTED_CORRECTION
 } from '@workflow/features/registration/fhir/constants'
 import {
   getTaskResource,
@@ -42,7 +43,7 @@ import {
   getPractitionerRef
 } from '@workflow/features/user/utils'
 import { logger } from '@workflow/logger'
-import { getTokenPayload, ITokenPayload } from '@workflow/utils/authUtils.ts'
+import { getTokenPayload, ITokenPayload } from '@workflow/utils/authUtils'
 import { RESOURCE_SERVICE_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 
@@ -104,6 +105,27 @@ export async function markBundleAsValidated(
     taskResource,
     getTokenPayload(token),
     REG_STATUS_VALIDATED
+  )
+
+  await setupLastRegLocation(taskResource, practitioner)
+
+  setupLastRegUser(taskResource, practitioner)
+
+  return bundle
+}
+
+export async function markBundleAsRequestedForCorrection(
+  bundle: fhir.Bundle & fhir.BundleEntry,
+  token: string
+): Promise<fhir.Bundle & fhir.BundleEntry> {
+  const taskResource = getTaskResource(bundle) as fhir.Task
+
+  const practitioner = await getLoggedInPractitionerResource(token)
+
+  await setupRegistrationWorkflow(
+    taskResource,
+    getTokenPayload(token),
+    REG_STATUS_REQUESTED_CORRECTION
   )
 
   await setupLastRegLocation(taskResource, practitioner)
@@ -246,7 +268,7 @@ export function setTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
     taskResource.identifier = []
   }
   const existingTrackingId = taskResource.identifier.find(
-    identifier =>
+    (identifier) =>
       identifier.system ===
       `${OPENCRVS_SPECIFICATION_URL}id/${trackingIdFhirName}`
   )
@@ -297,7 +319,7 @@ export async function setupRegistrationWorkflow(
   if (!taskResource.businessStatus.coding) {
     taskResource.businessStatus.coding = []
   }
-  const regStatusCode = taskResource.businessStatus.coding.find(code => {
+  const regStatusCode = taskResource.businessStatus.coding.find((code) => {
     return code.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
   })
 
@@ -327,7 +349,7 @@ export async function setupLastRegLocation(
     taskResource.extension = []
   }
   const regUserLastLocationExtension = taskResource.extension.find(
-    extension => {
+    (extension) => {
       return (
         extension.url ===
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`
@@ -348,11 +370,13 @@ export async function setupLastRegLocation(
 
   const primaryOffice = await getPractitionerOffice(practitioner.id)
 
-  const regUserLastOfficeExtension = taskResource.extension.find(extension => {
-    return (
-      extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`
-    )
-  })
+  const regUserLastOfficeExtension = taskResource.extension.find(
+    (extension) => {
+      return (
+        extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`
+      )
+    }
+  )
   if (regUserLastOfficeExtension && regUserLastOfficeExtension.valueReference) {
     regUserLastOfficeExtension.valueReference.reference = `Location/${primaryOffice.id}`
   } else {
@@ -371,7 +395,7 @@ export function setupLastRegUser(
   if (!taskResource.extension) {
     taskResource.extension = []
   }
-  const regUserExtension = taskResource.extension.find(extension => {
+  const regUserExtension = taskResource.extension.find((extension) => {
     return (
       extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`
     )
@@ -384,7 +408,8 @@ export function setupLastRegUser(
       valueReference: { reference: getPractitionerRef(practitioner) }
     })
   }
-  taskResource.lastModified = new Date().toISOString()
+  taskResource.lastModified =
+    taskResource.lastModified || new Date().toISOString()
   return taskResource
 }
 
@@ -396,7 +421,7 @@ export function setupAuthorOnNotes(
     return taskResource
   }
   const authorName = getPractitionerRef(practitioner)
-  taskResource.note.forEach(note => {
+  taskResource.note.forEach((note) => {
     if (!note.authorString) {
       note.authorString = authorName
     }
@@ -409,7 +434,7 @@ export async function checkForDuplicateStatusUpdate(taskResource: fhir.Task) {
     taskResource &&
     taskResource.businessStatus &&
     taskResource.businessStatus.coding &&
-    taskResource.businessStatus.coding.find(code => {
+    taskResource.businessStatus.coding.find((code) => {
       return code.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
     })
 
@@ -428,7 +453,7 @@ export async function checkForDuplicateStatusUpdate(taskResource: fhir.Task) {
     existingTaskResource &&
     existingTaskResource.businessStatus &&
     existingTaskResource.businessStatus.coding &&
-    existingTaskResource.businessStatus.coding.find(code => {
+    existingTaskResource.businessStatus.coding.find((code) => {
       return code.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
     })
   if (existingRegStatusCode && existingRegStatusCode.code === regStatusCode) {
@@ -449,7 +474,7 @@ export async function updatePatientIdentifierWithRN(
     patient.identifier = []
   }
   const rnIdentifier = patient.identifier.find(
-    identifier => identifier.type === identifierType
+    (identifier) => identifier.type === identifierType
   )
   if (rnIdentifier) {
     rnIdentifier.value = registrationNumber

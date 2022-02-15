@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/commons",
-  "version": "1.0.0-alpha.3.0",
+  "version": "1.0.0-alpha.3.1",
   "description": "OpenCRVS common modules and utils",
   "license": "MPL-2.0",
   "main": "build/dist/index.js",
@@ -9,22 +9,23 @@
     "test:watch": "jest --watch",
     "test:compilation": "tsc --noEmit",
     "postinstall": "yarn build",
-    "build": "tsc -d",
+    "build": "tsc",
     "build:clean": "rm -rf build"
   },
   "private": true,
   "dependencies": {
-    "@types/node-fetch": "^2.3.3",
+    "@types/jest": "^26.0.14",
+    "jest": "26.6.0",
+    "@types/node-fetch": "^2.5.12",
     "@hapi/hapi": "^20.0.1",
-    "node-fetch": "^2.6.1",
+    "@types/hapi__hapi": "^20.0.0",
+    "node-fetch": "^2.6.7",
     "lint-staged": "^7.1.0",
     "typescript": "^3.7.2"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.13",
-    "jest": "24.7.1",
     "jest-fetch-mock": "^2.1.2",
-    "ts-jest": "^24.0.2"
+    "ts-jest": "^26.4.4"
   },
   "lint-staged": {
     "src/**/*.{ts,graphql}": [

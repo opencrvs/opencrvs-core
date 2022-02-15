@@ -51,7 +51,7 @@ export default function getRoutes() {
     },
     {
       method: 'GET',
-      path: '/getConfig',
+      path: '/config',
       handler: applicationConfigHandler,
       config: {
         auth: false,

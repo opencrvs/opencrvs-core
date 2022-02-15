@@ -78,10 +78,7 @@ describe('Test reset credentials success page', () => {
     })
 
     it('login button redirects to home page', () => {
-      app
-        .find('#login-button')
-        .hostNodes()
-        .simulate('click')
+      app.find('#login-button').hostNodes().simulate('click')
       expect(window.location.pathname).toContain(routes.STEP_ONE)
     })
   })

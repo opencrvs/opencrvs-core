@@ -87,18 +87,18 @@ describe('Registraion Rates tests', () => {
             details: [
               {
                 actualTotalRegistration: 20,
-                actual45DayRegistration: 9,
+                actualTargetDayRegistration: 9,
                 estimatedRegistration: 45,
-                estimated45DayPercentage: 4.5,
+                estimatedTargetDayPercentage: 4.5,
                 month: 'April',
                 year: '2020',
                 startOfMonth: '2020-03-30T18:00:00.000Z'
               },
               {
                 actualTotalRegistration: 10,
-                actual45DayRegistration: 0,
+                actualTargetDayRegistration: 0,
                 estimatedRegistration: 45,
-                estimated45DayPercentage: 0,
+                estimatedTargetDayPercentage: 0,
                 month: 'March',
                 year: '2020',
                 startOfMonth: '2020-02-29T18:00:00.000Z'
@@ -106,9 +106,9 @@ describe('Registraion Rates tests', () => {
             ],
             total: {
               actualTotalRegistration: 30,
-              actual45DayRegistration: 9,
+              actualTargetDayRegistration: 9,
               estimatedRegistration: 45,
-              estimated45DayPercentage: 2.25
+              estimatedTargetDayPercentage: 2.25
             }
           }
         }
@@ -127,31 +127,28 @@ describe('Registraion Rates tests', () => {
   })
 
   beforeEach(async () => {
-    component = (
-      await createTestComponent(
-        <RegistrationRates
-          match={{
-            params: { eventType: 'birth' },
-            isExact: true,
-            path: EVENT_REGISTRATION_RATES,
-            url: ''
-          }}
-          // @ts-ignore
-          location={{
-            search: stringify({
-              locationId: LOCATION_DHAKA_DIVISION.id,
-              timeEnd: new Date(1487076708000).toISOString(),
-              timeStart: new Date(1455454308000).toISOString()
-            })
-          }}
-        />,
-        store,
-        graphqlMocks
-      )
-    ).component
+    component = await createTestComponent(
+      <RegistrationRates
+        match={{
+          params: { eventType: 'birth' },
+          isExact: true,
+          path: EVENT_REGISTRATION_RATES,
+          url: ''
+        }}
+        // @ts-ignore
+        location={{
+          search: stringify({
+            locationId: LOCATION_DHAKA_DIVISION.id,
+            timeEnd: new Date(1487076708000).toISOString(),
+            timeStart: new Date(1455454308000).toISOString()
+          })
+        }}
+      />,
+      { store, history, graphqlMocks: graphqlMocks }
+    )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 
@@ -174,12 +171,9 @@ describe('Registraion Rates tests', () => {
       .simulate('keyDown', { key: 'ArrowDown', keyCode: 40 })
     component.update()
     expect(component.find('.react-select__menu-list').children().length).toBe(2)
-    expect(
-      component
-        .find('.react-select__menu-list')
-        .childAt(1)
-        .text()
-    ).toBe('By location')
+    expect(component.find('.react-select__menu-list').childAt(1).text()).toBe(
+      'By location'
+    )
   })
 
   it('clicking on back takes back to operational dashboard with selected location', async () => {
@@ -207,10 +201,7 @@ describe('Registraion Rates tests', () => {
       component,
       '#last30Days'
     )
-    last30DaysPresetButtonElement
-      .hostNodes()
-      .at(0)
-      .simulate('click')
+    last30DaysPresetButtonElement.hostNodes().at(0).simulate('click')
     const confirmButtonElement = await waitForElement(
       component,
       '#date-range-confirm-action'
@@ -228,19 +219,13 @@ describe('Registraion Rates tests', () => {
 
     expect(component.find('#picker-modal').hostNodes()).toHaveLength(1)
 
-    component
-      .find('#close-btn')
-      .hostNodes()
-      .simulate('click')
+    component.find('#close-btn').hostNodes().simulate('click')
 
     expect(component.find('#picker-modal').hostNodes()).toHaveLength(0)
 
     locationPickerElement.hostNodes().simulate('click')
     expect(component.find('#picker-modal').hostNodes()).toHaveLength(1)
-    component
-      .find('#cancelable-area')
-      .hostNodes()
-      .simulate('click')
+    component.find('#cancelable-area').hostNodes().simulate('click')
     expect(component.find('#picker-modal').hostNodes()).toHaveLength(0)
   })
 
@@ -323,36 +308,34 @@ describe('Registraion Rates error state tests', () => {
   ]
   let component: ReactWrapper<{}, {}>
   let store: AppStore
+  let history: History
 
   beforeEach(async () => {
     Date.now = jest.fn(() => 1487076708000)
-    const { store: testStore } = await createTestStore()
-    store = testStore
-    component = (
-      await createTestComponent(
-        <RegistrationRates
-          match={{
-            params: { eventType: 'birth' },
-            isExact: true,
-            path: EVENT_REGISTRATION_RATES,
-            url: ''
-          }}
-          // @ts-ignore
-          location={{
-            search: stringify({
-              locationId: LOCATION_DHAKA_DIVISION.id,
-              timeEnd: new Date(1487076708000).toISOString(),
-              timeStart: new Date(1455454308000).toISOString()
-            })
-          }}
-        />,
-        store,
-        graphqlMocks
-      )
-    ).component
+    ;({ store, history } = await createTestStore())
+
+    component = await createTestComponent(
+      <RegistrationRates
+        match={{
+          params: { eventType: 'birth' },
+          isExact: true,
+          path: EVENT_REGISTRATION_RATES,
+          url: ''
+        }}
+        // @ts-ignore
+        location={{
+          search: stringify({
+            locationId: LOCATION_DHAKA_DIVISION.id,
+            timeEnd: new Date(1487076708000).toISOString(),
+            timeStart: new Date(1455454308000).toISOString()
+          })
+        }}
+      />,
+      { store, history, graphqlMocks: graphqlMocks }
+    )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
 

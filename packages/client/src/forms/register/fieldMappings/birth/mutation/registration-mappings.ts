@@ -12,8 +12,7 @@
 import {
   GQLAttachment,
   GQLPerson,
-  GQLRelatedPerson,
-  GQLRelationshipType
+  GQLRelatedPerson
 } from '@opencrvs/gateway/src/graphql/schema'
 import {
   ICertificate,
@@ -41,8 +40,7 @@ export function transformCertificateData(
   if (certificateData && certificateData.collector) {
     const collector: GQLRelatedPerson = {}
     if (certificateData.collector.type) {
-      collector.relationship = certificateData.collector
-        .type as GQLRelationshipType
+      collector.relationship = certificateData.collector.type as string
     }
     if (certificateData.collector.relationship) {
       collector.otherRelationship = certificateData.collector
@@ -122,56 +120,60 @@ export function setBirthRegistrationSectionTransformer(
   }
 }
 
-export const msisdnTransformer = (transformedFieldName?: string) => (
-  transformedData: TransformedData,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) => {
-  const fieldName = transformedFieldName ? transformedFieldName : field.name
+export const msisdnTransformer =
+  (transformedFieldName?: string) =>
+  (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    const fieldName = transformedFieldName ? transformedFieldName : field.name
 
-  set(
-    transformedData,
-    fieldName,
-    convertToMSISDN(draftData[sectionId][field.name] as string)
-  )
-
-  return transformedData
-}
-
-export const changeHirerchyMutationTransformer = (
-  transformedFieldName?: string,
-  transformerMethod?: IFormFieldMutationMapFunction
-) => (
-  transformedData: TransformedData,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField,
-  nestedField: IFormField
-) => {
-  let nestedFieldValueObj: IFormSectionData = (draftData[sectionId][
-    field.name
-  ] as IFormSectionData).nestedFields as IFormSectionData
-
-  if (transformedFieldName) {
     set(
       transformedData,
-      transformedFieldName,
-      nestedFieldValueObj[nestedField.name] || ''
+      fieldName,
+      convertToMSISDN(draftData[sectionId][field.name] as string)
     )
 
-    if (transformerMethod) {
-      transformerMethod(
-        transformedData,
-        draftData[sectionId][field.name] as IFormData,
-        'nestedFields',
-        nestedField
-      )
-    }
-  } else {
-    transformedData[nestedField.name] =
-      nestedFieldValueObj[nestedField.name] || ''
+    return transformedData
   }
 
-  return transformedData
-}
+export const changeHirerchyMutationTransformer =
+  (
+    transformedFieldName?: string,
+    transformerMethod?: IFormFieldMutationMapFunction
+  ) =>
+  (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: string,
+    field: IFormField,
+    nestedField: IFormField
+  ) => {
+    const nestedFieldValueObj: IFormSectionData = (
+      draftData[sectionId][field.name] as IFormSectionData
+    ).nestedFields as IFormSectionData
+
+    if (transformedFieldName) {
+      set(
+        transformedData,
+        transformedFieldName,
+        nestedFieldValueObj[nestedField.name] || ''
+      )
+
+      if (transformerMethod) {
+        transformerMethod(
+          transformedData,
+          draftData[sectionId][field.name] as IFormData,
+          'nestedFields',
+          nestedField
+        )
+      }
+    } else {
+      transformedData[nestedField.name] =
+        nestedFieldValueObj[nestedField.name] || ''
+    }
+
+    return transformedData
+  }

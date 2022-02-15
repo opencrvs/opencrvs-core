@@ -16,21 +16,21 @@ import { TimeFrameReports } from '@client/views/SysAdmin/Performance/reports/Tim
 import { Event } from '@client/forms'
 
 describe('Time frame report tests', () => {
-  const { store } = createStore()
+  const { store, history } = createStore()
   const timeFramesData = {
     details: [
       {
         locationId: 'Location/d5ccd1d1-ca47-435b-93db-36c626ad2dfa',
-        regWithin45d: 0,
-        regWithin45dTo1yr: 0,
+        regWithinTargetd: 0,
+        regWithinTargetdTo1yr: 0,
         regWithin1yrTo5yr: 0,
         regOver5yr: 2,
         total: 2
       }
     ],
     total: {
-      regWithin45d: 0,
-      regWithin45dTo1yr: 0,
+      regWithinTargetd: 0,
+      regWithinTargetdTo1yr: 0,
       regWithin1yrTo5yr: 0,
       regOver5yr: 2,
       total: 2
@@ -44,10 +44,10 @@ describe('Time frame report tests', () => {
         data={timeFramesData}
         loading={false}
       />,
-      store
+      { store, history }
     )
 
-    const columnValueOfRegOver5Year = testComponent.component
+    const columnValueOfRegOver5Year = testComponent
       .find('#row_0')
       .find('span')
       .at(5)

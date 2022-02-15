@@ -23,6 +23,7 @@ interface IConstantsMessages
   applicationCollectedOn: MessageDescriptor
   applicationFailedOn: MessageDescriptor
   applicationInformantLabel: MessageDescriptor
+  applicationName: MessageDescriptor
   applicationRegisteredOn: MessageDescriptor
   applicationRejectedOn: MessageDescriptor
   applicationStarted: MessageDescriptor
@@ -42,6 +43,7 @@ interface IConstantsMessages
   collected: MessageDescriptor
   collectedBy: MessageDescriptor
   comment: MessageDescriptor
+  configTitle: MessageDescriptor
   customTimePeriod: MessageDescriptor
   dateOfApplication: MessageDescriptor
   death: MessageDescriptor
@@ -114,24 +116,24 @@ interface IConstantsMessages
   femaleOver18: MessageDescriptor
   total: MessageDescriptor
   registrationTitle: MessageDescriptor
-  within45Days: MessageDescriptor
-  within45DaysTo1Year: MessageDescriptor
+  withinTargetDays: MessageDescriptor
+  withinTargetDaysTo1Year: MessageDescriptor
   within1YearTo5Years: MessageDescriptor
   over5Years: MessageDescriptor
   waitingValidated: MessageDescriptor
   validated: MessageDescriptor
   loadMore: MessageDescriptor
   showMore: MessageDescriptor
-  estimated45DayRegistrationTitle: MessageDescriptor
+  estimatedTargetDaysRegistrationTitle: MessageDescriptor
   estimatedNumberOfRegistartion: MessageDescriptor
-  totalRegisteredIn45Days: MessageDescriptor
+  totalRegisteredInTargetDays: MessageDescriptor
   percentageOfEstimation: MessageDescriptor
   averageRateOfRegistrations: MessageDescriptor
   estimatedNumberOfEvents: MessageDescriptor
-  rateOfRegistrationWithin45d: MessageDescriptor
+  rateOfRegistrationWithinTargetd: MessageDescriptor
   registerConfirmModalDesc: MessageDescriptor
-  registeredWithin45d: MessageDescriptor
-  registeredIn45d: MessageDescriptor
+  registeredWithinTargetd: MessageDescriptor
+  registeredInTargetd: MessageDescriptor
   timePeriod: MessageDescriptor
   totalRegistered: MessageDescriptor
   viewAll: MessageDescriptor
@@ -183,6 +185,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Informant',
     description: 'Informant Label',
     id: 'constants.informant'
+  },
+  applicationName: {
+    defaultMessage: 'OpenCRVS',
+    description: 'Application name of CRVS',
+    id: 'constants.applicationName'
   },
   applicationRegisteredOn: {
     defaultMessage: 'Application registered on',
@@ -290,6 +297,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Comment',
     description: 'Label for rejection comment',
     id: 'constants.comment'
+  },
+  configTitle: {
+    defaultMessage: 'Config',
+    description: 'Config title',
+    id: 'constants.config'
   },
   customTimePeriod: {
     defaultMessage: 'Custom time period',
@@ -665,18 +677,18 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Label for registrationTitle',
     id: 'constants.registrationTitle'
   },
-  within45Days: {
-    defaultMessage: 'Within 45 days',
-    description: 'Label for registrations within 45 days',
-    id: 'constants.within45Days'
+  withinTargetDays: {
+    defaultMessage: `Within {registrationTargetDays} days`,
+    description: `Label for registrations within {registrationTargetDays} days`,
+    id: 'constants.withinTargetDays'
   },
-  within45DaysTo1Year: {
-    defaultMessage: '45 days - 1 year',
-    description: 'Label for registrations within 45 days to 1 year',
-    id: 'constants.within45DaysTo1Year'
+  withinTargetDaysTo1Year: {
+    defaultMessage: `{registrationTargetDays} days - 1 year`,
+    description: `Label for registrations within {registrationTargetDays} days to 1 year`,
+    id: 'constants.withinTargetDaysTo1Year'
   },
   within1YearTo5Years: {
-    defaultMessage: '1 year to 5 years',
+    defaultMessage: '1 year - 5 years',
     description: 'Label for registrations within 1 year to 5 years',
     id: 'constants.within1YearTo5Years'
   },
@@ -700,20 +712,20 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Show next {pageSize}',
     description: 'Label for show more link'
   },
-  estimated45DayRegistrationTitle: {
-    id: 'constants.estimated45DayRegistrationTitle',
-    defaultMessage: 'Estimated vs total registered in 45 days',
-    description: 'A label for estimated vs total registered in 45 days'
+  estimatedTargetDaysRegistrationTitle: {
+    id: 'constants.estimatedTargetDaysRegistrationTitle',
+    defaultMessage: `Estimated vs total registered in {registrationTargetDays} days`,
+    description: `A label for estimated vs total registered in {registrationTargetDays} days`
   },
   estimatedNumberOfRegistartion: {
     id: 'constants.estimatedNumberOfRegistartion',
     defaultMessage: 'Estimated no. of registrations',
     description: 'A label for estimated no. of registrations'
   },
-  totalRegisteredIn45Days: {
-    id: 'constants.totalRegisteredIn45Days',
-    defaultMessage: 'Total registered in 45 days',
-    description: 'A label for total registered in 45 days'
+  totalRegisteredInTargetDays: {
+    id: 'constants.totalRegisteredInTargetDays',
+    defaultMessage: `Total registered in {registrationTargetDays} days`,
+    description: `A label for total registered in {registrationTargetDays} days`
   },
   percentageOfEstimation: {
     id: 'constants.percentageOfEstimation',
@@ -736,20 +748,21 @@ const messagesToDefine: IConstantsMessages = {
       'Estimated no. of {eventType, select, birth {birth} death {death} other {birth}}s',
     description: 'A label for Estimated number of events'
   },
-  rateOfRegistrationWithin45d: {
-    id: 'constants.rateOfRegistrationWithin45d',
-    defaultMessage: 'Rate within 45 days of event',
-    description: 'A label for Rate within 45 days of event'
+  rateOfRegistrationWithinTargetd: {
+    id: 'constants.rateOfRegistrationWithinTargetd',
+    defaultMessage: 'Rate within {registrationTargetDays} days of event',
+    description:
+      'A label for Rate within {registrationTargetDays} days of event'
   },
-  registeredWithin45d: {
-    id: 'constants.registeredWithin45d',
-    defaultMessage: 'Registered within\n45 days of event',
-    description: 'A label for Registered within 45 days of event'
+  registeredWithinTargetd: {
+    id: 'constants.registeredWithinTargetd',
+    defaultMessage: `Registered within\n{registrationTargetDays} days of event`,
+    description: `A label for Registered {registrationTargetDays} within  days of event`
   },
-  registeredIn45d: {
-    id: 'constants.registeredIn45d',
-    defaultMessage: 'Registered in 45 days',
-    description: 'A label for Registered in 45 days'
+  registeredInTargetd: {
+    id: 'constants.registeredInTargetd',
+    defaultMessage: `Registered in {registrationTargetDays} days`,
+    description: `A label for Registered in {registrationTargetDays} days`
   },
   timePeriod: {
     id: 'constants.timePeriod',
@@ -1303,6 +1316,11 @@ const countryMessagesToDefine: Record<
     id: 'countries.FLK',
     defaultMessage: 'Falkland Islands (Malvinas)',
     description: 'ISO Country: FLK'
+  },
+  FAR: {
+    id: 'countries.FAR',
+    defaultMessage: 'Farajaland',
+    description: 'Fictional country for OpenCRSV demo'
   },
   FRO: {
     id: 'countries.FRO',

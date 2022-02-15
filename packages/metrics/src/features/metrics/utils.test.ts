@@ -12,7 +12,7 @@
 import {
   calculateInterval,
   fetchEstimateByLocation,
-  fetchEstimateFor45DaysByLocationId,
+  fetchEstimateForTargetDaysByLocationId,
   getDistrictLocation,
   fillEmptyDataArrayByKey,
   EVENT_TYPE
@@ -105,6 +105,31 @@ export const location = {
   }
 }
 
+const office = {
+  id: '0d8474da-0361-4d32-979e-af91f012340a',
+  name: 'Moktarpur Union Parishad',
+  alias: ['মোক্তারপুর ইউনিয়ন পরিষদ'],
+  physicalType: {
+    coding: [
+      {
+        code: 'bu',
+        display: 'Building'
+      }
+    ]
+  },
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/location-type',
+        code: 'CRVS_OFFICE'
+      }
+    ]
+  },
+  partOf: {
+    reference: 'Location/7a18cb4c-38f3-449f-b3dc-508473d485f3'
+  }
+}
+
 describe('verify metrics util', () => {
   describe('verify calculateInterval', () => {
     it('Should return 365d', () => {
@@ -151,6 +176,25 @@ describe('verify metrics util', () => {
         estimationYear: 2017
       })
     })
+    it('Returns 0 as estimations for an office', async () => {
+      const result = await fetchEstimateByLocation(
+        office,
+        EVENT_TYPE.BIRTH,
+        {
+          Authorization: 'Bearer token'
+        },
+        '2016-04-05T14:48:00.000Z',
+        '2017-04-05T14:48:00.000Z'
+      )
+      expect(result).toEqual({
+        totalEstimation: 0,
+        femaleEstimation: 0,
+        maleEstimation: 0,
+        locationId: '0d8474da-0361-4d32-979e-af91f012340a',
+        locationLevel: '',
+        estimationYear: 2017
+      })
+    })
     it('Returns estimate properly for death', async () => {
       const clonedLocation = cloneDeep(location)
       // Emptying male population data for latest year
@@ -182,32 +226,6 @@ describe('verify metrics util', () => {
         locationLevel: 'DISTRICT',
         estimationYear: 2017
       })
-    })
-    it('Throws error if location doesnot have extension', async () => {
-      expect(
-        fetchEstimateByLocation(
-          { id: '' },
-          EVENT_TYPE.BIRTH,
-          {
-            Authorization: 'Bearer token'
-          },
-          '2016-04-05T14:48:00.000Z',
-          '2017-04-05T14:48:00.000Z'
-        )
-      ).rejects.toThrowError('Invalid location data found')
-    })
-    it('Throws error if location is not partOf address', async () => {
-      expect(
-        fetchEstimateByLocation(
-          { id: '', extension: [] },
-          EVENT_TYPE.BIRTH,
-          {
-            Authorization: 'Bearer token'
-          },
-          '2016-04-05T14:48:00.000Z',
-          '2017-04-05T14:48:00.000Z'
-        )
-      ).rejects.toThrowError('Unable to fetch estimate data from location tree')
     })
     it('Returns the estimatedFigures for right location', async () => {
       const result = await fetchEstimateByLocation(
@@ -297,12 +315,12 @@ describe('verify metrics util', () => {
       ).rejects.toThrowError('No district location found')
     })
   })
-  describe('verify fetchEstimateFor45DaysByLocationId', () => {
+  describe('verify fetchEstimateForTargetDaysByLocationId', () => {
     it('Returns estimate properly', async () => {
       // @ts-ignore
       jest.spyOn(api, 'fetchFHIR').mockReturnValue(location)
 
-      const result = await fetchEstimateFor45DaysByLocationId(
+      const result = await fetchEstimateForTargetDaysByLocationId(
         'Location/0eaa73dd-2a21-4998-b1e6-b08430595201',
         EVENT_TYPE.BIRTH,
         {
@@ -312,9 +330,9 @@ describe('verify metrics util', () => {
         '2017-04-05T14:48:00.000Z'
       )
       expect(result).toEqual({
-        femaleEstimation: 3214,
-        maleEstimation: 3187,
-        totalEstimation: 6401,
+        totalEstimation: 51916,
+        femaleEstimation: 26068,
+        maleEstimation: 25847,
         locationId: '0eaa73dd-2a21-4998-b1e6-b08430595201',
         locationLevel: 'DISTRICT',
         estimationYear: 2017

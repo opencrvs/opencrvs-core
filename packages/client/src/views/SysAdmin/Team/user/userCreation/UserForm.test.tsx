@@ -19,7 +19,7 @@ import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { waitForElement } from '@client/tests/wait-for-element'
 
-const { store } = createStore()
+const { store, history } = createStore()
 
 describe('Create new user page tests', () => {
   let component: ReactWrapper
@@ -33,7 +33,8 @@ describe('Create new user page tests', () => {
         facilities: mockOfflineData.facilities,
         pilotLocations: mockOfflineData.pilotLocations,
         offices: mockOfflineData.offices,
-        assets: mockOfflineData.assets
+        assets: mockOfflineData.assets,
+        config: mockOfflineData.config
       })
     )
     const testComponent = await createTestComponent(
@@ -49,9 +50,9 @@ describe('Create new user page tests', () => {
         nextGroupId="preview-user-view-group"
         nextSectionId="preview"
       />,
-      store
+      { store, history }
     )
-    component = testComponent.component
+    component = testComponent
   })
 
   it('it checks component has loaded', () => {
@@ -65,12 +66,12 @@ describe('Create new user page tests', () => {
   })
 
   it('performs auto complete search among offline data', () => {
-    component
-      .find('#locationSearchInput')
-      .hostNodes()
-      .simulate('change', {
-        target: { value: 'Moktarpur', id: 'locationSearchInput' }
-      })
+    const locationInput = component.find(`input#registrationOffice`).hostNodes()
+
+    locationInput.simulate('change', {
+      target: { id: `input#registrationOffice`, value: 'moktarpur' }
+    })
+    locationInput.simulate('focus')
 
     const autoCompleteSuggestion = component
       .find('#locationOption0d8474da-0361-4d32-979e-af91f012340a')
@@ -80,12 +81,12 @@ describe('Create new user page tests', () => {
 
   it('clicking on autocomplete suggestion modifies draft', () => {
     expect(store.getState().userForm.userFormData).toEqual({})
-    component
-      .find('#locationSearchInput')
-      .hostNodes()
-      .simulate('change', {
-        target: { value: 'Moktarpur', id: 'locationSearchInput' }
-      })
+    const locationInput = component.find(`input#registrationOffice`).hostNodes()
+
+    locationInput.simulate('change', {
+      target: { id: `input#registrationOffice`, value: 'moktarpur' }
+    })
+    locationInput.simulate('focus')
 
     const autoCompleteSuggestion = component
       .find('#locationOption0d8474da-0361-4d32-979e-af91f012340a')

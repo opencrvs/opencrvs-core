@@ -34,6 +34,7 @@ export const influx = new Influx.InfluxDB({
       tags: [
         'regStatus',
         'gender',
+        'officeLocation',
         'locationLevel5',
         'locationLevel4',
         'locationLevel3',
@@ -53,6 +54,7 @@ export const influx = new Influx.InfluxDB({
         'gender',
         'mannerOfDeath',
         'causeOfDeath',
+        'officeLocation',
         'locationLevel5',
         'locationLevel4',
         'locationLevel3',
@@ -87,6 +89,7 @@ export const influx = new Influx.InfluxDB({
         'trackingId',
         'eventType',
         'practitionerId',
+        'officeLocation',
         'locationLevel5',
         'locationLevel4',
         'locationLevel3',
@@ -111,6 +114,22 @@ export const influx = new Influx.InfluxDB({
       },
       tags: [
         'eventType',
+        'officeLocation',
+        'locationLevel5',
+        'locationLevel4',
+        'locationLevel3',
+        'locationLevel2'
+      ]
+    },
+    {
+      measurement: 'correction_payment',
+      fields: {
+        total: Influx.FieldType.FLOAT,
+        compositionId: Influx.FieldType.STRING
+      },
+      tags: [
+        'eventType',
+        'officeLocation',
         'locationLevel5',
         'locationLevel4',
         'locationLevel3',
@@ -127,6 +146,7 @@ export const influx = new Influx.InfluxDB({
       tags: [
         'eventType',
         'practitionerId',
+        'officeLocation',
         'locationLevel5',
         'locationLevel4',
         'locationLevel3',
@@ -141,6 +161,7 @@ export const influx = new Influx.InfluxDB({
       tags: [
         'eventType',
         'startedBy',
+        'officeLocation',
         'locationLevel5',
         'locationLevel4',
         'locationLevel3',

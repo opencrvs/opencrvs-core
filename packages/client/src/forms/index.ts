@@ -481,6 +481,7 @@ export interface IDateFormField extends IFormFieldBase {
 }
 export interface ITextareaFormField extends IFormFieldBase {
   type: typeof TEXTAREA
+  maxLength?: number
 }
 export interface ISubsectionFormField extends IFormFieldBase {
   type: typeof SUBSECTION
@@ -660,11 +661,11 @@ export interface IConditionals {
   identifierIDSelected: IConditional
   otherRelationship: IConditional
   fatherContactDetailsRequired: IConditional
-  withIn45Days: IConditional
+  withInTargetDays: IConditional
   between46daysTo5yrs: IConditional
   after5yrs: IConditional
   deceasedNationIdSelected: IConditional
-  isRegistrarOrRegistrationAgentRoleSelected: IConditional
+  isRegistrarRoleSelected: IConditional
   certCollectorOther: IConditional
   userAuditReasonSpecified: IConditional
   userAuditReasonOther: IConditional
@@ -822,6 +823,10 @@ export enum ReviewSection {
   Review = 'review'
 }
 
+export enum InformantSection {
+  Registration = 'registration'
+}
+
 export type Section =
   | ReviewSection
   | PaymentSection
@@ -829,6 +834,7 @@ export type Section =
   | DeathSection
   | UserSection
   | CertificateSection
+  | InformantSection
 
 export interface IFormSection {
   id: Section
@@ -961,6 +967,7 @@ export interface Ii18nNumberFormField extends Ii18nFormFieldBase {
   type: typeof NUMBER
   step?: number
   max?: number
+  inputFieldWidth?: string
 }
 
 export interface Ii18nBigNumberFormField extends Ii18nFormFieldBase {
@@ -979,6 +986,7 @@ export interface Ii18nDateFormField extends Ii18nFormFieldBase {
 }
 export interface Ii18nTextareaFormField extends Ii18nFormFieldBase {
   type: typeof TEXTAREA
+  maxLength?: number
 }
 export interface Ii18nSubsectionFormField extends Ii18nFormFieldBase {
   type: typeof SUBSECTION

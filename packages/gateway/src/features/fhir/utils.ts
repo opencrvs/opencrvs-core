@@ -32,7 +32,12 @@ import {
   REASON_MOTHER_NOT_APPLYING,
   REASON_FATHER_NOT_APPLYING,
   REASON_CAREGIVER_NOT_APPLYING,
-  createPractitionerEntryTemplate
+  createPractitionerEntryTemplate,
+  BIRTH_CORRECTION_ENCOUNTER_CODE,
+  DEATH_CORRECTION_ENCOUNTER_CODE,
+  CORRECTION_CERTIFICATE_DOCS_CODE,
+  CORRECTION_CERTIFICATE_DOCS_TITLE,
+  CORRECTION_CERTIFICATE_DOCS_CONTEXT_KEY
 } from '@gateway/features/fhir/templates'
 import {
   ITemplatedBundle,
@@ -59,11 +64,11 @@ import {
   GQLGenderBasisTotalCount,
   GQLCertificationPaymentDetailsMetrics,
   GQLCertificationPaymentTotalCount,
-  GQLEstimate45DayTotalCount,
-  GQLEstimated45DayMetrics,
-  GQLMonthWise45DayEstimation,
-  GQLLocationWise45DayEstimation,
-  GQLEventIn45DayEstimationCount
+  GQLEstimateTargetDayTotalCount,
+  GQLEstimatedTargetDayMetrics,
+  GQLMonthWiseTargetDayEstimation,
+  GQLLocationWiseTargetDayEstimation,
+  GQLEventInTargetDayEstimationCount
 } from '@gateway/graphql/schema'
 import { reduce } from 'lodash'
 
@@ -93,7 +98,7 @@ export function findCompositionSection(
       if (!section.code || !section.code.coding || !section.code.coding.some) {
         return false
       }
-      return section.code.coding.some(coding => coding.code === code)
+      return section.code.coding.some((coding) => coding.code === code)
     })
   )
 }
@@ -120,7 +125,7 @@ export function selectOrCreatePersonResource(
     }
     const personSectionEntry = section.entry[0]
     personEntry = fhirBundle.entry.find(
-      entry => entry.fullUrl === personSectionEntry.reference
+      (entry) => entry.fullUrl === personSectionEntry.reference
     )
   }
 
@@ -135,13 +140,18 @@ export function selectOrCreatePersonResource(
 
 export function selectOrCreateEncounterResource(
   fhirBundle: ITemplatedBundle,
-  context: any
+  context: any,
+  isCorrection?: boolean
 ): fhir.Encounter {
   let sectionCode
   if (context.event === EVENT_TYPE.BIRTH) {
-    sectionCode = BIRTH_ENCOUNTER_CODE
+    sectionCode = isCorrection
+      ? BIRTH_CORRECTION_ENCOUNTER_CODE
+      : BIRTH_ENCOUNTER_CODE
   } else if (context.event === EVENT_TYPE.DEATH) {
-    sectionCode = DEATH_ENCOUNTER_CODE
+    sectionCode = isCorrection
+      ? DEATH_CORRECTION_ENCOUNTER_CODE
+      : DEATH_ENCOUNTER_CODE
   } else {
     throw new Error(`Unknown event ${context}`)
   }
@@ -160,7 +170,7 @@ export function selectOrCreateEncounterResource(
     }
     const encounterSectionEntry = section.entry[0]
     encounterEntry = fhirBundle.entry.find(
-      entry => entry.fullUrl === encounterSectionEntry.reference
+      (entry) => entry.fullUrl === encounterSectionEntry.reference
     )
   }
 
@@ -182,7 +192,7 @@ export function selectOrCreateObservationResource(
   fhirBundle: ITemplatedBundle,
   context: any
 ): fhir.Observation {
-  let observation = fhirBundle.entry.find(entry => {
+  let observation = fhirBundle.entry.find((entry) => {
     if (
       !entry ||
       !entry.resource ||
@@ -195,7 +205,7 @@ export function selectOrCreateObservationResource(
       observationEntry.code &&
       observationEntry.code.coding &&
       observationEntry.code.coding.find(
-        obCode => obCode.code === observationCode
+        (obCode) => obCode.code === observationCode
       )
     if (obCoding) {
       return true
@@ -255,7 +265,7 @@ export function selectObservationResource(
   fhirBundle: ITemplatedBundle
 ): fhir.Observation | undefined {
   let observation
-  fhirBundle.entry.forEach(entry => {
+  fhirBundle.entry.forEach((entry) => {
     if (
       !entry ||
       !entry.resource ||
@@ -266,7 +276,7 @@ export function selectObservationResource(
         observationEntry.code &&
         observationEntry.code.coding &&
         observationEntry.code.coding.find(
-          obCode => obCode.code === observationCode
+          (obCode) => obCode.code === observationCode
         )
       if (obCoding) {
         observation = observationEntry
@@ -292,7 +302,7 @@ export async function removeObservationResource(
         observationEntry.code &&
         observationEntry.code.coding &&
         observationEntry.code.coding.find(
-          obCode => obCode.code === observationCode
+          (obCode) => obCode.code === observationCode
         )
       if (obCoding) {
         fhirBundle.entry.splice(index, 1)
@@ -336,7 +346,7 @@ export function createObservationResource(
   }
   const encounterSectionEntry = section.entry[0]
   const encounterEntry = fhirBundle.entry.find(
-    entry => entry.fullUrl === encounterSectionEntry.reference
+    (entry) => entry.fullUrl === encounterSectionEntry.reference
   )
   if (encounterEntry && encounter) {
     observationEntry.resource.context = {
@@ -354,8 +364,15 @@ export function selectOrCreateLocationRefResource(
   context: any
 ): fhir.Location {
   let locationEntry
-
-  const encounter = selectOrCreateEncounterResource(fhirBundle, context)
+  const isCorrection = [
+    BIRTH_CORRECTION_ENCOUNTER_CODE,
+    DEATH_CORRECTION_ENCOUNTER_CODE
+  ].includes(sectionCode)
+  const encounter = selectOrCreateEncounterResource(
+    fhirBundle,
+    context,
+    isCorrection
+  )
 
   if (!encounter.location) {
     // create location
@@ -372,7 +389,7 @@ export function selectOrCreateLocationRefResource(
     }
     const locationElement = encounter.location[0]
     locationEntry = fhirBundle.entry.find(
-      entry => entry.fullUrl === locationElement.location.reference
+      (entry) => entry.fullUrl === locationElement.location.reference
     )
   }
 
@@ -417,7 +434,7 @@ export function selectOrCreateEncounterPartitioner(
     fhirBundle.entry.push(practitioner)
   } else {
     practitioner = fhirBundle.entry.find(
-      entry => entry.fullUrl === encounterParticipant.individual?.reference
+      (entry) => entry.fullUrl === encounterParticipant.individual?.reference
     )
     if (!practitioner) {
       throw new Error(
@@ -430,9 +447,14 @@ export function selectOrCreateEncounterPartitioner(
 
 export function selectOrCreateEncounterLocationRef(
   fhirBundle: ITemplatedBundle,
-  context: any
+  context: any,
+  correction?: boolean
 ): fhir.Reference {
-  const encounter = selectOrCreateEncounterResource(fhirBundle, context)
+  const encounter = selectOrCreateEncounterResource(
+    fhirBundle,
+    context,
+    correction
+  )
   if (!encounter.location) {
     encounter.location = []
     encounter.location.push({
@@ -484,7 +506,7 @@ export function selectOrCreateDocRefResource(
       fhirBundle.entry.push(docRef)
     } else {
       docRef = fhirBundle.entry.find(
-        entry => entry.fullUrl === docSectionEntry.reference
+        (entry) => entry.fullUrl === docSectionEntry.reference
       )
       if (!docRef) {
         const ref = uuid()
@@ -503,14 +525,26 @@ export function selectOrCreateDocRefResource(
 export function selectOrCreateCertificateDocRefResource(
   fhirBundle: ITemplatedBundle,
   context: any,
-  eventType: string
+  eventType: string,
+  isCorrection?: boolean
 ): fhir.DocumentReference {
+  const certificate = isCorrection
+    ? {
+        code: CORRECTION_CERTIFICATE_DOCS_CODE,
+        title: CORRECTION_CERTIFICATE_DOCS_TITLE,
+        indexKey: CORRECTION_CERTIFICATE_DOCS_CONTEXT_KEY
+      }
+    : {
+        code: CERTIFICATE_DOCS_CODE,
+        title: CERTIFICATE_DOCS_TITLE,
+        indexKey: CERTIFICATE_CONTEXT_KEY
+      }
   const docRef = selectOrCreateDocRefResource(
-    CERTIFICATE_DOCS_CODE,
-    CERTIFICATE_DOCS_TITLE,
+    certificate.code,
+    certificate.title,
     fhirBundle,
     context,
-    CERTIFICATE_CONTEXT_KEY
+    certificate.indexKey
   )
   if (!docRef.type) {
     docRef.type = {
@@ -547,7 +581,7 @@ export function selectOrCreateInformantSection(
     }
     const personSectionEntry = section.entry[0]
     informantEntry = fhirBundle.entry.find(
-      entry => entry.fullUrl === personSectionEntry.reference
+      (entry) => entry.fullUrl === personSectionEntry.reference
     )
   }
 
@@ -579,7 +613,7 @@ export function selectOrCreateInformantResource(
     return personEntry.resource as fhir.Patient
   } else {
     const personEntry = fhirBundle.entry.find(
-      entry => entry.fullUrl === patientRef
+      (entry) => entry.fullUrl === patientRef
     )
     if (!personEntry) {
       throw new Error(
@@ -604,7 +638,7 @@ export function selectOrCreateRelatedPersonResource(
     docRef.extension = []
   }
   const relatedPersonExt = docRef.extension.find(
-    extention =>
+    (extention) =>
       extention.url === `${OPENCRVS_SPECIFICATION_URL}extension/collector`
   )
   if (!relatedPersonExt) {
@@ -618,7 +652,7 @@ export function selectOrCreateRelatedPersonResource(
     })
     return relatedPersonEntry.resource
   } else {
-    const relatedPersonEntry = fhirBundle.entry.find(entry => {
+    const relatedPersonEntry = fhirBundle.entry.find((entry) => {
       if (!relatedPersonExt.valueReference) {
         return false
       }
@@ -652,7 +686,7 @@ export function selectOrCreateCollectorPersonResource(
     return personEntry.resource as fhir.Patient
   } else {
     const personEntry = fhirBundle.entry.find(
-      entry => entry.fullUrl === patientRef
+      (entry) => entry.fullUrl === patientRef
     )
     if (!personEntry) {
       throw new Error(
@@ -673,7 +707,7 @@ export async function setCertificateCollectorReference(
   if (section && section.entry) {
     const personSectionEntry = section.entry[0]
     const personEntry = fhirBundle.entry.find(
-      entry => entry.fullUrl === personSectionEntry.reference
+      (entry) => entry.fullUrl === personSectionEntry.reference
     )
     if (!personEntry) {
       throw new Error('Expected person entry not found on the bundle')
@@ -705,7 +739,7 @@ export async function setPrimaryCaregiverReference(
   if (section && section.entry) {
     const personSectionEntry = section.entry[0]
     const personEntry = fhirBundle.entry.find(
-      entry => entry.fullUrl === personSectionEntry.reference
+      (entry) => entry.fullUrl === personSectionEntry.reference
     )
     if (!personEntry) {
       throw new Error('Expected person entry not found on the bundle')
@@ -719,18 +753,20 @@ export async function setPrimaryCaregiverReference(
 export function selectOrCreatePaymentReconciliationResource(
   fhirBundle: ITemplatedBundle,
   context: any,
-  eventType: string
+  eventType: string,
+  isCorrection?: boolean
 ): fhir.PaymentReconciliation {
   const docRef = selectOrCreateCertificateDocRefResource(
     fhirBundle,
     context,
-    eventType
+    eventType,
+    isCorrection
   )
   if (!docRef.extension) {
     docRef.extension = []
   }
   const paymentExt = docRef.extension.find(
-    extention =>
+    (extention) =>
       extention.url === `${OPENCRVS_SPECIFICATION_URL}extension/payment`
   )
   if (!paymentExt) {
@@ -744,7 +780,7 @@ export function selectOrCreatePaymentReconciliationResource(
     })
     return paymentEntry.resource
   } else {
-    const paymentEntry = fhirBundle.entry.find(entry => {
+    const paymentEntry = fhirBundle.entry.find((entry) => {
       if (!paymentExt.valueReference) {
         return false
       }
@@ -763,7 +799,7 @@ export function selectOrCreateTaskRefResource(
 ): fhir.Task {
   let taskEntry =
     fhirBundle.entry &&
-    fhirBundle.entry.find(entry => {
+    fhirBundle.entry.find((entry) => {
       if (entry.resource && entry.resource.resourceType === 'Task') {
         return true
       }
@@ -783,17 +819,26 @@ export function selectOrCreateTaskRefResource(
 export function setObjectPropInResourceArray(
   resource: fhir.Resource,
   label: string,
-  value: string | string[],
+  value: string | string[] | object,
   propName: string,
-  context: any
+  context: any,
+  contextProperty?: string
 ) {
   if (!resource[label]) {
     resource[label] = []
   }
-  if (!resource[label][context._index[label]]) {
-    resource[label][context._index[label]] = {}
+
+  if (contextProperty) {
+    if (!resource[label][context._index[contextProperty]]) {
+      resource[label][context._index[contextProperty]] = {}
+    }
+    resource[label][context._index[contextProperty]][propName] = value
+  } else {
+    if (!resource[label][context._index[label]]) {
+      resource[label][context._index[label]] = {}
+    }
+    resource[label][context._index[label]][propName] = value
   }
-  resource[label][context._index[label]][propName] = value
 }
 
 export function setArrayPropInResourceObject(
@@ -880,10 +925,10 @@ export const fetchFHIR = (
     },
     body
   })
-    .then(response => {
+    .then((response) => {
       return response.json()
     })
-    .catch(error => {
+    .catch((error) => {
       return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
     })
 }
@@ -900,10 +945,10 @@ export const postSearch = (
     },
     body: JSON.stringify(criteria)
   })
-    .then(response => {
+    .then((response) => {
       return response.json()
     })
-    .catch(error => {
+    .catch((error) => {
       return Promise.reject(
         new Error(`Search request failed: ${error.message}`)
       )
@@ -925,10 +970,10 @@ export const getMetrics = (
       }
     }
   )
-    .then(response => {
+    .then((response) => {
       return response.json()
     })
-    .catch(error => {
+    .catch((error) => {
       return Promise.reject(
         new Error(`Metrics request failed: ${error.message}`)
       )
@@ -944,13 +989,14 @@ export const postMetrics = (
     method: 'POST',
     body: JSON.stringify(payload),
     headers: {
+      'Content-Type': 'application/json',
       ...authHeader
     }
   })
-    .then(response => {
+    .then((response) => {
       return response.json()
     })
-    .catch(error => {
+    .catch((error) => {
       return Promise.reject(
         new Error(`Metrics request failed: ${error.message}`)
       )
@@ -969,10 +1015,10 @@ export const getTimeLoggedFromMetrics = async (
       ...authHeader
     }
   })
-    .then(response => {
+    .then((response) => {
       return response.json()
     })
-    .catch(error => {
+    .catch((error) => {
       return Promise.reject(
         new Error(`Time logged from metrics request failed: ${error.message}`)
       )
@@ -990,10 +1036,10 @@ export const getEventDurationsFromMetrics = async (
       ...authHeader
     }
   })
-    .then(response => {
+    .then((response) => {
       return response.json()
     })
-    .catch(error => {
+    .catch((error) => {
       return Promise.reject(
         new Error(
           `Event Durations from metrics request failed: ${error.message}`
@@ -1120,7 +1166,7 @@ export async function setInformantReference(
   if (section && section.entry) {
     const personSectionEntry = section.entry[0]
     const personEntry = fhirBundle.entry.find(
-      entry => entry.fullUrl === personSectionEntry.reference
+      (entry) => entry.fullUrl === personSectionEntry.reference
     )
     if (!personEntry) {
       logger.error('Expected person entry not found on the bundle')
@@ -1148,8 +1194,8 @@ export function timeFrameTotalCalculator(
   timeFrameMetrics: Array<GQLTimeFrameDetailMetrics>
 ): GQLTimeFrameTotalCount {
   const initialValue: GQLTimeFrameTotalCount = {
-    regWithin45d: 0,
-    regWithin45dTo1yr: 0,
+    regWithinTargetd: 0,
+    regWithinTargetdTo1yr: 0,
     regWithin1yrTo5yr: 0,
     regOver5yr: 0,
     total: 0
@@ -1157,19 +1203,24 @@ export function timeFrameTotalCalculator(
   return reduce(
     timeFrameMetrics,
     (accumulator, item) => {
-      const regWithin45d = accumulator.regWithin45d + item.regWithin45d
-      const regWithin45dTo1yr =
-        accumulator.regWithin45dTo1yr + item.regWithin45dTo1yr
+      const regWithinTargetd =
+        accumulator.regWithinTargetd + item.regWithinTargetd
+      const regWithinTargetdTo1yr =
+        accumulator.regWithinTargetdTo1yr + item.regWithinTargetdTo1yr
       const regWithin1yrTo5yr =
         accumulator.regWithin1yrTo5yr + item.regWithin1yrTo5yr
       const regOver5yr = accumulator.regOver5yr + item.regOver5yr
 
       return {
-        regWithin45d,
-        regWithin45dTo1yr,
+        regWithinTargetd,
+        regWithinTargetdTo1yr,
         regWithin1yrTo5yr,
         regOver5yr,
-        total: regWithin45d + regWithin45dTo1yr + regWithin1yrTo5yr + regOver5yr
+        total:
+          regWithinTargetd +
+          regWithinTargetdTo1yr +
+          regWithin1yrTo5yr +
+          regOver5yr
       }
     },
     initialValue
@@ -1206,28 +1257,30 @@ export function genderBasisTotalCalculator(
   )
 }
 
-export function estimated45DayMetricsTotalCalculator(
-  estimated45DayMetrics: Array<GQLEstimated45DayMetrics>
-): GQLEstimate45DayTotalCount {
-  const initialValue: GQLEstimate45DayTotalCount = {
+export function estimatedTargetDayMetricsTotalCalculator(
+  estimatedTargetDayMetrics: Array<GQLEstimatedTargetDayMetrics>
+): GQLEstimateTargetDayTotalCount {
+  const initialValue: GQLEstimateTargetDayTotalCount = {
     estimatedRegistration: 0,
-    registrationIn45Day: 0,
+    registrationInTargetDay: 0,
     estimationPercentage: 0
   }
   return reduce(
-    estimated45DayMetrics,
+    estimatedTargetDayMetrics,
     (accumulator, item) => {
       const estimatedRegistration =
         accumulator.estimatedRegistration + item.estimatedRegistration
-      const registrationIn45Day =
-        accumulator.registrationIn45Day + item.registrationIn45Day
+      const registrationInTargetDay =
+        accumulator.registrationInTargetDay + item.registrationInTargetDay
       return {
         estimatedRegistration,
-        registrationIn45Day,
+        registrationInTargetDay,
         estimationPercentage:
-          registrationIn45Day === 0 || estimatedRegistration === 0
+          registrationInTargetDay === 0 || estimatedRegistration === 0
             ? 0
-            : Math.round((registrationIn45Day / estimatedRegistration) * 100)
+            : Math.round(
+                (registrationInTargetDay / estimatedRegistration) * 100
+              )
       }
     },
     initialValue
@@ -1246,37 +1299,38 @@ export function paymentTotalCalculator(
   )
 }
 
-export function eventIn45DayEstimationCalculator(
-  eventIn45DayEstimations: Array<
-    GQLMonthWise45DayEstimation | GQLLocationWise45DayEstimation
+export function eventInTargetDayEstimationCalculator(
+  eventInTargetDayEstimations: Array<
+    GQLMonthWiseTargetDayEstimation | GQLLocationWiseTargetDayEstimation
   >
-): GQLEventIn45DayEstimationCount {
-  const initialValue: GQLEventIn45DayEstimationCount = {
+): GQLEventInTargetDayEstimationCount {
+  const initialValue: GQLEventInTargetDayEstimationCount = {
     actualTotalRegistration: 0,
-    actual45DayRegistration: 0,
+    actualTargetDayRegistration: 0,
     estimatedRegistration: 0,
-    estimated45DayPercentage: 0
+    estimatedTargetDayPercentage: 0
   }
   return reduce(
-    eventIn45DayEstimations,
+    eventInTargetDayEstimations,
     (accumulator, item) => {
       const actualTotalRegistration =
         accumulator.actualTotalRegistration + item.actualTotalRegistration
-      const actual45DayRegistration =
-        accumulator.actual45DayRegistration + item.actual45DayRegistration
+      const actualTargetDayRegistration =
+        accumulator.actualTargetDayRegistration +
+        item.actualTargetDayRegistration
       const estimatedRegistration =
         accumulator.estimatedRegistration + item.estimatedRegistration
 
       return {
         actualTotalRegistration,
-        actual45DayRegistration,
+        actualTargetDayRegistration,
         estimatedRegistration,
-        estimated45DayPercentage:
-          actual45DayRegistration === 0 || estimatedRegistration === 0
+        estimatedTargetDayPercentage:
+          actualTargetDayRegistration === 0 || estimatedRegistration === 0
             ? 0
             : Number(
                 (
-                  (actual45DayRegistration / estimatedRegistration) *
+                  (actualTargetDayRegistration / estimatedRegistration) *
                   100
                 ).toFixed(2)
               )

@@ -39,35 +39,28 @@ const StyledPage = styled.div<IPage>`
   @font-face {
     /* stylelint-disable-next-line opencrvs/no-font-styles */
     font-family: ${({ theme }) => theme.fonts.semiBoldFont};
-    src:
-      url('/fonts/notosans-semibold-webfont-en.ttf')
-      format('truetype');
+    src: url('/fonts/notosans-semibold-webfont-en.ttf') format('truetype');
   }
 
   @font-face {
     /* stylelint-disable-next-line opencrvs/no-font-styles */
     font-family: ${({ theme }) => theme.fonts.regularFont};
-    src:
-    url('/fonts/notosans-regular-webfont-en.ttf')
-      format('truetype');
+    src: url('/fonts/notosans-regular-webfont-en.ttf') format('truetype');
   }
 
   @font-face {
     /* stylelint-disable-next-line opencrvs/no-font-styles */
     font-family: ${({ theme }) => theme.fonts.semiBoldFont};
-    src:
-      url('/fonts/notosans-semibold-webfont-${languageFromProps}.ttf')
+    src: url('/fonts/notosans-semibold-webfont-${languageFromProps}.ttf')
       format('truetype');
   }
 
   @font-face {
     /* stylelint-disable-next-line opencrvs/no-font-styles */
     font-family: ${({ theme }) => theme.fonts.regularFont};
-    src:
-      url('/fonts/notosans-regular-webfont-${languageFromProps}.ttf')
+    src: url('/fonts/notosans-regular-webfont-${languageFromProps}.ttf')
       format('truetype');
   }
-
 `
 
 export class Page extends React.Component<IPage & RouteComponentProps<{}>> {

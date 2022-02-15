@@ -94,7 +94,7 @@ INFLUXDB_HOSTNAME=`echo $(docker service ps -f "desired-state=running" opencrvs_
 INFLUXDB_HOST=$(docker node inspect --format '{{.Status.Addr}}' "$HOSTNAME")
 INFLUXDB_SSH_USER=${INFLUXDB_SSH_USER:-root}
 
-# If required, SSH into the node running the opencrvs_metrics container and restore the metrics data from an influxdb subfolder 
+# If required, SSH into the node running the opencrvs_metrics container and restore the metrics data from an influxdb subfolder
 #------------------------------------------------------------------------------------------------------------------------------
 OWN_IP=`echo $(hostname -I | cut -d' ' -f1)`
 if [[ "$OWN_IP" = "$INFLUXDB_HOST" ]]; then

@@ -46,7 +46,7 @@ import {
   TRACKING_ID_TEXT
 } from '@client/utils/constants'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
-import { RowHistoryView } from '@opencrvs/client/src/views/RegistrationHome/RowHistoryView'
+import { RowHistoryView } from '@opencrvs/client/src/views/OfficeHome/RowHistoryView'
 import { Duplicate, Validate } from '@opencrvs/components/lib/icons'
 import {
   ColumnContentAlignment,
@@ -68,6 +68,7 @@ import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import { convertToMSISDN } from '@client/forms/utils'
 import { formattedDuration } from '@client/utils/date-formatting'
+import { Navigation } from '@client/components/interface/Navigation'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
@@ -78,6 +79,9 @@ const ErrorText = styled.div`
 
 const Container = styled.div`
   margin: 20px 0px 0px 0px;
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    margin-left: 249px;
+  }
 `
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -311,7 +315,7 @@ export class SearchResultView extends React.Component<
     const transformedData = transformData(data, this.props.intl)
     return transformedData.map((reg, index) => {
       const foundApplication = this.props.outboxApplications.find(
-        application => application.id === reg.id
+        (application) => application.id === reg.id
       )
       const actions: IAction[] = []
       const downloadStatus =
@@ -423,7 +427,7 @@ export class SearchResultView extends React.Component<
   renderExpandedComponent = (itemId: string, data: GQLQuery) => {
     const results = data && data.searchEvents && data.searchEvents.results
     const eventDetails =
-      results && results.find(result => result && result.id === itemId)
+      results && results.find((result) => result && result.id === itemId)
     return <RowHistoryView eventDetails={eventDetails} />
   }
 
@@ -442,6 +446,7 @@ export class SearchResultView extends React.Component<
           mobileSearchBar={true}
           enableMenuSelection={false}
         />
+        <Navigation />
         <Container>
           <HomeContent>
             {searchText && searchType && (
@@ -483,6 +488,7 @@ export class SearchResultView extends React.Component<
                       />
                     )
                   }
+
                   if (error || !data.searchEvents) {
                     return (
                       <ErrorText id="search-result-error-text">

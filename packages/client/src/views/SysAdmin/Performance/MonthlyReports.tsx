@@ -38,7 +38,7 @@ import { RouteComponentProps } from 'react-router'
 
 interface ReportProps {
   goToPerformanceReport: typeof goToPerformanceReport
-  offlineResources: IOfflineData
+  offlineCountryConfiguration: IOfflineData
 }
 
 const Actions = styled.div`
@@ -55,8 +55,8 @@ function downloadAllData() {
       Authorization: `Bearer ${getToken()}`
     }
   })
-    .then(resp => resp.blob())
-    .then(blob => {
+    .then((resp) => resp.blob())
+    .then((blob) => {
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
@@ -85,7 +85,7 @@ class MonthlyReportsComponent extends React.Component<Props, IState> {
   }
   getContent(eventType: Event) {
     moment.locale(this.props.intl.locale)
-    let content = []
+    const content = []
 
     const currentYear = moment().year()
     let currentMonth = 1
@@ -120,7 +120,9 @@ class MonthlyReportsComponent extends React.Component<Props, IState> {
     return content
   }
 
-  pushStateToTheCurrentRoute = (state: object) => {
+  pushStateToTheCurrentRoute = (state: {
+    selectedLocation: ISearchLocation
+  }) => {
     const {
       push,
       location: { pathname: currentRoute }
@@ -141,7 +143,7 @@ class MonthlyReportsComponent extends React.Component<Props, IState> {
   }
 
   render() {
-    const { intl, offlineResources } = this.props
+    const { intl, offlineCountryConfiguration } = this.props
 
     return (
       <>
@@ -149,7 +151,10 @@ class MonthlyReportsComponent extends React.Component<Props, IState> {
 
         <LocationSearch
           selectedLocation={this.state.selectedLocation}
-          locationList={generateLocations(offlineResources.locations)}
+          locationList={generateLocations(
+            offlineCountryConfiguration.locations,
+            intl
+          )}
           searchHandler={this.onClickSearchResult}
         />
 
@@ -211,7 +216,7 @@ class MonthlyReportsComponent extends React.Component<Props, IState> {
 
 function mapStateToProps(state: IStoreState) {
   return {
-    offlineResources: getOfflineData(state)
+    offlineCountryConfiguration: getOfflineData(state)
   }
 }
 

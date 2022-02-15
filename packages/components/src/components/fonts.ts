@@ -29,6 +29,10 @@ export interface IFonts {
   smallButtonStyle: string
   smallButtonStyleNoCapitalize: string
   chartLegendStyle: string
+  captionBold: string
+  captionBolder: string
+  multiColHeaderFont: string
+  multiColFont: string
 }
 
 // TODO: we need a way to load fonts for other languages without recompiling
@@ -122,12 +126,32 @@ export const fonts = (language: string): IFonts => {
       font-weight: normal;
       text-transform: capitalize;`,
     smallButtonStyleNoCapitalize: `font-family: ${semiBoldFont};
-        font-size: 14px;
-        font-weight: 600;
-        line-height: 150%;`,
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 150%;`,
     chartLegendStyle: `font-family: ${regularFont};
       font-size: 14px;
       font-weight: 400;
-      line-height: 21px;`
+      line-height: 21px;`,
+    captionBold: `font-family: ${semiBoldFont};
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 21px;
+    `,
+    captionBolder: `font-family: ${regularFont};
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 18px;
+    `,
+    multiColHeaderFont: `font-family:${semiBoldFont};
+    font-size: 14px;
+    line-height: 24px;
+    font-weight: 600;
+    `,
+    multiColFont: `font-family:${regularFont};
+    font-size: 14px;
+    line-height: 24px;
+    font-weight: normal;
+    `
   }
 }

@@ -42,56 +42,52 @@ describe('verify collector tests', () => {
     })
 
     it('when mother is collector renders idVerifier component', async () => {
-      const testComponent = (
-        await createTestComponent(
-          // @ts-ignore
-          <VerifyCollector
-            history={history}
-            match={{
-              params: {
-                registrationId: 'mockBirth1234',
-                eventType: Event.BIRTH,
-                collector: 'mother'
-              },
-              isExact: true,
-              path: '',
-              url: ''
-            }}
-          />,
-          store
-        )
-      ).component
+      const testComponent = await createTestComponent(
+        // @ts-ignore
+        <VerifyCollector
+          history={history}
+          match={{
+            params: {
+              registrationId: 'mockBirth1234',
+              eventType: Event.BIRTH,
+              collector: 'mother'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        { store, history }
+      )
 
       expect(testComponent.find('#idVerifier').hostNodes()).toHaveLength(1)
     })
 
     it('should takes user go back', async () => {
-      const testComponent = (
-        await createTestComponent(
-          // @ts-ignore
-          <VerifyCollector
-            history={history}
-            match={{
-              params: {
-                registrationId: 'mockBirth1234',
-                eventType: Event.BIRTH,
-                collector: 'mother'
-              },
-              isExact: true,
-              path: '',
-              url: ''
-            }}
-          />,
-          store
-        )
-      ).component
+      const testComponent = await createTestComponent(
+        // @ts-ignore
+        <VerifyCollector
+          history={history}
+          match={{
+            params: {
+              registrationId: 'mockBirth1234',
+              eventType: Event.BIRTH,
+              collector: 'mother'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        { store, history }
+      )
 
       testComponent
         .find('#action_page_back_button')
         .hostNodes()
         .simulate('click')
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
 
@@ -103,25 +99,23 @@ describe('verify collector tests', () => {
     describe('when father is collector', () => {
       let testComponent: ReactWrapper
       beforeEach(async () => {
-        testComponent = (
-          await createTestComponent(
-            // @ts-ignore
-            <VerifyCollector
-              history={history}
-              match={{
-                params: {
-                  registrationId: 'mockBirth1234',
-                  eventType: Event.BIRTH,
-                  collector: 'father'
-                },
-                isExact: true,
-                path: '',
-                url: ''
-              }}
-            />,
-            store
-          )
-        ).component
+        testComponent = await createTestComponent(
+          // @ts-ignore
+          <VerifyCollector
+            history={history}
+            match={{
+              params: {
+                registrationId: 'mockBirth1234',
+                eventType: Event.BIRTH,
+                collector: 'father'
+              },
+              isExact: true,
+              path: '',
+              url: ''
+            }}
+          />,
+          { store, history }
+        )
       })
 
       it('renders idVerifier compomnent', () => {
@@ -204,25 +198,23 @@ describe('verify collector tests', () => {
     })
 
     it('when informant is collector', async () => {
-      const testComponent = (
-        await createTestComponent(
-          // @ts-ignore
-          <VerifyCollector
-            history={history}
-            match={{
-              params: {
-                registrationId: 'mockDeath1234',
-                eventType: Event.DEATH,
-                collector: 'informant'
-              },
-              isExact: true,
-              path: '',
-              url: ''
-            }}
-          />,
-          store
-        )
-      ).component
+      const testComponent = await createTestComponent(
+        // @ts-ignore
+        <VerifyCollector
+          history={history}
+          match={{
+            params: {
+              registrationId: 'mockDeath1234',
+              eventType: Event.DEATH,
+              collector: 'informant'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        { store, history }
+      )
 
       expect(testComponent.find('#idVerifier').hostNodes()).toHaveLength(1)
     })

@@ -21,6 +21,7 @@ import { roleTypeResolvers } from '@gateway/features/role/type-resolvers'
 import { resolvers as searchRootResolvers } from '@gateway/features/search/root-resolvers'
 import { searchTypeResolvers } from '@gateway/features/search/type-resolvers'
 import { resolvers as userRootResolvers } from '@gateway/features/user/root-resolvers'
+import { resolvers as correctionRootResolvers } from '@gateway/features/correction/root-resolvers'
 import {
   IUserModelData,
   userTypeResolvers
@@ -59,7 +60,8 @@ const resolvers: StringIndexed<IResolvers> = merge(
   searchTypeResolvers as IResolvers,
   roleRootResolvers as IResolvers,
   roleTypeResolvers as IResolvers,
-  certificateResolvers as IResolvers
+  certificateResolvers as IResolvers,
+  correctionRootResolvers as IResolvers
 )
 
 export const getExecutableSchema = (): GraphQLSchema => {

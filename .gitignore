@@ -2,6 +2,8 @@
 
 # dependencies
 node_modules
+opencrvs-farajaland
+opencrvs-farajaland
 package-lock.json
 
 # testing
@@ -18,6 +20,7 @@ build
 # But, keep the .gitignore so the folder is created
 !.secrets/.gitignore
 .idea
+.vim
 data
 grafana
 

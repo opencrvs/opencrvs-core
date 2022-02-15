@@ -11,13 +11,10 @@
  */
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
-import {
-  buttonMessages,
-  constantsMessages,
-  userMessages
-} from '@client/i18n/messages'
+import { constantsMessages, userMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/header'
 import {
+  goToConfig,
   goToEvents as goToEventsAction,
   goToHome,
   goToOperationalReport,
@@ -36,35 +33,22 @@ import { IStoreState } from '@client/store'
 import { withTheme } from '@client/styledComponents'
 import {
   BRN_DRN_TEXT,
-  FIELD_AGENT_ROLES,
   NAME_TEXT,
+  NATL_ADMIN_ROLES,
   PHONE_TEXT,
-  SYS_ADMIN_ROLES,
   TRACKING_ID_TEXT
 } from '@client/utils/constants'
 import { getIndividualNameObj, IUserDetails } from '@client/utils/userUtils'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import {
-  ApplicationBlack,
-  ApplicationBlue,
   ArrowBack,
   BRN,
-  Hamburger,
-  HelpBlack,
-  HelpBlue,
   Location,
-  LogoutBlack,
-  LogoutBlue,
   Phone,
   Plus,
   SearchDark,
-  SettingsBlack,
-  SettingsBlue,
-  StatsBlack,
-  StatsBlue,
   TrackingID,
-  User,
-  Users
+  User
 } from '@opencrvs/components/lib/icons'
 import {
   AppHeader,
@@ -78,6 +62,8 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
+import { Navigation } from '@client/components/interface/Navigation'
+import { Avatar } from '@client/components/Avatar'
 
 type IProps = IntlShapeProps & {
   theme: ITheme
@@ -89,6 +75,7 @@ type IProps = IntlShapeProps & {
   goToSearch: typeof goToSearch
   goToSettings: typeof goToSettings
   goToHomeAction: typeof goToHome
+  goToConfigAction: typeof goToConfig
   goToPerformanceHomeAction: typeof goToPerformanceHome
   goToPerformanceReportListAction: typeof goToPerformanceReportList
   goToOperationalReportAction: typeof goToOperationalReport
@@ -109,6 +96,7 @@ interface IState {
 
 enum ACTIVE_MENU_ITEM {
   APPLICATIONS,
+  CONFIG,
   PERFORMANCE,
   TEAM,
   USERS
@@ -149,71 +137,22 @@ class HeaderComp extends React.Component<IProps, IState> {
         ? intl.formatMessage(userMessages[userDetails.role])
         : ''
 
-    let menuItems: any[] = []
-    if (userDetails && userDetails.role) {
-      if (!SYS_ADMIN_ROLES.includes(userDetails.role)) {
-        menuItems = menuItems.concat([
-          {
-            icon: <ApplicationBlack />,
-            iconHover: <ApplicationBlue />,
-            label: this.props.intl.formatMessage(
-              constantsMessages.applicationTitle
-            ),
-            onClick: this.props.goToHomeAction
-          }
-        ])
-      }
-      if (!FIELD_AGENT_ROLES.includes(userDetails.role)) {
-        menuItems = menuItems.concat([
-          {
-            icon: <StatsBlack />,
-            iconHover: <StatsBlue />,
-            label: this.props.intl.formatMessage(
-              constantsMessages.performanceTitle
-            ),
-            onClick: () => this.goToPerformanceView(this.props)
-          },
-          {
-            icon: <Users />,
-            iconHover: <Users stroke={this.props.theme.colors.secondary} />,
-            label: this.props.intl.formatMessage(messages.teamTitle),
-            onClick: () => this.goToTeamView(this.props)
-          }
-        ])
-      }
-    }
-    menuItems = menuItems.concat([
-      {
-        icon: <SettingsBlack />,
-        iconHover: <SettingsBlue />,
-        label: this.props.intl.formatMessage(messages.settingsTitle),
-        onClick: this.props.goToSettings
-      },
-      {
-        icon: <HelpBlack />,
-        iconHover: <HelpBlue />,
-        label: this.props.intl.formatMessage(messages.helpTitle),
-        onClick: () => alert('Help!')
-      },
-      {
-        icon: <LogoutBlack />,
-        iconHover: <LogoutBlue />,
-        label: this.props.intl.formatMessage(buttonMessages.logout),
-        secondary: true,
-        onClick: this.logout
-      }
-    ])
+    const avatar = <Avatar name={name} avatar={userDetails?.avatar} />
 
-    const userInfo = { name, role }
+    const userInfo = { name, role, avatar }
 
     return (
       <>
-        <Hamburger />
         <ExpandingMenu
-          menuItems={menuItems}
-          userDetails={userInfo}
           showMenu={this.state.showMenu}
-          menuCollapse={() => false}
+          menuCollapse={() => this.toggleMenu()}
+          navigation={() => (
+            <Navigation
+              navigationWidth={320}
+              menuCollapse={() => this.toggleMenu()}
+              userInfo={userInfo}
+            />
+          )}
         />
       </>
     )
@@ -281,7 +220,7 @@ class HeaderComp extends React.Component<IProps, IState> {
   }
 
   toggleMenu = () => {
-    this.setState(prevState => ({ showMenu: !prevState.showMenu }))
+    this.setState((prevState) => ({ showMenu: !prevState.showMenu }))
   }
 
   renderSearchInput(props: IProps, isMobile?: boolean) {
@@ -336,22 +275,16 @@ class HeaderComp extends React.Component<IProps, IState> {
   goToTeamView(props: IProps) {
     const { userDetails, goToTeamUserListAction, goToTeamSearchAction } = props
     if (userDetails && userDetails.role) {
-      if (SYS_ADMIN_ROLES.includes(userDetails.role)) {
+      if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
         return goToTeamSearchAction()
       } else {
-        return goToTeamUserListAction(
-          {
-            id:
-              (userDetails.primaryOffice && userDetails.primaryOffice.id) || '',
-            searchableText:
-              (userDetails.primaryOffice && userDetails.primaryOffice.name) ||
-              '',
-            displayLabel:
-              (userDetails.primaryOffice && userDetails.primaryOffice.name) ||
-              ''
-          },
-          true
-        )
+        return goToTeamUserListAction({
+          id: (userDetails.primaryOffice && userDetails.primaryOffice.id) || '',
+          searchableText:
+            (userDetails.primaryOffice && userDetails.primaryOffice.name) || '',
+          displayLabel:
+            (userDetails.primaryOffice && userDetails.primaryOffice.name) || ''
+        })
       }
     }
   }
@@ -363,7 +296,7 @@ class HeaderComp extends React.Component<IProps, IState> {
       goToOperationalReportAction
     } = props
     if (userDetails && userDetails.role) {
-      if (SYS_ADMIN_ROLES.includes(userDetails.role)) {
+      if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
         return goToPerformanceHomeAction()
       } else {
         const locationId = getJurisdictionLocationIdFromUserDetails(userDetails)
@@ -376,13 +309,7 @@ class HeaderComp extends React.Component<IProps, IState> {
   }
 
   render() {
-    const {
-      intl,
-      userDetails,
-      enableMenuSelection = true,
-      goToHomeAction,
-      activeMenuItem
-    } = this.props
+    const { intl, activeMenuItem } = this.props
     const title =
       this.props.title ||
       intl.formatMessage(
@@ -391,44 +318,10 @@ class HeaderComp extends React.Component<IProps, IState> {
           : activeMenuItem === ACTIVE_MENU_ITEM.TEAM ||
             activeMenuItem === ACTIVE_MENU_ITEM.USERS
           ? messages.teamTitle
+          : activeMenuItem === ACTIVE_MENU_ITEM.CONFIG
+          ? constantsMessages.configTitle
           : constantsMessages.applicationTitle
       )
-
-    let menuItems: any[] = []
-
-    if (userDetails && userDetails.role) {
-      if (!SYS_ADMIN_ROLES.includes(userDetails.role)) {
-        menuItems = menuItems.concat([
-          {
-            key: 'application',
-            title: intl.formatMessage(constantsMessages.applicationTitle),
-            onClick: goToHomeAction,
-            selected:
-              enableMenuSelection &&
-              activeMenuItem === ACTIVE_MENU_ITEM.APPLICATIONS
-          }
-        ])
-      }
-      if (!FIELD_AGENT_ROLES.includes(userDetails.role)) {
-        menuItems = menuItems.concat([
-          {
-            key: 'performance',
-            title: intl.formatMessage(constantsMessages.performanceTitle),
-            onClick: () => this.goToPerformanceView(this.props),
-            selected:
-              enableMenuSelection &&
-              activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
-          },
-          {
-            key: 'team',
-            title: intl.formatMessage(messages.teamTitle),
-            onClick: () => this.goToTeamView(this.props),
-            selected:
-              enableMenuSelection && activeMenuItem === ACTIVE_MENU_ITEM.TEAM
-          }
-        ])
-      }
-    }
 
     let rightMenu = [
       {
@@ -457,14 +350,12 @@ class HeaderComp extends React.Component<IProps, IState> {
       ]
     }
 
-    const mobileHeaderActionProps = this.getMobileHeaderActionProps(
-      activeMenuItem
-    )
+    const mobileHeaderActionProps =
+      this.getMobileHeaderActionProps(activeMenuItem)
 
     return (
       <>
         <AppHeader
-          menuItems={menuItems}
           id="register_app_header"
           desktopRightMenu={rightMenu}
           title={title}
@@ -481,6 +372,8 @@ export const Header = connect(
       ? ACTIVE_MENU_ITEM.PERFORMANCE
       : window.location.href.includes('team')
       ? ACTIVE_MENU_ITEM.TEAM
+      : window.location.href.includes('config')
+      ? ACTIVE_MENU_ITEM.CONFIG
       : ACTIVE_MENU_ITEM.APPLICATIONS,
     language: store.i18n.language,
     userDetails: getUserDetails(store)
@@ -492,6 +385,7 @@ export const Header = connect(
     goToSettings,
     goToEvents: goToEventsAction,
     goToHomeAction: goToHome,
+    goToConfigAction: goToConfig,
     goToPerformanceHomeAction: goToPerformanceHome,
     goToOperationalReportAction: goToOperationalReport,
     goToPerformanceReportListAction: goToPerformanceReportList,

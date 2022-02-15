@@ -54,9 +54,7 @@ export const transformData = (
         id: assignedReg.id,
         name:
           (createNamesMap(names)[locale] as string) ||
-          /* eslint-disable no-string-literal */
           (createNamesMap(names)['default'] as string) ||
-          /* eslint-enable no-string-literal */
           '',
         dob:
           (birthReg &&

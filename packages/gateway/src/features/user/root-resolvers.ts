@@ -32,6 +32,7 @@ import {
   GQLUserInput
 } from '@gateway/graphql/schema'
 import { logger } from '@gateway/logger'
+import { checkVerificationCode } from '@gateway/routes/verifyCode/handler'
 import fetch from 'node-fetch'
 
 export const resolvers: GQLResolver = {
@@ -102,6 +103,7 @@ export const resolvers: GQLResolver = {
       _,
       {
         locationId,
+        primaryOfficeId,
         language = 'en',
         status = null,
         timeStart,
@@ -122,12 +124,25 @@ export const resolvers: GQLResolver = {
         )
       }
 
+      if (!locationId && !primaryOfficeId) {
+        logger.error('No location provided')
+        return {
+          totalItems: 0,
+          results: []
+        }
+      }
+
       let payload: IUserSearchPayload = {
-        locationId,
         role: 'FIELD_AGENT',
         count,
         skip,
         sortOrder: sort
+      }
+      if (locationId) {
+        payload = { ...payload, locationId }
+      }
+      if (primaryOfficeId) {
+        payload = { ...payload, primaryOfficeId }
       }
       if (status) {
         payload = { ...payload, status }
@@ -154,7 +169,7 @@ export const resolvers: GQLResolver = {
         {
           timeStart,
           timeEnd,
-          locationId,
+          locationId: locationId ? locationId : (primaryOfficeId as string),
           event,
           practitionerIds: userResponse.results.map(
             (user: IUserModelData) => user.practitionerId
@@ -163,8 +178,8 @@ export const resolvers: GQLResolver = {
         authHeader
       )
 
-      const fieldAgentList: GQLSearchFieldAgentResponse[] = userResponse.results.map(
-        (user: IUserModelData) => {
+      const fieldAgentList: GQLSearchFieldAgentResponse[] =
+        userResponse.results.map((user: IUserModelData) => {
           const metricsData = metricsForPractitioners.find(
             (metricsForPractitioner: { practitionerId: string }) =>
               metricsForPractitioner.practitionerId === user.practitionerId
@@ -185,8 +200,7 @@ export const resolvers: GQLResolver = {
             averageTimeForDeclaredApplications:
               metricsData?.averageTimeForDeclaredApplications ?? 0
           }
-        }
-      )
+        })
 
       return {
         results: fieldAgentList,
@@ -291,6 +305,71 @@ export const resolvers: GQLResolver = {
         return await Promise.reject(
           new Error(
             "Something went wrong on user-mgnt service. Couldn't change user password"
+          )
+        )
+      }
+      return true
+    },
+    async changePhone(
+      _,
+      { userId, phoneNumber, nonce, verifyCode },
+      authHeader
+    ) {
+      if (!isTokenOwner(authHeader, userId)) {
+        return await Promise.reject(
+          new Error(
+            `Change phone is not allowed. ${userId} is not the owner of the token`
+          )
+        )
+      }
+      try {
+        await checkVerificationCode(nonce, verifyCode)
+      } catch (err) {
+        logger.error(err)
+        return await Promise.reject(
+          new Error(`Change phone is not allowed. Error: ${err}`)
+        )
+      }
+      const res = await fetch(`${USER_MANAGEMENT_URL}changeUserPhone`, {
+        method: 'POST',
+        body: JSON.stringify({ userId, phoneNumber }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+
+      if (res.status !== 200) {
+        return await Promise.reject(
+          new Error(
+            "Something went wrong on user-mgnt service. Couldn't change user phone number"
+          )
+        )
+      }
+      return true
+    },
+    async changeAvatar(_, { userId, avatar }, authHeader) {
+      // Only token owner should be able to change their avatar
+      if (!isTokenOwner(authHeader, userId)) {
+        return await Promise.reject(
+          new Error(
+            `Changing avatar is not allowed. ${userId} is not the owner of the token`
+          )
+        )
+      }
+      const res = await fetch(`${USER_MANAGEMENT_URL}changeUserAvatar`, {
+        method: 'POST',
+        body: JSON.stringify({ userId, avatar }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+
+      if (res.status !== 200) {
+        return await Promise.reject(
+          new Error(
+            "Something went wrong on user-mgnt service. Couldn't change user avatar"
           )
         )
       }

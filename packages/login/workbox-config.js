@@ -14,6 +14,7 @@ module.exports = {
   globDirectory: 'build/',
   globIgnores: ['**/config.js'],
   globPatterns: ['**/*.{json,ico,ttf,html,js}'],
+  maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
   navigateFallback: '/index.html',
   // fallback for anything that doesn't start with /__ which is used by cypress
   navigateFallbackBlacklist: [/^\/__.*$/],

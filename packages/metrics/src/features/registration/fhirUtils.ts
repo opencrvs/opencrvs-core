@@ -31,7 +31,7 @@ export function getSectionBySectionCode(
       if (!section.code || !section.code.coding || !section.code.coding.some) {
         return false
       }
-      return section.code.coding.some(coding => coding.code === sectionCode)
+      return section.code.coding.some((coding) => coding.code === sectionCode)
     })
 
   if (!personSection || !personSection.entry) {
@@ -61,6 +61,8 @@ export type APPLICATION_STATUS =
   | 'VALIDATED'
   | 'WAITING_VALIDATION'
   | 'REJECTED'
+  | 'REQUESTED_CORRECTION'
+  | 'CERTIFIED'
 
 export type APPLICATION_TYPE = 'BIRTH' | 'DEATH'
 
@@ -71,16 +73,16 @@ function findPreviousTask(
   const task =
     historyResponseBundle.entry &&
     historyResponseBundle.entry
-      .map(entry => entry.resource)
+      .map((entry) => entry.resource)
       .filter((resource): resource is fhir.Task =>
         Boolean(resource && isTaskResource(resource))
       )
-      .find(resource => {
+      .find((resource) => {
         if (!resource.businessStatus || !resource.businessStatus.coding) {
           return false
         }
 
-        return resource.businessStatus.coding.some(coding =>
+        return resource.businessStatus.coding.some((coding) =>
           allowedPreviousStates.includes(coding.code as APPLICATION_STATUS)
         )
       })
@@ -120,7 +122,9 @@ export async function getPreviousTask(
 
 export function getPractionerIdFromTask(task: fhir.Task) {
   return task?.extension
-    ?.find(ext => ext.url === 'http://opencrvs.org/specs/extension/regLastUser')
+    ?.find(
+      (ext) => ext.url === 'http://opencrvs.org/specs/extension/regLastUser'
+    )
     ?.valueReference?.reference?.split('/')?.[1]
 }
 
@@ -139,7 +143,7 @@ export function getApplicationStatus(task: Task): APPLICATION_STATUS | null {
 }
 
 export function getTrackingId(task: Task) {
-  const trackingIdentifier = task?.identifier?.find(identifier => {
+  const trackingIdentifier = task?.identifier?.find((identifier) => {
     return (
       identifier.system === `http://opencrvs.org/specs/id/birth-tracking-id` ||
       identifier.system === `http://opencrvs.org/specs/id/death-tracking-id`
@@ -178,7 +182,7 @@ export function getStartedByFieldAgent(taskHistory: fhir.Bundle): string {
   const regLastUserExtension =
     previousTask.extension &&
     previousTask.extension.find(
-      extension =>
+      (extension) =>
         extension.url === 'http://opencrvs.org/specs/extension/regLastUser'
     )
 
@@ -188,6 +192,28 @@ export function getStartedByFieldAgent(taskHistory: fhir.Bundle): string {
     (regLastUserExtension.valueReference.reference as string)
 
   return regLastUser?.split('/')?.[1] || ''
+}
+
+export function getRegLastOffice(bundle: fhir.Bundle) {
+  const task: fhir.Task = getResourceByType(
+    bundle,
+    FHIR_RESOURCE_TYPE.TASK
+  ) as fhir.Task
+  if (!task) {
+    throw new Error('Task not found!')
+  }
+  const regLastOffice =
+    task.extension &&
+    task.extension.find(
+      (extension) =>
+        extension.url === 'http://opencrvs.org/specs/extension/regLastOffice'
+    )
+
+  return (
+    regLastOffice &&
+    regLastOffice.valueReference &&
+    regLastOffice.valueReference.reference
+  )
 }
 
 export function getRegLastLocation(bundle: fhir.Bundle) {
@@ -201,7 +227,7 @@ export function getRegLastLocation(bundle: fhir.Bundle) {
   const regLastLocation =
     task.extension &&
     task.extension.find(
-      extension =>
+      (extension) =>
         extension.url === 'http://opencrvs.org/specs/extension/regLastLocation'
     )
 
@@ -219,7 +245,7 @@ export function getResourceByType<T = fhir.Resource>(
   const bundleEntry =
     bundle &&
     bundle.entry &&
-    bundle.entry.find(entry => {
+    bundle.entry.find((entry) => {
       if (!entry.resource) {
         return false
       } else {
@@ -241,7 +267,7 @@ export function getTimeLoggedFromTask(task: fhir.Task) {
   }
 
   const timeLoggedExt = task.extension.find(
-    ext => ext.url === 'http://opencrvs.org/specs/extension/timeLoggedMS'
+    (ext) => ext.url === 'http://opencrvs.org/specs/extension/timeLoggedMS'
   )
 
   if (!timeLoggedExt || timeLoggedExt.valueInteger === undefined) {
@@ -257,7 +283,7 @@ export function isNotification(composition: fhir.Composition): boolean {
   const compositionTypeCode =
     composition.type.coding &&
     composition.type.coding.find(
-      code => code.system === 'http://opencrvs.org/doc-types'
+      (code) => code.system === 'http://opencrvs.org/doc-types'
     )
   if (!compositionTypeCode) {
     throw new Error('Composition has no type codings defined')
@@ -276,7 +302,7 @@ export function getObservationValueByCode(
 ): string {
   const observationBundle =
     bundle.entry &&
-    bundle.entry.filter(item => {
+    bundle.entry.filter((item) => {
       return (
         item && item.resource && item.resource.resourceType === 'Observation'
       )
@@ -284,7 +310,7 @@ export function getObservationValueByCode(
   if (!Array.isArray(observationBundle) || !observationBundle.length) {
     return 'UNKNOWN'
   }
-  const selectedObservationEntry = observationBundle.find(entry => {
+  const selectedObservationEntry = observationBundle.find((entry) => {
     const observationEntry = entry.resource as fhir.Observation
     return (
       (observationEntry.code &&
@@ -297,7 +323,8 @@ export function getObservationValueByCode(
   if (!selectedObservationEntry) {
     return 'UNKNOWN'
   }
-  const observationResource = selectedObservationEntry.resource as fhir.Observation
+  const observationResource =
+    selectedObservationEntry.resource as fhir.Observation
   const value =
     (observationResource.valueCodeableConcept &&
       observationResource.valueCodeableConcept.coding &&

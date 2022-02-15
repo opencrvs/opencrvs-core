@@ -29,38 +29,34 @@ import {
   DeathSection,
   Event,
   IFormSection,
-  IFormSectionData
+  IFormSectionData,
+  FieldValueMap
 } from '@client/forms'
 import {
   getBirthSection,
   getDeathSection
 } from '@client/forms/register/application-selectors'
-import { buttonMessages, formMessages } from '@client/i18n/messages'
+import { buttonMessages } from '@client/i18n/messages'
 import { constantsMessages } from '@client/i18n/messages/constants'
-import { messages } from '@client/i18n/messages/views/selectInformant'
+import { formMessages } from '@client/i18n/messages/views/selectInformant'
 import {
   goBack,
   goToBirthContactPoint,
   goToBirthRegistrationAsParent,
   goToDeathContactPoint,
   goToDeathRegistration,
-  goToHome,
-  goToPrimaryApplicant
+  goToHome
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
-import {
-  INFORMANT_FIELD_STRING,
-  RADIO_BUTTON_LARGE_STRING
-} from '@client/utils/constants'
 import * as React from 'react'
-import {
-  injectIntl,
-  IntlShape,
-  WrappedComponentProps as IntlShapeProps
-} from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
+import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
+import { getInformantSection } from './SelectInformantSection'
+import { FormFieldGenerator } from '@client/components/form'
+import { getValidationErrorsForForm } from '@client/forms/validation'
 
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -77,159 +73,15 @@ const Actions = styled.div`
   }
 `
 
-enum INFORMANT {
-  FATHER = 'FATHER',
-  MOTHER = 'MOTHER',
-  BOTH_PARENTS = 'BOTH_PARENTS',
-  SELF = 'SELF',
-  SOMEONE_ELSE = 'OTHER',
-  SPOUSE = 'SPOUSE',
-  SON = 'SON',
-  DAUGHTER = 'DAUGHTER',
-  SON_IN_LAW = 'SON_IN_LAW',
-  DAUGHTER_IN_LAW = 'DAUGHTER_IN_LAW',
-  GRANDSON = 'GRANDSON',
-  GRANDDAUGHTER = 'GRANDDAUGHTER',
-  EXTENDED_FAMILY = 'EXTENDED_FAMILY'
-}
+const ErrorWrapper = styled.div`
+  margin-top: -50px;
+  margin-bottom: 16px;
+`
 
 export interface IInformantField {
   id: string
   option: RadioComponentOption
   disabled: boolean
-}
-
-const setInformantFields = (
-  intl: IntlShape,
-  event: string
-): IInformantField[] => {
-  if (event === Event.BIRTH) {
-    return [
-      {
-        id: `select_informant_${INFORMANT.MOTHER}`,
-        option: {
-          label: intl.formatMessage(formMessages.mother),
-          value: INFORMANT.MOTHER
-        },
-        disabled: false
-      },
-      {
-        id: `select_informant_${INFORMANT.FATHER}`,
-        option: {
-          label: intl.formatMessage(formMessages.father),
-          value: INFORMANT.FATHER
-        },
-        disabled: false
-      },
-      {
-        id: `select_informant_${INFORMANT.BOTH_PARENTS}`,
-        option: {
-          label: intl.formatMessage(messages.parents),
-          value: INFORMANT.BOTH_PARENTS
-        },
-        disabled: false
-      },
-      {
-        id: `select_informant_${INFORMANT.SOMEONE_ELSE}`,
-        option: {
-          label: intl.formatMessage(formMessages.someoneElse),
-          value: INFORMANT.SOMEONE_ELSE
-        },
-        disabled: false
-      },
-      {
-        id: `select_informant_${INFORMANT.SELF}`,
-        option: {
-          label: intl.formatMessage(formMessages.self),
-          value: INFORMANT.SELF
-        },
-        disabled: true
-      }
-    ]
-  } else {
-    return [
-      {
-        id: `select_informant_${INFORMANT.SPOUSE}`,
-        option: {
-          label: intl.formatMessage(formMessages.spouse),
-          value: INFORMANT.SPOUSE
-        },
-        disabled: false
-      },
-      {
-        id: `select_informant_${INFORMANT.SON}`,
-        option: {
-          label: intl.formatMessage(formMessages.son),
-          value: INFORMANT.SON
-        },
-        disabled: false
-      },
-      {
-        id: `select_informant_${INFORMANT.DAUGHTER}`,
-        option: {
-          label: intl.formatMessage(formMessages.daughter),
-          value: INFORMANT.DAUGHTER
-        },
-        disabled: false
-      },
-      {
-        id: `select_informant_${INFORMANT.SON_IN_LAW}`,
-        option: {
-          label: intl.formatMessage(formMessages.sonInLaw),
-          value: INFORMANT.SON_IN_LAW
-        },
-        disabled: false
-      },
-      {
-        id: `select_informant_${INFORMANT.DAUGHTER_IN_LAW}`,
-        option: {
-          label: intl.formatMessage(formMessages.daughterInLaw),
-          value: INFORMANT.DAUGHTER_IN_LAW
-        },
-        disabled: false
-      },
-      {
-        id: `select_informant_${INFORMANT.FATHER}`,
-        option: {
-          label: intl.formatMessage(formMessages.father),
-          value: INFORMANT.FATHER
-        },
-        disabled: false
-      },
-      {
-        id: `select_informant_${INFORMANT.MOTHER}`,
-        option: {
-          label: intl.formatMessage(formMessages.mother),
-          value: INFORMANT.MOTHER
-        },
-        disabled: false
-      },
-      {
-        id: `select_informant_${INFORMANT.GRANDSON}`,
-        option: {
-          label: intl.formatMessage(formMessages.grandson),
-          value: INFORMANT.GRANDSON
-        },
-        disabled: false
-      },
-      {
-        id: `select_informant_${INFORMANT.GRANDDAUGHTER}`,
-        option: {
-          label: intl.formatMessage(formMessages.granddaughter),
-          value: INFORMANT.GRANDDAUGHTER
-        },
-        disabled: false
-      },
-      {
-        id: `select_informant_${INFORMANT.SOMEONE_ELSE}`,
-        option: {
-          label: intl.formatMessage(formMessages.someoneElse),
-          value: INFORMANT.SOMEONE_ELSE
-        },
-        disabled: false
-      }
-    ]
-  }
 }
 
 interface IMatchProps {
@@ -246,7 +98,6 @@ type IFullProps = {
   goToDeathContactPoint: typeof goToDeathContactPoint
   goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
   goToDeathRegistration: typeof goToDeathRegistration
-  goToPrimaryApplicant: typeof goToPrimaryApplicant
   registrationSection: IFormSection
   applicantsSection: IFormSection
 } & IntlShapeProps &
@@ -255,7 +106,23 @@ type IFullProps = {
 interface IState {
   informant: string
   touched: boolean
-  isError: boolean
+  showError: boolean
+}
+
+function getGroupWithInitialValues(
+  section: IFormSection,
+  application: IApplication
+) {
+  const group = section.groups[0]
+
+  return {
+    ...group,
+    fields: replaceInitialValues(
+      group.fields,
+      application?.data[section.id] || {},
+      application?.data
+    )
+  }
 }
 
 export class SelectInformantView extends React.Component<IFullProps, IState> {
@@ -276,171 +143,136 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
             .applicantsRelationToDeceased as string)) ||
         '',
       touched: false,
-      isError: false
+      showError: false
+    }
+  }
+  section = getInformantSection(
+    this.props.location.pathname.includes(Event.BIRTH)
+      ? Event.BIRTH
+      : Event.DEATH
+  )
+  group = getGroupWithInitialValues(this.section, this.props.application)
+  componentDidMount() {
+    this.group = {
+      ...this.group,
+      fields: replaceInitialValues(
+        this.group.fields,
+        this.props.application?.data[this.section.id] || {},
+        this.props.application?.data
+      )
     }
   }
 
-  handleContinue = () => {
+  modifyApplication = (
+    sectionData: IFormSectionData,
+    activeSection: IFormSection
+  ) => {
+    const applicant = (
+      sectionData[activeSection.groups[0].fields[0].name] as IFormSectionData
+    )?.value
+
+    const nestedFieldValue = (
+      (sectionData[activeSection.groups[0].fields[0].name] as IFormSectionData)
+        ?.nestedFields as IFormSectionData
+    )?.otherRelationship
+
+    const nestedField = nestedFieldValue
+      ? ({
+          otherRelationship: nestedFieldValue
+        } as FieldValueMap)
+      : {}
+
+    const applicantValue = nestedFieldValue ? nestedFieldValue : applicant
+
     const event = this.props.location.pathname.includes(Event.BIRTH)
       ? Event.BIRTH
       : Event.DEATH
-
-    if (
-      this.state.informant &&
-      this.state.informant !== 'error' &&
-      this.state.informant === INFORMANT.BOTH_PARENTS
-    ) {
-      const {
-        application,
-        goToPrimaryApplicant,
-        registrationSection,
-        goToBirthRegistrationAsParent
-      } = this.props
-      this.props.modifyApplication({
-        ...application,
-        data: {
-          ...application.data,
-          registration: {
-            ...application.data[registrationSection.id],
-            ...{
-              presentAtBirthRegistration: this.state.informant,
-              applicant: {
-                value:
-                  (this.props.application &&
-                    this.props.application.data &&
-                    this.props.application.data[registrationSection.id] &&
-                    this.props.application.data[registrationSection.id]
-                      .applicant &&
-                    (this.props.application.data[registrationSection.id]
-                      .applicant as IFormSectionData).value) ||
-                  '',
-                nestedFields: {}
-              }
-            }
-          }
-        }
-      })
-      event === Event.BIRTH
-        ? goToBirthRegistrationAsParent(this.props.match.params.applicationId)
-        : goToPrimaryApplicant(this.props.match.params.applicationId)
-    } else if (
-      this.state.informant &&
-      this.state.informant !== 'error' &&
-      this.state.informant !== INFORMANT.SOMEONE_ELSE
-    ) {
-      const {
-        application,
-        goToBirthRegistrationAsParent,
-        goToDeathRegistration,
-        registrationSection,
-        applicantsSection
-      } = this.props
-      const newApplication = {
-        ...application,
-        data: {
-          ...application.data
-        }
+    const { application, registrationSection, applicantsSection } = this.props
+    const newApplication = {
+      ...application,
+      data: {
+        ...application?.data
       }
-      if (event === Event.BIRTH) {
-        newApplication.data[registrationSection.id] = {
-          ...application.data[registrationSection.id],
-          ...{
-            presentAtBirthRegistration: this.state.informant,
-            applicant: {
-              value: this.state.informant,
-              nestedFields: {}
-            }
-          }
-        }
-      } else {
-        newApplication.data[applicantsSection.id] = {
-          ...application.data[applicantsSection.id],
-          ...{
-            // Need to empty those because next screen will fill this up
-            // TODO: currently contact point is the informant,
-            // need to define the difference between informant and contact point on death schema
-            relationship: this.state.informant
+    }
+    if (event === Event.BIRTH) {
+      newApplication.data[registrationSection.id] = {
+        ...application?.data[registrationSection.id],
+        ...{
+          presentAtBirthRegistration: applicantValue,
+          applicant: {
+            value: applicant,
+            nestedFields: nestedField
           }
         }
       }
-      this.props.modifyApplication(newApplication)
-
-      this.props.location.pathname.includes(Event.BIRTH)
-        ? goToBirthRegistrationAsParent(this.props.match.params.applicationId)
-        : goToDeathRegistration(this.props.match.params.applicationId)
-    } else if (
-      event === Event.DEATH &&
-      this.state.informant &&
-      this.state.informant !== 'error' &&
-      this.state.informant === INFORMANT.SOMEONE_ELSE
-    ) {
-      const {
-        application,
-        goToDeathRegistration,
-        applicantsSection
-      } = this.props
-      this.props.modifyApplication({
-        ...application,
-        data: {
-          ...application.data,
-          [applicantsSection.id]: {
-            ...application.data[applicantsSection.id],
-            ...{
-              relationship: this.state.informant
-            }
-          }
-        }
-      })
-
-      goToDeathRegistration(this.props.match.params.applicationId)
-    } else if (
-      event === Event.BIRTH &&
-      this.state.informant &&
-      this.state.informant !== 'error' &&
-      this.state.informant === INFORMANT.SOMEONE_ELSE
-    ) {
-      const {
-        application,
-        registrationSection,
-        goToBirthRegistrationAsParent
-      } = this.props
-
-      const modifiedApplicationData = {
-        ...application,
-        data: {
-          ...application.data,
-          [registrationSection.id]: {
-            ...application.data[registrationSection.id],
-            ...{
-              presentAtBirthRegistration: this.state.informant,
-              applicant: {
-                value:
-                  (this.props.application &&
-                    this.props.application.data &&
-                    this.props.application.data[registrationSection.id] &&
-                    this.props.application.data[registrationSection.id]
-                      .applicant &&
-                    (this.props.application.data[registrationSection.id]
-                      .applicant as IFormSectionData).value) ||
-                  '',
-                nestedFields:
-                  (this.props.application &&
-                    this.props.application.data &&
-                    this.props.application.data[registrationSection.id] &&
-                    this.props.application.data[registrationSection.id]
-                      .applicant &&
-                    (this.props.application.data[registrationSection.id]
-                      .applicant as IFormSectionData).nestedFields) ||
-                  {}
-              }
-            }
-          }
-        }
-      }
-      this.props.modifyApplication(modifiedApplicationData)
-      goToBirthRegistrationAsParent(this.props.match.params.applicationId)
     } else {
-      this.setState({ informant: 'error' })
+      newApplication.data[applicantsSection.id] = {
+        ...application.data[applicantsSection.id],
+        ...{
+          // Need to empty those because next screen will fill this up
+          // TODO: currently contact point is the informant,
+          // need to define the difference between informant and contact point on death schema
+          relationship: applicantValue
+        }
+      }
+      newApplication.data[registrationSection.id] = {
+        ...application?.data[registrationSection.id],
+        ...{
+          relationship: {
+            value: applicant,
+            nestedFields: nestedField
+          }
+        }
+      }
+    }
+    this.props.modifyApplication(newApplication)
+  }
+
+  handleContinue = () => {
+    const errors = getValidationErrorsForForm(
+      this.group.fields,
+      this.props.application.data[this.section.id] || {}
+    )
+
+    let hasError = false
+    this.group.fields.forEach((field) => {
+      const fieldErrors = errors[field.name].errors
+      const nestedFieldErrors = errors[field.name].nestedFields
+
+      if (fieldErrors.length > 0) {
+        hasError = true
+      }
+
+      if (field.nestedFields) {
+        Object.values(field.nestedFields).forEach((nestedFields) => {
+          nestedFields.forEach((nestedField) => {
+            if (
+              nestedFieldErrors[nestedField.name] &&
+              nestedFieldErrors[nestedField.name].length > 0
+            ) {
+              hasError = true
+            }
+          })
+        })
+      }
+    })
+    if (hasError) {
+      this.setState({
+        ...this.state,
+        showError: true
+      })
+      return
+    } else {
+      const event = this.props.location.pathname.includes(Event.BIRTH)
+        ? Event.BIRTH
+        : Event.DEATH
+      event === Event.BIRTH
+        ? this.props.goToBirthRegistrationAsParent(
+            this.props.match.params.applicationId
+          )
+        : this.props.goToDeathRegistration(
+            this.props.match.params.applicationId
+          )
     }
   }
   render() {
@@ -448,7 +280,6 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
     const event = this.props.location.pathname.includes(Event.BIRTH)
       ? Event.BIRTH
       : Event.DEATH
-    const informantFields = setInformantFields(intl, event)
 
     let titleMessage
     switch (event) {
@@ -483,41 +314,29 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
 
           <Title>
             {event === Event.BIRTH
-              ? intl.formatMessage(messages.birthInformantTitle)
-              : intl.formatMessage(messages.deathInformantTitle)}
+              ? intl.formatMessage(formMessages.birthInformantTitle)
+              : intl.formatMessage(formMessages.deathInformantTitle)}
           </Title>
-          {this.state.informant === 'error' && (
-            <ErrorText id="error_text">
-              {event === Event.BIRTH
-                ? intl.formatMessage(messages.birthErrorMessage)
-                : intl.formatMessage(messages.deathErrorMessage)}
-            </ErrorText>
-          )}
           <Actions id="select_parent_informant">
-            {informantFields.map((informantField: IInformantField) => {
-              return (
-                <RadioButton
-                  size={RADIO_BUTTON_LARGE_STRING}
-                  key={informantField.id}
-                  name={INFORMANT_FIELD_STRING}
-                  label={informantField.option.label}
-                  value={informantField.option.value}
-                  id={informantField.id}
-                  selected={
-                    this.state.informant === informantField.option.value
-                      ? informantField.option.value
-                      : ''
-                  }
-                  onChange={() =>
-                    this.setState({
-                      informant: informantField.option.value as string
-                    })
-                  }
-                  disabled={informantField.disabled}
-                />
-              )
-            })}
+            <FormFieldGenerator
+              id={this.group.id}
+              onChange={(values) => {
+                this.modifyApplication(values, this.section)
+              }}
+              setAllFieldsDirty={false}
+              fields={this.group.fields}
+              draftData={this.props.application?.data}
+            />
           </Actions>
+          {this.state.showError && (
+            <ErrorWrapper>
+              <ErrorText id="error_text">
+                {event === Event.BIRTH
+                  ? intl.formatMessage(formMessages.birthErrorMessage)
+                  : intl.formatMessage(formMessages.deathErrorMessage)}
+              </ErrorText>
+            </ErrorWrapper>
+          )}
           <PrimaryButton id="continue" onClick={this.handleContinue}>
             {intl.formatMessage(buttonMessages.continueButton)}
           </PrimaryButton>
@@ -548,7 +367,6 @@ export const SelectInformant = withRouter(
     goToBirthContactPoint,
     goToDeathContactPoint,
     goToBirthRegistrationAsParent,
-    goToPrimaryApplicant,
     goToDeathRegistration,
     modifyApplication,
     deleteApplication

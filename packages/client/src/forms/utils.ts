@@ -65,6 +65,8 @@ import { IDynamicValues } from '@client/navigation'
 import { generateLocations } from '@client/utils/locationUtils'
 import { callingCountries } from 'country-data'
 
+const REGISTRATION_TARGET_DAYS = window.config.BIRTH_REGISTRATION_TARGET
+
 interface IRange {
   start: number
   end?: number
@@ -75,7 +77,7 @@ export const internationaliseOptions = (
   intl: IntlShape,
   options: Array<ISelectOption | IRadioOption | ICheckboxOption>
 ) => {
-  return options.map(opt => {
+  return options.map((opt) => {
     return {
       ...opt,
       label: intl.formatMessage(opt.label)
@@ -241,14 +243,14 @@ export const getFieldValidation = (
 }
 
 export const getVisibleGroupFields = (group: IFormSectionGroup) => {
-  return group.fields.filter(field => !field.hidden)
+  return group.fields.filter((field) => !field.hidden)
 }
 export const getFieldOptions = (
   field: ISelectFormFieldWithDynamicOptions,
   values: IFormSectionData,
-  resources: IOfflineData
+  offlineCountryConfig: IOfflineData
 ) => {
-  const locations = resources[OFFLINE_LOCATIONS_KEY]
+  const locations = offlineCountryConfig[OFFLINE_LOCATIONS_KEY]
   const dependencyVal = values[field.dynamicOptions.dependency] as string
   if (field.dynamicOptions.jurisdictionType) {
     return generateOptions(
@@ -260,7 +262,7 @@ export const getFieldOptions = (
       'location'
     )
   } else if (
-    resources &&
+    offlineCountryConfig &&
     field.dynamicOptions.resource === OFFLINE_LOCATIONS_KEY
   ) {
     if (!dependencyVal) {
@@ -279,10 +281,10 @@ export const getFieldOptions = (
       'location'
     )
   } else if (
-    resources &&
+    offlineCountryConfig &&
     field.dynamicOptions.resource === OFFLINE_FACILITIES_KEY
   ) {
-    const facilities = resources[OFFLINE_FACILITIES_KEY]
+    const facilities = offlineCountryConfig[OFFLINE_FACILITIES_KEY]
     return generateOptions(Object.values(facilities), 'facility')
   } else {
     let options
@@ -301,7 +303,7 @@ interface INested {
   [key: string]: any
 }
 
-const getNestedValue = (obj: object, key: string) => {
+const getNestedValue = (obj: Record<string, unknown>, key: string) => {
   return key.split('.').reduce((res: INested, k) => res[k] || '', obj)
 }
 
@@ -313,10 +315,10 @@ export const getFieldOptionsByValueMapper = (
   values: IFormSectionData | IFormData,
   valueMapper: IDynamicValueMapper
 ) => {
-  const dependencyVal = (getNestedValue(
+  const dependencyVal = getNestedValue(
     values,
     field.dynamicItems.dependency
-  ) as unknown) as string
+  ) as unknown as string
 
   const firstKey = Object.keys(field.dynamicItems.items)[0]
 
@@ -337,17 +339,24 @@ export const getFieldOptionsByValueMapper = (
 }
 
 export const diffDoB = (doB: string) => {
-  if (!isAValidDateFormat(doB) || !isDateNotInFuture(doB)) return 'within45days'
+  if (!isAValidDateFormat(doB) || !isDateNotInFuture(doB))
+    return 'withinTargetdays'
   const todaysDate = moment(Date.now())
   const birthDate = moment(doB)
   const diffInDays = todaysDate.diff(birthDate, 'days')
 
   const ranges: IRange[] = [
-    { start: 0, end: 45, value: 'within45days' },
-    { start: 46, end: 5 * 365, value: 'between46daysTo5yrs' },
+    { start: 0, end: REGISTRATION_TARGET_DAYS, value: 'withinTargetdays' },
+    {
+      start: REGISTRATION_TARGET_DAYS + 1,
+      end: 5 * 365,
+      value: 'between46daysTo5yrs'
+    },
     { start: 5 * 365 + 1, value: 'after5yrs' }
   ]
-  const valueWithinRange = ranges.find(range => betweenRange(range, diffInDays))
+  const valueWithinRange = ranges.find((range) =>
+    betweenRange(range, diffInDays)
+  )
   return valueWithinRange ? valueWithinRange.value : ''
 }
 
@@ -376,14 +385,9 @@ export function getListOfLocations(
   resourceType: Extract<
     keyof IOfflineData,
     'facilities' | 'locations' | 'offices'
-  >,
-  locationType?: LocationType
+  >
 ) {
   return resource[resourceType]
-    ? locationType
-      ? generateLocations(resource[resourceType], undefined, [locationType])
-      : generateLocations(resource[resourceType])
-    : []
 }
 
 interface IVars {
@@ -428,7 +432,7 @@ export const getConditionalActionsForField = (
    * These are used in the eval expression
    */
   values: IFormSectionData,
-  resources?: IOfflineData,
+  offlineCountryConfig?: IOfflineData,
   draftData?: IFormData
 ): string[] => {
   if (!field.conditionals) {
@@ -437,7 +441,7 @@ export const getConditionalActionsForField = (
   return (
     field.conditionals
       // eslint-disable-next-line no-eval
-      .filter(conditional => eval(conditional.expression))
+      .filter((conditional) => eval(conditional.expression))
       .map((conditional: IConditional) => conditional.action)
   )
 }
@@ -447,14 +451,14 @@ export const getVisibleSectionGroupsBasedOnConditions = (
   values: IFormSectionData,
   draftData?: IFormData
 ): IFormSectionGroup[] => {
-  return section.groups.filter(group => {
+  return section.groups.filter((group) => {
     if (!group.conditionals) {
       return true
     }
     return (
       group.conditionals
         // eslint-disable-next-line no-eval
-        .filter(conditional => eval(conditional.expression))
+        .filter((conditional) => eval(conditional.expression))
         .map((conditional: IConditional) => conditional.action)
         .includes('hide') !== true
     )
@@ -465,14 +469,14 @@ export const getVisibleOptions = (
   radioOptions: CRadioOption[],
   draftData: IFormData
 ): CRadioOption[] => {
-  return radioOptions.filter(option => {
+  return radioOptions.filter((option) => {
     if (!option.conditionals) {
       return true
     }
     return (
       option.conditionals
         // eslint-disable-next-line no-eval
-        .filter(conditional => eval(conditional.expression))
+        .filter((conditional) => eval(conditional.expression))
         .map((conditional: IConditional) => conditional.action)
         .includes('hide') !== true
     )
@@ -489,7 +493,7 @@ export const getSectionFields = (
     section,
     values || {},
     draftData
-  ).forEach(group => (fields = fields.concat(group.fields)))
+  ).forEach((group) => (fields = fields.concat(group.fields)))
   return fields
 }
 
@@ -507,26 +511,36 @@ export const hasFormError = (
   )
 
   const fieldListWithErrors = Object.values(errors).filter(
-    error =>
+    (error) =>
       (error as IFieldErrors).errors.length > 0 ||
       Object.values(error.nestedFields).some(
-        nestedFieldErrors => nestedFieldErrors.length > 0
+        (nestedFieldErrors) => nestedFieldErrors.length > 0
       )
   )
-
   return fieldListWithErrors && fieldListWithErrors.length > 0
 }
 
 export const convertToMSISDN = (phone: string) => {
+  /*
+   *  If country is the fictional demo country (Farajaland), use Zambian number format
+   */
   const countryCode =
-    callingCountries[window.config.COUNTRY.toUpperCase()].countryCallingCodes[0]
+    window.config.COUNTRY.toUpperCase() === 'FAR'
+      ? 'ZMB'
+      : window.config.COUNTRY.toUpperCase()
 
-  if (phone.startsWith(countryCode) || `+${phone}`.startsWith(countryCode)) {
+  const countryCallingCode =
+    callingCountries[countryCode].countryCallingCodes[0]
+
+  if (
+    phone.startsWith(countryCallingCode) ||
+    `+${phone}`.startsWith(countryCallingCode)
+  ) {
     return phone.startsWith('+') ? phone : `+${phone}`
   }
   return phone.startsWith('0')
-    ? `${countryCode}${phone.substring(1)}`
-    : `${countryCode}${phone}`
+    ? `${countryCallingCode}${phone.substring(1)}`
+    : `${countryCallingCode}${phone}`
 }
 
 export const conditionals: IConditionals = {
@@ -645,22 +659,22 @@ export const conditionals: IConditionals = {
   isNotCityLocation: {
     action: 'hide',
     expression:
-      '(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))'
+      '(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))'
   },
   isCityLocation: {
     action: 'hide',
     expression:
-      '!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))'
+      '!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))'
   },
   isNotCityLocationPermanent: {
     action: 'hide',
     expression:
-      '(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))'
+      '(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Permanent))'
   },
   isCityLocationPermanent: {
     action: 'hide',
     expression:
-      '!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))'
+      '!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Permanent))'
   },
   iDAvailable: {
     action: 'hide',
@@ -704,10 +718,10 @@ export const conditionals: IConditionals = {
     expression:
       '(draftData && draftData.registration && draftData.registration.whoseContactDetails === "FATHER")'
   },
-  withIn45Days: {
+  withInTargetDays: {
     action: 'hide',
     expression:
-      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "within45days") || !draftData.child || !draftData.child.childBirthDate'
+      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "withinTargetdays") || !draftData.child || !draftData.child.childBirthDate'
   },
   between46daysTo5yrs: {
     action: 'hide',
@@ -724,10 +738,9 @@ export const conditionals: IConditionals = {
     expression:
       '(values.uploadDocForDeceased && !!values.uploadDocForDeceased.find(a => ["National ID (front)", "National ID (Back)"].indexOf(a.optionValues[1]) > -1))'
   },
-  isRegistrarOrRegistrationAgentRoleSelected: {
+  isRegistrarRoleSelected: {
     action: 'hide',
-    expression:
-      'values.role!=="LOCAL_REGISTRAR" && values.role!=="REGISTRATION_AGENT"'
+    expression: 'values.role!=="LOCAL_REGISTRAR"'
   },
   certCollectorOther: {
     action: 'hide',

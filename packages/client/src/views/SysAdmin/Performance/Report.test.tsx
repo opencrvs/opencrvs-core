@@ -41,16 +41,16 @@ describe('Report page', () => {
               details: [
                 {
                   locationId: 'Location/db5faba3-8143-4924-a44a-8562ed5e0437',
-                  regWithin45d: 0,
-                  regWithin45dTo1yr: 0,
+                  regWithinTargetd: 0,
+                  regWithinTargetdTo1yr: 0,
                   regWithin1yrTo5yr: 0,
                   regOver5yr: 2,
                   total: 2
                 }
               ],
               total: {
-                regWithin45d: 0,
-                regWithin45dTo1yr: 0,
+                regWithinTargetd: 0,
+                regWithinTargetdTo1yr: 0,
                 regWithin1yrTo5yr: 0,
                 regOver5yr: 2,
                 total: 2
@@ -75,12 +75,12 @@ describe('Report page', () => {
                 total: 2
               }
             },
-            estimated45DayMetrics: {
+            estimatedTargetDayMetrics: {
               details: [
                 {
                   locationId: 'Location/db5faba3-8143-4924-a44a-8562ed5e0437',
                   estimatedRegistration: 99,
-                  registrationIn45Day: 2,
+                  registrationInTargetDay: 2,
                   estimationYear: 2019,
                   estimationLocationLevel: 'UNION',
                   estimationPercentage: 2
@@ -88,7 +88,7 @@ describe('Report page', () => {
               ],
               total: {
                 estimatedRegistration: 99,
-                registrationIn45Day: 2,
+                registrationInTargetDay: 2,
                 estimationPercentage: 2
               }
             },
@@ -123,8 +123,8 @@ describe('Report page', () => {
             timeFrames: {
               details: [],
               total: {
-                regWithin45d: 0,
-                regWithin45dTo1yr: 0,
+                regWithinTargetd: 0,
+                regWithinTargetdTo1yr: 0,
                 regWithin1yrTo5yr: 0,
                 regOver5yr: 0,
                 total: 0
@@ -140,11 +140,11 @@ describe('Report page', () => {
                 total: 0
               }
             },
-            estimated45DayMetrics: {
+            estimatedTargetDayMetrics: {
               details: [],
               total: {
                 estimatedRegistration: 0,
-                registrationIn45Day: 0,
+                registrationInTargetDay: 0,
                 estimationPercentage: 0
               }
             },
@@ -163,48 +163,41 @@ describe('Report page', () => {
   beforeEach(async () => {
     const mock: any = jest.fn()
 
-    testComponent = (
-      await createTestComponent(
-        // @ts-ignore
-        <Report
-          history={history}
-          staticContext={mock}
-          match={{
-            params: {},
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          location={{
-            pathname: '',
-            search: '',
-            hash: '',
-            state: {
-              selectedLocation: {
-                id: '8cbc862a-b817-4c29-a490-4a8767ff023c',
-                displayLabel: 'Chittagong Divison',
-                searchableText: 'Chittagong'
-              },
-              eventType: Event.BIRTH,
-              timeRange: {
-                start: timeStart,
-                end: timeEnd
-              }
+    testComponent = await createTestComponent(
+      <Report
+        history={history as any}
+        staticContext={mock}
+        match={{
+          params: {},
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+        location={{
+          pathname: '',
+          search: '',
+          hash: '',
+          state: {
+            selectedLocation: {
+              id: '8cbc862a-b817-4c29-a490-4a8767ff023c',
+              displayLabel: 'Chittagong Divison',
+              searchableText: 'Chittagong'
+            },
+            eventType: Event.BIRTH,
+            timeRange: {
+              start: timeStart,
+              end: timeEnd
             }
-          }}
-        />,
-        store,
-        graphqlMock
-      )
-    ).component
+          }
+        }}
+      />,
+      { store, history, graphqlMocks: graphqlMock }
+    )
   })
 
   it('loads with page title from given time range from props', () => {
-    expect(
-      testComponent
-        .find('#reports-header')
-        .first()
-        .text()
-    ).toBe('December 2019')
+    expect(testComponent.find('#reports-header').first().text()).toBe(
+      'December 2019'
+    )
   })
 })

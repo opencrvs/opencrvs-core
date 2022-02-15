@@ -12,8 +12,8 @@
 const path = require('path')
 const { ESLINT_MODES } = require('@craco/craco')
 
-process.env.REACT_APP_RESOURCES_URL =
-  process.env.RESOURCES_URL || 'http://localhost:3040'
+process.env.REACT_APP_COUNTRY_CONFIG_URL =
+  process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
 
 module.exports = {
   eslint: {

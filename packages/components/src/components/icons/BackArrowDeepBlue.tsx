@@ -14,7 +14,7 @@ import * as React from 'react'
 export const BackArrowDeepBlue = (props: React.HTMLAttributes<SVGElement>) => (
   <svg width={18} height={14} fill="none" {...props}>
     <g
-      stroke="#35495D"
+      stroke="#4C68C1"
       strokeWidth={2}
       strokeLinecap="round"
       strokeLinejoin="round"

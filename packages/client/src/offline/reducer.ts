@@ -25,7 +25,7 @@ import { IApplicationConfig, referenceApi } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations, getLocation } from '@client/utils/locationUtils'
 import { ISerializedForm } from '@client/forms'
-import { isOfflineDataLoaded, isSystemAdmin } from './selectors'
+import { isOfflineDataLoaded, isNationalSystemAdmin } from './selectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import {
   IPDFTemplate,
@@ -124,7 +124,7 @@ function checkIfDone(
 
   if (
     /*
-     * Data was updated with a fresh version from resources
+     * Data was updated with a fresh version from offlineCountryConfig
      */
     isOfflineDataLoaded(oldState.offlineData) &&
     isOfflineDataLoaded(newState.offlineData) &&
@@ -177,7 +177,7 @@ const RETRY_TIMEOUT = 5000
 
 function delay(cmd: RunCmd<any>, time: number) {
   return Cmd.list(
-    [Cmd.run(() => new Promise(resolve => setTimeout(resolve, time))), cmd],
+    [Cmd.run(() => new Promise((resolve) => setTimeout(resolve, time))), cmd],
     { sequence: true }
   )
 }
@@ -343,14 +343,7 @@ function reducer(
     case actions.FACILITIES_LOADED: {
       const facilities = filterLocations(
         action.payload,
-        LocationType.HEALTH_FACILITY,
-        {
-          locationLevel: 'partOf',
-          locationId: `Location/${getLocation(
-            state.userDetails!,
-            window.config.HEALTH_FACILITY_FILTER
-          )}`
-        }
+        LocationType.HEALTH_FACILITY
       )
 
       const offices = filterLocations(
@@ -358,7 +351,7 @@ function reducer(
         LocationType.CRVS_OFFICE,
         {
           locationLevel: 'id',
-          locationId: isSystemAdmin(state.userDetails)
+          locationId: isNationalSystemAdmin(state.userDetails)
             ? undefined
             : state.userDetails &&
               state.userDetails.primaryOffice &&

@@ -1,15 +1,14 @@
 {
   "name": "@opencrvs/integration",
-  "version": "1.0.0-alpha.3.0",
+  "version": "1.0.0-alpha.3.1",
   "description": "A set of integration and performance tests for OpenCRVS",
   "license": "MPL-2.0",
   "private": true,
   "scripts": {
-    "start": "yarn build && docker run -v `pwd`/build:/build -i loadimpact/k6 run /build/k6-registration.js && docker run -v `pwd`/build:/build -i loadimpact/k6 run /build/k6-declaration.js",
-    "start:once": "yarn build && docker run -v `pwd`/build:/build -i loadimpact/k6 run /build/k6-registration.js -u 1 -i 1 && docker run -v `pwd`/build:/build -i loadimpact/k6 run /build/k6-declaration.js -u 1 -i 1",
-    "start:staging": "yarn build && docker run -v `pwd`/build:/build -i -e API_URL=https://api.opencrvs-staging.jembi.org/fhir -e AUTH_URL=https://auth.opencrvs-staging.jembi.org loadimpact/k6 run /build/k6-registration.js && docker run -v `pwd`/build:/build -i -e API_URL=https://api.opencrvs-staging.jembi.org/fhir -e AUTH_URL=https://auth.opencrvs-staging.jembi.org loadimpact/k6 run /build/k6-declaration.js",
-    "start:qa": "yarn build && docker run -v `pwd`/build:/build -i -e API_URL=https://api.opencrvs.qa1.jembi.org.org/fhir -e AUTH_URL=https://auth.opencrvs.qa1.jembi.org.org loadimpact/k6 run /build/k6-registration.js && docker run -v `pwd`/build:/build -i -e API_URL=https://api.opencrvs.qa1.jembi.org.org/fhir -e AUTH_URL=https://auth.opencrvs.qa1.jembi.org.org loadimpact/k6 run /build/k6-declaration.js",
-    "build": "yarn tsc src/*.ts --outDir build",
+    "start": "tsc src/*.ts --outDir build && docker run -v `pwd`/build:/build -i loadimpact/k6 run /build/k6-registration.js && docker run -v `pwd`/build:/build -i loadimpact/k6 run /build/k6-declaration.js",
+    "start:once": "tsc src/*.ts --outDir build && docker run -v `pwd`/build:/build -i loadimpact/k6 run /build/k6-registration.js -u 1 -i 1 && docker run -v `pwd`/build:/build -i loadimpact/k6 run /build/k6-declaration.js -u 1 -i 1",
+    "start:staging": "tsc src/*.ts --outDir build && docker run -v `pwd`/build:/build -i -e API_URL=https://api.opencrvs-staging.jembi.org/fhir -e AUTH_URL=https://auth.opencrvs-staging.jembi.org loadimpact/k6 run /build/k6-registration.js && docker run -v `pwd`/build:/build -i -e API_URL=https://api.opencrvs-staging.jembi.org/fhir -e AUTH_URL=https://auth.opencrvs-staging.jembi.org loadimpact/k6 run /build/k6-declaration.js",
+    "start:qa": "tsc src/*.ts --outDir build && docker run -v `pwd`/build:/build -i -e API_URL=https://api.opencrvs.qa1.jembi.org.org/fhir -e AUTH_URL=https://auth.opencrvs.qa1.jembi.org.org loadimpact/k6 run /build/k6-registration.js && docker run -v `pwd`/build:/build -i -e API_URL=https://api.opencrvs.qa1.jembi.org.org/fhir -e AUTH_URL=https://auth.opencrvs.qa1.jembi.org.org loadimpact/k6 run /build/k6-declaration.js",
     "build:clean": "rm -rf build"
   },
   "dependencies": {

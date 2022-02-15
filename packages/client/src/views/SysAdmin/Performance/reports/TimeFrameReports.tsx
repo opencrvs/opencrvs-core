@@ -30,7 +30,7 @@ import { IFooterFColumn } from '@opencrvs/components/lib/interface/GridTable/typ
 import { get } from 'lodash'
 
 interface IStateProps {
-  offlineResources: IOfflineData
+  offlineCountryConfiguration: IOfflineData
 }
 
 type FullProps = {
@@ -44,17 +44,17 @@ class TimeFrameComponent extends React.Component<FullProps> {
   getContent = () => {
     return (
       (this.props.data.details &&
-        this.props.data.details.map(timeFrame => ({
+        this.props.data.details.map((timeFrame) => ({
           location: getLocationFromPartOfLocationId(
             timeFrame.locationId,
-            this.props.offlineResources
+            this.props.offlineCountryConfiguration
           ).name,
-          regWithin45d: getValueWithPercentageString(
-            timeFrame.regWithin45d,
+          regWithinTargetd: getValueWithPercentageString(
+            timeFrame.regWithinTargetd,
             timeFrame.total
           ),
-          regWithin45dTo1yr: getValueWithPercentageString(
-            timeFrame.regWithin45dTo1yr,
+          regWithinTargetdTo1yr: getValueWithPercentageString(
+            timeFrame.regWithinTargetdTo1yr,
             timeFrame.total
           ),
           regWithin1yrTo5yr: getValueWithPercentageString(
@@ -73,8 +73,8 @@ class TimeFrameComponent extends React.Component<FullProps> {
 
   getFooterColumns(): IFooterFColumn[] {
     const {
-      regWithin45d = 0,
-      regWithin45dTo1yr = 0,
+      regWithinTargetd = 0,
+      regWithinTargetdTo1yr = 0,
       regWithin1yrTo5yr = 0,
       regOver5yr = 0
     } = this.props.data.total || {}
@@ -84,11 +84,11 @@ class TimeFrameComponent extends React.Component<FullProps> {
         width: 25
       },
       {
-        label: getValueWithPercentageString(regWithin45d, total),
+        label: getValueWithPercentageString(regWithinTargetd, total),
         width: 15
       },
       {
-        label: getValueWithPercentageString(regWithin45dTo1yr, total),
+        label: getValueWithPercentageString(regWithinTargetdTo1yr, total),
         width: 15
       },
       {
@@ -127,15 +127,32 @@ class TimeFrameComponent extends React.Component<FullProps> {
             isSortable: false
           },
           {
-            label: intl.formatMessage(constantsMessages.within45Days),
+            label: intl.formatMessage(constantsMessages.withinTargetDays, {
+              registrationTargetDays:
+                eventType === Event.BIRTH
+                  ? this.props.offlineCountryConfiguration.config
+                      .BIRTH_REGISTRATION_TARGET
+                  : this.props.offlineCountryConfiguration.config
+                      .DEATH_REGISTRATION_TARGET
+            }),
             width: 15,
-            key: 'regWithin45d',
+            key: 'regWithinTargetd',
             isSortable: false
           },
           {
-            label: intl.formatMessage(constantsMessages.within45DaysTo1Year),
+            label: intl.formatMessage(
+              constantsMessages.withinTargetDaysTo1Year,
+              {
+                registrationTargetDays:
+                  eventType === Event.BIRTH
+                    ? this.props.offlineCountryConfiguration.config
+                        .BIRTH_REGISTRATION_TARGET
+                    : this.props.offlineCountryConfiguration.config
+                        .DEATH_REGISTRATION_TARGET
+              }
+            ),
             width: 15,
-            key: 'regWithin45dTo1yr',
+            key: 'regWithinTargetdTo1yr',
             isSortable: false
           },
           {
@@ -167,6 +184,6 @@ class TimeFrameComponent extends React.Component<FullProps> {
 
 export const TimeFrameReports = connect((store: IStoreState) => {
   return {
-    offlineResources: getOfflineData(store)
+    offlineCountryConfiguration: getOfflineData(store)
   }
 }, {})(injectIntl(TimeFrameComponent))

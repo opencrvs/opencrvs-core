@@ -39,7 +39,7 @@ import {
 import { getDefaultLanguage } from '@client/i18n/utils'
 import { withTheme, ITheme } from '@client/styledComponents'
 import { getDraftApplicantFullName } from '@client/utils/draftUtils'
-import { LoadingIndicator } from '@client/views/RegistrationHome/LoadingIndicator'
+import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 
 const APPLICATIONS_DAY_LIMIT = 7
 
@@ -137,7 +137,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
             new Date(application.modifiedOn).toISOString().split('T')[0]
           ) > APPLICATIONS_DAY_LIMIT
       )
-      .forEach(application => {
+      .forEach((application) => {
         this.props.deleteApplication(application)
       })
   }

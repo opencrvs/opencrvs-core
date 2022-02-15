@@ -109,9 +109,9 @@ describe('when in device of large viewport', () => {
           submitClickEvent={mockHandler}
           onChangeReviewForm={mockHandler}
         />,
-        store
+        { store, history }
       )
-      reviewSectionComponent = testComponent.component
+      reviewSectionComponent = testComponent
       await waitForElement(reviewSectionComponent, '#review_header')
     })
 
@@ -156,16 +156,10 @@ describe('when in device of large viewport', () => {
         reviewSectionComponent.find('#review_header').hostNodes()
       ).toHaveLength(1)
       expect(
-        reviewSectionComponent
-          .find('#review_header_title')
-          .hostNodes()
-          .text()
+        reviewSectionComponent.find('#review_header_title').hostNodes().text()
       ).toBe('Government of the peoples republic of Bangladesh')
       expect(
-        reviewSectionComponent
-          .find('#review_header_subject')
-          .hostNodes()
-          .text()
+        reviewSectionComponent.find('#review_header_subject').hostNodes().text()
       ).toBe('Birth Application for John Doe')
     })
 
@@ -227,14 +221,15 @@ describe('when in device of large viewport', () => {
           rejectApplicationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
         />,
-        store
+        { store, history }
       )
-      reviewSectionComponent = testComponent.component
+      reviewSectionComponent = testComponent
     })
 
     it('Should not click the Reject Application', async () => {
-      const rejectButton = reviewSectionComponent.find('#rejectApplicationBtn')
-        .length
+      const rejectButton = reviewSectionComponent.find(
+        '#rejectApplicationBtn'
+      ).length
       expect(rejectButton).toEqual(0)
     })
   })
@@ -249,14 +244,15 @@ describe('when in device of large viewport', () => {
           rejectApplicationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
         />,
-        store
+        { store, history }
       )
-      reviewSectionComponent = testComponent.component
+      reviewSectionComponent = testComponent
     })
 
     it('Should not click the Reject Application', async () => {
-      const rejectButton = reviewSectionComponent.find('#rejectApplicationBtn')
-        .length
+      const rejectButton = reviewSectionComponent.find(
+        '#rejectApplicationBtn'
+      ).length
       expect(rejectButton).toEqual(0)
     })
   })
@@ -272,9 +268,9 @@ describe('when in device of large viewport', () => {
           rejectApplicationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
         />,
-        store
+        { store, history }
       )
-      reviewSectionComponent = testComponent.component
+      reviewSectionComponent = testComponent
     })
 
     it('Should click the Validate Application Button', async () => {
@@ -478,9 +474,9 @@ describe('when in device of large viewport', () => {
           rejectApplicationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
         />,
-        store
+        { store, history }
       )
-      reviewSectionComponent = testComponent.component
+      reviewSectionComponent = testComponent
     })
 
     it('renders values in review section', () => {
@@ -489,11 +485,7 @@ describe('when in device of large viewport', () => {
       ).toHaveLength(1)
 
       expect(
-        reviewSectionComponent
-          .find('#Applicant')
-          .hostNodes()
-          .childAt(0)
-          .text()
+        reviewSectionComponent.find('#Applicant').hostNodes().childAt(0).text()
       ).toContain('Mother')
     })
 
@@ -576,9 +568,9 @@ describe('when in device of large viewport', () => {
           rejectApplicationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
         />,
-        store
+        { store, history }
       )
-      reviewSectionComponent = testComponent.component
+      reviewSectionComponent = testComponent
     })
 
     it('renders selected location label', () => {
@@ -701,10 +693,10 @@ describe('when in device of small viewport', () => {
         submitClickEvent={mockHandler}
         onChangeReviewForm={mockHandler}
       />,
-      store
+      { store, history }
     )
 
-    reviewSectionComponent = testComponent.component
+    reviewSectionComponent = testComponent
   })
 
   it('renders without preview list of documents', () => {

@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { resolvers } from '@gateway/features/user/root-resolvers'
+import { generateVerificationCode } from '@gateway/routes/verifyCode/handler'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
@@ -322,6 +323,63 @@ describe('User root resolvers', () => {
         creationDate: 1559054406444
       }
     ]
+    it('Returns field agent list with metrics data for an office', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          totalItems: dummyUserList.length,
+          results: dummyUserList
+        })
+      )
+      fetch.mockResponseOnce(
+        JSON.stringify([
+          {
+            practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
+            totalNumberOfApplicationStarted: 12,
+            totalNumberOfInProgressAppStarted: 5,
+            totalNumberOfRejectedApplications: 2,
+            averageTimeForDeclaredApplications: 360
+          }
+        ])
+      )
+
+      const response = await resolvers.Query.searchFieldAgents(
+        {},
+        {
+          primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
+          timeStart: '2019-03-31T18:00:00.000Z',
+          timeEnd: '2020-06-30T17:59:59.999Z'
+        },
+        authHeaderSysAdmin
+      )
+
+      expect(response.totalItems).toBe(2)
+      expect(response.results).toEqual([
+        {
+          practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
+          fullName: 'Sakib Al Hasan',
+          type: 'HA',
+          status: 'active',
+          primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
+          creationDate: 1559054406433,
+          totalNumberOfApplicationStarted: 12,
+          totalNumberOfInProgressAppStarted: 5,
+          totalNumberOfRejectedApplications: 2,
+          averageTimeForDeclaredApplications: 360
+        },
+        {
+          practitionerId: 'sseq1203-f0ff-4822-b5d9-cb90d0e7biwuw',
+          fullName: 'Md. Ariful Islam',
+          type: 'HA',
+          status: 'pending',
+          primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
+          creationDate: 1559054406444,
+          totalNumberOfApplicationStarted: 0,
+          totalNumberOfInProgressAppStarted: 0,
+          totalNumberOfRejectedApplications: 0,
+          averageTimeForDeclaredApplications: 0
+        }
+      ])
+    })
     it('Returns field agent list with metrics data for sysadmin', async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
@@ -447,10 +505,10 @@ describe('User root resolvers', () => {
         }
       ])
     })
-    it('should return error if invalid data received from user-mgnt endpoint', async () => {
+    it('returns empty results if invalid data received from user-mgnt endpoint', () => {
       fetch.mockResponseOnce(JSON.stringify({}))
 
-      expect(
+      return expect(
         resolvers.Query.searchFieldAgents(
           {},
           {
@@ -460,7 +518,27 @@ describe('User root resolvers', () => {
           },
           authHeaderSysAdmin
         )
-      ).rejects.toThrow('Invalid result found from search user endpoint')
+      ).resolves.toStrictEqual({
+        totalItems: 0,
+        results: []
+      })
+    })
+    it('returns empty results if no locationId or primaryOfficeId is provided', () => {
+      fetch.mockResponseOnce(JSON.stringify({}))
+
+      return expect(
+        resolvers.Query.searchFieldAgents(
+          {},
+          {
+            timeStart: '2019-03-31T18:00:00.000Z',
+            timeEnd: '2020-06-30T17:59:59.999Z'
+          },
+          authHeaderSysAdmin
+        )
+      ).resolves.toStrictEqual({
+        totalItems: 0,
+        results: []
+      })
     })
   })
 
@@ -595,15 +673,7 @@ describe('User root resolvers', () => {
     })
 
     it('changes password for loggedin user', async () => {
-      fetch.mockResponses(
-        [
-          JSON.stringify({
-            userId: 'ba7022f0ff4822'
-          }),
-          { status: 200 }
-        ],
-        [JSON.stringify({})]
-      )
+      fetch.mockResponseOnce(JSON.stringify({}), { status: 200 })
 
       const response = await resolvers.Mutation.changePassword(
         {},
@@ -617,12 +687,8 @@ describe('User root resolvers', () => {
 
       expect(response).toEqual(true)
     })
-    it('throws error if @user-mgnt/changeUserPassword sends anything but 201', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          statusCode: '401'
-        })
-      )
+    it('throws error if @user-mgnt/changeUserPassword sends anything but 200', async () => {
+      fetch.mockResponseOnce(JSON.stringify({}), { status: 401 })
 
       expect(
         resolvers.Mutation.changePassword(
@@ -639,16 +705,6 @@ describe('User root resolvers', () => {
       )
     })
     it("throws error if any user (except sysadmin) tries to update some other user's password", async () => {
-      fetch.mockResponses(
-        [
-          JSON.stringify({
-            userId: 'ba7022f0ff4822'
-          }),
-          { status: 201 }
-        ],
-        [JSON.stringify({})]
-      )
-
       expect(
         resolvers.Mutation.changePassword(
           {},
@@ -661,6 +717,194 @@ describe('User root resolvers', () => {
         )
       ).rejects.toThrowError(
         'Change password is not allowed. ba7022f0ff4822 is not the owner of the token'
+      )
+    })
+  })
+
+  describe('changePhone mutation', () => {
+    let authHeaderValidUser: { Authorization: string }
+    let authHeaderInValidUser: { Authorization: string }
+
+    beforeEach(() => {
+      fetch.resetMocks()
+      const validUserToken = jwt.sign(
+        { scope: ['register'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      authHeaderValidUser = {
+        Authorization: `Bearer ${validUserToken}`
+      }
+      const inValidUserToken = jwt.sign(
+        { scope: ['register'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      authHeaderInValidUser = {
+        Authorization: `Bearer ${inValidUserToken}`
+      }
+    })
+
+    it('changes phone number for loggedin user', async () => {
+      const nonce = '12345'
+      const mobile = '0711111111'
+      const code = await generateVerificationCode(nonce, mobile)
+      fetch.mockResponseOnce(JSON.stringify({}), { status: 200 })
+
+      const response = await resolvers.Mutation.changePhone(
+        {},
+        {
+          userId: 'ba7022f0ff4822',
+          phoneNumber: mobile,
+          nonce: nonce,
+          verifyCode: code
+        },
+        authHeaderValidUser
+      )
+
+      expect(response).toEqual(true)
+    })
+    it('throws error if @user-mgnt/changeUserPhone sends anything but 201', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          statusCode: '401'
+        })
+      )
+
+      const nonce = '12345'
+      const mobile = '0711111111'
+      const code = await generateVerificationCode(nonce, mobile)
+
+      expect(
+        resolvers.Mutation.changePhone(
+          {},
+          {
+            userId: 'ba7022f0ff4822',
+            phoneNumber: mobile,
+            nonce: nonce,
+            verifyCode: code
+          },
+          authHeaderValidUser
+        )
+      ).rejects.toThrowError(
+        "Something went wrong on user-mgnt service. Couldn't change user phone number"
+      )
+    })
+    it("throws error if any user tries to update some other user's phonenumber", async () => {
+      const nonce = '12345'
+      const mobile = '0711111111'
+      const code = await generateVerificationCode(nonce, mobile)
+
+      expect(
+        resolvers.Mutation.changePhone(
+          {},
+          {
+            userId: 'ba7022f0ff4822',
+            phoneNumber: mobile,
+            nonce: nonce,
+            verifyCode: code
+          },
+          authHeaderInValidUser
+        )
+      ).rejects.toThrowError(
+        'Change phone is not allowed. ba7022f0ff4822 is not the owner of the token'
+      )
+    })
+  })
+
+  describe('changeAvatar mutation', () => {
+    let authHeaderValidUser: { Authorization: string }
+    let authHeaderInValidUser: { Authorization: string }
+
+    beforeEach(() => {
+      fetch.resetMocks()
+      const validUserToken = jwt.sign(
+        { scope: ['register'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      authHeaderValidUser = {
+        Authorization: `Bearer ${validUserToken}`
+      }
+      const inValidUserToken = jwt.sign(
+        { scope: ['register'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      authHeaderInValidUser = {
+        Authorization: `Bearer ${inValidUserToken}`
+      }
+    })
+
+    it('changes avatar for loggedin user', async () => {
+      fetch.mockResponseOnce(JSON.stringify({}), { status: 200 })
+
+      const response = await resolvers.Mutation.changeAvatar(
+        {},
+        {
+          userId: 'ba7022f0ff4822',
+          avatar: {
+            type: 'image/png;base64',
+            data: 'aGVsbG8gd29ybGQ='
+          }
+        },
+        authHeaderValidUser
+      )
+
+      expect(response).toEqual(true)
+    })
+    it('throws error if @user-mgnt/changeUserAvatar sends anything but 200', async () => {
+      fetch.mockResponseOnce(JSON.stringify({}), { status: 401 })
+
+      expect(
+        resolvers.Mutation.changeAvatar(
+          {},
+          {
+            userId: 'ba7022f0ff4822',
+            avatar: {
+              type: 'image/png;base64',
+              data: 'aGVsbG8gd29ybGQ='
+            }
+          },
+          authHeaderValidUser
+        )
+      ).rejects.toThrowError(
+        "Something went wrong on user-mgnt service. Couldn't change user avatar"
+      )
+    })
+    it("throws error if any user tries to update some other user's avatar", async () => {
+      expect(
+        resolvers.Mutation.changeAvatar(
+          {},
+          {
+            userId: 'ba7022f0ff4822',
+            avatar: {
+              type: 'image/png;base64',
+              data: 'aGVsbG8gd29ybGQ='
+            }
+          },
+          authHeaderInValidUser
+        )
+      ).rejects.toThrowError(
+        'Changing avatar is not allowed. ba7022f0ff4822 is not the owner of the token'
       )
     })
   })

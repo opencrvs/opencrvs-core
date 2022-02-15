@@ -91,17 +91,12 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
   }
 
   render = () => {
-    const {
-      application,
-      form,
-      intl,
-      confirmRejectionEvent,
-      duplicate
-    } = this.props
+    const { application, form, intl, confirmRejectionEvent, duplicate } =
+      this.props
     const payload = this.processSubmitData()
     const { fields } = form
     if (duplicate) {
-      fields.map(field => {
+      fields.map((field) => {
         if (field.name === 'rejectionReason') {
           field.initialValue = ['duplicate']
         }

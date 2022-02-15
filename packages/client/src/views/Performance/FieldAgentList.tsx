@@ -25,7 +25,7 @@ import { generateLocations } from '@client/utils/locationUtils'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
 import { FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA } from '@client/views/SysAdmin/Performance/queries'
-import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/registrationRates/Within45DaysTable'
+import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/registrationRates/WithinTargetDaysTable'
 import { FilterContainer } from '@client/views/SysAdmin/Performance/utils'
 import {
   SysAdminContentWrapper,
@@ -34,7 +34,6 @@ import {
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
 import {
   ColumnContentAlignment,
-  ISearchLocation,
   ListTable
 } from '@opencrvs/components/lib/interface'
 import { GQLSearchFieldAgentResult } from '@opencrvs/gateway/src/graphql/schema'
@@ -47,6 +46,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
+import { ILocation } from '@client/offline/reducer'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -57,10 +57,22 @@ const { useState } = React
 interface SortMap {
   totalApplications: SORT_ORDER
   name: SORT_ORDER
+  startMonth: SORT_ORDER
+  avgCompleteApplicationTime: SORT_ORDER
+  type: SORT_ORDER
+  officeName: SORT_ORDER
+  inProgressApplications: SORT_ORDER
+  rejectedApplications: SORT_ORDER
 }
 const INITIAL_SORT_MAP = {
   totalApplications: SORT_ORDER.DESCENDING,
-  name: SORT_ORDER.ASCENDING
+  name: SORT_ORDER.ASCENDING,
+  startMonth: SORT_ORDER.ASCENDING,
+  avgCompleteApplicationTime: SORT_ORDER.ASCENDING,
+  type: SORT_ORDER.ASCENDING,
+  officeName: SORT_ORDER.ASCENDING,
+  inProgressApplications: SORT_ORDER.ASCENDING,
+  rejectedApplications: SORT_ORDER.ASCENDING
 }
 
 interface ISearchParams {
@@ -70,8 +82,7 @@ interface ISearchParams {
 }
 
 interface IConnectProps {
-  locations: ISearchLocation[]
-  offices: ISearchLocation[]
+  offlineOffices: { [key: string]: ILocation }
 }
 
 interface IDispatchProps {
@@ -133,18 +144,43 @@ function FieldAgentListComponent(props: IProps) {
     intl,
     location: { search },
     goToOperationalReport,
-    offices
+    offlineOffices
   } = props
-  const { locationId, timeStart, timeEnd } = (parse(
+  const { locationId, timeStart, timeEnd } = parse(
     search
-  ) as unknown) as ISearchParams
+  ) as unknown as ISearchParams
   const [status, setStatus] = useState<STATUS_OPTIONS>(STATUS_OPTIONS.ACTIVE)
   const [event, setEvent] = useState<EVENT_OPTIONS>(EVENT_OPTIONS.ALL)
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
+  const [columnToBeSort, setColumnToBeSort] =
+    useState<keyof SortMap>('totalApplications')
   const recordCount = DEFAULT_FIELD_AGENT_LIST_SIZE * currentPageNumber
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
+  const offices = generateLocations(offlineOffices, intl)
+
+  const isOfficeSelected = offices.some((office) => office.id === locationId)
+
+  const queryVariables = isOfficeSelected
+    ? {
+        timeStart: timeStart,
+        timeEnd: timeEnd,
+        primaryOfficeId: locationId,
+        status: status.toString(),
+        event: event === '' ? undefined : event.toUpperCase(),
+        count: recordCount,
+        sort: 'asc'
+      }
+    : {
+        timeStart: timeStart,
+        timeEnd: timeEnd,
+        locationId: locationId,
+        status: status.toString(),
+        event: event === '' ? undefined : event.toUpperCase(),
+        count: recordCount,
+        sort: 'asc'
+      }
 
   function toggleSort(key: keyof SortMap) {
     const invertedOrder =
@@ -152,6 +188,7 @@ function FieldAgentListComponent(props: IProps) {
         ? SORT_ORDER.ASCENDING
         : SORT_ORDER.DESCENDING
     setSortOrder({ ...sortOrder, [key]: invertedOrder })
+    setColumnToBeSort(key)
   }
 
   function getColumns(data?: GQLSearchFieldAgentResult) {
@@ -161,22 +198,38 @@ function FieldAgentListComponent(props: IProps) {
         label: intl.formatMessage(messages.fieldAgentColumnHeader, {
           totalAgents: (data && data.totalItems) || 0
         }),
-        width: 20
+        width: 20,
+        isSortable: true,
+        sortFunction: () => toggleSort('name'),
+        icon: columnToBeSort === 'name' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'name' ? true : false
       },
       {
         key: 'type',
         label: intl.formatMessage(messages.typeColumnHeader),
-        width: 12
+        width: 12,
+        isSortable: true,
+        sortFunction: () => toggleSort('type'),
+        icon: columnToBeSort === 'type' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'type' ? true : false
       },
       {
         key: 'officeName',
         label: intl.formatMessage(messages.officeColumnHeader),
-        width: 20
+        width: 20,
+        isSortable: true,
+        sortFunction: () => toggleSort('officeName'),
+        icon: columnToBeSort === 'officeName' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'officeName' ? true : false
       },
       {
         key: 'startMonth',
         label: intl.formatMessage(messages.startMonthColumnHeader),
-        width: 12
+        width: 12,
+        isSortable: true,
+        sortFunction: () => toggleSort('startMonth'),
+        icon: columnToBeSort === 'startMonth' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'startMonth' ? true : false
       },
       {
         key: 'totalApplications',
@@ -186,27 +239,52 @@ function FieldAgentListComponent(props: IProps) {
         width: 12,
         isSortable: true,
         sortFunction: () => toggleSort('totalApplications'),
-        icon: <ArrowDownBlue />
+        icon:
+          columnToBeSort === 'totalApplications' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'totalApplications' ? true : false
       },
       {
         key: 'inProgressApplications',
         label: intl.formatMessage(messages.totalInProgressColumnHeader, {
           linebreak: <br key={'inProgressApplications-break'} />
         }),
-        width: 12
+        width: 12,
+        isSortable: true,
+        sortFunction: () => toggleSort('inProgressApplications'),
+        icon:
+          columnToBeSort === 'inProgressApplications' ? (
+            <ArrowDownBlue />
+          ) : (
+            <></>
+          ),
+        isSorted: columnToBeSort === 'inProgressApplications' ? true : false
       },
       {
         key: 'avgCompleteApplicationTime',
         label: intl.formatMessage(messages.avgCompletionTimeColumnHeader, {
           linebreak: <br key={'avgCompleteApplicationTime-break'} />
         }),
-        width: 15
+        width: 15,
+        isSortable: true,
+        sortFunction: () => toggleSort('avgCompleteApplicationTime'),
+        icon:
+          columnToBeSort === 'avgCompleteApplicationTime' ? (
+            <ArrowDownBlue />
+          ) : (
+            <></>
+          ),
+        isSorted: columnToBeSort === 'avgCompleteApplicationTime' ? true : false
       },
       {
         key: 'rejectedApplications',
         label: intl.formatMessage(messages.totalRejectedColumnHeader),
         width: 10,
-        alignment: ColumnContentAlignment.RIGHT
+        alignment: ColumnContentAlignment.RIGHT,
+        isSortable: true,
+        sortFunction: () => toggleSort('rejectedApplications'),
+        icon:
+          columnToBeSort === 'rejectedApplications' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'rejectedApplications' ? true : false
       }
     ]
   }
@@ -235,10 +313,7 @@ function FieldAgentListComponent(props: IProps) {
           name: row.fullName,
           type: row.type,
           officeName: (office && office.displayLabel) || '',
-          startMonth:
-            (row.creationDate &&
-              moment(Number(row.creationDate)).format('MMMM YYYY')) ||
-            '',
+          startMonth: row.creationDate,
           totalApplications: String(row.totalNumberOfApplicationStarted),
           inProgressApplications: `${
             row.totalNumberOfInProgressAppStarted
@@ -246,10 +321,7 @@ function FieldAgentListComponent(props: IProps) {
             row.totalNumberOfApplicationStarted,
             row.totalNumberOfInProgressAppStarted
           )}%)`,
-          avgCompleteApplicationTime: getAverageCompletionTimeComponent(
-            row.averageTimeForDeclaredApplications,
-            idx
-          ),
+          avgCompleteApplicationTime: row.averageTimeForDeclaredApplications,
           rejectedApplications: `${
             row.totalNumberOfRejectedApplications
           } (${getPercentage(
@@ -262,9 +334,26 @@ function FieldAgentListComponent(props: IProps) {
       (content &&
         orderBy(
           content,
-          ['totalApplications'],
-          [sortOrder.totalApplications]
-        )) ||
+          columnToBeSort === 'name'
+            ? [(content) => content[columnToBeSort]!.toString().toLowerCase()]
+            : [columnToBeSort],
+          [sortOrder[columnToBeSort]]
+        ).map((row, idx) => {
+          return {
+            ...row,
+            startMonth:
+              (row.startMonth &&
+                moment(Number(row.startMonth)).format('MMMM YYYY')) ||
+              '',
+            avgCompleteApplicationTime:
+              row.avgCompleteApplicationTime === 0
+                ? '-'
+                : getAverageCompletionTimeComponent(
+                    Number(row.avgCompleteApplicationTime),
+                    idx
+                  )
+          }
+        })) ||
       []
     )
   }
@@ -287,7 +376,7 @@ function FieldAgentListComponent(props: IProps) {
         <FilterContainer>
           <LocationPicker
             selectedLocationId={locationId}
-            onChangeLocation={newLocationId => {
+            onChangeLocation={(newLocationId) => {
               props.goToFieldAgentList(newLocationId, timeStart, timeEnd, event)
             }}
             requiredJurisdictionTypes={
@@ -306,10 +395,10 @@ function FieldAgentListComponent(props: IProps) {
             }
           />
           <PerformanceSelect
-            onChange={option => {
+            onChange={(option) => {
               setEvent(
                 Object.values(EVENT_OPTIONS).find(
-                  val => val === option.value
+                  (val) => val === option.value
                 ) || EVENT_OPTIONS.ALL
               )
             }}
@@ -333,10 +422,10 @@ function FieldAgentListComponent(props: IProps) {
             ]}
           />
           <PerformanceSelect
-            onChange={option => {
+            onChange={(option) => {
               setStatus(
                 Object.values(STATUS_OPTIONS).find(
-                  val => val === option.value
+                  (val) => val === option.value
                 ) || STATUS_OPTIONS.ACTIVE
               )
             }}
@@ -370,15 +459,7 @@ function FieldAgentListComponent(props: IProps) {
     >
       <Query
         query={FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA}
-        variables={{
-          timeStart: timeStart,
-          timeEnd: timeEnd,
-          locationId: locationId,
-          status: status.toString(),
-          event: event === '' ? undefined : event.toUpperCase(),
-          count: recordCount,
-          sort: 'asc'
-        }}
+        variables={queryVariables}
         fetchPolicy={'no-cache'}
       >
         {({ data, loading, error }) => {
@@ -437,13 +518,9 @@ function FieldAgentListComponent(props: IProps) {
 
 export const FieldAgentList = connect(
   (state: IStoreState) => {
-    const offlineLocations = getOfflineData(state).locations
-    const offlineSearchableLocations = generateLocations(offlineLocations)
     const offlineOffices = getOfflineData(state).offices
-    const offlineSearchableOffices = generateLocations(offlineOffices)
     return {
-      locations: offlineSearchableLocations,
-      offices: offlineSearchableOffices
+      offlineOffices
     }
   },
   { goToOperationalReport, goToFieldAgentList }

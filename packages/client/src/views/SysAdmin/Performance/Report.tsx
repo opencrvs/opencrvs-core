@@ -12,14 +12,11 @@
 import { Query } from '@client/components/Query'
 import { Event } from '@client/forms'
 import { goBack } from '@client/navigation'
-import { IOfflineData } from '@client/offline/reducer'
-import { getOfflineData } from '@client/offline/selectors'
-import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { PERFORMANCE_METRICS } from '@client/views/SysAdmin/Performance/metricsQuery'
 import {
   CertificationPaymentReports,
-  Estimated45DayRegistrationReports,
+  EstimatedTargetDayRegistrationReports,
   GenderBasisReports,
   TimeFrameReports
 } from '@client/views/SysAdmin/Performance/reports'
@@ -30,7 +27,7 @@ import {
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
 import {
   GQLCertificationPaymentMetrics,
-  GQLRegistration45DayEstimatedMetrics,
+  GQLRegistrationTargetDayEstimatedMetrics,
   GQLRegistrationGenderBasisMetrics,
   GQLRegistrationMetrics,
   GQLRegistrationTimeFrameMetrics
@@ -38,34 +35,38 @@ import {
 import { ApolloError } from 'apollo-client'
 import { get, isEmpty } from 'lodash'
 import moment from 'moment'
-import React, { useState } from 'react'
+import React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
+import { RouteComponentProps, StaticContext } from 'react-router'
 import { NoResultMessage } from './NoResultMessage'
 
 const ReportWrapper = styled.div`
   margin-top: 16px;
 `
 
-interface ReportProps {
-  selectedLocation: ISearchLocation
-  timeRange: { start: Date; end: Date }
-  eventType: Event
+interface DispatchProps {
   goBack: typeof goBack
-  offlineResources: IOfflineData
 }
 
 interface IMetricsQueryResult {
   fetchRegistrationMetrics: GQLRegistrationMetrics
 }
 
-type Props = ReportProps & WrappedComponentProps & RouteComponentProps<{}>
+type RouteProps = RouteComponentProps<
+  {},
+  StaticContext,
+  {
+    eventType: Event
+    timeRange: { start: Date; end: Date }
+    selectedLocation: ISearchLocation
+  }
+>
+
+type Props = DispatchProps & WrappedComponentProps & RouteProps
 
 function ReportComponent(props: Props) {
-  const [selectedLocation] = useState<ISearchLocation>(props.selectedLocation)
-
-  const { timeRange, eventType } = props
+  const { eventType, timeRange, selectedLocation } = props.location.state
   const { start, end } = timeRange
 
   const title = moment(start).format('MMMM YYYY')
@@ -134,14 +135,14 @@ function ReportComponent(props: Props) {
                   }
                 />
                 {eventType === Event.BIRTH && (
-                  <Estimated45DayRegistrationReports
+                  <EstimatedTargetDayRegistrationReports
                     eventType={eventType}
                     loading={loading}
                     data={
                       (data &&
                         data.fetchRegistrationMetrics &&
                         (data.fetchRegistrationMetrics
-                          .estimated45DayMetrics as GQLRegistration45DayEstimatedMetrics)) ||
+                          .estimatedTargetDayMetrics as GQLRegistrationTargetDayEstimatedMetrics)) ||
                       {}
                     }
                   />
@@ -166,19 +167,6 @@ function ReportComponent(props: Props) {
   )
 }
 
-function mapStateToProps(state: IStoreState, props: Props) {
-  const historyState = props.history.location.state as any
-  return {
-    eventType: historyState && historyState.eventType,
-    timeRange: (historyState && historyState.timeRange) || {
-      start: new Date(),
-      end: new Date()
-    },
-    selectedLocation: historyState!.selectedLocation,
-    offlineResources: getOfflineData(state)
-  }
-}
-
-export const Report = connect(mapStateToProps, { goBack })(
+export const Report = connect(undefined, { goBack })(
   injectIntl(ReportComponent)
 )

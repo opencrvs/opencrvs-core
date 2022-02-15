@@ -24,7 +24,7 @@ import { Action } from '@client/forms'
 import { getRegisterForm } from '@client/forms/register/application-selectors'
 import { AppStore } from '@client/store'
 import { getMutationMapping } from '@client/views/DataProvider/MutationProvider'
-import { REGISTRATION_HOME_QUERY } from '@client/views/RegistrationHome/queries'
+import { REGISTRATION_HOME_QUERY } from '@client/views/OfficeHome/queries'
 import { getOperationName } from 'apollo-utilities'
 import { client } from '@client/utils/apolloClient'
 import moment from 'moment'
@@ -56,7 +56,8 @@ const INPROGRESS_STATUS = [
 const changeStatus = {
   [SUBMISSION_STATUS.SUBMITTING.toString()]: SUBMISSION_STATUS.READY_TO_SUBMIT,
   [SUBMISSION_STATUS.APPROVING.toString()]: SUBMISSION_STATUS.READY_TO_APPROVE,
-  [SUBMISSION_STATUS.REGISTERING.toString()]: SUBMISSION_STATUS.READY_TO_REGISTER,
+  [SUBMISSION_STATUS.REGISTERING.toString()]:
+    SUBMISSION_STATUS.READY_TO_REGISTER,
   [SUBMISSION_STATUS.REJECTING.toString()]: SUBMISSION_STATUS.READY_TO_REJECT,
   [SUBMISSION_STATUS.CERTIFYING.toString()]: SUBMISSION_STATUS.READY_TO_CERTIFY
 }
@@ -92,8 +93,8 @@ export class SubmissionController {
   public client: ApolloClient<{}> & {
     setRequestHandler: (query: DocumentNode, handler: RequestHandler) => void // used for mocking in tests
   }
-  public syncRunning: boolean = false
-  private syncCount: number = 0
+  public syncRunning = false
+  private syncCount = 0
 
   constructor(store: AppStore) {
     this.store = store
@@ -215,7 +216,7 @@ export class SubmissionController {
       SUCCESS_SUBMISSION_STATUS[application.action || ''] ||
       SUBMISSION_STATUS.SUBMITTED
     application.submissionStatus = submissionStatus
-    let response =
+    const response =
       (result && result.data && result.data.createBirthRegistration) ||
       (result && result.data && result.data.createDeathRegistration) ||
       null

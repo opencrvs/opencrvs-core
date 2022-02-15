@@ -8,7 +8,7 @@ ENV NPM_CONFIG_LOGLEVEL warn
 COPY package.json package.json
 COPY packages/components/package.json packages/components/package.json
 COPY packages/gateway/package.json packages/gateway/package.json
-COPY packages/commons/package.json packages/commons/package.json
+COPY packages/commons packages/commons
 COPY yarn.lock yarn.lock
 RUN yarn install
 
@@ -27,4 +27,4 @@ ENV REACT_APP_LANGUAGE='en'
 EXPOSE 6060
 WORKDIR /usr/src/app/packages/components
 
-CMD ["sh","-c","yarn build && yarn start"]
+CMD ["sh","-c","yarn start"]

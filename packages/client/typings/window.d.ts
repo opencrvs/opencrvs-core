@@ -12,7 +12,7 @@
 interface Window {
   config: {
     API_GATEWAY_URL: string
-    CONFIG_API_URL: String
+    CONFIG_API_URL: string
     BACKGROUND_SYNC_BROADCAST_CHANNEL: string
     COUNTRY: string
     COUNTRY_LOGO_FILE: string
@@ -22,7 +22,11 @@ interface Window {
     LANGUAGES: string
     LOGIN_URL: string
     AUTH_URL: string
-    RESOURCES_URL: string
+    COUNTRY_CONFIG_URL: string
+    SHOW_FARAJALAND_IN_COUNTRY_LISTS: boolean
+    /**
+     * @deprecated HEALTH_FACILITY_FILTER is no longer used
+     */
     HEALTH_FACILITY_FILTER: string
     CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: number
     CERTIFICATE_PRINT_CHARGE_UP_LIMIT: number
@@ -44,7 +48,14 @@ interface Window {
         endBefore: number
       }
     }
+    NID_NUMBER_PATTERN: {
+      pattern: RegExp
+      example: string
+      num: string
+    }
     LOGROCKET: string
     SENTRY: string
+    BIRTH_REGISTRATION_TARGET: number
+    DEATH_REGISTRATION_TARGET: number
   }
 }

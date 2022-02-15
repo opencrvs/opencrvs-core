@@ -41,18 +41,21 @@ if (
   })
 
   // setup log rocket to ship log messages and record user errors
-  LogRocket.init(window.config.LOGROCKET, {
-    release: process.env.REACT_APP_VERSION
-  })
+
+  if (window.config.LOGROCKET) {
+    LogRocket.init(window.config.LOGROCKET, {
+      release: process.env.REACT_APP_VERSION
+    })
+  }
 
   // Integrate the two
-  Sentry.configureScope(scope => {
-    scope.addEventProcessor(async event => {
+  Sentry.configureScope((scope) => {
+    scope.addEventProcessor(async (event) => {
       if (!event.extra) {
         event.extra = {}
       }
-      const sessionUrl = await new Promise(resolve => {
-        LogRocket.getSessionURL(url => {
+      const sessionUrl = await new Promise((resolve) => {
+        LogRocket.getSessionURL((url) => {
           resolve(url)
         })
       })
@@ -76,7 +79,7 @@ function onBackGroundSync() {
   const channel = new BroadcastChannel(
     window.config.BACKGROUND_SYNC_BROADCAST_CHANNEL
   )
-  channel.onmessage = e => {
+  channel.onmessage = (e) => {
     const action = actions.showBackgroundSyncedNotification()
     store.dispatch(action)
   }

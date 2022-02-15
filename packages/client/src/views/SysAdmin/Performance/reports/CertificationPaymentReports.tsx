@@ -27,7 +27,7 @@ import { IFooterFColumn } from '@opencrvs/components/lib/interface/GridTable/typ
 import { get } from 'lodash'
 
 interface IStateProps {
-  offlineResources: IOfflineData
+  offlineCountryConfiguration: IOfflineData
 }
 
 type FullProps = {
@@ -41,10 +41,10 @@ class CertificationPaymentReportComponent extends React.Component<FullProps> {
   getContent = () => {
     return (
       (this.props.data.details &&
-        this.props.data.details.map(payment => ({
+        this.props.data.details.map((payment) => ({
           location: getLocationFromPartOfLocationId(
             payment.locationId,
-            this.props.offlineResources
+            this.props.offlineCountryConfiguration
           ).name,
           total: String(payment.total)
         }))) ||
@@ -105,6 +105,6 @@ class CertificationPaymentReportComponent extends React.Component<FullProps> {
 
 export const CertificationPaymentReports = connect((store: IStoreState) => {
   return {
-    offlineResources: getOfflineData(store)
+    offlineCountryConfiguration: getOfflineData(store)
   }
 }, {})(injectIntl(CertificationPaymentReportComponent))
