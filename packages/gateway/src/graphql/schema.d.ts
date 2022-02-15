@@ -239,13 +239,13 @@ export interface GQLVerifyPasswordResult {
 export interface GQLRegistrationMetrics {
   genderBasisMetrics?: GQLRegistrationGenderBasisMetrics
   timeFrames?: GQLRegistrationTimeFrameMetrics
-  estimated45DayMetrics?: GQLRegistration45DayEstimatedMetrics
+  estimatedTargetDayMetrics?: GQLRegistrationTargetDayEstimatedMetrics
   payments?: GQLCertificationPaymentMetrics
 }
 
 export interface GQLEventEstimationMetrics {
-  birth45DayMetrics?: GQLEstimationMetrics
-  death45DayMetrics?: GQLEstimationMetrics
+  birthTargetDayMetrics?: GQLEstimationMetrics
+  deathTargetDayMetrics?: GQLEstimationMetrics
 }
 
 export interface GQLApplicationsStartedMetrics {
@@ -255,13 +255,13 @@ export interface GQLApplicationsStartedMetrics {
 }
 
 export interface GQLMonthWiseEstimationMetrics {
-  details?: Array<GQLMonthWise45DayEstimation | null>
-  total?: GQLEventIn45DayEstimationCount
+  details?: Array<GQLMonthWiseTargetDayEstimation | null>
+  total?: GQLEventInTargetDayEstimationCount
 }
 
 export interface GQLLocationWiseEstimationMetrics {
-  details?: Array<GQLLocationWise45DayEstimation | null>
-  total?: GQLEventIn45DayEstimationCount
+  details?: Array<GQLLocationWiseTargetDayEstimation | null>
+  total?: GQLEventInTargetDayEstimationCount
 }
 
 export interface GQLTimeLoggedMetricsResultSet {
@@ -591,9 +591,9 @@ export interface GQLRegistrationTimeFrameMetrics {
   total?: GQLTimeFrameTotalCount
 }
 
-export interface GQLRegistration45DayEstimatedMetrics {
-  details?: Array<GQLEstimated45DayMetrics>
-  total?: GQLEstimate45DayTotalCount
+export interface GQLRegistrationTargetDayEstimatedMetrics {
+  details?: Array<GQLEstimatedTargetDayMetrics>
+  total?: GQLEstimateTargetDayTotalCount
 }
 
 export interface GQLCertificationPaymentMetrics {
@@ -609,29 +609,29 @@ export interface GQLEstimationMetrics {
   femalePercentage: number
 }
 
-export interface GQLMonthWise45DayEstimation {
+export interface GQLMonthWiseTargetDayEstimation {
   actualTotalRegistration: number
-  actual45DayRegistration: number
+  actualTargetDayRegistration: number
   estimatedRegistration: number
-  estimated45DayPercentage: number
+  estimatedTargetDayPercentage: number
   month: string
   year: string
   startOfMonth: string
   endOfMonth: string
 }
 
-export interface GQLEventIn45DayEstimationCount {
+export interface GQLEventInTargetDayEstimationCount {
   actualTotalRegistration: number
-  actual45DayRegistration: number
+  actualTargetDayRegistration: number
   estimatedRegistration: number
-  estimated45DayPercentage: number
+  estimatedTargetDayPercentage: number
 }
 
-export interface GQLLocationWise45DayEstimation {
+export interface GQLLocationWiseTargetDayEstimation {
   actualTotalRegistration: number
-  actual45DayRegistration: number
+  actualTargetDayRegistration: number
   estimatedRegistration: number
-  estimated45DayPercentage: number
+  estimatedTargetDayPercentage: number
   locationId: string
   locationName: string
 }
@@ -909,33 +909,33 @@ export interface GQLGenderBasisTotalCount {
 
 export interface GQLTimeFrameDetailMetrics {
   locationId: string
-  regWithin45d: number
-  regWithin45dTo1yr: number
+  regWithinTargetd: number
+  regWithinTargetdTo1yr: number
   regWithin1yrTo5yr: number
   regOver5yr: number
   total: number
 }
 
 export interface GQLTimeFrameTotalCount {
-  regWithin45d: number
-  regWithin45dTo1yr: number
+  regWithinTargetd: number
+  regWithinTargetdTo1yr: number
   regWithin1yrTo5yr: number
   regOver5yr: number
   total: number
 }
 
-export interface GQLEstimated45DayMetrics {
+export interface GQLEstimatedTargetDayMetrics {
   locationId: string
   estimatedRegistration: number
-  registrationIn45Day: number
+  registrationInTargetDay: number
   estimationYear: number
   estimationLocationLevel: string
   estimationPercentage: number
 }
 
-export interface GQLEstimate45DayTotalCount {
+export interface GQLEstimateTargetDayTotalCount {
   estimatedRegistration: number
-  registrationIn45Day: number
+  registrationInTargetDay: number
   estimationPercentage: number
 }
 
@@ -1218,12 +1218,12 @@ export interface GQLResolver {
   SearchFieldAgentResponse?: GQLSearchFieldAgentResponseTypeResolver
   RegistrationGenderBasisMetrics?: GQLRegistrationGenderBasisMetricsTypeResolver
   RegistrationTimeFrameMetrics?: GQLRegistrationTimeFrameMetricsTypeResolver
-  Registration45DayEstimatedMetrics?: GQLRegistration45DayEstimatedMetricsTypeResolver
+  RegistrationTargetDayEstimatedMetrics?: GQLRegistrationTargetDayEstimatedMetricsTypeResolver
   CertificationPaymentMetrics?: GQLCertificationPaymentMetricsTypeResolver
   EstimationMetrics?: GQLEstimationMetricsTypeResolver
-  MonthWise45DayEstimation?: GQLMonthWise45DayEstimationTypeResolver
-  EventIn45DayEstimationCount?: GQLEventIn45DayEstimationCountTypeResolver
-  LocationWise45DayEstimation?: GQLLocationWise45DayEstimationTypeResolver
+  MonthWiseTargetDayEstimation?: GQLMonthWiseTargetDayEstimationTypeResolver
+  EventInTargetDayEstimationCount?: GQLEventInTargetDayEstimationCountTypeResolver
+  LocationWiseTargetDayEstimation?: GQLLocationWiseTargetDayEstimationTypeResolver
   TimeLoggedMetrics?: GQLTimeLoggedMetricsTypeResolver
   EventSearchSet?: {
     __resolveType: GQLEventSearchSetTypeResolver
@@ -1237,8 +1237,8 @@ export interface GQLResolver {
   GenderBasisTotalCount?: GQLGenderBasisTotalCountTypeResolver
   TimeFrameDetailMetrics?: GQLTimeFrameDetailMetricsTypeResolver
   TimeFrameTotalCount?: GQLTimeFrameTotalCountTypeResolver
-  Estimated45DayMetrics?: GQLEstimated45DayMetricsTypeResolver
-  Estimate45DayTotalCount?: GQLEstimate45DayTotalCountTypeResolver
+  EstimatedTargetDayMetrics?: GQLEstimatedTargetDayMetricsTypeResolver
+  EstimateTargetDayTotalCount?: GQLEstimateTargetDayTotalCountTypeResolver
   CertificationPaymentDetailsMetrics?: GQLCertificationPaymentDetailsMetricsTypeResolver
   CertificationPaymentTotalCount?: GQLCertificationPaymentTotalCountTypeResolver
   RegistrationSearchSet?: GQLRegistrationSearchSetTypeResolver
@@ -2921,7 +2921,7 @@ export interface VerifyPasswordResultToIdResolver<
 export interface GQLRegistrationMetricsTypeResolver<TParent = any> {
   genderBasisMetrics?: RegistrationMetricsToGenderBasisMetricsResolver<TParent>
   timeFrames?: RegistrationMetricsToTimeFramesResolver<TParent>
-  estimated45DayMetrics?: RegistrationMetricsToEstimated45DayMetricsResolver<TParent>
+  estimatedTargetDayMetrics?: RegistrationMetricsToEstimatedTargetDayMetricsResolver<TParent>
   payments?: RegistrationMetricsToPaymentsResolver<TParent>
 }
 
@@ -2939,7 +2939,7 @@ export interface RegistrationMetricsToTimeFramesResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface RegistrationMetricsToEstimated45DayMetricsResolver<
+export interface RegistrationMetricsToEstimatedTargetDayMetricsResolver<
   TParent = any,
   TResult = any
 > {
@@ -2954,18 +2954,18 @@ export interface RegistrationMetricsToPaymentsResolver<
 }
 
 export interface GQLEventEstimationMetricsTypeResolver<TParent = any> {
-  birth45DayMetrics?: EventEstimationMetricsToBirth45DayMetricsResolver<TParent>
-  death45DayMetrics?: EventEstimationMetricsToDeath45DayMetricsResolver<TParent>
+  birthTargetDayMetrics?: EventEstimationMetricsToBirthTargetDayMetricsResolver<TParent>
+  deathTargetDayMetrics?: EventEstimationMetricsToDeathTargetDayMetricsResolver<TParent>
 }
 
-export interface EventEstimationMetricsToBirth45DayMetricsResolver<
+export interface EventEstimationMetricsToBirthTargetDayMetricsResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface EventEstimationMetricsToDeath45DayMetricsResolver<
+export interface EventEstimationMetricsToDeathTargetDayMetricsResolver<
   TParent = any,
   TResult = any
 > {
@@ -3764,21 +3764,21 @@ export interface RegistrationTimeFrameMetricsToTotalResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLRegistration45DayEstimatedMetricsTypeResolver<
+export interface GQLRegistrationTargetDayEstimatedMetricsTypeResolver<
   TParent = any
 > {
-  details?: Registration45DayEstimatedMetricsToDetailsResolver<TParent>
-  total?: Registration45DayEstimatedMetricsToTotalResolver<TParent>
+  details?: RegistrationTargetDayEstimatedMetricsToDetailsResolver<TParent>
+  total?: RegistrationTargetDayEstimatedMetricsToTotalResolver<TParent>
 }
 
-export interface Registration45DayEstimatedMetricsToDetailsResolver<
+export interface RegistrationTargetDayEstimatedMetricsToDetailsResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface Registration45DayEstimatedMetricsToTotalResolver<
+export interface RegistrationTargetDayEstimatedMetricsToTotalResolver<
   TParent = any,
   TResult = any
 > {
@@ -3847,153 +3847,153 @@ export interface EstimationMetricsToFemalePercentageResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLMonthWise45DayEstimationTypeResolver<TParent = any> {
-  actualTotalRegistration?: MonthWise45DayEstimationToActualTotalRegistrationResolver<TParent>
-  actual45DayRegistration?: MonthWise45DayEstimationToActual45DayRegistrationResolver<TParent>
-  estimatedRegistration?: MonthWise45DayEstimationToEstimatedRegistrationResolver<TParent>
-  estimated45DayPercentage?: MonthWise45DayEstimationToEstimated45DayPercentageResolver<TParent>
-  month?: MonthWise45DayEstimationToMonthResolver<TParent>
-  year?: MonthWise45DayEstimationToYearResolver<TParent>
-  startOfMonth?: MonthWise45DayEstimationToStartOfMonthResolver<TParent>
-  endOfMonth?: MonthWise45DayEstimationToEndOfMonthResolver<TParent>
+export interface GQLMonthWiseTargetDayEstimationTypeResolver<TParent = any> {
+  actualTotalRegistration?: MonthWiseTargetDayEstimationToActualTotalRegistrationResolver<TParent>
+  actualTargetDayRegistration?: MonthWiseTargetDayEstimationToActualTargetDayRegistrationResolver<TParent>
+  estimatedRegistration?: MonthWiseTargetDayEstimationToEstimatedRegistrationResolver<TParent>
+  estimatedTargetDayPercentage?: MonthWiseTargetDayEstimationToEstimatedTargetDayPercentageResolver<TParent>
+  month?: MonthWiseTargetDayEstimationToMonthResolver<TParent>
+  year?: MonthWiseTargetDayEstimationToYearResolver<TParent>
+  startOfMonth?: MonthWiseTargetDayEstimationToStartOfMonthResolver<TParent>
+  endOfMonth?: MonthWiseTargetDayEstimationToEndOfMonthResolver<TParent>
 }
 
-export interface MonthWise45DayEstimationToActualTotalRegistrationResolver<
+export interface MonthWiseTargetDayEstimationToActualTotalRegistrationResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface MonthWise45DayEstimationToActual45DayRegistrationResolver<
+export interface MonthWiseTargetDayEstimationToActualTargetDayRegistrationResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface MonthWise45DayEstimationToEstimatedRegistrationResolver<
+export interface MonthWiseTargetDayEstimationToEstimatedRegistrationResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface MonthWise45DayEstimationToEstimated45DayPercentageResolver<
+export interface MonthWiseTargetDayEstimationToEstimatedTargetDayPercentageResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface MonthWise45DayEstimationToMonthResolver<
+export interface MonthWiseTargetDayEstimationToMonthResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface MonthWise45DayEstimationToYearResolver<
+export interface MonthWiseTargetDayEstimationToYearResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface MonthWise45DayEstimationToStartOfMonthResolver<
+export interface MonthWiseTargetDayEstimationToStartOfMonthResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface MonthWise45DayEstimationToEndOfMonthResolver<
+export interface MonthWiseTargetDayEstimationToEndOfMonthResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLEventIn45DayEstimationCountTypeResolver<TParent = any> {
-  actualTotalRegistration?: EventIn45DayEstimationCountToActualTotalRegistrationResolver<TParent>
-  actual45DayRegistration?: EventIn45DayEstimationCountToActual45DayRegistrationResolver<TParent>
-  estimatedRegistration?: EventIn45DayEstimationCountToEstimatedRegistrationResolver<TParent>
-  estimated45DayPercentage?: EventIn45DayEstimationCountToEstimated45DayPercentageResolver<TParent>
+export interface GQLEventInTargetDayEstimationCountTypeResolver<TParent = any> {
+  actualTotalRegistration?: EventInTargetDayEstimationCountToActualTotalRegistrationResolver<TParent>
+  actualTargetDayRegistration?: EventInTargetDayEstimationCountToActualTargetDayRegistrationResolver<TParent>
+  estimatedRegistration?: EventInTargetDayEstimationCountToEstimatedRegistrationResolver<TParent>
+  estimatedTargetDayPercentage?: EventInTargetDayEstimationCountToEstimatedTargetDayPercentageResolver<TParent>
 }
 
-export interface EventIn45DayEstimationCountToActualTotalRegistrationResolver<
+export interface EventInTargetDayEstimationCountToActualTotalRegistrationResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface EventIn45DayEstimationCountToActual45DayRegistrationResolver<
+export interface EventInTargetDayEstimationCountToActualTargetDayRegistrationResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface EventIn45DayEstimationCountToEstimatedRegistrationResolver<
+export interface EventInTargetDayEstimationCountToEstimatedRegistrationResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface EventIn45DayEstimationCountToEstimated45DayPercentageResolver<
+export interface EventInTargetDayEstimationCountToEstimatedTargetDayPercentageResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLLocationWise45DayEstimationTypeResolver<TParent = any> {
-  actualTotalRegistration?: LocationWise45DayEstimationToActualTotalRegistrationResolver<TParent>
-  actual45DayRegistration?: LocationWise45DayEstimationToActual45DayRegistrationResolver<TParent>
-  estimatedRegistration?: LocationWise45DayEstimationToEstimatedRegistrationResolver<TParent>
-  estimated45DayPercentage?: LocationWise45DayEstimationToEstimated45DayPercentageResolver<TParent>
-  locationId?: LocationWise45DayEstimationToLocationIdResolver<TParent>
-  locationName?: LocationWise45DayEstimationToLocationNameResolver<TParent>
+export interface GQLLocationWiseTargetDayEstimationTypeResolver<TParent = any> {
+  actualTotalRegistration?: LocationWiseTargetDayEstimationToActualTotalRegistrationResolver<TParent>
+  actualTargetDayRegistration?: LocationWiseTargetDayEstimationToActualTargetDayRegistrationResolver<TParent>
+  estimatedRegistration?: LocationWiseTargetDayEstimationToEstimatedRegistrationResolver<TParent>
+  estimatedTargetDayPercentage?: LocationWiseTargetDayEstimationToEstimatedTargetDayPercentageResolver<TParent>
+  locationId?: LocationWiseTargetDayEstimationToLocationIdResolver<TParent>
+  locationName?: LocationWiseTargetDayEstimationToLocationNameResolver<TParent>
 }
 
-export interface LocationWise45DayEstimationToActualTotalRegistrationResolver<
+export interface LocationWiseTargetDayEstimationToActualTotalRegistrationResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface LocationWise45DayEstimationToActual45DayRegistrationResolver<
+export interface LocationWiseTargetDayEstimationToActualTargetDayRegistrationResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface LocationWise45DayEstimationToEstimatedRegistrationResolver<
+export interface LocationWiseTargetDayEstimationToEstimatedRegistrationResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface LocationWise45DayEstimationToEstimated45DayPercentageResolver<
+export interface LocationWiseTargetDayEstimationToEstimatedTargetDayPercentageResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface LocationWise45DayEstimationToLocationIdResolver<
+export interface LocationWiseTargetDayEstimationToLocationIdResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface LocationWise45DayEstimationToLocationNameResolver<
+export interface LocationWiseTargetDayEstimationToLocationNameResolver<
   TParent = any,
   TResult = any
 > {
@@ -4301,8 +4301,8 @@ export interface GenderBasisTotalCountToTotalResolver<
 
 export interface GQLTimeFrameDetailMetricsTypeResolver<TParent = any> {
   locationId?: TimeFrameDetailMetricsToLocationIdResolver<TParent>
-  regWithin45d?: TimeFrameDetailMetricsToRegWithin45dResolver<TParent>
-  regWithin45dTo1yr?: TimeFrameDetailMetricsToRegWithin45dTo1yrResolver<TParent>
+  regWithinTargetd?: TimeFrameDetailMetricsToRegWithinTargetdResolver<TParent>
+  regWithinTargetdTo1yr?: TimeFrameDetailMetricsToRegWithinTargetdTo1yrResolver<TParent>
   regWithin1yrTo5yr?: TimeFrameDetailMetricsToRegWithin1yrTo5yrResolver<TParent>
   regOver5yr?: TimeFrameDetailMetricsToRegOver5yrResolver<TParent>
   total?: TimeFrameDetailMetricsToTotalResolver<TParent>
@@ -4315,14 +4315,14 @@ export interface TimeFrameDetailMetricsToLocationIdResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface TimeFrameDetailMetricsToRegWithin45dResolver<
+export interface TimeFrameDetailMetricsToRegWithinTargetdResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface TimeFrameDetailMetricsToRegWithin45dTo1yrResolver<
+export interface TimeFrameDetailMetricsToRegWithinTargetdTo1yrResolver<
   TParent = any,
   TResult = any
 > {
@@ -4351,21 +4351,21 @@ export interface TimeFrameDetailMetricsToTotalResolver<
 }
 
 export interface GQLTimeFrameTotalCountTypeResolver<TParent = any> {
-  regWithin45d?: TimeFrameTotalCountToRegWithin45dResolver<TParent>
-  regWithin45dTo1yr?: TimeFrameTotalCountToRegWithin45dTo1yrResolver<TParent>
+  regWithinTargetd?: TimeFrameTotalCountToRegWithinTargetdResolver<TParent>
+  regWithinTargetdTo1yr?: TimeFrameTotalCountToRegWithinTargetdTo1yrResolver<TParent>
   regWithin1yrTo5yr?: TimeFrameTotalCountToRegWithin1yrTo5yrResolver<TParent>
   regOver5yr?: TimeFrameTotalCountToRegOver5yrResolver<TParent>
   total?: TimeFrameTotalCountToTotalResolver<TParent>
 }
 
-export interface TimeFrameTotalCountToRegWithin45dResolver<
+export interface TimeFrameTotalCountToRegWithinTargetdResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface TimeFrameTotalCountToRegWithin45dTo1yrResolver<
+export interface TimeFrameTotalCountToRegWithinTargetdTo1yrResolver<
   TParent = any,
   TResult = any
 > {
@@ -4393,78 +4393,78 @@ export interface TimeFrameTotalCountToTotalResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLEstimated45DayMetricsTypeResolver<TParent = any> {
-  locationId?: Estimated45DayMetricsToLocationIdResolver<TParent>
-  estimatedRegistration?: Estimated45DayMetricsToEstimatedRegistrationResolver<TParent>
-  registrationIn45Day?: Estimated45DayMetricsToRegistrationIn45DayResolver<TParent>
-  estimationYear?: Estimated45DayMetricsToEstimationYearResolver<TParent>
-  estimationLocationLevel?: Estimated45DayMetricsToEstimationLocationLevelResolver<TParent>
-  estimationPercentage?: Estimated45DayMetricsToEstimationPercentageResolver<TParent>
+export interface GQLEstimatedTargetDayMetricsTypeResolver<TParent = any> {
+  locationId?: EstimatedTargetDayMetricsToLocationIdResolver<TParent>
+  estimatedRegistration?: EstimatedTargetDayMetricsToEstimatedRegistrationResolver<TParent>
+  registrationInTargetDay?: EstimatedTargetDayMetricsToRegistrationInTargetDayResolver<TParent>
+  estimationYear?: EstimatedTargetDayMetricsToEstimationYearResolver<TParent>
+  estimationLocationLevel?: EstimatedTargetDayMetricsToEstimationLocationLevelResolver<TParent>
+  estimationPercentage?: EstimatedTargetDayMetricsToEstimationPercentageResolver<TParent>
 }
 
-export interface Estimated45DayMetricsToLocationIdResolver<
+export interface EstimatedTargetDayMetricsToLocationIdResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface Estimated45DayMetricsToEstimatedRegistrationResolver<
+export interface EstimatedTargetDayMetricsToEstimatedRegistrationResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface Estimated45DayMetricsToRegistrationIn45DayResolver<
+export interface EstimatedTargetDayMetricsToRegistrationInTargetDayResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface Estimated45DayMetricsToEstimationYearResolver<
+export interface EstimatedTargetDayMetricsToEstimationYearResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface Estimated45DayMetricsToEstimationLocationLevelResolver<
+export interface EstimatedTargetDayMetricsToEstimationLocationLevelResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface Estimated45DayMetricsToEstimationPercentageResolver<
+export interface EstimatedTargetDayMetricsToEstimationPercentageResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLEstimate45DayTotalCountTypeResolver<TParent = any> {
-  estimatedRegistration?: Estimate45DayTotalCountToEstimatedRegistrationResolver<TParent>
-  registrationIn45Day?: Estimate45DayTotalCountToRegistrationIn45DayResolver<TParent>
-  estimationPercentage?: Estimate45DayTotalCountToEstimationPercentageResolver<TParent>
+export interface GQLEstimateTargetDayTotalCountTypeResolver<TParent = any> {
+  estimatedRegistration?: EstimateTargetDayTotalCountToEstimatedRegistrationResolver<TParent>
+  registrationInTargetDay?: EstimateTargetDayTotalCountToRegistrationInTargetDayResolver<TParent>
+  estimationPercentage?: EstimateTargetDayTotalCountToEstimationPercentageResolver<TParent>
 }
 
-export interface Estimate45DayTotalCountToEstimatedRegistrationResolver<
+export interface EstimateTargetDayTotalCountToEstimatedRegistrationResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface Estimate45DayTotalCountToRegistrationIn45DayResolver<
+export interface EstimateTargetDayTotalCountToRegistrationInTargetDayResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface Estimate45DayTotalCountToEstimationPercentageResolver<
+export interface EstimateTargetDayTotalCountToEstimationPercentageResolver<
   TParent = any,
   TResult = any
 > {

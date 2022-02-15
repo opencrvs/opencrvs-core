@@ -64,11 +64,11 @@ import {
   GQLGenderBasisTotalCount,
   GQLCertificationPaymentDetailsMetrics,
   GQLCertificationPaymentTotalCount,
-  GQLEstimate45DayTotalCount,
-  GQLEstimated45DayMetrics,
-  GQLMonthWise45DayEstimation,
-  GQLLocationWise45DayEstimation,
-  GQLEventIn45DayEstimationCount
+  GQLEstimateTargetDayTotalCount,
+  GQLEstimatedTargetDayMetrics,
+  GQLMonthWiseTargetDayEstimation,
+  GQLLocationWiseTargetDayEstimation,
+  GQLEventInTargetDayEstimationCount
 } from '@gateway/graphql/schema'
 import { reduce } from 'lodash'
 
@@ -1194,8 +1194,8 @@ export function timeFrameTotalCalculator(
   timeFrameMetrics: Array<GQLTimeFrameDetailMetrics>
 ): GQLTimeFrameTotalCount {
   const initialValue: GQLTimeFrameTotalCount = {
-    regWithin45d: 0,
-    regWithin45dTo1yr: 0,
+    regWithinTargetd: 0,
+    regWithinTargetdTo1yr: 0,
     regWithin1yrTo5yr: 0,
     regOver5yr: 0,
     total: 0
@@ -1203,19 +1203,24 @@ export function timeFrameTotalCalculator(
   return reduce(
     timeFrameMetrics,
     (accumulator, item) => {
-      const regWithin45d = accumulator.regWithin45d + item.regWithin45d
-      const regWithin45dTo1yr =
-        accumulator.regWithin45dTo1yr + item.regWithin45dTo1yr
+      const regWithinTargetd =
+        accumulator.regWithinTargetd + item.regWithinTargetd
+      const regWithinTargetdTo1yr =
+        accumulator.regWithinTargetdTo1yr + item.regWithinTargetdTo1yr
       const regWithin1yrTo5yr =
         accumulator.regWithin1yrTo5yr + item.regWithin1yrTo5yr
       const regOver5yr = accumulator.regOver5yr + item.regOver5yr
 
       return {
-        regWithin45d,
-        regWithin45dTo1yr,
+        regWithinTargetd,
+        regWithinTargetdTo1yr,
         regWithin1yrTo5yr,
         regOver5yr,
-        total: regWithin45d + regWithin45dTo1yr + regWithin1yrTo5yr + regOver5yr
+        total:
+          regWithinTargetd +
+          regWithinTargetdTo1yr +
+          regWithin1yrTo5yr +
+          regOver5yr
       }
     },
     initialValue
@@ -1252,28 +1257,30 @@ export function genderBasisTotalCalculator(
   )
 }
 
-export function estimated45DayMetricsTotalCalculator(
-  estimated45DayMetrics: Array<GQLEstimated45DayMetrics>
-): GQLEstimate45DayTotalCount {
-  const initialValue: GQLEstimate45DayTotalCount = {
+export function estimatedTargetDayMetricsTotalCalculator(
+  estimatedTargetDayMetrics: Array<GQLEstimatedTargetDayMetrics>
+): GQLEstimateTargetDayTotalCount {
+  const initialValue: GQLEstimateTargetDayTotalCount = {
     estimatedRegistration: 0,
-    registrationIn45Day: 0,
+    registrationInTargetDay: 0,
     estimationPercentage: 0
   }
   return reduce(
-    estimated45DayMetrics,
+    estimatedTargetDayMetrics,
     (accumulator, item) => {
       const estimatedRegistration =
         accumulator.estimatedRegistration + item.estimatedRegistration
-      const registrationIn45Day =
-        accumulator.registrationIn45Day + item.registrationIn45Day
+      const registrationInTargetDay =
+        accumulator.registrationInTargetDay + item.registrationInTargetDay
       return {
         estimatedRegistration,
-        registrationIn45Day,
+        registrationInTargetDay,
         estimationPercentage:
-          registrationIn45Day === 0 || estimatedRegistration === 0
+          registrationInTargetDay === 0 || estimatedRegistration === 0
             ? 0
-            : Math.round((registrationIn45Day / estimatedRegistration) * 100)
+            : Math.round(
+                (registrationInTargetDay / estimatedRegistration) * 100
+              )
       }
     },
     initialValue
@@ -1292,37 +1299,38 @@ export function paymentTotalCalculator(
   )
 }
 
-export function eventIn45DayEstimationCalculator(
-  eventIn45DayEstimations: Array<
-    GQLMonthWise45DayEstimation | GQLLocationWise45DayEstimation
+export function eventInTargetDayEstimationCalculator(
+  eventInTargetDayEstimations: Array<
+    GQLMonthWiseTargetDayEstimation | GQLLocationWiseTargetDayEstimation
   >
-): GQLEventIn45DayEstimationCount {
-  const initialValue: GQLEventIn45DayEstimationCount = {
+): GQLEventInTargetDayEstimationCount {
+  const initialValue: GQLEventInTargetDayEstimationCount = {
     actualTotalRegistration: 0,
-    actual45DayRegistration: 0,
+    actualTargetDayRegistration: 0,
     estimatedRegistration: 0,
-    estimated45DayPercentage: 0
+    estimatedTargetDayPercentage: 0
   }
   return reduce(
-    eventIn45DayEstimations,
+    eventInTargetDayEstimations,
     (accumulator, item) => {
       const actualTotalRegistration =
         accumulator.actualTotalRegistration + item.actualTotalRegistration
-      const actual45DayRegistration =
-        accumulator.actual45DayRegistration + item.actual45DayRegistration
+      const actualTargetDayRegistration =
+        accumulator.actualTargetDayRegistration +
+        item.actualTargetDayRegistration
       const estimatedRegistration =
         accumulator.estimatedRegistration + item.estimatedRegistration
 
       return {
         actualTotalRegistration,
-        actual45DayRegistration,
+        actualTargetDayRegistration,
         estimatedRegistration,
-        estimated45DayPercentage:
-          actual45DayRegistration === 0 || estimatedRegistration === 0
+        estimatedTargetDayPercentage:
+          actualTargetDayRegistration === 0 || estimatedRegistration === 0
             ? 0
             : Number(
                 (
-                  (actual45DayRegistration / estimatedRegistration) *
+                  (actualTargetDayRegistration / estimatedRegistration) *
                   100
                 ).toFixed(2)
               )

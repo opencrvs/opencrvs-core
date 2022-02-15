@@ -345,13 +345,13 @@ type VerifyPasswordResult {
 type RegistrationMetrics {
   genderBasisMetrics: RegistrationGenderBasisMetrics
   timeFrames: RegistrationTimeFrameMetrics
-  estimated45DayMetrics: Registration45DayEstimatedMetrics
+  estimatedTargetDayMetrics: RegistrationTargetDayEstimatedMetrics
   payments: CertificationPaymentMetrics
 }
 
 type EventEstimationMetrics {
-  birth45DayMetrics: EstimationMetrics
-  death45DayMetrics: EstimationMetrics
+  birthTargetDayMetrics: EstimationMetrics
+  deathTargetDayMetrics: EstimationMetrics
 }
 
 type ApplicationsStartedMetrics {
@@ -361,13 +361,13 @@ type ApplicationsStartedMetrics {
 }
 
 type MonthWiseEstimationMetrics {
-  details: [MonthWise45DayEstimation]
-  total: EventIn45DayEstimationCount
+  details: [MonthWiseTargetDayEstimation]
+  total: EventInTargetDayEstimationCount
 }
 
 type LocationWiseEstimationMetrics {
-  details: [LocationWise45DayEstimation]
-  total: EventIn45DayEstimationCount
+  details: [LocationWiseTargetDayEstimation]
+  total: EventInTargetDayEstimationCount
 }
 
 type TimeLoggedMetricsResultSet {
@@ -697,9 +697,9 @@ type RegistrationTimeFrameMetrics {
   total: TimeFrameTotalCount
 }
 
-type Registration45DayEstimatedMetrics {
-  details: [Estimated45DayMetrics!]
-  total: Estimate45DayTotalCount
+type RegistrationTargetDayEstimatedMetrics {
+  details: [EstimatedTargetDayMetrics!]
+  total: EstimateTargetDayTotalCount
 }
 
 type CertificationPaymentMetrics {
@@ -715,29 +715,29 @@ type EstimationMetrics {
   femalePercentage: Float!
 }
 
-type MonthWise45DayEstimation {
+type MonthWiseTargetDayEstimation {
   actualTotalRegistration: Int!
-  actual45DayRegistration: Int!
+  actualTargetDayRegistration: Int!
   estimatedRegistration: Float!
-  estimated45DayPercentage: Float!
+  estimatedTargetDayPercentage: Float!
   month: String!
   year: String!
   startOfMonth: String!
   endOfMonth: String!
 }
 
-type EventIn45DayEstimationCount {
+type EventInTargetDayEstimationCount {
   actualTotalRegistration: Int!
-  actual45DayRegistration: Int!
+  actualTargetDayRegistration: Int!
   estimatedRegistration: Float!
-  estimated45DayPercentage: Float!
+  estimatedTargetDayPercentage: Float!
 }
 
-type LocationWise45DayEstimation {
+type LocationWiseTargetDayEstimation {
   actualTotalRegistration: Int!
-  actual45DayRegistration: Int!
+  actualTargetDayRegistration: Int!
   estimatedRegistration: Float!
-  estimated45DayPercentage: Float!
+  estimatedTargetDayPercentage: Float!
   locationId: String!
   locationName: String!
 }
@@ -1004,33 +1004,33 @@ type GenderBasisTotalCount {
 
 type TimeFrameDetailMetrics {
   locationId: String!
-  regWithin45d: Int!
-  regWithin45dTo1yr: Int!
+  regWithinTargetd: Int!
+  regWithinTargetdTo1yr: Int!
   regWithin1yrTo5yr: Int!
   regOver5yr: Int!
   total: Int!
 }
 
 type TimeFrameTotalCount {
-  regWithin45d: Int!
-  regWithin45dTo1yr: Int!
+  regWithinTargetd: Int!
+  regWithinTargetdTo1yr: Int!
   regWithin1yrTo5yr: Int!
   regOver5yr: Int!
   total: Int!
 }
 
-type Estimated45DayMetrics {
+type EstimatedTargetDayMetrics {
   locationId: String!
   estimatedRegistration: Float!
-  registrationIn45Day: Int!
+  registrationInTargetDay: Int!
   estimationYear: Int!
   estimationLocationLevel: String!
   estimationPercentage: Float!
 }
 
-type Estimate45DayTotalCount {
+type EstimateTargetDayTotalCount {
   estimatedRegistration: Float!
-  registrationIn45Day: Int!
+  registrationInTargetDay: Int!
   estimationPercentage: Float!
 }
 
