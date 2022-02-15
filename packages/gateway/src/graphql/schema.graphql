@@ -121,6 +121,8 @@ type Query {
     sortBy: String
     sortOrder: String
   ): [Role]
+  getCertificateSVG(status: String, event: String): CertificateSVG
+  getActiveCertificatesSVG: [CertificateSVG]
 }
 
 type Mutation {
@@ -185,6 +187,9 @@ type Mutation {
     comment: String
   ): String
   resendSMSInvite(userId: String!): String
+  createOrUpdateCertificateSVG(
+    certificateSVG: CertificateSVGInput!
+  ): CertificateSVG
 }
 
 type Dummy {
@@ -393,6 +398,17 @@ type Role {
   active: Boolean
 }
 
+type CertificateSVG {
+  _id: ID
+  svgCode: String
+  svgFilename: String
+  svgDateUpdated: String
+  svgDateCreated: String
+  user: String
+  event: String
+  status: String
+}
+
 input NotificationInput {
   child: PersonInput
   mother: PersonInput
@@ -474,6 +490,17 @@ input SecurityQuestionAnswer {
 input AvatarInput {
   type: String!
   data: String!
+}
+
+input CertificateSVGInput {
+  id: ID!
+  svgCode: String!
+  svgFilename: String!
+  svgDateUpdated: Int
+  svgDateCreated: Int
+  user: String!
+  event: String!
+  status: String!
 }
 
 scalar Map

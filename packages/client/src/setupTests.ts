@@ -148,6 +148,7 @@ const navigatorMock = {
 const {
   mockUserResponse,
   mockOfflineData,
+  mockConfigResponse,
   userDetails,
   validToken,
   getItem
@@ -169,7 +170,7 @@ jest.mock(
           templates: mockOfflineData.templates
         }),
       loadAssets: () => Promise.resolve(mockOfflineData.assets),
-      loadConfig: () => Promise.resolve(mockOfflineData.config)
+      loadConfig: () => Promise.resolve(mockConfigResponse)
     }
   })
 )

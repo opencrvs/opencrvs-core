@@ -16,7 +16,7 @@ import {
   IFacilitiesDataResponse,
   IDefinitionsResponse,
   IAssetResponse,
-  IApplicationConfig
+  IApplicationConfigResponse
 } from '@client/utils/referenceApi'
 import { IUserDetails } from '@client/utils/userUtils'
 
@@ -89,7 +89,7 @@ export type AssetsFailedAction = {
 export const APPLICATION_CONFIG_LOADED = 'OFFLINE/APPLICATION_CONFIG_LOADED'
 export type ApplicationConfigLoadedAction = {
   type: typeof APPLICATION_CONFIG_LOADED
-  payload: IApplicationConfig
+  payload: IApplicationConfigResponse
 }
 
 export const APPLICATION_CONFIG_FAILED = 'OFFLINE/APPLICATION_CONFIG_FAILED'
@@ -210,7 +210,7 @@ export const offlineDataUpdated = (state: IOfflineData) => ({
 })
 
 export const configLoaded = (
-  payload: IApplicationConfig
+  payload: IApplicationConfigResponse
 ): ApplicationConfigLoadedAction => ({
   type: APPLICATION_CONFIG_LOADED,
   payload: payload
