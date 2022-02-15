@@ -154,6 +154,7 @@ input PaymentInput {
   amount: Float
   outcome: PaymentOutcomeType
   date: Date
+  data: String
 }
 
 type Payment { # -> PaymentReconciliation

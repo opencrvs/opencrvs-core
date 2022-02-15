@@ -986,7 +986,8 @@ test('should build bundle for correction fhir builders', async () => {
             total: 10,
             paymentId: '123',
             type: 'MANUAL',
-            date: '2022-01-28T07:09:01.079Z'
+            date: '2022-01-28T07:09:01.079Z',
+            data: 'data:image/png;base64,2324256'
           },
           data: 'data:image/png;base64,2324234'
         }

@@ -1178,6 +1178,7 @@ export interface GQLPaymentInput {
   amount?: number
   outcome?: GQLPaymentOutcomeType
   date?: GQLDate
+  data?: string
 }
 
 export interface GQLCorrectionValueInput {

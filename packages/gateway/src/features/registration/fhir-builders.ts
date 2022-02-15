@@ -2152,6 +2152,28 @@ export const builders: IFieldBuilders = {
           } else {
             paymentResource.detail[0].date = fieldValue
           }
+        },
+        data: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const certDocResource = selectOrCreateCertificateDocRefResource(
+            fhirBundle,
+            context,
+            context.event,
+            true
+          )
+          if (!certDocResource.content) {
+            certDocResource.content = []
+          }
+
+          certDocResource.content.push({
+            attachment: {
+              contentType: 'image/jpg',
+              data: fieldValue
+            }
+          })
         }
       },
       location: {
@@ -2237,15 +2259,15 @@ export const builders: IFieldBuilders = {
           true
         )
         if (!certDocResource.content) {
-          certDocResource.content = [
-            {
-              attachment: {
-                contentType: 'application/pdf'
-              }
-            }
-          ]
+          certDocResource.content = []
         }
-        certDocResource.content[0].attachment.data = fieldValue
+
+        certDocResource.content.push({
+          attachment: {
+            contentType: 'application/pdf',
+            data: fieldValue
+          }
+        })
       },
       reason: (
         fhirBundle: ITemplatedBundle,

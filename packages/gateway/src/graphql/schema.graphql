@@ -1273,6 +1273,7 @@ input PaymentInput {
   amount: Float
   outcome: PaymentOutcomeType
   date: Date
+  data: String
 }
 
 input CorrectionValueInput {
