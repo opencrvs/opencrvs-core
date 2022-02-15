@@ -145,11 +145,7 @@ services:
       - COUNTRY=${COUNTRY:-bgd}
       - HOST=0.0.0.0
       - CHECK_INVALID_TOKEN=true
-<<<<<<< HEAD
-      - RESOURCES_URL=http://resources:3040
-=======
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
->>>>>>> develop
   config:
     image: opencrvs/ocrvs-config:${VERSION:-latest}
     build:
