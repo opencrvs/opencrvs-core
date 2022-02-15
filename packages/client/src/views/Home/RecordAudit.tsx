@@ -15,7 +15,11 @@ import { Header } from '@client/components/interface/Header/Header'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import { Navigation } from '@client/components/interface/Navigation'
 import styled, { ITheme, withTheme } from '@client/styledComponents'
-import { ApplicationIcon, RotateLeft } from '@opencrvs/components/lib/icons'
+import {
+  RotateLeft,
+  Archive,
+  ApplicationIcon
+} from '@opencrvs/components/lib/icons'
 import { connect } from 'react-redux'
 import {
   goToApplicationDetails,
@@ -27,7 +31,8 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import {
   IWorkqueue,
   IApplication,
-  reinstateApplication
+  reinstateApplication,
+  archiveApplication
 } from '@client/applications'
 import { IStoreState } from '@client/store'
 import {
@@ -42,14 +47,15 @@ import { IOfflineData } from '@client/offline/reducer'
 import { IFormSectionData, IContactPoint } from '@client/forms'
 import { ResponsiveModal, Spinner } from '@opencrvs/components/lib/interface'
 import {
+  DangerButton,
   ICON_ALIGNMENT,
   PrimaryButton,
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
+import { ARCHIVED } from '@client/utils/constants'
 import { getScope } from '@client/profile/profileSelectors'
 import { Scope } from '@client/utils/authUtils'
-import { ARCHIVED } from '@client/utils/constants'
 import { messages } from '@client/i18n/messages/views/recordAudit'
 import NotificationToast from '@client/views/OfficeHome/NotificationToast'
 
@@ -96,13 +102,14 @@ const GreyedInfo = styled.div`
 interface IStateProps {
   workqueue: IWorkqueue
   resources: IOfflineData
-  scope: Scope
+  scope: Scope | null
   savedApplications: IApplication[]
 }
 
 interface IDispatchProps {
   goToApplicationDetails: typeof goToApplicationDetails
   reinstateApplication: typeof reinstateApplication
+  archiveApplication: typeof archiveApplication
   goBack: typeof goBackAction
   goToRegistrarHomeTab: typeof goToRegistrarHomeTab
 }
@@ -149,6 +156,7 @@ interface IGQLApplication {
 }
 
 const STATUSTOCOLOR: { [key: string]: string } = {
+  ARCHIVED: 'grey',
   DRAFT: 'violet',
   DECLARED: 'orange',
   REJECTED: 'red',
@@ -157,6 +165,8 @@ const STATUSTOCOLOR: { [key: string]: string } = {
   CERTIFIED: 'green',
   WAITING_VALIDATION: 'teal'
 }
+
+const ARCHIVABLE_STATUSES = ['DECLARED', 'REJECTED', 'VALIDATED']
 
 const KEY_LABEL: ILabel = {
   status: 'Status',
@@ -241,6 +251,22 @@ const getWQApplicationName = (application: GQLEventSearchSet): string => {
 
   if (applicationName) {
     name = [applicationName.firstNames, applicationName.familyName]
+      .filter((part) => Boolean(part))
+      .join(' ')
+  }
+  return name
+}
+
+const getGQLApplicationName = (application: IGQLApplication): string => {
+  let name = ''
+  const applicationName =
+    application?.child?.name[0] || application?.deceased?.name[0]
+
+  if (applicationName) {
+    name = [
+      (applicationName as GQLHumanName).firstNames,
+      (applicationName as GQLHumanName).familyName
+    ]
       .filter((part) => Boolean(part))
       .join(' ')
   }
@@ -377,6 +403,19 @@ const getWQApplication = (props: IFullProps): IApplicationData | null => {
   return applicationData
 }
 
+const getGQLApplication = (data: IGQLApplication): IApplicationData => {
+  const application: IApplicationData = {
+    id: data?.id,
+    type: data?.registration?.type,
+    status: data?.registration?.status[0].type,
+    trackingId: data?.registration?.trackingId,
+    dateOfBirth: '',
+    placeOfBirth: '',
+    informant: ''
+  }
+  return application
+}
+
 const getApplicationInfo = (
   props: IFullProps,
   application: IApplicationData,
@@ -385,8 +424,10 @@ const getApplicationInfo = (
   let informant = getCaptitalizedWord(application?.informant)
 
   const status = getCaptitalizedWord(application?.status).split('_')
-  let finalStatus = status[0]
-  if (status[1]) finalStatus += ' ' + status[1]
+  const finalStatus = status.reduce(
+    (accum, cur, idx) => (idx > 0 ? accum + ' ' + cur : cur),
+    ''
+  )
 
   if (application?.informantContact) {
     informant =
@@ -455,15 +496,16 @@ const getApplicationInfo = (
 export const ShowRecordAudit = (props: IFullProps) => {
   const { intl, scope, reinstateApplication } = props
   const applicationId = props.match.params.applicationId
-  const [showPrompt, setShowPrompt] = React.useState(false)
   const userHasRegisterScope = scope && scope.includes('register')
   const userHasValidateScope = scope && scope.includes('validate')
+  const [showDialog, setShowDialog] = React.useState(false)
   let application: IApplicationData | null
   application = getSavedApplications(props)
   const isDownloaded = application ? true : false
   if (!isDownloaded) {
     application = getWQApplication(props)
   }
+  const toggleDisplayDialog = () => setShowDialog((prevValue) => !prevValue)
 
   const topActionButtons: React.ReactElement[] = []
   const reinstateButton = (
@@ -472,11 +514,32 @@ export const ShowRecordAudit = (props: IFullProps) => {
       id="reinstate_button"
       key="reinstate_button"
       icon={() => <RotateLeft />}
-      onClick={() => setShowPrompt(!showPrompt)}
+      onClick={toggleDisplayDialog}
     >
       {intl.formatMessage(buttonMessages.reinstate)}
     </TertiaryButton>
   )
+
+  const archiveButton = (
+    <TertiaryButton
+      align={ICON_ALIGNMENT.LEFT}
+      id="archive_button"
+      key="archive_button"
+      icon={() => <Archive />}
+      onClick={toggleDisplayDialog}
+    >
+      {intl.formatMessage(buttonMessages.archive)}
+    </TertiaryButton>
+  )
+
+  if (
+    isDownloaded &&
+    (userHasValidateScope || userHasRegisterScope) &&
+    application?.status &&
+    ARCHIVABLE_STATUSES.includes(application.status)
+  ) {
+    topActionButtons.push(archiveButton)
+  }
 
   if (
     (userHasValidateScope || userHasRegisterScope) &&
@@ -495,6 +558,7 @@ export const ShowRecordAudit = (props: IFullProps) => {
           <Content
             title={application.name || 'No name provided'}
             titleColor={application.name ? 'copy' : 'grey600'}
+            topActionButtons={topActionButtons}
             size={'large'}
             icon={() => (
               <ApplicationIcon
@@ -503,39 +567,55 @@ export const ShowRecordAudit = (props: IFullProps) => {
                 }
               />
             )}
-            topActionButtons={topActionButtons}
           >
             {getApplicationInfo(props, application, isDownloaded)}
           </Content>
         )}
       </BodyContainer>
       <ResponsiveModal
-        id="reinstateDeclarationPrompt"
-        show={showPrompt}
-        title={intl.formatMessage(messages.reinstateDeclarationDialogTitle)}
+        title={
+          application?.status && ARCHIVED.includes(application.status)
+            ? intl.formatMessage(messages.reinstateDeclarationDialogTitle)
+            : intl.formatMessage(messages.confirmationTitle)
+        }
         contentHeight={96}
-        handleClose={() => setShowPrompt(!showPrompt)}
+        responsive={false}
         actions={[
           <TertiaryButton
-            id="cancel"
+            id="cancel-btn"
             key="cancel"
-            onClick={() => setShowPrompt(!showPrompt)}
+            onClick={toggleDisplayDialog}
           >
-            {intl.formatMessage(messages.reinstateDeclarationDialogCancel)}
+            {intl.formatMessage(buttonMessages.cancel)}
           </TertiaryButton>,
-          <PrimaryButton
-            id="continue"
-            key="continue"
-            onClick={() => {
-              reinstateApplication(applicationId)
-              setShowPrompt(!showPrompt)
-            }}
-          >
-            {intl.formatMessage(messages.reinstateDeclarationDialogConfirm)}
-          </PrimaryButton>
+          application?.status && ARCHIVED.includes(application.status) ? (
+            <PrimaryButton
+              id="continue"
+              key="continue"
+              onClick={() => {
+                reinstateApplication(applicationId)
+                toggleDisplayDialog()
+              }}
+            >
+              {intl.formatMessage(messages.reinstateDeclarationDialogConfirm)}
+            </PrimaryButton>
+          ) : (
+            <DangerButton
+              id="archive_confirm"
+              key="submit"
+              onClick={() => {
+                props.archiveApplication(applicationId)
+                toggleDisplayDialog()
+              }}
+            >
+              {intl.formatMessage(buttonMessages.archive)}
+            </DangerButton>
+          )
         ]}
+        show={showDialog}
+        handleClose={toggleDisplayDialog}
       >
-        {intl.formatMessage(messages.reinstateDeclarationDialogDescription)}
+        {intl.formatMessage(messages.confirmationBody)}
       </ResponsiveModal>
       <NotificationToast />
     </div>
@@ -546,7 +626,7 @@ function mapStateToProps(state: IStoreState): IStateProps {
   return {
     workqueue: state.workqueueState.workqueue,
     resources: getOfflineData(state),
-    scope: getScope(state) as Scope,
+    scope: getScope(state),
     savedApplications:
       state.applicationsState.applications &&
       state.applicationsState.applications
@@ -560,6 +640,7 @@ export const RecordAudit = connect<
   IStoreState
 >(mapStateToProps, {
   reinstateApplication,
+  archiveApplication,
   goToApplicationDetails,
   goBack: goBackAction,
   goToRegistrarHomeTab
