@@ -823,6 +823,10 @@ export enum ReviewSection {
   Review = 'review'
 }
 
+export enum InformantSection {
+  Registration = 'registration'
+}
+
 export type Section =
   | ReviewSection
   | PaymentSection
@@ -830,6 +834,7 @@ export type Section =
   | DeathSection
   | UserSection
   | CertificateSection
+  | InformantSection
 
 export interface IFormSection {
   id: Section

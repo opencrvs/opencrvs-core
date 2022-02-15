@@ -280,6 +280,11 @@ interface IFormMessages
   sonInLaw: MessageDescriptor
   grandson: MessageDescriptor
   spouse: MessageDescriptor
+  grandfather: MessageDescriptor
+  grandmother: MessageDescriptor
+  brother: MessageDescriptor
+  sister: MessageDescriptor
+  legalGuardian: MessageDescriptor
   headOfTheInstitute: MessageDescriptor
   driverOfTheVehicle: MessageDescriptor
   ownerOfTheHouse: MessageDescriptor
@@ -1687,6 +1692,31 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Grandson',
     description: 'Label for option Grandson',
     id: 'form.field.label.applicantRelation.grandson'
+  },
+  grandfather: {
+    defaultMessage: 'Grandfather',
+    description: 'Label for option Grandfather',
+    id: 'form.field.label.applicantRelation.grandfather'
+  },
+  grandmother: {
+    defaultMessage: 'Grandmother',
+    description: 'Label for option Grandmother',
+    id: 'form.field.label.applicantRelation.grandmother'
+  },
+  brother: {
+    defaultMessage: 'Brother',
+    description: 'Label for option brother',
+    id: 'form.field.label.applicantRelation.brother'
+  },
+  sister: {
+    defaultMessage: 'Sister',
+    description: 'Label for option Sister',
+    id: 'form.field.label.applicantRelation.sister'
+  },
+  legalGuardian: {
+    defaultMessage: 'Legal guardian',
+    description: 'Label for option Legal Guardian',
+    id: 'form.field.label.applicantRelation.legalGuardian'
   },
   spouse: {
     defaultMessage: 'Spouse',

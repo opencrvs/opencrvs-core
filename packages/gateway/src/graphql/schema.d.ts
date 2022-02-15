@@ -101,7 +101,7 @@ export interface GQLBirthRegistration extends GQLEventRegistration {
   attendantAtBirth?: GQLAttendantType
   otherAttendantAtBirth?: string
   birthRegistrationType?: GQLBirthRegType
-  presentAtBirthRegistration?: GQLBirthRegPresence
+  presentAtBirthRegistration?: string
   otherPresentAtBirthRegistration?: string
   childrenBornAliveToMother?: number
   foetalDeathsToMother?: number
@@ -316,7 +316,7 @@ export interface GQLBirthRegistrationInput {
   attendantAtBirth?: GQLAttendantType
   otherAttendantAtBirth?: string
   birthRegistrationType?: GQLBirthRegType
-  presentAtBirthRegistration?: GQLBirthRegPresence
+  presentAtBirthRegistration?: string
   otherPresentAtBirthRegistration?: string
   childrenBornAliveToMother?: number
   foetalDeathsToMother?: number
@@ -381,7 +381,7 @@ export interface GQLRegistration {
   paperFormID?: string
   page?: string
   book?: string
-  contact?: GQLRegistrationContactType
+  contact?: string
   contactRelationship?: string
   contactPhoneNumber?: string
   status?: Array<GQLRegWorkflow | null>
@@ -395,7 +395,7 @@ export interface GQLRegistration {
 export interface GQLRelatedPerson {
   id?: string
   _fhirID?: string
-  relationship?: GQLRelationshipType
+  relationship?: string
   otherRelationship?: string
   affidavit?: Array<GQLAttachment | null>
   individual?: GQLPerson
@@ -426,14 +426,6 @@ export const enum GQLBirthRegType {
   INFORMANT_ONLY = 'INFORMANT_ONLY',
   MOTHER_ONLY = 'MOTHER_ONLY',
   FATHER_ONLY = 'FATHER_ONLY'
-}
-
-export const enum GQLBirthRegPresence {
-  BOTH_PARENTS = 'BOTH_PARENTS',
-  INFORMANT = 'INFORMANT',
-  MOTHER = 'MOTHER',
-  FATHER = 'FATHER',
-  OTHER = 'OTHER'
 }
 
 export interface GQLPrimaryCaregiver {
@@ -725,7 +717,7 @@ export interface GQLRegistrationInput {
   paperFormID?: string
   page?: string
   book?: string
-  contact?: GQLRegistrationContactType
+  contact?: string
   contactRelationship?: string
   contactPhoneNumber?: string
   status?: Array<GQLRegWorkflowInput | null>
@@ -740,7 +732,7 @@ export interface GQLRegistrationInput {
 export interface GQLRelatedPersonInput {
   id?: string
   _fhirID?: string
-  relationship?: GQLRelationshipType
+  relationship?: string
   otherRelationship?: string
   affidavit?: Array<GQLAttachmentInput | null>
   individual?: GQLPersonInput
@@ -775,14 +767,6 @@ export interface GQLSignatureInput {
   type?: string
 }
 
-export const enum GQLRegistrationContactType {
-  BOTH = 'BOTH',
-  MOTHER = 'MOTHER',
-  FATHER = 'FATHER',
-  OTHER = 'OTHER',
-  APPLICANT = 'APPLICANT'
-}
-
 export interface GQLRegWorkflow {
   id: string
   type?: GQLRegStatus
@@ -805,36 +789,6 @@ export interface GQLCertificate {
   hasShowedVerifiedDocument?: boolean
   payments?: Array<GQLPayment | null>
   data?: string
-}
-
-export const enum GQLRelationshipType {
-  FATHER = 'FATHER',
-  MOTHER = 'MOTHER',
-  SPOUSE = 'SPOUSE',
-  SON = 'SON',
-  DAUGHTER = 'DAUGHTER',
-  SON_IN_LAW = 'SON_IN_LAW',
-  DAUGHTER_IN_LAW = 'DAUGHTER_IN_LAW',
-  EXTENDED_FAMILY = 'EXTENDED_FAMILY',
-  OTHER = 'OTHER',
-  INFORMANT = 'INFORMANT',
-  GRANDFATHER = 'GRANDFATHER',
-  GRANDMOTHER = 'GRANDMOTHER',
-  GRANDSON = 'GRANDSON',
-  GRANDDAUGHTER = 'GRANDDAUGHTER',
-  BROTHER = 'BROTHER',
-  SISTER = 'SISTER',
-  OTHER_FAMILY_MEMBER = 'OTHER_FAMILY_MEMBER',
-  INSTITUTION_HEAD_PLACE_OF_BIRTH = 'INSTITUTION_HEAD_PLACE_OF_BIRTH',
-  HOUSE_OWNER = 'HOUSE_OWNER',
-  OPERATOR = 'OPERATOR',
-  OFFICE_IN_CHARGE = 'OFFICE_IN_CHARGE',
-  LEGAL_GUARDIAN = 'LEGAL_GUARDIAN',
-  BOTH_PARENTS = 'BOTH_PARENTS',
-  HEAD_OF_THE_INSTITUTE = 'HEAD_OF_THE_INSTITUTE',
-  OWNER_OF_THE_HOUSE = 'OWNER_OF_THE_HOUSE',
-  DRIVER_OF_THE_VEHICLE = 'DRIVER_OF_THE_VEHICLE',
-  OFFICER_IN_CHARGE = 'OFFICER_IN_CHARGE'
 }
 
 export interface GQLReasonsNotApplying {
