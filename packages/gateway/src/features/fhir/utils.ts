@@ -32,7 +32,12 @@ import {
   REASON_MOTHER_NOT_APPLYING,
   REASON_FATHER_NOT_APPLYING,
   REASON_CAREGIVER_NOT_APPLYING,
-  createPractitionerEntryTemplate
+  createPractitionerEntryTemplate,
+  BIRTH_CORRECTION_ENCOUNTER_CODE,
+  DEATH_CORRECTION_ENCOUNTER_CODE,
+  CORRECTION_CERTIFICATE_DOCS_CODE,
+  CORRECTION_CERTIFICATE_DOCS_TITLE,
+  CORRECTION_CERTIFICATE_DOCS_CONTEXT_KEY
 } from '@gateway/features/fhir/templates'
 import {
   ITemplatedBundle,
@@ -135,13 +140,18 @@ export function selectOrCreatePersonResource(
 
 export function selectOrCreateEncounterResource(
   fhirBundle: ITemplatedBundle,
-  context: any
+  context: any,
+  isCorrection?: boolean
 ): fhir.Encounter {
   let sectionCode
   if (context.event === EVENT_TYPE.BIRTH) {
-    sectionCode = BIRTH_ENCOUNTER_CODE
+    sectionCode = isCorrection
+      ? BIRTH_CORRECTION_ENCOUNTER_CODE
+      : BIRTH_ENCOUNTER_CODE
   } else if (context.event === EVENT_TYPE.DEATH) {
-    sectionCode = DEATH_ENCOUNTER_CODE
+    sectionCode = isCorrection
+      ? DEATH_CORRECTION_ENCOUNTER_CODE
+      : DEATH_ENCOUNTER_CODE
   } else {
     throw new Error(`Unknown event ${context}`)
   }
@@ -354,8 +364,15 @@ export function selectOrCreateLocationRefResource(
   context: any
 ): fhir.Location {
   let locationEntry
-
-  const encounter = selectOrCreateEncounterResource(fhirBundle, context)
+  const isCorrection = [
+    BIRTH_CORRECTION_ENCOUNTER_CODE,
+    DEATH_CORRECTION_ENCOUNTER_CODE
+  ].includes(sectionCode)
+  const encounter = selectOrCreateEncounterResource(
+    fhirBundle,
+    context,
+    isCorrection
+  )
 
   if (!encounter.location) {
     // create location
@@ -430,9 +447,14 @@ export function selectOrCreateEncounterPartitioner(
 
 export function selectOrCreateEncounterLocationRef(
   fhirBundle: ITemplatedBundle,
-  context: any
+  context: any,
+  correction?: boolean
 ): fhir.Reference {
-  const encounter = selectOrCreateEncounterResource(fhirBundle, context)
+  const encounter = selectOrCreateEncounterResource(
+    fhirBundle,
+    context,
+    correction
+  )
   if (!encounter.location) {
     encounter.location = []
     encounter.location.push({
@@ -503,14 +525,26 @@ export function selectOrCreateDocRefResource(
 export function selectOrCreateCertificateDocRefResource(
   fhirBundle: ITemplatedBundle,
   context: any,
-  eventType: string
+  eventType: string,
+  isCorrection?: boolean
 ): fhir.DocumentReference {
+  const certificate = isCorrection
+    ? {
+        code: CORRECTION_CERTIFICATE_DOCS_CODE,
+        title: CORRECTION_CERTIFICATE_DOCS_TITLE,
+        indexKey: CORRECTION_CERTIFICATE_DOCS_CONTEXT_KEY
+      }
+    : {
+        code: CERTIFICATE_DOCS_CODE,
+        title: CERTIFICATE_DOCS_TITLE,
+        indexKey: CERTIFICATE_CONTEXT_KEY
+      }
   const docRef = selectOrCreateDocRefResource(
-    CERTIFICATE_DOCS_CODE,
-    CERTIFICATE_DOCS_TITLE,
+    certificate.code,
+    certificate.title,
     fhirBundle,
     context,
-    CERTIFICATE_CONTEXT_KEY
+    certificate.indexKey
   )
   if (!docRef.type) {
     docRef.type = {
@@ -719,12 +753,14 @@ export async function setPrimaryCaregiverReference(
 export function selectOrCreatePaymentReconciliationResource(
   fhirBundle: ITemplatedBundle,
   context: any,
-  eventType: string
+  eventType: string,
+  isCorrection?: boolean
 ): fhir.PaymentReconciliation {
   const docRef = selectOrCreateCertificateDocRefResource(
     fhirBundle,
     context,
-    eventType
+    eventType,
+    isCorrection
   )
   if (!docRef.extension) {
     docRef.extension = []
@@ -783,17 +819,26 @@ export function selectOrCreateTaskRefResource(
 export function setObjectPropInResourceArray(
   resource: fhir.Resource,
   label: string,
-  value: string | string[],
+  value: string | string[] | object,
   propName: string,
-  context: any
+  context: any,
+  contextProperty?: string
 ) {
   if (!resource[label]) {
     resource[label] = []
   }
-  if (!resource[label][context._index[label]]) {
-    resource[label][context._index[label]] = {}
+
+  if (contextProperty) {
+    if (!resource[label][context._index[contextProperty]]) {
+      resource[label][context._index[contextProperty]] = {}
+    }
+    resource[label][context._index[contextProperty]][propName] = value
+  } else {
+    if (!resource[label][context._index[label]]) {
+      resource[label][context._index[label]] = {}
+    }
+    resource[label][context._index[label]][propName] = value
   }
-  resource[label][context._index[label]][propName] = value
 }
 
 export function setArrayPropInResourceObject(

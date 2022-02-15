@@ -154,6 +154,7 @@ input PaymentInput {
   amount: Float
   outcome: PaymentOutcomeType
   date: Date
+  data: String
 }
 
 type Payment { # -> PaymentReconciliation
@@ -347,6 +348,26 @@ type DeathRegistration implements EventRegistration { # -> Composition
   updatedAt: Date # -> .date
 }
 
+input CorrectionValueInput {
+  section: String
+  fieldName: String
+  oldValue: String
+  newValue: String
+}
+
+input CorrectionInput {
+  requester: ID # -> Practitioner ID
+  hasShowedVerifiedDocument: Boolean
+  attestedAndCopied: Boolean
+  noSupportingDocumentationRequired: Boolean
+  payments: [PaymentInput]
+  values: [CorrectionValueInput]
+  location: LocationInput
+  data: String
+  reason: String
+  note: String
+}
+
 input RegistrationInput {
   _fhirID: ID
   draftId: String # long uuid for preventing an event from duplicate submission
@@ -366,6 +387,7 @@ input RegistrationInput {
   attachments: [AttachmentInput]
   certificates: [CertificateInput]
   location: LocationInput
+  correction: CorrectionInput
 }
 
 type Registration { # -> Task
@@ -515,6 +537,10 @@ type Mutation {
     details: BirthRegistrationInput
   ): BirthRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
+  requestBirthRegistrationCorrection(
+    id: ID!
+    details: BirthRegistrationInput!
+  ): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID! # updated status to 'voided' - the registration was captured in error
   notADuplicate(id: String!, duplicateId: String!): ID! # removes duplicates from composition
   # DEATH
@@ -531,4 +557,8 @@ type Mutation {
     details: DeathRegistrationInput
   ): DeathRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced
+  requestDeathRegistrationCorrection(
+    id: ID!
+    details: DeathRegistrationInput!
+  ): ID!
 }

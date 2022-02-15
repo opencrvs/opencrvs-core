@@ -51,6 +51,7 @@ export interface GQLMutation {
   markBirthAsValidated?: string
   markBirthAsRegistered: GQLBirthRegistration
   markBirthAsCertified: string
+  requestBirthRegistrationCorrection: string
   markEventAsVoided: string
   notADuplicate: string
   createDeathRegistration: GQLCreatedIds
@@ -59,6 +60,7 @@ export interface GQLMutation {
   markDeathAsValidated?: string
   markDeathAsRegistered: GQLDeathRegistration
   markDeathAsCertified: string
+  requestDeathRegistrationCorrection: string
   createOrUpdateUser: GQLUser
   activateUser?: string
   changePassword?: string
@@ -724,6 +726,7 @@ export interface GQLRegistrationInput {
   attachments?: Array<GQLAttachmentInput | null>
   certificates?: Array<GQLCertificateInput | null>
   location?: GQLLocationInput
+  correction?: GQLCorrectionInput
 }
 
 export interface GQLRelatedPersonInput {
@@ -1062,6 +1065,19 @@ export interface GQLCertificateInput {
   data?: string
 }
 
+export interface GQLCorrectionInput {
+  requester?: string
+  hasShowedVerifiedDocument?: boolean
+  attestedAndCopied?: boolean
+  noSupportingDocumentationRequired?: boolean
+  payments?: Array<GQLPaymentInput | null>
+  values?: Array<GQLCorrectionValueInput | null>
+  location?: GQLLocationInput
+  data?: string
+  reason?: string
+  note?: string
+}
+
 export interface GQLReasonsNotApplyingInput {
   primaryCaregiverType?: GQLPrimaryCaregiverType
   reasonNotApplying?: string
@@ -1116,6 +1132,14 @@ export interface GQLPaymentInput {
   amount?: number
   outcome?: GQLPaymentOutcomeType
   date?: GQLDate
+  data?: string
+}
+
+export interface GQLCorrectionValueInput {
+  section?: string
+  fieldName?: string
+  oldValue?: string
+  newValue?: string
 }
 
 export const enum GQLPaymentType {
@@ -1732,6 +1756,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markBirthAsValidated?: MutationToMarkBirthAsValidatedResolver<TParent>
   markBirthAsRegistered?: MutationToMarkBirthAsRegisteredResolver<TParent>
   markBirthAsCertified?: MutationToMarkBirthAsCertifiedResolver<TParent>
+  requestBirthRegistrationCorrection?: MutationToRequestBirthRegistrationCorrectionResolver<TParent>
   markEventAsVoided?: MutationToMarkEventAsVoidedResolver<TParent>
   notADuplicate?: MutationToNotADuplicateResolver<TParent>
   createDeathRegistration?: MutationToCreateDeathRegistrationResolver<TParent>
@@ -1740,6 +1765,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markDeathAsValidated?: MutationToMarkDeathAsValidatedResolver<TParent>
   markDeathAsRegistered?: MutationToMarkDeathAsRegisteredResolver<TParent>
   markDeathAsCertified?: MutationToMarkDeathAsCertifiedResolver<TParent>
+  requestDeathRegistrationCorrection?: MutationToRequestDeathRegistrationCorrectionResolver<TParent>
   createOrUpdateUser?: MutationToCreateOrUpdateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
   changePassword?: MutationToChangePasswordResolver<TParent>
@@ -1874,6 +1900,22 @@ export interface MutationToMarkBirthAsCertifiedResolver<
   ): TResult
 }
 
+export interface MutationToRequestBirthRegistrationCorrectionArgs {
+  id: string
+  details: GQLBirthRegistrationInput
+}
+export interface MutationToRequestBirthRegistrationCorrectionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToRequestBirthRegistrationCorrectionArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface MutationToMarkEventAsVoidedArgs {
   id: string
   reason: string
@@ -1994,6 +2036,22 @@ export interface MutationToMarkDeathAsCertifiedResolver<
   (
     parent: TParent,
     args: MutationToMarkDeathAsCertifiedArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToRequestDeathRegistrationCorrectionArgs {
+  id: string
+  details: GQLDeathRegistrationInput
+}
+export interface MutationToRequestDeathRegistrationCorrectionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToRequestDeathRegistrationCorrectionArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult

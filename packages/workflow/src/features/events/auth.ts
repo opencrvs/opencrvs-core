@@ -49,7 +49,12 @@ function getEventToScopeMap() {
       USER_SCOPE.VALIDATE,
       USER_SCOPE.REGISTER,
       USER_SCOPE.CERTIFY
-    ]
+    ],
+    [Events.BIRTH_REQUEST_CORRECTION]: [
+      USER_SCOPE.REGISTER,
+      USER_SCOPE.CERTIFY
+    ],
+    [Events.DEATH_REQUEST_CORRECTION]: [USER_SCOPE.REGISTER, USER_SCOPE.CERTIFY]
   }
 }
 
@@ -63,7 +68,7 @@ export function isUserAuthorized(
   const eventToScopeMap = getEventToScopeMap()
 
   return scopes.some(
-    scope =>
+    (scope) =>
       eventToScopeMap[event] &&
       (eventToScopeMap[event] as string[]).includes(scope)
   )

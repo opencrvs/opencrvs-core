@@ -20,6 +20,9 @@ export const INFORMANT_CODE = 'informant-details'
 export const SPOUSE_CODE = 'spouse-details'
 export const ATTACHMENT_DOCS_CODE = 'supporting-documents'
 export const CERTIFICATE_DOCS_CODE = 'certificates'
+export const CORRECTION_CERTIFICATE_DOCS_CODE = 'correction-certificates'
+export const CORRECTION_CERTIFICATE_DOCS_TITLE = 'Correction certificates'
+export const CORRECTION_CERTIFICATE_DOCS_CONTEXT_KEY = 'correction-certificates'
 export const BIRTH_ENCOUNTER_CODE = 'birth-encounter'
 export const BODY_WEIGHT_CODE = '3141-9'
 export const BIRTH_TYPE_CODE = '57722-1'
@@ -58,6 +61,8 @@ export const PRIMARY_CAREGIVER = 'primary-caregiver'
 export const PRIMARY_CAREGIVER_CODE = 'primary-caregiver-details'
 export const PRIMARY_CAREGIVER_TITLE = "Primary caregiver's details"
 export const PARENT_DETAILS = 'parent-details'
+export const BIRTH_CORRECTION_ENCOUNTER_CODE = 'birth-correction-encounters'
+export const DEATH_CORRECTION_ENCOUNTER_CODE = 'death-correction-encounters'
 
 export function createPersonSection(
   refUuid: string,
@@ -99,6 +104,10 @@ export function createEncounterSection(refUuid: string, sectionCode: string) {
     sectionTitle = 'Birth encounter'
   } else if (sectionCode === DEATH_ENCOUNTER_CODE) {
     sectionTitle = 'Death encounter'
+  } else if (sectionCode === BIRTH_CORRECTION_ENCOUNTER_CODE) {
+    sectionTitle = 'Birth correction encounters'
+  } else if (sectionCode === DEATH_CORRECTION_ENCOUNTER_CODE) {
+    sectionTitle = 'Death correction encounters'
   } else {
     throw new Error(`Unknown section code ${sectionCode}`)
   }

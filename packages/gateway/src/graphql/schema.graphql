@@ -138,6 +138,10 @@ type Mutation {
     details: BirthRegistrationInput
   ): BirthRegistration!
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
+  requestBirthRegistrationCorrection(
+    id: ID!
+    details: BirthRegistrationInput!
+  ): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID!
   notADuplicate(id: String!, duplicateId: String!): ID!
   createDeathRegistration(details: DeathRegistrationInput!): CreatedIds!
@@ -152,6 +156,10 @@ type Mutation {
     details: DeathRegistrationInput
   ): DeathRegistration!
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID!
+  requestDeathRegistrationCorrection(
+    id: ID!
+    details: DeathRegistrationInput!
+  ): ID!
   createOrUpdateUser(user: UserInput!): User!
   activateUser(
     userId: String!
@@ -813,6 +821,7 @@ input RegistrationInput {
   attachments: [AttachmentInput]
   certificates: [CertificateInput]
   location: LocationInput
+  correction: CorrectionInput
 }
 
 input RelatedPersonInput {
@@ -1151,6 +1160,19 @@ input CertificateInput {
   data: String
 }
 
+input CorrectionInput {
+  requester: ID
+  hasShowedVerifiedDocument: Boolean
+  attestedAndCopied: Boolean
+  noSupportingDocumentationRequired: Boolean
+  payments: [PaymentInput]
+  values: [CorrectionValueInput]
+  location: LocationInput
+  data: String
+  reason: String
+  note: String
+}
+
 input ReasonsNotApplyingInput {
   primaryCaregiverType: PrimaryCaregiverType
   reasonNotApplying: String
@@ -1205,6 +1227,14 @@ input PaymentInput {
   amount: Float
   outcome: PaymentOutcomeType
   date: Date
+  data: String
+}
+
+input CorrectionValueInput {
+  section: String
+  fieldName: String
+  oldValue: String
+  newValue: String
 }
 
 enum PaymentType {
