@@ -21,6 +21,7 @@ COPY packages/components packages/components
 COPY packages/gateway/package.json packages/gateway/package.json
 COPY packages/login/package.json packages/login/package.json
 COPY packages/metrics/package.json packages/metrics/package.json
+COPY packages/config/package.json packages/config/package.json
 COPY packages/notification/package.json packages/notification/package.json
 COPY packages/client/package.json packages/client/package.json
 COPY packages/search/package.json packages/search/package.json

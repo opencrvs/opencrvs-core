@@ -171,6 +171,12 @@ type Mutation {
     existingPassword: String!
     password: String!
   ): String
+  changePhone(
+    userId: String!
+    phoneNumber: String!
+    nonce: String!
+    verifyCode: String!
+  ): String
   changeAvatar(userId: String!, avatar: AvatarInput!): String
   auditUser(
     userId: String!

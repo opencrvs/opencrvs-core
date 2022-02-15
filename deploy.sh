@@ -92,6 +92,7 @@ mkdir -p /tmp/compose/infrastructure/default_updates
 cp $COUNTRY_CONFIG_PATH/backups/hearth-dev.gz /tmp/compose/infrastructure/default_backups/hearth-dev.gz
 cp $COUNTRY_CONFIG_PATH/backups/openhim-dev.gz /tmp/compose/infrastructure/default_backups/openhim-dev.gz
 cp $COUNTRY_CONFIG_PATH/backups/user-mgnt.gz /tmp/compose/infrastructure/default_backups/user-mgnt.gz
+cp $COUNTRY_CONFIG_PATH/backups/application-config.gz /tmp/compose/infrastructure/default_backups/application-config.gz
 
 # Copy selected country default updates to infrastructure default_updates folder
 [[ -d $COUNTRY_CONFIG_PATH/updates/generated ]] && cp $COUNTRY_CONFIG_PATH/updates/generated/*.json /tmp/compose/infrastructure/default_updates

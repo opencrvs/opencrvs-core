@@ -408,7 +408,8 @@ export function setupLastRegUser(
       valueReference: { reference: getPractitionerRef(practitioner) }
     })
   }
-  taskResource.lastModified = new Date().toISOString()
+  taskResource.lastModified =
+    taskResource.lastModified || new Date().toISOString()
   return taskResource
 }
 

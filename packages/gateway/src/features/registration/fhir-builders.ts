@@ -977,12 +977,16 @@ export const builders: IFieldBuilders = {
       }
     }
   },
-  createdAt: (fhirBundle, fieldValue) => {
+  createdAt: (fhirBundle, fieldValue, context) => {
     if (!fhirBundle.meta) {
       fhirBundle.meta = {}
     }
     fhirBundle.meta.lastUpdated = fieldValue
     fhirBundle.entry[0].resource.date = fieldValue
+
+    const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+    taskResource.lastModified = fieldValue as string
+    return
   },
   mother: {
     _fhirID: (fhirBundle, fieldValue) => {
@@ -2301,13 +2305,7 @@ export const builders: IFieldBuilders = {
           )
         }
       },
-      timestamp: (
-        fhirBundle: ITemplatedBundle,
-        fieldValue: string,
-        context: any
-      ) => {
-        const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-        taskResource.lastModified = fieldValue
+      timestamp: () => {
         return
       },
       timeLoggedMS: (

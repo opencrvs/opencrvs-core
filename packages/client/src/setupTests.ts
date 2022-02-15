@@ -106,27 +106,16 @@ userQueries.searchUsers = jest.fn()
 const navigatorMock = {
   onLine: true
 }
-
 ;(window as any).navigator = navigatorMock
 ;(window as any).scrollTo = noop
 ;(window as any).config = {
   API_GATEWAY_URL: 'http://localhost:7070/',
-  AUTH_URL: 'http://localhost:4040',
-  BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
-  COUNTRY: 'bgd',
-  COUNTRY_LOGO_FILE: 'logo.png',
-  LANGUAGES: 'en,bn',
-  HIDE_EVENT_REGISTER_INFORMATION: false,
-  EXTERNAL_VALIDATION_WORKQUEUE: true,
-  FIELD_AGENT_AUDIT_LOCATIONS:
-    'WARD,UNION,CITY_CORPORATION,MUNICIPALITY,UPAZILA',
-  APPLICATION_AUDIT_LOCATIONS: 'WARD,UNION',
+  CONFIG_API_URL: 'http://localhost:2021',
   LOGIN_URL: 'http://localhost:3020',
-  COUNTRY_CONFIG_URL: 'http://localhost:3040/bgd',
-  /**
-   * @deprecated HEALTH_FACILITY_FILTER is no longer used
-   */
-  HEALTH_FACILITY_FILTER: 'UPAZILA',
+  AUTH_URL: 'http://localhost:4040',
+  COUNTRY_CONFIG_URL: 'http://localhost:3040',
+  COUNTRY: 'bgd',
+  LANGUAGES: 'en,bn',
   CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 45,
   CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 1825,
   CERTIFICATE_PRINT_LOWEST_CHARGE: 25,
@@ -177,7 +166,8 @@ jest.mock(
           forms: mockOfflineData.forms,
           templates: mockOfflineData.templates
         }),
-      loadAssets: () => Promise.resolve(mockOfflineData.assets)
+      loadAssets: () => Promise.resolve(mockOfflineData.assets),
+      loadConfig: () => Promise.resolve(mockOfflineData.config)
     }
   })
 )
