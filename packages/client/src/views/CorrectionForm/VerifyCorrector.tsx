@@ -29,6 +29,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
 import { getVerifyCorrectorDefinition } from '@client/forms/correction/verifyCorrector'
+import { TimeMounted } from '@client/components/TimeMounted'
 interface INameField {
   firstNamesField: string
   familyNameField: string
@@ -142,6 +143,15 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
     }
   }
 
+  logTime(timeMs: number) {
+    const application = this.props.application
+    if (!application.timeLoggedMS) {
+      application.timeLoggedMS = 0
+    }
+    application.timeLoggedMS += timeMs
+    this.props.modifyApplication(application)
+  }
+
   render() {
     const { corrector } = this.props.match.params
     const { intl } = this.props
@@ -151,38 +161,40 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
     )
 
     return (
-      <ActionPageLight
-        goBack={this.props.goBack}
-        goHome={() => this.props.goToHomeTab('review')}
-        title={intl.formatMessage(messages.title)}
-        hideBackground
-      >
-        {
-          <IDVerifier
-            id="idVerifier"
-            title={
-              hasNoInfo
-                ? intl.formatMessage(messages.otherIdCheckTitle)
-                : intl.formatMessage(messages.idCheckTitle)
-            }
-            correctorInformation={(!hasNoInfo && correctorInfo) || undefined}
-            actionProps={{
-              positiveAction: {
-                label: intl.formatMessage(messages.idCheckVerify),
-                handler: () => {
-                  this.handleVerification(false)
-                }
-              },
-              negativeAction: {
-                label: intl.formatMessage(messages.idCheckWithoutVerify),
-                handler: () => {
-                  this.handleVerification(true)
-                }
+      <TimeMounted onUnmount={this.logTime}>
+        <ActionPageLight
+          goBack={this.props.goBack}
+          goHome={() => this.props.goToHomeTab('review')}
+          title={intl.formatMessage(messages.title)}
+          hideBackground
+        >
+          {
+            <IDVerifier
+              id="idVerifier"
+              title={
+                hasNoInfo
+                  ? intl.formatMessage(messages.otherIdCheckTitle)
+                  : intl.formatMessage(messages.idCheckTitle)
               }
-            }}
-          />
-        }
-      </ActionPageLight>
+              correctorInformation={(!hasNoInfo && correctorInfo) || undefined}
+              actionProps={{
+                positiveAction: {
+                  label: intl.formatMessage(messages.idCheckVerify),
+                  handler: () => {
+                    this.handleVerification(false)
+                  }
+                },
+                negativeAction: {
+                  label: intl.formatMessage(messages.idCheckWithoutVerify),
+                  handler: () => {
+                    this.handleVerification(true)
+                  }
+                }
+              }}
+            />
+          }
+        </ActionPageLight>
+      </TimeMounted>
     )
   }
 }

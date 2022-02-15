@@ -13,7 +13,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { RouteComponentProps } from 'react-router'
-import { IApplication } from '@client/applications'
+import { IApplication, modifyApplication } from '@client/applications'
 import {
   CorrectorForm,
   SupportingDocumentsForm
@@ -23,6 +23,8 @@ import { CorrectionReasonForm } from './CorrectionReasonForm'
 import { CorrectionSummary } from './CorrectionSummary'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import styled from '@client/styledComponents'
+import { TimeMounted } from '@client/components/TimeMounted'
+import { useCallback } from 'react'
 
 const SpinnerWrapper = styled.div`
   height: 80vh;
@@ -36,6 +38,18 @@ const SpinnerWrapper = styled.div`
 type IProps = IStateProps & IDispatchProps
 
 function CorrectionFormComponent({ sectionId, ...props }: IProps) {
+  const logTime = useCallback(
+    (timeMs: number) => {
+      const application = props.application
+      if (!application.timeLoggedMS) {
+        application.timeLoggedMS = 0
+      }
+      application.timeLoggedMS += timeMs
+      props.modifyApplication(application)
+    },
+    [props.modifyApplication, props.application]
+  )
+
   if (props.isWritingDraft) {
     return (
       <SpinnerWrapper>
@@ -44,6 +58,14 @@ function CorrectionFormComponent({ sectionId, ...props }: IProps) {
     )
   }
 
+  return (
+    <TimeMounted onUnmount={logTime}>
+      <FormSection sectionId={sectionId} {...props} />
+    </TimeMounted>
+  )
+}
+
+function FormSection({ sectionId, ...props }: IProps) {
   switch (sectionId) {
     case CorrectionSection.Corrector:
       return <CorrectorForm {...props} />
@@ -53,10 +75,10 @@ function CorrectionFormComponent({ sectionId, ...props }: IProps) {
       return <SupportingDocumentsForm {...props} />
     case CorrectionSection.Summary:
       return <CorrectionSummary {...props} />
+    default:
+      return <></>
   }
-  return <></>
 }
-
 function mapStateToProps(state: IStoreState, props: IRouteProps) {
   const { applicationId, pageId: sectionId } = props.match.params
   const application = state.applicationsState.applications.find(
@@ -80,7 +102,9 @@ type IStateProps = {
   isWritingDraft: boolean
 }
 
-type IDispatchProps = {}
+type IDispatchProps = {
+  modifyApplication: typeof modifyApplication
+}
 
 type IRouteProps = RouteComponentProps<{
   applicationId: string
@@ -92,4 +116,4 @@ export const CorrectionForm = connect<
   IDispatchProps,
   IRouteProps,
   IStoreState
->(mapStateToProps)(CorrectionFormComponent)
+>(mapStateToProps, { modifyApplication })(CorrectionFormComponent)
