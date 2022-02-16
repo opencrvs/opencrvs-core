@@ -232,22 +232,6 @@ const getWQApplicationName = (application: GQLEventSearchSet): string => {
   return name
 }
 
-const getGQLApplicationName = (application: IGQLApplication): string => {
-  let name = ''
-  const applicationName =
-    application?.child?.name[0] || application?.deceased?.name[0]
-
-  if (applicationName) {
-    name = [
-      (applicationName as GQLHumanName).firstNames,
-      (applicationName as GQLHumanName).familyName
-    ]
-      .filter((part) => Boolean(part))
-      .join(' ')
-  }
-  return name
-}
-
 const getLocation = (application: IApplication, props: IFullProps) => {
   let locationType = ''
   let locationId = ''
@@ -378,19 +362,6 @@ const getWQApplication = (props: IFullProps): IApplicationData | null => {
   return applicationData
 }
 
-const getGQLApplication = (data: IGQLApplication): IApplicationData => {
-  const application: IApplicationData = {
-    id: data?.id,
-    type: data?.registration?.type,
-    status: data?.registration?.status[0].type,
-    trackingId: data?.registration?.trackingId,
-    dateOfBirth: '',
-    placeOfBirth: '',
-    informant: ''
-  }
-  return application
-}
-
 const getApplicationInfo = (
   props: IFullProps,
   application: IApplicationData,
@@ -480,7 +451,7 @@ export const ShowRecordAudit = (props: IFullProps) => {
       <Header />
       <Navigation deselectAllTabs={true} />
       <BodyContainer>
-        {application ? (
+        {application && (
           <Content
             title={application.name || 'No name provided'}
             titleColor={application.name ? 'copy' : 'grey600'}
@@ -495,61 +466,6 @@ export const ShowRecordAudit = (props: IFullProps) => {
           >
             {getApplicationInfo(props, application, isDownloaded)}
           </Content>
-        ) : (
-          <Query
-            query={FETCH_APPLICATION_SHORT_INFO}
-            variables={{
-              id: applicationId
-            }}
-          >
-            {({
-              loading,
-              error,
-              data
-            }: {
-              loading: any
-              data?: any
-              error?: any
-            }) => {
-              if (error) {
-                goBack(props)
-              }
-              if (loading) {
-                return (
-                  <StyledSpinner
-                    id="field-agent-home-spinner"
-                    baseColor={props.theme.colors.background}
-                  />
-                )
-              }
-              return (
-                <>
-                  <Content
-                    title={getGQLApplicationName(
-                      data && data.fetchRegistration
-                    )}
-                    size={'large'}
-                    icon={() => (
-                      <ApplicationIcon
-                        color={
-                          STATUSTOCOLOR[
-                            getGQLApplication(data?.fetchRegistration).status ||
-                              'DRAFT'
-                          ]
-                        }
-                      />
-                    )}
-                  >
-                    {getApplicationInfo(
-                      props,
-                      data && getGQLApplication(data.fetchRegistration),
-                      isDownloaded
-                    )}
-                  </Content>
-                </>
-              )
-            }}
-          </Query>
         )}
       </BodyContainer>
     </div>
