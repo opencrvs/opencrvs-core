@@ -56,6 +56,7 @@ const STORE_APPLICATION = 'APPLICATION/STORE_APPLICATION'
 const MODIFY_APPLICATION = 'APPLICATION/MODIFY_DRAFT'
 const WRITE_APPLICATION = 'APPLICATION/WRITE_DRAFT'
 const DELETE_APPLICATION = 'APPLICATION/DELETE_DRAFT'
+const REINSTATE_APPLICATION = 'APPLICATION/REINSTATE_APPLICATION'
 const GET_APPLICATIONS_SUCCESS = 'APPLICATION/GET_DRAFTS_SUCCESS'
 const GET_APPLICATIONS_FAILED = 'APPLICATION/GET_DRAFTS_FAILED'
 const GET_WORKQUEUE_SUCCESS = 'APPLICATION/GET_WORKQUEUE_SUCCESS'
@@ -91,6 +92,8 @@ export enum SUBMISSION_STATUS {
   REJECTING = 'REJECTING',
   REJECTED = 'REJECTED',
   READY_TO_CERTIFY = 'READY_TO_CERTIFY',
+  REINSTATING = 'REINSTATING',
+  READY_TO_REINSTATE = 'READY_TO_REINSTATE',
   CERTIFYING = 'CERTIFYING',
   CERTIFIED = 'CERTIFIED',
   FAILED = 'FAILED',
@@ -284,6 +287,12 @@ interface IDeleteApplicationAction {
     application: IApplication | IPrintableApplication
   } & OnSuccessDeleteApplicationOptions
 }
+interface IREINSTATE_APPLICATIONAction {
+  type: typeof REINSTATE_APPLICATION
+  payload: {
+    applicationId: string
+  }
+}
 
 interface IGetStorageApplicationsSuccessAction {
   type: typeof GET_APPLICATIONS_SUCCESS
@@ -377,6 +386,7 @@ export type Action =
   | IWriteApplicationAction
   | NavigationAction
   | IDeleteApplicationAction
+  | IREINSTATE_APPLICATIONAction
   | IGetStorageApplicationsSuccessAction
   | IGetStorageApplicationsFailedAction
   | IGetWorkqueueOfCurrentUserSuccessAction
@@ -529,6 +539,12 @@ export function deleteApplication(
   options?: OnSuccessDeleteApplicationOptions
 ): IDeleteApplicationAction {
   return { type: DELETE_APPLICATION, payload: { application, ...options } }
+}
+
+export function reinstateApplication(
+  applicationId: string
+): IREINSTATE_APPLICATIONAction {
+  return { type: REINSTATE_APPLICATION, payload: { applicationId } }
 }
 
 export function writeApplication(
@@ -1264,6 +1280,23 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
       }
       return loop(state, Cmd.action(modifyApplication(modifiedApplication)))
     }
+    case REINSTATE_APPLICATION: {
+      const application = state.applications.find(
+        ({ id }) => id === action.payload.applicationId
+      )
+
+      if (!application) {
+        return state
+      }
+
+      const modifiedApplication: IApplication = {
+        ...application,
+        submissionStatus: SUBMISSION_STATUS.REINSTATING,
+        payload: { id: application.id }
+      }
+      return loop(state, Cmd.action(writeApplication(modifiedApplication)))
+    }
+
     case STORE_APPLICATION:
       return {
         ...state,

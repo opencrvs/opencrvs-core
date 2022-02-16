@@ -24,7 +24,11 @@ import {
 } from '@client/navigation'
 import { RouteComponentProps } from 'react-router'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { IWorkqueue, IApplication } from '@client/applications'
+import {
+  IWorkqueue,
+  IApplication,
+  reinstateApplication
+} from '@client/applications'
 import { IStoreState } from '@client/store'
 import {
   GQLEventSearchSet,
@@ -97,6 +101,7 @@ interface IStateProps {
 
 interface IDispatchProps {
   goToApplicationDetails: typeof goToApplicationDetails
+  reinstateApplication: typeof reinstateApplication
   goBack: typeof goBackAction
   goToRegistrarHomeTab: typeof goToRegistrarHomeTab
 }
@@ -447,7 +452,7 @@ const getApplicationInfo = (
 }
 
 export const ShowRecordAudit = (props: IFullProps) => {
-  const { intl, scope } = props
+  const { intl, scope, reinstateApplication } = props
   const applicationId = props.match.params.applicationId
   const [showPrompt, setShowPrompt] = React.useState(false)
   const userHasRegisterScope = scope && scope.includes('register')
@@ -502,32 +507,35 @@ export const ShowRecordAudit = (props: IFullProps) => {
             {getApplicationInfo(props, application, isDownloaded)}
           </Content>
         )}
-        <ResponsiveModal
-          id="reinstateDeclarationPrompt"
-          show={showPrompt}
-          title={intl.formatMessage(messages.reinstateDeclarationDialogTitle)}
-          contentHeight={96}
-          handleClose={() => setShowPrompt(!showPrompt)}
-          actions={[
-            <TertiaryButton
-              id="cancel"
-              key="cancel"
-              onClick={() => setShowPrompt(!showPrompt)}
-            >
-              {intl.formatMessage(messages.reinstateDeclarationDialogCancel)}
-            </TertiaryButton>,
-            <PrimaryButton
-              id="continue"
-              key="continue"
-              onClick={() => setShowPrompt(!showPrompt)}
-            >
-              {intl.formatMessage(messages.reinstateDeclarationDialogConfirm)}
-            </PrimaryButton>
-          ]}
-        >
-          {intl.formatMessage(messages.reinstateDeclarationDialogDescription)}
-        </ResponsiveModal>
       </BodyContainer>
+      <ResponsiveModal
+        id="reinstateDeclarationPrompt"
+        show={showPrompt}
+        title={intl.formatMessage(messages.reinstateDeclarationDialogTitle)}
+        contentHeight={96}
+        handleClose={() => setShowPrompt(!showPrompt)}
+        actions={[
+          <TertiaryButton
+            id="cancel"
+            key="cancel"
+            onClick={() => {
+              reinstateApplication(applicationId)
+              setShowPrompt(!showPrompt)
+            }}
+          >
+            {intl.formatMessage(messages.reinstateDeclarationDialogCancel)}
+          </TertiaryButton>,
+          <PrimaryButton
+            id="continue"
+            key="continue"
+            onClick={() => setShowPrompt(!showPrompt)}
+          >
+            {intl.formatMessage(messages.reinstateDeclarationDialogConfirm)}
+          </PrimaryButton>
+        ]}
+      >
+        {intl.formatMessage(messages.reinstateDeclarationDialogDescription)}
+      </ResponsiveModal>
     </div>
   )
 }
@@ -549,6 +557,7 @@ export const RecordAudit = connect<
   RouteComponentProps<{ applicationId: string }>,
   IStoreState
 >(mapStateToProps, {
+  reinstateApplication,
   goToApplicationDetails,
   goBack: goBackAction,
   goToRegistrarHomeTab

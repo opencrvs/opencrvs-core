@@ -75,7 +75,11 @@ const REJECT_DEATH_APPLICATION = gql`
     markEventAsVoided(id: $id, reason: $reason, comment: $comment)
   }
 `
-
+export const REINSTATE_DEATH_APPLICATION = gql`
+  mutation submitMutation($id: String!) {
+    markApplicationAsReinstated(id: $id)
+  }
+`
 const COLLECT_DEATH_CERTIFICATE = gql`
   mutation submitMutation($id: ID!, $details: DeathRegistrationInput!) {
     markDeathAsCertified(id: $id, details: $details)
@@ -126,6 +130,14 @@ export function getDeathMutationMappings(
           ...payload
         },
         dataKey: 'markEventAsVoided'
+      }
+    case Action.REINSTATE_APPLICATION:
+      return {
+        mutation: REINSTATE_DEATH_APPLICATION,
+        variables: {
+          ...payload
+        },
+        dataKey: 'markApplicationAsReinstate'
       }
     case Action.COLLECT_CERTIFICATE:
       return {

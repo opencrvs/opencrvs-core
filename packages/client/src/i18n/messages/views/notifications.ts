@@ -20,6 +20,7 @@ interface INotificationsMessages
   processingText: MessageDescriptor
   statusRegistering: MessageDescriptor
   statusRejecting: MessageDescriptor
+  statusReinstating: MessageDescriptor
   statusSubmitting: MessageDescriptor
   statusWaitingToValidate: MessageDescriptor
   statusWaitingToRegister: MessageDescriptor
@@ -70,6 +71,11 @@ const messagesToDefine: INotificationsMessages = {
     defaultMessage: 'Rejecting...',
     description: 'Label for application status Rejecting',
     id: 'regHome.outbox.statusRejecting'
+  },
+  statusReinstating: {
+    defaultMessage: 'Reinstating...',
+    description: 'Label for application status Reinstating',
+    id: 'regHome.outbox.statusReinstating'
   },
   statusSubmitting: {
     defaultMessage: 'Submitting...',

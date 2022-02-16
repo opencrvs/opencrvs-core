@@ -48,6 +48,7 @@ class Outbox extends React.Component<IFullProps, IState> {
       statusRegistering,
       statusWaitingToReject,
       statusRejecting,
+      statusReinstating,
       statusWaitingToSubmit,
       statusSubmitting,
       waitingToRetry
@@ -92,6 +93,11 @@ class Outbox extends React.Component<IFullProps, IState> {
         iconId = `rejecting${index}`
         icon = () => <Spinner id={iconId} key={iconId} size={24} />
         statusText = formatMessage(statusRejecting)
+        break
+      case SUBMISSION_STATUS.REINSTATING:
+        iconId = `reinstating${index}`
+        icon = () => <Spinner id={iconId} key={iconId} size={24} />
+        statusText = formatMessage(statusReinstating)
         break
       case SUBMISSION_STATUS.FAILED_NETWORK:
         iconId = `failed${index}`

@@ -112,20 +112,22 @@ async function updateEvent(task: fhir.Task, authHeader: string) {
     task.businessStatus.coding &&
     task.businessStatus.coding[0].code
   body.modifiedAt = Date.now().toString()
-  const rejectAnnotation: fhir.Annotation = (body.type === REJECTED_STATUS &&
-    task &&
-    task.note &&
-    Array.isArray(task.note) &&
-    task.note.length > 0 &&
-    task.note[task.note.length - 1]) || { text: '' }
-  const nodeText = rejectAnnotation.text
-  body.rejectReason =
-    (body.type === REJECTED_STATUS &&
+  if (body.type === REJECTED_STATUS) {
+    const rejectAnnotation: fhir.Annotation = (body.type === REJECTED_STATUS &&
       task &&
-      task.reason &&
-      task.reason.text) ||
-    ''
-  body.rejectComment = nodeText
+      task.note &&
+      Array.isArray(task.note) &&
+      task.note.length > 0 &&
+      task.note[task.note.length - 1]) || { text: '' }
+    const nodeText = rejectAnnotation.text
+    body.rejectReason =
+      (body.type === REJECTED_STATUS &&
+        task &&
+        task.reason &&
+        task.reason.text) ||
+      ''
+    body.rejectComment = nodeText
+  }
   body.updatedBy =
     regLastUserIdentifier &&
     regLastUserIdentifier.valueReference &&
@@ -404,7 +406,7 @@ async function createApplicationIndex(
   const compositionTypeCode =
     composition.type.coding &&
     composition.type.coding.find(
-      code => code.system === 'http://opencrvs.org/doc-types'
+      (code) => code.system === 'http://opencrvs.org/doc-types'
     )
 
   body.contactRelationship =
@@ -461,11 +463,11 @@ async function updateCompositionWithDuplicates(
 ) {
   const duplicateCompositions = await Promise.all(
     // tslint:disable-next-line
-    duplicates.map(duplicate => getCompositionById(duplicate))
+    duplicates.map((duplicate) => getCompositionById(duplicate))
   )
 
   const duplicateCompositionIds = duplicateCompositions.map(
-    dupComposition => dupComposition.id
+    (dupComposition) => dupComposition.id
   )
 
   if (composition && composition.id) {
