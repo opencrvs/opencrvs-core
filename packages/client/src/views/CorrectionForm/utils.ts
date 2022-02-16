@@ -57,7 +57,7 @@ import {
 } from '@client/forms/utils'
 import { buttonMessages } from '@client/i18n/messages'
 import { flattenDeep, get, clone, isEqual } from 'lodash'
-import { GQLLocation } from '@opencrvs/gateway/src/graphql/schema'
+import { IGQLLocation } from '@client/utils/userUtils'
 
 export function groupHasError(
   group: IFormSectionGroup,
@@ -96,7 +96,7 @@ export function isCorrection(application: IApplication) {
 
 export function updateApplicationRegistrationWithCorrection(
   application: IApplication,
-  meta?: { userPrimaryOffice?: GQLLocation }
+  meta?: { userPrimaryOffice?: IGQLLocation }
 ): void {
   const correctionValues: Record<string, any> = {}
   const { data } = application
@@ -145,12 +145,16 @@ export function updateApplicationRegistrationWithCorrection(
     ) {
       const { nestedFields }: { nestedFields?: IFormSectionData } = data
         .currectionFeesPayment.correctionFees as IFormSectionData
-      correctionValues.payment = {
-        total: nestedFields?.totalFees,
-        type: 'MANUAL'
-      }
+      correctionValues.payments = [
+        {
+          type: 'MANUAL',
+          total: Number(nestedFields?.totalFees),
+          amount: Number(nestedFields?.totalFees),
+          outcome: 'COMPLETED' as const
+        }
+      ]
       if (nestedFields?.proofOfPayment) {
-        correctionValues.payment.data = (
+        correctionValues.payments[0].data = (
           nestedFields?.proofOfPayment as IFileValue
         ).data
       }
@@ -160,7 +164,7 @@ export function updateApplicationRegistrationWithCorrection(
   if (meta) {
     if (meta.userPrimaryOffice) {
       correctionValues.location = {
-        _fhirID: meta.userPrimaryOffice._fhirID
+        _fhirID: meta.userPrimaryOffice.id
       }
     }
   }
