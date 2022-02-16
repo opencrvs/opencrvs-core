@@ -10,7 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { AppStore } from '@client/store'
-import { createTestComponent, createTestStore } from '@client/tests/util'
+import {
+  createRouterProps,
+  createTestComponent,
+  createTestStore,
+  loginAsFieldAgent
+} from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
@@ -20,9 +25,11 @@ import {
   OPERATIONAL_REPORT_SECTION
 } from './OperationalReport'
 import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
-import { stringify, parse } from 'query-string'
+import { parse } from 'query-string'
 import { OPERATIONAL_REPORTS_METRICS } from './metricsQuery'
 import { GraphQLError } from 'graphql'
+import { SEARCH_EVENTS } from '@client/views/OfficeHome/queries'
+import { COUNT_USER_WISE_APPLICATIONS } from '@client/search/queries'
 
 describe('OperationalReport tests', () => {
   let component: ReactWrapper<{}, {}>
@@ -35,15 +42,29 @@ describe('OperationalReport tests', () => {
     searchableText: 'Dhaka'
   }
 
-  beforeAll(async () => {
-    Date.now = jest.fn(() => 1487076708000)
-    const { store: testStore, history: testHistory } = await createTestStore()
-    store = testStore
-    history = testHistory
-  })
-
   beforeEach(async () => {
+    Date.now = jest.fn(() => 1487076708000)
+    ;({ store, history } = await createTestStore())
+
+    loginAsFieldAgent(store)
     const graphqlMock = [
+      {
+        request: {
+          query: COUNT_USER_WISE_APPLICATIONS,
+          variables: {
+            userId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+            status: ['REJECTED'],
+            locationIds: ['0d8474da-0361-4d32-979e-af91f012340a']
+          }
+        },
+        result: {
+          data: {
+            searchEvents: {
+              totalItems: 1
+            }
+          }
+        }
+      },
       {
         request: {
           query: OPERATIONAL_REPORTS_METRICS,
@@ -56,7 +77,7 @@ describe('OperationalReport tests', () => {
         result: {
           data: {
             getEventEstimationMetrics: {
-              birth45DayMetrics: {
+              birthTargetDayMetrics: {
                 actualRegistration: 4,
                 estimatedRegistration: 0,
                 estimatedPercentage: 0,
@@ -64,7 +85,7 @@ describe('OperationalReport tests', () => {
                 femalePercentage: 0,
                 __typename: 'EstimationMetrics'
               },
-              death45DayMetrics: {
+              deathTargetDayMetrics: {
                 actualRegistration: 0,
                 estimatedRegistration: 0,
                 estimatedPercentage: 0,
@@ -86,20 +107,18 @@ describe('OperationalReport tests', () => {
     ]
     const testComponent = await createTestComponent(
       <OperationalReport
-        // @ts-ignore
-        location={{
-          search: stringify({
+        {...createRouterProps('/', undefined, {
+          search: {
             locationId: LOCATION_DHAKA_DIVISION.id,
             sectionId: OPERATIONAL_REPORT_SECTION.OPERATIONAL,
             timeEnd: new Date(1487076708000).toISOString(),
             timeStart: new Date(1455454308000).toISOString()
-          })
-        }}
+          }
+        })}
       />,
-      store,
-      graphqlMock
+      { store, history, graphqlMocks: graphqlMock }
     )
-    component = testComponent.component
+    component = testComponent
   })
 
   it('renders without crashing', async () => {
@@ -244,7 +263,7 @@ describe('OperationalReport tests', () => {
 describe('OperationalReport reports tests', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
-
+  let history: History
   const LOCATION_DHAKA_DIVISION = {
     displayLabel: 'Dhaka Division',
     id: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
@@ -253,26 +272,24 @@ describe('OperationalReport reports tests', () => {
 
   beforeAll(async () => {
     Date.now = jest.fn(() => 1487076708000)
-    const { store: testStore } = await createTestStore()
-    store = testStore
+    ;({ store, history } = await createTestStore())
   })
 
   beforeEach(async () => {
     const testComponent = await createTestComponent(
       <OperationalReport
-        // @ts-ignore
-        location={{
-          search: stringify({
+        {...createRouterProps('/', undefined, {
+          search: {
             locationId: LOCATION_DHAKA_DIVISION.id,
             sectionId: OPERATIONAL_REPORT_SECTION.REPORTS,
             timeEnd: new Date(1487076708000).toISOString(),
             timeStart: new Date(1455454308000).toISOString()
-          })
-        }}
+          }
+        })}
       />,
-      store
+      { store, history }
     )
-    component = testComponent.component
+    component = testComponent
   })
 
   it('renders report lists', async () => {
@@ -283,6 +300,7 @@ describe('OperationalReport reports tests', () => {
 describe('Test error toast notification', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
+  let history: History
 
   const LOCATION_DHAKA_DIVISION = {
     displayLabel: 'Dhaka Division',
@@ -292,8 +310,7 @@ describe('Test error toast notification', () => {
 
   beforeAll(async () => {
     Date.now = jest.fn(() => 1487076708000)
-    const { store: testStore } = await createTestStore()
-    store = testStore
+    ;({ store, history } = await createTestStore())
   })
 
   beforeEach(async () => {
@@ -314,20 +331,18 @@ describe('Test error toast notification', () => {
     ]
     const testComponent = await createTestComponent(
       <OperationalReport
-        // @ts-ignore
-        location={{
-          search: stringify({
+        {...createRouterProps('/', undefined, {
+          search: {
             locationId: LOCATION_DHAKA_DIVISION.id,
             sectionId: OPERATIONAL_REPORT_SECTION.OPERATIONAL,
             timeEnd: new Date(1487076708000).toISOString(),
             timeStart: new Date(1455454308000).toISOString()
-          })
-        }}
+          }
+        })}
       />,
-      store,
-      graphqlMock
+      { store, history, graphqlMocks: graphqlMock }
     )
-    component = testComponent.component
+    component = testComponent
   })
 
   it('renders the error toast notification and component loader', async () => {

@@ -569,8 +569,7 @@ describe('verify applicationsStarted handler', () => {
           params: {
             method: 'POST',
             path: '/ocrvs/_search',
-            body:
-              '{"query":{"match_all":{}},"sort":[{"dateOfApplication":"asc"}]}',
+            body: '{"query":{"match_all":{}},"sort":[{"dateOfApplication":"asc"}]}',
             querystring: '',
             headers: {
               'User-Agent':

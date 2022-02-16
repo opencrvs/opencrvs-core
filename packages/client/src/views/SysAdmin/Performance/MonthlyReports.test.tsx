@@ -23,9 +23,10 @@ describe('Monthly report', () => {
   let app: ReactWrapper
 
   beforeAll(async () => {
-    app = (
-      await createTestComponent(<MonthlyReports history={history} />, store)
-    ).component
+    app = await createTestComponent(<MonthlyReports history={history} />, {
+      store,
+      history
+    })
     app.update()
   })
 
@@ -55,8 +56,10 @@ describe('Monthly report', () => {
       target: { id: 'locationSearchInput', value: 'Chittagong' }
     })
 
-    locationSearchInput.update()
-
+    await waitForElement(
+      app,
+      '#locationOption8cbc862a-b817-4c29-a490-4a8767ff023c'
+    )
     app
       .find('#locationOption8cbc862a-b817-4c29-a490-4a8767ff023c')
       .hostNodes()

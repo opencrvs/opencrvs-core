@@ -11,8 +11,7 @@
  */
 import {
   printMoneyReceipt,
-  previewCertificate,
-  printCertificate
+  previewCertificate
 } from '@client/views/PrintCertificate/PDFUtils'
 import {
   mockApplicationData,
@@ -87,38 +86,6 @@ describe('PDFUtils related tests', () => {
         faultyOfflineData
       )
     ).toThrowError('Money reciept template is misssing in offline data')
-  })
-  it('Throws exception if invalid key is provided', () => {
-    const deathApplication = omit(mockDeathApplicationData, 'deathEvent')
-    expect(() =>
-      printCertificate(
-        intl,
-        {
-          id: 'asdhdqe2472487jsdfsdf',
-          data: deathApplication,
-          event: Event.DEATH
-        },
-        userDetails,
-        mockOfflineData
-      )
-    ).toThrowError(
-      'Given value key structure is not valid: deathEvent.deathDate'
-    )
-  })
-  it('Throws exception if invalid userDetails found for printCertificate', () => {
-    const deathApplication = omit(mockDeathApplicationData, 'deathEvent')
-    expect(() =>
-      printCertificate(
-        intl,
-        {
-          id: 'asdhdqe2472487jsdfsdf',
-          data: deathApplication,
-          event: Event.DEATH
-        },
-        null,
-        mockOfflineData
-      )
-    ).toThrowError('No user details found')
   })
   it('Throws exception if invalid userDetails found for previewCertificate', () => {
     const deathApplication = omit(mockDeathApplicationData, 'deathEvent')

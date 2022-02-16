@@ -379,7 +379,9 @@ describe('when user is previewing the form data', () => {
       currentAddressSameAsPermanent: true,
       country: 'BGD',
       state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
+      internationalStatePermanent: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
       district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
+      internationalDistrictPermanent: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
       addressLine4: '34c377a0-2223-4361-851c-5e230a96d957',
       addressLine3: '1f06d980-e254-4e6b-b049-a9b4e7155180',
       addressLine3CityOption: '',
@@ -404,7 +406,9 @@ describe('when user is previewing the form data', () => {
       relationship: 'OTHER',
       country: 'BGD',
       state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
+      internationalState: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
       district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
+      internationalDistrict: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
       addressLine4: '34c377a0-2223-4361-851c-5e230a96d957',
       addressLine3: '1f06d980-e254-4e6b-b049-a9b4e7155180',
       addressLine3CityOption: '',
@@ -458,7 +462,7 @@ describe('when user is previewing the form data', () => {
     }
 
     const deathEventDetails = {
-      deathDate: '2019-01-01',
+      deathDate: '2017-01-01',
       manner: 'ACCIDENT',
       deathPlaceAddress: 'PERMANENT',
       country: 'BGD',
@@ -482,7 +486,7 @@ describe('when user is previewing the form data', () => {
       contactPoint: {
         value: 'OTHER',
         nestedFields: {
-          registrationPhone: '01717000000',
+          registrationPhone: '0799999999',
           contactRelationshipOther: 'grandma'
         }
       },
@@ -524,7 +528,7 @@ describe('when user is previewing the form data', () => {
           ]
         }
       }
-      // @ts-ignore
+
       customDraft = { id: uuid(), data, review: true, event: Event.DEATH }
       store.dispatch(storeApplication(customDraft))
       history.replace(
@@ -540,10 +544,9 @@ describe('when user is previewing the form data', () => {
 
     it('successfully submits the review form', async () => {
       jest.setMock('react-apollo', { default: ReactApollo })
+      app.update().find('#registerApplicationBtn').hostNodes().simulate('click')
 
-      app.find('#registerApplicationBtn').hostNodes().simulate('click')
-
-      app.find('#submit_confirm').hostNodes().simulate('click')
+      app.update().find('#submit_confirm').hostNodes().simulate('click')
     })
 
     it('rejecting application redirects to reject confirmation screen', async () => {

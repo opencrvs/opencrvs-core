@@ -12,4 +12,4 @@
 export * from '@client/views/SysAdmin/Performance/reports/GenderBasisReports'
 export * from '@client/views/SysAdmin/Performance/reports/TimeFrameReports'
 export * from '@client/views/SysAdmin/Performance/reports/CertificationPaymentReports'
-export * from '@client/views/SysAdmin/Performance/reports/Estimated45DayRegistrationReports'
+export * from '@client/views/SysAdmin/Performance/reports/EstimatedTargetDayRegistrationReports'

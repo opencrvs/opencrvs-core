@@ -56,9 +56,11 @@ export const REGISTRAR_HOME = '/registration-home'
 export const REGISTRAR_HOME_TAB = '/registration-home/:tabId/:selectorId?'
 export const FIELD_AGENT_HOME_TAB = '/field-agent-home/:tabId'
 export const SETTINGS = '/settings'
+export const CHANGE_PHONE = '/settings/phone'
 export const CONFIG = '/config'
 
 export const APPLICATION_DETAIL = '/details/:applicationId'
+export const APPLICATION_RECORD_AUDIT = '/record-audit/:applicationId'
 
 export const SYS_ADMIN_HOME = '/sys-admin-home'
 export const SYS_ADMIN_HOME_TAB = '/sys-admin-home/:tabId'

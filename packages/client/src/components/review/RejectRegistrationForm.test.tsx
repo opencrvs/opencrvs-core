@@ -17,14 +17,14 @@ import { RejectRegistrationForm } from '@opencrvs/client/src/components/review/R
 import { Event } from '@client/forms'
 import { createApplication } from '@client/applications'
 
-const { store } = createStore()
+const { store, history } = createStore()
 const mockHandler = jest.fn()
 
 describe('reject registration form', () => {
-  let rejectFormComponent: ReactWrapper<{}, {}>
+  let component: ReactWrapper<{}, {}>
   const draftApplication = createApplication(Event.BIRTH)
   beforeEach(async () => {
-    const testComponent = await createTestComponent(
+    component = await createTestComponent(
       <RejectRegistrationForm
         onClose={mockHandler}
         duplicate={true}
@@ -33,33 +33,27 @@ describe('reject registration form', () => {
         draftId="04ba2b0e-ba38-4049-ad74-332e4ee9fbfe"
         event={Event.BIRTH}
       />,
-      store
+      { store, history }
     )
-    rejectFormComponent = testComponent.component
   })
 
   it('renders form', () => {
-    expect(
-      rejectFormComponent.find('#submit_reject_form').hostNodes()
-    ).toHaveLength(1)
+    expect(component.find('#submit_reject_form').hostNodes()).toHaveLength(1)
   })
 
   it('renders form with submit button disabled', () => {
     expect(
-      rejectFormComponent
-        .find('#submit_reject_form')
-        .hostNodes()
-        .prop('disabled')
+      component.find('#submit_reject_form').hostNodes().prop('disabled')
     ).toEqual(true)
   })
 
   it('enables submit button when form is complete', () => {
-    rejectFormComponent
+    component
       .find('#rejectionReasonother')
       .hostNodes()
       .simulate('change', { checked: true })
 
-    rejectFormComponent
+    component
       .find('#rejectionCommentForHealthWorker')
       .hostNodes()
       .simulate('change', {
@@ -67,10 +61,7 @@ describe('reject registration form', () => {
       })
 
     expect(
-      rejectFormComponent
-        .find('#submit_reject_form')
-        .hostNodes()
-        .prop('disabled')
+      component.find('#submit_reject_form').hostNodes().prop('disabled')
     ).toEqual(false)
   })
 })

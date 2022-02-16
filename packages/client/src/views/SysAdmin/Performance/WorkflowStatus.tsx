@@ -33,7 +33,7 @@ import {
   StatusMapping
 } from '@client/views/SysAdmin/Performance/OperationalReport'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
-import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/registrationRates/Within45DaysTable'
+import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/registrationRates/WithinTargetDaysTable'
 import { FilterContainer } from '@client/views/SysAdmin/Performance/utils'
 import {
   SysAdminContentWrapper,
@@ -148,9 +148,13 @@ interface ISearchParams {
   status?: keyof IStatusMapping
   event?: Event
 }
-
+export interface IHistoryStateProps {
+  sectionId: OPERATIONAL_REPORT_SECTION
+  timeStart: Date | string
+  timeEnd: Date | string
+}
 interface WorkflowStatusProps
-  extends RouteComponentProps,
+  extends RouteComponentProps<{}, {}, IHistoryStateProps>,
     DispatchProps,
     WrappedComponentProps {}
 function WorkflowStatusComponent(props: WorkflowStatusProps) {
@@ -165,9 +169,9 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
   )
   const recordCount = DEFAULT_APPLICATION_STATUS_PAGE_SIZE * currentPageNumber
   let sectionId = OPERATIONAL_REPORT_SECTION.OPERATIONAL
-  let timeStart = moment().subtract(1, 'years').toDate()
-  let timeEnd = moment().toDate()
-  const historyState = props.history.location.state as any
+  let timeStart: string | Date = moment().subtract(1, 'years').toDate()
+  let timeEnd: string | Date = moment().toDate()
+  const historyState = props.history.location.state
 
   if (props.location.state) {
     sectionId = historyState.sectionId

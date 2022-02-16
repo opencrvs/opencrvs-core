@@ -39,7 +39,7 @@ const getValidationErrors = {
   forField: function (
     field: IFormField,
     values: IFormSectionData,
-    resources?: IOfflineData,
+    offlineCountryConfig?: IOfflineData,
     drafts?: IFormData,
     requiredErrorMessage?: MessageDescriptor
   ) {
@@ -51,7 +51,7 @@ const getValidationErrors = {
     const conditionalActions = getConditionalActionsForField(
       field,
       values,
-      resources,
+      offlineCountryConfig,
       drafts
     )
     if (
@@ -75,7 +75,7 @@ const getValidationErrors = {
     }
 
     const validationResults = validators
-      .map((validator) => validator(value, drafts, resources))
+      .map((validator) => validator(value, drafts, offlineCountryConfig))
       .filter((error) => error !== undefined) as IValidationResult[]
 
     return {
@@ -83,7 +83,7 @@ const getValidationErrors = {
       nestedFields: this.forNestedField(
         field,
         values,
-        resources,
+        offlineCountryConfig,
         drafts,
         requiredErrorMessage
       )

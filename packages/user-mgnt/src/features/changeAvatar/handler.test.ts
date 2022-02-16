@@ -47,7 +47,7 @@ const mockUser: Partial<IUser & { _id: string }> = {
   primaryOfficeId: '321',
   catchmentAreaIds: [],
   scope: ['register'],
-  deviceId: 'D444',
+  device: 'D444',
   passwordHash:
     'c6fdf98bdbb45fb987392b9c2e398cb1dc2915ccbfc7a7d48f9fa7d6b3f1844385517231e98662fbfee5806dcc7a2b0edd7b63cbcfb87efe7e51875ec3e41006',
   salt: '17cbf362-6a16-4728-adda-6bc700af13b6'

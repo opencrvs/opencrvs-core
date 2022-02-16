@@ -87,18 +87,18 @@ describe('Registraion Rates tests', () => {
             details: [
               {
                 actualTotalRegistration: 20,
-                actual45DayRegistration: 9,
+                actualTargetDayRegistration: 9,
                 estimatedRegistration: 45,
-                estimated45DayPercentage: 4.5,
+                estimatedTargetDayPercentage: 4.5,
                 month: 'April',
                 year: '2020',
                 startOfMonth: '2020-03-30T18:00:00.000Z'
               },
               {
                 actualTotalRegistration: 10,
-                actual45DayRegistration: 0,
+                actualTargetDayRegistration: 0,
                 estimatedRegistration: 45,
-                estimated45DayPercentage: 0,
+                estimatedTargetDayPercentage: 0,
                 month: 'March',
                 year: '2020',
                 startOfMonth: '2020-02-29T18:00:00.000Z'
@@ -106,9 +106,9 @@ describe('Registraion Rates tests', () => {
             ],
             total: {
               actualTotalRegistration: 30,
-              actual45DayRegistration: 9,
+              actualTargetDayRegistration: 9,
               estimatedRegistration: 45,
-              estimated45DayPercentage: 2.25
+              estimatedTargetDayPercentage: 2.25
             }
           }
         }
@@ -127,28 +127,25 @@ describe('Registraion Rates tests', () => {
   })
 
   beforeEach(async () => {
-    component = (
-      await createTestComponent(
-        <RegistrationRates
-          match={{
-            params: { eventType: 'birth' },
-            isExact: true,
-            path: EVENT_REGISTRATION_RATES,
-            url: ''
-          }}
-          // @ts-ignore
-          location={{
-            search: stringify({
-              locationId: LOCATION_DHAKA_DIVISION.id,
-              timeEnd: new Date(1487076708000).toISOString(),
-              timeStart: new Date(1455454308000).toISOString()
-            })
-          }}
-        />,
-        store,
-        graphqlMocks
-      )
-    ).component
+    component = await createTestComponent(
+      <RegistrationRates
+        match={{
+          params: { eventType: 'birth' },
+          isExact: true,
+          path: EVENT_REGISTRATION_RATES,
+          url: ''
+        }}
+        // @ts-ignore
+        location={{
+          search: stringify({
+            locationId: LOCATION_DHAKA_DIVISION.id,
+            timeEnd: new Date(1487076708000).toISOString(),
+            timeStart: new Date(1455454308000).toISOString()
+          })
+        }}
+      />,
+      { store, history, graphqlMocks: graphqlMocks }
+    )
 
     // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {
@@ -311,33 +308,31 @@ describe('Registraion Rates error state tests', () => {
   ]
   let component: ReactWrapper<{}, {}>
   let store: AppStore
+  let history: History
 
   beforeEach(async () => {
     Date.now = jest.fn(() => 1487076708000)
-    const { store: testStore } = await createTestStore()
-    store = testStore
-    component = (
-      await createTestComponent(
-        <RegistrationRates
-          match={{
-            params: { eventType: 'birth' },
-            isExact: true,
-            path: EVENT_REGISTRATION_RATES,
-            url: ''
-          }}
-          // @ts-ignore
-          location={{
-            search: stringify({
-              locationId: LOCATION_DHAKA_DIVISION.id,
-              timeEnd: new Date(1487076708000).toISOString(),
-              timeStart: new Date(1455454308000).toISOString()
-            })
-          }}
-        />,
-        store,
-        graphqlMocks
-      )
-    ).component
+    ;({ store, history } = await createTestStore())
+
+    component = await createTestComponent(
+      <RegistrationRates
+        match={{
+          params: { eventType: 'birth' },
+          isExact: true,
+          path: EVENT_REGISTRATION_RATES,
+          url: ''
+        }}
+        // @ts-ignore
+        location={{
+          search: stringify({
+            locationId: LOCATION_DHAKA_DIVISION.id,
+            timeEnd: new Date(1487076708000).toISOString(),
+            timeStart: new Date(1455454308000).toISOString()
+          })
+        }}
+      />,
+      { store, history, graphqlMocks: graphqlMocks }
+    )
 
     // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {

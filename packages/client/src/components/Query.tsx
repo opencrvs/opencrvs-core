@@ -9,6 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+
+/*
+ * Notice that this component is bypassed in tests!
+ * Tests use packages/client/src/tests/queryMock.tsx instead
+ * This is because at the time of writing, we are running a very old version
+ * of apollo client & react apollo and fetchPolicy isn't working with MockedProvider
+ */
+
 import * as React from 'react'
 import { ComponentProps } from '@client/utils/react'
 // eslint-disable-next-line no-restricted-imports

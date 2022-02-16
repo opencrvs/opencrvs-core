@@ -12,9 +12,9 @@
 import * as React from 'react'
 import {
   createTestApp,
-  createTestComponent,
   getItem,
-  flushPromises
+  flushPromises,
+  createTestComponent
 } from '@client/tests/util'
 
 import { createClient } from '@client/utils/apolloClient'
@@ -30,17 +30,28 @@ const validToken =
 const expiredToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2h3IiwiaWF0IjoxNTMwNzc2OTYxLCJleHAiOjE1MzA3Nzc1NjEsInN1YiI6IjViMzI1YTYyMGVmNDgxM2UzMDhhNDMxMyJ9.leJuSng-PmQvFCS-FrIl9-Z2iYitwuX274QHkDoVQGmHtfi9SsKIRmZ1OlNRS6g7eT4LvvUDjwBZvCO7Rvhf_vnrHmHE4JR_e9MWVoK_0vjxCkDmo-cZ6iM7aBzrB4-F1eaaZJwxrwPFY5o_rsxCAeHj-draVYQTEr388y-rffdaC7IHoHhTrGoj8n40d8RyvX7UVVG5w1zsxFhYlN44zvMDNy56zGpbJ7mNn3M6hJWGUjDaOhtsEpfyDeoeiuEkU4Rn_WxtbognqLt12P6TQWsQOy_eHqR2UfBdmPw_uSW28FFQh9ebOEjMSI0JnIFXagrWkkFVO2DcBh8YlGE5M_fZWrrkz9pTiVb1KQWTz_TPUf8VVlTRNBKCnumiQJRIkWNxIecYwKap_HpKd5SaD8sLgB3htmomfJE4h4nu-7Tjy_QYw_2Sm4upDCEcB-mjx_EeIVTQXk5Re3QMhY1hEh9tD0kDhJudPQWBG7g8GQy2ZBmy6CtP7FQ-tRdyOE_0TNazZSB4Ogz8im5c2ZSVRWalPZWp0TupiSWI5sY-k_Qab6hpbxAFxqsH-8eRelos4y9Ohh60mpNNIqZkizSLfoWKgR5tMBkyDbMPbfbDUEKYKSa5b29uCeAHeJXvW-A0Nk5YwiPNZIe2ycuVaWUaDnL3vvbb5yrTG1eDuhFm_xw'
 
-const assign = window.location.assign as jest.Mock
+const realLocation = window.location
+const assign = jest.fn()
 
 beforeEach(() => {
   getItem.mockReset()
+  assign.mockReset()
+})
+
+beforeAll(() => {
+  delete (window as { location?: Location }).location
+  window.location = { ...realLocation, assign }
+})
+
+afterAll(() => {
+  window.location = realLocation
 })
 
 it('renders without crashing', () =>
-  createTestApp({ waitUntilResourcesLoaded: false }))
+  createTestApp({ waitUntilOfflineCountryConfigLoaded: false }))
 
 it("redirects user to SSO if user doesn't have a token", async () => {
-  await createTestApp({ waitUntilResourcesLoaded: false })
+  await createTestApp({ waitUntilOfflineCountryConfigLoaded: false })
   await waitFor(() => assign.mock.calls[0][0] === window.config.LOGIN_URL)
 })
 
@@ -71,7 +82,9 @@ describe('when session expired', () => {
   let store: AppStore
 
   beforeEach(async () => {
-    const testApp = await createTestApp({ waitUntilResourcesLoaded: false })
+    const testApp = await createTestApp({
+      waitUntilOfflineCountryConfigLoaded: false
+    })
     app = testApp.app
     store = testApp.store
   })
@@ -115,8 +128,8 @@ describe('when user has a valid token in local storage', () => {
 })
 
 describe('it handles react errors', () => {
-  const { store } = createStore()
   it('displays react error page', async () => {
+    const { store, history } = createStore()
     function Problem(): JSX.Element {
       throw new Error('Error thrown.')
     }
@@ -124,18 +137,16 @@ describe('it handles react errors', () => {
       <StyledErrorBoundary>
         <Problem />
       </StyledErrorBoundary>,
-      store
+      { store, history }
     )
-    // @ts-ignore
-    expect(
-      testComponent.component.find('#GoToHomepage').hostNodes()
-    ).toHaveLength(1)
+
+    expect(testComponent.find('#GoToHomepage').hostNodes()).toHaveLength(1)
   })
 })
 
 describe('it handles react unauthorized errors', () => {
-  const { store } = createStore()
   it('displays react error page', async () => {
+    const { store, history } = createStore()
     function Problem(): JSX.Element {
       throw new Error('401')
     }
@@ -143,13 +154,11 @@ describe('it handles react unauthorized errors', () => {
       <StyledErrorBoundary>
         <Problem />
       </StyledErrorBoundary>,
-      store
+      { store, history }
     )
 
-    expect(
-      testComponent.component.find('#GoToHomepage').hostNodes()
-    ).toHaveLength(1)
+    expect(testComponent.find('#GoToHomepage').hostNodes()).toHaveLength(1)
 
-    testComponent.component.find('#GoToHomepage').hostNodes().simulate('click')
+    testComponent.find('#GoToHomepage').hostNodes().simulate('click')
   })
 })

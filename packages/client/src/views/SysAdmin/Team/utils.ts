@@ -52,7 +52,7 @@ export const mockIncompleteFormData = {
   familyNameEng: 'Hossain',
   firstNames: '',
   firstNamesEng: '',
-  nid: '1014881922',
+  nid: '101488192',
   phoneNumber: '',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
   role: 'FIELD_AGENT',
@@ -68,7 +68,7 @@ export const mockCompleteFormData = {
   familyNameEng: 'Hossain',
   firstNames: '',
   firstNamesEng: '',
-  nid: '1234567896',
+  nid: '123456789',
   phoneNumber: '01662132132',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
   role: 'FIELD_AGENT',
@@ -85,7 +85,7 @@ export const mockDataWithRegistarRoleSelected = {
   familyNameEng: 'Hossain',
   firstNames: '',
   firstNamesEng: '',
-  nid: '1014881922',
+  nid: '101488192',
   phoneNumber: '01662132132',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
   role: 'LOCAL_REGISTRAR',
@@ -159,7 +159,11 @@ export const mockUserGraphqlOperation = {
                     searchableResource: 'facilities',
                     searchableType: 'CRVS_OFFICE',
                     locationList: [],
-                    validate: [],
+                    validate: [
+                      {
+                        operation: 'officeMustBeSelected'
+                      }
+                    ],
                     mapping: {
                       mutation: {
                         operation: 'fieldNameTransformer',
@@ -536,6 +540,7 @@ export const transformRoleDataToDefinitions = (
 export async function alterRolesBasedOnUserRole(primaryOfficeId: string) {
   const roleData = await roleQueries.fetchRoles()
   const userData = await userQueries.searchUsers(primaryOfficeId)
+
   const roles = roleData.data.getRoles as Array<GQLRole>
   const users = userData.data.searchUsers.results as Array<GQLUser>
 

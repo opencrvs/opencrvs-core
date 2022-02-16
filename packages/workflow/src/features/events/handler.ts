@@ -20,12 +20,14 @@ import {
 import {
   createRegistrationHandler,
   markEventAsCertifiedHandler,
+  markEventAsRequestedForCorrectionHandler,
   markEventAsValidatedHandler,
   markEventAsWaitingValidationHandler,
   markEventAsDownloadedHandler
 } from '@workflow/features/registration/handler'
 import {
   getEventType,
+  hasCorrectionEncounterSection,
   isInProgressApplication
 } from '@workflow/features/registration/utils'
 import updateTaskHandler from '@workflow/features/task/handler'
@@ -46,6 +48,7 @@ export enum Events {
   BIRTH_MARK_VALID = '/events/birth/mark-validated',
   BIRTH_MARK_CERT = '/events/birth/mark-certified',
   BIRTH_MARK_VOID = '/events/birth/mark-voided',
+  BIRTH_REQUEST_CORRECTION = '/events/birth/request-correction',
   DEATH_IN_PROGRESS_DEC = '/events/death/in-progress-declaration', /// Field agent or DHIS2in progress application
   DEATH_NEW_DEC = '/events/death/new-declaration', // Field agent completed application
   DEATH_UPDATE_DEC = '/events/death/update-declaration',
@@ -55,6 +58,7 @@ export enum Events {
   DEATH_MARK_VALID = '/events/death/mark-validated',
   DEATH_MARK_CERT = '/events/death/mark-certified',
   DEATH_MARK_VOID = '/events/death/mark-voided',
+  DEATH_REQUEST_CORRECTION = '/events/death/request-correction',
   BIRTH_NEW_VALIDATE = '/events/birth/new-validation', // Registration agent new application
   DEATH_NEW_VALIDATE = '/events/death/new-validation', // Registration agent new application
   EVENT_NOT_DUPLICATE = '/events/not-duplicate',
@@ -86,7 +90,14 @@ function detectEvent(request: Hapi.Request): Events {
                 return Events.BIRTH_WAITING_VALIDATION
               }
             } else {
-              return Events.BIRTH_MARK_CERT
+              if (
+                hasRegisterScope(request) &&
+                hasCorrectionEncounterSection(firstEntry as fhir.Composition)
+              ) {
+                return Events.BIRTH_REQUEST_CORRECTION
+              } else {
+                return Events.BIRTH_MARK_CERT
+              }
             }
           } else {
             if (hasRegisterScope(request)) {
@@ -111,7 +122,14 @@ function detectEvent(request: Hapi.Request): Events {
                 return Events.DEATH_WAITING_VALIDATION
               }
             } else {
-              return Events.DEATH_MARK_CERT
+              if (
+                hasRegisterScope(request) &&
+                hasCorrectionEncounterSection(firstEntry as fhir.Composition)
+              ) {
+                return Events.DEATH_REQUEST_CORRECTION
+              } else {
+                return Events.DEATH_MARK_CERT
+              }
             }
           } else {
             if (hasRegisterScope(request)) {
@@ -224,6 +242,22 @@ export async function fhirWorkflowEventHandler(
       response = await markEventAsWaitingValidationHandler(request, h, event)
       await triggerEvent(
         Events.DEATH_WAITING_VALIDATION,
+        request.payload,
+        request.headers.authorization
+      )
+      break
+    case Events.BIRTH_REQUEST_CORRECTION:
+      response = await markEventAsRequestedForCorrectionHandler(request, h)
+      await triggerEvent(
+        Events.BIRTH_REQUEST_CORRECTION,
+        request.payload,
+        request.headers.authorization
+      )
+      break
+    case Events.DEATH_REQUEST_CORRECTION:
+      response = await markEventAsRequestedForCorrectionHandler(request, h)
+      await triggerEvent(
+        Events.DEATH_REQUEST_CORRECTION,
         request.payload,
         request.headers.authorization
       )

@@ -21,6 +21,7 @@ import { History } from 'history'
 import * as React from 'react'
 import { PerformanceHome } from './PerformanceHome'
 import { parse } from 'query-string'
+import { waitForElement } from '@client/tests/wait-for-element'
 
 describe('Performance home test', () => {
   describe('Performance home without location in props', () => {
@@ -28,9 +29,10 @@ describe('Performance home test', () => {
     let app: ReactWrapper
 
     beforeAll(async () => {
-      app = (
-        await createTestComponent(<PerformanceHome history={history} />, store)
-      ).component
+      app = await createTestComponent(<PerformanceHome history={history} />, {
+        store,
+        history
+      })
       app.update()
     })
 
@@ -40,20 +42,22 @@ describe('Performance home test', () => {
       ).toEqual('')
     })
 
-    it('loads the selected location in search input box', () => {
+    it('loads the selected location in search input box', async () => {
       app
         .find('#locationSearchInput')
         .hostNodes()
         .simulate('change', {
           target: { id: 'locationSearchInput', value: 'Dhaka' }
         })
-      app.update()
 
+      await waitForElement(
+        app,
+        '#locationOption6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
+      )
       app
         .find('#locationOption6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b')
         .hostNodes()
         .simulate('click')
-      app.update()
 
       expect(
         app.find('#locationSearchInput').hostNodes().props().value

@@ -47,6 +47,7 @@ export const SECURITY_PIN_INDEX = 'pin'
 export const SECURITY_PIN_EXPIRED_AT = 'locked_time'
 
 export const ALLOWED_IMAGE_TYPE = ['image/jpeg', 'image/jpg', 'image/png']
+export const ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE = ['image/svg+xml']
 
 export const TRACKING_ID_TEXT = 'tracking-id'
 export const BRN_DRN_TEXT = 'brn-drn'
@@ -58,7 +59,7 @@ export const ROLE_REGISTRATION_AGENT = 'REGISTRATION_AGENT'
 export const ROLE_LOCAL_REGISTRAR = 'LOCAL_REGISTRAR'
 export const FIELD_AGENT_ROLES = [ROLE_FIELD_AGENT]
 export const SYS_ADMIN_ROLES = ['LOCAL_SYSTEM_ADMIN']
-export const NATL_ADMIN_ROLES = 'NATIONAL_SYSTEM_ADMIN'
+export const NATL_ADMIN_ROLES = ['NATIONAL_SYSTEM_ADMIN']
 export const REGISTRAR_ROLES = [
   ROLE_LOCAL_REGISTRAR,
   'DISTRICT_REGISTRAR',
@@ -106,4 +107,4 @@ export const MONTHS_IN_YEAR = 12
 export const DECLARED_APPLICATION_SEARCH_QUERY_COUNT =
   process.env.DECLARED_APPLICATION_SEARCH_QUERY_COUNT || 100
 
-export const AVATAR_API = 'https:/eu.ui-avatars.com/api/?name='
+export const AVATAR_API = 'https://eu.ui-avatars.com/api/?name='

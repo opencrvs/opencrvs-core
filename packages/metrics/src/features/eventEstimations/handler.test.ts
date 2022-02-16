@@ -45,7 +45,7 @@ describe('verify eventEstimations handler', () => {
       }
     ])
     jest
-      .spyOn(utilService, 'fetchEstimateFor45DaysByLocationId')
+      .spyOn(utilService, 'fetchEstimateForTargetDaysByLocationId')
       .mockReturnValue({
         totalEstimation: 100,
         maleEstimation: 60,
@@ -65,7 +65,7 @@ describe('verify eventEstimations handler', () => {
       }
     ])
     jest
-      .spyOn(utilService, 'fetchEstimateFor45DaysByLocationId')
+      .spyOn(utilService, 'fetchEstimateForTargetDaysByLocationId')
       .mockReturnValue({
         totalEstimation: 50,
         maleEstimation: 30,
@@ -77,8 +77,7 @@ describe('verify eventEstimations handler', () => {
 
     const res = await server.server.inject({
       method: 'GET',
-      url:
-        '/eventEstimations?timeStart=1552469068679&timeEnd=1554814894419&locationId=1490d3dd-71a9-47e8-b143-f9fc64f71294',
+      url: '/eventEstimations?timeStart=1552469068679&timeEnd=1554814894419&locationId=1490d3dd-71a9-47e8-b143-f9fc64f71294',
       headers: {
         Authorization: `Bearer ${token}`
       }

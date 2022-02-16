@@ -20,7 +20,8 @@ import {
   markBundleAsWaitingValidation,
   invokeRegistrationValidation,
   updatePatientIdentifierWithRN,
-  touchBundle
+  touchBundle,
+  markBundleAsRequestedForCorrection
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
   getEventInformantName,
@@ -385,6 +386,24 @@ export async function markEventAsDownloadedHandler(
     return await forwardToHearth(newRequest, h)
   } catch (error) {
     logger.error(`Workflow/markBirthAsDownloadHandler: error: ${error}`)
+    throw new Error(error)
+  }
+}
+
+export async function markEventAsRequestedForCorrectionHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const payload = await markBundleAsRequestedForCorrection(
+      request.payload as fhir.Bundle,
+      getToken(request)
+    )
+    return await postToHearth(payload)
+  } catch (error) {
+    logger.error(
+      `Workflow/markEventAsRequestedForCorrectionHandler: error: ${error}`
+    )
     throw new Error(error)
   }
 }

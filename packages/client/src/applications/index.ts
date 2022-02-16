@@ -38,10 +38,7 @@ import { DECLARED_APPLICATION_SEARCH_QUERY_COUNT } from '@client/utils/constants
 import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
 import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
-import {
-  EVENT_STATUS,
-  IQueryData
-} from '@client/views/RegistrationHome/RegistrationHome'
+import { EVENT_STATUS, IQueryData } from '@client/views/OfficeHome/OfficeHome'
 import {
   GQLEventSearchResultSet,
   GQLEventSearchSet,
@@ -61,6 +58,8 @@ const WRITE_APPLICATION = 'APPLICATION/WRITE_DRAFT'
 const DELETE_APPLICATION = 'APPLICATION/DELETE_DRAFT'
 const GET_APPLICATIONS_SUCCESS = 'APPLICATION/GET_DRAFTS_SUCCESS'
 const GET_APPLICATIONS_FAILED = 'APPLICATION/GET_DRAFTS_FAILED'
+const GET_WORKQUEUE_SUCCESS = 'APPLICATION/GET_WORKQUEUE_SUCCESS'
+const GET_WORKQUEUE_FAILED = 'APPLICATION/GET_WORKQUEUE_FAILED'
 const UPDATE_REGISTRAR_WORKQUEUE = 'APPLICATION/UPDATE_REGISTRAR_WORKQUEUE'
 const UPDATE_REGISTRAR_WORKQUEUE_SUCCESS =
   'APPLICATION/UPDATE_REGISTRAR_WORKQUEUE_SUCCESS'
@@ -295,6 +294,15 @@ interface IGetStorageApplicationsFailedAction {
   type: typeof GET_APPLICATIONS_FAILED
 }
 
+interface IGetWorkqueueOfCurrentUserSuccessAction {
+  type: typeof GET_WORKQUEUE_SUCCESS
+  payload: string
+}
+
+interface IGetWorkqueueOfCurrentUserFailedAction {
+  type: typeof GET_WORKQUEUE_FAILED
+}
+
 interface UpdateRegistrarWorkQueueSuccessAction {
   type: typeof UPDATE_REGISTRAR_WORKQUEUE_SUCCESS
   payload: string
@@ -371,6 +379,8 @@ export type Action =
   | IDeleteApplicationAction
   | IGetStorageApplicationsSuccessAction
   | IGetStorageApplicationsFailedAction
+  | IGetWorkqueueOfCurrentUserSuccessAction
+  | IGetWorkqueueOfCurrentUserFailedAction
   | IDownloadApplication
   | IDownloadApplicationSuccess
   | IDownloadApplicationFail
@@ -400,7 +410,7 @@ export interface WorkqueueState {
   workqueue: IWorkqueue
 }
 
-const workqueueInitialState = {
+const workqueueInitialState: WorkqueueState = {
   workqueue: {
     loading: true,
     error: false,
@@ -494,6 +504,18 @@ export const getStorageApplicationsSuccess = (
   response: string
 ): IGetStorageApplicationsSuccessAction => ({
   type: GET_APPLICATIONS_SUCCESS,
+  payload: response
+})
+
+export const getCurrentUserWorkqueueFailed =
+  (): IGetWorkqueueOfCurrentUserFailedAction => ({
+    type: GET_WORKQUEUE_FAILED
+  })
+
+export const getCurrentUserWorkqueuSuccess = (
+  response: string
+): IGetWorkqueueOfCurrentUserSuccessAction => ({
+  type: GET_WORKQUEUE_SUCCESS,
   payload: response
 })
 
@@ -673,6 +695,33 @@ async function updateFieldAgentDeclaredApplicationsByUser(
     storage.setItem('USER_DATA', JSON.stringify(allUserData)),
     JSON.stringify(currentUserData)
   ]).then(([_, currentUserData]) => currentUserData)
+}
+
+export async function getWorkqueueOfCurrentUser(): Promise<string> {
+  // returns a 'stringified' IWorkqueue
+  const initialWorkqueue = workqueueInitialState.workqueue
+
+  const storageTable = await storage.getItem('USER_DATA')
+  if (!storageTable) {
+    return JSON.stringify(initialWorkqueue)
+  }
+
+  const currentUserID = await getCurrentUserID()
+
+  const allUserData = JSON.parse(storageTable) as IUserData[]
+
+  if (!allUserData.length) {
+    // No user-data at all
+    return JSON.stringify(initialWorkqueue)
+  }
+
+  const currentUserData = allUserData.find(
+    (uData) => uData.userID === currentUserID
+  )
+  const currentUserWorkqueue: IWorkqueue =
+    (currentUserData && currentUserData.workqueue) ||
+    workqueueInitialState.workqueue
+  return JSON.stringify(currentUserWorkqueue)
 }
 
 export async function getApplicationsOfCurrentUser(): Promise<string> {
@@ -1637,6 +1686,30 @@ export const registrarWorkqueueReducer: LoopReducer<WorkqueueState, Action> = (
           args: [Cmd.getState, action.payload]
         })
       )
+
+    case USER_DETAILS_AVAILABLE:
+      return loop(
+        {
+          ...state
+        },
+        Cmd.run<
+          IGetWorkqueueOfCurrentUserFailedAction,
+          IGetWorkqueueOfCurrentUserSuccessAction
+        >(getWorkqueueOfCurrentUser, {
+          successActionCreator: getCurrentUserWorkqueuSuccess,
+          failActionCreator: getCurrentUserWorkqueueFailed,
+          args: []
+        })
+      )
+
+    case GET_WORKQUEUE_SUCCESS:
+      if (action.payload) {
+        const workqueue = JSON.parse(action.payload) as IWorkqueue
+        return {
+          workqueue
+        }
+      }
+      return state
 
     case UPDATE_REGISTRAR_WORKQUEUE_SUCCESS:
       if (action.payload) {

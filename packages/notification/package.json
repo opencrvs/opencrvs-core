@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/notification",
-  "version": "1.0.0-alpha.3.0",
+  "version": "1.0.0-alpha.3.1",
   "description": "OpenCRVS notification service",
   "license": "MPL-2.0",
   "private": true,
@@ -10,6 +10,7 @@
     "test": "jest --coverage --silent --noStackTrace && yarn test:compilation",
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
+    "lint": "tslint --project ./tsconfig.json",
     "precommit": "tslint --project ./tsconfig.json && lint-staged",
     "test:compilation": "tsc --noEmit",
     "build": "tsc && copyfiles 'src/**/*.json' build/dist",
@@ -20,7 +21,7 @@
   "dependencies": {
     "@hapi/boom": "^9.1.1",
     "@hapi/hapi": "^20.0.1",
-    "@opencrvs/commons": "^1.0.0-alpha.3.0",
+    "@opencrvs/commons": "^1.0.0-alpha.3.1",
     "@types/hapi-pino": "^8.0.5",
     "@types/pino": "^6.3.12",
     "app-module-path": "^2.2.0",
@@ -33,7 +34,7 @@
     "iconv": "^2.3.1",
     "joi": "^17.3.0",
     "jsonwebtoken": "^8.3.0",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^2.6.7",
     "pino": "^6.0.0",
     "typescript": "^3.7.2"
   },
@@ -43,7 +44,7 @@
     "@types/handlebars": "^4.1.0",
     "@types/hapi__hapi": "^20.0.0",
     "@types/jest": "^26.0.14",
-    "@types/node-fetch": "^2.3.4",
+    "@types/node-fetch": "^2.5.12",
     "chalk": "^4.1.0",
     "copyfiles": "^2.1.1",
     "cross-env": "^5.2.0",

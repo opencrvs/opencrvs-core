@@ -50,11 +50,16 @@ import {
   WORKFLOW_STATUS,
   TEAM_USER_LIST,
   USER_PROFILE,
-  CONFIG
+  CONFIG,
+  APPLICATION_RECORD_AUDIT,
+  CHANGE_PHONE
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
+import { NATL_ADMIN_ROLES } from '@client/utils/constants'
+import { IUserDetails } from '@client/utils/userUtils'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
 import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseApplicationCountView'
+import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
 import { goBack as back, push, replace } from 'connected-react-router'
 import moment from 'moment'
@@ -242,15 +247,11 @@ export function goToOperationalReport(
   })
 }
 
-export function goToTeamUserList(
-  selectedLocation: ISearchLocation,
-  viewOnly?: boolean
-) {
+export function goToTeamUserList(selectedLocation: ISearchLocation) {
   return push({
     pathname: TEAM_USER_LIST,
     search: stringify({
-      locationId: selectedLocation.id,
-      viewOnly
+      locationId: selectedLocation.id
     })
   })
 }
@@ -288,6 +289,15 @@ export function goToApplicationDetails(
   })
 }
 
+export function goToApplicationRecordAudit(
+  applicationId: string,
+  forceDetailsQuery?: boolean
+) {
+  return push(formatUrl(APPLICATION_RECORD_AUDIT, { applicationId }), {
+    forceDetailsQuery
+  })
+}
+
 export function goToBirthRegistrationAsParent(applicationId: string) {
   return push(
     formatUrl(DRAFT_BIRTH_PARENT_FORM, {
@@ -299,13 +309,6 @@ export function goToApplicationContact(informant: string) {
   return push(
     formatUrl(DRAFT_BIRTH_APPLICANT_FORM, {
       informant: informant.toString()
-    })
-  )
-}
-export function goToPrimaryApplicant(applicationId: string) {
-  return push(
-    formatUrl(SELECT_BIRTH_PRIMARY_APPLICANT, {
-      applicationId
     })
   )
 }
@@ -394,6 +397,18 @@ export function goToSysAdminHomeTab(tabId: string) {
 
 export function goToSettings() {
   return push(SETTINGS)
+}
+export function goToPhoneSettings() {
+  return push(CHANGE_PHONE)
+}
+
+export function goToSettingsWithPhoneSuccessMsg(phonedNumberUpdated: boolean) {
+  return push({
+    pathname: SETTINGS,
+    state: {
+      phonedNumberUpdated
+    }
+  })
 }
 
 export function goToCreateNewUser() {
@@ -577,6 +592,36 @@ export function goToPage(
       fieldNameHash,
       pageRoute,
       historyState
+    }
+  }
+}
+
+export function goToPerformanceView(userDetails: IUserDetails) {
+  if (userDetails && userDetails.role) {
+    if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
+      return goToPerformanceHome()
+    } else {
+      const locationId = getJurisdictionLocationIdFromUserDetails(userDetails)
+      return (
+        (locationId && goToOperationalReport(locationId)) ||
+        goToPerformanceHome()
+      )
+    }
+  }
+}
+
+export function goToTeamView(userDetails: IUserDetails) {
+  if (userDetails && userDetails.role) {
+    if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
+      return goToTeamSearch()
+    } else {
+      return goToTeamUserList({
+        id: (userDetails.primaryOffice && userDetails.primaryOffice.id) || '',
+        searchableText:
+          (userDetails.primaryOffice && userDetails.primaryOffice.name) || '',
+        displayLabel:
+          (userDetails.primaryOffice && userDetails.primaryOffice.name) || ''
+      })
     }
   }
 }

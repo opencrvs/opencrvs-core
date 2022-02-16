@@ -7,74 +7,74 @@
 #
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
-version: "3.3"
+version: '3.3'
 
 services:
   # Expose dev secrets as a plain volume - these will use docker secrets in staging and prod
   auth:
     volumes:
-      - ".secrets/public-key.pem:/secrets/public-key.pem"
-      - ".secrets/private-key.pem:/secrets/private-key.pem"
+      - '.secrets/public-key.pem:/secrets/public-key.pem'
+      - '.secrets/private-key.pem:/secrets/private-key.pem'
     environment:
       - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
       - CERT_PRIVATE_KEY_PATH=/secrets/private-key.pem
     ports:
-      - "4040:4040"
+      - '4040:4040'
 
   user-mgnt:
     volumes:
-      - ".secrets/public-key.pem:/secrets/public-key.pem"
+      - '.secrets/public-key.pem:/secrets/public-key.pem'
     environment:
       - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
       - HOST=0.0.0.0
     ports:
-      - "3030:3030"
+      - '3030:3030'
 
   webhooks:
     volumes:
-      - ".secrets/public-key.pem:/secrets/public-key.pem"
+      - '.secrets/public-key.pem:/secrets/public-key.pem'
     environment:
       - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
       - HOST=0.0.0.0
     ports:
-      - "2525:2525"
+      - '2525:2525'
 
   notification:
     volumes:
-      - ".secrets/public-key.pem:/secrets/public-key.pem"
+      - '.secrets/public-key.pem:/secrets/public-key.pem'
     environment:
       - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
     ports:
-      - "2020:2020"
+      - '2020:2020'
 
   gateway:
     volumes:
-      - ".secrets/public-key.pem:/secrets/public-key.pem"
+      - '.secrets/public-key.pem:/secrets/public-key.pem'
     environment:
       - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
     ports:
-      - "7070:7070"
+      - '7070:7070'
 
   workflow:
     volumes:
-      - ".secrets/public-key.pem:/secrets/public-key.pem"
+      - '.secrets/public-key.pem:/secrets/public-key.pem'
     environment:
       - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
     ports:
-      - "5050:5050"
+      - '5050:5050'
 
   search:
     volumes:
-      - ".secrets/public-key.pem:/secrets/public-key.pem"
+      - '.secrets/public-key.pem:/secrets/public-key.pem'
     environment:
       - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
     ports:
-      - "9090:9090"
+      - '9090:9090'
 
-  resources:
-    image: opencrvs/ocrvs-zambia:latest
+  countryconfig:
+    image: opencrvs/ocrvs-farajaland:latest
     volumes:
-      - ".secrets/public-key.pem:/secrets/public-key.pem"
+      - '.secrets/public-key.pem:/secrets/public-key.pem'
     environment:
       - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
       - MONGO_URL=mongodb://mongo1/user-mgnt
@@ -85,20 +85,24 @@ services:
       - CONFIRM_REGISTRATION_URL=http://workflow:5050/confirm/registration
       - CHECK_INVALID_TOKEN=true
     ports:
-      - "3040:3040"
+      - '3040:3040'
 
   metrics:
     volumes:
-      - ".secrets/public-key.pem:/secrets/public-key.pem"
+      - '.secrets/public-key.pem:/secrets/public-key.pem'
     environment:
       - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
     ports:
-      - "1050:1050"
+      - '1050:1050'
 
   client:
     ports:
-      - "3000:80"
+      - '3000:80'
 
   login:
     ports:
-      - "3020:80"
+      - '3020:80'
+
+  config:
+    ports:
+      - '2021:2021'

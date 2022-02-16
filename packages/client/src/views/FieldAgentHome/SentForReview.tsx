@@ -31,7 +31,7 @@ import {
 } from '@opencrvs/components/lib/icons'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { calculateDays } from '@client/views/PrintCertificate/utils'
-import { goToApplicationDetails } from '@client/navigation'
+import { goToApplicationRecordAudit } from '@client/navigation'
 import {
   constantsMessages as messages,
   dynamicConstantsMessages
@@ -39,7 +39,7 @@ import {
 import { getDefaultLanguage } from '@client/i18n/utils'
 import { withTheme, ITheme } from '@client/styledComponents'
 import { getDraftApplicantFullName } from '@client/utils/draftUtils'
-import { LoadingIndicator } from '@client/views/RegistrationHome/LoadingIndicator'
+import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 
 const APPLICATIONS_DAY_LIMIT = 7
 
@@ -47,7 +47,7 @@ interface ISentForReviewProps {
   theme: ITheme
   applicationsReadyToSend: IApplication[]
   deleteApplication: typeof deleteApplication
-  goToApplicationDetails: typeof goToApplicationDetails
+  goToApplicationRecordAudit: typeof goToApplicationRecordAudit
   showPaginated?: boolean
   loading?: boolean
   error?: boolean
@@ -182,7 +182,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
                     'No composition id found for this application'
                   )
                 }
-                this.props.goToApplicationDetails(draft.compositionId)
+                this.props.goToApplicationRecordAudit(draft.compositionId)
               }
             }
           ]
@@ -276,5 +276,5 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
 
 export const SentForReview = connect(null, {
   deleteApplication,
-  goToApplicationDetails
+  goToApplicationRecordAudit
 })(injectIntl(withTheme(SentForReviewComponent)))

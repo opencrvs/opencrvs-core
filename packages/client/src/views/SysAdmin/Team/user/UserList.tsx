@@ -29,12 +29,17 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { withTheme } from '@client/styledComponents'
 import { SEARCH_USERS } from '@client/user/queries'
-import { LANG_EN } from '@client/utils/constants'
+import {
+  LANG_EN,
+  NATL_ADMIN_ROLES,
+  SYS_ADMIN_ROLES
+} from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { UserStatus } from '@client/views/SysAdmin/Team/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { IAvatar } from '@client/utils/userUtils'
+import { IAvatar, IUserDetails } from '@client/utils/userUtils'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import {
   AddUser,
   VerticalThreeDots,
@@ -67,6 +72,7 @@ import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { userMutations } from '@client/user/mutations'
+import { userDetails } from '@client/tests/util'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const { useState, useEffect } = React
@@ -96,8 +102,7 @@ const ErrorText = styled.div`
   text-align: center;
   margin-top: 100px;
 `
-
-const StatusBox = styled.span`
+const StatusBox = styled.div`
   padding: 4px 8px;
   ${({ theme }) => theme.fonts.captionBold};
   border-radius: 2px;
@@ -203,16 +208,17 @@ const Name = styled(LinkButton)`
 const RoleType = styled.div`
   ${({ theme }) => theme.fonts.chartLegendStyle}
   color: ${({ theme }) => theme.colors.waitingForExternalValidation};
+  text-align: left;
 `
 
 interface ISearchParams {
   locationId: string
-  viewOnly?: boolean
 }
 
 type BaseProps = {
   theme: ITheme
   offlineOffices: ILocation[]
+  userDetails: IUserDetails | null
   goToCreateNewUser: typeof goToCreateNewUser
   goToCreateNewUserWithLocationId: typeof goToCreateNewUserWithLocationId
   goToReviewUserDetails: typeof goToReviewUserDetails
@@ -254,6 +260,7 @@ function UserListComponent(props: IProps) {
 
   const {
     intl,
+    userDetails,
     goToReviewUserDetails,
     goToCreateNewUser,
     goToCreateNewUserWithLocationId,
@@ -263,8 +270,7 @@ function UserListComponent(props: IProps) {
     location: { search }
   } = props
 
-  const { locationId, viewOnly } = parse(search) as unknown as ISearchParams
-
+  const { locationId } = parse(search) as unknown as ISearchParams
   const [toggleActivation, setToggleActivation] =
     useState<ToggleUserActivation>({
       modalVisible: false,
@@ -434,6 +440,31 @@ function UserListComponent(props: IProps) {
     )
   }
 
+  function getViewOnly(
+    locationId: string,
+    userDetails: IUserDetails | null,
+    onlyNational: boolean
+  ) {
+    if (
+      userDetails &&
+      userDetails.role &&
+      userDetails.primaryOffice &&
+      SYS_ADMIN_ROLES.includes(userDetails.role) &&
+      locationId === userDetails.primaryOffice.id &&
+      !onlyNational
+    ) {
+      return false
+    } else if (
+      userDetails &&
+      userDetails.role &&
+      NATL_ADMIN_ROLES.includes(userDetails.role)
+    ) {
+      return false
+    } else {
+      return true
+    }
+  }
+
   function getStatusMenuType(
     user: GQLUser,
     index: number,
@@ -521,38 +552,41 @@ function UserListComponent(props: IProps) {
     )
   }
 
-  function renderUserList() {
+  function renderUserList(
+    locationId: string,
+    userDetails: IUserDetails | null
+  ) {
     let columns: IColumn[] = []
     if (viewportWidth <= props.theme.grid.breakpoints.md) {
       columns = columns.concat([
         {
           label: intl.formatMessage(constantsMessages.name),
-          width: 70,
+          width: 65,
           key: 'nameRoleType'
         },
         {
           label: intl.formatMessage(constantsMessages.status),
-          width: 30,
+          width: 35,
           alignment: ColumnContentAlignment.RIGHT,
-          key: 'status'
+          key: 'statusMenu'
         }
       ])
     } else if (viewportWidth <= props.theme.grid.breakpoints.lg) {
       columns = columns.concat([
         {
           label: intl.formatMessage(constantsMessages.name),
-          width: 75,
+          width: 70,
           key: 'photoNameRoleType'
         },
         {
           label: intl.formatMessage(constantsMessages.status),
-          width: 25,
+          width: 30,
           alignment: ColumnContentAlignment.RIGHT,
-          key: 'status'
+          key: 'statusMenu'
         }
       ])
     } else {
-      if (viewOnly) {
+      if (getViewOnly(locationId, userDetails, false)) {
         columns = columns.concat([
           {
             label: intl.formatMessage(constantsMessages.name),
@@ -561,14 +595,14 @@ function UserListComponent(props: IProps) {
           },
           {
             label: intl.formatMessage(constantsMessages.labelRole),
-            width: 50,
+            width: 45,
             key: 'roleType'
           },
           {
             label: intl.formatMessage(constantsMessages.status),
-            width: 15,
+            width: 20,
             alignment: ColumnContentAlignment.RIGHT,
-            key: 'status'
+            key: 'statusMenu'
           }
         ])
       } else {
@@ -614,7 +648,7 @@ function UserListComponent(props: IProps) {
               <TableHeader>
                 {(data && data.searchUsers && data.searchUsers.totalItems) || 0}{' '}
                 users
-                {!viewOnly && (
+                {!getViewOnly(locationId, userDetails, false) && (
                   <AddUserContainer id="add-user" onClick={onClickAddUser}>
                     <AddUserIcon />
                     {' New user'}
@@ -674,13 +708,16 @@ function UserListComponent(props: IProps) {
 
   return (
     <SysAdminContentWrapper
-      mapPinClickHandler={(!viewOnly && onChangeLocation) || undefined}
+      mapPinClickHandler={
+        (!getViewOnly(locationId, userDetails, true) && onChangeLocation) ||
+        undefined
+      }
     >
       <HeaderContainer>
         <Header id="header">
           {(searchedLocation && searchedLocation.name) || ''}
         </Header>
-        {!viewOnly && (
+        {!getViewOnly(locationId, userDetails, true) && (
           <ChangeButton id="chng-loc" onClick={onChangeLocation}>
             {intl.formatMessage(buttonMessages.change)}
           </ChangeButton>
@@ -698,7 +735,7 @@ function UserListComponent(props: IProps) {
           </LocationInfoEmptyValue>
         )}
       </LocationInfo>
-      {renderUserList()}
+      {renderUserList(locationId, userDetails)}
       {showResendSMSSuccess && (
         <FloatingNotification
           id="resend_invite_success"
@@ -725,7 +762,8 @@ function UserListComponent(props: IProps) {
 
 export const UserList = connect(
   (state: IStoreState) => ({
-    offlineOffices: Object.values(getOfflineData(state).offices)
+    offlineOffices: Object.values(getOfflineData(state).offices),
+    userDetails: getUserDetails(state)
   }),
   {
     goToCreateNewUser,

@@ -31,7 +31,7 @@ import {
   GQLStatusWiseRegistrationCount
 } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
-import { RESOURCES_URL, FHIR_URL, SEARCH_URL } from '@gateway/constants'
+import { COUNTRY_CONFIG_URL, FHIR_URL, SEARCH_URL } from '@gateway/constants'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -156,14 +156,17 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'validate') ||
         hasScope(authHeader, 'declare')
       ) {
-        const response = await fetch(`${RESOURCES_URL}/verify/nid/${country}`, {
-          method: 'POST',
-          body: JSON.stringify({ dob, nid }),
-          headers: {
-            'Content-Type': 'application/json',
-            ...authHeader
+        const response = await fetch(
+          `${COUNTRY_CONFIG_URL}/verify/nid/${country}`,
+          {
+            method: 'POST',
+            body: JSON.stringify({ dob, nid }),
+            headers: {
+              'Content-Type': 'application/json',
+              ...authHeader
+            }
           }
-        }).then((data) => data.json())
+        ).then((data) => data.json())
 
         if (!response.operationResult.success) {
           throw new Error(response.operationResult.error.errorMessage)
