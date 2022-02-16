@@ -107,9 +107,9 @@ interface IStateProps {
 }
 
 interface IDispatchProps {
+  archiveApplication: typeof archiveApplication
   goToApplicationDetails: typeof goToApplicationDetails
   reinstateApplication: typeof reinstateApplication
-  archiveApplication: typeof archiveApplication
   goBack: typeof goBackAction
   goToRegistrarHomeTab: typeof goToRegistrarHomeTab
 }

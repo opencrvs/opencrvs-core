@@ -50,6 +50,7 @@ import {
 import ApolloClient, { ApolloError, ApolloQueryResult } from 'apollo-client'
 import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
 import { v4 as uuid } from 'uuid'
+import { Action as FormAction } from '@client/forms'
 
 const ARCHIVE_APPLICATION = 'APPLICATION/ARCHIVE'
 const SET_INITIAL_APPLICATION = 'APPLICATION/SET_INITIAL_APPLICATION'
@@ -1727,7 +1728,7 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
         const modifiedApplication: IApplication = {
           ...application,
           submissionStatus: SUBMISSION_STATUS.READY_TO_ARCHIVE,
-          action: ApplicationAction.ARCHIVE_APPLICATION,
+          action: FormAction.ARCHIVE_APPLICATION,
           payload: { id: application.id }
         }
         return loop(state, Cmd.action(writeApplication(modifiedApplication)))
