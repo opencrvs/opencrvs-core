@@ -38,7 +38,7 @@ interface IState {
   maximizeXAxisInterval?: boolean
   legendLayout: string
   activeLabel: string
-  activeRegisteredIn45Day: IActiveState
+  activeRegisteredInTargetDays: IActiveState
   activeTotalRegistered: IActiveState
   activeTotalEstimate: IActiveState
 }
@@ -115,7 +115,7 @@ const LoaderBox = styled.span<{
 
 interface ILineDataPoint {
   label: string
-  registeredIn45Days: number
+  registeredInTargetDays: number
   totalRegistered: number
   totalEstimate: number
   registrationPercentage: string
@@ -190,8 +190,8 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
     const latestData = data && data[data.length - 1]
     return {
       activeLabel: (latestData && latestData.label) || '',
-      activeRegisteredIn45Day: {
-        value: (latestData && latestData.registeredIn45Days) || 0,
+      activeRegisteredInTargetDays: {
+        value: (latestData && latestData.registeredInTargetDays) || 0,
         stroke: theme.colors.fountainBlue
       },
       activeTotalRegistered: {
@@ -207,7 +207,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
   customizedLegend = () => {
     const {
       activeLabel,
-      activeRegisteredIn45Day,
+      activeRegisteredInTargetDays,
       activeTotalRegistered,
       activeTotalEstimate
     } = this.state.activeLabel ? this.state : this.getLatestData()
@@ -249,14 +249,21 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
         </LegendDetails>
         <LegendDetails>
           <div>
-            <LegendDot color={activeRegisteredIn45Day.stroke} />
+            <LegendDot color={activeRegisteredInTargetDays.stroke} />
           </div>
           <LegendData>
             <LegendDataLabel>
-              {intl.formatMessage(constantsMessages.registeredIn45d)}
+              {intl.formatMessage(constantsMessages.registeredInTargetd, {
+                registrationTargetDays:
+                  eventType === Event.BIRTH
+                    ? window.config.BIRTH_REGISTRATION_TARGET
+                    : window.config.DEATH_REGISTRATION_TARGET
+              })}
             </LegendDataLabel>
             <br />
-            <LegendDataValue>{activeRegisteredIn45Day.value}</LegendDataValue>
+            <LegendDataValue>
+              {activeRegisteredInTargetDays.value}
+            </LegendDataValue>
           </LegendData>
         </LegendDetails>
       </CustomLegendContainer>
@@ -280,7 +287,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
     if (data && data.activePayload) {
       this.setState({
         activeLabel: data.activeLabel || '',
-        activeRegisteredIn45Day: {
+        activeRegisteredInTargetDays: {
           value: data.activePayload[2].value || 0,
           stroke: theme.colors.fountainBlue
         },
@@ -427,7 +434,11 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
     return (
       <TriLineChart
         data={data}
-        dataKeys={['totalEstimate', 'totalRegistered', 'registeredIn45Days']}
+        dataKeys={[
+          'totalEstimate',
+          'totalRegistered',
+          'registeredInTargetDays'
+        ]}
         mouseMoveHandler={this.mouseMoveHandler}
         mouseLeaveHandler={this.mouseLeaveHandler}
         tooltipContent={this.customizedTooltip}

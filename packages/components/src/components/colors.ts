@@ -46,7 +46,8 @@ export const colorDictionary = {
   greyHover: '#F8F8F8',
   borderBottom: '#d8dbde',
   grey600: '#909397',
-  greyInfo: '#EFEFEF'
+  greyInfo: '#EFEFEF',
+  tableRowDivider: '#F1F2F3'
 }
 
 export const gradients = {
@@ -129,5 +130,6 @@ export const colors = {
   fountainBlue: colorDictionary.fountainBlue,
   ronchi: colorDictionary.ronchi,
   grey600: colorDictionary.grey600,
-  greyInfo: colorDictionary.greyInfo
+  greyInfo: colorDictionary.greyInfo,
+  tableRowDivider: colorDictionary.tableRowDivider
 }

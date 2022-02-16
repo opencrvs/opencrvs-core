@@ -40,7 +40,6 @@ import { ReviewForm } from '@client/views/RegisterForm/ReviewForm'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { SearchResult } from '@client/views/SearchResult/SearchResult'
 import { SelectInformant } from '@client/views/SelectInformant/SelectInformant'
-import { SelectPrimaryApplicant } from '@client/views/SelectPrimaryApplicant/SelectPrimaryApplicant'
 import { SelectVitalEvent } from '@client/views/SelectVitalEvent/SelectVitalEvent'
 import { SettingsPage } from '@client/views/Settings/SettingsPage'
 import { OperationalReport } from '@client/views/SysAdmin/Performance/OperationalReport'
@@ -140,13 +139,6 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.EVENT_INFO}
                                             component={EventInfo}
-                                          />
-                                          <ProtectedRoute
-                                            exact
-                                            path={
-                                              routes.SELECT_BIRTH_PRIMARY_APPLICANT
-                                            }
-                                            component={SelectPrimaryApplicant}
                                           />
                                           <ProtectedRoute
                                             exact

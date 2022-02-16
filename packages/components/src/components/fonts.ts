@@ -32,6 +32,8 @@ export interface IFonts {
   captionBold: string
   captionBigger: string
   captionBolder: string
+  multiColHeaderFont: string
+  multiColFont: string
 }
 
 // TODO: we need a way to load fonts for other languages without recompiling
@@ -146,6 +148,16 @@ export const fonts = (language: string): IFonts => {
       font-size: 12px;
       font-weight: 600;
       line-height: 18px;
+    `,
+    multiColHeaderFont: `font-family:${semiBoldFont};
+    font-size: 14px;
+    line-height: 24px;
+    font-weight: 600;
+    `,
+    multiColFont: `font-family:${regularFont};
+    font-size: 14px;
+    line-height: 24px;
+    font-weight: normal;
     `
   }
 }

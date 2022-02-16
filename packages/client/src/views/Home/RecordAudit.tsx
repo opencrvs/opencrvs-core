@@ -36,8 +36,6 @@ import moment from 'moment'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { IFormSectionData, IContactPoint } from '@client/forms'
-import { FETCH_APPLICATION_SHORT_INFO } from '@client/views/Home/queries'
-import { Query } from '@client/components/Query'
 import { Spinner } from '@opencrvs/components/lib/interface'
 
 const BodyContainer = styled.div`

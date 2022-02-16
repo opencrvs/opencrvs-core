@@ -312,13 +312,6 @@ export function goToApplicationContact(informant: string) {
     })
   )
 }
-export function goToPrimaryApplicant(applicationId: string) {
-  return push(
-    formatUrl(SELECT_BIRTH_PRIMARY_APPLICANT, {
-      applicationId
-    })
-  )
-}
 export function goToReviewDuplicate(applicationId: string) {
   return push(
     formatUrl(REVIEW_DUPLICATES, { applicationId: applicationId.toString() })

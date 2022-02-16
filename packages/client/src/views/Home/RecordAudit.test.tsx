@@ -28,8 +28,6 @@ import {
 import { Event } from '@client/forms'
 import { formatUrl } from '@client/navigation'
 import { APPLICATION_RECORD_AUDIT } from '@client/navigation/routes'
-import { waitForElement } from '@client/tests/wait-for-element'
-import { FETCH_APPLICATION_SHORT_INFO } from './queries'
 import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
 
 const application: IApplication = createApplication(
