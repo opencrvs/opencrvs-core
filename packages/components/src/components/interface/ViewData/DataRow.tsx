@@ -79,11 +79,12 @@ export interface IDataProps {
   value?: React.ReactNode
   placeHolder?: string
   action?: IAction
+  actionsMenu?: React.ReactNode
 }
 
 export class DataRow extends React.Component<IDataProps> {
   render() {
-    const { id, label, value, placeHolder, action } = this.props
+    const { id, label, value, placeHolder, action, actionsMenu } = this.props
 
     return (
       <Container id={id}>
@@ -109,6 +110,7 @@ export class DataRow extends React.Component<IDataProps> {
                 </LinkButton>
               </Action>
             )}
+            {actionsMenu && <div>{actionsMenu}</div>}
           </>
         )}
         {!label && <ValueContainer>{value}</ValueContainer>}

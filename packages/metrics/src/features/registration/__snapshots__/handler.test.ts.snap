@@ -12,6 +12,7 @@ Object {
     "locationLevel5": "Location/fb5b7377-0c00-407d-97a1-0a7f08ed727b",
     "officeLocation": "Location/fb5b7377-0c00-407d-97a1-0a7f08ed727b",
   },
+  "timestamp": undefined,
 }
 `;
 
@@ -29,6 +30,7 @@ Object {
     "eventType": "DEATH",
     "previousStatus": "REGISTERED",
   },
+  "timestamp": 1574083515546000000,
 }
 `;
 
@@ -46,6 +48,7 @@ Object {
     "eventType": "BIRTH",
     "previousStatus": "REGISTERED",
   },
+  "timestamp": 1570613507666000000,
 }
 `;
 
@@ -63,6 +66,7 @@ Object {
     "eventType": "DEATH",
     "previousStatus": "DECLARED",
   },
+  "timestamp": 1574074172990000000,
 }
 `;
 
@@ -80,6 +84,7 @@ Object {
     "eventType": "BIRTH",
     "previousStatus": "DECLARED",
   },
+  "timestamp": 1570516927666000000,
 }
 `;
 
@@ -97,6 +102,7 @@ Object {
     "eventType": "BIRTH",
     "previousStatus": "DECLARED",
   },
+  "timestamp": 1570516927666000000,
 }
 `;
 
@@ -114,6 +120,7 @@ Object {
     "eventType": "BIRTH",
     "previousStatus": "VALIDATED",
   },
+  "timestamp": 1570516927666000000,
 }
 `;
 
@@ -131,6 +138,45 @@ Object {
     "eventType": "BIRTH",
     "previousStatus": "VALIDATED",
   },
+  "timestamp": 1570516927666000000,
+}
+`;
+
+exports[`When an existing application requested correction a birth application writes the payment total to influxdb 1`] = `undefined`;
+
+exports[`When an existing application requested correction a death application writes the delta between REGISTERED and REQUESTED_FOR_CORRECTION states to influxdb 1`] = `
+Object {
+  "fields": Object {
+    "compositionId": "35acb304-ec54-46cb-b37f-831d970cb40d",
+    "currentTaskId": "2be5b7ad-34d7-4f6e-a91f-604f8baa4e9b",
+    "durationInSeconds": 73271619,
+    "previousTaskId": "e172627c-8490-44da-a702-80a082f978f5",
+  },
+  "measurement": "application_event_duration",
+  "tags": Object {
+    "currentStatus": "REQUESTED_CORRECTION",
+    "eventType": "DEATH",
+    "previousStatus": "REGISTERED",
+  },
+  "timestamp": 1643790745825000000,
+}
+`;
+
+exports[`When an existing application requested correction writes the delta between REGISTERED and REQUESTED_FOR_CORRECTION states to influxdb 1`] = `
+Object {
+  "fields": Object {
+    "compositionId": "c41a95b6-4439-4fc7-9d56-6d3a8ea0f80b",
+    "currentTaskId": "15d78710-8809-4a23-81db-45f917c15ac4",
+    "durationInSeconds": 73186871,
+    "previousTaskId": "e172627c-8490-44da-a702-80a082f978f5",
+  },
+  "measurement": "application_event_duration",
+  "tags": Object {
+    "currentStatus": "REQUESTED_CORRECTION",
+    "eventType": "BIRTH",
+    "previousStatus": "REGISTERED",
+  },
+  "timestamp": 1643705998544000000,
 }
 `;
 
@@ -148,6 +194,7 @@ Object {
     "missingFieldSectionId": "child",
     "regStatus": "IN_PROGESS",
   },
+  "timestamp": 1551785895844000000,
 }
 `;
 
@@ -163,5 +210,6 @@ Object {
     "officeLocation": "Location/2a520dc1-0a9a-48a1-a4b8-66f3075a9155",
     "startedBy": "4bb03541-116e-4ce2-8ea4-407f307f7579",
   },
+  "timestamp": 1589199329739000000,
 }
 `;

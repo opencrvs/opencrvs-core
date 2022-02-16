@@ -7,16 +7,16 @@
 #
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
-version: "3.3"
+version: '3.3'
 
 services:
   client:
     environment:
-      - RESOURCES_URL=http://localhost:3040
+      - COUNTRY_CONFIG_URL=http://localhost:3040
 
   login:
     environment:
-      - RESOURCES_URL=http://localhost:3040
+      - COUNTRY_CONFIG_URL=http://localhost:3040
 
   gateway:
     environment:
@@ -49,5 +49,9 @@ services:
       - NODE_ENV=development
 
   webhooks:
+    environment:
+      - NODE_ENV=development
+
+  config:
     environment:
       - NODE_ENV=development

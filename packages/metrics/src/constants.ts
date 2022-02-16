@@ -16,7 +16,8 @@ export const CERT_PUBLIC_KEY_PATH =
   (process.env.CERT_PUBLIC_KEY_PATH as string) ||
   '../../.secrets/public-key.pem'
 export const AUTH_URL = process.env.AUTH_URL || 'http://localhost:4040'
-export const RESOURCE_URL = process.env.RESOURCE_URL || 'http://localhost:3040'
+export const COUNTRY_CONFIG_URL =
+  process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
 export const SENTRY_DSN =
   process.env.SENTRY_DSN ||
   'https://2ed906a0ba1c4de2ae3f3f898ec9df0b@sentry.io/1774551'
@@ -27,3 +28,40 @@ export const CHECK_INVALID_TOKEN = process.env.CHECK_INVALID_TOKEN || 'false'
 export const SEARCH_URL = process.env.SEARCH_URL || 'http://localhost:9090/'
 export const EXPECTED_BIRTH_REGISTRATION_IN_DAYS =
   process.env.EXPECTED_BIRTH_REGISTRATION_IN_DAYS || 45
+export const CONFIG_API_URL = 'http://localhost:2021'
+export const mockFetchConfig = {
+  API_GATEWAY_URL: 'http://localhost:7070/',
+  CONFIG_API_URL: 'http://localhost:2021',
+  LOGIN_URL: 'http://localhost:3020',
+  AUTH_URL: 'http://localhost:4040',
+  RESOURCES_URL: 'http://localhost:3040',
+  CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 36500,
+  CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 36500,
+  CERTIFICATE_PRINT_LOWEST_CHARGE: 0,
+  CERTIFICATE_PRINT_HIGHEST_CHARGE: 0,
+  UI_POLLING_INTERVAL: 5000,
+  FIELD_AGENT_AUDIT_LOCATIONS: 'DISTRICT',
+  APPLICATION_AUDIT_LOCATIONS: 'DISTRICT',
+  INFORMANT_MINIMUM_AGE: 16,
+  HIDE_EVENT_REGISTER_INFORMATION: false,
+  EXTERNAL_VALIDATION_WORKQUEUE: false,
+  PHONE_NUMBER_PATTERN: {
+    pattern: '/^0(7|9)[0-9]{1}[0-9]{7}$/',
+    example: '0970545855',
+    start: '0[7|9]',
+    num: '10',
+    mask: {
+      startForm: 4,
+      endBefore: 2
+    }
+  },
+  SENTRY: 'https://f892d643aab642108f44e2d1795706bc@sentry.io/1774604',
+  LOGROCKET: 'opencrvs-foundation/opencrvs-zambia',
+  NID_NUMBER_PATTERN: {
+    pattern: '/^[0-9]{9}$/',
+    example: '4837281940',
+    num: '9'
+  },
+  COUNTRY: 'zmb',
+  LANGUAGES: 'en'
+}

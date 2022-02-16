@@ -94,7 +94,7 @@ export const countries = [
   /*
    * Include imaginary Farajaland country to country lists for demo environments
    */
-  window.config.SHOW_FARAJALAND_IN_COUNTRY_LISTS
+  window.config.COUNTRY === 'FAR'
     ? { value: 'FAR', label: messages.FAR }
     : null,
   { value: 'FLK', label: messages.FLK },

@@ -51,7 +51,7 @@ import {
   InformationTitle
 } from '@client/views/SysAdmin/Team/user/userProfilie/UserProfile'
 import { orderBy } from 'lodash'
-import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/registrationRates/Within45DaysTable'
+import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/registrationRates/WithinTargetDaysTable'
 
 const DEFAULT_LIST_SIZE = 10
 

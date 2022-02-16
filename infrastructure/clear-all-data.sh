@@ -24,6 +24,8 @@ docker run --rm --network=$NETWORK mongo:3.6 mongo openhim-dev --host $HOST --ev
 
 docker run --rm --network=$NETWORK mongo:3.6 mongo user-mgnt --host $HOST --eval "db.dropDatabase()"
 
+docker run --rm --network=$NETWORK mongo:3.6 mongo application-config --host $HOST --eval "db.dropDatabase()"
+
 # Delete all data from elasticsearch
 #-----------------------------------
 docker run --rm --network=$NETWORK appropriate/curl curl -XDELETE 'http://elasticsearch:9200/*' -v
