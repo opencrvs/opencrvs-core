@@ -13,7 +13,8 @@ import * as React from 'react'
 import {
   modifyApplication,
   IApplication,
-  SUBMISSION_STATUS
+  SUBMISSION_STATUS,
+  writeApplication
 } from '@client/applications'
 import { connect } from 'react-redux'
 import { flatten, isArray, flattenDeep, get, clone } from 'lodash'
@@ -110,6 +111,7 @@ type IDispatchProps = {
   goToPageGroup: typeof goToPageGroup
   goToCertificateCorrection: typeof goToCertificateCorrection
   goToHomeTab: typeof goToHomeTab
+  writeApplication: typeof writeApplication
 }
 
 type IFullProps = IProps & IStateProps & IDispatchProps & IntlShapeProps
@@ -894,6 +896,8 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
     updateApplicationRegistrationWithCorrection(application, {
       userPrimaryOffice: this.props.userPrimaryOffice
     })
+    this.props.writeApplication(application)
+    this.props.goToHomeTab('review')
   }
 
   gotoReviewPage = () => {
@@ -916,6 +920,7 @@ export const CorrectionSummary = connect(
   }),
   {
     modifyApplication,
+    writeApplication,
     goBack,
     goToPageGroup,
     goToCertificateCorrection,

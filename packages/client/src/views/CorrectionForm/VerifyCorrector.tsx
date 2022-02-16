@@ -143,7 +143,7 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
     }
   }
 
-  logTime(timeMs: number) {
+  logTime = (timeMs: number) => {
     const application = this.props.application
     if (!application.timeLoggedMS) {
       application.timeLoggedMS = 0
