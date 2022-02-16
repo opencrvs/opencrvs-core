@@ -50,7 +50,9 @@ import {
 import ApolloClient, { ApolloError, ApolloQueryResult } from 'apollo-client'
 import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
 import { v4 as uuid } from 'uuid'
+import { Action as FormAction } from '@client/forms'
 
+const ARCHIVE_APPLICATION = 'APPLICATION/ARCHIVE'
 const SET_INITIAL_APPLICATION = 'APPLICATION/SET_INITIAL_APPLICATION'
 const STORE_APPLICATION = 'APPLICATION/STORE_APPLICATION'
 const MODIFY_APPLICATION = 'APPLICATION/MODIFY_DRAFT'
@@ -90,6 +92,9 @@ export enum SUBMISSION_STATUS {
   READY_TO_REJECT = 'READY_TO_REJECT',
   REJECTING = 'REJECTING',
   REJECTED = 'REJECTED',
+  READY_TO_ARCHIVE = 'READY_TO_ARCHIVE',
+  ARCHIVING = 'ARCHIVING',
+  ARCHIVED = 'ARCHIVED',
   READY_TO_CERTIFY = 'READY_TO_CERTIFY',
   CERTIFYING = 'CERTIFYING',
   CERTIFIED = 'CERTIFIED',
@@ -251,6 +256,11 @@ type Payment = {
   date: number
 }
 
+interface IArchiveApplicationAction {
+  type: typeof ARCHIVE_APPLICATION
+  payload: { applicationId: string }
+}
+
 interface IStoreApplicationAction {
   type: typeof STORE_APPLICATION
   payload: { application: IApplication }
@@ -371,6 +381,7 @@ interface UpdateFieldAgentDeclaredApplicationsFailAction {
 }
 
 export type Action =
+  | IArchiveApplicationAction
   | IStoreApplicationAction
   | IModifyApplicationAction
   | ISetInitialApplicationsAction
@@ -523,6 +534,12 @@ export const getStorageApplicationsFailed =
   (): IGetStorageApplicationsFailedAction => ({
     type: GET_APPLICATIONS_FAILED
   })
+
+export function archiveApplication(
+  applicationId: string
+): IArchiveApplicationAction {
+  return { type: ARCHIVE_APPLICATION, payload: { applicationId } }
+}
 
 export function deleteApplication(
   application: IApplication | IPrintableApplication,
@@ -1659,6 +1676,25 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
           ...state,
           applications: userData.applications
         }
+      }
+      return state
+
+    case ARCHIVE_APPLICATION:
+      if (action.payload) {
+        const application = state.applications.find(
+          ({ id }) => id === action.payload.applicationId
+        )
+
+        if (!application) {
+          return state
+        }
+        const modifiedApplication: IApplication = {
+          ...application,
+          submissionStatus: SUBMISSION_STATUS.READY_TO_ARCHIVE,
+          action: FormAction.ARCHIVE_APPLICATION,
+          payload: { id: application.id }
+        }
+        return loop(state, Cmd.action(writeApplication(modifiedApplication)))
       }
       return state
 

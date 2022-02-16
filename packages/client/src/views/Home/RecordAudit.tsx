@@ -24,7 +24,11 @@ import {
 } from '@client/navigation'
 import { RouteComponentProps } from 'react-router'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { IWorkqueue, IApplication } from '@client/applications'
+import {
+  IWorkqueue,
+  IApplication,
+  archiveApplication
+} from '@client/applications'
 import { IStoreState } from '@client/store'
 import {
   GQLEventSearchSet,
@@ -90,6 +94,7 @@ interface IStateProps {
 }
 
 interface IDispatchProps {
+  archiveApplication: typeof archiveApplication
   goToApplicationDetails: typeof goToApplicationDetails
   goBack: typeof goBackAction
   goToRegistrarHomeTab: typeof goToRegistrarHomeTab
@@ -418,7 +423,7 @@ const getApplicationInfo = (
   )
 }
 
-export const ShowRecordAudit = (props: IFullProps) => {
+const ShowRecordAudit = (props: IFullProps) => {
   const [showDialog, setShowDialog] = React.useState(false)
   const { intl, scope } = props
   const applicationId = props.match.params.applicationId
@@ -491,7 +496,14 @@ export const ShowRecordAudit = (props: IFullProps) => {
           >
             {intl.formatMessage(buttonMessages.cancel)}
           </TertiaryButton>,
-          <DangerButton id="edit_confirm" key="submit" onClick={() => {}}>
+          <DangerButton
+            id="edit_confirm"
+            key="submit"
+            onClick={() => {
+              props.archiveApplication(applicationId)
+              toggleDisplayDialog()
+            }}
+          >
             {intl.formatMessage(buttonMessages.archive)}
           </DangerButton>
         ]}
@@ -521,6 +533,7 @@ export const RecordAudit = connect<
   RouteComponentProps<{ applicationId: string }>,
   IStoreState
 >(mapStateToProps, {
+  archiveApplication,
   goToApplicationDetails,
   goBack: goBackAction,
   goToRegistrarHomeTab
