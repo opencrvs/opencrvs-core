@@ -50,8 +50,9 @@ import {
   WORKFLOW_STATUS,
   TEAM_USER_LIST,
   USER_PROFILE,
-  CHANGE_PHONE,
-  CONFIG
+  CONFIG,
+  APPLICATION_RECORD_AUDIT,
+  CHANGE_PHONE
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
 import { NATL_ADMIN_ROLES } from '@client/utils/constants'
@@ -284,6 +285,15 @@ export function goToApplicationDetails(
   forceDetailsQuery?: boolean
 ) {
   return push(formatUrl(APPLICATION_DETAIL, { applicationId }), {
+    forceDetailsQuery
+  })
+}
+
+export function goToApplicationRecordAudit(
+  applicationId: string,
+  forceDetailsQuery?: boolean
+) {
+  return push(formatUrl(APPLICATION_RECORD_AUDIT, { applicationId }), {
     forceDetailsQuery
   })
 }

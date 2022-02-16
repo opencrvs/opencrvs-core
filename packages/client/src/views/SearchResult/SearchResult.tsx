@@ -46,7 +46,6 @@ import {
   TRACKING_ID_TEXT
 } from '@client/utils/constants'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
-import { RowHistoryView } from '@opencrvs/client/src/views/OfficeHome/RowHistoryView'
 import { Duplicate, Validate } from '@opencrvs/components/lib/icons'
 import {
   ColumnContentAlignment,
@@ -354,7 +353,12 @@ export class SearchResultView extends React.Component<
       ) {
         actions.push({
           label: this.props.intl.formatMessage(buttonMessages.print),
-          handler: () => this.props.goToPrintCertificate(reg.id, reg.event)
+          handler: (
+            e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
+          ) => {
+            e && e.stopPropagation()
+            this.props.goToPrintCertificate(reg.id, reg.event)
+          }
         })
       } else if (
         (applicationIsValidated && this.userHasRegisterScope()) ||
@@ -422,13 +426,6 @@ export class SearchResultView extends React.Component<
         ]
       }
     })
-  }
-
-  renderExpandedComponent = (itemId: string, data: GQLQuery) => {
-    const results = data && data.searchEvents && data.searchEvents.results
-    const eventDetails =
-      results && results.find((result) => result && result.id === itemId)
-    return <RowHistoryView eventDetails={eventDetails} />
   }
 
   onPageChange = (newPageNumber: number) => {
@@ -524,9 +521,6 @@ export class SearchResultView extends React.Component<
                               data.searchEvents
                             )}
                             columns={this.getColumns()}
-                            renderExpandedComponent={(itemId: string) =>
-                              this.renderExpandedComponent(itemId, data)
-                            }
                             noResultText={intl.formatMessage(
                               constantsMessages.noResults
                             )}
@@ -539,8 +533,7 @@ export class SearchResultView extends React.Component<
                               0
                             }
                             currentPage={this.state.currentPage}
-                            expandable={this.getExpandable()}
-                            clickable={!this.getExpandable()}
+                            clickable={true}
                             showPaginated={this.showPaginated}
                             loadMoreText={intl.formatMessage(
                               constantsMessages.loadMore
