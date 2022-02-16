@@ -403,6 +403,7 @@ export async function fhirWorkflowEventHandler(
     case Events.BIRTH_MARK_ARCHIVED:
     case Events.DEATH_MARK_ARCHIVED:
       response = await updateTaskHandler(request, h, event)
+      await triggerEvent(event, request.payload, request.headers.authorization)
       break
     case Events.EVENT_NOT_DUPLICATE:
       response = await forwardToHearth(request, h)
