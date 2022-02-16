@@ -279,6 +279,10 @@ export class SearchResultView extends React.Component<
         )
       case 'CERTIFIED':
         return this.props.intl.formatMessage(registrarHomeMessages.certified)
+      case 'REQUESTED_CORRECTION':
+        return this.props.intl.formatMessage(
+          registrarHomeMessages.requestedCorrection
+        )
       default:
         return this.props.intl.formatMessage(
           registrarHomeMessages.readyForReview
@@ -317,6 +321,8 @@ export class SearchResultView extends React.Component<
       const downloadStatus =
         (foundApplication && foundApplication.downloadStatus) || undefined
 
+      const applicationIsRequestedCorrection =
+        reg.declarationStatus === 'REQUESTED_CORRECTION'
       const applicationIsRegistered = reg.declarationStatus === 'REGISTERED'
       const applicationIsCertified = reg.declarationStatus === 'CERTIFIED'
       const applicationIsRejected = reg.declarationStatus === 'REJECTED'
@@ -338,6 +344,8 @@ export class SearchResultView extends React.Component<
                 action:
                   ((applicationIsRegistered || applicationIsCertified) &&
                     Action.LOAD_CERTIFICATE_APPLICATION) ||
+                  (applicationIsRequestedCorrection &&
+                    Action.LOAD_REQUESTED_CORRECTION_APPLICATION) ||
                   Action.LOAD_REVIEW_APPLICATION
               }}
               status={downloadStatus as DOWNLOAD_STATUS}
