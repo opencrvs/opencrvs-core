@@ -371,6 +371,8 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
         return constantsMessages.applicationRegisteredOn
       case 'REJECTED':
         return constantsMessages.applicationRejectedOn
+      case 'REQUESTED_CORRECTION':
+        return constantsMessages.applicationRequestedCorrectionOn
       case 'CERTIFIED':
         return constantsMessages.applicationCollectedOn
       default:

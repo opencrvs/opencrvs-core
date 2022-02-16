@@ -26,6 +26,7 @@ interface IConstantsMessages
   applicationName: MessageDescriptor
   applicationRegisteredOn: MessageDescriptor
   applicationRejectedOn: MessageDescriptor
+  applicationRequestedCorrectionOn: MessageDescriptor
   applicationStarted: MessageDescriptor
   applicationStartedBy: MessageDescriptor
   applicationStartedOn: MessageDescriptor
@@ -86,6 +87,7 @@ interface IConstantsMessages
   rejected: MessageDescriptor
   rejectedDays: MessageDescriptor
   relationship: MessageDescriptor
+  requestedCorrection: MessageDescriptor
   review: MessageDescriptor
   search: MessageDescriptor
   sending: MessageDescriptor
@@ -201,6 +203,12 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Application sent for updates on',
     description: 'Label for the workflow timestamp when the status is rejected',
     id: 'constants.applicationRejectedOn'
+  },
+  applicationRequestedCorrectionOn: {
+    defaultMessage: 'Application requested correction on',
+    description:
+      'Label for the workflow timestamp when the status is requested correction',
+    id: 'constants.applicationRequestedCorrectionOn'
   },
   applicationStarted: {
     defaultMessage: 'Application started',
@@ -526,6 +534,11 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Relationship Label for death',
     id: 'constants.relationship'
   },
+  requestedCorrection: {
+    id: 'constants.requestedCorrection',
+    defaultMessage: 'requested correction',
+    description: 'A label for requested correction'
+  },
   review: {
     defaultMessage: 'Review',
     description: 'A label from the review button',
@@ -803,6 +816,11 @@ const dynamicMessagesToDefine: Record<
     id: 'constants.registered',
     defaultMessage: 'registered',
     description: 'A label for registered'
+  },
+  requestedCorrection: {
+    id: 'constants.requestedCorrection',
+    defaultMessage: 'requested correction',
+    description: 'A label for requested correction'
   },
   certified: {
     id: 'constants.certified',
