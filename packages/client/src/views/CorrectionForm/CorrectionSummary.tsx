@@ -12,7 +12,7 @@
 import * as React from 'react'
 import { modifyApplication, IApplication } from '@client/applications'
 import { connect } from 'react-redux'
-import { flatten, isArray, flattenDeep, get, clone } from 'lodash'
+import { get } from 'lodash'
 import {
   WrappedComponentProps as IntlShapeProps,
   injectIntl,
@@ -38,14 +38,13 @@ import {
   ReviewSection,
   IFormData,
   IFormTag,
-  REVIEW_OVERRIDE_POSITION,
-  IFormFieldValue
+  REVIEW_OVERRIDE_POSITION
 } from '@client/forms'
 
 import {
   ActionPageLight,
   ColumnContentAlignment,
-  ListTable
+  TableView
 } from '@opencrvs/components/lib/interface'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import {
@@ -167,7 +166,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
             topActionButtons={[backToReviewButton]}
             bottomActionButtons={[continueButton]}
           >
-            <ListTable
+            <TableView
               isLoading={false}
               content={this.getChanges(formSections)}
               hideBoxShadow={true}
@@ -195,8 +194,8 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
                 }
               ]}
               noResultText={intl.formatMessage(constantsMessages.noResults)}
-            ></ListTable>
-            <ListTable
+            ></TableView>
+            <TableView
               hideTableBottomBorder={true}
               isLoading={false}
               content={[
@@ -216,9 +215,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
                 }
               ]}
               noResultText={intl.formatMessage(constantsMessages.noResults)}
-            ></ListTable>
+            ></TableView>
 
-            <ListTable
+            <TableView
               hideTableBottomBorder={true}
               isLoading={false}
               content={[
@@ -236,9 +235,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
                 }
               ]}
               noResultText={intl.formatMessage(constantsMessages.noResults)}
-            ></ListTable>
+            ></TableView>
 
-            <ListTable
+            <TableView
               hideTableBottomBorder={true}
               isLoading={false}
               content={[
@@ -258,9 +257,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
                 }
               ]}
               noResultText={intl.formatMessage(constantsMessages.noResults)}
-            ></ListTable>
+            ></TableView>
 
-            <ListTable
+            <TableView
               hideTableBottomBorder={true}
               isLoading={false}
               content={[
@@ -278,9 +277,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
                 }
               ]}
               noResultText={intl.formatMessage(constantsMessages.noResults)}
-            ></ListTable>
+            ></TableView>
 
-            <ListTable
+            <TableView
               isLoading={false}
               content={[
                 {
@@ -299,7 +298,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
                 }
               ]}
               noResultText={intl.formatMessage(constantsMessages.noResults)}
-            ></ListTable>
+            ></TableView>
             <FormFieldGenerator
               id={this.group.id}
               onChange={(values) => {
