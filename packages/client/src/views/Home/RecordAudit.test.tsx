@@ -206,7 +206,14 @@ describe('Record audit reinstated button', () => {
 
   it('Should show reinstated button', async () => {
     await flushPromises()
-
     expect(component.find('#reinstate_button').hostNodes()).toHaveLength(1)
+  })
+
+  it('Should show modal if click on reinstated button', async () => {
+    await flushPromises()
+    component.find('#reinstate_button').hostNodes().simulate('click')
+    expect(
+      component.find('#reinstateDeclarationPrompt').hostNodes()
+    ).toHaveLength(1)
   })
 })

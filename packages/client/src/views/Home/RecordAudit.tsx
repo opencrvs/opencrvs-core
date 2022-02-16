@@ -36,15 +36,17 @@ import moment from 'moment'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { IFormSectionData, IContactPoint } from '@client/forms'
-import { Spinner } from '@opencrvs/components/lib/interface'
+import { ResponsiveModal, Spinner } from '@opencrvs/components/lib/interface'
 import {
   ICON_ALIGNMENT,
+  PrimaryButton,
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
 import { getScope } from '@client/profile/profileSelectors'
 import { Scope } from '@client/utils/authUtils'
 import { ARCHIVED } from '@client/utils/constants'
+import { messages } from '@client/i18n/messages/views/recordAudit'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -447,6 +449,7 @@ const getApplicationInfo = (
 export const ShowRecordAudit = (props: IFullProps) => {
   const { intl, scope } = props
   const applicationId = props.match.params.applicationId
+  const [showPrompt, setShowPrompt] = React.useState(false)
   const userHasRegisterScope = scope && scope.includes('register')
   const userHasValidateScope = scope && scope.includes('validate')
   let application: IApplicationData | null
@@ -463,7 +466,7 @@ export const ShowRecordAudit = (props: IFullProps) => {
       id="reinstate_button"
       key="reinstate_button"
       icon={() => <RotateLeft />}
-      onClick={() => {}}
+      onClick={() => setShowPrompt(!showPrompt)}
     >
       {intl.formatMessage(buttonMessages.reinstate)}
     </TertiaryButton>
@@ -499,6 +502,31 @@ export const ShowRecordAudit = (props: IFullProps) => {
             {getApplicationInfo(props, application, isDownloaded)}
           </Content>
         )}
+        <ResponsiveModal
+          id="reinstateDeclarationPrompt"
+          show={showPrompt}
+          title={intl.formatMessage(messages.reinstateDeclarationDialogTitle)}
+          contentHeight={96}
+          handleClose={() => setShowPrompt(!showPrompt)}
+          actions={[
+            <TertiaryButton
+              id="cancel"
+              key="cancel"
+              onClick={() => setShowPrompt(!showPrompt)}
+            >
+              {intl.formatMessage(messages.reinstateDeclarationDialogCancel)}
+            </TertiaryButton>,
+            <PrimaryButton
+              id="continue"
+              key="continue"
+              onClick={() => setShowPrompt(!showPrompt)}
+            >
+              {intl.formatMessage(messages.reinstateDeclarationDialogConfirm)}
+            </PrimaryButton>
+          ]}
+        >
+          {intl.formatMessage(messages.reinstateDeclarationDialogDescription)}
+        </ResponsiveModal>
       </BodyContainer>
     </div>
   )
