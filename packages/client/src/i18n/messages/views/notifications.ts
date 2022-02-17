@@ -18,7 +18,7 @@ interface INotificationsMessages
   outboxText: MessageDescriptor
   updatePINSuccess: MessageDescriptor
   processingText: MessageDescriptor
-  statusArchivhing: MessageDescriptor
+  statusArchiving: MessageDescriptor
   statusRegistering: MessageDescriptor
   statusRejecting: MessageDescriptor
   statusReinstating: MessageDescriptor
@@ -64,7 +64,7 @@ const messagesToDefine: INotificationsMessages = {
     description: 'Application processing text',
     id: 'misc.notif.processingText'
   },
-  statusArchivhing: {
+  statusArchiving: {
     defaultMessage: 'Archiving...',
     description: 'Label for application status Archiving',
     id: 'regHome.outbox.statusArchiving'
@@ -90,7 +90,7 @@ const messagesToDefine: INotificationsMessages = {
     id: 'regHome.outbox.statusSubmitting'
   },
   statusWaitingToBeArchived: {
-    defaultMessage: 'Sending to be archived',
+    defaultMessage: 'Waiting to be archived',
     description: 'Label for application status waiting to be archived',
     id: 'regHome.outbox.statusWaitingToBeArchived'
   },

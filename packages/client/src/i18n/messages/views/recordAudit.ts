@@ -13,6 +13,8 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IRecordAuditMessages
   extends Record<string | number | symbol, MessageDescriptor> {
+  confirmationTitle: MessageDescriptor
+  confirmationBody: MessageDescriptor
   reinstateDeclarationDialogTitle: MessageDescriptor
   reinstateDeclarationDialogCancel: MessageDescriptor
   reinstateDeclarationDialogConfirm: MessageDescriptor
@@ -20,6 +22,17 @@ interface IRecordAuditMessages
 }
 
 const messagesToDefine: IRecordAuditMessages = {
+  confirmationTitle: {
+    id: 'recordAudit.archive.confirmation.title',
+    defaultMessage: 'Archive declaration?',
+    description: 'Confirmation title for archiving a declaration'
+  },
+  confirmationBody: {
+    id: 'recordAudit.archive.confirmation.body',
+    defaultMessage:
+      'This will remove the declaration from the workqueue and change the status to Archive. To revert this change you will need to search for the declaration.',
+    description: 'Confirmation body for archiving a declaration'
+  },
   reinstateDeclarationDialogTitle: {
     id: 'recordAudit.declaration.reinstateDialogTitle',
     defaultMessage: 'Reinstate declaration?',
