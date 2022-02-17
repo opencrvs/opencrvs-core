@@ -13,14 +13,14 @@
 import * as React from 'react'
 import { AppStore, createStore } from '@client/store'
 import { ReactWrapper } from 'enzyme'
-import { createTestComponent } from '@client/tests/util'
-import { Within45DaysTable } from '@client/views/SysAdmin/Performance/reports/registrationRates/Within45DaysTable'
+import { createTestStore, createTestComponent } from '@client/tests/util'
+import { WithinTargetDaysTable } from '@client/views/SysAdmin/Performance/reports/registrationRates/WithinTargetDaysTable'
 import { Event } from '@client/forms'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { REG_RATE_BASE } from '@client/views/SysAdmin/Performance/RegistrationRates'
 import { History } from 'history'
 
-describe('Within45DaysTable tests for over time option', () => {
+describe('WithinTargetDaysTable tests for over time option', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
   let history: History
@@ -29,18 +29,18 @@ describe('Within45DaysTable tests for over time option', () => {
     details: [
       {
         actualTotalRegistration: 20,
-        actual45DayRegistration: 9,
+        actualTargetDayRegistration: 9,
         estimatedRegistration: 45,
-        estimated45DayPercentage: 4.5,
+        estimatedTargetDayPercentage: 4.5,
         month: 'April',
         year: '2020',
         startOfMonth: '2020-03-30T18:00:00.000Z'
       },
       {
         actualTotalRegistration: 10,
-        actual45DayRegistration: 0,
+        actualTargetDayRegistration: 0,
         estimatedRegistration: 45,
-        estimated45DayPercentage: 0,
+        estimatedTargetDayPercentage: 0,
         month: 'March',
         year: '2020',
         startOfMonth: '2020-02-29T18:00:00.000Z'
@@ -48,9 +48,9 @@ describe('Within45DaysTable tests for over time option', () => {
     ],
     total: {
       actualTotalRegistration: 30,
-      actual45DayRegistration: 9,
+      actualTargetDayRegistration: 9,
       estimatedRegistration: 45,
-      estimated45DayPercentage: 2.25
+      estimatedTargetDayPercentage: 2.25
     }
   }
 
@@ -60,7 +60,7 @@ describe('Within45DaysTable tests for over time option', () => {
 
   beforeEach(async () => {
     component = await createTestComponent(
-      <Within45DaysTable
+      <WithinTargetDaysTable
         loading={false}
         base={{ baseType: REG_RATE_BASE.TIME }}
         eventType={Event.BIRTH}
@@ -88,7 +88,7 @@ describe('Within45DaysTable tests for over time option', () => {
     expect(firstRowElement.hostNodes().childAt(0).text()).toBe('March 2020')
   })
 })
-describe('Within45DaysTable tests for by location option', () => {
+describe('WithinTargetDaysTable tests for by location option', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
   let history: History
@@ -97,26 +97,26 @@ describe('Within45DaysTable tests for by location option', () => {
     details: [
       {
         actualTotalRegistration: 20,
-        actual45DayRegistration: 9,
+        actualTargetDayRegistration: 9,
         estimatedRegistration: 45,
-        estimated45DayPercentage: 4.5,
+        estimatedTargetDayPercentage: 4.5,
         locationName: 'Atpara Sadar',
         locationId: '123'
       },
       {
         actualTotalRegistration: 10,
-        actual45DayRegistration: 0,
+        actualTargetDayRegistration: 0,
         estimatedRegistration: 45,
-        estimated45DayPercentage: 0,
+        estimatedTargetDayPercentage: 0,
         locationName: 'Baniajan',
         locationId: '456'
       }
     ],
     total: {
       actualTotalRegistration: 30,
-      actual45DayRegistration: 9,
+      actualTargetDayRegistration: 9,
       estimatedRegistration: 45,
-      estimated45DayPercentage: 2.25
+      estimatedTargetDayPercentage: 2.25
     }
   }
 
@@ -126,7 +126,7 @@ describe('Within45DaysTable tests for by location option', () => {
 
   beforeEach(async () => {
     component = await createTestComponent(
-      <Within45DaysTable
+      <WithinTargetDaysTable
         loading={false}
         base={{
           baseType: REG_RATE_BASE.LOCATION,

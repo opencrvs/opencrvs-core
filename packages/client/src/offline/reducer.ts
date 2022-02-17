@@ -21,14 +21,22 @@ import {
 import * as actions from '@client/offline/actions'
 import * as profileActions from '@client/profile/profileActions'
 import { storage } from '@client/storage'
-import { IApplicationConfig, referenceApi } from '@client/utils/referenceApi'
+import {
+  IApplicationConfig,
+  referenceApi,
+  ICertificateTemplateData
+} from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations, getLocation } from '@client/utils/locationUtils'
 import { ISerializedForm } from '@client/forms'
 import { isOfflineDataLoaded, isNationalSystemAdmin } from './selectors'
 import { IUserDetails } from '@client/utils/userUtils'
-import { IPDFTemplate } from '@client/pdfRenderer/transformer/types'
+import {
+  IPDFTemplate,
+  ISVGTemplate
+} from '@client/pdfRenderer/transformer/types'
 import { ICertificateCollectorDefinition } from '@client/views/PrintCertificate/VerifyCollector'
+import _ from 'lodash'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -37,6 +45,15 @@ export enum LocationType {
   HEALTH_FACILITY = 'HEALTH_FACILITY',
   CRVS_OFFICE = 'CRVS_OFFICE',
   ADMIN_STRUCTURE = 'ADMIN_STRUCTURE'
+}
+
+interface IParsedCertificates {
+  birth: {
+    svgCode: string
+  }
+  death: {
+    svgCode: string
+  }
 }
 export interface ILocation {
   id: string
@@ -70,8 +87,8 @@ export interface IOfflineData {
   templates: {
     receipt?: IPDFTemplate
     certificates: {
-      birth: IPDFTemplate
-      death: IPDFTemplate
+      birth: ISVGTemplate
+      death: ISVGTemplate
     }
   }
   assets: {
@@ -104,8 +121,15 @@ function checkIfDone(
   const loopWithState = liftState(loopOrState)
   const newState = getModel(loopWithState)
   const cmd = getCmd(loopWithState)
-
   if (
+    !newState.offlineData.config?.COUNTRY_LOGO_FILE &&
+    !oldState.offlineDataLoaded
+  ) {
+    return loop(
+      { ...newState, offlineDataLoaded: false },
+      Cmd.list([CONFIG_CMD])
+    )
+  } else if (
     isOfflineDataLoaded(newState.offlineData) &&
     !oldState.offlineDataLoaded
   ) {
@@ -181,7 +205,6 @@ function delay(cmd: RunCmd<any>, time: number) {
 
 function getDataLoadingCommands() {
   return Cmd.list<actions.Action>([
-    CONFIG_CMD,
     FACILITIES_CMD,
     LOCATIONS_CMD,
     PILOT_LOCATIONS_CMD,
@@ -266,11 +289,37 @@ function reducer(
      * Configurations
      */
     case actions.APPLICATION_CONFIG_LOADED: {
+      _.merge(window.config, action.payload.config)
+      const birthCertificateTemplate = _.find(action.payload.certificates, {
+        event: 'birth',
+        status: 'ACTIVE'
+      }) as ICertificateTemplateData
+
+      const deathCertificateTemplate = _.find(action.payload.certificates, {
+        event: 'death',
+        status: 'ACTIVE'
+      }) as ICertificateTemplateData
+
+      const certificatesTemplates = {
+        birth: { svgCode: birthCertificateTemplate.svgCode },
+        death: { svgCode: deathCertificateTemplate.svgCode }
+      } as IParsedCertificates
+
       return {
         ...state,
         offlineData: {
           ...state.offlineData,
-          config: action.payload
+          config: action.payload.config,
+          templates: {
+            certificates: {
+              birth: {
+                definition: certificatesTemplates.birth.svgCode
+              },
+              death: {
+                definition: certificatesTemplates.birth.svgCode
+              }
+            }
+          }
         }
       }
     }
@@ -295,8 +344,7 @@ function reducer(
         offlineData: {
           ...state.offlineData,
           languages: action.payload.languages,
-          forms: action.payload.forms,
-          templates: action.payload.templates
+          forms: action.payload.forms
         }
       }
     }

@@ -49,6 +49,8 @@ export interface IApplicationConfigurationModel extends Document {
   SENTRY: string
   LOGROCKET: string
   PHONE_NUMBER_PATTERN: IPhoneNumberPattern
+  BIRTH_REGISTRATION_TARGET: number
+  DEATH_REGISTRATION_TARGET: number
   NID_NUMBER_PATTERN: INIDNumberPattern
 }
 
@@ -124,6 +126,16 @@ const systemSchema = new Schema({
     default: false
   },
   PHONE_NUMBER_PATTERN: { type: phoneNumberSchema, required: false },
+  BIRTH_REGISTRATION_TARGET: {
+    type: Number,
+    required: false,
+    default: 45
+  },
+  DEATH_REGISTRATION_TARGET: {
+    type: Number,
+    required: false,
+    default: 45
+  },
   NID_NUMBER_PATTERN: { type: nidPatternSchema, required: false },
   SENTRY: { type: String, required: false },
   LOGROCKET: { type: String, required: false }

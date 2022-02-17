@@ -397,12 +397,10 @@ describe('RegistrarHome ready to print tab related tests', () => {
     testComponent.find('#load_more_button').last().hostNodes().simulate('click')
   })
 
-  describe('When a row is expanded', () => {
+  describe('When a row is clicked', () => {
     let expandedRow: any
 
-    beforeEach(async () => {
-      Date.now = jest.fn(() => 1554055200000)
-
+    it('renders expanded area for ready to print', async () => {
       const testComponent = await createTestComponent(
         // @ts-ignore
         <PrintTab
@@ -414,23 +412,18 @@ describe('RegistrarHome ready to print tab related tests', () => {
         { store, history }
       )
 
-      const instance = (
-        await waitForElement(testComponent, GridTable)
-      ).instance() as any
+      // wait for mocked data to load mockedProvider
+      await waitForElement(testComponent, '#row_0')
 
-      instance.toggleExpanded('956281c9-1f47-4c26-948a-970dd23c4094')
+      testComponent.update()
+      testComponent.find('#row_0').hostNodes().simulate('click')
 
-      expandedRow = await waitForElement(testComponent, '#REGISTERED-0')
-    })
+      await waitForElement(testComponent, '#row_0')
+      testComponent.update()
 
-    it('renders expanded area for ready to print', async () => {
-      expect(expandedRow.hostNodes().length).toBe(1)
-    })
-
-    it('renders correct timestamps for history steps [OCRVS-2214]', async () => {
-      expect(
-        expandedRow.find('#expanded_history_item_timestamp').hostNodes().text()
-      ).toBe('Registered on:20 October 2019')
+      expect(window.location.href).toContain(
+        '/record-audit/956281c9-1f47-4c26-948a-970dd23c4094'
+      )
     })
   })
 
@@ -780,7 +773,7 @@ describe('Tablet tests', () => {
     resizeWindow(1024, 768)
   })
 
-  it('redirects to detail page if item is clicked', async () => {
+  it('redirects to recordAudit page if item is clicked', async () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
@@ -804,7 +797,7 @@ describe('Tablet tests', () => {
     testComponent.update()
 
     expect(window.location.href).toContain(
-      '/details/956281c9-1f47-4c26-948a-970dd23c4094'
+      '/record-audit/956281c9-1f47-4c26-948a-970dd23c4094'
     )
   })
 })

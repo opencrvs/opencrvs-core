@@ -22,6 +22,8 @@ export const METRICS_URL = process.env.METRICS_URL || 'http://localhost:1050'
 export const AUTH_URL = process.env.AUTH_URL || 'http://localhost:4040'
 export const USER_MANAGEMENT_URL =
   process.env.USER_MANAGEMENT_URL || 'http://localhost:3030/'
+export const APPLICATION_CONFIG_URL =
+  process.env.APPLICATION_CONFIG_URL || 'http://localhost:2021/'
 export const NOTIFICATION_URL =
   process.env.NOTIFICATION_URL || 'http://localhost:2020/'
 export const WORKFLOW_URL = process.env.WORKFLOW_URL || 'http://localhost:5050/'
