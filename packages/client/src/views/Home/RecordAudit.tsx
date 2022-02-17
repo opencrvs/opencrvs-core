@@ -48,7 +48,7 @@ import {
   DangerButton
 } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages/buttons'
-import { messages } from '@client/i18n/messages/views/archive'
+import { messages } from '@client/i18n/messages/views/recordAudit'
 import NotificationToast from '@client/views/OfficeHome/NotificationToast'
 
 const BodyContainer = styled.div`

@@ -19,12 +19,12 @@ interface IConfigMessages
 
 const messagesToDefine: IConfigMessages = {
   confirmationTitle: {
-    id: 'archive.confirmation.title',
+    id: 'recordAudit.archive.confirmation.title',
     defaultMessage: 'Archive declaration?',
     description: 'Confirmation title for archiving a declaration'
   },
   confirmationBody: {
-    id: 'archive.confirmation.body',
+    id: 'recordAudit.archive.confirmation.body',
     defaultMessage:
       'This will remove the declaration from the workqueue and change the status to Archive. To revert this change you will need to search for the declaration.',
     description: 'Confirmation body for archiving a declaration'
