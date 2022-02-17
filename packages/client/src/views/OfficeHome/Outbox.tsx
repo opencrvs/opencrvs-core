@@ -93,6 +93,16 @@ class Outbox extends React.Component<IFullProps, IState> {
         icon = () => <Spinner id={iconId} key={iconId} size={24} />
         statusText = formatMessage(statusRejecting)
         break
+      case SUBMISSION_STATUS.READY_TO_ARCHIVE:
+        iconId = `waiting${index}`
+        icon = () => <StatusWaiting id={iconId} key={iconId} />
+        statusText = formatMessage(statusWaitingToReject)
+        break
+      case SUBMISSION_STATUS.ARCHIVING:
+        iconId = `registering${index}`
+        icon = () => <Spinner id={iconId} key={iconId} size={24} />
+        statusText = formatMessage(statusRegistering)
+        break
       case SUBMISSION_STATUS.FAILED_NETWORK:
         iconId = `failed${index}`
         icon = () => <StatusWaiting id={iconId} key={iconId} />

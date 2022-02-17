@@ -49,6 +49,7 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { messages } from '@client/i18n/messages/views/archive'
+import NotificationToast from '@client/views/OfficeHome/NotificationToast'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -131,6 +132,7 @@ interface IApplicationData {
 }
 
 const STATUSTOCOLOR: { [key: string]: string } = {
+  ARCHIVED: 'grey',
   DRAFT: 'violet',
   DECLARED: 'orange',
   REJECTED: 'red',
@@ -356,8 +358,7 @@ const getApplicationInfo = (
   let informant = getCaptitalizedWord(application?.informant)
 
   const status = getCaptitalizedWord(application?.status).split('_')
-  let finalStatus = status[0]
-  if (status[1]) finalStatus += ' ' + status[1]
+  const finalStatus = status.reduce((accum, cur) => accum + ' ' + cur, '')
 
   if (application?.informantContact) {
     informant =
@@ -454,6 +455,7 @@ const ShowRecordAudit = (props: IFullProps) => {
   )
 
   if (
+    isDownloaded &&
     (userHasValidateScope || userHasRegisterScope) &&
     application?.status &&
     ARCHIVABLE_STATUSES.includes(application.status)
@@ -512,6 +514,7 @@ const ShowRecordAudit = (props: IFullProps) => {
       >
         {intl.formatMessage(messages.confirmationBody)}
       </ResponsiveModal>
+      <NotificationToast />
     </div>
   )
 }
