@@ -147,6 +147,20 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
       causeOfDeath
       maleDependentsOfDeceased
       femaleDependentsOfDeceased
+      history {
+        date
+        action
+        location {
+          name
+        }
+        office {
+          name
+          status
+        }
+        user {
+          username
+        }
+      }
     }
   }
 `
@@ -296,6 +310,20 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
       causeOfDeath
       maleDependentsOfDeceased
       femaleDependentsOfDeceased
+      history {
+        date
+        action
+        location {
+          name
+        }
+        office {
+          name
+          status
+        }
+        user {
+          username
+        }
+      }
     }
   }
 `

@@ -179,6 +179,20 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         }
       }
       presentAtBirthRegistration
+      history {
+        date
+        action
+        location {
+          name
+        }
+        office {
+          name
+          status
+        }
+        user {
+          username
+        }
+      }
     }
   }
 `
@@ -354,6 +368,20 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         }
       }
       presentAtBirthRegistration
+      history {
+        date
+        action
+        location {
+          name
+        }
+        office {
+          name
+          status
+        }
+        user {
+          username
+        }
+      }
     }
   }
 `

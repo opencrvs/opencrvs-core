@@ -20,11 +20,16 @@ import { connect } from 'react-redux'
 import {
   goToApplicationDetails,
   goBack as goBackAction,
-  goToRegistrarHomeTab
+  goToRegistrarHomeTab,
+  goToPage
 } from '@client/navigation'
 import { RouteComponentProps } from 'react-router'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { IWorkqueue, IApplication } from '@client/applications'
+import {
+  injectIntl,
+  IntlShape,
+  WrappedComponentProps as IntlShapeProps
+} from 'react-intl'
+import { IWorkqueue, IApplication, DOWNLOAD_STATUS } from '@client/applications'
 import { IStoreState } from '@client/store'
 import {
   GQLEventSearchSet,
@@ -35,8 +40,12 @@ import {
 import moment from 'moment'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
-import { IFormSectionData, IContactPoint } from '@client/forms'
+import { IFormSectionData, IContactPoint, Action } from '@client/forms'
 import { Spinner } from '@opencrvs/components/lib/interface'
+import { DownloadButton } from '@client/components/interface/DownloadButton'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { constantsMessages } from '@client/i18n/messages'
+import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -78,16 +87,22 @@ const GreyedInfo = styled.div`
   max-width: 330px;
 `
 
+const ReviewButton = styled(PrimaryButton)`
+  height: 40px;
+`
+
 interface IStateProps {
   workqueue: IWorkqueue
   resources: IOfflineData
   savedApplications: IApplication[]
+  outboxApplications: IApplication[]
 }
 
 interface IDispatchProps {
   goToApplicationDetails: typeof goToApplicationDetails
   goBack: typeof goBackAction
   goToRegistrarHomeTab: typeof goToRegistrarHomeTab
+  goToPage: typeof goToPage
 }
 
 type IFullProps = IDispatchProps &
@@ -180,19 +195,6 @@ const isDeathApplication = (
   application: GQLEventSearchSet | null
 ): application is GQLDeathEventSearchSet => {
   return (application && application.type === 'Death') || false
-}
-
-const goBack = (props: IFullProps) => {
-  const historyState = props.location.state
-  const navigatedFromInsideApp = Boolean(
-    historyState && historyState.isNavigatedInsideApp
-  )
-
-  if (navigatedFromInsideApp) {
-    props.goBack()
-  } else {
-    props.goToRegistrarHomeTab('review')
-  }
 }
 
 const getDraftApplicationName = (application: IApplication): string => {
@@ -435,8 +437,47 @@ const getApplicationInfo = (
   )
 }
 
+const downloadButton = (application: IApplicationData, props: IFullProps) => {
+  const { id, type } = application || {}
+  const { intl } = props
+
+  if (application == null || id == null || type == null) return <></>
+
+  const foundApplication = props.outboxApplications.find(
+    (app) => app.id === application.id
+  )
+
+  const downloadStatus =
+    (foundApplication && foundApplication.downloadStatus) || undefined
+  if (downloadStatus != DOWNLOAD_STATUS.DOWNLOADED) {
+    const downLoadConfig = {
+      event: type,
+      compositionId: id,
+      action: Action.LOAD_REVIEW_APPLICATION
+    }
+    return (
+      <DownloadButton
+        key={id}
+        downloadConfigs={downLoadConfig}
+        status={downloadStatus as DOWNLOAD_STATUS}
+      />
+    )
+  } else {
+    return (
+      <ReviewButton
+        key={id}
+        id="myButton"
+        onClick={() => {
+          props.goToPage(REVIEW_EVENT_PARENT_FORM_PAGE, id, 'review', type)
+        }}
+      >
+        {intl.formatMessage(constantsMessages.review)}
+      </ReviewButton>
+    )
+  }
+}
+
 export const ShowRecordAudit = (props: IFullProps) => {
-  const applicationId = props.match.params.applicationId
   let application: IApplicationData | null
   application = getSavedApplications(props)
   const isDownloaded = application ? true : false
@@ -461,6 +502,7 @@ export const ShowRecordAudit = (props: IFullProps) => {
                 }
               />
             )}
+            topActionButtons={[downloadButton(application, props)]}
           >
             {getApplicationInfo(props, application, isDownloaded)}
           </Content>
@@ -476,7 +518,8 @@ function mapStateToProps(state: IStoreState): IStateProps {
     resources: getOfflineData(state),
     savedApplications:
       state.applicationsState.applications &&
-      state.applicationsState.applications
+      state.applicationsState.applications,
+    outboxApplications: state.applicationsState.applications
   }
 }
 
@@ -488,5 +531,6 @@ export const RecordAudit = connect<
 >(mapStateToProps, {
   goToApplicationDetails,
   goBack: goBackAction,
-  goToRegistrarHomeTab
+  goToRegistrarHomeTab,
+  goToPage
 })(injectIntl(withTheme(ShowRecordAudit)))
