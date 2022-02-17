@@ -18,6 +18,65 @@ export interface ICodeVerifyData {
   code: string
 }
 
+export interface IPhoneNumberPattern {
+  pattern: RegExp
+  example: string
+  start: string
+  num: string
+  mask: {
+    startForm: number
+    endBefore: number
+  }
+}
+
+interface INIDNumberPattern {
+  pattern: RegExp
+  example: string
+  num: string
+}
+
+export interface ICertificateTemplateData {
+  event: string
+  status: string
+  svgCode: string
+  svgDateCreated: number
+  svgDateUpdated: number
+  svgFilename: string
+  user: string
+  _id: string
+}
+
+export interface IApplicationConfig {
+  BACKGROUND_SYNC_BROADCAST_CHANNEL: string
+  COUNTRY: string
+  COUNTRY_LOGO_FILE: string
+  COUNTRY_LOGO_RENDER_WIDTH: number
+  COUNTRY_LOGO_RENDER_HEIGHT: number
+  DESKTOP_TIME_OUT_MILLISECONDS: number
+  LANGUAGES: string
+  CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: number
+  CERTIFICATE_PRINT_CHARGE_UP_LIMIT: number
+  CERTIFICATE_PRINT_LOWEST_CHARGE: number
+  CERTIFICATE_PRINT_HIGHEST_CHARGE: number
+  UI_POLLING_INTERVAL: number
+  FIELD_AGENT_AUDIT_LOCATIONS: string
+  APPLICATION_AUDIT_LOCATIONS: string
+  INFORMANT_MINIMUM_AGE: number
+  HIDE_EVENT_REGISTER_INFORMATION: boolean
+  EXTERNAL_VALIDATION_WORKQUEUE: boolean
+  SENTRY: string
+  LOGROCKET: string
+  PHONE_NUMBER_PATTERN: IPhoneNumberPattern
+  BIRTH_REGISTRATION_TARGET: number
+  DEATH_REGISTRATION_TARGET: number
+  NID_NUMBER_PATTERN: INIDNumberPattern
+}
+
+export interface IApplicationConfigResponse {
+  config: IApplicationConfig
+  certificates: ICertificateTemplateData[]
+}
+
 export interface IAuthenticationData {
   username: string
   password: string
@@ -67,6 +126,13 @@ function request<T>(options: AxiosRequestConfig) {
   }
 
   return client(options).then(onSuccess).catch(onError)
+}
+
+const getApplicationConfig = () => {
+  return request<IApplicationConfigResponse>({
+    url: resolve(window.config.CONFIG_API_URL, '/config'),
+    method: 'GET'
+  })
 }
 
 const authenticate = (data: IAuthenticationData) => {
@@ -169,5 +235,6 @@ export const authApi = {
   verifyUser,
   verifySecurityAnswer,
   changePassword,
-  sendUserName
+  sendUserName,
+  getApplicationConfig
 }

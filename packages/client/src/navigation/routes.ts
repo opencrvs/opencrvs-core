@@ -16,7 +16,6 @@ export const SELECT_VITAL_EVENT = '/events'
 
 export const EVENT_INFO = '/events/:eventType/info'
 export const SELECT_BIRTH_INFORMANT = `/drafts/:applicationId/events/${Event.BIRTH}/registration/informant`
-export const SELECT_BIRTH_PRIMARY_APPLICANT = `/drafts/:applicationId/events/${Event.BIRTH}/registration/applicant`
 export const SELECT_BIRTH_MAIN_CONTACT_POINT = `/drafts/:applicationId/events/${Event.BIRTH}/registration/contact`
 
 export const DRAFT_BIRTH_PARENT_FORM = `/drafts/:applicationId/events/${Event.BIRTH}`
@@ -63,6 +62,7 @@ export const REGISTRAR_HOME = '/registration-home'
 export const REGISTRAR_HOME_TAB = '/registration-home/:tabId/:selectorId?'
 export const FIELD_AGENT_HOME_TAB = '/field-agent-home/:tabId'
 export const SETTINGS = '/settings'
+export const CHANGE_PHONE = '/settings/phone'
 export const CONFIG = '/config'
 
 export const APPLICATION_DETAIL = '/details/:applicationId'

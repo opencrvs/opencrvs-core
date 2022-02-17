@@ -1,0 +1,96 @@
+{
+  "name": "@opencrvs/config",
+  "version": "1.0.0-alpha.3.1",
+  "description": "OpenCRVS public configuration microservice",
+  "license": "MPL-2.0",
+  "scripts": {
+    "start": "cross-env NODE_ENV=development nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
+    "start:prod": "node build/dist/src/index.js",
+    "test": "jest --coverage --silent --noStackTrace && yarn test:compilation",
+    "test:watch": "jest --watch",
+    "open:cov": "yarn test && opener coverage/index.html",
+    "precommit": "tslint --project ./tsconfig.json && lint-staged",
+    "test:compilation": "tsc --noEmit",
+    "build": "tsc && copyfiles 'src/**/*.json' build/dist",
+    "postbuild": "ef-tspm",
+    "build:clean": "rm -rf build",
+    "extract:translations": "bash extract-translations.sh"
+  },
+  "dependencies": {
+    "@hapi/boom": "^9.1.1",
+    "@hapi/hapi": "^20.2.1",
+    "@types/hapi-pino": "^8.0.5",
+    "@types/pino": "^6.3.12",
+    "hapi-pino": "^8.5.0",
+    "hapi-sentry": "^3.2.0",
+    "is-svg": "^4.3.2",
+    "mongoose": "^5.11.0",
+    "pino": "^6.0.0",
+    "is-svg": "^4.3.2"
+  },
+  "devDependencies": {
+    "@types/boom": "^7.3.1",
+    "@types/mongoose": "^5.0.16",
+    "nodemon": "^2.0.15",
+    "prettier": "^2.5.0",
+    "ts-node": "^6.1.1",
+    "tsconfig-paths": "^3.8.0",
+    "tslint": "^5.17.0",
+    "tslint-microsoft-contrib": "^6.2.0",
+    "typescript": "^3.7.2"
+  },
+  "lint-staged": {
+    "src/**/*.{ts,graphql}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ],
+    "globals": {
+      "ts-jest": {
+        "diagnostics": {
+          "ignoreCodes": [
+            2722,
+            2532,
+            2554,
+            2339
+          ]
+        }
+      }
+    },
+    "testEnvironment": "node",
+    "setupFiles": [
+      "./test/setupJest.ts"
+    ],
+    "modulePaths": [
+      "<rootDir>"
+    ],
+    "moduleNameMapper": {
+      "@config/(.*)": "<rootDir>/src/$1"
+    },
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text",
+      "html"
+    ]
+  },
+  "keywords": [
+    "api",
+    "nodejs",
+    "hapi",
+    "typescript"
+  ]
+}

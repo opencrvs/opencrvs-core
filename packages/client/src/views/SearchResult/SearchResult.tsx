@@ -68,6 +68,7 @@ import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import { convertToMSISDN } from '@client/forms/utils'
 import { formattedDuration } from '@client/utils/date-formatting'
+import { Navigation } from '@client/components/interface/Navigation'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
@@ -78,6 +79,9 @@ const ErrorText = styled.div`
 
 const Container = styled.div`
   margin: 20px 0px 0px 0px;
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    margin-left: 249px;
+  }
 `
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -462,6 +466,7 @@ export class SearchResultView extends React.Component<
           mobileSearchBar={true}
           enableMenuSelection={false}
         />
+        <Navigation />
         <Container>
           <HomeContent>
             {searchText && searchType && (

@@ -31,7 +31,9 @@ if (
   })
 
   // setup log rocket to ship log messages and record user errors
-  LogRocket.init(window.config.LOGROCKET)
+  if (window.config.LOGROCKET) {
+    LogRocket.init(window.config.LOGROCKET)
+  }
 
   // Integrate the two
   Sentry.configureScope((scope) => {

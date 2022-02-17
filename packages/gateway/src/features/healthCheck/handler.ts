@@ -18,7 +18,7 @@ import {
   USER_MANAGEMENT_URL,
   METRICS_URL,
   NOTIFICATION_URL,
-  RESOURCES_URL,
+  COUNTRY_CONFIG_URL,
   WORKFLOW_URL
 } from '@gateway/constants'
 import fetch from 'node-fetch'
@@ -42,7 +42,7 @@ enum Services {
   USER_MGNT = 'user-mgnt',
   METRICS = 'metrics',
   NOTIFICATION = 'notification',
-  RESOURCES = 'resources',
+  COUNTRY_CONFIG = 'countryconfig',
   SEARCH = 'search',
   WORKFLOW = 'workflow',
   GATEWAY = 'gateway'
@@ -80,8 +80,8 @@ export default async function healthCheckHandler(
     case Services.NOTIFICATION:
       response = await checkServiceHealth(`${NOTIFICATION_URL}ping`)
       break
-    case Services.RESOURCES:
-      response = await checkServiceHealth(`${RESOURCES_URL}/ping`)
+    case Services.COUNTRY_CONFIG:
+      response = await checkServiceHealth(`${COUNTRY_CONFIG_URL}/ping`)
       break
     case Services.WORKFLOW:
       response = await checkServiceHealth(`${WORKFLOW_URL}ping`)
@@ -107,7 +107,7 @@ export const querySchema = Joi.object({
         Services.USER_MGNT,
         Services.METRICS,
         Services.NOTIFICATION,
-        Services.RESOURCES,
+        Services.COUNTRY_CONFIG,
         Services.SEARCH,
         Services.WORKFLOW,
         Services.GATEWAY

@@ -39,7 +39,6 @@ import {
   SEARCH_RESULT,
   SELECT_BIRTH_INFORMANT,
   SELECT_BIRTH_MAIN_CONTACT_POINT,
-  SELECT_BIRTH_PRIMARY_APPLICANT,
   SELECT_DEATH_INFORMANT,
   SELECT_DEATH_MAIN_CONTACT_POINT,
   SELECT_VITAL_EVENT,
@@ -50,9 +49,10 @@ import {
   WORKFLOW_STATUS,
   TEAM_USER_LIST,
   USER_PROFILE,
-  CONFIG,
   CERTIFICATE_CORRECTION,
-  VERIFY_CORRECTOR
+  VERIFY_CORRECTOR,
+  CHANGE_PHONE,
+  CONFIG
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
 import { NATL_ADMIN_ROLES } from '@client/utils/constants'
@@ -303,13 +303,6 @@ export function goToApplicationContact(informant: string) {
     })
   )
 }
-export function goToPrimaryApplicant(applicationId: string) {
-  return push(
-    formatUrl(SELECT_BIRTH_PRIMARY_APPLICANT, {
-      applicationId
-    })
-  )
-}
 export function goToReviewDuplicate(applicationId: string) {
   return push(
     formatUrl(REVIEW_DUPLICATES, { applicationId: applicationId.toString() })
@@ -416,6 +409,18 @@ export function goToSysAdminHomeTab(tabId: string) {
 
 export function goToSettings() {
   return push(SETTINGS)
+}
+export function goToPhoneSettings() {
+  return push(CHANGE_PHONE)
+}
+
+export function goToSettingsWithPhoneSuccessMsg(phonedNumberUpdated: boolean) {
+  return push({
+    pathname: SETTINGS,
+    state: {
+      phonedNumberUpdated
+    }
+  })
 }
 
 export function goToCreateNewUser() {

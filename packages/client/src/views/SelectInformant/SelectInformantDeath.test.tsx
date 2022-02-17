@@ -47,7 +47,7 @@ describe('when user is selecting the informant', () => {
   })
   describe('when selects "Parent"', () => {
     it('takes user to the death registration contact view', () => {
-      app.find('#select_informant_MOTHER').hostNodes().simulate('change')
+      app.find('#relationship_MOTHER').hostNodes().simulate('change')
 
       app.find('#continue').hostNodes().simulate('click')
 
@@ -67,46 +67,21 @@ describe('when user is selecting the informant', () => {
 
   describe('when traverse list then continue', () => {
     it('takes user to the death registration by parent informant view', () => {
-      app.find('#select_informant_MOTHER').hostNodes().simulate('change')
-      app.find('#select_informant_FATHER').hostNodes().simulate('change')
+      app.find('#relationship_SPOUSE').hostNodes().simulate('change')
+      app.find('#relationship_SON').hostNodes().simulate('change')
+      app.find('#relationship_DAUGHTER').hostNodes().simulate('change')
+      app.find('#relationship_SON_IN_LAW').hostNodes().simulate('change')
+      app.find('#relationship_DAUGHTER_IN_LAW').hostNodes().simulate('change')
+      app.find('#relationship_FATHER').hostNodes().simulate('change')
+      app.find('#relationship_MOTHER').hostNodes().simulate('change')
+      app.find('#relationship_GRANDSON').hostNodes().simulate('change')
+      app.find('#relationship_GRANDDAUGHTER').hostNodes().simulate('change')
+      app.find('#relationship_SOMEONE_ELSE').hostNodes().simulate('change')
 
-      app.find('#select_informant_SPOUSE').hostNodes().simulate('change')
-      app.find('#select_informant_SON').hostNodes().simulate('change')
-      app.find('#select_informant_DAUGHTER').hostNodes().simulate('change')
       app.find('#continue').hostNodes().simulate('click')
 
       const expectation = `/drafts/${draft.id}/events/death`
       expect(window.location.pathname).toContain(expectation)
-    })
-  })
-
-  describe('when select other informant', () => {
-    it('advances to additional relationship information if informant is other', async () => {
-      app.find('#select_informant_OTHER').hostNodes().simulate('change')
-
-      app.find('#continue').hostNodes().simulate('click')
-
-      await flushPromises()
-      app.update()
-
-      expect(
-        app.find('#relationship_HEAD_OF_THE_INSTITUTE').hostNodes()
-      ).toHaveLength(1)
-    })
-
-    it('advances to contact point if informant is other', async () => {
-      app.find('#select_informant_OTHER').hostNodes().simulate('change')
-
-      app.find('#continue').hostNodes().simulate('click')
-
-      app.find('#relationship_OFFICER_IN_CHARGE').hostNodes().simulate('change')
-
-      app.find('#next_section').hostNodes().simulate('click')
-
-      await flushPromises()
-      app.update()
-
-      expect(app.find('#contactPoint_APPLICANT').hostNodes()).toHaveLength(1)
     })
   })
 
@@ -127,17 +102,20 @@ describe('when select informant page loads with existing data', () => {
 
     const draft = createApplication(Event.DEATH, {
       informant: {
-        applicantsRelationToDeceased: 'OTHER',
-        applicantPhone: '01622688231',
-        applicantOtherRelationship: 'Grand Mother'
+        applicantsRelationToDeceased: 'SON',
+        applicantPhone: '01622688231'
+      },
+      registration: {
+        relationship: {
+          value: 'SON',
+          nestedFields: {}
+        }
       }
     })
     store.dispatch(storeApplication(draft))
     history.replace(SELECT_DEATH_INFORMANT.replace(':applicationId', draft.id))
     await setPinCode(app)
 
-    expect(
-      app.find('#select_informant_OTHER').hostNodes().props().checked
-    ).toBe(true)
+    expect(app.find('#relationship_SON').hostNodes().props().checked).toBe(true)
   })
 })

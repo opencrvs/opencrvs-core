@@ -746,6 +746,29 @@ describe('RegistrarHome ready to print tab related tests', () => {
       )
     })
 
+    it('expands and go to record correction', async () => {
+      const instance = (
+        await waitForElement(testComponent, GridTable)
+      ).instance() as any
+
+      instance.toggleExpanded('956281c9-1f47-4c26-948a-970dd23c4094')
+
+      const expandedRow = await waitForElement(testComponent, '#REGISTERED-0')
+
+      expandedRow
+        .find('#REGISTERED-record-correction-0')
+        .hostNodes()
+        .simulate('click')
+
+      await new Promise((resolve) => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.update()
+      expect(history.location.pathname).toContain(
+        '/correction/956281c9-1f47-4c26-948a-970dd23c4094/corrector'
+      )
+    })
+
     it('shows error when download is failed', async () => {
       const downloadedApplication = makeApplicationReadyToDownload(
         Event.DEATH,

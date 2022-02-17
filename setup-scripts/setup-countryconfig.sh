@@ -10,7 +10,7 @@
 set -e
 print_usage_and_exit () {
     echo
-    echo -e 'Usage: \033[32mbash setup-resources.sh PATH_TO_OPEN_CRVS_CORE_DIRECTORY\033[0m'
+    echo -e 'Usage: \033[32mbash setup-countryconfig.sh PATH_TO_OPEN_CRVS_CORE_DIRECTORY\033[0m'
     echo
     echo "PATH_TO_OPEN_CRVS_CORE_DIRECTORY must be provided"
     echo
@@ -63,6 +63,10 @@ echo "wait-on user-mgnt microservice" && wait-on -l tcp:3030
 echo
 echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
 echo
+echo "wait-on application config microservice" && wait-on -l tcp:2021
+echo
+echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
+echo
 echo "wait-on OpenCRVS client.  This takes the longest time to build" && wait-on -l http://localhost:3000
 echo
 echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
@@ -74,23 +78,24 @@ echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::
 echo
 echo -e "\033[32m:::::::: OpenCRVS Core is running, now we must checkout a config ::::::::\033[0m"
 echo
-echo -e "\033[32m::::::::::::::: Cloning the Zambia Country Configuration :::::::::::::::\033[0m"
+echo -e "\033[32m::::::::::::::: Cloning the fictional Farajaland Country Configuration :::::::::::::::\033[0m"
 echo
 
 cd ../
-git clone https://github.com/opencrvs/opencrvs-zambia.git
-cd opencrvs-zambia
+git clone https://github.com/opencrvs/opencrvs-farajaland.git
+cd opencrvs-farajaland
+git checkout master
 echo
 echo -e "\033[32m:::::::::::::::::: Installing some Node dependencies ::::::::::::::::::\033[0m"
 echo
 yarn install
 echo
-echo -e "\033[32m:::::::::::::::::: Installing Zambia Reference Data ::::::::::::::::::\033[0m"
+echo -e "\033[32m:::::::::::::::::: Installing Farajaland Reference Data ::::::::::::::::::\033[0m"
 echo
 yarn db:clear:all
 yarn db:backup:restore
 echo
-echo -e "\033[32m::::::::::::::::::::: Starting Zambia Config Server :::::::::::::::::::::\033[0m"
+echo -e "\033[32m::::::::::::::::::::: Starting Farajaland Config Server :::::::::::::::::::::\033[0m"
 echo
 export CERT_PUBLIC_KEY_PATH=$PATH_TO_OPEN_CRVS_CORE_DIRECTORY/.secrets/public-key.pem
 echo $CERT_PUBLIC_KEY_PATH

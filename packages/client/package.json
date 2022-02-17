@@ -1,12 +1,12 @@
 {
   "name": "@opencrvs/client",
-  "version": "1.0.0-alpha.3.0",
+  "version": "1.0.0-alpha.3.1",
   "description": "OpenCRVS client application",
   "license": "MPL-2.0",
   "private": true,
   "dependencies": {
     "@craco/craco": "^6.4.3",
-    "@opencrvs/components": "^1.0.0-alpha.3.0",
+    "@opencrvs/components": "^1.0.0-alpha.3.1",
     "@sentry/browser": "^4.6.3",
     "@types/bcryptjs": "^2.4.2",
     "@types/history": "^4.6.2",
@@ -60,6 +60,7 @@
     "react-router": "^5.1.2",
     "react-scripts": "4.0.3",
     "react-stickynode": "^2.0.1",
+    "react-to-print": "^2.14.3",
     "react-tooltip": "^3.11.1",
     "react-transition-group": "^4.2.1",
     "redux": "^4.0.4",

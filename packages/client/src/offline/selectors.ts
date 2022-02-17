@@ -33,9 +33,12 @@ export function isOfflineDataLoaded(
     state.forms.userForm &&
     state.languages &&
     state.assets &&
-    state.templates
+    state.templates &&
+    state.config
 
-  return Boolean(hasAllRequiredData)
+  const isOfflineDataLoaded = Boolean(hasAllRequiredData)
+
+  return isOfflineDataLoaded
 }
 
 export function isSystemAdmin(userDetails: IUserDetails | undefined) {

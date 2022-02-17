@@ -37,8 +37,8 @@ interface IAction {
   handler: () => void
 }
 
-const ResponsiveContainer = styled.div`
-  display: none;
+const ResponsiveContainer = styled.div<{ isConfigPage?: boolean }>`
+  display: ${({ isConfigPage }) => (isConfigPage === true ? 'block' : 'none')};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: block;
   }
@@ -49,6 +49,7 @@ interface IProps {
   items: IDataProps[]
   responsiveContents?: React.ReactNode
   action?: IAction
+  isConfigPage?: boolean
 }
 
 export class DataSection extends React.Component<IProps> {
@@ -64,7 +65,11 @@ export class DataSection extends React.Component<IProps> {
           )}
         </Title>
         {responsiveContents && (
-          <ResponsiveContainer>{responsiveContents}</ResponsiveContainer>
+          <ResponsiveContainer
+            isConfigPage={this.props.isConfigPage && this.props.isConfigPage}
+          >
+            {responsiveContents}
+          </ResponsiveContainer>
         )}
         {items.map((item: IDataProps, index: number) => (
           <DataRow id={item.label.split(' ').join('-')} key={index} {...item} />

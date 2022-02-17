@@ -573,7 +573,7 @@ interface IFormSectionProps {
 }
 
 interface IStateProps {
-  resources: IOfflineData
+  offlineCountryConfig: IOfflineData
 }
 
 interface IDispatchProps {
@@ -710,7 +710,7 @@ class FormSectionComponent extends React.Component<Props> {
       fields,
       setFieldValue,
       touched,
-      resources,
+      offlineCountryConfig,
       intl,
       draftData,
       setValues,
@@ -754,7 +754,7 @@ class FormSectionComponent extends React.Component<Props> {
           const conditionalActions: string[] = getConditionalActionsForField(
             field,
             values,
-            resources,
+            offlineCountryConfig,
             draftData
           )
 
@@ -788,7 +788,7 @@ class FormSectionComponent extends React.Component<Props> {
                   options: getFieldOptions(
                     field as ISelectFormFieldWithDynamicOptions,
                     values,
-                    resources
+                    offlineCountryConfig
                   )
                 } as ISelectFormFieldWithOptions)
               : field.type === FIELD_WITH_DYNAMIC_DEFINITIONS
@@ -854,7 +854,10 @@ class FormSectionComponent extends React.Component<Props> {
               ? {
                   ...field,
                   locationList: generateLocations(
-                    getListOfLocations(resources, field.searchableResource),
+                    getListOfLocations(
+                      offlineCountryConfig,
+                      field.searchableResource
+                    ),
                     intl,
                     undefined,
                     [field.searchableType as LocationType]
@@ -1033,7 +1036,7 @@ const FormFieldGeneratorWithFormik = withFormik<
     getValidationErrorsForForm(
       props.fields,
       values,
-      props.resources,
+      props.offlineCountryConfig,
       props.draftData,
       props.requiredErrorMessage
     )
@@ -1042,7 +1045,7 @@ const FormFieldGeneratorWithFormik = withFormik<
 export const FormFieldGenerator = connect(
   (state: IStoreState, ownProps: IFormSectionProps) => ({
     ...ownProps,
-    resources: getOfflineData(state)
+    offlineCountryConfig: getOfflineData(state)
   }),
   { dynamicDispatch }
 )(FormFieldGeneratorWithFormik)
