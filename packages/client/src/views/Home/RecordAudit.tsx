@@ -29,14 +29,13 @@ import { IStoreState } from '@client/store'
 import {
   GQLEventSearchSet,
   GQLBirthEventSearchSet,
-  GQLDeathEventSearchSet,
-  GQLHumanName
+  GQLDeathEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
 import moment from 'moment'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { IFormSectionData, IContactPoint } from '@client/forms'
-import { Spinner } from '@opencrvs/components/lib/interface'
+import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -46,11 +45,6 @@ const BodyContainer = styled.div`
     margin-top: 28px;
   }
 `
-
-const StyledSpinner = styled(Spinner)`
-  margin: 20% auto;
-`
-
 const InfoContainer = styled.div`
   display: flex;
   margin-bottom: 16px;
@@ -120,17 +114,6 @@ interface IApplicationData {
   brnDrn?: string
 }
 
-interface IGQLApplication {
-  id: string
-  child?: { name: GQLHumanName[] }
-  deceased?: { name: GQLHumanName[] }
-  registration?: {
-    trackingId: string
-    type: string
-    status: { type: string }[]
-  }
-}
-
 const STATUSTOCOLOR: { [key: string]: string } = {
   DRAFT: 'violet',
   DECLARED: 'orange',
@@ -139,30 +122,6 @@ const STATUSTOCOLOR: { [key: string]: string } = {
   REGISTERED: 'green',
   CERTIFIED: 'green',
   WAITING_VALIDATION: 'teal'
-}
-
-const KEY_LABEL: ILabel = {
-  status: 'Status',
-  type: 'Event',
-  trackingId: 'Tracking ID',
-  dateOfBirth: 'Date of birth',
-  dateOfDeath: 'Date of death',
-  placeOfBirth: 'Place of birth',
-  placeOfDeath: 'Place of death',
-  informant: 'Informant',
-  brn: 'BRN',
-  drn: 'DRN'
-}
-
-const NO_DATA_LABEL: ILabel = {
-  status: 'No status',
-  type: 'No event',
-  trackingId: 'No tracking id',
-  dateOfBirth: 'No date of birth',
-  dateOfDeath: 'No date of death',
-  placeOfBirth: 'No place of birth',
-  placeOfDeath: 'No place of death',
-  informant: 'No informant'
 }
 
 const getCaptitalizedWord = (word: string | undefined): string => {
@@ -180,19 +139,6 @@ const isDeathApplication = (
   application: GQLEventSearchSet | null
 ): application is GQLDeathEventSearchSet => {
   return (application && application.type === 'Death') || false
-}
-
-const goBack = (props: IFullProps) => {
-  const historyState = props.location.state
-  const navigatedFromInsideApp = Boolean(
-    historyState && historyState.isNavigatedInsideApp
-  )
-
-  if (navigatedFromInsideApp) {
-    props.goBack()
-  } else {
-    props.goToRegistrarHomeTab('review')
-  }
 }
 
 const getDraftApplicationName = (application: IApplication): string => {
@@ -414,7 +360,9 @@ const getApplicationInfo = (
       {Object.entries(info).map(([key, value]) => {
         return (
           <InfoContainer id={'summary'} key={key}>
-            <KeyContainer id={`${key}`}>{KEY_LABEL[key]}</KeyContainer>
+            <KeyContainer id={`${key}`}>
+              {props.intl.formatMessage(recordAuditMessages[key as string])}
+            </KeyContainer>
             <ValueContainer id={`${key}_value`} value={value}>
               {value ? (
                 key === 'dateOfBirth' || key === 'dateOfDeath' ? (
@@ -423,7 +371,11 @@ const getApplicationInfo = (
                   value
                 )
               ) : isDownloaded ? (
-                NO_DATA_LABEL[key]
+                props.intl.formatMessage(
+                  recordAuditMessages[
+                    (`no${key[0].toUpperCase()}` + key.slice(1)) as string
+                  ]
+                )
               ) : (
                 <GreyedInfo id={`${key}_grey`} />
               )}
@@ -436,7 +388,6 @@ const getApplicationInfo = (
 }
 
 export const ShowRecordAudit = (props: IFullProps) => {
-  const applicationId = props.match.params.applicationId
   let application: IApplicationData | null
   application = getSavedApplications(props)
   const isDownloaded = application ? true : false
