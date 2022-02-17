@@ -47,7 +47,7 @@ export const requestSchema = Joi.object({
     customFhirFunction: Joi.string() // used for referring to random extra functions used when building fhir such as setPrimaryCaregiverReference
   },
   label: messageDescriptorSchema.required(),
-  placeholder: Joi.string(),
+  placeholder: messageDescriptorSchema,
   maxLength: Joi.number(),
   options: Joi.array().items(
     Joi.object({
@@ -59,11 +59,13 @@ export const requestSchema = Joi.object({
   fieldType: Joi.string()
     .valid(...validFieldType)
     .required(),
-  sectionPositionForField: Joi.number().required(),
+  sectionPositionForField: Joi.number(),
   enabled: Joi.boolean().required(),
   required: Joi.boolean().required(),
   custom: Joi.boolean(),
-  conditionals: Joi.string()
+  initialValue: Joi.string(),
+  nestedFieldParentRadioId: Joi.string(),
+  sectionPositionForNestedRadioField: Joi.number()
 })
 
 export const responseSchema = Joi.object({})

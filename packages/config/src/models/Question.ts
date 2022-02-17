@@ -59,16 +59,18 @@ export interface IQuestion {
   fhirSectionCode?: string
   fhirResource?: IFhirResource
   label: IMessageDescriptor
-  placeholder?: string
+  placeholder?: IMessageDescriptor
   maxLength?: number
   options?: IOptions[]
   fieldName: string
   fieldType: FieldType
-  sectionPositionForField: number
+  sectionPositionForField?: number
   enabled: boolean
   required: boolean
   custom: boolean
-  conditionals?: string
+  initialValue?: string
+  nestedFieldParentRadioId?: string
+  sectionPositionForNestedRadioField?: number
 }
 
 export interface IQuestionModel extends IQuestion, Document {}
@@ -109,7 +111,7 @@ const questionSchema = new Schema({
   fhirSectionCode: { type: String }, // "birth-encounter",
   fhirResource: { type: fhirResourceSchema },
   label: { type: messageDescriptor, required: true },
-  placeholder: { type: String, required: false },
+  placeholder: { type: messageDescriptor, required: false },
   maxLength: { type: Number, required: false },
   options: { type: [dropdownOption], required: false },
   fieldName: { type: String, required: true },
@@ -119,11 +121,14 @@ const questionSchema = new Schema({
     enum: validFieldType,
     default: FieldType.TEXT
   },
-  sectionPositionForField: { type: Number, required: true },
+  sectionPositionForField: { type: Number },
   required: { type: Boolean, required: true },
+  readonly: { type: Boolean, required: true },
   enabled: { type: Boolean, required: true },
   custom: { type: Boolean },
-  conditionals: { type: String }
+  initialValue: { type: String },
+  nestedFieldParentRadioId: { type: String },
+  sectionPositionForNestedRadioField: { type: Number }
 })
 
 export default model<IQuestionModel>('Question', questionSchema)
