@@ -473,7 +473,7 @@ function UserListComponent(props: IProps) {
     status?: string,
     underInvestigation?: boolean
   ) {
-    const showMenuIcon =
+    const canEditUserDetails =
       userDetails?.role === 'NATIONAL_SYSTEM_ADMIN' ||
       (userDetails?.role === 'LOCAL_SYSTEM_ADMIN' &&
         userDetails?.primaryOffice?.id === locationId)
@@ -483,7 +483,7 @@ function UserListComponent(props: IProps) {
     return (
       <StatusMenu>
         {statusDetails}
-        {showMenuIcon && (
+        {canEditUserDetails && (
           <ToggleMenu
             id={`user-item-${index}-menu`}
             toggleButton={<VerticalThreeDots />}
