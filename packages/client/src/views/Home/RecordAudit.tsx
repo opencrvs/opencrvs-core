@@ -519,17 +519,17 @@ export const ShowRecordAudit = (props: IFullProps) => {
           <TertiaryButton
             id="cancel"
             key="cancel"
-            onClick={() => {
-              reinstateApplication(applicationId)
-              setShowPrompt(!showPrompt)
-            }}
+            onClick={() => setShowPrompt(!showPrompt)}
           >
             {intl.formatMessage(messages.reinstateDeclarationDialogCancel)}
           </TertiaryButton>,
           <PrimaryButton
             id="continue"
             key="continue"
-            onClick={() => setShowPrompt(!showPrompt)}
+            onClick={() => {
+              reinstateApplication(applicationId)
+              setShowPrompt(!showPrompt)
+            }}
           >
             {intl.formatMessage(messages.reinstateDeclarationDialogConfirm)}
           </PrimaryButton>
