@@ -458,6 +458,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                         {type === 'REGISTERED' &&
                           this.props.showRecordCorrection && (
                             <RecordCorrectionButton
+                              id={`${type}-record-correction-${index}`}
                               align={ICON_ALIGNMENT.LEFT}
                               onClick={() => {
                                 this.props.clearCorrectionChange(

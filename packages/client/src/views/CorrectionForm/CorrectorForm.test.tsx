@@ -84,6 +84,12 @@ describe('Corrector form', () => {
         wrapper.find('#confirm_form').hostNodes().props().disabled
       ).toBeFalsy()
     })
+
+    it('should go to verify section', () => {
+      wrapper.find('#confirm_form').hostNodes().simulate('click')
+      wrapper.update()
+      expect(history.location.pathname).toContain('/verify/mother')
+    })
   })
   describe('for a birth registration with father details', () => {
     beforeEach(async () => {
