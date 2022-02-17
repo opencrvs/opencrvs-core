@@ -190,7 +190,12 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           status
         }
         user {
+          id
           username
+          avatar {
+            data
+            type
+          }
         }
       }
     }
@@ -379,7 +384,12 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
           status
         }
         user {
+          id
           username
+          avatar {
+            data
+            type
+          }
         }
       }
     }

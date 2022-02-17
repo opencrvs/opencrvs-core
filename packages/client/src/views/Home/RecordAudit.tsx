@@ -13,6 +13,7 @@
 import React from 'react'
 import { Header } from '@client/components/interface/Header/Header'
 import { Content } from '@opencrvs/components/lib/interface/Content'
+import { TableView } from '@opencrvs/components/lib/interface/TableView'
 import { Navigation } from '@client/components/interface/Navigation'
 import styled, { ITheme, withTheme } from '@client/styledComponents'
 import { ApplicationIcon } from '@opencrvs/components/lib/icons'
@@ -477,6 +478,52 @@ const downloadButton = (application: IApplicationData, props: IFullProps) => {
   }
 }
 
+const getHistory = (application: IApplicationData) => {
+  const data = [
+    {
+      name: <>Yeasin</>,
+      role: 'Registrar',
+      type: 'Chairman',
+      status: 'Active'
+    },
+    { name: 'Euan', role: 'Registrar', type: 'Chairman', status: 'Active' },
+    { name: 'Euan', role: 'Registrar', type: 'Chairman', status: 'Active' },
+    { name: 'Euan', role: 'Registrar', type: 'Chairman', status: 'Active' },
+    { name: 'Euan', role: 'Registrar', type: 'Chairman', status: 'Active' },
+    { name: 'Euan', role: 'Registrar', type: 'Chairman', status: 'Active' },
+    { name: 'Euan', role: 'Registrar', type: 'Chairman', status: 'Active' },
+    { name: 'Euan', role: 'Registrar', type: 'Chairman', status: 'Active' },
+    { name: 'Euan', role: 'Registrar', type: 'Chairman', status: 'Active' }
+  ]
+  const columns = [
+    {
+      label: 'Name',
+      width: 30,
+      key: 'name',
+      isSortable: true
+    },
+    {
+      label: 'Role',
+      width: 30,
+      key: 'role',
+      isSortable: true
+    },
+    { label: 'Type', width: 30, key: 'type' },
+    { label: 'Status', width: 10, key: 'status' }
+  ]
+  return (
+    <>
+      <TableView
+        id="task-history"
+        noResultText=""
+        hideBoxShadow={true}
+        columns={columns}
+        content={data}
+      />
+    </>
+  )
+}
+
 export const ShowRecordAudit = (props: IFullProps) => {
   let application: IApplicationData | null
   application = getSavedApplications(props)
@@ -484,6 +531,10 @@ export const ShowRecordAudit = (props: IFullProps) => {
   if (!isDownloaded) {
     application = getWQApplication(props)
   }
+
+  const foundApplication = props.outboxApplications.find(
+    (app) => app.id === application?.id
+  )
 
   return (
     <div id={'recordAudit'}>
@@ -505,6 +556,7 @@ export const ShowRecordAudit = (props: IFullProps) => {
             topActionButtons={[downloadButton(application, props)]}
           >
             {getApplicationInfo(props, application, isDownloaded)}
+            {isDownloaded && getHistory(application)}
           </Content>
         )}
       </BodyContainer>

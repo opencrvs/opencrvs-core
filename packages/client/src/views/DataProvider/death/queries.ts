@@ -158,7 +158,12 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           status
         }
         user {
+          id
           username
+          avatar {
+            data
+            type
+          }
         }
       }
     }
@@ -321,7 +326,12 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
           status
         }
         user {
+          id
           username
+          avatar {
+            data
+            type
+          }
         }
       }
     }
