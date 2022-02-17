@@ -466,25 +466,39 @@ function UserListComponent(props: IProps) {
   }
 
   function getStatusMenuType(
+    userDetails: IUserDetails | null,
+    locationId: string,
     user: GQLUser,
     index: number,
     status?: string,
     underInvestigation?: boolean
   ) {
+    const showMenuIcon =
+      userDetails?.role === 'NATIONAL_SYSTEM_ADMIN' ||
+      (userDetails?.role === 'LOCAL_SYSTEM_ADMIN' &&
+        userDetails?.primaryOffice?.id === locationId)
+        ? true
+        : false
     const statusDetails = renderStatus(status, underInvestigation)
     return (
       <StatusMenu>
         {statusDetails}
-        <ToggleMenu
-          id={`user-item-${index}-menu`}
-          toggleButton={<VerticalThreeDots />}
-          menuItems={getMenuItems(user)}
-        />
+        {showMenuIcon && (
+          <ToggleMenu
+            id={`user-item-${index}-menu`}
+            toggleButton={<VerticalThreeDots />}
+            menuItems={getMenuItems(user)}
+          />
+        )}
       </StatusMenu>
     )
   }
 
-  function generateUserContents(data: GQLQuery) {
+  function generateUserContents(
+    data: GQLQuery,
+    userDetails: IUserDetails | null,
+    locationId: string
+  ) {
     if (!data || !data.searchUsers || !data.searchUsers.results) {
       return []
     }
@@ -520,8 +534,9 @@ function UserListComponent(props: IProps) {
               avatar
             ),
             roleType: getRoleType(role, type),
-            status: renderStatus(user.status, user.underInvestigation),
             statusMenu: getStatusMenuType(
+              userDetails,
+              locationId,
               user,
               index,
               user.status,
@@ -657,7 +672,13 @@ function UserListComponent(props: IProps) {
               </TableHeader>
               <ListTable
                 isLoading={loading}
-                content={generateUserContents(data) as IDynamicValues[]}
+                content={
+                  generateUserContents(
+                    data,
+                    props.userDetails,
+                    locationId
+                  ) as IDynamicValues[]
+                }
                 columns={columns}
                 noResultText="No result to display"
                 onPageChange={(currentPage: number) => {
