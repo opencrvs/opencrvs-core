@@ -631,7 +631,7 @@ export const stringifyFieldValue = (
   }
 
   if (isDateField(field, sectionData)) {
-    return (fieldValue as Date).toISOString()
+    return fieldValue.toString()
   }
 
   return fieldValue.toString()
