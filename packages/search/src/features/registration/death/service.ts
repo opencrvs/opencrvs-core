@@ -104,18 +104,8 @@ async function updateEvent(task: fhir.Task, authHeader: string) {
   body.modifiedAt = Date.now().toString()
   if (body.type === REJECTED_STATUS) {
     const nodeText =
-      (body.type === REJECTED_STATUS &&
-        task &&
-        task.note &&
-        task.note[0].text &&
-        task.note[0].text) ||
-      ''
-    body.rejectReason =
-      (body.type === REJECTED_STATUS &&
-        task &&
-        task.reason &&
-        task.reason.text) ||
-      ''
+      (task && task.note && task.note[0].text && task.note[0].text) || ''
+    body.rejectReason = (task && task.reason && task.reason.text) || ''
     body.rejectComment = nodeText
   }
   body.updatedBy =
