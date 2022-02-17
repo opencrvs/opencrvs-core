@@ -161,7 +161,6 @@ export class SubmissionController {
 
     await this.requeueHangingApplications()
     const applications = this.getSubmitableApplications()
-    console.log(applications)
     console.debug(
       `[${this.syncCount}] Syncing ${applications.length} applications`
     )
