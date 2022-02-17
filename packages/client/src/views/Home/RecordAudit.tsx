@@ -51,6 +51,7 @@ import { getScope } from '@client/profile/profileSelectors'
 import { Scope } from '@client/utils/authUtils'
 import { ARCHIVED } from '@client/utils/constants'
 import { messages } from '@client/i18n/messages/views/recordAudit'
+import NotificationToast from '@client/views/OfficeHome/NotificationToast'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -536,6 +537,7 @@ export const ShowRecordAudit = (props: IFullProps) => {
       >
         {intl.formatMessage(messages.reinstateDeclarationDialogDescription)}
       </ResponsiveModal>
+      <NotificationToast />
     </div>
   )
 }
