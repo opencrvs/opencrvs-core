@@ -119,12 +119,7 @@ async function updateEvent(task: fhir.Task, authHeader: string) {
       task.note.length > 0 &&
       task.note[task.note.length - 1]) || { text: '' }
     const nodeText = rejectAnnotation.text
-    body.rejectReason =
-      (body.type === REJECTED_STATUS &&
-        task &&
-        task.reason &&
-        task.reason.text) ||
-      ''
+    body.rejectReason = (task && task.reason && task.reason.text) || ''
     body.rejectComment = nodeText
   }
   body.updatedBy =
