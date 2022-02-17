@@ -1466,7 +1466,7 @@ describe('When an existing application requested correction', () => {
       const applicationEventPoint =
         influxClient.writePoints.mock.calls[0][0].find(
           ({ measurement }: { measurement: string }) =>
-            measurement === 'certification_payment'
+            measurement === 'correction_payment'
         )
 
       expect(applicationEventPoint).toMatchSnapshot()
