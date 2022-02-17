@@ -358,7 +358,10 @@ const getApplicationInfo = (
   let informant = getCaptitalizedWord(application?.informant)
 
   const status = getCaptitalizedWord(application?.status).split('_')
-  const finalStatus = status.reduce((accum, cur) => accum + ' ' + cur, '')
+  const finalStatus = status.reduce(
+    (accum, cur, idx) => (idx > 0 ? accum + ' ' + cur : cur),
+    ''
+  )
 
   if (application?.informantContact) {
     informant =
