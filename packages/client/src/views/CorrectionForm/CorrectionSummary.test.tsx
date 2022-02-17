@@ -17,7 +17,9 @@ import {
   getFileFromBase64String,
   validImageB64String,
   flushPromises,
-  mockDeathApplicationData
+  mockDeathApplicationData,
+  getRegisterFormFromStore,
+  mockOfflineData
 } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
@@ -26,6 +28,9 @@ import { IApplication, storeApplication } from '@client/applications'
 import { CorrectionForm } from './CorrectionForm'
 import { formatUrl } from '@client/navigation'
 import { CERTIFICATE_CORRECTION } from '@client/navigation/routes'
+import { REQUEST_BIRTH_REG_CORRECTION } from '@client/forms/correction/mutations'
+import { draftToGqlTransformer } from '@client/transformer'
+import { getOfflineDataSuccess } from '@client/offline/actions'
 
 let wrapper: ReactWrapper<{}, {}>
 
@@ -162,6 +167,8 @@ describe('Correction summary', () => {
   describe('for a birth application', () => {
     beforeEach(async () => {
       store.dispatch(storeApplication(birthApplication))
+      store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
+      const form = await getRegisterFormFromStore(store, Event.BIRTH)
       wrapper = await createTestComponent(
         <CorrectionForm
           {...createRouterProps(
@@ -180,7 +187,25 @@ describe('Correction summary', () => {
         />,
         {
           store,
-          history
+          history,
+          graphqlMocks: [
+            {
+              request: {
+                query: REQUEST_BIRTH_REG_CORRECTION,
+                variables: draftToGqlTransformer(
+                  form,
+                  birthApplication.data,
+                  birthApplication.id,
+                  birthApplication.originalData
+                )
+              },
+              result: {
+                data: {
+                  requsetBirthRegistrationCorrection: '201908122365BDSS0SE1'
+                }
+              }
+            }
+          ]
         }
       )
     })
@@ -361,6 +386,17 @@ describe('Correction summary', () => {
       wrapper.update()
 
       expect(history.location.pathname).toContain('/review')
+    })
+
+    it('after successful correction request redirects to  reg home review tab', () => {
+      wrapper
+        .find('#correctionFees_NOT_REQUIRED')
+        .hostNodes()
+        .simulate('change', { target: { checked: true } })
+      wrapper.update()
+      wrapper.find('#make_correction').hostNodes().simulate('click')
+      wrapper.update()
+      expect(history.location.pathname).toContain('registration-home/review')
     })
   })
   describe('for a death application', () => {

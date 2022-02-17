@@ -38,16 +38,17 @@ const SpinnerWrapper = styled.div`
 type IProps = IStateProps & IDispatchProps
 
 function CorrectionFormComponent({ sectionId, ...props }: IProps) {
+  const { application, modifyApplication } = props
   const logTime = useCallback(
     (timeMs: number) => {
-      const application = props.application
-      if (!application.timeLoggedMS) {
-        application.timeLoggedMS = 0
+      const applicationUpdated = application
+      if (!applicationUpdated.timeLoggedMS) {
+        applicationUpdated.timeLoggedMS = 0
       }
-      application.timeLoggedMS += timeMs
-      props.modifyApplication(application)
+      applicationUpdated.timeLoggedMS += timeMs
+      props.modifyApplication(applicationUpdated)
     },
-    [props.modifyApplication, props.application]
+    [modifyApplication, application]
   )
 
   if (props.isWritingDraft) {
