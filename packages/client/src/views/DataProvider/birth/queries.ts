@@ -183,15 +183,21 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         date
         action
         location {
+          id
           name
         }
         office {
+          id
           name
-          status
         }
         user {
-          id
-          username
+          type
+          role
+          name {
+            firstNames
+            familyName
+            use
+          }
           avatar {
             data
             type
@@ -377,15 +383,21 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         date
         action
         location {
+          id
           name
         }
         office {
+          id
           name
-          status
         }
         user {
-          id
-          username
+          type
+          role
+          name {
+            firstNames
+            familyName
+            use
+          }
           avatar {
             data
             type

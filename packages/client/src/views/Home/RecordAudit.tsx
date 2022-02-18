@@ -47,6 +47,8 @@ import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { constantsMessages } from '@client/i18n/messages'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
+import { getLanguage } from '@client/i18n/selectors'
+import { getIndividualNameObj } from '@client/utils/userUtils'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -93,6 +95,7 @@ const ReviewButton = styled(PrimaryButton)`
 `
 
 interface IStateProps {
+  language: string
   workqueue: IWorkqueue
   resources: IOfflineData
   savedApplications: IApplication[]
@@ -478,38 +481,47 @@ const downloadButton = (application: IApplicationData, props: IFullProps) => {
   }
 }
 
-const getHistory = (application: IApplicationData) => {
-  const data = [
-    {
-      name: <>Yeasin</>,
-      role: 'Registrar',
-      type: 'Chairman',
-      status: 'Active'
-    },
-    { name: 'Euan', role: 'Registrar', type: 'Chairman', status: 'Active' },
-    { name: 'Euan', role: 'Registrar', type: 'Chairman', status: 'Active' },
-    { name: 'Euan', role: 'Registrar', type: 'Chairman', status: 'Active' },
-    { name: 'Euan', role: 'Registrar', type: 'Chairman', status: 'Active' },
-    { name: 'Euan', role: 'Registrar', type: 'Chairman', status: 'Active' },
-    { name: 'Euan', role: 'Registrar', type: 'Chairman', status: 'Active' },
-    { name: 'Euan', role: 'Registrar', type: 'Chairman', status: 'Active' },
-    { name: 'Euan', role: 'Registrar', type: 'Chairman', status: 'Active' }
-  ]
+const getName = (nameObject: Array<GQLHumanName | null>, language: string) => {
+  const nameObj = getIndividualNameObj(nameObject, language)
+  if (nameObj) {
+    return `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+  }
+  return ''
+}
+
+const getHistory = (application: IApplicationData, props: IFullProps) => {
+  const { language } = props
+  const savedApplication = props.outboxApplications.find(
+    (app) => app.id === application.id
+  )
+
+  if (!savedApplication?.data?.history?.length) return <></>
+
+  const historyData = (
+    savedApplication.data.history as unknown as { [key: string]: any }[]
+  ).map((item) => ({
+    date: item?.date,
+    action: item?.action,
+    avatar: item.user?.avatar?.data,
+    user: getName(item.user.name, language),
+    type: item.user.role,
+    location: item.location.name
+  }))
+
   const columns = [
     {
-      label: 'Name',
-      width: 30,
-      key: 'name',
-      isSortable: true
+      label: 'Action',
+      width: 15,
+      key: 'action'
     },
     {
-      label: 'Role',
-      width: 30,
-      key: 'role',
-      isSortable: true
+      label: 'Date',
+      width: 20,
+      key: 'date'
     },
-    { label: 'Type', width: 30, key: 'type' },
-    { label: 'Status', width: 10, key: 'status' }
+    { label: 'By', width: 25, key: 'user' },
+    { label: 'Type', width: 20, key: 'type' },
+    { label: 'Location', width: 20, key: 'location' }
   ]
   return (
     <>
@@ -518,7 +530,7 @@ const getHistory = (application: IApplicationData) => {
         noResultText=""
         hideBoxShadow={true}
         columns={columns}
-        content={data}
+        content={historyData}
       />
     </>
   )
@@ -531,10 +543,6 @@ export const ShowRecordAudit = (props: IFullProps) => {
   if (!isDownloaded) {
     application = getWQApplication(props)
   }
-
-  const foundApplication = props.outboxApplications.find(
-    (app) => app.id === application?.id
-  )
 
   return (
     <div id={'recordAudit'}>
@@ -556,7 +564,7 @@ export const ShowRecordAudit = (props: IFullProps) => {
             topActionButtons={[downloadButton(application, props)]}
           >
             {getApplicationInfo(props, application, isDownloaded)}
-            {isDownloaded && getHistory(application)}
+            {isDownloaded && getHistory(application, props)}
           </Content>
         )}
       </BodyContainer>
@@ -566,6 +574,7 @@ export const ShowRecordAudit = (props: IFullProps) => {
 
 function mapStateToProps(state: IStoreState): IStateProps {
   return {
+    language: getLanguage(state),
     workqueue: state.workqueueState.workqueue,
     resources: getOfflineData(state),
     savedApplications:
