@@ -140,7 +140,7 @@ export function getBirthMutationMappings(
       }
     case Action.REINSTATE_APPLICATION:
       return {
-        mutation: REJECT_BIRTH_APPLICATION,
+        mutation: REINSTATE_BIRTH_APPLICATION,
         variables: {
           ...payload
         },

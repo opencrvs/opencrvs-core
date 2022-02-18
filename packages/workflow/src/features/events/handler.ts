@@ -322,12 +322,9 @@ export async function fhirWorkflowEventHandler(
       )
       break
     case Events.BIRTH_MARK_REINSTATED:
-      await triggerEvent(
-        Events.BIRTH_MARK_REINSTATED,
-        request.payload,
-        request.headers.authorization
-      )
+    case Events.DEATH_MARK_REINSTATED:
       response = await updateTaskHandler(request, h, event)
+      await triggerEvent(event, request.payload, request.headers.authorization)
       break
     case Events.DEATH_IN_PROGRESS_DEC:
       response = await createRegistrationHandler(request, h, event)
@@ -429,14 +426,6 @@ export async function fhirWorkflowEventHandler(
         request.payload,
         request.headers.authorization
       )
-      break
-    case Events.DEATH_MARK_REINSTATED:
-      await triggerEvent(
-        Events.DEATH_MARK_REINSTATED,
-        request.payload,
-        request.headers.authorization
-      )
-      response = await updateTaskHandler(request, h, event)
       break
     default:
       // forward as-is to hearth
