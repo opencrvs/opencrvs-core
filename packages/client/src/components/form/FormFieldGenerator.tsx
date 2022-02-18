@@ -118,6 +118,8 @@ import { LocationSearch } from '@opencrvs/components/lib/interface'
 import { REGEXP_NUMBER_INPUT_NON_NUMERIC } from '@client/utils/constants'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { generateLocations } from '@client/utils/locationUtils'
+import { IUserDetails } from '@client/utils/userUtils'
+import { getUserDetails } from '@client/profile/profileSelectors'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -235,6 +237,7 @@ function GeneratedInputField({
   }
 
   if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
+    console.log('value', value)
     return (
       <InputField {...inputFieldProps}>
         <Select
@@ -538,7 +541,10 @@ function GeneratedInputField({
   )
 }
 
-const mapFieldsToValues = (fields: IFormField[]) =>
+const mapFieldsToValues = (
+  fields: IFormField[],
+  userDetails: IUserDetails | null
+) =>
   fields.reduce((memo, field) => {
     let fieldInitialValue = field.initialValue as IFormFieldValue
 
@@ -558,6 +564,49 @@ const mapFieldsToValues = (fields: IFormField[]) =>
         nestedFields: nestedInitialValues
       }
     }
+
+    if (field.type === SELECT_WITH_DYNAMIC_OPTIONS && !field.initialValue) {
+      const district =
+        userDetails?.catchmentArea && userDetails?.catchmentArea[0].id
+      const state =
+        userDetails?.catchmentArea && userDetails?.catchmentArea[1].id
+
+      console.log(field)
+      console.log(userDetails)
+
+      if (field.name === 'state' && !field.initialValue) {
+        // const nestedFieldsFlatted = flatten(Object.values(field.nestedFields))
+
+        // const nestedInitialValues = nestedFieldsFlatted.reduce(
+        //   (nestedValues, nestedField) => ({
+        //     ...nestedValues,
+        //     [nestedField.name]: nestedField.initialValue
+        //   }),
+        //   {}
+        // )
+
+        // let value =  state as IFormFieldValue
+        // nestedFields: nestedInitialValues
+        fieldInitialValue = state as IFormFieldValue
+      }
+      if (field.name === 'district' && !field.initialValue) {
+        // const nestedFieldsFlatted = flatten(Object.values(field.nestedFields))
+
+        // const nestedInitialValues = nestedFieldsFlatted.reduce(
+        //   (nestedValues, nestedField) => ({
+        //     ...nestedValues,
+        //     [nestedField.name]: nestedField.initialValue
+        //   }),
+        //   {}
+        // )
+
+        // fieldInitialValue = {
+        //   value: district as IFormFieldValue
+        //   // nestedFields: nestedInitialValues
+        // }
+        fieldInitialValue = district as IFormFieldValue
+      }
+    }
     return { ...memo, [field.name]: fieldInitialValue }
   }, {})
 
@@ -575,6 +624,7 @@ interface IFormSectionProps {
 
 interface IStateProps {
   offlineCountryConfig: IOfflineData
+  userDetails: IUserDetails | null
 }
 
 interface IDispatchProps {
@@ -1031,7 +1081,8 @@ const FormFieldGeneratorWithFormik = withFormik<
   IFormSectionProps & IStateProps & IDispatchProps,
   IFormSectionData
 >({
-  mapPropsToValues: (props) => mapFieldsToValues(props.fields),
+  mapPropsToValues: (props) =>
+    mapFieldsToValues(props.fields, props.userDetails),
   handleSubmit: (values) => {},
   validate: (values, props: IFormSectionProps & IStateProps) =>
     getValidationErrorsForForm(
@@ -1046,7 +1097,8 @@ const FormFieldGeneratorWithFormik = withFormik<
 export const FormFieldGenerator = connect(
   (state: IStoreState, ownProps: IFormSectionProps) => ({
     ...ownProps,
-    offlineCountryConfig: getOfflineData(state)
+    offlineCountryConfig: getOfflineData(state),
+    userDetails: getUserDetails(state)
   }),
   { dynamicDispatch }
 )(FormFieldGeneratorWithFormik)

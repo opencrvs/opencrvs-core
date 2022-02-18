@@ -100,6 +100,7 @@ export interface IDynamicOptions {
   jurisdictionType?: string
   resource?: string
   options?: { [key: string]: ISelectOption[] }
+  initialValue?: string
 }
 
 export interface IDispatchOptions {
