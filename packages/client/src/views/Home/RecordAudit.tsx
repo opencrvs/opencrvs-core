@@ -455,29 +455,6 @@ const getApplicationInfo = (
   )
 }
 
-// const showActions = (application: IApplicationData, isDownloaded: boolean) => {
-//   const actions = []
-//   isDownloaded &&
-//     application.status === SUBMISSION_STATUS.REGISTERED &&
-//     actions.push(
-//       <TertiaryButton
-//         id="btn-correct-record"
-//         align={ICON_ALIGNMENT.LEFT}
-//         icon={() => <Edit />}
-//         onClick={() => {
-//           props.clearCorrectionChange(eventDetails.id)
-//           this.props.goToCertificateCorrection(
-//             eventDetails.id,
-//             CorrectionSection.Corrector
-//           )
-//         }}
-//       >
-//         {intl.formatMessage(correctionMessages.title)}
-//       </TertiaryButton>
-//     )
-//   return actions
-// }
-
 export const ShowRecordAudit = (props: IFullProps) => {
   const applicationId = props.match.params.applicationId
   let application: IApplicationData | null
@@ -487,6 +464,29 @@ export const ShowRecordAudit = (props: IFullProps) => {
     application = getWQApplication(props)
   }
 
+  const actions = []
+  if (
+    isDownloaded &&
+    application &&
+    application.status === SUBMISSION_STATUS.REGISTERED
+  ) {
+    actions.push(
+      <TertiaryButton
+        id="btn-correct-record"
+        align={ICON_ALIGNMENT.LEFT}
+        icon={() => <Edit />}
+        onClick={() => {
+          props.clearCorrectionChange(applicationId)
+          props.goToCertificateCorrection(
+            applicationId,
+            CorrectionSection.Corrector
+          )
+        }}
+      >
+        {props.intl.formatMessage(correctionMessages.title)}
+      </TertiaryButton>
+    )
+  }
   return (
     <div id={'recordAudit'}>
       <Header />
@@ -497,22 +497,7 @@ export const ShowRecordAudit = (props: IFullProps) => {
             title={application.name || 'No name provided'}
             titleColor={application.name ? 'copy' : 'grey600'}
             size={ContentSize.LARGE}
-            topActionButtons={[
-              <TertiaryButton
-                id="btn-correct-record"
-                align={ICON_ALIGNMENT.LEFT}
-                icon={() => <Edit />}
-                onClick={() => {
-                  props.clearCorrectionChange(applicationId)
-                  props.goToCertificateCorrection(
-                    applicationId,
-                    CorrectionSection.Corrector
-                  )
-                }}
-              >
-                {props.intl.formatMessage(correctionMessages.title)}
-              </TertiaryButton>
-            ]}
+            topActionButtons={actions}
             icon={() => (
               <ApplicationIcon
                 color={
