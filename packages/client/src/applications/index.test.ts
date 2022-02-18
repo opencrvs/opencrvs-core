@@ -12,9 +12,17 @@
 import {
   mergeDeclaredApplications,
   filterProcessingApplications,
-  filterProcessingApplicationsFromQuery
+  filterProcessingApplicationsFromQuery,
+  createApplication,
+  archiveApplication,
+  storeApplication,
+  IUserData
 } from '.'
 import { Event } from '@client/forms'
+import { AppStore, createStore } from '@client/store'
+import { mockApplicationData, flushPromises } from '@client/tests/util'
+import { IUserDetails } from '@client/utils/userUtils'
+import { storage } from '@client/storage'
 
 describe('query result filtering tests', () => {
   describe('.filterProcessingApplications()', () => {
@@ -257,5 +265,65 @@ describe('Utilty functions', () => {
     mergeDeclaredApplications(applications, declaredApplications)
 
     expect(applications).toHaveLength(3)
+  })
+})
+
+describe('archiveApplication tests', () => {
+  let store: AppStore
+  const application = createApplication(Event.BIRTH, mockApplicationData)
+  let indexedDB: { USER_DATA: string; USER_DETAILS: string }
+
+  beforeEach(() => {
+    store = createStore().store
+    store.dispatch(storeApplication(application))
+
+    const currentUserData: IUserData = {
+      userID: '123',
+      applications: [application]
+    }
+
+    const currentUserDetails: IUserDetails = {
+      language: 'en',
+      userMgntUserID: '123',
+      localRegistrar: { name: [] }
+    }
+
+    indexedDB = {
+      USER_DATA: JSON.stringify([currentUserData]),
+      USER_DETAILS: JSON.stringify(currentUserDetails)
+    }
+
+    // Mocking storage reading
+    // @ts-ignore
+    storage.getItem = jest.fn((key: string) => {
+      switch (key) {
+        case 'USER_DATA':
+        case 'USER_DETAILS':
+          return indexedDB[key]
+        default:
+          return undefined
+      }
+    })
+
+    // Mocking storage writing
+    // @ts-ignore
+    storage.setItem = jest.fn((key: string, value: string) => {
+      switch (key) {
+        case 'USER_DATA':
+        case 'USER_DETAILS':
+          indexedDB[key] = value
+          break
+        default:
+          break
+      }
+    })
+  })
+
+  it('should make an application ready to be archived', async () => {
+    store.dispatch(archiveApplication(application.id))
+    await flushPromises()
+    const applications = JSON.parse(indexedDB.USER_DATA)[0].applications
+
+    expect(applications[0].submissionStatus).toBe('READY_TO_ARCHIVE')
   })
 })

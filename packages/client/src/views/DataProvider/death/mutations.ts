@@ -25,12 +25,12 @@ const SUBMIT_DEATH_APPLICATION = gql`
     }
   }
 `
-const APPROVE_DEATH_APPLICATION = gql`
+export const APPROVE_DEATH_APPLICATION = gql`
   mutation submitMutation($id: ID!, $details: DeathRegistrationInput) {
     markDeathAsValidated(id: $id, details: $details)
   }
 `
-const REGISTER_DEATH_APPLICATION = gql`
+export const REGISTER_DEATH_APPLICATION = gql`
   mutation submitMutation($id: ID!, $details: DeathRegistrationInput) {
     markDeathAsRegistered(id: $id, details: $details) {
       id
@@ -70,7 +70,7 @@ const REGISTER_DEATH_APPLICATION = gql`
     }
   }
 `
-const REJECT_DEATH_APPLICATION = gql`
+export const REJECT_DEATH_APPLICATION = gql`
   mutation submitMutation($id: String!, $reason: String!, $comment: String!) {
     markEventAsVoided(id: $id, reason: $reason, comment: $comment)
   }
@@ -81,13 +81,13 @@ export const REINSTATE_DEATH_APPLICATION = gql`
   }
 `
 
-const ARCHIVE_DEATH_APPLICATION = gql`
+export const ARCHIVE_DEATH_APPLICATION = gql`
   mutation submitMutation($id: String!) {
     markEventAsArchived(id: $id)
   }
 `
 
-const COLLECT_DEATH_CERTIFICATE = gql`
+export const COLLECT_DEATH_CERTIFICATE = gql`
   mutation submitMutation($id: ID!, $details: DeathRegistrationInput!) {
     markDeathAsCertified(id: $id, details: $details)
   }
