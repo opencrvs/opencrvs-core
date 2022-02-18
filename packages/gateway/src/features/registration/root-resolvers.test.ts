@@ -59,6 +59,16 @@ const certifyToken = jwt.sign(
   }
 )
 
+const sysAdminToken = jwt.sign(
+  { scope: ['sysadmin'] },
+  readFileSync('../auth/test/cert.key'),
+  {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:gateway-user'
+  }
+)
+
 const authHeaderRegCert = {
   Authorization: `Bearer ${registerCertifyToken}`
 }
@@ -72,6 +82,14 @@ const authHeaderCertify = {
 }
 
 const authHeaderNotRegCert = {
+  Authorization: `Bearer ${declareToken}`
+}
+
+const authHeaderSysAdmin = {
+  Authorization: `Bearer ${sysAdminToken}`
+}
+
+const authHeaderNotSysAdmin = {
   Authorization: `Bearer ${declareToken}`
 }
 
@@ -152,6 +170,100 @@ beforeEach(() => {
 })
 
 describe('Registration root resolvers', () => {
+  describe('searchBirthRegistrations()', () => {
+    it('throws an error if the user does not have sysadmin scope', async () => {
+      expect(
+        resolvers.Query.searchBirthRegistrations(
+          {},
+          {
+            fromDate: new Date('05 October 2011 14:48 UTC'),
+            toDate: new Date('05 October 2012 14:48 UTC')
+          },
+          authHeaderNotSysAdmin
+        )
+      ).rejects.toThrowError('User does not have a sysadmin scope')
+    })
+
+    it('returns an array of compositions', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          entry: [
+            {
+              resource: {
+                id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
+                type: {
+                  coding: [
+                    {
+                      code: 'birth-application'
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        })
+      )
+
+      const compositions = await resolvers.Query.searchBirthRegistrations(
+        {},
+        {
+          fromDate: new Date('05 October 2011 14:48 UTC'),
+          toDate: new Date('05 October 2012 14:48 UTC')
+        },
+        authHeaderSysAdmin
+      )
+
+      expect(compositions[0].id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
+    })
+  })
+
+  describe('searchDeathRegistrations()', () => {
+    it('throws an error if the user does not have sysadmin scope', async () => {
+      expect(
+        resolvers.Query.searchDeathRegistrations(
+          {},
+          {
+            fromDate: new Date('05 October 2011 14:48 UTC'),
+            toDate: new Date('05 October 2012 14:48 UTC')
+          },
+          authHeaderNotSysAdmin
+        )
+      ).rejects.toThrowError('User does not have a sysadmin scope')
+    })
+
+    it('returns an array of compositions', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          entry: [
+            {
+              resource: {
+                id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
+                type: {
+                  coding: [
+                    {
+                      code: 'death-application'
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        })
+      )
+
+      const compositions = await resolvers.Query.searchDeathRegistrations(
+        {},
+        {
+          fromDate: new Date('05 October 2011 14:48 UTC'),
+          toDate: new Date('05 October 2012 14:48 UTC')
+        },
+        authHeaderSysAdmin
+      )
+
+      expect(compositions[0].id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
+    })
+  })
+
   describe('fetchBirthRegistration()', () => {
     it('returns object of composition result', async () => {
       fetch.mockResponseOnce(
