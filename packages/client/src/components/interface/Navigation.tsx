@@ -153,6 +153,7 @@ interface IProps {
   navigationWidth?: number
   menuCollapse?: () => void
   userInfo?: IUserInfo
+  deselectAllTabs?: boolean
 }
 
 interface IDispatchProps {
@@ -186,7 +187,7 @@ const TAB_LABEL = {
   requiresUpdate: 'Requires Updates',
   sentForUpdates: 'Sent for updates',
   sentForApproval: 'Sent for approval',
-  externalValidation: 'In external Validation',
+  externalValidation: 'Waiting for validation',
   readyToPrint: 'Ready to print ',
   application: 'Application',
   performance: 'Performance',
@@ -235,6 +236,7 @@ export const NavigationView = (props: IFullProps) => {
     intl,
     match,
     userDetails,
+    deselectAllTabs,
     enableMenuSelection = true,
     activeMenuItem,
     goToConfigAction,
@@ -246,11 +248,14 @@ export const NavigationView = (props: IFullProps) => {
     menuCollapse,
     userInfo
   } = props
-  const tabId = match.params.tabId
+  const tabId = deselectAllTabs
+    ? ''
+    : match.params.tabId
     ? match.params.tabId
     : activeMenuItem
     ? activeMenuItem
     : 'review'
+
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
   const { loading, error, data, initialSyncDone } = workqueue
   const filteredData = filterProcessingApplicationsFromQuery(

@@ -15,12 +15,11 @@ import {
   dynamicConstantsMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/registrarHome'
-import { goToApplicationDetails, goToPage } from '@client/navigation'
+import { goToApplicationRecordAudit, goToPage } from '@client/navigation'
 import { getScope } from '@client/profile/profileSelectors'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
 import styled, { ITheme } from '@client/styledComponents'
-import { RowHistoryView } from '@client/views/OfficeHome/RowHistoryView'
 import { Validate } from '@opencrvs/components/lib/icons'
 import {
   ColumnContentAlignment,
@@ -44,7 +43,7 @@ interface IBaseApprovalTabProps {
   theme: ITheme
   goToPage: typeof goToPage
   registrarLocationId: string | null
-  goToApplicationDetails: typeof goToApplicationDetails
+  goToApplicationRecordAudit: typeof goToApplicationRecordAudit
   outboxApplications: IApplication[]
   queryData: {
     data: GQLEventSearchResultSet
@@ -84,12 +83,6 @@ class ApprovalTabComponent extends React.Component<
 
   recordWindowWidth = () => {
     this.setState({ width: window.innerWidth })
-  }
-
-  getExpandable = () => {
-    return this.state.width > this.props.theme.grid.breakpoints.lg
-      ? true
-      : false
   }
 
   getColumns = () => {
@@ -187,18 +180,11 @@ class ApprovalTabComponent extends React.Component<
         rowClickHandler: [
           {
             label: 'rowClickHandler',
-            handler: () => this.props.goToApplicationDetails(reg.id)
+            handler: () => this.props.goToApplicationRecordAudit(reg.id)
           }
         ]
       }
     })
-  }
-
-  renderExpandedComponent = (itemId: string) => {
-    const { results } = this.props.queryData && this.props.queryData.data
-    const eventDetails =
-      results && results.find((result) => result && result.id === itemId)
-    return <RowHistoryView eventDetails={eventDetails} />
   }
 
   render() {
@@ -217,14 +203,12 @@ class ApprovalTabComponent extends React.Component<
         <GridTable
           content={this.transformValidatedContent(data)}
           columns={this.getColumns()}
-          renderExpandedComponent={this.renderExpandedComponent}
           noResultText={intl.formatMessage(constantsMessages.noResults)}
           onPageChange={onPageChange}
           pageSize={this.pageSize}
           totalItems={(data && data.totalItems) || 0}
           currentPage={page}
-          expandable={this.getExpandable()}
-          clickable={!this.getExpandable()}
+          clickable={true}
           showPaginated={this.props.showPaginated}
           loading={this.props.loading}
           loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
@@ -247,5 +231,5 @@ function mapStateToProps(state: IStoreState) {
 
 export const ApprovalTab = connect(mapStateToProps, {
   goToPage,
-  goToApplicationDetails
+  goToApplicationRecordAudit
 })(injectIntl(withTheme(ApprovalTabComponent)))
