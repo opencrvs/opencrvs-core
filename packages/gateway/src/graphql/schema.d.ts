@@ -1112,6 +1112,7 @@ export interface GQLReasonsNotApplyingInput {
 
 export const enum GQLRegStatus {
   IN_PROGRESS = 'IN_PROGRESS',
+  ARCHIVED = 'ARCHIVED',
   DECLARED = 'DECLARED',
   WAITING_VALIDATION = 'WAITING_VALIDATION',
   VALIDATED = 'VALIDATED',
