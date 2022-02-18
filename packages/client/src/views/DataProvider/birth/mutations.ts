@@ -82,7 +82,7 @@ export const ARCHIVE_BIRTH_APPLICATION = gql`
   }
 `
 
-const COLLECT_BIRTH_CERTIFICATE = gql`
+export const COLLECT_BIRTH_CERTIFICATE = gql`
   mutation submitMutation($id: ID!, $details: BirthRegistrationInput!) {
     markBirthAsCertified(id: $id, details: $details)
   }

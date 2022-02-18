@@ -213,4 +213,16 @@ describe('Record audit', () => {
 
     expect(component.find('ResponsiveModal').prop('show')).toBeTruthy()
   })
+
+  it('should close the confirmation modal when cancel button is clicked', async () => {
+    component.find('#archive_button').hostNodes().simulate('click')
+
+    component.update()
+
+    component.find('#cancel-btn').hostNodes().simulate('click')
+
+    component.update()
+
+    expect(component.find('ResponsiveModal').prop('show')).toBe(false)
+  })
 })

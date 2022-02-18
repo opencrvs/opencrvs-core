@@ -502,7 +502,7 @@ const ShowRecordAudit = (props: IFullProps) => {
             {intl.formatMessage(buttonMessages.cancel)}
           </TertiaryButton>,
           <DangerButton
-            id="edit_confirm"
+            id="archive_confirm"
             key="submit"
             onClick={() => {
               props.archiveApplication(applicationId)
