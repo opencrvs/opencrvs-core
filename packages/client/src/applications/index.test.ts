@@ -294,27 +294,25 @@ describe('archiveApplication tests', () => {
     }
 
     // Mocking storage reading
-    // @ts-ignore
     storage.getItem = jest.fn((key: string) => {
       switch (key) {
         case 'USER_DATA':
         case 'USER_DETAILS':
-          return indexedDB[key]
+          return Promise.resolve(indexedDB[key])
         default:
-          return undefined
+          return Promise.resolve(null)
       }
     })
 
     // Mocking storage writing
-    // @ts-ignore
     storage.setItem = jest.fn((key: string, value: string) => {
       switch (key) {
         case 'USER_DATA':
         case 'USER_DETAILS':
           indexedDB[key] = value
-          break
+          return Promise.resolve(indexedDB[key])
         default:
-          break
+          return Promise.resolve(value)
       }
     })
   })

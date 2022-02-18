@@ -27,8 +27,7 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import {
   IWorkqueue,
   IApplication,
-  archiveApplication,
-  SUBMISSION_STATUS
+  archiveApplication
 } from '@client/applications'
 import { IStoreState } from '@client/store'
 import {
@@ -51,6 +50,12 @@ import {
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { messages } from '@client/i18n/messages/views/recordAudit'
 import NotificationToast from '@client/views/OfficeHome/NotificationToast'
+import {
+  ARCHIVED,
+  DECLARED,
+  VALIDATED,
+  REJECTED
+} from '@client/utils/constants'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -143,11 +148,7 @@ const STATUSTOCOLOR: { [key: string]: string } = {
   WAITING_VALIDATION: 'teal'
 }
 
-const ARCHIVABLE_STATUSES = [
-  SUBMISSION_STATUS.DECLARED.toString(),
-  SUBMISSION_STATUS.REJECTED.toString(),
-  SUBMISSION_STATUS.APPROVED.toString()
-]
+const ARCHIVABLE_STATUSES = [DECLARED, VALIDATED, REJECTED]
 
 const KEY_LABEL: ILabel = {
   status: 'Status',
@@ -484,12 +485,8 @@ const ShowRecordAudit = (props: IFullProps) => {
             size={'large'}
             icon={() => (
               <ApplicationIcon
-                isArchive={application?.status === SUBMISSION_STATUS.ARCHIVED}
-                color={
-                  STATUSTOCOLOR[
-                    application?.status || SUBMISSION_STATUS.ARCHIVED
-                  ]
-                }
+                isArchive={application?.status === ARCHIVED}
+                color={STATUSTOCOLOR[application?.status || 'DRAFT']}
               />
             )}
           >
