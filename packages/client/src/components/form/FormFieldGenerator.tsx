@@ -299,6 +299,7 @@ function GeneratedInputField({
           name={fieldDefinition.name}
           value={value as string}
           notice={fieldDefinition.notice}
+          flexDirection={fieldDefinition.flexDirection}
         />
       </InputField>
     )
