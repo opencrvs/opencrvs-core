@@ -19,12 +19,12 @@ import { fetchFHIR } from '@metrics/api'
 type YYYY_MM_DD = string
 type ISO_DATE = string
 
-export function getAgeInDays(dateOfBirth: YYYY_MM_DD) {
-  return getDurationInDays(dateOfBirth, new Date().toISOString())
+export function getAgeInDays(dateOfBirth: YYYY_MM_DD, fromDate: Date) {
+  return getDurationInDays(dateOfBirth, fromDate.toISOString())
 }
 
-export function getAgeInYears(dateOfBirth: YYYY_MM_DD) {
-  return getDurationInYears(dateOfBirth, new Date().toISOString())
+export function getAgeInYears(dateOfBirth: YYYY_MM_DD, fromDate: Date) {
+  return getDurationInYears(dateOfBirth, fromDate.toISOString())
 }
 
 export function getDurationInDays(from: ISO_DATE, to: ISO_DATE) {
