@@ -52,6 +52,7 @@ interface IConstantsMessages
   dob: MessageDescriptor
   dod: MessageDescriptor
   downloading: MessageDescriptor
+  downloaded: MessageDescriptor
   eventDate: MessageDescriptor
   eventType: MessageDescriptor
   lastUpdated: MessageDescriptor
@@ -342,6 +343,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Downloading...',
     description: 'Label for application download status Downloading',
     id: 'constants.downloading'
+  },
+  downloaded: {
+    defaultMessage: 'Downloaded',
+    description: 'Label for application download status Downloaded',
+    id: 'constants.downloaded'
   },
   eventDate: {
     defaultMessage: 'Date of event',

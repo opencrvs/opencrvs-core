@@ -15,6 +15,7 @@ import { Header } from '@client/components/interface/Header/Header'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import { TableView } from '@opencrvs/components/lib/interface/TableView'
 import { Navigation } from '@client/components/interface/Navigation'
+import { AvatarSmall } from '@client/components/Avatar'
 import styled, { ITheme, withTheme } from '@client/styledComponents'
 import { ApplicationIcon } from '@opencrvs/components/lib/icons'
 import { connect } from 'react-redux'
@@ -28,7 +29,8 @@ import { RouteComponentProps } from 'react-router'
 import {
   injectIntl,
   IntlShape,
-  WrappedComponentProps as IntlShapeProps
+  WrappedComponentProps as IntlShapeProps,
+  MessageDescriptor
 } from 'react-intl'
 import { IWorkqueue, IApplication, DOWNLOAD_STATUS } from '@client/applications'
 import { IStoreState } from '@client/store'
@@ -45,10 +47,10 @@ import { IFormSectionData, IContactPoint, Action } from '@client/forms'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { constantsMessages } from '@client/i18n/messages'
+import { constantsMessages, userMessages } from '@client/i18n/messages'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { getLanguage } from '@client/i18n/selectors'
-import { getIndividualNameObj } from '@client/utils/userUtils'
+import { getIndividualNameObj, IAvatar } from '@client/utils/userUtils'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -94,6 +96,18 @@ const ReviewButton = styled(PrimaryButton)`
   height: 40px;
 `
 
+const NameAvatar = styled.span`
+  display: flex;
+  align-items: center;
+  img {
+    margin-right: 10px;
+  }
+`
+
+const Heading = styled.h4`
+  margin-bottom: 0px !important;
+`
+
 interface IStateProps {
   language: string
   workqueue: IWorkqueue
@@ -122,6 +136,10 @@ type IFullProps = IDispatchProps &
 
 interface ILabel {
   [key: string]: string | undefined
+}
+
+interface IStatus {
+  [key: string]: MessageDescriptor
 }
 
 interface IApplicationData {
@@ -182,6 +200,49 @@ const NO_DATA_LABEL: ILabel = {
   placeOfBirth: 'No place of birth',
   placeOfDeath: 'No place of death',
   informant: 'No informant'
+}
+
+const APPLICATION_STATUS_LABEL: IStatus = {
+  IN_PROGRESS: {
+    defaultMessage: 'In progress',
+    description: 'The title of In progress',
+    id: 'regHome.inProgress'
+  },
+  DECLARED: {
+    defaultMessage: 'Application started',
+    description: 'Label for table header column Application started',
+    id: 'constants.applicationStarted'
+  },
+  WAITING_VALIDATION: {
+    defaultMessage: 'Waiting for validation',
+    description: 'A label for waitingValidated',
+    id: 'constants.waitingValidated'
+  },
+  VALIDATED: {
+    id: 'constants.validated',
+    defaultMessage: 'validated',
+    description: 'A label for validated'
+  },
+  REGISTERED: {
+    defaultMessage: 'Application registered',
+    description: 'Label for date of registration in work queue list item',
+    id: 'regHome.table.label.registeredDate'
+  },
+  CERTIFIED: {
+    defaultMessage: 'Certified',
+    description: 'Label for registration status certified',
+    id: 'regHome.certified'
+  },
+  REJECTED: {
+    id: 'constants.rejected',
+    defaultMessage: 'rejected',
+    description: 'A label for rejected'
+  },
+  DOWNLOADED: {
+    defaultMessage: 'Downloaded',
+    description: 'Label for application download status Downloaded',
+    id: 'constants.downloaded'
+  }
 }
 
 const getCaptitalizedWord = (word: string | undefined): string => {
@@ -481,16 +542,32 @@ const downloadButton = (application: IApplicationData, props: IFullProps) => {
   }
 }
 
-const getName = (nameObject: Array<GQLHumanName | null>, language: string) => {
+const getName = (
+  nameObject: Array<GQLHumanName | null>,
+  avatar: IAvatar,
+  language: string
+) => {
   const nameObj = getIndividualNameObj(nameObject, language)
-  if (nameObj) {
-    return `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
-  }
+  const userName = nameObj
+    ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+    : ''
+
+  return (
+    <NameAvatar>
+      <AvatarSmall avatar={avatar} name={userName} />
+      <span>{userName}</span>
+    </NameAvatar>
+  )
+}
+
+const getStatusLabel = (status: string, intl: IntlShape) => {
+  if (status in APPLICATION_STATUS_LABEL)
+    return intl.formatMessage(APPLICATION_STATUS_LABEL[status])
   return ''
 }
 
 const getHistory = (application: IApplicationData, props: IFullProps) => {
-  const { language } = props
+  const { language, intl } = props
   const savedApplication = props.outboxApplications.find(
     (app) => app.id === application.id
   )
@@ -500,11 +577,10 @@ const getHistory = (application: IApplicationData, props: IFullProps) => {
   const historyData = (
     savedApplication.data.history as unknown as { [key: string]: any }[]
   ).map((item) => ({
-    date: item?.date,
-    action: item?.action,
-    avatar: item.user?.avatar?.data,
-    user: getName(item.user.name, language),
-    type: item.user.role,
+    date: moment(item?.date).format('MMM DD, YYYY. h:m a'),
+    action: getStatusLabel(item?.action, intl),
+    user: getName(item.user.name, item.user?.avatar, language),
+    type: intl.formatMessage(userMessages[item.user.role as string]),
     location: item.location.name
   }))
 
@@ -519,18 +595,22 @@ const getHistory = (application: IApplicationData, props: IFullProps) => {
       width: 20,
       key: 'date'
     },
-    { label: 'By', width: 25, key: 'user' },
+    { label: 'By', width: 25, key: 'user', isIconColumn: true },
     { label: 'Type', width: 20, key: 'type' },
     { label: 'Location', width: 20, key: 'location' }
   ]
   return (
     <>
+      <hr />
+      <Heading>History</Heading>
       <TableView
         id="task-history"
         noResultText=""
         hideBoxShadow={true}
         columns={columns}
         content={historyData}
+        alignItemCenter={true}
+        pageSize={100}
       />
     </>
   )
