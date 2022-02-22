@@ -378,3 +378,33 @@ export async function markValidatedHandler(
 
   return h.response().code(200)
 }
+
+export async function requestCorrectionHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const points = await Promise.all([
+      generatePaymentPoint(
+        request.payload as fhir.Bundle,
+        {
+          Authorization: request.headers.authorization
+        },
+        'correction_payment'
+      ),
+      generateEventDurationPoint(
+        request.payload as fhir.Bundle,
+        ['REGISTERED', 'CERTIFIED'],
+        {
+          Authorization: request.headers.authorization
+        }
+      )
+    ])
+
+    await writePoints(points)
+  } catch (err) {
+    return internal(err)
+  }
+
+  return h.response().code(200)
+}

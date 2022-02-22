@@ -16,6 +16,7 @@ const allSearchFields = `
     type
     registration {
       status
+      contactRelationship
       contactNumber
       trackingId
       eventLocationId

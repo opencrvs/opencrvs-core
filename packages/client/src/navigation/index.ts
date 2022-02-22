@@ -50,8 +50,9 @@ import {
   WORKFLOW_STATUS,
   TEAM_USER_LIST,
   USER_PROFILE,
-  CHANGE_PHONE,
-  CONFIG
+  CONFIG,
+  APPLICATION_RECORD_AUDIT,
+  CHANGE_PHONE
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
 import { NATL_ADMIN_ROLES } from '@client/utils/constants'
@@ -288,6 +289,15 @@ export function goToApplicationDetails(
   })
 }
 
+export function goToApplicationRecordAudit(
+  applicationId: string,
+  forceDetailsQuery?: boolean
+) {
+  return push(formatUrl(APPLICATION_RECORD_AUDIT, { applicationId }), {
+    forceDetailsQuery
+  })
+}
+
 export function goToBirthRegistrationAsParent(applicationId: string) {
   return push(
     formatUrl(DRAFT_BIRTH_PARENT_FORM, {
@@ -299,13 +309,6 @@ export function goToApplicationContact(informant: string) {
   return push(
     formatUrl(DRAFT_BIRTH_APPLICANT_FORM, {
       informant: informant.toString()
-    })
-  )
-}
-export function goToPrimaryApplicant(applicationId: string) {
-  return push(
-    formatUrl(SELECT_BIRTH_PRIMARY_APPLICANT, {
-      applicationId
     })
   )
 }

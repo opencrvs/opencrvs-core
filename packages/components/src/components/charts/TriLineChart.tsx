@@ -51,7 +51,7 @@ interface IProps {
 
 interface ILineDataPoint {
   label: React.ReactNode
-  registeredIn45Days: number
+  registeredInTargetDays: number
   totalRegistered: number
   totalEstimate: number
   registrationPercentage: string

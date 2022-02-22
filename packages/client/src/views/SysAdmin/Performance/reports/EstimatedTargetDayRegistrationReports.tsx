@@ -20,7 +20,7 @@ import { connect } from 'react-redux'
 import { IOfflineData } from '@client/offline/reducer'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
-import { GQLRegistration45DayEstimatedMetrics } from '@opencrvs/gateway/src/graphql/schema'
+import { GQLRegistrationTargetDayEstimatedMetrics } from '@opencrvs/gateway/src/graphql/schema'
 import { Event } from '@client/forms'
 import { getLocationFromPartOfLocationId } from '@client/views/SysAdmin/Performance/reports/utils'
 import { IFooterFColumn } from '@opencrvs/components/lib/interface/GridTable/types'
@@ -31,42 +31,44 @@ interface IStateProps {
 }
 
 type FullProps = {
-  data: GQLRegistration45DayEstimatedMetrics
+  data: GQLRegistrationTargetDayEstimatedMetrics
   eventType: Event
   loading: boolean
 } & IStateProps &
   WrappedComponentProps
 
-class Estimated45DayRegistrationReportComponent extends React.Component<FullProps> {
+class EstimatedTargetDayRegistrationReportComponent extends React.Component<FullProps> {
   getContent = () => {
     return (
       (this.props.data.details &&
-        this.props.data.details.map((registrationIn45Day) => {
+        this.props.data.details.map((registrationInTargetDay) => {
           const location = getLocationFromPartOfLocationId(
-            registrationIn45Day.locationId,
+            registrationInTargetDay.locationId,
             this.props.offlineCountryConfiguration
           ).name
-          return !registrationIn45Day.estimatedRegistration ||
-            registrationIn45Day.estimatedRegistration <= 0
+          return !registrationInTargetDay.estimatedRegistration ||
+            registrationInTargetDay.estimatedRegistration <= 0
             ? {
                 location,
                 estimation: 'No data',
-                estimationYear: String(registrationIn45Day.estimationYear),
+                estimationYear: String(registrationInTargetDay.estimationYear),
                 estimationLevel:
-                  registrationIn45Day.estimationLocationLevel.toLowerCase(),
-                registrationIn45Day: 'No data',
+                  registrationInTargetDay.estimationLocationLevel.toLowerCase(),
+                registrationInTargetDay: 'No data',
                 percentage: 'No data'
               }
             : {
                 location,
-                estimation: String(registrationIn45Day.estimatedRegistration),
-                estimationYear: String(registrationIn45Day.estimationYear),
-                estimationLevel:
-                  registrationIn45Day.estimationLocationLevel.toLowerCase(),
-                registrationIn45Day: String(
-                  registrationIn45Day.registrationIn45Day
+                estimation: String(
+                  registrationInTargetDay.estimatedRegistration
                 ),
-                percentage: `${registrationIn45Day.estimationPercentage}%`
+                estimationYear: String(registrationInTargetDay.estimationYear),
+                estimationLevel:
+                  registrationInTargetDay.estimationLocationLevel.toLowerCase(),
+                registrationInTargetDay: String(
+                  registrationInTargetDay.registrationInTargetDay
+                ),
+                percentage: `${registrationInTargetDay.estimationPercentage}%`
               }
         })) ||
       []
@@ -85,7 +87,7 @@ class Estimated45DayRegistrationReportComponent extends React.Component<FullProp
         width: 28
       },
       {
-        label: get(this.props.data, 'total.registrationIn45Day') || '0',
+        label: get(this.props.data, 'total.registrationInTargetDay') || '0',
         width: 22
       },
       {
@@ -100,9 +102,17 @@ class Estimated45DayRegistrationReportComponent extends React.Component<FullProp
 
     return (
       <ListTable
-        id="estimated45DayRegistrations"
+        id="estimatedTargetDayRegistrations"
         tableTitle={intl.formatMessage(
-          constantsMessages.estimated45DayRegistrationTitle
+          constantsMessages.estimatedTargetDaysRegistrationTitle,
+          {
+            registrationTargetDays:
+              this.props.eventType === Event.BIRTH
+                ? this.props.offlineCountryConfiguration.config
+                    .BIRTH_REGISTRATION_TARGET
+                : this.props.offlineCountryConfiguration.config
+                    .DEATH_REGISTRATION_TARGET
+          }
         )}
         fixedWidth={1074}
         isLoading={loading}
@@ -125,10 +135,18 @@ class Estimated45DayRegistrationReportComponent extends React.Component<FullProp
           },
           {
             label: intl.formatMessage(
-              constantsMessages.totalRegisteredIn45Days
+              constantsMessages.totalRegisteredInTargetDays,
+              {
+                registrationTargetDays:
+                  this.props.eventType === Event.BIRTH
+                    ? this.props.offlineCountryConfiguration.config
+                        .BIRTH_REGISTRATION_TARGET
+                    : this.props.offlineCountryConfiguration.config
+                        .DEATH_REGISTRATION_TARGET
+              }
             ),
             width: 22,
-            key: 'registrationIn45Day',
+            key: 'registrationInTargetDay',
             isSortable: false
           },
           {
@@ -146,11 +164,11 @@ class Estimated45DayRegistrationReportComponent extends React.Component<FullProp
   }
 }
 
-export const Estimated45DayRegistrationReports = connect(
+export const EstimatedTargetDayRegistrationReports = connect(
   (store: IStoreState) => {
     return {
       offlineCountryConfiguration: getOfflineData(store)
     }
   },
   {}
-)(injectIntl(Estimated45DayRegistrationReportComponent))
+)(injectIntl(EstimatedTargetDayRegistrationReportComponent))

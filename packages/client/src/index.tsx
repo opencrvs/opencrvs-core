@@ -41,9 +41,12 @@ if (
   })
 
   // setup log rocket to ship log messages and record user errors
-  LogRocket.init(window.config.LOGROCKET, {
-    release: process.env.REACT_APP_VERSION
-  })
+
+  if (window.config.LOGROCKET) {
+    LogRocket.init(window.config.LOGROCKET, {
+      release: process.env.REACT_APP_VERSION
+    })
+  }
 
   // Integrate the two
   Sentry.configureScope((scope) => {

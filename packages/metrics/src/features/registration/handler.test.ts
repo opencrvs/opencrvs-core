@@ -30,6 +30,60 @@ const token = jwt.sign(
   }
 )
 
+jest.mock('../metrics/utils', () => {
+  const originalModule = jest.requireActual('../metrics//utils')
+  return {
+    __esModule: true,
+    ...originalModule,
+    getRegistrationTargetDays: () => 45
+  }
+})
+
+jest.mock('../../configApi', () => {
+  const originalModule = jest.requireActual('../../configApi')
+  return {
+    __esModule: true,
+    ...originalModule,
+    getApplicationConfig: () =>
+      Promise.resolve({
+        API_GATEWAY_URL: 'http://localhost:7070/',
+        CONFIG_API_URL: 'http://localhost:2021',
+        LOGIN_URL: 'http://localhost:3020',
+        AUTH_URL: 'http://localhost:4040',
+        RESOURCES_URL: 'http://localhost:3040',
+        CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 36500,
+        CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 36500,
+        CERTIFICATE_PRINT_LOWEST_CHARGE: 0,
+        CERTIFICATE_PRINT_HIGHEST_CHARGE: 0,
+        UI_POLLING_INTERVAL: 5000,
+        FIELD_AGENT_AUDIT_LOCATIONS: 'DISTRICT',
+        APPLICATION_AUDIT_LOCATIONS: 'DISTRICT',
+        INFORMANT_MINIMUM_AGE: 16,
+        HIDE_EVENT_REGISTER_INFORMATION: false,
+        EXTERNAL_VALIDATION_WORKQUEUE: false,
+        PHONE_NUMBER_PATTERN: {
+          pattern: '/^0(7|9)[0-9]{1}[0-9]{7}$/',
+          example: '0970545855',
+          start: '0[7|9]',
+          num: '10',
+          mask: {
+            startForm: 4,
+            endBefore: 2
+          }
+        },
+        SENTRY: 'https://f892d643aab642108f44e2d1795706bc@sentry.io/1774604',
+        LOGROCKET: 'opencrvs-foundation/opencrvs-zambia',
+        NID_NUMBER_PATTERN: {
+          pattern: '/^[0-9]{9}$/',
+          example: '4837281940',
+          num: '9'
+        },
+        COUNTRY: 'zmb',
+        LANGUAGES: 'en'
+      })
+  }
+})
+
 describe('When a new registration event is received', () => {
   let server: any
 
@@ -307,8 +361,7 @@ describe('When a new registration event is received', () => {
             ],
             extension: [
               {
-                url:
-                  'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+                url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
                 extension: [
                   {
                     url: 'code',
@@ -564,8 +617,7 @@ describe('When a new registration event is received', () => {
             ],
             extension: [
               {
-                url:
-                  'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+                url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
                 extension: [
                   {
                     url: 'code',
@@ -805,8 +857,7 @@ describe('When a new registration event is received', () => {
             ],
             extension: [
               {
-                url:
-                  'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+                url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
                 extension: [
                   {
                     url: 'code',
@@ -1046,8 +1097,7 @@ describe('When a new registration event is received', () => {
             ],
             extension: [
               {
-                url:
-                  'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+                url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
                 extension: [
                   {
                     url: 'code',
@@ -1107,10 +1157,11 @@ describe('When an existing application is marked registered', () => {
       },
       payload
     })
-    const applicationEventPoint = influxClient.writePoints.mock.calls[0][0].find(
-      ({ measurement }: { measurement: string }) =>
-        measurement === 'application_event_duration'
-    )
+    const applicationEventPoint =
+      influxClient.writePoints.mock.calls[0][0].find(
+        ({ measurement }: { measurement: string }) =>
+          measurement === 'application_event_duration'
+      )
     expect(res.statusCode).toBe(200)
     expect(applicationEventPoint).toMatchSnapshot()
   })
@@ -1125,10 +1176,11 @@ describe('When an existing application is marked registered', () => {
       },
       payload
     })
-    const applicationEventPoint = influxClient.writePoints.mock.calls[0][0].find(
-      ({ measurement }: { measurement: string }) =>
-        measurement === 'application_event_duration'
-    )
+    const applicationEventPoint =
+      influxClient.writePoints.mock.calls[0][0].find(
+        ({ measurement }: { measurement: string }) =>
+          measurement === 'application_event_duration'
+      )
     expect(res.statusCode).toBe(200)
     expect(applicationEventPoint).toMatchSnapshot()
   })
@@ -1146,10 +1198,11 @@ describe('When an existing application is marked registered', () => {
       },
       payload
     })
-    const applicationEventPoint = influxClient.writePoints.mock.calls[0][0].find(
-      ({ measurement }: { measurement: string }) =>
-        measurement === 'application_event_duration'
-    )
+    const applicationEventPoint =
+      influxClient.writePoints.mock.calls[0][0].find(
+        ({ measurement }: { measurement: string }) =>
+          measurement === 'application_event_duration'
+      )
     expect(res.statusCode).toBe(200)
     expect(applicationEventPoint).toMatchSnapshot()
   })
@@ -1168,10 +1221,11 @@ describe('When an existing application is marked registered', () => {
       },
       payload
     })
-    const applicationEventPoint = influxClient.writePoints.mock.calls[0][0].find(
-      ({ measurement }: { measurement: string }) =>
-        measurement === 'application_event_duration'
-    )
+    const applicationEventPoint =
+      influxClient.writePoints.mock.calls[0][0].find(
+        ({ measurement }: { measurement: string }) =>
+          measurement === 'application_event_duration'
+      )
     expect(res.statusCode).toBe(200)
     expect(applicationEventPoint).toMatchSnapshot()
   })
@@ -1188,10 +1242,11 @@ describe('When an existing application is marked registered', () => {
         },
         payload
       })
-      const applicationEventPoint = influxClient.writePoints.mock.calls[0][0].find(
-        ({ measurement }: { measurement: string }) =>
-          measurement === 'application_event_duration'
-      )
+      const applicationEventPoint =
+        influxClient.writePoints.mock.calls[0][0].find(
+          ({ measurement }: { measurement: string }) =>
+            measurement === 'application_event_duration'
+        )
 
       expect(res.statusCode).toBe(200)
       expect(applicationEventPoint).toMatchSnapshot()
@@ -1216,10 +1271,11 @@ describe('When an existing application is marked certified', () => {
       },
       payload
     })
-    const applicationEventPoint = influxClient.writePoints.mock.calls[0][0].find(
-      ({ measurement }: { measurement: string }) =>
-        measurement === 'application_event_duration'
-    )
+    const applicationEventPoint =
+      influxClient.writePoints.mock.calls[0][0].find(
+        ({ measurement }: { measurement: string }) =>
+          measurement === 'application_event_duration'
+      )
 
     expect(res.statusCode).toBe(200)
     expect(applicationEventPoint).toMatchSnapshot()
@@ -1237,10 +1293,11 @@ describe('When an existing application is marked certified', () => {
         payload
       })
       expect(res.statusCode).toBe(200)
-      const applicationEventPoint = influxClient.writePoints.mock.calls[0][0].find(
-        ({ measurement }: { measurement: string }) =>
-          measurement === 'application_event_duration'
-      )
+      const applicationEventPoint =
+        influxClient.writePoints.mock.calls[0][0].find(
+          ({ measurement }: { measurement: string }) =>
+            measurement === 'application_event_duration'
+        )
 
       expect(applicationEventPoint).toMatchSnapshot()
     })
@@ -1258,10 +1315,11 @@ describe('When an existing application is marked certified', () => {
         payload
       })
       expect(res.statusCode).toBe(200)
-      const applicationEventPoint = influxClient.writePoints.mock.calls[0][0].find(
-        ({ measurement }: { measurement: string }) =>
-          measurement === 'certification_payment'
-      )
+      const applicationEventPoint =
+        influxClient.writePoints.mock.calls[0][0].find(
+          ({ measurement }: { measurement: string }) =>
+            measurement === 'certification_payment'
+        )
 
       expect(applicationEventPoint).toMatchSnapshot()
     })
@@ -1286,10 +1344,11 @@ describe('When an in-progress application is received', () => {
       },
       payload
     })
-    const inCompleteFieldPoints = influxClient.writePoints.mock.calls[0][0].find(
-      ({ measurement }: { measurement: string }) =>
-        measurement === 'in_complete_fields'
-    )
+    const inCompleteFieldPoints =
+      influxClient.writePoints.mock.calls[0][0].find(
+        ({ measurement }: { measurement: string }) =>
+          measurement === 'in_complete_fields'
+      )
 
     expect(res.statusCode).toBe(200)
     expect(inCompleteFieldPoints).toMatchSnapshot()
@@ -1339,5 +1398,78 @@ describe('When an in-progress application is received', () => {
       payload
     })
     expect(res.statusCode).toBe(500)
+  })
+})
+
+describe('When an existing application requested correction', () => {
+  let server: any
+
+  beforeEach(async () => {
+    server = await createServer()
+  })
+
+  it('writes the delta between REGISTERED and REQUESTED_FOR_CORRECTION states to influxdb', async () => {
+    const influxClient = require('@metrics/influxdb/client')
+    const payload = require('./test-data/request-correction-birth-request.json')
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/events/birth/request-correction',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      payload
+    })
+    const applicationEventPoint =
+      influxClient.writePoints.mock.calls[0][0].find(
+        ({ measurement }: { measurement: string }) =>
+          measurement === 'application_event_duration'
+      )
+
+    expect(res.statusCode).toBe(200)
+    expect(applicationEventPoint).toMatchSnapshot()
+  })
+  describe('a death application', () => {
+    it('writes the delta between REGISTERED and REQUESTED_FOR_CORRECTION states to influxdb', async () => {
+      const influxClient = require('@metrics/influxdb/client')
+      const payload = require('./test-data/request-correction-death-request.json')
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/events/death/request-correction',
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        payload
+      })
+      expect(res.statusCode).toBe(200)
+      const applicationEventPoint =
+        influxClient.writePoints.mock.calls[0][0].find(
+          ({ measurement }: { measurement: string }) =>
+            measurement === 'application_event_duration'
+        )
+
+      expect(applicationEventPoint).toMatchSnapshot()
+    })
+  })
+  describe('a birth application', () => {
+    it('writes the payment total to influxdb', async () => {
+      const influxClient = require('@metrics/influxdb/client')
+      const payload = require('./test-data/request-correction-birth-request.json')
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/events/birth/request-correction',
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        payload
+      })
+      expect(res.statusCode).toBe(200)
+      const applicationEventPoint =
+        influxClient.writePoints.mock.calls[0][0].find(
+          ({ measurement }: { measurement: string }) =>
+            measurement === 'certification_payment'
+        )
+
+      expect(applicationEventPoint).toMatchSnapshot()
+    })
   })
 })
