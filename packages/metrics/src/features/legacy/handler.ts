@@ -100,7 +100,7 @@ export async function generateLegacyMetricsHandler(
     throw new Error('Could not resolve values from search')
   }
   const totalPoints: IApplicationsStartedPoints[] = []
-  if (result.body.hits.total !== result.body.hits.hits.length) {
+  if (result.body.hits.total.value !== result.body.hits.hits.length) {
     throw new Error(
       'Not all results returned in search results.  Need to implement Elastic pagination for more than 10,000 records'
     )
@@ -199,7 +199,7 @@ export async function generateLegacyEventDurationHandler(
     throw new Error('Could not resolve values from search')
   }
   let totalPoints: IDurationPoints[] = []
-  if (result.body.hits.total !== result.body.hits.hits.length) {
+  if (result.body.hits.total.value !== result.body.hits.hits.length) {
     throw new Error(
       'Not all results returned in search results.  Need to implement Elastic pagination for more than 10,000 records'
     )

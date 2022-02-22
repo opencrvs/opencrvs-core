@@ -35,7 +35,7 @@ export interface ISearchResponse<T> {
   _scroll_id?: string
   _shards: IShardsResponse
   hits: {
-    total: number
+    total: { value: number; eq: string }
     max_score: number
     hits: Array<{
       _index: string
@@ -126,7 +126,7 @@ export const resolvers: GQLResolver = {
         totalItems:
           (searchResult &&
             searchResult.body.hits &&
-            searchResult.body.hits.total) ||
+            searchResult.body.hits.total.value) ||
           0,
         results:
           (searchResult &&
@@ -177,7 +177,7 @@ export const resolvers: GQLResolver = {
           (searchResult &&
             searchResult.body &&
             searchResult.body.hits &&
-            searchResult.body.hits.total) ||
+            searchResult.body.hits.total.value) ||
           0,
         results:
           (searchResult &&
