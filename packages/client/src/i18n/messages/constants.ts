@@ -139,6 +139,7 @@ interface IConstantsMessages
   totalRegistered: MessageDescriptor
   viewAll: MessageDescriptor
   notAvailable: MessageDescriptor
+  history: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   address: {
@@ -784,6 +785,11 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.notAvailable',
     defaultMessage: 'Not available',
     description: 'Placeholder for empty value'
+  },
+  history: {
+    id: 'constants.history',
+    defaultMessage: 'History',
+    description: 'History heading'
   }
 }
 

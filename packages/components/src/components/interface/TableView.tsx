@@ -119,7 +119,8 @@ const RowWrapper = styled.div<{
   }
 
   display: flex;
-  ${({ alignItemCenter }) => alignItemCenter && `align-items: start`};
+  ${({ alignItemCenter }) =>
+    alignItemCenter ? `align-items: center` : `align-items: start`};
   ${({ height }) =>
     height ? `min-height:${height.lg}px;` : `min-height: 48px)`};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {

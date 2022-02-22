@@ -92,6 +92,14 @@ const GreyedInfo = styled.div`
   max-width: 330px;
 `
 
+const LargeGreyedInfo = styled.div`
+  height: 231px;
+  background-color: ${({ theme }) => theme.colors.greyInfo};
+  max-width: 100%;
+  border-radius: 4px;
+  margin: 15px 0px;
+`
+
 const ReviewButton = styled(PrimaryButton)`
   height: 40px;
 `
@@ -566,13 +574,24 @@ const getStatusLabel = (status: string, intl: IntlShape) => {
   return ''
 }
 
-const getHistory = (application: IApplicationData, props: IFullProps) => {
+const getHistory = (
+  application: IApplicationData,
+  props: IFullProps,
+  isDownloaded: boolean
+) => {
   const { language, intl } = props
   const savedApplication = props.outboxApplications.find(
     (app) => app.id === application.id
   )
 
-  if (!savedApplication?.data?.history?.length) return <></>
+  if (!savedApplication?.data?.history?.length)
+    return (
+      <>
+        <hr />
+        <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
+        <LargeGreyedInfo />
+      </>
+    )
 
   const historyData = (
     savedApplication.data.history as unknown as { [key: string]: any }[]
@@ -602,7 +621,7 @@ const getHistory = (application: IApplicationData, props: IFullProps) => {
   return (
     <>
       <hr />
-      <Heading>History</Heading>
+      <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
       <TableView
         id="task-history"
         noResultText=""
@@ -644,7 +663,7 @@ export const ShowRecordAudit = (props: IFullProps) => {
             topActionButtons={[downloadButton(application, props)]}
           >
             {getApplicationInfo(props, application, isDownloaded)}
-            {isDownloaded && getHistory(application, props)}
+            {getHistory(application, props, isDownloaded)}
           </Content>
         )}
       </BodyContainer>
