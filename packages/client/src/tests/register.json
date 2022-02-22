@@ -962,7 +962,7 @@
                   "previewGroup": "placeOfBirth",
                   "ignoreFieldLabelOnErrorMessage": true,
                   "label": {
-                    "defaultMessage": "Place of delivery",
+                    "defaultMessage": "Location",
                     "description": "Label for form field: Place of delivery",
                     "id": "form.field.label.placeOfBirth"
                   },
@@ -2065,7 +2065,7 @@
                   "label": {
                     "defaultMessage": "Place of delivery",
                     "description": "Label for form field: Place of delivery",
-                    "id": "form.field.label.placeOfBirth"
+                    "id": "form.field.label.placeOfBirthPreview"
                   },
                   "fieldToRedirect": "placeOfBirth"
                 },
