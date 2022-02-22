@@ -1,0 +1,85 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+# graphic logo are (registered/a) trademark(s) of Plan International.
+name: End-to-end tests
+
+on:
+  push:
+    branches:
+      - 'develop'
+      - 'faraja-ci'
+
+jobs:
+  E2E:
+    runs-on: ubuntu-20.04
+    timeout-minutes: 30
+    env:
+      CYPRESS_LOGIN_URL: http://localhost:3020/
+      CYPRESS_CLIENT_URL: http://localhost:3000/
+      CYPRESS_AUTH_URL: http://localhost:4040/
+
+    strategy:
+      matrix:
+        node-version: [14.17.0]
+
+    steps:
+      - name: Checking out git repo
+        uses: actions/checkout@v2
+
+      - name: Generate Secrets
+        run: |
+          openssl genrsa -out .secrets/private-key.pem 2048
+          ls -la .secrets
+          openssl rsa -pubout -in .secrets/private-key.pem -out .secrets/public-key.pem
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install docker
+        uses: docker-practice/actions-setup-docker@master
+
+      - name: Install dependencies
+        run: |
+          yarn
+          yarn global add wait-on
+
+      - name: Initialize docker & folder structures
+        run: |
+          docker swarm init
+          sudo mkdir -p data/elasticsearch
+          sudo chown -R 1000:1000 data/elasticsearch
+
+      - name: Download & run docker images
+        run: |
+          yarn compose:deps -d
+          wait-on -l tcp:3447 http://localhost:9200 tcp:5001 tcp:9200 tcp:27017 tcp:6379 tcp:8086
+
+      - name: Run Microservices
+        run: |
+          bash -c 'LANGUAGES=en yarn start:prod' &
+          wait-on -l tcp:4040 http://localhost:3000 http://localhost:3020 tcp:3030 tcp:2020 tcp:7070 tcp:5050 tcp:9090 tcp:1050
+
+      - name: Running the Country specific resource package
+        run: |
+          git clone -b develop --depth=1 https://github.com/opencrvs/opencrvs-farajaland.git
+          cd opencrvs-farajaland
+          yarn install
+          yarn db:clear:all
+          yarn db:backup:restore
+
+          bash -c 'CERT_PUBLIC_KEY_PATH=./../.secrets/public-key.pem yarn start:prod' &
+          wait-on -l tcp:3040
+
+      - name: Running the E2E test
+        run: |
+          cd opencrvs-farajaland
+          yarn e2e --record false

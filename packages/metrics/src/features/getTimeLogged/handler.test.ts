@@ -40,8 +40,7 @@ describe('verify time logged handler', () => {
 
     const res = await server.server.inject({
       method: 'GET',
-      url:
-        '/timeLogged?compositionId=94429795-0a09-4de8-8e1e-27dab01877d2&status=REGISTERED',
+      url: '/timeLogged?compositionId=94429795-0a09-4de8-8e1e-27dab01877d2&status=REGISTERED',
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -55,8 +54,7 @@ describe('verify time logged handler', () => {
 
     const res = await server.server.inject({
       method: 'GET',
-      url:
-        '/timeLogged?compositionId=94429795-0a09-4de8-8e1e-27dab01877d2&status=REGISTERED',
+      url: '/timeLogged?compositionId=94429795-0a09-4de8-8e1e-27dab01877d2&status=REGISTERED',
       headers: {
         Authorization: `Bearer ${token}`
       }

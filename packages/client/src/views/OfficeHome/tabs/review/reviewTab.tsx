@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  goToApplicationDetails,
+  goToApplicationRecordAudit,
   goToPage,
   goToReviewDuplicate
 } from '@client/navigation'
@@ -21,7 +21,6 @@ import { IStoreState } from '@client/store'
 import styled, { ITheme } from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
 import { EVENT_STATUS } from '@client/views/OfficeHome/OfficeHome'
-import { RowHistoryView } from '@client/views/OfficeHome/RowHistoryView'
 import { Duplicate, Validate } from '@opencrvs/components/lib/icons'
 import {
   ColumnContentAlignment,
@@ -56,7 +55,7 @@ interface IBaseReviewTabProps {
   goToPage: typeof goToPage
   goToReviewDuplicate: typeof goToReviewDuplicate
   registrarLocationId: string | null
-  goToApplicationDetails: typeof goToApplicationDetails
+  goToApplicationRecordAudit: typeof goToApplicationRecordAudit
   outboxApplications: IApplication[]
   queryData: {
     data: GQLEventSearchResultSet
@@ -96,12 +95,6 @@ class ReviewTabComponent extends React.Component<
 
   recordWindowWidth = () => {
     this.setState({ width: window.innerWidth })
-  }
-
-  getExpandable = () => {
-    return this.state.width > this.props.theme.grid.breakpoints.lg
-      ? true
-      : false
   }
 
   userHasRegisterScope() {
@@ -167,13 +160,17 @@ class ReviewTabComponent extends React.Component<
         } else {
           actions.push({
             label: this.props.intl.formatMessage(constantsMessages.review),
-            handler: () =>
+            handler: (
+              e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
+            ) => {
+              e && e.stopPropagation()
               this.props.goToPage(
                 REVIEW_EVENT_PARENT_FORM_PAGE,
                 reg.id,
                 'review',
                 reg.event ? reg.event.toLowerCase() : ''
               )
+            }
           })
         }
       }
@@ -199,7 +196,7 @@ class ReviewTabComponent extends React.Component<
         rowClickHandler: [
           {
             label: 'rowClickHandler',
-            handler: () => this.props.goToApplicationDetails(reg.id)
+            handler: () => this.props.goToApplicationRecordAudit(reg.id)
           }
         ]
       }
@@ -266,17 +263,9 @@ class ReviewTabComponent extends React.Component<
     }
   }
 
-  renderExpandedComponent = (itemId: string) => {
-    const { results } = this.props.queryData && this.props.queryData.data
-    const eventDetails =
-      results && results.find((result) => result && result.id === itemId)
-    return <RowHistoryView eventDetails={eventDetails} />
-  }
-
   render() {
     const { intl, queryData, page, onPageChange } = this.props
     const { data } = queryData
-
     return (
       <HomeContent>
         <ReactTooltip id="validateTooltip">
@@ -289,14 +278,12 @@ class ReviewTabComponent extends React.Component<
         <GridTable
           content={this.transformDeclaredContent(data)}
           columns={this.getColumns()}
-          renderExpandedComponent={this.renderExpandedComponent}
           noResultText={intl.formatMessage(constantsMessages.noResults)}
           onPageChange={onPageChange}
           pageSize={this.pageSize}
           totalItems={(data && data.totalItems) || 0}
           currentPage={page}
-          expandable={this.getExpandable()}
-          clickable={!this.getExpandable()}
+          clickable={true}
           showPaginated={this.props.showPaginated}
           loading={this.props.loading}
           loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
@@ -320,5 +307,5 @@ function mapStateToProps(state: IStoreState) {
 export const ReviewTab = connect(mapStateToProps, {
   goToPage,
   goToReviewDuplicate,
-  goToApplicationDetails
+  goToApplicationRecordAudit
 })(injectIntl(withTheme(ReviewTabComponent)))

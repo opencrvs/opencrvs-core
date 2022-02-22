@@ -24,6 +24,12 @@ export interface IPDFTemplate {
   vfs: { [file: string]: string }
   transformers?: IFieldTransformer[]
 }
+export interface ISVGTemplate {
+  definition: string
+  fonts?: { [language: string]: { [name: string]: TFontFamilyTypes } }
+  vfs?: { [file: string]: string }
+  transformers?: IFieldTransformer[]
+}
 
 export type TransformerPayload =
   | IIntLabelPayload

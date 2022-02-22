@@ -234,7 +234,7 @@ describe('OfficeHome related tests', () => {
       )
       expect(
         app.find('#navigation_waitingValidation').hostNodes().text()
-      ).toContain('In external Validation6')
+      ).toContain('Waiting for validation6')
       expect(app.find('#navigation_print').hostNodes().text()).toContain(
         'Ready to print 1'
       )

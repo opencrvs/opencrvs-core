@@ -16,7 +16,7 @@ import styled from '@client/styledComponents'
 import { PERFORMANCE_METRICS } from '@client/views/SysAdmin/Performance/metricsQuery'
 import {
   CertificationPaymentReports,
-  Estimated45DayRegistrationReports,
+  EstimatedTargetDayRegistrationReports,
   GenderBasisReports,
   TimeFrameReports
 } from '@client/views/SysAdmin/Performance/reports'
@@ -27,7 +27,7 @@ import {
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
 import {
   GQLCertificationPaymentMetrics,
-  GQLRegistration45DayEstimatedMetrics,
+  GQLRegistrationTargetDayEstimatedMetrics,
   GQLRegistrationGenderBasisMetrics,
   GQLRegistrationMetrics,
   GQLRegistrationTimeFrameMetrics
@@ -135,14 +135,14 @@ function ReportComponent(props: Props) {
                   }
                 />
                 {eventType === Event.BIRTH && (
-                  <Estimated45DayRegistrationReports
+                  <EstimatedTargetDayRegistrationReports
                     eventType={eventType}
                     loading={loading}
                     data={
                       (data &&
                         data.fetchRegistrationMetrics &&
                         (data.fetchRegistrationMetrics
-                          .estimated45DayMetrics as GQLRegistration45DayEstimatedMetrics)) ||
+                          .estimatedTargetDayMetrics as GQLRegistrationTargetDayEstimatedMetrics)) ||
                       {}
                     }
                   />
