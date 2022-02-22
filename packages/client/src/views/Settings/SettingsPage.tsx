@@ -235,12 +235,6 @@ class SettingsView extends React.Component<IProps, IState> {
     }))
   }
 
-  toggleAvatarNotification = () => {
-    this.setState((state) => ({
-      showAvatarNotification: !state.showAvatarNotification
-    }))
-  }
-
   toggleAvatarChangeModal = () => {
     this.setState((state) => ({
       showChangeAvatar: !state.showChangeAvatar
@@ -281,7 +275,7 @@ class SettingsView extends React.Component<IProps, IState> {
   handleConfirmAvatarChange = () => {
     this.setState({ imageUploading: true })
     this.toggleAvatarChangeModal()
-    this.toggleAvatarNotification()
+    this.toggleSuccessNotification(NOTIFICATION_SUBJECT.AVATAR)
   }
 
   changeAvatar = (avatar: IImage) => {
@@ -504,10 +498,18 @@ class SettingsView extends React.Component<IProps, IState> {
           showPasswordChange={this.state.showPasswordChange}
           passwordChanged={this.changePassword}
         />
-        <Notification
-          type={NOTIFICATION_TYPE.SUCCESS}
+        <FloatingNotification
+          type={
+            this.state.imageUploading
+              ? NOTIFICATION_TYPE.IN_PROGRESS
+              : NOTIFICATION_TYPE.SUCCESS
+          }
           show={this.state.showSuccessNotification}
-          callback={() => this.toggleSuccessNotification()}
+          callback={
+            this.state.imageUploading
+              ? undefined
+              : () => this.toggleSuccessNotification()
+          }
         >
           {/* Success notification message for Language Change */}
           {this.state.notificationSubject === NOTIFICATION_SUBJECT.LANGUAGE && (
@@ -518,34 +520,24 @@ class SettingsView extends React.Component<IProps, IState> {
               }}
             />
           )}
-
+          {/* Success notification message for Password Change */}
           {this.state.notificationSubject === NOTIFICATION_SUBJECT.PASSWORD && (
             <FormattedMessage {...messages.passwordUpdated} />
           )}
 
-          {/* Success notification message for Password Change */}
+          {/* Success notification message for Phone Change */}
           {this.state.notificationSubject === NOTIFICATION_SUBJECT.PHONE && (
             <FormattedMessage {...messages.phoneNumberUpdated} />
           )}
-        </Notification>
-        <FloatingNotification
-          type={
-            this.state.imageUploading
-              ? NOTIFICATION_TYPE.IN_PROGRESS
-              : NOTIFICATION_TYPE.SUCCESS
-          }
-          show={this.state.showAvatarNotification}
-          callback={
-            this.state.imageUploading
-              ? undefined
-              : () => this.toggleAvatarNotification()
-          }
-        >
-          <FormattedMessage
-            {...(this.state.imageUploading
-              ? messages.avatarUpdating
-              : messages.avatarUpdated)}
-          />
+
+          {/* Success notification message for Avatar Change */}
+          {this.state.notificationSubject === NOTIFICATION_SUBJECT.AVATAR && (
+            <FormattedMessage
+              {...(this.state.imageUploading
+                ? messages.avatarUpdating
+                : messages.avatarUpdated)}
+            />
+          )}
         </FloatingNotification>
       </>
     )
