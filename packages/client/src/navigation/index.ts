@@ -291,13 +291,10 @@ export function goToApplicationDetails(
 }
 
 export function goToApplicationRecordAudit(
-  tab: keyof IQueryData,
-  applicationId: string,
-  forceDetailsQuery?: boolean
+  tab: keyof IQueryData | 'search',
+  applicationId: string
 ) {
-  return push(formatUrl(APPLICATION_RECORD_AUDIT, { tab, applicationId }), {
-    forceDetailsQuery
-  })
+  return push(formatUrl(APPLICATION_RECORD_AUDIT, { tab, applicationId }))
 }
 
 export function goToBirthRegistrationAsParent(applicationId: string) {

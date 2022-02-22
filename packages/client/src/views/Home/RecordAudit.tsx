@@ -14,7 +14,7 @@ import React from 'react'
 import { Header } from '@client/components/interface/Header/Header'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import { Navigation } from '@client/components/interface/Navigation'
-import styled from '@client/styledComponents'
+import styled, { withTheme, ITheme } from '@client/styledComponents'
 import { ApplicationIcon } from '@opencrvs/components/lib/icons'
 import { connect } from 'react-redux'
 import {
@@ -22,13 +22,13 @@ import {
   goBack as goBackAction,
   goToRegistrarHomeTab
 } from '@client/navigation'
-import { RouteComponentProps } from 'react-router'
+import { RouteComponentProps, Redirect } from 'react-router'
 import {
   injectIntl,
   WrappedComponentProps as IntlShapeProps,
   IntlShape
 } from 'react-intl'
-import { IWorkqueue, IApplication } from '@client/applications'
+import { IApplication } from '@client/applications'
 import { IStoreState } from '@client/store'
 import {
   GQLEventSearchSet,
@@ -40,9 +40,12 @@ import moment from 'moment'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { IFormSectionData, IContactPoint } from '@client/forms'
-import { Spinner } from '@opencrvs/components/lib/interface'
 import { IQueryData } from '@client/views/OfficeHome/OfficeHome'
 import { generateLocationName } from '@client/utils/locationUtils'
+import { Query } from '@client/components/Query'
+import { FETCH_APPLICATION_SHORT_INFO } from '@client/views/Home/queries'
+import { Spinner } from '@opencrvs/components/lib/interface'
+import { HOME } from '@client/navigation/routes'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -86,10 +89,11 @@ const GreyedInfo = styled.div`
 
 interface IStateProps {
   applicationId: string
-  tab: keyof IQueryData
-  queryData: IQueryData
+  draft: IApplication | null
+  language: string
   resources: IOfflineData
-  savedApplications: IApplication[]
+  tab: keyof IQueryData | 'search'
+  workqueueApplication: GQLEventSearchSet | null
 }
 
 interface IDispatchProps {
@@ -98,20 +102,15 @@ interface IDispatchProps {
   goToRegistrarHomeTab: typeof goToRegistrarHomeTab
 }
 
-type RouteProps = RouteComponentProps<
-  {
-    tab: keyof IQueryData
-    applicationId: string
-  },
-  {},
-  { isNavigatedInsideApp: boolean }
->
+type RouteProps = RouteComponentProps<{
+  tab: keyof IQueryData | 'search'
+  applicationId: string
+}>
 
 type IFullProps = IDispatchProps &
   IStateProps &
   IDispatchProps &
-  IntlShapeProps &
-  RouteProps
+  IntlShapeProps & { theme: ITheme } & RouteProps
 
 interface ILabel {
   [key: string]: string | undefined
@@ -194,20 +193,7 @@ const isDeathApplication = (
   return (application && application.type === 'Death') || false
 }
 
-const goBack = (props: IFullProps) => {
-  const historyState = props.location.state
-  const navigatedFromInsideApp = Boolean(
-    historyState && historyState.isNavigatedInsideApp
-  )
-
-  if (navigatedFromInsideApp) {
-    props.goBack()
-  } else {
-    props.goToRegistrarHomeTab('review')
-  }
-}
-
-const getDraftApplicationName = (application: IApplication): string => {
+const getDraftApplicationName = (application: IApplication) => {
   let name = ''
   let applicationName
   if (application.event === 'birth') {
@@ -224,7 +210,7 @@ const getDraftApplicationName = (application: IApplication): string => {
   return name
 }
 
-const getWQApplicationName = (application: GQLEventSearchSet): string => {
+const getWQApplicationName = (application: GQLEventSearchSet) => {
   let name = ''
   const applicationName =
     (isBirthApplication(application) &&
@@ -265,93 +251,79 @@ const getLocation = (
   }
 
   if (locationType === 'HEALTH_FACILITY') {
-    const facility = resources.facilities[locationId] || ''
+    const facility = resources.facilities[locationId]
     return generateLocationName(facility, intl)
   }
   if (locationType === 'OTHER' || locationType === 'PRIVATE_HOME') {
-    const location = resources.locations[locationDistrict] || ''
+    const location = resources.locations[locationDistrict]
     return generateLocationName(location, intl)
   }
   if (locationType === 'PERMANENT') {
-    const district = resources.locations[locationPermanent] || ''
+    const district = resources.locations[locationPermanent]
     return generateLocationName(district, intl)
   }
   return ''
 }
 
-const getSavedApplications = (
-  applicationId: string,
-  savedApplications: IApplication[],
+const getDraftApplicationData = (
+  application: IApplication,
   resources: IOfflineData,
   intl: IntlShape
 ): IApplicationData => {
-  const applications = savedApplications
-    .filter((application: IApplication) => {
-      return (
-        application.id === applicationId ||
-        application.compositionId === applicationId
-      )
-    })
-    .map((application) => {
-      const name = getDraftApplicationName(application)
-      return {
-        id: application.id,
-        name: name,
-        status:
-          application.submissionStatus?.toString() ||
-          application.registrationStatus?.toString() ||
-          '',
-        type: application.event || '',
-        brnDrn:
-          application.data?.registration?.registrationNumber?.toString() || '',
-        trackingId:
-          application.data?.registration?.trackingId?.toString() || '',
-        dateOfBirth: application.data?.child?.childBirthDate?.toString() || '',
-        dateOfDeath: application.data?.deathEvent?.deathDate?.toString() || '',
-        placeOfBirth: getLocation(application, resources, intl) || '',
-        placeOfDeath: getLocation(application, resources, intl) || '',
-        informant:
-          (
-            application.data?.registration?.contactPoint as IFormSectionData
-          )?.value.toString() || '',
-        informantContact:
-          (
-            (application.data?.registration?.contactPoint as IFormSectionData)
-              ?.nestedFields as IContactPoint
-          )?.registrationPhone.toString() || ''
-      }
-    })
-  return applications[0]
+  const name = getDraftApplicationName(application)
+  return {
+    id: application.id,
+    name: name,
+    status:
+      application.submissionStatus?.toString() ||
+      application.registrationStatus?.toString() ||
+      '',
+    type: application.event || '',
+    brnDrn:
+      application.data?.registration?.registrationNumber?.toString() || '',
+    trackingId: application.data?.registration?.trackingId?.toString() || '',
+    dateOfBirth: application.data?.child?.childBirthDate?.toString() || '',
+    dateOfDeath: application.data?.deathEvent?.deathDate?.toString() || '',
+    placeOfBirth: getLocation(application, resources, intl) || '',
+    placeOfDeath: getLocation(application, resources, intl) || '',
+    informant:
+      (
+        application.data?.registration?.contactPoint as IFormSectionData
+      )?.value.toString() || '',
+    informantContact:
+      (
+        (application.data?.registration?.contactPoint as IFormSectionData)
+          ?.nestedFields as IContactPoint
+      )?.registrationPhone.toString() || ''
+  }
 }
 
-const getWQApplication = (
-  tab: keyof IQueryData,
-  applicationId: string,
-  queryData: IQueryData
-): IApplicationData | null => {
-  const applications = queryData[tab].results || []
+const getWQApplicationData = (workqueueApplication: GQLEventSearchSet) => {
+  const name = getWQApplicationName(workqueueApplication)
 
-  const specificApplication = applications.find((application) => {
-    return application && application.id === applicationId
-  })
-
-  let applicationData: IApplicationData | null = null
-  if (specificApplication) {
-    const name = getWQApplicationName(specificApplication)
-
-    applicationData = {
-      id: specificApplication.id,
-      name: name,
-      type: (specificApplication.type && specificApplication.type) || '',
-      status: specificApplication.registration?.status || '',
-      trackingId: specificApplication.registration?.trackingId || '',
-      dateOfBirth: '',
-      placeOfBirth: '',
-      informant: ''
-    }
+  return {
+    id: workqueueApplication.id,
+    name: name,
+    type: (workqueueApplication.type && workqueueApplication.type) || '',
+    status: workqueueApplication.registration?.status || '',
+    trackingId: workqueueApplication.registration?.trackingId || '',
+    dateOfBirth: '',
+    placeOfBirth: '',
+    informant: ''
   }
+}
 
-  return applicationData
+const getGQLApplication = (data: IGQLApplication): IApplicationData => {
+  const application: IApplicationData = {
+    id: data?.id,
+    type: data?.registration?.type,
+    status: data?.registration?.status[0].type,
+    trackingId: data?.registration?.trackingId,
+    dateOfBirth: '',
+    placeOfBirth: '',
+    informant: ''
+  }
+  return application
 }
 
 const getApplicationInfo = (
@@ -365,8 +337,7 @@ const getApplicationInfo = (
   if (status[1]) finalStatus += ' ' + status[1]
 
   if (application?.informantContact) {
-    informant =
-      informant + ' . ' + getCaptitalizedWord(application.informantContact)
+    informant = informant + ' . ' + application.informantContact
   }
 
   let info: ILabel = {
@@ -428,49 +399,85 @@ const getApplicationInfo = (
   )
 }
 
-export const ShowRecordAudit = ({
-  applicationId,
-  tab,
-  intl,
-  resources,
-  queryData,
-  savedApplications
-}: IFullProps) => {
-  let application: IApplicationData | null
-  application = getSavedApplications(
-    applicationId,
-    savedApplications,
-    resources,
-    intl
-  )
-  const isDownloaded = application ? true : false
-  if (!isDownloaded) {
-    application = getWQApplication(tab, applicationId, queryData)
-  }
-
+function RecordAuditView(application: IApplicationData, isDownloaded = false) {
   return (
-    <div id={'recordAudit'}>
+    <>
       <Header />
       <Navigation deselectAllTabs={true} />
       <BodyContainer>
-        {application && (
-          <Content
-            title={application.name || 'No name provided'}
-            titleColor={application.name ? 'copy' : 'grey600'}
-            size={'large'}
-            icon={() => (
-              <ApplicationIcon
-                color={
-                  STATUSTOCOLOR[(application && application.status) || 'DRAFT']
-                }
-              />
-            )}
-          >
-            {getApplicationInfo(application, isDownloaded)}
-          </Content>
-        )}
+        <Content
+          title={application.name || 'No name provided'}
+          titleColor={application.name ? 'copy' : 'grey600'}
+          size={'large'}
+          icon={() => (
+            <ApplicationIcon
+              color={
+                STATUSTOCOLOR[(application && application.status) || 'DRAFT']
+              }
+            />
+          )}
+        >
+          {getApplicationInfo(application, isDownloaded)}
+        </Content>
       </BodyContainer>
-    </div>
+    </>
+  )
+}
+
+const ShowRecordAudit = ({
+  applicationId,
+  draft,
+  language,
+  tab,
+  theme,
+  intl,
+  resources,
+  workqueueApplication
+}: IFullProps) => {
+  if (draft) {
+    return RecordAuditView(
+      getDraftApplicationData(draft, resources, intl),
+      true
+    )
+  } else if (tab === 'search') {
+    return (
+      <>
+        <Query
+          query={FETCH_APPLICATION_SHORT_INFO}
+          variables={{
+            id: applicationId
+          }}
+          fetchPolicy="no-cache"
+        >
+          {({
+            loading,
+            error,
+            data
+          }: {
+            loading: any
+            error?: any
+            data: any
+          }) => {
+            if (loading) {
+              return (
+                <StyledSpinner
+                  id="field-agent-home-spinner"
+                  baseColor={theme.colors.background}
+                />
+              )
+            } else if (error) {
+              return <Redirect to={HOME} />
+            }
+            return RecordAuditView(getGQLApplication(data.fetchRegistration))
+          }}
+        </Query>
+      </>
+    )
+  }
+  return RecordAuditView(
+    getWQApplicationData(
+      workqueueApplication as NonNullable<typeof workqueueApplication>
+    )
   )
 }
 
@@ -478,10 +485,21 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
   const { applicationId, tab } = props.match.params
   return {
     applicationId,
-    tab,
-    queryData: state.workqueueState.workqueue.data,
+    draft:
+      state.applicationsState.applications.find(
+        (application) =>
+          application.id === applicationId ||
+          application.compositionId === applicationId
+      ) || null,
+    language: state.i18n.language,
     resources: getOfflineData(state),
-    savedApplications: state.applicationsState.applications
+    tab,
+    workqueueApplication:
+      (tab !== 'search' &&
+        state.workqueueState.workqueue.data[tab].results?.find(
+          (gqlSearchSet) => gqlSearchSet?.id === applicationId
+        )) ||
+      null
   }
 }
 
@@ -494,4 +512,4 @@ export const RecordAudit = connect<
   goToApplicationDetails,
   goBack: goBackAction,
   goToRegistrarHomeTab
-})(injectIntl(ShowRecordAudit))
+})(injectIntl(withTheme(ShowRecordAudit)))
