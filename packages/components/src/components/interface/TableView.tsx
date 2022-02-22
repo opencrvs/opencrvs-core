@@ -47,6 +47,7 @@ const TableHeader = styled.div<{
   isSortable?: boolean
   totalWidth?: number
   fixedWidth?: number
+  hideTableHeaderBorder?: boolean
 }>`
   ${({ fixedWidth, totalWidth }) =>
     fixedWidth ? `width: ${fixedWidth}px;` : `width: ${totalWidth || 100}%;`}
@@ -55,6 +56,9 @@ const TableHeader = styled.div<{
   display: flex;
   align-items: flex-end;
   border-bottom: 1px solid ${({ theme }) => theme.colors.disabled};
+  ${({ hideTableHeaderBorder }) =>
+    hideTableHeaderBorder === true ? 'border-bottom: none;' : ''};
+
   border-radius: 2px;
 
   & span:first-child {
@@ -316,6 +320,7 @@ interface ITableViewProps {
   highlightRowOnMouseOver?: boolean
   isFullPage?: boolean
   fixedWidth?: number
+  hideTableHeaderBorder?: boolean
 }
 
 interface ITableViewState {
@@ -405,7 +410,8 @@ export class TableView extends React.Component<
       loadMoreText,
       highlightRowOnMouseOver,
       isFullPage,
-      fixedWidth
+      fixedWidth,
+      hideTableHeaderBorder
     } = this.props
     const totalItems = this.props.totalItems || 0
     const totalWidth = columns.reduce((total, col) => (total += col.width), 0)
@@ -427,7 +433,11 @@ export class TableView extends React.Component<
             >
               {!hideTableHeader && content.length > 0 && (
                 <TableHeaderWrapper>
-                  <TableHeader totalWidth={totalWidth} fixedWidth={fixedWidth}>
+                  <TableHeader
+                    totalWidth={totalWidth}
+                    fixedWidth={fixedWidth}
+                    hideTableHeaderBorder={hideTableHeaderBorder}
+                  >
                     {columns.map((preference, index) => (
                       <ContentWrapper
                         key={index}

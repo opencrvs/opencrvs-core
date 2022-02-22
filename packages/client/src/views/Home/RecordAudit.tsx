@@ -46,7 +46,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { IFormSectionData, IContactPoint, Action } from '@client/forms'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { LinkButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { constantsMessages, userMessages } from '@client/i18n/messages'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { getLanguage } from '@client/i18n/selectors'
@@ -563,7 +563,14 @@ const getName = (
   return (
     <NameAvatar>
       <AvatarSmall avatar={avatar} name={userName} />
-      <span>{userName}</span>
+      <span>
+        <LinkButton
+          id={'username-link'}
+          onClick={() => alert('username clicked')}
+        >
+          {userName}
+        </LinkButton>
+      </span>
     </NameAvatar>
   )
 }
@@ -572,6 +579,10 @@ const getStatusLabel = (status: string, intl: IntlShape) => {
   if (status in APPLICATION_STATUS_LABEL)
     return intl.formatMessage(APPLICATION_STATUS_LABEL[status])
   return ''
+}
+
+const getLink = (status: string) => {
+  return <LinkButton onClick={() => alert('link clicked')}>{status}</LinkButton>
 }
 
 const getHistory = (
@@ -597,16 +608,16 @@ const getHistory = (
     savedApplication.data.history as unknown as { [key: string]: any }[]
   ).map((item) => ({
     date: moment(item?.date).format('MMM DD, YYYY. h:m a'),
-    action: getStatusLabel(item?.action, intl),
+    action: getLink(getStatusLabel(item?.action, intl)),
     user: getName(item.user.name, item.user?.avatar, language),
     type: intl.formatMessage(userMessages[item.user.role as string]),
-    location: item.location.name
+    location: getLink(item.location.name)
   }))
 
   const columns = [
     {
       label: 'Action',
-      width: 15,
+      width: 20,
       key: 'action'
     },
     {
@@ -630,6 +641,7 @@ const getHistory = (
         content={historyData}
         alignItemCenter={true}
         pageSize={100}
+        hideTableHeaderBorder={true}
       />
     </>
   )
