@@ -301,7 +301,10 @@ class FieldAgentHomeView extends React.Component<
           {
             label: 'rowClickHandler',
             handler: () =>
-              this.props.goToApplicationRecordAudit(registrationSearchSet.id)
+              this.props.goToApplicationRecordAudit(
+                'rejectTab',
+                registrationSearchSet.id
+              )
           }
         ]
       }

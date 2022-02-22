@@ -65,6 +65,7 @@ import { goBack as back, push, replace } from 'connected-react-router'
 import moment from 'moment'
 import { stringify } from 'query-string'
 import { Cmd, loop } from 'redux-loop'
+import { IQueryData } from '@client/views/OfficeHome/OfficeHome'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -290,10 +291,11 @@ export function goToApplicationDetails(
 }
 
 export function goToApplicationRecordAudit(
+  tab: keyof IQueryData,
   applicationId: string,
   forceDetailsQuery?: boolean
 ) {
-  return push(formatUrl(APPLICATION_RECORD_AUDIT, { applicationId }), {
+  return push(formatUrl(APPLICATION_RECORD_AUDIT, { tab, applicationId }), {
     forceDetailsQuery
   })
 }

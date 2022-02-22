@@ -91,7 +91,8 @@ function ExternalValidationTabComponent(props: IProps) {
         rowClickHandler: [
           {
             label: 'rowClickHandler',
-            handler: () => props.goToApplicationRecordAudit(reg.id)
+            handler: () =>
+              props.goToApplicationRecordAudit('externalValidationTab', reg.id)
           }
         ]
       }

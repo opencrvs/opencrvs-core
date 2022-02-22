@@ -267,7 +267,8 @@ export class InProgressTabComponent extends React.Component<
         rowClickHandler: [
           {
             label: 'rowClickHandler',
-            handler: () => this.props.goToApplicationRecordAudit(regId)
+            handler: () =>
+              this.props.goToApplicationRecordAudit('inProgressTab', regId)
           }
         ]
       }
@@ -320,7 +321,8 @@ export class InProgressTabComponent extends React.Component<
         rowClickHandler: [
           {
             label: 'rowClickHandler',
-            handler: () => this.props.goToApplicationRecordAudit(draft.id)
+            handler: () =>
+              this.props.goToApplicationRecordAudit('inProgressTab', draft.id)
           }
         ]
       }

@@ -196,7 +196,8 @@ class ReviewTabComponent extends React.Component<
         rowClickHandler: [
           {
             label: 'rowClickHandler',
-            handler: () => this.props.goToApplicationRecordAudit(reg.id)
+            handler: () =>
+              this.props.goToApplicationRecordAudit('reviewTab', reg.id)
           }
         ]
       }

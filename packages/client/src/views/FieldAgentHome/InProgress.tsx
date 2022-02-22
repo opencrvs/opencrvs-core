@@ -87,7 +87,8 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
         rowClickHandler: [
           {
             label: 'rowClickHandler',
-            handler: () => this.props.goToApplicationRecordAudit(draft.id)
+            handler: () =>
+              this.props.goToApplicationRecordAudit('inProgressTab', draft.id)
           }
         ]
       }

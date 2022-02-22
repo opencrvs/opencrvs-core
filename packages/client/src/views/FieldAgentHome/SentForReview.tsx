@@ -182,7 +182,10 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
                     'No composition id found for this application'
                   )
                 }
-                this.props.goToApplicationRecordAudit(draft.compositionId)
+                this.props.goToApplicationRecordAudit(
+                  'reviewTab',
+                  draft.compositionId
+                )
               }
             }
           ]
