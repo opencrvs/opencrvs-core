@@ -585,6 +585,16 @@ const getLink = (status: string) => {
   return <LinkButton onClick={() => alert('link clicked')}>{status}</LinkButton>
 }
 
+const getFormattedDate = (date: Date) => {
+  const momentDate = moment(date)
+  return (
+    <>
+      {momentDate.format('MMMM DD, YYYY')} &middot;{' '}
+      {momentDate.format('hh.mm A')}
+    </>
+  )
+}
+
 const getHistory = (
   application: IApplicationData,
   props: IFullProps,
@@ -607,7 +617,7 @@ const getHistory = (
   const historyData = (
     savedApplication.data.history as unknown as { [key: string]: any }[]
   ).map((item) => ({
-    date: moment(item?.date).format('MMM DD, YYYY. h:m a'),
+    date: getFormattedDate(item?.date),
     action: getLink(getStatusLabel(item?.action, intl)),
     user: getName(item.user.name, item.user?.avatar, language),
     type: intl.formatMessage(userMessages[item.user.role as string]),
