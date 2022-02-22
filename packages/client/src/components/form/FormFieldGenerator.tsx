@@ -118,7 +118,11 @@ import { LocationSearch } from '@opencrvs/components/lib/interface'
 import { REGEXP_NUMBER_INPUT_NON_NUMERIC } from '@client/utils/constants'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { generateLocations } from '@client/utils/locationUtils'
-import { IUserDetails } from '@client/utils/userUtils'
+import {
+  IUserDetails,
+  IGQLLocation,
+  IIdentifier
+} from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 
 const fadeIn = keyframes`
@@ -237,7 +241,6 @@ function GeneratedInputField({
   }
 
   if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
-    console.log('value', value)
     return (
       <InputField {...inputFieldProps}>
         <Select
@@ -565,46 +568,42 @@ const mapFieldsToValues = (
       }
     }
 
-    if (field.type === SELECT_WITH_DYNAMIC_OPTIONS && !field.initialValue) {
-      const district =
-        userDetails?.catchmentArea && userDetails?.catchmentArea[0].id
-      const state =
-        userDetails?.catchmentArea && userDetails?.catchmentArea[1].id
+    if (
+      field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
+      !field.initialValue &&
+      field.dynamicOptions.initialValue === 'agentDefault'
+    ) {
+      const catchmentAreas: IGQLLocation[] | undefined =
+        userDetails?.catchmentArea && userDetails?.catchmentArea
+      const catchmentAreaLengths = catchmentAreas?.length || 0
+      let district = ''
+      let state = ''
 
-      console.log(field)
-      console.log(userDetails)
-
-      if (field.name === 'state' && !field.initialValue) {
-        // const nestedFieldsFlatted = flatten(Object.values(field.nestedFields))
-
-        // const nestedInitialValues = nestedFieldsFlatted.reduce(
-        //   (nestedValues, nestedField) => ({
-        //     ...nestedValues,
-        //     [nestedField.name]: nestedField.initialValue
-        //   }),
-        //   {}
-        // )
-
-        // let value =  state as IFormFieldValue
-        // nestedFields: nestedInitialValues
-        fieldInitialValue = state as IFormFieldValue
+      if (catchmentAreas) {
+        for (let index = 0; index < catchmentAreaLengths; index++) {
+          if (
+            (
+              (catchmentAreas[index] as IGQLLocation)
+                .identifier as IIdentifier[]
+            )[1].value === 'DISTRICT'
+          ) {
+            district = (catchmentAreas[index] as IGQLLocation).id
+          } else if (
+            (
+              (catchmentAreas[index] as IGQLLocation)
+                .identifier as IIdentifier[]
+            )[1].value === 'STATE'
+          ) {
+            state = (catchmentAreas[index] as IGQLLocation).id
+          }
+        }
       }
-      if (field.name === 'district' && !field.initialValue) {
-        // const nestedFieldsFlatted = flatten(Object.values(field.nestedFields))
 
-        // const nestedInitialValues = nestedFieldsFlatted.reduce(
-        //   (nestedValues, nestedField) => ({
-        //     ...nestedValues,
-        //     [nestedField.name]: nestedField.initialValue
-        //   }),
-        //   {}
-        // )
-
-        // fieldInitialValue = {
-        //   value: district as IFormFieldValue
-        //   // nestedFields: nestedInitialValues
-        // }
+      if (field.name === 'district' && !field.initialValue && district) {
         fieldInitialValue = district as IFormFieldValue
+      }
+      if (field.name === 'state' && !field.initialValue && state) {
+        fieldInitialValue = state as IFormFieldValue
       }
     }
     return { ...memo, [field.name]: fieldInitialValue }
