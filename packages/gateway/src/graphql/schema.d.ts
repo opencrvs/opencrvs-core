@@ -55,6 +55,7 @@ export interface GQLMutation {
   markBirthAsCertified: string
   requestBirthRegistrationCorrection: string
   markEventAsVoided: string
+  markApplicationAsReinstated: string
   markEventAsArchived: string
   notADuplicate: string
   createDeathRegistration: GQLCreatedIds
@@ -1811,8 +1812,8 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markBirthAsCertified?: MutationToMarkBirthAsCertifiedResolver<TParent>
   requestBirthRegistrationCorrection?: MutationToRequestBirthRegistrationCorrectionResolver<TParent>
   markEventAsVoided?: MutationToMarkEventAsVoidedResolver<TParent>
+  markApplicationAsReinstated?: MutationToMarkApplicationAsReinstatedResolver<TParent>
   markEventAsArchived?: MutationToMarkEventAsArchivedResolver<TParent>
-  markApplicationAsReinstated?: MutationToMarkEventAsArchivedResolver<TParent>
   notADuplicate?: MutationToNotADuplicateResolver<TParent>
   createDeathRegistration?: MutationToCreateDeathRegistrationResolver<TParent>
   updateDeathRegistration?: MutationToUpdateDeathRegistrationResolver<TParent>
@@ -1989,20 +1990,6 @@ export interface MutationToMarkEventAsVoidedResolver<
   ): TResult
 }
 
-export interface MutationToMarkEventAsArchivedArgs {
-  id: string
-}
-export interface MutationToMarkEventAsArchivedResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: MutationToMarkEventAsArchivedArgs,
-    context: any,
-    info: GraphQLResolveInfo
-  ): TResult
-}
 export interface MutationToMarkApplicationAsReinstatedArgs {
   id: string
 }
@@ -2013,6 +2000,21 @@ export interface MutationToMarkApplicationAsReinstatedResolver<
   (
     parent: TParent,
     args: MutationToMarkApplicationAsReinstatedArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToMarkEventAsArchivedArgs {
+  id: string
+}
+export interface MutationToMarkEventAsArchivedResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToMarkEventAsArchivedArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
