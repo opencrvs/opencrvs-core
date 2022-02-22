@@ -36,7 +36,7 @@ services:
       dockerfile: ./packages/gateway/Dockerfile
     restart: unless-stopped
     environment:
-      - REDIS_HOST=redis://redis:6379
+      - REDIS_HOST=redis
       - CONFIG_SMS_CODE_EXPIRY_SECONDS=600
       - CONFIG_TOKEN_EXPIRY_SECONDS=604800
       - NODE_ENV=development
@@ -156,3 +156,4 @@ services:
       - HOST=0.0.0.0
       - PORT=2021
       - MONGO_URL=mongodb://mongo1/application-config
+      - CHECK_INVALID_TOKEN=true

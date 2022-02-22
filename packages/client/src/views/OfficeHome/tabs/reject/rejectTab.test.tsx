@@ -317,7 +317,7 @@ describe('OfficeHome sent for update tab related tests', () => {
     testComponent.find('#load_more_button').last().hostNodes().simulate('click')
   })
 
-  it('renders expanded area for required updates', async () => {
+  it('redirects to recordAudit page if item is clicked on desktop size', async () => {
     Date.now = jest.fn(() => 1554055200000)
     const graphqlMock = [
       {
@@ -493,21 +493,17 @@ describe('OfficeHome sent for update tab related tests', () => {
       { store, history, graphqlMocks: graphqlMock }
     )
 
-    // wait for mocked data to load mockedProvider
-    await new Promise((resolve) => {
-      setTimeout(resolve, 200)
-    })
-    testComponent.update()
-    const instance = testComponent.find(GridTable).instance() as any
+    const element = await waitForElement(testComponent, '#row_0')
+    element.hostNodes().simulate('click')
 
-    instance.toggleExpanded('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
-    // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
-
     testComponent.update()
-    expect(testComponent.find('#REJECTED-0').hostNodes().length).toBe(1)
+
+    expect(window.location.href).toContain(
+      '/record-audit/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+    )
   })
 
   describe('handles download status', () => {
@@ -802,7 +798,7 @@ describe('Tablet tests', () => {
     resizeWindow(1024, 768)
   })
 
-  it('redirects to detail page if item is clicked', async () => {
+  it('redirects to recordAudit page if item is clicked', async () => {
     const TIME_STAMP = '1544188309380'
     Date.now = jest.fn(() => 1554055200000)
 
@@ -886,7 +882,7 @@ describe('Tablet tests', () => {
     testComponent.update()
 
     expect(window.location.href).toContain(
-      '/details/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+      '/record-audit/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
   })
 })

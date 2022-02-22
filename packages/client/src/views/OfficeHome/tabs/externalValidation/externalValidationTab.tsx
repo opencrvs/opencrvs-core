@@ -26,8 +26,7 @@ import {
 import { messages } from '@client/i18n/messages/views/registrarHome'
 import moment from 'moment'
 import { connect } from 'react-redux'
-import { goToPage, goToApplicationDetails } from '@client/navigation'
-import { RowHistoryView } from '@client/views/OfficeHome/RowHistoryView'
+import { goToPage, goToApplicationRecordAudit } from '@client/navigation'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { formattedDuration } from '@client/utils/date-formatting'
 
@@ -48,7 +47,7 @@ interface IBaseProps {
 
 interface IDispatchProps {
   goToPage: typeof goToPage
-  goToApplicationDetails: typeof goToApplicationDetails
+  goToApplicationRecordAudit: typeof goToApplicationRecordAudit
 }
 
 type IProps = IBaseProps & IntlShapeProps & IDispatchProps
@@ -92,7 +91,7 @@ function ExternalValidationTabComponent(props: IProps) {
         rowClickHandler: [
           {
             label: 'rowClickHandler',
-            handler: () => props.goToApplicationDetails(reg.id)
+            handler: () => props.goToApplicationRecordAudit(reg.id)
           }
         ]
       }
@@ -154,15 +153,6 @@ function ExternalValidationTabComponent(props: IProps) {
           }
         ]
 
-  const renderExpandedComponent = (itemId: string) => {
-    const { results } = props.queryData && props.queryData.data
-    const eventDetails =
-      results && results.find((result) => result && result.id === itemId)
-    return <RowHistoryView eventDetails={eventDetails} />
-  }
-
-  const isExpandable = viewportWidth > props.theme.grid.breakpoints.lg
-
   const { intl, queryData, page, onPageChange } = props
   const { data } = queryData
 
@@ -170,14 +160,12 @@ function ExternalValidationTabComponent(props: IProps) {
     <HomeContent>
       <GridTable
         content={transformWaitingValidationContent(data)}
-        renderExpandedComponent={renderExpandedComponent}
         noResultText={intl.formatMessage(constantsMessages.noResults)}
         onPageChange={onPageChange}
         pageSize={pageSize}
         totalItems={(data && data.totalItems) || 0}
         currentPage={page}
-        expandable={isExpandable}
-        clickable={!isExpandable}
+        clickable={true}
         showPaginated={props.showPaginated}
         loading={props.loading}
         loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
@@ -193,5 +181,5 @@ function ExternalValidationTabComponent(props: IProps) {
 
 export const ExternalValidationTab = connect(null, {
   goToPage,
-  goToApplicationDetails
+  goToApplicationRecordAudit
 })(injectIntl(withTheme(ExternalValidationTabComponent)))

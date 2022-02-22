@@ -30,9 +30,9 @@ export async function eventEstimationsHandler(
   const authHeader: IAuthHeader = {
     Authorization: request.headers.authorization
   }
-  let estimated45DayBirthMetrics
+  let estimatedTargetDayBirthMetrics
   try {
-    estimated45DayBirthMetrics = await fetchLocationWiseEventEstimations(
+    estimatedTargetDayBirthMetrics = await fetchLocationWiseEventEstimations(
       timeStart,
       timeEnd,
       locationId,
@@ -41,14 +41,14 @@ export async function eventEstimationsHandler(
     )
   } catch (error) {
     return {
-      birth45DayMetrics: {
+      birthTargetDayMetrics: {
         actualRegistration: 0,
         estimatedRegistration: 0,
         estimatedPercentage: 0,
         malePercentage: 0,
         femalePercentage: 0
       },
-      death45DayMetrics: {
+      deathTargetDayMetrics: {
         actualRegistration: 0,
         estimatedRegistration: 0,
         estimatedPercentage: 0,
@@ -57,9 +57,9 @@ export async function eventEstimationsHandler(
       }
     }
   }
-  let estimated45DayDeathMetrics
+  let estimatedTargetDayDeathMetrics
   try {
-    estimated45DayDeathMetrics = await fetchLocationWiseEventEstimations(
+    estimatedTargetDayDeathMetrics = await fetchLocationWiseEventEstimations(
       timeStart,
       timeEnd,
       locationId,
@@ -68,10 +68,10 @@ export async function eventEstimationsHandler(
     )
   } catch (error) {
     return {
-      birth45DayMetrics: {
-        ...estimated45DayBirthMetrics
+      birthTargetDayMetrics: {
+        ...estimatedTargetDayBirthMetrics
       },
-      death45DayMetrics: {
+      deathTargetDayMetrics: {
         actualRegistration: 0,
         estimatedRegistration: 0,
         estimatedPercentage: 0,
@@ -83,11 +83,11 @@ export async function eventEstimationsHandler(
 
   return {
     locationId,
-    birth45DayMetrics: {
-      ...estimated45DayBirthMetrics
+    birthTargetDayMetrics: {
+      ...estimatedTargetDayBirthMetrics
     },
-    death45DayMetrics: {
-      ...estimated45DayDeathMetrics
+    deathTargetDayMetrics: {
+      ...estimatedTargetDayDeathMetrics
     }
   }
 }

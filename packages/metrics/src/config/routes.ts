@@ -22,7 +22,8 @@ import {
   newDeathRegistrationHandler,
   newDeclarationHandler,
   newWaitingValidationHandler,
-  newValidationHandler
+  newValidationHandler,
+  requestCorrectionHandler
 } from '@metrics/features/registration/handler'
 import { metricsHandler } from '@metrics/features/metrics/handler'
 import { eventEstimationsHandler } from '@metrics/features/eventEstimations/handler'
@@ -216,6 +217,24 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/events/death/mark-voided',
       handler: markRejectedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+
+    // Request correction
+    {
+      method: 'POST',
+      path: '/events/birth/request-correction',
+      handler: requestCorrectionHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/request-correction',
+      handler: requestCorrectionHandler,
       config: {
         tags: ['api']
       }
