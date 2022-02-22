@@ -27,7 +27,7 @@ export function findCompositionSection(
       if (!section.code || !section.code.coding || !section.code.coding.some) {
         return false
       }
-      return section.code.coding.some(coding => coding.code === code)
+      return section.code.coding.some((coding) => coding.code === code)
     })
   )
 }
@@ -37,7 +37,7 @@ export function findTask(
 ): fhir.Task | undefined {
   const taskEntry: fhir.BundleEntry | undefined =
     bundleEntries &&
-    bundleEntries.find(entry => {
+    bundleEntries.find((entry) => {
       if (entry && entry.resource) {
         return entry.resource.resourceType === 'Task'
       } else {
@@ -52,7 +52,7 @@ export function findTaskExtension(task?: fhir.Task, extensionUrl?: string) {
     task &&
     task.extension &&
     task.extension.find(
-      extension => extension && extension.url === extensionUrl
+      (extension) => extension && extension.url === extensionUrl
     )
   )
 }
@@ -61,7 +61,7 @@ export function findTaskIdentifier(task?: fhir.Task, identiferSystem?: string) {
   return (
     task &&
     task.identifier &&
-    task.identifier.find(identifier => identifier.system === identiferSystem)
+    task.identifier.find((identifier) => identifier.system === identiferSystem)
   )
 }
 
@@ -195,10 +195,10 @@ export const getFromFhir = (suffix: string) => {
       'Content-Type': 'application/json+fhir'
     }
   })
-    .then(response => {
+    .then((response) => {
       return response.json()
     })
-    .catch(error => {
+    .catch((error) => {
       return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
     })
 }
@@ -226,14 +226,14 @@ export function selectObservationEntry(
   bundleEntries?: fhir.BundleEntry[]
 ): fhir.BundleEntry | undefined {
   return bundleEntries
-    ? bundleEntries.find(entry => {
+    ? bundleEntries.find((entry) => {
         if (entry.resource && entry.resource.resourceType === 'Observation') {
           const observationEntry = entry.resource as fhir.Observation
           const obCoding =
             observationEntry.code &&
             observationEntry.code.coding &&
             observationEntry.code.coding.find(
-              obCode => obCode.code === observationCode
+              (obCode) => obCode.code === observationCode
             )
           return obCoding ? true : false
         } else {

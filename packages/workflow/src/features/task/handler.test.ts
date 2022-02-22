@@ -25,8 +25,6 @@ import {
   testDeathFhirTaskBundle
 } from '@workflow/test/utils'
 import { cloneDeep } from 'lodash'
-
-import { cloneDeep } from 'lodash'
 import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any
