@@ -37,7 +37,7 @@ interface IProps {
 
 interface ILineDataPoint {
   label: React.ReactNode
-  registeredIn45Days: number
+  registeredInTargetDays: number
   totalRegistered: number
   totalEstimate: number
   registrationPercentage: string
@@ -50,90 +50,90 @@ SampleTriLineChart.args = {
   data: [
     {
       label: 'Oct',
-      registeredIn45Days: 0,
+      registeredInTargetDays: 0,
       totalRegistered: 0,
       totalEstimate: 17000,
       registrationPercentage: '0%'
     },
     {
       label: 'Nov',
-      registeredIn45Days: 0,
+      registeredInTargetDays: 0,
       totalRegistered: 0,
       totalEstimate: 17000,
       registrationPercentage: '0%'
     },
     {
       label: 'Dec,20',
-      registeredIn45Days: 0,
+      registeredInTargetDays: 0,
       totalRegistered: 0,
       totalEstimate: 17000,
       registrationPercentage: '0%'
     },
     {
       label: 'Jan',
-      registeredIn45Days: 0,
+      registeredInTargetDays: 0,
       totalRegistered: 0,
       totalEstimate: 17000,
       registrationPercentage: '0%'
     },
     {
       label: 'Feb',
-      registeredIn45Days: 500,
+      registeredInTargetDays: 500,
       totalRegistered: 1000,
       totalEstimate: 17000,
       registrationPercentage: '10%'
     },
     {
       label: 'Mar',
-      registeredIn45Days: 1000,
+      registeredInTargetDays: 1000,
       totalRegistered: 2000,
       totalEstimate: 17000,
       registrationPercentage: '20%'
     },
     {
       label: 'Apr',
-      registeredIn45Days: 1500,
+      registeredInTargetDays: 1500,
       totalRegistered: 3000,
       totalEstimate: 17000,
       registrationPercentage: '35%'
     },
     {
       label: 'May',
-      registeredIn45Days: 4000,
+      registeredInTargetDays: 4000,
       totalRegistered: 6000,
       totalEstimate: 17000,
       registrationPercentage: '25%'
     },
     {
       label: 'Jun',
-      registeredIn45Days: 4500,
+      registeredInTargetDays: 4500,
       totalRegistered: 6500,
       totalEstimate: 17000,
       registrationPercentage: '40%'
     },
     {
       label: 'Jul',
-      registeredIn45Days: 8000,
+      registeredInTargetDays: 8000,
       totalRegistered: 9000,
       totalEstimate: 17000,
       registrationPercentage: '55%'
     },
     {
       label: 'Aug',
-      registeredIn45Days: 6000,
+      registeredInTargetDays: 6000,
       totalRegistered: 7000,
       totalEstimate: 17000,
       registrationPercentage: '43%'
     },
     {
       label: 'Sept',
-      registeredIn45Days: 7500,
+      registeredInTargetDays: 7500,
       totalRegistered: 8000,
       totalEstimate: 17000,
       registrationPercentage: '45%'
     }
   ],
-  dataKeys: ['totalEstimate', 'totalRegistered', 'registeredIn45Days'],
+  dataKeys: ['totalEstimate', 'totalRegistered', 'registeredInTargetDays'],
   tooltipContent: (dataPoint: any) => <div />,
   legendContent: () => <div />
 }

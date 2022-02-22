@@ -17,7 +17,7 @@ print_usage_and_exit () {
     echo 'Usage: ./emergency-restore-metadata.sh date e.g. 2019-01-01'
     echo "This script CLEARS ALL DATA and RESTORES'S A SPECIFIC DAY'S DATA.  This process is irreversable, so USE WITH CAUTION."
     echo "Script must receive a date parameter to restore data from that specific day in format +%Y-%m-%d"
-    echo "The Hearth, OpenHIM and User db backup zips you would like to restore from: hearth-dev-{date}.gz, openhim-dev-{date}.gz and user-mgnt-{date}.gz must exist in /data/backups/mongo/{date} folder"
+    echo "The Hearth, OpenHIM User and Application-config db backup zips you would like to restore from: hearth-dev-{date}.gz, openhim-dev-{date}.gz, user-mgnt-{date}.gz and  application-config-{date}.gz must exist in /data/backups/mongo/{date} folder"
     echo "The Elasticsearch backup folder /data/backups/elasticsearch must exist with all previous snapshots and indices. All files are required"
     echo "The InfluxDB backup files must exist in the /data/backups/influxdb/{date} folder"
     exit 1
@@ -55,7 +55,7 @@ else
   NETWORK=opencrvs_overlay_net
 fi
 
-# Delete all data from Hearth, OpenHIM and any other service related Mongo databases
+# Delete all data from Hearth, OpenHIM, User and Application-config and any other service related Mongo databases
 #-----------------------------------------------------------------------------------
 docker run --rm --network=$NETWORK mongo:3.6 mongo hearth-dev --host $HOST --eval "db.dropDatabase()"
 docker run --rm --network=$NETWORK mongo:3.6 mongo openhim-dev --host $HOST --eval "db.dropDatabase()"
@@ -71,7 +71,7 @@ docker run --rm --network=$NETWORK appropriate/curl curl -XDELETE 'http://elasti
 docker run --rm --network=$NETWORK appropriate/curl curl -X POST 'http://influxdb:8086/query?db=ocrvs' --data-urlencode "q=DROP SERIES FROM /.*/" -v
 docker run --rm --network=$NETWORK appropriate/curl curl -X POST 'http://influxdb:8086/query?db=ocrvs' --data-urlencode "q=DROP DATABASE \"ocrvs\"" -v
 
-# Restore all data from a backup into Hearth, OpenHIM and any other service related Mongo databases
+# Restore all data from a backup into Hearth, OpenHIM, User, Application-config and any other service related Mongo databases
 #--------------------------------------------------------------------------------------------------
 docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:3.6 bash \
  -c "mongorestore --host $HOST --drop --gzip --archive=/data/backups/mongo/hearth-dev-$1.gz"

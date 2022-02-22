@@ -10,13 +10,21 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { createTestComponent, userDetails } from '@client/tests/util'
+import {
+  createTestComponent,
+  userDetails,
+  flushPromises,
+  getFileFromBase64String,
+  validImageB64String
+} from '@client/tests/util'
 import { createStore } from '@client/store'
 import { SettingsPage } from '@client/views/Settings/SettingsPage'
 import { getStorageUserDetailsSuccess } from '@opencrvs/client/src/profile/profileActions'
 import { DataSection } from '@opencrvs/components/lib/interface'
 import { ReactWrapper } from 'enzyme'
 import { COUNT_USER_WISE_APPLICATIONS } from '@client/search/queries'
+import { changeAvatarMutation } from './AvatarChangeModal'
+import * as imageUtils from '@client/utils/imageUtils'
 
 const graphqlMocks = [
   {
@@ -33,6 +41,21 @@ const graphqlMocks = [
           totalItems: 1
         }
       }
+    }
+  },
+  {
+    request: {
+      query: changeAvatarMutation,
+      variables: {
+        userId: '123',
+        avatar: {
+          type: 'image/jpeg',
+          data: validImageB64String
+        }
+      }
+    },
+    result: {
+      data: []
     }
   }
 ]
@@ -149,6 +172,100 @@ describe('Settings page tests', () => {
         component.find('#ChangePasswordModal').hostNodes().length
       )
       expect(modalIsClosed).toBe(true)
+    })
+  })
+
+  describe('When user changes profile image', () => {
+    const file = new File(['(⌐□_□)'], 'chucknorris.png', { type: 'image/png' })
+
+    it('should display apply change modal', async () => {
+      component
+        .find('#image_file_uploader_field')
+        .hostNodes()
+        .simulate('change', { target: { files: [file] } })
+
+      component.update()
+      expect(
+        component.find('SettingsView').state('showChangeAvatar')
+      ).toBeTruthy()
+    })
+
+    it('should show error for invalid image', async () => {
+      const invalidFile = new File(['(⌐□_□)'], 'chucknorris.png', {
+        type: 'image/svg+xml'
+      })
+      component
+        .find('#image_file_uploader_field')
+        .hostNodes()
+        .simulate('change', { target: { files: [invalidFile] } })
+
+      await flushPromises()
+      component.update()
+      expect(
+        component.find('SettingsView').state('imageLoadingError')
+      ).toBeTruthy()
+    })
+
+    it('should change profile image', async () => {
+      jest
+        .spyOn(imageUtils, 'getCroppedImage')
+        .mockImplementation((img, crop) =>
+          Promise.resolve({
+            type: 'image/jpeg',
+            data: validImageB64String
+          })
+        )
+      component
+        .find('#image_file_uploader_field')
+        .hostNodes()
+        .simulate('change', {
+          target: {
+            files: [
+              getFileFromBase64String(
+                validImageB64String,
+                'img.png',
+                'image/png'
+              )
+            ]
+          }
+        })
+
+      await flushPromises()
+
+      component.update()
+
+      component
+        .find('SettingsView')
+        .find('#apply_change')
+        .hostNodes()
+        .simulate('click')
+
+      await flushPromises()
+
+      component.update()
+
+      expect(
+        component.find('SettingsView').state('showChangeAvatar')
+      ).toBeFalsy()
+    })
+
+    it('Should close change avater modal', () => {
+      component
+        .find('#image_file_uploader_field')
+        .hostNodes()
+        .simulate('change', {
+          target: {
+            files: [file]
+          }
+        })
+
+      component.update()
+      component.find('#close-btn').hostNodes().simulate('click')
+      component.update()
+
+      expect(
+        component.find('SettingsView').state('showChangeAvatar')
+      ).toBeFalsy()
     })
   })
 })

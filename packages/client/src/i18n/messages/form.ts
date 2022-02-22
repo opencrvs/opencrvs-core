@@ -238,7 +238,7 @@ interface IFormMessages
   otherHealthInstitution: MessageDescriptor
   otherInstitution: MessageDescriptor
   otherOption: MessageDescriptor
-  paragraph45daysTo5Years: MessageDescriptor
+  paragraphTargetDaysTo5Years: MessageDescriptor
   paragraph: MessageDescriptor
   paragraphAbove5Years: MessageDescriptor
   permanentAddress: MessageDescriptor
@@ -280,6 +280,11 @@ interface IFormMessages
   sonInLaw: MessageDescriptor
   grandson: MessageDescriptor
   spouse: MessageDescriptor
+  grandfather: MessageDescriptor
+  grandmother: MessageDescriptor
+  brother: MessageDescriptor
+  sister: MessageDescriptor
+  legalGuardian: MessageDescriptor
   headOfTheInstitute: MessageDescriptor
   driverOfTheVehicle: MessageDescriptor
   ownerOfTheHouse: MessageDescriptor
@@ -1474,11 +1479,11 @@ const messagesToDefine: IFormMessages = {
     description: 'Documents Paragraph text',
     id: 'form.section.documents.birth.requirements'
   },
-  paragraph45daysTo5Years: {
+  paragraphTargetDaysTo5Years: {
     defaultMessage:
       'For birth regiatration of children below 5 years old, one of the documents listed below is required:',
     description: 'Documents Paragraph text',
-    id: 'form.section.documents.paragraph45daysTo5Years'
+    id: 'form.section.documents.paragraphTargetDaysTo5Years'
   },
   paragraphAbove5Years: {
     defaultMessage:
@@ -1687,6 +1692,31 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Grandson',
     description: 'Label for option Grandson',
     id: 'form.field.label.applicantRelation.grandson'
+  },
+  grandfather: {
+    defaultMessage: 'Grandfather',
+    description: 'Label for option Grandfather',
+    id: 'form.field.label.applicantRelation.grandfather'
+  },
+  grandmother: {
+    defaultMessage: 'Grandmother',
+    description: 'Label for option Grandmother',
+    id: 'form.field.label.applicantRelation.grandmother'
+  },
+  brother: {
+    defaultMessage: 'Brother',
+    description: 'Label for option brother',
+    id: 'form.field.label.applicantRelation.brother'
+  },
+  sister: {
+    defaultMessage: 'Sister',
+    description: 'Label for option Sister',
+    id: 'form.field.label.applicantRelation.sister'
+  },
+  legalGuardian: {
+    defaultMessage: 'Legal guardian',
+    description: 'Label for option Legal Guardian',
+    id: 'form.field.label.applicantRelation.legalGuardian'
   },
   spouse: {
     defaultMessage: 'Spouse',

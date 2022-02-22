@@ -23,7 +23,7 @@ import {
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/fieldAgentHome'
 import {
-  goToApplicationDetails,
+  goToApplicationRecordAudit,
   goToEvents as goToEventsAction,
   goToFieldAgentHomeTab as goToFieldAgentHomeTabAction
 } from '@client/navigation'
@@ -76,7 +76,8 @@ import {
   GQLDeathEventSearchSet,
   GQLEventSearchSet,
   GQLHumanName,
-  GQLQuery
+  GQLQuery,
+  GQLEventSearchResultSet
 } from '@opencrvs/gateway/src/graphql/schema'
 import moment from 'moment'
 import * as React from 'react'
@@ -95,7 +96,7 @@ const FABContainer = styled.div`
     display: none;
   }
 `
-const BodyContainer = styled.div`
+export const BodyContainer = styled.div`
   margin-left: 0px;
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin-left: 265px;
@@ -132,7 +133,7 @@ interface IBaseFieldAgentHomeProps {
   goToEvents: typeof goToEventsAction
   draftCount: string
   goToFieldAgentHomeTab: typeof goToFieldAgentHomeTabAction
-  goToApplicationDetails: typeof goToApplicationDetails
+  goToApplicationRecordAudit: typeof goToApplicationRecordAudit
   applicationsReadyToSend: IApplication[]
   updateFieldAgentDeclaredApplications: typeof updateFieldAgentDeclaredApplications
 }
@@ -300,7 +301,7 @@ class FieldAgentHomeView extends React.Component<
           {
             label: 'rowClickHandler',
             handler: () =>
-              this.props.goToApplicationDetails(registrationSearchSet.id, true)
+              this.props.goToApplicationRecordAudit(registrationSearchSet.id)
           }
         ]
       }
@@ -503,6 +504,6 @@ const mapStateToProps = (
 export const FieldAgentHome = connect(mapStateToProps, {
   goToEvents: goToEventsAction,
   goToFieldAgentHomeTab: goToFieldAgentHomeTabAction,
-  goToApplicationDetails,
+  goToApplicationRecordAudit,
   updateFieldAgentDeclaredApplications
 })(injectIntl(withTheme(withOnlineStatus(FieldAgentHomeView))))

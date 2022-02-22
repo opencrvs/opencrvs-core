@@ -12,8 +12,8 @@
 import { IOfflineDataState, IOfflineData } from '@client/offline/reducer'
 import { IStoreState } from '@client/store'
 import { IUserDetails } from '@client/utils/userUtils'
-import { merge } from 'lodash'
 import { NATL_ADMIN_ROLES, SYS_ADMIN_ROLES } from '@client/utils/constants'
+import { merge } from 'lodash'
 
 export const getOfflineState = (store: IStoreState): IOfflineDataState =>
   store.offline

@@ -350,7 +350,7 @@ describe('OfficeHome sent for review tab related tests', () => {
     testComponent.find('#load_more_button').last().hostNodes().simulate('click')
   })
 
-  it('renders expanded area for validated status', async () => {
+  it('redirects to recordAudit page if row is clicked', async () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
@@ -444,120 +444,14 @@ describe('OfficeHome sent for review tab related tests', () => {
       />,
       { store, history }
     )
+    const element = await waitForElement(testComponent, '#row_0')
+    element.hostNodes().simulate('click')
 
-    const gridTable = (
-      await waitForElement(testComponent, GridTable)
-    ).instance()
-
-    gridTable.toggleExpanded('bc09200d-0160-43b4-9e2b-5b9e90424e95')
-
-    const element = await waitForElement(testComponent, '#VALIDATED-0')
-
-    expect(element.hostNodes().length).toBe(1)
-  })
-
-  it('renders expanded area for declared status', async () => {
-    Date.now = jest.fn(() => 1554055200000)
-
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <ReviewTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
-        queryData={{
-          data: {
-            totalItems: 2,
-            results: [
-              {
-                id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                type: 'Birth',
-                registration: {
-                  status: 'DECLARED',
-                  contactNumber: '01622688231',
-                  trackingId: 'BW0UTHR',
-                  registrationNumber: undefined,
-                  eventLocationId: undefined,
-                  registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
-                  duplicates: [null],
-                  createdAt: '2018-05-23T14:44:58+02:00',
-                  modifiedAt: '2018-05-23T14:44:58+02:00'
-                },
-                dateOfBirth: '2010-10-10',
-                childName: [
-                  {
-                    firstNames: 'Iliyas',
-                    familyName: 'Khan',
-                    use: 'en'
-                  },
-                  {
-                    firstNames: 'ইলিয়াস',
-                    familyName: 'খান',
-                    use: 'bn'
-                  }
-                ]
-              } as GQLBirthEventSearchSet,
-              {
-                id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                type: 'Death',
-                registration: {
-                  status: 'VALIDATED',
-                  trackingId: 'DW0UTHR',
-                  registrationNumber: undefined,
-                  eventLocationId: undefined,
-                  contactNumber: undefined,
-                  duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
-                  registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
-                  createdAt: '2007-01-01',
-                  modifiedAt: '2007-01-01'
-                },
-                operationHistories: [
-                  {
-                    operationType: 'DECLARED',
-                    operatedOn: '2019-12-12T15:23:21.280Z',
-                    operatorRole: 'FIELD_AGENT',
-                    operatorName: [
-                      {
-                        firstNames: 'Tamim',
-                        familyName: 'Iqbal',
-                        use: 'en'
-                      },
-                      {
-                        firstNames: '',
-                        familyName: null,
-                        use: 'bn'
-                      }
-                    ],
-                    operatorOfficeName: 'Alokbali Union Parishad',
-                    operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ']
-                  }
-                ],
-                dateOfDeath: '2007-01-01',
-                deceasedName: [
-                  {
-                    firstNames: 'Iliyas',
-                    familyName: 'Khan',
-                    use: 'en'
-                  },
-                  {
-                    firstNames: 'ইলিয়াস',
-                    familyName: 'খান',
-                    use: 'bn'
-                  }
-                ]
-              } as GQLDeathEventSearchSet
-            ]
-          }
-        }}
-      />,
-      { store, history }
+    await waitFor(() =>
+      window.location.href.includes(
+        '/record-audit/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+      )
     )
-
-    const instance = (await waitForElement(testComponent, GridTable)).instance()
-
-    instance.toggleExpanded('bc09200d-0160-43b4-9e2b-5b9e90424e95')
-
-    const element = await waitForElement(testComponent, '#DECLARED-0')
-
-    expect(element.hostNodes().length).toBe(1)
   })
 
   describe('handles download status', () => {
@@ -945,7 +839,7 @@ describe('Tablet tests', () => {
     resizeWindow(1024, 768)
   })
 
-  it('redirects to detail page if item is clicked', async () => {
+  it('redirects to recordAudit page if item is clicked', async () => {
     const TIME_STAMP = '1544188309380'
     Date.now = jest.fn(() => 1554055200000)
 
@@ -1027,7 +921,7 @@ describe('Tablet tests', () => {
     row.hostNodes().simulate('click')
 
     expect(window.location.href).toContain(
-      '/details/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+      '/record-audit/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
   })
 })
