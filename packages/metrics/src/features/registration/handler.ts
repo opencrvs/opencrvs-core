@@ -34,7 +34,8 @@ export async function waitingValidationHandler(
   try {
     points.push(
       await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
-        Authorization: request.headers.authorization
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
       })
     )
     points.push(
@@ -42,7 +43,8 @@ export async function waitingValidationHandler(
         request.payload as fhir.Bundle,
         ['IN_PROGRESS', 'DECLARED', 'VALIDATED'],
         {
-          Authorization: request.headers.authorization
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
         }
       )
     )
@@ -62,14 +64,16 @@ export async function newValidationHandler(
   try {
     points.push(
       await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
-        Authorization: request.headers.authorization
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
       })
     )
     points.push(
       await generateApplicationStartedPoint(
         request.payload as fhir.Bundle,
         {
-          Authorization: request.headers.authorization
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
         },
         Events.NEW_VALIDATE
       )
@@ -90,14 +94,16 @@ export async function newWaitingValidationHandler(
   try {
     points.push(
       await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
-        Authorization: request.headers.authorization
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
       })
     )
     points.push(
       await generateApplicationStartedPoint(
         request.payload as fhir.Bundle,
         {
-          Authorization: request.headers.authorization
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
         },
         Events.NEW_WAITING_VALIDATION
       )
@@ -118,14 +124,16 @@ export async function newDeclarationHandler(
   try {
     points.push(
       await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
-        Authorization: request.headers.authorization
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
       })
     )
     points.push(
       await generateApplicationStartedPoint(
         request.payload as fhir.Bundle,
         {
-          Authorization: request.headers.authorization
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
         },
         Events.NEW_DEC
       )
@@ -146,19 +154,22 @@ export async function inProgressHandler(
     const points = await generateInCompleteFieldPoints(
       request.payload as fhir.Bundle,
       {
-        Authorization: request.headers.authorization
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
       }
     )
     points.push(
       await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
-        Authorization: request.headers.authorization
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
       })
     )
     points.push(
       await generateApplicationStartedPoint(
         request.payload as fhir.Bundle,
         {
-          Authorization: request.headers.authorization
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
         },
         Events.IN_PROGRESS_DEC
       )
@@ -179,14 +190,16 @@ export async function markRejectedHandler(
     const points: IPoints[] = []
     points.push(
       await generateRejectedPoints(request.payload as fhir.Bundle, {
-        Authorization: request.headers.authorization
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
       })
     )
     points.push(
       await generateTimeLoggedPoint(
         request.payload as fhir.Bundle,
         {
-          Authorization: request.headers.authorization
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
         },
         true
       )
@@ -196,7 +209,8 @@ export async function markRejectedHandler(
         request.payload as fhir.Bundle,
         ['IN_PROGRESS', 'DECLARED', 'VALIDATED'],
         {
-          Authorization: request.headers.authorization
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
         },
         true
       )
@@ -220,11 +234,13 @@ export async function newBirthRegistrationHandler(
         request.payload as fhir.Bundle,
         'register-new-application',
         {
-          Authorization: request.headers.authorization
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
         }
       ),
       await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
-        Authorization: request.headers.authorization
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
       })
     )
     await writePoints(points)
@@ -250,14 +266,17 @@ export async function markBirthRegisteredHandler(
         bundle,
         ['IN_PROGRESS', 'DECLARED', 'VALIDATED', 'WAITING_VALIDATION'],
         {
-          Authorization: request.headers.authorization
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
         }
       ),
       generateBirthRegPoint(bundle, 'mark-existing-application-registered', {
-        Authorization: request.headers.authorization
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
       }),
       generateTimeLoggedPoint(bundle, {
-        Authorization: request.headers.authorization
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
       })
     ])
 
@@ -279,11 +298,13 @@ export async function newDeathRegistrationHandler(
         request.payload as fhir.Bundle,
         'register-new-application',
         {
-          Authorization: request.headers.authorization
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
         }
       ),
       await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
-        Authorization: request.headers.authorization
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
       })
     )
     await writePoints(points)
@@ -308,14 +329,17 @@ export async function markDeathRegisteredHandler(
         bundle,
         ['IN_PROGRESS', 'DECLARED', 'VALIDATED', 'WAITING_VALIDATION'],
         {
-          Authorization: request.headers.authorization
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
         }
       ),
       generateDeathRegPoint(bundle, 'mark-existing-application-registered', {
-        Authorization: request.headers.authorization
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
       }),
       generateTimeLoggedPoint(bundle, {
-        Authorization: request.headers.authorization
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
       })
     ])
 
@@ -334,13 +358,15 @@ export async function markCertifiedHandler(
   try {
     const points = await Promise.all([
       generatePaymentPoint(request.payload as fhir.Bundle, {
-        Authorization: request.headers.authorization
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
       }),
       generateEventDurationPoint(
         request.payload as fhir.Bundle,
         ['REGISTERED'],
         {
-          Authorization: request.headers.authorization
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
         }
       )
     ])
@@ -363,11 +389,13 @@ export async function markValidatedHandler(
         request.payload as fhir.Bundle,
         ['IN_PROGRESS', 'DECLARED'],
         {
-          Authorization: request.headers.authorization
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
         }
       ),
       generateTimeLoggedPoint(request.payload as fhir.Bundle, {
-        Authorization: request.headers.authorization
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
       })
     ])
 

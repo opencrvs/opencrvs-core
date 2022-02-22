@@ -31,6 +31,7 @@ import {
 } from 'apollo-server-hapi'
 import { getApolloConfig } from '@gateway/graphql/config'
 import * as database from '@gateway/features/user/database'
+import { uniqueId } from 'lodash'
 
 DotEnv.config({
   path: `${process.cwd()}/.env`
@@ -50,6 +51,14 @@ export async function createServer() {
   const plugins = getPlugins()
 
   await app.register(plugins)
+  app.ext({
+    type: 'onRequest',
+    method(request: Hapi.Request, h) {
+      request.headers['x-correlation-id'] =
+        request.headers['x-correlation-id'] || uniqueId()
+      return h.continue
+    }
+  })
   const apolloServer = new ApolloServer({
     ...getApolloConfig(),
     plugins: [ApolloServerPluginStopHapiServer({ hapiServer: app })]

@@ -320,7 +320,7 @@ export async function markEventAsRegisteredCallbackHandler(
         ? Events.BIRTH_MARK_REG
         : Events.DEATH_MARK_REG,
       { resourceType: 'Bundle', entry: [{ resource: task }] },
-      request.headers.authorization
+      request.headers
     )
   } catch (error) {
     logger.error(

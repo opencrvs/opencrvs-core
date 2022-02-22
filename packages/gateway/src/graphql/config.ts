@@ -105,7 +105,10 @@ export const getApolloConfig = (): Config => {
         throw new AuthenticationError(err)
       }
 
-      return { Authorization: request.headers.authorization }
+      return {
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
+      }
     }
   }
 }
