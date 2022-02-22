@@ -229,7 +229,7 @@ const generatePointLocations = async (
   // tslint:disable-next-line no-increment-decrement
   for (let index = 4; index > 1; index--) {
     locationID = await fetchParentLocationByLocationID(locationID, authHeader)
-    if (!locationID) {
+    if (!locationID || locationID === 'Location/0') {
       break
     }
     locations[`locationLevel${index}`] = locationID
