@@ -289,7 +289,6 @@ function reducer(
      * Configurations
      */
     case actions.APPLICATION_CONFIG_LOADED: {
-      _.merge(window.config, action.payload.config)
       const birthCertificateTemplate = _.find(action.payload.certificates, {
         event: 'birth',
         status: 'ACTIVE'
@@ -305,22 +304,25 @@ function reducer(
         death: { svgCode: deathCertificateTemplate.svgCode }
       } as IParsedCertificates
 
-      return {
-        ...state,
-        offlineData: {
-          ...state.offlineData,
-          config: action.payload.config,
-          templates: {
-            certificates: {
-              birth: {
-                definition: certificatesTemplates.birth.svgCode
-              },
-              death: {
-                definition: certificatesTemplates.birth.svgCode
-              }
+      const newOfflineData = {
+        ...state.offlineData,
+        config: action.payload.config,
+        templates: {
+          certificates: {
+            birth: {
+              definition: certificatesTemplates.birth.svgCode
+            },
+            death: {
+              definition: certificatesTemplates.birth.svgCode
             }
           }
         }
+      }
+
+      return {
+        ...state,
+        offlineDataLoaded: isOfflineDataLoaded(newOfflineData),
+        offlineData: newOfflineData
       }
     }
 
