@@ -24,7 +24,6 @@ import { CorrectionSummary } from './CorrectionSummary'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import styled from '@client/styledComponents'
 import { TimeMounted } from '@client/components/TimeMounted'
-import { useCallback } from 'react'
 
 const SpinnerWrapper = styled.div`
   height: 80vh;
@@ -39,14 +38,14 @@ type IProps = IStateProps & IDispatchProps
 
 function CorrectionFormComponent({ sectionId, ...props }: IProps) {
   const { application, modifyApplication } = props
-  const logTime = useCallback(
+  const logTime = React.useCallback(
     (timeMs: number) => {
       const applicationUpdated = application
       if (!applicationUpdated.timeLoggedMS) {
         applicationUpdated.timeLoggedMS = 0
       }
       applicationUpdated.timeLoggedMS += timeMs
-      props.modifyApplication(applicationUpdated)
+      modifyApplication(applicationUpdated)
     },
     [modifyApplication, application]
   )
