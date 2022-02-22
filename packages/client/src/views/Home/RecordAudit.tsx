@@ -567,6 +567,7 @@ const getName = (
         <LinkButton
           id={'username-link'}
           onClick={() => alert('username clicked')}
+          textDecoration="none"
         >
           {userName}
         </LinkButton>
@@ -582,7 +583,11 @@ const getStatusLabel = (status: string, intl: IntlShape) => {
 }
 
 const getLink = (status: string) => {
-  return <LinkButton onClick={() => alert('link clicked')}>{status}</LinkButton>
+  return (
+    <LinkButton textDecoration="none" onClick={() => alert('link clicked')}>
+      {status}
+    </LinkButton>
+  )
 }
 
 const getFormattedDate = (date: Date) => {
