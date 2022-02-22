@@ -19,6 +19,7 @@ print_usage_and_exit () {
     echo "  VERSION can be any OpenCRVS Core docker image tag or 'latest'"
     echo "  COUNTRY_CONFIG_VERSION can be any OpenCRVS Country Configuration docker image tag or 'latest'"
     echo "  COUNTRY_CONFIG_PATH path to where your resources package is located"
+    echo "  REPLICAS number of supported mongo databases in your replica set.  Can be 1, 3 or 5"
     exit 1
 }
 
@@ -63,11 +64,17 @@ if [ -z "$8" ] ; then
     print_usage_and_exit
 fi
 
+if [ -z "$9" ] ; then
+    echo 'Error: Argument REPLICAS is required in position 9.'
+    print_usage_and_exit
+fi
+
 ENV=$4
 HOST=$5
 VERSION=$6
 COUNTRY_CONFIG_VERSION=$7
 COUNTRY_CONFIG_PATH=$8
+REPLICAS=$9
 SSH_USER=${SSH_USER:-root}
 SSH_HOST=${SSH_HOST:-$HOST}
 LOG_LOCATION=${LOG_LOCATION:-/var/log}
@@ -109,22 +116,36 @@ rsync -rP /tmp/compose/infrastructure $SSH_USER@$SSH_HOST:/tmp/compose
 
 # Prepare docker-compose.deploy.yml and docker-compose.<COUNTRY>.yml file - rotate secrets etc
 if [[ "$ENV" = "development" ]]; then
-    ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/rotate-secrets.sh /tmp/compose/docker-compose.deploy.yml /tmp/compose/docker-compose.countryconfig.deploy.yml | tee -a '$LOG_LOCATION'/rotate-secrets.log'
+    ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/rotate-secrets.sh /tmp/compose/docker-compose.deploy.yml /tmp/compose/docker-compose.countryconfig.staging-deploy.yml | tee -a '$LOG_LOCATION'/rotate-secrets.log'
 elif [[ "$ENV" = "qa" ]]; then
-    ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/rotate-secrets.sh /tmp/compose/docker-compose.deploy.yml /tmp/compose/docker-compose.qa-deploy.yml /tmp/compose/docker-compose.countryconfig.deploy.yml | tee -a '$LOG_LOCATION'/rotate-secrets.log'
+    ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/rotate-secrets.sh /tmp/compose/docker-compose.deploy.yml /tmp/compose/docker-compose.qa-deploy.yml /tmp/compose/docker-compose.countryconfig.qa-deploy.yml | tee -a '$LOG_LOCATION'/rotate-secrets.log'
 else
-    ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/rotate-secrets.sh /tmp/compose/docker-compose.deploy.yml /tmp/compose/docker-compose.prod-deploy.yml /tmp/compose/docker-compose.countryconfig.deploy.yml | tee -a '$LOG_LOCATION'/rotate-secrets.log'
+  if [ "$REPLICAS" = "3" ]; then
+    ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/rotate-secrets.sh /tmp/compose/docker-compose.deploy.yml /tmp/compose/docker-compose.prod-deploy-3.yml /tmp/compose/docker-compose.countryconfig.prod-deploy.yml | tee -a '$LOG_LOCATION'/rotate-secrets.log'
+  elif [ "$REPLICAS" = "5" ]; then
+    ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/rotate-secrets.sh /tmp/compose/docker-compose.deploy.yml /tmp/compose/docker-compose.prod-deploy-5.yml /tmp/compose/docker-compose.countryconfig.prod-deploy.yml | tee -a '$LOG_LOCATION'/rotate-secrets.log'
+  else
+    echo "Error: Can only deply 3 or 5 replicas to production"
+    exit 1
+  fi
 fi
 # Setup configuration files and compose file for the deployment domain
 ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/setup-deploy-config.sh '$HOST' '$NETDATA_USER_DETAILS_BASE64' | tee -a '$LOG_LOCATION'/setup-deploy-config.log'
 
 # Deploy the OpenCRVS stack onto the swarm
 if [[ "$ENV" = "development" ]]; then
-    ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && HOSTNAME='$HOST' VERSION='$VERSION' COUNTRY_CONFIG_VERSION='$COUNTRY_CONFIG_VERSION' PAPERTRAIL='$PAPERTRAIL' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.countryconfig.deploy.yml --with-registry-auth opencrvs'
+    ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && HOSTNAME='$HOST' VERSION='$VERSION' COUNTRY_CONFIG_VERSION='$COUNTRY_CONFIG_VERSION' PAPERTRAIL='$PAPERTRAIL' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.countryconfig.staging-deploy.yml --with-registry-auth opencrvs'
 elif [[ "$ENV" = "qa" ]]; then
-    ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && HOSTNAME='$HOST' VERSION='$VERSION' COUNTRY_CONFIG_VERSION='$COUNTRY_CONFIG_VERSION' PAPERTRAIL='$PAPERTRAIL' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.qa-deploy.yml -c docker-compose.countryconfig.deploy.yml -c docker-compose.countryconfig.qa-deploy.yml --with-registry-auth opencrvs'
+    ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && HOSTNAME='$HOST' VERSION='$VERSION' COUNTRY_CONFIG_VERSION='$COUNTRY_CONFIG_VERSION' PAPERTRAIL='$PAPERTRAIL' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.qa-deploy.yml -c docker-compose.countryconfig.qa-deploy.yml --with-registry-auth opencrvs'
 else
-    ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && HOSTNAME='$HOST' VERSION='$VERSION' COUNTRY_CONFIG_VERSION='$COUNTRY_CONFIG_VERSION' PAPERTRAIL='$PAPERTRAIL' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.prod-deploy.yml -c docker-compose.countryconfig.deploy.yml --with-registry-auth opencrvs'
+  if [ "$REPLICAS" = "3" ]; then
+    ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && HOSTNAME='$HOST' VERSION='$VERSION' COUNTRY_CONFIG_VERSION='$COUNTRY_CONFIG_VERSION' PAPERTRAIL='$PAPERTRAIL' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.prod-deploy-3.yml -c docker-compose.countryconfig.prod-deploy.yml --with-registry-auth opencrvs'
+  elif [ "$REPLICAS" = "5" ]; then
+    ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && HOSTNAME='$HOST' VERSION='$VERSION' COUNTRY_CONFIG_VERSION='$COUNTRY_CONFIG_VERSION' PAPERTRAIL='$PAPERTRAIL' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.prod-deploy-5.yml -c docker-compose.countryconfig.prod-deploy.yml --with-registry-auth opencrvs'
+  else
+    echo "Unknown error running docker-compose on server as REPLICAS is not 3 or 5 in production."
+    exit 1
+  fi
 fi
 
 
@@ -138,19 +159,19 @@ if [ $1 == "--clear-data=yes" ] ; then
     echo
     echo "Clearing all existing data..."
     echo
-    ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/clear-all-data.sh'
+    ssh $SSH_USER@$SSH_HOST 'REPLICAS='$REPLICAS' && /tmp/compose/infrastructure/clear-all-data.sh'
 fi
 
 if [ $2 == "--restore-metadata=yes" ] ; then
     echo
     echo "Restoring metadata..."
     echo
-    ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/restore-metadata.sh'
+    ssh $SSH_USER@$SSH_HOST 'REPLICAS='$REPLICAS' && /tmp/compose/infrastructure/restore-metadata.sh'
 fi
 
 if [ $3 == "--update-metadata=yes" ] ; then
     echo
     echo "Updating existing metadata..."
     echo
-    ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/restore-metadata-updates.sh'
+    ssh $SSH_USER@$SSH_HOST 'REPLICAS='$REPLICAS' && /tmp/compose/infrastructure/restore-metadata-updates.sh'
 fi

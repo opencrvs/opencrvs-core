@@ -15,7 +15,7 @@
 #------------------------------------------------------------------------------------------------------------------
 
 print_usage_and_exit () {
-    echo 'Usage: ./emergency-backup-metadata.sh SSH_USER SSH_HOST SSH_PORT PRODUCTION_IP REMOTE_DIR'
+    echo 'Usage: ./emergency-backup-metadata.sh SSH_USER SSH_HOST SSH_PORT PRODUCTION_IP REMOTE_DIR REPLICAS'
     echo "Script must receive SSH details and a target directory of a remote server to copy backup files to."
     echo "7 days of backup data will be retained in the manager node"
     exit 1
@@ -41,6 +41,10 @@ if [ -z "$5" ] ; then
     echo "Error: Argument for the REMOTE_DIR is required in position 5."
     print_usage_and_exit
 fi
+if [ -z "$6" ] ; then
+    echo "Error: Argument for the REPLICAS is required in position 6."
+    print_usage_and_exit
+fi
 
 # Host and directory where backups will be remotely saved
 #--------------------------------------------------------
@@ -49,16 +53,26 @@ SSH_HOST=$2
 SSH_PORT=$3
 PRODUCTION_IP=$4
 REMOTE_DIR=$5
+REPLICAS=$5
 
 # Select docker network and replica set in production
 #----------------------------------------------------
-if [ "$DEV" = "true" ]; then
+if [ "$REPLICAS" = "0" ]; then
   HOST=mongo1
   NETWORK=opencrvs_default
-  echo "Working in DEV mode"
-else
+  echo "Working with no replicas"
+elif [ "$REPLICAS" = "1" ]; then
+  HOST=rs0/mongo1
+  NETWORK=opencrvs_overlay_net
+  echo "Working with 1 replica"
+elif [ "$REPLICAS" = "3" ]; then
   HOST=rs0/mongo1,mongo2,mongo3
   NETWORK=opencrvs_overlay_net
+  echo "Working with 3 replicas"
+else [ "$REPLICAS" = "5" ]; then
+  HOST=rs0/mongo1,mongo2,mongo3,mongo4,mongo5
+  NETWORK=opencrvs_overlay_net
+  echo "Working with 5 replicas"
 fi
 
 # Today's date is used for filenames

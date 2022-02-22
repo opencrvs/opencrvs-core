@@ -10,13 +10,22 @@
 DIR=$(cd "$(dirname "$0")"; pwd)
 echo "Working dir: $DIR"
 
-if [ "$DEV" = "true" ]; then
+if [ "$REPLICAS" = "0" ]; then
   HOST=mongo1
   NETWORK=opencrvs_default
-  echo "Working in DEV mode"
-else
+  echo "Working with no replicas"
+elif [ "$REPLICAS" = "1" ]; then
+  HOST=rs0/mongo1
+  NETWORK=opencrvs_overlay_net
+  echo "Working with 1 replica"
+elif [ "$REPLICAS" = "3" ]; then
   HOST=rs0/mongo1,mongo2,mongo3
   NETWORK=opencrvs_overlay_net
+  echo "Working with 3 replicas"
+else [ "$REPLICAS" = "5" ]; then
+  HOST=rs0/mongo1,mongo2,mongo3,mongo4,mongo5
+  NETWORK=opencrvs_overlay_net
+  echo "Working with 5 replicas"
 fi
 
 docker run --rm -v $DIR/default_backups:/default_backups --network=$NETWORK mongo:3.6 bash \

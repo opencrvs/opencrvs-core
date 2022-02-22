@@ -7,13 +7,22 @@
 #
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
-if [ "$DEV" = "true" ]; then
+if [ "$REPLICAS" = "0" ]; then
   HOST=mongo1
   NETWORK=opencrvs_default
-  echo "Working in DEV mode"
-else
+  echo "Working with no replicas"
+elif [ "$REPLICAS" = "1" ]; then
+  HOST=rs0/mongo1
+  NETWORK=opencrvs_overlay_net
+  echo "Working with 1 replica"
+elif [ "$REPLICAS" = "3" ]; then
   HOST=rs0/mongo1,mongo2,mongo3
   NETWORK=opencrvs_overlay_net
+  echo "Working with 3 replicas"
+else [ "$REPLICAS" = "5" ]; then
+  HOST=rs0/mongo1,mongo2,mongo3,mongo4,mongo5
+  NETWORK=opencrvs_overlay_net
+  echo "Working with 5 replicas"
 fi
 
 # Delete all data from mongo
