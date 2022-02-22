@@ -341,6 +341,7 @@ services:
   hearth:
     environment:
       - mongodb__url=mongodb://mongo1,mongo2,mongo3/hearth-dev?replicaSet=rs0
+      - logger__level=warn
     depends_on:
       - mongo1
       - mongo2
