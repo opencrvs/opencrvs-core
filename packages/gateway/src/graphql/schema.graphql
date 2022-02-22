@@ -1208,6 +1208,7 @@ input ReasonsNotApplyingInput {
 }
 
 enum RegStatus {
+  ARCHIVED
   IN_PROGRESS
   DECLARED
   WAITING_VALIDATION

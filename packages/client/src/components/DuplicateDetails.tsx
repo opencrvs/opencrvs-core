@@ -56,6 +56,7 @@ export enum Event {
 }
 
 export enum Action {
+  ARCHIVED = 'ARCHIVED',
   IN_PROGRESS = 'IN_PROGRESS',
   DECLARED = 'DECLARED',
   WAITING_VALIDATION = 'WAITING_VALIDATION',

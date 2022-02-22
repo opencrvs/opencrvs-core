@@ -49,7 +49,6 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { messages } from '@client/i18n/messages/views/recordAudit'
-import NotificationToast from '@client/views/OfficeHome/NotificationToast'
 import {
   ARCHIVED,
   DECLARED,
@@ -512,6 +511,7 @@ const ShowRecordAudit = (props: IFullProps) => {
             onClick={() => {
               props.archiveApplication(applicationId)
               toggleDisplayDialog()
+              props.goToRegistrarHomeTab('review')
             }}
           >
             {intl.formatMessage(buttonMessages.archive)}
@@ -522,7 +522,6 @@ const ShowRecordAudit = (props: IFullProps) => {
       >
         {intl.formatMessage(messages.confirmationBody)}
       </ResponsiveModal>
-      <NotificationToast />
     </div>
   )
 }

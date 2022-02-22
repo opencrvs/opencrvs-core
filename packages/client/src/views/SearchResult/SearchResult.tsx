@@ -23,6 +23,7 @@ import {
 } from '@client/i18n/messages'
 import { messages as registrarHomeMessages } from '@client/i18n/messages/views/registrarHome'
 import { messages as rejectMessages } from '@client/i18n/messages/views/reject'
+import { messages as archiveMessages } from '@client/i18n/messages/views/recordAudit'
 import { messages } from '@client/i18n/messages/views/search'
 import {
   goToApplicationDetails,
@@ -260,6 +261,8 @@ export class SearchResultView extends React.Component<
 
   getDeclarationStatusLabel = (status: string) => {
     switch (status) {
+      case 'ARCHIVED':
+        return this.props.intl.formatMessage(archiveMessages.archived)
       case 'IN_PROGRESS':
         return this.props.intl.formatMessage(registrarHomeMessages.inProgress)
       case 'DECLARED':
@@ -320,6 +323,7 @@ export class SearchResultView extends React.Component<
       const downloadStatus =
         (foundApplication && foundApplication.downloadStatus) || undefined
 
+      const applicationIsArchived = reg.declarationStatus === 'ARCHIVED'
       const applicationIsRegistered = reg.declarationStatus === 'REGISTERED'
       const applicationIsCertified = reg.declarationStatus === 'CERTIFIED'
       const applicationIsRejected = reg.declarationStatus === 'REJECTED'
@@ -365,6 +369,7 @@ export class SearchResultView extends React.Component<
         (!applicationIsValidated &&
           !applicationIsRegistered &&
           !applicationIsCertified &&
+          !applicationIsArchived &&
           this.userHasValidateOrRegistrarScope())
       ) {
         actions.push({

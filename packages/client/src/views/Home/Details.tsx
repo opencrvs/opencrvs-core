@@ -226,6 +226,8 @@ function generateHistoryEntry(
 class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
   getWorkflowDateLabel = (status: string) => {
     switch (status) {
+      case 'ARCHIVED':
+        return messages.applicationArchivedOn
       case 'DRAFT_STARTED':
         return messages.applicationStartedOn
       case 'DRAFT_MODIFIED':
@@ -258,6 +260,12 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
         return (
           <StatusIcon>
             <StatusFailed />
+          </StatusIcon>
+        )
+      case 'ARCHIVED':
+        return (
+          <StatusIcon>
+            <StatusGray />
           </StatusIcon>
         )
       case 'DECLARED':

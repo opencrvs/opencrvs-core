@@ -256,7 +256,8 @@ export class SubmissionController {
       application.submissionStatus === SUBMISSION_STATUS.SUBMITTED ||
       application.submissionStatus === SUBMISSION_STATUS.APPROVED ||
       application.submissionStatus === SUBMISSION_STATUS.REGISTERED ||
-      application.submissionStatus === SUBMISSION_STATUS.REJECTED
+      application.submissionStatus === SUBMISSION_STATUS.REJECTED ||
+      application.submissionStatus === SUBMISSION_STATUS.ARCHIVED
     ) {
       if (scopes.includes('declare')) {
         const attachmentSectionKey = getAttachmentSectionKey(application.event)

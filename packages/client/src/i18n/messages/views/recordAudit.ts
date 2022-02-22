@@ -15,9 +15,15 @@ interface IConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   confirmationTitle: MessageDescriptor
   confirmationBody: MessageDescriptor
+  archived: MessageDescriptor
 }
 
 const messagesToDefine: IConfigMessages = {
+  archived: {
+    id: 'recordAudit.archive.status',
+    defaultMessage: 'Archived',
+    description: 'Archived status'
+  },
   confirmationTitle: {
     id: 'recordAudit.archive.confirmation.title',
     defaultMessage: 'Archive declaration?',
