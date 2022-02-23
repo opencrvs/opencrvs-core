@@ -53,11 +53,13 @@ describe('Record audit summary for applicationState', () => {
       <RecordAudit
         {...createRouterProps(
           formatUrl(APPLICATION_RECORD_AUDIT, {
+            tab: 'inProgressTab',
             applicationId: application.id
           }),
           { isNavigatedInsideApp: false },
           {
             matchParams: {
+              tab: 'inProgressTab',
               applicationId: application.id
             }
           }
@@ -68,9 +70,9 @@ describe('Record audit summary for applicationState', () => {
   })
 
   it('Record Audit page loads properly', async () => {
-    expect(component.find('#recordAudit').hostNodes()).toHaveLength(1)
-    expect(component.find('#summary').length).toEqual(14)
+    expect(component.exists('RecordAuditBody')).toBeTruthy()
   })
+
   it('Check values for saved applications', async () => {
     expect(component.find('#status_value').hostNodes().text()).toBe('Draft')
     expect(component.find('#type_value').hostNodes().text()).toBe('Birth')
@@ -138,11 +140,13 @@ describe('Record audit summary for WorkQueue Applications', () => {
       <RecordAudit
         {...createRouterProps(
           formatUrl(APPLICATION_RECORD_AUDIT, {
+            tab: 'inProgressTab',
             applicationId: 'db097901-feba-4f71-a1ae-d3d46289d2d5'
           }),
           { isNavigatedInsideApp: false },
           {
             matchParams: {
+              tab: 'inProgressTab',
               applicationId: 'db097901-feba-4f71-a1ae-d3d46289d2d5'
             }
           }
@@ -153,8 +157,7 @@ describe('Record audit summary for WorkQueue Applications', () => {
   })
 
   it('Record Audit page loads properly', async () => {
-    expect(component.find('#recordAudit').hostNodes()).toHaveLength(1)
-    expect(component.find('#summary').length).toEqual(12)
+    expect(component.exists('RecordAuditBody')).toBeTruthy()
   })
 
   it('Check values for WQ applications', async () => {

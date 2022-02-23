@@ -409,7 +409,13 @@ const getApplicationInfo = (
   )
 }
 
-function RecordAuditBody(application: IApplicationData, isDownloaded = false) {
+function RecordAuditBody({
+  application,
+  isDownloaded = false
+}: {
+  application: IApplicationData
+  isDownloaded?: boolean
+}) {
   return (
     <Content
       title={application.name || 'No name provided'}
@@ -459,8 +465,13 @@ function getBodyContent({
             } else if (error) {
               return <Redirect to={HOME} />
             }
-            return RecordAuditBody(
-              getGQLApplication(data.fetchRegistration, language)
+            return (
+              <RecordAuditBody
+                application={getGQLApplication(
+                  data.fetchRegistration,
+                  language
+                )}
+              />
             )
           }}
         </Query>
@@ -473,7 +484,7 @@ function getBodyContent({
         workqueueApplication as NonNullable<typeof workqueueApplication>,
         language
       )
-  return RecordAuditBody(application, !!draft)
+  return <RecordAuditBody application={application} isDownloaded={!!draft} />
 }
 
 const ShowRecordAudit = (props: IFullProps) => {
