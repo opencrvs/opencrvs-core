@@ -29,6 +29,8 @@ import { Event } from '@client/forms'
 import { formatUrl } from '@client/navigation'
 import { APPLICATION_RECORD_AUDIT } from '@client/navigation/routes'
 import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
+import { FETCH_APPLICATION_SHORT_INFO } from './queries'
+import { waitForElement } from '@client/tests/wait-for-element'
 
 const application: IApplication = createApplication(
   Event.BIRTH,
@@ -168,5 +170,131 @@ describe('Record audit summary for WorkQueue Applications', () => {
     )
     expect(component.find('#placeOfBirth_grey').hostNodes()).toHaveLength(1)
     expect(component.find('#placeOfDeath_grey').hostNodes()).toHaveLength(0)
+  })
+})
+
+describe('Record audit summary for GQLQuery', () => {
+  let component: ReactWrapper<{}, {}>
+
+  beforeEach(async () => {
+    const { store, history } = createStore()
+
+    const mocks = [
+      {
+        request: {
+          query: FETCH_APPLICATION_SHORT_INFO,
+          variables: {
+            id: '956281c9-1f47-4c26-948a-970dd23c4094'
+          }
+        },
+        result: {
+          data: {
+            fetchRegistration: {
+              id: '956281c9-1f47-4c26-948a-970dd23c4094',
+              registration: {
+                type: 'DEATH',
+                trackingId: 'DG6PECX',
+                status: [
+                  {
+                    type: 'REGISTERED'
+                  }
+                ]
+              },
+              deceased: {
+                name: [
+                  {
+                    use: 'bn',
+                    firstNames: 'ক ম আব্দুল্লাহ আল আমিন ',
+                    familyName: 'খান'
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    ]
+
+    component = await createTestComponent(
+      <RecordAudit
+        {...createRouterProps(
+          formatUrl(APPLICATION_RECORD_AUDIT, {
+            tab: 'search',
+            applicationId: '956281c9-1f47-4c26-948a-970dd23c4094'
+          }),
+          { isNavigatedInsideApp: false },
+          {
+            matchParams: {
+              tab: 'search',
+              applicationId: '956281c9-1f47-4c26-948a-970dd23c4094'
+            }
+          }
+        )}
+      />,
+      { store, history, graphqlMocks: mocks }
+    )
+
+    await flushPromises()
+    component.update()
+  })
+
+  it('Record Audit page loads properly', async () => {
+    await waitForElement(component, 'RecordAuditBody')
+    expect(component.exists('RecordAuditBody')).toBeTruthy()
+  })
+
+  it('Check values for GQL applications', async () => {
+    expect(component.find('#status_value').hostNodes().text()).toBe(
+      'Registered'
+    )
+    expect(component.find('#type_value').hostNodes().text()).toBe('Death')
+    expect(component.find('#placeOfBirth_grey').hostNodes()).toHaveLength(0)
+    expect(component.find('#placeOfDeath_grey').hostNodes()).toHaveLength(1)
+  })
+})
+
+describe('Record audit summary for unsuccesful GQLQuery', () => {
+  let component: ReactWrapper<{}, {}>
+
+  beforeEach(async () => {
+    const { store, history } = createStore()
+
+    const mocks = [
+      {
+        request: {
+          query: FETCH_APPLICATION_SHORT_INFO,
+          variables: {
+            id: '956281c9-1f47-4c26-948a-970dd23c4094'
+          }
+        }
+      }
+    ]
+
+    component = await createTestComponent(
+      <RecordAudit
+        {...createRouterProps(
+          formatUrl(APPLICATION_RECORD_AUDIT, {
+            tab: 'search',
+            applicationId: '956281c9-1f47-4c26-948a-970dd23c4094'
+          }),
+          { isNavigatedInsideApp: false },
+          {
+            matchParams: {
+              tab: 'search',
+              applicationId: '956281c9-1f47-4c26-948a-970dd23c4094'
+            }
+          }
+        )}
+      />,
+      { store, history, graphqlMocks: mocks }
+    )
+
+    await flushPromises()
+    component.update()
+  })
+
+  it('Redirect to home page', async () => {
+    await flushPromises()
+    expect(window.location.href).not.toContain('/record-audit')
   })
 })
