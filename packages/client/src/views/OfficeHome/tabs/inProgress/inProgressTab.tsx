@@ -26,7 +26,7 @@ import { IApplication, DOWNLOAD_STATUS } from '@client/applications'
 import {
   goToPage as goToPageAction,
   goToRegistrarHomeTab as goToRegistrarHomeTabAction,
-  goToApplicationDetails
+  goToApplicationRecordAudit
 } from '@client/navigation'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,
@@ -44,8 +44,6 @@ import {
   IntlShape
 } from 'react-intl'
 import { connect } from 'react-redux'
-import { LocalInProgressDataDetails } from './localInProgressDataDetails'
-import { RowHistoryView } from '@client/views/OfficeHome/RowHistoryView'
 import {
   buttonMessages,
   constantsMessages,
@@ -129,7 +127,7 @@ interface IBaseRegistrarHomeProps {
   theme: ITheme
   goToPage: typeof goToPageAction
   goToRegistrarHomeTab: typeof goToRegistrarHomeTabAction
-  goToApplicationDetails: typeof goToApplicationDetails
+  goToApplicationRecordAudit: typeof goToApplicationRecordAudit
   selectorId: string
   registrarLocationId: string | null
   drafts: IApplication[]
@@ -269,7 +267,7 @@ export class InProgressTabComponent extends React.Component<
         rowClickHandler: [
           {
             label: 'rowClickHandler',
-            handler: () => this.props.goToApplicationDetails(regId)
+            handler: () => this.props.goToApplicationRecordAudit(regId)
           }
         ]
       }
@@ -294,13 +292,15 @@ export class InProgressTabComponent extends React.Component<
       const actions = [
         {
           label: this.props.intl.formatMessage(buttonMessages.update),
-          handler: () =>
+          handler: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+            e.stopPropagation()
             this.props.goToPage(
               pageRoute,
               draft.id,
               'preview',
               (draft.event && draft.event.toString()) || ''
             )
+          }
         }
       ]
       return {
@@ -320,7 +320,7 @@ export class InProgressTabComponent extends React.Component<
         rowClickHandler: [
           {
             label: 'rowClickHandler',
-            handler: () => this.props.goToApplicationDetails(draft.id)
+            handler: () => this.props.goToApplicationRecordAudit(draft.id)
           }
         ]
       }
@@ -428,32 +428,6 @@ export class InProgressTabComponent extends React.Component<
     )
   }
 
-  renderDraftDataExpandedComponent = (itemId: string) => {
-    return <LocalInProgressDataDetails eventId={itemId} />
-  }
-
-  renderFieldAgentDataExpandedComponent = (itemId: string) => {
-    return this.renderInProgressDataExpandedComponent(itemId, 'inProgressData')
-  }
-
-  renderHospitalDataExpandedComponent = (itemId: string) => {
-    return this.renderInProgressDataExpandedComponent(
-      itemId,
-      'notificationData'
-    )
-  }
-
-  renderInProgressDataExpandedComponent = (
-    itemId: string,
-    queryDataKey: QueryDataKey
-  ) => {
-    const { results } =
-      this.props.queryData && this.props.queryData[queryDataKey]
-    const eventDetails =
-      results && results.find((result) => result && result.id === itemId)
-    return <RowHistoryView eventDetails={eventDetails} />
-  }
-
   renderFieldAgentTable = (
     data: GQLEventSearchResultSet,
     intl: IntlShape,
@@ -465,14 +439,12 @@ export class InProgressTabComponent extends React.Component<
         <GridTable
           content={this.transformRemoteDraftsContent(data)}
           columns={this.getRemoteDraftColumns()}
-          renderExpandedComponent={this.renderFieldAgentDataExpandedComponent}
           noResultText={intl.formatMessage(constantsMessages.noResults)}
           onPageChange={onPageChange}
           pageSize={this.pageSize}
           totalItems={(data && data.totalItems) || 0}
           currentPage={page}
-          expandable={this.getExpandable()}
-          clickable={!this.getExpandable()}
+          clickable={true}
           showPaginated={this.props.showPaginated}
           loading={this.props.loading}
           loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
@@ -496,14 +468,12 @@ export class InProgressTabComponent extends React.Component<
         <GridTable
           content={this.transformRemoteDraftsContent(data)}
           columns={this.getNotificationColumns()}
-          renderExpandedComponent={this.renderHospitalDataExpandedComponent}
           noResultText={intl.formatMessage(constantsMessages.noResults)}
           onPageChange={onPageChange}
           pageSize={this.pageSize}
           totalItems={(data && data.totalItems) || 0}
           currentPage={page}
-          expandable={this.getExpandable()}
-          clickable={!this.getExpandable()}
+          clickable={true}
           showPaginated={this.props.showPaginated}
           loading={this.props.loading}
           loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
@@ -526,12 +496,6 @@ export class InProgressTabComponent extends React.Component<
 
   recordWindowWidth = () => {
     this.setState({ width: window.innerWidth })
-  }
-
-  getExpandable = () => {
-    return this.state.width > this.props.theme.grid.breakpoints.lg
-      ? true
-      : false
   }
 
   getDraftColumns = () => {
@@ -705,14 +669,12 @@ export class InProgressTabComponent extends React.Component<
             <GridTable
               content={this.transformDraftContent()}
               columns={this.getDraftColumns()}
-              renderExpandedComponent={this.renderDraftDataExpandedComponent}
               noResultText={intl.formatMessage(constantsMessages.noResults)}
               onPageChange={onPageChange}
               pageSize={this.pageSize}
               totalItems={drafts && drafts.length}
               currentPage={page}
-              expandable={this.getExpandable()}
-              clickable={!this.getExpandable()}
+              clickable={true}
               showPaginated={this.props.showPaginated}
               loading={this.props.loading}
               loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
@@ -742,5 +704,5 @@ function mapStateToProps(state: IStoreState) {
 export const InProgressTab = connect(mapStateToProps, {
   goToPage: goToPageAction,
   goToRegistrarHomeTab: goToRegistrarHomeTabAction,
-  goToApplicationDetails
+  goToApplicationRecordAudit
 })(injectIntl(withTheme(InProgressTabComponent)))

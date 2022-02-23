@@ -12,8 +12,7 @@
 import {
   GQLAttachment,
   GQLPerson,
-  GQLRelatedPerson,
-  GQLRelationshipType
+  GQLRelatedPerson
 } from '@opencrvs/gateway/src/graphql/schema'
 import {
   ICertificate,
@@ -41,8 +40,7 @@ export function transformCertificateData(
   if (certificateData && certificateData.collector) {
     const collector: GQLRelatedPerson = {}
     if (certificateData.collector.type) {
-      collector.relationship = certificateData.collector
-        .type as GQLRelationshipType
+      collector.relationship = certificateData.collector.type as string
     }
     if (certificateData.collector.relationship) {
       collector.otherRelationship = certificateData.collector

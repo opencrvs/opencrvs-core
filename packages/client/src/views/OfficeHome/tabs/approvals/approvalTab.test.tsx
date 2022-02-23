@@ -311,7 +311,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     testComponent.find('#load_more_button').last().hostNodes().simulate('click')
   })
 
-  it('renders expanded area for validated status', async () => {
+  it('redirect to recordAudit page if item is clicked on desktop view ', async () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
@@ -405,20 +405,18 @@ describe('RegistrationHome sent for approval tab related tests', () => {
       { store, history }
     )
 
-    // wait for mocked data to load mockedProvider
-    await new Promise((resolve) => {
-      setTimeout(resolve, 200)
-    })
     testComponent.update()
-    const instance = testComponent.find(GridTable).instance() as any
+    const element = await waitForElement(testComponent, '#row_0')
+    element.hostNodes().simulate('click')
 
-    instance.toggleExpanded('bc09200d-0160-43b4-9e2b-5b9e90424e95')
-    // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     testComponent.update()
-    expect(testComponent.find('#VALIDATED-0').hostNodes().length).toBe(1)
+
+    expect(window.location.href).toContain(
+      '/record-audit/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+    )
   })
 })
 
@@ -435,7 +433,7 @@ describe('Tablet tests', () => {
     resizeWindow(1024, 768)
   })
 
-  it('redirects to detail page if item is clicked', async () => {
+  it('redirects to recordAudit page if item is clicked', async () => {
     jest.clearAllMocks()
     const TIME_STAMP = '1544188309380'
     Date.now = jest.fn(() => 1554055200000)
@@ -520,7 +518,7 @@ describe('Tablet tests', () => {
     testComponent.update()
 
     expect(window.location.href).toContain(
-      '/details/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+      '/record-audit/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
   })
 })

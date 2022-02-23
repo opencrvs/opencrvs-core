@@ -25,9 +25,9 @@ import { fetchChildLocationsByParentId } from '@metrics/api'
 
 interface ILocationWiseEstimation {
   actualTotalRegistration: number
-  actual45DayRegistration: number
+  actualTargetDayRegistration: number
   estimatedRegistration: number
-  estimated45DayPercentage: number
+  estimatedTargetDayPercentage: number
   locationId: string
   locationName: string
 }
@@ -54,7 +54,7 @@ export async function locationWiseEventEstimationsHandler(
       continue
     }
 
-    const estimated45DayMetrics = await fetchLocationWiseEventEstimations(
+    const estimatedTargetDayMetrics = await fetchLocationWiseEventEstimations(
       timeStart,
       timeEnd,
       `Location/${childLocation.id}`,
@@ -69,9 +69,10 @@ export async function locationWiseEventEstimationsHandler(
         `Location/${childLocation.id}`,
         event
       ),
-      actual45DayRegistration: estimated45DayMetrics.actualRegistration,
-      estimatedRegistration: estimated45DayMetrics.estimatedRegistration,
-      estimated45DayPercentage: estimated45DayMetrics.estimatedPercentage,
+      actualTargetDayRegistration: estimatedTargetDayMetrics.actualRegistration,
+      estimatedRegistration: estimatedTargetDayMetrics.estimatedRegistration,
+      estimatedTargetDayPercentage:
+        estimatedTargetDayMetrics.estimatedPercentage,
       locationName: childLocation.name || '',
       locationId: childLocation.id
     })
