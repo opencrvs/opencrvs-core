@@ -271,7 +271,7 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(
         Events.BIRTH_REQUEST_CORRECTION,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.DEATH_REQUEST_CORRECTION:
@@ -279,7 +279,7 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(
         Events.DEATH_REQUEST_CORRECTION,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.DEATH_NEW_VALIDATE:
