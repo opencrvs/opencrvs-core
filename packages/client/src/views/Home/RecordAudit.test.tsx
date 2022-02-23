@@ -30,7 +30,7 @@ import { Event } from '@client/forms'
 import { formatUrl } from '@client/navigation'
 import { DECLARATION_RECORD_AUDIT } from '@client/navigation/routes'
 import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
-import { FETCH_APPLICATION_SHORT_INFO } from './queries'
+import { FETCH_DECLARATION_SHORT_INFO } from './queries'
 import { waitForElement } from '@client/tests/wait-for-element'
 
 const declaration: IApplication = createApplication(
@@ -228,7 +228,7 @@ describe('Record audit summary for GQLQuery', () => {
     const mocks = [
       {
         request: {
-          query: FETCH_APPLICATION_SHORT_INFO,
+          query: FETCH_DECLARATION_SHORT_INFO,
           variables: {
             id: '956281c9-1f47-4c26-948a-970dd23c4094'
           }
@@ -308,7 +308,7 @@ describe('Record audit summary for unsuccesful GQLQuery', () => {
     const mocks = [
       {
         request: {
-          query: FETCH_APPLICATION_SHORT_INFO,
+          query: FETCH_DECLARATION_SHORT_INFO,
           variables: {
             id: '956281c9-1f47-4c26-948a-970dd23c4094'
           }

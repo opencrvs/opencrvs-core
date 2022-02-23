@@ -16,7 +16,6 @@ export const SELECT_VITAL_EVENT = '/events'
 
 export const EVENT_INFO = '/events/:eventType/info'
 export const SELECT_BIRTH_INFORMANT = `/drafts/:applicationId/events/${Event.BIRTH}/registration/informant`
-export const SELECT_BIRTH_PRIMARY_APPLICANT = `/drafts/:applicationId/events/${Event.BIRTH}/registration/applicant`
 export const SELECT_BIRTH_MAIN_CONTACT_POINT = `/drafts/:applicationId/events/${Event.BIRTH}/registration/contact`
 
 export const DRAFT_BIRTH_PARENT_FORM = `/drafts/:applicationId/events/${Event.BIRTH}`

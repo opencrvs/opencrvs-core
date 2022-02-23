@@ -12,7 +12,6 @@
 
 import { Event, UserSection } from '@client/forms'
 import {
-  APPLICATION_DETAIL,
   CERTIFICATE_COLLECTOR,
   CREATE_USER,
   CREATE_USER_ON_LOCATION,
@@ -39,7 +38,6 @@ import {
   SEARCH_RESULT,
   SELECT_BIRTH_INFORMANT,
   SELECT_BIRTH_MAIN_CONTACT_POINT,
-  SELECT_BIRTH_PRIMARY_APPLICANT,
   SELECT_DEATH_INFORMANT,
   SELECT_DEATH_MAIN_CONTACT_POINT,
   SELECT_VITAL_EVENT,
@@ -279,15 +277,6 @@ export function goToSearchResult(
 
 export function goToSearch() {
   return push(SEARCH)
-}
-
-export function goToApplicationDetails(
-  applicationId: string,
-  forceDetailsQuery?: boolean
-) {
-  return push(formatUrl(APPLICATION_DETAIL, { applicationId }), {
-    forceDetailsQuery
-  })
 }
 
 export function goToDeclarationRecordAudit(

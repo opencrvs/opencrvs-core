@@ -81,7 +81,7 @@ export const FETCH_REGISTRATION_BY_COMPOSITION = gql`
     }
   }
 `
-export const FETCH_APPLICATION_SHORT_INFO = gql`
+export const FETCH_DECLARATION_SHORT_INFO = gql`
   query data($id: ID!) {
     fetchRegistration(id: $id) {
       id

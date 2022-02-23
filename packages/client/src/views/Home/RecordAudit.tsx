@@ -17,11 +17,7 @@ import { Navigation } from '@client/components/interface/Navigation'
 import styled from '@client/styledComponents'
 import { ApplicationIcon } from '@opencrvs/components/lib/icons'
 import { connect } from 'react-redux'
-import {
-  goToApplicationDetails,
-  goBack as goBackAction,
-  goToRegistrarHomeTab
-} from '@client/navigation'
+import { goToRegistrarHomeTab } from '@client/navigation'
 import { RouteComponentProps, Redirect } from 'react-router'
 import {
   injectIntl,
@@ -43,7 +39,7 @@ import { IFormSectionData, IContactPoint } from '@client/forms'
 import { IQueryData } from '@client/views/OfficeHome/OfficeHome'
 import { generateLocationName } from '@client/utils/locationUtils'
 import { Query } from '@client/components/Query'
-import { FETCH_APPLICATION_SHORT_INFO } from '@client/views/Home/queries'
+import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/Home/queries'
 import { Loader } from '@opencrvs/components/lib/interface'
 import { HOME } from '@client/navigation/routes'
 import { createNamesMap } from '@client/utils/data-formatting'
@@ -95,8 +91,6 @@ interface IStateProps {
 }
 
 interface IDispatchProps {
-  goToApplicationDetails: typeof goToApplicationDetails
-  goBack: typeof goBackAction
   goToRegistrarHomeTab: typeof goToRegistrarHomeTab
 }
 
@@ -300,7 +294,7 @@ const getGQLDeclaration = (
   } else if (data.deceased) {
     name = getName(data.deceased.name, language)
   }
-  const declaration: IDeclarationData = {
+  return {
     id: data?.id,
     name,
     type: data?.registration?.type,
@@ -310,7 +304,6 @@ const getGQLDeclaration = (
     placeOfBirth: '',
     informant: ''
   }
-  return declaration
 }
 
 const getDeclarationInfo = (
@@ -433,7 +426,7 @@ function getBodyContent({
     return (
       <>
         <Query
-          query={FETCH_APPLICATION_SHORT_INFO}
+          query={FETCH_DECLARATION_SHORT_INFO}
           variables={{
             id: declarationId
           }}
@@ -520,7 +513,5 @@ export const RecordAudit = connect<
   RouteProps,
   IStoreState
 >(mapStateToProps, {
-  goToApplicationDetails,
-  goBack: goBackAction,
   goToRegistrarHomeTab
 })(injectIntl(ShowRecordAudit))
