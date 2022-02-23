@@ -626,7 +626,7 @@ const getHistory = (
     action: getLink(getStatusLabel(item?.action, intl)),
     user: getName(item.user.name, item.user?.avatar, language),
     type: intl.formatMessage(userMessages[item.user.role as string]),
-    location: getLink(item.location.name)
+    location: getLink(item.office.name)
   }))
 
   const columns = [
