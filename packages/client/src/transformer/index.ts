@@ -76,26 +76,47 @@ export const transformRegistrationCorrection = (
 
   if (nestedFieldDef) {
     const valuePath = `${fieldDef.name}.nestedFields.${nestedFieldDef.name}`
-    transformedData.registration.correction.values.push({
-      section: section.id,
-      fieldName: valuePath,
-      newValue: stringifyFieldValue(
-        fieldDef,
-        get(draftData[section.id], valuePath),
-        draftData[section.id]
-      ),
-      oldValue: stringifyFieldValue(
-        fieldDef,
-        get(originalDraftData[section.id], valuePath),
-        originalDraftData[section.id]
-      )
-    })
+    const newFieldValue = get(draftData[section.id], valuePath)
+    const oldFieldValue = get(originalDraftData[section.id], valuePath)
+    if (newFieldValue !== oldFieldValue) {
+      transformedData.registration.correction.values.push({
+        section: section.id,
+        fieldName: valuePath,
+        newValue: stringifyFieldValue(
+          fieldDef,
+          newFieldValue,
+          draftData[section.id]
+        ),
+        oldValue: stringifyFieldValue(
+          fieldDef,
+          oldFieldValue,
+          originalDraftData[section.id]
+        )
+      })
+    }
   } else if (isRadioGroupWithNestedField(fieldDef)) {
     const selectedRadioOption = getSelectedRadioOptionWithNestedFields(
       fieldDef,
       draftData[section.id]
     )
-    if (selectedRadioOption) {
+    const selectedRadioOptionOld = getSelectedRadioOptionWithNestedFields(
+      fieldDef,
+      originalDraftData[section.id]
+    )
+
+    if (selectedRadioOption !== selectedRadioOptionOld) {
+      transformedData.registration.correction.values.push({
+        section: section.id,
+        fieldName: fieldDef.name,
+        newValue: selectedRadioOption,
+        oldValue: selectedRadioOptionOld
+      })
+    }
+
+    if (
+      selectedRadioOption &&
+      Array.isArray(fieldDef.nestedFields[selectedRadioOption])
+    ) {
       for (const nestedFieldDef of fieldDef.nestedFields[selectedRadioOption]) {
         transformRegistrationCorrection(
           section,
