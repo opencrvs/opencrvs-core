@@ -31,7 +31,7 @@ import {
 } from '@opencrvs/components/lib/icons'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { calculateDays } from '@client/views/PrintCertificate/utils'
-import { goToApplicationRecordAudit } from '@client/navigation'
+import { goToDeclarationRecordAudit } from '@client/navigation'
 import {
   constantsMessages as messages,
   dynamicConstantsMessages
@@ -47,7 +47,7 @@ interface ISentForReviewProps {
   theme: ITheme
   applicationsReadyToSend: IApplication[]
   deleteApplication: typeof deleteApplication
-  goToApplicationRecordAudit: typeof goToApplicationRecordAudit
+  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   showPaginated?: boolean
   loading?: boolean
   error?: boolean
@@ -182,7 +182,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
                     'No composition id found for this application'
                   )
                 }
-                this.props.goToApplicationRecordAudit(
+                this.props.goToDeclarationRecordAudit(
                   'reviewTab',
                   draft.compositionId
                 )
@@ -279,5 +279,5 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
 
 export const SentForReview = connect(null, {
   deleteApplication,
-  goToApplicationRecordAudit
+  goToDeclarationRecordAudit
 })(injectIntl(withTheme(SentForReviewComponent)))

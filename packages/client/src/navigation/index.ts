@@ -51,7 +51,7 @@ import {
   TEAM_USER_LIST,
   USER_PROFILE,
   CONFIG,
-  APPLICATION_RECORD_AUDIT,
+  DECLARATION_RECORD_AUDIT,
   CHANGE_PHONE
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
@@ -290,11 +290,11 @@ export function goToApplicationDetails(
   })
 }
 
-export function goToApplicationRecordAudit(
+export function goToDeclarationRecordAudit(
   tab: keyof IQueryData | 'search',
-  applicationId: string
+  declarationId: string
 ) {
-  return push(formatUrl(APPLICATION_RECORD_AUDIT, { tab, applicationId }))
+  return push(formatUrl(DECLARATION_RECORD_AUDIT, { tab, declarationId }))
 }
 
 export function goToBirthRegistrationAsParent(applicationId: string) {

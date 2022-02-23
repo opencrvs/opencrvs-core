@@ -86,7 +86,7 @@ const GreyedInfo = styled.div`
 `
 
 interface IStateProps {
-  applicationId: string
+  declarationId: string
   draft: IApplication | null
   language: string
   resources: IOfflineData
@@ -102,7 +102,7 @@ interface IDispatchProps {
 
 type RouteProps = RouteComponentProps<{
   tab: keyof IQueryData | 'search'
-  applicationId: string
+  declarationId: string
 }>
 
 type IFullProps = IDispatchProps &
@@ -421,7 +421,7 @@ function RecordAuditBody({
 }
 
 function getBodyContent({
-  applicationId,
+  declarationId,
   draft,
   language,
   tab,
@@ -435,7 +435,7 @@ function getBodyContent({
         <Query
           query={FETCH_APPLICATION_SHORT_INFO}
           variables={{
-            id: applicationId
+            id: declarationId
           }}
           fetchPolicy="no-cache"
         >
@@ -493,14 +493,14 @@ const ShowRecordAudit = (props: IFullProps) => {
 }
 
 function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
-  const { applicationId, tab } = props.match.params
+  const { declarationId, tab } = props.match.params
   return {
-    applicationId,
+    declarationId,
     draft:
       state.applicationsState.applications.find(
         (declaration) =>
-          declaration.id === applicationId ||
-          declaration.compositionId === applicationId
+          declaration.id === declarationId ||
+          declaration.compositionId === declarationId
       ) || null,
     language: state.i18n.language,
     resources: getOfflineData(state),
@@ -508,7 +508,7 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
     workqueueDeclaration:
       (tab !== 'search' &&
         state.workqueueState.workqueue.data[tab].results?.find(
-          (gqlSearchSet) => gqlSearchSet?.id === applicationId
+          (gqlSearchSet) => gqlSearchSet?.id === declarationId
         )) ||
       null
   }

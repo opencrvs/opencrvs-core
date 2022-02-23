@@ -28,7 +28,7 @@ import {
 } from '@client/applications'
 import { Event } from '@client/forms'
 import { formatUrl } from '@client/navigation'
-import { APPLICATION_RECORD_AUDIT } from '@client/navigation/routes'
+import { DECLARATION_RECORD_AUDIT } from '@client/navigation/routes'
 import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
 import { FETCH_APPLICATION_SHORT_INFO } from './queries'
 import { waitForElement } from '@client/tests/wait-for-element'
@@ -46,7 +46,7 @@ declaration.data.registration = {
   }
 }
 
-describe('Record audit summary for applicationState', () => {
+describe('Record audit summary for a draft birth declaration', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
@@ -55,15 +55,15 @@ describe('Record audit summary for applicationState', () => {
     component = await createTestComponent(
       <RecordAudit
         {...createRouterProps(
-          formatUrl(APPLICATION_RECORD_AUDIT, {
+          formatUrl(DECLARATION_RECORD_AUDIT, {
             tab: 'inProgressTab',
-            applicationId: declaration.id
+            declarationId: declaration.id
           }),
           { isNavigatedInsideApp: false },
           {
             matchParams: {
               tab: 'inProgressTab',
-              applicationId: declaration.id
+              declarationId: declaration.id
             }
           }
         )}
@@ -100,15 +100,15 @@ describe('Record audit summary for death declaration', () => {
     component = await createTestComponent(
       <RecordAudit
         {...createRouterProps(
-          formatUrl(APPLICATION_RECORD_AUDIT, {
+          formatUrl(DECLARATION_RECORD_AUDIT, {
             tab: 'inProgressTab',
-            applicationId: deathApplication.id
+            declarationId: deathApplication.id
           }),
           { isNavigatedInsideApp: false },
           {
             matchParams: {
               tab: 'inProgressTab',
-              applicationId: deathApplication.id
+              declarationId: deathApplication.id
             }
           }
         )}
@@ -187,15 +187,15 @@ describe('Record audit summary for WorkQueue declarations', () => {
     component = await createTestComponent(
       <RecordAudit
         {...createRouterProps(
-          formatUrl(APPLICATION_RECORD_AUDIT, {
+          formatUrl(DECLARATION_RECORD_AUDIT, {
             tab: 'inProgressTab',
-            applicationId: 'db097901-feba-4f71-a1ae-d3d46289d2d5'
+            declarationId: 'db097901-feba-4f71-a1ae-d3d46289d2d5'
           }),
           { isNavigatedInsideApp: false },
           {
             matchParams: {
               tab: 'inProgressTab',
-              applicationId: 'db097901-feba-4f71-a1ae-d3d46289d2d5'
+              declarationId: 'db097901-feba-4f71-a1ae-d3d46289d2d5'
             }
           }
         )}
@@ -264,15 +264,15 @@ describe('Record audit summary for GQLQuery', () => {
     component = await createTestComponent(
       <RecordAudit
         {...createRouterProps(
-          formatUrl(APPLICATION_RECORD_AUDIT, {
+          formatUrl(DECLARATION_RECORD_AUDIT, {
             tab: 'search',
-            applicationId: '956281c9-1f47-4c26-948a-970dd23c4094'
+            declarationId: '956281c9-1f47-4c26-948a-970dd23c4094'
           }),
           { isNavigatedInsideApp: false },
           {
             matchParams: {
               tab: 'search',
-              applicationId: '956281c9-1f47-4c26-948a-970dd23c4094'
+              declarationId: '956281c9-1f47-4c26-948a-970dd23c4094'
             }
           }
         )}
@@ -319,15 +319,15 @@ describe('Record audit summary for unsuccesful GQLQuery', () => {
     component = await createTestComponent(
       <RecordAudit
         {...createRouterProps(
-          formatUrl(APPLICATION_RECORD_AUDIT, {
+          formatUrl(DECLARATION_RECORD_AUDIT, {
             tab: 'search',
-            applicationId: '956281c9-1f47-4c26-948a-970dd23c4094'
+            declarationId: '956281c9-1f47-4c26-948a-970dd23c4094'
           }),
           { isNavigatedInsideApp: false },
           {
             matchParams: {
               tab: 'search',
-              applicationId: '956281c9-1f47-4c26-948a-970dd23c4094'
+              declarationId: '956281c9-1f47-4c26-948a-970dd23c4094'
             }
           }
         )}

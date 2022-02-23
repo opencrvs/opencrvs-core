@@ -220,7 +220,7 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             path={
-                                              routes.APPLICATION_RECORD_AUDIT
+                                              routes.DECLARATION_RECORD_AUDIT
                                             }
                                             component={RecordAudit}
                                           />

@@ -15,7 +15,7 @@ import {
   dynamicConstantsMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/registrarHome'
-import { goToApplicationRecordAudit, goToPage } from '@client/navigation'
+import { goToDeclarationRecordAudit, goToPage } from '@client/navigation'
 import { getScope } from '@client/profile/profileSelectors'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
@@ -43,7 +43,7 @@ interface IBaseApprovalTabProps {
   theme: ITheme
   goToPage: typeof goToPage
   registrarLocationId: string | null
-  goToApplicationRecordAudit: typeof goToApplicationRecordAudit
+  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   outboxApplications: IApplication[]
   queryData: {
     data: GQLEventSearchResultSet
@@ -181,7 +181,7 @@ class ApprovalTabComponent extends React.Component<
           {
             label: 'rowClickHandler',
             handler: () =>
-              this.props.goToApplicationRecordAudit('approvalTab', reg.id)
+              this.props.goToDeclarationRecordAudit('approvalTab', reg.id)
           }
         ]
       }
@@ -232,5 +232,5 @@ function mapStateToProps(state: IStoreState) {
 
 export const ApprovalTab = connect(mapStateToProps, {
   goToPage,
-  goToApplicationRecordAudit
+  goToDeclarationRecordAudit
 })(injectIntl(withTheme(ApprovalTabComponent)))

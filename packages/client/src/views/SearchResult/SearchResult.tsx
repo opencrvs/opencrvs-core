@@ -25,7 +25,7 @@ import { messages as registrarHomeMessages } from '@client/i18n/messages/views/r
 import { messages as rejectMessages } from '@client/i18n/messages/views/reject'
 import { messages } from '@client/i18n/messages/views/search'
 import {
-  goToApplicationRecordAudit,
+  goToDeclarationRecordAudit,
   goToEvents as goToEventsAction,
   goToPage as goToPageAction,
   goToPrintCertificate as goToPrintCertificateAction,
@@ -132,7 +132,7 @@ interface IBaseSearchResultProps {
   goToPage: typeof goToPageAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   goToPrintCertificate: typeof goToPrintCertificateAction
-  goToApplicationRecordAudit: typeof goToApplicationRecordAudit
+  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
 }
 
 interface IMatchParams {
@@ -421,7 +421,7 @@ export class SearchResultView extends React.Component<
             handler: () =>
               isDuplicate
                 ? this.props.goToReviewDuplicate(reg.id)
-                : this.props.goToApplicationRecordAudit('search', reg.id)
+                : this.props.goToDeclarationRecordAudit('search', reg.id)
           }
         ]
       }
@@ -564,6 +564,6 @@ export const SearchResult = connect(
     goToPage: goToPageAction,
     goToReviewDuplicate: goToReviewDuplicateAction,
     goToPrintCertificate: goToPrintCertificateAction,
-    goToApplicationRecordAudit
+    goToDeclarationRecordAudit
   }
 )(injectIntl(withTheme(SearchResultView)))

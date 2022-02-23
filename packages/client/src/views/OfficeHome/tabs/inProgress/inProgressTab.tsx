@@ -26,7 +26,7 @@ import { IApplication, DOWNLOAD_STATUS } from '@client/applications'
 import {
   goToPage as goToPageAction,
   goToRegistrarHomeTab as goToRegistrarHomeTabAction,
-  goToApplicationRecordAudit
+  goToDeclarationRecordAudit
 } from '@client/navigation'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,
@@ -127,7 +127,7 @@ interface IBaseRegistrarHomeProps {
   theme: ITheme
   goToPage: typeof goToPageAction
   goToRegistrarHomeTab: typeof goToRegistrarHomeTabAction
-  goToApplicationRecordAudit: typeof goToApplicationRecordAudit
+  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   selectorId: string
   registrarLocationId: string | null
   drafts: IApplication[]
@@ -268,7 +268,7 @@ export class InProgressTabComponent extends React.Component<
           {
             label: 'rowClickHandler',
             handler: () =>
-              this.props.goToApplicationRecordAudit('inProgressTab', regId)
+              this.props.goToDeclarationRecordAudit('inProgressTab', regId)
           }
         ]
       }
@@ -322,7 +322,7 @@ export class InProgressTabComponent extends React.Component<
           {
             label: 'rowClickHandler',
             handler: () =>
-              this.props.goToApplicationRecordAudit('inProgressTab', draft.id)
+              this.props.goToDeclarationRecordAudit('inProgressTab', draft.id)
           }
         ]
       }
@@ -706,5 +706,5 @@ function mapStateToProps(state: IStoreState) {
 export const InProgressTab = connect(mapStateToProps, {
   goToPage: goToPageAction,
   goToRegistrarHomeTab: goToRegistrarHomeTabAction,
-  goToApplicationRecordAudit
+  goToDeclarationRecordAudit
 })(injectIntl(withTheme(InProgressTabComponent)))

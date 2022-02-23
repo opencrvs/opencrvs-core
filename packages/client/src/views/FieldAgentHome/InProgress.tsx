@@ -16,7 +16,7 @@ import { IApplication } from '@client/applications'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import moment from 'moment'
-import { goToApplicationRecordAudit } from '@client/navigation'
+import { goToDeclarationRecordAudit } from '@client/navigation'
 import { withTheme, ITheme } from '@client/styledComponents'
 import {
   constantsMessages as messages,
@@ -29,7 +29,7 @@ import { formattedDuration } from '@client/utils/date-formatting'
 interface IInProgressProps {
   theme: ITheme
   draftApplications: IApplication[]
-  goToApplicationRecordAudit: typeof goToApplicationRecordAudit
+  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   showPaginated?: boolean
   loading?: boolean
   error?: boolean
@@ -88,7 +88,7 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
           {
             label: 'rowClickHandler',
             handler: () =>
-              this.props.goToApplicationRecordAudit('inProgressTab', draft.id)
+              this.props.goToDeclarationRecordAudit('inProgressTab', draft.id)
           }
         ]
       }
@@ -174,6 +174,6 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
   }
 }
 
-export const InProgress = connect(null, { goToApplicationRecordAudit })(
+export const InProgress = connect(null, { goToDeclarationRecordAudit })(
   injectIntl(withTheme(InProgressComponent))
 )
