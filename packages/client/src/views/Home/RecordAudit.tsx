@@ -47,6 +47,7 @@ import { FETCH_APPLICATION_SHORT_INFO } from '@client/views/Home/queries'
 import { Loader } from '@opencrvs/components/lib/interface'
 import { HOME } from '@client/navigation/routes'
 import { createNamesMap } from '@client/utils/data-formatting'
+import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -148,30 +149,6 @@ const STATUSTOCOLOR: { [key: string]: string } = {
   REGISTERED: 'green',
   CERTIFIED: 'green',
   WAITING_VALIDATION: 'teal'
-}
-
-const KEY_LABEL: ILabel = {
-  status: 'Status',
-  type: 'Event',
-  trackingId: 'Tracking ID',
-  dateOfBirth: 'Date of birth',
-  dateOfDeath: 'Date of death',
-  placeOfBirth: 'Place of birth',
-  placeOfDeath: 'Place of death',
-  informant: 'Informant',
-  brn: 'BRN',
-  drn: 'DRN'
-}
-
-const NO_DATA_LABEL: ILabel = {
-  status: 'No status',
-  type: 'No event',
-  trackingId: 'No tracking id',
-  dateOfBirth: 'No date of birth',
-  dateOfDeath: 'No date of death',
-  placeOfBirth: 'No place of birth',
-  placeOfDeath: 'No place of death',
-  informant: 'No informant'
 }
 
 const getCaptitalizedWord = (word: string | undefined): string => {
@@ -338,7 +315,8 @@ const getGQLApplication = (
 
 const getApplicationInfo = (
   application: IApplicationData,
-  isDownloaded: boolean
+  isDownloaded: boolean,
+  intl: IntlShape
 ) => {
   let informant = getCaptitalizedWord(application?.informant)
 
@@ -388,7 +366,11 @@ const getApplicationInfo = (
       {Object.entries(info).map(([key, value]) => {
         return (
           <InfoContainer id={'summary'} key={key}>
-            <KeyContainer id={`${key}`}>{KEY_LABEL[key]}</KeyContainer>
+            <KeyContainer id={`${key}`}>
+              <KeyContainer id={`${key}`}>
+                {intl.formatMessage(recordAuditMessages[key as string])}
+              </KeyContainer>
+            </KeyContainer>
             <ValueContainer id={`${key}_value`} value={value}>
               {value ? (
                 key === 'dateOfBirth' || key === 'dateOfDeath' ? (
@@ -397,7 +379,11 @@ const getApplicationInfo = (
                   value
                 )
               ) : isDownloaded ? (
-                NO_DATA_LABEL[key]
+                intl.formatMessage(
+                  recordAuditMessages[
+                    (`no${key[0].toUpperCase()}` + key.slice(1)) as string
+                  ]
+                )
               ) : (
                 <GreyedInfo id={`${key}_grey`} />
               )}
@@ -411,10 +397,12 @@ const getApplicationInfo = (
 
 function RecordAuditBody({
   application,
-  isDownloaded = false
+  isDownloaded = false,
+  intl
 }: {
   application: IApplicationData
   isDownloaded?: boolean
+  intl: IntlShape
 }) {
   return (
     <Content
@@ -427,7 +415,7 @@ function RecordAuditBody({
         />
       )}
     >
-      {getApplicationInfo(application, isDownloaded)}
+      {getApplicationInfo(application, isDownloaded, intl)}
     </Content>
   )
 }
@@ -471,6 +459,7 @@ function getBodyContent({
                   data.fetchRegistration,
                   language
                 )}
+                intl={intl}
               />
             )
           }}
@@ -484,7 +473,13 @@ function getBodyContent({
         workqueueApplication as NonNullable<typeof workqueueApplication>,
         language
       )
-  return <RecordAuditBody application={application} isDownloaded={!!draft} />
+  return (
+    <RecordAuditBody
+      application={application}
+      isDownloaded={!!draft}
+      intl={intl}
+    />
+  )
 }
 
 const ShowRecordAudit = (props: IFullProps) => {
