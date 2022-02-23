@@ -102,6 +102,7 @@ export interface IDynamicOptions {
   jurisdictionType?: string
   resource?: string
   options?: { [key: string]: ISelectOption[] }
+  initialValue?: string
 }
 
 export interface IDispatchOptions {
@@ -941,6 +942,7 @@ export interface Ii18nRadioGroupFormField extends Ii18nFormFieldBase {
   options: RadioComponentOption[]
   size?: RadioSize
   notice?: string
+  flexDirection?: string
 }
 
 export interface Ii18nRadioGroupWithNestedFieldsFormField
