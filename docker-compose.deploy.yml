@@ -105,45 +105,11 @@ services:
     networks:
       - overlay_net
 
-  mongo2:
-    image: mongo:3.6
-    hostname: 'mongo2'
-    container_name: 'mongo2'
-    restart: unless-stopped
-    command: --replSet rs0
-    volumes:
-      - '/data/mongo:/data/db'
-    deploy:
-      replicas: 1
-      placement:
-        constraints:
-          - node.labels.data2 == true
-    networks:
-      - overlay_net
-
-  mongo3:
-    image: mongo:3.6
-    hostname: 'mongo3'
-    container_name: 'mongo3'
-    restart: unless-stopped
-    command: --replSet rs0
-    volumes:
-      - '/data/mongo:/data/db'
-    deploy:
-      replicas: 1
-      placement:
-        constraints:
-          - node.labels.data3 == true
-    networks:
-      - overlay_net
-
   mongo-rs-init:
     image: mongo:3.6
     depends_on:
       - mongo1
-      - mongo2
-      - mongo3
-    command: bash -c 'sleep 20; mongo --host mongo1 --eval "rs.initiate({_id:\"rs0\",members:[{_id:0,host:\"mongo1:27017\"},{_id:1,host:\"mongo2:27017\"},{_id:2,host:\"mongo3:27017\"}]})"'
+    command: bash -c 'sleep 20; mongo --host mongo1 --eval "rs.initiate({_id:\"rs0\",members:[{_id:0,host:\"mongo1:27017\"}]})"'
     deploy:
       restart_policy:
         condition: none
@@ -261,7 +227,7 @@ services:
       - jwt-public-key.{{ts}}
     environment:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
-      - MONGO_URL=mongodb://mongo1,mongo2,mongo3/user-mgnt?replicaSet=rs0
+      - MONGO_URL=mongodb://mongo1/user-mgnt?replicaSet=rs0
     deploy:
       replicas: 2
     networks:
@@ -327,7 +293,7 @@ services:
       - jwt-public-key.{{ts}}
     environment:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
-      - MONGO_URL=mongodb://mongo1,mongo2,mongo3/application-config?replicaSet=rs0
+      - MONGO_URL=mongodb://mongo1/application-config?replicaSet=rs0
     deploy:
       labels:
         - 'traefik.enable=true'
@@ -341,12 +307,10 @@ services:
   # Configure other dependencies with deployment specifc details
   hearth:
     environment:
-      - mongodb__url=mongodb://mongo1,mongo2,mongo3/hearth-dev?replicaSet=rs0
+      - mongodb__url=mongodb://mongo1/hearth-dev?replicaSet=rs0
       - logger__level=warn
     depends_on:
       - mongo1
-      - mongo2
-      - mongo3
     deploy:
       replicas: 2
     secrets:
@@ -361,12 +325,10 @@ services:
 
   openhim-core:
     environment:
-      - mongo_url=mongodb://mongo1,mongo2,mongo3/openhim-dev?replicaSet=rs0
-      - mongo_atnaUrl=mongodb://mongo1,mongo2,mongo3/openhim-dev?replicaSet=rs0
+      - mongo_url=mongodb://mongo1/openhim-dev?replicaSet=rs0
+      - mongo_atnaUrl=mongodb://mongo1/openhim-dev?replicaSet=rs0
     depends_on:
       - mongo1
-      - mongo2
-      - mongo3
     deploy:
       labels:
         - 'traefik.enable=true'
@@ -417,7 +379,7 @@ services:
     secrets:
       - jwt-public-key.{{ts}}
     environment:
-      - MONGO_URL=mongodb://mongo1,mongo2,mongo3/webhooks?replicaSet=rs0
+      - MONGO_URL=mongodb://mongo1/webhooks?replicaSet=rs0
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
       labels:

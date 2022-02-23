@@ -195,7 +195,7 @@ export const generateDeathRegPoint = async (
       (deceased.deceasedDateTime &&
         getDurationInDays(
           deceased.deceasedDateTime,
-          new Date().toISOString()
+          new Date(composition.date).toISOString()
         )) ||
       undefined
   }

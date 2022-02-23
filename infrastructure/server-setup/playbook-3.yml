@@ -12,83 +12,83 @@
   become: yes
   become_method: sudo
   tasks:
-    - name: "Add docker repository key"
+    - name: 'Add docker repository key'
       apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg
         state: present
 
-    - name: "Add docker repository"
+    - name: 'Add docker repository'
       apt_repository: repo='deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable' state=present
       when: ansible_distribution == "Ubuntu"
 
-    - name: "Install docker"
+    - name: 'Install docker'
       apt: name=docker-ce state=present update_cache=yes install_recommends=yes allow_unauthenticated=yes
       when: ansible_distribution == "Ubuntu"
       retries: 3
       delay: 20
 
-    - name: "Ensure Docker service started"
+    - name: 'Ensure Docker service started'
       service: name=docker state=started
 
-    - name: "Get docker info"
+    - name: 'Get docker info'
       shell: docker info
       register: docker_info
       changed_when: False
 
-    - name: "Install pip3"
+    - name: 'Install pip3'
       apt:
         name: python3-pip
         state: present
 
-    - name: "Install pexpect python module for ansible expect commands"
+    - name: 'Install pexpect python module for ansible expect commands'
       pip:
         name: pexpect
 
-    - name: "Install docker python module for ansible docker commands"
+    - name: 'Install docker python module for ansible docker commands'
       pip:
         name: docker
 
-    - name: "Log into DockerHub"
+    - name: 'Log into DockerHub'
       docker_login:
-        username: "{{dockerhub_username}}"
-        password: "{{dockerhub_password}}"
+        username: '{{dockerhub_username}}'
+        password: '{{dockerhub_password}}'
 
-    - name: "Setup crontab to clean up docker images"
+    - name: 'Setup crontab to clean up docker images'
       cron:
-        name: "cleanup docker images"
-        minute: "0"
-        hour: "0"
-        job: "/usr/bin/docker system prune -af >> /var/log/docker-prune.log"
+        name: 'cleanup docker images'
+        minute: '0'
+        hour: '0'
+        job: '/usr/bin/docker system prune -af >> /var/log/docker-prune.log'
 
-    - name: "Setup crontab to backup the opencrvs data"
+    - name: 'Setup crontab to backup the opencrvs data'
       cron:
-        name: "backup opencrvs"
-        minute: "0"
-        hour: "0"
-        job: "cd / && bash /tmp/compose/infrastructure/emergency-backup-metadata.sh {{ external_backup_server_user }} {{ external_backup_server_ip }} {{ external_backup_server_ssh_port }} {{ manager_production_server_ip }} {{ external_backup_server_remote_directory }} >> /var/log/opencrvs-backup.log 2>&1"
+        name: 'backup opencrvs'
+        minute: '0'
+        hour: '0'
+        job: 'cd / && bash /tmp/compose/infrastructure/emergency-backup-metadata.sh {{ external_backup_server_user }} {{ external_backup_server_ip }} {{ external_backup_server_ssh_port }} {{ manager_production_server_ip }} {{ external_backup_server_remote_directory }} 3 >> /var/log/opencrvs-backup.log 2>&1'
       when: external_backup_server_ip is defined
 
-    - name: "Check file for encrypted file system exists"
+    - name: 'Check file for encrypted file system exists'
       stat:
         path: /cryptfs_file_sparse.img
         get_checksum: False
         get_md5: False
       register: st
 
-    - name: "Bootstrap encrypted data folder"
+    - name: 'Bootstrap encrypted data folder'
       script: ../cryptfs/bootstrap.sh -s 100g -p {{encrypt_passphrase}}
       when: (not st.stat.exists) and encrypt_data
 
-    - name: "Mount encrypted data folder"
+    - name: 'Mount encrypted data folder'
       script: ../cryptfs/mount.sh -p {{encrypt_passphrase}}
       when: st.stat.exists and encrypt_data
 
-    - name: "Create mongo data directory"
+    - name: 'Create mongo data directory'
       file:
         path: /data/mongo
         state: directory
 
-    - name: "Create mongo backup directory"
+    - name: 'Create mongo backup directory'
       file:
         path: /data/backups/mongo
         state: directory
@@ -96,12 +96,12 @@
         owner: 1000
         mode: g+rwx
 
-    - name: "Create traefik data directory"
+    - name: 'Create traefik data directory'
       file:
         path: /data/traefik
         state: directory
 
-    - name: "Create elasticsearch data directory"
+    - name: 'Create elasticsearch data directory'
       file:
         path: /data/elasticsearch
         state: directory
@@ -109,7 +109,7 @@
         owner: 1000
         mode: g+rwx
 
-    - name: "Create elasticsearch backup directory"
+    - name: 'Create elasticsearch backup directory'
       file:
         path: /data/backups/elasticsearch
         state: directory
@@ -117,48 +117,48 @@
         owner: 1000
         mode: g+rwx
 
-    - name: "Install UFW"
+    - name: 'Install UFW'
       apt:
         name: ufw
         state: present
 
-    - name: "Allow OpenSSH through UFW"
+    - name: 'Allow OpenSSH through UFW'
       ufw:
         rule: allow
         name: OpenSSH
 
-    - name: "Copy logrotate script"
+    - name: 'Copy logrotate script'
       copy:
         src: ../logrotate.conf
         dest: /etc/
 
-    - name: "Save system logs to Papertrail"
+    - name: 'Save system logs to Papertrail'
       register: papaertrailSystemLogs
       shell: ' cd / && wget -qO - --header="X-Papertrail-Token: {{ papertrail_token }}" \ https://papertrailapp.com/destinations/16712142/setup.sh | sudo bash >> /var/log/papertrail.log 2>&1'
       when: papertrail_token is defined
     # Docker swarm ports - Note: all published docker container port will override UFW rules!
-    - name: "Allow secure docker client communication"
+    - name: 'Allow secure docker client communication'
       ufw:
         rule: allow
         port: 2376
         proto: tcp
-    - name: "Allow docker swarm communication among nodes - TCP"
+    - name: 'Allow docker swarm communication among nodes - TCP'
       ufw:
         rule: allow
         port: 7946
         proto: tcp
-    - name: "Allow docker swarm communication among nodes - UDP"
+    - name: 'Allow docker swarm communication among nodes - UDP'
       ufw:
         rule: allow
         port: 7946
         proto: udp
-    - name: "Allow docker overlay network traffic"
+    - name: 'Allow docker overlay network traffic'
       ufw:
         rule: allow
         port: 4789
         proto: udp
 
-    - name: "Deny everything else and enable UFW"
+    - name: 'Deny everything else and enable UFW'
       ufw:
         state: enabled
         default: deny
@@ -168,36 +168,36 @@
   become: yes
   become_method: sudo
   tasks:
-    - name: "Allow secure docker swarm node communication (managers only)"
+    - name: 'Allow secure docker swarm node communication (managers only)'
       ufw:
         rule: allow
         port: 2377
         proto: tcp
 
-    - name: "Create primary swarm manager"
+    - name: 'Create primary swarm manager'
       shell: docker swarm init --advertise-addr {{ ansible_default_ipv4.address }}
       when: "docker_info.stdout.find('Swarm: inactive') != -1"
 
-    - name: "Get docker swarm manager token"
+    - name: 'Get docker swarm manager token'
       shell: docker swarm join-token -q manager
       register: manager_token
 
-    - name: "Get docker swarm worker token"
+    - name: 'Get docker swarm worker token'
       shell: docker swarm join-token -q worker
       register: worker_token
 
-    - name: "Set higher max map count for elastic search"
+    - name: 'Set higher max map count for elastic search'
       sysctl:
         name: vm.max_map_count
         value: 262144
         state: present
 
-    - name: "Create influxdb data directory"
+    - name: 'Create influxdb data directory'
       file:
         path: /data/influxdb
         state: directory
 
-    - name: "Create influxdb backup directory"
+    - name: 'Create influxdb backup directory'
       file:
         path: /data/backups/influxdb
         state: directory
@@ -205,17 +205,17 @@
         owner: 1000
         mode: g+rwx
 
-    - name: "Create acme file for traefik"
+    - name: 'Create acme file for traefik'
       file:
         path: /data/traefik/acme.json
         state: touch
-        mode: "600"
+        mode: '600'
 
 - hosts: docker-workers
   become: yes
   become_method: sudo
   tasks:
-    - name: "Join as a worker"
+    - name: 'Join as a worker'
       shell: "docker swarm join --token {{ hostvars['manager1']['worker_token']['stdout'] }} {{ hostvars['manager1']['ansible_default_ipv4']['address'] }}:2377"
       when: "docker_info.stdout.find('Swarm: inactive') != -1"
       retries: 3
@@ -225,9 +225,9 @@
   become: yes
   become_method: sudo
   tasks:
-    - name: "Label node as data1"
+    - name: 'Label node as data1'
       shell: docker node update --label-add data1=true {{ data1_hostname }}
-    - name: "Label node as data2"
+    - name: 'Label node as data2'
       shell: docker node update --label-add data2=true {{ data2_hostname }}
-    - name: "Label node as data3"
+    - name: 'Label node as data3'
       shell: docker node update --label-add data3=true {{ data3_hostname }}
