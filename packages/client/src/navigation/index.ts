@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { Event, UserSection } from '@client/forms'
+import { Event, UserSection, CorrectionSection } from '@client/forms'
 import {
   APPLICATION_DETAIL,
   CERTIFICATE_COLLECTOR,
@@ -39,7 +39,6 @@ import {
   SEARCH_RESULT,
   SELECT_BIRTH_INFORMANT,
   SELECT_BIRTH_MAIN_CONTACT_POINT,
-  SELECT_BIRTH_PRIMARY_APPLICANT,
   SELECT_DEATH_INFORMANT,
   SELECT_DEATH_MAIN_CONTACT_POINT,
   SELECT_VITAL_EVENT,
@@ -50,6 +49,8 @@ import {
   WORKFLOW_STATUS,
   TEAM_USER_LIST,
   USER_PROFILE,
+  CERTIFICATE_CORRECTION,
+  VERIFY_CORRECTOR,
   CONFIG,
   APPLICATION_RECORD_AUDIT,
   CHANGE_PHONE
@@ -328,6 +329,27 @@ export function goToPrintCertificate(
       registrationId: registrationId.toString(),
       eventType: event.toLowerCase().toString(),
       groupId: groupId || 'certCollector'
+    })
+  )
+}
+
+export function goToCertificateCorrection(
+  applicationId: string,
+  pageId: CorrectionSection
+) {
+  return push(
+    formatUrl(CERTIFICATE_CORRECTION, {
+      applicationId: applicationId.toString(),
+      pageId: pageId.toString()
+    })
+  )
+}
+
+export function goToVerifyCorrector(applicationId: string, corrector: string) {
+  return push(
+    formatUrl(VERIFY_CORRECTOR, {
+      applicationId: applicationId.toString(),
+      corrector: corrector.toLowerCase().toString()
     })
   )
 }

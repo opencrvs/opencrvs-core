@@ -312,6 +312,13 @@ export function getDeathQueryMappings(action: Action) {
         query: GET_DEATH_REGISTRATION_FOR_CERTIFICATION,
         dataKey: 'fetchDeathRegistration'
       }
+    case Action.LOAD_REQUESTED_CORRECTION_APPLICATION:
+      // TODO: Apply seperate query; currently using it
+      // because the actual query is yet to be developed
+      return {
+        query: GET_DEATH_REGISTRATION_FOR_CERTIFICATION,
+        dataKey: 'fetchDeathRegistration'
+      }
     default:
       return null
   }
