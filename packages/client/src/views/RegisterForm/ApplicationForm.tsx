@@ -34,6 +34,7 @@ export class ApplicationFormView extends React.Component<
   IFormProps & RouteProps
 > {
   render() {
+    console.log(this.props)
     return <RegisterForm {...this.props} />
   }
 }
