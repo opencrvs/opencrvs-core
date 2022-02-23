@@ -91,7 +91,7 @@ interface IStateProps {
   language: string
   resources: IOfflineData
   tab: keyof IQueryData | 'search'
-  workqueueApplication: GQLEventSearchSet | null
+  workqueueDeclaration: GQLEventSearchSet | null
 }
 
 interface IDispatchProps {
@@ -115,7 +115,7 @@ interface ILabel {
   [key: string]: string | undefined
 }
 
-interface IApplicationData {
+interface IDeclarationData {
   id: string
   name?: string
   status?: string
@@ -130,7 +130,7 @@ interface IApplicationData {
   brnDrn?: string
 }
 
-interface IGQLApplication {
+interface IGQLDeclaration {
   id: string
   child?: { name: Array<GQLHumanName | null> }
   deceased?: { name: Array<GQLHumanName | null> }
@@ -156,29 +156,29 @@ const getCaptitalizedWord = (word: string | undefined): string => {
   return word.toUpperCase()[0] + word.toLowerCase().slice(1)
 }
 
-const isBirthApplication = (
-  application: GQLEventSearchSet | null
-): application is GQLBirthEventSearchSet => {
-  return (application && application.type === 'Birth') || false
+const isBirthDeclaration = (
+  declaration: GQLEventSearchSet | null
+): declaration is GQLBirthEventSearchSet => {
+  return (declaration && declaration.type === 'Birth') || false
 }
 
-const isDeathApplication = (
-  application: GQLEventSearchSet | null
-): application is GQLDeathEventSearchSet => {
-  return (application && application.type === 'Death') || false
+const isDeathDeclaration = (
+  declaration: GQLEventSearchSet | null
+): declaration is GQLDeathEventSearchSet => {
+  return (declaration && declaration.type === 'Death') || false
 }
 
-const getDraftApplicationName = (application: IApplication) => {
+const getDraftDeclarationName = (declaration: IApplication) => {
   let name = ''
-  let applicationName
-  if (application.event === 'birth') {
-    applicationName = application.data?.child
+  let declarationName
+  if (declaration.event === 'birth') {
+    declarationName = declaration.data?.child
   } else {
-    applicationName = application.data?.deceased
+    declarationName = declaration.data?.deceased
   }
 
-  if (applicationName) {
-    name = [applicationName.firstNamesEng, applicationName.familyNameEng]
+  if (declarationName) {
+    name = [declarationName.firstNamesEng, declarationName.familyNameEng]
       .filter((part) => Boolean(part))
       .join(' ')
   }
@@ -194,7 +194,7 @@ const getName = (name: (GQLHumanName | null)[], language: string) => {
 }
 
 const getLocation = (
-  application: IApplication,
+  declaration: IApplication,
   resources: IOfflineData,
   intl: IntlShape
 ) => {
@@ -202,17 +202,17 @@ const getLocation = (
   let locationId = ''
   let locationDistrict = ''
   let locationPermanent = ''
-  if (application.event === 'death') {
+  if (declaration.event === 'death') {
     locationType =
-      application.data?.deathEvent?.deathPlaceAddress?.toString() || ''
-    locationId = application.data?.deathEvent?.deathLocation?.toString() || ''
-    locationDistrict = application.data?.deathEvent?.district?.toString() || ''
+      declaration.data?.deathEvent?.deathPlaceAddress?.toString() || ''
+    locationId = declaration.data?.deathEvent?.deathLocation?.toString() || ''
+    locationDistrict = declaration.data?.deathEvent?.district?.toString() || ''
     locationPermanent =
-      application.data?.deceased?.districtPermanent?.toString() || ''
+      declaration.data?.deceased?.districtPermanent?.toString() || ''
   } else {
-    locationType = application.data?.child?.placeOfBirth?.toString() || ''
-    locationId = application.data?.child?.birthLocation?.toString() || ''
-    locationDistrict = application.data?.child?.district?.toString() || ''
+    locationType = declaration.data?.child?.placeOfBirth?.toString() || ''
+    locationId = declaration.data?.child?.birthLocation?.toString() || ''
+    locationDistrict = declaration.data?.child?.district?.toString() || ''
   }
 
   if (locationType === 'HEALTH_FACILITY') {
@@ -230,77 +230,77 @@ const getLocation = (
   return ''
 }
 
-const getDraftApplicationData = (
-  application: IApplication,
+const getDraftDeclarationData = (
+  declaration: IApplication,
   resources: IOfflineData,
   intl: IntlShape
-): IApplicationData => {
+): IDeclarationData => {
   return {
-    id: application.id,
-    name: getDraftApplicationName(application),
+    id: declaration.id,
+    name: getDraftDeclarationName(declaration),
     status:
-      application.submissionStatus?.toString() ||
-      application.registrationStatus?.toString() ||
+      declaration.submissionStatus?.toString() ||
+      declaration.registrationStatus?.toString() ||
       '',
-    type: application.event || '',
+    type: declaration.event || '',
     brnDrn:
-      application.data?.registration?.registrationNumber?.toString() || '',
-    trackingId: application.data?.registration?.trackingId?.toString() || '',
-    dateOfBirth: application.data?.child?.childBirthDate?.toString() || '',
-    dateOfDeath: application.data?.deathEvent?.deathDate?.toString() || '',
-    placeOfBirth: getLocation(application, resources, intl) || '',
-    placeOfDeath: getLocation(application, resources, intl) || '',
+      declaration.data?.registration?.registrationNumber?.toString() || '',
+    trackingId: declaration.data?.registration?.trackingId?.toString() || '',
+    dateOfBirth: declaration.data?.child?.childBirthDate?.toString() || '',
+    dateOfDeath: declaration.data?.deathEvent?.deathDate?.toString() || '',
+    placeOfBirth: getLocation(declaration, resources, intl) || '',
+    placeOfDeath: getLocation(declaration, resources, intl) || '',
     informant:
       (
-        application.data?.registration?.contactPoint as IFormSectionData
+        declaration.data?.registration?.contactPoint as IFormSectionData
       )?.value.toString() || '',
     informantContact:
       (
-        (application.data?.registration?.contactPoint as IFormSectionData)
+        (declaration.data?.registration?.contactPoint as IFormSectionData)
           ?.nestedFields as IContactPoint
       )?.registrationPhone.toString() || ''
   }
 }
 
-const getWQApplicationData = (
-  workqueueApplication: GQLEventSearchSet,
+const getWQDeclarationData = (
+  workqueueDeclaration: GQLEventSearchSet,
   language: string
 ) => {
   let name = ''
   if (
-    isBirthApplication(workqueueApplication) &&
-    workqueueApplication.childName
+    isBirthDeclaration(workqueueDeclaration) &&
+    workqueueDeclaration.childName
   ) {
-    name = getName(workqueueApplication.childName, language)
+    name = getName(workqueueDeclaration.childName, language)
   } else if (
-    isDeathApplication(workqueueApplication) &&
-    workqueueApplication.deceasedName
+    isDeathDeclaration(workqueueDeclaration) &&
+    workqueueDeclaration.deceasedName
   ) {
-    name = getName(workqueueApplication.deceasedName, language)
+    name = getName(workqueueDeclaration.deceasedName, language)
   }
   return {
-    id: workqueueApplication.id,
+    id: workqueueDeclaration.id,
     name,
-    type: (workqueueApplication.type && workqueueApplication.type) || '',
-    status: workqueueApplication.registration?.status || '',
-    trackingId: workqueueApplication.registration?.trackingId || '',
+    type: (workqueueDeclaration.type && workqueueDeclaration.type) || '',
+    status: workqueueDeclaration.registration?.status || '',
+    trackingId: workqueueDeclaration.registration?.trackingId || '',
     dateOfBirth: '',
     placeOfBirth: '',
     informant: ''
   }
 }
 
-const getGQLApplication = (
-  data: IGQLApplication,
+const getGQLDeclaration = (
+  data: IGQLDeclaration,
   language: string
-): IApplicationData => {
+): IDeclarationData => {
   let name = ''
   if (data.child) {
     name = getName(data.child.name, language)
   } else if (data.deceased) {
     name = getName(data.deceased.name, language)
   }
-  const application: IApplicationData = {
+  const declaration: IDeclarationData = {
     id: data?.id,
     name,
     type: data?.registration?.type,
@@ -310,54 +310,54 @@ const getGQLApplication = (
     placeOfBirth: '',
     informant: ''
   }
-  return application
+  return declaration
 }
 
-const getApplicationInfo = (
-  application: IApplicationData,
+const getDeclarationInfo = (
+  declaration: IDeclarationData,
   isDownloaded: boolean,
   intl: IntlShape
 ) => {
-  let informant = getCaptitalizedWord(application?.informant)
+  let informant = getCaptitalizedWord(declaration?.informant)
 
-  const status = getCaptitalizedWord(application?.status).split('_')
+  const status = getCaptitalizedWord(declaration?.status).split('_')
   let finalStatus = status[0]
   if (status[1]) finalStatus += ' ' + status[1]
 
-  if (application?.informantContact) {
-    informant = informant + ' . ' + application.informantContact
+  if (declaration?.informantContact) {
+    informant = informant + ' . ' + declaration.informantContact
   }
 
   let info: ILabel = {
-    status: application?.status && finalStatus,
-    type: getCaptitalizedWord(application?.type),
-    trackingId: application?.trackingId
+    status: declaration?.status && finalStatus,
+    type: getCaptitalizedWord(declaration?.type),
+    trackingId: declaration?.trackingId
   }
 
   if (info.type === 'Birth') {
-    if (application?.brnDrn) {
+    if (declaration?.brnDrn) {
       info = {
         ...info,
-        brn: application.brnDrn
+        brn: declaration.brnDrn
       }
     }
     info = {
       ...info,
-      dateOfBirth: application?.dateOfBirth,
-      placeOfBirth: application?.placeOfBirth,
+      dateOfBirth: declaration?.dateOfBirth,
+      placeOfBirth: declaration?.placeOfBirth,
       informant: informant
     }
   } else if (info.type === 'Death') {
-    if (application?.brnDrn) {
+    if (declaration?.brnDrn) {
       info = {
         ...info,
-        drn: application.brnDrn
+        drn: declaration.brnDrn
       }
     }
     info = {
       ...info,
-      dateOfDeath: application?.dateOfDeath,
-      placeOfDeath: application?.placeOfDeath,
+      dateOfDeath: declaration?.dateOfDeath,
+      placeOfDeath: declaration?.placeOfDeath,
       informant: informant
     }
   }
@@ -396,26 +396,26 @@ const getApplicationInfo = (
 }
 
 function RecordAuditBody({
-  application,
+  declaration,
   isDownloaded = false,
   intl
 }: {
-  application: IApplicationData
+  declaration: IDeclarationData
   isDownloaded?: boolean
   intl: IntlShape
 }) {
   return (
     <Content
-      title={application.name || 'No name provided'}
-      titleColor={application.name ? 'copy' : 'grey600'}
+      title={declaration.name || 'No name provided'}
+      titleColor={declaration.name ? 'copy' : 'grey600'}
       size={'large'}
       icon={() => (
         <ApplicationIcon
-          color={STATUSTOCOLOR[(application && application.status) || 'DRAFT']}
+          color={STATUSTOCOLOR[(declaration && declaration.status) || 'DRAFT']}
         />
       )}
     >
-      {getApplicationInfo(application, isDownloaded, intl)}
+      {getDeclarationInfo(declaration, isDownloaded, intl)}
     </Content>
   )
 }
@@ -427,7 +427,7 @@ function getBodyContent({
   tab,
   intl,
   resources,
-  workqueueApplication
+  workqueueDeclaration
 }: IFullProps) {
   if (!draft && tab === 'search') {
     return (
@@ -455,7 +455,7 @@ function getBodyContent({
             }
             return (
               <RecordAuditBody
-                application={getGQLApplication(
+                declaration={getGQLDeclaration(
                   data.fetchRegistration,
                   language
                 )}
@@ -467,15 +467,15 @@ function getBodyContent({
       </>
     )
   }
-  const application = draft
-    ? getDraftApplicationData(draft, resources, intl)
-    : getWQApplicationData(
-        workqueueApplication as NonNullable<typeof workqueueApplication>,
+  const declaration = draft
+    ? getDraftDeclarationData(draft, resources, intl)
+    : getWQDeclarationData(
+        workqueueDeclaration as NonNullable<typeof workqueueDeclaration>,
         language
       )
   return (
     <RecordAuditBody
-      application={application}
+      declaration={declaration}
       isDownloaded={!!draft}
       intl={intl}
     />
@@ -498,14 +498,14 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
     applicationId,
     draft:
       state.applicationsState.applications.find(
-        (application) =>
-          application.id === applicationId ||
-          application.compositionId === applicationId
+        (declaration) =>
+          declaration.id === applicationId ||
+          declaration.compositionId === applicationId
       ) || null,
     language: state.i18n.language,
     resources: getOfflineData(state),
     tab,
-    workqueueApplication:
+    workqueueDeclaration:
       (tab !== 'search' &&
         state.workqueueState.workqueue.data[tab].results?.find(
           (gqlSearchSet) => gqlSearchSet?.id === applicationId

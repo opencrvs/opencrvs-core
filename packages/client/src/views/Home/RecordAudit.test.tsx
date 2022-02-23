@@ -32,12 +32,12 @@ import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
 import { FETCH_APPLICATION_SHORT_INFO } from './queries'
 import { waitForElement } from '@client/tests/wait-for-element'
 
-const application: IApplication = createApplication(
+const declaration: IApplication = createApplication(
   Event.BIRTH,
   mockApplicationData
 )
-application.data.registration = {
-  ...application.data.registration,
+declaration.data.registration = {
+  ...declaration.data.registration,
   presentAtBirthRegistration: 'MOTHER',
   contactPoint: {
     value: 'MOTHER',
@@ -50,19 +50,19 @@ describe('Record audit summary for applicationState', () => {
 
   beforeEach(async () => {
     const { store, history } = createStore()
-    store.dispatch(storeApplication(application))
+    store.dispatch(storeApplication(declaration))
     component = await createTestComponent(
       <RecordAudit
         {...createRouterProps(
           formatUrl(APPLICATION_RECORD_AUDIT, {
             tab: 'inProgressTab',
-            applicationId: application.id
+            applicationId: declaration.id
           }),
           { isNavigatedInsideApp: false },
           {
             matchParams: {
               tab: 'inProgressTab',
-              applicationId: application.id
+              applicationId: declaration.id
             }
           }
         )}
@@ -75,7 +75,7 @@ describe('Record audit summary for applicationState', () => {
     expect(component.exists('RecordAuditBody')).toBeTruthy()
   })
 
-  it('Check values for saved applications', async () => {
+  it('Check values for saved declarations', async () => {
     expect(component.find('#status_value').hostNodes().text()).toBe('Draft')
     expect(component.find('#type_value').hostNodes().text()).toBe('Birth')
     expect(component.find('#brn_value').hostNodes().text()).toBe(
@@ -85,7 +85,7 @@ describe('Record audit summary for applicationState', () => {
   })
 })
 
-describe('Record audit summary for WorkQueue Applications', () => {
+describe('Record audit summary for WorkQueue declarations', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
@@ -162,7 +162,7 @@ describe('Record audit summary for WorkQueue Applications', () => {
     expect(component.exists('RecordAuditBody')).toBeTruthy()
   })
 
-  it('Check values for WQ applications', async () => {
+  it('Check values for WQ declarations', async () => {
     expect(component.find('#status_value').hostNodes().text()).toBe('Draft')
     expect(component.find('#type_value').hostNodes().text()).toBe('Birth')
     expect(component.find('#content-name').hostNodes().text()).toBe(
@@ -243,7 +243,7 @@ describe('Record audit summary for GQLQuery', () => {
     expect(component.exists('RecordAuditBody')).toBeTruthy()
   })
 
-  it('Check values for GQL applications', async () => {
+  it('Check values for GQL declarations', async () => {
     expect(component.find('#status_value').hostNodes().text()).toBe(
       'Registered'
     )
