@@ -20,6 +20,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { Content } from '@opencrvs/components/lib/interface/Content'
+import { FormTabs } from '@opencrvs/components/lib/forms/FormTabs'
 import { messages } from '@client/i18n/messages/views/config'
 
 type Props = WrappedComponentProps &
@@ -29,12 +30,22 @@ type Props = WrappedComponentProps &
     offlineCountryConfiguration: IOfflineData
   }
 
-interface State {}
+interface State {
+  activeTabId: string
+}
 
 class ApplicationConfigComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
+    this.state = {
+      activeTabId: 'birthTab'
+    }
   }
+
+  changeTab(id: string) {
+    this.setState({ activeTabId: id })
+  }
+
   render() {
     const { intl } = this.props
     return (
@@ -42,7 +53,23 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
         <Content
           title={intl.formatMessage(messages.applicationTitle)}
           titleColor={'copy'}
-        ></Content>
+        >
+          <FormTabs
+            sections={[
+              {
+                id: 'generalTab',
+                title: 'General'
+              },
+              {
+                id: 'birthTab',
+                title: 'Birth'
+              },
+              { id: 'deathTab', title: 'Death' }
+            ]}
+            activeTabId={this.state.activeTabId}
+            onTabClick={(id: any) => this.changeTab(id)}
+          ></FormTabs>
+        </Content>
       </SysAdminContentWrapper>
     )
   }
