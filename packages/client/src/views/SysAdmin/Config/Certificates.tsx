@@ -149,7 +149,7 @@ export function downloadFile(
   downloadLink.setAttribute('download', fileName)
   downloadLink.click()
 }
-class ConfigHomeComponent extends React.Component<Props, State> {
+class CertificatesConfigComponent extends React.Component<Props, State> {
   birthCertificatefileUploader: React.RefObject<HTMLInputElement>
   deathCertificatefileUploader: React.RefObject<HTMLInputElement>
   constructor(props: Props) {
@@ -572,6 +572,6 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const ConfigHome = connect(mapStateToProps)(
-  injectIntl(ConfigHomeComponent)
+export const CertificatesConfig = connect(mapStateToProps)(
+  injectIntl(CertificatesConfigComponent)
 )

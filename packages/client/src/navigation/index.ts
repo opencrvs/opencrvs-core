@@ -50,9 +50,10 @@ import {
   WORKFLOW_STATUS,
   TEAM_USER_LIST,
   USER_PROFILE,
-  CONFIG,
+  CERTIFICATE_CONFIG,
   APPLICATION_RECORD_AUDIT,
-  CHANGE_PHONE
+  CHANGE_PHONE,
+  APPLICATION_CONFIG
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
 import { NATL_ADMIN_ROLES } from '@client/utils/constants'
@@ -187,7 +188,11 @@ export function goToHome() {
 }
 
 export function goToConfig() {
-  return push(CONFIG)
+  return push(CERTIFICATE_CONFIG)
+}
+
+export function goToApplicationConfig() {
+  return push(APPLICATION_CONFIG)
 }
 
 export function goToHomeTab(tabId: string, selectorId = '') {

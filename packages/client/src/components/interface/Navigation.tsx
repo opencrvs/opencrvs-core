@@ -31,7 +31,8 @@ import {
   goToConfig,
   goToSettings,
   goToPerformanceView,
-  goToTeamView
+  goToTeamView,
+  goToApplicationConfig
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { COUNT_USER_WISE_APPLICATIONS } from '@client/search/queries'
@@ -160,6 +161,7 @@ interface IDispatchProps {
   goToFieldAgentHomeTab: typeof goToFieldAgentHomeTabAction
   goToRegistrarHomeTab: typeof goToRegistrarHomeTab
   goToConfigAction: typeof goToConfig
+  goToApplicationConfigAction: typeof goToApplicationConfig
   redirectToAuthentication: typeof redirectToAuthentication
   goToPerformanceViewAction: typeof goToPerformanceView
   goToTeamViewAction: typeof goToTeamView
@@ -194,7 +196,7 @@ const TAB_LABEL = {
   team: 'Team',
   configuration: 'Configuration',
   certificatesConfiguration: 'Certificates',
-  applicationSettings: 'Application Settings',
+  applicationSettings: 'Application',
   settings: 'Settings',
   logout: 'Logout'
 }
@@ -240,6 +242,7 @@ export const NavigationView = (props: IFullProps) => {
     enableMenuSelection = true,
     activeMenuItem,
     goToConfigAction,
+    goToApplicationConfigAction,
     navigationWidth,
     workqueue,
     storedApplications,
@@ -255,7 +258,7 @@ export const NavigationView = (props: IFullProps) => {
     : activeMenuItem
     ? activeMenuItem
     : 'review'
-
+  const ConfigTab = [TAB_ID.application, TAB_ID.certificates]
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
   const { loading, error, data, initialSyncDone } = workqueue
   const filteredData = filterProcessingApplicationsFromQuery(
@@ -525,11 +528,11 @@ export const NavigationView = (props: IFullProps) => {
                         onClick={() => setIsConfigExpanded(!isConfigExpanded)}
                         isSelected={
                           enableMenuSelection &&
-                          activeMenuItem === TAB_ID.config
+                          ConfigTab.includes(activeMenuItem)
                         }
                         expandableIcon={() =>
                           isConfigExpanded ||
-                          activeMenuItem === TAB_ID.config ? (
+                          ConfigTab.includes(activeMenuItem) ? (
                             <Expandable selected={true} />
                           ) : (
                             <Expandable />
@@ -537,24 +540,24 @@ export const NavigationView = (props: IFullProps) => {
                         }
                       />
                       {(isConfigExpanded ||
-                        activeMenuItem === TAB_ID.config) && (
+                        ConfigTab.includes(activeMenuItem)) && (
                         <>
+                          <NavigationSubItem
+                            label={TAB_LABEL.applicationSettings}
+                            id={`navigation_${TAB_ID.application}`}
+                            onClick={goToApplicationConfigAction}
+                            isSelected={
+                              enableMenuSelection &&
+                              activeMenuItem === TAB_ID.application
+                            }
+                          />
                           <NavigationSubItem
                             label={TAB_LABEL.certificatesConfiguration}
                             id={`navigation_${TAB_ID.certificates}`}
                             onClick={goToConfigAction}
                             isSelected={
                               enableMenuSelection &&
-                              activeMenuItem === TAB_ID.config
-                            }
-                          />
-                          <NavigationSubItem
-                            label={TAB_LABEL.applicationSettings}
-                            id={`navigation_${TAB_ID.application}`}
-                            onClick={() => {}}
-                            isSelected={
-                              enableMenuSelection &&
-                              activeMenuItem === TAB_ID.application
+                              activeMenuItem === TAB_ID.certificates
                             }
                           />
                         </>
@@ -596,8 +599,8 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
       ? TAB_ID.performance
       : window.location.href.includes('team')
       ? TAB_ID.team
-      : window.location.href.includes('config')
-      ? TAB_ID.config
+      : window.location.href.includes('application')
+      ? TAB_ID.application
       : window.location.href.includes('settings')
       ? TAB_ID.settings
       : window.location.href.includes('certificate')
@@ -615,6 +618,7 @@ export const Navigation = connect<
   goToFieldAgentHomeTab: goToFieldAgentHomeTabAction,
   goToRegistrarHomeTab,
   goToConfigAction: goToConfig,
+  goToApplicationConfigAction: goToApplicationConfig,
   goToPerformanceViewAction: goToPerformanceView,
   goToTeamViewAction: goToTeamView,
   redirectToAuthentication,
