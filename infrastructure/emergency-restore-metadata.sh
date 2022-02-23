@@ -14,7 +14,7 @@
 #------------------------------------------------------------------------------------------------------------------
 
 print_usage_and_exit () {
-    echo 'Usage: ./emergency-restore-metadata.sh date e.g. 2019-01-01'
+    echo 'Usage: ./emergency-restore-metadata.sh date e.g. 2019-01-01 3'
     echo "This script CLEARS ALL DATA and RESTORES'S A SPECIFIC DAY'S DATA.  This process is irreversable, so USE WITH CAUTION."
     echo "Script must receive a date parameter to restore data from that specific day in format +%Y-%m-%d"
     echo "The Hearth, OpenHIM User and Application-config db backup zips you would like to restore from: hearth-dev-{date}.gz, openhim-dev-{date}.gz, user-mgnt-{date}.gz and  application-config-{date}.gz must exist in /data/backups/mongo/{date} folder"
@@ -27,6 +27,14 @@ if [ -z "$1" ] ; then
     echo "Error: Argument for the date is required in position 1.  You must select which day's data you would like to roll back to."
     print_usage_and_exit
 fi
+
+if [ -z "$2" ] ; then
+    echo "Error: Argument for the REPLICAS is required in position 2."
+    print_usage_and_exit
+fi
+
+
+REPLICAS=$2
 
 # Retrieve 2-step verification to continue
 #-----------------------------------------
@@ -46,13 +54,25 @@ fi
 
 # Select docker network and replica set in production
 #----------------------------------------------------
-if [ "$DEV" = "true" ]; then
+if [ "$REPLICAS" = "0" ]; then
   HOST=mongo1
   NETWORK=opencrvs_default
-  echo "Working in DEV mode"
-else
+  echo "Working with no replicas"
+elif [ "$REPLICAS" = "1" ]; then
+  HOST=rs0/mongo1
+  NETWORK=opencrvs_overlay_net
+  echo "Working with 1 replica"
+elif [ "$REPLICAS" = "3" ]; then
   HOST=rs0/mongo1,mongo2,mongo3
   NETWORK=opencrvs_overlay_net
+  echo "Working with 3 replicas"
+elif [ "$REPLICAS" = "5" ]; then
+  HOST=rs0/mongo1,mongo2,mongo3,mongo4,mongo5
+  NETWORK=opencrvs_overlay_net
+  echo "Working with 5 replicas"
+else
+  echo "Script must be passed an understandable number of replicas: 0,1,3 or 5"
+  exit 1
 fi
 
 # Delete all data from Hearth, OpenHIM, User and Application-config and any other service related Mongo databases

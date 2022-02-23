@@ -426,7 +426,10 @@ export async function requestCorrectionHandler(
         {
           Authorization: request.headers.authorization
         }
-      )
+      ),
+      generateTimeLoggedPoint(request.payload as fhir.Bundle, {
+        Authorization: request.headers.authorization
+      })
     ])
 
     await writePoints(points)

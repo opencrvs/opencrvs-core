@@ -37,20 +37,26 @@ async function transformField(
   targetObj: any,
   fieldBuilderForVal: IFieldBuilderFunction | IFieldBuilders,
   context: { authHeader: IAuthHeader },
-  currentPropName: string
+  currentPropNamePath: string[]
 ) {
   if (!(sourceVal instanceof Date) && typeof sourceVal === 'object') {
     if (isFieldBuilder(fieldBuilderForVal)) {
-      await transformObj(sourceVal, targetObj, fieldBuilderForVal, context)
+      await transformObj(
+        sourceVal,
+        targetObj,
+        fieldBuilderForVal,
+        context,
+        currentPropNamePath
+      )
       return targetObj
     }
 
     throw new Error(
       `Expected ${JSON.stringify(
         fieldBuilderForVal
-      )} to be a FieldBuilder object for field name ${currentPropName}. The current field value is ${JSON.stringify(
-        sourceVal
-      )}.`
+      )} to be a FieldBuilder object for field name ${currentPropNamePath.join(
+        '.'
+      )}. The current field value is ${JSON.stringify(sourceVal)}.`
     )
   }
 
@@ -63,9 +69,9 @@ async function transformField(
   throw new Error(
     `Expected ${JSON.stringify(
       fieldBuilderForVal
-    )} to be a FieldBuilderFunction for field name ${currentPropName}. The current field value is ${JSON.stringify(
-      sourceVal
-    )}.`
+    )} to be a FieldBuilderFunction for field name ${currentPropNamePath.join(
+      '.'
+    )}. The current field value is ${JSON.stringify(sourceVal)}.`
   )
 }
 
@@ -73,7 +79,8 @@ export default async function transformObj(
   sourceObj: object,
   targetObj: object,
   fieldBuilders: IFieldBuilders,
-  context: any = {}
+  context: { _index?: any; authHeader: IAuthHeader },
+  currentPropNamePath: string[] = []
 ) {
   // ensure the sourceObj has Object in its prototype chain
   // graphql-js creates objects with Object.create(null)
@@ -94,7 +101,7 @@ export default async function transformObj(
             targetObj,
             fieldBuilders[currentPropName],
             context,
-            currentPropName
+            currentPropNamePath.concat(currentPropName)
           )
         }
 
@@ -106,7 +113,7 @@ export default async function transformObj(
         targetObj,
         fieldBuilders[currentPropName],
         context,
-        currentPropName
+        currentPropNamePath.concat(currentPropName)
       )
     }
   }
