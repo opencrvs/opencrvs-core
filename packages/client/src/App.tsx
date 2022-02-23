@@ -218,6 +218,13 @@ export class App extends React.Component<IAppProps> {
                                             component={ConfigHome}
                                           />
                                           <ProtectedRoute
+                                            exact
+                                            path={
+                                              routes.APPLICATION_RECORD_AUDIT
+                                            }
+                                            component={RecordAudit}
+                                          />
+                                          <ProtectedRoute
                                             path={routes.SEARCH}
                                             component={SearchResult}
                                           />
@@ -262,12 +269,6 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             path={routes.APPLICATION_DETAIL}
                                             component={Details}
-                                          />
-                                          <ProtectedRoute
-                                            path={
-                                              routes.APPLICATION_RECORD_AUDIT
-                                            }
-                                            component={RecordAudit}
                                           />
                                           <ProtectedRoute
                                             exact
