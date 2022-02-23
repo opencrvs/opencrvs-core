@@ -86,6 +86,11 @@ export type AssetsFailedAction = {
   payload: Error
 }
 
+export const APPLICATION_CONFIG_LOAD = 'OFFLINE/APPLICATION_CONFIG_LOAD'
+export type ApplicationConfigLoadAction = {
+  type: typeof APPLICATION_CONFIG_LOAD
+}
+
 export const APPLICATION_CONFIG_LOADED = 'OFFLINE/APPLICATION_CONFIG_LOADED'
 export type ApplicationConfigLoadedAction = {
   type: typeof APPLICATION_CONFIG_LOADED
@@ -209,6 +214,10 @@ export const offlineDataUpdated = (state: IOfflineData) => ({
   payload: state
 })
 
+export const configLoad = (): ApplicationConfigLoadAction => ({
+  type: APPLICATION_CONFIG_LOAD
+})
+
 export const configLoaded = (
   payload: IApplicationConfigResponse
 ): ApplicationConfigLoadedAction => ({
@@ -241,6 +250,7 @@ export type Action =
   | DefinitionsLoadedAction
   | AssetsLoadedAction
   | AssetsFailedAction
+  | ApplicationConfigLoadAction
   | ApplicationConfigLoadedAction
   | ApplicationConfigFailedAction
   | IFilterLocationsAction
