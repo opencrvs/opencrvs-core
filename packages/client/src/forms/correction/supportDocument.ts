@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { RadioSize } from '@opencrvs/components/lib/forms'
 import {
   CorrectionSection,
   IFormSection,
@@ -17,6 +16,7 @@ import {
   RADIO_GROUP
 } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/correction'
+import { fieldValueSectionExchangeTransformer } from '@client/forms/mappings/mutation'
 
 export const supportingDocumentsSectionGroup: IFormSectionGroup = {
   id: 'correctionDocumentsViewGroup',
@@ -28,6 +28,9 @@ export const supportingDocumentsSectionGroup: IFormSectionGroup = {
       initialValue: '',
       hideHeader: true,
       hideAsterisk: true,
+      mapping: {
+        mutation: fieldValueSectionExchangeTransformer('correction', 'data')
+      },
       validate: [],
       options: [
         {

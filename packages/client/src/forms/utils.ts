@@ -39,7 +39,10 @@ import {
   IFormSectionGroup,
   IRadioGroupFormField,
   RADIO_GROUP_WITH_NESTED_FIELDS,
-  DOCUMENT_UPLOADER_WITH_OPTION
+  DOCUMENT_UPLOADER_WITH_OPTION,
+  IFormFieldValue,
+  FIELD_WITH_DYNAMIC_DEFINITIONS,
+  IRadioGroupWithNestedFieldsFormField
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -593,6 +596,52 @@ export const convertToMSISDN = (phone: string) => {
   return phone.startsWith('0')
     ? `${countryCallingCode}${phone.substring(1)}`
     : `${countryCallingCode}${phone}`
+}
+
+export const isRadioGroupWithNestedField = (
+  field: IFormField
+): field is IRadioGroupWithNestedFieldsFormField => {
+  return field.type === RADIO_GROUP_WITH_NESTED_FIELDS
+}
+
+export const isDynamicField = (
+  field: IFormField
+): field is IDynamicFormField => {
+  return field.type === FIELD_WITH_DYNAMIC_DEFINITIONS
+}
+
+export const isDateField = (
+  field: IFormField,
+  sectionData: IFormSectionData
+): field is IDateFormField => {
+  if (isDynamicField(field)) {
+    return getFieldType(field, sectionData) === DATE
+  }
+
+  return field.type === DATE
+}
+
+export const stringifyFieldValue = (
+  field: IFormField,
+  fieldValue: IFormFieldValue,
+  sectionData: IFormSectionData
+): string => {
+  if (!fieldValue) {
+    return ''
+  }
+
+  if (isDateField(field, sectionData)) {
+    return fieldValue.toString()
+  }
+
+  return fieldValue.toString()
+}
+
+export const getSelectedRadioOptionWithNestedFields = (
+  field: IRadioGroupWithNestedFieldsFormField,
+  sectionData: IFormSectionData
+): string | undefined => {
+  return (sectionData[field.name] as IFormSectionData).value as string
 }
 
 export const conditionals: IConditionals = {

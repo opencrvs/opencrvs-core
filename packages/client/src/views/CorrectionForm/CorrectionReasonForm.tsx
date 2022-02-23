@@ -25,7 +25,8 @@ import {
 import {
   CorrectionSection,
   IFormSection,
-  IFormSectionData
+  IFormSectionData,
+  IForm
 } from '@client/forms'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'

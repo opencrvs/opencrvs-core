@@ -35,7 +35,8 @@ import {
   SUBSECTION,
   TEXTAREA,
   WARNING,
-  LOCATION_SEARCH_INPUT
+  LOCATION_SEARCH_INPUT,
+  IAttachmentValue
 } from '@client/forms'
 import { IApplication, SUBMISSION_STATUS } from '@client/applications'
 import { Errors, getValidationErrorsForForm } from '@client/forms/validation'
@@ -55,7 +56,8 @@ import {
   getVisibleSectionGroupsBasedOnConditions
 } from '@client/forms/utils'
 import { buttonMessages } from '@client/i18n/messages'
-import { flattenDeep, get, clone } from 'lodash'
+import { flattenDeep, get, clone, isEqual } from 'lodash'
+import { IGQLLocation } from '@client/utils/userUtils'
 
 export function groupHasError(
   group: IFormSectionGroup,
@@ -90,6 +92,89 @@ export function groupHasError(
 
 export function isCorrection(application: IApplication) {
   return application.registrationStatus === SUBMISSION_STATUS.REGISTERED
+}
+
+export function updateApplicationRegistrationWithCorrection(
+  application: IApplication,
+  meta?: { userPrimaryOffice?: IGQLLocation }
+): void {
+  const correctionValues: Record<string, any> = {}
+  const { data } = application
+
+  if (data.corrector && data.corrector.relationship) {
+    correctionValues.requester = ((
+      data.corrector.relationship as IFormSectionData
+    ).value || data.corrector.relationship) as string
+  }
+
+  if (data.reason) {
+    if (data.reason.type) {
+      correctionValues.reason = ((data.reason.type as IFormSectionData).value ||
+        data.reason.type) as string
+    }
+
+    if (data.reason.additionalComment) {
+      correctionValues.note = data.reason.additionalComment
+    }
+  }
+
+  if (data.supportingDocuments) {
+    if (
+      typeof data.supportingDocuments.supportDocumentRequiredForCorrection ===
+      'boolean'
+    ) {
+      if (data.supportingDocuments.supportDocumentRequiredForCorrection) {
+        correctionValues.hasShowedVerifiedDocument = true
+      } else {
+        correctionValues.noSupportingDocumentationRequired = true
+      }
+    }
+
+    if (data.supportingDocuments.uploadDocForLegalProof) {
+      correctionValues.data = (
+        data.supportingDocuments.uploadDocForLegalProof as IAttachmentValue
+      ).data
+    }
+  }
+
+  if (data.currectionFeesPayment) {
+    if (
+      (data.currectionFeesPayment.correctionFees as IFormSectionData)?.value &&
+      (data.currectionFeesPayment.correctionFees as IFormSectionData).value ===
+        'REQUIRED'
+    ) {
+      const { nestedFields }: { nestedFields?: IFormSectionData } = data
+        .currectionFeesPayment.correctionFees as IFormSectionData
+      correctionValues.payments = [
+        {
+          type: 'MANUAL',
+          total: Number(nestedFields?.totalFees),
+          amount: Number(nestedFields?.totalFees),
+          outcome: 'COMPLETED' as const
+        }
+      ]
+      if (nestedFields?.proofOfPayment) {
+        correctionValues.payments[0].data = (
+          nestedFields?.proofOfPayment as IFileValue
+        ).data
+      }
+    }
+  }
+
+  if (meta) {
+    if (meta.userPrimaryOffice) {
+      correctionValues.location = {
+        _fhirID: meta.userPrimaryOffice.id
+      }
+    }
+  }
+
+  data.registration.correction = data.registration.correction
+    ? {
+        ...(data.registration.correction as IFormSectionData),
+        ...correctionValues
+      }
+    : correctionValues
 }
 
 export function sectionHasError(
@@ -310,6 +395,10 @@ export function hasFieldChanged(
    */
   if (!originalData[field.name] && data[field.name] === '') {
     return false
+  }
+
+  if (Array.isArray(data[field.name])) {
+    return !isEqual(data[field.name], originalData[field.name])
   }
   return data[field.name] !== originalData[field.name]
 }

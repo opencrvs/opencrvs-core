@@ -78,7 +78,9 @@ export enum Action {
   COLLECT_CERTIFICATE = 'collect certificate',
   REJECT_APPLICATION = 'reject',
   LOAD_REVIEW_APPLICATION = 'load application data for review',
-  LOAD_CERTIFICATE_APPLICATION = 'load application data for certificate collection'
+  LOAD_CERTIFICATE_APPLICATION = 'load application data for certificate collection',
+  LOAD_REQUESTED_CORRECTION_APPLICATION = 'load application data for which is requested correction',
+  REQUEST_CORRECTION_APPLICATION = 'request correction'
 }
 
 export interface ISelectOption {
