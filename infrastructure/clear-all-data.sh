@@ -7,6 +7,21 @@
 #
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
+
+set -e
+
+print_usage_and_exit () {
+    echo 'Usage: ./clear-all-data.sh REPLICAS'
+    exit 1
+}
+
+if [ -z "$1" ] ; then
+    echo 'Error: Argument REPLICAS is required in position 1.'
+    print_usage_and_exit
+fi
+
+REPLICAS=$1
+
 if [ "$REPLICAS" = "0" ]; then
   HOST=mongo1
   NETWORK=opencrvs_default

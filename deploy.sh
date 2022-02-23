@@ -159,19 +159,19 @@ if [ $1 == "--clear-data=yes" ] ; then
     echo
     echo "Clearing all existing data..."
     echo
-    ssh $SSH_USER@$SSH_HOST 'REPLICAS='$REPLICAS' && /tmp/compose/infrastructure/clear-all-data.sh'
+    ssh $SSH_USER@$SSH_HOST /tmp/compose/infrastructure/clear-all-data.sh $REPLICAS
 fi
 
 if [ $2 == "--restore-metadata=yes" ] ; then
     echo
     echo "Restoring metadata..."
     echo
-    ssh $SSH_USER@$SSH_HOST 'REPLICAS='$REPLICAS' && /tmp/compose/infrastructure/restore-metadata.sh'
+    ssh $SSH_USER@$SSH_HOST /tmp/compose/infrastructure/restore-metadata.sh $REPLICAS
 fi
 
 if [ $3 == "--update-metadata=yes" ] ; then
     echo
     echo "Updating existing metadata..."
     echo
-    ssh $SSH_USER@$SSH_HOST 'REPLICAS='$REPLICAS' && /tmp/compose/infrastructure/restore-metadata-updates.sh'
+    ssh $SSH_USER@$SSH_HOST /tmp/compose/infrastructure/restore-metadata-updates.sh $REPLICAS
 fi
