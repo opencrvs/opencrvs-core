@@ -33,6 +33,51 @@ jest.mock('@metrics/api', () => ({
   fetchPractitionerRole: jest.fn()
 }))
 
+jest.mock('@metrics/configApi', () => {
+  const originalModule = jest.requireActual('@metrics/configApi')
+  return {
+    __esModule: true,
+    ...originalModule,
+    getApplicationConfig: () =>
+      Promise.resolve({
+        API_GATEWAY_URL: 'http://localhost:7070/',
+        CONFIG_API_URL: 'http://localhost:2021',
+        LOGIN_URL: 'http://localhost:3020',
+        AUTH_URL: 'http://localhost:4040',
+        RESOURCES_URL: 'http://localhost:3040',
+        CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 36500,
+        CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 36500,
+        CERTIFICATE_PRINT_LOWEST_CHARGE: 0,
+        CERTIFICATE_PRINT_HIGHEST_CHARGE: 0,
+        UI_POLLING_INTERVAL: 5000,
+        FIELD_AGENT_AUDIT_LOCATIONS: 'DISTRICT',
+        APPLICATION_AUDIT_LOCATIONS: 'DISTRICT',
+        INFORMANT_MINIMUM_AGE: 16,
+        HIDE_EVENT_REGISTER_INFORMATION: false,
+        EXTERNAL_VALIDATION_WORKQUEUE: false,
+        PHONE_NUMBER_PATTERN: {
+          pattern: '/^0(7|9)[0-9]{1}[0-9]{7}$/',
+          example: '0970545855',
+          start: '0[7|9]',
+          num: '10',
+          mask: {
+            startForm: 4,
+            endBefore: 2
+          }
+        },
+        SENTRY: 'https://f892d643aab642108f44e2d1795706bc@sentry.io/1774604',
+        LOGROCKET: 'opencrvs-foundation/opencrvs-zambia',
+        NID_NUMBER_PATTERN: {
+          pattern: '/^[0-9]{9}$/',
+          example: '4837281940',
+          num: '9'
+        },
+        COUNTRY: 'zmb',
+        LANGUAGES: 'en'
+      })
+  }
+})
+
 process.env.CERT_PUBLIC_KEY_PATH = join(__dirname, './cert.key.pub')
 process.env.NODE_ENV = 'TEST'
 
@@ -363,7 +408,7 @@ beforeEach(() => {
       timed_out: false,
       _shards: { total: 5, successful: 5, skipped: 0, failed: 0 },
       hits: {
-        total: 6,
+        total: { value: 6 },
         max_score: null,
         hits: [
           {

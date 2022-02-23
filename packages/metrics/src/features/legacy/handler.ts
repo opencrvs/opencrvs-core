@@ -87,7 +87,8 @@ export async function generateLegacyMetricsHandler(
 ) {
   let result: any
   const authHeader = {
-    Authorization: request.headers.authorization
+    Authorization: request.headers.authorization,
+    'x-correlation-id': request.headers['x-correlation-id']
   }
   try {
     await query('DROP MEASUREMENT applications_started')
@@ -186,7 +187,8 @@ export async function generateLegacyEventDurationHandler(
 ) {
   let result: any
   const authHeader = {
-    Authorization: request.headers.authorization
+    Authorization: request.headers.authorization,
+    'x-correlation-id': request.headers['x-correlation-id']
   }
   try {
     await query('DROP MEASUREMENT application_event_duration')
