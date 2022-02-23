@@ -19,6 +19,8 @@ import { RouteComponentProps } from 'react-router'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
+import { Content } from '@opencrvs/components/lib/interface/Content'
+import { messages } from '@client/i18n/messages/views/config'
 
 type Props = WrappedComponentProps &
   Pick<RouteComponentProps, 'history'> & {
@@ -37,9 +39,10 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
     const { intl } = this.props
     return (
       <SysAdminContentWrapper isCertificatesConfigPage={true}>
-        <div>
-          <h1>Application</h1>
-        </div>
+        <Content
+          title={intl.formatMessage(messages.applicationTitle)}
+          titleColor={'copy'}
+        ></Content>
       </SysAdminContentWrapper>
     )
   }

@@ -25,7 +25,7 @@ const Title = styled.div`
 `
 
 const ResponsiveContainer = styled.div<{ isConfigPage?: boolean }>`
-  display: ${({ isConfigPage }) => (isConfigPage === true ? 'block' : 'none')};
+  display: none;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: block;
   }
