@@ -14,7 +14,7 @@ import React from 'react'
 import { Header } from '@client/components/interface/Header/Header'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import { Navigation } from '@client/components/interface/Navigation'
-import styled, { withTheme, ITheme } from '@client/styledComponents'
+import styled from '@client/styledComponents'
 import { ApplicationIcon } from '@opencrvs/components/lib/icons'
 import { connect } from 'react-redux'
 import {
@@ -44,8 +44,9 @@ import { IQueryData } from '@client/views/OfficeHome/OfficeHome'
 import { generateLocationName } from '@client/utils/locationUtils'
 import { Query } from '@client/components/Query'
 import { FETCH_APPLICATION_SHORT_INFO } from '@client/views/Home/queries'
-import { Spinner } from '@opencrvs/components/lib/interface'
+import { Loader } from '@opencrvs/components/lib/interface'
 import { HOME } from '@client/navigation/routes'
+import { createNamesMap } from '@client/utils/data-formatting'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -54,10 +55,6 @@ const BodyContainer = styled.div`
     margin-left: 265px;
     margin-top: 28px;
   }
-`
-
-const StyledSpinner = styled(Spinner)`
-  margin: 20% auto;
 `
 
 const InfoContainer = styled.div`
@@ -110,7 +107,8 @@ type RouteProps = RouteComponentProps<{
 type IFullProps = IDispatchProps &
   IStateProps &
   IDispatchProps &
-  IntlShapeProps & { theme: ITheme } & RouteProps
+  IntlShapeProps &
+  RouteProps
 
 interface ILabel {
   [key: string]: string | undefined
@@ -133,8 +131,8 @@ interface IApplicationData {
 
 interface IGQLApplication {
   id: string
-  child?: { name: GQLHumanName[] }
-  deceased?: { name: GQLHumanName[] }
+  child?: { name: Array<GQLHumanName | null> }
+  deceased?: { name: Array<GQLHumanName | null> }
   registration?: {
     trackingId: string
     type: string
@@ -210,22 +208,12 @@ const getDraftApplicationName = (application: IApplication) => {
   return name
 }
 
-const getWQApplicationName = (application: GQLEventSearchSet) => {
-  let name = ''
-  const applicationName =
-    (isBirthApplication(application) &&
-      application.childName &&
-      application.childName[0]) ||
-    (isDeathApplication(application) &&
-      application.deceasedName &&
-      application.deceasedName[0])
+function notNull<T>(value: T | null): value is T {
+  return value !== null
+}
 
-  if (applicationName) {
-    name = [applicationName.firstNames, applicationName.familyName]
-      .filter((part) => Boolean(part))
-      .join(' ')
-  }
-  return name
+const getName = (name: (GQLHumanName | null)[], language: string) => {
+  return createNamesMap(name.filter(notNull))[language]
 }
 
 const getLocation = (
@@ -270,10 +258,9 @@ const getDraftApplicationData = (
   resources: IOfflineData,
   intl: IntlShape
 ): IApplicationData => {
-  const name = getDraftApplicationName(application)
   return {
     id: application.id,
-    name: name,
+    name: getDraftApplicationName(application),
     status:
       application.submissionStatus?.toString() ||
       application.registrationStatus?.toString() ||
@@ -298,12 +285,25 @@ const getDraftApplicationData = (
   }
 }
 
-const getWQApplicationData = (workqueueApplication: GQLEventSearchSet) => {
-  const name = getWQApplicationName(workqueueApplication)
-
+const getWQApplicationData = (
+  workqueueApplication: GQLEventSearchSet,
+  language: string
+) => {
+  let name = ''
+  if (
+    isBirthApplication(workqueueApplication) &&
+    workqueueApplication.childName
+  ) {
+    name = getName(workqueueApplication.childName, language)
+  } else if (
+    isDeathApplication(workqueueApplication) &&
+    workqueueApplication.deceasedName
+  ) {
+    name = getName(workqueueApplication.deceasedName, language)
+  }
   return {
     id: workqueueApplication.id,
-    name: name,
+    name,
     type: (workqueueApplication.type && workqueueApplication.type) || '',
     status: workqueueApplication.registration?.status || '',
     trackingId: workqueueApplication.registration?.trackingId || '',
@@ -313,9 +313,19 @@ const getWQApplicationData = (workqueueApplication: GQLEventSearchSet) => {
   }
 }
 
-const getGQLApplication = (data: IGQLApplication): IApplicationData => {
+const getGQLApplication = (
+  data: IGQLApplication,
+  language: string
+): IApplicationData => {
+  let name = ''
+  if (data.child) {
+    name = getName(data.child.name, language)
+  } else if (data.deceased) {
+    name = getName(data.deceased.name, language)
+  }
   const application: IApplicationData = {
     id: data?.id,
+    name,
     type: data?.registration?.type,
     status: data?.registration?.status[0].type,
     trackingId: data?.registration?.trackingId,
@@ -399,47 +409,33 @@ const getApplicationInfo = (
   )
 }
 
-function RecordAuditView(application: IApplicationData, isDownloaded = false) {
+function RecordAuditBody(application: IApplicationData, isDownloaded = false) {
   return (
-    <>
-      <Header />
-      <Navigation deselectAllTabs={true} />
-      <BodyContainer>
-        <Content
-          title={application.name || 'No name provided'}
-          titleColor={application.name ? 'copy' : 'grey600'}
-          size={'large'}
-          icon={() => (
-            <ApplicationIcon
-              color={
-                STATUSTOCOLOR[(application && application.status) || 'DRAFT']
-              }
-            />
-          )}
-        >
-          {getApplicationInfo(application, isDownloaded)}
-        </Content>
-      </BodyContainer>
-    </>
+    <Content
+      title={application.name || 'No name provided'}
+      titleColor={application.name ? 'copy' : 'grey600'}
+      size={'large'}
+      icon={() => (
+        <ApplicationIcon
+          color={STATUSTOCOLOR[(application && application.status) || 'DRAFT']}
+        />
+      )}
+    >
+      {getApplicationInfo(application, isDownloaded)}
+    </Content>
   )
 }
 
-const ShowRecordAudit = ({
+function getBodyContent({
   applicationId,
   draft,
   language,
   tab,
-  theme,
   intl,
   resources,
   workqueueApplication
-}: IFullProps) => {
-  if (draft) {
-    return RecordAuditView(
-      getDraftApplicationData(draft, resources, intl),
-      true
-    )
-  } else if (tab === 'search') {
+}: IFullProps) {
+  if (!draft && tab === 'search') {
     return (
       <>
         <Query
@@ -459,25 +455,34 @@ const ShowRecordAudit = ({
             data: any
           }) => {
             if (loading) {
-              return (
-                <StyledSpinner
-                  id="field-agent-home-spinner"
-                  baseColor={theme.colors.background}
-                />
-              )
+              return <Loader id="search_loader" marginPercent={35} />
             } else if (error) {
               return <Redirect to={HOME} />
             }
-            return RecordAuditView(getGQLApplication(data.fetchRegistration))
+            return RecordAuditBody(
+              getGQLApplication(data.fetchRegistration, language)
+            )
           }}
         </Query>
       </>
     )
   }
-  return RecordAuditView(
-    getWQApplicationData(
-      workqueueApplication as NonNullable<typeof workqueueApplication>
-    )
+  const application = draft
+    ? getDraftApplicationData(draft, resources, intl)
+    : getWQApplicationData(
+        workqueueApplication as NonNullable<typeof workqueueApplication>,
+        language
+      )
+  return RecordAuditBody(application, !!draft)
+}
+
+const ShowRecordAudit = (props: IFullProps) => {
+  return (
+    <>
+      <Header />
+      <Navigation deselectAllTabs={true} />
+      <BodyContainer>{getBodyContent(props)}</BodyContainer>
+    </>
   )
 }
 
@@ -512,4 +517,4 @@ export const RecordAudit = connect<
   goToApplicationDetails,
   goBack: goBackAction,
   goToRegistrarHomeTab
-})(injectIntl(withTheme(ShowRecordAudit)))
+})(injectIntl(ShowRecordAudit))
