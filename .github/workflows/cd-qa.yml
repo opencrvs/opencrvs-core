@@ -7,16 +7,18 @@
 #
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
-name: Continuous Delivery to Production
+name: Continuous Delivery to QA
 
 on:
-  push:
-    branches:
-      - 'master'
-      - 'release/'
+  workflow_dispatch:
+    inputs:
+      job:
+        description: 'Deploy to QA'
+        required: true
+        default: 'qa-deploy'
 
 jobs:
-  push-deploy-prod:
+  qa-deploy:
     runs-on: ubuntu-20.04
     timeout-minutes: 60
     strategy:
@@ -28,11 +30,9 @@ jobs:
       - name: Checking out the country config repo
         run: |
           git clone https://github.com/opencrvs/opencrvs-farajaland.git
-          git checkout master
       - name: Get COUNTRY_CONFIG_VERSION
         run: |
           cd opencrvs-farajaland
-          git checkout master
           echo "COUNTRY_CONFIG_VERSION=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
           cd ../
       - name: Login to DockerHub
@@ -47,6 +47,6 @@ jobs:
         with:
           key: ${{ secrets.SSH_KEY }}
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
-      - name: Deploy to development
+      - name: Deploy to qa
         run: |
-          yarn deploy:qa farajaland.opencrvs.org $(git rev-parse --short HEAD) ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 3
+          yarn deploy:qa farajaland-qa.opencrvs.org $(git rev-parse --short HEAD) ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
