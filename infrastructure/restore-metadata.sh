@@ -10,7 +10,7 @@
 set -e
 
 print_usage_and_exit () {
-    echo 'Usage: ./restore-metadata.sh REPLICAS'
+    echo 'Usage: ./restore-metadata.sh REPLICAS ENV'
     exit 1
 }
 
@@ -19,7 +19,14 @@ if [ -z "$1" ] ; then
     print_usage_and_exit
 fi
 
+if [ -z "$2" ] ; then
+    echo 'Error: Argument ENV is required in position 2.'
+    print_usage_and_exit
+fi
+
 REPLICAS=$1
+ENV=$2
+
 DIR=$(cd "$(dirname "$0")"; pwd)
 echo "Working dir: $DIR"
 
@@ -50,8 +57,7 @@ docker run --rm -v $DIR/default_backups:/default_backups --network=$NETWORK mong
 docker run --rm -v $DIR/default_backups:/default_backups --network=$NETWORK mongo:3.6 bash \
  -c "mongorestore --host $HOST --drop --gzip --archive=/default_backups/openhim-dev.gz"
 
-docker run --rm -v $DIR/default_backups:/default_backups --network=$NETWORK mongo:3.6 bash \
- -c "mongorestore --host $HOST --drop --gzip --archive=/default_backups/user-mgnt.gz"
+if [[ "$ENV" != "qa" ]] ; then docker run --rm -v $DIR/default_backups:/default_backups --network=$NETWORK mongo:3.6 bash -c "mongorestore --host $HOST --drop --gzip --archive=/default_backups/user-mgnt.gz" ; fi
 
 docker run --rm -v $DIR/default_backups:/default_backups --network=$NETWORK mongo:3.6 bash \
  -c "mongorestore --host $HOST --drop --gzip --archive=/default_backups/application-config.gz"
