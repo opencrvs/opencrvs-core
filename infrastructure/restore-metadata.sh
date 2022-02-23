@@ -22,10 +22,13 @@ elif [ "$REPLICAS" = "3" ]; then
   HOST=rs0/mongo1,mongo2,mongo3
   NETWORK=opencrvs_overlay_net
   echo "Working with 3 replicas"
-else [ "$REPLICAS" = "5" ]; then
+elif [ "$REPLICAS" = "5" ]; then
   HOST=rs0/mongo1,mongo2,mongo3,mongo4,mongo5
   NETWORK=opencrvs_overlay_net
   echo "Working with 5 replicas"
+else
+  echo "Script must be passed an understandable number of replicas: 0,1,3 or 5"
+  exit 1
 fi
 
 docker run --rm -v $DIR/default_backups:/default_backups --network=$NETWORK mongo:3.6 bash \

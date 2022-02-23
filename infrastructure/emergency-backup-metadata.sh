@@ -69,10 +69,13 @@ elif [ "$REPLICAS" = "3" ]; then
   HOST=rs0/mongo1,mongo2,mongo3
   NETWORK=opencrvs_overlay_net
   echo "Working with 3 replicas"
-else [ "$REPLICAS" = "5" ]; then
+elif [ "$REPLICAS" = "5" ]; then
   HOST=rs0/mongo1,mongo2,mongo3,mongo4,mongo5
   NETWORK=opencrvs_overlay_net
   echo "Working with 5 replicas"
+else
+  echo "Script must be passed an understandable number of replicas: 0,1,3 or 5"
+  exit 1
 fi
 
 # Today's date is used for filenames
