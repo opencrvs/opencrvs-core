@@ -15,7 +15,8 @@ import {
   createTestComponent,
   mockApplicationData,
   createRouterProps,
-  flushPromises
+  flushPromises,
+  mockDeathApplicationData
 } from '@client/tests/util'
 import { RecordAudit } from './RecordAudit'
 import { createStore } from '@client/store'
@@ -82,6 +83,51 @@ describe('Record audit summary for applicationState', () => {
       '201908122365BDSS0SE1'
     )
     expect(component.find('#placeOfBirth_value').hostNodes()).toHaveLength(1)
+  })
+})
+
+describe('Record audit summary for death declaration', () => {
+  let component: ReactWrapper<{}, {}>
+
+  beforeEach(async () => {
+    const { store, history } = createStore()
+    const deathApplication = createApplication(
+      Event.DEATH,
+      mockDeathApplicationData
+    )
+
+    store.dispatch(storeApplication(deathApplication))
+    component = await createTestComponent(
+      <RecordAudit
+        {...createRouterProps(
+          formatUrl(APPLICATION_RECORD_AUDIT, {
+            tab: 'inProgressTab',
+            applicationId: deathApplication.id
+          }),
+          { isNavigatedInsideApp: false },
+          {
+            matchParams: {
+              tab: 'inProgressTab',
+              applicationId: deathApplication.id
+            }
+          }
+        )}
+      />,
+      { store, history }
+    )
+  })
+
+  it('Record Audit page loads properly', async () => {
+    expect(component.exists('RecordAuditBody')).toBeTruthy()
+  })
+
+  it('Check values for saved applications', async () => {
+    expect(component.find('#status_value').hostNodes().text()).toBe('Draft')
+    expect(component.find('#type_value').hostNodes().text()).toBe('Death')
+    expect(component.find('#drn_value').hostNodes().text()).toBe(
+      '201908122365DDSS0SE1'
+    )
+    expect(component.find('#placeOfDeath_value').hostNodes()).toHaveLength(1)
   })
 })
 
