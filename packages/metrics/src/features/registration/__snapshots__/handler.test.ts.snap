@@ -142,7 +142,21 @@ Object {
 }
 `;
 
-exports[`When an existing application requested correction a birth application writes the payment total to influxdb 1`] = `undefined`;
+exports[`When an existing application requested correction a birth application writes the payment total to influxdb 1`] = `
+Object {
+  "fields": Object {
+    "compositionId": "c41a95b6-4439-4fc7-9d56-6d3a8ea0f80b",
+    "total": undefined,
+  },
+  "measurement": "correction_payment",
+  "tags": Object {
+    "eventType": "BIRTH",
+    "locationLevel5": "Location/976c4871-c4d1-46f7-b50b-09f346e05d55",
+    "officeLocation": "Location/fe68d322-4d98-4cdf-a320-2db9653f781d",
+  },
+  "timestamp": undefined,
+}
+`;
 
 exports[`When an existing application requested correction a death application writes the delta between REGISTERED and REQUESTED_FOR_CORRECTION states to influxdb 1`] = `
 Object {

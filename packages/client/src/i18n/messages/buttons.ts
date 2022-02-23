@@ -38,6 +38,7 @@ interface IButtonsMessages
   register: MessageDescriptor
   reject: MessageDescriptor
   rejectApplication: MessageDescriptor
+  replace: MessageDescriptor
   retry: MessageDescriptor
   review: MessageDescriptor
   save: MessageDescriptor
@@ -60,6 +61,7 @@ interface IButtonsMessages
   yes: MessageDescriptor
   approve: MessageDescriptor
   editRecord: MessageDescriptor
+  makeCorrection: MessageDescriptor
 }
 
 const messagesToDefine: IButtonsMessages = {
@@ -193,6 +195,11 @@ const messagesToDefine: IButtonsMessages = {
     description: 'Reject application button text',
     id: 'buttons.rejectApplication'
   },
+  replace: {
+    defaultMessage: 'Change all',
+    description: 'Label for replacing the whole section in review form',
+    id: 'buttons.replace'
+  },
   retry: {
     defaultMessage: 'Retry',
     description: 'The title of retry button for failed application',
@@ -297,6 +304,11 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.editRecord',
     defaultMessage: 'Edit record',
     description: 'Edit record button text on review certificate'
+  },
+  makeCorrection: {
+    id: 'buttons.makeCorrection',
+    defaultMessage: 'Make correction',
+    description: 'Make correction button text on correction summary'
   }
 }
 

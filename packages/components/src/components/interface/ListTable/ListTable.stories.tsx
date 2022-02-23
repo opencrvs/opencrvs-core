@@ -36,6 +36,7 @@ interface IProps {
   tableTitle?: string
   hideBoxShadow?: boolean
   hideTableHeader?: boolean
+  hideTableBottomBorder?: boolean
   loadMoreText?: string
   highlightRowOnMouseOver?: boolean
   isFullPage?: boolean

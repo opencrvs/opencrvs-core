@@ -12,19 +12,28 @@
 
 import React from 'react'
 import { Header } from '@client/components/interface/Header/Header'
-import { Content } from '@opencrvs/components/lib/interface/Content'
+import {
+  Content,
+  ContentSize
+} from '@opencrvs/components/lib/interface/Content'
 import { Navigation } from '@client/components/interface/Navigation'
 import styled, { ITheme, withTheme } from '@client/styledComponents'
-import { ApplicationIcon } from '@opencrvs/components/lib/icons'
+import { ApplicationIcon, Edit } from '@opencrvs/components/lib/icons'
 import { connect } from 'react-redux'
 import {
   goToApplicationDetails,
   goBack as goBackAction,
-  goToRegistrarHomeTab
+  goToRegistrarHomeTab,
+  goToCertificateCorrection
 } from '@client/navigation'
 import { RouteComponentProps } from 'react-router'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { IWorkqueue, IApplication } from '@client/applications'
+import {
+  IWorkqueue,
+  IApplication,
+  SUBMISSION_STATUS,
+  clearCorrectionChange
+} from '@client/applications'
 import { IStoreState } from '@client/store'
 import {
   GQLEventSearchSet,
@@ -35,8 +44,17 @@ import {
 import moment from 'moment'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
-import { IFormSectionData, IContactPoint } from '@client/forms'
+import {
+  IFormSectionData,
+  IContactPoint,
+  CorrectionSection
+} from '@client/forms'
 import { Spinner } from '@opencrvs/components/lib/interface'
+import {
+  ICON_ALIGNMENT,
+  TertiaryButton
+} from '@opencrvs/components/lib/buttons'
+import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -88,6 +106,8 @@ interface IDispatchProps {
   goToApplicationDetails: typeof goToApplicationDetails
   goBack: typeof goBackAction
   goToRegistrarHomeTab: typeof goToRegistrarHomeTab
+  clearCorrectionChange: typeof clearCorrectionChange
+  goToCertificateCorrection: typeof goToCertificateCorrection
 }
 
 type IFullProps = IDispatchProps &
@@ -444,6 +464,29 @@ export const ShowRecordAudit = (props: IFullProps) => {
     application = getWQApplication(props)
   }
 
+  const actions = []
+  if (
+    isDownloaded &&
+    application &&
+    application.status === SUBMISSION_STATUS.REGISTERED
+  ) {
+    actions.push(
+      <TertiaryButton
+        id="btn-correct-record"
+        align={ICON_ALIGNMENT.LEFT}
+        icon={() => <Edit />}
+        onClick={() => {
+          props.clearCorrectionChange(applicationId)
+          props.goToCertificateCorrection(
+            applicationId,
+            CorrectionSection.Corrector
+          )
+        }}
+      >
+        {props.intl.formatMessage(correctionMessages.title)}
+      </TertiaryButton>
+    )
+  }
   return (
     <div id={'recordAudit'}>
       <Header />
@@ -453,7 +496,8 @@ export const ShowRecordAudit = (props: IFullProps) => {
           <Content
             title={application.name || 'No name provided'}
             titleColor={application.name ? 'copy' : 'grey600'}
-            size={'large'}
+            size={ContentSize.LARGE}
+            topActionButtons={actions}
             icon={() => (
               <ApplicationIcon
                 color={
@@ -488,5 +532,7 @@ export const RecordAudit = connect<
 >(mapStateToProps, {
   goToApplicationDetails,
   goBack: goBackAction,
-  goToRegistrarHomeTab
+  goToRegistrarHomeTab,
+  clearCorrectionChange,
+  goToCertificateCorrection
 })(injectIntl(withTheme(ShowRecordAudit)))

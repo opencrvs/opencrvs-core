@@ -57,11 +57,14 @@ class NotificationToast extends React.Component<IFullProps> {
         item.submissionStatus === SUBMISSION_STATUS.READY_TO_REGISTER ||
         item.submissionStatus === SUBMISSION_STATUS.READY_TO_REJECT ||
         item.submissionStatus === SUBMISSION_STATUS.READY_TO_CERTIFY ||
+        item.submissionStatus ===
+          SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION ||
         item.submissionStatus === SUBMISSION_STATUS.SUBMITTING ||
         item.submissionStatus === SUBMISSION_STATUS.APPROVING ||
         item.submissionStatus === SUBMISSION_STATUS.REGISTERING ||
         item.submissionStatus === SUBMISSION_STATUS.REJECTING ||
         item.submissionStatus === SUBMISSION_STATUS.CERTIFYING ||
+        item.submissionStatus === SUBMISSION_STATUS.REQUESTING_CORRECTION ||
         item.submissionStatus === SUBMISSION_STATUS.FAILED_NETWORK
     )
 

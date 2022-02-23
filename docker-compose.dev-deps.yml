@@ -87,6 +87,7 @@ services:
       - '5000:5000'
       - '5001:5001'
     extra_hosts:
+      - 'webhooks:${LOCAL_IP-172.17.0.1}'
       - 'gateway:${LOCAL_IP-172.17.0.1}'
       - 'workflow:${LOCAL_IP-172.17.0.1}'
       - 'search:${LOCAL_IP-172.17.0.1}'
