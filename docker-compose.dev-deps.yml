@@ -66,6 +66,8 @@ services:
 
   # Expose dev secrets as a plain volume - these will use docker secrets in staging and prod
   hearth:
+    environment:
+      - logger__level=warn
     volumes:
       - '.secrets/public-key.pem:/secrets/public-key.pem'
       - './infrastructure/hearth-plugins/checkDuplicateTask.js:/src/hearth/lib/plugins/checkDuplicateTask.js'

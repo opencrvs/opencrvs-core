@@ -308,6 +308,7 @@ services:
   hearth:
     environment:
       - mongodb__url=mongodb://mongo1/hearth-dev?replicaSet=rs0
+      - logger__level=warn
     depends_on:
       - mongo1
     deploy:
