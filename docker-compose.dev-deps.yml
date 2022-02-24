@@ -28,8 +28,9 @@ services:
     volumes:
       - './data/elasticsearch:/usr/share/elasticsearch/data'
     environment:
+      - 'discovery.type=single-node'
       - 'cluster.routing.allocation.disk.threshold_enabled=false'
-      - 'ES_JAVA_OPTS=-Xms1024m -Xmx1024m -XX:UseSSE=2'
+      - 'ES_JAVA_OPTS=-Xms1024m -Xmx1024m'
       - bootstrap.system_call_filter=false
       #- discovery.type=single-node
       #- http.port=9200

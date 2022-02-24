@@ -14,7 +14,8 @@ import * as influx from '@metrics/influxdb/client'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import * as api from '@metrics/api'
-const fetchChildLocationsByParentId = api.fetchChildLocationsByParentId as jest.Mock
+const fetchChildLocationsByParentId =
+  api.fetchChildLocationsByParentId as jest.Mock
 
 const readPoints = influx.query as jest.Mock
 
