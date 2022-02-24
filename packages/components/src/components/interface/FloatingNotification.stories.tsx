@@ -11,8 +11,14 @@
  */
 import { Meta, Story } from '@storybook/react'
 import { FloatingNotification } from './FloatingNotification'
-import { NOTIFICATION_TYPE } from './Notification'
 import React from 'react'
+
+export enum NOTIFICATION_TYPE {
+  SUCCESS = 'success',
+  WARNING = 'warning',
+  IN_PROGRESS = 'inProgress',
+  ERROR = 'error'
+}
 
 interface IProps {
   id?: string
