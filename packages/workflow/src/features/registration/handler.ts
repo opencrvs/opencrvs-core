@@ -217,7 +217,24 @@ export async function markEventAsValidatedHandler(
   event: Events
 ) {
   try {
-    const payload = await markBundleAsValidated(
+    let payload: fhir.Bundle & fhir.BundleEntry
+
+    const taskResource = getTaskResource(
+      request.payload as fhir.Bundle & fhir.BundleEntry
+    )
+
+    // In case the record was updated then there will be input output in payload
+    if (taskHasInput(taskResource)) {
+      payload = await markBundleAsDeclarationUpdated(
+        request.payload as fhir.Bundle & fhir.BundleEntry,
+        getToken(request)
+      )
+      await postToHearth(payload)
+      delete taskResource.input
+      delete taskResource.output
+    }
+
+    payload = await markBundleAsValidated(
       request.payload as fhir.Bundle & fhir.BundleEntry,
       getToken(request)
     )
@@ -347,6 +364,7 @@ export async function markEventAsWaitingValidationHandler(
       request.payload as fhir.Bundle & fhir.BundleEntry
     )
 
+    // In case the record was updated then there will be input output in payload
     if (taskHasInput(taskResource)) {
       payload = await markBundleAsDeclarationUpdated(
         request.payload as fhir.Bundle & fhir.BundleEntry,
