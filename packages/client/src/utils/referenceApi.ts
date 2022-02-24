@@ -38,8 +38,8 @@ export interface IDefinitionsResponse {
   templates: {
     receipt?: IPDFTemplate
     certificates: {
-      birth: ISVGTemplate
-      death: ISVGTemplate
+      birth: IPDFTemplate
+      death: IPDFTemplate
     }
   }
 }

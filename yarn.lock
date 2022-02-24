@@ -18810,7 +18810,7 @@ pdfkit@^0.12.0:
     linebreak "^1.0.2"
     png-js "^1.0.0"
 
-pdfmake@^0.1.58:
+pdfmake@^0.1.59:
   version "0.1.72"
   resolved "https://registry.yarnpkg.com/pdfmake/-/pdfmake-0.1.72.tgz#b5ef0057e40e7a22b23a19aaf0be35ada902a3bf"
   integrity sha512-xZrPS+Safjf1I8ZYtMoXX83E6C6Pd1zFwa168yNTeeJWHclqf1z9DoYajjlY2uviN7gGyxwVZeou39uSk1oh1g==
@@ -19948,15 +19948,6 @@ prop-types@15.x, prop-types@^15.0.0, prop-types@^15.5.10, prop-types@^15.5.8, pr
     object-assign "^4.1.1"
     react-is "^16.13.1"
 
-prop-types@^15.8.0:
-  version "15.8.0"
-  resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.8.0.tgz#d237e624c45a9846e469f5f31117f970017ff588"
-  integrity sha512-fDGekdaHh65eI3lMi5OnErU6a8Ighg2KjcjQxO7m8VHyWjcPyj5kiOgV1LQDOOOgVy3+5FgjXvdSSX7B8/5/4g==
-  dependencies:
-    loose-envify "^1.4.0"
-    object-assign "^4.1.1"
-    react-is "^16.13.1"
-
 property-information@^5.0.0, property-information@^5.3.0:
   version "5.6.0"
   resolved "https://registry.yarnpkg.com/property-information/-/property-information-5.6.0.tgz#61675545fb23002f245c6540ec46077d4da3ed69"
@@ -20781,13 +20772,6 @@ react-textarea-autosize@^8.1.1:
     "@babel/runtime" "^7.10.2"
     use-composed-ref "^1.0.0"
     use-latest "^1.0.0"
-
-react-to-print@^2.14.3:
-  version "2.14.3"
-  resolved "https://registry.yarnpkg.com/react-to-print/-/react-to-print-2.14.3.tgz#892580bdde1dcd5bca47661410254cf74a3eb97f"
-  integrity sha512-j0EAplQGcw4ujSLfUQoIhf1PgrSLrWRh4NSAiKZdWm6YNXMioHW56cGpbKEJkCpYN1E5g3tvFVHRADn0mTKGzg==
-  dependencies:
-    prop-types "^15.8.0"
 
 react-tooltip@^3.11.1, react-tooltip@^3.11.2:
   version "3.11.6"

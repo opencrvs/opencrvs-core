@@ -50,7 +50,31 @@ export async function previewCertificate(
     throw new Error('No user details found')
   }
 
-  const svgCode = await createSVG(
+  await createPDF(
+    application.event === Event.BIRTH
+      ? offlineResource.templates.certificates.birth
+      : offlineResource.templates.certificates.death,
+    application,
+    userDetails,
+    offlineResource,
+    intl,
+    optionalData
+  ).getDataUrl((pdf: string) => {
+    callBack(pdf)
+  })
+}
+
+export function printCertificate(
+  intl: IntlShape,
+  application: IApplication,
+  userDetails: IUserDetails | null,
+  offlineResource: IOfflineData,
+  optionalData?: OptionalData
+) {
+  if (!userDetails) {
+    throw new Error('No user details found')
+  }
+  printPDF(
     application.event === Event.BIRTH
       ? offlineResource.templates.certificates.birth
       : offlineResource.templates.certificates.death,
@@ -60,7 +84,4 @@ export async function previewCertificate(
     intl,
     optionalData
   )
-  const blob = new Blob([svgCode], { type: 'image/svg+xml' })
-  const url = URL.createObjectURL(blob)
-  callBack(url)
 }
