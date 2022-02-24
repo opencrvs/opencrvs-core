@@ -36,7 +36,7 @@ async function transformField(
   sourceVal: any,
   targetObj: any,
   fieldBuilderForVal: IFieldBuilderFunction | IFieldBuilders,
-  context: any,
+  context: { authHeader: IAuthHeader },
   currentPropNamePath: string[]
 ) {
   if (!(sourceVal instanceof Date) && typeof sourceVal === 'object') {
