@@ -33,13 +33,13 @@ type Props = WrappedComponentProps &
 interface State {
   activeTabId: string
 }
-
 class ApplicationConfigComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      activeTabId: 'birthTab'
+      activeTabId: 'generalTab'
     }
+    this.changeTab = this.changeTab.bind(this)
   }
 
   changeTab(id: string) {
@@ -53,9 +53,8 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
         <Content
           title={intl.formatMessage(messages.applicationTitle)}
           titleColor={'copy'}
-        >
-          <FormTabs
-            sections={[
+          tabs={{
+            sections: [
               {
                 id: 'generalTab',
                 title: 'General'
@@ -65,11 +64,11 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
                 title: 'Birth'
               },
               { id: 'deathTab', title: 'Death' }
-            ]}
-            activeTabId={this.state.activeTabId}
-            onTabClick={(id: any) => this.changeTab(id)}
-          ></FormTabs>
-        </Content>
+            ],
+            activeTabId: this.state.activeTabId,
+            onTabClick: (id: string) => this.changeTab(id)
+          }}
+        ></Content>
       </SysAdminContentWrapper>
     )
   }
