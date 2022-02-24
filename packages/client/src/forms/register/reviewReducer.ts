@@ -10,10 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { LoopReducer, Loop } from 'redux-loop'
-import { IForm, ReviewSection } from '@client/forms'
+import { IForm, ReviewSection, ISerializedForm } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/review'
 import * as offlineActions from '@client/offline/actions'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
+import { defaultFormsConfig } from '@client/forms/configurable'
 
 export type IReviewFormState =
   | {
@@ -45,9 +46,13 @@ export const reviewReducer: LoopReducer<IReviewFormState, Action> = (
 ): IReviewFormState | Loop<IReviewFormState, Action> => {
   switch (action.type) {
     case offlineActions.READY:
-    case offlineActions.DEFINITIONS_LOADED:
-      const birth = deserializeForm(action.payload.forms.registerForm.birth)
-      const death = deserializeForm(action.payload.forms.registerForm.death)
+    case offlineActions.CONTENT_LOADED:
+      const birth = deserializeForm(
+        defaultFormsConfig.registerForm.birth as ISerializedForm
+      )
+      const death = deserializeForm(
+        defaultFormsConfig.registerForm.death as ISerializedForm
+      )
 
       const review = {
         id: ReviewSection.Review,

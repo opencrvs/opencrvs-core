@@ -163,7 +163,7 @@ jest.mock(
       loadLocations: () => Promise.resolve(mockOfflineData.locations),
       loadFacilities: () => Promise.resolve(mockOfflineData.facilities),
       loadPilotLocations: () => Promise.resolve(mockOfflineData.pilotLocations),
-      loadDefinitions: () =>
+      loadContent: () =>
         Promise.resolve({
           languages: mockOfflineData.languages,
           forms: mockOfflineData.forms,

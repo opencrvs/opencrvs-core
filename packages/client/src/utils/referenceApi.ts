@@ -123,8 +123,8 @@ async function loadConfig(): Promise<IApplicationConfigResponse> {
   return response
 }
 
-async function loadDefinitions(): Promise<IDefinitionsResponse> {
-  const url = `${window.config.COUNTRY_CONFIG_URL}/definitions/client`
+async function loadContent(): Promise<IDefinitionsResponse> {
+  const url = `${window.config.COUNTRY_CONFIG_URL}/content/client`
 
   const res = await fetch(url, {
     method: 'GET',
@@ -224,7 +224,7 @@ export const referenceApi = {
   loadLocations,
   loadFacilities,
   loadPilotLocations,
-  loadDefinitions,
+  loadContent,
   loadAssets,
   loadConfig
 }

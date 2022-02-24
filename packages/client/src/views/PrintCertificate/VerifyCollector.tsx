@@ -43,7 +43,7 @@ export interface ICertificateCollectorField {
   identifierOtherTypeField: string
   identifierField: string
   nameFields: INameFields
-  birthDateField: string
+  birthDateField?: string
   nationalityField: string
 }
 
@@ -128,7 +128,9 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
       fields.nameFields[intl.locale].familyNameField
     ] as string
 
-    const birthDate = info[fields.birthDateField] as string
+    const birthDate = fields.birthDateField
+      ? (info[fields.birthDateField] as string)
+      : ''
     const nationality = info[fields.nationalityField] as string
 
     return {
