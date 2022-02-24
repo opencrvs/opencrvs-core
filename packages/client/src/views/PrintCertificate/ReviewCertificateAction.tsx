@@ -23,13 +23,14 @@ import {
   storeApplication,
   SUBMISSION_STATUS
 } from '@opencrvs/client/src/applications'
-import { Action, Event, IForm } from '@client/forms'
+import { Action, Event, IForm, CorrectionSection } from '@client/forms'
 import { constantsMessages } from '@client/i18n/messages'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import {
   goToRegistrarHomeTab as goToRegistrarHomeTabAction,
-  goBack
+  goBack,
+  goToCertificateCorrection
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
@@ -130,6 +131,7 @@ type IProps = {
   writeApplication: typeof writeApplication
   goToRegistrarHomeTabAction: typeof goToRegistrarHomeTabAction
   storeApplication: typeof storeApplication
+  goToCertificateCorrection: typeof goToCertificateCorrection
 }
 
 type IFullProps = IntlShapeProps &
@@ -284,8 +286,14 @@ class ReviewCertificateActionComponent extends React.Component<
                   >
                     {intl.formatMessage(certificateMessages.confirmAndPrint)}
                   </PrimaryButton>
-
-                  <CustomTertiaryButton disabled>
+                  <CustomTertiaryButton
+                    onClick={() =>
+                      this.props.goToCertificateCorrection(
+                        this.props.registrationId,
+                        CorrectionSection.Corrector
+                      )
+                    }
+                  >
                     {intl.formatMessage(buttonMessages.editRecord)}
                   </CustomTertiaryButton>
                 </ButtonWrapper>
@@ -370,7 +378,8 @@ const mapDispatchToProps = {
   writeApplication,
   goToRegistrarHomeTabAction,
   storeApplication,
-  goBack
+  goBack,
+  goToCertificateCorrection
 }
 export const ReviewCertificateAction = connect(
   mapStatetoProps,

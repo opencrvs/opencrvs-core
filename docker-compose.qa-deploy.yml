@@ -12,6 +12,7 @@ version: '3.3'
 services:
   gateway:
     environment:
+      - QA_ENV=true
       - NODE_ENV=production
 
   workflow:
@@ -42,6 +43,7 @@ services:
 
   webhooks:
     environment:
+      - QA_ENV=true
       - NODE_ENV=production
 
   config:

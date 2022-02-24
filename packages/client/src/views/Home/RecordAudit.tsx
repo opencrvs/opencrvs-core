@@ -15,16 +15,20 @@ import { Header } from '@client/components/interface/Header/Header'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import { Navigation } from '@client/components/interface/Navigation'
 import styled from '@client/styledComponents'
-import { ApplicationIcon } from '@opencrvs/components/lib/icons'
+import { ApplicationIcon, Edit } from '@opencrvs/components/lib/icons'
 import { connect } from 'react-redux'
-import { goToRegistrarHomeTab } from '@client/navigation'
 import { RouteComponentProps, Redirect } from 'react-router'
 import {
   injectIntl,
   WrappedComponentProps as IntlShapeProps,
   IntlShape
 } from 'react-intl'
-import { IApplication } from '@client/applications'
+import { goToCertificateCorrection } from '@client/navigation'
+import {
+  IApplication,
+  SUBMISSION_STATUS,
+  clearCorrectionChange
+} from '@client/applications'
 import { IStoreState } from '@client/store'
 import {
   GQLEventSearchSet,
@@ -35,7 +39,6 @@ import {
 import moment from 'moment'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
-import { IFormSectionData, IContactPoint } from '@client/forms'
 import { IQueryData } from '@client/views/OfficeHome/OfficeHome'
 import { generateLocationName } from '@client/utils/locationUtils'
 import { Query } from '@client/components/Query'
@@ -44,6 +47,16 @@ import { Loader } from '@opencrvs/components/lib/interface'
 import { HOME } from '@client/navigation/routes'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
+import {
+  IFormSectionData,
+  IContactPoint,
+  CorrectionSection
+} from '@client/forms'
+import {
+  ICON_ALIGNMENT,
+  TertiaryButton
+} from '@opencrvs/components/lib/buttons'
+import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -91,7 +104,8 @@ interface IStateProps {
 }
 
 interface IDispatchProps {
-  goToRegistrarHomeTab: typeof goToRegistrarHomeTab
+  clearCorrectionChange: typeof clearCorrectionChange
+  goToCertificateCorrection: typeof goToCertificateCorrection
 }
 
 type RouteProps = RouteComponentProps<{
@@ -389,14 +403,36 @@ const getDeclarationInfo = (
 }
 
 function RecordAuditBody({
+  clearCorrectionChange,
   declaration,
   isDownloaded = false,
-  intl
+  intl,
+  goToCertificateCorrection
 }: {
   declaration: IDeclarationData
   isDownloaded?: boolean
   intl: IntlShape
-}) {
+} & IDispatchProps) {
+  const actions = []
+  if (
+    isDownloaded &&
+    declaration &&
+    declaration.status === SUBMISSION_STATUS.REGISTERED
+  ) {
+    actions.push(
+      <TertiaryButton
+        id="btn-correct-record"
+        align={ICON_ALIGNMENT.LEFT}
+        icon={() => <Edit />}
+        onClick={() => {
+          clearCorrectionChange(declaration.id)
+          goToCertificateCorrection(declaration.id, CorrectionSection.Corrector)
+        }}
+      >
+        {intl.formatMessage(correctionMessages.title)}
+      </TertiaryButton>
+    )
+  }
   return (
     <Content
       title={declaration.name || 'No name provided'}
@@ -414,14 +450,20 @@ function RecordAuditBody({
 }
 
 function getBodyContent({
+  clearCorrectionChange,
   declarationId,
   draft,
+  goToCertificateCorrection,
   language,
   tab,
   intl,
   resources,
   workqueueDeclaration
 }: IFullProps) {
+  const actionProps = {
+    clearCorrectionChange,
+    goToCertificateCorrection
+  }
   if (!draft && tab === 'search') {
     return (
       <>
@@ -453,6 +495,7 @@ function getBodyContent({
                   language
                 )}
                 intl={intl}
+                {...actionProps}
               />
             )
           }}
@@ -471,6 +514,7 @@ function getBodyContent({
       declaration={declaration}
       isDownloaded={!!draft}
       intl={intl}
+      {...actionProps}
     />
   )
 }
@@ -513,5 +557,6 @@ export const RecordAudit = connect<
   RouteProps,
   IStoreState
 >(mapStateToProps, {
-  goToRegistrarHomeTab
+  clearCorrectionChange,
+  goToCertificateCorrection
 })(injectIntl(ShowRecordAudit))
