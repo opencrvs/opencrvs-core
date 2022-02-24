@@ -190,8 +190,6 @@ describe('validate', () => {
             'The error message that appears when an invalid value is used as nid'
         },
         props: {
-          min: 10,
-          max: 17,
           validLength: '9'
         }
       }
@@ -209,8 +207,6 @@ describe('validate', () => {
             'The error message that appears when an invalid value is used as nid'
         },
         props: {
-          min: 10,
-          max: 17,
           validLength: '9'
         }
       }
@@ -221,100 +217,6 @@ describe('validate', () => {
       const typeOfID = 'NATIONAL_ID'
       const response = undefined
       expect(validIDNumber(typeOfID)(goodValue)).toEqual(response)
-    })
-    it('Should error when supplied a bad value as Birth Registration Number.', () => {
-      const badValue = '2019333453BRTVSR'
-      const typeOfID = 'BIRTH_REGISTRATION_NUMBER'
-      const response = {
-        message: {
-          id: 'validations.validBirthRegistrationNumber',
-          defaultMessage:
-            'The Birth Registration Number can only be numeric and must be {validLength} characters long',
-          description:
-            'The error message that appears when an invalid value is used as brn'
-        },
-        props: {
-          validLength: 17
-        }
-      }
-      expect(validIDNumber(typeOfID)(badValue)).toEqual(response)
-    })
-    it('Should pass when supplied a good value as Birth Registration Number.', () => {
-      const goodValue = '20193334538255585'
-      const typeOfID = 'BIRTH_REGISTRATION_NUMBER'
-      const response = undefined
-      expect(validIDNumber(typeOfID)(goodValue)).toEqual(response)
-    })
-    it('Should error when supplied a bad value as Death Registration Number.', () => {
-      const badValue = '2019333453BRTVSRJ'
-      const typeOfID = 'DEATH_REGISTRATION_NUMBER'
-      const response = {
-        message: {
-          id: 'validations.validDeathRegistrationNumber',
-          defaultMessage:
-            'The Death Registration Number can only be numeric and must be {validLength} characters long',
-          description:
-            'The error message that appears when an invalid value is used as drn'
-        },
-        props: {
-          validLength: 18
-        }
-      }
-      expect(validIDNumber(typeOfID)(badValue)).toEqual(response)
-    })
-    it('Should pass when supplied a good value as Death Registration Number.', () => {
-      const goodValue = '201933345335464654'
-      const typeOfID = 'DEATH_REGISTRATION_NUMBER'
-      const response = undefined
-      expect(validIDNumber(typeOfID)(goodValue)).toEqual(response)
-    })
-    it('Should error when supplied a bad value as Pasport Number.', () => {
-      const badValue = '2019BrTVz8'
-      const typeOfID = 'PASSPORT'
-      const response = {
-        message: {
-          id: 'validations.validPassportNumber',
-          defaultMessage:
-            'The Passport Number can only be alpha numeric and must be {validLength} characters long',
-          description:
-            'The error message that appears when an invalid value is used as passport number'
-        },
-        props: {
-          validLength: 9
-        }
-      }
-      expect(validIDNumber(typeOfID)(badValue)).toEqual(response)
-    })
-    it('Should pass when supplied a good value as Passport Number.', () => {
-      const goodValue = '2019BrTVz'
-      const typeOfID = 'PASSPORT'
-      const response = undefined
-      expect(validIDNumber(typeOfID)(goodValue)).toEqual(response)
-    })
-
-    it('Should pass when supplied a good value as Driving License Number', () => {
-      const goodValue = 'BK1234567890123'
-      const typeOfID = 'DRIVING_LICENSE'
-      const response = undefined
-      expect(validIDNumber(typeOfID)(goodValue)).toEqual(response)
-    })
-
-    it('Should error when supplied a bad value as Driving License Number', () => {
-      const badValue = '1234567890'
-      const typeOfID = 'DRIVING_LICENSE'
-      const response = {
-        message: {
-          id: 'validations.validDrivingLicenseNumber',
-          defaultMessage:
-            'The Driving License Number can only be alpha numeric and must be {validLength} characters long',
-          description:
-            'The error message that appeards when an invalid value is used as driving license number'
-        },
-        props: {
-          validLength: 15
-        }
-      }
-      expect(validIDNumber(typeOfID)(badValue)).toEqual(response)
     })
   })
 

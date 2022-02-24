@@ -126,7 +126,7 @@ const navigatorMock = {
   DEATH_REGISTRATION_TARGET: 45,
   NID_NUMBER_PATTERN: {
     pattern: /^[0-9]{9}$/,
-    example: '4837281940',
+    example: '483728140',
     num: '9'
   },
   PHONE_NUMBER_PATTERN: {
