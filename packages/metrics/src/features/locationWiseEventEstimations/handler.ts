@@ -41,7 +41,8 @@ export async function locationWiseEventEstimationsHandler(
   const locationId = 'Location/' + request.query[LOCATION_ID]
   const event = request.query[EVENT]
   const authHeader: IAuthHeader = {
-    Authorization: request.headers.authorization
+    Authorization: request.headers.authorization,
+    'x-correlation-id': request.headers['x-correlation-id']
   }
   const childLocations = await fetchChildLocationsByParentId(
     locationId,

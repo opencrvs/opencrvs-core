@@ -30,7 +30,7 @@ services:
     image: jembi/hearth:v1.0.0-beta.3
     environment:
       - mongodb__url=mongodb://mongo1/hearth-dev
-      - logger__level=error
+      - logger__level=warn
       - authentication__type=disabled
       - idGenerator=uuidv4
       - server__fhirVersion=stu3
