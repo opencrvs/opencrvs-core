@@ -43,8 +43,8 @@ export const requestSchema = Joi.object({
     observationDescription: Joi.string(),
     categoryCode: Joi.string(),
     categoryDescription: Joi.string(),
-    fhirRepresentation: Joi.string().required(), // the fhir resource that must be run with safe-eval to replace the instance of fieldValue with the actual value
-    customFhirFunction: Joi.string() // used for referring to random extra functions used when building fhir such as setPrimaryCaregiverReference
+    fhirRepresentation: Joi.string().required(),
+    customFhirFunction: Joi.string()
   },
   label: messageDescriptorSchema.required(),
   placeholder: messageDescriptorSchema,

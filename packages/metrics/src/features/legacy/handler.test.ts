@@ -139,7 +139,7 @@ describe('verify applicationsStarted handler', () => {
         timed_out: false,
         _shards: { total: 5, successful: 5, skipped: 0, failed: 0 },
         hits: {
-          total: 6,
+          total: { value: 6 },
           max_score: null,
           hits: [
             {
@@ -569,8 +569,7 @@ describe('verify applicationsStarted handler', () => {
           params: {
             method: 'POST',
             path: '/ocrvs/_search',
-            body:
-              '{"query":{"match_all":{}},"sort":[{"dateOfApplication":"asc"}]}',
+            body: '{"query":{"match_all":{}},"sort":[{"dateOfApplication":"asc"}]}',
             querystring: '',
             headers: {
               'User-Agent':

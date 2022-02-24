@@ -24,7 +24,6 @@ import { checkAuth } from '@client/profile/profileActions'
 import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { GridTable } from '@opencrvs/components/lib/interface'
-import { RowHistoryView } from '@client/views/OfficeHome/RowHistoryView'
 import { History } from 'history'
 
 const EVENT_CREATION_TIME = 1583322631424 // Wed Mar 04 2020 13:50:31 GMT+0200 (Eastern European Standard Time)
@@ -105,15 +104,12 @@ describe('Registrar home external validation tab tests', () => {
     expect(data[0].actions).toBeDefined()
   })
 
-  it('clicking on a row makes it expanded', async () => {
+  it('clicking on a row redirect to recordAudit page', async () => {
     const tableElement = await waitForElement(component, GridTable)
     const dataRow = tableElement.find('#row_0').hostNodes()
     dataRow.simulate('click')
-    const rowHistoryView = await waitForElement(component, RowHistoryView)
-    const eventDetails = rowHistoryView.prop('eventDetails')
-    expect(eventDetails.registration.modifiedAt).toBe(
-      SEND_FOR_VALIDATION_TIME.toString()
-    )
+    component.update()
+    expect(history.location.pathname).toContain('record-audit')
   })
 
   describe('On devices with small viewport', () => {
@@ -127,7 +123,7 @@ describe('Registrar home external validation tab tests', () => {
       const dataRow = tableElement.find('#row_0').hostNodes()
       dataRow.simulate('click')
       component.update()
-      expect(history.location.pathname).toContain('details')
+      expect(history.location.pathname).toContain('record-audit')
     })
   })
 })

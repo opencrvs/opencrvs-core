@@ -12,7 +12,10 @@
 import { ISerializedForm } from '@client/forms'
 import { ILanguage } from '@client/i18n/reducer'
 import { ILocation } from '@client/offline/reducer'
-import { IPDFTemplate } from '@client/pdfRenderer/transformer/types'
+import {
+  IPDFTemplate,
+  ISVGTemplate
+} from '@client/pdfRenderer/transformer/types'
 import { getToken } from '@client/utils/authUtils'
 import { ICertificateCollectorDefinition } from '@client/views/PrintCertificate/VerifyCollector'
 
@@ -35,16 +38,17 @@ export interface IDefinitionsResponse {
   templates: {
     receipt?: IPDFTemplate
     certificates: {
-      birth: IPDFTemplate
-      death: IPDFTemplate
+      birth: ISVGTemplate
+      death: ISVGTemplate
     }
   }
 }
+
 export interface IAssetResponse {
   logo: string
 }
 
-interface IPhoneNumberPattern {
+export interface IPhoneNumberPattern {
   pattern: RegExp
   example: string
   start: string
@@ -55,10 +59,21 @@ interface IPhoneNumberPattern {
   }
 }
 
-interface INIDNumberPattern {
+export interface INIDNumberPattern {
   pattern: RegExp
   example: string
   num: string
+}
+
+export interface ICertificateTemplateData {
+  event: string
+  status: string
+  svgCode: string
+  svgDateCreated: number
+  svgDateUpdated: number
+  svgFilename: string
+  user: string
+  _id: string
 }
 
 export interface IApplicationConfig {
@@ -82,10 +97,17 @@ export interface IApplicationConfig {
   SENTRY: string
   LOGROCKET: string
   PHONE_NUMBER_PATTERN: IPhoneNumberPattern
+  BIRTH_REGISTRATION_TARGET: number
+  DEATH_REGISTRATION_TARGET: number
   NID_NUMBER_PATTERN: INIDNumberPattern
 }
 
-async function loadConfig(): Promise<IApplicationConfig> {
+export interface IApplicationConfigResponse {
+  config: IApplicationConfig
+  certificates: ICertificateTemplateData[]
+}
+
+async function loadConfig(): Promise<IApplicationConfigResponse> {
   const url = `${window.config.CONFIG_API_URL}/config`
 
   const res = await fetch(url, {
@@ -97,6 +119,7 @@ async function loadConfig(): Promise<IApplicationConfig> {
   }
 
   const response = await res.json()
+
   return response
 }
 
@@ -183,6 +206,9 @@ const toDataURL = (url: string) =>
           reader.readAsDataURL(blob)
         })
     )
+    .catch((error) => {
+      throw error
+    })
 
 async function loadAssets(): Promise<IAssetResponse> {
   const url = `${window.config.COUNTRY_CONFIG_URL}/assets/${window.config.COUNTRY_LOGO_FILE}`

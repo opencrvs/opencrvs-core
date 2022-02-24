@@ -962,7 +962,7 @@
                   "previewGroup": "placeOfBirth",
                   "ignoreFieldLabelOnErrorMessage": true,
                   "label": {
-                    "defaultMessage": "Place of delivery",
+                    "defaultMessage": "Location",
                     "description": "Label for form field: Place of delivery",
                     "id": "form.field.label.placeOfBirth"
                   },
@@ -2065,7 +2065,7 @@
                   "label": {
                     "defaultMessage": "Place of delivery",
                     "description": "Label for form field: Place of delivery",
-                    "id": "form.field.label.placeOfBirth"
+                    "id": "form.field.label.placeOfBirthPreview"
                   },
                   "fieldToRedirect": "placeOfBirth"
                 },
@@ -10076,14 +10076,14 @@
                   "label": {
                     "defaultMessage": "For birth registration of births occurring within 45 days and 5 years old the following documents are required:",
                     "description": "Documents Paragraph text",
-                    "id": "form.section.documents.paragraph45daysTo5Years"
+                    "id": "form.section.documents.paragraphTargetdaysTo5Years"
                   },
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"within45days\") || !draftData.child || !draftData.child.childBirthDate"
+                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"withinTargetdays\") || !draftData.child || !draftData.child.childBirthDate"
                     },
                     {
                       "action": "hide",
@@ -10104,7 +10104,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"within45days\") || !draftData.child || !draftData.child.childBirthDate"
+                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"withinTargetdays\") || !draftData.child || !draftData.child.childBirthDate"
                     },
                     {
                       "action": "hide",
@@ -10518,7 +10518,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"within45days\") || !draftData.child || !draftData.child.childBirthDate"
+                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"withinTargetdays\") || !draftData.child || !draftData.child.childBirthDate"
                     },
                     {
                       "action": "hide",
@@ -10575,7 +10575,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"within45days\") || !draftData.child || !draftData.child.childBirthDate"
+                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"withinTargetdays\") || !draftData.child || !draftData.child.childBirthDate"
                     },
                     {
                       "action": "hide",

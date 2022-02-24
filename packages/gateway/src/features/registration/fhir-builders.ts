@@ -54,7 +54,9 @@ import {
   PRIMARY_CAREGIVER_TITLE,
   PARENT_DETAILS,
   SPOUSE_CODE,
-  SPOUSE_TITLE
+  SPOUSE_TITLE,
+  BIRTH_CORRECTION_ENCOUNTER_CODE,
+  DEATH_CORRECTION_ENCOUNTER_CODE
 } from '@gateway/features/fhir/templates'
 import {
   selectOrCreateEncounterResource,
@@ -142,7 +144,7 @@ function createIDBuilder(sectionCode: string, sectionTitle: string) {
     id: async (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
-      context: any
+      context: { authHeader: IAuthHeader }
     ) => {
       const person = selectOrCreatePersonResource(
         sectionCode,
@@ -762,7 +764,112 @@ function createRegStatusCommentTimeStamp(
   resource.note[context._index.comments].time = fieldValue
 }
 
-const builders: IFieldBuilders = {
+function createActionTypesBuilder() {
+  const actionType = {
+    coding: [
+      {
+        system: 'http://terminology.hl7.org/CodeSystem/action-type',
+        code: 'update'
+      }
+    ]
+  }
+  return {
+    section: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const task = selectOrCreateTaskRefResource(fhirBundle, context)
+      setObjectPropInResourceArray(
+        task,
+        'input',
+        fieldValue,
+        'valueCode',
+        context,
+        'values'
+      )
+      setObjectPropInResourceArray(
+        task,
+        'output',
+        fieldValue,
+        'valueCode',
+        context,
+        'values'
+      )
+    },
+    fieldName: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const task = selectOrCreateTaskRefResource(fhirBundle, context)
+      setObjectPropInResourceArray(
+        task,
+        'input',
+        fieldValue,
+        'valueId',
+        context,
+        'values'
+      )
+      setObjectPropInResourceArray(
+        task,
+        'output',
+        fieldValue,
+        'valueId',
+        context,
+        'values'
+      )
+    },
+    oldValue: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const task = selectOrCreateTaskRefResource(fhirBundle, context)
+      setObjectPropInResourceArray(
+        task,
+        'input',
+        actionType,
+        'type',
+        context,
+        'values'
+      )
+      setObjectPropInResourceArray(
+        task,
+        'input',
+        fieldValue,
+        'valueString',
+        context,
+        'values'
+      )
+    },
+    newValue: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const task = selectOrCreateTaskRefResource(fhirBundle, context)
+      setObjectPropInResourceArray(
+        task,
+        'output',
+        actionType,
+        'type',
+        context,
+        'values'
+      )
+      setObjectPropInResourceArray(
+        task,
+        'output',
+        fieldValue,
+        'valueString',
+        context,
+        'values'
+      )
+    }
+  }
+}
+
+export const builders: IFieldBuilders = {
   _fhirIDMap: {
     composition: (fhirBundle, fieldValue) => {
       fhirBundle.entry[0].resource.id = fieldValue as string
@@ -1818,6 +1925,381 @@ const builders: IFieldBuilders = {
     ) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return setResourceIdentifier(taskResource, 'paper-form-id', fieldValue)
+    },
+    correction: {
+      requester: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+        if (!taskResource.extension) {
+          taskResource.extension = []
+        }
+        const requesterExtensionURL = `${OPENCRVS_SPECIFICATION_URL}extension/requestingIndividual`
+        const requesterExtension = taskResource.extension.find(
+          (ext) => ext.url === requesterExtensionURL
+        )
+        if (!requesterExtension) {
+          taskResource.extension.push({
+            url: requesterExtensionURL,
+            valueString: fieldValue
+          })
+        } else {
+          requesterExtension.valueString = fieldValue
+        }
+      },
+      hasShowedVerifiedDocument: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const certDocResource = selectOrCreateCertificateDocRefResource(
+          fhirBundle,
+          context,
+          context.event,
+          true
+        )
+        if (!certDocResource.extension) {
+          certDocResource.extension = []
+        }
+        const hasVerifiedExt = certDocResource.extension.find(
+          (extention) =>
+            extention.url ===
+            `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`
+        )
+        if (!hasVerifiedExt) {
+          certDocResource.extension.push({
+            url: `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`,
+            valueString: fieldValue
+          })
+        } else {
+          hasVerifiedExt.valueString = fieldValue
+        }
+      },
+      attestedAndCopied: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const certDocResource = selectOrCreateCertificateDocRefResource(
+          fhirBundle,
+          context,
+          context.event,
+          true
+        )
+        if (!certDocResource.extension) {
+          certDocResource.extension = []
+        }
+        const hasVerifiedExt = certDocResource.extension.find(
+          (extention) =>
+            extention.url ===
+            `${OPENCRVS_SPECIFICATION_URL}extension/attestedAndCopied`
+        )
+        if (!hasVerifiedExt) {
+          certDocResource.extension.push({
+            url: `${OPENCRVS_SPECIFICATION_URL}extension/attestedAndCopied`,
+            valueString: fieldValue
+          })
+        } else {
+          hasVerifiedExt.valueString = fieldValue
+        }
+      },
+      noSupportingDocumentationRequired: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const certDocResource = selectOrCreateCertificateDocRefResource(
+          fhirBundle,
+          context,
+          context.event,
+          true
+        )
+        if (!certDocResource.extension) {
+          certDocResource.extension = []
+        }
+        const hasVerifiedExt = certDocResource.extension.find(
+          (extention) =>
+            extention.url ===
+            `${OPENCRVS_SPECIFICATION_URL}extension/noSupportingDocumentationRequired`
+        )
+        if (!hasVerifiedExt) {
+          certDocResource.extension.push({
+            url: `${OPENCRVS_SPECIFICATION_URL}extension/noSupportingDocumentationRequired`,
+            valueString: fieldValue
+          })
+        } else {
+          hasVerifiedExt.valueString = fieldValue
+        }
+      },
+      payments: {
+        paymentId: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const paymentResource = selectOrCreatePaymentReconciliationResource(
+            fhirBundle,
+            context,
+            context.event,
+            true
+          )
+          if (!paymentResource.identifier) {
+            paymentResource.identifier = []
+          }
+          paymentResource.identifier.push({
+            system: `${OPENCRVS_SPECIFICATION_URL}id/payment-id`,
+            value: fieldValue
+          })
+        },
+        type: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const paymentResource = selectOrCreatePaymentReconciliationResource(
+            fhirBundle,
+            context,
+            context.event,
+            true
+          )
+          if (!paymentResource.detail) {
+            paymentResource.detail = [
+              {
+                type: {
+                  coding: [{ code: fieldValue }]
+                }
+              }
+            ]
+          } else {
+            paymentResource.detail[0].type = {
+              coding: [{ code: fieldValue }]
+            }
+          }
+        },
+        total: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const paymentResource = selectOrCreatePaymentReconciliationResource(
+            fhirBundle,
+            context,
+            context.event,
+            true
+          )
+          paymentResource.total = fieldValue as fhir.Money
+        },
+        amount: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const paymentResource = selectOrCreatePaymentReconciliationResource(
+            fhirBundle,
+            context,
+            context.event,
+            true
+          )
+          if (!paymentResource.detail) {
+            paymentResource.detail = [
+              {
+                /* should be replaced when type value comes in */
+                type: {
+                  coding: [{ code: 'payment' }]
+                },
+                amount: fieldValue as fhir.Money
+              }
+            ]
+          } else {
+            paymentResource.detail[0].amount = fieldValue as fhir.Money
+          }
+        },
+        outcome: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const paymentResource = selectOrCreatePaymentReconciliationResource(
+            fhirBundle,
+            context,
+            EVENT_TYPE.BIRTH,
+            true
+          )
+          paymentResource.outcome = {
+            coding: [{ code: fieldValue }]
+          }
+        },
+        date: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const paymentResource = selectOrCreatePaymentReconciliationResource(
+            fhirBundle,
+            context,
+            context.event,
+            true
+          )
+          if (!paymentResource.detail) {
+            paymentResource.detail = [
+              {
+                /* should be replaced when type value comes in */
+                type: {
+                  coding: [{ code: 'payment' }]
+                },
+                date: fieldValue
+              }
+            ]
+          } else {
+            paymentResource.detail[0].date = fieldValue
+          }
+        },
+        data: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const certDocResource = selectOrCreateCertificateDocRefResource(
+            fhirBundle,
+            context,
+            context.event,
+            true
+          )
+          if (!certDocResource.content) {
+            certDocResource.content = []
+          }
+
+          certDocResource.content.push({
+            attachment: {
+              contentType: 'image/jpg',
+              data: fieldValue
+            }
+          })
+        }
+      },
+      location: {
+        _fhirID: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const taskResource = selectOrCreateTaskRefResource(
+            fhirBundle,
+            context
+          )
+          const encounterRef = selectOrCreateEncounterResource(
+            fhirBundle,
+            context,
+            true
+          )
+          const encounterLocationRef = selectOrCreateEncounterLocationRef(
+            fhirBundle,
+            context,
+            true
+          )
+
+          //@ts-ignore
+          taskResource.encounter = encounterRef._id
+          encounterLocationRef.reference = `Location/${fieldValue}`
+        },
+        type: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          let location
+          location = selectOrCreateLocationRefResource(
+            context.event === EVENT_TYPE.BIRTH
+              ? BIRTH_CORRECTION_ENCOUNTER_CODE
+              : DEATH_CORRECTION_ENCOUNTER_CODE,
+            fhirBundle,
+            context
+          )
+          location.type = {
+            coding: [
+              {
+                system: `${OPENCRVS_SPECIFICATION_URL}location-type`,
+                code: fieldValue
+              }
+            ]
+          }
+        },
+        partOf: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const location = selectOrCreateLocationRefResource(
+            context.event === EVENT_TYPE.BIRTH
+              ? BIRTH_CORRECTION_ENCOUNTER_CODE
+              : DEATH_CORRECTION_ENCOUNTER_CODE,
+            fhirBundle,
+            context
+          )
+          location.partOf = {
+            reference: fieldValue
+          }
+        },
+        address: (_, __, context: any) =>
+          createLocationAddressBuilder(
+            context.event === EVENT_TYPE.BIRTH
+              ? BIRTH_CORRECTION_ENCOUNTER_CODE
+              : DEATH_CORRECTION_ENCOUNTER_CODE
+          )
+      },
+      values: createActionTypesBuilder(),
+      data: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const certDocResource = selectOrCreateCertificateDocRefResource(
+          fhirBundle,
+          context,
+          context.event,
+          true
+        )
+        if (!certDocResource.content) {
+          certDocResource.content = []
+        }
+
+        certDocResource.content.push({
+          attachment: {
+            contentType: 'application/pdf',
+            data: fieldValue
+          }
+        })
+      },
+      reason: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+        if (!taskResource.reason) {
+          taskResource.reason = {}
+        }
+        taskResource.reason.text = fieldValue
+      },
+      note: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+
+        const newNote: fhir.Annotation = {
+          text: fieldValue ? fieldValue : '',
+          time: new Date().toUTCString(),
+          authorString: ''
+        }
+        if (!taskResource.note) {
+          taskResource.note = []
+        }
+        taskResource.note.push(newNote)
+      }
     },
     status: {
       comments: {
@@ -2939,7 +3421,7 @@ const builders: IFieldBuilders = {
 export async function buildFHIRBundle(
   reg: object,
   eventType: EVENT_TYPE,
-  authHeader?: IAuthHeader
+  authHeader: IAuthHeader
 ) {
   const ref = uuid()
   const context: any = {

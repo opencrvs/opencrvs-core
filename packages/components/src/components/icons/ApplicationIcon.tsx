@@ -24,6 +24,18 @@ export const ApplicationIcon = (props: React.HTMLAttributes<SVGElement>) => {
       fill = '#F8D8B0'
       corner = '#F1B162'
       break
+    case 'red':
+      fill = '#EB9284'
+      corner = '#D53F3F'
+      break
+    case 'teal':
+      fill = '#96E9E4'
+      corner = '#4CC1BA'
+      break
+    case 'grey':
+      fill = '#DEE2E4'
+      corner = '#909397'
+      break
     default:
       fill = '#BFA4DB'
       corner = '#8049B7'

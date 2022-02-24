@@ -87,23 +87,23 @@ export const dropdownOption = new Schema({
 })
 
 export interface IFhirResource {
-  type: string // dot notation of the parent fhir resource type, followed by the prop, or comma delimeted props, in the resource to be updated with the fieldValue
+  type: string
   observationCode?: string
   observationDescription?: string
   categoryCode?: string
   categoryDescription?: string
-  fhirRepresentation: string // the fhir resource that must be run with safe-eval to replace the instance of fieldValue with the actual value
-  customFhirFunction?: string // used for referring to random extra functions used when building fhir such as setPrimaryCaregiverReference
+  fhirRepresentation: string
+  customFhirFunction?: string
 }
 
 const fhirResourceSchema = new Schema({
-  type: { type: String, required: true }, // dot notation of the parent fhir resource type, followed by the prop, or comma delimeted props, in the resource to be updated with the fieldValue
+  type: { type: String, required: true },
   observationCode: { type: String },
   observationDescription: { type: String },
   categoryCode: { type: String },
   categoryDescription: { type: String },
-  fhirRepresentation: { type: String, required: true }, // the fhir resource that must be run with safe-eval to replace the instance of fieldValue with the actual value
-  customFhirFunction: { type: String } // used for referring to random extra functions used when building fhir such as setPrimaryCaregiverReference
+  fhirRepresentation: { type: String, required: true },
+  customFhirFunction: { type: String }
 })
 
 const questionSchema = new Schema({

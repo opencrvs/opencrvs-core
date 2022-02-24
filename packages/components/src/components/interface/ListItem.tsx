@@ -27,7 +27,7 @@ export interface IStatus {
 
 export interface IActionObject {
   label: string
-  handler: () => void
+  handler: (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
   icon?: () => React.ReactNode
 }
 
@@ -162,7 +162,7 @@ export class ListItem extends React.Component<IListItemProps, IListItemState> {
   }
 
   toggleExpanded = () => {
-    this.setState(state => ({
+    this.setState((state) => ({
       expanded: !state.expanded
     }))
   }

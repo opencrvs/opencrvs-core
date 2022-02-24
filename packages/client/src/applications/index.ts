@@ -58,6 +58,8 @@ const WRITE_APPLICATION = 'APPLICATION/WRITE_DRAFT'
 const DELETE_APPLICATION = 'APPLICATION/DELETE_DRAFT'
 const GET_APPLICATIONS_SUCCESS = 'APPLICATION/GET_DRAFTS_SUCCESS'
 const GET_APPLICATIONS_FAILED = 'APPLICATION/GET_DRAFTS_FAILED'
+const GET_WORKQUEUE_SUCCESS = 'APPLICATION/GET_WORKQUEUE_SUCCESS'
+const GET_WORKQUEUE_FAILED = 'APPLICATION/GET_WORKQUEUE_FAILED'
 const UPDATE_REGISTRAR_WORKQUEUE = 'APPLICATION/UPDATE_REGISTRAR_WORKQUEUE'
 const UPDATE_REGISTRAR_WORKQUEUE_SUCCESS =
   'APPLICATION/UPDATE_REGISTRAR_WORKQUEUE_SUCCESS'
@@ -72,6 +74,7 @@ const UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_SUCCESS =
   'APPLICATION/UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_SUCCESS'
 const UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_FAIL =
   'APPLICATION/UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_FAIL'
+const CLEAR_CORRECTION_CHANGE = 'CLEAR_CORRECTION_CHANGE'
 
 export enum SUBMISSION_STATUS {
   DRAFT = 'DRAFT',
@@ -91,6 +94,9 @@ export enum SUBMISSION_STATUS {
   READY_TO_CERTIFY = 'READY_TO_CERTIFY',
   CERTIFYING = 'CERTIFYING',
   CERTIFIED = 'CERTIFIED',
+  READY_TO_REQUEST_CORRECTION = 'READY_TO_REQUEST_CORRECTION',
+  REQUESTING_CORRECTION = 'REQUESTING_CORRECTION',
+  REQUESTED_CORRECTION = 'REQUESTED_CORRECTION',
   FAILED = 'FAILED',
   FAILED_NETWORK = 'FAILED_NETWORK'
 }
@@ -113,7 +119,9 @@ export const processingStates = [
   SUBMISSION_STATUS.READY_TO_REJECT,
   SUBMISSION_STATUS.REJECTING,
   SUBMISSION_STATUS.READY_TO_CERTIFY,
-  SUBMISSION_STATUS.CERTIFYING
+  SUBMISSION_STATUS.CERTIFYING,
+  SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION,
+  SUBMISSION_STATUS.REQUESTING_CORRECTION
 ]
 
 const DOWNLOAD_MAX_RETRY_ATTEMPT = 3
@@ -153,6 +161,7 @@ export interface ITaskHistory {
 export interface IApplication {
   id: string
   data: IFormData
+  originalData?: IFormData
   savedOn?: number
   modifiedOn?: number
   eventType?: string
@@ -206,8 +215,21 @@ type Relation =
   | 'INFORMANT'
   | 'PRINT_IN_ADVANCE'
 
+type RelationForCertificateCorrection =
+  | 'FATHER'
+  | 'MOTHER'
+  | 'SPOUSE'
+  | 'SON'
+  | 'DAUGHTER'
+  | 'EXTENDED_FAMILY'
+  | 'OTHER'
+  | 'INFORMANT'
+  | 'PRINT_IN_ADVANCE'
+  | 'CHILD'
+
 export type ICertificate = {
   collector?: Partial<{ type: Relation }>
+  corrector?: Partial<{ type: RelationForCertificateCorrection }>
   hasShowedVerifiedDocument?: boolean
   payments?: Payment
   data?: string
@@ -261,6 +283,12 @@ interface IModifyApplicationAction {
   }
 }
 
+interface IClearCorrectionChange {
+  type: typeof CLEAR_CORRECTION_CHANGE
+  payload: {
+    applicationId: string
+  }
+}
 export interface IWriteApplicationAction {
   type: typeof WRITE_APPLICATION
   payload: {
@@ -290,6 +318,15 @@ interface IGetStorageApplicationsSuccessAction {
 
 interface IGetStorageApplicationsFailedAction {
   type: typeof GET_APPLICATIONS_FAILED
+}
+
+interface IGetWorkqueueOfCurrentUserSuccessAction {
+  type: typeof GET_WORKQUEUE_SUCCESS
+  payload: string
+}
+
+interface IGetWorkqueueOfCurrentUserFailedAction {
+  type: typeof GET_WORKQUEUE_FAILED
 }
 
 interface UpdateRegistrarWorkQueueSuccessAction {
@@ -362,12 +399,15 @@ interface UpdateFieldAgentDeclaredApplicationsFailAction {
 export type Action =
   | IStoreApplicationAction
   | IModifyApplicationAction
+  | IClearCorrectionChange
   | ISetInitialApplicationsAction
   | IWriteApplicationAction
   | NavigationAction
   | IDeleteApplicationAction
   | IGetStorageApplicationsSuccessAction
   | IGetStorageApplicationsFailedAction
+  | IGetWorkqueueOfCurrentUserSuccessAction
+  | IGetWorkqueueOfCurrentUserFailedAction
   | IDownloadApplication
   | IDownloadApplicationSuccess
   | IDownloadApplicationFail
@@ -397,7 +437,7 @@ export interface WorkqueueState {
   workqueue: IWorkqueue
 }
 
-const workqueueInitialState = {
+const workqueueInitialState: WorkqueueState = {
   workqueue: {
     loading: true,
     error: false,
@@ -454,6 +494,7 @@ export function createReviewApplication(
   return {
     id: applicationId,
     data: formData,
+    originalData: formData,
     review: true,
     event,
     registrationStatus: status
@@ -483,6 +524,12 @@ export function modifyApplication(
   application.modifiedOn = Date.now()
   return { type: MODIFY_APPLICATION, payload: { application } }
 }
+
+export function clearCorrectionChange(
+  applicationId: string
+): IClearCorrectionChange {
+  return { type: CLEAR_CORRECTION_CHANGE, payload: { applicationId } }
+}
 export function setInitialApplications() {
   return { type: SET_INITIAL_APPLICATION }
 }
@@ -491,6 +538,18 @@ export const getStorageApplicationsSuccess = (
   response: string
 ): IGetStorageApplicationsSuccessAction => ({
   type: GET_APPLICATIONS_SUCCESS,
+  payload: response
+})
+
+export const getCurrentUserWorkqueueFailed =
+  (): IGetWorkqueueOfCurrentUserFailedAction => ({
+    type: GET_WORKQUEUE_FAILED
+  })
+
+export const getCurrentUserWorkqueuSuccess = (
+  response: string
+): IGetWorkqueueOfCurrentUserSuccessAction => ({
+  type: GET_WORKQUEUE_SUCCESS,
   payload: response
 })
 
@@ -670,6 +729,33 @@ async function updateFieldAgentDeclaredApplicationsByUser(
     storage.setItem('USER_DATA', JSON.stringify(allUserData)),
     JSON.stringify(currentUserData)
   ]).then(([_, currentUserData]) => currentUserData)
+}
+
+export async function getWorkqueueOfCurrentUser(): Promise<string> {
+  // returns a 'stringified' IWorkqueue
+  const initialWorkqueue = workqueueInitialState.workqueue
+
+  const storageTable = await storage.getItem('USER_DATA')
+  if (!storageTable) {
+    return JSON.stringify(initialWorkqueue)
+  }
+
+  const currentUserID = await getCurrentUserID()
+
+  const allUserData = JSON.parse(storageTable) as IUserData[]
+
+  if (!allUserData.length) {
+    // No user-data at all
+    return JSON.stringify(initialWorkqueue)
+  }
+
+  const currentUserData = allUserData.find(
+    (uData) => uData.userID === currentUserID
+  )
+  const currentUserWorkqueue: IWorkqueue =
+    (currentUserData && currentUserData.workqueue) ||
+    workqueueInitialState.workqueue
+  return JSON.stringify(currentUserWorkqueue)
 }
 
 export async function getApplicationsOfCurrentUser(): Promise<string> {
@@ -1238,10 +1324,28 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
         (application) => application.id === action.payload.application.id
       )
       newApplications[currentApplicationIndex] = action.payload.application
+
       return {
         ...state,
         applications: newApplications
       }
+    case CLEAR_CORRECTION_CHANGE: {
+      const applicationIndex = state.applications.findIndex(
+        (application) => application.id === action.payload.applicationId
+      )
+
+      const correction = state.applications[applicationIndex]
+
+      const orignalAppliation: IApplication = {
+        ...correction,
+        data: {
+          ...correction.originalData
+        }
+      }
+
+      return loop(state, Cmd.action(writeApplication(orignalAppliation)))
+    }
+
     case WRITE_APPLICATION:
       return loop(
         {
@@ -1634,6 +1738,30 @@ export const registrarWorkqueueReducer: LoopReducer<WorkqueueState, Action> = (
           args: [Cmd.getState, action.payload]
         })
       )
+
+    case USER_DETAILS_AVAILABLE:
+      return loop(
+        {
+          ...state
+        },
+        Cmd.run<
+          IGetWorkqueueOfCurrentUserFailedAction,
+          IGetWorkqueueOfCurrentUserSuccessAction
+        >(getWorkqueueOfCurrentUser, {
+          successActionCreator: getCurrentUserWorkqueuSuccess,
+          failActionCreator: getCurrentUserWorkqueueFailed,
+          args: []
+        })
+      )
+
+    case GET_WORKQUEUE_SUCCESS:
+      if (action.payload) {
+        const workqueue = JSON.parse(action.payload) as IWorkqueue
+        return {
+          workqueue
+        }
+      }
+      return state
 
     case UPDATE_REGISTRAR_WORKQUEUE_SUCCESS:
       if (action.payload) {
