@@ -2892,13 +2892,13 @@ export const mockOfflineData = {
     COUNTRY: 'bgd',
     COUNTRY_LOGO_FILE: 'logo.png',
     PHONE_NUMBER_PATTERN: {
-      pattern: /^01[1-9][0-9]{8}$/,
-      example: '01741234567',
-      start: '01',
-      num: '11',
+      pattern: '^0(7|9)[0-9]{1}[0-9]{7}$',
+      start: '0[7|9]',
+      example: '0970545855',
+      num: '10',
       mask: {
-        startForm: 5,
-        endBefore: 3
+        startForm: 4,
+        endBefore: 2
       }
     },
     BIRTH_REGISTRATION_TARGET: 45,

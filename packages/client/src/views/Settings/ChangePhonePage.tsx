@@ -192,12 +192,7 @@ class ChangePhoneView extends React.Component<IProps & IDispatchProps, IState> {
       isInvalidLength: verifyCode.length === 6
     }))
   }
-  continueButtonHandler = (
-    userId: string,
-    phoneNumber: string,
-    view: string,
-    scope: string[]
-  ) => {
+  continueButtonHandler = (phoneNumber: string) => {
     if (!phoneNumber) return
     if (VIEW_TYPE.CHANGE_NUMBER) {
       this.props.sendVerifyCode(convertToMSISDN(phoneNumber))
@@ -303,12 +298,7 @@ class ChangePhoneView extends React.Component<IProps & IDispatchProps, IState> {
                   id="continue-button"
                   key="continue"
                   onClick={() => {
-                    this.continueButtonHandler(
-                      userId,
-                      this.state.phoneNumber,
-                      this.state.view,
-                      scope
-                    )
+                    this.continueButtonHandler(userId)
                   }}
                   disabled={
                     !Boolean(this.state.phoneNumber.length) ||
