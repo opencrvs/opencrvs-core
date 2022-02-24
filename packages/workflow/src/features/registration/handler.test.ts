@@ -1371,7 +1371,6 @@ describe('markEventAsWaitingValidationHandler', () => {
         audience: 'opencrvs:workflow-user'
       }
     )
-
     const res = await server.server.inject({
       method: 'POST',
       url: '/fhir',
@@ -1398,6 +1397,193 @@ describe('markEventAsWaitingValidationHandler', () => {
       method: 'POST',
       url: '/fhir',
       payload: bundleWithInputOutputDeath,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(200)
+  })
+})
+describe('markEventAsRequestedForCorrection handler', () => {
+  let server: any
+  let testCorrectionBundleBirth: any
+  let testCorrectionBundleDeath: any
+
+  beforeEach(async () => {
+    fetch.resetMocks()
+    server = await createServer()
+    fetch.mockResponses(
+      [userMock, { status: 200 }],
+      [fieldAgentPractitionerMock, { status: 200 }],
+      [taskResouceMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }]
+    )
+
+    testCorrectionBundleBirth = cloneDeep(testFhirBundleWithIds)
+    testCorrectionBundleDeath = cloneDeep(testFhirBundleWithIdsForDeath)
+
+    const correctionEncounterSection = {
+      title: 'Birth correction encounters',
+      code: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/doc-sections',
+            code: 'birth-correction-encounters'
+          }
+        ],
+        text: 'Birth correction encounters'
+      },
+      entry: [
+        {
+          reference: 'urn:uuid:ab392b88-1861-44e8-b5b0-f6e0525b2662'
+        }
+      ]
+    }
+
+    testCorrectionBundleBirth.entry[0].resource.section?.push(
+      correctionEncounterSection
+    )
+
+    testCorrectionBundleDeath.entry[0].resource.section?.push(
+      correctionEncounterSection
+    )
+
+    testCorrectionBundleBirth.entry[1].resource.identifier?.push({
+      system: 'http://opencrvs.org/specs/id/birth-registration-number',
+      value: 'B5WGYJE'
+    })
+
+    testCorrectionBundleDeath.entry[1].resource.identifier?.push({
+      system: 'http://opencrvs.org/specs/id/death-registration-number',
+      value: 'B5WGYJE'
+    })
+  })
+
+  it('returns OK with full fhir bundle as payload', async () => {
+    const token = jwt.sign(
+      { scope: ['register'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:workflow-user'
+      }
+    )
+
+    fetch.mockResponseOnce(
+      JSON.stringify({
+        resourceType: 'Bundle',
+        entry: [
+          {
+            fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
+            resource: {
+              resourceType: 'Task',
+              status: 'requested',
+              code: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/types',
+                    code: 'birth-registration'
+                  }
+                ]
+              },
+              identifier: [
+                {
+                  system: 'http://opencrvs.org/specs/id/paper-form-id',
+                  value: '12345678'
+                },
+                {
+                  system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+                  value: 'B5WGYJE'
+                }
+              ],
+              extension: [
+                {
+                  url: 'http://opencrvs.org/specs/extension/contact-person',
+                  valueString: 'MOTHER'
+                }
+              ],
+              id: '104ad8fd-e7b8-4e3e-8193-abc2c473f2c9'
+            }
+          }
+        ]
+      })
+    )
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/fhir',
+      payload: testCorrectionBundleBirth,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(200)
+  })
+
+  it('returns OK with full fhir bundle as payload for death', async () => {
+    const token = jwt.sign(
+      { scope: ['register'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:workflow-user'
+      }
+    )
+
+    fetch.mockResponseOnce(
+      JSON.stringify({
+        resourceType: 'Bundle',
+        entry: [
+          {
+            fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
+            resource: {
+              resourceType: 'Task',
+              status: 'requested',
+              code: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/types',
+                    code: 'death-registration'
+                  }
+                ]
+              },
+              identifier: [
+                {
+                  system: 'http://opencrvs.org/specs/id/death-tracking-id',
+                  value: 'D5WGYJE'
+                }
+              ],
+              id: '104ad8fd-e7b8-4e3e-8193-abc2c473f2c9'
+            }
+          }
+        ]
+      })
+    )
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/fhir',
+      payload: testCorrectionBundleDeath,
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -1803,8 +1989,7 @@ describe('populateCompositionWithID', () => {
                 valueString: ''
               },
               {
-                url:
-                  'http://opencrvs.org/specs/extension/contact-person-phone-number',
+                url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
                 valueString: '+260730208366'
               },
               {
@@ -1894,8 +2079,7 @@ describe('populateCompositionWithID', () => {
             ],
             extension: [
               {
-                url:
-                  'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+                url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
                 extension: [
                   {
                     url: 'code',
@@ -2189,8 +2373,7 @@ describe('populateCompositionWithID', () => {
                 valueString: ''
               },
               {
-                url:
-                  'http://opencrvs.org/specs/extension/contact-person-phone-number',
+                url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
                 valueString: '+260730208366'
               },
               {
@@ -2280,8 +2463,7 @@ describe('populateCompositionWithID', () => {
             ],
             extension: [
               {
-                url:
-                  'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+                url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
                 extension: [
                   {
                     url: 'code',
@@ -2567,8 +2749,7 @@ describe('populateCompositionWithID', () => {
                 valueString: ''
               },
               {
-                url:
-                  'http://opencrvs.org/specs/extension/contact-person-phone-number',
+                url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
                 valueString: '+260730208366'
               },
               {
@@ -2660,8 +2841,7 @@ describe('populateCompositionWithID', () => {
             ],
             extension: [
               {
-                url:
-                  'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+                url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
                 extension: [
                   {
                     url: 'code',
@@ -2961,8 +3141,7 @@ describe('populateCompositionWithID', () => {
                 valueString: ''
               },
               {
-                url:
-                  'http://opencrvs.org/specs/extension/contact-person-phone-number',
+                url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
                 valueString: '+260730208366'
               },
               {
@@ -3054,8 +3233,7 @@ describe('populateCompositionWithID', () => {
             ],
             extension: [
               {
-                url:
-                  'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+                url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
                 extension: [
                   {
                     url: 'code',

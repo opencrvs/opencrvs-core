@@ -18,7 +18,8 @@ import {
   REG_STATUS_VALIDATED,
   REG_STATUS_WAITING_VALIDATION,
   REG_STATUS_REGISTERED,
-  REG_STATUS_DECLARATION_UPDATED
+  REG_STATUS_DECLARATION_UPDATED,
+  REG_STATUS_REQUESTED_CORRECTION
 } from '@workflow/features/registration/fhir/constants'
 import {
   getTaskResource,
@@ -105,6 +106,27 @@ export async function markBundleAsValidated(
     taskResource,
     getTokenPayload(token),
     REG_STATUS_VALIDATED
+  )
+
+  await setupLastRegLocation(taskResource, practitioner)
+
+  setupLastRegUser(taskResource, practitioner)
+
+  return bundle
+}
+
+export async function markBundleAsRequestedForCorrection(
+  bundle: fhir.Bundle & fhir.BundleEntry,
+  token: string
+): Promise<fhir.Bundle & fhir.BundleEntry> {
+  const taskResource = getTaskResource(bundle) as fhir.Task
+
+  const practitioner = await getLoggedInPractitionerResource(token)
+
+  await setupRegistrationWorkflow(
+    taskResource,
+    getTokenPayload(token),
+    REG_STATUS_REQUESTED_CORRECTION
   )
 
   await setupLastRegLocation(taskResource, practitioner)

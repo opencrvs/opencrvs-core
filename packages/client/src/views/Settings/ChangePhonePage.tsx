@@ -41,6 +41,7 @@ import { Mutation } from 'react-apollo'
 import gql from 'graphql-tag'
 import { get } from 'lodash'
 import { getCurrentUserScope } from '@client/utils/authUtils'
+import { convertToMSISDN } from '@client/forms/utils'
 
 const Container = styled.div`
   ${({ theme }) => theme.shadows.mistyShadow};
@@ -199,7 +200,7 @@ class ChangePhoneView extends React.Component<IProps & IDispatchProps, IState> {
   ) => {
     if (!phoneNumber) return
     if (VIEW_TYPE.CHANGE_NUMBER) {
-      this.props.sendVerifyCode(phoneNumber)
+      this.props.sendVerifyCode(convertToMSISDN(phoneNumber))
       this.setState({
         view: VIEW_TYPE.VERIFY_NUMBER
       })
@@ -224,7 +225,7 @@ class ChangePhoneView extends React.Component<IProps & IDispatchProps, IState> {
       errorOccured: false
     })
     if (this.props.userDetails) {
-      this.props.userDetails.mobile = this.state.phoneNumber
+      this.props.userDetails.mobile = convertToMSISDN(this.state.phoneNumber)
       this.props.modifyUserDetails(this.props.userDetails)
     }
     this.props.goToSettingsWithPhoneSuccessMsg(true)
@@ -370,7 +371,7 @@ class ChangePhoneView extends React.Component<IProps & IDispatchProps, IState> {
                   mutation={changePhoneMutation}
                   variables={{
                     userId: get(this.props, 'userDetails.userMgntUserID'),
-                    phoneNumber: this.state.phoneNumber,
+                    phoneNumber: convertToMSISDN(this.state.phoneNumber),
                     nonce: nonce,
                     verifyCode: this.state.verifyCode
                   }}

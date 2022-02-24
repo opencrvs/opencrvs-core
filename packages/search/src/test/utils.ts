@@ -173,8 +173,7 @@ export const mockBirthFhirBundle = {
             valueString: 'FATHER'
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '01711111111'
           },
           {
@@ -759,8 +758,7 @@ export const mockBirthFhirBundleWithoutCompositionId = {
             valueString: 'MOTHER'
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '01722222222'
           },
           {
@@ -1413,8 +1411,7 @@ export const mockDeathFhirBundle = {
             valueString: 'EXTENDED_FAMILY'
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '01711111114'
           },
           {
@@ -1813,8 +1810,7 @@ export const mockDeathFhirBundleWithoutCompositionId = {
             valueString: 'EXTENDED_FAMILY'
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '01711111114'
           },
           {
@@ -2277,8 +2273,7 @@ export const mockBirthRejectionTaskBundle = {
             valueString: 'MOTHER'
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '01722222222'
           },
           {
@@ -2360,8 +2355,7 @@ export const mockBirthRejectionTaskBundleWithoutCompositionReference = {
             valueString: 'MOTHER'
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '01722222222'
           },
           {
@@ -2719,8 +2713,7 @@ export const mockBirthFhirBundleWithoutParents = {
             valueString: 'FATHER'
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '01711111111'
           },
           {
@@ -3644,4 +3637,59 @@ export const mockFacilityResponse = {
     versionId: '25b82e56-003f-4da7-975a-e9395100e819'
   },
   id: 'f1ea7c2f-0b71-43e8-a199-a92a0e17102c'
+}
+
+export const mockTaskBirthCorrectionBundle = {
+  resourceType: 'Bundle',
+  type: 'document',
+  entry: [
+    {
+      fullUrl:
+        'http://localhost:3447/fhir/Task/e849ceb4-0adc-4be2-8fc8-8a4c41781bb5',
+      resource: {
+        resourceType: 'Task',
+        status: 'requested',
+        intent: '',
+        input: [
+          {
+            type: {
+              coding: [
+                {
+                  system: 'http://terminology.hl7.org/CodeSystem/action-type',
+                  code: 'update'
+                }
+              ]
+            },
+            valueCode: 'child',
+            valueId: 'name',
+            valueString: 'Old name'
+          }
+        ],
+        output: [
+          {
+            type: {
+              coding: [
+                {
+                  system: 'http://terminology.hl7.org/CodeSystem/action-type',
+                  code: 'update'
+                }
+              ]
+            },
+            valueCode: 'child',
+            valueId: 'name',
+            valueString: 'New name'
+          }
+        ],
+        code: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/types',
+              code: 'BIRTH'
+            }
+          ]
+        },
+        id: 'e849ceb4-0adc-4be2-8fc8-8a4c41781bb5'
+      }
+    }
+  ]
 }

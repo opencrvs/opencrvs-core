@@ -35,6 +35,17 @@ interface INIDNumberPattern {
   num: string
 }
 
+export interface ICertificateTemplateData {
+  event: string
+  status: string
+  svgCode: string
+  svgDateCreated: number
+  svgDateUpdated: number
+  svgFilename: string
+  user: string
+  _id: string
+}
+
 export interface IApplicationConfig {
   BACKGROUND_SYNC_BROADCAST_CHANNEL: string
   COUNTRY: string
@@ -56,7 +67,14 @@ export interface IApplicationConfig {
   SENTRY: string
   LOGROCKET: string
   PHONE_NUMBER_PATTERN: IPhoneNumberPattern
+  BIRTH_REGISTRATION_TARGET: number
+  DEATH_REGISTRATION_TARGET: number
   NID_NUMBER_PATTERN: INIDNumberPattern
+}
+
+export interface IApplicationConfigResponse {
+  config: IApplicationConfig
+  certificates: ICertificateTemplateData[]
 }
 
 export interface IAuthenticationData {
@@ -111,7 +129,7 @@ function request<T>(options: AxiosRequestConfig) {
 }
 
 const getApplicationConfig = () => {
-  return request<IApplicationConfig>({
+  return request<IApplicationConfigResponse>({
     url: resolve(window.config.CONFIG_API_URL, '/config'),
     method: 'GET'
   })

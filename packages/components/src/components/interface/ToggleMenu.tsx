@@ -16,6 +16,7 @@ const ToggleMenuContainer = styled.div`
   position: relative;
   height: 40px;
   display: flex;
+  margin-left: auto;
   button {
     padding: 0;
     height: auto;

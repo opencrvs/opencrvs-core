@@ -20,7 +20,8 @@ import {
   markBundleAsWaitingValidation,
   invokeRegistrationValidation,
   updatePatientIdentifierWithRN,
-  markBundleAsDeclarationUpdated
+  markBundleAsDeclarationUpdated,
+  markBundleAsRequestedForCorrection
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
   getEventInformantName,
@@ -85,9 +86,9 @@ function getSectionFromResponse(
   reference: string
 ): fhir.BundleEntry[] {
   return (response.entry &&
-    response.entry.filter(o => {
+    response.entry.filter((o) => {
       const res = o.response as fhir.BundleEntryResponse
-      return Object.keys(res).some(k =>
+      return Object.keys(res).some((k) =>
         res[k].toLowerCase().includes(reference.toLowerCase())
       )
     })) as fhir.BundleEntry[]
@@ -133,9 +134,8 @@ export function populateCompositionWithID(
       ) {
         const entry = composition.section[payloadEncounterSectionIndex]
           .entry as fhir.Reference[]
-        entry[0].reference = responseEncounterSection[0].response.location.split(
-          '/'
-        )[3]
+        entry[0].reference =
+          responseEncounterSection[0].response.location.split('/')[3]
         composition.section[payloadEncounterSectionIndex].entry = entry
       }
       if (!composition.id) {
@@ -233,11 +233,8 @@ export async function markEventAsRegisteredCallbackHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const {
-    trackingId,
-    registrationNumber,
-    error
-  } = request.payload as IEventRegistrationCallbackPayload
+  const { trackingId, registrationNumber, error } =
+    request.payload as IEventRegistrationCallbackPayload
 
   if (error) {
     throw new Error(`Callback triggered with an error: ${error}`)
@@ -318,7 +315,7 @@ export async function markEventAsRegisteredCallbackHandler(
     // If an external system is being used, then its processing time will mean a wait is not required.
     if (!VALIDATING_EXTERNALLY) {
       // tslint:disable-next-line
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      await new Promise((resolve) => setTimeout(resolve, 2000))
     }
     // Trigger an event for the registration
     await triggerEvent(
@@ -389,6 +386,24 @@ export async function markEventAsCertifiedHandler(
     return await postToHearth(payload)
   } catch (error) {
     logger.error(`Workflow/markBirthAsCertifiedHandler: error: ${error}`)
+    throw new Error(error)
+  }
+}
+
+export async function markEventAsRequestedForCorrectionHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const payload = await markBundleAsRequestedForCorrection(
+      request.payload as fhir.Bundle,
+      getToken(request)
+    )
+    return await postToHearth(payload)
+  } catch (error) {
+    logger.error(
+      `Workflow/markEventAsRequestedForCorrectionHandler: error: ${error}`
+    )
     throw new Error(error)
   }
 }

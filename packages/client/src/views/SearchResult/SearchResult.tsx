@@ -46,7 +46,6 @@ import {
   TRACKING_ID_TEXT
 } from '@client/utils/constants'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
-import { RowHistoryView } from '@opencrvs/client/src/views/OfficeHome/RowHistoryView'
 import { Duplicate, Validate } from '@opencrvs/components/lib/icons'
 import {
   ColumnContentAlignment,
@@ -68,6 +67,7 @@ import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import { convertToMSISDN } from '@client/forms/utils'
 import { formattedDuration } from '@client/utils/date-formatting'
+import { Navigation } from '@client/components/interface/Navigation'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
@@ -78,6 +78,9 @@ const ErrorText = styled.div`
 
 const Container = styled.div`
   margin: 20px 0px 0px 0px;
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    margin-left: 249px;
+  }
 `
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -279,6 +282,10 @@ export class SearchResultView extends React.Component<
         )
       case 'CERTIFIED':
         return this.props.intl.formatMessage(registrarHomeMessages.certified)
+      case 'REQUESTED_CORRECTION':
+        return this.props.intl.formatMessage(
+          registrarHomeMessages.requestedCorrection
+        )
       default:
         return this.props.intl.formatMessage(
           registrarHomeMessages.readyForReview
@@ -317,6 +324,8 @@ export class SearchResultView extends React.Component<
       const downloadStatus =
         (foundApplication && foundApplication.downloadStatus) || undefined
 
+      const applicationIsRequestedCorrection =
+        reg.declarationStatus === 'REQUESTED_CORRECTION'
       const applicationIsRegistered = reg.declarationStatus === 'REGISTERED'
       const applicationIsCertified = reg.declarationStatus === 'CERTIFIED'
       const applicationIsRejected = reg.declarationStatus === 'REJECTED'
@@ -338,6 +347,8 @@ export class SearchResultView extends React.Component<
                 action:
                   ((applicationIsRegistered || applicationIsCertified) &&
                     Action.LOAD_CERTIFICATE_APPLICATION) ||
+                  (applicationIsRequestedCorrection &&
+                    Action.LOAD_REQUESTED_CORRECTION_APPLICATION) ||
                   Action.LOAD_REVIEW_APPLICATION
               }}
               status={downloadStatus as DOWNLOAD_STATUS}
@@ -350,7 +361,12 @@ export class SearchResultView extends React.Component<
       ) {
         actions.push({
           label: this.props.intl.formatMessage(buttonMessages.print),
-          handler: () => this.props.goToPrintCertificate(reg.id, reg.event)
+          handler: (
+            e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
+          ) => {
+            e && e.stopPropagation()
+            this.props.goToPrintCertificate(reg.id, reg.event)
+          }
         })
       } else if (
         (applicationIsValidated && this.userHasRegisterScope()) ||
@@ -420,13 +436,6 @@ export class SearchResultView extends React.Component<
     })
   }
 
-  renderExpandedComponent = (itemId: string, data: GQLQuery) => {
-    const results = data && data.searchEvents && data.searchEvents.results
-    const eventDetails =
-      results && results.find((result) => result && result.id === itemId)
-    return <RowHistoryView eventDetails={eventDetails} />
-  }
-
   onPageChange = (newPageNumber: number) => {
     this.setState({ currentPage: newPageNumber })
   }
@@ -442,6 +451,7 @@ export class SearchResultView extends React.Component<
           mobileSearchBar={true}
           enableMenuSelection={false}
         />
+        <Navigation />
         <Container>
           <HomeContent>
             {searchText && searchType && (
@@ -519,9 +529,6 @@ export class SearchResultView extends React.Component<
                               data.searchEvents
                             )}
                             columns={this.getColumns()}
-                            renderExpandedComponent={(itemId: string) =>
-                              this.renderExpandedComponent(itemId, data)
-                            }
                             noResultText={intl.formatMessage(
                               constantsMessages.noResults
                             )}
@@ -534,8 +541,7 @@ export class SearchResultView extends React.Component<
                               0
                             }
                             currentPage={this.state.currentPage}
-                            expandable={this.getExpandable()}
-                            clickable={!this.getExpandable()}
+                            clickable={true}
                             showPaginated={this.showPaginated}
                             loadMoreText={intl.formatMessage(
                               constantsMessages.loadMore

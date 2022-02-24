@@ -32,7 +32,8 @@ import { createStore } from '@client/store'
 import {
   createTestComponent,
   mockUserResponse,
-  resizeWindow
+  resizeWindow,
+  flushPromises
 } from '@client/tests/util'
 import { merge } from 'lodash'
 import moment from 'moment'
@@ -316,7 +317,7 @@ describe('In Progress tab', () => {
         .simulate('click')
     })
 
-    it('redirects user to draft preview page on update click', async () => {
+    it('redirects user to detail page on update click', async () => {
       const TIME_STAMP = 1562912635549
       const drafts: IApplication[] = [
         {
@@ -572,7 +573,7 @@ describe('In Progress tab', () => {
         .simulate('click')
     })
 
-    it('renders expanded area for remote draft data', async () => {
+    it('redirects to recordAudit page when item is clicked', async () => {
       jest.clearAllMocks()
       const TIME_STAMP = '1562912635549'
       const drafts: IApplication[] = []
@@ -656,14 +657,14 @@ describe('In Progress tab', () => {
         setTimeout(resolve, 100)
       })
       testComponent.update()
+      testComponent.find('#row_0').hostNodes().simulate('click')
 
-      const instance = (
-        await waitForElement(testComponent, GridTable)
-      ).instance()
+      await flushPromises()
+      testComponent.update()
 
-      instance.toggleExpanded('956281c9-1f47-4c26-948a-970dd23c4094')
-      const element = await waitForElement(testComponent, '#IN_PROGRESS-0')
-      expect(element.hostNodes().length).toBe(1)
+      expect(window.location.href).toContain(
+        '/record-audit/956281c9-1f47-4c26-948a-970dd23c4094'
+      )
     })
 
     describe('handles download status', () => {
@@ -874,7 +875,7 @@ describe('Tablet tests', () => {
     resizeWindow(1024, 768)
   })
 
-  it('redirects to detail page if item is clicked', async () => {
+  it('redirects to recordAudit page if item is clicked', async () => {
     jest.clearAllMocks()
     const TIME_STAMP = '1562912635549'
     const drafts: IApplication[] = []
@@ -931,7 +932,7 @@ describe('Tablet tests', () => {
     testComponent.update()
 
     expect(window.location.href).toContain(
-      '/details/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+      '/record-audit/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
   })
 })

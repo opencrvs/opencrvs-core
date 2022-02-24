@@ -66,6 +66,8 @@ services:
 
   # Expose dev secrets as a plain volume - these will use docker secrets in staging and prod
   hearth:
+    environment:
+      - logger__level=warn
     volumes:
       - '.secrets/public-key.pem:/secrets/public-key.pem'
       - './infrastructure/hearth-plugins/checkDuplicateTask.js:/src/hearth/lib/plugins/checkDuplicateTask.js'
@@ -86,6 +88,7 @@ services:
       - '5000:5000'
       - '5001:5001'
     extra_hosts:
+      - 'webhooks:${LOCAL_IP-172.17.0.1}'
       - 'gateway:${LOCAL_IP-172.17.0.1}'
       - 'workflow:${LOCAL_IP-172.17.0.1}'
       - 'search:${LOCAL_IP-172.17.0.1}'
