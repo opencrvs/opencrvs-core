@@ -13,6 +13,7 @@ import * as React from 'react'
 import { ReactElement } from 'react'
 import styled, { ThemeConsumer } from 'styled-components'
 import { colors } from '../colors'
+import { FormTabs, IFormTabProps } from '../forms'
 const Container = styled.div<{ size: string }>`
   z-index: 1;
   position: relative;
@@ -28,7 +29,7 @@ const Container = styled.div<{ size: string }>`
 `
 const Header = styled.div`
   display: flex;
-  height: 72px;
+  flex-flow: column wrap;
   border-bottom: 1px solid rgb(204, 207, 208);
   padding-top: 20px;
   padding-right: 32px;
@@ -62,6 +63,14 @@ const TopActionBar = styled.div`
   gap: 28px;
   margin-left: auto;
 `
+const TopTabBar = styled.div`
+  display: flex;
+  gap: 28px;
+  margin-right: auto;
+`
+const TopBar = styled.div`
+  display: flex;
+`
 const BottomActionBar = styled.div`
   display: flex;
   gap: 28px;
@@ -80,16 +89,16 @@ const Title = styled.div`
 const Icon = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
 `
-
 interface IProps {
   icon?: () => React.ReactNode
   title?: string
+  titleColor?: keyof typeof colors
   topActionButtons?: ReactElement[]
+  tabs?: IFormTabProps
   subtitle?: string
   children?: React.ReactNode
   bottomActionButtons?: ReactElement[]
   size?: 'normal' | 'large' | undefined
-  titleColor?: keyof typeof colors
 }
 
 export class Content extends React.Component<IProps> {
@@ -99,6 +108,7 @@ export class Content extends React.Component<IProps> {
       title,
       titleColor,
       topActionButtons,
+      tabs,
       subtitle,
       children,
       bottomActionButtons,
@@ -108,11 +118,24 @@ export class Content extends React.Component<IProps> {
     return (
       <Container size={size as string}>
         <Header>
-          <TitleContainer titleColor={titleColor}>
-            {icon && <Icon id={`content-icon`}>{icon()}</Icon>}
-            {title && <Title id={`content-name`}>{title}</Title>}
-          </TitleContainer>
-          {topActionButtons && <TopActionBar>{topActionButtons}</TopActionBar>}
+          <TopBar>
+            <TitleContainer titleColor={titleColor}>
+              {icon && <Icon id={`content-icon`}>{icon()}</Icon>}
+              {title && <Title id={`content-name`}>{title}</Title>}
+            </TitleContainer>
+            {topActionButtons && (
+              <TopActionBar>{topActionButtons}</TopActionBar>
+            )}
+          </TopBar>
+          {tabs && (
+            <TopTabBar>
+              <FormTabs
+                sections={tabs.sections}
+                activeTabId={tabs.activeTabId}
+                onTabClick={(id: string) => tabs.onTabClick(id)}
+              />
+            </TopTabBar>
+          )}
         </Header>
         {subtitle && <SubHeader>{subtitle}</SubHeader>}
         {children && <Body>{children}</Body>}

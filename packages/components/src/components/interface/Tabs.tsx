@@ -29,7 +29,6 @@ export const Tab = styled(Button)<IProps>`
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   border-bottom: ${({ theme, active }) =>
     active ? `4px solid ${theme.colors.indigo500}` : 'none'};
-  margin-bottom: 20px;
   & div {
     padding-left: 0px;
     padding-right: 20px;

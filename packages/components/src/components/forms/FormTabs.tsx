@@ -17,8 +17,7 @@ export interface IFormTabs {
   title: string
   disabled?: boolean
 }
-
-interface IFormTabProps {
+export interface IFormTabProps {
   sections: IFormTabs[]
   activeTabId: string
   onTabClick: (tabId: string) => void
