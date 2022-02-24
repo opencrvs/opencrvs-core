@@ -27,7 +27,6 @@ import { DataSection } from '@opencrvs/components/lib/interface/ViewData'
 import {
   ResponsiveModal,
   NOTIFICATION_TYPE,
-  Notification,
   FloatingNotification
 } from '@opencrvs/components/lib/interface'
 import { Select } from '@opencrvs/components/lib/forms'
