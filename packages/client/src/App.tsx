@@ -64,6 +64,8 @@ import { RecordAudit } from './views/Home/RecordAudit'
 import { ChangePhonePage } from './views/Settings/ChangePhonePage'
 import { ConfigHome } from './views/SysAdmin/Config/ConfigHome'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
+import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
+import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -240,6 +242,11 @@ export class App extends React.Component<IAppProps> {
                                             component={VerifyCollector}
                                           />
                                           <ProtectedRoute
+                                            exact
+                                            path={routes.VERIFY_CORRECTOR}
+                                            component={VerifyCorrector}
+                                          />
+                                          <ProtectedRoute
                                             path={routes.REVIEW_CERTIFICATE}
                                             component={ReviewCertificateAction}
                                           />
@@ -251,6 +258,17 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
+                                            path={routes.CERTIFICATE_CORRECTION}
+                                            component={CorrectionForm}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={
+                                              routes.CERTIFICATE_CORRECTION_REVIEW
+                                            }
+                                            component={CorrectionReviewForm}
+                                          />
+                                          <ProtectedRoute
                                             path={routes.SETTINGS}
                                             component={SettingsPage}
                                           />

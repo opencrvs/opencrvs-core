@@ -16,13 +16,20 @@ import {
   IFormField,
   IFormFieldMapping,
   IFormFieldMutationMapFunction,
-  IFormFieldQueryMapFunction
+  IFormFieldQueryMapFunction,
+  IFormSectionData,
+  IFormSection
 } from '@client/forms'
 import {
   getConditionalActionsForField,
-  getVisibleSectionGroupsBasedOnConditions
+  getVisibleSectionGroupsBasedOnConditions,
+  stringifyFieldValue,
+  isRadioGroupWithNestedField,
+  getSelectedRadioOptionWithNestedFields
 } from '@client/forms/utils'
 import { IApplication } from '@client/applications'
+import { hasFieldChanged } from '@client/views/CorrectionForm/utils'
+import { get } from 'lodash'
 
 const nestedFieldsMapping = (
   transformedData: TransformedData,
@@ -47,10 +54,102 @@ const nestedFieldsMapping = (
   }
 }
 
+export const transformRegistrationCorrection = (
+  section: IFormSection,
+  fieldDef: IFormField,
+  draftData: IFormData,
+  originalDraftData: IFormData,
+  transformedData: TransformedData,
+  nestedFieldDef: IFormField | null = null
+): void => {
+  if (!transformedData.registration) {
+    transformedData.registration = {}
+  }
+  if (!transformedData.registration.correction) {
+    transformedData.registration.correction = draftData.registration.correction
+      ? { ...(draftData.registration.correction as IFormSectionData) }
+      : {}
+  }
+  if (!transformedData.registration.correction.values) {
+    transformedData.registration.correction.values = []
+  }
+
+  if (nestedFieldDef) {
+    const valuePath = `${fieldDef.name}.nestedFields.${nestedFieldDef.name}`
+    const newFieldValue = get(draftData[section.id], valuePath)
+    const oldFieldValue = get(originalDraftData[section.id], valuePath)
+    if (newFieldValue !== oldFieldValue) {
+      transformedData.registration.correction.values.push({
+        section: section.id,
+        fieldName: valuePath,
+        newValue: stringifyFieldValue(
+          fieldDef,
+          newFieldValue,
+          draftData[section.id]
+        ),
+        oldValue: stringifyFieldValue(
+          fieldDef,
+          oldFieldValue,
+          originalDraftData[section.id]
+        )
+      })
+    }
+  } else if (isRadioGroupWithNestedField(fieldDef)) {
+    const selectedRadioOption = getSelectedRadioOptionWithNestedFields(
+      fieldDef,
+      draftData[section.id]
+    )
+    const selectedRadioOptionOld = getSelectedRadioOptionWithNestedFields(
+      fieldDef,
+      originalDraftData[section.id]
+    )
+
+    if (selectedRadioOption !== selectedRadioOptionOld) {
+      transformedData.registration.correction.values.push({
+        section: section.id,
+        fieldName: fieldDef.name,
+        newValue: selectedRadioOption,
+        oldValue: selectedRadioOptionOld
+      })
+    }
+
+    if (
+      selectedRadioOption &&
+      Array.isArray(fieldDef.nestedFields[selectedRadioOption])
+    ) {
+      for (const nestedFieldDef of fieldDef.nestedFields[selectedRadioOption]) {
+        transformRegistrationCorrection(
+          section,
+          fieldDef,
+          draftData,
+          originalDraftData,
+          transformedData,
+          nestedFieldDef
+        )
+      }
+    }
+  } else {
+    transformedData.registration.correction.values.push({
+      section: section.id,
+      fieldName: fieldDef.name,
+      newValue: stringifyFieldValue(
+        fieldDef,
+        draftData[section.id][fieldDef.name],
+        draftData[section.id]
+      ),
+      oldValue: stringifyFieldValue(
+        fieldDef,
+        originalDraftData[section.id][fieldDef.name],
+        originalDraftData[section.id]
+      )
+    })
+  }
+}
 export const draftToGqlTransformer = (
   formDefinition: IForm,
   draftData: IFormData,
-  draftId?: string
+  draftId?: string,
+  originalDraftData: IFormData = {}
 ) => {
   if (!formDefinition.sections) {
     throw new Error('Sections are missing in form definition')
@@ -94,6 +193,24 @@ export const draftToGqlTransformer = (
           )
           return
         }
+        if (Object.keys(originalDraftData).length) {
+          if (
+            hasFieldChanged(
+              fieldDef,
+              draftData[section.id],
+              originalDraftData[section.id]
+            )
+          ) {
+            transformRegistrationCorrection(
+              section,
+              fieldDef,
+              draftData,
+              originalDraftData,
+              transformedData
+            )
+          }
+        }
+
         if (
           draftData[section.id][fieldDef.name] !== null &&
           draftData[section.id][fieldDef.name] !== undefined &&

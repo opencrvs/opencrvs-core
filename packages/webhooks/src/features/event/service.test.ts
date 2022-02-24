@@ -60,8 +60,7 @@ const taskBundle = {
             valueString: ''
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '+260965656563'
           },
           {
@@ -267,8 +266,7 @@ const mosipBundle = {
             valueString: ''
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '+260965656563'
           },
           {
@@ -383,7 +381,8 @@ describe('Webhook transformBirthBundle for national id integration', () => {
       })
 
       const authHeader = {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
+        'x-correlation-id': '1'
       }
 
       const transformedBundle = await transformBirthBundle(

@@ -18,7 +18,7 @@ import { logger } from '@metrics/logger'
 export default function getPlugins() {
   const plugins: any[] = [
     JWT,
-    ...(process.env.NODE_ENV === 'TEST'
+    ...(process.env.NODE_ENV === 'test' || process.env.LOG_LEVEL === 'silent'
       ? []
       : [
           {

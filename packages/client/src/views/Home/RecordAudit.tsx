@@ -12,18 +12,22 @@
 
 import React from 'react'
 import { Header } from '@client/components/interface/Header/Header'
-import { Content } from '@opencrvs/components/lib/interface/Content'
 import { TableView } from '@opencrvs/components/lib/interface/TableView'
+import {
+  Content,
+  ContentSize
+} from '@opencrvs/components/lib/interface/Content'
 import { Navigation } from '@client/components/interface/Navigation'
 import { AvatarSmall } from '@client/components/Avatar'
 import styled, { ITheme, withTheme } from '@client/styledComponents'
-import { ApplicationIcon } from '@opencrvs/components/lib/icons'
+import { ApplicationIcon, Edit } from '@opencrvs/components/lib/icons'
 import { connect } from 'react-redux'
 import {
   goToApplicationDetails,
   goBack as goBackAction,
   goToRegistrarHomeTab,
-  goToPage
+  goToPage,
+  goToCertificateCorrection
 } from '@client/navigation'
 import { RouteComponentProps } from 'react-router'
 import {
@@ -32,7 +36,13 @@ import {
   WrappedComponentProps as IntlShapeProps,
   MessageDescriptor
 } from 'react-intl'
-import { IWorkqueue, IApplication, DOWNLOAD_STATUS } from '@client/applications'
+import {
+  IWorkqueue,
+  IApplication,
+  SUBMISSION_STATUS,
+  DOWNLOAD_STATUS,
+  clearCorrectionChange
+} from '@client/applications'
 import { IStoreState } from '@client/store'
 import {
   GQLEventSearchSet,
@@ -43,14 +53,24 @@ import {
 import moment from 'moment'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
-import { IFormSectionData, IContactPoint, Action } from '@client/forms'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import {
+  PrimaryButton,
+  ICON_ALIGNMENT,
+  TertiaryButton
+} from '@opencrvs/components/lib/buttons'
 import { constantsMessages, userMessages } from '@client/i18n/messages'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { getLanguage } from '@client/i18n/selectors'
 import { getIndividualNameObj, IAvatar } from '@client/utils/userUtils'
+import {
+  IFormSectionData,
+  IContactPoint,
+  CorrectionSection,
+  Action
+} from '@client/forms'
+import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -129,6 +149,8 @@ interface IDispatchProps {
   goBack: typeof goBackAction
   goToRegistrarHomeTab: typeof goToRegistrarHomeTab
   goToPage: typeof goToPage
+  clearCorrectionChange: typeof clearCorrectionChange
+  goToCertificateCorrection: typeof goToCertificateCorrection
 }
 
 type IFullProps = IDispatchProps &
@@ -636,12 +658,39 @@ const getHistory = (
 }
 
 export const ShowRecordAudit = (props: IFullProps) => {
+  const applicationId = props.match.params.applicationId
   let application: IApplicationData | null
   application = getSavedApplications(props)
   const isDownloaded = application ? true : false
   if (!isDownloaded) {
     application = getWQApplication(props)
   }
+
+  const actions = []
+  if (
+    isDownloaded &&
+    application &&
+    application.status === SUBMISSION_STATUS.REGISTERED
+  ) {
+    actions.push(
+      <TertiaryButton
+        id="btn-correct-record"
+        align={ICON_ALIGNMENT.LEFT}
+        icon={() => <Edit />}
+        onClick={() => {
+          props.clearCorrectionChange(applicationId)
+          props.goToCertificateCorrection(
+            applicationId,
+            CorrectionSection.Corrector
+          )
+        }}
+      >
+        {props.intl.formatMessage(correctionMessages.title)}
+      </TertiaryButton>
+    )
+  }
+
+  application && actions.push(downloadButton(application, props))
 
   return (
     <div id={'recordAudit'}>
@@ -652,7 +701,8 @@ export const ShowRecordAudit = (props: IFullProps) => {
           <Content
             title={application.name || 'No name provided'}
             titleColor={application.name ? 'copy' : 'grey600'}
-            size={'large'}
+            size={ContentSize.LARGE}
+            topActionButtons={actions}
             icon={() => (
               <ApplicationIcon
                 color={
@@ -660,7 +710,6 @@ export const ShowRecordAudit = (props: IFullProps) => {
                 }
               />
             )}
-            topActionButtons={[downloadButton(application, props)]}
           >
             {getApplicationInfo(props, application, isDownloaded)}
             {getHistory(application, props, isDownloaded)}
@@ -692,5 +741,7 @@ export const RecordAudit = connect<
   goToApplicationDetails,
   goBack: goBackAction,
   goToRegistrarHomeTab,
-  goToPage
+  goToPage,
+  clearCorrectionChange,
+  goToCertificateCorrection
 })(injectIntl(withTheme(ShowRecordAudit)))

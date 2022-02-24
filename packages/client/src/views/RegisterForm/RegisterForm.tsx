@@ -51,10 +51,12 @@ import {
   IFormSection,
   IFormSectionData,
   IFormSectionGroup,
-  IFormData
+  IFormData,
+  CorrectionSection
 } from '@client/forms'
 import {
   goBack as goBackAction,
+  goToCertificateCorrection,
   goToHome,
   goToHomeTab,
   goToPageGroup as goToPageGroupAction
@@ -70,9 +72,12 @@ import {
   getVisibleSectionGroupsBasedOnConditions,
   getVisibleGroupFields,
   hasFormError,
-  getSectionFields
+  getSectionFields,
+  getNextSectionIds,
+  VIEW_TYPE
 } from '@client/forms/utils'
 import { messages } from '@client/i18n/messages/views/register'
+import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { buttonMessages, formMessages } from '@client/i18n/messages'
 import {
   PAGE_TRANSITIONS_ENTER_TIME,
@@ -85,6 +90,7 @@ import {
 } from '@client/utils/constants'
 import { TimeMounted } from '@client/components/TimeMounted'
 import { getValueFromApplicationDataByKey } from '@client/pdfRenderer/transformer/utils'
+import { isCorrection } from '@client/views/CorrectionForm/utils'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -143,56 +149,6 @@ const ErrorText = styled.div`
   text-align: center;
   margin-top: 100px;
 `
-const VIEW_TYPE = {
-  FORM: 'form',
-  REVIEW: 'review',
-  PREVIEW: 'preview',
-  HIDDEN: 'hidden'
-}
-
-function getNextSectionIds(
-  sections: IFormSection[],
-  fromSection: IFormSection,
-  fromSectionGroup: IFormSectionGroup,
-  application: IApplication
-): { [key: string]: string } | null {
-  const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
-    fromSection,
-    application.data[fromSection.id] || {},
-    application.data
-  )
-  const currentGroupIndex = visibleGroups.findIndex(
-    (group: IFormSectionGroup) => group.id === fromSectionGroup.id
-  )
-
-  if (currentGroupIndex === visibleGroups.length - 1) {
-    const visibleSections = sections.filter(
-      (section) =>
-        section.viewType !== VIEW_TYPE.HIDDEN &&
-        getVisibleSectionGroupsBasedOnConditions(
-          section,
-          application.data[fromSection.id] || {},
-          application.data
-        ).length > 0
-    )
-
-    const currentIndex = visibleSections.findIndex(
-      (section: IFormSection) => section.id === fromSection.id
-    )
-    if (currentIndex === visibleSections.length - 1) {
-      return null
-    }
-
-    return {
-      sectionId: visibleSections[currentIndex + 1].id,
-      groupId: visibleSections[currentIndex + 1].groups[0].id
-    }
-  }
-  return {
-    sectionId: fromSection.id,
-    groupId: visibleGroups[currentGroupIndex + 1].id
-  }
-}
 
 export interface IFormProps {
   application: IApplication
@@ -210,6 +166,7 @@ export type RouteProps = RouteComponentProps<{
 type DispatchProps = {
   goToPageGroup: typeof goToPageGroupAction
   goBack: typeof goBackAction
+  goToCertificateCorrection: typeof goToCertificateCorrection
   goToHome: typeof goToHome
   goToHomeTab: typeof goToHomeTab
   writeApplication: typeof writeApplication
@@ -499,8 +456,35 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
   }
 
+  getEventTopBarPropsForCorrection = () => {
+    const { application, intl } = this.props
+
+    const backButton = (
+      <TertiaryButton
+        align={ICON_ALIGNMENT.LEFT}
+        icon={() => <BackArrow />}
+        onClick={() => {
+          this.props.goToCertificateCorrection(
+            application.id,
+            CorrectionSection.Corrector
+          )
+        }}
+      />
+    )
+
+    return {
+      title: intl.formatMessage(correctionMessages.title),
+      pageIcon: backButton,
+      goHome: () => this.props.goToHomeTab('review')
+    }
+  }
+
   getEventTopBarPropsForForm = (menuOption: IEventTopBarMenuAction) => {
     const { intl, application, activeSectionGroup, goToHomeTab } = this.props
+
+    if (isCorrection(application)) {
+      return this.getEventTopBarPropsForCorrection()
+    }
 
     let eventTopBarProps: IEventTopBarProps = {
       title: intl.formatMessage(messages.newVitalEventRegistration, {
@@ -547,7 +531,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
       fieldsToShowValidationErrors,
       application,
       registerForm,
-
       duplicate,
       activeSection,
       activeSectionGroup
@@ -622,32 +605,42 @@ class RegisterFormView extends React.Component<FullProps, State> {
               )}
               {activeSection.viewType === VIEW_TYPE.REVIEW && (
                 <>
-                  <EventTopBar
-                    title={intl.formatMessage(
-                      messages.newVitalEventRegistration,
-                      {
-                        event: application.event
+                  {isCorrection(application) ? (
+                    <EventTopBar {...this.getEventTopBarPropsForCorrection()} />
+                  ) : (
+                    <EventTopBar
+                      title={intl.formatMessage(
+                        messages.newVitalEventRegistration,
+                        {
+                          event: application.event
+                        }
+                      )}
+                      iconColor={
+                        application.submissionStatus === SUBMISSION_STATUS.DRAFT
+                          ? 'violet'
+                          : 'orange'
                       }
-                    )}
-                    iconColor={
-                      application.submissionStatus === SUBMISSION_STATUS.DRAFT
-                        ? 'violet'
-                        : 'orange'
-                    }
-                    saveAction={{
-                      handler: () =>
-                        this.props.goToHomeTab(
-                          this.getRedirectionTabOnSaveOrExit()
-                        ),
-                      label: intl.formatMessage(buttonMessages.exitButton)
-                    }}
-                  />
+                      saveAction={{
+                        handler: () =>
+                          this.props.goToHomeTab(
+                            this.getRedirectionTabOnSaveOrExit()
+                          ),
+                        label: intl.formatMessage(buttonMessages.exitButton)
+                      }}
+                    />
+                  )}
                   <ReviewSection
                     pageRoute={this.props.pageRoute}
                     draft={application}
                     rejectApplicationClickEvent={this.toggleRejectForm}
                     submitClickEvent={this.confirmSubmission}
                     onChangeReviewForm={this.modifyApplication}
+                    onContinue={() => {
+                      this.props.goToCertificateCorrection(
+                        this.props.application.id,
+                        CorrectionSection.SupportingDocuments
+                      )
+                    }}
                   />
                 </>
               )}
@@ -957,6 +950,7 @@ export const RegisterForm = connect<
   deleteApplication,
   goToPageGroup: goToPageGroupAction,
   goBack: goBackAction,
+  goToCertificateCorrection,
   goToHome,
   goToHomeTab,
   toggleDraftSavedNotification
