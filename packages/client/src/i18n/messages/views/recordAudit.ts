@@ -33,11 +33,6 @@ interface IRecordAuditMessages
   noInformant: MessageDescriptor
 }
 
-interface IDynamicUserMessages
-  extends Record<string | number | symbol, MessageDescriptor> {
-  [key: string]: MessageDescriptor
-}
-
 const messagesToDefine: IRecordAuditMessages = {
   status: {
     id: 'recordAudit.status',
@@ -130,5 +125,5 @@ const messagesToDefine: IRecordAuditMessages = {
     description: 'Label for informant not available'
   }
 }
-export const recordAuditMessages: IRecordAuditMessages | IDynamicUserMessages =
+export const recordAuditMessages: IRecordAuditMessages =
   defineMessages(messagesToDefine)

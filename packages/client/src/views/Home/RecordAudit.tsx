@@ -73,9 +73,6 @@ const BodyContainer = styled.div`
 const InfoContainer = styled.div`
   display: flex;
   margin-bottom: 16px;
-  &:last-child {
-    margin-bottom: 0px;
-  }
 `
 
 const KeyContainer = styled.div`
@@ -419,8 +416,8 @@ function RecordAuditBody({
   const actions = []
   if (
     isDownloaded &&
-    declaration &&
-    declaration.status === SUBMISSION_STATUS.REGISTERED
+    (declaration.status === SUBMISSION_STATUS.REGISTERED ||
+      declaration.status === SUBMISSION_STATUS.CERTIFIED)
   ) {
     actions.push(
       <TertiaryButton
