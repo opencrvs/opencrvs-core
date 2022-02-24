@@ -23,6 +23,7 @@ interface IRecordAuditMessages
   informant: MessageDescriptor
   brn: MessageDescriptor
   drn: MessageDescriptor
+  noName: MessageDescriptor
   noStatus: MessageDescriptor
   noType: MessageDescriptor
   noTrackingId: MessageDescriptor
@@ -88,6 +89,11 @@ const messagesToDefine: IRecordAuditMessages = {
     id: 'recordAudit.noStatus',
     defaultMessage: 'No status',
     description: 'Label for status not available'
+  },
+  noName: {
+    id: 'recordAudit.noName',
+    defaultMessage: 'No name provided',
+    description: 'Label for name not available'
   },
   noType: {
     id: 'recordAudit.noType',

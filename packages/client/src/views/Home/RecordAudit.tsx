@@ -94,12 +94,14 @@ const GreyedInfo = styled.div`
   max-width: 330px;
 `
 
+export type IRecordAuditTabs = keyof IQueryData | 'search'
+
 interface IStateProps {
   declarationId: string
   draft: IApplication | null
   language: string
   resources: IOfflineData
-  tab: keyof IQueryData | 'search'
+  tab: IRecordAuditTabs
   workqueueDeclaration: GQLEventSearchSet | null
 }
 
@@ -109,7 +111,7 @@ interface IDispatchProps {
 }
 
 type RouteProps = RouteComponentProps<{
-  tab: keyof IQueryData | 'search'
+  tab: IRecordAuditTabs
   declarationId: string
 }>
 
@@ -388,7 +390,7 @@ const getDeclarationInfo = (
               ) : isDownloaded ? (
                 intl.formatMessage(
                   recordAuditMessages[
-                    (`no${key[0].toUpperCase()}` + key.slice(1)) as string
+                    `no${key[0].toUpperCase()}${key.slice(1)}`
                   ]
                 )
               ) : (
@@ -435,13 +437,17 @@ function RecordAuditBody({
   }
   return (
     <Content
-      title={declaration.name || 'No name provided'}
+      title={declaration.name || intl.formatMessage(recordAuditMessages.noName)}
       titleColor={declaration.name ? 'copy' : 'grey600'}
       size={ContentSize.LARGE}
       topActionButtons={actions}
       icon={() => (
         <ApplicationIcon
-          color={STATUSTOCOLOR[(declaration && declaration.status) || 'DRAFT']}
+          color={
+            STATUSTOCOLOR[
+              (declaration && declaration.status) || SUBMISSION_STATUS.DRAFT
+            ]
+          }
         />
       )}
     >
@@ -475,15 +481,7 @@ function getBodyContent({
           }}
           fetchPolicy="no-cache"
         >
-          {({
-            loading,
-            error,
-            data
-          }: {
-            loading: any
-            error?: any
-            data: any
-          }) => {
+          {({ loading, error, data }) => {
             if (loading) {
               return <Loader id="search_loader" marginPercent={35} />
             } else if (error) {

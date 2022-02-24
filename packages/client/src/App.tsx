@@ -219,7 +219,6 @@ export class App extends React.Component<IAppProps> {
                                             component={ConfigHome}
                                           />
                                           <ProtectedRoute
-                                            exact
                                             path={
                                               routes.DECLARATION_RECORD_AUDIT
                                             }

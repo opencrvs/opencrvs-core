@@ -415,7 +415,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     testComponent.update()
 
     expect(window.location.href).toContain(
-      '/record-audit/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+      '/record-audit/approvalTab/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
   })
 })
@@ -518,7 +518,7 @@ describe('Tablet tests', () => {
     testComponent.update()
 
     expect(window.location.href).toContain(
-      '/record-audit/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+      '/record-audit/approvalTab/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
   })
 })

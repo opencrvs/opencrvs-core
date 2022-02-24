@@ -70,7 +70,7 @@ import {
 import moment from 'moment'
 import { stringify } from 'query-string'
 import { Cmd, loop } from 'redux-loop'
-import { IQueryData } from '@client/views/OfficeHome/OfficeHome'
+import { IRecordAuditTabs } from '@client/views/Home/RecordAudit'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -291,7 +291,7 @@ export function goToSearch() {
 }
 
 export function goToDeclarationRecordAudit(
-  tab: keyof IQueryData | 'search',
+  tab: IRecordAuditTabs,
   declarationId: string
 ) {
   return push(formatUrl(DECLARATION_RECORD_AUDIT, { tab, declarationId }))
