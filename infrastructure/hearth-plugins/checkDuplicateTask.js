@@ -35,7 +35,7 @@ module.exports = (mongo, fhirResources) => {
                   'http://opencrvs.org/specs/id/death-tracking-id'
             )
             if (!id) {
-              callback(null, null)
+              return callback(null, null)
             }
 
             const searchCtx = {

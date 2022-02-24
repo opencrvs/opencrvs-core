@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { RouteComponentProps } from 'react-router'
 import {
   RegisterForm,
   IFormProps,
@@ -34,7 +33,6 @@ export class ApplicationFormView extends React.Component<
   IFormProps & RouteProps
 > {
   render() {
-    console.log(this.props)
     return <RegisterForm {...this.props} />
   }
 }

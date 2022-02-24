@@ -11,6 +11,7 @@
  */
 import { IReviewFormState } from '@client/forms/register/reviewReducer'
 import { IStoreState } from '@client/store'
+import { Event } from '@client/forms'
 
 const getPartialState = (store: IStoreState): IReviewFormState =>
   store.reviewForm
@@ -19,6 +20,17 @@ function getKey<K extends keyof IReviewFormState>(store: IStoreState, key: K) {
   return getPartialState(store)[key]
 }
 
-export const getReviewForm = (
-  store: IStoreState
-): IReviewFormState['reviewForm'] => getKey(store, 'reviewForm')
+export const getReviewForm = (store: IStoreState) => {
+  const form = getKey(store, 'reviewForm')
+  if (!form) {
+    throw new Error(
+      'Selector called before data was ready. This should never happen'
+    )
+  }
+
+  return form
+}
+
+export const getEventReviewForm = (store: IStoreState, event: Event) => {
+  return getReviewForm(store)[event]
+}

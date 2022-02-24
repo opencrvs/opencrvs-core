@@ -282,7 +282,6 @@ function deserializeFormField(field: SerializedFormField) {
 export function deserializeFormSection(
   section: ISerializedFormSection
 ): IFormSection {
-  console.log(section)
   const mapping = {
     query:
       section.mapping &&

@@ -147,7 +147,10 @@ export const generateBirthRegPoint = async (
 
   const fields: IBirthRegistrationFields = {
     compositionId: composition.id,
-    ageInDays: (child.birthDate && getAgeInDays(child.birthDate)) || undefined
+    ageInDays:
+      (child.birthDate &&
+        getAgeInDays(child.birthDate, new Date(composition.date))) ||
+      undefined
   }
 
   const tags: IBirthRegistrationTags = {
@@ -185,12 +188,14 @@ export const generateDeathRegPoint = async (
   const fields: IDeathRegistrationFields = {
     compositionId: composition.id,
     ageInYears:
-      (deceased.birthDate && getAgeInYears(deceased.birthDate)) || undefined,
+      (deceased.birthDate &&
+        getAgeInYears(deceased.birthDate, new Date(composition.date))) ||
+      undefined,
     deathDays:
       (deceased.deceasedDateTime &&
         getDurationInDays(
           deceased.deceasedDateTime,
-          new Date().toISOString()
+          new Date(composition.date).toISOString()
         )) ||
       undefined
   }
@@ -229,7 +234,7 @@ const generatePointLocations = async (
   // tslint:disable-next-line no-increment-decrement
   for (let index = 4; index > 1; index--) {
     locationID = await fetchParentLocationByLocationID(locationID, authHeader)
-    if (!locationID) {
+    if (!locationID || locationID === 'Location/0') {
       break
     }
     locations[`locationLevel${index}`] = locationID

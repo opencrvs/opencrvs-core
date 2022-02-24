@@ -22,6 +22,16 @@ interface IProps extends React.HTMLAttributes<Element> {
 
 const AvatarImage = styled.img`
   border-radius: 50%;
+  /* border: solid 2px transparent; */
+  &:hover {
+    outline: 2px solid ${({ theme }) => theme.colors.grey300};
+  }
+  &:focus {
+    outline: 2px solid ${({ theme }) => theme.colors.yellow500};
+  }
+  &:active {
+    outline: 2px solid ${({ theme }) => theme.colors.grey300};
+  }
 `
 
 export function AvatarSmall({ name, avatar, ...props }: IProps) {
