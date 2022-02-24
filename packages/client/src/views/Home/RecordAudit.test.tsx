@@ -86,7 +86,7 @@ describe('Record audit summary for a draft birth declaration', () => {
   })
 })
 
-describe('Record audit summary for death declaration', () => {
+describe('Record audit summary for a draft death declaration', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {

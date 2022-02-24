@@ -12,7 +12,10 @@
 
 import React from 'react'
 import { Header } from '@client/components/interface/Header/Header'
-import { Content } from '@opencrvs/components/lib/interface/Content'
+import {
+  Content,
+  ContentSize
+} from '@opencrvs/components/lib/interface/Content'
 import { Navigation } from '@client/components/interface/Navigation'
 import styled from '@client/styledComponents'
 import { ApplicationIcon, Edit } from '@opencrvs/components/lib/icons'
@@ -437,7 +440,8 @@ function RecordAuditBody({
     <Content
       title={declaration.name || 'No name provided'}
       titleColor={declaration.name ? 'copy' : 'grey600'}
-      size={'large'}
+      size={ContentSize.LARGE}
+      topActionButtons={actions}
       icon={() => (
         <ApplicationIcon
           color={STATUSTOCOLOR[(declaration && declaration.status) || 'DRAFT']}
