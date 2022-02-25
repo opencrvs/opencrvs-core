@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "redis": "^3.1.1",
-    "@elastic/elasticsearch": "6",
+    "@elastic/elasticsearch": "7.17.0",
     "@graphql-tools/graphql-file-loader": "^6.0.9",
     "@graphql-tools/load": "^6.0.9",
     "@graphql-tools/schema": "^6.0.9",

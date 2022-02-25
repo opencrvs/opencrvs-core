@@ -26,7 +26,7 @@ import {
 import { messages } from '@client/i18n/messages/views/registrarHome'
 import moment from 'moment'
 import { connect } from 'react-redux'
-import { goToPage, goToApplicationRecordAudit } from '@client/navigation'
+import { goToPage, goToDeclarationRecordAudit } from '@client/navigation'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { formattedDuration } from '@client/utils/date-formatting'
 
@@ -47,7 +47,7 @@ interface IBaseProps {
 
 interface IDispatchProps {
   goToPage: typeof goToPage
-  goToApplicationRecordAudit: typeof goToApplicationRecordAudit
+  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
 }
 
 type IProps = IBaseProps & IntlShapeProps & IDispatchProps
@@ -91,7 +91,8 @@ function ExternalValidationTabComponent(props: IProps) {
         rowClickHandler: [
           {
             label: 'rowClickHandler',
-            handler: () => props.goToApplicationRecordAudit(reg.id)
+            handler: () =>
+              props.goToDeclarationRecordAudit('externalValidationTab', reg.id)
           }
         ]
       }
@@ -181,5 +182,5 @@ function ExternalValidationTabComponent(props: IProps) {
 
 export const ExternalValidationTab = connect(null, {
   goToPage,
-  goToApplicationRecordAudit
+  goToDeclarationRecordAudit
 })(injectIntl(withTheme(ExternalValidationTabComponent)))

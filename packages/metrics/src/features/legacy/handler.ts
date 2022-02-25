@@ -87,7 +87,8 @@ export async function generateLegacyMetricsHandler(
 ) {
   let result: any
   const authHeader = {
-    Authorization: request.headers.authorization
+    Authorization: request.headers.authorization,
+    'x-correlation-id': request.headers['x-correlation-id']
   }
   try {
     await query('DROP MEASUREMENT applications_started')
@@ -100,17 +101,15 @@ export async function generateLegacyMetricsHandler(
     throw new Error('Could not resolve values from search')
   }
   const totalPoints: IApplicationsStartedPoints[] = []
-  if (result.body.hits.total !== result.body.hits.hits.length) {
+  if (result.body.hits.total.value !== result.body.hits.hits.length) {
     throw new Error(
       'Not all results returned in search results.  Need to implement Elastic pagination for more than 10,000 records'
     )
   }
   const searchResults: ISearchResult[] = result.body.hits.hits
   for (const searchResult of searchResults) {
-    const points: IApplicationsStartedPoints = await generateApplicationStartedPoint(
-      searchResult,
-      authHeader
-    )
+    const points: IApplicationsStartedPoints =
+      await generateApplicationStartedPoint(searchResult, authHeader)
     totalPoints.push(points)
   }
   await writePoints(totalPoints)
@@ -186,7 +185,8 @@ export async function generateLegacyEventDurationHandler(
 ) {
   let result: any
   const authHeader = {
-    Authorization: request.headers.authorization
+    Authorization: request.headers.authorization,
+    'x-correlation-id': request.headers['x-correlation-id']
   }
   try {
     await query('DROP MEASUREMENT application_event_duration')
@@ -199,7 +199,7 @@ export async function generateLegacyEventDurationHandler(
     throw new Error('Could not resolve values from search')
   }
   let totalPoints: IDurationPoints[] = []
-  if (result.body.hits.total !== result.body.hits.hits.length) {
+  if (result.body.hits.total.value !== result.body.hits.hits.length) {
     throw new Error(
       'Not all results returned in search results.  Need to implement Elastic pagination for more than 10,000 records'
     )
@@ -248,8 +248,9 @@ async function generateEventDurationPoint(
             measurement: 'application_event_duration',
             tags,
             fields,
-            timestamp: `${parseInt(searchResult._source.createdAt, 10) *
-              1000000}`
+            timestamp: `${
+              parseInt(searchResult._source.createdAt, 10) * 1000000
+            }`
           }
         })) ||
     []

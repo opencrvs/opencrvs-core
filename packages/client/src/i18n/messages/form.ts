@@ -1521,7 +1521,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.app.phoneVerWarn'
   },
   placeOfBirth: {
-    defaultMessage: 'Place of delivery',
+    defaultMessage: 'Location',
     description: 'Label for form field: Place of delivery',
     id: 'form.field.label.placeOfBirth'
   },
