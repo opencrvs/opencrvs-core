@@ -245,7 +245,8 @@ export async function forwardToHearth(
   const requestOpts: RequestInit = {
     method: request.method,
     headers: {
-      'Content-Type': 'application/fhir+json'
+      'Content-Type': 'application/fhir+json',
+      'x-correlation-id': request.headers['x-correlation-id']
     }
   }
 
