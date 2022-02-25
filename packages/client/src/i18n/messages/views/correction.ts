@@ -63,6 +63,11 @@ interface ICorrectionMessages
 }
 
 const messagesToDefine: ICorrectionMessages = {
+  requestedCorrection: {
+    id: 'correction.request',
+    defaultMessage: 'Requested correction',
+    description: 'Status for application being requested for correction'
+  },
   whoRequestedCorrection: {
     id: 'correction.corrector.title',
     defaultMessage: 'Who is requesting a change to this record?',

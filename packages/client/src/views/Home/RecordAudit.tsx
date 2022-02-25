@@ -63,7 +63,11 @@ import {
 import { constantsMessages, userMessages } from '@client/i18n/messages'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { getLanguage } from '@client/i18n/selectors'
-import { getIndividualNameObj, IAvatar } from '@client/utils/userUtils'
+import {
+  getIndividualNameObj,
+  IAvatar,
+  IUserDetails
+} from '@client/utils/userUtils'
 import {
   IFormSectionData,
   IContactPoint,
@@ -137,6 +141,7 @@ const Heading = styled.h4`
 `
 
 interface IStateProps {
+  userDetails: IUserDetails | null
   language: string
   workqueue: IWorkqueue
   resources: IOfflineData
@@ -250,7 +255,7 @@ const APPLICATION_STATUS_LABEL: IStatus = {
   },
   VALIDATED: {
     id: 'constants.validated',
-    defaultMessage: 'validated',
+    defaultMessage: 'Validated',
     description: 'A label for validated'
   },
   REGISTERED: {
@@ -265,13 +270,18 @@ const APPLICATION_STATUS_LABEL: IStatus = {
   },
   REJECTED: {
     id: 'constants.rejected',
-    defaultMessage: 'rejected',
+    defaultMessage: 'Rejected',
     description: 'A label for rejected'
   },
   DOWNLOADED: {
     defaultMessage: 'Downloaded',
     description: 'Label for application download status Downloaded',
     id: 'constants.downloaded'
+  },
+  REQUESTED_CORRECTION: {
+    id: 'correction.request',
+    defaultMessage: 'Requested correction',
+    description: 'Status for application being requested for correction'
   }
 }
 
@@ -532,9 +542,63 @@ const getApplicationInfo = (
   )
 }
 
+const shouldShowReviewButton = (
+  application: IApplicationData,
+  role: string | undefined
+): boolean => {
+  if (null == role) {
+    return false
+  }
+
+  const reviewButtonRoleStatusMap: { [key: string]: string[] } = {
+    FIELD_AGENT: [
+      SUBMISSION_STATUS.REJECTED,
+      SUBMISSION_STATUS.FAILED,
+      SUBMISSION_STATUS.FAILED_NETWORK
+    ],
+    REGISTRATION_AGENT: [
+      SUBMISSION_STATUS.DECLARED,
+      SUBMISSION_STATUS.FAILED,
+      SUBMISSION_STATUS.FAILED_NETWORK
+    ],
+    DISTRICT_REGISTRAR: [
+      SUBMISSION_STATUS.DECLARED,
+      SUBMISSION_STATUS.FAILED,
+      SUBMISSION_STATUS.FAILED_NETWORK
+    ],
+    LOCAL_REGISTRAR: [
+      SUBMISSION_STATUS.DECLARED,
+      SUBMISSION_STATUS.FAILED,
+      SUBMISSION_STATUS.FAILED_NETWORK
+    ]
+  }
+
+  return reviewButtonRoleStatusMap[role].includes(application?.status as string)
+}
+
+const shouldShowUpdateButton = (props: IFullProps): boolean => {
+  const reviewButtonRoleStatusMap = {
+    FIELD_AGENT: [SUBMISSION_STATUS.DRAFT],
+    REGISTRATION_AGENT: [SUBMISSION_STATUS.DRAFT],
+    DISTRICT_REGISTRAR: [],
+    LOCAL_REGISTRAR: []
+  }
+  return false
+}
+
+const shouldShowDownloadButton = (props: IFullProps): boolean => {
+  const reviewButtonRoleStatusMap = {
+    FIELD_AGENT: [],
+    REGISTRATION_AGENT: [],
+    DISTRICT_REGISTRAR: [],
+    LOCAL_REGISTRAR: []
+  }
+  return false
+}
+
 const downloadButton = (application: IApplicationData, props: IFullProps) => {
   const { id, type } = application || {}
-  const { intl } = props
+  const { intl, userDetails } = props
 
   if (application == null || id == null || type == null) return <></>
 
@@ -558,7 +622,7 @@ const downloadButton = (application: IApplicationData, props: IFullProps) => {
       />
     )
   } else {
-    return (
+    return shouldShowReviewButton(application, userDetails?.role) ? (
       <ReviewButton
         key={id}
         id="myButton"
@@ -568,6 +632,8 @@ const downloadButton = (application: IApplicationData, props: IFullProps) => {
       >
         {intl.formatMessage(constantsMessages.review)}
       </ReviewButton>
+    ) : (
+      <></>
     )
   }
 }
@@ -722,6 +788,7 @@ export const ShowRecordAudit = (props: IFullProps) => {
 
 function mapStateToProps(state: IStoreState): IStateProps {
   return {
+    userDetails: state.profile.userDetails,
     language: getLanguage(state),
     workqueue: state.workqueueState.workqueue,
     resources: getOfflineData(state),
