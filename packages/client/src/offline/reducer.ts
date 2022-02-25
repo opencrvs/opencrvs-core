@@ -94,6 +94,10 @@ export interface IOfflineData {
   assets: {
     logo: string
   }
+  certificateSvg: {
+    birth: string
+    death: string
+  }
   config: IApplicationConfig
 }
 
@@ -306,17 +310,11 @@ function reducer(
 
       const newOfflineData = {
         ...state.offlineData,
-        config: action.payload.config
-        // templates: {
-        //   certificates: {
-        //     birth: {
-        //       definition: certificatesTemplates.birth.svgCode
-        //     },
-        //     death: {
-        //       definition: certificatesTemplates.birth.svgCode
-        //     }
-        //   }
-        // }
+        config: action.payload.config,
+        certificateSvg: {
+          birth: certificatesTemplates.birth.svgCode,
+          death: certificatesTemplates.death.svgCode
+        }
       }
 
       return {

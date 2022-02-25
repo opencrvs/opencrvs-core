@@ -15,7 +15,11 @@ import { IApplication } from '@client/applications'
 import { IUserDetails } from '@opencrvs/client/src/utils/userUtils'
 import { Event } from '@client/forms'
 import { IOfflineData } from '@client/offline/reducer'
-import { OptionalData } from '@client/pdfRenderer/transformer/types'
+import {
+  OptionalData,
+  IPDFTemplate
+} from '@client/pdfRenderer/transformer/types'
+import { Content } from 'pdfmake/interfaces'
 
 export function printMoneyReceipt(
   intl: IntlShape,
@@ -51,9 +55,7 @@ export async function previewCertificate(
   }
 
   await createPDF(
-    application.event === Event.BIRTH
-      ? offlineResource.templates.certificates.birth
-      : offlineResource.templates.certificates.death,
+    getPDFTemplateWithSVG(offlineResource, application.event),
     application,
     userDetails,
     offlineResource,
@@ -75,13 +77,46 @@ export function printCertificate(
     throw new Error('No user details found')
   }
   printPDF(
-    application.event === Event.BIRTH
-      ? offlineResource.templates.certificates.birth
-      : offlineResource.templates.certificates.death,
+    getPDFTemplateWithSVG(offlineResource, application.event),
     application,
     userDetails,
     offlineResource,
     intl,
     optionalData
+  )
+}
+
+function getPDFTemplateWithSVG(
+  offlineResource: IOfflineData,
+  event: Event
+): IPDFTemplate {
+  let template: IPDFTemplate
+  let svg: string
+
+  if (event === Event.BIRTH) {
+    template = offlineResource.templates.certificates.birth
+    svg = offlineResource.certificateSvg.birth
+  } else {
+    template = offlineResource.templates.certificates.death
+    svg = offlineResource.certificateSvg.death
+  }
+
+  updatePDFTemplateWithSVGContent(template, svg)
+  return template
+}
+
+function updatePDFTemplateWithSVGContent(template: IPDFTemplate, svg: string) {
+  if (hasTemplateEmptyArrayContent(template)) {
+    ;(template.definition.content as Array<Content>).push({
+      svg
+    })
+  }
+}
+
+function hasTemplateEmptyArrayContent(template: IPDFTemplate): boolean {
+  return Boolean(
+    template?.definition?.content &&
+      Array.isArray(template.definition.content) &&
+      template.definition.content.length === 0
   )
 }
