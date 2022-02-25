@@ -345,12 +345,7 @@ function reducer(
           ...state.offlineData,
           languages: action.payload.languages,
           forms: action.payload.forms,
-          templates: {
-            certificates: {
-              birth: action.payload.templates.certificates.birth,
-              death: action.payload.templates.certificates.death
-            }
-          }
+          templates: action.payload.templates
         }
       }
     }
