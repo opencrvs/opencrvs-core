@@ -81,3 +81,35 @@ export const FETCH_REGISTRATION_BY_COMPOSITION = gql`
     }
   }
 `
+export const FETCH_DECLARATION_SHORT_INFO = gql`
+  query data($id: ID!) {
+    fetchRegistration(id: $id) {
+      id
+      registration {
+        type
+        trackingId
+        status {
+          type
+        }
+      }
+      ... on BirthRegistration {
+        child {
+          name {
+            use
+            firstNames
+            familyName
+          }
+        }
+      }
+      ... on DeathRegistration {
+        deceased {
+          name {
+            use
+            firstNames
+            familyName
+          }
+        }
+      }
+    }
+  }
+`
