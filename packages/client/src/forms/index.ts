@@ -79,7 +79,9 @@ export enum Action {
   REJECT_APPLICATION = 'reject',
   ARCHIVE_APPLICATION = 'archive',
   LOAD_REVIEW_APPLICATION = 'load application data for review',
-  LOAD_CERTIFICATE_APPLICATION = 'load application data for certificate collection'
+  LOAD_CERTIFICATE_APPLICATION = 'load application data for certificate collection',
+  LOAD_REQUESTED_CORRECTION_APPLICATION = 'load application data for which is requested correction',
+  REQUEST_CORRECTION_APPLICATION = 'request correction'
 }
 
 export interface ISelectOption {
@@ -101,6 +103,7 @@ export interface IDynamicOptions {
   jurisdictionType?: string
   resource?: string
   options?: { [key: string]: ISelectOption[] }
+  initialValue?: string
 }
 
 export interface IDispatchOptions {
@@ -807,19 +810,31 @@ export enum DeathSection {
   DeathDocuments = 'documents',
   Preview = 'preview'
 }
+
 export enum UserSection {
   User = 'user',
   Preview = 'preview'
 }
+
 export enum CertificateSection {
   Collector = 'collector',
   CollectCertificate = 'collectCertificate',
   CollectDeathCertificate = 'collectDeathCertificate',
   CertificatePreview = 'certificatePreview'
 }
+
+export enum CorrectionSection {
+  Corrector = 'corrector',
+  Reason = 'reason',
+  SupportingDocuments = 'supportingDocuments',
+  CorrectionFeesPayment = 'currectionFeesPayment',
+  Summary = 'summary'
+}
+
 export enum PaymentSection {
   Payment = 'payment'
 }
+
 export enum ReviewSection {
   Review = 'review'
 }
@@ -835,11 +850,13 @@ export type Section =
   | DeathSection
   | UserSection
   | CertificateSection
+  | CorrectionSection
   | InformantSection
 
 export interface IFormSection {
   id: Section
   viewType: ViewType
+  replaceable?: boolean
   name: MessageDescriptor
   title: MessageDescriptor
   groups: IFormSectionGroup[]
@@ -926,6 +943,7 @@ export interface Ii18nRadioGroupFormField extends Ii18nFormFieldBase {
   options: RadioComponentOption[]
   size?: RadioSize
   notice?: string
+  flexDirection?: string
 }
 
 export interface Ii18nRadioGroupWithNestedFieldsFormField

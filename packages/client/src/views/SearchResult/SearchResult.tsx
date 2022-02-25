@@ -23,10 +23,10 @@ import {
 } from '@client/i18n/messages'
 import { messages as registrarHomeMessages } from '@client/i18n/messages/views/registrarHome'
 import { messages as rejectMessages } from '@client/i18n/messages/views/reject'
-import { messages as archiveMessages } from '@client/i18n/messages/views/recordAudit'
+import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import { messages } from '@client/i18n/messages/views/search'
 import {
-  goToApplicationDetails,
+  goToDeclarationRecordAudit,
   goToEvents as goToEventsAction,
   goToPage as goToPageAction,
   goToPrintCertificate as goToPrintCertificateAction,
@@ -133,7 +133,7 @@ interface IBaseSearchResultProps {
   goToPage: typeof goToPageAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   goToPrintCertificate: typeof goToPrintCertificateAction
-  goToApplicationDetails: typeof goToApplicationDetails
+  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
 }
 
 interface IMatchParams {
@@ -262,7 +262,7 @@ export class SearchResultView extends React.Component<
   getDeclarationStatusLabel = (status: string) => {
     switch (status) {
       case 'ARCHIVED':
-        return this.props.intl.formatMessage(archiveMessages.archived)
+        return this.props.intl.formatMessage(recordAuditMessages.archived)
       case 'IN_PROGRESS':
         return this.props.intl.formatMessage(registrarHomeMessages.inProgress)
       case 'DECLARED':
@@ -285,6 +285,10 @@ export class SearchResultView extends React.Component<
         )
       case 'CERTIFIED':
         return this.props.intl.formatMessage(registrarHomeMessages.certified)
+      case 'REQUESTED_CORRECTION':
+        return this.props.intl.formatMessage(
+          registrarHomeMessages.requestedCorrection
+        )
       default:
         return this.props.intl.formatMessage(
           registrarHomeMessages.readyForReview
@@ -324,6 +328,8 @@ export class SearchResultView extends React.Component<
         (foundApplication && foundApplication.downloadStatus) || undefined
 
       const applicationIsArchived = reg.declarationStatus === 'ARCHIVED'
+      const applicationIsRequestedCorrection =
+        reg.declarationStatus === 'REQUESTED_CORRECTION'
       const applicationIsRegistered = reg.declarationStatus === 'REGISTERED'
       const applicationIsCertified = reg.declarationStatus === 'CERTIFIED'
       const applicationIsRejected = reg.declarationStatus === 'REJECTED'
@@ -345,6 +351,8 @@ export class SearchResultView extends React.Component<
                 action:
                   ((applicationIsRegistered || applicationIsCertified) &&
                     Action.LOAD_CERTIFICATE_APPLICATION) ||
+                  (applicationIsRequestedCorrection &&
+                    Action.LOAD_REQUESTED_CORRECTION_APPLICATION) ||
                   Action.LOAD_REVIEW_APPLICATION
               }}
               status={downloadStatus as DOWNLOAD_STATUS}
@@ -426,7 +434,7 @@ export class SearchResultView extends React.Component<
             handler: () =>
               isDuplicate
                 ? this.props.goToReviewDuplicate(reg.id)
-                : this.props.goToApplicationDetails(reg.id)
+                : this.props.goToDeclarationRecordAudit('search', reg.id)
           }
         ]
       }
@@ -569,6 +577,6 @@ export const SearchResult = connect(
     goToPage: goToPageAction,
     goToReviewDuplicate: goToReviewDuplicateAction,
     goToPrintCertificate: goToPrintCertificateAction,
-    goToApplicationDetails
+    goToDeclarationRecordAudit
   }
 )(injectIntl(withTheme(SearchResultView)))

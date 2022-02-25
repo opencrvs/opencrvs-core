@@ -1,0 +1,146 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+# graphic logo are (registered/a) trademark(s) of Plan International.
+version: '3.3'
+
+services:
+  gateway:
+    environment:
+      - NODE_ENV=production
+
+  workflow:
+    environment:
+      - NODE_ENV=production
+
+  search:
+    environment:
+      - NODE_ENV=production
+
+  metrics:
+    environment:
+      - NODE_ENV=production
+
+  auth:
+    environment:
+      - NODE_ENV=production
+
+  user-mgnt:
+    environment:
+      - NODE_ENV=production
+      - MONGO_URL=mongodb://mongo1,mongo2,mongo3,mongo4,mongo5/user-mgnt?replicaSet=rs0
+
+  notification:
+    environment:
+      - NODE_ENV=production
+
+  webhooks:
+    environment:
+      - MONGO_URL=mongodb://mongo1,mongo2,mongo3,mongo4,mongo5/webhooks?replicaSet=rs0
+      - NODE_ENV=production
+
+  config:
+    environment:
+      - NODE_ENV=production
+      - MONGO_URL=mongodb://mongo1,mongo2,mongo3,mongo4,mongo5/application-config?replicaSet=rs0
+
+  hearth:
+    environment:
+      - mongodb__url=mongodb://mongo1,mongo2,mongo3,mongo4,mongo5/hearth-dev?replicaSet=rs0
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+
+  openhim-core:
+    environment:
+      - mongo_url=mongodb://mongo1,mongo2,mongo3,mongo4,mongo5/openhim-dev?replicaSet=rs0
+      - mongo_atnaUrl=mongodb://mongo1,mongo2,mongo3,mongo4,mongo5/openhim-dev?replicaSet=rs0
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+
+  mongo2:
+    image: mongo:3.6
+    hostname: 'mongo2'
+    container_name: 'mongo2'
+    restart: unless-stopped
+    command: --replSet rs0
+    volumes:
+      - '/data/mongo:/data/db'
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.data2 == true
+    networks:
+      - overlay_net
+
+  mongo3:
+    image: mongo:3.6
+    hostname: 'mongo3'
+    container_name: 'mongo3'
+    restart: unless-stopped
+    command: --replSet rs0
+    volumes:
+      - '/data/mongo:/data/db'
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.data3 == true
+    networks:
+      - overlay_net
+
+  mongo4:
+    image: mongo:3.6
+    hostname: 'mongo4'
+    container_name: 'mongo4'
+    restart: unless-stopped
+    command: --replSet rs0
+    volumes:
+      - '/data/mongo:/data/db'
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.data3 == true
+    networks:
+      - overlay_net
+
+  mongo5:
+    image: mongo:3.6
+    hostname: 'mongo5'
+    container_name: 'mongo5'
+    restart: unless-stopped
+    command: --replSet rs0
+    volumes:
+      - '/data/mongo:/data/db'
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.data3 == true
+    networks:
+      - overlay_net
+
+  mongo-rs-init:
+    image: mongo:3.6
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+      - mongo4
+      - mongo5
+    command: bash -c 'sleep 20; mongo --host mongo1 --eval "rs.initiate({_id:\"rs0\",members:[{_id:0,host:\"mongo1:27017\"},{_id:1,host:\"mongo2:27017\"},{_id:2,host:\"mongo3:27017\"},{_id:3,host:\"mongo4:27017\"},{_id:4,host:\"mongo5:27017\"}]})"'
+    deploy:
+      restart_policy:
+        condition: none
+    networks:
+      - overlay_net

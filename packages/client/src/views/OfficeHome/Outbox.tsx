@@ -52,7 +52,9 @@ class Outbox extends React.Component<IFullProps, IState> {
       statusRejecting,
       statusWaitingToSubmit,
       statusSubmitting,
-      waitingToRetry
+      waitingToRetry,
+      statusRequestingCorrection,
+      statusWaitingToRequestCorrection
     } = messages
 
     let icon: () => React.ReactNode
@@ -70,6 +72,11 @@ class Outbox extends React.Component<IFullProps, IState> {
         icon = () => <StatusWaiting id={iconId} key={iconId} />
         statusText = formatMessage(statusWaitingToValidate)
         break
+      case SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION:
+        iconId = `waiting${index}`
+        icon = () => <StatusWaiting id={iconId} key={iconId} />
+        statusText = formatMessage(statusWaitingToRequestCorrection)
+        break
       case SUBMISSION_STATUS.APPROVING:
         iconId = `registering${index}`
         icon = () => <Spinner id={iconId} key={iconId} size={24} />
@@ -84,6 +91,11 @@ class Outbox extends React.Component<IFullProps, IState> {
         iconId = `registering${index}`
         icon = () => <Spinner id={iconId} key={iconId} size={24} />
         statusText = formatMessage(statusRegistering)
+        break
+      case SUBMISSION_STATUS.REQUESTING_CORRECTION:
+        iconId = `requestingCorrection${index}`
+        icon = () => <Spinner id={iconId} key={iconId} size={24} />
+        statusText = formatMessage(statusRequestingCorrection)
         break
       case SUBMISSION_STATUS.READY_TO_REJECT:
         iconId = `waiting${index}`

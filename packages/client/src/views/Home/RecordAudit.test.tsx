@@ -16,7 +16,9 @@ import {
   mockApplicationData,
   createRouterProps,
   registerScopeToken,
-  getItem
+  getItem,
+  flushPromises,
+  mockDeathApplicationData
 } from '@client/tests/util'
 import { RecordAudit } from './RecordAudit'
 import { createStore } from '@client/store'
@@ -29,16 +31,18 @@ import {
 } from '@client/applications'
 import { Event } from '@client/forms'
 import { formatUrl } from '@client/navigation'
-import { APPLICATION_RECORD_AUDIT } from '@client/navigation/routes'
+import { DECLARATION_RECORD_AUDIT } from '@client/navigation/routes'
 import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
 import { checkAuth } from '@client/profile/profileActions'
+import { FETCH_DECLARATION_SHORT_INFO } from './queries'
+import { waitForElement } from '@client/tests/wait-for-element'
 
-const application: IApplication = createApplication(
+const declaration: IApplication = createApplication(
   Event.BIRTH,
   mockApplicationData
 )
-application.data.registration = {
-  ...application.data.registration,
+declaration.data.registration = {
+  ...declaration.data.registration,
   presentAtBirthRegistration: 'MOTHER',
   contactPoint: {
     value: 'MOTHER',
@@ -46,22 +50,24 @@ application.data.registration = {
   }
 }
 
-describe('Record audit summary for applicationState', () => {
+describe('Record audit summary for a draft birth declaration', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
     const { store, history } = createStore()
-    store.dispatch(storeApplication(application))
+    store.dispatch(storeApplication(declaration))
     component = await createTestComponent(
       <RecordAudit
         {...createRouterProps(
-          formatUrl(APPLICATION_RECORD_AUDIT, {
-            applicationId: application.id
+          formatUrl(DECLARATION_RECORD_AUDIT, {
+            tab: 'inProgressTab',
+            declarationId: declaration.id
           }),
           { isNavigatedInsideApp: false },
           {
             matchParams: {
-              applicationId: application.id
+              tab: 'inProgressTab',
+              declarationId: declaration.id
             }
           }
         )}
@@ -71,10 +77,10 @@ describe('Record audit summary for applicationState', () => {
   })
 
   it('Record Audit page loads properly', async () => {
-    expect(component.find('#recordAudit').hostNodes()).toHaveLength(1)
-    expect(component.find('#summary').length).toEqual(14)
+    expect(component.exists('RecordAuditBody')).toBeTruthy()
   })
-  it('Check values for saved applications', async () => {
+
+  it('Check values for saved declarations', async () => {
     expect(component.find('#status_value').hostNodes().text()).toBe('Draft')
     expect(component.find('#type_value').hostNodes().text()).toBe('Birth')
     expect(component.find('#brn_value').hostNodes().text()).toBe(
@@ -84,7 +90,52 @@ describe('Record audit summary for applicationState', () => {
   })
 })
 
-describe('Record audit summary for WorkQueue Applications', () => {
+describe('Record audit summary for a draft death declaration', () => {
+  let component: ReactWrapper<{}, {}>
+
+  beforeEach(async () => {
+    const { store, history } = createStore()
+    const deathApplication = createApplication(
+      Event.DEATH,
+      mockDeathApplicationData
+    )
+
+    store.dispatch(storeApplication(deathApplication))
+    component = await createTestComponent(
+      <RecordAudit
+        {...createRouterProps(
+          formatUrl(DECLARATION_RECORD_AUDIT, {
+            tab: 'inProgressTab',
+            declarationId: deathApplication.id
+          }),
+          { isNavigatedInsideApp: false },
+          {
+            matchParams: {
+              tab: 'inProgressTab',
+              declarationId: deathApplication.id
+            }
+          }
+        )}
+      />,
+      { store, history }
+    )
+  })
+
+  it('Record Audit page loads properly', async () => {
+    expect(component.exists('RecordAuditBody')).toBeTruthy()
+  })
+
+  it('Check values for saved applications', async () => {
+    expect(component.find('#status_value').hostNodes().text()).toBe('Draft')
+    expect(component.find('#type_value').hostNodes().text()).toBe('Death')
+    expect(component.find('#drn_value').hostNodes().text()).toBe(
+      '201908122365DDSS0SE1'
+    )
+    expect(component.find('#placeOfDeath_value').hostNodes()).toHaveLength(1)
+  })
+})
+
+describe('Record audit summary for WorkQueue declarations', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
@@ -140,13 +191,15 @@ describe('Record audit summary for WorkQueue Applications', () => {
     component = await createTestComponent(
       <RecordAudit
         {...createRouterProps(
-          formatUrl(APPLICATION_RECORD_AUDIT, {
-            applicationId: 'db097901-feba-4f71-a1ae-d3d46289d2d5'
+          formatUrl(DECLARATION_RECORD_AUDIT, {
+            tab: 'inProgressTab',
+            declarationId: 'db097901-feba-4f71-a1ae-d3d46289d2d5'
           }),
           { isNavigatedInsideApp: false },
           {
             matchParams: {
-              applicationId: 'db097901-feba-4f71-a1ae-d3d46289d2d5'
+              tab: 'inProgressTab',
+              declarationId: 'db097901-feba-4f71-a1ae-d3d46289d2d5'
             }
           }
         )}
@@ -156,11 +209,10 @@ describe('Record audit summary for WorkQueue Applications', () => {
   })
 
   it('Record Audit page loads properly', async () => {
-    expect(component.find('#recordAudit').hostNodes()).toHaveLength(1)
-    expect(component.find('#summary').length).toEqual(12)
+    expect(component.exists('RecordAuditBody')).toBeTruthy()
   })
 
-  it('Check values for WQ applications', async () => {
+  it('Check values for WQ declarations', async () => {
     expect(component.find('#status_value').hostNodes().text()).toBe('Draft')
     expect(component.find('#type_value').hostNodes().text()).toBe('Birth')
     expect(component.find('#content-name').hostNodes().text()).toBe(
@@ -171,7 +223,7 @@ describe('Record audit summary for WorkQueue Applications', () => {
   })
 })
 
-describe('Record audit', () => {
+describe('Record audit for a draft declaration', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
@@ -179,21 +231,25 @@ describe('Record audit', () => {
 
     getItem.mockReturnValue(registerScopeToken)
 
-    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
-    application.submissionStatus = SUBMISSION_STATUS.DECLARED
-    store.dispatch(storeApplication(application))
+    await flushPromises()
+
+    declaration.submissionStatus = SUBMISSION_STATUS.DECLARED
+    store.dispatch(storeApplication(declaration))
 
     component = await createTestComponent(
       <RecordAudit
         {...createRouterProps(
-          formatUrl(APPLICATION_RECORD_AUDIT, {
-            applicationId: application.id
+          formatUrl(DECLARATION_RECORD_AUDIT, {
+            declarationId: declaration.id,
+            tab: 'reviewTab'
           }),
           { isNavigatedInsideApp: false },
           {
             matchParams: {
-              applicationId: application.id
+              declarationId: declaration.id,
+              tab: 'reviewTab'
             }
           }
         )}
@@ -219,10 +275,135 @@ describe('Record audit', () => {
 
     component.update()
 
-    component.find('#cancel-btn').hostNodes().simulate('click')
+    component.find('#archive_cancel').hostNodes().simulate('click')
 
     component.update()
 
     expect(component.find('ResponsiveModal').prop('show')).toBe(false)
+  })
+})
+
+describe('Record audit summary for GQLQuery', () => {
+  let component: ReactWrapper<{}, {}>
+
+  beforeEach(async () => {
+    const { store, history } = createStore()
+
+    const mocks = [
+      {
+        request: {
+          query: FETCH_DECLARATION_SHORT_INFO,
+          variables: {
+            id: '956281c9-1f47-4c26-948a-970dd23c4094'
+          }
+        },
+        result: {
+          data: {
+            fetchRegistration: {
+              id: '956281c9-1f47-4c26-948a-970dd23c4094',
+              registration: {
+                type: 'DEATH',
+                trackingId: 'DG6PECX',
+                status: [
+                  {
+                    type: 'REGISTERED'
+                  }
+                ]
+              },
+              deceased: {
+                name: [
+                  {
+                    use: 'bn',
+                    firstNames: 'ক ম আব্দুল্লাহ আল আমিন ',
+                    familyName: 'খান'
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    ]
+
+    component = await createTestComponent(
+      <RecordAudit
+        {...createRouterProps(
+          formatUrl(DECLARATION_RECORD_AUDIT, {
+            tab: 'search',
+            declarationId: '956281c9-1f47-4c26-948a-970dd23c4094'
+          }),
+          { isNavigatedInsideApp: false },
+          {
+            matchParams: {
+              tab: 'search',
+              declarationId: '956281c9-1f47-4c26-948a-970dd23c4094'
+            }
+          }
+        )}
+      />,
+      { store, history, graphqlMocks: mocks }
+    )
+
+    await flushPromises()
+    component.update()
+    await waitForElement(component, 'RecordAuditBody')
+  })
+
+  it('Record Audit page loads properly', async () => {
+    expect(component.exists('RecordAuditBody')).toBeTruthy()
+  })
+
+  it('Check values for GQL declarations', async () => {
+    expect(component.find('#status_value').hostNodes().text()).toBe(
+      'Registered'
+    )
+    expect(component.find('#type_value').hostNodes().text()).toBe('Death')
+    expect(component.find('#placeOfBirth_grey').hostNodes()).toHaveLength(0)
+    expect(component.find('#placeOfDeath_grey').hostNodes()).toHaveLength(1)
+  })
+})
+
+describe('Record audit summary for unsuccesful GQLQuery', () => {
+  let component: ReactWrapper<{}, {}>
+
+  beforeEach(async () => {
+    const { store, history } = createStore()
+
+    const mocks = [
+      {
+        request: {
+          query: FETCH_DECLARATION_SHORT_INFO,
+          variables: {
+            id: '956281c9-1f47-4c26-948a-970dd23c4094'
+          }
+        }
+      }
+    ]
+
+    component = await createTestComponent(
+      <RecordAudit
+        {...createRouterProps(
+          formatUrl(DECLARATION_RECORD_AUDIT, {
+            tab: 'search',
+            declarationId: '956281c9-1f47-4c26-948a-970dd23c4094'
+          }),
+          { isNavigatedInsideApp: false },
+          {
+            matchParams: {
+              tab: 'search',
+              declarationId: '956281c9-1f47-4c26-948a-970dd23c4094'
+            }
+          }
+        )}
+      />,
+      { store, history, graphqlMocks: mocks }
+    )
+
+    await flushPromises()
+    component.update()
+  })
+
+  it('Redirect to home page', async () => {
+    expect(window.location.href).not.toContain('/record-audit')
   })
 })
