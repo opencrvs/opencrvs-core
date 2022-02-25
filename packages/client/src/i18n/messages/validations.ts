@@ -238,8 +238,8 @@ const messagesToDefine: IValidationMessages = {
     id: 'validations.validNationalIDLengths'
   },
   duplicateNationalID: {
-    defaultMessage: 'Natioal ID must be unique',
-    description: 'Nid valid lengths',
+    defaultMessage: 'National ID must be unique',
+    description: 'Unique Nid validation',
     id: 'validations.duplicateNationalID'
   },
   validPassportNumber: {
