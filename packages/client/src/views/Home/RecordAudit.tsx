@@ -545,12 +545,14 @@ function RecordAuditBody({
 }
 
 function getBodyContent({
+  archiveDeclaration,
   clearCorrectionChange,
   declarationId,
   draft,
   intl,
   language,
   goToCertificateCorrection,
+  goToRegistrarHomeTab,
   scope,
   tab,
   resources,

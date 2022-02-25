@@ -11,9 +11,10 @@
  */
 import * as React from 'react'
 
-export const ApplicationIcon = (
-  props: React.HTMLAttributes<SVGElement> & { isArchive?: boolean }
-) => {
+export const ApplicationIcon = ({
+  isArchive,
+  ...props
+}: React.HTMLAttributes<SVGElement> & { isArchive?: boolean }) => {
   let fill: string
   let corner: string
 
@@ -48,7 +49,7 @@ export const ApplicationIcon = (
         d="M0 5a1 1 0 0 1 1-1h9.804L18 11.209V27a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V5z"
         fill={fill}
       />
-      {props.isArchive && (
+      {isArchive && (
         <path
           transform="translate(3.75,15) scale(.60)"
           fillRule="evenodd"
