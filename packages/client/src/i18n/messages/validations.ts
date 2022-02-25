@@ -43,6 +43,7 @@ interface IValidationMessages
   validDeathRegistrationNumber: MessageDescriptor
   validNationalId: MessageDescriptor
   validNationalIDLengths: MessageDescriptor
+  duplicateNationalID: MessageDescriptor
   validPassportNumber: MessageDescriptor
   phoneNumberNotValid: MessageDescriptor
   validDrivingLicenseNumber: MessageDescriptor
@@ -235,6 +236,11 @@ const messagesToDefine: IValidationMessages = {
     defaultMessage: '10 or 17',
     description: 'Nid valid lengths',
     id: 'validations.validNationalIDLengths'
+  },
+  duplicateNationalID: {
+    defaultMessage: 'Natioal ID must be unique',
+    description: 'Nid valid lengths',
+    id: 'validations.duplicateNationalID'
   },
   validPassportNumber: {
     defaultMessage:
