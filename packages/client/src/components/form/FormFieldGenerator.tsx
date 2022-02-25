@@ -195,6 +195,7 @@ type GeneratedInputFieldProps = {
   error: string
   draftData?: IFormData
   disabled?: boolean
+  toggleFileUploading?: (isUploading: boolean) => void
 } & IDispatchProps
 
 function GeneratedInputField({
@@ -210,7 +211,8 @@ function GeneratedInputField({
   nestedFields,
   draftData,
   disabled,
-  dynamicDispatch
+  dynamicDispatch,
+  toggleFileUploading
 }: GeneratedInputFieldProps) {
   const inputFieldProps = {
     id: fieldDefinition.name,
@@ -239,7 +241,6 @@ function GeneratedInputField({
     touched: Boolean(touched),
     placeholder: fieldDefinition.placeholder
   }
-
   if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
     return (
       <InputField {...inputFieldProps}>
@@ -263,6 +264,7 @@ function GeneratedInputField({
     )
   }
   if (fieldDefinition.type === DOCUMENT_UPLOADER_WITH_OPTION) {
+    // sdfgsdfgsdfgsdfgsdfgsdfg
     return (
       <DocumentUploaderWithOption
         name={fieldDefinition.name}
@@ -275,10 +277,13 @@ function GeneratedInputField({
         onComplete={(files: IFileValue[]) =>
           onSetFieldValue(fieldDefinition.name, files)
         }
+        toggleFileUploading={toggleFileUploading}
       />
     )
   }
+  console.log(fieldDefinition.type)
   if (fieldDefinition.type === SIMPLE_DOCUMENT_UPLOADER) {
+    // sfgsgsdfgsfgsdfgsdfg
     return (
       <SimpleDocumentUploader
         name={fieldDefinition.name}
@@ -288,6 +293,7 @@ function GeneratedInputField({
         files={value as IAttachmentValue}
         error={error}
         onComplete={(file) => onSetFieldValue(fieldDefinition.name, file)}
+        toggleFileUploading={toggleFileUploading}
       />
     )
   }
@@ -619,6 +625,7 @@ interface IFormSectionProps {
   draftData?: IFormData
   onSetTouched?: (func: ISetTouchedFunction) => void
   requiredErrorMessage?: MessageDescriptor
+  toggleFileUploading?: (isUploading: boolean) => void
 }
 
 interface IStateProps {
@@ -914,7 +921,6 @@ class FormSectionComponent extends React.Component<Props> {
                   )
                 }
               : field
-
           if (
             field.type === PDF_DOCUMENT_VIEWER ||
             field.type === FETCH_BUTTON ||
@@ -1064,6 +1070,7 @@ class FormSectionComponent extends React.Component<Props> {
                       draftData={draftData}
                       dynamicDispatch={dynamicDispatch}
                       disabled={isFieldDisabled}
+                      toggleFileUploading={this.props.toggleFileUploading}
                     />
                   )}
                 </FastField>

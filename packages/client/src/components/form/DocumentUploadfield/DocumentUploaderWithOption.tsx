@@ -26,6 +26,7 @@ import { remove, clone } from 'lodash'
 import { buttonMessages, formMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/imageUpload'
 import imageCompression from 'browser-image-compression'
+import { FACILITIES_FAILED } from '@client/offline/actions'
 
 const options = {
   maxSizeMB: 0.4,
@@ -79,6 +80,7 @@ type IFullProps = {
   files?: IFileValue[]
   hideOnEmptyOption?: boolean
   onComplete: (files: IFileValue[]) => void
+  toggleFileUploading?: (isUploading: boolean) => void
 } & IntlShapeProps
 
 type DocumentFields = {
@@ -202,6 +204,8 @@ class DocumentUploaderWithOptionComp extends React.Component<
       ]
     }))
 
+    this.props.toggleFileUploading && this.props.toggleFileUploading(true)
+
     const minimumProcessingTime = new Promise<void>((resolve) =>
       setTimeout(resolve, 2000)
     )
@@ -256,6 +260,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
         }
       },
       () => {
+        this.props.toggleFileUploading && this.props.toggleFileUploading(false)
         this.props.onComplete(this.state.uploadedDocuments)
       }
     )

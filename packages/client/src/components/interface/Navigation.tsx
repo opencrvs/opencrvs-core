@@ -264,7 +264,7 @@ export const NavigationView = (props: IFullProps) => {
   )
 
   const fieldAgentLocationId = userDetails && getUserLocation(userDetails).id
-
+  console.log('------------>', initialSyncDone)
   const applicationCount = {
     inProgress: !initialSyncDone
       ? 0
@@ -378,6 +378,7 @@ export const NavigationView = (props: IFullProps) => {
               GROUP_ID.applicationGroup
             ) && (
               <NavigationGroup>
+                {console.log(applicationCount)}
                 {userDetails?.role &&
                   USER_SCOPE[userDetails.role].includes(TAB_ID.inProgress) && (
                     <NavigationItem
