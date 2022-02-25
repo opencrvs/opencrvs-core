@@ -31,7 +31,7 @@ import {
   goToRegistrarHomeTab
 } from '@client/navigation'
 import {
-  archiveApplication,
+  archiveDeclaration,
   clearCorrectionChange,
   IApplication,
   SUBMISSION_STATUS
@@ -121,7 +121,7 @@ interface IStateProps {
 }
 
 interface IDispatchProps {
-  archiveApplication: typeof archiveApplication
+  archiveDeclaration: typeof archiveDeclaration
   clearCorrectionChange: typeof clearCorrectionChange
   goToCertificateCorrection: typeof goToCertificateCorrection
   goToRegistrarHomeTab: typeof goToRegistrarHomeTab
@@ -432,7 +432,7 @@ function RecordAuditBody({
   isDownloaded = false,
   intl,
   scope,
-  archiveApplication,
+  archiveDeclaration,
   goToCertificateCorrection,
   goToRegistrarHomeTab
 }: {
@@ -527,7 +527,7 @@ function RecordAuditBody({
             id="archive_confirm"
             key="archive_confirm"
             onClick={() => {
-              archiveApplication(declaration.id)
+              archiveDeclaration(declaration.id)
               toggleDisplayDialog()
               goToRegistrarHomeTab('review')
             }}
@@ -557,7 +557,7 @@ function getBodyContent({
   workqueueDeclaration
 }: IFullProps) {
   const actionProps = {
-    archiveApplication,
+    archiveDeclaration,
     clearCorrectionChange,
     goToCertificateCorrection,
     goToRegistrarHomeTab
@@ -650,7 +650,7 @@ export const RecordAudit = connect<
   RouteProps,
   IStoreState
 >(mapStateToProps, {
-  archiveApplication,
+  archiveDeclaration,
   clearCorrectionChange,
   goToCertificateCorrection,
   goToRegistrarHomeTab

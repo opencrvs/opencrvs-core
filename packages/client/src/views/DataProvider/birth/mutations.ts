@@ -77,7 +77,7 @@ export const REJECT_BIRTH_APPLICATION = gql`
   }
 `
 
-export const ARCHIVE_BIRTH_APPLICATION = gql`
+export const ARCHIVE_BIRTH_DECLARATION = gql`
   mutation submitMutation($id: String!) {
     markEventAsArchived(id: $id)
   }
@@ -139,9 +139,9 @@ export function getBirthMutationMappings(
         },
         dataKey: 'markEventAsVoided'
       }
-    case Action.ARCHIVE_APPLICATION:
+    case Action.ARCHIVE_DECLARATION:
       return {
-        mutation: ARCHIVE_BIRTH_APPLICATION,
+        mutation: ARCHIVE_BIRTH_DECLARATION,
         variables: {
           ...payload
         },

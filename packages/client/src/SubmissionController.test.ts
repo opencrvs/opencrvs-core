@@ -20,10 +20,10 @@ import {
   REGISTER_BIRTH_APPLICATION,
   REJECT_BIRTH_APPLICATION,
   COLLECT_BIRTH_CERTIFICATE,
-  ARCHIVE_BIRTH_APPLICATION
+  ARCHIVE_BIRTH_DECLARATION
 } from '@client/views/DataProvider/birth/mutations'
 import {
-  ARCHIVE_DEATH_APPLICATION,
+  ARCHIVE_DEATH_DECLARATION,
   APPROVE_DEATH_APPLICATION,
   COLLECT_DEATH_CERTIFICATE,
   REGISTER_DEATH_APPLICATION,
@@ -550,7 +550,7 @@ describe('Submission Controller', () => {
             {
               event: 'birth',
               submissionStatus: SUBMISSION_STATUS.READY_TO_ARCHIVE,
-              action: Action.ARCHIVE_APPLICATION
+              action: Action.ARCHIVE_DECLARATION
             }
           ]
         },
@@ -573,7 +573,7 @@ describe('Submission Controller', () => {
     const mutationHandler = jest.fn().mockResolvedValue({
       data: { data: { markEventAsArchived: {} } }
     })
-    subCon.client.setRequestHandler(ARCHIVE_BIRTH_APPLICATION, mutationHandler)
+    subCon.client.setRequestHandler(ARCHIVE_BIRTH_DECLARATION, mutationHandler)
 
     await subCon.sync()
 
@@ -592,7 +592,7 @@ describe('Submission Controller', () => {
             {
               event: 'death',
               submissionStatus: SUBMISSION_STATUS.READY_TO_ARCHIVE,
-              action: Action.ARCHIVE_APPLICATION
+              action: Action.ARCHIVE_DECLARATION
             }
           ]
         },
@@ -615,7 +615,7 @@ describe('Submission Controller', () => {
     const mutationHandler = jest.fn().mockResolvedValue({
       data: { data: { markEventAsArchived: {} } }
     })
-    subCon.client.setRequestHandler(ARCHIVE_DEATH_APPLICATION, mutationHandler)
+    subCon.client.setRequestHandler(ARCHIVE_DEATH_DECLARATION, mutationHandler)
 
     await subCon.sync()
 
