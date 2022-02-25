@@ -15,12 +15,10 @@ import {
   createRouterProps,
   userDetails
 } from '@client/tests/util'
-import { AppStore, createStore } from '@client/store'
+import { createStore } from '@client/store'
 import { getStorageUserDetailsSuccess } from '@opencrvs/client/src/profile/profileActions'
 import { ReactWrapper } from 'enzyme'
 import { changePhoneMutation, ChangePhonePage } from './ChangePhonePage'
-import { waitForElement } from '@client/tests/wait-for-element'
-import { History } from 'history'
 
 const graphqlMocks = [
   {
@@ -61,13 +59,9 @@ describe('Change phone page tests', () => {
   })
 
   it('should enable continue button when input valid phone number', async () => {
-    const textInput = component.find('#PhoneNumber').hostNodes()
-    expect(textInput).toHaveLength(1)
-
     component.find('input').simulate('change', {
       target: { name: 'PhoneNumber', value: '01741234567' }
     })
-    await waitForElement(component, '#continue-button')
     component.update()
     expect(
       component.find('#continue-button').hostNodes().prop('disabled')
@@ -75,35 +69,23 @@ describe('Change phone page tests', () => {
   })
 
   it('should go to verify code page', async () => {
-    const phoneTextInput = component.find('#PhoneNumber').hostNodes()
-    expect(phoneTextInput).toHaveLength(1)
-
     component.find('input').simulate('change', {
       target: { name: 'PhoneNumber', value: '01741234567' }
     })
-    await waitForElement(component, '#continue-button')
     component.update()
     component.find('#continue-button').hostNodes().simulate('click')
+    component.update()
     expect(component.find('#verify-button').hostNodes().prop('disabled')).toBe(
       true
     )
   })
 
   it('should go to settings page after change phone number', async () => {
-    const phoneTextInput = component.find('#PhoneNumber').hostNodes()
-    expect(phoneTextInput).toHaveLength(1)
-
     component.find('input').simulate('change', {
       target: { name: 'PhoneNumber', value: '01741234567' }
     })
-    await waitForElement(component, '#continue-button')
     component.update()
     component.find('#continue-button').hostNodes().simulate('click')
-    expect(component.find('#verify-button').hostNodes().prop('disabled')).toBe(
-      true
-    )
-    const VerifyTextInput = component.find('#verifyCode').hostNodes()
-    expect(VerifyTextInput).toHaveLength(1)
     component.find('input').simulate('change', {
       target: { name: 'verifyCode', value: '000000' }
     })
@@ -111,6 +93,7 @@ describe('Change phone page tests', () => {
       false
     )
     component.find('#verify-button').hostNodes().simulate('click')
-    expect(history.location.pathname).toContain('/')
+    component.update()
+    expect(history.location.pathname).toContain('/settings')
   })
 })
