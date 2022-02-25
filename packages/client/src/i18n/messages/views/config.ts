@@ -28,6 +28,22 @@ interface IConfigMessages
   deathDefaultTempDesc: MessageDescriptor
   deathUpdatedTempDesc: MessageDescriptor
   listDetailsQsn: MessageDescriptor
+  applicationNameLabel: MessageDescriptor
+  govermentLogoLabel: MessageDescriptor
+  userTimeoutLabel: MessageDescriptor
+  currencyLable: MessageDescriptor
+  phoneNumberLabel: MessageDescriptor
+  logrocketLabel: MessageDescriptor
+  sentryLabel: MessageDescriptor
+  legallySpecifiedLabel: MessageDescriptor
+  lateRegistrationLabel: MessageDescriptor
+  delayedRegistrationLabel: MessageDescriptor
+  withinLegallySpecifiedTimeLabel: MessageDescriptor
+  generalTabTitle: MessageDescriptor
+  birthTabTitle: MessageDescriptor
+  deathTabTitle: MessageDescriptor
+  phoneNumberPatternLabel: MessageDescriptor
+  phoneNumberExampleLabel: MessageDescriptor
 }
 
 const messagesToDefine: IConfigMessages = {
@@ -143,6 +159,86 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.certificate.uploadCertificateDialogCancel',
     defaultMessage: 'Cancel',
     description: 'Cancel new certificate template upload button'
+  },
+  applicationNameLabel: {
+    id: 'config.application.applicationNameLabel',
+    defaultMessage: 'Name of application',
+    description: 'Application name config label'
+  },
+  govermentLogoLabel: {
+    id: 'config.application.govermentLogoLabel',
+    defaultMessage: 'Goverment logo',
+    description: 'Goverment logo config label'
+  },
+  userTimeoutLabel: {
+    id: 'config.application.userTimeoutLabel',
+    defaultMessage: 'User timeout',
+    description: 'User timeout config label'
+  },
+  currencyLable: {
+    id: 'config.application.currencyLable',
+    defaultMessage: 'Currency',
+    description: 'Currency config label'
+  },
+  phoneNumberLabel: {
+    id: 'config.application.phoneNumberLabel',
+    defaultMessage: 'Phone number',
+    description: 'Phone number config label'
+  },
+  logrocketLabel: {
+    id: 'config.application.logrocketLabel',
+    defaultMessage: 'Logrocket',
+    description: 'Logrocket config label'
+  },
+  sentryLabel: {
+    id: 'config.application.sentryLabel',
+    defaultMessage: 'Sentry',
+    description: 'Sentry config label'
+  },
+  legallySpecifiedLabel: {
+    id: 'config.application.legallySpecifiedLabel',
+    defaultMessage: 'Legally specified',
+    description: 'Legally specified config label'
+  },
+  lateRegistrationLabel: {
+    id: 'config.application.lateRegistrationLabel',
+    defaultMessage: 'Late registration',
+    description: 'Late registration config label'
+  },
+  delayedRegistrationLabel: {
+    id: 'config.application.delayedRegistrationLabel',
+    defaultMessage: 'Delayed registration',
+    description: 'Delayed registration config label'
+  },
+  withinLegallySpecifiedTimeLabel: {
+    id: 'config.application.withinLegallySpecifiedTimeLabel',
+    defaultMessage: 'Within legally specified time',
+    description: 'Within legally specified time config label'
+  },
+  generalTabTitle: {
+    id: 'config.application.generalTabTitle',
+    defaultMessage: 'General',
+    description: 'The title for general tab'
+  },
+  birthTabTitle: {
+    id: 'config.application.birthTabTitle',
+    defaultMessage: 'Birth',
+    description: 'The title for birth tab'
+  },
+  deathTabTitle: {
+    id: 'config.application.deathTabTitle',
+    defaultMessage: 'Death',
+    description: 'The title for death tab'
+  },
+  phoneNumberPatternLabel: {
+    id: 'config.application.phoneNumberPatternLabel',
+    defaultMessage: 'pattern: {pattern}',
+    description: 'Label for phone number pattern config'
+  },
+  phoneNumberExampleLabel: {
+    id: 'config.application.phoneNumberExampleLabel',
+    defaultMessage: 'example: {example}',
+    description: 'Label for phone number example config'
   }
 }
 

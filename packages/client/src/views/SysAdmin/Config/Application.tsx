@@ -26,6 +26,7 @@ import { DataSection } from '@opencrvs/components/lib/interface'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import { messages } from '@client/i18n/messages/views/config'
 import moment from 'moment'
+import { buttonMessages } from '@client/i18n/messages'
 
 type Props = IntlShapeProps & {
   userDetails: IUserDetails | null
@@ -36,10 +37,10 @@ interface State {
   activeTabId: string
 }
 
-export enum TabName {
-  GENERAL = 'generalTab',
-  BIRTH = 'birthTab',
-  DEATH = 'deathTab'
+export enum TabId {
+  GENERAL = 'general',
+  BIRTH = 'birth',
+  DEATH = 'death'
 }
 
 const millisecondsToMinutes = (ms: number): string => {
@@ -50,18 +51,28 @@ const millisecondsToMinutes = (ms: number): string => {
 
 function PhoneNumberDetails({
   pattern,
-  example
+  example,
+  intl
 }: {
   pattern: RegExp
-  example?: string
+  example: string
+  intl: IntlShape
 }) {
   return (
     <>
       <p>
-        <span>pattern: {pattern}</span>
+        <span>
+          {intl.formatMessage(messages.phoneNumberPatternLabel, {
+            pattern: pattern
+          })}
+        </span>
       </p>
       <p>
-        <span>example: {example}</span>
+        <span>
+          {intl.formatMessage(messages.phoneNumberExampleLabel, {
+            example: example
+          })}
+        </span>
       </p>
     </>
   )
@@ -72,19 +83,22 @@ function GeneralTabContent({
   intl
 }: {
   offlineCountryConfiguration: IOfflineData
-  intl?: IntlShape
+  intl: IntlShape
 }) {
   return (
     <DataSection
       title={''}
       items={[
         {
-          label: 'Name of application',
+          label: intl.formatMessage(messages.applicationNameLabel),
           value: 'Farajaland CRVS',
-          action: { label: 'Change' }
+          action: {
+            id: 'btnChangeAppName',
+            label: intl.formatMessage(buttonMessages.change)
+          }
         },
         {
-          label: 'Goverment logo',
+          label: intl.formatMessage(messages.govermentLogoLabel),
           value: (
             <img
               src={offlineCountryConfiguration.assets.logo}
@@ -96,22 +110,34 @@ function GeneralTabContent({
               }
             />
           ),
-          action: { label: 'Change' }
+          action: {
+            id: 'btnChangeGovtLogo',
+            label: intl.formatMessage(buttonMessages.change),
+            disabled: true
+          }
         },
         {
-          label: 'User timeout',
+          label: intl.formatMessage(messages.userTimeoutLabel),
           value: millisecondsToMinutes(
             offlineCountryConfiguration.config.DESKTOP_TIME_OUT_MILLISECONDS
           ),
-          action: { label: 'Change' }
+          action: {
+            id: 'btnChangeUsrTimeOut',
+            label: intl.formatMessage(buttonMessages.change),
+            disabled: true
+          }
         },
         {
-          label: 'Currency',
+          label: intl.formatMessage(messages.currencyLable),
           value: '',
-          action: { label: 'Change' }
+          action: {
+            id: 'btnChangeCurrency',
+            label: intl.formatMessage(buttonMessages.change),
+            disabled: true
+          }
         },
         {
-          label: 'Phone number',
+          label: intl.formatMessage(messages.phoneNumberLabel),
           value: (
             <PhoneNumberDetails
               pattern={
@@ -120,19 +146,32 @@ function GeneralTabContent({
               example={
                 offlineCountryConfiguration.config.PHONE_NUMBER_PATTERN.example
               }
+              intl={intl}
             />
           ),
-          action: { label: 'Change' }
+          action: {
+            id: 'btnChangePhnNum',
+            label: intl.formatMessage(buttonMessages.change),
+            disabled: true
+          }
         },
         {
-          label: 'Logrocket',
+          label: intl.formatMessage(messages.logrocketLabel),
           value: offlineCountryConfiguration.config.LOGROCKET,
-          action: { label: 'Change' }
+          action: {
+            id: 'btnChangeLogrocket',
+            label: intl.formatMessage(buttonMessages.change),
+            disabled: true
+          }
         },
         {
-          label: 'Sentry',
+          label: intl.formatMessage(messages.sentryLabel),
           value: offlineCountryConfiguration.config.SENTRY,
-          action: { label: 'Change' }
+          action: {
+            id: 'btnChangeSentry',
+            label: intl.formatMessage(buttonMessages.change),
+            disabled: true
+          }
         }
       ]}
     />
@@ -144,41 +183,59 @@ function BirthTabContent({
   intl
 }: {
   offlineCountryConfiguration: IOfflineData
-  intl?: IntlShape
+  intl: IntlShape
 }) {
   return (
     <DataSection
       title={''}
       items={[
         {
-          label: 'Legally specified',
+          label: intl.formatMessage(messages.legallySpecifiedLabel),
           value: 'Within 30 days',
-          action: { label: 'Change' }
+          action: {
+            label: intl.formatMessage(buttonMessages.change),
+            disabled: true
+          }
         },
         {
-          label: 'Late registration',
+          label: intl.formatMessage(messages.lateRegistrationLabel),
           value: 'Between 30 days and 365 days',
-          action: { label: 'Change' }
+          action: {
+            label: intl.formatMessage(buttonMessages.change),
+            disabled: true
+          }
         },
         {
-          label: 'Delayed registration',
+          label: intl.formatMessage(messages.delayedRegistrationLabel),
           value: 'After 365 days',
-          action: { label: 'Change' }
+          action: {
+            label: intl.formatMessage(buttonMessages.change),
+            disabled: true
+          }
         },
         {
-          label: 'Within legally specified time',
+          label: intl.formatMessage(messages.withinLegallySpecifiedTimeLabel),
           value: '',
-          action: { label: 'Change' }
+          action: {
+            label: intl.formatMessage(buttonMessages.change),
+            disabled: true
+          }
         },
         {
-          label: 'Late registration ',
+          label: intl.formatMessage(messages.lateRegistrationLabel),
           value: '',
-          action: { label: 'Change' }
+          action: {
+            label: intl.formatMessage(buttonMessages.change),
+            disabled: true
+          }
         },
         {
-          label: 'Delayed registration',
+          label: intl.formatMessage(messages.delayedRegistrationLabel),
           value: '',
-          action: { label: 'Change' }
+          action: {
+            label: intl.formatMessage(buttonMessages.change),
+            disabled: true
+          }
         }
       ]}
     />
@@ -190,31 +247,43 @@ function DeathTabContent({
   intl
 }: {
   offlineCountryConfiguration: IOfflineData
-  intl?: IntlShape
+  intl: IntlShape
 }) {
   return (
     <DataSection
       title={''}
       items={[
         {
-          label: 'Legally specified',
+          label: intl.formatMessage(messages.legallySpecifiedLabel),
           value: 'Within 30 days',
-          action: { label: 'Change' }
+          action: {
+            label: intl.formatMessage(buttonMessages.change),
+            disabled: true
+          }
         },
         {
-          label: 'Delayed registration',
+          label: intl.formatMessage(messages.delayedRegistrationLabel),
           value: 'After 30 days',
-          action: { label: 'Change' }
+          action: {
+            label: intl.formatMessage(buttonMessages.change),
+            disabled: true
+          }
         },
         {
-          label: 'Late registration ',
+          label: intl.formatMessage(messages.lateRegistrationLabel),
           value: '',
-          action: { label: 'Change' }
+          action: {
+            label: intl.formatMessage(buttonMessages.change),
+            disabled: true
+          }
         },
         {
-          label: 'Delayed registration',
+          label: intl.formatMessage(messages.delayedRegistrationLabel),
           value: '',
-          action: { label: 'Change' }
+          action: {
+            label: intl.formatMessage(buttonMessages.change),
+            disabled: true
+          }
         }
       ]}
     />
@@ -225,7 +294,7 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      activeTabId: TabName.GENERAL
+      activeTabId: TabId.GENERAL
     }
     this.changeTab = this.changeTab.bind(this)
   }
@@ -244,40 +313,41 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
           tabs={{
             sections: [
               {
-                id: 'generalTab',
-                title: TabName.GENERAL
+                id: 'general',
+                title: intl.formatMessage(messages.generalTabTitle)
               },
               {
-                id: 'birthTab',
-                title: TabName.BIRTH
+                id: 'birth',
+                title: intl.formatMessage(messages.birthTabTitle)
               },
-              { id: 'deathTab', title: TabName.DEATH }
+              {
+                id: 'death',
+                title: intl.formatMessage(messages.deathTabTitle)
+              }
             ],
             activeTabId: this.state.activeTabId,
             onTabClick: (id: string) => this.changeTab(id)
           }}
         >
           {this.state.activeTabId &&
-            this.state.activeTabId === TabName.GENERAL && (
+            this.state.activeTabId === TabId.GENERAL && (
               <GeneralTabContent
                 offlineCountryConfiguration={offlineCountryConfiguration}
                 intl={intl}
               />
             )}
-          {this.state.activeTabId &&
-            this.state.activeTabId === TabName.BIRTH && (
-              <BirthTabContent
-                offlineCountryConfiguration={offlineCountryConfiguration}
-                intl={intl}
-              />
-            )}
-          {this.state.activeTabId &&
-            this.state.activeTabId === TabName.DEATH && (
-              <DeathTabContent
-                offlineCountryConfiguration={offlineCountryConfiguration}
-                intl={intl}
-              />
-            )}
+          {this.state.activeTabId && this.state.activeTabId === TabId.BIRTH && (
+            <BirthTabContent
+              offlineCountryConfiguration={offlineCountryConfiguration}
+              intl={intl}
+            />
+          )}
+          {this.state.activeTabId && this.state.activeTabId === TabId.DEATH && (
+            <DeathTabContent
+              offlineCountryConfiguration={offlineCountryConfiguration}
+              intl={intl}
+            />
+          )}
         </Content>
       </SysAdminContentWrapper>
     )
