@@ -27,7 +27,8 @@ import {
   goBack as goBackAction,
   goToRegistrarHomeTab,
   goToPage,
-  goToCertificateCorrection
+  goToCertificateCorrection,
+  goToPrintCertificate
 } from '@client/navigation'
 import { RouteComponentProps } from 'react-router'
 import {
@@ -60,8 +61,16 @@ import {
   ICON_ALIGNMENT,
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
-import { constantsMessages, userMessages } from '@client/i18n/messages'
-import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
+import {
+  constantsMessages,
+  userMessages,
+  buttonMessages
+} from '@client/i18n/messages'
+import {
+  DRAFT_BIRTH_PARENT_FORM_PAGE,
+  DRAFT_DEATH_FORM_PAGE,
+  REVIEW_EVENT_PARENT_FORM_PAGE
+} from '@client/navigation/routes'
 import { getLanguage } from '@client/i18n/selectors'
 import {
   getIndividualNameObj,
@@ -75,6 +84,7 @@ import {
   Action
 } from '@client/forms'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
+import { EVENT_STATUS } from '@client/views/OfficeHome/OfficeHome'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -156,6 +166,7 @@ interface IDispatchProps {
   goToPage: typeof goToPage
   clearCorrectionChange: typeof clearCorrectionChange
   goToCertificateCorrection: typeof goToCertificateCorrection
+  goToPrintCertificate: typeof goToPrintCertificate
 }
 
 type IFullProps = IDispatchProps &
@@ -400,14 +411,13 @@ const getSavedApplications = (props: IFullProps): IApplicationData => {
         placeOfBirth: getLocation(application, props) || '',
         placeOfDeath: getLocation(application, props) || '',
         informant:
-          (
-            application.data?.registration?.contactPoint as IFormSectionData
-          )?.value.toString() || '',
+          ((application.data?.registration?.contactPoint as IFormSectionData)
+            ?.value as string) || '',
         informantContact:
-          (
+          ((
             (application.data?.registration?.contactPoint as IFormSectionData)
               ?.nestedFields as IContactPoint
-          )?.registrationPhone.toString() || ''
+          )?.registrationPhone as string) || ''
       }
     })
   return applications[0]
@@ -542,63 +552,100 @@ const getApplicationInfo = (
   )
 }
 
-const shouldShowReviewButton = (
-  application: IApplicationData,
-  role: string | undefined
-): boolean => {
-  if (null == role) {
-    return false
-  }
-
-  const reviewButtonRoleStatusMap: { [key: string]: string[] } = {
-    FIELD_AGENT: [
-      SUBMISSION_STATUS.REJECTED,
-      SUBMISSION_STATUS.FAILED,
-      SUBMISSION_STATUS.FAILED_NETWORK
-    ],
-    REGISTRATION_AGENT: [
-      SUBMISSION_STATUS.DECLARED,
-      SUBMISSION_STATUS.FAILED,
-      SUBMISSION_STATUS.FAILED_NETWORK
-    ],
-    DISTRICT_REGISTRAR: [
-      SUBMISSION_STATUS.DECLARED,
-      SUBMISSION_STATUS.FAILED,
-      SUBMISSION_STATUS.FAILED_NETWORK
-    ],
-    LOCAL_REGISTRAR: [
-      SUBMISSION_STATUS.DECLARED,
-      SUBMISSION_STATUS.FAILED,
-      SUBMISSION_STATUS.FAILED_NETWORK
-    ]
-  }
-
-  return reviewButtonRoleStatusMap[role].includes(application?.status as string)
-}
-
-const shouldShowUpdateButton = (props: IFullProps): boolean => {
-  const reviewButtonRoleStatusMap = {
-    FIELD_AGENT: [SUBMISSION_STATUS.DRAFT],
-    REGISTRATION_AGENT: [SUBMISSION_STATUS.DRAFT],
-    DISTRICT_REGISTRAR: [],
-    LOCAL_REGISTRAR: []
-  }
-  return false
-}
-
-const shouldShowDownloadButton = (props: IFullProps): boolean => {
-  const reviewButtonRoleStatusMap = {
-    FIELD_AGENT: [],
-    REGISTRATION_AGENT: [],
-    DISTRICT_REGISTRAR: [],
-    LOCAL_REGISTRAR: []
-  }
-  return false
-}
-
-const downloadButton = (application: IApplicationData, props: IFullProps) => {
+const showReviewButton = (application: IApplicationData, props: IFullProps) => {
   const { id, type } = application || {}
   const { intl, userDetails } = props
+
+  const foundApplication = props.outboxApplications.find(
+    (app) => app.id === application.id
+  )
+  const isDownloaded =
+    foundApplication?.downloadStatus == DOWNLOAD_STATUS.DOWNLOADED
+
+  if (!userDetails || !userDetails.role || !type || !isDownloaded) return <></>
+  const { role } = userDetails
+
+  const reviewButtonRoleStatusMap: { [key: string]: string[] } = {
+    FIELD_AGENT: [EVENT_STATUS.REJECTED],
+    REGISTRATION_AGENT: [EVENT_STATUS.DECLARED],
+    DISTRICT_REGISTRAR: [EVENT_STATUS.VALIDATED, EVENT_STATUS.DECLARED],
+    LOCAL_REGISTRAR: [EVENT_STATUS.VALIDATED, EVENT_STATUS.DECLARED]
+  }
+
+  if (reviewButtonRoleStatusMap[role].includes(application?.status as string))
+    return (
+      <ReviewButton
+        key={id}
+        id="myButton"
+        onClick={() => {
+          props.goToPage(REVIEW_EVENT_PARENT_FORM_PAGE, id, 'review', type)
+        }}
+      >
+        {intl.formatMessage(constantsMessages.review)}
+      </ReviewButton>
+    )
+  return <></>
+}
+
+const shouldShowUpdateButton = (
+  application: IApplicationData,
+  props: IFullProps
+) => {
+  const { id, type } = application || {}
+  const { intl, userDetails } = props
+
+  const foundApplication = props.outboxApplications.find(
+    (app) => app.id === application.id
+  )
+  const isDownloaded =
+    foundApplication?.downloadStatus == DOWNLOAD_STATUS.DOWNLOADED ||
+    foundApplication?.submissionStatus == SUBMISSION_STATUS.DRAFT
+
+  if (!userDetails || !userDetails.role || !type || !isDownloaded) return <></>
+  const { role } = userDetails
+
+  const reviewButtonRoleStatusMap: { [key: string]: string[] } = {
+    FIELD_AGENT: [SUBMISSION_STATUS.DRAFT],
+    REGISTRATION_AGENT: [SUBMISSION_STATUS.DRAFT, EVENT_STATUS.REJECTED],
+    DISTRICT_REGISTRAR: [SUBMISSION_STATUS.DRAFT, EVENT_STATUS.REJECTED],
+    LOCAL_REGISTRAR: [SUBMISSION_STATUS.DRAFT, EVENT_STATUS.REJECTED]
+  }
+
+  if (reviewButtonRoleStatusMap[role].includes(application?.status as string)) {
+    let PAGE_ROUTE: string, PAGE_ID: string
+
+    if (application?.status === SUBMISSION_STATUS.DRAFT) {
+      PAGE_ID = 'preview'
+      if (type.toString() === 'birth') {
+        PAGE_ROUTE = DRAFT_BIRTH_PARENT_FORM_PAGE
+      } else if (type.toString() === 'death') {
+        PAGE_ROUTE = DRAFT_DEATH_FORM_PAGE
+      }
+    } else {
+      PAGE_ROUTE = REVIEW_EVENT_PARENT_FORM_PAGE
+      PAGE_ID = 'review'
+    }
+    return (
+      <ReviewButton
+        key={id}
+        id={`update-application-${id}`}
+        onClick={() => {
+          props.goToPage(PAGE_ROUTE, id, PAGE_ID, type)
+        }}
+      >
+        {intl.formatMessage(buttonMessages.update)}
+      </ReviewButton>
+    )
+  }
+
+  return <></>
+}
+
+const showDownloadButton = (
+  application: IApplicationData,
+  props: IFullProps
+) => {
+  const { id, type } = application || {}
 
   if (application == null || id == null || type == null) return <></>
 
@@ -608,7 +655,16 @@ const downloadButton = (application: IApplicationData, props: IFullProps) => {
 
   const downloadStatus =
     (foundApplication && foundApplication.downloadStatus) || undefined
-  if (downloadStatus != DOWNLOAD_STATUS.DOWNLOADED) {
+
+  if (
+    props.userDetails?.role == 'FIELD_AGENT' &&
+    foundApplication?.submissionStatus == SUBMISSION_STATUS.DECLARED
+  )
+    return <></>
+  if (
+    foundApplication?.submissionStatus != SUBMISSION_STATUS.DRAFT &&
+    downloadStatus != DOWNLOAD_STATUS.DOWNLOADED
+  ) {
     const downLoadConfig = {
       event: type,
       compositionId: id,
@@ -621,21 +677,49 @@ const downloadButton = (application: IApplicationData, props: IFullProps) => {
         status={downloadStatus as DOWNLOAD_STATUS}
       />
     )
-  } else {
-    return shouldShowReviewButton(application, userDetails?.role) ? (
+  }
+
+  return <></>
+}
+
+const showPrintButton = (application: IApplicationData, props: IFullProps) => {
+  const { id, type } = application || {}
+  const { intl, userDetails } = props
+
+  const foundApplication = props.outboxApplications.find(
+    (app) => app.id === application.id
+  )
+  const isDownloaded =
+    foundApplication?.downloadStatus == DOWNLOAD_STATUS.DOWNLOADED ||
+    foundApplication?.submissionStatus == SUBMISSION_STATUS.DRAFT
+
+  if (!userDetails || !userDetails.role || !type || !isDownloaded) return <></>
+  const { role } = userDetails
+
+  const reviewButtonRoleStatusMap: { [key: string]: string[] } = {
+    REGISTRATION_AGENT: [SUBMISSION_STATUS.REGISTERED],
+    DISTRICT_REGISTRAR: [SUBMISSION_STATUS.REGISTERED],
+    LOCAL_REGISTRAR: [SUBMISSION_STATUS.REGISTERED]
+  }
+
+  const downloadStatus =
+    (foundApplication && foundApplication.downloadStatus) || undefined
+  if (
+    role in reviewButtonRoleStatusMap &&
+    reviewButtonRoleStatusMap[role].includes(application?.status as string)
+  )
+    return (
       <ReviewButton
         key={id}
-        id="myButton"
+        id={`print-${id}`}
         onClick={() => {
-          props.goToPage(REVIEW_EVENT_PARENT_FORM_PAGE, id, 'review', type)
+          props.goToPrintCertificate(id, type.toLocaleLowerCase())
         }}
       >
-        {intl.formatMessage(constantsMessages.review)}
+        {intl.formatMessage(buttonMessages.print)}
       </ReviewButton>
-    ) : (
-      <></>
     )
-  }
+  return <></>
 }
 
 const getName = (
@@ -756,7 +840,10 @@ export const ShowRecordAudit = (props: IFullProps) => {
     )
   }
 
-  application && actions.push(downloadButton(application, props))
+  application && actions.push(showDownloadButton(application, props))
+  application && actions.push(showReviewButton(application, props))
+  application && actions.push(shouldShowUpdateButton(application, props))
+  application && actions.push(showPrintButton(application, props))
 
   return (
     <div id={'recordAudit'}>
@@ -810,5 +897,6 @@ export const RecordAudit = connect<
   goToRegistrarHomeTab,
   goToPage,
   clearCorrectionChange,
-  goToCertificateCorrection
+  goToCertificateCorrection,
+  goToPrintCertificate
 })(injectIntl(withTheme(ShowRecordAudit)))
