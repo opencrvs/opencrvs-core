@@ -133,6 +133,7 @@ export interface GQLDeathRegistration extends GQLEventRegistration {
   medicalPractitioner?: GQLMedicalPractitioner
   createdAt?: GQLDate
   updatedAt?: GQLDate
+  history?: Array<GQLHistory | null>
 }
 
 export interface GQLPerson {
@@ -2484,6 +2485,7 @@ export interface GQLDeathRegistrationTypeResolver<TParent = any> {
   medicalPractitioner?: DeathRegistrationToMedicalPractitionerResolver<TParent>
   createdAt?: DeathRegistrationToCreatedAtResolver<TParent>
   updatedAt?: DeathRegistrationToUpdatedAtResolver<TParent>
+  history?: DeathRegistrationToHistoryResolver<TParent>
 }
 
 export interface DeathRegistrationToIdResolver<TParent = any, TResult = any> {
@@ -2596,6 +2598,13 @@ export interface DeathRegistrationToCreatedAtResolver<
 }
 
 export interface DeathRegistrationToUpdatedAtResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface DeathRegistrationToHistoryResolver<
   TParent = any,
   TResult = any
 > {

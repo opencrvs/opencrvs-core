@@ -252,6 +252,7 @@ type DeathRegistration implements EventRegistration {
   medicalPractitioner: MedicalPractitioner
   createdAt: Date
   updatedAt: Date
+  history: [History]
 }
 
 type Person {
