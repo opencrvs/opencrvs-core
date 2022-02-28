@@ -1409,8 +1409,15 @@ export const typeResolvers: GQLResolver = {
       )
     },
     async history(composition: ITemplatedComposition, _, authHeader) {
+      const task = await fetchFHIR(
+        `/Task/?focus=Composition/${composition.id}`,
+        authHeader
+      )
+
+      const taskId = task.entry[0].resource.id
+
       const taskHistory = await fetchFHIR(
-        `/Task/_history?focus=Composition/${composition.id}&_count=100`,
+        `/Task/${taskId}/_history?_count=100`,
         authHeader
       )
 

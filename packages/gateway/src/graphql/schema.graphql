@@ -283,6 +283,7 @@ type BirthRegResultSet {
 interface EventRegistration {
   id: ID!
   registration: Registration
+  history: [History]
   createdAt: Date
 }
 

@@ -265,6 +265,7 @@ type History {
 interface EventRegistration {
   id: ID! # long uuid
   registration: Registration
+  history: [History]
   createdAt: Date
 }
 

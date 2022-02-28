@@ -767,13 +767,17 @@ const getHistory = (
 
   const historyData = (
     savedApplication.data.history as unknown as { [key: string]: any }[]
-  ).map((item) => ({
-    date: moment(item?.date).format('MMM DD, YYYY. h:m a'),
-    action: getStatusLabel(item?.action, intl),
-    user: getName(item.user.name, item.user?.avatar, language),
-    type: intl.formatMessage(userMessages[item.user.role as string]),
-    location: item.location.name
-  }))
+  )
+    .sort((fe, se) => {
+      return new Date(fe.date).getTime() - new Date(se.date).getTime()
+    })
+    .map((item) => ({
+      date: moment(item?.date).format('MMM DD, YYYY. hh:mm a'),
+      action: getStatusLabel(item?.action, intl),
+      user: getName(item.user.name, item.user?.avatar, language),
+      type: intl.formatMessage(userMessages[item.user.role as string]),
+      location: item.location.name
+    }))
 
   const columns = [
     {

@@ -164,6 +164,7 @@ export interface GQLBirthRegResultSet {
 export interface GQLEventRegistration {
   id: string
   registration?: GQLRegistration
+  history?: Array<GQLHistory | null>
   createdAt?: GQLDate
 }
 
