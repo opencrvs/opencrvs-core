@@ -32,10 +32,7 @@ export async function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {
     throw new Error('Invalid FHIR bundle found for declaration')
   }
-  return await getPhoneNo(
-    getTaskResource(fhirBundle) as fhir.Task,
-    getEventType(fhirBundle)
-  )
+  return await getPhoneNo(getTaskResource(fhirBundle), getEventType(fhirBundle))
 }
 
 export async function getInformantName(
@@ -71,7 +68,7 @@ export async function getCRVSOfficeName(fhirBundle: fhir.Bundle) {
       'getCRVSOfficeName: Invalid FHIR bundle found for declaration/notification'
     )
   }
-  const taskResource = getTaskResource(fhirBundle) as fhir.Task
+  const taskResource = getTaskResource(fhirBundle)
   const regLastOfficeExt = taskResource?.extension?.find(
     (ext) => ext.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`
   )
@@ -162,7 +159,7 @@ export function getDeathRegistrationNumber(taskResource: fhir.Task) {
 
 export function hasBirthRegistrationNumber(fhirBundle: fhir.Bundle) {
   try {
-    getBirthRegistrationNumber(getTaskResource(fhirBundle) as fhir.Task)
+    getBirthRegistrationNumber(getTaskResource(fhirBundle))
     return true
   } catch (error) {
     return false
@@ -170,7 +167,7 @@ export function hasBirthRegistrationNumber(fhirBundle: fhir.Bundle) {
 }
 export function hasDeathRegistrationNumber(fhirBundle: fhir.Bundle) {
   try {
-    getDeathRegistrationNumber(getTaskResource(fhirBundle) as fhir.Task)
+    getDeathRegistrationNumber(getTaskResource(fhirBundle))
     return true
   } catch (error) {
     return false
