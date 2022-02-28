@@ -281,7 +281,6 @@ function GeneratedInputField({
       />
     )
   }
-  console.log(fieldDefinition.type)
   if (fieldDefinition.type === SIMPLE_DOCUMENT_UPLOADER) {
     // sfgsgsdfgsfgsdfgsdfg
     return (

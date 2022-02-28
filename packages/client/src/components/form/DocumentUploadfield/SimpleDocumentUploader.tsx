@@ -77,8 +77,6 @@ class SimpleDocumentUploaderComponent extends React.Component<
       return
     }
     const allowedDocType = this.props.allowedDocType
-    console.log('helllo')
-    console.log(this.props)
 
     this.props.toggleFileUploading && this.props.toggleFileUploading(true)
 
@@ -99,7 +97,6 @@ class SimpleDocumentUploaderComponent extends React.Component<
         .then((buffer) => {
           this.props.toggleFileUploading &&
             this.props.toggleFileUploading(false)
-          console.log('mello')
           this.props.onComplete({
             type: uploadedImage.type,
             data: buffer
@@ -111,7 +108,6 @@ class SimpleDocumentUploaderComponent extends React.Component<
         .catch(() => {
           this.props.toggleFileUploading &&
             this.props.toggleFileUploading(false)
-          console.log('mello error')
           allowedDocType &&
             allowedDocType.length > 0 &&
             this.setState({
@@ -140,7 +136,6 @@ class SimpleDocumentUploaderComponent extends React.Component<
     const { label, intl, files, description, error, disableDeleteInPreview } =
       this.props
     const errorMessage = this.state.error || error || ''
-    console.log(this.props)
 
     return (
       <>

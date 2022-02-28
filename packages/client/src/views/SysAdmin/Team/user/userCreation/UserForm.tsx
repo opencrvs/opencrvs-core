@@ -65,6 +65,7 @@ type IProps = {
 
 type IState = {
   disableContinueOnLocation: boolean
+  fileUploading: boolean
 }
 
 type IDispatchProps = {
@@ -81,7 +82,8 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
   constructor(props: IFullProps) {
     super(props)
     this.state = {
-      disableContinueOnLocation: false
+      disableContinueOnLocation: false,
+      fileUploading: false
     }
   }
 
@@ -101,6 +103,13 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
             this.props.nextGroupId
           )
     }
+  }
+
+  toggleFileUploading = (isUploading: boolean) => {
+    this.setState({
+      ...this.state,
+      fileUploading: isUploading
+    })
   }
 
   showAllValidationErrors = () => {
@@ -160,12 +169,15 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
               this.setAllFormFieldsTouched = setTouchedFunc
             }}
             requiredErrorMessage={messages.requiredForNewUser}
+            toggleFileUploading={this.toggleFileUploading}
           />
           <Action>
             <PrimaryButton
               id="confirm_form"
               onClick={this.handleFormAction}
-              disabled={this.state.disableContinueOnLocation}
+              disabled={
+                this.state.disableContinueOnLocation || this.state.fileUploading
+              }
             >
               {intl.formatMessage(buttonMessages.continueButton)}
             </PrimaryButton>

@@ -195,7 +195,7 @@ type State = {
   rejectFormOpen: boolean
   hasError: boolean
   showConfirmationModal: boolean
-  fileUploading: boolean
+  isFileUploading: boolean
 }
 
 const fadeFromTop = keyframes`
@@ -224,7 +224,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       rejectFormOpen: false,
       hasError: false,
       showConfirmationModal: false,
-      fileUploading: false
+      isFileUploading: false
     }
   }
   setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
@@ -274,10 +274,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   toggleFileUploading = (isUploading: boolean) => {
-    console.log('func', isUploading)
     this.setState({
       ...this.state,
-      fileUploading: isUploading
+      isFileUploading: isUploading
     })
   }
 
@@ -755,7 +754,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
                             toggleFileUploading={this.toggleFileUploading}
                           />
                         </form>
-                        {console.log(this.state.fileUploading)}
                         {nextSectionGroup && (
                           <FooterArea>
                             <PrimaryButton
@@ -769,7 +767,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                   application.event.toLowerCase()
                                 )
                               }}
-                              disabled={this.state.fileUploading}
+                              disabled={this.state.isFileUploading}
                             >
                               {intl.formatMessage(
                                 buttonMessages.continueButton

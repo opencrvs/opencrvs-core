@@ -264,7 +264,6 @@ export const NavigationView = (props: IFullProps) => {
   )
 
   const fieldAgentLocationId = userDetails && getUserLocation(userDetails).id
-  console.log('------------>', initialSyncDone)
   const applicationCount = {
     inProgress: !initialSyncDone
       ? 0
