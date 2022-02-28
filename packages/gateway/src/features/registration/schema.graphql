@@ -524,7 +524,7 @@ type Query {
 
 type Mutation {
   # BIRTH
-  createBirthRegistration(details: [FormValue]!): CreatedIds!
+  createBirthRegistration(details: BirthRegistrationInput!): CreatedIds!
   updateBirthRegistration(id: ID!, details: BirthRegistrationInput!): ID!
   # process transitions
   markBirthAsVerified(

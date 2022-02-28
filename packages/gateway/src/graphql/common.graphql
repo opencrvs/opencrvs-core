@@ -140,11 +140,6 @@ type RelatedPerson { # -> Related Person
   individual: Person # -> .patient.reference
 }
 
-input FormValue {
-  fieldId: String!
-  value: String
-}
-
 input DeceasedInput {
   deceased: Boolean
   deathDate: String

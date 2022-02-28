@@ -22,7 +22,6 @@ import {
 } from '@gateway/features/fhir/utils'
 import {
   buildFHIRBundle,
-  buildFHIRBundle2,
   updateFHIRTaskBundle
 } from '@gateway/features/registration/fhir-builders'
 import { hasScope } from '@gateway/features/user/utils'
@@ -402,7 +401,7 @@ async function createEventRegistration(
   authHeader: IAuthHeader,
   event: EVENT_TYPE
 ) {
-  const doc = await buildFHIRBundle2(details, event, authHeader)
+  const doc = await buildFHIRBundle(details, event, authHeader)
   const duplicateCompostion = await lookForDuplicate(
     details && details.registration && details.registration.draftId,
     authHeader

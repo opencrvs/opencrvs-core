@@ -128,7 +128,7 @@ type Query {
 type Mutation {
   createNotification(details: NotificationInput!): Notification!
   voidNotification(id: ID!): Notification
-  createBirthRegistration(details: [FormValue]!): CreatedIds!
+  createBirthRegistration(details: BirthRegistrationInput!): CreatedIds!
   updateBirthRegistration(id: ID!, details: BirthRegistrationInput!): ID!
   markBirthAsVerified(
     id: ID!
@@ -423,11 +423,6 @@ type CreatedIds {
   compositionId: String
   trackingId: String
   registrationNumber: String
-}
-
-input FormValue {
-  fieldId: String!
-  value: String
 }
 
 input BirthRegistrationInput {
