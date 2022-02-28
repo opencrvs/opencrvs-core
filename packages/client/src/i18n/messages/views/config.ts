@@ -14,6 +14,8 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 interface IConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   applicationTitle: MessageDescriptor
+  applicationNameChangeMessage: MessageDescriptor
+  applicationNameChangeError: MessageDescriptor
   certificateConfiguration: MessageDescriptor
   previewTemplate: MessageDescriptor
   printTemplate: MessageDescriptor
@@ -51,6 +53,16 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.applicationSettings',
     defaultMessage: 'Application',
     description: 'Link Text for Config Application Settings'
+  },
+  applicationNameChangeMessage: {
+    id: 'config.application.nameChangeMessage',
+    defaultMessage: 'Choose a name for your CRVS system',
+    description: 'Message for application name change modal'
+  },
+  applicationNameChangeError: {
+    id: 'config.application.nameChangeError',
+    defaultMessage: 'Unable to make change. Please try again',
+    description: 'Error message for application name change'
   },
   certificateConfiguration: {
     id: 'config.certificateConfiguration',

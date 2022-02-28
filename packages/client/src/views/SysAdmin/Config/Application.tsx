@@ -27,6 +27,7 @@ import { Content } from '@opencrvs/components/lib/interface/Content'
 import { messages } from '@client/i18n/messages/views/config'
 import moment from 'moment'
 import { buttonMessages } from '@client/i18n/messages'
+import { DynamicModal } from '@client/views/SysAdmin/Config/DynamicModal'
 
 type Props = IntlShapeProps & {
   userDetails: IUserDetails | null
@@ -35,12 +36,23 @@ type Props = IntlShapeProps & {
 }
 interface State {
   activeTabId: string
+  changeModalName: string
 }
 
 export enum TabId {
   GENERAL = 'general',
   BIRTH = 'birth',
   DEATH = 'death'
+}
+
+export enum GeneralActionId {
+  APPLICATION_NAME = 'changeAppName',
+  GOVT_LOGO = 'changeGovtLogo',
+  USER_TIMEOUT = 'changeUsrTimeOut',
+  Currency = 'changeCurrency',
+  PHONE_NUMBER = 'changePhnNum',
+  LOG_ROCKET = 'changeLogrocket',
+  SENTRY = 'changeSentry'
 }
 
 const millisecondsToMinutes = (ms: number): string => {
@@ -80,10 +92,12 @@ function PhoneNumberDetails({
 
 function GeneralTabContent({
   offlineCountryConfiguration,
-  intl
+  intl,
+  callBack
 }: {
   offlineCountryConfiguration: IOfflineData
   intl: IntlShape
+  callBack: (modalName: string) => void
 }) {
   return (
     <DataSection
@@ -93,8 +107,11 @@ function GeneralTabContent({
           label: intl.formatMessage(messages.applicationNameLabel),
           value: 'Farajaland CRVS',
           action: {
-            id: 'btnChangeAppName',
-            label: intl.formatMessage(buttonMessages.change)
+            id: GeneralActionId.APPLICATION_NAME,
+            label: intl.formatMessage(buttonMessages.change),
+            handler: () => {
+              callBack(GeneralActionId.APPLICATION_NAME)
+            }
           }
         },
         {
@@ -111,7 +128,7 @@ function GeneralTabContent({
             />
           ),
           action: {
-            id: 'btnChangeGovtLogo',
+            id: GeneralActionId.GOVT_LOGO,
             label: intl.formatMessage(buttonMessages.change),
             disabled: true
           }
@@ -122,7 +139,7 @@ function GeneralTabContent({
             offlineCountryConfiguration.config.DESKTOP_TIME_OUT_MILLISECONDS
           ),
           action: {
-            id: 'btnChangeUsrTimeOut',
+            id: GeneralActionId.USER_TIMEOUT,
             label: intl.formatMessage(buttonMessages.change),
             disabled: true
           }
@@ -131,7 +148,7 @@ function GeneralTabContent({
           label: intl.formatMessage(messages.currencyLable),
           value: '',
           action: {
-            id: 'btnChangeCurrency',
+            id: GeneralActionId.Currency,
             label: intl.formatMessage(buttonMessages.change),
             disabled: true
           }
@@ -150,7 +167,7 @@ function GeneralTabContent({
             />
           ),
           action: {
-            id: 'btnChangePhnNum',
+            id: GeneralActionId.PHONE_NUMBER,
             label: intl.formatMessage(buttonMessages.change),
             disabled: true
           }
@@ -159,7 +176,7 @@ function GeneralTabContent({
           label: intl.formatMessage(messages.logrocketLabel),
           value: offlineCountryConfiguration.config.LOGROCKET,
           action: {
-            id: 'btnChangeLogrocket',
+            id: GeneralActionId.LOG_ROCKET,
             label: intl.formatMessage(buttonMessages.change),
             disabled: true
           }
@@ -168,7 +185,7 @@ function GeneralTabContent({
           label: intl.formatMessage(messages.sentryLabel),
           value: offlineCountryConfiguration.config.SENTRY,
           action: {
-            id: 'btnChangeSentry',
+            id: GeneralActionId.SENTRY,
             label: intl.formatMessage(buttonMessages.change),
             disabled: true
           }
@@ -294,17 +311,31 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      activeTabId: TabId.GENERAL
+      activeTabId: TabId.GENERAL,
+      changeModalName: ''
     }
-    this.changeTab = this.changeTab.bind(this)
+  }
+
+  changeValue = () => {
+    this.hideModal()
+    // this.toggleSuccessNotification(NOTIFICATION_SUBJECT.PASSWORD)
   }
 
   changeTab(id: string) {
     this.setState({ activeTabId: id })
   }
 
+  hideModal = () => {
+    this.setState({ changeModalName: '' })
+  }
+
+  showModal = () => {
+    return !!!this.state.changeModalName ? false : true
+  }
+
   render() {
     const { intl, offlineCountryConfiguration } = this.props
+
     return (
       <SysAdminContentWrapper isCertificatesConfigPage={true}>
         <Content
@@ -329,13 +360,17 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
             onTabClick: (id: string) => this.changeTab(id)
           }}
         >
-          {this.state.activeTabId &&
-            this.state.activeTabId === TabId.GENERAL && (
-              <GeneralTabContent
-                offlineCountryConfiguration={offlineCountryConfiguration}
-                intl={intl}
-              />
-            )}
+          {this.state.activeTabId && this.state.activeTabId === TabId.GENERAL && (
+            <GeneralTabContent
+              offlineCountryConfiguration={offlineCountryConfiguration}
+              intl={intl}
+              callBack={(modalName: string) =>
+                this.setState({
+                  changeModalName: modalName
+                })
+              }
+            />
+          )}
           {this.state.activeTabId && this.state.activeTabId === TabId.BIRTH && (
             <BirthTabContent
               offlineCountryConfiguration={offlineCountryConfiguration}
@@ -349,6 +384,13 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
             />
           )}
         </Content>
+        {this.showModal() && (
+          <DynamicModal
+            hideModal={this.hideModal}
+            changeModalName={this.state.changeModalName}
+            valueChanged={this.changeValue}
+          />
+        )}
       </SysAdminContentWrapper>
     )
   }
