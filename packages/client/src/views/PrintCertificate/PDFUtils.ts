@@ -117,7 +117,7 @@ function updatePDFTemplateWithSVGContent(
   if (hasTemplateEmptyArrayContent(template)) {
     ;(template.definition.content as Array<Content>).push({
       svg,
-      ...getPageDimensions(pageSize)
+      fit: getPageDimensions(pageSize)
     })
   }
 }
@@ -130,23 +130,19 @@ function hasTemplateEmptyArrayContent(template: IPDFTemplate): boolean {
   )
 }
 
-function getPageDimensions(pageSize: PageSize) {
-  const standardPageSizes: Record<string, [number, number]> = {
-    A2: [1190.55, 1683.78],
-    A3: [841.89, 1190.55],
-    A4: [595.28, 841.89],
-    A5: [419.53, 595.28]
-  }
+const standardPageSizes: Record<string, [number, number]> = {
+  A2: [1190.55, 1683.78],
+  A3: [841.89, 1190.55],
+  A4: [595.28, 841.89],
+  A5: [419.53, 595.28]
+}
 
+function getPageDimensions(pageSize: PageSize) {
   if (
     typeof pageSize === 'string' &&
     standardPageSizes.hasOwnProperty(pageSize)
   ) {
-    const [width, height] = standardPageSizes[pageSize]
-    return {
-      width,
-      height
-    }
+    return standardPageSizes[pageSize]
   } else {
     throw new Error(
       `Pagesize ${pageSize} is not found in standardPageSizes map`
