@@ -19,7 +19,10 @@ import {
   updateCertificate,
   updateCertificateHandler
 } from '@config/handlers/applicationCertificateHandler'
-import applicationConfigHandler from '@config/handlers/applicationConfigHandler'
+import applicationConfigHandler, {
+  updateApplicationConfig,
+  updateApplicationConfigHandler
+} from '@config/handlers/applicationConfigHandler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -133,6 +136,21 @@ export default function getRoutes() {
         description: 'Delete certificate',
         auth: {
           scope: [RouteScope.NATLSYSADMIN]
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/updateApplicationConfig',
+      handler: updateApplicationConfigHandler,
+      config: {
+        tags: ['api'],
+        description: 'Updates an existing Config',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        validate: {
+          payload: updateApplicationConfig
         }
       }
     }
