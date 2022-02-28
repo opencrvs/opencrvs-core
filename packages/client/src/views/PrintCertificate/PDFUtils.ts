@@ -19,7 +19,7 @@ import {
   OptionalData,
   IPDFTemplate
 } from '@client/pdfRenderer/transformer/types'
-import { Content } from 'pdfmake/interfaces'
+import { Content, PageSize } from 'pdfmake/interfaces'
 
 export function printMoneyReceipt(
   intl: IntlShape,
@@ -48,14 +48,15 @@ export async function previewCertificate(
   userDetails: IUserDetails | null,
   offlineResource: IOfflineData,
   callBack: (pdf: string) => void,
-  optionalData?: OptionalData
+  optionalData?: OptionalData,
+  pageSize: PageSize = 'A4'
 ) {
   if (!userDetails) {
     throw new Error('No user details found')
   }
 
   await createPDF(
-    getPDFTemplateWithSVG(offlineResource, application.event),
+    getPDFTemplateWithSVG(offlineResource, application.event, pageSize),
     application,
     userDetails,
     offlineResource,
@@ -71,13 +72,14 @@ export function printCertificate(
   application: IApplication,
   userDetails: IUserDetails | null,
   offlineResource: IOfflineData,
-  optionalData?: OptionalData
+  optionalData?: OptionalData,
+  pageSize: PageSize = 'A4'
 ) {
   if (!userDetails) {
     throw new Error('No user details found')
   }
   printPDF(
-    getPDFTemplateWithSVG(offlineResource, application.event),
+    getPDFTemplateWithSVG(offlineResource, application.event, pageSize),
     application,
     userDetails,
     offlineResource,
@@ -88,7 +90,8 @@ export function printCertificate(
 
 function getPDFTemplateWithSVG(
   offlineResource: IOfflineData,
-  event: Event
+  event: Event,
+  pageSize: PageSize
 ): IPDFTemplate {
   let template: IPDFTemplate
   let svg: string
@@ -101,14 +104,20 @@ function getPDFTemplateWithSVG(
     svg = offlineResource.certificateSvg.death
   }
 
-  updatePDFTemplateWithSVGContent(template, svg)
+  template.definition.pageSize = pageSize
+  updatePDFTemplateWithSVGContent(template, svg, pageSize)
   return template
 }
 
-function updatePDFTemplateWithSVGContent(template: IPDFTemplate, svg: string) {
+function updatePDFTemplateWithSVGContent(
+  template: IPDFTemplate,
+  svg: string,
+  pageSize: PageSize
+) {
   if (hasTemplateEmptyArrayContent(template)) {
     ;(template.definition.content as Array<Content>).push({
-      svg
+      svg,
+      ...getPageDimensions(pageSize)
     })
   }
 }
@@ -119,4 +128,28 @@ function hasTemplateEmptyArrayContent(template: IPDFTemplate): boolean {
       Array.isArray(template.definition.content) &&
       template.definition.content.length === 0
   )
+}
+
+function getPageDimensions(pageSize: PageSize) {
+  const standardPageSizes: Record<string, [number, number]> = {
+    A2: [1190.55, 1683.78],
+    A3: [841.89, 1190.55],
+    A4: [595.28, 841.89],
+    A5: [419.53, 595.28]
+  }
+
+  if (
+    typeof pageSize === 'string' &&
+    standardPageSizes.hasOwnProperty(pageSize)
+  ) {
+    const [width, height] = standardPageSizes[pageSize]
+    return {
+      width,
+      height
+    }
+  } else {
+    throw new Error(
+      `Pagesize ${pageSize} is not found in standardPageSizes map`
+    )
+  }
 }
