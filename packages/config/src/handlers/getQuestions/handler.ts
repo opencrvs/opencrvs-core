@@ -13,20 +13,19 @@ import * as Hapi from '@hapi/hapi'
 import Question, { IQuestion } from '@config/models/question'
 import { internal, notFound } from '@hapi/boom'
 
-export default async function getQuestion(
+export default async function getQuestions(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { fieldID } = request.params
-  let question: IQuestion | null
+  let questions: IQuestion[]
   try {
-    question = await Question.findOne({ fieldID }).exec()
+    questions = await Question.find().exec()
   } catch (error) {
     throw internal(error.message)
   }
 
-  if (!question) {
+  if (!questions) {
     throw notFound()
   }
-  return question
+  return questions
 }

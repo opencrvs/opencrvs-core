@@ -36,36 +36,16 @@ const messageDescriptorSchema = Joi.object({
 
 export const requestSchema = Joi.object({
   fieldId: Joi.string().required(),
-  fhirSectionCode: Joi.string(),
-  fhirResource: {
-    type: Joi.string().required(),
-    observationCode: Joi.string(),
-    observationDescription: Joi.string(),
-    categoryCode: Joi.string(),
-    categoryDescription: Joi.string(),
-    fhirRepresentation: Joi.string().required(),
-    customFhirFunction: Joi.string()
-  },
-  label: messageDescriptorSchema.required(),
+  label: messageDescriptorSchema,
   placeholder: messageDescriptorSchema,
   maxLength: Joi.number(),
-  options: Joi.array().items(
-    Joi.object({
-      label: messageDescriptorSchema.required(),
-      value: Joi.string().required()
-    })
-  ),
-  fieldName: Joi.string().required(),
-  fieldType: Joi.string()
-    .valid(...validFieldType)
-    .required(),
-  sectionPositionForField: Joi.number(),
+  fieldName: Joi.string(),
+  fieldType: Joi.string().valid(...validFieldType),
+  preceedingFieldId: Joi.string(),
+  required: Joi.boolean(),
   enabled: Joi.boolean().required(),
-  required: Joi.boolean().required(),
   custom: Joi.boolean(),
-  initialValue: Joi.string(),
-  nestedFieldParentRadioId: Joi.string(),
-  sectionPositionForNestedRadioField: Joi.number()
+  initialValue: Joi.string()
 })
 
 export const responseSchema = Joi.object({})

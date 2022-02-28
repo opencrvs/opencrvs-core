@@ -23,7 +23,7 @@ import applicationConfigHandler from '@config/handlers/applicationConfigHandler'
 import createQuestionHandler, {
   requestSchema as createQuestionReqSchema
 } from '@config/handlers/createQuestion/handler'
-import getQuestionHandler from '@config/handlers/getQuestion/handler'
+import getQuestionsHandler from '@config/handlers/getQuestions/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -142,11 +142,14 @@ export default function getRoutes() {
     },
     {
       method: 'POST',
-      path: '/createQuestion',
+      path: '/question',
       handler: createQuestionHandler,
       config: {
-        tags: ['api'], // TODO: add auth with scope of National system admin user
+        tags: ['api'],
         description: 'Create question',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
         validate: {
           payload: createQuestionReqSchema
         }
@@ -154,11 +157,22 @@ export default function getRoutes() {
     },
     {
       method: 'GET',
-      path: '/questions/{fieldId}',
-      handler: getQuestionHandler,
+      path: '/questions',
+      handler: getQuestionsHandler,
       config: {
-        tags: ['api'], // TODO: add auth with scope of National system admin user
-        description: 'Get question by field id'
+        tags: ['api'],
+        description: 'Get questions',
+        auth: {
+          scope: [
+            RouteScope.NATLSYSADMIN,
+            RouteScope.DECLARE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN,
+            RouteScope.VALIDATE
+          ]
+        }
       }
     }
   ]
