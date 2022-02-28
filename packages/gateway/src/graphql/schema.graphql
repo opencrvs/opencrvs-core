@@ -123,6 +123,7 @@ type Query {
   ): [Role]
   getCertificateSVG(status: String, event: String): CertificateSVG
   getActiveCertificatesSVG: [CertificateSVG]
+  getQuestions: [Question]
 }
 
 type Mutation {
@@ -190,6 +191,7 @@ type Mutation {
   createOrUpdateCertificateSVG(
     certificateSVG: CertificateSVGInput!
   ): CertificateSVG
+  createOrUpdateQuestion(question: QuestionInput!): Question
 }
 
 type Dummy {
@@ -409,6 +411,21 @@ type CertificateSVG {
   status: String
 }
 
+type Question {
+  _id: ID
+  fieldId: String
+  label: MesssageDescriptor
+  placeholder: MesssageDescriptor
+  maxLength: Int
+  fieldName: String
+  fieldType: String
+  preceedingFieldId: String
+  required: Boolean
+  enabled: Boolean
+  custom: Boolean
+  initialValue: String
+}
+
 input NotificationInput {
   child: PersonInput
   mother: PersonInput
@@ -501,6 +518,21 @@ input CertificateSVGInput {
   user: String!
   event: String!
   status: String!
+}
+
+input QuestionInput {
+  id: ID
+  fieldId: String
+  label: MesssageDescriptorInput
+  placeholder: MesssageDescriptorInput
+  maxLength: Int
+  fieldName: String
+  fieldType: String
+  preceedingFieldId: String
+  required: Boolean
+  enabled: Boolean
+  custom: Boolean
+  initialValue: String
 }
 
 scalar Map
@@ -795,6 +827,12 @@ type EventProgressSet {
   progressReport: EventProgressData
 }
 
+type MesssageDescriptor {
+  id: String
+  description: String
+  defaultMessage: String
+}
+
 input PersonInput {
   _fhirID: ID
   identifier: [IdentityInput]
@@ -887,6 +925,12 @@ input UserIdentifierInput {
 input SignatureInput {
   data: String
   type: String
+}
+
+input MesssageDescriptorInput {
+  id: String
+  description: String
+  defaultMessage: String
 }
 
 type RegWorkflow {
