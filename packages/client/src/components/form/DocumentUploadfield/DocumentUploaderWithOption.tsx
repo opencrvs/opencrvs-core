@@ -351,6 +351,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
           documents={this.state.uploadedDocuments}
           onSelect={this.selectForPreview}
           dropdownOptions={this.props.options}
+          onDelete={this.onDelete}
         />
         {this.props.hideOnEmptyOption && this.state.dropDownOptions.length === 0
           ? null

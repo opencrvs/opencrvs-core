@@ -156,6 +156,7 @@ class SimpleDocumentUploaderComponent extends React.Component<
           attachment={files}
           onSelect={this.selectForPreview}
           label={label}
+          onDelete={this.onDelete}
         />
         {this.state.previewImage && (
           <DocumentPreview

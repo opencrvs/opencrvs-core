@@ -377,7 +377,6 @@ export const NavigationView = (props: IFullProps) => {
               GROUP_ID.applicationGroup
             ) && (
               <NavigationGroup>
-                {console.log(applicationCount)}
                 {userDetails?.role &&
                   USER_SCOPE[userDetails.role].includes(TAB_ID.inProgress) && (
                     <NavigationItem

@@ -264,7 +264,6 @@ function GeneratedInputField({
     )
   }
   if (fieldDefinition.type === DOCUMENT_UPLOADER_WITH_OPTION) {
-    // sdfgsdfgsdfgsdfgsdfgsdfg
     return (
       <DocumentUploaderWithOption
         name={fieldDefinition.name}
@@ -282,7 +281,6 @@ function GeneratedInputField({
     )
   }
   if (fieldDefinition.type === SIMPLE_DOCUMENT_UPLOADER) {
-    // sfgsgsdfgsfgsdfgsdfg
     return (
       <SimpleDocumentUploader
         name={fieldDefinition.name}

@@ -11,25 +11,22 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { PaperClip } from '@opencrvs/components/lib/icons'
-import { IFileValue, IAttachmentValue } from '@client/forms'
+import { PaperClip, Delete } from '@opencrvs/components/lib/icons'
+import { IFileValue, IAttachmentValue, IFormFieldValue } from '@client/forms'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { withTheme, ITheme } from '@client/styledComponents'
 import { ISelectOption } from '@opencrvs/components/lib/forms'
+import { Button } from '@opencrvs/components/lib/buttons/Button'
+import { TertiaryButton } from '@opencrvs/components/lib/buttons'
 const Wrapper = styled.div`
   ${({ theme }) => theme.fonts.bodyStyle};
 `
 const PreviewLink = styled.div<{ disabled?: boolean }>`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.primary};
-  font-style: normal;
-  text-decoration-line: underline;
-  padding: 5px 10px;
-  margin: 10px 0px;
+  align-items: center;
   display: flex;
   cursor: pointer;
-  background: ${({ theme }) => theme.colors.background};
   span {
     margin-left: 8px;
   }
@@ -43,6 +40,21 @@ const ProcessingSpinner = styled(Spinner)`
   margin-left: auto;
 `
 
+const PreviewContainer = styled.div`
+  background: ${({ theme }) => theme.colors.background};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  font-style: normal;
+  text-decoration-line: underline;
+  padding: 5px 10px;
+  margin: 10px 0px;
+  display: flex;
+  flex-flow: row;
+`
+
+const IconContainer = styled.div`
+  margin-left: auto;
+`
+
 type IProps = {
   id?: string
   documents?: IFileValue[] | null
@@ -52,6 +64,7 @@ type IProps = {
   theme: ITheme
   onSelect: (document: IFileValue | IAttachmentValue) => void
   dropdownOptions?: ISelectOption[]
+  onDelete?: (image: IFileValue | IAttachmentValue) => void
 }
 
 class DocumentListPreviewComponent extends React.Component<IProps> {
@@ -62,44 +75,73 @@ class DocumentListPreviewComponent extends React.Component<IProps> {
     return matchingOptionForDocType && matchingOptionForDocType.label
   }
   render() {
-    const { id, documents, processingDocuments, label, attachment, theme } =
-      this.props
+    const {
+      id,
+      documents,
+      processingDocuments,
+      label,
+      attachment,
+      theme,
+      onDelete
+    } = this.props
     return (
       <Wrapper id={`preview-list-${id}`}>
         {documents &&
           documents.map((document: IFileValue, key: number) => (
-            <PreviewLink
-              id={`document_${(document.optionValues[1] as string).replace(
-                /\s/g,
-                ''
-              )}_link`}
-              key={key}
-              onClick={(_) => this.props.onSelect(document)}
-            >
-              <PaperClip />
-              <span>
-                {this.getFormattedLabelForDocType(
-                  document.optionValues[1] as string
-                ) || document.optionValues[1]}
-              </span>
-            </PreviewLink>
+            <PreviewContainer key={`preview_${key}`}>
+              <PreviewLink
+                id={`document_${(document.optionValues[1] as string).replace(
+                  /\s/g,
+                  ''
+                )}_link`}
+                key={key}
+                onClick={(_) => this.props.onSelect(document)}
+              >
+                <PaperClip />
+                <span>
+                  {this.getFormattedLabelForDocType(
+                    document.optionValues[1] as string
+                  ) || document.optionValues[1]}
+                </span>
+              </PreviewLink>
+              <IconContainer>
+                <TertiaryButton
+                  id="preview_delete"
+                  icon={() => <Delete color="red" />}
+                  onClick={() => onDelete && onDelete(document)}
+                />
+              </IconContainer>
+            </PreviewContainer>
           ))}
         {processingDocuments &&
           processingDocuments.map(({ label }) => (
-            <PreviewLink disabled={true} key={label}>
-              <PaperClip stroke={theme.colors.disabled} />
-              <span>{this.getFormattedLabelForDocType(label) || label}</span>
-              <ProcessingSpinner
-                size={24}
-                id={`document_${label}_processing`}
-              />
-            </PreviewLink>
+            <PreviewContainer>
+              <PreviewLink disabled={true} key={label}>
+                <PaperClip stroke={theme.colors.disabled} />
+                <span>{this.getFormattedLabelForDocType(label) || label}</span>
+              </PreviewLink>
+              <IconContainer>
+                <ProcessingSpinner
+                  size={24}
+                  id={`document_${label}_processing`}
+                />
+              </IconContainer>
+            </PreviewContainer>
           ))}
         {attachment && attachment.data && label && (
-          <PreviewLink onClick={(_) => this.props.onSelect(attachment)}>
-            <PaperClip />
-            <span>{this.getFormattedLabelForDocType(label) || label}</span>
-          </PreviewLink>
+          <PreviewContainer>
+            <PreviewLink onClick={(_) => this.props.onSelect(attachment)}>
+              <PaperClip />
+              <span>{this.getFormattedLabelForDocType(label) || label}</span>
+            </PreviewLink>
+            <IconContainer>
+              <TertiaryButton
+                id="preview_delete"
+                icon={() => <Delete color="red" />}
+                onClick={() => onDelete && onDelete(attachment)}
+              />
+            </IconContainer>
+          </PreviewContainer>
         )}
       </Wrapper>
     )
