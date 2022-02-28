@@ -293,6 +293,16 @@ const APPLICATION_STATUS_LABEL: IStatus = {
     id: 'correction.request',
     defaultMessage: 'Requested correction',
     description: 'Status for application being requested for correction'
+  },
+  DECLARATION_UPDATED: {
+    defaultMessage: 'Updated',
+    description: 'Application has been updated',
+    id: 'constants.updated'
+  },
+  ARCHIVE_DECLARATION: {
+    defaultMessage: 'Archived',
+    description: 'Application has been archived',
+    id: 'constants.archived_declaration'
   }
 }
 

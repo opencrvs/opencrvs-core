@@ -845,6 +845,16 @@ const dynamicMessagesToDefine: Record<
     defaultMessage: 'validated',
     description: 'A label for validated'
   },
+  updated: {
+    defaultMessage: 'Updated',
+    description: 'Application has been updated',
+    id: 'constants.updated'
+  },
+  archived_declaration: {
+    defaultMessage: 'Archived',
+    description: 'Application has been archived',
+    id: 'constants.archived_declaration'
+  },
   waitingValidation: {
     id: 'constants.waitingValidation',
     defaultMessage: 'sent for validation',
