@@ -58,5 +58,5 @@ export const SENTRY_DSN =
 // Check if the token has been invalided in the auth service before it has expired
 // This needs to be a string to make it easy to pass as an ENV var.
 export const CHECK_INVALID_TOKEN = process.env.CHECK_INVALID_TOKEN || 'false'
-export const RESOURCES_URL =
-  process.env.RESOURCES_URL || 'http://localhost:3040'
+export const COUNTRY_CONFIG_URL =
+  process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'

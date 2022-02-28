@@ -10,9 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { Event, UserSection } from '@client/forms'
+import { Event, UserSection, CorrectionSection } from '@client/forms'
 import {
-  APPLICATION_DETAIL,
   CERTIFICATE_COLLECTOR,
   CREATE_USER,
   CREATE_USER_ON_LOCATION,
@@ -39,7 +38,6 @@ import {
   SEARCH_RESULT,
   SELECT_BIRTH_INFORMANT,
   SELECT_BIRTH_MAIN_CONTACT_POINT,
-  SELECT_BIRTH_PRIMARY_APPLICANT,
   SELECT_DEATH_INFORMANT,
   SELECT_DEATH_MAIN_CONTACT_POINT,
   SELECT_VITAL_EVENT,
@@ -50,16 +48,29 @@ import {
   WORKFLOW_STATUS,
   TEAM_USER_LIST,
   USER_PROFILE,
-  CONFIG
+  CERTIFICATE_CORRECTION,
+  VERIFY_CORRECTOR,
+  CONFIG,
+  DECLARATION_RECORD_AUDIT,
+  CHANGE_PHONE
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
+import { NATL_ADMIN_ROLES } from '@client/utils/constants'
+import { IUserDetails } from '@client/utils/userUtils'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
 import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseApplicationCountView'
+import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
-import { goBack as back, push, replace } from 'connected-react-router'
+import {
+  goBack as back,
+  push,
+  replace,
+  goForward as forward
+} from 'connected-react-router'
 import moment from 'moment'
 import { stringify } from 'query-string'
 import { Cmd, loop } from 'redux-loop'
+import { IRecordAuditTabs } from '@client/views/Home/RecordAudit'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -177,6 +188,10 @@ export function goBack() {
   return back()
 }
 
+export function goForward() {
+  return forward()
+}
+
 export function goToHome() {
   return push(HOME)
 }
@@ -275,13 +290,11 @@ export function goToSearch() {
   return push(SEARCH)
 }
 
-export function goToApplicationDetails(
-  applicationId: string,
-  forceDetailsQuery?: boolean
+export function goToDeclarationRecordAudit(
+  tab: IRecordAuditTabs,
+  declarationId: string
 ) {
-  return push(formatUrl(APPLICATION_DETAIL, { applicationId }), {
-    forceDetailsQuery
-  })
+  return push(formatUrl(DECLARATION_RECORD_AUDIT, { tab, declarationId }))
 }
 
 export function goToBirthRegistrationAsParent(applicationId: string) {
@@ -295,13 +308,6 @@ export function goToApplicationContact(informant: string) {
   return push(
     formatUrl(DRAFT_BIRTH_APPLICANT_FORM, {
       informant: informant.toString()
-    })
-  )
-}
-export function goToPrimaryApplicant(applicationId: string) {
-  return push(
-    formatUrl(SELECT_BIRTH_PRIMARY_APPLICANT, {
-      applicationId
     })
   )
 }
@@ -321,6 +327,27 @@ export function goToPrintCertificate(
       registrationId: registrationId.toString(),
       eventType: event.toLowerCase().toString(),
       groupId: groupId || 'certCollector'
+    })
+  )
+}
+
+export function goToCertificateCorrection(
+  applicationId: string,
+  pageId: CorrectionSection
+) {
+  return push(
+    formatUrl(CERTIFICATE_CORRECTION, {
+      applicationId: applicationId.toString(),
+      pageId: pageId.toString()
+    })
+  )
+}
+
+export function goToVerifyCorrector(applicationId: string, corrector: string) {
+  return push(
+    formatUrl(VERIFY_CORRECTOR, {
+      applicationId: applicationId.toString(),
+      corrector: corrector.toLowerCase().toString()
     })
   )
 }
@@ -390,6 +417,18 @@ export function goToSysAdminHomeTab(tabId: string) {
 
 export function goToSettings() {
   return push(SETTINGS)
+}
+export function goToPhoneSettings() {
+  return push(CHANGE_PHONE)
+}
+
+export function goToSettingsWithPhoneSuccessMsg(phonedNumberUpdated: boolean) {
+  return push({
+    pathname: SETTINGS,
+    state: {
+      phonedNumberUpdated
+    }
+  })
 }
 
 export function goToCreateNewUser() {
@@ -573,6 +612,36 @@ export function goToPage(
       fieldNameHash,
       pageRoute,
       historyState
+    }
+  }
+}
+
+export function goToPerformanceView(userDetails: IUserDetails) {
+  if (userDetails && userDetails.role) {
+    if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
+      return goToPerformanceHome()
+    } else {
+      const locationId = getJurisdictionLocationIdFromUserDetails(userDetails)
+      return (
+        (locationId && goToOperationalReport(locationId)) ||
+        goToPerformanceHome()
+      )
+    }
+  }
+}
+
+export function goToTeamView(userDetails: IUserDetails) {
+  if (userDetails && userDetails.role) {
+    if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
+      return goToTeamSearch()
+    } else {
+      return goToTeamUserList({
+        id: (userDetails.primaryOffice && userDetails.primaryOffice.id) || '',
+        searchableText:
+          (userDetails.primaryOffice && userDetails.primaryOffice.name) || '',
+        displayLabel:
+          (userDetails.primaryOffice && userDetails.primaryOffice.name) || ''
+      })
     }
   }
 }

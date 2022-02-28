@@ -47,10 +47,12 @@ import { setUserDetails } from '@client/profile/profileActions'
 import {
   createBrowserHistory,
   createLocation,
-  createMemoryHistory
+  createMemoryHistory,
+  History
 } from 'history'
 import { stringify } from 'query-string'
 import { match as Match } from 'react-router'
+import { ConnectedRouter } from 'connected-react-router'
 
 export const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -119,14 +121,14 @@ export function waitForReady(app: ReactWrapper) {
 }
 
 export async function createTestApp(
-  config = { waitUntilResourcesLoaded: true }
+  config = { waitUntilOfflineCountryConfigLoaded: true }
 ) {
   const { store, history } = createStore()
   const app = mount(
     <App store={store} history={history} client={createGraphQLClient()} />
   )
 
-  if (config.waitUntilResourcesLoaded) {
+  if (config.waitUntilOfflineCountryConfigLoaded) {
     await waitForReady(app)
   }
   return { history, app, store }
@@ -2534,6 +2536,29 @@ export const mockDeathRegistrationSectionData = {
   ]
 }
 
+export const mockFetchCertificatesTemplatesDefinition = [
+  {
+    event: 'birth',
+    status: 'ACTIVE',
+    svgCode:
+      '<svg width="420" height="595" viewBox="0 0 420 595" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\n<rect width="420" height="595" fill="white"/>\n<rect x="16.5" y="16.5" width="387" height="562" stroke="#D7DCDE"/>\n<path d="M138.429 511.629H281.571" stroke="#F4F4F4" stroke-width="1.22857" stroke-linecap="square" stroke-linejoin="round"/>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="526.552" text-anchor="middle">{registrarName}&#x2028;</tspan><tspan x="50%" y="538.552" text-anchor="middle">({role}) &#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="209.884" y="549.336">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="210" y="445.552">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="429.552" text-anchor="middle">This event was registered at {registrationLocation}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="308.828" text-anchor="middle">{eventDate}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="287.69" text-anchor="middle">Died on&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="345.69" text-anchor="middle">Place of death&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="500" letter-spacing="0px"><tspan x="211" y="384.004">&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="367.828" text-anchor="middle">{placeOfDeath}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="245.828" text-anchor="middle">{applicantName}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="224.69" text-anchor="middle">This is to certify that&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="1px"><tspan x="50%" y="145.828" text-anchor="middle">{registrationNumber}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" letter-spacing="0px"><tspan x="50%" y="127.828" text-anchor="middle">Death Registration No&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="170.104" text-anchor="middle">Date of issuance of certificate:  {certificateDate}</tspan></text>\n<line x1="44.9985" y1="403.75" x2="377.999" y2="401.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<line x1="44.9985" y1="189.75" x2="377.999" y2="187.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<rect x="188" y="51" width="46.7463" height="54" fill="url(#pattern0)"/>\n<defs>\n<pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">\n<use xlink:href="#image0_43_3545" transform="translate(0 -0.000358256) scale(0.0005)"/>\n</pattern>\n<image id="image0_43_3545" width="2000" height="2312" xlink:href="{countryLogo}"/>\n</defs>\n</svg>\n',
+    svgDateCreated: 1640696680593,
+    svgDateUpdated: 1644326332088,
+    svgFilename: 'oCRVS_DefaultZambia_Death_v1.svg',
+    user: '61d42359f1a2c25ea01beb4b'
+  },
+  {
+    event: 'death',
+    status: 'ACTIVE',
+    svgCode:
+      '<svg width="420" height="595" viewBox="0 0 420 595" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\n<rect width="420" height="595" fill="white"/>\n<rect x="16.5" y="16.5" width="387" height="562" stroke="#D7DCDE"/>\n<path d="M138.429 511.629H281.571" stroke="#F4F4F4" stroke-width="1.22857" stroke-linecap="square" stroke-linejoin="round"/>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="526.552" text-anchor="middle">{registrarName}&#x2028;</tspan><tspan x="50%" y="538.552" text-anchor="middle">({role}) &#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="549.336" text-anchor="middle">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="445.552" text-anchor="middle">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="429.552" text-anchor="middle">This event was registered at {registrationLocation}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="308.828" text-anchor="middle">{eventDate}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="287.69" text-anchor="middle">Was born on&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="345.69" text-anchor="middle">Place of birth&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="500" letter-spacing="0px"><tspan x="50%" y="384.004" text-anchor="middle">&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="367.828" text-anchor="middle">{placeOfBirth}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="245.828" text-anchor="middle">{applicantName}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="224.69" text-anchor="middle">This is to certify that&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="1px"><tspan x="50%" y="145.828" text-anchor="middle">{registrationNumber}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" letter-spacing="0px"><tspan x="50%" y="127.828" text-anchor="middle">Birth Registration No&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="170.104" text-anchor="middle">Date of issuance of certificate:  {certificateDate}</tspan></text>\n<line x1="44.9985" y1="403.75" x2="377.999" y2="401.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<line x1="44.9985" y1="189.75" x2="377.999" y2="187.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<rect x="188" y="51" width="46.7463" height="54" fill="url(#pattern0)"/>\n<defs>\n<pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">\n<use xlink:href="#image0_43_3545" transform="translate(0 -0.000358256) scale(0.0005)"/>\n</pattern>\n<image id="image0_43_3545" width="2000" height="2312" xlink:href="{countryLogo}"/>\n</defs>\n</svg>\n',
+    svgDateCreated: 1640696804785,
+    svgDateUpdated: 1643885502999,
+    svgFilename: 'oCRVS_DefaultZambia_Birth_v1.svg',
+    user: '61d42359f1a2c25ea01beb4b'
+  }
+]
+
 export const mockOfflineData = {
   forms: JSON.parse(
     readFileSync(join(__dirname, './register.json')).toString()
@@ -2844,7 +2869,53 @@ export const mockOfflineData = {
   ),
   assets: {
     logo: `data:image;base64,${validImageB64String}`
+  },
+  config: {
+    COUNTRY_LOGO_RENDER_WIDTH: 104,
+    COUNTRY_LOGO_RENDER_HEIGHT: 104,
+    DESKTOP_TIME_OUT_MILLISECONDS: 900000,
+    HEALTH_FACILITY_FILTER: 'DISTRICT',
+    LANGUAGES: 'en,bn',
+    CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 36500,
+    CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 36500,
+    CERTIFICATE_PRINT_LOWEST_CHARGE: 0,
+    CERTIFICATE_PRINT_HIGHEST_CHARGE: 0,
+    UI_POLLING_INTERVAL: 5000,
+    FIELD_AGENT_AUDIT_LOCATIONS:
+      'WARD,UNION,CITY_CORPORATION,MUNICIPALITY,UPAZILA',
+    APPLICATION_AUDIT_LOCATIONS: 'WARD,UNION',
+    INFORMANT_MINIMUM_AGE: 16,
+    HIDE_EVENT_REGISTER_INFORMATION: false,
+    EXTERNAL_VALIDATION_WORKQUEUE: true,
+    _id: '61a8c105c04ac94fe46ceb27',
+    BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
+    COUNTRY: 'bgd',
+    COUNTRY_LOGO_FILE: 'logo.png',
+    PHONE_NUMBER_PATTERN: {
+      pattern: /^01[1-9][0-9]{8}$/,
+      example: '01741234567',
+      start: '01',
+      num: '11',
+      mask: {
+        startForm: 5,
+        endBefore: 3
+      }
+    },
+    BIRTH_REGISTRATION_TARGET: 45,
+    DEATH_REGISTRATION_TARGET: 45,
+    NID_NUMBER_PATTERN: {
+      pattern: /^[0-9]{9}$/,
+      example: '4837281940',
+      num: '9'
+    },
+    SENTRY: 'https://sentry.com',
+    LOGROCKET: 'opencrvs-foundation/opencrvs-zambia'
   }
+}
+
+export const mockConfigResponse = {
+  config: mockOfflineData.config,
+  certificates: mockFetchCertificatesTemplatesDefinition
 }
 
 export async function createTestStore() {
@@ -2858,7 +2929,8 @@ export async function createTestStore() {
       facilities: mockOfflineData.facilities,
       pilotLocations: mockOfflineData.pilotLocations,
       offices: mockOfflineData.offices,
-      assets: mockOfflineData.assets
+      assets: mockOfflineData.assets,
+      config: mockOfflineData.config
     })
   )
   return { store, history }
@@ -2866,17 +2938,19 @@ export async function createTestStore() {
 
 export async function createTestComponent(
   node: React.ReactElement<ITestView>,
-  store: AppStore,
-  graphqlMocks: any = null,
+  {
+    store,
+    history,
+    graphqlMocks,
+    apolloClient
+  }: {
+    store: AppStore
+    history: History
+    graphqlMocks?: MockedProvider['props']['mocks']
+    apolloClient?: ApolloClient<any>
+  },
   options?: MountRendererProps
 ) {
-  /*
-   * Would it work to replace this fn with createTestApp()
-   * call send return only the component that requires testing..
-   *
-   * Feels odd the whole boilerplate has to be recreated
-   */
-
   await store.dispatch(
     offlineDataReady({
       languages: mockOfflineData.languages,
@@ -2886,11 +2960,16 @@ export async function createTestComponent(
       facilities: mockOfflineData.facilities,
       pilotLocations: mockOfflineData.pilotLocations,
       offices: mockOfflineData.offices,
-      assets: mockOfflineData.assets
+      assets: mockOfflineData.assets,
+      config: mockOfflineData.config
     })
   )
 
-  function PropProxy(props: Record<string, any>) {
+  const withGraphQL = (node: JSX.Element) => {
+    if (apolloClient) {
+      return <ApolloProvider client={apolloClient}>{node}</ApolloProvider>
+    }
+
     return (
       <MockedProvider
         mocks={graphqlMocks}
@@ -2900,59 +2979,26 @@ export async function createTestComponent(
           query: { fetchPolicy: 'no-cache' }
         }}
       >
-        <Provider store={store}>
+        {node}
+      </MockedProvider>
+    )
+  }
+
+  function PropProxy(props: Record<string, any>) {
+    return withGraphQL(
+      <Provider store={store}>
+        <ConnectedRouter noInitialPop={true} history={history}>
           <I18nContainer>
             <ThemeProvider theme={getTheme(getDefaultLanguage())}>
               <node.type {...node.props} {...props} />
             </ThemeProvider>
           </I18nContainer>
-        </Provider>
-      </MockedProvider>
+        </ConnectedRouter>
+      </Provider>
     )
   }
 
-  const component = mount(<PropProxy {...node.props} />, options)
-  return { component: component.update(), store }
-}
-
-export async function createTestComponentWithApolloClient(
-  node: React.ReactElement<ITestView>,
-  store: AppStore,
-  client: ApolloClient<{}>
-) {
-  /*
-   * Would it work to replace this fn with createTestApp()
-   * call send return only the component that requires testing..
-   *
-   * Feels odd the whole boilerplate has to be recreated
-   */
-
-  await store.dispatch(
-    offlineDataReady({
-      languages: mockOfflineData.languages,
-      forms: mockOfflineData.forms,
-      templates: mockOfflineData.templates,
-      locations: mockOfflineData.locations,
-      facilities: mockOfflineData.facilities,
-      pilotLocations: mockOfflineData.pilotLocations,
-      offices: mockOfflineData.offices,
-      assets: mockOfflineData.assets
-    })
-  )
-
-  const component = mount(
-    <ApolloProvider client={client}>
-      <Provider store={store}>
-        <I18nContainer>
-          <ThemeProvider theme={getTheme(getDefaultLanguage())}>
-            {node}
-          </ThemeProvider>
-        </I18nContainer>
-      </Provider>
-    </ApolloProvider>
-  )
-
-  return { component: component.update(), store }
+  return mount(<PropProxy {...node.props} />, options)
 }
 
 export const mockDeathApplicationDataWithoutFirstNames = {
@@ -3181,7 +3227,11 @@ export function loginAsFieldAgent(store: AppStore) {
               ]
             }
           ],
-          primaryOffice: undefined,
+          primaryOffice: {
+            id: '0d8474da-0361-4d32-979e-af91f012340a',
+            name: 'Kaliganj Union Sub Center',
+            status: 'active'
+          },
           localRegistrar: {
             name: [
               {
@@ -3201,11 +3251,11 @@ export function loginAsFieldAgent(store: AppStore) {
 
 export function createRouterProps<T, Params>(
   path: string,
-  locationState: T,
+  locationState?: T,
   {
     search,
     matchParams = {} as Params
-  }: { search?: Record<string, string>; matchParams?: Params }
+  }: { search?: Record<string, string>; matchParams?: Params } = {}
 ) {
   const location = createLocation(path, locationState)
 

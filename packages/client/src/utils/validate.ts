@@ -30,6 +30,7 @@ import {
 import moment from 'moment'
 import { IOfflineData } from '@client/offline/reducer'
 import { getListOfLocations } from '@client/forms/utils'
+import _ from 'lodash'
 
 export interface IValidationResult {
   message: MessageDescriptor
@@ -48,14 +49,14 @@ export type MaxLengthValidation = (
 export type Validation = (
   value: IFormFieldValue,
   drafts?: IFormData,
-  resources?: IOfflineData
+  offlineCountryConfig?: IOfflineData
 ) => IValidationResult | undefined
 
 export type ValidationInitializer = (...value: any[]) => Validation
 
 export const isAValidPhoneNumberFormat = (value: string): boolean => {
   const { pattern } = window.config.PHONE_NUMBER_PATTERN
-  return pattern.test(value)
+  return new RegExp(pattern).test(value)
 }
 
 export const isAValidEmailAddressFormat = (value: string): boolean => {
@@ -156,14 +157,27 @@ export const numeric: Validation = (value: IFormFieldValue) => {
 export const facilityMustBeSelected: Validation = (
   value: IFormFieldValue,
   drafts,
-  resources
+  offlineCountryConfig
 ) => {
   const locationsList = getListOfLocations(
-    resources as IOfflineData,
+    offlineCountryConfig as IOfflineData,
     'facilities'
   )
   const isValid = !value || locationsList[value as string]
   return isValid ? undefined : { message: messages.facilityMustBeSelected }
+}
+
+export const officeMustBeSelected: Validation = (
+  value: IFormFieldValue,
+  drafts,
+  offlineCountryConfig
+) => {
+  const locationsList = getListOfLocations(
+    offlineCountryConfig as IOfflineData,
+    'offices'
+  )
+  const isValid = !value || locationsList[value as string]
+  return isValid ? undefined : { message: messages.officeMustBeSelected }
 }
 
 export const phoneNumberFormat: Validation = (value: IFormFieldValue) => {
@@ -522,7 +536,7 @@ const hasValidLength = (value: string, length: number): boolean =>
 
 export const isAValidNIDNumberFormat = (value: string): boolean => {
   const { pattern } = window.config.NID_NUMBER_PATTERN
-  return pattern.test(value)
+  return new RegExp(pattern).test(value)
 }
 
 export const validIDNumber =
@@ -596,6 +610,17 @@ export const validIDNumber =
       default:
         return undefined
     }
+  }
+export const duplicateIDNumber =
+  (fieldToDuplicateCheck: string): Validation =>
+  (value: IFormFieldValue, drafts) => {
+    if (value === _.get(drafts, fieldToDuplicateCheck)) {
+      return {
+        message: messages.duplicateNationalID
+      }
+    }
+
+    return undefined
   }
 
 export const isValidDeathOccurrenceDate: Validation = (

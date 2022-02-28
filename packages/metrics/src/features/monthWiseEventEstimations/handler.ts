@@ -28,9 +28,9 @@ import { IAuthHeader } from '@metrics/features/registration/'
 
 interface IMonthWiseEstimation {
   actualTotalRegistration: number
-  actual45DayRegistration: number
+  actualTargetDayRegistration: number
   estimatedRegistration: number
-  estimated45DayPercentage: number
+  estimatedTargetDayPercentage: number
   month: string
   year: string
   startOfMonth: string
@@ -46,7 +46,8 @@ export async function monthWiseEventEstimationsHandler(
   const locationId = 'Location/' + request.query[LOCATION_ID]
   const event = request.query[EVENT]
   const authHeader: IAuthHeader = {
-    Authorization: request.headers.authorization
+    Authorization: request.headers.authorization,
+    'x-correlation-id': request.headers['x-correlation-id']
   }
   const monthFilters: IMonthRangeFilter[] = getMonthRangeFilterListFromTimeRage(
     timeStart,
@@ -54,7 +55,7 @@ export async function monthWiseEventEstimationsHandler(
   )
   const estimations: IMonthWiseEstimation[] = []
   for (const monthFilter of monthFilters) {
-    const estimated45DayMetrics = await fetchLocationWiseEventEstimations(
+    const estimatedTargetDayMetrics = await fetchLocationWiseEventEstimations(
       monthFilter.startOfMonthTime,
       monthFilter.endOfMonthTime,
       locationId,
@@ -71,9 +72,10 @@ export async function monthWiseEventEstimationsHandler(
         locationId,
         event
       ),
-      actual45DayRegistration: estimated45DayMetrics.actualRegistration,
-      estimatedRegistration: estimated45DayMetrics.estimatedRegistration,
-      estimated45DayPercentage: estimated45DayMetrics.estimatedPercentage,
+      actualTargetDayRegistration: estimatedTargetDayMetrics.actualRegistration,
+      estimatedRegistration: estimatedTargetDayMetrics.estimatedRegistration,
+      estimatedTargetDayPercentage:
+        estimatedTargetDayMetrics.estimatedPercentage,
       month: monthFilter.month,
       year: monthFilter.year
     })

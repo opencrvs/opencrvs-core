@@ -12,20 +12,33 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { IDataProps, DataRow } from './DataRow'
+import { LinkButton } from '../../buttons'
 
 const Container = styled.div`
   margin-top: 48px;
 `
 const Title = styled.div`
+  display: flex;
+  gap: 8px;
   ${({ theme }) => theme.fonts.h4Style};
   margin-bottom: 16px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     ${({ theme }) => theme.fonts.h5Style};
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0px;
   }
 `
 
-const ResponsiveContainer = styled.div`
-  display: none;
+interface IAction {
+  id?: string
+  label: string
+  disabled?: boolean
+  handler: () => void
+}
+
+const ResponsiveContainer = styled.div<{ isConfigPage?: boolean }>`
+  display: ${({ isConfigPage }) => (isConfigPage === true ? 'block' : 'none')};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: block;
   }
@@ -35,17 +48,28 @@ interface IProps {
   title: string
   items: IDataProps[]
   responsiveContents?: React.ReactNode
+  action?: IAction
+  isConfigPage?: boolean
 }
 
 export class DataSection extends React.Component<IProps> {
   render() {
-    const { id, title, items, responsiveContents } = this.props
+    const { action, id, title, items, responsiveContents } = this.props
 
     return (
       <Container id={id}>
-        <Title>{title}</Title>
+        <Title>
+          {title}
+          {action && (
+            <LinkButton onClick={action.handler}>{action.label}</LinkButton>
+          )}
+        </Title>
         {responsiveContents && (
-          <ResponsiveContainer>{responsiveContents}</ResponsiveContainer>
+          <ResponsiveContainer
+            isConfigPage={this.props.isConfigPage && this.props.isConfigPage}
+          >
+            {responsiveContents}
+          </ResponsiveContainer>
         )}
         {items.map((item: IDataProps, index: number) => (
           <DataRow id={item.label.split(' ').join('-')} key={index} {...item} />

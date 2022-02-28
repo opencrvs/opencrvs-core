@@ -29,7 +29,6 @@ import { createClient } from '@client/utils/apolloClient'
 import { ReviewDuplicates } from '@client/views/Duplicates/ReviewDuplicates'
 import { EventInfo } from '@client/views/EventInfo/EventInfo'
 import { FieldAgentHome } from '@client/views/FieldAgentHome/FieldAgentHome'
-import { Details } from '@client/views/Home/Details'
 import { FieldAgentList } from '@client/views/Performance/FieldAgentList'
 import { CollectorForm } from '@client/views/PrintCertificate/collectorForm/CollectorForm'
 import { Payment } from '@client/views/PrintCertificate/Payment'
@@ -37,10 +36,9 @@ import { ReviewCertificateAction } from '@client/views/PrintCertificate/ReviewCe
 import { VerifyCollector } from '@client/views/PrintCertificate/VerifyCollector'
 import { ApplicationForm } from '@client/views/RegisterForm/ApplicationForm'
 import { ReviewForm } from '@client/views/RegisterForm/ReviewForm'
-import { RegistrationHome } from '@client/views/RegistrationHome/RegistrationHome'
+import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { SearchResult } from '@client/views/SearchResult/SearchResult'
 import { SelectInformant } from '@client/views/SelectInformant/SelectInformant'
-import { SelectPrimaryApplicant } from '@client/views/SelectPrimaryApplicant/SelectPrimaryApplicant'
 import { SelectVitalEvent } from '@client/views/SelectVitalEvent/SelectVitalEvent'
 import { SettingsPage } from '@client/views/Settings/SettingsPage'
 import { OperationalReport } from '@client/views/SysAdmin/Performance/OperationalReport'
@@ -61,8 +59,12 @@ import { ApolloProvider } from 'react-apollo'
 import { Provider } from 'react-redux'
 import { Switch } from 'react-router'
 import { AppStore } from './store'
+import { RecordAudit } from './views/Home/RecordAudit'
+import { ChangePhonePage } from './views/Settings/ChangePhonePage'
 import { ConfigHome } from './views/SysAdmin/Config/ConfigHome'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
+import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
+import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -141,13 +143,6 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
-                                            path={
-                                              routes.SELECT_BIRTH_PRIMARY_APPLICANT
-                                            }
-                                            component={SelectPrimaryApplicant}
-                                          />
-                                          <ProtectedRoute
-                                            exact
                                             path={routes.SELECT_BIRTH_INFORMANT}
                                             component={SelectInformant}
                                           />
@@ -211,17 +206,23 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             path={routes.REGISTRAR_HOME}
-                                            component={RegistrationHome}
+                                            component={OfficeHome}
                                           />
                                           <ProtectedRoute
                                             exact
                                             path={routes.REGISTRAR_HOME_TAB}
-                                            component={RegistrationHome}
+                                            component={OfficeHome}
                                           />
                                           <ProtectedRoute
                                             exact
                                             path={routes.CONFIG}
                                             component={ConfigHome}
+                                          />
+                                          <ProtectedRoute
+                                            path={
+                                              routes.DECLARATION_RECORD_AUDIT
+                                            }
+                                            component={RecordAudit}
                                           />
                                           <ProtectedRoute
                                             path={routes.SEARCH}
@@ -246,6 +247,11 @@ export class App extends React.Component<IAppProps> {
                                             component={VerifyCollector}
                                           />
                                           <ProtectedRoute
+                                            exact
+                                            path={routes.VERIFY_CORRECTOR}
+                                            component={VerifyCorrector}
+                                          />
+                                          <ProtectedRoute
                                             path={routes.REVIEW_CERTIFICATE}
                                             component={ReviewCertificateAction}
                                           />
@@ -256,12 +262,25 @@ export class App extends React.Component<IAppProps> {
                                             component={Payment}
                                           />
                                           <ProtectedRoute
+                                            exact
+                                            path={routes.CERTIFICATE_CORRECTION}
+                                            component={CorrectionForm}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={
+                                              routes.CERTIFICATE_CORRECTION_REVIEW
+                                            }
+                                            component={CorrectionReviewForm}
+                                          />
+                                          <ProtectedRoute
                                             path={routes.SETTINGS}
                                             component={SettingsPage}
                                           />
                                           <ProtectedRoute
-                                            path={routes.APPLICATION_DETAIL}
-                                            component={Details}
+                                            exact
+                                            path={routes.CHANGE_PHONE}
+                                            component={ChangePhonePage}
                                           />
                                           <ProtectedRoute
                                             exact

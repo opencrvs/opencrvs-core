@@ -11,10 +11,22 @@
  */
 import * as React from 'react'
 
+interface IPropsUsers {
+  stroke?: string
+  width?: number
+  height?: number
+}
+
 export const Users = (
-  props: React.HTMLAttributes<SVGElement> & { stroke?: string }
+  props: React.HTMLAttributes<SVGElement> & IPropsUsers
 ) => (
-  <svg width={24} height={24} viewBox="0 0 24 24" fill="none" {...props}>
+  <svg
+    width={props.width ? props.width : 24}
+    height={props.height ? props.height : 24}
+    viewBox="0 0 24 24"
+    fill="none"
+    {...props}
+  >
     <path
       d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"
       stroke={props.stroke ? props.stroke : '#35495D'}

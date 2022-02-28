@@ -12,7 +12,10 @@
 import { ISerializedForm } from '@client/forms'
 import { ILanguage } from '@client/i18n/reducer'
 import { ILocation } from '@client/offline/reducer'
-import { IPDFTemplate } from '@client/pdfRenderer/transformer/types'
+import {
+  IPDFTemplate,
+  ISVGTemplate
+} from '@client/pdfRenderer/transformer/types'
 import { getToken } from '@client/utils/authUtils'
 import { ICertificateCollectorDefinition } from '@client/views/PrintCertificate/VerifyCollector'
 
@@ -35,17 +38,93 @@ export interface IDefinitionsResponse {
   templates: {
     receipt?: IPDFTemplate
     certificates: {
-      birth: IPDFTemplate
-      death: IPDFTemplate
+      birth: ISVGTemplate
+      death: ISVGTemplate
     }
   }
 }
+
 export interface IAssetResponse {
   logo: string
 }
 
+export interface IPhoneNumberPattern {
+  pattern: RegExp
+  example: string
+  start: string
+  num: string
+  mask: {
+    startForm: number
+    endBefore: number
+  }
+}
+
+export interface INIDNumberPattern {
+  pattern: RegExp
+  example: string
+  num: string
+}
+
+export interface ICertificateTemplateData {
+  event: string
+  status: string
+  svgCode: string
+  svgDateCreated: number
+  svgDateUpdated: number
+  svgFilename: string
+  user: string
+  _id: string
+}
+
+export interface IApplicationConfig {
+  BACKGROUND_SYNC_BROADCAST_CHANNEL: string
+  COUNTRY: string
+  COUNTRY_LOGO_FILE: string
+  COUNTRY_LOGO_RENDER_WIDTH: number
+  COUNTRY_LOGO_RENDER_HEIGHT: number
+  DESKTOP_TIME_OUT_MILLISECONDS: number
+  LANGUAGES: string
+  CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: number
+  CERTIFICATE_PRINT_CHARGE_UP_LIMIT: number
+  CERTIFICATE_PRINT_LOWEST_CHARGE: number
+  CERTIFICATE_PRINT_HIGHEST_CHARGE: number
+  UI_POLLING_INTERVAL: number
+  FIELD_AGENT_AUDIT_LOCATIONS: string
+  APPLICATION_AUDIT_LOCATIONS: string
+  INFORMANT_MINIMUM_AGE: number
+  HIDE_EVENT_REGISTER_INFORMATION: boolean
+  EXTERNAL_VALIDATION_WORKQUEUE: boolean
+  SENTRY: string
+  LOGROCKET: string
+  PHONE_NUMBER_PATTERN: IPhoneNumberPattern
+  BIRTH_REGISTRATION_TARGET: number
+  DEATH_REGISTRATION_TARGET: number
+  NID_NUMBER_PATTERN: INIDNumberPattern
+}
+
+export interface IApplicationConfigResponse {
+  config: IApplicationConfig
+  certificates: ICertificateTemplateData[]
+}
+
+async function loadConfig(): Promise<IApplicationConfigResponse> {
+  const url = `${window.config.CONFIG_API_URL}/config`
+
+  const res = await fetch(url, {
+    method: 'GET'
+  })
+
+  if (res && res.status !== 200) {
+    throw Error(res.statusText)
+  }
+
+  const response = await res.json()
+
+  return response
+}
+
 async function loadDefinitions(): Promise<IDefinitionsResponse> {
-  const url = `${window.config.RESOURCES_URL}/definitions/client`
+  const url = `${window.config.COUNTRY_CONFIG_URL}/definitions/client`
 
   const res = await fetch(url, {
     method: 'GET',
@@ -63,7 +142,7 @@ async function loadDefinitions(): Promise<IDefinitionsResponse> {
 }
 
 async function loadLocations(): Promise<ILocationDataResponse> {
-  const url = `${window.config.RESOURCES_URL}/locations`
+  const url = `${window.config.COUNTRY_CONFIG_URL}/locations`
 
   const res = await fetch(url, {
     method: 'GET',
@@ -81,7 +160,7 @@ async function loadLocations(): Promise<ILocationDataResponse> {
 }
 
 async function loadFacilities(): Promise<IFacilitiesDataResponse> {
-  const url = `${window.config.RESOURCES_URL}/facilities`
+  const url = `${window.config.COUNTRY_CONFIG_URL}/facilities`
   const res = await fetch(url, {
     method: 'GET',
     headers: {
@@ -98,7 +177,7 @@ async function loadFacilities(): Promise<IFacilitiesDataResponse> {
 }
 
 async function loadPilotLocations(): Promise<ILocationDataResponse> {
-  const url = `${window.config.RESOURCES_URL}/pilotLocations`
+  const url = `${window.config.COUNTRY_CONFIG_URL}/pilotLocations`
 
   const res = await fetch(url, {
     method: 'GET',
@@ -127,9 +206,12 @@ const toDataURL = (url: string) =>
           reader.readAsDataURL(blob)
         })
     )
+    .catch((error) => {
+      throw error
+    })
 
 async function loadAssets(): Promise<IAssetResponse> {
-  const url = `${window.config.RESOURCES_URL}/assets/${window.config.COUNTRY_LOGO_FILE}`
+  const url = `${window.config.COUNTRY_CONFIG_URL}/assets/${window.config.COUNTRY_LOGO_FILE}`
 
   return toDataURL(url).then((dataUrl) => {
     return {
@@ -143,5 +225,6 @@ export const referenceApi = {
   loadFacilities,
   loadPilotLocations,
   loadDefinitions,
-  loadAssets
+  loadAssets,
+  loadConfig
 }

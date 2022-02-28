@@ -1,3 +1,4 @@
+import { IAuthHeader } from '@gateway/common-types'
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -35,20 +36,27 @@ async function transformField(
   sourceVal: any,
   targetObj: any,
   fieldBuilderForVal: IFieldBuilderFunction | IFieldBuilders,
-  context: any
+  context: { authHeader: IAuthHeader },
+  currentPropNamePath: string[]
 ) {
   if (!(sourceVal instanceof Date) && typeof sourceVal === 'object') {
     if (isFieldBuilder(fieldBuilderForVal)) {
-      await transformObj(sourceVal, targetObj, fieldBuilderForVal, context)
+      await transformObj(
+        sourceVal,
+        targetObj,
+        fieldBuilderForVal,
+        context,
+        currentPropNamePath
+      )
       return targetObj
     }
 
     throw new Error(
       `Expected ${JSON.stringify(
         fieldBuilderForVal
-      )} to be a FieldBuilder object. The current field value is ${JSON.stringify(
-        sourceVal
-      )}.`
+      )} to be a FieldBuilder object for field name ${currentPropNamePath.join(
+        '.'
+      )}. The current field value is ${JSON.stringify(sourceVal)}.`
     )
   }
 
@@ -61,9 +69,9 @@ async function transformField(
   throw new Error(
     `Expected ${JSON.stringify(
       fieldBuilderForVal
-    )} to be a FieldBuilderFunction. The current field value is ${JSON.stringify(
-      sourceVal
-    )}.`
+    )} to be a FieldBuilderFunction for field name ${currentPropNamePath.join(
+      '.'
+    )}. The current field value is ${JSON.stringify(sourceVal)}.`
   )
 }
 
@@ -71,7 +79,8 @@ export default async function transformObj(
   sourceObj: object,
   targetObj: object,
   fieldBuilders: IFieldBuilders,
-  context: any = {}
+  context: { _index?: any; authHeader: IAuthHeader },
+  currentPropNamePath: string[] = []
 ) {
   // ensure the sourceObj has Object in its prototype chain
   // graphql-js creates objects with Object.create(null)
@@ -86,11 +95,13 @@ export default async function transformObj(
           /* context._index = {
             [currentPropName]: index
           } */
+
           await transformField(
             arrayVal,
             targetObj,
             fieldBuilders[currentPropName],
-            context
+            context,
+            currentPropNamePath.concat(currentPropName)
           )
         }
 
@@ -101,7 +112,8 @@ export default async function transformObj(
         sourceObj[currentPropName],
         targetObj,
         fieldBuilders[currentPropName],
-        context
+        context,
+        currentPropNamePath.concat(currentPropName)
       )
     }
   }

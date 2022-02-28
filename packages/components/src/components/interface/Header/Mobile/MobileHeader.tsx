@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
+import { Hamburger } from '../../../icons/Hamburger'
 import styled from 'styled-components'
 import { CircleButton } from '../../../buttons'
 
@@ -29,20 +30,41 @@ const HeaderContainer = styled.div`
   padding: 8px 16px;
   display: flex;
   align-items: center;
-  ${({ theme }) => theme.gradients.gradientNightshade};
+  background: ${({ theme }) => theme.colors.white};
   box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
   position: sticky;
   top: 0;
+  justify-content: space-between;
   z-index: 2;
 `
 
 const Title = styled.span`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
-  color: ${({ theme }) => theme.colors.white};
+  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+  color: ${({ theme }) => theme.colors.grey800};
   align-self: center;
+  position: absolute;
+  width: 100px;
+  height: 27px;
+  left: 71px;
+  top: 14px;
 `
 
 const HeaderBody = styled.div`
+  margin: 0 16px;
+  flex: 1;
+  display: flex;
+  height: 40px;
+
+  form {
+    width: 100%;
+  }
+
+  &:last-child {
+    margin-right: 0;
+  }
+`
+
+const SearchBody = styled.div`
   margin: 0 16px;
   flex: 1;
   display: flex;
@@ -75,25 +97,27 @@ class MobileHeader extends React.Component<IMobileHeaderProps> {
             <CircleButton
               id="mobile_header_left"
               onClick={mobileLeft.handler}
-              dark={true}
-              color="#fff"
+              color="#4972BB"
             >
+              {!mobileBody && <Hamburger />}
               {mobileLeft.icon()}
             </CircleButton>
+            <>{!mobileBody && mobileLeft.icon()}</>
           </EndComponentContainer>
         )}
 
-        <HeaderBody>
-          {mobileBody || <Title id="header_title">{title}</Title>}
-        </HeaderBody>
+        {mobileBody ? (
+          <SearchBody>{mobileBody}</SearchBody>
+        ) : (
+          <HeaderBody>{<Title id="header_title">{title}</Title>}</HeaderBody>
+        )}
 
         {mobileRight && (
           <EndComponentContainer>
             <CircleButton
               id="mobile_header_right"
               onClick={mobileRight.handler}
-              dark={true}
-              color="#fff"
+              color="#4972BB"
             >
               {mobileRight.icon()}
             </CircleButton>

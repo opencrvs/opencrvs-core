@@ -11,6 +11,10 @@
  */
 // tslint:disable-next-line no-var-requires
 require('app-module-path').addPath(require('path').join(__dirname, '../'))
+// tslint:disable-next-line no-var-requires
+require('dotenv').config({
+  path: `${process.cwd()}/.env`
+})
 
 import * as Hapi from '@hapi/hapi'
 import {
@@ -77,5 +81,5 @@ export async function createServer() {
 }
 
 if (require.main === module) {
-  createServer().then(server => server.start())
+  createServer().then((server) => server.start())
 }

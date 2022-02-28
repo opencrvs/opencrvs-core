@@ -117,9 +117,17 @@ export const generateInCompleteFieldPoints = async (
       return {
         measurement: 'in_complete_fields',
         tags,
-        fields
+        fields,
+        timestamp: toInfluxTimestamp(task.lastModified)
       }
     })
+}
+
+function toInfluxTimestamp(date?: Date | string) {
+  if (!date) {
+    return undefined
+  }
+  return new Date(date).valueOf() * 1000000
 }
 
 export const generateBirthRegPoint = async (
@@ -139,7 +147,10 @@ export const generateBirthRegPoint = async (
 
   const fields: IBirthRegistrationFields = {
     compositionId: composition.id,
-    ageInDays: (child.birthDate && getAgeInDays(child.birthDate)) || undefined
+    ageInDays:
+      (child.birthDate &&
+        getAgeInDays(child.birthDate, new Date(composition.date))) ||
+      undefined
   }
 
   const tags: IBirthRegistrationTags = {
@@ -152,7 +163,8 @@ export const generateBirthRegPoint = async (
   const point = {
     measurement: 'birth_reg',
     tags,
-    fields
+    fields,
+    timestamp: toInfluxTimestamp(composition.date)
   }
 
   return point
@@ -176,12 +188,14 @@ export const generateDeathRegPoint = async (
   const fields: IDeathRegistrationFields = {
     compositionId: composition.id,
     ageInYears:
-      (deceased.birthDate && getAgeInYears(deceased.birthDate)) || undefined,
+      (deceased.birthDate &&
+        getAgeInYears(deceased.birthDate, new Date(composition.date))) ||
+      undefined,
     deathDays:
       (deceased.deceasedDateTime &&
         getDurationInDays(
           deceased.deceasedDateTime,
-          new Date().toISOString()
+          new Date(composition.date).toISOString()
         )) ||
       undefined
   }
@@ -198,7 +212,8 @@ export const generateDeathRegPoint = async (
   const point = {
     measurement: 'death_reg',
     tags,
-    fields
+    fields,
+    timestamp: new Date(composition.date).valueOf() * 1000000
   }
 
   return point
@@ -219,7 +234,7 @@ const generatePointLocations = async (
   // tslint:disable-next-line no-increment-decrement
   for (let index = 4; index > 1; index--) {
     locationID = await fetchParentLocationByLocationID(locationID, authHeader)
-    if (!locationID) {
+    if (!locationID || locationID === 'Location/0') {
       break
     }
     locations[`locationLevel${index}`] = locationID
@@ -230,7 +245,8 @@ const generatePointLocations = async (
 
 export async function generatePaymentPoint(
   payload: fhir.Bundle,
-  authHeader: IAuthHeader
+  authHeader: IAuthHeader,
+  measurement = 'certification_payment'
 ): Promise<IPaymentPoints> {
   const reconciliation = getPaymentReconciliation(payload)
   const composition = getComposition(payload)
@@ -259,9 +275,10 @@ export async function generatePaymentPoint(
   }
 
   return {
-    measurement: 'certification_payment',
+    measurement,
     tags,
-    fields
+    fields,
+    timestamp: toInfluxTimestamp(reconciliation.created)
   }
 }
 
@@ -319,7 +336,8 @@ export async function generateEventDurationPoint(
   return {
     measurement: 'application_event_duration',
     tags,
-    fields
+    fields,
+    timestamp: toInfluxTimestamp(currentTask.lastModified)
   }
 }
 
@@ -330,15 +348,18 @@ export async function generateTimeLoggedPoint(
 ): Promise<IPoints> {
   const currentTask = getTask(payload)
   let compositionId
+  let timestamp
   if (!fromTask) {
     const composition = getComposition(payload)
     if (!composition) {
       throw new Error('composition not found')
     }
     compositionId = composition.id
+    timestamp = composition.date
   } else {
     if (currentTask && currentTask.focus && currentTask.focus.reference) {
       compositionId = currentTask.focus.reference.split('/')[1]
+      timestamp = currentTask.meta?.lastUpdated
     }
   }
 
@@ -370,7 +391,8 @@ export async function generateTimeLoggedPoint(
   return {
     measurement: 'application_time_logged',
     tags,
-    fields
+    fields,
+    timestamp: toInfluxTimestamp(timestamp)
   }
 }
 
@@ -424,7 +446,8 @@ export async function generateApplicationStartedPoint(
   return {
     measurement: 'applications_started',
     tags,
-    fields
+    fields,
+    timestamp: toInfluxTimestamp(task.lastModified)
   }
 }
 
@@ -459,6 +482,7 @@ export async function generateRejectedPoints(
   return {
     measurement: 'applications_rejected',
     tags,
-    fields
+    fields,
+    timestamp: toInfluxTimestamp(task.lastModified)
   }
 }

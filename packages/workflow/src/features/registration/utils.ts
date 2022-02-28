@@ -23,7 +23,9 @@ import {
 import {
   EVENT_TYPE,
   CHILD_SECTION_CODE,
-  DECEASED_SECTION_CODE
+  DECEASED_SECTION_CODE,
+  BIRTH_CORRECTION_ENCOUNTERS_SECTION_CODE,
+  DEATH_CORRECTION_ENCOUNTERS_SECTION_CODE
 } from '@workflow/features/registration/fhir/constants'
 import { Events } from '@workflow/features/events/handler'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
@@ -50,7 +52,7 @@ function generateTrackingId(prefix: string): string {
 
 export function convertStringToASCII(str: string): string {
   return [...str]
-    .map(char => char.charCodeAt(0).toString())
+    .map((char) => char.charCodeAt(0).toString())
     .reduce((acc, v) => acc.concat(v))
 }
 
@@ -81,7 +83,7 @@ export async function sendEventNotification(
         name: await getInformantName(fhirBundle, CHILD_SECTION_CODE),
         trackingId: getTrackingId(fhirBundle),
         registrationNumber: getBirthRegistrationNumber(
-          getTaskResource(fhirBundle) as fhir.Task
+          getTaskResource(fhirBundle)
         )
       })
       break
@@ -109,7 +111,7 @@ export async function sendEventNotification(
         name: await getInformantName(fhirBundle, DECEASED_SECTION_CODE),
         trackingId: getTrackingId(fhirBundle),
         registrationNumber: getDeathRegistrationNumber(
-          getTaskResource(fhirBundle) as fhir.Task
+          getTaskResource(fhirBundle)
         )
       })
       break
@@ -215,12 +217,30 @@ export function getEventType(fhirBundle: fhir.Bundle) {
   throw new Error('Invalid FHIR bundle found')
 }
 
+export function taskHasInput(taskResource: fhir.Task) {
+  return !!(taskResource.input && taskResource.input.length > 0)
+}
+
+export function hasCorrectionEncounterSection(
+  compositionResource: fhir.Composition
+) {
+  return compositionResource.section?.some((section) => {
+    if (section.code?.coding?.[0]?.code) {
+      return [
+        BIRTH_CORRECTION_ENCOUNTERS_SECTION_CODE,
+        DEATH_CORRECTION_ENCOUNTERS_SECTION_CODE
+      ].includes(section.code.coding[0].code)
+    }
+    return false
+  })
+}
+
 export function isInProgressApplication(fhirBundle: fhir.Bundle) {
   const taskEntry =
     fhirBundle &&
     fhirBundle.entry &&
     fhirBundle.entry.find(
-      entry => entry.resource && entry.resource.resourceType === 'Task'
+      (entry) => entry.resource && entry.resource.resourceType === 'Task'
     )
 
   return (
@@ -236,7 +256,7 @@ export function isEventNotification(fhirBundle: fhir.Bundle) {
     fhirBundle &&
     fhirBundle.entry &&
     fhirBundle.entry.find(
-      entry => entry.resource && entry.resource.resourceType === 'Composition'
+      (entry) => entry.resource && entry.resource.resourceType === 'Composition'
     )
   const composition =
     compositionEntry && (compositionEntry.resource as fhir.Composition)
@@ -244,7 +264,7 @@ export function isEventNotification(fhirBundle: fhir.Bundle) {
     composition &&
     composition.type.coding &&
     composition.type.coding.find(
-      coding => coding.system === 'http://opencrvs.org/doc-types'
+      (coding) => coding.system === 'http://opencrvs.org/doc-types'
     )
   return (
     (compositionDocTypeCode &&

@@ -47,6 +47,7 @@ export const SECURITY_PIN_INDEX = 'pin'
 export const SECURITY_PIN_EXPIRED_AT = 'locked_time'
 
 export const ALLOWED_IMAGE_TYPE = ['image/jpeg', 'image/jpg', 'image/png']
+export const ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE = ['image/svg+xml']
 
 export const TRACKING_ID_TEXT = 'tracking-id'
 export const BRN_DRN_TEXT = 'brn-drn'
@@ -106,4 +107,4 @@ export const MONTHS_IN_YEAR = 12
 export const DECLARED_APPLICATION_SEARCH_QUERY_COUNT =
   process.env.DECLARED_APPLICATION_SEARCH_QUERY_COUNT || 100
 
-export const AVATAR_API = 'https:/eu.ui-avatars.com/api/?name='
+export const AVATAR_API = 'https://eu.ui-avatars.com/api/?name='

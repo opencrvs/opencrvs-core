@@ -76,7 +76,7 @@ interface IDispatchProps {
   goToUserReviewForm: typeof goToUserReviewForm
   submitForm: (userFormSection: IFormSection) => void
   userFormSection: IFormSection
-  offlineResources: IOfflineData
+  offlineCountryConfiguration: IOfflineData
   goBack: typeof goBack
   modify: (values: IFormSectionData) => void
 }
@@ -156,7 +156,7 @@ class UserReviewFormComponent extends React.Component<
 
     if (field.type === LOCATION_SEARCH_INPUT) {
       const offlineLocations =
-        this.props.offlineResources[field.searchableResource]
+        this.props.offlineCountryConfiguration[field.searchableResource]
 
       const locationId = formData[field.name] as string
       return offlineLocations[locationId] && offlineLocations[locationId].name
@@ -254,7 +254,7 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
 export const UserReviewForm = connect((store: IStoreState) => {
   return {
     userFormSection: store.userForm.userForm!.sections[0],
-    offlineResources: getOfflineData(store)
+    offlineCountryConfiguration: getOfflineData(store)
   }
 }, mapDispatchToProps)(
   injectIntl<'intl', IFullProps & IDispatchProps>(UserReviewFormComponent)

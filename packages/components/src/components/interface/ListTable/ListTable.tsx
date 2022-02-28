@@ -50,34 +50,40 @@ const TableHeader = styled.div<{
 }>`
   ${({ fixedWidth, totalWidth }) =>
     fixedWidth ? `width: ${fixedWidth}px;` : `width: ${totalWidth || 100}%;`}
-  border-bottom: 1px solid ${({ theme }) => theme.colors.disabled};
-  color: ${({ theme }) => theme.colors.copy};
+  background: ${({ theme }) => theme.colors.background};
   padding: 10px 0px;
   display: flex;
   align-items: flex-end;
 
   & span:first-child {
-    padding-left: 12px;
+    padding-left: 8px;
   }
 
   & span:last-child {
-    text-align: right;
-    padding-right: 12px;
+    padding-right: 8px;
   }
 `
 
 const TableHeaderText = styled.div<{
   isSorted?: boolean
 }>`
-  ${({ isSorted, theme }) =>
-    isSorted ? theme.fonts.bodyBoldStyle : theme.fonts.bodyStyle}
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  color: ${({ theme }) => theme.colors.grey};
 `
 
 const TableBody = styled.div<{ footerColumns: boolean }>`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.bodyStyle};
+
   & div:last-of-type {
     ${({ footerColumns }) => (footerColumns ? 'border-bottom: none;' : '')};
+  }
+  & span:first-child {
+    padding-left: 8px;
+  }
+
+  & span:last-child {
+    padding-right: 8px;
   }
 `
 const RowWrapper = styled.div<{
@@ -85,12 +91,22 @@ const RowWrapper = styled.div<{
   highlight?: boolean
   height?: IBreakpoint
   horizontalPadding?: IBreakpoint
+  hideTableBottomBorder?: boolean
+  alignItemCenter?: boolean
 }>`
   width: 100%;
-  min-height: 48px;
+  /* min-height: 48px; */
+  padding-top: 10px;
+  padding-bottom: 10px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.disabled};
+
+  &:last-child {
+    ${({ hideTableBottomBorder }) =>
+      hideTableBottomBorder && `border-bottom: 0`};
+  }
+
   display: flex;
-  align-items: center;
+  ${({ alignItemCenter }) => alignItemCenter && `align-items: start`};
   ${({ height }) =>
     height ? `min-height:${height.lg}px;` : `min-height: 48px)`};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -105,12 +121,6 @@ const RowWrapper = styled.div<{
       horizontalPadding
         ? `padding-left:${horizontalPadding.lg}px;`
         : `padding-left: 12px;`}
-    @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-      ${({ horizontalPadding }) =>
-        horizontalPadding
-          ? `padding-left:${horizontalPadding.md}px;`
-          : `padding-left: 12px;`}
-    }
   }
 
   & span:last-child {
@@ -120,10 +130,18 @@ const RowWrapper = styled.div<{
         ? `padding-right:${horizontalPadding.lg}px;`
         : `padding-right: 12px;`}
   }
+
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    & span:first-child {
+      text-align: right;
+      ${({ horizontalPadding }) =>
+        horizontalPadding
+          ? `padding-left:${horizontalPadding.md}px;`
+          : `padding-left: 12px;`}
+    }
+
     & span:last-child {
       text-align: right;
-      padding-right: 12px;
       ${({ horizontalPadding }) =>
         horizontalPadding
           ? `padding-right:${horizontalPadding.md}px;`
@@ -165,12 +183,8 @@ const ValueWrapper = styled.span<{
   width: ${({ width, totalWidth }) =>
     totalWidth > 100 ? (width * 100) / totalWidth : width}%;
 
-  display: flex;
   justify-content: ${({ alignment }) =>
     alignment === ColumnContentAlignment.RIGHT ? 'flex-end' : 'flex-start'};
-  align-items: stretch;
-  flex-shrink: 0;
-  margin: auto 0;
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
   padding-right: 8px;
   ${({ color }) => color && `color: ${color};`}
@@ -238,7 +252,7 @@ const TableScroller = styled.div<{
 `
 
 const TableHeaderWrapper = styled.div`
-  padding-right: 10px;
+  padding-right: 0;
 `
 const ToggleSortIcon = styled.div<{
   toggle?: boolean
@@ -284,6 +298,8 @@ interface IListTableProps {
   tableTitle?: string
   hideBoxShadow?: boolean
   hideTableHeader?: boolean
+  hideTableBottomBorder?: boolean
+  alignItemCenter?: boolean
   loadMoreText?: string
   highlightRowOnMouseOver?: boolean
   isFullPage?: boolean
@@ -371,6 +387,8 @@ export class ListTable extends React.Component<
       rowStyle,
       hideBoxShadow,
       hideTableHeader,
+      hideTableBottomBorder,
+      alignItemCenter,
       footerColumns,
       loadMoreText,
       highlightRowOnMouseOver,
@@ -451,6 +469,8 @@ export class ListTable extends React.Component<
                           highlight={highlightRowOnMouseOver}
                           height={rowStyle?.height}
                           horizontalPadding={rowStyle?.horizontalPadding}
+                          hideTableBottomBorder={hideTableBottomBorder || false}
+                          alignItemCenter={alignItemCenter}
                         >
                           {columns.map((preference, indx) => {
                             return (

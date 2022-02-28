@@ -10,5 +10,3 @@
 This is the OpenCRVS client application.
 
 Built in Typescript as a progressive web application using [Google Workbox](https://github.com/GoogleChrome/workbox), bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app) & the [Craco](https://github.com/gsoft-inc/craco) CRA configuration package.
-
-For information on how to configure the client application, refer to the "resources" package config for your country implementation

@@ -127,10 +127,10 @@ test('should build a minimal FHIR registration document without error', async ()
             comments: [
               {
                 comment: 'This is just a test data',
-                createdAt: '2018-10-31T09:45:05+10:00'
+                createdAt: '2018-10-31T09:40:05+10:00'
               }
             ],
-            timestamp: '2018-10-31T09:45:05+10:00',
+            timestamp: '2018-10-31T09:40:05+10:00',
             timeLoggedMS: 1234
           }
         ],
@@ -211,7 +211,7 @@ test('should build a minimal FHIR registration document without error', async ()
       childrenBornAliveToMother: 2,
       foetalDeathsToMother: 0,
       lastPreviousLiveBirth: '2014-01-28',
-      createdAt: new Date(),
+      createdAt: '2018-10-31T09:45:05+10:00',
       _fhirIDMap: {
         composition: '8f18a6ea-89d1-4b03-80b3-57509a7eebcedsd',
         encounter: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dsakelske',
@@ -387,7 +387,7 @@ test('should build a minimal FHIR registration document without error', async ()
   )
   expect(fhir.entry[5].resource.note[0]).toEqual({
     text: 'This is just a test data',
-    time: '2018-10-31T09:45:05+10:00'
+    time: '2018-10-31T09:40:05+10:00'
   })
   expect(fhir.entry[5].resource.identifier).toEqual([
     { system: 'http://opencrvs.org/specs/id/paper-form-id', value: '12345678' },
@@ -809,10 +809,10 @@ test('creates task with contact other relationship', async () => {
             comments: [
               {
                 comment: 'This is just a test data',
-                createdAt: '2018-10-31T09:45:05+10:00'
+                createdAt: '2018-10-31T09:40:05+10:00'
               }
             ],
-            timestamp: '2018-10-31T09:45:05+10:00',
+            timestamp: '2018-10-31T09:40:05+10:00',
             timeLoggedMS: 1234
           }
         ],
@@ -873,13 +873,15 @@ test('creates task with contact other relationship', async () => {
 
   expect(simpleFhir).toBeDefined()
 
-  const taskResource = (simpleFhir.entry.find(
-    ({ resource }) => resource.resourceType === 'Task'
-  ) as fhir.BundleEntry).resource as fhir.Task
+  const taskResource = (
+    simpleFhir.entry.find(
+      ({ resource }) => resource.resourceType === 'Task'
+    ) as fhir.BundleEntry
+  ).resource as fhir.Task
 
   expect(taskResource).toBeDefined()
   expect(
-    taskResource.extension.some(taskExtension =>
+    taskResource.extension.some((taskExtension) =>
       _.isEqual(taskExtension, {
         url: 'http://opencrvs.org/specs/extension/contact-person',
         valueString: 'OTHER'
@@ -888,7 +890,7 @@ test('creates task with contact other relationship', async () => {
   ).toBe(true)
 
   expect(
-    taskResource.extension.some(taskExtension =>
+    taskResource.extension.some((taskExtension) =>
       _.isEqual(taskExtension, {
         url: 'http://opencrvs.org/specs/extension/contact-relationship',
         valueString: 'Friend'
@@ -936,4 +938,98 @@ test('build bundle for primaryCaregive', async () => {
   expect(fhir.entry[2].resource.resourceType).toBe('Observation')
   const observation = fhir.entry[2].resource as fhir.Observation
   expect(observation.valueString).toBe('MOTHER_AND_FATHER')
+})
+
+test('should build bundle for correction fhir builders', async () => {
+  const fhir = await buildFHIRBundle(
+    {
+      child: {
+        _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb41',
+        gender: 'male',
+        name: [],
+        birthDate: '2018-01-28',
+        maritalStatus: 'NOT_STATED',
+        deceased: false,
+        multipleBirth: 3,
+        dateOfMarriage: '',
+        nationality: ['BGD'],
+        educationalAttainment: 'NO_SCHOOLING'
+      },
+      registration: {
+        _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eebce',
+        contact: 'MOTHER',
+        contactPhoneNumber: '01733333333',
+        paperFormID: '12345678',
+        draftId: '8f18a6ea-89d1-4b03-80b3-57509a7eebce',
+        trackingId: 'B123456',
+        registrationNumber: '201923324512345671',
+        correction: {
+          location: {
+            _fhirID: '63ee3076-4568-4cce-aa94-ad904b8ebfc8'
+          },
+          requester: 'MOTHER',
+          hasShowedVerifiedDocument: true,
+          attestedAndCopied: true,
+          noSupportingDocumentationRequired: false,
+          values: [
+            {
+              section: 'child',
+              fieldName: 'name',
+              oldValue: 'Khaby Lame',
+              newValue: 'Khaby Lame Corrected'
+            }
+          ],
+          reason: 'CLERICAL_ERROR',
+          note: 'Spelling mistake',
+          payments: {
+            amount: 10,
+            total: 10,
+            paymentId: '123',
+            type: 'MANUAL',
+            date: '2022-01-28T07:09:01.079Z',
+            data: 'data:image/png;base64,2324256'
+          },
+          data: 'data:image/png;base64,2324234'
+        }
+      }
+    },
+    'BIRTH' as EVENT_TYPE
+  )
+
+  expect(fhir).toBeDefined()
+  // Task resource
+  expect(fhir.entry[2].resource.extension[2]).toEqual({
+    url: 'http://opencrvs.org/specs/extension/requestingIndividual',
+    valueString: 'MOTHER'
+  })
+  expect(fhir.entry[2].resource.input).toEqual([
+    {
+      valueCode: 'child',
+      valueId: 'name',
+      type: {
+        coding: [
+          {
+            code: 'update',
+            system: 'http://terminology.hl7.org/CodeSystem/action-type'
+          }
+        ]
+      },
+      valueString: 'Khaby Lame'
+    }
+  ])
+  expect(fhir.entry[2].resource.output).toEqual([
+    {
+      valueCode: 'child',
+      valueId: 'name',
+      type: {
+        coding: [
+          {
+            code: 'update',
+            system: 'http://terminology.hl7.org/CodeSystem/action-type'
+          }
+        ]
+      },
+      valueString: 'Khaby Lame Corrected'
+    }
+  ])
 })

@@ -9,11 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { AppStore } from '@client/store'
+import { AppStore, createStore } from '@client/store'
 import {
   mockLocalSysAdminUserResponse,
   createTestComponent,
-  createTestStore,
   flushPromises,
   mockOfflineData
 } from '@client/tests/util'
@@ -34,9 +33,7 @@ describe('User list tests', () => {
 
   beforeAll(async () => {
     Date.now = jest.fn(() => 1487076708000)
-    const { store: testStore, history: testHistory } = await createTestStore()
-    store = testStore
-    history = testHistory
+    ;({ store, history } = await createStore())
 
     const action = {
       type: actions.SET_USER_DETAILS,
@@ -52,7 +49,8 @@ describe('User list tests', () => {
         facilities: mockOfflineData.facilities,
         pilotLocations: mockOfflineData.pilotLocations,
         offices: mockOfflineData.offices,
-        assets: mockOfflineData.assets
+        assets: mockOfflineData.assets,
+        config: mockOfflineData.config
       })
     )
   })
@@ -87,8 +85,7 @@ describe('User list tests', () => {
             })
           }}
         />,
-        store,
-        userListMock
+        { store, history, graphqlMocks: userListMock }
       )
 
       // wait for mocked data to load mockedProvider
@@ -96,8 +93,8 @@ describe('User list tests', () => {
         setTimeout(resolve, 200)
       })
 
-      testComponent.component.update()
-      const app = testComponent.component
+      testComponent.update()
+      const app = testComponent
       expect(app.find('#user_list').hostNodes().html()).toContain('0 users')
     })
     it('load user list in view only mode', async () => {
@@ -120,7 +117,7 @@ describe('User list tests', () => {
           }
         }
       ]
-      const { component } = await createTestComponent(
+      const component = await createTestComponent(
         <UserList
           // @ts-ignore
           location={{
@@ -129,8 +126,7 @@ describe('User list tests', () => {
             })
           }}
         />,
-        store,
-        userListMock
+        { store, history, graphqlMocks: userListMock }
       )
       component.update()
       expect(component.find('#add-user').length).toBe(0)
@@ -155,7 +151,7 @@ describe('User list tests', () => {
           }
         }
       ]
-      const { component } = await createTestComponent(
+      const component = await createTestComponent(
         <UserList
           // @ts-ignore
           location={{
@@ -164,8 +160,7 @@ describe('User list tests', () => {
             })
           }}
         />,
-        store,
-        userListMock
+        { store, history, graphqlMocks: userListMock }
       )
       component.update()
 
@@ -196,7 +191,7 @@ describe('User list tests', () => {
           }
         }
       ]
-      const { component } = await createTestComponent(
+      const component = await createTestComponent(
         <UserList
           // @ts-ignore
           location={{
@@ -205,8 +200,7 @@ describe('User list tests', () => {
             })
           }}
         />,
-        store,
-        userListMock
+        { store, history, graphqlMocks: userListMock }
       )
       component.update()
 
@@ -250,8 +244,7 @@ describe('User list tests', () => {
             })
           }}
         />,
-        store,
-        userListMock
+        { store, history, graphqlMocks: userListMock }
       )
 
       // wait for mocked data to load mockedProvider
@@ -259,8 +252,8 @@ describe('User list tests', () => {
         setTimeout(resolve, 100)
       })
 
-      testComponent.component.update()
-      const app = testComponent.component
+      testComponent.update()
+      const app = testComponent
       expect(app.find('#no-record').hostNodes()).toHaveLength(1)
     })
 
@@ -379,8 +372,7 @@ describe('User list tests', () => {
               })
             }}
           />,
-          store,
-          userListMock
+          { store, history, graphqlMocks: userListMock }
         )
 
         // wait for mocked data to load mockedProvider
@@ -388,8 +380,8 @@ describe('User list tests', () => {
           setTimeout(resolve, 100)
         })
 
-        testComponent.component.update()
-        component = testComponent.component
+        testComponent.update()
+        component = testComponent
 
         component
           .find('#name-role-type-link-5d08e102542c7a19fc55b790')
@@ -401,7 +393,7 @@ describe('User list tests', () => {
           setTimeout(resolve, 100)
         })
 
-        testComponent.component.update()
+        testComponent.update()
 
         expect(history.location.pathname).toContain(
           '/userProfile/5d08e102542c7a19fc55b790'
@@ -422,8 +414,7 @@ describe('User list tests', () => {
               })
             }}
           />,
-          store,
-          userListMock
+          { store, history, graphqlMocks: userListMock }
         )
 
         // wait for mocked data to load mockedProvider
@@ -431,8 +422,8 @@ describe('User list tests', () => {
           setTimeout(resolve, 100)
         })
 
-        testComponent.component.update()
-        component = testComponent.component
+        testComponent.update()
+        component = testComponent
 
         expect(component.find('div#row_4').children()).toHaveLength(2)
       })
@@ -552,8 +543,7 @@ describe('User list tests', () => {
               })
             }}
           />,
-          store,
-          userListMock
+          { store, history, graphqlMocks: userListMock }
         )
 
         // wait for mocked data to load mockedProvider
@@ -561,8 +551,8 @@ describe('User list tests', () => {
           setTimeout(resolve, 100)
         })
 
-        testComponent.component.update()
-        component = testComponent.component
+        testComponent.update()
+        component = testComponent
       })
 
       it('renders list of users', () => {
@@ -794,8 +784,7 @@ describe('User list tests', () => {
             })
           }}
         />,
-        store,
-        userListMock
+        { store, history, graphqlMocks: userListMock }
       )
 
       // wait for mocked data to load mockedProvider
@@ -803,8 +792,8 @@ describe('User list tests', () => {
         setTimeout(resolve, 100)
       })
 
-      testComponent.component.update()
-      const app = testComponent.component
+      testComponent.update()
+      const app = testComponent
       expect(app.find('#pagination').hostNodes()).toHaveLength(0)
     })
     it('renders pagination block with proper page value when the total amount of data is applicable for pagination', async () => {
@@ -987,8 +976,7 @@ describe('User list tests', () => {
             })
           }}
         />,
-        store,
-        userListMock
+        { store, history, graphqlMocks: userListMock }
       )
 
       // wait for mocked data to load mockedProvider
@@ -996,8 +984,8 @@ describe('User list tests', () => {
         setTimeout(resolve, 100)
       })
 
-      testComponent.component.update()
-      const app = testComponent.component
+      testComponent.update()
+      const app = testComponent
       expect(app.find('#load_more_button').hostNodes().text()).toContain(
         'Show next 10'
       )
@@ -1410,8 +1398,7 @@ describe('User list tests', () => {
             })
           }}
         />,
-        store,
-        userListMock
+        { store, history, graphqlMocks: userListMock }
       )
 
       // wait for mocked data to load mockedProvider
@@ -1419,8 +1406,8 @@ describe('User list tests', () => {
         setTimeout(resolve, 100)
       })
 
-      testComponent.component.update()
-      const app = testComponent.component
+      testComponent.update()
+      const app = testComponent
       expect(app.find('#load_more_button').hostNodes()).toHaveLength(1)
 
       app.find('#load_more_button').hostNodes().simulate('click')

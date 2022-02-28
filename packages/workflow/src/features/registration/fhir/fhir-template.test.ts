@@ -12,7 +12,8 @@
 import {
   selectOrCreateTaskRefResource,
   findPersonEntry,
-  getTaskResource
+  getTaskResource,
+  isTask
 } from '@workflow/features/registration/fhir/fhir-template'
 import {
   OPENCRVS_SPECIFICATION_URL,
@@ -95,8 +96,7 @@ describe('Verify fhir templates', () => {
             valueString: 'MOTHER'
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '+8801622688231'
           },
           {
@@ -204,6 +204,17 @@ describe('Verify fhir templates', () => {
       } else {
         throw new Error('Failed')
       }
+    })
+  })
+  describe('isTask', () => {
+    it('returns true if the reasource is a Task', () => {
+      expect(isTask({ resourceType: 'Task' } as fhir.Resource)).toBeTruthy()
+    })
+
+    it('returns false if the reasource is not a Task', () => {
+      expect(
+        isTask({ resourceType: 'Composition' } as fhir.Resource)
+      ).toBeFalsy()
     })
   })
   describe('getTaskResource', () => {

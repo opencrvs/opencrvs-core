@@ -103,10 +103,10 @@ export async function registerSystemClient(
       ...authHeader
     }
   })
-    .then(response => {
+    .then((response) => {
       return response.json()
     })
-    .catch(error => {
+    .catch((error) => {
       return Promise.reject(new Error(` request failed: ${error.message}`))
     })
 

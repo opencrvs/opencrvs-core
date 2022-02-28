@@ -118,6 +118,12 @@ import { LocationSearch } from '@opencrvs/components/lib/interface'
 import { REGEXP_NUMBER_INPUT_NON_NUMERIC } from '@client/utils/constants'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { generateLocations } from '@client/utils/locationUtils'
+import {
+  IUserDetails,
+  IGQLLocation,
+  IIdentifier
+} from '@client/utils/userUtils'
+import { getUserDetails } from '@client/profile/profileSelectors'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -299,6 +305,7 @@ function GeneratedInputField({
           name={fieldDefinition.name}
           value={value as string}
           notice={fieldDefinition.notice}
+          flexDirection={fieldDefinition.flexDirection}
         />
       </InputField>
     )
@@ -537,7 +544,10 @@ function GeneratedInputField({
   )
 }
 
-const mapFieldsToValues = (fields: IFormField[]) =>
+const mapFieldsToValues = (
+  fields: IFormField[],
+  userDetails: IUserDetails | null
+) =>
   fields.reduce((memo, field) => {
     let fieldInitialValue = field.initialValue as IFormFieldValue
 
@@ -557,6 +567,45 @@ const mapFieldsToValues = (fields: IFormField[]) =>
         nestedFields: nestedInitialValues
       }
     }
+
+    if (
+      field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
+      !field.initialValue &&
+      field.dynamicOptions.initialValue === 'agentDefault'
+    ) {
+      const catchmentAreas: IGQLLocation[] | undefined =
+        userDetails?.catchmentArea && userDetails?.catchmentArea
+      const catchmentAreaLengths = catchmentAreas?.length || 0
+      let district = ''
+      let state = ''
+
+      if (catchmentAreas) {
+        for (let index = 0; index < catchmentAreaLengths; index++) {
+          if (
+            (
+              (catchmentAreas[index] as IGQLLocation)
+                .identifier as IIdentifier[]
+            )[1].value === 'DISTRICT'
+          ) {
+            district = (catchmentAreas[index] as IGQLLocation).id
+          } else if (
+            (
+              (catchmentAreas[index] as IGQLLocation)
+                .identifier as IIdentifier[]
+            )[1].value === 'STATE'
+          ) {
+            state = (catchmentAreas[index] as IGQLLocation).id
+          }
+        }
+      }
+
+      if (field.name === 'district' && !field.initialValue && district) {
+        fieldInitialValue = district as IFormFieldValue
+      }
+      if (field.name === 'state' && !field.initialValue && state) {
+        fieldInitialValue = state as IFormFieldValue
+      }
+    }
     return { ...memo, [field.name]: fieldInitialValue }
   }, {})
 
@@ -573,7 +622,8 @@ interface IFormSectionProps {
 }
 
 interface IStateProps {
-  resources: IOfflineData
+  offlineCountryConfig: IOfflineData
+  userDetails: IUserDetails | null
 }
 
 interface IDispatchProps {
@@ -710,7 +760,7 @@ class FormSectionComponent extends React.Component<Props> {
       fields,
       setFieldValue,
       touched,
-      resources,
+      offlineCountryConfig,
       intl,
       draftData,
       setValues,
@@ -754,7 +804,7 @@ class FormSectionComponent extends React.Component<Props> {
           const conditionalActions: string[] = getConditionalActionsForField(
             field,
             values,
-            resources,
+            offlineCountryConfig,
             draftData
           )
 
@@ -788,7 +838,7 @@ class FormSectionComponent extends React.Component<Props> {
                   options: getFieldOptions(
                     field as ISelectFormFieldWithDynamicOptions,
                     values,
-                    resources
+                    offlineCountryConfig
                   )
                 } as ISelectFormFieldWithOptions)
               : field.type === FIELD_WITH_DYNAMIC_DEFINITIONS
@@ -854,7 +904,10 @@ class FormSectionComponent extends React.Component<Props> {
               ? {
                   ...field,
                   locationList: generateLocations(
-                    getListOfLocations(resources, field.searchableResource),
+                    getListOfLocations(
+                      offlineCountryConfig,
+                      field.searchableResource
+                    ),
                     intl,
                     undefined,
                     [field.searchableType as LocationType]
@@ -1027,13 +1080,14 @@ const FormFieldGeneratorWithFormik = withFormik<
   IFormSectionProps & IStateProps & IDispatchProps,
   IFormSectionData
 >({
-  mapPropsToValues: (props) => mapFieldsToValues(props.fields),
+  mapPropsToValues: (props) =>
+    mapFieldsToValues(props.fields, props.userDetails),
   handleSubmit: (values) => {},
   validate: (values, props: IFormSectionProps & IStateProps) =>
     getValidationErrorsForForm(
       props.fields,
       values,
-      props.resources,
+      props.offlineCountryConfig,
       props.draftData,
       props.requiredErrorMessage
     )
@@ -1042,7 +1096,8 @@ const FormFieldGeneratorWithFormik = withFormik<
 export const FormFieldGenerator = connect(
   (state: IStoreState, ownProps: IFormSectionProps) => ({
     ...ownProps,
-    resources: getOfflineData(state)
+    offlineCountryConfig: getOfflineData(state),
+    userDetails: getUserDetails(state)
   }),
   { dynamicDispatch }
 )(FormFieldGeneratorWithFormik)

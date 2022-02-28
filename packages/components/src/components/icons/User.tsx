@@ -10,9 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
+import { colorDictionary } from '../colors'
 
 export const User = (props: React.HTMLAttributes<SVGElement>) => {
-  const stroke = props.color === 'invert' ? 'white' : '#35495D'
+  const stroke = props.color ? props.color : colorDictionary.blackStormy
   return (
     <svg width={24} height={24} fill="none" {...props}>
       <path

@@ -1,0 +1,60 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+# graphic logo are (registered/a) trademark(s) of Plan International.
+name: Continuous Delivery And E2E Tests Performed On Staging
+
+env:
+  CYPRESS_LOGIN_URL: https://login.farajaland-staging.opencrvs.org/
+  CYPRESS_CLIENT_URL: https://register.farajaland-staging.opencrvs.org/
+  CYPRESS_AUTH_URL: https://auth.farajaland-staging.opencrvs.org/
+
+on:
+  push:
+    branches:
+      - 'develop'
+
+jobs:
+  push-deploy-e2e:
+    runs-on: ubuntu-20.04
+    timeout-minutes: 120
+    strategy:
+      matrix:
+        node-version: [14.17.0]
+    steps:
+      - name: Checking out git repo
+        uses: actions/checkout@v2
+      - name: Checking out the country config repo
+        run: |
+          git clone https://github.com/opencrvs/opencrvs-farajaland.git
+      - name: Get COUNTRY_CONFIG_VERSION
+        run: |
+          cd opencrvs-farajaland
+          echo "COUNTRY_CONFIG_VERSION=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          cd ../
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Push images to Dockerhub
+        run: yarn compose:push:version
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_KEY }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+      - name: Deploy to development
+        run: |
+          yarn deploy:staging farajaland-staging.opencrvs.org $(git rev-parse --short HEAD) ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
+      - name: Run Cypress tests
+        run: |
+          cd opencrvs-farajaland
+          yarn install
+          npm install -g cypress
+          cypress run --record --key e0fc7a26-f292-4e48-9716-2009137fe646 --headless --browser chrome

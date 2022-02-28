@@ -16,6 +16,7 @@ import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 import { LoadingGrey } from '@opencrvs/components/lib/interface'
 import * as React from 'react'
 import styled from 'styled-components'
+import { Navigation } from '@client/components/interface/Navigation'
 
 const DynamicContainer = styled.div<{
   marginLeft?: number
@@ -67,6 +68,8 @@ interface BasePage {
   fixedWidth?: number
   mapPinClickHandler?: () => void
   profilePageStyle?: IprofilePageStyle
+  subMenuComponent?: React.ReactNode
+  isCertificatesConfigPage?: boolean
 }
 
 interface DefaultPage extends BasePage {
@@ -141,6 +144,13 @@ const HeaderText = styled.span`
   overflow: hidden;
   text-overflow: ellipsis;
 `
+const BodyContainer = styled.div`
+  margin-left: 0px;
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    margin-left: 249px;
+  }
+`
+
 function SubPageHeader(props: HeaderProps) {
   return (
     <SubPageHeaderContainer id="sub-page-header">
@@ -210,19 +220,25 @@ export function SysAdminContentWrapper(props: SysAdminPage) {
   } else {
     pageHeader = <Header mapPinClickHandler={props.mapPinClickHandler} />
     pageContent = (
-      <DynamicContainer
-        marginLeft={props.marginLeft}
-        marginRight={props.marginRight}
-        fixedWidth={props.fixedWidth}
-      >
-        <Content>{props.children}</Content>
-      </DynamicContainer>
+      <>
+        <Navigation />
+        <BodyContainer>
+          <DynamicContainer
+            marginLeft={props.marginLeft}
+            marginRight={props.marginRight}
+            fixedWidth={props.fixedWidth}
+          >
+            <Content>{props.children}</Content>
+          </DynamicContainer>
+        </BodyContainer>
+      </>
     )
   }
 
   return (
-    <Container>
+    <Container isCertificatesConfigPage={props.isCertificatesConfigPage}>
       {pageHeader}
+      {props.subMenuComponent && props.subMenuComponent}
       {pageContent}
     </Container>
   )

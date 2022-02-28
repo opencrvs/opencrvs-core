@@ -17,11 +17,11 @@ export function getValueWithPercentageString(value: number, total: number) {
 
 export function getLocationFromPartOfLocationId(
   locationId: string,
-  offlineResources: IOfflineData
+  offlineCountryConfiguration: IOfflineData
 ) {
   const id = (locationId && locationId.split('/')[1]) || ''
   return (
-    offlineResources.locations[id] ||
-    offlineResources.offices[id] || { name: '' }
+    offlineCountryConfiguration.locations[id] ||
+    offlineCountryConfiguration.offices[id] || { name: '' }
   )
 }

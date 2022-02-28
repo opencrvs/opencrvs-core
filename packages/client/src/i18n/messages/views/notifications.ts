@@ -20,6 +20,7 @@ interface INotificationsMessages
   processingText: MessageDescriptor
   statusRegistering: MessageDescriptor
   statusRejecting: MessageDescriptor
+  statusRequestingCorrection: MessageDescriptor
   statusSubmitting: MessageDescriptor
   statusWaitingToValidate: MessageDescriptor
   statusWaitingToRegister: MessageDescriptor
@@ -71,6 +72,11 @@ const messagesToDefine: INotificationsMessages = {
     description: 'Label for application status Rejecting',
     id: 'regHome.outbox.statusRejecting'
   },
+  statusRequestingCorrection: {
+    defaultMessage: 'Requesting correction...',
+    description: 'Label for application status Requesting correction',
+    id: 'regHome.outbox.statusRequestingCorrection'
+  },
   statusSubmitting: {
     defaultMessage: 'Submitting...',
     description: 'Label for application status submitting',
@@ -90,6 +96,11 @@ const messagesToDefine: INotificationsMessages = {
     defaultMessage: 'Waiting to reject',
     description: 'Label for application status waiting for reject',
     id: 'regHome.outbox.statusWaitingToReject'
+  },
+  statusWaitingToRequestCorrection: {
+    defaultMessage: 'Waiting to request correction',
+    description: 'Label for application status waiting for request correction',
+    id: 'regHome.outbox.statusWaitingToRequestCorrection'
   },
   statusWaitingToSubmit: {
     defaultMessage: 'Waiting to submit',

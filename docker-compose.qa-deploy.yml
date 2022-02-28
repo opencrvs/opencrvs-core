@@ -7,11 +7,12 @@
 #
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
-version: "3.3"
+version: '3.3'
 
 services:
   gateway:
     environment:
+      - QA_ENV=true
       - NODE_ENV=production
 
   workflow:
@@ -41,5 +42,10 @@ services:
       - NODE_ENV=production
 
   webhooks:
+    environment:
+      - QA_ENV=true
+      - NODE_ENV=production
+
+  config:
     environment:
       - NODE_ENV=production

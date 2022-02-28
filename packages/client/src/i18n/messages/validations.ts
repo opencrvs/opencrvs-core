@@ -21,6 +21,7 @@ interface IValidationMessages
   emailAddressFormat: MessageDescriptor
   englishOnlyNameFormat: MessageDescriptor
   facilityMustBeSelected: MessageDescriptor
+  officeMustBeSelected: MessageDescriptor
   greaterThanZero: MessageDescriptor
   isValidBirthDate: MessageDescriptor
   isValidDateOfDeath: MessageDescriptor
@@ -42,6 +43,7 @@ interface IValidationMessages
   validDeathRegistrationNumber: MessageDescriptor
   validNationalId: MessageDescriptor
   validNationalIDLengths: MessageDescriptor
+  duplicateNationalID: MessageDescriptor
   validPassportNumber: MessageDescriptor
   phoneNumberNotValid: MessageDescriptor
   validDrivingLicenseNumber: MessageDescriptor
@@ -99,6 +101,11 @@ const messagesToDefine: IValidationMessages = {
     defaultMessage: 'No facility selected',
     description: 'The error message appears when no valid facility is selected',
     id: 'validations.facilityMustBeSelected'
+  },
+  officeMustBeSelected: {
+    defaultMessage: 'No Office selected',
+    description: 'The error message appears when no valid office is selected',
+    id: 'validations.officeMustBeSelected'
   },
   greaterThanZero: {
     defaultMessage: 'Must be a greater than zero',
@@ -229,6 +236,11 @@ const messagesToDefine: IValidationMessages = {
     defaultMessage: '10 or 17',
     description: 'Nid valid lengths',
     id: 'validations.validNationalIDLengths'
+  },
+  duplicateNationalID: {
+    defaultMessage: 'National ID must be unique',
+    description: 'Unique Nid validation',
+    id: 'validations.duplicateNationalID'
   },
   validPassportNumber: {
     defaultMessage:

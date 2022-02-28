@@ -30,6 +30,7 @@ import {
   ApolloServerPluginStopHapiServer
 } from 'apollo-server-hapi'
 import { getApolloConfig } from '@gateway/graphql/config'
+import * as database from '@gateway/features/user/database'
 
 DotEnv.config({
   path: `${process.cwd()}/.env`
@@ -49,6 +50,7 @@ export async function createServer() {
   const plugins = getPlugins()
 
   await app.register(plugins)
+
   const apolloServer = new ApolloServer({
     ...getApolloConfig(),
     plugins: [ApolloServerPluginStopHapiServer({ hapiServer: app })]
@@ -75,7 +77,7 @@ export async function createServer() {
    * https://github.com/hapijs/good/search?q=request&type=Issues
    */
   if (process.env.NODE_ENV !== 'production') {
-    app.events.on('response', request => {
+    app.events.on('response', (request) => {
       app.log('info', JSON.stringify(request.payload))
     })
   }
@@ -83,6 +85,7 @@ export async function createServer() {
   async function start() {
     await apolloServer.start()
     await app.start()
+    await database.start()
     await apolloServer.applyMiddleware({
       app
     })
@@ -91,6 +94,7 @@ export async function createServer() {
 
   async function stop() {
     await app.stop()
+    await database.stop()
     app.log('info', 'server stopped')
   }
 
@@ -98,7 +102,7 @@ export async function createServer() {
 }
 
 if (require.main === module) {
-  createServer().then(app => {
+  createServer().then((app) => {
     app.start()
   })
 }
