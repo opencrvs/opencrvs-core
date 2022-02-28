@@ -520,5 +520,75 @@ describe('when draft data is transformed to graphql', () => {
         primaryCaregiverData
       )
     })
+
+    it('transform gql data from form correction data', () => {
+      const data = {
+        child: childDetails,
+        father: fatherDetails,
+        mother: motherDetails,
+        registration: {
+          ...registrationDetails,
+          applicant: {
+            value: 'FATHER',
+            nestedFields: {
+              otherRelationShip: ''
+            }
+          },
+          contactPoint: {
+            value: 'OTHER',
+            nestedFields: {
+              contactRelationshipOther: 'grandma',
+              registrationPhone: '01736478896'
+            }
+          }
+        },
+        primaryCaregiver,
+        documents: { imageUploader: '' }
+      }
+
+      const originalData = {
+        child: {
+          ...childDetails,
+          familyNameEng: 'Khan'
+        },
+        father: fatherDetails,
+        mother: motherDetails,
+        registration: registrationDetails,
+        primaryCaregiver,
+        documents: { imageUploader: '' }
+      }
+
+      const transformedCorrectionData = {
+        values: [
+          {
+            fieldName: 'applicant',
+            newValue: 'FATHER',
+            oldValue: 'MOTHER',
+            section: 'registration'
+          },
+          {
+            fieldName: 'contactPoint.nestedFields.registrationPhone',
+            newValue: '01736478896',
+            oldValue: '01736478884',
+            section: 'registration'
+          },
+          {
+            section: 'child',
+            fieldName: 'familyNameEng',
+            oldValue: 'Khan',
+            newValue: 'Islam'
+          }
+        ]
+      }
+
+      expect(
+        draftToGqlTransformer(
+          form,
+          data,
+          '9633042c-ca34-4b9f-959b-9d16909fd85c',
+          originalData
+        ).registration.correction
+      ).toEqual(transformedCorrectionData)
+    })
   })
 })

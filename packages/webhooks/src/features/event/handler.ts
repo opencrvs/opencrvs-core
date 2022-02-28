@@ -23,6 +23,7 @@ import {
 
 export interface IAuthHeader {
   Authorization: string
+  'x-correlation-id': string
 }
 
 export async function birthRegisteredHandler(
@@ -31,7 +32,8 @@ export async function birthRegisteredHandler(
 ) {
   const bundle = request.payload as fhir.Bundle
   const authHeader: IAuthHeader = {
-    Authorization: request.headers.authorization
+    Authorization: request.headers.authorization,
+    'x-correlation-id': request.headers['x-correlation-id']
   }
 
   let webhookQueue: Queue

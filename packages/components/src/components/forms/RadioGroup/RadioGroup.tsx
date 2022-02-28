@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { Radio } from './Radio'
 import { RadioButton } from '../../interface/RadioButton'
 import { NoticeWrapper } from '../DateField'
 import { InputLabel } from '../InputField/InputLabel'
@@ -21,21 +20,33 @@ const Wrapper = styled.div`
   margin-bottom: 0px;
 `
 
-const List = styled.ul`
+const List = styled.ul<{ flexDirection?: string }>`
   list-style: none;
   margin: 0;
   padding: 0;
   & > div {
     margin-bottom: 16px;
   }
+  ${({ flexDirection }) =>
+    flexDirection &&
+    `display: flex;
+    & > div {
+      margin-right: 16px;
+    }`}
 `
-const LargeList = styled.ul`
+const LargeList = styled.ul<{ flexDirection?: string }>`
   list-style: none;
   margin: 0;
   padding: 0;
   & > div {
     margin-bottom: 16px;
   }
+  ${({ flexDirection }) =>
+    flexDirection &&
+    `display: flex;
+    & > div {
+      margin-right: 16px;
+    }`}
 `
 const NestedChildren = styled.div`
   margin: 15px 0px 0px 18px;
@@ -66,6 +77,7 @@ export interface IRadioGroupProps {
   size?: RadioSize
   notice?: string
   nestedFields?: { [key: string]: JSX.Element[] }
+  flexDirection?: string
   onChange: (value: string) => void
 }
 
@@ -78,6 +90,7 @@ export class RadioGroup extends React.Component<IRadioGroupProps> {
       size,
       notice,
       nestedFields,
+      flexDirection,
       ...props
     } = this.props
 
@@ -90,7 +103,7 @@ export class RadioGroup extends React.Component<IRadioGroupProps> {
         )}
         {size && size === RadioSize.LARGE ? (
           <LargeList>
-            {options.map(option => {
+            {options.map((option) => {
               return (
                 <div key={option.label}>
                   <RadioButton
@@ -102,6 +115,7 @@ export class RadioGroup extends React.Component<IRadioGroupProps> {
                     id={`${name}_${option.value}`}
                     selected={value}
                     onChange={this.props.onChange}
+                    hasFlexDirection={flexDirection ? true : false}
                   />
                   {nestedFields &&
                     value === option.value &&
@@ -113,8 +127,8 @@ export class RadioGroup extends React.Component<IRadioGroupProps> {
             })}
           </LargeList>
         ) : (
-          <List>
-            {options.map(option => {
+          <List flexDirection={flexDirection}>
+            {options.map((option) => {
               return (
                 <div key={option.label}>
                   <RadioButton
@@ -126,6 +140,7 @@ export class RadioGroup extends React.Component<IRadioGroupProps> {
                     id={`${name}_${option.value}`}
                     selected={value}
                     onChange={this.props.onChange}
+                    hasFlexDirection={flexDirection ? true : false}
                   />
                 </div>
               )

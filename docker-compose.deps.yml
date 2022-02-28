@@ -19,8 +19,10 @@ services:
     restart: unless-stopped
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.5.4
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
     restart: unless-stopped
+    environment:
+      - discovery.type=single-node
 
   influxdb:
     image: influxdb:1.7.9
@@ -30,7 +32,7 @@ services:
     image: jembi/hearth:v1.0.0-beta.3
     environment:
       - mongodb__url=mongodb://mongo1/hearth-dev
-      - logger__level=error
+      - logger__level=warn
       - authentication__type=disabled
       - idGenerator=uuidv4
       - server__fhirVersion=stu3

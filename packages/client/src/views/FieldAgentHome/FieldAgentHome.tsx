@@ -23,7 +23,7 @@ import {
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/fieldAgentHome'
 import {
-  goToApplicationRecordAudit,
+  goToDeclarationRecordAudit,
   goToEvents as goToEventsAction,
   goToFieldAgentHomeTab as goToFieldAgentHomeTabAction
 } from '@client/navigation'
@@ -133,7 +133,7 @@ interface IBaseFieldAgentHomeProps {
   goToEvents: typeof goToEventsAction
   draftCount: string
   goToFieldAgentHomeTab: typeof goToFieldAgentHomeTabAction
-  goToApplicationRecordAudit: typeof goToApplicationRecordAudit
+  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   applicationsReadyToSend: IApplication[]
   updateFieldAgentDeclaredApplications: typeof updateFieldAgentDeclaredApplications
 }
@@ -301,7 +301,10 @@ class FieldAgentHomeView extends React.Component<
           {
             label: 'rowClickHandler',
             handler: () =>
-              this.props.goToApplicationRecordAudit(registrationSearchSet.id)
+              this.props.goToDeclarationRecordAudit(
+                'rejectTab',
+                registrationSearchSet.id
+              )
           }
         ]
       }
@@ -504,6 +507,6 @@ const mapStateToProps = (
 export const FieldAgentHome = connect(mapStateToProps, {
   goToEvents: goToEventsAction,
   goToFieldAgentHomeTab: goToFieldAgentHomeTabAction,
-  goToApplicationRecordAudit,
+  goToDeclarationRecordAudit,
   updateFieldAgentDeclaredApplications
 })(injectIntl(withTheme(withOnlineStatus(FieldAgentHomeView))))
