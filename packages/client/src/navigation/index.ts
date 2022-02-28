@@ -12,7 +12,6 @@
 
 import { Event, UserSection, CorrectionSection } from '@client/forms'
 import {
-  APPLICATION_DETAIL,
   CERTIFICATE_COLLECTOR,
   CREATE_USER,
   CREATE_USER_ON_LOCATION,
@@ -52,7 +51,7 @@ import {
   CERTIFICATE_CORRECTION,
   VERIFY_CORRECTOR,
   CONFIG,
-  APPLICATION_RECORD_AUDIT,
+  DECLARATION_RECORD_AUDIT,
   CHANGE_PHONE
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
@@ -71,6 +70,7 @@ import {
 import moment from 'moment'
 import { stringify } from 'query-string'
 import { Cmd, loop } from 'redux-loop'
+import { IRecordAuditTabs } from '@client/views/Home/RecordAudit'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -290,22 +290,11 @@ export function goToSearch() {
   return push(SEARCH)
 }
 
-export function goToApplicationDetails(
-  applicationId: string,
-  forceDetailsQuery?: boolean
+export function goToDeclarationRecordAudit(
+  tab: IRecordAuditTabs,
+  declarationId: string
 ) {
-  return push(formatUrl(APPLICATION_DETAIL, { applicationId }), {
-    forceDetailsQuery
-  })
-}
-
-export function goToApplicationRecordAudit(
-  applicationId: string,
-  forceDetailsQuery?: boolean
-) {
-  return push(formatUrl(APPLICATION_RECORD_AUDIT, { applicationId }), {
-    forceDetailsQuery
-  })
+  return push(formatUrl(DECLARATION_RECORD_AUDIT, { tab, declarationId }))
 }
 
 export function goToBirthRegistrationAsParent(applicationId: string) {

@@ -30,6 +30,7 @@ import {
 import moment from 'moment'
 import { IOfflineData } from '@client/offline/reducer'
 import { getListOfLocations } from '@client/forms/utils'
+import _ from 'lodash'
 
 export interface IValidationResult {
   message: MessageDescriptor
@@ -555,6 +556,17 @@ export const validIDNumber =
         }
       }
     }
+    return undefined
+  }
+export const duplicateIDNumber =
+  (fieldToDuplicateCheck: string): Validation =>
+  (value: IFormFieldValue, drafts) => {
+    if (value === _.get(drafts, fieldToDuplicateCheck)) {
+      return {
+        message: messages.duplicateNationalID
+      }
+    }
+
     return undefined
   }
 

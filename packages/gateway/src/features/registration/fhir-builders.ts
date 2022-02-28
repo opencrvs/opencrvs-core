@@ -141,7 +141,7 @@ function createIDBuilder(sectionCode: string, sectionTitle: string) {
     id: async (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
-      context: any
+      context: { authHeader: IAuthHeader }
     ) => {
       const person = selectOrCreatePersonResource(
         sectionCode,
@@ -3418,7 +3418,7 @@ export const builders: IFieldBuilders = {
 export async function buildFHIRBundle(
   reg: object,
   eventType: EVENT_TYPE,
-  authHeader?: IAuthHeader
+  authHeader: IAuthHeader
 ) {
   const ref = uuid()
   const context: any = {
