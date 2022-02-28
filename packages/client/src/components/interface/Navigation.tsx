@@ -295,58 +295,65 @@ export const NavigationView = (props: IFullProps) => {
     >
       {userDetails?.role === 'FIELD_AGENT' ? (
         <>
-          <Query
-            query={COUNT_USER_WISE_APPLICATIONS}
-            variables={{
-              userId: userDetails ? userDetails.practitionerId : '',
-              status: [EVENT_STATUS.REJECTED],
-              locationIds: fieldAgentLocationId ? [fieldAgentLocationId] : []
-            }}
-          >
-            {({
-              loading,
-              error,
-              data
-            }: {
-              loading: any
-              data?: any
-              error?: any
-            }) => {
-              if (loading) {
-                return (
-                  <StyledSpinner
-                    id="field-agent-home-spinner"
-                    baseColor={theme.colors.background}
-                  />
-                )
-              }
-              return (
-                <>
-                  <NavigationGroup>
-                    <NavigationItem
-                      icon={() => <LeftNavigationApplicationIcons />}
-                      id={`navigation_${TAB_ID.inProgress}`}
-                      label={TAB_LABEL.inProgress}
-                      count={props.draftApplications.length}
-                      isSelected={tabId === TAB_ID.inProgress}
-                      onClick={() => {
-                        props.goToFieldAgentHomeTab(TAB_ID.inProgress)
-                        menuCollapse && menuCollapse()
-                      }}
-                    />
+          <NavigationGroup>
+            <NavigationItem
+              icon={() => <LeftNavigationApplicationIcons />}
+              id={`navigation_${TAB_ID.inProgress}`}
+              label={TAB_LABEL.inProgress}
+              count={props.draftApplications.length}
+              isSelected={tabId === TAB_ID.inProgress}
+              onClick={() => {
+                props.goToFieldAgentHomeTab(TAB_ID.inProgress)
+                menuCollapse && menuCollapse()
+              }}
+            />
+            <NavigationItem
+              icon={() => <LeftNavigationApplicationIcons color={'orange'} />}
+              id={`navigation_${TAB_ID.sentForReview}`}
+              label={TAB_LABEL.sentForReview}
+              count={props.applicationsReadyToSend.length}
+              isSelected={tabId === TAB_ID.sentForReview}
+              onClick={() => {
+                props.goToFieldAgentHomeTab(TAB_ID.sentForReview)
+                menuCollapse && menuCollapse()
+              }}
+            />
+            <Query
+              query={COUNT_USER_WISE_APPLICATIONS}
+              variables={{
+                userId: userDetails ? userDetails.practitionerId : '',
+                status: [EVENT_STATUS.REJECTED],
+                locationIds: fieldAgentLocationId ? [fieldAgentLocationId] : []
+              }}
+            >
+              {({
+                loading,
+                error,
+                data
+              }: {
+                loading: any
+                data?: any
+                error?: any
+              }) => {
+                if (loading) {
+                  return (
                     <NavigationItem
                       icon={() => (
-                        <LeftNavigationApplicationIcons color={'orange'} />
+                        <LeftNavigationApplicationIcons color={'red'} />
                       )}
-                      id={`navigation_${TAB_ID.sentForReview}`}
-                      label={TAB_LABEL.sentForReview}
-                      count={props.applicationsReadyToSend.length}
-                      isSelected={tabId === TAB_ID.sentForReview}
+                      id={`navigation_${TAB_ID.requireUpdates}`}
+                      label={TAB_LABEL.requiresUpdate}
+                      count={0}
+                      isSelected={tabId === TAB_ID.requireUpdates}
                       onClick={() => {
-                        props.goToFieldAgentHomeTab(TAB_ID.sentForReview)
+                        props.goToFieldAgentHomeTab(TAB_ID.requireUpdates)
                         menuCollapse && menuCollapse()
                       }}
                     />
+                  )
+                }
+                return (
+                  <>
                     <NavigationItem
                       icon={() => (
                         <LeftNavigationApplicationIcons color={'red'} />
@@ -360,16 +367,14 @@ export const NavigationView = (props: IFullProps) => {
                         menuCollapse && menuCollapse()
                       }}
                     />
-                  </NavigationGroup>
-                  {menuCollapse && (
-                    <NavigationGroup>
-                      {getSettingsAndLogout(props)}
-                    </NavigationGroup>
-                  )}
-                </>
-              )
-            }}
-          </Query>
+                  </>
+                )
+              }}
+            </Query>
+          </NavigationGroup>
+          {menuCollapse && (
+            <NavigationGroup>{getSettingsAndLogout(props)}</NavigationGroup>
+          )}
         </>
       ) : (
         <>
