@@ -44,9 +44,9 @@ export const resolvers: GQLResolver = {
       }
       const questionPayload: IQuestionPayload =
         createOrUpdateQuestionPayload(question)
-      const action = questionPayload.id ? 'update' : 'create'
-      const res = await fetch(`${APPLICATION_CONFIG_URL}${action}question`, {
-        method: 'POST',
+      const method = questionPayload.id ? 'PUT' : 'POST'
+      const res = await fetch(`${APPLICATION_CONFIG_URL}question`, {
+        method,
         body: JSON.stringify(questionPayload),
         headers: {
           'Content-Type': 'application/json',
@@ -57,7 +57,7 @@ export const resolvers: GQLResolver = {
       if (res.status !== 201) {
         return await Promise.reject(
           new Error(
-            `Something went wrong on config service. Couldn't ${action} question`
+            `Something went wrong on config service. Couldn't mofify question`
           )
         )
       }

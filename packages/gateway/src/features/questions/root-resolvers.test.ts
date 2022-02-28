@@ -227,7 +227,7 @@ describe('createOrUpdateQuestion mutation', () => {
         authHeaderSysAdmin
       )
     ).rejects.toThrowError(
-      "Something went wrong on config service. Couldn't create question"
+      "Something went wrong on config service. Couldn't mofify question"
     )
   })
 })

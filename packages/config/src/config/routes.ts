@@ -23,6 +23,9 @@ import applicationConfigHandler from '@config/handlers/applicationConfigHandler'
 import createQuestionHandler, {
   requestSchema as createQuestionReqSchema
 } from '@config/handlers/createQuestion/handler'
+import updateQuestionHandler, {
+  requestSchema as updateQuestionReqSchema
+} from '@config/handlers/updateQuestion/handler'
 import getQuestionsHandler from '@config/handlers/getQuestions/handler'
 
 const enum RouteScope {
@@ -151,7 +154,26 @@ export default function getRoutes() {
           scope: [RouteScope.NATLSYSADMIN]
         },
         validate: {
+          /*failAction: async (request: any, h: any, err: any) => {
+            console.log(`Joi error: ${err}`)
+            throw err
+          },*/
           payload: createQuestionReqSchema
+        }
+      }
+    },
+    {
+      method: 'PUT',
+      path: '/question',
+      handler: updateQuestionHandler,
+      config: {
+        tags: ['api'],
+        description: 'Update question',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        validate: {
+          payload: updateQuestionReqSchema
         }
       }
     },
@@ -162,17 +184,7 @@ export default function getRoutes() {
       config: {
         tags: ['api'],
         description: 'Get questions',
-        auth: {
-          scope: [
-            RouteScope.NATLSYSADMIN,
-            RouteScope.DECLARE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY,
-            RouteScope.PERFORMANCE,
-            RouteScope.SYSADMIN,
-            RouteScope.VALIDATE
-          ]
-        }
+        auth: false
       }
     }
   ]

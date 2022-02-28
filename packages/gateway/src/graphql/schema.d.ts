@@ -292,16 +292,15 @@ export interface GQLRole {
   active?: boolean
 }
 
-export interface GQLMesssageDescriptorInput {
-  id?: string
-  description?: string
-  defaultMessage?: string
-}
-
-export interface GQLMesssageDescriptor {
-  id?: string
-  description?: string
-  defaultMessage?: string
+export interface GQLCertificateSVG {
+  _id?: string
+  svgCode?: string
+  svgFilename?: string
+  svgDateUpdated?: string
+  svgDateCreated?: string
+  user?: string
+  event?: string
+  status?: string
 }
 
 export interface GQLQuestion {
@@ -317,32 +316,6 @@ export interface GQLQuestion {
   enabled?: boolean
   custom?: boolean
   initialValue?: string
-}
-
-export interface GQLQuestionInput {
-  id?: string
-  fieldId?: string
-  label?: GQLMesssageDescriptorInput
-  placeholder?: GQLMesssageDescriptorInput
-  maxLength?: number
-  fieldName?: string
-  fieldType?: string
-  preceedingFieldId?: string
-  required?: boolean
-  enabled?: boolean
-  custom?: boolean
-  initialValue?: string
-}
-
-export interface GQLCertificateSVG {
-  _id?: string
-  svgCode?: string
-  svgFilename?: string
-  svgDateUpdated?: string
-  svgDateCreated?: string
-  user?: string
-  event?: string
-  status?: string
 }
 
 export interface GQLNotificationInput {
@@ -437,6 +410,21 @@ export interface GQLCertificateSVGInput {
   user: string
   event: string
   status: string
+}
+
+export interface GQLQuestionInput {
+  id?: string
+  fieldId?: string
+  label?: GQLMesssageDescriptorInput
+  placeholder?: GQLMesssageDescriptorInput
+  maxLength?: number
+  fieldName?: string
+  fieldType?: string
+  preceedingFieldId?: string
+  required?: boolean
+  enabled?: boolean
+  custom?: boolean
+  initialValue?: string
 }
 
 export type GQLMap = any
@@ -742,6 +730,12 @@ export interface GQLEventProgressSet {
   progressReport?: GQLEventProgressData
 }
 
+export interface GQLMesssageDescriptor {
+  id?: string
+  description?: string
+  defaultMessage?: string
+}
+
 export interface GQLPersonInput {
   _fhirID?: string
   identifier?: Array<GQLIdentityInput | null>
@@ -834,6 +828,12 @@ export interface GQLUserIdentifierInput {
 export interface GQLSignatureInput {
   data?: string
   type?: string
+}
+
+export interface GQLMesssageDescriptorInput {
+  id?: string
+  description?: string
+  defaultMessage?: string
 }
 
 export interface GQLRegWorkflow {
@@ -1260,9 +1260,8 @@ export interface GQLResolver {
   EventSearchResultSet?: GQLEventSearchResultSetTypeResolver
   EventProgressResultSet?: GQLEventProgressResultSetTypeResolver
   Role?: GQLRoleTypeResolver
-  MesssageDescriptor?: GQLMesssageDescriptorTypeResolver
-  Question?: GQLQuestionTypeResolver
   CertificateSVG?: GQLCertificateSVGTypeResolver
+  Question?: GQLQuestionTypeResolver
   CreatedIds?: GQLCreatedIdsTypeResolver
   Map?: GraphQLScalarType
   Registration?: GQLRegistrationTypeResolver
@@ -1295,6 +1294,7 @@ export interface GQLResolver {
   }
 
   EventProgressSet?: GQLEventProgressSetTypeResolver
+  MesssageDescriptor?: GQLMesssageDescriptorTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
   ReasonsNotApplying?: GQLReasonsNotApplyingTypeResolver
@@ -3249,27 +3249,55 @@ export interface RoleToActiveResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLMesssageDescriptorTypeResolver<TParent = any> {
-  id?: MesssageDescriptorToIdResolver<TParent>
-  description?: MesssageDescriptorToDescriptionResolver<TParent>
-  defaultMessage?: MesssageDescriptorToDefaultMessageResolver<TParent>
+export interface GQLCertificateSVGTypeResolver<TParent = any> {
+  _id?: CertificateSVGTo_idResolver<TParent>
+  svgCode?: CertificateSVGToSvgCodeResolver<TParent>
+  svgFilename?: CertificateSVGToSvgFilenameResolver<TParent>
+  svgDateUpdated?: CertificateSVGToSvgDateUpdatedResolver<TParent>
+  svgDateCreated?: CertificateSVGToSvgDateCreatedResolver<TParent>
+  user?: CertificateSVGToUserResolver<TParent>
+  event?: CertificateSVGToEventResolver<TParent>
+  status?: CertificateSVGToStatusResolver<TParent>
 }
 
-export interface MesssageDescriptorToIdResolver<TParent = any, TResult = any> {
+export interface CertificateSVGTo_idResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface MesssageDescriptorToDescriptionResolver<
+export interface CertificateSVGToSvgCodeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface CertificateSVGToSvgFilenameResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface MesssageDescriptorToDefaultMessageResolver<
+export interface CertificateSVGToSvgDateUpdatedResolver<
   TParent = any,
   TResult = any
 > {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface CertificateSVGToSvgDateCreatedResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface CertificateSVGToUserResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface CertificateSVGToEventResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface CertificateSVGToStatusResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -3336,58 +3364,6 @@ export interface QuestionToCustomResolver<TParent = any, TResult = any> {
 }
 
 export interface QuestionToInitialValueResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLCertificateSVGTypeResolver<TParent = any> {
-  _id?: CertificateSVGTo_idResolver<TParent>
-  svgCode?: CertificateSVGToSvgCodeResolver<TParent>
-  svgFilename?: CertificateSVGToSvgFilenameResolver<TParent>
-  svgDateUpdated?: CertificateSVGToSvgDateUpdatedResolver<TParent>
-  svgDateCreated?: CertificateSVGToSvgDateCreatedResolver<TParent>
-  user?: CertificateSVGToUserResolver<TParent>
-  event?: CertificateSVGToEventResolver<TParent>
-  status?: CertificateSVGToStatusResolver<TParent>
-}
-
-export interface CertificateSVGTo_idResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface CertificateSVGToSvgCodeResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface CertificateSVGToSvgFilenameResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface CertificateSVGToSvgDateUpdatedResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface CertificateSVGToSvgDateCreatedResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface CertificateSVGToUserResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface CertificateSVGToEventResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface CertificateSVGToStatusResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -4367,6 +4343,30 @@ export interface EventProgressSetToStartedAtResolver<
 }
 
 export interface EventProgressSetToProgressReportResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLMesssageDescriptorTypeResolver<TParent = any> {
+  id?: MesssageDescriptorToIdResolver<TParent>
+  description?: MesssageDescriptorToDescriptionResolver<TParent>
+  defaultMessage?: MesssageDescriptorToDefaultMessageResolver<TParent>
+}
+
+export interface MesssageDescriptorToIdResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface MesssageDescriptorToDescriptionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface MesssageDescriptorToDefaultMessageResolver<
   TParent = any,
   TResult = any
 > {
