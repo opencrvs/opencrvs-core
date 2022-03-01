@@ -71,6 +71,7 @@ export interface GQLMutation {
   auditUser?: string
   resendSMSInvite?: string
   createOrUpdateCertificateSVG?: GQLCertificateSVG
+  updateApplicationConfig?: GQLApplicationConfiguration
 }
 
 export interface GQLDummy {
@@ -393,6 +394,60 @@ export interface GQLCertificateSVGInput {
   user: string
   event: string
   status: string
+}
+
+export interface GQLApplicationConfiguration {
+  APPLICATION_NAME?: string
+  BACKGROUND_SYNC_BROADCAST_CHANNEL?: string
+  COUNTRY?: string
+  COUNTRY_LOGO_FILE?: string
+  COUNTRY_LOGO_RENDER_WIDTH?: number
+  COUNTRY_LOGO_RENDER_HEIGHT?: number
+  DESKTOP_TIME_OUT_MILLISECONDS?: number
+  LANGUAGES?: string
+  CERTIFICATE_PRINT_CHARGE_FREE_PERIOD?: number
+  CERTIFICATE_PRINT_CHARGE_UP_LIMIT?: number
+  CERTIFICATE_PRINT_LOWEST_CHARGE?: number
+  CERTIFICATE_PRINT_HIGHEST_CHARGE?: number
+  UI_POLLING_INTERVAL?: number
+  FIELD_AGENT_AUDIT_LOCATIONS?: string
+  APPLICATION_AUDIT_LOCATIONS?: string
+  INFORMANT_MINIMUM_AGE?: number
+  HIDE_EVENT_REGISTER_INFORMATION?: boolean
+  EXTERNAL_VALIDATION_WORKQUEUE?: boolean
+  SENTRY?: string
+  LOGROCKET?: string
+  PHONE_NUMBER_PATTERN?: GQLPhoneNumberPattern
+  BIRTH_REGISTRATION_TARGET?: number
+  DEATH_REGISTRATION_TARGET?: number
+  NID_NUMBER_PATTERN?: GQLNIDNumberPattern
+}
+
+export interface GQLApplicationConfigurationInput {
+  APPLICATION_NAME?: string
+  BACKGROUND_SYNC_BROADCAST_CHANNEL?: string
+  COUNTRY?: string
+  COUNTRY_LOGO_FILE?: string
+  COUNTRY_LOGO_RENDER_WIDTH?: number
+  COUNTRY_LOGO_RENDER_HEIGHT?: number
+  DESKTOP_TIME_OUT_MILLISECONDS?: number
+  LANGUAGES?: string
+  CERTIFICATE_PRINT_CHARGE_FREE_PERIOD?: number
+  CERTIFICATE_PRINT_CHARGE_UP_LIMIT?: number
+  CERTIFICATE_PRINT_LOWEST_CHARGE?: number
+  CERTIFICATE_PRINT_HIGHEST_CHARGE?: number
+  UI_POLLING_INTERVAL?: number
+  FIELD_AGENT_AUDIT_LOCATIONS?: string
+  APPLICATION_AUDIT_LOCATIONS?: string
+  INFORMANT_MINIMUM_AGE?: number
+  HIDE_EVENT_REGISTER_INFORMATION?: boolean
+  EXTERNAL_VALIDATION_WORKQUEUE?: boolean
+  SENTRY?: string
+  LOGROCKET?: string
+  PHONE_NUMBER_PATTERN?: GQLPhoneNumberPatternInput
+  BIRTH_REGISTRATION_TARGET?: number
+  DEATH_REGISTRATION_TARGET?: number
+  NID_NUMBER_PATTERN?: GQLNIDNumberPatternInput
 }
 
 export type GQLMap = any
@@ -792,6 +847,34 @@ export interface GQLSignatureInput {
   type?: string
 }
 
+export interface GQLPhoneNumberPattern {
+  pattern?: string
+  example?: string
+  start?: string
+  num?: string
+  mask?: GQLMask
+}
+
+export interface GQLNIDNumberPattern {
+  pattern?: string
+  example?: string
+  num?: string
+}
+
+export interface GQLPhoneNumberPatternInput {
+  pattern?: string
+  example?: string
+  start?: string
+  num?: string
+  mask?: GQLMaskInput
+}
+
+export interface GQLNIDNumberPatternInput {
+  pattern?: string
+  example?: string
+  num?: string
+}
+
 export interface GQLRegWorkflow {
   id: string
   type?: GQLRegStatus
@@ -1109,6 +1192,16 @@ export interface GQLReasonsNotApplyingInput {
   isDeceased?: boolean
 }
 
+export interface GQLMask {
+  startForm?: number
+  endBefore?: number
+}
+
+export interface GQLMaskInput {
+  startForm?: number
+  endBefore?: number
+}
+
 export const enum GQLRegStatus {
   IN_PROGRESS = 'IN_PROGRESS',
   DECLARED = 'DECLARED',
@@ -1218,6 +1311,7 @@ export interface GQLResolver {
   Role?: GQLRoleTypeResolver
   CertificateSVG?: GQLCertificateSVGTypeResolver
   CreatedIds?: GQLCreatedIdsTypeResolver
+  ApplicationConfiguration?: GQLApplicationConfigurationTypeResolver
   Map?: GraphQLScalarType
   Registration?: GQLRegistrationTypeResolver
   RelatedPerson?: GQLRelatedPersonTypeResolver
@@ -1249,6 +1343,8 @@ export interface GQLResolver {
   }
 
   EventProgressSet?: GQLEventProgressSetTypeResolver
+  PhoneNumberPattern?: GQLPhoneNumberPatternTypeResolver
+  NIDNumberPattern?: GQLNIDNumberPatternTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
   ReasonsNotApplying?: GQLReasonsNotApplyingTypeResolver
@@ -1265,6 +1361,7 @@ export interface GQLResolver {
   BirthEventSearchSet?: GQLBirthEventSearchSetTypeResolver
   DeathEventSearchSet?: GQLDeathEventSearchSetTypeResolver
   EventProgressData?: GQLEventProgressDataTypeResolver
+  Mask?: GQLMaskTypeResolver
   Comment?: GQLCommentTypeResolver
   Payment?: GQLPaymentTypeResolver
 }
@@ -1825,6 +1922,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   auditUser?: MutationToAuditUserResolver<TParent>
   resendSMSInvite?: MutationToResendSMSInviteResolver<TParent>
   createOrUpdateCertificateSVG?: MutationToCreateOrUpdateCertificateSVGResolver<TParent>
+  updateApplicationConfig?: MutationToUpdateApplicationConfigResolver<TParent>
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -2223,6 +2321,21 @@ export interface MutationToCreateOrUpdateCertificateSVGResolver<
   (
     parent: TParent,
     args: MutationToCreateOrUpdateCertificateSVGArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToUpdateApplicationConfigArgs {
+  applicationConfig: GQLApplicationConfigurationInput
+}
+export interface MutationToUpdateApplicationConfigResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToUpdateApplicationConfigArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -3258,6 +3371,201 @@ export interface CreatedIdsToRegistrationNumberResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
+  APPLICATION_NAME?: ApplicationConfigurationToAPPLICATION_NAMEResolver<TParent>
+  BACKGROUND_SYNC_BROADCAST_CHANNEL?: ApplicationConfigurationToBACKGROUND_SYNC_BROADCAST_CHANNELResolver<TParent>
+  COUNTRY?: ApplicationConfigurationToCOUNTRYResolver<TParent>
+  COUNTRY_LOGO_FILE?: ApplicationConfigurationToCOUNTRY_LOGO_FILEResolver<TParent>
+  COUNTRY_LOGO_RENDER_WIDTH?: ApplicationConfigurationToCOUNTRY_LOGO_RENDER_WIDTHResolver<TParent>
+  COUNTRY_LOGO_RENDER_HEIGHT?: ApplicationConfigurationToCOUNTRY_LOGO_RENDER_HEIGHTResolver<TParent>
+  DESKTOP_TIME_OUT_MILLISECONDS?: ApplicationConfigurationToDESKTOP_TIME_OUT_MILLISECONDSResolver<TParent>
+  LANGUAGES?: ApplicationConfigurationToLANGUAGESResolver<TParent>
+  CERTIFICATE_PRINT_CHARGE_FREE_PERIOD?: ApplicationConfigurationToCERTIFICATE_PRINT_CHARGE_FREE_PERIODResolver<TParent>
+  CERTIFICATE_PRINT_CHARGE_UP_LIMIT?: ApplicationConfigurationToCERTIFICATE_PRINT_CHARGE_UP_LIMITResolver<TParent>
+  CERTIFICATE_PRINT_LOWEST_CHARGE?: ApplicationConfigurationToCERTIFICATE_PRINT_LOWEST_CHARGEResolver<TParent>
+  CERTIFICATE_PRINT_HIGHEST_CHARGE?: ApplicationConfigurationToCERTIFICATE_PRINT_HIGHEST_CHARGEResolver<TParent>
+  UI_POLLING_INTERVAL?: ApplicationConfigurationToUI_POLLING_INTERVALResolver<TParent>
+  FIELD_AGENT_AUDIT_LOCATIONS?: ApplicationConfigurationToFIELD_AGENT_AUDIT_LOCATIONSResolver<TParent>
+  APPLICATION_AUDIT_LOCATIONS?: ApplicationConfigurationToAPPLICATION_AUDIT_LOCATIONSResolver<TParent>
+  INFORMANT_MINIMUM_AGE?: ApplicationConfigurationToINFORMANT_MINIMUM_AGEResolver<TParent>
+  HIDE_EVENT_REGISTER_INFORMATION?: ApplicationConfigurationToHIDE_EVENT_REGISTER_INFORMATIONResolver<TParent>
+  EXTERNAL_VALIDATION_WORKQUEUE?: ApplicationConfigurationToEXTERNAL_VALIDATION_WORKQUEUEResolver<TParent>
+  SENTRY?: ApplicationConfigurationToSENTRYResolver<TParent>
+  LOGROCKET?: ApplicationConfigurationToLOGROCKETResolver<TParent>
+  PHONE_NUMBER_PATTERN?: ApplicationConfigurationToPHONE_NUMBER_PATTERNResolver<TParent>
+  BIRTH_REGISTRATION_TARGET?: ApplicationConfigurationToBIRTH_REGISTRATION_TARGETResolver<TParent>
+  DEATH_REGISTRATION_TARGET?: ApplicationConfigurationToDEATH_REGISTRATION_TARGETResolver<TParent>
+  NID_NUMBER_PATTERN?: ApplicationConfigurationToNID_NUMBER_PATTERNResolver<TParent>
+}
+
+export interface ApplicationConfigurationToAPPLICATION_NAMEResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToBACKGROUND_SYNC_BROADCAST_CHANNELResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToCOUNTRYResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToCOUNTRY_LOGO_FILEResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToCOUNTRY_LOGO_RENDER_WIDTHResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToCOUNTRY_LOGO_RENDER_HEIGHTResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToDESKTOP_TIME_OUT_MILLISECONDSResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToLANGUAGESResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToCERTIFICATE_PRINT_CHARGE_FREE_PERIODResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToCERTIFICATE_PRINT_CHARGE_UP_LIMITResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToCERTIFICATE_PRINT_LOWEST_CHARGEResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToCERTIFICATE_PRINT_HIGHEST_CHARGEResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToUI_POLLING_INTERVALResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToFIELD_AGENT_AUDIT_LOCATIONSResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToAPPLICATION_AUDIT_LOCATIONSResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToINFORMANT_MINIMUM_AGEResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToHIDE_EVENT_REGISTER_INFORMATIONResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToEXTERNAL_VALIDATION_WORKQUEUEResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToSENTRYResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToLOGROCKETResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToPHONE_NUMBER_PATTERNResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToBIRTH_REGISTRATION_TARGETResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToDEATH_REGISTRATION_TARGETResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToNID_NUMBER_PATTERNResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLRegistrationTypeResolver<TParent = any> {
   id?: RegistrationToIdResolver<TParent>
   _fhirID?: RegistrationTo_fhirIDResolver<TParent>
@@ -4216,6 +4524,70 @@ export interface EventProgressSetToProgressReportResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLPhoneNumberPatternTypeResolver<TParent = any> {
+  pattern?: PhoneNumberPatternToPatternResolver<TParent>
+  example?: PhoneNumberPatternToExampleResolver<TParent>
+  start?: PhoneNumberPatternToStartResolver<TParent>
+  num?: PhoneNumberPatternToNumResolver<TParent>
+  mask?: PhoneNumberPatternToMaskResolver<TParent>
+}
+
+export interface PhoneNumberPatternToPatternResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface PhoneNumberPatternToExampleResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface PhoneNumberPatternToStartResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface PhoneNumberPatternToNumResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface PhoneNumberPatternToMaskResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLNIDNumberPatternTypeResolver<TParent = any> {
+  pattern?: NIDNumberPatternToPatternResolver<TParent>
+  example?: NIDNumberPatternToExampleResolver<TParent>
+  num?: NIDNumberPatternToNumResolver<TParent>
+}
+
+export interface NIDNumberPatternToPatternResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface NIDNumberPatternToExampleResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface NIDNumberPatternToNumResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLRegWorkflowTypeResolver<TParent = any> {
   id?: RegWorkflowToIdResolver<TParent>
   type?: RegWorkflowToTypeResolver<TParent>
@@ -4949,6 +5321,19 @@ export interface EventProgressDataToTimeInReadyToPrintResolver<
   TParent = any,
   TResult = any
 > {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLMaskTypeResolver<TParent = any> {
+  startForm?: MaskToStartFormResolver<TParent>
+  endBefore?: MaskToEndBeforeResolver<TParent>
+}
+
+export interface MaskToStartFormResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface MaskToEndBeforeResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
