@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IntlShape } from 'react-intl'
-import { createPDF, createSVG, printPDF } from '@client/pdfRenderer'
+import { createPDF, printPDF } from '@client/pdfRenderer'
 import { IApplication } from '@client/applications'
 import { IUserDetails } from '@opencrvs/client/src/utils/userUtils'
 import { Event } from '@client/forms'

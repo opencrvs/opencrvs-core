@@ -2870,6 +2870,10 @@ export const mockOfflineData = {
   assets: {
     logo: `data:image;base64,${validImageB64String}`
   },
+  certificateSvg: {
+    birth: '<svg></svg>',
+    death: '<svg></svg>'
+  },
   config: {
     COUNTRY_LOGO_RENDER_WIDTH: 104,
     COUNTRY_LOGO_RENDER_HEIGHT: 104,
@@ -2931,10 +2935,7 @@ export async function createTestStore() {
       offices: mockOfflineData.offices,
       assets: mockOfflineData.assets,
       config: mockOfflineData.config,
-      certificateSvg: {
-        birth: '<svg></svg>',
-        death: '<svg></svg>'
-      }
+      certificateSvg: mockOfflineData.certificateSvg
     })
   )
   return { store, history }
@@ -2966,10 +2967,7 @@ export async function createTestComponent(
       offices: mockOfflineData.offices,
       assets: mockOfflineData.assets,
       config: mockOfflineData.config,
-      certificateSvg: {
-        birth: '<svg></svg>',
-        death: '<svg></svg>'
-      }
+      certificateSvg: mockOfflineData.certificateSvg
     })
   )
 

@@ -50,7 +50,8 @@ describe('User list tests', () => {
         pilotLocations: mockOfflineData.pilotLocations,
         offices: mockOfflineData.offices,
         assets: mockOfflineData.assets,
-        config: mockOfflineData.config
+        config: mockOfflineData.config,
+        certificateSvg: mockOfflineData.certificateSvg
       })
     )
   })
