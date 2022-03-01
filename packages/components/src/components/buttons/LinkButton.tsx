@@ -14,38 +14,34 @@ import { Button } from './Button'
 
 export const LinkButton = styled(Button)<{ textDecoration?: string }>`
   ${({ theme }) => theme.fonts.bodyStyle}
-  color: ${({ theme }) => theme.colors.tertiary};
-  padding: 0;
+  color: ${({ theme }) => theme.colors.primary};
   height: auto;
-  text-decoration-line: ${({ textDecoration }) =>
-    textDecoration ? textDecoration : 'underline'};
-  & div {
-    padding: 0;
-  }
   &:focus {
-    outline: none;
+    border-radius: 4px;
     background: ${({ theme }) => theme.colors.focus};
     color: ${({ theme }) => theme.colors.copy};
   }
   &:not([data-focus-visible-added]) {
     background: transparent;
-    outline: none;
-    color: ${({ theme }) => theme.colors.tertiary};
+    color: ${({ theme }) => theme.colors.primary};
   }
 
   &:active {
-    outline: 0;
-    opacity: 1.0 !important;
-    background-color: ${({ theme }) => theme.colors.focus};
-    color: ${({ theme }) => theme.colors.copy};
+    text-decoration-line: ${({ textDecoration }) =>
+      textDecoration ? textDecoration : 'underline'};
+    text-underline-offset: 4px;
+    color: ${({ theme }) => theme.colors.indigoDark};
   }
 
   &:hover {
-    opacity: 0.8;
+    text-decoration-line: ${({ textDecoration }) =>
+      textDecoration ? textDecoration : 'underline'};
+    text-underline-offset: 4px;
+    color: ${({ theme }) => theme.colors.indigoDark};
   }
 
   &:disabled {
-    color: ${({ theme }) => theme.colors.disabled};
+    color: ${({ theme }) => theme.colors.grey500};
     background-color: transparent;
   }
 `
