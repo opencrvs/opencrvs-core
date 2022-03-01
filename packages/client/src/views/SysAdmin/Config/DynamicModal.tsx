@@ -10,7 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
-import { ResponsiveModal } from '@opencrvs/components/lib/interface'
+import {
+  NOTIFICATION_TYPE,
+  ResponsiveModal
+} from '@opencrvs/components/lib/interface'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/config'
@@ -24,6 +27,7 @@ import { InputField, TextInput } from '@opencrvs/components/lib/forms'
 import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { Alert } from '@opencrvs/components/lib/icons/Alert'
+import { configApplicationMutations } from '@client/views/SysAdmin/Config/mutations'
 
 const Message = styled.div`
   margin-bottom: 16px;
@@ -71,25 +75,37 @@ const ErrorMessage = styled.div`
   color: ${({ theme }) => theme.colors.error};
   margin-left: 6px;
 `
+type IApplicationName = {
+  applicatioName: string
+}
 type State = {
   applicationName: string
+  updatingValue: boolean
   errorOccured: boolean
+  errorMessages: string
 }
-
 interface IProps {
   userDetails: IUserDetails | null
   changeModalName: string
   hideModal: () => void
-  valueChanged: () => void
+  valueChanged: (notificationStatus: string, messages: string) => void
 }
 type IFullProps = IProps & IntlShapeProps
 
+function isApplicationName(
+  modalName: string,
+  value: IApplicationName
+): value is IApplicationName {
+  return modalName === GeneralActionId.APPLICATION_NAME
+}
 class DynamicModalComponent extends React.Component<IFullProps, State> {
   constructor(props: IFullProps) {
     super(props)
     this.state = {
       applicationName: EMPTY_STRING,
-      errorOccured: false
+      updatingValue: false,
+      errorOccured: false,
+      errorMessages: EMPTY_STRING
     }
   }
 
@@ -100,6 +116,43 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
     this.setState(() => ({
       applicationName: value
     }))
+  }
+
+  mutationHandler(
+    modalName: string,
+    value: IApplicationName,
+    valueChanged: (notificationStatus: string, messages: string) => void
+  ) {
+    if (isApplicationName(modalName, value)) {
+      const res = this.callUpdateApplicationNameMutation(value.applicatioName)
+      valueChanged(NOTIFICATION_TYPE.IN_PROGRESS, '')
+      res
+        .then(() => {
+          valueChanged(NOTIFICATION_TYPE.SUCCESS, '')
+        })
+        .catch((error) => {
+          valueChanged(NOTIFICATION_TYPE.ERROR, this.state.errorMessages)
+        })
+    }
+  }
+
+  async callUpdateApplicationNameMutation(applicationName: string) {
+    try {
+      this.setState({ updatingValue: true })
+      const res = await configApplicationMutations.updateApplicationName(
+        applicationName
+      )
+      if (res && res.data) {
+        this.setState({ updatingValue: false })
+      }
+    } catch (err) {
+      this.setState({
+        errorOccured: true,
+        errorMessages: this.props.intl.formatMessage(
+          messages.applicationNameChangeError
+        )
+      })
+    }
   }
 
   render() {
@@ -118,7 +171,11 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
             id="apply_change"
             disabled={!Boolean(this.state.applicationName.length)}
             onClick={() => {
-              alert('Click ' + changeModalName)
+              this.mutationHandler(
+                changeModalName,
+                { applicatioName: this.state.applicationName },
+                valueChanged
+              )
             }}
           >
             {intl.formatMessage(buttonMessages.apply)}
@@ -134,25 +191,25 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
           <ErrorContent>
             <Alert color="invert" />
             <ErrorMessage>
-              <div>
-                {intl.formatMessage(messages.applicationNameChangeError)}
-              </div>
+              <div>{this.state.errorMessages}</div>
             </ErrorMessage>
           </ErrorContent>
         )}
-        <Content>
-          <Field>
-            <InputField id="applicationName" touched={true} required={false}>
-              <HalfWidthInput
-                id="applicationName"
-                type="text"
-                error={false}
-                value={this.state.applicationName}
-                onChange={this.setApplicationName}
-              />
-            </InputField>
-          </Field>
-        </Content>
+        {changeModalName === GeneralActionId.APPLICATION_NAME && (
+          <Content>
+            <Field>
+              <InputField id="applicationName" touched={true} required={false}>
+                <HalfWidthInput
+                  id="applicationName"
+                  type="text"
+                  error={false}
+                  value={this.state.applicationName}
+                  onChange={this.setApplicationName}
+                />
+              </InputField>
+            </Field>
+          </Content>
+        )}
       </ResponsiveModal>
     )
   }

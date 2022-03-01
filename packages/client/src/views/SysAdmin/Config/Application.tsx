@@ -14,6 +14,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import * as React from 'react'
 import {
+  FormattedMessage,
   injectIntl,
   IntlShape,
   WrappedComponentProps as IntlShapeProps
@@ -22,7 +23,10 @@ import { connect } from 'react-redux'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { DataSection } from '@opencrvs/components/lib/interface'
+import {
+  DataSection,
+  FloatingNotification
+} from '@opencrvs/components/lib/interface'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import { messages } from '@client/i18n/messages/views/config'
 import moment from 'moment'
@@ -316,7 +320,7 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
     }
   }
 
-  changeValue = () => {
+  changeValue = (notificationStatus: string, messages: string) => {
     this.hideModal()
     // this.toggleSuccessNotification(NOTIFICATION_SUBJECT.PASSWORD)
   }
@@ -391,6 +395,8 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
             valueChanged={this.changeValue}
           />
         )}
+        {/* <FloatingNotification
+        </FloatingNotification> */}
       </SysAdminContentWrapper>
     )
   }
