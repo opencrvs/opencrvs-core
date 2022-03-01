@@ -341,7 +341,7 @@ export const NavigationView = (props: IFullProps) => {
                       icon={() => (
                         <LeftNavigationApplicationIcons color={'red'} />
                       )}
-                      id={`navigation_${TAB_ID.requireUpdates}`}
+                      id={`navigation_${TAB_ID.requireUpdates}_loading`}
                       label={TAB_LABEL.requiresUpdate}
                       count={0}
                       isSelected={tabId === TAB_ID.requireUpdates}
