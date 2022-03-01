@@ -25,46 +25,49 @@ export interface INavigationItemProps
 
 const ItemContainer = styled.button<{ isSelected?: boolean }>`
   width: 100%;
+  height: 40px;
   cursor: pointer;
   padding: 0px 0px;
   border: 0;
   outline: none;
   background-color: ${({ isSelected, theme }) =>
-    isSelected ? theme.colors.greyHover : theme.colors.white};
+    isSelected ? theme.colors.white : theme.colors.white};
   :hover {
     background-color: ${({ theme }) => theme.colors.greyHover};
   }
-  :focus {
-    box-shadow: inset 0px 0px 0px 2px ${({ theme }) => theme.colors.focus};
-  }
 `
+// focus state should show on keyboard navigation.
+// :focus {
+//   box-shadow: inset 0px 0px 0px 2px ${({ theme }) => theme.colors.focus};
+// }
 
 const ItemContentContainer = styled.div<{ isSelected?: boolean }>`
   display: flex;
   flex-flow: row;
   padding: 10px 19px 10px 22px;
 `
+// refactor icons to be 24x24px. so they have a bounding box. so this function is not required.
 const IconContainer = styled.span`
-  padding: 2px 0px;
-  width: 12px;
-  margin-top: 2px;
+  margin-top: 1px;
 `
+// padding: 2px 0px;
+// width: 12px;
+
 const LabelContainer = styled.span<{
   isSelected?: boolean
   isSubItem?: boolean
 }>`
   ${({ theme }) => theme.fonts.subtitleStyle};
-  margin-left: 13px;
-  padding-top: 3px;
+  margin-left: 12px;
   color: ${({ isSelected, theme }) =>
-    isSelected ? theme.colors.grey : theme.colors.greyLight};
+    isSelected ? theme.colors.copy : theme.colors.grey700};
 `
+
 const ValueContainer = styled.span<{ isSelected?: boolean }>`
   margin-left: auto;
   ${({ theme }) => theme.fonts.captionBolder};
-  padding-top: 3px;
   color: ${({ isSelected, theme }) =>
-    isSelected ? theme.colors.grey : theme.colors.greyLight};
+    isSelected ? theme.colors.copy : theme.colors.grey700};
 `
 
 export const NavigationItem = ({

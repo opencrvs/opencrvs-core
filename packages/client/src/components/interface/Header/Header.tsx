@@ -109,9 +109,8 @@ enum ACTIVE_MENU_ITEM {
 }
 
 const StyledPrimaryButton = styled(PrimaryButton)`
-  ${({ theme }) => theme.shadows.mistyShadow};
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   border-radius: 100%;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
@@ -129,55 +128,54 @@ const StyledPrimaryButton = styled(PrimaryButton)`
 
 const SearchBox = styled.div`
   position: static;
-  width: 624px;
-  height: 42px;
+  width: 664px;
+  height: 40px;
   left: calc(50% - 624px / 2 + 24px);
   top: calc(50% - 40px / 2);
   background: ${({ theme }) => theme.colors.grey300};
   box-sizing: border-box;
-  border-radius: 100px;
-  margin: 0px 12px;
-  margin-right: 96px;
+  border-radius: 40px;
+  margin: 0px 80px 0px 12px;
+  &:hover {
+    outline: 1px solid ${({ theme }) => theme.colors.grey800};
+  }
+
   &:focus-within {
-    border: 1px solid ${({ theme }) => theme.colors.grey800};
+    outline: 1px solid ${({ theme }) => theme.colors.grey800};
     background: ${({ theme }) => theme.colors.white};
   }
   &:active {
-    outline: 3px solid ${({ theme }) => theme.colors.yellow500};
+    outline: 1px solid ${({ theme }) => theme.colors.grey800};
   }
   &:focus-within input {
     background: ${({ theme }) => theme.colors.white};
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.xl}px) {
     width: 100%;
-    max-width: 507.87px;
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     width: 100%;
-    max-width: 334px;
     margin: auto;
   }
 `
 const HeaderCenter = styled.div`
   padding: 8px 16px;
-  height: 64px;
+  height: 40px;
   display: flex;
   flex-direction: row;
   align-items: center;
   background: ${({ theme }) => theme.colors.white};
 `
 const HeaderLeft = styled.div`
-  padding: 8px 16px;
-  height: 64px;
+  height: 40px;
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 20px;
+  gap: 4px;
   background: ${({ theme }) => theme.colors.white};
 `
 const HeaderRight = styled.div`
-  padding: 8px 16px;
-  height: 64px;
+  height: 40px;
   background: ${({ theme }) => theme.colors.white};
 `
 class HeaderComp extends React.Component<IProps, IState> {
@@ -343,6 +341,7 @@ class HeaderComp extends React.Component<IProps, IState> {
     )
   }
 
+  // OLD menu items in header?? Can be removed?
   goToTeamView(props: IProps) {
     const { userDetails, goToTeamUserListAction, goToTeamSearchAction } = props
     if (userDetails && userDetails.role) {
@@ -360,6 +359,7 @@ class HeaderComp extends React.Component<IProps, IState> {
     }
   }
 
+  // OLD menu items in header?? Can be removed?
   goToPerformanceView(props: IProps) {
     const {
       userDetails,

@@ -14,11 +14,11 @@ import * as React from 'react'
 
 export const TertiaryButton = styled(Button)`
   width: auto;
-  ${({ theme }) => theme.fonts.buttonStyle};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
   transition: background 0.4s ease;
   align-items: center;
   border: 0;
-  border-radius: 2px;
+  border-radius: 4px;
   text-transform: none !important;
   cursor: pointer;
   height: 32px;
@@ -26,14 +26,12 @@ export const TertiaryButton = styled(Button)`
     padding: 0 8px;
     height: 32px;
   }
-  color: ${({ theme }) => theme.colors.tertiary};
+  color: ${({ theme }) => theme.colors.primary};
   &:hover {
-    opacity: 0.8;
-    background: ${({ theme }) => theme.colors.background};
+    background: ${({ theme }) => theme.colors.grey300};
   }
   &:not([data-focus-visible-added]):hover {
-    opacity: 0.8;
-    background: ${({ theme }) => theme.colors.background};
+    background: ${({ theme }) => theme.colors.grey300};
   }
   &:focus {
     outline: none;
@@ -43,13 +41,10 @@ export const TertiaryButton = styled(Button)`
   &:not([data-focus-visible-added]) {
     background: transparent;
     outline: none;
-    color: ${({ theme }) => theme.colors.tertiary};
+    color: ${({ theme }) => theme.colors.primary};
   }
   &:active:not([data-focus-visible-added]) {
-    outline: none;
-    background: ${({ theme }) => theme.colors.focus};
-    color: ${({ theme }) => theme.colors.copy};
-    opacity: 1;
+    background: ${({ theme }) => theme.colors.grey300};
   }
 
   &:disabled {
@@ -135,7 +130,7 @@ const LeftButtonIcon = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-right: 1px;
+  margin-right: 2px;
   margin-left: -3px;
 `
 const RightButtonIcon = styled.div`

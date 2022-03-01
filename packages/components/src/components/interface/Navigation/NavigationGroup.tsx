@@ -18,9 +18,9 @@ export interface INavigationGroup
 
 const NavigationGroupContainer = styled.div`
   padding: 8px 0px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
+  box-shadow: 0px 16px 1px -16px ${({ theme }) => theme.colors.grey600};
   &:last-child {
-    border-bottom: none;
+    box-shadow: none;
   }
 `
 

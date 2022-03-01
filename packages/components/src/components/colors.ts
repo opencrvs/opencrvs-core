@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 export const colorDictionary = {
-  // remove color dictionary and just use the below colour library
+  // TODO: Find,replace and remove the below
   blackStormy: '#35495D',
   blueDeepSea: '#4C68C1',
   blueDeepSeaLight: '#F1F3FA',
@@ -23,7 +23,7 @@ export const colorDictionary = {
   greenPeaPeaDark: '#409977',
   blueCrystal: '#4A8AD7',
   yellowFocus: '#EDC55E',
-  white: '#FFFFFF',
+  // white: '#FFFFFF',
   black: '#000000',
   blueHover: '#F2F6FE',
   greyBlackMetal: '#373D3F',
@@ -47,12 +47,12 @@ export const colorDictionary = {
   grey: '#1E2326',
   greyLight: '#595C5F',
   greyHover: '#F8F8F8',
-  grey800: '#1E2326',
-  grey300: '#F1F2F3',
-  grey600: '#909397',
+  // grey800: '#1E2326',
+  // grey300: '#F1F2F3',
+  // grey600: '#909397',
   greyInfo: '#EFEFEF',
   indigo500: '#4972BB',
-  indigo600: '##42639C',
+  indigo600: '#42639C',
   yellow500: '#EDC55E'
 }
 
@@ -75,21 +75,66 @@ export const shadows = {
 }
 
 export const colors = {
-  primary: colorDictionary.blueDeepSea,
-  secondary: colorDictionary.blueBabyBaby,
-  tertiary: colorDictionary.blueDeepSea,
-  error: colorDictionary.redDanger,
-  errorHover: colorDictionary.redDangerDark,
-  warning: colorDictionary.orangeAmber,
-  copy: colorDictionary.blackStormy,
-  placeholder: colorDictionary.greyDarkSteel,
-  background: colorDictionary.greyPearl,
-  disabled: colorDictionary.greyGrey,
-  success: colorDictionary.greenPeaPea,
-  successHover: colorDictionary.greenPeaPeaDark,
-  white: colorDictionary.white,
-  black: colorDictionary.black,
-  focus: colorDictionary.yellowFocus,
+  // Pallete
+  primary: '#4972BB', // indigo
+  secondary: '#4A8AD7', // blue
+  tertiary: '#cccfd0', // grey
+
+  purple: '#8049B7', // in progress
+  orange: '#F1B162', // ready for review
+  red: '#d53f3f', // requires updates
+  green: '#49b78d', // registered
+  blue: '#4A8AD7', // certified
+  teal: '#4CC1BA', // charts
+
+  // Hover states (note: these should be removed in future and use Darken https://polished.js.org/docs/#darken )
+  indigoDark: '#42639C',
+
+  // Status
+  success: '#49b78d', // rename to positive - green buttons, lighten to make light green backgrounds
+  successHover: '#409977', // remove and use darken of success/positive colour for hover states
+  warning: '#f1b162', // rename to neutral
+  error: '#d53f3f', // rename to negative -  no buttons, lighten to make light red backgrounds
+  errorHover: '#994040', // remove and use darken of error colour for hover states
+  focus: '#edc55e', // focus state for buttons, forms, elements etc. (keyboard navigation)
+
+  // Monochrome
+  white: '#ffffff',
+  grey200: '#f8f8f8', // app background
+  grey300: '#f1f2f3', // hover state, light background
+  grey400: '#dee2e4', // dividers
+  grey500: '#cccfd0', // disabled state, borders
+  grey600: '#909397', // placeholder copy
+  grey700: '#676A6F', // supporting copy
+  grey800: '#1e2326', // copy
+
+  // Opacity
+  opacity24: 'rgba(41, 47, 51, 0.24)',
+  opacity54: 'rgba(41, 47, 51, 0.54)', // model backdrop
+
+  // Alternative defintions
+  copy: '#1e2326', // grey800 rename to text
+  secdondaryCopy: '#1e2326', // grey800 rename to secondarytText
+  placeholder: '#909397', // grey600 rename to placeholderText
+  background: '#f1f2f3', // grey300
+  disabled: '#cccfd0', // grey500
+
+  // Find, replace and delete
+  // primary: colorDictionary.blueDeepSea,
+  // secondary: colorDictionary.blueBabyBaby,
+  // tertiary: colorDictionary.blueDeepSea,
+  // error: colorDictionary.redDanger,
+  // errorHover: colorDictionary.redDangerDark,
+  // warning: colorDictionary.orangeAmber,
+  // copy: colorDictionary.blackStormy,
+  // placeholder: colorDictionary.greyDarkSteel,
+  // background: colorDictionary.greyPearl,
+  // disabled: colorDictionary.greyGrey,
+  // success: colorDictionary.greenPeaPea,
+  // successHover: colorDictionary.greenPeaPeaDark,
+  // white: colorDictionary.white,
+  // black: colorDictionary.black,
+  // focus: colorDictionary.yellowFocus,
   grey: colorDictionary.grey,
   greyLight: colorDictionary.greyLight,
   greyHover: colorDictionary.greyHover,
@@ -137,9 +182,9 @@ export const colors = {
   ronchi: colorDictionary.ronchi,
   yellow500: colorDictionary.yellow500,
   blue500: colorDictionary.blueCrystal,
-  grey300: colorDictionary.grey300,
-  grey600: colorDictionary.grey600,
-  grey800: colorDictionary.grey800,
+  // grey300: colorDictionary.grey300,
+  // grey600: colorDictionary.grey600,
+  // grey800: colorDictionary.grey800,
   greyInfo: colorDictionary.greyInfo,
   indigo500: colorDictionary.indigo500,
   indigo600: colorDictionary.indigo600,
