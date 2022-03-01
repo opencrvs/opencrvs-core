@@ -54,6 +54,10 @@ import {
   NOTIFICATION_TYPE
 } from '@opencrvs/components/lib/interface'
 import {
+  ListView,
+  IListRowProps
+} from '@opencrvs/components/lib/interface/ViewData'
+import {
   IColumn,
   IDynamicValues
 } from '@opencrvs/components/lib/interface/GridTable/types'
@@ -105,7 +109,7 @@ const ErrorText = styled.div`
 const StatusBox = styled.div`
   padding: 4px 8px;
   ${({ theme }) => theme.fonts.captionBold};
-  border-radius: 2px;
+  border-radius: 100px;
   height: 30px;
   text-align: center;
   margin-left: 4px;
@@ -211,6 +215,19 @@ const RoleType = styled.div`
   text-align: left;
 `
 
+const ValueWrapper = styled.div`
+  display: flex;
+  align-items: flex-start;
+  align-content: space-between;
+  width: 60%;
+  margin-left: 300px;
+  margin-top: 6px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: block;
+    width: 100%;
+    margin-left: 45px;
+  }
+`
 interface ISearchParams {
   locationId: string
 }
@@ -422,6 +439,8 @@ function UserListComponent(props: IProps) {
         <AvatarSmall name={name} avatar={avatar} />
         <MarginPhotoRight />
         <LinkButton
+          isBoldLink={true}
+          textDecoration="none"
           id={`name-link-${id}`}
           onClick={() => goToUserProfile(id || '')}
         >
@@ -471,10 +490,8 @@ function UserListComponent(props: IProps) {
     status?: string,
     underInvestigation?: boolean
   ) {
-    const statusDetails = renderStatus(status, underInvestigation)
     return (
       <StatusMenu>
-        {statusDetails}
         <ToggleMenu
           id={`user-item-${index}-menu`}
           toggleButton={<VerticalThreeDots />}
@@ -484,7 +501,12 @@ function UserListComponent(props: IProps) {
     )
   }
 
-  function generateUserContents(data: GQLQuery) {
+  function generateUserContents(
+    data: GQLQuery,
+    locationId: string,
+    userDetails: IUserDetails | null,
+    onlyNational: boolean
+  ) {
     if (!data || !data.searchUsers || !data.searchUsers.results) {
       return []
     }
@@ -510,26 +532,24 @@ function UserListComponent(props: IProps) {
           const avatar = user.avatar
 
           return {
-            photoNameType: getPhotoNameType(user.id || '', name, avatar),
-            nameRoleType: getNameRoleType(user.id || '', name, role, type),
-            photoNameRoleType: getPhotoNameRoleType(
-              user.id || '',
-              name,
-              role,
-              type,
-              avatar
-            ),
-            roleType: getRoleType(role, type),
-            status: renderStatus(user.status, user.underInvestigation),
-            statusMenu: getStatusMenuType(
-              user,
-              index,
-              user.status,
-              user.underInvestigation
-            )
+            label: 'user details',
+            value: <ValueWrapper>{role}</ValueWrapper>,
+            actionsMenu: !getViewOnly(locationId, userDetails, onlyNational)
+              ? getStatusMenuType(
+                  user,
+                  index,
+                  user.status,
+                  user.underInvestigation
+                )
+              : null,
+            nameWithAvatar: getPhotoNameType(user.id || '', name, avatar),
+            status: renderStatus(user.status, user.underInvestigation)
           }
         }
-        return {}
+        return {
+          label: '',
+          value: <></>
+        }
       }
     )
   }
@@ -655,35 +675,16 @@ function UserListComponent(props: IProps) {
                   </AddUserContainer>
                 )}
               </TableHeader>
-              <ListTable
-                isLoading={loading}
-                content={generateUserContents(data) as IDynamicValues[]}
-                columns={columns}
-                noResultText="No result to display"
-                onPageChange={(currentPage: number) => {
-                  setCurrentPageNumber(currentPage)
-                }}
-                pageSize={recordCount}
-                totalItems={
-                  data && data.searchUsers && data.searchUsers.totalItems
+              <ListView
+                key="userList"
+                items={
+                  generateUserContents(
+                    data,
+                    locationId,
+                    userDetails,
+                    false
+                  ) as IListRowProps[]
                 }
-                currentPage={currentPageNumber}
-                loadMoreText={intl.formatMessage(constantsMessages.showMore, {
-                  pageSize: DEFAULT_FIELD_AGENT_LIST_SIZE
-                })}
-                hideBoxShadow={true}
-                hideTableHeader={true}
-                disableScrollOnOverflow
-                rowStyle={{
-                  height: {
-                    lg: 56,
-                    md: 80
-                  },
-                  horizontalPadding: {
-                    lg: 8,
-                    md: 16
-                  }
-                }}
               />
               <UserAuditActionModal
                 show={toggleActivation.modalVisible}
