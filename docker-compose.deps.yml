@@ -19,8 +19,10 @@ services:
     restart: unless-stopped
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.5.4
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
     restart: unless-stopped
+    environment:
+      - discovery.type=single-node
 
   influxdb:
     image: influxdb:1.7.9

@@ -61,7 +61,8 @@ export async function metricsHandler(
   }
 
   const authHeader: IAuthHeader = {
-    Authorization: request.headers.authorization
+    Authorization: request.headers.authorization,
+    'x-correlation-id': request.headers['x-correlation-id']
   }
 
   const childLocationIds = await fetchChildLocationIdsByParentId(

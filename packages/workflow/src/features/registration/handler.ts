@@ -20,6 +20,7 @@ import {
   markBundleAsWaitingValidation,
   invokeRegistrationValidation,
   updatePatientIdentifierWithRN,
+  markBundleAsDeclarationUpdated,
   markBundleAsRequestedForCorrection
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
@@ -34,7 +35,8 @@ import {
   getTaskEventType,
   sendEventNotification,
   sendRegisteredNotification,
-  isEventNonNotifiable
+  isEventNonNotifiable,
+  taskHasInput
 } from '@workflow/features/registration/utils'
 import { logger } from '@workflow/logger'
 import { getToken } from '@workflow/utils/authUtils'
@@ -47,6 +49,7 @@ import {
   BIRTH_REG_NUMBER_SYSTEM,
   DEATH_REG_NUMBER_SYSTEM
 } from '@workflow/features/registration/fhir/constants'
+import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
 
 interface IEventRegistrationCallbackPayload {
   trackingId: string
@@ -214,7 +217,24 @@ export async function markEventAsValidatedHandler(
   event: Events
 ) {
   try {
-    const payload = await markBundleAsValidated(
+    let payload: fhir.Bundle & fhir.BundleEntry
+
+    const taskResource = getTaskResource(
+      request.payload as fhir.Bundle & fhir.BundleEntry
+    )
+
+    // In case the record was updated then there will be input output in payload
+    if (taskHasInput(taskResource)) {
+      payload = await markBundleAsDeclarationUpdated(
+        request.payload as fhir.Bundle & fhir.BundleEntry,
+        getToken(request)
+      )
+      await postToHearth(payload)
+      delete taskResource.input
+      delete taskResource.output
+    }
+
+    payload = await markBundleAsValidated(
       request.payload as fhir.Bundle & fhir.BundleEntry,
       getToken(request)
     )
@@ -320,7 +340,7 @@ export async function markEventAsRegisteredCallbackHandler(
         ? Events.BIRTH_MARK_REG
         : Events.DEATH_MARK_REG,
       { resourceType: 'Bundle', entry: [{ resource: task }] },
-      request.headers.authorization
+      request.headers
     )
   } catch (error) {
     logger.error(
@@ -338,7 +358,24 @@ export async function markEventAsWaitingValidationHandler(
   event: Events
 ) {
   try {
-    const payload = await markBundleAsWaitingValidation(
+    let payload: fhir.Bundle & fhir.BundleEntry
+
+    const taskResource = getTaskResource(
+      request.payload as fhir.Bundle & fhir.BundleEntry
+    )
+
+    // In case the record was updated then there will be input output in payload
+    if (taskHasInput(taskResource)) {
+      payload = await markBundleAsDeclarationUpdated(
+        request.payload as fhir.Bundle & fhir.BundleEntry,
+        getToken(request)
+      )
+      await postToHearth(payload)
+      delete taskResource.input
+      delete taskResource.output
+    }
+
+    payload = await markBundleAsWaitingValidation(
       request.payload as fhir.Bundle & fhir.BundleEntry,
       getToken(request)
     )

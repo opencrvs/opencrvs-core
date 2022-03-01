@@ -91,7 +91,12 @@ export function getDeathMutationMappings(
 ) {
   let gqlDetails = {}
   if (form && draft) {
-    gqlDetails = draftToGqlTransformer(form, draft.data, draft.id)
+    gqlDetails = draftToGqlTransformer(
+      form,
+      draft.data,
+      draft.id,
+      draft.originalData
+    )
     appendGqlMetadataFromDraft(draft, gqlDetails)
   }
 

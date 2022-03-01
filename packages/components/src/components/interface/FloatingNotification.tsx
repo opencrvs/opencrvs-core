@@ -15,7 +15,7 @@ import { CrossLarge, Error, Success, Warning } from '../icons'
 import { Spinner } from './Spinner'
 import { ITheme } from '../theme'
 
-enum NOTIFICATION_TYPE {
+export enum NOTIFICATION_TYPE {
   SUCCESS = 'success',
   WARNING = 'warning',
   IN_PROGRESS = 'inProgress',

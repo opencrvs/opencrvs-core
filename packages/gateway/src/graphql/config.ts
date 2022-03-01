@@ -38,7 +38,7 @@ import { AuthenticationError, Config, gql } from 'apollo-server-hapi'
 import { readFileSync } from 'fs'
 import { GraphQLSchema } from 'graphql'
 import { IResolvers } from 'graphql-tools'
-import { merge, isEqual } from 'lodash'
+import { merge, isEqual, uniqueId } from 'lodash'
 
 const graphQLSchemaPath = `${__dirname}/schema.graphql`
 
@@ -105,7 +105,10 @@ export const getApolloConfig = (): Config => {
         throw new AuthenticationError(err)
       }
 
-      return { Authorization: request.headers.authorization }
+      return {
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id'] || uniqueId()
+      }
     }
   }
 }
