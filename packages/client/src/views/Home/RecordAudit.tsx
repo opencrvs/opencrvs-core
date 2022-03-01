@@ -295,12 +295,12 @@ const getSavedApplications = (props: IFullProps): IApplicationData => {
         informant:
           (
             application.data?.registration?.contactPoint as IFormSectionData
-          )?.value.toString() || '',
+          )?.value?.toString() || '',
         informantContact:
           (
             (application.data?.registration?.contactPoint as IFormSectionData)
               ?.nestedFields as IContactPoint
-          )?.registrationPhone.toString() || ''
+          )?.registrationPhone?.toString() || ''
       }
     })
   return applications[0]
