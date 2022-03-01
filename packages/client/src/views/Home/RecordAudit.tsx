@@ -74,6 +74,7 @@ import {
   Action
 } from '@client/forms'
 import {
+  LinkButton,
   PrimaryButton,
   ICON_ALIGNMENT,
   TertiaryButton
@@ -757,7 +758,15 @@ const getNameWithAvatar = (
   return (
     <NameAvatar>
       <AvatarSmall avatar={avatar} name={userName} />
-      <span>{userName}</span>
+      <span>
+        <LinkButton
+          id={'username-link'}
+          onClick={() => alert('username clicked')}
+          textDecoration="none"
+        >
+          {userName}
+        </LinkButton>
+      </span>
     </NameAvatar>
   )
 }
@@ -766,6 +775,24 @@ const getStatusLabel = (status: string, intl: IntlShape) => {
   if (status in APPLICATION_STATUS_LABEL)
     return intl.formatMessage(APPLICATION_STATUS_LABEL[status])
   return ''
+}
+
+const getLink = (status: string) => {
+  return (
+    <LinkButton textDecoration="none" onClick={() => alert('link clicked')}>
+      {status}
+    </LinkButton>
+  )
+}
+
+const getFormattedDate = (date: Date) => {
+  const momentDate = moment(date)
+  return (
+    <>
+      {momentDate.format('MMMM DD, YYYY')} &middot;{' '}
+      {momentDate.format('hh.mm A')}
+    </>
+  )
 }
 
 const getHistory = ({
@@ -794,21 +821,21 @@ const getHistory = ({
       return new Date(fe.date).getTime() - new Date(se.date).getTime()
     })
     .map((item) => ({
-      date: moment(item?.date).format('MMM DD, YYYY. hh:mm a'),
-      action: getStatusLabel(item?.action, intl),
+      date: getFormattedDate(item?.date),
+      action: getLink(getStatusLabel(item?.action, intl)),
       user: getNameWithAvatar(
         item.user.name,
         item.user?.avatar,
         window.config.LANGUAGES
       ),
       type: intl.formatMessage(userMessages[item.user.role as string]),
-      location: item.location.name
+      location: getLink(item.office.name)
     }))
 
   const columns = [
     {
       label: 'Action',
-      width: 15,
+      width: 20,
       key: 'action'
     },
     {
@@ -832,6 +859,7 @@ const getHistory = ({
         content={historyData}
         alignItemCenter={true}
         pageSize={100}
+        hideTableHeaderBorder={true}
       />
     </>
   )
