@@ -758,7 +758,7 @@ export const typeResolvers: GQLResolver = {
       }
       return businessStatus
     },
-    date: (task) => task.lastModified,
+    date: (task) => task.meta.lastUpdated,
     user: async (task, _, authHeader) => {
       const user = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
@@ -1044,6 +1044,25 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       return encounterParticipant
+    },
+    async history(composition: ITemplatedComposition, _, authHeader) {
+      const taskHistory = await fetchFHIR(
+        `/Task/_history?focus=Composition/${composition.id}&_count=100`,
+        authHeader
+      )
+
+      if (!taskHistory.entry[0] || !taskHistory.entry[0].resource) {
+        return null
+      }
+
+      return taskHistory?.entry?.map(
+        (item: {
+          resource: { extension: any }
+          extension: fhir.Extension[]
+        }) => {
+          return item.resource
+        }
+      )
     }
   },
   BirthRegistration: {
@@ -1390,8 +1409,15 @@ export const typeResolvers: GQLResolver = {
       )
     },
     async history(composition: ITemplatedComposition, _, authHeader) {
+      const task = await fetchFHIR(
+        `/Task/?focus=Composition/${composition.id}`,
+        authHeader
+      )
+
+      const taskId = task.entry[0].resource.id
+
       const taskHistory = await fetchFHIR(
-        `/Task/_history?focus=Composition/${composition.id}&_count=100`,
+        `/Task/${taskId}/_history?_count=100`,
         authHeader
       )
 

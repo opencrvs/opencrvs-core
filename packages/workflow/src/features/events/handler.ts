@@ -211,23 +211,19 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(
         Events.BIRTH_IN_PROGRESS_DEC,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.BIRTH_NEW_DEC:
       response = await createRegistrationHandler(request, h, event)
-      await triggerEvent(
-        Events.BIRTH_NEW_DEC,
-        request.payload,
-        request.headers.authorization
-      )
+      await triggerEvent(Events.BIRTH_NEW_DEC, request.payload, request.headers)
       break
     case Events.BIRTH_NEW_VALIDATE:
       response = await createRegistrationHandler(request, h, event)
       await triggerEvent(
         Events.BIRTH_NEW_VALIDATE,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.BIRTH_WAITING_VALIDATION:
@@ -235,7 +231,7 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(
         Events.BIRTH_WAITING_VALIDATION,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.DEATH_WAITING_VALIDATION:
@@ -243,7 +239,7 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(
         Events.DEATH_WAITING_VALIDATION,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.BIRTH_REQUEST_CORRECTION:
@@ -251,7 +247,7 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(
         Events.BIRTH_REQUEST_CORRECTION,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.DEATH_REQUEST_CORRECTION:
@@ -259,7 +255,7 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(
         Events.DEATH_REQUEST_CORRECTION,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.DEATH_NEW_VALIDATE:
@@ -267,7 +263,7 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(
         Events.DEATH_NEW_VALIDATE,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.BIRTH_NEW_WAITING_VALIDATION:
@@ -275,7 +271,7 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(
         Events.BIRTH_NEW_WAITING_VALIDATION,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.DEATH_IN_PROGRESS_DEC:
@@ -283,23 +279,19 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(
         Events.DEATH_IN_PROGRESS_DEC,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.DEATH_NEW_DEC:
       response = await createRegistrationHandler(request, h, event)
-      await triggerEvent(
-        Events.DEATH_NEW_DEC,
-        request.payload,
-        request.headers.authorization
-      )
+      await triggerEvent(Events.DEATH_NEW_DEC, request.payload, request.headers)
       break
     case Events.DEATH_NEW_WAITING_VALIDATION:
       response = await createRegistrationHandler(request, h, event)
       await triggerEvent(
         Events.DEATH_NEW_WAITING_VALIDATION,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.BIRTH_MARK_VALID:
@@ -307,7 +299,7 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(
         Events.BIRTH_MARK_VALID,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.DEATH_MARK_VALID:
@@ -315,7 +307,7 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(
         Events.DEATH_MARK_VALID,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.BIRTH_MARK_REG:
@@ -323,7 +315,7 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(
         Events.BIRTH_MARK_REG,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.DEATH_MARK_REG:
@@ -331,7 +323,7 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(
         Events.DEATH_MARK_REG,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.BIRTH_MARK_CERT:
@@ -339,7 +331,7 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(
         Events.BIRTH_MARK_CERT,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.DEATH_MARK_CERT:
@@ -347,7 +339,7 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(
         Events.DEATH_MARK_CERT,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.BIRTH_MARK_VOID:
@@ -355,7 +347,7 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(
         Events.BIRTH_MARK_VOID,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.DEATH_MARK_VOID:
@@ -363,7 +355,7 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(
         Events.DEATH_MARK_VOID,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.EVENT_NOT_DUPLICATE:
@@ -371,16 +363,12 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(
         Events.EVENT_NOT_DUPLICATE,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.DOWNLOADED:
       response = await markEventAsDownloadedHandler(request, h)
-      await triggerEvent(
-        Events.DOWNLOADED,
-        request.payload,
-        request.headers.authorization
-      )
+      await triggerEvent(Events.DOWNLOADED, request.payload, request.headers)
       break
     default:
       // forward as-is to hearth
@@ -393,7 +381,7 @@ export async function fhirWorkflowEventHandler(
 export async function triggerEvent(
   event: Events,
   payload: string | object,
-  authHeader: string
+  headers: Record<string, string> = {}
 ) {
   try {
     await fetch(`${OPENHIM_URL}${event}`, {
@@ -401,7 +389,7 @@ export async function triggerEvent(
       body: JSON.stringify(payload),
       headers: {
         'Content-Type': 'application/json',
-        Authorization: authHeader
+        ...headers
       }
     })
   } catch (err) {

@@ -74,6 +74,7 @@ const UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_SUCCESS =
   'APPLICATION/UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_SUCCESS'
 const UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_FAIL =
   'APPLICATION/UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_FAIL'
+const CLEAR_CORRECTION_CHANGE = 'CLEAR_CORRECTION_CHANGE'
 
 export enum SUBMISSION_STATUS {
   DRAFT = 'DRAFT',
@@ -93,6 +94,9 @@ export enum SUBMISSION_STATUS {
   READY_TO_CERTIFY = 'READY_TO_CERTIFY',
   CERTIFYING = 'CERTIFYING',
   CERTIFIED = 'CERTIFIED',
+  READY_TO_REQUEST_CORRECTION = 'READY_TO_REQUEST_CORRECTION',
+  REQUESTING_CORRECTION = 'REQUESTING_CORRECTION',
+  REQUESTED_CORRECTION = 'REQUESTED_CORRECTION',
   FAILED = 'FAILED',
   FAILED_NETWORK = 'FAILED_NETWORK'
 }
@@ -115,7 +119,9 @@ export const processingStates = [
   SUBMISSION_STATUS.READY_TO_REJECT,
   SUBMISSION_STATUS.REJECTING,
   SUBMISSION_STATUS.READY_TO_CERTIFY,
-  SUBMISSION_STATUS.CERTIFYING
+  SUBMISSION_STATUS.CERTIFYING,
+  SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION,
+  SUBMISSION_STATUS.REQUESTING_CORRECTION
 ]
 
 const DOWNLOAD_MAX_RETRY_ATTEMPT = 3
@@ -155,6 +161,7 @@ export interface ITaskHistory {
 export interface IApplication {
   id: string
   data: IFormData
+  originalData?: IFormData
   savedOn?: number
   modifiedOn?: number
   eventType?: string
@@ -208,8 +215,21 @@ type Relation =
   | 'INFORMANT'
   | 'PRINT_IN_ADVANCE'
 
+type RelationForCertificateCorrection =
+  | 'FATHER'
+  | 'MOTHER'
+  | 'SPOUSE'
+  | 'SON'
+  | 'DAUGHTER'
+  | 'EXTENDED_FAMILY'
+  | 'OTHER'
+  | 'INFORMANT'
+  | 'PRINT_IN_ADVANCE'
+  | 'CHILD'
+
 export type ICertificate = {
   collector?: Partial<{ type: Relation }>
+  corrector?: Partial<{ type: RelationForCertificateCorrection }>
   hasShowedVerifiedDocument?: boolean
   payments?: Payment
   data?: string
@@ -263,6 +283,12 @@ interface IModifyApplicationAction {
   }
 }
 
+interface IClearCorrectionChange {
+  type: typeof CLEAR_CORRECTION_CHANGE
+  payload: {
+    applicationId: string
+  }
+}
 export interface IWriteApplicationAction {
   type: typeof WRITE_APPLICATION
   payload: {
@@ -373,6 +399,7 @@ interface UpdateFieldAgentDeclaredApplicationsFailAction {
 export type Action =
   | IStoreApplicationAction
   | IModifyApplicationAction
+  | IClearCorrectionChange
   | ISetInitialApplicationsAction
   | IWriteApplicationAction
   | NavigationAction
@@ -467,6 +494,7 @@ export function createReviewApplication(
   return {
     id: applicationId,
     data: formData,
+    originalData: formData,
     review: true,
     event,
     registrationStatus: status
@@ -495,6 +523,12 @@ export function modifyApplication(
 ): IModifyApplicationAction {
   application.modifiedOn = Date.now()
   return { type: MODIFY_APPLICATION, payload: { application } }
+}
+
+export function clearCorrectionChange(
+  applicationId: string
+): IClearCorrectionChange {
+  return { type: CLEAR_CORRECTION_CHANGE, payload: { applicationId } }
 }
 export function setInitialApplications() {
   return { type: SET_INITIAL_APPLICATION }
@@ -1290,10 +1324,28 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
         (application) => application.id === action.payload.application.id
       )
       newApplications[currentApplicationIndex] = action.payload.application
+
       return {
         ...state,
         applications: newApplications
       }
+    case CLEAR_CORRECTION_CHANGE: {
+      const applicationIndex = state.applications.findIndex(
+        (application) => application.id === action.payload.applicationId
+      )
+
+      const correction = state.applications[applicationIndex]
+
+      const orignalAppliation: IApplication = {
+        ...correction,
+        data: {
+          ...correction.originalData
+        }
+      }
+
+      return loop(state, Cmd.action(writeApplication(orignalAppliation)))
+    }
+
     case WRITE_APPLICATION:
       return loop(
         {

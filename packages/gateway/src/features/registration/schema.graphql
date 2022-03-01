@@ -10,6 +10,7 @@
 enum RegStatus {
   IN_PROGRESS
   DECLARED
+  DECLARATION_UPDATED
   WAITING_VALIDATION
   VALIDATED
   REGISTERED
@@ -265,6 +266,7 @@ type History {
 interface EventRegistration {
   id: ID! # long uuid
   registration: Registration
+  history: [History]
   createdAt: Date
 }
 
@@ -356,6 +358,7 @@ type DeathRegistration implements EventRegistration { # -> Composition
   medicalPractitioner: MedicalPractitioner # -> Encounter.participant
   createdAt: Date # -> .date($first)
   updatedAt: Date # -> .date
+  history: [History]
 }
 
 input CorrectionValueInput {

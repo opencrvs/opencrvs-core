@@ -133,6 +133,7 @@ export interface GQLDeathRegistration extends GQLEventRegistration {
   medicalPractitioner?: GQLMedicalPractitioner
   createdAt?: GQLDate
   updatedAt?: GQLDate
+  history?: Array<GQLHistory | null>
 }
 
 export interface GQLPerson {
@@ -163,6 +164,7 @@ export interface GQLBirthRegResultSet {
 export interface GQLEventRegistration {
   id: string
   registration?: GQLRegistration
+  history?: Array<GQLHistory | null>
   createdAt?: GQLDate
 }
 
@@ -841,6 +843,7 @@ export const enum GQLParentDetailsType {
 export const enum GQLRegStatus {
   IN_PROGRESS = 'IN_PROGRESS',
   DECLARED = 'DECLARED',
+  DECLARATION_UPDATED = 'DECLARATION_UPDATED',
   WAITING_VALIDATION = 'WAITING_VALIDATION',
   VALIDATED = 'VALIDATED',
   REGISTERED = 'REGISTERED',
@@ -2484,6 +2487,7 @@ export interface GQLDeathRegistrationTypeResolver<TParent = any> {
   medicalPractitioner?: DeathRegistrationToMedicalPractitionerResolver<TParent>
   createdAt?: DeathRegistrationToCreatedAtResolver<TParent>
   updatedAt?: DeathRegistrationToUpdatedAtResolver<TParent>
+  history?: DeathRegistrationToHistoryResolver<TParent>
 }
 
 export interface DeathRegistrationToIdResolver<TParent = any, TResult = any> {
@@ -2596,6 +2600,13 @@ export interface DeathRegistrationToCreatedAtResolver<
 }
 
 export interface DeathRegistrationToUpdatedAtResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface DeathRegistrationToHistoryResolver<
   TParent = any,
   TResult = any
 > {

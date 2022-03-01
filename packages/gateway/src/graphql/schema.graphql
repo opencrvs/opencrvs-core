@@ -252,6 +252,7 @@ type DeathRegistration implements EventRegistration {
   medicalPractitioner: MedicalPractitioner
   createdAt: Date
   updatedAt: Date
+  history: [History]
 }
 
 type Person {
@@ -282,6 +283,7 @@ type BirthRegResultSet {
 interface EventRegistration {
   id: ID!
   registration: Registration
+  history: [History]
   createdAt: Date
 }
 
@@ -938,6 +940,7 @@ enum ParentDetailsType {
 enum RegStatus {
   IN_PROGRESS
   DECLARED
+  DECLARATION_UPDATED
   WAITING_VALIDATION
   VALIDATED
   REGISTERED

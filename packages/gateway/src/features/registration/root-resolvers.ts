@@ -92,7 +92,7 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'validate') ||
         hasScope(authHeader, 'declare')
       ) {
-        return await markRecordAsDownloaded(`/Composition/${id}`, authHeader)
+        return await markRecordAsDownloaded(id, authHeader)
       } else {
         return await Promise.reject(
           new Error('User does not have a register or validate scope')
@@ -503,13 +503,14 @@ async function markEventAsRegistered(
       entry: taskBundle.entry
     }
   } else {
-    doc = await buildFHIRBundle(details, event)
+    doc = await buildFHIRBundle(details, event, authHeader)
   }
-
   await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
 
   // return the full composition
-  return fetchFHIR(`/Composition/${id}`, authHeader)
+  const res = await fetchFHIR(`/Composition/${id}`, authHeader)
+
+  return res
 }
 
 async function markEventAsCertified(

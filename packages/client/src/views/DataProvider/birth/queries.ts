@@ -419,6 +419,13 @@ export function getBirthQueryMappings(action: Action) {
         query: GET_BIRTH_REGISTRATION_FOR_CERTIFICATE,
         dataKey: 'fetchBirthRegistration'
       }
+    case Action.LOAD_REQUESTED_CORRECTION_APPLICATION:
+      // TODO: Apply seperate query; currently using it
+      // because the actual query is yet to be developed
+      return {
+        query: GET_BIRTH_REGISTRATION_FOR_CERTIFICATE,
+        dataKey: 'fetchBirthRegistration'
+      }
     default:
       return null
   }
