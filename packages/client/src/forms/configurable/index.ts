@@ -298,23 +298,23 @@ export const defaultFormsConfig = {
     birth: {
       sections: [
         {
-          id: InformantSection.Registration,
+          id: 'registration',
           viewType: 'form',
           name: {
             defaultMessage: 'Registration',
             description: 'Form section name for Registration',
-            id: 'form.section.declaration.name'
+            id: 'form.section.application.name'
           },
           title: {
-            defaultMessage: 'declaration Details',
+            defaultMessage: 'Application Details',
             description: 'Form section title for Registration',
-            id: 'form.section.declaration.title'
+            id: 'form.section.application.title'
           },
           groups: [
             {
-              id: 'informant-relation',
+              id: 'applicant-relation',
               title: {
-                defaultMessage: 'Who is the informant?',
+                defaultMessage: 'Who is the applicant?',
                 description: 'Form section title for contact point',
                 id: 'register.selectInformant.relation'
               },
@@ -329,10 +329,10 @@ export const defaultFormsConfig = {
               showExitButtonOnly: true,
               fields: [
                 {
-                  name: 'informant',
+                  name: 'applicant',
                   type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
                   label: {
-                    defaultMessage: 'Who is the informant?',
+                    defaultMessage: 'Who is the applicant?',
                     description: 'Form section title for contact point',
                     id: 'register.selectInformant.relation'
                   },
@@ -457,7 +457,7 @@ export const defaultFormsConfig = {
                         type: 'TEXT',
                         label: {
                           defaultMessage: 'Relationship to child',
-                          id: 'form.field.label.informantsRelationWithChild',
+                          id: 'form.field.label.applicantsRelationWithChild',
                           description: 'Label for input Relationship to child'
                         },
                         placeholder: {
@@ -492,7 +492,7 @@ export const defaultFormsConfig = {
                         type: 'TEXT',
                         label: {
                           defaultMessage: 'Relationship to child',
-                          id: 'form.field.label.informantsRelationWithChild',
+                          id: 'form.field.label.applicantsRelationWithChild',
                           description: 'Label for input Relationship to child'
                         },
                         placeholder: {
@@ -535,12 +535,12 @@ export const defaultFormsConfig = {
               ]
             },
             {
-              id: 'primary-informant',
+              id: 'primary-applicant',
               title: {
                 defaultMessage:
-                  'Who is the primary informant for this declaration?',
-                description: 'Form section title for primary informant',
-                id: 'register.primaryinformant.registerNewEventHeading'
+                  'Who is the primary applicant for this application?',
+                description: 'Form section title for primary applicant',
+                id: 'register.primaryApplicant.registerNewEventHeading'
               },
               conditionals: [
                 {
@@ -557,21 +557,21 @@ export const defaultFormsConfig = {
                   type: 'PARAGRAPH',
                   label: {
                     defaultMessage:
-                      'This person is responsible for providing accurate information in this declaration.',
+                      'This person is responsible for providing accurate information in this application.',
                     description: 'Documents Paragraph text',
-                    id: 'register.primaryinformant.description'
+                    id: 'register.primaryApplicant.description'
                   },
                   initialValue: '',
                   validate: [],
                   conditionals: []
                 },
                 {
-                  name: 'informant',
+                  name: 'applicant',
                   type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
                   label: {
-                    defaultMessage: 'Who is the primary informant?',
-                    description: 'Label for field primary informant',
-                    id: 'register.selectInformant.primaryinformant'
+                    defaultMessage: 'Who is the primary applicant?',
+                    description: 'Label for field primary applicant',
+                    id: 'register.selectInformant.primaryApplicant'
                   },
                   hideHeader: true,
                   size: 'large',
@@ -584,16 +584,16 @@ export const defaultFormsConfig = {
                       value: 'MOTHER',
                       label: {
                         defaultMessage: 'Mother',
-                        description: 'Mother as informant',
-                        id: 'form.field.label.informantRelation.mother'
+                        description: 'Mother as applicant',
+                        id: 'form.field.label.applicantRelation.mother'
                       }
                     },
                     {
                       value: 'FATHER',
                       label: {
                         defaultMessage: 'Father',
-                        description: 'Father as informant',
-                        id: 'form.field.label.informantRelation.father'
+                        description: 'Father as applicant',
+                        id: 'form.field.label.applicantRelation.father'
                       }
                     }
                   ],
@@ -619,7 +619,7 @@ export const defaultFormsConfig = {
               id: 'contact-view-group',
               title: {
                 defaultMessage:
-                  'Who is the main point of contact for this declaration?',
+                  'Who is the main point of contact for this application?',
                 description: 'Form section title for contact point',
                 id: 'register.SelectContactPoint.heading'
               },
@@ -632,7 +632,7 @@ export const defaultFormsConfig = {
                   label: {
                     defaultMessage: 'Main Contact',
                     description: 'Label for form field: Place of delivery',
-                    id: 'form.field.label.declaration.mainContact'
+                    id: 'form.field.label.application.mainContact'
                   },
                   required: false,
                   initialValue: '',
@@ -655,7 +655,7 @@ export const defaultFormsConfig = {
                       label: {
                         defaultMessage: 'Mother',
                         description: 'Label for option Mother',
-                        id: 'form.field.label.informantRelation.mother'
+                        id: 'form.field.label.applicantRelation.mother'
                       }
                     },
                     {
@@ -663,7 +663,7 @@ export const defaultFormsConfig = {
                       label: {
                         defaultMessage: 'Father',
                         description: 'Label for option Father',
-                        id: 'form.field.label.informantRelation.father'
+                        id: 'form.field.label.applicantRelation.father'
                       }
                     },
                     {
@@ -688,7 +688,7 @@ export const defaultFormsConfig = {
                     defaultMessage:
                       'Who is present for the birth registration?',
                     description: 'Form section title for contact point',
-                    id: 'form.field.label.declaration.whoIsPresent'
+                    id: 'form.field.label.application.whoIsPresent'
                   },
                   reviewOverrides: {
                     residingSection: 'registration',
@@ -697,9 +697,9 @@ export const defaultFormsConfig = {
                       groupID: 'contact-view-group',
                       fieldName: 'contactPoint'
                     },
-                    position: REVIEW_OVERRIDE_POSITION.BEFORE,
+                    position: 'before',
                     labelAs: {
-                      defaultMessage: 'Who is the informant?',
+                      defaultMessage: 'Who is the applicant?',
                       description: 'Form section title for contact point',
                       id: 'register.selectInformant.relation'
                     },
@@ -723,7 +723,7 @@ export const defaultFormsConfig = {
                   }
                 },
                 {
-                  name: 'informant',
+                  name: 'applicant',
                   type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
                   readonly: true,
                   hidden: true,
@@ -737,9 +737,9 @@ export const defaultFormsConfig = {
                     }
                   ],
                   label: {
-                    defaultMessage: 'informant',
+                    defaultMessage: 'Applicant',
                     description: 'Form section title for contact point',
-                    id: 'form.section.informant.name'
+                    id: 'form.section.applicant.name'
                   },
                   options: [
                     {
@@ -787,34 +787,12 @@ export const defaultFormsConfig = {
                   },
                   options: [
                     {
-                      value: 'informant',
-                      label: {
-                        defaultMessage: 'informant',
-                        description: 'Label for "informant" radio option',
-                        id: 'form.field.label.app.whoContDet.app'
-                      },
-                      conditionals: [
-                        {
-                          action: 'hide',
-                          expression:
-                            '(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration !== "OTHER")'
-                        }
-                      ]
-                    },
-                    {
                       value: 'MOTHER',
                       label: {
                         defaultMessage: 'Mother',
                         description: 'Label for "Mother" radio option',
                         id: 'form.field.label.app.whoContDet.mother'
-                      },
-                      conditionals: [
-                        {
-                          action: 'hide',
-                          expression:
-                            '(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration === "OTHER" && draftData.registration.informant.value === "LEGAL_GUARDIAN")'
-                        }
-                      ]
+                      }
                     },
                     {
                       value: 'FATHER',
@@ -822,14 +800,47 @@ export const defaultFormsConfig = {
                         defaultMessage: 'Father',
                         description: 'Label for "Father" radio option',
                         id: 'form.field.label.app.whoContDet.father'
-                      },
-                      conditionals: [
-                        {
-                          action: 'hide',
-                          expression:
-                            '(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration === "OTHER" && draftData.registration.informant.value === "LEGAL_GUARDIAN")'
-                        }
-                      ]
+                      }
+                    },
+                    {
+                      value: 'GRANDFATHER',
+                      label: {
+                        defaultMessage: 'Grandfather',
+                        description: 'Label for "Grandfather" radio option',
+                        id: 'form.field.label.app.whoContDet.grandFather'
+                      }
+                    },
+                    {
+                      value: 'GRANDMOTHER',
+                      label: {
+                        defaultMessage: 'Grandmother',
+                        description: 'Label for "Grandmother" radio option',
+                        id: 'form.field.label.app.whoContDet.grandMother'
+                      }
+                    },
+                    {
+                      value: 'BROTHER',
+                      label: {
+                        defaultMessage: 'Brother',
+                        description: 'Label for "Broher" radio option',
+                        id: 'form.field.label.app.whoContDet.brother'
+                      }
+                    },
+                    {
+                      value: 'SISTER',
+                      label: {
+                        defaultMessage: 'Sister',
+                        description: 'Label for "Sister" radio option',
+                        id: 'form.field.label.app.whoContDet.sister'
+                      }
+                    },
+                    {
+                      value: 'LEGALGUARDIAN',
+                      label: {
+                        defaultMessage: 'Legal Guardian',
+                        description: 'Label for "Legal Guardian" radio option',
+                        id: 'form.field.label.app.whoContDet.legalGuardian'
+                      }
                     },
                     {
                       value: 'OTHER',
@@ -841,46 +852,6 @@ export const defaultFormsConfig = {
                     }
                   ],
                   nestedFields: {
-                    informant: [
-                      {
-                        name: 'registrationPhone',
-                        type: 'TEL',
-                        label: {
-                          defaultMessage: 'Phone number',
-                          description: 'Input label for phone input',
-                          id: 'form.field.label.phoneNumber'
-                        },
-                        required: false,
-                        initialValue: '',
-                        validate: [
-                          {
-                            operation: 'phoneNumberFormat'
-                          }
-                        ],
-                        mapping: {
-                          mutation: {
-                            operation: 'changeHirerchyMutationTransformer',
-                            parameters: [
-                              'registration.contactPhoneNumber',
-                              {
-                                operation: 'msisdnTransformer',
-                                parameters: ['registration.contactPhoneNumber']
-                              }
-                            ]
-                          },
-                          query: {
-                            operation: 'changeHirerchyQueryTransformer',
-                            parameters: [
-                              'registration.contactPhoneNumber',
-                              {
-                                operation: 'localPhoneTransformer',
-                                parameters: ['registration.contactPhoneNumber']
-                              }
-                            ]
-                          }
-                        }
-                      }
-                    ],
                     MOTHER: [
                       {
                         name: 'registrationPhone',
@@ -961,39 +932,207 @@ export const defaultFormsConfig = {
                         }
                       }
                     ],
-                    OTHER: [
+                    GRANDFATHER: [
                       {
-                        name: 'contactRelationshipOther',
-                        type: 'TEXT',
+                        name: 'registrationPhone',
+                        type: 'TEL',
                         label: {
-                          defaultMessage: 'Relationship to child',
-                          id: 'form.field.label.informantsRelationWithChild',
-                          description: 'Label for input Relationship to child'
+                          defaultMessage: 'Phone number',
+                          description: 'Input label for phone input',
+                          id: 'form.field.label.phoneNumber'
                         },
-                        placeholder: {
-                          defaultMessage: 'eg. Grandmother',
-                          description:
-                            'Placeholder for example of relationship',
-                          id: 'form.field.label.relationshipPlaceHolder'
-                        },
-                        required: true,
+                        required: false,
                         initialValue: '',
                         validate: [
                           {
-                            operation: 'englishOnlyNameFormat'
+                            operation: 'phoneNumberFormat'
                           }
                         ],
                         mapping: {
                           mutation: {
                             operation: 'changeHirerchyMutationTransformer',
-                            parameters: ['registration.contactRelationship']
+                            parameters: [
+                              'registration.contactPhoneNumber',
+                              {
+                                operation: 'msisdnTransformer',
+                                parameters: ['registration.contactPhoneNumber']
+                              }
+                            ]
                           },
                           query: {
                             operation: 'changeHirerchyQueryTransformer',
-                            parameters: ['registration.contactRelationship']
+                            parameters: [
+                              'registration.contactPhoneNumber',
+                              {
+                                operation: 'localPhoneTransformer',
+                                parameters: ['registration.contactPhoneNumber']
+                              }
+                            ]
                           }
                         }
-                      },
+                      }
+                    ],
+                    GRANDMOTHER: [
+                      {
+                        name: 'registrationPhone',
+                        type: 'TEL',
+                        label: {
+                          defaultMessage: 'Phone number',
+                          description: 'Input label for phone input',
+                          id: 'form.field.label.phoneNumber'
+                        },
+                        required: false,
+                        initialValue: '',
+                        validate: [
+                          {
+                            operation: 'phoneNumberFormat'
+                          }
+                        ],
+                        mapping: {
+                          mutation: {
+                            operation: 'changeHirerchyMutationTransformer',
+                            parameters: [
+                              'registration.contactPhoneNumber',
+                              {
+                                operation: 'msisdnTransformer',
+                                parameters: ['registration.contactPhoneNumber']
+                              }
+                            ]
+                          },
+                          query: {
+                            operation: 'changeHirerchyQueryTransformer',
+                            parameters: [
+                              'registration.contactPhoneNumber',
+                              {
+                                operation: 'localPhoneTransformer',
+                                parameters: ['registration.contactPhoneNumber']
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    BROTHER: [
+                      {
+                        name: 'registrationPhone',
+                        type: 'TEL',
+                        label: {
+                          defaultMessage: 'Phone number',
+                          description: 'Input label for phone input',
+                          id: 'form.field.label.phoneNumber'
+                        },
+                        required: false,
+                        initialValue: '',
+                        validate: [
+                          {
+                            operation: 'phoneNumberFormat'
+                          }
+                        ],
+                        mapping: {
+                          mutation: {
+                            operation: 'changeHirerchyMutationTransformer',
+                            parameters: [
+                              'registration.contactPhoneNumber',
+                              {
+                                operation: 'msisdnTransformer',
+                                parameters: ['registration.contactPhoneNumber']
+                              }
+                            ]
+                          },
+                          query: {
+                            operation: 'changeHirerchyQueryTransformer',
+                            parameters: [
+                              'registration.contactPhoneNumber',
+                              {
+                                operation: 'localPhoneTransformer',
+                                parameters: ['registration.contactPhoneNumber']
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    SISTER: [
+                      {
+                        name: 'registrationPhone',
+                        type: 'TEL',
+                        label: {
+                          defaultMessage: 'Phone number',
+                          description: 'Input label for phone input',
+                          id: 'form.field.label.phoneNumber'
+                        },
+                        required: false,
+                        initialValue: '',
+                        validate: [
+                          {
+                            operation: 'phoneNumberFormat'
+                          }
+                        ],
+                        mapping: {
+                          mutation: {
+                            operation: 'changeHirerchyMutationTransformer',
+                            parameters: [
+                              'registration.contactPhoneNumber',
+                              {
+                                operation: 'msisdnTransformer',
+                                parameters: ['registration.contactPhoneNumber']
+                              }
+                            ]
+                          },
+                          query: {
+                            operation: 'changeHirerchyQueryTransformer',
+                            parameters: [
+                              'registration.contactPhoneNumber',
+                              {
+                                operation: 'localPhoneTransformer',
+                                parameters: ['registration.contactPhoneNumber']
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    LEGALGUARDIAN: [
+                      {
+                        name: 'registrationPhone',
+                        type: 'TEL',
+                        label: {
+                          defaultMessage: 'Phone number',
+                          description: 'Input label for phone input',
+                          id: 'form.field.label.phoneNumber'
+                        },
+                        required: false,
+                        initialValue: '',
+                        validate: [
+                          {
+                            operation: 'phoneNumberFormat'
+                          }
+                        ],
+                        mapping: {
+                          mutation: {
+                            operation: 'changeHirerchyMutationTransformer',
+                            parameters: [
+                              'registration.contactPhoneNumber',
+                              {
+                                operation: 'msisdnTransformer',
+                                parameters: ['registration.contactPhoneNumber']
+                              }
+                            ]
+                          },
+                          query: {
+                            operation: 'changeHirerchyQueryTransformer',
+                            parameters: [
+                              'registration.contactPhoneNumber',
+                              {
+                                operation: 'localPhoneTransformer',
+                                parameters: ['registration.contactPhoneNumber']
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    OTHER: [
                       {
                         name: 'registrationPhone',
                         type: 'TEL',
@@ -1058,7 +1197,7 @@ export const defaultFormsConfig = {
           }
         },
         {
-          id: BirthSection.Child,
+          id: 'child',
           viewType: 'form',
           name: {
             defaultMessage: 'Child',
@@ -1421,12 +1560,24 @@ export const defaultFormsConfig = {
                   inputFieldWidth: '78px'
                 },
                 {
+                  name: 'placeOfBirthTitle',
+                  type: 'SUBSECTION',
+                  label: {
+                    defaultMessage: 'Place of delivery',
+                    description: 'Title for place of birth sub section',
+                    id: 'form.field.label.placeOfBirthPreview'
+                  },
+                  previewGroup: 'placeOfBirtrh',
+                  initialValue: '',
+                  validate: []
+                },
+                {
                   name: 'placeOfBirth',
                   type: 'SELECT_WITH_OPTIONS',
                   previewGroup: 'placeOfBirth',
                   ignoreFieldLabelOnErrorMessage: true,
                   label: {
-                    defaultMessage: 'Place of delivery',
+                    defaultMessage: 'Location',
                     description: 'Label for form field: Place of delivery',
                     id: 'form.field.label.placeOfBirth'
                   },
@@ -1570,7 +1721,8 @@ export const defaultFormsConfig = {
                   },
                   dynamicOptions: {
                     resource: 'locations',
-                    dependency: 'country'
+                    dependency: 'country',
+                    initialValue: 'agentDefault'
                   },
                   conditionals: [
                     {
@@ -1630,7 +1782,8 @@ export const defaultFormsConfig = {
                   },
                   dynamicOptions: {
                     resource: 'locations',
-                    dependency: 'state'
+                    dependency: 'state',
+                    initialValue: 'agentDefault'
                   },
                   conditionals: [
                     {
@@ -1686,7 +1839,7 @@ export const defaultFormsConfig = {
                   options: [
                     {
                       label: {
-                        defaultMessage: 'Urban address',
+                        defaultMessage: 'Urban',
                         id: 'form.field.label.urban',
                         description:
                           'Label for form field checkbox option Urban'
@@ -1695,7 +1848,7 @@ export const defaultFormsConfig = {
                     },
                     {
                       label: {
-                        defaultMessage: 'Rural address',
+                        defaultMessage: 'Rural',
                         id: 'form.field.label.rural',
                         description:
                           'Label for form field checkbox option Rural'
@@ -1704,6 +1857,7 @@ export const defaultFormsConfig = {
                     }
                   ],
                   initialValue: 'URBAN',
+                  flexDirection: 'row',
                   required: false,
                   hideValueInPreview: true,
                   previewGroup: 'placeOfBirth',
@@ -2287,8 +2441,8 @@ export const defaultFormsConfig = {
                   id: 'placeOfBirth',
                   label: {
                     defaultMessage: 'Place of delivery',
-                    description: 'Label for form field: Place of delivery',
-                    id: 'form.field.label.placeOfBirth'
+                    description: 'Title for place of birth sub section',
+                    id: 'form.field.label.placeOfBirthPreview'
                   },
                   fieldToRedirect: 'placeOfBirth'
                 },
@@ -2307,17 +2461,17 @@ export const defaultFormsConfig = {
           ]
         },
         {
-          id: BirthSection.Applicant,
+          id: 'informant',
           viewType: 'form',
           name: {
-            defaultMessage: 'informant',
-            description: 'Form section name for informant',
-            id: 'form.section.informant.name'
+            defaultMessage: 'Applicant',
+            description: 'Form section name for Applicant',
+            id: 'form.section.applicant.name'
           },
           title: {
-            defaultMessage: "What are the informant's details?",
-            description: 'Form section title for informants',
-            id: 'form.section.informant.title'
+            defaultMessage: "What are the applicant's details?",
+            description: 'Form section title for applicants',
+            id: 'form.section.applicant.title'
           },
           hasDocumentSection: true,
           groups: [
@@ -2372,7 +2526,7 @@ export const defaultFormsConfig = {
                   }
                 },
                 {
-                  name: 'informantID',
+                  name: 'applicantID',
                   type: 'NUMBER',
                   label: {
                     defaultMessage: 'National ID',
@@ -2383,11 +2537,12 @@ export const defaultFormsConfig = {
                   initialValue: '',
                   validate: [
                     {
-                      operation: 'numeric'
+                      operation: 'validIDNumber',
+                      parameters: ['NATIONAL_ID']
                     },
                     {
-                      operation: 'validLength',
-                      parameters: [9]
+                      operation: 'duplicateIDNumber',
+                      parameters: ['deceased.iD']
                     }
                   ],
                   conditionals: [],
@@ -2416,7 +2571,7 @@ export const defaultFormsConfig = {
                 },
                 {
                   name: 'firstNamesEng',
-                  previewGroup: 'informantNameInEnglish',
+                  previewGroup: 'applicantNameInEnglish',
                   type: 'TEXT',
                   label: {
                     defaultMessage: 'First name(s)',
@@ -2457,7 +2612,7 @@ export const defaultFormsConfig = {
                 },
                 {
                   name: 'familyNameEng',
-                  previewGroup: 'informantNameInEnglish',
+                  previewGroup: 'applicantNameInEnglish',
                   type: 'TEXT',
                   label: {
                     defaultMessage: 'Last name',
@@ -2669,7 +2824,7 @@ export const defaultFormsConfig = {
                   options: [
                     {
                       label: {
-                        defaultMessage: 'Urban address',
+                        defaultMessage: 'Urban',
                         id: 'form.field.label.urban',
                         description:
                           'Label for form field checkbox option Urban'
@@ -2678,7 +2833,7 @@ export const defaultFormsConfig = {
                     },
                     {
                       label: {
-                        defaultMessage: 'Rural address',
+                        defaultMessage: 'Rural',
                         id: 'form.field.label.rural',
                         description:
                           'Label for form field checkbox option Rural'
@@ -2687,6 +2842,7 @@ export const defaultFormsConfig = {
                     }
                   ],
                   initialValue: 'URBAN',
+                  flexDirection: 'row',
                   previewGroup: 'permanentAddress',
                   hideValueInPreview: true,
                   required: false,
@@ -3363,13 +3519,13 @@ export const defaultFormsConfig = {
                   fieldToRedirect: 'countryPermanent'
                 },
                 {
-                  id: 'informantNameInEnglish',
+                  id: 'applicantNameInEnglish',
                   label: {
-                    defaultMessage: "informant's English name",
-                    description: "Label for informant's name in english",
-                    id: 'form.preview.group.label.informant.english.name'
+                    defaultMessage: "Applicant's English name",
+                    description: "Label for applicant's name in english",
+                    id: 'form.preview.group.label.applicant.english.name'
                   },
-                  fieldToRedirect: 'informantFamilyNameEng',
+                  fieldToRedirect: 'applicantFamilyNameEng',
                   delimiter: ' '
                 }
               ]
@@ -3385,7 +3541,7 @@ export const defaultFormsConfig = {
           }
         },
         {
-          id: BirthSection.Parent,
+          id: 'primaryCaregiver',
           hasDocumentSection: true,
           viewType: 'form',
           name: {
@@ -3766,14 +3922,14 @@ export const defaultFormsConfig = {
                         {
                           action: 'hide',
                           expression:
-                            '(draftData && draftData.registration && draftData.registration.informant && draftData.registration.informant.value === "LEGAL_GUARDIAN")'
+                            '(draftData && draftData.registration && draftData.registration.applicant && draftData.registration.applicant.value === "LEGAL_GUARDIAN")'
                         }
                       ]
                     },
                     {
                       value: 'INFORMANT',
                       label: {
-                        defaultMessage: 'informant is the primary caregiver',
+                        defaultMessage: 'Applicant is the primary caregiver',
                         description: 'label for informant radio button',
                         id: 'form.field.label.caregiver.informant'
                       }
@@ -3803,6 +3959,7 @@ export const defaultFormsConfig = {
                         initialValue: '',
                         validate: [],
                         required: true,
+                        maxLength: 32,
                         mapping: {
                           mutation: {
                             operation: 'nestedRadioFieldTransformer',
@@ -3841,7 +3998,7 @@ export const defaultFormsConfig = {
                         name: 'phone',
                         type: 'TEL',
                         label: {
-                          id: 'form.field.label.declaration.phone',
+                          id: 'form.field.label.application.phone',
                           defaultMessage: 'Phone number',
                           description: 'field label for phone'
                         },
@@ -3942,6 +4099,7 @@ export const defaultFormsConfig = {
                         },
                         initialValue: '',
                         required: true,
+                        maxLength: 32,
                         validate: [],
                         mapping: {
                           mutation: {
@@ -3981,7 +4139,7 @@ export const defaultFormsConfig = {
                         name: 'phone',
                         type: 'TEL',
                         label: {
-                          id: 'form.field.label.declaration.phone',
+                          id: 'form.field.label.application.phone',
                           defaultMessage: 'Phone number',
                           description: 'field label for phone'
                         },
@@ -4116,8 +4274,9 @@ export const defaultFormsConfig = {
           ]
         },
         {
-          id: BirthSection.Mother,
+          id: 'mother',
           viewType: 'form',
+          replaceable: true,
           name: {
             defaultMessage: 'Mother',
             description: 'Form section name for Mother',
@@ -4180,11 +4339,12 @@ export const defaultFormsConfig = {
                   initialValue: '',
                   validate: [
                     {
-                      operation: 'numeric'
+                      operation: 'validIDNumber',
+                      parameters: ['NATIONAL_ID']
                     },
                     {
-                      operation: 'validLength',
-                      parameters: [9]
+                      operation: 'duplicateIDNumber',
+                      parameters: ['father.iD']
                     }
                   ],
                   conditionals: [],
@@ -5110,7 +5270,7 @@ export const defaultFormsConfig = {
                   options: [
                     {
                       label: {
-                        defaultMessage: 'Urban address',
+                        defaultMessage: 'Urban',
                         id: 'form.field.label.urban',
                         description:
                           'Label for form field checkbox option Urban'
@@ -5119,7 +5279,7 @@ export const defaultFormsConfig = {
                     },
                     {
                       label: {
-                        defaultMessage: 'Rural address',
+                        defaultMessage: 'Rural',
                         id: 'form.field.label.rural',
                         description:
                           'Label for form field checkbox option Rural'
@@ -5128,6 +5288,7 @@ export const defaultFormsConfig = {
                     }
                   ],
                   initialValue: 'URBAN',
+                  flexDirection: 'row',
                   previewGroup: 'permanentAddress',
                   hideValueInPreview: true,
                   required: false,
@@ -5901,7 +6062,7 @@ export const defaultFormsConfig = {
                   options: [
                     {
                       label: {
-                        defaultMessage: 'Urban address',
+                        defaultMessage: 'Urban',
                         id: 'form.field.label.urban',
                         description:
                           'Label for form field checkbox option Urban'
@@ -5910,7 +6071,7 @@ export const defaultFormsConfig = {
                     },
                     {
                       label: {
-                        defaultMessage: 'Rural address',
+                        defaultMessage: 'Rural',
                         id: 'form.field.label.rural',
                         description:
                           'Label for form field checkbox option Rural'
@@ -5919,6 +6080,7 @@ export const defaultFormsConfig = {
                     }
                   ],
                   initialValue: 'URBAN',
+                  flexDirection: 'row',
                   previewGroup: 'currentAddress',
                   hideValueInPreview: true,
                   required: false,
@@ -6591,8 +6753,9 @@ export const defaultFormsConfig = {
           ]
         },
         {
-          id: BirthSection.Father,
+          id: 'father',
           viewType: 'form',
+          replaceable: true,
           name: {
             defaultMessage: 'Father',
             description: 'Form section name for Father',
@@ -6672,11 +6835,12 @@ export const defaultFormsConfig = {
                   initialValue: '',
                   validate: [
                     {
-                      operation: 'numeric'
+                      operation: 'validIDNumber',
+                      parameters: ['NATIONAL_ID']
                     },
                     {
-                      operation: 'validLength',
-                      parameters: [9]
+                      operation: 'duplicateIDNumber',
+                      parameters: ['mother.iD']
                     }
                   ],
                   conditionals: [
@@ -7264,7 +7428,7 @@ export const defaultFormsConfig = {
                   options: [
                     {
                       label: {
-                        defaultMessage: 'Urban address',
+                        defaultMessage: 'Urban',
                         id: 'form.field.label.urban',
                         description:
                           'Label for form field checkbox option Urban'
@@ -7273,7 +7437,7 @@ export const defaultFormsConfig = {
                     },
                     {
                       label: {
-                        defaultMessage: 'Rural address',
+                        defaultMessage: 'Rural',
                         id: 'form.field.label.rural',
                         description:
                           'Label for form field checkbox option Rural'
@@ -7282,6 +7446,7 @@ export const defaultFormsConfig = {
                     }
                   ],
                   initialValue: 'URBAN',
+                  flexDirection: 'row',
                   previewGroup: 'permanentAddress',
                   hideValueInPreview: true,
                   required: false,
@@ -7859,7 +8024,7 @@ export const defaultFormsConfig = {
           }
         },
         {
-          id: BirthSection.Documents,
+          id: 'documents',
           viewType: 'form',
           name: {
             defaultMessage: 'Documents',
@@ -8028,16 +8193,16 @@ export const defaultFormsConfig = {
                   }
                 },
                 {
-                  name: 'uploadDocForinformant',
+                  name: 'uploadDocForApplicant',
                   type: 'DOCUMENT_UPLOADER_WITH_OPTION',
                   label: {
-                    defaultMessage: "Proof of informant's ID",
+                    defaultMessage: "Proof of applicant's ID",
                     description:
                       'Option for radio group field: Type of Document To Upload',
-                    id: 'form.field.label.informantIDProof'
+                    id: 'form.field.label.applicantIDProof'
                   },
                   initialValue: '',
-                  extraValue: 'informant_ID_PROOF',
+                  extraValue: 'APPLICANT_ID_PROOF',
                   hideAsterisk: true,
                   validate: [],
                   options: [
@@ -8182,25 +8347,25 @@ export const defaultFormsConfig = {
     death: {
       sections: [
         {
-          id: InformantSection.Registration,
+          id: 'registration',
           viewType: 'form',
           name: {
             defaultMessage: 'Registration',
             description: 'Form section name for Registration',
-            id: 'form.section.declaration.name'
+            id: 'form.section.application.name'
           },
           title: {
-            defaultMessage: 'declaration Details',
+            defaultMessage: 'Application Details',
             description: 'Form section title for Registration',
-            id: 'form.section.declaration.title'
+            id: 'form.section.application.title'
           },
           groups: [
             {
               id: 'other-relationship-with-deceased',
               title: {
                 defaultMessage:
-                  "What is the informant's relationship to the deceased?",
-                description: 'Form section title for primary informant',
+                  "What is the applicant's relationship to the deceased?",
+                description: 'Form section title for primary applicant',
                 id: 'register.selInf.deathInfSomeoneElse'
               },
               conditionals: [
@@ -8218,8 +8383,8 @@ export const defaultFormsConfig = {
                   type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
                   label: {
                     defaultMessage:
-                      "What is the informant's relationship to the deceased?",
-                    description: 'Form section title for primary informant',
+                      "What is the applicant's relationship to the deceased?",
+                    description: 'Form section title for primary applicant',
                     id: 'register.selInf.deathInfSomeoneElse'
                   },
                   hideHeader: true,
@@ -8235,7 +8400,7 @@ export const defaultFormsConfig = {
                           'Head of the institution where the death occurred',
                         description:
                           'Option for form field: Head of the institute',
-                        id: 'form.field.label.informantRelation.headInst'
+                        id: 'form.field.label.applicantRelation.headInst'
                       }
                     },
                     {
@@ -8245,7 +8410,7 @@ export const defaultFormsConfig = {
                           'Owner of the house or building where the death occurred',
                         description:
                           'Option for form field: Owner of the house',
-                        id: 'form.field.label.informantRelation.owner'
+                        id: 'form.field.label.applicantRelation.owner'
                       }
                     },
                     {
@@ -8255,7 +8420,7 @@ export const defaultFormsConfig = {
                           'Driver or operator of the land or water vehicle or aircraft where the death occurred',
                         description:
                           'Option for form field: Driver of the vehicle',
-                        id: 'form.field.label.informantRelation.driver'
+                        id: 'form.field.label.applicantRelation.driver'
                       }
                     },
                     {
@@ -8264,7 +8429,7 @@ export const defaultFormsConfig = {
                         defaultMessage:
                           'Officer-in-charge of the Thana of a road or public space where the death occurred',
                         description: 'Option for form field: Officer-in-charge',
-                        id: 'form.field.label.informantRelation.officer'
+                        id: 'form.field.label.applicantRelation.officer'
                       }
                     },
                     {
@@ -8335,7 +8500,7 @@ export const defaultFormsConfig = {
               id: 'point-of-contact',
               title: {
                 defaultMessage:
-                  'Who is the main point of contact for this declaration?',
+                  'Who is the main point of contact for this application?',
                 description: 'Form section title for contact point',
                 id: 'register.SelectContactPoint.heading'
               },
@@ -8348,7 +8513,7 @@ export const defaultFormsConfig = {
                   type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
                   label: {
                     defaultMessage:
-                      'Who is the main point of contact for this declaration?',
+                      'Who is the main point of contact for this application?',
                     description: 'Form section title for contact point',
                     id: 'register.SelectContactPoint.heading'
                   },
@@ -8365,11 +8530,75 @@ export const defaultFormsConfig = {
                   },
                   options: [
                     {
-                      value: 'informant',
+                      value: 'SPOUSE',
                       label: {
-                        defaultMessage: 'informant',
-                        description: 'Label for "informant" radio option',
-                        id: 'form.field.label.app.whoContDet.app'
+                        defaultMessage: 'Spouse',
+                        description: 'Label for "Spouse" radio option',
+                        id: 'form.field.label.spouse'
+                      }
+                    },
+                    {
+                      value: 'SON',
+                      label: {
+                        defaultMessage: 'Son',
+                        description: 'Label for "Son" radio option',
+                        id: 'form.field.label.son'
+                      }
+                    },
+                    {
+                      value: 'DAUGHTER',
+                      label: {
+                        defaultMessage: 'Daughter',
+                        description: 'Label for "Daughter" radio option',
+                        id: 'form.field.label.daughter'
+                      }
+                    },
+                    {
+                      value: 'SON_IN_LAW',
+                      label: {
+                        defaultMessage: 'Son in law',
+                        description: 'Label for "Son in law" radio option',
+                        id: 'form.field.label.sonInLaw'
+                      }
+                    },
+                    {
+                      value: 'DAUGHTER_IN_LAW',
+                      label: {
+                        defaultMessage: 'Daughter in law',
+                        description: 'Label for "Daughter in law" radio option',
+                        id: 'form.field.label.daughterInLaw'
+                      }
+                    },
+                    {
+                      value: 'FATHER',
+                      label: {
+                        defaultMessage: 'Father',
+                        description: 'Label for "Father" radio option',
+                        id: 'form.field.label.father'
+                      }
+                    },
+                    {
+                      value: 'MOTHER',
+                      label: {
+                        defaultMessage: 'Mother',
+                        description: 'Label for "Mother" radio option',
+                        id: 'form.field.label.mother'
+                      }
+                    },
+                    {
+                      value: 'GRANDSON',
+                      label: {
+                        defaultMessage: 'Grandson',
+                        description: 'Label for "Grandson" radio option',
+                        id: 'form.field.label.grandSon'
+                      }
+                    },
+                    {
+                      value: 'GRANDDAUGHTER',
+                      label: {
+                        defaultMessage: 'Granddaughter',
+                        description: 'Label for "Granddaughter" radio option',
+                        id: 'form.field.label.grandDaughter'
                       }
                     },
                     {
@@ -8382,7 +8611,327 @@ export const defaultFormsConfig = {
                     }
                   ],
                   nestedFields: {
-                    informant: [
+                    SPOUSE: [
+                      {
+                        name: 'registrationPhone',
+                        type: 'TEL',
+                        label: {
+                          defaultMessage: 'Phone number',
+                          description: 'Input label for phone input',
+                          id: 'form.field.label.phoneNumber'
+                        },
+                        required: true,
+                        initialValue: '',
+                        validate: [
+                          {
+                            operation: 'phoneNumberFormat'
+                          }
+                        ],
+                        mapping: {
+                          mutation: {
+                            operation: 'changeHirerchyMutationTransformer',
+                            parameters: [
+                              'registration.contactPhoneNumber',
+                              {
+                                operation: 'msisdnTransformer',
+                                parameters: ['registration.contactPhoneNumber']
+                              }
+                            ]
+                          },
+                          query: {
+                            operation: 'changeHirerchyQueryTransformer',
+                            parameters: [
+                              'registration.contactPhoneNumber',
+                              {
+                                operation: 'localPhoneTransformer',
+                                parameters: ['registration.contactPhoneNumber']
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    SON: [
+                      {
+                        name: 'registrationPhone',
+                        type: 'TEL',
+                        label: {
+                          defaultMessage: 'Phone number',
+                          description: 'Input label for phone input',
+                          id: 'form.field.label.phoneNumber'
+                        },
+                        required: true,
+                        initialValue: '',
+                        validate: [
+                          {
+                            operation: 'phoneNumberFormat'
+                          }
+                        ],
+                        mapping: {
+                          mutation: {
+                            operation: 'changeHirerchyMutationTransformer',
+                            parameters: [
+                              'registration.contactPhoneNumber',
+                              {
+                                operation: 'msisdnTransformer',
+                                parameters: ['registration.contactPhoneNumber']
+                              }
+                            ]
+                          },
+                          query: {
+                            operation: 'changeHirerchyQueryTransformer',
+                            parameters: [
+                              'registration.contactPhoneNumber',
+                              {
+                                operation: 'localPhoneTransformer',
+                                parameters: ['registration.contactPhoneNumber']
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    DAUGHTER: [
+                      {
+                        name: 'registrationPhone',
+                        type: 'TEL',
+                        label: {
+                          defaultMessage: 'Phone number',
+                          description: 'Input label for phone input',
+                          id: 'form.field.label.phoneNumber'
+                        },
+                        required: true,
+                        initialValue: '',
+                        validate: [
+                          {
+                            operation: 'phoneNumberFormat'
+                          }
+                        ],
+                        mapping: {
+                          mutation: {
+                            operation: 'changeHirerchyMutationTransformer',
+                            parameters: [
+                              'registration.contactPhoneNumber',
+                              {
+                                operation: 'msisdnTransformer',
+                                parameters: ['registration.contactPhoneNumber']
+                              }
+                            ]
+                          },
+                          query: {
+                            operation: 'changeHirerchyQueryTransformer',
+                            parameters: [
+                              'registration.contactPhoneNumber',
+                              {
+                                operation: 'localPhoneTransformer',
+                                parameters: ['registration.contactPhoneNumber']
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    SON_IN_LAW: [
+                      {
+                        name: 'registrationPhone',
+                        type: 'TEL',
+                        label: {
+                          defaultMessage: 'Phone number',
+                          description: 'Input label for phone input',
+                          id: 'form.field.label.phoneNumber'
+                        },
+                        required: true,
+                        initialValue: '',
+                        validate: [
+                          {
+                            operation: 'phoneNumberFormat'
+                          }
+                        ],
+                        mapping: {
+                          mutation: {
+                            operation: 'changeHirerchyMutationTransformer',
+                            parameters: [
+                              'registration.contactPhoneNumber',
+                              {
+                                operation: 'msisdnTransformer',
+                                parameters: ['registration.contactPhoneNumber']
+                              }
+                            ]
+                          },
+                          query: {
+                            operation: 'changeHirerchyQueryTransformer',
+                            parameters: [
+                              'registration.contactPhoneNumber',
+                              {
+                                operation: 'localPhoneTransformer',
+                                parameters: ['registration.contactPhoneNumber']
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    DAUGHTER_IN_LAW: [
+                      {
+                        name: 'registrationPhone',
+                        type: 'TEL',
+                        label: {
+                          defaultMessage: 'Phone number',
+                          description: 'Input label for phone input',
+                          id: 'form.field.label.phoneNumber'
+                        },
+                        required: true,
+                        initialValue: '',
+                        validate: [
+                          {
+                            operation: 'phoneNumberFormat'
+                          }
+                        ],
+                        mapping: {
+                          mutation: {
+                            operation: 'changeHirerchyMutationTransformer',
+                            parameters: [
+                              'registration.contactPhoneNumber',
+                              {
+                                operation: 'msisdnTransformer',
+                                parameters: ['registration.contactPhoneNumber']
+                              }
+                            ]
+                          },
+                          query: {
+                            operation: 'changeHirerchyQueryTransformer',
+                            parameters: [
+                              'registration.contactPhoneNumber',
+                              {
+                                operation: 'localPhoneTransformer',
+                                parameters: ['registration.contactPhoneNumber']
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    FATHER: [
+                      {
+                        name: 'registrationPhone',
+                        type: 'TEL',
+                        label: {
+                          defaultMessage: 'Phone number',
+                          description: 'Input label for phone input',
+                          id: 'form.field.label.phoneNumber'
+                        },
+                        required: true,
+                        initialValue: '',
+                        validate: [
+                          {
+                            operation: 'phoneNumberFormat'
+                          }
+                        ],
+                        mapping: {
+                          mutation: {
+                            operation: 'changeHirerchyMutationTransformer',
+                            parameters: [
+                              'registration.contactPhoneNumber',
+                              {
+                                operation: 'msisdnTransformer',
+                                parameters: ['registration.contactPhoneNumber']
+                              }
+                            ]
+                          },
+                          query: {
+                            operation: 'changeHirerchyQueryTransformer',
+                            parameters: [
+                              'registration.contactPhoneNumber',
+                              {
+                                operation: 'localPhoneTransformer',
+                                parameters: ['registration.contactPhoneNumber']
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    MOTHER: [
+                      {
+                        name: 'registrationPhone',
+                        type: 'TEL',
+                        label: {
+                          defaultMessage: 'Phone number',
+                          description: 'Input label for phone input',
+                          id: 'form.field.label.phoneNumber'
+                        },
+                        required: true,
+                        initialValue: '',
+                        validate: [
+                          {
+                            operation: 'phoneNumberFormat'
+                          }
+                        ],
+                        mapping: {
+                          mutation: {
+                            operation: 'changeHirerchyMutationTransformer',
+                            parameters: [
+                              'registration.contactPhoneNumber',
+                              {
+                                operation: 'msisdnTransformer',
+                                parameters: ['registration.contactPhoneNumber']
+                              }
+                            ]
+                          },
+                          query: {
+                            operation: 'changeHirerchyQueryTransformer',
+                            parameters: [
+                              'registration.contactPhoneNumber',
+                              {
+                                operation: 'localPhoneTransformer',
+                                parameters: ['registration.contactPhoneNumber']
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    GRANDSON: [
+                      {
+                        name: 'registrationPhone',
+                        type: 'TEL',
+                        label: {
+                          defaultMessage: 'Phone number',
+                          description: 'Input label for phone input',
+                          id: 'form.field.label.phoneNumber'
+                        },
+                        required: true,
+                        initialValue: '',
+                        validate: [
+                          {
+                            operation: 'phoneNumberFormat'
+                          }
+                        ],
+                        mapping: {
+                          mutation: {
+                            operation: 'changeHirerchyMutationTransformer',
+                            parameters: [
+                              'registration.contactPhoneNumber',
+                              {
+                                operation: 'msisdnTransformer',
+                                parameters: ['registration.contactPhoneNumber']
+                              }
+                            ]
+                          },
+                          query: {
+                            operation: 'changeHirerchyQueryTransformer',
+                            parameters: [
+                              'registration.contactPhoneNumber',
+                              {
+                                operation: 'localPhoneTransformer',
+                                parameters: ['registration.contactPhoneNumber']
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    GRANDDAUGHTER: [
                       {
                         name: 'registrationPhone',
                         type: 'TEL',
@@ -8423,39 +8972,6 @@ export const defaultFormsConfig = {
                       }
                     ],
                     OTHER: [
-                      {
-                        name: 'contactRelationship',
-                        type: 'TEXT',
-                        label: {
-                          defaultMessage: 'Relationship to deceased',
-                          id: 'register.selectInformant.relationshipLabel',
-                          description:
-                            'Label for input Relationship to deceased'
-                        },
-                        placeholder: {
-                          defaultMessage: 'eg. Grandmother',
-                          description:
-                            'Placeholder for example of relationship',
-                          id: 'form.field.label.relationshipPlaceHolder'
-                        },
-                        required: true,
-                        initialValue: '',
-                        validate: [
-                          {
-                            operation: 'englishOnlyNameFormat'
-                          }
-                        ],
-                        mapping: {
-                          mutation: {
-                            operation: 'changeHirerchyMutationTransformer',
-                            parameters: ['registration.contactRelationship']
-                          },
-                          query: {
-                            operation: 'changeHirerchyQueryTransformer',
-                            parameters: ['registration.contactRelationship']
-                          }
-                        }
-                      },
                       {
                         name: 'registrationPhone',
                         type: 'TEL',
@@ -8520,7 +9036,7 @@ export const defaultFormsConfig = {
           }
         },
         {
-          id: DeathSection.Deceased,
+          id: 'deceased',
           viewType: 'form',
           name: {
             defaultMessage: 'Deceased',
@@ -8549,11 +9065,12 @@ export const defaultFormsConfig = {
                   initialValue: '',
                   validate: [
                     {
-                      operation: 'numeric'
+                      operation: 'validIDNumber',
+                      parameters: ['NATIONAL_ID']
                     },
                     {
-                      operation: 'validLength',
-                      parameters: [9]
+                      operation: 'duplicateIDNumber',
+                      parameters: ['informant.applicantID']
                     }
                   ],
                   conditionals: [],
@@ -8982,7 +9499,7 @@ export const defaultFormsConfig = {
                   options: [
                     {
                       label: {
-                        defaultMessage: 'Urban address',
+                        defaultMessage: 'Urban',
                         id: 'form.field.label.urban',
                         description:
                           'Label for form field checkbox option Urban'
@@ -8991,7 +9508,7 @@ export const defaultFormsConfig = {
                     },
                     {
                       label: {
-                        defaultMessage: 'Rural address',
+                        defaultMessage: 'Rural',
                         id: 'form.field.label.rural',
                         description:
                           'Label for form field checkbox option Rural'
@@ -9000,6 +9517,7 @@ export const defaultFormsConfig = {
                     }
                   ],
                   initialValue: 'URBAN',
+                  flexDirection: 'row',
                   previewGroup: 'permanentAddress',
                   hideValueInPreview: true,
                   required: false,
@@ -9535,7 +10053,7 @@ export const defaultFormsConfig = {
           ]
         },
         {
-          id: DeathSection.Event,
+          id: 'deathEvent',
           viewType: 'form',
           name: {
             defaultMessage: 'When did the death occur?',
@@ -9954,7 +10472,7 @@ export const defaultFormsConfig = {
                   options: [
                     {
                       label: {
-                        defaultMessage: 'Urban address',
+                        defaultMessage: 'Urban',
                         id: 'form.field.label.urban',
                         description:
                           'Label for form field checkbox option Urban'
@@ -9963,7 +10481,7 @@ export const defaultFormsConfig = {
                     },
                     {
                       label: {
-                        defaultMessage: 'Rural address',
+                        defaultMessage: 'Rural',
                         id: 'form.field.label.rural',
                         description:
                           'Label for form field checkbox option Rural'
@@ -9972,6 +10490,7 @@ export const defaultFormsConfig = {
                     }
                   ],
                   initialValue: 'URBAN',
+                  flexDirection: 'row',
                   required: false,
                   hideValueInPreview: true,
                   validate: [],
@@ -10491,7 +11010,7 @@ export const defaultFormsConfig = {
           }
         },
         {
-          id: DeathSection.CauseOfDeath,
+          id: 'causeOfDeath',
           viewType: 'form',
           name: {
             defaultMessage: 'What is the official cause of death?',
@@ -10519,7 +11038,7 @@ export const defaultFormsConfig = {
                   },
                   notice: {
                     defaultMessage:
-                      'A Medically Certified Cause of Death is not mandatory to submit the declaration. This can be added at a later date.',
+                      'A Medically Certified Cause of Death is not mandatory to submit the application. This can be added at a later date.',
                     description: 'Form section notice for Cause of Death',
                     id: 'form.section.causeOfDeathNotice'
                   },
@@ -10612,17 +11131,17 @@ export const defaultFormsConfig = {
           ]
         },
         {
-          id: DeathSection.Applicants,
+          id: 'informant',
           viewType: 'form',
           name: {
-            defaultMessage: 'informant',
-            description: 'Form section name for informant',
-            id: 'form.section.informant.name'
+            defaultMessage: 'Applicant',
+            description: 'Form section name for Applicant',
+            id: 'form.section.applicant.name'
           },
           title: {
-            defaultMessage: "What are the informant's details?",
-            description: 'Form section title for informants',
-            id: 'form.section.informant.title'
+            defaultMessage: "What are the applicant's details?",
+            description: 'Form section title for applicants',
+            id: 'form.section.applicant.title'
           },
           hasDocumentSection: true,
           groups: [
@@ -10670,7 +11189,7 @@ export const defaultFormsConfig = {
                   }
                 },
                 {
-                  name: 'informantID',
+                  name: 'applicantID',
                   type: 'NUMBER',
                   label: {
                     defaultMessage: 'National ID',
@@ -10681,11 +11200,12 @@ export const defaultFormsConfig = {
                   initialValue: '',
                   validate: [
                     {
-                      operation: 'numeric'
+                      operation: 'validIDNumber',
+                      parameters: ['NATIONAL_ID']
                     },
                     {
-                      operation: 'validLength',
-                      parameters: [9]
+                      operation: 'duplicateIDNumber',
+                      parameters: ['deceased.iD']
                     }
                   ],
                   conditionals: [],
@@ -10714,7 +11234,7 @@ export const defaultFormsConfig = {
                 },
                 {
                   name: 'firstNamesEng',
-                  previewGroup: 'informantNameInEnglish',
+                  previewGroup: 'applicantNameInEnglish',
                   type: 'TEXT',
                   label: {
                     defaultMessage: 'First name(s)',
@@ -10755,7 +11275,7 @@ export const defaultFormsConfig = {
                 },
                 {
                   name: 'familyNameEng',
-                  previewGroup: 'informantNameInEnglish',
+                  previewGroup: 'applicantNameInEnglish',
                   type: 'TEXT',
                   label: {
                     defaultMessage: 'Last name',
@@ -10800,7 +11320,7 @@ export const defaultFormsConfig = {
                   label: {
                     defaultMessage: 'Relationship to Deceased',
                     description: 'Label for Relationship to Deceased select',
-                    id: 'form.field.label.informantsRelationWithDeceased'
+                    id: 'form.field.label.applicantsRelationWithDeceased'
                   },
                   required: true,
                   initialValue: '',
@@ -10845,7 +11365,7 @@ export const defaultFormsConfig = {
                       label: {
                         defaultMessage: 'Father',
                         description: 'Label for option Father',
-                        id: 'form.field.label.informantRelation.father'
+                        id: 'form.field.label.applicantRelation.father'
                       }
                     },
                     {
@@ -10853,7 +11373,7 @@ export const defaultFormsConfig = {
                       label: {
                         defaultMessage: 'Mother',
                         description: 'Label for option Mother',
-                        id: 'form.field.label.informantRelation.mother'
+                        id: 'form.field.label.applicantRelation.mother'
                       }
                     },
                     {
@@ -10861,7 +11381,7 @@ export const defaultFormsConfig = {
                       label: {
                         defaultMessage: 'Spouse',
                         description: 'Label for option Spouse',
-                        id: 'form.field.label.informantRelation.spouse'
+                        id: 'form.field.label.applicantRelation.spouse'
                       }
                     },
                     {
@@ -10869,7 +11389,7 @@ export const defaultFormsConfig = {
                       label: {
                         defaultMessage: 'Son',
                         description: 'Label for option Son',
-                        id: 'form.field.label.informantRelation.son'
+                        id: 'form.field.label.applicantRelation.son'
                       }
                     },
                     {
@@ -10877,7 +11397,7 @@ export const defaultFormsConfig = {
                       label: {
                         defaultMessage: 'Daughter',
                         description: 'Label for option Daughter',
-                        id: 'form.field.label.informantRelation.daughter'
+                        id: 'form.field.label.applicantRelation.daughter'
                       }
                     },
                     {
@@ -10885,7 +11405,7 @@ export const defaultFormsConfig = {
                       label: {
                         defaultMessage: 'Son in law',
                         description: 'Label for option Son in law',
-                        id: 'form.field.label.informantRelation.sonInLaw'
+                        id: 'form.field.label.applicantRelation.sonInLaw'
                       }
                     },
                     {
@@ -10893,7 +11413,7 @@ export const defaultFormsConfig = {
                       label: {
                         defaultMessage: 'Daughter in law',
                         description: 'Label for option Daughter in law',
-                        id: 'form.field.label.informantRelation.daughterInLaw'
+                        id: 'form.field.label.applicantRelation.daughterInLaw'
                       }
                     },
                     {
@@ -10901,7 +11421,7 @@ export const defaultFormsConfig = {
                       label: {
                         defaultMessage: 'Daughter',
                         description: 'Label for option Daughter',
-                        id: 'form.field.label.informantRelation.daughter'
+                        id: 'form.field.label.applicantRelation.daughter'
                       }
                     },
                     {
@@ -10909,7 +11429,7 @@ export const defaultFormsConfig = {
                       label: {
                         defaultMessage: 'Grandson',
                         description: 'Label for option Grandson',
-                        id: 'form.field.label.informantRelation.grandson'
+                        id: 'form.field.label.applicantRelation.grandson'
                       }
                     },
                     {
@@ -10917,7 +11437,7 @@ export const defaultFormsConfig = {
                       label: {
                         defaultMessage: 'Granddaughter',
                         description: 'Label for option Granddaughter',
-                        id: 'form.field.label.informantRelation.granddaughter'
+                        id: 'form.field.label.applicantRelation.granddaughter'
                       }
                     },
                     {
@@ -10925,7 +11445,7 @@ export const defaultFormsConfig = {
                       label: {
                         defaultMessage: 'Other (Specify)',
                         description: 'Label for option Other',
-                        id: 'form.field.label.informantRelation.other'
+                        id: 'form.field.label.applicantRelation.other'
                       }
                     }
                   ],
@@ -10938,7 +11458,7 @@ export const defaultFormsConfig = {
                     },
                     position: 'before',
                     labelAs: {
-                      defaultMessage: 'Who is the informant?',
+                      defaultMessage: 'Who is the applicant?',
                       description: 'Form section title for contact point',
                       id: 'register.selectInformant.relation'
                     },
@@ -11142,7 +11662,7 @@ export const defaultFormsConfig = {
                   options: [
                     {
                       label: {
-                        defaultMessage: 'Urban address',
+                        defaultMessage: 'Urban',
                         id: 'form.field.label.urban',
                         description:
                           'Label for form field checkbox option Urban'
@@ -11151,7 +11671,7 @@ export const defaultFormsConfig = {
                     },
                     {
                       label: {
-                        defaultMessage: 'Rural address',
+                        defaultMessage: 'Rural',
                         id: 'form.field.label.rural',
                         description:
                           'Label for form field checkbox option Rural'
@@ -11160,6 +11680,7 @@ export const defaultFormsConfig = {
                     }
                   ],
                   initialValue: 'URBAN',
+                  flexDirection: 'row',
                   previewGroup: 'permanentAddress',
                   hideValueInPreview: true,
                   required: false,
@@ -11836,13 +12357,13 @@ export const defaultFormsConfig = {
                   fieldToRedirect: 'countryPermanent'
                 },
                 {
-                  id: 'informantNameInEnglish',
+                  id: 'applicantNameInEnglish',
                   label: {
-                    defaultMessage: "informant's English name",
-                    description: "Label for informant's name in english",
-                    id: 'form.preview.group.label.informant.english.name'
+                    defaultMessage: "Applicant's English name",
+                    description: "Label for applicant's name in english",
+                    id: 'form.preview.group.label.applicant.english.name'
                   },
-                  fieldToRedirect: 'informantFamilyNameEng',
+                  fieldToRedirect: 'applicantFamilyNameEng',
                   delimiter: ' '
                 }
               ]
@@ -11858,7 +12379,7 @@ export const defaultFormsConfig = {
           }
         },
         {
-          id: DeathSection.Father,
+          id: 'father',
           viewType: 'form',
           name: {
             defaultMessage: "What is the deceased's father name?",
@@ -11890,6 +12411,7 @@ export const defaultFormsConfig = {
                     description: 'Label for form field: Given names in english',
                     id: 'form.field.label.deceasedFathersGivenNamesEng'
                   },
+                  maxLength: 32,
                   required: false,
                   initialValue: '',
                   validate: [
@@ -11919,6 +12441,7 @@ export const defaultFormsConfig = {
                   },
                   required: true,
                   initialValue: '',
+                  maxLength: 32,
                   validate: [
                     {
                       operation: 'englishOnlyNameFormat'
@@ -11952,7 +12475,7 @@ export const defaultFormsConfig = {
           ]
         },
         {
-          id: DeathSection.Mother,
+          id: 'mother',
           viewType: 'form',
           name: {
             defaultMessage: "What is the deceased's mother name?",
@@ -11985,6 +12508,7 @@ export const defaultFormsConfig = {
                     id: 'form.field.label.deceasedMothersGivenNamesEng'
                   },
                   required: false,
+                  maxLength: 32,
                   initialValue: '',
                   validate: [
                     {
@@ -12012,6 +12536,7 @@ export const defaultFormsConfig = {
                     id: 'form.field.label.deceasedMothersFamilyNameEng'
                   },
                   required: true,
+                  maxLength: 32,
                   initialValue: '',
                   validate: [
                     {
@@ -12046,7 +12571,7 @@ export const defaultFormsConfig = {
           ]
         },
         {
-          id: DeathSection.Spouse,
+          id: 'spouse',
           viewType: 'form',
           title: {
             defaultMessage: "Spouse's details",
@@ -12109,6 +12634,7 @@ export const defaultFormsConfig = {
                             'Label for form field: Given names in english',
                           id: 'form.field.label.deceasedSpousesGivenNamesEng'
                         },
+                        maxLength: 32,
                         required: false,
                         initialValue: '',
                         extraValue: 'Yes',
@@ -12148,6 +12674,7 @@ export const defaultFormsConfig = {
                             'Label for form field: Family name in english',
                           id: 'form.field.label.deceasedSpousesFamilyNameEng'
                         },
+                        maxLength: 32,
                         required: true,
                         initialValue: '',
                         extraValue: 'Yes',
@@ -12208,7 +12735,7 @@ export const defaultFormsConfig = {
           ]
         },
         {
-          id: DeathSection.DeathDocuments,
+          id: 'documents',
           viewType: 'form',
           name: {
             defaultMessage: 'Documents',
@@ -12296,16 +12823,16 @@ export const defaultFormsConfig = {
                   }
                 },
                 {
-                  name: 'uploadDocForinformant',
+                  name: 'uploadDocForApplicant',
                   type: 'DOCUMENT_UPLOADER_WITH_OPTION',
                   label: {
-                    defaultMessage: 'informant ID',
+                    defaultMessage: 'Applicant ID',
                     description:
                       'Option for radio group field: Type of Document To Upload',
-                    id: 'form.field.label.informantIDProof'
+                    id: 'form.field.label.applicantIDProof'
                   },
                   initialValue: '',
-                  extraValue: 'informant_ID_PROOF',
+                  extraValue: 'APPLICANT_ID_PROOF',
                   hideAsterisk: true,
                   validate: [],
                   options: [
@@ -12497,7 +13024,7 @@ export const defaultFormsConfig = {
       informant: {
         identifierTypeField: 'iDType',
         identifierOtherTypeField: 'iDTypeOther',
-        identifierField: 'informantID',
+        identifierField: 'applicantID',
         nameFields: {
           en: {
             firstNamesField: 'firstNamesEng',
@@ -12507,8 +13034,5 @@ export const defaultFormsConfig = {
         nationalityField: 'nationality'
       }
     }
-  },
-  userForm: {
-    sections: [userSectionFormType, userSectionPreviewType]
   }
 }

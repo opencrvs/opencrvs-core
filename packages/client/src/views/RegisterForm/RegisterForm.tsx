@@ -542,7 +542,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
       activeSectionGroup,
       application
     )
-
     const isErrorOccured = this.state.hasError
     const debouncedModifyApplication = debounce(this.modifyApplication, 300)
 
