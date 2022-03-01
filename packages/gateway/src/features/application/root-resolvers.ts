@@ -85,6 +85,7 @@ export const resolvers: GQLResolver = {
           }
         }
       )
+
       if (res.status !== 201) {
         return await Promise.reject(
           new Error(
