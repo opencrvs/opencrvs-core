@@ -16,6 +16,7 @@ enum RegStatus {
   REGISTERED
   CERTIFIED
   REJECTED
+  DOWNLOADED
 }
 
 enum BirthRegType {
@@ -254,9 +255,18 @@ type RegWorkflow { # Task
   timeLogged: Int # -> from metrics
 }
 
+type History {
+  user: User
+  date: Date
+  action: RegStatus
+  location: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastLocation').valueReference
+  office: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastOffice').valueReference
+}
+
 interface EventRegistration {
   id: ID! # long uuid
   registration: Registration
+  history: [History]
   createdAt: Date
 }
 
@@ -305,6 +315,7 @@ type BirthRegistration implements EventRegistration { # -> Composition
   primaryCaregiver: PrimaryCaregiver
   createdAt: Date # -> .date($first)
   updatedAt: Date # -> .date
+  history: [History]
 }
 
 input DeathRegistrationInput {
@@ -347,6 +358,7 @@ type DeathRegistration implements EventRegistration { # -> Composition
   medicalPractitioner: MedicalPractitioner # -> Encounter.participant
   createdAt: Date # -> .date($first)
   updatedAt: Date # -> .date
+  history: [History]
 }
 
 input CorrectionValueInput {

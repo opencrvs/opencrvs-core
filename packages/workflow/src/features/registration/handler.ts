@@ -20,6 +20,7 @@ import {
   markBundleAsWaitingValidation,
   invokeRegistrationValidation,
   updatePatientIdentifierWithRN,
+  touchBundle,
   markBundleAsDeclarationUpdated,
   markBundleAsRequestedForCorrection
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
@@ -29,7 +30,8 @@ import {
   getPhoneNo,
   getSharedContactMsisdn,
   postToHearth,
-  generateEmptyBundle
+  generateEmptyBundle,
+  forwardToHearth
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   getTaskEventType,
@@ -404,6 +406,23 @@ export async function markEventAsCertifiedHandler(
     return await postToHearth(payload)
   } catch (error) {
     logger.error(`Workflow/markBirthAsCertifiedHandler: error: ${error}`)
+    throw new Error(error)
+  }
+}
+
+export async function markEventAsDownloadedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const payload = await touchBundle(
+      request.payload as fhir.Bundle,
+      getToken(request)
+    )
+    const newRequest = { ...request, payload } as Hapi.Request
+    return await forwardToHearth(newRequest, h)
+  } catch (error) {
+    logger.error(`Workflow/markBirthAsDownloadHandler: error: ${error}`)
     throw new Error(error)
   }
 }

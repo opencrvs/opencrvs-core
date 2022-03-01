@@ -12,25 +12,36 @@
 
 import React from 'react'
 import { Header } from '@client/components/interface/Header/Header'
+import { TableView } from '@opencrvs/components/lib/interface/TableView'
 import {
   Content,
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
 import { Navigation } from '@client/components/interface/Navigation'
+import { AvatarSmall } from '@client/components/Avatar'
 import styled from '@client/styledComponents'
 import { ApplicationIcon, Edit } from '@opencrvs/components/lib/icons'
 import { connect } from 'react-redux'
 import { RouteComponentProps, Redirect } from 'react-router'
 import {
+  goBack as goBackAction,
+  goToRegistrarHomeTab,
+  goToPage,
+  goToCertificateCorrection,
+  goToPrintCertificate
+} from '@client/navigation'
+import {
   injectIntl,
+  IntlShape,
   WrappedComponentProps as IntlShapeProps,
-  IntlShape
+  MessageDescriptor
 } from 'react-intl'
-import { goToCertificateCorrection } from '@client/navigation'
 import {
   IApplication,
   SUBMISSION_STATUS,
-  clearCorrectionChange
+  DOWNLOAD_STATUS,
+  clearCorrectionChange,
+  IWorkqueue
 } from '@client/applications'
 import { IStoreState } from '@client/store'
 import {
@@ -42,23 +53,43 @@ import {
 import moment from 'moment'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
-import { IQueryData } from '@client/views/OfficeHome/OfficeHome'
+import { IQueryData, EVENT_STATUS } from '@client/views/OfficeHome/OfficeHome'
+import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { generateLocationName } from '@client/utils/locationUtils'
 import { Query } from '@client/components/Query'
 import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/Home/queries'
 import { Loader } from '@opencrvs/components/lib/interface'
-import { HOME } from '@client/navigation/routes'
+import {
+  HOME,
+  DRAFT_BIRTH_PARENT_FORM_PAGE,
+  DRAFT_DEATH_FORM_PAGE,
+  REVIEW_EVENT_PARENT_FORM_PAGE
+} from '@client/navigation/routes'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import {
   IFormSectionData,
   IContactPoint,
-  CorrectionSection
+  CorrectionSection,
+  Action
 } from '@client/forms'
 import {
+  LinkButton,
+  PrimaryButton,
   ICON_ALIGNMENT,
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
+import {
+  constantsMessages,
+  userMessages,
+  buttonMessages
+} from '@client/i18n/messages'
+import { getLanguage } from '@client/i18n/selectors'
+import {
+  getIndividualNameObj,
+  IAvatar,
+  IUserDetails
+} from '@client/utils/userUtils'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 
 const BodyContainer = styled.div`
@@ -94,21 +125,65 @@ const GreyedInfo = styled.div`
   max-width: 330px;
 `
 
-export type IRecordAuditTabs = keyof IQueryData | 'search'
+const LargeGreyedInfo = styled.div`
+  height: 231px;
+  background-color: ${({ theme }) => theme.colors.greyInfo};
+  max-width: 100%;
+  border-radius: 4px;
+  margin: 15px 0px;
+`
+
+const ReviewButton = styled(PrimaryButton)`
+  height: 40px;
+`
+
+const NameAvatar = styled.span`
+  display: flex;
+  align-items: center;
+  img {
+    margin-right: 10px;
+  }
+`
+
+const Heading = styled.h4`
+  margin-bottom: 0px !important;
+`
 
 interface IStateProps {
+  userDetails: IUserDetails | null
+  language: string
+  workqueue: IWorkqueue
+  resources: IOfflineData
+  savedApplications: IApplication[]
+  outboxApplications: IApplication[]
   declarationId: string
   draft: IApplication | null
-  language: string
-  resources: IOfflineData
   tab: IRecordAuditTabs
   workqueueDeclaration: GQLEventSearchSet | null
 }
 
-interface IDispatchProps {
+export type IRecordAuditTabs = keyof IQueryData | 'search'
+
+type CMethodParams = {
+  declaration: IDeclarationData
+  intl: IntlShape
+  userDetails: IUserDetails | null
+  outboxApplications: IApplication[]
+  goToPage?: typeof goToPage
+  goToPrintCertificate?: typeof goToPrintCertificate
+}
+
+type IRecordAuditProps = {
   clearCorrectionChange: typeof clearCorrectionChange
   goToCertificateCorrection: typeof goToCertificateCorrection
+  goToPage: typeof goToPage
 }
+
+type IDispatchProps = {
+  goBack: typeof goBackAction
+  goToRegistrarHomeTab: typeof goToRegistrarHomeTab
+  goToPrintCertificate: typeof goToPrintCertificate
+} & IRecordAuditProps
 
 type RouteProps = RouteComponentProps<{
   tab: IRecordAuditTabs
@@ -125,6 +200,9 @@ interface ILabel {
   [key: string]: string | undefined
 }
 
+interface IStatus {
+  [key: string]: MessageDescriptor
+}
 interface IDeclarationData {
   id: string
   name?: string
@@ -159,6 +237,88 @@ const STATUSTOCOLOR: { [key: string]: string } = {
   REGISTERED: 'green',
   CERTIFIED: 'green',
   WAITING_VALIDATION: 'teal'
+}
+
+const KEY_LABEL: ILabel = {
+  status: 'Status',
+  type: 'Event',
+  trackingId: 'Tracking ID',
+  dateOfBirth: 'Date of birth',
+  dateOfDeath: 'Date of death',
+  placeOfBirth: 'Place of birth',
+  placeOfDeath: 'Place of death',
+  informant: 'Informant',
+  brn: 'BRN',
+  drn: 'DRN'
+}
+
+const NO_DATA_LABEL: ILabel = {
+  status: 'No status',
+  type: 'No event',
+  trackingId: 'No tracking id',
+  dateOfBirth: 'No date of birth',
+  dateOfDeath: 'No date of death',
+  placeOfBirth: 'No place of birth',
+  placeOfDeath: 'No place of death',
+  informant: 'No informant'
+}
+
+const APPLICATION_STATUS_LABEL: IStatus = {
+  IN_PROGRESS: {
+    defaultMessage: 'In progress',
+    description: 'The title of In progress',
+    id: 'regHome.inProgress'
+  },
+  DECLARED: {
+    defaultMessage: 'Application started',
+    description: 'Label for table header column Application started',
+    id: 'constants.applicationStarted'
+  },
+  WAITING_VALIDATION: {
+    defaultMessage: 'Waiting for validation',
+    description: 'A label for waitingValidated',
+    id: 'constants.waitingValidated'
+  },
+  VALIDATED: {
+    id: 'constants.validated',
+    defaultMessage: 'Validated',
+    description: 'A label for validated'
+  },
+  REGISTERED: {
+    defaultMessage: 'Application registered',
+    description: 'Label for date of registration in work queue list item',
+    id: 'regHome.table.label.registeredDate'
+  },
+  CERTIFIED: {
+    defaultMessage: 'Certified',
+    description: 'Label for registration status certified',
+    id: 'regHome.certified'
+  },
+  REJECTED: {
+    id: 'constants.rejected',
+    defaultMessage: 'Rejected',
+    description: 'A label for rejected'
+  },
+  DOWNLOADED: {
+    defaultMessage: 'Downloaded',
+    description: 'Label for application download status Downloaded',
+    id: 'constants.downloaded'
+  },
+  REQUESTED_CORRECTION: {
+    id: 'correction.request',
+    defaultMessage: 'Requested correction',
+    description: 'Status for application being requested for correction'
+  },
+  DECLARATION_UPDATED: {
+    defaultMessage: 'Updated',
+    description: 'Application has been updated',
+    id: 'constants.updated'
+  },
+  ARCHIVE_DECLARATION: {
+    defaultMessage: 'Archived',
+    description: 'Application has been archived',
+    id: 'constants.archived_declaration'
+  }
 }
 
 const getCaptitalizedWord = (word: string | undefined): string => {
@@ -261,9 +421,8 @@ const getDraftDeclarationData = (
     placeOfBirth: getLocation(declaration, resources, intl) || '',
     placeOfDeath: getLocation(declaration, resources, intl) || '',
     informant:
-      (
-        declaration.data?.registration?.contactPoint as IFormSectionData
-      )?.value.toString() || '',
+      ((declaration.data?.registration?.contactPoint as IFormSectionData)
+        ?.value as string) || '',
     informantContact:
       (
         (declaration.data?.registration?.contactPoint as IFormSectionData)
@@ -404,17 +563,324 @@ const getDeclarationInfo = (
   )
 }
 
+const showReviewButton = ({
+  declaration,
+  intl,
+  userDetails,
+  outboxApplications,
+  goToPage
+}: CMethodParams) => {
+  const { id, type } = declaration || {}
+  const foundApplication = outboxApplications.find(
+    (app) => app.id === declaration.id
+  )
+  const isDownloaded =
+    foundApplication?.downloadStatus == DOWNLOAD_STATUS.DOWNLOADED
+
+  if (!userDetails || !userDetails.role || !type || !isDownloaded) return <></>
+  const { role } = userDetails
+
+  const reviewButtonRoleStatusMap: { [key: string]: string[] } = {
+    FIELD_AGENT: [EVENT_STATUS.REJECTED],
+    REGISTRATION_AGENT: [EVENT_STATUS.DECLARED],
+    DISTRICT_REGISTRAR: [EVENT_STATUS.VALIDATED, EVENT_STATUS.DECLARED],
+    LOCAL_REGISTRAR: [EVENT_STATUS.VALIDATED, EVENT_STATUS.DECLARED]
+  }
+
+  if (reviewButtonRoleStatusMap[role].includes(declaration?.status as string))
+    return (
+      <ReviewButton
+        key={id}
+        id={`review-btn-${id}`}
+        onClick={() => {
+          goToPage &&
+            goToPage(REVIEW_EVENT_PARENT_FORM_PAGE, id, 'review', type)
+        }}
+      >
+        {intl.formatMessage(constantsMessages.review)}
+      </ReviewButton>
+    )
+  return <></>
+}
+
+const shouldShowUpdateButton = ({
+  declaration,
+  intl,
+  userDetails,
+  outboxApplications,
+  goToPage
+}: CMethodParams) => {
+  const { id, type } = declaration || {}
+
+  const foundApplication = outboxApplications.find(
+    (app) => app.id === declaration.id
+  )
+  const isDownloaded =
+    foundApplication?.downloadStatus == DOWNLOAD_STATUS.DOWNLOADED ||
+    foundApplication?.submissionStatus == SUBMISSION_STATUS.DRAFT
+
+  if (!userDetails || !userDetails.role || !type || !isDownloaded) return <></>
+  const { role } = userDetails
+
+  const reviewButtonRoleStatusMap: { [key: string]: string[] } = {
+    FIELD_AGENT: [SUBMISSION_STATUS.DRAFT],
+    REGISTRATION_AGENT: [SUBMISSION_STATUS.DRAFT, EVENT_STATUS.REJECTED],
+    DISTRICT_REGISTRAR: [SUBMISSION_STATUS.DRAFT, EVENT_STATUS.REJECTED],
+    LOCAL_REGISTRAR: [SUBMISSION_STATUS.DRAFT, EVENT_STATUS.REJECTED]
+  }
+
+  if (reviewButtonRoleStatusMap[role].includes(declaration?.status as string)) {
+    let PAGE_ROUTE: string, PAGE_ID: string
+
+    if (declaration?.status === SUBMISSION_STATUS.DRAFT) {
+      PAGE_ID = 'preview'
+      if (type.toString() === 'birth') {
+        PAGE_ROUTE = DRAFT_BIRTH_PARENT_FORM_PAGE
+      } else if (type.toString() === 'death') {
+        PAGE_ROUTE = DRAFT_DEATH_FORM_PAGE
+      }
+    } else {
+      PAGE_ROUTE = REVIEW_EVENT_PARENT_FORM_PAGE
+      PAGE_ID = 'review'
+    }
+    return (
+      <ReviewButton
+        key={id}
+        id={`update-application-${id}`}
+        onClick={() => {
+          goToPage && goToPage(PAGE_ROUTE, id, PAGE_ID, type)
+        }}
+      >
+        {intl.formatMessage(buttonMessages.update)}
+      </ReviewButton>
+    )
+  }
+
+  return <></>
+}
+
+const showDownloadButton = (
+  application: IDeclarationData,
+  userDetails: IUserDetails | null,
+  outboxApplications: IApplication[]
+) => {
+  const { id, type } = application || {}
+
+  if (application == null || id == null || type == null) return <></>
+
+  const foundApplication = outboxApplications.find(
+    (app) => app.id === application.id
+  )
+
+  const downloadStatus =
+    (foundApplication && foundApplication.downloadStatus) || undefined
+
+  if (
+    userDetails?.role == 'FIELD_AGENT' &&
+    foundApplication?.submissionStatus == SUBMISSION_STATUS.DECLARED
+  )
+    return <></>
+  if (
+    foundApplication?.submissionStatus != SUBMISSION_STATUS.DRAFT &&
+    downloadStatus != DOWNLOAD_STATUS.DOWNLOADED
+  ) {
+    const downLoadConfig = {
+      event: type,
+      compositionId: id,
+      action: Action.LOAD_REVIEW_APPLICATION
+    }
+    return (
+      <DownloadButton
+        key={id}
+        downloadConfigs={downLoadConfig}
+        status={downloadStatus as DOWNLOAD_STATUS}
+      />
+    )
+  }
+
+  return <></>
+}
+
+const showPrintButton = ({
+  declaration,
+  intl,
+  userDetails,
+  outboxApplications,
+  goToPrintCertificate
+}: CMethodParams) => {
+  const { id, type } = declaration || {}
+
+  const foundApplication = outboxApplications.find(
+    (app) => app.id === declaration.id
+  )
+  const isDownloaded =
+    foundApplication?.downloadStatus == DOWNLOAD_STATUS.DOWNLOADED ||
+    foundApplication?.submissionStatus == SUBMISSION_STATUS.DRAFT
+
+  if (!userDetails || !userDetails.role || !type || !isDownloaded) return <></>
+  const { role } = userDetails
+
+  const reviewButtonRoleStatusMap: { [key: string]: string[] } = {
+    REGISTRATION_AGENT: [SUBMISSION_STATUS.REGISTERED],
+    DISTRICT_REGISTRAR: [SUBMISSION_STATUS.REGISTERED],
+    LOCAL_REGISTRAR: [SUBMISSION_STATUS.REGISTERED]
+  }
+
+  if (
+    role in reviewButtonRoleStatusMap &&
+    reviewButtonRoleStatusMap[role].includes(declaration?.status as string)
+  )
+    return (
+      <ReviewButton
+        key={id}
+        id={`print-${id}`}
+        onClick={() => {
+          goToPrintCertificate &&
+            goToPrintCertificate(id, type.toLocaleLowerCase())
+        }}
+      >
+        {intl.formatMessage(buttonMessages.print)}
+      </ReviewButton>
+    )
+  return <></>
+}
+
+const getNameWithAvatar = (
+  nameObject: Array<GQLHumanName | null>,
+  avatar: IAvatar,
+  language: string
+) => {
+  const nameObj = getIndividualNameObj(nameObject, language)
+  const userName = nameObj
+    ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+    : ''
+
+  return (
+    <NameAvatar>
+      <AvatarSmall avatar={avatar} name={userName} />
+      <span>
+        <LinkButton
+          id={'username-link'}
+          onClick={() => alert('username clicked')}
+          textDecoration="none"
+        >
+          {userName}
+        </LinkButton>
+      </span>
+    </NameAvatar>
+  )
+}
+
+const getStatusLabel = (status: string, intl: IntlShape) => {
+  if (status in APPLICATION_STATUS_LABEL)
+    return intl.formatMessage(APPLICATION_STATUS_LABEL[status])
+  return ''
+}
+
+const getLink = (status: string) => {
+  return (
+    <LinkButton textDecoration="none" onClick={() => alert('link clicked')}>
+      {status}
+    </LinkButton>
+  )
+}
+
+const getFormattedDate = (date: Date) => {
+  const momentDate = moment(date)
+  return (
+    <>
+      {momentDate.format('MMMM DD, YYYY')} &middot;{' '}
+      {momentDate.format('hh.mm A')}
+    </>
+  )
+}
+
+const getHistory = ({
+  declaration,
+  intl,
+  outboxApplications
+}: CMethodParams) => {
+  const savedApplication = outboxApplications.find(
+    (app) => app.id === declaration.id
+  )
+
+  if (!savedApplication?.data?.history?.length)
+    return (
+      <>
+        <hr />
+        <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
+        <LargeGreyedInfo />
+      </>
+    )
+
+  const historyData = (
+    savedApplication.data.history as unknown as { [key: string]: any }[]
+  )
+    // TODO: We need to figure out a way to sort the history in backend
+    .sort((fe, se) => {
+      return new Date(fe.date).getTime() - new Date(se.date).getTime()
+    })
+    .map((item) => ({
+      date: getFormattedDate(item?.date),
+      action: getLink(getStatusLabel(item?.action, intl)),
+      user: getNameWithAvatar(
+        item.user.name,
+        item.user?.avatar,
+        window.config.LANGUAGES
+      ),
+      type: intl.formatMessage(userMessages[item.user.role as string]),
+      location: getLink(item.office.name)
+    }))
+
+  const columns = [
+    {
+      label: 'Action',
+      width: 20,
+      key: 'action'
+    },
+    {
+      label: 'Date',
+      width: 20,
+      key: 'date'
+    },
+    { label: 'By', width: 25, key: 'user', isIconColumn: true },
+    { label: 'Type', width: 20, key: 'type' },
+    { label: 'Location', width: 20, key: 'location' }
+  ]
+  return (
+    <>
+      <hr />
+      <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
+      <TableView
+        id="task-history"
+        noResultText=""
+        hideBoxShadow={true}
+        columns={columns}
+        content={historyData}
+        alignItemCenter={true}
+        pageSize={100}
+        hideTableHeaderBorder={true}
+      />
+    </>
+  )
+}
+
 function RecordAuditBody({
   clearCorrectionChange,
   declaration,
   isDownloaded = false,
   intl,
-  goToCertificateCorrection
+  goToCertificateCorrection,
+  userDetails,
+  outboxApplications,
+  goToPage
 }: {
   declaration: IDeclarationData
   isDownloaded?: boolean
   intl: IntlShape
-} & IDispatchProps) {
+  userDetails: IUserDetails | null
+  outboxApplications: IApplication[]
+} & IRecordAuditProps) {
   const actions = []
   if (
     isDownloaded &&
@@ -435,6 +901,42 @@ function RecordAuditBody({
       </TertiaryButton>
     )
   }
+
+  declaration &&
+    actions.push(
+      showDownloadButton(declaration, userDetails, outboxApplications)
+    )
+  declaration &&
+    actions.push(
+      showReviewButton({
+        declaration,
+        intl,
+        userDetails,
+        outboxApplications,
+        goToPage
+      })
+    )
+  declaration &&
+    actions.push(
+      shouldShowUpdateButton({
+        declaration,
+        intl,
+        userDetails,
+        outboxApplications,
+        goToPage
+      })
+    )
+  declaration &&
+    actions.push(
+      showPrintButton({
+        declaration,
+        intl,
+        userDetails,
+        outboxApplications,
+        goToPrintCertificate
+      })
+    )
+
   return (
     <Content
       title={declaration.name || intl.formatMessage(recordAuditMessages.noName)}
@@ -452,6 +954,7 @@ function RecordAuditBody({
       )}
     >
       {getDeclarationInfo(declaration, isDownloaded, intl)}
+      {getHistory({ declaration, intl, outboxApplications, userDetails })}
     </Content>
   )
 }
@@ -465,11 +968,17 @@ function getBodyContent({
   tab,
   intl,
   resources,
-  workqueueDeclaration
+  workqueueDeclaration,
+  userDetails,
+  outboxApplications,
+  goToPage
 }: IFullProps) {
   const actionProps = {
     clearCorrectionChange,
-    goToCertificateCorrection
+    goToCertificateCorrection,
+    userDetails,
+    outboxApplications,
+    goToPage
   }
   if (!draft && tab === 'search') {
     return (
@@ -509,12 +1018,14 @@ function getBodyContent({
         language
       )
   return (
-    <RecordAuditBody
-      declaration={declaration}
-      isDownloaded={!!draft}
-      intl={intl}
-      {...actionProps}
-    />
+    <>
+      <RecordAuditBody
+        declaration={declaration}
+        isDownloaded={!!draft}
+        intl={intl}
+        {...actionProps}
+      />
+    </>
   )
 }
 
@@ -531,6 +1042,13 @@ const ShowRecordAudit = (props: IFullProps) => {
 function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
   const { declarationId, tab } = props.match.params
   return {
+    userDetails: state.profile.userDetails,
+    language: getLanguage(state),
+    workqueue: state.workqueueState.workqueue,
+    savedApplications:
+      state.applicationsState.applications &&
+      state.applicationsState.applications,
+    outboxApplications: state.applicationsState.applications,
     declarationId,
     draft:
       state.applicationsState.applications.find(
@@ -538,7 +1056,6 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
           declaration.id === declarationId ||
           declaration.compositionId === declarationId
       ) || null,
-    language: state.i18n.language,
     resources: getOfflineData(state),
     tab,
     workqueueDeclaration:
@@ -556,6 +1073,10 @@ export const RecordAudit = connect<
   RouteProps,
   IStoreState
 >(mapStateToProps, {
+  goBack: goBackAction,
+  goToRegistrarHomeTab,
+  goToPage,
   clearCorrectionChange,
-  goToCertificateCorrection
+  goToCertificateCorrection,
+  goToPrintCertificate
 })(injectIntl(ShowRecordAudit))

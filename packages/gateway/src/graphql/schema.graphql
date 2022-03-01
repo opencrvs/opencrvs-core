@@ -231,6 +231,7 @@ type BirthRegistration implements EventRegistration {
   primaryCaregiver: PrimaryCaregiver
   createdAt: Date
   updatedAt: Date
+  history: [History]
 }
 
 type DeathRegistration implements EventRegistration {
@@ -251,6 +252,7 @@ type DeathRegistration implements EventRegistration {
   medicalPractitioner: MedicalPractitioner
   createdAt: Date
   updatedAt: Date
+  history: [History]
 }
 
 type Person {
@@ -281,6 +283,7 @@ type BirthRegResultSet {
 interface EventRegistration {
   id: ID!
   registration: Registration
+  history: [History]
   createdAt: Date
 }
 
@@ -565,6 +568,14 @@ type PrimaryCaregiver {
   primaryCaregiver: Person
   reasonsNotApplying: [ReasonsNotApplying]
   parentDetailsType: ParentDetailsType
+}
+
+type History {
+  user: User
+  date: Date
+  action: RegStatus
+  location: Location
+  office: Location
 }
 
 enum MannerOfDeath {
@@ -926,6 +937,18 @@ enum ParentDetailsType {
   NONE
 }
 
+enum RegStatus {
+  IN_PROGRESS
+  DECLARED
+  DECLARATION_UPDATED
+  WAITING_VALIDATION
+  VALIDATED
+  REGISTERED
+  CERTIFIED
+  REJECTED
+  DOWNLOADED
+}
+
 enum IdentityIDType {
   PASSPORT
   NATIONAL_ID
@@ -1204,17 +1227,6 @@ input ReasonsNotApplyingInput {
   primaryCaregiverType: PrimaryCaregiverType
   reasonNotApplying: String
   isDeceased: Boolean
-}
-
-enum RegStatus {
-  IN_PROGRESS
-  DECLARED
-  DECLARATION_UPDATED
-  WAITING_VALIDATION
-  VALIDATED
-  REGISTERED
-  CERTIFIED
-  REJECTED
 }
 
 type Comment {

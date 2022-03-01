@@ -64,7 +64,8 @@ export enum Action {
   REJECTED = 'REJECTED',
   REGISTERED = 'REGISTERED',
   CERTIFIED = 'CERTIFIED',
-  LOAD_REVIEW_APPLICATION = 'load application data for review'
+  LOAD_REVIEW_APPLICATION = 'load application data for review',
+  DOWNLOADED = 'Application downloaded'
 }
 interface IProps extends IntlShapeProps {
   id: string

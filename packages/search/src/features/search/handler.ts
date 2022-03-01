@@ -148,9 +148,9 @@ export async function populateHierarchicalLocationIdsHandler(
       )
     }
     // If total count is less than 5000, then proceed.
-    const allDocumentsWithoutHierarchicalLocations: ApiResponse<ISearchResponse<
-      ICompositionBody
-    >> = await client.search(
+    const allDocumentsWithoutHierarchicalLocations: ApiResponse<
+      ISearchResponse<ICompositionBody>
+    > = await client.search(
       {
         index: 'ocrvs',
         body: {
