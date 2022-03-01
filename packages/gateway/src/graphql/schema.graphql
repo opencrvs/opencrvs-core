@@ -191,7 +191,7 @@ type Mutation {
     certificateSVG: CertificateSVGInput!
   ): CertificateSVG
   updateApplicationConfig(
-    applicationConfig: ApplicationConfigurationInput!
+    applicationConfig: ApplicationConfigurationInput
   ): ApplicationConfiguration
 }
 

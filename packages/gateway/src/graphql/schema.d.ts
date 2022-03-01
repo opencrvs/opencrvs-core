@@ -2327,7 +2327,7 @@ export interface MutationToCreateOrUpdateCertificateSVGResolver<
 }
 
 export interface MutationToUpdateApplicationConfigArgs {
-  applicationConfig: GQLApplicationConfigurationInput
+  applicationConfig?: GQLApplicationConfigurationInput
 }
 export interface MutationToUpdateApplicationConfigResolver<
   TParent = any,

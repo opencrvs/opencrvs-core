@@ -111,6 +111,6 @@ type ApplicationConfiguration {
 
 type Mutation {
   updateApplicationConfig(
-    applicationConfig: ApplicationConfigurationInput!
+    applicationConfig: ApplicationConfigurationInput
   ): ApplicationConfiguration
 }
