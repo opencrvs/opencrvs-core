@@ -72,7 +72,7 @@ export async function sendEventNotification(
       })
       break
     case Events.BIRTH_NEW_DEC:
-    case Events.BIRTH_NEW_VALIDATE:
+    case Events.BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION:
       await sendNotification('birthDeclarationSMS', msisdn, authHeader, {
         name: await getInformantName(fhirBundle, CHILD_SECTION_CODE),
         trackingId: getTrackingId(fhirBundle)
@@ -100,7 +100,7 @@ export async function sendEventNotification(
       })
       break
     case Events.DEATH_NEW_DEC:
-    case Events.DEATH_NEW_VALIDATE:
+    case Events.DEATH_REQUEST_FOR_REGISTRAR_VALIDATION:
       await sendNotification('deathDeclarationSMS', msisdn, authHeader, {
         name: await getInformantName(fhirBundle, DECEASED_SECTION_CODE),
         trackingId: getTrackingId(fhirBundle)
@@ -277,10 +277,10 @@ export function isEventNotification(fhirBundle: fhir.Bundle) {
 export function isEventNonNotifiable(event: Events) {
   return (
     [
-      Events.BIRTH_WAITING_VALIDATION,
-      Events.DEATH_WAITING_VALIDATION,
-      Events.BIRTH_NEW_WAITING_VALIDATION,
-      Events.DEATH_NEW_WAITING_VALIDATION
+      Events.BIRTH_WAITING_EXTERNAL_RESOURCE_VALIDATION,
+      Events.DEATH_WAITING_EXTERNAL_RESOURCE_VALIDATION,
+      Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION,
+      Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
     ].indexOf(event) >= 0
   )
 }
