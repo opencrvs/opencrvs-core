@@ -420,9 +420,8 @@ const getDraftDeclarationData = (
     placeOfBirth: getLocation(declaration, resources, intl) || '',
     placeOfDeath: getLocation(declaration, resources, intl) || '',
     informant:
-      (
-        declaration.data?.registration?.contactPoint as IFormSectionData
-      )?.value.toString() || '',
+      ((declaration.data?.registration?.contactPoint as IFormSectionData)
+        ?.value as string) || '',
     informantContact:
       (
         (declaration.data?.registration?.contactPoint as IFormSectionData)
