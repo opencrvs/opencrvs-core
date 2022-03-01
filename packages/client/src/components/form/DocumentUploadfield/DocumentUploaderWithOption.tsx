@@ -76,7 +76,7 @@ type IFullProps = {
   extraValue: IFormFieldValue
   options: ISelectOption[]
   splitView?: boolean
-  files?: IFileValue[]
+  files: IFileValue[]
   hideOnEmptyOption?: boolean
   onComplete: (files: IFileValue[]) => void
 } & IntlShapeProps
@@ -89,7 +89,6 @@ type DocumentFields = {
 type IState = {
   errorMessage: string
   fields: DocumentFields
-  uploadedDocuments: IFileValue[]
   previewImage: IFileValue | null
   filesBeingProcessed: Array<{ label: string }>
   dropDownOptions: ISelectOption[]
@@ -117,7 +116,6 @@ class DocumentUploaderWithOptionComp extends React.Component<
     this.state = {
       errorMessage: EMPTY_STRING,
       previewImage: null,
-      uploadedDocuments: this.props.files || [],
       dropDownOptions: this.initializeDropDownOption(),
       filesBeingProcessed: [],
       fields: {
@@ -232,33 +230,29 @@ class DocumentUploaderWithOptionComp extends React.Component<
       (option: ISelectOption) => option.value === this.state.fields.documentType
     )
 
-    this.setState(
-      (prevState) => {
-        const newDocument: IFileValue = {
-          optionValues,
-          type: uploadedImage.type,
-          data: fileAsBase64.toString()
-        }
+    const newDocument: IFileValue = {
+      optionValues,
+      type: uploadedImage.type,
+      data: fileAsBase64.toString()
+    }
 
-        return {
-          ...prevState,
-          errorMessage: EMPTY_STRING,
-          fields: {
-            documentType: EMPTY_STRING,
-            documentData: EMPTY_STRING
-          },
-          uploadedDocuments: [...prevState.uploadedDocuments, newDocument],
-          dropDownOptions: tempOptions,
-          // Remove from processing files
-          filesBeingProcessed: this.state.filesBeingProcessed.filter(
-            ({ label }) => label !== optionValues[1]
-          )
-        }
-      },
-      () => {
-        this.props.onComplete(this.state.uploadedDocuments)
+    this.props.onComplete([...this.props.files, newDocument])
+
+    this.setState((prevState) => {
+      return {
+        ...prevState,
+        errorMessage: EMPTY_STRING,
+        fields: {
+          documentType: EMPTY_STRING,
+          documentData: EMPTY_STRING
+        },
+        dropDownOptions: tempOptions,
+        // Remove from processing files
+        filesBeingProcessed: this.state.filesBeingProcessed.filter(
+          ({ label }) => label !== optionValues[1]
+        )
       }
-    )
+    })
   }
 
   onDelete = (image: IFileValue | IAttachmentValue) => {
@@ -268,12 +262,9 @@ class DocumentUploaderWithOptionComp extends React.Component<
     ) as ISelectOption
     const dropDownOptions = this.state.dropDownOptions.concat(addableOption)
     this.setState(() => ({ dropDownOptions }))
-    remove(
-      this.state.uploadedDocuments,
-      (item: IFileValue) => item === previewImage
+    this.props.onComplete(
+      this.props.files.filter((file) => file !== previewImage)
     )
-
-    this.props.onComplete(this.state.uploadedDocuments)
     this.closePreviewSection()
   }
 
@@ -343,7 +334,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
         <Label>{label}</Label>
         <DocumentListPreview
           processingDocuments={this.state.filesBeingProcessed}
-          documents={this.state.uploadedDocuments}
+          documents={this.props.files}
           onSelect={this.selectForPreview}
           dropdownOptions={this.props.options}
         />

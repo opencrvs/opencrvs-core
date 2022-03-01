@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  goToApplicationRecordAudit,
+  goToDeclarationRecordAudit,
   goToPage,
   goToReviewDuplicate
 } from '@client/navigation'
@@ -55,7 +55,7 @@ interface IBaseReviewTabProps {
   goToPage: typeof goToPage
   goToReviewDuplicate: typeof goToReviewDuplicate
   registrarLocationId: string | null
-  goToApplicationRecordAudit: typeof goToApplicationRecordAudit
+  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   outboxApplications: IApplication[]
   queryData: {
     data: GQLEventSearchResultSet
@@ -196,7 +196,8 @@ class ReviewTabComponent extends React.Component<
         rowClickHandler: [
           {
             label: 'rowClickHandler',
-            handler: () => this.props.goToApplicationRecordAudit(reg.id)
+            handler: () =>
+              this.props.goToDeclarationRecordAudit('reviewTab', reg.id)
           }
         ]
       }
@@ -307,5 +308,5 @@ function mapStateToProps(state: IStoreState) {
 export const ReviewTab = connect(mapStateToProps, {
   goToPage,
   goToReviewDuplicate,
-  goToApplicationRecordAudit
+  goToDeclarationRecordAudit
 })(injectIntl(withTheme(ReviewTabComponent)))

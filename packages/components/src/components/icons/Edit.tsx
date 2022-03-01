@@ -12,57 +12,12 @@
 import * as React from 'react'
 
 export const Edit = (props: React.HTMLAttributes<SVGElement>) => (
-  <svg
-    width="18"
-    height="18"
-    viewBox="0 0 18 18"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <defs>
-      <linearGradient
-        x1="3.532%"
-        y1="49.468%"
-        x2="96.468%"
-        y2="49.468%"
-        id="linearGradient-1"
-      >
-        <stop stopColor="#4C68C1" offset="0%" />
-        <stop stopColor="#B0C8F1" offset="100%" />
-      </linearGradient>
-    </defs>
-    <g id="Certification-(Desktop-registrar)" fill="none" fillRule="evenodd">
-      <g
-        id="RegistrationCertification/Home/Module2"
-        transform="translate(-602 -1154)"
-        fillRule="nonzero"
-      >
-        <g id="Group-7-Copy" transform="translate(275 1138)">
-          <g id="Group-9" transform="translate(327 16)">
-            <g id="Group-18">
-              <rect
-                id="Rectangle-4"
-                stroke="#4C68C1"
-                fill="#D8D8D8"
-                x="0.5"
-                y="16.5"
-                width="17"
-                height="1"
-                rx="0.5"
-              />
-              <rect
-                id="Rectangle-4-Copy"
-                fill="url(#linearGradient-1)"
-                transform="rotate(120 9.565 7.388)"
-                x="2.315"
-                y="5.839"
-                width="14.5"
-                height="3.098"
-                rx="1.549"
-              />
-            </g>
-          </g>
-        </g>
-      </g>
-    </g>
+  <svg width={18} height={17} fill="none" {...props}>
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M15 1.659a.841.841 0 0 0-.595.246L7.427 8.883l-.396 1.586 1.586-.396 6.978-6.978A.841.841 0 0 0 15 1.659ZM13.345.845a2.34 2.34 0 1 1 3.31 3.31L9.53 11.28a.75.75 0 0 1-.348.197l-3 .75a.75.75 0 0 1-.91-.909l.75-3a.75.75 0 0 1 .198-.348L13.345.845ZM1.409 2.409A2.25 2.25 0 0 1 3 1.75h5.25a.75.75 0 0 1 0 1.5H3a.75.75 0 0 0-.75.75v10.5a.75.75 0 0 0 .75.75h10.5a.75.75 0 0 0 .75-.75V9.25a.75.75 0 0 1 1.5 0v5.25a2.25 2.25 0 0 1-2.25 2.25H3A2.25 2.25 0 0 1 .75 14.5V4c0-.597.237-1.17.659-1.591Z"
+      fill="#4972BB"
+    />
   </svg>
 )

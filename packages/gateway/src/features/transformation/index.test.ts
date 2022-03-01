@@ -11,6 +11,8 @@
  */
 import transformObj, { IFieldBuilders } from '@gateway/features/transformation'
 
+const mockContext = { authHeader: { Authorization: '' } }
+
 describe('Object transformation module', () => {
   it('converts an object using a simple set of field builders', async () => {
     const fieldBuilders: IFieldBuilders = {
@@ -30,7 +32,8 @@ describe('Object transformation module', () => {
     await transformObj(
       { gender: 'm', name: 'John Smith' },
       initialObject,
-      fieldBuilders
+      fieldBuilders,
+      mockContext
     )
 
     expect(initialObject).toEqual({
@@ -65,7 +68,8 @@ describe('Object transformation module', () => {
     await transformObj(
       { gender: 'm', name: 'John Smith' },
       initialObject,
-      fieldBuilders
+      fieldBuilders,
+      mockContext
     )
 
     expect(initialObject).toEqual({
@@ -93,7 +97,8 @@ describe('Object transformation module', () => {
     await transformObj(
       { gender: 'm', name: ['John Smith', 'John D Smith'] },
       initialObject,
-      fieldBuilders
+      fieldBuilders,
+      mockContext
     )
 
     expect(initialObject).toEqual({
@@ -131,14 +136,14 @@ describe('Object transformation module', () => {
         this: {
           is: {
             deep: {
-              man:
-                'Every great developer you know got there by solving problems they were unqualified to solve until they actually did it'
+              man: 'Every great developer you know got there by solving problems they were unqualified to solve until they actually did it'
             }
           }
         }
       },
       initialObject,
-      fieldBuilders
+      fieldBuilders,
+      mockContext
     )
 
     expect(initialObject).toEqual({
@@ -162,7 +167,8 @@ describe('Object transformation module', () => {
           name: ''
         },
         initialObject,
-        fieldBuilders
+        fieldBuilders,
+        mockContext
       )
     ).rejects.toThrowError(/.*to be a FieldBuilderFunction.*/)
   })
@@ -181,7 +187,8 @@ describe('Object transformation module', () => {
           }
         },
         initialObject,
-        fieldBuilders
+        fieldBuilders,
+        mockContext
       )
     ).rejects.toThrowError(/.*to be a FieldBuilder object.*/)
   })
@@ -198,7 +205,8 @@ describe('Object transformation module', () => {
           }
         },
         initialObject,
-        fieldBuilders
+        fieldBuilders,
+        mockContext
       )
     ).rejects.toThrowError(/.*to be a FieldBuilder object.*/)
   })

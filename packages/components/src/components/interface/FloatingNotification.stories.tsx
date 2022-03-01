@@ -10,8 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Meta, Story } from '@storybook/react'
-import { FloatingNotification } from './FloatingNotification'
-import { NOTIFICATION_TYPE } from './Notification'
+import { FloatingNotification, NOTIFICATION_TYPE } from './FloatingNotification'
 import React from 'react'
 
 interface IProps {
