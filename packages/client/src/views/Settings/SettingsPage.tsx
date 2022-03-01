@@ -23,7 +23,10 @@ import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import styled from '@client/styledComponents'
 import { Header } from '@client/components/interface/Header/Header'
 import { AvatarLarge, Avatar } from '@client/components/Avatar'
-import { DataSection } from '@opencrvs/components/lib/interface/ViewData'
+import {
+  DataSection,
+  ListView
+} from '@opencrvs/components/lib/interface/ViewData'
 import {
   ResponsiveModal,
   NOTIFICATION_TYPE,
@@ -417,7 +420,7 @@ class SettingsView extends React.Component<IProps, IState> {
             <Content>
               <Left>
                 {sections.map((sec, index: number) => (
-                  <DataSection key={index} {...sec} />
+                  <ListView key={index} {...sec} />
                 ))}
                 <Version>
                   <span>OpenCRVS v1.1.0</span>
