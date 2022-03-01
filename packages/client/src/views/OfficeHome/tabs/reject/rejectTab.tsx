@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  goToApplicationRecordAudit,
+  goToDeclarationRecordAudit,
   goToPage,
   goToReviewDuplicate
 } from '@client/navigation'
@@ -50,7 +50,7 @@ interface IBaseRejectTabProps {
   goToPage: typeof goToPage
   goToReviewDuplicate: typeof goToReviewDuplicate
   registrarLocationId: string | null
-  goToApplicationRecordAudit: typeof goToApplicationRecordAudit
+  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   outboxApplications: IApplication[]
   queryData: {
     data: GQLEventSearchResultSet
@@ -223,7 +223,8 @@ class RejectTabComponent extends React.Component<
         rowClickHandler: [
           {
             label: 'rowClickHandler',
-            handler: () => this.props.goToApplicationRecordAudit(reg.id)
+            handler: () =>
+              this.props.goToDeclarationRecordAudit('rejectTab', reg.id)
           }
         ]
       }
@@ -268,5 +269,5 @@ function mapStateToProps(state: IStoreState) {
 export const RejectTab = connect(mapStateToProps, {
   goToPage,
   goToReviewDuplicate,
-  goToApplicationRecordAudit
+  goToDeclarationRecordAudit
 })(injectIntl(withTheme(RejectTabComponent)))

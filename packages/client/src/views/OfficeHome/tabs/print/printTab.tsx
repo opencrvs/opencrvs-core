@@ -11,7 +11,7 @@
  */
 
 import {
-  goToApplicationRecordAudit,
+  goToDeclarationRecordAudit,
   goToPrintCertificate
 } from '@client/navigation'
 import { transformData } from '@client/search/transformer'
@@ -45,7 +45,7 @@ interface IBasePrintTabProps {
   theme: ITheme
   goToPrintCertificate: typeof goToPrintCertificate
   registrarLocationId: string | null
-  goToApplicationRecordAudit: typeof goToApplicationRecordAudit
+  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   outboxApplications: IApplication[]
   queryData: {
     data: GQLEventSearchResultSet
@@ -205,7 +205,8 @@ class PrintTabComponent extends React.Component<
         rowClickHandler: [
           {
             label: 'rowClickHandler',
-            handler: () => this.props.goToApplicationRecordAudit(reg.id)
+            handler: () =>
+              this.props.goToDeclarationRecordAudit('printTab', reg.id)
           }
         ]
       }
@@ -248,5 +249,5 @@ function mapStateToProps(state: IStoreState) {
 
 export const PrintTab = connect(mapStateToProps, {
   goToPrintCertificate,
-  goToApplicationRecordAudit
+  goToDeclarationRecordAudit
 })(injectIntl(withTheme(PrintTabComponent)))
