@@ -105,7 +105,7 @@ function GeneralTabContent({
       items={[
         {
           label: intl.formatMessage(messages.applicationNameLabel),
-          value: 'Farajaland CRVS',
+          value: offlineCountryConfiguration.config.APPLICATION_NAME,
           action: {
             id: GeneralActionId.APPLICATION_NAME,
             label: intl.formatMessage(buttonMessages.change),

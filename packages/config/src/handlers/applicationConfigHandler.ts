@@ -65,6 +65,7 @@ export async function updateApplicationConfigHandler(
 }
 
 export const updateApplicationConfig = Joi.object({
+  APPLICATION_NAME: Joi.string(),
   BACKGROUND_SYNC_BROADCAST_CHANNEL: Joi.string(),
   COUNTRY: Joi.string(),
   COUNTRY_LOGO_FILE: Joi.string(),

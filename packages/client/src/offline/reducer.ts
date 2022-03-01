@@ -36,7 +36,7 @@ import {
   ISVGTemplate
 } from '@client/pdfRenderer/transformer/types'
 import { ICertificateCollectorDefinition } from '@client/views/PrintCertificate/VerifyCollector'
-import _ from 'lodash'
+import { find } from 'lodash'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -289,12 +289,12 @@ function reducer(
      * Configurations
      */
     case actions.APPLICATION_CONFIG_LOADED: {
-      const birthCertificateTemplate = _.find(action.payload.certificates, {
+      const birthCertificateTemplate = find(action.payload.certificates, {
         event: 'birth',
         status: 'ACTIVE'
       }) as ICertificateTemplateData
 
-      const deathCertificateTemplate = _.find(action.payload.certificates, {
+      const deathCertificateTemplate = find(action.payload.certificates, {
         event: 'death',
         status: 'ACTIVE'
       }) as ICertificateTemplateData

@@ -114,6 +114,7 @@ const navigatorMock = {
   LOGIN_URL: 'http://localhost:3020',
   AUTH_URL: 'http://localhost:4040',
   COUNTRY_CONFIG_URL: 'http://localhost:3040',
+  APPLICATION_NAME: 'Farajaland CRVS',
   COUNTRY: 'bgd',
   LANGUAGES: 'en,bn',
   CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 45,

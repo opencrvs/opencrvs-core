@@ -35,6 +35,7 @@ export const mockFetchConfig = {
   LOGIN_URL: 'http://localhost:3020',
   AUTH_URL: 'http://localhost:4040',
   RESOURCES_URL: 'http://localhost:3040',
+  APPLICATION_NAME: 'Farajaland CRVS',
   CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 36500,
   CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 36500,
   CERTIFICATE_PRINT_LOWEST_CHARGE: 0,

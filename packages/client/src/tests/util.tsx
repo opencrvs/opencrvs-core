@@ -2871,6 +2871,7 @@ export const mockOfflineData = {
     logo: `data:image;base64,${validImageB64String}`
   },
   config: {
+    APPLICATION_NAME: 'Farajaland CRVS',
     COUNTRY_LOGO_RENDER_WIDTH: 104,
     COUNTRY_LOGO_RENDER_HEIGHT: 104,
     DESKTOP_TIME_OUT_MILLISECONDS: 900000,

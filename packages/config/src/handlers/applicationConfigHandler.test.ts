@@ -19,6 +19,7 @@ import mockingoose from 'mockingoose'
 const fetch = fetchMock as fetchMock.FetchMock
 
 let mockConfig = {
+  APPLICATION_NAME: 'Farajaland CRVS',
   BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
   COUNTRY: 'bgd',
   COUNTRY_LOGO_FILE: 'logo.png',

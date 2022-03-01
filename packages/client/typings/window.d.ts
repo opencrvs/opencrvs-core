@@ -11,6 +11,7 @@
  */
 interface Window {
   config: {
+    APPLICATION_NAME: string
     API_GATEWAY_URL: string
     CONFIG_API_URL: string
     BACKGROUND_SYNC_BROADCAST_CHANNEL: string
