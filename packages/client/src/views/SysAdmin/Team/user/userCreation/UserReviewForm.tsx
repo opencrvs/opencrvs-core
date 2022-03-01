@@ -52,8 +52,8 @@ import {
 import { IDynamicValues } from '@opencrvs/components/lib/common-types'
 import {
   ActionPageLight,
-  DataSection,
-  IDataProps
+  IDataProps,
+  ListView
 } from '@opencrvs/components/lib/interface'
 import ApolloClient from 'apollo-client'
 import * as React from 'react'
@@ -209,7 +209,7 @@ class UserReviewFormComponent extends React.Component<
           </FormTitle>
         )}
         {this.transformSectionData().map((sec, index) => (
-          <DataSection key={index} {...sec} />
+          <ListView key={index} {...sec} />
         ))}
         <Action>{actionComponent}</Action>
       </ActionPageLight>
