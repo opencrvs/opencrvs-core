@@ -343,6 +343,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
               fields={this.group.fields}
               draftData={application.data}
               toggleFileUploading={this.toggleFileUploading}
+              requiredErrorMessage={
+                messages.correctionSummaryproofOfPaymentError
+              }
             />
           </Content>
         </ActionPageLight>

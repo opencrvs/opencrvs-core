@@ -15,7 +15,11 @@ import { DocumentPreview } from '@client/components/form/DocumentUploadfield/Doc
 import { IFormFieldValue, IAttachmentValue } from '@client/forms'
 import Jimp from 'jimp'
 import * as React from 'react'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
+import {
+  WrappedComponentProps as IntlShapeProps,
+  injectIntl,
+  MessageDescriptor
+} from 'react-intl'
 import styled from 'styled-components'
 import { DocumentListPreview } from './DocumentListPreview'
 import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
@@ -52,7 +56,9 @@ type IFullProps = {
   error?: string
   disableDeleteInPreview?: boolean
   onComplete: (files: IAttachmentValue | {}) => void
+  touched?: boolean
   toggleFileUploading?: (isUploading: boolean) => void
+  requiredErrorMessage?: MessageDescriptor
 } & IntlShapeProps
 
 type IState = {
@@ -133,16 +139,24 @@ class SimpleDocumentUploaderComponent extends React.Component<
   }
 
   render() {
-    const { label, intl, files, description, error, disableDeleteInPreview } =
-      this.props
-    const errorMessage = this.state.error || error || ''
+    const {
+      label,
+      intl,
+      files,
+      description,
+      error,
+      disableDeleteInPreview,
+      requiredErrorMessage,
+      touched
+    } = this.props
+    const errorMessage = requiredErrorMessage || this.state.error || error || ''
 
     return (
       <>
         {description && <FieldDescription>{description}</FieldDescription>}
         <ErrorMessage>
-          {errorMessage && (
-            <ErrorText id="field-error">{errorMessage}</ErrorText>
+          {errorMessage && touched && (
+            <ErrorText id="field-error">{errorMessage as string}</ErrorText>
           )}
         </ErrorMessage>
         {(!files || !files.data) && (

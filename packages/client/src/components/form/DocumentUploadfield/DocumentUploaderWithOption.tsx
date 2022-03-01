@@ -19,7 +19,11 @@ import { DocumentPreview } from '@client/components/form/DocumentUploadfield/Doc
 import { IFileValue, IFormFieldValue, IAttachmentValue } from '@client/forms'
 import { ALLOWED_IMAGE_TYPE, EMPTY_STRING } from '@client/utils/constants'
 import * as React from 'react'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
+import {
+  WrappedComponentProps as IntlShapeProps,
+  injectIntl,
+  MessageDescriptor
+} from 'react-intl'
 import styled from 'styled-components'
 import { DocumentListPreview } from './DocumentListPreview'
 import { remove, clone } from 'lodash'
@@ -80,7 +84,9 @@ type IFullProps = {
   files?: IFileValue[]
   hideOnEmptyOption?: boolean
   onComplete: (files: IFileValue[]) => void
+  touched?: boolean
   toggleFileUploading?: (isUploading: boolean) => void
+  requiredErrorMessage?: MessageDescriptor
 } & IntlShapeProps
 
 type DocumentFields = {
@@ -335,13 +341,15 @@ class DocumentUploaderWithOptionComp extends React.Component<
   }
 
   render() {
-    const { label, intl } = this.props
+    const { label, intl, requiredErrorMessage } = this.props
 
     return (
       <UploaderWrapper>
         <ErrorMessage id="upload-error">
           {this.state.errorMessage && (
-            <ErrorText>{this.state.errorMessage}</ErrorText>
+            <ErrorText>
+              {(requiredErrorMessage as string) || this.state.errorMessage}
+            </ErrorText>
           )}
         </ErrorMessage>
 

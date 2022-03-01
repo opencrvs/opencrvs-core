@@ -196,6 +196,8 @@ type GeneratedInputFieldProps = {
   draftData?: IFormData
   disabled?: boolean
   toggleFileUploading?: (isUploading: boolean) => void
+  requiredErrorMessage?: MessageDescriptor
+  setFieldTouched?: (name: string, isTouched?: boolean) => void
 } & IDispatchProps
 
 function GeneratedInputField({
@@ -212,7 +214,9 @@ function GeneratedInputField({
   draftData,
   disabled,
   dynamicDispatch,
-  toggleFileUploading
+  toggleFileUploading,
+  setFieldTouched,
+  requiredErrorMessage
 }: GeneratedInputFieldProps) {
   const inputFieldProps = {
     id: fieldDefinition.name,
@@ -266,6 +270,7 @@ function GeneratedInputField({
   if (fieldDefinition.type === DOCUMENT_UPLOADER_WITH_OPTION) {
     return (
       <DocumentUploaderWithOption
+        {...inputProps}
         name={fieldDefinition.name}
         label={fieldDefinition.label}
         options={fieldDefinition.options}
@@ -273,24 +278,31 @@ function GeneratedInputField({
         files={value as IFileValue[]}
         extraValue={fieldDefinition.extraValue || ''}
         hideOnEmptyOption={fieldDefinition.hideOnEmptyOption}
-        onComplete={(files: IFileValue[]) =>
+        onComplete={(files: IFileValue[]) => {
           onSetFieldValue(fieldDefinition.name, files)
-        }
+          setFieldTouched && setFieldTouched(fieldDefinition.name, true)
+        }}
         toggleFileUploading={toggleFileUploading}
+        requiredErrorMessage={requiredErrorMessage}
       />
     )
   }
   if (fieldDefinition.type === SIMPLE_DOCUMENT_UPLOADER) {
     return (
       <SimpleDocumentUploader
+        {...inputProps}
         name={fieldDefinition.name}
         label={fieldDefinition.label}
         description={fieldDefinition.description}
         allowedDocType={fieldDefinition.allowedDocType}
         files={value as IAttachmentValue}
         error={error}
-        onComplete={(file) => onSetFieldValue(fieldDefinition.name, file)}
+        onComplete={(file) => {
+          onSetFieldValue(fieldDefinition.name, file)
+          setFieldTouched && setFieldTouched(fieldDefinition.name, true)
+        }}
         toggleFileUploading={toggleFileUploading}
+        requiredErrorMessage={requiredErrorMessage}
       />
     )
   }
@@ -763,6 +775,7 @@ class FormSectionComponent extends React.Component<Props> {
       values,
       fields,
       setFieldValue,
+      setFieldTouched,
       touched,
       offlineCountryConfig,
       intl,
@@ -833,7 +846,6 @@ class FormSectionComponent extends React.Component<Props> {
               touched[`${field.name}-mm`] &&
               touched[`${field.name}-yyyy`]
           }
-
           const withDynamicallyGeneratedFields =
             field.type === SELECT_WITH_DYNAMIC_OPTIONS
               ? ({
@@ -996,6 +1008,7 @@ class FormSectionComponent extends React.Component<Props> {
                               name: nestedFieldName
                             })}
                             onSetFieldValue={setFieldValue}
+                            setFieldTouched={setFieldTouched}
                             resetDependentSelectValues={
                               this.resetDependentSelectValues
                             }
@@ -1004,6 +1017,7 @@ class FormSectionComponent extends React.Component<Props> {
                             error={nestedError}
                             draftData={draftData}
                             dynamicDispatch={dynamicDispatch}
+                            toggleFileUploading={this.props.toggleFileUploading}
                           />
                         )}
                       </FastField>
