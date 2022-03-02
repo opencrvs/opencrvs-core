@@ -209,7 +209,8 @@ function getDataLoadingCommands() {
     LOCATIONS_CMD,
     PILOT_LOCATIONS_CMD,
     DEFINITIONS_CMD,
-    ASSETS_CMD
+    ASSETS_CMD,
+    CONFIG_CMD
   ])
 }
 
@@ -284,7 +285,15 @@ function reducer(
       }
       return loop(state, dataLoadingCmds)
     }
-
+    case actions.UPDATE_OFFLINE_CONFIG: {
+      return loop(
+        { ...state },
+        Cmd.list([
+          CONFIG_CMD,
+          Cmd.run(saveOfflineData, { args: [state.offlineData] })
+        ])
+      )
+    }
     /*
      * Configurations
      */

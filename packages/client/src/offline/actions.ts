@@ -226,6 +226,11 @@ export const refreshOfflineData = () => ({
   type: REFRESH_OFFLINE_DATA
 })
 
+export const UPDATE_OFFLINE_CONFIG = 'OFFLINE/UPDATE_OFFLINE_CONFIG' as const
+export const updateOfflineConfigData = () => ({
+  type: UPDATE_OFFLINE_CONFIG
+})
+
 export type Action =
   | GetLocations
   | LocationsFailedAction
@@ -247,3 +252,4 @@ export type Action =
   | ReturnType<typeof offlineDataReady>
   | ReturnType<typeof offlineDataUpdated>
   | ReturnType<typeof refreshOfflineData>
+  | ReturnType<typeof updateOfflineConfigData>

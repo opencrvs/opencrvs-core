@@ -14,11 +14,8 @@ import {
   NOTIFICATION_TYPE,
   ResponsiveModal
 } from '@opencrvs/components/lib/interface'
-import { IStoreState } from '@opencrvs/client/src/store'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/config'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { IUserDetails } from '@client/utils/userUtils'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -28,6 +25,7 @@ import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { Alert } from '@opencrvs/components/lib/icons/Alert'
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/mutations'
+import { updateOfflineConfigData } from '@client/offline/actions'
 
 const Message = styled.div`
   margin-bottom: 16px;
@@ -85,12 +83,16 @@ type State = {
   errorMessages: string
 }
 interface IProps {
-  userDetails: IUserDetails | null
   changeModalName: string
   hideModal: () => void
   valueChanged: (notificationStatus: string, messages: string) => void
 }
-type IFullProps = IProps & IntlShapeProps
+
+type DispatchProps = {
+  updateConfig: () => void
+}
+
+type IFullProps = IProps & IntlShapeProps & DispatchProps
 
 function isApplicationName(
   modalName: string,
@@ -124,13 +126,12 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
     valueChanged: (notificationStatus: string, messages: string) => void
   ) {
     if (isApplicationName(modalName, value)) {
-      const res = this.callUpdateApplicationNameMutation(value.applicatioName)
       valueChanged(NOTIFICATION_TYPE.IN_PROGRESS, '')
-      res
+      this.callUpdateApplicationNameMutation(value.applicatioName)
         .then(() => {
           valueChanged(NOTIFICATION_TYPE.SUCCESS, '')
         })
-        .catch((error) => {
+        .catch(() => {
           valueChanged(NOTIFICATION_TYPE.ERROR, this.state.errorMessages)
         })
     }
@@ -144,6 +145,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
       )
       if (res && res.data) {
         this.setState({ updatingValue: false })
+        this.props.updateConfig()
       }
     } catch (err) {
       this.setState({
@@ -215,11 +217,6 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
   }
 }
 
-const mapStateToProps = (state: IStoreState) => {
-  return {
-    userDetails: getUserDetails(state)
-  }
-}
-export const DynamicModal = connect(mapStateToProps)(
-  injectIntl(DynamicModalComponent)
-)
+export const DynamicModal = connect(null, {
+  updateConfig: updateOfflineConfigData
+})(injectIntl(DynamicModalComponent))
