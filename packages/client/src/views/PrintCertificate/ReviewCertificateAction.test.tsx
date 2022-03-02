@@ -68,78 +68,6 @@ describe('when user wants to review death certificate', () => {
   })
 })
 
-describe('when user wants to review birth certificate', () => {
-  let component: ReactWrapper<{}, {}>
-
-  beforeEach(async () => {
-    const { history, location, match } = createRouterProps(
-      '/',
-      { isNavigatedInsideApp: false },
-      {
-        matchParams: {
-          registrationId: 'asdhdqe2472487jsdfsdf',
-          eventType: Event.BIRTH
-        }
-      }
-    )
-    const { store } = createStore(history)
-
-    const mockBirthApplicationData = cloneDeep(mockApplicationData)
-    mockBirthApplicationData.registration.certificates[0] = {
-      collector: {
-        type: 'PRINT_IN_ADVANCE'
-      }
-    }
-    await loginAsFieldAgent(store)
-    await store.dispatch(
-      storeApplication({
-        id: 'asdhdqe2472487jsdfsdf',
-        data: mockBirthApplicationData,
-        event: Event.BIRTH
-      } as IApplication)
-    )
-
-    component = await createTestComponent(
-      <ReviewCertificateAction
-        location={location}
-        history={history}
-        match={match}
-      />,
-      { store, history }
-    )
-  })
-
-  it('displays have the Continue and print Button', () => {
-    const confirmBtnExist = !!component.find('#confirm-print').hostNodes()
-      .length
-    expect(confirmBtnExist).toBe(true)
-  })
-
-  it('shows the Confirm Print Modal', () => {
-    const confirmBtn = component.find('#confirm-print').hostNodes()
-    confirmBtn.simulate('click')
-    component.update()
-    const modalIsDisplayed = !!component
-      .find('#confirm-print-modal')
-      .hostNodes().length
-    expect(modalIsDisplayed).toBe(true)
-  })
-
-  it('closes the modal on clicking the print the button', async () => {
-    const confirmBtn = await waitForElement(component, '#confirm-print')
-    confirmBtn.hostNodes().simulate('click')
-    component.update()
-
-    component.find('#print-certificate').hostNodes().simulate('click')
-    component.update()
-
-    const modalIsClosed = !!component.find('#confirm-print-modal').hostNodes()
-      .length
-
-    expect(modalIsClosed).toBe(false)
-  })
-})
-
 describe('back button behavior tests of review certificate action', () => {
   let component: ReactWrapper
 
@@ -219,5 +147,77 @@ describe('back button behavior tests of review certificate action', () => {
     component.find('#action_page_back_button').hostNodes().simulate('click')
     await flushPromises()
     expect(history.location.pathname).toBe('/registration-home/print/')
+  })
+})
+
+describe('when user wants to review birth certificate', () => {
+  let component: ReactWrapper<{}, {}>
+
+  beforeEach(async () => {
+    const { history, location, match } = createRouterProps(
+      '/',
+      { isNavigatedInsideApp: false },
+      {
+        matchParams: {
+          registrationId: 'asdhdqe2472487jsdfsdf',
+          eventType: Event.BIRTH
+        }
+      }
+    )
+    const { store } = createStore(history)
+
+    const mockBirthApplicationData = cloneDeep(mockApplicationData)
+    mockBirthApplicationData.registration.certificates[0] = {
+      collector: {
+        type: 'PRINT_IN_ADVANCE'
+      }
+    }
+    await loginAsFieldAgent(store)
+    await store.dispatch(
+      storeApplication({
+        id: 'asdhdqe2472487jsdfsdf',
+        data: mockBirthApplicationData,
+        event: Event.BIRTH
+      } as IApplication)
+    )
+
+    component = await createTestComponent(
+      <ReviewCertificateAction
+        location={location}
+        history={history}
+        match={match}
+      />,
+      { store, history }
+    )
+  })
+
+  it('displays have the Continue and print Button', () => {
+    const confirmBtnExist = !!component.find('#confirm-print').hostNodes()
+      .length
+    expect(confirmBtnExist).toBe(true)
+  })
+
+  it('shows the Confirm Print Modal', () => {
+    const confirmBtn = component.find('#confirm-print').hostNodes()
+    confirmBtn.simulate('click')
+    component.update()
+    const modalIsDisplayed = !!component
+      .find('#confirm-print-modal')
+      .hostNodes().length
+    expect(modalIsDisplayed).toBe(true)
+  })
+
+  it('closes the modal on clicking the print the button', async () => {
+    const confirmBtn = await waitForElement(component, '#confirm-print')
+    confirmBtn.hostNodes().simulate('click')
+    component.update()
+
+    component.find('#print-certificate').hostNodes().simulate('click')
+    component.update()
+
+    const modalIsClosed = !!component.find('#confirm-print-modal').hostNodes()
+      .length
+
+    expect(modalIsClosed).toBe(false)
   })
 })
