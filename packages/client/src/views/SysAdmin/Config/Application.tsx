@@ -14,7 +14,6 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import * as React from 'react'
 import {
-  FormattedMessage,
   injectIntl,
   IntlShape,
   WrappedComponentProps as IntlShapeProps
@@ -25,13 +24,15 @@ import { IUserDetails } from '@client/utils/userUtils'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import {
   DataSection,
-  FloatingNotification
+  FloatingNotification,
+  NOTIFICATION_TYPE
 } from '@opencrvs/components/lib/interface'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import { messages } from '@client/i18n/messages/views/config'
 import moment from 'moment'
 import { buttonMessages } from '@client/i18n/messages'
 import { DynamicModal } from '@client/views/SysAdmin/Config/DynamicModal'
+import { EMPTY_STRING } from '@client/utils/constants'
 
 type Props = IntlShapeProps & {
   userDetails: IUserDetails | null
@@ -41,6 +42,9 @@ type Props = IntlShapeProps & {
 interface State {
   activeTabId: string
   changeModalName: string
+  showNotification: boolean
+  notificationStatus: NOTIFICATION_TYPE
+  notificationMessages: string
 }
 
 export enum TabId {
@@ -316,13 +320,20 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
     super(props)
     this.state = {
       activeTabId: TabId.GENERAL,
-      changeModalName: ''
+      changeModalName: EMPTY_STRING,
+      showNotification: false,
+      notificationStatus: NOTIFICATION_TYPE.IN_PROGRESS,
+      notificationMessages: EMPTY_STRING
     }
   }
 
-  changeValue = (notificationStatus: string, messages: string) => {
+  changeValue = (notificationStatus: NOTIFICATION_TYPE, messages: string) => {
     this.hideModal()
-    // this.toggleSuccessNotification(NOTIFICATION_SUBJECT.PASSWORD)
+    this.setState({
+      showNotification: true,
+      notificationStatus: notificationStatus,
+      notificationMessages: messages
+    })
   }
 
   changeTab(id: string) {
@@ -392,11 +403,20 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
           <DynamicModal
             hideModal={this.hideModal}
             changeModalName={this.state.changeModalName}
+            showNotification={this.state.showNotification}
             valueChanged={this.changeValue}
           />
         )}
-        {/* <FloatingNotification
-        </FloatingNotification> */}
+        <FloatingNotification
+          id="print-cert-notification"
+          type={this.state.notificationStatus}
+          show={this.state.showNotification}
+          callback={() => {
+            this.setState({ showNotification: false })
+          }}
+        >
+          {this.state.notificationMessages}
+        </FloatingNotification>
       </SysAdminContentWrapper>
     )
   }

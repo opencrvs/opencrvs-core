@@ -84,8 +84,12 @@ type State = {
 }
 interface IProps {
   changeModalName: string
+  showNotification: boolean
   hideModal: () => void
-  valueChanged: (notificationStatus: string, messages: string) => void
+  valueChanged: (
+    notificationStatus: NOTIFICATION_TYPE,
+    messages: string
+  ) => void
 }
 
 type DispatchProps = {
@@ -123,16 +127,26 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
   mutationHandler(
     modalName: string,
     value: IApplicationName,
-    valueChanged: (notificationStatus: string, messages: string) => void
+    valueChanged: (
+      notificationStatus: NOTIFICATION_TYPE,
+      messages: string
+    ) => void
   ) {
     if (isApplicationName(modalName, value)) {
-      valueChanged(NOTIFICATION_TYPE.IN_PROGRESS, '')
       this.callUpdateApplicationNameMutation(value.applicatioName)
         .then(() => {
-          valueChanged(NOTIFICATION_TYPE.SUCCESS, '')
+          valueChanged(
+            NOTIFICATION_TYPE.SUCCESS,
+            this.props.intl.formatMessage(
+              messages.applicationNameChangeNotification
+            )
+          )
         })
         .catch(() => {
-          valueChanged(NOTIFICATION_TYPE.ERROR, this.state.errorMessages)
+          valueChanged(
+            NOTIFICATION_TYPE.ERROR,
+            this.props.intl.formatMessage(messages.applicationNameChangeError)
+          )
         })
     }
   }

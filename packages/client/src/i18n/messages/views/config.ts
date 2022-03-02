@@ -46,6 +46,7 @@ interface IConfigMessages
   deathTabTitle: MessageDescriptor
   phoneNumberPatternLabel: MessageDescriptor
   phoneNumberExampleLabel: MessageDescriptor
+  applicationNameChangeNotification: MessageDescriptor
 }
 
 const messagesToDefine: IConfigMessages = {
@@ -251,6 +252,11 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.phoneNumberExampleLabel',
     defaultMessage: 'example: {example}',
     description: 'Label for phone number example config'
+  },
+  applicationNameChangeNotification: {
+    id: 'config.application.applicationNameChangeNotification',
+    defaultMessage: 'Name of application updated',
+    description: 'Application name change notification messages'
   }
 }
 
