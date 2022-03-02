@@ -106,7 +106,7 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
     })
   }
 
-  const toggleFileUploading = (isUploading: boolean) => {
+  const onUploadingStateChanged = (isUploading: boolean) => {
     setIsFileUploading(isUploading)
   }
 
@@ -145,7 +145,7 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
             setAllFieldsDirty={false}
             fields={group.fields}
             draftData={application.data}
-            toggleFileUploading={toggleFileUploading}
+            onUploadingStateChanged={onUploadingStateChanged}
           />
         </Content>
       </ActionPageLight>

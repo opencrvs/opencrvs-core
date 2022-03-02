@@ -105,7 +105,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
     }
   }
 
-  toggleFileUploading = (isUploading: boolean) => {
+  onUploadingStateChanged = (isUploading: boolean) => {
     this.setState({
       ...this.state,
       fileUploading: isUploading
@@ -169,7 +169,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
               this.setAllFormFieldsTouched = setTouchedFunc
             }}
             requiredErrorMessage={messages.requiredForNewUser}
-            toggleFileUploading={this.toggleFileUploading}
+            onUploadingStateChanged={this.onUploadingStateChanged}
           />
           <Action>
             <PrimaryButton

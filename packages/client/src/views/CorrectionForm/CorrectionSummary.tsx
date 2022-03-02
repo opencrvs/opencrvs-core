@@ -141,7 +141,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
     }
   }
 
-  toggleFileUploading = (isUploading: boolean) => {
+  onUploadingStateChanged = (isUploading: boolean) => {
     this.setState({
       ...this.state,
       isFileUploading: isUploading
@@ -342,7 +342,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
               setAllFieldsDirty={false}
               fields={this.group.fields}
               draftData={application.data}
-              toggleFileUploading={this.toggleFileUploading}
+              onUploadingStateChanged={this.onUploadingStateChanged}
               requiredErrorMessage={
                 messages.correctionSummaryproofOfPaymentError
               }

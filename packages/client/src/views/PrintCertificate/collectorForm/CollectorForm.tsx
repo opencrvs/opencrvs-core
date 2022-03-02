@@ -188,7 +188,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     }
   }
 
-  toggleFileUploading = (isUploading: boolean) => {
+  onUploadingStateChanged = (isUploading: boolean) => {
     this.setState({
       ...this.state,
       isFileUploading: isUploading
@@ -429,7 +429,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
             setAllFieldsDirty={false}
             fields={formGroup.fields}
             draftData={applicationToBeCertified.data}
-            toggleFileUploading={this.toggleFileUploading}
+            onUploadingStateChanged={this.onUploadingStateChanged}
           />
           <PrimaryButton
             id="confirm_form"

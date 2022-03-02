@@ -195,7 +195,7 @@ type GeneratedInputFieldProps = {
   error: string
   draftData?: IFormData
   disabled?: boolean
-  toggleFileUploading?: (isUploading: boolean) => void
+  onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
   setFieldTouched?: (name: string, isTouched?: boolean) => void
 } & IDispatchProps
@@ -214,7 +214,7 @@ function GeneratedInputField({
   draftData,
   disabled,
   dynamicDispatch,
-  toggleFileUploading,
+  onUploadingStateChanged,
   setFieldTouched,
   requiredErrorMessage
 }: GeneratedInputFieldProps) {
@@ -282,7 +282,7 @@ function GeneratedInputField({
           onSetFieldValue(fieldDefinition.name, files)
           setFieldTouched && setFieldTouched(fieldDefinition.name, true)
         }}
-        toggleFileUploading={toggleFileUploading}
+        onUploadingStateChanged={onUploadingStateChanged}
         requiredErrorMessage={requiredErrorMessage}
       />
     )
@@ -301,7 +301,7 @@ function GeneratedInputField({
           onSetFieldValue(fieldDefinition.name, file)
           setFieldTouched && setFieldTouched(fieldDefinition.name, true)
         }}
-        toggleFileUploading={toggleFileUploading}
+        onUploadingStateChanged={onUploadingStateChanged}
         requiredErrorMessage={requiredErrorMessage}
       />
     )
@@ -634,7 +634,7 @@ interface IFormSectionProps {
   draftData?: IFormData
   onSetTouched?: (func: ISetTouchedFunction) => void
   requiredErrorMessage?: MessageDescriptor
-  toggleFileUploading?: (isUploading: boolean) => void
+  onUploadingStateChanged?: (isUploading: boolean) => void
 }
 
 interface IStateProps {
@@ -1017,7 +1017,9 @@ class FormSectionComponent extends React.Component<Props> {
                             error={nestedError}
                             draftData={draftData}
                             dynamicDispatch={dynamicDispatch}
-                            toggleFileUploading={this.props.toggleFileUploading}
+                            onUploadingStateChanged={
+                              this.props.onUploadingStateChanged
+                            }
                           />
                         )}
                       </FastField>
@@ -1081,7 +1083,9 @@ class FormSectionComponent extends React.Component<Props> {
                       draftData={draftData}
                       dynamicDispatch={dynamicDispatch}
                       disabled={isFieldDisabled}
-                      toggleFileUploading={this.props.toggleFileUploading}
+                      onUploadingStateChanged={
+                        this.props.onUploadingStateChanged
+                      }
                     />
                   )}
                 </FastField>

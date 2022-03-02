@@ -57,7 +57,7 @@ type IFullProps = {
   disableDeleteInPreview?: boolean
   onComplete: (files: IAttachmentValue | {}) => void
   touched?: boolean
-  toggleFileUploading?: (isUploading: boolean) => void
+  onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
 } & IntlShapeProps
 
@@ -84,7 +84,8 @@ class SimpleDocumentUploaderComponent extends React.Component<
     }
     const allowedDocType = this.props.allowedDocType
 
-    this.props.toggleFileUploading && this.props.toggleFileUploading(true)
+    this.props.onUploadingStateChanged &&
+      this.props.onUploadingStateChanged(true)
 
     getBase64String(uploadedImage).then((data) => {
       let base64String = data as string
@@ -101,8 +102,8 @@ class SimpleDocumentUploaderComponent extends React.Component<
           return data as string
         })
         .then((buffer) => {
-          this.props.toggleFileUploading &&
-            this.props.toggleFileUploading(false)
+          this.props.onUploadingStateChanged &&
+            this.props.onUploadingStateChanged(false)
           this.props.onComplete({
             type: uploadedImage.type,
             data: buffer
@@ -112,8 +113,8 @@ class SimpleDocumentUploaderComponent extends React.Component<
           })
         })
         .catch(() => {
-          this.props.toggleFileUploading &&
-            this.props.toggleFileUploading(false)
+          this.props.onUploadingStateChanged &&
+            this.props.onUploadingStateChanged(false)
           allowedDocType &&
             allowedDocType.length > 0 &&
             this.setState({

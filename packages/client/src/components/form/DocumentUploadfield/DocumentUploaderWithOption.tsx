@@ -85,7 +85,7 @@ type IFullProps = {
   hideOnEmptyOption?: boolean
   onComplete: (files: IFileValue[]) => void
   touched?: boolean
-  toggleFileUploading?: (isUploading: boolean) => void
+  onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
 } & IntlShapeProps
 
@@ -210,7 +210,8 @@ class DocumentUploaderWithOptionComp extends React.Component<
       ]
     }))
 
-    this.props.toggleFileUploading && this.props.toggleFileUploading(true)
+    this.props.onUploadingStateChanged &&
+      this.props.onUploadingStateChanged(true)
 
     const minimumProcessingTime = new Promise<void>((resolve) =>
       setTimeout(resolve, 2000)
@@ -266,7 +267,8 @@ class DocumentUploaderWithOptionComp extends React.Component<
         }
       },
       () => {
-        this.props.toggleFileUploading && this.props.toggleFileUploading(false)
+        this.props.onUploadingStateChanged &&
+          this.props.onUploadingStateChanged(false)
         this.props.onComplete(this.state.uploadedDocuments)
       }
     )

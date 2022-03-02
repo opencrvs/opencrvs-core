@@ -273,7 +273,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
   }
 
-  toggleFileUploading = (isUploading: boolean) => {
+  onUploadingStateChanged = (isUploading: boolean) => {
     this.setState({
       ...this.state,
       isFileUploading: isUploading
@@ -751,7 +751,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
                             onSetTouched={(setTouchedFunc) => {
                               this.setAllFormFieldsTouched = setTouchedFunc
                             }}
-                            toggleFileUploading={this.toggleFileUploading}
+                            onUploadingStateChanged={
+                              this.onUploadingStateChanged
+                            }
                           />
                         </form>
                         {nextSectionGroup && (
