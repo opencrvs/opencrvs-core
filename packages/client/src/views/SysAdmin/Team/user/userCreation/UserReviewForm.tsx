@@ -20,7 +20,7 @@ import {
   LOCATION_SEARCH_INPUT,
   SIMPLE_DOCUMENT_UPLOADER
 } from '@client/forms'
-import { createOrUpdateUserMutation } from '@client/forms/user/fieldDefinitions/mutation/mutations'
+import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
 import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
 import {
   buttonMessages as messages,

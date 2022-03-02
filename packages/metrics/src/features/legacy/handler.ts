@@ -108,10 +108,8 @@ export async function generateLegacyMetricsHandler(
   }
   const searchResults: ISearchResult[] = result.body.hits.hits
   for (const searchResult of searchResults) {
-    const points: IApplicationsStartedPoints = await generateApplicationStartedPoint(
-      searchResult,
-      authHeader
-    )
+    const points: IApplicationsStartedPoints =
+      await generateApplicationStartedPoint(searchResult, authHeader)
     totalPoints.push(points)
   }
   await writePoints(totalPoints)
@@ -250,8 +248,9 @@ async function generateEventDurationPoint(
             measurement: 'application_event_duration',
             tags,
             fields,
-            timestamp: `${parseInt(searchResult._source.createdAt, 10) *
-              1000000}`
+            timestamp: `${
+              parseInt(searchResult._source.createdAt, 10) * 1000000
+            }`
           }
         })) ||
     []
