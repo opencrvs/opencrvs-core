@@ -216,7 +216,7 @@ class Outbox extends React.Component<IFullProps, IState> {
               ),
               width: 35,
               key: 'submissionStatus',
-              color: getTheme(getDefaultLanguage()).colors.secondaryCopy
+              color: getTheme(getDefaultLanguage()).colors.supportingCopy
             },
             {
               label: '',

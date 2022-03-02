@@ -224,7 +224,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           label: this.props.intl.formatMessage(messages.trackingId),
           width: 25,
           key: 'submissionStatus',
-          color: getTheme(getDefaultLanguage()).colors.secondaryCopy
+          color: getTheme(getDefaultLanguage()).colors.supportingCopy
         },
         {
           label: this.props.intl.formatMessage(messages.submissionStatus),
