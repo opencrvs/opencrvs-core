@@ -257,6 +257,23 @@ export async function markBundleAsCertified(
   return bundle
 }
 
+export async function touchBundle(
+  bundle: fhir.Bundle,
+  token: string
+): Promise<fhir.Bundle> {
+  const taskResource = getTaskResource(bundle) as fhir.Task
+
+  const practitioner = await getLoggedInPractitionerResource(token)
+
+  /* setting lastRegLocation here */
+  await setupLastRegLocation(taskResource, practitioner)
+
+  /* setting lastRegUser here */
+  setupLastRegUser(taskResource, practitioner)
+
+  return bundle
+}
+
 export function setTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
   let trackingId: string
   let trackingIdFhirName: string

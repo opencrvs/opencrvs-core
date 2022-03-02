@@ -27,7 +27,8 @@ import {
   createApplication,
   storeApplication,
   IApplication,
-  SUBMISSION_STATUS
+  SUBMISSION_STATUS,
+  DOWNLOAD_STATUS
 } from '@client/applications'
 import { Event } from '@client/forms'
 import { formatUrl } from '@client/navigation'
@@ -236,6 +237,7 @@ describe('Record audit for a draft declaration', () => {
     await flushPromises()
 
     declaration.submissionStatus = SUBMISSION_STATUS.DECLARED
+    declaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
     store.dispatch(storeApplication(declaration))
 
     component = await createTestComponent(

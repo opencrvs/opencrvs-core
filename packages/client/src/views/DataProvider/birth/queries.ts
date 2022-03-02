@@ -179,6 +179,31 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         }
       }
       presentAtBirthRegistration
+      history {
+        date
+        action
+        location {
+          id
+          name
+        }
+        office {
+          id
+          name
+        }
+        user {
+          type
+          role
+          name {
+            firstNames
+            familyName
+            use
+          }
+          avatar {
+            data
+            type
+          }
+        }
+      }
     }
   }
 `
@@ -354,6 +379,31 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         }
       }
       presentAtBirthRegistration
+      history {
+        date
+        action
+        location {
+          id
+          name
+        }
+        office {
+          id
+          name
+        }
+        user {
+          type
+          role
+          name {
+            firstNames
+            familyName
+            use
+          }
+          avatar {
+            data
+            type
+          }
+        }
+      }
     }
   }
 `

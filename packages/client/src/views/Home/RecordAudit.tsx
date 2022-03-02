@@ -12,29 +12,35 @@
 
 import React from 'react'
 import { Header } from '@client/components/interface/Header/Header'
+import { TableView } from '@opencrvs/components/lib/interface/TableView'
 import {
   Content,
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
 import { Navigation } from '@client/components/interface/Navigation'
+import { AvatarSmall } from '@client/components/Avatar'
 import styled from '@client/styledComponents'
 import { Archive, ApplicationIcon, Edit } from '@opencrvs/components/lib/icons'
 import { connect } from 'react-redux'
 import { RouteComponentProps, Redirect } from 'react-router'
 import {
-  injectIntl,
-  WrappedComponentProps as IntlShapeProps,
-  IntlShape
-} from 'react-intl'
-import {
+  goToRegistrarHomeTab,
+  goToPage,
   goToCertificateCorrection,
-  goToRegistrarHomeTab
+  goToPrintCertificate
 } from '@client/navigation'
+import {
+  injectIntl,
+  IntlShape,
+  WrappedComponentProps as IntlShapeProps,
+  MessageDescriptor
+} from 'react-intl'
 import {
   archiveDeclaration,
   clearCorrectionChange,
   IApplication,
-  SUBMISSION_STATUS
+  SUBMISSION_STATUS,
+  DOWNLOAD_STATUS
 } from '@client/applications'
 import { IStoreState } from '@client/store'
 import {
@@ -50,29 +56,48 @@ import { ResponsiveModal, Loader } from '@opencrvs/components/lib/interface'
 import { getScope } from '@client/profile/profileSelectors'
 import { Scope } from '@client/utils/authUtils'
 import {
+  LinkButton,
+  PrimaryButton,
   TertiaryButton,
   ICON_ALIGNMENT,
   DangerButton
 } from '@opencrvs/components/lib/buttons'
-import { buttonMessages } from '@client/i18n/messages/buttons'
 import {
   ARCHIVED,
   DECLARED,
   VALIDATED,
   REJECTED
 } from '@client/utils/constants'
-import { IQueryData } from '@client/views/OfficeHome/OfficeHome'
+import { IQueryData, EVENT_STATUS } from '@client/views/OfficeHome/OfficeHome'
+import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { generateLocationName } from '@client/utils/locationUtils'
 import { Query } from '@client/components/Query'
 import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/Home/queries'
-import { HOME } from '@client/navigation/routes'
+import {
+  HOME,
+  DRAFT_BIRTH_PARENT_FORM_PAGE,
+  DRAFT_DEATH_FORM_PAGE,
+  REVIEW_EVENT_PARENT_FORM_PAGE
+} from '@client/navigation/routes'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import {
   IFormSectionData,
   IContactPoint,
-  CorrectionSection
+  CorrectionSection,
+  Action
 } from '@client/forms'
+import {
+  constantsMessages,
+  userMessages,
+  buttonMessages
+} from '@client/i18n/messages'
+import { getLanguage } from '@client/i18n/selectors'
+import {
+  getIndividualNameObj,
+  IAvatar,
+  IUserDetails
+} from '@client/utils/userUtils'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 
 const BodyContainer = styled.div`
@@ -82,6 +107,10 @@ const BodyContainer = styled.div`
     margin-left: 265px;
     margin-top: 28px;
   }
+`
+
+const StyledTertiaryButton = styled(TertiaryButton)`
+  align-self: center;
 `
 
 const InfoContainer = styled.div`
@@ -108,14 +137,37 @@ const GreyedInfo = styled.div`
   max-width: 330px;
 `
 
-export type IRecordAuditTabs = keyof IQueryData | 'search'
+const LargeGreyedInfo = styled.div`
+  height: 231px;
+  background-color: ${({ theme }) => theme.colors.greyInfo};
+  max-width: 100%;
+  border-radius: 4px;
+  margin: 15px 0px;
+`
+
+const ReviewButton = styled(PrimaryButton)`
+  height: 40px;
+`
+
+const NameAvatar = styled.span`
+  display: flex;
+  align-items: center;
+  img {
+    margin-right: 10px;
+  }
+`
+
+const Heading = styled.h4`
+  margin-bottom: 0px !important;
+`
 
 interface IStateProps {
-  declarationId: string
-  draft: IApplication | null
+  userDetails: IUserDetails | null
   language: string
   resources: IOfflineData
   scope: Scope | null
+  declarationId: string
+  draft: IApplication | null
   tab: IRecordAuditTabs
   workqueueDeclaration: GQLEventSearchSet | null
 }
@@ -124,7 +176,19 @@ interface IDispatchProps {
   archiveDeclaration: typeof archiveDeclaration
   clearCorrectionChange: typeof clearCorrectionChange
   goToCertificateCorrection: typeof goToCertificateCorrection
+  goToPage: typeof goToPage
+  goToPrintCertificate: typeof goToPrintCertificate
   goToRegistrarHomeTab: typeof goToRegistrarHomeTab
+}
+export type IRecordAuditTabs = keyof IQueryData | 'search'
+
+type CMethodParams = {
+  declaration: IDeclarationData
+  intl: IntlShape
+  userDetails: IUserDetails | null
+  draft: IApplication | null
+  goToPage?: typeof goToPage
+  goToPrintCertificate?: typeof goToPrintCertificate
 }
 
 type RouteProps = RouteComponentProps<{
@@ -142,6 +206,9 @@ interface ILabel {
   [key: string]: string | undefined
 }
 
+interface IStatus {
+  [key: string]: MessageDescriptor
+}
 interface IDeclarationData {
   id: string
   name?: string
@@ -180,6 +247,64 @@ const STATUSTOCOLOR: { [key: string]: string } = {
 }
 
 const ARCHIVABLE_STATUSES = [DECLARED, VALIDATED, REJECTED]
+
+const APPLICATION_STATUS_LABEL: IStatus = {
+  IN_PROGRESS: {
+    defaultMessage: 'In progress',
+    description: 'The title of In progress',
+    id: 'regHome.inProgress'
+  },
+  DECLARED: {
+    defaultMessage: 'Application started',
+    description: 'Label for table header column Application started',
+    id: 'constants.applicationStarted'
+  },
+  WAITING_VALIDATION: {
+    defaultMessage: 'Waiting for validation',
+    description: 'A label for waitingValidated',
+    id: 'constants.waitingValidated'
+  },
+  VALIDATED: {
+    id: 'constants.validated',
+    defaultMessage: 'Validated',
+    description: 'A label for validated'
+  },
+  REGISTERED: {
+    defaultMessage: 'Application registered',
+    description: 'Label for date of registration in work queue list item',
+    id: 'regHome.table.label.registeredDate'
+  },
+  CERTIFIED: {
+    defaultMessage: 'Certified',
+    description: 'Label for registration status certified',
+    id: 'regHome.certified'
+  },
+  REJECTED: {
+    id: 'constants.rejected',
+    defaultMessage: 'Rejected',
+    description: 'A label for rejected'
+  },
+  DOWNLOADED: {
+    defaultMessage: 'Downloaded',
+    description: 'Label for application download status Downloaded',
+    id: 'constants.downloaded'
+  },
+  REQUESTED_CORRECTION: {
+    id: 'correction.request',
+    defaultMessage: 'Requested correction',
+    description: 'Status for application being requested for correction'
+  },
+  DECLARATION_UPDATED: {
+    defaultMessage: 'Updated',
+    description: 'Application has been updated',
+    id: 'constants.updated'
+  },
+  ARCHIVE_DECLARATION: {
+    defaultMessage: 'Archived',
+    description: 'Application has been archived',
+    id: 'constants.archived_declaration'
+  }
+}
 
 const getCaptitalizedWord = (word: string | undefined): string => {
   if (!word) return ''
@@ -281,9 +406,8 @@ const getDraftDeclarationData = (
     placeOfBirth: getLocation(declaration, resources, intl) || '',
     placeOfDeath: getLocation(declaration, resources, intl) || '',
     informant:
-      (
-        declaration.data?.registration?.contactPoint as IFormSectionData
-      )?.value.toString() || '',
+      ((declaration.data?.registration?.contactPoint as IFormSectionData)
+        ?.value as string) || '',
     informantContact:
       (
         (declaration.data?.registration?.contactPoint as IFormSectionData)
@@ -426,20 +550,303 @@ const getDeclarationInfo = (
   )
 }
 
+const showReviewButton = ({
+  declaration,
+  intl,
+  userDetails,
+  draft,
+  goToPage
+}: CMethodParams) => {
+  const { id, type } = declaration || {}
+
+  const isDownloaded = draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED
+
+  if (!userDetails || !userDetails.role || !type || !isDownloaded) return <></>
+  const { role } = userDetails
+
+  const reviewButtonRoleStatusMap: { [key: string]: string[] } = {
+    FIELD_AGENT: [EVENT_STATUS.REJECTED],
+    REGISTRATION_AGENT: [EVENT_STATUS.DECLARED],
+    DISTRICT_REGISTRAR: [EVENT_STATUS.VALIDATED, EVENT_STATUS.DECLARED],
+    LOCAL_REGISTRAR: [EVENT_STATUS.VALIDATED, EVENT_STATUS.DECLARED]
+  }
+
+  if (reviewButtonRoleStatusMap[role].includes(declaration?.status as string))
+    return (
+      <ReviewButton
+        key={id}
+        id={`review-btn-${id}`}
+        onClick={() => {
+          goToPage &&
+            goToPage(REVIEW_EVENT_PARENT_FORM_PAGE, id, 'review', type)
+        }}
+      >
+        {intl.formatMessage(constantsMessages.review)}
+      </ReviewButton>
+    )
+  return <></>
+}
+
+const shouldShowUpdateButton = ({
+  declaration,
+  intl,
+  userDetails,
+  draft,
+  goToPage
+}: CMethodParams) => {
+  const { id, type } = declaration || {}
+
+  const isDownloaded =
+    draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
+    draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
+
+  if (!userDetails || !userDetails.role || !type || !isDownloaded) return <></>
+  const { role } = userDetails
+
+  const reviewButtonRoleStatusMap: { [key: string]: string[] } = {
+    FIELD_AGENT: [SUBMISSION_STATUS.DRAFT],
+    REGISTRATION_AGENT: [SUBMISSION_STATUS.DRAFT, EVENT_STATUS.REJECTED],
+    DISTRICT_REGISTRAR: [SUBMISSION_STATUS.DRAFT, EVENT_STATUS.REJECTED],
+    LOCAL_REGISTRAR: [SUBMISSION_STATUS.DRAFT, EVENT_STATUS.REJECTED]
+  }
+
+  if (reviewButtonRoleStatusMap[role].includes(declaration?.status as string)) {
+    let PAGE_ROUTE: string, PAGE_ID: string
+
+    if (declaration?.status === SUBMISSION_STATUS.DRAFT) {
+      PAGE_ID = 'preview'
+      if (type.toString() === 'birth') {
+        PAGE_ROUTE = DRAFT_BIRTH_PARENT_FORM_PAGE
+      } else if (type.toString() === 'death') {
+        PAGE_ROUTE = DRAFT_DEATH_FORM_PAGE
+      }
+    } else {
+      PAGE_ROUTE = REVIEW_EVENT_PARENT_FORM_PAGE
+      PAGE_ID = 'review'
+    }
+    return (
+      <ReviewButton
+        key={id}
+        id={`update-application-${id}`}
+        onClick={() => {
+          goToPage && goToPage(PAGE_ROUTE, id, PAGE_ID, type)
+        }}
+      >
+        {intl.formatMessage(buttonMessages.update)}
+      </ReviewButton>
+    )
+  }
+
+  return <></>
+}
+
+const showDownloadButton = (
+  application: IDeclarationData,
+  draft: IApplication | null,
+  userDetails: IUserDetails | null
+) => {
+  const { id, type } = application || {}
+
+  if (application == null || id == null || type == null) return <></>
+
+  const downloadStatus = draft?.downloadStatus || undefined
+
+  if (
+    userDetails?.role === 'FIELD_AGENT' &&
+    draft?.submissionStatus === SUBMISSION_STATUS.DECLARED
+  )
+    return <></>
+  if (
+    draft?.submissionStatus !== SUBMISSION_STATUS.DRAFT &&
+    downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
+  ) {
+    const downLoadConfig = {
+      event: type,
+      compositionId: id,
+      action: Action.LOAD_REVIEW_APPLICATION
+    }
+    return (
+      <DownloadButton
+        key={id}
+        downloadConfigs={downLoadConfig}
+        status={downloadStatus as DOWNLOAD_STATUS}
+      />
+    )
+  }
+
+  return <></>
+}
+
+const showPrintButton = ({
+  declaration,
+  intl,
+  userDetails,
+  draft,
+  goToPrintCertificate
+}: CMethodParams) => {
+  const { id, type } = declaration || {}
+
+  const isDownloaded =
+    draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
+    draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
+
+  if (!userDetails || !userDetails.role || !type || !isDownloaded) return <></>
+  const { role } = userDetails
+
+  const reviewButtonRoleStatusMap: { [key: string]: string[] } = {
+    REGISTRATION_AGENT: [SUBMISSION_STATUS.REGISTERED],
+    DISTRICT_REGISTRAR: [SUBMISSION_STATUS.REGISTERED],
+    LOCAL_REGISTRAR: [SUBMISSION_STATUS.REGISTERED]
+  }
+
+  if (
+    role in reviewButtonRoleStatusMap &&
+    reviewButtonRoleStatusMap[role].includes(declaration?.status as string)
+  )
+    return (
+      <ReviewButton
+        key={id}
+        id={`print-${id}`}
+        onClick={() => {
+          goToPrintCertificate &&
+            goToPrintCertificate(id, type.toLocaleLowerCase())
+        }}
+      >
+        {intl.formatMessage(buttonMessages.print)}
+      </ReviewButton>
+    )
+  return <></>
+}
+
+const getNameWithAvatar = (
+  nameObject: Array<GQLHumanName | null>,
+  avatar: IAvatar,
+  language: string
+) => {
+  const nameObj = getIndividualNameObj(nameObject, language)
+  const userName = nameObj
+    ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+    : ''
+
+  return (
+    <NameAvatar>
+      <AvatarSmall avatar={avatar} name={userName} />
+      <span>
+        <LinkButton
+          id={'username-link'}
+          onClick={() => alert('username clicked')}
+          textDecoration="none"
+        >
+          {userName}
+        </LinkButton>
+      </span>
+    </NameAvatar>
+  )
+}
+
+const getStatusLabel = (status: string, intl: IntlShape) => {
+  if (status in APPLICATION_STATUS_LABEL)
+    return intl.formatMessage(APPLICATION_STATUS_LABEL[status])
+  return ''
+}
+
+const getLink = (status: string) => {
+  return (
+    <LinkButton textDecoration="none" onClick={() => alert('link clicked')}>
+      {status}
+    </LinkButton>
+  )
+}
+
+const getFormattedDate = (date: Date) => {
+  const momentDate = moment(date)
+  return (
+    <>
+      {momentDate.format('MMMM DD, YYYY')} &middot;{' '}
+      {momentDate.format('hh.mm A')}
+    </>
+  )
+}
+
+const getHistory = ({ intl, draft }: CMethodParams) => {
+  if (!draft?.data?.history?.length)
+    return (
+      <>
+        <hr />
+        <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
+        <LargeGreyedInfo />
+      </>
+    )
+
+  const historyData = (
+    draft.data.history as unknown as { [key: string]: any }[]
+  )
+    // TODO: We need to figure out a way to sort the history in backend
+    .sort((fe, se) => {
+      return new Date(fe.date).getTime() - new Date(se.date).getTime()
+    })
+    .map((item) => ({
+      date: getFormattedDate(item?.date),
+      action: getLink(getStatusLabel(item?.action, intl)),
+      user: getNameWithAvatar(
+        item.user.name,
+        item.user?.avatar,
+        window.config.LANGUAGES
+      ),
+      type: intl.formatMessage(userMessages[item.user.role as string]),
+      location: getLink(item.office.name)
+    }))
+
+  const columns = [
+    {
+      label: 'Action',
+      width: 20,
+      key: 'action'
+    },
+    {
+      label: 'Date',
+      width: 20,
+      key: 'date'
+    },
+    { label: 'By', width: 20, key: 'user', isIconColumn: true },
+    { label: 'Type', width: 20, key: 'type' },
+    { label: 'Location', width: 20, key: 'location' }
+  ]
+  return (
+    <>
+      <hr />
+      <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
+      <TableView
+        id="task-history"
+        noResultText=""
+        hideBoxShadow={true}
+        columns={columns}
+        content={historyData}
+        alignItemCenter={true}
+        pageSize={100}
+        hideTableHeaderBorder={true}
+      />
+    </>
+  )
+}
+
 function RecordAuditBody({
+  archiveDeclaration,
   clearCorrectionChange,
   declaration,
-  isDownloaded = false,
+  draft,
   intl,
-  scope,
-  archiveDeclaration,
   goToCertificateCorrection,
-  goToRegistrarHomeTab
+  goToPage,
+  goToRegistrarHomeTab,
+  scope,
+  userDetails
 }: {
   declaration: IDeclarationData
-  isDownloaded?: boolean
+  draft: IApplication | null
   intl: IntlShape
   scope: Scope | null
+  userDetails: IUserDetails | null
 } & IDispatchProps) {
   const [showDialog, setShowDialog] = React.useState(false)
 
@@ -450,13 +857,18 @@ function RecordAuditBody({
 
   const actions: React.ReactElement[] = []
 
+  const isDownloaded =
+    draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
+    draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
+
   if (
     isDownloaded &&
+    (userHasValidateScope || userHasRegisterScope) &&
     (declaration.status === SUBMISSION_STATUS.REGISTERED ||
       declaration.status === SUBMISSION_STATUS.CERTIFIED)
   ) {
     actions.push(
-      <TertiaryButton
+      <StyledTertiaryButton
         id="btn-correct-record"
         align={ICON_ALIGNMENT.LEFT}
         icon={() => <Edit />}
@@ -466,7 +878,7 @@ function RecordAuditBody({
         }}
       >
         {intl.formatMessage(correctionMessages.title)}
-      </TertiaryButton>
+      </StyledTertiaryButton>
     )
   }
 
@@ -477,7 +889,7 @@ function RecordAuditBody({
     ARCHIVABLE_STATUSES.includes(declaration.status)
   ) {
     actions.push(
-      <TertiaryButton
+      <StyledTertiaryButton
         align={ICON_ALIGNMENT.LEFT}
         id="archive_button"
         key="archive_button"
@@ -485,9 +897,42 @@ function RecordAuditBody({
         onClick={toggleDisplayDialog}
       >
         {intl.formatMessage(buttonMessages.archive)}
-      </TertiaryButton>
+      </StyledTertiaryButton>
     )
   }
+
+  if (!isDownloaded) {
+    actions.push(showDownloadButton(declaration, draft, userDetails))
+  }
+
+  actions.push(
+    showReviewButton({
+      declaration,
+      intl,
+      userDetails,
+      draft,
+      goToPage
+    })
+  )
+
+  actions.push(
+    shouldShowUpdateButton({
+      declaration,
+      intl,
+      userDetails,
+      draft,
+      goToPage
+    })
+  )
+  actions.push(
+    showPrintButton({
+      declaration,
+      intl,
+      userDetails,
+      draft,
+      goToPrintCertificate
+    })
+  )
 
   return (
     <>
@@ -510,6 +955,7 @@ function RecordAuditBody({
         )}
       >
         {getDeclarationInfo(declaration, isDownloaded, intl)}
+        {getHistory({ declaration, intl, draft, userDetails })}
       </Content>
       <ResponsiveModal
         title={intl.formatMessage(recordAuditMessages.confirmationTitle)}
@@ -545,25 +991,17 @@ function RecordAuditBody({
 }
 
 function getBodyContent({
-  archiveDeclaration,
-  clearCorrectionChange,
   declarationId,
   draft,
   intl,
   language,
-  goToCertificateCorrection,
-  goToRegistrarHomeTab,
   scope,
-  tab,
   resources,
-  workqueueDeclaration
+  tab,
+  userDetails,
+  workqueueDeclaration,
+  ...actionProps
 }: IFullProps) {
-  const actionProps = {
-    archiveDeclaration,
-    clearCorrectionChange,
-    goToCertificateCorrection,
-    goToRegistrarHomeTab
-  }
   if (!draft && tab === 'search') {
     return (
       <>
@@ -582,13 +1020,15 @@ function getBodyContent({
             }
             return (
               <RecordAuditBody
+                {...actionProps}
                 declaration={getGQLDeclaration(
                   data.fetchRegistration,
                   language
                 )}
+                draft={draft}
                 intl={intl}
                 scope={scope}
-                {...actionProps}
+                userDetails={userDetails}
               />
             )
           }}
@@ -604,16 +1044,17 @@ function getBodyContent({
       )
   return (
     <RecordAuditBody
+      {...actionProps}
       declaration={declaration}
-      isDownloaded={!!draft}
+      draft={draft}
       intl={intl}
       scope={scope}
-      {...actionProps}
+      userDetails={userDetails}
     />
   )
 }
 
-const ShowRecordAudit = (props: IFullProps) => {
+const RecordAuditComp = (props: IFullProps) => {
   return (
     <>
       <Header />
@@ -633,10 +1074,11 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
           declaration.id === declarationId ||
           declaration.compositionId === declarationId
       ) || null,
-    language: state.i18n.language,
+    language: getLanguage(state),
     resources: getOfflineData(state),
     scope: getScope(state),
     tab,
+    userDetails: state.profile.userDetails,
     workqueueDeclaration:
       (tab !== 'search' &&
         state.workqueueState.workqueue.data[tab].results?.find(
@@ -655,5 +1097,7 @@ export const RecordAudit = connect<
   archiveDeclaration,
   clearCorrectionChange,
   goToCertificateCorrection,
+  goToPage,
+  goToPrintCertificate,
   goToRegistrarHomeTab
-})(injectIntl(ShowRecordAudit))
+})(injectIntl(RecordAuditComp))

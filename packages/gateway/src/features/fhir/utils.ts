@@ -865,6 +865,15 @@ export function findExtension(
   return extension
 }
 
+export function getDownloadedExtensionStatus(task: fhir.Task) {
+  const extensionURL = `${OPENCRVS_SPECIFICATION_URL}extension/regDownloaded`
+  const extension = findExtension(
+    extensionURL,
+    task.extension as fhir.Extension[]
+  )
+  return extension?.valueString
+}
+
 export function getStatusFromTask(task: fhir.Task) {
   const statusType = task.businessStatus?.coding?.find(
     (coding: fhir.Coding) =>

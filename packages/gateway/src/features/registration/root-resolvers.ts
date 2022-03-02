@@ -22,7 +22,8 @@ import {
 } from '@gateway/features/fhir/utils'
 import {
   buildFHIRBundle,
-  updateFHIRTaskBundle
+  updateFHIRTaskBundle,
+  addDownloadedTaskExtension
 } from '@gateway/features/registration/fhir-builders'
 import { hasScope } from '@gateway/features/user/utils'
 import {
@@ -78,7 +79,7 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'validate') ||
         hasScope(authHeader, 'declare')
       ) {
-        return await fetchFHIR(`/Composition/${id}`, authHeader)
+        return await markRecordAsDownloaded(id, authHeader)
       } else {
         return await Promise.reject(
           new Error('User does not have a register or validate scope')
@@ -91,7 +92,7 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'validate') ||
         hasScope(authHeader, 'declare')
       ) {
-        return await fetchFHIR(`/Composition/${id}`, authHeader)
+        return await markRecordAsDownloaded(id, authHeader)
       } else {
         return await Promise.reject(
           new Error('User does not have a register or validate scope')
@@ -551,4 +552,21 @@ async function markEventAsCertified(
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
   // return composition-id
   return getIDFromResponse(res)
+}
+
+async function markRecordAsDownloaded(id: string, authHeader: IAuthHeader) {
+  let doc
+  const taskBundle = await fetchFHIR(
+    `/Task?focus=Composition/${id}`,
+    authHeader
+  )
+  if (!taskBundle || !taskBundle.entry || !taskBundle.entry[0]) {
+    throw new Error('Task does not exist')
+  }
+  doc = addDownloadedTaskExtension(taskBundle.entry[0])
+
+  await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
+
+  // return the full composition
+  return fetchFHIR(`/Composition/${id}`, authHeader)
 }
