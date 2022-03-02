@@ -124,10 +124,6 @@ Username: **kennedy.mweene** / Password: **test** / SMS code: **000000**
 
 Username: **emmanuel.mayuka** / Password: **test** / SMS code: **000000**
 
-### National System Admin
-
-Username: **jonathan.campbell** / Password: **test** / SMS code: **000000**
-
 ## Starting and stopping OpenCRVS
 
 After you have installed OpenCRVS. The setup script will have installed the [opencrvs-farajaland country configuration](https://github.com/opencrvs/opencrvs-farajaland) in a directory alongside opencrvs-core. The country configuration is a separate server that must be started and stopped alongside opencrvs-core.
