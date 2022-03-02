@@ -105,6 +105,10 @@ type IStateProps = {
   application: IApplication
 }
 
+type IState = {
+  isFileUploading: boolean
+}
+
 type IDispatchProps = {
   goBack: typeof goBack
   modifyApplication: typeof modifyApplication
@@ -116,9 +120,15 @@ type IDispatchProps = {
 
 type IFullProps = IProps & IStateProps & IDispatchProps & IntlShapeProps
 
-class CorrectionSummaryComponent extends React.Component<IFullProps> {
+class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
   section = correctionFeesPaymentSection
   group = this.section.groups[0]
+  constructor(props: IFullProps) {
+    super(props)
+    this.state = {
+      isFileUploading: false
+    }
+  }
 
   componentDidMount() {
     this.group = {
@@ -129,6 +139,13 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
         this.props.application.data
       )
     }
+  }
+
+  onUploadingStateChanged = (isUploading: boolean) => {
+    this.setState({
+      ...this.state,
+      isFileUploading: isUploading
+    })
   }
 
   render() {
@@ -155,7 +172,10 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
         id="make_correction"
         key="make_correction"
         onClick={this.makeCorrection}
-        disabled={sectionHasError(this.group, this.section, application)}
+        disabled={
+          sectionHasError(this.group, this.section, application) ||
+          this.state.isFileUploading
+        }
         icon={() => <Check />}
         align={ICON_ALIGNMENT.LEFT}
       >
@@ -322,6 +342,10 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
               setAllFieldsDirty={false}
               fields={this.group.fields}
               draftData={application.data}
+              onUploadingStateChanged={this.onUploadingStateChanged}
+              requiredErrorMessage={
+                messages.correctionSummaryproofOfPaymentError
+              }
             />
           </Content>
         </ActionPageLight>
