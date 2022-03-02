@@ -293,7 +293,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
     const { name, intl } = this.props
     return this.props.splitView ? (
       this.state.dropDownOptions.map((opt, idx) => (
-        <Flex splitView>
+        <Flex splitView key={idx}>
           <Select
             id={`${name}${idx}`}
             options={[opt]}
@@ -341,7 +341,9 @@ class DocumentUploaderWithOptionComp extends React.Component<
         <ErrorMessage id="upload-error">
           {this.state.errorMessage && (
             <ErrorText>
-              {(requiredErrorMessage as string) || this.state.errorMessage}
+              {(requiredErrorMessage &&
+                intl.formatMessage(requiredErrorMessage)) ||
+                this.state.errorMessage}
             </ErrorText>
           )}
         </ErrorMessage>

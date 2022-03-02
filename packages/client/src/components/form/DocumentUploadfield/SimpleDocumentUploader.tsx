@@ -150,14 +150,18 @@ class SimpleDocumentUploaderComponent extends React.Component<
       requiredErrorMessage,
       touched
     } = this.props
-    const errorMessage = requiredErrorMessage || this.state.error || error || ''
+    const errorMessage =
+      (requiredErrorMessage && intl.formatMessage(requiredErrorMessage)) ||
+      this.state.error ||
+      error ||
+      ''
 
     return (
       <>
         {description && <FieldDescription>{description}</FieldDescription>}
         <ErrorMessage>
           {errorMessage && touched && (
-            <ErrorText id="field-error">{errorMessage as string}</ErrorText>
+            <ErrorText id="field-error">{errorMessage}</ErrorText>
           )}
         </ErrorMessage>
         {(!files || !files.data) && (

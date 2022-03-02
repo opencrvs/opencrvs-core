@@ -115,7 +115,7 @@ class DocumentListPreviewComponent extends React.Component<IProps> {
           ))}
         {processingDocuments &&
           processingDocuments.map(({ label }) => (
-            <PreviewContainer>
+            <PreviewContainer key={label}>
               <PreviewLink disabled={true} key={label}>
                 <PaperClip stroke={theme.colors.disabled} />
                 <span>{this.getFormattedLabelForDocType(label) || label}</span>
