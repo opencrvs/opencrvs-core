@@ -23,7 +23,6 @@ const Wrapper = styled.form`
   margin-bottom: 1px;
   position: relative;
 `
-// Remove Autofill for search
 const SearchTextInput = styled.input`
   border: none;
   margin: 0px 0px;

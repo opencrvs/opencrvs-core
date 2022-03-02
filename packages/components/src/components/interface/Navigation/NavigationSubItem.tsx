@@ -23,7 +23,7 @@ export const SubItemContainer = styled.button<{ isSelected?: boolean }>`
   border: 0;
   background-color: ${({ theme }) => theme.colors.white};
   :hover {
-    background-color: ${({ theme }) => theme.colors.greyHover};
+    background-color: ${({ theme }) => theme.colors.grey200};
   }
   outline: none;
   :focus {

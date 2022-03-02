@@ -26,8 +26,8 @@ const HeaderContainer = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey500};
   flex-direction: row;
   justify-content: space-between;
-  align-items: center;
   position: sticky;
+  align-items: center;
   top: 0;
   margin-left: 249px;
   z-index: 2;

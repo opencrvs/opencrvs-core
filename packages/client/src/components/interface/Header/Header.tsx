@@ -341,7 +341,7 @@ class HeaderComp extends React.Component<IProps, IState> {
     )
   }
 
-  // OLD menu items in header?? Can be removed?
+  // OLD menu items in header??
   goToTeamView(props: IProps) {
     const { userDetails, goToTeamUserListAction, goToTeamSearchAction } = props
     if (userDetails && userDetails.role) {
@@ -359,7 +359,7 @@ class HeaderComp extends React.Component<IProps, IState> {
     }
   }
 
-  // OLD menu items in header?? Can be removed?
+  // OLD menu items in header??
   goToPerformanceView(props: IProps) {
     const {
       userDetails,
