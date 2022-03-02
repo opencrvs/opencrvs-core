@@ -128,7 +128,11 @@ import { IValidationResult } from '@client/utils/validate'
 import { DocumentListPreview } from '@client/components/form/DocumentUploadfield/DocumentListPreview'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import { generateLocations } from '@client/utils/locationUtils'
+import { isCorrection } from '@client/views/CorrectionForm/utils'
 
+const Deleted = styled.del`
+  color: ${({ theme }) => theme.colors.error};
+`
 const RequiredField = styled.span`
   color: ${({ theme }) => theme.colors.error};
   display: inline-block;
@@ -181,6 +185,10 @@ const ResponsiveDocumentViewer = styled.div<{ isRegisterScope: boolean }>`
   }
 `
 
+const FooterArea = styled.div`
+  padding-top: 20px;
+`
+
 const FormData = styled.div`
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
@@ -220,15 +228,16 @@ interface IProps {
   offlineCountryConfiguration: IOfflineData
   language: string
   onChangeReviewForm?: onChangeReviewForm
+  onContinue?: () => void
   writeApplication: typeof writeApplication
   registrationSection: IFormSection
   documentsSection: IFormSection
 }
 type State = {
   displayEditDialog: boolean
-  editClickedSectionId: Section | null
+  editClickedSectionId: string
   editClickedSectionGroupId: string
-  editClickFieldName?: string
+  editClickFieldName: string
   activeSection: Section | null
   previewImage: IFileValue | null
 }
@@ -462,6 +471,8 @@ const SECTION_TITLE = {
 }
 
 class ReviewSectionComp extends React.Component<FullProps, State> {
+  hasChangesBeenMade = false
+
   constructor(props: FullProps) {
     super(props)
 
@@ -469,10 +480,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       displayEditDialog: false,
       editClickedSectionGroupId: '',
       editClickFieldName: '',
-      editClickedSectionId: null,
+      editClickedSectionId: '',
       activeSection: null,
       previewImage: null
     }
+  }
+
+  componentWillUpdate() {
+    this.hasChangesBeenMade = false
   }
 
   componentDidMount() {
@@ -642,9 +657,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   editLinkClickHandler = (
-    sectionId: Section | null,
+    sectionId: string,
     sectionGroupId: string,
-    fieldName?: string
+    fieldName: string
   ) => {
     this.setState(() => ({
       editClickedSectionId: sectionId,
@@ -670,6 +685,20 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       groupId,
       application.event.toLowerCase(),
       fieldName
+    )
+  }
+
+  replaceHandler(sectionId: string, groupId: string) {
+    const { draft, pageRoute, writeApplication, goToPageGroup } = this.props
+    const application = draft
+    application.data[sectionId] = {}
+    writeApplication(application)
+    goToPageGroup(
+      pageRoute,
+      application.id,
+      sectionId,
+      groupId,
+      application.event.toLowerCase()
     )
   }
 
@@ -739,7 +768,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     value: IFormFieldValue | JSX.Element | undefined,
     ignoreAction = false
   ) {
-    const { intl } = this.props
+    const { draft: application, intl } = this.props
 
     return {
       label: intl.formatMessage(fieldLabel),
@@ -748,7 +777,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         id: `btn_change_${section.id}_${fieldName}`,
         label: intl.formatMessage(buttonMessages.change),
         handler: () => {
-          if (this.isDraft()) {
+          if (this.isDraft() || isCorrection(application)) {
             this.editLinkClickHandlerForDraft(section.id, group.id, fieldName)
           } else {
             this.editLinkClickHandler(section.id, group.id, fieldName)
@@ -771,12 +800,26 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
   getValueOrError = (
     section: IFormSection,
+    data: IFormData,
     field: IFormField,
     sectionErrors: IErrorsBySection,
-    ignoreNestedFieldWrapping?: boolean
+    ignoreNestedFieldWrapping?: boolean,
+    replaceEmpty?: boolean
   ) => {
-    const { intl, draft, offlineCountryConfiguration, language } = this.props
+    const { intl, offlineCountryConfiguration, language } = this.props
 
+    let value = renderValue(
+      data,
+      section.id,
+      field,
+      intl,
+      offlineCountryConfiguration,
+      language
+    )
+
+    if (replaceEmpty && !value) {
+      value = '-'
+    }
     const errorsOnField =
       get(sectionErrors[section.id][field.name], 'errors') ||
       this.getErrorForNestedField(section, field, sectionErrors)
@@ -785,12 +828,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       ? this.getFieldValueWithErrorMessage(section, field, errorsOnField[0])
       : field.nestedFields && !Boolean(ignoreNestedFieldWrapping)
       ? (
-          (draft.data[section.id] &&
-            draft.data[section.id][field.name] &&
-            (draft.data[section.id][field.name] as IFormSectionData).value &&
+          (data[section.id] &&
+            data[section.id][field.name] &&
+            (data[section.id][field.name] as IFormSectionData).value &&
             field.nestedFields[
-              (draft.data[section.id][field.name] as IFormSectionData)
-                .value as string
+              (data[section.id][field.name] as IFormSectionData).value as string
             ]) ||
           []
         ).reduce((groupedValues, nestedField) => {
@@ -800,10 +842,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             ] || []
           // Value of the parentField resembles with IFormData as a nested form
           const nestedValue =
-            (draft.data[section.id] &&
-              draft.data[section.id][field.name] &&
+            (data[section.id] &&
+              data[section.id][field.name] &&
               renderValue(
-                draft.data[section.id][field.name] as IFormData,
+                data[section.id][field.name] as IFormData,
                 'nestedFields',
                 nestedField,
                 intl,
@@ -824,15 +866,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 : nestedValue}
             </>
           )
-        }, <>{renderValue(draft.data, section.id, field, intl, offlineCountryConfiguration, language)}</>)
-      : renderValue(
-          draft.data,
-          section.id,
-          field,
-          intl,
-          offlineCountryConfiguration,
-          language
-        )
+        }, <>{value}</>)
+      : value
   }
 
   getNestedFieldValueOrError = (
@@ -870,8 +905,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     group: IFormSectionGroup,
     field: IFormField,
     visitedTags: string[],
-    errorsOnFields: IErrorsBySection
+    errorsOnFields: IErrorsBySection,
+    data: IFormSectionData,
+    originalData?: IFormSectionData
   ) {
+    const { draft } = this.props
+
     if (field.previewGroup && !visitedTags.includes(field.previewGroup)) {
       visitedTags.push(field.previewGroup)
 
@@ -903,7 +942,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           ) as IFormTag[])) ||
         []
       const values = taggedFields
-        .map((field) => this.getValueOrError(section, field, errorsOnFields))
+        .map((field) =>
+          this.getValueOrError(section, draft.data, field, errorsOnFields)
+        )
         .filter((value) => value)
 
       let completeValue = values[0]
@@ -913,15 +954,66 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           (completeValue = (
             <>
               {completeValue}
-              <span
-                dangerouslySetInnerHTML={{
-                  __html: tagDef[0].delimiter || '<br />'
-                }}
-              ></span>
+              {tagDef[0].delimiter ? (
+                <span>{tagDef[0].delimiter}</span>
+              ) : (
+                <br />
+              )}
               {value}
             </>
           ))
       )
+
+      const hasErrors = taggedFields.reduce(
+        (accum, field) =>
+          accum || this.fieldHasErrors(section, field, errorsOnFields),
+        false
+      )
+
+      const hasAnyFieldChanged = taggedFields.reduce(
+        (accum, field) =>
+          accum || this.hasFieldChanged(field, data, originalData),
+        false
+      )
+      const draftOriginalData = draft.originalData
+      if (draftOriginalData && hasAnyFieldChanged && !hasErrors) {
+        const previousValues = taggedFields
+          .map((field, index) =>
+            this.getValueOrError(
+              section,
+              draftOriginalData,
+              field,
+              errorsOnFields,
+              undefined,
+              !!index
+            )
+          )
+          .filter((value) => value)
+        let previousCompleteValue = <Deleted>{previousValues[0]}</Deleted>
+        previousValues.shift()
+        previousValues.forEach(
+          (previousValue) =>
+            (previousCompleteValue = (
+              <>
+                {previousCompleteValue}
+                {tagDef[0].delimiter ? (
+                  <span>{tagDef[0].delimiter}</span>
+                ) : (
+                  <br />
+                )}
+                <Deleted>{previousValue}</Deleted>
+              </>
+            ))
+        )
+
+        completeValue = (
+          <>
+            {previousCompleteValue}
+            <br />
+            {completeValue}
+          </>
+        )
+      }
 
       return this.getRenderableField(
         section,
@@ -934,6 +1026,69 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
   }
 
+  hasNestedDataChanged(
+    nestedFieldData: IFormData,
+    previousNestedFieldData: IFormData
+  ) {
+    if (nestedFieldData.value === previousNestedFieldData.value) {
+      for (const key in nestedFieldData.nestedFields) {
+        if (
+          nestedFieldData.nestedFields[key] !==
+          previousNestedFieldData.nestedFields[key]
+        ) {
+          this.hasChangesBeenMade = true
+          return true
+        }
+      }
+      return false
+    }
+    this.hasChangesBeenMade = true
+    return true
+  }
+
+  fieldHasErrors(
+    section: IFormSection,
+    field: IFormField,
+    sectionErrors: IErrorsBySection
+  ) {
+    if (
+      (
+        get(sectionErrors[section.id][field.name], 'errors') ||
+        this.getErrorForNestedField(section, field, sectionErrors)
+      ).length > 0
+    ) {
+      return true
+    }
+    return false
+  }
+
+  hasFieldChanged(
+    field: IFormField,
+    data: IFormSectionData,
+    originalData?: IFormSectionData
+  ) {
+    // const {
+    //   draft: { data, originalData }
+    // } = this.props
+    if (!originalData) return false
+    if (data[field.name] && (data[field.name] as IFormData).value) {
+      return this.hasNestedDataChanged(
+        data[field.name] as IFormData,
+        originalData[field.name] as IFormData
+      )
+    }
+    /*
+     * data section might have some values as empty string
+     * whereas original data section have them as undefined
+     */
+    if (!originalData[field.name] && data[field.name] === '') {
+      return false
+    }
+    const hasChanged = data[field.name] !== originalData[field.name]
+    this.hasChangesBeenMade = this.hasChangesBeenMade || hasChanged
+    return hasChanged
+  }
+
   getSinglePreviewField(
     section: IFormSection,
     group: IFormSectionGroup,
@@ -941,12 +1096,40 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     sectionErrors: IErrorsBySection,
     ignoreNestedFieldWrapping?: boolean
   ) {
-    const value = this.getValueOrError(
+    const {
+      draft: { data, originalData }
+    } = this.props
+
+    let value = this.getValueOrError(
       section,
+      data,
       field,
       sectionErrors,
       ignoreNestedFieldWrapping
     )
+
+    if (
+      originalData &&
+      this.hasFieldChanged(field, data[section.id], originalData[section.id]) &&
+      !this.fieldHasErrors(section, field, sectionErrors)
+    ) {
+      value = (
+        <>
+          <Deleted>
+            {this.getValueOrError(
+              section,
+              originalData,
+              field,
+              sectionErrors,
+              ignoreNestedFieldWrapping,
+              true
+            )}
+          </Deleted>
+          <br />
+          {value}
+        </>
+      )
+    }
 
     return this.getRenderableField(
       section,
@@ -989,7 +1172,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             group,
             nestedField,
             visitedTags,
-            sectionErrors
+            sectionErrors,
+            (draft.data[section.id][field.name] as IFormData).nestedFields,
+            (draft.originalData &&
+              (draft.originalData[section.id][field.name] as IFormData)
+                .nestedFields) ||
+              undefined
           )
         )
       } else {
@@ -1159,11 +1347,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const initialTransformedSection = formSections.map((section) => {
       let items: any[] = []
       const visitedTags: string[] = []
-      getVisibleSectionGroupsBasedOnConditions(
+      const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
         section,
         draft.data[section.id] || {},
         draft.data
-      ).forEach((group) => {
+      )
+      visibleGroups.forEach((group) => {
         group.fields
           .filter(
             (field) =>
@@ -1178,7 +1367,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   group,
                   field,
                   visitedTags,
-                  errorsOnFields
+                  errorsOnFields,
+                  draft.data[section.id],
+                  (draft.originalData && draft.originalData[section.id]) ||
+                    undefined
                 )
               : field.nestedFields && field.ignoreNestedFieldWrappingInPreview
               ? this.getNestedPreviewField(
@@ -1214,7 +1406,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       return {
         id: section.id,
         title: intl.formatMessage(section.title),
-        items: items.filter((item) => item)
+        items: items.filter((item) => item),
+        action: section.replaceable
+          ? {
+              label: intl.formatMessage(buttonMessages.replace),
+              handler: () =>
+                this.replaceHandler(section.id, visibleGroups[0].id)
+            }
+          : undefined
       }
     })
 
@@ -1235,7 +1434,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       registrationSection,
       documentsSection,
       offlineCountryConfiguration,
-      draft: { event }
+      draft: { event },
+      onContinue
     } = this.props
     const formSections = this.getViewableSection(registerForm[event])
 
@@ -1294,11 +1494,13 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               }
             />
             <FormData>
-              <FormDataHeader>
-                {intl.formatMessage(messages.formDataHeader, {
-                  isDraft: draft
-                })}
-              </FormDataHeader>
+              {!isCorrection(application) && (
+                <FormDataHeader>
+                  {intl.formatMessage(messages.formDataHeader, {
+                    isDraft: draft
+                  })}
+                </FormDataHeader>
+              )}
               {transformedSectionData.map((sec, index) => {
                 const { uploadedDocuments, selectOptions } =
                   this.prepSectionDocuments(application, sec.id)
@@ -1318,7 +1520,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   />
                 )
               })}
-              {event === BIRTH && (
+              {event === BIRTH && !isCorrection(application) && (
                 <InputWrapper>
                   <InputField
                     id="additional_comments"
@@ -1330,18 +1532,31 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   </InputField>
                 </InputWrapper>
               )}
-              <ReviewAction
-                completeApplication={isComplete}
-                applicationToBeValidated={this.userHasValidateScope()}
-                applicationToBeRegistered={this.userHasRegisterScope()}
-                alreadyRejectedApplication={
-                  this.props.draft.registrationStatus === REJECTED
-                }
-                draftApplication={draft}
-                application={application}
-                submitApplicationAction={submitClickEvent}
-                rejectApplicationAction={rejectApplicationClickEvent}
-              />
+              {!isCorrection(application) && (
+                <ReviewAction
+                  completeApplication={isComplete}
+                  applicationToBeValidated={this.userHasValidateScope()}
+                  applicationToBeRegistered={this.userHasRegisterScope()}
+                  alreadyRejectedApplication={
+                    this.props.draft.registrationStatus === REJECTED
+                  }
+                  draftApplication={draft}
+                  application={application}
+                  submitApplicationAction={submitClickEvent}
+                  rejectApplicationAction={rejectApplicationClickEvent}
+                />
+              )}
+              {isCorrection(application) && (
+                <FooterArea>
+                  <PrimaryButton
+                    id="continue_button"
+                    onClick={onContinue}
+                    disabled={!isComplete || !this.hasChangesBeenMade}
+                  >
+                    {intl.formatMessage(buttonMessages.continueButton)}
+                  </PrimaryButton>
+                </FooterArea>
+              )}
             </FormData>
           </StyledColumn>
           <Column>

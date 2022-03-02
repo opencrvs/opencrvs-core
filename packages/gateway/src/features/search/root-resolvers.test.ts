@@ -58,7 +58,10 @@ describe('Search root resolvers', () => {
       fetch.mockResponse(
         JSON.stringify({
           body: {
-            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+            hits: {
+              total: { value: 1 },
+              hits: [{ _type: 'composition', _source: {} }]
+            }
           }
         })
       )
@@ -77,7 +80,10 @@ describe('Search root resolvers', () => {
       fetch.mockResponse(
         JSON.stringify({
           body: {
-            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+            hits: {
+              total: { value: 1 },
+              hits: [{ _type: 'composition', _source: {} }]
+            }
           }
         })
       )
@@ -96,7 +102,10 @@ describe('Search root resolvers', () => {
       fetch.mockResponse(
         JSON.stringify({
           body: {
-            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+            hits: {
+              total: { value: 1 },
+              hits: [{ _type: 'composition', _source: {} }]
+            }
           }
         })
       )
@@ -115,7 +124,10 @@ describe('Search root resolvers', () => {
       fetch.mockResponse(
         JSON.stringify({
           body: {
-            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+            hits: {
+              total: { value: 1 },
+              hits: [{ _type: 'composition', _source: {} }]
+            }
           }
         })
       )
@@ -134,7 +146,10 @@ describe('Search root resolvers', () => {
       fetch.mockResponse(
         JSON.stringify({
           body: {
-            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+            hits: {
+              total: { value: 1 },
+              hits: [{ _type: 'composition', _source: {} }]
+            }
           }
         })
       )
@@ -153,7 +168,10 @@ describe('Search root resolvers', () => {
       fetch.mockResponse(
         JSON.stringify({
           body: {
-            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+            hits: {
+              total: { value: 1 },
+              hits: [{ _type: 'composition', _source: {} }]
+            }
           }
         })
       )
@@ -172,7 +190,10 @@ describe('Search root resolvers', () => {
       fetch.mockResponse(
         JSON.stringify({
           body: {
-            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+            hits: {
+              total: { value: 1 },
+              hits: [{ _type: 'composition', _source: {} }]
+            }
           }
         })
       )
@@ -191,7 +212,10 @@ describe('Search root resolvers', () => {
       fetch.mockResponse(
         JSON.stringify({
           body: {
-            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+            hits: {
+              total: { value: 1 },
+              hits: [{ _type: 'composition', _source: {} }]
+            }
           }
         })
       )
@@ -210,7 +234,10 @@ describe('Search root resolvers', () => {
       fetch.mockResponse(
         JSON.stringify({
           body: {
-            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+            hits: {
+              total: { value: 1 },
+              hits: [{ _type: 'composition', _source: {} }]
+            }
           }
         })
       )
@@ -229,7 +256,10 @@ describe('Search root resolvers', () => {
       fetch.mockResponse(
         JSON.stringify({
           body: {
-            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+            hits: {
+              total: { value: 1 },
+              hits: [{ _type: 'composition', _source: {} }]
+            }
           }
         })
       )
@@ -248,7 +278,10 @@ describe('Search root resolvers', () => {
       fetch.mockResponse(
         JSON.stringify({
           body: {
-            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+            hits: {
+              total: { value: 1 },
+              hits: [{ _type: 'composition', _source: {} }]
+            }
           }
         })
       )
@@ -267,7 +300,10 @@ describe('Search root resolvers', () => {
       fetch.mockResponse(
         JSON.stringify({
           body: {
-            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+            hits: {
+              total: { value: 1 },
+              hits: [{ _type: 'composition', _source: {} }]
+            }
           }
         })
       )
@@ -286,7 +322,10 @@ describe('Search root resolvers', () => {
       fetch.mockResponse(
         JSON.stringify({
           body: {
-            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+            hits: {
+              total: { value: 1 },
+              hits: [{ _type: 'composition', _source: {} }]
+            }
           }
         })
       )
@@ -326,7 +365,10 @@ describe('Search root resolvers', () => {
       fetch.mockResponse(
         JSON.stringify({
           body: {
-            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+            hits: {
+              total: { value: 1 },
+              hits: [{ _type: 'composition', _source: {} }]
+            }
           }
         })
       )
@@ -380,7 +422,10 @@ describe('Search root resolvers', () => {
       fetch.mockResponse(
         JSON.stringify({
           body: {
-            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+            hits: {
+              total: { value: 1 },
+              hits: [{ _type: 'composition', _source: {} }]
+            }
           }
         })
       )

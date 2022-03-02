@@ -58,7 +58,7 @@ describe('when app notifies the user', () => {
     describe('When user clicks the background sync notification', () => {
       beforeEach(() => {
         app
-          .find('#backgroundSyncShowNotification')
+          .find('#backgroundSyncShowNotificationCancel')
           .hostNodes()
           .simulate('click')
         app.update()

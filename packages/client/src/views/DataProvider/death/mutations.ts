@@ -16,6 +16,7 @@ import {
   draftToGqlTransformer,
   appendGqlMetadataFromDraft
 } from '@client/transformer'
+import { REQUEST_DEATH_REG_CORRECTION } from '@client/forms/correction/mutations'
 
 const SUBMIT_DEATH_APPLICATION = gql`
   mutation submitMutation($details: DeathRegistrationInput!) {
@@ -90,7 +91,12 @@ export function getDeathMutationMappings(
 ) {
   let gqlDetails = {}
   if (form && draft) {
-    gqlDetails = draftToGqlTransformer(form, draft.data, draft.id)
+    gqlDetails = draftToGqlTransformer(
+      form,
+      draft.data,
+      draft.id,
+      draft.originalData
+    )
     appendGqlMetadataFromDraft(draft, gqlDetails)
   }
 
@@ -135,6 +141,15 @@ export function getDeathMutationMappings(
           details: gqlDetails
         },
         dataKey: 'markDeathAsCertified'
+      }
+    case Action.REQUEST_CORRECTION_APPLICATION:
+      return {
+        mutation: REQUEST_DEATH_REG_CORRECTION,
+        variables: {
+          id: draft && draft.id,
+          details: gqlDetails
+        },
+        dataKey: 'requestDeathRegistrationCorrection'
       }
     default:
       return null

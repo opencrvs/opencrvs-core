@@ -82,7 +82,7 @@ const HideOnMobile = styled.div`
 const HideOnDesktop = styled.div`
   display: none;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    display: inline;
+    display: flex;
   }
 `
 
@@ -192,9 +192,11 @@ export class ListRow extends React.Component<IListRowProps> {
                     {placeHolder}
                   </PlaceHolder>
                 )}
-                {this.props.status && (
-                  <StatusContainer>{this.props.status}</StatusContainer>
-                )}
+                <HideOnDesktop>
+                  {this.props.status && (
+                    <StatusContainer>{this.props.status}</StatusContainer>
+                  )}
+                </HideOnDesktop>
               </ListDataContainer>
               <HideOnMobile>
                 {actionsMenu && <MenuContainer>{actionsMenu}</MenuContainer>}

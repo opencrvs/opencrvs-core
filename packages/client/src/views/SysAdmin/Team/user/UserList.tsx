@@ -228,6 +228,18 @@ const ValueWrapper = styled.div`
     margin-left: 45px;
   }
 `
+const HideMobileStatusWrapper = styled.div`
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: none;
+  }
+`
+
+const HideDesktopStatusWrapper = styled.div`
+  display: none;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: inline;
+  }
+`
 interface ISearchParams {
   locationId: string
 }
@@ -485,18 +497,30 @@ function UserListComponent(props: IProps) {
   }
 
   function getStatusMenuType(
+    userDetails: IUserDetails | null,
+    locationId: string,
     user: GQLUser,
     index: number,
     status?: string,
     underInvestigation?: boolean
   ) {
+    const canEditUserDetails =
+      userDetails?.role === 'NATIONAL_SYSTEM_ADMIN' ||
+      (userDetails?.role === 'LOCAL_SYSTEM_ADMIN' &&
+        userDetails?.primaryOffice?.id === locationId)
+        ? true
+        : false
+    const statusDetails = renderStatus(status, underInvestigation)
     return (
       <StatusMenu>
-        <ToggleMenu
-          id={`user-item-${index}-menu`}
-          toggleButton={<VerticalThreeDots />}
-          menuItems={getMenuItems(user)}
-        />
+        <HideMobileStatusWrapper>{statusDetails}</HideMobileStatusWrapper>
+        {canEditUserDetails && (
+          <ToggleMenu
+            id={`user-item-${index}-menu`}
+            toggleButton={<VerticalThreeDots />}
+            menuItems={getMenuItems(user)}
+          />
+        )}
       </StatusMenu>
     )
   }
@@ -504,8 +528,7 @@ function UserListComponent(props: IProps) {
   function generateUserContents(
     data: GQLQuery,
     locationId: string,
-    userDetails: IUserDetails | null,
-    onlyNational: boolean
+    userDetails: IUserDetails | null
   ) {
     if (!data || !data.searchUsers || !data.searchUsers.results) {
       return []
@@ -534,14 +557,15 @@ function UserListComponent(props: IProps) {
           return {
             label: 'user details',
             value: <ValueWrapper>{role}</ValueWrapper>,
-            actionsMenu: !getViewOnly(locationId, userDetails, onlyNational)
-              ? getStatusMenuType(
-                  user,
-                  index,
-                  user.status,
-                  user.underInvestigation
-                )
-              : null,
+            actionsMenu: getStatusMenuType(
+              userDetails,
+              locationId,
+              user,
+              index,
+              user.status,
+              user.underInvestigation
+            ),
+
             nameWithAvatar: getPhotoNameType(user.id || '', name, avatar),
             status: renderStatus(user.status, user.underInvestigation)
           }
@@ -681,8 +705,7 @@ function UserListComponent(props: IProps) {
                   generateUserContents(
                     data,
                     locationId,
-                    userDetails,
-                    false
+                    userDetails
                   ) as IListRowProps[]
                 }
               />

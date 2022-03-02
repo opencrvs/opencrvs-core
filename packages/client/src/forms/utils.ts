@@ -39,7 +39,10 @@ import {
   IFormSectionGroup,
   IRadioGroupFormField,
   RADIO_GROUP_WITH_NESTED_FIELDS,
-  DOCUMENT_UPLOADER_WITH_OPTION
+  DOCUMENT_UPLOADER_WITH_OPTION,
+  IFormFieldValue,
+  FIELD_WITH_DYNAMIC_DEFINITIONS,
+  IRadioGroupWithNestedFieldsFormField
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -64,6 +67,14 @@ import { IRadioOption as CRadioOption } from '@opencrvs/components/lib/forms'
 import { IDynamicValues } from '@client/navigation'
 import { generateLocations } from '@client/utils/locationUtils'
 import { callingCountries } from 'country-data'
+import { IApplication } from '@client/applications'
+
+export const VIEW_TYPE = {
+  FORM: 'form',
+  REVIEW: 'review',
+  PREVIEW: 'preview',
+  HIDDEN: 'hidden'
+}
 
 const REGISTRATION_TARGET_DAYS = window.config.BIRTH_REGISTRATION_TARGET
 
@@ -240,6 +251,50 @@ export const getFieldValidation = (
   }
 
   return validate
+}
+
+export function getNextSectionIds(
+  sections: IFormSection[],
+  fromSection: IFormSection,
+  fromSectionGroup: IFormSectionGroup,
+  application: IApplication
+): { [key: string]: string } | null {
+  const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
+    fromSection,
+    application.data[fromSection.id] || {},
+    application.data
+  )
+  const currentGroupIndex = visibleGroups.findIndex(
+    (group: IFormSectionGroup) => group.id === fromSectionGroup.id
+  )
+
+  if (currentGroupIndex === visibleGroups.length - 1) {
+    const visibleSections = sections.filter(
+      (section) =>
+        section.viewType !== VIEW_TYPE.HIDDEN &&
+        getVisibleSectionGroupsBasedOnConditions(
+          section,
+          application.data[fromSection.id] || {},
+          application.data
+        ).length > 0
+    )
+
+    const currentIndex = visibleSections.findIndex(
+      (section: IFormSection) => section.id === fromSection.id
+    )
+    if (currentIndex === visibleSections.length - 1) {
+      return null
+    }
+
+    return {
+      sectionId: visibleSections[currentIndex + 1].id,
+      groupId: visibleSections[currentIndex + 1].groups[0].id
+    }
+  }
+  return {
+    sectionId: fromSection.id,
+    groupId: visibleGroups[currentGroupIndex + 1].id
+  }
 }
 
 export const getVisibleGroupFields = (group: IFormSectionGroup) => {
@@ -541,6 +596,52 @@ export const convertToMSISDN = (phone: string) => {
   return phone.startsWith('0')
     ? `${countryCallingCode}${phone.substring(1)}`
     : `${countryCallingCode}${phone}`
+}
+
+export const isRadioGroupWithNestedField = (
+  field: IFormField
+): field is IRadioGroupWithNestedFieldsFormField => {
+  return field.type === RADIO_GROUP_WITH_NESTED_FIELDS
+}
+
+export const isDynamicField = (
+  field: IFormField
+): field is IDynamicFormField => {
+  return field.type === FIELD_WITH_DYNAMIC_DEFINITIONS
+}
+
+export const isDateField = (
+  field: IFormField,
+  sectionData: IFormSectionData
+): field is IDateFormField => {
+  if (isDynamicField(field)) {
+    return getFieldType(field, sectionData) === DATE
+  }
+
+  return field.type === DATE
+}
+
+export const stringifyFieldValue = (
+  field: IFormField,
+  fieldValue: IFormFieldValue,
+  sectionData: IFormSectionData
+): string => {
+  if (!fieldValue) {
+    return ''
+  }
+
+  if (isDateField(field, sectionData)) {
+    return fieldValue.toString()
+  }
+
+  return fieldValue.toString()
+}
+
+export const getSelectedRadioOptionWithNestedFields = (
+  field: IRadioGroupWithNestedFieldsFormField,
+  sectionData: IFormSectionData
+): string | undefined => {
+  return (sectionData[field.name] as IFormSectionData).value as string
 }
 
 export const conditionals: IConditionals = {
