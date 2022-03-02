@@ -35,7 +35,6 @@ import {
   IPDFTemplate,
   ISVGTemplate
 } from '@client/pdfRenderer/transformer/types'
-import { ICertificateCollectorDefinition } from '@client/views/PrintCertificate/VerifyCollector'
 import _ from 'lodash'
 import { registerForms } from '@client/forms/register/fieldDefinitions/register'
 import { createUserForm } from '@client/forms/user/fieldDefinitions/createUser'

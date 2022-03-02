@@ -14,7 +14,7 @@ import { ILanguageState } from '@client/i18n/reducer'
 import {
   ILocationDataResponse,
   IFacilitiesDataResponse,
-  IDefinitionsResponse,
+  IContentResponse,
   IAssetResponse,
   IApplicationConfigResponse
 } from '@client/utils/referenceApi'
@@ -29,7 +29,7 @@ type GetLocations = {
 export const CONTENT_LOADED = 'OFFLINE/CONTENT_LOADED'
 export type contentLoadedAction = {
   type: typeof CONTENT_LOADED
-  payload: IDefinitionsResponse
+  payload: IContentResponse
 }
 
 export const CONTENT_FAILED = 'OFFLINE/CONTENT_FAILED'
@@ -183,7 +183,7 @@ export const getOfflineDataFailed = (): IGetOfflineDataFailedAction => ({
 })
 
 export const contentLoaded = (
-  payload: IDefinitionsResponse
+  payload: IContentResponse
 ): contentLoadedAction => ({
   type: CONTENT_LOADED,
   payload: payload
