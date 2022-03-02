@@ -13,6 +13,9 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IRecordAuditMessages
   extends Record<string | number | symbol, MessageDescriptor> {
+  archived: MessageDescriptor
+  confirmationBody: MessageDescriptor
+  confirmationTitle: MessageDescriptor
   status: MessageDescriptor
   type: MessageDescriptor
   trackingId: MessageDescriptor
@@ -35,6 +38,22 @@ interface IRecordAuditMessages
 }
 
 const messagesToDefine: IRecordAuditMessages = {
+  archived: {
+    id: 'recordAudit.archive.status',
+    defaultMessage: 'Archived',
+    description: 'Archived status'
+  },
+  confirmationBody: {
+    id: 'recordAudit.archive.confirmation.body',
+    defaultMessage:
+      'This will remove the declaration from the workqueue and change the status to Archive. To revert this change you will need to search for the declaration.',
+    description: 'Confirmation body for archiving a declaration'
+  },
+  confirmationTitle: {
+    id: 'recordAudit.archive.confirmation.title',
+    defaultMessage: 'Archive declaration?',
+    description: 'Confirmation title for archiving a declaration'
+  },
   status: {
     id: 'recordAudit.status',
     defaultMessage: 'Status',

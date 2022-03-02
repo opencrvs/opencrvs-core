@@ -205,6 +205,14 @@ export function getTaskEventType(task: fhir.Task) {
   }
 }
 
+function getTaskBusinessStatus(taskResource: fhir.Task) {
+  return taskResource.businessStatus?.coding?.[0]?.code
+}
+
+export function isArchiveTask(taskResource: fhir.Task) {
+  return getTaskBusinessStatus(taskResource) === 'ARCHIVED'
+}
+
 export function getEventType(fhirBundle: fhir.Bundle) {
   if (fhirBundle.entry && fhirBundle.entry[0] && fhirBundle.entry[0].resource) {
     const firstEntry = fhirBundle.entry[0].resource

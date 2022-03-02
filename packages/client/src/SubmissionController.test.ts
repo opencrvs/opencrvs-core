@@ -18,8 +18,17 @@ import {
   SUBMIT_BIRTH_APPLICATION,
   APPROVE_BIRTH_APPLICATION,
   REGISTER_BIRTH_APPLICATION,
-  REJECT_BIRTH_APPLICATION
+  REJECT_BIRTH_APPLICATION,
+  COLLECT_BIRTH_CERTIFICATE,
+  ARCHIVE_BIRTH_DECLARATION
 } from '@client/views/DataProvider/birth/mutations'
+import {
+  ARCHIVE_DEATH_DECLARATION,
+  APPROVE_DEATH_APPLICATION,
+  COLLECT_DEATH_CERTIFICATE,
+  REGISTER_DEATH_APPLICATION,
+  REJECT_DEATH_APPLICATION
+} from '@client/views/DataProvider/death/mutations'
 import { ApolloError } from 'apollo-client'
 import { flushPromises } from './tests/util'
 
@@ -183,7 +192,7 @@ describe('Submission Controller', () => {
     expect(store.dispatch.mock.calls[9][0].type).toBe('APPLICATION/WRITE_DRAFT')
   })
 
-  it('sync all ready to approve application and deletes approved application', async () => {
+  it('syncs all ready to approve birth application and deletes approved application', async () => {
     const store = {
       getState: () => ({
         applicationsState: {
@@ -227,7 +236,51 @@ describe('Submission Controller', () => {
     )
   })
 
-  it('sync all ready to register application and deletes registered application', async () => {
+  it('syncs all ready to approve death application and deletes approved application', async () => {
+    const store = {
+      getState: () => ({
+        applicationsState: {
+          applications: [
+            {
+              event: 'death',
+              submissionStatus: SUBMISSION_STATUS.READY_TO_APPROVE,
+              action: Action.APPROVE_APPLICATION
+            }
+          ]
+        },
+        registerForm: {
+          registerForm: {}
+        },
+        profile: {
+          tokenPayload: {
+            scope: []
+          }
+        }
+      }),
+      dispatch: jest.fn()
+    }
+
+    // @ts-ignore
+    const subCon = new SubmissionController(store)
+    subCon.client = createMockClient()
+    const mutationHandler = jest.fn().mockResolvedValue({
+      data: { data: { markDeathAsValidated: {} } }
+    })
+    subCon.client.setRequestHandler(APPROVE_DEATH_APPLICATION, mutationHandler)
+
+    await subCon.sync()
+
+    expect(mutationHandler).toHaveBeenCalledTimes(1)
+    expect(store.dispatch).toHaveBeenCalledTimes(5)
+    expect(
+      store.dispatch.mock.calls[0][0].payload.application.submissionStatus
+    ).toBe(SUBMISSION_STATUS.APPROVED)
+    expect(store.dispatch.mock.calls[4][0].type).toBe(
+      'APPLICATION/DELETE_DRAFT'
+    )
+  })
+
+  it('syncs all ready to register birth application and deletes registered application', async () => {
     const store = {
       getState: () => ({
         applicationsState: {
@@ -272,7 +325,52 @@ describe('Submission Controller', () => {
     )
   })
 
-  it('sync all ready to reject application and deletes rejected application', async () => {
+  it('syncs all ready to register death application and deletes registered application', async () => {
+    const store = {
+      getState: () => ({
+        applicationsState: {
+          applications: [
+            {
+              event: 'death',
+              submissionStatus: SUBMISSION_STATUS.READY_TO_REGISTER,
+              action: Action.REGISTER_APPLICATION
+            }
+          ]
+        },
+        registerForm: {
+          registerForm: {}
+        },
+        profile: {
+          tokenPayload: {
+            scope: []
+          }
+        }
+      }),
+      dispatch: jest.fn()
+    }
+
+    // @ts-ignore
+    const subCon = new SubmissionController(store)
+
+    subCon.client = createMockClient()
+    const mutationHandler = jest.fn().mockResolvedValue({
+      data: { data: { markDeathAsValidated: {} } }
+    })
+    subCon.client.setRequestHandler(REGISTER_DEATH_APPLICATION, mutationHandler)
+
+    await subCon.sync()
+
+    expect(mutationHandler).toHaveBeenCalledTimes(1)
+    expect(store.dispatch).toHaveBeenCalledTimes(5)
+    expect(
+      store.dispatch.mock.calls[0][0].payload.application.submissionStatus
+    ).toBe(SUBMISSION_STATUS.REGISTERED)
+    expect(store.dispatch.mock.calls[4][0].type).toBe(
+      'APPLICATION/DELETE_DRAFT'
+    )
+  })
+
+  it('syncs all ready to reject birth application and deletes rejected application', async () => {
     const store = {
       getState: () => ({
         applicationsState: {
@@ -315,6 +413,217 @@ describe('Submission Controller', () => {
     expect(store.dispatch.mock.calls[4][0].type).toBe(
       'APPLICATION/DELETE_DRAFT'
     )
+  })
+
+  it('syncs all ready to reject death application and deletes rejected application', async () => {
+    const store = {
+      getState: () => ({
+        applicationsState: {
+          applications: [
+            {
+              event: 'death',
+              submissionStatus: SUBMISSION_STATUS.READY_TO_REJECT,
+              action: Action.REJECT_APPLICATION
+            }
+          ]
+        },
+        registerForm: {
+          registerForm: {}
+        },
+        profile: {
+          tokenPayload: {
+            scope: []
+          }
+        }
+      }),
+      dispatch: jest.fn()
+    }
+
+    // @ts-ignore
+    const subCon = new SubmissionController(store)
+
+    subCon.client = createMockClient()
+    const mutationHandler = jest.fn().mockResolvedValue({
+      data: { data: { markDeathAsValidated: {} } }
+    })
+    subCon.client.setRequestHandler(REJECT_DEATH_APPLICATION, mutationHandler)
+
+    await subCon.sync()
+
+    expect(mutationHandler).toHaveBeenCalledTimes(1)
+    expect(store.dispatch).toHaveBeenCalledTimes(5)
+    expect(
+      store.dispatch.mock.calls[0][0].payload.application.submissionStatus
+    ).toBe(SUBMISSION_STATUS.REJECTED)
+    expect(store.dispatch.mock.calls[4][0].type).toBe(
+      'APPLICATION/DELETE_DRAFT'
+    )
+  })
+
+  it('syncs all ready to certify birth application', async () => {
+    const store = {
+      getState: () => ({
+        applicationsState: {
+          applications: [
+            {
+              event: 'birth',
+              submissionStatus: SUBMISSION_STATUS.READY_TO_CERTIFY,
+              action: Action.COLLECT_CERTIFICATE
+            }
+          ]
+        },
+        registerForm: {
+          registerForm: {}
+        },
+        profile: {
+          tokenPayload: {
+            scope: []
+          }
+        }
+      }),
+      dispatch: jest.fn()
+    }
+
+    // @ts-ignore
+    const subCon = new SubmissionController(store)
+    subCon.client = createMockClient()
+    const mutationHandler = jest.fn().mockResolvedValue({
+      data: { data: { markBirthAsCertified: {} } }
+    })
+    subCon.client.setRequestHandler(COLLECT_BIRTH_CERTIFICATE, mutationHandler)
+
+    await subCon.sync()
+
+    expect(mutationHandler).toHaveBeenCalledTimes(1)
+    expect(store.dispatch).toHaveBeenCalledTimes(5)
+    expect(
+      store.dispatch.mock.calls[0][0].payload.application.submissionStatus
+    ).toBe(SUBMISSION_STATUS.CERTIFIED)
+  })
+
+  it('syncs all ready to certify death application', async () => {
+    const store = {
+      getState: () => ({
+        applicationsState: {
+          applications: [
+            {
+              event: 'death',
+              submissionStatus: SUBMISSION_STATUS.READY_TO_CERTIFY,
+              action: Action.COLLECT_CERTIFICATE
+            }
+          ]
+        },
+        registerForm: {
+          registerForm: {}
+        },
+        profile: {
+          tokenPayload: {
+            scope: []
+          }
+        }
+      }),
+      dispatch: jest.fn()
+    }
+
+    // @ts-ignore
+    const subCon = new SubmissionController(store)
+    subCon.client = createMockClient()
+    const mutationHandler = jest.fn().mockResolvedValue({
+      data: { data: { markBirthAsCertified: {} } }
+    })
+    subCon.client.setRequestHandler(COLLECT_DEATH_CERTIFICATE, mutationHandler)
+
+    await subCon.sync()
+
+    expect(mutationHandler).toHaveBeenCalledTimes(1)
+    expect(store.dispatch).toHaveBeenCalledTimes(5)
+    expect(
+      store.dispatch.mock.calls[0][0].payload.application.submissionStatus
+    ).toBe(SUBMISSION_STATUS.CERTIFIED)
+  })
+
+  it('syncs all ready to archive birth applications', async () => {
+    const store = {
+      getState: () => ({
+        applicationsState: {
+          applications: [
+            {
+              event: 'birth',
+              submissionStatus: SUBMISSION_STATUS.READY_TO_ARCHIVE,
+              action: Action.ARCHIVE_DECLARATION
+            }
+          ]
+        },
+        registerForm: {
+          registerForm: {}
+        },
+        profile: {
+          tokenPayload: {
+            scope: []
+          }
+        }
+      }),
+      dispatch: jest.fn()
+    }
+
+    // @ts-ignore
+    const subCon = new SubmissionController(store)
+
+    subCon.client = createMockClient()
+    const mutationHandler = jest.fn().mockResolvedValue({
+      data: { data: { markEventAsArchived: {} } }
+    })
+    subCon.client.setRequestHandler(ARCHIVE_BIRTH_DECLARATION, mutationHandler)
+
+    await subCon.sync()
+
+    expect(mutationHandler).toHaveBeenCalledTimes(1)
+    expect(store.dispatch).toHaveBeenCalledTimes(5)
+    expect(
+      store.dispatch.mock.calls[0][0].payload.application.submissionStatus
+    ).toBe(SUBMISSION_STATUS.ARCHIVED)
+  })
+
+  it('syncs all ready to archive death applications', async () => {
+    const store = {
+      getState: () => ({
+        applicationsState: {
+          applications: [
+            {
+              event: 'death',
+              submissionStatus: SUBMISSION_STATUS.READY_TO_ARCHIVE,
+              action: Action.ARCHIVE_DECLARATION
+            }
+          ]
+        },
+        registerForm: {
+          registerForm: {}
+        },
+        profile: {
+          tokenPayload: {
+            scope: []
+          }
+        }
+      }),
+      dispatch: jest.fn()
+    }
+
+    // @ts-ignore
+    const subCon = new SubmissionController(store)
+
+    subCon.client = createMockClient()
+    const mutationHandler = jest.fn().mockResolvedValue({
+      data: { data: { markEventAsArchived: {} } }
+    })
+    subCon.client.setRequestHandler(ARCHIVE_DEATH_DECLARATION, mutationHandler)
+
+    await subCon.sync()
+
+    expect(mutationHandler).toHaveBeenCalledTimes(1)
+    expect(store.dispatch).toHaveBeenCalledTimes(5)
+    expect(
+      store.dispatch.mock.calls[0][0].payload.application.submissionStatus
+    ).toBe(SUBMISSION_STATUS.ARCHIVED)
   })
 
   it('fails a application that has a network error', async () => {

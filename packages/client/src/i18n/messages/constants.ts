@@ -20,6 +20,7 @@ interface IConstantsMessages
   applicantContactNumber: MessageDescriptor
   application: MessageDescriptor
   applications: MessageDescriptor
+  applicationArchivedOn: MessageDescriptor
   applicationCollectedOn: MessageDescriptor
   applicationFailedOn: MessageDescriptor
   applicationInformantLabel: MessageDescriptor
@@ -173,6 +174,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Applications ({totalItems})',
     description: 'A label for applications count',
     id: 'constants.applicationsCount'
+  },
+  applicationArchivedOn: {
+    defaultMessage: 'Application archived on',
+    description: 'Label for the workflow timestamp when the status is archived',
+    id: 'constants.applicationArchivedOn'
   },
   applicationCollectedOn: {
     defaultMessage: 'Certificate collected on',

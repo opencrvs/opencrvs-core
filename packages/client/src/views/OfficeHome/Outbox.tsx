@@ -43,8 +43,10 @@ class Outbox extends React.Component<IFullProps, IState> {
   submissionStatusMap = (status: string, index: number) => {
     const { formatMessage } = this.props.intl
     const {
+      statusWaitingToBeArchived,
       statusWaitingToRegister,
       statusWaitingToValidate,
+      statusArchiving,
       statusRegistering,
       statusWaitingToReject,
       statusRejecting,
@@ -104,6 +106,16 @@ class Outbox extends React.Component<IFullProps, IState> {
         iconId = `rejecting${index}`
         icon = () => <Spinner id={iconId} key={iconId} size={24} />
         statusText = formatMessage(statusRejecting)
+        break
+      case SUBMISSION_STATUS.READY_TO_ARCHIVE:
+        iconId = `waiting${index}`
+        icon = () => <StatusWaiting id={iconId} key={iconId} />
+        statusText = formatMessage(statusWaitingToBeArchived)
+        break
+      case SUBMISSION_STATUS.ARCHIVING:
+        iconId = `registering${index}`
+        icon = () => <Spinner id={iconId} key={iconId} size={24} />
+        statusText = formatMessage(statusArchiving)
         break
       case SUBMISSION_STATUS.FAILED_NETWORK:
         iconId = `failed${index}`

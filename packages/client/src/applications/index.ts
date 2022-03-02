@@ -51,6 +51,7 @@ import ApolloClient, { ApolloError, ApolloQueryResult } from 'apollo-client'
 import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
 import { v4 as uuid } from 'uuid'
 
+const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_APPLICATION = 'APPLICATION/SET_INITIAL_APPLICATION'
 const STORE_APPLICATION = 'APPLICATION/STORE_APPLICATION'
 const MODIFY_APPLICATION = 'APPLICATION/MODIFY_DRAFT'
@@ -91,6 +92,9 @@ export enum SUBMISSION_STATUS {
   READY_TO_REJECT = 'READY_TO_REJECT',
   REJECTING = 'REJECTING',
   REJECTED = 'REJECTED',
+  READY_TO_ARCHIVE = 'READY_TO_ARCHIVE',
+  ARCHIVING = 'ARCHIVING',
+  ARCHIVED = 'ARCHIVED',
   READY_TO_CERTIFY = 'READY_TO_CERTIFY',
   CERTIFYING = 'CERTIFYING',
   CERTIFIED = 'CERTIFIED',
@@ -271,6 +275,11 @@ type Payment = {
   date: number
 }
 
+interface IArchiveDeclarationAction {
+  type: typeof ARCHIVE_DECLARATION
+  payload: { declarationId: string }
+}
+
 interface IStoreApplicationAction {
   type: typeof STORE_APPLICATION
   payload: { application: IApplication }
@@ -397,6 +406,7 @@ interface UpdateFieldAgentDeclaredApplicationsFailAction {
 }
 
 export type Action =
+  | IArchiveDeclarationAction
   | IStoreApplicationAction
   | IModifyApplicationAction
   | IClearCorrectionChange
@@ -557,6 +567,12 @@ export const getStorageApplicationsFailed =
   (): IGetStorageApplicationsFailedAction => ({
     type: GET_APPLICATIONS_FAILED
   })
+
+export function archiveDeclaration(
+  declarationId: string
+): IArchiveDeclarationAction {
+  return { type: ARCHIVE_DECLARATION, payload: { declarationId } }
+}
 
 export function deleteApplication(
   application: IApplication | IPrintableApplication,
@@ -1711,6 +1727,25 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
           ...state,
           applications: userData.applications
         }
+      }
+      return state
+
+    case ARCHIVE_DECLARATION:
+      if (action.payload) {
+        const declaration = state.applications.find(
+          ({ id }) => id === action.payload.declarationId
+        )
+
+        if (!declaration) {
+          return state
+        }
+        const modifiedApplication: IApplication = {
+          ...declaration,
+          submissionStatus: SUBMISSION_STATUS.READY_TO_ARCHIVE,
+          action: ApplicationAction.ARCHIVE_DECLARATION,
+          payload: { id: declaration.id }
+        }
+        return loop(state, Cmd.action(writeApplication(modifiedApplication)))
       }
       return state
 

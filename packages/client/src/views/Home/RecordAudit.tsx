@@ -20,11 +20,10 @@ import {
 import { Navigation } from '@client/components/interface/Navigation'
 import { AvatarSmall } from '@client/components/Avatar'
 import styled from '@client/styledComponents'
-import { ApplicationIcon, Edit } from '@opencrvs/components/lib/icons'
+import { Archive, ApplicationIcon, Edit } from '@opencrvs/components/lib/icons'
 import { connect } from 'react-redux'
 import { RouteComponentProps, Redirect } from 'react-router'
 import {
-  goBack as goBackAction,
   goToRegistrarHomeTab,
   goToPage,
   goToCertificateCorrection,
@@ -37,11 +36,11 @@ import {
   MessageDescriptor
 } from 'react-intl'
 import {
+  archiveDeclaration,
+  clearCorrectionChange,
   IApplication,
   SUBMISSION_STATUS,
-  DOWNLOAD_STATUS,
-  clearCorrectionChange,
-  IWorkqueue
+  DOWNLOAD_STATUS
 } from '@client/applications'
 import { IStoreState } from '@client/store'
 import {
@@ -53,12 +52,27 @@ import {
 import moment from 'moment'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
+import { ResponsiveModal, Loader } from '@opencrvs/components/lib/interface'
+import { getScope } from '@client/profile/profileSelectors'
+import { Scope } from '@client/utils/authUtils'
+import {
+  LinkButton,
+  PrimaryButton,
+  TertiaryButton,
+  ICON_ALIGNMENT,
+  DangerButton
+} from '@opencrvs/components/lib/buttons'
+import {
+  ARCHIVED,
+  DECLARED,
+  VALIDATED,
+  REJECTED
+} from '@client/utils/constants'
 import { IQueryData, EVENT_STATUS } from '@client/views/OfficeHome/OfficeHome'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { generateLocationName } from '@client/utils/locationUtils'
 import { Query } from '@client/components/Query'
 import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/Home/queries'
-import { Loader } from '@opencrvs/components/lib/interface'
 import {
   HOME,
   DRAFT_BIRTH_PARENT_FORM_PAGE,
@@ -73,12 +87,6 @@ import {
   CorrectionSection,
   Action
 } from '@client/forms'
-import {
-  LinkButton,
-  PrimaryButton,
-  ICON_ALIGNMENT,
-  TertiaryButton
-} from '@opencrvs/components/lib/buttons'
 import {
   constantsMessages,
   userMessages,
@@ -99,6 +107,10 @@ const BodyContainer = styled.div`
     margin-left: 265px;
     margin-top: 28px;
   }
+`
+
+const StyledTertiaryButton = styled(TertiaryButton)`
+  align-self: center;
 `
 
 const InfoContainer = styled.div`
@@ -152,38 +164,32 @@ const Heading = styled.h4`
 interface IStateProps {
   userDetails: IUserDetails | null
   language: string
-  workqueue: IWorkqueue
   resources: IOfflineData
-  savedApplications: IApplication[]
-  outboxApplications: IApplication[]
+  scope: Scope | null
   declarationId: string
   draft: IApplication | null
   tab: IRecordAuditTabs
   workqueueDeclaration: GQLEventSearchSet | null
 }
 
+interface IDispatchProps {
+  archiveDeclaration: typeof archiveDeclaration
+  clearCorrectionChange: typeof clearCorrectionChange
+  goToCertificateCorrection: typeof goToCertificateCorrection
+  goToPage: typeof goToPage
+  goToPrintCertificate: typeof goToPrintCertificate
+  goToRegistrarHomeTab: typeof goToRegistrarHomeTab
+}
 export type IRecordAuditTabs = keyof IQueryData | 'search'
 
 type CMethodParams = {
   declaration: IDeclarationData
   intl: IntlShape
   userDetails: IUserDetails | null
-  outboxApplications: IApplication[]
+  draft: IApplication | null
   goToPage?: typeof goToPage
   goToPrintCertificate?: typeof goToPrintCertificate
 }
-
-type IRecordAuditProps = {
-  clearCorrectionChange: typeof clearCorrectionChange
-  goToCertificateCorrection: typeof goToCertificateCorrection
-  goToPage: typeof goToPage
-}
-
-type IDispatchProps = {
-  goBack: typeof goBackAction
-  goToRegistrarHomeTab: typeof goToRegistrarHomeTab
-  goToPrintCertificate: typeof goToPrintCertificate
-} & IRecordAuditProps
 
 type RouteProps = RouteComponentProps<{
   tab: IRecordAuditTabs
@@ -230,6 +236,7 @@ interface IGQLDeclaration {
 }
 
 const STATUSTOCOLOR: { [key: string]: string } = {
+  ARCHIVED: 'grey',
   DRAFT: 'violet',
   DECLARED: 'orange',
   REJECTED: 'red',
@@ -239,29 +246,7 @@ const STATUSTOCOLOR: { [key: string]: string } = {
   WAITING_VALIDATION: 'teal'
 }
 
-const KEY_LABEL: ILabel = {
-  status: 'Status',
-  type: 'Event',
-  trackingId: 'Tracking ID',
-  dateOfBirth: 'Date of birth',
-  dateOfDeath: 'Date of death',
-  placeOfBirth: 'Place of birth',
-  placeOfDeath: 'Place of death',
-  informant: 'Informant',
-  brn: 'BRN',
-  drn: 'DRN'
-}
-
-const NO_DATA_LABEL: ILabel = {
-  status: 'No status',
-  type: 'No event',
-  trackingId: 'No tracking id',
-  dateOfBirth: 'No date of birth',
-  dateOfDeath: 'No date of death',
-  placeOfBirth: 'No place of birth',
-  placeOfDeath: 'No place of death',
-  informant: 'No informant'
-}
+const ARCHIVABLE_STATUSES = [DECLARED, VALIDATED, REJECTED]
 
 const APPLICATION_STATUS_LABEL: IStatus = {
   IN_PROGRESS: {
@@ -489,8 +474,10 @@ const getDeclarationInfo = (
   let informant = getCaptitalizedWord(declaration?.informant)
 
   const status = getCaptitalizedWord(declaration?.status).split('_')
-  let finalStatus = status[0]
-  if (status[1]) finalStatus += ' ' + status[1]
+  const finalStatus = status.reduce(
+    (accum, cur, idx) => (idx > 0 ? accum + ' ' + cur : cur),
+    ''
+  )
 
   if (declaration?.informantContact) {
     informant = informant + ' . ' + declaration.informantContact
@@ -536,7 +523,7 @@ const getDeclarationInfo = (
           <InfoContainer id={'summary'} key={key}>
             <KeyContainer id={`${key}`}>
               <KeyContainer id={`${key}`}>
-                {intl.formatMessage(recordAuditMessages[key as string])}
+                {intl.formatMessage(recordAuditMessages[key])}
               </KeyContainer>
             </KeyContainer>
             <ValueContainer id={`${key}_value`} value={value}>
@@ -567,15 +554,12 @@ const showReviewButton = ({
   declaration,
   intl,
   userDetails,
-  outboxApplications,
+  draft,
   goToPage
 }: CMethodParams) => {
   const { id, type } = declaration || {}
-  const foundApplication = outboxApplications.find(
-    (app) => app.id === declaration.id
-  )
-  const isDownloaded =
-    foundApplication?.downloadStatus == DOWNLOAD_STATUS.DOWNLOADED
+
+  const isDownloaded = draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED
 
   if (!userDetails || !userDetails.role || !type || !isDownloaded) return <></>
   const { role } = userDetails
@@ -607,17 +591,14 @@ const shouldShowUpdateButton = ({
   declaration,
   intl,
   userDetails,
-  outboxApplications,
+  draft,
   goToPage
 }: CMethodParams) => {
   const { id, type } = declaration || {}
 
-  const foundApplication = outboxApplications.find(
-    (app) => app.id === declaration.id
-  )
   const isDownloaded =
-    foundApplication?.downloadStatus == DOWNLOAD_STATUS.DOWNLOADED ||
-    foundApplication?.submissionStatus == SUBMISSION_STATUS.DRAFT
+    draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
+    draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
 
   if (!userDetails || !userDetails.role || !type || !isDownloaded) return <></>
   const { role } = userDetails
@@ -661,28 +642,23 @@ const shouldShowUpdateButton = ({
 
 const showDownloadButton = (
   application: IDeclarationData,
-  userDetails: IUserDetails | null,
-  outboxApplications: IApplication[]
+  draft: IApplication | null,
+  userDetails: IUserDetails | null
 ) => {
   const { id, type } = application || {}
 
   if (application == null || id == null || type == null) return <></>
 
-  const foundApplication = outboxApplications.find(
-    (app) => app.id === application.id
-  )
-
-  const downloadStatus =
-    (foundApplication && foundApplication.downloadStatus) || undefined
+  const downloadStatus = draft?.downloadStatus || undefined
 
   if (
-    userDetails?.role == 'FIELD_AGENT' &&
-    foundApplication?.submissionStatus == SUBMISSION_STATUS.DECLARED
+    userDetails?.role === 'FIELD_AGENT' &&
+    draft?.submissionStatus === SUBMISSION_STATUS.DECLARED
   )
     return <></>
   if (
-    foundApplication?.submissionStatus != SUBMISSION_STATUS.DRAFT &&
-    downloadStatus != DOWNLOAD_STATUS.DOWNLOADED
+    draft?.submissionStatus !== SUBMISSION_STATUS.DRAFT &&
+    downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
   ) {
     const downLoadConfig = {
       event: type,
@@ -705,17 +681,14 @@ const showPrintButton = ({
   declaration,
   intl,
   userDetails,
-  outboxApplications,
+  draft,
   goToPrintCertificate
 }: CMethodParams) => {
   const { id, type } = declaration || {}
 
-  const foundApplication = outboxApplications.find(
-    (app) => app.id === declaration.id
-  )
   const isDownloaded =
-    foundApplication?.downloadStatus == DOWNLOAD_STATUS.DOWNLOADED ||
-    foundApplication?.submissionStatus == SUBMISSION_STATUS.DRAFT
+    draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
+    draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
 
   if (!userDetails || !userDetails.role || !type || !isDownloaded) return <></>
   const { role } = userDetails
@@ -795,16 +768,8 @@ const getFormattedDate = (date: Date) => {
   )
 }
 
-const getHistory = ({
-  declaration,
-  intl,
-  outboxApplications
-}: CMethodParams) => {
-  const savedApplication = outboxApplications.find(
-    (app) => app.id === declaration.id
-  )
-
-  if (!savedApplication?.data?.history?.length)
+const getHistory = ({ intl, draft }: CMethodParams) => {
+  if (!draft?.data?.history?.length)
     return (
       <>
         <hr />
@@ -814,7 +779,7 @@ const getHistory = ({
     )
 
   const historyData = (
-    savedApplication.data.history as unknown as { [key: string]: any }[]
+    draft.data.history as unknown as { [key: string]: any }[]
   )
     // TODO: We need to figure out a way to sort the history in backend
     .sort((fe, se) => {
@@ -843,7 +808,7 @@ const getHistory = ({
       width: 20,
       key: 'date'
     },
-    { label: 'By', width: 25, key: 'user', isIconColumn: true },
+    { label: 'By', width: 20, key: 'user', isIconColumn: true },
     { label: 'Type', width: 20, key: 'type' },
     { label: 'Location', width: 20, key: 'location' }
   ]
@@ -866,29 +831,44 @@ const getHistory = ({
 }
 
 function RecordAuditBody({
+  archiveDeclaration,
   clearCorrectionChange,
   declaration,
-  isDownloaded = false,
+  draft,
   intl,
   goToCertificateCorrection,
-  userDetails,
-  outboxApplications,
-  goToPage
+  goToPage,
+  goToRegistrarHomeTab,
+  scope,
+  userDetails
 }: {
   declaration: IDeclarationData
-  isDownloaded?: boolean
+  draft: IApplication | null
   intl: IntlShape
+  scope: Scope | null
   userDetails: IUserDetails | null
-  outboxApplications: IApplication[]
-} & IRecordAuditProps) {
-  const actions = []
+} & IDispatchProps) {
+  const [showDialog, setShowDialog] = React.useState(false)
+
+  const toggleDisplayDialog = () => setShowDialog((prevValue) => !prevValue)
+
+  const userHasRegisterScope = scope && scope.includes('register')
+  const userHasValidateScope = scope && scope.includes('validate')
+
+  const actions: React.ReactElement[] = []
+
+  const isDownloaded =
+    draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
+    draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
+
   if (
     isDownloaded &&
+    (userHasValidateScope || userHasRegisterScope) &&
     (declaration.status === SUBMISSION_STATUS.REGISTERED ||
       declaration.status === SUBMISSION_STATUS.CERTIFIED)
   ) {
     actions.push(
-      <TertiaryButton
+      <StyledTertiaryButton
         id="btn-correct-record"
         align={ICON_ALIGNMENT.LEFT}
         icon={() => <Edit />}
@@ -898,88 +878,130 @@ function RecordAuditBody({
         }}
       >
         {intl.formatMessage(correctionMessages.title)}
-      </TertiaryButton>
+      </StyledTertiaryButton>
     )
   }
 
-  declaration &&
+  if (
+    isDownloaded &&
+    (userHasValidateScope || userHasRegisterScope) &&
+    declaration.status &&
+    ARCHIVABLE_STATUSES.includes(declaration.status)
+  ) {
     actions.push(
-      showDownloadButton(declaration, userDetails, outboxApplications)
+      <StyledTertiaryButton
+        align={ICON_ALIGNMENT.LEFT}
+        id="archive_button"
+        key="archive_button"
+        icon={() => <Archive />}
+        onClick={toggleDisplayDialog}
+      >
+        {intl.formatMessage(buttonMessages.archive)}
+      </StyledTertiaryButton>
     )
-  declaration &&
-    actions.push(
-      showReviewButton({
-        declaration,
-        intl,
-        userDetails,
-        outboxApplications,
-        goToPage
-      })
-    )
-  declaration &&
-    actions.push(
-      shouldShowUpdateButton({
-        declaration,
-        intl,
-        userDetails,
-        outboxApplications,
-        goToPage
-      })
-    )
-  declaration &&
-    actions.push(
-      showPrintButton({
-        declaration,
-        intl,
-        userDetails,
-        outboxApplications,
-        goToPrintCertificate
-      })
-    )
+  }
+
+  if (!isDownloaded) {
+    actions.push(showDownloadButton(declaration, draft, userDetails))
+  }
+
+  actions.push(
+    showReviewButton({
+      declaration,
+      intl,
+      userDetails,
+      draft,
+      goToPage
+    })
+  )
+
+  actions.push(
+    shouldShowUpdateButton({
+      declaration,
+      intl,
+      userDetails,
+      draft,
+      goToPage
+    })
+  )
+  actions.push(
+    showPrintButton({
+      declaration,
+      intl,
+      userDetails,
+      draft,
+      goToPrintCertificate
+    })
+  )
 
   return (
-    <Content
-      title={declaration.name || intl.formatMessage(recordAuditMessages.noName)}
-      titleColor={declaration.name ? 'copy' : 'grey600'}
-      size={ContentSize.LARGE}
-      topActionButtons={actions}
-      icon={() => (
-        <ApplicationIcon
-          color={
-            STATUSTOCOLOR[
-              (declaration && declaration.status) || SUBMISSION_STATUS.DRAFT
-            ]
-          }
-        />
-      )}
-    >
-      {getDeclarationInfo(declaration, isDownloaded, intl)}
-      {getHistory({ declaration, intl, outboxApplications, userDetails })}
-    </Content>
+    <>
+      <Content
+        title={
+          declaration.name || intl.formatMessage(recordAuditMessages.noName)
+        }
+        titleColor={declaration.name ? 'copy' : 'grey600'}
+        size={ContentSize.LARGE}
+        topActionButtons={actions}
+        icon={() => (
+          <ApplicationIcon
+            isArchive={declaration?.status === ARCHIVED}
+            color={
+              STATUSTOCOLOR[
+                (declaration && declaration.status) || SUBMISSION_STATUS.DRAFT
+              ]
+            }
+          />
+        )}
+      >
+        {getDeclarationInfo(declaration, isDownloaded, intl)}
+        {getHistory({ declaration, intl, draft, userDetails })}
+      </Content>
+      <ResponsiveModal
+        title={intl.formatMessage(recordAuditMessages.confirmationTitle)}
+        contentHeight={96}
+        responsive={false}
+        actions={[
+          <TertiaryButton
+            id="archive_cancel"
+            key="archive_cancel"
+            onClick={toggleDisplayDialog}
+          >
+            {intl.formatMessage(buttonMessages.cancel)}
+          </TertiaryButton>,
+          <DangerButton
+            id="archive_confirm"
+            key="archive_confirm"
+            onClick={() => {
+              archiveDeclaration(declaration.id)
+              toggleDisplayDialog()
+              goToRegistrarHomeTab('review')
+            }}
+          >
+            {intl.formatMessage(buttonMessages.archive)}
+          </DangerButton>
+        ]}
+        show={showDialog}
+        handleClose={toggleDisplayDialog}
+      >
+        {intl.formatMessage(recordAuditMessages.confirmationBody)}
+      </ResponsiveModal>
+    </>
   )
 }
 
 function getBodyContent({
-  clearCorrectionChange,
   declarationId,
   draft,
-  goToCertificateCorrection,
-  language,
-  tab,
   intl,
+  language,
+  scope,
   resources,
-  workqueueDeclaration,
+  tab,
   userDetails,
-  outboxApplications,
-  goToPage
+  workqueueDeclaration,
+  ...actionProps
 }: IFullProps) {
-  const actionProps = {
-    clearCorrectionChange,
-    goToCertificateCorrection,
-    userDetails,
-    outboxApplications,
-    goToPage
-  }
   if (!draft && tab === 'search') {
     return (
       <>
@@ -998,12 +1020,15 @@ function getBodyContent({
             }
             return (
               <RecordAuditBody
+                {...actionProps}
                 declaration={getGQLDeclaration(
                   data.fetchRegistration,
                   language
                 )}
+                draft={draft}
                 intl={intl}
-                {...actionProps}
+                scope={scope}
+                userDetails={userDetails}
               />
             )
           }}
@@ -1018,18 +1043,18 @@ function getBodyContent({
         language
       )
   return (
-    <>
-      <RecordAuditBody
-        declaration={declaration}
-        isDownloaded={!!draft}
-        intl={intl}
-        {...actionProps}
-      />
-    </>
+    <RecordAuditBody
+      {...actionProps}
+      declaration={declaration}
+      draft={draft}
+      intl={intl}
+      scope={scope}
+      userDetails={userDetails}
+    />
   )
 }
 
-const ShowRecordAudit = (props: IFullProps) => {
+const RecordAuditComp = (props: IFullProps) => {
   return (
     <>
       <Header />
@@ -1042,13 +1067,6 @@ const ShowRecordAudit = (props: IFullProps) => {
 function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
   const { declarationId, tab } = props.match.params
   return {
-    userDetails: state.profile.userDetails,
-    language: getLanguage(state),
-    workqueue: state.workqueueState.workqueue,
-    savedApplications:
-      state.applicationsState.applications &&
-      state.applicationsState.applications,
-    outboxApplications: state.applicationsState.applications,
     declarationId,
     draft:
       state.applicationsState.applications.find(
@@ -1056,8 +1074,11 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
           declaration.id === declarationId ||
           declaration.compositionId === declarationId
       ) || null,
+    language: getLanguage(state),
     resources: getOfflineData(state),
+    scope: getScope(state),
     tab,
+    userDetails: state.profile.userDetails,
     workqueueDeclaration:
       (tab !== 'search' &&
         state.workqueueState.workqueue.data[tab].results?.find(
@@ -1073,10 +1094,10 @@ export const RecordAudit = connect<
   RouteProps,
   IStoreState
 >(mapStateToProps, {
-  goBack: goBackAction,
-  goToRegistrarHomeTab,
-  goToPage,
+  archiveDeclaration,
   clearCorrectionChange,
   goToCertificateCorrection,
-  goToPrintCertificate
-})(injectIntl(ShowRecordAudit))
+  goToPage,
+  goToPrintCertificate,
+  goToRegistrarHomeTab
+})(injectIntl(RecordAuditComp))

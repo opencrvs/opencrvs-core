@@ -15,6 +15,8 @@ import {
   createTestComponent,
   mockApplicationData,
   createRouterProps,
+  registerScopeToken,
+  getItem,
   flushPromises,
   mockDeathApplicationData
 } from '@client/tests/util'
@@ -24,12 +26,15 @@ import { ReactWrapper } from 'enzyme'
 import {
   createApplication,
   storeApplication,
-  IApplication
+  IApplication,
+  SUBMISSION_STATUS,
+  DOWNLOAD_STATUS
 } from '@client/applications'
 import { Event } from '@client/forms'
 import { formatUrl } from '@client/navigation'
 import { DECLARATION_RECORD_AUDIT } from '@client/navigation/routes'
 import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
+import { checkAuth } from '@client/profile/profileActions'
 import { FETCH_DECLARATION_SHORT_INFO } from './queries'
 import { waitForElement } from '@client/tests/wait-for-element'
 
@@ -219,6 +224,67 @@ describe('Record audit summary for WorkQueue declarations', () => {
   })
 })
 
+describe('Record audit for a draft declaration', () => {
+  let component: ReactWrapper<{}, {}>
+
+  beforeEach(async () => {
+    const { store, history } = createStore()
+
+    getItem.mockReturnValue(registerScopeToken)
+
+    store.dispatch(checkAuth({ '?token': registerScopeToken }))
+
+    await flushPromises()
+
+    declaration.submissionStatus = SUBMISSION_STATUS.DECLARED
+    declaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
+    store.dispatch(storeApplication(declaration))
+
+    component = await createTestComponent(
+      <RecordAudit
+        {...createRouterProps(
+          formatUrl(DECLARATION_RECORD_AUDIT, {
+            declarationId: declaration.id,
+            tab: 'reviewTab'
+          }),
+          { isNavigatedInsideApp: false },
+          {
+            matchParams: {
+              declarationId: declaration.id,
+              tab: 'reviewTab'
+            }
+          }
+        )}
+      />,
+      { store, history }
+    )
+  })
+
+  it('should show the archive button', async () => {
+    expect(component.exists('#archive_button')).toBeTruthy()
+  })
+
+  it('should show the confirmation modal when archive button is clicked', async () => {
+    component.find('#archive_button').hostNodes().simulate('click')
+
+    component.update()
+
+    expect(component.find('ResponsiveModal').prop('show')).toBeTruthy()
+  })
+
+  it('should close the confirmation modal when cancel button is clicked', async () => {
+    component.find('#archive_button').hostNodes().simulate('click')
+
+    component.update()
+
+    component.find('#archive_cancel').hostNodes().simulate('click')
+
+    component.update()
+
+    expect(component.find('ResponsiveModal').prop('show')).toBe(false)
+  })
+})
+
 describe('Record audit summary for GQLQuery', () => {
   let component: ReactWrapper<{}, {}>
 
@@ -282,10 +348,10 @@ describe('Record audit summary for GQLQuery', () => {
 
     await flushPromises()
     component.update()
+    await waitForElement(component, 'RecordAuditBody')
   })
 
   it('Record Audit page loads properly', async () => {
-    await waitForElement(component, 'RecordAuditBody')
     expect(component.exists('RecordAuditBody')).toBeTruthy()
   })
 
@@ -340,7 +406,6 @@ describe('Record audit summary for unsuccesful GQLQuery', () => {
   })
 
   it('Redirect to home page', async () => {
-    await flushPromises()
     expect(window.location.href).not.toContain('/record-audit')
   })
 })

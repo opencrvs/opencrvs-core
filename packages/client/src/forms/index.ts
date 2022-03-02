@@ -77,6 +77,7 @@ export enum Action {
   REGISTER_APPLICATION = 'register',
   COLLECT_CERTIFICATE = 'collect certificate',
   REJECT_APPLICATION = 'reject',
+  ARCHIVE_DECLARATION = 'archive',
   LOAD_REVIEW_APPLICATION = 'load application data for review',
   LOAD_CERTIFICATE_APPLICATION = 'load application data for certificate collection',
   LOAD_REQUESTED_CORRECTION_APPLICATION = 'load application data for which is requested correction',
