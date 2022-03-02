@@ -248,6 +248,8 @@ class DocumentUploaderWithOptionComp extends React.Component<
     }
 
     this.props.onComplete([...this.props.files, newDocument])
+    this.props.onUploadingStateChanged &&
+      this.props.onUploadingStateChanged(false)
 
     this.setState((prevState) => {
       return {
