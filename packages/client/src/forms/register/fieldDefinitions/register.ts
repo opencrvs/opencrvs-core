@@ -2442,7 +2442,8 @@ export const registerForms = {
                 },
                 dynamicOptions: {
                   resource: 'locations',
-                  dependency: 'countryPermanent'
+                  dependency: 'countryPermanent',
+                  initialValue: 'agentDefault'
                 },
                 conditionals: [
                   {
@@ -2493,7 +2494,8 @@ export const registerForms = {
                 },
                 dynamicOptions: {
                   resource: 'locations',
-                  dependency: 'statePermanent'
+                  dependency: 'statePermanent',
+                  initialValue: 'agentDefault'
                 },
                 conditionals: [
                   {
@@ -4388,7 +4390,8 @@ export const registerForms = {
                 },
                 dynamicOptions: {
                   resource: 'locations',
-                  dependency: 'countryPlaceOfHeritage'
+                  dependency: 'countryPlaceOfHeritage',
+                  initialValue: 'agentDefault'
                 },
                 conditionals: [
                   {
@@ -4431,7 +4434,8 @@ export const registerForms = {
                 },
                 dynamicOptions: {
                   resource: 'locations',
-                  dependency: 'statePlaceOfHeritage'
+                  dependency: 'statePlaceOfHeritage',
+                  initialValue: 'agentDefault'
                 },
                 conditionals: [
                   {
@@ -4899,7 +4903,8 @@ export const registerForms = {
                 },
                 dynamicOptions: {
                   resource: 'locations',
-                  dependency: 'countryPermanent'
+                  dependency: 'countryPermanent',
+                  initialValue: 'agentDefault'
                 },
                 conditionals: [
                   {
@@ -4941,7 +4946,8 @@ export const registerForms = {
                 },
                 dynamicOptions: {
                   resource: 'locations',
-                  dependency: 'statePermanent'
+                  dependency: 'statePermanent',
+                  initialValue: 'agentDefault'
                 },
                 conditionals: [
                   {
@@ -7037,7 +7043,8 @@ export const registerForms = {
                 },
                 dynamicOptions: {
                   resource: 'locations',
-                  dependency: 'countryPermanent'
+                  dependency: 'countryPermanent',
+                  initialValue: 'agentDefault'
                 },
                 conditionals: [
                   {
@@ -7087,7 +7094,8 @@ export const registerForms = {
                 },
                 dynamicOptions: {
                   resource: 'locations',
-                  dependency: 'statePermanent'
+                  dependency: 'statePermanent',
+                  initialValue: 'agentDefault'
                 },
                 conditionals: [
                   {
@@ -9118,7 +9126,8 @@ export const registerForms = {
                 },
                 dynamicOptions: {
                   resource: 'locations',
-                  dependency: 'countryPermanent'
+                  dependency: 'countryPermanent',
+                  initialValue: 'agentDefault'
                 },
                 conditionals: [
                   {
@@ -9160,7 +9169,8 @@ export const registerForms = {
                 },
                 dynamicOptions: {
                   resource: 'locations',
-                  dependency: 'statePermanent'
+                  dependency: 'statePermanent',
+                  initialValue: 'agentDefault'
                 },
                 conditionals: [
                   {
@@ -11250,7 +11260,8 @@ export const registerForms = {
                 },
                 dynamicOptions: {
                   resource: 'locations',
-                  dependency: 'countryPermanent'
+                  dependency: 'countryPermanent',
+                  initialValue: 'agentDefault'
                 },
                 conditionals: [
                   {
@@ -11305,7 +11316,8 @@ export const registerForms = {
                 },
                 dynamicOptions: {
                   resource: 'locations',
-                  dependency: 'statePermanent'
+                  dependency: 'statePermanent',
+                  initialValue: 'agentDefault'
                 },
                 conditionals: [
                   {
