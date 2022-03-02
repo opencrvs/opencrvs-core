@@ -14,7 +14,7 @@ import { IForm, ReviewSection, ISerializedForm } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/review'
 import * as offlineActions from '@client/offline/actions'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
-import { defaultFormsConfig } from '@client/forms/configurable'
+import { registerForms } from '@client/forms/register/fieldDefinitions/register'
 import { mockOfflineData } from '@client/tests/util'
 
 export type IReviewFormState =
@@ -51,12 +51,12 @@ export const reviewReducer: LoopReducer<IReviewFormState, Action> = (
       const birth = deserializeForm(
         process.env.NODE_ENV === 'test'
           ? (mockOfflineData.forms.registerForm.birth as ISerializedForm)
-          : (defaultFormsConfig.registerForm.birth as ISerializedForm)
+          : (registerForms.birth as ISerializedForm)
       )
       const death = deserializeForm(
         process.env.NODE_ENV === 'test'
           ? (mockOfflineData.forms.registerForm.death as ISerializedForm)
-          : (defaultFormsConfig.registerForm.death as ISerializedForm)
+          : (registerForms.death as ISerializedForm)
       )
 
       const review = {

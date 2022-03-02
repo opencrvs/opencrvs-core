@@ -32,6 +32,8 @@ import * as validators from '@opencrvs/client/src/utils/validate'
 import { ICertificate as IApplicationCertificate } from '@client/applications'
 import { IOfflineData } from '@client/offline/reducer'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
+import { registerForms } from './register/fieldDefinitions/register'
+import { createUserForm } from './user/fieldDefinitions/createUser'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'

@@ -39,8 +39,8 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { userAuditForm, IUserAuditForm } from '@client/user/user-audit'
-import { defaultFormsConfig } from '@client/forms/configurable'
 import { mockOfflineData } from '@client/tests/util'
+import { createUserForm } from '@client/forms/user/fieldDefinitions/createUser'
 
 const UPDATE_FORM_FIELD_DEFINITIONS = 'USER_FORM/UPDATE_FORM_FIELD_DEFINITIONS'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'
@@ -276,7 +276,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       const form = deserializeForm(
         process.env.NODE_ENV === 'test'
           ? (mockOfflineData.forms.userForm as ISerializedForm)
-          : (defaultFormsConfig.userForm as ISerializedForm)
+          : (createUserForm as ISerializedForm)
       )
 
       return {

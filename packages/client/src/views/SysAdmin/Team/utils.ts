@@ -17,11 +17,8 @@ import {
   Section
 } from '@client/forms'
 import { deserializeFormSection } from '@client/forms/mappings/deserializer'
-import { createOrUpdateUserMutation } from '@client/forms/user/fieldDefinitions/mutation/mutations'
-import {
-  getRolesQuery,
-  roleQueries
-} from '@client/forms/user/fieldDefinitions/query/queries'
+import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
+import { getRolesQuery, roleQueries } from '@client/forms/user/query/queries'
 import { userMessages } from '@client/i18n/messages'
 import { userQueries } from '@client/user/queries'
 import { draftToGqlTransformer } from '@client/transformer'

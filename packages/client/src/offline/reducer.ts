@@ -37,7 +37,8 @@ import {
 } from '@client/pdfRenderer/transformer/types'
 import { ICertificateCollectorDefinition } from '@client/views/PrintCertificate/VerifyCollector'
 import _ from 'lodash'
-import { defaultFormsConfig } from '@client/forms/configurable'
+import { registerForms } from '@client/forms/register/fieldDefinitions/register'
+import { createUserForm } from '@client/forms/user/fieldDefinitions/createUser'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -71,10 +72,6 @@ interface IForm {
   registerForm: {
     birth: ISerializedForm
     death: ISerializedForm
-  }
-  certificateCollectorDefinition: {
-    birth: ICertificateCollectorDefinition
-    death: ICertificateCollectorDefinition
   }
   userForm: ISerializedForm
 }
@@ -339,6 +336,10 @@ function reducer(
      */
 
     case actions.CONTENT_LOADED: {
+      const defaultFormsConfig = {
+        registerForm: registerForms,
+        userForm: createUserForm
+      }
       return {
         ...state,
         offlineData: {

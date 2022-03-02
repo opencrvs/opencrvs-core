@@ -19,7 +19,7 @@ import { referenceApi } from './utils/referenceApi'
 import { authApi } from './utils/authApi'
 import 'core-js/features/array/flat'
 import 'jsdom-worker'
-import { roleQueries } from './forms/user/fieldDefinitions/query/queries'
+import { roleQueries } from './forms/user/query/queries'
 import { userQueries } from './user/queries'
 import debounce from 'lodash/debounce'
 

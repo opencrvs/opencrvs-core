@@ -18,7 +18,7 @@ import {
 } from '@client/forms'
 import * as offlineActions from '@client/offline/actions'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
-import { defaultFormsConfig } from '@client/forms/configurable'
+import { registerForms } from '@client/forms/register/fieldDefinitions/register'
 import { messages } from '@client/i18n/messages/views/review'
 import { mockOfflineData } from '@client/tests/util'
 
@@ -56,12 +56,12 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
       const birth = deserializeForm(
         process.env.NODE_ENV === 'test'
           ? (mockOfflineData.forms.registerForm.birth as ISerializedForm)
-          : (defaultFormsConfig.registerForm.birth as ISerializedForm)
+          : (registerForms.birth as ISerializedForm)
       )
       const death = deserializeForm(
         process.env.NODE_ENV === 'test'
           ? (mockOfflineData.forms.registerForm.death as ISerializedForm)
-          : (defaultFormsConfig.registerForm.death as ISerializedForm)
+          : (registerForms.death as ISerializedForm)
       )
 
       const preview = {
