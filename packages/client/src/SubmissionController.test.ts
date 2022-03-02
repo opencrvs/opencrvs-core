@@ -20,11 +20,11 @@ import {
   REGISTER_BIRTH_APPLICATION,
   REJECT_BIRTH_APPLICATION,
   COLLECT_BIRTH_CERTIFICATE,
-  ARCHIVE_BIRTH_APPLICATION,
+  ARCHIVE_BIRTH_DECLARATION,
   REINSTATE_BIRTH_APPLICATION
 } from '@client/views/DataProvider/birth/mutations'
 import {
-  ARCHIVE_DEATH_APPLICATION,
+  ARCHIVE_DEATH_DECLARATION,
   APPROVE_DEATH_APPLICATION,
   COLLECT_DEATH_CERTIFICATE,
   REGISTER_DEATH_APPLICATION,
@@ -552,7 +552,7 @@ describe('Submission Controller', () => {
             {
               event: 'birth',
               submissionStatus: SUBMISSION_STATUS.READY_TO_ARCHIVE,
-              action: Action.ARCHIVE_APPLICATION
+              action: Action.ARCHIVE_DECLARATION
             }
           ]
         },
@@ -575,7 +575,7 @@ describe('Submission Controller', () => {
     const mutationHandler = jest.fn().mockResolvedValue({
       data: { data: { markEventAsArchived: {} } }
     })
-    subCon.client.setRequestHandler(ARCHIVE_BIRTH_APPLICATION, mutationHandler)
+    subCon.client.setRequestHandler(ARCHIVE_BIRTH_DECLARATION, mutationHandler)
 
     await subCon.sync()
 
@@ -615,7 +615,14 @@ describe('Submission Controller', () => {
 
     subCon.client = createMockClient()
     const mutationHandler = jest.fn().mockResolvedValue({
-      data: { data: { markApplicationAsReinstated: {} } }
+      data: {
+        data: {
+          markEventAsReinstated: {
+            taskEntryResourceID: '12321fsfasf',
+            registrationStatus: 'DECLARED'
+          }
+        }
+      }
     })
     subCon.client.setRequestHandler(
       REINSTATE_BIRTH_APPLICATION,
@@ -625,55 +632,10 @@ describe('Submission Controller', () => {
     await subCon.sync()
 
     expect(mutationHandler).toHaveBeenCalledTimes(1)
-    expect(store.dispatch).toHaveBeenCalledTimes(5)
-    expect(
-      store.dispatch.mock.calls[0][0].payload.application.submissionStatus
-    ).toBe('')
+    expect(store.dispatch).toHaveBeenCalledTimes(4)
   })
 
-  it('syncs all ready to archive death applications', async () => {
-    const store = {
-      getState: () => ({
-        applicationsState: {
-          applications: [
-            {
-              event: 'death',
-              submissionStatus: SUBMISSION_STATUS.READY_TO_ARCHIVE,
-              action: Action.ARCHIVE_APPLICATION
-            }
-          ]
-        },
-        registerForm: {
-          registerForm: {}
-        },
-        profile: {
-          tokenPayload: {
-            scope: []
-          }
-        }
-      }),
-      dispatch: jest.fn()
-    }
-
-    // @ts-ignore
-    const subCon = new SubmissionController(store)
-
-    subCon.client = createMockClient()
-    const mutationHandler = jest.fn().mockResolvedValue({
-      data: { data: { markEventAsArchived: {} } }
-    })
-    subCon.client.setRequestHandler(ARCHIVE_DEATH_APPLICATION, mutationHandler)
-
-    await subCon.sync()
-
-    expect(mutationHandler).toHaveBeenCalledTimes(1)
-    expect(store.dispatch).toHaveBeenCalledTimes(5)
-    expect(
-      store.dispatch.mock.calls[0][0].payload.application.submissionStatus
-    ).toBe(SUBMISSION_STATUS.ARCHIVED)
-  })
-
-  it('syncs all ready to archive death applications', async () => {
+  it('syncs all ready to reinstate death applications', async () => {
     const store = {
       getState: () => ({
         applicationsState: {
@@ -699,15 +661,61 @@ describe('Submission Controller', () => {
 
     // @ts-ignore
     const subCon = new SubmissionController(store)
+    const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
+    subCon.client = createMockClient()
+    const mutationHandler = jest.fn().mockResolvedValue({
+      data: {
+        data: {
+          markEventAsReinstated: {
+            taskEntryResourceID: id,
+            registrationStatus: 'DECLARED'
+          }
+        }
+      }
+    })
+    subCon.client.setRequestHandler(
+      REINSTATE_BIRTH_APPLICATION,
+      mutationHandler
+    )
+
+    await subCon.sync()
+
+    expect(mutationHandler).toHaveBeenCalledTimes(1)
+    expect(store.dispatch).toHaveBeenCalledTimes(4)
+  })
+
+  it('syncs all ready to archive death applications', async () => {
+    const store = {
+      getState: () => ({
+        applicationsState: {
+          applications: [
+            {
+              event: 'death',
+              submissionStatus: SUBMISSION_STATUS.READY_TO_ARCHIVE,
+              action: Action.ARCHIVE_DECLARATION
+            }
+          ]
+        },
+        registerForm: {
+          registerForm: {}
+        },
+        profile: {
+          tokenPayload: {
+            scope: []
+          }
+        }
+      }),
+      dispatch: jest.fn()
+    }
+
+    // @ts-ignore
+    const subCon = new SubmissionController(store)
 
     subCon.client = createMockClient()
     const mutationHandler = jest.fn().mockResolvedValue({
-      data: { data: { markApplicationAsReinstated: {} } }
+      data: { data: { markEventAsArchived: {} } }
     })
-    subCon.client.setRequestHandler(
-      REINSTATE_DEATH_APPLICATION,
-      mutationHandler
-    )
+    subCon.client.setRequestHandler(ARCHIVE_DEATH_DECLARATION, mutationHandler)
 
     await subCon.sync()
 
@@ -715,7 +723,7 @@ describe('Submission Controller', () => {
     expect(store.dispatch).toHaveBeenCalledTimes(5)
     expect(
       store.dispatch.mock.calls[0][0].payload.application.submissionStatus
-    ).toBe('')
+    ).toBe(SUBMISSION_STATUS.ARCHIVED)
   })
 
   it('fails a application that has a network error', async () => {

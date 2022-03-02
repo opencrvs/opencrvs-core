@@ -50,6 +50,7 @@ export async function createServer() {
   const plugins = getPlugins()
 
   await app.register(plugins)
+
   const apolloServer = new ApolloServer({
     ...getApolloConfig(),
     plugins: [ApolloServerPluginStopHapiServer({ hapiServer: app })]

@@ -14,6 +14,7 @@ import { v4 as uuid } from 'uuid'
 import {
   createCompositionTemplate,
   updateTaskTemplate,
+  addDownloadExtensionToTaskTemplate,
   MOTHER_CODE,
   FATHER_CODE,
   CHILD_CODE,
@@ -141,7 +142,7 @@ function createIDBuilder(sectionCode: string, sectionTitle: string) {
     id: async (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
-      context: any
+      context: { authHeader: IAuthHeader }
     ) => {
       const person = selectOrCreatePersonResource(
         sectionCode,
@@ -3418,7 +3419,7 @@ export const builders: IFieldBuilders = {
 export async function buildFHIRBundle(
   reg: object,
   eventType: EVENT_TYPE,
-  authHeader?: IAuthHeader
+  authHeader: IAuthHeader
 ) {
   const ref = uuid()
   const context: any = {
@@ -3449,6 +3450,28 @@ export async function updateFHIRTaskBundle(
     resourceType: 'Bundle',
     type: 'document',
     entry: [taskEntry]
+  }
+  return fhirBundle
+}
+
+export function addDownloadedTaskExtension(taskEntry: ITaskBundleEntry) {
+  taskEntry.resource = addDownloadExtensionToTaskTemplate(taskEntry.resource)
+  taskEntry.request = {
+    method: 'PUT',
+    url: `Task/${taskEntry.resource.id}`
+  } as fhir.BundleEntryRequest
+  const fhirBundle: ITaskBundle = {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: [taskEntry],
+    signature: {
+      type: [
+        {
+          code: 'downloaded'
+        }
+      ],
+      when: Date().toString()
+    }
   }
   return fhirBundle
 }

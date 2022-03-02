@@ -59,6 +59,16 @@ const certifyToken = jwt.sign(
   }
 )
 
+const sysAdminToken = jwt.sign(
+  { scope: ['sysadmin'] },
+  readFileSync('../auth/test/cert.key'),
+  {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:gateway-user'
+  }
+)
+
 const authHeaderRegCert = {
   Authorization: `Bearer ${registerCertifyToken}`
 }
@@ -72,6 +82,14 @@ const authHeaderCertify = {
 }
 
 const authHeaderNotRegCert = {
+  Authorization: `Bearer ${declareToken}`
+}
+
+const authHeaderSysAdmin = {
+  Authorization: `Bearer ${sysAdminToken}`
+}
+
+const authHeaderNotSysAdmin = {
   Authorization: `Bearer ${declareToken}`
 }
 
@@ -152,13 +170,187 @@ beforeEach(() => {
 })
 
 describe('Registration root resolvers', () => {
-  describe('fetchBirthRegistration()', () => {
-    it('returns object of composition result', async () => {
+  describe('searchBirthRegistrations()', () => {
+    it('throws an error if the user does not have sysadmin scope', async () => {
+      expect(
+        resolvers.Query.searchBirthRegistrations(
+          {},
+          {
+            fromDate: new Date('05 October 2011 14:48 UTC'),
+            toDate: new Date('05 October 2012 14:48 UTC')
+          },
+          authHeaderNotSysAdmin
+        )
+      ).rejects.toThrowError('User does not have a sysadmin scope')
+    })
+
+    it('returns an array of compositions', async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
-          id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
+          entry: [
+            {
+              resource: {
+                id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
+                type: {
+                  coding: [
+                    {
+                      code: 'birth-application'
+                    }
+                  ]
+                }
+              }
+            }
+          ]
         })
       )
+
+      const compositions = await resolvers.Query.searchBirthRegistrations(
+        {},
+        {
+          fromDate: new Date('05 October 2011 14:48 UTC'),
+          toDate: new Date('05 October 2012 14:48 UTC')
+        },
+        authHeaderSysAdmin
+      )
+
+      expect(compositions[0].id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
+    })
+  })
+
+  describe('searchDeathRegistrations()', () => {
+    it('throws an error if the user does not have sysadmin scope', async () => {
+      expect(
+        resolvers.Query.searchDeathRegistrations(
+          {},
+          {
+            fromDate: new Date('05 October 2011 14:48 UTC'),
+            toDate: new Date('05 October 2012 14:48 UTC')
+          },
+          authHeaderNotSysAdmin
+        )
+      ).rejects.toThrowError('User does not have a sysadmin scope')
+    })
+
+    it('returns an array of compositions', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          entry: [
+            {
+              resource: {
+                id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
+                type: {
+                  coding: [
+                    {
+                      code: 'death-application'
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        })
+      )
+
+      const compositions = await resolvers.Query.searchDeathRegistrations(
+        {},
+        {
+          fromDate: new Date('05 October 2011 14:48 UTC'),
+          toDate: new Date('05 October 2012 14:48 UTC')
+        },
+        authHeaderSysAdmin
+      )
+
+      expect(compositions[0].id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
+    })
+  })
+
+  describe('fetchBirthRegistration()', () => {
+    it('returns object of composition result', async () => {
+      const mockTaskOfComposition = JSON.stringify({
+        id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
+        entry: [
+          {
+            fullUrl:
+              'http://localhost:3447/fhir/Task/10b082d6-e152-4391-b1ef-d88586b049b8/_history/80c56eba-9dc1-4d03-aebe-118a7390c8c0',
+            resource: {
+              resourceType: 'Task',
+              status: 'requested',
+              code: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/types',
+                    code: 'BIRTH'
+                  }
+                ]
+              },
+              focus: {
+                reference: 'Composition/0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
+              },
+              identifier: [
+                {
+                  system: 'http://opencrvs.org/specs/id/draft-id',
+                  value: '0b760582-9f9b-4793-a8e3-1022c91c4052'
+                },
+                {
+                  system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+                  value: 'BIU2VLU'
+                }
+              ],
+              extension: [
+                {
+                  url: 'http://opencrvs.org/specs/extension/contact-person',
+                  valueString: 'MOTHER'
+                },
+                {
+                  url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
+                  valueString: '+260725632525'
+                },
+                {
+                  url: 'http://opencrvs.org/specs/extension/regLastUser',
+                  valueReference: {
+                    reference:
+                      'Practitioner/aa5fe4e2-9a89-4ab8-b4f1-2cd4471a7e2c'
+                  }
+                },
+                {
+                  url: 'http://opencrvs.org/specs/extension/regLastLocation',
+                  valueReference: {
+                    reference: 'Location/0fc529b4-4099-4b71-a26d-e367652b6921'
+                  }
+                },
+                {
+                  url: 'http://opencrvs.org/specs/extension/regLastOffice',
+                  valueReference: {
+                    reference: 'Location/497449a0-4f38-426f-b183-93bebfae9b8b'
+                  }
+                },
+                {
+                  url: 'http://opencrvs.org/specs/extension/regDownloaded',
+                  valueString: 'DECLARED'
+                }
+              ],
+              lastModified: '2022-02-16T13:07:22.445Z',
+              businessStatus: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/reg-status',
+                    code: 'DECLARED'
+                  }
+                ]
+              },
+              meta: {
+                lastUpdated: '2022-02-22T06:55:13.928+00:00',
+                versionId: '80c56eba-9dc1-4d03-aebe-118a7390c8c0'
+              },
+              id: '10b082d6-e152-4391-b1ef-d88586b049b8'
+            }
+          }
+        ]
+      })
+      const mockPost = JSON.stringify({
+        id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
+      })
+      fetch.mockResponses([mockTaskOfComposition], [mockPost], [mockPost])
       const composition = await resolvers.Query.fetchBirthRegistration(
         {},
         { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
@@ -180,11 +372,91 @@ describe('Registration root resolvers', () => {
   })
   describe('fetchDeathRegistration()', () => {
     it('returns object of composition result', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
-        })
-      )
+      const mockTaskOfComposition = JSON.stringify({
+        id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
+        entry: [
+          {
+            fullUrl:
+              'http://localhost:3447/fhir/Task/10b082d6-e152-4391-b1ef-d88586b049b8/_history/80c56eba-9dc1-4d03-aebe-118a7390c8c0',
+            resource: {
+              resourceType: 'Task',
+              status: 'requested',
+              code: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/types',
+                    code: 'BIRTH'
+                  }
+                ]
+              },
+              focus: {
+                reference: 'Composition/0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
+              },
+              identifier: [
+                {
+                  system: 'http://opencrvs.org/specs/id/draft-id',
+                  value: '0b760582-9f9b-4793-a8e3-1022c91c4052'
+                },
+                {
+                  system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+                  value: 'BIU2VLU'
+                }
+              ],
+              extension: [
+                {
+                  url: 'http://opencrvs.org/specs/extension/contact-person',
+                  valueString: 'MOTHER'
+                },
+                {
+                  url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
+                  valueString: '+260725632525'
+                },
+                {
+                  url: 'http://opencrvs.org/specs/extension/regLastUser',
+                  valueReference: {
+                    reference:
+                      'Practitioner/aa5fe4e2-9a89-4ab8-b4f1-2cd4471a7e2c'
+                  }
+                },
+                {
+                  url: 'http://opencrvs.org/specs/extension/regLastLocation',
+                  valueReference: {
+                    reference: 'Location/0fc529b4-4099-4b71-a26d-e367652b6921'
+                  }
+                },
+                {
+                  url: 'http://opencrvs.org/specs/extension/regLastOffice',
+                  valueReference: {
+                    reference: 'Location/497449a0-4f38-426f-b183-93bebfae9b8b'
+                  }
+                },
+                {
+                  url: 'http://opencrvs.org/specs/extension/regDownloaded',
+                  valueString: 'DECLARED'
+                }
+              ],
+              lastModified: '2022-02-16T13:07:22.445Z',
+              businessStatus: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/reg-status',
+                    code: 'DECLARED'
+                  }
+                ]
+              },
+              meta: {
+                lastUpdated: '2022-02-22T06:55:13.928+00:00',
+                versionId: '80c56eba-9dc1-4d03-aebe-118a7390c8c0'
+              },
+              id: '10b082d6-e152-4391-b1ef-d88586b049b8'
+            }
+          }
+        ]
+      })
+      const mockPost = JSON.stringify({
+        id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
+      })
+      fetch.mockResponses([mockTaskOfComposition], [mockPost], [mockPost])
       // @ts-ignore
       const composition = await resolvers.Query.fetchDeathRegistration(
         {},
@@ -751,7 +1023,7 @@ describe('Registration root resolvers', () => {
     })
   })
 
-  describe('markApplicationAsReinstated()', () => {
+  describe('markEventAsReinstated()', () => {
     it('updates a task with WAITING_VALIDATION status', async () => {
       fetch.mockResponses(
         [
@@ -971,10 +1243,41 @@ describe('Registration root resolvers', () => {
         ]
       )
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
-      const result = await resolvers.Mutation.markApplicationAsReinstated(
+      const result = await resolvers.Mutation.markEventAsReinstated(
+        {},
+        { taskEntryResourceID: id, registrationStatus: 'DECLARED' },
+        authHeaderRegCert
+      )
+      expect(result.registrationStatus).toBe('WAITING_VALIDATION')
+    })
+
+    it('throws error if user does not have register or validate scope', async () => {
+      const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
+      await expect(
+        resolvers.Mutation.markEventAsReinstated(
+          {},
+          { id },
+          authHeaderNotRegCert
+        )
+      ).rejects.toThrowError('User does not have a register or validate scope')
+    })
+  })
+
+  describe('markEventAsArchived()', () => {
+    it('updates a task with archived status', async () => {
+      fetch.mockResponses(
+        [JSON.stringify(mockTaskBundle)],
+        [JSON.stringify('ok'), { status: 200 }]
+      )
+      const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
+      const result = await resolvers.Mutation.markEventAsArchived(
         {},
         { id },
         authHeaderRegCert
+      )
+      const postData = JSON.parse(fetch.mock.calls[1][1].body)
+      expect(postData.entry[0].resource.businessStatus.coding[0].code).toBe(
+        'ARCHIVED'
       )
       expect(result).toBe('ba0412c6-5125-4447-bd32-fb5cf336ddbc')
     })
@@ -982,11 +1285,7 @@ describe('Registration root resolvers', () => {
     it('throws error if user does not have register or validate scope', async () => {
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       await expect(
-        resolvers.Mutation.markApplicationAsReinstated(
-          {},
-          { id },
-          authHeaderNotRegCert
-        )
+        resolvers.Mutation.markEventAsArchived({}, { id }, authHeaderNotRegCert)
       ).rejects.toThrowError('User does not have a register or validate scope')
     })
   })

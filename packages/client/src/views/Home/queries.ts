@@ -11,45 +11,16 @@
  */
 import gql from 'graphql-tag'
 
-export const FETCH_REGISTRATION_BY_COMPOSITION = gql`
+export const FETCH_DECLARATION_SHORT_INFO = gql`
   query data($id: ID!) {
     fetchRegistration(id: $id) {
       id
       registration {
-        id
         type
-        status {
-          id
-          user {
-            id
-            name {
-              use
-              firstNames
-              familyName
-            }
-            role
-          }
-          location {
-            id
-            name
-            alias
-          }
-          office {
-            name
-            alias
-            address {
-              district
-              state
-            }
-          }
-          type
-          timestamp
-          comments {
-            comment
-          }
-        }
-        contactPhoneNumber
         trackingId
+        status {
+          type
+        }
       }
       ... on BirthRegistration {
         child {
@@ -66,15 +37,6 @@ export const FETCH_REGISTRATION_BY_COMPOSITION = gql`
             use
             firstNames
             familyName
-          }
-        }
-        informant {
-          individual {
-            telecom {
-              use
-              system
-              value
-            }
           }
         }
       }

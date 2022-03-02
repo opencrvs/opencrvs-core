@@ -28,9 +28,9 @@ const Container = styled.div<{ size: string }>`
 `
 const Header = styled.div`
   display: flex;
+  align-items: center;
   height: 72px;
   border-bottom: 1px solid rgb(204, 207, 208);
-  padding-top: 20px;
   padding-right: 32px;
   padding-left: 32px;
 `
@@ -79,7 +79,14 @@ const Title = styled.div`
 `
 const Icon = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
+  display: flex;
+  align-items: center;
 `
+
+export enum ContentSize {
+  LARGE = 'large',
+  NORMAL = 'normal'
+}
 
 interface IProps {
   icon?: () => React.ReactNode
@@ -88,7 +95,7 @@ interface IProps {
   subtitle?: string
   children?: React.ReactNode
   bottomActionButtons?: ReactElement[]
-  size?: 'normal' | 'large' | undefined
+  size?: ContentSize
   titleColor?: keyof typeof colors
 }
 
@@ -116,11 +123,12 @@ export class Content extends React.Component<IProps> {
         </Header>
         {subtitle && <SubHeader>{subtitle}</SubHeader>}
         {children && <Body>{children}</Body>}
-        <Footer>
-          {bottomActionButtons && (
+
+        {bottomActionButtons && (
+          <Footer>
             <BottomActionBar>{bottomActionButtons}</BottomActionBar>
-          )}
-        </Footer>
+          </Footer>
+        )}
       </Container>
     )
   }

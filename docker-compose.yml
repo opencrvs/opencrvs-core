@@ -91,6 +91,7 @@ services:
       - INFLUX_DB=ocrvs
       - AUTH_URL=http://auth:4040
       - COUNTRY_CONFIG_URL=http://countryconfig:3040/
+      - CONFIG_API_URL=http://config:2021/
       - FHIR_URL=http://openhim-core:5001/fhir
       - SEARCH_URL=http://search:9090/
       - CHECK_INVALID_TOKEN=true

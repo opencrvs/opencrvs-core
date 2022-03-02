@@ -16,6 +16,7 @@ import {
   draftToGqlTransformer,
   appendGqlMetadataFromDraft
 } from '@client/transformer'
+import { REQUEST_BIRTH_REG_CORRECTION } from '@client/forms/correction/mutations'
 
 export const SUBMIT_BIRTH_APPLICATION = gql`
   mutation submitMutation($details: BirthRegistrationInput!) {
@@ -77,11 +78,13 @@ export const REJECT_BIRTH_APPLICATION = gql`
 `
 export const REINSTATE_BIRTH_APPLICATION = gql`
   mutation submitMutation($id: String!) {
-    markApplicationAsReinstated(id: $id)
+    markEventAsReinstated(id: $id) {
+      taskEntryResourceID
+      registrationStatus
+    }
   }
 `
-
-export const ARCHIVE_BIRTH_APPLICATION = gql`
+export const ARCHIVE_BIRTH_DECLARATION = gql`
   mutation submitMutation($id: String!) {
     markEventAsArchived(id: $id)
   }
@@ -101,7 +104,12 @@ export function getBirthMutationMappings(
 ) {
   let gqlDetails = {}
   if (form && draft) {
-    gqlDetails = draftToGqlTransformer(form, draft.data, draft.id)
+    gqlDetails = draftToGqlTransformer(
+      form,
+      draft.data,
+      draft.id,
+      draft.originalData
+    )
     appendGqlMetadataFromDraft(draft, gqlDetails)
   }
 
@@ -146,9 +154,9 @@ export function getBirthMutationMappings(
         },
         dataKey: 'markApplicationAsReinstate'
       }
-    case Action.ARCHIVE_APPLICATION:
+    case Action.ARCHIVE_DECLARATION:
       return {
-        mutation: ARCHIVE_BIRTH_APPLICATION,
+        mutation: ARCHIVE_BIRTH_DECLARATION,
         variables: {
           ...payload
         },
@@ -162,6 +170,15 @@ export function getBirthMutationMappings(
           details: gqlDetails
         },
         dataKey: 'markBirthAsCertified'
+      }
+    case Action.REQUEST_CORRECTION_APPLICATION:
+      return {
+        mutation: REQUEST_BIRTH_REG_CORRECTION,
+        variables: {
+          id: draft && draft.id,
+          details: gqlDetails
+        },
+        dataKey: 'requestBirthRegistrationCorrection'
       }
     default:
       return null

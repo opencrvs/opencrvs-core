@@ -22,7 +22,8 @@ import {
 } from '@gateway/features/fhir/utils'
 import {
   buildFHIRBundle,
-  updateFHIRTaskBundle
+  updateFHIRTaskBundle,
+  addDownloadedTaskExtension
 } from '@gateway/features/registration/fhir-builders'
 import { hasScope } from '@gateway/features/user/utils'
 import {
@@ -79,7 +80,7 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'validate') ||
         hasScope(authHeader, 'declare')
       ) {
-        return await fetchFHIR(`/Composition/${id}`, authHeader)
+        return await markRecordAsDownloaded(id, authHeader)
       } else {
         return await Promise.reject(
           new Error('User does not have a register or validate scope')
@@ -92,7 +93,7 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'validate') ||
         hasScope(authHeader, 'declare')
       ) {
-        return await fetchFHIR(`/Composition/${id}`, authHeader)
+        return await markRecordAsDownloaded(id, authHeader)
       } else {
         return await Promise.reject(
           new Error('User does not have a register or validate scope')
@@ -362,7 +363,7 @@ export const resolvers: GQLResolver = {
         )
       }
     },
-    async markApplicationAsReinstated(_, { id }, authHeader) {
+    async markEventAsReinstated(_, { id }, authHeader) {
       if (
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate')
@@ -401,18 +402,23 @@ export const resolvers: GQLResolver = {
           throw new Error('Task has no history')
         }
 
+        const filteredTaskHistory = taskHistory?.filter((task) => {
+          return (
+            task.businessStatus?.coding &&
+            task.businessStatus?.coding[0].code !== 'ARCHIVED'
+          )
+        })
         const regStatusCode =
-          taskHistory &&
-          taskHistory[1].businessStatus &&
-          taskHistory[1].businessStatus.coding?.find((code) => {
+          filteredTaskHistory &&
+          (filteredTaskHistory[0]?.businessStatus?.coding?.find((code) => {
             return code.system === 'http://opencrvs.org/specs/reg-status'
-          })
+          })?.code as GQLRegStatus)
 
         if (!regStatusCode) {
           return await Promise.reject(new Error('Task has no reg-status code'))
         }
 
-        const status = regStatusCode.code as GQLRegStatus
+        const status = regStatusCode as GQLRegStatus
         const newTaskBundle = await updateFHIRTaskBundle(taskEntryData, status)
         await fetchFHIR(
           '/Task',
@@ -420,7 +426,7 @@ export const resolvers: GQLResolver = {
           'PUT',
           JSON.stringify(newTaskBundle)
         )
-        return taskEntryData.resource.id
+        return { taskEntryResourceID, registrationStatus: regStatusCode }
       } else {
         return await Promise.reject(
           new Error('User does not have a register or validate scope')
@@ -597,13 +603,14 @@ async function markEventAsRegistered(
       entry: taskBundle.entry
     }
   } else {
-    doc = await buildFHIRBundle(details, event)
+    doc = await buildFHIRBundle(details, event, authHeader)
   }
-
   await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
 
   // return the full composition
-  return fetchFHIR(`/Composition/${id}`, authHeader)
+  const res = await fetchFHIR(`/Composition/${id}`, authHeader)
+
+  return res
 }
 
 async function markEventAsCertified(
@@ -616,4 +623,21 @@ async function markEventAsCertified(
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
   // return composition-id
   return getIDFromResponse(res)
+}
+
+async function markRecordAsDownloaded(id: string, authHeader: IAuthHeader) {
+  let doc
+  const taskBundle = await fetchFHIR(
+    `/Task?focus=Composition/${id}`,
+    authHeader
+  )
+  if (!taskBundle || !taskBundle.entry || !taskBundle.entry[0]) {
+    throw new Error('Task does not exist')
+  }
+  doc = addDownloadedTaskExtension(taskBundle.entry[0])
+
+  await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
+
+  // return the full composition
+  return fetchFHIR(`/Composition/${id}`, authHeader)
 }

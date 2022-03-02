@@ -25,17 +25,16 @@ import {
   getSectionEntryBySectionCode
 } from '@workflow/features/registration/fhir/fhir-template'
 import { ITokenPayload, USER_SCOPE } from '@workflow/utils/authUtils'
-import fetch from 'node-fetch'
+import fetch, { RequestInit } from 'node-fetch'
 import { getEventType } from '@workflow/features/registration/utils'
+import * as Hapi from '@hapi/hapi'
+import { logger } from '@workflow/logger'
 
 export async function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {
     throw new Error('Invalid FHIR bundle found for declaration')
   }
-  return await getPhoneNo(
-    getTaskResource(fhirBundle) as fhir.Task,
-    getEventType(fhirBundle)
-  )
+  return await getPhoneNo(getTaskResource(fhirBundle), getEventType(fhirBundle))
 }
 
 export async function getInformantName(
@@ -71,7 +70,7 @@ export async function getCRVSOfficeName(fhirBundle: fhir.Bundle) {
       'getCRVSOfficeName: Invalid FHIR bundle found for declaration/notification'
     )
   }
-  const taskResource = getTaskResource(fhirBundle) as fhir.Task
+  const taskResource = getTaskResource(fhirBundle)
   const regLastOfficeExt = taskResource?.extension?.find(
     (ext) => ext.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`
   )
@@ -162,7 +161,7 @@ export function getDeathRegistrationNumber(taskResource: fhir.Task) {
 
 export function hasBirthRegistrationNumber(fhirBundle: fhir.Bundle) {
   try {
-    getBirthRegistrationNumber(getTaskResource(fhirBundle) as fhir.Task)
+    getBirthRegistrationNumber(getTaskResource(fhirBundle))
     return true
   } catch (error) {
     return false
@@ -170,7 +169,7 @@ export function hasBirthRegistrationNumber(fhirBundle: fhir.Bundle) {
 }
 export function hasDeathRegistrationNumber(fhirBundle: fhir.Bundle) {
   try {
-    getDeathRegistrationNumber(getTaskResource(fhirBundle) as fhir.Task)
+    getDeathRegistrationNumber(getTaskResource(fhirBundle))
     return true
   } catch (error) {
     return false
@@ -230,6 +229,40 @@ export const getFromFhir = (suffix: string) => {
     .catch((error) => {
       return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
     })
+}
+
+export async function forwardToHearth(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  logger.info(
+    `Forwarding to Hearth unchanged: ${request.method} ${request.path}`
+  )
+
+  const requestOpts: RequestInit = {
+    method: request.method,
+    headers: {
+      'Content-Type': 'application/fhir+json',
+      'x-correlation-id': request.headers['x-correlation-id']
+    }
+  }
+
+  let path = request.path
+  if (request.method === 'post' || request.method === 'put') {
+    requestOpts.body = JSON.stringify(request.payload)
+  } else if (request.method === 'get') {
+    path = `${request.path}${request.url.search}`
+  }
+  const res = await fetch(HEARTH_URL + path.replace('/fhir', ''), requestOpts)
+  const resBody = await res.text()
+  const response = h.response(resBody)
+
+  response.code(res.status)
+  res.headers.forEach((headerVal, headerName) => {
+    response.header(headerName, headerVal)
+  })
+
+  return response
 }
 
 export async function postToHearth(payload: any) {

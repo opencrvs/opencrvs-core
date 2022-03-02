@@ -22,6 +22,7 @@ interface INotificationsMessages
   statusRegistering: MessageDescriptor
   statusRejecting: MessageDescriptor
   statusReinstating: MessageDescriptor
+  statusRequestingCorrection: MessageDescriptor
   statusSubmitting: MessageDescriptor
   statusWaitingToBeArchived: MessageDescriptor
   statusWaitingToValidate: MessageDescriptor
@@ -84,6 +85,11 @@ const messagesToDefine: INotificationsMessages = {
     description: 'Label for application status Reinstating',
     id: 'regHome.outbox.statusReinstating'
   },
+  statusRequestingCorrection: {
+    defaultMessage: 'Requesting correction...',
+    description: 'Label for application status Requesting correction',
+    id: 'regHome.outbox.statusRequestingCorrection'
+  },
   statusSubmitting: {
     defaultMessage: 'Submitting...',
     description: 'Label for application status submitting',
@@ -93,6 +99,11 @@ const messagesToDefine: INotificationsMessages = {
     defaultMessage: 'Waiting to be archived',
     description: 'Label for application status waiting to be archived',
     id: 'regHome.outbox.statusWaitingToBeArchived'
+  },
+  statusWaitingToBeReinstated: {
+    defaultMessage: 'Waiting to be reinstated',
+    description: 'Label for application status waiting to be reinstated',
+    id: 'regHome.outbox.statusWaitingToBeReinstated'
   },
   statusWaitingToValidate: {
     defaultMessage: 'Sending for approval',
@@ -108,6 +119,11 @@ const messagesToDefine: INotificationsMessages = {
     defaultMessage: 'Waiting to reject',
     description: 'Label for application status waiting for reject',
     id: 'regHome.outbox.statusWaitingToReject'
+  },
+  statusWaitingToRequestCorrection: {
+    defaultMessage: 'Waiting to request correction',
+    description: 'Label for application status waiting for request correction',
+    id: 'regHome.outbox.statusWaitingToRequestCorrection'
   },
   statusWaitingToSubmit: {
     defaultMessage: 'Waiting to submit',

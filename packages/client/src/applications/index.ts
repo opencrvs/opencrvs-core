@@ -51,7 +51,7 @@ import ApolloClient, { ApolloError, ApolloQueryResult } from 'apollo-client'
 import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
 import { v4 as uuid } from 'uuid'
 
-const ARCHIVE_APPLICATION = 'APPLICATION/ARCHIVE'
+const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_APPLICATION = 'APPLICATION/SET_INITIAL_APPLICATION'
 const STORE_APPLICATION = 'APPLICATION/STORE_APPLICATION'
 const MODIFY_APPLICATION = 'APPLICATION/MODIFY_DRAFT'
@@ -76,6 +76,7 @@ const UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_SUCCESS =
   'APPLICATION/UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_SUCCESS'
 const UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_FAIL =
   'APPLICATION/UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_FAIL'
+const CLEAR_CORRECTION_CHANGE = 'CLEAR_CORRECTION_CHANGE'
 
 export enum SUBMISSION_STATUS {
   DRAFT = 'DRAFT',
@@ -101,6 +102,9 @@ export enum SUBMISSION_STATUS {
   READY_TO_REINSTATE = 'READY_TO_REINSTATE',
   CERTIFYING = 'CERTIFYING',
   CERTIFIED = 'CERTIFIED',
+  READY_TO_REQUEST_CORRECTION = 'READY_TO_REQUEST_CORRECTION',
+  REQUESTING_CORRECTION = 'REQUESTING_CORRECTION',
+  REQUESTED_CORRECTION = 'REQUESTED_CORRECTION',
   FAILED = 'FAILED',
   FAILED_NETWORK = 'FAILED_NETWORK'
 }
@@ -123,7 +127,9 @@ export const processingStates = [
   SUBMISSION_STATUS.READY_TO_REJECT,
   SUBMISSION_STATUS.REJECTING,
   SUBMISSION_STATUS.READY_TO_CERTIFY,
-  SUBMISSION_STATUS.CERTIFYING
+  SUBMISSION_STATUS.CERTIFYING,
+  SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION,
+  SUBMISSION_STATUS.REQUESTING_CORRECTION
 ]
 
 const DOWNLOAD_MAX_RETRY_ATTEMPT = 3
@@ -163,6 +169,7 @@ export interface ITaskHistory {
 export interface IApplication {
   id: string
   data: IFormData
+  originalData?: IFormData
   savedOn?: number
   modifiedOn?: number
   eventType?: string
@@ -216,8 +223,21 @@ type Relation =
   | 'INFORMANT'
   | 'PRINT_IN_ADVANCE'
 
+type RelationForCertificateCorrection =
+  | 'FATHER'
+  | 'MOTHER'
+  | 'SPOUSE'
+  | 'SON'
+  | 'DAUGHTER'
+  | 'EXTENDED_FAMILY'
+  | 'OTHER'
+  | 'INFORMANT'
+  | 'PRINT_IN_ADVANCE'
+  | 'CHILD'
+
 export type ICertificate = {
   collector?: Partial<{ type: Relation }>
+  corrector?: Partial<{ type: RelationForCertificateCorrection }>
   hasShowedVerifiedDocument?: boolean
   payments?: Payment
   data?: string
@@ -259,9 +279,9 @@ type Payment = {
   date: number
 }
 
-interface IArchiveApplicationAction {
-  type: typeof ARCHIVE_APPLICATION
-  payload: { applicationId: string }
+interface IArchiveDeclarationAction {
+  type: typeof ARCHIVE_DECLARATION
+  payload: { declarationId: string }
 }
 
 interface IStoreApplicationAction {
@@ -276,6 +296,12 @@ interface IModifyApplicationAction {
   }
 }
 
+interface IClearCorrectionChange {
+  type: typeof CLEAR_CORRECTION_CHANGE
+  payload: {
+    applicationId: string
+  }
+}
 export interface IWriteApplicationAction {
   type: typeof WRITE_APPLICATION
   payload: {
@@ -300,7 +326,7 @@ interface IDeleteApplicationAction {
 interface IREINSTATE_APPLICATIONAction {
   type: typeof REINSTATE_APPLICATION
   payload: {
-    applicationId: string
+    declarationId: string
   }
 }
 
@@ -390,9 +416,10 @@ interface UpdateFieldAgentDeclaredApplicationsFailAction {
 }
 
 export type Action =
-  | IArchiveApplicationAction
+  | IArchiveDeclarationAction
   | IStoreApplicationAction
   | IModifyApplicationAction
+  | IClearCorrectionChange
   | ISetInitialApplicationsAction
   | IWriteApplicationAction
   | NavigationAction
@@ -488,6 +515,7 @@ export function createReviewApplication(
   return {
     id: applicationId,
     data: formData,
+    originalData: formData,
     review: true,
     event,
     registrationStatus: status
@@ -517,6 +545,12 @@ export function modifyApplication(
   application.modifiedOn = Date.now()
   return { type: MODIFY_APPLICATION, payload: { application } }
 }
+
+export function clearCorrectionChange(
+  applicationId: string
+): IClearCorrectionChange {
+  return { type: CLEAR_CORRECTION_CHANGE, payload: { applicationId } }
+}
 export function setInitialApplications() {
   return { type: SET_INITIAL_APPLICATION }
 }
@@ -545,10 +579,10 @@ export const getStorageApplicationsFailed =
     type: GET_APPLICATIONS_FAILED
   })
 
-export function archiveApplication(
-  applicationId: string
-): IArchiveApplicationAction {
-  return { type: ARCHIVE_APPLICATION, payload: { applicationId } }
+export function archiveDeclaration(
+  declarationId: string
+): IArchiveDeclarationAction {
+  return { type: ARCHIVE_DECLARATION, payload: { declarationId } }
 }
 
 export function deleteApplication(
@@ -559,9 +593,9 @@ export function deleteApplication(
 }
 
 export function reinstateApplication(
-  applicationId: string
+  declarationId: string
 ): IREINSTATE_APPLICATIONAction {
-  return { type: REINSTATE_APPLICATION, payload: { applicationId } }
+  return { type: REINSTATE_APPLICATION, payload: { declarationId } }
 }
 
 export function writeApplication(
@@ -1299,19 +1333,18 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
     }
     case REINSTATE_APPLICATION: {
       if (action.payload) {
-        const application = state.applications.find(
-          ({ id }) => id === action.payload.applicationId
+        const declaration = state.applications.find(
+          ({ id }) => id === action.payload.declarationId
         )
 
-        if (!application) {
+        if (!declaration) {
           return state
         }
-
         const modifiedApplication: IApplication = {
-          ...application,
+          ...declaration,
           submissionStatus: SUBMISSION_STATUS.READY_TO_REINSTATE,
           action: ApplicationAction.REINSTATE_APPLICATION,
-          payload: { id: application.id }
+          payload: { id: declaration.id }
         }
         return loop(state, Cmd.action(writeApplication(modifiedApplication)))
       }
@@ -1343,10 +1376,28 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
         (application) => application.id === action.payload.application.id
       )
       newApplications[currentApplicationIndex] = action.payload.application
+
       return {
         ...state,
         applications: newApplications
       }
+    case CLEAR_CORRECTION_CHANGE: {
+      const applicationIndex = state.applications.findIndex(
+        (application) => application.id === action.payload.applicationId
+      )
+
+      const correction = state.applications[applicationIndex]
+
+      const orignalAppliation: IApplication = {
+        ...correction,
+        data: {
+          ...correction.originalData
+        }
+      }
+
+      return loop(state, Cmd.action(writeApplication(orignalAppliation)))
+    }
+
     case WRITE_APPLICATION:
       return loop(
         {
@@ -1715,20 +1766,20 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
       }
       return state
 
-    case ARCHIVE_APPLICATION:
+    case ARCHIVE_DECLARATION:
       if (action.payload) {
-        const application = state.applications.find(
-          ({ id }) => id === action.payload.applicationId
+        const declaration = state.applications.find(
+          ({ id }) => id === action.payload.declarationId
         )
 
-        if (!application) {
+        if (!declaration) {
           return state
         }
         const modifiedApplication: IApplication = {
-          ...application,
+          ...declaration,
           submissionStatus: SUBMISSION_STATUS.READY_TO_ARCHIVE,
-          action: ApplicationAction.ARCHIVE_APPLICATION,
-          payload: { id: application.id }
+          action: ApplicationAction.ARCHIVE_DECLARATION,
+          payload: { id: declaration.id }
         }
         return loop(state, Cmd.action(writeApplication(modifiedApplication)))
       }

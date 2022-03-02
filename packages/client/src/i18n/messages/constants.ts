@@ -20,12 +20,14 @@ interface IConstantsMessages
   applicantContactNumber: MessageDescriptor
   application: MessageDescriptor
   applications: MessageDescriptor
+  applicationArchivedOn: MessageDescriptor
   applicationCollectedOn: MessageDescriptor
   applicationFailedOn: MessageDescriptor
   applicationInformantLabel: MessageDescriptor
   applicationName: MessageDescriptor
   applicationRegisteredOn: MessageDescriptor
   applicationRejectedOn: MessageDescriptor
+  applicationRequestedCorrectionOn: MessageDescriptor
   applicationStarted: MessageDescriptor
   applicationStartedBy: MessageDescriptor
   applicationStartedOn: MessageDescriptor
@@ -52,6 +54,7 @@ interface IConstantsMessages
   dob: MessageDescriptor
   dod: MessageDescriptor
   downloading: MessageDescriptor
+  downloaded: MessageDescriptor
   eventDate: MessageDescriptor
   eventType: MessageDescriptor
   lastUpdated: MessageDescriptor
@@ -86,6 +89,7 @@ interface IConstantsMessages
   rejected: MessageDescriptor
   rejectedDays: MessageDescriptor
   relationship: MessageDescriptor
+  requestedCorrection: MessageDescriptor
   review: MessageDescriptor
   search: MessageDescriptor
   sending: MessageDescriptor
@@ -138,6 +142,7 @@ interface IConstantsMessages
   totalRegistered: MessageDescriptor
   viewAll: MessageDescriptor
   notAvailable: MessageDescriptor
+  history: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   address: {
@@ -170,6 +175,11 @@ const messagesToDefine: IConstantsMessages = {
     description: 'A label for applications count',
     id: 'constants.applicationsCount'
   },
+  applicationArchivedOn: {
+    defaultMessage: 'Application archived on',
+    description: 'Label for the workflow timestamp when the status is archived',
+    id: 'constants.applicationArchivedOn'
+  },
   applicationCollectedOn: {
     defaultMessage: 'Certificate collected on',
     description:
@@ -201,6 +211,12 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Application sent for updates on',
     description: 'Label for the workflow timestamp when the status is rejected',
     id: 'constants.applicationRejectedOn'
+  },
+  applicationRequestedCorrectionOn: {
+    defaultMessage: 'Application requested correction on',
+    description:
+      'Label for the workflow timestamp when the status is requested correction',
+    id: 'constants.applicationRequestedCorrectionOn'
   },
   applicationStarted: {
     defaultMessage: 'Application started',
@@ -342,6 +358,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Downloading...',
     description: 'Label for application download status Downloading',
     id: 'constants.downloading'
+  },
+  downloaded: {
+    defaultMessage: 'Downloaded',
+    description: 'Label for application download status Downloaded',
+    id: 'constants.downloaded'
   },
   eventDate: {
     defaultMessage: 'Date of event',
@@ -525,6 +546,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Relationship',
     description: 'Relationship Label for death',
     id: 'constants.relationship'
+  },
+  requestedCorrection: {
+    id: 'constants.requestedCorrection',
+    defaultMessage: 'requested correction',
+    description: 'A label for requested correction'
   },
   review: {
     defaultMessage: 'Review',
@@ -778,6 +804,11 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.notAvailable',
     defaultMessage: 'Not available',
     description: 'Placeholder for empty value'
+  },
+  history: {
+    id: 'constants.history',
+    defaultMessage: 'History',
+    description: 'History heading'
   }
 }
 
@@ -805,6 +836,11 @@ const dynamicMessagesToDefine: Record<
     defaultMessage: 'registered',
     description: 'A label for registered'
   },
+  requestedCorrection: {
+    id: 'constants.requestedCorrection',
+    defaultMessage: 'requested correction',
+    description: 'A label for requested correction'
+  },
   certified: {
     id: 'constants.certified',
     defaultMessage: 'certified',
@@ -814,6 +850,16 @@ const dynamicMessagesToDefine: Record<
     id: 'constants.validated',
     defaultMessage: 'validated',
     description: 'A label for validated'
+  },
+  updated: {
+    defaultMessage: 'Updated',
+    description: 'Application has been updated',
+    id: 'constants.updated'
+  },
+  archived_declaration: {
+    defaultMessage: 'Archived',
+    description: 'Application has been archived',
+    id: 'constants.archived_declaration'
   },
   waitingValidation: {
     id: 'constants.waitingValidation',

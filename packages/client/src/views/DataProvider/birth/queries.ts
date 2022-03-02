@@ -179,6 +179,31 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         }
       }
       presentAtBirthRegistration
+      history {
+        date
+        action
+        location {
+          id
+          name
+        }
+        office {
+          id
+          name
+        }
+        user {
+          type
+          role
+          name {
+            firstNames
+            familyName
+            use
+          }
+          avatar {
+            data
+            type
+          }
+        }
+      }
     }
   }
 `
@@ -354,6 +379,31 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         }
       }
       presentAtBirthRegistration
+      history {
+        date
+        action
+        location {
+          id
+          name
+        }
+        office {
+          id
+          name
+        }
+        user {
+          type
+          role
+          name {
+            firstNames
+            familyName
+            use
+          }
+          avatar {
+            data
+            type
+          }
+        }
+      }
     }
   }
 `
@@ -365,6 +415,13 @@ export function getBirthQueryMappings(action: Action) {
         dataKey: 'fetchBirthRegistration'
       }
     case Action.LOAD_CERTIFICATE_APPLICATION:
+      return {
+        query: GET_BIRTH_REGISTRATION_FOR_CERTIFICATE,
+        dataKey: 'fetchBirthRegistration'
+      }
+    case Action.LOAD_REQUESTED_CORRECTION_APPLICATION:
+      // TODO: Apply seperate query; currently using it
+      // because the actual query is yet to be developed
       return {
         query: GET_BIRTH_REGISTRATION_FOR_CERTIFICATE,
         dataKey: 'fetchBirthRegistration'

@@ -145,7 +145,7 @@ type Mutation {
     details: BirthRegistrationInput!
   ): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID!
-  markApplicationAsReinstated(id: String!): ID!
+  markEventAsReinstated(id: String!): Reinstated
   markEventAsArchived(id: String!): ID!
   notADuplicate(id: String!, duplicateId: String!): ID!
   createDeathRegistration(details: DeathRegistrationInput!): CreatedIds!
@@ -233,6 +233,7 @@ type BirthRegistration implements EventRegistration {
   primaryCaregiver: PrimaryCaregiver
   createdAt: Date
   updatedAt: Date
+  history: [History]
 }
 
 type DeathRegistration implements EventRegistration {
@@ -253,6 +254,7 @@ type DeathRegistration implements EventRegistration {
   medicalPractitioner: MedicalPractitioner
   createdAt: Date
   updatedAt: Date
+  history: [History]
 }
 
 type Person {
@@ -283,6 +285,7 @@ type BirthRegResultSet {
 interface EventRegistration {
   id: ID!
   registration: Registration
+  history: [History]
   createdAt: Date
 }
 
@@ -450,6 +453,11 @@ input BirthRegistrationInput {
   updatedAt: Date
 }
 
+type Reinstated {
+  taskEntryResourceID: ID!
+  registrationStatus: RegStatus
+}
+
 input DeathRegistrationInput {
   _fhirIDMap: Map
   registration: RegistrationInput
@@ -567,6 +575,14 @@ type PrimaryCaregiver {
   primaryCaregiver: Person
   reasonsNotApplying: [ReasonsNotApplying]
   parentDetailsType: ParentDetailsType
+}
+
+type History {
+  user: User
+  date: Date
+  action: RegStatus
+  location: Location
+  office: Location
 }
 
 enum MannerOfDeath {
@@ -866,6 +882,19 @@ input PrimaryCaregiverInput {
   primaryCaregiver: PersonInput
   reasonsNotApplying: [ReasonsNotApplyingInput]
   parentDetailsType: ParentDetailsType
+}
+
+enum RegStatus {
+  IN_PROGRESS
+  ARCHIVED
+  DECLARED
+  DECLARATION_UPDATED
+  WAITING_VALIDATION
+  VALIDATED
+  REGISTERED
+  CERTIFIED
+  REJECTED
+  DOWNLOADED
 }
 
 input MedicalPractitionerInput {
@@ -1206,17 +1235,6 @@ input ReasonsNotApplyingInput {
   primaryCaregiverType: PrimaryCaregiverType
   reasonNotApplying: String
   isDeceased: Boolean
-}
-
-enum RegStatus {
-  IN_PROGRESS
-  ARCHIVED
-  DECLARED
-  WAITING_VALIDATION
-  VALIDATED
-  REGISTERED
-  CERTIFIED
-  REJECTED
 }
 
 type Comment {

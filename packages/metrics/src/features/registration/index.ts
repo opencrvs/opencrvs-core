@@ -33,9 +33,14 @@ export interface IPointLocation {
   locationLevel2?: string
 }
 
-export interface IAuthHeader {
-  Authorization: string
-}
+export type IAuthHeader =
+  | {
+      Authorization: string
+      'x-correlation-id': string
+    }
+  | {
+      Authorization: string
+    }
 
 export interface IBirthRegistrationTags {
   regStatus: string

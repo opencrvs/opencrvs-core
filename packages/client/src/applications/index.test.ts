@@ -14,7 +14,7 @@ import {
   filterProcessingApplications,
   filterProcessingApplicationsFromQuery,
   createApplication,
-  archiveApplication,
+  archiveDeclaration,
   storeApplication,
   IUserData
 } from '.'
@@ -268,18 +268,18 @@ describe('Utilty functions', () => {
   })
 })
 
-describe('archiveApplication tests', () => {
+describe('archiveDeclaration tests', () => {
   let store: AppStore
-  const application = createApplication(Event.BIRTH, mockApplicationData)
+  const declaration = createApplication(Event.BIRTH, mockApplicationData)
   let indexedDB: { USER_DATA: string; USER_DETAILS: string }
 
   beforeEach(() => {
     store = createStore().store
-    store.dispatch(storeApplication(application))
+    store.dispatch(storeApplication(declaration))
 
     const currentUserData: IUserData = {
       userID: '123',
-      applications: [application]
+      applications: [declaration]
     }
 
     const currentUserDetails: IUserDetails = {
@@ -294,36 +294,34 @@ describe('archiveApplication tests', () => {
     }
 
     // Mocking storage reading
-    // @ts-ignore
     storage.getItem = jest.fn((key: string) => {
       switch (key) {
         case 'USER_DATA':
         case 'USER_DETAILS':
-          return indexedDB[key]
+          return Promise.resolve(indexedDB[key])
         default:
-          return undefined
+          return Promise.resolve(null)
       }
     })
 
     // Mocking storage writing
-    // @ts-ignore
     storage.setItem = jest.fn((key: string, value: string) => {
       switch (key) {
         case 'USER_DATA':
         case 'USER_DETAILS':
           indexedDB[key] = value
-          break
+          return Promise.resolve(indexedDB[key])
         default:
-          break
+          return Promise.resolve(value)
       }
     })
   })
 
   it('should make an application ready to be archived', async () => {
-    store.dispatch(archiveApplication(application.id))
+    store.dispatch(archiveDeclaration(declaration.id))
     await flushPromises()
-    const applications = JSON.parse(indexedDB.USER_DATA)[0].applications
+    const declarations = JSON.parse(indexedDB.USER_DATA)[0].applications
 
-    expect(applications[0].submissionStatus).toBe('READY_TO_ARCHIVE')
+    expect(declarations[0].submissionStatus).toBe('READY_TO_ARCHIVE')
   })
 })

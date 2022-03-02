@@ -44,6 +44,7 @@ class Outbox extends React.Component<IFullProps, IState> {
     const { formatMessage } = this.props.intl
     const {
       statusWaitingToBeArchived,
+      statusWaitingToBeReinstated,
       statusWaitingToRegister,
       statusWaitingToValidate,
       statusArchiving,
@@ -53,7 +54,9 @@ class Outbox extends React.Component<IFullProps, IState> {
       statusReinstating,
       statusWaitingToSubmit,
       statusSubmitting,
-      waitingToRetry
+      waitingToRetry,
+      statusRequestingCorrection,
+      statusWaitingToRequestCorrection
     } = messages
 
     let icon: () => React.ReactNode
@@ -71,6 +74,11 @@ class Outbox extends React.Component<IFullProps, IState> {
         icon = () => <StatusWaiting id={iconId} key={iconId} />
         statusText = formatMessage(statusWaitingToValidate)
         break
+      case SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION:
+        iconId = `waiting${index}`
+        icon = () => <StatusWaiting id={iconId} key={iconId} />
+        statusText = formatMessage(statusWaitingToRequestCorrection)
+        break
       case SUBMISSION_STATUS.APPROVING:
         iconId = `registering${index}`
         icon = () => <Spinner id={iconId} key={iconId} size={24} />
@@ -86,6 +94,11 @@ class Outbox extends React.Component<IFullProps, IState> {
         icon = () => <Spinner id={iconId} key={iconId} size={24} />
         statusText = formatMessage(statusRegistering)
         break
+      case SUBMISSION_STATUS.REQUESTING_CORRECTION:
+        iconId = `requestingCorrection${index}`
+        icon = () => <Spinner id={iconId} key={iconId} size={24} />
+        statusText = formatMessage(statusRequestingCorrection)
+        break
       case SUBMISSION_STATUS.READY_TO_REJECT:
         iconId = `waiting${index}`
         icon = () => <StatusWaiting id={iconId} key={iconId} />
@@ -95,6 +108,11 @@ class Outbox extends React.Component<IFullProps, IState> {
         iconId = `rejecting${index}`
         icon = () => <Spinner id={iconId} key={iconId} size={24} />
         statusText = formatMessage(statusRejecting)
+        break
+      case SUBMISSION_STATUS.READY_TO_REINSTATE:
+        iconId = `waiting${index}`
+        icon = () => <Spinner id={iconId} key={iconId} size={24} />
+        statusText = formatMessage(statusWaitingToBeReinstated)
         break
       case SUBMISSION_STATUS.REINSTATING:
         iconId = `reinstating${index}`
