@@ -614,10 +614,10 @@ const mapFieldsToValues = (
         }
       }
 
-      if (field.name === 'district' && !field.initialValue && district) {
+      if (field.name.includes('district') && !field.initialValue && district) {
         fieldInitialValue = district as IFormFieldValue
       }
-      if (field.name === 'state' && !field.initialValue && state) {
+      if (field.name.includes('state') && !field.initialValue && state) {
         fieldInitialValue = state as IFormFieldValue
       }
     }
