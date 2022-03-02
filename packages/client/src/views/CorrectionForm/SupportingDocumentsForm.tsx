@@ -55,6 +55,7 @@ type IFullProps = IProps & IDispatchProps & IntlShapeProps
 
 function SupportingDocumentsFormComoponent(props: IFullProps) {
   const { intl, application } = props
+  const [isFileUploading, setIsFileUploading] = React.useState<boolean>(false)
 
   const section = supportingDocumentsSection
   const group = React.useMemo(
@@ -105,6 +106,10 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
     })
   }
 
+  const onUploadingStateChanged = (isUploading: boolean) => {
+    setIsFileUploading(isUploading)
+  }
+
   const continueButtonHandler = () => {
     props.writeApplication(application)
     props.goToCertificateCorrection(application.id, CorrectionSection.Reason)
@@ -125,7 +130,7 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
             <PrimaryButton
               id="confirm_form"
               key="confirm_form"
-              disabled={!hasUploadDocOrSelectOption}
+              disabled={!hasUploadDocOrSelectOption || isFileUploading}
               onClick={continueButtonHandler}
             >
               {intl.formatMessage(buttonMessages.continueButton)}
@@ -140,6 +145,7 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
             setAllFieldsDirty={false}
             fields={group.fields}
             draftData={application.data}
+            onUploadingStateChanged={onUploadingStateChanged}
           />
         </Content>
       </ActionPageLight>

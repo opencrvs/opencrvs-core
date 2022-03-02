@@ -46,7 +46,11 @@ export class ImageUploader extends React.Component<IImagePickerProps, {}> {
   fileUploader: React.RefObject<HTMLInputElement> = React.createRef()
   handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = event.target
-    return files && this.props.handleFileChange(files[0])
+    if (files) {
+      this.props.handleFileChange(files[0])
+    }
+    // Required to select the same file again
+    event.target.value = ''
   }
 
   render() {
@@ -54,7 +58,7 @@ export class ImageUploader extends React.Component<IImagePickerProps, {}> {
     return (
       <ImageBase
         {...otherProps}
-        onClick={event => {
+        onClick={(event) => {
           if (this.props.onClick) {
             this.props.onClick(event)
           }
