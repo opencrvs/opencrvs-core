@@ -25,9 +25,19 @@ import debounce from 'lodash/debounce'
 
 import './tests/queryMock'
 
+import { mockOfflineData } from './tests/mock-offline-data'
+
 if (process.env.CI) {
   jest.setTimeout(30000)
 }
+
+jest.mock('@client/forms/register/fieldDefinitions/register', () => ({
+  registerForms: mockOfflineData.forms.registerForm
+}))
+
+jest.mock('@client/forms/user/fieldDefinitions/createUser', () => ({
+  createUserForm: mockOfflineData.forms.userForm
+}))
 
 /*
  * Initialize mocks
@@ -147,7 +157,6 @@ const navigatorMock = {
 
 const {
   mockUserResponse,
-  mockOfflineData,
   mockConfigResponse,
   userDetails,
   validToken,
