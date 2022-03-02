@@ -191,6 +191,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           name
         }
         user {
+          id
           type
           role
           name {
@@ -391,6 +392,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
           name
         }
         user {
+          id
           type
           role
           name {

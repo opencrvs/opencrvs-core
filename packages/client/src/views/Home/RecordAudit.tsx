@@ -27,7 +27,9 @@ import {
   goToRegistrarHomeTab,
   goToPage,
   goToCertificateCorrection,
-  goToPrintCertificate
+  goToPrintCertificate,
+  goToUserProfile,
+  goToTeamUserList
 } from '@client/navigation'
 import {
   injectIntl,
@@ -52,7 +54,11 @@ import {
 import moment from 'moment'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
-import { ResponsiveModal, Loader } from '@opencrvs/components/lib/interface'
+import {
+  ResponsiveModal,
+  Loader,
+  ISearchLocation
+} from '@opencrvs/components/lib/interface'
 import { getScope } from '@client/profile/profileSelectors'
 import { Scope } from '@client/utils/authUtils'
 import {
@@ -179,6 +185,8 @@ interface IDispatchProps {
   goToPage: typeof goToPage
   goToPrintCertificate: typeof goToPrintCertificate
   goToRegistrarHomeTab: typeof goToRegistrarHomeTab
+  goToUserProfile: typeof goToUserProfile
+  goToTeamUserList: typeof goToTeamUserList
 }
 export type IRecordAuditTabs = keyof IQueryData | 'search'
 
@@ -189,6 +197,8 @@ type CMethodParams = {
   draft: IApplication | null
   goToPage?: typeof goToPage
   goToPrintCertificate?: typeof goToPrintCertificate
+  goToUserProfile?: typeof goToUserProfile
+  goToTeamUserList?: typeof goToTeamUserList
 }
 
 type RouteProps = RouteComponentProps<{
@@ -299,7 +309,7 @@ const APPLICATION_STATUS_LABEL: IStatus = {
     description: 'Application has been updated',
     id: 'constants.updated'
   },
-  ARCHIVE_DECLARATION: {
+  ARCHIVED: {
     defaultMessage: 'Archived',
     description: 'Application has been archived',
     id: 'constants.archived_declaration'
@@ -719,9 +729,11 @@ const showPrintButton = ({
 }
 
 const getNameWithAvatar = (
+  id: string,
   nameObject: Array<GQLHumanName | null>,
   avatar: IAvatar,
-  language: string
+  language: string,
+  goToUser?: typeof goToUserProfile
 ) => {
   const nameObj = getIndividualNameObj(nameObject, language)
   const userName = nameObj
@@ -734,7 +746,9 @@ const getNameWithAvatar = (
       <span>
         <LinkButton
           id={'username-link'}
-          onClick={() => alert('username clicked')}
+          onClick={() => {
+            goToUser && goToUser(id)
+          }}
           textDecoration="none"
         >
           {userName}
@@ -768,7 +782,12 @@ const getFormattedDate = (date: Date) => {
   )
 }
 
-const getHistory = ({ intl, draft }: CMethodParams) => {
+const getHistory = ({
+  intl,
+  draft,
+  goToUserProfile,
+  goToTeamUserList
+}: CMethodParams) => {
   if (!draft?.data?.history?.length)
     return (
       <>
@@ -789,12 +808,28 @@ const getHistory = ({ intl, draft }: CMethodParams) => {
       date: getFormattedDate(item?.date),
       action: getLink(getStatusLabel(item?.action, intl)),
       user: getNameWithAvatar(
+        item.user.id,
         item.user.name,
         item.user?.avatar,
-        window.config.LANGUAGES
+        window.config.LANGUAGES,
+        goToUserProfile
       ),
       type: intl.formatMessage(userMessages[item.user.role as string]),
-      location: getLink(item.office.name)
+      location: (
+        <LinkButton
+          textDecoration="none"
+          onClick={() => {
+            goToTeamUserList &&
+              goToTeamUserList({
+                id: item.office.id,
+                searchableText: item.office.name,
+                displayLabel: item.office.name
+              } as ISearchLocation)
+          }}
+        >
+          {item.office.name}
+        </LinkButton>
+      )
     }))
 
   const columns = [
@@ -840,7 +875,8 @@ function RecordAuditBody({
   goToPage,
   goToRegistrarHomeTab,
   scope,
-  userDetails
+  userDetails,
+  goToUserProfile
 }: {
   declaration: IDeclarationData
   draft: IApplication | null
@@ -930,7 +966,8 @@ function RecordAuditBody({
       intl,
       userDetails,
       draft,
-      goToPrintCertificate
+      goToPrintCertificate,
+      goToTeamUserList
     })
   )
 
@@ -955,7 +992,14 @@ function RecordAuditBody({
         )}
       >
         {getDeclarationInfo(declaration, isDownloaded, intl)}
-        {getHistory({ declaration, intl, draft, userDetails })}
+        {getHistory({
+          declaration,
+          intl,
+          draft,
+          userDetails,
+          goToUserProfile,
+          goToTeamUserList
+        })}
       </Content>
       <ResponsiveModal
         title={intl.formatMessage(recordAuditMessages.confirmationTitle)}
@@ -1099,5 +1143,7 @@ export const RecordAudit = connect<
   goToCertificateCorrection,
   goToPage,
   goToPrintCertificate,
-  goToRegistrarHomeTab
+  goToRegistrarHomeTab,
+  goToUserProfile,
+  goToTeamUserList
 })(injectIntl(RecordAuditComp))
