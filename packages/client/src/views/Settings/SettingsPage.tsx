@@ -50,7 +50,7 @@ import { ImageLoader } from './ImageLoader'
 import { IImage } from '@client/utils/imageUtils'
 
 const Container = styled.div`
-  ${({ theme }) => theme.shadows.mistyShadow};
+  ${({ theme }) => theme.shadows.lightShadow};
   color: ${({ theme }) => theme.colors.copy};
   background: ${({ theme }) => theme.colors.white};
   padding: 40px 77px;

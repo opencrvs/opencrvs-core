@@ -34,7 +34,7 @@ const Wrapper = styled.div<{
       : hideBoxShadow
       ? `padding: 24px 0;`
       : `padding: 24px;
-    ${theme.shadows.mistyShadow};`}
+    ${theme.shadows.lightShadow};`}
 `
 const TableTitleLoading = styled.span`
   background: ${({ theme }) => theme.colors.background};
@@ -68,7 +68,7 @@ const TableHeaderText = styled.div<{
   isSorted?: boolean
 }>`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
-  color: ${({ theme }) => theme.colors.grey};
+  color: ${({ theme }) => theme.colors.grey700};
 `
 
 const TableBody = styled.div<{ footerColumns: boolean }>`
@@ -114,7 +114,7 @@ const RowWrapper = styled.div<{
       height ? `min-height:${height.md}px` : `min-height: 48px)`};
   }
   ${({ highlight, theme }) =>
-    highlight && `:hover { background-color: ${theme.colors.dropdownHover};}`}
+    highlight && `:hover { background-color: ${theme.colors.grey200};}`}
 
   & span:first-child {
     ${({ horizontalPadding }) =>
@@ -190,7 +190,7 @@ const ValueWrapper = styled.span<{
   ${({ color }) => color && `color: ${color};`}
 `
 const Error = styled.span`
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.negative};
 `
 const ErrorText = styled.div<{ isFullPage?: boolean }>`
   ${({ theme }) => theme.fonts.h5Style};
@@ -227,7 +227,7 @@ const TableScrollerHorizontal = styled.div<{
 
   &::-webkit-scrollbar-thumb {
     border-radius: 10px;
-    background: ${({ theme }) => theme.colors.lightScrollBarGrey};
+    background: ${({ theme }) => theme.colors.grey600};
   }
 `
 const TableScroller = styled.div<{

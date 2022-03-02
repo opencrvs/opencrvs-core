@@ -33,12 +33,12 @@ const ItemContainer = styled.button<{ isSelected?: boolean }>`
   background-color: ${({ isSelected, theme }) =>
     isSelected ? theme.colors.white : theme.colors.white};
   :hover {
-    background-color: ${({ theme }) => theme.colors.greyHover};
+    background-color: ${({ theme }) => theme.colors.grey200};
   }
 `
 // focus state should show on keyboard navigation.
 // :focus {
-//   box-shadow: inset 0px 0px 0px 2px ${({ theme }) => theme.colors.focus};
+//   box-shadow: inset 0px 0px 0px 2px ${({ theme }) => theme.colors.yellow};
 // }
 
 const ItemContentContainer = styled.div<{ isSelected?: boolean }>`

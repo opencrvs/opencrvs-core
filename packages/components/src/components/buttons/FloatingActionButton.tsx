@@ -17,27 +17,27 @@ const ButtonStyled = styled.button`
   width: 56px;
   border-radius: 100%;
   background: ${({ theme }) => theme.colors.primary};
-  ${({ theme }) => theme.shadows.mistyShadow};
+  ${({ theme }) => theme.shadows.lightShadow};
   justify-content: center;
   outline: none;
   border: none;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   &:hover:enabled {
-    ${({ theme }) => theme.gradients.gradientSkyDark};
+    ${({ theme }) => theme.colors.indigoDark};
     color: ${({ theme }) => theme.colors.white};
   }
 
   &:active:enabled {
     background: ${({ theme }) => theme.colors.primary};
-    border: 3px solid ${({ theme }) => theme.colors.focus};
+    border: 3px solid ${({ theme }) => theme.colors.yellow};
     outline: none;
   }
 
   &:disabled {
     background-color: ${({ theme }) => theme.colors.disabled};
     cursor: not-allowed;
-    color: ${({ theme }) => theme.colors.placeholder};
+    color: ${({ theme }) => theme.colors.disabled};
   }
 `
 interface IButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

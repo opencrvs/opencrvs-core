@@ -17,7 +17,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.dividerDark};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey400};
   padding: 16px 0px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     flex-direction: column;
@@ -60,7 +60,7 @@ const Value = styled.div`
 
 const PlaceHolder = styled.div`
   ${({ theme }) => theme.fonts.bodyStyle};
-  color: ${({ theme }) => theme.colors.placeholder};
+  color: ${({ theme }) => theme.colors.placeholderCopy};
   flex: 1;
 `
 const Action = styled.div`

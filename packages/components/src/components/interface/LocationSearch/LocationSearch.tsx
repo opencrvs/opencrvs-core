@@ -48,11 +48,11 @@ const SearchTextInput = styled.input<{ error?: boolean; touched?: boolean }>`
   padding-left: 36px;
   border: 2px solid
     ${({ theme, error, touched }) =>
-      error && touched ? theme.colors.error : theme.colors.copy};
+      error && touched ? theme.colors.negative : theme.colors.copy};
 
   &:focus {
     outline: none;
-    box-shadow: 0 0 0px 3px ${({ theme }) => theme.colors.focus};
+    box-shadow: 0 0 0px 3px ${({ theme }) => theme.colors.yellow};
   }
 `
 const DropDownWrapper = styled.ul`
@@ -81,7 +81,7 @@ const DropDownItem = styled.li`
     border-bottom: none;
   }
   &:hover {
-    background: ${({ theme }) => theme.colors.dropdownHover};
+    background: ${({ theme }) => theme.colors.grey200};
   }
 `
 const Label = styled.span`

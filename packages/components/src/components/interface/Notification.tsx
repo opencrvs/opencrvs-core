@@ -59,11 +59,11 @@ const NotificationContainer = styled.div`
   }
 
   &.success {
-    border-color: ${({ theme }) => theme.colors.success};
+    border-color: ${({ theme }) => theme.colors.positive};
   }
 
   &.error {
-    border-color: ${({ theme }) => theme.colors.error};
+    border-color: ${({ theme }) => theme.colors.negative};
   }
 
   &.inProgress {
@@ -71,7 +71,7 @@ const NotificationContainer = styled.div`
   }
 
   &.warning {
-    border-color: ${({ theme }) => theme.colors.warning};
+    border-color: ${({ theme }) => theme.colors.neutral};
   }
 
   &.clickable {

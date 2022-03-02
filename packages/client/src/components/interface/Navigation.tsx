@@ -434,7 +434,7 @@ export const NavigationView = (props: IFullProps) => {
                   ) && (
                     <NavigationItem
                       icon={() => (
-                        <LeftNavigationApplicationIcons color={'grey'} />
+                        <LeftNavigationApplicationIcons color={'grey700'} />
                       )}
                       id={`navigation_${TAB_ID.sentForApproval}`}
                       label={TAB_LABEL.sentForApproval}

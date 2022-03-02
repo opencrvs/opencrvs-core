@@ -67,16 +67,16 @@ const NotificationContainer = styled.div`
   }
 
   &.success {
-    background: ${({ theme }) => theme.colors.success};
+    background: ${({ theme }) => theme.colors.positive};
   }
   &.inProgress {
     background: ${({ theme }) => theme.colors.primary};
   }
   &.error {
-    background: ${({ theme }) => theme.colors.error};
+    background: ${({ theme }) => theme.colors.negative};
   }
   &.warning {
-    background: ${({ theme }) => theme.colors.warning};
+    background: ${({ theme }) => theme.colors.neutral};
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     width: 100%;

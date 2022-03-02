@@ -35,7 +35,7 @@ export const TertiaryButton = styled(Button)`
   }
   &:focus {
     outline: none;
-    background: ${({ theme }) => theme.colors.focus};
+    background: ${({ theme }) => theme.colors.yellow};
     color: ${({ theme }) => theme.colors.copy};
   }
   &:not([data-focus-visible-added]) {

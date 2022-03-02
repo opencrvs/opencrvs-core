@@ -32,7 +32,7 @@ export const SecondaryButton = styled(Button)`
 
   &:focus {
     outline: none;
-    background: ${({ theme }) => theme.colors.focus};
+    background: ${({ theme }) => theme.colors.yellow};
     color: ${({ theme }) => theme.colors.copy};
     border: none;
   }

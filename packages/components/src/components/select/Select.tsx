@@ -52,9 +52,7 @@ const StyledSelect = styled(ReactSelect)<{
     &:hover {
       border: 2px solid ${({ theme }) => theme.colors.secondary};
       ${({ theme, withLightTheme }) =>
-        withLightTheme
-          ? theme.gradients.gradientGreyShade
-          : theme.gradients.gradientBabyShade}
+        withLightTheme ? theme.colors.grey400 : theme.colors.grey600}
     }
   }
 
@@ -88,7 +86,7 @@ const StyledSelect = styled(ReactSelect)<{
   }
   .react-select__control--is-focused {
     background: ${({ theme }) => theme.colors.secondary};
-    box-shadow: 0 0 0px 3px ${({ theme }) => theme.colors.focus};
+    box-shadow: 0 0 0px 3px ${({ theme }) => theme.colors.yellow};
   }
 `
 

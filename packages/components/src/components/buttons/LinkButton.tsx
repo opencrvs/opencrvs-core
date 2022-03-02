@@ -24,7 +24,7 @@ export const LinkButton = styled(Button)<{ textDecoration?: string }>`
   }
   &:focus {
     outline: none;
-    background: ${({ theme }) => theme.colors.focus};
+    background: ${({ theme }) => theme.colors.yellow};
     color: ${({ theme }) => theme.colors.copy};
   }
   &:not([data-focus-visible-added]) {
@@ -35,8 +35,8 @@ export const LinkButton = styled(Button)<{ textDecoration?: string }>`
 
   &:active {
     outline: 0;
-    opacity: 1.0 !important;
-    background-color: ${({ theme }) => theme.colors.focus};
+    opacity: 1 !important;
+    background-color: ${({ theme }) => theme.colors.yellow};
     color: ${({ theme }) => theme.colors.copy};
   }
 

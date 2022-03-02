@@ -77,20 +77,20 @@ const InfoContainer = styled.div`
 
 const KeyContainer = styled.div`
   width: 190px;
-  color: ${({ theme }) => theme.colors.grey};
+  color: ${({ theme }) => theme.colors.grey700};
   ${({ theme }) => theme.fonts.bodyBoldStyle}
 `
 
 const ValueContainer = styled.div<{ value: undefined | string }>`
   width: 325px;
   color: ${({ theme, value }) =>
-    value ? theme.colors.grey : theme.colors.grey600};
+    value ? theme.colors.grey700 : theme.colors.grey600};
   ${({ theme }) => theme.fonts.captionBigger};
 `
 
 const GreyedInfo = styled.div`
   height: 26px;
-  background-color: ${({ theme }) => theme.colors.greyInfo};
+  background-color: ${({ theme }) => theme.colors.grey500};
   max-width: 330px;
 `
 

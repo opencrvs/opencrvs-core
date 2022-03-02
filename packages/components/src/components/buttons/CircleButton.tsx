@@ -26,20 +26,20 @@ export const CircleButton = styled.button<{ dark?: boolean }>`
   &:hover:not([disabled]) {
     ${({ theme, dark }) =>
       dark
-        ? theme.gradients.gradientSkyDark
+        ? theme.colors.indigoDark
         : 'background-color: ' + theme.colors.grey300};
   }
   &:not([data-focus-visible-added]):not([disabled]):hover {
     ${({ theme, dark }) =>
       dark
-        ? theme.gradients.gradientSkyDark
+        ? theme.colors.indigoDark
         : 'background-color: ' + theme.colors.grey300};
   }
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   &:focus {
     outline: none;
-    background: ${({ theme }) => theme.colors.focus};
+    background: ${({ theme }) => theme.colors.yellow};
     color: ${({ theme }) => theme.colors.copy};
   }
   &:not([data-focus-visible-added]):not([disabled]) {

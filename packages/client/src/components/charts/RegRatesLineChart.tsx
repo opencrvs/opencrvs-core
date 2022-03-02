@@ -55,7 +55,7 @@ const CustomLegendContainer = styled.div<{
 const LegendHeader = styled.div`
   padding-bottom: 8px;
   margin-bottom: 8px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.silverSand};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey400};
   ${({ theme }) => theme.fonts.bodyBoldStyle};
 `
 
@@ -192,15 +192,15 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
       activeLabel: (latestData && latestData.label) || '',
       activeRegisteredInTargetDays: {
         value: (latestData && latestData.registeredInTargetDays) || 0,
-        stroke: theme.colors.fountainBlue
+        stroke: theme.colors.teal
       },
       activeTotalRegistered: {
         value: (latestData && latestData.totalRegistered) || 0,
-        stroke: theme.colors.swansDown
+        stroke: theme.colors.tealLight
       },
       activeTotalEstimate: {
         value: (latestData && latestData.totalEstimate) || 0,
-        stroke: theme.colors.silverSand
+        stroke: theme.colors.grey500
       }
     }
   }
@@ -289,15 +289,15 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
         activeLabel: data.activeLabel || '',
         activeRegisteredInTargetDays: {
           value: data.activePayload[2].value || 0,
-          stroke: theme.colors.fountainBlue
+          stroke: theme.colors.teal
         },
         activeTotalRegistered: {
           value: data.activePayload[1].value || 0,
-          stroke: theme.colors.swansDown
+          stroke: theme.colors.tealLight
         },
         activeTotalEstimate: {
           value: data.activePayload[0].value || 0,
-          stroke: theme.colors.silverSand
+          stroke: theme.colors.grey400
         }
       })
     }
@@ -318,7 +318,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
             </LegendHeader>
             <LegendDetails>
               <div>
-                <LegendDot color={this.props.theme.colors.silverSand} />
+                <LegendDot color={this.props.theme.colors.grey500} />
               </div>
               <LegendData>
                 <LoaderBox width={60} />
@@ -328,7 +328,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
             </LegendDetails>
             <LegendDetails>
               <div>
-                <LegendDot color={this.props.theme.colors.silverSand} />
+                <LegendDot color={this.props.theme.colors.grey500} />
               </div>
               <LegendData>
                 <LegendDataLabel>
@@ -342,7 +342,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
             </LegendDetails>
             <LegendDetails>
               <div>
-                <LegendDot color={this.props.theme.colors.silverSand} />
+                <LegendDot color={this.props.theme.colors.grey500} />
               </div>
               <LegendData>
                 <LegendDataLabel>
@@ -374,7 +374,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
             </LegendHeader>
             <LegendDetails>
               <div>
-                <LegendDot color={this.props.theme.colors.silverSand} />
+                <LegendDot color={this.props.theme.colors.grey500} />
               </div>
               <LegendData>
                 <LoaderBox width={80} />
@@ -384,7 +384,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
             </LegendDetails>
             <LegendDetails>
               <div>
-                <LegendDot color={this.props.theme.colors.silverSand} />
+                <LegendDot color={this.props.theme.colors.grey500} />
               </div>
               <LegendData>
                 <LegendDataLabel>
@@ -398,7 +398,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
             </LegendDetails>
             <LegendDetails>
               <div>
-                <LegendDot color={this.props.theme.colors.silverSand} />
+                <LegendDot color={this.props.theme.colors.grey500} />
               </div>
               <LegendData>
                 <LegendDataLabel>

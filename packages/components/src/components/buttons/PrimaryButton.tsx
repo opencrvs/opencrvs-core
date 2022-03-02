@@ -25,7 +25,7 @@ export const PrimaryButton = styled(Button)`
     background: ${({ theme }) => theme.colors.indigoDark};
   }
   &:focus {
-    background: ${({ theme }) => theme.colors.focus};
+    background: ${({ theme }) => theme.colors.yellow};
     color: ${({ theme }) => theme.colors.copy};
   }
 

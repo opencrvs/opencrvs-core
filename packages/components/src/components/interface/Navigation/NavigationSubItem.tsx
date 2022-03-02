@@ -23,23 +23,21 @@ export const SubItemContainer = styled.button<{ isSelected?: boolean }>`
   border: 0;
   background-color: ${({ theme }) => theme.colors.white};
   :hover {
-    background-color: ${({ theme }) => theme.colors.greyHover};
+    background-color: ${({ theme }) => theme.colors.grey200};
   }
   outline: none;
-  :focus {
-    box-shadow: inset 0px 0px 0px 2px ${({ theme }) => theme.colors.focus};
-  }
+
   cursor: pointer;
   width: 100%;
-  height: 38px;
+  height: 36px;
   text-align: left;
   color: ${({ isSelected, theme }) =>
-    isSelected ? theme.colors.grey : theme.colors.greyLight};
+    isSelected ? theme.colors.copy : theme.colors.grey700};
   ${({ theme }) => theme.fonts.chartLegendStyle};
 `
 
 const LabelContainer = styled.div`
-  padding: 7px 38px 9px 46px;
+  padding: 7px 38px 9px 42px;
 `
 
 export const NavigationSubItem = ({

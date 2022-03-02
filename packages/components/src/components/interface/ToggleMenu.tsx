@@ -61,7 +61,7 @@ const MenuItem = styled.li`
   padding: 12px 16px;
   height: 48px;
   &:hover {
-    background-color: ${({ theme }) => theme.colors.dropdownHover};
+    background-color: ${({ theme }) => theme.colors.grey200};
   }
   &:last-child {
     border: 0;
@@ -171,7 +171,7 @@ const Button = styled((props) => (
   &:focus {
     outline: none;
     box-shadow: ${({ theme, hasFocusRing }) =>
-      hasFocusRing ? `0 0 0 2pt ${theme.colors.focus}` : 'none'};
+      hasFocusRing ? `0 0 0 2pt ${theme.colors.yellow}` : 'none'};
   }
   &:focus:not([data-focus-visible-added]) {
     outline: none;
@@ -180,6 +180,6 @@ const Button = styled((props) => (
   &:active:not([data-focus-visible-added]) {
     outline: none;
     box-shadow: ${({ theme, hasFocusRing }) =>
-      hasFocusRing ? `0 0 0 2pt ${theme.colors.focus}` : 'none'};
+      hasFocusRing ? `0 0 0 2pt ${theme.colors.yellow}` : 'none'};
   }
 `

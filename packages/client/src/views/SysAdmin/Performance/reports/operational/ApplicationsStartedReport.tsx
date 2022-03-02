@@ -50,7 +50,7 @@ const ApplicationsStartedReportHeader = styled(ReportHeader)<
   Pick<IStateProps, 'isOfficeSelected'>
 >`
   border-top: ${({ isOfficeSelected }) => (!isOfficeSelected ? '1' : '0')}px
-    solid ${({ theme }) => theme.colors.dividerDark};
+    solid ${({ theme }) => theme.colors.grey500};
 `
 
 const ApplicationsStartedSubHeader = styled(SubHeader)`
@@ -85,7 +85,7 @@ const KeyNumber = styled.div`
 `
 
 const KeyPercentage = styled.span`
-  color: ${({ theme }) => theme.colors.placeholder};
+  color: ${({ theme }) => theme.colors.placeholderCopy};
   ${({ theme }) => theme.fonts.bodyStyle};
   margin: 16px 10px;
 `

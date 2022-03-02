@@ -10,10 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { colorDictionary } from '../colors'
+import { colors } from '../colors'
 
 export const User = (props: React.HTMLAttributes<SVGElement>) => {
-  const stroke = props.color ? props.color : colorDictionary.blackStormy
+  const stroke = props.color ? props.color : colors.grey800
   return (
     <svg width={24} height={24} fill="none" {...props}>
       <path

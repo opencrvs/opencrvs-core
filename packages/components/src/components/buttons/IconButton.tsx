@@ -18,13 +18,13 @@ export const IconButton = styled(Button)`
   height: 42px;
   color: ${({ theme }) => theme.colors.white};
   background: ${({ theme }) => theme.colors.primary};
-  ${({ theme }) => theme.shadows.mistyShadow};
+  ${({ theme }) => theme.shadows.lightShadow};
   justify-content: center;
   border-radius: 2px;
   ${({ theme }) => theme.fonts.buttonStyle};
 
   &:hover:enabled {
-    ${({ theme }) => theme.gradients.gradientSkyDark};
+    ${({ theme }) => theme.colors.indigoDark};
     color: ${({ theme }) => theme.colors.white};
   }
   &:focus {
@@ -34,13 +34,13 @@ export const IconButton = styled(Button)`
   &:active:enabled {
     outline: none;
     background: ${({ theme }) => theme.colors.primary};
-    border: 3px solid ${({ theme }) => theme.colors.focus};
+    border: 3px solid ${({ theme }) => theme.colors.yellow};
   }
 
   &:disabled {
-    background: ${({ theme }) => theme.colors.disabled};
+    background: ${({ theme }) => theme.colors.grey500};
     cursor: not-allowed;
-    color: ${({ theme }) => theme.colors.placeholder};
+    color: ${({ theme }) => theme.colors.grey500};
   }
   & > svg {
     padding: 5px;

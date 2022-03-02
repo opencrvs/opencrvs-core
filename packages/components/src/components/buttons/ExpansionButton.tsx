@@ -23,14 +23,14 @@ export const StyledButton = styled(Button)`
   border-radius: 100%;
   align-items: center;
   &:hover {
-    background-color: ${({ theme }) => theme.colors.dropdownHover};
+    background-color: ${({ theme }) => theme.colors.grey200};
   }
   &:not([data-focus-visible-added]):hover {
-    background-color: ${({ theme }) => theme.colors.dropdownHover};
+    background-color: ${({ theme }) => theme.colors.grey200};
   }
   &:focus {
     outline: none;
-    background: ${({ theme }) => theme.colors.focus};
+    background: ${({ theme }) => theme.colors.yellow};
     color: ${({ theme }) => theme.colors.copy};
   }
   &:not([data-focus-visible-added]) {
@@ -40,7 +40,7 @@ export const StyledButton = styled(Button)`
   }
   &:active:not([data-focus-visible-added]) {
     outline: none;
-    background: ${({ theme }) => theme.colors.focus};
+    background: ${({ theme }) => theme.colors.yellow};
     color: ${({ theme }) => theme.colors.copy};
   }
 `

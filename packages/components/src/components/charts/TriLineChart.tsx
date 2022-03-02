@@ -81,7 +81,7 @@ function CustomizedDot(props: ICustomisedDot) {
         cy={8}
         r={5}
         fill={theme.colors.white}
-        stroke={theme.colors.ronchi}
+        stroke={theme.colors.yellow}
         strokeWidth={3}
       />
     </svg>
@@ -182,21 +182,21 @@ class TriLineChartComponent extends React.Component<IProps> {
 
             <Line
               dataKey={dataKeys[0]}
-              stroke={theme.colors.silverSand}
+              stroke={theme.colors.grey400}
               dot={false}
               activeDot={false}
               strokeWidth={3}
             />
             <Line
               dataKey={dataKeys[1]}
-              stroke={theme.colors.swansDown}
+              stroke={theme.colors.tealLight}
               dot={false}
               activeDot={false}
               strokeWidth={3}
             />
             <Line
               dataKey={dataKeys[2]}
-              stroke={theme.colors.fountainBlue}
+              stroke={theme.colors.teal}
               dot={false}
               activeDot={(dotProps: ICustomisedDot) => (
                 <CustomizedDot {...dotProps} theme={theme} />
@@ -205,7 +205,7 @@ class TriLineChartComponent extends React.Component<IProps> {
             />
 
             <Tooltip
-              cursor={{ stroke: theme.colors.ronchi }}
+              cursor={{ stroke: theme.colors.yellow }}
               content={tooltipContent}
             />
 
