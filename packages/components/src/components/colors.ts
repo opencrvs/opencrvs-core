@@ -51,9 +51,9 @@ export const colors = {
   opacity54: 'rgba(41, 47, 51, 0.54)',
 
   // Alternative defintions
-  copy: '#222222', // grey800
-  supportingCopy: '#707070', // grey700
-  placeholderCopy: '#A5A5A5', // grey600
+  copy: '#222222', // grey600
+  supportingCopy: '#707070', // grey500
+  placeholderCopy: '#A5A5A5', // grey400
   disabled: '#CCCCCC', // grey300
   background: '#F5F5F5' // grey100
 }
