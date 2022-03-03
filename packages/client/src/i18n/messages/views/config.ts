@@ -13,7 +13,7 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
-  applicationSettings: MessageDescriptor
+  applicationTitle: MessageDescriptor
   certificateConfiguration: MessageDescriptor
   previewTemplate: MessageDescriptor
   printTemplate: MessageDescriptor
@@ -28,12 +28,24 @@ interface IConfigMessages
   deathDefaultTempDesc: MessageDescriptor
   deathUpdatedTempDesc: MessageDescriptor
   listDetailsQsn: MessageDescriptor
+  applicationNameLabel: MessageDescriptor
+  govermentLogoLabel: MessageDescriptor
+  currencyLable: MessageDescriptor
+  phoneNumberLabel: MessageDescriptor
+  uniqueIdentificationNumberLabel: MessageDescriptor
+  legallySpecifiedLabel: MessageDescriptor
+  lateRegistrationLabel: MessageDescriptor
+  delayedRegistrationLabel: MessageDescriptor
+  withinLegallySpecifiedTimeLabel: MessageDescriptor
+  generalTabTitle: MessageDescriptor
+  birthTabTitle: MessageDescriptor
+  deathTabTitle: MessageDescriptor
 }
 
 const messagesToDefine: IConfigMessages = {
-  applicationSettings: {
+  applicationTitle: {
     id: 'config.applicationSettings',
-    defaultMessage: 'Application settings',
+    defaultMessage: 'Application',
     description: 'Link Text for Config Application Settings'
   },
   certificateConfiguration: {
@@ -143,6 +155,66 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.certificate.uploadCertificateDialogCancel',
     defaultMessage: 'Cancel',
     description: 'Cancel new certificate template upload button'
+  },
+  applicationNameLabel: {
+    id: 'config.application.applicationNameLabel',
+    defaultMessage: 'Name of application',
+    description: 'Application name config label'
+  },
+  govermentLogoLabel: {
+    id: 'config.application.govermentLogoLabel',
+    defaultMessage: 'Goverment logo',
+    description: 'Goverment logo config label'
+  },
+  currencyLable: {
+    id: 'config.application.currencyLable',
+    defaultMessage: 'Currency',
+    description: 'Currency config label'
+  },
+  phoneNumberLabel: {
+    id: 'config.application.phoneNumberLabel',
+    defaultMessage: 'Phone number',
+    description: 'Phone number config label'
+  },
+  uniqueIdentificationNumberLabel: {
+    id: 'config.application.uniqueIdentificationNumberLabel',
+    defaultMessage: 'Unique Identification Number (UIN) e.g. National ID',
+    description: 'Unique Identification Number (UIN) config label'
+  },
+  legallySpecifiedLabel: {
+    id: 'config.application.legallySpecifiedLabel',
+    defaultMessage: 'Legally specified',
+    description: 'Legally specified config label'
+  },
+  lateRegistrationLabel: {
+    id: 'config.application.lateRegistrationLabel',
+    defaultMessage: 'Late registration',
+    description: 'Late registration config label'
+  },
+  delayedRegistrationLabel: {
+    id: 'config.application.delayedRegistrationLabel',
+    defaultMessage: 'Delayed registration',
+    description: 'Delayed registration config label'
+  },
+  withinLegallySpecifiedTimeLabel: {
+    id: 'config.application.withinLegallySpecifiedTimeLabel',
+    defaultMessage: 'Within legally specified time',
+    description: 'Within legally specified time config label'
+  },
+  generalTabTitle: {
+    id: 'config.application.generalTabTitle',
+    defaultMessage: 'General',
+    description: 'The title for general tab'
+  },
+  birthTabTitle: {
+    id: 'config.application.birthTabTitle',
+    defaultMessage: 'Birth',
+    description: 'The title for birth tab'
+  },
+  deathTabTitle: {
+    id: 'config.application.deathTabTitle',
+    defaultMessage: 'Death',
+    description: 'The title for death tab'
   }
 }
 

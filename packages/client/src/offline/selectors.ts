@@ -30,7 +30,6 @@ export function isOfflineDataLoaded(
     state.facilities &&
     state.forms &&
     state.forms.registerForm &&
-    state.forms.certificateCollectorDefinition &&
     state.forms.userForm &&
     state.languages &&
     state.assets &&

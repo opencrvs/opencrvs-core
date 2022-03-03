@@ -487,7 +487,6 @@ async function markEventAsRegistered(
   event: EVENT_TYPE,
   details?: any
 ) {
-
   let doc
   if (!details) {
     const taskBundle = await fetchFHIR(

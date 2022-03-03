@@ -32,7 +32,7 @@ function hasOperatorDescriptors(form: IForm) {
 
 describe('Form desearializer', () => {
   it('replaces all operator descriptors from the serialized form', async () => {
-    const definitions = await referenceApi.loadDefinitions()
+    const definitions = await referenceApi.loadContent()
     const { birth, death } = definitions.forms.registerForm
 
     expect(hasOperatorDescriptors(deserializeForm(birth))).toEqual([[], false])
@@ -40,7 +40,7 @@ describe('Form desearializer', () => {
   })
 
   it('throws errors when developer passes in invalid operations', async () => {
-    const definitions = await referenceApi.loadDefinitions()
+    const definitions = await referenceApi.loadContent()
     const { birth } = definitions.forms.registerForm
 
     birth.sections[0].groups[0].fields[0].mapping!.mutation!.operation =

@@ -449,7 +449,7 @@ describe('OfficeHome sent for review tab related tests', () => {
 
     await waitFor(() =>
       window.location.href.includes(
-        '/record-audit/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+        '/record-audit/reviewTab/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
       )
     )
   })
@@ -921,7 +921,7 @@ describe('Tablet tests', () => {
     row.hostNodes().simulate('click')
 
     expect(window.location.href).toContain(
-      '/record-audit/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+      '/record-audit/reviewTab/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
   })
 })

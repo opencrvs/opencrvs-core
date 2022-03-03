@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { FormFieldGenerator } from '@client/components/form'
-import { roleQueries } from '@client/forms/user/fieldDefinitions/query/queries'
+import { roleQueries } from '@client/forms/user/query/queries'
 import { offlineDataReady } from '@client/offline/actions'
 import { AppStore, createStore } from '@client/store'
 import { userQueries, GET_USER } from '@client/user/queries'

@@ -30,26 +30,10 @@ import { RouteComponentProps } from 'react-router'
 import { getEventDate, isFreeOfCost } from './utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
-interface INameField {
-  firstNamesField: string
-  familyNameField: string
-}
-interface INameFields {
-  [language: string]: INameField
-}
-
-export interface ICertificateCollectorField {
-  identifierTypeField: string
-  identifierOtherTypeField: string
-  identifierField: string
-  nameFields: INameFields
-  birthDateField: string
-  nationalityField: string
-}
-
-export interface ICertificateCollectorDefinition {
-  [collector: string]: ICertificateCollectorField
-}
+import {
+  IVerifyIDCertificateCollectorField,
+  verifyIDOnBirthCertificateCollectorDefinition
+} from '@client/forms/certificate/fieldDefinitions/collectorSection'
 
 interface IMatchParams {
   registrationId: string
@@ -113,10 +97,9 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
   getGenericCollectorInfo = (collector: string): ICollectorInfo => {
     const { intl, application, offlineCountryConfiguration } = this.props
     const info = application.data[collector]
-    const fields =
-      offlineCountryConfiguration.forms.certificateCollectorDefinition[
-        application.event
-      ][collector]
+    const fields = verifyIDOnBirthCertificateCollectorDefinition[
+      application.event
+    ][collector] as IVerifyIDCertificateCollectorField
     const iD = info[fields.identifierField] as string
     const iDType = (info[fields.identifierTypeField] ||
       info[fields.identifierOtherTypeField]) as string
@@ -128,7 +111,9 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
       fields.nameFields[intl.locale].familyNameField
     ] as string
 
-    const birthDate = info[fields.birthDateField] as string
+    const birthDate = fields.birthDateField
+      ? (info[fields.birthDateField] as string)
+      : ''
     const nationality = info[fields.nationalityField] as string
 
     return {

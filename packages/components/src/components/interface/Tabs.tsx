@@ -9,16 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
 import styled, { StyledComponentBase } from 'styled-components'
 import { Button, IButtonProps } from '../buttons'
 
 export const Tabs = styled.div`
-  padding: 0 ${({ theme }) => theme.grid.margin}px;
   position: relative;
-  white-space: nowrap;
 `
-
 export interface IProps extends IButtonProps {
   active?: boolean
   disabled?: boolean
@@ -26,20 +22,20 @@ export interface IProps extends IButtonProps {
 }
 
 export const Tab = styled(Button)<IProps>`
-  color: ${({ theme, active }) =>
-    active ? theme.colors.white : theme.colors.disabled};
+  margin-right: 10px;
+  padding-right: 10px;
+  color: ${({ theme }) => theme.colors.indigo500};
   opacity: ${({ disabled }) => (disabled ? 0.3 : 1)};
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
+  border-bottom: ${({ theme, active }) =>
+    active ? `4px solid ${theme.colors.indigo500}` : 'none'};
   & div {
-    padding-left: 20px;
+    padding-left: 0px;
     padding-right: 20px;
+    -webkit-justify-content: normal !important;
+    display: contents;
+    justify-content: normal !important;
+    width: max-content;
   }
-  &:disabled {
-    background: transparent;
-  }
-  ${({ theme, active }) =>
-    active ? theme.fonts.bodyBoldStyle : theme.fonts.bodyStyle};
-
-  ${({ theme, active }) =>
-    active ? `border-bottom: 3px solid ${theme.fonts.secondary}` : ''};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
 `

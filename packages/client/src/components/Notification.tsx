@@ -17,7 +17,6 @@ import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { getLanguage } from '@opencrvs/client/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
 import {
-  Notification,
   NOTIFICATION_TYPE,
   FloatingNotification
 } from '@opencrvs/components/lib/interface'
@@ -98,16 +97,16 @@ class Component extends React.Component<
       <div>
         {children}
         {backgroundSyncMessageVisible && (
-          <Notification
+          <FloatingNotification
             id="backgroundSyncShowNotification"
             show={backgroundSyncMessageVisible}
             callback={this.hideBackgroundSyncedNotification}
           >
             {intl.formatMessage(messages.declarationsSynced)}
-          </Notification>
+          </FloatingNotification>
         )}
         {configurationErrorVisible && (
-          <Notification
+          <FloatingNotification
             type={NOTIFICATION_TYPE.ERROR}
             id="configErrorShowNotification"
             show={configurationErrorVisible}
@@ -115,16 +114,16 @@ class Component extends React.Component<
           >
             OpenCRVS has been only partially configured - Awaiting facilities
             and locations
-          </Notification>
+          </FloatingNotification>
         )}
         {saveDraftClicked && (
-          <Notification
+          <FloatingNotification
             id="draftsSavedNotification"
             show={saveDraftClicked}
             callback={this.hideDraftsSavedNotification}
           >
             {intl.formatMessage(messages.draftsSaved)}
-          </Notification>
+          </FloatingNotification>
         )}
 
         {submitFormSuccessToast && (

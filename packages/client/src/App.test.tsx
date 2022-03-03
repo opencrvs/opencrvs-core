@@ -116,13 +116,13 @@ describe('when user has a valid token in local storage', () => {
 
   it('loads languages, facilities and locations on startup', async () => {
     const loadFacilities = jest.spyOn(referenceApi, 'loadFacilities')
-    const loadDefinitions = jest.spyOn(referenceApi, 'loadDefinitions')
+    const loadContent = jest.spyOn(referenceApi, 'loadContent')
     const loadLocations = jest.spyOn(referenceApi, 'loadLocations')
 
     createTestApp()
     await flushPromises()
     expect(loadFacilities).toHaveBeenCalled()
-    expect(loadDefinitions).toHaveBeenCalled()
+    expect(loadContent).toHaveBeenCalled()
     expect(loadLocations).toHaveBeenCalled()
   })
 })
