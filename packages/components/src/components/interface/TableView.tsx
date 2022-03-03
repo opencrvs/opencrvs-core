@@ -558,13 +558,13 @@ export class TableView extends React.Component<
         )}
         {totalItems > pageSize && (
           <>
-            {!loadMoreText && (
+            {/* {!loadMoreText && (
               <Pagination
                 initialPage={currentPage}
                 totalPages={Math.ceil(totalItems / pageSize)}
                 onPageChange={this.onPageChange}
               />
-            )}
+            )} */}
             {loadMoreText && (
               <LoadMore
                 initialPage={currentPage}
