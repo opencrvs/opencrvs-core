@@ -1263,33 +1263,6 @@ describe('Registration root resolvers', () => {
     })
   })
 
-  describe('markEventAsArchived()', () => {
-    it('updates a task with archived status', async () => {
-      fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
-        [JSON.stringify('ok'), { status: 200 }]
-      )
-      const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
-      const result = await resolvers.Mutation.markEventAsArchived(
-        {},
-        { id },
-        authHeaderRegCert
-      )
-      const postData = JSON.parse(fetch.mock.calls[1][1].body)
-      expect(postData.entry[0].resource.businessStatus.coding[0].code).toBe(
-        'ARCHIVED'
-      )
-      expect(result).toBe('ba0412c6-5125-4447-bd32-fb5cf336ddbc')
-    })
-
-    it('throws error if user does not have register or validate scope', async () => {
-      const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
-      await expect(
-        resolvers.Mutation.markEventAsArchived({}, { id }, authHeaderNotRegCert)
-      ).rejects.toThrowError('User does not have a register or validate scope')
-    })
-  })
-
   describe('markBirthAsValidated()', () => {
     it('updates status successfully when composition id and details both are sent', async () => {
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'

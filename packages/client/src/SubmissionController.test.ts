@@ -21,15 +21,14 @@ import {
   REJECT_BIRTH_APPLICATION,
   COLLECT_BIRTH_CERTIFICATE,
   ARCHIVE_BIRTH_DECLARATION,
-  REINSTATE_BIRTH_APPLICATION
+  REINSTATE_BIRTH_DECLARATION
 } from '@client/views/DataProvider/birth/mutations'
 import {
   ARCHIVE_DEATH_DECLARATION,
   APPROVE_DEATH_APPLICATION,
   COLLECT_DEATH_CERTIFICATE,
   REGISTER_DEATH_APPLICATION,
-  REJECT_DEATH_APPLICATION,
-  REINSTATE_DEATH_APPLICATION
+  REJECT_DEATH_APPLICATION
 } from '@client/views/DataProvider/death/mutations'
 import { ApolloError } from 'apollo-client'
 import { flushPromises } from './tests/util'
@@ -585,9 +584,6 @@ describe('Submission Controller', () => {
     subCon.client.setRequestHandler(ARCHIVE_BIRTH_DECLARATION, mutationHandler)
 
     await subCon.sync()
-    await new Promise((resolve) => {
-      setTimeout(resolve, 500)
-    })
     expect(mutationHandler).toHaveBeenCalledTimes(1)
     expect(store.dispatch).toHaveBeenCalledTimes(5)
     expect(
@@ -634,7 +630,7 @@ describe('Submission Controller', () => {
       }
     })
     subCon.client.setRequestHandler(
-      REINSTATE_BIRTH_APPLICATION,
+      REINSTATE_BIRTH_DECLARATION,
       mutationHandler
     )
 
@@ -683,7 +679,7 @@ describe('Submission Controller', () => {
       }
     })
     subCon.client.setRequestHandler(
-      REINSTATE_BIRTH_APPLICATION,
+      REINSTATE_BIRTH_DECLARATION,
       mutationHandler
     )
 

@@ -323,7 +323,7 @@ interface IDeleteApplicationAction {
     application: IApplication | IPrintableApplication
   } & OnSuccessDeleteApplicationOptions
 }
-interface IREINSTATE_APPLICATIONAction {
+interface IReinstateDeclarationAction {
   type: typeof REINSTATE_APPLICATION
   payload: {
     declarationId: string
@@ -424,7 +424,7 @@ export type Action =
   | IWriteApplicationAction
   | NavigationAction
   | IDeleteApplicationAction
-  | IREINSTATE_APPLICATIONAction
+  | IReinstateDeclarationAction
   | IGetStorageApplicationsSuccessAction
   | IGetStorageApplicationsFailedAction
   | IGetWorkqueueOfCurrentUserSuccessAction
@@ -594,7 +594,7 @@ export function deleteApplication(
 
 export function reinstateApplication(
   declarationId: string
-): IREINSTATE_APPLICATIONAction {
+): IReinstateDeclarationAction {
   return { type: REINSTATE_APPLICATION, payload: { declarationId } }
 }
 
