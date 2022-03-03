@@ -143,6 +143,12 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
           )
         })
         .catch(() => {
+          this.setState({
+            errorOccured: true,
+            errorMessages: this.props.intl.formatMessage(
+              messages.applicationNameChangeError
+            )
+          })
           valueChanged(
             NOTIFICATION_TYPE.ERROR,
             this.props.intl.formatMessage(messages.applicationNameChangeError)

@@ -23,7 +23,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import {
-  DataSection,
+  ListView,
   FloatingNotification,
   NOTIFICATION_TYPE
 } from '@opencrvs/components/lib/interface'
@@ -79,8 +79,7 @@ function GeneralTabContent({
   callBack: (modalName: string) => void
 }) {
   return (
-    <DataSection
-      title={''}
+    <ListView
       items={[
         {
           label: intl.formatMessage(messages.applicationNameLabel),
@@ -153,8 +152,7 @@ function BirthTabContent({
   intl: IntlShape
 }) {
   return (
-    <DataSection
-      title={''}
+    <ListView
       items={[
         {
           label: intl.formatMessage(messages.legallySpecifiedLabel),
@@ -217,7 +215,7 @@ function DeathTabContent({
   intl: IntlShape
 }) {
   return (
-    <DataSection
+    <ListView
       title={''}
       items={[
         {
@@ -270,12 +268,14 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
   }
 
   changeValue = (notificationStatus: NOTIFICATION_TYPE, messages: string) => {
-    this.hideModal()
-    this.setState({
-      showNotification: true,
-      notificationStatus: notificationStatus,
-      notificationMessages: messages
-    })
+    if (notificationStatus !== NOTIFICATION_TYPE.ERROR) {
+      this.hideModal()
+      this.setState({
+        showNotification: true,
+        notificationStatus: notificationStatus,
+        notificationMessages: messages
+      })
+    }
   }
 
   changeTab(id: string) {
