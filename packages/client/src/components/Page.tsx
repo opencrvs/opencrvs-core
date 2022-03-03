@@ -34,6 +34,7 @@ import { USER_DETAILS } from '@client/utils/userUtils'
 import { getDefaultLanguage } from '@client/i18n/utils'
 import { getInitialApplicationsLoaded } from '@client/applications/selectors'
 import { isRegisterFormReady } from '@client/forms/register/application-selectors'
+import { configLoad } from '@client/offline/actions'
 
 const languageFromProps = ({ language }: IPageProps) => language
 
@@ -105,6 +106,7 @@ interface IDispatchProps {
   showConfigurationErrorNotification: () => void
   hideConfigurationErrorNotification: () => void
   changeLanguage: (values: Ii18n) => void
+  configLoad: () => void
 }
 
 class Component extends React.Component<
@@ -136,6 +138,7 @@ class Component extends React.Component<
   }
 
   async componentDidMount() {
+    this.props.configLoad()
     const values = parse(this.props.location.search)
 
     this.props.checkAuth(values)
@@ -184,7 +187,8 @@ const mapDispatchToProps = {
   checkAuth,
   showConfigurationErrorNotification,
   hideConfigurationErrorNotification,
-  changeLanguage
+  changeLanguage,
+  configLoad
 }
 
 export const Page = withRouter(

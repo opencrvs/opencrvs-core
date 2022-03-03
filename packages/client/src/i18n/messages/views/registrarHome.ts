@@ -25,6 +25,7 @@ interface IOfficeHomeMessages
   readyForReview: MessageDescriptor
   readyToPrint: MessageDescriptor
   registrationNumber: MessageDescriptor
+  requestedCorrection: MessageDescriptor
   sentForApprovals: MessageDescriptor
   sentForUpdates: MessageDescriptor
   sentForExternalValidation: MessageDescriptor
@@ -93,6 +94,11 @@ const messagesToDefine: IOfficeHomeMessages = {
     defaultMessage: 'Registration no.',
     description: 'The heading of registration no. column',
     id: 'regHome.registrationNumber'
+  },
+  requestedCorrection: {
+    defaultMessage: 'Requested correction',
+    description: 'Label for registration status requested correction',
+    id: 'regHome.requestedCorrection'
   },
   sentForApprovals: {
     defaultMessage: 'Sent for approval',

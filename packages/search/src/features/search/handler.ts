@@ -56,7 +56,7 @@ export async function getAllDocumentsHandler(
         ignore: [404]
       }
     )
-    const count: number = allDocumentsCountCheck.body.hits.total
+    const count: number = allDocumentsCountCheck.body.hits.total.value
     if (count > 5000) {
       return internal(
         'Elastic contains over 5000 results.  It is risky to return all without pagination.'
@@ -101,7 +101,7 @@ export async function getStatusWiseRegistrationCountHandler(
       })
       countResult.push({
         status: regStatus,
-        count: searchResult?.body?.hits?.total || 0
+        count: searchResult?.body?.hits?.total?.value || 0
       })
     }
     return h.response(countResult).code(200)
@@ -141,16 +141,16 @@ export async function populateHierarchicalLocationIdsHandler(
         ignore: [404]
       }
     )
-    const count: number = resultCountCheck.body.hits.total
+    const count: number = resultCountCheck.body.hits.total.value
     if (count > 5000) {
       return internal(
         'Elastic contains over 5000 results.  It is risky to return all without pagination.'
       )
     }
     // If total count is less than 5000, then proceed.
-    const allDocumentsWithoutHierarchicalLocations: ApiResponse<ISearchResponse<
-      ICompositionBody
-    >> = await client.search(
+    const allDocumentsWithoutHierarchicalLocations: ApiResponse<
+      ISearchResponse<ICompositionBody>
+    > = await client.search(
       {
         index: 'ocrvs',
         body: {

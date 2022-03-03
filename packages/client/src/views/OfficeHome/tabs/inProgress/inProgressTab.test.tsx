@@ -43,7 +43,6 @@ import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
-import { waitForElement } from '@client/tests/wait-for-element'
 import { formattedDuration } from '@client/utils/date-formatting'
 
 const registerScopeToken =
@@ -663,7 +662,7 @@ describe('In Progress tab', () => {
       testComponent.update()
 
       expect(window.location.href).toContain(
-        '/record-audit/956281c9-1f47-4c26-948a-970dd23c4094'
+        '/record-audit/inProgressTab/956281c9-1f47-4c26-948a-970dd23c4094'
       )
     })
 
@@ -932,7 +931,7 @@ describe('Tablet tests', () => {
     testComponent.update()
 
     expect(window.location.href).toContain(
-      '/record-audit/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+      '/record-audit/inProgressTab/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
   })
 })

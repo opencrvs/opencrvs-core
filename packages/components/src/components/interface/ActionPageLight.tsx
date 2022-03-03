@@ -11,8 +11,8 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { BackArrowDeepBlue } from '../icons'
-import { Button, CircleButton } from '../buttons'
+import { BackArrowDeepBlue, Cross } from '../icons'
+import { CircleButton } from '../buttons'
 const ActionContainer = styled.div`
   width: 100%;
 `
@@ -23,24 +23,20 @@ const HeaderContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0 20px;
   position: relative;
 `
 const BodyContent = styled.div`
   width: 100%;
   height: 64px;
-  margin: 0 24px;
   padding: 24px 0px;
   display: flex;
   flex-direction: row;
   align-items: center;
 `
 const BackButtonContainer = styled.div`
-  margin-right: 8px;
+  margin-right: 16px;
   cursor: pointer;
-`
-const BackButton = styled(Button)`
-  justify-content: center;
-  height: auto;
 `
 
 const BackButtonText = styled.span`
@@ -54,14 +50,16 @@ const MenuTitle = styled.div`
   ${({ theme }) => theme.fonts.bigBodyBoldStyle};
 `
 
-const Container = styled.div`
+const Container = styled.div<{ hideBackground: boolean | undefined }>`
   ${({ theme }) => theme.fonts.bodyStyle};
-  ${({ theme }) => theme.shadows.mistyShadow};
+  ${({ theme, hideBackground }) =>
+    hideBackground ? '' : theme.shadows.mistyShadow};
   color: ${({ theme }) => theme.colors.copy};
   padding: 24px 32px 32px;
   margin: 32px auto 0;
   max-width: 940px;
-  background: ${({ theme }) => theme.colors.white};
+  background: ${({ theme, hideBackground }) =>
+    hideBackground ? '' : theme.colors.white};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin: 40px 54px;
     padding: 24px 32px;
@@ -76,9 +74,11 @@ const Container = styled.div`
 `
 interface IProps {
   title?: string
+  hideBackground?: boolean
   backLabel?: string
   icon?: () => React.ReactNode
   id?: string
+  goHome?: () => void
 }
 
 export class ActionPageLight extends React.Component<
@@ -87,7 +87,8 @@ export class ActionPageLight extends React.Component<
   }
 > {
   render() {
-    const { id, title, icon, goBack, backLabel } = this.props
+    const { id, title, icon, goBack, goHome, backLabel, hideBackground } =
+      this.props
 
     return (
       <ActionContainer id={id}>
@@ -101,8 +102,15 @@ export class ActionPageLight extends React.Component<
             </BackButtonContainer>
             {title && <MenuTitle>{title}</MenuTitle>}
           </BodyContent>
+          {goHome && (
+            <CircleButton id="crcl-btn" onClick={goHome}>
+              <Cross color="currentColor" />
+            </CircleButton>
+          )}
         </HeaderContainer>
-        <Container>{this.props.children}</Container>
+        <Container hideBackground={hideBackground}>
+          {this.props.children}
+        </Container>
       </ActionContainer>
     )
   }
