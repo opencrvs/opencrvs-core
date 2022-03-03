@@ -85,6 +85,32 @@ export enum Action {
   REQUEST_CORRECTION_APPLICATION = 'request correction'
 }
 
+export enum QuestionConfigFieldType {
+  TEXT = 'TEXT',
+  TEL = 'TEL',
+  NUMBER = 'NUMBER',
+  TEXTAREA = 'TEXTAREA',
+  SUBSECTION = 'SUBSECTION',
+  PARAGRAPH = 'PARAGRAPH'
+}
+export interface IQuestionConfig {
+  fieldId: string
+  label?: MessageDescriptor
+  placeholder?: MessageDescriptor
+  maxLength?: number
+  fieldName?: string
+  fieldType?: QuestionConfigFieldType
+  preceedingFieldId?: string
+  required?: boolean
+  enabled: boolean
+  custom?: boolean
+  initialValue?: string
+}
+
+export interface IFormConfig {
+  questionConfig: IQuestionConfig[]
+}
+
 export interface ISelectOption {
   value: SelectComponentOption['value']
   label: MessageDescriptor
@@ -437,11 +463,21 @@ export type INestedInputFields = {
   [key: string]: IFormField[]
 }
 
+export enum FLEX_DIRECTION {
+  ROW = 'row',
+  ROW_REVERSE = 'row-reverse',
+  COLUMN = 'column',
+  COLUMN_REVERSE = 'column-reverse',
+  INITIAL = 'initial',
+  INHERIT = 'inherit'
+}
+
 export interface IRadioGroupFormField extends IFormFieldBase {
   type: typeof RADIO_GROUP
   options: IRadioOption[]
   size?: RadioSize
   notice?: MessageDescriptor
+  flexDirection?: FLEX_DIRECTION
 }
 
 export interface IRadioGroupWithNestedFieldsFormField

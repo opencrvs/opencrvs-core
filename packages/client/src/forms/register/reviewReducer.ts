@@ -14,7 +14,10 @@ import { IForm, ReviewSection, ISerializedForm } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/review'
 import * as offlineActions from '@client/offline/actions'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
-import { registerForms } from '@client/forms/register/fieldDefinitions/register'
+import {
+  configureRegistrationForm,
+  registerForms
+} from '@client/forms/register/fieldDefinitions/register'
 
 export type IReviewFormState =
   | {
@@ -47,8 +50,16 @@ export const reviewReducer: LoopReducer<IReviewFormState, Action> = (
   switch (action.type) {
     case offlineActions.READY:
     case offlineActions.CONTENT_LOADED:
-      const birth = deserializeForm(registerForms.birth as ISerializedForm)
-      const death = deserializeForm(registerForms.death as ISerializedForm)
+      const configuredBirthForm: ISerializedForm = configureRegistrationForm(
+        action.payload.formConfig,
+        registerForms.birth
+      )
+      const configuredDeathForm: ISerializedForm = configureRegistrationForm(
+        action.payload.formConfig,
+        registerForms.death
+      )
+      const birth = deserializeForm(configuredBirthForm)
+      const death = deserializeForm(configuredDeathForm)
 
       const review = {
         id: ReviewSection.Review,

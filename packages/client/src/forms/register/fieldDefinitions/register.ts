@@ -9,24 +9,34 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IForm } from '@client/forms/index'
+import { RadioSize } from '@client/../../components/lib/forms'
+import {
+  IForm,
+  IFormConfig,
+  InformantSection,
+  BirthSection,
+  REVIEW_OVERRIDE_POSITION,
+  FLEX_DIRECTION
+} from '@client/forms/index'
+import { formMessageDescriptors } from '@client/i18n/messages'
 
-/*interface IRegisterForms {
+interface IDefaultRegisterForms {
   birth: IForm
   death: IForm
-}*/
+}
 
-export const registerForms = {
+export function configureRegistrationForm(
+  formConfig: IFormConfig,
+  defaultEventForm: IForm
+): IForm {}
+
+export const registerForms: IDefaultRegisterForms = {
   birth: {
     sections: [
       {
-        id: 'registration',
+        id: InformantSection.Registration,
         viewType: 'form',
-        name: {
-          defaultMessage: 'Registration',
-          description: 'Form section name for Registration',
-          id: 'form.section.application.name'
-        },
+        name: formMessageDescriptors.registrationName,
         title: {
           defaultMessage: 'Application Details',
           description: 'Form section title for Registration',
@@ -63,7 +73,7 @@ export const registerForms = {
                 hideHeader: true,
                 initialValue: '',
                 validate: [],
-                size: 'large',
+                size: RadioSize.LARGE,
                 placeholder: {
                   defaultMessage: 'Select',
                   description: 'Placeholder text for a select',
@@ -293,7 +303,7 @@ export const registerForms = {
                   id: 'register.selectInformant.primaryApplicant'
                 },
                 hideHeader: true,
-                size: 'large',
+                size: RadioSize.LARGE,
                 required: true,
                 readonly: true,
                 initialValue: '',
@@ -415,7 +425,7 @@ export const registerForms = {
                     groupID: 'contact-view-group',
                     fieldName: 'contactPoint'
                   },
-                  position: 'before',
+                  position: REVIEW_OVERRIDE_POSITION.BEFORE,
                   labelAs: {
                     defaultMessage: 'Who is the applicant?',
                     description: 'Form section title for contact point',
@@ -497,7 +507,7 @@ export const registerForms = {
                 hideHeader: true,
                 initialValue: '',
                 validate: [],
-                size: 'large',
+                size: RadioSize.LARGE,
                 placeholder: {
                   defaultMessage: 'Select',
                   description: 'Placeholder text for a select',
@@ -915,7 +925,7 @@ export const registerForms = {
         }
       },
       {
-        id: 'child',
+        id: BirthSection.Child,
         viewType: 'form',
         name: {
           defaultMessage: 'Child',
@@ -1573,7 +1583,7 @@ export const registerForms = {
                   }
                 ],
                 initialValue: 'URBAN',
-                flexDirection: 'row',
+                flexDirection: FLEX_DIRECTION.ROW,
                 required: false,
                 hideValueInPreview: true,
                 previewGroup: 'placeOfBirth',
@@ -2177,7 +2187,7 @@ export const registerForms = {
         ]
       },
       {
-        id: 'informant',
+        id: BirthSection.Applicant,
         viewType: 'form',
         name: {
           defaultMessage: 'Applicant',
@@ -2558,7 +2568,7 @@ export const registerForms = {
                   }
                 ],
                 initialValue: 'URBAN',
-                flexDirection: 'row',
+                flexDirection: FLEX_DIRECTION.ROW,
                 previewGroup: 'permanentAddress',
                 hideValueInPreview: true,
                 required: false,
@@ -3257,7 +3267,7 @@ export const registerForms = {
         }
       },
       {
-        id: 'primaryCaregiver',
+        id: BirthSection.Parent,
         hasDocumentSection: true,
         viewType: 'form',
         name: {
@@ -3284,7 +3294,7 @@ export const registerForms = {
               {
                 name: 'parentDetailsType',
                 type: 'RADIO_GROUP',
-                size: 'large',
+                size: RadioSize.LARGE,
                 label: {
                   defaultMessage:
                     "Do you have the mother and father's details?",
@@ -3435,7 +3445,7 @@ export const registerForms = {
                       'reasonsNotApplying',
                       'isDeceased',
                       'primaryCaregiverType',
-                      '',
+                      undefined,
                       ['deceased']
                     ]
                   }
@@ -3570,7 +3580,7 @@ export const registerForms = {
               {
                 name: 'primaryCaregiverType',
                 type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
-                size: 'large',
+                size: RadioSize.LARGE,
                 label: {
                   defaultMessage: 'Who is looking after the child?',
                   description: 'Question to ask the user about caregiver',
@@ -5001,7 +5011,7 @@ export const registerForms = {
                   }
                 ],
                 initialValue: 'URBAN',
-                flexDirection: 'row',
+                flexDirection: FLEX_DIRECTION.ROW,
                 previewGroup: 'permanentAddress',
                 hideValueInPreview: true,
                 required: false,
@@ -5791,7 +5801,7 @@ export const registerForms = {
                   }
                 ],
                 initialValue: 'URBAN',
-                flexDirection: 'row',
+                flexDirection: FLEX_DIRECTION.ROW,
                 previewGroup: 'currentAddress',
                 hideValueInPreview: true,
                 required: false,
@@ -7157,7 +7167,7 @@ export const registerForms = {
                   }
                 ],
                 initialValue: 'URBAN',
-                flexDirection: 'row',
+                flexDirection: FLEX_DIRECTION.ROW,
                 previewGroup: 'permanentAddress',
                 hideValueInPreview: true,
                 required: false,
@@ -8098,7 +8108,7 @@ export const registerForms = {
                   id: 'register.selInf.deathInfSomeoneElse'
                 },
                 hideHeader: true,
-                size: 'large',
+                size: RadioSize.LARGE,
                 required: true,
                 initialValue: '',
                 validate: [],
@@ -8229,7 +8239,7 @@ export const registerForms = {
                 required: true,
                 initialValue: '',
                 validate: [],
-                size: 'large',
+                size: RadioSize.LARGE,
                 placeholder: {
                   defaultMessage: 'Select',
                   description: 'Placeholder text for a select',
@@ -9224,7 +9234,7 @@ export const registerForms = {
                   }
                 ],
                 initialValue: 'URBAN',
-                flexDirection: 'row',
+                flexDirection: FLEX_DIRECTION.ROW,
                 previewGroup: 'permanentAddress',
                 hideValueInPreview: true,
                 required: false,
@@ -9831,7 +9841,7 @@ export const registerForms = {
                 required: false,
                 initialValue: '',
                 validate: [],
-                size: 'large',
+                size: RadioSize.LARGE,
                 placeholder: {
                   defaultMessage: 'Select',
                   description: 'Placeholder text for a select',
@@ -9907,7 +9917,7 @@ export const registerForms = {
                 required: true,
                 initialValue: '',
                 validate: [],
-                size: 'large',
+                size: RadioSize.LARGE,
                 options: [
                   {
                     value: 'PERMANENT',
@@ -10195,7 +10205,7 @@ export const registerForms = {
                   }
                 ],
                 initialValue: 'URBAN',
-                flexDirection: 'row',
+                flexDirection: FLEX_DIRECTION.ROW,
                 required: false,
                 hideValueInPreview: true,
                 validate: [],
@@ -10749,7 +10759,7 @@ export const registerForms = {
                 },
                 required: false,
                 initialValue: '',
-                size: 'large',
+                size: RadioSize.LARGE,
                 validate: [],
                 options: [
                   {
@@ -11160,7 +11170,7 @@ export const registerForms = {
                     groupID: 'point-of-contact',
                     fieldName: 'contactPoint'
                   },
-                  position: 'before',
+                  position: REVIEW_OVERRIDE_POSITION.BEFORE,
                   labelAs: {
                     defaultMessage: 'Who is the applicant?',
                     description: 'Form section title for contact point',
@@ -11384,7 +11394,7 @@ export const registerForms = {
                   }
                 ],
                 initialValue: 'URBAN',
-                flexDirection: 'row',
+                flexDirection: FLEX_DIRECTION.ROW,
                 previewGroup: 'permanentAddress',
                 hideValueInPreview: true,
                 required: false,
@@ -12302,7 +12312,7 @@ export const registerForms = {
                   id: 'form.section.deceased.spouse.name'
                 },
                 hideHeader: true,
-                size: 'large',
+                size: RadioSize.LARGE,
                 required: true,
                 initialValue: '',
                 validate: [],

@@ -18,7 +18,7 @@ import {
   requestNewCertificate,
   updateCertificate,
   updateCertificateHandler
-} from '@config/handlers/applicationCertificateHandler'
+} from '@config/handlers/getCertificate/applicationCertificateHandler'
 import applicationConfigHandler from '@config/handlers/applicationConfigHandler'
 import createQuestionHandler, {
   requestSchema as createQuestionReqSchema
@@ -26,7 +26,6 @@ import createQuestionHandler, {
 import updateQuestionHandler, {
   requestSchema as updateQuestionReqSchema
 } from '@config/handlers/updateQuestion/handler'
-import getQuestionsHandler from '@config/handlers/getQuestions/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -175,16 +174,6 @@ export default function getRoutes() {
         validate: {
           payload: updateQuestionReqSchema
         }
-      }
-    },
-    {
-      method: 'GET',
-      path: '/questions',
-      handler: getQuestionsHandler,
-      config: {
-        tags: ['api'],
-        description: 'Get questions',
-        auth: false
       }
     }
   ]

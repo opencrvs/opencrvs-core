@@ -369,7 +369,7 @@ interface IFormMessages
   helperTextNID: MessageDescriptor
 }
 
-const messagesToDefine: IFormMessages = {
+export const formMessageDescriptors: IFormMessages = {
   accountDetails: {
     defaultMessage: 'Account details',
     description: 'Account details section',
@@ -2174,4 +2174,6 @@ const messagesToDefine: IFormMessages = {
   }
 }
 
-export const formMessages: IFormMessages = defineMessages(messagesToDefine)
+export const formMessages: IFormMessages = defineMessages(
+  formMessageDescriptors
+)
