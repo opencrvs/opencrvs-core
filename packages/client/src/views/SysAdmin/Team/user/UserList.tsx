@@ -708,6 +708,7 @@ function UserListComponent(props: IProps) {
                     userDetails
                   ) as IListRowProps[]
                 }
+                noResultText="No result"
               />
               <UserAuditActionModal
                 show={toggleActivation.modalVisible}

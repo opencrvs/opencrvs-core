@@ -240,48 +240,6 @@ const getLocation = (
   return ''
 }
 
-/*const getSavedApplications = (props: IFullProps): IApplicationData => {
-  const savedApplications = props.savedApplications
-  const applicationId = props.match.params.applicationId
-
-  const applications = savedApplications
-    .filter((application: IApplication) => {
-      return (
-        application.id === applicationId ||
-        application.compositionId === applicationId
-      )
-    })
-    .map((application) => {
-      const name = getDraftApplicationName(application)
-      return {
-        id: application.id,
-        name: name,
-        status:
-          application.submissionStatus?.toString() ||
-          application.registrationStatus?.toString() ||
-          '',
-        type: application.event || '',
-        brnDrn:
-          application.data?.registration?.registrationNumber?.toString() || '',
-        trackingId:
-          application.data?.registration?.trackingId?.toString() || '',
-        dateOfBirth: application.data?.child?.childBirthDate?.toString() || '',
-        dateOfDeath: application.data?.deathEvent?.deathDate?.toString() || '',
-        placeOfBirth: getLocation(application, props) || '',
-        placeOfDeath: getLocation(application, props) || '',
-        informant:
-          (
-            application.data?.registration?.contactPoint as IFormSectionData
-          )?.value?.toString() || '',
-        informantContact:
-          (
-            (application.data?.registration?.contactPoint as IFormSectionData)
-              ?.nestedFields as IContactPoint
-          )?.registrationPhone?.toString() || ''
-      }
-    })
-  return applications[0]
-}*/
 const getDraftDeclarationData = (
   declaration: IApplication,
   resources: IOfflineData,
