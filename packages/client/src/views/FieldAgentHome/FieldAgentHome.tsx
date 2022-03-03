@@ -23,7 +23,7 @@ import {
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/fieldAgentHome'
 import {
-  goToApplicationRecordAudit,
+  goToDeclarationRecordAudit,
   goToEvents as goToEventsAction,
   goToFieldAgentHomeTab as goToFieldAgentHomeTabAction
 } from '@client/navigation'
@@ -133,7 +133,7 @@ interface IBaseFieldAgentHomeProps {
   goToEvents: typeof goToEventsAction
   draftCount: string
   goToFieldAgentHomeTab: typeof goToFieldAgentHomeTabAction
-  goToApplicationRecordAudit: typeof goToApplicationRecordAudit
+  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   applicationsReadyToSend: IApplication[]
   updateFieldAgentDeclaredApplications: typeof updateFieldAgentDeclaredApplications
 }
@@ -301,7 +301,10 @@ class FieldAgentHomeView extends React.Component<
           {
             label: 'rowClickHandler',
             handler: () =>
-              this.props.goToApplicationRecordAudit(registrationSearchSet.id)
+              this.props.goToDeclarationRecordAudit(
+                'rejectTab',
+                registrationSearchSet.id
+              )
           }
         ]
       }
@@ -390,7 +393,7 @@ class FieldAgentHomeView extends React.Component<
                     }
                     return (
                       <>
-                        {data && data.searchEvents.totalItems > 0 && (
+                        {data && data.searchEvents?.totalItems > 0 && (
                           <HomeContent id="require_updates_list">
                             <GridTable
                               content={this.transformRejectedContent(data)}
@@ -418,7 +421,7 @@ class FieldAgentHomeView extends React.Component<
                             />
                           </HomeContent>
                         )}
-                        {data && data.searchEvents.totalItems === 0 && (
+                        {data && data.searchEvents?.totalItems === 0 && (
                           <ZeroUpdatesContainer>
                             <ApplicationsOrangeAmber />
                             <ZeroUpdatesText>
@@ -504,6 +507,6 @@ const mapStateToProps = (
 export const FieldAgentHome = connect(mapStateToProps, {
   goToEvents: goToEventsAction,
   goToFieldAgentHomeTab: goToFieldAgentHomeTabAction,
-  goToApplicationRecordAudit,
+  goToDeclarationRecordAudit,
   updateFieldAgentDeclaredApplications
 })(injectIntl(withTheme(withOnlineStatus(FieldAgentHomeView))))

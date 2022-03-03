@@ -120,6 +120,8 @@ describe('OutBox tests', () => {
     'REGISTERING',
     'READY_TO_REJECT',
     'REJECTING',
+    'READY_TO_REQUEST_CORRECTION',
+    'REQUESTING_CORRECTION',
     'FAILED_NETWORK'
   ]
   const messages = [
@@ -128,6 +130,8 @@ describe('OutBox tests', () => {
     'Registering...',
     'Waiting to reject',
     'Rejecting...',
+    'Waiting to request correction',
+    'Requesting correction...',
     'Waiting to retry'
   ]
   const { store, history } = createStore()

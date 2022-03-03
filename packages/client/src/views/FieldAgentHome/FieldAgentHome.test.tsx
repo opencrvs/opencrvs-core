@@ -109,7 +109,7 @@ describe('FieldAgentHome tests', () => {
 
     testComponent.update()
     const app = testComponent
-    const element = await waitForElement(app, '#field-agent-home-spinner')
+    const element = await waitForElement(app, '#navigation_updates_loading')
 
     expect(element.hostNodes()).toHaveLength(1)
   })
@@ -431,7 +431,7 @@ describe('FieldAgentHome tests', () => {
     testComponent.find('#row_0').hostNodes().simulate('click')
 
     expect(window.location.href).toContain(
-      'record-audit/613da949-db8c-49ad-94b4-631ab0b7503e'
+      'record-audit/rejectTab/613da949-db8c-49ad-94b4-631ab0b7503e'
     )
   })
 

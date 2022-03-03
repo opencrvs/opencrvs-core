@@ -14,7 +14,7 @@ import { ILanguageState } from '@client/i18n/reducer'
 import {
   ILocationDataResponse,
   IFacilitiesDataResponse,
-  IDefinitionsResponse,
+  IContentResponse,
   IAssetResponse,
   IApplicationConfigResponse
 } from '@client/utils/referenceApi'
@@ -26,15 +26,15 @@ type GetLocations = {
   payload: string
 }
 
-export const DEFINITIONS_LOADED = 'OFFLINE/DEFINITIONS_LOADED'
-export type DefinitionsLoadedAction = {
-  type: typeof DEFINITIONS_LOADED
-  payload: IDefinitionsResponse
+export const CONTENT_LOADED = 'OFFLINE/CONTENT_LOADED'
+export type contentLoadedAction = {
+  type: typeof CONTENT_LOADED
+  payload: IContentResponse
 }
 
-export const DEFINITIONS_FAILED = 'OFFLINE/DEFINITIONS_FAILED'
-export type DefinitionsFailedAction = {
-  type: typeof DEFINITIONS_FAILED
+export const CONTENT_FAILED = 'OFFLINE/CONTENT_FAILED'
+export type contentFailedAction = {
+  type: typeof CONTENT_FAILED
   payload: Error
 }
 
@@ -84,6 +84,11 @@ export const ASSETS_FAILED = 'OFFLINE/ASSETS_FAILED'
 export type AssetsFailedAction = {
   type: typeof ASSETS_FAILED
   payload: Error
+}
+
+export const APPLICATION_CONFIG_LOAD = 'OFFLINE/APPLICATION_CONFIG_LOAD'
+export type ApplicationConfigLoadAction = {
+  type: typeof APPLICATION_CONFIG_LOAD
 }
 
 export const APPLICATION_CONFIG_LOADED = 'OFFLINE/APPLICATION_CONFIG_LOADED'
@@ -177,15 +182,15 @@ export const getOfflineDataFailed = (): IGetOfflineDataFailedAction => ({
   type: GET_OFFLINE_DATA_FAILED
 })
 
-export const definitionsLoaded = (
-  payload: IDefinitionsResponse
-): DefinitionsLoadedAction => ({
-  type: DEFINITIONS_LOADED,
+export const contentLoaded = (
+  payload: IContentResponse
+): contentLoadedAction => ({
+  type: CONTENT_LOADED,
   payload: payload
 })
 
-export const definitionsFailed = (error: Error): DefinitionsFailedAction => ({
-  type: DEFINITIONS_FAILED,
+export const contentFailed = (error: Error): contentFailedAction => ({
+  type: CONTENT_FAILED,
   payload: error
 })
 
@@ -207,6 +212,10 @@ export const offlineDataReady = (state: IOfflineData) => ({
 export const offlineDataUpdated = (state: IOfflineData) => ({
   type: UPDATED,
   payload: state
+})
+
+export const configLoad = (): ApplicationConfigLoadAction => ({
+  type: APPLICATION_CONFIG_LOAD
 })
 
 export const configLoaded = (
@@ -242,10 +251,11 @@ export type Action =
   | FacilitiesFailedAction
   | PilotLocationsLoadedAction
   | PilotLocationsFailedAction
-  | DefinitionsFailedAction
-  | DefinitionsLoadedAction
+  | contentFailedAction
+  | contentLoadedAction
   | AssetsLoadedAction
   | AssetsFailedAction
+  | ApplicationConfigLoadAction
   | ApplicationConfigLoadedAction
   | ApplicationConfigFailedAction
   | IFilterLocationsAction

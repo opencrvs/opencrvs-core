@@ -31,7 +31,7 @@ export interface ISearchResponse<T> {
   _scroll_id?: string
   _shards: IShardsResponse
   hits: {
-    total: number
+    total: { value: number; relation: string }
     max_score: number
     hits: Array<{
       _index: string

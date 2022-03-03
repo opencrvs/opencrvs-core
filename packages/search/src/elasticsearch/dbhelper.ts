@@ -12,7 +12,6 @@
 import { client, ISearchResponse } from '@search/elasticsearch/client'
 import { buildQuery, ICompositionBody } from '@search/elasticsearch/utils'
 import { logger } from '@search/logger'
-import { ApiResponse } from '@elastic/elasticsearch'
 
 export const indexComposition = async (
   compositionIdentifier: string,
@@ -53,11 +52,9 @@ export const updateComposition = async (id: string, body: ICompositionBody) => {
   return response
 }
 
-export const searchComposition = async (
-  body: ICompositionBody
-): Promise<ApiResponse<ISearchResponse<any>> | null> => {
+export const searchComposition = async (body: ICompositionBody) => {
   try {
-    const response = client.search({
+    const response = client.search<ISearchResponse<any>>({
       index: 'ocrvs',
       type: 'compositions',
       body: {
@@ -71,11 +68,9 @@ export const searchComposition = async (
   }
 }
 
-export const searchByCompositionId = async (
-  compositionId: string
-): Promise<ApiResponse<ISearchResponse<any>> | null> => {
+export const searchByCompositionId = async (compositionId: string) => {
   try {
-    const response = await client.search({
+    const response = await client.search<ISearchResponse<any>>({
       index: 'ocrvs',
       type: 'compositions',
       body: {

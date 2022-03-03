@@ -41,14 +41,18 @@ export const colorDictionary = {
   swansDown: '#D3EEE4',
   fountainBlue: '#4CC1BA',
   ronchi: '#EDC55E',
+  borderBottom: '#d8dbde',
   grey: '#1E2326',
   greyLight: '#595C5F',
   greyHover: '#F8F8F8',
-  borderBottom: '#d8dbde',
+  grey800: '#1E2326',
+  grey300: '#F1F2F3',
   grey600: '#909397',
   greyInfo: '#EFEFEF',
   tableRowDivider: '#F1F2F3',
-  indigo500: '#4972BB'
+  indigo500: '#4972BB',
+  indigo600: '##42639C',
+  yellow500: '#EDC55E'
 }
 
 export const gradients = {
@@ -131,7 +135,12 @@ export const colors = {
   fountainBlue: colorDictionary.fountainBlue,
   ronchi: colorDictionary.ronchi,
   indigo500: colorDictionary.indigo500,
+  yellow500: colorDictionary.yellow500,
+  blue500: colorDictionary.blueCrystal,
+  grey300: colorDictionary.grey300,
   grey600: colorDictionary.grey600,
+  grey800: colorDictionary.grey800,
   greyInfo: colorDictionary.greyInfo,
+  indigo600: colorDictionary.indigo600,
   tableRowDivider: colorDictionary.tableRowDivider
 }

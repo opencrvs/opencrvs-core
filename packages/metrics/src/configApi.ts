@@ -50,7 +50,7 @@ export interface IApplicationConfig {
 }
 
 export async function getApplicationConfig(): Promise<IApplicationConfig> {
-  return fetch(`${CONFIG_API_URL}/getConfig`, {
+  return fetch(`${CONFIG_API_URL}/config`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json'
@@ -58,6 +58,9 @@ export async function getApplicationConfig(): Promise<IApplicationConfig> {
   })
     .then((response) => {
       return response.json()
+    })
+    .then((response) => {
+      return response.config
     })
     .catch((error) => {
       return Promise.reject(

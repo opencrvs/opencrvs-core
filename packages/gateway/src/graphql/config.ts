@@ -23,6 +23,7 @@ import { searchTypeResolvers } from '@gateway/features/search/type-resolvers'
 import { resolvers as userRootResolvers } from '@gateway/features/user/root-resolvers'
 import { resolvers as correctionRootResolvers } from '@gateway/features/correction/root-resolvers'
 import { resolvers as applicationRootResolvers } from '@gateway/features/application/root-resolvers'
+import { resolvers as questionResolvers } from '@gateway/features/questions/root-resolvers'
 import {
   IUserModelData,
   userTypeResolvers
@@ -39,7 +40,7 @@ import { AuthenticationError, Config, gql } from 'apollo-server-hapi'
 import { readFileSync } from 'fs'
 import { GraphQLSchema } from 'graphql'
 import { IResolvers } from 'graphql-tools'
-import { merge, isEqual } from 'lodash'
+import { merge, isEqual, uniqueId } from 'lodash'
 
 const graphQLSchemaPath = `${__dirname}/schema.graphql`
 
@@ -63,7 +64,8 @@ const resolvers: StringIndexed<IResolvers> = merge(
   roleTypeResolvers as IResolvers,
   certificateResolvers as IResolvers,
   correctionRootResolvers as IResolvers,
-  applicationRootResolvers as IResolvers
+  applicationRootResolvers as IResolvers,
+  questionResolvers as IResolvers
 )
 
 export const getExecutableSchema = (): GraphQLSchema => {
@@ -107,7 +109,10 @@ export const getApolloConfig = (): Config => {
         throw new AuthenticationError(err)
       }
 
-      return { Authorization: request.headers.authorization }
+      return {
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id'] || uniqueId()
+      }
     }
   }
 }

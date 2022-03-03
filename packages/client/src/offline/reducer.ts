@@ -35,8 +35,9 @@ import {
   IPDFTemplate,
   ISVGTemplate
 } from '@client/pdfRenderer/transformer/types'
-import { ICertificateCollectorDefinition } from '@client/views/PrintCertificate/VerifyCollector'
-import { find } from 'lodash'
+import { find, merge } from 'lodash'
+import { registerForms } from '@client/forms/register/fieldDefinitions/register'
+import { createUserForm } from '@client/forms/user/fieldDefinitions/createUser'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -66,24 +67,21 @@ export interface ILocation {
   partOf: string
 }
 
+interface IForm {
+  registerForm: {
+    birth: ISerializedForm
+    death: ISerializedForm
+  }
+  userForm: ISerializedForm
+}
+
 export interface IOfflineData {
   locations: { [key: string]: ILocation }
   facilities: { [key: string]: ILocation }
   offices: { [key: string]: ILocation }
   pilotLocations: { [key: string]: ILocation }
   languages: ILanguage[]
-  forms: {
-    // @todo this is also used in review, so it could be named just form
-    registerForm: {
-      birth: ISerializedForm
-      death: ISerializedForm
-    }
-    certificateCollectorDefinition: {
-      birth: ICertificateCollectorDefinition
-      death: ICertificateCollectorDefinition
-    }
-    userForm: ISerializedForm
-  }
+  forms: IForm
   templates: {
     receipt?: IPDFTemplate
     certificates: {
@@ -122,14 +120,6 @@ function checkIfDone(
   const newState = getModel(loopWithState)
   const cmd = getCmd(loopWithState)
   if (
-    !newState.offlineData.config?.COUNTRY_LOGO_FILE &&
-    !oldState.offlineDataLoaded
-  ) {
-    return loop(
-      { ...newState, offlineDataLoaded: false },
-      Cmd.list([CONFIG_CMD])
-    )
-  } else if (
     isOfflineDataLoaded(newState.offlineData) &&
     !oldState.offlineDataLoaded
   ) {
@@ -179,9 +169,9 @@ const PILOT_LOCATIONS_CMD = Cmd.run(() => referenceApi.loadPilotLocations(), {
   failActionCreator: actions.pilotLocationsFailed
 })
 
-const DEFINITIONS_CMD = Cmd.run(() => referenceApi.loadDefinitions(), {
-  successActionCreator: actions.definitionsLoaded,
-  failActionCreator: actions.definitionsFailed
+const CONTENT_CMD = Cmd.run(() => referenceApi.loadContent(), {
+  successActionCreator: actions.contentLoaded,
+  failActionCreator: actions.contentFailed
 })
 
 const ASSETS_CMD = Cmd.run(() => referenceApi.loadAssets(), {
@@ -208,7 +198,7 @@ function getDataLoadingCommands() {
     FACILITIES_CMD,
     LOCATIONS_CMD,
     PILOT_LOCATIONS_CMD,
-    DEFINITIONS_CMD,
+    CONTENT_CMD,
     ASSETS_CMD,
     CONFIG_CMD
   ])
@@ -297,7 +287,11 @@ function reducer(
     /*
      * Configurations
      */
+    case actions.APPLICATION_CONFIG_LOAD: {
+      return loop(state, CONFIG_CMD)
+    }
     case actions.APPLICATION_CONFIG_LOADED: {
+      merge(window.config, action.payload.config)
       const birthCertificateTemplate = find(action.payload.certificates, {
         event: 'birth',
         status: 'ACTIVE'
@@ -349,23 +343,27 @@ function reducer(
      * Definitions
      */
 
-    case actions.DEFINITIONS_LOADED: {
+    case actions.CONTENT_LOADED: {
+      const defaultFormsConfig = {
+        registerForm: registerForms,
+        userForm: createUserForm
+      }
       return {
         ...state,
         offlineData: {
           ...state.offlineData,
           languages: action.payload.languages,
-          forms: action.payload.forms
+          forms: defaultFormsConfig as IForm
         }
       }
     }
-    case actions.DEFINITIONS_FAILED: {
+    case actions.CONTENT_FAILED: {
       return loop(
         {
           ...state,
           loadingError: errorIfDataNotLoaded(state)
         },
-        delay(DEFINITIONS_CMD, RETRY_TIMEOUT)
+        delay(CONTENT_CMD, RETRY_TIMEOUT)
       )
     }
 

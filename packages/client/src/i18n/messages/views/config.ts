@@ -32,11 +32,9 @@ interface IConfigMessages
   listDetailsQsn: MessageDescriptor
   applicationNameLabel: MessageDescriptor
   govermentLogoLabel: MessageDescriptor
-  userTimeoutLabel: MessageDescriptor
   currencyLable: MessageDescriptor
   phoneNumberLabel: MessageDescriptor
-  logrocketLabel: MessageDescriptor
-  sentryLabel: MessageDescriptor
+  uniqueIdentificationNumberLabel: MessageDescriptor
   legallySpecifiedLabel: MessageDescriptor
   lateRegistrationLabel: MessageDescriptor
   delayedRegistrationLabel: MessageDescriptor
@@ -44,9 +42,6 @@ interface IConfigMessages
   generalTabTitle: MessageDescriptor
   birthTabTitle: MessageDescriptor
   deathTabTitle: MessageDescriptor
-  phoneNumberPatternLabel: MessageDescriptor
-  phoneNumberExampleLabel: MessageDescriptor
-  applicationNameChangeNotification: MessageDescriptor
 }
 
 const messagesToDefine: IConfigMessages = {
@@ -59,6 +54,11 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.nameChangeMessage',
     defaultMessage: 'Choose a name for your CRVS system',
     description: 'Message for application name change modal'
+  },
+  applicationNameChangeNotification: {
+    id: 'config.application.applicationNameChangeNotification',
+    defaultMessage: 'Name of application updated',
+    description: 'Message for application name change notification'
   },
   applicationNameChangeError: {
     id: 'config.application.nameChangeError',
@@ -183,11 +183,6 @@ const messagesToDefine: IConfigMessages = {
     defaultMessage: 'Goverment logo',
     description: 'Goverment logo config label'
   },
-  userTimeoutLabel: {
-    id: 'config.application.userTimeoutLabel',
-    defaultMessage: 'User timeout',
-    description: 'User timeout config label'
-  },
   currencyLable: {
     id: 'config.application.currencyLable',
     defaultMessage: 'Currency',
@@ -198,15 +193,10 @@ const messagesToDefine: IConfigMessages = {
     defaultMessage: 'Phone number',
     description: 'Phone number config label'
   },
-  logrocketLabel: {
-    id: 'config.application.logrocketLabel',
-    defaultMessage: 'Logrocket',
-    description: 'Logrocket config label'
-  },
-  sentryLabel: {
-    id: 'config.application.sentryLabel',
-    defaultMessage: 'Sentry',
-    description: 'Sentry config label'
+  uniqueIdentificationNumberLabel: {
+    id: 'config.application.uniqueIdentificationNumberLabel',
+    defaultMessage: 'Unique Identification Number (UIN) e.g. National ID',
+    description: 'Unique Identification Number (UIN) config label'
   },
   legallySpecifiedLabel: {
     id: 'config.application.legallySpecifiedLabel',
@@ -242,21 +232,6 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.deathTabTitle',
     defaultMessage: 'Death',
     description: 'The title for death tab'
-  },
-  phoneNumberPatternLabel: {
-    id: 'config.application.phoneNumberPatternLabel',
-    defaultMessage: 'pattern: {pattern}',
-    description: 'Label for phone number pattern config'
-  },
-  phoneNumberExampleLabel: {
-    id: 'config.application.phoneNumberExampleLabel',
-    defaultMessage: 'example: {example}',
-    description: 'Label for phone number example config'
-  },
-  applicationNameChangeNotification: {
-    id: 'config.application.applicationNameChangeNotification',
-    defaultMessage: 'Name of application updated',
-    description: 'Application name change notification messages'
   }
 }
 

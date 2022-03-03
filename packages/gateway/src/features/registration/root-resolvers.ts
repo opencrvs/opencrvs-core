@@ -502,13 +502,14 @@ async function markEventAsRegistered(
       entry: taskBundle.entry
     }
   } else {
-    doc = await buildFHIRBundle(details, event)
+    doc = await buildFHIRBundle(details, event, authHeader)
   }
-
   await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
 
   // return the full composition
-  return fetchFHIR(`/Composition/${id}`, authHeader)
+  const res = await fetchFHIR(`/Composition/${id}`, authHeader)
+
+  return res
 }
 
 async function markEventAsCertified(

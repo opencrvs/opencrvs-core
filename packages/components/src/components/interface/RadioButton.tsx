@@ -20,7 +20,12 @@ const Wrapper = styled.div`
   align-items: center;
 `
 
-const Label = styled.label<{ size?: string; disabled?: boolean }>`
+const Label = styled.label<{
+  size?: string
+  disabled?: boolean
+  marginLeft?: number
+  hasFlexDirection?: boolean
+}>`
   color: ${({ theme, disabled }) =>
     disabled ? theme.colors.disabled : theme.colors.copy};
   cursor: pointer;
@@ -32,6 +37,8 @@ const Label = styled.label<{ size?: string; disabled?: boolean }>`
       : `
     ${theme.fonts.bodyStyle};
     margin-left: 16px;`}
+
+  ${({ hasFlexDirection }) => hasFlexDirection && `margin-left: 8px;`}
 `
 const CheckOuter = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -101,6 +108,7 @@ interface IRadioButton {
   selected?: string
   disabled?: boolean
   size?: string
+  hasFlexDirection?: boolean
   onChange?: (value: Value) => void
 }
 
@@ -111,7 +119,16 @@ export class RadioButton extends React.Component<IRadioButton> {
     }
   }
   render() {
-    const { id, name, selected, label, value, size, disabled } = this.props
+    const {
+      id,
+      name,
+      selected,
+      label,
+      value,
+      size,
+      disabled,
+      hasFlexDirection
+    } = this.props
     return (
       <Wrapper>
         <CheckOuter>
@@ -129,7 +146,12 @@ export class RadioButton extends React.Component<IRadioButton> {
             {disabled ? '' : <span />}
           </Check>
         </CheckOuter>
-        <Label disabled={disabled} size={size} htmlFor={id}>
+        <Label
+          disabled={disabled}
+          size={size}
+          htmlFor={id}
+          hasFlexDirection={hasFlexDirection}
+        >
           {label}
         </Label>
       </Wrapper>

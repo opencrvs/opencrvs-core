@@ -89,6 +89,12 @@ const Title = styled.div`
 const Icon = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
 `
+
+export enum ContentSize {
+  LARGE = 'large',
+  NORMAL = 'normal'
+}
+
 interface IProps {
   icon?: () => React.ReactNode
   title?: string
@@ -98,7 +104,7 @@ interface IProps {
   subtitle?: string
   children?: React.ReactNode
   bottomActionButtons?: ReactElement[]
-  size?: 'normal' | 'large' | undefined
+  size?: ContentSize
 }
 
 export class Content extends React.Component<IProps> {
@@ -139,11 +145,12 @@ export class Content extends React.Component<IProps> {
         </Header>
         {subtitle && <SubHeader>{subtitle}</SubHeader>}
         {children && <Body>{children}</Body>}
-        <Footer>
-          {bottomActionButtons && (
+
+        {bottomActionButtons && (
+          <Footer>
             <BottomActionBar>{bottomActionButtons}</BottomActionBar>
-          )}
-        </Footer>
+          </Footer>
+        )}
       </Container>
     )
   }

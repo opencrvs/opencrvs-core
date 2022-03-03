@@ -69,35 +69,6 @@ const millisecondsToMinutes = (ms: number): string => {
   return `${minutes} minutes`
 }
 
-function PhoneNumberDetails({
-  pattern,
-  example,
-  intl
-}: {
-  pattern: RegExp
-  example: string
-  intl: IntlShape
-}) {
-  return (
-    <>
-      <p>
-        <span>
-          {intl.formatMessage(messages.phoneNumberPatternLabel, {
-            pattern: pattern
-          })}
-        </span>
-      </p>
-      <p>
-        <span>
-          {intl.formatMessage(messages.phoneNumberExampleLabel, {
-            example: example
-          })}
-        </span>
-      </p>
-    </>
-  )
-}
-
 function GeneralTabContent({
   offlineCountryConfiguration,
   intl,
@@ -142,17 +113,6 @@ function GeneralTabContent({
           }
         },
         {
-          label: intl.formatMessage(messages.userTimeoutLabel),
-          value: millisecondsToMinutes(
-            offlineCountryConfiguration.config.DESKTOP_TIME_OUT_MILLISECONDS
-          ),
-          action: {
-            id: GeneralActionId.USER_TIMEOUT,
-            label: intl.formatMessage(buttonMessages.change),
-            disabled: true
-          }
-        },
-        {
           label: intl.formatMessage(messages.currencyLable),
           value: '',
           action: {
@@ -163,17 +123,8 @@ function GeneralTabContent({
         },
         {
           label: intl.formatMessage(messages.phoneNumberLabel),
-          value: (
-            <PhoneNumberDetails
-              pattern={
-                offlineCountryConfiguration.config.PHONE_NUMBER_PATTERN.pattern
-              }
-              example={
-                offlineCountryConfiguration.config.PHONE_NUMBER_PATTERN.example
-              }
-              intl={intl}
-            />
-          ),
+          value:
+            offlineCountryConfiguration.config.PHONE_NUMBER_PATTERN.pattern,
           action: {
             id: GeneralActionId.PHONE_NUMBER,
             label: intl.formatMessage(buttonMessages.change),
@@ -181,19 +132,10 @@ function GeneralTabContent({
           }
         },
         {
-          label: intl.formatMessage(messages.logrocketLabel),
-          value: offlineCountryConfiguration.config.LOGROCKET,
+          label: intl.formatMessage(messages.uniqueIdentificationNumberLabel),
+          value: offlineCountryConfiguration.config.NID_NUMBER_PATTERN.pattern,
           action: {
-            id: GeneralActionId.LOG_ROCKET,
-            label: intl.formatMessage(buttonMessages.change),
-            disabled: true
-          }
-        },
-        {
-          label: intl.formatMessage(messages.sentryLabel),
-          value: offlineCountryConfiguration.config.SENTRY,
-          action: {
-            id: GeneralActionId.SENTRY,
+            id: 'btnChangeUIN',
             label: intl.formatMessage(buttonMessages.change),
             disabled: true
           }
