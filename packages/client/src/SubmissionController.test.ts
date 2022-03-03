@@ -46,6 +46,13 @@ describe('Submission Controller', () => {
     new SubmissionController(store).start()
     expect(setInterval).toBeCalled()
     window.setInterval = originalInterval
+    // @ts-ignore
+    window.setTimeout = (fn: (...args: any[]) => void, duration: number) => {
+      return new Promise((resolve) => {
+        fn()
+        resolve(0)
+      })
+    }
   })
 
   it('does nothing if sync is already running', async () => {
@@ -578,7 +585,9 @@ describe('Submission Controller', () => {
     subCon.client.setRequestHandler(ARCHIVE_BIRTH_DECLARATION, mutationHandler)
 
     await subCon.sync()
-
+    await new Promise((resolve) => {
+      setTimeout(resolve, 500)
+    })
     expect(mutationHandler).toHaveBeenCalledTimes(1)
     expect(store.dispatch).toHaveBeenCalledTimes(5)
     expect(
