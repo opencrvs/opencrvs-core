@@ -195,6 +195,7 @@ type State = {
   rejectFormOpen: boolean
   hasError: boolean
   showConfirmationModal: boolean
+  isFileUploading: boolean
 }
 
 const fadeFromTop = keyframes`
@@ -222,7 +223,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
       isDataAltered: false,
       rejectFormOpen: false,
       hasError: false,
-      showConfirmationModal: false
+      showConfirmationModal: false,
+      isFileUploading: false
     }
   }
   setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
@@ -269,6 +271,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
         hash: newHash + '-form-input'
       })
     }
+  }
+
+  onUploadingStateChanged = (isUploading: boolean) => {
+    this.setState({
+      ...this.state,
+      isFileUploading: isUploading
+    })
   }
 
   modifyApplication = (
@@ -542,7 +551,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
       activeSectionGroup,
       application
     )
-
     const isErrorOccured = this.state.hasError
     const debouncedModifyApplication = debounce(this.modifyApplication, 300)
 
@@ -742,6 +750,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
                             onSetTouched={(setTouchedFunc) => {
                               this.setAllFormFieldsTouched = setTouchedFunc
                             }}
+                            onUploadingStateChanged={
+                              this.onUploadingStateChanged
+                            }
                           />
                         </form>
                         {nextSectionGroup && (
@@ -757,6 +768,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                   application.event.toLowerCase()
                                 )
                               }}
+                              disabled={this.state.isFileUploading}
                             >
                               {intl.formatMessage(
                                 buttonMessages.continueButton

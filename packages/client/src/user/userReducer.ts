@@ -13,7 +13,8 @@ import {
   IForm,
   IFormSectionData,
   UserSection,
-  IFormSection
+  IFormSection,
+  ISerializedForm
 } from '@client/forms'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
 import { goToTeamUserList } from '@client/navigation'
@@ -38,6 +39,7 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { userAuditForm, IUserAuditForm } from '@client/user/user-audit'
+import { createUserForm } from '@client/forms/user/fieldDefinitions/createUser'
 
 const UPDATE_FORM_FIELD_DEFINITIONS = 'USER_FORM/UPDATE_FORM_FIELD_DEFINITIONS'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'
@@ -269,10 +271,8 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
 ): IUserFormState | Loop<IUserFormState, UserFormAction> => {
   switch (action.type) {
     case offlineActions.READY:
-    case offlineActions.DEFINITIONS_LOADED:
-      const { userForm } = (action as offlineActions.DefinitionsLoadedAction)
-        .payload.forms
-      const form = deserializeForm(userForm)
+    case offlineActions.CONTENT_LOADED:
+      const form = deserializeForm(createUserForm as ISerializedForm)
 
       return {
         ...state,

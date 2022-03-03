@@ -12,12 +12,8 @@
 import { ISerializedForm } from '@client/forms'
 import { ILanguage } from '@client/i18n/reducer'
 import { ILocation } from '@client/offline/reducer'
-import {
-  IPDFTemplate,
-  ISVGTemplate
-} from '@client/pdfRenderer/transformer/types'
 import { getToken } from '@client/utils/authUtils'
-import { ICertificateCollectorDefinition } from '@client/views/PrintCertificate/VerifyCollector'
+import { IPDFTemplate } from '@client/pdfRenderer/transformer/types'
 
 export interface ILocationDataResponse {
   [locationId: string]: ILocation
@@ -25,14 +21,10 @@ export interface ILocationDataResponse {
 export interface IFacilitiesDataResponse {
   [facilityId: string]: ILocation
 }
-export interface IDefinitionsResponse {
+export interface IContentResponse {
   languages: ILanguage[]
   forms: {
     registerForm: { birth: ISerializedForm; death: ISerializedForm }
-    certificateCollectorDefinition: {
-      birth: ICertificateCollectorDefinition
-      death: ICertificateCollectorDefinition
-    }
     userForm: ISerializedForm
   }
   templates: {
@@ -123,8 +115,8 @@ async function loadConfig(): Promise<IApplicationConfigResponse> {
   return response
 }
 
-async function loadDefinitions(): Promise<IDefinitionsResponse> {
-  const url = `${window.config.COUNTRY_CONFIG_URL}/definitions/client`
+async function loadContent(): Promise<IContentResponse> {
+  const url = `${window.config.COUNTRY_CONFIG_URL}/content/client`
 
   const res = await fetch(url, {
     method: 'GET',
@@ -224,7 +216,7 @@ export const referenceApi = {
   loadLocations,
   loadFacilities,
   loadPilotLocations,
-  loadDefinitions,
+  loadContent,
   loadAssets,
   loadConfig
 }

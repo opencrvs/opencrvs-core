@@ -51,7 +51,7 @@ fi
 
 # Delete all data from mongo
 #---------------------------
-docker run --rm --network=$NETWORK mongo:3.6 mongo hearth-dev --host $HOST --eval "db.dropDatabase()"
+if [[ "$ENV" != "qa" ]] ; then docker run --rm --network=$NETWORK mongo:3.6 mongo hearth-dev --host $HOST --eval "db.dropDatabase()" ; fi
 
 docker run --rm --network=$NETWORK mongo:3.6 mongo openhim-dev --host $HOST --eval "db.dropDatabase()"
 
