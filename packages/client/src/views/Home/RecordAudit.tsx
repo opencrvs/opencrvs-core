@@ -254,18 +254,6 @@ const STATUSTOCOLOR: { [key: string]: string } = {
   WAITING_VALIDATION: 'teal'
 }
 
-const KEY_LABEL: ILabel = {
-  status: 'Status',
-  type: 'Event',
-  trackingId: 'Tracking ID',
-  dateOfBirth: 'Date of birth',
-  dateOfDeath: 'Date of death',
-  placeOfBirth: 'Place of birth',
-  placeOfDeath: 'Place of death',
-  informant: 'Informant',
-  brn: 'BRN',
-  drn: 'DRN'
-}
 const ARCHIVABLE_STATUSES = [DECLARED, VALIDATED, REJECTED]
 
 const APPLICATION_STATUS_LABEL: IStatus = {
@@ -1046,7 +1034,11 @@ function RecordAuditBody({
         show={showDialog}
         handleClose={toggleDisplayDialog}
       >
-        {intl.formatMessage(recordAuditMessages.confirmationBody)}
+        {declaration.status && ARCHIVED.includes(declaration.status)
+          ? intl.formatMessage(
+              recordAuditMessages.reinstateDeclarationDialogDescription
+            )
+          : intl.formatMessage(recordAuditMessages.confirmationBody)}
       </ResponsiveModal>
     </>
   )

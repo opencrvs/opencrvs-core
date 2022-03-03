@@ -76,7 +76,7 @@ export const REJECT_BIRTH_APPLICATION = gql`
     markEventAsVoided(id: $id, reason: $reason, comment: $comment)
   }
 `
-export const REINSTATE_BIRTH_APPLICATION = gql`
+export const REINSTATE_BIRTH_DECLARATION = gql`
   mutation submitMutation($id: String!) {
     markEventAsReinstated(id: $id) {
       taskEntryResourceID
@@ -148,7 +148,7 @@ export function getBirthMutationMappings(
       }
     case Action.REINSTATE_APPLICATION:
       return {
-        mutation: REINSTATE_BIRTH_APPLICATION,
+        mutation: REINSTATE_BIRTH_DECLARATION,
         variables: {
           ...payload
         },
