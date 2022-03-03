@@ -44,7 +44,7 @@ import { getCurrentUserScope } from '@client/utils/authUtils'
 import { convertToMSISDN } from '@client/forms/utils'
 
 const Container = styled.div`
-  ${({ theme }) => theme.shadows.lightShadow};
+  ${({ theme }) => theme.shadows.light};
   color: ${({ theme }) => theme.colors.copy};
   background: ${({ theme }) => theme.colors.white};
   padding: 40px 77px;

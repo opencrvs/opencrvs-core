@@ -16,7 +16,7 @@ const TopBarWrapper = styled.div`
   padding: 0 24px;
   height: 48px;
   background: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.shadows.lightShadow};
+  ${({ theme }) => theme.shadows.light};
   display: flex;
   overflow-x: auto;
   justify-content: flex-start;

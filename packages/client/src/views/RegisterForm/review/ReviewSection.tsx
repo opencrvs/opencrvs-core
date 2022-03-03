@@ -165,7 +165,7 @@ const Column = styled.div`
 `
 
 const StyledColumn = styled(Column)`
-  ${({ theme }) => theme.shadows.lightShadow};
+  ${({ theme }) => theme.shadows.light};
   width: 60%;
 `
 

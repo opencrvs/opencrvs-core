@@ -98,7 +98,7 @@ const SvgWrapper = styled.div`
 `
 const Certificate = styled.img`
   display: block;
-  ${({ theme }) => theme.shadows.lightShadow};
+  ${({ theme }) => theme.shadows.light};
   width: 64%;
   align-items: center;
   justify-content: center;

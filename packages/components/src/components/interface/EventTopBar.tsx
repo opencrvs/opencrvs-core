@@ -19,7 +19,7 @@ const TopBar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
   height: 64px;
   background: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.shadows.lightShadow};
+  ${({ theme }) => theme.shadows.light};
   display: flex;
   justify-content: space-between;
   align-items: center;

@@ -19,7 +19,7 @@ const ActionContainer = styled.div`
 const HeaderContainer = styled.div`
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.shadows.lightShadow};
+  ${({ theme }) => theme.shadows.light};
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -52,8 +52,7 @@ const MenuTitle = styled.div`
 
 const Container = styled.div<{ hideBackground: boolean | undefined }>`
   ${({ theme }) => theme.fonts.bodyStyle};
-  ${({ theme, hideBackground }) =>
-    hideBackground ? '' : theme.shadows.lightShadow};
+  ${({ theme, hideBackground }) => (hideBackground ? '' : theme.shadows.light)};
   color: ${({ theme }) => theme.colors.copy};
   padding: 24px 32px 32px;
   margin: 32px auto 0;

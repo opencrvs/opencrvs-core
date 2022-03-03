@@ -63,6 +63,6 @@ export const gradients = {
 }
 
 export const shadows = {
-  lightShadow: 'box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32)',
-  heavyShadow: 'box-shadow: 0px 2px 8px rgba(53, 67, 93, 0.54)'
+  light: 'box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32)',
+  heavy: 'box-shadow: 0px 2px 8px rgba(53, 67, 93, 0.54)'
 }

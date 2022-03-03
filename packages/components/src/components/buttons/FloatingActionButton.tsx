@@ -17,7 +17,7 @@ const ButtonStyled = styled.button`
   width: 56px;
   border-radius: 100%;
   background: ${({ theme }) => theme.colors.primary};
-  ${({ theme }) => theme.shadows.lightShadow};
+  ${({ theme }) => theme.shadows.light};
   justify-content: center;
   outline: none;
   border: none;

@@ -131,7 +131,7 @@ export const ModalContainer = styled.div`
   margin: -42px 0 0 -16px;
   overflow: hidden;
 
-  ${({ theme }) => theme.shadows.heavyShadow};
+  ${({ theme }) => theme.shadows.heavy};
   border-radius: 4px;
   color: ${({ theme }) => theme.colors.copy};
 

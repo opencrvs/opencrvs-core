@@ -34,7 +34,7 @@ const Wrapper = styled.div<{
       : hideBoxShadow
       ? `padding: 24px 0;`
       : `padding: 24px;
-    ${theme.shadows.lightShadow};`}
+    ${theme.shadows.light};`}
 `
 const TableTitleLoading = styled.span`
   background: ${({ theme }) => theme.colors.background};

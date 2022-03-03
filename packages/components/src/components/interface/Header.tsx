@@ -19,6 +19,6 @@ export const Header = styled.section`
 
   overflow: visible;
   ${({ theme }) => theme.gradients.primary};
-  ${({ theme }) => theme.shadows.lightShadow};
+  ${({ theme }) => theme.shadows.light};
   position: relative;
 `

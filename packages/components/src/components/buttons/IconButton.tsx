@@ -18,7 +18,7 @@ export const IconButton = styled(Button)`
   height: 42px;
   color: ${({ theme }) => theme.colors.white};
   background: ${({ theme }) => theme.colors.primary};
-  ${({ theme }) => theme.shadows.lightShadow};
+  ${({ theme }) => theme.shadows.light};
   justify-content: center;
   border-radius: 2px;
   ${({ theme }) => theme.fonts.buttonStyle};

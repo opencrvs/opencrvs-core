@@ -67,8 +67,7 @@ const Header = styled.div<{ responsive?: boolean; hideBoxShadow?: boolean }>`
   padding: 0 8px 0px 24px;
   @media (max-width: ${({ theme, responsive }) =>
       responsive && theme.grid.breakpoints.lg}px) {
-    ${({ theme, hideBoxShadow }) =>
-      !hideBoxShadow && theme.shadows.lightShadow};
+    ${({ theme, hideBoxShadow }) => !hideBoxShadow && theme.shadows.light};
     margin-bottom: 16px;
   }
 `

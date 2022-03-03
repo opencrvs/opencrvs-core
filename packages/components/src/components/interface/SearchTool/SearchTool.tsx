@@ -51,7 +51,7 @@ export const LabelButton = styled(Button)`
 const DropDownWrapper = styled.ul`
   background: ${({ theme }) => theme.colors.white};
   border-radius: 4px;
-  ${({ theme }) => theme.shadows.heavyShadow};
+  ${({ theme }) => theme.shadows.heavy};
   position: absolute;
   padding: 8px 0px;
   width: 250px;
