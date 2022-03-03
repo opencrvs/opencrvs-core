@@ -32,64 +32,33 @@ services:
     networks:
       - overlay_net
 
-  netdata-master:
-    image: netdata/netdata:v1.19.0
-    hostname: 'master-{{.Node.Hostname}}'
+  metricbeat:
+    hostname: 'metricbeat-{{.Node.Hostname}}'
     restart: always
-    cap_add:
-      - SYS_PTRACE
-    security_opt:
-      - apparmor:unconfined
-    volumes:
-      - /etc/passwd:/host/etc/passwd:ro
-      - /etc/group:/host/etc/group:ro
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    configs:
-      - source: netdata-master-stream.{{ts}}
-        target: /etc/netdata/stream.conf
-    environment:
-      - PGID=999
     deploy:
-      replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
+      mode: global
+    environment:
+      - KIBANA_HOST=kibana:5601
+      - ELASTICSEARCH_HOST=elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=changeme
+    networks:
+      - overlay_net
+    configs:
+      - source: metricbeat-conf.{{ts}}
+        target: /usr/share/metricbeat/metricbeat.yml
+  kibana:
+    restart: always
+    deploy:
       labels:
         - 'traefik.enable=true'
-        - 'traefik.frontend.rule=Host: monitor.{{hostname}}'
-        - 'traefik.port=19999'
+        - 'traefik.frontend.rule=Host: kibana.{{hostname}}'
+        - 'traefik.port=5601'
         - 'traefik.docker.network=opencrvs_overlay_net'
     networks:
       - overlay_net
-
-  netdata-slave:
-    image: netdata/netdata:v1.19.0
-    hostname: 'slave-{{.Node.Hostname}}'
-    restart: always
-    cap_add:
-      - SYS_PTRACE
-    security_opt:
-      - apparmor:unconfined
     volumes:
-      - /etc/passwd:/host/etc/passwd:ro
-      - /etc/group:/host/etc/group:ro
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    configs:
-      - source: netdata-slave.{{ts}}
-        target: /etc/netdata/netdata.conf
-      - source: netdata-slave-stream.{{ts}}
-        target: /etc/netdata/stream.conf
-    environment:
-      - PGID=999
-    deploy:
-      mode: global
-    networks:
-      - overlay_net
-
+      - '/tmp/compose/infrastructure/monitoring/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml:ro,Z'
   # Configure mongo nodes as a replica set
   mongo1:
     command: --replSet rs0
@@ -116,6 +85,12 @@ services:
     networks:
       - overlay_net
 
+  setup-kibana-alerts:
+    volumes:
+      - '/tmp/compose/infrastructure/monitoring/kibana/alert-rules.json:/usr/app/alert-rules.json'
+      - '/tmp/compose/infrastructure/monitoring/kibana/setup-alerts.js:/usr/app/setup-alerts.js'
+    networks:
+      - overlay_net
   # Configure redis
   redis:
     networks:
@@ -135,7 +110,17 @@ services:
           - node.labels.data1 == true
     networks:
       - overlay_net
-
+  elastalert:
+    volumes:
+      - '/tmp/compose/infrastructure/monitoring/elastalert/elastalert.yaml:/opt/elastalert/config.yaml'
+      - '/tmp/compose/infrastructure/monitoring/elastalert/rules:/opt/elastalert/rules'
+    networks:
+      - overlay_net
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
   # Configure influxdb
   influxdb:
     volumes:
@@ -406,13 +391,8 @@ configs:
     file: ./infrastructure/hearth-plugins/checkDuplicateTask.js
   hearth-queryparam-extensions-conf.{{ts}}:
     file: ./infrastructure/hearth-queryparam-extensions.json
-  netdata-master-stream.{{ts}}:
-    file: ./infrastructure/netdata-master-stream.conf
-  netdata-slave.{{ts}}:
-    file: ./infrastructure/netdata-slave.conf
-  netdata-slave-stream.{{ts}}:
-    file: ./infrastructure/netdata-slave-stream.conf
-
+  metricbeat-conf.{{ts}}:
+    file: ./infrastructure/monitoring/beats/metricbeat.yml
 networks:
   overlay_net:
     driver: overlay

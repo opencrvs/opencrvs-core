@@ -244,9 +244,9 @@ Run the following script as root but beware that **ALL DATA WILL BE REPLACED BY 
 
 ## How to know when to scale a service
 
-OpenCRVS uses the [Netdata](https://www.netdata.cloud/) tool for server and container monitoring. This would be your first stop to determine how your servers are operating and if they are keeping up with the load.
+OpenCRVS uses the [Kibana](https://www.elastic.co/kibana) tool for server and container monitoring. This would be your first stop to determine how your servers are operating and if they are keeping up with the load.
 
-Access Netdata by visiting: https://monitor.<your_domain>
+Access Kibana by visiting: https://kibana.<your_domain>
 
 In the top left you will see a dropdown. From here you may select each of the servers in your swarm. The first step you should take is to determine if any/all of the servers are at capacity. Thing you should look for include:
 
