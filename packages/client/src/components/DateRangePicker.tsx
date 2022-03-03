@@ -100,7 +100,7 @@ export const PickerButton = styled.button`
   }
 
   &:hover {
-    background: ${({ theme }) => theme.colors.grey200};
+    background: ${({ theme }) => theme.colors.grey100};
   }
   white-space: nowrap;
   padding: 0;
@@ -155,7 +155,7 @@ export const ModalHeader = styled.div<{ hide?: boolean }>`
   padding: 8px 16px;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey500};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   background: ${({ theme }) => theme.colors.white};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     ${({ hide }) => (hide ? `display: none;` : '')}
@@ -174,7 +174,7 @@ export const TitleContent = styled.div`
 export const ModalBody = styled.div`
   display: flex;
   flex: 1;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey500};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   background: ${({ theme }) => theme.colors.white};
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -194,7 +194,7 @@ const PresetContainer = styled.div`
   flex: 0.9;
   flex-direction: column;
   background: ${({ theme }) => theme.colors.white};
-  border-right: 1px solid ${({ theme }) => theme.colors.grey400};
+  border-right: 1px solid ${({ theme }) => theme.colors.grey200};
 
   & > :last-child {
     display: none;
@@ -248,7 +248,7 @@ const MonthSelectorHeader = styled.div`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 0 16px;
     border-radius: 2px;
-    border-bottom: 1px solid ${({ theme }) => theme.colors.grey400};
+    border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
   }
 `
 const MonthContainer = styled.div`
@@ -372,7 +372,7 @@ export const CancelableArea = styled.div`
   overflow: hidden;
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    background: ${({ theme }) => theme.colors.grey800};
+    background: ${({ theme }) => theme.colors.grey600};
     opacity: 0.5;
   }
 `

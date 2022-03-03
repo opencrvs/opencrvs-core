@@ -13,7 +13,7 @@ import * as React from 'react'
 import { colors } from '../colors'
 
 export const TrackingID = (props: React.HTMLAttributes<SVGElement>) => {
-  const stroke = props.color ? props.color : colors.grey800
+  const stroke = props.color ? props.color : colors.grey600
   return (
     <svg width={24} height={24} fill="none" {...props}>
       <path

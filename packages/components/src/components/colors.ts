@@ -14,15 +14,15 @@ export const colors = {
   // Pallete
   primary: '#4972BB', // indigo
   secondary: '#4A8AD7', // blue
-  tertiary: '#cccfd0', // grey
+  tertiary: '#CCCFD0', // grey
 
   purple: '#8049B7', // in progress
   orange: '#F1B162', // ready for review
-  red: '#d53f3f', // requires updates
+  red: '#D53F3F', // requires updates
   green: '#49b78d', // registered
   blue: '#4A8AD7', // certified
   teal: '#4CC1BA', // charts
-  yellow: '#edc55e', // focus state
+  yellow: '#EDC55E', // focus state
 
   // Darks
   indigoDark: '#42639C',
@@ -33,30 +33,29 @@ export const colors = {
   tealLight: '#D3EEE4',
 
   // Status
-  positive: '#49b78d', // green
-  neutral: '#f1b162', // orange
-  negative: '#d53f3f', // red
+  positive: '#49B78D', // green
+  neutral: '#F1B162', // orange
+  negative: '#D53F3F', // red
 
   // Monochrome
-  white: '#ffffff',
-  grey200: '#f8f8f8', // app background
-  grey300: '#f1f2f3', // hover state, light background
-  grey400: '#dee2e4', // dividers
-  grey500: '#cccfd0', // disabled state, borders
-  grey600: '#909397', // placeholder copy
-  grey700: '#676A6F', // supporting copy
-  grey800: '#1e2326', // copy
+  white: '#FFFFFF',
+  grey100: '#F5F5F5', // background
+  grey200: '#EEEEEE', // dividers, hover
+  grey300: '#CCCCCC', // disabled state, borders
+  grey400: '#A5A5A5', // placeholder copy
+  grey500: '#707070', // supporting copy
+  grey600: '#222222', // copy
 
   // Opacity
   opacity24: 'rgba(41, 47, 51, 0.24)',
   opacity54: 'rgba(41, 47, 51, 0.54)',
 
   // Alternative defintions
-  copy: '#1e2326', // grey800
-  supportingCopy: '#1e2326', // grey700
-  placeholderCopy: '#909397', // grey600
-  disabled: '#cccfd0', // grey500
-  background: '#f8f8f8' // grey200
+  copy: '#222222', // grey800
+  supportingCopy: '#707070', // grey700
+  placeholderCopy: '#A5A5A5', // grey600
+  disabled: '#CCCCCC', // grey300
+  background: '#F5F5F5' // grey100
 }
 
 export const gradients = {

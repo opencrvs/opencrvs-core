@@ -182,7 +182,7 @@ class TriLineChartComponent extends React.Component<IProps> {
 
             <Line
               dataKey={dataKeys[0]}
-              stroke={theme.colors.grey400}
+              stroke={theme.colors.grey200}
               dot={false}
               activeDot={false}
               strokeWidth={3}

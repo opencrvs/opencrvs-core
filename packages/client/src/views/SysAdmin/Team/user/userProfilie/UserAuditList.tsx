@@ -75,7 +75,7 @@ const RecentActionsHolder = styled.div`
     margin-top: 24px;
     padding-top: 24px;
   }
-  border-top: 1px solid ${({ theme }) => theme.colors.grey400};
+  border-top: 1px solid ${({ theme }) => theme.colors.grey200};
 `
 
 const SectionTitle = styled.div`

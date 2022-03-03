@@ -103,7 +103,7 @@ const SubPageHeaderContainer = styled.div`
   width: 100%;
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey500};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
 `
 const SubPageHeaderBody = styled.div`
   display: flex;

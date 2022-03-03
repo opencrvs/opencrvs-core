@@ -18,8 +18,8 @@ const Container = styled.div`
   width: calc(40vw - 50px);
   position: fixed;
   top: 94px;
-  background-color: ${({ theme }) => theme.colors.grey200};
-  outline: 1px solid ${({ theme }) => theme.colors.grey500};
+  background-color: ${({ theme }) => theme.colors.grey100};
+  outline: 1px solid ${({ theme }) => theme.colors.grey300};
   box-sizing: border-box;
   height: 720px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {

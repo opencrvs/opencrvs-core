@@ -94,7 +94,7 @@ const TableHeader = styled.div`
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.bodyBoldStyle};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey500};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
 `
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors};

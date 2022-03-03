@@ -102,7 +102,7 @@ const Body = styled.div<{
   }
 
   ::-webkit-scrollbar-thumb {
-    background: ${({ theme }) => theme.colors.grey600};
+    background: ${({ theme }) => theme.colors.grey400};
     border-radius: 10px;
   }
 `
@@ -112,7 +112,7 @@ const Footer = styled.div<{ responsive?: boolean }>`
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
-  border-top: 2px solid ${({ theme }) => theme.colors.grey400};
+  border-top: 2px solid ${({ theme }) => theme.colors.grey200};
   @media (max-width: ${({ theme, responsive }) =>
       responsive && theme.grid.breakpoints.md}px) {
     flex-direction: column-reverse;

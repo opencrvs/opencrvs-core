@@ -50,7 +50,7 @@ const ApplicationsStartedReportHeader = styled(ReportHeader)<
   Pick<IStateProps, 'isOfficeSelected'>
 >`
   border-top: ${({ isOfficeSelected }) => (!isOfficeSelected ? '1' : '0')}px
-    solid ${({ theme }) => theme.colors.grey500};
+    solid ${({ theme }) => theme.colors.grey300};
 `
 
 const ApplicationsStartedSubHeader = styled(SubHeader)`

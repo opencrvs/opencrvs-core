@@ -73,7 +73,7 @@ const CustomTertiaryButton = styled(TertiaryButton)`
   height: 48px;
   &:disabled {
     background: ${({ theme }) => theme.colors.white};
-    color: ${({ theme }) => theme.colors.grey500};
+    color: ${({ theme }) => theme.colors.grey300};
   }
 `
 const ButtonWrapper = styled.div`
@@ -87,7 +87,7 @@ const ButtonWrapper = styled.div`
   }
 `
 const SvgWrapper = styled.div`
-  background: ${({ theme }) => theme.colors.grey200};
+  background: ${({ theme }) => theme.colors.grey100};
   display: flex;
   height: 100%;
   padding-top: 48px;
@@ -108,7 +108,7 @@ const Certificate = styled.img`
 const Info = styled.div`
   ${({ theme }) => theme.fonts.bodyStyle};
   margin-bottom: 30px;
-  color: ${({ theme }) => theme.colors.grey700};
+  color: ${({ theme }) => theme.colors.grey500};
   width: 80%;
 `
 const Title = styled.h4`

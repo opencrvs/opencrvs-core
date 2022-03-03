@@ -28,7 +28,7 @@ const SearchTextInput = styled.input`
   border: none;
   margin: 0px 0px;
   ${({ theme }) => theme.fonts.bodyStyle};
-  background-color: ${({ theme }) => theme.colors.grey300};
+  background-color: ${({ theme }) => theme.colors.grey200};
   flex-grow: 1;
   &:focus {
     outline: none;

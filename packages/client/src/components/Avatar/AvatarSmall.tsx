@@ -24,13 +24,13 @@ const AvatarImage = styled.img`
   border-radius: 50%;
   border: solid 2px transparent;
   &:hover {
-    border: 2px solid ${({ theme }) => theme.colors.grey200};
+    border: 2px solid ${({ theme }) => theme.colors.grey100};
   }
   &:focus {
     border: 2px solid ${({ theme }) => theme.colors.yellow};
   }
   &:active {
-    border: 2px solid ${({ theme }) => theme.colors.grey200};
+    border: 2px solid ${({ theme }) => theme.colors.grey100};
   }
 `
 

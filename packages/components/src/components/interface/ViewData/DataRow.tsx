@@ -17,7 +17,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey400};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
   padding: 16px 0px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     flex-direction: column;

@@ -38,9 +38,9 @@ export const IconButton = styled(Button)`
   }
 
   &:disabled {
-    background: ${({ theme }) => theme.colors.grey500};
+    background: ${({ theme }) => theme.colors.grey300};
     cursor: not-allowed;
-    color: ${({ theme }) => theme.colors.grey500};
+    color: ${({ theme }) => theme.colors.grey300};
   }
   & > svg {
     padding: 5px;

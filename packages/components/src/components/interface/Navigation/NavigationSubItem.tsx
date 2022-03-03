@@ -23,7 +23,7 @@ export const SubItemContainer = styled.button<{ isSelected?: boolean }>`
   border: 0;
   background-color: ${({ theme }) => theme.colors.white};
   :hover {
-    background-color: ${({ theme }) => theme.colors.grey200};
+    background-color: ${({ theme }) => theme.colors.grey100};
   }
   outline: none;
 
@@ -32,7 +32,7 @@ export const SubItemContainer = styled.button<{ isSelected?: boolean }>`
   height: 36px;
   text-align: left;
   color: ${({ isSelected, theme }) =>
-    isSelected ? theme.colors.copy : theme.colors.grey700};
+    isSelected ? theme.colors.copy : theme.colors.grey500};
   ${({ theme }) => theme.fonts.chartLegendStyle};
 `
 

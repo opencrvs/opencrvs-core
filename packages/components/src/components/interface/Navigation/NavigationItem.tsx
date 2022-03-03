@@ -33,7 +33,7 @@ const ItemContainer = styled.button<{ isSelected?: boolean }>`
   background-color: ${({ isSelected, theme }) =>
     isSelected ? theme.colors.white : theme.colors.white};
   :hover {
-    background-color: ${({ theme }) => theme.colors.grey200};
+    background-color: ${({ theme }) => theme.colors.grey100};
   }
 `
 // focus state should show on keyboard navigation.
@@ -60,14 +60,14 @@ const LabelContainer = styled.span<{
   ${({ theme }) => theme.fonts.subtitleStyle};
   margin-left: 12px;
   color: ${({ isSelected, theme }) =>
-    isSelected ? theme.colors.copy : theme.colors.grey700};
+    isSelected ? theme.colors.copy : theme.colors.grey500};
 `
 
 const ValueContainer = styled.span<{ isSelected?: boolean }>`
   margin-left: auto;
   ${({ theme }) => theme.fonts.captionBolder};
   color: ${({ isSelected, theme }) =>
-    isSelected ? theme.colors.copy : theme.colors.grey700};
+    isSelected ? theme.colors.copy : theme.colors.grey500};
 `
 
 export const NavigationItem = ({

@@ -52,7 +52,7 @@ const StyledSelect = styled(ReactSelect)<{
     &:hover {
       border: 2px solid ${({ theme }) => theme.colors.secondary};
       ${({ theme, withLightTheme }) =>
-        withLightTheme ? theme.colors.grey400 : theme.colors.grey600}
+        withLightTheme ? theme.colors.grey200 : theme.colors.grey400}
     }
   }
 

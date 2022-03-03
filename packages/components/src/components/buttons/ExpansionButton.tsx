@@ -23,10 +23,10 @@ export const StyledButton = styled(Button)`
   border-radius: 100%;
   align-items: center;
   &:hover {
-    background-color: ${({ theme }) => theme.colors.grey200};
+    background-color: ${({ theme }) => theme.colors.grey100};
   }
   &:not([data-focus-visible-added]):hover {
-    background-color: ${({ theme }) => theme.colors.grey200};
+    background-color: ${({ theme }) => theme.colors.grey100};
   }
   &:focus {
     outline: none;

@@ -61,7 +61,7 @@ const MenuItem = styled.li`
   padding: 12px 16px;
   height: 48px;
   &:hover {
-    background-color: ${({ theme }) => theme.colors.grey200};
+    background-color: ${({ theme }) => theme.colors.grey100};
   }
   &:last-child {
     border: 0;

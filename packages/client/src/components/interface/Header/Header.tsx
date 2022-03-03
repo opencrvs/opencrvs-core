@@ -132,20 +132,20 @@ const SearchBox = styled.div`
   height: 40px;
   left: calc(50% - 624px / 2 + 24px);
   top: calc(50% - 40px / 2);
-  background: ${({ theme }) => theme.colors.grey300};
+  background: ${({ theme }) => theme.colors.grey200};
   box-sizing: border-box;
   border-radius: 40px;
   margin: 0px 80px 0px 12px;
   &:hover {
-    outline: 1px solid ${({ theme }) => theme.colors.grey800};
+    outline: 1px solid ${({ theme }) => theme.colors.grey600};
   }
 
   &:focus-within {
-    outline: 1px solid ${({ theme }) => theme.colors.grey800};
+    outline: 1px solid ${({ theme }) => theme.colors.grey600};
     background: ${({ theme }) => theme.colors.white};
   }
   &:active {
-    outline: 1px solid ${({ theme }) => theme.colors.grey800};
+    outline: 1px solid ${({ theme }) => theme.colors.grey600};
   }
   &:focus-within input {
     background: ${({ theme }) => theme.colors.white};

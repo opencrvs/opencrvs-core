@@ -68,7 +68,7 @@ const TableHeaderText = styled.div<{
   isSorted?: boolean
 }>`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
-  color: ${({ theme }) => theme.colors.grey700};
+  color: ${({ theme }) => theme.colors.grey500};
 `
 
 const TableBody = styled.div<{ footerColumns: boolean }>`
@@ -114,7 +114,7 @@ const RowWrapper = styled.div<{
       height ? `min-height:${height.md}px` : `min-height: 48px)`};
   }
   ${({ highlight, theme }) =>
-    highlight && `:hover { background-color: ${theme.colors.grey200};}`}
+    highlight && `:hover { background-color: ${theme.colors.grey100};}`}
 
   & span:first-child {
     ${({ horizontalPadding }) =>
@@ -227,7 +227,7 @@ const TableScrollerHorizontal = styled.div<{
 
   &::-webkit-scrollbar-thumb {
     border-radius: 10px;
-    background: ${({ theme }) => theme.colors.grey600};
+    background: ${({ theme }) => theme.colors.grey400};
   }
 `
 const TableScroller = styled.div<{

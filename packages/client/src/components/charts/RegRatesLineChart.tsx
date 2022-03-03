@@ -55,7 +55,7 @@ const CustomLegendContainer = styled.div<{
 const LegendHeader = styled.div`
   padding-bottom: 8px;
   margin-bottom: 8px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey400};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
   ${({ theme }) => theme.fonts.bodyBoldStyle};
 `
 
@@ -200,7 +200,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
       },
       activeTotalEstimate: {
         value: (latestData && latestData.totalEstimate) || 0,
-        stroke: theme.colors.grey500
+        stroke: theme.colors.grey300
       }
     }
   }
@@ -297,7 +297,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
         },
         activeTotalEstimate: {
           value: data.activePayload[0].value || 0,
-          stroke: theme.colors.grey400
+          stroke: theme.colors.grey200
         }
       })
     }
@@ -318,7 +318,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
             </LegendHeader>
             <LegendDetails>
               <div>
-                <LegendDot color={this.props.theme.colors.grey500} />
+                <LegendDot color={this.props.theme.colors.grey300} />
               </div>
               <LegendData>
                 <LoaderBox width={60} />
@@ -328,7 +328,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
             </LegendDetails>
             <LegendDetails>
               <div>
-                <LegendDot color={this.props.theme.colors.grey500} />
+                <LegendDot color={this.props.theme.colors.grey300} />
               </div>
               <LegendData>
                 <LegendDataLabel>
@@ -342,7 +342,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
             </LegendDetails>
             <LegendDetails>
               <div>
-                <LegendDot color={this.props.theme.colors.grey500} />
+                <LegendDot color={this.props.theme.colors.grey300} />
               </div>
               <LegendData>
                 <LegendDataLabel>
@@ -374,7 +374,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
             </LegendHeader>
             <LegendDetails>
               <div>
-                <LegendDot color={this.props.theme.colors.grey500} />
+                <LegendDot color={this.props.theme.colors.grey300} />
               </div>
               <LegendData>
                 <LoaderBox width={80} />
@@ -384,7 +384,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
             </LegendDetails>
             <LegendDetails>
               <div>
-                <LegendDot color={this.props.theme.colors.grey500} />
+                <LegendDot color={this.props.theme.colors.grey300} />
               </div>
               <LegendData>
                 <LegendDataLabel>
@@ -398,7 +398,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
             </LegendDetails>
             <LegendDetails>
               <div>
-                <LegendDot color={this.props.theme.colors.grey500} />
+                <LegendDot color={this.props.theme.colors.grey300} />
               </div>
               <LegendData>
                 <LegendDataLabel>

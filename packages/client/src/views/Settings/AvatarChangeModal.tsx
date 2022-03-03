@@ -74,7 +74,7 @@ const DefaultImage = styled.div<{ width: number; height: number }>`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: ${({ theme }) => theme.colors.grey200};
+  background-color: ${({ theme }) => theme.colors.grey100};
 `
 
 const Error = styled.div`

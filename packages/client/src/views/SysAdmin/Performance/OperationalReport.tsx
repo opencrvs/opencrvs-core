@@ -190,11 +190,11 @@ export const StatusMapping: IStatusMapping = {
   },
   VALIDATED: {
     labelDescriptor: statusMessages.sentForApprovals,
-    color: colors.grey500
+    color: colors.grey300
   },
   WAITING_VALIDATION: {
     labelDescriptor: statusMessages.sentForExternalValidation,
-    color: colors.grey700
+    color: colors.grey500
   },
   REGISTERED: {
     labelDescriptor: statusMessages.readyToPrint,

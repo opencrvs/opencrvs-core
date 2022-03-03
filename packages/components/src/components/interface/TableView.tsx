@@ -50,7 +50,7 @@ const TableHeader = styled.div<{
 }>`
   ${({ fixedWidth, totalWidth }) =>
     fixedWidth ? `width: ${fixedWidth}px;` : `width: ${totalWidth || 100}%;`}
-  background: ${({ theme }) => theme.colors.grey200};
+  background: ${({ theme }) => theme.colors.grey100};
   padding: 10px 0px;
   display: flex;
   align-items: flex-end;
@@ -109,7 +109,7 @@ const RowWrapper = styled.div<{
   padding-bottom: 10px;
   border-bottom: 1px solid
     ${({ theme, columns }) =>
-      columns.length > 5 ? theme.colors.grey200 : theme.colors.grey400};
+      columns.length > 5 ? theme.colors.grey100 : theme.colors.grey200};
 
   &:last-child {
     ${({ hideTableBottomBorder }) =>
@@ -125,7 +125,7 @@ const RowWrapper = styled.div<{
       height ? `min-height:${height.md}px` : `min-height: 48px)`};
   }
   ${({ highlight, theme }) =>
-    highlight && `:hover { background-color: ${theme.colors.grey200};}`}
+    highlight && `:hover { background-color: ${theme.colors.grey100};}`}
 
   & span:first-child {
     ${({ horizontalPadding }) =>
@@ -236,7 +236,7 @@ const TableScrollerHorizontal = styled.div<{
 
   &::-webkit-scrollbar-thumb {
     border-radius: 10px;
-    background: ${({ theme }) => theme.colors.grey600};
+    background: ${({ theme }) => theme.colors.grey400};
   }
 `
 const TableScroller = styled.div<{

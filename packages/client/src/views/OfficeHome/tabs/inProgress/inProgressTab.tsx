@@ -86,7 +86,7 @@ const WhiteButton = styled(Button)`
   ${({ theme }) => theme.fonts.smallButtonStyle};
   ${({ theme }) => theme.shadows.lightShadow};
   &:hover {
-    background: ${({ theme }) => theme.colors.grey200};
+    background: ${({ theme }) => theme.colors.grey100};
   }
   &:focus {
     outline: none;
