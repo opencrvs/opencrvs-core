@@ -41,7 +41,7 @@ services:
     restart: unless-stopped
 
   openhim-core:
-    image: jembi/openhim-core:5
+    image: jembi/openhim-core:7
     environment:
       - mongo_url=mongodb://mongo1/openhim-dev
       - mongo_atnaUrl=mongodb://mongo1/openhim-dev
