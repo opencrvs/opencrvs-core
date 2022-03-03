@@ -42,6 +42,8 @@ interface IConfigMessages
   generalTabTitle: MessageDescriptor
   birthTabTitle: MessageDescriptor
   deathTabTitle: MessageDescriptor
+  registrationTimePeriodsGroupTitle: MessageDescriptor
+  registrationFeesGroupTitle: MessageDescriptor
 }
 
 const messagesToDefine: IConfigMessages = {
@@ -232,6 +234,16 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.deathTabTitle',
     defaultMessage: 'Death',
     description: 'The title for death tab'
+  },
+  registrationTimePeriodsGroupTitle: {
+    id: 'config.application.registrationTimePeriodsGroupTitle',
+    defaultMessage: 'Registration time periods',
+    description: 'The title for registration time periods group'
+  },
+  registrationFeesGroupTitle: {
+    id: 'config.application.registrationFeesGroupTitle',
+    defaultMessage: 'Registration fees',
+    description: 'The title for registration fee group'
   }
 }
 

@@ -40,7 +40,6 @@ const ListGroupTitle = styled.div`
   height: 21px;
   ${({ theme }) => theme.fonts.bodyBoldStyle};
 `
-
 type Props = IntlShapeProps & {
   userDetails: IUserDetails | null
   offlineResources: IOfflineData
@@ -157,7 +156,11 @@ function BirthTabContent({
       items={[
         {
           label: EMPTY_STRING,
-          value: <ListGroupTitle>Registration time periods</ListGroupTitle>
+          value: (
+            <ListGroupTitle>
+              {intl.formatMessage(messages.registrationTimePeriodsGroupTitle)}
+            </ListGroupTitle>
+          )
         },
         {
           label: intl.formatMessage(messages.legallySpecifiedLabel),
@@ -185,7 +188,11 @@ function BirthTabContent({
         },
         {
           label: EMPTY_STRING,
-          value: <ListGroupTitle>Registration fees</ListGroupTitle>
+          value: (
+            <ListGroupTitle>
+              {intl.formatMessage(messages.registrationFeesGroupTitle)}
+            </ListGroupTitle>
+          )
         },
         {
           label: intl.formatMessage(messages.withinLegallySpecifiedTimeLabel),
@@ -228,7 +235,11 @@ function DeathTabContent({
       items={[
         {
           label: EMPTY_STRING,
-          value: <ListGroupTitle>Registration time periods</ListGroupTitle>
+          value: (
+            <ListGroupTitle>
+              {intl.formatMessage(messages.registrationTimePeriodsGroupTitle)}
+            </ListGroupTitle>
+          )
         },
         {
           label: intl.formatMessage(messages.legallySpecifiedLabel),
@@ -248,7 +259,11 @@ function DeathTabContent({
         },
         {
           label: EMPTY_STRING,
-          value: <ListGroupTitle>Registration fees</ListGroupTitle>
+          value: (
+            <ListGroupTitle>
+              {intl.formatMessage(messages.registrationFeesGroupTitle)}
+            </ListGroupTitle>
+          )
         },
         {
           label: intl.formatMessage(messages.lateRegistrationLabel),
