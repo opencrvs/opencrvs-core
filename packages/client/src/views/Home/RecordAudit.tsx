@@ -764,9 +764,9 @@ const getStatusLabel = (status: string, intl: IntlShape) => {
   return ''
 }
 
-const getLink = (status: string) => {
+const getLink = (status: string, onClick: () => void) => {
   return (
-    <LinkButton textDecoration="none" onClick={() => alert('link clicked')}>
+    <LinkButton textDecoration="none" onClick={onClick}>
       {status}
     </LinkButton>
   )
@@ -782,12 +782,15 @@ const getFormattedDate = (date: Date) => {
   )
 }
 
-const getHistory = ({
+const GetHistory = ({
   intl,
   draft,
   goToUserProfile,
   goToTeamUserList
 }: CMethodParams) => {
+  const [showActionDetails, setActionDetails] = React.useState(false)
+  const toggleActionDetails = () => setActionDetails((prevValue) => !prevValue)
+
   if (!draft?.data?.history?.length)
     return (
       <>
@@ -806,7 +809,9 @@ const getHistory = ({
     })
     .map((item) => ({
       date: getFormattedDate(item?.date),
-      action: getLink(getStatusLabel(item?.action, intl)),
+      action: getLink(getStatusLabel(item?.action, intl), () =>
+        toggleActionDetails()
+      ),
       user: getNameWithAvatar(
         item.user.id,
         item.user.name,
@@ -815,21 +820,14 @@ const getHistory = ({
         goToUserProfile
       ),
       type: intl.formatMessage(userMessages[item.user.role as string]),
-      location: (
-        <LinkButton
-          textDecoration="none"
-          onClick={() => {
-            goToTeamUserList &&
-              goToTeamUserList({
-                id: item.office.id,
-                searchableText: item.office.name,
-                displayLabel: item.office.name
-              } as ISearchLocation)
-          }}
-        >
-          {item.office.name}
-        </LinkButton>
-      )
+      location: getLink(item.office.name, () => {
+        goToTeamUserList &&
+          goToTeamUserList({
+            id: item.office.id,
+            searchableText: item.office.name,
+            displayLabel: item.office.name
+          } as ISearchLocation)
+      })
     }))
 
   const columns = [
@@ -861,7 +859,23 @@ const getHistory = ({
         pageSize={100}
         hideTableHeaderBorder={true}
       />
+      {actionDetailsModal(showActionDetails, toggleActionDetails)}
     </>
+  )
+}
+
+const actionDetailsModal = (show: boolean, toggleActionDetails: () => void) => {
+  return (
+    <ResponsiveModal
+      actions={[]}
+      handleClose={toggleActionDetails}
+      show={show}
+      responsive={true}
+      title="Are you ready to submit?"
+      width={1024}
+    >
+      <></>
+    </ResponsiveModal>
   )
 }
 
@@ -993,7 +1007,7 @@ function RecordAuditBody({
         )}
       >
         {getDeclarationInfo(declaration, isDownloaded, intl)}
-        {getHistory({
+        {GetHistory({
           declaration,
           intl,
           draft,

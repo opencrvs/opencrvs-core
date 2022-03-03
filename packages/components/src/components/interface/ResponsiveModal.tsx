@@ -199,11 +199,13 @@ export class ResponsiveModal extends React.Component<IProps> {
           >
             {this.props.children}
           </Body>
-          <Footer responsive={responsive}>
-            {actions.map((action, i) => (
-              <Action key={i}>{action}</Action>
-            ))}
-          </Footer>
+          {actions.length > 0 && (
+            <Footer responsive={responsive}>
+              {actions.map((action, i) => (
+                <Action key={i}>{action}</Action>
+              ))}
+            </Footer>
+          )}
         </ModalContent>
       </ModalContainer>
     )
