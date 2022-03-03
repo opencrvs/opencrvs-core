@@ -84,6 +84,7 @@ describe('ConfigHome page when already has uploaded certificate template', () =>
     testComponent
       .find('#template-birth-action-menuToggleButton')
       .hostNodes()
+      .first()
       .simulate('click')
 
     testComponent.update()
@@ -101,6 +102,7 @@ describe('ConfigHome page when already has uploaded certificate template', () =>
       testComponent
         .find('#template-birth-action-menuToggleButton')
         .hostNodes()
+        .first()
         .simulate('click')
       testComponent.update()
 
@@ -123,6 +125,7 @@ describe('ConfigHome page when already has uploaded certificate template', () =>
       testComponent
         .find('#template-birth-action-menuToggleButton')
         .hostNodes()
+        .first()
         .simulate('click')
       testComponent.update()
 
@@ -145,6 +148,7 @@ describe('ConfigHome page when already has uploaded certificate template', () =>
       testComponent
         .find('#template-birth-action-menuToggleButton')
         .hostNodes()
+        .first()
         .simulate('click')
       testComponent.update()
 
