@@ -11,37 +11,37 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface ISelectPrimaryApplicantMessages
+interface ISelectPrimaryInformantMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   registerNewEventTitle: MessageDescriptor
   registerNewEventHeading: MessageDescriptor
-  primaryApplicantDescription: MessageDescriptor
+  primaryInformantDescription: MessageDescriptor
   errorMessage: MessageDescriptor
 }
 
-const messagesToDefine: ISelectPrimaryApplicantMessages = {
+const messagesToDefine: ISelectPrimaryInformantMessages = {
   registerNewEventTitle: {
     id: 'register.selectVitalEvent.registerNewEventTitle',
     defaultMessage: 'New declaration',
     description: 'The title that appears on the select vital event page'
   },
   registerNewEventHeading: {
-    id: 'register.primaryApplicant.registerNewEventHeading',
-    defaultMessage: 'Who is the primary applicant for this declaration?',
+    id: 'register.primaryInformant.registerNewEventHeading',
+    defaultMessage: 'Who is the primary informant for this declaration?',
     description: 'The section heading on the page'
   },
-  primaryApplicantDescription: {
-    id: 'register.primaryApplicant.description',
+  primaryInformantDescription: {
+    id: 'register.primaryInformant.description',
     defaultMessage:
       'This person is responsible for providing accurate information in this declaration. ',
     description: 'The section heading on the page'
   },
   errorMessage: {
-    id: 'register.primaryApplicant.errorMessage',
-    defaultMessage: 'Please select who is the primary applicant',
+    id: 'register.primaryInformant.errorMessage',
+    defaultMessage: 'Please select who is the primary informant',
     description: 'Error Message to show when no event is being selected'
   }
 }
 
-export const messages: ISelectPrimaryApplicantMessages =
+export const messages: ISelectPrimaryInformantMessages =
   defineMessages(messagesToDefine)

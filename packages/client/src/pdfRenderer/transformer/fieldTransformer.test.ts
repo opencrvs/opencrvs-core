@@ -63,14 +63,14 @@ describe('PDF template field transformer tests', () => {
       )
     })
   })
-  describe('ApplicantName transformer tests', () => {
+  describe('InformantName transformer tests', () => {
     it('Returns proper name based on event and local', () => {
       const intl = createIntl({
         locale: 'bn',
         defaultLocale: 'bn'
       })
 
-      const transformedValue = fieldTransformers.ApplicantName(data, intl, {
+      const transformedValue = fieldTransformers.InformantName(data, intl, {
         conditions: [
           {
             key: {
@@ -89,7 +89,7 @@ describe('PDF template field transformer tests', () => {
         locale: 'en'
       })
 
-      expect(() => fieldTransformers.ApplicantName(data, intl)).toThrowError(
+      expect(() => fieldTransformers.InformantName(data, intl)).toThrowError(
         'No payload found for this transformer'
       )
     })
@@ -99,7 +99,7 @@ describe('PDF template field transformer tests', () => {
       })
 
       expect(() =>
-        fieldTransformers.ApplicantName(data, intl, {
+        fieldTransformers.InformantName(data, intl, {
           conditions: [
             {
               key: {

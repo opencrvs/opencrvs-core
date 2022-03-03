@@ -125,7 +125,7 @@ describe('when draft data is transformed to graphql', () => {
     registrationCertificateLanguage: ['en'],
     registrationPhone: '01736478884',
     whoseContactDetails: 'MOTHER',
-    applicant: {
+    informant: {
       value: 'MOTHER',
       nestedFields: {
         otherRelationShip: ''
@@ -528,7 +528,7 @@ describe('when draft data is transformed to graphql', () => {
         mother: motherDetails,
         registration: {
           ...registrationDetails,
-          applicant: {
+          informant: {
             value: 'FATHER',
             nestedFields: {
               otherRelationShip: ''
@@ -561,7 +561,7 @@ describe('when draft data is transformed to graphql', () => {
       const transformedCorrectionData = {
         values: [
           {
-            fieldName: 'applicant',
+            fieldName: 'informant',
             newValue: 'FATHER',
             oldValue: 'MOTHER',
             section: 'registration'

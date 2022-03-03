@@ -331,26 +331,26 @@ describe('when in device of large viewport', () => {
               hasDocumentSection: true,
               viewType: 'form' as ViewType,
               title: {
-                defaultMessage: 'Applicant',
-                description: 'Form section name for Applicant',
-                id: 'form.section.applicant.name'
+                defaultMessage: 'Informant',
+                description: 'Form section name for Informant',
+                id: 'form.section.informant.name'
               },
               name: {
-                defaultMessage: 'Applicant',
-                description: 'Form section name for Applicant',
-                id: 'form.section.applicant.name'
+                defaultMessage: 'Informant',
+                description: 'Form section name for Informant',
+                id: 'form.section.informant.name'
               },
               groups: [
                 {
                   id: 'contact-group',
                   fields: [
                     {
-                      name: 'applicant',
+                      name: 'informant',
                       type: RADIO_GROUP_WITH_NESTED_FIELDS,
                       label: {
-                        defaultMessage: 'Applicant',
-                        description: 'Form section name for Applicant',
-                        id: 'form.section.applicant.name'
+                        defaultMessage: 'Informant',
+                        description: 'Form section name for Informant',
+                        id: 'form.section.informant.name'
                       },
                       required: true,
                       initialValue: '',
@@ -361,7 +361,7 @@ describe('when in device of large viewport', () => {
                           label: {
                             defaultMessage: 'Father',
                             description: 'Label for option Father',
-                            id: 'form.field.label.applicantRelation.father'
+                            id: 'form.field.label.informantRelation.father'
                           }
                         },
                         {
@@ -369,14 +369,14 @@ describe('when in device of large viewport', () => {
                           label: {
                             defaultMessage: 'Mother',
                             description: 'Label for option Mother',
-                            id: 'form.field.label.applicantRelation.mother'
+                            id: 'form.field.label.informantRelation.mother'
                           }
                         }
                       ],
                       nestedFields: {
                         FATHER: [
                           {
-                            name: 'applicantPhoneFather',
+                            name: 'informantPhoneFather',
                             type: TEL,
                             label: {
                               defaultMessage: 'Phone number',
@@ -390,7 +390,7 @@ describe('when in device of large viewport', () => {
                         ],
                         MOTHER: [
                           {
-                            name: 'applicantPhoneMother',
+                            name: 'informantPhoneMother',
                             type: TEL,
                             label: {
                               defaultMessage: 'Phone number',
@@ -452,10 +452,10 @@ describe('when in device of large viewport', () => {
 
       const data = {
         registration: {
-          applicant: {
+          informant: {
             value: 'MOTHER',
             nestedFields: {
-              applicantPhoneMother: '011123456789'
+              informantPhoneMother: '011123456789'
             }
           }
         }
@@ -481,18 +481,18 @@ describe('when in device of large viewport', () => {
 
     it('renders values in review section', () => {
       expect(
-        reviewSectionComponent.find('#Applicant').hostNodes()
+        reviewSectionComponent.find('#Informant').hostNodes()
       ).toHaveLength(1)
 
       expect(
-        reviewSectionComponent.find('#Applicant').hostNodes().childAt(0).text()
+        reviewSectionComponent.find('#Informant').hostNodes().childAt(0).text()
       ).toContain('Mother')
     })
 
     it('renders validation error if wrong value given', () => {
       expect(
         reviewSectionComponent
-          .find('#required_label_registration_applicant')
+          .find('#required_label_registration_informant')
           .hostNodes()
       ).toHaveLength(1)
     })

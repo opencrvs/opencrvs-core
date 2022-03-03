@@ -53,7 +53,7 @@ const deathDeclaration: IDeclaration = {
     },
     documents: {
       uploadDocForDeceased: [],
-      uploadDocForApplicant: [],
+      uploadDocForInformant: [],
       uploadDocForDeceasedDeath: []
     },
     _fhirIDMap: {

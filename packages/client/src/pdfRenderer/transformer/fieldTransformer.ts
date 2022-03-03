@@ -19,7 +19,7 @@ import {
 import {
   IIntLabelPayload,
   IConditionExecutorPayload,
-  IApplicantNamePayload,
+  IInformantNamePayload,
   IFeildValuePayload,
   INumberFeildConversionPayload,
   IDateFeildValuePayload,
@@ -28,7 +28,7 @@ import {
   TransformerPayload,
   IFormattedFeildValuePayload,
   IPersonIdentifierValuePayload,
-  IApplicantNameCondition,
+  IInformantNameCondition,
   IArithmeticOperationPayload
 } from '@client/pdfRenderer/transformer/types'
 import moment from 'moment'
@@ -75,17 +75,17 @@ export const fieldTransformers: IFunctionTransformer = {
   },
 
   /*
-    ApplicantName transforms the applicant name from the declaration data
+    InformantName transforms the informant name from the declaration data
     @params:
       - key: Mendatory field. Need to provide event wise source object key. Ex: 'birth': 'data.child'
       - format: Mendatory field. Need to provide locale wise name fields which will be concatenated together with spaces
   */
-  ApplicantName: (
+  InformantName: (
     templateData: TemplateTransformerData,
     intl: IntlShape,
     payload?: TransformerPayload
   ) => {
-    const formatPayload = payload && (payload as IApplicantNamePayload)
+    const formatPayload = payload && (payload as IInformantNamePayload)
     if (!formatPayload) {
       throw new Error('No payload found for this transformer')
     }
@@ -93,10 +93,10 @@ export const fieldTransformers: IFunctionTransformer = {
     const matchedCondition = getMatchedCondition(
       formatPayload.conditions,
       templateData.declaration.data
-    ) as IApplicantNameCondition
+    ) as IInformantNameCondition
 
     if (!matchedCondition) {
-      throw new Error('No condition has matched for ApplicantName transformer')
+      throw new Error('No condition has matched for InformantName transformer')
     }
 
     if (!matchedCondition.key[templateData.declaration.event]) {
@@ -105,20 +105,20 @@ export const fieldTransformers: IFunctionTransformer = {
       )
     }
 
-    const applicantObj: IFormSectionData | null =
+    const informantObj: IFormSectionData | null =
       getValueFromDeclarationDataByKey(
         templateData.declaration.data,
         matchedCondition.key[templateData.declaration.event]
       )
-    let applicantName = ''
+    let informantName = ''
     matchedCondition.format[
       formatPayload.language ? formatPayload.language : intl.locale
     ].forEach((field) => {
-      applicantName = applicantName.concat(
-        `${(applicantObj && applicantObj[field]) || ''} `
+      informantName = informantName.concat(
+        `${(informantObj && informantObj[field]) || ''} `
       )
     })
-    const fullName = applicantName.substr(0, applicantName.length - 1)
+    const fullName = informantName.substr(0, informantName.length - 1)
     return formatPayload.allCapital ? fullName.toUpperCase() : fullName
   },
 

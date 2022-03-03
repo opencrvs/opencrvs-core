@@ -22,7 +22,7 @@ describe('OutBox tests', () => {
     data: {
       registration: {
         presentAtBirthRegistration: 'BOTH_PARENTS',
-        applicant: 'MOTHER_ONLY',
+        informant: 'MOTHER_ONLY',
         registrationPhone: '01989898989',
         whoseContactDetails: 'FATHER'
       },
@@ -85,16 +85,16 @@ describe('OutBox tests', () => {
       },
       informant: {
         iDType: 'NO_ID',
-        applicantFamilyName: 'চৌধুরী',
-        applicantFamilyNameEng: 'Chowdhury',
+        informantFamilyName: 'চৌধুরী',
+        informantFamilyNameEng: 'Chowdhury',
         nationality: 'BGD',
-        applicantsRelationToDeceased: 'EXTENDED_FAMILY',
-        applicantPhone: '01987789987',
+        informantsRelationToDeceased: 'EXTENDED_FAMILY',
+        informantPhone: '01987789987',
         country: 'BGD',
         state: 'e5320d3c-78b3-4122-9dfd-9324906ab7de',
         district: '9914f913-453c-413e-a6fd-553971769f2e',
         addressLine4: '2c390875-0a74-4fb6-93ec-fa33dbf50ab9',
-        applicantPermanentAddressSameAsCurrent: true,
+        informantPermanentAddressSameAsCurrent: true,
         countryPermanent: 'BGD'
       },
       deathEvent: {

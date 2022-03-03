@@ -17,7 +17,7 @@ interface IConstantsMessages
   allEvents: MessageDescriptor
   allStatuses: MessageDescriptor
   areYouSure: MessageDescriptor
-  applicantContactNumber: MessageDescriptor
+  informantContactNumber: MessageDescriptor
   declaration: MessageDescriptor
   declarations: MessageDescriptor
   declarationCollectedOn: MessageDescriptor
@@ -157,10 +157,10 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Label for select option All statuses',
     id: 'constants.allStatuses'
   },
-  applicantContactNumber: {
-    defaultMessage: 'Applicant contact number',
+  informantContactNumber: {
+    defaultMessage: 'Informant contact number',
     description: 'The title of contact number label',
-    id: 'constants.applicantContactNumber'
+    id: 'constants.informantContactNumber'
   },
   declaration: {
     defaultMessage: 'declaration',
@@ -859,37 +859,37 @@ const dynamicMessagesToDefine: Record<
     description: 'A label from the death event'
   },
   father: {
-    id: 'form.field.label.applicantRelation.father',
+    id: 'form.field.label.informantRelation.father',
     defaultMessage: 'Father',
     description: 'Label for option Father'
   },
   mother: {
-    id: 'form.field.label.applicantRelation.mother',
+    id: 'form.field.label.informantRelation.mother',
     defaultMessage: 'Mother',
     description: 'Label for option Mother'
   },
   spouse: {
-    id: 'form.field.label.applicantRelation.spouse',
+    id: 'form.field.label.informantRelation.spouse',
     defaultMessage: 'Spouse',
     description: 'Label for option Spouse'
   },
   son: {
-    id: 'form.field.label.applicantRelation.son',
+    id: 'form.field.label.informantRelation.son',
     defaultMessage: 'Son',
     description: 'Label for option Son'
   },
   daughter: {
-    id: 'form.field.label.applicantRelation.daughter',
+    id: 'form.field.label.informantRelation.daughter',
     defaultMessage: 'Daughter',
     description: 'Label for option Daughter'
   },
   MOTHER: {
-    id: 'form.field.label.applicantRelation.mother',
+    id: 'form.field.label.informantRelation.mother',
     defaultMessage: 'Mother',
     description: 'Label for option Mother'
   },
   FATHER: {
-    id: 'form.field.label.applicantRelation.father',
+    id: 'form.field.label.informantRelation.father',
     defaultMessage: 'Father',
     description: 'Label for option Father'
   },
@@ -910,34 +910,34 @@ const dynamicMessagesToDefine: Record<
     id: 'form.field.label.someoneElse'
   },
   SPOUSE: {
-    id: 'form.field.label.applicantRelation.spouse',
+    id: 'form.field.label.informantRelation.spouse',
     defaultMessage: 'Spouse',
     description: 'Label for option Spouse'
   },
   SON: {
-    id: 'form.field.label.applicantRelation.son',
+    id: 'form.field.label.informantRelation.son',
     defaultMessage: 'Son',
     description: 'Label for option Son'
   },
   DAUGHTER: {
-    id: 'form.field.label.applicantRelation.daughter',
+    id: 'form.field.label.informantRelation.daughter',
     defaultMessage: 'Daughter',
     description: 'Label for option Daughter'
   },
   EXTENDED_FAMILY: {
     defaultMessage: 'Extended Family',
     description: 'Label for option Extended Family',
-    id: 'form.field.label.applicantRelation.extendedFamily'
+    id: 'form.field.label.informantRelation.extendedFamily'
   },
   SOMEONE_ELSE: {
     defaultMessage: 'Someone else',
     description: 'Other Label',
     id: 'form.field.label.someoneElse'
   },
-  APPLICANT: {
-    defaultMessage: 'Applicant',
-    description: 'Applicant Label',
-    id: 'form.field.label.applicant'
+  INFORMANT: {
+    defaultMessage: 'Informant',
+    description: 'Informant Label',
+    id: 'form.field.label.informant'
   }
 }
 

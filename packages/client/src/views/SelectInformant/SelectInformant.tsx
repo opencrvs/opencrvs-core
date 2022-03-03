@@ -99,7 +99,7 @@ type IFullProps = {
   goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
   goToDeathRegistration: typeof goToDeathRegistration
   registrationSection: IFormSection
-  applicantsSection: IFormSection
+  informantsSection: IFormSection
 } & IntlShapeProps &
   RouteComponentProps<IMatchProps>
 
@@ -128,7 +128,7 @@ function getGroupWithInitialValues(
 export class SelectInformantView extends React.Component<IFullProps, IState> {
   constructor(props: IFullProps) {
     super(props)
-    const { applicantsSection, registrationSection } = props
+    const { informantsSection, registrationSection } = props
     this.state = {
       informant:
         (this.props.declaration &&
@@ -138,9 +138,9 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
             .presentAtBirthRegistration as string)) ||
         (this.props.declaration &&
           this.props.declaration.data &&
-          this.props.declaration.data[applicantsSection.id] &&
-          (this.props.declaration.data[applicantsSection.id]
-            .applicantsRelationToDeceased as string)) ||
+          this.props.declaration.data[informantsSection.id] &&
+          (this.props.declaration.data[informantsSection.id]
+            .informantsRelationToDeceased as string)) ||
         '',
       touched: false,
       showError: false
@@ -167,7 +167,7 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
     sectionData: IFormSectionData,
     activeSection: IFormSection
   ) => {
-    const applicant = (
+    const informant = (
       sectionData[activeSection.groups[0].fields[0].name] as IFormSectionData
     )?.value
 
@@ -182,12 +182,12 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
         } as FieldValueMap)
       : {}
 
-    const applicantValue = nestedFieldValue ? nestedFieldValue : applicant
+    const informantValue = nestedFieldValue ? nestedFieldValue : informant
 
     const event = this.props.location.pathname.includes(Event.BIRTH)
       ? Event.BIRTH
       : Event.DEATH
-    const { declaration, registrationSection, applicantsSection } = this.props
+    const { declaration, registrationSection, informantsSection } = this.props
     const newDeclaration = {
       ...declaration,
       data: {
@@ -198,28 +198,28 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       newDeclaration.data[registrationSection.id] = {
         ...declaration?.data[registrationSection.id],
         ...{
-          presentAtBirthRegistration: applicantValue,
-          applicant: {
-            value: applicant,
+          presentAtBirthRegistration: informantValue,
+          informant: {
+            value: informant,
             nestedFields: nestedField
           }
         }
       }
     } else {
-      newDeclaration.data[applicantsSection.id] = {
-        ...declaration.data[applicantsSection.id],
+      newDeclaration.data[informantsSection.id] = {
+        ...declaration.data[informantsSection.id],
         ...{
           // Need to empty those because next screen will fill this up
           // TODO: currently contact point is the informant,
           // need to define the difference between informant and contact point on death schema
-          relationship: applicantValue
+          relationship: informantValue
         }
       }
       newDeclaration.data[registrationSection.id] = {
         ...declaration?.data[registrationSection.id],
         ...{
           relationship: {
-            value: applicant,
+            value: informant,
             nestedFields: nestedField
           }
         }
@@ -353,7 +353,7 @@ const mapStateToProps = (
   const { match } = props
   return {
     registrationSection: getBirthSection(store, BirthSection.Registration),
-    applicantsSection: getDeathSection(store, DeathSection.Applicants),
+    informantsSection: getDeathSection(store, DeathSection.Informants),
     declaration: store.declarationsState.declarations.find(
       ({ id }) => id === match.params.declarationId
     )!

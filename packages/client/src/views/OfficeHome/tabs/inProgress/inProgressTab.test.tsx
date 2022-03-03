@@ -192,7 +192,7 @@ describe('In Progress tab', () => {
           data: {
             registration: {
               presentAtBirthRegistration: 'MOTHER_ONLY',
-              applicant: 'MOTHER_ONLY',
+              informant: 'MOTHER_ONLY',
               registrationPhone: '01722222222',
               whoseContactDetails: 'MOTHER'
             },
@@ -213,7 +213,7 @@ describe('In Progress tab', () => {
           data: {
             registration: {
               presentAtBirthRegistration: 'MOTHER_ONLY',
-              applicant: 'MOTHER_ONLY',
+              informant: 'MOTHER_ONLY',
               registrationPhone: '01722222222',
               whoseContactDetails: 'MOTHER'
             },

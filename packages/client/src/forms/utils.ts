@@ -781,9 +781,9 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression: '!values.iDType || values.iDType === "NO_ID"'
   },
-  applicantPermanentAddressSameAsCurrent: {
+  informantPermanentAddressSameAsCurrent: {
     action: 'hide',
-    expression: 'values.applicantPermanentAddressSameAsCurrent'
+    expression: 'values.informantPermanentAddressSameAsCurrent'
   },
   deathPlaceOther: {
     action: 'hide',
@@ -812,7 +812,7 @@ export const conditionals: IConditionals = {
   },
   otherRelationship: {
     action: 'hide',
-    expression: 'values.applicantsRelationToDeceased !== "OTHER"'
+    expression: 'values.informantsRelationToDeceased !== "OTHER"'
   },
   fatherContactDetailsRequired: {
     action: 'hide',

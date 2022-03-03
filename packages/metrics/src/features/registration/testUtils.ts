@@ -595,7 +595,7 @@ export const testDeathPayload = {
         extension: [
           {
             url: 'http://opencrvs.org/specs/extension/contact-person',
-            valueString: 'APPLICANT'
+            valueString: 'INFORMANT'
           },
           {
             url: 'http://opencrvs.org/specs/extension/contact-relationship',
@@ -999,7 +999,7 @@ export const testDeathCertPayload = {
         extension: [
           {
             url: 'http://opencrvs.org/specs/extension/contact-person',
-            valueString: 'APPLICANT'
+            valueString: 'INFORMANT'
           },
           {
             url: 'http://opencrvs.org/specs/extension/contact-relationship',

@@ -848,7 +848,7 @@ describe('fhirUtils', () => {
       extension: [
         {
           url: 'http://opencrvs.org/specs/extension/contact-person',
-          valueString: 'APPLICANT'
+          valueString: 'INFORMANT'
         },
         {
           url: 'http://opencrvs.org/specs/extension/contact-relationship',
@@ -952,7 +952,7 @@ describe('fhirUtils', () => {
       extension: [
         {
           url: 'http://opencrvs.org/specs/extension/contact-person',
-          valueString: 'APPLICANT'
+          valueString: 'INFORMANT'
         },
         {
           url: 'http://opencrvs.org/specs/extension/contact-relationship',

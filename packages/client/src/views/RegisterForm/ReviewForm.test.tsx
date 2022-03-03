@@ -723,7 +723,7 @@ describe('ReviewForm tests', () => {
       .find(RegisterForm)
       .prop('declaration') as IDeclaration
     expect(data.data.registration).toEqual({
-      applicant: {
+      informant: {
         nestedFields: {}
       },
       presentAtBirthRegistration: 'MOTHER_ONLY',

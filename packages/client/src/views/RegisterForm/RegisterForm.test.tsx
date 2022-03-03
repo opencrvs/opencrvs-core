@@ -560,20 +560,20 @@ describe('when user is in the register form for death event', () => {
       component = testComponent
       selectOption(component, '#iDType', 'National ID number')
 
-      component.find('input#applicantID').simulate('change', {
-        target: { id: 'applicantID', value: '1234567898' }
+      component.find('input#informantID').simulate('change', {
+        target: { id: 'informantID', value: '1234567898' }
       })
 
-      component.find('input#applicantBirthDate-dd').simulate('change', {
-        target: { id: 'applicantBirthDate-dd', value: '10' }
+      component.find('input#informantBirthDate-dd').simulate('change', {
+        target: { id: 'informantBirthDate-dd', value: '10' }
       })
 
-      component.find('input#applicantBirthDate-mm').simulate('change', {
-        target: { id: 'applicantBirthDate-mm', value: '10' }
+      component.find('input#informantBirthDate-mm').simulate('change', {
+        target: { id: 'informantBirthDate-mm', value: '10' }
       })
 
-      component.find('input#applicantBirthDate-yyyy').simulate('change', {
-        target: { id: 'applicantBirthDate-yyyy', value: '1992' }
+      component.find('input#informantBirthDate-yyyy').simulate('change', {
+        target: { id: 'informantBirthDate-yyyy', value: '1992' }
       })
 
       component.update()

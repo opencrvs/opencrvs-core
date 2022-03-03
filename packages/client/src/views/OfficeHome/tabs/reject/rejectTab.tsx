@@ -111,7 +111,7 @@ class RejectTabComponent extends React.Component<
         },
         {
           label: this.props.intl.formatMessage(
-            constantsMessages.applicantContactNumber
+            constantsMessages.informantContactNumber
           ),
           width: 21,
           key: 'contactNumber'

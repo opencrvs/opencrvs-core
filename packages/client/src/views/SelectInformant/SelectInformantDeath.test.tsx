@@ -102,8 +102,8 @@ describe('when select informant page loads with existing data', () => {
 
     const draft = createDeclaration(Event.DEATH, {
       informant: {
-        applicantsRelationToDeceased: 'SON',
-        applicantPhone: '01622688231'
+        informantsRelationToDeceased: 'SON',
+        informantPhone: '01622688231'
       },
       registration: {
         relationship: {

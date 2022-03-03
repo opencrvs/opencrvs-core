@@ -111,7 +111,7 @@ import { Scope } from '@client/utils/authUtils'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { BIRTH, REJECTED } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
-import { getDraftApplicantFullName } from '@client/utils/draftUtils'
+import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { flatten, isArray, flattenDeep, get, clone } from 'lodash'
 import * as React from 'react'
 import { findDOMNode } from 'react-dom'
@@ -1466,7 +1466,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
 
     const sectionName = this.state.activeSection || this.docSections[0].id
-    const applicantName = getDraftApplicantFullName(declaration, intl.locale)
+    const informantName = getDraftInformantFullName(declaration, intl.locale)
     const draft = this.isDraft()
     const transformedSectionData = this.transformSectionData(
       formSections,
@@ -1482,10 +1482,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               logoSource={offlineCountryConfiguration.assets.logo}
               title={intl.formatMessage(messages.govtName)}
               subject={
-                applicantName
+                informantName
                   ? intl.formatMessage(messages.headerSubjectWithName, {
                       eventType: event,
-                      name: applicantName
+                      name: informantName
                     })
                   : intl.formatMessage(messages.headerSubjectWithoutName, {
                       eventType: event

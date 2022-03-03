@@ -654,7 +654,7 @@ export interface IConditionals {
   isNotCityLocationPermanent: IConditional
   isDefaultCountryPermanent: IConditional
   isCityLocationPermanent: IConditional
-  applicantPermanentAddressSameAsCurrent: IConditional
+  informantPermanentAddressSameAsCurrent: IConditional
   iDAvailable: IConditional
   deathPlaceOther: IConditional
   deathPlaceAtPrivateHome: IConditional
@@ -794,7 +794,7 @@ export enum BirthSection {
   Child = 'child',
   Mother = 'mother',
   Father = 'father',
-  Applicant = 'informant',
+  Informant = 'informant',
   Parent = 'primaryCaregiver',
   Registration = 'registration',
   Documents = 'documents',
@@ -805,7 +805,7 @@ export enum DeathSection {
   Deceased = 'deceased',
   Event = 'deathEvent',
   CauseOfDeath = 'causeOfDeath',
-  Applicants = 'informant',
+  Informants = 'informant',
   DeathDocuments = 'documents',
   Preview = 'preview'
 }

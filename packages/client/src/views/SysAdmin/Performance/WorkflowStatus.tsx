@@ -82,7 +82,7 @@ interface SortMap {
   status: SORT_ORDER
   eventType: SORT_ORDER
   dateOfEvent: SORT_ORDER
-  applicant: SORT_ORDER
+  informant: SORT_ORDER
   declarationStartedOn: SORT_ORDER
   nameIntl: SORT_ORDER
   declarationStartedBy: SORT_ORDER
@@ -99,7 +99,7 @@ const INITIAL_SORT_MAP = {
   status: SORT_ORDER.ASCENDING,
   eventType: SORT_ORDER.ASCENDING,
   dateOfEvent: SORT_ORDER.ASCENDING,
-  applicant: SORT_ORDER.ASCENDING,
+  informant: SORT_ORDER.ASCENDING,
   declarationStartedOn: SORT_ORDER.DESCENDING,
   nameIntl: SORT_ORDER.ASCENDING,
   declarationStartedBy: SORT_ORDER.ASCENDING,
@@ -130,7 +130,7 @@ const statusOptions = [
 const PrimaryContactLabelMapping = {
   MOTHER: formMessages.contactDetailsMother,
   FATHER: formMessages.contactDetailsFather,
-  APPLICANT: formMessages.contactDetailsApplicant
+  INFORMANT: formMessages.contactDetailsInformant
 }
 
 type PrimaryContact = keyof typeof PrimaryContactLabelMapping
@@ -243,13 +243,13 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         width: 12
       },
       {
-        label: intl.formatMessage(formMessages.applicantName),
-        key: 'applicant',
+        label: intl.formatMessage(formMessages.informantName),
+        key: 'informant',
         width: 14,
         isSortable: true,
-        sortFunction: () => toggleSort('applicant'),
-        icon: columnToBeSort === 'applicant' ? <ArrowDownBlue /> : <></>,
-        isSorted: columnToBeSort === 'applicant' ? true : false
+        sortFunction: () => toggleSort('informant'),
+        icon: columnToBeSort === 'informant' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'informant' ? true : false
       },
       {
         label: intl.formatMessage(constantsMessages.declarationStarted),
@@ -542,7 +542,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
             dateOfEvent: eventProgress.dateOfEvent,
             nameIntl,
             nameLocal,
-            applicant:
+            informant:
               (eventProgress.registration &&
                 ((eventProgress.registration.contactRelationship &&
                   conditioanllyFormatContactRelationship(

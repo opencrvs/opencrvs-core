@@ -79,7 +79,7 @@ const messagesToDefine = {
   title: {
     id: 'register.eventInfo.event.title',
     defaultMessage:
-      'Introduce the {eventType, select, birth{birth} death{death} other{birth}} registration process to the applicant'
+      'Introduce the {eventType, select, birth{birth} death{death} other{birth}} registration process to the informant'
   }
 }
 

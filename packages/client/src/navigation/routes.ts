@@ -21,7 +21,7 @@ export const SELECT_BIRTH_MAIN_CONTACT_POINT = `/drafts/:declarationId/events/${
 export const DRAFT_BIRTH_PARENT_FORM = `/drafts/:declarationId/events/${Event.BIRTH}`
 export const DRAFT_BIRTH_PARENT_FORM_PAGE = `/drafts/:declarationId/events/${Event.BIRTH}/:pageId`
 export const DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP = `/drafts/:declarationId/events/${Event.BIRTH}/:pageId/group/:groupId`
-export const DRAFT_BIRTH_APPLICANT_FORM = `/events/${Event.BIRTH}/contact`
+export const DRAFT_BIRTH_INFORMANT_FORM = `/events/${Event.BIRTH}/contact`
 export const DRAFT_BIRTH_PARENT_FORM_TAB = `/drafts/:declarationId/events/${Event.BIRTH}/parent/:tabId`
 
 export const SELECT_DEATH_INFORMANT = `/drafts/:declarationId/events/${Event.DEATH}/registration/informant`

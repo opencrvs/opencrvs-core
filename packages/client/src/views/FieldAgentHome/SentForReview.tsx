@@ -38,7 +38,7 @@ import {
 } from '@client/i18n/messages'
 import { getDefaultLanguage } from '@client/i18n/utils'
 import { withTheme, ITheme } from '@client/styledComponents'
-import { getDraftApplicantFullName } from '@client/utils/draftUtils'
+import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 
 const DECLARATIONS_DAY_LIMIT = 7
@@ -153,7 +153,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
       (draft: IDeclaration, index) => {
         const { intl } = this.props
         const { locale } = intl
-        const name = getDraftApplicantFullName(draft, locale)
+        const name = getDraftInformantFullName(draft, locale)
         const event =
           (draft.event &&
             intl.formatMessage(

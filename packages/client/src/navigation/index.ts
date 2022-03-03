@@ -16,7 +16,7 @@ import {
   CREATE_USER,
   CREATE_USER_ON_LOCATION,
   CREATE_USER_SECTION,
-  DRAFT_BIRTH_APPLICANT_FORM,
+  DRAFT_BIRTH_INFORMANT_FORM,
   DRAFT_BIRTH_PARENT_FORM,
   DRAFT_DEATH_FORM,
   EVENT_INFO,
@@ -306,7 +306,7 @@ export function goToBirthRegistrationAsParent(declarationId: string) {
 }
 export function goToDeclarationContact(informant: string) {
   return push(
-    formatUrl(DRAFT_BIRTH_APPLICANT_FORM, {
+    formatUrl(DRAFT_BIRTH_INFORMANT_FORM, {
       informant: informant.toString()
     })
   )

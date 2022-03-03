@@ -22,7 +22,7 @@ import {
   constantsMessages as messages,
   dynamicConstantsMessages
 } from '@client/i18n/messages'
-import { getDraftApplicantFullName } from '@client/utils/draftUtils'
+import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { formattedDuration } from '@client/utils/date-formatting'
 
@@ -74,7 +74,7 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
             dynamicConstantsMessages[draft.event.toLowerCase()]
           )) ||
         ''
-      const name = getDraftApplicantFullName(draft, locale)
+      const name = getDraftInformantFullName(draft, locale)
       return {
         id: draft.id,
         event: event,

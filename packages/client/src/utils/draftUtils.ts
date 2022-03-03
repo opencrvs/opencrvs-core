@@ -25,7 +25,7 @@ import { IUserDetails } from './userUtils'
 import { getEvent } from '@client/views/PrintCertificate/utils'
 import { BIRTH, DEATH } from './constants'
 
-const getApplicantFullName = (
+const getInformantFullName = (
   sectionData: IFormSectionData,
   language = 'en'
 ): string => {
@@ -53,15 +53,15 @@ const getApplicantFullName = (
   return fullName
 }
 
-export const getDraftApplicantFullName = (
+export const getDraftInformantFullName = (
   draft: IDeclaration,
   language?: string
 ) => {
   switch (draft.event) {
     case Event.BIRTH:
-      return getApplicantFullName(draft.data.child, language)
+      return getInformantFullName(draft.data.child, language)
     case Event.DEATH:
-      return getApplicantFullName(draft.data.deceased, language)
+      return getInformantFullName(draft.data.deceased, language)
   }
 }
 

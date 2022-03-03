@@ -49,7 +49,7 @@ describe('when user is selecting the informant', () => {
   })
   describe('when selects "Parent"', () => {
     it('takes user to the birth registration contact view', () => {
-      app.find('#applicant_GRANDFATHER').hostNodes().simulate('change')
+      app.find('#informant_GRANDFATHER').hostNodes().simulate('change')
 
       app.find('#continue').hostNodes().simulate('click')
 
@@ -69,15 +69,15 @@ describe('when user is selecting the informant', () => {
 
   describe('when traverse list then continue', () => {
     it('takes user to the birth registration by parent informant view', () => {
-      app.find('#applicant_MOTHER').hostNodes().simulate('change')
-      app.find('#applicant_FATHER').hostNodes().simulate('change')
+      app.find('#informant_MOTHER').hostNodes().simulate('change')
+      app.find('#informant_FATHER').hostNodes().simulate('change')
 
-      app.find('#applicant_GRANDFATHER').hostNodes().simulate('change')
-      app.find('#applicant_GRANDMOTHER').hostNodes().simulate('change')
-      app.find('#applicant_BROTHER').hostNodes().simulate('change')
-      app.find('#applicant_SISTER').hostNodes().simulate('change')
-      app.find('#applicant_LEGAL_GUARDIAN').hostNodes().simulate('change')
-      app.find('#applicant_SOMEONE_ELSE').hostNodes().simulate('change')
+      app.find('#informant_GRANDFATHER').hostNodes().simulate('change')
+      app.find('#informant_GRANDMOTHER').hostNodes().simulate('change')
+      app.find('#informant_BROTHER').hostNodes().simulate('change')
+      app.find('#informant_SISTER').hostNodes().simulate('change')
+      app.find('#informant_LEGAL_GUARDIAN').hostNodes().simulate('change')
+      app.find('#informant_SOMEONE_ELSE').hostNodes().simulate('change')
 
       app.find('#continue').hostNodes().simulate('click')
 
@@ -105,7 +105,7 @@ describe('when select informant page loads with existing data', () => {
       registration: {
         presentAtBirthRegistration: 'MOTHER',
         registrationPhone: '01622688231',
-        applicant: {
+        informant: {
           value: 'MOTHER',
           nestedFields: {}
         }
@@ -115,6 +115,6 @@ describe('when select informant page loads with existing data', () => {
     history.replace(SELECT_BIRTH_INFORMANT.replace(':declarationId', draft.id))
 
     await setPinCode(app)
-    expect(app.find('#applicant_MOTHER').hostNodes().props().checked).toBe(true)
+    expect(app.find('#informant_MOTHER').hostNodes().props().checked).toBe(true)
   })
 })

@@ -56,7 +56,7 @@ import { IStoreState } from '@client/store'
 import { Action } from '@client/forms'
 import { get } from 'lodash'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
-import { getDraftApplicantFullName } from '@client/utils/draftUtils'
+import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { formattedDuration } from '@client/utils/date-formatting'
 
@@ -288,7 +288,7 @@ export class InProgressTabComponent extends React.Component<
       } else if (draft.event && draft.event.toString() === 'death') {
         pageRoute = DRAFT_DEATH_FORM_PAGE
       }
-      const name = getDraftApplicantFullName(draft, locale)
+      const name = getDraftInformantFullName(draft, locale)
       const lastModificationDate = draft.modifiedOn || draft.savedOn
       const actions = [
         {

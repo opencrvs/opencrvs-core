@@ -134,7 +134,7 @@ describe('when user is previewing the form data', () => {
       presentAtBirthRegistration: 'MOTHER',
       registrationCertificateLanguage: ['en'],
       whoseContactDetails: 'MOTHER',
-      applicant: {
+      informant: {
         value: 'OTHER',
         nestedFields: {
           otherRelationShip: 'Friend'
@@ -395,14 +395,14 @@ describe('when user is previewing the form data', () => {
 
     const informantDetails = {
       iDType: 'PASSPORT',
-      applicantID: '123456789',
-      applicantFirstNames: 'অনিক',
-      applicantFamilyName: 'অনিক',
-      applicantFirstNamesEng: 'Anik',
-      applicantFamilyNameEng: 'Anik',
+      informantID: '123456789',
+      informantFirstNames: 'অনিক',
+      informantFamilyName: 'অনিক',
+      informantFirstNamesEng: 'Anik',
+      informantFamilyNameEng: 'Anik',
       nationality: 'BGD',
-      applicantBirthDate: '1996-01-01',
-      applicantPhone: '01622688231',
+      informantBirthDate: '1996-01-01',
+      informantPhone: '01622688231',
       relationship: 'OTHER',
       country: 'BGD',
       state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
@@ -417,7 +417,7 @@ describe('when user is previewing the form data', () => {
       postCodeCityOption: '12',
       addressLine1: '12',
       postCode: '12',
-      applicantPermanentAddressSameAsCurrent: true,
+      informantPermanentAddressSameAsCurrent: true,
       countryPermanent: 'BGD',
       statePermanent: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
       districtPermanent: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',

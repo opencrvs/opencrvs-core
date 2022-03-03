@@ -17,9 +17,9 @@
           },
           "groups": [
             {
-              "id": "applicant-relation",
+              "id": "informant-relation",
               "title": {
-                "defaultMessage": "Who is the applicant?",
+                "defaultMessage": "Who is the informant?",
                 "description": "Form section title for contact point",
                 "id": "register.selectInformant.relation"
               },
@@ -33,10 +33,10 @@
               "showExitButtonOnly": true,
               "fields": [
                 {
-                  "name": "applicant",
+                  "name": "informant",
                   "type": "RADIO_GROUP_WITH_NESTED_FIELDS",
                   "label": {
-                    "defaultMessage": "Who is the applicant?",
+                    "defaultMessage": "Who is the informant?",
                     "description": "Form section title for contact point",
                     "id": "register.selectInformant.relation"
                   },
@@ -152,7 +152,7 @@
                         "type": "TEXT",
                         "label": {
                           "defaultMessage": "Relationship to child",
-                          "id": "form.field.label.applicantsRelationWithChild",
+                          "id": "form.field.label.informantsRelationWithChild",
                           "description": "Label for input Relationship to child"
                         },
                         "placeholder": {
@@ -186,7 +186,7 @@
                         "type": "TEXT",
                         "label": {
                           "defaultMessage": "Relationship to child",
-                          "id": "form.field.label.applicantsRelationWithChild",
+                          "id": "form.field.label.informantsRelationWithChild",
                           "description": "Label for input Relationship to child"
                         },
                         "placeholder": {
@@ -228,11 +228,11 @@
               ]
             },
             {
-              "id": "primary-applicant",
+              "id": "primary-informant",
               "title": {
-                "defaultMessage": "Who is the primary applicant for this declaration?",
-                "description": "Form section title for primary applicant",
-                "id": "register.primaryApplicant.registerNewEventHeading"
+                "defaultMessage": "Who is the primary informant for this declaration?",
+                "description": "Form section title for primary informant",
+                "id": "register.primaryInformant.registerNewEventHeading"
               },
               "conditionals": [
                 {
@@ -249,18 +249,18 @@
                   "label": {
                     "defaultMessage": "This person is responsible for providing accurate information in this declaration.",
                     "description": "Documents Paragraph text",
-                    "id": "register.primaryApplicant.description"
+                    "id": "register.primaryInformant.description"
                   },
                   "initialValue": "",
                   "validate": [],
                   "conditionals": []
                 },
                 {
-                  "name": "applicant",
+                  "name": "informant",
                   "type": "RADIO_GROUP_WITH_NESTED_FIELDS",
                   "label": {
-                    "defaultMessage": "Who is the primary applicant for this declaration?",
-                    "description": "Form section title for primary applicant",
+                    "defaultMessage": "Who is the primary informant for this declaration?",
+                    "description": "Form section title for primary informant",
                     "id": "register.selectInformant.relation"
                   },
                   "hideHeader": true,
@@ -273,16 +273,16 @@
                       "value": "MOTHER",
                       "label": {
                         "defaultMessage": "Mother",
-                        "description": "Mother as applicant",
-                        "id": "form.field.label.applicantRelation.mother"
+                        "description": "Mother as informant",
+                        "id": "form.field.label.informantRelation.mother"
                       }
                     },
                     {
                       "value": "FATHER",
                       "label": {
                         "defaultMessage": "Father",
-                        "description": "Father as applicant",
-                        "id": "form.field.label.applicantRelation.father"
+                        "description": "Father as informant",
+                        "id": "form.field.label.informantRelation.father"
                       }
                     }
                   ],
@@ -343,7 +343,7 @@
                       "label": {
                         "defaultMessage": "Mother",
                         "description": "Label for option Mother",
-                        "id": "form.field.label.applicantRelation.mother"
+                        "id": "form.field.label.informantRelation.mother"
                       }
                     },
                     {
@@ -351,7 +351,7 @@
                       "label": {
                         "defaultMessage": "Father",
                         "description": "Label for option Father",
-                        "id": "form.field.label.applicantRelation.father"
+                        "id": "form.field.label.informantRelation.father"
                       }
                     },
                     {
@@ -385,7 +385,7 @@
                     },
                     "position": "before",
                     "labelAs": {
-                      "defaultMessage": "Who is the applicant?",
+                      "defaultMessage": "Who is the informant?",
                       "description": "Form section title for contact point",
                       "id": "register.selectInformant.relation"
                     },
@@ -408,7 +408,7 @@
                   }
                 },
                 {
-                  "name": "applicant",
+                  "name": "informant",
                   "type": "RADIO_GROUP_WITH_NESTED_FIELDS",
                   "readonly": true,
                   "hidden": true,
@@ -421,9 +421,9 @@
                     }
                   ],
                   "label": {
-                    "defaultMessage": "Applicant",
+                    "defaultMessage": "Informant",
                     "description": "Form section title for contact point",
-                    "id": "form.section.applicant.name"
+                    "id": "form.section.informant.name"
                   },
                   "options": [
                     {
@@ -471,10 +471,10 @@
                   },
                   "options": [
                     {
-                      "value": "APPLICANT",
+                      "value": "INFORMANT",
                       "label": {
-                        "defaultMessage": "Applicant",
-                        "description": "Label for \"Applicant\" radio option",
+                        "defaultMessage": "Informant",
+                        "description": "Label for \"Informant\" radio option",
                         "id": "form.field.label.app.whoContDet.app"
                       },
                       "conditionals": [
@@ -494,7 +494,7 @@
                       "conditionals": [
                         {
                           "action": "hide",
-                          "expression": "(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration === \"OTHER\" && draftData.registration.applicant.value === \"LEGAL_GUARDIAN\")"
+                          "expression": "(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration === \"OTHER\" && draftData.registration.informant.value === \"LEGAL_GUARDIAN\")"
                         }
                       ]
                     },
@@ -508,7 +508,7 @@
                       "conditionals": [
                         {
                           "action": "hide",
-                          "expression": "(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration === \"OTHER\" && draftData.registration.applicant.value === \"LEGAL_GUARDIAN\")"
+                          "expression": "(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration === \"OTHER\" && draftData.registration.informant.value === \"LEGAL_GUARDIAN\")"
                         }
                       ]
                     },
@@ -522,7 +522,7 @@
                     }
                   ],
                   "nestedFields": {
-                    "APPLICANT": [
+                    "INFORMANT": [
                       {
                         "name": "registrationPhone",
                         "type": "TEL",
@@ -660,7 +660,7 @@
                         "type": "TEXT",
                         "label": {
                           "defaultMessage": "Relationship to child",
-                          "id": "form.field.label.applicantsRelationWithChild",
+                          "id": "form.field.label.informantsRelationWithChild",
                           "description": "Label for input Relationship to child"
                         },
                         "placeholder": {
@@ -2097,14 +2097,14 @@
           "id": "informant",
           "viewType": "form",
           "name": {
-            "defaultMessage": "Applicant",
-            "description": "Form section name for Applicant",
-            "id": "form.section.applicant.name"
+            "defaultMessage": "Informant",
+            "description": "Form section name for Informant",
+            "id": "form.section.informant.name"
           },
           "title": {
-            "defaultMessage": "What are the applicant's details?",
-            "description": "Form section title for applicants",
-            "id": "form.section.applicant.title"
+            "defaultMessage": "What are the informant's details?",
+            "description": "Form section title for informants",
+            "id": "form.section.informant.title"
           },
           "hasDocumentSection": true,
           "groups": [
@@ -2118,12 +2118,12 @@
               ],
               "fields": [
                 {
-                  "name": "applicantBirthDate",
+                  "name": "informantBirthDate",
                   "type": "DATE",
                   "label": {
                     "defaultMessage": "Date of Birth",
                     "description": "Label for form field: Date of birth",
-                    "id": "form.field.label.applicantsDateOfBirth"
+                    "id": "form.field.label.informantsDateOfBirth"
                   },
                   "required": false,
                   "initialValue": "",
@@ -2164,7 +2164,7 @@
                   "label": {
                     "defaultMessage": "Type of ID",
                     "description": "Label for form field: Existing ID",
-                    "id": "form.field.label.applicantsIdType"
+                    "id": "form.field.label.informantsIdType"
                   },
                   "required": true,
                   "initialValue": "",
@@ -2216,7 +2216,7 @@
                   }
                 },
                 {
-                  "name": "applicantID",
+                  "name": "informantID",
                   "type": "FIELD_WITH_DYNAMIC_DEFINITIONS",
                   "dynamicDefinitions": {
                     "label": {
@@ -2308,7 +2308,7 @@
                       "inputs": [
                         {
                           "name": "identifier",
-                          "valueField": "applicantID"
+                          "valueField": "informantID"
                         }
                       ],
                       "responseTransformer": {
@@ -2332,11 +2332,11 @@
                       "inputs": [
                         {
                           "name": "dob",
-                          "valueField": "applicantBirthDate"
+                          "valueField": "informantBirthDate"
                         },
                         {
                           "name": "nid",
-                          "valueField": "applicantID"
+                          "valueField": "informantID"
                         },
                         {
                           "name": "country",
@@ -2376,7 +2376,7 @@
                     },
                     {
                       "action": "disable",
-                      "expression": "(!values.applicantBirthDate)"
+                      "expression": "(!values.informantBirthDate)"
                     }
                   ],
                   "modalTitle": {
@@ -2401,7 +2401,7 @@
                   "label": {
                     "defaultMessage": "Nationality",
                     "description": "Label for form field: Nationality",
-                    "id": "form.field.label.applicants.nationality"
+                    "id": "form.field.label.informants.nationality"
                   },
                   "required": false,
                   "initialValue": "BGD",
@@ -2436,13 +2436,13 @@
                   }
                 },
                 {
-                  "name": "applicantFirstNames",
-                  "previewGroup": "applicantNameInBengali",
+                  "name": "informantFirstNames",
+                  "previewGroup": "informantNameInBengali",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "নামের প্রথমাংশ বাংলায়",
                     "description": "Label for form field: Given names",
-                    "id": "form.field.label.applicantsGivenNames"
+                    "id": "form.field.label.informantsGivenNames"
                   },
                   "required": false,
                   "initialValue": "",
@@ -2476,13 +2476,13 @@
                   }
                 },
                 {
-                  "name": "applicantFamilyName",
-                  "previewGroup": "applicantNameInBengali",
+                  "name": "informantFamilyName",
+                  "previewGroup": "informantNameInBengali",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "নামের শেষাংশ বাংলায়",
                     "description": "Label for form field: Family name",
-                    "id": "form.field.label.applicantsFamilyName"
+                    "id": "form.field.label.informantsFamilyName"
                   },
                   "required": true,
                   "initialValue": "",
@@ -2516,13 +2516,13 @@
                   }
                 },
                 {
-                  "name": "applicantFirstNamesEng",
-                  "previewGroup": "applicantNameInEnglish",
+                  "name": "informantFirstNamesEng",
+                  "previewGroup": "informantNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First Name(s) in English",
                     "description": "Label for form field: Given names in english",
-                    "id": "form.field.label.applicantsGivenNamesEng"
+                    "id": "form.field.label.informantsGivenNamesEng"
                   },
                   "required": false,
                   "initialValue": "",
@@ -2556,13 +2556,13 @@
                   }
                 },
                 {
-                  "name": "applicantFamilyNameEng",
-                  "previewGroup": "applicantNameInEnglish",
+                  "name": "informantFamilyNameEng",
+                  "previewGroup": "informantNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last Name(s) in English",
                     "description": "Label for form field: Family name in english",
-                    "id": "form.field.label.applicantsFamilyNameEng"
+                    "id": "form.field.label.informantsFamilyNameEng"
                   },
                   "required": true,
                   "initialValue": "",
@@ -4661,23 +4661,23 @@
                   "fieldToRedirect": "country"
                 },
                 {
-                  "id": "applicantNameInBengali",
+                  "id": "informantNameInBengali",
                   "label": {
-                    "defaultMessage": "Applicant's Bengali name",
-                    "description": "Label for applicant's name in bengali",
-                    "id": "form.preview.group.label.applicant.bengali.name"
+                    "defaultMessage": "Informant's Bengali name",
+                    "description": "Label for informant's name in bengali",
+                    "id": "form.preview.group.label.informant.bengali.name"
                   },
-                  "fieldToRedirect": "applicantFamilyName",
+                  "fieldToRedirect": "informantFamilyName",
                   "delimiter": " "
                 },
                 {
-                  "id": "applicantNameInEnglish",
+                  "id": "informantNameInEnglish",
                   "label": {
-                    "defaultMessage": "Applicant's English name",
-                    "description": "Label for applicant's name in english",
-                    "id": "form.preview.group.label.applicant.english.name"
+                    "defaultMessage": "Informant's English name",
+                    "description": "Label for informant's name in english",
+                    "id": "form.preview.group.label.informant.english.name"
                   },
-                  "fieldToRedirect": "applicantFamilyNameEng",
+                  "fieldToRedirect": "informantFamilyNameEng",
                   "delimiter": " "
                 }
               ]
@@ -5055,14 +5055,14 @@
                       "conditionals": [
                         {
                           "action": "hide",
-                          "expression": "(draftData && draftData.registration && draftData.registration.applicant && draftData.registration.applicant.value === \"LEGAL_GUARDIAN\")"
+                          "expression": "(draftData && draftData.registration && draftData.registration.informant && draftData.registration.informant.value === \"LEGAL_GUARDIAN\")"
                         }
                       ]
                     },
                     {
                       "value": "INFORMANT",
                       "label": {
-                        "defaultMessage": "Applicant is the primary caregiver",
+                        "defaultMessage": "Informant is the primary caregiver",
                         "description": "label for informant radio button",
                         "id": "form.field.label.caregiver.informant"
                       }
@@ -10221,15 +10221,15 @@
                   }
                 },
                 {
-                  "name": "uploadDocForApplicant",
+                  "name": "uploadDocForInformant",
                   "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                   "label": {
-                    "defaultMessage": "Proof of applicant's ID",
+                    "defaultMessage": "Proof of informant's ID",
                     "description": "Option for radio group field: Type of Document To Upload",
-                    "id": "form.field.label.applicantIDProof"
+                    "id": "form.field.label.informantIDProof"
                   },
                   "initialValue": "",
-                  "extraValue": "APPLICANT_ID_PROOF",
+                  "extraValue": "INFORMANT_ID_PROOF",
                   "hideAsterisk": true,
                   "validate": [],
                   "options": [
@@ -10647,8 +10647,8 @@
             {
               "id": "other-relationship-with-deceased",
               "title": {
-                "defaultMessage": "What is the applicant's relationship to the deceased?",
-                "description": "Form section title for primary applicant",
+                "defaultMessage": "What is the informant's relationship to the deceased?",
+                "description": "Form section title for primary informant",
                 "id": "register.selInf.deathInfSomeoneElse"
               },
               "conditionals": [
@@ -10664,8 +10664,8 @@
                   "name": "relationship",
                   "type": "RADIO_GROUP_WITH_NESTED_FIELDS",
                   "label": {
-                    "defaultMessage": "What is the applicant's relationship to the deceased?",
-                    "description": "Form section title for primary applicant",
+                    "defaultMessage": "What is the informant's relationship to the deceased?",
+                    "description": "Form section title for primary informant",
                     "id": "register.selInf.deathInfSomeoneElse"
                   },
                   "hideHeader": true,
@@ -10679,7 +10679,7 @@
                       "label": {
                         "defaultMessage": "Head of the institution where the death occurred",
                         "description": "Option for form field: Head of the institute",
-                        "id": "form.field.label.applicantRelation.headInst"
+                        "id": "form.field.label.informantRelation.headInst"
                       }
                     },
                     {
@@ -10687,7 +10687,7 @@
                       "label": {
                         "defaultMessage": "Owner of the house or building where the death occurred",
                         "description": "Option for form field: Owner of the house",
-                        "id": "form.field.label.applicantRelation.owner"
+                        "id": "form.field.label.informantRelation.owner"
                       }
                     },
                     {
@@ -10695,7 +10695,7 @@
                       "label": {
                         "defaultMessage": "Driver or operator of the land or water vehicle or aircraft where the death occurred",
                         "description": "Option for form field: Driver of the vehicle",
-                        "id": "form.field.label.applicantRelation.driver"
+                        "id": "form.field.label.informantRelation.driver"
                       }
                     },
                     {
@@ -10703,7 +10703,7 @@
                       "label": {
                         "defaultMessage": "Officer-in-charge of the Thana of a road or public space where the death occurred",
                         "description": "Option for form field: Officer-in-charge",
-                        "id": "form.field.label.applicantRelation.officer"
+                        "id": "form.field.label.informantRelation.officer"
                       }
                     },
                     {
@@ -10800,10 +10800,10 @@
                   },
                   "options": [
                     {
-                      "value": "APPLICANT",
+                      "value": "INFORMANT",
                       "label": {
-                        "defaultMessage": "Applicant",
-                        "description": "Label for \"Applicant\" radio option",
+                        "defaultMessage": "Informant",
+                        "description": "Label for \"Informant\" radio option",
                         "id": "form.field.label.app.whoContDet.app"
                       }
                     },
@@ -10817,7 +10817,7 @@
                     }
                   ],
                   "nestedFields": {
-                    "APPLICANT": [
+                    "INFORMANT": [
                       {
                         "name": "registrationPhone",
                         "type": "TEL",
@@ -14936,14 +14936,14 @@
           "id": "informant",
           "viewType": "form",
           "name": {
-            "defaultMessage": "Applicant",
-            "description": "Form section name for Applicant",
-            "id": "form.section.applicant.name"
+            "defaultMessage": "Informant",
+            "description": "Form section name for Informant",
+            "id": "form.section.informant.name"
           },
           "title": {
-            "defaultMessage": "What are the applicant's details?",
-            "description": "Form section title for applicants",
-            "id": "form.section.applicant.title"
+            "defaultMessage": "What are the informant's details?",
+            "description": "Form section title for informants",
+            "id": "form.section.informant.title"
           },
           "hasDocumentSection": true,
           "groups": [
@@ -14951,12 +14951,12 @@
               "id": "informant-view-group",
               "fields": [
                 {
-                  "name": "applicantBirthDate",
+                  "name": "informantBirthDate",
                   "type": "DATE",
                   "label": {
                     "defaultMessage": "Date of Birth",
                     "description": "Label for form field: Date of birth",
-                    "id": "form.field.label.applicantsDateOfBirth"
+                    "id": "form.field.label.informantsDateOfBirth"
                   },
                   "required": false,
                   "initialValue": "",
@@ -14997,7 +14997,7 @@
                   "label": {
                     "defaultMessage": "Type of ID",
                     "description": "Label for form field: Existing ID",
-                    "id": "form.field.label.applicantsIdType"
+                    "id": "form.field.label.informantsIdType"
                   },
                   "required": true,
                   "initialValue": "",
@@ -15049,7 +15049,7 @@
                   }
                 },
                 {
-                  "name": "applicantID",
+                  "name": "informantID",
                   "type": "FIELD_WITH_DYNAMIC_DEFINITIONS",
                   "dynamicDefinitions": {
                     "label": {
@@ -15141,7 +15141,7 @@
                       "inputs": [
                         {
                           "name": "identifier",
-                          "valueField": "applicantID"
+                          "valueField": "informantID"
                         }
                       ],
                       "responseTransformer": {
@@ -15165,11 +15165,11 @@
                       "inputs": [
                         {
                           "name": "dob",
-                          "valueField": "applicantBirthDate"
+                          "valueField": "informantBirthDate"
                         },
                         {
                           "name": "nid",
-                          "valueField": "applicantID"
+                          "valueField": "informantID"
                         },
                         {
                           "name": "country",
@@ -15209,7 +15209,7 @@
                     },
                     {
                       "action": "disable",
-                      "expression": "(!values.applicantBirthDate)"
+                      "expression": "(!values.informantBirthDate)"
                     }
                   ],
                   "modalTitle": {
@@ -15234,7 +15234,7 @@
                   "label": {
                     "defaultMessage": "Nationality",
                     "description": "Label for form field: Nationality",
-                    "id": "form.field.label.applicants.nationality"
+                    "id": "form.field.label.informants.nationality"
                   },
                   "required": false,
                   "initialValue": "BGD",
@@ -15269,13 +15269,13 @@
                   }
                 },
                 {
-                  "name": "applicantFirstNames",
-                  "previewGroup": "applicantNameInBengali",
+                  "name": "informantFirstNames",
+                  "previewGroup": "informantNameInBengali",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "নামের প্রথমাংশ বাংলায়",
                     "description": "Label for form field: Given names",
-                    "id": "form.field.label.applicantsGivenNames"
+                    "id": "form.field.label.informantsGivenNames"
                   },
                   "required": false,
                   "initialValue": "",
@@ -15309,13 +15309,13 @@
                   }
                 },
                 {
-                  "name": "applicantFamilyName",
-                  "previewGroup": "applicantNameInBengali",
+                  "name": "informantFamilyName",
+                  "previewGroup": "informantNameInBengali",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "নামের শেষাংশ বাংলায়",
                     "description": "Label for form field: Family name",
-                    "id": "form.field.label.applicantsFamilyName"
+                    "id": "form.field.label.informantsFamilyName"
                   },
                   "required": true,
                   "initialValue": "",
@@ -15349,13 +15349,13 @@
                   }
                 },
                 {
-                  "name": "applicantFirstNamesEng",
-                  "previewGroup": "applicantNameInEnglish",
+                  "name": "informantFirstNamesEng",
+                  "previewGroup": "informantNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First Name(s) in English",
                     "description": "Label for form field: Given names in english",
-                    "id": "form.field.label.applicantsGivenNamesEng"
+                    "id": "form.field.label.informantsGivenNamesEng"
                   },
                   "required": false,
                   "initialValue": "",
@@ -15389,13 +15389,13 @@
                   }
                 },
                 {
-                  "name": "applicantFamilyNameEng",
-                  "previewGroup": "applicantNameInEnglish",
+                  "name": "informantFamilyNameEng",
+                  "previewGroup": "informantNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last Name(s) in English",
                     "description": "Label for form field: Family name in english",
-                    "id": "form.field.label.applicantsFamilyNameEng"
+                    "id": "form.field.label.informantsFamilyNameEng"
                   },
                   "required": true,
                   "initialValue": "",
@@ -15434,7 +15434,7 @@
                   "label": {
                     "defaultMessage": "Relationship to Deceased",
                     "description": "Label for Relationship to Deceased select",
-                    "id": "form.field.label.applicantsRelationWithDeceased"
+                    "id": "form.field.label.informantsRelationWithDeceased"
                   },
                   "required": true,
                   "initialValue": "",
@@ -15474,7 +15474,7 @@
                       "label": {
                         "defaultMessage": "Father",
                         "description": "Label for option Father",
-                        "id": "form.field.label.applicantRelation.father"
+                        "id": "form.field.label.informantRelation.father"
                       }
                     },
                     {
@@ -15482,7 +15482,7 @@
                       "label": {
                         "defaultMessage": "Mother",
                         "description": "Label for option Mother",
-                        "id": "form.field.label.applicantRelation.mother"
+                        "id": "form.field.label.informantRelation.mother"
                       }
                     },
                     {
@@ -15490,7 +15490,7 @@
                       "label": {
                         "defaultMessage": "Spouse",
                         "description": "Label for option Spouse",
-                        "id": "form.field.label.applicantRelation.spouse"
+                        "id": "form.field.label.informantRelation.spouse"
                       }
                     },
                     {
@@ -15498,7 +15498,7 @@
                       "label": {
                         "defaultMessage": "Son",
                         "description": "Label for option Son",
-                        "id": "form.field.label.applicantRelation.son"
+                        "id": "form.field.label.informantRelation.son"
                       }
                     },
                     {
@@ -15506,7 +15506,7 @@
                       "label": {
                         "defaultMessage": "Daughter",
                         "description": "Label for option Daughter",
-                        "id": "form.field.label.applicantRelation.daughter"
+                        "id": "form.field.label.informantRelation.daughter"
                       }
                     },
                     {
@@ -15514,7 +15514,7 @@
                       "label": {
                         "defaultMessage": "Son in law",
                         "description": "Label for option Son in law",
-                        "id": "form.field.label.applicantRelation.sonInLaw"
+                        "id": "form.field.label.informantRelation.sonInLaw"
                       }
                     },
                     {
@@ -15522,7 +15522,7 @@
                       "label": {
                         "defaultMessage": "Daughter in law",
                         "description": "Label for option Daughter in law",
-                        "id": "form.field.label.applicantRelation.daughterInLaw"
+                        "id": "form.field.label.informantRelation.daughterInLaw"
                       }
                     },
                     {
@@ -15530,7 +15530,7 @@
                       "label": {
                         "defaultMessage": "Daughter",
                         "description": "Label for option Daughter",
-                        "id": "form.field.label.applicantRelation.daughter"
+                        "id": "form.field.label.informantRelation.daughter"
                       }
                     },
                     {
@@ -15538,7 +15538,7 @@
                       "label": {
                         "defaultMessage": "Grandson",
                         "description": "Label for option Grandson",
-                        "id": "form.field.label.applicantRelation.grandson"
+                        "id": "form.field.label.informantRelation.grandson"
                       }
                     },
                     {
@@ -15546,7 +15546,7 @@
                       "label": {
                         "defaultMessage": "Granddaughter",
                         "description": "Label for option Granddaughter",
-                        "id": "form.field.label.applicantRelation.granddaughter"
+                        "id": "form.field.label.informantRelation.granddaughter"
                       }
                     },
                     {
@@ -15554,7 +15554,7 @@
                       "label": {
                         "defaultMessage": "Other (Specify)",
                         "description": "Label for option Other",
-                        "id": "form.field.label.applicantRelation.other"
+                        "id": "form.field.label.informantRelation.other"
                       }
                     }
                   ],
@@ -15567,9 +15567,9 @@
                     },
                     "position": "before",
                     "labelAs": {
-                      "defaultMessage": "Applicant",
+                      "defaultMessage": "Informant",
                       "description": "Label for relation to deceased",
-                      "id": "form.field.label.applicant"
+                      "id": "form.field.label.informant"
                     },
                     "conditionals": [
                       {
@@ -16544,11 +16544,11 @@
                   }
                 },
                 {
-                  "name": "applicantPermanentAddressSameAsCurrent",
+                  "name": "informantPermanentAddressSameAsCurrent",
                   "type": "RADIO_GROUP",
                   "label": {
-                    "defaultMessage": "Is applicant’s permanent address the same as their current address?",
-                    "description": "Title for the radio button to select that the applicants current address is the same as their permanent address",
+                    "defaultMessage": "Is informant’s permanent address the same as their current address?",
+                    "description": "Title for the radio button to select that the informants current address is the same as their permanent address",
                     "id": "form.field.label.appCurrAddSameAsPerm"
                   },
                   "required": true,
@@ -16632,7 +16632,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "values.applicantPermanentAddressSameAsCurrent"
+                      "expression": "values.informantPermanentAddressSameAsCurrent"
                     }
                   ],
                   "mapping": {
@@ -16691,7 +16691,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.applicantPermanentAddressSameAsCurrent"
+                      "expression": "values.informantPermanentAddressSameAsCurrent"
                     }
                   ],
                   "mapping": {
@@ -16754,7 +16754,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.applicantPermanentAddressSameAsCurrent"
+                      "expression": "values.informantPermanentAddressSameAsCurrent"
                     }
                   ],
                   "mapping": {
@@ -16821,7 +16821,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.applicantPermanentAddressSameAsCurrent"
+                      "expression": "values.informantPermanentAddressSameAsCurrent"
                     }
                   ],
                   "mapping": {
@@ -16892,7 +16892,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.applicantPermanentAddressSameAsCurrent"
+                      "expression": "values.informantPermanentAddressSameAsCurrent"
                     }
                   ],
                   "mapping": {
@@ -17008,7 +17008,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.applicantPermanentAddressSameAsCurrent"
+                      "expression": "values.informantPermanentAddressSameAsCurrent"
                     }
                   ],
                   "mapping": {
@@ -17190,7 +17190,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.applicantPermanentAddressSameAsCurrent"
+                      "expression": "values.informantPermanentAddressSameAsCurrent"
                     }
                   ],
                   "mapping": {
@@ -17256,7 +17256,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.applicantPermanentAddressSameAsCurrent"
+                      "expression": "values.informantPermanentAddressSameAsCurrent"
                     }
                   ],
                   "mapping": {
@@ -17302,7 +17302,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.applicantPermanentAddressSameAsCurrent"
+                      "expression": "values.informantPermanentAddressSameAsCurrent"
                     }
                   ],
                   "mapping": {
@@ -17348,7 +17348,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.applicantPermanentAddressSameAsCurrent"
+                      "expression": "values.informantPermanentAddressSameAsCurrent"
                     }
                   ],
                   "mapping": {
@@ -17394,7 +17394,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.applicantPermanentAddressSameAsCurrent"
+                      "expression": "values.informantPermanentAddressSameAsCurrent"
                     }
                   ],
                   "mapping": {
@@ -17440,7 +17440,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.applicantPermanentAddressSameAsCurrent"
+                      "expression": "values.informantPermanentAddressSameAsCurrent"
                     }
                   ],
                   "mapping": {
@@ -17486,7 +17486,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.applicantPermanentAddressSameAsCurrent"
+                      "expression": "values.informantPermanentAddressSameAsCurrent"
                     }
                   ],
                   "mapping": {
@@ -17532,7 +17532,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.applicantPermanentAddressSameAsCurrent"
+                      "expression": "values.informantPermanentAddressSameAsCurrent"
                     }
                   ],
                   "mapping": {
@@ -17578,7 +17578,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.applicantPermanentAddressSameAsCurrent"
+                      "expression": "values.informantPermanentAddressSameAsCurrent"
                     }
                   ],
                   "mapping": {
@@ -17626,23 +17626,23 @@
                   "fieldToRedirect": "country"
                 },
                 {
-                  "id": "applicantNameInBengali",
+                  "id": "informantNameInBengali",
                   "label": {
-                    "defaultMessage": "Applicant's Bengali name",
-                    "description": "Label for applicant's name in bengali",
-                    "id": "form.preview.group.label.applicant.bengali.name"
+                    "defaultMessage": "Informant's Bengali name",
+                    "description": "Label for informant's name in bengali",
+                    "id": "form.preview.group.label.informant.bengali.name"
                   },
-                  "fieldToRedirect": "applicantFamilyName",
+                  "fieldToRedirect": "informantFamilyName",
                   "delimiter": " "
                 },
                 {
-                  "id": "applicantNameInEnglish",
+                  "id": "informantNameInEnglish",
                   "label": {
-                    "defaultMessage": "Applicant's English name",
-                    "description": "Label for applicant's name in english",
-                    "id": "form.preview.group.label.applicant.english.name"
+                    "defaultMessage": "Informant's English name",
+                    "description": "Label for informant's name in english",
+                    "id": "form.preview.group.label.informant.english.name"
                   },
-                  "fieldToRedirect": "applicantFamilyNameEng",
+                  "fieldToRedirect": "informantFamilyNameEng",
                   "delimiter": " "
                 }
               ]
@@ -18298,15 +18298,15 @@
                   }
                 },
                 {
-                  "name": "uploadDocForApplicant",
+                  "name": "uploadDocForInformant",
                   "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                   "label": {
-                    "defaultMessage": "Proof of applicant's ID",
+                    "defaultMessage": "Proof of informant's ID",
                     "description": "Option for radio group field: Type of Document To Upload",
-                    "id": "form.field.label.applicantIDProof"
+                    "id": "form.field.label.informantIDProof"
                   },
                   "initialValue": "",
-                  "extraValue": "APPLICANT_ID_PROOF",
+                  "extraValue": "INFORMANT_ID_PROOF",
                   "hideAsterisk": true,
                   "validate": [],
                   "options": [
@@ -18353,15 +18353,15 @@
                   }
                 },
                 {
-                  "name": "uploadDocForApplicantAthorityToApply",
+                  "name": "uploadDocForInformantAthorityToApply",
                   "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                   "label": {
-                    "defaultMessage": "Proof of applicant's authority to apply",
+                    "defaultMessage": "Proof of informant's authority to apply",
                     "description": "Option for radio group field: Type of Document To Upload",
-                    "id": "form.field.label.applicantAthorityToApplyProof"
+                    "id": "form.field.label.informantAthorityToApplyProof"
                   },
                   "initialValue": "",
-                  "extraValue": "APPLICANT_ATHORITY_TO_APPLY_PROOF",
+                  "extraValue": "INFORMANT_ATHORITY_TO_APPLY_PROOF",
                   "hideAsterisk": true,
                   "validate": [],
                   "options": [
@@ -18631,18 +18631,18 @@
       "informant": {
         "identifierTypeField": "iDType",
         "identifierOtherTypeField": "iDTypeOther",
-        "identifierField": "applicantID",
+        "identifierField": "informantID",
         "nameFields": {
           "en": {
-            "firstNamesField": "applicantFirstNamesEng",
-            "familyNameField": "applicantFamilyNameEng"
+            "firstNamesField": "informantFirstNamesEng",
+            "familyNameField": "informantFamilyNameEng"
           },
           "bn": {
-            "firstNamesField": "applicantFirstNames",
-            "familyNameField": "applicantFamilyName"
+            "firstNamesField": "informantFirstNames",
+            "familyNameField": "informantFamilyName"
           }
         },
-        "birthDateField": "applicantBirthDate",
+        "birthDateField": "informantBirthDate",
         "nationalityField": "nationality"
       }
     }
