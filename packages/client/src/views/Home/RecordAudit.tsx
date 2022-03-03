@@ -18,9 +18,14 @@ import {
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
 import { Navigation } from '@client/components/interface/Navigation'
+import styled, { ITheme, withTheme } from '@client/styledComponents'
+import {
+  RotateLeft,
+  Archive,
+  ApplicationIcon,
+  Edit
+} from '@opencrvs/components/lib/icons'
 import { AvatarSmall } from '@client/components/Avatar'
-import styled from '@client/styledComponents'
-import { Archive, ApplicationIcon, Edit } from '@opencrvs/components/lib/icons'
 import { connect } from 'react-redux'
 import { RouteComponentProps, Redirect } from 'react-router'
 import {
@@ -37,6 +42,7 @@ import {
 } from 'react-intl'
 import {
   archiveDeclaration,
+  reinstateApplication,
   clearCorrectionChange,
   IApplication,
   SUBMISSION_STATUS,
@@ -99,6 +105,7 @@ import {
   IUserDetails
 } from '@client/utils/userUtils'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
+import NotificationToast from '@client/views/OfficeHome/NotificationToast'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -160,7 +167,6 @@ const NameAvatar = styled.span`
 const Heading = styled.h4`
   margin-bottom: 0px !important;
 `
-
 interface IStateProps {
   userDetails: IUserDetails | null
   language: string
@@ -174,12 +180,14 @@ interface IStateProps {
 
 interface IDispatchProps {
   archiveDeclaration: typeof archiveDeclaration
+  reinstateApplication: typeof reinstateApplication
   clearCorrectionChange: typeof clearCorrectionChange
   goToCertificateCorrection: typeof goToCertificateCorrection
   goToPage: typeof goToPage
   goToPrintCertificate: typeof goToPrintCertificate
   goToRegistrarHomeTab: typeof goToRegistrarHomeTab
 }
+
 export type IRecordAuditTabs = keyof IQueryData | 'search'
 
 type CMethodParams = {
@@ -246,6 +254,18 @@ const STATUSTOCOLOR: { [key: string]: string } = {
   WAITING_VALIDATION: 'teal'
 }
 
+const KEY_LABEL: ILabel = {
+  status: 'Status',
+  type: 'Event',
+  trackingId: 'Tracking ID',
+  dateOfBirth: 'Date of birth',
+  dateOfDeath: 'Date of death',
+  placeOfBirth: 'Place of birth',
+  placeOfDeath: 'Place of death',
+  informant: 'Informant',
+  brn: 'BRN',
+  drn: 'DRN'
+}
 const ARCHIVABLE_STATUSES = [DECLARED, VALIDATED, REJECTED]
 
 const APPLICATION_STATUS_LABEL: IStatus = {
@@ -832,6 +852,7 @@ const getHistory = ({ intl, draft }: CMethodParams) => {
 
 function RecordAuditBody({
   archiveDeclaration,
+  reinstateApplication,
   clearCorrectionChange,
   declaration,
   draft,
@@ -901,6 +922,25 @@ function RecordAuditBody({
     )
   }
 
+  if (
+    isDownloaded &&
+    (userHasValidateScope || userHasRegisterScope) &&
+    declaration.status &&
+    ARCHIVED.includes(declaration.status)
+  ) {
+    actions.push(
+      <StyledTertiaryButton
+        align={ICON_ALIGNMENT.LEFT}
+        id="reinstate_button"
+        key="reinstate_button"
+        icon={() => <RotateLeft />}
+        onClick={toggleDisplayDialog}
+      >
+        {intl.formatMessage(buttonMessages.reinstate)}
+      </StyledTertiaryButton>
+    )
+  }
+
   if (!isDownloaded) {
     actions.push(showDownloadButton(declaration, draft, userDetails))
   }
@@ -957,29 +997,51 @@ function RecordAuditBody({
         {getDeclarationInfo(declaration, isDownloaded, intl)}
         {getHistory({ declaration, intl, draft, userDetails })}
       </Content>
+
       <ResponsiveModal
-        title={intl.formatMessage(recordAuditMessages.confirmationTitle)}
+        title={
+          declaration.status && ARCHIVED.includes(declaration.status)
+            ? intl.formatMessage(
+                recordAuditMessages.reinstateDeclarationDialogTitle
+              )
+            : intl.formatMessage(recordAuditMessages.confirmationTitle)
+        }
         contentHeight={96}
         responsive={false}
         actions={[
           <TertiaryButton
-            id="archive_cancel"
-            key="archive_cancel"
+            id="cancel-btn"
+            key="cancel"
             onClick={toggleDisplayDialog}
           >
             {intl.formatMessage(buttonMessages.cancel)}
           </TertiaryButton>,
-          <DangerButton
-            id="archive_confirm"
-            key="archive_confirm"
-            onClick={() => {
-              archiveDeclaration(declaration.id)
-              toggleDisplayDialog()
-              goToRegistrarHomeTab('review')
-            }}
-          >
-            {intl.formatMessage(buttonMessages.archive)}
-          </DangerButton>
+          declaration.status && ARCHIVED.includes(declaration.status) ? (
+            <PrimaryButton
+              id="continue"
+              key="continue"
+              onClick={() => {
+                reinstateApplication(declaration.id)
+                toggleDisplayDialog()
+              }}
+            >
+              {intl.formatMessage(
+                recordAuditMessages.reinstateDeclarationDialogConfirm
+              )}
+            </PrimaryButton>
+          ) : (
+            <DangerButton
+              id="archive_confirm"
+              key="archive_confirm"
+              onClick={() => {
+                archiveDeclaration(declaration.id)
+                toggleDisplayDialog()
+                goToRegistrarHomeTab('review')
+              }}
+            >
+              {intl.formatMessage(buttonMessages.archive)}
+            </DangerButton>
+          )
         ]}
         show={showDialog}
         handleClose={toggleDisplayDialog}
@@ -1036,6 +1098,7 @@ function getBodyContent({
       </>
     )
   }
+
   const declaration = draft
     ? getDraftDeclarationData(draft, resources, intl)
     : getWQDeclarationData(
@@ -1060,6 +1123,7 @@ const RecordAuditComp = (props: IFullProps) => {
       <Header />
       <Navigation deselectAllTabs={true} />
       <BodyContainer>{getBodyContent(props)}</BodyContainer>
+      <NotificationToast />
     </>
   )
 }
@@ -1095,6 +1159,7 @@ export const RecordAudit = connect<
   IStoreState
 >(mapStateToProps, {
   archiveDeclaration,
+  reinstateApplication,
   clearCorrectionChange,
   goToCertificateCorrection,
   goToPage,

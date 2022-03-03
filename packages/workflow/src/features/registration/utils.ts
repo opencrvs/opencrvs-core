@@ -209,6 +209,10 @@ function getTaskBusinessStatus(taskResource: fhir.Task) {
   return taskResource.businessStatus?.coding?.[0]?.code
 }
 
+export function isRejectedTask(taskResource: fhir.Task) {
+  return getTaskBusinessStatus(taskResource) === 'REJECTED'
+}
+
 export function isArchiveTask(taskResource: fhir.Task) {
   return getTaskBusinessStatus(taskResource) === 'ARCHIVED'
 }

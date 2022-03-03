@@ -8,8 +8,8 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 enum RegStatus {
-  ARCHIVED
   IN_PROGRESS
+  ARCHIVED
   DECLARED
   DECLARATION_UPDATED
   WAITING_VALIDATION
@@ -511,6 +511,11 @@ type CreatedIds {
   registrationNumber: String
 }
 
+type Reinstated {
+  taskEntryResourceID: ID!
+  registrationStatus: RegStatus
+}
+
 type Query {
   fetchBirthRegistration(id: ID!): BirthRegistration
   searchBirthRegistrations(fromDate: Date, toDate: Date): [BirthRegistration]
@@ -556,6 +561,7 @@ type Mutation {
     details: BirthRegistrationInput!
   ): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID! # updated status to 'voided' - the registration was captured in error
+  markEventAsReinstated(id: String!): Reinstated # updates status to 'reinstated'
   markEventAsArchived(id: String!): ID! # updates status to 'archived'
   notADuplicate(id: String!, duplicateId: String!): ID! # removes duplicates from composition
   # DEATH

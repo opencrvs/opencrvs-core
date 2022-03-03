@@ -45,6 +45,7 @@ const ALLOWED_STATUS_FOR_RETRY = [
   SUBMISSION_STATUS.READY_TO_REJECT.toString(),
   SUBMISSION_STATUS.READY_TO_ARCHIVE.toString(),
   SUBMISSION_STATUS.READY_TO_CERTIFY.toString(),
+  SUBMISSION_STATUS.READY_TO_REINSTATE.toString(),
   SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION.toString(),
   SUBMISSION_STATUS.FAILED_NETWORK.toString()
 ]
@@ -54,6 +55,7 @@ const INPROGRESS_STATUS = [
   SUBMISSION_STATUS.REGISTERING.toString(),
   SUBMISSION_STATUS.REJECTING.toString(),
   SUBMISSION_STATUS.ARCHIVING.toString(),
+  SUBMISSION_STATUS.REINSTATING.toString(),
   SUBMISSION_STATUS.CERTIFYING.toString(),
   SUBMISSION_STATUS.REQUESTING_CORRECTION.toString()
 ]
@@ -64,6 +66,8 @@ const changeStatus = {
     SUBMISSION_STATUS.READY_TO_REGISTER,
   [SUBMISSION_STATUS.REJECTING.toString()]: SUBMISSION_STATUS.READY_TO_REJECT,
   [SUBMISSION_STATUS.ARCHIVING.toString()]: SUBMISSION_STATUS.READY_TO_ARCHIVE,
+  [SUBMISSION_STATUS.REINSTATING.toString()]:
+    SUBMISSION_STATUS.READY_TO_REINSTATE,
   [SUBMISSION_STATUS.CERTIFYING.toString()]: SUBMISSION_STATUS.READY_TO_CERTIFY,
   [SUBMISSION_STATUS.REQUESTING_CORRECTION.toString()]:
     SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION
@@ -78,6 +82,9 @@ const ACTION_LIST: IActionList = {
   [Action.APPROVE_APPLICATION]: Action.APPROVE_APPLICATION,
   [Action.REGISTER_APPLICATION]: Action.REGISTER_APPLICATION,
   [Action.REJECT_APPLICATION]: Action.REJECT_APPLICATION,
+  [Action.ARCHIVE_APPLICATION]: Action.ARCHIVE_APPLICATION,
+  [Action.REINSTATE_APPLICATION]: Action.REINSTATE_APPLICATION,
+  [Action.COLLECT_CERTIFICATE]: Action.COLLECT_CERTIFICATE,
   [Action.ARCHIVE_DECLARATION]: Action.ARCHIVE_DECLARATION,
   [Action.COLLECT_CERTIFICATE]: Action.COLLECT_CERTIFICATE,
   [Action.REQUEST_CORRECTION_APPLICATION]: Action.REQUEST_CORRECTION_APPLICATION
@@ -87,7 +94,8 @@ const REQUEST_IN_PROGRESS_STATUS: IActionList = {
   [Action.APPROVE_APPLICATION]: SUBMISSION_STATUS.APPROVING,
   [Action.REGISTER_APPLICATION]: SUBMISSION_STATUS.REGISTERING,
   [Action.REJECT_APPLICATION]: SUBMISSION_STATUS.REJECTING,
-  [Action.ARCHIVE_DECLARATION]: SUBMISSION_STATUS.ARCHIVING,
+  [Action.ARCHIVE_APPLICATION]: SUBMISSION_STATUS.ARCHIVING,
+  [Action.REINSTATE_APPLICATION]: SUBMISSION_STATUS.REINSTATING,
   [Action.COLLECT_CERTIFICATE]: SUBMISSION_STATUS.CERTIFYING,
   [Action.REQUEST_CORRECTION_APPLICATION]:
     SUBMISSION_STATUS.REQUESTING_CORRECTION
@@ -98,6 +106,7 @@ const SUCCESS_SUBMISSION_STATUS: IActionList = {
   [Action.REGISTER_APPLICATION]: SUBMISSION_STATUS.REGISTERED,
   [Action.REJECT_APPLICATION]: SUBMISSION_STATUS.REJECTED,
   [Action.ARCHIVE_DECLARATION]: SUBMISSION_STATUS.ARCHIVED,
+  [Action.REINSTATE_APPLICATION]: SUBMISSION_STATUS.REINSTATED,
   [Action.COLLECT_CERTIFICATE]: SUBMISSION_STATUS.CERTIFIED,
   [Action.REQUEST_CORRECTION_APPLICATION]:
     SUBMISSION_STATUS.REQUESTED_CORRECTION
@@ -185,7 +194,6 @@ export class SubmissionController {
     }
 
     const applicationAction = ACTION_LIST[application.action || ''] || null
-
     const forms = getRegisterForm(this.store.getState())
 
     const result = getMutationMapping(
@@ -231,6 +239,12 @@ export class SubmissionController {
       SUCCESS_SUBMISSION_STATUS[application.action || ''] ||
       SUBMISSION_STATUS.SUBMITTED
     application.submissionStatus = submissionStatus
+
+    if (application.action === Action.REINSTATE_APPLICATION) {
+      application.submissionStatus = ''
+      application.registrationStatus =
+        result.data.markEventAsReinstated.registrationStatus
+    }
     const response =
       (result && result.data && result.data.createBirthRegistration) ||
       (result && result.data && result.data.createDeathRegistration) ||
@@ -258,7 +272,10 @@ export class SubmissionController {
       }
       application.operationHistories.push(taskHistory)
     }
-    await this.store.dispatch(updateRegistrarWorkqueue())
+    //It needs some times to elasticSearch to update index
+    setTimeout(async () => {
+      await this.store.dispatch(updateRegistrarWorkqueue())
+    }, 100)
     await this.store.dispatch(modifyApplication(application))
 
     if (
@@ -267,6 +284,7 @@ export class SubmissionController {
       application.submissionStatus === SUBMISSION_STATUS.REGISTERED ||
       application.submissionStatus === SUBMISSION_STATUS.REJECTED ||
       application.submissionStatus === SUBMISSION_STATUS.ARCHIVED ||
+      application.submissionStatus === SUBMISSION_STATUS.REINSTATED ||
       application.submissionStatus === SUBMISSION_STATUS.REQUESTED_CORRECTION
     ) {
       if (scopes.includes('declare')) {
