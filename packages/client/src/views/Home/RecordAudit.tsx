@@ -876,7 +876,8 @@ function RecordAuditBody({
   goToRegistrarHomeTab,
   scope,
   userDetails,
-  goToUserProfile
+  goToUserProfile,
+  goToTeamUserList
 }: {
   declaration: IDeclarationData
   draft: IApplication | null
