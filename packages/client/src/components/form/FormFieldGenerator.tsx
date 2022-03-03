@@ -13,7 +13,6 @@ import * as React from 'react'
 import {
   CheckboxGroup,
   DateField,
-  PDFViewer,
   RadioGroup,
   Select,
   TextArea,
@@ -67,7 +66,6 @@ import {
   NUMBER,
   BIG_NUMBER,
   PARAGRAPH,
-  PDF_DOCUMENT_VIEWER,
   DYNAMIC_LIST,
   IDynamicListFormField,
   IListFormField,
@@ -498,15 +496,6 @@ function GeneratedInputField({
     )
   }
 
-  if (fieldDefinition.type === PDF_DOCUMENT_VIEWER) {
-    return (
-      <PDFViewer
-        id={fieldDefinition.name}
-        pdfSource={fieldDefinition.initialValue as string}
-      />
-    )
-  }
-
   if (fieldDefinition.type === LOCATION_SEARCH_INPUT) {
     const selectedLocation = fieldDefinition.locationList.find(
       (location) => location.id === value
@@ -931,7 +920,6 @@ class FormSectionComponent extends React.Component<Props> {
                 }
               : field
           if (
-            field.type === PDF_DOCUMENT_VIEWER ||
             field.type === FETCH_BUTTON ||
             field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
             field.type === SELECT_WITH_DYNAMIC_OPTIONS
