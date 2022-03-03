@@ -272,7 +272,10 @@ export class SubmissionController {
       }
       application.operationHistories.push(taskHistory)
     }
-    await this.store.dispatch(updateRegistrarWorkqueue())
+    //It needs some times to elasticSearch to update index
+    setTimeout(async () => {
+      await this.store.dispatch(updateRegistrarWorkqueue())
+    }, 100)
     await this.store.dispatch(modifyApplication(application))
 
     if (
