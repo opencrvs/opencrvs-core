@@ -20,14 +20,16 @@ import {
   REGISTER_BIRTH_APPLICATION,
   REJECT_BIRTH_APPLICATION,
   COLLECT_BIRTH_CERTIFICATE,
-  ARCHIVE_BIRTH_DECLARATION
+  ARCHIVE_BIRTH_DECLARATION,
+  REINSTATE_BIRTH_APPLICATION
 } from '@client/views/DataProvider/birth/mutations'
 import {
   ARCHIVE_DEATH_DECLARATION,
   APPROVE_DEATH_APPLICATION,
   COLLECT_DEATH_CERTIFICATE,
   REGISTER_DEATH_APPLICATION,
-  REJECT_DEATH_APPLICATION
+  REJECT_DEATH_APPLICATION,
+  REINSTATE_DEATH_APPLICATION
 } from '@client/views/DataProvider/death/mutations'
 import { ApolloError } from 'apollo-client'
 import { flushPromises } from './tests/util'
@@ -44,6 +46,13 @@ describe('Submission Controller', () => {
     new SubmissionController(store).start()
     expect(setInterval).toBeCalled()
     window.setInterval = originalInterval
+    // @ts-ignore
+    window.setTimeout = (fn: (...args: any[]) => void, duration: number) => {
+      return new Promise((resolve) => {
+        fn()
+        resolve(0)
+      })
+    }
   })
 
   it('does nothing if sync is already running', async () => {
@@ -576,12 +585,112 @@ describe('Submission Controller', () => {
     subCon.client.setRequestHandler(ARCHIVE_BIRTH_DECLARATION, mutationHandler)
 
     await subCon.sync()
-
+    await new Promise((resolve) => {
+      setTimeout(resolve, 500)
+    })
     expect(mutationHandler).toHaveBeenCalledTimes(1)
     expect(store.dispatch).toHaveBeenCalledTimes(5)
     expect(
       store.dispatch.mock.calls[0][0].payload.application.submissionStatus
     ).toBe(SUBMISSION_STATUS.ARCHIVED)
+  })
+
+  it('syncs all ready to reinstate birth applications', async () => {
+    const store = {
+      getState: () => ({
+        applicationsState: {
+          applications: [
+            {
+              event: 'birth',
+              submissionStatus: SUBMISSION_STATUS.READY_TO_REINSTATE,
+              action: Action.REINSTATE_APPLICATION
+            }
+          ]
+        },
+        registerForm: {
+          registerForm: {}
+        },
+        profile: {
+          tokenPayload: {
+            scope: []
+          }
+        }
+      }),
+      dispatch: jest.fn()
+    }
+
+    // @ts-ignore
+    const subCon = new SubmissionController(store)
+
+    subCon.client = createMockClient()
+    const mutationHandler = jest.fn().mockResolvedValue({
+      data: {
+        data: {
+          markEventAsReinstated: {
+            taskEntryResourceID: '12321fsfasf',
+            registrationStatus: 'DECLARED'
+          }
+        }
+      }
+    })
+    subCon.client.setRequestHandler(
+      REINSTATE_BIRTH_APPLICATION,
+      mutationHandler
+    )
+
+    await subCon.sync()
+
+    expect(mutationHandler).toHaveBeenCalledTimes(1)
+    expect(store.dispatch).toHaveBeenCalledTimes(4)
+  })
+
+  it('syncs all ready to reinstate death applications', async () => {
+    const store = {
+      getState: () => ({
+        applicationsState: {
+          applications: [
+            {
+              event: 'death',
+              submissionStatus: SUBMISSION_STATUS.READY_TO_REINSTATE,
+              action: Action.REINSTATE_APPLICATION
+            }
+          ]
+        },
+        registerForm: {
+          registerForm: {}
+        },
+        profile: {
+          tokenPayload: {
+            scope: []
+          }
+        }
+      }),
+      dispatch: jest.fn()
+    }
+
+    // @ts-ignore
+    const subCon = new SubmissionController(store)
+    const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
+    subCon.client = createMockClient()
+    const mutationHandler = jest.fn().mockResolvedValue({
+      data: {
+        data: {
+          markEventAsReinstated: {
+            taskEntryResourceID: id,
+            registrationStatus: 'DECLARED'
+          }
+        }
+      }
+    })
+    subCon.client.setRequestHandler(
+      REINSTATE_BIRTH_APPLICATION,
+      mutationHandler
+    )
+
+    await subCon.sync()
+
+    expect(mutationHandler).toHaveBeenCalledTimes(1)
+    expect(store.dispatch).toHaveBeenCalledTimes(4)
   })
 
   it('syncs all ready to archive death applications', async () => {

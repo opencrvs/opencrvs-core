@@ -55,6 +55,7 @@ export interface GQLMutation {
   markBirthAsCertified: string
   requestBirthRegistrationCorrection: string
   markEventAsVoided: string
+  markEventAsReinstated?: GQLReinstated
   markEventAsArchived: string
   notADuplicate: string
   createDeathRegistration: GQLCreatedIds
@@ -342,6 +343,11 @@ export interface GQLBirthRegistrationInput {
   primaryCaregiver?: GQLPrimaryCaregiverInput
   createdAt?: GQLDate
   updatedAt?: GQLDate
+}
+
+export interface GQLReinstated {
+  taskEntryResourceID: string
+  registrationStatus?: GQLRegStatus
 }
 
 export interface GQLDeathRegistrationInput {
@@ -781,6 +787,19 @@ export interface GQLPrimaryCaregiverInput {
   parentDetailsType?: GQLParentDetailsType
 }
 
+export const enum GQLRegStatus {
+  IN_PROGRESS = 'IN_PROGRESS',
+  ARCHIVED = 'ARCHIVED',
+  DECLARED = 'DECLARED',
+  DECLARATION_UPDATED = 'DECLARATION_UPDATED',
+  WAITING_VALIDATION = 'WAITING_VALIDATION',
+  VALIDATED = 'VALIDATED',
+  REGISTERED = 'REGISTERED',
+  CERTIFIED = 'CERTIFIED',
+  REJECTED = 'REJECTED',
+  DOWNLOADED = 'DOWNLOADED'
+}
+
 export interface GQLMedicalPractitionerInput {
   name?: string
   qualification?: string
@@ -839,19 +858,6 @@ export const enum GQLParentDetailsType {
   MOTHER_ONLY = 'MOTHER_ONLY',
   FATHER_ONLY = 'FATHER_ONLY',
   NONE = 'NONE'
-}
-
-export const enum GQLRegStatus {
-  ARCHIVED = 'ARCHIVED',
-  IN_PROGRESS = 'IN_PROGRESS',
-  DECLARED = 'DECLARED',
-  DECLARATION_UPDATED = 'DECLARATION_UPDATED',
-  WAITING_VALIDATION = 'WAITING_VALIDATION',
-  VALIDATED = 'VALIDATED',
-  REGISTERED = 'REGISTERED',
-  CERTIFIED = 'CERTIFIED',
-  REJECTED = 'REJECTED',
-  DOWNLOADED = 'DOWNLOADED'
 }
 
 export const enum GQLIdentityIDType {
@@ -1233,6 +1239,7 @@ export interface GQLResolver {
   Role?: GQLRoleTypeResolver
   CertificateSVG?: GQLCertificateSVGTypeResolver
   CreatedIds?: GQLCreatedIdsTypeResolver
+  Reinstated?: GQLReinstatedTypeResolver
   Map?: GraphQLScalarType
   Registration?: GQLRegistrationTypeResolver
   RelatedPerson?: GQLRelatedPersonTypeResolver
@@ -1825,6 +1832,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markBirthAsCertified?: MutationToMarkBirthAsCertifiedResolver<TParent>
   requestBirthRegistrationCorrection?: MutationToRequestBirthRegistrationCorrectionResolver<TParent>
   markEventAsVoided?: MutationToMarkEventAsVoidedResolver<TParent>
+  markEventAsReinstated?: MutationToMarkEventAsReinstatedResolver<TParent>
   markEventAsArchived?: MutationToMarkEventAsArchivedResolver<TParent>
   notADuplicate?: MutationToNotADuplicateResolver<TParent>
   createDeathRegistration?: MutationToCreateDeathRegistrationResolver<TParent>
@@ -1997,6 +2005,21 @@ export interface MutationToMarkEventAsVoidedResolver<
   (
     parent: TParent,
     args: MutationToMarkEventAsVoidedArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToMarkEventAsReinstatedArgs {
+  id: string
+}
+export interface MutationToMarkEventAsReinstatedResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToMarkEventAsReinstatedArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -3300,6 +3323,25 @@ export interface CreatedIdsToTrackingIdResolver<TParent = any, TResult = any> {
 }
 
 export interface CreatedIdsToRegistrationNumberResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLReinstatedTypeResolver<TParent = any> {
+  taskEntryResourceID?: ReinstatedToTaskEntryResourceIDResolver<TParent>
+  registrationStatus?: ReinstatedToRegistrationStatusResolver<TParent>
+}
+
+export interface ReinstatedToTaskEntryResourceIDResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ReinstatedToRegistrationStatusResolver<
   TParent = any,
   TResult = any
 > {

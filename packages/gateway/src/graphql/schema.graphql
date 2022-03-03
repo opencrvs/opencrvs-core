@@ -145,6 +145,7 @@ type Mutation {
     details: BirthRegistrationInput!
   ): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID!
+  markEventAsReinstated(id: String!): Reinstated
   markEventAsArchived(id: String!): ID!
   notADuplicate(id: String!, duplicateId: String!): ID!
   createDeathRegistration(details: DeathRegistrationInput!): CreatedIds!
@@ -450,6 +451,11 @@ input BirthRegistrationInput {
   primaryCaregiver: PrimaryCaregiverInput
   createdAt: Date
   updatedAt: Date
+}
+
+type Reinstated {
+  taskEntryResourceID: ID!
+  registrationStatus: RegStatus
 }
 
 input DeathRegistrationInput {
@@ -878,6 +884,19 @@ input PrimaryCaregiverInput {
   parentDetailsType: ParentDetailsType
 }
 
+enum RegStatus {
+  IN_PROGRESS
+  ARCHIVED
+  DECLARED
+  DECLARATION_UPDATED
+  WAITING_VALIDATION
+  VALIDATED
+  REGISTERED
+  CERTIFIED
+  REJECTED
+  DOWNLOADED
+}
+
 input MedicalPractitionerInput {
   name: String
   qualification: String
@@ -936,19 +955,6 @@ enum ParentDetailsType {
   MOTHER_ONLY
   FATHER_ONLY
   NONE
-}
-
-enum RegStatus {
-  ARCHIVED
-  IN_PROGRESS
-  DECLARED
-  DECLARATION_UPDATED
-  WAITING_VALIDATION
-  VALIDATED
-  REGISTERED
-  CERTIFIED
-  REJECTED
-  DOWNLOADED
 }
 
 enum IdentityIDType {

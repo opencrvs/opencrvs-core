@@ -28,6 +28,9 @@ import {
   storeApplication,
   IApplication,
   SUBMISSION_STATUS,
+  getApplicationsOfCurrentUser,
+  IUserData,
+  modifyApplication,
   DOWNLOAD_STATUS
 } from '@client/applications'
 import { Event } from '@client/forms'
@@ -35,6 +38,9 @@ import { formatUrl } from '@client/navigation'
 import { DECLARATION_RECORD_AUDIT } from '@client/navigation/routes'
 import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
 import { checkAuth } from '@client/profile/profileActions'
+import { REINSTATE_BIRTH_APPLICATION } from '@client/views/DataProvider/birth/mutations'
+import { IUserDetails } from '@client/utils/userUtils'
+import { storage } from '@client/storage'
 import { FETCH_DECLARATION_SHORT_INFO } from './queries'
 import { waitForElement } from '@client/tests/wait-for-element'
 
@@ -277,7 +283,7 @@ describe('Record audit for a draft declaration', () => {
 
     component.update()
 
-    component.find('#archive_cancel').hostNodes().simulate('click')
+    component.find('#cancel-btn').hostNodes().simulate('click')
 
     component.update()
 
@@ -407,5 +413,60 @@ describe('Record audit summary for unsuccesful GQLQuery', () => {
 
   it('Redirect to home page', async () => {
     expect(window.location.href).not.toContain('/record-audit')
+  })
+})
+
+describe('Record audit for a reinstate declaration', () => {
+  let component: ReactWrapper<{}, {}>
+
+  beforeEach(async () => {
+    const { store, history } = createStore()
+
+    getItem.mockReturnValue(registerScopeToken)
+
+    store.dispatch(checkAuth({ '?token': registerScopeToken }))
+
+    await flushPromises()
+
+    declaration.submissionStatus = SUBMISSION_STATUS.ARCHIVED
+    declaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
+    store.dispatch(storeApplication(declaration))
+
+    component = await createTestComponent(
+      <RecordAudit
+        {...createRouterProps(
+          formatUrl(DECLARATION_RECORD_AUDIT, {
+            declarationId: declaration.id,
+            tab: 'reviewTab'
+          }),
+          { isNavigatedInsideApp: false },
+          {
+            matchParams: {
+              declarationId: declaration.id,
+              tab: 'reviewTab'
+            }
+          }
+        )}
+      />,
+      { store, history }
+    )
+  })
+
+  it('should show the reinstate button', async () => {
+    expect(component.exists('#reinstate_button')).toBeTruthy()
+  })
+
+  it('should show the confirmation modal when reinstate button is clicked', async () => {
+    component.find('#reinstate_button').hostNodes().simulate('click')
+    component.update()
+    expect(component.find('ResponsiveModal').prop('show')).toBeTruthy()
+  })
+
+  it('should close the confirmation modal when cancel button is clicked', async () => {
+    component.find('#reinstate_button').hostNodes().simulate('click')
+    component.update()
+    component.find('#cancel-btn').hostNodes().simulate('click')
+    component.update()
+    expect(component.find('ResponsiveModal').prop('show')).toBe(false)
   })
 })

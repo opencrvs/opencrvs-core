@@ -44,12 +44,14 @@ class Outbox extends React.Component<IFullProps, IState> {
     const { formatMessage } = this.props.intl
     const {
       statusWaitingToBeArchived,
+      statusWaitingToBeReinstated,
       statusWaitingToRegister,
       statusWaitingToValidate,
       statusArchiving,
       statusRegistering,
       statusWaitingToReject,
       statusRejecting,
+      statusReinstating,
       statusWaitingToSubmit,
       statusSubmitting,
       waitingToRetry,
@@ -106,6 +108,16 @@ class Outbox extends React.Component<IFullProps, IState> {
         iconId = `rejecting${index}`
         icon = () => <Spinner id={iconId} key={iconId} size={24} />
         statusText = formatMessage(statusRejecting)
+        break
+      case SUBMISSION_STATUS.READY_TO_REINSTATE:
+        iconId = `waiting${index}`
+        icon = () => <Spinner id={iconId} key={iconId} size={24} />
+        statusText = formatMessage(statusWaitingToBeReinstated)
+        break
+      case SUBMISSION_STATUS.REINSTATING:
+        iconId = `reinstating${index}`
+        icon = () => <Spinner id={iconId} key={iconId} size={24} />
+        statusText = formatMessage(statusReinstating)
         break
       case SUBMISSION_STATUS.READY_TO_ARCHIVE:
         iconId = `waiting${index}`

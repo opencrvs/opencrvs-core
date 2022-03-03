@@ -1023,6 +1023,273 @@ describe('Registration root resolvers', () => {
     })
   })
 
+  describe('markEventAsReinstated()', () => {
+    it('updates a task with WAITING_VALIDATION status', async () => {
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            id: 'dc4e9b8b-82fa-4868-a6d2-2fb49f795ec1',
+            meta: { lastUpdated: '2018-11-29T10:43:30.286+00:00' },
+            type: 'searchset',
+            total: 1,
+            link: [
+              {
+                relation: 'self',
+                url: 'http://localhost:3447/fhir/Task?focus=Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422'
+              }
+            ],
+            entry: [
+              {
+                fullUrl:
+                  'http://localhost:3447/fhir/Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc',
+                resource: {
+                  resourceType: 'Task',
+                  status: 'requested',
+                  code: {
+                    coding: [
+                      {
+                        system: 'http://opencrvs.org/specs/types',
+                        code: 'BIRTH'
+                      }
+                    ]
+                  },
+                  extension: [
+                    {
+                      url: 'http://opencrvs.org/specs/extension/contact-person',
+                      valueString: 'MOTHER'
+                    },
+                    {
+                      url: 'http://opencrvs.org/specs/extension/regLastUser',
+                      valueReference: { reference: 'DUMMY' }
+                    }
+                  ],
+                  lastModified: '2018-11-28T15:13:57.492Z',
+                  note: [
+                    {
+                      text: '',
+                      time: '2018-11-28T15:13:57.492Z',
+                      authorString: 'DUMMY'
+                    }
+                  ],
+                  focus: {
+                    reference:
+                      'Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422'
+                  },
+                  identifier: [
+                    {
+                      system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+                      value: 'B1mW7jA'
+                    }
+                  ],
+                  businessStatus: {
+                    coding: [
+                      {
+                        system: 'http://opencrvs.org/specs/reg-status',
+                        code: 'WAITING_VALIDATION'
+                      }
+                    ]
+                  },
+                  meta: {
+                    lastUpdated: '2018-11-29T10:40:08.913+00:00',
+                    versionId: 'aa8c1c4a-4680-497f-81f7-fde357fdb77d'
+                  },
+                  id: 'ba0412c6-5125-4447-bd32-fb5cf336ddbc'
+                }
+              }
+            ]
+          })
+        ],
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            id: 'dc4e9b8b-82fa-4868-a6d2-2fb49f795ec1',
+            meta: { lastUpdated: '2022-02-14T12:47:29.841+00:00' },
+            type: 'history',
+            total: 2,
+            link: [
+              { relation: 'self', url: 'http://localhost:3447/fhir/_history' }
+            ],
+            entry: [
+              {
+                fullUrl:
+                  'http://localhost:3447/fhir/Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc',
+                resource: {
+                  resourceType: 'Task',
+                  status: 'requested',
+                  code: {
+                    coding: [
+                      {
+                        system: 'http://opencrvs.org/specs/types',
+                        code: 'BIRTH'
+                      }
+                    ]
+                  },
+                  extension: [
+                    {
+                      url: 'http://opencrvs.org/specs/extension/contact-person',
+                      valueString: 'MOTHER'
+                    },
+                    {
+                      url: 'http://opencrvs.org/specs/extension/regLastUser',
+                      valueReference: { reference: 'DUMMY' }
+                    }
+                  ],
+                  lastModified: '2018-11-28T15:13:57.492Z',
+                  note: [
+                    {
+                      text: '',
+                      time: '2018-11-28T15:13:57.492Z',
+                      authorString: 'DUMMY'
+                    }
+                  ],
+                  focus: {
+                    reference:
+                      'Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422'
+                  },
+                  identifier: [
+                    {
+                      system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+                      value: 'B1mW7jA'
+                    }
+                  ],
+                  businessStatus: {
+                    coding: [
+                      {
+                        system: 'http://opencrvs.org/specs/reg-status',
+                        code: 'WAITING_VALIDATION'
+                      }
+                    ]
+                  },
+                  meta: {
+                    lastUpdated: '2018-11-29T10:40:08.913+00:00',
+                    versionId: 'aa8c1c4a-4680-497f-81f7-fde357fdb77d'
+                  },
+                  id: 'ba0412c6-5125-4447-bd32-fb5cf336ddbc'
+                }
+              },
+              {
+                fullUrl:
+                  'http://localhost:3447/fhir/Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc',
+                resource: {
+                  resourceType: 'Task',
+                  status: 'requested',
+                  code: {
+                    coding: [
+                      {
+                        system: 'http://opencrvs.org/specs/types',
+                        code: 'BIRTH'
+                      }
+                    ]
+                  },
+                  extension: [
+                    {
+                      url: 'http://opencrvs.org/specs/extension/contact-person',
+                      valueString: 'MOTHER'
+                    },
+                    {
+                      url: 'http://opencrvs.org/specs/extension/regLastUser',
+                      valueReference: { reference: 'DUMMY' }
+                    }
+                  ],
+                  lastModified: '2018-11-28T15:13:57.492Z',
+                  note: [
+                    {
+                      text: '',
+                      time: '2018-11-28T15:13:57.492Z',
+                      authorString: 'DUMMY'
+                    }
+                  ],
+                  focus: {
+                    reference:
+                      'Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422'
+                  },
+                  identifier: [
+                    {
+                      system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+                      value: 'B1mW7jA'
+                    }
+                  ],
+                  businessStatus: {
+                    coding: [
+                      {
+                        system: 'http://opencrvs.org/specs/reg-status',
+                        code: 'WAITING_VALIDATION'
+                      }
+                    ]
+                  },
+                  meta: {
+                    lastUpdated: '2018-11-29T10:40:08.913+00:00',
+                    versionId: 'aa8c1c4a-4680-497f-81f7-fde357fdb77d'
+                  },
+                  id: 'ba0412c6-5125-4447-bd32-fb5cf336ddbc'
+                }
+              }
+            ]
+          })
+        ],
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: [
+              {
+                response: {
+                  location:
+                    'Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc/_history/ba0412c6-5125-4447-bd32-fb5cf336ddbc'
+                }
+              }
+            ]
+          })
+        ]
+      )
+      const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
+      const result = await resolvers.Mutation.markEventAsReinstated(
+        {},
+        { taskEntryResourceID: id, registrationStatus: 'DECLARED' },
+        authHeaderRegCert
+      )
+      expect(result.registrationStatus).toBe('WAITING_VALIDATION')
+    })
+
+    it('throws error if user does not have register or validate scope', async () => {
+      const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
+      await expect(
+        resolvers.Mutation.markEventAsReinstated(
+          {},
+          { id },
+          authHeaderNotRegCert
+        )
+      ).rejects.toThrowError('User does not have a register or validate scope')
+    })
+  })
+
+  describe('markEventAsArchived()', () => {
+    it('updates a task with archived status', async () => {
+      fetch.mockResponses(
+        [JSON.stringify(mockTaskBundle)],
+        [JSON.stringify('ok'), { status: 200 }]
+      )
+      const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
+      const result = await resolvers.Mutation.markEventAsArchived(
+        {},
+        { id },
+        authHeaderRegCert
+      )
+      const postData = JSON.parse(fetch.mock.calls[1][1].body)
+      expect(postData.entry[0].resource.businessStatus.coding[0].code).toBe(
+        'ARCHIVED'
+      )
+      expect(result).toBe('ba0412c6-5125-4447-bd32-fb5cf336ddbc')
+    })
+
+    it('throws error if user does not have register or validate scope', async () => {
+      const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
+      await expect(
+        resolvers.Mutation.markEventAsArchived({}, { id }, authHeaderNotRegCert)
+      ).rejects.toThrowError('User does not have a register or validate scope')
+    })
+  })
+
   describe('markBirthAsValidated()', () => {
     it('updates status successfully when composition id and details both are sent', async () => {
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'

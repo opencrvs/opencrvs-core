@@ -35,6 +35,10 @@ interface IRecordAuditMessages
   noPlaceOfBirth: MessageDescriptor
   noPlaceOfDeath: MessageDescriptor
   noInformant: MessageDescriptor
+  reinstateDeclarationDialogTitle: MessageDescriptor
+  reinstateDeclarationDialogCancel: MessageDescriptor
+  reinstateDeclarationDialogConfirm: MessageDescriptor
+  reinstateDeclarationDialogDescription: MessageDescriptor
 }
 
 const messagesToDefine: IRecordAuditMessages = {
@@ -148,6 +152,28 @@ const messagesToDefine: IRecordAuditMessages = {
     id: 'recordAudit.noInformant',
     defaultMessage: 'No Informant',
     description: 'Label for informant not available'
+  },
+  reinstateDeclarationDialogTitle: {
+    id: 'recordAudit.declaration.reinstateDialogTitle',
+    defaultMessage: 'Reinstate declaration?',
+    description: 'Title for the dialog when reinstate declaration'
+  },
+  reinstateDeclarationDialogCancel: {
+    id: 'recordAudit.declaration.reinstateDialog.actions.cancel',
+    defaultMessage: 'Cancel',
+    description: 'Button label for the dialog when cancel reinstate declaration'
+  },
+  reinstateDeclarationDialogConfirm: {
+    id: 'recordAudit.declaration.reinstateDialog.actions.confirm',
+    defaultMessage: 'Confirm',
+    description:
+      'Button label for the dialog when confirm reinstate declaration'
+  },
+  reinstateDeclarationDialogDescription: {
+    id: 'recordAudit.declaration.reinstateDialogDescription',
+    defaultMessage:
+      'This will revert the application back to its original status and add it to your workqueue.',
+    description: 'Description for the dialog when reinstate declaration'
   }
 }
 export const recordAuditMessages: IRecordAuditMessages =

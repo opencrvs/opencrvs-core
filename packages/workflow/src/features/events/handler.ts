@@ -29,14 +29,15 @@ import {
   getEventType,
   hasCorrectionEncounterSection,
   isInProgressApplication,
+  isRejectedTask,
   isArchiveTask
 } from '@workflow/features/registration/utils'
 import updateTaskHandler from '@workflow/features/task/handler'
 import { logger } from '@workflow/logger'
 import { hasRegisterScope, hasValidateScope } from '@workflow/utils/authUtils'
 import * as Hapi from '@hapi/hapi'
-import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
 import fetch from 'node-fetch'
+import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
 
 // TODO: Change these event names to be closer in definition to the comments
 // https://jembiprojects.jira.com/browse/OCRVS-2767
@@ -52,6 +53,7 @@ export enum Events {
   BIRTH_MARK_VOID = '/events/birth/mark-voided',
   BIRTH_MARK_ARCHIVED = '/events/birth/mark-archived',
   BIRTH_REQUEST_CORRECTION = '/events/birth/request-correction',
+  BIRTH_MARK_REINSTATED = '/events/birth/mark-reinstated',
   DEATH_IN_PROGRESS_DEC = '/events/death/in-progress-declaration', /// Field agent or DHIS2in progress application
   DEATH_NEW_DEC = '/events/death/new-declaration', // Field agent completed application
   DEATH_UPDATE_DEC = '/events/death/update-declaration',
@@ -63,6 +65,7 @@ export enum Events {
   DEATH_MARK_VOID = '/events/death/mark-voided',
   DEATH_MARK_ARCHIVED = '/events/death/mark-archived',
   DEATH_REQUEST_CORRECTION = '/events/death/request-correction',
+  DEATH_MARK_REINSTATED = '/events/death/mark-reinstated',
   BIRTH_NEW_VALIDATE = '/events/birth/new-validation', // Registration agent new application
   DEATH_NEW_VALIDATE = '/events/death/new-validation', // Registration agent new application
   EVENT_NOT_DUPLICATE = '/events/not-duplicate',
@@ -179,15 +182,21 @@ function detectEvent(request: Hapi.Request): Events {
     const taskResource = getTaskResource(fhirBundle)
     const eventType = getEventType(fhirBundle)
     if (eventType === EVENT_TYPE.BIRTH) {
+      if (isRejectedTask(taskResource)) {
+        return Events.BIRTH_MARK_VOID
+      }
       if (isArchiveTask(taskResource)) {
         return Events.BIRTH_MARK_ARCHIVED
       }
-      return Events.BIRTH_MARK_VOID
+      return Events.BIRTH_MARK_REINSTATED
     } else if (eventType === EVENT_TYPE.DEATH) {
+      if (isRejectedTask(taskResource)) {
+        return Events.DEATH_MARK_VOID
+      }
       if (isArchiveTask(taskResource)) {
         return Events.DEATH_MARK_ARCHIVED
       }
-      return Events.DEATH_MARK_VOID
+      return Events.DEATH_MARK_REINSTATED
     }
   }
 
@@ -284,6 +293,11 @@ export async function fhirWorkflowEventHandler(
         request.payload,
         request.headers
       )
+      break
+    case Events.BIRTH_MARK_REINSTATED:
+    case Events.DEATH_MARK_REINSTATED:
+      response = await updateTaskHandler(request, h, event)
+      await triggerEvent(event, request.payload, request.headers)
       break
     case Events.DEATH_IN_PROGRESS_DEC:
       response = await createRegistrationHandler(request, h, event)
