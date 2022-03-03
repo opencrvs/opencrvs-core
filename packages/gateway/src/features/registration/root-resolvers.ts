@@ -378,8 +378,7 @@ export const resolvers: GQLResolver = {
           throw new Error('Task does not exist')
         }
 
-        const taskEntryResourceID =
-          taskBundle.entry && taskBundle.entry[0].resource.id
+        const taskEntryResourceID = taskEntryData.resource.id
 
         const taskHistoryBundle: fhir.Bundle = await fetchFHIR(
           `/Task/${taskEntryResourceID}/_history`,

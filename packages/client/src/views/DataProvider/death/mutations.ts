@@ -76,7 +76,7 @@ export const REJECT_DEATH_APPLICATION = gql`
     markEventAsVoided(id: $id, reason: $reason, comment: $comment)
   }
 `
-export const REINSTATE_DEATH_APPLICATION = gql`
+export const REINSTATE_DEATH_DECLARATION = gql`
   mutation submitMutation($id: String!) {
     markEventAsReinstated(id: $id) {
       taskEntryResourceID
@@ -84,12 +84,6 @@ export const REINSTATE_DEATH_APPLICATION = gql`
     }
   }
 `
-export const ARCHIVE_DEATH_APPLICATION = gql`
-  mutation submitMutation($id: String!) {
-    markEventAsArchived(id: $id)
-  }
-`
-
 export const ARCHIVE_DEATH_DECLARATION = gql`
   mutation submitMutation($id: String!) {
     markEventAsArchived(id: $id)
@@ -154,7 +148,7 @@ export function getDeathMutationMappings(
       }
     case Action.REINSTATE_APPLICATION:
       return {
-        mutation: REINSTATE_DEATH_APPLICATION,
+        mutation: REINSTATE_DEATH_DECLARATION,
         variables: {
           ...payload
         },
