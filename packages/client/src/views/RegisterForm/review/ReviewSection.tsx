@@ -23,6 +23,7 @@ import {
   DataSection,
   DocumentViewer,
   IDocumentViewerOptions,
+  ListView,
   ResponsiveModal
 } from '@opencrvs/components/lib/interface'
 import { FullBodyContent } from '@opencrvs/components/lib/layout'
@@ -1504,7 +1505,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 const { uploadedDocuments, selectOptions } =
                   this.prepSectionDocuments(application, sec.id)
                 return (
-                  <DataSection
+                  <ListView
                     responsiveContents={
                       <DocumentListPreview
                         id={sec.id}

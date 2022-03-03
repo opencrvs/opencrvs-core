@@ -27,8 +27,8 @@ import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { messages } from '@client/i18n/messages/views/config'
 import { messages as imageUploadMessages } from '@client/i18n/messages/views/imageUpload'
 import {
-  DataSection,
   FloatingNotification,
+  ListView,
   NOTIFICATION_TYPE,
   ResponsiveModal,
   ToggleMenu
@@ -438,10 +438,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                           {intl.formatMessage(messages.listDetailsQsn)}
                         </BlueTitle>
                       </ListTitleDiv>
-                      <DataSection
-                        title={''}
-                        items={CertificateSection.items}
-                      />
+                      <ListView items={CertificateSection.items} />
                     </Content>
                   )}
                   <FloatingNotification
