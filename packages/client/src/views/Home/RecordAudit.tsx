@@ -929,7 +929,7 @@ function RecordAuditBody({
     ARCHIVED.includes(declaration.status)
   ) {
     actions.push(
-      <TertiaryButton
+      <StyledTertiaryButton
         align={ICON_ALIGNMENT.LEFT}
         id="reinstate_button"
         key="reinstate_button"
@@ -937,7 +937,7 @@ function RecordAuditBody({
         onClick={toggleDisplayDialog}
       >
         {intl.formatMessage(buttonMessages.reinstate)}
-      </TertiaryButton>
+      </StyledTertiaryButton>
     )
   }
 
