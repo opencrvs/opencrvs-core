@@ -29,10 +29,17 @@ import {
 } from '@opencrvs/components/lib/interface'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import { messages } from '@client/i18n/messages/views/config'
-import moment from 'moment'
 import { buttonMessages } from '@client/i18n/messages'
 import { DynamicModal } from '@client/views/SysAdmin/Config/DynamicModal'
 import { EMPTY_STRING } from '@client/utils/constants'
+import styled from 'styled-components'
+
+const ListGroupTitle = styled.div`
+  color: ${({ theme }) => theme.colors.grey400};
+  width: 240px;
+  height: 21px;
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
+`
 
 type Props = IntlShapeProps & {
   userDetails: IUserDetails | null
@@ -61,12 +68,6 @@ export enum GeneralActionId {
   PHONE_NUMBER = 'changePhnNum',
   LOG_ROCKET = 'changeLogrocket',
   SENTRY = 'changeSentry'
-}
-
-const millisecondsToMinutes = (ms: number): string => {
-  const duration = moment.duration(ms, 'milliseconds')
-  const minutes = Math.floor(duration.asMinutes())
-  return `${minutes} minutes`
 }
 
 function GeneralTabContent({
@@ -155,6 +156,10 @@ function BirthTabContent({
     <ListView
       items={[
         {
+          label: EMPTY_STRING,
+          value: <ListGroupTitle>Registration time periods</ListGroupTitle>
+        },
+        {
           label: intl.formatMessage(messages.legallySpecifiedLabel),
           value: 'Within 30 days',
           action: {
@@ -177,6 +182,10 @@ function BirthTabContent({
             label: intl.formatMessage(buttonMessages.change),
             disabled: true
           }
+        },
+        {
+          label: EMPTY_STRING,
+          value: <ListGroupTitle>Registration fees</ListGroupTitle>
         },
         {
           label: intl.formatMessage(messages.withinLegallySpecifiedTimeLabel),
@@ -216,8 +225,11 @@ function DeathTabContent({
 }) {
   return (
     <ListView
-      title={''}
       items={[
+        {
+          label: EMPTY_STRING,
+          value: <ListGroupTitle>Registration time periods</ListGroupTitle>
+        },
         {
           label: intl.formatMessage(messages.legallySpecifiedLabel),
           value: 'Within 30 days',
@@ -233,6 +245,10 @@ function DeathTabContent({
             label: intl.formatMessage(buttonMessages.change),
             disabled: true
           }
+        },
+        {
+          label: EMPTY_STRING,
+          value: <ListGroupTitle>Registration fees</ListGroupTitle>
         },
         {
           label: intl.formatMessage(messages.lateRegistrationLabel),
