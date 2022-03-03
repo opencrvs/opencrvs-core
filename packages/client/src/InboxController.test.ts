@@ -11,7 +11,7 @@
  */
 import { createStore } from '@client/store'
 import { InboxController } from '@client/InboxController'
-import { DOWNLOAD_STATUS } from '@client/applications'
+import { DOWNLOAD_STATUS } from '@client/declarations'
 import { Action } from './forms'
 import { Event } from './components/DuplicateDetails'
 import { createMockClient } from 'mock-apollo-client'
@@ -29,12 +29,12 @@ describe('Inbox Controller', () => {
   it('should do nothing if sync is already running', () => {
     const store = {
       getState: () => ({
-        applicationsState: {
-          applications: [
+        declarationsState: {
+          declarations: [
             {
               id: '1',
               event: Event.BIRTH.toLowerCase(),
-              action: Action.LOAD_REVIEW_APPLICATION,
+              action: Action.LOAD_REVIEW_DECLARATION,
               downloadStatus: DOWNLOAD_STATUS.READY_TO_DOWNLOAD
             }
           ]
@@ -54,33 +54,33 @@ describe('Inbox Controller', () => {
     expect(store.dispatch).not.toBeCalled()
   })
 
-  it('should sync all ready to download applications in the queue', async () => {
+  it('should sync all ready to download declarations in the queue', async () => {
     const store = {
       getState: () => ({
-        applicationsState: {
-          applications: [
+        declarationsState: {
+          declarations: [
             {
               id: '1',
               event: Event.BIRTH.toLowerCase(),
-              action: Action.LOAD_REVIEW_APPLICATION,
+              action: Action.LOAD_REVIEW_DECLARATION,
               downloadStatus: DOWNLOAD_STATUS.READY_TO_DOWNLOAD
             },
             {
               id: '2',
               event: Event.BIRTH.toLowerCase(),
-              action: Action.LOAD_REVIEW_APPLICATION,
+              action: Action.LOAD_REVIEW_DECLARATION,
               downoadStatus: DOWNLOAD_STATUS.FAILED_NETWORK
             },
             {
               id: '3',
               event: Event.BIRTH.toLowerCase(),
-              action: Action.LOAD_REVIEW_APPLICATION,
+              action: Action.LOAD_REVIEW_DECLARATION,
               downloadStatus: DOWNLOAD_STATUS.FAILED
             },
             {
               id: '4',
               event: Event.BIRTH.toLowerCase(),
-              action: Action.LOAD_REVIEW_APPLICATION,
+              action: Action.LOAD_REVIEW_DECLARATION,
               downloadStatus: DOWNLOAD_STATUS.DOWNLOADED
             }
           ]
@@ -117,19 +117,19 @@ describe('Inbox Controller', () => {
     expect(queryHandler).toHaveBeenCalledTimes(1)
     expect(store.dispatch).toHaveBeenCalledTimes(4)
     expect(
-      store.dispatch.mock.calls[2][0].payload.application.downloadStatus
+      store.dispatch.mock.calls[2][0].payload.declaration.downloadStatus
     ).toBe(DOWNLOAD_STATUS.READY_TO_DOWNLOAD)
   })
 
-  it('should increase retry attempt for an application that has a network error or error', async () => {
+  it('should increase retry attempt for an declaration that has a network error or error', async () => {
     const store = {
       getState: () => ({
-        applicationsState: {
-          applications: [
+        declarationsState: {
+          declarations: [
             {
               id: '1',
               event: Event.BIRTH.toLowerCase(),
-              action: Action.LOAD_REVIEW_APPLICATION,
+              action: Action.LOAD_REVIEW_DECLARATION,
               downloadRetryAttempt: 1,
               downloadStatus: DOWNLOAD_STATUS.READY_TO_DOWNLOAD
             }
@@ -162,22 +162,22 @@ describe('Inbox Controller', () => {
     expect(queryHandler).toHaveBeenCalledTimes(1)
     expect(store.dispatch).toHaveBeenCalledTimes(8)
     expect(
-      store.dispatch.mock.calls[3][0].payload.application.downloadStatus
+      store.dispatch.mock.calls[3][0].payload.declaration.downloadStatus
     ).toBe(DOWNLOAD_STATUS.READY_TO_DOWNLOAD)
     expect(
-      store.dispatch.mock.calls[3][0].payload.application.downloadRetryAttempt
+      store.dispatch.mock.calls[3][0].payload.declaration.downloadRetryAttempt
     ).toBe(2)
   })
 
-  it('should increate retry attempt for an application that has an progrmmatic error', async () => {
+  it('should increate retry attempt for an declaration that has an progrmmatic error', async () => {
     const store = {
       getState: () => ({
-        applicationsState: {
-          applications: [
+        declarationsState: {
+          declarations: [
             {
               id: '1',
               event: Event.BIRTH.toLowerCase(),
-              action: Action.LOAD_REVIEW_APPLICATION,
+              action: Action.LOAD_REVIEW_DECLARATION,
               downloadRetryAttempt: 1,
               downloadStatus: DOWNLOAD_STATUS.READY_TO_DOWNLOAD
             }
@@ -209,22 +209,22 @@ describe('Inbox Controller', () => {
     expect(queryHandler).toHaveBeenCalledTimes(1)
     expect(store.dispatch).toHaveBeenCalledTimes(8)
     expect(
-      store.dispatch.mock.calls[3][0].payload.application.downloadStatus
+      store.dispatch.mock.calls[3][0].payload.declaration.downloadStatus
     ).toBe(DOWNLOAD_STATUS.READY_TO_DOWNLOAD)
     expect(
-      store.dispatch.mock.calls[3][0].payload.application.downloadRetryAttempt
+      store.dispatch.mock.calls[3][0].payload.declaration.downloadRetryAttempt
     ).toBe(2)
   })
 
   it('should change the status to failed network for network error when retry attempt reaches maximum limit', async () => {
     const store = {
       getState: () => ({
-        applicationsState: {
-          applications: [
+        declarationsState: {
+          declarations: [
             {
               id: '1',
               event: Event.BIRTH.toLowerCase(),
-              action: Action.LOAD_REVIEW_APPLICATION,
+              action: Action.LOAD_REVIEW_DECLARATION,
               downloadRetryAttempt: 2,
               downloadStatus: DOWNLOAD_STATUS.READY_TO_DOWNLOAD
             }
@@ -257,22 +257,22 @@ describe('Inbox Controller', () => {
     expect(queryHandler).toHaveBeenCalledTimes(1)
     expect(store.dispatch).toHaveBeenCalledTimes(8)
     expect(
-      store.dispatch.mock.calls[3][0].payload.application.downloadRetryAttempt
+      store.dispatch.mock.calls[3][0].payload.declaration.downloadRetryAttempt
     ).toBe(3)
     expect(
-      store.dispatch.mock.calls[3][0].payload.application.downloadStatus
+      store.dispatch.mock.calls[3][0].payload.declaration.downloadStatus
     ).toBe(DOWNLOAD_STATUS.FAILED_NETWORK)
   })
   /*
   it('should change the status to failed for programmatic error when retry attempt reaches maximum limit', async () => {
     const store = {
       getState: () => ({
-        applicationsState: {
-          applications: [
+        declarationsState: {
+          declarations: [
             {
               id: '1',
               event: Event.BIRTH.toLowerCase(),
-              action: Action.LOAD_REVIEW_APPLICATION,
+              action: Action.LOAD_REVIEW_DECLARATION,
               downloadRetryAttempt: 2,
               downloadStatus: DOWNLOAD_STATUS.READY_TO_DOWNLOAD
             }
@@ -304,10 +304,10 @@ describe('Inbox Controller', () => {
     expect(queryHandler).toHaveBeenCalledTimes(1)
     expect(store.dispatch).toHaveBeenCalledTimes(8)
     expect(
-      store.dispatch.mock.calls[3][0].payload.application.downloadRetryAttempt
+      store.dispatch.mock.calls[3][0].payload.declaration.downloadRetryAttempt
     ).toBe(3)
     expect(
-      store.dispatch.mock.calls[3][0].payload.application.downloadStatus
+      store.dispatch.mock.calls[3][0].payload.declaration.downloadStatus
     ).toBe(DOWNLOAD_STATUS.FAILED)
   })*/
 })

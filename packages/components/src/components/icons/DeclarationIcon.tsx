@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 
-export const ApplicationIcon = (props: React.HTMLAttributes<SVGElement>) => {
+export const DeclarationIcon = (props: React.HTMLAttributes<SVGElement>) => {
   let fill: string
   let corner: string
 

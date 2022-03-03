@@ -13,7 +13,7 @@ import {
   generateBirthRegPoint,
   generateDeathRegPoint,
   generatePaymentPoint,
-  generateApplicationStartedPoint,
+  generateDeclarationStartedPoint,
   generateRejectedPoints
 } from '@metrics/features/registration/pointGenerator'
 import {
@@ -45,13 +45,13 @@ describe('Verify point generation', () => {
       .mockResolvedValueOnce('Location/2')
     const point = await generateBirthRegPoint(
       cloneDeep(testPayload),
-      'mark-existing-application-registered',
+      'mark-existing-declaration-registered',
       AUTH_HEADER
     )
     expect(point).toMatchObject({
       measurement: 'birth_reg',
       tags: {
-        regStatus: 'mark-existing-application-registered',
+        regStatus: 'mark-existing-declaration-registered',
         gender: 'male',
         officeLocation: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6',
         locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1',
@@ -87,13 +87,13 @@ describe('Verify point generation', () => {
 
     const point = await generateBirthRegPoint(
       payload,
-      'mark-existing-application-registered',
+      'mark-existing-declaration-registered',
       AUTH_HEADER
     )
     expect(point).toMatchObject({
       measurement: 'birth_reg',
       tags: {
-        regStatus: 'mark-existing-application-registered',
+        regStatus: 'mark-existing-declaration-registered',
         gender: 'male',
         officeLocation: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6',
         locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1'
@@ -112,13 +112,13 @@ describe('Verify point generation', () => {
       .mockResolvedValueOnce(null)
     const point = await generateBirthRegPoint(
       cloneDeep(testPayload),
-      'mark-existing-application-registered',
+      'mark-existing-declaration-registered',
       AUTH_HEADER
     )
     expect(point).toMatchObject({
       measurement: 'birth_reg',
       tags: {
-        regStatus: 'mark-existing-application-registered',
+        regStatus: 'mark-existing-declaration-registered',
         gender: 'male',
         officeLocation: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6',
         locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1',
@@ -139,7 +139,7 @@ describe('Verify point generation', () => {
     expect(
       generateBirthRegPoint(
         payload,
-        'mark-existing-application-registered',
+        'mark-existing-declaration-registered',
         AUTH_HEADER
       )
     ).rejects.toThrowError('No child found!')
@@ -153,13 +153,13 @@ describe('Verify point generation', () => {
       .mockResolvedValueOnce('Location/2')
     const point = await generateDeathRegPoint(
       cloneDeep(testDeathPayload),
-      'mark-existing-application-registered',
+      'mark-existing-declaration-registered',
       AUTH_HEADER
     )
     expect(point).toMatchObject({
       measurement: 'death_reg',
       tags: {
-        regStatus: 'mark-existing-application-registered',
+        regStatus: 'mark-existing-declaration-registered',
         gender: 'male',
         causeOfDeath: 'Old age',
         mannerOfDeath: 'NATURAL_CAUSES',
@@ -183,7 +183,7 @@ describe('Verify point generation', () => {
     expect(
       generateDeathRegPoint(
         payload,
-        'mark-existing-application-registered',
+        'mark-existing-declaration-registered',
         AUTH_HEADER
       )
     ).rejects.toThrowError('No section found for given code: deceased-details')
@@ -222,19 +222,19 @@ describe('Verify point generation', () => {
       'Payment reconciliation not found'
     )
   })
-  it('returns applications started point for field agent', async () => {
+  it('returns declarations started point for field agent', async () => {
     fetchLocation.mockReset()
     fetchParentLocationByLocationID
       .mockResolvedValueOnce('Location/4')
       .mockResolvedValueOnce('Location/3')
       .mockResolvedValueOnce('Location/2')
-    const point = await generateApplicationStartedPoint(
+    const point = await generateDeclarationStartedPoint(
       cloneDeep(testDeclaration),
       AUTH_HEADER,
       Events.NEW_DEC
     )
     expect(point).toMatchObject({
-      measurement: 'applications_started',
+      measurement: 'declarations_started',
       tags: {
         eventType: 'BIRTH',
         practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
@@ -251,19 +251,19 @@ describe('Verify point generation', () => {
       }
     })
   })
-  it('returns applications started point for registration agent', async () => {
+  it('returns declarations started point for registration agent', async () => {
     fetchLocation.mockReset()
     fetchParentLocationByLocationID
       .mockResolvedValueOnce('Location/4')
       .mockResolvedValueOnce('Location/3')
       .mockResolvedValueOnce('Location/2')
-    const point = await generateApplicationStartedPoint(
+    const point = await generateDeclarationStartedPoint(
       cloneDeep(testDeclaration),
       AUTH_HEADER,
       Events.NEW_VALIDATE
     )
     expect(point).toMatchObject({
-      measurement: 'applications_started',
+      measurement: 'declarations_started',
       tags: {
         eventType: 'BIRTH',
         practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
@@ -280,19 +280,19 @@ describe('Verify point generation', () => {
       }
     })
   })
-  it('returns applications started point for registrar', async () => {
+  it('returns declarations started point for registrar', async () => {
     fetchLocation.mockReset()
     fetchParentLocationByLocationID
       .mockResolvedValueOnce('Location/4')
       .mockResolvedValueOnce('Location/3')
       .mockResolvedValueOnce('Location/2')
-    const point = await generateApplicationStartedPoint(
+    const point = await generateDeclarationStartedPoint(
       cloneDeep(testDeclaration),
       AUTH_HEADER,
       Events.NEW_WAITING_VALIDATION
     )
     expect(point).toMatchObject({
-      measurement: 'applications_started',
+      measurement: 'declarations_started',
       tags: {
         eventType: 'BIRTH',
         practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
@@ -309,19 +309,19 @@ describe('Verify point generation', () => {
       }
     })
   })
-  it('returns applications started point for field agent', async () => {
+  it('returns declarations started point for field agent', async () => {
     fetchLocation.mockReset()
     fetchParentLocationByLocationID
       .mockResolvedValueOnce('Location/4')
       .mockResolvedValueOnce('Location/3')
       .mockResolvedValueOnce('Location/2')
-    const point = await generateApplicationStartedPoint(
+    const point = await generateDeclarationStartedPoint(
       cloneDeep(testDeclaration),
       AUTH_HEADER,
       Events.IN_PROGRESS_DEC
     )
     expect(point).toMatchObject({
-      measurement: 'applications_started',
+      measurement: 'declarations_started',
       tags: {
         eventType: 'BIRTH',
         practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
@@ -338,7 +338,7 @@ describe('Verify point generation', () => {
       }
     })
   })
-  it('returns applications started point for notification api', async () => {
+  it('returns declarations started point for notification api', async () => {
     const payload = cloneDeep(testDeclaration)
     // @ts-ignore
     payload.entry[0].resource.type?.coding[0].code = 'birth-notification'
@@ -347,13 +347,13 @@ describe('Verify point generation', () => {
       .mockResolvedValueOnce('Location/4')
       .mockResolvedValueOnce('Location/3')
       .mockResolvedValueOnce('Location/2')
-    const point = await generateApplicationStartedPoint(
+    const point = await generateDeclarationStartedPoint(
       cloneDeep(payload),
       AUTH_HEADER,
       Events.IN_PROGRESS_DEC
     )
     expect(point).toMatchObject({
-      measurement: 'applications_started',
+      measurement: 'declarations_started',
       tags: {
         eventType: 'BIRTH',
         practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
@@ -382,7 +382,7 @@ describe('Verify point generation', () => {
       .mockResolvedValueOnce('Location/2')
     const point = await generateRejectedPoints(payload, AUTH_HEADER)
     expect(point).toMatchObject({
-      measurement: 'applications_rejected',
+      measurement: 'declarations_rejected',
       tags: {
         eventType: 'BIRTH',
         startedBy: 'fe16875f-3e5f-47bc-85d6-16482a63e7df',

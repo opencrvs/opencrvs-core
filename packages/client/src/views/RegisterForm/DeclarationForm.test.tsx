@@ -24,11 +24,11 @@ import {
 } from '@client/tests/util'
 import { DRAFT_BIRTH_PARENT_FORM } from '@client/navigation/routes'
 import {
-  storeApplication,
-  createApplication,
-  IApplication,
+  storeDeclaration,
+  createDeclaration,
+  IDeclaration,
   IUserData
-} from '@client/applications'
+} from '@client/declarations'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
@@ -36,9 +36,9 @@ import { storage } from '@client/storage'
 import { Event } from '@client/forms'
 import { waitForElement } from '@client/tests/wait-for-element'
 
-describe('when user has starts a new application', () => {
+describe('when user has starts a new declaration', () => {
   describe('In case of insecured page show unlock screen', () => {
-    let draft: IApplication
+    let draft: IDeclaration
     let app: ReactWrapper
     let history: History
     let store: Store
@@ -49,7 +49,7 @@ describe('when user has starts a new application', () => {
           userID: userDetails.userMgntUserID,
           userPIN:
             '$2a$10$xQBLcbPgGQNu9p6zVchWuu6pmCrQIjcb6k2W1PIVUxVTE/PumWM82',
-          applications: []
+          declarations: []
         }
       ]
 
@@ -66,13 +66,13 @@ describe('when user has starts a new application', () => {
       history = testApp.history
       store = testApp.store
 
-      draft = createApplication(Event.BIRTH)
-      await store.dispatch(storeApplication(draft))
+      draft = createDeclaration(Event.BIRTH)
+      await store.dispatch(storeDeclaration(draft))
     })
 
     it('renders unlock screen', async () => {
       history.replace(
-        DRAFT_BIRTH_PARENT_FORM.replace(':applicationId', draft.id.toString())
+        DRAFT_BIRTH_PARENT_FORM.replace(':declarationId', draft.id.toString())
       )
       await waitForElement(app, '#unlockPage')
     })
@@ -91,17 +91,17 @@ describe('when user has starts a new application', () => {
     })
 
     describe('when user tries to continue without providing contact-point datas', () => {
-      let draft: IApplication
+      let draft: IDeclaration
       beforeEach(async () => {
         const data = {
           registration: {
             presentAtBirthRegistration: 'MOTHER'
           }
         }
-        draft = createApplication(Event.BIRTH, data)
-        store.dispatch(storeApplication(draft))
+        draft = createDeclaration(Event.BIRTH, data)
+        store.dispatch(storeDeclaration(draft))
         history.replace(
-          DRAFT_BIRTH_PARENT_FORM.replace(':applicationId', draft.id.toString())
+          DRAFT_BIRTH_PARENT_FORM.replace(':declarationId', draft.id.toString())
         )
         await waitForElement(app, '#register_form')
       })
@@ -148,22 +148,22 @@ describe('when user has starts a new application', () => {
     })
 
     describe('when user is in birth registration by parent informant view', () => {
-      let draft: IApplication
+      let draft: IDeclaration
       beforeEach(async () => {
         const data = {
           registration: {
             presentAtBirthRegistration: 'MOTHER'
           }
         }
-        draft = createApplication(Event.BIRTH, data)
+        draft = createDeclaration(Event.BIRTH, data)
 
         /*
-         * Needs to be done before storeApplication(draft)
-         * so offline applications wouldn't override the dispatched ones
+         * Needs to be done before storeDeclaration(draft)
+         * so offline declarations wouldn't override the dispatched ones
          */
-        store.dispatch(storeApplication(draft))
+        store.dispatch(storeDeclaration(draft))
         history.replace(
-          DRAFT_BIRTH_PARENT_FORM.replace(':applicationId', draft.id.toString())
+          DRAFT_BIRTH_PARENT_FORM.replace(':declarationId', draft.id.toString())
         )
         await waitForElement(app, '#register_form')
         app
@@ -202,10 +202,10 @@ describe('when user has starts a new application', () => {
         it('stores the value to a new draft and move to next section', () => {
           const mockCalls = (storage.setItem as jest.Mock).mock.calls
           const userData = mockCalls[mockCalls.length - 1]
-          const storedApplications = JSON.parse(
+          const storedDeclarations = JSON.parse(
             userData[userData.length - 1]
-          )[0].applications
-          expect(storedApplications[0].data.child.firstNames).toEqual('hello')
+          )[0].declarations
+          expect(storedDeclarations[0].data.child.firstNames).toEqual('hello')
           expect(window.location.href).toContain('mother')
         })
         it('redirect to home when pressed save and exit button', async () => {

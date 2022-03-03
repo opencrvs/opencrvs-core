@@ -58,7 +58,7 @@ import { getCurrentUserScope } from '@client/utils/authUtils'
 import { NATL_ADMIN_ROLES } from '@client/utils/constants'
 import { IUserDetails } from '@client/utils/userUtils'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
-import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseApplicationCountView'
+import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
 import {
@@ -89,7 +89,7 @@ type GoToPageAction = {
   type: typeof GO_TO_PAGE
   payload: {
     pageRoute: string
-    applicationId: string
+    declarationId: string
     pageId: string
     groupId?: string
     event: string
@@ -144,26 +144,26 @@ type GoToSysAdminHome = {
   }
 }
 
-export function goToBirthInformant(applicationId: string) {
+export function goToBirthInformant(declarationId: string) {
   return push(
     formatUrl(SELECT_BIRTH_INFORMANT, {
-      applicationId
+      declarationId
     })
   )
 }
 
-export function goToDeathInformant(applicationId: string) {
+export function goToDeathInformant(declarationId: string) {
   return push(
     formatUrl(SELECT_DEATH_INFORMANT, {
-      applicationId
+      declarationId
     })
   )
 }
 
-export function goToBirthContactPoint(applicationId: string) {
+export function goToBirthContactPoint(declarationId: string) {
   return push(
     formatUrl(SELECT_BIRTH_MAIN_CONTACT_POINT, {
-      applicationId
+      declarationId
     })
   )
 }
@@ -172,10 +172,10 @@ export function goToEventInfo(eventType: Event) {
   return push(formatUrl(EVENT_INFO, { eventType }))
 }
 
-export function goToDeathContactPoint(applicationId: string) {
+export function goToDeathContactPoint(declarationId: string) {
   return push(
     formatUrl(SELECT_DEATH_MAIN_CONTACT_POINT, {
-      applicationId
+      declarationId
     })
   )
 }
@@ -297,23 +297,23 @@ export function goToDeclarationRecordAudit(
   return push(formatUrl(DECLARATION_RECORD_AUDIT, { tab, declarationId }))
 }
 
-export function goToBirthRegistrationAsParent(applicationId: string) {
+export function goToBirthRegistrationAsParent(declarationId: string) {
   return push(
     formatUrl(DRAFT_BIRTH_PARENT_FORM, {
-      applicationId: applicationId.toString()
+      declarationId: declarationId.toString()
     })
   )
 }
-export function goToApplicationContact(informant: string) {
+export function goToDeclarationContact(informant: string) {
   return push(
     formatUrl(DRAFT_BIRTH_APPLICANT_FORM, {
       informant: informant.toString()
     })
   )
 }
-export function goToReviewDuplicate(applicationId: string) {
+export function goToReviewDuplicate(declarationId: string) {
   return push(
-    formatUrl(REVIEW_DUPLICATES, { applicationId: applicationId.toString() })
+    formatUrl(REVIEW_DUPLICATES, { declarationId: declarationId.toString() })
   )
 }
 
@@ -332,21 +332,21 @@ export function goToPrintCertificate(
 }
 
 export function goToCertificateCorrection(
-  applicationId: string,
+  declarationId: string,
   pageId: CorrectionSection
 ) {
   return push(
     formatUrl(CERTIFICATE_CORRECTION, {
-      applicationId: applicationId.toString(),
+      declarationId: declarationId.toString(),
       pageId: pageId.toString()
     })
   )
 }
 
-export function goToVerifyCorrector(applicationId: string, corrector: string) {
+export function goToVerifyCorrector(declarationId: string, corrector: string) {
   return push(
     formatUrl(VERIFY_CORRECTOR, {
-      applicationId: applicationId.toString(),
+      declarationId: declarationId.toString(),
       corrector: corrector.toLowerCase().toString()
     })
   )
@@ -388,9 +388,9 @@ export function goToPrintCertificatePayment(
   )
 }
 
-export function goToDeathRegistration(applicationId: string) {
+export function goToDeathRegistration(declarationId: string) {
   return push(
-    formatUrl(DRAFT_DEATH_FORM, { applicationId: applicationId.toString() })
+    formatUrl(DRAFT_DEATH_FORM, { declarationId: declarationId.toString() })
   )
 }
 
@@ -574,7 +574,7 @@ export function goToUserReviewForm(
 
 export function goToPageGroup(
   pageRoute: string,
-  applicationId: string,
+  declarationId: string,
   pageId: string,
   groupId: string,
   event: string,
@@ -584,7 +584,7 @@ export function goToPageGroup(
   return {
     type: GO_TO_PAGE,
     payload: {
-      applicationId,
+      declarationId,
       pageId,
       groupId,
       event,
@@ -597,7 +597,7 @@ export function goToPageGroup(
 
 export function goToPage(
   pageRoute: string,
-  applicationId: string,
+  declarationId: string,
   pageId: string,
   event: string,
   fieldNameHash?: string,
@@ -606,7 +606,7 @@ export function goToPage(
   return {
     type: GO_TO_PAGE,
     payload: {
-      applicationId,
+      declarationId,
       pageId,
       event,
       fieldNameHash,
@@ -653,7 +653,7 @@ export function navigationReducer(state: INavigationState, action: any) {
     case GO_TO_PAGE:
       const {
         fieldNameHash,
-        applicationId,
+        declarationId,
         pageId,
         groupId,
         event,
@@ -665,7 +665,7 @@ export function navigationReducer(state: INavigationState, action: any) {
         Cmd.action(
           push(
             formatUrl(pageRoute, {
-              applicationId: applicationId.toString(),
+              declarationId: declarationId.toString(),
               pageId,
               groupId,
               event

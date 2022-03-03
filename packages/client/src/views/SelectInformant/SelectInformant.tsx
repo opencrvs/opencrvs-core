@@ -20,10 +20,10 @@ import { BackArrow } from '@opencrvs/components/lib/icons'
 import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
 import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 import {
-  deleteApplication,
-  IApplication,
-  modifyApplication
-} from '@client/applications'
+  deleteDeclaration,
+  IDeclaration,
+  modifyDeclaration
+} from '@client/declarations'
 import {
   BirthSection,
   DeathSection,
@@ -35,7 +35,7 @@ import {
 import {
   getBirthSection,
   getDeathSection
-} from '@client/forms/register/application-selectors'
+} from '@client/forms/register/declaration-selectors'
 import { buttonMessages } from '@client/i18n/messages'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { formMessages } from '@client/i18n/messages/views/selectInformant'
@@ -85,13 +85,13 @@ export interface IInformantField {
 }
 
 interface IMatchProps {
-  applicationId: string
+  declarationId: string
 }
 
 type IFullProps = {
-  application: IApplication
-  modifyApplication: typeof modifyApplication
-  deleteApplication: typeof deleteApplication
+  declaration: IDeclaration
+  modifyDeclaration: typeof modifyDeclaration
+  deleteDeclaration: typeof deleteDeclaration
   goBack: typeof goBack
   goToHome: typeof goToHome
   goToBirthContactPoint: typeof goToBirthContactPoint
@@ -111,7 +111,7 @@ interface IState {
 
 function getGroupWithInitialValues(
   section: IFormSection,
-  application: IApplication
+  declaration: IDeclaration
 ) {
   const group = section.groups[0]
 
@@ -119,8 +119,8 @@ function getGroupWithInitialValues(
     ...group,
     fields: replaceInitialValues(
       group.fields,
-      application?.data[section.id] || {},
-      application?.data
+      declaration?.data[section.id] || {},
+      declaration?.data
     )
   }
 }
@@ -131,15 +131,15 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
     const { applicantsSection, registrationSection } = props
     this.state = {
       informant:
-        (this.props.application &&
-          this.props.application.data &&
-          this.props.application.data[registrationSection.id] &&
-          (this.props.application.data[registrationSection.id]
+        (this.props.declaration &&
+          this.props.declaration.data &&
+          this.props.declaration.data[registrationSection.id] &&
+          (this.props.declaration.data[registrationSection.id]
             .presentAtBirthRegistration as string)) ||
-        (this.props.application &&
-          this.props.application.data &&
-          this.props.application.data[applicantsSection.id] &&
-          (this.props.application.data[applicantsSection.id]
+        (this.props.declaration &&
+          this.props.declaration.data &&
+          this.props.declaration.data[applicantsSection.id] &&
+          (this.props.declaration.data[applicantsSection.id]
             .applicantsRelationToDeceased as string)) ||
         '',
       touched: false,
@@ -151,19 +151,19 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       ? Event.BIRTH
       : Event.DEATH
   )
-  group = getGroupWithInitialValues(this.section, this.props.application)
+  group = getGroupWithInitialValues(this.section, this.props.declaration)
   componentDidMount() {
     this.group = {
       ...this.group,
       fields: replaceInitialValues(
         this.group.fields,
-        this.props.application?.data[this.section.id] || {},
-        this.props.application?.data
+        this.props.declaration?.data[this.section.id] || {},
+        this.props.declaration?.data
       )
     }
   }
 
-  modifyApplication = (
+  modifyDeclaration = (
     sectionData: IFormSectionData,
     activeSection: IFormSection
   ) => {
@@ -187,16 +187,16 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
     const event = this.props.location.pathname.includes(Event.BIRTH)
       ? Event.BIRTH
       : Event.DEATH
-    const { application, registrationSection, applicantsSection } = this.props
-    const newApplication = {
-      ...application,
+    const { declaration, registrationSection, applicantsSection } = this.props
+    const newDeclaration = {
+      ...declaration,
       data: {
-        ...application?.data
+        ...declaration?.data
       }
     }
     if (event === Event.BIRTH) {
-      newApplication.data[registrationSection.id] = {
-        ...application?.data[registrationSection.id],
+      newDeclaration.data[registrationSection.id] = {
+        ...declaration?.data[registrationSection.id],
         ...{
           presentAtBirthRegistration: applicantValue,
           applicant: {
@@ -206,8 +206,8 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
         }
       }
     } else {
-      newApplication.data[applicantsSection.id] = {
-        ...application.data[applicantsSection.id],
+      newDeclaration.data[applicantsSection.id] = {
+        ...declaration.data[applicantsSection.id],
         ...{
           // Need to empty those because next screen will fill this up
           // TODO: currently contact point is the informant,
@@ -215,8 +215,8 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
           relationship: applicantValue
         }
       }
-      newApplication.data[registrationSection.id] = {
-        ...application?.data[registrationSection.id],
+      newDeclaration.data[registrationSection.id] = {
+        ...declaration?.data[registrationSection.id],
         ...{
           relationship: {
             value: applicant,
@@ -225,13 +225,13 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
         }
       }
     }
-    this.props.modifyApplication(newApplication)
+    this.props.modifyDeclaration(newDeclaration)
   }
 
   handleContinue = () => {
     const errors = getValidationErrorsForForm(
       this.group.fields,
-      this.props.application.data[this.section.id] || {}
+      this.props.declaration.data[this.section.id] || {}
     )
 
     let hasError = false
@@ -268,10 +268,10 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
         : Event.DEATH
       event === Event.BIRTH
         ? this.props.goToBirthRegistrationAsParent(
-            this.props.match.params.applicationId
+            this.props.match.params.declarationId
           )
         : this.props.goToDeathRegistration(
-            this.props.match.params.applicationId
+            this.props.match.params.declarationId
           )
     }
   }
@@ -298,7 +298,7 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
         <EventTopBar
           title={intl.formatMessage(titleMessage)}
           goHome={() => {
-            this.props.deleteApplication(this.props.application)
+            this.props.deleteDeclaration(this.props.declaration)
             this.props.goToHome()
           }}
         />
@@ -321,11 +321,11 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
             <FormFieldGenerator
               id={this.group.id}
               onChange={(values) => {
-                this.modifyApplication(values, this.section)
+                this.modifyDeclaration(values, this.section)
               }}
               setAllFieldsDirty={false}
               fields={this.group.fields}
-              draftData={this.props.application?.data}
+              draftData={this.props.declaration?.data}
             />
           </Actions>
           {this.state.showError && (
@@ -348,14 +348,14 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
 
 const mapStateToProps = (
   store: IStoreState,
-  props: RouteComponentProps<{ applicationId: string }>
+  props: RouteComponentProps<{ declarationId: string }>
 ) => {
   const { match } = props
   return {
     registrationSection: getBirthSection(store, BirthSection.Registration),
     applicantsSection: getDeathSection(store, DeathSection.Applicants),
-    application: store.applicationsState.applications.find(
-      ({ id }) => id === match.params.applicationId
+    declaration: store.declarationsState.declarations.find(
+      ({ id }) => id === match.params.declarationId
     )!
   }
 }
@@ -368,7 +368,7 @@ export const SelectInformant = withRouter(
     goToDeathContactPoint,
     goToBirthRegistrationAsParent,
     goToDeathRegistration,
-    modifyApplication,
-    deleteApplication
+    modifyDeclaration,
+    deleteDeclaration
   })(injectIntl(SelectInformantView))
 )

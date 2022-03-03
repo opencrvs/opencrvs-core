@@ -11,7 +11,7 @@
  */
 import { App } from '@client/App'
 import { Event, ISerializedForm } from '@client/forms'
-import { getRegisterForm } from '@client/forms/register/application-selectors'
+import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getReviewForm } from '@client/forms/register/review-selectors'
 import { getDefaultLanguage } from '@client/i18n/utils'
 import { offlineDataReady, setOfflineData } from '@client/offline/actions'
@@ -117,7 +117,7 @@ export function getInitialState(): IStoreState {
 }
 
 export function waitForReady(app: ReactWrapper) {
-  return waitForElement(app, '#readyApplication')
+  return waitForElement(app, '#readyDeclaration')
 }
 
 export async function createTestApp(
@@ -200,9 +200,9 @@ export const selectOption = (
 const currentUserId = '123'
 
 // This object has more than 10 drafts to utilize pagination testing in draft tab
-export const currentUserApplications = {
+export const currentUserDeclarations = {
   userID: currentUserId,
-  applications: [
+  declarations: [
     {
       id: '72c18939-70c1-40b4-9b80-b162c4871160',
       data: {
@@ -2240,7 +2240,7 @@ export const mockRegistrarUserResponse = {
   }
 }
 
-export const mockApplicationData = {
+export const mockDeclarationData = {
   child: {
     firstNames: 'গায়ত্রী',
     familyName: 'স্পিভক',
@@ -2335,7 +2335,7 @@ export const mockApplicationData = {
   }
 }
 
-export const mockDeathApplicationData = {
+export const mockDeathDeclarationData = {
   deceased: {
     iDType: 'NATIONAL_ID',
     iD: '1230000000000',
@@ -2883,7 +2883,7 @@ export const mockOfflineData = {
     UI_POLLING_INTERVAL: 5000,
     FIELD_AGENT_AUDIT_LOCATIONS:
       'WARD,UNION,CITY_CORPORATION,MUNICIPALITY,UPAZILA',
-    APPLICATION_AUDIT_LOCATIONS: 'WARD,UNION',
+    DECLARATION_AUDIT_LOCATIONS: 'WARD,UNION',
     INFORMANT_MINIMUM_AGE: 16,
     HIDE_EVENT_REGISTER_INFORMATION: false,
     EXTERNAL_VALIDATION_WORKQUEUE: true,
@@ -3001,7 +3001,7 @@ export async function createTestComponent(
   return mount(<PropProxy {...node.props} />, options)
 }
 
-export const mockDeathApplicationDataWithoutFirstNames = {
+export const mockDeathDeclarationDataWithoutFirstNames = {
   deceased: {
     iDType: 'NATIONAL_ID',
     iD: '1230000000000',

@@ -13,9 +13,9 @@ import * as React from 'react'
 import {
   createTestComponent,
   selectOption,
-  mockApplicationData,
-  mockDeathApplicationData,
-  mockDeathApplicationDataWithoutFirstNames,
+  mockDeclarationData,
+  mockDeathDeclarationData,
+  mockDeathDeclarationDataWithoutFirstNames,
   getRegisterFormFromStore,
   getReviewFormFromStore,
   createTestStore,
@@ -24,13 +24,13 @@ import {
 import { RegisterForm } from '@client/views/RegisterForm/RegisterForm'
 import { ReactWrapper } from 'enzyme'
 import {
-  createApplication,
-  createReviewApplication,
-  storeApplication,
-  setInitialApplications,
+  createDeclaration,
+  createReviewDeclaration,
+  storeDeclaration,
+  setInitialDeclarations,
   SUBMISSION_STATUS,
-  modifyApplication
-} from '@client/applications'
+  modifyDeclaration
+} from '@client/declarations'
 import { v4 as uuid } from 'uuid'
 import { AppStore } from '@client/store'
 import {
@@ -51,7 +51,7 @@ import { FETCH_PERSON_NID } from '@opencrvs/client/src/forms/register/queries/pe
 
 import { formMessages as messages } from '@client/i18n/messages'
 import * as profileSelectors from '@client/profile/profileSelectors'
-import { getRegisterForm } from '@client/forms/register/application-selectors'
+import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { History } from 'history'
 import { DECLARED } from '@client/utils/constants'
@@ -71,10 +71,10 @@ describe('when user is in the register form for birth event', () => {
       store = storeContext.store
       history = storeContext.history
 
-      const draft = createApplication(Event.BIRTH)
-      store.dispatch(storeApplication(draft))
-      store.dispatch(setInitialApplications())
-      store.dispatch(storeApplication(draft))
+      const draft = createDeclaration(Event.BIRTH)
+      store.dispatch(storeDeclaration(draft))
+      store.dispatch(setInitialDeclarations())
+      store.dispatch(storeDeclaration(draft))
 
       const mock: any = jest.fn()
       const form = await getRegisterFormFromStore(store, Event.BIRTH)
@@ -85,11 +85,11 @@ describe('when user is in the register form for birth event', () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          application={draft}
+          declaration={draft}
           pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP}
           match={{
             params: {
-              applicationId: draft.id,
+              declarationId: draft.id,
               pageId: 'mother',
               groupId: 'mother-view-group'
             },
@@ -145,16 +145,16 @@ describe('when user is in the register form for death event', () => {
   let form: IForm
   let store: AppStore
   let history: History
-  let draft: ReturnType<typeof createApplication>
+  let draft: ReturnType<typeof createDeclaration>
 
   beforeEach(async () => {
     const testStore = await createTestStore()
     store = testStore.store
     history = testStore.history
     const mock: any = jest.fn()
-    draft = createApplication(Event.DEATH)
-    store.dispatch(setInitialApplications())
-    store.dispatch(storeApplication(draft))
+    draft = createDeclaration(Event.DEATH)
+    store.dispatch(setInitialDeclarations())
+    store.dispatch(storeDeclaration(draft))
     form = await getRegisterFormFromStore(store, Event.DEATH)
   })
   describe('when user is in optional cause of death section', () => {
@@ -171,11 +171,11 @@ describe('when user is in the register form for death event', () => {
           history={history}
           staticContext={mock}
           registerForm={clonedForm}
-          application={draft}
+          declaration={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
             params: {
-              applicationId: draft.id,
+              declarationId: draft.id,
               pageId: 'causeOfDeath',
               groupId: 'causeOfDeath-causeOfDeathEstablished'
             },
@@ -210,11 +210,11 @@ describe('when user is in the register form for death event', () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          application={draft}
+          declaration={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
             params: {
-              applicationId: draft.id,
+              declarationId: draft.id,
               pageId: 'deceased',
               groupId: 'deceased-view-group'
             },
@@ -243,10 +243,10 @@ describe('when user is in the register form for death event', () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          application={draft}
+          declaration={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
-            params: { applicationId: draft.id, pageId: '', groupId: '' },
+            params: { declarationId: draft.id, pageId: '', groupId: '' },
             isExact: true,
             path: '',
             url: ''
@@ -271,10 +271,10 @@ describe('when user is in the register form for death event', () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          application={draft}
+          declaration={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
-            params: { applicationId: draft.id, pageId: '', groupId: '' },
+            params: { declarationId: draft.id, pageId: '', groupId: '' },
             isExact: true,
             path: '',
             url: ''
@@ -298,11 +298,11 @@ describe('when user is in the register form for death event', () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          application={draft}
+          declaration={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
             params: {
-              applicationId: draft.id,
+              declarationId: draft.id,
               pageId: 'deceased',
               groupId: 'deceased-view-group'
             },
@@ -360,11 +360,11 @@ describe('when user is in the register form for death event', () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          application={draft}
+          declaration={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
             params: {
-              applicationId: draft.id,
+              declarationId: draft.id,
               pageId: 'deceased',
               groupId: 'deceased-view-group'
             },
@@ -440,11 +440,11 @@ describe('when user is in the register form for death event', () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          application={draft}
+          declaration={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
             params: {
-              applicationId: draft.id,
+              declarationId: draft.id,
               pageId: 'deceased',
               groupId: 'deceased-view-group'
             },
@@ -538,11 +538,11 @@ describe('when user is in the register form for death event', () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          application={draft}
+          declaration={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
             params: {
-              applicationId: draft.id,
+              declarationId: draft.id,
               pageId: 'informant',
               groupId: 'informant-view-group'
             },
@@ -617,11 +617,11 @@ describe('when user is in the register form for death event', () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          application={draft}
+          declaration={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
             params: {
-              applicationId: draft.id,
+              declarationId: draft.id,
               pageId: 'deceased',
               groupId: 'deceased-view-group'
             },
@@ -691,11 +691,11 @@ describe('when user is in the register form for death event', () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          application={draft}
+          declaration={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
             params: {
-              applicationId: draft.id,
+              declarationId: draft.id,
               pageId: 'deceased',
               groupId: 'deceased-view-group'
             },
@@ -768,11 +768,11 @@ describe('when user is in the register form for death event', () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          application={draft}
+          declaration={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
             params: {
-              applicationId: draft.id,
+              declarationId: draft.id,
               pageId: 'deceased',
               groupId: 'deceased-view-group'
             },
@@ -833,11 +833,11 @@ describe('when user is in the register form for death event', () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          application={draft}
+          declaration={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
             params: {
-              applicationId: draft.id,
+              declarationId: draft.id,
               pageId: 'deathEvent',
               groupId: 'deathEvent-deathDate'
             },
@@ -867,9 +867,9 @@ describe('when user is in the register form preview section', () => {
     store = storeContext.store
     history = storeContext.history
 
-    const draft = createApplication(Event.BIRTH)
-    store.dispatch(setInitialApplications())
-    store.dispatch(storeApplication(draft))
+    const draft = createDeclaration(Event.BIRTH)
+    store.dispatch(setInitialDeclarations())
+    store.dispatch(storeDeclaration(draft))
 
     const form = await getRegisterFormFromStore(store, Event.BIRTH)
     const testComponent = await createTestComponent(
@@ -877,11 +877,11 @@ describe('when user is in the register form preview section', () => {
       <RegisterForm
         history={history}
         registerForm={form}
-        application={draft}
+        declaration={draft}
         pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
         match={{
           params: {
-            applicationId: draft.id,
+            declarationId: draft.id,
             pageId: 'preview',
             groupId: 'preview-view-group'
           },
@@ -910,14 +910,14 @@ describe('when user is in the register form preview section', () => {
   describe('User in the Preview section for submitting the Form', () => {
     beforeEach(async () => {
       // @ts-ignore
-      const nApplication = createReviewApplication(
+      const nDeclaration = createReviewDeclaration(
         uuid(),
-        mockApplicationData,
+        mockDeclarationData,
         Event.BIRTH
       )
-      nApplication.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-      store.dispatch(setInitialApplications())
-      store.dispatch(storeApplication(nApplication))
+      nDeclaration.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+      store.dispatch(setInitialDeclarations())
+      store.dispatch(storeDeclaration(nDeclaration))
 
       const nform = getRegisterForm(store.getState())[Event.BIRTH]
       const nTestComponent = await createTestComponent(
@@ -925,11 +925,11 @@ describe('when user is in the register form preview section', () => {
         <RegisterForm
           history={history}
           registerForm={nform}
-          application={nApplication}
+          declaration={nDeclaration}
           pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
           match={{
             params: {
-              applicationId: nApplication.id,
+              declarationId: nDeclaration.id,
               pageId: 'preview',
               groupId: 'preview-view-group'
             },
@@ -975,13 +975,13 @@ describe('when user is in the register form review section', () => {
   beforeEach(async () => {
     const { store, history } = await createTestStore()
     // @ts-ignore
-    const application = createReviewApplication(
+    const declaration = createReviewDeclaration(
       uuid(),
-      mockApplicationData,
+      mockDeclarationData,
       Event.BIRTH
     )
-    store.dispatch(setInitialApplications())
-    store.dispatch(storeApplication(application))
+    store.dispatch(setInitialDeclarations())
+    store.dispatch(storeDeclaration(declaration))
     const mock: any = jest.fn()
     jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
 
@@ -994,11 +994,11 @@ describe('when user is in the register form review section', () => {
         history={history}
         staticContext={mock}
         registerForm={form}
-        application={application}
+        declaration={declaration}
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
-            applicationId: application.id,
+            declarationId: declaration.id,
             pageId: 'review',
             groupId: 'review-view-group'
           },
@@ -1013,7 +1013,7 @@ describe('when user is in the register form review section', () => {
   })
 
   it('clicking the reject button launches the reject form action page', async () => {
-    component.find('#rejectApplicationBtn').hostNodes().simulate('click')
+    component.find('#rejectDeclarationBtn').hostNodes().simulate('click')
 
     await waitForElement(component, '#reject-registration-form-container')
     expect(
@@ -1027,13 +1027,13 @@ describe('when user is in the register form from review edit', () => {
   beforeEach(async () => {
     const { store, history } = await createTestStore()
     // @ts-ignore
-    const application = createReviewApplication(
+    const declaration = createReviewDeclaration(
       uuid(),
-      mockApplicationData,
+      mockDeclarationData,
       Event.BIRTH
     )
-    store.dispatch(setInitialApplications())
-    store.dispatch(storeApplication(application))
+    store.dispatch(setInitialDeclarations())
+    store.dispatch(storeDeclaration(declaration))
     const mock: any = jest.fn()
     jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
 
@@ -1046,11 +1046,11 @@ describe('when user is in the register form from review edit', () => {
         history={history}
         staticContext={mock}
         registerForm={form}
-        application={application}
+        declaration={declaration}
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
-            applicationId: application.id,
+            declarationId: declaration.id,
             pageId: 'mother',
             groupId: 'mother-view-group'
           },
@@ -1064,18 +1064,18 @@ describe('when user is in the register form from review edit', () => {
     component = testComponent
   })
 
-  it('should redirect to progress tab when close application button is clicked', async () => {
+  it('should redirect to progress tab when close declaration button is clicked', async () => {
     const menuButton = await waitForElement(
       component,
       '#eventToggleMenuToggleButton'
     )
     menuButton.hostNodes().simulate('click')
     component.update()
-    const closeApplicationButton = await waitForElement(
+    const closeDeclarationButton = await waitForElement(
       component,
       '#eventToggleMenuItem0'
     )
-    closeApplicationButton.hostNodes().simulate('click')
+    closeDeclarationButton.hostNodes().simulate('click')
     component.update()
     expect(window.location.href).toContain('/progress')
   })
@@ -1089,14 +1089,14 @@ describe('when user is in the register form from sent for review edit', () => {
     Date.now = jest.fn(() => 1582525224324)
     const { store, history } = await createTestStore()
     // @ts-ignore
-    const application = createReviewApplication(
+    const declaration = createReviewDeclaration(
       uuid(),
-      mockApplicationData,
+      mockDeclarationData,
       Event.BIRTH,
       DECLARED
     )
-    store.dispatch(setInitialApplications())
-    store.dispatch(storeApplication(application))
+    store.dispatch(setInitialDeclarations())
+    store.dispatch(storeDeclaration(declaration))
     const mock: any = jest.fn()
     jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
 
@@ -1109,11 +1109,11 @@ describe('when user is in the register form from sent for review edit', () => {
         history={history}
         staticContext={mock}
         registerForm={form}
-        application={application}
+        declaration={declaration}
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
-            applicationId: application.id,
+            declarationId: declaration.id,
             pageId: 'mother',
             groupId: 'mother-view-group'
           },
@@ -1134,7 +1134,7 @@ describe('when user is in the register form from sent for review edit', () => {
     component.update()
     const saveDraftConfirmationModal = await waitForElement(
       component,
-      '#save_application_confirmation'
+      '#save_declaration_confirmation'
     )
     expect(saveDraftConfirmationModal.hostNodes()).toHaveLength(1)
   })
@@ -1153,7 +1153,7 @@ describe('when user is in the register form from sent for review edit', () => {
     component.update()
     const saveDraftConfirmationModal = await waitForElement(
       component,
-      '#save_application_confirmation'
+      '#save_declaration_confirmation'
     )
 
     saveDraftConfirmationModal
@@ -1163,7 +1163,7 @@ describe('when user is in the register form from sent for review edit', () => {
     component.update()
 
     const modifyTime =
-      testAppStore.getState().applicationsState.applications[0].modifiedOn
+      testAppStore.getState().declarationsState.declarations[0].modifiedOn
 
     expect(modifyTime).toBe(DRAFT_MODIFY_TIME)
   })
@@ -1183,20 +1183,20 @@ describe('When user is in Preview section death event', () => {
     store = testStore.store
     history = testStore.history
 
-    const draft = createApplication(Event.DEATH)
-    store.dispatch(setInitialApplications())
-    store.dispatch(storeApplication(draft))
+    const draft = createDeclaration(Event.DEATH)
+    store.dispatch(setInitialDeclarations())
+    store.dispatch(storeDeclaration(draft))
     jest.clearAllMocks()
     // @ts-ignore
-    deathDraft = createReviewApplication(
+    deathDraft = createReviewDeclaration(
       uuid(),
       // @ts-ignore
-      mockDeathApplicationData,
+      mockDeathDeclarationData,
       Event.DEATH
     )
     deathDraft.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-    store.dispatch(setInitialApplications())
-    store.dispatch(storeApplication(deathDraft))
+    store.dispatch(setInitialDeclarations())
+    store.dispatch(storeDeclaration(deathDraft))
 
     jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['declare'])
 
@@ -1208,11 +1208,11 @@ describe('When user is in Preview section death event', () => {
         history={history}
         staticContext={mock}
         registerForm={deathForm}
-        application={deathDraft}
+        declaration={deathDraft}
         pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
         match={{
           params: {
-            applicationId: deathDraft.id,
+            declarationId: deathDraft.id,
             pageId: 'preview',
             groupId: 'preview-view-group'
           },
@@ -1228,14 +1228,14 @@ describe('When user is in Preview section death event', () => {
 
   it('Check if death location type is parsed properly', () => {
     expect(
-      draftToGqlTransformer(deathForm, mockDeathApplicationData as IFormData)
+      draftToGqlTransformer(deathForm, mockDeathDeclarationData as IFormData)
         .eventLocation.type
     ).toBe('OTHER')
   })
 
   it('Check if death location partOf is parsed properly', () => {
     expect(
-      draftToGqlTransformer(deathForm, mockDeathApplicationData as IFormData)
+      draftToGqlTransformer(deathForm, mockDeathDeclarationData as IFormData)
         .eventLocation.partOf
     ).toBe('Location/1dfc716a-c5f7-4d39-ad71-71d2a359210c')
   })
@@ -1252,53 +1252,53 @@ describe('When user is in Preview section death event', () => {
     expect(history.location.pathname).toBe(HOME)
   })
   it('Check if death location as hospital is parsed properly', () => {
-    const hospitalLocatioMockDeathApplicationData = clone(
-      mockDeathApplicationData
+    const hospitalLocatioMockDeathDeclarationData = clone(
+      mockDeathDeclarationData
     )
-    hospitalLocatioMockDeathApplicationData.deathEvent.deathPlaceAddress =
+    hospitalLocatioMockDeathDeclarationData.deathEvent.deathPlaceAddress =
       'HEALTH_FACILITY'
-    hospitalLocatioMockDeathApplicationData.deathEvent.deathLocation =
+    hospitalLocatioMockDeathDeclarationData.deathEvent.deathLocation =
       '5e3736a0-090e-43b4-9012-f1cef399e123'
 
     expect(
       draftToGqlTransformer(
         deathForm,
-        hospitalLocatioMockDeathApplicationData as IFormData
+        hospitalLocatioMockDeathDeclarationData as IFormData
       ).eventLocation.type
     ).toBe(undefined)
   })
 
   it('Check if death location as hospital _fhirID is parsed properly', () => {
-    const hospitalLocatioMockDeathApplicationData = clone(
-      mockDeathApplicationData
+    const hospitalLocatioMockDeathDeclarationData = clone(
+      mockDeathDeclarationData
     )
-    hospitalLocatioMockDeathApplicationData.deathEvent.deathPlaceAddress =
+    hospitalLocatioMockDeathDeclarationData.deathEvent.deathPlaceAddress =
       'HEALTH_FACILITY'
-    hospitalLocatioMockDeathApplicationData.deathEvent.deathLocation =
+    hospitalLocatioMockDeathDeclarationData.deathEvent.deathLocation =
       '5e3736a0-090e-43b4-9012-f1cef399e123'
 
     expect(
       draftToGqlTransformer(
         deathForm,
-        hospitalLocatioMockDeathApplicationData as IFormData
+        hospitalLocatioMockDeathDeclarationData as IFormData
       ).eventLocation._fhirID
     ).toBe('5e3736a0-090e-43b4-9012-f1cef399e123')
   })
 
   it('Check if death location is deceased parmanent address', () => {
-    const mockDeathApplication = clone(mockDeathApplicationData)
-    mockDeathApplication.deathEvent.deathPlaceAddress = 'PERMANENT'
+    const mockDeathDeclaration = clone(mockDeathDeclarationData)
+    mockDeathDeclaration.deathEvent.deathPlaceAddress = 'PERMANENT'
 
     expect(
-      draftToGqlTransformer(deathForm, mockDeathApplication as IFormData)
+      draftToGqlTransformer(deathForm, mockDeathDeclaration as IFormData)
         .eventLocation.address.type
     ).toBe('PERMANENT')
   })
 
   it('Death location should be undefined if no decased address is found', () => {
-    const mockDeathApplication = cloneDeep(mockDeathApplicationData)
+    const mockDeathDeclaration = cloneDeep(mockDeathDeclarationData)
     // @ts-ignore
-    mockDeathApplication.deceased = {
+    mockDeathDeclaration.deceased = {
       iDType: 'NATIONAL_ID',
       iD: '1230000000000',
       firstNames: 'মকবুল',
@@ -1310,10 +1310,10 @@ describe('When user is in Preview section death event', () => {
       maritalStatus: 'MARRIED',
       birthDate: '1987-02-16'
     }
-    mockDeathApplication.deathEvent.deathPlaceAddress = 'CURRENT'
+    mockDeathDeclaration.deathEvent.deathPlaceAddress = 'CURRENT'
 
     expect(
-      draftToGqlTransformer(deathForm, mockDeathApplication as IFormData)
+      draftToGqlTransformer(deathForm, mockDeathDeclaration as IFormData)
         .eventLocation
     ).toBe(undefined)
   })
@@ -1333,9 +1333,9 @@ describe('When user is in Preview section death event in offline mode', () => {
     history = testStore.history
     store = testStore.store
 
-    const draft = createApplication(Event.DEATH)
-    store.dispatch(setInitialApplications())
-    store.dispatch(storeApplication(draft))
+    const draft = createDeclaration(Event.DEATH)
+    store.dispatch(setInitialDeclarations())
+    store.dispatch(storeDeclaration(draft))
 
     Object.defineProperty(window.navigator, 'onLine', {
       value: false,
@@ -1343,15 +1343,15 @@ describe('When user is in Preview section death event in offline mode', () => {
     })
     jest.clearAllMocks()
     // @ts-ignore
-    deathDraft = createReviewApplication(
+    deathDraft = createReviewDeclaration(
       uuid(),
       // @ts-ignore
-      mockDeathApplicationDataWithoutFirstNames,
+      mockDeathDeclarationDataWithoutFirstNames,
       Event.DEATH
     )
     deathDraft.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-    store.dispatch(setInitialApplications())
-    store.dispatch(storeApplication(deathDraft))
+    store.dispatch(setInitialDeclarations())
+    store.dispatch(storeDeclaration(deathDraft))
 
     deathForm = await getRegisterFormFromStore(store, Event.DEATH)
     const nTestComponent = await createTestComponent(
@@ -1361,11 +1361,11 @@ describe('When user is in Preview section death event in offline mode', () => {
         history={history}
         staticContext={mock}
         registerForm={deathForm}
-        application={deathDraft}
+        declaration={deathDraft}
         pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
         match={{
           params: {
-            applicationId: deathDraft.id,
+            declarationId: deathDraft.id,
             pageId: 'preview',
             groupId: 'preview-view-group'
           },

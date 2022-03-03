@@ -41,10 +41,10 @@ describe('fhirUtils', () => {
               coding: [
                 {
                   system: 'http://opencrvs.org/doc-types',
-                  code: 'birth-application'
+                  code: 'birth-declaration'
                 }
               ],
-              text: 'Birth Application'
+              text: 'Birth Declaration'
             },
             class: {
               coding: [
@@ -252,10 +252,10 @@ describe('fhirUtils', () => {
               coding: [
                 {
                   system: 'http://opencrvs.org/doc-types',
-                  code: 'birth-application'
+                  code: 'birth-declaration'
                 }
               ],
-              text: 'Birth Application'
+              text: 'Birth Declaration'
             },
             class: {
               coding: [
@@ -442,10 +442,10 @@ describe('fhirUtils', () => {
               coding: [
                 {
                   system: 'http://opencrvs.org/doc-types',
-                  code: 'death-application'
+                  code: 'death-declaration'
                 }
               ],
-              text: 'Death Application'
+              text: 'Death Declaration'
             },
             class: {
               coding: [
@@ -456,7 +456,7 @@ describe('fhirUtils', () => {
               ],
               text: 'CRVS Document'
             },
-            title: 'Death Application',
+            title: 'Death Declaration',
             section: [
               {
                 title: 'Deceased details',
@@ -611,10 +611,10 @@ describe('fhirUtils', () => {
               coding: [
                 {
                   system: 'http://opencrvs.org/doc-types',
-                  code: 'death-application'
+                  code: 'death-declaration'
                 }
               ],
-              text: 'Death Application'
+              text: 'Death Declaration'
             },
             class: {
               coding: [
@@ -625,7 +625,7 @@ describe('fhirUtils', () => {
               ],
               text: 'CRVS Document'
             },
-            title: 'Death Application',
+            title: 'Death Declaration',
             section: [
               {
                 title: 'Deceased details',
@@ -704,10 +704,10 @@ describe('fhirUtils', () => {
               coding: [
                 {
                   system: 'http://opencrvs.org/doc-types',
-                  code: 'death-application'
+                  code: 'death-declaration'
                 }
               ],
-              text: 'Death Application'
+              text: 'Death Declaration'
             },
             class: {
               coding: [
@@ -718,7 +718,7 @@ describe('fhirUtils', () => {
               ],
               text: 'CRVS Document'
             },
-            title: 'Death Application',
+            title: 'Death Declaration',
             section: [
               {
                 title: 'Deceased details',
@@ -1004,10 +1004,10 @@ describe('fhirUtils', () => {
         coding: [
           {
             system: 'http://opencrvs.org/doc-types',
-            code: 'birth-application'
+            code: 'birth-declaration'
           }
         ],
-        text: 'Birth Application'
+        text: 'Birth Declaration'
       },
       class: {
         coding: [
@@ -1015,7 +1015,7 @@ describe('fhirUtils', () => {
         ],
         text: 'CRVS Document'
       },
-      title: 'Birth Application',
+      title: 'Birth Declaration',
       section: [
         {
           title: 'Child details',
@@ -1083,7 +1083,7 @@ describe('fhirUtils', () => {
             code: 'birth-notification'
           }
         ],
-        text: 'Birth Application'
+        text: 'Birth Declaration'
       },
       class: {
         coding: [
@@ -1091,7 +1091,7 @@ describe('fhirUtils', () => {
         ],
         text: 'CRVS Document'
       },
-      title: 'Birth Application',
+      title: 'Birth Declaration',
       section: [
         {
           title: 'Child details',
@@ -1154,7 +1154,7 @@ describe('fhirUtils', () => {
       status: 'preliminary',
       type: {
         coding: [],
-        text: 'Birth Application'
+        text: 'Birth Declaration'
       },
       class: {
         coding: [
@@ -1162,7 +1162,7 @@ describe('fhirUtils', () => {
         ],
         text: 'CRVS Document'
       },
-      title: 'Birth Application',
+      title: 'Birth Declaration',
       section: [
         {
           title: 'Child details',
@@ -1220,14 +1220,14 @@ describe('fhirUtils', () => {
       'Composition has no type codings defined'
     )
   })
-  it('returns practitioner who started the application', () => {
+  it('returns practitioner who started the declaration', () => {
     const taskHistory = require('./test-data/task-history.json')
 
     expect(getStartedByFieldAgent(taskHistory)).toEqual(
       'fe16875f-3e5f-47bc-85d6-16482a63e7df'
     )
   })
-  it('throws error if no task associated with declared or in progress application ', () => {
+  it('throws error if no task associated with declared or in progress declaration ', () => {
     const taskHistory = require('./test-data/task-history.json')
     taskHistory.entry[1].resource.businessStatus.coding[0].code = ''
 

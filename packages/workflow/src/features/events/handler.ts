@@ -26,7 +26,7 @@ import {
 import {
   getEventType,
   hasCorrectionEncounterSection,
-  isInProgressApplication
+  isInProgressDeclaration
 } from '@workflow/features/registration/utils'
 import updateTaskHandler from '@workflow/features/task/handler'
 import { logger } from '@workflow/logger'
@@ -37,28 +37,28 @@ import fetch, { RequestInit } from 'node-fetch'
 // TODO: Change these event names to be closer in definition to the comments
 // https://jembiprojects.jira.com/browse/OCRVS-2767
 export enum Events {
-  BIRTH_IN_PROGRESS_DEC = '/events/birth/in-progress-declaration', // Field agent or DHIS2in progress application
-  BIRTH_NEW_DEC = '/events/birth/new-declaration', // Field agent completed application
+  BIRTH_IN_PROGRESS_DEC = '/events/birth/in-progress-declaration', // Field agent or DHIS2in progress declaration
+  BIRTH_NEW_DEC = '/events/birth/new-declaration', // Field agent completed declaration
   BIRTH_UPDATE_DEC = '/events/birth/update-declaration',
   BIRTH_WAITING_VALIDATION = '/events/birth/waiting-validation',
-  BIRTH_NEW_WAITING_VALIDATION = '/events/birth/new-waiting-validation', // Registrar new registration application
+  BIRTH_NEW_WAITING_VALIDATION = '/events/birth/new-waiting-validation', // Registrar new registration declaration
   BIRTH_MARK_REG = '/events/birth/mark-registered',
   BIRTH_MARK_VALID = '/events/birth/mark-validated',
   BIRTH_MARK_CERT = '/events/birth/mark-certified',
   BIRTH_MARK_VOID = '/events/birth/mark-voided',
   BIRTH_REQUEST_CORRECTION = '/events/birth/request-correction',
-  DEATH_IN_PROGRESS_DEC = '/events/death/in-progress-declaration', /// Field agent or DHIS2in progress application
-  DEATH_NEW_DEC = '/events/death/new-declaration', // Field agent completed application
+  DEATH_IN_PROGRESS_DEC = '/events/death/in-progress-declaration', /// Field agent or DHIS2in progress declaration
+  DEATH_NEW_DEC = '/events/death/new-declaration', // Field agent completed declaration
   DEATH_UPDATE_DEC = '/events/death/update-declaration',
   DEATH_WAITING_VALIDATION = '/events/death/waiting-validation',
-  DEATH_NEW_WAITING_VALIDATION = '/events/death/new-waiting-validation', // Registrar new registration application
+  DEATH_NEW_WAITING_VALIDATION = '/events/death/new-waiting-validation', // Registrar new registration declaration
   DEATH_MARK_REG = '/events/death/mark-registered',
   DEATH_MARK_VALID = '/events/death/mark-validated',
   DEATH_MARK_CERT = '/events/death/mark-certified',
   DEATH_MARK_VOID = '/events/death/mark-voided',
   DEATH_REQUEST_CORRECTION = '/events/death/request-correction',
-  BIRTH_NEW_VALIDATE = '/events/birth/new-validation', // Registration agent new application
-  DEATH_NEW_VALIDATE = '/events/death/new-validation', // Registration agent new application
+  BIRTH_NEW_VALIDATE = '/events/birth/new-validation', // Registration agent new declaration
+  DEATH_NEW_VALIDATE = '/events/death/new-validation', // Registration agent new declaration
   EVENT_NOT_DUPLICATE = '/events/not-duplicate',
   UNKNOWN = 'unknown'
 }
@@ -105,7 +105,7 @@ function detectEvent(request: Hapi.Request): Events {
               return Events.BIRTH_NEW_VALIDATE
             }
 
-            return isInProgressApplication(fhirBundle)
+            return isInProgressDeclaration(fhirBundle)
               ? Events.BIRTH_IN_PROGRESS_DEC
               : Events.BIRTH_NEW_DEC
           }
@@ -137,7 +137,7 @@ function detectEvent(request: Hapi.Request): Events {
               return Events.DEATH_NEW_VALIDATE
             }
 
-            return isInProgressApplication(fhirBundle)
+            return isInProgressDeclaration(fhirBundle)
               ? Events.DEATH_IN_PROGRESS_DEC
               : Events.DEATH_NEW_DEC
           }

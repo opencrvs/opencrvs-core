@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  mockApplicationData,
+  mockDeclarationData,
   userDetails,
   mockOfflineData
 } from '@client/tests/util'
@@ -21,9 +21,9 @@ import { TemplateTransformerData } from './types'
 
 describe('PDF template field transformer tests', () => {
   const data: TemplateTransformerData = {
-    application: {
+    declaration: {
       id: 'sample',
-      data: mockApplicationData,
+      data: mockDeclarationData,
       event: Event.BIRTH
     },
     userDetails,
@@ -217,7 +217,7 @@ describe('PDF template field transformer tests', () => {
           9: '৯'
         }
       })
-      expect(data.application.data.mother.iD).toEqual('6546511876932')
+      expect(data.declaration.data.mother.iD).toEqual('6546511876932')
       expect(transformedValue).toEqual('৬৫৪৬৫১১৮৭৬৯৩২')
     })
     it('Throws exception if payload is not provided', () => {

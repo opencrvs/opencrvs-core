@@ -101,7 +101,7 @@ interface IState {
 }
 
 enum ACTIVE_MENU_ITEM {
-  APPLICATIONS,
+  DECLARATIONS,
   CONFIG,
   PERFORMANCE,
   TEAM,
@@ -391,7 +391,7 @@ class HeaderComp extends React.Component<IProps, IState> {
           ? messages.teamTitle
           : activeMenuItem === ACTIVE_MENU_ITEM.CONFIG
           ? constantsMessages.configTitle
-          : constantsMessages.applicationTitle
+          : constantsMessages.declarationTitle
       )
 
     let rightMenu = [
@@ -429,7 +429,7 @@ class HeaderComp extends React.Component<IProps, IState> {
       }
     ]
 
-    if (activeMenuItem !== ACTIVE_MENU_ITEM.APPLICATIONS) {
+    if (activeMenuItem !== ACTIVE_MENU_ITEM.DECLARATIONS) {
       rightMenu = [
         {
           element: (
@@ -473,7 +473,7 @@ export const Header = connect(
       ? ACTIVE_MENU_ITEM.TEAM
       : window.location.href.includes('config')
       ? ACTIVE_MENU_ITEM.CONFIG
-      : ACTIVE_MENU_ITEM.APPLICATIONS,
+      : ACTIVE_MENU_ITEM.DECLARATIONS,
     language: store.i18n.language,
     userDetails: getUserDetails(store)
   }),

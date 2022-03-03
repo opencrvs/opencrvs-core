@@ -599,7 +599,7 @@ const messagesToDefine: IFormMessages = {
   },
   causeOfDeathNotice: {
     defaultMessage:
-      'A Medically Certified Cause of Death is not mandatory to submit the application. This can be added at a later date.',
+      'A Medically Certified Cause of Death is not mandatory to submit the declaration. This can be added at a later date.',
     description: 'Form section notice for Cause of Death',
     id: 'form.section.causeOfDeathNotice'
   },
@@ -678,12 +678,12 @@ const messagesToDefine: IFormMessages = {
     defaultMessage:
       'Use this section to add any comments or notes that might be relevant to the completion and certification of this registration. This information won’t be shared with the informants.',
     description: 'Help text for the notes field',
-    id: 'form.field.label.application.comment.desc'
+    id: 'form.field.label.declaration.comment.desc'
   },
   commentsOrNotesLabel: {
     defaultMessage: 'Comments or notes',
     description: 'Input label for comments or notes textarea',
-    id: 'form.field.label.application.commentsOrNotes'
+    id: 'form.field.label.declaration.commentsOrNotes'
   },
   confirm: {
     defaultMessage: 'Yes',
@@ -1533,22 +1533,22 @@ const messagesToDefine: IFormMessages = {
   presentBoth: {
     defaultMessage: 'Both Parents',
     description: 'Label for "Both Parents" select option',
-    id: 'form.field.label.application.whoIsPresent.both'
+    id: 'form.field.label.declaration.whoIsPresent.both'
   },
   presentFather: {
     defaultMessage: 'Father',
     description: 'Label for "Father" select option',
-    id: 'form.field.label.application.whoIsPresent.father'
+    id: 'form.field.label.declaration.whoIsPresent.father'
   },
   presentMother: {
     defaultMessage: 'Mother',
     description: 'Label for "Mother" select option',
-    id: 'form.field.label.application.whoIsPresent.mother'
+    id: 'form.field.label.declaration.whoIsPresent.mother'
   },
   presentOther: {
     defaultMessage: 'Other',
     description: 'Label for "Other" select option',
-    id: 'form.field.label.application.whoIsPresent.other'
+    id: 'form.field.label.declaration.whoIsPresent.other'
   },
   privateHome: {
     defaultMessage: 'Private Home',
@@ -1596,7 +1596,7 @@ const messagesToDefine: IFormMessages = {
   registrationName: {
     defaultMessage: 'Registration',
     description: 'Form section name for Registration',
-    id: 'form.section.application.name'
+    id: 'form.section.declaration.name'
   },
   registrationOffice: {
     defaultMessage: 'Registration Office',
@@ -1606,12 +1606,12 @@ const messagesToDefine: IFormMessages = {
   registrationPhoneLabel: {
     defaultMessage: 'Phone number',
     description: 'Input label for phone input',
-    id: 'form.field.label.application.phone'
+    id: 'form.field.label.declaration.phone'
   },
   registrationTitle: {
     defaultMessage: 'Registration',
     description: 'Form section title for Registration',
-    id: 'form.section.application.title'
+    id: 'form.section.declaration.title'
   },
   relationExtendedFamily: {
     defaultMessage: 'Extended Family',
@@ -1886,12 +1886,12 @@ const messagesToDefine: IFormMessages = {
   whoIsPresentLabel: {
     defaultMessage: 'Who is present for the registration',
     description: 'Input label for who is present input',
-    id: 'form.field.label.application.whoIsPresent'
+    id: 'form.field.label.declaration.whoIsPresent'
   },
   whoseContactDetailsLabel: {
-    defaultMessage: 'Who is the contact person for this application?',
+    defaultMessage: 'Who is the contact person for this declaration?',
     description: 'Input label for contact details person',
-    id: 'form.field.label.application.whoseContactDetails'
+    id: 'form.field.label.declaration.whoseContactDetails'
   },
   userSignatureAttachmentTitle: {
     defaultMessage: 'Attach the signature',

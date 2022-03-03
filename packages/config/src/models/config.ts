@@ -28,7 +28,7 @@ interface INIDNumberPattern {
   num: string
 }
 
-export interface IApplicationConfigurationModel extends Document {
+export interface IDeclarationConfigurationModel extends Document {
   BACKGROUND_SYNC_BROADCAST_CHANNEL: string
   COUNTRY: string
   COUNTRY_LOGO_FILE: string
@@ -42,7 +42,7 @@ export interface IApplicationConfigurationModel extends Document {
   CERTIFICATE_PRINT_HIGHEST_CHARGE: number
   UI_POLLING_INTERVAL: number
   FIELD_AGENT_AUDIT_LOCATIONS: string
-  APPLICATION_AUDIT_LOCATIONS: string
+  DECLARATION_AUDIT_LOCATIONS: string
   INFORMANT_MINIMUM_AGE: number
   HIDE_EVENT_REGISTER_INFORMATION: boolean
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
@@ -109,7 +109,7 @@ const systemSchema = new Schema({
     required: false,
     default: 'DISTRICT'
   },
-  APPLICATION_AUDIT_LOCATIONS: {
+  DECLARATION_AUDIT_LOCATIONS: {
     type: String,
     required: false,
     default: 'DISTRICT'
@@ -141,4 +141,4 @@ const systemSchema = new Schema({
   LOGROCKET: { type: String, required: false }
 })
 
-export default model<IApplicationConfigurationModel>('Config', systemSchema)
+export default model<IDeclarationConfigurationModel>('Config', systemSchema)

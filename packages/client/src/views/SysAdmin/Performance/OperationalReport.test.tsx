@@ -29,7 +29,7 @@ import { parse } from 'query-string'
 import { OPERATIONAL_REPORTS_METRICS } from './metricsQuery'
 import { GraphQLError } from 'graphql'
 import { SEARCH_EVENTS } from '@client/views/OfficeHome/queries'
-import { COUNT_USER_WISE_APPLICATIONS } from '@client/search/queries'
+import { COUNT_USER_WISE_DECLARATIONS } from '@client/search/queries'
 
 describe('OperationalReport tests', () => {
   let component: ReactWrapper<{}, {}>
@@ -50,7 +50,7 @@ describe('OperationalReport tests', () => {
     const graphqlMock = [
       {
         request: {
-          query: COUNT_USER_WISE_APPLICATIONS,
+          query: COUNT_USER_WISE_DECLARATIONS,
           variables: {
             userId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
             status: ['REJECTED'],
@@ -95,11 +95,11 @@ describe('OperationalReport tests', () => {
               },
               __typename: 'EventEstimationMetrics'
             },
-            getApplicationsStartedMetrics: {
-              fieldAgentApplications: 0,
-              hospitalApplications: 0,
-              officeApplications: 6,
-              __typename: 'ApplicationsStartedMetrics'
+            getDeclarationsStartedMetrics: {
+              fieldAgentDeclarations: 0,
+              hospitalDeclarations: 0,
+              officeDeclarations: 6,
+              __typename: 'DeclarationsStartedMetrics'
             }
           }
         }
@@ -352,7 +352,7 @@ describe('Test error toast notification', () => {
       component.find('#registration-rates-reports-loader').hostNodes()
     ).toHaveLength(1)
     expect(
-      component.find('#applications-started-reports-loader').hostNodes()
+      component.find('#declarations-started-reports-loader').hostNodes()
     ).toHaveLength(1)
   })
 })

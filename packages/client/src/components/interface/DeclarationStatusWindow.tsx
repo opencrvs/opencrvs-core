@@ -65,7 +65,7 @@ const TopBar = styled.div`
 
 const Title = styled.div``
 
-class ApplicationStatusWindowComponent extends React.Component<IProps> {
+class DeclarationStatusWindowComponent extends React.Component<IProps> {
   render() {
     return (
       <Window id="status-window" width={this.props.width}>
@@ -82,6 +82,6 @@ class ApplicationStatusWindowComponent extends React.Component<IProps> {
   }
 }
 
-export const ApplicationStatusWindow = withTheme(
-  ApplicationStatusWindowComponent
+export const DeclarationStatusWindow = withTheme(
+  DeclarationStatusWindowComponent
 )

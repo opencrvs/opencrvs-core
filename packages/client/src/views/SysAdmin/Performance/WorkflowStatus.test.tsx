@@ -50,7 +50,7 @@ describe('Workflow status tests', () => {
             skip: 0,
             locationId: locationId,
             status: ['REGISTERED'],
-            type: ['birth-application']
+            type: ['birth-declaration']
           }
         },
         result: {
@@ -78,7 +78,7 @@ describe('Workflow status tests', () => {
                     status: null,
                     contactNumber: null,
                     contactRelationship: null,
-                    dateOfApplication: null,
+                    dateOfDeclaration: null,
                     trackingId: 'B6N6YSF',
                     registrationNumber: '20207210411000121',
                     createdAt: '1590143054612',
@@ -125,7 +125,7 @@ describe('Workflow status tests', () => {
                     status: 'REGISTERED',
                     contactNumber: '+8801959595999',
                     contactRelationship: 'Uncle',
-                    dateOfApplication: '2020-05-20T14:40:03.088Z',
+                    dateOfDeclaration: '2020-05-20T14:40:03.088Z',
                     trackingId: 'BXOQWTT',
                     registrationNumber: '20207210411000119',
                     createdAt: '1589985603133',
@@ -171,7 +171,7 @@ describe('Workflow status tests', () => {
                     status: 'CERTIFIED',
                     contactNumber: '+8801656568682',
                     contactRelationship: 'MOTHER',
-                    dateOfApplication: '2020-05-22T06:18:04.895Z',
+                    dateOfDeclaration: '2020-05-22T06:18:04.895Z',
                     trackingId: 'BGEPVNQ',
                     registrationNumber: '20207210411000118',
                     createdAt: '1590128285130',
@@ -231,7 +231,7 @@ describe('Workflow status tests', () => {
 
       component = testComponent
 
-      await waitForElement(component, '#application-status-list')
+      await waitForElement(component, '#declaration-status-list')
       component.update()
     })
 
@@ -253,7 +253,7 @@ describe('Workflow status tests', () => {
     it('renders data', async () => {
       const listTable = await waitForElement(
         component,
-        '#application-status-list'
+        '#declaration-status-list'
       )
 
       expect(listTable.find('div#row_1').hostNodes()).toHaveLength(1)
@@ -262,12 +262,12 @@ describe('Workflow status tests', () => {
     it('toggles sort order', async () => {
       const listTable = await waitForElement(
         component,
-        '#application-status-list'
+        '#declaration-status-list'
       )
 
       const toggleSortButton = await waitForElement(
         component,
-        'span#applicationStartedOn-label'
+        'span#declarationStartedOn-label'
       )
       expect(listTable.find('div#row_0').hostNodes().childAt(7).text()).toMatch(
         /May 17, 2020/
@@ -341,7 +341,7 @@ describe('Workflow status tests', () => {
             skip: 0,
             parentLocationId: locationId,
             status: ['REGISTERED'],
-            type: ['birth-application']
+            type: ['birth-declaration']
           }
         },
         result: {

@@ -48,7 +48,7 @@ export async function getAllDocumentsHandler(
         index: 'ocrvs',
         body: {
           query: { match_all: {} },
-          sort: [{ dateOfApplication: 'asc' }],
+          sort: [{ dateOfDeclaration: 'asc' }],
           size: DEFAULT_SIZE
         }
       },
@@ -68,7 +68,7 @@ export async function getAllDocumentsHandler(
         index: 'ocrvs',
         body: {
           query: { match_all: {} },
-          sort: [{ dateOfApplication: 'asc' }],
+          sort: [{ dateOfDeclaration: 'asc' }],
           size: count
         }
       },
@@ -83,7 +83,7 @@ export async function getAllDocumentsHandler(
 }
 
 interface ICountQueryParam {
-  applicationLocationHirarchyId: string
+  declarationLocationHirarchyId: string
   status: string[]
 }
 
@@ -96,7 +96,7 @@ export async function getStatusWiseRegistrationCountHandler(
     const countResult: { status: string; count: number }[] = []
     for (const regStatus of payload.status) {
       const searchResult = await searchComposition({
-        applicationLocationHirarchyId: payload.applicationLocationHirarchyId,
+        declarationLocationHirarchyId: payload.declarationLocationHirarchyId,
         status: [regStatus]
       })
       countResult.push({
@@ -129,7 +129,7 @@ export async function populateHierarchicalLocationIdsHandler(
             bool: {
               must_not: {
                 exists: {
-                  field: 'applicationLocationHirarchyIds'
+                  field: 'declarationLocationHirarchyIds'
                 }
               }
             }
@@ -148,9 +148,9 @@ export async function populateHierarchicalLocationIdsHandler(
       )
     }
     // If total count is less than 5000, then proceed.
-    const allDocumentsWithoutHierarchicalLocations: ApiResponse<ISearchResponse<
-      ICompositionBody
-    >> = await client.search(
+    const allDocumentsWithoutHierarchicalLocations: ApiResponse<
+      ISearchResponse<ICompositionBody>
+    > = await client.search(
       {
         index: 'ocrvs',
         body: {
@@ -158,7 +158,7 @@ export async function populateHierarchicalLocationIdsHandler(
             bool: {
               must_not: {
                 exists: {
-                  field: 'applicationLocationHirarchyIds'
+                  field: 'declarationLocationHirarchyIds'
                 }
               }
             }
@@ -175,9 +175,9 @@ export async function populateHierarchicalLocationIdsHandler(
 
     for (const composition of compositions) {
       const body: ICompositionBody = composition._source
-      if (body && body.applicationLocationId) {
-        body.applicationLocationHirarchyIds = await getLocationHirarchyIDs(
-          body.applicationLocationId
+      if (body && body.declarationLocationId) {
+        body.declarationLocationHirarchyIds = await getLocationHirarchyIDs(
+          body.declarationLocationId
         )
         await updateComposition(composition._id, body)
         if (

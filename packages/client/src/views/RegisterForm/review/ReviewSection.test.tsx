@@ -10,12 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  createApplication,
-  createReviewApplication,
-  storeApplication
-} from '@client/applications'
+  createDeclaration,
+  createReviewDeclaration,
+  storeDeclaration
+} from '@client/declarations'
 import {
-  Event as ApplicationEvent,
+  Event as DeclarationEvent,
   BirthSection,
   ViewType,
   RADIO_GROUP_WITH_NESTED_FIELDS,
@@ -28,7 +28,7 @@ import {
 } from '@client/forms'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import * as profileSelectors from '@client/profile/profileSelectors'
-import * as applicationSelectors from '@client/forms/register/application-selectors'
+import * as declarationSelectors from '@client/forms/register/declaration-selectors'
 import { createStore } from '@client/store'
 import {
   createTestComponent,
@@ -54,23 +54,23 @@ import { LocationType } from '@client/offline/reducer'
 const { store, history } = createStore()
 const mockHandler = jest.fn()
 
-const draft = createApplication(ApplicationEvent.BIRTH)
+const draft = createDeclaration(DeclarationEvent.BIRTH)
 
-const declaredBirthApplication = createReviewApplication(
+const declaredBirthDeclaration = createReviewDeclaration(
   uuid(),
   {},
-  ApplicationEvent.BIRTH
+  DeclarationEvent.BIRTH
 )
-const rejectedDraftBirth = createReviewApplication(
+const rejectedDraftBirth = createReviewDeclaration(
   uuid(),
   {},
-  ApplicationEvent.BIRTH,
+  DeclarationEvent.BIRTH,
   REJECTED
 )
-const rejectedDraftDeath = createReviewApplication(
+const rejectedDraftDeath = createReviewDeclaration(
   uuid(),
   {},
-  ApplicationEvent.DEATH,
+  DeclarationEvent.DEATH,
   REJECTED
 )
 
@@ -105,7 +105,7 @@ describe('when in device of large viewport', () => {
         <ReviewSection
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           draft={draft}
-          rejectApplicationClickEvent={mockHandler}
+          rejectDeclarationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
           onChangeReviewForm={mockHandler}
         />,
@@ -160,11 +160,11 @@ describe('when in device of large viewport', () => {
       ).toBe('Government of the peoples republic of Bangladesh')
       expect(
         reviewSectionComponent.find('#review_header_subject').hostNodes().text()
-      ).toBe('Birth Application for John Doe')
+      ).toBe('Birth Declaration for John Doe')
     })
 
     it('typing additional comments input triggers onchange review form', async () => {
-      store.dispatch(storeApplication(draft))
+      store.dispatch(storeDeclaration(draft))
       reviewSectionComponent
         .find('#additional_comments')
         .hostNodes()
@@ -210,7 +210,7 @@ describe('when in device of large viewport', () => {
     })
   })
 
-  describe('when user is in the review page for rejected birth application', () => {
+  describe('when user is in the review page for rejected birth declaration', () => {
     let reviewSectionComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
       jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
@@ -218,7 +218,7 @@ describe('when in device of large viewport', () => {
         <ReviewSection
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           draft={rejectedDraftBirth}
-          rejectApplicationClickEvent={mockHandler}
+          rejectDeclarationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
         />,
         { store, history }
@@ -226,22 +226,22 @@ describe('when in device of large viewport', () => {
       reviewSectionComponent = testComponent
     })
 
-    it('Should not click the Reject Application', async () => {
+    it('Should not click the Reject Declaration', async () => {
       const rejectButton = reviewSectionComponent.find(
-        '#rejectApplicationBtn'
+        '#rejectDeclarationBtn'
       ).length
       expect(rejectButton).toEqual(0)
     })
   })
 
-  describe('when user is in the review page for rejected death application', () => {
+  describe('when user is in the review page for rejected death declaration', () => {
     let reviewSectionComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
       const testComponent = await createTestComponent(
         <ReviewSection
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           draft={rejectedDraftDeath}
-          rejectApplicationClickEvent={mockHandler}
+          rejectDeclarationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
         />,
         { store, history }
@@ -249,23 +249,23 @@ describe('when in device of large viewport', () => {
       reviewSectionComponent = testComponent
     })
 
-    it('Should not click the Reject Application', async () => {
+    it('Should not click the Reject Declaration', async () => {
       const rejectButton = reviewSectionComponent.find(
-        '#rejectApplicationBtn'
+        '#rejectDeclarationBtn'
       ).length
       expect(rejectButton).toEqual(0)
     })
   })
 
-  describe('when user is in the review page to validate birth application', () => {
+  describe('when user is in the review page to validate birth declaration', () => {
     let reviewSectionComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
       jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['validate'])
       const testComponent = await createTestComponent(
         <ReviewSection
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
-          draft={declaredBirthApplication}
-          rejectApplicationClickEvent={mockHandler}
+          draft={declaredBirthDeclaration}
+          rejectDeclarationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
         />,
         { store, history }
@@ -273,16 +273,16 @@ describe('when in device of large viewport', () => {
       reviewSectionComponent = testComponent
     })
 
-    it('Should click the Validate Application Button', async () => {
+    it('Should click the Validate Declaration Button', async () => {
       const validateButton = reviewSectionComponent
-        .find('#validateApplicationBtn')
+        .find('#validateDeclarationBtn')
         .hostNodes().length
       expect(validateButton).toEqual(1)
     })
 
-    it('Should click the Reject Application Button', async () => {
+    it('Should click the Reject Declaration Button', async () => {
       const rejectButton = reviewSectionComponent
-        .find('#rejectApplicationBtn')
+        .find('#rejectDeclarationBtn')
         .hostNodes().length
       expect(rejectButton).toEqual(1)
     })
@@ -323,7 +323,7 @@ describe('when in device of large viewport', () => {
 
     beforeEach(async () => {
       jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
-      jest.spyOn(applicationSelectors, 'getRegisterForm').mockReturnValue({
+      jest.spyOn(declarationSelectors, 'getRegisterForm').mockReturnValue({
         birth: {
           sections: [
             {
@@ -461,17 +461,17 @@ describe('when in device of large viewport', () => {
         }
       }
 
-      const simpleDraft = createReviewApplication(
+      const simpleDraft = createReviewDeclaration(
         uuid(),
         data,
-        ApplicationEvent.BIRTH
+        DeclarationEvent.BIRTH
       )
 
       const testComponent = await createTestComponent(
         <ReviewSection
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           draft={simpleDraft}
-          rejectApplicationClickEvent={mockHandler}
+          rejectDeclarationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
         />,
         { store, history }
@@ -507,7 +507,7 @@ describe('when in device of large viewport', () => {
 
     beforeEach(async () => {
       jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
-      jest.spyOn(applicationSelectors, 'getRegisterForm').mockReturnValue({
+      jest.spyOn(declarationSelectors, 'getRegisterForm').mockReturnValue({
         birth: {
           sections: [
             {
@@ -555,17 +555,17 @@ describe('when in device of large viewport', () => {
         }
       }
 
-      const simpleDraft = createReviewApplication(
+      const simpleDraft = createReviewDeclaration(
         uuid(),
         data,
-        ApplicationEvent.BIRTH
+        DeclarationEvent.BIRTH
       )
 
       const testComponent = await createTestComponent(
         <ReviewSection
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           draft={simpleDraft}
-          rejectApplicationClickEvent={mockHandler}
+          rejectDeclarationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
         />,
         { store, history }
@@ -599,7 +599,7 @@ describe('when in device of small viewport', () => {
     userAgentMock = jest.spyOn(window.navigator, 'userAgent', 'get')
     userAgentMock.mockReturnValue('Android')
     jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
-    jest.spyOn(applicationSelectors, 'getRegisterForm').mockReturnValue({
+    jest.spyOn(declarationSelectors, 'getRegisterForm').mockReturnValue({
       birth: {
         sections: [
           {
@@ -679,17 +679,17 @@ describe('when in device of small viewport', () => {
       }
     }
 
-    const simpleDraft = createReviewApplication(
+    const simpleDraft = createReviewDeclaration(
       uuid(),
       data,
-      ApplicationEvent.BIRTH
+      DeclarationEvent.BIRTH
     )
 
     const testComponent = await createTestComponent(
       <ReviewSection
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         draft={simpleDraft}
-        rejectApplicationClickEvent={mockHandler}
+        rejectDeclarationClickEvent={mockHandler}
         submitClickEvent={mockHandler}
         onChangeReviewForm={mockHandler}
       />,
@@ -736,7 +736,7 @@ describe('when in device of small viewport', () => {
       ).toHaveLength(0)
     })
 
-    it('clicking on delete button modifies application by removing uploaded file', () => {
+    it('clicking on delete button modifies declaration by removing uploaded file', () => {
       reviewSectionComponent
         .find('#preview_image_field')
         .hostNodes()

@@ -11,7 +11,7 @@
  */
 import { IntlShape } from 'react-intl'
 import {
-  getValueFromApplicationDataByKey,
+  getValueFromDeclarationDataByKey,
   getEventMessageDescription,
   getExecutorFieldValue,
   getMatchedCondition
@@ -56,10 +56,10 @@ export const fieldTransformers: IFunctionTransformer = {
         const messageValue =
           valueKey === 'event'
             ? intl.formatMessage(
-                getEventMessageDescription(templateData.application.event)
+                getEventMessageDescription(templateData.declaration.event)
               )
-            : getValueFromApplicationDataByKey(
-                templateData.application.data,
+            : getValueFromDeclarationDataByKey(
+                templateData.declaration.data,
                 (message.messageValues && message.messageValues[valueKey]) || ''
               ) || ''
 
@@ -75,7 +75,7 @@ export const fieldTransformers: IFunctionTransformer = {
   },
 
   /*
-    ApplicantName transforms the applicant name from the application data
+    ApplicantName transforms the applicant name from the declaration data
     @params:
       - key: Mendatory field. Need to provide event wise source object key. Ex: 'birth': 'data.child'
       - format: Mendatory field. Need to provide locale wise name fields which will be concatenated together with spaces
@@ -92,23 +92,23 @@ export const fieldTransformers: IFunctionTransformer = {
 
     const matchedCondition = getMatchedCondition(
       formatPayload.conditions,
-      templateData.application.data
+      templateData.declaration.data
     ) as IApplicantNameCondition
 
     if (!matchedCondition) {
       throw new Error('No condition has matched for ApplicantName transformer')
     }
 
-    if (!matchedCondition.key[templateData.application.event]) {
+    if (!matchedCondition.key[templateData.declaration.event]) {
       throw new Error(
-        `No data key defined on payload for event: ${templateData.application.event}`
+        `No data key defined on payload for event: ${templateData.declaration.event}`
       )
     }
 
     const applicantObj: IFormSectionData | null =
-      getValueFromApplicationDataByKey(
-        templateData.application.data,
-        matchedCondition.key[templateData.application.event]
+      getValueFromDeclarationDataByKey(
+        templateData.declaration.data,
+        matchedCondition.key[templateData.declaration.event]
       )
     let applicantName = ''
     matchedCondition.format[
@@ -123,13 +123,13 @@ export const fieldTransformers: IFunctionTransformer = {
   },
 
   /*
-    FieldValue transforms the value for any given key from the application data
+    FieldValue transforms the value for any given key from the declaration data
     @params:
       - key: Mendatory field. It will be able to traverse through the object structure
       and fetch the appropriate value if found otherwise will throw exception. Ex: 'child.dob'
       - condition: Optional field. ex: "(!draftData || !draftData.informant || draftData.informant.relationship == \"OTHER\")"
       - messageDescriptors: Optional field. This option will allow you to configure
-      a list message descriptors for fetched value against given key from application data.
+      a list message descriptors for fetched value against given key from declaration data.
       ex: 'child.gender' key will return a value like: 'male' which will be presented as 'Male' through message descriptor
   */
   FieldValue: (
@@ -143,14 +143,14 @@ export const fieldTransformers: IFunctionTransformer = {
     }
     // this is needed for eval fn to evalute the data against the given condition
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const draftData = templateData.application.data
+    const draftData = templateData.declaration.data
     // eslint-disable-next-line no-eval
     if (key.condition && !eval(key.condition)) {
       return ''
     }
 
-    const fieldValue = getValueFromApplicationDataByKey(
-      templateData.application.data,
+    const fieldValue = getValueFromDeclarationDataByKey(
+      templateData.declaration.data,
       key.valueKey
     )
     if (key.messageDescriptors) {
@@ -167,7 +167,7 @@ export const fieldTransformers: IFunctionTransformer = {
   },
 
   /*
-    DateFieldValue transforms the date value for any given key from the application data
+    DateFieldValue transforms the date value for any given key from the declaration data
     @params:
       - key: Optional field. It will be able to traverse through the object structure
       and fetch the appropriate value if found otherwise will throw exception. Ex: 'child.dob'
@@ -185,9 +185,9 @@ export const fieldTransformers: IFunctionTransformer = {
     }
 
     const dateValue = formatPayload.key
-      ? getValueFromApplicationDataByKey(
-          templateData.application.data,
-          formatPayload.key[templateData.application.event]
+      ? getValueFromDeclarationDataByKey(
+          templateData.declaration.data,
+          formatPayload.key[templateData.declaration.event]
         )
       : Date.now()
 
@@ -200,7 +200,7 @@ export const fieldTransformers: IFunctionTransformer = {
   },
 
   /*
-    FormattedFieldValue transforms the value for one/many given keys from the application data in a provided format
+    FormattedFieldValue transforms the value for one/many given keys from the declaration data in a provided format
     @params:
       - formattedKeys: Mendatory field. It will be able to traverse through the object structure
       and fetch the appropriate value if found otherwise will throw exception.
@@ -220,8 +220,8 @@ export const fieldTransformers: IFunctionTransformer = {
     keys &&
       keys.forEach((key) => {
         keyValues[key] =
-          getValueFromApplicationDataByKey(
-            templateData.application.data,
+          getValueFromDeclarationDataByKey(
+            templateData.declaration.data,
             // Getting rid of { }
             key.substr(1, key.length - 2)
           ) || ''
@@ -251,13 +251,13 @@ export const fieldTransformers: IFunctionTransformer = {
       throw new Error('No payload found for this transformer')
     }
     const leftValue =
-      getValueFromApplicationDataByKey(
-        templateData.application.data,
+      getValueFromDeclarationDataByKey(
+        templateData.declaration.data,
         params.leftValueKey
       ) || 0
     const rightValue =
-      getValueFromApplicationDataByKey(
-        templateData.application.data,
+      getValueFromDeclarationDataByKey(
+        templateData.declaration.data,
         params.rightValueKey
       ) || 0
 
@@ -281,7 +281,7 @@ export const fieldTransformers: IFunctionTransformer = {
 
   /*
     ConditionExecutor allows us to run provided conditions on given from and to fields
-    From/To fields can be a key from the application data or can be ExecutorKey type.
+    From/To fields can be a key from the declaration data or can be ExecutorKey type.
     ExecutorKey type allows us to define different type of default data. Ex: CURRENT_DATE
     Conditions is an array of type, minDiff, maxDiff and output
     Based on matched condition, this transformer will render the result based on output type
@@ -297,11 +297,11 @@ export const fieldTransformers: IFunctionTransformer = {
     }
     const fromValue = getExecutorFieldValue(
       params.fromKey,
-      templateData.application
+      templateData.declaration
     )
     const toValue = getExecutorFieldValue(
       params.toKey,
-      templateData.application
+      templateData.declaration
     )
 
     let value = null
@@ -344,8 +344,8 @@ export const fieldTransformers: IFunctionTransformer = {
       throw new Error('No payload found for this transformer')
     }
     let value = (
-      getValueFromApplicationDataByKey(
-        templateData.application.data,
+      getValueFromDeclarationDataByKey(
+        templateData.declaration.data,
         params.valueKey
       ) || ''
     ).toString()
@@ -369,16 +369,16 @@ export const fieldTransformers: IFunctionTransformer = {
       throw new Error('No payload found for this transformer')
     }
     const idType =
-      getValueFromApplicationDataByKey(
-        templateData.application.data,
+      getValueFromDeclarationDataByKey(
+        templateData.declaration.data,
         key.idTypeKey
       ) || ''
     if (idType !== key.idTypeValue) {
       return ' '
     }
     return (
-      getValueFromApplicationDataByKey(
-        templateData.application.data,
+      getValueFromDeclarationDataByKey(
+        templateData.declaration.data,
         key.idValueKey
       ) || ' '
     )

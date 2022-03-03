@@ -22,18 +22,18 @@ interface ISelectPrimaryApplicantMessages
 const messagesToDefine: ISelectPrimaryApplicantMessages = {
   registerNewEventTitle: {
     id: 'register.selectVitalEvent.registerNewEventTitle',
-    defaultMessage: 'New application',
+    defaultMessage: 'New declaration',
     description: 'The title that appears on the select vital event page'
   },
   registerNewEventHeading: {
     id: 'register.primaryApplicant.registerNewEventHeading',
-    defaultMessage: 'Who is the primary applicant for this application?',
+    defaultMessage: 'Who is the primary applicant for this declaration?',
     description: 'The section heading on the page'
   },
   primaryApplicantDescription: {
     id: 'register.primaryApplicant.description',
     defaultMessage:
-      'This person is responsible for providing accurate information in this application. ',
+      'This person is responsible for providing accurate information in this declaration. ',
     description: 'The section heading on the page'
   },
   errorMessage: {

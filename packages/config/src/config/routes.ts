@@ -18,8 +18,8 @@ import {
   requestNewCertificate,
   updateCertificate,
   updateCertificateHandler
-} from '@config/handlers/applicationCertificateHandler'
-import applicationConfigHandler from '@config/handlers/applicationConfigHandler'
+} from '@config/handlers/declarationCertificateHandler'
+import declarationConfigHandler from '@config/handlers/declarationConfigHandler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -52,11 +52,11 @@ export default function getRoutes() {
     {
       method: 'GET',
       path: '/config',
-      handler: applicationConfigHandler,
+      handler: declarationConfigHandler,
       config: {
         auth: false,
         tags: ['api'],
-        description: 'Retrieve Application configuration'
+        description: 'Retrieve Declaration configuration'
       }
     },
     {

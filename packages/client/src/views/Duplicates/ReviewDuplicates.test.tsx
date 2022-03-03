@@ -516,7 +516,7 @@ describe('Review Duplicates component', () => {
         // @ts-ignore
         match={{
           params: {
-            applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+            declarationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
           }
         }}
       />,
@@ -534,7 +534,7 @@ describe('Review Duplicates component', () => {
         // @ts-ignore
         match={{
           params: {
-            applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+            declarationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
           }
         }}
       />,
@@ -588,7 +588,7 @@ describe('Review Duplicates component', () => {
         // @ts-ignore
         match={{
           params: {
-            applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+            declarationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
           }
         }}
       />,
@@ -621,7 +621,7 @@ describe('Review Duplicates component', () => {
         // @ts-ignore
         match={{
           params: {
-            applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+            declarationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
           }
         }}
       />,
@@ -643,7 +643,7 @@ describe('Review Duplicates component', () => {
           // @ts-ignore
           match={{
             params: {
-              applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+              declarationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
             }
           }}
         />,
@@ -686,7 +686,7 @@ describe('Review Duplicates component', () => {
       expect(component.find('#reject_confirm').hostNodes()).toHaveLength(0)
     })
 
-    it('successfuly rejects the application', async () => {
+    it('successfuly rejects the declaration', async () => {
       const mock = clone(graphqlMock)
       mock.push({
         request: {
@@ -710,7 +710,7 @@ describe('Review Duplicates component', () => {
           // @ts-ignore
           match={{
             params: {
-              applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+              declarationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
             }
           }}
         />,
@@ -747,7 +747,7 @@ describe('Review Duplicates component', () => {
           // @ts-ignore
           match={{
             params: {
-              applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+              declarationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
             }
           }}
         />,
@@ -787,7 +787,7 @@ describe('Review Duplicates component', () => {
       )
     })
 
-    it('successfully removes duplicate from application', async () => {
+    it('successfully removes duplicate from declaration', async () => {
       const mock = clone(graphqlMock)
       // @ts-ignore
       mock.push({
@@ -812,7 +812,7 @@ describe('Review Duplicates component', () => {
           // @ts-ignore
           match={{
             params: {
-              applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+              declarationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
             }
           }}
         />,
@@ -880,7 +880,7 @@ describe('Review Duplicates component', () => {
             // @ts-ignore
             match={{
               params: {
-                applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+                declarationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
               }
             }}
           />,
@@ -915,7 +915,7 @@ describe('Review Duplicates component', () => {
             // @ts-ignore
             match={{
               params: {
-                applicationId: '460ce5e3-b495-4868-bb6a-1183ffd0fee1'
+                declarationId: '460ce5e3-b495-4868-bb6a-1183ffd0fee1'
               }
             }}
           />,

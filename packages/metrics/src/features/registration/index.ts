@@ -1,4 +1,4 @@
-import { APPLICATION_STATUS } from '@metrics/features/registration/fhirUtils'
+import { DECLARATION_STATUS } from '@metrics/features/registration/fhirUtils'
 
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -64,11 +64,11 @@ export interface IDeathRegistrationTags {
   locationLevel2?: string
 }
 
-export interface IInProgressApplicationFields {
+export interface IInProgressDeclarationFields {
   compositionId: string
 }
 
-export interface IInProgressApplicationTags {
+export interface IInProgressDeclarationTags {
   regStatus: string
   missingFieldSectionId: string
   missingFieldGroupId: string
@@ -132,10 +132,10 @@ export interface ITimeLoggedPoints {
   timestamp: number | undefined
 }
 
-export interface IInProgressApplicationPoints {
+export interface IInProgressDeclarationPoints {
   measurement: string
-  tags: IInProgressApplicationTags
-  fields: IInProgressApplicationFields
+  tags: IInProgressDeclarationTags
+  fields: IInProgressDeclarationFields
   timestamp: number | undefined
 }
 
@@ -165,16 +165,16 @@ export interface IPaymentFields {
   compositionId: string
 }
 
-export interface IApplicationsStartedPoints {
+export interface IDeclarationsStartedPoints {
   measurement: string
   tags: ILocationTags
-  fields: IApplicationsStartedFields
+  fields: IDeclarationsStartedFields
   timestamp: number | undefined
 }
 
-export interface IApplicationsStartedFields {
+export interface IDeclarationsStartedFields {
   role: string
-  status?: APPLICATION_STATUS | null
+  status?: DECLARATION_STATUS | null
   compositionId: string
 }
 
@@ -192,10 +192,10 @@ export interface IRejectedPoints {
 export type IPoints =
   | IDurationPoints
   | ITimeLoggedPoints
-  | IInProgressApplicationPoints
+  | IInProgressDeclarationPoints
   | IPaymentPoints
   | IBirthRegistrationPoints
   | IDeathRegistrationPoints
   | IPaymentPoints
-  | IApplicationsStartedPoints
+  | IDeclarationsStartedPoints
   | IRejectedPoints

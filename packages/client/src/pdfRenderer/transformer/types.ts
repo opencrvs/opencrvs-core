@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IApplication } from '@client/applications'
+import { IDeclaration } from '@client/declarations'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { TDocumentDefinitions, TFontFamilyTypes } from 'pdfmake/interfaces'
@@ -55,7 +55,7 @@ export interface IFieldTransformer {
 }
 
 export type TemplateTransformerData = {
-  application: IApplication
+  declaration: IDeclaration
   userDetails: IUserDetails
   resource: IOfflineData
 }

@@ -13,13 +13,13 @@
 import * as React from 'react'
 import { storage } from '@client/storage'
 import {
-  IApplication,
+  IDeclaration,
   SUBMISSION_STATUS,
   IWorkqueue,
-  filterProcessingApplicationsFromQuery
-} from '@client/applications'
+  filterProcessingDeclarationsFromQuery
+} from '@client/declarations'
 import { IStoreState } from '@opencrvs/client/src/store'
-import { LeftNavigationApplicationIcons } from '@opencrvs/components/lib/icons/LeftNavigationApplicationIcons'
+import { LeftNavigationDeclarationIcons } from '@opencrvs/components/lib/icons/LeftNavigationDeclarationIcons'
 import { LeftNavigation } from '@opencrvs/components/lib/interface/Navigation/LeftNavigation'
 import { NavigationGroup } from '@opencrvs/components/lib/interface/Navigation/NavigationGroup'
 import { NavigationItem } from '@opencrvs/components/lib/interface/Navigation/NavigationItem'
@@ -34,7 +34,7 @@ import {
   goToTeamView
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
-import { COUNT_USER_WISE_APPLICATIONS } from '@client/search/queries'
+import { COUNT_USER_WISE_DECLARATIONS } from '@client/search/queries'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
 import { EVENT_STATUS } from '@client/views/OfficeHome/OfficeHome'
@@ -65,7 +65,7 @@ const TAB_ID = {
   sentForApproval: 'approvals',
   readyToPrint: 'print',
   externalValidation: 'waitingValidation',
-  application: 'application',
+  declaration: 'declaration',
   performance: 'performance',
   team: 'team',
   config: 'config',
@@ -75,7 +75,7 @@ const TAB_ID = {
 }
 
 const GROUP_ID = {
-  applicationGroup: 'applicationGroup',
+  declarationGroup: 'declarationGroup',
   menuGroup: 'menuGroup'
 }
 
@@ -88,7 +88,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     TAB_ID.inProgress,
     TAB_ID.sentForReview,
     TAB_ID.requireUpdates,
-    GROUP_ID.applicationGroup
+    GROUP_ID.declarationGroup
   ],
   REGISTRATION_AGENT: [
     TAB_ID.inProgress,
@@ -98,7 +98,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     TAB_ID.readyToPrint,
     TAB_ID.performance,
     TAB_ID.team,
-    GROUP_ID.applicationGroup,
+    GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup
   ],
   DISTRICT_REGISTRAR: [
@@ -108,7 +108,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     TAB_ID.readyToPrint,
     TAB_ID.performance,
     TAB_ID.team,
-    GROUP_ID.applicationGroup,
+    GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup
   ],
   LOCAL_REGISTRAR: [
@@ -118,7 +118,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     TAB_ID.readyToPrint,
     TAB_ID.performance,
     TAB_ID.team,
-    GROUP_ID.applicationGroup,
+    GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup
   ],
   LOCAL_SYSTEM_ADMIN: [TAB_ID.performance, TAB_ID.team, GROUP_ID.menuGroup],
@@ -167,12 +167,12 @@ interface IDispatchProps {
 }
 
 interface IStateProps {
-  draftApplications: IApplication[]
-  applicationsReadyToSend: IApplication[]
+  draftDeclarations: IDeclaration[]
+  declarationsReadyToSend: IDeclaration[]
   userDetails: IUserDetails | null
   activeMenuItem: string
   workqueue: IWorkqueue
-  storedApplications: IApplication[]
+  storedDeclarations: IDeclaration[]
 }
 
 type IFullProps = IProps &
@@ -189,12 +189,12 @@ const TAB_LABEL = {
   sentForApproval: 'Sent for approval',
   externalValidation: 'Waiting for validation',
   readyToPrint: 'Ready to print ',
-  application: 'Application',
+  declaration: 'Declaration',
   performance: 'Performance',
   team: 'Team',
   configuration: 'Configuration',
   certificatesConfiguration: 'Certificates',
-  applicationSettings: 'Application Settings',
+  declarationSettings: 'Declaration Settings',
   settings: 'Settings',
   logout: 'Logout'
 }
@@ -242,8 +242,8 @@ export const NavigationView = (props: IFullProps) => {
     goToConfigAction,
     navigationWidth,
     workqueue,
-    storedApplications,
-    draftApplications,
+    storedDeclarations,
+    draftDeclarations,
     theme,
     menuCollapse,
     userInfo
@@ -258,17 +258,17 @@ export const NavigationView = (props: IFullProps) => {
 
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
   const { loading, error, data, initialSyncDone } = workqueue
-  const filteredData = filterProcessingApplicationsFromQuery(
+  const filteredData = filterProcessingDeclarationsFromQuery(
     data,
-    storedApplications
+    storedDeclarations
   )
 
   const fieldAgentLocationId = userDetails && getUserLocation(userDetails).id
 
-  const applicationCount = {
+  const declarationCount = {
     inProgress: !initialSyncDone
       ? 0
-      : draftApplications.filter(
+      : draftDeclarations.filter(
           (draft) =>
             draft.submissionStatus ===
             SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
@@ -296,7 +296,7 @@ export const NavigationView = (props: IFullProps) => {
       {userDetails?.role === 'FIELD_AGENT' ? (
         <>
           <Query
-            query={COUNT_USER_WISE_APPLICATIONS}
+            query={COUNT_USER_WISE_DECLARATIONS}
             variables={{
               userId: userDetails ? userDetails.practitionerId : '',
               status: [EVENT_STATUS.REJECTED],
@@ -324,10 +324,10 @@ export const NavigationView = (props: IFullProps) => {
                 <>
                   <NavigationGroup>
                     <NavigationItem
-                      icon={() => <LeftNavigationApplicationIcons />}
+                      icon={() => <LeftNavigationDeclarationIcons />}
                       id={`navigation_${TAB_ID.inProgress}`}
                       label={TAB_LABEL.inProgress}
-                      count={props.draftApplications.length}
+                      count={props.draftDeclarations.length}
                       isSelected={tabId === TAB_ID.inProgress}
                       onClick={() => {
                         props.goToFieldAgentHomeTab(TAB_ID.inProgress)
@@ -336,11 +336,11 @@ export const NavigationView = (props: IFullProps) => {
                     />
                     <NavigationItem
                       icon={() => (
-                        <LeftNavigationApplicationIcons color={'orange'} />
+                        <LeftNavigationDeclarationIcons color={'orange'} />
                       )}
                       id={`navigation_${TAB_ID.sentForReview}`}
                       label={TAB_LABEL.sentForReview}
-                      count={props.applicationsReadyToSend.length}
+                      count={props.declarationsReadyToSend.length}
                       isSelected={tabId === TAB_ID.sentForReview}
                       onClick={() => {
                         props.goToFieldAgentHomeTab(TAB_ID.sentForReview)
@@ -349,7 +349,7 @@ export const NavigationView = (props: IFullProps) => {
                     />
                     <NavigationItem
                       icon={() => (
-                        <LeftNavigationApplicationIcons color={'red'} />
+                        <LeftNavigationDeclarationIcons color={'red'} />
                       )}
                       id={`navigation_${TAB_ID.requireUpdates}`}
                       label={TAB_LABEL.requiresUpdate}
@@ -375,16 +375,16 @@ export const NavigationView = (props: IFullProps) => {
         <>
           {userDetails?.role &&
             USER_SCOPE[userDetails.role].includes(
-              GROUP_ID.applicationGroup
+              GROUP_ID.declarationGroup
             ) && (
               <NavigationGroup>
                 {userDetails?.role &&
                   USER_SCOPE[userDetails.role].includes(TAB_ID.inProgress) && (
                     <NavigationItem
-                      icon={() => <LeftNavigationApplicationIcons />}
+                      icon={() => <LeftNavigationDeclarationIcons />}
                       id={`navigation_${TAB_ID.inProgress}`}
                       label={TAB_LABEL.inProgress}
-                      count={applicationCount.inProgress}
+                      count={declarationCount.inProgress}
                       isSelected={tabId === TAB_ID.inProgress}
                       onClick={() => {
                         props.goToRegistrarHomeTab(TAB_ID.inProgress)
@@ -398,11 +398,11 @@ export const NavigationView = (props: IFullProps) => {
                   ) && (
                     <NavigationItem
                       icon={() => (
-                        <LeftNavigationApplicationIcons color={'orange'} />
+                        <LeftNavigationDeclarationIcons color={'orange'} />
                       )}
                       id={`navigation_${TAB_ID.readyForReview}`}
                       label={TAB_LABEL.readyForReview}
-                      count={applicationCount.readyForReview}
+                      count={declarationCount.readyForReview}
                       isSelected={tabId === TAB_ID.readyForReview}
                       onClick={() => {
                         props.goToRegistrarHomeTab(TAB_ID.readyForReview)
@@ -416,11 +416,11 @@ export const NavigationView = (props: IFullProps) => {
                   ) && (
                     <NavigationItem
                       icon={() => (
-                        <LeftNavigationApplicationIcons color={'red'} />
+                        <LeftNavigationDeclarationIcons color={'red'} />
                       )}
                       id={`navigation_${TAB_ID.sentForUpdates}`}
                       label={TAB_LABEL.sentForUpdates}
-                      count={applicationCount.sentForUpdates}
+                      count={declarationCount.sentForUpdates}
                       isSelected={tabId === TAB_ID.sentForUpdates}
                       onClick={() => {
                         props.goToRegistrarHomeTab(TAB_ID.sentForUpdates)
@@ -434,11 +434,11 @@ export const NavigationView = (props: IFullProps) => {
                   ) && (
                     <NavigationItem
                       icon={() => (
-                        <LeftNavigationApplicationIcons color={'grey'} />
+                        <LeftNavigationDeclarationIcons color={'grey'} />
                       )}
                       id={`navigation_${TAB_ID.sentForApproval}`}
                       label={TAB_LABEL.sentForApproval}
-                      count={applicationCount.sentForApproval}
+                      count={declarationCount.sentForApproval}
                       isSelected={tabId === TAB_ID.sentForApproval}
                       onClick={() => {
                         props.goToRegistrarHomeTab(TAB_ID.sentForApproval)
@@ -449,11 +449,11 @@ export const NavigationView = (props: IFullProps) => {
                 {window.config.EXTERNAL_VALIDATION_WORKQUEUE && (
                   <NavigationItem
                     icon={() => (
-                      <LeftNavigationApplicationIcons color={'teal'} />
+                      <LeftNavigationDeclarationIcons color={'teal'} />
                     )}
                     id={`navigation_${TAB_ID.externalValidation}`}
                     label={TAB_LABEL.externalValidation}
-                    count={applicationCount.externalValidation}
+                    count={declarationCount.externalValidation}
                     isSelected={tabId === TAB_ID.externalValidation}
                     onClick={() => {
                       props.goToRegistrarHomeTab(TAB_ID.externalValidation)
@@ -467,11 +467,11 @@ export const NavigationView = (props: IFullProps) => {
                   ) && (
                     <NavigationItem
                       icon={() => (
-                        <LeftNavigationApplicationIcons color={'green'} />
+                        <LeftNavigationDeclarationIcons color={'green'} />
                       )}
                       id={`navigation_${TAB_ID.readyToPrint}`}
                       label={TAB_LABEL.readyToPrint}
-                      count={applicationCount.readyToPrint}
+                      count={declarationCount.readyToPrint}
                       isSelected={tabId === TAB_ID.readyToPrint}
                       onClick={() => {
                         props.goToRegistrarHomeTab(TAB_ID.readyToPrint)
@@ -549,12 +549,12 @@ export const NavigationView = (props: IFullProps) => {
                             }
                           />
                           <NavigationSubItem
-                            label={TAB_LABEL.applicationSettings}
-                            id={`navigation_${TAB_ID.application}`}
+                            label={TAB_LABEL.declarationSettings}
+                            id={`navigation_${TAB_ID.declaration}`}
                             onClick={() => {}}
                             isSelected={
                               enableMenuSelection &&
-                              activeMenuItem === TAB_ID.application
+                              activeMenuItem === TAB_ID.declaration
                             }
                           />
                         </>
@@ -572,25 +572,25 @@ export const NavigationView = (props: IFullProps) => {
 
 const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
   return {
-    draftApplications:
-      (state.applicationsState.applications &&
-        state.applicationsState.applications.filter(
-          (application: IApplication) =>
-            application.submissionStatus ===
+    draftDeclarations:
+      (state.declarationsState.declarations &&
+        state.declarationsState.declarations.filter(
+          (declaration: IDeclaration) =>
+            declaration.submissionStatus ===
             SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
         )) ||
       [],
-    applicationsReadyToSend: (
-      (state.applicationsState.applications &&
-        state.applicationsState.applications.filter(
-          (application: IApplication) =>
-            application.submissionStatus !==
+    declarationsReadyToSend: (
+      (state.declarationsState.declarations &&
+        state.declarationsState.declarations.filter(
+          (declaration: IDeclaration) =>
+            declaration.submissionStatus !==
             SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
         )) ||
       []
     ).reverse(),
     workqueue: state.workqueueState.workqueue,
-    storedApplications: state.applicationsState.applications,
+    storedDeclarations: state.declarationsState.declarations,
     userDetails: getUserDetails(state),
     activeMenuItem: window.location.href.includes('performance')
       ? TAB_ID.performance

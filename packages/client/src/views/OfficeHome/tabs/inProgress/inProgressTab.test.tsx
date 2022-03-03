@@ -11,14 +11,14 @@
  */
 import { GridTable } from '@opencrvs/components/lib/interface'
 import {
-  createApplication,
-  IApplication,
-  storeApplication,
+  createDeclaration,
+  IDeclaration,
+  storeDeclaration,
   SUBMISSION_STATUS,
-  makeApplicationReadyToDownload,
+  makeDeclarationReadyToDownload,
   DOWNLOAD_STATUS,
-  modifyApplication
-} from '@client/applications'
+  modifyDeclaration
+} from '@client/declarations'
 import { Event, Action } from '@client/forms'
 import { formatUrl } from '@client/navigation'
 import {
@@ -186,7 +186,7 @@ describe('In Progress tab', () => {
     it('renders all items returned from local storage in inProgress tab', async () => {
       const { store } = createStore()
       const TIME_STAMP = 1562912635549
-      const drafts: IApplication[] = [
+      const drafts: IDeclaration[] = [
         {
           id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
           data: {
@@ -281,9 +281,9 @@ describe('In Progress tab', () => {
 
     it('Should render pagination in progress tab if pagination is used and data is more than 10', async () => {
       jest.clearAllMocks()
-      const drafts: IApplication[] = []
+      const drafts: IDeclaration[] = []
       for (let i = 0; i < 12; i++) {
-        drafts.push(createApplication(Event.BIRTH))
+        drafts.push(createDeclaration(Event.BIRTH))
       }
       const testComponent = await createTestComponent(
         // @ts-ignore
@@ -318,7 +318,7 @@ describe('In Progress tab', () => {
 
     it('redirects user to detail page on update click', async () => {
       const TIME_STAMP = 1562912635549
-      const drafts: IApplication[] = [
+      const drafts: IDeclaration[] = [
         {
           id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
           event: Event.BIRTH,
@@ -409,7 +409,7 @@ describe('In Progress tab', () => {
         }
       ]
       // @ts-ignore
-      store.dispatch(storeApplication(drafts))
+      store.dispatch(storeDeclaration(drafts))
       const testComponent = await createTestComponent(
         // @ts-ignore
         <InProgressTab
@@ -451,8 +451,8 @@ describe('In Progress tab', () => {
   describe('When the remote drafts selector is selected', () => {
     it('renders all items returned from graphql query in inProgress tab', async () => {
       const TIME_STAMP = '1562912635549'
-      const drafts: IApplication[] = []
-      drafts.push(createApplication(Event.BIRTH))
+      const drafts: IDeclaration[] = []
+      drafts.push(createDeclaration(Event.BIRTH))
       const testComponent = await createTestComponent(
         // @ts-ignore
         <InProgressTab
@@ -539,8 +539,8 @@ describe('In Progress tab', () => {
 
     it('Should render pagination in progress tab if pagination is used and data is more than 10', async () => {
       jest.clearAllMocks()
-      const drafts: IApplication[] = []
-      drafts.push(createApplication(Event.BIRTH))
+      const drafts: IDeclaration[] = []
+      drafts.push(createDeclaration(Event.BIRTH))
       const testComponent = await createTestComponent(
         // @ts-ignore
         <InProgressTab
@@ -575,8 +575,8 @@ describe('In Progress tab', () => {
     it('redirects to recordAudit page when item is clicked', async () => {
       jest.clearAllMocks()
       const TIME_STAMP = '1562912635549'
-      const drafts: IApplication[] = []
-      drafts.push(createApplication(Event.BIRTH))
+      const drafts: IDeclaration[] = []
+      drafts.push(createDeclaration(Event.BIRTH))
       // @ts-ignore
       const testComponent = await createTestComponent(
         // @ts-ignore
@@ -668,7 +668,7 @@ describe('In Progress tab', () => {
 
     describe('handles download status', () => {
       const TIME_STAMP = '1562912635549'
-      const applicationId = 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+      const declarationId = 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
       const inprogressProps = {
         drafts: [],
         selectorId: SELECTOR_ID.fieldAgentDrafts,
@@ -678,7 +678,7 @@ describe('In Progress tab', () => {
             totalItems: 1,
             results: [
               {
-                id: applicationId,
+                id: declarationId,
                 type: 'Birth',
                 registration: {
                   trackingId: 'BQ2IDOP',
@@ -698,13 +698,13 @@ describe('In Progress tab', () => {
         }
       }
       it('renders download button when not downloaded', async () => {
-        const downloadableApplication = makeApplicationReadyToDownload(
+        const downloadableDeclaration = makeDeclarationReadyToDownload(
           Event.BIRTH,
-          applicationId,
-          Action.LOAD_REVIEW_APPLICATION
+          declarationId,
+          Action.LOAD_REVIEW_DECLARATION
         )
-        downloadableApplication.downloadStatus = undefined
-        store.dispatch(modifyApplication(downloadableApplication))
+        downloadableDeclaration.downloadStatus = undefined
+        store.dispatch(modifyDeclaration(downloadableDeclaration))
         const testComponent = await createTestComponent(
           // @ts-ignore
           <InProgressTab {...inprogressProps} />,
@@ -715,14 +715,14 @@ describe('In Progress tab', () => {
           testComponent.find('#ListItemAction-0-icon').hostNodes()
         ).toHaveLength(1)
       })
-      it('renders loading indicator when application is being downloaded', async () => {
-        const downloadableApplication = makeApplicationReadyToDownload(
+      it('renders loading indicator when declaration is being downloaded', async () => {
+        const downloadableDeclaration = makeDeclarationReadyToDownload(
           Event.BIRTH,
-          applicationId,
-          Action.LOAD_REVIEW_APPLICATION
+          declarationId,
+          Action.LOAD_REVIEW_DECLARATION
         )
-        downloadableApplication.downloadStatus = DOWNLOAD_STATUS.DOWNLOADING
-        store.dispatch(modifyApplication(downloadableApplication))
+        downloadableDeclaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADING
+        store.dispatch(modifyDeclaration(downloadableDeclaration))
         const testComponent = await createTestComponent(
           // @ts-ignore
           <InProgressTab {...inprogressProps} />,
@@ -734,13 +734,13 @@ describe('In Progress tab', () => {
         ).toHaveLength(1)
       })
       it('renders update button when download succeeds', async () => {
-        const downloadableApplication = makeApplicationReadyToDownload(
+        const downloadableDeclaration = makeDeclarationReadyToDownload(
           Event.BIRTH,
-          applicationId,
-          Action.LOAD_REVIEW_APPLICATION
+          declarationId,
+          Action.LOAD_REVIEW_DECLARATION
         )
-        downloadableApplication.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
-        store.dispatch(modifyApplication(downloadableApplication))
+        downloadableDeclaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
+        store.dispatch(modifyDeclaration(downloadableDeclaration))
         const testComponent = await createTestComponent(
           // @ts-ignore
           <InProgressTab {...inprogressProps} />,
@@ -763,20 +763,20 @@ describe('In Progress tab', () => {
 
         expect(history.location.pathname).toContain(
           formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {
-            applicationId,
+            declarationId,
             pageId: 'review',
             event: 'birth'
           })
         )
       })
       it('renders error when download fails', async () => {
-        const downloadableApplication = makeApplicationReadyToDownload(
+        const downloadableDeclaration = makeDeclarationReadyToDownload(
           Event.BIRTH,
-          applicationId,
-          Action.LOAD_REVIEW_APPLICATION
+          declarationId,
+          Action.LOAD_REVIEW_DECLARATION
         )
-        downloadableApplication.downloadStatus = DOWNLOAD_STATUS.FAILED
-        store.dispatch(modifyApplication(downloadableApplication))
+        downloadableDeclaration.downloadStatus = DOWNLOAD_STATUS.FAILED
+        store.dispatch(modifyDeclaration(downloadableDeclaration))
         const testComponent = await createTestComponent(
           // @ts-ignore
           <InProgressTab {...inprogressProps} />,
@@ -793,8 +793,8 @@ describe('In Progress tab', () => {
   describe('When Notification (Hospital) tab is selected', () => {
     it('Should render all items returned from graphQL', async () => {
       const TIME_STAMP = '1562912635549'
-      const drafts: IApplication[] = []
-      drafts.push(createApplication(Event.BIRTH))
+      const drafts: IDeclaration[] = []
+      drafts.push(createDeclaration(Event.BIRTH))
       const testComponent = await createTestComponent(
         // @ts-ignore
         <InProgressTab
@@ -877,9 +877,9 @@ describe('Tablet tests', () => {
   it('redirects to recordAudit page if item is clicked', async () => {
     jest.clearAllMocks()
     const TIME_STAMP = '1562912635549'
-    const drafts: IApplication[] = []
-    drafts.push(createApplication(Event.BIRTH))
-    const applicationId = 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+    const drafts: IDeclaration[] = []
+    drafts.push(createDeclaration(Event.BIRTH))
+    const declarationId = 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
 
     // @ts-ignore
     const testComponent = await createTestComponent(
@@ -893,7 +893,7 @@ describe('Tablet tests', () => {
             totalItems: 1,
             results: [
               {
-                id: applicationId,
+                id: declarationId,
                 type: 'Birth',
                 registration: {
                   trackingId: 'BQ2IDOP',

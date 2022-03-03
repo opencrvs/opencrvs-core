@@ -12,10 +12,10 @@
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import {
-  modifyApplication,
-  IApplication,
-  writeApplication
-} from '@client/applications'
+  modifyDeclaration,
+  IDeclaration,
+  writeDeclaration
+} from '@client/declarations'
 import { FormFieldGenerator } from '@client/components/form'
 import {
   IFormSection,
@@ -40,21 +40,21 @@ import {
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 
 type IProps = {
-  application: IApplication
+  declaration: IDeclaration
 }
 
 type IDispatchProps = {
   goBack: typeof goBack
   goToHomeTab: typeof goToHomeTab
   goToCertificateCorrection: typeof goToCertificateCorrection
-  writeApplication: typeof writeApplication
-  modifyApplication: typeof modifyApplication
+  writeDeclaration: typeof writeDeclaration
+  modifyDeclaration: typeof modifyDeclaration
 }
 
 type IFullProps = IProps & IDispatchProps & IntlShapeProps
 
 function SupportingDocumentsFormComoponent(props: IFullProps) {
-  const { intl, application } = props
+  const { intl, declaration } = props
 
   const section = supportingDocumentsSection
   const group = React.useMemo(
@@ -62,8 +62,8 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
       ...section.groups[0],
       fields: replaceInitialValues(
         section.groups[0].fields,
-        application.data[section.id] || {},
-        application.data
+        declaration.data[section.id] || {},
+        declaration.data
       )
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -71,14 +71,14 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
   )
 
   const hasUploadDocOrSelectOption =
-    application.data[section.id] &&
-    (application.data[section.id].uploadDocForLegalProof ||
-      application.data[section.id].supportDocumentRequiredForCorrection !==
+    declaration.data[section.id] &&
+    (declaration.data[section.id].uploadDocForLegalProof ||
+      declaration.data[section.id].supportDocumentRequiredForCorrection !==
         undefined)
 
   group.fields[1].disabled =
-    application.data[section.id] &&
-    application.data[section.id].uploadDocForLegalProof
+    declaration.data[section.id] &&
+    declaration.data[section.id].uploadDocForLegalProof
       ? true
       : false
 
@@ -88,17 +88,17 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
     size: ContentSize.LARGE
   }
 
-  const modifyApplication = (
+  const modifyDeclaration = (
     sectionData: IFormSectionData,
     section: IFormSection,
-    application: IApplication
+    declaration: IDeclaration
   ) => {
-    props.modifyApplication({
-      ...application,
+    props.modifyDeclaration({
+      ...declaration,
       data: {
-        ...application.data,
+        ...declaration.data,
         [section.id]: {
-          ...application.data[section.id],
+          ...declaration.data[section.id],
           ...sectionData
         }
       }
@@ -106,8 +106,8 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
   }
 
   const continueButtonHandler = () => {
-    props.writeApplication(application)
-    props.goToCertificateCorrection(application.id, CorrectionSection.Reason)
+    props.writeDeclaration(declaration)
+    props.goToCertificateCorrection(declaration.id, CorrectionSection.Reason)
   }
 
   return (
@@ -135,11 +135,11 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
           <FormFieldGenerator
             id={group.id}
             onChange={(values) => {
-              modifyApplication(values, section, application)
+              modifyDeclaration(values, section, declaration)
             }}
             setAllFieldsDirty={false}
             fields={group.fields}
-            draftData={application.data}
+            draftData={declaration.data}
           />
         </Content>
       </ActionPageLight>
@@ -151,6 +151,6 @@ export const SupportingDocumentsForm = connect(undefined, {
   goBack,
   goToHomeTab,
   goToCertificateCorrection,
-  modifyApplication,
-  writeApplication
+  modifyDeclaration,
+  writeDeclaration
 })(injectIntl(SupportingDocumentsFormComoponent))

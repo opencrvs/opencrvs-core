@@ -10,11 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  createReviewApplication,
-  getStorageApplicationsSuccess,
-  IApplication,
-  storeApplication
-} from '@opencrvs/client/src/applications'
+  createReviewDeclaration,
+  getStorageDeclarationsSuccess,
+  IDeclaration,
+  storeDeclaration
+} from '@opencrvs/client/src/declarations'
 import { Event, IForm, IFormSectionData } from '@opencrvs/client/src/forms'
 
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@opencrvs/client/src/navigation/routes'
@@ -81,7 +81,7 @@ describe('ReviewForm tests', () => {
   })
 
   it('it returns error while fetching', async () => {
-    const application = createReviewApplication(uuid(), {}, Event.BIRTH)
+    const declaration = createReviewDeclaration(uuid(), {}, Event.BIRTH)
     const graphqlMock = [
       {
         request: {
@@ -98,19 +98,19 @@ describe('ReviewForm tests', () => {
         staticContext={mock}
         registerForm={form}
         scope={scope}
-        event={application.event}
+        event={declaration.event}
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
-            applicationId: application.id,
+            declarationId: declaration.id,
             pageId: 'review',
-            event: application.event.toLowerCase()
+            event: declaration.event.toLowerCase()
           },
           isExact: true,
           path: '',
           url: ''
         }}
-        applicationId={application.id}
+        declarationId={declaration.id}
       />,
       { store, history, graphqlMocks: graphqlMock }
     )
@@ -126,12 +126,12 @@ describe('ReviewForm tests', () => {
     ).toBe('An error occurred while fetching birth registration')
   })
   it('it returns birth registration', async () => {
-    const application = createReviewApplication(uuid(), {}, Event.BIRTH)
+    const declaration = createReviewDeclaration(uuid(), {}, Event.BIRTH)
     const graphqlMock = [
       {
         request: {
           query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
-          variables: { id: application.id }
+          variables: { id: declaration.id }
         },
         result: {
           data: {
@@ -260,20 +260,20 @@ describe('ReviewForm tests', () => {
         history={history}
         scope={scope}
         staticContext={mock}
-        event={application.event}
+        event={declaration.event}
         registerForm={form}
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
-            applicationId: application.id,
+            declarationId: declaration.id,
             pageId: 'review',
-            event: application.event.toLowerCase()
+            event: declaration.event.toLowerCase()
           },
           isExact: true,
           path: '',
           url: ''
         }}
-        applicationId={application.id}
+        declarationId={declaration.id}
       />,
       { store, history, graphqlMocks: graphqlMock }
     )
@@ -285,7 +285,7 @@ describe('ReviewForm tests', () => {
     testComponent.update()
     const data = testComponent
       .find(RegisterForm)
-      .prop('application') as IApplication
+      .prop('declaration') as IDeclaration
     expect(data.data.child).toEqual({
       _fhirID: '16025284-bae2-4b37-ae80-e16745b7a6b9',
       attendantAtBirth: 'NURSE',
@@ -312,12 +312,12 @@ describe('ReviewForm tests', () => {
     })
   })
   it('Shared contact phone number should be set properly', async () => {
-    const application = createReviewApplication(uuid(), {}, Event.BIRTH)
+    const declaration = createReviewDeclaration(uuid(), {}, Event.BIRTH)
     const graphqlMock = [
       {
         request: {
           query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
-          variables: { id: application.id }
+          variables: { id: declaration.id }
         },
         result: {
           data: {
@@ -425,20 +425,20 @@ describe('ReviewForm tests', () => {
         history={history}
         staticContext={mock}
         scope={scope}
-        event={application.event}
+        event={declaration.event}
         registerForm={form}
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
-            applicationId: application.id,
+            declarationId: declaration.id,
             pageId: 'review',
-            event: application.event.toLowerCase()
+            event: declaration.event.toLowerCase()
           },
           isExact: true,
           path: '',
           url: ''
         }}
-        applicationId={application.id}
+        declarationId={declaration.id}
       />,
       { store, history, graphqlMocks: graphqlMock }
     )
@@ -450,7 +450,7 @@ describe('ReviewForm tests', () => {
 
     const data = testComponent
       .find(RegisterForm)
-      .prop('application') as IApplication
+      .prop('declaration') as IDeclaration
     expect(
       (
         (data.data.registration.contactPoint as IFormSectionData)
@@ -459,12 +459,12 @@ describe('ReviewForm tests', () => {
     ).toBe('01733333333')
   })
   it('when registration has attachment', async () => {
-    const application = createReviewApplication(uuid(), {}, Event.BIRTH)
+    const declaration = createReviewDeclaration(uuid(), {}, Event.BIRTH)
     const graphqlMock = [
       {
         request: {
           query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
-          variables: { id: application.id }
+          variables: { id: declaration.id }
         },
         result: {
           data: {
@@ -532,20 +532,20 @@ describe('ReviewForm tests', () => {
         history={history}
         staticContext={mock}
         scope={scope}
-        event={application.event}
+        event={declaration.event}
         registerForm={form}
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
-            applicationId: application.id,
+            declarationId: declaration.id,
             pageId: 'review',
-            event: application.event.toLowerCase()
+            event: declaration.event.toLowerCase()
           },
           isExact: true,
           path: '',
           url: ''
         }}
-        applicationId={application.id}
+        declarationId={declaration.id}
       />,
       { store, history, graphqlMocks: graphqlMock }
     )
@@ -558,7 +558,7 @@ describe('ReviewForm tests', () => {
 
     const data = testComponent
       .find(RegisterForm)
-      .prop('application') as IApplication
+      .prop('declaration') as IDeclaration
 
     expect(data.data.documents.uploadDocForMother).toEqual([
       {
@@ -571,12 +571,12 @@ describe('ReviewForm tests', () => {
     ])
   })
   it('check registration', async () => {
-    const application = createReviewApplication(uuid(), {}, Event.BIRTH)
+    const declaration = createReviewDeclaration(uuid(), {}, Event.BIRTH)
     const graphqlMock = [
       {
         request: {
           query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
-          variables: { id: application.id }
+          variables: { id: declaration.id }
         },
         result: {
           data: {
@@ -695,20 +695,20 @@ describe('ReviewForm tests', () => {
         history={history}
         staticContext={mock}
         scope={scope}
-        event={application.event}
+        event={declaration.event}
         registerForm={form}
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
-            applicationId: application.id,
+            declarationId: declaration.id,
             pageId: 'review',
-            event: application.event.toLowerCase()
+            event: declaration.event.toLowerCase()
           },
           isExact: true,
           path: '',
           url: ''
         }}
-        applicationId={application.id}
+        declarationId={declaration.id}
       />,
       { store, history, graphqlMocks: graphqlMock }
     )
@@ -721,7 +721,7 @@ describe('ReviewForm tests', () => {
 
     const data = testComponent
       .find(RegisterForm)
-      .prop('application') as IApplication
+      .prop('declaration') as IDeclaration
     expect(data.data.registration).toEqual({
       applicant: {
         nestedFields: {}
@@ -741,13 +741,13 @@ describe('ReviewForm tests', () => {
     })
   })
   it('redirect to home when exit button is clicked', async () => {
-    const application = createReviewApplication(
+    const declaration = createReviewDeclaration(
       uuid(),
       {},
       Event.BIRTH,
       'IN_PROGRESS'
     )
-    application.data = {
+    declaration.data = {
       child: {
         attendantAtBirth: 'NURSE',
         childBirthDate: '2001-01-01',
@@ -767,15 +767,15 @@ describe('ReviewForm tests', () => {
       }
     }
     store.dispatch(
-      getStorageApplicationsSuccess(
+      getStorageDeclarationsSuccess(
         JSON.stringify({
           userID: 'currentUser', // mock
-          drafts: [application],
-          applications: []
+          drafts: [declaration],
+          declarations: []
         })
       )
     )
-    store.dispatch(storeApplication(application))
+    store.dispatch(storeDeclaration(declaration))
 
     const testComponent = await createTestComponent(
       <ReviewForm
@@ -783,20 +783,20 @@ describe('ReviewForm tests', () => {
         history={history}
         staticContext={mock}
         scope={scope}
-        event={application.event}
+        event={declaration.event}
         registerForm={form}
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
-            applicationId: application.id,
+            declarationId: declaration.id,
             pageId: 'review',
-            event: application.event.toLowerCase()
+            event: declaration.event.toLowerCase()
           },
           isExact: true,
           path: '',
           url: ''
         }}
-        applicationId={application.id}
+        declarationId={declaration.id}
       />,
       { store, history }
     )
@@ -807,13 +807,13 @@ describe('ReviewForm tests', () => {
   })
 
   it('redirect to review tab when exit button is clicked', async () => {
-    const application = createReviewApplication(
+    const declaration = createReviewDeclaration(
       uuid(),
       {},
       Event.BIRTH,
       'DECLARED'
     )
-    application.data = {
+    declaration.data = {
       child: {
         attendantAtBirth: 'NURSE',
         childBirthDate: '2001-01-01',
@@ -833,15 +833,15 @@ describe('ReviewForm tests', () => {
       }
     }
     store.dispatch(
-      getStorageApplicationsSuccess(
+      getStorageDeclarationsSuccess(
         JSON.stringify({
           userID: 'currentUser', // mock
-          drafts: [application],
-          applications: []
+          drafts: [declaration],
+          declarations: []
         })
       )
     )
-    store.dispatch(storeApplication(application))
+    store.dispatch(storeDeclaration(declaration))
 
     const testComponent = await createTestComponent(
       <ReviewForm
@@ -849,20 +849,20 @@ describe('ReviewForm tests', () => {
         history={history}
         staticContext={mock}
         scope={scope}
-        event={application.event}
+        event={declaration.event}
         registerForm={form}
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
-            applicationId: application.id,
+            declarationId: declaration.id,
             pageId: 'review',
-            event: application.event.toLowerCase()
+            event: declaration.event.toLowerCase()
           },
           isExact: true,
           path: '',
           url: ''
         }}
-        applicationId={application.id}
+        declarationId={declaration.id}
       />,
       { store, history }
     )
@@ -873,13 +873,13 @@ describe('ReviewForm tests', () => {
   })
 
   it('redirect to review tab when exit button is clicked', async () => {
-    const application = createReviewApplication(
+    const declaration = createReviewDeclaration(
       uuid(),
       {},
       Event.BIRTH,
       'VALIDATED'
     )
-    application.data = {
+    declaration.data = {
       child: {
         attendantAtBirth: 'NURSE',
         childBirthDate: '2001-01-01',
@@ -899,15 +899,15 @@ describe('ReviewForm tests', () => {
       }
     }
     store.dispatch(
-      getStorageApplicationsSuccess(
+      getStorageDeclarationsSuccess(
         JSON.stringify({
           userID: 'currentUser', // mock
-          drafts: [application],
-          applications: []
+          drafts: [declaration],
+          declarations: []
         })
       )
     )
-    store.dispatch(storeApplication(application))
+    store.dispatch(storeDeclaration(declaration))
 
     const testComponent = await createTestComponent(
       <ReviewForm
@@ -915,20 +915,20 @@ describe('ReviewForm tests', () => {
         history={history}
         staticContext={mock}
         scope={scope}
-        event={application.event}
+        event={declaration.event}
         registerForm={form}
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
-            applicationId: application.id,
+            declarationId: declaration.id,
             pageId: 'review',
-            event: application.event.toLowerCase()
+            event: declaration.event.toLowerCase()
           },
           isExact: true,
           path: '',
           url: ''
         }}
-        applicationId={application.id}
+        declarationId={declaration.id}
       />,
       { store, history }
     )
@@ -939,13 +939,13 @@ describe('ReviewForm tests', () => {
   })
 
   it('redirect to update tab when exit button is clicked', async () => {
-    const application = createReviewApplication(
+    const declaration = createReviewDeclaration(
       uuid(),
       {},
       Event.BIRTH,
       'REJECTED'
     )
-    application.data = {
+    declaration.data = {
       child: {
         attendantAtBirth: 'NURSE',
         childBirthDate: '2001-01-01',
@@ -965,15 +965,15 @@ describe('ReviewForm tests', () => {
       }
     }
     store.dispatch(
-      getStorageApplicationsSuccess(
+      getStorageDeclarationsSuccess(
         JSON.stringify({
           userID: 'currentUser', // mock
-          drafts: [application],
-          applications: []
+          drafts: [declaration],
+          declarations: []
         })
       )
     )
-    store.dispatch(storeApplication(application))
+    store.dispatch(storeDeclaration(declaration))
 
     const testComponent = await createTestComponent(
       <ReviewForm
@@ -981,20 +981,20 @@ describe('ReviewForm tests', () => {
         history={history}
         staticContext={mock}
         scope={scope}
-        event={application.event}
+        event={declaration.event}
         registerForm={form}
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
-            applicationId: application.id,
+            declarationId: declaration.id,
             pageId: 'review',
-            event: application.event.toLowerCase()
+            event: declaration.event.toLowerCase()
           },
           isExact: true,
           path: '',
           url: ''
         }}
-        applicationId={application.id}
+        declarationId={declaration.id}
       />,
       { store, history }
     )
@@ -1005,8 +1005,8 @@ describe('ReviewForm tests', () => {
   })
 
   it('redirect to progress tab when exit button is clicked', async () => {
-    const application = createReviewApplication(uuid(), {}, Event.BIRTH)
-    application.data = {
+    const declaration = createReviewDeclaration(uuid(), {}, Event.BIRTH)
+    declaration.data = {
       child: {
         attendantAtBirth: 'NURSE',
         childBirthDate: '2001-01-01',
@@ -1026,15 +1026,15 @@ describe('ReviewForm tests', () => {
       }
     }
     store.dispatch(
-      getStorageApplicationsSuccess(
+      getStorageDeclarationsSuccess(
         JSON.stringify({
           userID: 'currentUser', // mock
-          drafts: [application],
-          applications: []
+          drafts: [declaration],
+          declarations: []
         })
       )
     )
-    store.dispatch(storeApplication(application))
+    store.dispatch(storeDeclaration(declaration))
 
     const testComponent = await createTestComponent(
       <ReviewForm
@@ -1042,20 +1042,20 @@ describe('ReviewForm tests', () => {
         history={history}
         staticContext={mock}
         scope={scope}
-        event={application.event}
+        event={declaration.event}
         registerForm={form}
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
-            applicationId: application.id,
+            declarationId: declaration.id,
             pageId: 'review',
-            event: application.event.toLowerCase()
+            event: declaration.event.toLowerCase()
           },
           isExact: true,
           path: '',
           url: ''
         }}
-        applicationId={application.id}
+        declarationId={declaration.id}
       />,
       { store, history }
     )
@@ -1065,29 +1065,29 @@ describe('ReviewForm tests', () => {
     expect(window.location.href).toContain('/progress')
   })
 
-  it('should redirect to progress tab when close application button is clicked', async () => {
-    const application = createReviewApplication(uuid(), {}, Event.BIRTH)
-    store.dispatch(storeApplication(application))
+  it('should redirect to progress tab when close declaration button is clicked', async () => {
+    const declaration = createReviewDeclaration(uuid(), {}, Event.BIRTH)
+    store.dispatch(storeDeclaration(declaration))
     const testComponent = await createTestComponent(
       <ReviewForm
         location={mock}
         history={history}
         scope={scope}
         staticContext={mock}
-        event={application.event}
+        event={declaration.event}
         registerForm={form}
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
-            applicationId: application.id,
+            declarationId: declaration.id,
             pageId: 'child',
-            event: application.event.toLowerCase()
+            event: declaration.event.toLowerCase()
           },
           isExact: true,
           path: '',
           url: ''
         }}
-        applicationId={application.id}
+        declarationId={declaration.id}
       />,
       { store, history }
     )
@@ -1105,19 +1105,19 @@ describe('ReviewForm tests', () => {
     menuButton.hostNodes().simulate('click')
     testComponent.update()
 
-    const closeApplicationButton = await waitForElement(
+    const closeDeclarationButton = await waitForElement(
       testComponent,
       '#eventToggleMenuItem0'
     )
-    closeApplicationButton.hostNodes().simulate('click')
+    closeDeclarationButton.hostNodes().simulate('click')
     testComponent.update()
 
     expect(window.location.href).toContain('/progress')
   })
 
   it('it checked if review form is already in store and avoid loading from backend', async () => {
-    const application = createReviewApplication(uuid(), {}, Event.BIRTH)
-    application.data = {
+    const declaration = createReviewDeclaration(uuid(), {}, Event.BIRTH)
+    declaration.data = {
       child: {
         attendantAtBirth: 'NURSE',
         childBirthDate: '2001-01-01',
@@ -1137,15 +1137,15 @@ describe('ReviewForm tests', () => {
       }
     }
     store.dispatch(
-      getStorageApplicationsSuccess(
+      getStorageDeclarationsSuccess(
         JSON.stringify({
           userID: 'currentUser', // mock
-          drafts: [application],
-          applications: []
+          drafts: [declaration],
+          declarations: []
         })
       )
     )
-    store.dispatch(storeApplication(application))
+    store.dispatch(storeDeclaration(declaration))
 
     const testComponent = await createTestComponent(
       <ReviewForm
@@ -1153,20 +1153,20 @@ describe('ReviewForm tests', () => {
         history={history}
         staticContext={mock}
         scope={scope}
-        event={application.event}
+        event={declaration.event}
         registerForm={form}
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
-            applicationId: application.id,
+            declarationId: declaration.id,
             pageId: 'review',
-            event: application.event.toLowerCase()
+            event: declaration.event.toLowerCase()
           },
           isExact: true,
           path: '',
           url: ''
         }}
-        applicationId={application.id}
+        declarationId={declaration.id}
       />,
       { store, history }
     )
@@ -1178,7 +1178,7 @@ describe('ReviewForm tests', () => {
     testComponent.update()
     const data = testComponent
       .find(RegisterForm)
-      .prop('application') as IApplication
+      .prop('declaration') as IDeclaration
 
     expect(data.data).toEqual({
       child: {
@@ -1202,12 +1202,12 @@ describe('ReviewForm tests', () => {
   })
   describe('Death review flow', () => {
     it('it returns death registration', async () => {
-      const application = createReviewApplication(uuid(), {}, Event.DEATH)
+      const declaration = createReviewDeclaration(uuid(), {}, Event.DEATH)
       const graphqlMock = [
         {
           request: {
             query: GET_DEATH_REGISTRATION_FOR_REVIEW,
-            variables: { id: application.id }
+            variables: { id: declaration.id }
           },
           result: {
             data: {
@@ -1436,20 +1436,20 @@ describe('ReviewForm tests', () => {
           history={history}
           scope={scope}
           staticContext={mock}
-          event={application.event}
+          event={declaration.event}
           registerForm={getReviewFormFromStore(store, Event.DEATH)}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           match={{
             params: {
-              applicationId: application.id,
+              declarationId: declaration.id,
               pageId: 'review',
-              event: application.event.toLowerCase()
+              event: declaration.event.toLowerCase()
             },
             isExact: true,
             path: '',
             url: ''
           }}
-          applicationId={application.id}
+          declarationId={declaration.id}
         />,
         { store, history, graphqlMocks: graphqlMock }
       )
@@ -1461,7 +1461,7 @@ describe('ReviewForm tests', () => {
       testComponent.update()
       const data = testComponent
         .find(RegisterForm)
-        .prop('application') as IApplication
+        .prop('declaration') as IDeclaration
 
       expect(data.data.deceased).toEqual({
         iDType: 'PASSPORT',
@@ -1515,12 +1515,12 @@ describe('ReviewForm tests', () => {
       })
     })
     it('populates proper casue of death section', async () => {
-      const application = createReviewApplication(uuid(), {}, Event.DEATH)
+      const declaration = createReviewDeclaration(uuid(), {}, Event.DEATH)
       const graphqlMock = [
         {
           request: {
             query: GET_DEATH_REGISTRATION_FOR_REVIEW,
-            variables: { id: application.id }
+            variables: { id: declaration.id }
           },
           result: {
             data: {
@@ -1749,20 +1749,20 @@ describe('ReviewForm tests', () => {
           history={history}
           scope={scope}
           staticContext={mock}
-          event={application.event}
+          event={declaration.event}
           registerForm={form}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           match={{
             params: {
-              applicationId: application.id,
+              declarationId: declaration.id,
               pageId: 'review',
-              event: application.event.toLowerCase()
+              event: declaration.event.toLowerCase()
             },
             isExact: true,
             path: '',
             url: ''
           }}
-          applicationId={application.id}
+          declarationId={declaration.id}
         />,
         { store, history, graphqlMocks: graphqlMock }
       )
@@ -1774,7 +1774,7 @@ describe('ReviewForm tests', () => {
       testComponent.update()
       const data = testComponent
         .find(RegisterForm)
-        .prop('application') as IApplication
+        .prop('declaration') as IDeclaration
 
       expect(data.data.causeOfDeath).toEqual({
         causeOfDeathEstablished: true,
@@ -1789,12 +1789,12 @@ describe('ReviewForm tests', () => {
     })
 
     it('shows error message for user with declare scope', async () => {
-      const application = createReviewApplication(uuid(), {}, Event.BIRTH)
+      const declaration = createReviewDeclaration(uuid(), {}, Event.BIRTH)
       const graphqlMock = [
         {
           request: {
             query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
-            variables: { id: application.id }
+            variables: { id: declaration.id }
           },
           result: {
             data: {
@@ -1841,20 +1841,20 @@ describe('ReviewForm tests', () => {
           history={history}
           staticContext={mock}
           scope={scope}
-          event={application.event}
+          event={declaration.event}
           registerForm={form}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           match={{
             params: {
-              draftId: application.id,
+              draftId: declaration.id,
               pageId: 'review',
-              event: application.event.toLowerCase()
+              event: declaration.event.toLowerCase()
             },
             isExact: true,
             path: '',
             url: ''
           }}
-          applicationId={application.id}
+          declarationId={declaration.id}
         />,
         { store, history, graphqlMocks: graphqlMock }
       )

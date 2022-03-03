@@ -11,11 +11,11 @@
  */
 import * as React from 'react'
 import {
-  modifyApplication,
-  IApplication,
+  modifyDeclaration,
+  IDeclaration,
   SUBMISSION_STATUS,
-  writeApplication
-} from '@client/applications'
+  writeDeclaration
+} from '@client/declarations'
 import { connect } from 'react-redux'
 import { get } from 'lodash'
 import {
@@ -74,10 +74,10 @@ import {
   isVisibleField,
   renderValue,
   sectionHasError,
-  updateApplicationRegistrationWithCorrection
+  updateDeclarationRegistrationWithCorrection
 } from './utils'
 import { IStoreState } from '@client/store'
-import { getRegisterForm } from '@client/forms/register/application-selectors'
+import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getLanguage } from '@client/i18n/selectors'
 import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
 import { getOfflineData } from '@client/offline/selectors'
@@ -102,16 +102,16 @@ interface IProps {
 }
 
 type IStateProps = {
-  application: IApplication
+  declaration: IDeclaration
 }
 
 type IDispatchProps = {
   goBack: typeof goBack
-  modifyApplication: typeof modifyApplication
+  modifyDeclaration: typeof modifyDeclaration
   goToPageGroup: typeof goToPageGroup
   goToCertificateCorrection: typeof goToCertificateCorrection
   goToHomeTab: typeof goToHomeTab
-  writeApplication: typeof writeApplication
+  writeDeclaration: typeof writeDeclaration
 }
 
 type IFullProps = IProps & IStateProps & IDispatchProps & IntlShapeProps
@@ -125,8 +125,8 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
       ...this.group,
       fields: replaceInitialValues(
         this.group.fields,
-        this.props.application.data[this.section.id] || {},
-        this.props.application.data
+        this.props.declaration.data[this.section.id] || {},
+        this.props.declaration.data
       )
     }
   }
@@ -134,12 +134,12 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
   render() {
     const {
       registerForm,
-      application,
+      declaration,
       intl,
       goBack,
-      application: { event }
+      declaration: { event }
     } = this.props
-    const formSections = getViewableSection(registerForm[event], application)
+    const formSections = getViewableSection(registerForm[event], declaration)
     const backToReviewButton = (
       <SecondaryButton
         id="back_to_review"
@@ -155,7 +155,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
         id="make_correction"
         key="make_correction"
         onClick={this.makeCorrection}
-        disabled={sectionHasError(this.group, this.section, application)}
+        disabled={sectionHasError(this.group, this.section, declaration)}
         icon={() => <Check />}
         align={ICON_ALIGNMENT.LEFT}
       >
@@ -313,15 +313,15 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
             <FormFieldGenerator
               id={this.group.id}
               onChange={(values) => {
-                this.modifyApplication(
+                this.modifyDeclaration(
                   values,
                   correctionFeesPaymentSection,
-                  application
+                  declaration
                 )
               }}
               setAllFieldsDirty={false}
               fields={this.group.fields}
-              draftData={application.data}
+              draftData={declaration.data}
             />
           </Content>
         </ActionPageLight>
@@ -392,18 +392,18 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
     field: IFormField,
     ignoreNestedFieldWrapping?: boolean
   ) => {
-    const { application, intl, offlineResources, language } = this.props
+    const { declaration, intl, offlineResources, language } = this.props
     if (
-      application.originalData &&
+      declaration.originalData &&
       hasFieldChanged(
         field,
-        application.data[section.id],
-        application.originalData[section.id]
+        declaration.data[section.id],
+        declaration.originalData[section.id]
       )
     ) {
       const changed = this.getFieldValue(
         section,
-        application.data,
+        declaration.data,
         field,
         intl,
         offlineResources,
@@ -412,7 +412,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
       )
       const original = this.getFieldValue(
         section,
-        application.originalData,
+        declaration.originalData,
         field,
         intl,
         offlineResources,
@@ -433,7 +433,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
     data: IFormSectionData,
     originalData?: IFormSectionData
   ) => {
-    const { application, intl, offlineResources, language } = this.props
+    const { declaration, intl, offlineResources, language } = this.props
     if (field.previewGroup && !visitedTags.includes(field.previewGroup)) {
       visitedTags.push(field.previewGroup)
 
@@ -441,7 +441,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
       const taggedFields: IFormField[] = []
       group.fields.forEach((field) => {
         if (
-          isVisibleField(field, section, application, offlineResources) &&
+          isVisibleField(field, section, declaration, offlineResources) &&
           !isViewOnly(field)
         ) {
           if (field.previewGroup === baseTag) {
@@ -453,7 +453,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
                 isVisibleField(
                   tempField,
                   section,
-                  application,
+                  declaration,
                   offlineResources
                 ) &&
                 !isViewOnly(tempField) &&
@@ -476,7 +476,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
         .map((field) =>
           this.getFieldValue(
             section,
-            application.data,
+            declaration.data,
             field,
             intl,
             offlineResources,
@@ -503,13 +503,13 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
         false
       )
 
-      const applicationOriginalData = application.originalData
-      if (applicationOriginalData && hasAnyFieldChanged) {
+      const declarationOriginalData = declaration.originalData
+      if (declarationOriginalData && hasAnyFieldChanged) {
         const previousValues = taggedFields
           .map((field, index) =>
             this.getFieldValue(
               section,
-              applicationOriginalData,
+              declarationOriginalData,
               field,
               intl,
               offlineResources,
@@ -549,7 +549,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
     field: IFormField
   ) => {
     const {
-      application: { data, originalData },
+      declaration: { data, originalData },
       intl,
       offlineResources,
       language
@@ -608,7 +608,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
     item: any,
     deathForm: IForm
   ) => {
-    const { application, intl, offlineResources, language } = this.props
+    const { declaration, intl, offlineResources, language } = this.props
     overriddenField.label =
       get(overriddenField, 'reviewOverrides.labelAs') || overriddenField.label
     const residingSectionId = get(
@@ -650,10 +650,10 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
   }
 
   getChanges = (formSections: IFormSection[]) => {
-    const { application, offlineResources, language } = this.props
+    const { declaration, offlineResources, language } = this.props
     const overriddenFields = getOverriddenFieldsListForPreview(
       formSections,
-      application,
+      declaration,
       offlineResources
     )
     let tempItem: any
@@ -663,14 +663,14 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
       const visitedTags: string[] = []
       const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
         section,
-        application.data[section.id] || {},
-        application.data
+        declaration.data[section.id] || {},
+        declaration.data
       )
       visibleGroups.forEach((group) => {
         group.fields
           .filter(
             (field) =>
-              isVisibleField(field, section, application, offlineResources) &&
+              isVisibleField(field, section, declaration, offlineResources) &&
               !isViewOnly(field)
           )
           .filter((field) => !Boolean(field.hideInPreview))
@@ -682,9 +682,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
                   group,
                   field,
                   visitedTags,
-                  application.data[section.id],
-                  application.originalData &&
-                    application.originalData[section.id]
+                  declaration.data[section.id],
+                  declaration.originalData &&
+                    declaration.originalData[section.id]
                 )
               : field.nestedFields && field.ignoreNestedFieldWrappingInPreview
               ? this.getNestedPreviewField(section, group, field)
@@ -711,17 +711,17 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
     return items.filter((item) => item)
   }
 
-  modifyApplication = (
+  modifyDeclaration = (
     sectionData: IFormSectionData,
     activeSection: IFormSection,
-    application: IApplication
+    declaration: IDeclaration
   ) => {
-    this.props.modifyApplication({
-      ...application,
+    this.props.modifyDeclaration({
+      ...declaration,
       data: {
-        ...application.data,
+        ...declaration.data,
         [activeSection.id]: {
-          ...application.data[activeSection.id],
+          ...declaration.data[activeSection.id],
           ...sectionData
         }
       }
@@ -736,20 +736,20 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
   }
 
   getRequestedBy = () => {
-    const corrector = this.props.application.data.corrector as IFormSectionData
+    const corrector = this.props.declaration.data.corrector as IFormSectionData
 
     const relationship =
       corrector &&
       ((corrector.relationship as IFormSectionData).value as string)
     switch (relationship) {
       case CorrectorRelationship.INFORMANT:
-        return this.getName(this.props.application.data.informant)
+        return this.getName(this.props.declaration.data.informant)
       case CorrectorRelationship.MOTHER:
-        return this.getName(this.props.application.data.mother)
+        return this.getName(this.props.declaration.data.mother)
       case CorrectorRelationship.FATHER:
-        return this.getName(this.props.application.data.father)
+        return this.getName(this.props.declaration.data.father)
       case CorrectorRelationship.CHILD:
-        return this.getName(this.props.application.data.child)
+        return this.getName(this.props.declaration.data.child)
       case CorrectorRelationship.LEGAL_GUARDIAN:
         return this.props.intl.formatMessage(messages.legalGuardian)
       case CorrectorRelationship.ANOTHER_AGENT:
@@ -770,7 +770,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
   }
 
   getIdCheck = () => {
-    const corrector = this.props.application.data.corrector as IFormSectionData
+    const corrector = this.props.declaration.data.corrector as IFormSectionData
     const idChecked =
       corrector &&
       ((corrector as IFormSectionData).hasShowedVerifiedDocument as boolean)
@@ -780,7 +780,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
   }
 
   getReasonForRequest = () => {
-    const reason = this.props.application.data.reason as IFormSectionData
+    const reason = this.props.declaration.data.reason as IFormSectionData
     const reasonType = reason && (reason.type as IFormSectionData)
     const reasonValue = reasonType && (reasonType.value as string)
     switch (reasonValue) {
@@ -818,7 +818,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
           id="change-reason-link"
           onClick={() =>
             this.props.goToCertificateCorrection(
-              this.props.application.id,
+              this.props.declaration.id,
               CorrectionSection.Reason
             )
           }
@@ -830,7 +830,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
   }
 
   getComments = () => {
-    const reason = this.props.application.data.reason as IFormSectionData
+    const reason = this.props.declaration.data.reason as IFormSectionData
     const comments = reason && (reason.additionalComment as string)
 
     return (
@@ -840,7 +840,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
           id="change-comment-link"
           onClick={() =>
             this.props.goToCertificateCorrection(
-              this.props.application.id,
+              this.props.declaration.id,
               CorrectionSection.Reason
             )
           }
@@ -856,7 +856,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
   }
 
   getSupportingDocuments = () => {
-    const supportingDocuments = this.props.application.data
+    const supportingDocuments = this.props.declaration.data
       .supportingDocuments as IFormSectionData
     const proofOfDoc =
       supportingDocuments &&
@@ -878,7 +878,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
           id="upload-supporting-doc-link"
           onClick={() =>
             this.props.goToCertificateCorrection(
-              this.props.application.id,
+              this.props.declaration.id,
               CorrectionSection.SupportingDocuments
             )
           }
@@ -890,23 +890,23 @@ class CorrectionSummaryComponent extends React.Component<IFullProps> {
   }
 
   makeCorrection = () => {
-    const application = this.props.application
-    application.action = Action.REQUEST_CORRECTION_APPLICATION
-    application.submissionStatus = SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION
-    updateApplicationRegistrationWithCorrection(application, {
+    const declaration = this.props.declaration
+    declaration.action = Action.REQUEST_CORRECTION_DECLARATION
+    declaration.submissionStatus = SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION
+    updateDeclarationRegistrationWithCorrection(declaration, {
       userPrimaryOffice: this.props.userPrimaryOffice
     })
-    this.props.writeApplication(application)
+    this.props.writeDeclaration(declaration)
     this.props.goToHomeTab('review')
   }
 
   gotoReviewPage = () => {
     this.props.goToPageGroup(
       CERTIFICATE_CORRECTION_REVIEW,
-      this.props.application.id,
+      this.props.declaration.id,
       ReviewSection.Review,
       'review-view-group',
-      this.props.application.event
+      this.props.declaration.event
     )
   }
 }
@@ -919,8 +919,8 @@ export const CorrectionSummary = connect(
     userPrimaryOffice: getUserDetails(state)?.primaryOffice
   }),
   {
-    modifyApplication,
-    writeApplication,
+    modifyDeclaration,
+    writeDeclaration,
     goBack,
     goToPageGroup,
     goToCertificateCorrection,

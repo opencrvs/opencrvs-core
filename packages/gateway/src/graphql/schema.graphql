@@ -67,11 +67,11 @@ type Query {
     timeEnd: String!
     locationId: String!
   ): EventEstimationMetrics
-  getApplicationsStartedMetrics(
+  getDeclarationsStartedMetrics(
     timeStart: String!
     timeEnd: String!
     locationId: String!
-  ): ApplicationsStartedMetrics
+  ): DeclarationsStartedMetrics
   fetchMonthWiseEventMetrics(
     timeStart: String!
     timeEnd: String!
@@ -359,10 +359,10 @@ type EventEstimationMetrics {
   deathTargetDayMetrics: EstimationMetrics
 }
 
-type ApplicationsStartedMetrics {
-  fieldAgentApplications: Int!
-  hospitalApplications: Int!
-  officeApplications: Int!
+type DeclarationsStartedMetrics {
+  fieldAgentDeclarations: Int!
+  hospitalDeclarations: Int!
+  officeDeclarations: Int!
 }
 
 type MonthWiseEstimationMetrics {
@@ -708,10 +708,10 @@ type SearchFieldAgentResponse {
   status: String
   primaryOfficeId: String
   creationDate: String
-  totalNumberOfApplicationStarted: Int
+  totalNumberOfDeclarationStarted: Int
   totalNumberOfInProgressAppStarted: Int
-  totalNumberOfRejectedApplications: Int
-  averageTimeForDeclaredApplications: Int
+  totalNumberOfRejectedDeclarations: Int
+  averageTimeForDeclaredDeclarations: Int
 }
 
 type RegistrationGenderBasisMetrics {
@@ -1074,7 +1074,7 @@ type RegistrationSearchSet {
   status: String
   contactNumber: String
   contactRelationship: String
-  dateOfApplication: Date
+  dateOfDeclaration: Date
   trackingId: String
   registrationNumber: String
   eventLocationId: String

@@ -18,7 +18,7 @@ import {
 } from '@client/tests/util'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { ReactWrapper } from 'enzyme'
-import { createApplication, storeApplication } from '@client/applications'
+import { createDeclaration, storeDeclaration } from '@client/declarations'
 import { createStore } from '@client/store'
 import {
   SELECT_WITH_OPTIONS,
@@ -47,8 +47,8 @@ describe('form component', () => {
 
   beforeEach(async () => {
     const { store, history } = createStore()
-    const draft = createApplication(Event.BIRTH)
-    store.dispatch(storeApplication(draft))
+    const draft = createDeclaration(Event.BIRTH)
+    store.dispatch(storeDeclaration(draft))
     const modifyDraft = jest.fn()
     component = await createTestComponent(
       <FormFieldGenerator
@@ -219,8 +219,8 @@ describe('when user is in the register section', () => {
   let component: ReactWrapper<{}, {}>
   beforeEach(async () => {
     const { store, history } = createStore()
-    const draft = createApplication(Event.BIRTH)
-    store.dispatch(storeApplication(draft))
+    const draft = createDeclaration(Event.BIRTH)
+    store.dispatch(storeDeclaration(draft))
     const modifyDraft = jest.fn()
     component = await createTestComponent(
       <FormFieldGenerator
@@ -233,7 +233,7 @@ describe('when user is in the register section', () => {
             type: TEL,
             label: {
               defaultMessage: 'Phone number',
-              id: 'form.field.label.application.phone',
+              id: 'form.field.label.declaration.phone',
               description: 'Input label for phone input'
             },
             required: true,
@@ -260,8 +260,8 @@ describe('when field definition has nested fields', () => {
 
   beforeEach(async () => {
     const { store, history } = createStore()
-    const draft = createApplication(Event.BIRTH)
-    store.dispatch(storeApplication(draft))
+    const draft = createDeclaration(Event.BIRTH)
+    store.dispatch(storeDeclaration(draft))
     const modifyDraft = jest.fn()
     component = await createTestComponent(
       <FormFieldGenerator

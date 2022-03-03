@@ -21,7 +21,7 @@ interface ISelectPrimaryApplicantMessages
 const messagesToDefine: ISelectPrimaryApplicantMessages = {
   registerNewEventTitle: {
     id: 'register.selectVitalEvent.registerNewEventTitle',
-    defaultMessage: 'New application',
+    defaultMessage: 'New declaration',
     description: 'The title that appears on the select vital event page'
   },
   registerNewEventHeading: {

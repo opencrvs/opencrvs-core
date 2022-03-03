@@ -27,11 +27,11 @@ import {
 } from '@opencrvs/components/lib/interface'
 import { FullBodyContent } from '@opencrvs/components/lib/layout'
 import {
-  IApplication,
+  IDeclaration,
   IPayload,
   SUBMISSION_STATUS,
-  writeApplication
-} from '@client/applications'
+  writeDeclaration
+} from '@client/declarations'
 import { ReviewAction } from '@client/components/form/ReviewActionComponent'
 import {
   BirthSection,
@@ -72,7 +72,7 @@ import {
 import {
   getBirthSection,
   getRegisterForm
-} from '@client/forms/register/application-selectors'
+} from '@client/forms/register/declaration-selectors'
 import {
   birthSectionMapping,
   birthSectionTitle
@@ -208,16 +208,16 @@ const InputWrapper = styled.div`
 type onChangeReviewForm = (
   sectionData: IFormSectionData,
   activeSection: IFormSection,
-  application: IApplication
+  declaration: IDeclaration
 ) => void
 interface IProps {
-  draft: IApplication
+  draft: IDeclaration
   registerForm: { [key: string]: IForm }
   pageRoute: string
-  rejectApplicationClickEvent?: () => void
+  rejectDeclarationClickEvent?: () => void
   goToPageGroup: typeof goToPageGroup
   submitClickEvent: (
-    application: IApplication,
+    declaration: IDeclaration,
     submissionStatus: string,
     action: string,
     payload?: IPayload,
@@ -228,7 +228,7 @@ interface IProps {
   language: string
   onChangeReviewForm?: onChangeReviewForm
   onContinue?: () => void
-  writeApplication: typeof writeApplication
+  writeDeclaration: typeof writeDeclaration
   registrationSection: IFormSection
   documentsSection: IFormSection
 }
@@ -417,7 +417,7 @@ const renderValue = (
 const getErrorsOnFieldsBySection = (
   formSections: IFormSection[],
   offlineCountryConfig: IOfflineData,
-  draft: IApplication
+  draft: IDeclaration
 ): IErrorsBySection => {
   return formSections.reduce((sections, section: IFormSection) => {
     const fields: IFormField[] = getSectionFields(
@@ -589,7 +589,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     return matchedOption && intl.formatMessage(matchedOption.label)
   }
   prepSectionDocuments = (
-    draft: IApplication,
+    draft: IDeclaration,
     activeSection: Section
   ): IDocumentViewerOptions & { uploadedDocuments: IFileValue[] } => {
     const { documentsSection, intl } = this.props
@@ -673,31 +673,31 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     groupId: string,
     fieldName?: string
   ) => {
-    const { draft, pageRoute, writeApplication, goToPageGroup } = this.props
-    const application = draft
-    application.review = true
-    writeApplication(application)
+    const { draft, pageRoute, writeDeclaration, goToPageGroup } = this.props
+    const declaration = draft
+    declaration.review = true
+    writeDeclaration(declaration)
     goToPageGroup(
       pageRoute,
-      application.id,
+      declaration.id,
       sectionId,
       groupId,
-      application.event.toLowerCase(),
+      declaration.event.toLowerCase(),
       fieldName
     )
   }
 
   replaceHandler(sectionId: string, groupId: string) {
-    const { draft, pageRoute, writeApplication, goToPageGroup } = this.props
-    const application = draft
-    application.data[sectionId] = {}
-    writeApplication(application)
+    const { draft, pageRoute, writeDeclaration, goToPageGroup } = this.props
+    const declaration = draft
+    declaration.data[sectionId] = {}
+    writeDeclaration(declaration)
     goToPageGroup(
       pageRoute,
-      application.id,
+      declaration.id,
       sectionId,
       groupId,
-      application.event.toLowerCase()
+      declaration.event.toLowerCase()
     )
   }
 
@@ -767,7 +767,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     value: IFormFieldValue | JSX.Element | undefined,
     ignoreAction = false
   ) {
-    const { draft: application, intl } = this.props
+    const { draft: declaration, intl } = this.props
 
     return {
       label: intl.formatMessage(fieldLabel),
@@ -776,7 +776,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         id: `btn_change_${section.id}_${fieldName}`,
         label: intl.formatMessage(buttonMessages.change),
         handler: () => {
-          if (this.isDraft() || isCorrection(application)) {
+          if (this.isDraft() || isCorrection(declaration)) {
             this.editLinkClickHandlerForDraft(section.id, group.id, fieldName)
           } else {
             this.editLinkClickHandler(section.id, group.id, fieldName)
@@ -1426,9 +1426,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   render() {
     const {
       intl,
-      draft: application,
+      draft: declaration,
       registerForm,
-      rejectApplicationClickEvent,
+      rejectDeclarationClickEvent,
       submitClickEvent,
       registrationSection,
       documentsSection,
@@ -1441,7 +1441,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const errorsOnFields = getErrorsOnFieldsBySection(
       formSections,
       offlineCountryConfiguration,
-      application
+      declaration
     )
 
     const isComplete =
@@ -1455,18 +1455,18 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         ;(this.props.onChangeReviewForm as onChangeReviewForm)(
           { commentsOrNotes: e.target.value },
           registrationSection,
-          application
+          declaration
         )
       },
       value:
-        (application.data.registration &&
-          application.data.registration.commentsOrNotes) ||
+        (declaration.data.registration &&
+          declaration.data.registration.commentsOrNotes) ||
         '',
       ignoreMediaQuery: true
     }
 
     const sectionName = this.state.activeSection || this.docSections[0].id
-    const applicantName = getDraftApplicantFullName(application, intl.locale)
+    const applicantName = getDraftApplicantFullName(declaration, intl.locale)
     const draft = this.isDraft()
     const transformedSectionData = this.transformSectionData(
       formSections,
@@ -1493,7 +1493,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               }
             />
             <FormData>
-              {!isCorrection(application) && (
+              {!isCorrection(declaration) && (
                 <FormDataHeader>
                   {intl.formatMessage(messages.formDataHeader, {
                     isDraft: draft
@@ -1502,7 +1502,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               )}
               {transformedSectionData.map((sec, index) => {
                 const { uploadedDocuments, selectOptions } =
-                  this.prepSectionDocuments(application, sec.id)
+                  this.prepSectionDocuments(declaration, sec.id)
                 return (
                   <DataSection
                     responsiveContents={
@@ -1519,7 +1519,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   />
                 )
               })}
-              {event === BIRTH && !isCorrection(application) && (
+              {event === BIRTH && !isCorrection(declaration) && (
                 <InputWrapper>
                   <InputField
                     id="additional_comments"
@@ -1531,21 +1531,21 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   </InputField>
                 </InputWrapper>
               )}
-              {!isCorrection(application) && (
+              {!isCorrection(declaration) && (
                 <ReviewAction
-                  completeApplication={isComplete}
-                  applicationToBeValidated={this.userHasValidateScope()}
-                  applicationToBeRegistered={this.userHasRegisterScope()}
-                  alreadyRejectedApplication={
+                  completeDeclaration={isComplete}
+                  declarationToBeValidated={this.userHasValidateScope()}
+                  declarationToBeRegistered={this.userHasRegisterScope()}
+                  alreadyRejectedDeclaration={
                     this.props.draft.registrationStatus === REJECTED
                   }
-                  draftApplication={draft}
-                  application={application}
-                  submitApplicationAction={submitClickEvent}
-                  rejectApplicationAction={rejectApplicationClickEvent}
+                  draftDeclaration={draft}
+                  declaration={declaration}
+                  submitDeclarationAction={submitClickEvent}
+                  rejectDeclarationAction={rejectDeclarationClickEvent}
                 />
               )}
-              {isCorrection(application) && (
+              {isCorrection(declaration) && (
                 <FooterArea>
                   <PrimaryButton
                     id="continue_button"
@@ -1566,7 +1566,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 id={'document_section_' + this.state.activeSection}
                 key={'Document_section_' + this.state.activeSection}
                 options={this.prepSectionDocuments(
-                  application,
+                  declaration,
                   this.state.activeSection || this.docSections[0].id
                 )}
               >
@@ -1591,7 +1591,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           </Column>
         </Row>
         <ResponsiveModal
-          title={intl.formatMessage(messages.editApplicationConfirmationTitle)}
+          title={intl.formatMessage(messages.editDeclarationConfirmationTitle)}
           contentHeight={96}
           responsive={false}
           actions={[
@@ -1619,7 +1619,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           show={this.state.displayEditDialog}
           handleClose={this.toggleDisplayDialog}
         >
-          {intl.formatMessage(messages.editApplicationConfirmation)}
+          {intl.formatMessage(messages.editDeclarationConfirmation)}
         </ResponsiveModal>
         {this.state.previewImage && (
           <DocumentPreview
@@ -1643,5 +1643,5 @@ export const ReviewSection = connect(
     offlineCountryConfiguration: getOfflineData(state),
     language: getLanguage(state)
   }),
-  { goToPageGroup, writeApplication }
+  { goToPageGroup, writeDeclaration }
 )(injectIntl(ReviewSectionComp))

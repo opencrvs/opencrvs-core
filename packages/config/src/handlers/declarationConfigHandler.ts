@@ -10,21 +10,21 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as Hapi from '@hapi/hapi'
-import ApplicationConfig, {
-  IApplicationConfigurationModel
-} from '@config/models/config' //   IApplicationConfigurationModel
+import DeclarationConfig, {
+  IDeclarationConfigurationModel
+} from '@config/models/config' //   IDeclarationConfigurationModel
 import { logger } from '@config/config/logger'
-import { getActiveCertificatesHandler } from '@config/handlers/applicationCertificateHandler'
+import { getActiveCertificatesHandler } from '@config/handlers/declarationCertificateHandler'
 
-export default async function applicationHandler(
+export default async function declarationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   try {
     const certificateResponse = await getActiveCertificatesHandler(request, h)
-    let appConfig: IApplicationConfigurationModel | null
+    let appConfig: IDeclarationConfigurationModel | null
     // tslint:disable-next-line
-    appConfig = await ApplicationConfig.findOne({})
+    appConfig = await DeclarationConfig.findOne({})
     return {
       config: appConfig,
       certificates: certificateResponse

@@ -10,10 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  createApplication,
-  IApplication,
-  storeApplication
-} from '@client/applications'
+  createDeclaration,
+  IDeclaration,
+  storeDeclaration
+} from '@client/declarations'
 import { Event } from '@client/forms'
 import { SELECT_BIRTH_INFORMANT } from '@client/navigation/routes'
 
@@ -32,7 +32,7 @@ describe('when user is selecting the informant', () => {
   let app: ReactWrapper
   let history: History
   let store: AppStore
-  let draft: IApplication
+  let draft: IDeclaration
 
   beforeEach(async () => {
     const testApp = await createTestApp()
@@ -40,9 +40,9 @@ describe('when user is selecting the informant', () => {
     history = testApp.history
     store = testApp.store
 
-    draft = createApplication(Event.BIRTH)
-    store.dispatch(storeApplication(draft))
-    history.replace(SELECT_BIRTH_INFORMANT.replace(':applicationId', draft.id))
+    draft = createDeclaration(Event.BIRTH)
+    store.dispatch(storeDeclaration(draft))
+    history.replace(SELECT_BIRTH_INFORMANT.replace(':declarationId', draft.id))
 
     await flushPromises()
     await setPinCode(app)
@@ -101,7 +101,7 @@ describe('when select informant page loads with existing data', () => {
     const history = testApp.history
     const store = testApp.store
 
-    const draft = createApplication(Event.BIRTH, {
+    const draft = createDeclaration(Event.BIRTH, {
       registration: {
         presentAtBirthRegistration: 'MOTHER',
         registrationPhone: '01622688231',
@@ -111,8 +111,8 @@ describe('when select informant page loads with existing data', () => {
         }
       }
     })
-    store.dispatch(storeApplication(draft))
-    history.replace(SELECT_BIRTH_INFORMANT.replace(':applicationId', draft.id))
+    store.dispatch(storeDeclaration(draft))
+    history.replace(SELECT_BIRTH_INFORMANT.replace(':declarationId', draft.id))
 
     await setPinCode(app)
     expect(app.find('#applicant_MOTHER').hostNodes().props().checked).toBe(true)
