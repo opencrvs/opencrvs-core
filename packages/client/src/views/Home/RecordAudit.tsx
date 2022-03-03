@@ -173,6 +173,10 @@ const NameAvatar = styled.span`
 const Heading = styled.h4`
   margin-bottom: 0px !important;
 `
+
+interface IActionDetailsData {
+  [key: string]: any
+}
 interface IStateProps {
   userDetails: IUserDetails | null
   language: string
@@ -806,11 +810,11 @@ const GetHistory = ({
   intl,
   draft,
   goToUserProfile,
-  goToTeamUserList
-}: CMethodParams) => {
-  const [showActionDetails, setActionDetails] = React.useState(false)
-  const toggleActionDetails = () => setActionDetails((prevValue) => !prevValue)
-
+  goToTeamUserList,
+  toggleActionDetails
+}: CMethodParams & {
+  toggleActionDetails: (actionItem: IActionDetailsData) => void
+}) => {
   if (!draft?.data?.history?.length)
     return (
       <>
@@ -830,7 +834,7 @@ const GetHistory = ({
     .map((item) => ({
       date: getFormattedDate(item?.date),
       action: getLink(getStatusLabel(item?.action, intl), () =>
-        toggleActionDetails()
+        toggleActionDetails(item)
       ),
       user: getNameWithAvatar(
         item.user.id,
@@ -879,22 +883,46 @@ const GetHistory = ({
         pageSize={100}
         hideTableHeaderBorder={true}
       />
-      {actionDetailsModal(showActionDetails, toggleActionDetails)}
     </>
   )
 }
 
-const actionDetailsModal = (show: boolean, toggleActionDetails: () => void) => {
+const actionDetailsModal = (
+  show: boolean,
+  actionDetailsData: IActionDetailsData,
+  toggleActionDetails: (param: IActionDetailsData | null) => void,
+  intl: IntlShape
+) => {
+  console.log(actionDetailsData)
+
+  const title =
+    (APPLICATION_STATUS_LABEL[actionDetailsData?.action] &&
+      intl.formatMessage(
+        APPLICATION_STATUS_LABEL[actionDetailsData?.action]
+      )) ||
+    ''
   return (
     <ResponsiveModal
       actions={[]}
-      handleClose={toggleActionDetails}
+      handleClose={() => toggleActionDetails(null)}
       show={show}
       responsive={true}
-      title="Are you ready to submit?"
+      title={title}
       width={1024}
+      autoHeight={true}
     >
-      <></>
+      <>
+        <p>.......................</p>
+        <p>.......................</p>
+        <p>.......................</p>
+        <p>.......................</p>
+        <p>.......................</p>
+        <p>.......................</p>
+        <p>.......................</p>
+        <p>.......................</p>
+        <p>.......................</p>
+        <p>.......................</p>
+      </>
     </ResponsiveModal>
   )
 }
@@ -921,7 +949,13 @@ function RecordAuditBody({
   userDetails: IUserDetails | null
 } & IDispatchProps) {
   const [showDialog, setShowDialog] = React.useState(false)
+  const [showActionDetails, setActionDetails] = React.useState(false)
+  const [actionDetailsData, setActionDetailsData] = React.useState({})
 
+  const toggleActionDetails = (actionItem: IActionDetailsData | null) => {
+    actionItem && setActionDetailsData(actionItem)
+    setActionDetails((prevValue) => !prevValue)
+  }
   const toggleDisplayDialog = () => setShowDialog((prevValue) => !prevValue)
 
   const userHasRegisterScope = scope && scope.includes('register')
@@ -1053,9 +1087,17 @@ function RecordAuditBody({
           draft,
           userDetails,
           goToUserProfile,
-          goToTeamUserList
+          goToTeamUserList,
+          toggleActionDetails
         })}
       </Content>
+
+      {actionDetailsModal(
+        showActionDetails,
+        actionDetailsData,
+        toggleActionDetails,
+        intl
+      )}
 
       <ResponsiveModal
         title={
