@@ -27,7 +27,7 @@ const StyledPage = styled.div<IPage>`
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
 
   ${({ submitting }) =>
     submitting && `justify-content: center; align-items: center;`}

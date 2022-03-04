@@ -31,18 +31,17 @@ import { getMSISDNCountryCode } from '@login/utils/dataCleanse'
 import {
   Title,
   FormWrapper,
-  ActionWrapper,
+  // ActionWrapper,
   Container,
   LogoContainer,
-  StyledButton,
-  StyledButtonWrapper,
+  TertiaryButtonWrapper,
   FieldWrapper
 } from '@login/views/StepOne/StepOneForm'
 
 import { IVerifyCodeNumbers } from '@login/login/actions'
 import { Ii18nReduxFormFieldProps } from '@login/utils/fieldUtils'
 
-import { PrimaryButton } from '@opencrvs/components/lib/buttons/PrimaryButton'
+import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 
 export const messages: {
   [key: string]: MessageDescriptor
@@ -133,7 +132,6 @@ const CodeInput = injectIntl(
         optionalLabel={intl.formatMessage(messages.optionalLabel)}
         ignoreMediaQuery
         hideAsterisk
-        mode={THEME_MODE.DARK}
       >
         <TextInput
           {...field}
@@ -175,9 +173,9 @@ export class StepTwoForm extends React.Component<FullProps> {
     return (
       <Container id="login-step-two-box">
         <Title>
-          <LogoContainer>
+          {/* <LogoContainer>
             <StyledMobile2FA />
-          </LogoContainer>
+          </LogoContainer> */}
           {resentSMS ? (
             <React.Fragment>
               <h2>{intl.formatMessage(messages.stepTwoResendTitle)}</h2>
@@ -213,26 +211,22 @@ export class StepTwoForm extends React.Component<FullProps> {
               field={field}
             />
           </FieldWrapper>
-
-          <ActionWrapper>
-            <PrimaryButton
-              id="login-mobile-submit"
-              disabled={submitting}
-              type="submit"
+          <PrimaryButton
+            id="login-mobile-submit"
+            disabled={submitting}
+            type="submit"
+          >
+            {intl.formatMessage(messages.submit)}
+          </PrimaryButton>{' '}
+          <TertiaryButtonWrapper>
+            <TertiaryButton
+              onClick={this.props.onResendSMS}
+              id="login-mobile-resend"
+              type="button"
             >
-              {intl.formatMessage(messages.submit)}
-            </PrimaryButton>{' '}
-            <br />
-            <StyledButtonWrapper>
-              <StyledButton
-                onClick={this.props.onResendSMS}
-                id="login-mobile-resend"
-                type="button"
-              >
-                {intl.formatMessage(messages.resend)}
-              </StyledButton>
-            </StyledButtonWrapper>
-          </ActionWrapper>
+              {intl.formatMessage(messages.resend)}
+            </TertiaryButton>
+          </TertiaryButtonWrapper>
         </FormWrapper>
       </Container>
     )

@@ -20,7 +20,8 @@ import {
 import styled from 'styled-components'
 import { InjectedFormProps, WrappedFieldProps, Field } from 'redux-form'
 
-import { PrimaryButton, LinkButton } from '@opencrvs/components/lib/buttons'
+import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
+
 import {
   InputField,
   TextInput,
@@ -101,31 +102,21 @@ export const messages: {
 })
 
 export const Container = styled.div`
+  background: ${({ theme }) => theme.colors.white};
+  ${({ theme }) => theme.shadows.mistyShadow};
+  border-radius: 4px;
   position: relative;
+  padding: 56px 40px 24px 40px;
   height: auto;
-  padding: 0px;
-  margin: 0px auto;
-  width: 300px;
-`
-
-export const FormWrapper = styled.form`
-  position: relative;
-  margin: auto;
-  width: 100%;
-  margin-bottom: 50px;
-  margin-top: 64px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-top: 48px;
+  margin: 80px auto;
+  width: 400px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin-top: 24px;
   }
 `
 
-export const ActionWrapper = styled.div`
-  position: relative;
-  margin-top: 10px;
-  display: flex;
-  flex-direction: column;
-`
 export const LogoContainer = styled.div`
+  margin-bottom: 64px;
   flex-direction: row;
   display: flex;
   justify-content: center;
@@ -136,51 +127,35 @@ export const LogoContainer = styled.div`
   }
 `
 
-export const Title = styled.div`
-  margin: auto;
-  margin-top: 30px;
-  color: ${({ theme }) => theme.colors.white};
-  text-align: center;
-  ${({ theme }) => theme.fonts.bodyStyle};
-`
-export const StyledPrimaryButton = styled(PrimaryButton)`
-  justify-content: center;
-  flex-direction: row;
+export const FormWrapper = styled.form`
+  position: relative;
+  flex-direction: column;
   display: flex;
-  flex: 1;
-  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.16);
-  padding: 10px ${({ theme }) => theme.grid.margin}px;
-  margin-bottom: 10px;
+  justify-content: center;
+  margin-bottom: 24px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin-top: 48px;
+    max-width: 320px;
+  }
 `
 
-export const StyledButton = styled(LinkButton)`
-  color: ${({ theme }) => theme.colors.white};
-  flex-direction: row;
-  justify-content: center;
-  text-decoration: none;
-  margin: 10px ${({ theme }) => theme.grid.margin}px;
+export const Title = styled.div`
+  margin-bottom: 48px;
+  text-align: center;
+  color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.bodyStyle};
-  :hover {
-    text-decoration: underline;
-    text-decoration-color: ${({ theme }) => theme.colors.secondary};
-  }
-  &:focus {
-    outline: none;
-    background: ${({ theme }) => theme.colors.focus};
-    color: ${({ theme }) => theme.colors.copy};
-  }
-  &:not([data-focus-visible-added]) {
-    background: transparent;
-    outline: none;
-    color: ${({ theme }) => theme.colors.white};
-  }
-  &:active:not([data-focus-visible-added]):enabled {
-    outline: none;
-    background: ${({ theme }) => theme.colors.focus};
-    color: ${({ theme }) => theme.colors.copy};
-  }
 `
-export const StyledButtonWrapper = styled.div`
+// export const StyledPrimaryButton = styled(PrimaryButton)`
+//   justify-content: center;
+//   flex-direction: row;
+//   display: flex;
+//   flex: 1;
+//   margin-top: 24px;
+//   padding: 10px ${({ theme }) => theme.grid.margin}px;
+// `
+
+export const TertiaryButtonWrapper = styled.div`
+  margin-top: 24px;
   display: inline-flex;
   justify-content: center;
 `
@@ -221,7 +196,6 @@ const UserNameInput = injectIntl((props: Props) => {
       optionalLabel={intl.formatMessage(messages.optionalLabel)}
       ignoreMediaQuery
       hideAsterisk
-      mode={THEME_MODE.DARK}
     >
       <TextInput
         {...userNameField}
@@ -247,7 +221,6 @@ const Password = injectIntl((props: Props) => {
       optionalLabel={intl.formatMessage(messages.optionalLabel)}
       ignoreMediaQuery
       hideAsterisk
-      mode={THEME_MODE.DARK}
     >
       <PasswordInput
         {...passwordField}
@@ -278,26 +251,24 @@ export class StepOneForm extends React.Component<FullProps> {
         <LogoContainer>
           <Logo />
         </LogoContainer>
-        <Title>
-          {submissionError && errorCode ? (
+        {submissionError && errorCode ? (
+          <ErrorMessage>
+            {errorCode === ERROR_CODE_FIELD_MISSING &&
+              intl.formatMessage(messages.fieldMissing)}
+            {errorCode === ERROR_CODE_INVALID_CREDENTIALS &&
+              intl.formatMessage(messages.submissionError)}
+            {errorCode === ERROR_CODE_FORBIDDEN_CREDENTIALS &&
+              intl.formatMessage(messages.forbiddenCredentialError)}
+            {errorCode === ERROR_CODE_PHONE_NUMBER_VALIDATE &&
+              intl.formatMessage(messages.phoneNumberFormat)}
+          </ErrorMessage>
+        ) : (
+          isOffline && (
             <ErrorMessage>
-              {errorCode === ERROR_CODE_FIELD_MISSING &&
-                intl.formatMessage(messages.fieldMissing)}
-              {errorCode === ERROR_CODE_INVALID_CREDENTIALS &&
-                intl.formatMessage(messages.submissionError)}
-              {errorCode === ERROR_CODE_FORBIDDEN_CREDENTIALS &&
-                intl.formatMessage(messages.forbiddenCredentialError)}
-              {errorCode === ERROR_CODE_PHONE_NUMBER_VALIDATE &&
-                intl.formatMessage(messages.phoneNumberFormat)}
+              {intl.formatMessage(messages.networkError)}
             </ErrorMessage>
-          ) : (
-            isOffline && (
-              <ErrorMessage>
-                {intl.formatMessage(messages.networkError)}
-              </ErrorMessage>
-            )
-          )}
-        </Title>
+          )
+        )}
         <FormWrapper id={formId} onSubmit={handleSubmit(submitAction)}>
           <FieldWrapper>
             <Field
@@ -313,20 +284,18 @@ export class StepOneForm extends React.Component<FullProps> {
               component={Password}
             />
           </FieldWrapper>
-          <ActionWrapper>
-            <PrimaryButton id="login-mobile-submit" type="submit">
-              {intl.formatMessage(messages.submit)}
-            </PrimaryButton>
-            <StyledButtonWrapper>
-              <StyledButton
-                id="login-forgot-password"
-                type="button"
-                onClick={forgetAction}
-              >
-                {intl.formatMessage(messages.forgotPassword)}
-              </StyledButton>
-            </StyledButtonWrapper>
-          </ActionWrapper>
+          <PrimaryButton id="login-mobile-submit" type="submit">
+            {intl.formatMessage(messages.submit)}
+          </PrimaryButton>
+          <TertiaryButtonWrapper>
+            <TertiaryButton
+              id="login-forgot-password"
+              type="button"
+              onClick={forgetAction}
+            >
+              {intl.formatMessage(messages.forgotPassword)}
+            </TertiaryButton>
+          </TertiaryButtonWrapper>
         </FormWrapper>
       </Container>
     )
