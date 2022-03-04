@@ -131,7 +131,7 @@ else
     ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/rotate-secrets.sh /tmp/compose/docker-compose.deploy.yml /tmp/compose/docker-compose.prod-deploy.yml /tmp/compose/docker-compose.countryconfig.prod-deploy.yml | tee -a '$LOG_LOCATION'/rotate-secrets.log'
 fi
 # Setup configuration files and compose file for the deployment domain
-ssh $SSH_USER@$SSH_HOST 'SLACK_WEBHOOK_URL='$SLACK_WEBHOOK_URL' /tmp/compose/infrastructure/setup-deploy-config.sh '$HOST' | tee -a '$LOG_LOCATION'/setup-deploy-config.log'
+ssh $SSH_USER@$SSH_HOST "SLACK_WEBHOOK_URL=$SLACK_WEBHOOK_URL /tmp/compose/infrastructure/setup-deploy-config.sh $HOST | tee -a $LOG_LOCATION/setup-deploy-config.log"
 
 # Deploy the OpenCRVS stack onto the swarm
 if [[ "$ENV" = "development" ]]; then
