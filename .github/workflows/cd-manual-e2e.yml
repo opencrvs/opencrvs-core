@@ -37,7 +37,7 @@ jobs:
         node-version: [14.17.0]
     steps:
       - name: Checking out git repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.4
         with:
           ref: ${{ github.event.inputs.farajaland }}
       - name: Checking out the country config repo
