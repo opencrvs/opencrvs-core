@@ -120,6 +120,9 @@ Before the deployment can be done a few secrets need to be manually added to the
 ssh into the manager server and run the following, replacing the values with the actual secrets:
 
 ```sh
+# Create login credentials for Kibana Basic Auth
+htpasswd -nb kibana-admin example-password
+printf 'kibana-admin:$apr1$LFvoLjiD$j/33/z/rI9xrMFUiIC5rM.' | docker secret create kibana-htpasswd -
 # For API integration mediators, allows API access to the OpenHIM
 printf "<openhim-user>" | docker secret create openhim-user -
 printf "<openhim-password>" | docker secret create openhim-password -

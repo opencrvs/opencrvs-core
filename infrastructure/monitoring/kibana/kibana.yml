@@ -1,3 +1,12 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+# graphic logo are (registered/a) trademark(s) of Plan International.
 # For more configuration options see the configuration guide for Kibana in
 # https://www.elastic.co/guide/index.html
 
@@ -42,9 +51,8 @@ server.ssl.enabled: false
 # The URLs of the Elasticsearch instances to use for all your queries.
 elasticsearch.hosts: ['http://elasticsearch:9200']
 monitoring.ui.container.elasticsearch.enabled: true
-xpack.encryptedSavedObjects:
-  encryptionKey: '#€%3453SjtytwfdFGEXVCGefgsSwrwerwe544545DFXCVX'
-xpack.reporting.encryptionKey: '#€%3453SjtytwfdFGEXVCGefgsSwrwerwe544545DFXCVX'
+xpack.encryptedSavedObjects.encryptionKey: '{{KIBANA_ENCRYPTION_KEY}}'
+xpack.reporting.encryptionKey: '{{KIBANA_ENCRYPTION_KEY}}'
 xpack.actions.preconfiguredAlertHistoryEsIndex: true
 # If your Elasticsearch is protected with basic authentication, these settings provide
 # the username and password that the Kibana server uses to perform maintenance on the Kibana

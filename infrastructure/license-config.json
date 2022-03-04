@@ -27,7 +27,7 @@
   ],
   "license": "infrastructure/license-header.txt",
   "licenseFormats": {
-    "sh|yml|toml|conf|txt|dotfile|graphql": {
+    "sh|yml|yaml|toml|conf|txt|dotfile|graphql": {
       "eachLine": {
         "prepend": "# "
       }

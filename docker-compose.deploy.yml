@@ -31,6 +31,8 @@ services:
           - node.role == manager
     networks:
       - overlay_net
+    secrets:
+      - kibana-htpasswd
 
   metricbeat:
     hostname: 'metricbeat-{{.Node.Hostname}}'
@@ -51,8 +53,10 @@ services:
     restart: always
     deploy:
       labels:
+        # https://doc.traefik.io/traefik/v1.7/configuration/backends/docker/#labels-overriding-default-behavior
         - 'traefik.enable=true'
         - 'traefik.frontend.rule=Host: kibana.{{hostname}}'
+        - 'traefik.frontend.auth.basic.usersFile=/run/secrets/kibana-htpasswd'
         - 'traefik.port=5601'
         - 'traefik.docker.network=opencrvs_overlay_net'
     networks:
@@ -381,7 +385,8 @@ secrets:
     external: true
   jwt-private-key.{{ts}}:
     external: true
-
+  kibana-htpasswd:
+    external: true
 configs:
   openhim-console-conf.{{ts}}:
     file: ./infrastructure/openhim-console-config.deploy.json
