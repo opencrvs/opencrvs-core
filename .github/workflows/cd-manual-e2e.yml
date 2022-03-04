@@ -21,6 +21,12 @@ on:
         description: Farajaland branch name
         default: develop
         required: true
+      farajaland-image-tag:
+        description: Farajaland DockerHub image tag
+        required: false
+      core-image-tag:
+        description: Core DockerHub image tag
+        required: false
 
 jobs:
   manual-deploy-staging-e2e:
@@ -36,11 +42,16 @@ jobs:
         run: |
           git clone https://github.com/opencrvs/opencrvs-farajaland.git
       - name: Get COUNTRY_CONFIG_VERSION
+        if: ${{ !github.event.inputs.farajaland-image-tag }}
         run: |
           cd opencrvs-farajaland
           git checkout ${{ github.event.inputs.farajaland }}
           echo "COUNTRY_CONFIG_VERSION=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
           cd ../
+      - name: Set COUNTRY_CONFIG_VERSION from inputs
+        if: ${{ github.event.inputs.farajaland-image-tag }}
+        run: |
+          echo "COUNTRY_CONFIG_VERSION=${{ github.event.inputs.farajaland-image-tag }}" >> $GITHUB_ENV
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
@@ -48,9 +59,15 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Get CORE_VERSION
+        if: ${{ !github.event.inputs.core-image-tag }}
         run: echo "CORE_VERSION=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
+      - name: Set CORE_VERSION from inputs
+        if: ${{ github.event.inputs.core-image-tag }}
+        run: echo "CORE_VERSION=${{ github.event.inputs.core-image-tag }}" >> $GITHUB_ENV
+
       - name: Check if images exist on Dockerhub and build if they dont
+        if: ${{ !github.event.inputs.core-image-tag && !github.event.inputs.farajaland-image-tag }}
         run: bash check-before-build.sh ${{ secrets.DOCKER_USERNAME }} ${{ secrets.DOCKER_PASSWORD }} ${{ env.CORE_VERSION }}
 
       - name: Install SSH Key
@@ -60,7 +77,7 @@ jobs:
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
       - name: Deploy to development
         run: |
-          yarn deploy:staging farajaland-staging.opencrvs.org $(git rev-parse --short HEAD) ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
+          yarn deploy:staging farajaland-staging.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
       - name: Run Cypress tests
         run: |
           cd opencrvs-farajaland
