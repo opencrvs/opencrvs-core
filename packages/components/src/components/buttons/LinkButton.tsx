@@ -45,7 +45,6 @@ export const LinkButton = styled(Button)<{
   }
 
   &:hover {
-    opacity: 0.8;
     text-decoration-line: underline;
   }
 

@@ -15,7 +15,7 @@ import styled from 'styled-components'
 import { IListRowProps, ListRow } from './ListRow'
 
 const Container = styled.div`
-  margin-top: 48px;
+  margin-top: 20px;
   margin-bottom: 30px;
 `
 const Title = styled.div`

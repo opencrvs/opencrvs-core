@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { isString } from 'lodash'
 import * as React from 'react'
 import styled from 'styled-components'
 import { Button, IconButton, LinkButton } from '../../buttons'
@@ -147,7 +146,7 @@ export interface IListRowProps {
   nameWithAvatar?: React.ReactNode
 }
 
-enum ActionType {
+export enum ActionType {
   LINK = 'link',
   ICON = 'icon',
   BUTTON = 'button'
@@ -176,15 +175,17 @@ export class ListRow extends React.Component<IListRowProps> {
             <LabelValueLayer>
               <ListDataContainer>
                 {isLinkLabel ? (
-                  <LinkButton isBoldLink={true} textDecoration="none">
-                    {label}
-                  </LinkButton>
+                  <Label id={`${id}_label`}>
+                    <LinkButton isBoldLink={true} textDecoration="none">
+                      {label}
+                    </LinkButton>
+                  </Label>
                 ) : nameWithAvatar ? (
-                  <ProfileInfoContainer>{nameWithAvatar}</ProfileInfoContainer>
-                ) : isString(label) ? (
-                  <Label id={`${id}_label`}>{label}</Label>
+                  <ProfileInfoContainer id={`${id}_label`}>
+                    {nameWithAvatar}
+                  </ProfileInfoContainer>
                 ) : (
-                  <>{label}</>
+                  <Label id={`${id}_label`}>{label}</Label>
                 )}
                 {value && <Value id={`${id}_value`}>{value}</Value>}
                 {placeHolder && (
