@@ -42,7 +42,6 @@ const ListGroupTitle = styled.div`
 `
 type Props = IntlShapeProps & {
   userDetails: IUserDetails | null
-  offlineResources: IOfflineData
   offlineCountryConfiguration: IOfflineData
 }
 interface State {
@@ -123,7 +122,7 @@ function GeneralTabContent({
         {
           label: intl.formatMessage(messages.phoneNumberLabel),
           value:
-            offlineCountryConfiguration.config.PHONE_NUMBER_PATTERN.pattern,
+            offlineCountryConfiguration.config.PHONE_NUMBER_PATTERN.pattern.toString(),
           action: {
             id: GeneralActionId.PHONE_NUMBER,
             label: intl.formatMessage(buttonMessages.change),
@@ -132,7 +131,6 @@ function GeneralTabContent({
         },
         {
           label: intl.formatMessage(messages.uniqueIdentificationNumberLabel),
-          value: offlineCountryConfiguration.config.NID_NUMBER_PATTERN.pattern,
           action: {
             id: 'btnChangeUIN',
             label: intl.formatMessage(buttonMessages.change),
@@ -397,7 +395,6 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
 
 function mapStateToProps(state: IStoreState) {
   return {
-    offlineResources: getOfflineData(state),
     userDetails: getUserDetails(state),
     offlineCountryConfiguration: getOfflineData(state)
   }
