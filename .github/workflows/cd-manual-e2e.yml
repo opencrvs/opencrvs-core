@@ -38,6 +38,8 @@ jobs:
     steps:
       - name: Checking out git repo
         uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.farajaland }}
       - name: Checking out the country config repo
         run: |
           git clone https://github.com/opencrvs/opencrvs-farajaland.git
@@ -45,7 +47,6 @@ jobs:
         if: ${{ !github.event.inputs.farajaland-image-tag }}
         run: |
           cd opencrvs-farajaland
-          git checkout ${{ github.event.inputs.farajaland }}
           echo "COUNTRY_CONFIG_VERSION=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
           cd ../
       - name: Set COUNTRY_CONFIG_VERSION from inputs
