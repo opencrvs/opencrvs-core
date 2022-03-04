@@ -12,8 +12,12 @@
 import styled from 'styled-components'
 import { Button } from './Button'
 
-export const LinkButton = styled(Button)<{ textDecoration?: string }>`
-  ${({ theme }) => theme.fonts.bodyStyle}
+export const LinkButton = styled(Button)<{
+  textDecoration?: string
+  isBoldLink?: boolean
+}>`
+  ${({ theme, isBoldLink }) =>
+    isBoldLink ? theme.fonts.bodyBoldStyle : theme.fonts.bodyStyle}
   color: ${({ theme }) => theme.colors.tertiary};
   padding: 0;
   height: auto;
@@ -35,13 +39,14 @@ export const LinkButton = styled(Button)<{ textDecoration?: string }>`
 
   &:active {
     outline: 0;
-    opacity: 1.0 !important;
+    opacity: 1 !important;
     background-color: ${({ theme }) => theme.colors.focus};
     color: ${({ theme }) => theme.colors.copy};
   }
 
   &:hover {
     opacity: 0.8;
+    text-decoration-line: underline;
   }
 
   &:disabled {
