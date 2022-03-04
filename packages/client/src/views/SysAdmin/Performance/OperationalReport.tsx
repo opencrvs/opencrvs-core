@@ -57,8 +57,8 @@ import { colors } from '@opencrvs/components/lib/colors'
 import { Activity } from '@opencrvs/components/lib/icons'
 import {
   ISearchLocation,
-  ListTable,
-  ColumnContentAlignment
+  ColumnContentAlignment,
+  TableView
 } from '@opencrvs/components/lib/interface'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import {
@@ -306,10 +306,14 @@ class OperationalReportComponent extends React.Component<Props, State> {
     const monthDiff = currentMonth + (endMonth - startMonth)
     while (currentMonth <= monthDiff) {
       const { start, end } = getMonthDateRange(currentYear, currentMonth)
-      const title = start.format('MMMM YYYY')
+      const title = `${start.format('DD MMMM')} to ${end.format(
+        'DD MMMM YYYY'
+      )}`
       content.push({
         month: (
           <LinkButton
+            isBoldLink={true}
+            textDecoration="none"
             onClick={() =>
               this.props.goToPerformanceReport(
                 this.state.selectedLocation!,
@@ -325,11 +329,12 @@ class OperationalReportComponent extends React.Component<Props, State> {
         ),
         export: (
           <RowLink
+            textDecoration="none"
             onClick={() =>
               this.downloadMonthlyData(start, end, eventType.toString())
             }
           >
-            CSV
+            Export
           </RowLink>
         )
       })
@@ -545,7 +550,8 @@ class OperationalReportComponent extends React.Component<Props, State> {
           )}
           {sectionId === OPERATIONAL_REPORT_SECTION.REPORTS && (
             <MonthlyReportsList id="report-lists">
-              <ListTable
+              <TableView
+                hideTableHeader={true}
                 tableTitle={intl.formatMessage(constantsMessages.births)}
                 isLoading={false}
                 content={this.getContent(Event.BIRTH)}
@@ -568,7 +574,8 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 noResultText={intl.formatMessage(constantsMessages.noResults)}
               />
               <DeathReportHolder>
-                <ListTable
+                <TableView
+                  hideTableHeader={true}
                   tableTitle={intl.formatMessage(constantsMessages.deaths)}
                   isLoading={false}
                   content={this.getContent(Event.DEATH)}
