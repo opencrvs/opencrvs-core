@@ -11,7 +11,7 @@
  */
 import { createServer } from '@config/index'
 import Question, { IQuestion } from '@config/models/question'
-import mockingoose from 'mockingoose'
+import * as mockingoose from 'mockingoose'
 
 const mockQuestion = {
   _id: '123',

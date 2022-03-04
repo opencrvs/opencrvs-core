@@ -24,8 +24,9 @@ db.on('connected', () => {
   logger.info('Connected to MongoDB')
 })
 
-// tslint:disable-next-line
-const wait = (time: number) => new Promise(resolve => setTimeout(resolve, time))
+const wait = (time: number) =>
+  // tslint:disable-next-line
+  new Promise((resolve) => setTimeout(resolve, time))
 
 let redisConnection: IORedis.Redis
 
@@ -37,7 +38,7 @@ const connect = async (): Promise<void> => {
   try {
     redisConnection = new IORedis(REDIS_HOST)
 
-    redisConnection.on('error', error => {
+    redisConnection.on('error', (error) => {
       logger.error('Redis connection error', error)
     })
 
@@ -51,7 +52,7 @@ const connect = async (): Promise<void> => {
     logger.error(`Cant create Redis instance: ${err}`)
   }
   try {
-    await mongoose.connect(MONGO_URL, { autoReconnect: true })
+    await mongoose.connect(MONGO_URL)
   } catch (err) {
     logger.error(`Cant connect to Mongo: ${err}`)
     await wait(1000)

@@ -14,7 +14,7 @@ import Webhook, { IWebhook } from '@webhooks/model/webhook'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
-import mockingoose from 'mockingoose'
+import * as mockingoose from 'mockingoose'
 import * as service from '@webhooks/features/manage/service'
 
 const fetch = fetchMock as fetchMock.FetchMock
@@ -47,7 +47,7 @@ const mockInactiveSystem = {
   sha_secret: '123'
 }
 
-const mockWebhook = ({
+const mockWebhook = {
   webhookId: '123',
   createdBy: {
     client_id: '123',
@@ -59,7 +59,7 @@ const mockWebhook = ({
   mode: 'subscribe',
   secret: '123',
   topic: 'BIRTH_REGISTERED'
-} as unknown) as IWebhook
+} as unknown as IWebhook
 
 const mockWebhooks = [
   {

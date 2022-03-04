@@ -14,7 +14,7 @@ import Certificate, {
   IApplicationCertificateModel
 } from '@config/models/Certificate'
 import * as fetchMock from 'jest-fetch-mock'
-import mockingoose from 'mockingoose'
+import * as mockingoose from 'mockingoose'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 

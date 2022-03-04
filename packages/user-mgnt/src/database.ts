@@ -24,12 +24,13 @@ db.on('connected', () => {
   logger.info('Connected to MongoDB')
 })
 
-// tslint:disable-next-line
-const wait = (time: number) => new Promise(resolve => setTimeout(resolve, time))
+const wait = (time: number) =>
+  // tslint:disable-next-line
+  new Promise((resolve) => setTimeout(resolve, time))
 
 const connect = async (): Promise<void> => {
   try {
-    await mongoose.connect(MONGO_URL, { autoReconnect: true })
+    await mongoose.connect(MONGO_URL)
   } catch (err) {
     logger.error(err)
     await wait(1000)

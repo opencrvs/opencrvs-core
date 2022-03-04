@@ -15,7 +15,7 @@ import UsernameRecord from '@user-mgnt/model/usernameRecord'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
-import mockingoose from 'mockingoose'
+import * as mockingoose from 'mockingoose'
 
 const fetch = fetchMock as fetchMock.FetchMock
 
@@ -29,7 +29,7 @@ const token = jwt.sign(
   }
 )
 
-const mockUser = ({
+const mockUser = {
   name: [
     {
       use: 'en',
@@ -50,8 +50,7 @@ const mockUser = ({
   password: 'test',
   signature: {
     type: 'image/png',
-    data:
-      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlwAAAK8CAYAAAA6WGEyAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2h'
+    data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlwAAAK8CAYAAAA6WGEyAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2h'
   },
   localRegistrar: {
     name: [
@@ -63,11 +62,10 @@ const mockUser = ({
     ],
     signature: {
       type: 'image/png',
-      data:
-        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlwAAAK8CAYAAAA6WGEyAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2h'
+      data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlwAAAK8CAYAAAA6WGEyAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2h'
     }
   }
-} as unknown) as IUser & { password: string }
+} as unknown as IUser & { password: string }
 
 describe('createUser handler', () => {
   let server: any
