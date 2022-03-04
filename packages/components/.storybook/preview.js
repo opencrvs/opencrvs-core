@@ -38,6 +38,10 @@ body,
     }
   }
 }
+@font-face {
+  font-family: 'noto_sans_regular';
+  src: url('fonts/notosans-regular-webfont-en') format('ttf');
+}
 body,
 h1, h2, h3, h4, h5, h6,
 blockquote, p, pre, code,

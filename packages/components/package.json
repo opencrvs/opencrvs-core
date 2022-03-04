@@ -8,6 +8,7 @@
     "css-animation": "^2.0.4",
     "jest": "26.6.0",
     "patch-package": "^6.1.2",
+    "path": "^0.12.7",
     "postinstall-postinstall": "^2.0.0",
     "rc-menu": "^7.4.13",
     "rc-progress": "^2.5.2",

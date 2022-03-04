@@ -9,6 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+
+const custom = require('./webpack.config')
+const path = require('path')
 module.exports = {
   stories: ['../src/**/*.stories.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
   addons: [
@@ -16,5 +19,39 @@ module.exports = {
     '@storybook/addon-essentials',
     '@storybook/preset-create-react-app'
   ],
-  framework: '@storybook/react'
+  framework: '@storybook/react',
+  webpackFinal: async (config) => {
+    return {
+      ...config,
+      // module: { ...config.module, rules: custom.module?.rules }
+      module: {
+        ...config.module,
+        rules: [
+          ...config.module.rules,
+          {
+            test: /\.(png|woff|woff2|eot|ttf|svg)$/,
+            use: [
+              {
+                loader: 'file-loader',
+                query: {
+                  name: '[name].[ext]'
+                }
+              }
+            ],
+            include: path.resolve(__dirname, '../')
+          }
+        ]
+        // }
+        // }
+        // webpackFinal: async (config) => {
+        //   config.plugins.push(...);
+        //   return config
+      }
+    }
+  }
 }
+
+// module.exports = async ({ config, mode }) => {
+//   config.plugins.push(...)
+//   return config;
+// }
