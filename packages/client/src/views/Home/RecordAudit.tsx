@@ -112,6 +112,7 @@ import {
 } from '@client/utils/userUtils'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import NotificationToast from '@client/views/OfficeHome/NotificationToast'
+import { isEmpty } from 'lodash'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -172,6 +173,11 @@ const NameAvatar = styled.span`
 
 const Heading = styled.h4`
   margin-bottom: 0px !important;
+`
+
+const CLinkButton = styled(LinkButton)`
+  width: fit-content;
+  display: inline-block;
 `
 
 interface IActionDetailsData {
@@ -272,9 +278,9 @@ const ARCHIVABLE_STATUSES = [DECLARED, VALIDATED, REJECTED]
 
 const APPLICATION_STATUS_LABEL: IStatus = {
   IN_PROGRESS: {
-    defaultMessage: 'In progress',
-    description: 'The title of In progress',
-    id: 'regHome.inProgress'
+    defaultMessage: 'Sent incomplete',
+    description: 'Declaration submitted without completing the required fields',
+    id: 'constants.sent_incomplete'
   },
   DECLARED: {
     defaultMessage: 'Application started',
@@ -287,9 +293,9 @@ const APPLICATION_STATUS_LABEL: IStatus = {
     id: 'constants.waitingValidated'
   },
   VALIDATED: {
-    id: 'constants.validated',
-    defaultMessage: 'Validated',
-    description: 'A label for validated'
+    defaultMessage: 'Sent for approval',
+    description: 'The title of sent for approvals tab',
+    id: 'regHome.sentForApprovals'
   },
   REGISTERED: {
     defaultMessage: 'Application registered',
@@ -317,9 +323,9 @@ const APPLICATION_STATUS_LABEL: IStatus = {
     description: 'Status for application being requested for correction'
   },
   DECLARATION_UPDATED: {
-    defaultMessage: 'Updated',
-    description: 'Application has been updated',
-    id: 'constants.updated'
+    defaultMessage: 'Updated declaration',
+    description: 'Declaration has been updated',
+    id: 'updated_declaration'
   },
   ARCHIVED: {
     defaultMessage: 'Archived',
@@ -609,7 +615,7 @@ const showReviewButton = ({
   return <></>
 }
 
-const shouldShowUpdateButton = ({
+const showUpdateButton = ({
   declaration,
   intl,
   userDetails,
@@ -627,8 +633,16 @@ const shouldShowUpdateButton = ({
 
   const reviewButtonRoleStatusMap: { [key: string]: string[] } = {
     FIELD_AGENT: [SUBMISSION_STATUS.DRAFT],
-    REGISTRATION_AGENT: [SUBMISSION_STATUS.DRAFT, EVENT_STATUS.REJECTED],
-    DISTRICT_REGISTRAR: [SUBMISSION_STATUS.DRAFT, EVENT_STATUS.REJECTED],
+    REGISTRATION_AGENT: [
+      SUBMISSION_STATUS.DRAFT,
+      EVENT_STATUS.IN_PROGRESS,
+      EVENT_STATUS.REJECTED
+    ],
+    DISTRICT_REGISTRAR: [
+      SUBMISSION_STATUS.DRAFT,
+      EVENT_STATUS.IN_PROGRESS,
+      EVENT_STATUS.REJECTED
+    ],
     LOCAL_REGISTRAR: [SUBMISSION_STATUS.DRAFT, EVENT_STATUS.REJECTED]
   }
 
@@ -875,13 +889,14 @@ const GetHistory = ({
   )
 }
 
-const actionDetailsModal = (
+const ActionDetailsModal = (
   show: boolean,
   actionDetailsData: IActionDetailsData,
   toggleActionDetails: (param: IActionDetailsData | null) => void,
-  intl: IntlShape
+  intl: IntlShape,
+  goToUser: typeof goToUserProfile
 ) => {
-  console.log(actionDetailsData)
+  if (isEmpty(actionDetailsData)) return <></>
 
   const title =
     (APPLICATION_STATUS_LABEL[actionDetailsData?.action] &&
@@ -889,6 +904,15 @@ const actionDetailsModal = (
         APPLICATION_STATUS_LABEL[actionDetailsData?.action]
       )) ||
     ''
+
+  const nameObj = getIndividualNameObj(
+    actionDetailsData.user.name,
+    window.config.LANGUAGES
+  )
+  const userName = nameObj
+    ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+    : ''
+
   return (
     <ResponsiveModal
       actions={[]}
@@ -899,18 +923,16 @@ const actionDetailsModal = (
       width={1024}
       autoHeight={true}
     >
-      <>
-        <p>.......................</p>
-        <p>.......................</p>
-        <p>.......................</p>
-        <p>.......................</p>
-        <p>.......................</p>
-        <p>.......................</p>
-        <p>.......................</p>
-        <p>.......................</p>
-        <p>.......................</p>
-        <p>.......................</p>
-      </>
+      <div>
+        <CLinkButton
+          onClick={() => {
+            goToUser && goToUser(actionDetailsData.user.id)
+          }}
+        >
+          {userName}
+        </CLinkButton>
+        <span> — {getFormattedDate(actionDetailsData.date)}</span>
+      </div>
     </ResponsiveModal>
   )
 }
@@ -1029,7 +1051,7 @@ function RecordAuditBody({
   )
 
   actions.push(
-    shouldShowUpdateButton({
+    showUpdateButton({
       declaration,
       intl,
       userDetails,
@@ -1080,11 +1102,12 @@ function RecordAuditBody({
         })}
       </Content>
 
-      {actionDetailsModal(
+      {ActionDetailsModal(
         showActionDetails,
         actionDetailsData,
         toggleActionDetails,
-        intl
+        intl,
+        goToUserProfile
       )}
 
       <ResponsiveModal
