@@ -9,6 +9,15 @@
 # graphic logo are (registered/a) trademark(s) of Plan International.
 set -e
 
+# Read environment variable file for the environment
+# .env.qa
+# .env.development
+# .env.production
+if [ -f .env.$4 ]
+then
+    export $(cat .env.$4 | sed 's/#.*//g' | xargs)
+fi
+
 print_usage_and_exit () {
     echo 'Usage: ./deploy.sh --clear-data=yes|no --restore-metadata=yes|no --update-metadata=yes|no HOST ENV VERSION COUNTRY_CONFIG_VERSION COUNTRY_CONFIG_PATH'
     echo "  --clear-data must have a value of 'yes' or 'no' set e.g. --clear-data=yes"
@@ -69,6 +78,11 @@ if [ -z "$9" ] ; then
     print_usage_and_exit
 fi
 
+if [ -z "$SLACK_WEBHOOK_URL" ] ; then
+    echo 'Error: Missing environment variable SLACK_WEBHOOK_URL.'
+    print_usage_and_exit
+fi
+
 ENV=$4
 HOST=$5
 VERSION=$6
@@ -117,7 +131,7 @@ else
     ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/rotate-secrets.sh /tmp/compose/docker-compose.deploy.yml /tmp/compose/docker-compose.prod-deploy.yml /tmp/compose/docker-compose.countryconfig.prod-deploy.yml | tee -a '$LOG_LOCATION'/rotate-secrets.log'
 fi
 # Setup configuration files and compose file for the deployment domain
-ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/setup-deploy-config.sh '$HOST' | tee -a '$LOG_LOCATION'/setup-deploy-config.log'
+ssh $SSH_USER@$SSH_HOST 'SLACK_WEBHOOK_URL='$SLACK_WEBHOOK_URL' /tmp/compose/infrastructure/setup-deploy-config.sh '$HOST' | tee -a '$LOG_LOCATION'/setup-deploy-config.log'
 
 # Deploy the OpenCRVS stack onto the swarm
 if [[ "$ENV" = "development" ]]; then

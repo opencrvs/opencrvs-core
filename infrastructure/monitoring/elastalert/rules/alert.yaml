@@ -35,7 +35,7 @@ filter:
         query: '@timestamp:*'
 alert:
   - 'slack'
-slack_webhook_url: 'https://hooks.slack.com/services/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'
+slack_webhook_url: '{{SLACK_WEBHOOK_URL}}'
 slack_channel_override: '#kibana-alerts'
 slack_emoji_override: ':kissing_cat:'
 slack_msg_color: 'warning'

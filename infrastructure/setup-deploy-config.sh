@@ -24,5 +24,7 @@ sed -i "s/{{hostname}}/$1/g" /tmp/compose/docker-compose.deploy.yml
 KIBANA_ENCRYPTION_KEY=`uuidgen`
 sed -i "s/{{KIBANA_ENCRYPTION_KEY}}/$KIBANA_ENCRYPTION_KEY/g" /tmp/compose/infrastructure/monitoring/kibana/kibana.yml
 
+sed -i "s/{{SLACK_WEBHOOK_URL}}/$SLACK_WEBHOOK_URL/g" /tmp/compose/infrastructure/monitoring/elastalert/rules/alert.yaml
+
 echo "DONE - `date --iso-8601=ns`"
 echo
