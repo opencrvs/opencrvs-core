@@ -42,8 +42,8 @@ export const colors = {
   grey100: '#F5F5F5', // background
   grey200: '#EEEEEE', // dividers, hover
   grey300: '#CCCCCC', // disabled state, borders
-  grey400: '#A5A5A5', // placeholder copy
-  grey500: '#707070', // supporting copy
+  grey400: '#959595', // placeholder copy
+  grey500: '#5B5B5B', // supporting copy
   grey600: '#222222', // copy
 
   // Opacity
