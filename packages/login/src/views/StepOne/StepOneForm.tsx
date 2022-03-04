@@ -145,14 +145,6 @@ export const Title = styled.div`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.bodyStyle};
 `
-// export const StyledPrimaryButton = styled(PrimaryButton)`
-//   justify-content: center;
-//   flex-direction: row;
-//   display: flex;
-//   flex: 1;
-//   margin-top: 24px;
-//   padding: 10px ${({ theme }) => theme.grid.margin}px;
-// `
 
 export const TertiaryButtonWrapper = styled.div`
   margin-top: 24px;
