@@ -34,7 +34,7 @@ import {
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
 import {
   ColumnContentAlignment,
-  ListTable
+  TableView
 } from '@opencrvs/components/lib/interface'
 import { GQLSearchFieldAgentResult } from '@opencrvs/gateway/src/graphql/schema'
 import { orderBy } from 'lodash'
@@ -466,7 +466,7 @@ function FieldAgentListComponent(props: IProps) {
           if (error) {
             return (
               <>
-                <ListTable
+                <TableView
                   id={'field-agent-error-list'}
                   noResultText={intl.formatMessage(
                     messages.fieldAgentsNoResult
@@ -482,7 +482,7 @@ function FieldAgentListComponent(props: IProps) {
             )
           } else {
             return (
-              <ListTable
+              <TableView
                 id={'field-agent-list'}
                 noResultText={intl.formatMessage(messages.fieldAgentsNoResult)}
                 isLoading={loading}
