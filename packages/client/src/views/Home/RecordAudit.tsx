@@ -58,7 +58,11 @@ import {
 import moment from 'moment'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
-import { ResponsiveModal, Loader } from '@opencrvs/components/lib/interface'
+import {
+  ResponsiveModal,
+  Loader,
+  ColumnContentAlignment
+} from '@opencrvs/components/lib/interface'
 import { getScope } from '@client/profile/profileSelectors'
 import { Scope } from '@client/utils/authUtils'
 import {
@@ -123,6 +127,10 @@ const StyledTertiaryButton = styled(TertiaryButton)`
 const InfoContainer = styled.div`
   display: flex;
   margin-bottom: 16px;
+  flex-flow: row;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    flex-flow: column;
+  }
 `
 
 const KeyContainer = styled.div`
@@ -156,7 +164,7 @@ const ReviewButton = styled(PrimaryButton)`
   height: 40px;
 `
 
-const NameAvatar = styled.span`
+const NameAvatar = styled.div`
   display: flex;
   align-items: center;
   img {
@@ -808,16 +816,22 @@ const getHistory = ({ intl, draft }: CMethodParams) => {
   const columns = [
     {
       label: 'Action',
-      width: 20,
+      width: 22,
       key: 'action'
     },
     {
       label: 'Date',
-      width: 20,
+      width: 22,
       key: 'date'
     },
-    { label: 'By', width: 20, key: 'user', isIconColumn: true },
-    { label: 'Type', width: 20, key: 'type' },
+    {
+      label: 'By',
+      width: 22,
+      key: 'user',
+      isIconColumn: true,
+      ICON_ALIGNMENT: ColumnContentAlignment.LEFT
+    },
+    { label: 'Type', width: 15, key: 'type' },
     { label: 'Location', width: 20, key: 'location' }
   ]
   return (
@@ -826,6 +840,7 @@ const getHistory = ({ intl, draft }: CMethodParams) => {
       <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
       <TableView
         id="task-history"
+        fixedWidth={1065}
         noResultText=""
         hideBoxShadow={true}
         columns={columns}
