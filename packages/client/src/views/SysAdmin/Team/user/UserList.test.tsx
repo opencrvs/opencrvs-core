@@ -385,7 +385,7 @@ describe('User list tests', () => {
         component = testComponent
 
         component
-          .find('#name-role-type-link-5d08e102542c7a19fc55b790')
+          .find('#name-link-5d08e102542c7a19fc55b790')
           .hostNodes()
           .simulate('click')
 
@@ -399,34 +399,6 @@ describe('User list tests', () => {
         expect(history.location.pathname).toContain(
           '/userProfile/5d08e102542c7a19fc55b790'
         )
-      })
-      it('renders 2 columns for smaller devices', async () => {
-        Object.defineProperty(window, 'innerWidth', {
-          writable: true,
-          configurable: true,
-          value: 400
-        })
-        const testComponent = await createTestComponent(
-          <UserList
-            // @ts-ignore
-            location={{
-              search: stringify({
-                locationId: '0d8474da-0361-4d32-979e-af91f012340a'
-              })
-            }}
-          />,
-          { store, history, graphqlMocks: userListMock }
-        )
-
-        // wait for mocked data to load mockedProvider
-        await new Promise((resolve) => {
-          setTimeout(resolve, 100)
-        })
-
-        testComponent.update()
-        component = testComponent
-
-        expect(component.find('div#row_4').children()).toHaveLength(2)
       })
     })
 
@@ -566,7 +538,7 @@ describe('User list tests', () => {
           '#user-item-0-menuToggleButton'
         )
 
-        toggleButtonElement.hostNodes().simulate('click')
+        toggleButtonElement.hostNodes().first().simulate('click')
         const menuOptionButton = await waitForElement(
           component,
           '#user-item-0-menuItem0'
@@ -580,7 +552,7 @@ describe('User list tests', () => {
           '#user-item-0-menuToggleButton'
         )
 
-        toggleButtonElement.hostNodes().simulate('click')
+        toggleButtonElement.hostNodes().first().simulate('click')
         const menuOptionButton = await waitForElement(
           component,
           '#user-item-0-menuItem0'
@@ -599,7 +571,7 @@ describe('User list tests', () => {
           '#user-item-1-menuToggleButton'
         )
 
-        toggleButtonElement.hostNodes().simulate('click')
+        toggleButtonElement.hostNodes().first().simulate('click')
         const menuOptionButton = await waitForElement(
           component,
           '#user-item-1-menuItem1'
@@ -620,7 +592,7 @@ describe('User list tests', () => {
           '#user-item-1-menuToggleButton'
         )
 
-        toggleButtonElement.hostNodes().simulate('click')
+        toggleButtonElement.hostNodes().first().simulate('click')
         const menuOptionButton = await waitForElement(
           component,
           '#user-item-1-menuItem1'
@@ -638,7 +610,7 @@ describe('User list tests', () => {
           '#user-item-1-menuToggleButton'
         )
 
-        toggleButtonElement.hostNodes().simulate('click')
+        toggleButtonElement.hostNodes().first().simulate('click')
         const menuOptionButton = await waitForElement(
           component,
           '#user-item-1-menuItem2'
@@ -654,7 +626,7 @@ describe('User list tests', () => {
           '#user-item-3-menuToggleButton'
         )
 
-        toggleButtonElement.hostNodes().simulate('click')
+        toggleButtonElement.hostNodes().first().simulate('click')
         const menuOptionButton = await waitForElement(
           component,
           '#user-item-3-menuItem1'
@@ -679,7 +651,9 @@ describe('User list tests', () => {
     })
   })
 
-  describe('Pagination test', () => {
+  /* Todo: fix after adding pagination in ListView */
+
+  /*describe('Pagination test', () => {
     it('renders no pagination block when the total amount of data is not applicable for pagination', async () => {
       const userListMock = [
         {
@@ -1418,5 +1392,5 @@ describe('User list tests', () => {
 
       expect(app.find('#load_more_button').hostNodes()).toHaveLength(0)
     })
-  })
+  })*/
 })

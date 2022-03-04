@@ -33,6 +33,7 @@ import { messages as imageUploadMessages } from '@client/i18n/messages/views/ima
 import {
   DataSection,
   FloatingNotification,
+  ListView,
   NOTIFICATION_TYPE,
   ResponsiveModal,
   ToggleMenu,
@@ -457,7 +458,7 @@ class ConfigHomeComponent extends React.Component<Props, State> {
                   {this.state.selectedSubMenuItem ===
                     this.SUB_MENU_ID.certificatesConfig && (
                     <ColoredDataSection>
-                      <DataSection
+                      <ListView
                         title={CertificateSection.title}
                         items={CertificateSection.items}
                         responsiveContents={
