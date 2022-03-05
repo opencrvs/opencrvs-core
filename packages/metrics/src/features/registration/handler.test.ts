@@ -1147,7 +1147,7 @@ describe('When an existing declaration is marked registered', () => {
     fetchTaskHistory.mockResolvedValue(taskHistory)
     const res = await server.server.inject({
       method: 'POST',
-      url: '/events/birth/waiting-validation',
+      url: '/events/birth/waiting-external-resource-validation',
       headers: {
         Authorization: `Bearer ${token}`
       },

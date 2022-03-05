@@ -20,6 +20,13 @@ import {
   updateCertificateHandler
 } from '@config/handlers/declarationCertificateHandler'
 import declarationConfigHandler from '@config/handlers/declarationConfigHandler'
+import createQuestionHandler, {
+  requestSchema as createQuestionReqSchema
+} from '@config/handlers/createQuestion/handler'
+import updateQuestionHandler, {
+  requestSchema as updateQuestionReqSchema
+} from '@config/handlers/updateQuestion/handler'
+import getQuestionsHandler from '@config/handlers/getQuestions/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -134,6 +141,50 @@ export default function getRoutes() {
         auth: {
           scope: [RouteScope.NATLSYSADMIN]
         }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/question',
+      handler: createQuestionHandler,
+      config: {
+        tags: ['api'],
+        description: 'Create question',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        validate: {
+          /*failAction: async (request: any, h: any, err: any) => {
+            console.log(`Joi error: ${err}`)
+            throw err
+          },*/
+          payload: createQuestionReqSchema
+        }
+      }
+    },
+    {
+      method: 'PUT',
+      path: '/question',
+      handler: updateQuestionHandler,
+      config: {
+        tags: ['api'],
+        description: 'Update question',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        validate: {
+          payload: updateQuestionReqSchema
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/questions',
+      handler: getQuestionsHandler,
+      config: {
+        tags: ['api'],
+        description: 'Get questions',
+        auth: false
       }
     }
   ]

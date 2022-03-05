@@ -19,15 +19,25 @@ import { referenceApi } from './utils/referenceApi'
 import { authApi } from './utils/authApi'
 import 'core-js/features/array/flat'
 import 'jsdom-worker'
-import { roleQueries } from './forms/user/fieldDefinitions/query/queries'
+import { roleQueries } from './forms/user/query/queries'
 import { userQueries } from './user/queries'
 import debounce from 'lodash/debounce'
 
 import './tests/queryMock'
 
+import { mockOfflineData } from './tests/mock-offline-data'
+
 if (process.env.CI) {
   jest.setTimeout(30000)
 }
+
+jest.mock('@client/forms/register/fieldDefinitions/register', () => ({
+  registerForms: mockOfflineData.forms.registerForm
+}))
+
+jest.mock('@client/forms/user/fieldDefinitions/createUser', () => ({
+  createUserForm: mockOfflineData.forms.userForm
+}))
 
 /*
  * Initialize mocks
@@ -126,7 +136,7 @@ const navigatorMock = {
   DEATH_REGISTRATION_TARGET: 45,
   NID_NUMBER_PATTERN: {
     pattern: /^[0-9]{9}$/,
-    example: '4837281940',
+    example: '483728140',
     num: '9'
   },
   PHONE_NUMBER_PATTERN: {
@@ -147,7 +157,6 @@ const navigatorMock = {
 
 const {
   mockUserResponse,
-  mockOfflineData,
   mockConfigResponse,
   userDetails,
   validToken,
@@ -163,7 +172,7 @@ jest.mock(
       loadLocations: () => Promise.resolve(mockOfflineData.locations),
       loadFacilities: () => Promise.resolve(mockOfflineData.facilities),
       loadPilotLocations: () => Promise.resolve(mockOfflineData.pilotLocations),
-      loadDefinitions: () =>
+      loadContent: () =>
         Promise.resolve({
           languages: mockOfflineData.languages,
           forms: mockOfflineData.forms,

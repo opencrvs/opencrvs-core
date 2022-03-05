@@ -645,6 +645,14 @@ export const getSelectedRadioOptionWithNestedFields = (
 }
 
 export const conditionals: IConditionals = {
+  isRegistrarRoleSelected: {
+    action: 'hide',
+    expression: 'values.role!=="LOCAL_REGISTRAR"'
+  },
+  isOfficePreSelected: {
+    action: 'hide',
+    expression: 'values.skippedOfficeSelction && values.registrationOffice'
+  },
   iDType: {
     action: 'hide',
     expression: "!values.iDType || (values.iDType !== 'OTHER')"
@@ -838,10 +846,6 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression:
       '(values.uploadDocForDeceased && !!values.uploadDocForDeceased.find(a => ["National ID (front)", "National ID (Back)"].indexOf(a.optionValues[1]) > -1))'
-  },
-  isRegistrarRoleSelected: {
-    action: 'hide',
-    expression: 'values.role!=="LOCAL_REGISTRAR"'
   },
   certCollectorOther: {
     action: 'hide',

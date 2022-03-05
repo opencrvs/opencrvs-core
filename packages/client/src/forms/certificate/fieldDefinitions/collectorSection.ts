@@ -33,6 +33,76 @@ import { messages as certificateMessages } from '@client/i18n/messages/views/cer
 import { validIDNumber } from '@client/utils/validate'
 import { RadioSize } from '@opencrvs/components/lib/forms'
 
+export interface INameField {
+  firstNamesField: string
+  familyNameField: string
+}
+export interface INameFields {
+  [language: string]: INameField
+}
+export interface IVerifyIDCertificateCollectorField {
+  identifierTypeField: string
+  identifierOtherTypeField: string
+  identifierField: string
+  nameFields: INameFields
+  birthDateField?: string
+  nationalityField: string
+}
+
+export interface IVerifyIDCertificateCollector {
+  [collector: string]: IVerifyIDCertificateCollectorField
+}
+
+export interface IVerifyIDCertificateCollectorDefinition {
+  [event: string]: IVerifyIDCertificateCollector
+}
+
+export const verifyIDOnBirthCertificateCollectorDefinition: IVerifyIDCertificateCollectorDefinition =
+  {
+    birth: {
+      mother: {
+        identifierTypeField: 'iDType',
+        identifierOtherTypeField: 'iDTypeOther',
+        identifierField: 'iD',
+        nameFields: {
+          en: {
+            firstNamesField: 'firstNamesEng',
+            familyNameField: 'familyNameEng'
+          }
+        },
+        birthDateField: 'motherBirthDate',
+        nationalityField: 'nationality'
+      },
+      father: {
+        identifierTypeField: 'iDType',
+        identifierOtherTypeField: 'iDTypeOther',
+        identifierField: 'iD',
+        nameFields: {
+          en: {
+            firstNamesField: 'firstNamesEng',
+            familyNameField: 'familyNameEng'
+          }
+        },
+        birthDateField: 'fatherBirthDate',
+        nationalityField: 'nationality'
+      }
+    },
+    death: {
+      informant: {
+        identifierTypeField: 'iDType',
+        identifierOtherTypeField: 'iDTypeOther',
+        identifierField: 'applicantID',
+        nameFields: {
+          en: {
+            firstNamesField: 'firstNamesEng',
+            familyNameField: 'familyNameEng'
+          }
+        },
+        nationalityField: 'nationality'
+      }
+    }
+  }
+
 export const certCollectorGroupForBirthAppWithoutFatherDetails: IFormSectionGroup =
   {
     id: 'certCollector',

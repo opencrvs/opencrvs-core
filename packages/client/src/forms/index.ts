@@ -32,6 +32,8 @@ import * as validators from '@opencrvs/client/src/utils/validate'
 import { ICertificate as IDeclarationCertificate } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
+import { registerForms } from './register/fieldDefinitions/register'
+import { createUserForm } from './user/fieldDefinitions/createUser'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -468,6 +470,7 @@ export interface INumberFormField extends IFormFieldBase {
   type: typeof NUMBER
   step?: number
   max?: number
+  inputFieldWidth?: string
 }
 export interface IBigNumberFormField extends IFormFieldBase {
   type: typeof BIG_NUMBER
@@ -609,6 +612,8 @@ export interface IFormTag {
   label: MessageDescriptor
   fieldToRedirect?: string
   delimiter?: string
+  required?: boolean
+  initialValue?: string
 }
 
 export interface IDynamicFormField
@@ -624,6 +629,7 @@ export interface IConditional {
 
 export interface IConditionals {
   iDType: IConditional
+  isOfficePreSelected: IConditional
   fathersDetailsExist: IConditional
   permanentAddressSameAsMother: IConditional
   addressSameAsMother: IConditional
@@ -807,7 +813,10 @@ export enum DeathSection {
   CauseOfDeath = 'causeOfDeath',
   Informants = 'informant',
   DeathDocuments = 'documents',
-  Preview = 'preview'
+  Preview = 'preview',
+  Father = 'father',
+  Mother = 'mother',
+  Spouse = 'spouse'
 }
 
 export enum UserSection {

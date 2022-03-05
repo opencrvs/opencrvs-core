@@ -289,11 +289,11 @@ const getWQDeclarationData = (
     name = getName(workqueueDeclaration.deceasedName, language)
   }
   return {
-    id: workqueueDeclaration.id,
+    id: workqueueDeclaration?.id,
     name,
-    type: (workqueueDeclaration.type && workqueueDeclaration.type) || '',
-    status: workqueueDeclaration.registration?.status || '',
-    trackingId: workqueueDeclaration.registration?.trackingId || '',
+    type: (workqueueDeclaration?.type && workqueueDeclaration.type) || '',
+    status: workqueueDeclaration?.registration?.status || '',
+    trackingId: workqueueDeclaration?.registration?.trackingId || '',
     dateOfBirth: '',
     placeOfBirth: '',
     informant: ''

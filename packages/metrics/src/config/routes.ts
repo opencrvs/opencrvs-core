@@ -17,12 +17,12 @@ import {
   markCertifiedHandler,
   markValidatedHandler,
   markRejectedHandler,
-  waitingValidationHandler,
+  waitingExternalValidationHandler,
   markDeathRegisteredHandler,
   newDeathRegistrationHandler,
   newDeclarationHandler,
-  newWaitingValidationHandler,
-  newValidationHandler,
+  registrarRegistrationWaitingExternalValidationHandler,
+  requestForRegistrarValidationHandler,
   requestCorrectionHandler
 } from '@metrics/features/registration/handler'
 import { metricsHandler } from '@metrics/features/metrics/handler'
@@ -82,53 +82,53 @@ export const getRoutes = () => {
       }
     },
 
-    // New validation
+    // Request for registrar validation
     {
       method: 'POST',
-      path: '/events/birth/new-validation',
-      handler: newValidationHandler,
+      path: '/events/birth/request-for-registrar-validation',
+      handler: requestForRegistrarValidationHandler,
       config: {
         tags: ['api']
       }
     },
     {
       method: 'POST',
-      path: '/events/death/new-validation',
-      handler: newValidationHandler,
+      path: '/events/death/request-for-registrar-validation',
+      handler: requestForRegistrarValidationHandler,
       config: {
         tags: ['api']
       }
     },
 
-    // New registration
+    // Waiting external resource validation
     {
       method: 'POST',
-      path: '/events/birth/waiting-validation',
-      handler: waitingValidationHandler,
+      path: '/events/birth/waiting-external-resource-validation',
+      handler: waitingExternalValidationHandler,
       config: {
         tags: ['api']
       }
     },
     {
       method: 'POST',
-      path: '/events/death/waiting-validation',
-      handler: waitingValidationHandler,
+      path: '/events/death/waiting-external-resource-validation',
+      handler: waitingExternalValidationHandler,
       config: {
         tags: ['api']
       }
     },
     {
       method: 'POST',
-      path: '/events/birth/new-waiting-validation',
-      handler: newWaitingValidationHandler,
+      path: '/events/birth/registrar-registration-waiting-external-resource-validation',
+      handler: registrarRegistrationWaitingExternalValidationHandler,
       config: {
         tags: ['api']
       }
     },
     {
       method: 'POST',
-      path: '/events/death/new-waiting-validation',
-      handler: newWaitingValidationHandler,
+      path: '/events/death/registrar-registration-waiting-external-resource-validation',
+      handler: registrarRegistrationWaitingExternalValidationHandler,
       config: {
         tags: ['api']
       }

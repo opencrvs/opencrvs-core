@@ -260,7 +260,7 @@ describe('Verify point generation', () => {
     const point = await generateDeclarationStartedPoint(
       cloneDeep(testDeclaration),
       AUTH_HEADER,
-      Events.NEW_VALIDATE
+      Events.REQUEST_FOR_REGISTRAR_VALIDATION
     )
     expect(point).toMatchObject({
       measurement: 'declarations_started',
@@ -289,7 +289,7 @@ describe('Verify point generation', () => {
     const point = await generateDeclarationStartedPoint(
       cloneDeep(testDeclaration),
       AUTH_HEADER,
-      Events.NEW_WAITING_VALIDATION
+      Events.REGISTRAR_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
     )
     expect(point).toMatchObject({
       measurement: 'declarations_started',

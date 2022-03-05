@@ -109,7 +109,7 @@ describe('FieldAgentHome tests', () => {
 
     testComponent.update()
     const app = testComponent
-    const element = await waitForElement(app, '#field-agent-home-spinner')
+    const element = await waitForElement(app, '#navigation_updates_loading')
 
     expect(element.hostNodes()).toHaveLength(1)
   })
