@@ -65,10 +65,13 @@ export const fonts = (language: string): IFonts => {
     languageFonts.default.semiBoldFontFamily
 
   return {
+    // Fonts
+
     regularFont,
     semiBoldFont,
 
     // Headings
+
     h1: `font-family: ${semiBoldFont};
     font-size: 36px;
     font-weight: 600;
@@ -114,6 +117,7 @@ export const fonts = (language: string): IFonts => {
       `,
 
     // Regular Body Styles
+
     reg18: `font-family: ${regularFont};
       font-size: 18px;
       font-weight: normal;
