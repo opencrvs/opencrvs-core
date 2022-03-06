@@ -30,7 +30,7 @@ const Container = styled.div`
   .recharts-label {
     text-anchor: middle;
   }
-  ${({ theme }) => theme.fonts.subtitleStyle};
+  ${({ theme }) => theme.fonts.bold14};
 `
 
 interface IProps {

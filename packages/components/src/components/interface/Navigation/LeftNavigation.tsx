@@ -54,11 +54,11 @@ const UserInfo = styled.div`
   }
 `
 const UserName = styled.p`
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+  ${({ theme }) => theme.fonts.h4};
   margin: 25px 0px 5px;
 `
 const Role = styled.p`
-  ${({ theme }) => theme.fonts.captionStyle};
+  ${({ theme }) => theme.fonts.reg12};
   margin: 0px;
 `
 
@@ -73,7 +73,7 @@ const ApplicationNameContainer = styled.div`
 `
 const ApplicationName = styled.div`
   color: ${({ theme }) => theme.colors.grey};
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+  ${({ theme }) => theme.fonts.h4};
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

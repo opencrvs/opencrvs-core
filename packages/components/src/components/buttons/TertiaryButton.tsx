@@ -14,7 +14,7 @@ import * as React from 'react'
 
 export const TertiaryButton = styled(Button)`
   width: auto;
-  ${({ theme }) => theme.fonts.buttonStyle};
+  ${({ theme }) => theme.fonts.bold14};
   transition: background 0.4s ease;
   align-items: center;
   border: 0;

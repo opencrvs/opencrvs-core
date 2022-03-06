@@ -31,7 +31,7 @@ import styled from 'styled-components'
 import { messages } from './resetCredentialsForm'
 
 const Header = styled.h4`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   color: ${({ theme }) => theme.colors.black};
   margin: 0px;
 `

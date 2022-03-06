@@ -141,7 +141,7 @@ export const Title = styled.div`
   margin-top: 30px;
   color: ${({ theme }) => theme.colors.white};
   text-align: center;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 export const StyledPrimaryButton = styled(PrimaryButton)`
   justify-content: center;
@@ -159,7 +159,7 @@ export const StyledButton = styled(LinkButton)`
   justify-content: center;
   text-decoration: none;
   margin: 10px ${({ theme }) => theme.grid.margin}px;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   :hover {
     text-decoration: underline;
     text-decoration-color: ${({ theme }) => theme.colors.secondary};

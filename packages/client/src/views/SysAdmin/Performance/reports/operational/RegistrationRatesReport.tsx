@@ -57,12 +57,12 @@ const Reports = styled.div<{ loading?: boolean }>`
 
 const KeyNumber = styled.div`
   color: ${({ theme }) => theme.colors.menuBackground};
-  ${({ theme }) => theme.fonts.h2Style};
+  ${({ theme }) => theme.fonts.h1};
   margin: 0px 0px -16px 0px;
 `
 const KeyNumberDescription = styled.div`
   color: ${({ theme }) => theme.colors.menuBackground};
-  ${({ theme }) => theme.fonts.chartLegendStyle};
+  ${({ theme }) => theme.fonts.reg14};
   margin: 16px 0px;
 `
 
@@ -72,11 +72,11 @@ const Pair = styled.div`
 `
 const Label = styled.span`
   color: ${({ theme }) => theme.colors.menuBackground};
-  ${({ theme }) => theme.fonts.chartLegendStyle};
+  ${({ theme }) => theme.fonts.reg14};
 `
 const Value = styled.span`
   color: ${({ theme }) => theme.colors.menuBackground};
-  ${({ theme }) => theme.fonts.subtitleStyle};
+  ${({ theme }) => theme.fonts.bold14};
 `
 
 export const LoaderBox = styled.span<{

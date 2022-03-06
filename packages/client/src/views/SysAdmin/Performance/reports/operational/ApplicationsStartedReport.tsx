@@ -78,7 +78,7 @@ const Reports = styled.div<{ loading?: boolean }>`
 
 const KeyNumber = styled.div`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.h2Style};
+  ${({ theme }) => theme.fonts.h1};
   position: relative;
   width: 100%;
   height: 100%;
@@ -86,12 +86,12 @@ const KeyNumber = styled.div`
 
 const KeyPercentage = styled.span`
   color: ${({ theme }) => theme.colors.placeholder};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   margin: 16px 10px;
 `
 
 const PerformanceLink = styled(LinkButton)<{ disabled: boolean }>`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
   ${({ disabled }) =>
     disabled
       ? `
@@ -110,7 +110,7 @@ const PerformanceLink = styled(LinkButton)<{ disabled: boolean }>`
 
 const ReportTitle = styled.div`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
 `
 
 const LoaderBox = styled.span<{

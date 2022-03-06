@@ -13,7 +13,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 
 const StyledInputDescriptor = styled.p`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   color: ${({ theme }) => theme.colors.placeholder};
   width: 100%;
   margin-bottom: 5px;

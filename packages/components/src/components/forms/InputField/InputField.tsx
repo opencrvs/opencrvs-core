@@ -27,7 +27,7 @@ const Padding = styled.span`
   padding: 0 4px;
   display: inline-flex;
   align-items: center;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.secondary};
 `
 
@@ -35,14 +35,14 @@ const PostFixPadding = styled.span`
   padding: 0 8px;
   display: inline-flex;
   align-items: center;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.menuBackground};
 `
 
 const InputDescription = styled.p<{
   ignoreMediaQuery?: boolean
 }>`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.copy};
 
   ${({ ignoreMediaQuery, theme }) => {

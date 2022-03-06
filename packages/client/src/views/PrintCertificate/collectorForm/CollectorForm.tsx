@@ -82,7 +82,7 @@ import {
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 
 const FormSectionTitle = styled.h4`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   color: ${({ theme }) => theme.colors.copy};
   margin-top: 0px;
   margin-bottom: 16px;

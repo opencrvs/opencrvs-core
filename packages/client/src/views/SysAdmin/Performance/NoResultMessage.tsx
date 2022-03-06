@@ -28,7 +28,7 @@ const MessageContainer = styled.div`
 `
 const StyledHeader = styled.h5`
   color: ${({ theme }) => theme.colors.menuBackground};
-  ${({ theme }) => theme.fonts.h5Style};
+  ${({ theme }) => theme.fonts.h3};
   margin: 16px 0;
 `
 interface NoResultMessageProps {

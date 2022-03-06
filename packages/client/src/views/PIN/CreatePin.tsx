@@ -39,7 +39,7 @@ const StyledPIN = styled(PIN)`
 
 const TitleText = styled.span`
   color: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   text-align: center;
   margin-top: 24px;
   margin-bottom: 16px;
@@ -47,7 +47,7 @@ const TitleText = styled.span`
 
 const DescriptionText = styled.span`
   color: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   text-align: center;
   max-width: 360px;
   margin-bottom: 40px;
@@ -58,7 +58,7 @@ const ErrorBox = styled.div`
   align-items: center;
   justify-content: center;
   color: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   background: ${({ theme }) => theme.colors.error};
   height: 40px;
   width: 360px;

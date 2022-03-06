@@ -19,7 +19,7 @@ export const PrimaryButton = styled(Button)`
   ${({ theme }) => theme.shadows.mistyShadow};
   justify-content: center;
   border-radius: 2px;
-  ${({ theme }) => theme.fonts.buttonStyle};
+  ${({ theme }) => theme.fonts.bold16};
 
   &:hover:enabled {
     ${({ theme }) => theme.gradients.gradientSkyDark};

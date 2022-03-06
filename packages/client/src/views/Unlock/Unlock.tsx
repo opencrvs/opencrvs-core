@@ -33,7 +33,7 @@ import { Button } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
 
 export const PageWrapper = styled.div`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
   ${({ theme }) => theme.gradients.gradientNightshade};
   ${['ZMB', 'FAR'].includes(window.config.COUNTRY.toUpperCase())
     ? `background: url(${zambiaBackground});`
@@ -79,7 +79,7 @@ const Name = styled.p`
   color: ${({ theme }) => theme.colors.white};
 `
 const ForgottenPinLink = styled(Button)`
-  ${({ theme }) => theme.fonts.buttonStyle};
+  ${({ theme }) => theme.fonts.bold14};
   color: ${({ theme }) => theme.colors.white};
   text-transform: none;
 `

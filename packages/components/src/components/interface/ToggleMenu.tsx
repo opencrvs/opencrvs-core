@@ -27,7 +27,7 @@ const MenuContainer = styled.ul`
   background-color: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
   text-align: left;
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   min-width: 200px;
   width: auto;
   white-space: nowrap;
@@ -45,14 +45,14 @@ const MenuContainer = styled.ul`
 
 const MenuHeader = styled.li`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   padding: 8px 32px 8px 16px;
   border-bottom: 1px solid rgb(244, 244, 244);
   font-feature-settings: 'pnum' on, 'lnum' on;
 `
 const MenuItem = styled.li`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   display: flex;
   flex-direction: row;
   border-bottom: 1px solid rgb(244, 244, 244);

@@ -59,7 +59,7 @@ import { FormFieldGenerator } from '@client/components/form'
 import { getValidationErrorsForForm } from '@client/forms/validation'
 
 const Title = styled.h4`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   margin-top: 16px;
   margin-bottom: 24px;
 `

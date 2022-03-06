@@ -25,7 +25,7 @@ const Label = styled.label`
   position: relative;
   margin-left: 16px;
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 
 const Check = styled.span<{ size?: string }>`

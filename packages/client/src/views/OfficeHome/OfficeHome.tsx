@@ -77,7 +77,7 @@ export const StyledSpinner = styled(Spinner)`
 `
 export const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   text-align: center;
   margin-top: 100px;
 `

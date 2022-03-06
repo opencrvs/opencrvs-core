@@ -29,7 +29,7 @@ const Wrapper = styled.div`
 `
 const TableHeader = styled.div`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.captionStyle};
+  ${({ theme }) => theme.fonts.reg12};
   margin: 40px 0 25px;
   padding: 0 25px;
 
@@ -42,12 +42,12 @@ const StyledBox = styled(Box)`
   margin-top: 8px;
   padding: 0;
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   text-align: center;
   margin-top: 100px;
 `

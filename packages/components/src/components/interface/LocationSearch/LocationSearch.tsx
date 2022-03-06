@@ -44,7 +44,7 @@ const SearchTextInput = styled.input<{ error?: boolean; touched?: boolean }>`
   width: 100%;
   height: 40px;
   border-radius: 2px;
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   padding-left: 36px;
   border: 2px solid
     ${({ theme, error, touched }) =>
@@ -85,7 +85,7 @@ const DropDownItem = styled.li`
   }
 `
 const Label = styled.span`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.copy};
 `
 export interface ISearchLocation {

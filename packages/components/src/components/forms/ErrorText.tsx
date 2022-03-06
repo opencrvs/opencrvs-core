@@ -36,7 +36,7 @@ const Container = styled.div<{ ignoreMediaQuery?: boolean }>`
   }}
 `
 const StyledParagraph = styled(Paragraph)`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
   color: ${({ theme }) => theme.colors.error};
 `
 

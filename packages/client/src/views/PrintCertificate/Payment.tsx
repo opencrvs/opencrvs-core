@@ -35,7 +35,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 
 const Header = styled.h4`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   color: ${({ theme }) => theme.colors.black};
   margin-bottom: 16px;
   margin-top: 0;
@@ -58,11 +58,11 @@ const GreyBody = styled.div`
 `
 
 const StyledLabel = styled.label`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
   margin-right: 3px;
 `
 const StyledValue = styled.span`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 
 function LabelValue({

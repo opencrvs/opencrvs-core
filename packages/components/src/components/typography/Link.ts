@@ -20,5 +20,5 @@ export const Link = styled.a<{ error?: boolean }>`
   cursor: pointer;
   border: 0;
   text-decoration: underline;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `

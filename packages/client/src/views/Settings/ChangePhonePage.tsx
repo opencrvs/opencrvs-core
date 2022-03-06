@@ -77,7 +77,7 @@ const HalfWidthInput = styled(TextInput)`
   }
 `
 const FormSectionTitle = styled.h4`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   color: ${({ theme }) => theme.colors.copy};
   margin-top: 0px;
   margin-bottom: 16px;
@@ -98,7 +98,7 @@ const Field = styled.div`
 `
 const Message = styled.div`
   margin-bottom: 16px;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.copy};
 `
 
@@ -111,7 +111,7 @@ const InvalidPhoneNumber = styled.div`
 `
 const BoxedError = styled.div`
   margin-top: -10px;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   margin-bottom: 10px;
   display: flex;
 `

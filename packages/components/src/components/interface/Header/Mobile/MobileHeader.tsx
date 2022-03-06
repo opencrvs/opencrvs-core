@@ -39,7 +39,7 @@ const HeaderContainer = styled.div`
 `
 
 const Title = styled.span`
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+  ${({ theme }) => theme.fonts.h4};
   color: ${({ theme }) => theme.colors.grey800};
   align-self: center;
   position: absolute;

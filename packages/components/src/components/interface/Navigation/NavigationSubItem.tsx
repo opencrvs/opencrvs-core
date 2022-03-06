@@ -35,7 +35,7 @@ export const SubItemContainer = styled.button<{ isSelected?: boolean }>`
   text-align: left;
   color: ${({ isSelected, theme }) =>
     isSelected ? theme.colors.grey : theme.colors.greyLight};
-  ${({ theme }) => theme.fonts.chartLegendStyle};
+  ${({ theme }) => theme.fonts.reg14};
 `
 
 const LabelContainer = styled.div`

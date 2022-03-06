@@ -106,7 +106,7 @@ const Cancel = styled.div`
 
 const NotificationMessage = styled.div`
   position: relative;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   padding: 8px 16px;
   margin: 8px;
   color: ${({ theme }) => theme.colors.white};

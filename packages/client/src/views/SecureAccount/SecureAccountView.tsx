@@ -16,7 +16,7 @@ import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { CreatePin } from '@client/views/PIN/CreatePin'
 
 const SecurePageContainer = styled.div`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   ${({ theme }) => theme.gradients.gradientNightshade};
   height: 100vh;
   text-align: center;
@@ -39,7 +39,7 @@ const PinButton = styled(PrimaryButton)`
   display: block;
 `
 const Bold = styled.span`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
 `
 
 export class SecureAccount extends React.Component<{

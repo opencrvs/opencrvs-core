@@ -39,7 +39,7 @@ const SearchTextInput = styled.input`
   border: none;
   background: ${({ theme }) => theme.colors.background};
   margin: 2px 5px;
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   flex-grow: 1;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     width: 100%;

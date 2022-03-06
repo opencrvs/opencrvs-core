@@ -150,11 +150,11 @@ const FormItem = styled.div<{
   }`}
 `
 const LinkFormField = styled(Link)`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 
 const FieldGroupTitle = styled.div`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   margin-top: 16px;
 `
 

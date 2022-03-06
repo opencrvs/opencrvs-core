@@ -23,13 +23,13 @@ const SubSectionWrapper = styled.div`
 `
 
 const Title = styled.div`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   color: ${({ theme }) => theme.colors.copy};
 `
 const Optional = styled.span<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
 >`
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+  ${({ theme }) => theme.fonts.h4};
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.placeholder};
   flex-grow: 0;

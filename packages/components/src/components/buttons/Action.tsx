@@ -40,18 +40,18 @@ const ActionContainer = styled(Button)`
 const ActionTitle = styled.h3<{ disabled?: boolean }>`
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.primary};
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   margin: 0;
 `
 
 const ActionDescription = styled.p<{ disabled?: boolean }>`
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.secondary};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   margin: 0;
   margin-top: 3px;
   strong {
-    ${({ theme }) => theme.fonts.bodyBoldStyle};
+    ${({ theme }) => theme.fonts.bold16};
   }
 `
 

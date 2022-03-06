@@ -93,7 +93,7 @@ import { getValueFromApplicationDataByKey } from '@client/pdfRenderer/transforme
 import { isCorrection } from '@client/views/CorrectionForm/utils'
 
 const FormSectionTitle = styled.h4`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   color: ${({ theme }) => theme.colors.copy};
   margin-top: 16px;
   margin-bottom: 24px;
@@ -110,7 +110,7 @@ const Notice = styled.div`
   box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.11);
   padding: 25px;
   color: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   margin: 30px -25px;
 `
 
@@ -120,7 +120,7 @@ const StyledLinkButton = styled(LinkButton)`
 const Required = styled.span<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
 >`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.error};
   flex-grow: 0;
@@ -129,7 +129,7 @@ const Required = styled.span<
 const Optional = styled.span<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
 >`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.placeholder};
   flex-grow: 0;
@@ -145,7 +145,7 @@ const SpinnerWrapper = styled.div`
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   text-align: center;
   margin-top: 100px;
 `

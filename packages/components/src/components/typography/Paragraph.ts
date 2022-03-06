@@ -12,9 +12,9 @@
 import styled from 'styled-components'
 
 export const Paragraph = styled.p<{ fontSize?: string }>`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   /* stylelint-disable-next-line opencrvs/no-font-styles */
   font-size: ${({ fontSize, theme }) =>
-    fontSize ? theme.fonts[fontSize] : theme.fonts.bodyStyle};
+    fontSize ? theme.fonts[fontSize] : theme.fonts.reg16};
   width: 100%;
 `

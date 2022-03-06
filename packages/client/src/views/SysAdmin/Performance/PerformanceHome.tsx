@@ -38,7 +38,7 @@ const MessageContainer = styled.div`
 `
 
 export const MessageHeader = styled.div`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   margin-bottom: 15px;
 `
 

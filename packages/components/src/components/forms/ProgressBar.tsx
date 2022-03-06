@@ -21,16 +21,16 @@ const HeaderWrapper = styled.div`
 
 const TitleLink = styled.div<{ disabled?: boolean }>`
   ${({ disabled }) => (disabled ? '' : 'cursor: pointer;')};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme, disabled }) =>
     disabled ? theme.colors.copy : theme.colors.primary};
   ${({ disabled }) => (disabled ? '' : 'text-decoration: underline')};
 `
 const ValueHolder = styled.div`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 const Value = styled.span`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
 `
 const Percentage = styled.span`
   color: ${({ theme }) => theme.colors.placeholder};

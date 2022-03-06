@@ -18,7 +18,7 @@ const Wrapper = styled.form`
   align-items: center;
   border-radius: 2px;
   display: flex;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   padding: 0px 10px;
   padding-right: 0;
   margin-bottom: 1px;
@@ -27,7 +27,7 @@ const Wrapper = styled.form`
 const SearchTextInput = styled.input`
   border: none;
   margin: 0px 10px;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   background-color: ${({ theme }) => theme.colors.grey300};
   flex-grow: 1;
   &:focus {
@@ -53,7 +53,7 @@ export const LabelButton = styled(Button)`
   background: ${({ theme }) => theme.colors.gray300};
   border-radius: 2px;
   color: ${({ theme }) => theme.colors.secondary};
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
 `
 
 const DropDownWrapper = styled.ul`
@@ -94,7 +94,7 @@ const IconWrapper = styled.span`
   padding: 8px 16px;
 `
 const Label = styled.span`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.copy};
 `
 const SelectedSearchCriteria = styled.span`
@@ -102,7 +102,7 @@ const SelectedSearchCriteria = styled.span`
   border-radius: 2px;
   padding: 5px 10px;
   color: ${({ theme }) => theme.colors.secondary};
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
   display: flex;
   & .selected-icon {
     display: none;

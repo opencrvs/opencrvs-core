@@ -54,7 +54,7 @@ export const LogoContainer = styled.div`
   }
 `
 const TitleHolder = styled.div`
-  ${({ theme }) => theme.fonts.h2Style};
+  ${({ theme }) => theme.fonts.h1};
   padding-top: 40px;
 `
 const InfoHolder = styled.div`
@@ -63,14 +63,14 @@ const InfoHolder = styled.div`
   margin: 20px 0px;
 `
 const NameHolder = styled.div`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
 `
 const RoleHolder = styled.div`
-  ${({ theme }) => theme.fonts.captionStyle};
+  ${({ theme }) => theme.fonts.reg12};
   padding-top: 12px;
 `
 const InstructionHolder = styled.div`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   padding: 40px 65px 30px 65px;
 `
 const NextButton = styled(PrimaryButton)`

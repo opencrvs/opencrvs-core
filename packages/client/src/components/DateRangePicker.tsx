@@ -116,7 +116,7 @@ export const ContentWrapper = styled.div`
   display: flex;
   width: 100%;
   align-items: center;
-  ${({ theme }) => theme.fonts.smallButtonStyleNoCapitalize};
+  ${({ theme }) => theme.fonts.reg14};
   color: ${({ theme }) => theme.colors.tertiary};
 
   & > svg {
@@ -164,7 +164,7 @@ export const ModalHeader = styled.div<{ hide?: boolean }>`
 export const TitleContent = styled.div`
   display: flex;
   align-items: center;
-  ${({ theme }) => theme.fonts.buttonStyle}
+  ${({ theme }) => theme.fonts.h2}
   text-transform: none;
 
   & > :first-child {
@@ -225,20 +225,20 @@ const PresetContainer = styled.div`
 
 const LabelContainer = styled.div`
   padding: 8px;
-  ${({ theme }) => theme.fonts.smallButtonStyleNoCapitalize}
+  ${({ theme }) => theme.fonts.reg14}
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 8px 0 0;
-    ${({ theme }) => theme.fonts.bodyBoldStyle}
+    ${({ theme }) => theme.fonts.bold16}
     text-align: center;
   }
 `
 const YearLabelContainer = styled.div`
   padding: 8px;
-  ${({ theme }) => theme.fonts.smallButtonStyleNoCapitalize}
+  ${({ theme }) => theme.fonts.reg14}
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.h4Style}
+    ${({ theme }) => theme.fonts.h2}
   }
 `
 
@@ -287,7 +287,7 @@ const MonthButtonsContainer = styled.div`
   }
 `
 const PresetRangeButton = styled.button<{ selected?: boolean }>`
-  ${({ theme }) => theme.fonts.bodyStyle}
+  ${({ theme }) => theme.fonts.reg16}
   padding: 8px 16px;
   border: 0;
   width: 100%;
@@ -314,7 +314,7 @@ const PresetRangeButton = styled.button<{ selected?: boolean }>`
   }
 `
 const MonthButton = styled.button<{ selected?: boolean }>`
-  ${({ theme }) => theme.fonts.smallButtonStyle}
+  ${({ theme }) => theme.fonts.reg14}
   height: 40px;
   width: 64px;
   border: 0;
@@ -336,7 +336,7 @@ const MonthButton = styled.button<{ selected?: boolean }>`
   }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.bigBodyStyle}
+    ${({ theme }) => theme.fonts.reg18}
     height: 72px;
     width: 33.33%;
     padding: 12px 8px 11px 8px;

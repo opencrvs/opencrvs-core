@@ -24,7 +24,7 @@ const StyledBanner = styled.div`
   border-radius: 1px;
   display: flex;
   align-items: center;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   background-color: ${({ theme }) => theme.colors.secondary};
   min-height: 109px;
   margin: 20px 0;
@@ -42,12 +42,12 @@ const StyledStatus = styled.div`
 `
 const StyledText = styled.div`
   color: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.h3Style};
+  ${({ theme }) => theme.fonts.h1};
   min-height: 42px;
 `
 
 const StyledNumber = styled.span`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   margin-left: 5px;
   color: ${({ theme }) => theme.colors.white};
 `

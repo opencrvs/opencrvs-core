@@ -20,7 +20,7 @@ import { ILocation } from '@client/offline/reducer'
 
 export const Header = styled.h1`
   color: ${({ theme }) => theme.colors.menuBackground};
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
 `
 
 export function getMonthDateRange(year: number, month: number) {
@@ -39,13 +39,13 @@ export const ReportHeader = styled.div`
 
 export const SubHeader = styled.div`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+  ${({ theme }) => theme.fonts.h4};
 `
 
 export const Description = styled.div`
   margin: 8px 0px;
   color: ${({ theme }) => theme.colors.placeholder};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 
 export const ActionContainer = styled.div`

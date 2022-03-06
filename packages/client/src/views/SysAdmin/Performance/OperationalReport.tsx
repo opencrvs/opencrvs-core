@@ -127,7 +127,7 @@ interface State {
 
 const Header = styled.h2`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.h2Style};
+  ${({ theme }) => theme.fonts.h1};
   margin: 0;
 `
 
@@ -164,10 +164,10 @@ const StatusTitleContainer = styled.div`
 `
 
 const Title = styled.div`
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle}
+  ${({ theme }) => theme.fonts.h4}
   margin-left: 8px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.bodyBoldStyle}
+    ${({ theme }) => theme.fonts.bold16}
   }
 `
 

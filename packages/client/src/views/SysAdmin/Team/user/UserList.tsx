@@ -97,18 +97,18 @@ const TableHeader = styled.div`
   padding: 8px 18px;
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
   border-bottom: 1px solid ${({ theme }) => theme.colors.silverSand};
 `
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   text-align: center;
   margin-top: 100px;
 `
 const StatusBox = styled.div`
   padding: 4px 8px;
-  ${({ theme }) => theme.fonts.captionBold};
+  ${({ theme }) => theme.fonts.bold12};
   border-radius: 100px;
   height: 30px;
   text-align: center;
@@ -141,7 +141,7 @@ const AddUserIcon = styled(AddUser)`
 
 const Header = styled.h1`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.h2Style};
+  ${({ theme }) => theme.fonts.h1};
 `
 
 const HeaderContainer = styled.div`
@@ -174,17 +174,17 @@ const LocationInfo = styled.div`
 
 const LocationInfoKey = styled.div`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
 `
 
 const LocationInfoValue = styled.div`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 
 const LocationInfoEmptyValue = styled.div`
   color: ${({ theme }) => theme.colors.placeholder};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 
 const ChangeButton = styled(LinkButton)`
@@ -210,7 +210,7 @@ const Name = styled(LinkButton)`
 `
 
 const RoleType = styled.div`
-  ${({ theme }) => theme.fonts.chartLegendStyle}
+  ${({ theme }) => theme.fonts.reg14}
   color: ${({ theme }) => theme.colors.waitingForExternalValidation};
   text-align: left;
 `

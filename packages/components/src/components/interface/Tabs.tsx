@@ -37,8 +37,7 @@ export const Tab = styled(Button)<IProps>`
   &:disabled {
     background: transparent;
   }
-  ${({ theme, active }) =>
-    active ? theme.fonts.bodyBoldStyle : theme.fonts.bodyStyle};
+  ${({ theme, active }) => (active ? theme.fonts.bold16 : theme.fonts.reg16)};
 
   ${({ theme, active }) =>
     active ? `border-bottom: 3px solid ${theme.fonts.secondary}` : ''};

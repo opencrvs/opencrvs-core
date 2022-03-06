@@ -19,10 +19,10 @@ const Container = styled.div`
   margin-bottom: 30px;
 `
 const Title = styled.div`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   margin-bottom: 16px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.h5Style};
+    ${({ theme }) => theme.fonts.h3};
   }
 `
 
@@ -42,7 +42,7 @@ interface IProps {
 }
 
 const ErrorText = styled.div<{ isFullPage?: boolean }>`
-  ${({ theme }) => theme.fonts.h5Style};
+  ${({ theme }) => theme.fonts.h3};
   text-align: left;
   margin-left: ${({ isFullPage }) => (isFullPage ? `40px` : `10px`)};
   color: ${({ theme }) => theme.colors.copy};

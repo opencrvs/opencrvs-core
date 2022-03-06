@@ -69,7 +69,7 @@ const TableHeader = styled.div<{
 const TableHeaderText = styled.div<{
   isSorted?: boolean
 }>`
-  ${({ theme }) => theme.fonts.multiColHeaderFont};
+  ${({ theme }) => theme.fonts.bold14};
   color: ${({ theme }) => theme.colors.grey};
 `
 
@@ -80,8 +80,8 @@ const TableBody = styled.div<{
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme, columns }) =>
     columns.length > 3 && columns.length <= 5
-      ? theme.fonts.multiColFont
-      : theme.fonts.bodyStyle};
+      ? theme.fonts.reg14
+      : theme.fonts.reg16};
 
   & div:last-of-type {
     ${({ footerColumns }) => (footerColumns ? 'border-bottom: none;' : '')};
@@ -167,7 +167,7 @@ const TableFooter = styled(RowWrapper)`
   border-bottom: none;
   & span {
     color: ${({ theme }) => theme.colors.copy};
-    ${({ theme }) => theme.fonts.bodyBoldStyle};
+    ${({ theme }) => theme.fonts.bold16};
   }
 `
 
@@ -204,7 +204,7 @@ const Error = styled.span`
   color: ${({ theme }) => theme.colors.error};
 `
 const ErrorText = styled.div<{ isFullPage?: boolean }>`
-  ${({ theme }) => theme.fonts.h5Style};
+  ${({ theme }) => theme.fonts.h3};
   text-align: left;
   margin-left: ${({ isFullPage }) => (isFullPage ? `40px` : `10px`)};
   color: ${({ theme }) => theme.colors.copy};
@@ -212,7 +212,7 @@ const ErrorText = styled.div<{ isFullPage?: boolean }>`
 const H3 = styled.div`
   padding-left: 12px;
   margin-bottom: 8px;
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+  ${({ theme }) => theme.fonts.h4};
   color: ${({ theme }) => theme.colors.copy};
 `
 export const LoadingTableGrey = styled.span<{

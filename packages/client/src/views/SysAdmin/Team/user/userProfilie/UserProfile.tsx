@@ -69,7 +69,7 @@ const UserAvatar = styled(Avatar)`
 `
 
 const NameHolder = styled.div`
-  ${({ theme }) => theme.fonts.h2Style};
+  ${({ theme }) => theme.fonts.h1};
   margin: 20px auto 30px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
@@ -88,13 +88,13 @@ const InformationHolder = styled.div`
 `
 
 export const InformationTitle = styled.div<{ paddingRight?: number }>`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
   ${({ paddingRight }) => {
     return `padding-right: ${paddingRight ? paddingRight : 0}px`
   }}
 `
 const InformationValue = styled.div`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 
 const LoadingTitle = styled.span<{ width: number; marginRight: number }>`

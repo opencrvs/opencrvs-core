@@ -54,7 +54,7 @@ type IFullProps = RouteComponentProps<{ eventType: Event }> &
   IDispatchProps
 
 const Title = styled.h4`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   color: ${({ theme }) => theme.colors.copy};
   margin-top: 16px;
   margin-bottom: 24px;

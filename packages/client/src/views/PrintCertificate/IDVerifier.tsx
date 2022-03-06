@@ -57,7 +57,7 @@ interface IIDVerifierProps {
 }
 
 const Title = styled.div`
-  ${({ theme }) => theme.fonts.h4Style}
+  ${({ theme }) => theme.fonts.h2}
   margin-bottom: 32px;
 `
 const Content = styled.div`

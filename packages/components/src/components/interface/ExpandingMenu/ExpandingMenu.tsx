@@ -14,7 +14,7 @@ import styled from 'styled-components'
 
 const NavigationMainWrapper = styled.div`
   width: 100%;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.copy};
   height: 100vh;
   z-index: 99999;
