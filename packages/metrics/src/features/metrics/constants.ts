@@ -30,6 +30,6 @@ export const NOTIFICATION_TYPES = ['birth-notification', 'death-notification']
 export enum Events {
   IN_PROGRESS_DEC = 'in-progress-declaration', // Field agent or DHIS2 in progress
   NEW_DEC = 'new-declaration', // Field agent complete
-  NEW_WAITING_VALIDATION = 'new-waiting-validation', // Registrar
-  NEW_VALIDATE = 'new-validation' // Registration agent new event
+  REGISTRAR_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION = 'registrar-registration-waiting-external-resource-validation', // Registrar
+  REQUEST_FOR_REGISTRAR_VALIDATION = 'request-for-registrar-validation' // Registration agent new event
 }
