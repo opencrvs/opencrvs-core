@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { createServer } from '@config/index'
-import ApplicationConfig, {
-  IApplicationConfigurationModel
+import DeclarationConfig, {
+  IDeclarationConfigurationModel
 } from '@config/models/config'
 import * as fetchMock from 'jest-fetch-mock'
 import mockingoose from 'mockingoose'
@@ -37,13 +37,13 @@ let mockConfig = {
   UI_POLLING_INTERVAL: 5000,
   FIELD_AGENT_AUDIT_LOCATIONS:
     'WARD,UNION,CITY_CORPORATION,MUNICIPALITY,UPAZILA',
-  APPLICATION_AUDIT_LOCATIONS: 'WARD,UNION,MUNICIPALITY',
+  DECLARATION_AUDIT_LOCATIONS: 'WARD,UNION,MUNICIPALITY',
   EXTERNAL_VALIDATION_WORKQUEUE: true, // this flag will decide whether to show external validation workqueue on registrar home
   SENTRY: 'https://2ed906a0ba1c4de2ae3f3f898ec9df0b@sentry.io/1774551',
   LOGROCKET: 'opencrvs-foundation/opencrvs-bangladesh'
-} as unknown as IApplicationConfigurationModel
+} as unknown as IDeclarationConfigurationModel
 
-describe('applicationHandler', () => {
+describe('declarationHandler', () => {
   let server: any
 
   beforeEach(async () => {
@@ -52,8 +52,8 @@ describe('applicationHandler', () => {
     fetch.resetMocks()
   })
 
-  it('get application config using mongoose', async () => {
-    mockingoose(ApplicationConfig).toReturn(mockConfig, 'findOne')
+  it('get declaration config using mongoose', async () => {
+    mockingoose(DeclarationConfig).toReturn(mockConfig, 'findOne')
 
     const res = await server.server.inject({
       method: 'GET',

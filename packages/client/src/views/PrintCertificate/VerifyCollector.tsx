@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
-import { IPrintableApplication, modifyApplication } from '@client/applications'
+import { IPrintableDeclaration, modifyDeclaration } from '@client/declarations'
 import { Event } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/certificate'
 import {
@@ -42,12 +42,12 @@ interface IMatchParams {
 }
 
 interface IStateProps {
-  application: IPrintableApplication
+  declaration: IPrintableDeclaration
   offlineCountryConfiguration: IOfflineData
 }
 interface IDispatchProps {
   goBack: typeof goBack
-  modifyApplication: typeof modifyApplication
+  modifyDeclaration: typeof modifyDeclaration
   goToReviewCertificate: typeof goToReviewCertificate
   goToPrintCertificatePayment: typeof goToPrintCertificatePayment
 }
@@ -58,8 +58,8 @@ type IFullProps = IStateProps & IDispatchProps & IOwnProps
 
 class VerifyCollectorComponent extends React.Component<IFullProps> {
   handleVerification = () => {
-    const event = this.props.application.event
-    const eventDate = getEventDate(this.props.application.data, event)
+    const event = this.props.declaration.event
+    const eventDate = getEventDate(this.props.declaration.data, event)
 
     if (isFreeOfCost(event, eventDate)) {
       this.props.goToReviewCertificate(
@@ -75,17 +75,17 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
   }
 
   handleNegativeVerification = () => {
-    const { application } = this.props
-    const certificates = application.data.registration.certificates
+    const { declaration } = this.props
+    const certificates = declaration.data.registration.certificates
 
     const certificate = (certificates && certificates[0]) || {}
 
-    this.props.modifyApplication({
-      ...application,
+    this.props.modifyDeclaration({
+      ...declaration,
       data: {
-        ...application.data,
+        ...declaration.data,
         registration: {
-          ...application.data.registration,
+          ...declaration.data.registration,
           certificates: [{ ...certificate, hasShowedVerifiedDocument: true }]
         }
       }
@@ -95,10 +95,10 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
   }
 
   getGenericCollectorInfo = (collector: string): ICollectorInfo => {
-    const { intl, application, offlineCountryConfiguration } = this.props
-    const info = application.data[collector]
+    const { intl, declaration, offlineCountryConfiguration } = this.props
+    const info = declaration.data[collector]
     const fields = verifyIDOnBirthCertificateCollectorDefinition[
-      application.event
+      declaration.event
     ][collector] as IVerifyIDCertificateCollectorField
     const iD = info[fields.identifierField] as string
     const iDType = (info[fields.identifierTypeField] ||
@@ -160,19 +160,19 @@ const mapStateToProps = (
 ): IStateProps => {
   const { registrationId } = ownProps.match.params
 
-  const application = state.applicationsState.applications.find(
+  const declaration = state.declarationsState.declarations.find(
     (draft) => draft.id === registrationId
-  ) as IPrintableApplication
+  ) as IPrintableDeclaration
 
   return {
-    application,
+    declaration,
     offlineCountryConfiguration: getOfflineData(state)
   }
 }
 
 export const VerifyCollector = connect(mapStateToProps, {
   goBack,
-  modifyApplication,
+  modifyDeclaration,
   goToReviewCertificate,
   goToPrintCertificatePayment
 })(injectIntl(VerifyCollectorComponent))

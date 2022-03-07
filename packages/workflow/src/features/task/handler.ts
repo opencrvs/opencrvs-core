@@ -59,14 +59,14 @@ export default async function updateTaskHandler(
     /* sending notification to the contact */
     if (msisdn) {
       logger.info(
-        'updateTaskHandler(reject application) sending event notification'
+        'updateTaskHandler(reject declaration) sending event notification'
       )
       sendEventNotification(payload, event, msisdn, {
         Authorization: request.headers.authorization
       })
     } else {
       logger.info(
-        'updateTaskHandler(reject application) could not send event notification'
+        'updateTaskHandler(reject declaration) could not send event notification'
       )
     }
 

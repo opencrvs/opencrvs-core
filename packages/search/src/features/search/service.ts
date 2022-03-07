@@ -46,8 +46,8 @@ export function formatSearchParams(params: ISearchQuery) {
     event = EMPTY_STRING,
     status,
     type,
-    applicationLocationId = EMPTY_STRING,
-    applicationLocationHirarchyId = EMPTY_STRING,
+    declarationLocationId = EMPTY_STRING,
+    declarationLocationHirarchyId = EMPTY_STRING,
     eventLocationId = EMPTY_STRING,
     gender = EMPTY_STRING,
     name = EMPTY_STRING,
@@ -56,7 +56,7 @@ export function formatSearchParams(params: ISearchQuery) {
     from = 0,
     size = DEFAULT_SIZE,
     sort = SortOrder.ASC,
-    sortColumn = 'dateOfApplication'
+    sortColumn = 'dateOfDeclaration'
   } = params
 
   if (nameCombinations.length === 0 && name !== EMPTY_STRING) {
@@ -80,8 +80,8 @@ export function formatSearchParams(params: ISearchQuery) {
         eventLocationId,
         gender,
         nameCombinations,
-        applicationLocationId,
-        applicationLocationHirarchyId,
+        declarationLocationId,
+        declarationLocationHirarchyId,
         createdBy,
         { event, status, type }
       ),

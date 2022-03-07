@@ -19,7 +19,7 @@ import {
   updateCertificate,
   updateCertificateHandler
 } from '@config/handlers/getCertificate/applicationCertificateHandler'
-import applicationConfigHandler from '@config/handlers/applicationConfigHandler'
+import declarationConfigHandler from '@config/handlers/declarationConfigHandler'
 import createQuestionHandler, {
   requestSchema as createQuestionReqSchema
 } from '@config/handlers/createQuestion/handler'
@@ -58,11 +58,11 @@ export default function getRoutes() {
     {
       method: 'GET',
       path: '/config',
-      handler: applicationConfigHandler,
+      handler: declarationConfigHandler,
       config: {
         auth: false,
         tags: ['api'],
-        description: 'Retrieve Application configuration'
+        description: 'Retrieve Declaration configuration'
       }
     },
     {

@@ -10,11 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { IApplication, SUBMISSION_STATUS } from '@client/applications'
+import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import { Event } from '@client/forms'
 import { isCorrection } from './utils'
 
-let application: IApplication = {
+let declaration: IDeclaration = {
   id: '72c18939-70c1-40b4-9b80-b162c4871160',
   data: {},
   event: Event.BIRTH
@@ -22,22 +22,22 @@ let application: IApplication = {
 
 describe('isCorrection()', () => {
   it('should return false if there is no registration status', () => {
-    expect(isCorrection(application)).toBeFalsy()
+    expect(isCorrection(declaration)).toBeFalsy()
   })
 
-  it('should return true if an application is registered', () => {
-    application = {
-      ...application,
+  it('should return true if an declaration is registered', () => {
+    declaration = {
+      ...declaration,
       registrationStatus: SUBMISSION_STATUS.REGISTERED
     }
-    expect(isCorrection(application)).toBeTruthy()
+    expect(isCorrection(declaration)).toBeTruthy()
   })
 
-  it('should return false if an application is not registered', () => {
-    application = {
-      ...application,
+  it('should return false if an declaration is not registered', () => {
+    declaration = {
+      ...declaration,
       registrationStatus: SUBMISSION_STATUS.DRAFT
     }
-    expect(isCorrection(application)).toBeFalsy()
+    expect(isCorrection(declaration)).toBeFalsy()
   })
 })

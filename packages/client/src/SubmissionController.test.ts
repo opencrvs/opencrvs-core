@@ -11,14 +11,14 @@
  */
 import { AppStore, createStore } from '@client/store'
 import { SubmissionController } from '@client/SubmissionController'
-import { SUBMISSION_STATUS } from '@client/applications'
+import { SUBMISSION_STATUS } from '@client/declarations'
 import { Action } from './forms'
 import { createMockClient } from 'mock-apollo-client'
 import {
-  SUBMIT_BIRTH_APPLICATION,
-  APPROVE_BIRTH_APPLICATION,
-  REGISTER_BIRTH_APPLICATION,
-  REJECT_BIRTH_APPLICATION
+  SUBMIT_BIRTH_DECLARATION,
+  APPROVE_BIRTH_DECLARATION,
+  REGISTER_BIRTH_DECLARATION,
+  REJECT_BIRTH_DECLARATION
 } from '@client/views/DataProvider/birth/mutations'
 import { ApolloError } from 'apollo-client'
 import { flushPromises } from './tests/util'
@@ -40,8 +40,8 @@ describe('Submission Controller', () => {
   it('does nothing if sync is already running', async () => {
     const store = {
       getState: () => ({
-        applicationsState: {
-          applications: [
+        declarationsState: {
+          declarations: [
             {
               submissionStatus: SUBMISSION_STATUS.READY_TO_SUBMIT
             }
@@ -66,8 +66,8 @@ describe('Submission Controller', () => {
   it('changes status of drafts that are hanging for long time', async () => {
     const store = {
       getState: () => ({
-        applicationsState: {
-          applications: [
+        declarationsState: {
+          declarations: [
             {
               modifiedOn: 1572408000000,
               submissionStatus: SUBMISSION_STATUS.SUBMITTING
@@ -82,7 +82,7 @@ describe('Submission Controller', () => {
     }
 
     const subCon = new SubmissionController(store as unknown as AppStore)
-    await subCon.requeueHangingApplications()
+    await subCon.requeueHangingDeclarations()
 
     expect(store.dispatch).toHaveBeenCalledTimes(2)
   })
@@ -90,8 +90,8 @@ describe('Submission Controller', () => {
   it('does nothing if offline', () => {
     const store = {
       getState: () => ({
-        applicationsState: {
-          applications: [
+        declarationsState: {
+          declarations: [
             {
               submissionStatus: SUBMISSION_STATUS.READY_TO_SUBMIT
             }
@@ -121,7 +121,7 @@ describe('Submission Controller', () => {
     expect(store.dispatch).not.toBeCalled()
   })
 
-  it('syncs all ready to submit and network failed applications but keeps the submitted application when having declare scope', async () => {
+  it('syncs all ready to submit and network failed declarations but keeps the submitted declaration when having declare scope', async () => {
     const store = {
       getState: () => ({
         profile: {
@@ -130,8 +130,8 @@ describe('Submission Controller', () => {
             scope: ['declare']
           }
         },
-        applicationsState: {
-          applications: [
+        declarationsState: {
+          declarations: [
             {
               event: 'birth',
               action: Action.SUBMIT_FOR_REVIEW,
@@ -168,30 +168,30 @@ describe('Submission Controller', () => {
         }
       }
     })
-    subCon.client.setRequestHandler(SUBMIT_BIRTH_APPLICATION, mutationHandler)
+    subCon.client.setRequestHandler(SUBMIT_BIRTH_DECLARATION, mutationHandler)
 
     await subCon.sync()
 
     expect(mutationHandler).toHaveBeenCalledTimes(2)
     expect(store.dispatch).toHaveBeenCalledTimes(10)
     expect(
-      store.dispatch.mock.calls[0][0].payload.application.submissionStatus
+      store.dispatch.mock.calls[0][0].payload.declaration.submissionStatus
     ).toBe(SUBMISSION_STATUS.SUBMITTED)
     expect(
-      store.dispatch.mock.calls[1][0].payload.application.submissionStatus
+      store.dispatch.mock.calls[1][0].payload.declaration.submissionStatus
     ).toBe(SUBMISSION_STATUS.SUBMITTED)
-    expect(store.dispatch.mock.calls[9][0].type).toBe('APPLICATION/WRITE_DRAFT')
+    expect(store.dispatch.mock.calls[9][0].type).toBe('DECLARATION/WRITE_DRAFT')
   })
 
-  it('sync all ready to approve application and deletes approved application', async () => {
+  it('sync all ready to approve declaration and deletes approved declaration', async () => {
     const store = {
       getState: () => ({
-        applicationsState: {
-          applications: [
+        declarationsState: {
+          declarations: [
             {
               event: 'birth',
               submissionStatus: SUBMISSION_STATUS.READY_TO_APPROVE,
-              action: Action.APPROVE_APPLICATION
+              action: Action.APPROVE_DECLARATION
             }
           ]
         },
@@ -213,29 +213,29 @@ describe('Submission Controller', () => {
     const mutationHandler = jest.fn().mockResolvedValue({
       data: { data: { markBirthAsValidated: {} } }
     })
-    subCon.client.setRequestHandler(APPROVE_BIRTH_APPLICATION, mutationHandler)
+    subCon.client.setRequestHandler(APPROVE_BIRTH_DECLARATION, mutationHandler)
 
     await subCon.sync()
 
     expect(mutationHandler).toHaveBeenCalledTimes(1)
     expect(store.dispatch).toHaveBeenCalledTimes(5)
     expect(
-      store.dispatch.mock.calls[0][0].payload.application.submissionStatus
+      store.dispatch.mock.calls[0][0].payload.declaration.submissionStatus
     ).toBe(SUBMISSION_STATUS.APPROVED)
     expect(store.dispatch.mock.calls[4][0].type).toBe(
-      'APPLICATION/DELETE_DRAFT'
+      'DECLARATION/DELETE_DRAFT'
     )
   })
 
-  it('sync all ready to register application and deletes registered application', async () => {
+  it('sync all ready to register declaration and deletes registered declaration', async () => {
     const store = {
       getState: () => ({
-        applicationsState: {
-          applications: [
+        declarationsState: {
+          declarations: [
             {
               event: 'birth',
               submissionStatus: SUBMISSION_STATUS.READY_TO_REGISTER,
-              action: Action.REGISTER_APPLICATION
+              action: Action.REGISTER_DECLARATION
             }
           ]
         },
@@ -258,29 +258,29 @@ describe('Submission Controller', () => {
     const mutationHandler = jest.fn().mockResolvedValue({
       data: { data: { markBirthAsValidated: {} } }
     })
-    subCon.client.setRequestHandler(REGISTER_BIRTH_APPLICATION, mutationHandler)
+    subCon.client.setRequestHandler(REGISTER_BIRTH_DECLARATION, mutationHandler)
 
     await subCon.sync()
 
     expect(mutationHandler).toHaveBeenCalledTimes(1)
     expect(store.dispatch).toHaveBeenCalledTimes(5)
     expect(
-      store.dispatch.mock.calls[0][0].payload.application.submissionStatus
+      store.dispatch.mock.calls[0][0].payload.declaration.submissionStatus
     ).toBe(SUBMISSION_STATUS.REGISTERED)
     expect(store.dispatch.mock.calls[4][0].type).toBe(
-      'APPLICATION/DELETE_DRAFT'
+      'DECLARATION/DELETE_DRAFT'
     )
   })
 
-  it('sync all ready to reject application and deletes rejected application', async () => {
+  it('sync all ready to reject declaration and deletes rejected declaration', async () => {
     const store = {
       getState: () => ({
-        applicationsState: {
-          applications: [
+        declarationsState: {
+          declarations: [
             {
               event: 'birth',
               submissionStatus: SUBMISSION_STATUS.READY_TO_REJECT,
-              action: Action.REJECT_APPLICATION
+              action: Action.REJECT_DECLARATION
             }
           ]
         },
@@ -303,29 +303,29 @@ describe('Submission Controller', () => {
     const mutationHandler = jest.fn().mockResolvedValue({
       data: { data: { markBirthAsValidated: {} } }
     })
-    subCon.client.setRequestHandler(REJECT_BIRTH_APPLICATION, mutationHandler)
+    subCon.client.setRequestHandler(REJECT_BIRTH_DECLARATION, mutationHandler)
 
     await subCon.sync()
 
     expect(mutationHandler).toHaveBeenCalledTimes(1)
     expect(store.dispatch).toHaveBeenCalledTimes(5)
     expect(
-      store.dispatch.mock.calls[0][0].payload.application.submissionStatus
+      store.dispatch.mock.calls[0][0].payload.declaration.submissionStatus
     ).toBe(SUBMISSION_STATUS.REJECTED)
     expect(store.dispatch.mock.calls[4][0].type).toBe(
-      'APPLICATION/DELETE_DRAFT'
+      'DECLARATION/DELETE_DRAFT'
     )
   })
 
-  it('fails a application that has a network error', async () => {
+  it('fails a declaration that has a network error', async () => {
     const store = {
       getState: () => ({
-        applicationsState: {
-          applications: [
+        declarationsState: {
+          declarations: [
             {
               event: 'birth',
               submissionStatus: SUBMISSION_STATUS.READY_TO_REJECT,
-              action: Action.REJECT_APPLICATION
+              action: Action.REJECT_DECLARATION
             }
           ]
         },
@@ -342,26 +342,26 @@ describe('Submission Controller', () => {
     const err = new ApolloError({ networkError: new Error('network boom') })
     subCon.client = createMockClient()
     const mutationHandler = jest.fn().mockImplementation(() => err)
-    subCon.client.setRequestHandler(REJECT_BIRTH_APPLICATION, mutationHandler)
+    subCon.client.setRequestHandler(REJECT_BIRTH_DECLARATION, mutationHandler)
 
     await subCon.sync()
 
     expect(mutationHandler).toHaveBeenCalledTimes(1)
     expect(store.dispatch).toHaveBeenCalledTimes(4)
     expect(
-      store.dispatch.mock.calls[0][0].payload.application.submissionStatus
+      store.dispatch.mock.calls[0][0].payload.declaration.submissionStatus
     ).toBe(SUBMISSION_STATUS.FAILED_NETWORK)
   })
 
-  it('fails a application that has an ordinary error', async () => {
+  it('fails a declaration that has an ordinary error', async () => {
     const store = {
       getState: () => ({
-        applicationsState: {
-          applications: [
+        declarationsState: {
+          declarations: [
             {
               event: 'birth',
               submissionStatus: SUBMISSION_STATUS.READY_TO_REJECT,
-              action: Action.REJECT_APPLICATION
+              action: Action.REJECT_DECLARATION
             }
           ]
         },
@@ -378,14 +378,14 @@ describe('Submission Controller', () => {
     const err = new Error('boom')
     subCon.client = createMockClient()
     const mutationHandler = jest.fn().mockResolvedValue(() => err)
-    subCon.client.setRequestHandler(REJECT_BIRTH_APPLICATION, mutationHandler)
+    subCon.client.setRequestHandler(REJECT_BIRTH_DECLARATION, mutationHandler)
 
     await subCon.sync()
 
     expect(mutationHandler).toHaveBeenCalledTimes(1)
     expect(store.dispatch).toHaveBeenCalledTimes(4)
     expect(
-      store.dispatch.mock.calls[0][0].payload.application.submissionStatus
+      store.dispatch.mock.calls[0][0].payload.declaration.submissionStatus
     ).toBe(SUBMISSION_STATUS.FAILED)
   })
 })

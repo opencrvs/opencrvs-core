@@ -15,14 +15,14 @@ import {
   RegisterForm
 } from '@client/views/RegisterForm/RegisterForm'
 import { IForm } from '@client/forms'
-import { IApplication } from '@client/applications'
+import { IDeclaration } from '@client/declarations'
 import { IStoreState } from '@client/store'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
 import { connect } from 'react-redux'
 import { getEventReviewForm } from '@client/forms/register/review-selectors'
 
 type IStateProps = {
-  application: IApplication
+  declaration: IDeclaration
   registerForm: IForm
   pageRoute: string
 }
@@ -36,22 +36,22 @@ function CorrectionReviewFormComponent(props: IProps) {
 function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
   const { match } = props
 
-  const { applicationId } = match.params
+  const { declarationId } = match.params
 
-  const application = state.applicationsState.applications.find(
-    (app) => app.id === applicationId
+  const declaration = state.declarationsState.declarations.find(
+    (app) => app.id === declarationId
   )
 
-  if (!application) {
-    throw new Error(`Application "${match.params.applicationId}" missing!`)
+  if (!declaration) {
+    throw new Error(`Declaration "${match.params.declarationId}" missing!`)
   }
 
-  const event = application.event
+  const event = declaration.event
 
   const reviewForm = getEventReviewForm(state, event)
 
   return {
-    application,
+    declaration,
     registerForm: reviewForm,
     pageRoute: CERTIFICATE_CORRECTION_REVIEW
   }

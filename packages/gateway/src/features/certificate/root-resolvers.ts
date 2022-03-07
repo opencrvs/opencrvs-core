@@ -11,7 +11,7 @@
  */
 import { GQLResolver } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
-import { APPLICATION_CONFIG_URL } from '@gateway/constants'
+import { DECLARATION_CONFIG_URL } from '@gateway/constants'
 import {
   ICertificateSVGPayload,
   IGetCertificatePayload
@@ -28,7 +28,7 @@ export const resolvers: GQLResolver = {
       if (event) {
         payload = { ...payload, event }
       }
-      const res = await fetch(`${APPLICATION_CONFIG_URL}getCertificate`, {
+      const res = await fetch(`${DECLARATION_CONFIG_URL}getCertificate`, {
         method: 'POST',
         body: JSON.stringify(payload),
         headers: {
@@ -40,7 +40,7 @@ export const resolvers: GQLResolver = {
     },
     async getActiveCertificatesSVG(_, {}, authHeader) {
       const res = await fetch(
-        `${APPLICATION_CONFIG_URL}getActiveCertificates`,
+        `${DECLARATION_CONFIG_URL}getActiveCertificates`,
         {
           method: 'GET',
           headers: {
@@ -74,7 +74,7 @@ export const resolvers: GQLResolver = {
       }
 
       const action = certificateSVGPayload.id ? 'update' : 'create'
-      const res = await fetch(`${APPLICATION_CONFIG_URL}${action}Certificate`, {
+      const res = await fetch(`${DECLARATION_CONFIG_URL}${action}Certificate`, {
         method: 'POST',
         body: JSON.stringify(certificateSVGPayload),
         headers: {

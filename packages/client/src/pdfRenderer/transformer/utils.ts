@@ -21,7 +21,7 @@ import {
   IFormSectionData,
   IFormFieldValue
 } from '@opencrvs/client/src/forms'
-import { IApplication } from '@client/applications'
+import { IDeclaration } from '@client/declarations'
 import { MessageDescriptor } from 'react-intl'
 
 const eventMessageDescriptor = {
@@ -36,7 +36,7 @@ const eventMessageDescriptor = {
     id: 'constants.death'
   }
 }
-export function getValueFromApplicationDataByKey(
+export function getValueFromDeclarationDataByKey(
   data: IFormData,
   valueKey: string
 ) {
@@ -70,15 +70,15 @@ export function getExecutorKeyValue(key: ExecutorKey) {
 
 export function getExecutorFieldValue(
   key: ExecutorKey | IEventWiseKey,
-  application: IApplication
+  declaration: IDeclaration
 ) {
   let value = null
   if (typeof key === 'string') {
     value = getExecutorKeyValue(key as ExecutorKey)
   } else {
-    value = getValueFromApplicationDataByKey(
-      application.data,
-      (key as IEventWiseKey)[application.event]
+    value = getValueFromDeclarationDataByKey(
+      declaration.data,
+      (key as IEventWiseKey)[declaration.event]
     )
   }
   return value
@@ -110,7 +110,7 @@ function getConditionalOperationEnumByValue(value: string | undefined) {
 
 export function getMatchedCondition(
   conditions: Condition[],
-  applicationData: IFormData
+  declarationData: IFormData
 ) {
   return conditions.find((conditionObj) => {
     try {
@@ -121,8 +121,8 @@ export function getMatchedCondition(
         getConditionalOperationEnumByValue(conditionObj.condition.operation),
         conditionObj.condition.values,
         // Will return empty string when value is not found for given key
-        getValueFromApplicationDataByKey(
-          applicationData,
+        getValueFromDeclarationDataByKey(
+          declarationData,
           conditionObj.condition.key || ''
         ) || ''
       )

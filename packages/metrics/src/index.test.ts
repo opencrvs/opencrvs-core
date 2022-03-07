@@ -18,7 +18,7 @@ jest.mock('./configApi', () => {
   return {
     __esModule: true,
     ...originalModule,
-    getApplicationConfig: () =>
+    getDeclarationConfig: () =>
       Promise.resolve({
         API_GATEWAY_URL: 'http://localhost:7070/',
         CONFIG_API_URL: 'http://localhost:2021',
@@ -31,7 +31,7 @@ jest.mock('./configApi', () => {
         CERTIFICATE_PRINT_HIGHEST_CHARGE: 0,
         UI_POLLING_INTERVAL: 5000,
         FIELD_AGENT_AUDIT_LOCATIONS: 'DISTRICT',
-        APPLICATION_AUDIT_LOCATIONS: 'DISTRICT',
+        DECLARATION_AUDIT_LOCATIONS: 'DISTRICT',
         INFORMANT_MINIMUM_AGE: 16,
         HIDE_EVENT_REGISTER_INFORMATION: false,
         EXTERNAL_VALIDATION_WORKQUEUE: false,

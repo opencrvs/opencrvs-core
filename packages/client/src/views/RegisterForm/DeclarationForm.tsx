@@ -19,7 +19,7 @@ import {
   DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
   DRAFT_DEATH_FORM_PAGE_GROUP
 } from '@opencrvs/client/src/navigation/routes'
-import { getRegisterForm } from '@opencrvs/client/src/forms/register/application-selectors'
+import { getRegisterForm } from '@opencrvs/client/src/forms/register/declaration-selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { connect } from 'react-redux'
 import { Event } from '@client/forms'
@@ -29,7 +29,7 @@ const pageRoute: { [key in Event]: string } = {
   death: DRAFT_DEATH_FORM_PAGE_GROUP
 }
 
-export class ApplicationFormView extends React.Component<
+export class DeclarationFormView extends React.Component<
   IFormProps & RouteProps
 > {
   render() {
@@ -39,15 +39,15 @@ export class ApplicationFormView extends React.Component<
 
 function mapStatetoProps(state: IStoreState, props: RouteProps) {
   const { match } = props
-  const application = state.applicationsState.applications.find(
-    ({ id }) => id === match.params.applicationId
+  const declaration = state.declarationsState.declarations.find(
+    ({ id }) => id === match.params.declarationId
   )
 
-  if (!application) {
-    throw new Error(`Draft "${match.params.applicationId}" missing!`)
+  if (!declaration) {
+    throw new Error(`Draft "${match.params.declarationId}" missing!`)
   }
 
-  const event = application.event
+  const event = declaration.event
 
   if (!event) {
     throw new Error(`Event is not specified in Draft`)
@@ -56,12 +56,12 @@ function mapStatetoProps(state: IStoreState, props: RouteProps) {
   const registerForm = getRegisterForm(state)[event]
 
   return {
-    application,
+    declaration,
     registerForm,
     pageRoute: pageRoute[event]
   }
 }
 
-export const ApplicationForm = connect<IFormProps, {}, RouteProps, IStoreState>(
+export const DeclarationForm = connect<IFormProps, {}, RouteProps, IStoreState>(
   mapStatetoProps
-)(ApplicationFormView)
+)(DeclarationFormView)

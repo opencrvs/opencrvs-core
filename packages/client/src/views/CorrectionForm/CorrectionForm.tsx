@@ -13,7 +13,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { RouteComponentProps } from 'react-router'
-import { IApplication, modifyApplication } from '@client/applications'
+import { IDeclaration, modifyDeclaration } from '@client/declarations'
 import {
   CorrectorForm,
   SupportingDocumentsForm
@@ -37,17 +37,17 @@ const SpinnerWrapper = styled.div`
 type IProps = IStateProps & IDispatchProps
 
 function CorrectionFormComponent({ sectionId, ...props }: IProps) {
-  const { application, modifyApplication } = props
+  const { declaration, modifyDeclaration } = props
   const logTime = React.useCallback(
     (timeMs: number) => {
-      const applicationUpdated = application
-      if (!applicationUpdated.timeLoggedMS) {
-        applicationUpdated.timeLoggedMS = 0
+      const declarationUpdated = declaration
+      if (!declarationUpdated.timeLoggedMS) {
+        declarationUpdated.timeLoggedMS = 0
       }
-      applicationUpdated.timeLoggedMS += timeMs
-      modifyApplication(applicationUpdated)
+      declarationUpdated.timeLoggedMS += timeMs
+      modifyDeclaration(declarationUpdated)
     },
-    [modifyApplication, application]
+    [modifyDeclaration, declaration]
   )
 
   if (props.isWritingDraft) {
@@ -80,34 +80,34 @@ function FormSection({ sectionId, ...props }: IProps) {
   }
 }
 function mapStateToProps(state: IStoreState, props: IRouteProps) {
-  const { applicationId, pageId: sectionId } = props.match.params
-  const application = state.applicationsState.applications.find(
-    ({ id }) => id === applicationId
+  const { declarationId, pageId: sectionId } = props.match.params
+  const declaration = state.declarationsState.declarations.find(
+    ({ id }) => id === declarationId
   )
 
-  if (!application) {
-    throw new Error(`Draft "${applicationId}" missing!`)
+  if (!declaration) {
+    throw new Error(`Draft "${declarationId}" missing!`)
   }
 
   return {
-    application,
+    declaration,
     sectionId,
-    isWritingDraft: state.applicationsState.isWritingDraft
+    isWritingDraft: state.declarationsState.isWritingDraft
   }
 }
 
 type IStateProps = {
-  application: IApplication
+  declaration: IDeclaration
   sectionId: string
   isWritingDraft: boolean
 }
 
 type IDispatchProps = {
-  modifyApplication: typeof modifyApplication
+  modifyDeclaration: typeof modifyDeclaration
 }
 
 type IRouteProps = RouteComponentProps<{
-  applicationId: string
+  declarationId: string
   pageId: string
 }>
 
@@ -116,4 +116,4 @@ export const CorrectionForm = connect<
   IDispatchProps,
   IRouteProps,
   IStoreState
->(mapStateToProps, { modifyApplication })(CorrectionFormComponent)
+>(mapStateToProps, { modifyDeclaration })(CorrectionFormComponent)

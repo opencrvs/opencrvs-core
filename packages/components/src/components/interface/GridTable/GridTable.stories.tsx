@@ -44,7 +44,7 @@ function reviewClicked() {
 
 const list = [
   {
-    date_of_application: '3 days ago',
+    date_of_declaration: '3 days ago',
     tracking_id: '1234567',
     date_of_event: '2017-12-10',
     event: 'birth',
@@ -56,7 +56,7 @@ const list = [
     ]
   },
   {
-    date_of_application: '5 days ago',
+    date_of_declaration: '5 days ago',
     tracking_id: '1234567',
     date_of_event: '2017-11-10',
     event: 'death',
@@ -68,7 +68,7 @@ const list = [
     ]
   },
   {
-    date_of_application: '23 days ago',
+    date_of_declaration: '23 days ago',
     tracking_id: '1234567',
     date_of_event: '2017-11-10',
     event: 'marriage',
@@ -80,7 +80,7 @@ const list = [
     ]
   },
   {
-    date_of_application: '12 days ago',
+    date_of_declaration: '12 days ago',
     tracking_id: '1234567',
     date_of_event: '2017-09-10',
     event: 'birth',
@@ -92,7 +92,7 @@ const list = [
     ]
   },
   {
-    date_of_application: '3 days ago',
+    date_of_declaration: '3 days ago',
     tracking_id: '1234567',
     date_of_event: '2017-10-10',
     event: 'birth',
@@ -104,7 +104,7 @@ const list = [
     ]
   },
   {
-    date_of_application: '18 days ago',
+    date_of_declaration: '18 days ago',
     tracking_id: '1234567',
     date_of_event: '2017-10-10',
     event: 'marriage',
@@ -116,7 +116,7 @@ const list = [
     ]
   },
   {
-    date_of_application: '23 days ago',
+    date_of_declaration: '23 days ago',
     tracking_id: '1234567',
     date_of_event: '2017-10-09',
     event: 'birth',
@@ -128,7 +128,7 @@ const list = [
     ]
   },
   {
-    date_of_application: '7 days ago',
+    date_of_declaration: '7 days ago',
     tracking_id: '1234567',
     date_of_event: '2017-10-08',
     event: 'birth',
@@ -140,7 +140,7 @@ const list = [
     ]
   },
   {
-    date_of_application: '9 days ago',
+    date_of_declaration: '9 days ago',
     tracking_id: '1234567',
     date_of_event: '2017-10-09',
     event: 'death',
@@ -152,7 +152,7 @@ const list = [
     ]
   },
   {
-    date_of_application: '11 days ago',
+    date_of_declaration: '11 days ago',
     tracking_id: '1234567',
     date_of_event: '2017-10-09',
     event: 'marriage',
@@ -164,7 +164,7 @@ const list = [
     ]
   },
   {
-    date_of_application: '3 days ago',
+    date_of_declaration: '3 days ago',
     tracking_id: '1234567',
     date_of_event: '2017-10-06',
     event: 'birth',
@@ -176,7 +176,7 @@ const list = [
     ]
   },
   {
-    date_of_application: '5 days ago',
+    date_of_declaration: '5 days ago',
     tracking_id: '1234567',
     date_of_event: '2017-10-09',
     event: 'birth',
@@ -188,7 +188,7 @@ const list = [
     ]
   },
   {
-    date_of_application: '3 days ago',
+    date_of_declaration: '3 days ago',
     tracking_id: '1234567',
     date_of_event: '2017-10-09',
     event: 'death',
@@ -200,7 +200,7 @@ const list = [
     ]
   },
   {
-    date_of_application: '7 days ago',
+    date_of_declaration: '7 days ago',
     tracking_id: '1234567',
     date_of_event: '2017-10-09',
     event: 'marriage',
@@ -212,7 +212,7 @@ const list = [
     ]
   },
   {
-    date_of_application: '9 days ago',
+    date_of_declaration: '9 days ago',
     tracking_id: '1234567',
     createdAt: '2017-10-09',
     event: 'birth',
@@ -237,9 +237,9 @@ const columns = [
     key: 'tracking_id'
   },
   {
-    label: 'Date of Application',
+    label: 'Date of Declaration',
     width: 23,
-    key: 'date_of_application'
+    key: 'date_of_declaration'
   },
   {
     label: 'Date of event',

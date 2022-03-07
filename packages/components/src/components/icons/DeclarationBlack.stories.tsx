@@ -11,13 +11,13 @@
  */
 import React from 'react'
 import { Meta, Story } from '@storybook/react'
-import { ApplicationIcon } from './ApplicationIcon'
+import { DeclarationBlack } from './DeclarationBlack'
 
 export default {
-  title: 'Components/icons/ApplicationIcon',
-  component: ApplicationIcon
+  title: 'Components/icons/DeclarationBlack',
+  component: DeclarationBlack
 } as Meta
 
-const Template: Story<{}> = () => <ApplicationIcon />
+const Template: Story<{}> = () => <DeclarationBlack />
 
-export const ApplicationIconView = Template.bind({})
+export const DeclarationBlackView = Template.bind({})

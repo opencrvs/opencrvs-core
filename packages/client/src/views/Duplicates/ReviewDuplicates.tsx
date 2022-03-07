@@ -64,7 +64,7 @@ import { goToHome } from '@client/navigation'
 import { Container } from '@opencrvs/components/lib/layout'
 
 interface IMatchParams {
-  applicationId: string
+  declarationId: string
 }
 
 const StyledSpinner = styled(Spinner)`
@@ -274,7 +274,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
 
       return {
         id: rec.id,
-        dateOfApplication: rec.createdAt,
+        dateOfDeclaration: rec.createdAt,
         trackingId: (rec.registration && rec.registration.trackingId) || '',
         event:
           (rec.registration &&
@@ -389,7 +389,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
   render() {
     const { intl } = this.props
     const match = this.props.match
-    const applicationId = match.params.applicationId
+    const declarationId = match.params.declarationId
 
     return (
       <Container>
@@ -401,7 +401,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
         <Query
           query={FETCH_DUPLICATES}
           variables={{
-            id: applicationId
+            id: declarationId
           }}
         >
           {({
@@ -438,7 +438,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
               window.location.assign(REGISTRAR_HOME)
             }
 
-            let duplicateIds = [applicationId]
+            let duplicateIds = [declarationId]
             if (data.fetchBirthRegistration.registration.duplicates) {
               duplicateIds = duplicateIds.concat(
                 data.fetchBirthRegistration.registration.duplicates
@@ -506,7 +506,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
                           <DuplicateDetails
                             id={`duplicate-details-item-${i}`}
                             key={i}
-                            duplicateContextId={applicationId}
+                            duplicateContextId={declarationId}
                             data={duplicateData}
                             notDuplicateHandler={() =>
                               this.toggleNotDuplicateModal(duplicateData.id)
@@ -568,7 +568,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
         <Mutation
           mutation={notADuplicateMutation}
           variables={{
-            id: applicationId,
+            id: declarationId,
             duplicateId: this.state.selectedCompositionID
           }}
           onCompleted={(data: any) => {

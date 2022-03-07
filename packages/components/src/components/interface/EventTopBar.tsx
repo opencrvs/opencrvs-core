@@ -12,7 +12,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { TertiaryButton, CircleButton } from '../buttons'
-import { ApplicationIcon, Cross, VerticalThreeDots } from '../icons'
+import { DeclarationIcon, Cross, VerticalThreeDots } from '../icons'
 import { ToggleMenu } from '.'
 
 const TopBar = styled.div`
@@ -70,7 +70,7 @@ export const EventTopBar = (props: IEventTopBarProps) => {
   return (
     <TopBar>
       <Item>
-        {pageIcon || <ApplicationIcon color={iconColor} />}{' '}
+        {pageIcon || <DeclarationIcon color={iconColor} />}{' '}
         <TopBarTitle>{title}</TopBarTitle>
       </Item>
       <Item>

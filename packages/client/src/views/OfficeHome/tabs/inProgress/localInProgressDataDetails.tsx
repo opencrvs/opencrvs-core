@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { StatusProgress } from '@opencrvs/components/lib/icons'
-import { IApplication, SUBMISSION_STATUS } from '@client/applications'
+import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import { messages } from '@client/i18n/messages/views/search'
 import { IStoreState } from '@client/store'
 import { CERTIFICATE_DATE_FORMAT } from '@client/utils/constants'
@@ -75,7 +75,7 @@ function LabelValue({ label, value }: { label: string; value: string }) {
 }
 
 type IProps = {
-  draft?: IApplicationWithContactPoint
+  draft?: IDeclarationWithContactPoint
 }
 
 type NestedFields = {
@@ -83,7 +83,7 @@ type NestedFields = {
   registrationPhone: string
 }
 
-type IApplicationWithContactPoint = IApplication & {
+type IDeclarationWithContactPoint = IDeclaration & {
   data: {
     registration: {
       contactPoint: {
@@ -95,7 +95,7 @@ type IApplicationWithContactPoint = IApplication & {
   }
 }
 
-function getInformant(draft: IApplicationWithContactPoint): string {
+function getInformant(draft: IDeclarationWithContactPoint): string {
   const contactPoint = draft.data.registration.contactPoint
   const informantType = contactPoint && contactPoint.value
 
@@ -108,7 +108,7 @@ function getInformant(draft: IApplicationWithContactPoint): string {
 class LocalInProgressDataDetailsComponent extends React.Component<
   IProps & IntlShapeProps
 > {
-  transformer = (draft?: IApplicationWithContactPoint) => {
+  transformer = (draft?: IDeclarationWithContactPoint) => {
     if (!draft) {
       return {}
     }
@@ -146,7 +146,7 @@ class LocalInProgressDataDetailsComponent extends React.Component<
             <ExpansionContentContainer>
               <LabelValue
                 label={intl.formatMessage(
-                  constantsMessages.applicationStartedOn
+                  constantsMessages.declarationStartedOn
                 )}
                 value={timestamp}
               />
@@ -168,14 +168,14 @@ function mapStateToProps(state: IStoreState, props: { eventId: string }) {
   const { eventId } = props
   return {
     draft:
-      (state.applicationsState.applications &&
+      (state.declarationsState.declarations &&
         eventId &&
-        (state.applicationsState.applications.find(
-          (application) =>
-            application.id === eventId &&
-            application.submissionStatus ===
+        (state.declarationsState.declarations.find(
+          (declaration) =>
+            declaration.id === eventId &&
+            declaration.submissionStatus ===
               SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-        ) as IApplicationWithContactPoint)) ||
+        ) as IDeclarationWithContactPoint)) ||
       undefined
   }
 }

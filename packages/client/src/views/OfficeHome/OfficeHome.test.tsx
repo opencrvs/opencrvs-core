@@ -10,11 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  createApplication,
-  storeApplication,
+  createDeclaration,
+  storeDeclaration,
   IUserData,
   updateRegistrarWorkqueueSuccessActionCreator
-} from '@client/applications'
+} from '@client/declarations'
 import { Event } from '@client/forms'
 import { checkAuth } from '@client/profile/profileActions'
 import { queries } from '@client/profile/queries'
@@ -40,7 +40,7 @@ const getItem = window.localStorage.getItem as jest.Mock
 const mockFetchUserDetails = jest.fn()
 const mockListSyncController = jest.fn()
 
-const application = {
+const declaration = {
   id: 'db097901-feba-4f71-a1ae-d3d46289d2d5',
   type: 'Birth',
   registration: {
@@ -86,7 +86,7 @@ const application = {
 }
 const currentUserData: IUserData = {
   userID: '123',
-  applications: [],
+  declarations: [],
   workqueue: {
     loading: false,
     error: false,
@@ -94,7 +94,7 @@ const currentUserData: IUserData = {
     data: {
       inProgressTab: {
         totalItems: 1,
-        results: [application]
+        results: [declaration]
       },
       notificationTab: { totalItems: 0, results: [] },
       reviewTab: { totalItems: 0, results: [] },
@@ -620,7 +620,7 @@ describe('OfficeHome related tests', () => {
 
       mockListSyncController.mockReturnValue({
         data: {
-          inProgressTab: { totalItems: 15, results: [application] },
+          inProgressTab: { totalItems: 15, results: [declaration] },
           notificationTab: { totalItems: 12, results: [] },
           reviewTab: { totalItems: 13, results: [] },
           rejectTab: { totalItems: 14, results: [] },
@@ -633,7 +633,7 @@ describe('OfficeHome related tests', () => {
     })
     it('shows loadmore in progress tab', async () => {
       for (let i = 0; i < 12; i++) {
-        await store.dispatch(storeApplication(createApplication(Event.BIRTH)))
+        await store.dispatch(storeDeclaration(createDeclaration(Event.BIRTH)))
       }
       const testComponent = await createTestComponent(
         <OfficeHome

@@ -71,7 +71,7 @@ export const getRoutes = () => {
             RouteScope.SYSADMIN
           ]
         },
-        description: 'Handles searching from applications'
+        description: 'Handles searching from declarations'
       }
     },
     {
@@ -81,7 +81,7 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         description:
-          'Handles indexing a new application and searching for duplicates or updating an existing application'
+          'Handles indexing a new declaration and searching for duplicates or updating an existing declaration'
       }
     },
     {
@@ -91,7 +91,7 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         description:
-          'Handles indexing a new application or updating an existing application'
+          'Handles indexing a new declaration or updating an existing declaration'
       }
     },
     {
@@ -100,7 +100,7 @@ export const getRoutes = () => {
       handler: deduplicateHandler,
       config: {
         tags: ['api'],
-        description: 'Marks the application as not a duplicate'
+        description: 'Marks the declaration as not a duplicate'
       }
     },
     {
@@ -136,7 +136,7 @@ export const getRoutes = () => {
         },
         validate: {
           payload: Joi.object({
-            applicationLocationHirarchyId: Joi.string().required(),
+            declarationLocationHirarchyId: Joi.string().required(),
             status: Joi.array().required()
           })
         },

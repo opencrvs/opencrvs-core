@@ -61,7 +61,7 @@ export interface ICertificateTemplateData {
   _id: string
 }
 
-export interface IApplicationConfig {
+export interface IDeclarationConfig {
   BACKGROUND_SYNC_BROADCAST_CHANNEL: string
   COUNTRY: string
   COUNTRY_LOGO_FILE: string
@@ -75,7 +75,7 @@ export interface IApplicationConfig {
   CERTIFICATE_PRINT_HIGHEST_CHARGE: number
   UI_POLLING_INTERVAL: number
   FIELD_AGENT_AUDIT_LOCATIONS: string
-  APPLICATION_AUDIT_LOCATIONS: string
+  DECLARATION_AUDIT_LOCATIONS: string
   INFORMANT_MINIMUM_AGE: number
   HIDE_EVENT_REGISTER_INFORMATION: boolean
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
@@ -87,13 +87,13 @@ export interface IApplicationConfig {
   NID_NUMBER_PATTERN: INIDNumberPattern
 }
 
-export interface IApplicationConfigResponse {
-  config: IApplicationConfig
+export interface IDeclarationConfigResponse {
+  config: IDeclarationConfig
   certificates: ICertificateTemplateData[]
   formConfig: IFormConfig
 }
 
-async function loadConfig(): Promise<IApplicationConfigResponse> {
+async function loadConfig(): Promise<IDeclarationConfigResponse> {
   const url = `${window.config.CONFIG_API_URL}/config`
 
   const res = await fetch(url, {
