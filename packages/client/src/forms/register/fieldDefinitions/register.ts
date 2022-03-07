@@ -11,29 +11,233 @@
  */
 import { RadioSize } from '@client/../../components/lib/forms'
 import {
-  IForm,
+  /* IForm, */
   IFormConfig,
-  InformantSection,
   BirthSection,
   REVIEW_OVERRIDE_POSITION,
   FLEX_DIRECTION,
-  ISerializedForm
+  ISerializedForm,
+  DeathSection,
+  IQuestionIdentifiers,
+  IQuestionConfig,
+  SerializedFormField,
+  ISerializedFormSection,
+  IFormSectionGroup
 } from '@client/forms/index'
 import { conditionals } from '@client/forms/utils'
 import { formMessageDescriptors } from '@client/i18n/messages'
-import { changeHirerchyMutationTransformer } from '../fieldMappings/birth/mutation/registration-mappings'
-import { changeHirerchyQueryTransformer } from '../fieldMappings/birth/query/registration-mappings'
+import { set } from 'lodash'
+import { get } from 'traverse'
 
 interface IDefaultRegisterForms {
   birth: ISerializedForm
   death: ISerializedForm
 }
 
-export function configureRegistrationForm(
+export function filterQuestionsByEventType(
   formConfig: IFormConfig,
+  event: string
+): IQuestionConfig[] {
+  const filteredQuestions: IQuestionConfig[] = []
+  formConfig.questionConfig.map((question) => {
+    if (question.fieldId.includes(event)) {
+      filteredQuestions.push(question)
+    }
+  })
+  return filteredQuestions
+}
+
+interface IDefaultField {
+  index: number
+  selectedSectionIndex: number
+  selectedGroupIndex: number
+  field: SerializedFormField
+}
+
+interface ISection {
+  index: number
+  section: ISerializedFormSection
+}
+
+type IGroups = (Omit<IFormSectionGroup, 'fields'> & {
+  fields: SerializedFormField[]
+})[]
+
+interface IGroup {
+  index: number
+  group: Omit<IFormSectionGroup, 'fields'> & {
+    fields: SerializedFormField[]
+  }
+}
+
+function getSection(sections: ISerializedFormSection[], id: string): ISection {
+  const selectedSection = sections.filter((section) => section.id === id)[0]
+  return {
+    section: selectedSection,
+    index: sections.indexOf(selectedSection)
+  }
+}
+
+function getGroup(groups: IGroups, id: string): IGroup {
+  const selectedGroup = groups.filter((group) => group.id === id)[0]
+  return {
+    group: selectedGroup,
+    index: groups.indexOf(selectedGroup)
+  }
+}
+
+function getQuestionsIdentifiersFromFieldId(
+  fieldId: string
+): IQuestionIdentifiers {
+  const splitIds = fieldId.split('.')
+  return {
+    event: splitIds[0],
+    sectionId: splitIds[1],
+    groupId: splitIds[2],
+    fieldName: splitIds[3]
+  }
+}
+
+function getDefaultField(
+  form: ISerializedForm,
+  fieldId: string
+): IDefaultField | undefined {
+  const questionIdentifiers = getQuestionsIdentifiersFromFieldId(fieldId)
+  const selectedSection = getSection(
+    form.sections,
+    questionIdentifiers.sectionId
+  )
+
+  const selectedGroup = getGroup(
+    selectedSection.section.groups,
+    questionIdentifiers.groupId
+  )
+
+  const selectedField = selectedGroup.group.fields.filter(
+    (field) => field.name === questionIdentifiers.fieldName
+  )[0]
+
+  if (!selectedField) {
+    return undefined
+  }
+
+  return {
+    index: selectedGroup.group.fields.indexOf(selectedField),
+    field: selectedField,
+    selectedGroupIndex: selectedGroup.index,
+    selectedSectionIndex: selectedSection.index
+  }
+}
+
+function createCustomField(question: IQuestionConfig): SerializedFormField {
+  // TODO: create custom field
+  return {
+    name: 'firstNamesEng',
+    previewGroup: 'childNameInEnglish',
+    type: 'TEXT',
+    label: {
+      defaultMessage: 'First name(s)',
+      description: 'Label for form field: Given names',
+      id: 'form.field.label.childFirstNamesEng'
+    },
+    maxLength: 32,
+    required: true,
+    initialValue: '',
+    validate: [
+      {
+        operation: 'englishOnlyNameFormat'
+      }
+    ],
+    mapping: {
+      mutation: {
+        operation: 'fieldToNameTransformer',
+        parameters: ['en', 'firstNames']
+      },
+      query: {
+        operation: 'nameToFieldTransformer',
+        parameters: ['en', 'firstNames']
+      }
+    }
+  }
+}
+
+export function configureRegistrationForm(
+  filteredQuestions: IQuestionConfig[],
   defaultEventForm: ISerializedForm
 ): ISerializedForm {
-  return registerForms
+  filteredQuestions.forEach((question) => {
+    const defaultField: IDefaultField | undefined = getDefaultField(
+      defaultEventForm,
+      question.fieldId
+    )
+
+    if (defaultField && !question.custom) {
+      // this is a customisation to a default field
+      // default fields can only be enabled or disabled
+      set(
+        defaultEventForm,
+        `sections[${defaultField.selectedSectionIndex}].groups[${defaultField.selectedGroupIndex}].fields[${defaultField.index}].enabled`,
+        question.enabled
+      )
+    } else if (!defaultField && question.custom) {
+      // this is a new custom field to be added
+      const customQuestionIdentifiers = getQuestionsIdentifiersFromFieldId(
+        question.fieldId
+      )
+      const activeSection = getSection(
+        defaultEventForm.sections,
+        customQuestionIdentifiers.sectionId
+      )
+      const activeGroup = getGroup(
+        activeSection.section.groups,
+        customQuestionIdentifiers.groupId
+      )
+
+      const newCustomField = createCustomField(question)
+
+      const unmodifiedSectionFields =
+        defaultEventForm.sections[activeSection.index].groups[activeGroup.index]
+          .fields
+
+      if (question.preceedingFieldId && question.preceedingFieldId === 'TOP') {
+        // position custom field at the top
+        set(
+          defaultEventForm,
+          `sections[${activeSection.index}].groups[${activeGroup.index}].fields`,
+          unmodifiedSectionFields.unshift(newCustomField)
+        )
+      } else if (question.preceedingFieldId) {
+        // position custom field after preeceding field
+        const verticallyPreceedingDefaultField: IDefaultField | undefined =
+          getDefaultField(defaultEventForm, question.preceedingFieldId)
+        if (verticallyPreceedingDefaultField) {
+          set(
+            defaultEventForm,
+            `sections[${activeSection.index}].groups[${activeGroup.index}].fields`,
+            unmodifiedSectionFields.splice(
+              verticallyPreceedingDefaultField?.index + 1,
+              0,
+              newCustomField
+            )
+          )
+        } else {
+          throw new Error(
+            `The preceedingFieldId is set incorrectly as the preeceding field cannot be found for this custom question.  This should not occur: fieldId: ${question.fieldId} preceedingFieldId: ${question.preceedingFieldId}`
+          )
+        }
+      } else {
+        throw new Error(
+          `The preceedingFieldId is undefined and also not set to TOP for a custom question.  This should not occur: ${question.fieldId}`
+        )
+      }
+    } else {
+      throw new Error(
+        `The config question is neither custom nor among the default questions.  This should not occur: ${question.fieldId}`
+      )
+    }
+  })
+
+  return defaultEventForm
 }
 
 export const registerForms: IDefaultRegisterForms = {
@@ -121,16 +325,9 @@ export const registerForms: IDefaultRegisterForms = {
                     {
                       name: 'otherRelationShip',
                       type: 'TEXT',
-                      label: {
-                        defaultMessage: 'Relationship to child',
-                        id: 'form.field.label.informantsRelationWithChild',
-                        description: 'Label for input Relationship to child'
-                      },
-                      placeholder: {
-                        defaultMessage: 'eg. Grandmother',
-                        description: 'Placeholder for example of relationship',
-                        id: 'form.field.label.relationshipPlaceHolder'
-                      },
+                      label: formMessageDescriptors.informantsRelationWithChild,
+                      placeholder:
+                        formMessageDescriptors.relationshipPlaceHolder,
                       required: true,
                       initialValue: '',
                       validate: [
@@ -3166,7 +3363,7 @@ export const registerForms: IDefaultRegisterForms = {
         }
       },
       {
-        id: 'primaryCaregiver',
+        id: BirthSection.Parent,
         hasDocumentSection: true,
         viewType: 'form',
         name: {
@@ -3344,7 +3541,7 @@ export const registerForms: IDefaultRegisterForms = {
                       'reasonsNotApplying',
                       'isDeceased',
                       'primaryCaregiverType',
-                      '',
+                      undefined,
                       ['deceased']
                     ]
                   }
@@ -3436,7 +3633,7 @@ export const registerForms: IDefaultRegisterForms = {
                       'reasonsNotApplying',
                       'isDeceased',
                       'primaryCaregiverType',
-                      '',
+                      undefined,
                       ['deceased']
                     ]
                   }
@@ -4079,8 +4276,7 @@ export const registerForms: IDefaultRegisterForms = {
                   },
                   {
                     operation: 'isValidParentsBirthDate',
-                    parameters: [5],
-                    dependencies: []
+                    parameters: [5]
                   }
                 ],
                 mapping: {
@@ -6369,7 +6565,7 @@ export const registerForms: IDefaultRegisterForms = {
         ]
       },
       {
-        id: 'father',
+        id: BirthSection.Father,
         viewType: 'form',
         replaceable: true,
         name: {
@@ -7638,7 +7834,7 @@ export const registerForms: IDefaultRegisterForms = {
         }
       },
       {
-        id: 'documents',
+        id: BirthSection.Documents,
         viewType: 'form',
         name: {
           defaultMessage: 'Documents',
@@ -7960,7 +8156,7 @@ export const registerForms: IDefaultRegisterForms = {
   death: {
     sections: [
       {
-        id: 'registration',
+        id: DeathSection.Registration,
         viewType: 'form',
         name: {
           defaultMessage: 'Registration',
@@ -8646,7 +8842,7 @@ export const registerForms: IDefaultRegisterForms = {
         }
       },
       {
-        id: 'deceased',
+        id: DeathSection.Deceased,
         viewType: 'form',
         name: {
           defaultMessage: 'Deceased',
@@ -9661,7 +9857,7 @@ export const registerForms: IDefaultRegisterForms = {
         ]
       },
       {
-        id: 'deathEvent',
+        id: DeathSection.Event,
         viewType: 'form',
         name: {
           defaultMessage: 'When did the death occur?',
@@ -10616,7 +10812,7 @@ export const registerForms: IDefaultRegisterForms = {
         }
       },
       {
-        id: 'causeOfDeath',
+        id: DeathSection.CauseOfDeath,
         viewType: 'form',
         name: {
           defaultMessage: 'What is the official cause of death?',
@@ -10736,7 +10932,7 @@ export const registerForms: IDefaultRegisterForms = {
         ]
       },
       {
-        id: 'informant',
+        id: DeathSection.Informants,
         viewType: 'form',
         name: {
           defaultMessage: 'Informant',
@@ -11982,7 +12178,7 @@ export const registerForms: IDefaultRegisterForms = {
         }
       },
       {
-        id: 'father',
+        id: DeathSection.Father,
         viewType: 'form',
         name: {
           defaultMessage: "What is the deceased's father name?",
@@ -12078,7 +12274,7 @@ export const registerForms: IDefaultRegisterForms = {
         ]
       },
       {
-        id: 'mother',
+        id: DeathSection.Mother,
         viewType: 'form',
         name: {
           defaultMessage: "What is the deceased's mother name?",
@@ -12174,7 +12370,7 @@ export const registerForms: IDefaultRegisterForms = {
         ]
       },
       {
-        id: 'spouse',
+        id: DeathSection.Spouse,
         viewType: 'form',
         title: {
           defaultMessage: "Spouse's details",
@@ -12337,7 +12533,7 @@ export const registerForms: IDefaultRegisterForms = {
         ]
       },
       {
-        id: 'documents',
+        id: DeathSection.DeathDocuments,
         viewType: 'form',
         name: {
           defaultMessage: 'Documents',

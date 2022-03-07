@@ -20,6 +20,7 @@ import * as offlineActions from '@client/offline/actions'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
 import {
   configureRegistrationForm,
+  filterQuestionsByEventType,
   registerForms
 } from '@client/forms/register/fieldDefinitions/register'
 import { messages } from '@client/i18n/messages/views/review'
@@ -56,11 +57,11 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
     case offlineActions.READY:
     case offlineActions.CONTENT_LOADED:
       const configuredBirthForm: ISerializedForm = configureRegistrationForm(
-        action.payload.formConfig,
+        filterQuestionsByEventType(action.payload.formConfig, 'birth'),
         registerForms.birth
       )
       const configuredDeathForm: ISerializedForm = configureRegistrationForm(
-        action.payload.formConfig,
+        filterQuestionsByEventType(action.payload.formConfig, 'death'),
         registerForms.death
       )
       const birth = deserializeForm(configuredBirthForm)

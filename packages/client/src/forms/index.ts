@@ -93,6 +93,13 @@ export enum QuestionConfigFieldType {
   SUBSECTION = 'SUBSECTION',
   PARAGRAPH = 'PARAGRAPH'
 }
+
+export interface IQuestionIdentifiers {
+  event: string
+  sectionId: string
+  groupId: string
+  fieldName: string
+}
 export interface IQuestionConfig {
   fieldId: string
   label?: MessageDescriptor
@@ -315,13 +322,6 @@ interface Operation<
   operation: Key
 }
 
-export type IFormFieldQueryMapDescriptor<
-  T extends keyof typeof queries = keyof typeof queries
-> = {
-  operation: T
-  parameters: FunctionParamsToDescriptor<Params<typeof queries[T]>>
-}
-
 export type IFormFieldMapping = {
   mutation?: IFormFieldMutationMapFunction
   query?: IFormFieldQueryMapFunction
@@ -411,6 +411,7 @@ export interface IFormFieldBase {
   prefix?: string
   postfix?: string
   disabled?: boolean
+  enabled?: boolean
   initialValue?: IFormFieldValue
   initialValueKey?: string
   extraValue?: IFormFieldValue
@@ -850,6 +851,7 @@ export enum DeathSection {
   Event = 'deathEvent',
   CauseOfDeath = 'causeOfDeath',
   Informants = 'informant',
+  Registration = 'registration',
   DeathDocuments = 'documents',
   Preview = 'preview',
   Father = 'father',

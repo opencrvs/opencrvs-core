@@ -29,12 +29,15 @@ export interface IMessageDescriptor {
 }
 
 export interface IQuestion {
+  // fieldId is in the format:
+  // event.sectionId.groupId.fieldName
   fieldId: string
   label?: IMessageDescriptor
   placeholder?: IMessageDescriptor
   maxLength?: number
   fieldName?: string
   fieldType?: FieldType
+  // must be the fieldId for the field vertically above this one in the form or the string "TOP"
   preceedingFieldId?: string
   required?: boolean
   enabled: boolean
