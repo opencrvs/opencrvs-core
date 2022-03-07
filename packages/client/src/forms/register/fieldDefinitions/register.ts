@@ -77,14 +77,6 @@ export const registerForms: IDefaultRegisterForms = {
                     label: formMessageDescriptors.brother
                   },
                   {
-                    value: 'SISTER',
-                    label: formMessageDescriptors.sister
-                  },
-                  {
-                    value: 'OTHER_FAMILY_MEMBER',
-                    label: formMessageDescriptors.otherFamilyMember
-                  },
-                  {
                     value: 'LEGAL_GUARDIAN',
                     label: formMessageDescriptors.legalGuardian
                   },

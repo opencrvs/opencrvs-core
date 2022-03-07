@@ -12,8 +12,8 @@
 import { AxiosError } from 'axios'
 import { RouterAction, push, goBack as back } from 'connected-react-router'
 import {
-  IDeclarationConfigResponse,
-  IDeclarationConfig,
+  IApplicationConfigResponse,
+  IApplicationConfig,
   IAuthenticateResponse,
   IAuthenticationData,
   ITokenResponse
@@ -51,16 +51,16 @@ export enum FORGOTTEN_ITEMS {
   PASSWORD = 'password'
 }
 
-export type DeclarationConfigAction = {
+export type ApplicationConfigAction = {
   type: typeof CONFIG_LOAD
 }
 
-export type DeclarationConfigLoaded = {
+export type ApplicationConfigLoaded = {
   type: typeof CONFIG_LOADED
-  payload: IDeclarationConfig
+  payload: IApplicationConfig
 }
 
-export type DeclarationConfigFailed = {
+export type ApplicationConfigFailed = {
   type: typeof CONFIG_LOAD_ERROR
   payload: Error
 }
@@ -120,9 +120,9 @@ export type GoToAppAction = {
 
 export type Action =
   | RouterAction
-  | DeclarationConfigAction
-  | DeclarationConfigLoaded
-  | DeclarationConfigFailed
+  | ApplicationConfigAction
+  | ApplicationConfigLoaded
+  | ApplicationConfigFailed
   | AuthenticationDataAction
   | AuthenticateResponseAction
   | AuthenticationFailedAction
@@ -135,20 +135,20 @@ export type Action =
   | GoToAppAction
   | AuthenticationFieldValidationAction
 
-export const declarationConfigLoadAction = (): DeclarationConfigAction => ({
+export const applicationConfigLoadAction = (): ApplicationConfigAction => ({
   type: CONFIG_LOAD
 })
 
-export const declarationConfigLoadedAction = (
-  response: IDeclarationConfigResponse
-): DeclarationConfigLoaded => ({
+export const applicationConfigLoadedAction = (
+  response: IApplicationConfigResponse
+): ApplicationConfigLoaded => ({
   type: CONFIG_LOADED,
   payload: response.config
 })
 
-export const declarationConfigFailedAction = (
+export const applicationConfigFailedAction = (
   error: Error
-): DeclarationConfigFailed => ({
+): ApplicationConfigFailed => ({
   type: CONFIG_LOAD_ERROR,
   payload: error
 })

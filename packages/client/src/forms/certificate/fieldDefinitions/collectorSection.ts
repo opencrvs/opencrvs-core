@@ -91,7 +91,7 @@ export const verifyIDOnBirthCertificateCollectorDefinition: IVerifyIDCertificate
       informant: {
         identifierTypeField: 'iDType',
         identifierOtherTypeField: 'iDTypeOther',
-        identifierField: 'applicantID',
+        identifierField: 'informantID',
         nameFields: {
           en: {
             firstNamesField: 'firstNamesEng',

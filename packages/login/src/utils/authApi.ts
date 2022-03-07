@@ -46,7 +46,7 @@ export interface ICertificateTemplateData {
   _id: string
 }
 
-export interface IDeclarationConfig {
+export interface IApplicationConfig {
   BACKGROUND_SYNC_BROADCAST_CHANNEL: string
   COUNTRY: string
   COUNTRY_LOGO_FILE: string
@@ -72,8 +72,8 @@ export interface IDeclarationConfig {
   NID_NUMBER_PATTERN: INIDNumberPattern
 }
 
-export interface IDeclarationConfigResponse {
-  config: IDeclarationConfig
+export interface IApplicationConfigResponse {
+  config: IApplicationConfig
   certificates: ICertificateTemplateData[]
   formConfig: any // using any because it is not used in login app.  No need to use type.
 }
@@ -129,8 +129,8 @@ function request<T>(options: AxiosRequestConfig) {
   return client(options).then(onSuccess).catch(onError)
 }
 
-const getDeclarationConfig = () => {
-  return request<IDeclarationConfigResponse>({
+const getApplicationConfig = () => {
+  return request<IApplicationConfigResponse>({
     url: resolve(window.config.CONFIG_API_URL, '/config'),
     method: 'GET'
   })
@@ -237,5 +237,5 @@ export const authApi = {
   verifySecurityAnswer,
   changePassword,
   sendUserName,
-  getDeclarationConfig
+  getApplicationConfig
 }

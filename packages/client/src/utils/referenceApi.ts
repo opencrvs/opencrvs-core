@@ -61,7 +61,7 @@ export interface ICertificateTemplateData {
   _id: string
 }
 
-export interface IDeclarationConfig {
+export interface IApplicationConfig {
   BACKGROUND_SYNC_BROADCAST_CHANNEL: string
   COUNTRY: string
   COUNTRY_LOGO_FILE: string
@@ -87,13 +87,13 @@ export interface IDeclarationConfig {
   NID_NUMBER_PATTERN: INIDNumberPattern
 }
 
-export interface IDeclarationConfigResponse {
-  config: IDeclarationConfig
+export interface IApplicationConfigResponse {
+  config: IApplicationConfig
   certificates: ICertificateTemplateData[]
   formConfig: IFormConfig
 }
 
-async function loadConfig(): Promise<IDeclarationConfigResponse> {
+async function loadConfig(): Promise<IApplicationConfigResponse> {
   const url = `${window.config.CONFIG_API_URL}/config`
 
   const res = await fetch(url, {

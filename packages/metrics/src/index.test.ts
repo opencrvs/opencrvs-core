@@ -18,7 +18,7 @@ jest.mock('./configApi', () => {
   return {
     __esModule: true,
     ...originalModule,
-    getDeclarationConfig: () =>
+    getApplicationConfig: () =>
       Promise.resolve({
         API_GATEWAY_URL: 'http://localhost:7070/',
         CONFIG_API_URL: 'http://localhost:2021',

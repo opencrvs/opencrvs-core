@@ -16,7 +16,7 @@ import {
   IFacilitiesDataResponse,
   IContentResponse,
   IAssetResponse,
-  IDeclarationConfigResponse
+  IApplicationConfigResponse
 } from '@client/utils/referenceApi'
 import { IUserDetails } from '@client/utils/userUtils'
 
@@ -86,20 +86,20 @@ export type AssetsFailedAction = {
   payload: Error
 }
 
-export const DECLARATION_CONFIG_LOAD = 'OFFLINE/DECLARATION_CONFIG_LOAD'
-export type DeclarationConfigLoadAction = {
-  type: typeof DECLARATION_CONFIG_LOAD
+export const APPLICATION_CONFIG_LOAD = 'OFFLINE/APPLICATION_CONFIG_LOAD'
+export type ApplicationConfigLoadAction = {
+  type: typeof APPLICATION_CONFIG_LOAD
 }
 
-export const DECLARATION_CONFIG_LOADED = 'OFFLINE/DECLARATION_CONFIG_LOADED'
-export type DeclarationConfigLoadedAction = {
-  type: typeof DECLARATION_CONFIG_LOADED
-  payload: IDeclarationConfigResponse
+export const APPLICATION_CONFIG_LOADED = 'OFFLINE/APPLICATION_CONFIG_LOADED'
+export type ApplicationConfigLoadedAction = {
+  type: typeof APPLICATION_CONFIG_LOADED
+  payload: IApplicationConfigResponse
 }
 
-export const DECLARATION_CONFIG_FAILED = 'OFFLINE/DECLARATION_CONFIG_FAILED'
-export type DeclarationConfigFailedAction = {
-  type: typeof DECLARATION_CONFIG_FAILED
+export const APPLICATION_CONFIG_FAILED = 'OFFLINE/APPLICATION_CONFIG_FAILED'
+export type ApplicationConfigFailedAction = {
+  type: typeof APPLICATION_CONFIG_FAILED
   payload: Error
 }
 
@@ -214,19 +214,19 @@ export const offlineDataUpdated = (state: IOfflineData) => ({
   payload: state
 })
 
-export const configLoad = (): DeclarationConfigLoadAction => ({
-  type: DECLARATION_CONFIG_LOAD
+export const configLoad = (): ApplicationConfigLoadAction => ({
+  type: APPLICATION_CONFIG_LOAD
 })
 
 export const configLoaded = (
-  payload: IDeclarationConfigResponse
-): DeclarationConfigLoadedAction => ({
-  type: DECLARATION_CONFIG_LOADED,
+  payload: IApplicationConfigResponse
+): ApplicationConfigLoadedAction => ({
+  type: APPLICATION_CONFIG_LOADED,
   payload: payload
 })
 
-export const configFailed = (error: Error): DeclarationConfigFailedAction => ({
-  type: DECLARATION_CONFIG_FAILED,
+export const configFailed = (error: Error): ApplicationConfigFailedAction => ({
+  type: APPLICATION_CONFIG_FAILED,
   payload: error
 })
 
@@ -250,9 +250,9 @@ export type Action =
   | contentLoadedAction
   | AssetsLoadedAction
   | AssetsFailedAction
-  | DeclarationConfigLoadAction
-  | DeclarationConfigLoadedAction
-  | DeclarationConfigFailedAction
+  | ApplicationConfigLoadAction
+  | ApplicationConfigLoadedAction
+  | ApplicationConfigFailedAction
   | IFilterLocationsAction
   | ReturnType<typeof offlineDataReady>
   | ReturnType<typeof offlineDataUpdated>

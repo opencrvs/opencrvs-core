@@ -28,7 +28,7 @@ interface INIDNumberPattern {
   num: string
 }
 
-export interface IDeclarationConfigurationModel extends Document {
+export interface IApplicationConfigurationModel extends Document {
   BACKGROUND_SYNC_BROADCAST_CHANNEL: string
   COUNTRY: string
   COUNTRY_LOGO_FILE: string
@@ -141,4 +141,4 @@ const systemSchema = new Schema({
   LOGROCKET: { type: String, required: false }
 })
 
-export default model<IDeclarationConfigurationModel>('Config', systemSchema)
+export default model<IApplicationConfigurationModel>('Config', systemSchema)
