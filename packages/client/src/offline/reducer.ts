@@ -85,17 +85,14 @@ export interface IOfflineData {
   templates: {
     receipt?: IPDFTemplate
     certificates: {
-      birth: IPDFTemplate
-      death: IPDFTemplate
+      birth: ISVGTemplate
+      death: ISVGTemplate
     }
   }
   assets: {
     logo: string
   }
-  certificateSvg: {
-    birth: string
-    death: string
-  }
+
   config: IApplicationConfig
 }
 
@@ -305,9 +302,15 @@ function reducer(
       const newOfflineData = {
         ...state.offlineData,
         config: action.payload.config,
-        certificateSvg: {
-          birth: certificatesTemplates.birth.svgCode,
-          death: certificatesTemplates.death.svgCode
+        templates: {
+          certificates: {
+            birth: {
+              definition: certificatesTemplates.birth.svgCode
+            },
+            death: {
+              definition: certificatesTemplates.death.svgCode
+            }
+          }
         }
       }
 
@@ -342,8 +345,7 @@ function reducer(
         offlineData: {
           ...state.offlineData,
           languages: action.payload.languages,
-          forms: defaultFormsConfig as IForm,
-          templates: action.payload.templates
+          forms: defaultFormsConfig as IForm
         }
       }
     }

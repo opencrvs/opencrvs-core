@@ -20,6 +20,7 @@ import {
   IPDFTemplate
 } from '@client/pdfRenderer/transformer/types'
 import { Content, PageSize } from 'pdfmake/interfaces'
+import { certificateTemplates } from '@client/templates/register'
 
 export function printMoneyReceipt(
   intl: IntlShape,
@@ -93,20 +94,20 @@ function getPDFTemplateWithSVG(
   event: Event,
   pageSize: PageSize
 ): IPDFTemplate {
-  let template: IPDFTemplate
-  let svg: string
+  let svgCode: string
+  let pdfTemplate: IPDFTemplate
 
   if (event === Event.BIRTH) {
-    template = offlineResource.templates.certificates.birth
-    svg = offlineResource.certificateSvg.birth
+    svgCode = offlineResource.templates.certificates.birth.definition
+    pdfTemplate = certificateTemplates.birth
   } else {
-    template = offlineResource.templates.certificates.death
-    svg = offlineResource.certificateSvg.death
+    svgCode = offlineResource.templates.certificates.death.definition
+    pdfTemplate = certificateTemplates.death
   }
 
-  template.definition.pageSize = pageSize
-  updatePDFTemplateWithSVGContent(template, svg, pageSize)
-  return template
+  pdfTemplate.definition.pageSize = pageSize
+  updatePDFTemplateWithSVGContent(pdfTemplate, svgCode, pageSize)
+  return pdfTemplate
 }
 
 function updatePDFTemplateWithSVGContent(

@@ -34,12 +34,10 @@ export function isOfflineDataLoaded(
     state.languages &&
     state.assets &&
     state.templates &&
-    state.config &&
-    state.certificateSvg
+    state.config
 
   const isOfflineDataLoaded = Boolean(hasAllRequiredData)
-  if (isOfflineDataLoaded)
-    merge(window.config, state.config, state.certificateSvg)
+  if (isOfflineDataLoaded) merge(window.config, state.config)
   return isOfflineDataLoaded
 }
 
