@@ -29,34 +29,6 @@ services:
     image: docker.elastic.co/kibana/kibana:7.17.0
     restart: unless-stopped
 
-  setup-kibana-alerts:
-    image: node:17.6.0-alpine
-    command: node /usr/app/setup-alerts.js
-    restart: on-failure
-    depends_on:
-      - kibana
-    environment:
-      - KIBANA_HOST=kibana
-      - KIBANA_PORT=5601
-  elastalert:
-    image: jertel/elastalert2:2.3.0
-    restart: unless-stopped
-
-  metricbeat:
-    image: docker.elastic.co/beats/metricbeat:7.17.0
-    restart: unless-stopped
-    hostname: 'metricbeat'
-    user: root
-    volumes:
-      - /proc:/hostfs/proc:ro
-      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
-      - /:/hostfs:ro
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      - KIBANA_HOST=kibana:5601
-      - ELASTICSEARCH_HOST=elasticsearch:9200
-    command: ['--strict.perms=false', '-system.hostfs=/hostfs']
-
   influxdb:
     image: influxdb:1.7.9
     restart: unless-stopped
