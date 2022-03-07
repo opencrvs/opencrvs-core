@@ -62,7 +62,7 @@ const Field = styled.div`
   }
 `
 const HalfWidthInput = styled(TextInput)`
-  width: 271px;
+  width: 300px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     width: 100%;
   }
