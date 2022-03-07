@@ -39,11 +39,11 @@ export const initialState: LoginState = {
 }
 
 const CONFIG_CMD = Cmd.run<
-  actions.DeclarationConfigFailed,
-  actions.DeclarationConfigLoaded
->(authApi.getDeclarationConfig, {
-  successActionCreator: actions.declarationConfigLoadedAction,
-  failActionCreator: actions.declarationConfigFailedAction
+  actions.ApplicationConfigFailed,
+  actions.ApplicationConfigLoaded
+>(authApi.getApplicationConfig, {
+  successActionCreator: actions.applicationConfigLoadedAction,
+  failActionCreator: actions.applicationConfigFailedAction
 })
 const RETRY_TIMEOUT = 5000
 function delay(cmd: RunCmd<any>, time: number) {

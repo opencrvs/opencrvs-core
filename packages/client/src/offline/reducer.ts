@@ -22,7 +22,7 @@ import * as actions from '@client/offline/actions'
 import * as profileActions from '@client/profile/profileActions'
 import { storage } from '@client/storage'
 import {
-  IDeclarationConfig,
+  IApplicationConfig,
   referenceApi,
   ICertificateTemplateData
 } from '@client/utils/referenceApi'
@@ -92,7 +92,7 @@ export interface IOfflineData {
   assets: {
     logo: string
   }
-  config: IDeclarationConfig
+  config: IApplicationConfig
 }
 
 export type IOfflineDataState = {
@@ -278,10 +278,10 @@ function reducer(
     /*
      * Configurations
      */
-    case actions.DECLARATION_CONFIG_LOAD: {
+    case actions.APPLICATION_CONFIG_LOAD: {
       return loop(state, CONFIG_CMD)
     }
-    case actions.DECLARATION_CONFIG_LOADED: {
+    case actions.APPLICATION_CONFIG_LOADED: {
       _.merge(window.config, action.payload.config)
       const birthCertificateTemplate = _.find(action.payload.certificates, {
         event: 'birth',
@@ -320,7 +320,7 @@ function reducer(
       }
     }
 
-    case actions.DECLARATION_CONFIG_FAILED: {
+    case actions.APPLICATION_CONFIG_FAILED: {
       return loop(
         {
           ...state,

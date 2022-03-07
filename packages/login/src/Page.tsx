@@ -12,18 +12,18 @@
 import * as React from 'react'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { connect } from 'react-redux'
-import { declarationConfigLoadAction } from './login/actions'
+import { applicationConfigLoadAction } from './login/actions'
 import { IStoreState } from './store'
 
 interface IDispatchProps {
-  getDeclarationConfig: () => void
+  getApplicationConfig: () => void
 }
 
 class Component extends React.Component<
   RouteComponentProps<{}> & IDispatchProps
 > {
   componentDidMount() {
-    this.props.getDeclarationConfig()
+    this.props.getApplicationConfig()
   }
   render() {
     const { children } = this.props
@@ -32,7 +32,7 @@ class Component extends React.Component<
 }
 
 const mapDispatchToProps = {
-  getDeclarationConfig: declarationConfigLoadAction
+  getApplicationConfig: applicationConfigLoadAction
 }
 export const Page = withRouter(
   connect<{}, IDispatchProps, {}, IStoreState>(

@@ -27,7 +27,7 @@ import {
 } from '@metrics/features/metrics/constants'
 import { IAuthHeader } from '@metrics/features/registration'
 import { fetchLocation, fetchFromResource, fetchFHIR } from '@metrics/api'
-import { getDeclarationConfig } from '@metrics/configApi'
+import { getApplicationConfig } from '@metrics/configApi'
 export const YEARLY_INTERVAL = '365d'
 export const MONTHLY_INTERVAL = '30d'
 export const WEEKLY_INTERVAL = '7d'
@@ -399,10 +399,10 @@ export function getMonthRangeFilterListFromTimeRage(
 }
 
 export async function getRegistrationTargetDays(event: string) {
-  const declarationConfig = await getDeclarationConfig()
+  const applicationConfig = await getApplicationConfig()
   const targetDays =
     event === EVENT_TYPE.BIRTH
-      ? declarationConfig.BIRTH_REGISTRATION_TARGET
-      : declarationConfig.DEATH_REGISTRATION_TARGET
+      ? applicationConfig.BIRTH_REGISTRATION_TARGET
+      : applicationConfig.DEATH_REGISTRATION_TARGET
   return targetDays
 }

@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { createServer } from '@config/index'
-import DeclarationConfig, {
-  IDeclarationConfigurationModel
+import ApplicationConfig, {
+  IApplicationConfigurationModel
 } from '@config/models/config'
 import * as fetchMock from 'jest-fetch-mock'
 import mockingoose from 'mockingoose'
@@ -41,9 +41,9 @@ let mockConfig = {
   EXTERNAL_VALIDATION_WORKQUEUE: true, // this flag will decide whether to show external validation workqueue on registrar home
   SENTRY: 'https://2ed906a0ba1c4de2ae3f3f898ec9df0b@sentry.io/1774551',
   LOGROCKET: 'opencrvs-foundation/opencrvs-bangladesh'
-} as unknown as IDeclarationConfigurationModel
+} as unknown as IApplicationConfigurationModel
 
-describe('declarationHandler', () => {
+describe('applicationHandler', () => {
   let server: any
 
   beforeEach(async () => {
@@ -53,7 +53,7 @@ describe('declarationHandler', () => {
   })
 
   it('get declaration config using mongoose', async () => {
-    mockingoose(DeclarationConfig).toReturn(mockConfig, 'findOne')
+    mockingoose(ApplicationConfig).toReturn(mockConfig, 'findOne')
 
     const res = await server.server.inject({
       method: 'GET',
