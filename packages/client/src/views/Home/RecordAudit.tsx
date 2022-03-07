@@ -63,7 +63,8 @@ import { IOfflineData } from '@client/offline/reducer'
 import {
   ResponsiveModal,
   Loader,
-  ISearchLocation
+  ISearchLocation,
+  ListTable
 } from '@opencrvs/components/lib/interface'
 import { getScope } from '@client/profile/profileSelectors'
 import { Scope } from '@client/utils/authUtils'
@@ -923,16 +924,39 @@ const ActionDetailsModal = (
       width={1024}
       autoHeight={true}
     >
-      <div>
-        <CLinkButton
-          onClick={() => {
-            goToUser && goToUser(actionDetailsData.user.id)
-          }}
-        >
-          {userName}
-        </CLinkButton>
-        <span> — {getFormattedDate(actionDetailsData.date)}</span>
-      </div>
+      <>
+        <div>
+          <CLinkButton
+            onClick={() => {
+              goToUser && goToUser(actionDetailsData.user.id)
+            }}
+          >
+            {userName}
+          </CLinkButton>
+          <span> — {getFormattedDate(actionDetailsData.date)}</span>
+        </div>
+        <ListTable
+          noResultText="None"
+          hideBoxShadow={true}
+          columns={[
+            {
+              isSortable: false,
+              key: 'name',
+              label: 'Name',
+              sortFunction: () => {},
+              width: 100
+            }
+          ]}
+          content={[
+            {
+              name: 'Euan',
+              role: 'Registrar',
+              status: 'Active',
+              type: 'Chairman'
+            }
+          ]}
+        ></ListTable>
+      </>
     </ResponsiveModal>
   )
 }

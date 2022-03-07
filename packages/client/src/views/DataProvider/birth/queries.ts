@@ -204,6 +204,28 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
             type
           }
         }
+        comments {
+          user {
+            id
+            username
+            avatar {
+              data
+              type
+            }
+          }
+          comment
+          createdAt
+        }
+        input {
+          valueCode
+          valueId
+          valueString
+        }
+        output {
+          valueCode
+          valueId
+          valueString
+        }
       }
     }
   }
@@ -404,6 +426,28 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
             data
             type
           }
+        }
+        comments {
+          user {
+            id
+            username
+            avatar {
+              data
+              type
+            }
+          }
+          comment
+          createdAt
+        }
+        input {
+          valueCode
+          valueId
+          valueString
+        }
+        output {
+          valueCode
+          valueId
+          valueString
         }
       }
     }

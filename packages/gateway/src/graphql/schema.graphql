@@ -583,6 +583,9 @@ type History {
   action: RegStatus
   location: Location
   office: Location
+  comments: [Comment]
+  input: [InputOutput]
+  output: [InputOutput]
 }
 
 enum MannerOfDeath {
@@ -957,6 +960,19 @@ enum ParentDetailsType {
   NONE
 }
 
+type Comment {
+  id: ID!
+  user: User
+  comment: String
+  createdAt: Date
+}
+
+type InputOutput {
+  valueCode: String
+  valueId: String
+  valueString: String
+}
+
 enum IdentityIDType {
   PASSPORT
   NATIONAL_ID
@@ -1235,13 +1251,6 @@ input ReasonsNotApplyingInput {
   primaryCaregiverType: PrimaryCaregiverType
   reasonNotApplying: String
   isDeceased: Boolean
-}
-
-type Comment {
-  id: ID!
-  user: User
-  comment: String
-  createdAt: Date
 }
 
 type Payment {

@@ -804,7 +804,10 @@ export const typeResolvers: GQLResolver = {
         `/${taskLocation.valueReference.reference}`,
         authHeader
       )
-    }
+    },
+    comments: (task) => task.note || [],
+    input: (task) => task.input || [],
+    output: (task) => task.output || []
   },
 
   DeathRegistration: {
@@ -1046,8 +1049,15 @@ export const typeResolvers: GQLResolver = {
       return encounterParticipant
     },
     async history(composition: ITemplatedComposition, _, authHeader) {
+      const task = await fetchFHIR(
+        `/Task/?focus=Composition/${composition.id}`,
+        authHeader
+      )
+
+      const taskId = task.entry[0].resource.id
+
       const taskHistory = await fetchFHIR(
-        `/Task/_history?focus=Composition/${composition.id}&_count=100`,
+        `/Task/${taskId}/_history?_count=100`,
         authHeader
       )
 

@@ -475,6 +475,9 @@ export interface GQLHistory {
   action?: GQLRegStatus
   location?: GQLLocation
   office?: GQLLocation
+  comments?: Array<GQLComment | null>
+  input?: Array<GQLInputOutput | null>
+  output?: Array<GQLInputOutput | null>
 }
 
 export const enum GQLMannerOfDeath {
@@ -860,6 +863,19 @@ export const enum GQLParentDetailsType {
   NONE = 'NONE'
 }
 
+export interface GQLComment {
+  id: string
+  user?: GQLUser
+  comment?: string
+  createdAt?: GQLDate
+}
+
+export interface GQLInputOutput {
+  valueCode?: string
+  valueId?: string
+  valueString?: string
+}
+
 export const enum GQLIdentityIDType {
   PASSPORT = 'PASSPORT',
   NATIONAL_ID = 'NATIONAL_ID',
@@ -1140,13 +1156,6 @@ export interface GQLReasonsNotApplyingInput {
   isDeceased?: boolean
 }
 
-export interface GQLComment {
-  id: string
-  user?: GQLUser
-  comment?: string
-  createdAt?: GQLDate
-}
-
 export interface GQLPayment {
   paymentId?: string
   type?: GQLPaymentType
@@ -1275,6 +1284,8 @@ export interface GQLResolver {
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
   ReasonsNotApplying?: GQLReasonsNotApplyingTypeResolver
+  Comment?: GQLCommentTypeResolver
+  InputOutput?: GQLInputOutputTypeResolver
   GenderBasisDetailsMetrics?: GQLGenderBasisDetailsMetricsTypeResolver
   GenderBasisTotalCount?: GQLGenderBasisTotalCountTypeResolver
   TimeFrameDetailMetrics?: GQLTimeFrameDetailMetricsTypeResolver
@@ -1288,7 +1299,6 @@ export interface GQLResolver {
   BirthEventSearchSet?: GQLBirthEventSearchSetTypeResolver
   DeathEventSearchSet?: GQLDeathEventSearchSetTypeResolver
   EventProgressData?: GQLEventProgressDataTypeResolver
-  Comment?: GQLCommentTypeResolver
   Payment?: GQLPaymentTypeResolver
 }
 export interface GQLQueryTypeResolver<TParent = any> {
@@ -3541,6 +3551,9 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   action?: HistoryToActionResolver<TParent>
   location?: HistoryToLocationResolver<TParent>
   office?: HistoryToOfficeResolver<TParent>
+  comments?: HistoryToCommentsResolver<TParent>
+  input?: HistoryToInputResolver<TParent>
+  output?: HistoryToOutputResolver<TParent>
 }
 
 export interface HistoryToUserResolver<TParent = any, TResult = any> {
@@ -3560,6 +3573,18 @@ export interface HistoryToLocationResolver<TParent = any, TResult = any> {
 }
 
 export interface HistoryToOfficeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToCommentsResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToInputResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToOutputResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -4435,6 +4460,50 @@ export interface ReasonsNotApplyingToIsDeceasedResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLCommentTypeResolver<TParent = any> {
+  id?: CommentToIdResolver<TParent>
+  user?: CommentToUserResolver<TParent>
+  comment?: CommentToCommentResolver<TParent>
+  createdAt?: CommentToCreatedAtResolver<TParent>
+}
+
+export interface CommentToIdResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface CommentToUserResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface CommentToCommentResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface CommentToCreatedAtResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLInputOutputTypeResolver<TParent = any> {
+  valueCode?: InputOutputToValueCodeResolver<TParent>
+  valueId?: InputOutputToValueIdResolver<TParent>
+  valueString?: InputOutputToValueStringResolver<TParent>
+}
+
+export interface InputOutputToValueCodeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface InputOutputToValueIdResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface InputOutputToValueStringResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLGenderBasisDetailsMetricsTypeResolver<TParent = any> {
   location?: GenderBasisDetailsMetricsToLocationResolver<TParent>
   maleUnder18?: GenderBasisDetailsMetricsToMaleUnder18Resolver<TParent>
@@ -5067,29 +5136,6 @@ export interface EventProgressDataToTimeInReadyToPrintResolver<
   TParent = any,
   TResult = any
 > {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLCommentTypeResolver<TParent = any> {
-  id?: CommentToIdResolver<TParent>
-  user?: CommentToUserResolver<TParent>
-  comment?: CommentToCommentResolver<TParent>
-  createdAt?: CommentToCreatedAtResolver<TParent>
-}
-
-export interface CommentToIdResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface CommentToUserResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface CommentToCommentResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface CommentToCreatedAtResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
