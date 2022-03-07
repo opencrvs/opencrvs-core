@@ -101,7 +101,7 @@ interface IState {
   isFocused?: boolean
 }
 interface IProps {
-  locationList: ISearchLocation[]
+  locationList?: ISearchLocation[]
   selectedLocation?: ISearchLocation | undefined
   searchHandler?: (location: ISearchLocation) => void
   searchButtonHandler?: () => void
@@ -139,7 +139,7 @@ export class LocationSearch extends React.Component<IProps, IState> {
 
   search = (searchText: string) => {
     const searchResult = [] as ISearchLocation[]
-    if (searchText.length > 0) {
+    if (searchText.length > 0 && this.props.locationList) {
       for (const location of this.props.locationList) {
         if (searchResult.length === 10) {
           break

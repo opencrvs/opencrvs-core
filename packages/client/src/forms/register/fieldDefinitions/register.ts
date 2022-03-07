@@ -16,169 +16,81 @@ import {
   InformantSection,
   BirthSection,
   REVIEW_OVERRIDE_POSITION,
-  FLEX_DIRECTION
+  FLEX_DIRECTION,
+  ISerializedForm
 } from '@client/forms/index'
+import { conditionals } from '@client/forms/utils'
 import { formMessageDescriptors } from '@client/i18n/messages'
+import { changeHirerchyMutationTransformer } from '../fieldMappings/birth/mutation/registration-mappings'
+import { changeHirerchyQueryTransformer } from '../fieldMappings/birth/query/registration-mappings'
 
 interface IDefaultRegisterForms {
-  birth: IForm
-  death: IForm
+  birth: ISerializedForm
+  death: ISerializedForm
 }
 
 export function configureRegistrationForm(
   formConfig: IFormConfig,
-  defaultEventForm: IForm
-): IForm {}
+  defaultEventForm: ISerializedForm
+): ISerializedForm {
+  return registerForms
+}
 
 export const registerForms: IDefaultRegisterForms = {
   birth: {
     sections: [
       {
-        id: 'registration',
+        id: BirthSection.Registration,
         viewType: 'form',
-        name: {
-          defaultMessage: 'Registration',
-          description: 'Form section name for Registration',
-          id: 'form.section.declaration.name'
-        },
-        title: {
-          defaultMessage: 'Declaration Details',
-          description: 'Form section title for Registration',
-          id: 'form.section.declaration.title'
-        },
+        name: formMessageDescriptors.registrationName,
+        title: formMessageDescriptors.registrationTitle,
         groups: [
           {
             id: 'informant-relation',
-            title: {
-              defaultMessage: 'Who is the informant?',
-              description: 'Form section title for contact point',
-              id: 'register.selectInformant.relation'
-            },
-            conditionals: [
-              {
-                action: 'hide',
-                expression:
-                  '(!draftData || !draftData.registration || draftData.registration.presentAtBirthRegistration !== "OTHER" || draftData.registration.presentAtBirthRegistration === "BOTH_PARENTS" )'
-              }
-            ],
+            title: formMessageDescriptors.informantRelation,
+            conditionals: [conditionals.presentAtBirthRegistration],
             preventContinueIfError: true,
             showExitButtonOnly: true,
             fields: [
               {
                 name: 'informant',
                 type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
-                label: {
-                  defaultMessage: 'Who is the informant?',
-                  description: 'Form section title for contact point',
-                  id: 'register.selectInformant.relation'
-                },
+                label: formMessageDescriptors.informantRelation,
                 required: true,
                 readonly: true,
                 hideHeader: true,
                 initialValue: '',
                 validate: [],
-                size: 'large',
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                size: RadioSize.LARGE,
+                placeholder: formMessageDescriptors.select,
                 options: [
                   {
                     value: 'GRANDFATHER',
-                    label: {
-                      defaultMessage: 'Grandfather',
-                      description: 'Option for form field: Grandfather',
-                      id: 'form.field.label.relationGrandfather'
-                    }
+                    label: formMessageDescriptors.grandfather
                   },
                   {
                     value: 'GRANDMOTHER',
-                    label: {
-                      defaultMessage: 'Grandmother',
-                      description: 'Option for form field: Grandmother',
-                      id: 'form.field.label.relationGrandmother'
-                    }
+                    label: formMessageDescriptors.grandmother
                   },
                   {
                     value: 'BROTHER',
-                    label: {
-                      defaultMessage: 'Brother',
-                      description: 'Option for form field: Brother',
-                      id: 'form.field.label.relationBrother'
-                    }
+                    label: formMessageDescriptors.brother
                   },
                   {
                     value: 'SISTER',
-                    label: {
-                      defaultMessage: 'Sister',
-                      description: 'Option for form field: Sister',
-                      id: 'form.field.label.relationSister'
-                    }
+                    label: formMessageDescriptors.sister
                   },
                   {
                     value: 'OTHER_FAMILY_MEMBER',
-                    label: {
-                      defaultMessage: 'Other family member',
-                      description: 'Option for form field: Other family member',
-                      id: 'form.field.label.relationOtherFamilyMember'
-                    }
+                    label: formMessageDescriptors.otherFamilyMember
                   },
                   {
                     value: 'LEGAL_GUARDIAN',
-                    label: {
-                      defaultMessage: 'Legal guardian',
-                      description: 'Option for form field: Legal guardian',
-                      id: 'register.selectinformant.legalGuardian'
-                    }
-                  },
-                  {
-                    value: 'INSTITUTION_HEAD_PLACE_OF_BIRTH',
-                    label: {
-                      defaultMessage:
-                        'Head of the institution where the birth occurred',
-                      description:
-                        'Option for form field: Head of the institution where the birth occurred',
-                      id: 'form.field.label.relInstHeadPlaceOfBirth'
-                    }
-                  },
-                  {
-                    value: 'HOUSE_OWNER',
-                    label: {
-                      defaultMessage:
-                        'Owner of the house or building where the birth occurred',
-                      description:
-                        'Option for form field: Owner of the house or building where the birth occurred',
-                      id: 'form.field.label.relationHouseOwner'
-                    }
-                  },
-                  {
-                    value: 'OPERATOR',
-                    label: {
-                      defaultMessage:
-                        'Driver or operator of the land or water vehicle or aircraft where the birth occurred',
-                      description:
-                        'Option for form field: Driver or operator of the land or water vehicle or aircraft where the birth occurred',
-                      id: 'form.field.label.relationOperator'
-                    }
-                  },
-                  {
-                    value: 'OFFICE_IN_CHARGE',
-                    label: {
-                      defaultMessage:
-                        'Officer-in-charge of the Thana of a road or public space where the birth occurred',
-                      description:
-                        'Option for form field: Officer-in-charge of the Thana of a road or public space where the birth occurred',
-                      id: 'form.field.label.relationOfficeInCharge'
-                    }
+                    label: formMessageDescriptors.legalGuardian
                   },
                   {
                     value: 'OTHER',
-                    label: {
-                      defaultMessage: 'Someone else',
-                      description: 'Option for form field: Someone else',
-                      id: 'form.field.label.relationSomeoneElse'
-                    }
+                    label: formMessageDescriptors.others
                   }
                 ],
                 nestedFields: {
@@ -190,16 +102,9 @@ export const registerForms: IDefaultRegisterForms = {
                     {
                       name: 'otherRelationShip',
                       type: 'TEXT',
-                      label: {
-                        defaultMessage: 'Relationship to child',
-                        id: 'form.field.label.informantsRelationWithChild',
-                        description: 'Label for input Relationship to child'
-                      },
-                      placeholder: {
-                        defaultMessage: 'eg. Grandmother',
-                        description: 'Placeholder for example of relationship',
-                        id: 'form.field.label.relationshipPlaceHolder'
-                      },
+                      label: formMessageDescriptors.informantsRelationWithChild,
+                      placeholder:
+                        formMessageDescriptors.relationshipPlaceHolder,
                       required: true,
                       initialValue: '',
                       validate: [],
@@ -307,7 +212,7 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'register.selectInformant.primaryInformant'
                 },
                 hideHeader: true,
-                size: 'large',
+                size: RadioSize.LARGE,
                 required: true,
                 readonly: true,
                 initialValue: '',
@@ -429,7 +334,7 @@ export const registerForms: IDefaultRegisterForms = {
                     groupID: 'contact-view-group',
                     fieldName: 'contactPoint'
                   },
-                  position: 'before',
+                  position: REVIEW_OVERRIDE_POSITION.BEFORE,
                   labelAs: {
                     defaultMessage: 'Who is the informant?',
                     description: 'Form section title for contact point',
@@ -511,7 +416,7 @@ export const registerForms: IDefaultRegisterForms = {
                 hideHeader: true,
                 initialValue: '',
                 validate: [],
-                size: 'large',
+                size: RadioSize.LARGE,
                 placeholder: {
                   defaultMessage: 'Select',
                   description: 'Placeholder text for a select',
@@ -929,7 +834,7 @@ export const registerForms: IDefaultRegisterForms = {
         }
       },
       {
-        id: 'child',
+        id: BirthSection.Child,
         viewType: 'form',
         name: {
           defaultMessage: 'Child',
@@ -1587,7 +1492,7 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 initialValue: 'URBAN',
-                flexDirection: 'row',
+                flexDirection: FLEX_DIRECTION.ROW,
                 required: false,
                 hideValueInPreview: true,
                 previewGroup: 'placeOfBirth',
@@ -2191,7 +2096,7 @@ export const registerForms: IDefaultRegisterForms = {
         ]
       },
       {
-        id: 'informant',
+        id: BirthSection.Informant,
         viewType: 'form',
         name: {
           defaultMessage: 'Informant',
@@ -2570,7 +2475,7 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 initialValue: 'URBAN',
-                flexDirection: 'row',
+                flexDirection: FLEX_DIRECTION.ROW,
                 previewGroup: 'permanentAddress',
                 hideValueInPreview: true,
                 required: false,
@@ -3296,7 +3201,7 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'parentDetailsType',
                 type: 'RADIO_GROUP',
-                size: 'large',
+                size: RadioSize.LARGE,
                 label: {
                   defaultMessage:
                     "Do you have the mother and father's details?",
@@ -3582,7 +3487,7 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'primaryCaregiverType',
                 type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
-                size: 'large',
+                size: RadioSize.LARGE,
                 label: {
                   defaultMessage: 'Who is looking after the child?',
                   description: 'Question to ask the user about caregiver',
@@ -5009,7 +4914,7 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 initialValue: 'URBAN',
-                flexDirection: 'row',
+                flexDirection: FLEX_DIRECTION.ROW,
                 previewGroup: 'permanentAddress',
                 hideValueInPreview: true,
                 required: false,
@@ -5799,7 +5704,7 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 initialValue: 'URBAN',
-                flexDirection: 'row',
+                flexDirection: FLEX_DIRECTION.ROW,
                 previewGroup: 'currentAddress',
                 hideValueInPreview: true,
                 required: false,
@@ -7163,7 +7068,7 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 initialValue: 'URBAN',
-                flexDirection: 'row',
+                flexDirection: FLEX_DIRECTION.ROW,
                 previewGroup: 'permanentAddress',
                 hideValueInPreview: true,
                 required: false,
@@ -8104,7 +8009,7 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'register.selInf.deathInfSomeoneElse'
                 },
                 hideHeader: true,
-                size: 'large',
+                size: RadioSize.LARGE,
                 required: true,
                 initialValue: '',
                 validate: [],
@@ -8235,7 +8140,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: '',
                 validate: [],
-                size: 'large',
+                size: RadioSize.LARGE,
                 placeholder: {
                   defaultMessage: 'Select',
                   description: 'Placeholder text for a select',
@@ -9228,7 +9133,7 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 initialValue: 'URBAN',
-                flexDirection: 'row',
+                flexDirection: FLEX_DIRECTION.ROW,
                 previewGroup: 'permanentAddress',
                 hideValueInPreview: true,
                 required: false,
@@ -9835,7 +9740,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: false,
                 initialValue: '',
                 validate: [],
-                size: 'large',
+                size: RadioSize.LARGE,
                 placeholder: {
                   defaultMessage: 'Select',
                   description: 'Placeholder text for a select',
@@ -9911,7 +9816,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: '',
                 validate: [],
-                size: 'large',
+                size: RadioSize.LARGE,
                 options: [
                   {
                     value: 'PERMANENT',
@@ -10199,7 +10104,7 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 initialValue: 'URBAN',
-                flexDirection: 'row',
+                flexDirection: FLEX_DIRECTION.ROW,
                 required: false,
                 hideValueInPreview: true,
                 validate: [],
@@ -10753,7 +10658,7 @@ export const registerForms: IDefaultRegisterForms = {
                 },
                 required: false,
                 initialValue: '',
-                size: 'large',
+                size: RadioSize.LARGE,
                 validate: [],
                 options: [
                   {
@@ -11164,7 +11069,7 @@ export const registerForms: IDefaultRegisterForms = {
                     groupID: 'point-of-contact',
                     fieldName: 'contactPoint'
                   },
-                  position: 'before',
+                  position: REVIEW_OVERRIDE_POSITION.BEFORE,
                   labelAs: {
                     defaultMessage: 'Who is the informant?',
                     description: 'Form section title for contact point',
@@ -11386,7 +11291,7 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 initialValue: 'URBAN',
-                flexDirection: 'row',
+                flexDirection: FLEX_DIRECTION.ROW,
                 previewGroup: 'permanentAddress',
                 hideValueInPreview: true,
                 required: false,
@@ -12304,7 +12209,7 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'form.section.deceased.spouse.name'
                 },
                 hideHeader: true,
-                size: 'large',
+                size: RadioSize.LARGE,
                 required: true,
                 initialValue: '',
                 validate: [],

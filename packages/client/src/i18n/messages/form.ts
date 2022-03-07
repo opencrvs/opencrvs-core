@@ -1673,6 +1673,11 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Label for signed affidavit confirmation radio group',
     id: 'form.field.label.print.signedAffidavit'
   },
+  informantRelation: {
+    defaultMessage: 'Who is the informant?',
+    description: 'Form section title for contact point',
+    id: 'register.selectInformant.relation'
+  },
   someoneElse: {
     defaultMessage: 'Someone else',
     description: 'Other Label',
@@ -1697,6 +1702,11 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: 'Grandfather',
     description: 'Label for option Grandfather',
     id: 'form.field.label.informantRelation.grandfather'
+  },
+  otherFamilyMember: {
+    defaultMessage: 'Other family member',
+    description: 'Label for option Other family member',
+    id: 'form.field.label.relationOtherFamilyMember'
   },
   grandmother: {
     defaultMessage: 'Grandmother',

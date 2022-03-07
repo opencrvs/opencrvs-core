@@ -645,6 +645,11 @@ export const getSelectedRadioOptionWithNestedFields = (
 }
 
 export const conditionals: IConditionals = {
+  presentAtBirthRegistration: {
+    action: 'hide',
+    expression:
+      '(!draftData || !draftData.registration || draftData.registration.presentAtBirthRegistration !== "OTHER" || draftData.registration.presentAtBirthRegistration === "BOTH_PARENTS" )'
+  },
   isRegistrarRoleSelected: {
     action: 'hide',
     expression: 'values.role!=="LOCAL_REGISTRAR"'

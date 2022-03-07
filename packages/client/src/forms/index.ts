@@ -126,7 +126,7 @@ export interface ICheckboxOption {
 }
 
 export interface IDynamicOptions {
-  dependency: string
+  dependency?: string
   jurisdictionType?: string
   resource?: string
   options?: { [key: string]: ISelectOption[] }
@@ -568,9 +568,10 @@ export interface ILocationSearchInputFormField extends IFormFieldBase {
     keyof IOfflineData,
     'facilities' | 'locations' | 'offices'
   >
-  locationList: ISearchLocation[]
+  locationList?: ISearchLocation[]
   searchableType: string
   dispatchOptions?: IDispatchOptions
+  dynamicOptions?: IDynamicOptions
 }
 
 export interface IWarningField extends IFormFieldBase {
@@ -664,6 +665,7 @@ export interface IConditional {
 }
 
 export interface IConditionals {
+  presentAtBirthRegistration: IConditional
   iDType: IConditional
   isOfficePreSelected: IConditional
   fathersDetailsExist: IConditional
@@ -1092,8 +1094,10 @@ export interface Ii18nLocationSearchInputFormField extends Ii18nFormFieldBase {
     'facilities' | 'locations' | 'offices'
   >
   searchableType: string
-  locationList: ISearchLocation[]
+  locationList?: ISearchLocation[]
   dispatchOptions?: IDispatchOptions
+
+  dynamicOptions?: IDynamicOptions
 }
 
 export interface Ii18nWarningField extends Ii18nFormFieldBase {
