@@ -131,6 +131,8 @@ function GeneralTabContent({
         },
         {
           label: intl.formatMessage(messages.uniqueIdentificationNumberLabel),
+          value:
+            offlineCountryConfiguration.config.NID_NUMBER_PATTERN.pattern.toString(),
           action: {
             id: 'btnChangeUIN',
             label: intl.formatMessage(buttonMessages.change),
