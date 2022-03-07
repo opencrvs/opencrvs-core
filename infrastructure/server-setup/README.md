@@ -251,26 +251,26 @@ OpenCRVS uses the [Kibana](https://www.elastic.co/kibana) tool for server and co
 
 Access Kibana by visiting: https://kibana.<your_domain>
 
-In the top left you will see a dropdown. From here you may select each of the servers in your swarm. The first step you should take is to determine if any/all of the servers are at capacity. Thing you should look for include:
+In the top left you will see an expanding side navigation. In the menu you should navigate to Observability -> Metrics. From here you can see different observations (CPU load, memory usage, traffic) for each of your servers. The first step you should take is to determine if any/all of the servers are at capacity. Thing you should look for include:
 
 - A constantly maxed out CPU percentage or load number
 - If IOWAIT is constantly high your disks are becoming a bottleneck
 - Check RAM usage to make sure the server isn't paging (linux systems always try use as much RAM as possible, what you are looking for is high number with almost no caching)
-- Check if Netadata has any active alarms on any of the servers
+- Check if Kibana has any active alarms on any of the servers (Main menu -> Observability -> Alerts)
 
 If all of the server are running at capacity you might need to add more servers to the swarm. If just a few are at capacity then you should try to figure out which containers are using the most resources and scale those out so other server may take the load.
 
-To do this, first check the 'Applications' section in Netdata and see if it really is the containers using up system resources, it could be another rouge process.
+To do this, navigate to Observability -> Metrics -> Inventory. By selecting Metric:`docker.cpu.total.pct` and Group by:`docker.container.labels.com_docker_swarm_service_name` you should be able to see all running services and the containers on each server. By hovering over the containers, you'll see basic system statistics for each container.
 
-Next, go through each of the docker containers listed on the menu on the left in Netdata. Try to find which one is using the majority of the resources. Look for constantly high CPU or Disk usage. If you find a culprit you may increase the number of replicas of that service using:
+Next, go through each of the docker containers listed and try to find which one is using the majority of the resources. Look for constantly high CPU or Disk usage. If you find a culprit you may increase the number of replicas of that service using:
 
 ```
 docker service scale <service name e.g.: "opencrvs_workflow">=5
 ```
 
-After this is done, watch Netdata and ensure that the change was effective and ensure there aren't any other services that are also at capacity. In some cases the only answer may be to [add additional servers to the docker swarm](https://docs.docker.com/engine/swarm/swarm-tutorial/add-nodes/). To get tasks to move to the new server you can scale down certain service and scale them back up again or you can [force a rebalance](https://docs.docker.com/engine/swarm/admin_guide/#force-the-swarm-to-rebalance) which may lead to so down time.
+After this is done, monitor the containers and ensure that the change was effective and ensure there aren't any other services that are also at capacity. In some cases the only answer may be to [add additional servers to the docker swarm](https://docs.docker.com/engine/swarm/swarm-tutorial/add-nodes/). To get tasks to move to the new server you can scale down certain service and scale them back up again or you can [force a rebalance](https://docs.docker.com/engine/swarm/admin_guide/#force-the-swarm-to-rebalance) which may lead to so down time.
 
-You may want to [setup notifications](https://docs.netdata.cloud/health/notifications/) in Netdata as well so that you may be notified of any alarms on the servers.
+Alert rules can be added by navigating to Observability -> Alerts -> Manage rules.
 
 ## Some useful Docker and Docker Swarm commands
 
