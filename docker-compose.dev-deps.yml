@@ -20,19 +20,6 @@ services:
   redis:
     ports:
       - '6379:6379'
-  elastalert:
-    volumes:
-      - ./infrastructure/monitoring/elastalert/elastalert.yaml:/opt/elastalert/config.yaml
-      - ./infrastructure/monitoring/elastalert/rules:/opt/elastalert/rules
-  metricbeat:
-    environment:
-      - ELASTICSEARCH_USERNAME=${ELASTICSEARCH_USERNAME:-elastic}
-      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD:-changeme}
-
-  setup-kibana-alerts:
-    volumes:
-      - ./infrastructure/monitoring/kibana/alert-rules.json:/usr/app/alert-rules.json
-      - ./infrastructure/monitoring/kibana/setup-alerts.js:/usr/app/setup-alerts.js
 
   elasticsearch:
     ports:
