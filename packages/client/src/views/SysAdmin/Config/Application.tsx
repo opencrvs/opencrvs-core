@@ -64,6 +64,7 @@ export enum GeneralActionId {
   USER_TIMEOUT = 'changeUsrTimeOut',
   Currency = 'changeCurrency',
   PHONE_NUMBER = 'changePhnNum',
+  NID_PATTERN = 'changeNidPattern',
   LOG_ROCKET = 'changeLogrocket',
   SENTRY = 'changeSentry'
 }
@@ -130,13 +131,15 @@ function GeneralTabContent({
           }
         },
         {
-          label: intl.formatMessage(messages.uniqueIdentificationNumberLabel),
+          label: intl.formatMessage(messages.nidPatternTitle),
           value:
             offlineCountryConfiguration.config.NID_NUMBER_PATTERN.pattern.toString(),
           action: {
             id: 'btnChangeUIN',
             label: intl.formatMessage(buttonMessages.change),
-            disabled: true
+            handler: () => {
+              callBack(GeneralActionId.NID_PATTERN)
+            }
           }
         }
       ]}

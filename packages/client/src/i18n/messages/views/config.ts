@@ -10,6 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
+import { Message } from 'typescript-react-intl'
+import { Description } from '@client/views/SysAdmin/Performance/utils'
 
 interface IConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
@@ -34,7 +36,9 @@ interface IConfigMessages
   govermentLogoLabel: MessageDescriptor
   currencyLable: MessageDescriptor
   phoneNumberLabel: MessageDescriptor
-  uniqueIdentificationNumberLabel: MessageDescriptor
+  nidPatternTitle: MessageDescriptor
+  nidPatternChangeMessage: MessageDescriptor
+  nidPatternChangeError: MessageDescriptor
   legallySpecifiedLabel: MessageDescriptor
   lateRegistrationLabel: MessageDescriptor
   delayedRegistrationLabel: MessageDescriptor
@@ -44,6 +48,11 @@ interface IConfigMessages
   deathTabTitle: MessageDescriptor
   registrationTimePeriodsGroupTitle: MessageDescriptor
   registrationFeesGroupTitle: MessageDescriptor
+  pattern: MessageDescriptor
+  example: MessageDescriptor
+  testNumber: MessageDescriptor
+  validExample: MessageDescriptor
+  invalidExample: MessageDescriptor
 }
 
 const messagesToDefine: IConfigMessages = {
@@ -195,10 +204,21 @@ const messagesToDefine: IConfigMessages = {
     defaultMessage: 'Phone number',
     description: 'Phone number config label'
   },
-  uniqueIdentificationNumberLabel: {
-    id: 'config.application.uniqueIdentificationNumberLabel',
+  nidPatternTitle: {
+    id: 'config.application.nidPatternLabel',
     defaultMessage: 'Unique Identification Number (UIN) e.g. National ID',
-    description: 'Unique Identification Number (UIN) config label'
+    description: 'Unique Identification Number (UIN) config title'
+  },
+  nidPatternChangeMessage: {
+    id: 'config.application.nidPatternChangeMessage',
+    defaultMessage:
+      'Set the regex pattern for your national ID. For guidance please refer to www.regex101.com',
+    description: 'Unique Identification Number (UIN) config message'
+  },
+  nidPatternChangeError: {
+    id: 'config.application.nidPatternChangeError',
+    defaultMessage: 'Invalid regular expression for a National ID Number',
+    description: 'Error message for invalid regular expression for NID number'
   },
   legallySpecifiedLabel: {
     id: 'config.application.legallySpecifiedLabel',
@@ -244,6 +264,31 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.registrationFeesGroupTitle',
     defaultMessage: 'Registration fees',
     description: 'The title for registration fee group'
+  },
+  pattern: {
+    id: 'config.application.pattern',
+    defaultMessage: 'Pattern',
+    description: 'Label for Pattern'
+  },
+  example: {
+    id: 'config.application.example',
+    defaultMessage: 'Example',
+    description: 'Label for Example'
+  },
+  testNumber: {
+    id: 'config.application.testNumber',
+    defaultMessage: 'Test number',
+    description: 'Label for test number'
+  },
+  validExample: {
+    id: 'config.application.validExample',
+    defaultMessage: 'Valid',
+    description: 'Label for valid example'
+  },
+  invalidExample: {
+    id: 'config.application.invalidExample',
+    defaultMessage: 'Invalid',
+    description: 'Label for Invalid example'
   }
 }
 

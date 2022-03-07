@@ -20,6 +20,9 @@ export const Cross = (props: React.HTMLAttributes<SVGElement>) => {
     case 'currentColor':
       fill = 'currentColor'
       break
+    case 'red':
+      fill = '#D53F3F'
+      break
     default:
       fill = '#4C68C1'
   }
