@@ -83,6 +83,16 @@ if [ -z "$SLACK_WEBHOOK_URL" ] ; then
     print_usage_and_exit
 fi
 
+if [ -z "$KIBANA_USERNAME" ] ; then
+    echo 'Error: Missing environment variable KIBANA_USERNAME.'
+    print_usage_and_exit
+fi
+
+if [ -z "$KIBANA_PASSWORD" ] ; then
+    echo 'Error: Missing environment variable KIBANA_PASSWORD.'
+    print_usage_and_exit
+fi
+
 ENV=$4
 HOST=$5
 VERSION=$6
@@ -137,8 +147,9 @@ else
     exit 1
   fi
 fi
+
 # Setup configuration files and compose file for the deployment domain
-ssh $SSH_USER@$SSH_HOST "SLACK_WEBHOOK_URL=$SLACK_WEBHOOK_URL /tmp/compose/infrastructure/setup-deploy-config.sh $HOST | tee -a $LOG_LOCATION/setup-deploy-config.log"
+ssh $SSH_USER@$SSH_HOST "KIBANA_USERNAME=$KIBANA_USERNAME KIBANA_PASSWORD=$KIBANA_PASSWORD SLACK_WEBHOOK_URL=$SLACK_WEBHOOK_URL /tmp/compose/infrastructure/setup-deploy-config.sh $HOST | tee -a $LOG_LOCATION/setup-deploy-config.log"
 
 # Deploy the OpenCRVS stack onto the swarm
 if [[ "$ENV" = "development" ]]; then
