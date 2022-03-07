@@ -9,20 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import fetch from 'node-fetch'
-import { CONFIG_API_URL } from '@metrics/constants'
-export interface IPhoneNumberPattern {
-  pattern: RegExp
-  example: string
-  start: string
-  num: string
-  mask: {
-    startForm: number
-    endBefore: number
-  }
-}
 
-export interface IApplicationConfig {
+import {
+  GQLNIDNumberPatternInput,
+  GQLPhoneNumberPatternInput
+} from '@gateway/graphql/schema'
+
+export interface IApplicationConfigPayload {
   APPLICATION_NAME: string
   BACKGROUND_SYNC_BROADCAST_CHANNEL: string
   COUNTRY: string
@@ -30,7 +23,6 @@ export interface IApplicationConfig {
   COUNTRY_LOGO_RENDER_WIDTH: number
   COUNTRY_LOGO_RENDER_HEIGHT: number
   DESKTOP_TIME_OUT_MILLISECONDS: number
-  HEALTH_FACILITY_FILTER: string
   LANGUAGES: string
   CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: number
   CERTIFICATE_PRINT_CHARGE_UP_LIMIT: number
@@ -44,27 +36,8 @@ export interface IApplicationConfig {
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
   SENTRY: string
   LOGROCKET: string
-  PHONE_NUMBER_PATTERN: IPhoneNumberPattern
+  PHONE_NUMBER_PATTERN: GQLPhoneNumberPatternInput
   BIRTH_REGISTRATION_TARGET: number
   DEATH_REGISTRATION_TARGET: number
-}
-
-export async function getApplicationConfig(): Promise<IApplicationConfig> {
-  return fetch(`${CONFIG_API_URL}/config`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  })
-    .then((response) => {
-      return response.json()
-    })
-    .then((response) => {
-      return response.config
-    })
-    .catch((error) => {
-      return Promise.reject(
-        new Error(`Application config request failed: ${error.message}`)
-      )
-    })
+  NID_NUMBER_PATTERN: GQLNIDNumberPatternInput
 }

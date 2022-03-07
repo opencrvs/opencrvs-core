@@ -22,19 +22,34 @@ import { connect } from 'react-redux'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { DataSection } from '@opencrvs/components/lib/interface'
+import {
+  ListView,
+  FloatingNotification,
+  NOTIFICATION_TYPE
+} from '@opencrvs/components/lib/interface'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import { messages } from '@client/i18n/messages/views/config'
-import moment from 'moment'
 import { buttonMessages } from '@client/i18n/messages'
+import { DynamicModal } from '@client/views/SysAdmin/Config/DynamicModal'
+import { EMPTY_STRING } from '@client/utils/constants'
+import styled from 'styled-components'
 
+const ListGroupTitle = styled.div`
+  color: ${({ theme }) => theme.colors.grey400};
+  width: 240px;
+  height: 21px;
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
+`
 type Props = IntlShapeProps & {
   userDetails: IUserDetails | null
-  offlineResources: IOfflineData
   offlineCountryConfiguration: IOfflineData
 }
 interface State {
   activeTabId: string
+  changeModalName: string
+  showNotification: boolean
+  notificationStatus: NOTIFICATION_TYPE
+  notificationMessages: string
 }
 
 export enum TabId {
@@ -43,29 +58,37 @@ export enum TabId {
   DEATH = 'death'
 }
 
-const millisecondsToMinutes = (ms: number): string => {
-  const duration = moment.duration(ms, 'milliseconds')
-  const minutes = Math.floor(duration.asMinutes())
-  return `${minutes} minutes`
+export enum GeneralActionId {
+  APPLICATION_NAME = 'changeAppName',
+  GOVT_LOGO = 'changeGovtLogo',
+  USER_TIMEOUT = 'changeUsrTimeOut',
+  Currency = 'changeCurrency',
+  PHONE_NUMBER = 'changePhnNum',
+  LOG_ROCKET = 'changeLogrocket',
+  SENTRY = 'changeSentry'
 }
 
 function GeneralTabContent({
   offlineCountryConfiguration,
-  intl
+  intl,
+  callBack
 }: {
   offlineCountryConfiguration: IOfflineData
   intl: IntlShape
+  callBack: (modalName: string) => void
 }) {
   return (
-    <DataSection
-      title={''}
+    <ListView
       items={[
         {
           label: intl.formatMessage(messages.applicationNameLabel),
-          value: 'Farajaland CRVS',
+          value: offlineCountryConfiguration.config.APPLICATION_NAME,
           action: {
-            id: 'btnChangeAppName',
-            label: intl.formatMessage(buttonMessages.change)
+            id: GeneralActionId.APPLICATION_NAME,
+            label: intl.formatMessage(buttonMessages.change),
+            handler: () => {
+              callBack(GeneralActionId.APPLICATION_NAME)
+            }
           }
         },
         {
@@ -82,7 +105,7 @@ function GeneralTabContent({
             />
           ),
           action: {
-            id: 'btnChangeGovtLogo',
+            id: GeneralActionId.GOVT_LOGO,
             label: intl.formatMessage(buttonMessages.change),
             disabled: true
           }
@@ -91,7 +114,7 @@ function GeneralTabContent({
           label: intl.formatMessage(messages.currencyLable),
           value: '',
           action: {
-            id: 'btnChangeCurrency',
+            id: GeneralActionId.Currency,
             label: intl.formatMessage(buttonMessages.change),
             disabled: true
           }
@@ -99,16 +122,17 @@ function GeneralTabContent({
         {
           label: intl.formatMessage(messages.phoneNumberLabel),
           value:
-            offlineCountryConfiguration.config.PHONE_NUMBER_PATTERN.pattern,
+            offlineCountryConfiguration.config.PHONE_NUMBER_PATTERN.pattern.toString(),
           action: {
-            id: 'btnChangePhnNum',
+            id: GeneralActionId.PHONE_NUMBER,
             label: intl.formatMessage(buttonMessages.change),
             disabled: true
           }
         },
         {
           label: intl.formatMessage(messages.uniqueIdentificationNumberLabel),
-          value: offlineCountryConfiguration.config.NID_NUMBER_PATTERN.pattern,
+          value:
+            offlineCountryConfiguration.config.NID_NUMBER_PATTERN.pattern.toString(),
           action: {
             id: 'btnChangeUIN',
             label: intl.formatMessage(buttonMessages.change),
@@ -128,9 +152,16 @@ function BirthTabContent({
   intl: IntlShape
 }) {
   return (
-    <DataSection
-      title={''}
+    <ListView
       items={[
+        {
+          label: EMPTY_STRING,
+          value: (
+            <ListGroupTitle>
+              {intl.formatMessage(messages.registrationTimePeriodsGroupTitle)}
+            </ListGroupTitle>
+          )
+        },
         {
           label: intl.formatMessage(messages.legallySpecifiedLabel),
           value: 'Within 30 days',
@@ -154,6 +185,14 @@ function BirthTabContent({
             label: intl.formatMessage(buttonMessages.change),
             disabled: true
           }
+        },
+        {
+          label: EMPTY_STRING,
+          value: (
+            <ListGroupTitle>
+              {intl.formatMessage(messages.registrationFeesGroupTitle)}
+            </ListGroupTitle>
+          )
         },
         {
           label: intl.formatMessage(messages.withinLegallySpecifiedTimeLabel),
@@ -192,9 +231,16 @@ function DeathTabContent({
   intl: IntlShape
 }) {
   return (
-    <DataSection
-      title={''}
+    <ListView
       items={[
+        {
+          label: EMPTY_STRING,
+          value: (
+            <ListGroupTitle>
+              {intl.formatMessage(messages.registrationTimePeriodsGroupTitle)}
+            </ListGroupTitle>
+          )
+        },
         {
           label: intl.formatMessage(messages.legallySpecifiedLabel),
           value: 'Within 30 days',
@@ -210,6 +256,14 @@ function DeathTabContent({
             label: intl.formatMessage(buttonMessages.change),
             disabled: true
           }
+        },
+        {
+          label: EMPTY_STRING,
+          value: (
+            <ListGroupTitle>
+              {intl.formatMessage(messages.registrationFeesGroupTitle)}
+            </ListGroupTitle>
+          )
         },
         {
           label: intl.formatMessage(messages.lateRegistrationLabel),
@@ -236,17 +290,40 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      activeTabId: TabId.GENERAL
+      activeTabId: TabId.GENERAL,
+      changeModalName: EMPTY_STRING,
+      showNotification: false,
+      notificationStatus: NOTIFICATION_TYPE.IN_PROGRESS,
+      notificationMessages: EMPTY_STRING
     }
-    this.changeTab = this.changeTab.bind(this)
+  }
+
+  changeValue = (notificationStatus: NOTIFICATION_TYPE, messages: string) => {
+    if (notificationStatus !== NOTIFICATION_TYPE.ERROR) {
+      this.hideModal()
+      this.setState({
+        showNotification: true,
+        notificationStatus: notificationStatus,
+        notificationMessages: messages
+      })
+    }
   }
 
   changeTab(id: string) {
     this.setState({ activeTabId: id })
   }
 
+  hideModal = () => {
+    this.setState({ changeModalName: '' })
+  }
+
+  showModal = () => {
+    return !!!this.state.changeModalName ? false : true
+  }
+
   render() {
     const { intl, offlineCountryConfiguration } = this.props
+
     return (
       <SysAdminContentWrapper isCertificatesConfigPage={true}>
         <Content
@@ -271,13 +348,17 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
             onTabClick: (id: string) => this.changeTab(id)
           }}
         >
-          {this.state.activeTabId &&
-            this.state.activeTabId === TabId.GENERAL && (
-              <GeneralTabContent
-                offlineCountryConfiguration={offlineCountryConfiguration}
-                intl={intl}
-              />
-            )}
+          {this.state.activeTabId && this.state.activeTabId === TabId.GENERAL && (
+            <GeneralTabContent
+              offlineCountryConfiguration={offlineCountryConfiguration}
+              intl={intl}
+              callBack={(modalName: string) =>
+                this.setState({
+                  changeModalName: modalName
+                })
+              }
+            />
+          )}
           {this.state.activeTabId && this.state.activeTabId === TabId.BIRTH && (
             <BirthTabContent
               offlineCountryConfiguration={offlineCountryConfiguration}
@@ -291,6 +372,24 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
             />
           )}
         </Content>
+        {this.showModal() && (
+          <DynamicModal
+            hideModal={this.hideModal}
+            changeModalName={this.state.changeModalName}
+            showNotification={this.state.showNotification}
+            valueChanged={this.changeValue}
+          />
+        )}
+        <FloatingNotification
+          id="print-cert-notification"
+          type={this.state.notificationStatus}
+          show={this.state.showNotification}
+          callback={() => {
+            this.setState({ showNotification: false })
+          }}
+        >
+          {this.state.notificationMessages}
+        </FloatingNotification>
       </SysAdminContentWrapper>
     )
   }
@@ -298,7 +397,6 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
 
 function mapStateToProps(state: IStoreState) {
   return {
-    offlineResources: getOfflineData(state),
     userDetails: getUserDetails(state),
     offlineCountryConfiguration: getOfflineData(state)
   }

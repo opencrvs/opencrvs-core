@@ -20,7 +20,7 @@ import mockingoose from 'mockingoose'
 const fetch = fetchMock as fetchMock.FetchMock
 
 const token = jwt.sign(
-  { scope: ['sysadmin', 'demo'] },
+  { scope: ['natlsysadmin', 'sysadmin', 'demo'] },
   readFileSync('../auth/test/cert.key'),
   {
     algorithm: 'RS256',
@@ -29,7 +29,7 @@ const token = jwt.sign(
   }
 )
 
-const mockUser = ({
+const mockUser = {
   id: '12345',
   name: [
     {
@@ -51,8 +51,7 @@ const mockUser = ({
   password: 'test',
   signature: {
     type: 'image/png',
-    data:
-      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlwAAAK8CAYAAAA6WGEyAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2h'
+    data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlwAAAK8CAYAAAA6WGEyAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2h'
   },
   localRegistrar: {
     name: [
@@ -64,11 +63,10 @@ const mockUser = ({
     ],
     signature: {
       type: 'image/png',
-      data:
-        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlwAAAK8CAYAAAA6WGEyAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2h'
+      data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlwAAAK8CAYAAAA6WGEyAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2h'
     }
   }
-} as unknown) as IUser & { password: string }
+} as unknown as IUser & { password: string }
 
 const mockPractitioner = {
   resourceType: 'Practitioner',

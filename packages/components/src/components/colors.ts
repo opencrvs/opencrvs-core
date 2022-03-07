@@ -132,12 +132,14 @@ export const colors = {
   // Tri Line chart lines
   silverSand: colorDictionary.silverSand,
   swansDown: colorDictionary.swansDown,
+
   fountainBlue: colorDictionary.fountainBlue,
   ronchi: colorDictionary.ronchi,
   indigo500: colorDictionary.indigo500,
   yellow500: colorDictionary.yellow500,
   blue500: colorDictionary.blueCrystal,
   grey300: colorDictionary.grey300,
+  grey400: '#A5A5A5',
   grey600: colorDictionary.grey600,
   grey800: colorDictionary.grey800,
   greyInfo: colorDictionary.greyInfo,

@@ -14,6 +14,8 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 interface IConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   applicationTitle: MessageDescriptor
+  applicationNameChangeMessage: MessageDescriptor
+  applicationNameChangeError: MessageDescriptor
   certificateConfiguration: MessageDescriptor
   previewTemplate: MessageDescriptor
   printTemplate: MessageDescriptor
@@ -40,6 +42,8 @@ interface IConfigMessages
   generalTabTitle: MessageDescriptor
   birthTabTitle: MessageDescriptor
   deathTabTitle: MessageDescriptor
+  registrationTimePeriodsGroupTitle: MessageDescriptor
+  registrationFeesGroupTitle: MessageDescriptor
 }
 
 const messagesToDefine: IConfigMessages = {
@@ -47,6 +51,21 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.applicationSettings',
     defaultMessage: 'Application',
     description: 'Link Text for Config Application Settings'
+  },
+  applicationNameChangeMessage: {
+    id: 'config.application.nameChangeMessage',
+    defaultMessage: 'Choose a name for your CRVS system',
+    description: 'Message for application name change modal'
+  },
+  applicationNameChangeNotification: {
+    id: 'config.application.applicationNameChangeNotification',
+    defaultMessage: 'Name of application updated',
+    description: 'Message for application name change notification'
+  },
+  applicationNameChangeError: {
+    id: 'config.application.nameChangeError',
+    defaultMessage: 'Unable to make change. Please try again',
+    description: 'Error message for application name change'
   },
   certificateConfiguration: {
     id: 'config.certificateConfiguration',
@@ -215,6 +234,16 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.deathTabTitle',
     defaultMessage: 'Death',
     description: 'The title for death tab'
+  },
+  registrationTimePeriodsGroupTitle: {
+    id: 'config.application.registrationTimePeriodsGroupTitle',
+    defaultMessage: 'Registration time periods',
+    description: 'The title for registration time periods group'
+  },
+  registrationFeesGroupTitle: {
+    id: 'config.application.registrationFeesGroupTitle',
+    defaultMessage: 'Registration fees',
+    description: 'The title for registration fee group'
   }
 }
 

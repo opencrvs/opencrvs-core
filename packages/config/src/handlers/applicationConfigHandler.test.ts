@@ -15,10 +15,23 @@ import ApplicationConfig, {
 } from '@config/models/config'
 import * as fetchMock from 'jest-fetch-mock'
 import mockingoose from 'mockingoose'
+import * as jwt from 'jsonwebtoken'
+import { readFileSync } from 'fs'
+
+const token = jwt.sign(
+  { scope: ['natlsysadmin'] },
+  readFileSync('../auth/test/cert.key'),
+  {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:config-user'
+  }
+)
 
 const fetch = fetchMock as fetchMock.FetchMock
 
 let mockConfig = {
+  APPLICATION_NAME: 'Farajaland CRVS',
   BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
   COUNTRY: 'bgd',
   COUNTRY_LOGO_FILE: 'logo.png',
@@ -60,5 +73,41 @@ describe('applicationHandler', () => {
       url: '/config'
     })
     expect(res.statusCode).toBe(200)
+  })
+
+  it('update application config using mongoose', async () => {
+    mockConfig.id = '61c4664e663fc6af203b63b8'
+    mockingoose(ApplicationConfig).toReturn(mockConfig, 'findOne')
+    mockingoose(ApplicationConfig).toReturn(mockConfig, 'update')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/updateApplicationConfig',
+      payload: {
+        APPLICATION_NAME: 'Farajaland CRVS'
+      },
+      headers: {
+        Authorization: `${token}`
+      }
+    })
+    expect(res.statusCode).toBe(201)
+  })
+
+  it('return error when tries to save invalid data', async () => {
+    mockingoose(ApplicationConfig).toReturn(null, 'findOne')
+    mockingoose(ApplicationConfig).toReturn({}, 'update')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/getCertificate',
+      payload: {
+        APPLICATION_NAME: 1234
+      },
+      headers: {
+        Authorization: `${token}`
+      }
+    })
+
+    expect(res.statusCode).toBe(400)
   })
 })

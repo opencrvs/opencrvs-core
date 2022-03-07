@@ -35,7 +35,7 @@ import {
   IPDFTemplate,
   ISVGTemplate
 } from '@client/pdfRenderer/transformer/types'
-import _ from 'lodash'
+import { find, merge } from 'lodash'
 import { registerForms } from '@client/forms/register/fieldDefinitions/register'
 import { createUserForm } from '@client/forms/user/fieldDefinitions/createUser'
 
@@ -199,7 +199,8 @@ function getDataLoadingCommands() {
     LOCATIONS_CMD,
     PILOT_LOCATIONS_CMD,
     CONTENT_CMD,
-    ASSETS_CMD
+    ASSETS_CMD,
+    CONFIG_CMD
   ])
 }
 
@@ -274,7 +275,15 @@ function reducer(
       }
       return loop(state, dataLoadingCmds)
     }
-
+    case actions.UPDATE_OFFLINE_CONFIG: {
+      return loop(
+        { ...state },
+        Cmd.list([
+          CONFIG_CMD,
+          Cmd.run(saveOfflineData, { args: [state.offlineData] })
+        ])
+      )
+    }
     /*
      * Configurations
      */
@@ -282,13 +291,13 @@ function reducer(
       return loop(state, CONFIG_CMD)
     }
     case actions.APPLICATION_CONFIG_LOADED: {
-      _.merge(window.config, action.payload.config)
-      const birthCertificateTemplate = _.find(action.payload.certificates, {
+      merge(window.config, action.payload.config)
+      const birthCertificateTemplate = find(action.payload.certificates, {
         event: 'birth',
         status: 'ACTIVE'
       }) as ICertificateTemplateData
 
-      const deathCertificateTemplate = _.find(action.payload.certificates, {
+      const deathCertificateTemplate = find(action.payload.certificates, {
         event: 'death',
         status: 'ACTIVE'
       }) as ICertificateTemplateData

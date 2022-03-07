@@ -50,6 +50,8 @@ import { Spinner } from '@opencrvs/components/lib/interface'
 import styled, { ITheme, withTheme } from '@client/styledComponents'
 import { Query } from '@client/components/Query'
 import { RouteComponentProps, withRouter } from 'react-router'
+import { getOfflineData } from '@client/offline/selectors'
+import { IOfflineData } from '@client/offline/reducer'
 
 const StyledSpinner = styled(Spinner)`
   margin: 20% auto;
@@ -175,6 +177,7 @@ interface IStateProps {
   activeMenuItem: string
   workqueue: IWorkqueue
   storedApplications: IApplication[]
+  offlineCountryConfiguration: IOfflineData
 }
 
 type IFullProps = IProps &
@@ -249,7 +252,8 @@ export const NavigationView = (props: IFullProps) => {
     draftApplications,
     theme,
     menuCollapse,
-    userInfo
+    userInfo,
+    offlineCountryConfiguration
   } = props
   const tabId = deselectAllTabs
     ? ''
@@ -289,7 +293,7 @@ export const NavigationView = (props: IFullProps) => {
 
   return (
     <LeftNavigation
-      applicationName={intl.formatMessage(constantsMessages.applicationName)}
+      applicationName={offlineCountryConfiguration.config.APPLICATION_NAME}
       navigationWidth={navigationWidth}
       name={userInfo && userInfo.name}
       role={userInfo && userInfo.role}
@@ -579,6 +583,7 @@ export const NavigationView = (props: IFullProps) => {
 
 const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
   return {
+    offlineCountryConfiguration: getOfflineData(state),
     draftApplications:
       (state.applicationsState.applications &&
         state.applicationsState.applications.filter(
