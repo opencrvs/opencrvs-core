@@ -20,6 +20,7 @@
     "build:clean": "rm -rf build"
   },
   "dependencies": {
+    "@opencrvs/commons": "^1.0.0-alpha.3.1",
     "@hapi/boom": "^9.1.1",
     "@hapi/hapi": "^20.0.1",
     "@types/hapi-pino": "^8.0.5",

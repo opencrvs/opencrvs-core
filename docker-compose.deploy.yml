@@ -88,6 +88,9 @@ services:
       - overlay_net
     volumes:
       - '/tmp/compose/infrastructure/monitoring/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml:ro,Z'
+    depends_on:
+      - elasticsearch
+
   # Configure mongo nodes as a replica set
   mongo1:
     command: --replSet rs0
@@ -147,6 +150,27 @@ services:
       placement:
         constraints:
           - node.role == manager
+
+  apm-server:
+    image: docker.elastic.co/apm/apm-server:7.15.2
+    depends_on:
+      - elasticsearch
+      - kibana
+    cap_add: ['CHOWN', 'DAC_OVERRIDE', 'SETGID', 'SETUID']
+    cap_drop: ['ALL']
+    ports:
+      - 8200:8200
+    networks:
+      - overlay_net
+    command: >
+      apm-server -e
+        -E apm-server.rum.enabled=true
+        -E setup.kibana.host=kibana:5601
+        -E setup.template.settings.index.number_of_replicas=0
+        -E apm-server.kibana.enabled=true
+        -E apm-server.kibana.host=kibana:5601
+        -E output.elasticsearch.hosts=["elasticsearch:9200"]
+
   # Configure influxdb
   influxdb:
     volumes:

@@ -11,7 +11,7 @@
  */
 // tslint:disable-next-line no-var-requires
 require('app-module-path').addPath(require('path').join(__dirname, '../'))
-
+import '@opencrvs/commons/monitoring'
 import * as Hapi from '@hapi/hapi'
 import * as DotEnv from 'dotenv'
 import { getPlugins } from '@gateway/config/plugins'

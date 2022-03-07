@@ -15,7 +15,7 @@ require('app-module-path').addPath(require('path').join(__dirname, '../'))
 require('dotenv').config({
   path: `${process.cwd()}/.env`
 })
-
+import '@opencrvs/commons/monitoring'
 import * as Hapi from '@hapi/hapi'
 import {
   HOST,

@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 // tslint:disable-next-line no-var-requires
+import '@opencrvs/commons/monitoring'
 require('app-module-path').addPath(require('path').join(__dirname, '../'))
 
 import * as Hapi from '@hapi/hapi'

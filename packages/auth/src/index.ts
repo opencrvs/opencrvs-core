@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 // tslint:disable no-var-requires
+import '@opencrvs/commons/monitoring'
 require('app-module-path').addPath(require('path').join(__dirname, '../'))
 require('dotenv').config({
   path: `${process.cwd()}/.env`
