@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createServer } from '@config/index'
+import { createServer } from '@config/server'
 import Certificate, {
   IApplicationCertificateModel
 } from '@config/models/Certificate'
@@ -43,7 +43,7 @@ let mockCertificate = {
   svgCode: `<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
   width="200.000000pt" height="200.000000pt" viewBox="0 0 200.000000 200.000000"
   preserveAspectRatio="xMidYMid meet">
- 
+
  <g transform="translate(0.000000,200.000000) scale(0.100000,-0.100000)"
  fill="#000000" stroke="none">
  <path d="M15 1970 c-13 -25 -15 -147 -15 -977 0 -842 2 -951 16 -971 l15 -22
@@ -88,7 +88,7 @@ describe('createCertificate handler', () => {
   const svgCode = `<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
   width="200.000000pt" height="200.000000pt" viewBox="0 0 200.000000 200.000000"
   preserveAspectRatio="xMidYMid meet">
- 
+
  <g transform="translate(0.000000,200.000000) scale(0.100000,-0.100000)"
  fill="#000000" stroke="none">
  <path d="M15 1970 c-13 -25 -15 -147 -15 -977 0 -842 2 -951 16 -971 l15 -22
