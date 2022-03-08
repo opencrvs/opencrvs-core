@@ -511,7 +511,22 @@ export const typeResolvers: GQLResolver = {
     }
   },
   Comment: {
-    user: (comment) => comment.authorString,
+    user: async (comment, _, authHeader) => {
+      if (!comment.authorString) {
+        return null
+      }
+      const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
+        method: 'POST',
+        body: JSON.stringify({
+          practitionerId: comment.authorString.split('/')[1]
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+      return await res.json()
+    },
     comment: (comment) => comment.text,
     createdAt: (comment) => comment.time
   },

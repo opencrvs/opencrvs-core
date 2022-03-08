@@ -34,7 +34,8 @@ import {
   goToCertificateCorrection,
   goToPrintCertificate,
   goToUserProfile,
-  goToTeamUserList
+  goToTeamUserList,
+  IDynamicValues
 } from '@client/navigation'
 import {
   injectIntl,
@@ -98,7 +99,8 @@ import {
   IFormSectionData,
   IContactPoint,
   CorrectionSection,
-  Action
+  Action,
+  IForm
 } from '@client/forms'
 import {
   constantsMessages,
@@ -113,7 +115,8 @@ import {
 } from '@client/utils/userUtils'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import NotificationToast from '@client/views/OfficeHome/NotificationToast'
-import { isEmpty } from 'lodash'
+import { isEmpty, get } from 'lodash'
+import { IRegisterFormState } from '@client/forms/register/reducer'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -181,6 +184,11 @@ const CLinkButton = styled(LinkButton)`
   display: inline-block;
 `
 
+interface IOutputInput {
+  item: string
+  original: string
+  edit: string
+}
 interface IActionDetailsData {
   [key: string]: any
 }
@@ -193,6 +201,7 @@ interface IStateProps {
   draft: IApplication | null
   tab: IRecordAuditTabs
   workqueueDeclaration: GQLEventSearchSet | null
+  registerForm: IRegisterFormState
 }
 
 interface IDispatchProps {
@@ -890,12 +899,60 @@ const GetHistory = ({
   )
 }
 
+const actionDetailsModalListTable = (
+  actionDetailsData: IActionDetailsData,
+  registerForm: IForm
+) => {
+  console.log(actionDetailsData, registerForm)
+  const commentsColumn = [{ key: 'comment', label: 'Comment', width: 100 }]
+  const dataChangeColumns = [
+    { key: 'item', label: 'Item', width: 33.33 },
+    { key: 'original', label: 'Original', width: 33.33 },
+    { key: 'edit', label: 'Edit', width: 33.33 }
+  ]
+
+  const dataChange = (
+    actionDetailsData: IActionDetailsData
+  ): IDynamicValues[] => {
+    const result: IDynamicValues[] = []
+    actionDetailsData.input.forEach((item: { [key: string]: any }) => {
+      result.push({
+        item: 'Mother',
+        original: '',
+        edit: ''
+      })
+    })
+
+    return result
+  }
+
+  return (
+    <>
+      {/* For Comments */}
+      <ListTable
+        noResultText=" "
+        hideBoxShadow={true}
+        columns={commentsColumn}
+        content={actionDetailsData.comments}
+      ></ListTable>
+      {/* For Data Updated */}
+      <ListTable
+        noResultText=" "
+        hideBoxShadow={true}
+        columns={dataChangeColumns}
+        content={dataChange(actionDetailsData)}
+      ></ListTable>
+    </>
+  )
+}
+
 const ActionDetailsModal = (
   show: boolean,
   actionDetailsData: IActionDetailsData,
   toggleActionDetails: (param: IActionDetailsData | null) => void,
   intl: IntlShape,
-  goToUser: typeof goToUserProfile
+  goToUser: typeof goToUserProfile,
+  registerForm: IForm
 ) => {
   if (isEmpty(actionDetailsData)) return <></>
 
@@ -935,27 +992,7 @@ const ActionDetailsModal = (
           </CLinkButton>
           <span> — {getFormattedDate(actionDetailsData.date)}</span>
         </div>
-        <ListTable
-          noResultText="None"
-          hideBoxShadow={true}
-          columns={[
-            {
-              isSortable: false,
-              key: 'name',
-              label: 'Name',
-              sortFunction: () => {},
-              width: 100
-            }
-          ]}
-          content={[
-            {
-              name: 'Euan',
-              role: 'Registrar',
-              status: 'Active',
-              type: 'Chairman'
-            }
-          ]}
-        ></ListTable>
+        {actionDetailsModalListTable(actionDetailsData, registerForm)}
       </>
     </ResponsiveModal>
   )
@@ -973,6 +1010,7 @@ function RecordAuditBody({
   goToRegistrarHomeTab,
   scope,
   userDetails,
+  registerForm,
   goToUserProfile,
   goToTeamUserList
 }: {
@@ -981,10 +1019,13 @@ function RecordAuditBody({
   intl: IntlShape
   scope: Scope | null
   userDetails: IUserDetails | null
+  registerForm: IRegisterFormState
 } & IDispatchProps) {
   const [showDialog, setShowDialog] = React.useState(false)
   const [showActionDetails, setActionDetails] = React.useState(false)
   const [actionDetailsData, setActionDetailsData] = React.useState({})
+
+  if (!registerForm.registerForm || !declaration.type) return <></>
 
   const toggleActionDetails = (actionItem: IActionDetailsData | null) => {
     actionItem && setActionDetailsData(actionItem)
@@ -1094,6 +1135,11 @@ function RecordAuditBody({
     })
   )
 
+  let regForm: IForm
+  const eventType = declaration.type
+  if (eventType in registerForm.registerForm)
+    regForm = get(registerForm.registerForm, eventType)
+  else regForm = registerForm.registerForm['birth']
   return (
     <>
       <Content
@@ -1131,7 +1177,8 @@ function RecordAuditBody({
         actionDetailsData,
         toggleActionDetails,
         intl,
-        goToUserProfile
+        goToUserProfile,
+        regForm
       )}
 
       <ResponsiveModal
@@ -1283,6 +1330,7 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
     scope: getScope(state),
     tab,
     userDetails: state.profile.userDetails,
+    registerForm: state.registerForm,
     workqueueDeclaration:
       (tab !== 'search' &&
         state.workqueueState.workqueue.data[tab].results?.find(
