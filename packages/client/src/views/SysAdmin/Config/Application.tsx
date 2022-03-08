@@ -133,7 +133,7 @@ function GeneralTabContent({
         {
           label: intl.formatMessage(messages.nidPatternTitle),
           value:
-            offlineCountryConfiguration.config.NID_NUMBER_PATTERN.pattern.toString(),
+            offlineCountryConfiguration.config.NID_NUMBER_PATTERN.toString(),
           action: {
             id: 'btnChangeUIN',
             label: intl.formatMessage(buttonMessages.change),
@@ -380,6 +380,7 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
             changeModalName={this.state.changeModalName}
             showNotification={this.state.showNotification}
             valueChanged={this.changeValue}
+            offlineCountryConfiguration={offlineCountryConfiguration}
           />
         )}
         <FloatingNotification

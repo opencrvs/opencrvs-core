@@ -45,11 +45,7 @@ interface Window {
         endBefore: number
       }
     }
-    NID_NUMBER_PATTERN: {
-      pattern: RegExp
-      example: string
-      num: string
-    }
+    NID_NUMBER_PATTERN: RegExp
     LOGROCKET: string
     SENTRY: string
     BIRTH_REGISTRATION_TARGET: number

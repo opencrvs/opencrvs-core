@@ -70,8 +70,7 @@ export const resolvers: GQLResolver = {
           applicationConfig.BIRTH_REGISTRATION_TARGET as number,
         DEATH_REGISTRATION_TARGET:
           applicationConfig.DEATH_REGISTRATION_TARGET as number,
-        NID_NUMBER_PATTERN:
-          applicationConfig.NID_NUMBER_PATTERN as GQLNIDNumberPatternInput
+        NID_NUMBER_PATTERN: applicationConfig.NID_NUMBER_PATTERN as string
       }
 
       const res = await fetch(

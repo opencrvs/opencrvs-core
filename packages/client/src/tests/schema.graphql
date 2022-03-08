@@ -542,7 +542,7 @@ type ApplicationConfiguration {
   PHONE_NUMBER_PATTERN: PhoneNumberPattern
   BIRTH_REGISTRATION_TARGET: Int
   DEATH_REGISTRATION_TARGET: Int
-  NID_NUMBER_PATTERN: NIDNumberPattern
+  NID_NUMBER_PATTERN: String
 }
 
 input ApplicationConfigurationInput {
@@ -569,7 +569,7 @@ input ApplicationConfigurationInput {
   PHONE_NUMBER_PATTERN: PhoneNumberPatternInput
   BIRTH_REGISTRATION_TARGET: Int
   DEATH_REGISTRATION_TARGET: Int
-  NID_NUMBER_PATTERN: NIDNumberPatternInput
+  NID_NUMBER_PATTERN: String
 }
 
 scalar Map

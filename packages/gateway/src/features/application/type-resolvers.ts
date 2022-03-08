@@ -39,5 +39,5 @@ export interface IApplicationConfigPayload {
   PHONE_NUMBER_PATTERN: GQLPhoneNumberPatternInput
   BIRTH_REGISTRATION_TARGET: number
   DEATH_REGISTRATION_TARGET: number
-  NID_NUMBER_PATTERN: GQLNIDNumberPatternInput
+  NID_NUMBER_PATTERN: string
 }

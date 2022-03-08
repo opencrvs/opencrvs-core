@@ -42,13 +42,6 @@ export interface IPhoneNumberPattern {
     endBefore: number
   }
 }
-
-export interface INIDNumberPattern {
-  pattern: RegExp
-  example: string
-  num: string
-}
-
 export interface ICertificateTemplateData {
   event: string
   status: string
@@ -84,7 +77,7 @@ export interface IApplicationConfig {
   PHONE_NUMBER_PATTERN: IPhoneNumberPattern
   BIRTH_REGISTRATION_TARGET: number
   DEATH_REGISTRATION_TARGET: number
-  NID_NUMBER_PATTERN: INIDNumberPattern
+  NID_NUMBER_PATTERN: RegExp
 }
 
 export interface IApplicationConfigResponse {

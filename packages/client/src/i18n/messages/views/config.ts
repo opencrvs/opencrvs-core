@@ -39,6 +39,7 @@ interface IConfigMessages
   nidPatternTitle: MessageDescriptor
   nidPatternChangeMessage: MessageDescriptor
   nidPatternChangeError: MessageDescriptor
+  nidPatternChangeNotification: MessageDescriptor
   legallySpecifiedLabel: MessageDescriptor
   lateRegistrationLabel: MessageDescriptor
   delayedRegistrationLabel: MessageDescriptor
@@ -289,6 +290,11 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.invalidExample',
     defaultMessage: 'Invalid',
     description: 'Label for Invalid example'
+  },
+  nidPatternChangeNotification: {
+    id: 'config.application.nidPatternChangeNotification',
+    defaultMessage: 'NID Pattern of application updated',
+    description: 'Message for NID Pattern change modal'
   }
 }
 

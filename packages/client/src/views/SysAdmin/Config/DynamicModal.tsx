@@ -9,11 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  PrimaryButton,
-  TertiaryButton,
-  LinkButton
-} from '@opencrvs/components/lib/buttons'
+import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import {
   NOTIFICATION_TYPE,
   ResponsiveModal
@@ -32,9 +28,8 @@ import { configApplicationMutations } from '@client/views/SysAdmin/Config/mutati
 import { updateOfflineConfigData } from '@client/offline/actions'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
+import ContentComponent from '@client/views/SysAdmin/Config/NIDPhoneNumContent'
 import { IOfflineData } from '@client/offline/reducer'
-import { Cross } from '@opencrvs/components/lib/icons'
-import { SuccessSmall } from '@opencrvs/components/lib/icons/SuccessSmall'
 
 const Message = styled.div`
   margin-bottom: 16px;
@@ -51,7 +46,7 @@ const CancelButton = styled(TertiaryButton)`
     padding: 0;
   }
 `
-const Content = styled.div`
+export const Content = styled.div`
   display: flex;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     flex-direction: column-reverse;
@@ -64,13 +59,13 @@ const ErrorContent = styled.div`
     flex-direction: column-reverse;
   }
 `
-const Field = styled.div`
+export const Field = styled.div`
   margin-bottom: 30px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin-bottom: 0px;
   }
 `
-const HalfWidthInput = styled(TextInput)`
+export const HalfWidthInput = styled(TextInput)`
   width: 300px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     width: 100%;
@@ -83,46 +78,9 @@ const ErrorMessage = styled.div`
   margin-left: 6px;
 `
 
-const ErrorMessageBottom = styled.div<{ marginTop?: number }>`
-  position: relative;
-  ${({ theme }) => theme.fonts.subtitleStyle};
-  color: ${({ theme }) => theme.colors.error};
-  margin-top: ${({ marginTop }) => (marginTop ? `${marginTop}px` : `0px`)};
-`
-
-const SuccessMessage = styled.div`
-  ${({ theme }) => theme.fonts.subtitleStyle};
-  color: ${({ theme }) => theme.colors.success};
-  margin-left: 9px;
-`
-
-const InputContainer = styled.div<{ displayFlex?: boolean }>`
-  width: 100%;
-  ${({ displayFlex }) =>
-    displayFlex &&
-    ` display: flex;
-      flex-flow: row;
-    `}
-
-  padding-bottom: 32px;
-  :last-child {
-    padding-bottom: 0px;
-  }
-`
-
-const ExampleValidityContainer = styled.div`
-  margin-top: 40px;
-  margin-left: 17px;
-  display: flex;
-  height: 21px;
-`
-
-const LinkButtonContainer = styled.div`
-  margin-top: 13px;
-`
-
-type IApplicationName = {
-  applicatioName: string
+type IApplicationConfigName = {
+  applicationName?: string
+  nidPattern?: string
 }
 type State = {
   applicationName: string
@@ -136,12 +94,12 @@ type State = {
 interface IProps {
   changeModalName: string
   showNotification: boolean
-  offlineCountryConfiguration: IOfflineData
   toggleConfigModal: () => void
   valueChanged: (
     notificationStatus: NOTIFICATION_TYPE,
     messages: string
   ) => void
+  offlineCountryConfiguration: IOfflineData
 }
 
 type DispatchProps = {
@@ -149,19 +107,14 @@ type DispatchProps = {
 }
 
 type IFullProps = IProps & IntlShapeProps & DispatchProps
-
-function isApplicationName(
-  modalName: string,
-  value: IApplicationName
-): value is IApplicationName {
-  return modalName === GeneralActionId.APPLICATION_NAME
-}
 class DynamicModalComponent extends React.Component<IFullProps, State> {
   constructor(props: IFullProps) {
     super(props)
     this.state = {
-      applicationName: EMPTY_STRING,
-      nidPattern: EMPTY_STRING,
+      applicationName:
+        props.offlineCountryConfiguration.config.APPLICATION_NAME,
+      nidPattern:
+        props.offlineCountryConfiguration.config.NID_NUMBER_PATTERN.toString(),
       nidExample: EMPTY_STRING,
       testNid: false,
       updatingValue: false,
@@ -195,20 +148,43 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
 
   mutationHandler(
     modalName: string,
-    value: IApplicationName,
+    value: IApplicationConfigName,
     valueChanged: (
       notificationStatus: NOTIFICATION_TYPE,
       messages: string
     ) => void
   ) {
-    if (isApplicationName(modalName, value)) {
-      this.callUpdateApplicationNameMutation(value.applicatioName)
+    if (
+      modalName === GeneralActionId.APPLICATION_NAME &&
+      value.applicationName
+    ) {
+      this.callUpdateApplicationNameMutation(value.applicationName)
         .then(() => {
           valueChanged(
             NOTIFICATION_TYPE.SUCCESS,
             this.props.intl.formatMessage(
               messages.applicationNameChangeNotification
             )
+          )
+        })
+        .catch(() => {
+          this.setState({
+            errorOccured: true,
+            errorMessages: this.props.intl.formatMessage(
+              messages.applicationNameChangeError
+            )
+          })
+          valueChanged(
+            NOTIFICATION_TYPE.ERROR,
+            this.props.intl.formatMessage(messages.applicationNameChangeError)
+          )
+        })
+    } else if (modalName === GeneralActionId.NID_PATTERN && value.nidPattern) {
+      this.callUpdateNIDPatternMutation(value.nidPattern)
+        .then(() => {
+          valueChanged(
+            NOTIFICATION_TYPE.SUCCESS,
+            this.props.intl.formatMessage(messages.nidPatternChangeNotification)
           )
         })
         .catch(() => {
@@ -240,6 +216,32 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
           config: {
             ...this.props.offlineCountryConfiguration.config,
             APPLICATION_NAME
+          }
+        }
+        this.props.updateConfig(offlineConfig)
+      }
+    } catch (err) {
+      this.setState({
+        errorOccured: true,
+        errorMessages: this.props.intl.formatMessage(
+          messages.applicationNameChangeError
+        )
+      })
+    }
+  }
+
+  async callUpdateNIDPatternMutation(nidPattern: string) {
+    try {
+      this.setState({ updatingValue: true })
+      const res = await configApplicationMutations.updateNidPattern(nidPattern)
+      if (res && res.data) {
+        this.setState({ updatingValue: false })
+        const NID_NUMBER_PATTERN =
+          res.data.updateApplicationConfig.NID_NUMBER_PATTERN
+        const offlineConfig = {
+          config: {
+            ...this.props.offlineCountryConfiguration.config,
+            NID_NUMBER_PATTERN
           }
         }
         this.props.updateConfig(offlineConfig)
@@ -319,7 +321,10 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
             onClick={() => {
               this.mutationHandler(
                 changeModalName,
-                { applicatioName: this.state.applicationName },
+                {
+                  applicationName: this.state.applicationName,
+                  nidPattern: this.state.nidPattern
+                },
                 valueChanged
               )
             }}
@@ -359,88 +364,18 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
           </Content>
         )}
         {changeModalName === GeneralActionId.NID_PATTERN && (
-          <Content>
-            <Field>
-              <InputContainer>
-                <InputField
-                  id="nidPattern"
-                  touched={false}
-                  required={true}
-                  label={intl.formatMessage(messages.pattern)}
-                  error={intl.formatMessage(messages.nidPatternChangeError)}
-                  ignoreMediaQuery={true}
-                >
-                  <HalfWidthInput
-                    id="applicationName"
-                    type="text"
-                    error={!this.isValidRegEx(this.state.nidPattern)}
-                    value={this.state.nidPattern}
-                    onChange={this.setNIDPattern}
-                    ignoreMediaQuery={true}
-                  />
-                </InputField>
-                <ErrorMessageBottom id="nid-regex-error" marginTop={6}>
-                  {!this.isValidRegEx(this.state.nidPattern) &&
-                    intl.formatMessage(messages.nidPatternChangeError)}
-                </ErrorMessageBottom>
-              </InputContainer>
-              <InputContainer displayFlex={true}>
-                <div>
-                  <InputField
-                    id="nidExample"
-                    touched={false}
-                    required={false}
-                    label={intl.formatMessage(messages.example)}
-                    ignoreMediaQuery={true}
-                  >
-                    <HalfWidthInput
-                      id="nidExample"
-                      type="text"
-                      error={false}
-                      value={this.state.nidExample}
-                      onChange={this.setNIDExample}
-                      ignoreMediaQuery={true}
-                    />
-                  </InputField>
-                  <LinkButtonContainer>
-                    <LinkButton
-                      id="test-nid-example"
-                      onClick={() => {
-                        this.setState(() => ({
-                          testNid: true
-                        }))
-                      }}
-                      textDecoration={'none'}
-                    >
-                      {intl.formatMessage(messages.testNumber)}
-                    </LinkButton>
-                  </LinkButtonContainer>
-                </div>
-                {this.state.testNid && (
-                  <ExampleValidityContainer>
-                    {this.isValidExample(
-                      this.state.nidPattern,
-                      this.state.nidExample
-                    ) ? (
-                      <>
-                        <SuccessSmall />
-                        <SuccessMessage>
-                          {intl.formatMessage(messages.validExample)}
-                        </SuccessMessage>
-                      </>
-                    ) : (
-                      <>
-                        <Cross color={'red'} />
-                        <ErrorMessageBottom>
-                          {intl.formatMessage(messages.invalidExample)}
-                        </ErrorMessageBottom>
-                      </>
-                    )}
-                  </ExampleValidityContainer>
-                )}
-              </InputContainer>
-            </Field>
-          </Content>
+          <ContentComponent
+            intl={intl}
+            pattern={this.state.nidPattern}
+            example={this.state.nidExample}
+            setPattern={this.setNIDPattern}
+            setExample={this.setNIDExample}
+            isValidRegEx={this.isValidRegEx}
+            isValidExample={this.isValidExample}
+            patternErrorMessage={intl.formatMessage(
+              messages.nidPatternChangeError
+            )}
+          />
         )}
       </ResponsiveModal>
     )

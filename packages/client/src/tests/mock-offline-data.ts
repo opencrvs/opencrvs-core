@@ -353,10 +353,7 @@ export const mockOfflineData = {
     },
     BIRTH_REGISTRATION_TARGET: 45,
     DEATH_REGISTRATION_TARGET: 45,
-    NID_NUMBER_PATTERN: {
-      pattern: /^[0-9]{9}$/,
-      example: '4837281940',
-      num: '9'
+    NID_NUMBER_PATTERN: /^[0-9]{9}$/,
     },
     SENTRY: 'https://sentry.com',
     LOGROCKET: 'opencrvs-foundation/opencrvs-zambia'

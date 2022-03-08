@@ -437,7 +437,7 @@ export interface GQLApplicationConfiguration {
   PHONE_NUMBER_PATTERN?: GQLPhoneNumberPattern
   BIRTH_REGISTRATION_TARGET?: number
   DEATH_REGISTRATION_TARGET?: number
-  NID_NUMBER_PATTERN?: GQLNIDNumberPattern
+  NID_NUMBER_PATTERN?: string
 }
 
 export interface GQLApplicationConfigurationInput {
@@ -464,7 +464,7 @@ export interface GQLApplicationConfigurationInput {
   PHONE_NUMBER_PATTERN?: GQLPhoneNumberPatternInput
   BIRTH_REGISTRATION_TARGET?: number
   DEATH_REGISTRATION_TARGET?: number
-  NID_NUMBER_PATTERN?: GQLNIDNumberPatternInput
+  NID_NUMBER_PATTERN?: string
 }
 
 export interface GQLQuestionInput {

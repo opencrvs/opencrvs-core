@@ -532,7 +532,7 @@ export const range: RangeValidation =
   }
 
 export const isAValidNIDNumberFormat = (value: string): boolean => {
-  const { pattern } = window.config.NID_NUMBER_PATTERN
+  const pattern = window.config.NID_NUMBER_PATTERN
   return new RegExp(pattern).test(value)
 }
 
@@ -540,7 +540,6 @@ export const validIDNumber =
   (typeOfID: string): Validation =>
   (value: any) => {
     value = (value && value.toString()) || ''
-    const { num } = window.config.NID_NUMBER_PATTERN
 
     const cast = value as string
     const trimmedValue = cast === undefined || cast === null ? '' : cast.trim()

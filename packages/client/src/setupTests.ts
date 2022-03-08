@@ -135,11 +135,7 @@ const navigatorMock = {
   LOGROCKET: 'opencrvs-foundation/opencrvs-bangladesh',
   BIRTH_REGISTRATION_TARGET: 45,
   DEATH_REGISTRATION_TARGET: 45,
-  NID_NUMBER_PATTERN: {
-    pattern: /^[0-9]{9}$/,
-    example: '483728140',
-    num: '9'
-  },
+  NID_NUMBER_PATTERN: /^[0-9]{9}$/,
   PHONE_NUMBER_PATTERN: {
     pattern: /^01[1-9][0-9]{8}$/,
     example: '01741234567',

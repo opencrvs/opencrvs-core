@@ -149,11 +149,7 @@ export const mockFetchConfig = {
     },
     SENTRY: 'https://f892d643aab642108f44e2d1795706bc@sentry.io/1774604',
     LOGROCKET: 'opencrvs-foundation/opencrvs-zambia',
-    NID_NUMBER_PATTERN: {
-      pattern: '/^[0-9]{9}$/',
-      example: '4837281940',
-      num: '9'
-    },
+    NID_NUMBER_PATTERN: '/^[0-9]{9}$/',
     COUNTRY: 'zmb',
     LANGUAGES: 'en'
   },
