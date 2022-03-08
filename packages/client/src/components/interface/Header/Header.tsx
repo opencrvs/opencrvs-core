@@ -309,29 +309,20 @@ class HeaderComp extends React.Component<IFullProps, IState> {
 
   isLandingPage = () => {
     const role = this.props.userDetails && this.props.userDetails.role
-    const location = this.props.history.location.pathname as any
+    const location = this.props.history.location.pathname
     if (
-      FIELD_AGENT_ROLES.includes(role as string) &&
-      [HOME].includes(location)
+      (FIELD_AGENT_ROLES.includes(role as string) && HOME.includes(location)) ||
+      (NATL_ADMIN_ROLES.includes(role as string) &&
+        PERFORMANCE_HOME.includes(location)) ||
+      (SYS_ADMIN_ROLES.includes(role as string) &&
+        OPERATIONAL_REPORT.includes(location)) ||
+      (REGISTRAR_ROLES.includes(role as string) &&
+        REGISTRAR_HOME.includes(location))
     ) {
       return true
-    } else if (
-      NATL_ADMIN_ROLES.includes(role as string) &&
-      [PERFORMANCE_HOME].includes(location)
-    ) {
-      return true
-    } else if (
-      SYS_ADMIN_ROLES.includes(role as string) &&
-      [OPERATIONAL_REPORT].includes(location)
-    ) {
-      return true
-    } else if (
-      REGISTRAR_ROLES.includes(role as string) &&
-      [REGISTRAR_HOME].includes(location)
-    ) {
-      return true
+    } else {
+      return false
     }
-    return false
   }
 
   toggleMenu = () => {
