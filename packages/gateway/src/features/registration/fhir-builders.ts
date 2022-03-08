@@ -3444,12 +3444,50 @@ export async function updateFHIRTaskBundle(
   reason?: string,
   comment?: string
 ) {
-  const taskResource = taskEntry.resource as fhir.Task
+  const taskResource = taskEntry.resource
   taskEntry.resource = updateTaskTemplate(taskResource, status, reason, comment)
   const fhirBundle: ITaskBundle = {
     resourceType: 'Bundle',
     type: 'document',
     entry: [taskEntry]
+  }
+  return fhirBundle
+}
+
+export function addOrUpdateExtension(
+  taskEntry: ITaskBundleEntry,
+  extension: fhir.Extension
+) {
+  const task = taskEntry.resource
+  if (!task.extension) {
+    task.extension = []
+  }
+  const taskExtensionIndex =
+    task.extension.findIndex((ext) => ext.url === extension.url) || -1
+
+  if (taskExtensionIndex < 0) {
+    task.extension.push(extension)
+  } else {
+    task.extension[taskExtensionIndex].valueString = extension.valueString
+  }
+
+  taskEntry.request = {
+    method: 'PUT',
+    url: `Task/${taskEntry.resource.id}`
+  } as fhir.BundleEntryRequest
+
+  const fhirBundle: ITaskBundle = {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: [taskEntry],
+    signature: {
+      type: [
+        {
+          code: 'downloaded'
+        }
+      ],
+      when: Date().toString()
+    }
   }
   return fhirBundle
 }

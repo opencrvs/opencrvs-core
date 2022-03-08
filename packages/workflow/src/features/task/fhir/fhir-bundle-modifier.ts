@@ -17,11 +17,9 @@ import {
   checkForDuplicateStatusUpdate
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
+import { ITaskBundle } from '@workflow/features/task/handler'
 
-export async function modifyTaskBundle(
-  fhirBundle: fhir.Bundle,
-  token: string
-): Promise<fhir.Bundle> {
+export async function modifyTaskBundle(fhirBundle: ITaskBundle, token: string) {
   if (
     !fhirBundle ||
     !fhirBundle.entry ||

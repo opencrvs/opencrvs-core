@@ -10,7 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IAuthHeader } from '@gateway/common-types'
-import { EVENT_TYPE } from '@gateway/features/fhir/constants'
+import {
+  EVENT_TYPE,
+  OPENCRVS_SPECIFICATION_URL
+} from '@gateway/features/fhir/constants'
 import {
   fetchFHIR,
   getDeclarationIdsFromResponse,
@@ -23,7 +26,9 @@ import {
 import {
   buildFHIRBundle,
   updateFHIRTaskBundle,
-  addDownloadedTaskExtension
+  addDownloadedTaskExtension,
+  addOrUpdateExtension,
+  ITaskBundle
 } from '@gateway/features/registration/fhir-builders'
 import { hasScope } from '@gateway/features/user/utils'
 import {
@@ -33,6 +38,7 @@ import {
 } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
 import { COUNTRY_CONFIG_URL, FHIR_URL, SEARCH_URL } from '@gateway/constants'
+import { cloneDeep } from 'lodash'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -368,7 +374,7 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate')
       ) {
-        const taskBundle = await fetchFHIR(
+        const taskBundle: ITaskBundle = await fetchFHIR(
           `/Task?focus=Composition/${id}`,
           authHeader
         )
@@ -387,7 +393,7 @@ export const resolvers: GQLResolver = {
 
         const taskHistory =
           taskHistoryBundle.entry &&
-          taskHistoryBundle.entry.map((taskEntry: fhir.BundleEntry, i) => {
+          taskHistoryBundle.entry.map((taskEntry: fhir.BundleEntry) => {
             const historicalTask = taskEntry.resource
             // all these tasks will have the same id, make it more specific to keep apollo-client's cache happy
             if (historicalTask && historicalTask.meta) {
@@ -417,8 +423,25 @@ export const resolvers: GQLResolver = {
           return await Promise.reject(new Error('Task has no reg-status code'))
         }
 
-        const status = regStatusCode as GQLRegStatus
-        const newTaskBundle = await updateFHIRTaskBundle(taskEntryData, status)
+        const taskBundleWithReinstatedExtension = addOrUpdateExtension(
+          cloneDeep(taskEntryData),
+          {
+            url: `${OPENCRVS_SPECIFICATION_URL}extension/regReinstated`,
+            valueString: 'ARCHIVED'
+          }
+        )
+
+        await fetchFHIR(
+          '/Task',
+          authHeader,
+          'PUT',
+          JSON.stringify(taskBundleWithReinstatedExtension)
+        )
+
+        const newTaskBundle = await updateFHIRTaskBundle(
+          taskEntryData,
+          regStatusCode
+        )
         await fetchFHIR(
           '/Task',
           authHeader,

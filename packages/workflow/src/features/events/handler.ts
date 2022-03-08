@@ -30,7 +30,8 @@ import {
   hasCorrectionEncounterSection,
   isInProgressApplication,
   isRejectedTask,
-  isArchiveTask
+  isArchiveTask,
+  hasReinstatedExtension
 } from '@workflow/features/registration/utils'
 import updateTaskHandler from '@workflow/features/task/handler'
 import { logger } from '@workflow/logger'
@@ -185,7 +186,10 @@ function detectEvent(request: Hapi.Request): Events {
       if (isRejectedTask(taskResource)) {
         return Events.BIRTH_MARK_VOID
       }
-      if (isArchiveTask(taskResource)) {
+      if (
+        isArchiveTask(taskResource) &&
+        !hasReinstatedExtension(taskResource)
+      ) {
         return Events.BIRTH_MARK_ARCHIVED
       }
       return Events.BIRTH_MARK_REINSTATED
@@ -193,7 +197,10 @@ function detectEvent(request: Hapi.Request): Events {
       if (isRejectedTask(taskResource)) {
         return Events.DEATH_MARK_VOID
       }
-      if (isArchiveTask(taskResource)) {
+      if (
+        isArchiveTask(taskResource) &&
+        !hasReinstatedExtension(taskResource)
+      ) {
         return Events.DEATH_MARK_ARCHIVED
       }
       return Events.DEATH_MARK_REINSTATED
@@ -297,7 +304,11 @@ export async function fhirWorkflowEventHandler(
     case Events.BIRTH_MARK_REINSTATED:
     case Events.DEATH_MARK_REINSTATED:
       response = await updateTaskHandler(request, h, event)
-      await triggerEvent(event, request.payload, request.headers)
+      if (
+        !hasReinstatedExtension(getTaskResource(request.payload as fhir.Bundle))
+      ) {
+        await triggerEvent(event, request.payload, request.headers)
+      }
       break
     case Events.DEATH_IN_PROGRESS_DEC:
       response = await createRegistrationHandler(request, h, event)
