@@ -12,7 +12,7 @@
 
 import React from 'react'
 import styled from '@client/styledComponents'
-import { Content, Field, HalfWidthInput } from './DynamicModal'
+import { Content, Field, HalfWidthInput, isValidRegEx } from './DynamicModal'
 import { InputField } from '@opencrvs/components/lib/forms'
 import { IntlShape } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/config'
@@ -64,7 +64,6 @@ interface IProps {
   example: string
   setPattern: (event: React.ChangeEvent<HTMLInputElement>) => void
   setExample: (event: React.ChangeEvent<HTMLInputElement>) => void
-  isValidRegEx: (pattern: string) => boolean
   isValidExample: (pattern: string, example: string) => boolean
   patternErrorMessage: string
 }
@@ -75,7 +74,6 @@ function ContentComponent({
   example,
   setPattern,
   setExample,
-  isValidRegEx,
   isValidExample,
   patternErrorMessage
 }: IProps) {

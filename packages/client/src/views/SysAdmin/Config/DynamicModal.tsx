@@ -107,6 +107,18 @@ type DispatchProps = {
 }
 
 type IFullProps = IProps & IntlShapeProps & DispatchProps
+
+export function isValidRegEx(pattern: string): boolean {
+  try {
+    const value = ''
+    value.match(pattern)
+  } catch {
+    return false
+  }
+  if (pattern === '') return false
+  return true
+}
+
 class DynamicModalComponent extends React.Component<IFullProps, State> {
   constructor(props: IFullProps) {
     super(props)
@@ -263,37 +275,27 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
     else return intl.formatMessage(messages.nidPatternTitle)
   }
 
-  isValidRegEx(pattern: string) {
-    try {
-      const value = ''
-      value.match(pattern)
-    } catch {
-      return false
-    }
-    return true
-  }
-
   isApplyButtonDisable(props: IFullProps) {
     const { changeModalName } = props
     if (changeModalName === GeneralActionId.APPLICATION_NAME) {
       return !Boolean(this.state.applicationName.length)
     } else if (changeModalName === GeneralActionId.NID_PATTERN) {
       return (
-        !this.isValidRegEx(this.state.nidPattern) ||
-        !Boolean(this.state.nidPattern)
+        !isValidRegEx(this.state.nidPattern) || !Boolean(this.state.nidPattern)
       )
     } else return true
   }
 
   isValidExample(pattern: string, example: string) {
     if (
-      !this.isValidRegEx(pattern) ||
+      !isValidRegEx(pattern) ||
       !example.match(pattern) ||
       !pattern ||
       !example
-    )
+    ) {
       return false
-    else return true
+    }
+    return true
   }
 
   render() {
@@ -370,7 +372,6 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
             example={this.state.nidExample}
             setPattern={this.setNIDPattern}
             setExample={this.setNIDExample}
-            isValidRegEx={this.isValidRegEx}
             isValidExample={this.isValidExample}
             patternErrorMessage={intl.formatMessage(
               messages.nidPatternChangeError
