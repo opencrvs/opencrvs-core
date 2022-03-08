@@ -17,12 +17,6 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 
-type NIDNumberPattern {
-  pattern: String
-  example: String
-  num: String
-}
-
 type Mask {
   startForm: Int
   endBefore: Int
@@ -34,12 +28,6 @@ type PhoneNumberPattern {
   start: String
   num: String
   mask: Mask
-}
-
-input NIDNumberPatternInput {
-  pattern: String
-  example: String
-  num: String
 }
 
 input MaskInput {

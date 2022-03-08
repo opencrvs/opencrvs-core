@@ -10,10 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import {
-  GQLNIDNumberPatternInput,
-  GQLPhoneNumberPatternInput
-} from '@gateway/graphql/schema'
+import { GQLPhoneNumberPatternInput } from '@gateway/graphql/schema'
 
 export interface IApplicationConfigPayload {
   APPLICATION_NAME: string

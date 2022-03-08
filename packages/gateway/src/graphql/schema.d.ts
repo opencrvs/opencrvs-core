@@ -893,24 +893,12 @@ export interface GQLPhoneNumberPattern {
   mask?: GQLMask
 }
 
-export interface GQLNIDNumberPattern {
-  pattern?: string
-  example?: string
-  num?: string
-}
-
 export interface GQLPhoneNumberPatternInput {
   pattern?: string
   example?: string
   start?: string
   num?: string
   mask?: GQLMaskInput
-}
-
-export interface GQLNIDNumberPatternInput {
-  pattern?: string
-  example?: string
-  num?: string
 }
 
 export interface GQLMesssageDescriptorInput {
@@ -1391,7 +1379,6 @@ export interface GQLResolver {
   EventProgressSet?: GQLEventProgressSetTypeResolver
   MesssageDescriptor?: GQLMesssageDescriptorTypeResolver
   PhoneNumberPattern?: GQLPhoneNumberPatternTypeResolver
-  NIDNumberPattern?: GQLNIDNumberPatternTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
   ReasonsNotApplying?: GQLReasonsNotApplyingTypeResolver
@@ -4719,30 +4706,6 @@ export interface PhoneNumberPatternToMaskResolver<
   TParent = any,
   TResult = any
 > {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLNIDNumberPatternTypeResolver<TParent = any> {
-  pattern?: NIDNumberPatternToPatternResolver<TParent>
-  example?: NIDNumberPatternToExampleResolver<TParent>
-  num?: NIDNumberPatternToNumResolver<TParent>
-}
-
-export interface NIDNumberPatternToPatternResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface NIDNumberPatternToExampleResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface NIDNumberPatternToNumResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

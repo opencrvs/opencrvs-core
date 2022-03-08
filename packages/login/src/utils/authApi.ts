@@ -28,7 +28,6 @@ export interface IPhoneNumberPattern {
     endBefore: number
   }
 }
-
 export interface ICertificateTemplateData {
   event: string
   status: string

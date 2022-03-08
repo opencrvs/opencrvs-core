@@ -966,24 +966,12 @@ type PhoneNumberPattern {
   mask: Mask
 }
 
-type NIDNumberPattern {
-  pattern: String
-  example: String
-  num: String
-}
-
 input PhoneNumberPatternInput {
   pattern: String
   example: String
   start: String
   num: String
   mask: MaskInput
-}
-
-input NIDNumberPatternInput {
-  pattern: String
-  example: String
-  num: String
 }
 
 type RegWorkflow {

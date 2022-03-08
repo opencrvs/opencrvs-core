@@ -289,7 +289,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
   isValidExample(pattern: string, example: string) {
     if (
       !isValidRegEx(pattern) ||
-      !example.match(pattern) ||
+      !new RegExp(pattern).test(example) ||
       !pattern ||
       !example
     ) {
