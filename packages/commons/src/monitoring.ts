@@ -1,7 +1,7 @@
 import pkgUp = require('pkg-up')
 
 async function init() {
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV === 'production') {
     const path = await pkgUp()
 
     require('elastic-apm-node').start({
