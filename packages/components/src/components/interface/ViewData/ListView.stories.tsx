@@ -67,6 +67,17 @@ DataSectionView.args = {
         label: 'edit',
         handler: () => alert('Change your phone number')
       }
+    },
+    {
+      label: <div>Atiq Zaman</div>,
+      value: <>Registrar</>,
+      isLinkLabel: true,
+      onClickLabelLink: () => alert('label link clicked'),
+      actionType: ActionType.BUTTON,
+      action: {
+        label: 'edit',
+        handler: () => alert('Change your phone number')
+      }
     }
   ]
 }

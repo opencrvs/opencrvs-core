@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Button, IconButton, LinkButton } from '../../buttons'
+import { IconButton, LinkButton, PrimaryButton } from '../../buttons'
 
 const Container = styled.div`
   display: flex;
@@ -234,13 +234,13 @@ export class ListRow extends React.Component<IListRowProps> {
             )}
             {action && actionType === ActionType.BUTTON && (
               <Action>
-                <Button
+                <PrimaryButton
                   id={action.id}
                   disabled={action.disabled}
                   onClick={action.handler}
                 >
                   {action.label}
-                </Button>
+                </PrimaryButton>
               </Action>
             )}
             <HideOnDesktop>
