@@ -16,7 +16,8 @@ import {
   IFacilitiesDataResponse,
   IContentResponse,
   IAssetResponse,
-  IApplicationConfigResponse
+  IApplicationConfigResponse,
+  IApplicationConfig
 } from '@client/utils/referenceApi'
 import { IUserDetails } from '@client/utils/userUtils'
 
@@ -95,6 +96,12 @@ export const APPLICATION_CONFIG_LOADED = 'OFFLINE/APPLICATION_CONFIG_LOADED'
 export type ApplicationConfigLoadedAction = {
   type: typeof APPLICATION_CONFIG_LOADED
   payload: IApplicationConfigResponse
+}
+
+export const UPDATE_OFFLINE_CONFIG = 'OFFLINE/UPDATE_OFFLINE_CONFIG' as const
+export type ApplicationConfigUpdatedAction = {
+  type: typeof UPDATE_OFFLINE_CONFIG
+  payload: { config: IApplicationConfig }
 }
 
 export const APPLICATION_CONFIG_FAILED = 'OFFLINE/APPLICATION_CONFIG_FAILED'
@@ -230,14 +237,16 @@ export const configFailed = (error: Error): ApplicationConfigFailedAction => ({
   payload: error
 })
 
+export const updateOfflineConfigData = (payload: {
+  config: IApplicationConfig
+}): ApplicationConfigUpdatedAction => ({
+  type: UPDATE_OFFLINE_CONFIG,
+  payload: payload
+})
+
 export const REFRESH_OFFLINE_DATA = 'OFFLINE/REFRESH_OFFLINE_DATA' as const
 export const refreshOfflineData = () => ({
   type: REFRESH_OFFLINE_DATA
-})
-
-export const UPDATE_OFFLINE_CONFIG = 'OFFLINE/UPDATE_OFFLINE_CONFIG' as const
-export const updateOfflineConfigData = () => ({
-  type: UPDATE_OFFLINE_CONFIG
 })
 
 export type Action =
@@ -258,8 +267,8 @@ export type Action =
   | ApplicationConfigLoadAction
   | ApplicationConfigLoadedAction
   | ApplicationConfigFailedAction
+  | ApplicationConfigUpdatedAction
   | IFilterLocationsAction
   | ReturnType<typeof offlineDataReady>
   | ReturnType<typeof offlineDataUpdated>
   | ReturnType<typeof refreshOfflineData>
-  | ReturnType<typeof updateOfflineConfigData>

@@ -276,12 +276,17 @@ function reducer(
       return loop(state, dataLoadingCmds)
     }
     case actions.UPDATE_OFFLINE_CONFIG: {
+      const newOfflineData = {
+        ...state.offlineData,
+        config: action.payload.config
+      }
+
       return loop(
-        { ...state },
-        Cmd.list([
-          CONFIG_CMD,
-          Cmd.run(saveOfflineData, { args: [state.offlineData] })
-        ])
+        {
+          ...state,
+          offlineData: newOfflineData
+        },
+        Cmd.run(saveOfflineData, { args: [newOfflineData] })
       )
     }
     /*

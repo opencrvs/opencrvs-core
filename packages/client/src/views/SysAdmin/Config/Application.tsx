@@ -300,7 +300,7 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
 
   changeValue = (notificationStatus: NOTIFICATION_TYPE, messages: string) => {
     if (notificationStatus !== NOTIFICATION_TYPE.ERROR) {
-      this.hideModal()
+      this.toggleConfigModal()
       this.setState({
         showNotification: true,
         notificationStatus: notificationStatus,
@@ -313,11 +313,10 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
     this.setState({ activeTabId: id })
   }
 
-  hideModal = () => {
-    this.setState({ changeModalName: '' })
-  }
-
-  showModal = () => {
+  toggleConfigModal = () => {
+    if (this.state.changeModalName) {
+      this.setState({ changeModalName: '' })
+    }
     return !!!this.state.changeModalName ? false : true
   }
 
@@ -372,9 +371,9 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
             />
           )}
         </Content>
-        {this.showModal() && (
+        {this.state.changeModalName && (
           <DynamicModal
-            hideModal={this.hideModal}
+            toggleConfigModal={this.toggleConfigModal}
             changeModalName={this.state.changeModalName}
             showNotification={this.state.showNotification}
             valueChanged={this.changeValue}

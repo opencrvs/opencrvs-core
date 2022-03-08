@@ -26,6 +26,9 @@ import { EMPTY_STRING } from '@client/utils/constants'
 import { Alert } from '@opencrvs/components/lib/icons/Alert'
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/mutations'
 import { updateOfflineConfigData } from '@client/offline/actions'
+import { IStoreState } from '@client/store'
+import { getOfflineData } from '@client/offline/selectors'
+import { IOfflineData } from '@client/offline/reducer'
 
 const Message = styled.div`
   margin-bottom: 16px;
@@ -85,7 +88,8 @@ type State = {
 interface IProps {
   changeModalName: string
   showNotification: boolean
-  hideModal: () => void
+  offlineCountryConfiguration: IOfflineData
+  toggleConfigModal: () => void
   valueChanged: (
     notificationStatus: NOTIFICATION_TYPE,
     messages: string
@@ -93,7 +97,7 @@ interface IProps {
 }
 
 type DispatchProps = {
-  updateConfig: () => void
+  updateConfig: typeof updateOfflineConfigData
 }
 
 type IFullProps = IProps & IntlShapeProps & DispatchProps
@@ -165,7 +169,15 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
       )
       if (res && res.data) {
         this.setState({ updatingValue: false })
-        this.props.updateConfig()
+        const APPLICATION_NAME =
+          res.data.updateApplicationConfig.APPLICATION_NAME
+        const offlineConfig = {
+          config: {
+            ...this.props.offlineCountryConfiguration.config,
+            APPLICATION_NAME
+          }
+        }
+        this.props.updateConfig(offlineConfig)
       }
     } catch (err) {
       this.setState({
@@ -178,14 +190,19 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
   }
 
   render() {
-    const { intl, changeModalName, hideModal, valueChanged } = this.props
+    const { intl, changeModalName, toggleConfigModal, valueChanged } =
+      this.props
     return (
       <ResponsiveModal
         id={`${changeModalName}Modal`}
         title={intl.formatMessage(messages.applicationNameLabel)}
         show={this.showChangeModal}
         actions={[
-          <CancelButton key="cancel" id="modal_cancel" onClick={hideModal}>
+          <CancelButton
+            key="cancel"
+            id="modal_cancel"
+            onClick={toggleConfigModal}
+          >
             {intl.formatMessage(buttonMessages.cancel)}
           </CancelButton>,
           <ApplyButton
@@ -203,7 +220,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
             {intl.formatMessage(buttonMessages.apply)}
           </ApplyButton>
         ]}
-        handleClose={hideModal}
+        handleClose={toggleConfigModal}
         contentHeight={175}
       >
         <Message>
@@ -237,6 +254,12 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
   }
 }
 
-export const DynamicModal = connect(null, {
+function mapStateToProps(state: IStoreState) {
+  return {
+    offlineCountryConfiguration: getOfflineData(state)
+  }
+}
+
+export const DynamicModal = connect(mapStateToProps, {
   updateConfig: updateOfflineConfigData
 })(injectIntl(DynamicModalComponent))
