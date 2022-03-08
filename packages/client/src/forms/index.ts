@@ -109,7 +109,7 @@ export interface IQuestionConfig {
   fieldType?: QuestionConfigFieldType
   preceedingFieldId?: string
   required?: boolean
-  enabled: boolean
+  enabled: string
   custom?: boolean
   initialValue?: string
 }
@@ -303,7 +303,7 @@ type FunctionParamsToDescriptor<T> =
   T extends Array<any>
     ? { [K in keyof T]: FunctionParamsToDescriptor<T[K]> }
     : T extends IFormFieldQueryMapFunction // It's a query transformation function - return a query transformation descriptor
-    ? IQueryDescriptor
+    ? any
     : T extends IFormFieldMutationMapFunction // It's a mutation transformation function - return a mutation transformation descriptor
     ? IMutationDescriptor
     : T // It's a none of the above - return self
@@ -411,7 +411,8 @@ export interface IFormFieldBase {
   prefix?: string
   postfix?: string
   disabled?: boolean
-  enabled?: boolean
+  enabled?: string
+  custom?: boolean
   initialValue?: IFormFieldValue
   initialValueKey?: string
   extraValue?: IFormFieldValue

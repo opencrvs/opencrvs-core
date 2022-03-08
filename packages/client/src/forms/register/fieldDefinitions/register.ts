@@ -22,12 +22,13 @@ import {
   IQuestionConfig,
   SerializedFormField,
   ISerializedFormSection,
-  IFormSectionGroup
+  IFormSectionGroup,
+  QuestionConfigFieldType
 } from '@client/forms/index'
 import { conditionals } from '@client/forms/utils'
 import { formMessageDescriptors } from '@client/i18n/messages'
 import { set } from 'lodash'
-import { get } from 'traverse'
+import { MessageDescriptor } from 'react-intl'
 
 interface IDefaultRegisterForms {
   birth: ISerializedForm
@@ -130,35 +131,44 @@ function getDefaultField(
 }
 
 function createCustomField(question: IQuestionConfig): SerializedFormField {
-  // TODO: create custom field
-  return {
-    name: 'firstNamesEng',
-    previewGroup: 'childNameInEnglish',
-    type: 'TEXT',
-    label: {
-      defaultMessage: 'First name(s)',
-      description: 'Label for form field: Given names',
-      id: 'form.field.label.childFirstNamesEng'
-    },
-    maxLength: 32,
-    required: true,
-    initialValue: '',
-    validate: [
-      {
-        operation: 'englishOnlyNameFormat'
-      }
-    ],
+  const baseField: SerializedFormField = {
+    name: question.fieldName as string,
+    custom: true,
+    type: question.fieldType as QuestionConfigFieldType,
+    label: question.label as MessageDescriptor,
+    validate: [],
     mapping: {
       mutation: {
-        operation: 'fieldToNameTransformer',
-        parameters: ['en', 'firstNames']
+        operation: 'customFieldToQuestionnaireTransformer'
       },
       query: {
-        operation: 'nameToFieldTransformer',
-        parameters: ['en', 'firstNames']
+        operation: 'questionnaireToCustomFieldTransformer'
       }
     }
   }
+
+  if (
+    baseField.type === 'TEXT' ||
+    baseField.type === 'NUMBER' ||
+    baseField.type === 'TEXTAREA'
+  ) {
+    baseField.required = question.required
+    baseField.placeholder = question.placeholder as MessageDescriptor
+  }
+
+  if (baseField.type === 'TEL') {
+    baseField.validate = [
+      {
+        operation: 'phoneNumberFormat'
+      }
+    ]
+  }
+
+  if (baseField.type === 'TEXT' || baseField.type === 'TEXTAREA') {
+    baseField.maxLength = question.maxLength as number
+  }
+
+  return baseField
 }
 
 export function configureRegistrationForm(
