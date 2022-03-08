@@ -1,8 +1,8 @@
 import pkgUp = require('pkg-up')
 
-async function init() {
+function init() {
   if (process.env.NODE_ENV === 'production') {
-    const path = await pkgUp()
+    const path = pkgUp.sync()
 
     require('elastic-apm-node').start({
       // Override service name from package.json

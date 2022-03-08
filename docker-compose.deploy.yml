@@ -223,7 +223,7 @@ services:
         - 'traefik.docker.network=opencrvs_overlay_net'
       replicas: 2
     environment:
-      - APN_SERVICE_URL=apm-server:8200
+      - APN_SERVICE_URL=http://apm-server:8200
     networks:
       - overlay_net
 
@@ -247,7 +247,7 @@ services:
       - jwt-public-key.{{ts}}
       - jwt-private-key.{{ts}}
     environment:
-      - APN_SERVICE_URL=apm-server:8200
+      - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PRIVATE_KEY_PATH=/run/secrets/jwt-private-key.{{ts}}
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
@@ -264,7 +264,7 @@ services:
     secrets:
       - jwt-public-key.{{ts}}
     environment:
-      - APN_SERVICE_URL=apm-server:8200
+      - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
       - MONGO_URL=mongodb://mongo1/user-mgnt?replicaSet=rs0
     deploy:
@@ -276,7 +276,7 @@ services:
     secrets:
       - jwt-public-key.{{ts}}
     environment:
-      - APN_SERVICE_URL=apm-server:8200
+      - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
       replicas: 2
@@ -287,7 +287,7 @@ services:
     secrets:
       - jwt-public-key.{{ts}}
     environment:
-      - APN_SERVICE_URL=apm-server:8200
+      - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
       labels:
@@ -303,7 +303,7 @@ services:
     secrets:
       - jwt-public-key.{{ts}}
     environment:
-      - APN_SERVICE_URL=apm-server:8200
+      - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
       replicas: 2
@@ -314,7 +314,7 @@ services:
     secrets:
       - jwt-public-key.{{ts}}
     environment:
-      - APN_SERVICE_URL=apm-server:8200
+      - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
       replicas: 2
@@ -325,7 +325,7 @@ services:
     secrets:
       - jwt-public-key.{{ts}}
     environment:
-      - APN_SERVICE_URL=apm-server:8200
+      - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
       replicas: 2
@@ -336,7 +336,7 @@ services:
     secrets:
       - jwt-public-key.{{ts}}
     environment:
-      - APN_SERVICE_URL=apm-server:8200
+      - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
       - MONGO_URL=mongodb://mongo1/application-config?replicaSet=rs0
     deploy:
@@ -424,7 +424,7 @@ services:
     secrets:
       - jwt-public-key.{{ts}}
     environment:
-      - APN_SERVICE_URL=apm-server:8200
+      - APN_SERVICE_URL=http://apm-server:8200
       - MONGO_URL=mongodb://mongo1/webhooks?replicaSet=rs0
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
