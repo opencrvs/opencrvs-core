@@ -418,9 +418,12 @@ export async function generateApplicationStartedPoint(
     isNotification(composition)
       ? (role = 'NOTIFICATION_API_USER')
       : (role = 'FIELD_AGENT')
-  } else if (status === Events.NEW_VALIDATE) {
+  } else if (status === Events.REQUEST_FOR_REGISTRAR_VALIDATION) {
     role = 'REGISTRATION_AGENT'
-  } else if (status === Events.NEW_WAITING_VALIDATION) {
+  } else if (
+    status ===
+    Events.REGISTRAR_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
+  ) {
     role = 'REGISTRAR'
   } else if (status === Events.NEW_DEC) {
     role = 'FIELD_AGENT'

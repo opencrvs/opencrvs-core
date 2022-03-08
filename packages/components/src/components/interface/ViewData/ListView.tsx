@@ -38,8 +38,15 @@ interface IProps {
   items: IListRowProps[]
   responsiveContents?: React.ReactNode
   isConfigPage?: boolean
+  noResultText?: string
 }
 
+const ErrorText = styled.div<{ isFullPage?: boolean }>`
+  ${({ theme }) => theme.fonts.h5Style};
+  text-align: left;
+  margin-left: ${({ isFullPage }) => (isFullPage ? `40px` : `10px`)};
+  color: ${({ theme }) => theme.colors.copy};
+`
 export class ListView extends React.Component<IProps> {
   render() {
     const { id, title, items, responsiveContents } = this.props
@@ -54,17 +61,21 @@ export class ListView extends React.Component<IProps> {
             {responsiveContents}
           </ResponsiveContainer>
         )}
-        {items.map((item: IListRowProps, index: number) => (
-          <ListRow
-            id={
-              isString(item.label)
-                ? item.label.split(' ').join('-')
-                : 'label-component'
-            }
-            key={index}
-            {...item}
-          />
-        ))}
+        {items.length <= 0 && (
+          <ErrorText id="no-record">{this.props.noResultText}</ErrorText>
+        )}
+        {items.length > 0 &&
+          items.map((item: IListRowProps, index: number) => (
+            <ListRow
+              id={
+                isString(item.label)
+                  ? item.label.split(' ').join('-')
+                  : 'label-component'
+              }
+              key={index}
+              {...item}
+            />
+          ))}
       </Container>
     )
   }

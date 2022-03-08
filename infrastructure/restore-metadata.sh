@@ -51,8 +51,7 @@ else
   exit 1
 fi
 
-docker run --rm -v $DIR/default_backups:/default_backups --network=$NETWORK mongo:3.6 bash \
- -c "mongorestore --host $HOST --drop --gzip --archive=/default_backups/hearth-dev.gz"
+if [[ "$ENV" != "qa" ]] ; then docker run --rm -v $DIR/default_backups:/default_backups --network=$NETWORK mongo:3.6 bash -c "mongorestore --host $HOST --drop --gzip --archive=/default_backups/hearth-dev.gz" ; fi
 
 docker run --rm -v $DIR/default_backups:/default_backups --network=$NETWORK mongo:3.6 bash \
  -c "mongorestore --host $HOST --drop --gzip --archive=/default_backups/openhim-dev.gz"

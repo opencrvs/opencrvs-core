@@ -51,6 +51,7 @@ DataSectionView.args = {
       label: <div>Atiq Zaman</div>,
       value: <>Registrar</>,
       isLinkLabel: true,
+      onClickLabelLink: () => alert('label link clicked'),
       action: {
         label: 'Change',
         handler: () => alert('Change your phone number')
@@ -60,6 +61,7 @@ DataSectionView.args = {
       label: <div>Atiq Zaman</div>,
       value: <>Registrar</>,
       isLinkLabel: true,
+      onClickLabelLink: () => alert('label link clicked'),
       actionType: ActionType.ICON,
       action: {
         label: 'edit',

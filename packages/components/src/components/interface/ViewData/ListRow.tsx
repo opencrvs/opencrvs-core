@@ -142,6 +142,7 @@ export interface IListRowProps {
   actionsMenu?: React.ReactNode
   actionType?: ActionType
   isLinkLabel?: boolean
+  onClickLabelLink?: () => void
   status?: React.ReactNode
   nameWithAvatar?: React.ReactNode
 }
@@ -163,6 +164,7 @@ export class ListRow extends React.Component<IListRowProps> {
       actionsMenu,
       actionType,
       isLinkLabel,
+      onClickLabelLink,
       nameWithAvatar
     } = this.props
 
@@ -176,7 +178,11 @@ export class ListRow extends React.Component<IListRowProps> {
               <ListDataContainer>
                 {isLinkLabel ? (
                   <Label id={`${id}_label`}>
-                    <LinkButton isBoldLink={true} textDecoration="none">
+                    <LinkButton
+                      onClick={() => onClickLabelLink && onClickLabelLink()}
+                      isBoldLink={true}
+                      textDecoration="none"
+                    >
                       {label}
                     </LinkButton>
                   </Label>

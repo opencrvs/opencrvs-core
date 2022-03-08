@@ -26,7 +26,7 @@ import { populateBundleFromPayload } from '@metrics/features/registration/utils'
 import { Events } from '@metrics/features/metrics/constants'
 import { IPoints } from '@metrics/features/registration'
 
-export async function waitingValidationHandler(
+export async function waitingExternalValidationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -56,7 +56,7 @@ export async function waitingValidationHandler(
   return h.response().code(200)
 }
 
-export async function newValidationHandler(
+export async function requestForRegistrarValidationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -75,7 +75,7 @@ export async function newValidationHandler(
           Authorization: request.headers.authorization,
           'x-correlation-id': request.headers['x-correlation-id']
         },
-        Events.NEW_VALIDATE
+        Events.REQUEST_FOR_REGISTRAR_VALIDATION
       )
     )
     await writePoints(points)
@@ -86,7 +86,7 @@ export async function newValidationHandler(
   return h.response().code(200)
 }
 
-export async function newWaitingValidationHandler(
+export async function registrarRegistrationWaitingExternalValidationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -105,7 +105,7 @@ export async function newWaitingValidationHandler(
           Authorization: request.headers.authorization,
           'x-correlation-id': request.headers['x-correlation-id']
         },
-        Events.NEW_WAITING_VALIDATION
+        Events.REGISTRAR_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
       )
     )
     await writePoints(points)
