@@ -18,6 +18,6 @@ require('app-module-path').addPath(require('path').join(__dirname, '../'))
 require('dotenv').config({
   path: `${process.cwd()}/.env`
 })
-import { createServer } from './server'
+import { createServer } from '@workflow/server'
 
 createServer().then((server) => server.start())

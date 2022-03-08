@@ -14,7 +14,7 @@ import '@opencrvs/commons/monitoring'
 // tslint:disable-next-line no-var-requires
 require('app-module-path').addPath(require('path').join(__dirname, '../'))
 import * as DotEnv from 'dotenv'
-import { createServer } from './server'
+import { createServer } from '@gateway/server'
 
 DotEnv.config({
   path: `${process.cwd()}/.env`

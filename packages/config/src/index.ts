@@ -11,6 +11,6 @@
  */
 import '@opencrvs/commons/monitoring'
 
-import { createServer } from './server'
+import { createServer } from '@config/server'
 
 createServer().then((server) => server.start())

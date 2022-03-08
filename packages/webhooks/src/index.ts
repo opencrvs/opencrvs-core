@@ -13,6 +13,6 @@
 import '@opencrvs/commons/monitoring'
 // tslint:disable-next-line no-var-requires
 require('app-module-path').addPath(require('path').join(__dirname, '../'))
-import { createServer } from './server'
+import { createServer } from '@webhooks/server'
 
 createServer().then((server) => server.start())
