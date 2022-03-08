@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "start": "cross-env NODE_ENV=development nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
-    "start:prod": "node build/dist/src/index.js",
+    "start:prod": "TS_NODE_BASEURL=./build/dist/src node -r tsconfig-paths/register build/dist/src/index.js",
     "test": "jest --coverage --silent --noStackTrace && yarn test:compilation",
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
@@ -39,7 +39,6 @@
     "redis": "^3.1.1"
   },
   "devDependencies": {
-    "@ef-carbon/tspm": "^2.2.5",
     "@types/command-line-args": "^5.0.0",
     "@types/command-line-usage": "^5.0.1",
     "@types/dotenv": "^6.1.0",

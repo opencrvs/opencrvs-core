@@ -39,7 +39,6 @@
     "typescript": "^3.7.2"
   },
   "devDependencies": {
-    "@ef-carbon/tspm": "^2.2.5",
     "@types/fhir": "^0.0.30",
     "@types/handlebars": "^4.1.0",
     "@types/hapi__hapi": "^20.0.0",

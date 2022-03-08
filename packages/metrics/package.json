@@ -14,7 +14,6 @@
     "precommit": "yarn lint && lint-staged",
     "test:compilation": "tsc --noEmit",
     "build": "tsc",
-    "postbuild": "ef-tspm --tsconfig tsconfig.build.json",
     "build:clean": "rm -rf build"
   },
   "dependencies": {
@@ -39,7 +38,6 @@
     "typescript": "^3.7.2"
   },
   "devDependencies": {
-    "@ef-carbon/tspm": "^2.2.5",
     "@types/archiver": "^3.0.0",
     "@types/fhir": "^0.0.30",
     "@types/hapi-pino": "^8.0.5",

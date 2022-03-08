@@ -62,7 +62,6 @@
     "winston": "^3.0.0"
   },
   "devDependencies": {
-    "@ef-carbon/tspm": "^2.2.5",
     "@hapi/lab": "^24.0.0",
     "@types/bunyan": "^1.8.4",
     "@types/code": "^4.0.3",
