@@ -27,6 +27,7 @@
     "joi": "^17.5.0",
     "is-svg": "^4.3.2",
     "mongoose": "^5.11.0",
+    "tsconfig-paths": "^3.13.0",
     "pino": "^6.0.0"
   },
   "devDependencies": {
@@ -35,7 +36,6 @@
     "nodemon": "^2.0.15",
     "prettier": "^2.5.0",
     "ts-node": "^6.1.1",
-    "tsconfig-paths": "^3.13.0",
     "tslint": "^5.17.0",
     "tslint-microsoft-contrib": "^6.2.0",
     "typescript": "^3.7.2"
