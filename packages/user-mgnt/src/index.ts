@@ -9,8 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-// tslint:disable-next-line no-var-requires
+// tslint:disable-next-line no-import-side-effect
 import '@opencrvs/commons/monitoring'
+// tslint:disable-next-line no-var-requires
 require('app-module-path').addPath(require('path').join(__dirname, '../'))
 
 import * as Hapi from '@hapi/hapi'

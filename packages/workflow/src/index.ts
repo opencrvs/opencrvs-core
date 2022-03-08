@@ -9,13 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+
+// tslint:disable-next-line no-import-side-effect
+import '@opencrvs/commons/monitoring'
 // tslint:disable-next-line no-var-requires
 require('app-module-path').addPath(require('path').join(__dirname, '../'))
 // tslint:disable-next-line no-var-requires
 require('dotenv').config({
   path: `${process.cwd()}/.env`
 })
-import '@opencrvs/commons/monitoring'
 import * as Hapi from '@hapi/hapi'
 import {
   HOST,
