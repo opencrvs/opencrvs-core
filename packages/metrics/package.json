@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "start": "cross-env NODE_ENV=development nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
-    "start:prod": "node build/dist/src/index.js",
+    "start:prod": "TS_NODE_BASEURL=./build/dist/src node -r tsconfig-paths/register build/dist/src/index.js",
     "test": "yarn test:compilation && jest --coverage --silent --noStackTrace",
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
@@ -33,6 +33,7 @@
     "jsonwebtoken": "^8.3.0",
     "jwt-decode": "^2.2.0",
     "moment": "^2.22.2",
+    "tsconfig-paths": "^3.13.0",
     "node-fetch": "^2.6.7",
     "pino": "^6.0.0",
     "typescript": "^3.7.2"
@@ -56,7 +57,6 @@
     "prettier": "^2.5.1",
     "ts-jest": "^26.4.4",
     "ts-node": "^6.1.1",
-    "tsconfig-paths": "^3.8.0",
     "tslint": "^5.17.0",
     "tslint-microsoft-contrib": "^6.2.0"
   },
