@@ -71,6 +71,10 @@ export const updateApplicationConfig = Joi.object({
   COUNTRY_LOGO_FILE: Joi.string(),
   COUNTRY_LOGO_RENDER_WIDTH: Joi.number(),
   COUNTRY_LOGO_RENDER_HEIGHT: Joi.number(),
+  CURRENCY: Joi.object().keys({
+    isoCode: Joi.string(),
+    languagesAndCountry: Joi.array().items(Joi.string())
+  }),
   DESKTOP_TIME_OUT_MILLISECONDS: Joi.number(),
   LANGUAGES: Joi.string(),
   CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: Joi.number(),
