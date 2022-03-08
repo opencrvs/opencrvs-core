@@ -23,7 +23,8 @@ import {
   RotateLeft,
   Archive,
   ApplicationIcon,
-  Edit
+  Edit,
+  BackArrow
 } from '@opencrvs/components/lib/icons'
 import { AvatarSmall } from '@client/components/Avatar'
 import { connect } from 'react-redux'
@@ -58,7 +59,11 @@ import {
 import moment from 'moment'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
-import { ResponsiveModal, Loader } from '@opencrvs/components/lib/interface'
+import {
+  ResponsiveModal,
+  Loader,
+  ColumnContentAlignment
+} from '@opencrvs/components/lib/interface'
 import { getScope } from '@client/profile/profileSelectors'
 import { Scope } from '@client/utils/authUtils'
 import {
@@ -66,7 +71,8 @@ import {
   PrimaryButton,
   TertiaryButton,
   ICON_ALIGNMENT,
-  DangerButton
+  DangerButton,
+  CircleButton
 } from '@opencrvs/components/lib/buttons'
 import {
   ARCHIVED,
@@ -106,6 +112,7 @@ import {
 } from '@client/utils/userUtils'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import NotificationToast from '@client/views/OfficeHome/NotificationToast'
+import { goBack } from 'connected-react-router'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -123,6 +130,27 @@ const StyledTertiaryButton = styled(TertiaryButton)`
 const InfoContainer = styled.div`
   display: flex;
   margin-bottom: 16px;
+  flex-flow: row;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    flex-flow: column;
+  }
+`
+const IconDiv = styled.div`
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: none;
+  }
+`
+const BackButtonDiv = styled.div`
+  display: none;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: inline;
+  }
+`
+
+const BackButton = styled(CircleButton)`
+  color: ${({ theme }) => theme.colors.white};
+  display: flex;
+  margin-left: -8px;
 `
 
 const KeyContainer = styled.div`
@@ -154,9 +182,32 @@ const LargeGreyedInfo = styled.div`
 
 const ReviewButton = styled(PrimaryButton)`
   height: 40px;
+  border-radius: 4px;
 `
 
-const NameAvatar = styled.span`
+const DesktopDiv = styled.div`
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: none;
+  }
+`
+
+const MobileDiv = styled.div`
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: inline;
+  }
+`
+
+const ShowOnMobile = styled.div`
+  display: none;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: flex;
+    margin-left: auto;
+    margin-bottom: 32px;
+    margin-top: 32px;
+  }
+`
+
+const NameAvatar = styled.div`
   display: flex;
   align-items: center;
   img {
@@ -186,6 +237,7 @@ interface IDispatchProps {
   goToPage: typeof goToPage
   goToPrintCertificate: typeof goToPrintCertificate
   goToRegistrarHomeTab: typeof goToRegistrarHomeTab
+  goBack: typeof goBack
 }
 
 export type IRecordAuditTabs = keyof IQueryData | 'search'
@@ -477,7 +529,8 @@ const getGQLDeclaration = (
 const getDeclarationInfo = (
   declaration: IDeclarationData,
   isDownloaded: boolean,
-  intl: IntlShape
+  intl: IntlShape,
+  actions: React.ReactElement[]
 ) => {
   let informant = getCaptitalizedWord(declaration?.informant)
 
@@ -524,36 +577,40 @@ const getDeclarationInfo = (
       informant: informant
     }
   }
+  const mobileActions = actions.map((action) => <MobileDiv>{action}</MobileDiv>)
   return (
     <>
-      {Object.entries(info).map(([key, value]) => {
-        return (
-          <InfoContainer id={'summary'} key={key}>
-            <KeyContainer id={`${key}`}>
+      <div>
+        {Object.entries(info).map(([key, value]) => {
+          return (
+            <InfoContainer id={'summary'} key={key}>
               <KeyContainer id={`${key}`}>
-                {intl.formatMessage(recordAuditMessages[key])}
+                <KeyContainer id={`${key}`}>
+                  {intl.formatMessage(recordAuditMessages[key])}
+                </KeyContainer>
               </KeyContainer>
-            </KeyContainer>
-            <ValueContainer id={`${key}_value`} value={value}>
-              {value ? (
-                key === 'dateOfBirth' || key === 'dateOfDeath' ? (
-                  moment(new Date(value)).format('MMMM DD, YYYY')
+              <ValueContainer id={`${key}_value`} value={value}>
+                {value ? (
+                  key === 'dateOfBirth' || key === 'dateOfDeath' ? (
+                    moment(new Date(value)).format('MMMM DD, YYYY')
+                  ) : (
+                    value
+                  )
+                ) : isDownloaded ? (
+                  intl.formatMessage(
+                    recordAuditMessages[
+                      `no${key[0].toUpperCase()}${key.slice(1)}`
+                    ]
+                  )
                 ) : (
-                  value
-                )
-              ) : isDownloaded ? (
-                intl.formatMessage(
-                  recordAuditMessages[
-                    `no${key[0].toUpperCase()}${key.slice(1)}`
-                  ]
-                )
-              ) : (
-                <GreyedInfo id={`${key}_grey`} />
-              )}
-            </ValueContainer>
-          </InfoContainer>
-        )
-      })}
+                  <GreyedInfo id={`${key}_grey`} />
+                )}
+              </ValueContainer>
+            </InfoContainer>
+          )
+        })}
+      </div>
+      <ShowOnMobile>{mobileActions.map((action) => action)}</ShowOnMobile>
     </>
   )
 }
@@ -808,16 +865,22 @@ const getHistory = ({ intl, draft }: CMethodParams) => {
   const columns = [
     {
       label: 'Action',
-      width: 20,
+      width: 22,
       key: 'action'
     },
     {
       label: 'Date',
-      width: 20,
+      width: 22,
       key: 'date'
     },
-    { label: 'By', width: 20, key: 'user', isIconColumn: true },
-    { label: 'Type', width: 20, key: 'type' },
+    {
+      label: 'By',
+      width: 22,
+      key: 'user',
+      isIconColumn: true,
+      ICON_ALIGNMENT: ColumnContentAlignment.LEFT
+    },
+    { label: 'Type', width: 15, key: 'type' },
     { label: 'Location', width: 20, key: 'location' }
   ]
   return (
@@ -826,6 +889,7 @@ const getHistory = ({ intl, draft }: CMethodParams) => {
       <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
       <TableView
         id="task-history"
+        fixedWidth={1065}
         noResultText=""
         hideBoxShadow={true}
         columns={columns}
@@ -849,7 +913,8 @@ function RecordAuditBody({
   goToPage,
   goToRegistrarHomeTab,
   scope,
-  userDetails
+  userDetails,
+  goBack
 }: {
   declaration: IDeclarationData
   draft: IApplication | null
@@ -865,6 +930,8 @@ function RecordAuditBody({
   const userHasValidateScope = scope && scope.includes('validate')
 
   const actions: React.ReactElement[] = []
+  const mobileActions: React.ReactElement[] = []
+  const desktopActionsView: React.ReactElement[] = []
 
   const isDownloaded =
     draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
@@ -889,6 +956,7 @@ function RecordAuditBody({
         {intl.formatMessage(correctionMessages.title)}
       </StyledTertiaryButton>
     )
+    desktopActionsView.push(actions[actions.length - 1])
   }
 
   if (
@@ -908,6 +976,7 @@ function RecordAuditBody({
         {intl.formatMessage(buttonMessages.archive)}
       </StyledTertiaryButton>
     )
+    desktopActionsView.push(actions[actions.length - 1])
   }
 
   if (
@@ -927,10 +996,12 @@ function RecordAuditBody({
         {intl.formatMessage(buttonMessages.reinstate)}
       </StyledTertiaryButton>
     )
+    desktopActionsView.push(actions[actions.length - 1])
   }
 
   if (!isDownloaded) {
     actions.push(showDownloadButton(declaration, draft, userDetails))
+    desktopActionsView.push(actions[actions.length - 1])
   }
 
   actions.push(
@@ -942,6 +1013,10 @@ function RecordAuditBody({
       goToPage
     })
   )
+  mobileActions.push(actions[actions.length - 1])
+  desktopActionsView.push(
+    <DesktopDiv>{actions[actions.length - 1]}</DesktopDiv>
+  )
 
   actions.push(
     shouldShowUpdateButton({
@@ -952,6 +1027,12 @@ function RecordAuditBody({
       goToPage
     })
   )
+
+  mobileActions.push(actions[actions.length - 1])
+  desktopActionsView.push(
+    <DesktopDiv>{actions[actions.length - 1]}</DesktopDiv>
+  )
+
   actions.push(
     showPrintButton({
       declaration,
@@ -962,6 +1043,11 @@ function RecordAuditBody({
     })
   )
 
+  mobileActions.push(actions[actions.length - 1])
+  desktopActionsView.push(
+    <DesktopDiv>{actions[actions.length - 1]}</DesktopDiv>
+  )
+
   return (
     <>
       <Content
@@ -970,19 +1056,29 @@ function RecordAuditBody({
         }
         titleColor={declaration.name ? 'copy' : 'grey600'}
         size={ContentSize.LARGE}
-        topActionButtons={actions}
+        topActionButtons={desktopActionsView}
         icon={() => (
-          <ApplicationIcon
-            isArchive={declaration?.status === ARCHIVED}
-            color={
-              STATUSTOCOLOR[
-                (declaration && declaration.status) || SUBMISSION_STATUS.DRAFT
-              ]
-            }
-          />
+          <>
+            <IconDiv>
+              <ApplicationIcon
+                isArchive={declaration?.status === ARCHIVED}
+                color={
+                  STATUSTOCOLOR[
+                    (declaration && declaration.status) ||
+                      SUBMISSION_STATUS.DRAFT
+                  ]
+                }
+              />
+            </IconDiv>
+            <BackButtonDiv>
+              <BackButton onClick={() => goBack()}>
+                <BackArrow />
+              </BackButton>
+            </BackButtonDiv>
+          </>
         )}
       >
-        {getDeclarationInfo(declaration, isDownloaded, intl)}
+        {getDeclarationInfo(declaration, isDownloaded, intl, mobileActions)}
         {getHistory({ declaration, intl, draft, userDetails })}
       </Content>
 
@@ -1083,6 +1179,7 @@ function getBodyContent({
                 intl={intl}
                 scope={scope}
                 userDetails={userDetails}
+                goBack={goBack}
               />
             )
           }}
@@ -1156,5 +1253,6 @@ export const RecordAudit = connect<
   goToCertificateCorrection,
   goToPage,
   goToPrintCertificate,
-  goToRegistrarHomeTab
+  goToRegistrarHomeTab,
+  goBack
 })(injectIntl(RecordAuditComp))
