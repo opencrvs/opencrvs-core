@@ -194,7 +194,7 @@ export interface ISerializedDynamicFormFieldDefinitions {
       }
   validate?: Array<{
     dependencies: string[]
-    validator: FactoryOperation<typeof validators>
+    validator: FactoryOperation<typeof validators, IQueryDescriptor>
   }>
 }
 
@@ -256,6 +256,14 @@ export interface FieldValueMap {
   [key: string]: IFormFieldValue
 }
 
+export interface IQuestionnaireQuestion {
+  fieldName: string
+  value: string
+}
+export interface IQuestionnaire {
+  data: IQuestionnaireQuestion[]
+}
+
 export interface IFileValue {
   optionValues: IFormFieldValue[]
   type: string
@@ -295,31 +303,40 @@ export type IFormFieldQueryMapFunction = (
  * Takes in an array of function arguments (array, number, string, function)
  * and replaces all functions with the descriptor type
  *
- * So type Array<number | Function | string> would become
- * Array<number | Descriptor | string>
+ * So type Array<number | Function | string> would become
+ * Array<number | Descriptor | string>
  */
-type FunctionParamsToDescriptor<T> =
+type FunctionParamsToDescriptor<T, Descriptor> =
   // It's an array - recursively call this type for all items
   T extends Array<any>
-    ? { [K in keyof T]: FunctionParamsToDescriptor<T[K]> }
-    : T extends IFormFieldQueryMapFunction // It's a query transformation function - return a query transformation descriptor
-    ? IQueryDescriptor
-    : T extends IFormFieldMutationMapFunction // It's a mutation transformation function - return a mutation transformation descriptor
-    ? IMutationDescriptor
+    ? { [K in keyof T]: FunctionParamsToDescriptor<T[K], Descriptor> }
+    : T extends IFormFieldQueryMapFunction | IFormFieldMutationMapFunction // It's a query transformation function - return a query transformation descriptor
+    ? Descriptor
     : T // It's a none of the above - return self
 
 interface FactoryOperation<
   OperationMap,
+  Descriptor extends IQueryDescriptor | IMutationDescriptor,
   Key extends keyof OperationMap = keyof OperationMap
 > {
   operation: Key
-  parameters: FunctionParamsToDescriptor<Params<OperationMap[Key]>>
+  parameters: FunctionParamsToDescriptor<Params<OperationMap[Key]>, Descriptor>
 }
 interface Operation<
   OperationMap,
   Key extends keyof OperationMap = keyof OperationMap
 > {
   operation: Key
+}
+
+export type IFormFieldQueryMapDescriptor<
+  T extends keyof typeof queries = keyof typeof queries
+> = {
+  operation: T
+  parameters: FunctionParamsToDescriptor<
+    Params<typeof queries[T]>,
+    IQueryDescriptor
+  >
 }
 
 export type IFormFieldMapping = {
@@ -775,7 +792,10 @@ export type QueryFactoryOperation<
   T extends QueryFactoryOperationKeys = QueryFactoryOperationKeys
 > = {
   operation: T
-  parameters: FunctionParamsToDescriptor<Params<typeof queries[T]>>
+  parameters: FunctionParamsToDescriptor<
+    Params<typeof queries[T]>,
+    IQueryDescriptor
+  >
 }
 
 type QueryDefaultOperation<
@@ -802,7 +822,10 @@ export type MutationFactoryOperation<
   T extends MutationFactoryOperationKeys = MutationFactoryOperationKeys
 > = {
   operation: T
-  parameters: FunctionParamsToDescriptor<Params<typeof mutations[T]>>
+  parameters: FunctionParamsToDescriptor<
+    Params<typeof mutations[T]>,
+    IMutationDescriptor
+  >
 }
 
 type MutationDefaultOperation<

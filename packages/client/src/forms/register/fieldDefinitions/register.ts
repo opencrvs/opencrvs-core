@@ -130,7 +130,10 @@ function getDefaultField(
   }
 }
 
-function createCustomField(question: IQuestionConfig): SerializedFormField {
+function createCustomField(
+  question: IQuestionConfig,
+  sectionId: string
+): SerializedFormField {
   const baseField: SerializedFormField = {
     name: question.fieldName as string,
     custom: true,
@@ -203,7 +206,10 @@ export function configureRegistrationForm(
         customQuestionIdentifiers.groupId
       )
 
-      const newCustomField = createCustomField(question)
+      const newCustomField = createCustomField(
+        question,
+        customQuestionIdentifiers.sectionId
+      )
 
       const unmodifiedSectionFields =
         defaultEventForm.sections[activeSection.index].groups[activeGroup.index]
@@ -4101,7 +4107,7 @@ export const registerForms: IDefaultRegisterForms = {
         ]
       },
       {
-        id: 'mother',
+        id: BirthSection.Mother,
         viewType: 'form',
         replaceable: true,
         name: {
@@ -12382,6 +12388,11 @@ export const registerForms: IDefaultRegisterForms = {
       {
         id: DeathSection.Spouse,
         viewType: 'form',
+        name: {
+          defaultMessage: "Spouse's details",
+          description: 'Form section title for spouse section',
+          id: 'form.section.deceased.spouse.title'
+        },
         title: {
           defaultMessage: "Spouse's details",
           description: 'Form section title for spouse section',
