@@ -153,6 +153,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           contentType
           subject
         }
+        questionnaire
         status {
           comments {
             comment
@@ -317,6 +318,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         id
         contact
         contactPhoneNumber
+        questionnaire
         status {
           comments {
             comment

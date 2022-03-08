@@ -22,6 +22,7 @@ import {
   createTaskRefTemplate,
   createRelatedPersonTemplate,
   createPaymentReconciliationTemplate,
+  createQuestionnaireResponseTemplate,
   CERTIFICATE_DOCS_CODE,
   CERTIFICATE_DOCS_TITLE,
   CERTIFICATE_CONTEXT_KEY,
@@ -791,6 +792,33 @@ export function selectOrCreatePaymentReconciliationResource(
     }
     return paymentEntry.resource as fhir.PaymentReconciliation
   }
+}
+
+export function selectOrCreateQuestionnaireResource(
+  fhirBundle: ITemplatedBundle
+): fhir.QuestionnaireResponse {
+  let questionnaireResponseEntry =
+    fhirBundle.entry &&
+    fhirBundle.entry.find((entry) => {
+      if (
+        entry.resource &&
+        entry.resource.resourceType === 'QuestionnaireResponse'
+      ) {
+        return true
+      }
+      return false
+    })
+  if (!questionnaireResponseEntry) {
+    questionnaireResponseEntry = createQuestionnaireResponseTemplate(uuid())
+    const questionnaireResource =
+      questionnaireResponseEntry.resource as fhir.QuestionnaireResponse
+    if (!questionnaireResource.subject) {
+      questionnaireResource.subject = { reference: '' }
+    }
+    questionnaireResource.subject.reference = fhirBundle.entry[0].fullUrl
+    fhirBundle.entry.push(questionnaireResponseEntry)
+  }
+  return questionnaireResponseEntry.resource as fhir.QuestionnaireResponse
 }
 
 export function selectOrCreateTaskRefResource(

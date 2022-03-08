@@ -15,6 +15,7 @@ const allSearchFields = `
   id
     type
     registration {
+      questionnaire
       status
       contactRelationship
       contactNumber
@@ -117,8 +118,8 @@ export const REGISTRATION_HOME_QUERY = gql`
       locationIds: $locationIds
       status: ["REJECTED"]
       count: $rejectCount
-      skip: $rejectSkip  
-      sortColumn: "createdAt.keyword"          
+      skip: $rejectSkip
+      sortColumn: "createdAt.keyword"
       sort: "asc"
     ) {
       totalItems
@@ -198,6 +199,7 @@ export const FETCH_REGISTRATION_BY_COMPOSITION = gql`
       registration {
         id
         type
+        questionnaire
         status {
           id
           user {

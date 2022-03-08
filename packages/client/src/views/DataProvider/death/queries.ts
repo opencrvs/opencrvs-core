@@ -122,6 +122,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           contentType
           subject
         }
+        questionnaire
         status {
           type
           timestamp
@@ -255,6 +256,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         contact
         contactRelationship
         contactPhoneNumber
+        questionnaire
         status {
           comments {
             comment

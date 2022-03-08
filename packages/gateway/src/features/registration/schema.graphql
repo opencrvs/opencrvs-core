@@ -385,6 +385,7 @@ input RegistrationInput {
   status: [RegWorkflowInput]
   type: RegistrationType
   inCompleteFields: String
+  questionnaire: [QuestionnaireQuestionInput]
   attachments: [AttachmentInput]
   certificates: [CertificateInput]
   location: LocationInput
@@ -400,12 +401,14 @@ type Registration { # -> Task
   # BRN (Birth Registration Number) DRN (Death Registration Number) - Format to be decided
   registrationNumber: String # -> .identifier
   paperFormID: String # -> .identifier
+  questionnaire: [QuestionnaireQuestion]
   page: String # -> .identifier
   book: String # -> .identifier
   contact: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
   contactRelationship: String # -> extension(url='http://opencrvs.org/specs/extension/contact-relationship').valueString
   contactPhoneNumber: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person-phone-number').valueString
   status: [RegWorkflow] # -> Task.*
+  questionnaire: [QuestionnaireQuestion]
   type: RegistrationType # -> .code
   inCompleteFields: String # -> .status ('draft' | 'requested') && extension(url='http://opencrvs.org/specs/extension/in-complete-fields').valueString
   attachments: [Attachment] # -> Composition.section(code='scanned-documents').entry.reference
@@ -427,6 +430,11 @@ type Certificate { # -> Document Reference
   data: String # -> .content.attachment.data base64
 }
 
+input QuestionnaireQuestionInput {
+  fieldName: String
+  value: String
+}
+
 input AttachmentInput {
   _fhirID: ID
   contentType: String
@@ -440,6 +448,11 @@ input AttachmentInput {
   description: String # -> use for other document type -> .description
   subject: AttachmentSubject
   createdAt: Date
+}
+
+type QuestionnaireQuestion {
+  fieldName: String
+  value: String
 }
 
 type Attachment { # -> DocumentReference

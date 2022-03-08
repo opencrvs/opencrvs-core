@@ -356,6 +356,22 @@ export const typeResolvers: GQLResolver = {
 
       return (foundIdentifier && foundIdentifier.value) || null
     },
+    questionnaire: async (composition: fhir.Composition, _, authHeader) => {
+      const questionnaireBundle: fhir.Bundle = await fetchFHIR(
+        `/QuestionnaireResponse?subject=${composition.id}`,
+        authHeader
+      )
+      return (
+        questionnaireBundle.entry &&
+        questionnaireBundle.entry.map(
+          (questionnaireResponseEntry: fhir.BundleEntry, i) => {
+            const questionnaire = questionnaireResponseEntry.resource
+
+            return questionnaire
+          }
+        )
+      )
+    },
     status: async (task: fhir.Task, _, authHeader) => {
       // fetch full task history
       const taskBundle: fhir.Bundle = await fetchFHIR(

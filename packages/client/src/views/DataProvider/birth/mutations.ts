@@ -37,6 +37,7 @@ export const REGISTER_BIRTH_DECLARATION = gql`
       id
       registration {
         id
+        questionnaire
         status {
           id
           user {

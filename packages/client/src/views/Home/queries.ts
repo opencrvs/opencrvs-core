@@ -18,6 +18,7 @@ export const FETCH_REGISTRATION_BY_COMPOSITION = gql`
       registration {
         id
         type
+        questionnaire
         status {
           id
           user {

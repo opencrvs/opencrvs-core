@@ -125,6 +125,7 @@ export const FETCH_EVENTS_WITH_PROGRESS = gql`
         }
         dateOfEvent
         registration {
+          questionnaire
           status
           contactNumber
           contactRelationship

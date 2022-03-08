@@ -142,6 +142,7 @@ export function createDuplicateDetailsQuery(ids: string[]) {
         id
         trackingId
         type
+        questionnaire
         status {
           type
           timestamp

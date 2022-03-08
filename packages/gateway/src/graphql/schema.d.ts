@@ -436,6 +436,7 @@ export interface GQLRegistration {
   trackingId?: string
   registrationNumber?: string
   paperFormID?: string
+  questionnaire?: Array<GQLQuestionnaireQuestion | null>
   page?: string
   book?: string
   contact?: string
@@ -786,6 +787,7 @@ export interface GQLRegistrationInput {
   status?: Array<GQLRegWorkflowInput | null>
   type?: GQLRegistrationType
   inCompleteFields?: string
+  questionnaire?: Array<GQLQuestionnaireQuestionInput | null>
   attachments?: Array<GQLAttachmentInput | null>
   certificates?: Array<GQLCertificateInput | null>
   location?: GQLLocationInput
@@ -834,6 +836,11 @@ export interface GQLMesssageDescriptorInput {
   id?: string
   description?: string
   defaultMessage?: string
+}
+
+export interface GQLQuestionnaireQuestion {
+  fieldName?: string
+  value?: string
 }
 
 export interface GQLRegWorkflow {
@@ -1127,6 +1134,11 @@ export interface GQLRegWorkflowInput {
   timeLoggedMS?: number
 }
 
+export interface GQLQuestionnaireQuestionInput {
+  fieldName?: string
+  value?: string
+}
+
 export interface GQLCertificateInput {
   collector?: GQLRelatedPersonInput
   hasShowedVerifiedDocument?: boolean
@@ -1296,6 +1308,7 @@ export interface GQLResolver {
 
   EventProgressSet?: GQLEventProgressSetTypeResolver
   MesssageDescriptor?: GQLMesssageDescriptorTypeResolver
+  QuestionnaireQuestion?: GQLQuestionnaireQuestionTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
   ReasonsNotApplying?: GQLReasonsNotApplyingTypeResolver
@@ -3399,6 +3412,7 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   trackingId?: RegistrationToTrackingIdResolver<TParent>
   registrationNumber?: RegistrationToRegistrationNumberResolver<TParent>
   paperFormID?: RegistrationToPaperFormIDResolver<TParent>
+  questionnaire?: RegistrationToQuestionnaireResolver<TParent>
   page?: RegistrationToPageResolver<TParent>
   book?: RegistrationToBookResolver<TParent>
   contact?: RegistrationToContactResolver<TParent>
@@ -3439,6 +3453,13 @@ export interface RegistrationToRegistrationNumberResolver<
 }
 
 export interface RegistrationToPaperFormIDResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationToQuestionnaireResolver<
   TParent = any,
   TResult = any
 > {
@@ -4368,6 +4389,25 @@ export interface MesssageDescriptorToDescriptionResolver<
 }
 
 export interface MesssageDescriptorToDefaultMessageResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLQuestionnaireQuestionTypeResolver<TParent = any> {
+  fieldName?: QuestionnaireQuestionToFieldNameResolver<TParent>
+  value?: QuestionnaireQuestionToValueResolver<TParent>
+}
+
+export interface QuestionnaireQuestionToFieldNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface QuestionnaireQuestionToValueResolver<
   TParent = any,
   TResult = any
 > {

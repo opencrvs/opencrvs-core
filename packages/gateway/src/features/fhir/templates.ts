@@ -325,3 +325,12 @@ export function createTaskRefTemplate(refUuid: string, event: EVENT_TYPE) {
     }
   }
 }
+export function createQuestionnaireResponseTemplate(refUuid: string) {
+  return {
+    fullUrl: `urn:uuid:${refUuid}`,
+    resource: {
+      resourceType: 'QuestionnaireResponse',
+      status: 'completed'
+    }
+  }
+}

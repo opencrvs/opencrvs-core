@@ -130,10 +130,7 @@ function getDefaultField(
   }
 }
 
-function createCustomField(
-  question: IQuestionConfig,
-  sectionId: string
-): SerializedFormField {
+function createCustomField(question: IQuestionConfig): SerializedFormField {
   const baseField: SerializedFormField = {
     name: question.fieldName as string,
     custom: true,
@@ -206,10 +203,7 @@ export function configureRegistrationForm(
         customQuestionIdentifiers.groupId
       )
 
-      const newCustomField = createCustomField(
-        question,
-        customQuestionIdentifiers.sectionId
-      )
+      const newCustomField = createCustomField(question)
 
       const unmodifiedSectionFields =
         defaultEventForm.sections[activeSection.index].groups[activeGroup.index]

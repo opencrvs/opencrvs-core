@@ -530,6 +530,7 @@ type Registration {
   contactRelationship: String
   contactPhoneNumber: String
   status: [RegWorkflow]
+  questionnaire: [QuestionnaireQuestion]
   type: RegistrationType
   inCompleteFields: String
   attachments: [Attachment]
@@ -654,6 +655,11 @@ type Attachment {
   description: String
   subject: AttachmentSubject
   createdAt: Date
+}
+
+type QuestionnaireQuestion {
+  fieldName: String
+  value: String
 }
 
 type Deceased {
@@ -857,6 +863,7 @@ input RegistrationInput {
   status: [RegWorkflowInput]
   type: RegistrationType
   inCompleteFields: String
+  questionnaire: [QuestionnaireQuestionInput]
   attachments: [AttachmentInput]
   certificates: [CertificateInput]
   location: LocationInput
@@ -1162,6 +1169,11 @@ input AddressInput {
   country: String
   from: Date
   to: Date
+}
+
+input QuestionnaireQuestionInput {
+  fieldName: String
+  value: String
 }
 
 input AttachmentInput {

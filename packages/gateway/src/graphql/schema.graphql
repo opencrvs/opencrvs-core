@@ -544,6 +544,7 @@ type Registration {
   trackingId: String
   registrationNumber: String
   paperFormID: String
+  questionnaire: [QuestionnaireQuestion]
   page: String
   book: String
   contact: String
@@ -883,6 +884,7 @@ input RegistrationInput {
   status: [RegWorkflowInput]
   type: RegistrationType
   inCompleteFields: String
+  questionnaire: [QuestionnaireQuestionInput]
   attachments: [AttachmentInput]
   certificates: [CertificateInput]
   location: LocationInput
@@ -931,6 +933,11 @@ input MesssageDescriptorInput {
   id: String
   description: String
   defaultMessage: String
+}
+
+type QuestionnaireQuestion {
+  fieldName: String
+  value: String
 }
 
 type RegWorkflow {
@@ -1222,6 +1229,11 @@ input RegWorkflowInput {
   comments: [CommentInput]
   location: LocationInput
   timeLoggedMS: Int
+}
+
+input QuestionnaireQuestionInput {
+  fieldName: String
+  value: String
 }
 
 input CertificateInput {

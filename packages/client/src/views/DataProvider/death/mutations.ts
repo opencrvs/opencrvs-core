@@ -37,6 +37,7 @@ const REGISTER_DEATH_DECLARATION = gql`
       id
       registration {
         id
+        questionnaire
         status {
           id
           user {
