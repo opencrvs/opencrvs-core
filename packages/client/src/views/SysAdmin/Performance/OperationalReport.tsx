@@ -313,7 +313,6 @@ class OperationalReportComponent extends React.Component<Props, State> {
         month: (
           <LinkButton
             isBoldLink={true}
-            textDecoration="none"
             onClick={() =>
               this.props.goToPerformanceReport(
                 this.state.selectedLocation!,
@@ -329,7 +328,6 @@ class OperationalReportComponent extends React.Component<Props, State> {
         ),
         export: (
           <RowLink
-            textDecoration="none"
             onClick={() =>
               this.downloadMonthlyData(start, end, eventType.toString())
             }
