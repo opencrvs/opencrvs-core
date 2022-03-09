@@ -98,7 +98,7 @@ const TableHeader = styled.div`
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.bodyBoldStyle};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.silverSand};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
 `
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors};
@@ -183,7 +183,7 @@ const LocationInfoValue = styled.div`
 `
 
 const LocationInfoEmptyValue = styled.div`
-  color: ${({ theme }) => theme.colors.placeholder};
+  color: ${({ theme }) => theme.colors.placeholderCopy};
   ${({ theme }) => theme.fonts.bodyStyle};
 `
 
@@ -211,7 +211,7 @@ const Name = styled(LinkButton)`
 
 const RoleType = styled.div`
   ${({ theme }) => theme.fonts.chartLegendStyle}
-  color: ${({ theme }) => theme.colors.waitingForExternalValidation};
+  color: ${({ theme }) => theme.colors.copy};
   text-align: left;
 `
 

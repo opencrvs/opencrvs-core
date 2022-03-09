@@ -23,7 +23,7 @@ const HeaderContainer = styled.div`
   padding: 8px 16px;
   height: 56px;
   display: flex;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey500};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   flex-direction: row;
   justify-content: space-between;
   position: sticky;

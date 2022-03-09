@@ -122,7 +122,7 @@ const Required = styled.span<
 >`
   ${({ theme }) => theme.fonts.bigBodyStyle};
   color: ${({ disabled, theme }) =>
-    disabled ? theme.colors.disabled : theme.colors.error};
+    disabled ? theme.colors.disabled : theme.colors.negative};
   flex-grow: 0;
 `
 
@@ -131,7 +131,7 @@ const Optional = styled.span<
 >`
   ${({ theme }) => theme.fonts.bigBodyStyle};
   color: ${({ disabled, theme }) =>
-    disabled ? theme.colors.disabled : theme.colors.placeholder};
+    disabled ? theme.colors.disabled : theme.colors.supportingCopy};
   flex-grow: 0;
 `
 const SpinnerWrapper = styled.div`
@@ -144,7 +144,7 @@ const SpinnerWrapper = styled.div`
 `
 
 const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.negative};
   ${({ theme }) => theme.fonts.bodyStyle};
   text-align: center;
   margin-top: 100px;

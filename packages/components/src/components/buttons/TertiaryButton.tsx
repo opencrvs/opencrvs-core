@@ -28,14 +28,14 @@ export const TertiaryButton = styled(Button)`
   }
   color: ${({ theme }) => theme.colors.primary};
   &:hover {
-    background: ${({ theme }) => theme.colors.grey300};
+    background: ${({ theme }) => theme.colors.grey200};
   }
   &:not([data-focus-visible-added]):hover {
-    background: ${({ theme }) => theme.colors.grey300};
+    background: ${({ theme }) => theme.colors.grey200};
   }
   &:focus {
     outline: none;
-    background: ${({ theme }) => theme.colors.focus};
+    background: ${({ theme }) => theme.colors.yellow};
     color: ${({ theme }) => theme.colors.copy};
   }
   &:not([data-focus-visible-added]) {
@@ -44,7 +44,7 @@ export const TertiaryButton = styled(Button)`
     color: ${({ theme }) => theme.colors.primary};
   }
   &:active:not([data-focus-visible-added]) {
-    background: ${({ theme }) => theme.colors.grey300};
+    background: ${({ theme }) => theme.colors.grey200};
   }
 
   &:disabled {
