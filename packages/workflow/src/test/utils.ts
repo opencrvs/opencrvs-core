@@ -132,8 +132,7 @@ export const testFhirBundle = {
             valueString: 'MOTHER'
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '+8801622688231'
           },
           {
@@ -473,8 +472,7 @@ export const testFhirBundleWithIdsForDeath = {
             valueString: 'MOTHER'
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '+8801818181818'
           },
           {
@@ -551,6 +549,7 @@ export const testFhirTaskBundle = {
       resource: {
         resourceType: 'Task',
         status: 'requested',
+        intent: '',
         code: {
           coding: [{ system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }]
         },
@@ -1584,8 +1583,7 @@ export const testInProgressFhirBundle = {
             valueString: 'MOTHER'
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '+8801622688231'
           }
         ]
@@ -1652,8 +1650,7 @@ export const testInProgressDeathFhirBundle = {
             valueString: 'MOTHER'
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '+8801622688231'
           }
         ]
@@ -1777,7 +1774,7 @@ export function wrapInBundle(...resources: [fhir.Resource | string]): string {
   return JSON.stringify({
     resourceType: 'Bundle',
     type: 'document',
-    entry: resources.map(resource => ({
+    entry: resources.map((resource) => ({
       resource: typeof resource === 'string' ? JSON.parse(resource) : resource
     }))
   })

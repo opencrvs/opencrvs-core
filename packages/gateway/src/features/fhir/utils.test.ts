@@ -14,14 +14,19 @@ import {
   selectOrCreateCollectorPersonResource,
   removeDuplicatesFromComposition,
   selectOrCreateInformantSection,
-  setInformantReference
+  setInformantReference,
+  getExtensionStatus
 } from '@gateway/features/fhir/utils'
 import {
   FATHER_CODE,
   INFORMANT_CODE,
   INFORMANT_TITLE
 } from '@gateway/features/fhir/templates'
-import { mockFhirBundle, mockComposition } from '@gateway/utils/testUtils'
+import {
+  mockFhirBundle,
+  mockComposition,
+  mockTask
+} from '@gateway/utils/testUtils'
 import { ITemplatedBundle } from '@gateway/features/registration/fhir-builders'
 import { clone, cloneDeep } from 'lodash'
 import { logger } from '@gateway/logger'
@@ -246,6 +251,26 @@ describe('Fhir util function testing', () => {
       expect(mockFhirBundleCloned.entry[8].resource.patient.reference).toEqual(
         'urn:uuid:b9044443-c708-4977-b0e7-7e51ef0c9221'
       )
+    })
+  })
+
+  describe('getExtensionStatus()', () => {
+    const task = {
+      ...mockTask,
+      extension: [
+        {
+          url: 'test-url',
+          valueString: 'test-value'
+        }
+      ]
+    }
+
+    it('should return the status if the extension was found', () => {
+      expect(getExtensionStatus(task, 'test-url')).toBe('test-value')
+    })
+
+    it('should return undefined if the extension was not found', () => {
+      expect(getExtensionStatus(task, 'dummy-url')).toBeUndefined()
     })
   })
 })

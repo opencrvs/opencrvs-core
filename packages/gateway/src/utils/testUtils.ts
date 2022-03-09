@@ -181,6 +181,7 @@ export const mockDocumentReference = {
 export const mockTask = {
   resourceType: 'Task',
   status: 'requested',
+  intent: '',
   identifier: [
     {
       system: 'http://opencrvs.org/specs/id/birth-tracking-id',

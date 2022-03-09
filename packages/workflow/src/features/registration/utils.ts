@@ -26,7 +26,7 @@ import {
   DECEASED_SECTION_CODE,
   BIRTH_CORRECTION_ENCOUNTERS_SECTION_CODE,
   DEATH_CORRECTION_ENCOUNTERS_SECTION_CODE,
-  OPENCRVS_SPECIFICATION_URL
+  REINSTATED_EXTENSION_URL
 } from '@workflow/features/registration/fhir/constants'
 import { Events } from '@workflow/features/events/handler'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
@@ -221,8 +221,7 @@ export function isArchiveTask(taskResource: fhir.Task) {
 export function hasReinstatedExtension(taskResource: fhir.Task) {
   return (
     taskResource.extension?.findIndex(
-      (extension) =>
-        extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/regReinstated`
+      (extension) => extension.url === REINSTATED_EXTENSION_URL
     ) !== -1
   )
 }
