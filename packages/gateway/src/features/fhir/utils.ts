@@ -51,7 +51,8 @@ import {
   OPENCRVS_SPECIFICATION_URL,
   EVENT_TYPE,
   BIRTH_REG_NO,
-  DEATH_REG_NO
+  DEATH_REG_NO,
+  DOWNLOADED_EXTENSION_URL
 } from '@gateway/features/fhir/constants'
 import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import { IMetricsParam } from '@gateway/features/metrics/root-resolvers'
@@ -866,9 +867,8 @@ export function findExtension(
 }
 
 export function getDownloadedExtensionStatus(task: fhir.Task) {
-  const extensionURL = `${OPENCRVS_SPECIFICATION_URL}extension/regDownloaded`
   const extension = findExtension(
-    extensionURL,
+    DOWNLOADED_EXTENSION_URL,
     task.extension as fhir.Extension[]
   )
   return extension?.valueString
@@ -879,7 +879,7 @@ export function getStatusFromTask(task: fhir.Task) {
     (coding: fhir.Coding) =>
       coding.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
   )
-  return (statusType && statusType.code) || null
+  return statusType && statusType.code
 }
 export function getMaritalStatusCode(fieldValue: string) {
   switch (fieldValue) {

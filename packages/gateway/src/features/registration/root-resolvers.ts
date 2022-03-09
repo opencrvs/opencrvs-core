@@ -12,7 +12,8 @@
 import { IAuthHeader } from '@gateway/common-types'
 import {
   EVENT_TYPE,
-  OPENCRVS_SPECIFICATION_URL
+  DOWNLOADED_EXTENSION_URL,
+  REINSTATED_EXTENSION_URL
 } from '@gateway/features/fhir/constants'
 import {
   fetchFHIR,
@@ -21,18 +22,17 @@ import {
   getRegistrationIdsFromResponse,
   removeDuplicatesFromComposition,
   getRegistrationIds,
-  getDeclarationIds
+  getDeclarationIds,
+  getStatusFromTask
 } from '@gateway/features/fhir/utils'
 import {
   buildFHIRBundle,
   updateFHIRTaskBundle,
-  addDownloadedTaskExtension,
   addOrUpdateExtension,
   ITaskBundle
 } from '@gateway/features/registration/fhir-builders'
 import { hasScope } from '@gateway/features/user/utils'
 import {
-  GQLRegStatus,
   GQLResolver,
   GQLStatusWiseRegistrationCount
 } from '@gateway/graphql/schema'
@@ -415,9 +415,8 @@ export const resolvers: GQLResolver = {
         })
         const regStatusCode =
           filteredTaskHistory &&
-          (filteredTaskHistory[0]?.businessStatus?.coding?.find((code) => {
-            return code.system === 'http://opencrvs.org/specs/reg-status'
-          })?.code as GQLRegStatus)
+          filteredTaskHistory.length > 0 &&
+          getStatusFromTask(filteredTaskHistory[0])
 
         if (!regStatusCode) {
           return await Promise.reject(new Error('Task has no reg-status code'))
@@ -426,9 +425,10 @@ export const resolvers: GQLResolver = {
         const taskBundleWithReinstatedExtension = addOrUpdateExtension(
           cloneDeep(taskEntryData),
           {
-            url: `${OPENCRVS_SPECIFICATION_URL}extension/regReinstated`,
-            valueString: 'ARCHIVED'
-          }
+            url: REINSTATED_EXTENSION_URL,
+            valueString: regStatusCode
+          },
+          'reinstated'
         )
 
         await fetchFHIR(
@@ -648,15 +648,21 @@ async function markEventAsCertified(
 }
 
 async function markRecordAsDownloaded(id: string, authHeader: IAuthHeader) {
-  let doc
-  const taskBundle = await fetchFHIR(
+  const taskBundle: ITaskBundle = await fetchFHIR(
     `/Task?focus=Composition/${id}`,
     authHeader
   )
   if (!taskBundle || !taskBundle.entry || !taskBundle.entry[0]) {
     throw new Error('Task does not exist')
   }
-  doc = addDownloadedTaskExtension(taskBundle.entry[0])
+  const doc = addOrUpdateExtension(
+    taskBundle.entry[0],
+    {
+      url: DOWNLOADED_EXTENSION_URL,
+      valueString: getStatusFromTask(taskBundle.entry[0].resource)
+    },
+    'downloaded'
+  )
 
   await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
 

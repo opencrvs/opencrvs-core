@@ -22,5 +22,8 @@ export enum EVENT_TYPE {
   DEATH = 'DEATH'
 }
 
+export const DOWNLOADED_EXTENSION_URL = `${FHIR_SPECIFICATION_URL}extension/regDownloaded`
+export const REINSTATED_EXTENSION_URL = `${FHIR_SPECIFICATION_URL}extension/regReinstated`
+
 export const BIRTH_REG_NO = 'birth-registration-number'
 export const DEATH_REG_NO = 'death-registration-number'

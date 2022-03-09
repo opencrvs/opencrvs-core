@@ -13,6 +13,7 @@ import {
   resolvers,
   lookForDuplicate
 } from '@gateway/features/registration/root-resolvers'
+import { DOWNLOADED_EXTENSION_URL } from '@gateway/features/fhir/constants'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
@@ -325,7 +326,7 @@ describe('Registration root resolvers', () => {
                   }
                 },
                 {
-                  url: 'http://opencrvs.org/specs/extension/regDownloaded',
+                  url: DOWNLOADED_EXTENSION_URL,
                   valueString: 'DECLARED'
                 }
               ],
@@ -431,7 +432,7 @@ describe('Registration root resolvers', () => {
                   }
                 },
                 {
-                  url: 'http://opencrvs.org/specs/extension/regDownloaded',
+                  url: DOWNLOADED_EXTENSION_URL,
                   valueString: 'DECLARED'
                 }
               ],
