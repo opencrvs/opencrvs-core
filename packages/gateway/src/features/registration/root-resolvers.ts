@@ -23,7 +23,8 @@ import {
   removeDuplicatesFromComposition,
   getRegistrationIds,
   getDeclarationIds,
-  getStatusFromTask
+  getStatusFromTask,
+  findExtension
 } from '@gateway/features/fhir/utils'
 import {
   buildFHIRBundle,
@@ -355,6 +356,15 @@ export const resolvers: GQLResolver = {
         }
         const status = 'ARCHIVED'
         const newTaskBundle = await updateFHIRTaskBundle(taskEntry, status)
+        const taskResource = newTaskBundle.entry[0].resource
+        if (
+          taskResource.extension &&
+          findExtension(DOWNLOADED_EXTENSION_URL, taskResource.extension)
+        ) {
+          taskResource.extension = taskResource.extension.filter(
+            (ext) => ext.url !== DOWNLOADED_EXTENSION_URL
+          )
+        }
         await fetchFHIR(
           '/Task',
           authHeader,
