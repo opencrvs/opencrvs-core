@@ -380,7 +380,6 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
             changeModalName={this.state.changeModalName}
             showNotification={this.state.showNotification}
             valueChanged={this.changeValue}
-            offlineCountryConfiguration={offlineCountryConfiguration}
           />
         )}
         <FloatingNotification

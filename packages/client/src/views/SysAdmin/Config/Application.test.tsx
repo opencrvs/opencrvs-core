@@ -136,7 +136,12 @@ describe('application name update test', () => {
   })
   it('should disable the button if input is empty', async () => {
     testComponent.find('#changeAppName').hostNodes().first().simulate('click')
-    expect(testComponent.find('#applicationName').hostNodes().text()).toBe('')
+    testComponent
+      .find('#applicationName')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'applicationName', value: '' }
+      })
     expect(
       testComponent.find('#apply_change').hostNodes().props().disabled
     ).toBeTruthy()
