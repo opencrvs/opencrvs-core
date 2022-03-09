@@ -126,6 +126,10 @@ const navigatorMock = {
   COUNTRY_CONFIG_URL: 'http://localhost:3040',
   APPLICATION_NAME: 'Farajaland CRVS',
   COUNTRY: 'bgd',
+  CURRENCY: {
+    isoCode: 'Pound sterling',
+    languagesAndCountry: ['en-US']
+  },
   LANGUAGES: 'en,bn',
   CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 45,
   CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 1825,
