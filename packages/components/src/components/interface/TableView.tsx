@@ -34,7 +34,7 @@ const Wrapper = styled.div<{
       : hideBoxShadow
       ? `padding: 24px 0;`
       : `padding: 24px;
-    ${theme.shadows.mistyShadow};`}
+    ${theme.shadows.light};`}
 `
 const TableTitleLoading = styled.span`
   background: ${({ theme }) => theme.colors.background};
@@ -50,7 +50,7 @@ const TableHeader = styled.div<{
 }>`
   ${({ fixedWidth, totalWidth }) =>
     fixedWidth ? `width: ${fixedWidth}px;` : `width: ${totalWidth || 100}%;`}
-  background: ${({ theme }) => theme.colors.greyHover};
+  background: ${({ theme }) => theme.colors.grey100};
   padding: 10px 0px;
   display: flex;
   align-items: flex-end;
@@ -109,9 +109,7 @@ const RowWrapper = styled.div<{
   padding-bottom: 10px;
   border-bottom: 1px solid
     ${({ theme, columns }) =>
-      columns.length > 5
-        ? theme.colors.greyHover
-        : theme.colors.tableRowDivider};
+      columns.length > 5 ? theme.colors.grey100 : theme.colors.grey200};
 
   &:last-child {
     ${({ hideTableBottomBorder }) =>
@@ -127,7 +125,7 @@ const RowWrapper = styled.div<{
       height ? `min-height:${height.md}px` : `min-height: 48px)`};
   }
   ${({ highlight, theme }) =>
-    highlight && `:hover { background-color: ${theme.colors.dropdownHover};}`}
+    highlight && `:hover { background-color: ${theme.colors.grey100};}`}
 
   & span:first-child {
     ${({ horizontalPadding }) =>
@@ -201,7 +199,7 @@ const ValueWrapper = styled.span<{
   ${({ color }) => color && `color: ${color};`}
 `
 const Error = styled.span`
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.negative};
 `
 const ErrorText = styled.div<{ isFullPage?: boolean }>`
   ${({ theme }) => theme.fonts.h3};
@@ -238,7 +236,7 @@ const TableScrollerHorizontal = styled.div<{
 
   &::-webkit-scrollbar-thumb {
     border-radius: 10px;
-    background: ${({ theme }) => theme.colors.lightScrollBarGrey};
+    background: ${({ theme }) => theme.colors.grey400};
   }
 `
 const TableScroller = styled.div<{

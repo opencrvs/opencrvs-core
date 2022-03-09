@@ -452,7 +452,6 @@ function UserListComponent(props: IProps) {
         <MarginPhotoRight />
         <LinkButton
           isBoldLink={true}
-          textDecoration="none"
           id={`name-link-${id}`}
           onClick={() => goToUserProfile(id || '')}
         >

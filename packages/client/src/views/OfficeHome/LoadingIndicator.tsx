@@ -17,7 +17,7 @@ import styled from 'styled-components'
 import { errorMessages } from '@client/i18n/messages'
 
 const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.negative};
   ${({ theme }) => theme.fonts.reg16};
   text-align: center;
   margin-top: 100px;

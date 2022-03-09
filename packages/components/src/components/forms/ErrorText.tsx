@@ -37,7 +37,7 @@ const Container = styled.div<{ ignoreMediaQuery?: boolean }>`
 `
 const StyledParagraph = styled(Paragraph)`
   ${({ theme }) => theme.fonts.bold16};
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.negative};
 `
 
 export function ErrorText(props: IErrorTextProps) {

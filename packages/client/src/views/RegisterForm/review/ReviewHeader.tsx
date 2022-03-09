@@ -27,7 +27,7 @@ const HeaderContainer = styled.div`
   text-align: center;
   color: ${({ theme }) => theme.colors.copy};
   background-color: ${({ theme }) => theme.colors.white};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.dividerDark};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
 `
 const ContentContainer = styled.div`
   flex-direction: column;

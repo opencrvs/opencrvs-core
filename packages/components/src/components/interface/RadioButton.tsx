@@ -86,7 +86,7 @@ const Input = styled.input<{ disabled?: boolean }>`
   cursor: pointer;
   &:focus ~ ${Check} {
     box-shadow: ${({ theme, disabled }) =>
-        disabled ? theme.colors.white : theme.colors.focus}
+        disabled ? theme.colors.white : theme.colors.yellow}
       0 0 0 4px;
   }
   /* stylelint-disable */

@@ -49,7 +49,7 @@ const MenuTitle = styled.span`
   text-overflow: ellipsis;
 `
 const EmptyTitle = styled(MenuTitle)`
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.negative};
 `
 const BodyContainer = styled(Box)`
   width: 100%;

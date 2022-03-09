@@ -34,13 +34,6 @@ const SearchTextInput = styled.input`
     outline: none;
     background-color: ${({ theme }) => theme.colors.white};
   }
-  &:-webkit-autofill {
-    background-color: ${({ theme }) => theme.colors.white};
-    border-radius: 50px;
-    padding-left: 15px;
-    -webkit-box-shadow: 0 0 0px 1000px ${({ theme }) => theme.colors.grey300}
-      inset;
-  }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin: 0px 4px;
@@ -50,7 +43,6 @@ const SearchTextInput = styled.input`
 export const LabelButton = styled(Button)`
   width: auto;
   height: auto;
-  background: ${({ theme }) => theme.colors.gray300};
   border-radius: 2px;
   color: ${({ theme }) => theme.colors.secondary};
   ${({ theme }) => theme.fonts.bold16};
@@ -58,29 +50,27 @@ export const LabelButton = styled(Button)`
 
 const DropDownWrapper = styled.ul`
   background: ${({ theme }) => theme.colors.white};
-  border-radius: 2px;
-  box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.11);
+  border-radius: 4px;
+  ${({ theme }) => theme.shadows.heavy};
   position: absolute;
-  width: 100%;
+  padding: 8px 0px;
+  width: 250px;
   z-index: 9999;
   list-style: none;
-  padding: 0px;
   top: 100%;
-  left: 0px;
-  margin: 3px 0px;
+  right: -56px;
+  margin: 6px 0px;
   cursor: pointer;
 `
 const DropDownItem = styled.li`
   display: flex;
   align-items: center;
-  border-bottom: solid 1px ${({ theme }) => theme.colors.background};
-  padding: 0px 15px;
   cursor: pointer;
   &:nth-last-child {
     border-bottom: none;
   }
   &:hover {
-    background: ${({ theme }) => theme.colors.blue500};
+    background: ${({ theme }) => theme.colors.secondary};
   }
   &:hover span {
     color: ${({ theme }) => theme.colors.white};
@@ -110,11 +100,10 @@ const SelectedSearchCriteria = styled.span`
   & .selected-label {
     border-radius: 50px;
     text-align: center;
-    width: 110px;
+    margin-right: 8px;
+    width: auto;
   }
-  & .selected-label:hover {
-    background: ${({ theme }) => theme.colors.grey300};
-  }
+
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     padding: 2px;
     padding-right: 7px;

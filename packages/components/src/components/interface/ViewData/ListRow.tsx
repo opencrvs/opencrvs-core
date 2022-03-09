@@ -181,7 +181,6 @@ export class ListRow extends React.Component<IListRowProps> {
                     <LinkButton
                       onClick={() => onClickLabelLink && onClickLabelLink()}
                       isBoldLink={true}
-                      textDecoration="none"
                     >
                       {label}
                     </LinkButton>
@@ -215,7 +214,6 @@ export class ListRow extends React.Component<IListRowProps> {
                   id={action.id}
                   disabled={action.disabled}
                   onClick={action.handler}
-                  textDecoration="none"
                 >
                   {action.label}
                 </LinkButton>

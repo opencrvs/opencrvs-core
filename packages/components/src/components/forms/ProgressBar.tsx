@@ -33,7 +33,7 @@ const Value = styled.span`
   ${({ theme }) => theme.fonts.bold16};
 `
 const Percentage = styled.span`
-  color: ${({ theme }) => theme.colors.placeholder};
+  color: ${({ theme }) => theme.colors.grey400};
 `
 const LoaderBox = styled.span<{
   width?: number

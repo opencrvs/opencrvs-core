@@ -46,38 +46,38 @@ const StyledInput = styled.input<ITextInputProps>`
       border:none;
       ${
         error && touched
-          ? `box-shadow: 0 0 0px 2px ${theme.colors.error};`
+          ? `box-shadow: 0 0 0px 2px ${theme.colors.negative};`
           : 'box-shadow: none;'
       }
       &:focus {
         box-shadow: 0 0 0px 2px ${
-          error && touched ? theme.colors.error : theme.colors.focus
+          error && touched ? theme.colors.negative : theme.colors.yellow
         };
       }
         `
       : `
       border: 2px solid ${
         error && touched
-          ? theme.colors.error
+          ? theme.colors.negative
           : isDisabled
           ? theme.colors.greyGrey
           : theme.colors.copy
       };
       &:focus {
-        box-shadow: 0 0 0px 3px ${theme.colors.focus};
+        box-shadow: 0 0 0px 3px ${theme.colors.yellow};
       }
       `}
 
   &::-webkit-input-placeholder {
-    color: ${({ theme }) => theme.colors.placeholder};
+    color: ${({ theme }) => theme.colors.placeholderCopy};
   }
 
   &::-moz-placeholder {
-    color: ${({ theme }) => theme.colors.placeholder};
+    color: ${({ theme }) => theme.colors.placeholderCopy};
   }
 
   &:-ms-input-placeholder {
-    color: ${({ theme }) => theme.colors.placeholder};
+    color: ${({ theme }) => theme.colors.placeholderCopy};
   }
 
   &::-webkit-outer-spin-button,

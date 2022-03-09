@@ -25,17 +25,15 @@ export interface INavigationItemProps
 
 const ItemContainer = styled.button<{ isSelected?: boolean }>`
   width: 100%;
+  height: 40px;
   cursor: pointer;
   padding: 0px 0px;
   border: 0;
   outline: none;
   background-color: ${({ isSelected, theme }) =>
-    isSelected ? theme.colors.greyHover : theme.colors.white};
+    isSelected ? theme.colors.white : theme.colors.white};
   :hover {
-    background-color: ${({ theme }) => theme.colors.greyHover};
-  }
-  :focus {
-    box-shadow: inset 0px 0px 0px 2px ${({ theme }) => theme.colors.focus};
+    background-color: ${({ theme }) => theme.colors.grey100};
   }
 `
 
@@ -45,10 +43,9 @@ const ItemContentContainer = styled.div<{ isSelected?: boolean }>`
   padding: 10px 19px 10px 22px;
 `
 const IconContainer = styled.span`
-  padding: 2px 0px;
-  width: 12px;
-  margin-top: 2px;
+  margin-top: 1px;
 `
+
 const LabelContainer = styled.span<{
   isSelected?: boolean
   isSubItem?: boolean
@@ -57,14 +54,15 @@ const LabelContainer = styled.span<{
   margin-left: 13px;
   padding-top: 3px;
   color: ${({ isSelected, theme }) =>
-    isSelected ? theme.colors.grey : theme.colors.greyLight};
+    isSelected ? theme.colors.copy : theme.colors.grey500};
 `
+
 const ValueContainer = styled.span<{ isSelected?: boolean }>`
   margin-left: auto;
   ${({ theme }) => theme.fonts.bold12};
   padding-top: 3px;
   color: ${({ isSelected, theme }) =>
-    isSelected ? theme.colors.grey : theme.colors.greyLight};
+    isSelected ? theme.colors.copy : theme.colors.grey500};
 `
 
 export const NavigationItem = ({

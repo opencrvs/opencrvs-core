@@ -31,24 +31,17 @@ const LeftNavigationContainer = styled.div<{
   height: 100vh;
   overflow-y: auto;
   background-color: ${({ theme }) => theme.colors.white};
-  border: 0px;
-  border-right: 1px;
-  border-style: solid;
-  border-color: ${({ theme }) => theme.colors.border};
+  border-right: 1px solid ${({ theme }) => theme.colors.grey300};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     ${({ navigationWidth }) => !navigationWidth && `display: none;`}
   }
 `
-
 const UserInfo = styled.div`
   background: ${({ theme }) => theme.colors.white};
-  padding: 30px 24px;
+  padding: 32px 24px;
   text-align: justify;
   border: 0px;
-  border-bottom: 1px;
-  border-style: solid;
-  border-color: ${({ theme }) => theme.colors.border};
-  border-color: ${({ theme }) => theme.colors.border};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
@@ -63,10 +56,10 @@ const Role = styled.p`
 `
 
 const ApplicationNameContainer = styled.div`
-  padding: 20px 20px;
-  height: 64px;
+  padding: 16px 20px;
+  height: 56px;
   background-color: ${({ theme }) => theme.colors.white};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }

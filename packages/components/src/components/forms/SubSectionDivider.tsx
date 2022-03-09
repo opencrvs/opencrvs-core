@@ -31,7 +31,7 @@ const Optional = styled.span<
 >`
   ${({ theme }) => theme.fonts.h4};
   color: ${({ disabled, theme }) =>
-    disabled ? theme.colors.disabled : theme.colors.placeholder};
+    disabled ? theme.colors.disabled : theme.colors.placeholderCopy};
   flex-grow: 0;
 `
 

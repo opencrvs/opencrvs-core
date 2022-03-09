@@ -55,7 +55,7 @@ export const ActionContainer = styled.div`
   flex-wrap: wrap;
   margin: 0 -24px 0 -24px;
   padding: 12px 24px 11px 24px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.dividerDark};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
 `
 
 export const FilterContainer = styled.div`

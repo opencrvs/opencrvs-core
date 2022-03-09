@@ -72,7 +72,7 @@ const Subtitle = styled.h2`
   ${({ theme }) => theme.fonts.reg18};
   color: ${({ theme }) => theme.colors.copy};
   padding-bottom: 16px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.dividerDark};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
 `
 
 export enum AUDIT_ACTION {

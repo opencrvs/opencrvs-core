@@ -53,7 +53,7 @@ const Action = styled.div`
 `
 
 const GlobalError = styled.div`
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.negative};
 `
 
 const ConfirmButton = styled(PrimaryButton)`

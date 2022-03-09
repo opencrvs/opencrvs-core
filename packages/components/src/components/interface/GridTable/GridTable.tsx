@@ -46,7 +46,7 @@ const StyledBox = styled(Box)`
 `
 
 const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.negative};
   ${({ theme }) => theme.fonts.reg16};
   text-align: center;
   margin-top: 100px;
@@ -97,7 +97,7 @@ const ExpandedSectionContainer = styled.div<{ expanded: boolean }>`
 `
 
 const Error = styled.span`
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.negative};
 `
 
 export enum ColumnContentAlignment {

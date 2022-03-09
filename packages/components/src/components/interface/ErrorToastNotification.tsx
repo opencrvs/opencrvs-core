@@ -36,7 +36,7 @@ const RetryButton = styled(Button)`
   }
   &:focus {
     outline: none;
-    background: ${({ theme }) => theme.colors.focus};
+    background: ${({ theme }) => theme.colors.yellow};
     color: ${({ theme }) => theme.colors.white};
   }
   &:not([data-focus-visible-added]) {
@@ -46,7 +46,7 @@ const RetryButton = styled(Button)`
   }
   &:active:not([data-focus-visible-added]) {
     outline: none;
-    background: ${({ theme }) => theme.colors.focus};
+    background: ${({ theme }) => theme.colors.yellow};
     color: ${({ theme }) => theme.colors.white};
     opacity: 1;
   }
@@ -73,7 +73,7 @@ const NotificationContainer = styled.div`
   justify-content: space-between;
   align-items: center;
   box-sizing: border-box;
-  background: ${({ theme }) => theme.colors.error};
+  background: ${({ theme }) => theme.colors.negative};
   animation: ${easeIn} 500ms;
   bottom: 0;
 `

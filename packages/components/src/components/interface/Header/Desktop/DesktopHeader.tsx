@@ -21,12 +21,13 @@ export interface IDesktopHeaderProps {
 
 const HeaderContainer = styled.div`
   padding: 8px 16px;
-  height: 64px;
+  height: 56px;
   display: flex;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   flex-direction: row;
   justify-content: space-between;
-  align-items: center;
   position: sticky;
+  align-items: center;
   top: 0;
   margin-left: 249px;
   z-index: 2;

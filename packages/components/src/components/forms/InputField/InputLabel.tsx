@@ -46,7 +46,7 @@ const Required = styled.span<
 >`
   ${({ theme }) => theme.fonts.reg18};
   color: ${({ disabled, theme }) =>
-    disabled ? theme.colors.disabled : theme.colors.error};
+    disabled ? theme.colors.disabled : theme.colors.negative};
   flex-grow: 0;
 `
 

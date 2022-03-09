@@ -57,11 +57,11 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
     padding: 0 8px;
     border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '2px')};
     ${({ error, touched, theme }) =>
-      error && touched ? theme.colors.error : theme.colors.copy};
+      error && touched ? theme.colors.negative : theme.colors.copy};
     &:hover {
       border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '2px')};
       ${({ error, touched, theme }) =>
-        error && touched ? theme.colors.error : theme.colors.copy};
+        error && touched ? theme.colors.negative : theme.colors.copy};
     }
     &:focus {
       outline: none;
@@ -73,7 +73,7 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
   }
 
   .react-select__control--is-focused {
-    box-shadow: 0 0 0px 3px ${({ theme }) => theme.colors.focus};
+    box-shadow: 0 0 0px 3px ${({ theme }) => theme.colors.yellow};
     border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '2px')};
     ${({ theme }) => theme.colors.copy};
   }

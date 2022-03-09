@@ -222,7 +222,7 @@ class FieldAgentHomeView extends React.Component<
           label: this.props.intl.formatMessage(constantsMessages.name),
           width: 40,
           key: 'name',
-          color: this.props.theme.colors.secondaryLabel
+          color: this.props.theme.colors.supportingCopy
         },
         {
           label: this.props.intl.formatMessage(
@@ -243,7 +243,7 @@ class FieldAgentHomeView extends React.Component<
           label: this.props.intl.formatMessage(constantsMessages.name),
           width: 70,
           key: 'name',
-          color: this.props.theme.colors.secondaryLabel
+          color: this.props.theme.colors.supportingCopy
         }
       ]
     }

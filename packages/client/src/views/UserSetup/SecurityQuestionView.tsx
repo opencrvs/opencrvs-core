@@ -88,7 +88,7 @@ const FullWidthInput = styled(TextInput)`
   }
 `
 const Error = styled.span`
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.negative};
   ${({ theme }) => theme.fonts.reg12};
 `
 

@@ -17,7 +17,7 @@ const ActionContainer = styled.div`
   width: 100%;
 `
 const HeaderContainer = styled.div`
-  ${({ theme }) => theme.gradients.gradientNightshade};
+  ${({ theme }) => theme.gradients.primary};
   color: ${({ theme }) => theme.colors.white};
   box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.5);
   height: 90px;
