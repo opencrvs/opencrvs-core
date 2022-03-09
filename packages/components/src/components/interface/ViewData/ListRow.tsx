@@ -176,9 +176,7 @@ export class ListRow extends React.Component<IListRowProps> {
             <LabelValueLayer>
               <ListDataContainer>
                 {isLinkLabel ? (
-                  <LinkButton isBoldLink={true} textDecoration="none">
-                    {label}
-                  </LinkButton>
+                  <LinkButton isBoldLink={true}>{label}</LinkButton>
                 ) : nameWithAvatar ? (
                   <ProfileInfoContainer>{nameWithAvatar}</ProfileInfoContainer>
                 ) : isString(label) ? (
@@ -208,7 +206,6 @@ export class ListRow extends React.Component<IListRowProps> {
                   id={action.id}
                   disabled={action.disabled}
                   onClick={action.handler}
-                  textDecoration="none"
                 >
                   {action.label}
                 </LinkButton>

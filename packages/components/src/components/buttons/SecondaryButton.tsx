@@ -16,9 +16,9 @@ import { Button, IButtonProps } from './Button'
 export const SecondaryButton = styled(Button)`
   color: ${({ theme }) => theme.colors.primary};
   transition: background 0.4s ease;
+  border-radius: 4px;
   background: ${({ theme }) => theme.colors.white};
   border: ${({ theme }) => `2px solid ${theme.colors.primary}`};
-  border-radius: 4px;
   ${({ theme }) => theme.fonts.bodyBoldStyle};
   height: 40px;
 
