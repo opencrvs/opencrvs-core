@@ -355,10 +355,7 @@ class UserProfileComponent extends React.Component<Props, State> {
                           user.id as string,
                           user.status as string
                         )}
-                        hide={
-                          viewOnlyMode ||
-                          this.state.viewportWidth <= theme.grid.breakpoints.md
-                        }
+                        hide={viewOnlyMode}
                       />
                     </HeaderMenuHolder>
                   }

@@ -10,10 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  IApplication,
+  IDeclaration,
   SUBMISSION_STATUS,
-  updateFieldAgentDeclaredApplications
-} from '@client/applications'
+  updateFieldAgentDeclaredDeclarations
+} from '@client/declarations'
 import { Header } from '@client/components/interface/Header/Header'
 import { Query } from '@client/components/Query'
 import {
@@ -33,7 +33,7 @@ import {
   REGISTRAR_HOME
 } from '@client/navigation/routes'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { SEARCH_APPLICATIONS_USER_WISE } from '@client/search/queries'
+import { SEARCH_DECLARATIONS_USER_WISE } from '@client/search/queries'
 import styled, { ITheme, withTheme } from '@client/styledComponents'
 import {
   EMPTY_STRING,
@@ -62,7 +62,7 @@ import { getLanguage } from '@opencrvs/client/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
 import {
-  ApplicationsOrangeAmber,
+  DeclarationsOrangeAmber,
   PlusTransparentWhite
 } from '@opencrvs/components/lib/icons'
 import {
@@ -129,13 +129,13 @@ interface IBaseFieldAgentHomeProps {
   language: string
   userDetails: IUserDetails | null
   tabId: string
-  draftApplications: IApplication[]
+  draftDeclarations: IDeclaration[]
   goToEvents: typeof goToEventsAction
   draftCount: string
   goToFieldAgentHomeTab: typeof goToFieldAgentHomeTabAction
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
-  applicationsReadyToSend: IApplication[]
-  updateFieldAgentDeclaredApplications: typeof updateFieldAgentDeclaredApplications
+  declarationsReadyToSend: IDeclaration[]
+  updateFieldAgentDeclaredDeclarations: typeof updateFieldAgentDeclaredDeclarations
 }
 
 interface IFieldAgentHomeState {
@@ -178,7 +178,7 @@ class FieldAgentHomeView extends React.Component<
   }
 
   syncWorkqueue() {
-    this.props.updateFieldAgentDeclaredApplications()
+    this.props.updateFieldAgentDeclaredDeclarations()
   }
 
   componentDidMount() {
@@ -313,11 +313,11 @@ class FieldAgentHomeView extends React.Component<
 
   render() {
     const {
-      draftApplications,
+      draftDeclarations,
       userDetails,
       match,
       intl,
-      applicationsReadyToSend
+      declarationsReadyToSend
     } = this.props
 
     const tabId = match.params.tabId || TAB_ID.sentForReview
@@ -335,19 +335,19 @@ class FieldAgentHomeView extends React.Component<
             <BodyContainer>
               {tabId === TAB_ID.inProgress && (
                 <InProgress
-                  draftApplications={draftApplications}
+                  draftDeclarations={draftDeclarations}
                   showPaginated={this.showPaginated}
                 />
               )}
               {tabId === TAB_ID.sentForReview && (
                 <SentForReview
-                  applicationsReadyToSend={applicationsReadyToSend}
+                  declarationsReadyToSend={declarationsReadyToSend}
                   showPaginated={this.showPaginated}
                 />
               )}
               {tabId === TAB_ID.requireUpdates && (
                 <Query
-                  query={SEARCH_APPLICATIONS_USER_WISE} // TODO can this be changed to use SEARCH_EVENTS
+                  query={SEARCH_DECLARATIONS_USER_WISE} // TODO can this be changed to use SEARCH_EVENTS
                   variables={{
                     userId: userDetails!.practitionerId,
                     status: [EVENT_STATUS.REJECTED],
@@ -423,7 +423,7 @@ class FieldAgentHomeView extends React.Component<
                         )}
                         {data && data.searchEvents?.totalItems === 0 && (
                           <ZeroUpdatesContainer>
-                            <ApplicationsOrangeAmber />
+                            <DeclarationsOrangeAmber />
                             <ZeroUpdatesText>
                               {intl.formatMessage(messages.zeroUpdatesText)}
                             </ZeroUpdatesText>
@@ -484,19 +484,19 @@ const mapStateToProps = (
     language: getLanguage(state),
     userDetails: getUserDetails(state),
     tabId: (match && match.params && match.params.tabId) || 'progress',
-    draftApplications:
-      (state.applicationsState.applications &&
-        state.applicationsState.applications.filter(
-          (application: IApplication) =>
-            application.submissionStatus ===
+    draftDeclarations:
+      (state.declarationsState.declarations &&
+        state.declarationsState.declarations.filter(
+          (declaration: IDeclaration) =>
+            declaration.submissionStatus ===
             SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
         )) ||
       [],
-    applicationsReadyToSend: (
-      (state.applicationsState.applications &&
-        state.applicationsState.applications.filter(
-          (application: IApplication) =>
-            application.submissionStatus !==
+    declarationsReadyToSend: (
+      (state.declarationsState.declarations &&
+        state.declarationsState.declarations.filter(
+          (declaration: IDeclaration) =>
+            declaration.submissionStatus !==
             SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
         )) ||
       []
@@ -508,5 +508,5 @@ export const FieldAgentHome = connect(mapStateToProps, {
   goToEvents: goToEventsAction,
   goToFieldAgentHomeTab: goToFieldAgentHomeTabAction,
   goToDeclarationRecordAudit,
-  updateFieldAgentDeclaredApplications
+  updateFieldAgentDeclaredDeclarations
 })(injectIntl(withTheme(withOnlineStatus(FieldAgentHomeView))))

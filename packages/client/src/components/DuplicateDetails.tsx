@@ -10,11 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  downloadApplication,
+  downloadDeclaration,
   DOWNLOAD_STATUS,
-  IApplication,
-  makeApplicationReadyToDownload
-} from '@client/applications'
+  IDeclaration,
+  makeDeclarationReadyToDownload
+} from '@client/declarations'
 import {
   constantsMessages,
   dynamicConstantsMessages,
@@ -64,14 +64,14 @@ export enum Action {
   REJECTED = 'REJECTED',
   REGISTERED = 'REGISTERED',
   CERTIFIED = 'CERTIFIED',
-  LOAD_REVIEW_APPLICATION = 'load application data for review'
+  LOAD_REVIEW_DECLARATION = 'load declaration data for review'
 }
 interface IProps extends IntlShapeProps {
   id: string
   duplicateContextId: string
   data: {
     id: string
-    dateOfApplication: string
+    dateOfDeclaration: string
     trackingId: string
     event: Event
     child: {
@@ -101,8 +101,8 @@ interface IProps extends IntlShapeProps {
   notDuplicateHandler?: () => void
   rejectHandler?: () => void
   goToPage: typeof goToPageAction
-  outboxApplications: IApplication[]
-  downloadApplication: typeof downloadApplication
+  outboxDeclarations: IDeclaration[]
+  downloadDeclaration: typeof downloadDeclaration
 }
 
 const DetailsBox = styled(Box)<{ id: string; currentStatus: string }>`
@@ -156,7 +156,7 @@ class DuplicateDetailsClass extends React.Component<
 > {
   normalizeAction(action: string) {
     if (action === 'DECLARED') {
-      return 'application'
+      return 'declaration'
     }
 
     return action
@@ -177,24 +177,24 @@ class DuplicateDetailsClass extends React.Component<
     }
   }
 
-  downloadApplication = (
+  downloadDeclaration = (
     event: string,
     compositionId: string,
     action: Action
   ) => {
-    const downloadableApplication = makeApplicationReadyToDownload(
+    const downloadableDeclaration = makeDeclarationReadyToDownload(
       event.toLowerCase() as Event,
       compositionId,
       action
     )
-    this.props.downloadApplication(downloadableApplication, this.props.client)
+    this.props.downloadDeclaration(downloadableDeclaration, this.props.client)
   }
 
   downloadAndReview = () => {
-    const { intl, data, outboxApplications, duplicateContextId } = this.props
+    const { intl, data, outboxDeclarations, duplicateContextId } = this.props
 
-    const application = find(outboxApplications, { id: data.id })
-    const downloadStatus = get(application, 'downloadStatus')
+    const declaration = find(outboxDeclarations, { id: data.id })
+    const downloadStatus = get(declaration, 'downloadStatus')
 
     if (
       downloadStatus === DOWNLOAD_STATUS.DOWNLOADING ||
@@ -229,10 +229,10 @@ class DuplicateDetailsClass extends React.Component<
         )}
         <Download
           onClick={() =>
-            this.downloadApplication(
+            this.downloadDeclaration(
               data.event,
               data.id,
-              Action.LOAD_REVIEW_APPLICATION
+              Action.LOAD_REVIEW_DECLARATION
             )
           }
         />
@@ -254,9 +254,9 @@ class DuplicateDetailsClass extends React.Component<
             <b>{intl.formatMessage(constantsMessages.dob)}:</b> {data.child.dob}
             <br />
             <b>
-              {intl.formatMessage(constantsMessages.dateOfApplication)}:
+              {intl.formatMessage(constantsMessages.dateOfDeclaration)}:
             </b>{' '}
-            <Moment format="DD-MM-YYYY">{data.dateOfApplication}</Moment>
+            <Moment format="DD-MM-YYYY">{data.dateOfDeclaration}</Moment>
             <br />
             <b>{intl.formatMessage(constantsMessages.trackingId)}:</b>{' '}
             {data.trackingId}
@@ -320,7 +320,7 @@ class DuplicateDetailsClass extends React.Component<
               </ListStatusContainer>
               <DetailText>
                 <b>
-                  {intl.formatMessage(constantsMessages.applicationState, {
+                  {intl.formatMessage(constantsMessages.declarationState, {
                     action: intl.formatMessage(
                       dynamicConstantsMessages[camelCase(status.action)]
                     )
@@ -388,13 +388,13 @@ class DuplicateDetailsClass extends React.Component<
 
 const mapStateToProps = (state: IStoreState) => {
   return {
-    outboxApplications: state.applicationsState.applications
+    outboxDeclarations: state.declarationsState.declarations
   }
 }
 
 const mapDispatchToProps = {
   goToPage: goToPageAction,
-  downloadApplication
+  downloadDeclaration
 }
 
 export const DuplicateDetails = connect(

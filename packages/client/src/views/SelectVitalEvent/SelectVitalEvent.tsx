@@ -33,10 +33,10 @@ import {
   PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE
 } from '@client/utils/constants'
 import {
-  storeApplication,
-  IApplication,
-  createApplication
-} from '@client/applications'
+  storeDeclaration,
+  IDeclaration,
+  createDeclaration
+} from '@client/declarations'
 
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h2};
@@ -81,7 +81,7 @@ class SelectVitalEventView extends React.Component<
   IntlShapeProps & {
     goBack: typeof goBack
     goToHome: typeof goToHome
-    storeApplication: typeof storeApplication
+    storeDeclaration: typeof storeDeclaration
     goToEventInfo: typeof goToEventInfo
     goToBirthInformant: typeof goToBirthInformant
     goToDeathInformant: typeof goToDeathInformant
@@ -96,17 +96,17 @@ class SelectVitalEventView extends React.Component<
       this.setState({ noEventSelectedError: true })
     } else {
       if (window.config.HIDE_EVENT_REGISTER_INFORMATION) {
-        let application: IApplication
+        let declaration: IDeclaration
         switch (this.state.goTo as Event) {
           case Event.BIRTH:
-            application = createApplication(Event.BIRTH)
-            this.props.storeApplication(application)
-            this.props.goToBirthInformant(application.id)
+            declaration = createDeclaration(Event.BIRTH)
+            this.props.storeDeclaration(declaration)
+            this.props.goToBirthInformant(declaration.id)
             break
           case Event.DEATH:
-            application = createApplication(Event.DEATH)
-            this.props.storeApplication(application)
-            this.props.goToDeathInformant(application.id)
+            declaration = createDeclaration(Event.DEATH)
+            this.props.storeDeclaration(declaration)
+            this.props.goToDeathInformant(declaration.id)
             break
           default:
             throw new Error(`Unknown eventType ${this.state.goTo}`)
@@ -177,7 +177,7 @@ class SelectVitalEventView extends React.Component<
 export const SelectVitalEvent = connect(null, {
   goBack,
   goToHome,
-  storeApplication,
+  storeDeclaration,
   goToBirthInformant,
   goToDeathInformant,
   goToEventInfo

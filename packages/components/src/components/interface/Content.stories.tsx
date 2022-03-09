@@ -14,7 +14,7 @@ import { Content } from './Content'
 import React, { ReactElement } from 'react'
 import { LinkButton, PrimaryButton, SecondaryButton } from '../buttons'
 import { GridView } from './GridTable/GridTable.stories'
-import { ApplicationIcon } from '../icons'
+import { DeclarationIcon } from '../icons'
 
 interface IProps {
   icon?: () => React.ReactNode
@@ -33,7 +33,7 @@ const Template: Story<IProps> = (args) => (
 )
 export const ContentView = Template.bind({})
 ContentView.args = {
-  icon: () => <ApplicationIcon />,
+  icon: () => <DeclarationIcon />,
   title: 'Register',
   topActionButtons: [
     <SecondaryButton

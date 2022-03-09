@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import OutBox from '@client/views/OfficeHome/Outbox'
-import { IApplication } from '@client/applications'
+import { IDeclaration } from '@client/declarations'
 import { Event } from '@client/forms'
 import { createTestComponent } from '@client/tests/util'
 import { createStore } from '@client/store'
@@ -22,7 +22,7 @@ describe('OutBox tests', () => {
     data: {
       registration: {
         presentAtBirthRegistration: 'BOTH_PARENTS',
-        applicant: 'MOTHER_ONLY',
+        informant: 'MOTHER_ONLY',
         registrationPhone: '01989898989',
         whoseContactDetails: 'FATHER'
       },
@@ -85,16 +85,16 @@ describe('OutBox tests', () => {
       },
       informant: {
         iDType: 'NO_ID',
-        applicantFamilyName: 'চৌধুরী',
-        applicantFamilyNameEng: 'Chowdhury',
+        informantFamilyName: 'চৌধুরী',
+        informantFamilyNameEng: 'Chowdhury',
         nationality: 'BGD',
-        applicantsRelationToDeceased: 'EXTENDED_FAMILY',
-        applicantPhone: '01987789987',
+        informantsRelationToDeceased: 'EXTENDED_FAMILY',
+        informantPhone: '01987789987',
         country: 'BGD',
         state: 'e5320d3c-78b3-4122-9dfd-9324906ab7de',
         district: '9914f913-453c-413e-a6fd-553971769f2e',
         addressLine4: '2c390875-0a74-4fb6-93ec-fa33dbf50ab9',
-        applicantPermanentAddressSameAsCurrent: true,
+        informantPermanentAddressSameAsCurrent: true,
         countryPermanent: 'BGD'
       },
       deathEvent: {
@@ -137,16 +137,16 @@ describe('OutBox tests', () => {
   const { store, history } = createStore()
 
   describe('When all the fields are fully provided', () => {
-    it('renders texts in data rows for birth applications', async () => {
-      const applications: IApplication[] = []
+    it('renders texts in data rows for birth declarations', async () => {
+      const declarations: IDeclaration[] = []
       statuses.map((status) =>
-        applications.push({
+        declarations.push({
           ...birthApp,
           submissionStatus: status
         })
       )
       const comp = await createTestComponent(
-        <OutBox application={applications} />,
+        <OutBox declaration={declarations} />,
         { store, history }
       )
       const testComp = comp
@@ -162,16 +162,16 @@ describe('OutBox tests', () => {
       }
     })
 
-    it('renders texts in data rows for death applications', async () => {
-      const applications: IApplication[] = []
+    it('renders texts in data rows for death declarations', async () => {
+      const declarations: IDeclaration[] = []
       statuses.map((status) =>
-        applications.push({
+        declarations.push({
           ...deathApp,
           submissionStatus: status
         })
       )
       const comp = await createTestComponent(
-        <OutBox application={applications} />,
+        <OutBox declaration={declarations} />,
         { store, history }
       )
       const testComp = comp
@@ -187,14 +187,14 @@ describe('OutBox tests', () => {
       }
     })
     it('shows "Waiting to register" if no status is provided', async () => {
-      const applications: IApplication[] = []
-      applications.push({
+      const declarations: IDeclaration[] = []
+      declarations.push({
         ...deathApp,
         submissionStatus: ''
       })
 
       const comp = await createTestComponent(
-        <OutBox application={applications} />,
+        <OutBox declaration={declarations} />,
         { store, history }
       )
       const testComp = comp
@@ -214,7 +214,7 @@ describe('OutBox tests', () => {
       const noFirstNameBirthApp = birthApp
       noFirstNameBirthApp.data.child.firstNamesEng = ''
       const comp = await createTestComponent(
-        <OutBox application={[noFirstNameBirthApp]} />,
+        <OutBox declaration={[noFirstNameBirthApp]} />,
         { store, history }
       )
       const testComp = comp
@@ -232,7 +232,7 @@ describe('OutBox tests', () => {
       const noLastNameDeathApp = deathApp
       noLastNameDeathApp.data.deceased.familyNameEng = ''
       const comp = await createTestComponent(
-        <OutBox application={[noLastNameDeathApp]} />,
+        <OutBox declaration={[noLastNameDeathApp]} />,
         { store, history }
       )
       const testComp = comp
@@ -251,7 +251,7 @@ describe('OutBox tests', () => {
       noNameBirthApp.data.child.familyNameEng = ''
 
       const comp = await createTestComponent(
-        <OutBox application={[noNameBirthApp]} />,
+        <OutBox declaration={[noNameBirthApp]} />,
         { store, history }
       )
       const testComp = comp
@@ -264,8 +264,8 @@ describe('OutBox tests', () => {
           )
         )
     })
-    it('displays empty div if there is no application', async () => {
-      const comp = await createTestComponent(<OutBox application={[]} />, {
+    it('displays empty div if there is no declaration', async () => {
+      const comp = await createTestComponent(<OutBox declaration={[]} />, {
         store,
         history
       })
@@ -274,14 +274,14 @@ describe('OutBox tests', () => {
     })
   })
 
-  describe('Pagination/loadmore test for more than 10 applications', () => {
-    const applications: IApplication[] = []
+  describe('Pagination/loadmore test for more than 10 declarations', () => {
+    const declarations: IDeclaration[] = []
     for (let i = 0; i < 16; i++) {
-      applications.push(birthApp)
+      declarations.push(birthApp)
     }
     it('shows pagination bar when pagination is used', async () => {
       const testComp = await createTestComponent(
-        <OutBox application={applications} showPaginated={true} />,
+        <OutBox declaration={declarations} showPaginated={true} />,
         { store, history }
       )
       expect(testComp.exists('#pagination')).toBeTruthy()
@@ -292,7 +292,7 @@ describe('OutBox tests', () => {
     })
     it('shows loadmore button when loadmore is used', async () => {
       const testComp = await createTestComponent(
-        <OutBox application={applications} showPaginated={false} />,
+        <OutBox declaration={declarations} showPaginated={false} />,
         { store, history }
       )
       expect(testComp.exists('#load_more_button')).toBeTruthy()

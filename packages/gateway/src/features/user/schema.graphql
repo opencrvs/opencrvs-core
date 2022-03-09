@@ -99,10 +99,10 @@ type SearchFieldAgentResponse {
   status: String
   primaryOfficeId: String
   creationDate: String
-  totalNumberOfApplicationStarted: Int
+  totalNumberOfDeclarationStarted: Int
   totalNumberOfInProgressAppStarted: Int
-  totalNumberOfRejectedApplications: Int
-  averageTimeForDeclaredApplications: Int
+  totalNumberOfRejectedDeclarations: Int
+  averageTimeForDeclaredDeclarations: Int
 }
 
 type VerifyPasswordResult {

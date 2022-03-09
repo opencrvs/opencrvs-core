@@ -14,32 +14,32 @@ import { createStore } from '@client/store'
 import {
   createTestComponent,
   flushPromises,
-  mockApplicationData,
-  mockDeathApplicationData
+  mockDeclarationData,
+  mockDeathDeclarationData
 } from '@client/tests/util'
 import { VerifyCorrector } from './VerifyCorrector'
-import { storeApplication } from '@client/applications'
+import { storeDeclaration } from '@client/declarations'
 import { Event } from '@client/forms'
 import { ReactWrapper } from 'enzyme'
 
 describe('verify corrector tests', () => {
   const { store, history } = createStore()
 
-  const birthApplication = {
+  const birthDeclaration = {
     id: 'mockBirth1234',
-    data: mockApplicationData,
+    data: mockDeclarationData,
     event: Event.BIRTH
   }
 
-  const deathApplication = {
+  const deathDeclaration = {
     id: 'mockDeath1234',
-    data: mockDeathApplicationData,
+    data: mockDeathDeclarationData,
     event: Event.DEATH
   }
 
-  describe('in case of birth application', () => {
+  describe('in case of birth declaration', () => {
     beforeAll(async () => {
-      store.dispatch(storeApplication(birthApplication))
+      store.dispatch(storeDeclaration(birthDeclaration))
     })
 
     it('when mother is corrector renders idVerifier component', async () => {
@@ -49,7 +49,7 @@ describe('verify corrector tests', () => {
           location={history.location}
           match={{
             params: {
-              applicationId: 'mockBirth1234',
+              declarationId: 'mockBirth1234',
               corrector: 'mother'
             },
             isExact: true,
@@ -70,7 +70,7 @@ describe('verify corrector tests', () => {
           location={history.location}
           match={{
             params: {
-              applicationId: 'mockBirth1234',
+              declarationId: 'mockBirth1234',
               corrector: 'child'
             },
             isExact: true,
@@ -91,7 +91,7 @@ describe('verify corrector tests', () => {
           location={history.location}
           match={{
             params: {
-              applicationId: 'mockBirth1234',
+              declarationId: 'mockBirth1234',
               corrector: 'mother'
             },
             isExact: true,
@@ -124,7 +124,7 @@ describe('verify corrector tests', () => {
           location={history.location}
           match={{
             params: {
-              applicationId: 'mockBirth1234',
+              declarationId: 'mockBirth1234',
               corrector: 'father'
             },
             isExact: true,
@@ -214,7 +214,7 @@ describe('verify corrector tests', () => {
           location={history.location}
           match={{
             params: {
-              applicationId: 'mockBirth1234',
+              declarationId: 'mockBirth1234',
               corrector: 'other'
             },
             isExact: true,
@@ -259,9 +259,9 @@ describe('verify corrector tests', () => {
     })
   })
 
-  describe('in case of death application', () => {
+  describe('in case of death declaration', () => {
     beforeAll(async () => {
-      store.dispatch(storeApplication(deathApplication))
+      store.dispatch(storeDeclaration(deathDeclaration))
     })
 
     it('when informant is corrector renders idVerifier component', async () => {
@@ -271,7 +271,7 @@ describe('verify corrector tests', () => {
           location={history.location}
           match={{
             params: {
-              applicationId: 'mockDeath1234',
+              declarationId: 'mockDeath1234',
               corrector: 'informant'
             },
             isExact: true,

@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  mockApplicationData,
+  mockDeclarationData,
   userDetails,
   mockOfflineData
 } from '@client/tests/util'
@@ -21,9 +21,9 @@ import { TemplateTransformerData } from './types'
 
 describe('PDF template offline data related field transformer tests', () => {
   const data: TemplateTransformerData = {
-    application: {
+    declaration: {
       id: 'sample',
-      data: mockApplicationData,
+      data: mockDeclarationData,
       event: Event.BIRTH
     },
     userDetails,
@@ -228,11 +228,11 @@ describe('PDF template offline data related field transformer tests', () => {
       locale: 'en'
     })
     const otherPlaceOfBirth = { ...data }
-    otherPlaceOfBirth.application.data.child.placeOfBirth = 'PRIVATE_HOME'
-    otherPlaceOfBirth.application.data.child.country = 'BGD'
-    otherPlaceOfBirth.application.data.child.state =
+    otherPlaceOfBirth.declaration.data.child.placeOfBirth = 'PRIVATE_HOME'
+    otherPlaceOfBirth.declaration.data.child.country = 'BGD'
+    otherPlaceOfBirth.declaration.data.child.state =
       '65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
-    otherPlaceOfBirth.application.data.child.district =
+    otherPlaceOfBirth.declaration.data.child.district =
       'bc4b9f99-0db3-4815-926d-89fd56889407'
 
     const transformedValue = offlineTransformers.OfflineAddress(
@@ -288,15 +288,15 @@ describe('PDF template offline data related field transformer tests', () => {
       locale: 'en'
     })
     const internationalPlaceOfBirth = { ...data }
-    internationalPlaceOfBirth.application.data.child.placeOfBirth =
+    internationalPlaceOfBirth.declaration.data.child.placeOfBirth =
       'PRIVATE_HOME'
-    internationalPlaceOfBirth.application.data.child.country = 'ARB'
-    internationalPlaceOfBirth.application.data.child.state = ''
+    internationalPlaceOfBirth.declaration.data.child.country = 'ARB'
+    internationalPlaceOfBirth.declaration.data.child.state = ''
     //@ts-ignore
-    internationalPlaceOfBirth.application.data.child.district = undefined
-    internationalPlaceOfBirth.application.data.child.internationalState =
+    internationalPlaceOfBirth.declaration.data.child.district = undefined
+    internationalPlaceOfBirth.declaration.data.child.internationalState =
       'My state'
-    internationalPlaceOfBirth.application.data.child.internationalDistrict =
+    internationalPlaceOfBirth.declaration.data.child.internationalDistrict =
       'My district'
 
     const transformedValue = offlineTransformers.OfflineAddress(

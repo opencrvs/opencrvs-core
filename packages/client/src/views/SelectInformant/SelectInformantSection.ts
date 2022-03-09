@@ -26,7 +26,7 @@ const birthInformantRelationGroup: IFormSectionGroup = {
   error: formMessages.informantError,
   fields: [
     {
-      name: 'applicant',
+      name: 'informant',
       type: RADIO_GROUP_WITH_NESTED_FIELDS,
       size: RadioSize.LARGE,
       label: formMessages.whoIsBirthInformant,
@@ -71,7 +71,7 @@ const birthInformantRelationGroup: IFormSectionGroup = {
             type: 'TEXT',
             label: {
               defaultMessage: 'Relationship to child',
-              id: 'form.field.label.applicantsRelationWithChild',
+              id: 'form.field.label.informantsRelationWithChild',
               description: 'Label for input Relationship to child'
             },
             placeholder: {
@@ -138,7 +138,7 @@ const deathInformantRelationGroup: IFormSectionGroup = {
             type: 'TEXT',
             label: {
               defaultMessage: 'Relationship to deceased',
-              id: 'form.field.label.applicantsRelationWithDeceased',
+              id: 'form.field.label.informantsRelationWithDeceased',
               description: 'Label for input Relationship to deceased'
             },
             placeholder: {

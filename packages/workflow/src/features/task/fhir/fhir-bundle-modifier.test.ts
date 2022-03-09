@@ -83,7 +83,7 @@ describe('Verify handler', () => {
     }
   })
 
-  it('Throws error if application is already rejected', () => {
+  it('Throws error if declaration is already rejected', () => {
     fetch.mockResponses(
       [
         JSON.stringify({

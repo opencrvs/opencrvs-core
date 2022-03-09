@@ -24,7 +24,7 @@ const Template: Story<IBannerProps> = (args) => (
 export const BannerView = Template.bind({})
 BannerView.args = {
   count: 15,
-  text: 'Applications to register in your area'
+  text: 'Declarations to register in your area'
 }
 
 export default {

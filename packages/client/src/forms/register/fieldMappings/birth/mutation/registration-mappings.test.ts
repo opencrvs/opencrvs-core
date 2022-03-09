@@ -14,7 +14,7 @@ import {
   changeHirerchyMutationTransformer
 } from '@client/forms/register/fieldMappings/birth/mutation/registration-mappings'
 import {
-  mockApplicationData,
+  mockDeclarationData,
   mockBirthRegistrationSectionData
 } from '@client/tests/util'
 import { TransformedData, IFormField } from '@client/forms'
@@ -25,11 +25,11 @@ describe('Birth registration mutation mapping related tests', () => {
     const transformedData: TransformedData = {
       registration: {}
     }
-    const mockBirthApplication = cloneDeep(mockApplicationData)
-    mockBirthApplication.registration = mockBirthRegistrationSectionData
+    const mockBirthDeclaration = cloneDeep(mockDeclarationData)
+    mockBirthDeclaration.registration = mockBirthRegistrationSectionData
     setBirthRegistrationSectionTransformer(
       transformedData,
-      mockBirthApplication,
+      mockBirthDeclaration,
       'registration'
     )
     expect(transformedData.registration).toBeDefined()
@@ -71,7 +71,7 @@ describe('Birth registration mutation mapping related tests', () => {
     }
     setBirthRegistrationSectionTransformer(
       transformedData,
-      mockApplicationData,
+      mockDeclarationData,
       'registration'
     )
     expect(transformedData.registration).toBeDefined()
@@ -86,12 +86,12 @@ describe('Birth registration mutation mapping related tests', () => {
       registrationPhone: ''
     }
 
-    const mockBirthApplication = cloneDeep(mockApplicationData)
-    mockBirthApplication.registration = mockBirthRegistrationSectionData
+    const mockBirthDeclaration = cloneDeep(mockDeclarationData)
+    mockBirthDeclaration.registration = mockBirthRegistrationSectionData
     const field = { name: 'whoseContactDetails' } as IFormField
     changeHirerchyMutationTransformer()(
       transformedData,
-      mockBirthApplication,
+      mockBirthDeclaration,
       'registration',
       field,
       { name: 'registrationPhone' } as IFormField

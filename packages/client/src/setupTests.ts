@@ -12,7 +12,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { GlobalWithFetchMock } from 'jest-fetch-mock'
 import { storage } from '@client/storage'
-import { IUserData } from './applications'
+import { IUserData } from './declarations'
 import { noop } from 'lodash'
 import * as CommonUtils from '@client/utils/commonUtils'
 import { referenceApi } from './utils/referenceApi'
@@ -226,7 +226,7 @@ beforeEach(() => {
     {
       userID: userDetails.userMgntUserID,
       userPIN: '$2a$10$xQBLcbPgGQNu9p6zVchWuu6pmCrQIjcb6k2W1PIVUxVTE/PumWM82',
-      applications: []
+      declarations: []
     }
   ]
 

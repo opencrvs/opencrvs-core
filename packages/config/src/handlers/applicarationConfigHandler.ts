@@ -14,7 +14,7 @@ import ApplicationConfig, {
   IApplicationConfigurationModel
 } from '@config/models/config' //   IApplicationConfigurationModel
 import { logger } from '@config/config/logger'
-import { getActiveCertificatesHandler } from '@config/handlers/applicationCertificateHandler'
+import { getActiveCertificatesHandler } from '@config/handlers/declarationCertificateHandler'
 
 export default async function applicationHandler(
   request: Hapi.Request,

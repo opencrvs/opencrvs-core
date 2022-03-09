@@ -135,7 +135,7 @@ export default function getRoutes() {
       config: {
         tags: ['api'],
         description:
-          'Sends an sms to a user for birth application rejection entry',
+          'Sends an sms to a user for birth declaration rejection entry',
         auth: {
           scope: [RouteScope.VALIDATE, RouteScope.REGISTER]
         },
@@ -206,7 +206,7 @@ export default function getRoutes() {
       config: {
         tags: ['api'],
         description:
-          'Sends an sms to a user for death application rejection entry',
+          'Sends an sms to a user for death declaration rejection entry',
         auth: {
           scope: [RouteScope.VALIDATE, RouteScope.REGISTER]
         },

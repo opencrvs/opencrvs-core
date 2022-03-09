@@ -17,7 +17,7 @@ import {
   generateDeathRegPoint,
   generateEventDurationPoint,
   generatePaymentPoint,
-  generateApplicationStartedPoint,
+  generateDeclarationStartedPoint,
   generateTimeLoggedPoint,
   generateRejectedPoints
 } from '@metrics/features/registration/pointGenerator'
@@ -69,7 +69,7 @@ export async function requestForRegistrarValidationHandler(
       })
     )
     points.push(
-      await generateApplicationStartedPoint(
+      await generateDeclarationStartedPoint(
         request.payload as fhir.Bundle,
         {
           Authorization: request.headers.authorization,
@@ -99,7 +99,7 @@ export async function registrarRegistrationWaitingExternalValidationHandler(
       })
     )
     points.push(
-      await generateApplicationStartedPoint(
+      await generateDeclarationStartedPoint(
         request.payload as fhir.Bundle,
         {
           Authorization: request.headers.authorization,
@@ -129,7 +129,7 @@ export async function newDeclarationHandler(
       })
     )
     points.push(
-      await generateApplicationStartedPoint(
+      await generateDeclarationStartedPoint(
         request.payload as fhir.Bundle,
         {
           Authorization: request.headers.authorization,
@@ -165,7 +165,7 @@ export async function inProgressHandler(
       })
     )
     points.push(
-      await generateApplicationStartedPoint(
+      await generateDeclarationStartedPoint(
         request.payload as fhir.Bundle,
         {
           Authorization: request.headers.authorization,
@@ -232,7 +232,7 @@ export async function newBirthRegistrationHandler(
     points.push(
       await generateBirthRegPoint(
         request.payload as fhir.Bundle,
-        'register-new-application',
+        'register-new-declaration',
         {
           Authorization: request.headers.authorization,
           'x-correlation-id': request.headers['x-correlation-id']
@@ -270,7 +270,7 @@ export async function markBirthRegisteredHandler(
           'x-correlation-id': request.headers['x-correlation-id']
         }
       ),
-      generateBirthRegPoint(bundle, 'mark-existing-application-registered', {
+      generateBirthRegPoint(bundle, 'mark-existing-declaration-registered', {
         Authorization: request.headers.authorization,
         'x-correlation-id': request.headers['x-correlation-id']
       }),
@@ -296,7 +296,7 @@ export async function newDeathRegistrationHandler(
     points.push(
       await generateDeathRegPoint(
         request.payload as fhir.Bundle,
-        'register-new-application',
+        'register-new-declaration',
         {
           Authorization: request.headers.authorization,
           'x-correlation-id': request.headers['x-correlation-id']
@@ -333,7 +333,7 @@ export async function markDeathRegisteredHandler(
           'x-correlation-id': request.headers['x-correlation-id']
         }
       ),
-      generateDeathRegPoint(bundle, 'mark-existing-application-registered', {
+      generateDeathRegPoint(bundle, 'mark-existing-declaration-registered', {
         Authorization: request.headers.authorization,
         'x-correlation-id': request.headers['x-correlation-id']
       }),

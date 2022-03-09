@@ -11,7 +11,7 @@
  */
 import { setDeathRegistrationSectionTransformer } from '@client/forms/register/fieldMappings/death/mutation/event-mappings'
 import {
-  mockDeathApplicationData,
+  mockDeathDeclarationData,
   mockDeathRegistrationSectionData
 } from '@client/tests/util'
 import { TransformedData } from '@client/forms'
@@ -24,7 +24,7 @@ describe('Death registration mutation mapping related tests', () => {
     }
     setDeathRegistrationSectionTransformer(
       transformedData,
-      mockDeathApplicationData,
+      mockDeathDeclarationData,
       'registration'
     )
     expect(transformedData.registration).toBeDefined()
@@ -44,11 +44,11 @@ describe('Death registration mutation mapping related tests', () => {
     const transformedData: TransformedData = {
       registration: {}
     }
-    const mockDeathApplication = cloneDeep(mockDeathApplicationData)
-    mockDeathApplication.registration = mockDeathRegistrationSectionData
+    const mockDeathDeclaration = cloneDeep(mockDeathDeclarationData)
+    mockDeathDeclaration.registration = mockDeathRegistrationSectionData
     setDeathRegistrationSectionTransformer(
       transformedData,
-      mockDeathApplication,
+      mockDeathDeclaration,
       'registration'
     )
     expect(transformedData.registration).toBeDefined()

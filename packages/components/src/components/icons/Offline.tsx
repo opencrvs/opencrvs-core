@@ -18,7 +18,7 @@ export const Offline = (props: React.HTMLAttributes<SVGElement>) => (
     viewBox="0 0 36 23"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <g id="Birth-Application" fill="none" fillRule="evenodd">
+    <g id="Birth-Declaration" fill="none" fillRule="evenodd">
       <g id="New-Event" transform="translate(-361 -36)">
         <g
           fillRule="nonzero"
