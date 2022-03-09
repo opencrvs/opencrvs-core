@@ -19,7 +19,7 @@ import { IUserDetails } from '@client/utils/userUtils'
 import { ILocation } from '@client/offline/reducer'
 
 export const Header = styled.h1`
-  color: ${({ theme }) => theme.colors.menuBackground};
+  color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.h4Style};
 `
 
@@ -44,7 +44,7 @@ export const SubHeader = styled.div`
 
 export const Description = styled.div`
   margin: 8px 0px;
-  color: ${({ theme }) => theme.colors.placeholder};
+  color: ${({ theme }) => theme.colors.supportingCopy};
   ${({ theme }) => theme.fonts.bodyStyle};
 `
 
@@ -55,7 +55,7 @@ export const ActionContainer = styled.div`
   flex-wrap: wrap;
   margin: 0 -24px 0 -24px;
   padding: 12px 24px 11px 24px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.dividerDark};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
 `
 
 export const FilterContainer = styled.div`

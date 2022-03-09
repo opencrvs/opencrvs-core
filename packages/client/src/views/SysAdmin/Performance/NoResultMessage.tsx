@@ -27,7 +27,7 @@ const MessageContainer = styled.div`
   margin: 0;
 `
 const StyledHeader = styled.h5`
-  color: ${({ theme }) => theme.colors.menuBackground};
+  color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.h5Style};
   margin: 16px 0;
 `
@@ -68,7 +68,6 @@ class NoResultMessageComponent extends React.Component<Props> {
                 <LinkButton
                   id={`pilot-location-link-${index}`}
                   key={index}
-                  textDecoration="none"
                   onClick={() =>
                     this.props.goToOperationalReport(
                       pilotLocation.id,

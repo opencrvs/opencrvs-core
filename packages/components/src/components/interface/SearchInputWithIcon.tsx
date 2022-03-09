@@ -31,7 +31,7 @@ const Wrapper = styled.div<{
   ${({ error, touched, theme }) =>
     `
         border: 2px solid ${
-          error && touched ? theme.colors.error : theme.colors.copy
+          error && touched ? theme.colors.negative : theme.colors.copy
         };
         `}
 `

@@ -46,7 +46,7 @@ const Required = styled.span<
 >`
   ${({ theme }) => theme.fonts.bigBodyStyle};
   color: ${({ disabled, theme }) =>
-    disabled ? theme.colors.disabled : theme.colors.error};
+    disabled ? theme.colors.disabled : theme.colors.negative};
   flex-grow: 0;
 `
 
@@ -56,13 +56,8 @@ const ToolTipContainer = styled.span`
 
 export class InputLabel extends React.Component<IInputLabel> {
   render() {
-    const {
-      inputDescriptor,
-      required,
-      hideAsterisk,
-      children,
-      tooltip
-    } = this.props
+    const { inputDescriptor, required, hideAsterisk, children, tooltip } =
+      this.props
     return (
       <StyledInputLabel data-tip={tooltip} {...this.props}>
         {tooltip && <ReactTooltip />}

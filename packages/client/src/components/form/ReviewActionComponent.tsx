@@ -71,9 +71,9 @@ const Content = styled.div`
 const UnderLayBackground = styled.div<{ background: string }>`
   background-color: ${({ background, theme }) =>
     background === 'success'
-      ? theme.colors.success
+      ? theme.colors.positive
       : background === 'error'
-      ? theme.colors.error
+      ? theme.colors.negative
       : theme.colors.primary};
   position: absolute;
   top: 0;

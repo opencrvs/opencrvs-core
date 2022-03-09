@@ -73,7 +73,7 @@ const CustomTertiaryButton = styled(TertiaryButton)`
   height: 48px;
   &:disabled {
     background: ${({ theme }) => theme.colors.white};
-    color: ${({ theme }) => theme.colors.scrollBarGrey};
+    color: ${({ theme }) => theme.colors.grey300};
   }
 `
 const ButtonWrapper = styled.div`
@@ -87,17 +87,19 @@ const ButtonWrapper = styled.div`
   }
 `
 const SvgWrapper = styled.div`
-  ${({ theme }) => theme.shadows.mistyShadow};
-  background: ${({ theme }) => theme.colors.blueDeepSeaLight};
+  background: ${({ theme }) => theme.colors.grey100};
   display: flex;
   height: 100%;
+  padding-top: 48px;
+  padding-bottom: 48px;
   align-items: center;
   justify-content: center;
   margin-bottom: 32px;
 `
 const Certificate = styled.img`
   display: block;
-  width: 70%;
+  ${({ theme }) => theme.shadows.light};
+  width: 64%;
   align-items: center;
   justify-content: center;
   margin: 0 auto;
@@ -106,7 +108,7 @@ const Certificate = styled.img`
 const Info = styled.div`
   ${({ theme }) => theme.fonts.bodyStyle};
   margin-bottom: 30px;
-  color: ${({ theme }) => theme.colors.menuBackground};
+  color: ${({ theme }) => theme.colors.grey500};
   width: 80%;
 `
 const Title = styled.h4`

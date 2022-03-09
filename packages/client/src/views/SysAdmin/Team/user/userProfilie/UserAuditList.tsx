@@ -75,7 +75,7 @@ const RecentActionsHolder = styled.div`
     margin-top: 24px;
     padding-top: 24px;
   }
-  border-top: 1px solid ${({ theme }) => theme.colors.dividerDark};
+  border-top: 1px solid ${({ theme }) => theme.colors.grey200};
 `
 
 const SectionTitle = styled.div`
@@ -307,9 +307,7 @@ class UserAuditListComponent extends React.Component<Props, State> {
           ),
           statusIcon: this.getWorkflowStatusIcon(timeLoggedMetrics.status),
           trackingId: (timeLoggedMetrics.trackingId && (
-            <LinkButton textDecoration={'none'}>
-              {timeLoggedMetrics.trackingId}
-            </LinkButton>
+            <LinkButton>{timeLoggedMetrics.trackingId}</LinkButton>
           )) || <></>,
           eventType: this.props.intl.formatMessage(
             constantsMessages[timeLoggedMetrics.eventType.toLowerCase()]

@@ -30,22 +30,22 @@ const StyledSpinner = styled.div<IInvertSpinner>`
   /* stylelint-disable value-no-vendor-prefix */
   background: -moz-linear-gradient(
     left,
-    ${({ theme }) => theme.colors.gradientLight} 10%,
+    ${({ theme }) => theme.colors.indigoDark} 10%,
     ${({ theme }) => theme.colors.white} 42%
   );
   background: -webkit-linear-gradient(
     left,
-    ${({ theme }) => theme.colors.gradientLight} 10%,
+    ${({ theme }) => theme.colors.indigoDark} 10%,
     ${({ theme }) => theme.colors.white} 42%
   );
   background: -o-linear-gradient(
     left,
-    ${({ theme }) => theme.colors.gradientLight} 10%,
+    ${({ theme }) => theme.colors.indigoDark} 10%,
     ${({ theme }) => theme.colors.white} 42%
   );
   background: linear-gradient(
     to right,
-    ${({ theme }) => theme.colors.gradientLight} 10%,
+    ${({ theme }) => theme.colors.indigoDark} 10%,
     ${({ theme }) => theme.colors.white} 42%
   );
   position: relative;
