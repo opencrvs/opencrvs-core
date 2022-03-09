@@ -64,5 +64,9 @@ export const mockFetchConfig = {
     num: '9'
   },
   COUNTRY: 'zmb',
+  CURRENCY: {
+    isoCode: 'Pound sterling',
+    languagesAndCountry: ['en-US']
+  },
   LANGUAGES: 'en'
 }
