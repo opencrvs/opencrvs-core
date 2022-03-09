@@ -24,6 +24,7 @@
     "hapi-auth-jwt2": "10.2.0",
     "hapi-pino": "^8.5.0",
     "hapi-sentry": "^3.2.0",
+    "joi": "^17.5.0",
     "is-svg": "^4.3.2",
     "mongoose": "^5.11.0",
     "pino": "^6.0.0"

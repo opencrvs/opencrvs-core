@@ -393,7 +393,7 @@ class FieldAgentHomeView extends React.Component<
                     }
                     return (
                       <>
-                        {data && data.searchEvents.totalItems > 0 && (
+                        {data && data.searchEvents?.totalItems > 0 && (
                           <HomeContent id="require_updates_list">
                             <GridTable
                               content={this.transformRejectedContent(data)}
@@ -421,7 +421,7 @@ class FieldAgentHomeView extends React.Component<
                             />
                           </HomeContent>
                         )}
-                        {data && data.searchEvents.totalItems === 0 && (
+                        {data && data.searchEvents?.totalItems === 0 && (
                           <ZeroUpdatesContainer>
                             <ApplicationsOrangeAmber />
                             <ZeroUpdatesText>

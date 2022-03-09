@@ -60,6 +60,7 @@ interface ICorrectionMessages
   correctionSummaryFeesRequired: MessageDescriptor
   correctionSummaryProofOfPaymentRequired: MessageDescriptor
   correctionSummaryProofOfPayment: MessageDescriptor
+  correctionSummaryproofOfPaymentError: MessageDescriptor
 }
 
 const messagesToDefine: ICorrectionMessages = {
@@ -326,6 +327,11 @@ const messagesToDefine: ICorrectionMessages = {
     id: 'correction.summary.proofOfPayment',
     defaultMessage: 'Proof of payment',
     description: 'Proof of payment label fees payment document'
+  },
+  correctionSummaryproofOfPaymentError: {
+    id: 'correction.summary.proofOfPaymentError',
+    defaultMessage: 'Proof of payment is required for correction',
+    description: 'Proof of payment document upload error'
   }
 }
 

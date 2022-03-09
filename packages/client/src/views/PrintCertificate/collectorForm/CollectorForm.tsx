@@ -175,6 +175,7 @@ const getErrorsOnFieldsBySection = (
 interface IState {
   showError: boolean
   showModalForNoSignedAffidavit: boolean
+  isFileUploading: boolean
 }
 
 class CollectorFormComponent extends React.Component<IProps, IState> {
@@ -182,9 +183,18 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     super(props)
     this.state = {
       showError: false,
-      showModalForNoSignedAffidavit: false
+      showModalForNoSignedAffidavit: false,
+      isFileUploading: false
     }
   }
+
+  onUploadingStateChanged = (isUploading: boolean) => {
+    this.setState({
+      ...this.state,
+      isFileUploading: isUploading
+    })
+  }
+
   modifyApplication = (
     sectionData: ICertificate['collector'],
     application: IPrintableApplication
@@ -419,6 +429,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
             setAllFieldsDirty={false}
             fields={formGroup.fields}
             draftData={applicationToBeCertified.data}
+            onUploadingStateChanged={this.onUploadingStateChanged}
           />
           <PrimaryButton
             id="confirm_form"
@@ -433,6 +444,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
                 applicationToBeCertified
               )
             }}
+            disabled={this.state.isFileUploading}
           >
             {intl.formatMessage(buttonMessages.continueButton)}
           </PrimaryButton>
@@ -462,6 +474,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
                     event
                   )
                 }
+                disabled={this.state.isFileUploading}
               >
                 {intl.formatMessage(buttonMessages.continueButton)}
               </PrimaryButton>

@@ -42,6 +42,7 @@ export interface GQLQuery {
   getRoles?: Array<GQLRole | null>
   getCertificateSVG?: GQLCertificateSVG
   getActiveCertificatesSVG?: Array<GQLCertificateSVG | null>
+  getQuestions?: Array<GQLQuestion | null>
 }
 
 export interface GQLMutation {
@@ -73,6 +74,7 @@ export interface GQLMutation {
   auditUser?: string
   resendSMSInvite?: string
   createOrUpdateCertificateSVG?: GQLCertificateSVG
+  createOrUpdateQuestion?: GQLQuestion
 }
 
 export interface GQLDummy {
@@ -306,6 +308,21 @@ export interface GQLCertificateSVG {
   status?: string
 }
 
+export interface GQLQuestion {
+  _id?: string
+  fieldId?: string
+  label?: GQLMesssageDescriptor
+  placeholder?: GQLMesssageDescriptor
+  maxLength?: number
+  fieldName?: string
+  fieldType?: string
+  preceedingFieldId?: string
+  required?: boolean
+  enabled?: boolean
+  custom?: boolean
+  initialValue?: string
+}
+
 export interface GQLNotificationInput {
   child?: GQLPersonInput
   mother?: GQLPersonInput
@@ -403,6 +420,21 @@ export interface GQLCertificateSVGInput {
   user: string
   event: string
   status: string
+}
+
+export interface GQLQuestionInput {
+  id?: string
+  fieldId?: string
+  label?: GQLMesssageDescriptorInput
+  placeholder?: GQLMesssageDescriptorInput
+  maxLength?: number
+  fieldName?: string
+  fieldType?: string
+  preceedingFieldId?: string
+  required?: boolean
+  enabled?: boolean
+  custom?: boolean
+  initialValue?: string
 }
 
 export type GQLMap = any
@@ -716,6 +748,12 @@ export interface GQLEventProgressSet {
   progressReport?: GQLEventProgressData
 }
 
+export interface GQLMesssageDescriptor {
+  id?: string
+  description?: string
+  defaultMessage?: string
+}
+
 export interface GQLPersonInput {
   _fhirID?: string
   identifier?: Array<GQLIdentityInput | null>
@@ -821,6 +859,12 @@ export interface GQLUserIdentifierInput {
 export interface GQLSignatureInput {
   data?: string
   type?: string
+}
+
+export interface GQLMesssageDescriptorInput {
+  id?: string
+  description?: string
+  defaultMessage?: string
 }
 
 export interface GQLRegWorkflow {
@@ -1238,6 +1282,7 @@ export interface GQLResolver {
   EventProgressResultSet?: GQLEventProgressResultSetTypeResolver
   Role?: GQLRoleTypeResolver
   CertificateSVG?: GQLCertificateSVGTypeResolver
+  Question?: GQLQuestionTypeResolver
   CreatedIds?: GQLCreatedIdsTypeResolver
   Reinstated?: GQLReinstatedTypeResolver
   Map?: GraphQLScalarType
@@ -1272,6 +1317,7 @@ export interface GQLResolver {
   }
 
   EventProgressSet?: GQLEventProgressSetTypeResolver
+  MesssageDescriptor?: GQLMesssageDescriptorTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
   ReasonsNotApplying?: GQLReasonsNotApplyingTypeResolver
@@ -1322,6 +1368,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   getRoles?: QueryToGetRolesResolver<TParent>
   getCertificateSVG?: QueryToGetCertificateSVGResolver<TParent>
   getActiveCertificatesSVG?: QueryToGetActiveCertificatesSVGResolver<TParent>
+  getQuestions?: QueryToGetQuestionsResolver<TParent>
 }
 
 export interface QueryToListNotificationsArgs {
@@ -1821,6 +1868,10 @@ export interface QueryToGetActiveCertificatesSVGResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface QueryToGetQuestionsResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLMutationTypeResolver<TParent = any> {
   createNotification?: MutationToCreateNotificationResolver<TParent>
   voidNotification?: MutationToVoidNotificationResolver<TParent>
@@ -1850,6 +1901,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   auditUser?: MutationToAuditUserResolver<TParent>
   resendSMSInvite?: MutationToResendSMSInviteResolver<TParent>
   createOrUpdateCertificateSVG?: MutationToCreateOrUpdateCertificateSVGResolver<TParent>
+  createOrUpdateQuestion?: MutationToCreateOrUpdateQuestionResolver<TParent>
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -2278,6 +2330,21 @@ export interface MutationToCreateOrUpdateCertificateSVGResolver<
   (
     parent: TParent,
     args: MutationToCreateOrUpdateCertificateSVGArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToCreateOrUpdateQuestionArgs {
+  question: GQLQuestionInput
+}
+export interface MutationToCreateOrUpdateQuestionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToCreateOrUpdateQuestionArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -3305,6 +3372,72 @@ export interface CertificateSVGToStatusResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLQuestionTypeResolver<TParent = any> {
+  _id?: QuestionTo_idResolver<TParent>
+  fieldId?: QuestionToFieldIdResolver<TParent>
+  label?: QuestionToLabelResolver<TParent>
+  placeholder?: QuestionToPlaceholderResolver<TParent>
+  maxLength?: QuestionToMaxLengthResolver<TParent>
+  fieldName?: QuestionToFieldNameResolver<TParent>
+  fieldType?: QuestionToFieldTypeResolver<TParent>
+  preceedingFieldId?: QuestionToPreceedingFieldIdResolver<TParent>
+  required?: QuestionToRequiredResolver<TParent>
+  enabled?: QuestionToEnabledResolver<TParent>
+  custom?: QuestionToCustomResolver<TParent>
+  initialValue?: QuestionToInitialValueResolver<TParent>
+}
+
+export interface QuestionTo_idResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface QuestionToFieldIdResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface QuestionToLabelResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface QuestionToPlaceholderResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface QuestionToMaxLengthResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface QuestionToFieldNameResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface QuestionToFieldTypeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface QuestionToPreceedingFieldIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface QuestionToRequiredResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface QuestionToEnabledResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface QuestionToCustomResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface QuestionToInitialValueResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLCreatedIdsTypeResolver<TParent = any> {
   compositionId?: CreatedIdsToCompositionIdResolver<TParent>
   trackingId?: CreatedIdsToTrackingIdResolver<TParent>
@@ -4328,6 +4461,30 @@ export interface EventProgressSetToStartedAtResolver<
 }
 
 export interface EventProgressSetToProgressReportResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLMesssageDescriptorTypeResolver<TParent = any> {
+  id?: MesssageDescriptorToIdResolver<TParent>
+  description?: MesssageDescriptorToDescriptionResolver<TParent>
+  defaultMessage?: MesssageDescriptorToDefaultMessageResolver<TParent>
+}
+
+export interface MesssageDescriptorToIdResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface MesssageDescriptorToDescriptionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface MesssageDescriptorToDefaultMessageResolver<
   TParent = any,
   TResult = any
 > {
