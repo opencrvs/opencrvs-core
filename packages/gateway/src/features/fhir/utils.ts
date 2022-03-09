@@ -51,8 +51,7 @@ import {
   OPENCRVS_SPECIFICATION_URL,
   EVENT_TYPE,
   BIRTH_REG_NO,
-  DEATH_REG_NO,
-  DOWNLOADED_EXTENSION_URL
+  DEATH_REG_NO
 } from '@gateway/features/fhir/constants'
 import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import { IMetricsParam } from '@gateway/features/metrics/root-resolvers'
@@ -866,11 +865,8 @@ export function findExtension(
   return extension
 }
 
-export function getDownloadedExtensionStatus(task: fhir.Task) {
-  const extension = findExtension(
-    DOWNLOADED_EXTENSION_URL,
-    task.extension as fhir.Extension[]
-  )
+export function getExtensionStatus(task: fhir.Task, url: string) {
+  const extension = task.extension && findExtension(url, task.extension)
   return extension?.valueString
 }
 

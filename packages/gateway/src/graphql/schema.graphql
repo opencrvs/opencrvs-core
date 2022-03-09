@@ -581,6 +581,7 @@ type History {
   user: User
   date: Date
   action: RegStatus
+  reinstated: Boolean
   location: Location
   office: Location
 }
