@@ -13,22 +13,22 @@ import styled from 'styled-components'
 import { PrimaryButton } from './PrimaryButton'
 
 export const SuccessButton = styled(PrimaryButton)`
-  background-color: ${({ theme }) => theme.colors.success};
+  background-color: ${({ theme }) => theme.colors.positive};
   &:hover:enabled {
-    background: ${({ theme }) => theme.colors.successHover};
+    background: ${({ theme }) => theme.colors.greenDark};
   }
   &:focus {
     outline: none;
-    background: ${({ theme }) => theme.colors.focus};
+    background: ${({ theme }) => theme.colors.yellow};
     color: ${({ theme }) => theme.colors.copy};
   }
 
   &:not([data-focus-visible-added]) {
     outline: none;
-    background-color: ${({ theme }) => theme.colors.success};
+    background-color: ${({ theme }) => theme.colors.positive};
     color: ${({ theme }) => theme.colors.white};
   }
   &:active:enabled {
-    background: ${({ theme }) => theme.colors.success};
+    background: ${({ theme }) => theme.colors.positive};
   }
 `

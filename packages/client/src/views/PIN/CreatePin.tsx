@@ -25,7 +25,7 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  ${({ theme }) => theme.gradients.gradientNightshade};
+  ${({ theme }) => theme.gradients.primary};
   height: 100vh;
   width: 100%;
   position: absolute;
@@ -59,7 +59,7 @@ const ErrorBox = styled.div`
   justify-content: center;
   color: ${({ theme }) => theme.colors.white};
   ${({ theme }) => theme.fonts.bodyStyle};
-  background: ${({ theme }) => theme.colors.error};
+  background: ${({ theme }) => theme.colors.negative};
   height: 40px;
   width: 360px;
   margin-top: -20px;

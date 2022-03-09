@@ -178,31 +178,31 @@ const RowLink = styled(LinkButton)`
 export const StatusMapping: IStatusMapping = {
   IN_PROGRESS: {
     labelDescriptor: statusMessages.inProgress,
-    color: colors.inProgress
+    color: colors.purple
   },
   DECLARED: {
     labelDescriptor: statusMessages.readyForReview,
-    color: colors.readyForReview
+    color: colors.orange
   },
   REJECTED: {
     labelDescriptor: statusMessages.sentForUpdates,
-    color: colors.sentForUpdate
+    color: colors.red
   },
   VALIDATED: {
     labelDescriptor: statusMessages.sentForApprovals,
-    color: colors.waitingForApproval
+    color: colors.grey300
   },
   WAITING_VALIDATION: {
     labelDescriptor: statusMessages.sentForExternalValidation,
-    color: colors.waitingForExternalValidation
+    color: colors.grey500
   },
   REGISTERED: {
     labelDescriptor: statusMessages.readyToPrint,
-    color: colors.readyToPrint
+    color: colors.green
   },
   CERTIFIED: {
     labelDescriptor: statusMessages.certified,
-    color: colors.readyToPrint
+    color: colors.blue
   }
 }
 

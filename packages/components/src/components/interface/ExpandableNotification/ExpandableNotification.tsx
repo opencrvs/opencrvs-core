@@ -37,10 +37,10 @@ const NotificationBar = styled.div`
   color: ${({ theme }) => theme.colors.white};
   ${({ theme }) => theme.fonts.bodyStyle};
   background-color: ${({ theme }) => theme.colors.primary};
-  ${({ theme }) => theme.shadows.thickShadow};
+  ${({ theme }) => theme.shadows.heavy};
   z-index: 3;
   &:hover {
-    ${({ theme }) => theme.gradients.gradientSkyDark};
+    ${({ theme }) => theme.colors.indigoDark};
   }
 `
 const ExpandableOverlay = styled.div<{ show: boolean }>`
@@ -65,7 +65,7 @@ class ExpandableNotificationComponent extends React.Component<IProps, IState> {
     }
   }
   handleClick = () => {
-    this.setState(prev => ({
+    this.setState((prev) => ({
       expand: !prev.expand
     }))
   }
@@ -111,6 +111,6 @@ class ExpandableNotificationComponent extends React.Component<IProps, IState> {
 
 // cast because of styled-components bug
 // https://stackoverflow.com/questions/53724583/why-this-wrapped-styled-component-errors-has-no-properties-in-common-with/53902817#53902817
-export const ExpandableNotification = (withTheme(
+export const ExpandableNotification = withTheme(
   ExpandableNotificationComponent
-) as unknown) as React.ComponentClass<Omit<IProps, 'theme'>, IState>
+) as unknown as React.ComponentClass<Omit<IProps, 'theme'>, IState>

@@ -31,7 +31,7 @@ const LeftNavigationContainer = styled.div<{
   height: 100vh;
   overflow-y: auto;
   background-color: ${({ theme }) => theme.colors.white};
-  border-right: 1px solid ${({ theme }) => theme.colors.grey500};
+  border-right: 1px solid ${({ theme }) => theme.colors.grey300};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     ${({ navigationWidth }) => !navigationWidth && `display: none;`}
   }
@@ -41,7 +41,7 @@ const UserInfo = styled.div`
   padding: 32px 24px;
   text-align: justify;
   border: 0px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey500};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
@@ -59,7 +59,7 @@ const ApplicationNameContainer = styled.div`
   padding: 16px 20px;
   height: 56px;
   background-color: ${({ theme }) => theme.colors.white};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey500};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
