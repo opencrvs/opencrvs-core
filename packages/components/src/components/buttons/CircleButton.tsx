@@ -12,7 +12,7 @@
 import styled from 'styled-components'
 
 export const CircleButton = styled.button<{ dark?: boolean }>`
-  color: ${({ color = '#4C68C1' }) => color};
+  color: ${({ theme }) => theme.colors.primary};
   margin: 0;
   transition: background 0.4s ease;
   border: none;

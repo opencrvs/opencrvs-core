@@ -94,11 +94,11 @@ const CenterWrapper = styled.div`
 `
 const LeftButtonIcon = styled.div`
   display: flex;
-  margin-right: 16px;
+  margin-right: 8px;
 `
 const RightButtonIcon = styled.div`
   display: flex;
-  margin-left: 16px;
+  margin-left: 8px;
 `
 const IconOnly = styled.div`
   display: flex;
