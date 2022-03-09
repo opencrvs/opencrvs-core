@@ -25,12 +25,12 @@ export const registerForms = {
         name: {
           defaultMessage: 'Registration',
           description: 'Form section name for Registration',
-          id: 'form.section.application.name'
+          id: 'form.section.declaration.name'
         },
         title: {
           defaultMessage: 'Declaration Details',
           description: 'Form section title for Registration',
-          id: 'form.section.application.title'
+          id: 'form.section.declaration.title'
         },
         groups: [
           {
@@ -257,7 +257,7 @@ export const registerForms = {
             id: 'primary-informant',
             title: {
               defaultMessage:
-                'Who is the primary informant for this application?',
+                'Who is the primary informant for this declaration?',
               description: 'Form section title for primary informant',
               id: 'register.primaryInformant.registerNewEventHeading'
             },
@@ -276,7 +276,7 @@ export const registerForms = {
                 type: 'PARAGRAPH',
                 label: {
                   defaultMessage:
-                    'This person is responsible for providing accurate information in this application.',
+                    'This person is responsible for providing accurate information in this declaration.',
                   description: 'Documents Paragraph text',
                   id: 'register.primaryInformant.description'
                 },
@@ -338,7 +338,7 @@ export const registerForms = {
             id: 'contact-view-group',
             title: {
               defaultMessage:
-                'Who is the main point of contact for this application?',
+                'Who is the main point of contact for this declaration?',
               description: 'Form section title for contact point',
               id: 'register.SelectContactPoint.heading'
             },
@@ -351,7 +351,7 @@ export const registerForms = {
                 label: {
                   defaultMessage: 'Main Contact',
                   description: 'Label for form field: Place of delivery',
-                  id: 'form.field.label.application.mainContact'
+                  id: 'form.field.label.declaration.mainContact'
                 },
                 required: false,
                 initialValue: '',
@@ -406,7 +406,7 @@ export const registerForms = {
                 label: {
                   defaultMessage: 'Who is present for the birth registration?',
                   description: 'Form section title for contact point',
-                  id: 'form.field.label.application.whoIsPresent'
+                  id: 'form.field.label.declaration.whoIsPresent'
                 },
                 reviewOverrides: {
                   residingSection: 'registration',
@@ -3712,7 +3712,7 @@ export const registerForms = {
                       name: 'phone',
                       type: 'TEL',
                       label: {
-                        id: 'form.field.label.application.phone',
+                        id: 'form.field.label.declaration.phone',
                         defaultMessage: 'Phone number',
                         description: 'field label for phone'
                       },
@@ -3852,7 +3852,7 @@ export const registerForms = {
                       name: 'phone',
                       type: 'TEL',
                       label: {
-                        id: 'form.field.label.application.phone',
+                        id: 'form.field.label.declaration.phone',
                         defaultMessage: 'Phone number',
                         description: 'field label for phone'
                       },
@@ -8062,12 +8062,12 @@ export const registerForms = {
         name: {
           defaultMessage: 'Registration',
           description: 'Form section name for Registration',
-          id: 'form.section.application.name'
+          id: 'form.section.declaration.name'
         },
         title: {
           defaultMessage: 'Declaration Details',
           description: 'Form section title for Registration',
-          id: 'form.section.application.title'
+          id: 'form.section.declaration.title'
         },
         groups: [
           {
@@ -8207,7 +8207,7 @@ export const registerForms = {
             id: 'point-of-contact',
             title: {
               defaultMessage:
-                'Who is the main point of contact for this application?',
+                'Who is the main point of contact for this declaration?',
               description: 'Form section title for contact point',
               id: 'register.SelectContactPoint.heading'
             },
@@ -8220,7 +8220,7 @@ export const registerForms = {
                 type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
                 label: {
                   defaultMessage:
-                    'Who is the main point of contact for this application?',
+                    'Who is the main point of contact for this declaration?',
                   description: 'Form section title for contact point',
                   id: 'register.SelectContactPoint.heading'
                 },
@@ -10743,7 +10743,7 @@ export const registerForms = {
                 },
                 notice: {
                   defaultMessage:
-                    'A Medically Certified Cause of Death is not mandatory to submit the application. This can be added at a later date.',
+                    'A Medically Certified Cause of Death is not mandatory to submit the declaration. This can be added at a later date.',
                   description: 'Form section notice for Cause of Death',
                   id: 'form.section.causeOfDeathNotice'
                 },
