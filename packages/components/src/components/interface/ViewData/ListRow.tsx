@@ -129,7 +129,7 @@ const ProfileInfoContainer = styled.div`
 
 interface IAction {
   id?: string
-  label: string
+  label: string | React.ReactNode
   disabled?: boolean
   handler?: () => void
 }

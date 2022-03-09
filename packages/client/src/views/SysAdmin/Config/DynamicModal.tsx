@@ -268,17 +268,19 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
     }
   }
 
-  getTitle(props: IFullProps) {
-    const { intl, changeModalName } = props
+  getTitle() {
+    const { intl, changeModalName } = this.props
     if (changeModalName === GeneralActionId.APPLICATION_NAME)
       return intl.formatMessage(messages.applicationNameLabel)
-    else return intl.formatMessage(messages.nidPatternTitle)
+    else if (changeModalName === GeneralActionId.NID_PATTERN)
+      return intl.formatMessage(messages.nidPatternTitle)
+    else return EMPTY_STRING
   }
 
-  isApplyButtonDisable(props: IFullProps) {
-    const { changeModalName } = props
+  isApplyButtonDisable() {
+    const { changeModalName } = this.props
     if (changeModalName === GeneralActionId.APPLICATION_NAME) {
-      return !Boolean(this.state.applicationName.length)
+      return !Boolean(this.state.applicationName)
     } else if (changeModalName === GeneralActionId.NID_PATTERN) {
       return (
         !isValidRegEx(this.state.nidPattern) || !Boolean(this.state.nidPattern)
@@ -304,7 +306,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
     return (
       <ResponsiveModal
         id={`${changeModalName}Modal`}
-        title={this.getTitle(this.props)}
+        title={this.getTitle()}
         autoHeight={true}
         titleHeightAuto={changeModalName === GeneralActionId.NID_PATTERN}
         show={this.showChangeModal}
@@ -319,7 +321,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
           <ApplyButton
             key="apply"
             id="apply_change"
-            disabled={this.isApplyButtonDisable(this.props)}
+            disabled={this.isApplyButtonDisable()}
             onClick={() => {
               this.mutationHandler(
                 changeModalName,
@@ -368,6 +370,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
         {changeModalName === GeneralActionId.NID_PATTERN && (
           <ContentComponent
             intl={intl}
+            changeModalName={changeModalName}
             pattern={this.state.nidPattern}
             example={this.state.nidExample}
             setPattern={this.setNIDPattern}

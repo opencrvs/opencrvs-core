@@ -40,6 +40,9 @@ const ListGroupTitle = styled.div`
   height: 21px;
   ${({ theme }) => theme.fonts.bodyBoldStyle};
 `
+
+const Container = styled.div``
+
 type Props = IntlShapeProps & {
   userDetails: IUserDetails | null
   offlineCountryConfiguration: IOfflineData
@@ -132,10 +135,13 @@ function GeneralTabContent({
         },
         {
           label: intl.formatMessage(messages.nidPatternTitle),
-          value:
-            offlineCountryConfiguration.config.NID_NUMBER_PATTERN.toString(),
+          value: (
+            <div id="nidPattern_value_container">
+              {offlineCountryConfiguration.config.NID_NUMBER_PATTERN.toString()}
+            </div>
+          ),
           action: {
-            id: 'btnChangeUIN',
+            id: GeneralActionId.NID_PATTERN,
             label: intl.formatMessage(buttonMessages.change),
             handler: () => {
               callBack(GeneralActionId.NID_PATTERN)

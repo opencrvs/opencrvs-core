@@ -60,6 +60,7 @@ const LinkButtonContainer = styled.div`
 
 interface IProps {
   intl: IntlShape
+  changeModalName: string
   pattern: string
   example: string
   setPattern: (event: React.ChangeEvent<HTMLInputElement>) => void
@@ -70,6 +71,7 @@ interface IProps {
 
 function ContentComponent({
   intl,
+  changeModalName,
   pattern,
   example,
   setPattern,
@@ -84,7 +86,7 @@ function ContentComponent({
       <Field>
         <InputContainer>
           <InputField
-            id="nidPattern"
+            id={`${changeModalName}Input`}
             touched={false}
             required={true}
             label={intl.formatMessage(messages.pattern)}
@@ -92,7 +94,7 @@ function ContentComponent({
             ignoreMediaQuery={true}
           >
             <HalfWidthInput
-              id="applicationName"
+              id={`${changeModalName}Input`}
               type="text"
               error={!isValidRegEx(pattern)}
               value={pattern}
@@ -107,14 +109,14 @@ function ContentComponent({
         <InputContainer displayFlex={true}>
           <div>
             <InputField
-              id="nidExample"
+              id={`${changeModalName}Example`}
               touched={false}
               required={false}
               label={intl.formatMessage(messages.example)}
               ignoreMediaQuery={true}
             >
               <HalfWidthInput
-                id="nidExample"
+                id={`${changeModalName}ExampleInput`}
                 type="text"
                 error={false}
                 value={example}
@@ -124,7 +126,7 @@ function ContentComponent({
             </InputField>
             <LinkButtonContainer>
               <LinkButton
-                id="test-nid-example"
+                id={`test-${changeModalName}-example`}
                 onClick={() => {
                   setShowExampleValidation(true)
                 }}
@@ -138,15 +140,22 @@ function ContentComponent({
             <ExampleValidityContainer>
               {isValidExample(pattern, example) ? (
                 <>
-                  <SuccessSmall />
-                  <SuccessMessage>
+                  <SuccessSmall id={`${changeModalName}-example-valid-icon`} />
+                  <SuccessMessage
+                    id={`${changeModalName}-example-valid-message`}
+                  >
                     {intl.formatMessage(messages.validExample)}
                   </SuccessMessage>
                 </>
               ) : (
                 <>
-                  <Cross color={'red'} />
-                  <ErrorMessageBottom>
+                  <Cross
+                    color={'red'}
+                    id={`${changeModalName}-example-invalid-icon`}
+                  />
+                  <ErrorMessageBottom
+                    id={`${changeModalName}-example-invalid-message`}
+                  >
                     {intl.formatMessage(messages.invalidExample)}
                   </ErrorMessageBottom>
                 </>
