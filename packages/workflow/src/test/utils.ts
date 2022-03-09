@@ -26,10 +26,10 @@ export const testFhirBundle = {
           coding: [
             {
               system: 'http://opencrvs.org/doc-types',
-              code: 'birth-application'
+              code: 'birth-declaration'
             }
           ],
-          text: 'Birth Application'
+          text: 'Birth Declaration'
         },
         class: {
           coding: [
@@ -132,8 +132,7 @@ export const testFhirBundle = {
             valueString: 'MOTHER'
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '+8801622688231'
           },
           {
@@ -213,10 +212,10 @@ export const testFhirBundleWithIds = {
           coding: [
             {
               system: 'http://opencrvs.org/doc-types',
-              code: 'birth-application'
+              code: 'birth-declaration'
             }
           ],
-          text: 'Birth Application'
+          text: 'Birth Declaration'
         },
         class: {
           coding: [
@@ -391,10 +390,10 @@ export const testFhirBundleWithIdsForDeath = {
           coding: [
             {
               system: 'http://opencrvs.org/doc-types',
-              code: 'death-application'
+              code: 'death-declaration'
             }
           ],
-          text: 'Death Application'
+          text: 'Death Declaration'
         },
         class: {
           coding: [
@@ -473,8 +472,7 @@ export const testFhirBundleWithIdsForDeath = {
             valueString: 'MOTHER'
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '+8801818181818'
           },
           {
@@ -884,10 +882,10 @@ export const compositionMock = JSON.stringify({
     coding: [
       {
         system: 'http://opencrvs.org/doc-types',
-        code: 'birth-application'
+        code: 'birth-declaration'
       }
     ],
-    text: 'Birth Application'
+    text: 'Birth Declaration'
   },
   class: {
     coding: [
@@ -976,10 +974,10 @@ export const deathCompositionMock = JSON.stringify({
     coding: [
       {
         system: 'http://opencrvs.org/doc-types',
-        code: 'death-application'
+        code: 'death-declaration'
       }
     ],
-    text: 'Death Application'
+    text: 'Death Declaration'
   },
   class: {
     coding: [
@@ -1159,10 +1157,10 @@ export const testDeathFhirBundle = {
           coding: [
             {
               system: 'http://opencrvs.org/doc-types',
-              code: 'death-application'
+              code: 'death-declaration'
             }
           ],
-          text: 'Death Application'
+          text: 'Death Declaration'
         },
         class: {
           coding: [
@@ -1540,10 +1538,10 @@ export const testInProgressFhirBundle = {
           coding: [
             {
               system: 'http://opencrvs.org/doc-types',
-              code: 'birth-application'
+              code: 'birth-declaration'
             }
           ],
-          text: 'Birth Application'
+          text: 'Birth Declaration'
         },
         class: {
           coding: [
@@ -1584,8 +1582,7 @@ export const testInProgressFhirBundle = {
             valueString: 'MOTHER'
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '+8801622688231'
           }
         ]
@@ -1611,10 +1608,10 @@ export const testInProgressDeathFhirBundle = {
           coding: [
             {
               system: 'http://opencrvs.org/doc-types',
-              code: 'death-application'
+              code: 'death-declaration'
             }
           ],
-          text: 'Death Application'
+          text: 'Death Declaration'
         },
         class: {
           coding: [
@@ -1652,8 +1649,7 @@ export const testInProgressDeathFhirBundle = {
             valueString: 'MOTHER'
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '+8801622688231'
           }
         ]
@@ -1777,7 +1773,7 @@ export function wrapInBundle(...resources: [fhir.Resource | string]): string {
   return JSON.stringify({
     resourceType: 'Bundle',
     type: 'document',
-    entry: resources.map(resource => ({
+    entry: resources.map((resource) => ({
       resource: typeof resource === 'string' ? JSON.parse(resource) : resource
     }))
   })

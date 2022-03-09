@@ -10,10 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { createTestComponent } from '@client/tests/util'
-import { ApplicationsStartedReport } from './ApplicationsStartedReport'
+import { DeclarationsStartedReport } from './DeclarationsStartedReport'
 import { createStore } from '@client/store'
 import * as React from 'react'
-import { GQLApplicationsStartedMetrics } from '@opencrvs/gateway/src/graphql/schema'
+import { GQLDeclarationsStartedMetrics } from '@opencrvs/gateway/src/graphql/schema'
 import * as locationUtils from '@client/utils/locationUtils'
 import moment from 'moment'
 
@@ -25,7 +25,7 @@ describe('Registration rates report', () => {
 
   it('renders loading indicator', async () => {
     const component = await createTestComponent(
-      <ApplicationsStartedReport
+      <DeclarationsStartedReport
         loading={true}
         locationId={'c879ce5c-545b-4042-98a6-77015b0e13df'}
         reportTimeFrom={moment(new Date())}
@@ -34,21 +34,21 @@ describe('Registration rates report', () => {
       { store, history }
     )
     expect(
-      component.find('#applications-started-reports-loader').hostNodes()
+      component.find('#declarations-started-reports-loader').hostNodes()
     ).toHaveLength(1)
     expect(
-      component.find('#applications-started-reports').hostNodes()
+      component.find('#declarations-started-reports').hostNodes()
     ).toHaveLength(0)
   })
 
   it('renders reports', async () => {
-    const data: GQLApplicationsStartedMetrics = {
-      fieldAgentApplications: 2,
-      hospitalApplications: 1,
-      officeApplications: 2
+    const data: GQLDeclarationsStartedMetrics = {
+      fieldAgentDeclarations: 2,
+      hospitalDeclarations: 1,
+      officeDeclarations: 2
     }
     const component = await createTestComponent(
-      <ApplicationsStartedReport
+      <DeclarationsStartedReport
         data={data}
         locationId={'c879ce5c-545b-4042-98a6-77015b0e13df'}
         reportTimeFrom={moment(new Date())}
@@ -58,12 +58,12 @@ describe('Registration rates report', () => {
     )
 
     expect(
-      component.find('#applications-started-reports-loader').hostNodes()
+      component.find('#declarations-started-reports-loader').hostNodes()
     ).toHaveLength(0)
     expect(
-      component.find('#applications-started-reports').hostNodes()
+      component.find('#declarations-started-reports').hostNodes()
     ).toHaveLength(1)
-    expect(component.find('#total-applications').hostNodes().text()).toBe('5')
+    expect(component.find('#total-declarations').hostNodes().text()).toBe('5')
     expect(component.find('#field-agent-percentage').hostNodes().text()).toBe(
       '(40%)'
     )

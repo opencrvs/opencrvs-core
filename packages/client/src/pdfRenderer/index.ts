@@ -18,16 +18,16 @@ import {
   OptionalData
 } from '@client/pdfRenderer/transformer/types'
 import { IntlShape } from 'react-intl'
-import { IApplication } from '@client/applications'
+import { IDeclaration } from '@client/declarations'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IOfflineData } from '@client/offline/reducer'
 
 /*
-  Converts template definition into actual PDF using defined transformers, applicationData and userDetails
+  Converts template definition into actual PDF using defined transformers, declarationData and userDetails
 */
 export function createPDF(
   template: IPDFTemplate,
-  application: IApplication,
+  declaration: IDeclaration,
   userDetails: IUserDetails,
   offlineResource: IOfflineData,
   intl: IntlShape,
@@ -44,7 +44,7 @@ export function createPDF(
         )
       }
       let result = transformFunction(
-        { application, userDetails, resource: offlineResource },
+        { declaration, userDetails, resource: offlineResource },
         intl,
         transformerDef.parameters,
         optionalData
@@ -68,12 +68,12 @@ export function createPDF(
   )
 }
 /*
-  Converts template definition into actual SVG using defined transformers, applicationData and userDetails
+  Converts template definition into actual SVG using defined transformers, declarationData and userDetails
 */
 
 export function createSVG(
   template: ISVGTemplate,
-  application: IApplication,
+  declaration: IDeclaration,
   userDetails: IUserDetails,
   offlineResource: IOfflineData,
   intl: IntlShape,
@@ -90,7 +90,7 @@ export function createSVG(
         )
       }
       let result = transformFunction(
-        { application, userDetails, resource: offlineResource },
+        { declaration, userDetails, resource: offlineResource },
         intl,
         transformerDef.parameters,
         optionalData
@@ -112,7 +112,7 @@ export function createSVG(
 
 export function printPDF(
   template: IPDFTemplate,
-  application: IApplication,
+  declaration: IDeclaration,
   userDetails: IUserDetails,
   offlineResource: IOfflineData,
   intl: IntlShape,
@@ -120,7 +120,7 @@ export function printPDF(
 ) {
   createPDF(
     template,
-    application,
+    declaration,
     userDetails,
     offlineResource,
     intl,

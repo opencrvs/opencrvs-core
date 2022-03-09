@@ -17,14 +17,14 @@ export interface IPractitionerMetrics {
   totalStarted: number
 }
 
-export async function fetchLocationWiseApplicationsStarted(
+export async function fetchLocationWiseDeclarationsStarted(
   timeFrom: string,
   timeTo: string,
   locationId: string
 ) {
   const fieldAgent = await query(
     `SELECT COUNT(role)
-          FROM applications_started
+          FROM declarations_started
         WHERE time > '${timeFrom}'
           AND time <= '${timeTo}'
           AND ( officeLocation = '${locationId}'
@@ -37,7 +37,7 @@ export async function fetchLocationWiseApplicationsStarted(
 
   const office = await query(
     `SELECT COUNT(role)
-          FROM applications_started
+          FROM declarations_started
         WHERE time > '${timeFrom}'
           AND time <= '${timeTo}'
           AND ( officeLocation = '${locationId}'
@@ -50,7 +50,7 @@ export async function fetchLocationWiseApplicationsStarted(
 
   const hospital = await query(
     `SELECT COUNT(role)
-          FROM applications_started
+          FROM declarations_started
         WHERE time > '${timeFrom}'
           AND time <= '${timeTo}'
           AND ( officeLocation = '${locationId}'
@@ -62,11 +62,11 @@ export async function fetchLocationWiseApplicationsStarted(
   )
 
   return {
-    fieldAgentApplications:
+    fieldAgentDeclarations:
       (fieldAgent && fieldAgent.length > 0 && fieldAgent[0].count) || 0,
-    hospitalApplications:
+    hospitalDeclarations:
       (hospital && hospital.length > 0 && hospital[0].count) || 0,
-    officeApplications: (office && office.length > 0 && office[0].count) || 0
+    officeDeclarations: (office && office.length > 0 && office[0].count) || 0
   }
 }
 
@@ -84,12 +84,12 @@ export async function getNumberOfAppStartedByPractitioners(
 > {
   const eventClause = (event && `AND eventType = '${event}' `) || ''
   const statusClause = (status && `AND status = '${status}' `) || ''
-  const totalApplicationStarted: {
+  const totalDeclarationStarted: {
     practitionerId: string
     totalStarted: number
   }[] = await query(
     `SELECT COUNT(compositionId) as totalStarted
-            FROM applications_started
+            FROM declarations_started
             WHERE time > '${timeFrom}'
               AND time <= '${timeTo}'
               AND ( officeLocation = '${locationId}'
@@ -101,7 +101,7 @@ export async function getNumberOfAppStartedByPractitioners(
               ${statusClause}    
               GROUP BY practitionerId`
   )
-  return totalApplicationStarted
+  return totalDeclarationStarted
 }
 
 export async function getNumberOfRejectedAppStartedByPractitioners(
@@ -121,7 +121,7 @@ export async function getNumberOfRejectedAppStartedByPractitioners(
     totalStarted: number
   }[] = await query(
     `SELECT COUNT(compositionId) as totalStarted
-              FROM applications_rejected
+              FROM declarations_rejected
               WHERE time > '${timeFrom}'
                 AND time <= '${timeTo}'
                 AND ( officeLocation = '${locationId}'
@@ -144,19 +144,19 @@ export async function getAvgTimeSpentOnAppByPractitioners(
 ): Promise<
   {
     practitionerId: string
-    totalApplications: number
+    totalDeclarations: number
     totalTimeSpent: number
   }[]
 > {
   const eventClause = (event && `AND eventType = '${event}' `) || ''
-  const averageTimeForApplications: {
+  const averageTimeForDeclarations: {
     practitionerId: string
-    totalApplications: number
+    totalDeclarations: number
     totalTimeSpent: number
   }[] = await query(
     `SELECT SUM(timeSpentEditing) as totalTimeSpent, 
-                COUNT(compositionId) as totalApplications
-                FROM application_time_logged
+                COUNT(compositionId) as totalDeclarations
+                FROM declaration_time_logged
                 WHERE time > '${timeFrom}'
                     AND time <= '${timeTo}'
                     AND currentStatus = '${status}'
@@ -168,5 +168,5 @@ export async function getAvgTimeSpentOnAppByPractitioners(
                     ${eventClause}
                     GROUP BY practitionerId`
   )
-  return averageTimeForApplications
+  return averageTimeForDeclarations
 }

@@ -25,13 +25,13 @@ const birthBulletListItemsToDefine: MessageDescriptor[] = [
   {
     id: 'register.eventInfo.birth.listItem0',
     defaultMessage:
-      'I am here to complete the birth registration application for you.',
+      'I am here to complete the birth registration declaration for you.',
     description: 'Event info bullet list item for birth'
   },
   {
     id: 'register.eventInfo.birth.listItem1',
     defaultMessage:
-      'Once I complete the application, it will be sent to the registration office for review.',
+      'Once I complete the declaration, it will be sent to the registration office for review.',
     description: 'Event info bullet list item for birth'
   },
   {
@@ -52,13 +52,13 @@ const deathBulletListItemsToDefine: MessageDescriptor[] = [
   {
     id: 'register.eventInfo.death.listItem0',
     defaultMessage:
-      'I am here to complete the death registration application for you. ',
+      'I am here to complete the death registration declaration for you. ',
     description: 'Event info bullet list item for death'
   },
   {
     id: 'register.eventInfo.death.listItem1',
     defaultMessage:
-      'Once I complete the application, it will be sent to the registration office for review.',
+      'Once I complete the declaration, it will be sent to the registration office for review.',
     description: 'Event info bullet list item for death'
   },
   {
@@ -79,7 +79,7 @@ const messagesToDefine = {
   title: {
     id: 'register.eventInfo.event.title',
     defaultMessage:
-      'Introduce the {eventType, select, birth{birth} death{death} other{birth}} registration process to the applicant'
+      'Introduce the {eventType, select, birth{birth} death{death} other{birth}} registration process to the informant'
   }
 }
 

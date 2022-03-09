@@ -26,8 +26,8 @@ describe('elasticsearch db helper', () => {
       registrationNumber: 'dummy',
       event: 'EMPTY_STRING',
       status: ['DECLARED'],
-      type: ['birth-application', 'death-application'],
-      applicationLocationId: 'EMPTY_STRING',
+      type: ['birth-declaration', 'death-declaration'],
+      declarationLocationId: 'EMPTY_STRING',
       from: 0,
       size: 10
     }
@@ -50,8 +50,8 @@ describe('elasticsearch db helper', () => {
       registrationNumber: 'dummy',
       event: 'EMPTY_STRING',
       status: ['DECLARED'],
-      type: ['birth-application', 'death-application'],
-      applicationLocationId: 'EMPTY_STRING',
+      type: ['birth-declaration', 'death-declaration'],
+      declarationLocationId: 'EMPTY_STRING',
       from: 0,
       size: 10
     }
@@ -61,7 +61,7 @@ describe('elasticsearch db helper', () => {
 })
 
 describe('elasticsearch params formatter', () => {
-  it('should prepare search params to search birth applications using a single name against all fields', () => {
+  it('should prepare search params to search birth declarations using a single name against all fields', () => {
     const params = formatSearchParams({
       query: 'some query',
       trackingId: 'myTrackingId',
@@ -69,8 +69,8 @@ describe('elasticsearch params formatter', () => {
       registrationNumber: 'BHGUGKJH',
       event: 'EMPTY_STRING',
       status: ['DECLARED'],
-      type: ['birth-application'],
-      applicationLocationId: '123',
+      type: ['birth-declaration'],
+      declarationLocationId: '123',
       eventLocationId: '456',
       gender: 'male',
       name: 'Anik',
@@ -176,7 +176,7 @@ describe('elasticsearch params formatter', () => {
               },
               {
                 term: {
-                  'applicationLocationId.keyword': {
+                  'declarationLocationId.keyword': {
                     value: '123',
                     // tslint:disable-next-line
                     boost: 2.0
@@ -202,18 +202,18 @@ describe('elasticsearch params formatter', () => {
               },
               {
                 terms: {
-                  'compositionType.keyword': ['birth-application']
+                  'compositionType.keyword': ['birth-declaration']
                 }
               }
             ],
             should: []
           }
         },
-        sort: [{ dateOfApplication: 'asc' }]
+        sort: [{ dateOfDeclaration: 'asc' }]
       }
     })
   })
-  it('should prepare search params to search birth applications using specific names against specific fields', () => {
+  it('should prepare search params to search birth declarations using specific names against specific fields', () => {
     const params = formatSearchParams({
       query: '',
       trackingId: 'myTrackingId',
@@ -221,8 +221,8 @@ describe('elasticsearch params formatter', () => {
       registrationNumber: 'BHGUGKJH',
       event: 'EMPTY_STRING',
       status: ['DECLARED'],
-      type: ['birth-application'],
-      applicationLocationId: '123',
+      type: ['birth-declaration'],
+      declarationLocationId: '123',
       eventLocationId: '456',
       gender: 'male',
       name: 'EMPTY_STRING',
@@ -297,7 +297,7 @@ describe('elasticsearch params formatter', () => {
               },
               {
                 term: {
-                  'applicationLocationId.keyword': {
+                  'declarationLocationId.keyword': {
                     value: '123',
                     // tslint:disable-next-line
                     boost: 2.0
@@ -323,7 +323,7 @@ describe('elasticsearch params formatter', () => {
               },
               {
                 terms: {
-                  'compositionType.keyword': ['birth-application']
+                  'compositionType.keyword': ['birth-declaration']
                 }
               }
             ],

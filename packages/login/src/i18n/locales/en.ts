@@ -47,7 +47,7 @@ export const ENGLISH_STATE = {
     'login.clearForm': 'Clear form',
     'login.manager.registerAppTitle': 'OpenCRVS Homepage',
     'login.manager.registerAppDescription':
-      'Manage applications, registrations and certifications here.',
+      'Manage declarations, registrations and certifications here.',
     'login.manager.performanceAppTitle': 'Performance Management',
     'login.manager.performanceAppDescription':
       "Analyse the performance of a particular area of your country in it's Civil Registration.",

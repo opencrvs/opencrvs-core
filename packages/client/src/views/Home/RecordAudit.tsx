@@ -18,7 +18,7 @@ import {
 } from '@opencrvs/components/lib/interface/Content'
 import { Navigation } from '@client/components/interface/Navigation'
 import styled from '@client/styledComponents'
-import { ApplicationIcon, Edit } from '@opencrvs/components/lib/icons'
+import { DeclarationIcon, Edit } from '@opencrvs/components/lib/icons'
 import { connect } from 'react-redux'
 import { RouteComponentProps, Redirect } from 'react-router'
 import {
@@ -28,10 +28,10 @@ import {
 } from 'react-intl'
 import { goToCertificateCorrection } from '@client/navigation'
 import {
-  IApplication,
+  IDeclaration,
   SUBMISSION_STATUS,
   clearCorrectionChange
-} from '@client/applications'
+} from '@client/declarations'
 import { IStoreState } from '@client/store'
 import {
   GQLEventSearchSet,
@@ -98,7 +98,7 @@ export type IRecordAuditTabs = keyof IQueryData | 'search'
 
 interface IStateProps {
   declarationId: string
-  draft: IApplication | null
+  draft: IDeclaration | null
   language: string
   resources: IOfflineData
   tab: IRecordAuditTabs
@@ -178,7 +178,7 @@ const isDeathDeclaration = (
   return (declaration && declaration.type === 'Death') || false
 }
 
-const getDraftDeclarationName = (declaration: IApplication) => {
+const getDraftDeclarationName = (declaration: IDeclaration) => {
   let name = ''
   let declarationName
   if (declaration.event === 'birth') {
@@ -204,7 +204,7 @@ const getName = (name: (GQLHumanName | null)[], language: string) => {
 }
 
 const getLocation = (
-  declaration: IApplication,
+  declaration: IDeclaration,
   resources: IOfflineData,
   intl: IntlShape
 ) => {
@@ -241,7 +241,7 @@ const getLocation = (
 }
 
 const getDraftDeclarationData = (
-  declaration: IApplication,
+  declaration: IDeclaration,
   resources: IOfflineData,
   intl: IntlShape
 ): IDeclarationData => {
@@ -442,7 +442,7 @@ function RecordAuditBody({
       size={ContentSize.LARGE}
       topActionButtons={actions}
       icon={() => (
-        <ApplicationIcon
+        <DeclarationIcon
           color={
             STATUSTOCOLOR[
               (declaration && declaration.status) || SUBMISSION_STATUS.DRAFT
@@ -533,7 +533,7 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
   return {
     declarationId,
     draft:
-      state.applicationsState.applications.find(
+      state.declarationsState.declarations.find(
         (declaration) =>
           declaration.id === declarationId ||
           declaration.compositionId === declarationId

@@ -73,7 +73,7 @@ async function sendSMSInfobip(to: string, text: string) {
   })
   const headers = {
     Authorization: `Basic ${INFOBIP_API_KEY}`,
-    'Content-Type': 'application/json'
+    'Content-Type': 'declaration/json'
   }
 
   let response

@@ -37,7 +37,7 @@ const EditConfirmationComponent = ({
 }: IProps & IntlShapeProps) => {
   return (
     <Modal
-      title={intl.formatMessage(messages.editApplicationConfirmation)}
+      title={intl.formatMessage(messages.editDeclarationConfirmation)}
       actions={[
         <PrimaryButton key="edit" id="edit_confirm" onClick={handleEdit}>
           {intl.formatMessage(buttonMessages.edit)}

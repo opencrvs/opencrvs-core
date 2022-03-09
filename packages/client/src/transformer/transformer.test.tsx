@@ -19,10 +19,10 @@ import {
 } from '@client/tests/util'
 import { DRAFT_BIRTH_PARENT_FORM } from '@client/navigation/routes'
 import {
-  storeApplication,
-  IApplication,
+  storeDeclaration,
+  IDeclaration,
   SUBMISSION_STATUS
-} from '@client/applications'
+} from '@client/declarations'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
@@ -31,7 +31,7 @@ import {
   draftToGqlTransformer,
   gqlToDraftTransformer
 } from '@client/transformer'
-import { getRegisterForm } from '@opencrvs/client/src/forms/register/application-selectors'
+import { getRegisterForm } from '@opencrvs/client/src/forms/register/declaration-selectors'
 import { getOfflineDataSuccess } from '@client/offline/actions'
 import { Event, IForm } from '@opencrvs/client/src/forms'
 import { clone } from 'lodash'
@@ -47,7 +47,7 @@ describe('when draft data is transformed to graphql', () => {
   let app: ReactWrapper
   let history: History
   let store: Store
-  let customDraft: IApplication
+  let customDraft: IDeclaration
   let form: IForm
 
   const childDetails: IPersonDetails = {
@@ -125,7 +125,7 @@ describe('when draft data is transformed to graphql', () => {
     registrationCertificateLanguage: ['en'],
     registrationPhone: '01736478884',
     whoseContactDetails: 'MOTHER',
-    applicant: {
+    informant: {
       value: 'MOTHER',
       nestedFields: {
         otherRelationShip: ''
@@ -183,11 +183,11 @@ describe('when draft data is transformed to graphql', () => {
       event: Event.BIRTH,
       submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
     }
-    store.dispatch(storeApplication(customDraft))
+    store.dispatch(storeDeclaration(customDraft))
     form = getRegisterForm(store.getState())[Event.BIRTH]
     history.replace(
       DRAFT_BIRTH_PARENT_FORM.replace(
-        ':applicationId',
+        ':declarationId',
         customDraft.id.toString()
       )
     )
@@ -528,7 +528,7 @@ describe('when draft data is transformed to graphql', () => {
         mother: motherDetails,
         registration: {
           ...registrationDetails,
-          applicant: {
+          informant: {
             value: 'FATHER',
             nestedFields: {
               otherRelationShip: ''
@@ -561,7 +561,7 @@ describe('when draft data is transformed to graphql', () => {
       const transformedCorrectionData = {
         values: [
           {
-            fieldName: 'applicant',
+            fieldName: 'informant',
             newValue: 'FATHER',
             oldValue: 'MOTHER',
             section: 'registration'

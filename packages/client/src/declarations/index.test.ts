@@ -10,33 +10,33 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  mergeDeclaredApplications,
-  filterProcessingApplications,
-  filterProcessingApplicationsFromQuery
+  mergeDeclaredDeclarations,
+  filterProcessingDeclarations,
+  filterProcessingDeclarationsFromQuery
 } from '.'
 import { Event } from '@client/forms'
 
 describe('query result filtering tests', () => {
-  describe('.filterProcessingApplications()', () => {
+  describe('.filterProcessingDeclarations()', () => {
     it(`return data if results isn't defined`, () => {
       const data = {}
-      const returnVal = filterProcessingApplications(data, [''])
+      const returnVal = filterProcessingDeclarations(data, [''])
       expect(returnVal).toBe(data)
     })
 
     it(`removes null values from results`, () => {
       const data = { results: [{}, null, {}], totalItems: 3 }
       // @ts-ignore
-      const returnVal = filterProcessingApplications(data, [''])
+      const returnVal = filterProcessingDeclarations(data, [''])
       expect(returnVal).toEqual({ results: [{}, {}], totalItems: 2 })
     })
 
-    it(`filters out applications with ids in the supplied array`, () => {
+    it(`filters out declarations with ids in the supplied array`, () => {
       const data = {
         results: [{ id: '111' }, { id: '222' }, { id: '333' }],
         totalItems: 3
       }
-      const returnVal = filterProcessingApplications(data, ['222'])
+      const returnVal = filterProcessingDeclarations(data, ['222'])
       expect(returnVal).toEqual({
         results: [{ id: '111' }, { id: '333' }],
         totalItems: 2
@@ -44,8 +44,8 @@ describe('query result filtering tests', () => {
     })
   })
 
-  describe('.filterProcessingApplicationsFromQuery()', () => {
-    it('filters out applications in processing state from application query results', () => {
+  describe('.filterProcessingDeclarationsFromQuery()', () => {
+    it('filters out declarations in processing state from declaration query results', () => {
       const queryData = {
         inProgressTab: {
           results: [
@@ -113,7 +113,7 @@ describe('query result filtering tests', () => {
         }
       }
 
-      const storedApplications = [
+      const storedDeclarations = [
         {
           id: 'DRAFT',
           submissionStatus: 'DRAFT'
@@ -188,10 +188,10 @@ describe('query result filtering tests', () => {
         }
       ]
 
-      const filteredResult = filterProcessingApplicationsFromQuery(
+      const filteredResult = filterProcessingDeclarationsFromQuery(
         queryData,
         // @ts-ignore
-        storedApplications
+        storedDeclarations
       )
 
       expect(filteredResult).toEqual({
@@ -229,9 +229,9 @@ describe('query result filtering tests', () => {
 })
 
 describe('Utilty functions', () => {
-  it('fetch declared applications', () => {})
-  it('merges applications', () => {
-    const applications = [
+  it('fetch declared declarations', () => {})
+  it('merges declarations', () => {
+    const declarations = [
       {
         id: '1',
         data: {},
@@ -245,7 +245,7 @@ describe('Utilty functions', () => {
         compositionId: '2'
       }
     ]
-    const declaredApplications = [
+    const declaredDeclarations = [
       {
         id: '2'
       },
@@ -254,8 +254,8 @@ describe('Utilty functions', () => {
       }
     ]
 
-    mergeDeclaredApplications(applications, declaredApplications)
+    mergeDeclaredDeclarations(declarations, declaredDeclarations)
 
-    expect(applications).toHaveLength(3)
+    expect(declarations).toHaveLength(3)
   })
 })

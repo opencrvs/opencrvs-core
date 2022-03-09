@@ -23,9 +23,9 @@ export const deathDocumentForWhomFhirMapping = {
   'Proof of Death of Deceased': 'DECEASED_DEATH_PROOF',
   'Proof of Date of Birth of Deceased': 'DECEASED_BIRTH_PROOF',
   'Cuase of Death': 'CAUSE_OF_DEATH',
-  "Proof of Applicant's ID": 'APPLICANT_ID_PROOF',
-  "Proof of applicant's authority to apply":
-    'APPLICANT_ATHORITY_TO_APPLY_PROOF',
+  "Proof of Informant's ID": 'INFORMANT_ID_PROOF',
+  "Proof of informant's authority to apply":
+    'INFORMANT_ATHORITY_TO_APPLY_PROOF',
   'Letter from ward councillor': 'WARD_COUNCILLOR_PROOF',
   'Coroner Report': 'CORONERS_REPORT'
 }
@@ -40,15 +40,15 @@ export const deathSectionMapping = {
     deathDocumentForWhomFhirMapping['Letter from ward councillor'],
     deathDocumentForWhomFhirMapping['Coroner Report']
   ],
-  [DeathSection.Applicants]: [
-    deathDocumentForWhomFhirMapping["Proof of Applicant's ID"],
-    deathDocumentForWhomFhirMapping["Proof of applicant's authority to apply"]
+  [DeathSection.Informants]: [
+    deathDocumentForWhomFhirMapping["Proof of Informant's ID"],
+    deathDocumentForWhomFhirMapping["Proof of informant's authority to apply"]
   ]
 }
 
 export const deathSectionTitle = {
   [DeathSection.Deceased]: 'Deceased',
-  [DeathSection.Applicants]: 'Applicant'
+  [DeathSection.Informants]: 'Informant'
 }
 
 export const deathDocumentTypeFhirMapping = {

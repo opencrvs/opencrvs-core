@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 
-export const LeftNavigationApplicationIcons = (
+export const LeftNavigationDeclarationIcons = (
   props: React.HTMLAttributes<SVGElement> & { color?: string }
 ) => {
   let fill: string

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { DOWNLOAD_STATUS, IApplication } from '@client/applications'
+import { DOWNLOAD_STATUS, IDeclaration } from '@client/declarations'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { Header } from '@client/components/interface/Header/Header'
 import { Query } from '@client/components/Query'
@@ -128,7 +128,7 @@ interface IBaseSearchResultProps {
   scope: Scope | null
   goToEvents: typeof goToEventsAction
   userDetails: IUserDetails | null
-  outboxApplications: IApplication[]
+  outboxDeclarations: IDeclaration[]
   goToPage: typeof goToPageAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   goToPrintCertificate: typeof goToPrintCertificateAction
@@ -317,25 +317,25 @@ export class SearchResultView extends React.Component<
 
     const transformedData = transformData(data, this.props.intl)
     return transformedData.map((reg, index) => {
-      const foundApplication = this.props.outboxApplications.find(
-        (application) => application.id === reg.id
+      const foundDeclaration = this.props.outboxDeclarations.find(
+        (declaration) => declaration.id === reg.id
       )
       const actions: IAction[] = []
       const downloadStatus =
-        (foundApplication && foundApplication.downloadStatus) || undefined
+        (foundDeclaration && foundDeclaration.downloadStatus) || undefined
 
-      const applicationIsRequestedCorrection =
+      const declarationIsRequestedCorrection =
         reg.declarationStatus === 'REQUESTED_CORRECTION'
-      const applicationIsRegistered = reg.declarationStatus === 'REGISTERED'
-      const applicationIsCertified = reg.declarationStatus === 'CERTIFIED'
-      const applicationIsRejected = reg.declarationStatus === 'REJECTED'
-      const applicationIsValidated = reg.declarationStatus === 'VALIDATED'
-      const applicationIsInProgress = reg.declarationStatus === 'IN_PROGRESS'
+      const declarationIsRegistered = reg.declarationStatus === 'REGISTERED'
+      const declarationIsCertified = reg.declarationStatus === 'CERTIFIED'
+      const declarationIsRejected = reg.declarationStatus === 'REJECTED'
+      const declarationIsValidated = reg.declarationStatus === 'VALIDATED'
+      const declarationIsInProgress = reg.declarationStatus === 'IN_PROGRESS'
       const isDuplicate = reg.duplicates && reg.duplicates.length > 0
       if (
         downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED &&
-        ((!applicationIsValidated && this.userHasValidateOrRegistrarScope()) ||
-          (applicationIsValidated && this.userHasRegisterScope()))
+        ((!declarationIsValidated && this.userHasValidateOrRegistrarScope()) ||
+          (declarationIsValidated && this.userHasRegisterScope()))
       ) {
         actions.push({
           actionComponent: (
@@ -345,18 +345,18 @@ export class SearchResultView extends React.Component<
                 event: reg.event,
                 compositionId: reg.id,
                 action:
-                  ((applicationIsRegistered || applicationIsCertified) &&
-                    Action.LOAD_CERTIFICATE_APPLICATION) ||
-                  (applicationIsRequestedCorrection &&
-                    Action.LOAD_REQUESTED_CORRECTION_APPLICATION) ||
-                  Action.LOAD_REVIEW_APPLICATION
+                  ((declarationIsRegistered || declarationIsCertified) &&
+                    Action.LOAD_CERTIFICATE_DECLARATION) ||
+                  (declarationIsRequestedCorrection &&
+                    Action.LOAD_REQUESTED_CORRECTION_DECLARATION) ||
+                  Action.LOAD_REVIEW_DECLARATION
               }}
               status={downloadStatus as DOWNLOAD_STATUS}
             />
           )
         })
       } else if (
-        (applicationIsRegistered || applicationIsCertified) &&
+        (declarationIsRegistered || declarationIsCertified) &&
         this.userHasCertifyScope()
       ) {
         actions.push({
@@ -369,15 +369,15 @@ export class SearchResultView extends React.Component<
           }
         })
       } else if (
-        (applicationIsValidated && this.userHasRegisterScope()) ||
-        (!applicationIsValidated &&
-          !applicationIsRegistered &&
-          !applicationIsCertified &&
+        (declarationIsValidated && this.userHasRegisterScope()) ||
+        (!declarationIsValidated &&
+          !declarationIsRegistered &&
+          !declarationIsCertified &&
           this.userHasValidateOrRegistrarScope())
       ) {
         actions.push({
           label:
-            applicationIsRejected || applicationIsInProgress
+            declarationIsRejected || declarationIsInProgress
               ? this.props.intl.formatMessage(constantsMessages.update)
               : this.props.intl.formatMessage(constantsMessages.review),
           handler: () =>
@@ -393,9 +393,9 @@ export class SearchResultView extends React.Component<
       }
 
       let icon: JSX.Element = <div />
-      if (isDuplicate && !applicationIsRegistered && !applicationIsCertified) {
+      if (isDuplicate && !declarationIsRegistered && !declarationIsCertified) {
         icon = <Duplicate />
-      } else if (applicationIsValidated) {
+      } else if (declarationIsValidated) {
         icon = <Validate data-tip data-for="validateTooltip" />
       }
 
@@ -520,7 +520,7 @@ export class SearchResultView extends React.Component<
                           <ReactTooltip id="validateTooltip">
                             <ToolTipContainer>
                               {this.props.intl.formatMessage(
-                                registrarHomeMessages.validatedApplicationTooltipForRegistrar
+                                registrarHomeMessages.validatedDeclarationTooltipForRegistrar
                               )}
                             </ToolTipContainer>
                           </ReactTooltip>
@@ -565,7 +565,7 @@ export const SearchResult = connect(
     language: state.i18n.language,
     scope: getScope(state),
     userDetails: getUserDetails(state),
-    outboxApplications: state.applicationsState.applications
+    outboxDeclarations: state.declarationsState.declarations
   }),
   {
     goToEvents: goToEventsAction,

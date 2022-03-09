@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { getCurrentUserID, IUserData } from '@client/applications'
+import { getCurrentUserID, IUserData } from '@client/declarations'
 import { storage } from '@client/storage'
 
 async function loadUserPin() {
