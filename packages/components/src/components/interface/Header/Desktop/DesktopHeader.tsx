@@ -26,8 +26,8 @@ const HeaderContainer = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   flex-direction: row;
   justify-content: space-between;
-  align-items: center;
   position: sticky;
+  align-items: center;
   top: 0;
   margin-left: 249px;
   z-index: 2;
@@ -40,7 +40,9 @@ export class DesktopHeader extends React.Component<IDesktopHeaderProps> {
     return (
       <HeaderContainer>
         {desktopRightMenu &&
-          desktopRightMenu.map((item: IRightMenu) => item.element)}
+          desktopRightMenu.map((item: IRightMenu, index) => (
+            <React.Fragment key={index}> {item.element}</React.Fragment>
+          ))}
       </HeaderContainer>
     )
   }

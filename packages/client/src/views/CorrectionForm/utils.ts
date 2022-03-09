@@ -38,7 +38,7 @@ import {
   LOCATION_SEARCH_INPUT,
   IAttachmentValue
 } from '@client/forms'
-import { IApplication, SUBMISSION_STATUS } from '@client/applications'
+import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import { Errors, getValidationErrorsForForm } from '@client/forms/validation'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -90,16 +90,16 @@ export function groupHasError(
   return false
 }
 
-export function isCorrection(application: IApplication) {
-  return application.registrationStatus === SUBMISSION_STATUS.REGISTERED
+export function isCorrection(declaration: IDeclaration) {
+  return declaration.registrationStatus === SUBMISSION_STATUS.REGISTERED
 }
 
-export function updateApplicationRegistrationWithCorrection(
-  application: IApplication,
+export function updateDeclarationRegistrationWithCorrection(
+  declaration: IDeclaration,
   meta?: { userPrimaryOffice?: IGQLLocation }
 ): void {
   const correctionValues: Record<string, any> = {}
-  const { data } = application
+  const { data } = declaration
 
   if (data.corrector && data.corrector.relationship) {
     correctionValues.requester = ((
@@ -180,11 +180,11 @@ export function updateApplicationRegistrationWithCorrection(
 export function sectionHasError(
   group: IFormSectionGroup,
   section: IFormSection,
-  application: IApplication
+  declaration: IDeclaration
 ) {
   const errors = getValidationErrorsForForm(
     group.fields,
-    application.data[section.id] || {}
+    declaration.data[section.id] || {}
   )
 
   for (const field of group.fields) {
@@ -442,7 +442,7 @@ export function getRenderableField(
 export function isVisibleField(
   field: IFormField,
   section: IFormSection,
-  draft: IApplication,
+  draft: IDeclaration,
   offlineResources: IOfflineData
 ) {
   const conditionalActions = getConditionalActionsForField(
@@ -459,7 +459,7 @@ export function isVisibleField(
 
 export function getOverriddenFieldsListForPreview(
   formSections: IFormSection[],
-  draft: IApplication,
+  draft: IDeclaration,
   offlineResources: IOfflineData
 ): IFormField[] {
   const overriddenFields = formSections
@@ -522,7 +522,7 @@ export const getNestedFieldValue = (
 
 export const getViewableSection = (
   registerForm: IForm,
-  draft: IApplication
+  draft: IDeclaration
 ): IFormSection[] => {
   const sections = registerForm.sections.filter(
     ({ id, viewType }) =>
@@ -534,7 +534,7 @@ export const getViewableSection = (
 
 const getVisibleSections = (
   formSections: IFormSection[],
-  draft: IApplication
+  draft: IDeclaration
 ) => {
   return formSections.filter(
     (section) =>

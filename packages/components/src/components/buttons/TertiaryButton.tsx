@@ -14,13 +14,13 @@ import * as React from 'react'
 
 export const TertiaryButton = styled(Button)`
   width: auto;
+  cursor: pointer;
   ${({ theme }) => theme.fonts.bodyBoldStyle};
   transition: background 0.4s ease;
   align-items: center;
   border: 0;
   border-radius: 4px;
   text-transform: none !important;
-  cursor: pointer;
   height: 32px;
   & > div {
     padding: 0 8px;

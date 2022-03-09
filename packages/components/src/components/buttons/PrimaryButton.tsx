@@ -15,10 +15,10 @@ import { Button } from './Button'
 export const PrimaryButton = styled(Button)`
   padding: 0 8px;
   transition: background 0.4s ease;
+  border-radius: 4px;
   color: ${({ theme }) => theme.colors.white};
   background: ${({ theme }) => theme.colors.primary};
   justify-content: center;
-  border-radius: 4px;
   ${({ theme }) => theme.fonts.bodyBoldStyle};
 
   &:hover:enabled {

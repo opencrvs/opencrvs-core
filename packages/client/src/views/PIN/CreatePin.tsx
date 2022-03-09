@@ -18,7 +18,7 @@ import { storage } from '@opencrvs/client/src/storage'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/pin'
 import * as ReactDOM from 'react-dom'
-import { getCurrentUserID, IUserData } from '@client/applications'
+import { getCurrentUserID, IUserData } from '@client/declarations'
 
 const Container = styled.div`
   display: flex;
@@ -125,7 +125,7 @@ class CreatePinComponent extends React.Component<IProps> {
       allUserData.push({
         userID: currentUserID,
         userPIN: hash,
-        applications: []
+        declarations: []
       })
     }
     await storage.setItem('USER_DATA', JSON.stringify(allUserData))

@@ -226,38 +226,38 @@ const messagesToDefine: IUserSetupMessages = {
     id: 'user.profile.audit.list.noDataFound'
   },
   inProgressAuditAction: {
-    defaultMessage: 'Sent application for review - incomplete',
-    description: 'Description for incomplete application',
+    defaultMessage: 'Sent declaration for review - incomplete',
+    description: 'Description for incomplete declaration',
     id: 'user.profile.audit.description.inProgress'
   },
   declaredAuditAction: {
-    defaultMessage: 'Sent application for review - complete',
-    description: 'Description for complete application',
+    defaultMessage: 'Sent declaration for review - complete',
+    description: 'Description for complete declaration',
     id: 'user.profile.audit.description.declared'
   },
   validatedAuditAction: {
-    defaultMessage: 'Sent application for approval',
-    description: 'Description for validated application',
+    defaultMessage: 'Sent declaration for approval',
+    description: 'Description for validated declaration',
     id: 'user.profile.audit.description.validated'
   },
   waitingForValidationAuditAction: {
-    defaultMessage: 'Sent application for external system validation',
-    description: 'Description for waiting for external validation application',
+    defaultMessage: 'Sent declaration for external system validation',
+    description: 'Description for waiting for external validation declaration',
     id: 'user.profile.audit.description.waiting_validation'
   },
   registeredAuditAction: {
     defaultMessage: 'Registered vital event',
-    description: 'Description for registered application',
+    description: 'Description for registered declaration',
     id: 'user.profile.audit.description.registered'
   },
   rejectedAuditAction: {
-    defaultMessage: 'Sent application for updates',
-    description: 'Description for rejected application',
+    defaultMessage: 'Sent declaration for updates',
+    description: 'Description for rejected declaration',
     id: 'user.profile.audit.description.rejected'
   },
   certifiedAuditAction: {
     defaultMessage: 'Printed certificate',
-    description: 'Description for certified application',
+    description: 'Description for certified declaration',
     id: 'user.profile.audit.description.certified'
   },
   showMoreAuditList: {

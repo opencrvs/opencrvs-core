@@ -80,13 +80,13 @@ export const resolvers: GQLResolver = {
         authHeader
       )
     },
-    async getApplicationsStartedMetrics(
+    async getDeclarationsStartedMetrics(
       _,
       { timeStart, timeEnd, locationId },
       authHeader
     ) {
       return getMetrics(
-        '/applicationsStarted',
+        '/declarationsStarted',
         {
           timeStart,
           timeEnd,

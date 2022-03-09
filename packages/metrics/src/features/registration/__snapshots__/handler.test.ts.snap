@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`When an existing application is marked certified a birth application writes the payment total to influxdb 1`] = `
+exports[`When an existing declaration is marked certified a birth declaration writes the payment total to influxdb 1`] = `
 Object {
   "fields": Object {
     "compositionId": "1744fc19-95be-434b-8bc9-a76d6b81551b",
@@ -16,7 +16,7 @@ Object {
 }
 `;
 
-exports[`When an existing application is marked certified a death application writes the delta between REGISTERED and CERTIFIED states to influxdb 1`] = `
+exports[`When an existing declaration is marked certified a death declaration writes the delta between REGISTERED and CERTIFIED states to influxdb 1`] = `
 Object {
   "fields": Object {
     "compositionId": "62168b7e-7f80-4e2a-a7b0-1d33759c9d71",
@@ -24,7 +24,7 @@ Object {
     "durationInSeconds": 3564388,
     "previousTaskId": "e172627c-8490-44da-a702-80a082f978f5",
   },
-  "measurement": "application_event_duration",
+  "measurement": "declaration_event_duration",
   "tags": Object {
     "currentStatus": "CERTIFIED",
     "eventType": "DEATH",
@@ -34,7 +34,7 @@ Object {
 }
 `;
 
-exports[`When an existing application is marked certified writes the delta between REGISTERED and CERTIFIED states to influxdb 1`] = `
+exports[`When an existing declaration is marked certified writes the delta between REGISTERED and CERTIFIED states to influxdb 1`] = `
 Object {
   "fields": Object {
     "compositionId": "1744fc19-95be-434b-8bc9-a76d6b81551b",
@@ -42,7 +42,7 @@ Object {
     "durationInSeconds": 94381,
     "previousTaskId": "e172627c-8490-44da-a702-80a082f978f5",
   },
-  "measurement": "application_event_duration",
+  "measurement": "declaration_event_duration",
   "tags": Object {
     "currentStatus": "CERTIFIED",
     "eventType": "BIRTH",
@@ -52,7 +52,7 @@ Object {
 }
 `;
 
-exports[`When an existing application is marked registered a death application writes the delta between REGISTERED and CERTIFIED states to influxdb 1`] = `
+exports[`When an existing declaration is marked registered a death declaration writes the delta between REGISTERED and CERTIFIED states to influxdb 1`] = `
 Object {
   "fields": Object {
     "compositionId": "62168b7e-7f80-4e2a-a7b0-1d33759c9d71",
@@ -60,7 +60,7 @@ Object {
     "durationInSeconds": 3727875,
     "previousTaskId": "e172627c-8490-44da-a702-80a082f978f5",
   },
-  "measurement": "application_event_duration",
+  "measurement": "declaration_event_duration",
   "tags": Object {
     "currentStatus": "REGISTERED",
     "eventType": "DEATH",
@@ -70,7 +70,7 @@ Object {
 }
 `;
 
-exports[`When an existing application is marked registered writes the delta between DECLARED and REGISTERED states to influxdb 1`] = `
+exports[`When an existing declaration is marked registered writes the delta between DECLARED and REGISTERED states to influxdb 1`] = `
 Object {
   "fields": Object {
     "compositionId": "80433e78-7042-4837-b888-a79c0181bf4e",
@@ -78,7 +78,7 @@ Object {
     "durationInSeconds": 170630,
     "previousTaskId": "e172627c-8490-44da-a702-80a082f978f5",
   },
-  "measurement": "application_event_duration",
+  "measurement": "declaration_event_duration",
   "tags": Object {
     "currentStatus": "REGISTERED",
     "eventType": "BIRTH",
@@ -88,7 +88,7 @@ Object {
 }
 `;
 
-exports[`When an existing application is marked registered writes the delta between DECLARED and VALIDATED states to influxdb 1`] = `
+exports[`When an existing declaration is marked registered writes the delta between DECLARED and VALIDATED states to influxdb 1`] = `
 Object {
   "fields": Object {
     "compositionId": "80433e78-7042-4837-b888-a79c0181bf4e",
@@ -96,7 +96,7 @@ Object {
     "durationInSeconds": 170630,
     "previousTaskId": "e172627c-8490-44da-a702-80a082f978f5",
   },
-  "measurement": "application_event_duration",
+  "measurement": "declaration_event_duration",
   "tags": Object {
     "currentStatus": "VALIDATED",
     "eventType": "BIRTH",
@@ -106,7 +106,7 @@ Object {
 }
 `;
 
-exports[`When an existing application is marked registered writes the delta between VALIDATED and REGISTERED states to influxdb 1`] = `
+exports[`When an existing declaration is marked registered writes the delta between VALIDATED and REGISTERED states to influxdb 1`] = `
 Object {
   "fields": Object {
     "compositionId": "80433e78-7042-4837-b888-a79c0181bf4e",
@@ -114,7 +114,7 @@ Object {
     "durationInSeconds": 170630,
     "previousTaskId": "e172627c-8490-44da-a702-80a082f978f5",
   },
-  "measurement": "application_event_duration",
+  "measurement": "declaration_event_duration",
   "tags": Object {
     "currentStatus": "REGISTERED",
     "eventType": "BIRTH",
@@ -124,7 +124,7 @@ Object {
 }
 `;
 
-exports[`When an existing application is marked registered writes the delta between VALIDATED and WAITING_VALIDATION states to influxdb 1`] = `
+exports[`When an existing declaration is marked registered writes the delta between VALIDATED and WAITING_VALIDATION states to influxdb 1`] = `
 Object {
   "fields": Object {
     "compositionId": "80433e78-7042-4837-b888-a79c0181bf4e",
@@ -132,7 +132,7 @@ Object {
     "durationInSeconds": 170630,
     "previousTaskId": "e172627c-8490-44da-a702-80a082f978f5",
   },
-  "measurement": "application_event_duration",
+  "measurement": "declaration_event_duration",
   "tags": Object {
     "currentStatus": "WAITING_VALIDATION",
     "eventType": "BIRTH",
@@ -142,7 +142,7 @@ Object {
 }
 `;
 
-exports[`When an existing application requested correction a birth application writes the payment total to influxdb 1`] = `
+exports[`When an existing declaration requested correction a birth declaration writes the payment total to influxdb 1`] = `
 Object {
   "fields": Object {
     "compositionId": "c41a95b6-4439-4fc7-9d56-6d3a8ea0f80b",
@@ -158,7 +158,7 @@ Object {
 }
 `;
 
-exports[`When an existing application requested correction a death application writes the delta between REGISTERED and REQUESTED_FOR_CORRECTION states to influxdb 1`] = `
+exports[`When an existing declaration requested correction a death declaration writes the delta between REGISTERED and REQUESTED_FOR_CORRECTION states to influxdb 1`] = `
 Object {
   "fields": Object {
     "compositionId": "35acb304-ec54-46cb-b37f-831d970cb40d",
@@ -166,7 +166,7 @@ Object {
     "durationInSeconds": 73271619,
     "previousTaskId": "e172627c-8490-44da-a702-80a082f978f5",
   },
-  "measurement": "application_event_duration",
+  "measurement": "declaration_event_duration",
   "tags": Object {
     "currentStatus": "REQUESTED_CORRECTION",
     "eventType": "DEATH",
@@ -176,7 +176,7 @@ Object {
 }
 `;
 
-exports[`When an existing application requested correction writes the delta between REGISTERED and REQUESTED_FOR_CORRECTION states to influxdb 1`] = `
+exports[`When an existing declaration requested correction writes the delta between REGISTERED and REQUESTED_FOR_CORRECTION states to influxdb 1`] = `
 Object {
   "fields": Object {
     "compositionId": "c41a95b6-4439-4fc7-9d56-6d3a8ea0f80b",
@@ -184,7 +184,7 @@ Object {
     "durationInSeconds": 73186871,
     "previousTaskId": "e172627c-8490-44da-a702-80a082f978f5",
   },
-  "measurement": "application_event_duration",
+  "measurement": "declaration_event_duration",
   "tags": Object {
     "currentStatus": "REQUESTED_CORRECTION",
     "eventType": "BIRTH",
@@ -194,7 +194,7 @@ Object {
 }
 `;
 
-exports[`When an in-progress application is received writes the in complete field points to influxdb 1`] = `
+exports[`When an in-progress declaration is received writes the in complete field points to influxdb 1`] = `
 Object {
   "fields": Object {
     "compositionId": "b2fbb82c-a68d-4793-98e1-87484fc785c4",
@@ -212,12 +212,12 @@ Object {
 }
 `;
 
-exports[`When an in-progress application is received writes the rejected points to influxdb 1`] = `
+exports[`When an in-progress declaration is received writes the rejected points to influxdb 1`] = `
 Object {
   "fields": Object {
     "compositionId": "81278acf-6105-435e-b1c2-91619c8cf6e1",
   },
-  "measurement": "applications_rejected",
+  "measurement": "declarations_rejected",
   "tags": Object {
     "eventType": "BIRTH",
     "locationLevel5": "Location/acb24f46-83ec-45c3-b00f-5ded939ecfd8",

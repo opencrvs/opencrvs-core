@@ -70,8 +70,5 @@ export async function getSystem(
 }
 
 export function generateChallenge() {
-  return crypto
-    .randomBytes(16)
-    .toString('base64')
-    .toString()
+  return crypto.randomBytes(16).toString('base64').toString()
 }

@@ -79,7 +79,7 @@ export const influx = new Influx.InfluxDB({
       ]
     },
     {
-      measurement: 'application_time_logged',
+      measurement: 'declaration_time_logged',
       fields: {
         timeSpentEditing: Influx.FieldType.INTEGER,
         compositionId: Influx.FieldType.STRING
@@ -97,7 +97,7 @@ export const influx = new Influx.InfluxDB({
       ]
     },
     {
-      measurement: 'application_event_duration',
+      measurement: 'declaration_event_duration',
       fields: {
         durationInSeconds: Influx.FieldType.INTEGER,
         compositionId: Influx.FieldType.STRING,
@@ -137,7 +137,7 @@ export const influx = new Influx.InfluxDB({
       ]
     },
     {
-      measurement: 'applications_started',
+      measurement: 'declarations_started',
       fields: {
         role: Influx.FieldType.STRING,
         status: Influx.FieldType.STRING,
@@ -154,7 +154,7 @@ export const influx = new Influx.InfluxDB({
       ]
     },
     {
-      measurement: 'applications_rejected',
+      measurement: 'declarations_rejected',
       fields: {
         compositionId: Influx.FieldType.STRING
       },

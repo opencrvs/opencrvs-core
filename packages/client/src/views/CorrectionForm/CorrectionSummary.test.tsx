@@ -12,19 +12,19 @@
 import { createStore } from '@client/store'
 import {
   createTestComponent,
-  mockApplicationData,
+  mockDeclarationData,
   createRouterProps,
   getFileFromBase64String,
   validImageB64String,
   flushPromises,
-  mockDeathApplicationData,
+  mockDeathDeclarationData,
   getRegisterFormFromStore,
   mockOfflineData
 } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { Event, CorrectionSection } from '@client/forms'
-import { IApplication, storeApplication } from '@client/applications'
+import { IDeclaration, storeDeclaration } from '@client/declarations'
 import { CorrectionForm } from './CorrectionForm'
 import { formatUrl } from '@client/navigation'
 import { CERTIFICATE_CORRECTION } from '@client/navigation/routes'
@@ -34,10 +34,10 @@ import { getOfflineDataSuccess } from '@client/offline/actions'
 
 let wrapper: ReactWrapper<{}, {}>
 
-const deathApplication: IApplication = {
+const deathDeclaration: IDeclaration = {
   id: '85bccf72-6117-4cab-827d-47728becb0c1',
   data: {
-    ...mockDeathApplicationData,
+    ...mockDeathDeclarationData,
     informant: {
       firstNamesEng: 'John',
       familyNameEng: 'Millar'
@@ -53,7 +53,7 @@ const deathApplication: IApplication = {
     },
     documents: {
       uploadDocForDeceased: [],
-      uploadDocForApplicant: [],
+      uploadDocForInformant: [],
       uploadDocForDeceasedDeath: []
     },
     _fhirIDMap: {
@@ -83,7 +83,7 @@ const deathApplication: IApplication = {
       additionalComment: ''
     }
   },
-  originalData: mockDeathApplicationData,
+  originalData: mockDeathDeclarationData,
   review: true,
   event: Event.DEATH,
   registrationStatus: 'REGISTERED',
@@ -114,10 +114,10 @@ const deathApplication: IApplication = {
   timeLoggedMS: 4446
 }
 
-const birthApplication: IApplication = {
+const birthDeclaration: IDeclaration = {
   id: '31a78be1-5ab3-42c7-8f64-7678cb294508',
   data: {
-    ...mockApplicationData,
+    ...mockDeclarationData,
     corrector: {
       relationship: {
         value: 'MOTHER',
@@ -142,7 +142,7 @@ const birthApplication: IApplication = {
       additionalComment: 'Comment'
     }
   },
-  originalData: mockApplicationData,
+  originalData: mockDeclarationData,
   review: true,
   event: Event.BIRTH,
   registrationStatus: 'REGISTERED',
@@ -164,22 +164,22 @@ const birthApplication: IApplication = {
 const { store, history } = createStore()
 
 describe('Correction summary', () => {
-  describe('for a birth application', () => {
+  describe('for a birth declaration', () => {
     beforeEach(async () => {
-      store.dispatch(storeApplication(birthApplication))
+      store.dispatch(storeDeclaration(birthDeclaration))
       store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
       const form = await getRegisterFormFromStore(store, Event.BIRTH)
       wrapper = await createTestComponent(
         <CorrectionForm
           {...createRouterProps(
             formatUrl(CERTIFICATE_CORRECTION, {
-              applicationId: birthApplication.id,
+              declarationId: birthDeclaration.id,
               pageId: CorrectionSection.Summary
             }),
             { isNavigatedInsideApp: false },
             {
               matchParams: {
-                applicationId: birthApplication.id,
+                declarationId: birthDeclaration.id,
                 pageId: CorrectionSection.Summary
               }
             }
@@ -194,9 +194,9 @@ describe('Correction summary', () => {
                 query: REQUEST_BIRTH_REG_CORRECTION,
                 variables: draftToGqlTransformer(
                   form,
-                  birthApplication.data,
-                  birthApplication.id,
-                  birthApplication.originalData
+                  birthDeclaration.data,
+                  birthDeclaration.id,
+                  birthDeclaration.originalData
                 )
               },
               result: {
@@ -216,8 +216,8 @@ describe('Correction summary', () => {
     })
 
     it('should match corrector with Child name', () => {
-      ;(birthApplication.data.corrector.relationship as any).value = 'CHILD'
-      store.dispatch(storeApplication(birthApplication))
+      ;(birthDeclaration.data.corrector.relationship as any).value = 'CHILD'
+      store.dispatch(storeDeclaration(birthDeclaration))
       const instance = wrapper
         .find('CorrectionSummaryComponent')
         .instance() as any
@@ -226,8 +226,8 @@ describe('Correction summary', () => {
     })
 
     it('should match corrector with Father name', () => {
-      ;(birthApplication.data.corrector.relationship as any).value = 'FATHER'
-      store.dispatch(storeApplication(birthApplication))
+      ;(birthDeclaration.data.corrector.relationship as any).value = 'FATHER'
+      store.dispatch(storeDeclaration(birthDeclaration))
       const instance = wrapper
         .find('CorrectionSummaryComponent')
         .instance() as any
@@ -236,9 +236,9 @@ describe('Correction summary', () => {
     })
 
     it('should match corrector with LEGAL_GUARDIAN', () => {
-      ;(birthApplication.data.corrector.relationship as any).value =
+      ;(birthDeclaration.data.corrector.relationship as any).value =
         'LEGAL_GUARDIAN'
-      store.dispatch(storeApplication(birthApplication))
+      store.dispatch(storeDeclaration(birthDeclaration))
       const instance = wrapper
         .find('CorrectionSummaryComponent')
         .instance() as any
@@ -247,9 +247,9 @@ describe('Correction summary', () => {
     })
 
     it('should match corrector with ANOTHER_AGENT', () => {
-      ;(birthApplication.data.corrector.relationship as any).value =
+      ;(birthDeclaration.data.corrector.relationship as any).value =
         'ANOTHER_AGENT'
-      store.dispatch(storeApplication(birthApplication))
+      store.dispatch(storeDeclaration(birthDeclaration))
       const instance = wrapper
         .find('CorrectionSummaryComponent')
         .instance() as any
@@ -258,8 +258,8 @@ describe('Correction summary', () => {
     })
 
     it('should match corrector with ANOTHER_AGENT', () => {
-      ;(birthApplication.data.corrector.relationship as any).value = 'REGISTRAR'
-      store.dispatch(storeApplication(birthApplication))
+      ;(birthDeclaration.data.corrector.relationship as any).value = 'REGISTRAR'
+      store.dispatch(storeDeclaration(birthDeclaration))
       const instance = wrapper
         .find('CorrectionSummaryComponent')
         .instance() as any
@@ -268,8 +268,8 @@ describe('Correction summary', () => {
     })
 
     it('should match corrector with COURT', () => {
-      ;(birthApplication.data.corrector.relationship as any).value = 'COURT'
-      store.dispatch(storeApplication(birthApplication))
+      ;(birthDeclaration.data.corrector.relationship as any).value = 'COURT'
+      store.dispatch(storeDeclaration(birthDeclaration))
       const instance = wrapper
         .find('CorrectionSummaryComponent')
         .instance() as any
@@ -278,13 +278,13 @@ describe('Correction summary', () => {
     })
 
     it('should match corrector with OTHER', () => {
-      birthApplication.data.corrector.relationship = {
+      birthDeclaration.data.corrector.relationship = {
         value: 'OTHER',
         nestedFields: {
           otherRelationship: 'Uncle'
         }
       }
-      store.dispatch(storeApplication(birthApplication))
+      store.dispatch(storeDeclaration(birthDeclaration))
       const instance = wrapper
         .find('CorrectionSummaryComponent')
         .instance() as any
@@ -293,8 +293,8 @@ describe('Correction summary', () => {
     })
 
     it('should match corrector with CLERICAL_ERROR', () => {
-      ;(birthApplication.data.reason as any).type.value = 'CLERICAL_ERROR'
-      store.dispatch(storeApplication(birthApplication))
+      ;(birthDeclaration.data.reason as any).type.value = 'CLERICAL_ERROR'
+      store.dispatch(storeDeclaration(birthDeclaration))
       const instance = wrapper
         .find('CorrectionSummaryComponent')
         .instance() as any
@@ -303,8 +303,8 @@ describe('Correction summary', () => {
     })
 
     it('should match corrector with MATERIAL_ERROR', () => {
-      ;(birthApplication.data.reason as any).type.value = 'MATERIAL_ERROR'
-      store.dispatch(storeApplication(birthApplication))
+      ;(birthDeclaration.data.reason as any).type.value = 'MATERIAL_ERROR'
+      store.dispatch(storeDeclaration(birthDeclaration))
       const instance = wrapper
         .find('CorrectionSummaryComponent')
         .instance() as any
@@ -313,8 +313,8 @@ describe('Correction summary', () => {
     })
 
     it('should match corrector with MATERIAL_OMISSION', () => {
-      ;(birthApplication.data.reason as any).type.value = 'MATERIAL_OMISSION'
-      store.dispatch(storeApplication(birthApplication))
+      ;(birthDeclaration.data.reason as any).type.value = 'MATERIAL_OMISSION'
+      store.dispatch(storeDeclaration(birthDeclaration))
       const instance = wrapper
         .find('CorrectionSummaryComponent')
         .instance() as any
@@ -323,8 +323,8 @@ describe('Correction summary', () => {
     })
 
     it('should match corrector with JUDICIAL_ORDER', () => {
-      ;(birthApplication.data.reason as any).type.value = 'JUDICIAL_ORDER'
-      store.dispatch(storeApplication(birthApplication))
+      ;(birthDeclaration.data.reason as any).type.value = 'JUDICIAL_ORDER'
+      store.dispatch(storeDeclaration(birthDeclaration))
       const instance = wrapper
         .find('CorrectionSummaryComponent')
         .instance() as any
@@ -333,7 +333,7 @@ describe('Correction summary', () => {
     })
 
     it('should match correction reason with OTHER', () => {
-      birthApplication.data.reason = {
+      birthDeclaration.data.reason = {
         type: {
           value: 'OTHER',
           nestedFields: {
@@ -342,7 +342,7 @@ describe('Correction summary', () => {
         },
         additionalComment: ''
       }
-      store.dispatch(storeApplication(birthApplication))
+      store.dispatch(storeDeclaration(birthDeclaration))
       const instance = wrapper
         .find('CorrectionSummaryComponent')
         .instance() as any
@@ -399,22 +399,22 @@ describe('Correction summary', () => {
       expect(history.location.pathname).toContain('registration-home/review')
     })
   })
-  describe('for a death application', () => {
+  describe('for a death declaration', () => {
     beforeEach(async () => {
-      // ;(deathApplication.data.corrector.relationship as any).value = 'INFORMANT'
+      // ;(deathDeclaration.data.corrector.relationship as any).value = 'INFORMANT'
 
-      store.dispatch(storeApplication(deathApplication))
+      store.dispatch(storeDeclaration(deathDeclaration))
       wrapper = await createTestComponent(
         <CorrectionForm
           {...createRouterProps(
             formatUrl(CERTIFICATE_CORRECTION, {
-              applicationId: deathApplication.id,
+              declarationId: deathDeclaration.id,
               pageId: CorrectionSection.Summary
             }),
             { isNavigatedInsideApp: false },
             {
               matchParams: {
-                applicationId: deathApplication.id,
+                declarationId: deathDeclaration.id,
                 pageId: CorrectionSection.Summary
               }
             }

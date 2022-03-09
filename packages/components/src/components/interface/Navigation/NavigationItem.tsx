@@ -36,22 +36,15 @@ const ItemContainer = styled.button<{ isSelected?: boolean }>`
     background-color: ${({ theme }) => theme.colors.grey100};
   }
 `
-// focus state should show on keyboard navigation.
-// :focus {
-//   box-shadow: inset 0px 0px 0px 2px ${({ theme }) => theme.colors.yellow};
-// }
 
 const ItemContentContainer = styled.div<{ isSelected?: boolean }>`
   display: flex;
   flex-flow: row;
   padding: 10px 19px 10px 22px;
 `
-// refactor icons to be 24x24px. so they have a bounding box. so this function is not required.
 const IconContainer = styled.span`
   margin-top: 1px;
 `
-// padding: 2px 0px;
-// width: 12px;
 
 const LabelContainer = styled.span<{
   isSelected?: boolean

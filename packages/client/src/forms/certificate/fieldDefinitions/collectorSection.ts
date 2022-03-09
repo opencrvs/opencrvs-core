@@ -33,6 +33,76 @@ import { messages as certificateMessages } from '@client/i18n/messages/views/cer
 import { validIDNumber } from '@client/utils/validate'
 import { RadioSize } from '@opencrvs/components/lib/forms'
 
+export interface INameField {
+  firstNamesField: string
+  familyNameField: string
+}
+export interface INameFields {
+  [language: string]: INameField
+}
+export interface IVerifyIDCertificateCollectorField {
+  identifierTypeField: string
+  identifierOtherTypeField: string
+  identifierField: string
+  nameFields: INameFields
+  birthDateField?: string
+  nationalityField: string
+}
+
+export interface IVerifyIDCertificateCollector {
+  [collector: string]: IVerifyIDCertificateCollectorField
+}
+
+export interface IVerifyIDCertificateCollectorDefinition {
+  [event: string]: IVerifyIDCertificateCollector
+}
+
+export const verifyIDOnBirthCertificateCollectorDefinition: IVerifyIDCertificateCollectorDefinition =
+  {
+    birth: {
+      mother: {
+        identifierTypeField: 'iDType',
+        identifierOtherTypeField: 'iDTypeOther',
+        identifierField: 'iD',
+        nameFields: {
+          en: {
+            firstNamesField: 'firstNamesEng',
+            familyNameField: 'familyNameEng'
+          }
+        },
+        birthDateField: 'motherBirthDate',
+        nationalityField: 'nationality'
+      },
+      father: {
+        identifierTypeField: 'iDType',
+        identifierOtherTypeField: 'iDTypeOther',
+        identifierField: 'iD',
+        nameFields: {
+          en: {
+            firstNamesField: 'firstNamesEng',
+            familyNameField: 'familyNameEng'
+          }
+        },
+        birthDateField: 'fatherBirthDate',
+        nationalityField: 'nationality'
+      }
+    },
+    death: {
+      informant: {
+        identifierTypeField: 'iDType',
+        identifierOtherTypeField: 'iDTypeOther',
+        identifierField: 'informantID',
+        nameFields: {
+          en: {
+            firstNamesField: 'firstNamesEng',
+            familyNameField: 'familyNameEng'
+          }
+        },
+        nationalityField: 'nationality'
+      }
+    }
+  }
+
 export const certCollectorGroupForBirthAppWithoutFatherDetails: IFormSectionGroup =
   {
     id: 'certCollector',
@@ -224,7 +294,7 @@ export const collectBirthCertificateFormSection: IFormSection = {
         {
           name: 'relationship',
           type: TEXT,
-          label: formMessages.applicantsRelationWithChild,
+          label: formMessages.informantsRelationWithChild,
           required: true,
           initialValue: '',
           validate: []
@@ -293,7 +363,7 @@ export const collectDeathCertificateFormSection: IFormSection = {
           initialValue: true,
           validate: [],
           options: [
-            { value: 'INFORMANT', label: formMessages.applicantName },
+            { value: 'INFORMANT', label: formMessages.informantName },
             { value: 'OTHER', label: formMessages.someoneElse },
             {
               value: 'PRINT_IN_ADVANCE',
@@ -380,7 +450,7 @@ export const collectDeathCertificateFormSection: IFormSection = {
         {
           name: 'relationship',
           type: TEXT,
-          label: formMessages.applicantsRelationWithDeceased,
+          label: formMessages.informantsRelationWithDeceased,
           required: true,
           initialValue: '',
           validate: []

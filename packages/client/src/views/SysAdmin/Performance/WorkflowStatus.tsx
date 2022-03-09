@@ -65,7 +65,7 @@ import {
   checkIfLocalLanguageProvided
 } from '@client/views/SysAdmin/Team/utils'
 import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
-import { IStatusMapping } from './reports/operational/StatusWiseApplicationCountView'
+import { IStatusMapping } from './reports/operational/StatusWiseDeclarationCountView'
 import { formattedDuration } from '@client/utils/date-formatting'
 
 const ToolTipContainer = styled.span`
@@ -82,10 +82,10 @@ interface SortMap {
   status: SORT_ORDER
   eventType: SORT_ORDER
   dateOfEvent: SORT_ORDER
-  applicant: SORT_ORDER
-  applicationStartedOn: SORT_ORDER
+  informant: SORT_ORDER
+  declarationStartedOn: SORT_ORDER
   nameIntl: SORT_ORDER
-  applicationStartedBy: SORT_ORDER
+  declarationStartedBy: SORT_ORDER
   timeLoggedInProgress: SORT_ORDER
   timeLoggedDeclared: SORT_ORDER
   timeLoggedRejected: SORT_ORDER
@@ -99,10 +99,10 @@ const INITIAL_SORT_MAP = {
   status: SORT_ORDER.ASCENDING,
   eventType: SORT_ORDER.ASCENDING,
   dateOfEvent: SORT_ORDER.ASCENDING,
-  applicant: SORT_ORDER.ASCENDING,
-  applicationStartedOn: SORT_ORDER.DESCENDING,
+  informant: SORT_ORDER.ASCENDING,
+  declarationStartedOn: SORT_ORDER.DESCENDING,
   nameIntl: SORT_ORDER.ASCENDING,
-  applicationStartedBy: SORT_ORDER.ASCENDING,
+  declarationStartedBy: SORT_ORDER.ASCENDING,
   timeLoggedInProgress: SORT_ORDER.ASCENDING,
   timeLoggedDeclared: SORT_ORDER.ASCENDING,
   timeLoggedRejected: SORT_ORDER.ASCENDING,
@@ -111,7 +111,7 @@ const INITIAL_SORT_MAP = {
   timeLoggedRegistered: SORT_ORDER.ASCENDING
 }
 
-const DEFAULT_APPLICATION_STATUS_PAGE_SIZE = 25
+const DEFAULT_DECLARATION_STATUS_PAGE_SIZE = 25
 
 const statusOptions = [
   {
@@ -130,7 +130,7 @@ const statusOptions = [
 const PrimaryContactLabelMapping = {
   MOTHER: formMessages.contactDetailsMother,
   FATHER: formMessages.contactDetailsFather,
-  APPLICANT: formMessages.contactDetailsApplicant
+  INFORMANT: formMessages.contactDetailsInformant
 }
 
 type PrimaryContact = keyof typeof PrimaryContactLabelMapping
@@ -165,9 +165,9 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
   const [columnToBeSort, setColumnToBeSort] = useState<keyof SortMap>(
-    'applicationStartedOn'
+    'declarationStartedOn'
   )
-  const recordCount = DEFAULT_APPLICATION_STATUS_PAGE_SIZE * currentPageNumber
+  const recordCount = DEFAULT_DECLARATION_STATUS_PAGE_SIZE * currentPageNumber
   let sectionId = OPERATIONAL_REPORT_SECTION.OPERATIONAL
   let timeStart: string | Date = moment().subtract(1, 'years').toDate()
   let timeEnd: string | Date = moment().toDate()
@@ -191,7 +191,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
   function getColumns(totalItems = 0): IColumn[] {
     const keys = [
       {
-        label: intl.formatMessage(constantsMessages.applications, {
+        label: intl.formatMessage(constantsMessages.declarations, {
           totalItems
         }),
         key: 'id',
@@ -243,33 +243,33 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         width: 12
       },
       {
-        label: intl.formatMessage(formMessages.applicantName),
-        key: 'applicant',
+        label: intl.formatMessage(formMessages.informantName),
+        key: 'informant',
         width: 14,
         isSortable: true,
-        sortFunction: () => toggleSort('applicant'),
-        icon: columnToBeSort === 'applicant' ? <ArrowDownBlue /> : <></>,
-        isSorted: columnToBeSort === 'applicant' ? true : false
+        sortFunction: () => toggleSort('informant'),
+        icon: columnToBeSort === 'informant' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'informant' ? true : false
       },
       {
-        label: intl.formatMessage(constantsMessages.applicationStarted),
-        key: 'applicationStartedOn',
+        label: intl.formatMessage(constantsMessages.declarationStarted),
+        key: 'declarationStartedOn',
         width: 12,
         isSortable: true,
-        sortFunction: () => toggleSort('applicationStartedOn'),
+        sortFunction: () => toggleSort('declarationStartedOn'),
         icon:
-          columnToBeSort === 'applicationStartedOn' ? <ArrowDownBlue /> : <></>,
-        isSorted: columnToBeSort === 'applicationStartedOn' ? true : false
+          columnToBeSort === 'declarationStartedOn' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'declarationStartedOn' ? true : false
       },
       {
-        label: intl.formatMessage(constantsMessages.applicationStartedBy),
-        key: 'applicationStartedBy',
+        label: intl.formatMessage(constantsMessages.declarationStartedBy),
+        key: 'declarationStartedBy',
         width: 10,
         isSortable: true,
-        sortFunction: () => toggleSort('applicationStartedBy'),
+        sortFunction: () => toggleSort('declarationStartedBy'),
         icon:
-          columnToBeSort === 'applicationStartedBy' ? <ArrowDownBlue /> : <></>,
-        isSorted: columnToBeSort === 'applicationStartedBy' ? true : false
+          columnToBeSort === 'declarationStartedBy' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'declarationStartedBy' ? true : false
       },
       {
         label: intl.formatMessage(constantsMessages.timeInProgress),
@@ -542,7 +542,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
             dateOfEvent: eventProgress.dateOfEvent,
             nameIntl,
             nameLocal,
-            applicant:
+            informant:
               (eventProgress.registration &&
                 ((eventProgress.registration.contactRelationship &&
                   conditioanllyFormatContactRelationship(
@@ -550,15 +550,15 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                   ) + ' ') ||
                   '') + (eventProgress.registration.contactNumber || '')) ||
               '',
-            applicationStartedOn: formateDateWithRelationalText(
+            declarationStartedOn: formateDateWithRelationalText(
               eventProgress.startedAt
             ),
-            applicationStartedOnTime:
+            declarationStartedOnTime:
               eventProgress.registration &&
-              new Date(eventProgress.registration.dateOfApplication)
+              new Date(eventProgress.registration.dateOfDeclaration)
                 .getTime()
                 .toString(),
-            applicationStartedBy:
+            declarationStartedBy:
               starterPractitionerRole !== ''
                 ? starterPractitionerName +
                   '\n' +
@@ -580,17 +580,17 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       content,
       columnToBeSort === 'nameIntl'
         ? [(content) => content[columnToBeSort]!.toString().toLowerCase()]
-        : columnToBeSort === 'applicationStartedOn'
-        ? ['applicationStartedOnTime']
+        : columnToBeSort === 'declarationStartedOn'
+        ? ['declarationStartedOnTime']
         : [columnToBeSort],
       [sortOrder[columnToBeSort]]
     ).map((row, idx) => {
       return {
         ...row,
         id: <LinkButton>{row.id}</LinkButton>,
-        applicationStartedBy: (
+        declarationStartedBy: (
           <DoubleLineValueWrapper>
-            {row.applicationStartedBy}
+            {row.declarationStartedBy}
           </DoubleLineValueWrapper>
         ),
         dateOfEvent: formateDateWithRelationalText(row.dateOfEvent),
@@ -656,7 +656,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
               )
             }}
             requiredJurisdictionTypes={
-              window.config.APPLICATION_AUDIT_LOCATIONS
+              window.config.DECLARATION_AUDIT_LOCATIONS
             }
           />
           <PerformanceSelect
@@ -719,7 +719,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           skip: 0,
           count: recordCount,
           status: (status && [status]) || undefined,
-          type: (event && [`${event.toLowerCase()}-application`]) || undefined
+          type: (event && [`${event.toLowerCase()}-declaration`]) || undefined
         }}
         fetchPolicy={'no-cache'}
       >
@@ -735,7 +735,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           return (
             <>
               <ListTable
-                id="application-status-list"
+                id="declaration-status-list"
                 content={getContent(data)}
                 columns={getColumns(total)}
                 isLoading={loading || Boolean(error)}
@@ -753,7 +753,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                 loadMoreText={intl.formatMessage(
                   messages.showMoreUsersLinkLabel,
                   {
-                    pageSize: DEFAULT_APPLICATION_STATUS_PAGE_SIZE
+                    pageSize: DEFAULT_DECLARATION_STATUS_PAGE_SIZE
                   }
                 )}
                 isFullPage

@@ -128,7 +128,7 @@ export const FETCH_EVENTS_WITH_PROGRESS = gql`
           status
           contactNumber
           contactRelationship
-          dateOfApplication
+          dateOfDeclaration
           trackingId
           registrationNumber
           createdAt
@@ -188,10 +188,10 @@ export const FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA = gql`
         status
         primaryOfficeId
         creationDate
-        totalNumberOfApplicationStarted
+        totalNumberOfDeclarationStarted
         totalNumberOfInProgressAppStarted
-        totalNumberOfRejectedApplications
-        averageTimeForDeclaredApplications
+        totalNumberOfRejectedDeclarations
+        averageTimeForDeclaredDeclarations
       }
       totalItems
     }

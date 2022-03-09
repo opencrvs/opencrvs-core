@@ -23,7 +23,7 @@ export interface IProcessData {
 export function initWorker(name: string, connection: IORedis.Redis): Worker {
   return new Worker(
     name,
-    async job => {
+    async (job) => {
       try {
         await fetch(job.data.url, {
           method: 'POST',

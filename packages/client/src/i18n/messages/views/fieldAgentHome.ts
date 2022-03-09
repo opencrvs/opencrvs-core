@@ -40,18 +40,18 @@ const messagesToDefine: IFieldAgentHomeMessages = {
 
   zeroUpdatesText: {
     id: 'fieldAgentHome.zeroUpdatesText',
-    defaultMessage: 'No applications require updates',
-    description: 'The text when no rejected applications'
+    defaultMessage: 'No declarations require updates',
+    description: 'The text when no rejected declarations'
   },
   allUpdatesText: {
     id: 'fieldAgentHome.allUpdatesText',
-    defaultMessage: 'Great job! You have updated all applications',
-    description: 'The text when all rejected applications updated'
+    defaultMessage: 'Great job! You have updated all declarations',
+    description: 'The text when all rejected declarations updated'
   },
   requireUpdatesLoading: {
     id: 'fieldAgentHome.requireUpdatesCountLoading',
-    defaultMessage: 'Checking your applications',
-    description: 'The text when all rejected applications are loading'
+    defaultMessage: 'Checking your declarations',
+    description: 'The text when all rejected declarations are loading'
   }
 }
 

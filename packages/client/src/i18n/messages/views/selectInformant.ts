@@ -49,12 +49,12 @@ const messagesToDefine: IFormMessages = {
   whoIsBirthInformant: {
     defaultMessage: 'Who is informant',
     description: 'Label for option birth informant',
-    id: 'form.field.label.applicantRelation.whoIsBirthInformant'
+    id: 'form.field.label.informantRelation.whoIsBirthInformant'
   },
   whoIsDeathInformant: {
     defaultMessage: 'Who is informant',
     description: 'Label for option death informant',
-    id: 'form.field.label.applicantRelation.whoIsDeathInformant'
+    id: 'form.field.label.informantRelation.whoIsDeathInformant'
   },
   informantError: {
     id: 'correction.informant.error',
@@ -64,42 +64,42 @@ const messagesToDefine: IFormMessages = {
   mother: {
     defaultMessage: 'Mother',
     description: 'Label for option mother',
-    id: 'form.field.label.applicantRelation.mother'
+    id: 'form.field.label.informantRelation.mother'
   },
   father: {
     defaultMessage: 'Father',
     description: 'Label for option father',
-    id: 'form.field.label.applicantRelation.father'
+    id: 'form.field.label.informantRelation.father'
   },
   grandfather: {
     defaultMessage: 'Grandfather',
     description: 'Label for option Grandfather',
-    id: 'form.field.label.applicantRelation.grandfather'
+    id: 'form.field.label.informantRelation.grandfather'
   },
   grandmother: {
     defaultMessage: 'Grandmother',
     description: 'Label for option Grandmother',
-    id: 'form.field.label.applicantRelation.grandmother'
+    id: 'form.field.label.informantRelation.grandmother'
   },
   brother: {
     defaultMessage: 'Brother',
     description: 'Label for option brother',
-    id: 'form.field.label.applicantRelation.brother'
+    id: 'form.field.label.informantRelation.brother'
   },
   sister: {
     defaultMessage: 'Sister',
     description: 'Label for option Sister',
-    id: 'form.field.label.applicantRelation.sister'
+    id: 'form.field.label.informantRelation.sister'
   },
   legalGuardian: {
     defaultMessage: 'Legal guardian',
     description: 'Label for option Legal Guardian',
-    id: 'form.field.label.applicantRelation.legalGuardian'
+    id: 'form.field.label.informantRelation.legalGuardian'
   },
   others: {
     defaultMessage: 'Someone else',
     description: 'Label for option someone else',
-    id: 'form.field.label.applicantRelation.others'
+    id: 'form.field.label.informantRelation.others'
   },
   birthInformantTitle: {
     defaultMessage: 'Who is applying for birth registration?',
@@ -114,37 +114,37 @@ const messagesToDefine: IFormMessages = {
   spouse: {
     defaultMessage: 'Spouse',
     description: 'Label for option Spouse',
-    id: 'form.field.label.applicantRelation.spouse'
+    id: 'form.field.label.informantRelation.spouse'
   },
   son: {
     defaultMessage: 'Son',
     description: 'Label for option Son',
-    id: 'form.field.label.applicantRelation.son'
+    id: 'form.field.label.informantRelation.son'
   },
   sonInLaw: {
     defaultMessage: 'Son in law',
     description: 'Label for option Son in law',
-    id: 'form.field.label.applicantRelation.sonInLaw'
+    id: 'form.field.label.informantRelation.sonInLaw'
   },
   grandson: {
     defaultMessage: 'Grandson',
     description: 'Label for option Grandson',
-    id: 'form.field.label.applicantRelation.grandson'
+    id: 'form.field.label.informantRelation.grandson'
   },
   daughter: {
     defaultMessage: 'Daughter',
     description: 'Label for option Daughter',
-    id: 'form.field.label.applicantRelation.daughter'
+    id: 'form.field.label.informantRelation.daughter'
   },
   daughterInLaw: {
     defaultMessage: 'Daughter in law',
     description: 'Label for option Daughter in law',
-    id: 'form.field.label.applicantRelation.daughterInLaw'
+    id: 'form.field.label.informantRelation.daughterInLaw'
   },
   granddaughter: {
     defaultMessage: 'Granddaughter',
     description: 'Label for option Granddaughter',
-    id: 'form.field.label.applicantRelation.granddaughter'
+    id: 'form.field.label.informantRelation.granddaughter'
   },
   birthErrorMessage: {
     defaultMessage: 'Please select who is present and applying',

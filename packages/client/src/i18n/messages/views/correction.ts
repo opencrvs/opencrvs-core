@@ -60,6 +60,7 @@ interface ICorrectionMessages
   correctionSummaryFeesRequired: MessageDescriptor
   correctionSummaryProofOfPaymentRequired: MessageDescriptor
   correctionSummaryProofOfPayment: MessageDescriptor
+  correctionSummaryproofOfPaymentError: MessageDescriptor
 }
 
 const messagesToDefine: ICorrectionMessages = {
@@ -152,13 +153,13 @@ const messagesToDefine: ICorrectionMessages = {
   },
   materialError: {
     id: 'correction.reason.materialError',
-    defaultMessage: 'Applicant provided incorrect information (Material error)',
+    defaultMessage: 'Informant provided incorrect information (Material error)',
     description: 'Label for material error for correction reason form'
   },
   materialOmission: {
     id: 'correction.reason.materialOmission',
     defaultMessage:
-      'Applicant did not provide this information (Material omission)',
+      'Informant did not provide this information (Material omission)',
     description: 'Label for material omission for correction reason form'
   },
   judicialOrder: {
@@ -321,6 +322,11 @@ const messagesToDefine: ICorrectionMessages = {
     id: 'correction.summary.proofOfPayment',
     defaultMessage: 'Proof of payment',
     description: 'Proof of payment label fees payment document'
+  },
+  correctionSummaryproofOfPaymentError: {
+    id: 'correction.summary.proofOfPaymentError',
+    defaultMessage: 'Proof of payment is required for correction',
+    description: 'Proof of payment document upload error'
   }
 }
 

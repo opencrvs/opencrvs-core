@@ -67,11 +67,11 @@ type Query {
     timeEnd: String!
     locationId: String!
   ): EventEstimationMetrics
-  getApplicationsStartedMetrics(
+  getDeclarationsStartedMetrics(
     timeStart: String!
     timeEnd: String!
     locationId: String!
-  ): ApplicationsStartedMetrics
+  ): DeclarationsStartedMetrics
   fetchMonthWiseEventMetrics(
     timeStart: String!
     timeEnd: String!
@@ -123,6 +123,7 @@ type Query {
   ): [Role]
   getCertificateSVG(status: String, event: String): CertificateSVG
   getActiveCertificatesSVG: [CertificateSVG]
+  getQuestions: [Question]
 }
 
 type Mutation {
@@ -190,6 +191,7 @@ type Mutation {
   createOrUpdateCertificateSVG(
     certificateSVG: CertificateSVGInput!
   ): CertificateSVG
+  createOrUpdateQuestion(question: QuestionInput!): Question
 }
 
 type Dummy {
@@ -359,10 +361,10 @@ type EventEstimationMetrics {
   deathTargetDayMetrics: EstimationMetrics
 }
 
-type ApplicationsStartedMetrics {
-  fieldAgentApplications: Int!
-  hospitalApplications: Int!
-  officeApplications: Int!
+type DeclarationsStartedMetrics {
+  fieldAgentDeclarations: Int!
+  hospitalDeclarations: Int!
+  officeDeclarations: Int!
 }
 
 type MonthWiseEstimationMetrics {
@@ -407,6 +409,21 @@ type CertificateSVG {
   user: String
   event: String
   status: String
+}
+
+type Question {
+  _id: ID
+  fieldId: String
+  label: MesssageDescriptor
+  placeholder: MesssageDescriptor
+  maxLength: Int
+  fieldName: String
+  fieldType: String
+  preceedingFieldId: String
+  required: Boolean
+  enabled: Boolean
+  custom: Boolean
+  initialValue: String
 }
 
 input NotificationInput {
@@ -501,6 +518,21 @@ input CertificateSVGInput {
   user: String!
   event: String!
   status: String!
+}
+
+input QuestionInput {
+  id: ID
+  fieldId: String
+  label: MesssageDescriptorInput
+  placeholder: MesssageDescriptorInput
+  maxLength: Int
+  fieldName: String
+  fieldType: String
+  preceedingFieldId: String
+  required: Boolean
+  enabled: Boolean
+  custom: Boolean
+  initialValue: String
 }
 
 scalar Map
@@ -708,10 +740,10 @@ type SearchFieldAgentResponse {
   status: String
   primaryOfficeId: String
   creationDate: String
-  totalNumberOfApplicationStarted: Int
+  totalNumberOfDeclarationStarted: Int
   totalNumberOfInProgressAppStarted: Int
-  totalNumberOfRejectedApplications: Int
-  averageTimeForDeclaredApplications: Int
+  totalNumberOfRejectedDeclarations: Int
+  averageTimeForDeclaredDeclarations: Int
 }
 
 type RegistrationGenderBasisMetrics {
@@ -793,6 +825,12 @@ type EventProgressSet {
   startedByFacility: String
   startedAt: Date
   progressReport: EventProgressData
+}
+
+type MesssageDescriptor {
+  id: String
+  description: String
+  defaultMessage: String
 }
 
 input PersonInput {
@@ -887,6 +925,12 @@ input UserIdentifierInput {
 input SignatureInput {
   data: String
   type: String
+}
+
+input MesssageDescriptorInput {
+  id: String
+  description: String
+  defaultMessage: String
 }
 
 type RegWorkflow {
@@ -1003,8 +1047,8 @@ enum AttachmentSubject {
   DECEASED_PARMANENT_ADDRESS_PROOF
   DECEASED_DEATH_PROOF
   DECEASED_BIRTH_PROOF
-  APPLICANT_ID_PROOF
-  APPLICANT_ATHORITY_TO_APPLY_PROOF
+  INFORMANT_ID_PROOF
+  INFORMANT_ATHORITY_TO_APPLY_PROOF
   LEGAL_GUARDIAN_PROOF
   ASSIGNED_RESPONSIBILITY_PROOF
   WARD_COUNCILLOR_PROOF
@@ -1074,7 +1118,7 @@ type RegistrationSearchSet {
   status: String
   contactNumber: String
   contactRelationship: String
-  dateOfApplication: Date
+  dateOfDeclaration: Date
   trackingId: String
   registrationNumber: String
   eventLocationId: String

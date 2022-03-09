@@ -54,7 +54,7 @@ function isTaskResource(resource: fhir.Resource): resource is fhir.Task {
   return resource.resourceType === 'Task'
 }
 
-export type APPLICATION_STATUS =
+export type DECLARATION_STATUS =
   | 'IN_PROGRESS'
   | 'DECLARED'
   | 'REGISTERED'
@@ -64,11 +64,11 @@ export type APPLICATION_STATUS =
   | 'REQUESTED_CORRECTION'
   | 'CERTIFIED'
 
-export type APPLICATION_TYPE = 'BIRTH' | 'DEATH'
+export type DECLARATION_TYPE = 'BIRTH' | 'DEATH'
 
 function findPreviousTask(
   historyResponseBundle: fhir.Bundle,
-  allowedPreviousStates: APPLICATION_STATUS[]
+  allowedPreviousStates: DECLARATION_STATUS[]
 ) {
   const task =
     historyResponseBundle.entry &&
@@ -83,7 +83,7 @@ function findPreviousTask(
         }
 
         return resource.businessStatus.coding.some((coding) =>
-          allowedPreviousStates.includes(coding.code as APPLICATION_STATUS)
+          allowedPreviousStates.includes(coding.code as DECLARATION_STATUS)
         )
       })
 
@@ -113,7 +113,7 @@ export function getComposition(bundle: fhir.Bundle) {
 
 export async function getPreviousTask(
   task: Task,
-  allowedPreviousStates: APPLICATION_STATUS[],
+  allowedPreviousStates: DECLARATION_STATUS[],
   authHeader: IAuthHeader
 ) {
   const taskHistory = await fetchTaskHistory(task.id, authHeader)
@@ -128,7 +128,7 @@ export function getPractionerIdFromTask(task: fhir.Task) {
     ?.valueReference?.reference?.split('/')?.[1]
 }
 
-export function getApplicationStatus(task: Task): APPLICATION_STATUS | null {
+export function getDeclarationStatus(task: Task): DECLARATION_STATUS | null {
   if (!task.businessStatus || !task.businessStatus.coding) {
     return null
   }
@@ -139,7 +139,7 @@ export function getApplicationStatus(task: Task): APPLICATION_STATUS | null {
   if (!coding) {
     return null
   }
-  return coding.code as APPLICATION_STATUS
+  return coding.code as DECLARATION_STATUS
 }
 
 export function getTrackingId(task: Task) {
@@ -155,7 +155,7 @@ export function getTrackingId(task: Task) {
   return trackingIdentifier.value
 }
 
-export function getApplicationType(task: Task): APPLICATION_TYPE | null {
+export function getDeclarationType(task: Task): DECLARATION_TYPE | null {
   if (!task.code || !task.code.coding) {
     return null
   }
@@ -166,7 +166,7 @@ export function getApplicationType(task: Task): APPLICATION_TYPE | null {
   if (!coding) {
     return null
   }
-  return coding.code as APPLICATION_TYPE
+  return coding.code as DECLARATION_TYPE
 }
 
 export function getStartedByFieldAgent(taskHistory: fhir.Bundle): string {

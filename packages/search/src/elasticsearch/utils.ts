@@ -71,12 +71,12 @@ export interface ICompositionBody {
   type?: string
   contactRelationship?: string
   contactNumber?: string
-  dateOfApplication?: string
+  dateOfDeclaration?: string
   trackingId?: string
   registrationNumber?: string
   eventLocationId?: string
-  applicationLocationId?: string
-  applicationLocationHirarchyIds?: string[]
+  declarationLocationId?: string
+  declarationLocationHirarchyIds?: string[]
   rejectReason?: string
   rejectComment?: string
   relatesTo?: string[]
@@ -212,7 +212,7 @@ export const createStatusHistory = async (
   } as IOperationHistory
 
   if (
-    isApplicationInStatus(body, IN_PROGRESS_STATUS) &&
+    isDeclarationInStatus(body, IN_PROGRESS_STATUS) &&
     isNotification(body) &&
     body.eventLocationId
   ) {
@@ -223,14 +223,14 @@ export const createStatusHistory = async (
     operationHistory.notificationFacilityAlias = facility?.alias || []
   }
 
-  if (isApplicationInStatus(body, REQUESTED_CORRECTION_STATUS)) {
+  if (isDeclarationInStatus(body, REQUESTED_CORRECTION_STATUS)) {
     updateOperationHistoryWithCorrection(operationHistory, task)
   }
   body.operationHistories = body.operationHistories || []
   body.operationHistories.push(operationHistory)
 }
 
-function isApplicationInStatus(
+function isDeclarationInStatus(
   body: ICompositionBody,
   status: string
 ): boolean {

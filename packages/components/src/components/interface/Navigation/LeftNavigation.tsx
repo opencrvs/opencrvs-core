@@ -36,10 +36,9 @@ const LeftNavigationContainer = styled.div<{
     ${({ navigationWidth }) => !navigationWidth && `display: none;`}
   }
 `
-
 const UserInfo = styled.div`
   background: ${({ theme }) => theme.colors.white};
-  padding: 30px 24px;
+  padding: 32px 24px;
   text-align: justify;
   border: 0px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};

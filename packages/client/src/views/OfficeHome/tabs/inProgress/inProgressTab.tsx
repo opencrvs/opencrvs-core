@@ -22,7 +22,7 @@ import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
-import { IApplication, DOWNLOAD_STATUS } from '@client/applications'
+import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
 import {
   goToPage as goToPageAction,
   goToRegistrarHomeTab as goToRegistrarHomeTabAction,
@@ -56,7 +56,7 @@ import { IStoreState } from '@client/store'
 import { Action } from '@client/forms'
 import { get } from 'lodash'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
-import { getDraftApplicantFullName } from '@client/utils/draftUtils'
+import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { formattedDuration } from '@client/utils/date-formatting'
 
@@ -130,8 +130,8 @@ interface IBaseRegistrarHomeProps {
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   selectorId: string
   registrarLocationId: string | null
-  drafts: IApplication[]
-  outboxApplications: IApplication[]
+  drafts: IDeclaration[]
+  outboxDeclarations: IDeclaration[]
   queryData: IQueryData
   page: number
   onPageChange: (newPageNumber: number) => void
@@ -214,11 +214,11 @@ export class InProgressTabComponent extends React.Component<
       }
 
       const actions: IAction[] = []
-      const foundApplication = this.props.outboxApplications.find(
-        (application) => application.id === reg.id
+      const foundDeclaration = this.props.outboxDeclarations.find(
+        (declaration) => declaration.id === reg.id
       )
       const downloadStatus =
-        (foundApplication && foundApplication.downloadStatus) || undefined
+        (foundDeclaration && foundDeclaration.downloadStatus) || undefined
 
       if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
         actions.push({
@@ -227,7 +227,7 @@ export class InProgressTabComponent extends React.Component<
               downloadConfigs={{
                 event: event as string,
                 compositionId: reg.id,
-                action: Action.LOAD_REVIEW_APPLICATION
+                action: Action.LOAD_REVIEW_DECLARATION
               }}
               key={`DownloadButton-${index}`}
               status={downloadStatus as DOWNLOAD_STATUS}
@@ -281,14 +281,14 @@ export class InProgressTabComponent extends React.Component<
     if (!this.props.drafts || this.props.drafts.length <= 0) {
       return []
     }
-    return this.props.drafts.map((draft: IApplication) => {
+    return this.props.drafts.map((draft: IDeclaration) => {
       let pageRoute: string
       if (draft.event && draft.event.toString() === 'birth') {
         pageRoute = DRAFT_BIRTH_PARENT_FORM_PAGE
       } else if (draft.event && draft.event.toString() === 'death') {
         pageRoute = DRAFT_DEATH_FORM_PAGE
       }
-      const name = getDraftApplicantFullName(draft, locale)
+      const name = getDraftInformantFullName(draft, locale)
       const lastModificationDate = draft.modifiedOn || draft.savedOn
       const actions = [
         {
@@ -331,7 +331,7 @@ export class InProgressTabComponent extends React.Component<
 
   renderInProgressSelectorsWithCounts = (
     selectorId: string,
-    drafts: IApplication[],
+    drafts: IDeclaration[],
     fieldAgentCount: number,
     hospitalCount: number
   ) => {
@@ -698,7 +698,7 @@ export class InProgressTabComponent extends React.Component<
 
 function mapStateToProps(state: IStoreState) {
   return {
-    outboxApplications: state.applicationsState.applications,
+    outboxDeclarations: state.declarationsState.declarations,
     offlineCountryConfig: getOfflineData(state)
   }
 }
