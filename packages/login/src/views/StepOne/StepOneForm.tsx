@@ -166,7 +166,7 @@ export const StyledButton = styled(LinkButton)`
   }
   &:focus {
     outline: none;
-    background: ${({ theme }) => theme.colors.focus};
+    background: ${({ theme }) => theme.colors.yellow};
     color: ${({ theme }) => theme.colors.copy};
   }
   &:not([data-focus-visible-added]) {
@@ -176,7 +176,7 @@ export const StyledButton = styled(LinkButton)`
   }
   &:active:not([data-focus-visible-added]):enabled {
     outline: none;
-    background: ${({ theme }) => theme.colors.focus};
+    background: ${({ theme }) => theme.colors.yellow};
     color: ${({ theme }) => theme.colors.copy};
   }
 `

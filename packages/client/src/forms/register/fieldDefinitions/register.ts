@@ -289,14 +289,6 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     value: 'BROTHER',
                     label: formMessageDescriptors.brother
-                  },
-                  {
-                    value: 'LEGAL_GUARDIAN',
-                    label: formMessageDescriptors.legalGuardian
-                  },
-                  {
-                    value: 'OTHER',
-                    label: formMessageDescriptors.others
                   }
                 ],
                 nestedFields: {

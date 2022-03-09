@@ -66,10 +66,10 @@ const BlueButton = styled(Button)`
   color: ${({ theme }) => theme.colors.white};
   ${({ theme }) => theme.fonts.smallButtonStyle};
   border-radius: 4px;
-  ${({ theme }) => theme.shadows.mistyShadow};
+  ${({ theme }) => theme.shadows.light};
   &:focus {
     outline: none;
-    background: ${({ theme }) => theme.colors.focus};
+    background: ${({ theme }) => theme.colors.yellow};
     color: ${({ theme }) => theme.colors.copy};
   }
 
@@ -84,13 +84,13 @@ const WhiteButton = styled(Button)`
   color: ${({ theme }) => theme.colors.copy};
   height: 32px;
   ${({ theme }) => theme.fonts.smallButtonStyle};
-  ${({ theme }) => theme.shadows.mistyShadow};
+  ${({ theme }) => theme.shadows.light};
   &:hover {
-    background: ${({ theme }) => theme.colors.dropdownHover};
+    background: ${({ theme }) => theme.colors.grey100};
   }
   &:focus {
     outline: none;
-    background: ${({ theme }) => theme.colors.focus};
+    background: ${({ theme }) => theme.colors.yellow};
     color: ${({ theme }) => theme.colors.copy};
   }
 

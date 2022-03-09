@@ -81,7 +81,7 @@ const StyledInput = styled.input<ISearchInputProps>`
   border: 0px solid;
   border-bottom: solid 1px ${({ theme }) => theme.colors.secondary};
   ${({ error, touched, theme }) =>
-    error && touched ? theme.colors.error : theme.colors.disabled};
+    error && touched ? theme.colors.negative : theme.colors.disabled};
   box-sizing: border-box;
   outline: none;
   ${({ theme }) => theme.fonts.bodyStyle};
@@ -92,15 +92,15 @@ const StyledInput = styled.input<ISearchInputProps>`
   }
 
   &::-webkit-input-placeholder {
-    color: ${({ theme }) => theme.colors.placeholder};
+    color: ${({ theme }) => theme.colors.placeholderCopy};
   }
 
   &::-moz-placeholder {
-    color: ${({ theme }) => theme.colors.placeholder};
+    color: ${({ theme }) => theme.colors.placeholderCopy};
   }
 
   &:-ms-input-placeholder {
-    color: ${({ theme }) => theme.colors.placeholder};
+    color: ${({ theme }) => theme.colors.placeholderCopy};
   }
 
   &::-webkit-outer-spin-button,

@@ -37,7 +37,7 @@ const HeaderBlock = styled.div`
   margin-bottom: 1px;
   align-items: center;
 `
-const BackButton = styled(props => <CircleButton {...props} />)`
+const BackButton = styled((props) => <CircleButton {...props} />)`
   background: '#35495d00';
   margin-left: ${({ theme }) => theme.grid.margin}px;
 `
@@ -49,7 +49,7 @@ const MenuTitle = styled.span`
   text-overflow: ellipsis;
 `
 const EmptyTitle = styled(MenuTitle)`
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.negative};
 `
 const BodyContainer = styled(Box)`
   width: 100%;

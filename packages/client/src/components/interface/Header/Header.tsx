@@ -35,9 +35,12 @@ import { IStoreState } from '@client/store'
 import { withTheme } from '@client/styledComponents'
 import {
   BRN_DRN_TEXT,
+  FIELD_AGENT_ROLES,
   NAME_TEXT,
   NATL_ADMIN_ROLES,
   PHONE_TEXT,
+  REGISTRAR_ROLES,
+  SYS_ADMIN_ROLES,
   TRACKING_ID_TEXT
 } from '@client/utils/constants'
 import { getIndividualNameObj, IUserDetails } from '@client/utils/userUtils'
@@ -68,12 +71,21 @@ import styled from 'styled-components'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { Navigation } from '@client/components/interface/Navigation'
 import { Avatar } from '@client/components/Avatar'
+import { RouteComponentProps, withRouter } from 'react-router'
+import {
+  HOME,
+  OPERATIONAL_REPORT,
+  PERFORMANCE_HOME,
+  REGISTRAR_HOME
+} from '@client/navigation/routes'
 
-type IProps = IntlShapeProps & {
-  theme: ITheme
+type IStateProps = {
   userDetails: IUserDetails | null
-  redirectToAuthentication: typeof redirectToAuthentication
   language: string
+}
+
+type IDispatchProps = {
+  redirectToAuthentication: typeof redirectToAuthentication
   goToSearchResult: typeof goToSearchResult
   goToEvents: typeof goToEventsAction
   goToSearch: typeof goToSearch
@@ -87,6 +99,10 @@ type IProps = IntlShapeProps & {
   goToOperationalReportAction: typeof goToOperationalReport
   goToTeamSearchAction: typeof goToTeamSearch
   goToTeamUserListAction: typeof goToTeamUserList
+}
+
+interface IProps extends RouteComponentProps {
+  theme: ITheme
   activeMenuItem: ACTIVE_MENU_ITEM
   title?: string
   searchText?: string
@@ -95,6 +111,9 @@ type IProps = IntlShapeProps & {
   enableMenuSelection?: boolean
   mapPinClickHandler?: () => void
 }
+
+type IFullProps = IntlShapeProps & IStateProps & IDispatchProps & IProps
+
 interface IState {
   showMenu: boolean
   showLogoutModal: boolean
@@ -109,79 +128,77 @@ enum ACTIVE_MENU_ITEM {
 }
 
 const StyledPrimaryButton = styled(PrimaryButton)`
-  ${({ theme }) => theme.shadows.mistyShadow};
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   border-radius: 100%;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
   &:hover {
-    background: ${({ theme }) => theme.colors.indigo600};
+    background: ${({ theme }) => theme.colors.indigoDark};
   }
   &:focus {
-    background: ${({ theme }) => theme.colors.yellow500};
+    background: ${({ theme }) => theme.colors.yellow};
   }
   &:active {
-    background: ${({ theme }) => theme.colors.indigo600};
+    background: ${({ theme }) => theme.colors.indigoDark};
   }
 `
 
 const SearchBox = styled.div`
   position: static;
-  width: 624px;
-  height: 42px;
+  width: 664px;
+  height: 40px;
   left: calc(50% - 624px / 2 + 24px);
   top: calc(50% - 40px / 2);
-  background: ${({ theme }) => theme.colors.grey300};
+  background: ${({ theme }) => theme.colors.grey200};
   box-sizing: border-box;
-  border-radius: 100px;
-  margin: 0px 12px;
-  margin-right: 96px;
+  border-radius: 40px;
+  margin: 0px 80px 0px 12px;
+  &:hover {
+    outline: 1px solid ${({ theme }) => theme.colors.grey600};
+  }
+
   &:focus-within {
-    border: 1px solid ${({ theme }) => theme.colors.grey800};
+    outline: 1px solid ${({ theme }) => theme.colors.grey600};
     background: ${({ theme }) => theme.colors.white};
   }
   &:active {
-    outline: 3px solid ${({ theme }) => theme.colors.yellow500};
+    outline: 1px solid ${({ theme }) => theme.colors.grey600};
   }
   &:focus-within input {
     background: ${({ theme }) => theme.colors.white};
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.xl}px) {
     width: 100%;
-    max-width: 507.87px;
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     width: 100%;
-    max-width: 334px;
     margin: auto;
   }
 `
 const HeaderCenter = styled.div`
   padding: 8px 16px;
-  height: 64px;
+  height: 40px;
   display: flex;
   flex-direction: row;
   align-items: center;
   background: ${({ theme }) => theme.colors.white};
 `
 const HeaderLeft = styled.div`
-  padding: 8px 16px;
-  height: 64px;
+  height: 40px;
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 20px;
+  gap: 4px;
   background: ${({ theme }) => theme.colors.white};
 `
 const HeaderRight = styled.div`
-  padding: 8px 16px;
-  height: 64px;
+  height: 40px;
   background: ${({ theme }) => theme.colors.white};
 `
-class HeaderComp extends React.Component<IProps, IState> {
-  constructor(props: IProps) {
+class HeaderComp extends React.Component<IFullProps, IState> {
+  constructor(props: IFullProps) {
     super(props)
 
     this.state = {
@@ -288,11 +305,29 @@ class HeaderComp extends React.Component<IProps, IState> {
     this.props.redirectToAuthentication()
   }
 
+  isLandingPage = () => {
+    const role = this.props.userDetails && this.props.userDetails.role
+    const location = this.props.history.location.pathname
+    if (
+      (FIELD_AGENT_ROLES.includes(role as string) && HOME.includes(location)) ||
+      (NATL_ADMIN_ROLES.includes(role as string) &&
+        PERFORMANCE_HOME.includes(location)) ||
+      (SYS_ADMIN_ROLES.includes(role as string) &&
+        OPERATIONAL_REPORT.includes(location)) ||
+      (REGISTRAR_ROLES.includes(role as string) &&
+        REGISTRAR_HOME.includes(location))
+    ) {
+      return true
+    } else {
+      return false
+    }
+  }
+
   toggleMenu = () => {
     this.setState((prevState) => ({ showMenu: !prevState.showMenu }))
   }
 
-  renderSearchInput(props: IProps, isMobile?: boolean) {
+  renderSearchInput(props: IFullProps, isMobile?: boolean) {
     const { intl, searchText, selectedSearchType, language } = props
 
     const searchTypeList: ISearchType[] = [
@@ -343,7 +378,7 @@ class HeaderComp extends React.Component<IProps, IState> {
     )
   }
 
-  goToTeamView(props: IProps) {
+  goToTeamView(props: IFullProps) {
     const { userDetails, goToTeamUserListAction, goToTeamSearchAction } = props
     if (userDetails && userDetails.role) {
       if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
@@ -360,7 +395,7 @@ class HeaderComp extends React.Component<IProps, IState> {
     }
   }
 
-  goToPerformanceView(props: IProps) {
+  goToPerformanceView(props: IFullProps) {
     const {
       userDetails,
       goToPerformanceHomeAction,
@@ -377,6 +412,32 @@ class HeaderComp extends React.Component<IProps, IState> {
         )
       }
     }
+  }
+
+  arrowNavigator() {
+    return (
+      <HeaderLeft>
+        <CircleButton
+          disabled={
+            (this.props.history.action === 'POP' ||
+              this.props.history.action === 'REPLACE') &&
+            this.isLandingPage()
+          }
+          onClick={() => this.props.goBack()}
+        >
+          <BackArrowDeepBlue />
+        </CircleButton>
+        <CircleButton
+          disabled={
+            this.props.history.action === 'PUSH' ||
+            this.props.history.action === 'REPLACE'
+          }
+          onClick={() => this.props.goForward()}
+        >
+          <ForwardArrowDeepBlue />
+        </CircleButton>
+      </HeaderLeft>
+    )
   }
 
   render() {
@@ -396,16 +457,7 @@ class HeaderComp extends React.Component<IProps, IState> {
 
     let rightMenu = [
       {
-        element: (
-          <HeaderLeft>
-            <CircleButton onClick={() => this.props.goBack()}>
-              <BackArrowDeepBlue />
-            </CircleButton>
-            <CircleButton onClick={() => this.props.goForward()}>
-              <ForwardArrowDeepBlue />
-            </CircleButton>
-          </HeaderLeft>
-        )
+        element: this.arrowNavigator()
       },
       {
         element: (
@@ -432,16 +484,7 @@ class HeaderComp extends React.Component<IProps, IState> {
     if (activeMenuItem !== ACTIVE_MENU_ITEM.DECLARATIONS) {
       rightMenu = [
         {
-          element: (
-            <HeaderLeft>
-              <CircleButton onClick={() => this.props.goBack()}>
-                <BackArrowDeepBlue />
-              </CircleButton>
-              <CircleButton onClick={() => this.props.goForward()}>
-                <ForwardArrowDeepBlue />
-              </CircleButton>
-            </HeaderLeft>
-          )
+          element: this.arrowNavigator()
         },
         {
           element: <ProfileMenu key="profileMenu" />
@@ -493,4 +536,4 @@ export const Header = connect(
     goToTeamSearchAction: goToTeamSearch,
     goToTeamUserListAction: goToTeamUserList
   }
-)(withTheme(injectIntl<'intl', IProps>(HeaderComp)))
+)(injectIntl(withTheme(withRouter(HeaderComp))))

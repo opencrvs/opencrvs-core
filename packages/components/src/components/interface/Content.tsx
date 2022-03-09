@@ -20,7 +20,7 @@ const Container = styled.div<{ size: string }>`
   max-width: ${({ size }) => (size === 'large' ? '1140px' : '778px')};
   height: 100%;
   border-radius: 4px;
-  border: 1px solid ${({ theme }) => theme.colors.dividerDark};
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
   box-sizing: border-box;
   background-color: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};

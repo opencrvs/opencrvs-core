@@ -131,10 +131,10 @@ import { generateLocations } from '@client/utils/locationUtils'
 import { isCorrection } from '@client/views/CorrectionForm/utils'
 
 const Deleted = styled.del`
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.negative};
 `
 const RequiredField = styled.span`
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.negative};
   display: inline-block;
   text-transform: lowercase;
   &::first-letter {
@@ -166,7 +166,7 @@ const Column = styled.div`
 `
 
 const StyledColumn = styled(Column)`
-  ${({ theme }) => theme.shadows.mistyShadow};
+  ${({ theme }) => theme.shadows.light};
   width: 60%;
 `
 
