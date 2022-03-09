@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IApplication } from '@client/applications'
+import { IDeclaration } from '@client/declarations'
 import {
   constantsMessages,
   dynamicConstantsMessages
@@ -44,7 +44,7 @@ interface IBaseApprovalTabProps {
   goToPage: typeof goToPage
   registrarLocationId: string | null
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
-  outboxApplications: IApplication[]
+  outboxDeclarations: IDeclaration[]
   queryData: {
     data: GQLEventSearchResultSet
   }
@@ -197,7 +197,7 @@ class ApprovalTabComponent extends React.Component<
         <ReactTooltip id="validatedTooltip">
           <ToolTipContainer>
             {this.props.intl.formatMessage(
-              messages.validatedApplicationTooltipForRegistrationAgent
+              messages.validatedDeclarationTooltipForRegistrationAgent
             )}
           </ToolTipContainer>
         </ReactTooltip>
@@ -226,7 +226,7 @@ class ApprovalTabComponent extends React.Component<
 function mapStateToProps(state: IStoreState) {
   return {
     scope: getScope(state),
-    outboxApplications: state.applicationsState.applications
+    outboxDeclarations: state.declarationsState.declarations
   }
 }
 

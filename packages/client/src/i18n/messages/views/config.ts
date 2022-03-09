@@ -13,7 +13,7 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
-  applicationSettings: MessageDescriptor
+  declarationSettings: MessageDescriptor
   certificateConfiguration: MessageDescriptor
   previewTemplate: MessageDescriptor
   printTemplate: MessageDescriptor
@@ -31,15 +31,15 @@ interface IConfigMessages
 }
 
 const messagesToDefine: IConfigMessages = {
-  applicationSettings: {
-    id: 'config.applicationSettings',
-    defaultMessage: 'Application settings',
-    description: 'Link Text for Config Application Settings'
+  declarationSettings: {
+    id: 'config.declarationSettings',
+    defaultMessage: 'Declaration settings',
+    description: 'Link Text for Config Declaration Settings'
   },
   certificateConfiguration: {
     id: 'config.certificateConfiguration',
     defaultMessage: 'Certificate configuration',
-    description: 'Link Text for Config Application Settings'
+    description: 'Link Text for Config Declaration Settings'
   },
   previewTemplate: {
     id: 'config.previewTemplate',

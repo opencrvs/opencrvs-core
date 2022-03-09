@@ -10,16 +10,16 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  createApplication,
-  storeApplication,
+  createDeclaration,
+  storeDeclaration,
   SUBMISSION_STATUS
-} from '@client/applications'
+} from '@client/declarations'
 import { Event } from '@client/forms'
 import { checkAuth } from '@client/profile/profileActions'
 import { queries } from '@client/profile/queries'
 import {
-  COUNT_USER_WISE_APPLICATIONS,
-  SEARCH_APPLICATIONS_USER_WISE
+  COUNT_USER_WISE_DECLARATIONS,
+  SEARCH_DECLARATIONS_USER_WISE
 } from '@client/search/queries'
 import { createStore } from '@client/store'
 import {
@@ -27,7 +27,7 @@ import {
   fieldAgentScopeToken,
   flushPromises,
   getItem,
-  mockApplicationData,
+  mockDeclarationData,
   mockUserResponse
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
@@ -59,7 +59,7 @@ const nameObj = {
 
 const countQueryGraphqlMock = {
   request: {
-    query: COUNT_USER_WISE_APPLICATIONS,
+    query: COUNT_USER_WISE_DECLARATIONS,
     variables: {
       userId: nameObj.data.getUser.practitionerId,
       status: [EVENT_STATUS.REJECTED],
@@ -109,7 +109,7 @@ describe('FieldAgentHome tests', () => {
 
     testComponent.update()
     const app = testComponent
-    const element = await waitForElement(app, '#field-agent-home-spinner')
+    const element = await waitForElement(app, '#navigation_updates_loading')
 
     expect(element.hostNodes()).toHaveLength(1)
   })
@@ -167,7 +167,7 @@ describe('FieldAgentHome tests', () => {
   it('renders require for updates section while on updates tab', async () => {
     const requireUpdatesMock = {
       request: {
-        query: SEARCH_APPLICATIONS_USER_WISE,
+        query: SEARCH_DECLARATIONS_USER_WISE,
         variables: {
           userId: nameObj.data.getUser.practitionerId,
           status: [EVENT_STATUS.REJECTED],
@@ -187,7 +187,7 @@ describe('FieldAgentHome tests', () => {
                 registration: {
                   contactNumber: '+8801711111111',
                   trackingId: 'BZW3T4',
-                  dateOfApplication: '2019-05-22T10:22:21.840Z',
+                  dateOfDeclaration: '2019-05-22T10:22:21.840Z',
                   status: 'REJECTED'
                 },
                 operationHistories: [
@@ -298,10 +298,10 @@ describe('FieldAgentHome tests', () => {
     expect(app.find('#require_updates_list').hostNodes()).toHaveLength(1)
   })
 
-  it('render application details page after clicking require for updates applications', async () => {
+  it('render declaration details page after clicking require for updates declarations', async () => {
     const requireUpdatesMock = {
       request: {
-        query: SEARCH_APPLICATIONS_USER_WISE,
+        query: SEARCH_DECLARATIONS_USER_WISE,
         variables: {
           userId: nameObj.data.getUser.practitionerId,
           status: [EVENT_STATUS.REJECTED],
@@ -321,7 +321,7 @@ describe('FieldAgentHome tests', () => {
                 registration: {
                   contactNumber: '+8801711111111',
                   trackingId: 'BZW3T4',
-                  dateOfApplication: '2019-05-22T10:22:21.840Z',
+                  dateOfDeclaration: '2019-05-22T10:22:21.840Z',
                   status: 'REJECTED'
                 },
                 operationHistories: [
@@ -547,38 +547,38 @@ describe('FieldAgentHome tests', () => {
     })
 
     it('when online renders submission status', () => {
-      const readyApplication = {
+      const readyDeclaration = {
         id: uuid(),
-        data: mockApplicationData,
+        data: mockDeclarationData,
         event: Event.BIRTH,
         submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.READY_TO_SUBMIT]
       }
 
-      const submittingApplication = {
+      const submittingDeclaration = {
         id: uuid(),
-        data: mockApplicationData,
+        data: mockDeclarationData,
         event: Event.BIRTH,
         submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTING]
       }
 
-      const submittedApplication = {
+      const submittedDeclaration = {
         id: uuid(),
-        data: mockApplicationData,
+        data: mockDeclarationData,
         event: Event.BIRTH,
         submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTED]
       }
 
-      const failedApplication = {
+      const failedDeclaration = {
         id: uuid(),
-        data: mockApplicationData,
+        data: mockDeclarationData,
         event: Event.BIRTH,
         submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.FAILED]
       }
 
-      store.dispatch(storeApplication(readyApplication))
-      store.dispatch(storeApplication(submittingApplication))
-      store.dispatch(storeApplication(submittedApplication))
-      store.dispatch(storeApplication(failedApplication))
+      store.dispatch(storeDeclaration(readyDeclaration))
+      store.dispatch(storeDeclaration(submittingDeclaration))
+      store.dispatch(storeDeclaration(submittedDeclaration))
+      store.dispatch(storeDeclaration(failedDeclaration))
 
       component.update()
       expect(component.find('#failed0').hostNodes()).toHaveLength(1)
@@ -590,14 +590,14 @@ describe('FieldAgentHome tests', () => {
     it('when offline renders pending submission status', async () => {
       Object.defineProperty(window.navigator, 'onLine', { value: false })
 
-      const readyApplication = {
+      const readyDeclaration = {
         id: uuid(),
-        data: mockApplicationData,
+        data: mockDeclarationData,
         event: Event.BIRTH,
         submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.READY_TO_SUBMIT]
       }
 
-      store.dispatch(storeApplication(readyApplication))
+      store.dispatch(storeDeclaration(readyDeclaration))
 
       const element = await waitForElement(component, '#offline0')
 
@@ -629,9 +629,9 @@ describe('FieldAgentHome tests', () => {
       expect(component.find('#no-record').hostNodes()).toHaveLength(1)
     })
 
-    it('renders draft application', async () => {
-      const draftApplication = createApplication(Event.BIRTH)
-      store.dispatch(storeApplication(draftApplication))
+    it('renders draft declaration', async () => {
+      const draftDeclaration = createDeclaration(Event.BIRTH)
+      store.dispatch(storeDeclaration(draftDeclaration))
       const element = await waitForElement(component, '#row_0')
       expect(element.hostNodes()).toHaveLength(1)
     })

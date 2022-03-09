@@ -40,7 +40,9 @@ export class DesktopHeader extends React.Component<IDesktopHeaderProps> {
     return (
       <HeaderContainer>
         {desktopRightMenu &&
-          desktopRightMenu.map((item: IRightMenu) => item.element)}
+          desktopRightMenu.map((item: IRightMenu, index) => (
+            <React.Fragment key={index}> {item.element}</React.Fragment>
+          ))}
       </HeaderContainer>
     )
   }

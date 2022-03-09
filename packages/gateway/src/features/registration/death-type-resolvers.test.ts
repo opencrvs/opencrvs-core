@@ -153,9 +153,10 @@ describe('Registration type resolvers', () => {
         JSON.stringify(mockObservations.causeOfDeathMethod)
       )
       // @ts-ignore
-      const causeOfDeathMethod = await typeResolvers.DeathRegistration.causeOfDeathMethod(
-        mockDeathComposition
-      )
+      const causeOfDeathMethod =
+        await typeResolvers.DeathRegistration.causeOfDeathMethod(
+          mockDeathComposition
+        )
       expect(causeOfDeathMethod).toBeDefined()
       expect(causeOfDeathMethod).toEqual('VERBAL_AUTOPSY')
     })
@@ -341,11 +342,10 @@ describe('Registration type resolvers', () => {
         JSON.stringify(mockObservations.causeOfDeathMethod)
       )
       // @ts-ignore
-      const causeOfDeathMethod = await typeResolvers.DeathRegistration.causeOfDeathMethod(
-        {
+      const causeOfDeathMethod =
+        await typeResolvers.DeathRegistration.causeOfDeathMethod({
           section: []
-        }
-      )
+        })
       expect(causeOfDeathMethod).toBeNull()
     })
     it('causeOfDeath is null when section does not exist', async () => {

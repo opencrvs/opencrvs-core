@@ -45,7 +45,7 @@ export interface ICollectorInfo {
   iDType: string
   firstNames: string
   familyName: string
-  birthDate: string
+  birthDate?: string
   nationality: string
 }
 

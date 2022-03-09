@@ -67,7 +67,7 @@ import { IRadioOption as CRadioOption } from '@opencrvs/components/lib/forms'
 import { IDynamicValues } from '@client/navigation'
 import { generateLocations } from '@client/utils/locationUtils'
 import { callingCountries } from 'country-data'
-import { IApplication } from '@client/applications'
+import { IDeclaration } from '@client/declarations'
 
 export const VIEW_TYPE = {
   FORM: 'form',
@@ -257,12 +257,12 @@ export function getNextSectionIds(
   sections: IFormSection[],
   fromSection: IFormSection,
   fromSectionGroup: IFormSectionGroup,
-  application: IApplication
+  declaration: IDeclaration
 ): { [key: string]: string } | null {
   const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
     fromSection,
-    application.data[fromSection.id] || {},
-    application.data
+    declaration.data[fromSection.id] || {},
+    declaration.data
   )
   const currentGroupIndex = visibleGroups.findIndex(
     (group: IFormSectionGroup) => group.id === fromSectionGroup.id
@@ -274,8 +274,8 @@ export function getNextSectionIds(
         section.viewType !== VIEW_TYPE.HIDDEN &&
         getVisibleSectionGroupsBasedOnConditions(
           section,
-          application.data[fromSection.id] || {},
-          application.data
+          declaration.data[fromSection.id] || {},
+          declaration.data
         ).length > 0
     )
 
@@ -645,6 +645,14 @@ export const getSelectedRadioOptionWithNestedFields = (
 }
 
 export const conditionals: IConditionals = {
+  isRegistrarRoleSelected: {
+    action: 'hide',
+    expression: 'values.role!=="LOCAL_REGISTRAR"'
+  },
+  isOfficePreSelected: {
+    action: 'hide',
+    expression: 'values.skippedOfficeSelction && values.registrationOffice'
+  },
   iDType: {
     action: 'hide',
     expression: "!values.iDType || (values.iDType !== 'OTHER')"
@@ -781,9 +789,9 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression: '!values.iDType || values.iDType === "NO_ID"'
   },
-  applicantPermanentAddressSameAsCurrent: {
+  informantPermanentAddressSameAsCurrent: {
     action: 'hide',
-    expression: 'values.applicantPermanentAddressSameAsCurrent'
+    expression: 'values.informantPermanentAddressSameAsCurrent'
   },
   deathPlaceOther: {
     action: 'hide',
@@ -812,7 +820,7 @@ export const conditionals: IConditionals = {
   },
   otherRelationship: {
     action: 'hide',
-    expression: 'values.applicantsRelationToDeceased !== "OTHER"'
+    expression: 'values.informantsRelationToDeceased !== "OTHER"'
   },
   fatherContactDetailsRequired: {
     action: 'hide',
@@ -838,10 +846,6 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression:
       '(values.uploadDocForDeceased && !!values.uploadDocForDeceased.find(a => ["National ID (front)", "National ID (Back)"].indexOf(a.optionValues[1]) > -1))'
-  },
-  isRegistrarRoleSelected: {
-    action: 'hide',
-    expression: 'values.role!=="LOCAL_REGISTRAR"'
   },
   certCollectorOther: {
     action: 'hide',

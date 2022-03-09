@@ -15,7 +15,7 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import { connect } from 'react-redux'
 import { getLanguage } from '@opencrvs/client/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
-import { setInitialApplications } from '@client/applications'
+import { setInitialDeclarations } from '@client/declarations'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import {
   getOfflineDataLoaded,
@@ -32,8 +32,8 @@ import { changeLanguage } from '@client/i18n/actions'
 import { Ii18n } from '@client/type/i18n'
 import { USER_DETAILS } from '@client/utils/userUtils'
 import { getDefaultLanguage } from '@client/i18n/utils'
-import { getInitialApplicationsLoaded } from '@client/applications/selectors'
-import { isRegisterFormReady } from '@client/forms/register/application-selectors'
+import { getInitialDeclarationsLoaded } from '@client/declarations/selectors'
+import { isRegisterFormReady } from '@client/forms/register/declaration-selectors'
 import { configLoad } from '@client/offline/actions'
 
 const languageFromProps = ({ language }: IPageProps) => language
@@ -94,14 +94,14 @@ const StyledSpinner = styled(Spinner)`
 
 interface IPageProps {
   language?: string
-  initialApplicationsLoaded: boolean
+  initialDeclarationsLoaded: boolean
   offlineDataLoaded: boolean
   registerFormLoaded: boolean
   loadingError: boolean
 }
 
 interface IDispatchProps {
-  setInitialApplications: () => void
+  setInitialDeclarations: () => void
   checkAuth: typeof checkAuth
   showConfigurationErrorNotification: () => void
   hideConfigurationErrorNotification: () => void
@@ -154,15 +154,15 @@ class Component extends React.Component<
 
   render() {
     const {
-      initialApplicationsLoaded,
+      initialDeclarationsLoaded,
       offlineDataLoaded,
       registerFormLoaded,
       children
     } = this.props
 
-    if (offlineDataLoaded && initialApplicationsLoaded && registerFormLoaded) {
+    if (offlineDataLoaded && initialDeclarationsLoaded && registerFormLoaded) {
       return (
-        <div id="readyApplication">
+        <div id="readyDeclaration">
           <StyledPage {...this.props}>{children}</StyledPage>
         </div>
       )
@@ -175,7 +175,7 @@ class Component extends React.Component<
 const mapStateToProps = (store: IStoreState): IPageProps => {
   return {
     language: getLanguage(store),
-    initialApplicationsLoaded: getInitialApplicationsLoaded(store),
+    initialDeclarationsLoaded: getInitialDeclarationsLoaded(store),
     offlineDataLoaded: getOfflineDataLoaded(store),
     loadingError: getOfflineLoadingError(store),
     registerFormLoaded: isRegisterFormReady(store)
@@ -183,7 +183,7 @@ const mapStateToProps = (store: IStoreState): IPageProps => {
 }
 
 const mapDispatchToProps = {
-  setInitialApplications,
+  setInitialDeclarations,
   checkAuth,
   showConfigurationErrorNotification,
   hideConfigurationErrorNotification,

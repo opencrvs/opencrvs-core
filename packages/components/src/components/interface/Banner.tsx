@@ -57,7 +57,7 @@ export const Banner = ({ text, count, status }: IBannerProps) => {
     <StyledBanner>
       <StyledText>{text}</StyledText>
       <StyledStatus>
-        {status === 'applications' ? (
+        {status === 'declarations' ? (
           <StatusOrange />
         ) : status === 'rejected' ? (
           <StatusRejected />

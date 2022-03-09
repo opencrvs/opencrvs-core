@@ -11,10 +11,10 @@
  */
 import {
   DOWNLOAD_STATUS,
-  makeApplicationReadyToDownload,
-  storeApplication,
-  modifyApplication
-} from '@client/applications'
+  makeDeclarationReadyToDownload,
+  storeDeclaration,
+  modifyDeclaration
+} from '@client/declarations'
 import { Action, Event } from '@client/forms'
 import { checkAuth } from '@client/profile/profileActions'
 import { queries } from '@client/profile/queries'
@@ -261,14 +261,14 @@ describe('OfficeHome sent for review tab related tests', () => {
     const gridTable = await waitForElement(testComponent, GridTable)
 
     const data = gridTable.prop('content')
-    const EXPECTED_DATE_OF_APPLICATION = formattedDuration(
+    const EXPECTED_DATE_OF_DECLARATION = formattedDuration(
       moment(new Date(Number.parseInt(TIME_STAMP)))
     )
 
     expect(data.length).toBe(2)
     expect(data[0].id).toBe('9a55d213-ad9f-4dcd-9418-340f3a7f6269')
     expect(data[0].eventTimeElapsed).toBe('8 years ago')
-    expect(data[0].applicationTimeElapsed).toBe(EXPECTED_DATE_OF_APPLICATION)
+    expect(data[0].declarationTimeElapsed).toBe(EXPECTED_DATE_OF_DECLARATION)
     expect(data[0].name).toBe('Iliyas Khan')
     expect(data[0].trackingId).toBe('BW0UTHR')
     expect(data[0].event).toBe('Birth')
@@ -592,7 +592,7 @@ describe('OfficeHome sent for review tab related tests', () => {
       testComponent = createdTestComponent
     })
 
-    it('downloads application after clicking download button', async () => {
+    it('downloads declaration after clicking download button', async () => {
       const downloadButton = await waitForElement(
         testComponent,
         '#ListItemAction-0-icon'
@@ -627,13 +627,13 @@ describe('OfficeHome sent for review tab related tests', () => {
     })
 
     it('shows error when download is failed', async () => {
-      const downloadedApplication = makeApplicationReadyToDownload(
+      const downloadedDeclaration = makeDeclarationReadyToDownload(
         Event.DEATH,
         'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-        Action.LOAD_REVIEW_APPLICATION
+        Action.LOAD_REVIEW_DECLARATION
       )
-      downloadedApplication.downloadStatus = DOWNLOAD_STATUS.FAILED
-      store.dispatch(storeApplication(downloadedApplication))
+      downloadedDeclaration.downloadStatus = DOWNLOAD_STATUS.FAILED
+      store.dispatch(storeDeclaration(downloadedDeclaration))
 
       testComponent.update()
 
@@ -720,7 +720,7 @@ describe('OfficeHome sent for review tab related tests', () => {
     expect(validate).toHaveLength(1)
   })
 
-  describe.skip('handles download status for possible duplicate application', () => {
+  describe.skip('handles download status for possible duplicate declaration', () => {
     let testComponent: ReactWrapper<{}, {}>
     let createdTestComponent: ReactWrapper<{}, {}>
     beforeAll(async () => {
@@ -781,13 +781,13 @@ describe('OfficeHome sent for review tab related tests', () => {
     })
 
     it('shows review button when download is complete', async () => {
-      const downloadedApplication = makeApplicationReadyToDownload(
+      const downloadedDeclaration = makeDeclarationReadyToDownload(
         Event.DEATH,
         'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-        Action.LOAD_REVIEW_APPLICATION
+        Action.LOAD_REVIEW_DECLARATION
       )
-      downloadedApplication.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
-      store.dispatch(modifyApplication(downloadedApplication))
+      downloadedDeclaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
+      store.dispatch(modifyDeclaration(downloadedDeclaration))
 
       const action = await waitForElement(
         testComponent,
@@ -805,13 +805,13 @@ describe('OfficeHome sent for review tab related tests', () => {
     })
 
     it('shows error when download is failed', async () => {
-      const downloadedApplication = makeApplicationReadyToDownload(
+      const downloadedDeclaration = makeDeclarationReadyToDownload(
         Event.DEATH,
         'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-        Action.LOAD_REVIEW_APPLICATION
+        Action.LOAD_REVIEW_DECLARATION
       )
-      downloadedApplication.downloadStatus = DOWNLOAD_STATUS.FAILED
-      store.dispatch(modifyApplication(downloadedApplication))
+      downloadedDeclaration.downloadStatus = DOWNLOAD_STATUS.FAILED
+      store.dispatch(modifyDeclaration(downloadedDeclaration))
 
       testComponent.update()
 

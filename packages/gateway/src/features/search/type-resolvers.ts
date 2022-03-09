@@ -29,8 +29,8 @@ interface ISearchDataTemplate {
   [key: string]: any
 }
 export interface ISearchCriteria {
-  applicationLocationId?: string
-  applicationLocationHirarchyId?: string
+  declarationLocationId?: string
+  declarationLocationHirarchyId?: string
   status?: string[]
   type?: string[]
   trackingId?: string
@@ -167,7 +167,7 @@ export const searchTypeResolvers: GQLResolver = {
       return searchData.type
     },
     registeredLocationId(searchData: ISearchDataTemplate) {
-      return searchData.applicationLocationId
+      return searchData.declarationLocationId
     },
     eventLocationId(searchData: ISearchDataTemplate) {
       return searchData.eventLocationId

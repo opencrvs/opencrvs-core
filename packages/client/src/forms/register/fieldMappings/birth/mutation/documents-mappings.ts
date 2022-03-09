@@ -24,7 +24,7 @@ export const birthDocumentForWhomFhirMapping = {
   Parent: 'PARENT',
   Other: 'OTHER',
   ChildAge: 'CHILD_AGE',
-  Applicant: 'APPLICANT_ID_PROOF',
+  Informant: 'INFORMANT_ID_PROOF',
   AssignedResponsibilityProof: 'ASSIGNED_RESPONSIBILITY_PROOF',
   LegalGuardianProof: 'LEGAL_GUARDIAN_PROOF',
   WardCouncillorProof: 'WARD_COUNCILLOR_PROOF'
@@ -38,7 +38,7 @@ export const birthSectionMapping = {
   ],
   [BirthSection.Mother]: [birthDocumentForWhomFhirMapping.Mother],
   [BirthSection.Father]: [birthDocumentForWhomFhirMapping.Father],
-  [BirthSection.Applicant]: [birthDocumentForWhomFhirMapping.Applicant],
+  [BirthSection.Informant]: [birthDocumentForWhomFhirMapping.Informant],
   [BirthSection.Parent]: [
     birthDocumentForWhomFhirMapping.Parent,
     birthDocumentForWhomFhirMapping.AssignedResponsibilityProof,
@@ -50,7 +50,7 @@ export const birthSectionTitle = {
   [BirthSection.Child]: 'Child',
   [BirthSection.Mother]: 'Mother',
   [BirthSection.Father]: 'Father',
-  [BirthSection.Applicant]: 'Applicant',
+  [BirthSection.Informant]: 'Informant',
   [BirthSection.Parent]: 'Parent'
 }
 

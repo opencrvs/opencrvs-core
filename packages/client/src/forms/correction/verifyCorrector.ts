@@ -57,7 +57,7 @@ const verifyDeathCorrector: ICertificateCorrectorDefinition = {
   informant: {
     identifierTypeField: 'iDType',
     identifierOtherTypeField: 'iDTypeOther',
-    identifierField: 'applicantID',
+    identifierField: 'informantID',
     nameFields: {
       en: {
         firstNamesField: 'firstNamesEng',

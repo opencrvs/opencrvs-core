@@ -27,15 +27,27 @@ body,
   ${({ theme }) => theme.fonts.text}
   color: ${({ theme }) => theme.colors.neutralD};
   overflow-x: hidden;
-  *:not(i) {
-    font-family: Ubuntu, sans-serif !important;
-  }
   .page-content {
     position: relative;
     height: 100%;
     .table-container {
       height: 100%;
     }
+  }
+
+  @font-face {
+    /* stylelint-disable-next-line opencrvs/no-font-styles */
+    font-family: ${({ theme }) => theme.fonts.semiBoldFont};
+    src: url('/fonts/notosans-semibold-webfont-en.ttf') format('truetype');
+  }
+
+  @font-face {
+    /* stylelint-disable-next-line opencrvs/no-font-styles */
+    font-family: ${({ theme }) => theme.fonts.regularFont};
+    src: url('/fonts/notosans-regular-webfont-en.ttf') format('truetype');
+  }
+  *:not(i) {
+    font-family: ${({ theme }) => theme.fonts.regularFont};
   }
 }
 body,

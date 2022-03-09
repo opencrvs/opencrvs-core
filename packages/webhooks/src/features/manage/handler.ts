@@ -128,10 +128,10 @@ export async function subscribeWebhooksHandler(
           }
         }
       )
-        .then(response => {
+        .then((response) => {
           return response.json()
         })
-        .catch(error => {
+        .catch((error) => {
           return Promise.reject(new Error(` request failed: ${error.message}`))
         })
       if (challenge !== challengeCheck.challenge) {
@@ -189,7 +189,7 @@ export async function listWebhooksHandler(
       })
 
       const sortedEntries: any = []
-      entries.forEach(item => {
+      entries.forEach((item) => {
         const entry = {
           id: item.webhookId,
           callback: item.address,

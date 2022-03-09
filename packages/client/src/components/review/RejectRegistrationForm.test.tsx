@@ -15,21 +15,21 @@ import { createStore } from '@client/store'
 import { createTestComponent } from '@client/tests/util'
 import { RejectRegistrationForm } from '@opencrvs/client/src/components/review/RejectRegistrationForm'
 import { Event } from '@client/forms'
-import { createApplication } from '@client/applications'
+import { createDeclaration } from '@client/declarations'
 
 const { store, history } = createStore()
 const mockHandler = jest.fn()
 
 describe('reject registration form', () => {
   let component: ReactWrapper<{}, {}>
-  const draftApplication = createApplication(Event.BIRTH)
+  const draftDeclaration = createDeclaration(Event.BIRTH)
   beforeEach(async () => {
     component = await createTestComponent(
       <RejectRegistrationForm
         onClose={mockHandler}
         duplicate={true}
         confirmRejectionEvent={mockHandler}
-        application={draftApplication}
+        declaration={draftDeclaration}
         draftId="04ba2b0e-ba38-4049-ad74-332e4ee9fbfe"
         event={Event.BIRTH}
       />,

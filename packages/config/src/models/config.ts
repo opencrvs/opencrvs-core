@@ -42,7 +42,7 @@ export interface IApplicationConfigurationModel extends Document {
   CERTIFICATE_PRINT_HIGHEST_CHARGE: number
   UI_POLLING_INTERVAL: number
   FIELD_AGENT_AUDIT_LOCATIONS: string
-  APPLICATION_AUDIT_LOCATIONS: string
+  DECLARATION_AUDIT_LOCATIONS: string
   INFORMANT_MINIMUM_AGE: number
   HIDE_EVENT_REGISTER_INFORMATION: boolean
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
@@ -109,7 +109,7 @@ const systemSchema = new Schema({
     required: false,
     default: 'DISTRICT'
   },
-  APPLICATION_AUDIT_LOCATIONS: {
+  DECLARATION_AUDIT_LOCATIONS: {
     type: String,
     required: false,
     default: 'DISTRICT'

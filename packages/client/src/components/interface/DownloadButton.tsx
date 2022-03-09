@@ -18,10 +18,10 @@ import { Warning, Download } from '@opencrvs/components/lib/icons'
 import { TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { connect } from 'react-redux'
 import {
-  downloadApplication,
-  makeApplicationReadyToDownload,
+  downloadDeclaration,
+  makeDeclarationReadyToDownload,
   DOWNLOAD_STATUS
-} from '@client/applications'
+} from '@client/declarations'
 import { Event, Action } from '@client/forms'
 import { withApollo, WithApolloClient } from 'react-apollo'
 
@@ -39,7 +39,7 @@ interface DownloadButtonProps extends IntlShapeProps {
 }
 
 interface IDispatchProps {
-  downloadApplication: typeof downloadApplication
+  downloadDeclaration: typeof downloadDeclaration
 }
 
 type HOCProps = IDispatchProps & WithApolloClient<{}>
@@ -70,13 +70,13 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
 
   function initiateDownload() {
     const { event, compositionId, action } = props.downloadConfigs
-    const downloadableApplication = makeApplicationReadyToDownload(
+    const downloadableDeclaration = makeDeclarationReadyToDownload(
       event.toLowerCase() as unknown as Event,
       compositionId,
       action
     )
 
-    props.downloadApplication(downloadableApplication, props.client)
+    props.downloadDeclaration(downloadableDeclaration, props.client)
   }
 
   if (
@@ -125,6 +125,6 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
   )
 }
 
-export const DownloadButton = connect(null, { downloadApplication })(
+export const DownloadButton = connect(null, { downloadDeclaration })(
   injectIntl(withApollo(DownloadButtonComponent))
 )

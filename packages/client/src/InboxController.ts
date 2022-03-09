@@ -11,18 +11,18 @@
  */
 import {
   DOWNLOAD_STATUS,
-  IApplication,
-  modifyApplication,
-  writeApplication,
-  createReviewApplication
-} from '@client/applications'
+  IDeclaration,
+  modifyDeclaration,
+  writeDeclaration,
+  createReviewDeclaration
+} from '@client/declarations'
 import { Action, IForm, IFormData } from '@client/forms'
 import { AppStore } from '@client/store'
 import { client } from '@client/utils/apolloClient'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
 import ApolloClient, { ApolloError } from 'apollo-client'
-import { getRegisterForm } from './forms/register/application-selectors'
+import { getRegisterForm } from './forms/register/declaration-selectors'
 import { gqlToDraftTransformer } from './transformer'
 import { getQueryMapping } from './views/DataProvider/QueryProvider'
 import { RequestHandler } from 'mock-apollo-client'
@@ -37,18 +37,18 @@ interface IActionList {
 }
 
 const ACTION_LIST: IActionList = {
-  [Action.LOAD_REVIEW_APPLICATION]: Action.LOAD_REVIEW_APPLICATION,
-  [Action.LOAD_CERTIFICATE_APPLICATION]: Action.LOAD_CERTIFICATE_APPLICATION
+  [Action.LOAD_REVIEW_DECLARATION]: Action.LOAD_REVIEW_DECLARATION,
+  [Action.LOAD_CERTIFICATE_DECLARATION]: Action.LOAD_CERTIFICATE_DECLARATION
 }
 
 const REQUEST_IN_PROGRESS_STATUS: IActionList = {
-  [Action.LOAD_REVIEW_APPLICATION]: DOWNLOAD_STATUS.DOWNLOADING,
-  [Action.LOAD_CERTIFICATE_APPLICATION]: DOWNLOAD_STATUS.DOWNLOADING
+  [Action.LOAD_REVIEW_DECLARATION]: DOWNLOAD_STATUS.DOWNLOADING,
+  [Action.LOAD_CERTIFICATE_DECLARATION]: DOWNLOAD_STATUS.DOWNLOADING
 }
 
 const SUCCESS_DOWNLOAD_STATUS: IActionList = {
-  [Action.LOAD_REVIEW_APPLICATION]: DOWNLOAD_STATUS.DOWNLOADED,
-  [Action.LOAD_CERTIFICATE_APPLICATION]: DOWNLOAD_STATUS.DOWNLOADED
+  [Action.LOAD_REVIEW_DECLARATION]: DOWNLOAD_STATUS.DOWNLOADED,
+  [Action.LOAD_CERTIFICATE_DECLARATION]: DOWNLOAD_STATUS.DOWNLOADED
 }
 
 export class InboxController {
@@ -69,12 +69,12 @@ export class InboxController {
     }, INTERVAL_TIME)
   }
 
-  private getApplications = () =>
-    this.store.getState().applicationsState.applications || []
+  private getDeclarations = () =>
+    this.store.getState().declarationsState.declarations || []
 
-  private getDownloadableApplications = () => {
-    return this.getApplications().filter(
-      (app: IApplication) =>
+  private getDownloadableDeclarations = () => {
+    return this.getDeclarations().filter(
+      (app: IDeclaration) =>
         app.downloadStatus &&
         ALLOWED_STATUS_FOR_RETRY.includes(app.downloadStatus)
     )
@@ -87,27 +87,27 @@ export class InboxController {
 
     this.syncRunning = true
 
-    const applications = this.getDownloadableApplications()
-    for (const application of applications) {
-      await this.queryData(application)
+    const declarations = this.getDownloadableDeclarations()
+    for (const declaration of declarations) {
+      await this.queryData(declaration)
     }
 
     this.syncRunning = false
   }
 
-  public queryData = async (application: IApplication | undefined) => {
-    if (!application) {
+  public queryData = async (declaration: IDeclaration | undefined) => {
+    if (!declaration) {
       return
     }
 
-    const applicationAction = ACTION_LIST[application.action as string] || null
+    const declarationAction = ACTION_LIST[declaration.action as string] || null
 
     const forms = getRegisterForm(this.store.getState())
 
     const result = getQueryMapping(
-      application.event,
+      declaration.event,
       // @ts-ignore
-      applicationAction
+      declarationAction
     )
     const { query, dataKey } = result || {
       query: null,
@@ -115,53 +115,53 @@ export class InboxController {
     }
 
     const requestInProgressStatus =
-      REQUEST_IN_PROGRESS_STATUS[application.action as string] ||
+      REQUEST_IN_PROGRESS_STATUS[declaration.action as string] ||
       DOWNLOAD_STATUS.DOWNLOADING
-    application.downloadStatus = requestInProgressStatus
-    this.store.dispatch(modifyApplication(application))
-    this.store.dispatch(writeApplication(application))
+    declaration.downloadStatus = requestInProgressStatus
+    this.store.dispatch(modifyDeclaration(declaration))
+    this.store.dispatch(writeDeclaration(declaration))
 
     if (query) {
       try {
         const queryResult = await this.client.query({
           query,
           variables: {
-            id: application.id
+            id: declaration.id
           }
         })
         this.onSuccess(
-          application,
-          forms[application.event],
+          declaration,
+          forms[declaration.event],
           queryResult.data[dataKey as string]
         )
       } catch (exception) {
-        this.onError(application, exception)
+        this.onError(declaration, exception)
       }
     }
   }
 
-  private onSuccess = (application: IApplication, form: IForm, result: any) => {
+  private onSuccess = (declaration: IDeclaration, form: IForm, result: any) => {
     const transData: IFormData = gqlToDraftTransformer(form, result)
-    const app: IApplication = createReviewApplication(
-      application.id,
+    const app: IDeclaration = createReviewDeclaration(
+      declaration.id,
       transData,
-      application.event
+      declaration.event
     )
     app.downloadStatus =
-      SUCCESS_DOWNLOAD_STATUS[application.action as string] ||
+      SUCCESS_DOWNLOAD_STATUS[declaration.action as string] ||
       DOWNLOAD_STATUS.DOWNLOADED
-    this.store.dispatch(modifyApplication(app))
-    this.store.dispatch(writeApplication(app))
+    this.store.dispatch(modifyDeclaration(app))
+    this.store.dispatch(writeDeclaration(app))
   }
 
-  private onError = (application: IApplication, error: ApolloError) => {
-    application.downloadRetryAttempt =
-      (application.downloadRetryAttempt || 0) + 1
+  private onError = (declaration: IDeclaration, error: ApolloError) => {
+    declaration.downloadRetryAttempt =
+      (declaration.downloadRetryAttempt || 0) + 1
 
-    if (application.downloadRetryAttempt < MAX_RETRY_ATTEMPT) {
-      application.downloadStatus = DOWNLOAD_STATUS.READY_TO_DOWNLOAD
-      this.store.dispatch(modifyApplication(application))
-      this.store.dispatch(writeApplication(application))
+    if (declaration.downloadRetryAttempt < MAX_RETRY_ATTEMPT) {
+      declaration.downloadStatus = DOWNLOAD_STATUS.READY_TO_DOWNLOAD
+      this.store.dispatch(modifyDeclaration(declaration))
+      this.store.dispatch(writeDeclaration(declaration))
       return
     }
 
@@ -173,8 +173,8 @@ export class InboxController {
       Sentry.captureException(error)
     }
 
-    application.downloadStatus = status
-    this.store.dispatch(modifyApplication(application))
-    this.store.dispatch(writeApplication(application))
+    declaration.downloadStatus = status
+    this.store.dispatch(modifyDeclaration(declaration))
+    this.store.dispatch(writeDeclaration(declaration))
   }
 }

@@ -55,24 +55,24 @@ const ToolTipContainer = styled.span`
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 25
 const { useState } = React
 interface SortMap {
-  totalApplications: SORT_ORDER
+  totalDeclarations: SORT_ORDER
   name: SORT_ORDER
   startMonth: SORT_ORDER
-  avgCompleteApplicationTime: SORT_ORDER
+  avgCompleteDeclarationTime: SORT_ORDER
   type: SORT_ORDER
   officeName: SORT_ORDER
-  inProgressApplications: SORT_ORDER
-  rejectedApplications: SORT_ORDER
+  inProgressDeclarations: SORT_ORDER
+  rejectedDeclarations: SORT_ORDER
 }
 const INITIAL_SORT_MAP = {
-  totalApplications: SORT_ORDER.DESCENDING,
+  totalDeclarations: SORT_ORDER.DESCENDING,
   name: SORT_ORDER.ASCENDING,
   startMonth: SORT_ORDER.ASCENDING,
-  avgCompleteApplicationTime: SORT_ORDER.ASCENDING,
+  avgCompleteDeclarationTime: SORT_ORDER.ASCENDING,
   type: SORT_ORDER.ASCENDING,
   officeName: SORT_ORDER.ASCENDING,
-  inProgressApplications: SORT_ORDER.ASCENDING,
-  rejectedApplications: SORT_ORDER.ASCENDING
+  inProgressDeclarations: SORT_ORDER.ASCENDING,
+  rejectedDeclarations: SORT_ORDER.ASCENDING
 }
 
 interface ISearchParams {
@@ -154,7 +154,7 @@ function FieldAgentListComponent(props: IProps) {
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
   const [columnToBeSort, setColumnToBeSort] =
-    useState<keyof SortMap>('totalApplications')
+    useState<keyof SortMap>('totalDeclarations')
   const recordCount = DEFAULT_FIELD_AGENT_LIST_SIZE * currentPageNumber
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
@@ -232,59 +232,59 @@ function FieldAgentListComponent(props: IProps) {
         isSorted: columnToBeSort === 'startMonth' ? true : false
       },
       {
-        key: 'totalApplications',
+        key: 'totalDeclarations',
         label: intl.formatMessage(messages.totalSentColumnHeader, {
-          linebreak: <br key={'totalApplications-break'} />
+          linebreak: <br key={'totalDeclarations-break'} />
         }),
         width: 12,
         isSortable: true,
-        sortFunction: () => toggleSort('totalApplications'),
+        sortFunction: () => toggleSort('totalDeclarations'),
         icon:
-          columnToBeSort === 'totalApplications' ? <ArrowDownBlue /> : <></>,
-        isSorted: columnToBeSort === 'totalApplications' ? true : false
+          columnToBeSort === 'totalDeclarations' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'totalDeclarations' ? true : false
       },
       {
-        key: 'inProgressApplications',
+        key: 'inProgressDeclarations',
         label: intl.formatMessage(messages.totalInProgressColumnHeader, {
-          linebreak: <br key={'inProgressApplications-break'} />
+          linebreak: <br key={'inProgressDeclarations-break'} />
         }),
         width: 12,
         isSortable: true,
-        sortFunction: () => toggleSort('inProgressApplications'),
+        sortFunction: () => toggleSort('inProgressDeclarations'),
         icon:
-          columnToBeSort === 'inProgressApplications' ? (
+          columnToBeSort === 'inProgressDeclarations' ? (
             <ArrowDownBlue />
           ) : (
             <></>
           ),
-        isSorted: columnToBeSort === 'inProgressApplications' ? true : false
+        isSorted: columnToBeSort === 'inProgressDeclarations' ? true : false
       },
       {
-        key: 'avgCompleteApplicationTime',
+        key: 'avgCompleteDeclarationTime',
         label: intl.formatMessage(messages.avgCompletionTimeColumnHeader, {
-          linebreak: <br key={'avgCompleteApplicationTime-break'} />
+          linebreak: <br key={'avgCompleteDeclarationTime-break'} />
         }),
         width: 15,
         isSortable: true,
-        sortFunction: () => toggleSort('avgCompleteApplicationTime'),
+        sortFunction: () => toggleSort('avgCompleteDeclarationTime'),
         icon:
-          columnToBeSort === 'avgCompleteApplicationTime' ? (
+          columnToBeSort === 'avgCompleteDeclarationTime' ? (
             <ArrowDownBlue />
           ) : (
             <></>
           ),
-        isSorted: columnToBeSort === 'avgCompleteApplicationTime' ? true : false
+        isSorted: columnToBeSort === 'avgCompleteDeclarationTime' ? true : false
       },
       {
-        key: 'rejectedApplications',
+        key: 'rejectedDeclarations',
         label: intl.formatMessage(messages.totalRejectedColumnHeader),
         width: 10,
         alignment: ColumnContentAlignment.RIGHT,
         isSortable: true,
-        sortFunction: () => toggleSort('rejectedApplications'),
+        sortFunction: () => toggleSort('rejectedDeclarations'),
         icon:
-          columnToBeSort === 'rejectedApplications' ? <ArrowDownBlue /> : <></>,
-        isSorted: columnToBeSort === 'rejectedApplications' ? true : false
+          columnToBeSort === 'rejectedDeclarations' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'rejectedDeclarations' ? true : false
       }
     ]
   }
@@ -300,10 +300,10 @@ function FieldAgentListComponent(props: IProps) {
             type: '',
             officeName: '',
             startMonth: '',
-            totalApplications: '',
-            inProgressApplications: '',
-            avgCompleteApplicationTime: '',
-            rejectedApplications: ''
+            totalDeclarations: '',
+            inProgressDeclarations: '',
+            avgCompleteDeclarationTime: '',
+            rejectedDeclarations: ''
           }
         }
         const office =
@@ -314,19 +314,19 @@ function FieldAgentListComponent(props: IProps) {
           type: row.type,
           officeName: (office && office.displayLabel) || '',
           startMonth: row.creationDate,
-          totalApplications: String(row.totalNumberOfApplicationStarted),
-          inProgressApplications: `${
+          totalDeclarations: String(row.totalNumberOfDeclarationStarted),
+          inProgressDeclarations: `${
             row.totalNumberOfInProgressAppStarted
           } (${getPercentage(
-            row.totalNumberOfApplicationStarted,
+            row.totalNumberOfDeclarationStarted,
             row.totalNumberOfInProgressAppStarted
           )}%)`,
-          avgCompleteApplicationTime: row.averageTimeForDeclaredApplications,
-          rejectedApplications: `${
-            row.totalNumberOfRejectedApplications
+          avgCompleteDeclarationTime: row.averageTimeForDeclaredDeclarations,
+          rejectedDeclarations: `${
+            row.totalNumberOfRejectedDeclarations
           } (${getPercentage(
-            row.totalNumberOfApplicationStarted,
-            row.totalNumberOfRejectedApplications
+            row.totalNumberOfDeclarationStarted,
+            row.totalNumberOfRejectedDeclarations
           )}%)`
         }
       })
@@ -345,11 +345,11 @@ function FieldAgentListComponent(props: IProps) {
               (row.startMonth &&
                 moment(Number(row.startMonth)).format('MMMM YYYY')) ||
               '',
-            avgCompleteApplicationTime:
-              row.avgCompleteApplicationTime === 0
+            avgCompleteDeclarationTime:
+              row.avgCompleteDeclarationTime === 0
                 ? '-'
                 : getAverageCompletionTimeComponent(
-                    Number(row.avgCompleteApplicationTime),
+                    Number(row.avgCompleteDeclarationTime),
                     idx
                   )
           }
