@@ -26,17 +26,6 @@ export interface IFonts {
   reg16: string
   reg14: string
   reg12: string
-
-  // englishTextFont: string
-  // reg12: string
-  // bold14: string
-  // reg14: string
-  // reg14: string
-  // reg14: string
-  // reg16: string
-  // bold12: string
-  // bold14: string
-  // reg14: string
 }
 
 // TODO: we need a way to load fonts for other languages without recompiling
