@@ -18,7 +18,7 @@ import {
   requestNewCertificate,
   updateCertificate,
   updateCertificateHandler
-} from '@config/handlers/declarationCertificateHandler'
+} from '@config/handlers/certificate/certificateHandler'
 import applicationConfigHandler from '@config/handlers/applicationConfigHandler'
 import createQuestionHandler, {
   requestSchema as createQuestionReqSchema
