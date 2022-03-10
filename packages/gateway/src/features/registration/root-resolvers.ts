@@ -39,7 +39,7 @@ import {
 } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
 import { COUNTRY_CONFIG_URL, FHIR_URL, SEARCH_URL } from '@gateway/constants'
-import { cloneDeep } from 'lodash'
+import { updateTaskTemplate } from '@gateway/features/fhir/templates'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -432,8 +432,8 @@ export const resolvers: GQLResolver = {
           return await Promise.reject(new Error('Task has no reg-status code'))
         }
 
-        const taskBundleWithReinstatedExtension = addOrUpdateExtension(
-          cloneDeep(taskEntryData),
+        const newTaskBundle = addOrUpdateExtension(
+          taskEntryData,
           {
             url: REINSTATED_EXTENSION_URL,
             valueString: regStatusCode
@@ -441,23 +441,18 @@ export const resolvers: GQLResolver = {
           'reinstated'
         )
 
-        await fetchFHIR(
-          '/Task',
-          authHeader,
-          'PUT',
-          JSON.stringify(taskBundleWithReinstatedExtension)
-        )
-
-        const newTaskBundle = await updateFHIRTaskBundle(
-          taskEntryData,
+        newTaskBundle.entry[0].resource = updateTaskTemplate(
+          newTaskBundle.entry[0].resource,
           regStatusCode
         )
+
         await fetchFHIR(
           '/Task',
           authHeader,
           'PUT',
           JSON.stringify(newTaskBundle)
         )
+
         return { taskEntryResourceID, registrationStatus: regStatusCode }
       } else {
         return await Promise.reject(

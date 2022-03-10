@@ -25,9 +25,9 @@ import {
   CHILD_SECTION_CODE,
   DECEASED_SECTION_CODE,
   BIRTH_CORRECTION_ENCOUNTERS_SECTION_CODE,
-  DEATH_CORRECTION_ENCOUNTERS_SECTION_CODE,
-  REINSTATED_EXTENSION_URL
+  DEATH_CORRECTION_ENCOUNTERS_SECTION_CODE
 } from '@workflow/features/registration/fhir/constants'
+import { REINSTATED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import { Events } from '@workflow/features/events/handler'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
 
@@ -206,7 +206,7 @@ export function getTaskEventType(task: fhir.Task) {
   }
 }
 
-function getTaskBusinessStatus(taskResource: fhir.Task) {
+export function getTaskBusinessStatus(taskResource: fhir.Task) {
   return taskResource.businessStatus?.coding?.[0]?.code
 }
 

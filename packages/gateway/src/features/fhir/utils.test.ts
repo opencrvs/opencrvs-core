@@ -15,7 +15,7 @@ import {
   removeDuplicatesFromComposition,
   selectOrCreateInformantSection,
   setInformantReference,
-  getExtensionStatus
+  getDownloadedExtensionStatus
 } from '@gateway/features/fhir/utils'
 import {
   FATHER_CODE,
@@ -31,6 +31,8 @@ import { ITemplatedBundle } from '@gateway/features/registration/fhir-builders'
 import { clone, cloneDeep } from 'lodash'
 import { logger } from '@gateway/logger'
 import * as fetchAny from 'jest-fetch-mock'
+import { DOWNLOADED_EXTENSION_URL } from '@gateway/features/fhir/constants'
+
 const fetch = fetchAny as any
 
 describe('Fhir util function testing', () => {
@@ -254,23 +256,25 @@ describe('Fhir util function testing', () => {
     })
   })
 
-  describe('getExtensionStatus()', () => {
+  describe('getDownloadedExtensionStatus()', () => {
     const task = {
       ...mockTask,
       extension: [
         {
-          url: 'test-url',
+          url: DOWNLOADED_EXTENSION_URL,
           valueString: 'test-value'
         }
       ]
     }
 
     it('should return the status if the extension was found', () => {
-      expect(getExtensionStatus(task, 'test-url')).toBe('test-value')
+      expect(getDownloadedExtensionStatus(task)).toBe('test-value')
     })
 
     it('should return undefined if the extension was not found', () => {
-      expect(getExtensionStatus(task, 'dummy-url')).toBeUndefined()
+      expect(
+        getDownloadedExtensionStatus({ ...task, extension: [] }, 'dummy-url')
+      ).toBeUndefined()
     })
   })
 })

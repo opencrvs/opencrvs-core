@@ -21,7 +21,7 @@ import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
 import { cloneDeep } from 'lodash'
-import { getStatusFromTask } from '@gateway/features/fhir/utils'
+import { getStatusFromTask, findExtension } from '@gateway/features/fhir/utils'
 
 const fetch = fetchAny as any
 
@@ -1039,7 +1039,6 @@ describe('Registration root resolvers', () => {
       fetch.mockResponses(
         [JSON.stringify(archivedTaskBundle)],
         [JSON.stringify(taskHistoryBundle)],
-        [JSON.stringify({})],
         [JSON.stringify({})]
       )
       await resolvers.Mutation.markEventAsReinstated(
@@ -1048,12 +1047,11 @@ describe('Registration root resolvers', () => {
         authHeaderRegCert
       )
       expect(fetch.mock.calls[0][0]).toContain(archivedTaskBundle.id)
-      expect(fetch.mock.calls[2][1].body).toContain(REINSTATED_EXTENSION_URL)
+      const task = JSON.parse(fetch.mock.calls[2][1].body).entry[0].resource
       expect(
-        getStatusFromTask(
-          JSON.parse(fetch.mock.calls[3][1].body).entry[0].resource
-        )
-      ).toBe('DECLARED')
+        findExtension(REINSTATED_EXTENSION_URL, task.extension)
+      ).not.toBeUndefined()
+      expect(getStatusFromTask(task)).toBe('DECLARED')
     })
 
     it('throws error if user does not have register or validate scope', async () => {

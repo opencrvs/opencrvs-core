@@ -25,7 +25,7 @@ import {
   officeMock
 } from '@workflow/test/utils'
 import { Events } from '@workflow/features/events/handler'
-import { REINSTATED_EXTENSION_URL } from '@workflow/features/registration/fhir/constants'
+import { REINSTATED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 
 import * as fetchAny from 'jest-fetch-mock'
 
