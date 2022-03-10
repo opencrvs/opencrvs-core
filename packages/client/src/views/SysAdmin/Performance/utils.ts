@@ -19,7 +19,7 @@ import { IUserDetails } from '@client/utils/userUtils'
 import { ILocation } from '@client/offline/reducer'
 
 export const Header = styled.h1`
-  color: ${({ theme }) => theme.colors.menuBackground};
+  color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.h2};
 `
 
@@ -44,7 +44,7 @@ export const SubHeader = styled.div`
 
 export const Description = styled.div`
   margin: 8px 0px;
-  color: ${({ theme }) => theme.colors.placeholder};
+  color: ${({ theme }) => theme.colors.supportingCopy};
   ${({ theme }) => theme.fonts.reg16};
 `
 

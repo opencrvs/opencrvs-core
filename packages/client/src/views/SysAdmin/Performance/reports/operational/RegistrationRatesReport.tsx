@@ -56,12 +56,12 @@ const Reports = styled.div<{ loading?: boolean }>`
 `
 
 const KeyNumber = styled.div`
-  color: ${({ theme }) => theme.colors.menuBackground};
+  color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.h1};
   margin: 0px 0px -16px 0px;
 `
 const KeyNumberDescription = styled.div`
-  color: ${({ theme }) => theme.colors.menuBackground};
+  color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.reg14};
   margin: 16px 0px;
 `
@@ -71,11 +71,11 @@ const Pair = styled.div`
   flex-wrap: no-wrap;
 `
 const Label = styled.span`
-  color: ${({ theme }) => theme.colors.menuBackground};
+  color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.reg14};
 `
 const Value = styled.span`
-  color: ${({ theme }) => theme.colors.menuBackground};
+  color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.bold14};
 `
 

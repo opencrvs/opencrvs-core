@@ -85,7 +85,7 @@ const KeyNumber = styled.div`
 `
 
 const KeyPercentage = styled.span`
-  color: ${({ theme }) => theme.colors.placeholder};
+  color: ${({ theme }) => theme.colors.supportingCopy};
   ${({ theme }) => theme.fonts.reg16};
   margin: 16px 10px;
 `

@@ -32,7 +32,7 @@ const ScreenBlocker = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: ${({ theme }) => theme.colors.menuBackground};
+  background-color: ${({ theme }) => theme.colors.copy};
   opacity: 0.8;
 `
 const ModalContent = styled.div<{

@@ -35,7 +35,7 @@ const StyledList = styled.ul`
   width: 100%;
 `
 const ResultsText = styled.div`
-  color: ${({ theme }) => theme.colors.placeholder};
+  color: ${({ theme }) => theme.colors.supportingCopy};
   ${({ theme }) => theme.fonts.bold16};
   margin: 10px 0;
 `

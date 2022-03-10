@@ -27,7 +27,7 @@ const StyledStatus = styled.span`
   align-items: center;
   height: 32px;
   & span {
-    color: ${({ theme }) => theme.colors.placeholder};
+    color: ${({ theme }) => theme.colors.supportingCopy};
     text-transform: uppercase;
     margin-left: 5px;
   }

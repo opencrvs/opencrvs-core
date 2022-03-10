@@ -34,7 +34,7 @@ import { buttonMessages } from '@client/i18n/messages'
 
 export const PageWrapper = styled.div`
   ${({ theme }) => theme.fonts.bold16};
-  ${({ theme }) => theme.gradients.gradientNightshade};
+  ${({ theme }) => theme.colors.primary};
   ${['ZMB', 'FAR'].includes(window.config.COUNTRY.toUpperCase())
     ? `background: url(${zambiaBackground});`
     : ''}

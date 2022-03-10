@@ -60,7 +60,7 @@ const Value = styled.div`
 
 const PlaceHolder = styled.div`
   ${({ theme }) => theme.fonts.reg16};
-  color: ${({ theme }) => theme.colors.placeholder};
+  color: ${({ theme }) => theme.colors.supportingCopy};
   flex: 1;
 `
 const Action = styled.div`

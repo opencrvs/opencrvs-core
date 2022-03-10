@@ -28,7 +28,7 @@ const SearchTextInput = styled.input`
   border: none;
   margin: 0px 10px;
   ${({ theme }) => theme.fonts.reg16};
-  background-color: ${({ theme }) => theme.colors.grey300};
+  background-color: ${({ theme }) => theme.colors.grey200};
   flex-grow: 1;
   &:focus {
     outline: none;
@@ -44,8 +44,8 @@ export const LabelButton = styled(Button)`
   width: auto;
   height: auto;
   border-radius: 2px;
-  color: ${({ theme }) => theme.colors.secondary};
-  ${({ theme }) => theme.fonts.bold16};
+  color: ${({ theme }) => theme.colors.primary};
+  ${({ theme }) => theme.fonts.bold14};
 `
 
 const DropDownWrapper = styled.ul`
@@ -70,7 +70,7 @@ const DropDownItem = styled.li`
     border-bottom: none;
   }
   &:hover {
-    background: ${({ theme }) => theme.colors.secondary};
+    background: ${({ theme }) => theme.colors.primary};
   }
   &:hover span {
     color: ${({ theme }) => theme.colors.white};
@@ -91,8 +91,8 @@ const SelectedSearchCriteria = styled.span`
   background: ${({ theme }) => theme.colors.gray300};
   border-radius: 2px;
   padding: 5px 10px;
-  color: ${({ theme }) => theme.colors.secondary};
-  ${({ theme }) => theme.fonts.bold16};
+  color: ${({ theme }) => theme.colors.primary};
+  ${({ theme }) => theme.fonts.bold14};
   display: flex;
   & .selected-icon {
     display: none;

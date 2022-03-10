@@ -183,7 +183,7 @@ const LocationInfoValue = styled.div`
 `
 
 const LocationInfoEmptyValue = styled.div`
-  color: ${({ theme }) => theme.colors.placeholder};
+  color: ${({ theme }) => theme.colors.supportingCopy};
   ${({ theme }) => theme.fonts.reg16};
 `
 
