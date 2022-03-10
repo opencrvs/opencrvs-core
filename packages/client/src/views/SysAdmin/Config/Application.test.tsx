@@ -27,30 +27,20 @@ const { store, history } = createStore()
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 let testComponent: ReactWrapper
 beforeEach(async () => {
-  configApplicationMutations.updateApplicationName = jest.fn(
+  configApplicationMutations.mutateApplicationConfig = jest.fn(
     () =>
       new Promise((resolve) =>
         resolve({
           data: {
             updateApplicationConfig: {
-              APPLICATION_NAME: 'OPENCRVS'
-            }
-          }
-        })
-      )
-  )
-  configApplicationMutations.updateNidPattern = jest.fn(
-    () =>
-      new Promise((resolve) =>
-        resolve({
-          data: {
-            updateApplicationConfig: {
+              APPLICATION_NAME: 'OPENCRVS',
               NID_NUMBER_PATTERN: '/^[0-9]{10}$/'
             }
           }
         })
       )
   )
+
   testComponent = await createTestComponent(
     <ApplicationConfig></ApplicationConfig>,
     { store, history }
@@ -74,8 +64,7 @@ describe('application name update test', () => {
       Promise.resolve({
         ...mockConfigResponse,
         config: {
-          ...mockConfigResponse.config,
-          APPLICATION_NAME: 'OPENCRVS'
+          ...mockConfigResponse.config
         }
       })
     )
