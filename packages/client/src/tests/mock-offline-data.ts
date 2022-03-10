@@ -341,8 +341,8 @@ export const mockOfflineData = {
     BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
     COUNTRY: 'bgd',
     CURRENCY: {
-      isoCode: 'Pound sterling',
-      languagesAndCountry: ['en-US']
+      isoCode: 'ZMW',
+      languagesAndCountry: ['en-ZM']
     },
     COUNTRY_LOGO_FILE: 'logo.png',
     PHONE_NUMBER_PATTERN: {

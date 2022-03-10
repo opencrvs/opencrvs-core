@@ -127,8 +127,8 @@ const navigatorMock = {
   APPLICATION_NAME: 'Farajaland CRVS',
   COUNTRY: 'bgd',
   CURRENCY: {
-    isoCode: 'Pound sterling',
-    languagesAndCountry: ['en-US']
+    isoCode: 'ZMW',
+    languagesAndCountry: ['en-ZM']
   },
   LANGUAGES: 'en,bn',
   CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 45,

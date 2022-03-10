@@ -60,8 +60,8 @@ export const mockFetchConfig = {
     },
     COUNTRY: 'zmb',
     CURRENCY: {
-      isoCode: 'Pound sterling',
-      languagesAndCountry: ['en-US']
+      isoCode: 'ZMW',
+      languagesAndCountry: ['en-ZM']
     },
     LANGUAGES: 'en'
   },
