@@ -20,7 +20,7 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from '@client/styledComponents'
-import { InputField, TextInput } from '@opencrvs/components/lib/forms'
+import { InputField, TextInput, Select } from '@opencrvs/components/lib/forms'
 import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { Alert } from '@opencrvs/components/lib/icons/Alert'
@@ -29,6 +29,8 @@ import { updateOfflineConfigData } from '@client/offline/actions'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
+import { countries as countryList, lookup } from 'country-data'
+import { orderBy, uniqBy } from 'lodash'
 
 const Message = styled.div`
   margin-bottom: 16px;
@@ -81,6 +83,7 @@ type IApplicationName = {
 }
 type State = {
   applicationName: string
+  currency: string
   updatingValue: boolean
   errorOccured: boolean
   errorMessages: string
@@ -94,6 +97,21 @@ interface IProps {
     notificationStatus: NOTIFICATION_TYPE,
     messages: string
   ) => void
+}
+
+type ICountrylist = {
+  alpha2: string
+  alpha3: string
+  countryCallingCodes: string[]
+  currencies: string[]
+  emoji: string
+  ioc: string
+  languages: string[]
+  name: string
+  status: string
+}
+interface ICurrencyOptions {
+  [key: string]: string
 }
 
 type DispatchProps = {
@@ -112,7 +130,9 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
   constructor(props: IFullProps) {
     super(props)
     this.state = {
-      applicationName: EMPTY_STRING,
+      applicationName:
+        this.props.offlineCountryConfiguration.config.APPLICATION_NAME,
+      currency: `${this.props.offlineCountryConfiguration.config.CURRENCY.languagesAndCountry[0]}-${this.props.offlineCountryConfiguration.config.CURRENCY.isoCode}`,
       updatingValue: false,
       errorOccured: false,
       errorMessages: EMPTY_STRING
@@ -189,14 +209,62 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
     }
   }
 
+  getCurrencySelectOptions() {
+    const currencyOptions = [] as ICurrencyOptions[]
+    countryList.all.map((element: ICountrylist) => {
+      const countryLanguage = lookup.languages({
+        alpha3: element.languages[0]
+      })
+      const countryCurrency = lookup.currencies({
+        code: element.currencies[0]
+      })
+
+      if (Boolean(element.currencies.length) && Boolean(countryLanguage[0])) {
+        currencyOptions.push({
+          value: `${countryLanguage[0].alpha2}-${element.alpha2}-${element.currencies[0]}`,
+          label: countryCurrency[0].name
+        })
+      }
+    })
+    const uniqCurrencyOptions = uniqBy(currencyOptions, 'label')
+    const sortedCountryOptions = orderBy(
+      uniqCurrencyOptions,
+      ['label'],
+      ['asc']
+    )
+    return sortedCountryOptions
+  }
+
+  getTitle() {
+    const { intl, changeModalName } = this.props
+    if (changeModalName === GeneralActionId.APPLICATION_NAME)
+      return intl.formatMessage(messages.applicationNameLabel)
+    else if (changeModalName === GeneralActionId.CURRENCY)
+      return intl.formatMessage(messages.currencyLable)
+    else return EMPTY_STRING
+  }
+
+  isApplyButtonDisable() {
+    const { changeModalName } = this.props
+    if (changeModalName === GeneralActionId.APPLICATION_NAME) {
+      return !Boolean(this.state.applicationName)
+    } else if (changeModalName === GeneralActionId.CURRENCY) {
+      return !Boolean(this.state.currency)
+    } else return true
+  }
+
   render() {
     const { intl, changeModalName, toggleConfigModal, valueChanged } =
       this.props
+
     return (
       <ResponsiveModal
         id={`${changeModalName}Modal`}
-        title={intl.formatMessage(messages.applicationNameLabel)}
+        title={this.getTitle()}
         show={this.showChangeModal}
+        contentScrollableY={
+          changeModalName === GeneralActionId.CURRENCY ? true : false
+        }
         actions={[
           <CancelButton
             key="cancel"
@@ -208,7 +276,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
           <ApplyButton
             key="apply"
             id="apply_change"
-            disabled={!Boolean(this.state.applicationName.length)}
+            disabled={this.isApplyButtonDisable()}
             onClick={() => {
               this.mutationHandler(
                 changeModalName,
@@ -224,7 +292,11 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
         contentHeight={175}
       >
         <Message>
-          {intl.formatMessage(messages.applicationNameChangeMessage)}
+          {changeModalName === GeneralActionId.APPLICATION_NAME
+            ? intl.formatMessage(messages.applicationNameChangeMessage)
+            : changeModalName === GeneralActionId.CURRENCY
+            ? intl.formatMessage(messages.applicationCurrencyChangeMessage)
+            : EMPTY_STRING}
         </Message>
         {this.state.errorOccured && (
           <ErrorContent>
@@ -244,6 +316,29 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
                   error={false}
                   value={this.state.applicationName}
                   onChange={this.setApplicationName}
+                />
+              </InputField>
+            </Field>
+          </Content>
+        )}
+        {changeModalName === GeneralActionId.CURRENCY && (
+          <Content>
+            <Field>
+              <InputField
+                id="applicationCurrency"
+                touched={true}
+                required={false}
+              >
+                <Select
+                  isDisabled={false}
+                  onChange={(val: string) => {
+                    this.setState({
+                      currency: val
+                    })
+                  }}
+                  value={this.state.currency}
+                  onFocus={() => {}}
+                  options={this.getCurrencySelectOptions()}
                 />
               </InputField>
             </Field>
