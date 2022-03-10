@@ -12,10 +12,8 @@
 import {
   OPENCRVS_SPECIFICATION_URL,
   CHILD_SECTION_CODE,
-  REG_STATUS_DECLARED,
-  REG_STATUS_REGISTERED,
+  RegStatus,
   EVENT_TYPE,
-  REG_STATUS_VALIDATED,
   DECEASED_SECTION_CODE
 } from '@workflow/features/registration/fhir/constants'
 import { HEARTH_URL, getDefaultLanguage } from '@workflow/constants'
@@ -196,11 +194,11 @@ export function getRegStatusCode(tokenPayload: ITokenPayload) {
     throw new Error('No scope found on token')
   }
   if (tokenPayload.scope.indexOf(USER_SCOPE.REGISTER.toString()) > -1) {
-    return REG_STATUS_REGISTERED
+    return RegStatus.REGISTERED
   } else if (tokenPayload.scope.indexOf(USER_SCOPE.DECLARE.toString()) > -1) {
-    return REG_STATUS_DECLARED
+    return RegStatus.DECLARED
   } else if (tokenPayload.scope.indexOf(USER_SCOPE.VALIDATE.toString()) > -1) {
-    return REG_STATUS_VALIDATED
+    return RegStatus.VALIDATED
   } else {
     throw new Error('No valid scope found on token')
   }

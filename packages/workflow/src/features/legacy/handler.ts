@@ -11,7 +11,7 @@
  */
 import * as Hapi from '@hapi/hapi'
 import {
-  REG_STATUS_REGISTERED,
+  RegStatus,
   CHILD_SECTION_CODE,
   DECEASED_SECTION_CODE,
   EVENT_TYPE,
@@ -41,7 +41,7 @@ export async function updatePatientRegistrationNumberHandler(
     throw unauthorized()
   }
   const taskBundle: fhir.Bundle = await getFromFhir(
-    `/Task?business-status=${REG_STATUS_REGISTERED}&_count=0`
+    `/Task?business-status=${RegStatus.REGISTERED}&_count=0`
   )
   if (!taskBundle || !taskBundle.entry) {
     throw new Error('No task found on search')

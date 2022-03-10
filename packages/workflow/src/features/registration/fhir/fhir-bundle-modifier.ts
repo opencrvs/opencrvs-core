@@ -12,14 +12,7 @@
 import {
   EVENT_TYPE,
   OPENCRVS_SPECIFICATION_URL,
-  REG_STATUS_CERTIFIED,
-  REG_STATUS_DECLARED,
-  REG_STATUS_IN_PROGRESS,
-  REG_STATUS_VALIDATED,
-  REG_STATUS_WAITING_VALIDATION,
-  REG_STATUS_REGISTERED,
-  REG_STATUS_DECLARATION_UPDATED,
-  REG_STATUS_REQUESTED_CORRECTION
+  RegStatus
 } from '@workflow/features/registration/fhir/constants'
 import {
   getTaskResource,
@@ -75,8 +68,8 @@ export async function modifyRegistrationBundle(
     taskResource,
     getTokenPayload(token),
     isInProgressApplication(fhirBundle)
-      ? REG_STATUS_IN_PROGRESS
-      : REG_STATUS_DECLARED
+      ? RegStatus.IN_PROGRESS
+      : RegStatus.DECLARED
   )
 
   const practitioner = await getLoggedInPractitionerResource(token)
@@ -105,7 +98,7 @@ export async function markBundleAsValidated(
   await setupRegistrationWorkflow(
     taskResource,
     getTokenPayload(token),
-    REG_STATUS_VALIDATED
+    RegStatus.VALIDATED
   )
 
   await setupLastRegLocation(taskResource, practitioner)
@@ -126,7 +119,7 @@ export async function markBundleAsRequestedForCorrection(
   await setupRegistrationWorkflow(
     taskResource,
     getTokenPayload(token),
-    REG_STATUS_REQUESTED_CORRECTION
+    RegStatus.REQUESTED_CORRECTION
   )
 
   await setupLastRegLocation(taskResource, practitioner)
@@ -166,7 +159,7 @@ export async function markBundleAsWaitingValidation(
   await setupRegistrationWorkflow(
     taskResource,
     getTokenPayload(token),
-    REG_STATUS_WAITING_VALIDATION
+    RegStatus.WAITING_VALIDATION
   )
 
   /* setting lastRegLocation here */
@@ -190,7 +183,7 @@ export async function markBundleAsDeclarationUpdated(
   await setupRegistrationWorkflow(
     taskResource,
     getTokenPayload(token),
-    REG_STATUS_DECLARATION_UPDATED
+    RegStatus.DECLARATION_UPDATED
   )
 
   /* setting lastRegLocation here */
@@ -227,7 +220,7 @@ export async function markEventAsRegistered(
   await setupRegistrationWorkflow(
     taskResource,
     getTokenPayload(token),
-    REG_STATUS_REGISTERED
+    RegStatus.REGISTERED
   )
 
   return taskResource
@@ -245,7 +238,7 @@ export async function markBundleAsCertified(
   await setupRegistrationWorkflow(
     taskResource,
     getTokenPayload(token),
-    REG_STATUS_CERTIFIED
+    RegStatus.CERTIFIED
   )
 
   /* setting lastRegLocation here */
@@ -484,7 +477,7 @@ export async function checkForDuplicateStatusUpdate(taskResource: fhir.Task) {
     !taskResource ||
     !taskResource.id ||
     !regStatusCode ||
-    regStatusCode.code === REG_STATUS_CERTIFIED
+    regStatusCode.code === RegStatus.CERTIFIED
   ) {
     return
   }
