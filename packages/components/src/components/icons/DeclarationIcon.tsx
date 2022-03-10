@@ -11,14 +11,14 @@
  */
 import * as React from 'react'
 
-export const ApplicationIcon = (props: React.HTMLAttributes<SVGElement>) => {
+export const DeclarationIcon = (props: React.HTMLAttributes<SVGElement>) => {
   let fill: string
   let corner: string
 
   switch (props.color) {
     case 'green':
-      fill = 'lightgreen'
-      corner = 'green'
+      fill = '#A4DBC6'
+      corner = '#49B78D'
       break
     case 'orange':
       fill = '#F8D8B0'
@@ -41,34 +41,48 @@ export const ApplicationIcon = (props: React.HTMLAttributes<SVGElement>) => {
       corner = '#8049B7'
   }
   return (
-    <svg width={20} height={28} fill="none" {...props}>
+    <svg width={24} height={24} fill="none" {...props}>
       <path
-        d="M0 5a1 1 0 0 1 1-1h9.804L18 11.209V27a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V5z"
+        d="M6 5C6 4.44772 6.44772 4 7 4L13.2027 4L18 8.80602V19C18 19.5523 17.5523 20 17 20H7C6.44772 20 6 19.5523 6 19V5Z"
         fill={fill}
       />
-      <g filter="url(#prefix__filter0_d)">
-        <path d="M10.8 4l7.2 7.2h-7.2V4z" fill={corner} />
+      <g filter="url(#filter0_d_5261_5601)">
+        <path d="M13.2 4L18 8.8H13.2V4Z" fill={fill} />
       </g>
       <defs>
         <filter
-          id="prefix__filter0_d"
-          x={4.8}
-          y={0}
-          width={19.2}
-          height={19.2}
+          id="filter0_d_5261_5601"
+          x={9.20001}
+          y={2}
+          width={12.8}
+          height={12.8}
           filterUnits="userSpaceOnUse"
-          colorInterpolationFilters="sRGB"
+          color-interpolation-filters="sRGB"
         >
-          <feFlood floodOpacity={0} result="BackgroundImageFix" />
+          <feFlood flood-opacity="0" result="BackgroundImageFix" />
           <feColorMatrix
             in="SourceAlpha"
+            type="matrix"
             values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+            result="hardAlpha"
           />
-          <feOffset dy={2} />
-          <feGaussianBlur stdDeviation={3} />
-          <feColorMatrix values="0 0 0 0 0.207843 0 0 0 0 0.263216 0 0 0 0 0.364706 0 0 0 0.32 0" />
-          <feBlend in2="BackgroundImageFix" result="effect1_dropShadow" />
-          <feBlend in="SourceGraphic" in2="effect1_dropShadow" result="shape" />
+          <feOffset dy="2" />
+          <feGaussianBlur stdDeviation="2" />
+          <feColorMatrix
+            type="matrix"
+            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.24 0"
+          />
+          <feBlend
+            mode="normal"
+            in2="BackgroundImageFix"
+            result="effect1_dropShadow_5261_5601"
+          />
+          <feBlend
+            mode="normal"
+            in="SourceGraphic"
+            in2="effect1_dropShadow_5261_5601"
+            result="shape"
+          />
         </filter>
       </defs>
     </svg>

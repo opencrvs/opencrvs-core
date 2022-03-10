@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { createTestComponent } from '@client/tests/util'
-import { StatusWiseApplicationCountView } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseApplicationCountView'
+import { StatusWiseDeclarationCountView } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
 import { StatusMapping } from '@client/views/SysAdmin/Performance/OperationalReport'
 import { createStore } from '@client/store'
 import * as React from 'react'
@@ -27,7 +27,7 @@ describe('Status wise registration count', () => {
 
   it('renders loading indicator', async () => {
     const component = await createTestComponent(
-      <StatusWiseApplicationCountView
+      <StatusWiseDeclarationCountView
         loading={true}
         locationId={'c879ce5c-545b-4042-98a6-77015b0e13df'}
         statusMapping={StatusMapping}
@@ -56,7 +56,7 @@ describe('Status wise registration count', () => {
         total: 15
       }
       component = await createTestComponent(
-        <StatusWiseApplicationCountView
+        <StatusWiseDeclarationCountView
           data={data}
           locationId={'c879ce5c-545b-4042-98a6-77015b0e13df'}
           statusMapping={StatusMapping}

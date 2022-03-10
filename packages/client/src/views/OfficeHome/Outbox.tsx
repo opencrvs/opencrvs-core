@@ -25,7 +25,7 @@ import { StatusWaiting } from '@opencrvs/components/lib/icons'
 import { messages } from '@client/i18n/messages/views/notifications'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import styled from '@client/styledComponents'
-import { IApplication, SUBMISSION_STATUS } from '@client/applications'
+import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import { getDefaultLanguage } from '@client/i18n/utils'
 const Container = styled(BodyContent)`
   padding-top: 32px;
@@ -35,7 +35,7 @@ interface IState {
   sentForReviewPageNo: number
 }
 interface IProps {
-  application: IApplication[]
+  declaration: IDeclaration[]
   showPaginated?: boolean
 }
 type IFullProps = IProps & IntlShapeProps
@@ -123,61 +123,61 @@ class Outbox extends React.Component<IFullProps, IState> {
     }
   }
 
-  transformApplicationsReadyToSend = () => {
+  transformDeclarationsReadyToSend = () => {
     const { intl } = this.props
-    const allapplications = this.props.application || []
-    return allapplications.map((application, index) => {
+    const alldeclarations = this.props.declaration || []
+    return alldeclarations.map((declaration, index) => {
       let name
-      if (application.event && application.event.toString() === 'birth') {
+      if (declaration.event && declaration.event.toString() === 'birth') {
         name =
-          (application.data &&
-            application.data.child &&
-            application.data.child.familyNameEng &&
-            (!application.data.child.firstNamesEng
+          (declaration.data &&
+            declaration.data.child &&
+            declaration.data.child.familyNameEng &&
+            (!declaration.data.child.firstNamesEng
               ? ''
-              : application.data.child.firstNamesEng + ' ') +
-              application.data.child.familyNameEng) ||
-          (application.data &&
-            application.data.child &&
-            application.data.child.familyName &&
-            (!application.data.child.firstNames
+              : declaration.data.child.firstNamesEng + ' ') +
+              declaration.data.child.familyNameEng) ||
+          (declaration.data &&
+            declaration.data.child &&
+            declaration.data.child.familyName &&
+            (!declaration.data.child.firstNames
               ? ''
-              : application.data.child.firstNames + ' ') +
-              application.data.child.familyName) ||
+              : declaration.data.child.firstNames + ' ') +
+              declaration.data.child.familyName) ||
           ''
       } else if (
-        application.event &&
-        application.event.toString() === 'death'
+        declaration.event &&
+        declaration.event.toString() === 'death'
       ) {
         name =
-          (application.data &&
-            application.data.deceased &&
-            application.data.deceased.familyNameEng &&
-            (!application.data.deceased.firstNamesEng
+          (declaration.data &&
+            declaration.data.deceased &&
+            declaration.data.deceased.familyNameEng &&
+            (!declaration.data.deceased.firstNamesEng
               ? ''
-              : application.data.deceased.firstNamesEng + ' ') +
-              application.data.deceased.familyNameEng) ||
-          (application.data &&
-            application.data.deceased &&
-            application.data.deceased.familyName &&
-            (!application.data.deceased.firstNames
+              : declaration.data.deceased.firstNamesEng + ' ') +
+              declaration.data.deceased.familyNameEng) ||
+          (declaration.data &&
+            declaration.data.deceased &&
+            declaration.data.deceased.familyName &&
+            (!declaration.data.deceased.firstNames
               ? ''
-              : application.data.deceased.firstNames + ' ') +
-              application.data.deceased.familyName) ||
+              : declaration.data.deceased.firstNames + ' ') +
+              declaration.data.deceased.familyName) ||
           ''
       }
 
       const { statusText, icon } = this.submissionStatusMap(
-        application.submissionStatus || '',
+        declaration.submissionStatus || '',
         index
       )
 
       return {
-        id: application.id,
+        id: declaration.id,
         event:
-          (application.event &&
+          (declaration.event &&
             intl.formatMessage(
-              dynamicConstantsMessages[application.event.toLowerCase()]
+              dynamicConstantsMessages[declaration.event.toLowerCase()]
             )) ||
           '',
         name,
@@ -192,13 +192,13 @@ class Outbox extends React.Component<IFullProps, IState> {
   }
 
   render() {
-    const { intl, application } = this.props
+    const { intl, declaration } = this.props
 
     return (
       <Container>
         <GridTable
           hideTableHeader={true}
-          content={this.transformApplicationsReadyToSend()}
+          content={this.transformDeclarationsReadyToSend()}
           columns={[
             {
               label: this.props.intl.formatMessage(constantsMessages.type),
@@ -216,7 +216,7 @@ class Outbox extends React.Component<IFullProps, IState> {
               ),
               width: 35,
               key: 'submissionStatus',
-              color: getTheme(getDefaultLanguage()).colors.secondaryLabel
+              color: getTheme(getDefaultLanguage()).colors.supportingCopy
             },
             {
               label: '',
@@ -226,7 +226,7 @@ class Outbox extends React.Component<IFullProps, IState> {
             }
           ]}
           noResultText={intl.formatMessage(constantsMessages.noResults)}
-          totalItems={application.length}
+          totalItems={declaration.length}
           onPageChange={this.onPageChange}
           pageSize={10}
           showPaginated={this.props.showPaginated}

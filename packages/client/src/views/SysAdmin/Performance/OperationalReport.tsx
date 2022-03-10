@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { DateRangePicker } from '@client/components/DateRangePicker'
-import { ApplicationStatusWindow } from '@client/components/interface/ApplicationStatusWindow'
+import { DeclarationStatusWindow } from '@client/components/interface/DeclarationStatusWindow'
 import {
   NOTIFICATION_TYPE,
   ToastNotification
@@ -40,8 +40,8 @@ import { PerformanceSelect } from '@client/views/SysAdmin/Performance/Performanc
 import { FETCH_STATUS_WISE_REGISTRATION_COUNT } from '@client/views/SysAdmin/Performance/queries'
 import {
   IStatusMapping,
-  StatusWiseApplicationCountView
-} from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseApplicationCountView'
+  StatusWiseDeclarationCountView
+} from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
 import {
   ActionContainer,
   FilterContainer,
@@ -57,12 +57,12 @@ import { colors } from '@opencrvs/components/lib/colors'
 import { Activity } from '@opencrvs/components/lib/icons'
 import {
   ISearchLocation,
-  ListTable,
-  ColumnContentAlignment
+  ColumnContentAlignment,
+  TableView
 } from '@opencrvs/components/lib/interface'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import {
-  GQLApplicationsStartedMetrics,
+  GQLDeclarationsStartedMetrics,
   GQLEventEstimationMetrics,
   GQLRegistrationCountResult
 } from '@opencrvs/gateway/src/graphql/schema'
@@ -78,7 +78,7 @@ import {
   OPERATIONAL_REPORTS_METRICS,
   OPERATIONAL_REPORTS_METRICS_FOR_OFFICE
 } from './metricsQuery'
-import { ApplicationsStartedReport } from './reports/operational/ApplicationsStartedReport'
+import { DeclarationsStartedReport } from './reports/operational/DeclarationsStartedReport'
 import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
 
 interface IConnectProps {
@@ -95,7 +95,7 @@ interface IDispatchProps {
 
 interface IMetricsQueryResult {
   getEventEstimationMetrics: GQLEventEstimationMetrics
-  getApplicationsStartedMetrics: GQLApplicationsStartedMetrics
+  getDeclarationsStartedMetrics: GQLDeclarationsStartedMetrics
   fetchRegistrationCountByStatus: GQLRegistrationCountResult
 }
 export enum OPERATIONAL_REPORT_SECTION {
@@ -178,31 +178,31 @@ const RowLink = styled(LinkButton)`
 export const StatusMapping: IStatusMapping = {
   IN_PROGRESS: {
     labelDescriptor: statusMessages.inProgress,
-    color: colors.inProgress
+    color: colors.purple
   },
   DECLARED: {
     labelDescriptor: statusMessages.readyForReview,
-    color: colors.readyForReview
+    color: colors.orange
   },
   REJECTED: {
     labelDescriptor: statusMessages.sentForUpdates,
-    color: colors.sentForUpdate
+    color: colors.red
   },
   VALIDATED: {
     labelDescriptor: statusMessages.sentForApprovals,
-    color: colors.waitingForApproval
+    color: colors.grey300
   },
   WAITING_VALIDATION: {
     labelDescriptor: statusMessages.sentForExternalValidation,
-    color: colors.waitingForExternalValidation
+    color: colors.grey500
   },
   REGISTERED: {
     labelDescriptor: statusMessages.readyToPrint,
-    color: colors.readyToPrint
+    color: colors.green
   },
   CERTIFIED: {
     labelDescriptor: statusMessages.certified,
-    color: colors.readyToPrint
+    color: colors.blue
   }
 }
 
@@ -287,11 +287,11 @@ class OperationalReportComponent extends React.Component<Props, State> {
     })
   }
 
-  getTotal(applicationMetrics: GQLApplicationsStartedMetrics): number {
+  getTotal(declarationMetrics: GQLDeclarationsStartedMetrics): number {
     return (
-      applicationMetrics.fieldAgentApplications +
-      applicationMetrics.hospitalApplications +
-      applicationMetrics.officeApplications
+      declarationMetrics.fieldAgentDeclarations +
+      declarationMetrics.hospitalDeclarations +
+      declarationMetrics.officeDeclarations
     )
   }
 
@@ -306,10 +306,13 @@ class OperationalReportComponent extends React.Component<Props, State> {
     const monthDiff = currentMonth + (endMonth - startMonth)
     while (currentMonth <= monthDiff) {
       const { start, end } = getMonthDateRange(currentYear, currentMonth)
-      const title = start.format('MMMM YYYY')
+      const title = `${start.format('DD MMMM')} to ${end.format(
+        'DD MMMM YYYY'
+      )}`
       content.push({
         month: (
           <LinkButton
+            isBoldLink={true}
             onClick={() =>
               this.props.goToPerformanceReport(
                 this.state.selectedLocation!,
@@ -329,7 +332,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
               this.downloadMonthlyData(start, end, eventType.toString())
             }
           >
-            CSV
+            Export
           </RowLink>
         )
       })
@@ -339,7 +342,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
   }
 
   getPercentage(
-    totalMetrics: GQLApplicationsStartedMetrics,
+    totalMetrics: GQLDeclarationsStartedMetrics,
     value: number
   ): number {
     return Math.round((value / this.getTotal(totalMetrics)) * 100)
@@ -507,7 +510,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
                       {!this.isOfficeSelected() && (
                         <RegistrationRatesReport loading={true} />
                       )}
-                      <ApplicationsStartedReport
+                      <DeclarationsStartedReport
                         loading={true}
                         locationId={locationId}
                         reportTimeFrom={timeStart}
@@ -530,10 +533,10 @@ class OperationalReportComponent extends React.Component<Props, State> {
                           }
                         />
                       )}
-                      <ApplicationsStartedReport
+                      <DeclarationsStartedReport
                         loading={loading}
                         locationId={locationId}
-                        data={data && data.getApplicationsStartedMetrics}
+                        data={data && data.getDeclarationsStartedMetrics}
                         reportTimeFrom={timeStart}
                         reportTimeTo={timeEnd}
                       />
@@ -545,7 +548,8 @@ class OperationalReportComponent extends React.Component<Props, State> {
           )}
           {sectionId === OPERATIONAL_REPORT_SECTION.REPORTS && (
             <MonthlyReportsList id="report-lists">
-              <ListTable
+              <TableView
+                hideTableHeader={true}
                 tableTitle={intl.formatMessage(constantsMessages.births)}
                 isLoading={false}
                 content={this.getContent(Event.BIRTH)}
@@ -568,7 +572,8 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 noResultText={intl.formatMessage(constantsMessages.noResults)}
               />
               <DeathReportHolder>
-                <ListTable
+                <TableView
+                  hideTableHeader={true}
                   tableTitle={intl.formatMessage(constantsMessages.deaths)}
                   isLoading={false}
                   content={this.getContent(Event.DEATH)}
@@ -595,7 +600,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
           )}
         </Container>
         {expandStatusWindow && (
-          <ApplicationStatusWindow
+          <DeclarationStatusWindow
             width={statusWindowWidth}
             crossClickHandler={this.statusWindowCrossClickHandler}
             title={this.getStatusWindowTitle()}
@@ -626,7 +631,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 if (error) {
                   return (
                     <>
-                      <StatusWiseApplicationCountView
+                      <StatusWiseDeclarationCountView
                         loading={true}
                         locationId={locationId}
                         onClickStatusDetails={this.onClickStatusDetails}
@@ -636,7 +641,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
                   )
                 }
                 return (
-                  <StatusWiseApplicationCountView
+                  <StatusWiseDeclarationCountView
                     loading={loading}
                     locationId={locationId}
                     data={data && data.fetchRegistrationCountByStatus}
@@ -646,7 +651,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 )
               }}
             </Query>
-          </ApplicationStatusWindow>
+          </DeclarationStatusWindow>
         )}
       </SysAdminContentWrapper>
     )

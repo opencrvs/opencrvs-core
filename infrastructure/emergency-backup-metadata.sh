@@ -84,13 +84,13 @@ BACKUP_DATE=$(date +%Y-%m-%d)
 
 # Backup Hearth, OpenHIM, User, Application-config and any other service related Mongo databases into a mongo sub folder
 #---------------------------------------------------------------------------------------------
-docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:3.6 bash \
+docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:4.4 bash \
  -c "mongodump --host $HOST -d hearth-dev --gzip --archive=/data/backups/mongo/hearth-dev-$BACKUP_DATE.gz"
-docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:3.6 bash \
+docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:4.4 bash \
  -c "mongodump --host $HOST -d openhim-dev --gzip --archive=/data/backups/mongo/openhim-dev-$BACKUP_DATE.gz"
-docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:3.6 bash \
+docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:4.4 bash \
  -c "mongodump --host $HOST -d user-mgnt --gzip --archive=/data/backups/mongo/user-mgnt-$BACKUP_DATE.gz"
-docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:3.6 bash \
+docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:4.4 bash \
  -c "mongodump --host $HOST -d application-config --gzip --archive=/data/backups/mongo/application-config-$BACKUP_DATE.gz"
 
 # Register backup folder as an Elasticsearch repository for backing up the search data

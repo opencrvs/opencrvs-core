@@ -24,10 +24,10 @@ export const testDeclaration = {
           coding: [
             {
               system: 'http://opencrvs.org/doc-types',
-              code: 'birth-application'
+              code: 'birth-declaration'
             }
           ],
-          text: 'Birth Application'
+          text: 'Birth Declaration'
         },
         class: {
           coding: [
@@ -35,7 +35,7 @@ export const testDeclaration = {
           ],
           text: 'CRVS Document'
         },
-        title: 'Birth Application',
+        title: 'Birth Declaration',
         section: [
           {
             title: 'Child details',
@@ -114,8 +114,7 @@ export const testDeclaration = {
             valueString: 'MOTHER'
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '+8801916546544'
           },
           {
@@ -278,10 +277,10 @@ export const testPayload = {
           coding: [
             {
               system: 'http://opencrvs.org/doc-types',
-              code: 'birth-application'
+              code: 'birth-declaration'
             }
           ],
-          text: 'Birth Application'
+          text: 'Birth Declaration'
         },
         class: {
           coding: [
@@ -500,10 +499,10 @@ export const testDeathPayload = {
           coding: [
             {
               system: 'http://opencrvs.org/doc-types',
-              code: 'death-application'
+              code: 'death-declaration'
             }
           ],
-          text: 'Death Application'
+          text: 'Death Declaration'
         },
         class: {
           coding: [
@@ -514,7 +513,7 @@ export const testDeathPayload = {
           ],
           text: 'CRVS Document'
         },
-        title: 'Death Application',
+        title: 'Death Declaration',
         section: [
           {
             title: 'Deceased details',
@@ -596,15 +595,14 @@ export const testDeathPayload = {
         extension: [
           {
             url: 'http://opencrvs.org/specs/extension/contact-person',
-            valueString: 'APPLICANT'
+            valueString: 'INFORMANT'
           },
           {
             url: 'http://opencrvs.org/specs/extension/contact-relationship',
             valueString: ''
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '+8801916543214'
           },
           {
@@ -720,7 +718,10 @@ export const testDeathPayload = {
         resourceType: 'Patient',
         active: true,
         identifier: [{ value: '9516546546544', type: 'NATIONAL_ID' }],
-        name: [{ use: 'bn', family: ['অমর'] }, { use: 'en', family: ['scad'] }],
+        name: [
+          { use: 'bn', family: ['অমর'] },
+          { use: 'en', family: ['scad'] }
+        ],
         address: [
           {
             type: 'CURRENT',
@@ -886,10 +887,10 @@ export const testDeathCertPayload = {
           coding: [
             {
               system: 'http://opencrvs.org/doc-types',
-              code: 'death-application'
+              code: 'death-declaration'
             }
           ],
-          text: 'Death Application'
+          text: 'Death Declaration'
         },
         class: {
           coding: [
@@ -900,7 +901,7 @@ export const testDeathCertPayload = {
           ],
           text: 'CRVS Document'
         },
-        title: 'Death Application',
+        title: 'Death Declaration',
         section: [
           {
             title: 'Certificates',
@@ -998,15 +999,14 @@ export const testDeathCertPayload = {
         extension: [
           {
             url: 'http://opencrvs.org/specs/extension/contact-person',
-            valueString: 'APPLICANT'
+            valueString: 'INFORMANT'
           },
           {
             url: 'http://opencrvs.org/specs/extension/contact-relationship',
             valueString: ''
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '+8801916543214'
           },
           {
@@ -1064,8 +1064,7 @@ export const testDeathCertPayload = {
             }
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/hasShowedVerifiedDocument',
+            url: 'http://opencrvs.org/specs/extension/hasShowedVerifiedDocument',
             valueString: false
           },
           {
@@ -1201,7 +1200,10 @@ export const testDeathCertPayload = {
         active: true,
         id: '7154aa20-0e72-4531-9aff-003cdbdb7e80',
         identifier: [{ value: '9516546546544', type: 'NATIONAL_ID' }],
-        name: [{ use: 'bn', family: ['অমর'] }, { use: 'en', family: ['scad'] }],
+        name: [
+          { use: 'bn', family: ['অমর'] },
+          { use: 'en', family: ['scad'] }
+        ],
         address: [
           {
             type: 'CURRENT',

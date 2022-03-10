@@ -11,17 +11,17 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface ISelectPrimaryApplicantMessages
+interface ISelectPrimaryInformantMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   registerNewEventTitle: MessageDescriptor
   registerNewEventHeading: MessageDescriptor
   errorMessage: MessageDescriptor
 }
 
-const messagesToDefine: ISelectPrimaryApplicantMessages = {
+const messagesToDefine: ISelectPrimaryInformantMessages = {
   registerNewEventTitle: {
     id: 'register.selectVitalEvent.registerNewEventTitle',
-    defaultMessage: 'New application',
+    defaultMessage: 'New declaration',
     description: 'The title that appears on the select vital event page'
   },
   registerNewEventHeading: {
@@ -36,5 +36,5 @@ const messagesToDefine: ISelectPrimaryApplicantMessages = {
   }
 }
 
-export const messages: ISelectPrimaryApplicantMessages =
+export const messages: ISelectPrimaryInformantMessages =
   defineMessages(messagesToDefine)

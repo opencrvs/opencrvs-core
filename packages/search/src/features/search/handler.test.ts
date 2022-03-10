@@ -142,7 +142,7 @@ describe('Verify handlers', () => {
           method: 'POST',
           url: '/statusWiseRegistrationCount',
           payload: {
-            applicationLocationHirarchyId: '123',
+            declarationLocationHirarchyId: '123',
             status: ['REGISTED']
           },
           headers: {
@@ -159,7 +159,7 @@ describe('Verify handlers', () => {
           method: 'POST',
           url: '/statusWiseRegistrationCount',
           payload: {
-            applicationLocationHirarchyId: '123',
+            declarationLocationHirarchyId: '123',
             status: ['REGISTED']
           },
           headers: {

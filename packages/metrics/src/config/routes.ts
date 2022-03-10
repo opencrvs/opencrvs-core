@@ -30,9 +30,9 @@ import { eventEstimationsHandler } from '@metrics/features/eventEstimations/hand
 import { monthWiseEventEstimationsHandler } from '@metrics/features/monthWiseEventEstimations/handler'
 import { locationWiseEventEstimationsHandler } from '@metrics/features/locationWiseEventEstimations/handler'
 import {
-  applicationsStartedHandler,
-  applicationStartedMetricsByPractitionersHandler
-} from '@metrics/features/applicationsStarted/handler'
+  declarationsStartedHandler,
+  declarationStartedMetricsByPractitionersHandler
+} from '@metrics/features/declarationsStarted/handler'
 import { getTimeLoggedHandler } from '@metrics/features/getTimeLogged/handler'
 import {
   exportHandler,
@@ -258,11 +258,11 @@ export const getRoutes = () => {
       }
     },
 
-    // Area wise applications started query API
+    // Area wise declarations started query API
     {
       method: 'GET',
-      path: '/applicationsStarted',
-      handler: applicationsStartedHandler,
+      path: '/declarationsStarted',
+      handler: declarationsStartedHandler,
       config: {
         validate: {
           query: Joi.object({
@@ -325,7 +325,7 @@ export const getRoutes = () => {
         tags: ['api']
       }
     },
-    // event duration query by application id
+    // event duration query by declaration id
     {
       method: 'GET',
       path: '/eventDuration',
@@ -339,7 +339,7 @@ export const getRoutes = () => {
         tags: ['api']
       }
     },
-    // Time logged query by application status API
+    // Time logged query by declaration status API
     {
       method: 'GET',
       path: '/timeLogged',
@@ -355,7 +355,7 @@ export const getRoutes = () => {
       }
     },
 
-    // Time logged query by application status API
+    // Time logged query by declaration status API
     {
       method: 'GET',
       path: '/timeLoggedMetricsByPractitioner',
@@ -376,8 +376,8 @@ export const getRoutes = () => {
 
     {
       method: 'POST',
-      path: '/applicationStartedMetricsByPractitioners',
-      handler: applicationStartedMetricsByPractitionersHandler,
+      path: '/declarationStartedMetricsByPractitioners',
+      handler: declarationStartedMetricsByPractitionersHandler,
       config: {
         validate: {
           payload: Joi.object({

@@ -18,7 +18,7 @@ import {
   IOfflineAddressCondition
 } from '@client/pdfRenderer/transformer/types'
 import {
-  getValueFromApplicationDataByKey,
+  getValueFromDeclarationDataByKey,
   getMatchedCondition
 } from '@client/pdfRenderer/transformer/utils'
 import {
@@ -33,8 +33,8 @@ const getKeyValues = (keys: any, templateData: TemplateTransformerData) =>
   keys &&
   keys.reduce((keyValues: { [key: string]: string }, key: string) => {
     keyValues[key] =
-      getValueFromApplicationDataByKey(
-        templateData.application.data,
+      getValueFromDeclarationDataByKey(
+        templateData.declaration.data,
         // Getting rid of { }
         key.substr(1, key.length - 2)
       ) || ''
@@ -47,8 +47,8 @@ const getCountryValue = (
 ) => {
   return countryCode.toUpperCase() === window.config.COUNTRY.toUpperCase()
     ? countryCode
-    : getValueFromApplicationDataByKey(
-        templateData.application.data,
+    : getValueFromDeclarationDataByKey(
+        templateData.declaration.data,
         // Getting rid of { }
         countryCode
       ) || ''
@@ -139,7 +139,7 @@ export const offlineTransformers: IFunctionTransformer = {
 
     const matchedCondition = getMatchedCondition(
       params.conditions,
-      templateData.application.data
+      templateData.declaration.data
     ) as IOfflineAddressCondition
 
     if (!matchedCondition) {

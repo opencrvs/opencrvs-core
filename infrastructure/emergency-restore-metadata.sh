@@ -77,10 +77,10 @@ fi
 
 # Delete all data from Hearth, OpenHIM, User and Application-config and any other service related Mongo databases
 #-----------------------------------------------------------------------------------
-docker run --rm --network=$NETWORK mongo:3.6 mongo hearth-dev --host $HOST --eval "db.dropDatabase()"
-docker run --rm --network=$NETWORK mongo:3.6 mongo openhim-dev --host $HOST --eval "db.dropDatabase()"
-docker run --rm --network=$NETWORK mongo:3.6 mongo user-mgnt --host $HOST --eval "db.dropDatabase()"
-docker run --rm --network=$NETWORK mongo:3.6 mongo application-config --host $HOST --eval "db.dropDatabase()"
+docker run --rm --network=$NETWORK mongo:4.4 mongo hearth-dev --host $HOST --eval "db.dropDatabase()"
+docker run --rm --network=$NETWORK mongo:4.4 mongo openhim-dev --host $HOST --eval "db.dropDatabase()"
+docker run --rm --network=$NETWORK mongo:4.4 mongo user-mgnt --host $HOST --eval "db.dropDatabase()"
+docker run --rm --network=$NETWORK mongo:4.4 mongo application-config --host $HOST --eval "db.dropDatabase()"
 
 # Delete all data from search
 #----------------------------
@@ -93,13 +93,13 @@ docker run --rm --network=$NETWORK appropriate/curl curl -X POST 'http://influxd
 
 # Restore all data from a backup into Hearth, OpenHIM, User, Application-config and any other service related Mongo databases
 #--------------------------------------------------------------------------------------------------
-docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:3.6 bash \
+docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:4.4 bash \
  -c "mongorestore --host $HOST --drop --gzip --archive=/data/backups/mongo/hearth-dev-$1.gz"
-docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:3.6 bash \
+docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:4.4 bash \
  -c "mongorestore --host $HOST --drop --gzip --archive=/data/backups/mongo/openhim-dev-$1.gz"
-docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:3.6 bash \
+docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:4.4 bash \
  -c "mongorestore --host $HOST --drop --gzip --archive=/data/backups/mongo/user-mgnt-$1.gz"
-docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:3.6 bash \
+docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:4.4 bash \
  -c "mongorestore --host $HOST --drop --gzip --archive=/data/backups/mongo/application-config-$1.gz"
 
 # Restore all data from a backup into search

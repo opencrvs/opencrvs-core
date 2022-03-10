@@ -67,11 +67,11 @@ type Query {
     timeEnd: String!
     locationId: String!
   ): EventEstimationMetrics
-  getApplicationsStartedMetrics(
+  getDeclarationsStartedMetrics(
     timeStart: String!
     timeEnd: String!
     locationId: String!
-  ): ApplicationsStartedMetrics
+  ): DeclarationsStartedMetrics
   fetchMonthWiseEventMetrics(
     timeStart: String!
     timeEnd: String!
@@ -361,10 +361,10 @@ type EventEstimationMetrics {
   deathTargetDayMetrics: EstimationMetrics
 }
 
-type ApplicationsStartedMetrics {
-  fieldAgentApplications: Int!
-  hospitalApplications: Int!
-  officeApplications: Int!
+type DeclarationsStartedMetrics {
+  fieldAgentDeclarations: Int!
+  hospitalDeclarations: Int!
+  officeDeclarations: Int!
 }
 
 type MonthWiseEstimationMetrics {
@@ -740,10 +740,10 @@ type SearchFieldAgentResponse {
   status: String
   primaryOfficeId: String
   creationDate: String
-  totalNumberOfApplicationStarted: Int
+  totalNumberOfDeclarationStarted: Int
   totalNumberOfInProgressAppStarted: Int
-  totalNumberOfRejectedApplications: Int
-  averageTimeForDeclaredApplications: Int
+  totalNumberOfRejectedDeclarations: Int
+  averageTimeForDeclaredDeclarations: Int
 }
 
 type RegistrationGenderBasisMetrics {
@@ -1047,8 +1047,8 @@ enum AttachmentSubject {
   DECEASED_PARMANENT_ADDRESS_PROOF
   DECEASED_DEATH_PROOF
   DECEASED_BIRTH_PROOF
-  APPLICANT_ID_PROOF
-  APPLICANT_ATHORITY_TO_APPLY_PROOF
+  INFORMANT_ID_PROOF
+  INFORMANT_ATHORITY_TO_APPLY_PROOF
   LEGAL_GUARDIAN_PROOF
   ASSIGNED_RESPONSIBILITY_PROOF
   WARD_COUNCILLOR_PROOF
@@ -1118,7 +1118,7 @@ type RegistrationSearchSet {
   status: String
   contactNumber: String
   contactRelationship: String
-  dateOfApplication: Date
+  dateOfDeclaration: Date
   trackingId: String
   registrationNumber: String
   eventLocationId: String

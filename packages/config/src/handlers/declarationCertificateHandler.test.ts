@@ -11,7 +11,7 @@
  */
 import { createServer } from '@config/server'
 import Certificate, {
-  IApplicationCertificateModel
+  IDeclarationCertificateModel
 } from '@config/models/Certificate'
 import * as fetchMock from 'jest-fetch-mock'
 import mockingoose from 'mockingoose'
@@ -81,7 +81,7 @@ let mockCertificate = {
   user: 'dde0846b-4b0f-4732-80e7-b0f06444fef5',
   event: 'birth',
   status: 'ACTIVE'
-} as unknown as IApplicationCertificateModel
+} as unknown as IDeclarationCertificateModel
 
 describe('createCertificate handler', () => {
   let server: any

@@ -19,7 +19,7 @@ import {
   getPrimaryLocationIdOfOffice
 } from '@opencrvs/client/src/views/SysAdmin/Performance/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { GQLApplicationsStartedMetrics } from '@opencrvs/gateway/src/graphql/schema'
+import { GQLDeclarationsStartedMetrics } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import styled from 'styled-components'
@@ -46,14 +46,14 @@ const Report = styled.div<{
   }
 `
 
-const ApplicationsStartedReportHeader = styled(ReportHeader)<
+const DeclarationsStartedReportHeader = styled(ReportHeader)<
   Pick<IStateProps, 'isOfficeSelected'>
 >`
   border-top: ${({ isOfficeSelected }) => (!isOfficeSelected ? '1' : '0')}px
-    solid ${({ theme }) => theme.colors.dividerDark};
+    solid ${({ theme }) => theme.colors.grey300};
 `
 
-const ApplicationsStartedSubHeader = styled(SubHeader)`
+const DeclarationsStartedSubHeader = styled(SubHeader)`
   margin-top: 24px;
 `
 
@@ -85,7 +85,7 @@ const KeyNumber = styled.div`
 `
 
 const KeyPercentage = styled.span`
-  color: ${({ theme }) => theme.colors.placeholder};
+  color: ${({ theme }) => theme.colors.placeholderCopy};
   ${({ theme }) => theme.fonts.bodyStyle};
   margin: 16px 10px;
 `
@@ -125,7 +125,7 @@ const LoaderBox = styled.span<{
 type Props = WrappedComponentProps & BaseProps & IStateProps & IDispatchProps
 
 interface BaseProps {
-  data?: GQLApplicationsStartedMetrics
+  data?: GQLDeclarationsStartedMetrics
   loading?: boolean
   reportTimeFrom: moment.Moment
   reportTimeTo: moment.Moment
@@ -143,20 +143,20 @@ interface IDispatchProps {
 
 interface States {}
 
-class ApplicationsStartedReportComponent extends React.Component<
+class DeclarationsStartedReportComponent extends React.Component<
   Props,
   States
 > {
-  getTotal(applicationMetrics: GQLApplicationsStartedMetrics): number {
+  getTotal(declarationMetrics: GQLDeclarationsStartedMetrics): number {
     return (
-      applicationMetrics.fieldAgentApplications +
-      applicationMetrics.hospitalApplications +
-      applicationMetrics.officeApplications
+      declarationMetrics.fieldAgentDeclarations +
+      declarationMetrics.hospitalDeclarations +
+      declarationMetrics.officeDeclarations
     )
   }
 
   getPercentage(
-    totalMetrics: GQLApplicationsStartedMetrics,
+    totalMetrics: GQLDeclarationsStartedMetrics,
     value: number
   ): number {
     return value && value > 0
@@ -170,12 +170,12 @@ class ApplicationsStartedReportComponent extends React.Component<
       <>
         <ReportHeader>
           <SubHeader>
-            {intl.formatMessage(messages.applicationsStartedTitle)}
+            {intl.formatMessage(messages.declarationsStartedTitle)}
           </SubHeader>
           <LoaderBox width={60} />
         </ReportHeader>
 
-        <Reports id="applications-started-reports-loader">
+        <Reports id="declarations-started-reports-loader">
           <Report total={true}>
             <ReportTitle>
               <LoaderBox width={40} />
@@ -213,7 +213,7 @@ class ApplicationsStartedReportComponent extends React.Component<
     )
   }
 
-  getReport(data: GQLApplicationsStartedMetrics) {
+  getReport(data: GQLDeclarationsStartedMetrics) {
     const {
       intl,
       reportTimeFrom,
@@ -222,25 +222,25 @@ class ApplicationsStartedReportComponent extends React.Component<
       isOfficeSelected,
       locationId
     } = this.props
-    const { fieldAgentApplications, hospitalApplications, officeApplications } =
+    const { fieldAgentDeclarations, hospitalDeclarations, officeDeclarations } =
       data
     return (
       <>
-        <ApplicationsStartedReportHeader isOfficeSelected={isOfficeSelected}>
-          <ApplicationsStartedSubHeader>
-            {intl.formatMessage(messages.applicationsStartedTitle)}
-          </ApplicationsStartedSubHeader>
+        <DeclarationsStartedReportHeader isOfficeSelected={isOfficeSelected}>
+          <DeclarationsStartedSubHeader>
+            {intl.formatMessage(messages.declarationsStartedTitle)}
+          </DeclarationsStartedSubHeader>
           <Description>
-            {intl.formatMessage(messages.applicationsStartedDescription)}
+            {intl.formatMessage(messages.declarationsStartedDescription)}
             {reportTimeFrom.format()} - {reportTimeTo.format()}
           </Description>
-        </ApplicationsStartedReportHeader>
-        <Reports id="applications-started-reports">
+        </DeclarationsStartedReportHeader>
+        <Reports id="declarations-started-reports">
           <Report total={true}>
             <ReportTitle>
-              {intl.formatMessage(messages.applicationsStartedTotal)}
+              {intl.formatMessage(messages.declarationsStartedTotal)}
             </ReportTitle>
-            <KeyNumber id="total-applications">
+            <KeyNumber id="total-declarations">
               {intl.formatNumber(this.getTotal(data))}
             </KeyNumber>
           </Report>
@@ -255,15 +255,15 @@ class ApplicationsStartedReportComponent extends React.Component<
                 )
               }}
             >
-              {intl.formatMessage(messages.applicationsStartedFieldAgents)}
+              {intl.formatMessage(messages.declarationsStartedFieldAgents)}
             </PerformanceLink>
             <KeyNumber>
-              {intl.formatNumber(fieldAgentApplications)}
+              {intl.formatNumber(fieldAgentDeclarations)}
 
               <KeyPercentage id="field-agent-percentage">
                 (
                 {intl.formatNumber(
-                  this.getPercentage(data, fieldAgentApplications)
+                  this.getPercentage(data, fieldAgentDeclarations)
                 )}
                 %)
               </KeyPercentage>
@@ -271,15 +271,15 @@ class ApplicationsStartedReportComponent extends React.Component<
           </Report>
           <Report>
             <ReportTitle>
-              {intl.formatMessage(messages.applicationsStartedHospitals)}
+              {intl.formatMessage(messages.declarationsStartedHospitals)}
             </ReportTitle>
             <KeyNumber>
-              {intl.formatNumber(hospitalApplications)}
+              {intl.formatNumber(hospitalDeclarations)}
 
               <KeyPercentage>
                 (
                 {intl.formatNumber(
-                  this.getPercentage(data, hospitalApplications)
+                  this.getPercentage(data, hospitalDeclarations)
                 )}
                 %)
               </KeyPercentage>
@@ -287,15 +287,15 @@ class ApplicationsStartedReportComponent extends React.Component<
           </Report>
           <Report>
             <ReportTitle>
-              {intl.formatMessage(messages.applicationsStartedOffices)}
+              {intl.formatMessage(messages.declarationsStartedOffices)}
             </ReportTitle>
             <KeyNumber>
-              {intl.formatNumber(officeApplications)}
+              {intl.formatNumber(officeDeclarations)}
 
               <KeyPercentage>
                 (
                 {intl.formatNumber(
-                  this.getPercentage(data, officeApplications)
+                  this.getPercentage(data, officeDeclarations)
                 )}
                 %)
               </KeyPercentage>
@@ -317,7 +317,7 @@ class ApplicationsStartedReportComponent extends React.Component<
   }
 }
 
-export const ApplicationsStartedReport = connect<
+export const DeclarationsStartedReport = connect<
   IStateProps,
   IDispatchProps,
   BaseProps,
@@ -362,4 +362,4 @@ export const ApplicationsStartedReport = connect<
   {
     goToFieldAgentList
   }
-)(injectIntl(ApplicationsStartedReportComponent))
+)(injectIntl(DeclarationsStartedReportComponent))

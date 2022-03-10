@@ -18,7 +18,7 @@ import {
 } from '@opencrvs/components/lib/interface/Content'
 import { Navigation } from '@client/components/interface/Navigation'
 import styled from '@client/styledComponents'
-import { ApplicationIcon, Edit } from '@opencrvs/components/lib/icons'
+import { DeclarationIcon, Edit } from '@opencrvs/components/lib/icons'
 import { connect } from 'react-redux'
 import { RouteComponentProps, Redirect } from 'react-router'
 import {
@@ -28,10 +28,10 @@ import {
 } from 'react-intl'
 import { goToCertificateCorrection } from '@client/navigation'
 import {
-  IApplication,
+  IDeclaration,
   SUBMISSION_STATUS,
   clearCorrectionChange
-} from '@client/applications'
+} from '@client/declarations'
 import { IStoreState } from '@client/store'
 import {
   GQLEventSearchSet,
@@ -77,20 +77,20 @@ const InfoContainer = styled.div`
 
 const KeyContainer = styled.div`
   width: 190px;
-  color: ${({ theme }) => theme.colors.grey};
+  color: ${({ theme }) => theme.colors.grey500};
   ${({ theme }) => theme.fonts.bodyBoldStyle}
 `
 
 const ValueContainer = styled.div<{ value: undefined | string }>`
   width: 325px;
   color: ${({ theme, value }) =>
-    value ? theme.colors.grey : theme.colors.grey600};
+    value ? theme.colors.grey500 : theme.colors.grey400};
   ${({ theme }) => theme.fonts.captionBigger};
 `
 
 const GreyedInfo = styled.div`
   height: 26px;
-  background-color: ${({ theme }) => theme.colors.greyInfo};
+  background-color: ${({ theme }) => theme.colors.grey300};
   max-width: 330px;
 `
 
@@ -98,7 +98,7 @@ export type IRecordAuditTabs = keyof IQueryData | 'search'
 
 interface IStateProps {
   declarationId: string
-  draft: IApplication | null
+  draft: IDeclaration | null
   language: string
   resources: IOfflineData
   tab: IRecordAuditTabs
@@ -178,7 +178,7 @@ const isDeathDeclaration = (
   return (declaration && declaration.type === 'Death') || false
 }
 
-const getDraftDeclarationName = (declaration: IApplication) => {
+const getDraftDeclarationName = (declaration: IDeclaration) => {
   let name = ''
   let declarationName
   if (declaration.event === 'birth') {
@@ -204,7 +204,7 @@ const getName = (name: (GQLHumanName | null)[], language: string) => {
 }
 
 const getLocation = (
-  declaration: IApplication,
+  declaration: IDeclaration,
   resources: IOfflineData,
   intl: IntlShape
 ) => {
@@ -240,8 +240,50 @@ const getLocation = (
   return ''
 }
 
+/*const getSavedApplications = (props: IFullProps): IApplicationData => {
+  const savedApplications = props.savedApplications
+  const applicationId = props.match.params.applicationId
+
+  const applications = savedApplications
+    .filter((application: IApplication) => {
+      return (
+        application.id === applicationId ||
+        application.compositionId === applicationId
+      )
+    })
+    .map((application) => {
+      const name = getDraftApplicationName(application)
+      return {
+        id: application.id,
+        name: name,
+        status:
+          application.submissionStatus?.toString() ||
+          application.registrationStatus?.toString() ||
+          '',
+        type: application.event || '',
+        brnDrn:
+          application.data?.registration?.registrationNumber?.toString() || '',
+        trackingId:
+          application.data?.registration?.trackingId?.toString() || '',
+        dateOfBirth: application.data?.child?.childBirthDate?.toString() || '',
+        dateOfDeath: application.data?.deathEvent?.deathDate?.toString() || '',
+        placeOfBirth: getLocation(application, props) || '',
+        placeOfDeath: getLocation(application, props) || '',
+        informant:
+          (
+            application.data?.registration?.contactPoint as IFormSectionData
+          )?.value?.toString() || '',
+        informantContact:
+          (
+            (application.data?.registration?.contactPoint as IFormSectionData)
+              ?.nestedFields as IContactPoint
+          )?.registrationPhone?.toString() || ''
+      }
+    })
+  return applications[0]
+}*/
 const getDraftDeclarationData = (
-  declaration: IApplication,
+  declaration: IDeclaration,
   resources: IOfflineData,
   intl: IntlShape
 ): IDeclarationData => {
@@ -442,7 +484,7 @@ function RecordAuditBody({
       size={ContentSize.LARGE}
       topActionButtons={actions}
       icon={() => (
-        <ApplicationIcon
+        <DeclarationIcon
           color={
             STATUSTOCOLOR[
               (declaration && declaration.status) || SUBMISSION_STATUS.DRAFT
@@ -533,7 +575,7 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
   return {
     declarationId,
     draft:
-      state.applicationsState.applications.find(
+      state.declarationsState.declarations.find(
         (declaration) =>
           declaration.id === declarationId ||
           declaration.compositionId === declarationId

@@ -11,14 +11,14 @@
  */
 import * as Hapi from '@hapi/hapi'
 import Certificate, {
-  IApplicationCertificateModel,
+  IDeclarationCertificateModel,
   Status,
   Event
 } from '@config/models/Certificate' //   IApplicationConfigurationModel
 import { logger } from '@config/config/logger'
 import * as Joi from 'joi'
 import { badRequest } from '@hapi/boom'
-import { isValidSVGCode } from '@config/services/applicationCertificateService'
+import { isValidSVGCode } from '@config/services/declarationCertificateService'
 interface IActivePayload {
   status: Status
   event: Event
@@ -29,7 +29,7 @@ export async function getCertificateHandler(
   h: Hapi.ResponseToolkit
 ) {
   const { status, event } = request.payload as IActivePayload
-  const certificate: IApplicationCertificateModel | null =
+  const certificate: IDeclarationCertificateModel | null =
     await Certificate.findOne({ status: status, event: event })
 
   return certificate
@@ -51,7 +51,7 @@ export async function createCertificateHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const newCertificate = request.payload as IApplicationCertificateModel
+  const newCertificate = request.payload as IDeclarationCertificateModel
 
   const validSvgCode: boolean = await isValidSVGCode(newCertificate.svgCode)
 
@@ -79,8 +79,8 @@ export async function updateCertificateHandler(
   h: Hapi.ResponseToolkit
 ) {
   try {
-    const certificate = request.payload as IApplicationCertificateModel
-    const existingCertificate: IApplicationCertificateModel | null =
+    const certificate = request.payload as IDeclarationCertificateModel
+    const existingCertificate: IDeclarationCertificateModel | null =
       await Certificate.findOne({ _id: certificate.id })
     if (!existingCertificate) {
       throw badRequest(`No certificate found by given id: ${certificate.id}`)

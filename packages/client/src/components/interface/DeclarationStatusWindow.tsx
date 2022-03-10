@@ -31,7 +31,7 @@ const Window = styled.div<{
   z-index: 1;
   height: 100%;
   width: ${({ width }) => `${width}px`};
-  border: 1px solid ${({ theme }) => theme.colors.dividerDark};
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
   color: ${({ theme }) => theme.colors.copy};
   transition: all 0.03s;
   background-color: ${({ theme }) => theme.colors.white};
@@ -56,16 +56,16 @@ const TopBar = styled.div`
   justify-content: space-between;
   padding: 0 12px;
 
-  background-color: ${({ theme }) => theme.colors.lightGreyBackground};
+  background-color: ${({ theme }) => theme.colors.grey100};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     background-color: ${({ theme }) => theme.colors.white};
   }
-  border-bottom: 1px solid ${({ theme }) => theme.colors.dividerDark};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
 `
 
 const Title = styled.div``
 
-class ApplicationStatusWindowComponent extends React.Component<IProps> {
+class DeclarationStatusWindowComponent extends React.Component<IProps> {
   render() {
     return (
       <Window id="status-window" width={this.props.width}>
@@ -82,6 +82,6 @@ class ApplicationStatusWindowComponent extends React.Component<IProps> {
   }
 }
 
-export const ApplicationStatusWindow = withTheme(
-  ApplicationStatusWindowComponent
+export const DeclarationStatusWindow = withTheme(
+  DeclarationStatusWindowComponent
 )

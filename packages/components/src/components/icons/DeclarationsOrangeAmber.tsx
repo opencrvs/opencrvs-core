@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 
-export const ApplicationsOrangeAmber = (
+export const DeclarationsOrangeAmber = (
   props: React.HTMLAttributes<SVGElement>
 ) => (
   <svg width={68} height={87} fill="none" {...props}>

@@ -12,7 +12,7 @@
 import * as React from 'react'
 import { HomeContent } from '@opencrvs/components/lib/layout'
 import { GridTable } from '@opencrvs/components/lib/interface'
-import { IApplication } from '@client/applications'
+import { IDeclaration } from '@client/declarations'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import moment from 'moment'
@@ -22,13 +22,13 @@ import {
   constantsMessages as messages,
   dynamicConstantsMessages
 } from '@client/i18n/messages'
-import { getDraftApplicantFullName } from '@client/utils/draftUtils'
+import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { formattedDuration } from '@client/utils/date-formatting'
 
 interface IInProgressProps {
   theme: ITheme
-  draftApplications: IApplication[]
+  draftDeclarations: IDeclaration[]
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   showPaginated?: boolean
   loading?: boolean
@@ -57,13 +57,13 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
 
   transformDraftContent = () => {
     if (
-      !this.props.draftApplications ||
-      this.props.draftApplications.length <= 0
+      !this.props.draftDeclarations ||
+      this.props.draftDeclarations.length <= 0
     ) {
       return []
     }
 
-    return this.props.draftApplications.map((draft: IApplication) => {
+    return this.props.draftDeclarations.map((draft: IDeclaration) => {
       const { intl } = this.props
       const { locale } = intl
       const lastModificationDate = draft.modifiedOn || draft.savedOn
@@ -74,7 +74,7 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
             dynamicConstantsMessages[draft.event.toLowerCase()]
           )) ||
         ''
-      const name = getDraftApplicantFullName(draft, locale)
+      const name = getDraftInformantFullName(draft, locale)
       return {
         id: draft.id,
         event: event,
@@ -149,7 +149,7 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
   }
 
   render() {
-    const { draftApplications, intl } = this.props
+    const { draftDeclarations, intl } = this.props
 
     return (
       <HomeContent>
@@ -161,7 +161,7 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
             this.onPageChange(currentPage)
           }}
           pageSize={this.pageSize}
-          totalItems={draftApplications && draftApplications.length}
+          totalItems={draftDeclarations && draftDeclarations.length}
           currentPage={this.state.inProgressPageNo}
           expandable={false}
           clickable={true}

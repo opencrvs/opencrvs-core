@@ -374,7 +374,6 @@ class UserProfileComponent extends React.Component<Props, State> {
                       <InformationValue>
                         <LinkButton
                           id="office-link"
-                          textDecoration={'none'}
                           onClick={() =>
                             this.props.goToTeamUserList(
                               user.primaryOffice as ISearchLocation

@@ -343,7 +343,7 @@ const messagesToDefine: ICertificateMessages = {
   },
   reviewDescription: {
     defaultMessage:
-      'Please confirm that the applicant has reviewed that the information on the certificate is correct and that it is ready to print.',
+      'Please confirm that the informant has reviewed that the information on the certificate is correct and that it is ready to print.',
     description: 'Certificate review description',
     id: 'print.certificate.review.description'
   },

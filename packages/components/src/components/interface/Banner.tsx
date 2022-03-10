@@ -36,7 +36,7 @@ const StyledStatus = styled.div`
   border-radius: 16px;
   padding: 5px 10px 5px 7px;
   align-items: center;
-  background-color: ${({ theme }) => theme.colors.placeholder};
+  background-color: ${({ theme }) => theme.colors.placeholderCopy};
   height: 32px;
   margin-left: 10px;
 `
@@ -57,7 +57,7 @@ export const Banner = ({ text, count, status }: IBannerProps) => {
     <StyledBanner>
       <StyledText>{text}</StyledText>
       <StyledStatus>
-        {status === 'applications' ? (
+        {status === 'declarations' ? (
           <StatusOrange />
         ) : status === 'rejected' ? (
           <StatusRejected />
