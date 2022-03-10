@@ -1,8 +1,21 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
+
 import * as Hapi from '@hapi/hapi'
 import {
   PORT,
   HOST,
   CHECK_INVALID_TOKEN,
+  CERT_PUBLIC_KEY_PATH,
   AUTH_URL
 } from '@config/config/constants'
 import getRoutes from '@config/config/routes'
@@ -10,7 +23,6 @@ import getPlugins from '@config/config/plugins'
 import * as database from '@config/config/database'
 import { validateFunc } from '@opencrvs/commons'
 
-import { CERT_PUBLIC_KEY_PATH } from '@config/config/constants'
 import { readFileSync } from 'fs'
 
 export const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
