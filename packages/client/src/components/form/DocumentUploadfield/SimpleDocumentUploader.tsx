@@ -105,6 +105,7 @@ class SimpleDocumentUploaderComponent extends React.Component<
           this.props.onUploadingStateChanged &&
             this.props.onUploadingStateChanged(false)
           this.props.onComplete({
+            name: uploadedImage.name,
             type: uploadedImage.type,
             data: buffer
           })
@@ -167,7 +168,7 @@ class SimpleDocumentUploaderComponent extends React.Component<
         {(!files || !files.data) && (
           <DocumentUploader
             id="upload_document"
-            title={intl.formatMessage(messages.addFile)}
+            title={intl.formatMessage(messages.uploadFile)}
             handleFileChange={this.handleFileChange}
           />
         )}

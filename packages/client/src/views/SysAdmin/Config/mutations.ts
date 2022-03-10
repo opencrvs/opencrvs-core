@@ -18,6 +18,7 @@ const applicationNameConfigMutation = gql`
   ) {
     updateApplicationConfig(applicationConfig: $applicationConfig) {
       APPLICATION_NAME
+      COUNTRY_LOGO_FILE
     }
   }
 `
@@ -36,6 +37,21 @@ async function updateApplicationName(applicationName: string) {
   )
 }
 
+async function updateApplicationLogo(govtLogo: string) {
+  const applicationConfig = {
+    COUNTRY_LOGO_FILE: govtLogo
+  }
+
+  return (
+    client &&
+    client.mutate({
+      mutation: applicationNameConfigMutation,
+      variables: { applicationConfig }
+    })
+  )
+}
+
 export const configApplicationMutations = {
-  updateApplicationName
+  updateApplicationName,
+  updateApplicationLogo
 }

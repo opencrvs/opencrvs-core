@@ -29,6 +29,8 @@ import { updateOfflineConfigData } from '@client/offline/actions'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
+import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
+import { IAttachmentValue } from '@client/forms'
 
 const Message = styled.div`
   margin-bottom: 16px;
@@ -45,7 +47,7 @@ const CancelButton = styled(TertiaryButton)`
     padding: 0;
   }
 `
-const Content = styled.div`
+export const Content = styled.div`
   display: flex;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     flex-direction: column-reverse;
@@ -58,13 +60,13 @@ const ErrorContent = styled.div`
     flex-direction: column-reverse;
   }
 `
-const Field = styled.div`
+export const Field = styled.div`
   margin-bottom: 30px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin-bottom: 0px;
   }
 `
-const HalfWidthInput = styled(TextInput)`
+export const HalfWidthInput = styled(TextInput)`
   width: 300px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     width: 100%;
@@ -76,14 +78,18 @@ const ErrorMessage = styled.div`
   color: ${({ theme }) => theme.colors.error};
   margin-left: 6px;
 `
-type IApplicationName = {
-  applicatioName: string
+type IApplicationConfigName = {
+  APPLICATION_NAME?: string
+  GOVT_LOGO?: string
 }
 type State = {
   applicationName: string
   updatingValue: boolean
   errorOccured: boolean
   errorMessages: string
+  govtLogo: string
+  logoFile: IAttachmentValue
+  isFileUploading: boolean
 }
 interface IProps {
   changeModalName: string
@@ -102,20 +108,18 @@ type DispatchProps = {
 
 type IFullProps = IProps & IntlShapeProps & DispatchProps
 
-function isApplicationName(
-  modalName: string,
-  value: IApplicationName
-): value is IApplicationName {
-  return modalName === GeneralActionId.APPLICATION_NAME
-}
 class DynamicModalComponent extends React.Component<IFullProps, State> {
   constructor(props: IFullProps) {
     super(props)
     this.state = {
-      applicationName: EMPTY_STRING,
+      applicationName:
+        props.offlineCountryConfiguration.config.APPLICATION_NAME,
       updatingValue: false,
       errorOccured: false,
-      errorMessages: EMPTY_STRING
+      errorMessages: EMPTY_STRING,
+      govtLogo: EMPTY_STRING,
+      logoFile: { name: '', type: '', data: '' },
+      isFileUploading: false
     }
   }
 
@@ -128,16 +132,37 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
     }))
   }
 
+  setGovtLogo = (data: string) => {
+    this.setState(() => ({
+      govtLogo: data
+    }))
+  }
+
+  setLogoFile(data: IAttachmentValue) {
+    this.setState(() => ({
+      logoFile: data
+    }))
+  }
+
+  onUploadingStateChanged = (isUploading: boolean) => {
+    this.setState(() => ({
+      isFileUploading: isUploading
+    }))
+  }
+
   mutationHandler(
     modalName: string,
-    value: IApplicationName,
+    value: IApplicationConfigName,
     valueChanged: (
       notificationStatus: NOTIFICATION_TYPE,
       messages: string
     ) => void
   ) {
-    if (isApplicationName(modalName, value)) {
-      this.callUpdateApplicationNameMutation(value.applicatioName)
+    if (
+      modalName === GeneralActionId.APPLICATION_NAME &&
+      value.APPLICATION_NAME
+    ) {
+      this.callUpdateApplicationNameMutation(value.APPLICATION_NAME)
         .then(() => {
           valueChanged(
             NOTIFICATION_TYPE.SUCCESS,
@@ -158,6 +183,45 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
             this.props.intl.formatMessage(messages.applicationNameChangeError)
           )
         })
+    } else if (modalName === GeneralActionId.GOVT_LOGO && value.GOVT_LOGO) {
+      if (this.isWithinFileLength(value.GOVT_LOGO as string) === false) {
+        this.setState({
+          errorOccured: true,
+          errorMessages: this.props.intl.formatMessage(
+            messages.govtLogoFileLimitError
+          ),
+          govtLogo: EMPTY_STRING,
+          logoFile: {
+            name: '',
+            type: '',
+            data: ''
+          }
+        })
+        valueChanged(
+          NOTIFICATION_TYPE.ERROR,
+          this.props.intl.formatMessage(messages.govtLogoFileLimitError)
+        )
+      } else {
+        this.callUpdateGovtLogoMutation(value.GOVT_LOGO)
+          .then(() => {
+            valueChanged(
+              NOTIFICATION_TYPE.SUCCESS,
+              this.props.intl.formatMessage(messages.govtLogoChangeNotification)
+            )
+          })
+          .catch(() => {
+            this.setState({
+              errorOccured: true,
+              errorMessages: this.props.intl.formatMessage(
+                messages.govtLogoChangeError
+              )
+            })
+            valueChanged(
+              NOTIFICATION_TYPE.ERROR,
+              this.props.intl.formatMessage(messages.govtLogoChangeError)
+            )
+          })
+      }
     }
   }
 
@@ -189,13 +253,69 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
     }
   }
 
+  async callUpdateGovtLogoMutation(govtLogo: string) {
+    try {
+      this.setState({ updatingValue: true })
+      const res = await configApplicationMutations.updateApplicationLogo(
+        govtLogo
+      )
+      if (res && res.data) {
+        this.setState({ updatingValue: false })
+        const COUNTRY_LOGO_FILE =
+          res.data.updateApplicationConfig.COUNTRY_LOGO_FILE
+        const updatedOfflineConfig = {
+          config: {
+            ...this.props.offlineCountryConfiguration.config,
+            COUNTRY_LOGO_FILE
+          }
+        }
+        this.props.updateConfig(updatedOfflineConfig)
+      }
+    } catch (err) {
+      this.setState({
+        errorOccured: true,
+        errorMessages: this.props.intl.formatMessage(
+          messages.govtLogoChangeError
+        )
+      })
+    }
+  }
+
+  getTitle(props: IFullProps) {
+    const { intl, changeModalName } = props
+    if (changeModalName === GeneralActionId.APPLICATION_NAME)
+      return intl.formatMessage(messages.applicationNameLabel)
+    else if (changeModalName === GeneralActionId.GOVT_LOGO)
+      return intl.formatMessage(messages.govermentLogoLabel)
+    return EMPTY_STRING
+  }
+
+  isApplyButtonDisabled(props: IFullProps) {
+    const { changeModalName } = props
+    if (changeModalName === GeneralActionId.APPLICATION_NAME) {
+      return !Boolean(this.state.applicationName.length)
+    } else if (changeModalName === GeneralActionId.GOVT_LOGO) {
+      return !Boolean(this.state.govtLogo) || this.state.isFileUploading
+    } else return true
+  }
+
+  isWithinFileLength(base64data: string) {
+    const baseStr = base64data.substring(22)
+    const decoded = window.atob(baseStr)
+    if (decoded.length >= 2000000) {
+      return false
+    }
+    return true
+  }
+
   render() {
     const { intl, changeModalName, toggleConfigModal, valueChanged } =
       this.props
     return (
       <ResponsiveModal
         id={`${changeModalName}Modal`}
-        title={intl.formatMessage(messages.applicationNameLabel)}
+        title={this.getTitle(this.props)}
+        autoHeight={true}
         show={this.showChangeModal}
         actions={[
           <CancelButton
@@ -208,11 +328,14 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
           <ApplyButton
             key="apply"
             id="apply_change"
-            disabled={!Boolean(this.state.applicationName.length)}
+            disabled={this.isApplyButtonDisabled(this.props)}
             onClick={() => {
               this.mutationHandler(
                 changeModalName,
-                { applicatioName: this.state.applicationName },
+                {
+                  APPLICATION_NAME: this.state.applicationName,
+                  GOVT_LOGO: this.state.govtLogo
+                },
                 valueChanged
               )
             }}
@@ -224,7 +347,10 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
         contentHeight={175}
       >
         <Message>
-          {intl.formatMessage(messages.applicationNameChangeMessage)}
+          {changeModalName === GeneralActionId.APPLICATION_NAME &&
+            intl.formatMessage(messages.applicationNameChangeMessage)}
+          {changeModalName === GeneralActionId.GOVT_LOGO &&
+            intl.formatMessage(messages.govtLogoChangeMessage)}
         </Message>
         {this.state.errorOccured && (
           <ErrorContent>
@@ -246,6 +372,29 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
                   onChange={this.setApplicationName}
                 />
               </InputField>
+            </Field>
+          </Content>
+        )}
+        {changeModalName === GeneralActionId.GOVT_LOGO && (
+          <Content>
+            <Field>
+              <SimpleDocumentUploader
+                label={this.state.logoFile.name ? this.state.logoFile.name : ''}
+                disableDeleteInPreview={false}
+                name={intl.formatMessage(messages.govermentLogoLabel)}
+                allowedDocType={['image/png', 'image/svg']}
+                onComplete={(file) => {
+                  this.setState({
+                    errorOccured: false,
+                    errorMessages: EMPTY_STRING
+                  })
+                  this.setGovtLogo((file as IAttachmentValue).data as string)
+                  this.setLogoFile(file as IAttachmentValue)
+                }}
+                files={this.state.logoFile}
+                onUploadingStateChanged={this.onUploadingStateChanged}
+                error={this.state.errorMessages}
+              />
             </Field>
           </Content>
         )}

@@ -316,6 +316,7 @@ interface IFormMessages
   userAttachmentSection: MessageDescriptor
   userSignatureAttachmentDesc: MessageDescriptor
   addFile: MessageDescriptor
+  uploadFile: MessageDescriptor
   fileUploadError: MessageDescriptor
   typeOfId: MessageDescriptor
   firstName: MessageDescriptor
@@ -1918,6 +1919,11 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Add file',
     description: 'text for add file button',
     id: 'form.field.label.addFile'
+  },
+  uploadFile: {
+    defaultMessage: 'Upload',
+    description: 'text for file uploader button',
+    id: 'form.field.label.uploadFile'
   },
   fileUploadError: {
     defaultMessage: '{type} supported only',

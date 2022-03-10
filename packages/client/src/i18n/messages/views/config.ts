@@ -16,6 +16,10 @@ interface IConfigMessages
   applicationTitle: MessageDescriptor
   applicationNameChangeMessage: MessageDescriptor
   applicationNameChangeError: MessageDescriptor
+  govtLogoChangeMessage: MessageDescriptor
+  govtLogoChangeNotification: MessageDescriptor
+  govtLogoChangeError: MessageDescriptor
+  govtLogoFileLimitError: MessageDescriptor
   certificateConfiguration: MessageDescriptor
   previewTemplate: MessageDescriptor
   printTemplate: MessageDescriptor
@@ -66,6 +70,28 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.nameChangeError',
     defaultMessage: 'Unable to make change. Please try again',
     description: 'Error message for application name change'
+  },
+  govtLogoChangeMessage: {
+    id: 'config.application.govtLogoChangeMessage',
+    defaultMessage:
+      'Upload the Government logo to be used on the login and form decalation. Note certificate logo is uploaded as part of the certificate template.',
+    description:
+      'Upload the Government logo to be used on the login and form decalation. Note certificate logo is uploaded as part of the certificate template.'
+  },
+  govtLogoChangeNotification: {
+    id: 'config.application.govtLogoChangeNotification',
+    defaultMessage: 'Country govt logo of application updated',
+    description: 'Message for government logo change notification'
+  },
+  govtLogoFileLimitError: {
+    id: 'config.application.govtLogoFileLimitError',
+    defaultMessage: 'Logo image file must be less than 2mb',
+    description: 'Error message for large country logo file'
+  },
+  govtLogoChangeError: {
+    id: 'config.application.govtLogoChangeError',
+    defaultMessage: 'Unable to change logo. Please try again.',
+    description: 'Error message for country logo change'
   },
   certificateConfiguration: {
     id: 'config.certificateConfiguration',
@@ -182,8 +208,8 @@ const messagesToDefine: IConfigMessages = {
   },
   govermentLogoLabel: {
     id: 'config.application.govermentLogoLabel',
-    defaultMessage: 'Goverment logo',
-    description: 'Goverment logo config label'
+    defaultMessage: 'Government logo',
+    description: 'Government logo config label'
   },
   currencyLable: {
     id: 'config.application.currencyLable',
