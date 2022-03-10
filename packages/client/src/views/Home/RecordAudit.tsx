@@ -257,6 +257,16 @@ const STATUSTOCOLOR: { [key: string]: string } = {
 const ARCHIVABLE_STATUSES = [DECLARED, VALIDATED, REJECTED]
 
 const APPLICATION_STATUS_LABEL: IStatus = {
+  REINSTATED: {
+    defaultMessage: 'Reinstated to ',
+    description: 'The prefix for reinstated declaration',
+    id: 'recordAudit.status.reinstated.prefix'
+  },
+  ARCHIVED: {
+    defaultMessage: 'Archived',
+    description: 'The title of archived',
+    id: 'recordAudit.status.archived'
+  },
   IN_PROGRESS: {
     defaultMessage: 'In progress',
     description: 'The title of In progress',
@@ -752,15 +762,27 @@ const getNameWithAvatar = (
   )
 }
 
-const getStatusLabel = (status: string, intl: IntlShape) => {
+const getStatusLabel = (
+  status: string,
+  reinstated: boolean,
+  intl: IntlShape
+) => {
   if (status in APPLICATION_STATUS_LABEL)
-    return intl.formatMessage(APPLICATION_STATUS_LABEL[status])
+    return (
+      (reinstated
+        ? intl.formatMessage(APPLICATION_STATUS_LABEL['REINSTATED'])
+        : '') + intl.formatMessage(APPLICATION_STATUS_LABEL[status])
+    )
   return ''
 }
 
 const getLink = (status: string) => {
   return (
-    <LinkButton textDecoration="none" onClick={() => alert('link clicked')}>
+    <LinkButton
+      style={{ textAlign: 'left' }}
+      textDecoration="none"
+      onClick={() => alert('link clicked')}
+    >
       {status}
     </LinkButton>
   )
@@ -794,11 +816,11 @@ const getHistory = ({ intl, draft }: CMethodParams) => {
       return new Date(fe.date).getTime() - new Date(se.date).getTime()
     })
     .map((item) => ({
-      date: getFormattedDate(item?.date),
-      action: getLink(getStatusLabel(item?.action, intl)),
+      date: getFormattedDate(item.date),
+      action: getLink(getStatusLabel(item.action, item.reinstated, intl)),
       user: getNameWithAvatar(
         item.user.name,
-        item.user?.avatar,
+        item.user.avatar,
         window.config.LANGUAGES
       ),
       type: intl.formatMessage(userMessages[item.user.role as string]),
