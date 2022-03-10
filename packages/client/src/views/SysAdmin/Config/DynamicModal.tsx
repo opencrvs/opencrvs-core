@@ -78,7 +78,7 @@ const ErrorMessage = styled.div`
   margin-left: 6px;
 `
 
-export type IApplicationConfigName = {
+export type IApplicationConfig = {
   APPLICATION_NAME?: string
   NID_NUMBER_PATTERN?: string
 }
@@ -160,7 +160,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
 
   mutationHandler(
     modalName: string,
-    value: IApplicationConfigName,
+    value: IApplicationConfig,
     valueChanged: (
       notificationStatus: NOTIFICATION_TYPE,
       messages: string
