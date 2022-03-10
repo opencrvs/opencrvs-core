@@ -28,11 +28,13 @@ import {
 import {
   getEventType,
   hasCorrectionEncounterSection,
-  isInProgressApplication,
-  isRejectedTask,
-  isArchiveTask,
-  hasReinstatedExtension
+  isInProgressApplication
 } from '@workflow/features/registration/utils'
+import {
+  hasReinstatedExtension,
+  isRejectedTask,
+  isArchiveTask
+} from '@workflow/features/task/fhir/utils'
 import updateTaskHandler from '@workflow/features/task/handler'
 import { logger } from '@workflow/logger'
 import { hasRegisterScope, hasValidateScope } from '@workflow/utils/authUtils'

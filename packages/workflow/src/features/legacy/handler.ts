@@ -18,7 +18,7 @@ import {
   BIRTH_REG_NUMBER_SYSTEM,
   DEATH_REG_NUMBER_SYSTEM
 } from '@workflow/features/registration/fhir/constants'
-import { getTaskEventType } from '@workflow/features/registration/utils'
+import { getTaskEventType } from '@workflow/features/task/fhir/utils'
 import { updatePatientIdentifierWithRN } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
   getFromFhir,

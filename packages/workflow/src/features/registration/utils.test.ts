@@ -13,19 +13,16 @@ import {
   generateBirthTrackingId,
   generateDeathTrackingId,
   convertStringToASCII,
-  sendEventNotification,
-  hasReinstatedExtension
+  sendEventNotification
 } from '@workflow/features/registration/utils'
 import { setTrackingId } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { logger } from '@workflow/logger'
 import {
   testFhirBundle,
   testFhirBundleWithIdsForDeath,
-  testFhirTaskBundle,
   officeMock
 } from '@workflow/test/utils'
 import { Events } from '@workflow/features/events/handler'
-import { REINSTATED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 
 import * as fetchAny from 'jest-fetch-mock'
 
@@ -216,26 +213,5 @@ describe('Verify utility functions', () => {
         Authorization: 'bearer acd '
       })
     ).toBeDefined()
-  })
-
-  describe('hasReinstatedExtension()', () => {
-    it('should return false if task has no reinstated extension', () => {
-      expect(
-        hasReinstatedExtension(testFhirTaskBundle.entry[0].resource)
-      ).toBeFalsy()
-    })
-
-    it('should return true if task has reinstated extension', () => {
-      const mockTask = {
-        ...testFhirTaskBundle.entry[0].resource,
-        extension: [
-          {
-            url: REINSTATED_EXTENSION_URL,
-            valueString: 'DECLARED'
-          }
-        ]
-      }
-      expect(hasReinstatedExtension(mockTask)).toBeTruthy()
-    })
   })
 })

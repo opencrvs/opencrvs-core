@@ -34,12 +34,14 @@ import {
   forwardToHearth
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
-  getTaskEventType,
   sendEventNotification,
   sendRegisteredNotification,
-  isEventNonNotifiable,
-  taskHasInput
+  isEventNonNotifiable
 } from '@workflow/features/registration/utils'
+import {
+  taskHasInput,
+  getTaskEventType
+} from '@workflow/features/task/fhir/utils'
 import { logger } from '@workflow/logger'
 import { getToken } from '@workflow/utils/authUtils'
 import * as Hapi from '@hapi/hapi'

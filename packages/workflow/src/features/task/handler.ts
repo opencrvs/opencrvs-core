@@ -19,12 +19,12 @@ import {
 } from '@workflow/features/registration/fhir/fhir-utils'
 import { getToken } from '@workflow/utils/authUtils'
 import { logger } from '@workflow/logger'
-import {
-  sendEventNotification,
-  getTaskBusinessStatus
-} from '@workflow/features/registration/utils'
+import { sendEventNotification } from '@workflow/features/registration/utils'
 import { Events } from '@workflow/features/events/handler'
-import { filterTaskExtensions } from '@workflow/features/task/fhir/utils'
+import {
+  filterTaskExtensions,
+  getTaskBusinessStatus
+} from '@workflow/features/task/fhir/utils'
 import {
   DOWNLOADED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL
