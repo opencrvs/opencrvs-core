@@ -29,10 +29,10 @@ const messagesToDefine: IConfirmationScreenMessages = {
   },
   boxHeaderDesc: {
     id: 'register.confirmationScreen.boxHeaderDesc',
-    defaultMessage: `{event, select, declaration {{eventType, select, birth {birth} death {death}} application has been sent for review.} registration {{eventType, select, birth {birth} death {death}} has been registered.}
-        duplication {{eventType, select, birth {birth} death {death}} has been registered.} rejection {{eventType, select, birth {birth} death {death}} application has been rejected.}
+    defaultMessage: `{event, select, declaration {{eventType, select, birth {birth} death {death}} declaration has been sent for review.} registration {{eventType, select, birth {birth} death {death}} has been registered.}
+        duplication {{eventType, select, birth {birth} death {death}} has been registered.} rejection {{eventType, select, birth {birth} death {death}} declaration has been rejected.}
         certificate {{eventType, select, birth {birth} death {death}} certificate has been completed.}
-        offline {{eventType, select, birth {birth} death {death}} application will be sent when you reconnect.} }`,
+        offline {{eventType, select, birth {birth} death {death}} declaration will be sent when you reconnect.} }`,
     description:
       'The first box header description that appear on the confirmation screen '
   },
@@ -49,8 +49,8 @@ const messagesToDefine: IConfirmationScreenMessages = {
         declaration {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.}
         registration {The informant will receive this number via SMS with instructions on how and where to collect the certificate.}
         duplication{The informant will receive this number via SMS with instructions on how and where to collect the certificate.}
-        rejection{The application agent will be informed about the reasons for rejection and instructed to follow up.}
-        offline {The informant will receive the tracking ID number via SMS when the application has been sent for review.}} `,
+        rejection{The declaration agent will be informed about the reasons for rejection and instructed to follow up.}
+        offline {The informant will receive the tracking ID number via SMS when the declaration has been sent for review.}} `,
     description:
       'The tracking section description that appear on the confirmation screen'
   },
@@ -61,9 +61,9 @@ const messagesToDefine: IConfirmationScreenMessages = {
   },
   newButton: {
     id: 'register.conf.butt.newDecl',
-    defaultMessage: 'New application',
+    defaultMessage: 'New declaration',
     description:
-      'The button to start a new application now that they are finished with this one'
+      'The button to start a new declaration now that they are finished with this one'
   }
 }
 

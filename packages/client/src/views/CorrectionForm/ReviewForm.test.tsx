@@ -9,16 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { mockApplicationData, createTestApp } from '@client/tests/util'
+import { mockDeclarationData, createTestApp } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { Event, ReviewSection } from '@client/forms'
 import {
-  IApplication,
-  storeApplication,
-  modifyApplication,
-  createReviewApplication,
+  IDeclaration,
+  storeDeclaration,
+  modifyDeclaration,
+  createReviewDeclaration,
   SUBMISSION_STATUS
-} from '@client/applications'
+} from '@client/declarations'
 import { formatUrl } from '@client/navigation'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
 import { Store } from 'redux'
@@ -28,20 +28,20 @@ let wrapper: ReactWrapper<{}, {}>
 let store: Store
 let history: History
 
-const application: IApplication = createReviewApplication(
+const declaration: IDeclaration = createReviewDeclaration(
   '72c18939-70c1-40b4-9b80-b162c4871160',
-  mockApplicationData,
+  mockDeclarationData,
   Event.BIRTH,
   SUBMISSION_STATUS.REGISTERED
 )
 
-application.data.mother = {
-  ...application.data.mother,
+declaration.data.mother = {
+  ...declaration.data.mother,
   iD: '123456789'
 }
 
-application.data.registration = {
-  ...application.data.registration,
+declaration.data.registration = {
+  ...declaration.data.registration,
   presentAtBirthRegistration: 'MOTHER',
   contactPoint: {
     value: 'MOTHER',
@@ -49,7 +49,7 @@ application.data.registration = {
   }
 }
 
-describe('Review form for an application', () => {
+describe('Review form for an declaration', () => {
   beforeEach(async () => {
     const appBundle = await createTestApp()
 
@@ -57,11 +57,11 @@ describe('Review form for an application', () => {
     store = appBundle.store
     history = appBundle.history
 
-    store.dispatch(storeApplication(application))
+    store.dispatch(storeDeclaration(declaration))
 
     history.replace(
       formatUrl(CERTIFICATE_CORRECTION_REVIEW, {
-        applicationId: application.id,
+        declarationId: declaration.id,
         pageId: ReviewSection.Review,
         groupId: 'review-view-group'
       })
@@ -71,10 +71,10 @@ describe('Review form for an application', () => {
 
   it('should disable the continue button if there is an error', () => {
     store.dispatch(
-      modifyApplication({
-        ...application,
+      modifyDeclaration({
+        ...declaration,
         data: {
-          ...application.data,
+          ...declaration.data,
           child: {}
         }
       })
@@ -101,12 +101,12 @@ describe('Review form for an application', () => {
 
   it('should not disable the continue button if changes have been made', () => {
     store.dispatch(
-      modifyApplication({
-        ...application,
+      modifyDeclaration({
+        ...declaration,
         data: {
-          ...application.data,
+          ...declaration.data,
           mother: {
-            ...application.data.mother,
+            ...declaration.data.mother,
             iD: '122456789'
           }
         }
@@ -121,12 +121,12 @@ describe('Review form for an application', () => {
 
   it('should go to supporting documents form when continue is pressed', () => {
     store.dispatch(
-      modifyApplication({
-        ...application,
+      modifyDeclaration({
+        ...declaration,
         data: {
-          ...application.data,
+          ...declaration.data,
           mother: {
-            ...application.data.mother,
+            ...declaration.data.mother,
             iD: '122456789'
           }
         }

@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IntlShape } from 'react-intl'
-import { createPDF, printPDF } from '@client/pdfRenderer'
-import { IApplication } from '@client/applications'
+import { createPDF, createSVG, printPDF } from '@client/pdfRenderer'
+import { IDeclaration } from '@client/declarations'
 import { IUserDetails } from '@opencrvs/client/src/utils/userUtils'
 import { Event } from '@client/forms'
 import { IOfflineData } from '@client/offline/reducer'
@@ -24,7 +24,7 @@ import { certificateTemplates } from '@client/templates/register'
 
 export function printMoneyReceipt(
   intl: IntlShape,
-  application: IApplication,
+  declaration: IDeclaration,
   userDetails: IUserDetails | null,
   offlineResource: IOfflineData
 ) {
@@ -36,7 +36,7 @@ export function printMoneyReceipt(
   }
   printPDF(
     offlineResource.templates.receipt,
-    application,
+    declaration,
     userDetails,
     offlineResource,
     intl
@@ -45,7 +45,7 @@ export function printMoneyReceipt(
 
 export async function previewCertificate(
   intl: IntlShape,
-  application: IApplication,
+  declaration: IDeclaration,
   userDetails: IUserDetails | null,
   offlineResource: IOfflineData,
   callBack: (pdf: string) => void,
@@ -57,8 +57,8 @@ export async function previewCertificate(
   }
 
   await createPDF(
-    getPDFTemplateWithSVG(offlineResource, application.event, pageSize),
-    application,
+    getPDFTemplateWithSVG(offlineResource, declaration.event, pageSize),
+    declaration,
     userDetails,
     offlineResource,
     intl,
@@ -70,7 +70,7 @@ export async function previewCertificate(
 
 export function printCertificate(
   intl: IntlShape,
-  application: IApplication,
+  declaration: IDeclaration,
   userDetails: IUserDetails | null,
   offlineResource: IOfflineData,
   optionalData?: OptionalData,
@@ -80,8 +80,8 @@ export function printCertificate(
     throw new Error('No user details found')
   }
   printPDF(
-    getPDFTemplateWithSVG(offlineResource, application.event, pageSize),
-    application,
+    getPDFTemplateWithSVG(offlineResource, declaration.event, pageSize),
+    declaration,
     userDetails,
     offlineResource,
     intl,

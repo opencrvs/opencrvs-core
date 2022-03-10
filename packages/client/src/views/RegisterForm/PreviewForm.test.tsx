@@ -12,7 +12,7 @@
 import {
   createTestApp,
   getItem,
-  mockApplicationData,
+  mockDeclarationData,
   goToEndOfForm,
   waitForReady,
   validateScopeToken
@@ -23,11 +23,11 @@ import {
   HOME
 } from '@client/navigation/routes'
 import {
-  storeApplication,
-  IApplication,
+  storeDeclaration,
+  IDeclaration,
   SUBMISSION_STATUS,
-  createReviewApplication
-} from '@client/applications'
+  createReviewDeclaration
+} from '@client/declarations'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
@@ -58,7 +58,7 @@ describe('when user is previewing the form data', () => {
   })
 
   describe('when user is in the preview section', () => {
-    let customDraft: IApplication
+    let customDraft: IDeclaration
 
     const childDetails: IPersonDetails = {
       attendantAtBirth: 'NURSE',
@@ -134,7 +134,7 @@ describe('when user is previewing the form data', () => {
       presentAtBirthRegistration: 'MOTHER',
       registrationCertificateLanguage: ['en'],
       whoseContactDetails: 'MOTHER',
-      applicant: {
+      informant: {
         value: 'OTHER',
         nestedFields: {
           otherRelationShip: 'Friend'
@@ -164,15 +164,15 @@ describe('when user is previewing the form data', () => {
         event: Event.BIRTH,
         submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
       }
-      store.dispatch(storeApplication(customDraft))
+      store.dispatch(storeDeclaration(customDraft))
       history.replace(
         DRAFT_BIRTH_PARENT_FORM.replace(
-          ':applicationId',
+          ':declarationId',
           customDraft.id.toString()
         )
       )
 
-      await waitForElement(app, '#readyApplication')
+      await waitForElement(app, '#readyDeclaration')
     })
 
     describe('when user clicks the "submit" button', () => {
@@ -206,7 +206,7 @@ describe('when user is previewing the form data', () => {
     })
   })
   describe('when user is in the birth review section', () => {
-    let customDraft: IApplication
+    let customDraft: IDeclaration
 
     const childDetails: IPersonDetails = {
       attendantAtBirth: 'NURSE',
@@ -317,22 +317,22 @@ describe('when user is previewing the form data', () => {
       }
 
       customDraft = { id: uuid(), data, review: true, event: Event.BIRTH }
-      store.dispatch(storeApplication(customDraft))
+      store.dispatch(storeDeclaration(customDraft))
       history.replace(
         REVIEW_EVENT_PARENT_FORM_PAGE.replace(
-          ':applicationId',
+          ':declarationId',
           customDraft.id.toString()
         )
           .replace(':event', 'birth')
           .replace(':pageId', 'review')
       )
-      await waitForElement(app, '#readyApplication')
+      await waitForElement(app, '#readyDeclaration')
     })
 
-    it('rejecting application redirects to home screen', async () => {
+    it('rejecting declaration redirects to home screen', async () => {
       jest.setMock('react-apollo', { default: ReactApollo })
 
-      app.find('#rejectApplicationBtn').hostNodes().simulate('click')
+      app.find('#rejectDeclarationBtn').hostNodes().simulate('click')
 
       app.find('#rejectionReasonmisspelling').hostNodes().simulate('change')
 
@@ -352,7 +352,7 @@ describe('when user is previewing the form data', () => {
     })
   })
   describe('when user is in the death review section', () => {
-    let customDraft: IApplication
+    let customDraft: IDeclaration
 
     const deceasedDetails = {
       iDType: 'PASSPORT',
@@ -395,14 +395,14 @@ describe('when user is previewing the form data', () => {
 
     const informantDetails = {
       iDType: 'PASSPORT',
-      applicantID: '123456789',
-      applicantFirstNames: 'অনিক',
-      applicantFamilyName: 'অনিক',
-      applicantFirstNamesEng: 'Anik',
-      applicantFamilyNameEng: 'Anik',
+      informantID: '123456789',
+      informantFirstNames: 'অনিক',
+      informantFamilyName: 'অনিক',
+      informantFirstNamesEng: 'Anik',
+      informantFamilyNameEng: 'Anik',
       nationality: 'BGD',
-      applicantBirthDate: '1996-01-01',
-      applicantPhone: '01622688231',
+      informantBirthDate: '1996-01-01',
+      informantPhone: '01622688231',
       relationship: 'OTHER',
       country: 'BGD',
       state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
@@ -417,7 +417,7 @@ describe('when user is previewing the form data', () => {
       postCodeCityOption: '12',
       addressLine1: '12',
       postCode: '12',
-      applicantPermanentAddressSameAsCurrent: true,
+      informantPermanentAddressSameAsCurrent: true,
       countryPermanent: 'BGD',
       statePermanent: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
       districtPermanent: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
@@ -530,29 +530,29 @@ describe('when user is previewing the form data', () => {
       }
 
       customDraft = { id: uuid(), data, review: true, event: Event.DEATH }
-      store.dispatch(storeApplication(customDraft))
+      store.dispatch(storeDeclaration(customDraft))
       history.replace(
         REVIEW_EVENT_PARENT_FORM_PAGE.replace(
-          ':applicationId',
+          ':declarationId',
           customDraft.id.toString()
         )
           .replace(':event', 'death')
           .replace(':pageId', 'review')
       )
-      await waitForElement(app, '#readyApplication')
+      await waitForElement(app, '#readyDeclaration')
     })
 
     it('successfully submits the review form', async () => {
       jest.setMock('react-apollo', { default: ReactApollo })
-      app.update().find('#registerApplicationBtn').hostNodes().simulate('click')
+      app.update().find('#registerDeclarationBtn').hostNodes().simulate('click')
 
       app.update().find('#submit_confirm').hostNodes().simulate('click')
     })
 
-    it('rejecting application redirects to reject confirmation screen', async () => {
+    it('rejecting declaration redirects to reject confirmation screen', async () => {
       jest.setMock('react-apollo', { default: ReactApollo })
 
-      app.find('#rejectApplicationBtn').hostNodes().simulate('click')
+      app.find('#rejectDeclarationBtn').hostNodes().simulate('click')
 
       app.find('#rejectionReasonmisspelling').hostNodes().simulate('change')
 
@@ -580,16 +580,16 @@ describe('when user is previewing the form data', () => {
         _fhirIDMap: {
           composition: '16'
         },
-        ...mockApplicationData
+        ...mockDeclarationData
       }
 
-      const customDraft = createReviewApplication(uuid(), data, Event.BIRTH)
+      const customDraft = createReviewDeclaration(uuid(), data, Event.BIRTH)
       customDraft.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
 
-      store.dispatch(storeApplication(customDraft))
+      store.dispatch(storeDeclaration(customDraft))
       history.replace(
         REVIEW_EVENT_PARENT_FORM_PAGE.replace(
-          ':applicationId',
+          ':declarationId',
           customDraft.id.toString()
         )
           .replace(':event', 'birth')
@@ -599,10 +599,10 @@ describe('when user is previewing the form data', () => {
     })
 
     it('shows send for review button', async () => {
-      await waitForElement(app, '#readyApplication')
+      await waitForElement(app, '#readyDeclaration')
 
       expect(
-        app.update().find('#validateApplicationBtn').hostNodes().text()
+        app.update().find('#validateDeclarationBtn').hostNodes().text()
       ).toBe('Send For Approval')
     })
   })

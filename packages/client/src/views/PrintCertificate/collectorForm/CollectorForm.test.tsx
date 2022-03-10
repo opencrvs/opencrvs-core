@@ -1180,7 +1180,7 @@ describe('Certificate collector test for a death registration', () => {
       component = testComponent
     })
 
-    it('applicant will be available', async () => {
+    it('informant will be available', async () => {
       const element = await waitForElement(component, '#type_INFORMANT')
       expect(element.hostNodes()).toHaveLength(1)
     })

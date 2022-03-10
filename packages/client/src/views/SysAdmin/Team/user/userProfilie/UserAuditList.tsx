@@ -33,9 +33,9 @@ import styled from 'styled-components'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import moment from 'moment'
 import {
-  ListTable,
   LoadingGrey,
-  ColumnContentAlignment
+  ColumnContentAlignment,
+  TableView
 } from '@opencrvs/components/lib/interface'
 import {
   NOTIFICATION_TYPE,
@@ -75,7 +75,7 @@ const RecentActionsHolder = styled.div`
     margin-top: 24px;
     padding-top: 24px;
   }
-  border-top: 1px solid ${({ theme }) => theme.colors.dividerDark};
+  border-top: 1px solid ${({ theme }) => theme.colors.grey200};
 `
 
 const SectionTitle = styled.div`
@@ -307,9 +307,7 @@ class UserAuditListComponent extends React.Component<Props, State> {
           ),
           statusIcon: this.getWorkflowStatusIcon(timeLoggedMetrics.status),
           trackingId: (timeLoggedMetrics.trackingId && (
-            <LinkButton textDecoration={'none'}>
-              {timeLoggedMetrics.trackingId}
-            </LinkButton>
+            <LinkButton>{timeLoggedMetrics.trackingId}</LinkButton>
           )) || <></>,
           eventType: this.props.intl.formatMessage(
             constantsMessages[timeLoggedMetrics.eventType.toLowerCase()]
@@ -342,7 +340,7 @@ class UserAuditListComponent extends React.Component<Props, State> {
   getLoadingAuditListView(hasError?: boolean) {
     return (
       <>
-        <ListTable
+        <TableView
           id="loading-audit-list"
           isLoading={true}
           columns={this.getAuditColumns()}
@@ -401,7 +399,7 @@ class UserAuditListComponent extends React.Component<Props, State> {
                       0
 
                     return (
-                      <ListTable
+                      <TableView
                         columns={this.getAuditColumns()}
                         content={this.getAuditData(data, user)}
                         noResultText={intl.formatMessage(messages.noAuditFound)}

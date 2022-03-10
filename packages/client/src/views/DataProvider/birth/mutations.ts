@@ -11,14 +11,14 @@
  */
 import gql from 'graphql-tag'
 import { IForm, Action } from '@client/forms'
-import { IApplication } from '@client/applications'
+import { IDeclaration } from '@client/declarations'
 import {
   draftToGqlTransformer,
   appendGqlMetadataFromDraft
 } from '@client/transformer'
 import { REQUEST_BIRTH_REG_CORRECTION } from '@client/forms/correction/mutations'
 
-export const SUBMIT_BIRTH_APPLICATION = gql`
+export const SUBMIT_BIRTH_DECLARATION = gql`
   mutation submitMutation($details: BirthRegistrationInput!) {
     createBirthRegistration(details: $details) {
       trackingId
@@ -26,12 +26,12 @@ export const SUBMIT_BIRTH_APPLICATION = gql`
     }
   }
 `
-export const APPROVE_BIRTH_APPLICATION = gql`
+export const APPROVE_BIRTH_DECLARATION = gql`
   mutation submitMutation($id: ID!, $details: BirthRegistrationInput) {
     markBirthAsValidated(id: $id, details: $details)
   }
 `
-export const REGISTER_BIRTH_APPLICATION = gql`
+export const REGISTER_BIRTH_DECLARATION = gql`
   mutation submitMutation($id: ID!, $details: BirthRegistrationInput) {
     markBirthAsRegistered(id: $id, details: $details) {
       id
@@ -71,7 +71,7 @@ export const REGISTER_BIRTH_APPLICATION = gql`
     }
   }
 `
-export const REJECT_BIRTH_APPLICATION = gql`
+export const REJECT_BIRTH_DECLARATION = gql`
   mutation submitMutation($id: String!, $reason: String!, $comment: String!) {
     markEventAsVoided(id: $id, reason: $reason, comment: $comment)
   }
@@ -86,7 +86,7 @@ export function getBirthMutationMappings(
   action: Action,
   payload?: any,
   form?: IForm,
-  draft?: IApplication
+  draft?: IDeclaration
 ) {
   let gqlDetails = {}
   if (form && draft) {
@@ -102,31 +102,31 @@ export function getBirthMutationMappings(
   switch (action) {
     case Action.SUBMIT_FOR_REVIEW:
       return {
-        mutation: SUBMIT_BIRTH_APPLICATION,
+        mutation: SUBMIT_BIRTH_DECLARATION,
         variables: { details: gqlDetails },
         dataKey: 'createBirthRegistration'
       }
-    case Action.APPROVE_APPLICATION:
+    case Action.APPROVE_DECLARATION:
       return {
-        mutation: APPROVE_BIRTH_APPLICATION,
+        mutation: APPROVE_BIRTH_DECLARATION,
         variables: {
           id: draft && draft.id,
           details: gqlDetails
         },
         dataKey: 'markBirthAsValidated'
       }
-    case Action.REGISTER_APPLICATION:
+    case Action.REGISTER_DECLARATION:
       return {
-        mutation: REGISTER_BIRTH_APPLICATION,
+        mutation: REGISTER_BIRTH_DECLARATION,
         variables: {
           id: draft && draft.id,
           details: gqlDetails
         },
         dataKey: 'markBirthAsRegistered'
       }
-    case Action.REJECT_APPLICATION:
+    case Action.REJECT_DECLARATION:
       return {
-        mutation: REJECT_BIRTH_APPLICATION,
+        mutation: REJECT_BIRTH_DECLARATION,
         variables: {
           ...payload
         },
@@ -141,7 +141,7 @@ export function getBirthMutationMappings(
         },
         dataKey: 'markBirthAsCertified'
       }
-    case Action.REQUEST_CORRECTION_APPLICATION:
+    case Action.REQUEST_CORRECTION_DECLARATION:
       return {
         mutation: REQUEST_BIRTH_REG_CORRECTION,
         variables: {

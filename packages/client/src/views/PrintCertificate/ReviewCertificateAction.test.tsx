@@ -11,11 +11,11 @@
  */
 import * as React from 'react'
 import { createStore } from '@client/store'
-import { storeApplication, IApplication } from '@client/applications'
+import { storeDeclaration, IDeclaration } from '@client/declarations'
 import {
   createTestComponent,
-  mockApplicationData,
-  mockDeathApplicationData,
+  mockDeclarationData,
+  mockDeathDeclarationData,
   flushPromises,
   loginAsFieldAgent,
   createRouterProps
@@ -45,11 +45,11 @@ describe('when user wants to review death certificate', () => {
 
     await loginAsFieldAgent(store)
     await store.dispatch(
-      storeApplication({
+      storeDeclaration({
         id: 'mockDeath1234',
-        data: mockDeathApplicationData,
+        data: mockDeathDeclarationData,
         event: Event.DEATH
-      } as IApplication)
+      } as IDeclaration)
     )
     component = await createTestComponent(
       <ReviewCertificateAction
@@ -71,8 +71,8 @@ describe('when user wants to review death certificate', () => {
 describe('back button behavior tests of review certificate action', () => {
   let component: ReactWrapper
 
-  const mockBirthApplicationData = cloneDeep(mockApplicationData)
-  mockBirthApplicationData.registration.certificates[0] = {
+  const mockBirthDeclarationData = cloneDeep(mockDeclarationData)
+  mockBirthDeclarationData.registration.certificates[0] = {
     collector: {
       type: 'PRINT_IN_ADVANCE'
     }
@@ -95,11 +95,11 @@ describe('back button behavior tests of review certificate action', () => {
 
     await loginAsFieldAgent(store)
     await store.dispatch(
-      storeApplication({
+      storeDeclaration({
         id: 'asdhdqe2472487jsdfsdf',
-        data: mockBirthApplicationData,
+        data: mockBirthDeclarationData,
         event: Event.BIRTH
-      } as IApplication)
+      } as IDeclaration)
     )
     component = await createTestComponent(
       <ReviewCertificateAction
@@ -129,11 +129,11 @@ describe('back button behavior tests of review certificate action', () => {
 
     await loginAsFieldAgent(store)
     await store.dispatch(
-      storeApplication({
+      storeDeclaration({
         id: 'asdhdqe2472487jsdfsdf',
-        data: mockBirthApplicationData,
+        data: mockBirthDeclarationData,
         event: Event.BIRTH
-      } as IApplication)
+      } as IDeclaration)
     )
     component = await createTestComponent(
       <ReviewCertificateAction
@@ -166,19 +166,19 @@ describe('when user wants to review birth certificate', () => {
     )
     const { store } = createStore(history)
 
-    const mockBirthApplicationData = cloneDeep(mockApplicationData)
-    mockBirthApplicationData.registration.certificates[0] = {
+    const mockBirthDeclarationData = cloneDeep(mockDeclarationData)
+    mockBirthDeclarationData.registration.certificates[0] = {
       collector: {
         type: 'PRINT_IN_ADVANCE'
       }
     }
     await loginAsFieldAgent(store)
     await store.dispatch(
-      storeApplication({
+      storeDeclaration({
         id: 'asdhdqe2472487jsdfsdf',
-        data: mockBirthApplicationData,
+        data: mockBirthDeclarationData,
         event: Event.BIRTH
-      } as IApplication)
+      } as IDeclaration)
     )
 
     component = await createTestComponent(

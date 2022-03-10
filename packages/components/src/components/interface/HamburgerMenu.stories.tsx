@@ -30,9 +30,9 @@ HamburgerMenuView.args = {
       onClick: () => alert('Home clicked')
     },
     {
-      title: 'Applications',
-      key: 'Applications',
-      onClick: () => alert('Applications clicked')
+      title: 'Declarations',
+      key: 'Declarations',
+      onClick: () => alert('Declarations clicked')
     }
   ]
 }

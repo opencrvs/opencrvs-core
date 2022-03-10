@@ -20,7 +20,7 @@ import zambiaBackground from './background-zmb.jpg'
 const languageFromProps = ({ language }: IPage) => language
 
 const StyledPage = styled.div<IPage>`
-  ${({ theme }) => theme.gradients.gradientNightshade};
+  ${({ theme }) => theme.gradients.primary};
   ${['ZMB', 'FAR'].includes(window.config.COUNTRY.toUpperCase())
     ? `background: url(${zambiaBackground});`
     : ''}

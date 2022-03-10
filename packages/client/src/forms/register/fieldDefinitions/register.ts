@@ -25,18 +25,18 @@ export const registerForms = {
         name: {
           defaultMessage: 'Registration',
           description: 'Form section name for Registration',
-          id: 'form.section.application.name'
+          id: 'form.section.declaration.name'
         },
         title: {
-          defaultMessage: 'Application Details',
+          defaultMessage: 'Declaration Details',
           description: 'Form section title for Registration',
-          id: 'form.section.application.title'
+          id: 'form.section.declaration.title'
         },
         groups: [
           {
-            id: 'applicant-relation',
+            id: 'informant-relation',
             title: {
-              defaultMessage: 'Who is the applicant?',
+              defaultMessage: 'Who is the informant?',
               description: 'Form section title for contact point',
               id: 'register.selectInformant.relation'
             },
@@ -51,10 +51,10 @@ export const registerForms = {
             showExitButtonOnly: true,
             fields: [
               {
-                name: 'applicant',
+                name: 'informant',
                 type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
                 label: {
-                  defaultMessage: 'Who is the applicant?',
+                  defaultMessage: 'Who is the informant?',
                   description: 'Form section title for contact point',
                   id: 'register.selectInformant.relation'
                 },
@@ -178,7 +178,7 @@ export const registerForms = {
                       type: 'TEXT',
                       label: {
                         defaultMessage: 'Relationship to child',
-                        id: 'form.field.label.applicantsRelationWithChild',
+                        id: 'form.field.label.informantsRelationWithChild',
                         description: 'Label for input Relationship to child'
                       },
                       placeholder: {
@@ -212,7 +212,7 @@ export const registerForms = {
                       type: 'TEXT',
                       label: {
                         defaultMessage: 'Relationship to child',
-                        id: 'form.field.label.applicantsRelationWithChild',
+                        id: 'form.field.label.informantsRelationWithChild',
                         description: 'Label for input Relationship to child'
                       },
                       placeholder: {
@@ -254,12 +254,12 @@ export const registerForms = {
             ]
           },
           {
-            id: 'primary-applicant',
+            id: 'primary-informant',
             title: {
               defaultMessage:
-                'Who is the primary applicant for this application?',
-              description: 'Form section title for primary applicant',
-              id: 'register.primaryApplicant.registerNewEventHeading'
+                'Who is the primary informant for this declaration?',
+              description: 'Form section title for primary informant',
+              id: 'register.primaryInformant.registerNewEventHeading'
             },
             conditionals: [
               {
@@ -276,21 +276,21 @@ export const registerForms = {
                 type: 'PARAGRAPH',
                 label: {
                   defaultMessage:
-                    'This person is responsible for providing accurate information in this application.',
+                    'This person is responsible for providing accurate information in this declaration.',
                   description: 'Documents Paragraph text',
-                  id: 'register.primaryApplicant.description'
+                  id: 'register.primaryInformant.description'
                 },
                 initialValue: '',
                 validate: [],
                 conditionals: []
               },
               {
-                name: 'applicant',
+                name: 'informant',
                 type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
                 label: {
-                  defaultMessage: 'Who is the primary applicant?',
-                  description: 'Label for field primary applicant',
-                  id: 'register.selectInformant.primaryApplicant'
+                  defaultMessage: 'Who is the primary informant?',
+                  description: 'Label for field primary informant',
+                  id: 'register.selectInformant.primaryInformant'
                 },
                 hideHeader: true,
                 size: 'large',
@@ -303,16 +303,16 @@ export const registerForms = {
                     value: 'MOTHER',
                     label: {
                       defaultMessage: 'Mother',
-                      description: 'Mother as applicant',
-                      id: 'form.field.label.applicantRelation.mother'
+                      description: 'Mother as informant',
+                      id: 'form.field.label.informantRelation.mother'
                     }
                   },
                   {
                     value: 'FATHER',
                     label: {
                       defaultMessage: 'Father',
-                      description: 'Father as applicant',
-                      id: 'form.field.label.applicantRelation.father'
+                      description: 'Father as informant',
+                      id: 'form.field.label.informantRelation.father'
                     }
                   }
                 ],
@@ -338,7 +338,7 @@ export const registerForms = {
             id: 'contact-view-group',
             title: {
               defaultMessage:
-                'Who is the main point of contact for this application?',
+                'Who is the main point of contact for this declaration?',
               description: 'Form section title for contact point',
               id: 'register.SelectContactPoint.heading'
             },
@@ -351,7 +351,7 @@ export const registerForms = {
                 label: {
                   defaultMessage: 'Main Contact',
                   description: 'Label for form field: Place of delivery',
-                  id: 'form.field.label.application.mainContact'
+                  id: 'form.field.label.declaration.mainContact'
                 },
                 required: false,
                 initialValue: '',
@@ -374,7 +374,7 @@ export const registerForms = {
                     label: {
                       defaultMessage: 'Mother',
                       description: 'Label for option Mother',
-                      id: 'form.field.label.applicantRelation.mother'
+                      id: 'form.field.label.informantRelation.mother'
                     }
                   },
                   {
@@ -382,7 +382,7 @@ export const registerForms = {
                     label: {
                       defaultMessage: 'Father',
                       description: 'Label for option Father',
-                      id: 'form.field.label.applicantRelation.father'
+                      id: 'form.field.label.informantRelation.father'
                     }
                   },
                   {
@@ -406,7 +406,7 @@ export const registerForms = {
                 label: {
                   defaultMessage: 'Who is present for the birth registration?',
                   description: 'Form section title for contact point',
-                  id: 'form.field.label.application.whoIsPresent'
+                  id: 'form.field.label.declaration.whoIsPresent'
                 },
                 reviewOverrides: {
                   residingSection: 'registration',
@@ -417,7 +417,7 @@ export const registerForms = {
                   },
                   position: 'before',
                   labelAs: {
-                    defaultMessage: 'Who is the applicant?',
+                    defaultMessage: 'Who is the informant?',
                     description: 'Form section title for contact point',
                     id: 'register.selectInformant.relation'
                   },
@@ -441,7 +441,7 @@ export const registerForms = {
                 }
               },
               {
-                name: 'applicant',
+                name: 'informant',
                 type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
                 readonly: true,
                 hidden: true,
@@ -455,9 +455,9 @@ export const registerForms = {
                   }
                 ],
                 label: {
-                  defaultMessage: 'Applicant',
+                  defaultMessage: 'Informant',
                   description: 'Form section title for contact point',
-                  id: 'form.section.applicant.name'
+                  id: 'form.section.informant.name'
                 },
                 options: [
                   {
@@ -2180,14 +2180,14 @@ export const registerForms = {
         id: 'informant',
         viewType: 'form',
         name: {
-          defaultMessage: 'Applicant',
-          description: 'Form section name for Applicant',
-          id: 'form.section.applicant.name'
+          defaultMessage: 'Informant',
+          description: 'Form section name for Informant',
+          id: 'form.section.informant.name'
         },
         title: {
-          defaultMessage: "What are the applicant's details?",
-          description: 'Form section title for applicants',
-          id: 'form.section.applicant.title'
+          defaultMessage: "What are the informant's details?",
+          description: 'Form section title for informants',
+          id: 'form.section.informant.title'
         },
         hasDocumentSection: true,
         groups: [
@@ -2242,7 +2242,7 @@ export const registerForms = {
                 }
               },
               {
-                name: 'applicantID',
+                name: 'informantID',
                 type: 'NUMBER',
                 label: {
                   defaultMessage: 'National ID',
@@ -2287,7 +2287,7 @@ export const registerForms = {
               },
               {
                 name: 'firstNamesEng',
-                previewGroup: 'applicantNameInEnglish',
+                previewGroup: 'informantNameInEnglish',
                 type: 'TEXT',
                 label: {
                   defaultMessage: 'First name(s)',
@@ -2328,7 +2328,7 @@ export const registerForms = {
               },
               {
                 name: 'familyNameEng',
-                previewGroup: 'applicantNameInEnglish',
+                previewGroup: 'informantNameInEnglish',
                 type: 'TEXT',
                 label: {
                   defaultMessage: 'Last name',
@@ -3235,13 +3235,13 @@ export const registerForms = {
                 fieldToRedirect: 'countryPermanent'
               },
               {
-                id: 'applicantNameInEnglish',
+                id: 'informantNameInEnglish',
                 label: {
-                  defaultMessage: "Applicant's English name",
-                  description: "Label for applicant's name in english",
-                  id: 'form.preview.group.label.applicant.english.name'
+                  defaultMessage: "Informant's English name",
+                  description: "Label for informant's name in english",
+                  id: 'form.preview.group.label.informant.english.name'
                 },
-                fieldToRedirect: 'applicantFamilyNameEng',
+                fieldToRedirect: 'informantFamilyNameEng',
                 delimiter: ' '
               }
             ]
@@ -3636,14 +3636,14 @@ export const registerForms = {
                       {
                         action: 'hide',
                         expression:
-                          '(draftData && draftData.registration && draftData.registration.applicant && draftData.registration.applicant.value === "LEGAL_GUARDIAN")'
+                          '(draftData && draftData.registration && draftData.registration.informant && draftData.registration.informant.value === "LEGAL_GUARDIAN")'
                       }
                     ]
                   },
                   {
                     value: 'INFORMANT',
                     label: {
-                      defaultMessage: 'Applicant is the primary caregiver',
+                      defaultMessage: 'Informant is the primary caregiver',
                       description: 'label for informant radio button',
                       id: 'form.field.label.caregiver.informant'
                     }
@@ -3712,7 +3712,7 @@ export const registerForms = {
                       name: 'phone',
                       type: 'TEL',
                       label: {
-                        id: 'form.field.label.application.phone',
+                        id: 'form.field.label.declaration.phone',
                         defaultMessage: 'Phone number',
                         description: 'field label for phone'
                       },
@@ -3852,7 +3852,7 @@ export const registerForms = {
                       name: 'phone',
                       type: 'TEL',
                       label: {
-                        id: 'form.field.label.application.phone',
+                        id: 'form.field.label.declaration.phone',
                         defaultMessage: 'Phone number',
                         description: 'field label for phone'
                       },
@@ -7904,13 +7904,13 @@ export const registerForms = {
                 }
               },
               {
-                name: 'uploadDocForApplicant',
+                name: 'uploadDocForInformant',
                 type: 'DOCUMENT_UPLOADER_WITH_OPTION',
                 label: {
-                  defaultMessage: "Proof of applicant's ID",
+                  defaultMessage: "Proof of informant's ID",
                   description:
                     'Option for radio group field: Type of Document To Upload',
-                  id: 'form.field.label.applicantIDProof'
+                  id: 'form.field.label.informantIDProof'
                 },
                 initialValue: '',
                 extraValue: 'APPLICANT_ID_PROOF',
@@ -8062,20 +8062,20 @@ export const registerForms = {
         name: {
           defaultMessage: 'Registration',
           description: 'Form section name for Registration',
-          id: 'form.section.application.name'
+          id: 'form.section.declaration.name'
         },
         title: {
-          defaultMessage: 'Application Details',
+          defaultMessage: 'Declaration Details',
           description: 'Form section title for Registration',
-          id: 'form.section.application.title'
+          id: 'form.section.declaration.title'
         },
         groups: [
           {
             id: 'other-relationship-with-deceased',
             title: {
               defaultMessage:
-                "What is the applicant's relationship to the deceased?",
-              description: 'Form section title for primary applicant',
+                "What is the informant's relationship to the deceased?",
+              description: 'Form section title for primary informant',
               id: 'register.selInf.deathInfSomeoneElse'
             },
             conditionals: [
@@ -8093,8 +8093,8 @@ export const registerForms = {
                 type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
                 label: {
                   defaultMessage:
-                    "What is the applicant's relationship to the deceased?",
-                  description: 'Form section title for primary applicant',
+                    "What is the informant's relationship to the deceased?",
+                  description: 'Form section title for primary informant',
                   id: 'register.selInf.deathInfSomeoneElse'
                 },
                 hideHeader: true,
@@ -8110,7 +8110,7 @@ export const registerForms = {
                         'Head of the institution where the death occurred',
                       description:
                         'Option for form field: Head of the institute',
-                      id: 'form.field.label.applicantRelation.headInst'
+                      id: 'form.field.label.informantRelation.headInst'
                     }
                   },
                   {
@@ -8119,7 +8119,7 @@ export const registerForms = {
                       defaultMessage:
                         'Owner of the house or building where the death occurred',
                       description: 'Option for form field: Owner of the house',
-                      id: 'form.field.label.applicantRelation.owner'
+                      id: 'form.field.label.informantRelation.owner'
                     }
                   },
                   {
@@ -8129,7 +8129,7 @@ export const registerForms = {
                         'Driver or operator of the land or water vehicle or aircraft where the death occurred',
                       description:
                         'Option for form field: Driver of the vehicle',
-                      id: 'form.field.label.applicantRelation.driver'
+                      id: 'form.field.label.informantRelation.driver'
                     }
                   },
                   {
@@ -8138,7 +8138,7 @@ export const registerForms = {
                       defaultMessage:
                         'Officer-in-charge of the Thana of a road or public space where the death occurred',
                       description: 'Option for form field: Officer-in-charge',
-                      id: 'form.field.label.applicantRelation.officer'
+                      id: 'form.field.label.informantRelation.officer'
                     }
                   },
                   {
@@ -8207,7 +8207,7 @@ export const registerForms = {
             id: 'point-of-contact',
             title: {
               defaultMessage:
-                'Who is the main point of contact for this application?',
+                'Who is the main point of contact for this declaration?',
               description: 'Form section title for contact point',
               id: 'register.SelectContactPoint.heading'
             },
@@ -8220,7 +8220,7 @@ export const registerForms = {
                 type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
                 label: {
                   defaultMessage:
-                    'Who is the main point of contact for this application?',
+                    'Who is the main point of contact for this declaration?',
                   description: 'Form section title for contact point',
                   id: 'register.SelectContactPoint.heading'
                 },
@@ -8777,7 +8777,7 @@ export const registerForms = {
                   },
                   {
                     operation: 'duplicateIDNumber',
-                    parameters: ['informant.applicantID']
+                    parameters: ['informant.informantID']
                   }
                 ],
                 conditionals: [],
@@ -10743,7 +10743,7 @@ export const registerForms = {
                 },
                 notice: {
                   defaultMessage:
-                    'A Medically Certified Cause of Death is not mandatory to submit the application. This can be added at a later date.',
+                    'A Medically Certified Cause of Death is not mandatory to submit the declaration. This can be added at a later date.',
                   description: 'Form section notice for Cause of Death',
                   id: 'form.section.causeOfDeathNotice'
                 },
@@ -10838,14 +10838,14 @@ export const registerForms = {
         id: 'informant',
         viewType: 'form',
         name: {
-          defaultMessage: 'Applicant',
-          description: 'Form section name for Applicant',
-          id: 'form.section.applicant.name'
+          defaultMessage: 'Informant',
+          description: 'Form section name for Informant',
+          id: 'form.section.informant.name'
         },
         title: {
-          defaultMessage: "What are the applicant's details?",
-          description: 'Form section title for applicants',
-          id: 'form.section.applicant.title'
+          defaultMessage: "What are the informant's details?",
+          description: 'Form section title for informants',
+          id: 'form.section.informant.title'
         },
         hasDocumentSection: true,
         groups: [
@@ -10893,7 +10893,7 @@ export const registerForms = {
                 }
               },
               {
-                name: 'applicantID',
+                name: 'informantID',
                 type: 'NUMBER',
                 label: {
                   defaultMessage: 'National ID',
@@ -10938,7 +10938,7 @@ export const registerForms = {
               },
               {
                 name: 'firstNamesEng',
-                previewGroup: 'applicantNameInEnglish',
+                previewGroup: 'informantNameInEnglish',
                 type: 'TEXT',
                 label: {
                   defaultMessage: 'First name(s)',
@@ -10979,7 +10979,7 @@ export const registerForms = {
               },
               {
                 name: 'familyNameEng',
-                previewGroup: 'applicantNameInEnglish',
+                previewGroup: 'informantNameInEnglish',
                 type: 'TEXT',
                 label: {
                   defaultMessage: 'Last name',
@@ -11024,7 +11024,7 @@ export const registerForms = {
                 label: {
                   defaultMessage: 'Relationship to Deceased',
                   description: 'Label for Relationship to Deceased select',
-                  id: 'form.field.label.applicantsRelationWithDeceased'
+                  id: 'form.field.label.informantsRelationWithDeceased'
                 },
                 required: true,
                 initialValue: '',
@@ -11069,7 +11069,7 @@ export const registerForms = {
                     label: {
                       defaultMessage: 'Father',
                       description: 'Label for option Father',
-                      id: 'form.field.label.applicantRelation.father'
+                      id: 'form.field.label.informantRelation.father'
                     }
                   },
                   {
@@ -11077,7 +11077,7 @@ export const registerForms = {
                     label: {
                       defaultMessage: 'Mother',
                       description: 'Label for option Mother',
-                      id: 'form.field.label.applicantRelation.mother'
+                      id: 'form.field.label.informantRelation.mother'
                     }
                   },
                   {
@@ -11085,7 +11085,7 @@ export const registerForms = {
                     label: {
                       defaultMessage: 'Spouse',
                       description: 'Label for option Spouse',
-                      id: 'form.field.label.applicantRelation.spouse'
+                      id: 'form.field.label.informantRelation.spouse'
                     }
                   },
                   {
@@ -11093,7 +11093,7 @@ export const registerForms = {
                     label: {
                       defaultMessage: 'Son',
                       description: 'Label for option Son',
-                      id: 'form.field.label.applicantRelation.son'
+                      id: 'form.field.label.informantRelation.son'
                     }
                   },
                   {
@@ -11101,7 +11101,7 @@ export const registerForms = {
                     label: {
                       defaultMessage: 'Daughter',
                       description: 'Label for option Daughter',
-                      id: 'form.field.label.applicantRelation.daughter'
+                      id: 'form.field.label.informantRelation.daughter'
                     }
                   },
                   {
@@ -11109,7 +11109,7 @@ export const registerForms = {
                     label: {
                       defaultMessage: 'Son in law',
                       description: 'Label for option Son in law',
-                      id: 'form.field.label.applicantRelation.sonInLaw'
+                      id: 'form.field.label.informantRelation.sonInLaw'
                     }
                   },
                   {
@@ -11117,7 +11117,7 @@ export const registerForms = {
                     label: {
                       defaultMessage: 'Daughter in law',
                       description: 'Label for option Daughter in law',
-                      id: 'form.field.label.applicantRelation.daughterInLaw'
+                      id: 'form.field.label.informantRelation.daughterInLaw'
                     }
                   },
                   {
@@ -11125,7 +11125,7 @@ export const registerForms = {
                     label: {
                       defaultMessage: 'Daughter',
                       description: 'Label for option Daughter',
-                      id: 'form.field.label.applicantRelation.daughter'
+                      id: 'form.field.label.informantRelation.daughter'
                     }
                   },
                   {
@@ -11133,7 +11133,7 @@ export const registerForms = {
                     label: {
                       defaultMessage: 'Grandson',
                       description: 'Label for option Grandson',
-                      id: 'form.field.label.applicantRelation.grandson'
+                      id: 'form.field.label.informantRelation.grandson'
                     }
                   },
                   {
@@ -11141,7 +11141,7 @@ export const registerForms = {
                     label: {
                       defaultMessage: 'Granddaughter',
                       description: 'Label for option Granddaughter',
-                      id: 'form.field.label.applicantRelation.granddaughter'
+                      id: 'form.field.label.informantRelation.granddaughter'
                     }
                   },
                   {
@@ -11149,7 +11149,7 @@ export const registerForms = {
                     label: {
                       defaultMessage: 'Other (Specify)',
                       description: 'Label for option Other',
-                      id: 'form.field.label.applicantRelation.other'
+                      id: 'form.field.label.informantRelation.other'
                     }
                   }
                 ],
@@ -11162,7 +11162,7 @@ export const registerForms = {
                   },
                   position: 'before',
                   labelAs: {
-                    defaultMessage: 'Who is the applicant?',
+                    defaultMessage: 'Who is the informant?',
                     description: 'Form section title for contact point',
                     id: 'register.selectInformant.relation'
                   },
@@ -12061,13 +12061,13 @@ export const registerForms = {
                 fieldToRedirect: 'countryPermanent'
               },
               {
-                id: 'applicantNameInEnglish',
+                id: 'informantNameInEnglish',
                 label: {
-                  defaultMessage: "Applicant's English name",
-                  description: "Label for applicant's name in english",
-                  id: 'form.preview.group.label.applicant.english.name'
+                  defaultMessage: "Informant's English name",
+                  description: "Label for informant's name in english",
+                  id: 'form.preview.group.label.informant.english.name'
                 },
-                fieldToRedirect: 'applicantFamilyNameEng',
+                fieldToRedirect: 'informantFamilyNameEng',
                 delimiter: ' '
               }
             ]
@@ -12525,13 +12525,13 @@ export const registerForms = {
                 }
               },
               {
-                name: 'uploadDocForApplicant',
+                name: 'uploadDocForInformant',
                 type: 'DOCUMENT_UPLOADER_WITH_OPTION',
                 label: {
-                  defaultMessage: 'Applicant ID',
+                  defaultMessage: 'Informant ID',
                   description:
                     'Option for radio group field: Type of Document To Upload',
-                  id: 'form.field.label.applicantIDProof'
+                  id: 'form.field.label.informantIDProof'
                 },
                 initialValue: '',
                 extraValue: 'APPLICANT_ID_PROOF',

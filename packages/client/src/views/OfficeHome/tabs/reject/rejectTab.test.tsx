@@ -11,9 +11,9 @@
  */
 import {
   DOWNLOAD_STATUS,
-  makeApplicationReadyToDownload,
-  storeApplication
-} from '@client/applications'
+  makeDeclarationReadyToDownload,
+  storeDeclaration
+} from '@client/declarations'
 import { Action, Event } from '@client/forms'
 import { checkAuth } from '@client/profile/profileActions'
 import { queries } from '@client/profile/queries'
@@ -730,7 +730,7 @@ describe('OfficeHome sent for update tab related tests', () => {
       await store.dispatch(checkAuth({ '?token': registerScopeToken }))
     })
 
-    it('downloads the application after clicking download button', async () => {
+    it('downloads the declaration after clicking download button', async () => {
       const downloadButton = await waitForElement(
         testComponent,
         '#ListItemAction-0-icon'
@@ -765,13 +765,13 @@ describe('OfficeHome sent for update tab related tests', () => {
     })
 
     it('shows error when download is failed', async () => {
-      const downloadedApplication = makeApplicationReadyToDownload(
+      const downloadedDeclaration = makeDeclarationReadyToDownload(
         Event.DEATH,
         'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-        Action.LOAD_REVIEW_APPLICATION
+        Action.LOAD_REVIEW_DECLARATION
       )
-      downloadedApplication.downloadStatus = DOWNLOAD_STATUS.FAILED
-      store.dispatch(storeApplication(downloadedApplication))
+      downloadedDeclaration.downloadStatus = DOWNLOAD_STATUS.FAILED
+      store.dispatch(storeDeclaration(downloadedDeclaration))
 
       testComponent.update()
 

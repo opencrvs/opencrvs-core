@@ -16,13 +16,13 @@ import {
   ResponsiveModal
 } from '@opencrvs/components/lib/interface'
 import {
-  createReviewApplication,
-  modifyApplication,
-  storeApplication,
-  writeApplication,
-  IPrintableApplication,
+  createReviewDeclaration,
+  modifyDeclaration,
+  storeDeclaration,
+  writeDeclaration,
+  IPrintableDeclaration,
   ICertificate
-} from '@client/applications'
+} from '@client/declarations'
 import { FormFieldGenerator } from '@client/components/form'
 import {
   Action,
@@ -72,7 +72,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { withTheme } from 'styled-components'
 import { IValidationResult } from '@client/utils/validate'
-import { getRegisterForm } from '@client/forms/register/application-selectors'
+import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
   certCollectorGroupForBirthAppWithParentDetails,
   certCollectorGroupForBirthAppWithoutFatherDetails,
@@ -97,15 +97,15 @@ interface IBaseProps {
   registerForm: IForm
   event: Event
   pageRoute: string
-  applicationId: string
-  application: IPrintableApplication | undefined
+  declarationId: string
+  declaration: IPrintableDeclaration | undefined
   formSection: IFormSection
   formGroup: IFormSectionGroup
   theme: ITheme
   goBack: typeof goBack
-  storeApplication: typeof storeApplication
-  writeApplication: typeof writeApplication
-  modifyApplication: typeof modifyApplication
+  storeDeclaration: typeof storeDeclaration
+  writeDeclaration: typeof writeDeclaration
+  modifyDeclaration: typeof modifyDeclaration
   goToPrintCertificate: typeof goToPrintCertificate
   goToVerifyCollector: typeof goToVerifyCollector
   goToReviewCertificate: typeof goToReviewCertificate
@@ -117,9 +117,9 @@ type IProps = IBaseProps & IntlShapeProps
 function getNextSectionIds(
   formSection: IFormSection,
   formSectionGroup: IFormSectionGroup,
-  application?: IPrintableApplication
+  declaration?: IPrintableDeclaration
 ) {
-  const certificates = application && application.data.registration.certificates
+  const certificates = declaration && declaration.data.registration.certificates
 
   const certificate = (certificates && certificates[0]) || {}
   const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
@@ -142,9 +142,9 @@ function getNextSectionIds(
 }
 
 const getErrorsOnFieldsBySection = (
-  sectionId: keyof IPrintableApplication['data'],
+  sectionId: keyof IPrintableDeclaration['data'],
   fields: IFormField[],
-  draft: IPrintableApplication
+  draft: IPrintableDeclaration
 ) => {
   const certificates = draft.data.registration.certificates
   const certificate = (certificates && certificates[0]) || {}
@@ -195,20 +195,20 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     })
   }
 
-  modifyApplication = (
+  modifyDeclaration = (
     sectionData: ICertificate['collector'],
-    application: IPrintableApplication
+    declaration: IPrintableDeclaration
   ) => {
-    const certificates = application.data.registration.certificates
+    const certificates = declaration.data.registration.certificates
     const certificate = (certificates && certificates[0]) || {}
     const collector = { ...(certificate.collector || {}), ...sectionData }
 
-    this.props.modifyApplication({
-      ...application,
+    this.props.modifyDeclaration({
+      ...declaration,
       data: {
-        ...application.data,
+        ...declaration.data,
         registration: {
-          ...application.data.registration,
+          ...declaration.data.registration,
           certificates: [
             {
               collector: collector,
@@ -221,13 +221,13 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
   }
 
   continueButtonHandler = (
-    applicationId: string,
+    declarationId: string,
     currentGroup: string,
     nextGroup: string | undefined,
     event: Event,
-    sectionId: keyof IPrintableApplication['data'],
+    sectionId: keyof IPrintableDeclaration['data'],
     fields: IFormField[],
-    draft: IPrintableApplication | undefined
+    draft: IPrintableDeclaration | undefined
   ) => {
     if (!draft) return
 
@@ -256,8 +256,8 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
         collector.affidavitFile &&
         (collector.affidavitFile as IFormSectionData).data
       ) {
-        this.props.writeApplication(draft)
-        this.goToNextFormForSomeoneElse(applicationId, draft, event)
+        this.props.writeDeclaration(draft)
+        this.goToNextFormForSomeoneElse(declarationId, draft, event)
 
         return
       }
@@ -274,7 +274,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
         return
       }
 
-      this.props.writeApplication(draft)
+      this.props.writeDeclaration(draft)
       this.setState({ showModalForNoSignedAffidavit: true })
 
       return
@@ -285,31 +285,31 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       showModalForNoSignedAffidavit: false
     })
     if (!nextGroup) {
-      this.props.writeApplication(draft)
+      this.props.writeDeclaration(draft)
 
       if (isCertificateForPrintInAdvance(draft)) {
-        this.props.goToReviewCertificate(applicationId, event)
+        this.props.goToReviewCertificate(declarationId, event)
       } else {
         this.props.goToVerifyCollector(
-          applicationId,
+          declarationId,
           event,
           collector.type as string
         )
       }
     } else {
-      this.props.goToPrintCertificate(applicationId, event, nextGroup)
+      this.props.goToPrintCertificate(declarationId, event, nextGroup)
     }
   }
 
   goToNextFormForSomeoneElse = (
-    applicationId: string,
-    application: IPrintableApplication,
+    declarationId: string,
+    declaration: IPrintableDeclaration,
     event: Event
   ) => {
-    if (isFreeOfCost(event, getEventDate(application.data, event))) {
-      this.props.goToReviewCertificate(applicationId, event)
+    if (isFreeOfCost(event, getEventDate(declaration.data, event))) {
+      this.props.goToReviewCertificate(declarationId, event)
     } else {
-      this.props.goToPrintCertificatePayment(applicationId, event)
+      this.props.goToPrintCertificatePayment(declarationId, event)
     }
   }
 
@@ -320,17 +320,17 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
   }
 
   resetCertificatesInformation = () => {
-    const application = Object.assign({}, this.props.application)
-    application.data.registration.certificates = []
-    this.props.modifyApplication(application)
+    const declaration = Object.assign({}, this.props.declaration)
+    declaration.data.registration.certificates = []
+    this.props.modifyDeclaration(declaration)
   }
 
   render() {
     const {
       intl,
       event,
-      applicationId,
-      application,
+      declarationId,
+      declaration,
       formSection,
       formGroup,
       goBack,
@@ -342,19 +342,19 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     const nextSectionGroup = getNextSectionIds(
       formSection,
       formGroup,
-      application
+      declaration
     )
-    const applicationToBeCertified = application
+    const declarationToBeCertified = declaration
 
     if (
-      !applicationToBeCertified ||
-      !applicationToBeCertified.data.registration.regStatus
+      !declarationToBeCertified ||
+      !declarationToBeCertified.data.registration.regStatus
     ) {
       return (
         <QueryProvider
           event={event}
-          action={Action.LOAD_CERTIFICATE_APPLICATION}
-          payload={{ id: applicationId }}
+          action={Action.LOAD_CERTIFICATE_DECLARATION}
+          payload={{ id: declarationId }}
           fetchPolicy="no-cache"
         >
           <QueryContext.Consumer>
@@ -378,16 +378,16 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
                   retrievedData
                 )
 
-                const newApplicationToBeCertified = createReviewApplication(
-                  applicationId,
+                const newDeclarationToBeCertified = createReviewDeclaration(
+                  declarationId,
                   transformedData,
                   event
                 )
 
-                if (applicationToBeCertified) {
-                  this.props.modifyApplication(newApplicationToBeCertified)
+                if (declarationToBeCertified) {
+                  this.props.modifyDeclaration(newDeclarationToBeCertified)
                 } else {
-                  this.props.storeApplication(newApplicationToBeCertified)
+                  this.props.storeDeclaration(newDeclarationToBeCertified)
                 }
               }
             }}
@@ -424,24 +424,24 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
                   showError: false
                 })
               }
-              this.modifyApplication(values, applicationToBeCertified)
+              this.modifyDeclaration(values, declarationToBeCertified)
             }}
             setAllFieldsDirty={false}
             fields={formGroup.fields}
-            draftData={applicationToBeCertified.data}
+            draftData={declarationToBeCertified.data}
             onUploadingStateChanged={this.onUploadingStateChanged}
           />
           <PrimaryButton
             id="confirm_form"
             onClick={() => {
               this.continueButtonHandler(
-                applicationToBeCertified.id,
+                declarationToBeCertified.id,
                 formGroup.id,
                 nextSectionGroup ? nextSectionGroup.groupId : undefined,
                 event,
                 formSection.id,
                 formGroup.fields,
-                applicationToBeCertified
+                declarationToBeCertified
               )
             }}
             disabled={this.state.isFileUploading}
@@ -469,8 +469,8 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
                 id="submit_confirm"
                 onClick={() =>
                   this.goToNextFormForSomeoneElse(
-                    applicationId,
-                    applicationToBeCertified,
+                    declarationId,
+                    declarationToBeCertified,
                     event
                   )
                 }
@@ -513,44 +513,44 @@ const mapStateToProps = (
   const { registrationId, eventType, groupId } = props.match.params
   const event = getEvent(eventType)
 
-  const application = state.applicationsState.applications.find(
-    (application) => application.id === registrationId
-  ) as IPrintableApplication | undefined
+  const declaration = state.declarationsState.declarations.find(
+    (declaration) => declaration.id === registrationId
+  ) as IPrintableDeclaration | undefined
 
   const formSection = getCollectCertificateForm(event, state)
   const clonedFormSection = cloneDeep(formSection)
   if (event === Event.BIRTH && groupId === 'certCollector') {
-    const applicationData = application && application.data
+    const declarationData = declaration && declaration.data
 
     const isMotherDeceased = isEqual(
-      get(applicationData, 'primaryCaregiver.motherIsDeceased'),
+      get(declarationData, 'primaryCaregiver.motherIsDeceased'),
       ['deceased']
     )
     const isFatherDeceased = isEqual(
-      get(applicationData, 'primaryCaregiver.fatherIsDeceased'),
+      get(declarationData, 'primaryCaregiver.fatherIsDeceased'),
       ['deceased']
     )
 
     const motherDataExist =
-      applicationData && applicationData.mother && !isMotherDeceased
+      declarationData && declarationData.mother && !isMotherDeceased
     let fatherDataExist =
-      applicationData && applicationData.father && !isFatherDeceased
+      declarationData && declarationData.father && !isFatherDeceased
 
     //TODO: This needs to be dynamic.
     // We shouldn't hardcode 'fathersDetailsExist' field check here
     // As it's part of the form definition so we can't ensure
     // that all countries will have this field in their definition
     if (
-      applicationData &&
-      applicationData.father &&
-      applicationData.father.fathersDetailsExist !== undefined
+      declarationData &&
+      declarationData.father &&
+      declarationData.father.fathersDetailsExist !== undefined
     ) {
       fatherDataExist =
-        fatherDataExist && applicationData.father.fathersDetailsExist
+        fatherDataExist && declarationData.father.fathersDetailsExist
     }
 
     if (motherDataExist && fatherDataExist) {
-      //  !!applicationData.father.fathersDetailsExist &&
+      //  !!declarationData.father.fathersDetailsExist &&
 
       clonedFormSection.groups.unshift(
         certCollectorGroupForBirthAppWithParentDetails
@@ -575,21 +575,21 @@ const mapStateToProps = (
 
   const fields = replaceInitialValues(
     formGroup.fields,
-    (application &&
-      application.data.registration.certificates &&
-      application.data.registration.certificates[
-        application.data.registration.certificates.length - 1
+    (declaration &&
+      declaration.data.registration.certificates &&
+      declaration.data.registration.certificates[
+        declaration.data.registration.certificates.length - 1
       ].collector) ||
       {},
-    application && application.data
+    declaration && declaration.data
   )
 
   return {
     registerForm: getRegisterForm(state)[event],
     event,
     pageRoute: CERTIFICATE_COLLECTOR,
-    applicationId: registrationId,
-    application,
+    declarationId: registrationId,
+    declaration,
     formSection: clonedFormSection,
     formGroup: {
       ...formGroup,
@@ -600,9 +600,9 @@ const mapStateToProps = (
 
 export const CollectorForm = connect(mapStateToProps, {
   goBack,
-  storeApplication,
-  writeApplication,
-  modifyApplication,
+  storeDeclaration,
+  writeDeclaration,
+  modifyDeclaration,
   goToPrintCertificate,
   goToVerifyCollector,
   goToReviewCertificate,

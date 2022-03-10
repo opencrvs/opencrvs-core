@@ -111,9 +111,9 @@ const compositionResource = {
   status: 'preliminary',
   type: {
     coding: [
-      { system: 'http://opencrvs.org/doc-types', code: 'birth-application' }
+      { system: 'http://opencrvs.org/doc-types', code: 'birth-declaration' }
     ],
-    text: 'Birth Application'
+    text: 'Birth Declaration'
   },
   class: {
     coding: [
@@ -121,7 +121,7 @@ const compositionResource = {
     ],
     text: 'CRVS Document'
   },
-  title: 'Birth Application',
+  title: 'Birth Declaration',
   section: [
     {
       title: 'Supporting Documents',

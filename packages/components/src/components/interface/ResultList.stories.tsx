@@ -33,7 +33,7 @@ ResultListView.args = {
           value: '10.10.2018'
         },
         {
-          label: 'Date of application',
+          label: 'Date of declaration',
           value: '10.10.2018'
         },
         {
@@ -47,7 +47,7 @@ ResultListView.args = {
           type: 'gray'
         },
         {
-          label: 'Application',
+          label: 'Declaration',
           type: 'orange'
         }
       ]
@@ -63,7 +63,7 @@ ResultListView.args = {
           value: '10.10.2018'
         },
         {
-          label: 'Date of application',
+          label: 'Date of declaration',
           value: '10.10.2018'
         },
         {
@@ -77,7 +77,7 @@ ResultListView.args = {
           type: 'gray'
         },
         {
-          label: 'Application',
+          label: 'Declaration',
           type: 'orange'
         }
       ]

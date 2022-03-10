@@ -32,7 +32,7 @@ import { messages } from './resetCredentialsForm'
 
 const Header = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
-  color: ${({ theme }) => theme.colors.black};
+  color: ${({ theme }) => theme.colors.copy};
   margin: 0px;
 `
 const Instruction = styled.p`
@@ -44,16 +44,16 @@ const Action = styled.div`
 `
 
 const GlobalError = styled.div`
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.negative};
 `
 const PasswordMatch = styled.div`
   ${({ theme }) => theme.fonts.semiBoldFont};
-  color: ${({ theme }) => theme.colors.success};
+  color: ${({ theme }) => theme.colors.positive};
   margin-top: 8px;
 `
 const PasswordMismatch = styled.div`
   ${({ theme }) => theme.fonts.semiBoldFont};
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.negative};
   margin-top: 8px;
 `
 
