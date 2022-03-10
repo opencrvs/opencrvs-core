@@ -33,6 +33,7 @@ interface IConfigMessages
   applicationNameLabel: MessageDescriptor
   govermentLogoLabel: MessageDescriptor
   currencyLable: MessageDescriptor
+  applicationCurrencyChangeMessage: MessageDescriptor
   phoneNumberLabel: MessageDescriptor
   uniqueIdentificationNumberLabel: MessageDescriptor
   legallySpecifiedLabel: MessageDescriptor
@@ -189,6 +190,11 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.currencyLable',
     defaultMessage: 'Currency',
     description: 'Currency config label'
+  },
+  applicationCurrencyChangeMessage: {
+    id: 'config.application.currencyChangeMessage',
+    defaultMessage: 'Select your currency for your CRVS system',
+    description: 'Message for application currency change modal'
   },
   phoneNumberLabel: {
     id: 'config.application.phoneNumberLabel',
