@@ -17,7 +17,7 @@ interface IConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   applicationTitle: MessageDescriptor
   applicationNameChangeMessage: MessageDescriptor
-  applicationNameChangeError: MessageDescriptor
+  applicationConfigChangeError: MessageDescriptor
   certificateConfiguration: MessageDescriptor
   previewTemplate: MessageDescriptor
   printTemplate: MessageDescriptor
@@ -72,8 +72,8 @@ const messagesToDefine: IConfigMessages = {
     defaultMessage: 'Name of application updated',
     description: 'Message for application name change notification'
   },
-  applicationNameChangeError: {
-    id: 'config.application.nameChangeError',
+  applicationConfigChangeError: {
+    id: 'config.application.configChangeError',
     defaultMessage: 'Unable to make change. Please try again',
     description: 'Error message for application name change'
   },

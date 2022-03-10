@@ -11,6 +11,7 @@
  */
 import gql from 'graphql-tag'
 import { client } from '@client/utils/apolloClient'
+import { IApplicationConfigName } from '@client/views/SysAdmin/Config/DynamicModal'
 
 const applicationConfigMutation = gql`
   mutation ($applicationConfig: ApplicationConfigurationInput) {
@@ -21,25 +22,9 @@ const applicationConfigMutation = gql`
   }
 `
 
-async function updateApplicationName(applicationName: string) {
-  const applicationConfig = {
-    APPLICATION_NAME: applicationName
-  }
-
-  return (
-    client &&
-    client.mutate({
-      mutation: applicationConfigMutation,
-      variables: { applicationConfig }
-    })
-  )
-}
-
-async function updateNidPattern(nidPattern: string) {
-  const applicationConfig = {
-    NID_NUMBER_PATTERN: nidPattern
-  }
-
+async function mutateApplicationConfig(
+  applicationConfig: IApplicationConfigName
+) {
   return (
     client &&
     client.mutate({
@@ -50,6 +35,5 @@ async function updateNidPattern(nidPattern: string) {
 }
 
 export const configApplicationMutations = {
-  updateApplicationName,
-  updateNidPattern
+  mutateApplicationConfig
 }

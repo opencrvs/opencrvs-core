@@ -78,9 +78,9 @@ const ErrorMessage = styled.div`
   margin-left: 6px;
 `
 
-type IApplicationConfigName = {
-  applicationName?: string
-  nidPattern?: string
+export type IApplicationConfigName = {
+  APPLICATION_NAME?: string
+  NID_NUMBER_PATTERN?: string
 }
 type State = {
   applicationName: string
@@ -168,9 +168,9 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
   ) {
     if (
       modalName === GeneralActionId.APPLICATION_NAME &&
-      value.applicationName
+      value.APPLICATION_NAME
     ) {
-      this.callUpdateApplicationNameMutation(value.applicationName)
+      this.callUpdateApplicationNameMutation(value.APPLICATION_NAME)
         .then(() => {
           valueChanged(
             NOTIFICATION_TYPE.SUCCESS,
@@ -183,16 +183,19 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
           this.setState({
             errorOccured: true,
             errorMessages: this.props.intl.formatMessage(
-              messages.applicationNameChangeError
+              messages.applicationConfigChangeError
             )
           })
           valueChanged(
             NOTIFICATION_TYPE.ERROR,
-            this.props.intl.formatMessage(messages.applicationNameChangeError)
+            this.props.intl.formatMessage(messages.applicationConfigChangeError)
           )
         })
-    } else if (modalName === GeneralActionId.NID_PATTERN && value.nidPattern) {
-      this.callUpdateNIDPatternMutation(value.nidPattern)
+    } else if (
+      modalName === GeneralActionId.NID_PATTERN &&
+      value.NID_NUMBER_PATTERN
+    ) {
+      this.callUpdateNIDPatternMutation(value.NID_NUMBER_PATTERN)
         .then(() => {
           valueChanged(
             NOTIFICATION_TYPE.SUCCESS,
@@ -203,12 +206,12 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
           this.setState({
             errorOccured: true,
             errorMessages: this.props.intl.formatMessage(
-              messages.applicationNameChangeError
+              messages.applicationConfigChangeError
             )
           })
           valueChanged(
             NOTIFICATION_TYPE.ERROR,
-            this.props.intl.formatMessage(messages.applicationNameChangeError)
+            this.props.intl.formatMessage(messages.applicationConfigChangeError)
           )
         })
     }
@@ -217,9 +220,9 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
   async callUpdateApplicationNameMutation(applicationName: string) {
     try {
       this.setState({ updatingValue: true })
-      const res = await configApplicationMutations.updateApplicationName(
-        applicationName
-      )
+      const res = await configApplicationMutations.mutateApplicationConfig({
+        APPLICATION_NAME: applicationName
+      })
       if (res && res.data) {
         this.setState({ updatingValue: false })
         const APPLICATION_NAME =
@@ -236,7 +239,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
       this.setState({
         errorOccured: true,
         errorMessages: this.props.intl.formatMessage(
-          messages.applicationNameChangeError
+          messages.applicationConfigChangeError
         )
       })
     }
@@ -245,7 +248,9 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
   async callUpdateNIDPatternMutation(nidPattern: string) {
     try {
       this.setState({ updatingValue: true })
-      const res = await configApplicationMutations.updateNidPattern(nidPattern)
+      const res = await configApplicationMutations.mutateApplicationConfig({
+        NID_NUMBER_PATTERN: nidPattern
+      })
       if (res && res.data) {
         this.setState({ updatingValue: false })
         const NID_NUMBER_PATTERN =
@@ -262,7 +267,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
       this.setState({
         errorOccured: true,
         errorMessages: this.props.intl.formatMessage(
-          messages.applicationNameChangeError
+          messages.applicationConfigChangeError
         )
       })
     }
@@ -326,8 +331,8 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
               this.mutationHandler(
                 changeModalName,
                 {
-                  applicationName: this.state.applicationName,
-                  nidPattern: this.state.nidPattern
+                  APPLICATION_NAME: this.state.applicationName,
+                  NID_NUMBER_PATTERN: this.state.nidPattern
                 },
                 valueChanged
               )
