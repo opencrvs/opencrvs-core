@@ -162,6 +162,8 @@ services:
       - 8200:8200
     networks:
       - overlay_net
+    deploy:
+      replicas: 3
     command: >
       apm-server -e
         -E apm-server.rum.enabled=true
@@ -170,6 +172,7 @@ services:
         -E apm-server.kibana.enabled=true
         -E apm-server.kibana.host=kibana:5601
         -E output.elasticsearch.hosts=["elasticsearch:9200"]
+        -E output.elasticsearch.bulk_max_size=5120
 
   # Configure influxdb
   influxdb:
