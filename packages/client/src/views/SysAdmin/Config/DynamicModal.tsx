@@ -78,9 +78,17 @@ const ErrorMessage = styled.div`
   color: ${({ theme }) => theme.colors.error};
   margin-left: 6px;
 `
-type IApplicationName = {
-  applicatioName: string
+
+type ICurrency = {
+  isoCode: string | undefined
+  languagesAndCountry: string[]
 }
+
+export type IApplicationConfigName = {
+  APPLICATION_NAME?: string
+  CURRENCY?: ICurrency
+}
+
 type State = {
   applicationName: string
   currency: string
@@ -119,13 +127,6 @@ type DispatchProps = {
 }
 
 type IFullProps = IProps & IntlShapeProps & DispatchProps
-
-function isApplicationName(
-  modalName: string,
-  value: IApplicationName
-): value is IApplicationName {
-  return modalName === GeneralActionId.APPLICATION_NAME
-}
 class DynamicModalComponent extends React.Component<IFullProps, State> {
   constructor(props: IFullProps) {
     super(props)
@@ -148,16 +149,27 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
     }))
   }
 
+  getCurrencyObject = (value: string) => {
+    const arr = value.split('-')
+    return {
+      isoCode: arr.pop(),
+      languagesAndCountry: [arr.join('-')]
+    }
+  }
+
   mutationHandler(
     modalName: string,
-    value: IApplicationName,
+    value: IApplicationConfigName,
     valueChanged: (
       notificationStatus: NOTIFICATION_TYPE,
       messages: string
     ) => void
   ) {
-    if (isApplicationName(modalName, value)) {
-      this.callUpdateApplicationNameMutation(value.applicatioName)
+    if (
+      modalName === GeneralActionId.APPLICATION_NAME &&
+      value.APPLICATION_NAME
+    ) {
+      this.callUpdateApplicationNameMutation(value.APPLICATION_NAME)
         .then(() => {
           valueChanged(
             NOTIFICATION_TYPE.SUCCESS,
@@ -170,12 +182,34 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
           this.setState({
             errorOccured: true,
             errorMessages: this.props.intl.formatMessage(
-              messages.applicationNameChangeError
+              messages.applicationConfigChangeError
             )
           })
           valueChanged(
             NOTIFICATION_TYPE.ERROR,
-            this.props.intl.formatMessage(messages.applicationNameChangeError)
+            this.props.intl.formatMessage(messages.applicationConfigChangeError)
+          )
+        })
+    } else if (modalName === GeneralActionId.CURRENCY && value.CURRENCY) {
+      this.callUpdateApplicationCurrencyMutation(value.CURRENCY)
+        .then(() => {
+          valueChanged(
+            NOTIFICATION_TYPE.SUCCESS,
+            this.props.intl.formatMessage(
+              messages.applicationCurrencyChangeNotification
+            )
+          )
+        })
+        .catch(() => {
+          this.setState({
+            errorOccured: true,
+            errorMessages: this.props.intl.formatMessage(
+              messages.applicationConfigChangeError
+            )
+          })
+          valueChanged(
+            NOTIFICATION_TYPE.ERROR,
+            this.props.intl.formatMessage(messages.applicationConfigChangeError)
           )
         })
     }
@@ -184,9 +218,9 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
   async callUpdateApplicationNameMutation(applicationName: string) {
     try {
       this.setState({ updatingValue: true })
-      const res = await configApplicationMutations.updateApplicationName(
-        applicationName
-      )
+      const res = await configApplicationMutations.mutateApplicationConfig({
+        APPLICATION_NAME: applicationName
+      })
       if (res && res.data) {
         this.setState({ updatingValue: false })
         const APPLICATION_NAME =
@@ -203,7 +237,34 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
       this.setState({
         errorOccured: true,
         errorMessages: this.props.intl.formatMessage(
-          messages.applicationNameChangeError
+          messages.applicationConfigChangeError
+        )
+      })
+    }
+  }
+
+  async callUpdateApplicationCurrencyMutation(currency: ICurrency) {
+    try {
+      this.setState({ updatingValue: true })
+      const res = await configApplicationMutations.mutateApplicationConfig({
+        CURRENCY: currency
+      })
+      if (res && res.data) {
+        this.setState({ updatingValue: false })
+        const CURRENCY = res.data.updateApplicationConfig.CURRENCY
+        const offlineConfig = {
+          config: {
+            ...this.props.offlineCountryConfiguration.config,
+            CURRENCY
+          }
+        }
+        this.props.updateConfig(offlineConfig)
+      }
+    } catch (err) {
+      this.setState({
+        errorOccured: true,
+        errorMessages: this.props.intl.formatMessage(
+          messages.applicationConfigChangeError
         )
       })
     }
@@ -280,7 +341,10 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
             onClick={() => {
               this.mutationHandler(
                 changeModalName,
-                { applicatioName: this.state.applicationName },
+                {
+                  APPLICATION_NAME: this.state.applicationName,
+                  CURRENCY: this.getCurrencyObject(this.state.currency)
+                },
                 valueChanged
               )
             }}
@@ -330,6 +394,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
                 required={false}
               >
                 <Select
+                  id="selectCurrency"
                   isDisabled={false}
                   onChange={(val: string) => {
                     this.setState({
@@ -337,7 +402,6 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
                     })
                   }}
                   value={this.state.currency}
-                  onFocus={() => {}}
                   options={this.getCurrencySelectOptions()}
                 />
               </InputField>
