@@ -206,7 +206,7 @@ const messagesToDefine: IConfigMessages = {
     description: 'Phone number config label'
   },
   nidPatternTitle: {
-    id: 'config.application.nidPatternLabel',
+    id: 'config.application.nidPatternTitle',
     defaultMessage: 'Unique Identification Number (UIN) e.g. National ID',
     description: 'Unique Identification Number (UIN) config title'
   },

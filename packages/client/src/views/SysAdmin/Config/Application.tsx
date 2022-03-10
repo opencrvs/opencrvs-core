@@ -41,8 +41,6 @@ const ListGroupTitle = styled.div`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
 `
 
-const Container = styled.div``
-
 type Props = IntlShapeProps & {
   userDetails: IUserDetails | null
   offlineCountryConfiguration: IOfflineData
