@@ -61,7 +61,7 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema'
 import moment from 'moment'
 import { getOfflineData } from '@client/offline/selectors'
-import { IOfflineData } from '@client/offline/reducer'
+import { IOfflineData, ILocation } from '@client/offline/reducer'
 import {
   ResponsiveModal,
   Loader,
@@ -121,9 +121,10 @@ import {
 } from '@client/utils/userUtils'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import NotificationToast from '@client/views/OfficeHome/NotificationToast'
-import { isEmpty, get, find } from 'lodash'
+import { isEmpty, get, find, has, flatten, values } from 'lodash'
 import { IRegisterFormState } from '@client/forms/register/reducer'
 import { goBack } from 'connected-react-router'
+import { getFieldValue } from './utils'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -253,6 +254,7 @@ interface IStateProps {
   tab: IRecordAuditTabs
   workqueueDeclaration: GQLEventSearchSet | null
   registerForm: IRegisterFormState
+  offlineData: Partial<IOfflineData>
 }
 
 interface IDispatchProps {
@@ -966,13 +968,14 @@ const GetHistory = ({
 const actionDetailsModalListTable = (
   actionDetailsData: IActionDetailsData,
   registerForm: IForm,
-  intl: IntlShape
+  intl: IntlShape,
+  offlineData: Partial<IOfflineData>
 ) => {
   if (registerForm == undefined) return []
 
   const sections = registerForm?.sections || []
   const commentsColumn = [{ key: 'comment', label: 'Comment', width: 100 }]
-  const dataChangeColumns = [
+  const declarationUpdatedColumns = [
     { key: 'item', label: 'Item', width: 33.33 },
     { key: 'original', label: 'Original', width: 33.33 },
     { key: 'edit', label: 'Edit', width: 33.33 }
@@ -983,41 +986,50 @@ const actionDetailsModalListTable = (
   ): IDynamicValues[] => {
     const result: IDynamicValues[] = []
     actionDetailsData.input.forEach((item: { [key: string]: any }) => {
+      const editedValue = actionDetailsData.output.find(
+        (oi: { valueId: string }) => oi.valueId == item.valueId
+      )
+
       const section = find(
         sections,
         (section) => section.id == item.valueCode
       ) as IFormSection
 
       const indexes: string[] = item.valueId.split('.')
-      section.groups.forEach((group) => {
-        group.fields.forEach((field) => {
-          indexes.forEach((index) => {
-            if (index == 'nestedFields' && field) {
-              let nestedField
-              for (const fieldIndex in field.nestedFields) {
-                nestedField = field.nestedFields[fieldIndex]
-                nestedField.forEach((nf) => {
-                  if (nf.name == index) {
-                    result.push({
-                      item: intl.formatMessage(nf.label),
-                      original: item.valueString,
-                      edit: 'EDIT...'
-                    })
-                  }
-                })
-              }
-            } else {
-              if (field.name == index) {
-                result.push({
-                  item: intl.formatMessage(field.label),
-                  original: item.valueString,
-                  edit: 'EDIT...'
-                })
-              }
-            }
+
+      if (indexes.length > 1) {
+        const [parentField, , nestedField] = indexes
+
+        const nestedFields = flatten(
+          section.groups.map((group) => {
+            return group.fields
           })
+        ).find((field) => field.name == parentField)
+
+        const fieldObj = flatten(values(nestedFields?.nestedFields)).find(
+          (field) => field.name == nestedField
+        ) as IFormField
+
+        result.push({
+          item: intl.formatMessage(fieldObj.label),
+          original: getFieldValue(item.valueString, fieldObj, offlineData),
+          edit: 'EDIT...'
         })
-      })
+      } else {
+        const [parentField] = indexes
+
+        const fieldObj = flatten(
+          section.groups.map((group) => {
+            return group.fields
+          })
+        ).find((field) => field.name == parentField) as IFormField
+
+        result.push({
+          item: intl.formatMessage(fieldObj.label),
+          original: getFieldValue(item.valueString, fieldObj, offlineData),
+          edit: 'EDIT...'
+        })
+      }
     })
 
     return result
@@ -1036,7 +1048,7 @@ const actionDetailsModalListTable = (
       <ListTable
         noResultText=" "
         hideBoxShadow={true}
-        columns={dataChangeColumns}
+        columns={declarationUpdatedColumns}
         content={dataChange(actionDetailsData)}
       ></ListTable>
     </>
@@ -1049,7 +1061,8 @@ const ActionDetailsModal = (
   toggleActionDetails: (param: IActionDetailsData | null) => void,
   intl: IntlShape,
   goToUser: typeof goToUserProfile,
-  registerForm: IForm
+  registerForm: IForm,
+  offlineData: Partial<IOfflineData>
 ) => {
   if (isEmpty(actionDetailsData)) return <></>
 
@@ -1089,7 +1102,12 @@ const ActionDetailsModal = (
           </CLinkButton>
           <span> — {getFormattedDate(actionDetailsData.date)}</span>
         </div>
-        {actionDetailsModalListTable(actionDetailsData, registerForm, intl)}
+        {actionDetailsModalListTable(
+          actionDetailsData,
+          registerForm,
+          intl,
+          offlineData
+        )}
       </>
     </ResponsiveModal>
   )
@@ -1110,7 +1128,8 @@ function RecordAuditBody({
   registerForm,
   goToUserProfile,
   goToTeamUserList,
-  goBack
+  goBack,
+  offlineData
 }: {
   declaration: IDeclarationData
   draft: IApplication | null
@@ -1118,6 +1137,7 @@ function RecordAuditBody({
   scope: Scope | null
   userDetails: IUserDetails | null
   registerForm: IRegisterFormState
+  offlineData: Partial<IOfflineData>
 } & IDispatchProps) {
   const [showDialog, setShowDialog] = React.useState(false)
   const [showActionDetails, setActionDetails] = React.useState(false)
@@ -1308,7 +1328,8 @@ function RecordAuditBody({
         toggleActionDetails,
         intl,
         goToUserProfile,
-        regForm
+        regForm,
+        offlineData
       )}
 
       <ResponsiveModal
@@ -1462,6 +1483,7 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
     tab,
     userDetails: state.profile.userDetails,
     registerForm: state.registerForm,
+    offlineData: state.offline.offlineData,
     workqueueDeclaration:
       (tab !== 'search' &&
         state.workqueueState.workqueue.data[tab].results?.find(
