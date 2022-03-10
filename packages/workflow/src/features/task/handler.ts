@@ -41,7 +41,7 @@ export default async function updateTaskHandler(
       getToken(request)
     )
     const taskId = getEntryId(payload)
-    const taskResource = payload.entry?.[0].resource as fhir.Task
+    const taskResource = payload.entry?.[0].resource as fhir.Task | undefined
     if (!taskResource) {
       throw new Error('TaskBundle has no entry')
     }
