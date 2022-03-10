@@ -20,6 +20,7 @@ const applicationConfigMutation = gql`
     updateApplicationConfig(applicationConfig: $applicationConfig) {
       APPLICATION_NAME
       CURRENCY {
+        languagesAndCountry
         isoCode
       }
     }
