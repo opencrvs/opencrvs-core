@@ -39,7 +39,7 @@ import {
   dynamicConstantsMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/registrarHome'
-import { IApplication, DOWNLOAD_STATUS } from '@client/applications'
+import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
 import { Action } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { withTheme } from 'styled-components'
@@ -56,7 +56,7 @@ interface IBaseReviewTabProps {
   goToReviewDuplicate: typeof goToReviewDuplicate
   registrarLocationId: string | null
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
-  outboxApplications: IApplication[]
+  outboxDeclarations: IDeclaration[]
   queryData: {
     data: GQLEventSearchResultSet
   }
@@ -109,11 +109,11 @@ class ReviewTabComponent extends React.Component<
     const transformedData = transformData(data, this.props.intl)
     return transformedData.map((reg, index) => {
       const actions = [] as IAction[]
-      const foundApplication = this.props.outboxApplications.find(
-        (application) => application.id === reg.id
+      const foundDeclaration = this.props.outboxDeclarations.find(
+        (declaration) => declaration.id === reg.id
       )
       const downloadStatus =
-        (foundApplication && foundApplication.downloadStatus) || undefined
+        (foundDeclaration && foundDeclaration.downloadStatus) || undefined
       let icon: JSX.Element = <div />
 
       if (reg.duplicates && reg.duplicates.length > 0) {
@@ -124,7 +124,7 @@ class ReviewTabComponent extends React.Component<
                 downloadConfigs={{
                   event: reg.event,
                   compositionId: reg.id,
-                  action: Action.LOAD_REVIEW_APPLICATION
+                  action: Action.LOAD_REVIEW_DECLARATION
                 }}
                 key={`DownloadButton-${index}`}
                 status={downloadStatus as DOWNLOAD_STATUS}
@@ -150,7 +150,7 @@ class ReviewTabComponent extends React.Component<
                 downloadConfigs={{
                   event: reg.event,
                   compositionId: reg.id,
-                  action: Action.LOAD_REVIEW_APPLICATION
+                  action: Action.LOAD_REVIEW_DECLARATION
                 }}
                 key={`DownloadButton-${index}`}
                 status={downloadStatus as DOWNLOAD_STATUS}
@@ -189,7 +189,7 @@ class ReviewTabComponent extends React.Component<
               moment(reg.dateOfEvent.toString(), 'YYYY-MM-DD')
             )) ||
           '',
-        applicationTimeElapsed:
+        declarationTimeElapsed:
           (reg.createdAt && formattedDuration(moment(reg.createdAt))) || '',
         actions,
         icon,
@@ -219,10 +219,10 @@ class ReviewTabComponent extends React.Component<
         },
         {
           label: this.props.intl.formatMessage(
-            messages.listItemApplicationDate
+            messages.listItemDeclarationDate
           ),
           width: 19,
-          key: 'applicationTimeElapsed'
+          key: 'declarationTimeElapsed'
         },
         {
           label: this.props.intl.formatMessage(constantsMessages.eventDate),
@@ -272,7 +272,7 @@ class ReviewTabComponent extends React.Component<
         <ReactTooltip id="validateTooltip">
           <ToolTipContainer>
             {this.props.intl.formatMessage(
-              messages.validatedApplicationTooltipForRegistrar
+              messages.validatedDeclarationTooltipForRegistrar
             )}
           </ToolTipContainer>
         </ReactTooltip>
@@ -301,7 +301,7 @@ class ReviewTabComponent extends React.Component<
 function mapStateToProps(state: IStoreState) {
   return {
     scope: getScope(state),
-    outboxApplications: state.applicationsState.applications
+    outboxDeclarations: state.declarationsState.declarations
   }
 }
 

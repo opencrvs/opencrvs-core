@@ -11,10 +11,10 @@
  */
 import * as React from 'react'
 import {
-  modifyApplication,
-  IApplication,
-  writeApplication
-} from '@client/applications'
+  modifyDeclaration,
+  IDeclaration,
+  writeDeclaration
+} from '@client/declarations'
 import { getCorrectorSection } from '@client/forms/correction/corrector'
 import { connect } from 'react-redux'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
@@ -36,14 +36,14 @@ import { Content } from '@opencrvs/components/lib/interface/Content'
 import { groupHasError } from './utils'
 
 type IProps = {
-  application: IApplication
+  declaration: IDeclaration
 }
 
 type IDispatchProps = {
   goBack: typeof goBack
   goToVerifyCorrector: typeof goToVerifyCorrector
-  modifyApplication: typeof modifyApplication
-  writeApplication: typeof writeApplication
+  modifyDeclaration: typeof modifyDeclaration
+  writeDeclaration: typeof writeDeclaration
   goToHomeTab: typeof goToHomeTab
 }
 
@@ -51,30 +51,30 @@ type IFullProps = IProps & IDispatchProps & IntlShapeProps
 
 function getGroupWithVisibleFields(
   section: IFormSection,
-  application: IApplication
+  declaration: IDeclaration
 ) {
-  const event = application.event
+  const event = declaration.event
   const group = section.groups[0]
   const field = group.fields[0] as IRadioGroupWithNestedFieldsFormField
   if (event === Event.BIRTH) {
-    const applicationData = application.data
+    const declarationData = declaration.data
 
     const isMotherDeceased = isEqual(
-      get(applicationData, 'primaryCaregiver.motherIsDeceased'),
+      get(declarationData, 'primaryCaregiver.motherIsDeceased'),
       ['deceased']
     )
     const isFatherDeceased = isEqual(
-      get(applicationData, 'primaryCaregiver.fatherIsDeceased'),
+      get(declarationData, 'primaryCaregiver.fatherIsDeceased'),
       ['deceased']
     )
 
     const motherDataExists =
-      applicationData && applicationData.mother && !isMotherDeceased
+      declarationData && declarationData.mother && !isMotherDeceased
 
     const fatherDataExists =
-      applicationData &&
-      applicationData.father &&
-      applicationData.father.fathersDetailsExist &&
+      declarationData &&
+      declarationData.father &&
+      declarationData.father.fathersDetailsExist &&
       !isFatherDeceased
 
     if (!fatherDataExists) {
@@ -94,44 +94,44 @@ function getGroupWithVisibleFields(
     ...group,
     fields: replaceInitialValues(
       group.fields,
-      application.data[section.id] || {},
-      application.data
+      declaration.data[section.id] || {},
+      declaration.data
     )
   }
 }
 
 function CorrectorFormComponent(props: IFullProps) {
-  const { application, intl } = props
+  const { declaration, intl } = props
 
-  const section = getCorrectorSection(application.event)
+  const section = getCorrectorSection(declaration.event)
 
   const group = React.useMemo(
-    () => getGroupWithVisibleFields(section, application),
+    () => getGroupWithVisibleFields(section, declaration),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   )
 
-  const modifyApplication = (
+  const modifyDeclaration = (
     sectionData: IFormSectionData,
     section: IFormSection,
-    application: IApplication
+    declaration: IDeclaration
   ) => {
-    props.modifyApplication({
-      ...application,
+    props.modifyDeclaration({
+      ...declaration,
       data: {
-        ...application.data,
+        ...declaration.data,
         [section.id]: {
-          ...application.data[section.id],
+          ...declaration.data[section.id],
           ...sectionData
         }
       }
     })
   }
   const continueButtonHandler = () => {
-    props.writeApplication(application)
+    props.writeDeclaration(declaration)
     props.goToVerifyCorrector(
-      application.id,
-      (application.data.corrector.relationship as IFormSectionData)
+      declaration.id,
+      (declaration.data.corrector.relationship as IFormSectionData)
         .value as string
     )
   }
@@ -141,7 +141,7 @@ function CorrectorFormComponent(props: IFullProps) {
       id="confirm_form"
       key="confirm_form"
       onClick={continueButtonHandler}
-      disabled={groupHasError(group, application.data[section.id])}
+      disabled={groupHasError(group, declaration.data[section.id])}
     >
       {intl.formatMessage(buttonMessages.continueButton)}
     </PrimaryButton>
@@ -159,7 +159,7 @@ function CorrectorFormComponent(props: IFullProps) {
         <Content
           title={group.title && intl.formatMessage(group.title)}
           subtitle={
-            application.event === Event.BIRTH
+            declaration.event === Event.BIRTH
               ? intl.formatMessage(messages.birthCorrectionNote)
               : undefined
           }
@@ -168,11 +168,11 @@ function CorrectorFormComponent(props: IFullProps) {
           <FormFieldGenerator
             id={group.id}
             onChange={(values) => {
-              modifyApplication(values, section, application)
+              modifyDeclaration(values, section, declaration)
             }}
             setAllFieldsDirty={false}
             fields={group.fields}
-            draftData={application.data}
+            draftData={declaration.data}
           />
         </Content>
       </ActionPageLight>
@@ -182,8 +182,8 @@ function CorrectorFormComponent(props: IFullProps) {
 
 export const CorrectorForm = connect(undefined, {
   goBack,
-  modifyApplication,
-  writeApplication,
+  modifyDeclaration,
+  writeDeclaration,
   goToVerifyCorrector,
   goToHomeTab
 })(injectIntl(CorrectorFormComponent))

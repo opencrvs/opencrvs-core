@@ -49,7 +49,7 @@ export const HomeContent = styled.div`
 export const Container = styled.div<{ isCertificatesConfigPage?: boolean }>`
   background-color: ${({ isCertificatesConfigPage, theme }) =>
     isCertificatesConfigPage === true
-      ? theme.colors.smallButtonFocus
+      ? theme.colors.grey100
       : theme.colors.white};
   position: absolute;
   min-height: 100vh;

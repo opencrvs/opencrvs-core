@@ -24,10 +24,6 @@ interface Window {
     AUTH_URL: string
     COUNTRY_CONFIG_URL: string
     SHOW_FARAJALAND_IN_COUNTRY_LISTS: boolean
-    /**
-     * @deprecated HEALTH_FACILITY_FILTER is no longer used
-     */
-    HEALTH_FACILITY_FILTER: string
     CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: number
     CERTIFICATE_PRINT_CHARGE_UP_LIMIT: number
     CERTIFICATE_PRINT_LOWEST_CHARGE: number
@@ -37,7 +33,7 @@ interface Window {
     HIDE_EVENT_REGISTER_INFORMATION: boolean
     EXTERNAL_VALIDATION_WORKQUEUE: boolean
     FIELD_AGENT_AUDIT_LOCATIONS: string
-    APPLICATION_AUDIT_LOCATIONS: string
+    DECLARATION_AUDIT_LOCATIONS: string
     PHONE_NUMBER_PATTERN: {
       pattern: RegExp
       example: string

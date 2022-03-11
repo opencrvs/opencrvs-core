@@ -21,6 +21,12 @@ on:
         description: Farajaland branch name
         default: develop
         required: true
+      farajaland-image-tag:
+        description: Farajaland DockerHub image tag
+        required: false
+      core-image-tag:
+        description: Core DockerHub image tag
+        required: false
 
 jobs:
   manual-deploy-staging-e2e:
@@ -31,23 +37,41 @@ jobs:
         node-version: [14.17.0]
     steps:
       - name: Checking out git repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.4
       - name: Checking out the country config repo
         run: |
-          git clone https://github.com/opencrvs/opencrvs-farajaland.git
+          git clone -b ${{ github.event.inputs.farajaland }} https://github.com/opencrvs/opencrvs-farajaland.git
+          cd opencrvs-farajaland
+          git status
+          cd ../
       - name: Get COUNTRY_CONFIG_VERSION
+        if: ${{ !github.event.inputs.farajaland-image-tag }}
         run: |
           cd opencrvs-farajaland
-          git checkout ${{ github.event.inputs.farajaland }}
           echo "COUNTRY_CONFIG_VERSION=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
           cd ../
+      - name: Set COUNTRY_CONFIG_VERSION from inputs
+        if: ${{ github.event.inputs.farajaland-image-tag }}
+        run: |
+          echo "COUNTRY_CONFIG_VERSION=${{ github.event.inputs.farajaland-image-tag }}" >> $GITHUB_ENV
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Push images to Dockerhub
-        run: yarn compose:push:version
+
+      - name: Get CORE_VERSION
+        if: ${{ !github.event.inputs.core-image-tag }}
+        run: echo "CORE_VERSION=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Set CORE_VERSION from inputs
+        if: ${{ github.event.inputs.core-image-tag }}
+        run: echo "CORE_VERSION=${{ github.event.inputs.core-image-tag }}" >> $GITHUB_ENV
+
+      - name: Check if images exist on Dockerhub and build if they dont
+        if: ${{ !github.event.inputs.core-image-tag && !github.event.inputs.farajaland-image-tag }}
+        run: bash check-before-build.sh ${{ secrets.DOCKER_USERNAME }} ${{ secrets.DOCKER_PASSWORD }} ${{ env.CORE_VERSION }}
+
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
         with:
@@ -55,7 +79,7 @@ jobs:
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
       - name: Deploy to development
         run: |
-          yarn deploy:staging farajaland-staging.opencrvs.org $(git rev-parse --short HEAD) ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
+          yarn deploy:staging farajaland-staging.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
       - name: Run Cypress tests
         run: |
           cd opencrvs-farajaland

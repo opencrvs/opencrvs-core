@@ -11,14 +11,13 @@
  */
 import { App } from '@client/App'
 import { Event, ISerializedForm } from '@client/forms'
-import { getRegisterForm } from '@client/forms/register/application-selectors'
+import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getReviewForm } from '@client/forms/register/review-selectors'
 import { getDefaultLanguage } from '@client/i18n/utils'
 import { offlineDataReady, setOfflineData } from '@client/offline/actions'
 import { AppStore, createStore, IStoreState } from '@client/store'
 import { ThemeProvider } from '@client/styledComponents'
 import { getSchema } from '@client/tests/graphql-schema-mock'
-import { ICertificateCollectorDefinition } from '@client/views/PrintCertificate/VerifyCollector'
 import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { InMemoryCache } from 'apollo-cache-inmemory'
@@ -53,6 +52,8 @@ import {
 import { stringify } from 'query-string'
 import { match as Match } from 'react-router'
 import { ConnectedRouter } from 'connected-react-router'
+import { IVerifyIDCertificateCollectorDefinition } from '@client/forms/certificate/fieldDefinitions/collectorSection'
+import { mockOfflineData } from './mock-offline-data'
 
 export const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -117,7 +118,7 @@ export function getInitialState(): IStoreState {
 }
 
 export function waitForReady(app: ReactWrapper) {
-  return waitForElement(app, '#readyApplication')
+  return waitForElement(app, '#readyDeclaration')
 }
 
 export async function createTestApp(
@@ -200,9 +201,9 @@ export const selectOption = (
 const currentUserId = '123'
 
 // This object has more than 10 drafts to utilize pagination testing in draft tab
-export const currentUserApplications = {
+export const currentUserDeclarations = {
   userID: currentUserId,
-  applications: [
+  declarations: [
     {
       id: '72c18939-70c1-40b4-9b80-b162c4871160',
       data: {
@@ -1197,17 +1198,17 @@ export const currentUserApplications = {
         informant: {
           iDType: 'NATIONAL_ID',
           iDTypeOther: '',
-          applicantID: 1111111111111,
+          informantID: 1111111111111,
           fetchButton: '',
-          applicantFirstNames: 'স্যাম',
-          applicantFamilyName: 'পল',
-          applicantFirstNamesEng: 'Sam',
-          applicantFamilyNameEng: 'Paul',
+          informantFirstNames: 'স্যাম',
+          informantFamilyName: 'পল',
+          informantFirstNamesEng: 'Sam',
+          informantFamilyNameEng: 'Paul',
           nationality: 'BGD',
-          applicantBirthDate: '2000-01-01',
+          informantBirthDate: '2000-01-01',
           relationship: 'OTHER',
           otherRelationship: 'Friend',
-          applicantPhone: '01711111111',
+          informantPhone: '01711111111',
           currentAddress: '',
           country: 'BGD',
           state: '9a236522-0c3d-40eb-83ad-e8567518c763',
@@ -1221,7 +1222,7 @@ export const currentUserApplications = {
           addressLine1: '',
           postCode: '',
           permanentAddress: '',
-          applicantPermanentAddressSameAsCurrent: true,
+          informantPermanentAddressSameAsCurrent: true,
           countryPermanent: 'BGD',
           statePermanent: '',
           districtPermanent: '',
@@ -1561,16 +1562,16 @@ export const currentUserApplications = {
         informant: {
           iDType: 'NATIONAL_ID',
           iDTypeOther: '',
-          applicantID: 1111111111111,
+          informantID: 1111111111111,
           fetchButton: '',
-          applicantFirstNames: 'স্যাম',
-          applicantFamilyName: 'পল',
-          applicantFirstNamesEng: 'Sam',
-          applicantFamilyNameEng: 'Paul',
+          informantFirstNames: 'স্যাম',
+          informantFamilyName: 'পল',
+          informantFirstNamesEng: 'Sam',
+          informantFamilyNameEng: 'Paul',
           nationality: 'BGD',
-          applicantBirthDate: '2000-01-01',
+          informantBirthDate: '2000-01-01',
           relationship: 'SON',
-          applicantPhone: '01711111111',
+          informantPhone: '01711111111',
           currentAddress: '',
           country: 'BGD',
           state: '9a236522-0c3d-40eb-83ad-e8567518c763',
@@ -1584,7 +1585,7 @@ export const currentUserApplications = {
           addressLine1: '',
           postCode: '',
           permanentAddress: '',
-          applicantPermanentAddressSameAsCurrent: true,
+          informantPermanentAddressSameAsCurrent: true,
           countryPermanent: 'BGD',
           statePermanent: '',
           districtPermanent: '',
@@ -1674,16 +1675,16 @@ export const currentUserApplications = {
         informant: {
           iDType: 'NATIONAL_ID',
           iDTypeOther: '',
-          applicantID: 1111111111111,
+          informantID: 1111111111111,
           fetchButton: '',
-          applicantFirstNames: 'স্যাম',
-          applicantFamilyName: 'পল',
-          applicantFirstNamesEng: 'Sam',
-          applicantFamilyNameEng: 'Paul',
+          informantFirstNames: 'স্যাম',
+          informantFamilyName: 'পল',
+          informantFirstNamesEng: 'Sam',
+          informantFamilyNameEng: 'Paul',
           nationality: 'BGD',
-          applicantBirthDate: '2000-01-01',
+          informantBirthDate: '2000-01-01',
           relationship: 'SON',
-          applicantPhone: '01711111111',
+          informantPhone: '01711111111',
           currentAddress: '',
           country: 'BGD',
           state: '9a236522-0c3d-40eb-83ad-e8567518c763',
@@ -1697,7 +1698,7 @@ export const currentUserApplications = {
           addressLine1: '',
           postCode: '',
           permanentAddress: '',
-          applicantPermanentAddressSameAsCurrent: true,
+          informantPermanentAddressSameAsCurrent: true,
           countryPermanent: 'BGD',
           statePermanent: '',
           districtPermanent: '',
@@ -1787,14 +1788,14 @@ export const currentUserApplications = {
         informant: {
           iDType: 'NATIONAL_ID',
           iDTypeOther: '',
-          applicantID: 1111111111111,
+          informantID: 1111111111111,
           fetchButton: '',
-          applicantFirstNames: 'স্যাম',
-          applicantFamilyName: 'পল',
-          applicantFirstNamesEng: 'Sam',
-          applicantFamilyNameEng: 'Paul',
+          informantFirstNames: 'স্যাম',
+          informantFamilyName: 'পল',
+          informantFirstNamesEng: 'Sam',
+          informantFamilyNameEng: 'Paul',
           nationality: 'BGD',
-          applicantBirthDate: '2000-01-01',
+          informantBirthDate: '2000-01-01',
           relationship: 'SON',
           currentAddress: '',
           country: 'BGD',
@@ -1809,7 +1810,7 @@ export const currentUserApplications = {
           addressLine1: '',
           postCode: '',
           permanentAddress: '',
-          applicantPermanentAddressSameAsCurrent: true,
+          informantPermanentAddressSameAsCurrent: true,
           countryPermanent: 'BGD',
           statePermanent: '',
           districtPermanent: '',
@@ -2240,7 +2241,7 @@ export const mockRegistrarUserResponse = {
   }
 }
 
-export const mockApplicationData = {
+export const mockDeclarationData = {
   child: {
     firstNames: 'গায়ত্রী',
     familyName: 'স্পিভক',
@@ -2335,7 +2336,7 @@ export const mockApplicationData = {
   }
 }
 
-export const mockDeathApplicationData = {
+export const mockDeathDeclarationData = {
   deceased: {
     iDType: 'NATIONAL_ID',
     iD: '1230000000000',
@@ -2368,15 +2369,15 @@ export const mockDeathApplicationData = {
     postCode: '2200'
   },
   informant: {
-    applicantIdType: 'NATIONAL_ID',
+    informantIdType: 'NATIONAL_ID',
     iDType: 'NATIONAL_ID',
-    applicantID: '1230000000000',
-    applicantFirstNames: '',
-    applicantFamilyName: 'ইসলাম',
-    applicantFirstNamesEng: 'Islam',
-    applicantFamilyNameEng: 'Islam',
+    informantID: '1230000000000',
+    informantFirstNames: '',
+    informantFamilyName: 'ইসলাম',
+    informantFirstNamesEng: 'Islam',
+    informantFamilyNameEng: 'Islam',
     nationality: 'BGD',
-    applicantBirthDate: '',
+    informantBirthDate: '',
     relationship: 'MOTHER',
     currentAddress: '',
     country: 'BGD',
@@ -2388,7 +2389,7 @@ export const mockDeathApplicationData = {
     addressLine1: '193 Kalibari Road',
     postCode: '2200',
     permanentAddress: '',
-    applicantPermanentAddressSameAsCurrent: true,
+    informantPermanentAddressSameAsCurrent: true,
     countryPermanent: 'BGD',
     statePermanent: '',
     districtPermanent: '',
@@ -2541,7 +2542,7 @@ export const mockFetchCertificatesTemplatesDefinition = [
     event: 'birth',
     status: 'ACTIVE',
     svgCode:
-      '<svg width="420" height="595" viewBox="0 0 420 595" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\n<rect width="420" height="595" fill="white"/>\n<rect x="16.5" y="16.5" width="387" height="562" stroke="#D7DCDE"/>\n<path d="M138.429 511.629H281.571" stroke="#F4F4F4" stroke-width="1.22857" stroke-linecap="square" stroke-linejoin="round"/>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="526.552" text-anchor="middle">{registrarName}&#x2028;</tspan><tspan x="50%" y="538.552" text-anchor="middle">({role}) &#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="209.884" y="549.336">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="210" y="445.552">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="429.552" text-anchor="middle">This event was registered at {registrationLocation}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="308.828" text-anchor="middle">{eventDate}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="287.69" text-anchor="middle">Died on&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="345.69" text-anchor="middle">Place of death&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="500" letter-spacing="0px"><tspan x="211" y="384.004">&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="367.828" text-anchor="middle">{placeOfDeath}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="245.828" text-anchor="middle">{applicantName}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="224.69" text-anchor="middle">This is to certify that&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="1px"><tspan x="50%" y="145.828" text-anchor="middle">{registrationNumber}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" letter-spacing="0px"><tspan x="50%" y="127.828" text-anchor="middle">Death Registration No&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="170.104" text-anchor="middle">Date of issuance of certificate:  {certificateDate}</tspan></text>\n<line x1="44.9985" y1="403.75" x2="377.999" y2="401.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<line x1="44.9985" y1="189.75" x2="377.999" y2="187.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<rect x="188" y="51" width="46.7463" height="54" fill="url(#pattern0)"/>\n<defs>\n<pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">\n<use xlink:href="#image0_43_3545" transform="translate(0 -0.000358256) scale(0.0005)"/>\n</pattern>\n<image id="image0_43_3545" width="2000" height="2312" xlink:href="{countryLogo}"/>\n</defs>\n</svg>\n',
+      '<svg width="420" height="595" viewBox="0 0 420 595" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\n<rect width="420" height="595" fill="white"/>\n<rect x="16.5" y="16.5" width="387" height="562" stroke="#D7DCDE"/>\n<path d="M138.429 511.629H281.571" stroke="#F4F4F4" stroke-width="1.22857" stroke-linecap="square" stroke-linejoin="round"/>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="526.552" text-anchor="middle">{registrarName}&#x2028;</tspan><tspan x="50%" y="538.552" text-anchor="middle">({role}) &#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="209.884" y="549.336">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="210" y="445.552">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="429.552" text-anchor="middle">This event was registered at {registrationLocation}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="308.828" text-anchor="middle">{eventDate}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="287.69" text-anchor="middle">Died on&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="345.69" text-anchor="middle">Place of death&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="500" letter-spacing="0px"><tspan x="211" y="384.004">&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="367.828" text-anchor="middle">{placeOfDeath}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="245.828" text-anchor="middle">{informantName}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="224.69" text-anchor="middle">This is to certify that&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="1px"><tspan x="50%" y="145.828" text-anchor="middle">{registrationNumber}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" letter-spacing="0px"><tspan x="50%" y="127.828" text-anchor="middle">Death Registration No&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="170.104" text-anchor="middle">Date of issuance of certificate:  {certificateDate}</tspan></text>\n<line x1="44.9985" y1="403.75" x2="377.999" y2="401.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<line x1="44.9985" y1="189.75" x2="377.999" y2="187.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<rect x="188" y="51" width="46.7463" height="54" fill="url(#pattern0)"/>\n<defs>\n<pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">\n<use xlink:href="#image0_43_3545" transform="translate(0 -0.000358256) scale(0.0005)"/>\n</pattern>\n<image id="image0_43_3545" width="2000" height="2312" xlink:href="{countryLogo}"/>\n</defs>\n</svg>\n',
     svgDateCreated: 1640696680593,
     svgDateUpdated: 1644326332088,
     svgFilename: 'oCRVS_DefaultZambia_Death_v1.svg',
@@ -2551,367 +2552,13 @@ export const mockFetchCertificatesTemplatesDefinition = [
     event: 'death',
     status: 'ACTIVE',
     svgCode:
-      '<svg width="420" height="595" viewBox="0 0 420 595" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\n<rect width="420" height="595" fill="white"/>\n<rect x="16.5" y="16.5" width="387" height="562" stroke="#D7DCDE"/>\n<path d="M138.429 511.629H281.571" stroke="#F4F4F4" stroke-width="1.22857" stroke-linecap="square" stroke-linejoin="round"/>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="526.552" text-anchor="middle">{registrarName}&#x2028;</tspan><tspan x="50%" y="538.552" text-anchor="middle">({role}) &#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="549.336" text-anchor="middle">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="445.552" text-anchor="middle">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="429.552" text-anchor="middle">This event was registered at {registrationLocation}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="308.828" text-anchor="middle">{eventDate}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="287.69" text-anchor="middle">Was born on&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="345.69" text-anchor="middle">Place of birth&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="500" letter-spacing="0px"><tspan x="50%" y="384.004" text-anchor="middle">&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="367.828" text-anchor="middle">{placeOfBirth}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="245.828" text-anchor="middle">{applicantName}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="224.69" text-anchor="middle">This is to certify that&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="1px"><tspan x="50%" y="145.828" text-anchor="middle">{registrationNumber}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" letter-spacing="0px"><tspan x="50%" y="127.828" text-anchor="middle">Birth Registration No&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="170.104" text-anchor="middle">Date of issuance of certificate:  {certificateDate}</tspan></text>\n<line x1="44.9985" y1="403.75" x2="377.999" y2="401.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<line x1="44.9985" y1="189.75" x2="377.999" y2="187.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<rect x="188" y="51" width="46.7463" height="54" fill="url(#pattern0)"/>\n<defs>\n<pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">\n<use xlink:href="#image0_43_3545" transform="translate(0 -0.000358256) scale(0.0005)"/>\n</pattern>\n<image id="image0_43_3545" width="2000" height="2312" xlink:href="{countryLogo}"/>\n</defs>\n</svg>\n',
+      '<svg width="420" height="595" viewBox="0 0 420 595" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\n<rect width="420" height="595" fill="white"/>\n<rect x="16.5" y="16.5" width="387" height="562" stroke="#D7DCDE"/>\n<path d="M138.429 511.629H281.571" stroke="#F4F4F4" stroke-width="1.22857" stroke-linecap="square" stroke-linejoin="round"/>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="526.552" text-anchor="middle">{registrarName}&#x2028;</tspan><tspan x="50%" y="538.552" text-anchor="middle">({role}) &#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="549.336" text-anchor="middle">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="445.552" text-anchor="middle">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="429.552" text-anchor="middle">This event was registered at {registrationLocation}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="308.828" text-anchor="middle">{eventDate}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="287.69" text-anchor="middle">Was born on&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="345.69" text-anchor="middle">Place of birth&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="500" letter-spacing="0px"><tspan x="50%" y="384.004" text-anchor="middle">&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="367.828" text-anchor="middle">{placeOfBirth}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="245.828" text-anchor="middle">{informantName}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="224.69" text-anchor="middle">This is to certify that&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="1px"><tspan x="50%" y="145.828" text-anchor="middle">{registrationNumber}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" letter-spacing="0px"><tspan x="50%" y="127.828" text-anchor="middle">Birth Registration No&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="170.104" text-anchor="middle">Date of issuance of certificate:  {certificateDate}</tspan></text>\n<line x1="44.9985" y1="403.75" x2="377.999" y2="401.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<line x1="44.9985" y1="189.75" x2="377.999" y2="187.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<rect x="188" y="51" width="46.7463" height="54" fill="url(#pattern0)"/>\n<defs>\n<pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">\n<use xlink:href="#image0_43_3545" transform="translate(0 -0.000358256) scale(0.0005)"/>\n</pattern>\n<image id="image0_43_3545" width="2000" height="2312" xlink:href="{countryLogo}"/>\n</defs>\n</svg>\n',
     svgDateCreated: 1640696804785,
     svgDateUpdated: 1643885502999,
     svgFilename: 'oCRVS_DefaultZambia_Birth_v1.svg',
     user: '61d42359f1a2c25ea01beb4b'
   }
 ]
-
-export const mockOfflineData = {
-  forms: JSON.parse(
-    readFileSync(join(__dirname, './register.json')).toString()
-  ) as {
-    registerForm: { birth: ISerializedForm; death: ISerializedForm }
-    certificateCollectorDefinition: {
-      birth: ICertificateCollectorDefinition
-      death: ICertificateCollectorDefinition
-    }
-    userForm: ISerializedForm
-  },
-  facilities: {
-    '627fc0cc-e0e2-4c09-804d-38a9fa1807ee': {
-      id: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee',
-      name: 'Shaheed Taj Uddin Ahmad Medical College',
-      alias: 'শহীদ তাজউদ্দিন আহমেদ মেডিকেল কলেজ হাসপাতাল',
-      physicalType: 'Building',
-      type: 'HEALTH_FACILITY',
-      partOf: 'Location/3a5358d0-1bcd-4ea9-b0b7-7cfb7cbcbf0f'
-    },
-    'ae5b4462-d1b2-4b22-b289-a66f912dce73': {
-      id: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
-      name: 'Kaliganj Union Sub Center',
-      alias: 'কালীগঞ্জ ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র',
-      physicalType: 'Building',
-      type: 'HEALTH_FACILITY',
-      partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
-    },
-    '6abbb7b8-d02e-41cf-8a3e-5039776c1eb0': {
-      id: '6abbb7b8-d02e-41cf-8a3e-5039776c1eb0',
-      name: 'Kaliganj Upazila Health Complex',
-      alias: 'কালীগঞ্জ উপজেলা স্বাস্থ্য কমপ্লেক্স',
-      physicalType: 'Building',
-      type: 'HEALTH_FACILITY',
-      partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
-    },
-    '0d8474da-0361-4d32-979e-af91f020309e': {
-      id: '0d8474da-0361-4d32-979e-af91f020309e',
-      name: 'Dholashadhukhan Cc',
-      alias: 'ধলাশাধুখান সিসি - কালিগঞ্জ',
-      physicalType: 'Building',
-      type: 'HEALTH_FACILITY',
-      partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
-    }
-  },
-  offices: {
-    '0d8474da-0361-4d32-979e-af91f012340a': {
-      id: '0d8474da-0361-4d32-979e-af91f012340a',
-      name: 'Moktarpur Union Parishad',
-      alias: 'মোক্তারপুর ইউনিয়ন পরিষদ',
-      physicalType: 'Building',
-      type: 'CRVS_OFFICE',
-      partOf: 'Location/7a18cb4c-38f3-449f-b3dc-508473d485f3'
-    }
-  },
-  locations: {
-    '65cf62cb-864c-45e3-9c0d-5c70f0074cb4': {
-      id: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
-      name: 'Barisal',
-      alias: 'বরিশাল',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DIVISION',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/0'
-    },
-    '8cbc862a-b817-4c29-a490-4a8767ff023c': {
-      id: '8cbc862a-b817-4c29-a490-4a8767ff023c',
-      name: 'Chittagong',
-      alias: 'চট্টগ্রাম',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DIVISION',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/0'
-    },
-    '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b': {
-      id: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
-      name: 'Dhaka',
-      alias: 'ঢাকা',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DIVISION',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/0'
-    },
-    '7304b306-1b0d-4640-b668-5bf39bc78f48': {
-      id: '7304b306-1b0d-4640-b668-5bf39bc78f48',
-      name: 'Khulna',
-      alias: 'খুলনা',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DIVISION',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/0'
-    },
-    '75fdf3dc-0dd2-4b65-9c59-3afe5f49fc3a': {
-      id: '75fdf3dc-0dd2-4b65-9c59-3afe5f49fc3a',
-      name: 'Rajshahi',
-      alias: 'রাজশাহী',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DIVISION',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/0'
-    },
-    '2b55d13f-f700-4373-8255-c0febd4733b6': {
-      id: '2b55d13f-f700-4373-8255-c0febd4733b6',
-      name: 'Rangpur',
-      alias: 'রংপুর',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DIVISION',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/0'
-    },
-    '59f7f044-84b8-4a6c-955d-271aa3e5af46': {
-      id: '59f7f044-84b8-4a6c-955d-271aa3e5af46',
-      name: 'Sylhet',
-      alias: 'সিলেট',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DIVISION',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/0'
-    },
-    '237f3404-d417-41fe-9130-3d049800a1e5': {
-      id: '237f3404-d417-41fe-9130-3d049800a1e5',
-      name: 'Mymensingh',
-      alias: 'ময়মনসিংহ',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DIVISION',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/0'
-    },
-    'bc4b9f99-0db3-4815-926d-89fd56889407': {
-      id: 'bc4b9f99-0db3-4815-926d-89fd56889407',
-      name: 'BARGUNA',
-      alias: 'বরগুনা',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DISTRICT',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
-    },
-    'dabffdf7-c174-4450-b306-5a3c2c0e2c0e': {
-      id: 'dabffdf7-c174-4450-b306-5a3c2c0e2c0e',
-      name: 'BARISAL',
-      alias: 'বরিশাল',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DISTRICT',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
-    },
-    'a5b61fc5-f0c9-4f54-a934-eba18f9110c2': {
-      id: 'a5b61fc5-f0c9-4f54-a934-eba18f9110c2',
-      name: 'BHOLA',
-      alias: 'ভোলা',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DISTRICT',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
-    },
-    '5ffa5780-5ddf-4549-a391-7ad3ba2334d4': {
-      id: '5ffa5780-5ddf-4549-a391-7ad3ba2334d4',
-      name: 'JHALOKATI',
-      alias: 'ঝালকাঠি',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DISTRICT',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
-    },
-    'c8dcf1fe-bf92-404b-81c0-31d6802a1a68': {
-      id: 'c8dcf1fe-bf92-404b-81c0-31d6802a1a68',
-      name: 'PATUAKHALI',
-      alias: 'পটুয়াখালী ',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DISTRICT',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
-    },
-    '9c86160a-f704-464a-8b7d-9eae2b4cf1f9': {
-      id: '9c86160a-f704-464a-8b7d-9eae2b4cf1f9',
-      name: 'PIROJPUR',
-      alias: 'পিরোজপুর ',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DISTRICT',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
-    },
-    '1846f07e-6f5c-4507-b5d6-126716b0856b': {
-      id: '1846f07e-6f5c-4507-b5d6-126716b0856b',
-      name: 'BANDARBAN',
-      alias: 'বান্দরবান',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DISTRICT',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
-    },
-    'cf141982-36a1-4308-9090-0445c311f5ae': {
-      id: 'cf141982-36a1-4308-9090-0445c311f5ae',
-      name: 'BRAHMANBARIA',
-      alias: 'ব্রাহ্মণবাড়িয়া',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DISTRICT',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
-    },
-    '478f518e-8d86-439d-8618-5cfa8d3bf5dd': {
-      id: '478f518e-8d86-439d-8618-5cfa8d3bf5dd',
-      name: 'CHANDPUR',
-      alias: 'চাঁদপুর',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DISTRICT',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
-    },
-    'db5faba3-8143-4924-a44a-8562ed5e0437': {
-      id: 'db5faba3-8143-4924-a44a-8562ed5e0437',
-      name: 'CHITTAGONG',
-      alias: 'চট্টগ্রাম',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DISTRICT',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
-    },
-    '5926982b-845c-4463-80aa-cbfb86762e0a': {
-      id: '5926982b-845c-4463-80aa-cbfb86762e0a',
-      name: 'COMILLA',
-      alias: 'কুমিল্লা',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DISTRICT',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
-    },
-    'a3455e64-164c-4bf4-b834-16640a85efd8': {
-      id: 'a3455e64-164c-4bf4-b834-16640a85efd8',
-      name: "COX'S BAZAR",
-      alias: 'কক্সবাজার ',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DISTRICT',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
-    },
-    '1dfc716a-c5f7-4d39-ad71-71d2a359210c': {
-      id: '1dfc716a-c5f7-4d39-ad71-71d2a359210c',
-      name: 'FENI',
-      alias: 'ফেনী',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DISTRICT',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
-    },
-    'bfe8306c-0910-48fe-8bf5-0db906cf3155': {
-      alias: 'বানিয়াজান',
-      id: 'bfe8306c-0910-48fe-8bf5-0db906cf3155',
-      jurisdictionType: 'UNION',
-      name: 'Baniajan',
-      partOf: 'Location/8f1aae72-2f90-4585-b853-e8c37f4be764',
-      physicalType: 'Jurisdiction',
-      type: 'ADMIN_STRUCTURE'
-    },
-    'd3cef1d4-6187-4f0e-a024-61abd3fce9d4': {
-      alias: 'দুওজ',
-      id: 'd3cef1d4-6187-4f0e-a024-61abd3fce9d4',
-      jurisdictionType: 'UNION',
-      name: 'Duaz',
-      partOf: 'Location/8f1aae72-2f90-4585-b853-e8c37f4be764',
-      physicalType: 'Jurisdiction',
-      type: 'ADMIN_STRUCTURE'
-    },
-    '473ed705-13e8-4ec1-9836-69bc269f7fad': {
-      alias: '',
-      id: '473ed705-13e8-4ec1-9836-69bc269f7fad',
-      jurisdictionType: 'STATE',
-      name: 'Lusaka',
-      partOf: 'Location/0',
-      physicalType: 'Jurisdiction',
-      type: 'ADMIN_STRUCTURE'
-    },
-    '81317429-1d89-42ac-8abc-7a92f268273c': {
-      alias: '',
-      id: '81317429-1d89-42ac-8abc-7a92f268273c',
-      jurisdictionType: 'DISTRICT',
-      name: 'Lusaka',
-      partOf: 'Location/473ed705-13e8-4ec1-9836-69bc269f7fad',
-      physicalType: 'Jurisdiction',
-      type: 'ADMIN_STRUCTURE'
-    }
-  },
-  pilotLocations: {
-    'bfe8306c-0910-48fe-8bf5-0db906cf3155': {
-      alias: 'বানিয়াজান',
-      id: 'bfe8306c-0910-48fe-8bf5-0db906cf3155',
-      jurisdictionType: 'UNION',
-      name: 'Baniajan',
-      partOf: 'Location/8f1aae72-2f90-4585-b853-e8c37f4be764',
-      physicalType: 'Jurisdiction',
-      type: 'ADMIN_STRUCTURE'
-    },
-    'd3cef1d4-6187-4f0e-a024-61abd3fce9d4': {
-      alias: 'দুওজ',
-      id: 'd3cef1d4-6187-4f0e-a024-61abd3fce9d4',
-      jurisdictionType: 'UNION',
-      name: 'Duaz',
-      partOf: 'Location/8f1aae72-2f90-4585-b853-e8c37f4be764',
-      physicalType: 'Jurisdiction',
-      type: 'ADMIN_STRUCTURE'
-    }
-  },
-  languages: JSON.parse(
-    readFileSync(join(__dirname, './languages.json')).toString()
-  ).data,
-  templates: JSON.parse(
-    readFileSync(join(__dirname, './templates.json')).toString()
-  ),
-  assets: {
-    logo: `data:image;base64,${validImageB64String}`
-  },
-  config: {
-    COUNTRY_LOGO_RENDER_WIDTH: 104,
-    COUNTRY_LOGO_RENDER_HEIGHT: 104,
-    DESKTOP_TIME_OUT_MILLISECONDS: 900000,
-    HEALTH_FACILITY_FILTER: 'DISTRICT',
-    LANGUAGES: 'en,bn',
-    CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 36500,
-    CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 36500,
-    CERTIFICATE_PRINT_LOWEST_CHARGE: 0,
-    CERTIFICATE_PRINT_HIGHEST_CHARGE: 0,
-    UI_POLLING_INTERVAL: 5000,
-    FIELD_AGENT_AUDIT_LOCATIONS:
-      'WARD,UNION,CITY_CORPORATION,MUNICIPALITY,UPAZILA',
-    APPLICATION_AUDIT_LOCATIONS: 'WARD,UNION',
-    INFORMANT_MINIMUM_AGE: 16,
-    HIDE_EVENT_REGISTER_INFORMATION: false,
-    EXTERNAL_VALIDATION_WORKQUEUE: true,
-    _id: '61a8c105c04ac94fe46ceb27',
-    BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
-    COUNTRY: 'bgd',
-    COUNTRY_LOGO_FILE: 'logo.png',
-    PHONE_NUMBER_PATTERN: {
-      pattern: /^01[1-9][0-9]{8}$/,
-      example: '01741234567',
-      start: '01',
-      num: '11',
-      mask: {
-        startForm: 5,
-        endBefore: 3
-      }
-    },
-    BIRTH_REGISTRATION_TARGET: 45,
-    DEATH_REGISTRATION_TARGET: 45,
-    NID_NUMBER_PATTERN: {
-      pattern: /^[0-9]{9}$/,
-      example: '4837281940',
-      num: '9'
-    },
-    SENTRY: 'https://sentry.com',
-    LOGROCKET: 'opencrvs-foundation/opencrvs-zambia'
-  }
-}
 
 export const mockConfigResponse = {
   config: mockOfflineData.config,
@@ -3001,7 +2648,7 @@ export async function createTestComponent(
   return mount(<PropProxy {...node.props} />, options)
 }
 
-export const mockDeathApplicationDataWithoutFirstNames = {
+export const mockDeathDeclarationDataWithoutFirstNames = {
   deceased: {
     iDType: 'NATIONAL_ID',
     iD: '1230000000000',
@@ -3034,15 +2681,15 @@ export const mockDeathApplicationDataWithoutFirstNames = {
     postCode: ''
   },
   informant: {
-    applicantIdType: 'NATIONAL_ID',
+    informantIdType: 'NATIONAL_ID',
     iDType: 'NATIONAL_ID',
-    applicantID: '1230000000000',
-    applicantFirstNames: '',
-    applicantFamilyName: 'ইসলাম',
-    applicantFirstNamesEng: 'Islam',
-    applicantFamilyNameEng: 'Islam',
+    informantID: '1230000000000',
+    informantFirstNames: '',
+    informantFamilyName: 'ইসলাম',
+    informantFirstNamesEng: 'Islam',
+    informantFamilyNameEng: 'Islam',
     nationality: 'BGD',
-    applicantBirthDate: '',
+    informantBirthDate: '',
     relationship: 'SPOUSE',
     currentAddress: '',
     country: 'BGD',
@@ -3054,7 +2701,7 @@ export const mockDeathApplicationDataWithoutFirstNames = {
     addressLine1: '193 Kalibari Road',
     postCode: '2200',
     permanentAddress: '',
-    applicantPermanentAddressSameAsCurrent: true,
+    informantPermanentAddressSameAsCurrent: true,
     countryPermanent: 'BGD',
     statePermanent: '',
     districtPermanent: '',
@@ -3279,3 +2926,5 @@ export function createRouterProps<T, Params>(
 
   return { location, history, match }
 }
+
+export { mockOfflineData } from './mock-offline-data'

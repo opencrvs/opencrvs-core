@@ -18,7 +18,7 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 
 const StickyFormTabsContainer = styled.div`
   div.sticky-inner-wrapper {
-    ${({ theme }) => theme.gradients.gradientNightshade};
+    ${({ theme }) => theme.gradients.primary};
   }
 `
 

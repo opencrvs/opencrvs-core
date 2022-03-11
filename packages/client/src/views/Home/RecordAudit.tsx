@@ -22,7 +22,7 @@ import styled, { ITheme, withTheme } from '@client/styledComponents'
 import {
   RotateLeft,
   Archive,
-  ApplicationIcon,
+  DeclarationIcon,
   Edit,
   BackArrow
 } from '@opencrvs/components/lib/icons'
@@ -46,12 +46,12 @@ import {
 } from 'react-intl'
 import {
   archiveDeclaration,
-  reinstateApplication,
+  reinstateDeclaration,
   clearCorrectionChange,
-  IApplication,
+  IDeclaration,
   SUBMISSION_STATUS,
   DOWNLOAD_STATUS
-} from '@client/applications'
+} from '@client/declarations'
 import { IStoreState } from '@client/store'
 import {
   GQLEventSearchSet,
@@ -167,26 +167,26 @@ const BackButton = styled(CircleButton)`
 
 const KeyContainer = styled.div`
   width: 190px;
-  color: ${({ theme }) => theme.colors.grey};
+  color: ${({ theme }) => theme.colors.grey600};
   ${({ theme }) => theme.fonts.bodyBoldStyle}
 `
 
 const ValueContainer = styled.div<{ value: undefined | string }>`
   width: 325px;
   color: ${({ theme, value }) =>
-    value ? theme.colors.grey : theme.colors.grey600};
+    value ? theme.colors.grey600 : theme.colors.grey400};
   ${({ theme }) => theme.fonts.captionBigger};
 `
 
 const GreyedInfo = styled.div`
   height: 26px;
-  background-color: ${({ theme }) => theme.colors.greyInfo};
+  background-color: ${({ theme }) => theme.colors.grey200};
   max-width: 330px;
 `
 
 const LargeGreyedInfo = styled.div`
   height: 231px;
-  background-color: ${({ theme }) => theme.colors.greyInfo};
+  background-color: ${({ theme }) => theme.colors.grey200};
   max-width: 100%;
   border-radius: 4px;
   margin: 15px 0px;
@@ -250,7 +250,7 @@ interface IStateProps {
   resources: IOfflineData
   scope: Scope | null
   declarationId: string
-  draft: IApplication | null
+  draft: IDeclaration | null
   tab: IRecordAuditTabs
   workqueueDeclaration: GQLEventSearchSet | null
   registerForm: IRegisterFormState
@@ -259,7 +259,7 @@ interface IStateProps {
 
 interface IDispatchProps {
   archiveDeclaration: typeof archiveDeclaration
-  reinstateApplication: typeof reinstateApplication
+  reinstateDeclaration: typeof reinstateDeclaration
   clearCorrectionChange: typeof clearCorrectionChange
   goToCertificateCorrection: typeof goToCertificateCorrection
   goToPage: typeof goToPage
@@ -276,7 +276,7 @@ type CMethodParams = {
   declaration: IDeclarationData
   intl: IntlShape
   userDetails: IUserDetails | null
-  draft: IApplication | null
+  draft: IDeclaration | null
   goToPage?: typeof goToPage
   goToPrintCertificate?: typeof goToPrintCertificate
   goToUserProfile?: typeof goToUserProfile
@@ -336,21 +336,21 @@ const STATUSTOCOLOR: { [key: string]: string } = {
 
 const ARCHIVABLE_STATUSES = [DECLARED, VALIDATED, REJECTED]
 
-const APPLICATION_STATUS_LABEL: IStatus = {
+const DECLARATION_STATUS_LABEL: IStatus = {
   IN_PROGRESS: {
     defaultMessage: 'Sent incomplete',
     description: 'Declaration submitted without completing the required fields',
     id: 'constants.sent_incomplete'
   },
   DECLARED: {
-    defaultMessage: 'Application started',
-    description: 'Label for table header column Application started',
-    id: 'constants.applicationStarted'
+    defaultMessage: 'Declaration started',
+    description: 'Label for registration status declared',
+    id: 'recordAudit.history.declared'
   },
   WAITING_VALIDATION: {
     defaultMessage: 'Waiting for validation',
-    description: 'A label for waitingValidated',
-    id: 'constants.waitingValidated'
+    description: 'Label for registration status waitingValidation',
+    id: 'recordAudit.history.waitingValidation'
   },
   VALIDATED: {
     defaultMessage: 'Sent for approval',
@@ -358,29 +358,29 @@ const APPLICATION_STATUS_LABEL: IStatus = {
     id: 'regHome.sentForApprovals'
   },
   REGISTERED: {
-    defaultMessage: 'Application registered',
-    description: 'Label for date of registration in work queue list item',
-    id: 'regHome.table.label.registeredDate'
+    defaultMessage: 'Declaration registered',
+    description: 'Label for registration status registered',
+    id: 'recordAudit.history.registered'
   },
   CERTIFIED: {
     defaultMessage: 'Certified',
     description: 'Label for registration status certified',
-    id: 'regHome.certified'
+    id: 'recordAudit.history.certified'
   },
   REJECTED: {
-    id: 'constants.rejected',
     defaultMessage: 'Rejected',
-    description: 'A label for rejected'
+    description: 'A label for registration status rejected',
+    id: 'recordAudit.history.rejected'
   },
   DOWNLOADED: {
     defaultMessage: 'Downloaded',
-    description: 'Label for application download status Downloaded',
-    id: 'constants.downloaded'
+    description: 'Label for declaration download status Downloaded',
+    id: 'recordAudit.history.downloaded'
   },
   REQUESTED_CORRECTION: {
-    id: 'correction.request',
     defaultMessage: 'Requested correction',
-    description: 'Status for application being requested for correction'
+    description: 'Status for declaration being requested for correction',
+    id: 'recordAudit.history.requestedCorrection'
   },
   DECLARATION_UPDATED: {
     defaultMessage: 'Updated declaration',
@@ -389,8 +389,8 @@ const APPLICATION_STATUS_LABEL: IStatus = {
   },
   ARCHIVED: {
     defaultMessage: 'Archived',
-    description: 'Application has been archived',
-    id: 'constants.archived_declaration'
+    description: 'A label for registration status archived',
+    id: 'recordAudit.history.archived'
   }
 }
 
@@ -411,7 +411,7 @@ const isDeathDeclaration = (
   return (declaration && declaration.type === 'Death') || false
 }
 
-const getDraftDeclarationName = (declaration: IApplication) => {
+const getDraftDeclarationName = (declaration: IDeclaration) => {
   let name = ''
   let declarationName
   if (declaration.event === 'birth') {
@@ -437,7 +437,7 @@ const getName = (name: (GQLHumanName | null)[], language: string) => {
 }
 
 const getLocation = (
-  declaration: IApplication,
+  declaration: IDeclaration,
   resources: IOfflineData,
   intl: IntlShape
 ) => {
@@ -474,7 +474,7 @@ const getLocation = (
 }
 
 const getDraftDeclarationData = (
-  declaration: IApplication,
+  declaration: IDeclaration,
   resources: IOfflineData,
   intl: IntlShape
 ): IDeclarationData => {
@@ -521,11 +521,11 @@ const getWQDeclarationData = (
     name = getName(workqueueDeclaration.deceasedName, language)
   }
   return {
-    id: workqueueDeclaration.id,
+    id: workqueueDeclaration?.id,
     name,
-    type: (workqueueDeclaration.type && workqueueDeclaration.type) || '',
-    status: workqueueDeclaration.registration?.status || '',
-    trackingId: workqueueDeclaration.registration?.trackingId || '',
+    type: (workqueueDeclaration?.type && workqueueDeclaration.type) || '',
+    status: workqueueDeclaration?.registration?.status || '',
+    trackingId: workqueueDeclaration?.registration?.trackingId || '',
     dateOfBirth: '',
     placeOfBirth: '',
     informant: ''
@@ -742,13 +742,13 @@ const showUpdateButton = ({
 }
 
 const showDownloadButton = (
-  application: IDeclarationData,
-  draft: IApplication | null,
+  declaration: IDeclarationData,
+  draft: IDeclaration | null,
   userDetails: IUserDetails | null
 ) => {
-  const { id, type } = application || {}
+  const { id, type } = declaration || {}
 
-  if (application == null || id == null || type == null) return <></>
+  if (declaration == null || id == null || type == null) return <></>
 
   const downloadStatus = draft?.downloadStatus || undefined
 
@@ -764,7 +764,7 @@ const showDownloadButton = (
     const downLoadConfig = {
       event: type,
       compositionId: id,
-      action: Action.LOAD_REVIEW_APPLICATION
+      action: Action.LOAD_REVIEW_DECLARATION
     }
     return (
       <DownloadButton
@@ -840,7 +840,6 @@ const getNameWithAvatar = (
           onClick={() => {
             goToUser && goToUser(id)
           }}
-          textDecoration="none"
         >
           {userName}
         </LinkButton>
@@ -850,17 +849,13 @@ const getNameWithAvatar = (
 }
 
 const getStatusLabel = (status: string, intl: IntlShape) => {
-  if (status in APPLICATION_STATUS_LABEL)
-    return intl.formatMessage(APPLICATION_STATUS_LABEL[status])
+  if (status in DECLARATION_STATUS_LABEL)
+    return intl.formatMessage(DECLARATION_STATUS_LABEL[status])
   return ''
 }
 
 const getLink = (status: string, onClick: () => void) => {
-  return (
-    <LinkButton textDecoration="none" onClick={onClick}>
-      {status}
-    </LinkButton>
-  )
+  return <LinkButton onClick={onClick}>{status}</LinkButton>
 }
 
 const getFormattedDate = (date: Date) => {
@@ -1099,9 +1094,9 @@ const ActionDetailsModal = ({
   if (isEmpty(actionDetailsData)) return <></>
 
   const title =
-    (APPLICATION_STATUS_LABEL[actionDetailsData?.action] &&
+    (DECLARATION_STATUS_LABEL[actionDetailsData?.action] &&
       intl.formatMessage(
-        APPLICATION_STATUS_LABEL[actionDetailsData?.action]
+        DECLARATION_STATUS_LABEL[actionDetailsData?.action]
       )) ||
     ''
 
@@ -1147,7 +1142,7 @@ const ActionDetailsModal = ({
 
 function RecordAuditBody({
   archiveDeclaration,
-  reinstateApplication,
+  reinstateDeclaration,
   clearCorrectionChange,
   declaration,
   draft,
@@ -1165,7 +1160,7 @@ function RecordAuditBody({
   offlineData
 }: {
   declaration: IDeclarationData
-  draft: IApplication | null
+  draft: IDeclaration | null
   intl: IntlShape
   scope: Scope | null
   userDetails: IUserDetails | null
@@ -1334,7 +1329,7 @@ function RecordAuditBody({
         icon={() => (
           <>
             <IconDiv>
-              <ApplicationIcon
+              <DeclarationIcon
                 isArchive={declaration?.status === ARCHIVED}
                 color={
                   STATUSTOCOLOR[
@@ -1387,7 +1382,7 @@ function RecordAuditBody({
               id="continue"
               key="continue"
               onClick={() => {
-                reinstateApplication(declaration.id)
+                reinstateDeclaration(declaration.id)
                 toggleDisplayDialog()
               }}
             >
@@ -1506,7 +1501,7 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
   return {
     declarationId,
     draft:
-      state.applicationsState.applications.find(
+      state.declarationsState.declarations.find(
         (declaration) =>
           declaration.id === declarationId ||
           declaration.compositionId === declarationId
@@ -1534,7 +1529,7 @@ export const RecordAudit = connect<
   IStoreState
 >(mapStateToProps, {
   archiveDeclaration,
-  reinstateApplication,
+  reinstateDeclaration,
   clearCorrectionChange,
   goToCertificateCorrection,
   goToPage,

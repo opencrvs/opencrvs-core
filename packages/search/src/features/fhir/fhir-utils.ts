@@ -243,12 +243,12 @@ export function selectObservationEntry(
     : undefined
 }
 
-export async function getLocationHirarchyIDs(applicationLocationId?: string) {
-  if (!applicationLocationId) {
+export async function getLocationHirarchyIDs(declarationLocationId?: string) {
+  if (!declarationLocationId) {
     return []
   }
-  const locationHirarchyIds = [applicationLocationId]
-  let locationId = `Location/${applicationLocationId}`
+  const locationHirarchyIds = [declarationLocationId]
+  let locationId = `Location/${declarationLocationId}`
   while (locationId) {
     locationId = await fetchParentLocationByLocationID(locationId)
     if (locationId === 'Location/0') {

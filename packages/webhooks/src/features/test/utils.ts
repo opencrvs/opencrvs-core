@@ -21,10 +21,10 @@ export const testBundle = {
           coding: [
             {
               system: 'http://opencrvs.org/doc-types',
-              code: 'birth-application'
+              code: 'birth-declaration'
             }
           ],
-          text: 'Birth Application'
+          text: 'Birth Declaration'
         },
         class: {
           coding: [
@@ -35,7 +35,7 @@ export const testBundle = {
           ],
           text: 'CRVS Document'
         },
-        title: 'Birth Application',
+        title: 'Birth Declaration',
         section: [
           {
             title: 'Child details',
@@ -142,8 +142,7 @@ export const testBundle = {
             valueString: ''
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '+260798989899'
           },
           {

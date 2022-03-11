@@ -22,14 +22,14 @@ import { SettingsPage } from '@client/views/Settings/SettingsPage'
 import { getStorageUserDetailsSuccess } from '@opencrvs/client/src/profile/profileActions'
 import { DataSection } from '@opencrvs/components/lib/interface'
 import { ReactWrapper } from 'enzyme'
-import { COUNT_USER_WISE_APPLICATIONS } from '@client/search/queries'
+import { COUNT_USER_WISE_DECLARATIONS } from '@client/search/queries'
 import { changeAvatarMutation } from './AvatarChangeModal'
 import * as imageUtils from '@client/utils/imageUtils'
 
 const graphqlMocks = [
   {
     request: {
-      query: COUNT_USER_WISE_APPLICATIONS,
+      query: COUNT_USER_WISE_DECLARATIONS,
       variables: {
         status: ['REJECTED'],
         locationIds: ['6327dbd9-e118-4dbe-9246-cb0f7649a666']

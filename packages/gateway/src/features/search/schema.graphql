@@ -23,7 +23,7 @@ type RegistrationSearchSet {
   status: String
   contactNumber: String
   contactRelationship: String
-  dateOfApplication: Date
+  dateOfDeclaration: Date
   trackingId: String
   registrationNumber: String
   eventLocationId: String

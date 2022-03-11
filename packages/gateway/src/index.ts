@@ -72,7 +72,7 @@ export async function createServer() {
   app.route(routes)
 
   /*
-   * For debugging sent applications on pre-prod environments.
+   * For debugging sent declarations on pre-prod environments.
    * Custom implementation a sGood doesn't support logging request payloads
    * https://github.com/hapijs/good/search?q=request&type=Issues
    */

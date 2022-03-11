@@ -15,7 +15,7 @@ import {
   ColumnContentAlignment,
   GridTable
 } from '@opencrvs/components/lib/interface'
-import { IApplication } from '@client/applications'
+import { IDeclaration } from '@client/declarations'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import moment from 'moment'
@@ -27,18 +27,17 @@ import {
   buttonMessages
 } from '@client/i18n/messages'
 import { messages as reg_messages } from '@client/i18n/messages/views/registrarHome'
-import { getDraftApplicantFullName } from '@client/utils/draftUtils'
+import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { formattedDuration } from '@client/utils/date-formatting'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,
-  DRAFT_DEATH_FORM_PAGE,
-  REVIEW_EVENT_PARENT_FORM_PAGE
+  DRAFT_DEATH_FORM_PAGE
 } from '@client/navigation/routes'
 
 interface IInProgressProps {
   theme: ITheme
-  draftApplications: IApplication[]
+  draftDeclarations: IDeclaration[]
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   goToPage: typeof goToPage
   showPaginated?: boolean
@@ -68,13 +67,13 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
 
   transformDraftContent = () => {
     if (
-      !this.props.draftApplications ||
-      this.props.draftApplications.length <= 0
+      !this.props.draftDeclarations ||
+      this.props.draftDeclarations.length <= 0
     ) {
       return []
     }
 
-    return this.props.draftApplications.map((draft: IApplication) => {
+    return this.props.draftDeclarations.map((draft: IDeclaration) => {
       const { intl } = this.props
       const { locale } = intl
       const lastModificationDate = draft.modifiedOn || draft.savedOn
@@ -85,7 +84,7 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
             dynamicConstantsMessages[draft.event.toLowerCase()]
           )) ||
         ''
-      const name = getDraftApplicantFullName(draft, locale)
+      const name = getDraftInformantFullName(draft, locale)
 
       let pageRoute: string
       if (draft.event && draft.event.toString() === 'birth') {
@@ -191,7 +190,7 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
   }
 
   render() {
-    const { draftApplications, intl } = this.props
+    const { draftDeclarations, intl } = this.props
 
     return (
       <HomeContent>
@@ -203,7 +202,7 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
             this.onPageChange(currentPage)
           }}
           pageSize={this.pageSize}
-          totalItems={draftApplications && draftApplications.length}
+          totalItems={draftDeclarations && draftDeclarations.length}
           currentPage={this.state.inProgressPageNo}
           expandable={false}
           clickable={true}

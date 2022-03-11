@@ -35,7 +35,7 @@ const StyledList = styled.ul`
   width: 100%;
 `
 const ResultsText = styled.div`
-  color: ${({ theme }) => theme.colors.placeholder};
+  color: ${({ theme }) => theme.colors.placeholderCopy};
   ${({ theme }) => theme.fonts.bodyBoldStyle};
   margin: 10px 0;
 `
@@ -137,7 +137,7 @@ const getTotalPageNumber = (totalItemCount: number, pageSize: number) => {
 }
 
 const filterItems = (key: string, value: string, items: IDynamicValues[]) => {
-  return items.filter(item => item[key].toLowerCase() === value.toLowerCase())
+  return items.filter((item) => item[key].toLowerCase() === value.toLowerCase())
 }
 
 export class DataTable extends React.Component<
@@ -250,11 +250,8 @@ export class DataTable extends React.Component<
       pageSize = defaultConfiguration.pageSize,
       initialPage = defaultConfiguration.initialPage
     } = this.props
-    const {
-      currentPage,
-      sortBySelectedValues,
-      filterBySelectedValues
-    } = this.state
+    const { currentPage, sortBySelectedValues, filterBySelectedValues } =
+      this.state
 
     const sortValues =
       sortBy && this.ensureAllValuesInitialized(sortBy, sortBySelectedValues)

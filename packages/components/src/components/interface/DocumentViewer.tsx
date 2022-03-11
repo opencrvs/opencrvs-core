@@ -18,8 +18,8 @@ const Container = styled.div`
   width: calc(40vw - 50px);
   position: fixed;
   top: 94px;
-  background-color: ${({ theme }) => theme.colors.background};
-  outline: 2px solid ${({ theme }) => theme.colors.chartAreaGradientStart};
+  background-color: ${({ theme }) => theme.colors.grey100};
+  outline: 1px solid ${({ theme }) => theme.colors.grey300};
   box-sizing: border-box;
   height: 720px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -34,7 +34,7 @@ const Container = styled.div`
 
   > div#select_document {
     z-index: 2;
-    background: ${({ theme }) => theme.colors.lightGreyBackground};
+    background: ${({ theme }) => theme.colors.white};
     top: 16px;
     left: 16px;
     width: 250px;

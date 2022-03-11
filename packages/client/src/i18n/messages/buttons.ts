@@ -38,14 +38,14 @@ interface IButtonsMessages
   print: MessageDescriptor
   register: MessageDescriptor
   reject: MessageDescriptor
-  rejectApplication: MessageDescriptor
+  rejectDeclaration: MessageDescriptor
   replace: MessageDescriptor
   retry: MessageDescriptor
   review: MessageDescriptor
   save: MessageDescriptor
   saveExitButton: MessageDescriptor
-  deleteApplication: MessageDescriptor
-  closeApplication: MessageDescriptor
+  deleteDeclaration: MessageDescriptor
+  closeDeclaration: MessageDescriptor
   reactivate: MessageDescriptor
   search: MessageDescriptor
   select: MessageDescriptor
@@ -201,10 +201,10 @@ const messagesToDefine: IButtonsMessages = {
     description: 'A label for reject link',
     id: 'buttons.reject'
   },
-  rejectApplication: {
-    defaultMessage: 'Reject Application',
-    description: 'Reject application button text',
-    id: 'buttons.rejectApplication'
+  rejectDeclaration: {
+    defaultMessage: 'Reject Declaration',
+    description: 'Reject declaration button text',
+    id: 'buttons.rejectDeclaration'
   },
   replace: {
     defaultMessage: 'Change all',
@@ -213,7 +213,7 @@ const messagesToDefine: IButtonsMessages = {
   },
   retry: {
     defaultMessage: 'Retry',
-    description: 'The title of retry button for failed application',
+    description: 'The title of retry button for failed declaration',
     id: 'buttons.retry'
   },
   review: {
@@ -231,15 +231,15 @@ const messagesToDefine: IButtonsMessages = {
     description: 'Save & Exit Button Text',
     id: 'buttons.saveAndExit'
   },
-  deleteApplication: {
-    defaultMessage: 'Delete Application',
-    description: 'Delete application button text',
-    id: 'buttons.deleteApplication'
+  deleteDeclaration: {
+    defaultMessage: 'Delete Declaration',
+    description: 'Delete declaration button text',
+    id: 'buttons.deleteDeclaration'
   },
-  closeApplication: {
-    defaultMessage: 'Close Application',
-    description: 'Close application button text',
-    id: 'buttons.closeApplication'
+  closeDeclaration: {
+    defaultMessage: 'Close Declaration',
+    description: 'Close declaration button text',
+    id: 'buttons.closeDeclaration'
   },
   reactivate: {
     defaultMessage: 'Reactivate',
@@ -293,7 +293,7 @@ const messagesToDefine: IButtonsMessages = {
   },
   update: {
     defaultMessage: 'Update',
-    description: 'The title of update button for draft application',
+    description: 'The title of update button for draft declaration',
     id: 'buttons.update'
   },
   upload: {

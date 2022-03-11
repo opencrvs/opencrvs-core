@@ -165,11 +165,11 @@ export function createCompositionTemplate(refUuid: string, context: any) {
   let declarationText
   let declarationCode
   if (context.event === EVENT_TYPE.BIRTH) {
-    declarationCode = 'birth-application'
-    declarationText = 'Birth Application'
+    declarationCode = 'birth-declaration'
+    declarationText = 'Birth Declaration'
   } else {
-    declarationCode = 'death-application'
-    declarationText = 'Death Application'
+    declarationCode = 'death-declaration'
+    declarationText = 'Death Declaration'
   }
 
   return {

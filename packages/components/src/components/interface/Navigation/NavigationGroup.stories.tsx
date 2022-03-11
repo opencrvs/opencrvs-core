@@ -30,7 +30,7 @@ import {
   subItemForms
 } from './NavigationSubItem.stories'
 
-const ApplicationTemplate: Story<INavigationGroup> = (args) => (
+const DeclarationTemplate: Story<INavigationGroup> = (args) => (
   <div {...args}>
     <NavigationItem {...itemInProgress.args} />
     <NavigationItem {...itemReadyForReview.args} />
@@ -39,10 +39,10 @@ const ApplicationTemplate: Story<INavigationGroup> = (args) => (
   </div>
 )
 
-export const groupApplication = ApplicationTemplate.bind({})
+export const groupDeclaration = DeclarationTemplate.bind({})
 
-groupApplication.args = {
-  children: <ApplicationTemplate />
+groupDeclaration.args = {
+  children: <DeclarationTemplate />
 }
 
 const SettingTemplate: Story<INavigationGroup> = (args) => (

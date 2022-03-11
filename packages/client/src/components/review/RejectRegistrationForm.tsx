@@ -20,7 +20,7 @@ import { getRejectForm } from '@opencrvs/client/src/review/selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { IApplication, IPayload, SUBMISSION_STATUS } from '@client/applications'
+import { IDeclaration, IPayload, SUBMISSION_STATUS } from '@client/declarations'
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { goToSearchResult } from '@client/navigation'
 import { buttonMessages } from '@client/i18n/messages'
@@ -35,12 +35,12 @@ interface IState {
 }
 interface IProps {
   draftId: string
-  application: IApplication
+  declaration: IDeclaration
   event: Event
   duplicate?: boolean
   onClose: () => void
   confirmRejectionEvent: (
-    application: IApplication,
+    declaration: IDeclaration,
     status: string,
     action: string,
     payload: IPayload
@@ -91,7 +91,7 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
   }
 
   render = () => {
-    const { application, form, intl, confirmRejectionEvent, duplicate } =
+    const { declaration, form, intl, confirmRejectionEvent, duplicate } =
       this.props
     const payload = this.processSubmitData()
     const { fields } = form
@@ -124,9 +124,9 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
               id="submit_reject_form"
               onClick={() =>
                 confirmRejectionEvent(
-                  application,
+                  declaration,
                   SUBMISSION_STATUS.READY_TO_REJECT,
-                  Action.REJECT_APPLICATION,
+                  Action.REJECT_DECLARATION,
                   payload
                 )
               }

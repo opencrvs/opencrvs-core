@@ -1,4 +1,3 @@
-import { IAuthHeader } from '@gateway/common-types'
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -10,6 +9,8 @@ import { IAuthHeader } from '@gateway/common-types'
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { IAuthHeader } from '@gateway/common-types'
+
 export type IFieldBuilderFunction = (
   accumulatedObj: any,
   fieldValue: string | number | boolean,

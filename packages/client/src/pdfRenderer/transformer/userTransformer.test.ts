@@ -12,7 +12,7 @@
 import {
   userDetails,
   validImageB64String,
-  mockApplicationData,
+  mockDeclarationData,
   mockOfflineData
 } from '@client/tests/util'
 import { userTransformers } from '@client/pdfRenderer/transformer/userTransformer'
@@ -27,7 +27,7 @@ describe("PDF template's logged-in user field related transformer tests", () => 
     locale: 'en'
   })
   const data: TemplateTransformerData = {
-    application: { id: '123', event: Event.BIRTH, data: mockApplicationData },
+    declaration: { id: '123', event: Event.BIRTH, data: mockDeclarationData },
     userDetails,
     resource: mockOfflineData
   }
