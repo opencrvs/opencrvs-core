@@ -18,37 +18,40 @@ export const DeclarationIcon = (props: React.HTMLAttributes<SVGElement>) => {
   switch (props.color) {
     case 'green':
       fill = '#A4DBC6'
-      corner = '#49B78D'
+      corner = '#409877'
       break
     case 'orange':
-      fill = '#F8D8B0'
-      corner = '#F1B162'
+      fill = '#F5CE9E'
+      corner = '#C86E00'
       break
     case 'red':
-      fill = '#EB9284'
-      corner = '#D53F3F'
+      fill = '#EEA6A6'
+      corner = '#9A4040'
       break
     case 'teal':
-      fill = '#96E9E4'
-      corner = '#4CC1BA'
+      fill = '#96E8E4'
+      corner = '#03668D'
       break
     case 'grey':
-      fill = '#DEE2E4'
-      corner = '#909397'
+      fill = '#CCCCCC'
+      corner = '#5B5B5B'
+      break
+    case 'purple':
+      fill = '#BFA4DB'
+      corner = '#450487'
       break
     default:
-      fill = '#BFA4DB'
-      corner = '#8049B7'
+      fill = '#CCCCCC'
+      corner = '#5B5B5B'
   }
+
   return (
     <svg width={24} height={24} fill="none" {...props}>
       <path
-        d="M6 5C6 4.44772 6.44772 4 7 4L13.2027 4L18 8.80602V19C18 19.5523 17.5523 20 17 20H7C6.44772 20 6 19.5523 6 19V5Z"
+        d="M3 1C3 0.447716 3.44772 0 4 0L13.804 0L21 7.20903V23C21 23.5523 20.5523 24 20 24H4C3.44772 24 3 23.5523 3 23V1Z"
         fill={fill}
       />
-      <g filter="url(#filter0_d_5261_5601)">
-        <path d="M13.2 4L18 8.8H13.2V4Z" fill={fill} />
-      </g>
+      <path d="M13.8 0L21 7.2H13.8V0Z" fill={corner} />
       <defs>
         <filter
           id="filter0_d_5261_5601"

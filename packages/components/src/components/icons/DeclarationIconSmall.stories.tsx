@@ -11,10 +11,10 @@
  */
 import React from 'react'
 import { Meta, Story } from '@storybook/react'
-import { LeftNavigationDeclarationIcons } from './LeftNavigationDeclarationIcons'
+import { DeclarationIconSmall } from './DeclarationIconSmall'
 
 const Template: Story<React.HTMLAttributes<SVGElement>> = (args) => (
-  <LeftNavigationDeclarationIcons {...args} />
+  <DeclarationIconSmall {...args} />
 )
 
 export const LeftNavigationIconView = Template.bind({})
@@ -25,5 +25,5 @@ LeftNavigationIconView.args = {
 
 export default {
   title: 'Components/icons/LeftNavigationDeclarationIcon',
-  component: LeftNavigationDeclarationIcons
+  component: DeclarationIconSmall
 } as Meta
