@@ -297,7 +297,7 @@ export const NavigationView = (props: IFullProps) => {
         <>
           <NavigationGroup>
             <NavigationItem
-              icon={() => <DeclarationIconSmall />}
+              icon={() => <DeclarationIconSmall color={'purple'} />}
               id={`navigation_${TAB_ID.inProgress}`}
               label={TAB_LABEL.inProgress}
               count={props.draftDeclarations.length}
@@ -382,7 +382,7 @@ export const NavigationView = (props: IFullProps) => {
                 {userDetails?.role &&
                   USER_SCOPE[userDetails.role].includes(TAB_ID.inProgress) && (
                     <NavigationItem
-                      icon={() => <DeclarationIconSmall />}
+                      icon={() => <DeclarationIconSmall color={'purple'} />}
                       id={`navigation_${TAB_ID.inProgress}`}
                       label={TAB_LABEL.inProgress}
                       count={declarationCount.inProgress}
@@ -430,7 +430,7 @@ export const NavigationView = (props: IFullProps) => {
                     TAB_ID.sentForApproval
                   ) && (
                     <NavigationItem
-                      icon={() => <DeclarationIconSmall color={'grey500'} />}
+                      icon={() => <DeclarationIconSmall color={'grey'} />}
                       id={`navigation_${TAB_ID.sentForApproval}`}
                       label={TAB_LABEL.sentForApproval}
                       count={declarationCount.sentForApproval}
