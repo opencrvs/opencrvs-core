@@ -9,12 +9,57 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { IFormConfig, QuestionConfigFieldType } from '@client/forms'
 import { readFileSync } from 'fs'
 import { join } from 'path'
 
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 
+const formConfig: IFormConfig = {
+  questionConfig: [
+    {
+      fieldId: 'birth.child.child-view-group.vaccinations',
+      label: {
+        defaultMessage: 'What vaccinations has the child received?',
+        description: 'Label for form field: vaccination question',
+        id: 'form.field.label.vaccination'
+      },
+      placeholder: {
+        defaultMessage: 'E.G. Polio, Diptheria',
+        description: 'Placeholder for form field: vaccination question',
+        id: 'form.field.label.vaccinationPlaceholder'
+      },
+      maxLength: 32,
+      fieldName: 'vaccination',
+      fieldType: QuestionConfigFieldType.TEXT,
+      preceedingFieldId: 'birth.child.child-view-group.attendantAtBirth',
+      required: false,
+      enabled: '',
+      custom: true
+    },
+    {
+      fieldId: 'birth.child.child-view-group.vaccinations',
+      label: {
+        defaultMessage: 'What vaccinations has the child received?',
+        description: 'Label for form field: vaccination question',
+        id: 'form.field.label.vaccination'
+      },
+      placeholder: {
+        defaultMessage: 'E.G. Polio, Diptheria',
+        description: 'Placeholder for form field: vaccination question',
+        id: 'form.field.label.vaccinationPlaceholder'
+      },
+      maxLength: 32,
+      fieldName: 'vaccination',
+      fieldType: QuestionConfigFieldType.TEXT,
+      preceedingFieldId: 'birth.child.child-view-group.attendantAtBirth',
+      required: false,
+      enabled: '',
+      custom: true
+    }
+  ]
+}
 export const mockOfflineData = {
   forms: JSON.parse(
     readFileSync(join(__dirname, './register.json')).toString()
@@ -359,5 +404,6 @@ export const mockOfflineData = {
     },
     SENTRY: 'https://sentry.com',
     LOGROCKET: 'opencrvs-foundation/opencrvs-zambia'
-  }
+  },
+  formConfig
 }

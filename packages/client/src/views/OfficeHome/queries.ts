@@ -15,7 +15,6 @@ const allSearchFields = `
   id
     type
     registration {
-      questionnaire
       status
       contactRelationship
       contactNumber

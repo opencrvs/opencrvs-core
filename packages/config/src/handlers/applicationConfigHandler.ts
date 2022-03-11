@@ -14,7 +14,7 @@ import ApplicationConfig, {
   IApplicationConfigurationModel
 } from '@config/models/config' //   IApplicationConfigurationModel
 import { logger } from '@config/config/logger'
-import { getActiveCertificatesHandler } from '@config/handlers/getCertificate/applicationCertificateHandler'
+import { getActiveCertificatesHandler } from '@config/handlers/certificate/certificateHandler'
 import getQuestionsHandler from '@config/handlers/getQuestions/handler'
 
 export default async function applicationHandler(

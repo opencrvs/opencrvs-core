@@ -40,9 +40,9 @@ export interface IQuestion {
   // must be the fieldId for the field vertically above this one in the form or the string "TOP"
   preceedingFieldId?: string
   required?: boolean
-  // enabled should be a string "DISABLED" or "" because existing default fields will be ""
+  // enabled should be a string "DISABLED" or "" or undefined because existing default fields will be ""
   // wanted to use disabled, but this prop is already in use in IFormField
-  enabled: string
+  enabled?: string
   custom?: boolean
   initialValue?: string
 }

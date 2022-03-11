@@ -408,7 +408,6 @@ type Registration { # -> Task
   contactRelationship: String # -> extension(url='http://opencrvs.org/specs/extension/contact-relationship').valueString
   contactPhoneNumber: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person-phone-number').valueString
   status: [RegWorkflow] # -> Task.*
-  questionnaire: [QuestionnaireQuestion]
   type: RegistrationType # -> .code
   inCompleteFields: String # -> .status ('draft' | 'requested') && extension(url='http://opencrvs.org/specs/extension/in-complete-fields').valueString
   attachments: [Attachment] # -> Composition.section(code='scanned-documents').entry.reference

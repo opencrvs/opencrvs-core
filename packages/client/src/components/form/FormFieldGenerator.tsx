@@ -507,7 +507,10 @@ function GeneratedInputField({
     )
   }
 
-  if (fieldDefinition.type === LOCATION_SEARCH_INPUT) {
+  if (
+    fieldDefinition.type === LOCATION_SEARCH_INPUT &&
+    fieldDefinition.locationList
+  ) {
     const selectedLocation = fieldDefinition.locationList.find(
       (location) => location.id === value
     )
