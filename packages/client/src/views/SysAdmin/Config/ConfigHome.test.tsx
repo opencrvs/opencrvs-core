@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import { createStore } from '@client/store'
-import { createTestComponent } from '@client/tests/util'
+import { createTestComponent, flushPromises } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { ConfigHome } from './ConfigHome'
 import { GET_ACTIVE_CERTIFICATES } from '@client/certificate/queries'
@@ -133,6 +133,7 @@ describe('ConfigHome page when already has uploaded certificate template', () =>
         .find('#template-birth-action-menuItem0')
         .hostNodes()
         .simulate('click')
+      await flushPromises()
       testComponent.update()
 
       expect(
@@ -156,6 +157,7 @@ describe('ConfigHome page when already has uploaded certificate template', () =>
         .find('#template-birth-action-menuItem0')
         .hostNodes()
         .simulate('click')
+      await flushPromises()
       testComponent.update()
 
       testComponent.find('#preview_back').hostNodes().simulate('click')

@@ -19,10 +19,6 @@ export const mockOfflineData = {
   forms: JSON.parse(
     readFileSync(join(__dirname, './register.json')).toString()
   ) as any,
-  certificateSvg: {
-    birth: '<svg></svg>',
-    death: '<svg></svg>'
-  },
   facilities: {
     '627fc0cc-e0e2-4c09-804d-38a9fa1807ee': {
       id: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee',
