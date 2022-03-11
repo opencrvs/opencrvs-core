@@ -102,7 +102,10 @@ function ContentComponent({
               ignoreMediaQuery={true}
             />
           </InputField>
-          <ErrorMessageBottom id="nid-regex-error" marginTop={6}>
+          <ErrorMessageBottom
+            id={`${changeModalName}-regex-error`}
+            marginTop={6}
+          >
             {!isValidRegEx(pattern) && patternErrorMessage}
           </ErrorMessageBottom>
         </InputContainer>

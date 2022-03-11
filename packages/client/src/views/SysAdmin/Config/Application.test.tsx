@@ -219,11 +219,11 @@ describe('NID Pattern update test', () => {
         target: { id: 'changeNidPattern', value: '^[0-9]{10}$' }
       })
     testComponent.find('#apply_change').hostNodes().simulate('click')
-    await waitForElement(testComponent, '#nidPattern_value_container')
+    await waitForElement(testComponent, '#nidPattern_value_container_value')
     await flushPromises()
     testComponent.update()
     expect(
-      testComponent.find('#nidPattern_value_container').hostNodes().text()
+      testComponent.find('#nidPattern_value_container_value').hostNodes().text()
     ).toBe('/^[0-9]{10}$/')
   })
   it('should show success notification if appliction name change', async () => {

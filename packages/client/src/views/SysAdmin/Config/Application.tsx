@@ -132,12 +132,10 @@ function GeneralTabContent({
           }
         },
         {
+          id: 'nidPattern_value_container',
           label: intl.formatMessage(messages.nidPatternTitle),
-          value: (
-            <div id="nidPattern_value_container">
-              {offlineCountryConfiguration.config.NID_NUMBER_PATTERN.toString()}
-            </div>
-          ),
+          value:
+            offlineCountryConfiguration.config.NID_NUMBER_PATTERN.toString(),
           action: {
             id: GeneralActionId.NID_PATTERN,
             label: intl.formatMessage(buttonMessages.change),
