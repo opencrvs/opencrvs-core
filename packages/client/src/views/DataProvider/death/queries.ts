@@ -160,6 +160,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           name
         }
         user {
+          id
           type
           role
           name {
@@ -171,6 +172,28 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
             data
             type
           }
+        }
+        comments {
+          user {
+            id
+            username
+            avatar {
+              data
+              type
+            }
+          }
+          comment
+          createdAt
+        }
+        input {
+          valueCode
+          valueId
+          valueString
+        }
+        output {
+          valueCode
+          valueId
+          valueString
         }
       }
     }
@@ -335,6 +358,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
           name
         }
         user {
+          id
           type
           role
           name {
@@ -346,6 +370,28 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
             data
             type
           }
+        }
+        comments {
+          user {
+            id
+            username
+            avatar {
+              data
+              type
+            }
+          }
+          comment
+          createdAt
+        }
+        input {
+          valueCode
+          valueId
+          valueString
+        }
+        output {
+          valueCode
+          valueId
+          valueString
         }
       }
     }

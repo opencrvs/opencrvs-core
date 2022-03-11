@@ -856,6 +856,16 @@ const dynamicMessagesToDefine: Record<
     description: 'Application has been updated',
     id: 'constants.updated'
   },
+  sent_incomplete: {
+    defaultMessage: 'Sent incomplete',
+    description: 'Declaration submitted without completing the required fields',
+    id: 'constants.sent_incomplete'
+  },
+  updated_declaration: {
+    defaultMessage: 'Updated declaration',
+    description: 'Declaration has been updated',
+    id: 'constants.updated_declaration'
+  },
   archived_declaration: {
     defaultMessage: 'Archived',
     description: 'Application has been archived',

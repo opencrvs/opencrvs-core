@@ -256,6 +256,12 @@ type RegWorkflow { # Task
   timeLogged: Int # -> from metrics
 }
 
+type InputOutput {
+  valueCode: String
+  valueId: String
+  valueString: String
+}
+
 type History {
   user: User
   date: Date
@@ -263,6 +269,9 @@ type History {
   reinstated: Boolean # -> extension(url='http://opencrvs.org/specs/extension/regReinstated')
   location: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastLocation').valueReference
   office: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastOffice').valueReference
+  comments: [Comment]
+  input: [InputOutput]
+  output: [InputOutput]
 }
 
 interface EventRegistration {

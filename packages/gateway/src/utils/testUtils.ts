@@ -178,6 +178,18 @@ export const mockDocumentReference = {
   ]
 }
 
+export const mockUser = {
+  type: 'CHAIRMAN',
+  role: 'LOCAL_REGISTRAR',
+  name: [
+    {
+      firstNames: 'Kennedy',
+      familyName: 'Mweene',
+      use: 'en'
+    }
+  ]
+}
+
 export const mockTask = {
   resourceType: 'Task',
   status: 'requested',
@@ -218,7 +230,7 @@ export const mockTask = {
   lastModified: '2016-10-31T09:45:05+10:00',
   note: [
     {
-      authorString: '<username>',
+      authorString: 'Practitioner/12121212',
       text: 'Comment',
       time: '2016-10-31T09:45:05+10:00'
     }

@@ -267,6 +267,28 @@ export async function touchBundle(
   return bundle
 }
 
+export function removeExtensionFromBundle(
+  fhirBundle: fhir.Bundle,
+  urls: string[]
+): fhir.Bundle {
+  if (
+    fhirBundle &&
+    fhirBundle.entry &&
+    fhirBundle.entry[0] &&
+    fhirBundle.entry[0].resource
+  ) {
+    let extensions: fhir.Extension[] =
+      (fhirBundle.entry[0].resource as fhir.Element).extension || []
+
+    extensions = extensions.filter(
+      (ext: fhir.Extension) => !urls.includes(ext.url)
+    )
+    ;(fhirBundle.entry[0].resource as fhir.Element).extension = extensions
+  }
+
+  return fhirBundle
+}
+
 export function setTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
   let trackingId: string
   let trackingIdFhirName: string

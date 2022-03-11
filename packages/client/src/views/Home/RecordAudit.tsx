@@ -33,7 +33,10 @@ import {
   goToRegistrarHomeTab,
   goToPage,
   goToCertificateCorrection,
-  goToPrintCertificate
+  goToPrintCertificate,
+  goToUserProfile,
+  goToTeamUserList,
+  IDynamicValues
 } from '@client/navigation'
 import {
   injectIntl,
@@ -58,10 +61,12 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema'
 import moment from 'moment'
 import { getOfflineData } from '@client/offline/selectors'
-import { IOfflineData } from '@client/offline/reducer'
+import { IOfflineData, ILocation } from '@client/offline/reducer'
 import {
   ResponsiveModal,
   Loader,
+  ISearchLocation,
+  ListTable,
   ColumnContentAlignment
 } from '@opencrvs/components/lib/interface'
 import { getScope } from '@client/profile/profileSelectors'
@@ -97,7 +102,11 @@ import {
   IFormSectionData,
   IContactPoint,
   CorrectionSection,
-  Action
+  Action,
+  IForm,
+  IFormSection,
+  IFormSectionGroup,
+  IFormField
 } from '@client/forms'
 import {
   constantsMessages,
@@ -112,7 +121,10 @@ import {
 } from '@client/utils/userUtils'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import NotificationToast from '@client/views/OfficeHome/NotificationToast'
+import { isEmpty, get, find, has, flatten, values } from 'lodash'
+import { IRegisterFormState } from '@client/forms/register/reducer'
 import { goBack } from 'connected-react-router'
+import { getFieldValue } from './utils'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -218,6 +230,20 @@ const NameAvatar = styled.div`
 const Heading = styled.h4`
   margin-bottom: 0px !important;
 `
+
+const CLinkButton = styled(LinkButton)`
+  width: fit-content;
+  display: inline-block;
+`
+
+interface IOutputInput {
+  item: string
+  original: string
+  edit: string
+}
+interface IActionDetailsData {
+  [key: string]: any
+}
 interface IStateProps {
   userDetails: IUserDetails | null
   language: string
@@ -227,6 +253,8 @@ interface IStateProps {
   draft: IDeclaration | null
   tab: IRecordAuditTabs
   workqueueDeclaration: GQLEventSearchSet | null
+  registerForm: IRegisterFormState
+  offlineData: Partial<IOfflineData>
 }
 
 interface IDispatchProps {
@@ -237,6 +265,8 @@ interface IDispatchProps {
   goToPage: typeof goToPage
   goToPrintCertificate: typeof goToPrintCertificate
   goToRegistrarHomeTab: typeof goToRegistrarHomeTab
+  goToUserProfile: typeof goToUserProfile
+  goToTeamUserList: typeof goToTeamUserList
   goBack: typeof goBack
 }
 
@@ -249,6 +279,8 @@ type CMethodParams = {
   draft: IDeclaration | null
   goToPage?: typeof goToPage
   goToPrintCertificate?: typeof goToPrintCertificate
+  goToUserProfile?: typeof goToUserProfile
+  goToTeamUserList?: typeof goToTeamUserList
 }
 
 type RouteProps = RouteComponentProps<{
@@ -256,11 +288,7 @@ type RouteProps = RouteComponentProps<{
   declarationId: string
 }>
 
-type IFullProps = IDispatchProps &
-  IStateProps &
-  IDispatchProps &
-  IntlShapeProps &
-  RouteProps
+type IFullProps = IDispatchProps & IStateProps & IntlShapeProps & RouteProps
 
 interface ILabel {
   [key: string]: string | undefined
@@ -320,9 +348,9 @@ const DECLARATION_STATUS_LABEL: IStatus = {
     id: 'recordAudit.history.archived'
   },
   IN_PROGRESS: {
-    defaultMessage: 'In progress',
-    description: 'Label for registration status inProgess',
-    id: 'recordAudit.history.inProgress'
+    defaultMessage: 'Sent incomplete',
+    description: 'Declaration submitted without completing the required fields',
+    id: 'constants.sent_incomplete'
   },
   DECLARED: {
     defaultMessage: 'Declaration started',
@@ -335,9 +363,9 @@ const DECLARATION_STATUS_LABEL: IStatus = {
     id: 'recordAudit.history.waitingValidation'
   },
   VALIDATED: {
-    defaultMessage: 'Validated',
-    description: 'Label for registration status validated',
-    id: 'recordAudit.history.validated'
+    defaultMessage: 'Sent for approval',
+    description: 'The title of sent for approvals tab',
+    id: 'regHome.sentForApprovals'
   },
   REGISTERED: {
     defaultMessage: 'Declaration registered',
@@ -365,9 +393,9 @@ const DECLARATION_STATUS_LABEL: IStatus = {
     id: 'recordAudit.history.requestedCorrection'
   },
   DECLARATION_UPDATED: {
-    defaultMessage: 'Updated',
-    description: 'Status for declaration being updated',
-    id: 'recordAudit.history.declarationUpdated'
+    defaultMessage: 'Updated declaration',
+    description: 'Declaration has been updated',
+    id: 'updated_declaration'
   }
 }
 
@@ -657,7 +685,7 @@ const showReviewButton = ({
   return <></>
 }
 
-const shouldShowUpdateButton = ({
+const showUpdateButton = ({
   declaration,
   intl,
   userDetails,
@@ -675,8 +703,16 @@ const shouldShowUpdateButton = ({
 
   const reviewButtonRoleStatusMap: { [key: string]: string[] } = {
     FIELD_AGENT: [SUBMISSION_STATUS.DRAFT],
-    REGISTRATION_AGENT: [SUBMISSION_STATUS.DRAFT, EVENT_STATUS.REJECTED],
-    DISTRICT_REGISTRAR: [SUBMISSION_STATUS.DRAFT, EVENT_STATUS.REJECTED],
+    REGISTRATION_AGENT: [
+      SUBMISSION_STATUS.DRAFT,
+      EVENT_STATUS.IN_PROGRESS,
+      EVENT_STATUS.REJECTED
+    ],
+    DISTRICT_REGISTRAR: [
+      SUBMISSION_STATUS.DRAFT,
+      EVENT_STATUS.IN_PROGRESS,
+      EVENT_STATUS.REJECTED
+    ],
     LOCAL_REGISTRAR: [SUBMISSION_STATUS.DRAFT, EVENT_STATUS.REJECTED]
   }
 
@@ -789,9 +825,11 @@ const showPrintButton = ({
 }
 
 const getNameWithAvatar = (
+  id: string,
   nameObject: Array<GQLHumanName | null>,
   avatar: IAvatar,
-  language: string
+  language: string,
+  goToUser?: typeof goToUserProfile
 ) => {
   const nameObj = getIndividualNameObj(nameObject, language)
   const userName = nameObj
@@ -804,7 +842,9 @@ const getNameWithAvatar = (
       <span>
         <LinkButton
           id={'username-link'}
-          onClick={() => alert('username clicked')}
+          onClick={() => {
+            goToUser && goToUser(id)
+          }}
         >
           {userName}
         </LinkButton>
@@ -827,12 +867,9 @@ const getStatusLabel = (
   return ''
 }
 
-const getLink = (status: string) => {
+const getLink = (status: string, onClick: () => void) => {
   return (
-    <LinkButton
-      style={{ textAlign: 'left' }}
-      onClick={() => alert('link clicked')}
-    >
+    <LinkButton style={{ textAlign: 'left' }} onClick={onClick}>
       {status}
     </LinkButton>
   )
@@ -848,7 +885,15 @@ const getFormattedDate = (date: Date) => {
   )
 }
 
-const getHistory = ({ intl, draft }: CMethodParams) => {
+const GetHistory = ({
+  intl,
+  draft,
+  goToUserProfile,
+  goToTeamUserList,
+  toggleActionDetails
+}: CMethodParams & {
+  toggleActionDetails: (actionItem: IActionDetailsData) => void
+}) => {
   if (!draft?.data?.history?.length)
     return (
       <>
@@ -866,15 +911,26 @@ const getHistory = ({ intl, draft }: CMethodParams) => {
       return new Date(fe.date).getTime() - new Date(se.date).getTime()
     })
     .map((item) => ({
-      date: getFormattedDate(item.date),
-      action: getLink(getStatusLabel(item.action, item.reinstated, intl)),
+      date: getFormattedDate(item?.date),
+      action: getLink(getStatusLabel(item?.action, item.reinstated, intl), () =>
+        toggleActionDetails(item)
+      ),
       user: getNameWithAvatar(
+        item.user.id,
         item.user.name,
-        item.user.avatar,
-        window.config.LANGUAGES
+        item.user?.avatar,
+        window.config.LANGUAGES,
+        goToUserProfile
       ),
       type: intl.formatMessage(userMessages[item.user.role as string]),
-      location: getLink(item.office.name)
+      location: getLink(item.office.name, () => {
+        goToTeamUserList &&
+          goToTeamUserList({
+            id: item.office.id,
+            searchableText: item.office.name,
+            displayLabel: item.office.name
+          } as ISearchLocation)
+      })
     }))
 
   const columns = [
@@ -917,6 +973,190 @@ const getHistory = ({ intl, draft }: CMethodParams) => {
   )
 }
 
+const ActionDetailsModalListTable = (
+  actionDetailsData: IActionDetailsData,
+  registerForm: IForm,
+  intl: IntlShape,
+  offlineData: Partial<IOfflineData>
+) => {
+  const [currentPage, setCurrentPage] = React.useState(1)
+  if (registerForm == undefined) return []
+
+  const sections = registerForm?.sections || []
+  const commentsColumn = [{ key: 'comment', label: 'Comment', width: 100 }]
+  const declarationUpdatedColumns = [
+    { key: 'item', label: 'Item', width: 33.33 },
+    { key: 'original', label: 'Original', width: 33.33 },
+    { key: 'edit', label: 'Edit', width: 33.33 }
+  ]
+
+  const dataChange = (
+    actionDetailsData: IActionDetailsData
+  ): IDynamicValues[] => {
+    const result: IDynamicValues[] = []
+    actionDetailsData.input.forEach((item: { [key: string]: any }) => {
+      const editedValue = actionDetailsData.output.find(
+        (oi: { valueId: string }) => oi.valueId == item.valueId
+      )
+
+      const section = find(
+        sections,
+        (section) => section.id == item.valueCode
+      ) as IFormSection
+
+      const indexes: string[] = item.valueId.split('.')
+
+      if (indexes.length > 1) {
+        const [parentField, , nestedField] = indexes
+
+        const nestedFields = flatten(
+          section.groups.map((group) => {
+            return group.fields
+          })
+        ).find((field) => field.name == parentField)
+
+        const fieldObj = flatten(values(nestedFields?.nestedFields)).find(
+          (field) => field.name == nestedField
+        ) as IFormField
+
+        result.push({
+          item: intl.formatMessage(fieldObj.label) || 'Not Found',
+          original: getFieldValue(
+            item.valueString,
+            fieldObj,
+            offlineData,
+            intl
+          ),
+          edit: getFieldValue(
+            editedValue.valueString,
+            fieldObj,
+            offlineData,
+            intl
+          )
+        })
+      } else {
+        const [parentField] = indexes
+
+        const fieldObj = flatten(
+          section.groups.map((group) => {
+            return group.fields
+          })
+        ).find((field) => field.name == parentField) as IFormField
+
+        result.push({
+          item: intl.formatMessage(fieldObj.label) || 'Not Found',
+          original: getFieldValue(
+            item.valueString,
+            fieldObj,
+            offlineData,
+            intl
+          ),
+          edit: getFieldValue(
+            editedValue.valueString,
+            fieldObj,
+            offlineData,
+            intl
+          )
+        })
+      }
+    })
+
+    return result
+  }
+
+  const declarationUpdates = dataChange(actionDetailsData)
+  const pageChangeHandler = (cp: number) => setCurrentPage(cp)
+  return (
+    <>
+      {/* For Comments */}
+      <ListTable
+        noResultText=" "
+        hideBoxShadow={true}
+        columns={commentsColumn}
+        content={actionDetailsData.comments}
+      ></ListTable>
+
+      {/* For Data Updated */}
+      <ListTable
+        noResultText=" "
+        hideBoxShadow={true}
+        columns={declarationUpdatedColumns}
+        content={declarationUpdates}
+        pageSize={10}
+        totalItems={declarationUpdates.length}
+        currentPage={currentPage}
+        onPageChange={pageChangeHandler}
+      ></ListTable>
+    </>
+  )
+}
+
+const ActionDetailsModal = ({
+  show,
+  actionDetailsData,
+  toggleActionDetails,
+  intl,
+  goToUser,
+  registerForm,
+  offlineData
+}: {
+  show: boolean
+  actionDetailsData: IActionDetailsData
+  toggleActionDetails: (param: IActionDetailsData | null) => void
+  intl: IntlShape
+  goToUser: typeof goToUserProfile
+  registerForm: IForm
+  offlineData: Partial<IOfflineData>
+}) => {
+  if (isEmpty(actionDetailsData)) return <></>
+
+  const title =
+    (DECLARATION_STATUS_LABEL[actionDetailsData?.action] &&
+      intl.formatMessage(
+        DECLARATION_STATUS_LABEL[actionDetailsData?.action]
+      )) ||
+    ''
+
+  const nameObj = getIndividualNameObj(
+    actionDetailsData.user.name,
+    window.config.LANGUAGES
+  )
+  const userName = nameObj
+    ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+    : ''
+
+  return (
+    <ResponsiveModal
+      actions={[]}
+      handleClose={() => toggleActionDetails(null)}
+      show={show}
+      responsive={true}
+      title={title}
+      width={1024}
+      autoHeight={true}
+    >
+      <>
+        <div>
+          <CLinkButton
+            onClick={() => {
+              goToUser && goToUser(actionDetailsData.user.id)
+            }}
+          >
+            {userName}
+          </CLinkButton>
+          <span> — {getFormattedDate(actionDetailsData.date)}</span>
+        </div>
+        {ActionDetailsModalListTable(
+          actionDetailsData,
+          registerForm,
+          intl,
+          offlineData
+        )}
+      </>
+    </ResponsiveModal>
+  )
+}
+
 function RecordAuditBody({
   archiveDeclaration,
   reinstateDeclaration,
@@ -925,20 +1165,35 @@ function RecordAuditBody({
   draft,
   intl,
   goToCertificateCorrection,
+  goToPrintCertificate,
   goToPage,
   goToRegistrarHomeTab,
   scope,
   userDetails,
-  goBack
+  registerForm,
+  goToUserProfile,
+  goToTeamUserList,
+  goBack,
+  offlineData
 }: {
   declaration: IDeclarationData
   draft: IDeclaration | null
   intl: IntlShape
   scope: Scope | null
   userDetails: IUserDetails | null
+  registerForm: IRegisterFormState
+  offlineData: Partial<IOfflineData>
 } & IDispatchProps) {
   const [showDialog, setShowDialog] = React.useState(false)
+  const [showActionDetails, setActionDetails] = React.useState(false)
+  const [actionDetailsData, setActionDetailsData] = React.useState({})
 
+  if (!registerForm.registerForm || !declaration.type) return <></>
+
+  const toggleActionDetails = (actionItem: IActionDetailsData | null) => {
+    actionItem && setActionDetailsData(actionItem)
+    setActionDetails((prevValue) => !prevValue)
+  }
   const toggleDisplayDialog = () => setShowDialog((prevValue) => !prevValue)
 
   const userHasRegisterScope = scope && scope.includes('register')
@@ -1034,7 +1289,7 @@ function RecordAuditBody({
   )
 
   actions.push(
-    shouldShowUpdateButton({
+    showUpdateButton({
       declaration,
       intl,
       userDetails,
@@ -1054,7 +1309,8 @@ function RecordAuditBody({
       intl,
       userDetails,
       draft,
-      goToPrintCertificate
+      goToPrintCertificate,
+      goToTeamUserList
     })
   )
 
@@ -1063,6 +1319,21 @@ function RecordAuditBody({
     <DesktopDiv>{actions[actions.length - 1]}</DesktopDiv>
   )
 
+  let regForm: IForm
+  const eventType = declaration.type
+  if (eventType in registerForm.registerForm)
+    regForm = get(registerForm.registerForm, eventType)
+  else regForm = registerForm.registerForm['birth']
+
+  const actionDetailsModalProps = {
+    show: showActionDetails,
+    actionDetailsData,
+    toggleActionDetails,
+    intl,
+    goToUser: goToUserProfile,
+    registerForm: regForm,
+    offlineData
+  }
   return (
     <>
       <Content
@@ -1094,9 +1365,17 @@ function RecordAuditBody({
         )}
       >
         {getDeclarationInfo(declaration, isDownloaded, intl, mobileActions)}
-        {getHistory({ declaration, intl, draft, userDetails })}
+        {GetHistory({
+          declaration,
+          intl,
+          draft,
+          userDetails,
+          goToUserProfile,
+          goToTeamUserList,
+          toggleActionDetails
+        })}
       </Content>
-
+      <ActionDetailsModal {...actionDetailsModalProps} />
       <ResponsiveModal
         title={
           declaration.status && ARCHIVED.includes(declaration.status)
@@ -1185,6 +1464,7 @@ function getBodyContent({
             }
             return (
               <RecordAuditBody
+                key={`record-audit-${declarationId}`}
                 {...actionProps}
                 declaration={getGQLDeclaration(
                   data.fetchRegistration,
@@ -1211,6 +1491,7 @@ function getBodyContent({
       )
   return (
     <RecordAuditBody
+      key={`record-audit-${declarationId}`}
       {...actionProps}
       declaration={declaration}
       draft={draft}
@@ -1247,6 +1528,8 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
     scope: getScope(state),
     tab,
     userDetails: state.profile.userDetails,
+    registerForm: state.registerForm,
+    offlineData: state.offline.offlineData,
     workqueueDeclaration:
       (tab !== 'search' &&
         state.workqueueState.workqueue.data[tab].results?.find(
@@ -1269,5 +1552,7 @@ export const RecordAudit = connect<
   goToPage,
   goToPrintCertificate,
   goToRegistrarHomeTab,
+  goToUserProfile,
+  goToTeamUserList,
   goBack
 })(injectIntl(RecordAuditComp))
