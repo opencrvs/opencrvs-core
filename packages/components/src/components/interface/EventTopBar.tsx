@@ -17,9 +17,9 @@ import { ToggleMenu } from '.'
 
 const TopBar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
-  height: 64px;
+  height: 56px;
   background: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.shadows.light};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   display: flex;
   justify-content: space-between;
   align-items: center;
