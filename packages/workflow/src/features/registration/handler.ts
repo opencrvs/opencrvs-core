@@ -20,8 +20,10 @@ import {
   markBundleAsWaitingValidation,
   invokeRegistrationValidation,
   updatePatientIdentifierWithRN,
+  touchBundle,
   markBundleAsDeclarationUpdated,
-  markBundleAsRequestedForCorrection
+  markBundleAsRequestedForCorrection,
+  removeExtensionFromBundle
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
   getEventInformantName,
@@ -29,15 +31,18 @@ import {
   getPhoneNo,
   getSharedContactMsisdn,
   postToHearth,
-  generateEmptyBundle
+  generateEmptyBundle,
+  forwardToHearth
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
-  getTaskEventType,
   sendEventNotification,
   sendRegisteredNotification,
-  isEventNonNotifiable,
-  taskHasInput
+  isEventNonNotifiable
 } from '@workflow/features/registration/utils'
+import {
+  taskHasInput,
+  getTaskEventType
+} from '@workflow/features/task/fhir/utils'
 import { logger } from '@workflow/logger'
 import { getToken } from '@workflow/utils/authUtils'
 import * as Hapi from '@hapi/hapi'
@@ -50,6 +55,7 @@ import {
   DEATH_REG_NUMBER_SYSTEM
 } from '@workflow/features/registration/fhir/constants'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
+import { REINSTATED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 
 interface IEventRegistrationCallbackPayload {
   trackingId: string
@@ -408,6 +414,24 @@ export async function markEventAsCertifiedHandler(
     return await postToHearth(payload)
   } catch (error) {
     logger.error(`Workflow/markBirthAsCertifiedHandler: error: ${error}`)
+    throw new Error(error)
+  }
+}
+
+export async function markEventAsDownloadedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    let payload = await touchBundle(
+      request.payload as fhir.Bundle,
+      getToken(request)
+    )
+    payload = removeExtensionFromBundle(payload, [REINSTATED_EXTENSION_URL])
+    const newRequest = { ...request, payload } as Hapi.Request
+    return await forwardToHearth(newRequest, h)
+  } catch (error) {
+    logger.error(`Workflow/markBirthAsDownloadHandler: error: ${error}`)
     throw new Error(error)
   }
 }

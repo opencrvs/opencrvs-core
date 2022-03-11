@@ -18,6 +18,7 @@ import {
 import {
   mockPatient,
   mockDocumentReference,
+  mockUser,
   mockTask,
   mockTaskForDeath,
   mockComposition,
@@ -961,6 +962,8 @@ describe('Registration type resolvers', () => {
     })
 
     it('returns comments of the task', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockUser))
+
       // @ts-ignore
       const comments = await typeResolvers.RegWorkflow.comments(mockTask)
       // @ts-ignore
@@ -974,7 +977,7 @@ describe('Registration type resolvers', () => {
 
       expect(comments).toHaveLength(1)
       expect(comment).toBe('Comment')
-      expect(user).toBe('<username>')
+      expect(user.role).toBe(mockUser.role)
       expect(time).toBe('2016-10-31T09:45:05+10:00')
     })
 

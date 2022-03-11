@@ -18,10 +18,7 @@ import {
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
 
-export async function modifyTaskBundle(
-  fhirBundle: fhir.Bundle,
-  token: string
-): Promise<fhir.Bundle> {
+export async function modifyTaskBundle(fhirBundle: fhir.Bundle, token: string) {
   if (
     !fhirBundle ||
     !fhirBundle.entry ||

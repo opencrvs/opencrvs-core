@@ -11,7 +11,8 @@
  */
 import {
   buildFHIRBundle,
-  updateFHIRTaskBundle
+  updateFHIRTaskBundle,
+  addOrUpdateExtension
 } from '@gateway/features/registration/fhir-builders'
 import {
   FHIR_SPECIFICATION_URL,
@@ -31,6 +32,8 @@ import {
 } from '@gateway/features/fhir/templates'
 import { EVENT_TYPE } from '@gateway/features/fhir/constants'
 import * as _ from 'lodash'
+import { mockTask } from '@gateway/utils/testUtils'
+import { findExtension } from '@gateway/features/fhir/utils'
 
 test('should build a minimal FHIR registration document without error', async () => {
   const fhir = await buildFHIRBundle(
@@ -1032,4 +1035,37 @@ test('should build bundle for correction fhir builders', async () => {
       valueString: 'Khaby Lame Corrected'
     }
   ])
+})
+
+describe('addOrUpdateExtension()', () => {
+  it('should add the extension if it is not present', () => {
+    const bundle = addOrUpdateExtension(
+      { resource: mockTask },
+      { url: 'mock-url', valueString: 'mock-value' },
+      'downloaded'
+    )
+    const extension = bundle.entry[0].resource.extension as fhir.Extension[]
+    expect(findExtension('mock-url', extension)).toHaveProperty(
+      'valueString',
+      'mock-value'
+    )
+  })
+
+  it('should update the extension if it is already present', () => {
+    const mockTaskWithExtension = {
+      ...mockTask,
+      extension: [{ url: 'mock-url', valueString: 'not-mock-value' }]
+    }
+    const bundle = addOrUpdateExtension(
+      { resource: mockTaskWithExtension },
+      { url: 'mock-url', valueString: 'mock-value' },
+      'downloaded'
+    )
+    const extension = bundle.entry[0].resource.extension as fhir.Extension[]
+    expect(extension.length).toBe(1)
+    expect(findExtension('mock-url', extension)).toHaveProperty(
+      'valueString',
+      'mock-value'
+    )
+  })
 })
