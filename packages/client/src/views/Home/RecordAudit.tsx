@@ -18,7 +18,7 @@ import {
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
 import { Navigation } from '@client/components/interface/Navigation'
-import styled, { ITheme, withTheme } from '@client/styledComponents'
+import styled from '@client/styledComponents'
 import {
   RotateLeft,
   Archive,
@@ -309,6 +309,16 @@ const STATUSTOCOLOR: { [key: string]: string } = {
 const ARCHIVABLE_STATUSES = [DECLARED, VALIDATED, REJECTED]
 
 const DECLARATION_STATUS_LABEL: IStatus = {
+  REINSTATED: {
+    defaultMessage: 'Reinstated to ',
+    description: 'The prefix for reinstated declaration',
+    id: 'recordAudit.history.reinstated.prefix'
+  },
+  ARCHIVED: {
+    defaultMessage: 'Archived',
+    description: 'Label for registration status archived',
+    id: 'recordAudit.history.archived'
+  },
   IN_PROGRESS: {
     defaultMessage: 'In progress',
     description: 'Label for registration status inProgess',
@@ -358,11 +368,6 @@ const DECLARATION_STATUS_LABEL: IStatus = {
     defaultMessage: 'Updated',
     description: 'Status for declaration being updated',
     id: 'recordAudit.history.declarationUpdated'
-  },
-  ARCHIVED: {
-    defaultMessage: 'Archived',
-    description: 'A label for registration status archived',
-    id: 'recordAudit.history.archived'
   }
 }
 
@@ -808,14 +813,29 @@ const getNameWithAvatar = (
   )
 }
 
-const getStatusLabel = (status: string, intl: IntlShape) => {
+const getStatusLabel = (
+  status: string,
+  reinstated: boolean,
+  intl: IntlShape
+) => {
   if (status in DECLARATION_STATUS_LABEL)
-    return intl.formatMessage(DECLARATION_STATUS_LABEL[status])
+    return (
+      (reinstated
+        ? intl.formatMessage(DECLARATION_STATUS_LABEL['REINSTATED'])
+        : '') + intl.formatMessage(DECLARATION_STATUS_LABEL[status])
+    )
   return ''
 }
 
 const getLink = (status: string) => {
-  return <LinkButton onClick={() => alert('link clicked')}>{status}</LinkButton>
+  return (
+    <LinkButton
+      style={{ textAlign: 'left' }}
+      onClick={() => alert('link clicked')}
+    >
+      {status}
+    </LinkButton>
+  )
 }
 
 const getFormattedDate = (date: Date) => {
@@ -846,11 +866,11 @@ const getHistory = ({ intl, draft }: CMethodParams) => {
       return new Date(fe.date).getTime() - new Date(se.date).getTime()
     })
     .map((item) => ({
-      date: getFormattedDate(item?.date),
-      action: getLink(getStatusLabel(item?.action, intl)),
+      date: getFormattedDate(item.date),
+      action: getLink(getStatusLabel(item.action, item.reinstated, intl)),
       user: getNameWithAvatar(
         item.user.name,
-        item.user?.avatar,
+        item.user.avatar,
         window.config.LANGUAGES
       ),
       type: intl.formatMessage(userMessages[item.user.role as string]),

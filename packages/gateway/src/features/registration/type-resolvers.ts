@@ -15,8 +15,8 @@ import {
   fetchFHIR,
   getTimeLoggedFromMetrics,
   getStatusFromTask,
-  getDownloadedExtensionStatus,
-  ITimeLoggedResponse
+  ITimeLoggedResponse,
+  getDownloadedExtensionStatus
 } from '@gateway/features/fhir/utils'
 import {
   MOTHER_CODE,
@@ -54,7 +54,8 @@ import {
   ORIGINAL_FILE_NAME_SYSTEM,
   SYSTEM_FILE_NAME_SYSTEM,
   FHIR_SPECIFICATION_URL,
-  OPENCRVS_SPECIFICATION_URL
+  OPENCRVS_SPECIFICATION_URL,
+  REINSTATED_EXTENSION_URL
 } from '@gateway/features/fhir/constants'
 import { ITemplatedComposition } from '@gateway/features/registration/fhir-builders'
 import fetch from 'node-fetch'
@@ -757,6 +758,12 @@ export const typeResolvers: GQLResolver = {
         return 'DOWNLOADED'
       }
       return businessStatus
+    },
+    reinstated: (task: fhir.Task) => {
+      const extension =
+        task.extension &&
+        findExtension(REINSTATED_EXTENSION_URL, task.extension)
+      return extension !== undefined
     },
     date: (task) => task.meta.lastUpdated,
     user: async (task, _, authHeader) => {

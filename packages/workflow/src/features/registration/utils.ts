@@ -29,6 +29,7 @@ import {
 } from '@workflow/features/registration/fhir/constants'
 import { Events } from '@workflow/features/events/handler'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
+import { getTaskEventType } from '@workflow/features/task/fhir/utils'
 
 interface INotificationPayload {
   msisdn: string
@@ -192,29 +193,6 @@ export function getCompositionEventType(compoition: fhir.Composition) {
   } else {
     return EVENT_TYPE.BIRTH
   }
-}
-
-export function getTaskEventType(task: fhir.Task) {
-  const eventType =
-    task && task.code && task.code.coding && task.code.coding[0].code
-
-  if (eventType === EVENT_TYPE.DEATH) {
-    return EVENT_TYPE.DEATH
-  } else {
-    return EVENT_TYPE.BIRTH
-  }
-}
-
-function getTaskBusinessStatus(taskResource: fhir.Task) {
-  return taskResource.businessStatus?.coding?.[0]?.code
-}
-
-export function isRejectedTask(taskResource: fhir.Task) {
-  return getTaskBusinessStatus(taskResource) === 'REJECTED'
-}
-
-export function isArchiveTask(taskResource: fhir.Task) {
-  return getTaskBusinessStatus(taskResource) === 'ARCHIVED'
 }
 
 export function getEventType(fhirBundle: fhir.Bundle) {

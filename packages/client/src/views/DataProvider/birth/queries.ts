@@ -182,6 +182,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
       history {
         date
         action
+        reinstated
         location {
           id
           name
@@ -382,6 +383,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
       history {
         date
         action
+        reinstated
         location {
           id
           name

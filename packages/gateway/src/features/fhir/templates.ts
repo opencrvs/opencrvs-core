@@ -11,7 +11,6 @@
  */
 import { ITemplatedComposition } from '@gateway/features/registration/fhir-builders'
 import { EVENT_TYPE } from '@gateway/features/fhir/constants'
-import { get, set } from 'lodash'
 
 export const MOTHER_CODE = 'mother-details'
 export const FATHER_CODE = 'father-details'
@@ -242,21 +241,6 @@ export function updateTaskTemplate(
       task.note = []
     }
     task.note.push(newNote)
-  }
-  return task
-}
-
-export function addDownloadExtensionToTaskTemplate(task: fhir.Task): fhir.Task {
-  const url = 'http://opencrvs.org/specs/extension/regDownloaded'
-  const taskExtensionIndex =
-    task.extension?.findIndex((ext) => ext.url === url) || -1
-  const taskStatus = get(task, 'businessStatus.coding[0].code')
-
-  if (taskExtensionIndex < 0) {
-    const newExtension: fhir.Extension = { url, valueString: taskStatus }
-    task.extension?.push(newExtension)
-  } else {
-    set(task, `extension[${taskExtensionIndex}].valueString`, taskStatus)
   }
   return task
 }

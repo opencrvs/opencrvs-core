@@ -29,6 +29,10 @@ import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any
 
+const archivedTaskBundle = cloneDeep(testFhirTaskBundle)
+
+archivedTaskBundle.entry[0].resource.businessStatus.coding[0].code = 'ARCHIVED'
+
 describe('Verify handler', () => {
   let server: any
 
@@ -144,14 +148,10 @@ describe('Verify handler', () => {
       }
     )
 
-    const taskBundle = cloneDeep(testFhirTaskBundle)
-
-    taskBundle.entry[0].resource.businessStatus.coding[0].code = 'ARCHIVED'
-
     const res = await server.server.inject({
       method: 'PUT',
       url: '/fhir/Task/123',
-      payload: taskBundle,
+      payload: archivedTaskBundle,
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -184,9 +184,8 @@ describe('Verify handler', () => {
       }
     )
 
-    const taskBundle = cloneDeep(testFhirTaskBundle)
+    const taskBundle = cloneDeep(archivedTaskBundle)
 
-    taskBundle.entry[0].resource.businessStatus.coding[0].code = 'ARCHIVED'
     taskBundle.entry[0].resource.code.coding[0].code = 'DEATH'
 
     const res = await server.server.inject({
@@ -248,7 +247,7 @@ describe('Verify handler', () => {
     const res = await server.server.inject({
       method: 'PUT',
       url: '/fhir/Task/123',
-      payload: testFhirTaskBundle,
+      payload: archivedTaskBundle,
       headers: {
         Authorization: `Bearer ${token}`
       }
