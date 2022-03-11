@@ -18,7 +18,7 @@ const Container = styled.div`
   flex-direction: row;
   flex-wrap: nowrap;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
-  padding: 8px 0px;
+  padding: 16px 0px;
   width: 100%;
   &:last-child {
     border-bottom: none;
@@ -40,7 +40,7 @@ const ValueContainer = styled.div`
 `
 const Label = styled.label`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
-  color: ${({ theme }) => theme.colors.supportingCopy};
+  color: ${({ theme }) => theme.colors.Copy};
   flex: 1;
   margin-right: 10%;
   max-width: 40%;
@@ -52,6 +52,7 @@ const Label = styled.label`
 `
 const Value = styled.div`
   ${({ theme }) => theme.fonts.bodyStyle};
+  color: ${({ theme }) => theme.colors.supportingCopy};
   flex: 1;
   overflow-wrap: break-word;
   max-width: 50%;
@@ -91,6 +92,7 @@ const PlaceHolder = styled.div`
   color: ${({ theme }) => theme.colors.placeholder};
   flex: 1;
 `
+
 const Action = styled.div`
   width: auto;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -109,7 +111,9 @@ const StatusContainer = styled.div`
 `
 
 const MenuContainer = styled.div`
-  margin-left: 30%;
+  align-items: center;
+  position: absolute;
+  right: 8px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     max-width: 40%;
     margin-left: auto;
@@ -118,7 +122,9 @@ const MenuContainer = styled.div`
 
 const ProfileInfoContainer = styled.div`
   display: flex;
-  width: 10%;
+  width: 40%;
+  align-items: center;
+  margin: -8px 0;
   white-space: nowrap;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin-right: auto;
