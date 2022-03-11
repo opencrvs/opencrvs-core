@@ -505,6 +505,7 @@ export interface GQLHistory {
   user?: GQLUser
   date?: GQLDate
   action?: GQLRegStatus
+  reinstated?: boolean
   location?: GQLLocation
   office?: GQLLocation
   comments?: Array<GQLComment | null>
@@ -3682,6 +3683,7 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   user?: HistoryToUserResolver<TParent>
   date?: HistoryToDateResolver<TParent>
   action?: HistoryToActionResolver<TParent>
+  reinstated?: HistoryToReinstatedResolver<TParent>
   location?: HistoryToLocationResolver<TParent>
   office?: HistoryToOfficeResolver<TParent>
   comments?: HistoryToCommentsResolver<TParent>
@@ -3698,6 +3700,10 @@ export interface HistoryToDateResolver<TParent = any, TResult = any> {
 }
 
 export interface HistoryToActionResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToReinstatedResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

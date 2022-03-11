@@ -14,7 +14,6 @@ import { v4 as uuid } from 'uuid'
 import {
   createCompositionTemplate,
   updateTaskTemplate,
-  addDownloadExtensionToTaskTemplate,
   MOTHER_CODE,
   FATHER_CODE,
   CHILD_CODE,
@@ -80,7 +79,8 @@ import {
   getReasonCodeAndDesc,
   removeObservationResource,
   selectOrCreateEncounterPartitioner,
-  selectOrCreateEncounterParticipant
+  selectOrCreateEncounterParticipant,
+  findExtension
 } from '@gateway/features/fhir/utils'
 import {
   OPENCRVS_SPECIFICATION_URL,
@@ -3444,7 +3444,7 @@ export async function updateFHIRTaskBundle(
   reason?: string,
   comment?: string
 ) {
-  const taskResource = taskEntry.resource as fhir.Task
+  const taskResource = taskEntry.resource
   taskEntry.resource = updateTaskTemplate(taskResource, status, reason, comment)
   const fhirBundle: ITaskBundle = {
     resourceType: 'Bundle',
@@ -3454,12 +3454,30 @@ export async function updateFHIRTaskBundle(
   return fhirBundle
 }
 
-export function addDownloadedTaskExtension(taskEntry: ITaskBundleEntry) {
-  taskEntry.resource = addDownloadExtensionToTaskTemplate(taskEntry.resource)
+export function addOrUpdateExtension(
+  taskEntry: ITaskBundleEntry,
+  extension: fhir.Extension,
+  code: 'downloaded' | 'reinstated'
+) {
+  const task = taskEntry.resource
+
+  if (!task.extension) {
+    task.extension = []
+  }
+
+  const previousExtension = findExtension(extension.url, task.extension)
+
+  if (!previousExtension) {
+    task.extension.push(extension)
+  } else {
+    previousExtension.valueString = extension.valueString
+  }
+
   taskEntry.request = {
     method: 'PUT',
     url: `Task/${taskEntry.resource.id}`
   } as fhir.BundleEntryRequest
+
   const fhirBundle: ITaskBundle = {
     resourceType: 'Bundle',
     type: 'document',
@@ -3467,7 +3485,7 @@ export function addDownloadedTaskExtension(taskEntry: ITaskBundleEntry) {
     signature: {
       type: [
         {
-          code: 'downloaded'
+          code
         }
       ],
       when: Date().toString()

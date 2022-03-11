@@ -10,7 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IAuthHeader } from '@gateway/common-types'
-import { EVENT_TYPE } from '@gateway/features/fhir/constants'
+import {
+  EVENT_TYPE,
+  DOWNLOADED_EXTENSION_URL,
+  REINSTATED_EXTENSION_URL
+} from '@gateway/features/fhir/constants'
 import {
   fetchFHIR,
   getDeclarationIdsFromResponse,
@@ -18,21 +22,24 @@ import {
   getRegistrationIdsFromResponse,
   removeDuplicatesFromComposition,
   getRegistrationIds,
-  getDeclarationIds
+  getDeclarationIds,
+  getStatusFromTask,
+  findExtension
 } from '@gateway/features/fhir/utils'
 import {
   buildFHIRBundle,
   updateFHIRTaskBundle,
-  addDownloadedTaskExtension
+  addOrUpdateExtension,
+  ITaskBundle
 } from '@gateway/features/registration/fhir-builders'
 import { hasScope } from '@gateway/features/user/utils'
 import {
-  GQLRegStatus,
   GQLResolver,
   GQLStatusWiseRegistrationCount
 } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
 import { COUNTRY_CONFIG_URL, FHIR_URL, SEARCH_URL } from '@gateway/constants'
+import { updateTaskTemplate } from '@gateway/features/fhir/templates'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -349,6 +356,15 @@ export const resolvers: GQLResolver = {
         }
         const status = 'ARCHIVED'
         const newTaskBundle = await updateFHIRTaskBundle(taskEntry, status)
+        const taskResource = newTaskBundle.entry[0].resource
+        if (
+          taskResource.extension &&
+          findExtension(DOWNLOADED_EXTENSION_URL, taskResource.extension)
+        ) {
+          taskResource.extension = taskResource.extension.filter(
+            (ext) => ext.url !== DOWNLOADED_EXTENSION_URL
+          )
+        }
         await fetchFHIR(
           '/Task',
           authHeader,
@@ -368,7 +384,7 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate')
       ) {
-        const taskBundle = await fetchFHIR(
+        const taskBundle: ITaskBundle = await fetchFHIR(
           `/Task?focus=Composition/${id}`,
           authHeader
         )
@@ -387,7 +403,7 @@ export const resolvers: GQLResolver = {
 
         const taskHistory =
           taskHistoryBundle.entry &&
-          taskHistoryBundle.entry.map((taskEntry: fhir.BundleEntry, i) => {
+          taskHistoryBundle.entry.map((taskEntry: fhir.BundleEntry) => {
             const historicalTask = taskEntry.resource
             // all these tasks will have the same id, make it more specific to keep apollo-client's cache happy
             if (historicalTask && historicalTask.meta) {
@@ -409,22 +425,34 @@ export const resolvers: GQLResolver = {
         })
         const regStatusCode =
           filteredTaskHistory &&
-          (filteredTaskHistory[0]?.businessStatus?.coding?.find((code) => {
-            return code.system === 'http://opencrvs.org/specs/reg-status'
-          })?.code as GQLRegStatus)
+          filteredTaskHistory.length > 0 &&
+          getStatusFromTask(filteredTaskHistory[0])
 
         if (!regStatusCode) {
           return await Promise.reject(new Error('Task has no reg-status code'))
         }
 
-        const status = regStatusCode as GQLRegStatus
-        const newTaskBundle = await updateFHIRTaskBundle(taskEntryData, status)
+        const newTaskBundle = addOrUpdateExtension(
+          taskEntryData,
+          {
+            url: REINSTATED_EXTENSION_URL,
+            valueString: regStatusCode
+          },
+          'reinstated'
+        )
+
+        newTaskBundle.entry[0].resource = updateTaskTemplate(
+          newTaskBundle.entry[0].resource,
+          regStatusCode
+        )
+
         await fetchFHIR(
           '/Task',
           authHeader,
           'PUT',
           JSON.stringify(newTaskBundle)
         )
+
         return { taskEntryResourceID, registrationStatus: regStatusCode }
       } else {
         return await Promise.reject(
@@ -625,15 +653,21 @@ async function markEventAsCertified(
 }
 
 async function markRecordAsDownloaded(id: string, authHeader: IAuthHeader) {
-  let doc
-  const taskBundle = await fetchFHIR(
+  const taskBundle: ITaskBundle = await fetchFHIR(
     `/Task?focus=Composition/${id}`,
     authHeader
   )
   if (!taskBundle || !taskBundle.entry || !taskBundle.entry[0]) {
     throw new Error('Task does not exist')
   }
-  doc = addDownloadedTaskExtension(taskBundle.entry[0])
+  const doc = addOrUpdateExtension(
+    taskBundle.entry[0],
+    {
+      url: DOWNLOADED_EXTENSION_URL,
+      valueString: getStatusFromTask(taskBundle.entry[0].resource)
+    },
+    'downloaded'
+  )
 
   await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
 

@@ -150,6 +150,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
       history {
         date
         action
+        reinstated
         location {
           id
           name
@@ -347,6 +348,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
       history {
         date
         action
+        reinstated
         location {
           id
           name

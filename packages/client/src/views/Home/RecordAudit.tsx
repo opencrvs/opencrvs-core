@@ -18,7 +18,7 @@ import {
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
 import { Navigation } from '@client/components/interface/Navigation'
-import styled, { ITheme, withTheme } from '@client/styledComponents'
+import styled from '@client/styledComponents'
 import {
   RotateLeft,
   Archive,
@@ -337,6 +337,16 @@ const STATUSTOCOLOR: { [key: string]: string } = {
 const ARCHIVABLE_STATUSES = [DECLARED, VALIDATED, REJECTED]
 
 const DECLARATION_STATUS_LABEL: IStatus = {
+  REINSTATED: {
+    defaultMessage: 'Reinstated to ',
+    description: 'The prefix for reinstated declaration',
+    id: 'recordAudit.history.reinstated.prefix'
+  },
+  ARCHIVED: {
+    defaultMessage: 'Archived',
+    description: 'Label for registration status archived',
+    id: 'recordAudit.history.archived'
+  },
   IN_PROGRESS: {
     defaultMessage: 'Sent incomplete',
     description: 'Declaration submitted without completing the required fields',
@@ -386,11 +396,6 @@ const DECLARATION_STATUS_LABEL: IStatus = {
     defaultMessage: 'Updated declaration',
     description: 'Declaration has been updated',
     id: 'updated_declaration'
-  },
-  ARCHIVED: {
-    defaultMessage: 'Archived',
-    description: 'A label for registration status archived',
-    id: 'recordAudit.history.archived'
   }
 }
 
@@ -848,9 +853,17 @@ const getNameWithAvatar = (
   )
 }
 
-const getStatusLabel = (status: string, intl: IntlShape) => {
+const getStatusLabel = (
+  status: string,
+  reinstated: boolean,
+  intl: IntlShape
+) => {
   if (status in DECLARATION_STATUS_LABEL)
-    return intl.formatMessage(DECLARATION_STATUS_LABEL[status])
+    return (
+      (reinstated
+        ? intl.formatMessage(DECLARATION_STATUS_LABEL['REINSTATED'])
+        : '') + intl.formatMessage(DECLARATION_STATUS_LABEL[status])
+    )
   return ''
 }
 
@@ -895,7 +908,7 @@ const GetHistory = ({
     })
     .map((item) => ({
       date: getFormattedDate(item?.date),
-      action: getLink(getStatusLabel(item?.action, intl), () =>
+      action: getLink(getStatusLabel(item?.action, item.reinstated, intl), () =>
         toggleActionDetails(item)
       ),
       user: getNameWithAvatar(

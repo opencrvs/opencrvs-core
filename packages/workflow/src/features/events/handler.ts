@@ -28,10 +28,13 @@ import {
 import {
   getEventType,
   hasCorrectionEncounterSection,
-  isInProgressDeclaration,
+  isInProgressDeclaration
+} from '@workflow/features/registration/utils'
+import {
+  hasReinstatedExtension,
   isRejectedTask,
   isArchiveTask
-} from '@workflow/features/registration/utils'
+} from '@workflow/features/task/fhir/utils'
 import updateTaskHandler from '@workflow/features/task/handler'
 import { logger } from '@workflow/logger'
 import { hasRegisterScope, hasValidateScope } from '@workflow/utils/authUtils'
@@ -186,7 +189,9 @@ function detectEvent(request: Hapi.Request): Events {
       if (isArchiveTask(taskResource)) {
         return Events.BIRTH_MARK_ARCHIVED
       }
-      return Events.BIRTH_MARK_REINSTATED
+      if (hasReinstatedExtension(taskResource)) {
+        return Events.BIRTH_MARK_REINSTATED
+      }
     } else if (eventType === EVENT_TYPE.DEATH) {
       if (isRejectedTask(taskResource)) {
         return Events.DEATH_MARK_VOID
@@ -194,7 +199,9 @@ function detectEvent(request: Hapi.Request): Events {
       if (isArchiveTask(taskResource)) {
         return Events.DEATH_MARK_ARCHIVED
       }
-      return Events.DEATH_MARK_REINSTATED
+      if (hasReinstatedExtension(taskResource)) {
+        return Events.DEATH_MARK_REINSTATED
+      }
     }
   }
 
