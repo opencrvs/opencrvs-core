@@ -501,7 +501,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       }),
       iconColor:
         declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
-          ? 'violet'
+          ? 'purple'
           : 'orange'
     }
 
@@ -594,7 +594,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     )}
                     iconColor={
                       declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
-                        ? 'violet'
+                        ? 'purple'
                         : 'orange'
                     }
                     saveAction={{
@@ -625,7 +625,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       )}
                       iconColor={
                         declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
-                          ? 'violet'
+                          ? 'purple'
                           : 'orange'
                       }
                       saveAction={{

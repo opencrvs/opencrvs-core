@@ -64,13 +64,14 @@ export const EventTopBar = (props: IEventTopBarProps) => {
     saveAction,
     exitAction,
     menuItems,
-    iconColor,
+    iconColor = 'purple',
     pageIcon
   } = props
   return (
     <TopBar>
       <Item>
-        {pageIcon || <DeclarationIcon color={iconColor} />}{' '}
+        {pageIcon || <DeclarationIcon color={iconColor} />}
+        {''}
         <TopBarTitle>{title}</TopBarTitle>
       </Item>
       <Item>
