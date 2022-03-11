@@ -120,6 +120,10 @@ describe('OutBox tests', () => {
     'REGISTERING',
     'READY_TO_REJECT',
     'REJECTING',
+    'READY_TO_APPROVE',
+    'APPROVING',
+    'READY_TO_ARCHIVE',
+    'ARCHIVING',
     'READY_TO_REQUEST_CORRECTION',
     'REQUESTING_CORRECTION',
     'FAILED_NETWORK'
@@ -130,6 +134,10 @@ describe('OutBox tests', () => {
     'Registering...',
     'Waiting to reject',
     'Rejecting...',
+    'Sending for approval',
+    'Submitting...',
+    'Waiting to be archived',
+    'Archiving...',
     'Waiting to request correction',
     'Requesting correction...',
     'Waiting to retry'

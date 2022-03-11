@@ -354,5 +354,8 @@ export const gqlToDraftTransformer = (
   if (queryData._fhirIDMap) {
     transformedData._fhirIDMap = queryData._fhirIDMap
   }
+  if (queryData.history) {
+    transformedData.history = queryData.history
+  }
   return transformedData
 }

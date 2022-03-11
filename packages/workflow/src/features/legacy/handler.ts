@@ -11,14 +11,14 @@
  */
 import * as Hapi from '@hapi/hapi'
 import {
-  REG_STATUS_REGISTERED,
+  RegStatus,
   CHILD_SECTION_CODE,
   DECEASED_SECTION_CODE,
   EVENT_TYPE,
   BIRTH_REG_NUMBER_SYSTEM,
   DEATH_REG_NUMBER_SYSTEM
 } from '@workflow/features/registration/fhir/constants'
-import { getTaskEventType } from '@workflow/features/registration/utils'
+import { getTaskEventType } from '@workflow/features/task/fhir/utils'
 import { updatePatientIdentifierWithRN } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
   getFromFhir,
@@ -41,7 +41,7 @@ export async function updatePatientRegistrationNumberHandler(
     throw unauthorized()
   }
   const taskBundle: fhir.Bundle = await getFromFhir(
-    `/Task?business-status=${REG_STATUS_REGISTERED}&_count=0`
+    `/Task?business-status=${RegStatus.REGISTERED}&_count=0`
   )
   if (!taskBundle || !taskBundle.entry) {
     throw new Error('No task found on search')
