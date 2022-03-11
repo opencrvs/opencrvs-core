@@ -22,7 +22,8 @@ import {
   updatePatientIdentifierWithRN,
   touchBundle,
   markBundleAsDeclarationUpdated,
-  markBundleAsRequestedForCorrection
+  markBundleAsRequestedForCorrection,
+  removeExtensionFromBundle
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
   getEventInformantName,
@@ -54,6 +55,7 @@ import {
   DEATH_REG_NUMBER_SYSTEM
 } from '@workflow/features/registration/fhir/constants'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
+import { REINSTATED_EXTENSION_URL } from '@gateway/features/fhir/constants'
 
 interface IEventRegistrationCallbackPayload {
   trackingId: string
@@ -421,10 +423,11 @@ export async function markEventAsDownloadedHandler(
   h: Hapi.ResponseToolkit
 ) {
   try {
-    const payload = await touchBundle(
+    let payload = await touchBundle(
       request.payload as fhir.Bundle,
       getToken(request)
     )
+    payload = removeExtensionFromBundle(payload, [REINSTATED_EXTENSION_URL])
     const newRequest = { ...request, payload } as Hapi.Request
     return await forwardToHearth(newRequest, h)
   } catch (error) {
