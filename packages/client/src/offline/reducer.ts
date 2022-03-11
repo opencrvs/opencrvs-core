@@ -276,6 +276,7 @@ function reducer(
       return loop(state, dataLoadingCmds)
     }
     case actions.UPDATE_OFFLINE_CONFIG: {
+      merge(window.config, action.payload.config)
       const newOfflineData = {
         ...state.offlineData,
         config: action.payload.config

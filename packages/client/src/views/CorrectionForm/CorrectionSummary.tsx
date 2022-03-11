@@ -46,7 +46,7 @@ import {
   REVIEW_OVERRIDE_POSITION,
   Action
 } from '@client/forms'
-
+import { lookup } from 'country-data'
 import {
   ActionPageLight,
   ColumnContentAlignment,
@@ -139,6 +139,12 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         this.props.application.data
       )
     }
+    const currency = lookup.currencies({
+      code: window.config.CURRENCY && window.config.CURRENCY['isoCode']
+    })[0].symbol
+    ;(
+      this.group.fields[0].nestedFields as any
+    ).REQUIRED[0].label.defaultMessage += ` ${currency}`
   }
 
   onUploadingStateChanged = (isUploading: boolean) => {
@@ -157,6 +163,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       application: { event }
     } = this.props
     const formSections = getViewableSection(registerForm[event], application)
+
     const backToReviewButton = (
       <SecondaryButton
         id="back_to_review"
