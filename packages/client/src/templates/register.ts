@@ -48,10 +48,6 @@ export const certificateTemplates = {
     vfs: {},
     transformers: [
       {
-        field: 'countryLogo',
-        operation: 'OfflineCompanyLogo'
-      },
-      {
         field: 'registrationNumber',
         operation: 'FieldValue',
         parameters: {
@@ -70,8 +66,8 @@ export const certificateTemplates = {
         }
       },
       {
-        field: 'applicantName',
-        operation: 'ApplicantName',
+        field: 'informantName',
+        operation: 'InformantName',
         parameters: {
           conditions: [
             {
@@ -196,10 +192,6 @@ export const certificateTemplates = {
     vfs: {},
     transformers: [
       {
-        field: 'countryLogo',
-        operation: 'OfflineCompanyLogo'
-      },
-      {
         field: 'registrationNumber',
         operation: 'FieldValue',
         parameters: {
@@ -218,8 +210,8 @@ export const certificateTemplates = {
         }
       },
       {
-        field: 'applicantName',
-        operation: 'ApplicantName',
+        field: 'informantName',
+        operation: 'InformantName',
         parameters: {
           conditions: [
             {
