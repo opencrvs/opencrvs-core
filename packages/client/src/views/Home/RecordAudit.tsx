@@ -965,12 +965,13 @@ const GetHistory = ({
   )
 }
 
-const actionDetailsModalListTable = (
+const ActionDetailsModalListTable = (
   actionDetailsData: IActionDetailsData,
   registerForm: IForm,
   intl: IntlShape,
   offlineData: Partial<IOfflineData>
 ) => {
+  const [currentPage, setCurrentPage] = React.useState(1)
   if (registerForm == undefined) return []
 
   const sections = registerForm?.sections || []
@@ -1011,9 +1012,19 @@ const actionDetailsModalListTable = (
         ) as IFormField
 
         result.push({
-          item: intl.formatMessage(fieldObj.label),
-          original: getFieldValue(item.valueString, fieldObj, offlineData),
-          edit: 'EDIT...'
+          item: intl.formatMessage(fieldObj.label) || 'Not Found',
+          original: getFieldValue(
+            item.valueString,
+            fieldObj,
+            offlineData,
+            intl
+          ),
+          edit: getFieldValue(
+            editedValue.valueString,
+            fieldObj,
+            offlineData,
+            intl
+          )
         })
       } else {
         const [parentField] = indexes
@@ -1025,9 +1036,19 @@ const actionDetailsModalListTable = (
         ).find((field) => field.name == parentField) as IFormField
 
         result.push({
-          item: intl.formatMessage(fieldObj.label),
-          original: getFieldValue(item.valueString, fieldObj, offlineData),
-          edit: 'EDIT...'
+          item: intl.formatMessage(fieldObj.label) || 'Not Found',
+          original: getFieldValue(
+            item.valueString,
+            fieldObj,
+            offlineData,
+            intl
+          ),
+          edit: getFieldValue(
+            editedValue.valueString,
+            fieldObj,
+            offlineData,
+            intl
+          )
         })
       }
     })
@@ -1035,6 +1056,8 @@ const actionDetailsModalListTable = (
     return result
   }
 
+  const declarationUpdates = dataChange(actionDetailsData)
+  const pageChangeHandler = (cp: number) => setCurrentPage(cp)
   return (
     <>
       {/* For Comments */}
@@ -1044,26 +1067,39 @@ const actionDetailsModalListTable = (
         columns={commentsColumn}
         content={actionDetailsData.comments}
       ></ListTable>
+
       {/* For Data Updated */}
       <ListTable
         noResultText=" "
         hideBoxShadow={true}
         columns={declarationUpdatedColumns}
-        content={dataChange(actionDetailsData)}
+        content={declarationUpdates}
+        pageSize={10}
+        totalItems={declarationUpdates.length}
+        currentPage={currentPage}
+        onPageChange={pageChangeHandler}
       ></ListTable>
     </>
   )
 }
 
-const ActionDetailsModal = (
-  show: boolean,
-  actionDetailsData: IActionDetailsData,
-  toggleActionDetails: (param: IActionDetailsData | null) => void,
-  intl: IntlShape,
-  goToUser: typeof goToUserProfile,
-  registerForm: IForm,
+const ActionDetailsModal = ({
+  show,
+  actionDetailsData,
+  toggleActionDetails,
+  intl,
+  goToUser,
+  registerForm,
+  offlineData
+}: {
+  show: boolean
+  actionDetailsData: IActionDetailsData
+  toggleActionDetails: (param: IActionDetailsData | null) => void
+  intl: IntlShape
+  goToUser: typeof goToUserProfile
+  registerForm: IForm
   offlineData: Partial<IOfflineData>
-) => {
+}) => {
   if (isEmpty(actionDetailsData)) return <></>
 
   const title =
@@ -1102,7 +1138,7 @@ const ActionDetailsModal = (
           </CLinkButton>
           <span> — {getFormattedDate(actionDetailsData.date)}</span>
         </div>
-        {actionDetailsModalListTable(
+        {ActionDetailsModalListTable(
           actionDetailsData,
           registerForm,
           intl,
@@ -1280,6 +1316,15 @@ function RecordAuditBody({
     regForm = get(registerForm.registerForm, eventType)
   else regForm = registerForm.registerForm['birth']
 
+  const actionDetailsModalProps = {
+    show: showActionDetails,
+    actionDetailsData,
+    toggleActionDetails,
+    intl,
+    goToUser: goToUserProfile,
+    registerForm: regForm,
+    offlineData
+  }
   return (
     <>
       <Content
@@ -1321,17 +1366,7 @@ function RecordAuditBody({
           toggleActionDetails
         })}
       </Content>
-
-      {ActionDetailsModal(
-        showActionDetails,
-        actionDetailsData,
-        toggleActionDetails,
-        intl,
-        goToUserProfile,
-        regForm,
-        offlineData
-      )}
-
+      <ActionDetailsModal {...actionDetailsModalProps} />
       <ResponsiveModal
         title={
           declaration.status && ARCHIVED.includes(declaration.status)
