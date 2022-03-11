@@ -12,13 +12,14 @@
 
 import React from 'react'
 import styled from '@client/styledComponents'
-import { Content, Field, HalfWidthInput, isValidRegEx } from './DynamicModal'
+import { Content, Field, HalfWidthInput } from './DynamicModal'
 import { InputField } from '@opencrvs/components/lib/forms'
 import { IntlShape } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/config'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import SuccessSmall from '@opencrvs/components/lib/icons/SuccessSmall'
 import { Cross } from '@opencrvs/components/lib/icons/Cross'
+import { isValidRegEx, isValidExample } from './Utils'
 
 const ErrorMessageBottom = styled.div<{ marginTop?: number }>`
   position: relative;
@@ -65,7 +66,6 @@ interface IProps {
   example: string
   setPattern: (event: React.ChangeEvent<HTMLInputElement>) => void
   setExample: (event: React.ChangeEvent<HTMLInputElement>) => void
-  isValidExample: (pattern: string, example: string) => boolean
   patternErrorMessage: string
 }
 
@@ -76,7 +76,6 @@ function ContentComponent({
   example,
   setPattern,
   setExample,
-  isValidExample,
   patternErrorMessage
 }: IProps) {
   const [showExampleValidation, setShowExampleValidation] =

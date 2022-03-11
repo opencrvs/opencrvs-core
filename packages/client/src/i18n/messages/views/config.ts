@@ -40,6 +40,10 @@ interface IConfigMessages
   nidPatternChangeMessage: MessageDescriptor
   nidPatternChangeError: MessageDescriptor
   nidPatternChangeNotification: MessageDescriptor
+  phoneNumberPatternTitle: MessageDescriptor
+  phoneNumberChangeMessage: MessageDescriptor
+  phoneNumberChangeError: MessageDescriptor
+  phoneNumberChangeNotification: MessageDescriptor
   legallySpecifiedLabel: MessageDescriptor
   lateRegistrationLabel: MessageDescriptor
   delayedRegistrationLabel: MessageDescriptor
@@ -295,6 +299,28 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.nidPatternChangeNotification',
     defaultMessage: 'NID Pattern of application updated',
     description: 'Message for NID Pattern change modal'
+  },
+  phoneNumberPatternTitle: {
+    id: 'config.application.phoneNumberPatternTitle',
+    defaultMessage: 'Phone number regex',
+    description: 'Phone number config title'
+  },
+  phoneNumberChangeMessage: {
+    id: 'config.application.phoneNumberChangeMessage',
+    defaultMessage:
+      'Set the regex pattern for your country phone number. For guidance please refer to www.regex101.com',
+    description: 'phone number config config message'
+  },
+  phoneNumberChangeError: {
+    id: 'config.application.phoneNumberChangeError',
+    defaultMessage: 'Invalid regular expression for a phone number Number',
+    description:
+      'Error message for invalid regular expression for phone number number'
+  },
+  phoneNumberChangeNotification: {
+    id: 'config.application.phoneNumberChangeNotification',
+    defaultMessage: 'Phone Number Pattern Pattern of application updated',
+    description: 'Message for phone number  Pattern change modal'
   }
 }
 

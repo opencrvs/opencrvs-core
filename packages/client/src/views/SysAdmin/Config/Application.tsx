@@ -128,7 +128,9 @@ function GeneralTabContent({
           action: {
             id: GeneralActionId.PHONE_NUMBER,
             label: intl.formatMessage(buttonMessages.change),
-            disabled: true
+            handler: () => {
+              callBack(GeneralActionId.PHONE_NUMBER)
+            }
           }
         },
         {

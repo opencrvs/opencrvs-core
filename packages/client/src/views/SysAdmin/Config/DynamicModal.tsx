@@ -24,12 +24,19 @@ import { InputField, TextInput } from '@opencrvs/components/lib/forms'
 import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { Alert } from '@opencrvs/components/lib/icons/Alert'
-import { configApplicationMutations } from '@client/views/SysAdmin/Config/mutations'
 import { updateOfflineConfigData } from '@client/offline/actions'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import ContentComponent from '@client/views/SysAdmin/Config/NIDPhoneNumContent'
 import { IOfflineData } from '@client/offline/reducer'
+import {
+  isApplyButtonDisabled,
+  getTitle,
+  getMessage,
+  callUpdateNIDPatternMutation,
+  callUpdateApplicationNameMutation,
+  callUpdatePhoneNumberPatternMutation
+} from './Utils'
 
 const Message = styled.div`
   margin-bottom: 16px;
@@ -78,15 +85,30 @@ const ErrorMessage = styled.div`
   margin-left: 6px;
 `
 
+export type ITempPhoneNumber = {
+  mask: {
+    startForm: number
+    endBefore: number
+  }
+  pattern: string
+  example: string
+  start: string
+  num: string
+}
+
 export type IApplicationConfig = {
   APPLICATION_NAME?: string
   NID_NUMBER_PATTERN?: string
+  PHONE_NUMBER_PATTERN?: ITempPhoneNumber
 }
-type State = {
+export type IState = {
   applicationName: string
   nidPattern: string
   nidExample: string
   testNid: boolean
+  phoneNumberPattern: string
+  phoneNumberExample: string
+  testPhoneNumber: boolean
   updatingValue: boolean
   errorOccured: boolean
   errorMessages: string
@@ -106,20 +128,8 @@ type DispatchProps = {
   updateConfig: typeof updateOfflineConfigData
 }
 
-type IFullProps = IProps & IntlShapeProps & DispatchProps
-
-export function isValidRegEx(pattern: string): boolean {
-  try {
-    const value = ''
-    value.match(pattern)
-  } catch {
-    return false
-  }
-  if (pattern === '') return false
-  return true
-}
-
-class DynamicModalComponent extends React.Component<IFullProps, State> {
+export type IFullProps = IProps & IntlShapeProps & DispatchProps
+class DynamicModalComponent extends React.Component<IFullProps, IState> {
   constructor(props: IFullProps) {
     super(props)
     this.state = {
@@ -129,6 +139,10 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
         props.offlineCountryConfiguration.config.NID_NUMBER_PATTERN.toString(),
       nidExample: EMPTY_STRING,
       testNid: false,
+      phoneNumberPattern:
+        props.offlineCountryConfiguration.config.PHONE_NUMBER_PATTERN.pattern.toString(),
+      phoneNumberExample: EMPTY_STRING,
+      testPhoneNumber: false,
       updatingValue: false,
       errorOccured: false,
       errorMessages: EMPTY_STRING
@@ -158,6 +172,33 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
     }))
   }
 
+  setPhoneNumberPattern = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const pattern = event.target.value
+    this.setState(() => ({
+      phoneNumberPattern: pattern
+    }))
+  }
+
+  setPhoneNumberExample = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const example = event.target.value
+    this.setState(() => ({
+      phoneNumberExample: example
+    }))
+  }
+
+  setUpdatingValue = (value: boolean) => {
+    this.setState({
+      updatingValue: value
+    })
+  }
+
+  setError = (errorMessage: string) => {
+    this.setState({
+      errorOccured: true,
+      errorMessages: errorMessage
+    })
+  }
+
   mutationHandler(
     modalName: string,
     value: IApplicationConfig,
@@ -170,7 +211,12 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
       modalName === GeneralActionId.APPLICATION_NAME &&
       value.APPLICATION_NAME
     ) {
-      this.callUpdateApplicationNameMutation(value.APPLICATION_NAME)
+      callUpdateApplicationNameMutation(
+        value.APPLICATION_NAME,
+        this.props,
+        this.setUpdatingValue,
+        this.setError
+      )
         .then(() => {
           valueChanged(
             NOTIFICATION_TYPE.SUCCESS,
@@ -180,12 +226,9 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
           )
         })
         .catch(() => {
-          this.setState({
-            errorOccured: true,
-            errorMessages: this.props.intl.formatMessage(
-              messages.applicationConfigChangeError
-            )
-          })
+          this.setError(
+            this.props.intl.formatMessage(messages.applicationConfigChangeError)
+          )
           valueChanged(
             NOTIFICATION_TYPE.ERROR,
             this.props.intl.formatMessage(messages.applicationConfigChangeError)
@@ -195,7 +238,12 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
       modalName === GeneralActionId.NID_PATTERN &&
       value.NID_NUMBER_PATTERN
     ) {
-      this.callUpdateNIDPatternMutation(value.NID_NUMBER_PATTERN)
+      callUpdateNIDPatternMutation(
+        value.NID_NUMBER_PATTERN,
+        this.props,
+        this.setUpdatingValue,
+        this.setError
+      )
         .then(() => {
           valueChanged(
             NOTIFICATION_TYPE.SUCCESS,
@@ -203,12 +251,36 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
           )
         })
         .catch(() => {
-          this.setState({
-            errorOccured: true,
-            errorMessages: this.props.intl.formatMessage(
-              messages.applicationConfigChangeError
+          this.setError(
+            this.props.intl.formatMessage(messages.applicationConfigChangeError)
+          )
+          valueChanged(
+            NOTIFICATION_TYPE.ERROR,
+            this.props.intl.formatMessage(messages.applicationConfigChangeError)
+          )
+        })
+    } else if (
+      modalName === GeneralActionId.PHONE_NUMBER &&
+      value.PHONE_NUMBER_PATTERN
+    ) {
+      callUpdatePhoneNumberPatternMutation(
+        value.PHONE_NUMBER_PATTERN,
+        this.props,
+        this.setUpdatingValue,
+        this.setError
+      )
+        .then(() => {
+          valueChanged(
+            NOTIFICATION_TYPE.SUCCESS,
+            this.props.intl.formatMessage(
+              messages.phoneNumberChangeNotification
             )
-          })
+          )
+        })
+        .catch(() => {
+          this.setError(
+            this.props.intl.formatMessage(messages.applicationConfigChangeError)
+          )
           valueChanged(
             NOTIFICATION_TYPE.ERROR,
             this.props.intl.formatMessage(messages.applicationConfigChangeError)
@@ -217,101 +289,13 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
     }
   }
 
-  async callUpdateApplicationNameMutation(applicationName: string) {
-    try {
-      this.setState({ updatingValue: true })
-      const res = await configApplicationMutations.mutateApplicationConfig({
-        APPLICATION_NAME: applicationName
-      })
-      if (res && res.data) {
-        this.setState({ updatingValue: false })
-        const APPLICATION_NAME =
-          res.data.updateApplicationConfig.APPLICATION_NAME
-        const offlineConfig = {
-          config: {
-            ...this.props.offlineCountryConfiguration.config,
-            APPLICATION_NAME
-          }
-        }
-        this.props.updateConfig(offlineConfig)
-      }
-    } catch (err) {
-      this.setState({
-        errorOccured: true,
-        errorMessages: this.props.intl.formatMessage(
-          messages.applicationConfigChangeError
-        )
-      })
-    }
-  }
-
-  async callUpdateNIDPatternMutation(nidPattern: string) {
-    try {
-      this.setState({ updatingValue: true })
-      const res = await configApplicationMutations.mutateApplicationConfig({
-        NID_NUMBER_PATTERN: nidPattern
-      })
-      if (res && res.data) {
-        this.setState({ updatingValue: false })
-        const NID_NUMBER_PATTERN =
-          res.data.updateApplicationConfig.NID_NUMBER_PATTERN
-        const offlineConfig = {
-          config: {
-            ...this.props.offlineCountryConfiguration.config,
-            NID_NUMBER_PATTERN
-          }
-        }
-        this.props.updateConfig(offlineConfig)
-      }
-    } catch (err) {
-      this.setState({
-        errorOccured: true,
-        errorMessages: this.props.intl.formatMessage(
-          messages.applicationConfigChangeError
-        )
-      })
-    }
-  }
-
-  getTitle() {
-    const { intl, changeModalName } = this.props
-    if (changeModalName === GeneralActionId.APPLICATION_NAME)
-      return intl.formatMessage(messages.applicationNameLabel)
-    else if (changeModalName === GeneralActionId.NID_PATTERN)
-      return intl.formatMessage(messages.nidPatternTitle)
-    else return EMPTY_STRING
-  }
-
-  isApplyButtonDisabled() {
-    const { changeModalName } = this.props
-    if (changeModalName === GeneralActionId.APPLICATION_NAME) {
-      return !Boolean(this.state.applicationName)
-    } else if (changeModalName === GeneralActionId.NID_PATTERN) {
-      return (
-        !isValidRegEx(this.state.nidPattern) || !Boolean(this.state.nidPattern)
-      )
-    } else return true
-  }
-
-  isValidExample(pattern: string, example: string) {
-    if (
-      !isValidRegEx(pattern) ||
-      !new RegExp(pattern).test(example) ||
-      !pattern ||
-      !example
-    ) {
-      return false
-    }
-    return true
-  }
-
   render() {
     const { intl, changeModalName, toggleConfigModal, valueChanged } =
       this.props
     return (
       <ResponsiveModal
         id={`${changeModalName}Modal`}
-        title={this.getTitle()}
+        title={getTitle(intl, changeModalName)}
         autoHeight={true}
         titleHeightAuto={changeModalName === GeneralActionId.NID_PATTERN}
         show={this.showChangeModal}
@@ -326,13 +310,23 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
           <ApplyButton
             key="apply"
             id="apply_change"
-            disabled={this.isApplyButtonDisabled()}
+            disabled={isApplyButtonDisabled(this.state, changeModalName)}
             onClick={() => {
               this.mutationHandler(
                 changeModalName,
                 {
                   APPLICATION_NAME: this.state.applicationName,
-                  NID_NUMBER_PATTERN: this.state.nidPattern
+                  NID_NUMBER_PATTERN: this.state.nidPattern,
+                  PHONE_NUMBER_PATTERN: {
+                    mask: {
+                      startForm: 4,
+                      endBefore: 2
+                    },
+                    pattern: this.state.phoneNumberPattern,
+                    example: '0970545855',
+                    start: '0[7|9]',
+                    num: '10'
+                  }
                 },
                 valueChanged
               )
@@ -344,11 +338,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
         handleClose={toggleConfigModal}
         contentHeight={175}
       >
-        <Message>
-          {changeModalName === GeneralActionId.APPLICATION_NAME
-            ? intl.formatMessage(messages.applicationNameChangeMessage)
-            : intl.formatMessage(messages.nidPatternChangeMessage)}
-        </Message>
+        <Message>{getMessage(intl, changeModalName)}</Message>
         {this.state.errorOccured && (
           <ErrorContent>
             <Alert color="invert" />
@@ -380,9 +370,21 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
             example={this.state.nidExample}
             setPattern={this.setNIDPattern}
             setExample={this.setNIDExample}
-            isValidExample={this.isValidExample}
             patternErrorMessage={intl.formatMessage(
               messages.nidPatternChangeError
+            )}
+          />
+        )}
+        {changeModalName === GeneralActionId.PHONE_NUMBER && (
+          <ContentComponent
+            intl={intl}
+            changeModalName={changeModalName}
+            pattern={this.state.phoneNumberPattern}
+            example={this.state.phoneNumberExample}
+            setPattern={this.setPhoneNumberPattern}
+            setExample={this.setPhoneNumberExample}
+            patternErrorMessage={intl.formatMessage(
+              messages.phoneNumberChangeError
             )}
           />
         )}
