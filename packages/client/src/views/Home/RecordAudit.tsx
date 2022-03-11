@@ -152,7 +152,7 @@ interface IGQLDeclaration {
 }
 
 const STATUSTOCOLOR: { [key: string]: string } = {
-  DRAFT: 'violet',
+  DRAFT: 'purple',
   DECLARED: 'orange',
   REJECTED: 'red',
   VALIDATED: 'grey',
