@@ -543,7 +543,6 @@ export const validIDNumber =
 
     const cast = value as string
     const trimmedValue = cast === undefined || cast === null ? '' : cast.trim()
-    console.log(value, trimmedValue)
     if (typeOfID === NATIONAL_ID) {
       if (isAValidNIDNumberFormat(trimmedValue) || !trimmedValue) {
         return undefined

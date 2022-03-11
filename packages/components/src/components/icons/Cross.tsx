@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
+import { colors } from 'react-select/lib/theme'
 
 export const Cross = (props: React.HTMLAttributes<SVGElement>) => {
   let fill: string
@@ -21,10 +22,10 @@ export const Cross = (props: React.HTMLAttributes<SVGElement>) => {
       fill = 'currentColor'
       break
     case 'red':
-      fill = '#D53F3F'
+      fill = colors.danger
       break
     default:
-      fill = '#4C68C1'
+      fill = colors.primary
   }
   return (
     <svg width={24} height={24} fill="none" {...props}>

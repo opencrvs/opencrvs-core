@@ -282,7 +282,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
     else return EMPTY_STRING
   }
 
-  isApplyButtonDisable() {
+  isApplyButtonDisabled() {
     const { changeModalName } = this.props
     if (changeModalName === GeneralActionId.APPLICATION_NAME) {
       return !Boolean(this.state.applicationName)
@@ -326,7 +326,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
           <ApplyButton
             key="apply"
             id="apply_change"
-            disabled={this.isApplyButtonDisable()}
+            disabled={this.isApplyButtonDisabled()}
             onClick={() => {
               this.mutationHandler(
                 changeModalName,
