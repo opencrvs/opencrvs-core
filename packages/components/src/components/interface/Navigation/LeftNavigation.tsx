@@ -72,6 +72,27 @@ const ApplicationName = styled.div`
   text-overflow: ellipsis;
 `
 
+const Version = styled.div`
+  color: ${({ theme }) => theme.colors.grey400};
+  ${({ theme }) => theme.fonts.smallButtonStyle};
+  height: 40px;
+  position: absolute;
+  bottom: 0px;
+  padding: 24px 24px;
+  margin-top: 2rem;
+  span:last-child {
+    display: none;
+  }
+  :hover {
+    span:first-child {
+      display: none;
+    }
+    span:last-child {
+      display: inline;
+    }
+  }
+`
+
 export const LeftNavigation = (props: ILeftNavigationProps) => {
   return (
     <LeftNavigationContainer navigationWidth={props.navigationWidth}>
@@ -84,6 +105,10 @@ export const LeftNavigation = (props: ILeftNavigationProps) => {
         <Role>{props.role && props.role}</Role>
       </UserInfo>
       {props.children && props.children}
+      <Version>
+        <span>OpenCRVS v1.1.0</span>
+        <span>{process.env.REACT_APP_VERSION || 'development'}</span>
+      </Version>
     </LeftNavigationContainer>
   )
 }
