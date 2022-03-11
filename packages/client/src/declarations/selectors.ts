@@ -9,20 +9,20 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IApplicationsState } from '@client/applications/index'
+import { IDeclarationsState } from '@client/declarations/index'
 import { IStoreState } from '@client/store'
 
-export const getDraftsState = (store: IStoreState): IApplicationsState =>
-  store.applicationsState
+export const getDraftsState = (store: IStoreState): IDeclarationsState =>
+  store.declarationsState
 
-function getKey<K extends keyof IApplicationsState>(
+function getKey<K extends keyof IDeclarationsState>(
   store: IStoreState,
   key: K
 ) {
   return getDraftsState(store)[key]
 }
 
-export const getInitialApplicationsLoaded = (
+export const getInitialDeclarationsLoaded = (
   store: IStoreState
-): IApplicationsState['initialApplicationsLoaded'] =>
-  getKey(store, 'initialApplicationsLoaded')
+): IDeclarationsState['initialDeclarationsLoaded'] =>
+  getKey(store, 'initialDeclarationsLoaded')

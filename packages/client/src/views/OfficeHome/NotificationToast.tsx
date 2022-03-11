@@ -20,18 +20,18 @@ import {
   injectIntl
 } from 'react-intl'
 import Outbox from './Outbox'
-import { IApplication, SUBMISSION_STATUS } from '@client/applications'
+import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 
 const messages = defineMessages({
   processingText: {
     id: 'misc.notif.processingText',
-    defaultMessage: '{num} application processing...',
-    description: 'Application processing text'
+    defaultMessage: '{num} declaration processing...',
+    description: 'Declaration processing text'
   },
   outboxText: {
     id: 'misc.notif.outboxText',
     defaultMessage: 'Outbox({num})',
-    description: 'Application outbox text'
+    description: 'Declaration outbox text'
   }
 })
 const ExpandableNotificationContainer = styled.div`
@@ -44,13 +44,13 @@ const ExpandableNotificationContainer = styled.div`
 `
 
 interface IProps {
-  application: IApplication[]
+  declaration: IDeclaration[]
   showPaginated?: boolean
 }
 type IFullProps = IProps & IntlShapeProps
 class NotificationToast extends React.Component<IFullProps> {
   render() {
-    const outboxData = this.props.application.filter(
+    const outboxData = this.props.declaration.filter(
       (item) =>
         item.submissionStatus === SUBMISSION_STATUS.READY_TO_ARCHIVE ||
         item.submissionStatus === SUBMISSION_STATUS.READY_TO_REINSTATE ||
@@ -86,7 +86,7 @@ class NotificationToast extends React.Component<IFullProps> {
           )}
         >
           <Outbox
-            application={outboxData}
+            declaration={outboxData}
             showPaginated={this.props.showPaginated}
           />
         </ExpandableNotification>
@@ -97,9 +97,9 @@ class NotificationToast extends React.Component<IFullProps> {
 
 function mapStatetoProps(state: IStoreState) {
   return {
-    application:
-      state.applicationsState && state.applicationsState.applications
-        ? [...state.applicationsState.applications]
+    declaration:
+      state.declarationsState && state.declarationsState.declarations
+        ? [...state.declarationsState.declarations]
         : []
   }
 }

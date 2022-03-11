@@ -28,7 +28,8 @@ export const CHECK_INVALID_TOKEN = process.env.CHECK_INVALID_TOKEN || 'false'
 export const SEARCH_URL = process.env.SEARCH_URL || 'http://localhost:9090/'
 export const EXPECTED_BIRTH_REGISTRATION_IN_DAYS =
   process.env.EXPECTED_BIRTH_REGISTRATION_IN_DAYS || 45
-export const CONFIG_API_URL = 'http://localhost:2021'
+export const CONFIG_API_URL =
+  process.env.CONFIG_API_URL || 'http://localhost:2021'
 export const mockFetchConfig = {
   API_GATEWAY_URL: 'http://localhost:7070/',
   CONFIG_API_URL: 'http://localhost:2021',
@@ -41,7 +42,7 @@ export const mockFetchConfig = {
   CERTIFICATE_PRINT_HIGHEST_CHARGE: 0,
   UI_POLLING_INTERVAL: 5000,
   FIELD_AGENT_AUDIT_LOCATIONS: 'DISTRICT',
-  APPLICATION_AUDIT_LOCATIONS: 'DISTRICT',
+  DECLARATION_AUDIT_LOCATIONS: 'DISTRICT',
   INFORMANT_MINIMUM_AGE: 16,
   HIDE_EVENT_REGISTER_INFORMATION: false,
   EXTERNAL_VALIDATION_WORKQUEUE: false,

@@ -114,7 +114,7 @@ const MenuContainer = styled.div`
   }
 
   ul.rc-menu.rc-menu-sub.rc-menu-vertical > li {
-    border-top: 1px inset ${({ theme }) => theme.colors.placeholder};
+    border-top: 1px inset ${({ theme }) => theme.colors.placeholderCopy};
   }
 
   li.rc-menu-submenu.rc-menu-submenu-vertical > div:nth-child(2) {

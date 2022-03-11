@@ -165,7 +165,7 @@ export const resolvers: GQLResolver = {
       }
       // Loading metrics data by practitioner ids
       const metricsForPractitioners = await postMetrics(
-        '/applicationStartedMetricsByPractitioners',
+        '/declarationStartedMetricsByPractitioners',
         {
           timeStart,
           timeEnd,
@@ -191,14 +191,14 @@ export const resolvers: GQLResolver = {
             status: user.status,
             primaryOfficeId: user.primaryOfficeId,
             creationDate: user?.creationDate,
-            totalNumberOfApplicationStarted:
-              metricsData?.totalNumberOfApplicationStarted ?? 0,
+            totalNumberOfDeclarationStarted:
+              metricsData?.totalNumberOfDeclarationStarted ?? 0,
             totalNumberOfInProgressAppStarted:
               metricsData?.totalNumberOfInProgressAppStarted ?? 0,
-            totalNumberOfRejectedApplications:
-              metricsData?.totalNumberOfRejectedApplications ?? 0,
-            averageTimeForDeclaredApplications:
-              metricsData?.averageTimeForDeclaredApplications ?? 0
+            totalNumberOfRejectedDeclarations:
+              metricsData?.totalNumberOfRejectedDeclarations ?? 0,
+            averageTimeForDeclaredDeclarations:
+              metricsData?.averageTimeForDeclaredDeclarations ?? 0
           }
         })
 

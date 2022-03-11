@@ -74,11 +74,11 @@ const DefaultImage = styled.div<{ width: number; height: number }>`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: ${({ theme }) => theme.colors.loadingImage};
+  background-color: ${({ theme }) => theme.colors.grey100};
 `
 
 const Error = styled.div`
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.negative};
 `
 
 export const changeAvatarMutation = gql`

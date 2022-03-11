@@ -52,7 +52,7 @@ interface BaseProps {
 }
 
 interface IStateProps {
-  disableApplicationLink: boolean
+  disableDeclarationLink: boolean
 }
 
 const ContentHolder = styled.div`
@@ -77,7 +77,7 @@ const StatusListFooter = styled.div`
   border-bottom: none;
 `
 
-class StatusWiseApplicationCountViewComponent extends React.Component<
+class StatusWiseDeclarationCountViewComponent extends React.Component<
   Props,
   {}
 > {
@@ -116,19 +116,19 @@ class StatusWiseApplicationCountViewComponent extends React.Component<
   }
 
   getStatusCountView(data: GQLRegistrationCountResult) {
-    const { intl, statusMapping, disableApplicationLink } = this.props
+    const { intl, statusMapping, disableDeclarationLink } = this.props
     const { results, total } = data
     return (
       <ContentHolder>
         <StatusHeader id="status-header">
           <SubHeader>
-            {intl.formatMessage(constantsMessages.applicationTitle)}
+            {intl.formatMessage(constantsMessages.declarationTitle)}
           </SubHeader>
           <Description>
             {intl.formatMessage(
-              performanceMessages.applicationCountByStatusDescription
+              performanceMessages.declarationCountByStatusDescription
             )}{' '}
-            {!disableApplicationLink && (
+            {!disableDeclarationLink && (
               <LinkButton
                 id="view-all-link"
                 onClick={() => this.props.onClickStatusDetails()}
@@ -151,7 +151,7 @@ class StatusWiseApplicationCountViewComponent extends React.Component<
                     )}
                     color={statusMapping![statusCount.status].color}
                     totalPoints={total}
-                    disabled={disableApplicationLink || false}
+                    disabled={disableDeclarationLink || false}
                     onClick={() =>
                       this.props.onClickStatusDetails(statusCount.status)
                     }
@@ -180,7 +180,7 @@ class StatusWiseApplicationCountViewComponent extends React.Component<
   }
 }
 
-export const StatusWiseApplicationCountView = connect<
+export const StatusWiseDeclarationCountView = connect<
   IStateProps,
   {},
   BaseProps,
@@ -191,9 +191,9 @@ export const StatusWiseApplicationCountView = connect<
 
   const isOfficeSelected = !!offlineOffices[ownProps.locationId]
 
-  let disableApplicationLink = !(
+  let disableDeclarationLink = !(
     isOfficeSelected ||
-    window.config.APPLICATION_AUDIT_LOCATIONS.includes(
+    window.config.DECLARATION_AUDIT_LOCATIONS.includes(
       getJurisidictionType(offlineLocations, ownProps.locationId) as string
     )
   )
@@ -205,7 +205,7 @@ export const StatusWiseApplicationCountView = connect<
   ) {
     const jurisdictionLocation =
       getJurisdictionLocationIdFromUserDetails(userDetails)
-    disableApplicationLink = !isUnderJurisdictionOfUser(
+    disableDeclarationLink = !isUnderJurisdictionOfUser(
       offlineLocations,
       isOfficeSelected
         ? getPrimaryLocationIdOfOffice(
@@ -217,6 +217,6 @@ export const StatusWiseApplicationCountView = connect<
     )
   }
   return {
-    disableApplicationLink
+    disableDeclarationLink
   }
-})(injectIntl(StatusWiseApplicationCountViewComponent))
+})(injectIntl(StatusWiseDeclarationCountViewComponent))

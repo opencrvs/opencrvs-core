@@ -14,32 +14,29 @@ import { Button } from './Button'
 
 export const PrimaryButton = styled(Button)`
   padding: 0 8px;
+  transition: background 0.4s ease;
+  border-radius: 4px;
   color: ${({ theme }) => theme.colors.white};
   background: ${({ theme }) => theme.colors.primary};
-  ${({ theme }) => theme.shadows.mistyShadow};
   justify-content: center;
-  border-radius: 2px;
-  ${({ theme }) => theme.fonts.buttonStyle};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
 
   &:hover:enabled {
-    ${({ theme }) => theme.gradients.gradientSkyDark};
-    color: ${({ theme }) => theme.colors.white};
+    background: ${({ theme }) => theme.colors.indigoDark};
   }
   &:focus {
-    outline: none;
-    background: ${({ theme }) => theme.colors.focus};
+    background: ${({ theme }) => theme.colors.yellow};
     color: ${({ theme }) => theme.colors.copy};
   }
 
   &:not([data-focus-visible-added]) {
-    outline: none;
     background: ${({ theme }) => theme.colors.primary};
     color: ${({ theme }) => theme.colors.white};
   }
 
   &:active:enabled {
-    background: ${({ theme }) => theme.colors.primary};
-    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.focus};
+    background: ${({ theme }) => theme.colors.indigoDark};
+    color: ${({ theme }) => theme.colors.white};
   }
 
   &:not([data-focus-visible-added]):disabled {

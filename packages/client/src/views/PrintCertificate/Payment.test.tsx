@@ -13,12 +13,12 @@ import * as React from 'react'
 import { createStore } from '@client/store'
 import {
   createTestComponent,
-  mockApplicationData,
-  mockDeathApplicationData,
+  mockDeclarationData,
+  mockDeathDeclarationData,
   validToken,
   mockUserResponse
 } from '@client/tests/util'
-import { storeApplication } from '@client/applications'
+import { storeDeclaration } from '@client/declarations'
 import { Event } from '@client/forms'
 import { Payment } from './Payment'
 import * as PDFUtils from '@client/views/PrintCertificate/PDFUtils'
@@ -32,24 +32,24 @@ describe('verify collector tests', () => {
   const { store, history } = createStore()
   const mockLocation: any = jest.fn()
 
-  const birthApplication = {
+  const birthDeclaration = {
     id: 'mockBirth1234',
-    data: mockApplicationData,
+    data: mockDeclarationData,
     event: Event.BIRTH
   }
 
-  const deathApplication = {
+  const deathDeclaration = {
     id: 'mockDeath1234',
-    data: mockDeathApplicationData,
+    data: mockDeathDeclarationData,
     event: Event.DEATH
   }
 
-  describe('in case of birth application', () => {
+  describe('in case of birth declaration', () => {
     beforeAll(async () => {
       getItem.mockReturnValue(validToken)
       await store.dispatch(checkAuth({ '?token': validToken }))
 
-      store.dispatch(storeApplication(birthApplication))
+      store.dispatch(storeDeclaration(birthDeclaration))
     })
 
     it('when mother is collector renders Payment component', async () => {
@@ -105,7 +105,7 @@ describe('verify collector tests', () => {
       expect(printMoneyReceiptSpy).toBeCalled()
     })
 
-    it('invalid application id', () => {
+    it('invalid declaration id', () => {
       expect(
         createTestComponent(
           <Payment
@@ -123,13 +123,13 @@ describe('verify collector tests', () => {
           />,
           { store, history }
         )
-      ).rejects.toEqual(new Error('Application "mockBirth" missing!'))
+      ).rejects.toEqual(new Error('Declaration "mockBirth" missing!'))
     })
   })
 
-  describe('in case of death application renders payment component', () => {
+  describe('in case of death declaration renders payment component', () => {
     beforeAll(() => {
-      store.dispatch(storeApplication(deathApplication))
+      store.dispatch(storeDeclaration(deathDeclaration))
     })
 
     it('when informant is collector', async () => {

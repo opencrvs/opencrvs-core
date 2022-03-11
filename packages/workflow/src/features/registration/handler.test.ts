@@ -1699,10 +1699,10 @@ describe('populateCompositionWithID', () => {
               coding: [
                 {
                   system: 'http://opencrvs.org/doc-types',
-                  code: 'birth-application'
+                  code: 'birth-declaration'
                 }
               ],
-              text: 'Birth Application'
+              text: 'Birth Declaration'
             },
             class: {
               coding: [
@@ -1713,7 +1713,7 @@ describe('populateCompositionWithID', () => {
               ],
               text: 'CRVS Document'
             },
-            title: 'Birth Application',
+            title: 'Birth Declaration',
             section: [
               {
                 title: 'Child details',
@@ -2084,10 +2084,10 @@ describe('populateCompositionWithID', () => {
               coding: [
                 {
                   system: 'http://opencrvs.org/doc-types',
-                  code: 'birth-application'
+                  code: 'birth-declaration'
                 }
               ],
-              text: 'Birth Application'
+              text: 'Birth Declaration'
             },
             class: {
               coding: [
@@ -2098,7 +2098,7 @@ describe('populateCompositionWithID', () => {
               ],
               text: 'CRVS Document'
             },
-            title: 'Birth Application',
+            title: 'Birth Declaration',
             section: [
               {
                 title: 'Child details',
@@ -2410,10 +2410,10 @@ describe('populateCompositionWithID', () => {
               coding: [
                 {
                   system: 'http://opencrvs.org/doc-types',
-                  code: 'birth-application'
+                  code: 'birth-declaration'
                 }
               ],
-              text: 'Birth Application'
+              text: 'Birth Declaration'
             },
             class: {
               coding: [
@@ -2424,7 +2424,7 @@ describe('populateCompositionWithID', () => {
               ],
               text: 'CRVS Document'
             },
-            title: 'Birth Application',
+            title: 'Birth Declaration',
             section: [
               {
                 title: 'Birth encounter',
@@ -2804,10 +2804,10 @@ describe('populateCompositionWithID', () => {
               coding: [
                 {
                   system: 'http://opencrvs.org/doc-types',
-                  code: 'birth-application'
+                  code: 'birth-declaration'
                 }
               ],
-              text: 'Birth Application'
+              text: 'Birth Declaration'
             },
             class: {
               coding: [
@@ -2818,7 +2818,7 @@ describe('populateCompositionWithID', () => {
               ],
               text: 'CRVS Document'
             },
-            title: 'Birth Application',
+            title: 'Birth Declaration',
             section: [
               {
                 title: 'Birth encounter',

@@ -78,7 +78,7 @@ export const SEARCH_EVENTS = gql`
     }
   }
 `
-export const SEARCH_APPLICATIONS_USER_WISE = gql`
+export const SEARCH_DECLARATIONS_USER_WISE = gql`
   query (
     $status: [String]
     $userId: String
@@ -102,7 +102,7 @@ export const SEARCH_APPLICATIONS_USER_WISE = gql`
         registration {
           contactNumber
           trackingId
-          dateOfApplication
+          dateOfDeclaration
           status
         }
         operationHistories {
@@ -140,7 +140,7 @@ export const SEARCH_APPLICATIONS_USER_WISE = gql`
   }
 `
 
-export const COUNT_USER_WISE_APPLICATIONS = gql`
+export const COUNT_USER_WISE_DECLARATIONS = gql`
   query ($status: [String], $userId: String, $locationIds: [String]) {
     searchEvents(status: $status, userId: $userId, locationIds: $locationIds) {
       totalItems

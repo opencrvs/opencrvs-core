@@ -9,15 +9,21 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Meta, Story } from '@storybook/react'
-import ColorsDisplay from './ColorsDisplay'
 import React from 'react'
+import { Meta, Story } from '@storybook/react'
+import { LeftNavigationDeclarationIcons } from './LeftNavigationDeclarationIcons'
+
+const Template: Story<React.HTMLAttributes<SVGElement>> = (args) => (
+  <LeftNavigationDeclarationIcons {...args} />
+)
+
+export const LeftNavigationIconView = Template.bind({})
+
+LeftNavigationIconView.args = {
+  color: 'red'
+}
 
 export default {
-  title: 'Components/styles/ColorsDisplay',
-  component: ColorsDisplay
+  title: 'Components/icons/LeftNavigationDeclarationIcon',
+  component: LeftNavigationDeclarationIcons
 } as Meta
-
-const Template: Story<{}> = () => <ColorsDisplay />
-
-export const ColorsView = Template.bind({})

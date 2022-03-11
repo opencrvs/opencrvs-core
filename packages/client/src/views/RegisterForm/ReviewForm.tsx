@@ -23,10 +23,10 @@ import { IStoreState } from '@opencrvs/client/src/store'
 import { connect } from 'react-redux'
 import { getReviewForm } from '@opencrvs/client/src/forms/register/review-selectors'
 import {
-  storeApplication,
-  IApplication,
-  createReviewApplication
-} from '@opencrvs/client/src/applications'
+  storeDeclaration,
+  IDeclaration,
+  createReviewDeclaration
+} from '@opencrvs/client/src/declarations'
 import { Dispatch } from 'redux'
 import { getScope } from '@client/profile/profileSelectors'
 import { Scope } from '@opencrvs/client/src/utils/authUtils'
@@ -46,13 +46,13 @@ interface IReviewProps {
   scope: Scope | null
   event: Event
 }
-interface IApplicationProp {
-  application: IApplication | undefined
-  applicationId: string
+interface IDeclarationProp {
+  declaration: IDeclaration | undefined
+  declarationId: string
 }
 
 type IProps = IReviewProps &
-  IApplicationProp &
+  IDeclarationProp &
   FullProps &
   IntlShapeProps &
   RouteComponentProps<{}>
@@ -66,7 +66,7 @@ const StyledSpinner = styled(Spinner)`
 `
 
 const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.negative};
   ${({ theme }) => theme.fonts.bodyStyle};
   text-align: center;
   margin-top: 100px;
@@ -82,7 +82,7 @@ export class ReviewFormView extends React.Component<IProps> {
   }
 
   render() {
-    const { intl, theme, application, applicationId, dispatch } = this.props
+    const { intl, theme, declaration, declarationId, dispatch } = this.props
     if (!this.userHasRegisterScope() && !this.userHasValidateScope()) {
       return (
         <ErrorText id="review-unauthorized-error-text">
@@ -90,12 +90,12 @@ export class ReviewFormView extends React.Component<IProps> {
         </ErrorText>
       )
     }
-    if (!application) {
+    if (!declaration) {
       return (
         <QueryProvider
           event={this.props.event}
-          action={Action.LOAD_REVIEW_APPLICATION}
-          payload={{ id: this.props.applicationId }}
+          action={Action.LOAD_REVIEW_DECLARATION}
+          payload={{ id: this.props.declarationId }}
         >
           <QueryContext.Consumer>
             {({ loading, error, data, dataKey }) => {
@@ -126,15 +126,15 @@ export class ReviewFormView extends React.Component<IProps> {
                   eventData.registration.status &&
                   eventData.registration.status[0].type) ||
                 ''
-              const reviewDraft = createReviewApplication(
-                applicationId,
+              const reviewDraft = createReviewDeclaration(
+                declarationId,
                 transData,
                 this.props.event,
                 status
               )
-              dispatch(storeApplication(reviewDraft))
+              dispatch(storeDeclaration(reviewDraft))
 
-              return <RegisterForm {...this.props} application={reviewDraft} />
+              return <RegisterForm {...this.props} declaration={reviewDraft} />
             }}
           </QueryContext.Consumer>
         </QueryProvider>
@@ -165,7 +165,7 @@ function mapStatetoProps(
     pageRoute: string
     pageId: string
     groupId: string
-    applicationId: string
+    declarationId: string
     event: string
   }>
 ) {
@@ -178,14 +178,14 @@ function mapStatetoProps(
   ) as IReviewFormState
   const form = reviewFormState[match.params.event.toLowerCase()]
 
-  const application = state.applicationsState.applications.find(
-    ({ id, review }) => id === match.params.applicationId && review === true
+  const declaration = state.declarationsState.declarations.find(
+    ({ id, review }) => id === match.params.declarationId && review === true
   )
   const historyState = history.location.state as any
   return {
-    application,
+    declaration,
     scope: getScope(state),
-    applicationId: match.params.applicationId,
+    declarationId: match.params.declarationId,
     event: getEvent(match.params.event),
     registerForm: form,
     pageRoute: REVIEW_EVENT_PARENT_FORM_PAGE_GROUP,

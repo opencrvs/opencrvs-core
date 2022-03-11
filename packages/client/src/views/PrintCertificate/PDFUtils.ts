@@ -11,7 +11,7 @@
  */
 import { IntlShape } from 'react-intl'
 import { createPDF, createSVG, printPDF } from '@client/pdfRenderer'
-import { IApplication } from '@client/applications'
+import { IDeclaration } from '@client/declarations'
 import { IUserDetails } from '@opencrvs/client/src/utils/userUtils'
 import { Event } from '@client/forms'
 import { IOfflineData } from '@client/offline/reducer'
@@ -19,7 +19,7 @@ import { OptionalData } from '@client/pdfRenderer/transformer/types'
 
 export function printMoneyReceipt(
   intl: IntlShape,
-  application: IApplication,
+  declaration: IDeclaration,
   userDetails: IUserDetails | null,
   offlineResource: IOfflineData
 ) {
@@ -31,7 +31,7 @@ export function printMoneyReceipt(
   }
   printPDF(
     offlineResource.templates.receipt,
-    application,
+    declaration,
     userDetails,
     offlineResource,
     intl
@@ -40,7 +40,7 @@ export function printMoneyReceipt(
 
 export async function previewCertificate(
   intl: IntlShape,
-  application: IApplication,
+  declaration: IDeclaration,
   userDetails: IUserDetails | null,
   offlineResource: IOfflineData,
   callBack: (pdf: string) => void,
@@ -51,10 +51,10 @@ export async function previewCertificate(
   }
 
   const svgCode = await createSVG(
-    application.event === Event.BIRTH
+    declaration.event === Event.BIRTH
       ? offlineResource.templates.certificates.birth
       : offlineResource.templates.certificates.death,
-    application,
+    declaration,
     userDetails,
     offlineResource,
     intl,

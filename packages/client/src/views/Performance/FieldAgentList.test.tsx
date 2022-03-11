@@ -55,10 +55,10 @@ describe('Field agent list tests', () => {
                   status: 'active',
                   primaryOfficeId: '1',
                   creationDate: '1488076708000',
-                  totalNumberOfApplicationStarted: 12,
+                  totalNumberOfDeclarationStarted: 12,
                   totalNumberOfInProgressAppStarted: 3,
-                  totalNumberOfRejectedApplications: 1782,
-                  averageTimeForDeclaredApplications: 2
+                  totalNumberOfRejectedDeclarations: 1782,
+                  averageTimeForDeclaredDeclarations: 2
                 },
                 {
                   practitionerId: '2',
@@ -67,10 +67,10 @@ describe('Field agent list tests', () => {
                   status: 'active',
                   primaryOfficeId: '1',
                   creationDate: '1487076708000',
-                  totalNumberOfApplicationStarted: 0,
+                  totalNumberOfDeclarationStarted: 0,
                   totalNumberOfInProgressAppStarted: 0,
-                  totalNumberOfRejectedApplications: 0,
-                  averageTimeForDeclaredApplications: 0
+                  totalNumberOfRejectedDeclarations: 0,
+                  averageTimeForDeclaredDeclarations: 0
                 }
               ],
               totalItems: 2
@@ -102,7 +102,7 @@ describe('Field agent list tests', () => {
     const firstRowElement = await waitForElement(component, '#row_0')
     const toggleSortActionElement = await waitForElement(
       component,
-      '#totalApplications-label'
+      '#totalDeclarations-label'
     )
     expect(firstRowElement.hostNodes().childAt(0).text()).toBe('Sakib Al Hasan')
 

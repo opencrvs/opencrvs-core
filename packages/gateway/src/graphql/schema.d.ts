@@ -33,7 +33,7 @@ export interface GQLQuery {
   verifyPasswordById?: GQLVerifyPasswordResult
   fetchRegistrationMetrics?: GQLRegistrationMetrics
   getEventEstimationMetrics?: GQLEventEstimationMetrics
-  getApplicationsStartedMetrics?: GQLApplicationsStartedMetrics
+  getDeclarationsStartedMetrics?: GQLDeclarationsStartedMetrics
   fetchMonthWiseEventMetrics?: GQLMonthWiseEstimationMetrics
   fetchLocationWiseEventMetrics?: GQLLocationWiseEstimationMetrics
   fetchTimeLoggedMetricsByPractitioner?: GQLTimeLoggedMetricsResultSet
@@ -258,10 +258,10 @@ export interface GQLEventEstimationMetrics {
   deathTargetDayMetrics?: GQLEstimationMetrics
 }
 
-export interface GQLApplicationsStartedMetrics {
-  fieldAgentApplications: number
-  hospitalApplications: number
-  officeApplications: number
+export interface GQLDeclarationsStartedMetrics {
+  fieldAgentDeclarations: number
+  hospitalDeclarations: number
+  officeDeclarations: number
 }
 
 export interface GQLMonthWiseEstimationMetrics {
@@ -650,10 +650,10 @@ export interface GQLSearchFieldAgentResponse {
   status?: string
   primaryOfficeId?: string
   creationDate?: string
-  totalNumberOfApplicationStarted?: number
+  totalNumberOfDeclarationStarted?: number
   totalNumberOfInProgressAppStarted?: number
-  totalNumberOfRejectedApplications?: number
-  averageTimeForDeclaredApplications?: number
+  totalNumberOfRejectedDeclarations?: number
+  averageTimeForDeclaredDeclarations?: number
 }
 
 export interface GQLRegistrationGenderBasisMetrics {
@@ -981,8 +981,8 @@ export const enum GQLAttachmentSubject {
   DECEASED_PARMANENT_ADDRESS_PROOF = 'DECEASED_PARMANENT_ADDRESS_PROOF',
   DECEASED_DEATH_PROOF = 'DECEASED_DEATH_PROOF',
   DECEASED_BIRTH_PROOF = 'DECEASED_BIRTH_PROOF',
-  APPLICANT_ID_PROOF = 'APPLICANT_ID_PROOF',
-  APPLICANT_ATHORITY_TO_APPLY_PROOF = 'APPLICANT_ATHORITY_TO_APPLY_PROOF',
+  INFORMANT_ID_PROOF = 'INFORMANT_ID_PROOF',
+  INFORMANT_ATHORITY_TO_APPLY_PROOF = 'INFORMANT_ATHORITY_TO_APPLY_PROOF',
   LEGAL_GUARDIAN_PROOF = 'LEGAL_GUARDIAN_PROOF',
   ASSIGNED_RESPONSIBILITY_PROOF = 'ASSIGNED_RESPONSIBILITY_PROOF',
   WARD_COUNCILLOR_PROOF = 'WARD_COUNCILLOR_PROOF',
@@ -1052,7 +1052,7 @@ export interface GQLRegistrationSearchSet {
   status?: string
   contactNumber?: string
   contactRelationship?: string
-  dateOfApplication?: GQLDate
+  dateOfDeclaration?: GQLDate
   trackingId?: string
   registrationNumber?: string
   eventLocationId?: string
@@ -1274,7 +1274,7 @@ export interface GQLResolver {
   VerifyPasswordResult?: GQLVerifyPasswordResultTypeResolver
   RegistrationMetrics?: GQLRegistrationMetricsTypeResolver
   EventEstimationMetrics?: GQLEventEstimationMetricsTypeResolver
-  ApplicationsStartedMetrics?: GQLApplicationsStartedMetricsTypeResolver
+  DeclarationsStartedMetrics?: GQLDeclarationsStartedMetricsTypeResolver
   MonthWiseEstimationMetrics?: GQLMonthWiseEstimationMetricsTypeResolver
   LocationWiseEstimationMetrics?: GQLLocationWiseEstimationMetricsTypeResolver
   TimeLoggedMetricsResultSet?: GQLTimeLoggedMetricsResultSetTypeResolver
@@ -1359,7 +1359,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   verifyPasswordById?: QueryToVerifyPasswordByIdResolver<TParent>
   fetchRegistrationMetrics?: QueryToFetchRegistrationMetricsResolver<TParent>
   getEventEstimationMetrics?: QueryToGetEventEstimationMetricsResolver<TParent>
-  getApplicationsStartedMetrics?: QueryToGetApplicationsStartedMetricsResolver<TParent>
+  getDeclarationsStartedMetrics?: QueryToGetDeclarationsStartedMetricsResolver<TParent>
   fetchMonthWiseEventMetrics?: QueryToFetchMonthWiseEventMetricsResolver<TParent>
   fetchLocationWiseEventMetrics?: QueryToFetchLocationWiseEventMetricsResolver<TParent>
   fetchTimeLoggedMetricsByPractitioner?: QueryToFetchTimeLoggedMetricsByPractitionerResolver<TParent>
@@ -1713,18 +1713,18 @@ export interface QueryToGetEventEstimationMetricsResolver<
   ): TResult
 }
 
-export interface QueryToGetApplicationsStartedMetricsArgs {
+export interface QueryToGetDeclarationsStartedMetricsArgs {
   timeStart: string
   timeEnd: string
   locationId: string
 }
-export interface QueryToGetApplicationsStartedMetricsResolver<
+export interface QueryToGetDeclarationsStartedMetricsResolver<
   TParent = any,
   TResult = any
 > {
   (
     parent: TParent,
-    args: QueryToGetApplicationsStartedMetricsArgs,
+    args: QueryToGetDeclarationsStartedMetricsArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -3170,27 +3170,27 @@ export interface EventEstimationMetricsToDeathTargetDayMetricsResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLApplicationsStartedMetricsTypeResolver<TParent = any> {
-  fieldAgentApplications?: ApplicationsStartedMetricsToFieldAgentApplicationsResolver<TParent>
-  hospitalApplications?: ApplicationsStartedMetricsToHospitalApplicationsResolver<TParent>
-  officeApplications?: ApplicationsStartedMetricsToOfficeApplicationsResolver<TParent>
+export interface GQLDeclarationsStartedMetricsTypeResolver<TParent = any> {
+  fieldAgentDeclarations?: DeclarationsStartedMetricsToFieldAgentDeclarationsResolver<TParent>
+  hospitalDeclarations?: DeclarationsStartedMetricsToHospitalDeclarationsResolver<TParent>
+  officeDeclarations?: DeclarationsStartedMetricsToOfficeDeclarationsResolver<TParent>
 }
 
-export interface ApplicationsStartedMetricsToFieldAgentApplicationsResolver<
+export interface DeclarationsStartedMetricsToFieldAgentDeclarationsResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface ApplicationsStartedMetricsToHospitalApplicationsResolver<
+export interface DeclarationsStartedMetricsToHospitalDeclarationsResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface ApplicationsStartedMetricsToOfficeApplicationsResolver<
+export interface DeclarationsStartedMetricsToOfficeDeclarationsResolver<
   TParent = any,
   TResult = any
 > {
@@ -4013,10 +4013,10 @@ export interface GQLSearchFieldAgentResponseTypeResolver<TParent = any> {
   status?: SearchFieldAgentResponseToStatusResolver<TParent>
   primaryOfficeId?: SearchFieldAgentResponseToPrimaryOfficeIdResolver<TParent>
   creationDate?: SearchFieldAgentResponseToCreationDateResolver<TParent>
-  totalNumberOfApplicationStarted?: SearchFieldAgentResponseToTotalNumberOfApplicationStartedResolver<TParent>
+  totalNumberOfDeclarationStarted?: SearchFieldAgentResponseToTotalNumberOfDeclarationStartedResolver<TParent>
   totalNumberOfInProgressAppStarted?: SearchFieldAgentResponseToTotalNumberOfInProgressAppStartedResolver<TParent>
-  totalNumberOfRejectedApplications?: SearchFieldAgentResponseToTotalNumberOfRejectedApplicationsResolver<TParent>
-  averageTimeForDeclaredApplications?: SearchFieldAgentResponseToAverageTimeForDeclaredApplicationsResolver<TParent>
+  totalNumberOfRejectedDeclarations?: SearchFieldAgentResponseToTotalNumberOfRejectedDeclarationsResolver<TParent>
+  averageTimeForDeclaredDeclarations?: SearchFieldAgentResponseToAverageTimeForDeclaredDeclarationsResolver<TParent>
 }
 
 export interface SearchFieldAgentResponseToPractitionerIdResolver<
@@ -4061,7 +4061,7 @@ export interface SearchFieldAgentResponseToCreationDateResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface SearchFieldAgentResponseToTotalNumberOfApplicationStartedResolver<
+export interface SearchFieldAgentResponseToTotalNumberOfDeclarationStartedResolver<
   TParent = any,
   TResult = any
 > {
@@ -4075,14 +4075,14 @@ export interface SearchFieldAgentResponseToTotalNumberOfInProgressAppStartedReso
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface SearchFieldAgentResponseToTotalNumberOfRejectedApplicationsResolver<
+export interface SearchFieldAgentResponseToTotalNumberOfRejectedDeclarationsResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface SearchFieldAgentResponseToAverageTimeForDeclaredApplicationsResolver<
+export interface SearchFieldAgentResponseToAverageTimeForDeclaredDeclarationsResolver<
   TParent = any,
   TResult = any
 > {
@@ -4894,7 +4894,7 @@ export interface GQLRegistrationSearchSetTypeResolver<TParent = any> {
   status?: RegistrationSearchSetToStatusResolver<TParent>
   contactNumber?: RegistrationSearchSetToContactNumberResolver<TParent>
   contactRelationship?: RegistrationSearchSetToContactRelationshipResolver<TParent>
-  dateOfApplication?: RegistrationSearchSetToDateOfApplicationResolver<TParent>
+  dateOfDeclaration?: RegistrationSearchSetToDateOfDeclarationResolver<TParent>
   trackingId?: RegistrationSearchSetToTrackingIdResolver<TParent>
   registrationNumber?: RegistrationSearchSetToRegistrationNumberResolver<TParent>
   eventLocationId?: RegistrationSearchSetToEventLocationIdResolver<TParent>
@@ -4927,7 +4927,7 @@ export interface RegistrationSearchSetToContactRelationshipResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface RegistrationSearchSetToDateOfApplicationResolver<
+export interface RegistrationSearchSetToDateOfDeclarationResolver<
   TParent = any,
   TResult = any
 > {

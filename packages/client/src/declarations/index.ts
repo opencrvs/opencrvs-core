@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  Action as ApplicationAction,
+  Action as DeclarationAction,
   Event,
   IForm,
   IFormData,
@@ -18,7 +18,7 @@ import {
   IRegistration,
   Sort
 } from '@client/forms'
-import { getRegisterForm } from '@client/forms/register/application-selectors'
+import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { syncRegistrarWorkqueue } from '@client/ListSyncController'
 import { Action as NavigationAction, GO_TO_PAGE } from '@client/navigation'
 import {
@@ -26,7 +26,7 @@ import {
   USER_DETAILS_AVAILABLE
 } from '@client/profile/profileActions'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import { SEARCH_APPLICATIONS_USER_WISE } from '@client/search/queries'
+import { SEARCH_DECLARATIONS_USER_WISE } from '@client/search/queries'
 import { storage } from '@client/storage'
 import { IStoreState } from '@client/store'
 import {
@@ -34,7 +34,7 @@ import {
   draftToGqlTransformer
 } from '@client/transformer'
 import { client } from '@client/utils/apolloClient'
-import { DECLARED_APPLICATION_SEARCH_QUERY_COUNT } from '@client/utils/constants'
+import { DECLARED_DECLARATION_SEARCH_QUERY_COUNT } from '@client/utils/constants'
 import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
 import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
@@ -52,30 +52,30 @@ import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
 import { v4 as uuid } from 'uuid'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
-const SET_INITIAL_APPLICATION = 'APPLICATION/SET_INITIAL_APPLICATION'
-const STORE_APPLICATION = 'APPLICATION/STORE_APPLICATION'
-const MODIFY_APPLICATION = 'APPLICATION/MODIFY_DRAFT'
-const WRITE_APPLICATION = 'APPLICATION/WRITE_DRAFT'
-const DELETE_APPLICATION = 'APPLICATION/DELETE_DRAFT'
-const REINSTATE_APPLICATION = 'APPLICATION/REINSTATE_APPLICATION'
-const GET_APPLICATIONS_SUCCESS = 'APPLICATION/GET_DRAFTS_SUCCESS'
-const GET_APPLICATIONS_FAILED = 'APPLICATION/GET_DRAFTS_FAILED'
-const GET_WORKQUEUE_SUCCESS = 'APPLICATION/GET_WORKQUEUE_SUCCESS'
-const GET_WORKQUEUE_FAILED = 'APPLICATION/GET_WORKQUEUE_FAILED'
-const UPDATE_REGISTRAR_WORKQUEUE = 'APPLICATION/UPDATE_REGISTRAR_WORKQUEUE'
+const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
+const STORE_DECLARATION = 'DECLARATION/STORE_DECLARATION'
+const MODIFY_DECLARATION = 'DECLARATION/MODIFY_DRAFT'
+const WRITE_DECLARATION = 'DECLARATION/WRITE_DRAFT'
+const DELETE_DECLARATION = 'DECLARATION/DELETE_DRAFT'
+const REINSTATE_DECLARATION = 'DECLARATION/REINSTATE_DECLARATION'
+const GET_DECLARATIONS_SUCCESS = 'DECLARATION/GET_DRAFTS_SUCCESS'
+const GET_DECLARATIONS_FAILED = 'DECLARATION/GET_DRAFTS_FAILED'
+const GET_WORKQUEUE_SUCCESS = 'DECLARATION/GET_WORKQUEUE_SUCCESS'
+const GET_WORKQUEUE_FAILED = 'DECLARATION/GET_WORKQUEUE_FAILED'
+const UPDATE_REGISTRAR_WORKQUEUE = 'DECLARATION/UPDATE_REGISTRAR_WORKQUEUE'
 const UPDATE_REGISTRAR_WORKQUEUE_SUCCESS =
-  'APPLICATION/UPDATE_REGISTRAR_WORKQUEUE_SUCCESS'
+  'DECLARATION/UPDATE_REGISTRAR_WORKQUEUE_SUCCESS'
 const UPDATE_REGISTRAR_WORKQUEUE_FAIL =
-  'APPLICATION/UPDATE_REGISTRAR_WORKQUEUE_FAIL'
-const ENQUEUE_DOWNLOAD_APPLICATION = 'APPLICATION/ENQUEUE_DOWNLOAD_APPLICATION'
-const DOWNLOAD_APPLICATION_SUCCESS = 'APPLICATION/DOWNLOAD_APPLICATION_SUCCESS'
-const DOWNLOAD_APPLICATION_FAIL = 'APPLICATION/DOWNLOAD_APPLICATION_FAIL'
-const UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS =
-  'APPLICATION/UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS'
-const UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_SUCCESS =
-  'APPLICATION/UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_SUCCESS'
-const UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_FAIL =
-  'APPLICATION/UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_FAIL'
+  'DECLARATION/UPDATE_REGISTRAR_WORKQUEUE_FAIL'
+const ENQUEUE_DOWNLOAD_DECLARATION = 'DECLARATION/ENQUEUE_DOWNLOAD_DECLARATION'
+const DOWNLOAD_DECLARATION_SUCCESS = 'DECLARATION/DOWNLOAD_DECLARATION_SUCCESS'
+const DOWNLOAD_DECLARATION_FAIL = 'DECLARATION/DOWNLOAD_DECLARATION_FAIL'
+const UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS =
+  'DECLARATION/UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS'
+const UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_SUCCESS =
+  'DECLARATION/UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_SUCCESS'
+const UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_FAIL =
+  'DECLARATION/UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_FAIL'
 const CLEAR_CORRECTION_CHANGE = 'CLEAR_CORRECTION_CHANGE'
 
 export enum SUBMISSION_STATUS {
@@ -138,10 +138,10 @@ interface IActionList {
 }
 
 const ACTION_LIST: IActionList = {
-  [ApplicationAction.LOAD_REVIEW_APPLICATION]:
-    ApplicationAction.LOAD_REVIEW_APPLICATION,
-  [ApplicationAction.LOAD_CERTIFICATE_APPLICATION]:
-    ApplicationAction.LOAD_CERTIFICATE_APPLICATION
+  [DeclarationAction.LOAD_REVIEW_DECLARATION]:
+    DeclarationAction.LOAD_REVIEW_DECLARATION,
+  [DeclarationAction.LOAD_CERTIFICATE_DECLARATION]:
+    DeclarationAction.LOAD_CERTIFICATE_DECLARATION
 }
 
 export interface IPayload {
@@ -166,7 +166,7 @@ export interface ITaskHistory {
   rejectComment?: string
 }
 
-export interface IApplication {
+export interface IDeclaration {
   id: string
   data: IFormData
   originalData?: IFormData
@@ -244,10 +244,10 @@ export type ICertificate = {
 }
 
 /*
- * This type represents a submitted application that we've received from the API
- * It provides a more strict alternative to IApplication with fields we know should always exist
+ * This type represents a submitted declaration that we've received from the API
+ * It provides a more strict alternative to IDeclaration with fields we know should always exist
  */
-export interface IPrintableApplication extends Omit<IApplication, 'data'> {
+export interface IPrintableDeclaration extends Omit<IDeclaration, 'data'> {
   data: {
     father: {
       fathersDetailsExist: boolean
@@ -263,7 +263,7 @@ export interface IPrintableApplication extends Omit<IApplication, 'data'> {
       certificates: ICertificate[]
       [key: string]: IFormFieldValue
     }
-  } & Exclude<IApplication['data'], 'father' | 'registration'>
+  } & Exclude<IDeclaration['data'], 'father' | 'registration'>
 }
 
 type PaymentType = 'MANUAL'
@@ -284,59 +284,59 @@ interface IArchiveDeclarationAction {
   payload: { declarationId: string }
 }
 
-interface IStoreApplicationAction {
-  type: typeof STORE_APPLICATION
-  payload: { application: IApplication }
+interface IStoreDeclarationAction {
+  type: typeof STORE_DECLARATION
+  payload: { declaration: IDeclaration }
 }
 
-interface IModifyApplicationAction {
-  type: typeof MODIFY_APPLICATION
+interface IModifyDeclarationAction {
+  type: typeof MODIFY_DECLARATION
   payload: {
-    application: IApplication | IPrintableApplication
+    declaration: IDeclaration | IPrintableDeclaration
   }
 }
 
 interface IClearCorrectionChange {
   type: typeof CLEAR_CORRECTION_CHANGE
   payload: {
-    applicationId: string
+    declarationId: string
   }
 }
-export interface IWriteApplicationAction {
-  type: typeof WRITE_APPLICATION
+export interface IWriteDeclarationAction {
+  type: typeof WRITE_DECLARATION
   payload: {
-    application: IApplication | IPrintableApplication
+    declaration: IDeclaration | IPrintableDeclaration
     callback?: () => void
   }
 }
 
-interface ISetInitialApplicationsAction {
-  type: typeof SET_INITIAL_APPLICATION
+interface ISetInitialDeclarationsAction {
+  type: typeof SET_INITIAL_DECLARATION
 }
 
-type OnSuccessDeleteApplicationOptions = Partial<{
+type OnSuccessDeleteDeclarationOptions = Partial<{
   shouldUpdateFieldAgentHome: boolean
 }>
-interface IDeleteApplicationAction {
-  type: typeof DELETE_APPLICATION
+interface IDeleteDeclarationAction {
+  type: typeof DELETE_DECLARATION
   payload: {
-    application: IApplication | IPrintableApplication
-  } & OnSuccessDeleteApplicationOptions
+    declaration: IDeclaration | IPrintableDeclaration
+  } & OnSuccessDeleteDeclarationOptions
 }
 interface IReinstateDeclarationAction {
-  type: typeof REINSTATE_APPLICATION
+  type: typeof REINSTATE_DECLARATION
   payload: {
     declarationId: string
   }
 }
 
-interface IGetStorageApplicationsSuccessAction {
-  type: typeof GET_APPLICATIONS_SUCCESS
+interface IGetStorageDeclarationsSuccessAction {
+  type: typeof GET_DECLARATIONS_SUCCESS
   payload: string
 }
 
-interface IGetStorageApplicationsFailedAction {
-  type: typeof GET_APPLICATIONS_FAILED
+interface IGetStorageDeclarationsFailedAction {
+  type: typeof GET_DECLARATIONS_FAILED
 }
 
 interface IGetWorkqueueOfCurrentUserSuccessAction {
@@ -357,16 +357,16 @@ interface UpdateRegistrarWorkQueueFailAction {
   type: typeof UPDATE_REGISTRAR_WORKQUEUE_FAIL
 }
 
-interface IDownloadApplication {
-  type: typeof ENQUEUE_DOWNLOAD_APPLICATION
+interface IDownloadDeclaration {
+  type: typeof ENQUEUE_DOWNLOAD_DECLARATION
   payload: {
-    application: IApplication
+    declaration: IDeclaration
     client: ApolloClient<{}>
   }
 }
 
-interface IDownloadApplicationSuccess {
-  type: typeof DOWNLOAD_APPLICATION_SUCCESS
+interface IDownloadDeclarationSuccess {
+  type: typeof DOWNLOAD_DECLARATION_SUCCESS
   payload: {
     queryData: any
     form: {
@@ -376,11 +376,11 @@ interface IDownloadApplicationSuccess {
   }
 }
 
-interface IDownloadApplicationFail {
-  type: typeof DOWNLOAD_APPLICATION_FAIL
+interface IDownloadDeclarationFail {
+  type: typeof DOWNLOAD_DECLARATION_FAIL
   payload: {
     error: ApolloError
-    application: IApplication
+    declaration: IDeclaration
     client: ApolloClient<{}>
   }
 }
@@ -404,53 +404,53 @@ interface UpdateRegistrarWorkqueueAction {
   }
 }
 
-interface UpdateFieldAgentDeclaredApplicationsAction {
-  type: typeof UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS
+interface UpdateFieldAgentDeclaredDeclarationsAction {
+  type: typeof UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS
 }
-interface UpdateFieldAgentDeclaredApplicationsSuccessAction {
-  type: typeof UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_SUCCESS
+interface UpdateFieldAgentDeclaredDeclarationsSuccessAction {
+  type: typeof UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_SUCCESS
   payload: string
 }
-interface UpdateFieldAgentDeclaredApplicationsFailAction {
-  type: typeof UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_FAIL
+interface UpdateFieldAgentDeclaredDeclarationsFailAction {
+  type: typeof UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_FAIL
 }
 
 export type Action =
   | IArchiveDeclarationAction
-  | IStoreApplicationAction
-  | IModifyApplicationAction
+  | IStoreDeclarationAction
+  | IModifyDeclarationAction
   | IClearCorrectionChange
-  | ISetInitialApplicationsAction
-  | IWriteApplicationAction
+  | ISetInitialDeclarationsAction
+  | IWriteDeclarationAction
   | NavigationAction
-  | IDeleteApplicationAction
+  | IDeleteDeclarationAction
   | IReinstateDeclarationAction
-  | IGetStorageApplicationsSuccessAction
-  | IGetStorageApplicationsFailedAction
+  | IGetStorageDeclarationsSuccessAction
+  | IGetStorageDeclarationsFailedAction
   | IGetWorkqueueOfCurrentUserSuccessAction
   | IGetWorkqueueOfCurrentUserFailedAction
-  | IDownloadApplication
-  | IDownloadApplicationSuccess
-  | IDownloadApplicationFail
+  | IDownloadDeclaration
+  | IDownloadDeclarationSuccess
+  | IDownloadDeclarationFail
   | UserDetailsAvailable
   | UpdateRegistrarWorkqueueAction
   | UpdateRegistrarWorkQueueSuccessAction
   | UpdateRegistrarWorkQueueFailAction
-  | UpdateFieldAgentDeclaredApplicationsAction
-  | UpdateFieldAgentDeclaredApplicationsSuccessAction
-  | UpdateFieldAgentDeclaredApplicationsFailAction
+  | UpdateFieldAgentDeclaredDeclarationsAction
+  | UpdateFieldAgentDeclaredDeclarationsSuccessAction
+  | UpdateFieldAgentDeclaredDeclarationsFailAction
 
 export interface IUserData {
   userID: string
   userPIN?: string
-  applications: IApplication[]
+  declarations: IDeclaration[]
   workqueue?: IWorkqueue
 }
 
-export interface IApplicationsState {
+export interface IDeclarationsState {
   userID: string
-  applications: IApplication[]
-  initialApplicationsLoaded: boolean
+  declarations: IDeclaration[]
+  initialDeclarationsLoaded: boolean
   isWritingDraft: boolean
 }
 
@@ -475,14 +475,14 @@ const workqueueInitialState: WorkqueueState = {
   }
 }
 
-const initialState: IApplicationsState = {
+const initialState: IDeclarationsState = {
   userID: '',
-  applications: [],
-  initialApplicationsLoaded: false,
+  declarations: [],
+  initialDeclarationsLoaded: false,
   isWritingDraft: false
 }
 
-export function createApplication(event: Event, initialData?: IFormData) {
+export function createDeclaration(event: Event, initialData?: IFormData) {
   return {
     id: uuid(),
     data: initialData || {},
@@ -491,11 +491,11 @@ export function createApplication(event: Event, initialData?: IFormData) {
   }
 }
 
-export function makeApplicationReadyToDownload(
+export function makeDeclarationReadyToDownload(
   event: Event,
   compositionId: string,
   action: string
-): IApplication {
+): IDeclaration {
   return {
     id: compositionId,
     data: {},
@@ -506,14 +506,14 @@ export function makeApplicationReadyToDownload(
   }
 }
 
-export function createReviewApplication(
-  applicationId: string,
+export function createReviewDeclaration(
+  declarationId: string,
   formData: IFormData,
   event: Event,
   status?: string
-): IApplication {
+): IDeclaration {
   return {
-    id: applicationId,
+    id: declarationId,
     data: formData,
     originalData: formData,
     review: true,
@@ -532,33 +532,33 @@ export function dynamicDispatch(
   }
 }
 
-export function storeApplication(
-  application: IApplication
-): IStoreApplicationAction {
-  application.savedOn = Date.now()
-  return { type: STORE_APPLICATION, payload: { application } }
+export function storeDeclaration(
+  declaration: IDeclaration
+): IStoreDeclarationAction {
+  declaration.savedOn = Date.now()
+  return { type: STORE_DECLARATION, payload: { declaration } }
 }
 
-export function modifyApplication(
-  application: IApplication | IPrintableApplication
-): IModifyApplicationAction {
-  application.modifiedOn = Date.now()
-  return { type: MODIFY_APPLICATION, payload: { application } }
+export function modifyDeclaration(
+  declaration: IDeclaration | IPrintableDeclaration
+): IModifyDeclarationAction {
+  declaration.modifiedOn = Date.now()
+  return { type: MODIFY_DECLARATION, payload: { declaration } }
 }
 
 export function clearCorrectionChange(
-  applicationId: string
+  declarationId: string
 ): IClearCorrectionChange {
-  return { type: CLEAR_CORRECTION_CHANGE, payload: { applicationId } }
+  return { type: CLEAR_CORRECTION_CHANGE, payload: { declarationId } }
 }
-export function setInitialApplications() {
-  return { type: SET_INITIAL_APPLICATION }
+export function setInitialDeclarations() {
+  return { type: SET_INITIAL_DECLARATION }
 }
 
-export const getStorageApplicationsSuccess = (
+export const getStorageDeclarationsSuccess = (
   response: string
-): IGetStorageApplicationsSuccessAction => ({
-  type: GET_APPLICATIONS_SUCCESS,
+): IGetStorageDeclarationsSuccessAction => ({
+  type: GET_DECLARATIONS_SUCCESS,
   payload: response
 })
 
@@ -574,9 +574,9 @@ export const getCurrentUserWorkqueuSuccess = (
   payload: response
 })
 
-export const getStorageApplicationsFailed =
-  (): IGetStorageApplicationsFailedAction => ({
-    type: GET_APPLICATIONS_FAILED
+export const getStorageDeclarationsFailed =
+  (): IGetStorageDeclarationsFailedAction => ({
+    type: GET_DECLARATIONS_FAILED
   })
 
 export function archiveDeclaration(
@@ -585,24 +585,24 @@ export function archiveDeclaration(
   return { type: ARCHIVE_DECLARATION, payload: { declarationId } }
 }
 
-export function deleteApplication(
-  application: IApplication | IPrintableApplication,
-  options?: OnSuccessDeleteApplicationOptions
-): IDeleteApplicationAction {
-  return { type: DELETE_APPLICATION, payload: { application, ...options } }
-}
-
-export function reinstateApplication(
+export function reinstateDeclaration(
   declarationId: string
 ): IReinstateDeclarationAction {
-  return { type: REINSTATE_APPLICATION, payload: { declarationId } }
+  return { type: REINSTATE_DECLARATION, payload: { declarationId } }
 }
 
-export function writeApplication(
-  application: IApplication | IPrintableApplication,
+export function deleteDeclaration(
+  declaration: IDeclaration | IPrintableDeclaration,
+  options?: OnSuccessDeleteDeclarationOptions
+): IDeleteDeclarationAction {
+  return { type: DELETE_DECLARATION, payload: { declaration, ...options } }
+}
+
+export function writeDeclaration(
+  declaration: IDeclaration | IPrintableDeclaration,
   callback?: () => void
-): IWriteApplicationAction {
-  return { type: WRITE_APPLICATION, payload: { application, callback } }
+): IWriteDeclarationAction {
+  return { type: WRITE_DECLARATION, payload: { declaration, callback } }
 }
 
 export async function getCurrentUserID(): Promise<string> {
@@ -624,19 +624,19 @@ async function getUserData(userId: string) {
   return { allUserData, currentUserData }
 }
 
-async function getFieldAgentDeclaredApplications(userDetails: IUserDetails) {
+async function getFieldAgentDeclaredDeclarations(userDetails: IUserDetails) {
   const userId = userDetails.practitionerId
   const locationIds = (userDetails && [getUserLocation(userDetails).id]) || []
 
   let result
   try {
     const response = await client.query({
-      query: SEARCH_APPLICATIONS_USER_WISE,
+      query: SEARCH_DECLARATIONS_USER_WISE,
       variables: {
         userId,
         status: [EVENT_STATUS.DECLARED],
         locationIds,
-        count: DECLARED_APPLICATION_SEARCH_QUERY_COUNT,
+        count: DECLARED_DECLARATION_SEARCH_QUERY_COUNT,
         sort: Sort.ASC
       },
       fetchPolicy: 'no-cache'
@@ -649,14 +649,14 @@ async function getFieldAgentDeclaredApplications(userDetails: IUserDetails) {
   return result
 }
 
-async function getFieldAgentRejectedApplications(userDetails: IUserDetails) {
+async function getFieldAgentRejectedDeclarations(userDetails: IUserDetails) {
   const userId = userDetails.practitionerId
   const locationIds = (userDetails && [getUserLocation(userDetails).id]) || []
 
   let result
   try {
     const response = await client.query({
-      query: SEARCH_APPLICATIONS_USER_WISE,
+      query: SEARCH_DECLARATIONS_USER_WISE,
       variables: {
         userId,
         status: [EVENT_STATUS.REJECTED],
@@ -671,38 +671,38 @@ async function getFieldAgentRejectedApplications(userDetails: IUserDetails) {
   return result
 }
 
-export function mergeDeclaredApplications(
-  applications: IApplication[],
-  declaredApplications: GQLEventSearchSet[]
+export function mergeDeclaredDeclarations(
+  declarations: IDeclaration[],
+  declaredDeclarations: GQLEventSearchSet[]
 ) {
-  const localApplications = applications.map(
-    (application) => application.compositionId
+  const localDeclarations = declarations.map(
+    (declaration) => declaration.compositionId
   )
 
-  const transformedDeclaredApplications = declaredApplications
+  const transformedDeclaredDeclarations = declaredDeclarations
     .filter(
-      (declaredApplication) =>
-        !localApplications.includes(declaredApplication.id)
+      (declaredDeclaration) =>
+        !localDeclarations.includes(declaredDeclaration.id)
     )
     .map((app) => {
       return transformSearchQueryDataToDraft(app)
     })
 
-  applications.push(...transformedDeclaredApplications)
+  declarations.push(...transformedDeclaredDeclarations)
 }
 
-async function updateFieldAgentDeclaredApplicationsByUser(
+async function updateFieldAgentDeclaredDeclarationsByUser(
   getState: () => IStoreState
 ) {
   const state = getState()
   const scope = getScope(state)
 
   if (
-    !state.applicationsState.applications ||
+    !state.declarationsState.declarations ||
     !scope ||
     !scope.includes('declare')
   ) {
-    return Promise.reject('Remote declared application merging not applicable')
+    return Promise.reject('Remote declared declaration merging not applicable')
   }
 
   const userDetails =
@@ -714,34 +714,34 @@ async function updateFieldAgentDeclaredApplicationsByUser(
   const uID = userDetails.userMgntUserID || ''
   let { allUserData, currentUserData } = await getUserData(uID)
 
-  const declaredApplications = await getFieldAgentDeclaredApplications(
+  const declaredDeclarations = await getFieldAgentDeclaredDeclarations(
     userDetails
   )
 
-  const rejectedApplications = await getFieldAgentRejectedApplications(
+  const rejectedDeclarations = await getFieldAgentRejectedDeclarations(
     userDetails
   )
-  const rejectedApplicationIds = (
-    rejectedApplications.results as IApplication[]
-  ).map((application) => application.id)
+  const rejectedDeclarationIds = (
+    rejectedDeclarations.results as IDeclaration[]
+  ).map((declaration) => declaration.id)
 
   if (!currentUserData) {
     currentUserData = {
       userID: uID,
-      applications: state.applicationsState.applications
+      declarations: state.declarationsState.declarations
     }
     allUserData.push(currentUserData)
   }
-  mergeDeclaredApplications(
-    currentUserData.applications,
-    declaredApplications.results
+  mergeDeclaredDeclarations(
+    currentUserData.declarations,
+    declaredDeclarations.results
   )
 
   currentUserData = {
     ...currentUserData,
-    applications: currentUserData.applications.filter(
-      (application) =>
-        !rejectedApplicationIds.includes(application.compositionId as string)
+    declarations: currentUserData.declarations.filter(
+      (declaration) =>
+        !rejectedDeclarationIds.includes(declaration.compositionId as string)
     )
   }
 
@@ -791,11 +791,11 @@ export async function getWorkqueueOfCurrentUser(): Promise<string> {
   return JSON.stringify(currentUserWorkqueue)
 }
 
-export async function getApplicationsOfCurrentUser(): Promise<string> {
+export async function getDeclarationsOfCurrentUser(): Promise<string> {
   // returns a 'stringified' IUserData
   const storageTable = await storage.getItem('USER_DATA')
   if (!storageTable) {
-    return JSON.stringify({ applications: [] })
+    return JSON.stringify({ declarations: [] })
   }
 
   const currentUserID = await getCurrentUserID()
@@ -804,29 +804,29 @@ export async function getApplicationsOfCurrentUser(): Promise<string> {
 
   if (!allUserData.length) {
     // No user-data at all
-    const payloadWithoutApplications: IUserData = {
+    const payloadWithoutDeclarations: IUserData = {
       userID: currentUserID,
-      applications: []
+      declarations: []
     }
 
-    return JSON.stringify(payloadWithoutApplications)
+    return JSON.stringify(payloadWithoutDeclarations)
   }
 
   const currentUserData = allUserData.find(
     (uData) => uData.userID === currentUserID
   )
-  const currentUserApplications: IApplication[] =
-    (currentUserData && currentUserData.applications) || []
+  const currentUserDeclarations: IDeclaration[] =
+    (currentUserData && currentUserData.declarations) || []
   const payload: IUserData = {
     userID: currentUserID,
-    applications: currentUserApplications
+    declarations: currentUserDeclarations
   }
   return JSON.stringify(payload)
 }
 
 async function updateWorkqueueData(
   state: IStoreState,
-  application: IApplication,
+  declaration: IDeclaration,
   workQueueId: keyof IQueryData,
   userWorkqueue?: IWorkqueue
 ) {
@@ -839,45 +839,45 @@ async function updateWorkqueueData(
     userWorkqueue.data[workQueueId].results &&
     // @ts-ignore
     userWorkqueue.data[workQueueId].results.find(
-      (app) => app && app.id === application.id
+      (app) => app && app.id === declaration.id
     )
   if (!workqueueApp) {
     return
   }
-  const sectionId = application.event === 'birth' ? 'child' : 'deceased'
+  const sectionId = declaration.event === 'birth' ? 'child' : 'deceased'
   const sectionDefinition = getRegisterForm(state)[
-    application.event
+    declaration.event
   ].sections.find((section) => section.id === sectionId)
 
-  const transformedApplication = draftToGqlTransformer(
+  const transformedDeclaration = draftToGqlTransformer(
     // transforming required section only
     { sections: sectionDefinition ? [sectionDefinition] : [] },
-    application.data
+    declaration.data
   )
   const transformedName =
-    (transformedApplication &&
-      transformedApplication[sectionId] &&
-      transformedApplication[sectionId].name) ||
+    (transformedDeclaration &&
+      transformedDeclaration[sectionId] &&
+      transformedDeclaration[sectionId].name) ||
     []
   const transformedDeathDate =
-    (application.data &&
-      application.data.deathEvent &&
-      application.data.deathEvent.deathDate) ||
+    (declaration.data &&
+      declaration.data.deathEvent &&
+      declaration.data.deathEvent.deathDate) ||
     []
   const transformedBirthDate =
-    (application.data &&
-      application.data.child &&
-      application.data.child.childBirthDate) ||
+    (declaration.data &&
+      declaration.data.child &&
+      declaration.data.child.childBirthDate) ||
     []
   const transformedInformantContactNumber =
-    (application.data &&
-      application.data.registration &&
-      application.data.registration.contactPoint &&
-      (application.data.registration.contactPoint as IRegistration).nestedFields
+    (declaration.data &&
+      declaration.data.registration &&
+      declaration.data.registration.contactPoint &&
+      (declaration.data.registration.contactPoint as IRegistration).nestedFields
         .registrationPhone) ||
     ''
 
-  if (application.event === 'birth') {
+  if (declaration.event === 'birth') {
     ;(workqueueApp as GQLBirthEventSearchSet).childName = transformedName
     ;(workqueueApp as GQLBirthEventSearchSet).dateOfBirth = transformedBirthDate
     ;(
@@ -894,83 +894,83 @@ async function updateWorkqueueData(
   }
 }
 
-export async function writeApplicationByUser(
+export async function writeDeclarationByUser(
   getState: () => IStoreState,
   userId: string,
-  application: IApplication
+  declaration: IDeclaration
 ): Promise<string> {
   const uID = userId || (await getCurrentUserID())
   const userData = await getUserData(uID)
   const { allUserData } = userData
   let { currentUserData } = userData
 
-  const existingApplicationId = currentUserData
-    ? currentUserData.applications.findIndex((app) => app.id === application.id)
+  const existingDeclarationId = currentUserData
+    ? currentUserData.declarations.findIndex((app) => app.id === declaration.id)
     : -1
 
-  if (existingApplicationId >= 0) {
+  if (existingDeclarationId >= 0) {
     currentUserData &&
-      currentUserData.applications.splice(existingApplicationId, 1)
+      currentUserData.declarations.splice(existingDeclarationId, 1)
   }
 
   if (currentUserData) {
-    currentUserData.applications.push(application)
+    currentUserData.declarations.push(declaration)
   } else {
     currentUserData = {
       userID: uID,
-      applications: [application]
+      declarations: [declaration]
     }
     allUserData.push(currentUserData)
   }
   if (
-    application.registrationStatus &&
-    application.registrationStatus === 'IN_PROGRESS'
+    declaration.registrationStatus &&
+    declaration.registrationStatus === 'IN_PROGRESS'
   ) {
     updateWorkqueueData(
       getState(),
-      application,
+      declaration,
       'inProgressTab',
       currentUserData.workqueue
     )
     updateWorkqueueData(
       getState(),
-      application,
+      declaration,
       'notificationTab',
       currentUserData.workqueue
     )
   }
 
   if (
-    application.registrationStatus &&
-    application.registrationStatus === 'DECLARED'
+    declaration.registrationStatus &&
+    declaration.registrationStatus === 'DECLARED'
   ) {
     updateWorkqueueData(
       getState(),
-      application,
+      declaration,
       'reviewTab',
       currentUserData.workqueue
     )
   }
 
   if (
-    application.registrationStatus &&
-    application.registrationStatus === 'VALIDATED'
+    declaration.registrationStatus &&
+    declaration.registrationStatus === 'VALIDATED'
   ) {
     updateWorkqueueData(
       getState(),
-      application,
+      declaration,
       'reviewTab',
       currentUserData.workqueue
     )
   }
 
   if (
-    application.registrationStatus &&
-    application.registrationStatus === 'REJECTED'
+    declaration.registrationStatus &&
+    declaration.registrationStatus === 'REJECTED'
   ) {
     updateWorkqueueData(
       getState(),
-      application,
+      declaration,
       'rejectTab',
       currentUserData.workqueue
     )
@@ -985,7 +985,7 @@ export async function writeApplicationByUser(
 function mergeWorkQueueData(
   state: IStoreState,
   workQueueIds: (keyof IQueryData)[],
-  currentApplicatons: IApplication[] | undefined,
+  currentApplicatons: IDeclaration[] | undefined,
   destinationWorkQueue: IWorkqueue
 ) {
   if (!currentApplicatons) {
@@ -997,17 +997,17 @@ function mergeWorkQueueData(
     }
     ;(
       destinationWorkQueue.data[workQueueId].results as GQLEventSearchSet[]
-    ).forEach((application) => {
-      if (application == null) {
+    ).forEach((declaration) => {
+      if (declaration == null) {
         return
       }
-      const applicationIndex = currentApplicatons.findIndex(
-        (app) => app && app.id === application.id
+      const declarationIndex = currentApplicatons.findIndex(
+        (app) => app && app.id === declaration.id
       )
-      if (applicationIndex >= 0) {
+      if (declarationIndex >= 0) {
         updateWorkqueueData(
           state,
-          currentApplicatons[applicationIndex],
+          currentApplicatons[declarationIndex],
           workQueueId,
           destinationWorkQueue
         )
@@ -1087,7 +1087,7 @@ async function getWorkqueueData(
   return mergeWorkQueueData(
     state,
     ['inProgressTab', 'notificationTab', 'reviewTab', 'rejectTab'],
-    currentUserData && currentUserData.applications,
+    currentUserData && currentUserData.declarations,
     workqueue
   )
 }
@@ -1116,7 +1116,7 @@ export async function writeRegistrarWorkqueueByUser(
   } else {
     currentUserData = {
       userID: uID,
-      applications: [],
+      declarations: [],
       workqueue
     }
     allUserData.push(currentUserData)
@@ -1127,34 +1127,34 @@ export async function writeRegistrarWorkqueueByUser(
   ]).then(([_, currentUserWorkqueueData]) => currentUserWorkqueueData)
 }
 
-export async function deleteApplicationByUser(
+export async function deleteDeclarationByUser(
   userId: string,
-  application: IApplication
+  declaration: IDeclaration
 ): Promise<string> {
   const uID = userId || (await getCurrentUserID())
   const { allUserData, currentUserData } = await getUserData(uID)
 
-  const deletedApplicationId = currentUserData
-    ? currentUserData.applications.findIndex((app) => app.id === application.id)
+  const deletedDeclarationId = currentUserData
+    ? currentUserData.declarations.findIndex((app) => app.id === declaration.id)
     : -1
 
-  if (deletedApplicationId >= 0) {
+  if (deletedDeclarationId >= 0) {
     currentUserData &&
-      currentUserData.applications.splice(deletedApplicationId, 1)
+      currentUserData.declarations.splice(deletedDeclarationId, 1)
     storage.setItem('USER_DATA', JSON.stringify(allUserData))
   }
 
   return JSON.stringify(currentUserData)
 }
 
-export function downloadApplication(
-  application: IApplication,
+export function downloadDeclaration(
+  declaration: IDeclaration,
   client: ApolloClient<{}>
-): IDownloadApplication {
+): IDownloadDeclaration {
   return {
-    type: ENQUEUE_DOWNLOAD_APPLICATION,
+    type: ENQUEUE_DOWNLOAD_DECLARATION,
     payload: {
-      application,
+      declaration,
       client
     }
   }
@@ -1207,32 +1207,32 @@ export const updateRegistrarWorkqueueFailActionCreator =
     type: UPDATE_REGISTRAR_WORKQUEUE_FAIL
   })
 
-export function updateFieldAgentDeclaredApplications() {
+export function updateFieldAgentDeclaredDeclarations() {
   return {
-    type: UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS
+    type: UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS
   }
 }
 
-export const updateFieldAgentDeclaredApplicationsSuccessActionCreator = (
+export const updateFieldAgentDeclaredDeclarationsSuccessActionCreator = (
   response: string
-): UpdateFieldAgentDeclaredApplicationsSuccessAction => ({
-  type: UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_SUCCESS,
+): UpdateFieldAgentDeclaredDeclarationsSuccessAction => ({
+  type: UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_SUCCESS,
   payload: response
 })
 
-export const updateFieldAgentDeclaredApplicationsFailActionCreator =
-  (): UpdateFieldAgentDeclaredApplicationsFailAction => ({
-    type: UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_FAIL
+export const updateFieldAgentDeclaredDeclarationsFailActionCreator =
+  (): UpdateFieldAgentDeclaredDeclarationsFailAction => ({
+    type: UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_FAIL
   })
 
-function createRequestForApplication(
-  application: IApplication,
+function createRequestForDeclaration(
+  declaration: IDeclaration,
   client: ApolloClient<{}>
 ) {
-  const applicationAction = ACTION_LIST[application.action as string] || null
+  const declarationAction = ACTION_LIST[declaration.action as string] || null
   const result = getQueryMapping(
-    application.event,
-    applicationAction as ApplicationAction
+    declaration.event,
+    declarationAction as DeclarationAction
   )
   const { query } = result || {
     query: null
@@ -1242,7 +1242,7 @@ function createRequestForApplication(
     request: client.query,
     requestArgs: {
       query,
-      variables: { id: application.id }
+      variables: { id: declaration.id }
     }
   }
 }
@@ -1263,17 +1263,17 @@ function requestWithStateWrapper(
   })
 }
 
-function getDataKey(application: IApplication) {
+function getDataKey(declaration: IDeclaration) {
   const result = getQueryMapping(
-    application.event,
-    application.action as ApplicationAction
+    declaration.event,
+    declaration.action as DeclarationAction
   )
 
   const { dataKey } = result || { dataKey: null }
   return dataKey
 }
 
-function downloadApplicationSuccess({
+function downloadDeclarationSuccess({
   data,
   store,
   client
@@ -1281,11 +1281,11 @@ function downloadApplicationSuccess({
   data: any
   store: IStoreState
   client: ApolloClient<{}>
-}): IDownloadApplicationSuccess {
+}): IDownloadDeclarationSuccess {
   const form = getRegisterForm(store)
 
   return {
-    type: DOWNLOAD_APPLICATION_SUCCESS,
+    type: DOWNLOAD_DECLARATION_SUCCESS,
     payload: {
       queryData: data,
       form,
@@ -1294,125 +1294,125 @@ function downloadApplicationSuccess({
   }
 }
 
-function downloadApplicationFail(
+function downloadDeclarationFail(
   error: ApolloError,
-  application: IApplication,
+  declaration: IDeclaration,
   client: ApolloClient<{}>
-): IDownloadApplicationFail {
+): IDownloadDeclarationFail {
   return {
-    type: DOWNLOAD_APPLICATION_FAIL,
+    type: DOWNLOAD_DECLARATION_FAIL,
     payload: {
       error,
-      application,
+      declaration,
       client
     }
   }
 }
 
-export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
-  state: IApplicationsState = initialState,
+export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
+  state: IDeclarationsState = initialState,
   action: Action
-): IApplicationsState | Loop<IApplicationsState, Action> => {
+): IDeclarationsState | Loop<IDeclarationsState, Action> => {
   switch (action.type) {
     case GO_TO_PAGE: {
-      const application = state.applications.find(
-        ({ id }) => id === action.payload.applicationId
+      const declaration = state.declarations.find(
+        ({ id }) => id === action.payload.declarationId
       )
 
-      if (!application || application.data[action.payload.pageId]) {
+      if (!declaration || declaration.data[action.payload.pageId]) {
         return state
       }
-      const modifiedApplication = {
-        ...application,
+      const modifiedDeclaration = {
+        ...declaration,
         data: {
-          ...application.data,
+          ...declaration.data,
           [action.payload.pageId]: {}
         }
       }
-      return loop(state, Cmd.action(modifyApplication(modifiedApplication)))
+      return loop(state, Cmd.action(modifyDeclaration(modifiedDeclaration)))
     }
-    case REINSTATE_APPLICATION: {
+    case REINSTATE_DECLARATION: {
       if (action.payload) {
-        const declaration = state.applications.find(
+        const declaration = state.declarations.find(
           ({ id }) => id === action.payload.declarationId
         )
 
         if (!declaration) {
           return state
         }
-        const modifiedApplication: IApplication = {
+        const modifiedDeclaration: IDeclaration = {
           ...declaration,
           submissionStatus: SUBMISSION_STATUS.READY_TO_REINSTATE,
-          action: ApplicationAction.REINSTATE_APPLICATION,
+          action: DeclarationAction.REINSTATE_DECLARATION,
           payload: { id: declaration.id }
         }
-        return loop(state, Cmd.action(writeApplication(modifiedApplication)))
+        return loop(state, Cmd.action(writeDeclaration(modifiedDeclaration)))
       }
       return state
     }
-    case STORE_APPLICATION:
+    case STORE_DECLARATION:
       return {
         ...state,
-        applications: state.applications
-          ? state.applications.concat(action.payload.application)
-          : [action.payload.application]
+        declarations: state.declarations
+          ? state.declarations.concat(action.payload.declaration)
+          : [action.payload.declaration]
       }
-    case DELETE_APPLICATION:
+    case DELETE_DECLARATION:
       return loop(
         {
           ...state
         },
-        Cmd.run(deleteApplicationByUser, {
+        Cmd.run(deleteDeclarationByUser, {
           successActionCreator: action.payload.shouldUpdateFieldAgentHome
-            ? updateFieldAgentDeclaredApplications
-            : getStorageApplicationsSuccess,
-          failActionCreator: getStorageApplicationsFailed,
-          args: [state.userID, action.payload.application]
+            ? updateFieldAgentDeclaredDeclarations
+            : getStorageDeclarationsSuccess,
+          failActionCreator: getStorageDeclarationsFailed,
+          args: [state.userID, action.payload.declaration]
         })
       )
-    case MODIFY_APPLICATION:
-      const newApplications: IApplication[] = state.applications || []
-      const currentApplicationIndex = newApplications.findIndex(
-        (application) => application.id === action.payload.application.id
+    case MODIFY_DECLARATION:
+      const newDeclarations: IDeclaration[] = state.declarations || []
+      const currentDeclarationIndex = newDeclarations.findIndex(
+        (declaration) => declaration.id === action.payload.declaration.id
       )
-      newApplications[currentApplicationIndex] = action.payload.application
+      newDeclarations[currentDeclarationIndex] = action.payload.declaration
 
       return {
         ...state,
-        applications: newApplications
+        declarations: newDeclarations
       }
     case CLEAR_CORRECTION_CHANGE: {
-      const applicationIndex = state.applications.findIndex(
-        (application) => application.id === action.payload.applicationId
+      const declarationIndex = state.declarations.findIndex(
+        (declaration) => declaration.id === action.payload.declarationId
       )
 
-      const correction = state.applications[applicationIndex]
+      const correction = state.declarations[declarationIndex]
 
-      const orignalAppliation: IApplication = {
+      const orignalAppliation: IDeclaration = {
         ...correction,
         data: {
           ...correction.originalData
         }
       }
 
-      return loop(state, Cmd.action(writeApplication(orignalAppliation)))
+      return loop(state, Cmd.action(writeDeclaration(orignalAppliation)))
     }
 
-    case WRITE_APPLICATION:
+    case WRITE_DECLARATION:
       return loop(
         {
           ...state,
           isWritingDraft: true
         },
-        Cmd.run(writeApplicationByUser, {
+        Cmd.run(writeDeclarationByUser, {
           successActionCreator: (response: string) => {
             if (action.payload.callback) {
               action.payload.callback()
             }
-            return getStorageApplicationsSuccess(response)
+            return getStorageDeclarationsSuccess(response)
           },
-          failActionCreator: getStorageApplicationsFailed,
-          args: [Cmd.getState, state.userID, action.payload.application]
+          failActionCreator: getStorageDeclarationsFailed,
+          args: [Cmd.getState, state.userID, action.payload.declaration]
         })
       )
     case USER_DETAILS_AVAILABLE:
@@ -1421,75 +1421,75 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
           ...state
         },
         Cmd.run<
-          IGetStorageApplicationsFailedAction,
-          IGetStorageApplicationsSuccessAction
-        >(getApplicationsOfCurrentUser, {
-          successActionCreator: getStorageApplicationsSuccess,
-          failActionCreator: getStorageApplicationsFailed,
+          IGetStorageDeclarationsFailedAction,
+          IGetStorageDeclarationsSuccessAction
+        >(getDeclarationsOfCurrentUser, {
+          successActionCreator: getStorageDeclarationsSuccess,
+          failActionCreator: getStorageDeclarationsFailed,
           args: []
         })
       )
-    case GET_APPLICATIONS_SUCCESS:
+    case GET_DECLARATIONS_SUCCESS:
       if (action.payload) {
         const userData = JSON.parse(action.payload) as IUserData
         return {
           ...state,
           userID: userData.userID,
-          applications: userData.applications,
-          initialApplicationsLoaded: true,
+          declarations: userData.declarations,
+          initialDeclarationsLoaded: true,
           isWritingDraft: false
         }
       }
       return {
         ...state,
-        initialApplicationsLoaded: true
+        initialDeclarationsLoaded: true
       }
-    case ENQUEUE_DOWNLOAD_APPLICATION:
-      const { applications } = state
-      const { application, client } = action.payload
-      const downloadIsRunning = applications.some(
-        (application) =>
-          application.downloadStatus === DOWNLOAD_STATUS.DOWNLOADING
+    case ENQUEUE_DOWNLOAD_DECLARATION:
+      const { declarations } = state
+      const { declaration, client } = action.payload
+      const downloadIsRunning = declarations.some(
+        (declaration) =>
+          declaration.downloadStatus === DOWNLOAD_STATUS.DOWNLOADING
       )
 
-      const applicationIndex = applications.findIndex(
-        (app) => application.id === app.id
+      const declarationIndex = declarations.findIndex(
+        (app) => declaration.id === app.id
       )
-      let newApplicationsAfterStartingDownload = Array.from(applications)
+      let newDeclarationsAfterStartingDownload = Array.from(declarations)
 
       // Download is running, so enqueue
       if (downloadIsRunning) {
-        // Application is not in list
-        if (applicationIndex === -1) {
-          newApplicationsAfterStartingDownload = applications.concat([
-            application
+        // Declaration is not in list
+        if (declarationIndex === -1) {
+          newDeclarationsAfterStartingDownload = declarations.concat([
+            declaration
           ])
         } else {
-          // Application is failed before, just make it ready to download
-          newApplicationsAfterStartingDownload[applicationIndex] = application
+          // Declaration is failed before, just make it ready to download
+          newDeclarationsAfterStartingDownload[declarationIndex] = declaration
         }
 
         // Download is running just return the state
         return {
           ...state,
-          applications: newApplicationsAfterStartingDownload
+          declarations: newDeclarationsAfterStartingDownload
         }
       }
       // Download is not running
       else {
-        // Application is not in list, so push it
-        if (applicationIndex === -1) {
-          newApplicationsAfterStartingDownload = applications.concat([
+        // Declaration is not in list, so push it
+        if (declarationIndex === -1) {
+          newDeclarationsAfterStartingDownload = declarations.concat([
             {
-              ...application,
+              ...declaration,
               downloadStatus: DOWNLOAD_STATUS.DOWNLOADING
             }
           ])
         }
-        // Application is in list make it downloading
+        // Declaration is in list make it downloading
         else {
-          newApplicationsAfterStartingDownload[applicationIndex] = {
-            ...application,
+          newDeclarationsAfterStartingDownload[declarationIndex] = {
+            ...declaration,
             downloadStatus: DOWNLOAD_STATUS.DOWNLOADING
           }
         }
@@ -1497,17 +1497,17 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
 
       const newState = {
         ...state,
-        applications: newApplicationsAfterStartingDownload
+        declarations: newDeclarationsAfterStartingDownload
       }
 
-      const { request, requestArgs } = createRequestForApplication(
-        application,
+      const { request, requestArgs } = createRequestForDeclaration(
+        declaration,
         client
       ) as any
 
       return loop(
         newState,
-        Cmd.run<IDownloadApplicationFail, IDownloadApplicationSuccess>(
+        Cmd.run<IDownloadDeclarationFail, IDownloadDeclarationSuccess>(
           requestWithStateWrapper,
           {
             args: [
@@ -1515,12 +1515,12 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
               Cmd.getState,
               client
             ],
-            successActionCreator: downloadApplicationSuccess,
+            successActionCreator: downloadDeclarationSuccess,
             failActionCreator: (err) =>
-              downloadApplicationFail(
+              downloadDeclarationFail(
                 err,
                 {
-                  ...application,
+                  ...declaration,
                   downloadStatus: DOWNLOAD_STATUS.DOWNLOADING
                 },
                 client
@@ -1528,21 +1528,21 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
           }
         )
       )
-    case DOWNLOAD_APPLICATION_SUCCESS:
+    case DOWNLOAD_DECLARATION_SUCCESS:
       const { queryData, form, client: clientFromSuccess } = action.payload
 
-      const downloadingApplicationIndex = state.applications.findIndex(
-        (application) =>
-          application.downloadStatus === DOWNLOAD_STATUS.DOWNLOADING
+      const downloadingDeclarationIndex = state.declarations.findIndex(
+        (declaration) =>
+          declaration.downloadStatus === DOWNLOAD_STATUS.DOWNLOADING
       )
-      const newApplicationsAfterDownload = Array.from(state.applications)
-      const downloadingApplication =
-        newApplicationsAfterDownload[downloadingApplicationIndex]
+      const newDeclarationsAfterDownload = Array.from(state.declarations)
+      const downloadingDeclaration =
+        newDeclarationsAfterDownload[downloadingDeclarationIndex]
 
-      const dataKey = getDataKey(downloadingApplication)
+      const dataKey = getDataKey(downloadingDeclaration)
       const eventData = queryData.data[dataKey as string]
       const transData: IFormData = gqlToDraftTransformer(
-        form[downloadingApplication.event],
+        form[downloadingDeclaration.event],
         eventData
       )
       const downloadedAppStatus: string =
@@ -1551,69 +1551,69 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
           eventData.registration.status &&
           eventData.registration.status[0].type) ||
         ''
-      newApplicationsAfterDownload[downloadingApplicationIndex] =
-        createReviewApplication(
-          downloadingApplication.id,
+      newDeclarationsAfterDownload[downloadingDeclarationIndex] =
+        createReviewDeclaration(
+          downloadingDeclaration.id,
           transData,
-          downloadingApplication.event,
+          downloadingDeclaration.event,
           downloadedAppStatus
         )
-      newApplicationsAfterDownload[downloadingApplicationIndex].downloadStatus =
+      newDeclarationsAfterDownload[downloadingDeclarationIndex].downloadStatus =
         DOWNLOAD_STATUS.DOWNLOADED
 
       const newStateAfterDownload = {
         ...state,
-        applications: newApplicationsAfterDownload
+        declarations: newDeclarationsAfterDownload
       }
 
       // Check if there is more to download
-      const downloadQueueInprogress = state.applications.filter(
-        (application) =>
-          application.downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD
+      const downloadQueueInprogress = state.declarations.filter(
+        (declaration) =>
+          declaration.downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD
       )
 
       // If not then, write to IndexedDB and return state
       if (!downloadQueueInprogress.length) {
         return loop(
           newStateAfterDownload,
-          Cmd.run(writeApplicationByUser, {
+          Cmd.run(writeDeclarationByUser, {
             args: [
               Cmd.getState,
               state.userID,
-              newApplicationsAfterDownload[downloadingApplicationIndex]
+              newDeclarationsAfterDownload[downloadingDeclarationIndex]
             ],
             failActionCreator: (err) =>
-              downloadApplicationFail(
+              downloadDeclarationFail(
                 err,
-                newApplicationsAfterDownload[downloadingApplicationIndex],
+                newDeclarationsAfterDownload[downloadingDeclarationIndex],
                 clientFromSuccess
               )
           })
         )
       }
 
-      const applicationToDownload = downloadQueueInprogress[0]
-      applicationToDownload.downloadStatus = DOWNLOAD_STATUS.DOWNLOADING
+      const declarationToDownload = downloadQueueInprogress[0]
+      declarationToDownload.downloadStatus = DOWNLOAD_STATUS.DOWNLOADING
       const { request: nextRequest, requestArgs: nextRequestArgs } =
-        createRequestForApplication(
-          applicationToDownload,
+        createRequestForDeclaration(
+          declarationToDownload,
           clientFromSuccess
         ) as any
 
-      // Return state, write to indexedDB and download the next ready to download application, all in sequence
+      // Return state, write to indexedDB and download the next ready to download declaration, all in sequence
       return loop(
         newStateAfterDownload,
         Cmd.list(
           [
-            Cmd.run(writeApplicationByUser, {
+            Cmd.run(writeDeclarationByUser, {
               args: [
                 Cmd.getState,
                 state.userID,
-                newApplicationsAfterDownload[downloadingApplicationIndex]
+                newDeclarationsAfterDownload[downloadingDeclarationIndex]
               ],
-              failActionCreator: downloadApplicationFail
+              failActionCreator: downloadDeclarationFail
             }),
-            Cmd.run<IDownloadApplicationFail, IDownloadApplicationSuccess>(
+            Cmd.run<IDownloadDeclarationFail, IDownloadDeclarationSuccess>(
               requestWithStateWrapper,
               {
                 args: [
@@ -1621,11 +1621,11 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
                   Cmd.getState,
                   clientFromSuccess
                 ],
-                successActionCreator: downloadApplicationSuccess,
+                successActionCreator: downloadDeclarationSuccess,
                 failActionCreator: (err) =>
-                  downloadApplicationFail(
+                  downloadDeclarationFail(
                     err,
-                    newApplicationsAfterDownload[downloadingApplicationIndex],
+                    newDeclarationsAfterDownload[downloadingDeclarationIndex],
                     clientFromSuccess
                   )
               }
@@ -1635,36 +1635,36 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
         )
       )
 
-    case DOWNLOAD_APPLICATION_FAIL:
+    case DOWNLOAD_DECLARATION_FAIL:
       const {
-        application: erroredApplication,
+        declaration: erroredDeclaration,
         error,
         client: clientFromFail
       } = action.payload
-      erroredApplication.downloadRetryAttempt =
-        (erroredApplication.downloadRetryAttempt || 0) + 1
+      erroredDeclaration.downloadRetryAttempt =
+        (erroredDeclaration.downloadRetryAttempt || 0) + 1
 
       const { request: retryRequest, requestArgs: retryRequestArgs } =
-        createRequestForApplication(erroredApplication, clientFromFail) as any
+        createRequestForDeclaration(erroredDeclaration, clientFromFail) as any
 
-      const applicationsAfterError = Array.from(state.applications)
-      const erroredApplicationIndex = applicationsAfterError.findIndex(
-        (application) =>
-          application.downloadStatus === DOWNLOAD_STATUS.DOWNLOADING
+      const declarationsAfterError = Array.from(state.declarations)
+      const erroredDeclarationIndex = declarationsAfterError.findIndex(
+        (declaration) =>
+          declaration.downloadStatus === DOWNLOAD_STATUS.DOWNLOADING
       )
 
-      applicationsAfterError[erroredApplicationIndex] = erroredApplication
+      declarationsAfterError[erroredDeclarationIndex] = erroredDeclaration
 
       // Retry download until limit reached
       if (
-        erroredApplication.downloadRetryAttempt < DOWNLOAD_MAX_RETRY_ATTEMPT
+        erroredDeclaration.downloadRetryAttempt < DOWNLOAD_MAX_RETRY_ATTEMPT
       ) {
         return loop(
           {
             ...state,
-            applications: applicationsAfterError
+            declarations: declarationsAfterError
           },
-          Cmd.run<IDownloadApplicationFail, IDownloadApplicationSuccess>(
+          Cmd.run<IDownloadDeclarationFail, IDownloadDeclarationSuccess>(
             requestWithStateWrapper,
             {
               args: [
@@ -1672,9 +1672,9 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
                 Cmd.getState,
                 clientFromFail
               ],
-              successActionCreator: downloadApplicationSuccess,
+              successActionCreator: downloadDeclarationSuccess,
               failActionCreator: (err) =>
-                downloadApplicationFail(err, erroredApplication, clientFromFail)
+                downloadDeclarationFail(err, erroredDeclaration, clientFromFail)
             }
           )
         )
@@ -1687,101 +1687,101 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
         status = DOWNLOAD_STATUS.FAILED
       }
 
-      erroredApplication.downloadStatus = status
+      erroredDeclaration.downloadStatus = status
 
-      applicationsAfterError[erroredApplicationIndex] = erroredApplication
+      declarationsAfterError[erroredDeclarationIndex] = erroredDeclaration
 
-      const downloadQueueFollowing = state.applications.filter(
-        (application) =>
-          application.downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD
+      const downloadQueueFollowing = state.declarations.filter(
+        (declaration) =>
+          declaration.downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD
       )
 
-      // If nothing more to download, return the state and write the applications
+      // If nothing more to download, return the state and write the declarations
       if (!downloadQueueFollowing.length) {
         return loop(
           {
             ...state,
-            applications: applicationsAfterError
+            declarations: declarationsAfterError
           },
-          Cmd.run(writeApplicationByUser, {
-            args: [Cmd.getState, state.userID, erroredApplication]
+          Cmd.run(writeDeclarationByUser, {
+            args: [Cmd.getState, state.userID, erroredDeclaration]
           })
         )
       }
 
       // If there are more to download in queue, start the next request
-      const nextApplication = downloadQueueFollowing[0]
+      const nextDeclaration = downloadQueueFollowing[0]
       const {
-        request: nextApplicationRequest,
-        requestArgs: nextApplicationRequestArgs
-      } = createRequestForApplication(nextApplication, clientFromFail) as any
+        request: nextDeclarationRequest,
+        requestArgs: nextDeclarationRequestArgs
+      } = createRequestForDeclaration(nextDeclaration, clientFromFail) as any
       return loop(
         {
           ...state,
-          applications: applicationsAfterError
+          declarations: declarationsAfterError
         },
         Cmd.list(
           [
-            Cmd.run(writeApplicationByUser, {
-              args: [Cmd.getState, state.userID, erroredApplication]
+            Cmd.run(writeDeclarationByUser, {
+              args: [Cmd.getState, state.userID, erroredDeclaration]
             }),
             Cmd.run(requestWithStateWrapper, {
               args: [
-                nextApplicationRequest({
-                  ...nextApplicationRequestArgs,
+                nextDeclarationRequest({
+                  ...nextDeclarationRequestArgs,
                   fetchPolicy: 'no-cache'
                 }),
                 Cmd.getState,
                 clientFromFail
               ],
-              successActionCreator: downloadApplicationSuccess,
+              successActionCreator: downloadDeclarationSuccess,
               failActionCreator: (err) =>
-                downloadApplicationFail(err, nextApplication, clientFromFail)
+                downloadDeclarationFail(err, nextDeclaration, clientFromFail)
             })
           ],
           { sequence: true }
         )
       )
 
-    case UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS:
+    case UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS:
       return loop(
         state,
-        Cmd.run(updateFieldAgentDeclaredApplicationsByUser, {
+        Cmd.run(updateFieldAgentDeclaredDeclarationsByUser, {
           successActionCreator:
-            updateFieldAgentDeclaredApplicationsSuccessActionCreator,
+            updateFieldAgentDeclaredDeclarationsSuccessActionCreator,
           failActionCreator:
-            updateFieldAgentDeclaredApplicationsFailActionCreator,
+            updateFieldAgentDeclaredDeclarationsFailActionCreator,
           args: [Cmd.getState]
         })
       )
 
-    case UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_SUCCESS:
+    case UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_SUCCESS:
       if (action.payload) {
         const userData = JSON.parse(action.payload) as IUserData
 
         return {
           ...state,
-          applications: userData.applications
+          declarations: userData.declarations
         }
       }
       return state
 
     case ARCHIVE_DECLARATION:
       if (action.payload) {
-        const declaration = state.applications.find(
+        const declaration = state.declarations.find(
           ({ id }) => id === action.payload.declarationId
         )
 
         if (!declaration) {
           return state
         }
-        const modifiedApplication: IApplication = {
+        const modifiedDeclaration: IDeclaration = {
           ...declaration,
           submissionStatus: SUBMISSION_STATUS.READY_TO_ARCHIVE,
-          action: ApplicationAction.ARCHIVE_DECLARATION,
+          action: DeclarationAction.ARCHIVE_DECLARATION,
           payload: { id: declaration.id }
         }
-        return loop(state, Cmd.action(writeApplication(modifiedApplication)))
+        return loop(state, Cmd.action(writeDeclaration(modifiedDeclaration)))
       }
       return state
 
@@ -1849,9 +1849,9 @@ export const registrarWorkqueueReducer: LoopReducer<WorkqueueState, Action> = (
   }
 }
 
-export function filterProcessingApplications(
+export function filterProcessingDeclarations(
   data: GQLEventSearchResultSet,
-  processingApplicationIds: string[]
+  processingDeclarationIds: string[]
 ): GQLEventSearchResultSet {
   if (!data.results) {
     return data
@@ -1862,7 +1862,7 @@ export function filterProcessingApplications(
       return false
     }
 
-    return !processingApplicationIds.includes(result.id)
+    return !processingDeclarationIds.includes(result.id)
   })
   const filteredTotal =
     (data.totalItems || 0) - (data.results.length - filteredResults.length)
@@ -1873,48 +1873,48 @@ export function filterProcessingApplications(
   }
 }
 
-export function filterProcessingApplicationsFromQuery(
+export function filterProcessingDeclarationsFromQuery(
   queryData: IQueryData,
-  storedApplications: IApplication[]
+  storedDeclarations: IDeclaration[]
 ): IQueryData {
-  const processingApplicationIds = storedApplications
+  const processingDeclarationIds = storedDeclarations
     .filter(
-      (application) =>
-        application.submissionStatus &&
+      (declaration) =>
+        declaration.submissionStatus &&
         processingStates.includes(
-          application.submissionStatus as SUBMISSION_STATUS
+          declaration.submissionStatus as SUBMISSION_STATUS
         )
     )
-    .map((application) => application.id)
+    .map((declaration) => declaration.id)
 
   return {
-    inProgressTab: filterProcessingApplications(
+    inProgressTab: filterProcessingDeclarations(
       queryData.inProgressTab,
-      processingApplicationIds
+      processingDeclarationIds
     ),
-    notificationTab: filterProcessingApplications(
+    notificationTab: filterProcessingDeclarations(
       queryData.notificationTab,
-      processingApplicationIds
+      processingDeclarationIds
     ),
-    reviewTab: filterProcessingApplications(
+    reviewTab: filterProcessingDeclarations(
       queryData.reviewTab,
-      processingApplicationIds
+      processingDeclarationIds
     ),
-    rejectTab: filterProcessingApplications(
+    rejectTab: filterProcessingDeclarations(
       queryData.rejectTab,
-      processingApplicationIds
+      processingDeclarationIds
     ),
-    approvalTab: filterProcessingApplications(
+    approvalTab: filterProcessingDeclarations(
       queryData.approvalTab,
-      processingApplicationIds
+      processingDeclarationIds
     ),
-    printTab: filterProcessingApplications(
+    printTab: filterProcessingDeclarations(
       queryData.printTab,
-      processingApplicationIds
+      processingDeclarationIds
     ),
-    externalValidationTab: filterProcessingApplications(
+    externalValidationTab: filterProcessingDeclarations(
       queryData.externalValidationTab,
-      processingApplicationIds
+      processingDeclarationIds
     )
   }
 }

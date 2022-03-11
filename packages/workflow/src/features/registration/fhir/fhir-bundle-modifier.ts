@@ -35,7 +35,7 @@ import {
   generateDeathTrackingId,
   getEventType,
   isEventNotification,
-  isInProgressApplication
+  isInProgressDeclaration
 } from '@workflow/features/registration/utils'
 import {
   getLoggedInPractitionerResource,
@@ -74,7 +74,7 @@ export async function modifyRegistrationBundle(
   await setupRegistrationWorkflow(
     taskResource,
     getTokenPayload(token),
-    isInProgressApplication(fhirBundle)
+    isInProgressDeclaration(fhirBundle)
       ? REG_STATUS_IN_PROGRESS
       : REG_STATUS_DECLARED
   )
@@ -499,8 +499,8 @@ export async function checkForDuplicateStatusUpdate(taskResource: fhir.Task) {
       return code.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
     })
   if (existingRegStatusCode && existingRegStatusCode.code === regStatusCode) {
-    logger.error(`Application is already in ${regStatusCode} state`)
-    throw new Error(`Application is already in ${regStatusCode} state`)
+    logger.error(`Declaration is already in ${regStatusCode} state`)
+    throw new Error(`Declaration is already in ${regStatusCode} state`)
   }
 }
 

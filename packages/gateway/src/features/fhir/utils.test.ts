@@ -158,10 +158,10 @@ describe('Fhir util function testing', () => {
             coding: [
               {
                 system: 'http://opencrvs.org/doc-types',
-                code: 'birth-application'
+                code: 'birth-declaration'
               }
             ],
-            text: 'Birth Application'
+            text: 'Birth Declaration'
           },
           class: {
             coding: [

@@ -28,7 +28,7 @@ const messagesToDefine: IDuplicatesMessages = {
   rejectDescription: {
     id: 'duplicates.modal.reject',
     defaultMessage:
-      'Are you sure you want to reject this application for being a duplicate ?',
+      'Are you sure you want to reject this declaration for being a duplicate ?',
     description: 'Description of the reject modal'
   },
   duplicateFoundTitle: {
@@ -39,7 +39,7 @@ const messagesToDefine: IDuplicatesMessages = {
   duplicateFoundDescription: {
     id: 'duplicates.duplicateFoundDescription',
     defaultMessage:
-      'The following application has been flagged as a possible duplicate of an existing registered record.',
+      'The following declaration has been flagged as a possible duplicate of an existing registered record.',
     description: 'The description at the top of the duplicates page'
   },
   possibleDuplicateFound: {
@@ -54,7 +54,7 @@ const messagesToDefine: IDuplicatesMessages = {
   },
   notDuplicateConfirmationTxt: {
     id: 'duplicates.notDuplicate.modal.confirmationText',
-    defaultMessage: 'Are you sure this is not a duplicate application?',
+    defaultMessage: 'Are you sure this is not a duplicate declaration?',
     description: 'Not a duplicate modal confirmation text'
   },
   duplicateReview: {

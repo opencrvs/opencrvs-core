@@ -10,41 +10,41 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  mergeDeclaredApplications,
-  filterProcessingApplications,
-  filterProcessingApplicationsFromQuery,
-  createApplication,
+  createDeclaration,
   archiveDeclaration,
-  storeApplication,
-  IUserData
+  storeDeclaration,
+  IUserData,
+  mergeDeclaredDeclarations,
+  filterProcessingDeclarations,
+  filterProcessingDeclarationsFromQuery
 } from '.'
 import { Event } from '@client/forms'
 import { AppStore, createStore } from '@client/store'
-import { mockApplicationData, flushPromises } from '@client/tests/util'
+import { mockDeclarationData, flushPromises } from '@client/tests/util'
 import { IUserDetails } from '@client/utils/userUtils'
 import { storage } from '@client/storage'
 
 describe('query result filtering tests', () => {
-  describe('.filterProcessingApplications()', () => {
+  describe('.filterProcessingDeclarations()', () => {
     it(`return data if results isn't defined`, () => {
       const data = {}
-      const returnVal = filterProcessingApplications(data, [''])
+      const returnVal = filterProcessingDeclarations(data, [''])
       expect(returnVal).toBe(data)
     })
 
     it(`removes null values from results`, () => {
       const data = { results: [{}, null, {}], totalItems: 3 }
       // @ts-ignore
-      const returnVal = filterProcessingApplications(data, [''])
+      const returnVal = filterProcessingDeclarations(data, [''])
       expect(returnVal).toEqual({ results: [{}, {}], totalItems: 2 })
     })
 
-    it(`filters out applications with ids in the supplied array`, () => {
+    it(`filters out declarations with ids in the supplied array`, () => {
       const data = {
         results: [{ id: '111' }, { id: '222' }, { id: '333' }],
         totalItems: 3
       }
-      const returnVal = filterProcessingApplications(data, ['222'])
+      const returnVal = filterProcessingDeclarations(data, ['222'])
       expect(returnVal).toEqual({
         results: [{ id: '111' }, { id: '333' }],
         totalItems: 2
@@ -52,8 +52,8 @@ describe('query result filtering tests', () => {
     })
   })
 
-  describe('.filterProcessingApplicationsFromQuery()', () => {
-    it('filters out applications in processing state from application query results', () => {
+  describe('.filterProcessingDeclarationsFromQuery()', () => {
+    it('filters out declarations in processing state from declaration query results', () => {
       const queryData = {
         inProgressTab: {
           results: [
@@ -121,7 +121,7 @@ describe('query result filtering tests', () => {
         }
       }
 
-      const storedApplications = [
+      const storedDeclarations = [
         {
           id: 'DRAFT',
           submissionStatus: 'DRAFT'
@@ -196,10 +196,10 @@ describe('query result filtering tests', () => {
         }
       ]
 
-      const filteredResult = filterProcessingApplicationsFromQuery(
+      const filteredResult = filterProcessingDeclarationsFromQuery(
         queryData,
         // @ts-ignore
-        storedApplications
+        storedDeclarations
       )
 
       expect(filteredResult).toEqual({
@@ -237,9 +237,9 @@ describe('query result filtering tests', () => {
 })
 
 describe('Utilty functions', () => {
-  it('fetch declared applications', () => {})
-  it('merges applications', () => {
-    const applications = [
+  it('fetch declared declarations', () => {})
+  it('merges declarations', () => {
+    const declarations = [
       {
         id: '1',
         data: {},
@@ -253,7 +253,7 @@ describe('Utilty functions', () => {
         compositionId: '2'
       }
     ]
-    const declaredApplications = [
+    const declaredDeclarations = [
       {
         id: '2'
       },
@@ -262,24 +262,24 @@ describe('Utilty functions', () => {
       }
     ]
 
-    mergeDeclaredApplications(applications, declaredApplications)
+    mergeDeclaredDeclarations(declarations, declaredDeclarations)
 
-    expect(applications).toHaveLength(3)
+    expect(declarations).toHaveLength(3)
   })
 })
 
 describe('archiveDeclaration tests', () => {
   let store: AppStore
-  const declaration = createApplication(Event.BIRTH, mockApplicationData)
+  const declaration = createDeclaration(Event.BIRTH, mockDeclarationData)
   let indexedDB: { USER_DATA: string; USER_DETAILS: string }
 
   beforeEach(() => {
     store = createStore().store
-    store.dispatch(storeApplication(declaration))
+    store.dispatch(storeDeclaration(declaration))
 
     const currentUserData: IUserData = {
       userID: '123',
-      applications: [declaration]
+      declarations: [declaration]
     }
 
     const currentUserDetails: IUserDetails = {
@@ -320,7 +320,7 @@ describe('archiveDeclaration tests', () => {
   it('should make an application ready to be archived', async () => {
     store.dispatch(archiveDeclaration(declaration.id))
     await flushPromises()
-    const declarations = JSON.parse(indexedDB.USER_DATA)[0].applications
+    const declarations = JSON.parse(indexedDB.USER_DATA)[0].declarations
 
     expect(declarations[0].submissionStatus).toBe('READY_TO_ARCHIVE')
   })

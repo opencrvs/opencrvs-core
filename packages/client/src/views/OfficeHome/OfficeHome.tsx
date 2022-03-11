@@ -10,12 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  filterProcessingApplicationsFromQuery,
-  IApplication,
+  filterProcessingDeclarationsFromQuery,
+  IDeclaration,
   IWorkqueue,
   SUBMISSION_STATUS,
   updateRegistrarWorkqueue
-} from '@client/applications'
+} from '@client/declarations'
 import { Header } from '@client/components/interface/Header/Header'
 import { messages as certificateMessage } from '@client/i18n/messages/views/certificate'
 import {
@@ -76,7 +76,7 @@ export const StyledSpinner = styled(Spinner)`
   margin: 20% auto;
 `
 export const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.negative};
   ${({ theme }) => theme.fonts.bodyStyle};
   text-align: center;
   margin-top: 100px;
@@ -112,10 +112,10 @@ interface IBaseOfficeHomeStateProps {
   registrarLocationId: string
   tabId: string
   selectorId: string
-  drafts: IApplication[]
-  applications: IApplication[]
+  drafts: IDeclaration[]
+  declarations: IDeclaration[]
   workqueue: IWorkqueue
-  storedApplications: IApplication[]
+  storedDeclarations: IDeclaration[]
 }
 
 interface IOfficeHomeState {
@@ -166,7 +166,7 @@ export class OfficeHomeView extends React.Component<
       printCurrentPage: 1,
       externalValidationCurrentPage: 1,
       showCertificateToast: Boolean(
-        this.props.applications.filter(
+        this.props.declarations.filter(
           (item) => item.submissionStatus === SUBMISSION_STATUS.READY_TO_CERTIFY
         ).length
       )
@@ -224,8 +224,8 @@ export class OfficeHomeView extends React.Component<
     return this.props.scope && this.props.scope.includes('validate')
   }
 
-  subtractApplicationsWithStatus(count: number, status: string[]) {
-    const outboxCount = this.props.storedApplications.filter(
+  subtractDeclarationsWithStatus(count: number, status: string[]) {
+    const outboxCount = this.props.storedDeclarations.filter(
       (app) => app.submissionStatus && status.includes(app.submissionStatus)
     ).length
     return count - outboxCount
@@ -283,12 +283,12 @@ export class OfficeHomeView extends React.Component<
       drafts,
       selectorId,
       registrarLocationId,
-      storedApplications
+      storedDeclarations
     } = this.props
     const { loading, error, data } = workqueue
-    const filteredData = filterProcessingApplicationsFromQuery(
+    const filteredData = filterProcessingDeclarationsFromQuery(
       data,
-      storedApplications
+      storedDeclarations
     )
 
     return (
@@ -443,19 +443,19 @@ function mapStateToProps(
   const scope = getScope(state)
 
   return {
-    applications: state.applicationsState.applications,
+    declarations: state.declarationsState.declarations,
     workqueue: state.workqueueState.workqueue,
     language: state.i18n.language,
     scope,
     registrarLocationId,
     tabId: (match && match.params && match.params.tabId) || 'review',
     selectorId: (match && match.params && match.params.selectorId) || '',
-    storedApplications: state.applicationsState.applications,
+    storedDeclarations: state.declarationsState.declarations,
     drafts:
-      (state.applicationsState.applications &&
-        state.applicationsState.applications.filter(
-          (application: IApplication) =>
-            application.submissionStatus ===
+      (state.declarationsState.declarations &&
+        state.declarationsState.declarations.filter(
+          (declaration: IDeclaration) =>
+            declaration.submissionStatus ===
             SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
         )) ||
       []
