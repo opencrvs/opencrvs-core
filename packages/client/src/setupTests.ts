@@ -179,7 +179,6 @@ jest.mock(
           forms: mockOfflineData.forms,
           templates: mockOfflineData.templates
         }),
-      loadAssets: () => Promise.resolve(mockOfflineData.assets),
       loadConfig: () => Promise.resolve(mockConfigResponse)
     }
   })

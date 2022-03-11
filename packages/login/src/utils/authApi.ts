@@ -46,11 +46,15 @@ export interface ICertificateTemplateData {
   _id: string
 }
 
+export interface ICountryLogo {
+  fileName: string
+  file: string
+}
 export interface IApplicationConfig {
   APPLICATION_NAME: string
   BACKGROUND_SYNC_BROADCAST_CHANNEL: string
   COUNTRY: string
-  COUNTRY_LOGO_FILE: string
+  COUNTRY_LOGO: ICountryLogo
   COUNTRY_LOGO_RENDER_WIDTH: number
   COUNTRY_LOGO_RENDER_HEIGHT: number
   DESKTOP_TIME_OUT_MILLISECONDS: number

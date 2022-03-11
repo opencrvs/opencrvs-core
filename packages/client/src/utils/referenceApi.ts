@@ -49,6 +49,11 @@ export interface INIDNumberPattern {
   num: string
 }
 
+export interface ICountryLogo {
+  fileName: string
+  file: string
+}
+
 export interface ICertificateTemplateData {
   event: string
   status: string
@@ -64,7 +69,7 @@ export interface IApplicationConfig {
   APPLICATION_NAME: string
   BACKGROUND_SYNC_BROADCAST_CHANNEL: string
   COUNTRY: string
-  COUNTRY_LOGO_FILE: string
+  COUNTRY_LOGO: ICountryLogo
   COUNTRY_LOGO_RENDER_WIDTH: number
   COUNTRY_LOGO_RENDER_HEIGHT: number
   DESKTOP_TIME_OUT_MILLISECONDS: number
@@ -195,21 +200,10 @@ const toDataURL = (url: string) =>
       throw error
     })
 
-async function loadAssets(): Promise<IAssetResponse> {
-  const url = `${window.config.COUNTRY_CONFIG_URL}/assets/${window.config.COUNTRY_LOGO_FILE}`
-
-  return toDataURL(url).then((dataUrl) => {
-    return {
-      logo: `${dataUrl}`
-    }
-  })
-}
-
 export const referenceApi = {
   loadLocations,
   loadFacilities,
   loadPilotLocations,
   loadContent,
-  loadAssets,
   loadConfig
 }

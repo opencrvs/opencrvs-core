@@ -30,11 +30,17 @@ const token = jwt.sign(
 
 const fetch = fetchMock as fetchMock.FetchMock
 
+export const validImageB64String =
+  'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
+
 let mockConfig = {
   APPLICATION_NAME: 'Farajaland CRVS',
   BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
   COUNTRY: 'bgd',
-  COUNTRY_LOGO_FILE: 'logo.png',
+  COUNTRY_LOGO: {
+    fileName: 'logo.png',
+    file: `data:image;base64,${validImageB64String}`
+  },
   DESKTOP_TIME_OUT_MILLISECONDS: 900000, // 15 mins
   HEALTH_FACILITY_FILTER: 'UPAZILA',
   LANGUAGES: 'en,bn',

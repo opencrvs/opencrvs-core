@@ -81,6 +81,7 @@ const ErrorMessage = styled.div`
 type IApplicationConfigName = {
   APPLICATION_NAME?: string
   GOVT_LOGO?: string
+  COUNTRY_LOGO_FILE_NAME?: string
 }
 type State = {
   applicationName: string
@@ -89,6 +90,7 @@ type State = {
   errorMessages: string
   govtLogo: string
   logoFile: IAttachmentValue
+  logoFileName: string
   isFileUploading: boolean
 }
 interface IProps {
@@ -118,8 +120,9 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
       errorOccured: false,
       errorMessages: EMPTY_STRING,
       govtLogo: EMPTY_STRING,
-      logoFile: { name: '', type: '', data: '' },
-      isFileUploading: false
+      logoFile: { name: EMPTY_STRING, type: EMPTY_STRING, data: EMPTY_STRING },
+      isFileUploading: false,
+      logoFileName: EMPTY_STRING
     }
   }
 
@@ -141,6 +144,12 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
   setLogoFile(data: IAttachmentValue) {
     this.setState(() => ({
       logoFile: data
+    }))
+  }
+
+  setLogoFileName = (attachment: IAttachmentValue) => {
+    this.setState(() => ({
+      logoFileName: attachment.name ? attachment.name : EMPTY_STRING
     }))
   }
 
@@ -183,7 +192,11 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
             this.props.intl.formatMessage(messages.applicationNameChangeError)
           )
         })
-    } else if (modalName === GeneralActionId.GOVT_LOGO && value.GOVT_LOGO) {
+    } else if (
+      modalName === GeneralActionId.GOVT_LOGO &&
+      value.GOVT_LOGO &&
+      value.COUNTRY_LOGO_FILE_NAME
+    ) {
       if (this.isWithinFileLength(value.GOVT_LOGO as string) === false) {
         this.setState({
           errorOccured: true,
@@ -192,9 +205,9 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
           ),
           govtLogo: EMPTY_STRING,
           logoFile: {
-            name: '',
-            type: '',
-            data: ''
+            name: EMPTY_STRING,
+            type: EMPTY_STRING,
+            data: EMPTY_STRING
           }
         })
         valueChanged(
@@ -202,7 +215,10 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
           this.props.intl.formatMessage(messages.govtLogoFileLimitError)
         )
       } else {
-        this.callUpdateGovtLogoMutation(value.GOVT_LOGO)
+        this.callUpdateGovtLogoMutation(
+          value.GOVT_LOGO,
+          value.COUNTRY_LOGO_FILE_NAME
+        )
           .then(() => {
             valueChanged(
               NOTIFICATION_TYPE.SUCCESS,
@@ -253,20 +269,26 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
     }
   }
 
-  async callUpdateGovtLogoMutation(govtLogo: string) {
+  async callUpdateGovtLogoMutation(govtLogo: string, logoFileName: string) {
     try {
       this.setState({ updatingValue: true })
       const res = await configApplicationMutations.updateApplicationLogo(
-        govtLogo
+        govtLogo,
+        logoFileName
       )
       if (res && res.data) {
         this.setState({ updatingValue: false })
         const COUNTRY_LOGO_FILE =
-          res.data.updateApplicationConfig.COUNTRY_LOGO_FILE
+          res.data.updateApplicationConfig.COUNTRY_LOGO.file
+        const COUNTRY_LOGO_FILE_NAME =
+          res.data.updateApplicationConfig.COUNTRY_LOGO.fileName
         const updatedOfflineConfig = {
           config: {
             ...this.props.offlineCountryConfiguration.config,
-            COUNTRY_LOGO_FILE
+            COUNTRY_LOGO: {
+              file: COUNTRY_LOGO_FILE,
+              fileName: COUNTRY_LOGO_FILE_NAME
+            }
           }
         }
         this.props.updateConfig(updatedOfflineConfig)
@@ -334,7 +356,8 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
                 changeModalName,
                 {
                   APPLICATION_NAME: this.state.applicationName,
-                  GOVT_LOGO: this.state.govtLogo
+                  GOVT_LOGO: this.state.govtLogo,
+                  COUNTRY_LOGO_FILE_NAME: this.state.logoFileName
                 },
                 valueChanged
               )
@@ -390,6 +413,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
                   })
                   this.setGovtLogo((file as IAttachmentValue).data as string)
                   this.setLogoFile(file as IAttachmentValue)
+                  this.setLogoFileName(file as IAttachmentValue)
                 }}
                 files={this.state.logoFile}
                 onUploadingStateChanged={this.onUploadingStateChanged}

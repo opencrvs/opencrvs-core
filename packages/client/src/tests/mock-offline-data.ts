@@ -316,9 +316,6 @@ export const mockOfflineData = {
   templates: JSON.parse(
     readFileSync(join(__dirname, './templates.json')).toString()
   ),
-  assets: {
-    logo: `data:image;base64,${validImageB64String}`
-  },
   config: {
     APPLICATION_NAME: 'Farajaland CRVS',
     COUNTRY_LOGO_RENDER_WIDTH: 104,
@@ -340,7 +337,10 @@ export const mockOfflineData = {
     _id: '61a8c105c04ac94fe46ceb27',
     BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
     COUNTRY: 'bgd',
-    COUNTRY_LOGO_FILE: 'logo.png',
+    COUNTRY_LOGO: {
+      fileName: 'logo.png',
+      file: `data:image;base64,${validImageB64String}`
+    },
     PHONE_NUMBER_PATTERN: {
       pattern: /^01[1-9][0-9]{8}$/,
       example: '01741234567',

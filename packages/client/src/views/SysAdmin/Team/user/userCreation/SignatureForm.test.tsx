@@ -43,7 +43,6 @@ describe('signature upload tests', () => {
         facilities: mockOfflineData.facilities,
         pilotLocations: mockOfflineData.pilotLocations,
         offices: mockOfflineData.offices,
-        assets: mockOfflineData.assets,
         config: mockOfflineData.config
       })
     )

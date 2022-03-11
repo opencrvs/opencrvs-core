@@ -95,7 +95,7 @@ function GeneralTabContent({
           label: intl.formatMessage(messages.govermentLogoLabel),
           value: (
             <img
-              src={offlineCountryConfiguration.config.COUNTRY_LOGO_FILE}
+              src={offlineCountryConfiguration.config.COUNTRY_LOGO.file}
               width={
                 offlineCountryConfiguration.config.COUNTRY_LOGO_RENDER_HEIGHT
               }

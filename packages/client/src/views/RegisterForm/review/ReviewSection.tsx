@@ -1480,7 +1480,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           <StyledColumn>
             <ReviewHeader
               id="review_header"
-              logoSource={offlineCountryConfiguration.assets.logo}
+              logoSource={offlineCountryConfiguration.config.COUNTRY_LOGO.file}
               title={intl.formatMessage(messages.govtName)}
               subject={
                 applicantName

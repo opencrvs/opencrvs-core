@@ -18,7 +18,10 @@ const applicationNameConfigMutation = gql`
   ) {
     updateApplicationConfig(applicationConfig: $applicationConfig) {
       APPLICATION_NAME
-      COUNTRY_LOGO_FILE
+      COUNTRY_LOGO {
+        fileName
+        file
+      }
     }
   }
 `
@@ -37,9 +40,12 @@ async function updateApplicationName(applicationName: string) {
   )
 }
 
-async function updateApplicationLogo(govtLogo: string) {
+async function updateApplicationLogo(govtLogo: string, logoFileName: string) {
   const applicationConfig = {
-    COUNTRY_LOGO_FILE: govtLogo
+    COUNTRY_LOGO: {
+      fileName: logoFileName,
+      file: govtLogo
+    }
   }
 
   return (

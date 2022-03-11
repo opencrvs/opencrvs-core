@@ -28,11 +28,15 @@ interface INIDNumberPattern {
   num: string
 }
 
+interface ICountryLogo {
+  fileName: string
+  file: string
+}
 export interface IApplicationConfigurationModel extends Document {
   APPLICATION_NAME: string
   BACKGROUND_SYNC_BROADCAST_CHANNEL: string
   COUNTRY: string
-  COUNTRY_LOGO_FILE: string
+  COUNTRY_LOGO: ICountryLogo
   COUNTRY_LOGO_RENDER_WIDTH: number
   COUNTRY_LOGO_RENDER_HEIGHT: number
   DESKTOP_TIME_OUT_MILLISECONDS: number
@@ -72,11 +76,16 @@ const phoneNumberSchema = new Schema<IPhoneNumberPattern>({
   }
 })
 
+const countryLogoSchema = new Schema<ICountryLogo>({
+  fileName: String,
+  file: String
+})
+
 const systemSchema = new Schema({
   APPLICATION_NAME: { type: String, required: false, default: 'OpenCRVS' },
   BACKGROUND_SYNC_BROADCAST_CHANNEL: { type: String, required: false },
   COUNTRY: { type: String, required: false },
-  COUNTRY_LOGO_FILE: { type: String, required: false },
+  COUNTRY_LOGO: { type: countryLogoSchema, required: false },
   COUNTRY_LOGO_RENDER_WIDTH: { type: Number, required: false, default: 104 },
   COUNTRY_LOGO_RENDER_HEIGHT: { type: Number, required: false, default: 104 },
   DESKTOP_TIME_OUT_MILLISECONDS: {
