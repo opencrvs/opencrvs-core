@@ -55,7 +55,7 @@ import {
   DEATH_REG_NUMBER_SYSTEM
 } from '@workflow/features/registration/fhir/constants'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
-import { REINSTATED_EXTENSION_URL } from '@gateway/features/fhir/constants'
+import { REINSTATED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 
 interface IEventRegistrationCallbackPayload {
   trackingId: string
