@@ -122,6 +122,33 @@ interface State {
   previewImage: IAttachmentValue | null
 }
 
+function blobToBase64(blob: Blob): Promise<string | null | ArrayBuffer> {
+  return new Promise((resolve, _) => {
+    const reader = new FileReader()
+    reader.onloadend = () => resolve(reader.result)
+    reader.readAsDataURL(blob)
+  })
+}
+
+async function updatePreviewSvgWithSampleSignature(
+  svgCode: string
+): Promise<string> {
+  const html = document.createElement('html')
+  html.innerHTML = svgCode
+  const certificateImages = html.querySelectorAll('image')
+  if (certificateImages[1]) {
+    const signatureImage = certificateImages[1]
+
+    const res = await fetch('./assets/sample-signature.png')
+    const blob = await res.blob()
+    const base64signature = await blobToBase64(blob)
+    signatureImage.setAttribute('xlink:href', base64signature as string)
+  }
+
+  svgCode = html.getElementsByTagName('svg')[0].outerHTML
+  return unescape(encodeURIComponent(svgCode))
+}
+
 export function printFile(data: string, fileName: string) {
   const html =
     '<html><head><title>' +
@@ -182,7 +209,8 @@ class ConfigHomeComponent extends React.Component<Props, State> {
     const menuItems = [
       {
         label: intl.formatMessage(messages.previewTemplate),
-        handler: () => {
+        handler: async () => {
+          svgCode = await updatePreviewSvgWithSampleSignature(svgCode)
           const linkSource = `data:${SVGFile.type};base64,${window.btoa(
             svgCode
           )}`
