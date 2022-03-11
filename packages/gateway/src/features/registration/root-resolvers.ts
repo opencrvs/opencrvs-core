@@ -59,7 +59,7 @@ export const resolvers: GQLResolver = {
       )
 
       return compositions.filter(({ type }) =>
-        type.coding?.some(({ code }) => code === 'birth-application')
+        type.coding?.some(({ code }) => code === 'birth-declaration')
       )
     },
     async searchDeathRegistrations(_, { fromDate, toDate }, authHeader) {
@@ -78,7 +78,7 @@ export const resolvers: GQLResolver = {
       )
 
       return compositions.filter(({ type }) =>
-        type.coding?.some(({ code }) => code === 'death-application')
+        type.coding?.some(({ code }) => code === 'death-declaration')
       )
     },
     async fetchBirthRegistration(_, { id }, authHeader) {
@@ -199,10 +199,10 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'sysadmin')
       ) {
         const payload: {
-          applicationLocationHirarchyId: string
+          declarationLocationHirarchyId: string
           status: string[]
         } = {
-          applicationLocationHirarchyId: locationId,
+          declarationLocationHirarchyId: locationId,
           status: status as string[]
         }
         const results: GQLStatusWiseRegistrationCount[] = await fetch(

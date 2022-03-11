@@ -119,10 +119,10 @@ describe('When a new registration event is received', () => {
               coding: [
                 {
                   system: 'http://opencrvs.org/doc-types',
-                  code: 'birth-application'
+                  code: 'birth-declaration'
                 }
               ],
-              text: 'Birth Application'
+              text: 'Birth Declaration'
             },
             class: {
               coding: [
@@ -375,10 +375,10 @@ describe('When a new registration event is received', () => {
               coding: [
                 {
                   system: 'http://opencrvs.org/doc-types',
-                  code: 'birth-application'
+                  code: 'birth-declaration'
                 }
               ],
-              text: 'Birth Application'
+              text: 'Birth Declaration'
             },
             class: {
               coding: [
@@ -631,10 +631,10 @@ describe('When a new registration event is received', () => {
               coding: [
                 {
                   system: 'http://opencrvs.org/doc-types',
-                  code: 'birth-application'
+                  code: 'birth-declaration'
                 }
               ],
-              text: 'Birth Application'
+              text: 'Birth Declaration'
             },
             class: {
               coding: [
@@ -871,10 +871,10 @@ describe('When a new registration event is received', () => {
               coding: [
                 {
                   system: 'http://opencrvs.org/doc-types',
-                  code: 'birth-application'
+                  code: 'birth-declaration'
                 }
               ],
-              text: 'Birth Application'
+              text: 'Birth Declaration'
             },
             class: {
               coding: [
@@ -1095,7 +1095,7 @@ describe('When a new registration event is received', () => {
   })
 })
 
-describe('When an existing application is marked registered', () => {
+describe('When an existing declaration is marked registered', () => {
   let server: any
 
   beforeEach(async () => {
@@ -1112,13 +1112,13 @@ describe('When an existing application is marked registered', () => {
       },
       payload
     })
-    const applicationEventPoint =
+    const declarationEventPoint =
       influxClient.writePoints.mock.calls[0][0].find(
         ({ measurement }: { measurement: string }) =>
-          measurement === 'application_event_duration'
+          measurement === 'declaration_event_duration'
       )
     expect(res.statusCode).toBe(200)
-    expect(applicationEventPoint).toMatchSnapshot()
+    expect(declarationEventPoint).toMatchSnapshot()
   })
   it('writes the delta between DECLARED and REGISTERED states to influxdb', async () => {
     const influxClient = require('@metrics/influxdb/client')
@@ -1131,13 +1131,13 @@ describe('When an existing application is marked registered', () => {
       },
       payload
     })
-    const applicationEventPoint =
+    const declarationEventPoint =
       influxClient.writePoints.mock.calls[0][0].find(
         ({ measurement }: { measurement: string }) =>
-          measurement === 'application_event_duration'
+          measurement === 'declaration_event_duration'
       )
     expect(res.statusCode).toBe(200)
-    expect(applicationEventPoint).toMatchSnapshot()
+    expect(declarationEventPoint).toMatchSnapshot()
   })
   it('writes the delta between VALIDATED and WAITING_VALIDATION states to influxdb', async () => {
     const influxClient = require('@metrics/influxdb/client')
@@ -1147,19 +1147,19 @@ describe('When an existing application is marked registered', () => {
     fetchTaskHistory.mockResolvedValue(taskHistory)
     const res = await server.server.inject({
       method: 'POST',
-      url: '/events/birth/waiting-validation',
+      url: '/events/birth/waiting-external-resource-validation',
       headers: {
         Authorization: `Bearer ${token}`
       },
       payload
     })
-    const applicationEventPoint =
+    const declarationEventPoint =
       influxClient.writePoints.mock.calls[0][0].find(
         ({ measurement }: { measurement: string }) =>
-          measurement === 'application_event_duration'
+          measurement === 'declaration_event_duration'
       )
     expect(res.statusCode).toBe(200)
-    expect(applicationEventPoint).toMatchSnapshot()
+    expect(declarationEventPoint).toMatchSnapshot()
   })
 
   it('writes the delta between VALIDATED and REGISTERED states to influxdb', async () => {
@@ -1176,16 +1176,16 @@ describe('When an existing application is marked registered', () => {
       },
       payload
     })
-    const applicationEventPoint =
+    const declarationEventPoint =
       influxClient.writePoints.mock.calls[0][0].find(
         ({ measurement }: { measurement: string }) =>
-          measurement === 'application_event_duration'
+          measurement === 'declaration_event_duration'
       )
     expect(res.statusCode).toBe(200)
-    expect(applicationEventPoint).toMatchSnapshot()
+    expect(declarationEventPoint).toMatchSnapshot()
   })
 
-  describe('a death application', () => {
+  describe('a death declaration', () => {
     it('writes the delta between REGISTERED and CERTIFIED states to influxdb', async () => {
       const influxClient = require('@metrics/influxdb/client')
       const payload = require('./test-data/mark-death-registered-request.json')
@@ -1197,18 +1197,18 @@ describe('When an existing application is marked registered', () => {
         },
         payload
       })
-      const applicationEventPoint =
+      const declarationEventPoint =
         influxClient.writePoints.mock.calls[0][0].find(
           ({ measurement }: { measurement: string }) =>
-            measurement === 'application_event_duration'
+            measurement === 'declaration_event_duration'
         )
 
       expect(res.statusCode).toBe(200)
-      expect(applicationEventPoint).toMatchSnapshot()
+      expect(declarationEventPoint).toMatchSnapshot()
     })
   })
 })
-describe('When an existing application is marked certified', () => {
+describe('When an existing declaration is marked certified', () => {
   let server: any
 
   beforeEach(async () => {
@@ -1226,16 +1226,16 @@ describe('When an existing application is marked certified', () => {
       },
       payload
     })
-    const applicationEventPoint =
+    const declarationEventPoint =
       influxClient.writePoints.mock.calls[0][0].find(
         ({ measurement }: { measurement: string }) =>
-          measurement === 'application_event_duration'
+          measurement === 'declaration_event_duration'
       )
 
     expect(res.statusCode).toBe(200)
-    expect(applicationEventPoint).toMatchSnapshot()
+    expect(declarationEventPoint).toMatchSnapshot()
   })
-  describe('a death application', () => {
+  describe('a death declaration', () => {
     it('writes the delta between REGISTERED and CERTIFIED states to influxdb', async () => {
       const influxClient = require('@metrics/influxdb/client')
       const payload = require('./test-data/mark-death-certified-request.json')
@@ -1248,16 +1248,16 @@ describe('When an existing application is marked certified', () => {
         payload
       })
       expect(res.statusCode).toBe(200)
-      const applicationEventPoint =
+      const declarationEventPoint =
         influxClient.writePoints.mock.calls[0][0].find(
           ({ measurement }: { measurement: string }) =>
-            measurement === 'application_event_duration'
+            measurement === 'declaration_event_duration'
         )
 
-      expect(applicationEventPoint).toMatchSnapshot()
+      expect(declarationEventPoint).toMatchSnapshot()
     })
   })
-  describe('a birth application', () => {
+  describe('a birth declaration', () => {
     it('writes the payment total to influxdb', async () => {
       const influxClient = require('@metrics/influxdb/client')
       const payload = require('./test-data/mark-certified-request.json')
@@ -1270,18 +1270,18 @@ describe('When an existing application is marked certified', () => {
         payload
       })
       expect(res.statusCode).toBe(200)
-      const applicationEventPoint =
+      const declarationEventPoint =
         influxClient.writePoints.mock.calls[0][0].find(
           ({ measurement }: { measurement: string }) =>
             measurement === 'certification_payment'
         )
 
-      expect(applicationEventPoint).toMatchSnapshot()
+      expect(declarationEventPoint).toMatchSnapshot()
     })
   })
 })
 
-describe('When an in-progress application is received', () => {
+describe('When an in-progress declaration is received', () => {
   let server: any
 
   beforeEach(async () => {
@@ -1335,7 +1335,7 @@ describe('When an in-progress application is received', () => {
     })
     const rejectedPoints = influxClient.writePoints.mock.calls[0][0].find(
       ({ measurement }: { measurement: string }) =>
-        measurement === 'applications_rejected'
+        measurement === 'declarations_rejected'
     )
 
     expect(res.statusCode).toBe(200)
@@ -1356,7 +1356,7 @@ describe('When an in-progress application is received', () => {
   })
 })
 
-describe('When an existing application requested correction', () => {
+describe('When an existing declaration requested correction', () => {
   let server: any
 
   beforeEach(async () => {
@@ -1374,16 +1374,16 @@ describe('When an existing application requested correction', () => {
       },
       payload
     })
-    const applicationEventPoint =
+    const declarationEventPoint =
       influxClient.writePoints.mock.calls[0][0].find(
         ({ measurement }: { measurement: string }) =>
-          measurement === 'application_event_duration'
+          measurement === 'declaration_event_duration'
       )
 
     expect(res.statusCode).toBe(200)
-    expect(applicationEventPoint).toMatchSnapshot()
+    expect(declarationEventPoint).toMatchSnapshot()
   })
-  describe('a death application', () => {
+  describe('a death declaration', () => {
     it('writes the delta between REGISTERED and REQUESTED_FOR_CORRECTION states to influxdb', async () => {
       const influxClient = require('@metrics/influxdb/client')
       const payload = require('./test-data/request-correction-death-request.json')
@@ -1396,16 +1396,16 @@ describe('When an existing application requested correction', () => {
         payload
       })
       expect(res.statusCode).toBe(200)
-      const applicationEventPoint =
+      const declarationEventPoint =
         influxClient.writePoints.mock.calls[0][0].find(
           ({ measurement }: { measurement: string }) =>
-            measurement === 'application_event_duration'
+            measurement === 'declaration_event_duration'
         )
 
-      expect(applicationEventPoint).toMatchSnapshot()
+      expect(declarationEventPoint).toMatchSnapshot()
     })
   })
-  describe('a birth application', () => {
+  describe('a birth declaration', () => {
     it('writes the payment total to influxdb', async () => {
       const influxClient = require('@metrics/influxdb/client')
       const payload = require('./test-data/request-correction-birth-request.json')
@@ -1418,13 +1418,13 @@ describe('When an existing application requested correction', () => {
         payload
       })
       expect(res.statusCode).toBe(200)
-      const applicationEventPoint =
+      const declarationEventPoint =
         influxClient.writePoints.mock.calls[0][0].find(
           ({ measurement }: { measurement: string }) =>
             measurement === 'correction_payment'
         )
 
-      expect(applicationEventPoint).toMatchSnapshot()
+      expect(declarationEventPoint).toMatchSnapshot()
     })
   })
 })

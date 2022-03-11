@@ -17,26 +17,26 @@ interface IConstantsMessages
   allEvents: MessageDescriptor
   allStatuses: MessageDescriptor
   areYouSure: MessageDescriptor
-  applicantContactNumber: MessageDescriptor
-  application: MessageDescriptor
-  applications: MessageDescriptor
-  applicationArchivedOn: MessageDescriptor
-  applicationCollectedOn: MessageDescriptor
-  applicationFailedOn: MessageDescriptor
-  applicationInformantLabel: MessageDescriptor
+  informantContactNumber: MessageDescriptor
+  declaration: MessageDescriptor
+  declarations: MessageDescriptor
+  declarationArchivedOn: MessageDescriptor
+  declarationCollectedOn: MessageDescriptor
+  declarationFailedOn: MessageDescriptor
+  declarationInformantLabel: MessageDescriptor
   applicationName: MessageDescriptor
-  applicationRegisteredOn: MessageDescriptor
-  applicationRejectedOn: MessageDescriptor
-  applicationRequestedCorrectionOn: MessageDescriptor
-  applicationStarted: MessageDescriptor
-  applicationStartedBy: MessageDescriptor
-  applicationStartedOn: MessageDescriptor
-  applicationState: MessageDescriptor
-  applicationSubmittedOn: MessageDescriptor
-  applicationTitle: MessageDescriptor
-  applicationUpdatedOn: MessageDescriptor
-  applicationValidatedOn: MessageDescriptor
-  applicationSentForExternalValidationOn: MessageDescriptor
+  declarationRegisteredOn: MessageDescriptor
+  declarationRejectedOn: MessageDescriptor
+  declarationRequestedCorrectionOn: MessageDescriptor
+  declarationStarted: MessageDescriptor
+  declarationStartedBy: MessageDescriptor
+  declarationStartedOn: MessageDescriptor
+  declarationState: MessageDescriptor
+  declarationSubmittedOn: MessageDescriptor
+  declarationTitle: MessageDescriptor
+  declarationUpdatedOn: MessageDescriptor
+  declarationValidatedOn: MessageDescriptor
+  declarationSentForExternalValidationOn: MessageDescriptor
   birth: MessageDescriptor
   births: MessageDescriptor
   by: MessageDescriptor
@@ -47,7 +47,7 @@ interface IConstantsMessages
   comment: MessageDescriptor
   configTitle: MessageDescriptor
   customTimePeriod: MessageDescriptor
-  dateOfApplication: MessageDescriptor
+  dateOfDeclaration: MessageDescriptor
   death: MessageDescriptor
   deaths: MessageDescriptor
   declared: MessageDescriptor
@@ -160,113 +160,113 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Label for select option All statuses',
     id: 'constants.allStatuses'
   },
-  applicantContactNumber: {
-    defaultMessage: 'Applicant contact number',
+  informantContactNumber: {
+    defaultMessage: 'Informant contact number',
     description: 'The title of contact number label',
-    id: 'constants.applicantContactNumber'
+    id: 'constants.informantContactNumber'
   },
-  application: {
-    defaultMessage: 'application',
-    description: 'A label for application',
-    id: 'constants.application'
+  declaration: {
+    defaultMessage: 'declaration',
+    description: 'A label for declaration',
+    id: 'constants.declaration'
   },
-  applications: {
-    defaultMessage: 'Applications ({totalItems})',
-    description: 'A label for applications count',
-    id: 'constants.applicationsCount'
+  declarations: {
+    defaultMessage: 'Declarations ({totalItems})',
+    description: 'A label for declarations count',
+    id: 'constants.declarationsCount'
   },
-  applicationArchivedOn: {
+  declarationArchivedOn: {
     defaultMessage: 'Application archived on',
     description: 'Label for the workflow timestamp when the status is archived',
     id: 'constants.applicationArchivedOn'
   },
-  applicationCollectedOn: {
+  declarationCollectedOn: {
     defaultMessage: 'Certificate collected on',
     description:
       'Label for the workflow timestamp when the status is collected',
-    id: 'constants.applicationCollectedOn'
+    id: 'constants.declarationCollectedOn'
   },
-  applicationFailedOn: {
+  declarationFailedOn: {
     defaultMessage: 'Failed to send on',
     description: 'Label for the workflow timestamp when the status is failed',
-    id: 'constants.applicationFailedOn'
+    id: 'constants.declarationFailedOn'
   },
-  applicationInformantLabel: {
+  declarationInformantLabel: {
     defaultMessage: 'Informant',
     description: 'Informant Label',
     id: 'constants.informant'
   },
   applicationName: {
     defaultMessage: 'OpenCRVS',
-    description: 'Application name of CRVS',
+    description: 'Declaration name of CRVS',
     id: 'constants.applicationName'
   },
-  applicationRegisteredOn: {
-    defaultMessage: 'Application registered on',
+  declarationRegisteredOn: {
+    defaultMessage: 'Declaration registered on',
     description:
       'Label for the workflow timestamp when the status is registered',
-    id: 'constants.applicationRegisteredOn'
+    id: 'constants.declarationRegisteredOn'
   },
-  applicationRejectedOn: {
-    defaultMessage: 'Application sent for updates on',
+  declarationRejectedOn: {
+    defaultMessage: 'Declaration sent for updates on',
     description: 'Label for the workflow timestamp when the status is rejected',
-    id: 'constants.applicationRejectedOn'
+    id: 'constants.declarationRejectedOn'
   },
-  applicationRequestedCorrectionOn: {
-    defaultMessage: 'Application requested correction on',
+  declarationRequestedCorrectionOn: {
+    defaultMessage: 'Declaration requested correction on',
     description:
       'Label for the workflow timestamp when the status is requested correction',
-    id: 'constants.applicationRequestedCorrectionOn'
+    id: 'constants.declarationRequestedCorrectionOn'
   },
-  applicationStarted: {
-    defaultMessage: 'Application started',
-    description: 'Label for table header column Application started',
-    id: 'constants.applicationStarted'
+  declarationStarted: {
+    defaultMessage: 'Declaration started',
+    description: 'Label for table header column Declaration started',
+    id: 'constants.declarationStarted'
   },
-  applicationStartedBy: {
+  declarationStartedBy: {
     defaultMessage: 'Started by',
     description: 'Label for table header column Started by',
-    id: 'constants.applicationStartedBy'
+    id: 'constants.declarationStartedBy'
   },
-  applicationStartedOn: {
+  declarationStartedOn: {
     defaultMessage: 'Started on',
     description:
       'Label for the workflow timestamp when the status is draft created',
-    id: 'constants.applicationStartedOn'
+    id: 'constants.declarationStartedOn'
   },
-  applicationState: {
-    defaultMessage: 'Application {action} on',
-    description: 'A label to describe when the application was actioned on',
-    id: 'constants.applicationState'
+  declarationState: {
+    defaultMessage: 'Declaration {action} on',
+    description: 'A label to describe when the declaration was actioned on',
+    id: 'constants.declarationState'
   },
-  applicationSubmittedOn: {
-    defaultMessage: 'Application submitted on',
+  declarationSubmittedOn: {
+    defaultMessage: 'Declaration submitted on',
     description:
-      'Label for the workflow timestamp when the status is application',
-    id: 'constants.applicationSubmittedOn'
+      'Label for the workflow timestamp when the status is declaration',
+    id: 'constants.declarationSubmittedOn'
   },
-  applicationTitle: {
-    defaultMessage: 'Applications',
-    description: 'Application title',
-    id: 'constants.applications'
+  declarationTitle: {
+    defaultMessage: 'Declarations',
+    description: 'Declaration title',
+    id: 'constants.declarations'
   },
-  applicationUpdatedOn: {
+  declarationUpdatedOn: {
     defaultMessage: 'Updated on',
     description:
       'Label for the workflow timestamp when the status is draft updated',
-    id: 'constants.applicationUpdatedOn'
+    id: 'constants.declarationUpdatedOn'
   },
-  applicationValidatedOn: {
-    defaultMessage: 'Application reviewed on',
+  declarationValidatedOn: {
+    defaultMessage: 'Declaration reviewed on',
     description:
       'Label for the workflow timestamp when the status is validated',
-    id: 'constants.applicationValidatedOn'
+    id: 'constants.declarationValidatedOn'
   },
-  applicationSentForExternalValidationOn: {
-    defaultMessage: 'Application sent for external validation on',
+  declarationSentForExternalValidationOn: {
+    defaultMessage: 'Declaration sent for external validation on',
     description:
       'Label for the workflow timestamp when the status is waiting_validation',
-    id: 'constants.applicationSentForExternalValidationOn'
+    id: 'constants.declarationSentForExternalValidationOn'
   },
   areYouSure: {
     defaultMessage: 'Are you sure?',
@@ -324,10 +324,10 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Label for Custom time period',
     id: 'constants.customTimePeriod'
   },
-  dateOfApplication: {
-    defaultMessage: 'Date of application',
-    description: 'Date of application label',
-    id: 'constants.dateOfApplication'
+  dateOfDeclaration: {
+    defaultMessage: 'Date of declaration',
+    description: 'Date of declaration label',
+    id: 'constants.dateOfDeclaration'
   },
   death: {
     defaultMessage: 'Death',
@@ -356,7 +356,7 @@ const messagesToDefine: IConstantsMessages = {
   },
   downloading: {
     defaultMessage: 'Downloading...',
-    description: 'Label for application download status Downloading',
+    description: 'Label for declaration download status Downloading',
     id: 'constants.downloading'
   },
   downloaded: {
@@ -396,7 +396,7 @@ const messagesToDefine: IConstantsMessages = {
   },
   failedToSend: {
     defaultMessage: 'Failed to send',
-    description: 'Label for application status Failed',
+    description: 'Label for declaration status Failed',
     id: 'constants.failedToSend'
   },
   from: {
@@ -481,12 +481,12 @@ const messagesToDefine: IConstantsMessages = {
   },
   newBirthRegistration: {
     id: 'register.selectInformant.newBirthRegistration',
-    defaultMessage: 'New birth application',
+    defaultMessage: 'New birth declaration',
     description: 'The title that appears for new birth registrations'
   },
   newDeathRegistration: {
     id: 'register.selectInformant.newDeathRegistration',
-    defaultMessage: 'New death application',
+    defaultMessage: 'New death declaration',
     description: 'The title that appears for new death registrations'
   },
   noNameProvided: {
@@ -507,7 +507,7 @@ const messagesToDefine: IConstantsMessages = {
   },
   pendingConnection: {
     defaultMessage: 'Pending connection',
-    description: 'Label for application status Pending Connection',
+    description: 'Label for declaration status Pending Connection',
     id: 'constants.pendingConnection'
   },
   performanceTitle: {
@@ -517,14 +517,14 @@ const messagesToDefine: IConstantsMessages = {
   },
   reason: {
     defaultMessage: 'Reason',
-    description: 'Label for Reason the application was rejected',
+    description: 'Label for Reason the declaration was rejected',
     id: 'constants.reason'
   },
   registerConfirmModalDesc: {
     defaultMessage:
       'A {event, select, birth{birth} death{death}} certificate will be generated with your signature for issuance.',
     description:
-      'Description for confirmation modal when registering application',
+      'Description for confirmation modal when registering declaration',
     id: 'constants.registerConfirmModalDesc'
   },
   registered: {
@@ -539,7 +539,7 @@ const messagesToDefine: IConstantsMessages = {
   },
   rejectedDays: {
     defaultMessage: 'Sent for updates {text}',
-    description: 'The title of rejected days of application',
+    description: 'The title of rejected days of declaration',
     id: 'constants.rejectedDays'
   },
   relationship: {
@@ -564,7 +564,7 @@ const messagesToDefine: IConstantsMessages = {
   },
   sending: {
     defaultMessage: 'Sending...',
-    description: 'Label for application status Submitting',
+    description: 'Label for declaration status Submitting',
     id: 'constants.sending'
   },
   sentForUpdatesOn: {
@@ -660,7 +660,7 @@ const messagesToDefine: IConstantsMessages = {
   },
   waitingToSend: {
     defaultMessage: 'Waiting to send',
-    description: 'Label for application status Ready to Submit',
+    description: 'Label for declaration status Ready to Submit',
     id: 'constants.waitingToSend'
   },
   week: {
@@ -887,37 +887,37 @@ const dynamicMessagesToDefine: Record<
     description: 'A label from the death event'
   },
   father: {
-    id: 'form.field.label.applicantRelation.father',
+    id: 'form.field.label.informantRelation.father',
     defaultMessage: 'Father',
     description: 'Label for option Father'
   },
   mother: {
-    id: 'form.field.label.applicantRelation.mother',
+    id: 'form.field.label.informantRelation.mother',
     defaultMessage: 'Mother',
     description: 'Label for option Mother'
   },
   spouse: {
-    id: 'form.field.label.applicantRelation.spouse',
+    id: 'form.field.label.informantRelation.spouse',
     defaultMessage: 'Spouse',
     description: 'Label for option Spouse'
   },
   son: {
-    id: 'form.field.label.applicantRelation.son',
+    id: 'form.field.label.informantRelation.son',
     defaultMessage: 'Son',
     description: 'Label for option Son'
   },
   daughter: {
-    id: 'form.field.label.applicantRelation.daughter',
+    id: 'form.field.label.informantRelation.daughter',
     defaultMessage: 'Daughter',
     description: 'Label for option Daughter'
   },
   MOTHER: {
-    id: 'form.field.label.applicantRelation.mother',
+    id: 'form.field.label.informantRelation.mother',
     defaultMessage: 'Mother',
     description: 'Label for option Mother'
   },
   FATHER: {
-    id: 'form.field.label.applicantRelation.father',
+    id: 'form.field.label.informantRelation.father',
     defaultMessage: 'Father',
     description: 'Label for option Father'
   },
@@ -938,34 +938,34 @@ const dynamicMessagesToDefine: Record<
     id: 'form.field.label.someoneElse'
   },
   SPOUSE: {
-    id: 'form.field.label.applicantRelation.spouse',
+    id: 'form.field.label.informantRelation.spouse',
     defaultMessage: 'Spouse',
     description: 'Label for option Spouse'
   },
   SON: {
-    id: 'form.field.label.applicantRelation.son',
+    id: 'form.field.label.informantRelation.son',
     defaultMessage: 'Son',
     description: 'Label for option Son'
   },
   DAUGHTER: {
-    id: 'form.field.label.applicantRelation.daughter',
+    id: 'form.field.label.informantRelation.daughter',
     defaultMessage: 'Daughter',
     description: 'Label for option Daughter'
   },
   EXTENDED_FAMILY: {
     defaultMessage: 'Extended Family',
     description: 'Label for option Extended Family',
-    id: 'form.field.label.applicantRelation.extendedFamily'
+    id: 'form.field.label.informantRelation.extendedFamily'
   },
   SOMEONE_ELSE: {
     defaultMessage: 'Someone else',
     description: 'Other Label',
     id: 'form.field.label.someoneElse'
   },
-  APPLICANT: {
-    defaultMessage: 'Applicant',
-    description: 'Applicant Label',
-    id: 'form.field.label.applicant'
+  INFORMANT: {
+    defaultMessage: 'Informant',
+    description: 'Informant Label',
+    id: 'form.field.label.informant'
   }
 }
 

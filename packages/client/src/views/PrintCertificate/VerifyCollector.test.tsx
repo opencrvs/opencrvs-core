@@ -13,32 +13,32 @@ import * as React from 'react'
 import { createStore } from '@client/store'
 import {
   createTestComponent,
-  mockApplicationData,
-  mockDeathApplicationData
+  mockDeclarationData,
+  mockDeathDeclarationData
 } from '@client/tests/util'
 import { VerifyCollector } from './VerifyCollector'
-import { storeApplication } from '@client/applications'
+import { storeDeclaration } from '@client/declarations'
 import { Event } from '@client/forms'
 import { ReactWrapper } from 'enzyme'
 
 describe('verify collector tests', () => {
   const { store, history } = createStore()
 
-  const birthApplication = {
+  const birthDeclaration = {
     id: 'mockBirth1234',
-    data: mockApplicationData,
+    data: mockDeclarationData,
     event: Event.BIRTH
   }
 
-  const deathApplication = {
+  const deathDeclaration = {
     id: 'mockDeath1234',
-    data: mockDeathApplicationData,
+    data: mockDeathDeclarationData,
     event: Event.DEATH
   }
 
-  describe('in case of birth application', () => {
+  describe('in case of birth declaration', () => {
     beforeAll(async () => {
-      store.dispatch(storeApplication(birthApplication))
+      store.dispatch(storeDeclaration(birthDeclaration))
     })
 
     it('when mother is collector renders idVerifier component', async () => {
@@ -192,9 +192,9 @@ describe('verify collector tests', () => {
     })
   })
 
-  describe('in case of death application renders idVerifier component', () => {
+  describe('in case of death declaration renders idVerifier component', () => {
     beforeAll(() => {
-      store.dispatch(storeApplication(deathApplication))
+      store.dispatch(storeDeclaration(deathDeclaration))
     })
 
     it('when informant is collector', async () => {

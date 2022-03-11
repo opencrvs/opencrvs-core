@@ -13,26 +13,23 @@
 import * as React from 'react'
 import {
   createTestComponent,
-  mockApplicationData,
+  mockDeclarationData,
   createRouterProps,
   registerScopeToken,
   getItem,
   flushPromises,
-  mockDeathApplicationData
+  mockDeathDeclarationData
 } from '@client/tests/util'
 import { RecordAudit } from './RecordAudit'
 import { createStore } from '@client/store'
 import { ReactWrapper } from 'enzyme'
 import {
-  createApplication,
-  storeApplication,
-  IApplication,
+  createDeclaration,
+  storeDeclaration,
+  IDeclaration,
   SUBMISSION_STATUS,
-  getApplicationsOfCurrentUser,
-  IUserData,
-  modifyApplication,
   DOWNLOAD_STATUS
-} from '@client/applications'
+} from '@client/declarations'
 import { Event } from '@client/forms'
 import { formatUrl } from '@client/navigation'
 import { DECLARATION_RECORD_AUDIT } from '@client/navigation/routes'
@@ -41,9 +38,9 @@ import { checkAuth } from '@client/profile/profileActions'
 import { FETCH_DECLARATION_SHORT_INFO } from './queries'
 import { waitForElement } from '@client/tests/wait-for-element'
 
-const declaration: IApplication = createApplication(
+const declaration: IDeclaration = createDeclaration(
   Event.BIRTH,
-  mockApplicationData
+  mockDeclarationData
 )
 declaration.data.registration = {
   ...declaration.data.registration,
@@ -59,7 +56,7 @@ describe('Record audit summary for a draft birth declaration', () => {
 
   beforeEach(async () => {
     const { store, history } = createStore()
-    store.dispatch(storeApplication(declaration))
+    store.dispatch(storeDeclaration(declaration))
     component = await createTestComponent(
       <RecordAudit
         {...createRouterProps(
@@ -99,24 +96,24 @@ describe('Record audit summary for a draft death declaration', () => {
 
   beforeEach(async () => {
     const { store, history } = createStore()
-    const deathApplication = createApplication(
+    const deathDeclaration = createDeclaration(
       Event.DEATH,
-      mockDeathApplicationData
+      mockDeathDeclarationData
     )
 
-    store.dispatch(storeApplication(deathApplication))
+    store.dispatch(storeDeclaration(deathDeclaration))
     component = await createTestComponent(
       <RecordAudit
         {...createRouterProps(
           formatUrl(DECLARATION_RECORD_AUDIT, {
             tab: 'inProgressTab',
-            declarationId: deathApplication.id
+            declarationId: deathDeclaration.id
           }),
           { isNavigatedInsideApp: false },
           {
             matchParams: {
               tab: 'inProgressTab',
-              declarationId: deathApplication.id
+              declarationId: deathDeclaration.id
             }
           }
         )}
@@ -129,7 +126,7 @@ describe('Record audit summary for a draft death declaration', () => {
     expect(component.exists('RecordAuditBody')).toBeTruthy()
   })
 
-  it('Check values for saved applications', async () => {
+  it('Check values for saved declarations', async () => {
     expect(component.find('#status_value').hostNodes().text()).toBe('Draft')
     expect(component.find('#type_value').hostNodes().text()).toBe('Death')
     expect(component.find('#drn_value').hostNodes().text()).toBe(
@@ -241,7 +238,7 @@ describe('Record audit for a draft declaration', () => {
 
     declaration.submissionStatus = SUBMISSION_STATUS.DECLARED
     declaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
-    store.dispatch(storeApplication(declaration))
+    store.dispatch(storeDeclaration(declaration))
 
     component = await createTestComponent(
       <RecordAudit
@@ -427,7 +424,7 @@ describe('Record audit for a reinstate declaration', () => {
 
     declaration.submissionStatus = SUBMISSION_STATUS.ARCHIVED
     declaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
-    store.dispatch(storeApplication(declaration))
+    store.dispatch(storeDeclaration(declaration))
 
     component = await createTestComponent(
       <RecordAudit

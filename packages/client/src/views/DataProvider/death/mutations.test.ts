@@ -24,7 +24,7 @@ describe('When calling getDeathQueryMappings', () => {
   })
 
   it('Should return null', () => {
-    const query = getDeathMutationMappings(Action.LOAD_REVIEW_APPLICATION)
+    const query = getDeathMutationMappings(Action.LOAD_REVIEW_DECLARATION)
     expect(query).toBe(null)
   })
 })

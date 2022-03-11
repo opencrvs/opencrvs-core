@@ -22,12 +22,12 @@ interface IPerformanceReportsMessages
   exportAll: MessageDescriptor
   operational: MessageDescriptor
   reports: MessageDescriptor
-  applicationsStartedTitle: MessageDescriptor
-  applicationsStartedDescription: MessageDescriptor
-  applicationsStartedTotal: MessageDescriptor
-  applicationsStartedFieldAgents: MessageDescriptor
-  applicationsStartedHospitals: MessageDescriptor
-  applicationsStartedOffices: MessageDescriptor
+  declarationsStartedTitle: MessageDescriptor
+  declarationsStartedDescription: MessageDescriptor
+  declarationsStartedTotal: MessageDescriptor
+  declarationsStartedFieldAgents: MessageDescriptor
+  declarationsStartedHospitals: MessageDescriptor
+  declarationsStartedOffices: MessageDescriptor
   registrationRatesReportHeader: MessageDescriptor
   registrationRatesReportSubHeader: MessageDescriptor
   registrationRatesReportDescription: MessageDescriptor
@@ -36,7 +36,7 @@ interface IPerformanceReportsMessages
   overTime: MessageDescriptor
   byLocation: MessageDescriptor
   locationTitle: MessageDescriptor
-  applicationCountByStatusDescription: MessageDescriptor
+  declarationCountByStatusDescription: MessageDescriptor
   workflowStatusHeader: MessageDescriptor
   fieldAgentsTitle: MessageDescriptor
   fieldAgentsNoResult: MessageDescriptor
@@ -105,36 +105,36 @@ const messagesToDefine: IPerformanceReportsMessages = {
     defaultMessage: 'Reports',
     description: 'Label for select option Reports'
   },
-  applicationsStartedTitle: {
-    id: 'performance.reports.applicationsStarted.title',
-    defaultMessage: 'Applications started',
-    description: 'Title for applications started in performance reports'
+  declarationsStartedTitle: {
+    id: 'performance.reports.declarationsStarted.title',
+    defaultMessage: 'Declarations started',
+    description: 'Title for declarations started in performance reports'
   },
-  applicationsStartedDescription: {
+  declarationsStartedDescription: {
     id: 'performance.reports.appStart.desc',
     defaultMessage:
-      'Total and percentage breakdown of the applications started by source from ',
-    description: 'Description for applications started in performance reports'
+      'Total and percentage breakdown of the declarations started by source from ',
+    description: 'Description for declarations started in performance reports'
   },
-  applicationsStartedTotal: {
-    id: 'performance.reports.applicationsStarted.total',
+  declarationsStartedTotal: {
+    id: 'performance.reports.declarationsStarted.total',
     defaultMessage: 'Total started',
-    description: 'Total applications started title'
+    description: 'Total declarations started title'
   },
-  applicationsStartedFieldAgents: {
+  declarationsStartedFieldAgents: {
     id: 'performance.reports.appStart.fieldAgents',
     defaultMessage: 'Field agents',
-    description: 'Field agent applications started title'
+    description: 'Field agent declarations started title'
   },
-  applicationsStartedOffices: {
-    id: 'performance.reports.applicationsStarted.offices',
+  declarationsStartedOffices: {
+    id: 'performance.reports.declarationsStarted.offices',
     defaultMessage: 'Registration offices',
-    description: 'Offices applications started title'
+    description: 'Offices declarations started title'
   },
-  applicationsStartedHospitals: {
-    id: 'performance.reports.applicationsStarted.hospitals',
+  declarationsStartedHospitals: {
+    id: 'performance.reports.declarationsStarted.hospitals',
     defaultMessage: 'Hospitals (DHIS2)',
-    description: 'Hospitals applications started title'
+    description: 'Hospitals declarations started title'
   },
   registrationRatesReportHeader: {
     id: 'performance.report.registration.rates.header',
@@ -180,15 +180,15 @@ const messagesToDefine: IPerformanceReportsMessages = {
     defaultMessage: 'Locations',
     description: 'Title for location column on estimation table'
   },
-  applicationCountByStatusDescription: {
+  declarationCountByStatusDescription: {
     id: 'performance.ops.statCount.desc',
     defaultMessage:
-      'Current status of all applications being processed for your selected administrative area.',
-    description: 'Description of the status wise application count view'
+      'Current status of all declarations being processed for your selected administrative area.',
+    description: 'Description of the status wise declaration count view'
   },
   workflowStatusHeader: {
     id: 'performance.operational.workflowStatus.header',
-    defaultMessage: 'Current applications in workflow',
+    defaultMessage: 'Current declarations in workflow',
     description: 'Header title for work flow status page'
   },
   fieldAgentsTitle: {
@@ -223,26 +223,26 @@ const messagesToDefine: IPerformanceReportsMessages = {
   },
   totalSentColumnHeader: {
     id: 'performance.fieldAgents.columnHeader.totalSent',
-    defaultMessage: 'Applications{linebreak}sent',
-    description: 'Column header for total application sent in field agent list'
+    defaultMessage: 'Declarations{linebreak}sent',
+    description: 'Column header for total declaration sent in field agent list'
   },
   totalInProgressColumnHeader: {
     id: 'performance.fieldAgents.col.totInProg',
     defaultMessage: 'Sent{linebreak}incomplete',
     description:
-      'Column header for total inprogress application sent in field agent list'
+      'Column header for total inprogress declaration sent in field agent list'
   },
   avgCompletionTimeColumnHeader: {
     id: 'performance.fieldAgents.col.avgCompTime',
-    defaultMessage: 'Avg. time to send{linebreak}complete application',
+    defaultMessage: 'Avg. time to send{linebreak}complete declaration',
     description:
-      'Column header for avg application completion time in field agent list'
+      'Column header for avg declaration completion time in field agent list'
   },
   totalRejectedColumnHeader: {
     id: 'performance.fieldAgents.col.totRej',
     defaultMessage: 'Rejected',
     description:
-      'Column header for total rejected applications in field agent list'
+      'Column header for total rejected declarations in field agent list'
   },
   fieldAgentStatusOptionActive: {
     id: 'performance.fieldAgents.options.status.active',

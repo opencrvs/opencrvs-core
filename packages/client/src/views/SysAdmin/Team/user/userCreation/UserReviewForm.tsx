@@ -20,7 +20,7 @@ import {
   LOCATION_SEARCH_INPUT,
   SIMPLE_DOCUMENT_UPLOADER
 } from '@client/forms'
-import { createOrUpdateUserMutation } from '@client/forms/user/fieldDefinitions/mutation/mutations'
+import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
 import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
 import {
   buttonMessages as messages,
@@ -52,8 +52,8 @@ import {
 import { IDynamicValues } from '@opencrvs/components/lib/common-types'
 import {
   ActionPageLight,
-  DataSection,
-  IDataProps
+  IDataProps,
+  ListView
 } from '@opencrvs/components/lib/interface'
 import ApolloClient from 'apollo-client'
 import * as React from 'react'
@@ -63,6 +63,8 @@ import { Dispatch } from 'redux'
 import { RouteComponentProps } from 'react-router'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { Check } from '@opencrvs/components/lib/icons'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { IUserDetails } from '@client/utils/userUtils'
 
 export interface IUserReviewFormProps {
   userId?: string
@@ -79,6 +81,7 @@ interface IDispatchProps {
   offlineCountryConfiguration: IOfflineData
   goBack: typeof goBack
   modify: (values: IFormSectionData) => void
+  userDetails: IUserDetails | null
 }
 
 interface ISectionData {
@@ -109,24 +112,29 @@ class UserReviewFormComponent extends React.Component<
                 ? ''
                 : intl.formatMessage(field.label),
             value: this.getValue(field),
-            action: {
-              id: `btn_change_${field.name}`,
-              label: intl.formatMessage(messages.change),
-              handler: () => {
-                this.props.userId
-                  ? this.props.goToUserReviewForm(
-                      this.props.userId,
-                      userFormSection.id,
-                      group.id,
-                      field.name
-                    )
-                  : this.props.goToCreateUserSection(
-                      userFormSection.id,
-                      group.id,
-                      field.name
-                    )
-              }
-            }
+            action: !(
+              field.name === 'registrationOffice' &&
+              this.props.userDetails?.role !== 'NATIONAL_SYSTEM_ADMIN'
+            )
+              ? {
+                  id: `btn_change_${field.name}`,
+                  label: intl.formatMessage(messages.change),
+                  handler: () => {
+                    this.props.userId
+                      ? this.props.goToUserReviewForm(
+                          this.props.userId,
+                          userFormSection.id,
+                          group.id,
+                          field.name
+                        )
+                      : this.props.goToCreateUserSection(
+                          userFormSection.id,
+                          group.id,
+                          field.name
+                        )
+                  }
+                }
+              : undefined
           })
         }
       })
@@ -209,7 +217,7 @@ class UserReviewFormComponent extends React.Component<
           </FormTitle>
         )}
         {this.transformSectionData().map((sec, index) => (
-          <DataSection key={index} {...sec} />
+          <ListView key={index} {...sec} />
         ))}
         <Action>{actionComponent}</Action>
       </ActionPageLight>
@@ -254,7 +262,8 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
 export const UserReviewForm = connect((store: IStoreState) => {
   return {
     userFormSection: store.userForm.userForm!.sections[0],
-    offlineCountryConfiguration: getOfflineData(store)
+    offlineCountryConfiguration: getOfflineData(store),
+    userDetails: getUserDetails(store)
   }
 }, mapDispatchToProps)(
   injectIntl<'intl', IFullProps & IDispatchProps>(UserReviewFormComponent)

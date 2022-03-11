@@ -422,7 +422,7 @@ export const isDateInPast: Validation = (value: IFormFieldValue) => {
   if (isDateNotInFuture(cast) && dateNotToday(cast)) {
     return undefined
   } else {
-    return { message: messages.isValidBirthDate } // specific to DOB of parent/applicant
+    return { message: messages.isValidBirthDate } // specific to DOB of parent/informant
   }
 }
 
@@ -531,9 +531,6 @@ export const range: RangeValidation =
       : { message: messages.range, props: { min, max } }
   }
 
-const hasValidLength = (value: string, length: number): boolean =>
-  !value || value.length === length
-
 export const isAValidNIDNumberFormat = (value: string): boolean => {
   const { pattern } = window.config.NID_NUMBER_PATTERN
   return new RegExp(pattern).test(value)
@@ -542,79 +539,31 @@ export const isAValidNIDNumberFormat = (value: string): boolean => {
 export const validIDNumber =
   (typeOfID: string): Validation =>
   (value: any) => {
-    const validNationalIDLengths = [10, 17]
-    const validBirthRegistrationNumberLength = 17
-    const validDeathRegistrationNumberLength = 18
-    const validPassportLength = 9
-    const validDrivingLicenseLength = 15
     value = (value && value.toString()) || ''
-    switch (typeOfID) {
-      case NATIONAL_ID:
-        const { num } = window.config.NID_NUMBER_PATTERN
+    const { num } = window.config.NID_NUMBER_PATTERN
 
-        const cast = value as string
-        const trimmedValue =
-          cast === undefined || cast === null ? '' : cast.trim()
-
-        if (isAValidNIDNumberFormat(trimmedValue) || !trimmedValue) {
-          return undefined
-        }
-
-        return {
-          message: messages.validNationalId,
-          props: {
-            min: validNationalIDLengths[0],
-            max: validNationalIDLengths[1],
-            validLength: num
-          }
-        }
-
-      case BIRTH_REGISTRATION_NUMBER:
-        return hasValidLength(
-          value.toString(),
-          validBirthRegistrationNumberLength
-        )
-          ? undefined
-          : {
-              message: messages.validBirthRegistrationNumber,
-              props: { validLength: validBirthRegistrationNumberLength }
-            }
-
-      case DEATH_REGISTRATION_NUMBER:
-        return hasValidLength(
-          value.toString(),
-          validDeathRegistrationNumberLength
-        )
-          ? undefined
-          : {
-              message: messages.validDeathRegistrationNumber,
-              props: { validLength: validDeathRegistrationNumberLength }
-            }
-
-      case PASSPORT:
-        return hasValidLength(value.toString(), validPassportLength) &&
-          isRegexpMatched(value, REGEXP_ALPHA_NUMERIC)
-          ? undefined
-          : {
-              message: messages.validPassportNumber,
-              props: { validLength: validPassportLength }
-            }
-      case DRIVING_LICENSE:
-        return hasValidLength(value, validDrivingLicenseLength) &&
-          isRegexpMatched(value, REGEXP_ALPHA_NUMERIC)
-          ? undefined
-          : {
-              message: messages.validDrivingLicenseNumber,
-              props: { validLength: validDrivingLicenseLength }
-            }
-      default:
+    const cast = value as string
+    const trimmedValue = cast === undefined || cast === null ? '' : cast.trim()
+    if (typeOfID === NATIONAL_ID) {
+      if (isAValidNIDNumberFormat(trimmedValue) || !trimmedValue) {
         return undefined
+      }
+
+      return {
+        message: messages.validNationalId,
+        props: {
+          validLength: num
+        }
+      }
     }
+    return undefined
   }
 export const duplicateIDNumber =
   (fieldToDuplicateCheck: string): Validation =>
   (value: IFormFieldValue, drafts) => {
-    if (value === _.get(drafts, fieldToDuplicateCheck)) {
+    const valueToCheck = _.get(drafts, fieldToDuplicateCheck)
+
+    if (value && valueToCheck && +value === +valueToCheck) {
       return {
         message: messages.duplicateNationalID
       }

@@ -13,22 +13,22 @@ import styled from 'styled-components'
 import { PrimaryButton } from './PrimaryButton'
 
 export const DangerButton = styled(PrimaryButton)`
-  background-color: ${({ theme }) => theme.colors.error};
+  background-color: ${({ theme }) => theme.colors.negative};
   &:hover:enabled {
-    background: ${({ theme }) => theme.colors.errorHover};
+    background: ${({ theme }) => theme.colors.redDark};
   }
   &:focus {
     outline: none;
-    background: ${({ theme }) => theme.colors.focus};
+    background: ${({ theme }) => theme.colors.yellow};
     color: ${({ theme }) => theme.colors.copy};
   }
 
   &:not([data-focus-visible-added]) {
     outline: none;
-    background-color: ${({ theme }) => theme.colors.error};
+    background-color: ${({ theme }) => theme.colors.negative};
     color: ${({ theme }) => theme.colors.white};
   }
   &:active:enabled {
-    background: ${({ theme }) => theme.colors.error};
+    background: ${({ theme }) => theme.colors.negative};
   }
 `

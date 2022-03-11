@@ -73,7 +73,7 @@ export async function sendEventNotification(
       })
       break
     case Events.BIRTH_NEW_DEC:
-    case Events.BIRTH_NEW_VALIDATE:
+    case Events.BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION:
       await sendNotification('birthDeclarationSMS', msisdn, authHeader, {
         name: await getInformantName(fhirBundle, CHILD_SECTION_CODE),
         trackingId: getTrackingId(fhirBundle)
@@ -101,7 +101,7 @@ export async function sendEventNotification(
       })
       break
     case Events.DEATH_NEW_DEC:
-    case Events.DEATH_NEW_VALIDATE:
+    case Events.DEATH_REQUEST_FOR_REGISTRAR_VALIDATION:
       await sendNotification('deathDeclarationSMS', msisdn, authHeader, {
         name: await getInformantName(fhirBundle, DECEASED_SECTION_CODE),
         trackingId: getTrackingId(fhirBundle)
@@ -188,7 +188,7 @@ export function getCompositionEventType(compoition: fhir.Composition) {
     compoition.type.coding &&
     compoition.type.coding[0].code
 
-  if (eventType === 'death-application' || eventType === 'death-notification') {
+  if (eventType === 'death-declaration' || eventType === 'death-notification') {
     return EVENT_TYPE.DEATH
   } else {
     return EVENT_TYPE.BIRTH
@@ -225,7 +225,7 @@ export function hasCorrectionEncounterSection(
   })
 }
 
-export function isInProgressApplication(fhirBundle: fhir.Bundle) {
+export function isInProgressDeclaration(fhirBundle: fhir.Bundle) {
   const taskEntry =
     fhirBundle &&
     fhirBundle.entry &&
@@ -267,10 +267,10 @@ export function isEventNotification(fhirBundle: fhir.Bundle) {
 export function isEventNonNotifiable(event: Events) {
   return (
     [
-      Events.BIRTH_WAITING_VALIDATION,
-      Events.DEATH_WAITING_VALIDATION,
-      Events.BIRTH_NEW_WAITING_VALIDATION,
-      Events.DEATH_NEW_WAITING_VALIDATION
+      Events.BIRTH_WAITING_EXTERNAL_RESOURCE_VALIDATION,
+      Events.DEATH_WAITING_EXTERNAL_RESOURCE_VALIDATION,
+      Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION,
+      Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
     ].indexOf(event) >= 0
   )
 }

@@ -200,7 +200,7 @@ describe('Registration root resolvers', () => {
                 type: {
                   coding: [
                     {
-                      code: 'birth-application'
+                      code: 'birth-declaration'
                     }
                   ]
                 }
@@ -247,7 +247,7 @@ describe('Registration root resolvers', () => {
                 type: {
                   coding: [
                     {
-                      code: 'death-application'
+                      code: 'death-declaration'
                     }
                   ]
                 }

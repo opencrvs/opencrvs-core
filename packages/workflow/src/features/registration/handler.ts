@@ -166,16 +166,18 @@ export async function createRegistrationHandler(
       getToken(request)
     )
     if (
-      event === Events.BIRTH_NEW_WAITING_VALIDATION ||
-      event === Events.DEATH_NEW_WAITING_VALIDATION
+      event ===
+        Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION ||
+      event ===
+        Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
     ) {
       payload = await markBundleAsWaitingValidation(
         payload as fhir.Bundle,
         getToken(request)
       )
     } else if (
-      event === Events.BIRTH_NEW_VALIDATE ||
-      event === Events.DEATH_NEW_VALIDATE
+      event === Events.BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION ||
+      event === Events.DEATH_REQUEST_FOR_REGISTRAR_VALIDATION
     ) {
       payload = await markBundleAsValidated(
         payload as fhir.Bundle,
@@ -185,8 +187,10 @@ export async function createRegistrationHandler(
     const resBundle = await sendBundleToHearth(payload)
     populateCompositionWithID(payload, resBundle)
     if (
-      event === Events.BIRTH_NEW_WAITING_VALIDATION ||
-      event === Events.DEATH_NEW_WAITING_VALIDATION
+      event ===
+        Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION ||
+      event ===
+        Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
     ) {
       // validate registration with resource service and set resulting registration number now that bundle exists in Hearth
       // validate registration with resource service and set resulting registration number

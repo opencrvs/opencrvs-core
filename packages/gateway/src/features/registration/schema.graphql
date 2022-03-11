@@ -33,7 +33,7 @@ enum RegistrationContactType {
   MOTHER
   FATHER
   OTHER
-  APPLICANT
+  INFORMANT
 }
 
 enum BirthRegPresence {
@@ -113,8 +113,8 @@ enum AttachmentSubject {
   DECEASED_PARMANENT_ADDRESS_PROOF
   DECEASED_DEATH_PROOF
   DECEASED_BIRTH_PROOF
-  APPLICANT_ID_PROOF
-  APPLICANT_ATHORITY_TO_APPLY_PROOF
+  INFORMANT_ID_PROOF
+  INFORMANT_ATHORITY_TO_APPLY_PROOF
   LEGAL_GUARDIAN_PROOF
   ASSIGNED_RESPONSIBILITY_PROOF
   WARD_COUNCILLOR_PROOF
@@ -325,10 +325,10 @@ input DeathRegistrationInput {
   registration: RegistrationInput
   # Remember to mark person as deceased
   deceased: PersonInput
-  informant: RelatedPersonInput # -> Use for applicant ->.section(code='informant-details').entry.reference
-  mother: PersonInput # -> Use for applicant ->.section(code='mother-details').entry.reference
-  father: PersonInput # -> Use for applicant ->.section(code='father-details').entry.reference
-  spouse: PersonInput # -> Use for applicant ->.section(code='spouse-details').entry.reference
+  informant: RelatedPersonInput # -> Use for informant ->.section(code='informant-details').entry.reference
+  mother: PersonInput # -> Use for informant ->.section(code='mother-details').entry.reference
+  father: PersonInput # -> Use for informant ->.section(code='father-details').entry.reference
+  spouse: PersonInput # -> Use for informant ->.section(code='spouse-details').entry.reference
   eventLocation: LocationInput
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
   causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept
@@ -347,10 +347,10 @@ type DeathRegistration implements EventRegistration { # -> Composition
   registration: Registration
   # Remember to mark person as deceased
   deceased: Person # -> .section(code='deceased-details').entry.reference
-  informant: RelatedPerson # -> Use for applicant ->.section(code='informant-details').entry.reference
-  mother: Person # -> Use for applicant ->.section(code='mother-details').entry.reference
-  father: Person # -> Use for applicant ->.section(code='father-details').entry.reference
-  spouse: Person # -> Use for applicant ->.section(code='spouse-details').entry.reference
+  informant: RelatedPerson # -> Use for informant ->.section(code='informant-details').entry.reference
+  mother: Person # -> Use for informant ->.section(code='mother-details').entry.reference
+  father: Person # -> Use for informant ->.section(code='father-details').entry.reference
+  spouse: Person # -> Use for informant ->.section(code='spouse-details').entry.reference
   eventLocation: Location
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
   causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept

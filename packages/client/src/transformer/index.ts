@@ -27,7 +27,7 @@ import {
   isRadioGroupWithNestedField,
   getSelectedRadioOptionWithNestedFields
 } from '@client/forms/utils'
-import { IApplication } from '@client/applications'
+import { IDeclaration } from '@client/declarations'
 import { hasFieldChanged } from '@client/views/CorrectionForm/utils'
 import { get } from 'lodash'
 
@@ -275,7 +275,7 @@ export const draftToGqlTransformer = (
 }
 
 export const appendGqlMetadataFromDraft = (
-  draft: IApplication,
+  draft: IDeclaration,
   gqlDetails: TransformedData
 ) => {
   const { timeLoggedMS } = draft
