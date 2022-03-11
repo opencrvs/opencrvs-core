@@ -288,11 +288,7 @@ type RouteProps = RouteComponentProps<{
   declarationId: string
 }>
 
-type IFullProps = IDispatchProps &
-  IStateProps &
-  IDispatchProps &
-  IntlShapeProps &
-  RouteProps
+type IFullProps = IDispatchProps & IStateProps & IntlShapeProps & RouteProps
 
 interface ILabel {
   [key: string]: string | undefined
@@ -1157,6 +1153,7 @@ function RecordAuditBody({
   draft,
   intl,
   goToCertificateCorrection,
+  goToPrintCertificate,
   goToPage,
   goToRegistrarHomeTab,
   scope,
@@ -1455,6 +1452,7 @@ function getBodyContent({
             }
             return (
               <RecordAuditBody
+                key={`record-audit-${declarationId}`}
                 {...actionProps}
                 declaration={getGQLDeclaration(
                   data.fetchRegistration,
@@ -1481,6 +1479,7 @@ function getBodyContent({
       )
   return (
     <RecordAuditBody
+      key={`record-audit-${declarationId}`}
       {...actionProps}
       declaration={declaration}
       draft={draft}
