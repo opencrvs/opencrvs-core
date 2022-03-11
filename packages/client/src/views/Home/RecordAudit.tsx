@@ -868,7 +868,11 @@ const getStatusLabel = (
 }
 
 const getLink = (status: string, onClick: () => void) => {
-  return <LinkButton onClick={onClick}>{status}</LinkButton>
+  return (
+    <LinkButton style={{ textAlign: 'left' }} onClick={onClick}>
+      {status}
+    </LinkButton>
+  )
 }
 
 const getFormattedDate = (date: Date) => {
