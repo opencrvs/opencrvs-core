@@ -79,7 +79,6 @@ const Version = styled.div`
   position: absolute;
   bottom: 0px;
   padding: 24px 24px;
-  margin-top: 2rem;
   span:last-child {
     display: none;
   }
@@ -107,7 +106,7 @@ export const LeftNavigation = (props: ILeftNavigationProps) => {
       {props.children && props.children}
       <Version>
         <span>OpenCRVS v1.1.0</span>
-        <span>{process.env.REACT_APP_VERSION || 'development'}</span>
+        <span>{process.env.REACT_APP_VERSION || 'Development'}</span>
       </Version>
     </LeftNavigationContainer>
   )
