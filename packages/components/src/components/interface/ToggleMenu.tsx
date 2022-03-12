@@ -25,6 +25,7 @@ const ToggleMenuContainer = styled.div`
 `
 const MenuContainer = styled.ul`
   border-radius: 4px;
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
   background-color: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.bigBodyStyle};
