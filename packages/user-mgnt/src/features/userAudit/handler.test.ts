@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createServer } from '@user-mgnt/index'
+import { createServer } from '@user-mgnt/server'
 import { logger } from '@user-mgnt/logger'
 import User, { AUDIT_ACTION, AUDIT_REASON, IUser } from '@user-mgnt/model/user'
 import { readFileSync } from 'fs'

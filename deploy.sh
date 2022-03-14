@@ -9,6 +9,15 @@
 # graphic logo are (registered/a) trademark(s) of Plan International.
 set -e
 
+# Read environment variable file for the environment
+# .env.qa
+# .env.development
+# .env.production
+if [ -f .env.$4 ]
+then
+    export $(cat .env.$4 | sed 's/#.*//g' | xargs)
+fi
+
 print_usage_and_exit () {
     echo 'Usage: ./deploy.sh --clear-data=yes|no --restore-metadata=yes|no --update-metadata=yes|no HOST ENV VERSION COUNTRY_CONFIG_VERSION COUNTRY_CONFIG_PATH'
     echo "  --clear-data must have a value of 'yes' or 'no' set e.g. --clear-data=yes"
@@ -69,6 +78,21 @@ if [ -z "$9" ] ; then
     print_usage_and_exit
 fi
 
+if [ -z "$SLACK_WEBHOOK_URL" ] ; then
+    echo 'Error: Missing environment variable SLACK_WEBHOOK_URL.'
+    print_usage_and_exit
+fi
+
+if [ -z "$KIBANA_USERNAME" ] ; then
+    echo 'Error: Missing environment variable KIBANA_USERNAME.'
+    print_usage_and_exit
+fi
+
+if [ -z "$KIBANA_PASSWORD" ] ; then
+    echo 'Error: Missing environment variable KIBANA_PASSWORD.'
+    print_usage_and_exit
+fi
+
 ENV=$4
 HOST=$5
 VERSION=$6
@@ -79,12 +103,6 @@ SSH_USER=${SSH_USER:-root}
 SSH_HOST=${SSH_HOST:-$HOST}
 LOG_LOCATION=${LOG_LOCATION:-/var/log}
 
-# Netdata user and passwrod
-NETDATA_USER=${NETDATA_USER:-monitor}
-NETDATA_PASSWORD=${NETDATA_PASSWORD:-monitor-password}
-NETDATA_USER_DETAILS_BASE64=`echo $(htpasswd -nb $NETDATA_USER $NETDATA_PASSWORD) | base64`
-
-echo $NETDATA_USER $NETDATA_PASSWORD $NETDATA_USER_DETAILS_BASE64
 
 echo
 echo "Deploying VERSION $VERSION to $SSH_HOST..."
@@ -129,8 +147,9 @@ else
     exit 1
   fi
 fi
+
 # Setup configuration files and compose file for the deployment domain
-ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/setup-deploy-config.sh '$HOST' '$NETDATA_USER_DETAILS_BASE64' | tee -a '$LOG_LOCATION'/setup-deploy-config.log'
+ssh $SSH_USER@$SSH_HOST "KIBANA_USERNAME=$KIBANA_USERNAME KIBANA_PASSWORD=$KIBANA_PASSWORD SLACK_WEBHOOK_URL=$SLACK_WEBHOOK_URL /tmp/compose/infrastructure/setup-deploy-config.sh $HOST | tee -a $LOG_LOCATION/setup-deploy-config.log"
 
 # Deploy the OpenCRVS stack onto the swarm
 if [[ "$ENV" = "development" ]]; then

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createServer } from '@auth/index'
+import { createServer } from '@auth/server'
 import { get, setex } from '@auth/database'
 import { INVALID_TOKEN_NAMESPACE } from '@auth/constants'
 

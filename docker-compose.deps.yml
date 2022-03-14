@@ -8,7 +8,8 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 version: '3.3'
-
+volumes:
+  metricbeat:
 services:
   mongo1:
     image: mongo:4.4
@@ -23,6 +24,10 @@ services:
     restart: unless-stopped
     environment:
       - discovery.type=single-node
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.0
+    restart: unless-stopped
 
   influxdb:
     image: influxdb:1.7.9
