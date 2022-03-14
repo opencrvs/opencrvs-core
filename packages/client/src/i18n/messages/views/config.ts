@@ -80,7 +80,7 @@ const messagesToDefine: IConfigMessages = {
   },
   govtLogoChangeNotification: {
     id: 'config.application.govtLogoChangeNotification',
-    defaultMessage: 'Country govt logo of application updated',
+    defaultMessage: 'Government logo updated',
     description: 'Message for government logo change notification'
   },
   govtLogoFileLimitError: {
