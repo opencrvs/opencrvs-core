@@ -40,6 +40,7 @@ describe('Verify handlers', () => {
   describe('birthEventHandler', () => {
     beforeEach(async () => {
       server = await createServer()
+      fetch.resetMocks()
     })
 
     it('should return status code 200 if the composition indexed correctly', async () => {
