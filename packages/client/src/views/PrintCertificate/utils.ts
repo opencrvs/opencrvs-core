@@ -16,8 +16,9 @@ import { getAvailableLanguages } from '@client/i18n/utils'
 import { ILanguageState } from '@client/i18n/reducer'
 import { IPrintableApplication } from '@client/applications'
 
-const FREE_PERIOD = window.config.CERTIFICATE_PRINT_CHARGE_FREE_PERIOD
-const CHARGE_UP_LIMIT = window.config.CERTIFICATE_PRINT_CHARGE_UP_LIMIT
+//todo:ocrvs-2562
+const FREE_PERIOD = 36500
+const CHARGE_UP_LIMIT = 36500
 
 const LOWEST_CHARGE = window.config.CERTIFICATE_PRINT_LOWEST_CHARGE
 const HIGHEST_CHARGE = window.config.CERTIFICATE_PRINT_HIGHEST_CHARGE

@@ -77,8 +77,6 @@ export const updateApplicationConfig = Joi.object({
   }),
   DESKTOP_TIME_OUT_MILLISECONDS: Joi.number(),
   LANGUAGES: Joi.string(),
-  CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: Joi.number(),
-  CERTIFICATE_PRINT_CHARGE_UP_LIMIT: Joi.number(),
   CERTIFICATE_PRINT_LOWEST_CHARGE: Joi.number(),
   CERTIFICATE_PRINT_HIGHEST_CHARGE: Joi.number(),
   UI_POLLING_INTERVAL: Joi.number(),

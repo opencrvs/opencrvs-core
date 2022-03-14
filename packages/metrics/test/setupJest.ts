@@ -46,8 +46,6 @@ jest.mock('@metrics/configApi', () => {
         AUTH_URL: 'http://localhost:4040',
         RESOURCES_URL: 'http://localhost:3040',
         APPLICATION_NAME: 'Farajaland CRVS',
-        CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 36500,
-        CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 36500,
         CERTIFICATE_PRINT_LOWEST_CHARGE: 0,
         CERTIFICATE_PRINT_HIGHEST_CHARGE: 0,
         UI_POLLING_INTERVAL: 5000,

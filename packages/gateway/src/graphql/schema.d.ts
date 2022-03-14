@@ -423,10 +423,6 @@ export interface GQLApplicationConfiguration {
   COUNTRY_LOGO_RENDER_HEIGHT?: number
   DESKTOP_TIME_OUT_MILLISECONDS?: number
   LANGUAGES?: string
-  CERTIFICATE_PRINT_CHARGE_FREE_PERIOD?: number
-  CERTIFICATE_PRINT_CHARGE_UP_LIMIT?: number
-  CERTIFICATE_PRINT_LOWEST_CHARGE?: number
-  CERTIFICATE_PRINT_HIGHEST_CHARGE?: number
   UI_POLLING_INTERVAL?: number
   FIELD_AGENT_AUDIT_LOCATIONS?: string
   APPLICATION_AUDIT_LOCATIONS?: string
@@ -451,8 +447,6 @@ export interface GQLApplicationConfigurationInput {
   COUNTRY_LOGO_RENDER_HEIGHT?: number
   DESKTOP_TIME_OUT_MILLISECONDS?: number
   LANGUAGES?: string
-  CERTIFICATE_PRINT_CHARGE_FREE_PERIOD?: number
-  CERTIFICATE_PRINT_CHARGE_UP_LIMIT?: number
   CERTIFICATE_PRINT_LOWEST_CHARGE?: number
   CERTIFICATE_PRINT_HIGHEST_CHARGE?: number
   UI_POLLING_INTERVAL?: number
@@ -3528,10 +3522,6 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   COUNTRY_LOGO_RENDER_HEIGHT?: ApplicationConfigurationToCOUNTRY_LOGO_RENDER_HEIGHTResolver<TParent>
   DESKTOP_TIME_OUT_MILLISECONDS?: ApplicationConfigurationToDESKTOP_TIME_OUT_MILLISECONDSResolver<TParent>
   LANGUAGES?: ApplicationConfigurationToLANGUAGESResolver<TParent>
-  CERTIFICATE_PRINT_CHARGE_FREE_PERIOD?: ApplicationConfigurationToCERTIFICATE_PRINT_CHARGE_FREE_PERIODResolver<TParent>
-  CERTIFICATE_PRINT_CHARGE_UP_LIMIT?: ApplicationConfigurationToCERTIFICATE_PRINT_CHARGE_UP_LIMITResolver<TParent>
-  CERTIFICATE_PRINT_LOWEST_CHARGE?: ApplicationConfigurationToCERTIFICATE_PRINT_LOWEST_CHARGEResolver<TParent>
-  CERTIFICATE_PRINT_HIGHEST_CHARGE?: ApplicationConfigurationToCERTIFICATE_PRINT_HIGHEST_CHARGEResolver<TParent>
   UI_POLLING_INTERVAL?: ApplicationConfigurationToUI_POLLING_INTERVALResolver<TParent>
   FIELD_AGENT_AUDIT_LOCATIONS?: ApplicationConfigurationToFIELD_AGENT_AUDIT_LOCATIONSResolver<TParent>
   APPLICATION_AUDIT_LOCATIONS?: ApplicationConfigurationToAPPLICATION_AUDIT_LOCATIONSResolver<TParent>
@@ -3603,34 +3593,6 @@ export interface ApplicationConfigurationToDESKTOP_TIME_OUT_MILLISECONDSResolver
 }
 
 export interface ApplicationConfigurationToLANGUAGESResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface ApplicationConfigurationToCERTIFICATE_PRINT_CHARGE_FREE_PERIODResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface ApplicationConfigurationToCERTIFICATE_PRINT_CHARGE_UP_LIMITResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface ApplicationConfigurationToCERTIFICATE_PRINT_LOWEST_CHARGEResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface ApplicationConfigurationToCERTIFICATE_PRINT_HIGHEST_CHARGEResolver<
   TParent = any,
   TResult = any
 > {

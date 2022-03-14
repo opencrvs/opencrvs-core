@@ -42,8 +42,6 @@ export interface IApplicationConfigurationModel extends Document {
   CURRENCY: ICurrency
   DESKTOP_TIME_OUT_MILLISECONDS: number
   LANGUAGES: string
-  CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: number
-  CERTIFICATE_PRINT_CHARGE_UP_LIMIT: number
   CERTIFICATE_PRINT_LOWEST_CHARGE: number
   CERTIFICATE_PRINT_HIGHEST_CHARGE: number
   UI_POLLING_INTERVAL: number
@@ -96,16 +94,6 @@ const systemSchema = new Schema({
     default: 900000
   },
   LANGUAGES: { type: String, required: false, default: 'en' },
-  CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: {
-    type: Number,
-    required: false,
-    default: 36500
-  },
-  CERTIFICATE_PRINT_CHARGE_UP_LIMIT: {
-    type: Number,
-    required: false,
-    default: 36500
-  },
   CERTIFICATE_PRINT_LOWEST_CHARGE: {
     type: Number,
     required: false,
