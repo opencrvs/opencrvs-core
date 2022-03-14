@@ -17,6 +17,7 @@ import { Spinner } from '@opencrvs/components/lib/interface'
 import { withTheme, ITheme } from '@client/styledComponents'
 import { ISelectOption } from '@opencrvs/components/lib/forms'
 import { Button } from '@opencrvs/components/lib/buttons/Button'
+import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
 import { TertiaryButton } from '@opencrvs/components/lib/buttons'
 const Wrapper = styled.div`
   ${({ theme }) => theme.fonts.bodyStyle};
@@ -41,11 +42,11 @@ const ProcessingSpinner = styled(Spinner)`
 `
 
 const PreviewContainer = styled.div`
-  background: ${({ theme }) => theme.colors.background};
+  background: ${({ theme }) => theme.colors.grey200};
   ${({ theme }) => theme.fonts.bodyBoldStyle};
-  font-style: normal;
-  text-decoration-line: underline;
   padding: 5px 10px;
+  border-radius: 4px;
+  height: 48px;
   margin: 10px 0px;
   display: flex;
   flex-flow: row;
@@ -89,7 +90,8 @@ class DocumentListPreviewComponent extends React.Component<IProps> {
         {documents &&
           documents.map((document: IFileValue, key: number) => (
             <PreviewContainer key={`preview_${key}`}>
-              <PreviewLink
+              <PaperClip />
+              <LinkButton
                 id={`document_${(document.optionValues[1] as string).replace(
                   /\s/g,
                   ''
@@ -97,13 +99,12 @@ class DocumentListPreviewComponent extends React.Component<IProps> {
                 key={key}
                 onClick={(_) => this.props.onSelect(document)}
               >
-                <PaperClip />
                 <span>
                   {this.getFormattedLabelForDocType(
                     document.optionValues[1] as string
                   ) || document.optionValues[1]}
                 </span>
-              </PreviewLink>
+              </LinkButton>
               <IconContainer>
                 <TertiaryButton
                   id="preview_delete"

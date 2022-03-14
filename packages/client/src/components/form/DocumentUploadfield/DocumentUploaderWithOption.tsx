@@ -38,18 +38,16 @@ const options = {
   useWebWorker: true
 }
 
-const UploaderWrapper = styled.div`
-  margin-bottom: 20px;
-`
+const UploaderWrapper = styled.div``
 const Label = styled.label`
   position: relative;
-  top: -2px;
+  margin-bottom: 4px;
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.bodyStyle};
 `
 const Flex = styled.div<{ splitView?: boolean }>`
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: no-wrap;
   margin-bottom: ${({ splitView }) => {
     return splitView ? '10px' : '0px'
   }};
@@ -58,20 +56,11 @@ export const ErrorMessage = styled.div`
   margin-bottom: 20px;
 `
 const DocumentUploader = styled(ImageUploader)`
-  color: ${({ theme }) => theme.colors.primary};
-  background: ${({ theme }) => theme.colors.white};
-  border: ${({ theme }) => `2px solid ${theme.colors.primary}`};
-  box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
-  border-radius: 2px;
-  ${({ theme }) => theme.fonts.buttonStyle};
-  height: 40px;
-  text-transform: initial;
-  margin-left: 10px;
-  padding: 0px 30px;
+  margin-left: 8px;
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin-left: 0px;
-    margin-top: 10px;
+    margin-left: 16px;
+    margin-top: 16px;
   }
 `
 

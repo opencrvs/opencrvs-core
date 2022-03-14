@@ -15,8 +15,6 @@ import { SecondaryButton } from '../buttons'
 
 const ImageBase = styled(SecondaryButton)`
   width: auto;
-  height: 48px;
-  padding: 0 35px;
   ${({ theme }) => theme.fonts.bodyBoldStyle};
   align-items: center;
   display: inline-flex;
