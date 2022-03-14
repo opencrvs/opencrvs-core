@@ -54,6 +54,7 @@ export interface IApplicationConfigurationModel extends Document {
   LOGROCKET: string
   PHONE_NUMBER_PATTERN: IPhoneNumberPattern
   BIRTH_REGISTRATION_TARGET: number
+  LATE_BIRTH_REGISTRATION_TARGET: number
   DEATH_REGISTRATION_TARGET: number
   NID_NUMBER_PATTERN: INIDNumberPattern
 }
@@ -131,6 +132,11 @@ const systemSchema = new Schema({
     type: Number,
     required: false,
     default: 45
+  },
+  LATE_BIRTH_REGISTRATION_TARGET: {
+    type: Number,
+    required: false,
+    default: 365
   },
   DEATH_REGISTRATION_TARGET: {
     type: Number,

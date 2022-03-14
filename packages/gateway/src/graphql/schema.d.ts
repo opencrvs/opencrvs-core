@@ -423,6 +423,8 @@ export interface GQLApplicationConfiguration {
   COUNTRY_LOGO_RENDER_HEIGHT?: number
   DESKTOP_TIME_OUT_MILLISECONDS?: number
   LANGUAGES?: string
+  CERTIFICATE_PRINT_LOWEST_CHARGE?: number
+  CERTIFICATE_PRINT_HIGHEST_CHARGE?: number
   UI_POLLING_INTERVAL?: number
   FIELD_AGENT_AUDIT_LOCATIONS?: string
   APPLICATION_AUDIT_LOCATIONS?: string
@@ -433,6 +435,7 @@ export interface GQLApplicationConfiguration {
   LOGROCKET?: string
   PHONE_NUMBER_PATTERN?: GQLPhoneNumberPattern
   BIRTH_REGISTRATION_TARGET?: number
+  LATE_BIRTH_REGISTRATION_TARGET?: number
   DEATH_REGISTRATION_TARGET?: number
   NID_NUMBER_PATTERN?: GQLNIDNumberPattern
 }
@@ -459,6 +462,7 @@ export interface GQLApplicationConfigurationInput {
   LOGROCKET?: string
   PHONE_NUMBER_PATTERN?: GQLPhoneNumberPatternInput
   BIRTH_REGISTRATION_TARGET?: number
+  LATE_BIRTH_REGISTRATION_TARGET?: number
   DEATH_REGISTRATION_TARGET?: number
   NID_NUMBER_PATTERN?: GQLNIDNumberPatternInput
 }
@@ -3522,6 +3526,8 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   COUNTRY_LOGO_RENDER_HEIGHT?: ApplicationConfigurationToCOUNTRY_LOGO_RENDER_HEIGHTResolver<TParent>
   DESKTOP_TIME_OUT_MILLISECONDS?: ApplicationConfigurationToDESKTOP_TIME_OUT_MILLISECONDSResolver<TParent>
   LANGUAGES?: ApplicationConfigurationToLANGUAGESResolver<TParent>
+  CERTIFICATE_PRINT_LOWEST_CHARGE?: ApplicationConfigurationToCERTIFICATE_PRINT_LOWEST_CHARGEResolver<TParent>
+  CERTIFICATE_PRINT_HIGHEST_CHARGE?: ApplicationConfigurationToCERTIFICATE_PRINT_HIGHEST_CHARGEResolver<TParent>
   UI_POLLING_INTERVAL?: ApplicationConfigurationToUI_POLLING_INTERVALResolver<TParent>
   FIELD_AGENT_AUDIT_LOCATIONS?: ApplicationConfigurationToFIELD_AGENT_AUDIT_LOCATIONSResolver<TParent>
   APPLICATION_AUDIT_LOCATIONS?: ApplicationConfigurationToAPPLICATION_AUDIT_LOCATIONSResolver<TParent>
@@ -3532,6 +3538,7 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   LOGROCKET?: ApplicationConfigurationToLOGROCKETResolver<TParent>
   PHONE_NUMBER_PATTERN?: ApplicationConfigurationToPHONE_NUMBER_PATTERNResolver<TParent>
   BIRTH_REGISTRATION_TARGET?: ApplicationConfigurationToBIRTH_REGISTRATION_TARGETResolver<TParent>
+  LATE_BIRTH_REGISTRATION_TARGET?: ApplicationConfigurationToLATE_BIRTH_REGISTRATION_TARGETResolver<TParent>
   DEATH_REGISTRATION_TARGET?: ApplicationConfigurationToDEATH_REGISTRATION_TARGETResolver<TParent>
   NID_NUMBER_PATTERN?: ApplicationConfigurationToNID_NUMBER_PATTERNResolver<TParent>
 }
@@ -3593,6 +3600,20 @@ export interface ApplicationConfigurationToDESKTOP_TIME_OUT_MILLISECONDSResolver
 }
 
 export interface ApplicationConfigurationToLANGUAGESResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToCERTIFICATE_PRINT_LOWEST_CHARGEResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToCERTIFICATE_PRINT_HIGHEST_CHARGEResolver<
   TParent = any,
   TResult = any
 > {
@@ -3663,6 +3684,13 @@ export interface ApplicationConfigurationToPHONE_NUMBER_PATTERNResolver<
 }
 
 export interface ApplicationConfigurationToBIRTH_REGISTRATION_TARGETResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToLATE_BIRTH_REGISTRATION_TARGETResolver<
   TParent = any,
   TResult = any
 > {

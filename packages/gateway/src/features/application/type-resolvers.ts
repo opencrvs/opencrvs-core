@@ -38,6 +38,7 @@ export interface IApplicationConfigPayload {
   LOGROCKET: string
   PHONE_NUMBER_PATTERN: GQLPhoneNumberPatternInput
   BIRTH_REGISTRATION_TARGET: number
+  LATE_BIRTH_REGISTRATION_TARGET: number
   DEATH_REGISTRATION_TARGET: number
   NID_NUMBER_PATTERN: GQLNIDNumberPatternInput
 }

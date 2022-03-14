@@ -354,6 +354,7 @@ export const mockOfflineData = {
       }
     },
     BIRTH_REGISTRATION_TARGET: 45,
+    LATE_BIRTH_REGISTRATION_TARGET: 365,
     DEATH_REGISTRATION_TARGET: 45,
     NID_NUMBER_PATTERN: {
       pattern: /^[0-9]{9}$/,

@@ -55,6 +55,7 @@ interface Window {
     LOGROCKET: string
     SENTRY: string
     BIRTH_REGISTRATION_TARGET: number
+    LATE_BIRTH_REGISTRATION_TARGET: number
     DEATH_REGISTRATION_TARGET: number
   }
 }

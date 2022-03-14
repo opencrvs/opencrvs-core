@@ -136,6 +136,7 @@ const navigatorMock = {
   SENTRY: 'https://2ed906a0ba1c4de2ae3f3f898ec9df0b@sentry.io/1774551',
   LOGROCKET: 'opencrvs-foundation/opencrvs-bangladesh',
   BIRTH_REGISTRATION_TARGET: 45,
+  LATE_BIRTH_REGISTRATION_TARGET: 365,
   DEATH_REGISTRATION_TARGET: 45,
   NID_NUMBER_PATTERN: {
     pattern: /^[0-9]{9}$/,
