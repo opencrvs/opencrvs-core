@@ -24,7 +24,6 @@ import { InputField, TextInput } from '@opencrvs/components/lib/forms'
 import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { Alert } from '@opencrvs/components/lib/icons/Alert'
-import { configApplicationMutations } from '@client/views/SysAdmin/Config/mutations'
 import { updateOfflineConfigData } from '@client/offline/actions'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
@@ -62,12 +61,13 @@ export const Content = styled.div`
 `
 const ErrorContent = styled.div`
   display: flex;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     flex-direction: column-reverse;
   }
 `
 const Field = styled.div`
+  width: 100%;
   margin-bottom: 30px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin-bottom: 0px;
@@ -348,7 +348,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
         )}
         {changeModalName === GeneralActionId.GOVT_LOGO && (
           <Content>
-            <Field>
+            <Field id="govtLogoFile">
               <SimpleDocumentUploader
                 label={this.state.logoFile.name ? this.state.logoFile.name : ''}
                 disableDeleteInPreview={false}

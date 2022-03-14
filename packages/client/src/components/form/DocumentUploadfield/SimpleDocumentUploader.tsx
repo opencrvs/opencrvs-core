@@ -64,8 +64,8 @@ type IFullProps = {
 type IState = {
   error: string
   previewImage: IAttachmentValue | null
+  filesBeingUploaded: Array<{ label: string }>
 }
-
 class SimpleDocumentUploaderComponent extends React.Component<
   IFullProps,
   IState
@@ -74,7 +74,8 @@ class SimpleDocumentUploaderComponent extends React.Component<
     super(props)
     this.state = {
       error: '',
-      previewImage: null
+      previewImage: null,
+      filesBeingUploaded: []
     }
   }
 
@@ -83,6 +84,15 @@ class SimpleDocumentUploaderComponent extends React.Component<
       return
     }
     const allowedDocType = this.props.allowedDocType
+
+    this.setState(() => ({
+      filesBeingUploaded: [
+        ...this.state.filesBeingUploaded,
+        {
+          label: uploadedImage.name
+        }
+      ]
+    }))
 
     this.props.onUploadingStateChanged &&
       this.props.onUploadingStateChanged(true)
@@ -112,10 +122,16 @@ class SimpleDocumentUploaderComponent extends React.Component<
           this.setState({
             error: ''
           })
+          this.setState({
+            filesBeingUploaded: []
+          })
         })
         .catch(() => {
           this.props.onUploadingStateChanged &&
             this.props.onUploadingStateChanged(false)
+          this.setState({
+            filesBeingUploaded: []
+          })
           allowedDocType &&
             allowedDocType.length > 0 &&
             this.setState({
@@ -165,18 +181,12 @@ class SimpleDocumentUploaderComponent extends React.Component<
             <ErrorText id="field-error">{errorMessage}</ErrorText>
           )}
         </ErrorMessage>
-        {(!files || !files.data) && (
-          <DocumentUploader
-            id="upload_document"
-            title={intl.formatMessage(messages.uploadFile)}
-            handleFileChange={this.handleFileChange}
-          />
-        )}
         <DocumentListPreview
           attachment={files}
           onSelect={this.selectForPreview}
           label={label}
           onDelete={this.onDelete}
+          processingDocuments={this.state.filesBeingUploaded}
         />
         {this.state.previewImage && (
           <DocumentPreview
@@ -185,6 +195,14 @@ class SimpleDocumentUploaderComponent extends React.Component<
             title={intl.formatMessage(buttonMessages.preview)}
             goBack={this.closePreviewSection}
             onDelete={this.onDelete}
+          />
+        )}
+        {(!files || !files.data) && (
+          <DocumentUploader
+            id="upload_document"
+            title={intl.formatMessage(messages.uploadFile)}
+            handleFileChange={this.handleFileChange}
+            disabled={this.state.filesBeingUploaded.length > 0}
           />
         )}
       </>
