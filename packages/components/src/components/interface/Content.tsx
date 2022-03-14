@@ -28,6 +28,7 @@ const Container = styled.div<{ size: string }>`
 `
 const Header = styled.div`
   display: flex;
+  align-items: center;
   height: 72px;
   align-items: center;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
@@ -80,6 +81,8 @@ const Title = styled.div`
 `
 const Icon = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
+  display: flex;
+  align-items: center;
 `
 
 export enum ContentSize {

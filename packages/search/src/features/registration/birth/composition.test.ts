@@ -40,14 +40,14 @@ describe('Verify handlers', () => {
   describe('birthEventHandler', () => {
     beforeEach(async () => {
       server = await createServer()
+      fetch.resetMocks()
     })
 
     it('should return status code 200 if the composition indexed correctly', async () => {
       const mockedIndexComposition = indexComposition as jest.Mocked<any>
       const mockedSearchComposition = searchComposition as jest.Mocked<any>
-      const mockedSearchByCompositionId = searchByCompositionId as jest.Mocked<
-        any
-      >
+      const mockedSearchByCompositionId =
+        searchByCompositionId as jest.Mocked<any>
       const mockedUpdateComposition = updateComposition as jest.Mocked<any>
       mockedIndexComposition.mockReturnValue({})
       mockedSearchComposition.mockReturnValue(mockSearchResponse)
@@ -90,9 +90,8 @@ describe('Verify handlers', () => {
     it('should return status code 200 if the composition indexed correctly', async () => {
       const mockedIndexComposition = indexComposition as jest.Mocked<any>
       const mockedSearchComposition = searchComposition as jest.Mocked<any>
-      const mockedSearchByCompositionId = searchByCompositionId as jest.Mocked<
-        any
-      >
+      const mockedSearchByCompositionId =
+        searchByCompositionId as jest.Mocked<any>
       const mockedUpdateComposition = updateComposition as jest.Mocked<any>
       mockedIndexComposition.mockReturnValue({})
       mockedSearchComposition.mockReturnValue(

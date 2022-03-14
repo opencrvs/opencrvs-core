@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 export * from './Activity'
+export * from './Archive'
 export * from './ArrowBack'
 export * from './ArrowForward'
 export * from './Hamburger'

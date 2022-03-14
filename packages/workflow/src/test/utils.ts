@@ -549,6 +549,7 @@ export const testFhirTaskBundle = {
       resource: {
         resourceType: 'Task',
         status: 'requested',
+        intent: '',
         code: {
           coding: [{ system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }]
         },
