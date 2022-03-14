@@ -610,7 +610,9 @@ const getDeclarationInfo = (
       informant: informant
     }
   }
-  const mobileActions = actions.map((action) => <MobileDiv>{action}</MobileDiv>)
+  const mobileActions = actions.map((action, index) => (
+    <MobileDiv key={index}>{action}</MobileDiv>
+  ))
   return (
     <>
       <div>
@@ -1283,10 +1285,14 @@ function RecordAuditBody({
       goToPage
     })
   )
-  mobileActions.push(actions[actions.length - 1])
-  desktopActionsView.push(
-    <DesktopDiv>{actions[actions.length - 1]}</DesktopDiv>
-  )
+  if (actions[actions.length - 1].key) {
+    mobileActions.push(actions[actions.length - 1])
+    desktopActionsView.push(
+      <DesktopDiv key={actions.length}>
+        {actions[actions.length - 1]}
+      </DesktopDiv>
+    )
+  }
 
   actions.push(
     showUpdateButton({
@@ -1297,11 +1303,14 @@ function RecordAuditBody({
       goToPage
     })
   )
-
-  mobileActions.push(actions[actions.length - 1])
-  desktopActionsView.push(
-    <DesktopDiv>{actions[actions.length - 1]}</DesktopDiv>
-  )
+  if (actions[actions.length - 1].key) {
+    mobileActions.push(actions[actions.length - 1])
+    desktopActionsView.push(
+      <DesktopDiv key={actions.length}>
+        {actions[actions.length - 1]}
+      </DesktopDiv>
+    )
+  }
 
   actions.push(
     showPrintButton({
@@ -1313,11 +1322,14 @@ function RecordAuditBody({
       goToTeamUserList
     })
   )
-
-  mobileActions.push(actions[actions.length - 1])
-  desktopActionsView.push(
-    <DesktopDiv>{actions[actions.length - 1]}</DesktopDiv>
-  )
+  if (actions[actions.length - 1].key) {
+    mobileActions.push(actions[actions.length - 1])
+    desktopActionsView.push(
+      <DesktopDiv key={actions.length}>
+        {actions[actions.length - 1]}
+      </DesktopDiv>
+    )
+  }
 
   let regForm: IForm
   const eventType = declaration.type
