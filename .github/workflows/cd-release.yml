@@ -49,4 +49,4 @@ jobs:
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
       - name: Deploy to development
         run: |
-          yarn deploy:qa farajaland.opencrvs.org $(git rev-parse --short HEAD) ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 3
+          yarn deploy:qa farajaland.opencrvs.org $(git rev-parse --short HEAD) ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 3 ${{ secrets.SLACK_WEBHOOK_URL }} ${{ secrets.KIBANA_USERNAME }} ${{ secrets.KIBANA_PASSWORD }}

@@ -190,10 +190,13 @@ COUNTRY_CONFIG_VERSION can be any OpenCRVS Country Configuration docker image ta
 COUNTRY_CONFIG_PATH directory path to where your country configuration repository is locally checked out
 REPLICAS number of supported servers. Can be 1, 3 or 5
 
+The following options are currently required, but will be made configurable:
+SLACK_WEBHOOK_URL, KIBANA_USERNAME & KIBANA_PASSWORD must be set as environent variables and are used by Kibana to alert you of server issues and to protect access to Kibana
+
 E.G.:
 
 ```
-yarn deploy:qa farajaland-qa.opencrvs.org 7b994cd 88a5a83 opencrvs-farajaland 1
+yarn deploy:qa farajaland-qa.opencrvs.org 7b994cd 88a5a83 opencrvs-farajaland 1 env.SLACK_WEBHOOK_URL env.KIBANA_USERNAME env.KIBANA_PASSWORD
 ```
 
 ## Emergency Backup & Restore
