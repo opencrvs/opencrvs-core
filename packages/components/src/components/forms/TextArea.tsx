@@ -20,15 +20,16 @@ interface ITextAreaProps {
 const StyledTextArea = styled.textarea<ITextAreaProps>`
   ${({ theme }) => theme.fonts.bigBodyStyle};
   width: 100%;
-  padding: 10px;
+  padding: 8px;
   min-height: 104px;
-  max-width: 344px;
+  min-width: 344px;
+  border-radius: 4px;
   border: 2px solid ${({ theme }) => theme.colors.grey600};
   &:focus {
-    box-shadow: 0 0 0px 2px ${({ theme }) => theme.colors.yellow};
+    box-shadow: 0 0 0px 3px ${({ theme }) => theme.colors.yellow};
     outline: 0;
   }
-  background-color: ${({ theme }) => theme.colors.background};
+  background-color: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
 
   &::-webkit-input-placeholder {

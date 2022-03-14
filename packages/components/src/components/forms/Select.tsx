@@ -46,12 +46,13 @@ const DropdownIndicator = (props: IndicatorProps<ISelectOption>) => {
 const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
   width: 100%;
   ${({ theme }) => theme.fonts.bodyStyle};
+
   .react-select__control {
     background: ${({ theme }) => theme.colors.white};
     border-radius: 4px;
     height: 40px;
     padding: 0 8px;
-    ${({ theme }) => theme.fonts.bodyStyle};
+    ${({ theme }) => theme.fonts.bigBodyStyle};
     border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '2px')};
     ${({ error, touched, theme }) =>
       error && touched ? theme.colors.negative : theme.colors.copy};
@@ -63,6 +64,20 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
     &:focus {
       outline: none;
     }
+  }
+
+  .react-select__menuList {
+    &:hover {
+      background: ${({ theme }) => theme.colors.grey200};
+    }
+  }
+
+  .react-select__placeholder {
+    ${({ theme }) => theme.fonts.bigBodyStyle};
+  }
+
+  .react-select__dropdown-indicator {
+    padding: 0;
   }
 
   .react-select__indicator-separator {

@@ -45,7 +45,7 @@ export const LinkButton = styled(Button)<{
   }
 
   &:disabled {
-    color: ${({ theme }) => theme.colors.grey500};
+    color: ${({ theme }) => theme.colors.grey400};
     background-color: transparent;
   }
 `

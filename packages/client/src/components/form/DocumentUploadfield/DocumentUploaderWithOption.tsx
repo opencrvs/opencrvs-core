@@ -39,21 +39,22 @@ const options = {
 }
 
 const UploaderWrapper = styled.div``
+
 const Label = styled.label`
   position: relative;
-  margin-bottom: 4px;
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.bigBodyStyle};
 `
 const Flex = styled.div<{ splitView?: boolean }>`
   display: flex;
   flex-wrap: no-wrap;
+  margin-top: 6px;
   margin-bottom: ${({ splitView }) => {
     return splitView ? '10px' : '0px'
   }};
 `
 export const ErrorMessage = styled.div`
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 `
 const DocumentUploader = styled(ImageUploader)`
   margin-left: 8px;

@@ -7743,7 +7743,7 @@ export const registerForms = {
           id: 'form.section.documents.name'
         },
         title: {
-          defaultMessage: 'Attaching supporting documents',
+          defaultMessage: 'Upload supporting documents',
           description: 'Form section title for Documents',
           id: 'form.section.documents.title'
         },

@@ -16,43 +16,28 @@ import { IFileValue, IAttachmentValue, IFormFieldValue } from '@client/forms'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { withTheme, ITheme } from '@client/styledComponents'
 import { ISelectOption } from '@opencrvs/components/lib/forms'
-import { Button } from '@opencrvs/components/lib/buttons/Button'
-import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
-import { TertiaryButton } from '@opencrvs/components/lib/buttons'
-const Wrapper = styled.div`
-  ${({ theme }) => theme.fonts.bodyStyle};
-`
-const PreviewLink = styled.div<{ disabled?: boolean }>`
-  color: ${({ disabled, theme }) =>
-    disabled ? theme.colors.disabled : theme.colors.primary};
-  align-items: center;
-  display: flex;
-  cursor: pointer;
-  span {
-    margin-left: 8px;
-  }
+import { LinkButton, CircleButton } from '@opencrvs/components/lib/buttons'
 
-  &:hover span {
-    text-decoration: underline;
-  }
+const Wrapper = styled.div``
+
+const PreviewContainer = styled.div`
+  background: ${({ theme }) => theme.colors.grey100};
+  padding: 8px 16px;
+  align-items: center;
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
+  border-radius: 4px;
+  height: 48px;
+  margin: 8px 0px;
+  display: flex;
+  gap: 8px;
+  flex-flow: row;
 `
 
 const ProcessingSpinner = styled(Spinner)`
   margin-left: auto;
 `
 
-const PreviewContainer = styled.div`
-  background: ${({ theme }) => theme.colors.grey200};
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
-  padding: 5px 10px;
-  border-radius: 4px;
-  height: 48px;
-  margin: 10px 0px;
-  display: flex;
-  flex-flow: row;
-`
-
-const IconContainer = styled.div`
+const DeleteContainer = styled.div`
   margin-left: auto;
 `
 
@@ -92,12 +77,13 @@ class DocumentListPreviewComponent extends React.Component<IProps> {
             <PreviewContainer key={`preview_${key}`}>
               <PaperClip />
               <LinkButton
+                isBoldLink
                 id={`document_${(document.optionValues[1] as string).replace(
                   /\s/g,
                   ''
                 )}_link`}
                 key={key}
-                onClick={(_) => this.props.onSelect(document)}
+                onClick={() => this.props.onSelect(document)}
               >
                 <span>
                   {this.getFormattedLabelForDocType(
@@ -105,43 +91,48 @@ class DocumentListPreviewComponent extends React.Component<IProps> {
                   ) || document.optionValues[1]}
                 </span>
               </LinkButton>
-              <IconContainer>
-                <TertiaryButton
+              <DeleteContainer>
+                <CircleButton
                   id="preview_delete"
-                  icon={() => <Delete color="red" />}
                   onClick={() => onDelete && onDelete(document)}
-                />
-              </IconContainer>
+                >
+                  <Delete color="red" />
+                </CircleButton>
+              </DeleteContainer>
             </PreviewContainer>
           ))}
         {processingDocuments &&
           processingDocuments.map(({ label }) => (
             <PreviewContainer key={label}>
-              <PreviewLink disabled={true} key={label}>
-                <PaperClip stroke={theme.colors.disabled} />
+              <PaperClip stroke={theme.colors.grey400} />
+              <LinkButton isBoldLink disabled={true} key={label}>
                 <span>{this.getFormattedLabelForDocType(label) || label}</span>
-              </PreviewLink>
-              <IconContainer>
+              </LinkButton>
+              <DeleteContainer>
                 <ProcessingSpinner
                   size={24}
                   id={`document_${label}_processing`}
                 />
-              </IconContainer>
+              </DeleteContainer>
             </PreviewContainer>
           ))}
         {attachment && attachment.data && label && (
           <PreviewContainer>
-            <PreviewLink onClick={(_) => this.props.onSelect(attachment)}>
-              <PaperClip />
+            <PaperClip />
+            <LinkButton
+              isBoldLink
+              onClick={() => this.props.onSelect(attachment)}
+            >
               <span>{this.getFormattedLabelForDocType(label) || label}</span>
-            </PreviewLink>
-            <IconContainer>
-              <TertiaryButton
+            </LinkButton>
+            <DeleteContainer>
+              <CircleButton
                 id="preview_delete"
-                icon={() => <Delete color="red" />}
                 onClick={() => onDelete && onDelete(attachment)}
-              />
-            </IconContainer>
+              >
+                <Delete color="red" />
+              </CircleButton>
+            </DeleteContainer>
           </PreviewContainer>
         )}
       </Wrapper>

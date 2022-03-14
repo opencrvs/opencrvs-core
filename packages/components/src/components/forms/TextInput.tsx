@@ -32,13 +32,14 @@ const StyledInput = styled.input<ITextInputProps>`
     inputFieldWidth ? `width: ${inputFieldWidth}` : `width: 100%`};
   padding: 8px 10px;
   height: 40px;
+  border-radius: 4px;
   transition: border-color 500ms ease-out;
   box-sizing: border-box;
   outline: none;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.bigBodyStyle};
   color: ${({ theme }) => theme.colors.copy};
   background: ${({ isDisabled, theme }) =>
-    isDisabled ? theme.colors.lightGrey : theme.colors.background};
+    isDisabled ? theme.colors.grey100 : theme.colors.white};
 
   ${({ hideBorder, error, touched, isDisabled, theme }) =>
     hideBorder

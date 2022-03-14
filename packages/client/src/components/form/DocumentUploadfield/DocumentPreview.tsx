@@ -12,7 +12,7 @@
 import * as React from 'react'
 import styled from '@client/styledComponents'
 import { IFileValue, IAttachmentValue } from '@client/forms'
-import { Button } from '@opencrvs/components/lib/buttons'
+import { Button, CircleButton } from '@opencrvs/components/lib/buttons'
 import { ArrowBack, Delete } from '@opencrvs/components/lib/icons'
 import PanViewer from '@opencrvs/components/lib/interface/components/PanViewer'
 const PreviewContainer = styled.div`
@@ -29,7 +29,7 @@ const PreviewContainer = styled.div`
 const PreviewContainerHeader = styled.div`
   width: 100%;
   padding: 0 ${({ theme }) => theme.grid.margin}px;
-  height: 64px;
+  height: 56px;
   position: absolute;
   display: flex;
   justify-content: space-between;
@@ -50,20 +50,20 @@ const ImageHolder = styled.div`
   }
 `
 
-const Title = styled.span`
-  padding-left: 16px;
-  color: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.bodyStyle};
-`
-const BackButton = styled.button`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: ${({ theme }) => theme.colors.white};
-`
+// const Title = styled.span`
+//   padding-left: 16px;
+//   color: ${({ theme }) => theme.colors.white};
+//   ${({ theme }) => theme.fonts.bodyStyle};
+// `
+// const BackButton = styled.button`
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   background: transparent;
+//   border: none;
+//   cursor: pointer;
+//   color: ${({ theme }) => theme.colors.white};
+// `
 type IProps = {
   previewImage: IFileValue | IAttachmentValue
   disableDelete?: boolean
@@ -78,17 +78,17 @@ export class DocumentPreview extends React.Component<IProps> {
     return (
       <PreviewContainer id="preview_image_field">
         <PreviewContainerHeader>
-          <BackButton id="preview_back" onClick={goBack}>
+          <CircleButton id="preview_back" onClick={goBack}>
             <ArrowBack />
-            <Title>{title}</Title>
-          </BackButton>
+          </CircleButton>
           {!disableDelete && (
             <span>
-              <Button
+              <CircleButton
                 id="preview_delete"
-                icon={() => <Delete color="white" />}
                 onClick={() => onDelete(previewImage)}
-              />
+              >
+                <Delete color="red" />
+              </CircleButton>
             </span>
           )}
         </PreviewContainerHeader>
