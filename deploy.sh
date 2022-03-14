@@ -19,7 +19,7 @@ then
 fi
 
 print_usage_and_exit () {
-    echo 'Usage: ./deploy.sh --clear-data=yes|no --restore-metadata=yes|no --update-metadata=yes|no HOST ENV VERSION COUNTRY_CONFIG_VERSION COUNTRY_CONFIG_PATH'
+    echo 'Usage: ./deploy.sh --clear-data=yes|no --restore-metadata=yes|no --update-metadata=yes|no HOST ENV VERSION COUNTRY_CONFIG_VERSION COUNTRY_CONFIG_PATH REPLICAS'
     echo "  --clear-data must have a value of 'yes' or 'no' set e.g. --clear-data=yes"
     echo "  --restore-metadata must have a value of 'yes' or 'no' set e.g. --restore-metadata=yes"
     echo "  --update-metadata must have a value of 'yes' or 'no' set e.g. --update-metadata=yes"
