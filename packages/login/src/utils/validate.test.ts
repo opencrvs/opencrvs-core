@@ -123,9 +123,6 @@ describe('validate', () => {
             'Must be a valid mobile phone number. Starting with 0. e.g. {example}',
           description:
             'The error message that appears on phone numbers where the first character must be a 0'
-        },
-        props: {
-          example: '01741234567'
         }
       }
       expect(phoneNumberFormat(badValue)).toEqual(response)

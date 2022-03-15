@@ -63,10 +63,7 @@ export enum TabId {
 export enum GeneralActionId {
   APPLICATION_NAME = 'changeAppName',
   GOVT_LOGO = 'changeGovtLogo',
-  USER_TIMEOUT = 'changeUsrTimeOut',
   NID_PATTERN = 'changeNidPattern',
-  LOG_ROCKET = 'changeLogrocket',
-  SENTRY = 'changeSentry',
   CURRENCY = 'changeCurrency',
   PHONE_NUMBER = 'changePhnNum'
 }

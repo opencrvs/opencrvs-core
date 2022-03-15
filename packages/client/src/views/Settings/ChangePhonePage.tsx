@@ -282,12 +282,11 @@ class ChangePhoneView extends React.Component<IProps & IDispatchProps, IState> {
                         messages.phoneNumberChangeFormValidationMsg,
                         {
                           num: intl.formatMessage({
-                            defaultMessage: 'at least testing 10 digits',
-                            description: 'Minimum number digit',
+                            defaultMessage: '10',
                             id: 'phone.digit'
                           }),
                           start: intl.formatMessage({
-                            defaultMessage: 'should be start with 0(4|5)',
+                            defaultMessage: '0(4|5)',
                             description: 'Should starts with',
                             id: 'phone.start'
                           })

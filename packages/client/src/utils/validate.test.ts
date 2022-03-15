@@ -244,10 +244,6 @@ describe('validate', () => {
             'Must be a valid {num} digit number that starts with {start}',
           description:
             'The error message that appears on phone numbers where the first two characters must be a 01 and length must be 11'
-        },
-        props: {
-          num: '11',
-          start: '01'
         }
       }
       expect(phoneNumberFormat(badValue)).toEqual(response)

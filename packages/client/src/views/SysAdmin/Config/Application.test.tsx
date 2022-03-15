@@ -30,6 +30,7 @@ beforeEach(async () => {
             updateApplicationConfig: {
               APPLICATION_NAME: 'OPENCRVS',
               NID_NUMBER_PATTERN: '/^[0-9]{10}$/',
+              PHONE_NUMBER_PATTERN: '/^[0-9]{8}$/',
               CURRENCY: {
                 isoCode: 'CAD',
                 languagesAndCountry: ['en-CA']
@@ -132,7 +133,7 @@ describe('application name update test', () => {
 })
 
 describe('NID Pattern update test', () => {
-  it('should show the application name change modal of click on change', async () => {
+  it('should show the application config change modal of click on change', async () => {
     testComponent
       .find('#changeNidPattern')
       .hostNodes()
@@ -297,6 +298,32 @@ describe('NID Pattern update test', () => {
     expect(
       testComponent.find('#changeNidPattern-example-invalid-icon')
     ).toHaveLength(2)
+  })
+})
+
+describe('Phone Number Pattern update test', () => {
+  it('should show the application config change modal of click on change', async () => {
+    testComponent.find('#changePhnNum').hostNodes().first().simulate('click')
+    expect(testComponent.find('#changePhnNumModal').hostNodes()).toHaveLength(1)
+  })
+  it('should change the Phone Number Pattern if click on apply', async () => {
+    testComponent.find('#changePhnNum').hostNodes().first().simulate('click')
+    testComponent
+      .find('#changePhnNumInput')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'changePhnNum', value: '^[0-9]{8}$' }
+      })
+    testComponent.find('#apply_change').hostNodes().simulate('click')
+    await waitForElement(testComponent, '#phoneNumberPattern_value_container')
+    await flushPromises()
+    testComponent.update()
+    expect(
+      testComponent
+        .find('#phoneNumberPattern_value_container_value')
+        .hostNodes()
+        .text()
+    ).toBe('/^[0-9]{8}$/')
   })
 })
 
