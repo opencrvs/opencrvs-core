@@ -192,4 +192,21 @@ describe('country logo update test', () => {
       0
     )
   })
+  it('No error while uploading valid file', async () => {
+    testComponent.find('#changeGovtLogo').hostNodes().first().simulate('click')
+    testComponent.find('#upload_document').hostNodes().simulate('click')
+    testComponent
+      .find('#image_file_uploader_field')
+      .hostNodes()
+      .simulate('change', {
+        target: {
+          files: [
+            getFileFromBase64String(validImageB64String, 'img.png', 'image/png')
+          ]
+        }
+      })
+    testComponent.update()
+    await flushPromises()
+    expect(testComponent.find('#field-error').hostNodes().length).toBe(0)
+  })
 })
