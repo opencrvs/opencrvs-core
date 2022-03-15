@@ -11,7 +11,7 @@
  */
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { createServer } from '@search/index'
+import { createServer } from '@search/server'
 import { searchComposition } from '@search/features/search/service'
 import { mockSearchResult } from '@search/test/utils'
 import { client } from '@search/elasticsearch/client'

@@ -1,0 +1,43 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+# graphic logo are (registered/a) trademark(s) of Plan International.
+name: 'alert'
+type: 'frequency'
+index: 'kibana-alert-history-default'
+is_enabled: true
+num_events: 1
+realert:
+  minutes: 5
+terms_size: 50
+timeframe:
+  minutes: 5
+timestamp_field: '@timestamp'
+timestamp_type: 'iso'
+use_strftime_index: false
+# https://github.com/Yelp/elastalert/issues/1260
+raw_count_keys: false
+alert_subject: 'New Kibana {}: {} ⚠️'
+alert_subject_args:
+  - 'kibana.alert.context.metrics__alert__inventory__threshold.alertState'
+  - 'rule.name'
+alert_text: 'Reason: {}'
+alert_text_args:
+  - 'kibana.alert.context.metrics__alert__inventory__threshold.reason'
+filter:
+  - query:
+      query_string:
+        query: '@timestamp:*'
+alert:
+  - 'slack'
+slack_webhook_url: '{{SLACK_WEBHOOK_URL}}'
+slack_channel_override: '#kibana-alerts'
+slack_emoji_override: ':kissing_cat:'
+slack_msg_color: 'warning'
+slack_parse_override: 'none'
+slack_username_override: 'elastalert'

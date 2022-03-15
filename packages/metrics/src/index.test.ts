@@ -11,7 +11,7 @@
  */
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { createServer } from '@metrics/index'
+import { createServer } from '@metrics/server'
 
 jest.mock('./configApi', () => {
   const originalModule = jest.requireActual('./configApi')

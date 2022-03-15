@@ -10,3 +10,5 @@
 ansible_python_interpreter: /usr/bin/python3
 ansible_user: root
 encrypt_data: False
+swap_file_path: /swapfile
+swap_file_size_mb: 4000

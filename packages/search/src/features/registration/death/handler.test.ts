@@ -14,7 +14,7 @@ import {
   searchByCompositionId,
   updateComposition
 } from '@search/elasticsearch/dbhelper'
-import { createServer } from '@search/index'
+import { createServer } from '@search/server'
 import {
   mockDeathFhirBundle,
   mockDeathFhirBundleWithoutCompositionId,
@@ -82,9 +82,8 @@ describe('Verify handlers', () => {
 
     it('should return status code 200 if the composition indexed correctly', async () => {
       const mockedIndexComposition = indexComposition as jest.Mocked<any>
-      const mockedSearchByCompositionId = searchByCompositionId as jest.Mocked<
-        any
-      >
+      const mockedSearchByCompositionId =
+        searchByCompositionId as jest.Mocked<any>
       mockedIndexComposition.mockResolvedValue({})
       mockedSearchByCompositionId.mockReturnValue(mockSearchResponse)
 
@@ -124,9 +123,8 @@ describe('Verify handlers', () => {
     it('should return status code 200 if the some sections is missing too', async () => {
       fetch.resetMocks()
       const mockedIndexComposition = indexComposition as jest.Mocked<any>
-      const mockedSearchByCompositionId = searchByCompositionId as jest.Mocked<
-        any
-      >
+      const mockedSearchByCompositionId =
+        searchByCompositionId as jest.Mocked<any>
       mockedIndexComposition.mockResolvedValue({})
       mockedSearchByCompositionId.mockReturnValue(mockSearchResponse)
 
@@ -166,9 +164,8 @@ describe('Verify handlers', () => {
     it('should return status code 200 if the composition indexed correctly', async () => {
       fetch.resetMocks()
       const mockedIndexComposition = indexComposition as jest.Mocked<any>
-      const mockedSearchByCompositionId = searchByCompositionId as jest.Mocked<
-        any
-      >
+      const mockedSearchByCompositionId =
+        searchByCompositionId as jest.Mocked<any>
       mockedIndexComposition.mockReturnValue({})
       mockedSearchByCompositionId.mockReturnValue(
         mockSearchResponseWithoutCreatedBy
