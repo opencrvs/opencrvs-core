@@ -19,7 +19,10 @@ import { messages } from '@client/i18n/messages/views/config'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import SuccessSmall from '@opencrvs/components/lib/icons/SuccessSmall'
 import { Cross } from '@opencrvs/components/lib/icons/Cross'
-import { isValidRegEx, isValidExample } from './Utils'
+import {
+  isValidRegEx,
+  isValidExample
+} from '@client/views/SysAdmin/Config/utils'
 
 const ErrorMessageBottom = styled.div<{ marginTop?: number }>`
   position: relative;

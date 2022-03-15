@@ -43,6 +43,7 @@ import { IVerifyCodeNumbers } from '@login/login/actions'
 import { Ii18nReduxFormFieldProps } from '@login/utils/fieldUtils'
 
 import { PrimaryButton } from '@opencrvs/components/lib/buttons/PrimaryButton'
+import { ceil } from 'lodash'
 
 export const messages: {
   [key: string]: MessageDescriptor
@@ -159,17 +160,18 @@ export class StepTwoForm extends React.Component<FullProps> {
       stepOneDetails,
       submissionError
     } = this.props
-    const maskPattern = { startForm: 4, endBefore: 7 }
+    const maskPercentage = 0.6
+    const numberLength = stepOneDetails.mobile.length
+    const unmaskedNumberLength =
+      numberLength - ceil(maskPercentage * numberLength)
+    const startForm = ceil(unmaskedNumberLength / 2)
+    const endBefore = unmaskedNumberLength - startForm
     const mobileNumber = stepOneDetails.mobile.replace(
       stepOneDetails.mobile.slice(
-        maskPattern.startForm,
-        stepOneDetails.mobile.length - maskPattern.endBefore
+        startForm,
+        stepOneDetails.mobile.length - endBefore
       ),
-      '*'.repeat(
-        stepOneDetails.mobile.length -
-          maskPattern.startForm -
-          maskPattern.endBefore
-      )
+      '*'.repeat(stepOneDetails.mobile.length - startForm - endBefore)
     )
     const field = stepTwoFields.code
     return (
