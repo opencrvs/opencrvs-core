@@ -27,12 +27,159 @@ import {
   IConditionals
 } from '@client/forms/index'
 import { formMessageDescriptors } from '@client/i18n/messages'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, concat } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
 
 interface IDefaultRegisterForms {
   birth: ISerializedForm
   death: ISerializedForm
+}
+
+interface ICustomQuestionConfiguration {
+  question: IQuestionConfig
+  field: SerializedFormField
+}
+
+interface ISortedCustomGroup {
+  preceedingDefaultField?: IDefaultField
+  positionTop?: boolean
+  questions: ICustomQuestionConfiguration[]
+  section: ISection
+  group: IGroup
+}
+
+interface IDefaultFieldCustomisation {
+  question: IQuestionConfig
+  defaultField: IDefaultField
+}
+
+interface IFormCustomisations {
+  defaultFieldCustomisations: IDefaultFieldCustomisation[]
+  customQuestionConfigurations: ISortedCustomGroup[]
+}
+
+function createCustomGroup(
+  form: ISerializedForm,
+  customQuestionConfigurations: ISortedCustomGroup[],
+  question: IQuestionConfig,
+  preceedingDefaultField: IDefaultField | null,
+  positionTop?: boolean
+) {
+  const customQuestionIdentifiers = getQuestionsIdentifiersFromFieldId(
+    question.fieldId
+  )
+  const section = getSection(form.sections, customQuestionIdentifiers.sectionId)
+  const group = getGroup(
+    section.section.groups,
+    customQuestionIdentifiers.groupId
+  )
+  const newCustomGroup: ISortedCustomGroup = {
+    section,
+    group,
+    questions: [{ question, field: createCustomField(question) }]
+  }
+  if (preceedingDefaultField) {
+    newCustomGroup.preceedingDefaultField = preceedingDefaultField
+  }
+  if (positionTop) {
+    newCustomGroup.positionTop = positionTop
+  }
+  customQuestionConfigurations.push(newCustomGroup)
+}
+
+function sortQuestion(
+  form: ISerializedForm,
+  customQuestion: IQuestionConfig,
+  customQuestionConfigurations: ISortedCustomGroup[]
+): boolean {
+  let sorted = false
+  customQuestionConfigurations.find((sortedCustomGroups) => {
+    sortedCustomGroups.questions.find((customQuestionConfig) => {
+      if (
+        customQuestionConfig.question.fieldId ===
+        customQuestion.preceedingFieldId
+      ) {
+        sortedCustomGroups.questions.push({
+          question: customQuestionConfig.question,
+          field: createCustomField(customQuestionConfig.question)
+        })
+        sorted = true
+      }
+    })
+  })
+  return sorted
+}
+
+export function sortFormCustomisations(
+  customQuestions: IQuestionConfig[],
+  defaultEventForm: ISerializedForm
+): IFormCustomisations {
+  // Separates default field customisations
+  // Sorts custom questions into ordered blocks
+  // so that they can be positioned vertically correctly
+  const formCustomisations: IFormCustomisations = {
+    defaultFieldCustomisations: [],
+    customQuestionConfigurations: []
+  }
+
+  const customQsToBeSorted: IQuestionConfig[] = []
+
+  customQuestions.map((question, index) => {
+    const defaultField: IDefaultField | undefined = getDefaultField(
+      defaultEventForm,
+      question.fieldId
+    )
+    if (defaultField && !question.custom) {
+      formCustomisations.defaultFieldCustomisations?.push({
+        question,
+        defaultField
+      })
+    } else if (question.custom && question.preceedingFieldId) {
+      const preceedingDefaultField: IDefaultField | undefined = getDefaultField(
+        defaultEventForm,
+        question.preceedingFieldId
+      )
+
+      if (preceedingDefaultField) {
+        createCustomGroup(
+          defaultEventForm,
+          formCustomisations.customQuestionConfigurations,
+          question,
+          preceedingDefaultField,
+          false
+        )
+      } else if (question.preceedingFieldId === 'TOP') {
+        createCustomGroup(
+          defaultEventForm,
+          formCustomisations.customQuestionConfigurations,
+          question,
+          null,
+          true
+        )
+      } else {
+        customQsToBeSorted.push(question)
+      }
+    }
+  })
+
+  while (
+    customQsToBeSorted.length &&
+    formCustomisations.customQuestionConfigurations.length
+  ) {
+    customQsToBeSorted.map((customQuestion, index) => {
+      if (
+        sortQuestion(
+          defaultEventForm,
+          customQuestion,
+          formCustomisations.customQuestionConfigurations
+        )
+      ) {
+        customQsToBeSorted.splice(0, 0, customQsToBeSorted.splice(index, 1)[0])
+      }
+    })
+  }
+
+  return formCustomisations
 }
 
 export function filterQuestionsByEventType(
@@ -178,74 +325,73 @@ function createCustomField(question: IQuestionConfig): SerializedFormField {
   return baseField
 }
 
-export function configureRegistrationForm(
-  filteredQuestions: IQuestionConfig[],
+function configureDefaultQuestions(
+  defaultFieldCustomisations: IDefaultFieldCustomisation[],
   defaultEventForm: ISerializedForm
 ): ISerializedForm {
   const newForm = cloneDeep(defaultEventForm)
-  filteredQuestions.forEach((question) => {
-    const defaultField: IDefaultField | undefined = getDefaultField(
-      newForm,
-      question.fieldId
-    )
+  defaultFieldCustomisations.forEach((defaultFieldCustomisation) => {
+    // this is a customisation to a default field
+    // default fields can only be enabled or disabled at present
+    if (defaultFieldCustomisation.question.enabled === 'DISABLED') {
+      newForm.sections[
+        defaultFieldCustomisation.defaultField.selectedSectionIndex
+      ].groups[
+        defaultFieldCustomisation.defaultField.selectedGroupIndex
+      ].fields.splice(defaultFieldCustomisation.defaultField.index, 1)
+    }
+  })
+  return newForm
+}
 
-    if (defaultField && !question.custom) {
-      // this is a customisation to a default field
-      // default fields can only be enabled or disabled
-      newForm.sections[defaultField.selectedSectionIndex].groups[
-        defaultField.selectedGroupIndex
-      ].fields.splice(defaultField.index, 1)
-    } else if (!defaultField && question.custom) {
-      // this is a new custom field to be added
-      const customQuestionIdentifiers = getQuestionsIdentifiersFromFieldId(
-        question.fieldId
+function getCustomFields(customQuestionConfig: ICustomQuestionConfiguration[]) {
+  const fields: SerializedFormField[] = []
+  customQuestionConfig.forEach((config) => {
+    fields.push(config.field)
+  })
+  return fields
+}
+
+function configureCustomQuestions(
+  sortedCustomGroups: ISortedCustomGroup[],
+  defaultEventForm: ISerializedForm
+): ISerializedForm {
+  const newForm = cloneDeep(defaultEventForm)
+  sortedCustomGroups.forEach((customGroup) => {
+    if (customGroup.positionTop) {
+      newForm.sections[customGroup.section.index].groups[
+        customGroup.group.index
+      ].fields = concat(
+        getCustomFields(customGroup.questions),
+        newForm.sections[customGroup.section.index].groups[
+          customGroup.group.index
+        ].fields
       )
-      const activeSection = getSection(
-        newForm.sections,
-        customQuestionIdentifiers.sectionId
-      )
-      const activeGroup = getGroup(
-        activeSection.section.groups,
-        customQuestionIdentifiers.groupId
-      )
-
-      const newCustomField = createCustomField(question)
-
-      const unmodifiedSectionFields =
-        newForm.sections[activeSection.index].groups[activeGroup.index].fields
-
-      if (question.preceedingFieldId && question.preceedingFieldId === 'TOP') {
-        // position custom field at the top
-        newForm.sections[activeSection.index].groups[
-          activeGroup.index
-        ].fields.unshift(newCustomField)
-      } else if (question.preceedingFieldId) {
-        // position custom field after preeceding field
-        const verticallyPreceedingDefaultField: IDefaultField | undefined =
-          getDefaultField(newForm, question.preceedingFieldId)
-        if (verticallyPreceedingDefaultField) {
-          unmodifiedSectionFields.splice(
-            verticallyPreceedingDefaultField?.index + 1,
-            0,
-            newCustomField
-          )
-        } else {
-          throw new Error(
-            `The preceedingFieldId is set incorrectly as the preeceding field cannot be found for this custom question.  This should not occur: fieldId: ${question.fieldId} preceedingFieldId: ${question.preceedingFieldId}`
-          )
-        }
-      } else {
-        throw new Error(
-          `The preceedingFieldId is undefined and also not set to TOP for a custom question.  This should not occur: ${question.fieldId}`
-        )
-      }
-    } else {
-      throw new Error(
-        `The config question is neither custom nor among the default questions.  This should not occur: ${question.fieldId}`
+    } else if (customGroup.preceedingDefaultField) {
+      newForm.sections[customGroup.section.index].groups[
+        customGroup.group.index
+      ].fields.splice(
+        customGroup.preceedingDefaultField.index + 1,
+        0,
+        ...getCustomFields(customGroup.questions)
       )
     }
   })
   return newForm
+}
+
+export function configureRegistrationForm(
+  formCustomisations: IFormCustomisations,
+  defaultEventForm: ISerializedForm
+): ISerializedForm {
+  const defaultFormWithCustomisations = configureDefaultQuestions(
+    formCustomisations.defaultFieldCustomisations,
+    defaultEventForm
+  )
+  return configureCustomQuestions(
+    formCustomisations.customQuestionConfigurations,
+    defaultEventForm
+  )
 }
 
 export const conditionals: IConditionals = {

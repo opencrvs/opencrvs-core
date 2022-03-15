@@ -184,9 +184,9 @@ export function questionnaireToCustomFieldTransformer(
   sectionId: string,
   field: IFormField
 ) {
-  if (queryData.questionnaire) {
+  if (queryData.registration.questionnaire) {
     const selectedQuestion: IQuestionnaireQuestion =
-      queryData.questionnaire.filter(
+      queryData.registration.questionnaire.filter(
         (question: IQuestionnaireQuestion) => question.fieldName === field.name
       )[0]
     if (selectedQuestion) {

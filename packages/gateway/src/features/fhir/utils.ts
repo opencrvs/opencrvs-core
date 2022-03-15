@@ -870,6 +870,23 @@ export function setObjectPropInResourceArray(
   }
 }
 
+export function setItemInQuestionnaireItemArray(
+  questionnaire: fhir.QuestionnaireResponse,
+  label: string
+) {
+  if (!questionnaire.item) {
+    questionnaire.item = []
+  }
+
+  if (questionnaire.item.filter((item) => item.text === label)[0]) {
+    throw new Error('item already exists in questionnaire item array')
+  }
+
+  questionnaire.item.push({
+    text: label
+  } as fhir.QuestionnaireResponseItem)
+}
+
 export function setArrayPropInResourceObject(
   resource: fhir.Resource,
   label: string,

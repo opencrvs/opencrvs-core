@@ -770,6 +770,12 @@ function createQuestionnaireBuilder() {
       fieldValue: string,
       context: any
     ) => {
+      console.log(
+        `fieldName context obj: ${JSON.stringify(
+          context
+        )} createQuestionnaireBuilder: `,
+        JSON.stringify(fieldValue)
+      )
       const questionnaire = selectOrCreateQuestionnaireResource(fhirBundle)
       setObjectPropInResourceArray(
         questionnaire,
@@ -780,6 +786,12 @@ function createQuestionnaireBuilder() {
       )
     },
     value: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
+      console.log(
+        `value context obj: ${JSON.stringify(
+          context
+        )} createQuestionnaireBuilder: `,
+        JSON.stringify(fieldValue)
+      )
       const questionnaire = selectOrCreateQuestionnaireResource(fhirBundle)
       setObjectPropInResourceArray(
         questionnaire,
