@@ -91,8 +91,6 @@ export interface IApplicationConfig {
     }
   }
   LANGUAGES: string
-  CERTIFICATE_PRINT_LOWEST_CHARGE: number
-  CERTIFICATE_PRINT_HIGHEST_CHARGE: number
   UI_POLLING_INTERVAL: number
   FIELD_AGENT_AUDIT_LOCATIONS: string
   DECLARATION_AUDIT_LOCATIONS: string

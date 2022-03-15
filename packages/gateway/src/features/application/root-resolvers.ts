@@ -45,10 +45,6 @@ export const resolvers: GQLResolver = {
         DESKTOP_TIME_OUT_MILLISECONDS:
           applicationConfig.DESKTOP_TIME_OUT_MILLISECONDS as number,
         LANGUAGES: applicationConfig.LANGUAGES as string,
-        CERTIFICATE_PRINT_LOWEST_CHARGE:
-          applicationConfig.CERTIFICATE_PRINT_LOWEST_CHARGE as number,
-        CERTIFICATE_PRINT_HIGHEST_CHARGE:
-          applicationConfig.CERTIFICATE_PRINT_HIGHEST_CHARGE as number,
         UI_POLLING_INTERVAL: applicationConfig.UI_POLLING_INTERVAL as number,
         FIELD_AGENT_AUDIT_LOCATIONS:
           applicationConfig.FIELD_AGENT_AUDIT_LOCATIONS as string,

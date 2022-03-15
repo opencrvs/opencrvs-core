@@ -20,8 +20,8 @@ import { IPrintableDeclaration } from '@client/declarations'
 const FREE_PERIOD = 36500
 const CHARGE_UP_LIMIT = 36500
 
-const LOWEST_CHARGE = window.config.CERTIFICATE_PRINT_LOWEST_CHARGE
-const HIGHEST_CHARGE = window.config.CERTIFICATE_PRINT_HIGHEST_CHARGE
+const LOWEST_CHARGE = 0
+const HIGHEST_CHARGE = 0
 
 const MONTH_IN_DAYS = 30
 const YEAR_IN_DAYS = 365

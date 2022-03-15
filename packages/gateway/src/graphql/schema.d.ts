@@ -435,8 +435,6 @@ export interface GQLApplicationConfiguration {
   DESKTOP_TIME_OUT_MILLISECONDS?: number
   DEATH?: GQLDeath
   LANGUAGES?: string
-  CERTIFICATE_PRINT_LOWEST_CHARGE?: number
-  CERTIFICATE_PRINT_HIGHEST_CHARGE?: number
   UI_POLLING_INTERVAL?: number
   FIELD_AGENT_AUDIT_LOCATIONS?: string
   APPLICATION_AUDIT_LOCATIONS?: string
@@ -461,8 +459,6 @@ export interface GQLApplicationConfigurationInput {
   DESKTOP_TIME_OUT_MILLISECONDS?: number
   DEATH?: GQLDeathInput
   LANGUAGES?: string
-  CERTIFICATE_PRINT_LOWEST_CHARGE?: number
-  CERTIFICATE_PRINT_HIGHEST_CHARGE?: number
   UI_POLLING_INTERVAL?: number
   FIELD_AGENT_AUDIT_LOCATIONS?: string
   APPLICATION_AUDIT_LOCATIONS?: string
@@ -3674,8 +3670,6 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   DESKTOP_TIME_OUT_MILLISECONDS?: ApplicationConfigurationToDESKTOP_TIME_OUT_MILLISECONDSResolver<TParent>
   DEATH?: ApplicationConfigurationToDEATHResolver<TParent>
   LANGUAGES?: ApplicationConfigurationToLANGUAGESResolver<TParent>
-  CERTIFICATE_PRINT_LOWEST_CHARGE?: ApplicationConfigurationToCERTIFICATE_PRINT_LOWEST_CHARGEResolver<TParent>
-  CERTIFICATE_PRINT_HIGHEST_CHARGE?: ApplicationConfigurationToCERTIFICATE_PRINT_HIGHEST_CHARGEResolver<TParent>
   UI_POLLING_INTERVAL?: ApplicationConfigurationToUI_POLLING_INTERVALResolver<TParent>
   FIELD_AGENT_AUDIT_LOCATIONS?: ApplicationConfigurationToFIELD_AGENT_AUDIT_LOCATIONSResolver<TParent>
   APPLICATION_AUDIT_LOCATIONS?: ApplicationConfigurationToAPPLICATION_AUDIT_LOCATIONSResolver<TParent>
@@ -3759,20 +3753,6 @@ export interface ApplicationConfigurationToDEATHResolver<
 }
 
 export interface ApplicationConfigurationToLANGUAGESResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface ApplicationConfigurationToCERTIFICATE_PRINT_LOWEST_CHARGEResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface ApplicationConfigurationToCERTIFICATE_PRINT_HIGHEST_CHARGEResolver<
   TParent = any,
   TResult = any
 > {

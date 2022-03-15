@@ -59,8 +59,6 @@ export interface IApplicationConfigurationModel extends Document {
   DEATH: IDeath
   DESKTOP_TIME_OUT_MILLISECONDS: number
   LANGUAGES: string
-  CERTIFICATE_PRINT_LOWEST_CHARGE: number
-  CERTIFICATE_PRINT_HIGHEST_CHARGE: number
   UI_POLLING_INTERVAL: number
   FIELD_AGENT_AUDIT_LOCATIONS: string
   DECLARATION_AUDIT_LOCATIONS: string
@@ -129,16 +127,6 @@ const systemSchema = new Schema({
     default: 900000
   },
   LANGUAGES: { type: String, required: false, default: 'en' },
-  CERTIFICATE_PRINT_LOWEST_CHARGE: {
-    type: Number,
-    required: false,
-    default: 0
-  },
-  CERTIFICATE_PRINT_HIGHEST_CHARGE: {
-    type: Number,
-    required: false,
-    default: 0
-  },
   UI_POLLING_INTERVAL: { type: Number, required: false, default: 5000 },
   FIELD_AGENT_AUDIT_LOCATIONS: {
     type: String,
