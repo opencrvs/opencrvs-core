@@ -22,15 +22,26 @@ type Mask {
   endBefore: Int
 }
 
+type Currency {
+  isoCode: String
+  languagesAndCountry: [String]
+}
+
 input MaskInput {
   startForm: Int
   endBefore: Int
+}
+
+input CurrencyInput {
+  isoCode: String
+  languagesAndCountry: [String]
 }
 
 input ApplicationConfigurationInput {
   APPLICATION_NAME: String
   BACKGROUND_SYNC_BROADCAST_CHANNEL: String
   COUNTRY: String
+  CURRENCY: CurrencyInput
   COUNTRY_LOGO_FILE: String
   COUNTRY_LOGO_RENDER_WIDTH: Int
   COUNTRY_LOGO_RENDER_HEIGHT: Int
@@ -58,6 +69,7 @@ type ApplicationConfiguration {
   APPLICATION_NAME: String
   BACKGROUND_SYNC_BROADCAST_CHANNEL: String
   COUNTRY: String
+  CURRENCY: Currency
   COUNTRY_LOGO_FILE: String
   COUNTRY_LOGO_RENDER_WIDTH: Int
   COUNTRY_LOGO_RENDER_HEIGHT: Int

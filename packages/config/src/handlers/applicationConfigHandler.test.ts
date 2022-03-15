@@ -35,6 +35,10 @@ let mockConfig = {
   BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
   COUNTRY: 'bgd',
   COUNTRY_LOGO_FILE: 'logo.png',
+  CURRENCY: {
+    isoCode: 'ZMW',
+    languagesAndCountry: ['en-ZM']
+  },
   DESKTOP_TIME_OUT_MILLISECONDS: 900000, // 15 mins
   HEALTH_FACILITY_FILTER: 'UPAZILA',
   LANGUAGES: 'en,bn',

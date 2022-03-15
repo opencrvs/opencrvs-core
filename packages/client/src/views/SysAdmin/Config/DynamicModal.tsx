@@ -20,7 +20,7 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from '@client/styledComponents'
-import { InputField, TextInput } from '@opencrvs/components/lib/forms'
+import { InputField, TextInput, Select } from '@opencrvs/components/lib/forms'
 import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { Alert } from '@opencrvs/components/lib/icons/Alert'
@@ -30,13 +30,16 @@ import { getOfflineData } from '@client/offline/selectors'
 import ContentComponent from '@client/views/SysAdmin/Config/NIDPhoneNumContent'
 import { IOfflineData } from '@client/offline/reducer'
 import {
-  isApplyButtonDisabled,
+  getCurrencyObject,
+  getCurrencySelectOptions,
   getTitle,
   getMessage,
+  isApplyButtonDisabled,
+  callUpdateApplicationCurrencyMutation,
   callUpdateNIDPatternMutation,
   callUpdateApplicationNameMutation,
   callUpdatePhoneNumberPatternMutation
-} from '@client/views/SysAdmin/Config/Utils'
+} from '@client/views/SysAdmin/Config/utils'
 
 const Message = styled.div`
   margin-bottom: 16px;
@@ -84,13 +87,20 @@ const ErrorMessage = styled.div`
   color: ${({ theme }) => theme.colors.error};
   margin-left: 6px;
 `
+export type ICurrency = {
+  isoCode: string | undefined
+  languagesAndCountry: string[]
+}
+
 export type IApplicationConfig = {
   APPLICATION_NAME?: string
   NID_NUMBER_PATTERN?: string
   PHONE_NUMBER_PATTERN?: string
+  CURRENCY?: ICurrency
 }
 export type IState = {
   applicationName: string
+  currency: string
   nidPattern: string
   nidExample: string
   testNid: boolean
@@ -131,6 +141,7 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
         props.offlineCountryConfiguration.config.PHONE_NUMBER_PATTERN.toString(),
       phoneNumberExample: EMPTY_STRING,
       testPhoneNumber: false,
+      currency: `${this.props.offlineCountryConfiguration.config.CURRENCY.languagesAndCountry[0]}-${this.props.offlineCountryConfiguration.config.CURRENCY.isoCode}`,
       updatingValue: false,
       errorOccured: false,
       errorMessages: EMPTY_STRING
@@ -269,6 +280,29 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
           this.props.intl.formatMessage(messages.applicationConfigChangeError)
         )
       }
+    } else if (modalName === GeneralActionId.CURRENCY && value.CURRENCY) {
+      try {
+        await callUpdateApplicationCurrencyMutation(
+          value.CURRENCY,
+          this.props,
+          this.setUpdatingValue,
+          this.setError
+        )
+        valueChanged(
+          NOTIFICATION_TYPE.SUCCESS,
+          this.props.intl.formatMessage(
+            messages.applicationCurrencyChangeNotification
+          )
+        )
+      } catch {
+        this.setError(
+          this.props.intl.formatMessage(messages.applicationConfigChangeError)
+        )
+        valueChanged(
+          NOTIFICATION_TYPE.ERROR,
+          this.props.intl.formatMessage(messages.applicationConfigChangeError)
+        )
+      }
     }
   }
 
@@ -282,6 +316,9 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
         autoHeight={true}
         titleHeightAuto={changeModalName === GeneralActionId.NID_PATTERN}
         show={this.showChangeModal}
+        contentScrollableY={
+          changeModalName === GeneralActionId.CURRENCY ? true : false
+        }
         actions={[
           <CancelButton
             key="cancel"
@@ -300,7 +337,8 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
                 {
                   APPLICATION_NAME: this.state.applicationName,
                   NID_NUMBER_PATTERN: this.state.nidPattern,
-                  PHONE_NUMBER_PATTERN: this.state.phoneNumberPattern
+                  PHONE_NUMBER_PATTERN: this.state.phoneNumberPattern,
+                  CURRENCY: getCurrencyObject(this.state.currency)
                 },
                 valueChanged
               )
@@ -361,6 +399,29 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
               messages.phoneNumberChangeError
             )}
           />
+        )}
+        {changeModalName === GeneralActionId.CURRENCY && (
+          <Content>
+            <Field>
+              <InputField
+                id="applicationCurrency"
+                touched={true}
+                required={false}
+              >
+                <Select
+                  id="selectCurrency"
+                  isDisabled={false}
+                  onChange={(val: string) => {
+                    this.setState({
+                      currency: val
+                    })
+                  }}
+                  value={this.state.currency}
+                  options={getCurrencySelectOptions()}
+                />
+              </InputField>
+            </Field>
+          </Content>
         )}
       </ResponsiveModal>
     )

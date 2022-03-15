@@ -417,6 +417,7 @@ export interface GQLApplicationConfiguration {
   APPLICATION_NAME?: string
   BACKGROUND_SYNC_BROADCAST_CHANNEL?: string
   COUNTRY?: string
+  CURRENCY?: GQLCurrency
   COUNTRY_LOGO_FILE?: string
   COUNTRY_LOGO_RENDER_WIDTH?: number
   COUNTRY_LOGO_RENDER_HEIGHT?: number
@@ -444,6 +445,7 @@ export interface GQLApplicationConfigurationInput {
   APPLICATION_NAME?: string
   BACKGROUND_SYNC_BROADCAST_CHANNEL?: string
   COUNTRY?: string
+  CURRENCY?: GQLCurrencyInput
   COUNTRY_LOGO_FILE?: string
   COUNTRY_LOGO_RENDER_WIDTH?: number
   COUNTRY_LOGO_RENDER_HEIGHT?: number
@@ -883,6 +885,16 @@ export interface GQLUserIdentifierInput {
 export interface GQLSignatureInput {
   data?: string
   type?: string
+}
+
+export interface GQLCurrency {
+  isoCode?: string
+  languagesAndCountry?: Array<string | null>
+}
+
+export interface GQLCurrencyInput {
+  isoCode?: string
+  languagesAndCountry?: Array<string | null>
 }
 
 export interface GQLMesssageDescriptorInput {
@@ -1352,6 +1364,7 @@ export interface GQLResolver {
 
   EventProgressSet?: GQLEventProgressSetTypeResolver
   MesssageDescriptor?: GQLMesssageDescriptorTypeResolver
+  Currency?: GQLCurrencyTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
   ReasonsNotApplying?: GQLReasonsNotApplyingTypeResolver
@@ -3468,6 +3481,7 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   APPLICATION_NAME?: ApplicationConfigurationToAPPLICATION_NAMEResolver<TParent>
   BACKGROUND_SYNC_BROADCAST_CHANNEL?: ApplicationConfigurationToBACKGROUND_SYNC_BROADCAST_CHANNELResolver<TParent>
   COUNTRY?: ApplicationConfigurationToCOUNTRYResolver<TParent>
+  CURRENCY?: ApplicationConfigurationToCURRENCYResolver<TParent>
   COUNTRY_LOGO_FILE?: ApplicationConfigurationToCOUNTRY_LOGO_FILEResolver<TParent>
   COUNTRY_LOGO_RENDER_WIDTH?: ApplicationConfigurationToCOUNTRY_LOGO_RENDER_WIDTHResolver<TParent>
   COUNTRY_LOGO_RENDER_HEIGHT?: ApplicationConfigurationToCOUNTRY_LOGO_RENDER_HEIGHTResolver<TParent>
@@ -3506,6 +3520,13 @@ export interface ApplicationConfigurationToBACKGROUND_SYNC_BROADCAST_CHANNELReso
 }
 
 export interface ApplicationConfigurationToCOUNTRYResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToCURRENCYResolver<
   TParent = any,
   TResult = any
 > {
@@ -4635,6 +4656,22 @@ export interface MesssageDescriptorToDescriptionResolver<
 }
 
 export interface MesssageDescriptorToDefaultMessageResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLCurrencyTypeResolver<TParent = any> {
+  isoCode?: CurrencyToIsoCodeResolver<TParent>
+  languagesAndCountry?: CurrencyToLanguagesAndCountryResolver<TParent>
+}
+
+export interface CurrencyToIsoCodeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface CurrencyToLanguagesAndCountryResolver<
   TParent = any,
   TResult = any
 > {

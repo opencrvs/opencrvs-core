@@ -11,17 +11,12 @@
  */
 import * as React from 'react'
 import { createStore } from '@client/store'
-import {
-  createTestComponent,
-  flushPromises,
-  mockConfigResponse
-} from '@client/tests/util'
+import { createTestComponent, flushPromises } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { ApplicationConfig } from '@client/views/SysAdmin/Config/Application'
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/mutations'
 import * as fetchMock from 'jest-fetch-mock'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { referenceApi } from '@client/utils/referenceApi'
 
 const { store, history } = createStore()
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
@@ -34,7 +29,11 @@ beforeEach(async () => {
           data: {
             updateApplicationConfig: {
               APPLICATION_NAME: 'OPENCRVS',
-              NID_NUMBER_PATTERN: '/^[0-9]{10}$/'
+              NID_NUMBER_PATTERN: '/^[0-9]{10}$/',
+              CURRENCY: {
+                isoCode: 'CAD',
+                languagesAndCountry: ['en-CA']
+              }
             }
           }
         })
@@ -59,16 +58,6 @@ describe('application config page test', () => {
 })
 
 describe('application name update test', () => {
-  beforeEach(() => {
-    jest.spyOn(referenceApi, 'loadConfig').mockImplementationOnce(() =>
-      Promise.resolve({
-        ...mockConfigResponse,
-        config: {
-          ...mockConfigResponse.config
-        }
-      })
-    )
-  })
   it('should show the application name change modal of click on change', async () => {
     testComponent.find('#changeAppName').hostNodes().first().simulate('click')
     expect(testComponent.find('#changeAppNameModal').hostNodes()).toHaveLength(
@@ -143,16 +132,6 @@ describe('application name update test', () => {
 })
 
 describe('NID Pattern update test', () => {
-  beforeEach(() => {
-    jest.spyOn(referenceApi, 'loadConfig').mockImplementationOnce(() =>
-      Promise.resolve({
-        ...mockConfigResponse,
-        config: {
-          ...mockConfigResponse.config
-        }
-      })
-    )
-  })
   it('should show the application name change modal of click on change', async () => {
     testComponent
       .find('#changeNidPattern')
@@ -318,5 +297,43 @@ describe('NID Pattern update test', () => {
     expect(
       testComponent.find('#changeNidPattern-example-invalid-icon')
     ).toHaveLength(2)
+  })
+})
+
+describe('application currency update test', () => {
+  it('should show the application currency change modal of click on change', async () => {
+    testComponent.find('#changeCurrency').hostNodes().first().simulate('click')
+    expect(testComponent.find('#changeCurrencyModal').hostNodes()).toHaveLength(
+      1
+    )
+  })
+  it('should change the application currency if click on apply', async () => {
+    testComponent.find('#changeCurrency').hostNodes().first().simulate('click')
+    testComponent
+      .find('#selectCurrency')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'selectCurrency', value: 'en-CA-CAD' }
+      })
+    testComponent.find('#apply_change').hostNodes().simulate('click')
+    await flushPromises()
+    expect(testComponent.find('#Currency_value').hostNodes().text()).toBe(
+      'Canadian dollar'
+    )
+  })
+
+  it('should show success notification if appliction config change', async () => {
+    testComponent.find('#changeCurrency').hostNodes().first().simulate('click')
+    testComponent
+      .find('#selectCurrency')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'selectCurrency', value: 'en-CA-CAD' }
+      })
+    testComponent.find('#apply_change').hostNodes().simulate('click')
+    await flushPromises()
+    expect(
+      testComponent.find('#print-cert-notification').hostNodes().text()
+    ).toBe('Currency updated')
   })
 })

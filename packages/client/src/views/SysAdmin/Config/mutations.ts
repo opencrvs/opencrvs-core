@@ -14,15 +14,19 @@ import { client } from '@client/utils/apolloClient'
 import { IApplicationConfig } from '@client/views/SysAdmin/Config/DynamicModal'
 
 const applicationConfigMutation = gql`
-  mutation ($applicationConfig: ApplicationConfigurationInput) {
+  mutation updateApplicationConfig(
+    $applicationConfig: ApplicationConfigurationInput
+  ) {
     updateApplicationConfig(applicationConfig: $applicationConfig) {
       APPLICATION_NAME
       NID_NUMBER_PATTERN
-      PHONE_NUMBER_PATTERN
+      CURRENCY {
+        languagesAndCountry
+        isoCode
+      }
     }
   }
 `
-
 async function mutateApplicationConfig(applicationConfig: IApplicationConfig) {
   return (
     client &&

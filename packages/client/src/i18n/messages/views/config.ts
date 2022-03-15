@@ -35,6 +35,8 @@ interface IConfigMessages
   applicationNameLabel: MessageDescriptor
   govermentLogoLabel: MessageDescriptor
   currencyLable: MessageDescriptor
+  applicationCurrencyChangeNotification: MessageDescriptor
+  applicationCurrencyChangeMessage: MessageDescriptor
   phoneNumberLabel: MessageDescriptor
   nidPatternTitle: MessageDescriptor
   nidPatternChangeMessage: MessageDescriptor
@@ -79,7 +81,7 @@ const messagesToDefine: IConfigMessages = {
   applicationConfigChangeError: {
     id: 'config.application.configChangeError',
     defaultMessage: 'Unable to make change. Please try again',
-    description: 'Error message for application name change'
+    description: 'Error message for application config change'
   },
   certificateConfiguration: {
     id: 'config.certificateConfiguration',
@@ -203,6 +205,16 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.currencyLable',
     defaultMessage: 'Currency',
     description: 'Currency config label'
+  },
+  applicationCurrencyChangeNotification: {
+    id: 'config.application.currencyChangeNotification',
+    defaultMessage: 'Currency updated',
+    description: 'Message for application currency change notification'
+  },
+  applicationCurrencyChangeMessage: {
+    id: 'config.application.currencyChangeMessage',
+    defaultMessage: 'Select your currency for your CRVS system',
+    description: 'Message for application currency change modal'
   },
   phoneNumberLabel: {
     id: 'config.application.phoneNumberLabel',

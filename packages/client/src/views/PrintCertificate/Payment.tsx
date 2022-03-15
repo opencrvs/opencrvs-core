@@ -12,6 +12,7 @@
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { Print } from '@opencrvs/components/lib/icons'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
+import { FormattedNumberCurrency } from '@opencrvs/components/lib/symbol'
 import { IPrintableApplication, modifyApplication } from '@client/applications'
 import { Event } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
@@ -72,7 +73,7 @@ function LabelValue({
 }: {
   id: string
   label: string
-  value: string
+  value: React.ReactNode | string
 }) {
   return (
     <div id={id}>
@@ -133,7 +134,8 @@ class PaymentComponent extends React.Component<IFullProps> {
   }
 
   render = () => {
-    const { intl, application, event, goBack } = this.props
+    const { intl, application, event, goBack, offlineCountryConfig } =
+      this.props
     const eventDate = getEventDate(application.data, event)
 
     const paymentAmount = calculatePrice(event, eventDate)
@@ -156,9 +158,15 @@ class PaymentComponent extends React.Component<IFullProps> {
             <LabelValue
               id="amountDue"
               label={intl.formatMessage(messages.amountDue)}
-              value={intl.formatMessage(messages.paymentAmount, {
-                paymentAmount
-              })}
+              value={
+                <FormattedNumberCurrency
+                  value={parseInt(paymentAmount)}
+                  currency={offlineCountryConfig.config.CURRENCY.isoCode}
+                  languagesAndCountry={
+                    offlineCountryConfig.config.CURRENCY.languagesAndCountry[0]
+                  }
+                />
+              }
             />
             <TertiaryButton
               id="print-receipt"

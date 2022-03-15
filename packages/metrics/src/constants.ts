@@ -51,5 +51,9 @@ export const mockFetchConfig = {
   LOGROCKET: 'opencrvs-foundation/opencrvs-zambia',
   NID_NUMBER_PATTERN: '/^[0-9]{9}$/',
   COUNTRY: 'zmb',
+  CURRENCY: {
+    isoCode: 'ZMW',
+    languagesAndCountry: ['en-ZM']
+  },
   LANGUAGES: 'en'
 }

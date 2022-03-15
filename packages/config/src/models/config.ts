@@ -10,6 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { model, Schema, Document } from 'mongoose'
+interface ICurrency {
+  isoCode: string
+  languagesAndCountry: string[]
+}
 
 export interface IApplicationConfigurationModel extends Document {
   APPLICATION_NAME: string
@@ -18,6 +22,7 @@ export interface IApplicationConfigurationModel extends Document {
   COUNTRY_LOGO_FILE: string
   COUNTRY_LOGO_RENDER_WIDTH: number
   COUNTRY_LOGO_RENDER_HEIGHT: number
+  CURRENCY: ICurrency
   DESKTOP_TIME_OUT_MILLISECONDS: number
   LANGUAGES: string
   CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: number
@@ -38,6 +43,11 @@ export interface IApplicationConfigurationModel extends Document {
   NID_NUMBER_PATTERN: string
 }
 
+const currencySchema = new Schema<ICurrency>({
+  isoCode: { type: String },
+  languagesAndCountry: { type: [String] }
+})
+
 const systemSchema = new Schema({
   APPLICATION_NAME: { type: String, required: false, default: 'OpenCRVS' },
   BACKGROUND_SYNC_BROADCAST_CHANNEL: { type: String, required: false },
@@ -45,6 +55,7 @@ const systemSchema = new Schema({
   COUNTRY_LOGO_FILE: { type: String, required: false },
   COUNTRY_LOGO_RENDER_WIDTH: { type: Number, required: false, default: 104 },
   COUNTRY_LOGO_RENDER_HEIGHT: { type: Number, required: false, default: 104 },
+  CURRENCY: { type: currencySchema, required: false },
   DESKTOP_TIME_OUT_MILLISECONDS: {
     type: Number,
     required: false,
