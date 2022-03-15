@@ -511,6 +511,7 @@ export interface GQLHistory {
   comments?: Array<GQLComment | null>
   input?: Array<GQLInputOutput | null>
   output?: Array<GQLInputOutput | null>
+  certificates?: Array<GQLCertificate | null>
 }
 
 export const enum GQLMannerOfDeath {
@@ -3689,6 +3690,7 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   comments?: HistoryToCommentsResolver<TParent>
   input?: HistoryToInputResolver<TParent>
   output?: HistoryToOutputResolver<TParent>
+  certificates?: HistoryToCertificatesResolver<TParent>
 }
 
 export interface HistoryToUserResolver<TParent = any, TResult = any> {
@@ -3724,6 +3726,10 @@ export interface HistoryToInputResolver<TParent = any, TResult = any> {
 }
 
 export interface HistoryToOutputResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToCertificatesResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
