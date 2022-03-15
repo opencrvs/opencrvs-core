@@ -119,12 +119,17 @@ import {
   IAvatar,
   IUserDetails
 } from '@client/utils/userUtils'
-import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
+import {
+  messages as correctionMessages,
+  messages
+} from '@client/i18n/messages/views/correction'
+import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import NotificationToast from '@client/views/OfficeHome/NotificationToast'
 import { isEmpty, get, find, has, flatten, values } from 'lodash'
 import { IRegisterFormState } from '@client/forms/register/reducer'
 import { goBack } from 'connected-react-router'
 import { getFieldValue } from './utils'
+import { CollectorRelationLabelArray } from '@client/forms/correction/corrector'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -802,9 +807,15 @@ const showPrintButton = ({
   const { role } = userDetails
 
   const reviewButtonRoleStatusMap: { [key: string]: string[] } = {
-    REGISTRATION_AGENT: [SUBMISSION_STATUS.REGISTERED],
-    DISTRICT_REGISTRAR: [SUBMISSION_STATUS.REGISTERED],
-    LOCAL_REGISTRAR: [SUBMISSION_STATUS.REGISTERED]
+    REGISTRATION_AGENT: [
+      SUBMISSION_STATUS.REGISTERED,
+      SUBMISSION_STATUS.CERTIFIED
+    ],
+    DISTRICT_REGISTRAR: [
+      SUBMISSION_STATUS.REGISTERED,
+      SUBMISSION_STATUS.CERTIFIED
+    ],
+    LOCAL_REGISTRAR: [SUBMISSION_STATUS.REGISTERED, SUBMISSION_STATUS.CERTIFIED]
   }
 
   if (
@@ -985,11 +996,39 @@ const ActionDetailsModalListTable = (
   if (registerForm == undefined) return []
 
   const sections = registerForm?.sections || []
-  const commentsColumn = [{ key: 'comment', label: 'Comment', width: 100 }]
+  const commentsColumn = [
+    {
+      key: 'comment',
+      label: intl.formatMessage(constantsMessages.comment),
+      width: 100
+    }
+  ]
   const declarationUpdatedColumns = [
-    { key: 'item', label: 'Item', width: 33.33 },
-    { key: 'original', label: 'Original', width: 33.33 },
+    {
+      key: 'item',
+      label: intl.formatMessage(messages.correctionSummaryItem),
+      width: 33.33
+    },
+    {
+      key: 'original',
+      label: intl.formatMessage(messages.correctionSummaryOriginal),
+      width: 33.33
+    },
     { key: 'edit', label: 'Edit', width: 33.33 }
+  ]
+  const certificateCollector = [
+    {
+      key: 'collector',
+      label: intl.formatMessage(certificateMessages.printedOnCollection),
+      width: 100
+    }
+  ]
+  const certificateCollectorVerified = [
+    {
+      key: 'hasShowedVerifiedDocument',
+      label: intl.formatMessage(certificateMessages.collectorIDCheck),
+      width: 100
+    }
   ]
 
   const dataChange = (
@@ -1065,8 +1104,41 @@ const ActionDetailsModalListTable = (
 
     return result
   }
+  const certificateCollectorData = (
+    actionDetailsData: IActionDetailsData
+  ): IDynamicValues[] => {
+    if (!actionDetailsData.certificates) return []
+    return actionDetailsData.certificates
+      .map((certificate: IDynamicValues) => {
+        if (!certificate) return
+
+        const name = getIndividualNameObj(
+          certificate.collector.individual.name,
+          window.config.LANGUAGES
+        )
+        const collectorLabel = () => {
+          const relation = CollectorRelationLabelArray.find(
+            (labelItem) =>
+              labelItem.value === certificate.collector.relationship
+          )
+          const collectorName = `${name?.firstNames} ${name?.familyName}`
+          if (relation)
+            return `${collectorName} (${intl.formatMessage(relation.label)})`
+          return collectorName
+        }
+
+        return {
+          hasShowedVerifiedDocument: certificate.hasShowedVerifiedDocument
+            ? intl.formatMessage(certificateMessages.idCheckVerify)
+            : intl.formatMessage(certificateMessages.idCheckWithoutVerify),
+          collector: collectorLabel()
+        }
+      })
+      .filter((item: IDynamicValues) => null != item)
+  }
 
   const declarationUpdates = dataChange(actionDetailsData)
+  const collectorData = certificateCollectorData(actionDetailsData)
   const pageChangeHandler = (cp: number) => setCurrentPage(cp)
   return (
     <>
@@ -1079,13 +1151,37 @@ const ActionDetailsModalListTable = (
       ></ListTable>
 
       {/* For Data Updated */}
+      {declarationUpdates.length > 0 && (
+        <ListTable
+          noResultText=" "
+          hideBoxShadow={true}
+          columns={declarationUpdatedColumns}
+          content={declarationUpdates}
+          pageSize={10}
+          totalItems={declarationUpdates.length}
+          currentPage={currentPage}
+          onPageChange={pageChangeHandler}
+        ></ListTable>
+      )}
+
+      {/* For Certificate */}
       <ListTable
         noResultText=" "
         hideBoxShadow={true}
-        columns={declarationUpdatedColumns}
-        content={declarationUpdates}
+        columns={certificateCollector}
+        content={collectorData}
         pageSize={10}
-        totalItems={declarationUpdates.length}
+        totalItems={collectorData.length}
+        currentPage={currentPage}
+        onPageChange={pageChangeHandler}
+      ></ListTable>
+      <ListTable
+        noResultText=" "
+        hideBoxShadow={true}
+        columns={certificateCollectorVerified}
+        content={collectorData}
+        pageSize={10}
+        totalItems={collectorData.length}
         currentPage={currentPage}
         onPageChange={pageChangeHandler}
       ></ListTable>
