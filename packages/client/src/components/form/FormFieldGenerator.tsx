@@ -806,6 +806,7 @@ class FormSectionComponent extends React.Component<Props> {
      *
      * This might be because of setState not used with the function syntax
      */
+
     const fieldsWithValuesDefined = fields.filter(
       (field) => values[field.name] !== undefined
     )

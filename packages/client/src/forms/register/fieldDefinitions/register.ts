@@ -142,6 +142,7 @@ function createCustomField(question: IQuestionConfig): SerializedFormField {
     custom: true,
     type: question.fieldType as QuestionConfigFieldType,
     label: question.label as MessageDescriptor,
+    initialValue: '',
     validate: [],
     mapping: {
       mutation: {
