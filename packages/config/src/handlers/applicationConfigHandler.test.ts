@@ -33,11 +33,27 @@ const fetch = fetchMock as fetchMock.FetchMock
 let mockConfig = {
   APPLICATION_NAME: 'Farajaland CRVS',
   BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
+  BIRTH: {
+    REGISTRATION_TARGET: 45,
+    LATE_REGISTRATION_TARGET: 365,
+    FEE: {
+      ON_TIME: 0,
+      LATE: 0,
+      DELAYED: 0
+    }
+  },
   COUNTRY: 'bgd',
   COUNTRY_LOGO_FILE: 'logo.png',
   CURRENCY: {
     isoCode: 'ZMW',
     languagesAndCountry: ['en-ZM']
+  },
+  DEATH: {
+    REGISTRATION_TARGET: 45,
+    FEE: {
+      ON_TIME: 0,
+      DELAYED: 0
+    }
   },
   DESKTOP_TIME_OUT_MILLISECONDS: 900000, // 15 mins
   HEALTH_FACILITY_FILTER: 'UPAZILA',

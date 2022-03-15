@@ -17,6 +17,28 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 
+type BirthFee {
+  ON_TIME: Int
+  LATE: Int
+  DELAYED: Int
+}
+
+type Birth {
+  REGISTRATION_TARGET: Int
+  LATE_REGISTRATION_TARGET: Int
+  FEE: BirthFee
+}
+
+type DeathFee {
+  ON_TIME: Int
+  DELAYED: Int
+}
+
+type Death {
+  REGISTRATION_TARGET: Int
+  FEE: DeathFee
+}
+
 type NIDNumberPattern {
   pattern: String
   example: String
@@ -39,6 +61,28 @@ type PhoneNumberPattern {
 type Currency {
   isoCode: String
   languagesAndCountry: [String]
+}
+
+input BirthFeeInput {
+  ON_TIME: Int
+  LATE: Int
+  DELAYED: Int
+}
+
+input BirthInput {
+  REGISTRATION_TARGET: Int
+  LATE_REGISTRATION_TARGET: Int
+  FEE: BirthFeeInput
+}
+
+input DeathFeeInput {
+  ON_TIME: Int
+  DELAYED: Int
+}
+
+input DeathInput {
+  REGISTRATION_TARGET: Int
+  FEE: DeathFeeInput
 }
 
 input NIDNumberPatternInput {
@@ -68,12 +112,14 @@ input CurrencyInput {
 input ApplicationConfigurationInput {
   APPLICATION_NAME: String
   BACKGROUND_SYNC_BROADCAST_CHANNEL: String
+  BIRTH: BirthInput
   COUNTRY: String
   CURRENCY: CurrencyInput
   COUNTRY_LOGO_FILE: String
   COUNTRY_LOGO_RENDER_WIDTH: Int
   COUNTRY_LOGO_RENDER_HEIGHT: Int
   DESKTOP_TIME_OUT_MILLISECONDS: Int
+  DEATH: DeathInput
   LANGUAGES: String
   CERTIFICATE_PRINT_LOWEST_CHARGE: Int
   CERTIFICATE_PRINT_HIGHEST_CHARGE: Int
@@ -86,21 +132,20 @@ input ApplicationConfigurationInput {
   SENTRY: String
   LOGROCKET: String
   PHONE_NUMBER_PATTERN: PhoneNumberPatternInput
-  BIRTH_REGISTRATION_TARGET: Int
-  LATE_BIRTH_REGISTRATION_TARGET: Int
-  DEATH_REGISTRATION_TARGET: Int
   NID_NUMBER_PATTERN: NIDNumberPatternInput
 }
 
 type ApplicationConfiguration {
   APPLICATION_NAME: String
   BACKGROUND_SYNC_BROADCAST_CHANNEL: String
+  BIRTH: Birth
   COUNTRY: String
   CURRENCY: Currency
   COUNTRY_LOGO_FILE: String
   COUNTRY_LOGO_RENDER_WIDTH: Int
   COUNTRY_LOGO_RENDER_HEIGHT: Int
   DESKTOP_TIME_OUT_MILLISECONDS: Int
+  DEATH: Death
   LANGUAGES: String
   CERTIFICATE_PRINT_LOWEST_CHARGE: Int
   CERTIFICATE_PRINT_HIGHEST_CHARGE: Int
@@ -113,9 +158,6 @@ type ApplicationConfiguration {
   SENTRY: String
   LOGROCKET: String
   PHONE_NUMBER_PATTERN: PhoneNumberPattern
-  BIRTH_REGISTRATION_TARGET: Int
-  LATE_BIRTH_REGISTRATION_TARGET: Int
-  DEATH_REGISTRATION_TARGET: Int
   NID_NUMBER_PATTERN: NIDNumberPattern
 }
 

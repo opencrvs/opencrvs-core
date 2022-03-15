@@ -67,6 +67,15 @@ export async function updateApplicationConfigHandler(
 export const updateApplicationConfig = Joi.object({
   APPLICATION_NAME: Joi.string(),
   BACKGROUND_SYNC_BROADCAST_CHANNEL: Joi.string(),
+  BIRTH: Joi.object().keys({
+    REGISTRATION_TARGET: Joi.number(),
+    LATE_REGISTRATION_TARGET: Joi.number(),
+    FEE: {
+      ON_TIME: Joi.number(),
+      LATE: Joi.number(),
+      DELAYED: Joi.number()
+    }
+  }),
   COUNTRY: Joi.string(),
   COUNTRY_LOGO_FILE: Joi.string(),
   COUNTRY_LOGO_RENDER_WIDTH: Joi.number(),
@@ -74,6 +83,13 @@ export const updateApplicationConfig = Joi.object({
   CURRENCY: Joi.object().keys({
     isoCode: Joi.string(),
     languagesAndCountry: Joi.array().items(Joi.string())
+  }),
+  DEATH: Joi.object().keys({
+    REGISTRATION_TARGET: Joi.number(),
+    FEE: {
+      ON_TIME: Joi.number(),
+      DELAYED: Joi.number()
+    }
   }),
   DESKTOP_TIME_OUT_MILLISECONDS: Joi.number(),
   LANGUAGES: Joi.string(),
@@ -97,9 +113,6 @@ export const updateApplicationConfig = Joi.object({
       endBefore: Joi.number()
     }
   }),
-  BIRTH_REGISTRATION_TARGET: Joi.number(),
-  LATE_BIRTH_REGISTRATION_TARGET: Joi.number(),
-  DEATH_REGISTRATION_TARGET: Joi.number(),
   NID_NUMBER_PATTERN: Joi.object().keys({
     pattern: Joi.string(),
     example: Joi.string(),

@@ -130,10 +130,10 @@ class TimeFrameComponent extends React.Component<FullProps> {
             label: intl.formatMessage(constantsMessages.withinTargetDays, {
               registrationTargetDays:
                 eventType === Event.BIRTH
-                  ? this.props.offlineCountryConfiguration.config
-                      .BIRTH_REGISTRATION_TARGET
-                  : this.props.offlineCountryConfiguration.config
-                      .DEATH_REGISTRATION_TARGET
+                  ? this.props.offlineCountryConfiguration.config.BIRTH
+                      .REGISTRATION_TARGET
+                  : this.props.offlineCountryConfiguration.config.DEATH
+                      .REGISTRATION_TARGET
             }),
             width: 15,
             key: 'regWithinTargetd',
@@ -145,10 +145,10 @@ class TimeFrameComponent extends React.Component<FullProps> {
               {
                 registrationTargetDays:
                   eventType === Event.BIRTH
-                    ? this.props.offlineCountryConfiguration.config
-                        .BIRTH_REGISTRATION_TARGET
-                    : this.props.offlineCountryConfiguration.config
-                        .DEATH_REGISTRATION_TARGET
+                    ? this.props.offlineCountryConfiguration.config.BIRTH
+                        .REGISTRATION_TARGET
+                    : this.props.offlineCountryConfiguration.config.DEATH
+                        .REGISTRATION_TARGET
               }
             ),
             width: 15,

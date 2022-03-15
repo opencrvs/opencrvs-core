@@ -321,9 +321,25 @@ export const mockOfflineData = {
   },
   config: {
     APPLICATION_NAME: 'Farajaland CRVS',
+    BIRTH: {
+      REGISTRATION_TARGET: 45,
+      LATE_REGISTRATION_TARGET: 365,
+      FEE: {
+        ON_TIME: 0,
+        LATE: 0,
+        DELAYED: 0
+      }
+    },
     COUNTRY_LOGO_RENDER_WIDTH: 104,
     COUNTRY_LOGO_RENDER_HEIGHT: 104,
     DESKTOP_TIME_OUT_MILLISECONDS: 900000,
+    DEATH: {
+      REGISTRATION_TARGET: 45,
+      FEE: {
+        ON_TIME: 0,
+        DELAYED: 0
+      }
+    },
     HEALTH_FACILITY_FILTER: 'DISTRICT',
     LANGUAGES: 'en,bn',
     CERTIFICATE_PRINT_LOWEST_CHARGE: 0,
@@ -353,9 +369,6 @@ export const mockOfflineData = {
         endBefore: 3
       }
     },
-    BIRTH_REGISTRATION_TARGET: 45,
-    LATE_BIRTH_REGISTRATION_TARGET: 365,
-    DEATH_REGISTRATION_TARGET: 45,
     NID_NUMBER_PATTERN: {
       pattern: /^[0-9]{9}$/,
       example: '4837281940',

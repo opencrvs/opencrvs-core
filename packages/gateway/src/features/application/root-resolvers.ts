@@ -64,12 +64,6 @@ export const resolvers: GQLResolver = {
         LOGROCKET: applicationConfig.LOGROCKET as string,
         PHONE_NUMBER_PATTERN:
           applicationConfig.PHONE_NUMBER_PATTERN as GQLPhoneNumberPatternInput,
-        BIRTH_REGISTRATION_TARGET:
-          applicationConfig.BIRTH_REGISTRATION_TARGET as number,
-        LATE_BIRTH_REGISTRATION_TARGET:
-          applicationConfig.LATE_BIRTH_REGISTRATION_TARGET as number,
-        DEATH_REGISTRATION_TARGET:
-          applicationConfig.DEATH_REGISTRATION_TARGET as number,
         NID_NUMBER_PATTERN:
           applicationConfig.NID_NUMBER_PATTERN as GQLNIDNumberPatternInput
       }

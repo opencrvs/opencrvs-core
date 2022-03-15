@@ -10,7 +10,22 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { model, Schema, Document } from 'mongoose'
-
+interface IBirth {
+  REGISTRATION_TARGET: number
+  LATE_REGISTRATION_TARGET: number
+  FEE: {
+    ON_TIME: number
+    LATE: number
+    DELAYED: number
+  }
+}
+interface IDeath {
+  REGISTRATION_TARGET: number
+  FEE: {
+    ON_TIME: number
+    DELAYED: number
+  }
+}
 interface IPhoneNumberPattern {
   pattern: RegExp
   example: string
@@ -35,11 +50,13 @@ interface ICurrency {
 export interface IApplicationConfigurationModel extends Document {
   APPLICATION_NAME: string
   BACKGROUND_SYNC_BROADCAST_CHANNEL: string
+  BIRTH: IBirth
   COUNTRY: string
   COUNTRY_LOGO_FILE: string
   COUNTRY_LOGO_RENDER_WIDTH: number
   COUNTRY_LOGO_RENDER_HEIGHT: number
   CURRENCY: ICurrency
+  DEATH: IDeath
   DESKTOP_TIME_OUT_MILLISECONDS: number
   LANGUAGES: string
   CERTIFICATE_PRINT_LOWEST_CHARGE: number
@@ -53,11 +70,26 @@ export interface IApplicationConfigurationModel extends Document {
   SENTRY: string
   LOGROCKET: string
   PHONE_NUMBER_PATTERN: IPhoneNumberPattern
-  BIRTH_REGISTRATION_TARGET: number
-  LATE_BIRTH_REGISTRATION_TARGET: number
-  DEATH_REGISTRATION_TARGET: number
   NID_NUMBER_PATTERN: INIDNumberPattern
 }
+
+const birthSchema = new Schema<IBirth>({
+  REGISTRATION_TARGET: { type: Number, default: 45 },
+  LATE_REGISTRATION_TARGET: { type: Number, default: 365 },
+  FEE: {
+    ON_TIME: Number,
+    LATE: Number,
+    DELAYED: Number
+  }
+})
+
+const deathSchema = new Schema<IDeath>({
+  REGISTRATION_TARGET: { type: Number, default: 45 },
+  FEE: {
+    ON_TIME: Number,
+    DELAYED: Number
+  }
+})
 
 const nidPatternSchema = new Schema<INIDNumberPattern>({
   pattern: { type: String },
@@ -84,11 +116,13 @@ const currencySchema = new Schema<ICurrency>({
 const systemSchema = new Schema({
   APPLICATION_NAME: { type: String, required: false, default: 'OpenCRVS' },
   BACKGROUND_SYNC_BROADCAST_CHANNEL: { type: String, required: false },
+  BIRTH: { type: birthSchema, required: false },
   COUNTRY: { type: String, required: false },
   COUNTRY_LOGO_FILE: { type: String, required: false },
   COUNTRY_LOGO_RENDER_WIDTH: { type: Number, required: false, default: 104 },
   COUNTRY_LOGO_RENDER_HEIGHT: { type: Number, required: false, default: 104 },
   CURRENCY: { type: currencySchema, required: false },
+  DEATH: { type: deathSchema, required: false },
   DESKTOP_TIME_OUT_MILLISECONDS: {
     type: Number,
     required: false,
@@ -128,21 +162,6 @@ const systemSchema = new Schema({
     default: false
   },
   PHONE_NUMBER_PATTERN: { type: phoneNumberSchema, required: false },
-  BIRTH_REGISTRATION_TARGET: {
-    type: Number,
-    required: false,
-    default: 45
-  },
-  LATE_BIRTH_REGISTRATION_TARGET: {
-    type: Number,
-    required: false,
-    default: 365
-  },
-  DEATH_REGISTRATION_TARGET: {
-    type: Number,
-    required: false,
-    default: 45
-  },
   NID_NUMBER_PATTERN: { type: nidPatternSchema, required: false },
   SENTRY: { type: String, required: false },
   LOGROCKET: { type: String, required: false }

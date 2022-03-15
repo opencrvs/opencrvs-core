@@ -526,12 +526,14 @@ input CertificateSVGInput {
 type ApplicationConfiguration {
   APPLICATION_NAME: String
   BACKGROUND_SYNC_BROADCAST_CHANNEL: String
+  BIRTH: Birth
   COUNTRY: String
   CURRENCY: Currency
   COUNTRY_LOGO_FILE: String
   COUNTRY_LOGO_RENDER_WIDTH: Int
   COUNTRY_LOGO_RENDER_HEIGHT: Int
   DESKTOP_TIME_OUT_MILLISECONDS: Int
+  DEATH: Death
   LANGUAGES: String
   CERTIFICATE_PRINT_LOWEST_CHARGE: Int
   CERTIFICATE_PRINT_HIGHEST_CHARGE: Int
@@ -544,21 +546,20 @@ type ApplicationConfiguration {
   SENTRY: String
   LOGROCKET: String
   PHONE_NUMBER_PATTERN: PhoneNumberPattern
-  BIRTH_REGISTRATION_TARGET: Int
-  LATE_BIRTH_REGISTRATION_TARGET: Int
-  DEATH_REGISTRATION_TARGET: Int
   NID_NUMBER_PATTERN: NIDNumberPattern
 }
 
 input ApplicationConfigurationInput {
   APPLICATION_NAME: String
   BACKGROUND_SYNC_BROADCAST_CHANNEL: String
+  BIRTH: BirthInput
   COUNTRY: String
   CURRENCY: CurrencyInput
   COUNTRY_LOGO_FILE: String
   COUNTRY_LOGO_RENDER_WIDTH: Int
   COUNTRY_LOGO_RENDER_HEIGHT: Int
   DESKTOP_TIME_OUT_MILLISECONDS: Int
+  DEATH: DeathInput
   LANGUAGES: String
   CERTIFICATE_PRINT_LOWEST_CHARGE: Int
   CERTIFICATE_PRINT_HIGHEST_CHARGE: Int
@@ -571,9 +572,6 @@ input ApplicationConfigurationInput {
   SENTRY: String
   LOGROCKET: String
   PHONE_NUMBER_PATTERN: PhoneNumberPatternInput
-  BIRTH_REGISTRATION_TARGET: Int
-  LATE_BIRTH_REGISTRATION_TARGET: Int
-  DEATH_REGISTRATION_TARGET: Int
   NID_NUMBER_PATTERN: NIDNumberPatternInput
 }
 
@@ -984,9 +982,20 @@ input SignatureInput {
   type: String
 }
 
+type Birth {
+  REGISTRATION_TARGET: Int
+  LATE_REGISTRATION_TARGET: Int
+  FEE: BirthFee
+}
+
 type Currency {
   isoCode: String
   languagesAndCountry: [String]
+}
+
+type Death {
+  REGISTRATION_TARGET: Int
+  FEE: DeathFee
 }
 
 type PhoneNumberPattern {
@@ -1003,9 +1012,20 @@ type NIDNumberPattern {
   num: String
 }
 
+input BirthInput {
+  REGISTRATION_TARGET: Int
+  LATE_REGISTRATION_TARGET: Int
+  FEE: BirthFeeInput
+}
+
 input CurrencyInput {
   isoCode: String
   languagesAndCountry: [String]
+}
+
+input DeathInput {
+  REGISTRATION_TARGET: Int
+  FEE: DeathFeeInput
 }
 
 input PhoneNumberPatternInput {
@@ -1345,9 +1365,31 @@ input ReasonsNotApplyingInput {
   isDeceased: Boolean
 }
 
+type BirthFee {
+  ON_TIME: Int
+  LATE: Int
+  DELAYED: Int
+}
+
+type DeathFee {
+  ON_TIME: Int
+  DELAYED: Int
+}
+
 type Mask {
   startForm: Int
   endBefore: Int
+}
+
+input BirthFeeInput {
+  ON_TIME: Int
+  LATE: Int
+  DELAYED: Int
+}
+
+input DeathFeeInput {
+  ON_TIME: Int
+  DELAYED: Int
 }
 
 input MaskInput {

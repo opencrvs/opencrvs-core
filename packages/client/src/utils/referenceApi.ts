@@ -68,12 +68,28 @@ interface ICurrency {
 export interface IApplicationConfig {
   APPLICATION_NAME: string
   BACKGROUND_SYNC_BROADCAST_CHANNEL: string
+  BIRTH: {
+    REGISTRATION_TARGET: number
+    LATE_REGISTRATION_TARGET: number
+    FEE: {
+      ON_TIME: number
+      LATE: number
+      DELAYED: number
+    }
+  }
   COUNTRY: string
   CURRENCY: ICurrency
   COUNTRY_LOGO_FILE: string
   COUNTRY_LOGO_RENDER_WIDTH: number
   COUNTRY_LOGO_RENDER_HEIGHT: number
   DESKTOP_TIME_OUT_MILLISECONDS: number
+  DEATH: {
+    REGISTRATION_TARGET: number
+    FEE: {
+      ON_TIME: number
+      DELAYED: number
+    }
+  }
   LANGUAGES: string
   CERTIFICATE_PRINT_LOWEST_CHARGE: number
   CERTIFICATE_PRINT_HIGHEST_CHARGE: number
@@ -86,9 +102,6 @@ export interface IApplicationConfig {
   SENTRY: string
   LOGROCKET: string
   PHONE_NUMBER_PATTERN: IPhoneNumberPattern
-  BIRTH_REGISTRATION_TARGET: number
-  LATE_BIRTH_REGISTRATION_TARGET: number
-  DEATH_REGISTRATION_TARGET: number
   NID_NUMBER_PATTERN: INIDNumberPattern
 }
 

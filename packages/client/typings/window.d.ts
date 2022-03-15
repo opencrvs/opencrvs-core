@@ -13,6 +13,15 @@ interface Window {
   config: {
     APPLICATION_NAME: string
     API_GATEWAY_URL: string
+    BIRTH: {
+      REGISTRATION_TARGET: number
+      LATE_REGISTRATION_TARGET: number
+      FEE: {
+        ON_TIME: number
+        LATE: number
+        DELAYED: number
+      }
+    }
     CONFIG_API_URL: string
     BACKGROUND_SYNC_BROADCAST_CHANNEL: string
     COUNTRY: string
@@ -24,6 +33,13 @@ interface Window {
     COUNTRY_LOGO_RENDER_WIDTH: number // in px
     COUNTRY_LOGO_RENDER_HEIGHT: number // in px
     DESKTOP_TIME_OUT_MILLISECONDS: number
+    DEATH: {
+      REGISTRATION_TARGET: number
+      FEE: {
+        ON_TIME: number
+        DELAYED: number
+      }
+    }
     LANGUAGES: string
     LOGIN_URL: string
     AUTH_URL: string
@@ -54,8 +70,5 @@ interface Window {
     }
     LOGROCKET: string
     SENTRY: string
-    BIRTH_REGISTRATION_TARGET: number
-    LATE_BIRTH_REGISTRATION_TARGET: number
-    DEATH_REGISTRATION_TARGET: number
   }
 }

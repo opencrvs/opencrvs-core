@@ -11,6 +11,22 @@
  */
 import fetch from 'node-fetch'
 import { CONFIG_API_URL } from '@metrics/constants'
+interface IBirth {
+  REGISTRATION_TARGET: number
+  LATE_REGISTRATION_TARGET: number
+  FEE: {
+    ON_TIME: number
+    LATE: number
+    DELAYED: number
+  }
+}
+interface IDeath {
+  REGISTRATION_TARGET: number
+  FEE: {
+    ON_TIME: number
+    DELAYED: number
+  }
+}
 export interface IPhoneNumberPattern {
   pattern: RegExp
   example: string
@@ -28,12 +44,14 @@ interface ICurrency {
 export interface IApplicationConfig {
   APPLICATION_NAME: string
   BACKGROUND_SYNC_BROADCAST_CHANNEL: string
+  BIRTH: IBirth
   COUNTRY: string
   CURRENCY: ICurrency
   COUNTRY_LOGO_FILE: string
   COUNTRY_LOGO_RENDER_WIDTH: number
   COUNTRY_LOGO_RENDER_HEIGHT: number
   DESKTOP_TIME_OUT_MILLISECONDS: number
+  DEATH: IDeath
   HEALTH_FACILITY_FILTER: string
   LANGUAGES: string
   CERTIFICATE_PRINT_LOWEST_CHARGE: number
@@ -47,9 +65,6 @@ export interface IApplicationConfig {
   SENTRY: string
   LOGROCKET: string
   PHONE_NUMBER_PATTERN: IPhoneNumberPattern
-  BIRTH_REGISTRATION_TARGET: number
-  LATE_BIRTH_REGISTRATION_TARGET: number
-  DEATH_REGISTRATION_TARGET: number
 }
 
 export async function getApplicationConfig(): Promise<IApplicationConfig> {

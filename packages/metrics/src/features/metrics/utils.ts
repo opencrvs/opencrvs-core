@@ -402,7 +402,7 @@ export async function getRegistrationTargetDays(event: string) {
   const applicationConfig = await getApplicationConfig()
   const targetDays =
     event === EVENT_TYPE.BIRTH
-      ? applicationConfig.BIRTH_REGISTRATION_TARGET
-      : applicationConfig.DEATH_REGISTRATION_TARGET
+      ? applicationConfig.BIRTH?.REGISTRATION_TARGET
+      : applicationConfig.DEATH?.REGISTRATION_TARGET
   return targetDays
 }
