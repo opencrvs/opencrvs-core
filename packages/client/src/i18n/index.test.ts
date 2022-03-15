@@ -10,11 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { getAvailableLanguages } from './utils'
-import moment from 'moment'
 import './components/I18nContainer'
+import { locales } from '@client/utils/date-formatting'
 
 describe('Available languages', () => {
-  it('are all defined as moment locales', () => {
-    expect(getAvailableLanguages()).toEqual(moment.locales())
+  it('are all defined as date-fns locales', () => {
+    expect(getAvailableLanguages()).toEqual(Object.keys(locales))
   })
 })

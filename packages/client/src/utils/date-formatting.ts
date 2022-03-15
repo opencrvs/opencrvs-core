@@ -9,41 +9,33 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import moment from 'moment'
+import format from 'date-fns/format'
+import formatDistanceToNowStrict from 'date-fns/formatDistanceToNowStrict'
+import { enGB, bn } from 'date-fns/locale'
 
-const config: { [key: string]: moment.LocaleSpecification } = {
-  en: {
-    longDateFormat: {
-      L: 'DD-MM-YYYY',
-      LT: 'HH:mm',
-      LTS: 'HH:mm:ss',
-      LL: 'DD MMMM YYYY',
-      LLL: 'D MMMM YYYY HH:mm',
-      LLLL: 'dddd D MMMM YYYY HH:mm'
-    }
-  },
-  bn: {
-    longDateFormat: {
-      L: 'DD-MM-YYYY',
-      LT: 'HH:mm',
-      LTS: 'HH:mm:ss',
-      LL: 'DD MMMM YYYY',
-      LLL: 'D MMMM YYYY HH:mm',
-      LLLL: 'dddd D MMMM YYYY HH:mm'
-    }
-  }
-}
+export const locales: Record<string, Locale> = { en: enGB, bn }
 
 export const formatLongDate = (
   date: string,
   locale = 'en',
-  formatString = 'LL'
+  formatString = 'dd MMMM yyyy'
 ) => {
-  moment.updateLocale(locale, config[locale])
-  return moment(date).format(formatString)
+  window.__localeId__ = locale
+  return format(new Date(date), formatString, {
+    locale: locales[window.__localeId__]
+  })
 }
 
-export const formattedDuration = (fromDate: moment.Moment) => {
-  moment.relativeTimeRounding(Math.floor)
-  return fromDate.fromNow()
+export const formattedDuration = (fromDate: Date | number) => {
+  return formatDistanceToNowStrict(fromDate, {
+    locale: locales[window.__localeId__],
+    addSuffix: true,
+    roundingMethod: 'floor'
+  })
+}
+
+export default function (date: Date | number, formatStr = 'PP') {
+  return format(date, formatStr, {
+    locale: locales[window.__localeId__]
+  })
 }
