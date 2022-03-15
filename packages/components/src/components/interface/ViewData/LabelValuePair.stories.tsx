@@ -28,6 +28,6 @@ const Template: Story<ILabelValuePairProps> = (args) => (
 )
 export const LabelValuePairView = Template.bind({})
 LabelValuePairView.args = {
-  label: 'Percentage of Female Birth Applications',
+  label: 'Percentage of Female Birth Declarations',
   value: '25%'
 }

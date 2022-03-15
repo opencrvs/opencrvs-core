@@ -91,7 +91,7 @@ export const verifyIDOnBirthCertificateCollectorDefinition: IVerifyIDCertificate
       informant: {
         identifierTypeField: 'iDType',
         identifierOtherTypeField: 'iDTypeOther',
-        identifierField: 'applicantID',
+        identifierField: 'informantID',
         nameFields: {
           en: {
             firstNamesField: 'firstNamesEng',
@@ -294,7 +294,7 @@ export const collectBirthCertificateFormSection: IFormSection = {
         {
           name: 'relationship',
           type: TEXT,
-          label: formMessages.applicantsRelationWithChild,
+          label: formMessages.informantsRelationWithChild,
           required: true,
           initialValue: '',
           validate: []
@@ -363,7 +363,7 @@ export const collectDeathCertificateFormSection: IFormSection = {
           initialValue: true,
           validate: [],
           options: [
-            { value: 'INFORMANT', label: formMessages.applicantName },
+            { value: 'INFORMANT', label: formMessages.informantName },
             { value: 'OTHER', label: formMessages.someoneElse },
             {
               value: 'PRINT_IN_ADVANCE',
@@ -450,7 +450,7 @@ export const collectDeathCertificateFormSection: IFormSection = {
         {
           name: 'relationship',
           type: TEXT,
-          label: formMessages.applicantsRelationWithDeceased,
+          label: formMessages.informantsRelationWithDeceased,
           required: true,
           initialValue: '',
           validate: []

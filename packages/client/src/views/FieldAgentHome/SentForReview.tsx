@@ -20,9 +20,9 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import {
   SUBMISSION_STATUS,
-  IApplication,
-  deleteApplication
-} from '@client/applications'
+  IDeclaration,
+  deleteDeclaration
+} from '@client/declarations'
 import {
   StatusSubmitted,
   StatusFailed24 as StatusFailed,
@@ -38,15 +38,15 @@ import {
 } from '@client/i18n/messages'
 import { getDefaultLanguage } from '@client/i18n/utils'
 import { withTheme, ITheme } from '@client/styledComponents'
-import { getDraftApplicantFullName } from '@client/utils/draftUtils'
+import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 
-const APPLICATIONS_DAY_LIMIT = 7
+const DECLARATIONS_DAY_LIMIT = 7
 
 interface ISentForReviewProps {
   theme: ITheme
-  applicationsReadyToSend: IApplication[]
-  deleteApplication: typeof deleteApplication
+  declarationsReadyToSend: IDeclaration[]
+  deleteDeclaration: typeof deleteDeclaration
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   showPaginated?: boolean
   loading?: boolean
@@ -127,33 +127,33 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
 
   componentDidMount() {
     window.addEventListener('resize', this.recordWindowWidth)
-    this.props.applicationsReadyToSend
+    this.props.declarationsReadyToSend
       .filter(
-        (application: IApplication) =>
-          application.submissionStatus ===
+        (declaration: IDeclaration) =>
+          declaration.submissionStatus ===
             SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTED] &&
-          application.modifiedOn &&
+          declaration.modifiedOn &&
           calculateDays(
-            new Date(application.modifiedOn).toISOString().split('T')[0]
-          ) > APPLICATIONS_DAY_LIMIT
+            new Date(declaration.modifiedOn).toISOString().split('T')[0]
+          ) > DECLARATIONS_DAY_LIMIT
       )
-      .forEach((application) => {
-        this.props.deleteApplication(application)
+      .forEach((declaration) => {
+        this.props.deleteDeclaration(declaration)
       })
   }
 
-  transformApplicationsReadyToSend = () => {
+  transformDeclarationsReadyToSend = () => {
     if (
-      !this.props.applicationsReadyToSend ||
-      this.props.applicationsReadyToSend.length <= 0
+      !this.props.declarationsReadyToSend ||
+      this.props.declarationsReadyToSend.length <= 0
     ) {
       return []
     }
-    return this.props.applicationsReadyToSend.map(
-      (draft: IApplication, index) => {
+    return this.props.declarationsReadyToSend.map(
+      (draft: IDeclaration, index) => {
         const { intl } = this.props
         const { locale } = intl
-        const name = getDraftApplicantFullName(draft, locale)
+        const name = getDraftInformantFullName(draft, locale)
         const event =
           (draft.event &&
             intl.formatMessage(
@@ -179,7 +179,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
               handler: () => {
                 if (!draft.compositionId) {
                   throw new Error(
-                    'No composition id found for this application'
+                    'No composition id found for this declaration'
                   )
                 }
                 this.props.goToDeclarationRecordAudit(
@@ -224,7 +224,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           label: this.props.intl.formatMessage(messages.trackingId),
           width: 25,
           key: 'submissionStatus',
-          color: getTheme(getDefaultLanguage()).colors.secondaryLabel
+          color: getTheme(getDefaultLanguage()).colors.supportingCopy
         },
         {
           label: this.props.intl.formatMessage(messages.submissionStatus),
@@ -256,15 +256,15 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
   }
 
   render() {
-    const { intl, applicationsReadyToSend } = this.props
+    const { intl, declarationsReadyToSend } = this.props
 
     return (
       <HomeContent>
         <GridTable
-          content={this.transformApplicationsReadyToSend()}
+          content={this.transformDeclarationsReadyToSend()}
           columns={this.getColumns()}
           noResultText={intl.formatMessage(messages.noResults)}
-          totalItems={applicationsReadyToSend && applicationsReadyToSend.length}
+          totalItems={declarationsReadyToSend && declarationsReadyToSend.length}
           onPageChange={this.onPageChange}
           pageSize={this.pageSize}
           currentPage={this.state.sentForReviewPageNo}
@@ -278,6 +278,6 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
 }
 
 export const SentForReview = connect(null, {
-  deleteApplication,
+  deleteDeclaration,
   goToDeclarationRecordAudit
 })(injectIntl(withTheme(SentForReviewComponent)))

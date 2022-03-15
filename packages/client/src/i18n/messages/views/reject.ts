@@ -28,7 +28,7 @@ interface IRejectMessages
 const messagesToDefine: IRejectMessages = {
   rejectionFormTitle: {
     id: 'review.rejection.form.title',
-    defaultMessage: 'What update does the application require?',
+    defaultMessage: 'What update does the declaration require?',
     description: 'Rejection form title'
   },
   rejectionFormInstruction: {
@@ -54,7 +54,7 @@ const messagesToDefine: IRejectMessages = {
   },
   rejectionReasonDuplicate: {
     id: 'review.rejection.form.reasons.duplicate',
-    defaultMessage: 'Duplicate application',
+    defaultMessage: 'Duplicate declaration',
     description: 'Label for rejection option duplicate'
   },
   rejectionReasonMisspelling: {
@@ -75,7 +75,7 @@ const messagesToDefine: IRejectMessages = {
   rejectionCommentForHealthWorkerLabel: {
     id: 'review.rejection.form.commentLabel',
     defaultMessage:
-      'Comments or instructions for health worker to rectify application'
+      'Comments or instructions for health worker to rectify declaration'
   }
 }
 

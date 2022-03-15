@@ -18,7 +18,7 @@ import {
 } from '@client/tests/util'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { ReactWrapper } from 'enzyme'
-import { createApplication, storeApplication } from '@client/applications'
+import { createDeclaration, storeDeclaration } from '@client/declarations'
 import { createStore } from '@client/store'
 import {
   SELECT_WITH_OPTIONS,
@@ -47,8 +47,8 @@ describe('form component', () => {
 
   beforeEach(async () => {
     const { store, history } = createStore()
-    const draft = createApplication(Event.BIRTH)
-    store.dispatch(storeApplication(draft))
+    const draft = createDeclaration(Event.BIRTH)
+    store.dispatch(storeDeclaration(draft))
     const modifyDraft = jest.fn()
     component = await createTestComponent(
       <FormFieldGenerator
@@ -219,8 +219,8 @@ describe('when user is in the register section', () => {
   let component: ReactWrapper<{}, {}>
   beforeEach(async () => {
     const { store, history } = createStore()
-    const draft = createApplication(Event.BIRTH)
-    store.dispatch(storeApplication(draft))
+    const draft = createDeclaration(Event.BIRTH)
+    store.dispatch(storeDeclaration(draft))
     const modifyDraft = jest.fn()
     component = await createTestComponent(
       <FormFieldGenerator
@@ -233,7 +233,7 @@ describe('when user is in the register section', () => {
             type: TEL,
             label: {
               defaultMessage: 'Phone number',
-              id: 'form.field.label.application.phone',
+              id: 'form.field.label.declaration.phone',
               description: 'Input label for phone input'
             },
             required: true,
@@ -260,8 +260,8 @@ describe('when field definition has nested fields', () => {
 
   beforeEach(async () => {
     const { store, history } = createStore()
-    const draft = createApplication(Event.BIRTH)
-    store.dispatch(storeApplication(draft))
+    const draft = createDeclaration(Event.BIRTH)
+    store.dispatch(storeDeclaration(draft))
     const modifyDraft = jest.fn()
     component = await createTestComponent(
       <FormFieldGenerator
@@ -270,12 +270,12 @@ describe('when field definition has nested fields', () => {
         setAllFieldsDirty={false}
         fields={[
           {
-            name: 'applicant',
+            name: 'informant',
             type: RADIO_GROUP_WITH_NESTED_FIELDS,
             label: {
-              defaultMessage: 'Applicant',
-              description: 'Form section name for Applicant',
-              id: 'form.section.applicant.name'
+              defaultMessage: 'Informant',
+              description: 'Form section name for Informant',
+              id: 'form.section.informant.name'
             },
             required: true,
             initialValue: '',
@@ -286,7 +286,7 @@ describe('when field definition has nested fields', () => {
                 label: {
                   defaultMessage: 'Father',
                   description: 'Label for option Father',
-                  id: 'form.field.label.applicantRelation.father'
+                  id: 'form.field.label.informantRelation.father'
                 }
               },
               {
@@ -294,14 +294,14 @@ describe('when field definition has nested fields', () => {
                 label: {
                   defaultMessage: 'Mother',
                   description: 'Label for option Mother',
-                  id: 'form.field.label.applicantRelation.mother'
+                  id: 'form.field.label.informantRelation.mother'
                 }
               }
             ],
             nestedFields: {
               FATHER: [
                 {
-                  name: 'applicantPhoneFather',
+                  name: 'informantPhoneFather',
                   type: TEL,
                   label: {
                     defaultMessage: 'Phone number',
@@ -315,7 +315,7 @@ describe('when field definition has nested fields', () => {
               ],
               MOTHER: [
                 {
-                  name: 'applicantPhoneMother',
+                  name: 'informantPhoneMother',
                   type: TEL,
                   label: {
                     defaultMessage: 'Phone number',
@@ -339,57 +339,57 @@ describe('when field definition has nested fields', () => {
   })
 
   it('renders radio group with nested fields', () => {
-    expect(component.find('#applicant').length).toBeGreaterThanOrEqual(1)
+    expect(component.find('#informant').length).toBeGreaterThanOrEqual(1)
   })
 
   it('when clicking on a radio option renders nested fields', () => {
     component
-      .find('#applicant_MOTHER')
+      .find('#informant_MOTHER')
       .hostNodes()
       .simulate('change', { target: { checked: true } })
     component.update()
 
     expect(
       component.find(
-        'input[name="applicant.nestedFields.applicantPhoneMother"]'
+        'input[name="informant.nestedFields.informantPhoneMother"]'
       )
     ).toHaveLength(1)
   })
 
   it('changing radio button resets nested field values', () => {
     component
-      .find('#applicant_MOTHER')
+      .find('#informant_MOTHER')
       .hostNodes()
       .simulate('change', { target: { checked: true } })
 
     component
-      .find('input[name="applicant.nestedFields.applicantPhoneMother"]')
+      .find('input[name="informant.nestedFields.informantPhoneMother"]')
       .simulate('change', {
         target: {
-          name: 'applicant.nestedFields.applicantPhoneMother',
+          name: 'informant.nestedFields.informantPhoneMother',
           value: '01912345678'
         }
       })
 
     expect(
       component
-        .find('input[name="applicant.nestedFields.applicantPhoneMother"]')
+        .find('input[name="informant.nestedFields.informantPhoneMother"]')
         .props().value
     ).toEqual('01912345678')
 
     component
-      .find('#applicant_FATHER')
+      .find('#informant_FATHER')
       .hostNodes()
       .simulate('change', { target: { checked: true } })
 
     component
-      .find('#applicant_MOTHER')
+      .find('#informant_MOTHER')
       .hostNodes()
       .simulate('change', { target: { checked: true } })
 
     expect(
       component
-        .find('input[name="applicant.nestedFields.applicantPhoneMother"]')
+        .find('input[name="informant.nestedFields.informantPhoneMother"]')
         .props().value
     ).toEqual('')
   })

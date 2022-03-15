@@ -11,25 +11,35 @@
  */
 import * as React from 'react'
 import { HomeContent } from '@opencrvs/components/lib/layout'
-import { GridTable } from '@opencrvs/components/lib/interface'
-import { IApplication } from '@client/applications'
+import {
+  ColumnContentAlignment,
+  GridTable
+} from '@opencrvs/components/lib/interface'
+import { IDeclaration } from '@client/declarations'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import moment from 'moment'
-import { goToDeclarationRecordAudit } from '@client/navigation'
+import { goToDeclarationRecordAudit, goToPage } from '@client/navigation'
 import { withTheme, ITheme } from '@client/styledComponents'
 import {
   constantsMessages as messages,
-  dynamicConstantsMessages
+  dynamicConstantsMessages,
+  buttonMessages
 } from '@client/i18n/messages'
-import { getDraftApplicantFullName } from '@client/utils/draftUtils'
+import { messages as reg_messages } from '@client/i18n/messages/views/registrarHome'
+import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { formattedDuration } from '@client/utils/date-formatting'
+import {
+  DRAFT_BIRTH_PARENT_FORM_PAGE,
+  DRAFT_DEATH_FORM_PAGE
+} from '@client/navigation/routes'
 
 interface IInProgressProps {
   theme: ITheme
-  draftApplications: IApplication[]
+  draftDeclarations: IDeclaration[]
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
+  goToPage: typeof goToPage
   showPaginated?: boolean
   loading?: boolean
   error?: boolean
@@ -57,13 +67,13 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
 
   transformDraftContent = () => {
     if (
-      !this.props.draftApplications ||
-      this.props.draftApplications.length <= 0
+      !this.props.draftDeclarations ||
+      this.props.draftDeclarations.length <= 0
     ) {
       return []
     }
 
-    return this.props.draftApplications.map((draft: IApplication) => {
+    return this.props.draftDeclarations.map((draft: IDeclaration) => {
       const { intl } = this.props
       const { locale } = intl
       const lastModificationDate = draft.modifiedOn || draft.savedOn
@@ -74,7 +84,30 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
             dynamicConstantsMessages[draft.event.toLowerCase()]
           )) ||
         ''
-      const name = getDraftApplicantFullName(draft, locale)
+      const name = getDraftInformantFullName(draft, locale)
+
+      let pageRoute: string
+      if (draft.event && draft.event.toString() === 'birth') {
+        pageRoute = DRAFT_BIRTH_PARENT_FORM_PAGE
+      } else if (draft.event && draft.event.toString() === 'death') {
+        pageRoute = DRAFT_DEATH_FORM_PAGE
+      }
+
+      const actions = [
+        {
+          label: this.props.intl.formatMessage(buttonMessages.update),
+          handler: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+            e.stopPropagation()
+            this.props.goToPage(
+              pageRoute,
+              draft.id,
+              'preview',
+              (draft.event && draft.event.toString()) || ''
+            )
+          }
+        }
+      ]
+
       return {
         id: draft.id,
         event: event,
@@ -84,6 +117,7 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
             lastModificationDate &&
             formattedDuration(moment(lastModificationDate))
           }` || '',
+        actions,
         rowClickHandler: [
           {
             label: 'rowClickHandler',
@@ -116,19 +150,26 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
       return [
         {
           label: this.props.intl.formatMessage(messages.type),
-          width: 20,
+          width: 15,
           key: 'event'
         },
         {
           label: this.props.intl.formatMessage(messages.name),
-          width: 40,
+          width: 35,
           key: 'name',
           errorValue: this.props.intl.formatMessage(messages.noNameProvided)
         },
         {
           label: this.props.intl.formatMessage(messages.lastEdited),
-          width: 40,
+          width: 35,
           key: 'dateOfModification'
+        },
+        {
+          label: this.props.intl.formatMessage(reg_messages.listItemAction),
+          width: 15,
+          key: 'actions',
+          isActionColumn: true,
+          alignment: ColumnContentAlignment.CENTER
         }
       ]
     } else {
@@ -149,7 +190,7 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
   }
 
   render() {
-    const { draftApplications, intl } = this.props
+    const { draftDeclarations, intl } = this.props
 
     return (
       <HomeContent>
@@ -161,7 +202,7 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
             this.onPageChange(currentPage)
           }}
           pageSize={this.pageSize}
-          totalItems={draftApplications && draftApplications.length}
+          totalItems={draftDeclarations && draftDeclarations.length}
           currentPage={this.state.inProgressPageNo}
           expandable={false}
           clickable={true}
@@ -174,6 +215,7 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
   }
 }
 
-export const InProgress = connect(null, { goToDeclarationRecordAudit })(
-  injectIntl(withTheme(InProgressComponent))
-)
+export const InProgress = connect(null, {
+  goToDeclarationRecordAudit,
+  goToPage
+})(injectIntl(withTheme(InProgressComponent)))

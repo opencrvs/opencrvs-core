@@ -13,7 +13,7 @@ import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { Print } from '@opencrvs/components/lib/icons'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { FormattedNumberCurrency } from '@opencrvs/components/lib/symbol'
-import { IPrintableApplication, modifyApplication } from '@client/applications'
+import { IPrintableDeclaration, modifyDeclaration } from '@client/declarations'
 import { Event } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/certificate'
@@ -86,9 +86,9 @@ interface IProps {
   event: Event
   registrationId: string
   language: string
-  application: IPrintableApplication
+  declaration: IPrintableDeclaration
   theme: ITheme
-  modifyApplication: typeof modifyApplication
+  modifyDeclaration: typeof modifyDeclaration
   goToReviewCertificate: typeof goToReviewCertificateAction
   goBack: typeof goBackAction
   userDetails: IUserDetails | null
@@ -99,18 +99,18 @@ type IFullProps = IProps & IntlShapeProps
 
 class PaymentComponent extends React.Component<IFullProps> {
   continue = (paymentAmount: string) => {
-    const { application } = this.props
+    const { declaration } = this.props
     const certificates =
-      application && application.data.registration.certificates
+      declaration && declaration.data.registration.certificates
 
     const certificate = (certificates && certificates[0]) || {}
 
-    this.props.modifyApplication({
-      ...application,
+    this.props.modifyDeclaration({
+      ...declaration,
       data: {
-        ...application.data,
+        ...declaration.data,
         registration: {
-          ...application.data.registration,
+          ...declaration.data.registration,
           certificates: [
             {
               ...certificate,
@@ -134,9 +134,9 @@ class PaymentComponent extends React.Component<IFullProps> {
   }
 
   render = () => {
-    const { intl, application, event, goBack, offlineCountryConfig } =
+    const { intl, declaration, event, goBack, offlineCountryConfig } =
       this.props
-    const eventDate = getEventDate(application.data, event)
+    const eventDate = getEventDate(declaration.data, event)
 
     const paymentAmount = calculatePrice(event, eventDate)
 
@@ -175,7 +175,7 @@ class PaymentComponent extends React.Component<IFullProps> {
               onClick={() =>
                 printMoneyReceipt(
                   this.props.intl,
-                  this.props.application,
+                  this.props.declaration,
                   this.props.userDetails,
                   this.props.offlineCountryConfig
                 )
@@ -214,19 +214,19 @@ function mapStatetoProps(
 ) {
   const { registrationId, eventType } = props.match.params
   const event = getEvent(eventType)
-  const application = state.applicationsState.applications.find(
+  const declaration = state.declarationsState.declarations.find(
     (app) => app.id === registrationId && app.event === event
-  ) as IPrintableApplication | undefined
+  ) as IPrintableDeclaration | undefined
 
-  if (!application) {
-    throw new Error(`Application "${registrationId}" missing!`)
+  if (!declaration) {
+    throw new Error(`Declaration "${registrationId}" missing!`)
   }
 
   return {
-    event: application.event,
+    event: declaration.event,
     registrationId,
     language: state.i18n.language,
-    application,
+    declaration,
     userDetails: getUserDetails(state),
     offlineCountryConfig: getOfflineData(state)
   }
@@ -234,6 +234,6 @@ function mapStatetoProps(
 
 export const Payment = connect(mapStatetoProps, {
   goBack: goBackAction,
-  modifyApplication,
+  modifyDeclaration,
   goToReviewCertificate: goToReviewCertificateAction
 })(injectIntl(withTheme(PaymentComponent)))

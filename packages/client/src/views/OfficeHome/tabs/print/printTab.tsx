@@ -36,7 +36,7 @@ import {
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/registrarHome'
 import { IStoreState } from '@client/store'
-import { IApplication, DOWNLOAD_STATUS } from '@client/applications'
+import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
 import { Action } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { formattedDuration } from '@client/utils/date-formatting'
@@ -46,7 +46,7 @@ interface IBasePrintTabProps {
   goToPrintCertificate: typeof goToPrintCertificate
   registrarLocationId: string | null
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
-  outboxApplications: IApplication[]
+  outboxDeclarations: IDeclaration[]
   queryData: {
     data: GQLEventSearchResultSet
   }
@@ -148,12 +148,12 @@ class PrintTabComponent extends React.Component<
 
     const transformedData = transformData(data, this.props.intl)
     return transformedData.map((reg, index) => {
-      const foundApplication = this.props.outboxApplications.find(
-        (application) => application.id === reg.id
+      const foundDeclaration = this.props.outboxDeclarations.find(
+        (declaration) => declaration.id === reg.id
       )
       const actions: IAction[] = []
       const downloadStatus =
-        (foundApplication && foundApplication.downloadStatus) || undefined
+        (foundDeclaration && foundDeclaration.downloadStatus) || undefined
 
       if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
         actions.push({
@@ -162,7 +162,7 @@ class PrintTabComponent extends React.Component<
               downloadConfigs={{
                 event: reg.event,
                 compositionId: reg.id,
-                action: Action.LOAD_CERTIFICATE_APPLICATION
+                action: Action.LOAD_CERTIFICATE_DECLARATION
               }}
               key={`DownloadButton-${index}`}
               status={downloadStatus as DOWNLOAD_STATUS}
@@ -243,7 +243,7 @@ class PrintTabComponent extends React.Component<
 
 function mapStateToProps(state: IStoreState) {
   return {
-    outboxApplications: state.applicationsState.applications
+    outboxDeclarations: state.declarationsState.declarations
   }
 }
 

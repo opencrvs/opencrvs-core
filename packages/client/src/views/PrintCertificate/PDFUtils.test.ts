@@ -14,9 +14,9 @@ import {
   previewCertificate
 } from '@client/views/PrintCertificate/PDFUtils'
 import {
-  mockApplicationData,
+  mockDeclarationData,
   userDetails,
-  mockDeathApplicationData,
+  mockDeathDeclarationData,
   mockOfflineData
 } from '@client/tests/util'
 import { createIntl } from 'react-intl'
@@ -34,7 +34,7 @@ describe('PDFUtils related tests', () => {
         intl,
         {
           id: 'asdhdqe2472487jsdfsdf',
-          data: mockApplicationData,
+          data: mockDeclarationData,
           event: Event.BIRTH
         },
         userDetails,
@@ -48,7 +48,7 @@ describe('PDFUtils related tests', () => {
         intl,
         {
           id: 'asdhdqe2472487jsdfsdf',
-          data: mockDeathApplicationData,
+          data: mockDeathDeclarationData,
           event: Event.DEATH
         },
         userDetails,
@@ -57,13 +57,13 @@ describe('PDFUtils related tests', () => {
     ).not.toThrowError()
   })
   it('Print money reciept function will throws exception if invalid userDetails found', () => {
-    const deathApplication = omit(mockDeathApplicationData, 'deathEvent')
+    const deathDeclaration = omit(mockDeathDeclarationData, 'deathEvent')
     expect(() =>
       printMoneyReceipt(
         intl,
         {
           id: 'asdhdqe2472487jsdfsdf',
-          data: deathApplication,
+          data: deathDeclaration,
           event: Event.DEATH
         },
         null,
@@ -79,7 +79,7 @@ describe('PDFUtils related tests', () => {
         intl,
         {
           id: 'asdhdqe2472487jsdfsdf',
-          data: mockDeathApplicationData,
+          data: mockDeathDeclarationData,
           event: Event.DEATH
         },
         userDetails,
@@ -88,13 +88,13 @@ describe('PDFUtils related tests', () => {
     ).toThrowError('Money reciept template is misssing in offline data')
   })
   it('Throws exception if invalid userDetails found for previewCertificate', () => {
-    const deathApplication = omit(mockDeathApplicationData, 'deathEvent')
+    const deathDeclaration = omit(mockDeathDeclarationData, 'deathEvent')
     expect(
       previewCertificate(
         intl,
         {
           id: 'asdhdqe2472487jsdfsdf',
-          data: deathApplication,
+          data: deathDeclaration,
           event: Event.DEATH
         },
         null,

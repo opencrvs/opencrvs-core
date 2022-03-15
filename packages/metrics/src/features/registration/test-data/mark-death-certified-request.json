@@ -15,10 +15,10 @@
           "coding": [
             {
               "system": "http://opencrvs.org/doc-types",
-              "code": "death-application"
+              "code": "death-declaration"
             }
           ],
-          "text": "Death Application"
+          "text": "Death Declaration"
         },
         "class": {
           "coding": [
@@ -29,7 +29,7 @@
           ],
           "text": "CRVS Document"
         },
-        "title": "Death Application",
+        "title": "Death Declaration",
         "section": [
           {
             "title": "Certificates",
@@ -133,7 +133,7 @@
           },
           {
             "url": "http://opencrvs.org/specs/extension/contact-person",
-            "valueString": "APPLICANT"
+            "valueString": "INFORMANT"
           },
           {
             "url": "http://opencrvs.org/specs/extension/contact-relationship",

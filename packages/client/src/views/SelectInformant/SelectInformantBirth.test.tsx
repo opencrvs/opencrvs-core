@@ -10,10 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  createApplication,
-  IApplication,
-  storeApplication
-} from '@client/applications'
+  createDeclaration,
+  IDeclaration,
+  storeDeclaration
+} from '@client/declarations'
 import { Event } from '@client/forms'
 import { SELECT_BIRTH_INFORMANT } from '@client/navigation/routes'
 
@@ -32,7 +32,7 @@ describe('when user is selecting the informant', () => {
   let app: ReactWrapper
   let history: History
   let store: AppStore
-  let draft: IApplication
+  let draft: IDeclaration
 
   beforeEach(async () => {
     const testApp = await createTestApp()
@@ -40,16 +40,16 @@ describe('when user is selecting the informant', () => {
     history = testApp.history
     store = testApp.store
 
-    draft = createApplication(Event.BIRTH)
-    store.dispatch(storeApplication(draft))
-    history.replace(SELECT_BIRTH_INFORMANT.replace(':applicationId', draft.id))
+    draft = createDeclaration(Event.BIRTH)
+    store.dispatch(storeDeclaration(draft))
+    history.replace(SELECT_BIRTH_INFORMANT.replace(':declarationId', draft.id))
 
     await flushPromises()
     await setPinCode(app)
   })
   describe('when selects "Parent"', () => {
     it('takes user to the birth registration contact view', () => {
-      app.find('#applicant_GRANDFATHER').hostNodes().simulate('change')
+      app.find('#informant_GRANDFATHER').hostNodes().simulate('change')
 
       app.find('#continue').hostNodes().simulate('click')
 
@@ -69,15 +69,15 @@ describe('when user is selecting the informant', () => {
 
   describe('when traverse list then continue', () => {
     it('takes user to the birth registration by parent informant view', () => {
-      app.find('#applicant_MOTHER').hostNodes().simulate('change')
-      app.find('#applicant_FATHER').hostNodes().simulate('change')
+      app.find('#informant_MOTHER').hostNodes().simulate('change')
+      app.find('#informant_FATHER').hostNodes().simulate('change')
 
-      app.find('#applicant_GRANDFATHER').hostNodes().simulate('change')
-      app.find('#applicant_GRANDMOTHER').hostNodes().simulate('change')
-      app.find('#applicant_BROTHER').hostNodes().simulate('change')
-      app.find('#applicant_SISTER').hostNodes().simulate('change')
-      app.find('#applicant_LEGAL_GUARDIAN').hostNodes().simulate('change')
-      app.find('#applicant_SOMEONE_ELSE').hostNodes().simulate('change')
+      app.find('#informant_GRANDFATHER').hostNodes().simulate('change')
+      app.find('#informant_GRANDMOTHER').hostNodes().simulate('change')
+      app.find('#informant_BROTHER').hostNodes().simulate('change')
+      app.find('#informant_SISTER').hostNodes().simulate('change')
+      app.find('#informant_LEGAL_GUARDIAN').hostNodes().simulate('change')
+      app.find('#informant_SOMEONE_ELSE').hostNodes().simulate('change')
 
       app.find('#continue').hostNodes().simulate('click')
 
@@ -101,20 +101,20 @@ describe('when select informant page loads with existing data', () => {
     const history = testApp.history
     const store = testApp.store
 
-    const draft = createApplication(Event.BIRTH, {
+    const draft = createDeclaration(Event.BIRTH, {
       registration: {
         presentAtBirthRegistration: 'MOTHER',
         registrationPhone: '01622688231',
-        applicant: {
+        informant: {
           value: 'MOTHER',
           nestedFields: {}
         }
       }
     })
-    store.dispatch(storeApplication(draft))
-    history.replace(SELECT_BIRTH_INFORMANT.replace(':applicationId', draft.id))
+    store.dispatch(storeDeclaration(draft))
+    history.replace(SELECT_BIRTH_INFORMANT.replace(':declarationId', draft.id))
 
     await setPinCode(app)
-    expect(app.find('#applicant_MOTHER').hostNodes().props().checked).toBe(true)
+    expect(app.find('#informant_MOTHER').hostNodes().props().checked).toBe(true)
   })
 })

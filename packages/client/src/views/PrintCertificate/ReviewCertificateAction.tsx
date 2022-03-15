@@ -16,13 +16,13 @@ import {
   ActionPageLight
 } from '@opencrvs/components/lib/interface'
 import {
-  IPrintableApplication,
-  IApplicationsState,
-  modifyApplication,
-  writeApplication,
-  storeApplication,
+  IPrintableDeclaration,
+  IDeclarationsState,
+  modifyDeclaration,
+  writeDeclaration,
+  storeDeclaration,
   SUBMISSION_STATUS
-} from '@opencrvs/client/src/applications'
+} from '@opencrvs/client/src/declarations'
 import { Action, Event, IForm, CorrectionSection } from '@client/forms'
 import { constantsMessages } from '@client/i18n/messages'
 import { buttonMessages } from '@client/i18n/messages/buttons'
@@ -42,7 +42,7 @@ import { RouteComponentProps } from 'react-router'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { previewCertificate } from '@client/views/PrintCertificate/PDFUtils'
-import { getEventRegisterForm } from '@client/forms/register/application-selectors'
+import { getEventRegisterForm } from '@client/forms/register/declaration-selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import {
   getCountryTranslations,
@@ -73,7 +73,7 @@ const CustomTertiaryButton = styled(TertiaryButton)`
   height: 48px;
   &:disabled {
     background: ${({ theme }) => theme.colors.white};
-    color: ${({ theme }) => theme.colors.scrollBarGrey};
+    color: ${({ theme }) => theme.colors.grey300};
   }
 `
 const ButtonWrapper = styled.div`
@@ -87,17 +87,19 @@ const ButtonWrapper = styled.div`
   }
 `
 const SvgWrapper = styled.div`
-  ${({ theme }) => theme.shadows.mistyShadow};
-  background: ${({ theme }) => theme.colors.blueDeepSeaLight};
+  background: ${({ theme }) => theme.colors.grey100};
   display: flex;
   height: 100%;
+  padding-top: 48px;
+  padding-bottom: 48px;
   align-items: center;
   justify-content: center;
   margin-bottom: 32px;
 `
 const Certificate = styled.img`
   display: block;
-  width: 70%;
+  ${({ theme }) => theme.shadows.light};
+  width: 64%;
   align-items: center;
   justify-content: center;
   margin: 0 auto;
@@ -106,7 +108,7 @@ const Certificate = styled.img`
 const Info = styled.div`
   ${({ theme }) => theme.fonts.bodyStyle};
   margin-bottom: 30px;
-  color: ${({ theme }) => theme.colors.menuBackground};
+  color: ${({ theme }) => theme.colors.grey500};
   width: 80%;
 `
 const Title = styled.h4`
@@ -121,22 +123,22 @@ type State = {
 type IProps = {
   event: Event
   registrationId: string
-  draft: IPrintableApplication
+  draft: IPrintableDeclaration
   userDetails: IUserDetails | null
   countries: IAvailableCountries[]
   registerForm: IForm
   offlineCountryConfig: IOfflineData
   goBack: typeof goBack
-  modifyApplication: typeof modifyApplication
-  writeApplication: typeof writeApplication
+  modifyDeclaration: typeof modifyDeclaration
+  writeDeclaration: typeof writeDeclaration
   goToRegistrarHomeTabAction: typeof goToRegistrarHomeTabAction
-  storeApplication: typeof storeApplication
+  storeDeclaration: typeof storeDeclaration
   goToCertificateCorrection: typeof goToCertificateCorrection
 }
 
 type IFullProps = IntlShapeProps &
   RouteComponentProps<{}, {}, { isNavigatedInsideApp: boolean }> &
-  IProps & { drafts: IApplicationsState }
+  IProps & { drafts: IDeclarationsState }
 
 class ReviewCertificateActionComponent extends React.Component<
   IFullProps,
@@ -212,8 +214,8 @@ class ReviewCertificateActionComponent extends React.Component<
     }
 
     printSvgCertificate()
-    this.props.modifyApplication(draft)
-    this.props.writeApplication(draft)
+    this.props.modifyDeclaration(draft)
+    this.props.writeDeclaration(draft)
     this.toggleModal()
     this.props.goToRegistrarHomeTabAction(TAB_ID.readyForPrint)
   }
@@ -340,7 +342,7 @@ const getEvent = (eventType: string | undefined) => {
 }
 
 const getDraft = (
-  drafts: IPrintableApplication[],
+  drafts: IPrintableDeclaration[],
   registrationId: string,
   eventType: string
 ) =>
@@ -349,17 +351,17 @@ const getDraft = (
     id: '',
     data: {},
     event: getEvent(eventType)
-  } as IPrintableApplication)
+  } as IPrintableDeclaration)
 
 function mapStatetoProps(
   state: IStoreState,
   props: RouteComponentProps<{ registrationId: string; eventType: string }>
 ) {
   const { registrationId, eventType } = props.match.params
-  const applications = state.applicationsState
-    .applications as IPrintableApplication[]
+  const declarations = state.declarationsState
+    .declarations as IPrintableDeclaration[]
 
-  const draft = getDraft(applications, registrationId, eventType)
+  const draft = getDraft(declarations, registrationId, eventType)
   const event = getEvent(draft.event)
 
   return {
@@ -367,17 +369,17 @@ function mapStatetoProps(
     registrationId,
     draft,
     countries: getCountryTranslations(state.i18n.languages, countries),
-    drafts: state.applicationsState,
+    drafts: state.declarationsState,
     userDetails: getUserDetails(state),
     offlineCountryConfig: getOfflineData(state),
     registerForm: getEventRegisterForm(state, event)
   }
 }
 const mapDispatchToProps = {
-  modifyApplication,
-  writeApplication,
+  modifyDeclaration,
+  writeDeclaration,
   goToRegistrarHomeTabAction,
-  storeApplication,
+  storeDeclaration,
   goBack,
   goToCertificateCorrection
 }

@@ -54,6 +54,6 @@ do
   DB=${NAMES[0]}
   COLLECTION=${NAMES[1]}
   echo "Updating collection: $COLLECTION of db: $DB"
-  docker run --rm -v /tmp/compose/infrastructure/default_updates:/default_updates --network=$NETWORK mongo:3.6 bash \
+  docker run --rm -v /tmp/compose/infrastructure/default_updates:/default_updates --network=$NETWORK mongo:4.4 bash \
  -c "mongoimport -h=$HOST -d=$DB -c=$COLLECTION --mode=upsert --file=/default_updates/$FILE"
 done

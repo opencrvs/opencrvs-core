@@ -9,6 +9,7 @@
 # graphic logo are (registered/a) trademark(s) of Plan International.
 enum RegStatus {
   IN_PROGRESS
+  ARCHIVED
   DECLARED
   DECLARATION_UPDATED
   WAITING_VALIDATION
@@ -16,6 +17,7 @@ enum RegStatus {
   REGISTERED
   CERTIFIED
   REJECTED
+  DOWNLOADED
 }
 
 enum BirthRegType {
@@ -31,7 +33,7 @@ enum RegistrationContactType {
   MOTHER
   FATHER
   OTHER
-  APPLICANT
+  INFORMANT
 }
 
 enum BirthRegPresence {
@@ -111,8 +113,8 @@ enum AttachmentSubject {
   DECEASED_PARMANENT_ADDRESS_PROOF
   DECEASED_DEATH_PROOF
   DECEASED_BIRTH_PROOF
-  APPLICANT_ID_PROOF
-  APPLICANT_ATHORITY_TO_APPLY_PROOF
+  INFORMANT_ID_PROOF
+  INFORMANT_ATHORITY_TO_APPLY_PROOF
   LEGAL_GUARDIAN_PROOF
   ASSIGNED_RESPONSIBILITY_PROOF
   WARD_COUNCILLOR_PROOF
@@ -254,9 +256,28 @@ type RegWorkflow { # Task
   timeLogged: Int # -> from metrics
 }
 
+type InputOutput {
+  valueCode: String
+  valueId: String
+  valueString: String
+}
+
+type History {
+  user: User
+  date: Date
+  action: RegStatus
+  reinstated: Boolean # -> extension(url='http://opencrvs.org/specs/extension/regReinstated')
+  location: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastLocation').valueReference
+  office: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastOffice').valueReference
+  comments: [Comment]
+  input: [InputOutput]
+  output: [InputOutput]
+}
+
 interface EventRegistration {
   id: ID! # long uuid
   registration: Registration
+  history: [History]
   createdAt: Date
 }
 
@@ -305,6 +326,7 @@ type BirthRegistration implements EventRegistration { # -> Composition
   primaryCaregiver: PrimaryCaregiver
   createdAt: Date # -> .date($first)
   updatedAt: Date # -> .date
+  history: [History]
 }
 
 input DeathRegistrationInput {
@@ -312,10 +334,10 @@ input DeathRegistrationInput {
   registration: RegistrationInput
   # Remember to mark person as deceased
   deceased: PersonInput
-  informant: RelatedPersonInput # -> Use for applicant ->.section(code='informant-details').entry.reference
-  mother: PersonInput # -> Use for applicant ->.section(code='mother-details').entry.reference
-  father: PersonInput # -> Use for applicant ->.section(code='father-details').entry.reference
-  spouse: PersonInput # -> Use for applicant ->.section(code='spouse-details').entry.reference
+  informant: RelatedPersonInput # -> Use for informant ->.section(code='informant-details').entry.reference
+  mother: PersonInput # -> Use for informant ->.section(code='mother-details').entry.reference
+  father: PersonInput # -> Use for informant ->.section(code='father-details').entry.reference
+  spouse: PersonInput # -> Use for informant ->.section(code='spouse-details').entry.reference
   eventLocation: LocationInput
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
   causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept
@@ -334,10 +356,10 @@ type DeathRegistration implements EventRegistration { # -> Composition
   registration: Registration
   # Remember to mark person as deceased
   deceased: Person # -> .section(code='deceased-details').entry.reference
-  informant: RelatedPerson # -> Use for applicant ->.section(code='informant-details').entry.reference
-  mother: Person # -> Use for applicant ->.section(code='mother-details').entry.reference
-  father: Person # -> Use for applicant ->.section(code='father-details').entry.reference
-  spouse: Person # -> Use for applicant ->.section(code='spouse-details').entry.reference
+  informant: RelatedPerson # -> Use for informant ->.section(code='informant-details').entry.reference
+  mother: Person # -> Use for informant ->.section(code='mother-details').entry.reference
+  father: Person # -> Use for informant ->.section(code='father-details').entry.reference
+  spouse: Person # -> Use for informant ->.section(code='spouse-details').entry.reference
   eventLocation: Location
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
   causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept
@@ -347,6 +369,7 @@ type DeathRegistration implements EventRegistration { # -> Composition
   medicalPractitioner: MedicalPractitioner # -> Encounter.participant
   createdAt: Date # -> .date($first)
   updatedAt: Date # -> .date
+  history: [History]
 }
 
 input CorrectionValueInput {
@@ -498,6 +521,11 @@ type CreatedIds {
   registrationNumber: String
 }
 
+type Reinstated {
+  taskEntryResourceID: ID!
+  registrationStatus: RegStatus
+}
+
 type Query {
   fetchBirthRegistration(id: ID!): BirthRegistration
   searchBirthRegistrations(fromDate: Date, toDate: Date): [BirthRegistration]
@@ -543,6 +571,8 @@ type Mutation {
     details: BirthRegistrationInput!
   ): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID! # updated status to 'voided' - the registration was captured in error
+  markEventAsReinstated(id: String!): Reinstated # updates status to 'reinstated'
+  markEventAsArchived(id: String!): ID! # updates status to 'archived'
   notADuplicate(id: String!, duplicateId: String!): ID! # removes duplicates from composition
   # DEATH
   createDeathRegistration(details: DeathRegistrationInput!): CreatedIds!

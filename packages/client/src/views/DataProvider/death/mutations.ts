@@ -11,14 +11,14 @@
  */
 import gql from 'graphql-tag'
 import { IForm, Action } from '@client/forms'
-import { IApplication } from '@client/applications'
+import { IDeclaration } from '@client/declarations'
 import {
   draftToGqlTransformer,
   appendGqlMetadataFromDraft
 } from '@client/transformer'
 import { REQUEST_DEATH_REG_CORRECTION } from '@client/forms/correction/mutations'
 
-const SUBMIT_DEATH_APPLICATION = gql`
+const SUBMIT_DEATH_DECLARATION = gql`
   mutation submitMutation($details: DeathRegistrationInput!) {
     createDeathRegistration(details: $details) {
       trackingId
@@ -26,12 +26,12 @@ const SUBMIT_DEATH_APPLICATION = gql`
     }
   }
 `
-const APPROVE_DEATH_APPLICATION = gql`
+export const APPROVE_DEATH_DECLARATION = gql`
   mutation submitMutation($id: ID!, $details: DeathRegistrationInput) {
     markDeathAsValidated(id: $id, details: $details)
   }
 `
-const REGISTER_DEATH_APPLICATION = gql`
+export const REGISTER_DEATH_DECLARATION = gql`
   mutation submitMutation($id: ID!, $details: DeathRegistrationInput) {
     markDeathAsRegistered(id: $id, details: $details) {
       id
@@ -71,13 +71,26 @@ const REGISTER_DEATH_APPLICATION = gql`
     }
   }
 `
-const REJECT_DEATH_APPLICATION = gql`
+export const REJECT_DEATH_DECLARATION = gql`
   mutation submitMutation($id: String!, $reason: String!, $comment: String!) {
     markEventAsVoided(id: $id, reason: $reason, comment: $comment)
   }
 `
+export const REINSTATE_DEATH_DECLARATION = gql`
+  mutation submitMutation($id: String!) {
+    markEventAsReinstated(id: $id) {
+      taskEntryResourceID
+      registrationStatus
+    }
+  }
+`
+export const ARCHIVE_DEATH_DECLARATION = gql`
+  mutation submitMutation($id: String!) {
+    markEventAsArchived(id: $id)
+  }
+`
 
-const COLLECT_DEATH_CERTIFICATE = gql`
+export const COLLECT_DEATH_CERTIFICATE = gql`
   mutation submitMutation($id: ID!, $details: DeathRegistrationInput!) {
     markDeathAsCertified(id: $id, details: $details)
   }
@@ -87,7 +100,7 @@ export function getDeathMutationMappings(
   action: Action,
   payload?: any,
   form?: IForm,
-  draft?: IApplication
+  draft?: IDeclaration
 ) {
   let gqlDetails = {}
   if (form && draft) {
@@ -103,35 +116,51 @@ export function getDeathMutationMappings(
   switch (action) {
     case Action.SUBMIT_FOR_REVIEW:
       return {
-        mutation: SUBMIT_DEATH_APPLICATION,
+        mutation: SUBMIT_DEATH_DECLARATION,
         variables: { details: gqlDetails },
         dataKey: 'createDeathRegistration'
       }
-    case Action.APPROVE_APPLICATION:
+    case Action.APPROVE_DECLARATION:
       return {
-        mutation: APPROVE_DEATH_APPLICATION,
+        mutation: APPROVE_DEATH_DECLARATION,
         variables: {
           id: draft && draft.id,
           details: gqlDetails
         },
         dataKey: 'markDeathAsValidated'
       }
-    case Action.REGISTER_APPLICATION:
+    case Action.REGISTER_DECLARATION:
       return {
-        mutation: REGISTER_DEATH_APPLICATION,
+        mutation: REGISTER_DEATH_DECLARATION,
         variables: {
           id: draft && draft.id,
           details: gqlDetails
         },
         dataKey: 'markDeathAsRegistered'
       }
-    case Action.REJECT_APPLICATION:
+    case Action.REJECT_DECLARATION:
       return {
-        mutation: REJECT_DEATH_APPLICATION,
+        mutation: REJECT_DEATH_DECLARATION,
         variables: {
           ...payload
         },
         dataKey: 'markEventAsVoided'
+      }
+    case Action.REINSTATE_DECLARATION:
+      return {
+        mutation: REINSTATE_DEATH_DECLARATION,
+        variables: {
+          ...payload
+        },
+        dataKey: 'markDeclarationAsReinstate'
+      }
+    case Action.ARCHIVE_DECLARATION:
+      return {
+        mutation: ARCHIVE_DEATH_DECLARATION,
+        variables: {
+          ...payload
+        },
+        dataKey: 'markEventAsArchived'
       }
     case Action.COLLECT_CERTIFICATE:
       return {
@@ -142,7 +171,7 @@ export function getDeathMutationMappings(
         },
         dataKey: 'markDeathAsCertified'
       }
-    case Action.REQUEST_CORRECTION_APPLICATION:
+    case Action.REQUEST_CORRECTION_DECLARATION:
       return {
         mutation: REQUEST_DEATH_REG_CORRECTION,
         variables: {

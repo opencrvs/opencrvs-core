@@ -12,30 +12,30 @@
 import { createStore } from '@client/store'
 import {
   createTestComponent,
-  mockApplicationData,
-  mockDeathApplicationData,
+  mockDeclarationData,
+  mockDeathDeclarationData,
   createRouterProps
 } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { CorrectorForm } from './CorrectorForm'
 import { Event, CorrectionSection } from '@client/forms'
-import { IApplication, storeApplication } from '@client/applications'
+import { IDeclaration, storeDeclaration } from '@client/declarations'
 import { CorrectionForm } from './CorrectionForm'
 import { formatUrl } from '@client/navigation'
 import { CERTIFICATE_CORRECTION } from '@client/navigation/routes'
 
 let wrapper: ReactWrapper<{}, {}>
 
-const birthApplication: IApplication = {
+const birthDeclaration: IDeclaration = {
   id: '72c18939-70c1-40b4-9b80-b162c4871160',
-  data: mockApplicationData,
+  data: mockDeclarationData,
   event: Event.BIRTH
 }
 
-const deathApplication: IApplication = {
+const deathDeclaration: IDeclaration = {
   id: '72c18939-70c1-40b4-9b80-b162c4871161',
-  data: mockDeathApplicationData,
+  data: mockDeathDeclarationData,
   event: Event.DEATH
 }
 
@@ -44,18 +44,18 @@ const { store, history } = createStore()
 describe('Corrector form', () => {
   describe('for a birth registration', () => {
     beforeEach(async () => {
-      store.dispatch(storeApplication(birthApplication))
+      store.dispatch(storeDeclaration(birthDeclaration))
       wrapper = await createTestComponent(
         <CorrectionForm
           {...createRouterProps(
             formatUrl(CERTIFICATE_CORRECTION, {
-              applicationId: birthApplication.id,
+              declarationId: birthDeclaration.id,
               pageId: CorrectionSection.Corrector
             }),
             { isNavigatedInsideApp: false },
             {
               matchParams: {
-                applicationId: birthApplication.id,
+                declarationId: birthDeclaration.id,
                 pageId: CorrectionSection.Corrector
               }
             }
@@ -93,18 +93,18 @@ describe('Corrector form', () => {
   })
   describe('for a birth registration with father details', () => {
     beforeEach(async () => {
-      const application: IApplication = {
-        ...birthApplication,
+      const declaration: IDeclaration = {
+        ...birthDeclaration,
         data: {
-          ...birthApplication.data,
+          ...birthDeclaration.data,
           father: {
-            ...birthApplication.data.father,
+            ...birthDeclaration.data.father,
             fathersDetailsExist: true
           }
         }
       }
       wrapper = await createTestComponent(
-        <CorrectorForm application={application} />,
+        <CorrectorForm declaration={declaration} />,
         {
           store,
           history
@@ -118,18 +118,18 @@ describe('Corrector form', () => {
 
   describe('for a birth registration without father details', () => {
     beforeEach(async () => {
-      const application: IApplication = {
-        ...birthApplication,
+      const declaration: IDeclaration = {
+        ...birthDeclaration,
         data: {
-          ...birthApplication.data,
+          ...birthDeclaration.data,
           father: {
-            ...birthApplication.data.father,
+            ...birthDeclaration.data.father,
             fathersDetailsExist: false
           }
         }
       }
       wrapper = await createTestComponent(
-        <CorrectorForm application={application} />,
+        <CorrectorForm declaration={declaration} />,
         {
           store,
           history
@@ -143,18 +143,18 @@ describe('Corrector form', () => {
 
   describe('for a birth registration with father deceased', () => {
     beforeEach(async () => {
-      const application: IApplication = {
-        ...birthApplication,
+      const declaration: IDeclaration = {
+        ...birthDeclaration,
         data: {
-          ...birthApplication.data,
+          ...birthDeclaration.data,
           primaryCaregiver: {
-            ...birthApplication.data.primaryCaregiver,
+            ...birthDeclaration.data.primaryCaregiver,
             fatherIsDeceased: ['deceased']
           }
         }
       }
       wrapper = await createTestComponent(
-        <CorrectorForm application={application} />,
+        <CorrectorForm declaration={declaration} />,
         {
           store,
           history
@@ -168,18 +168,18 @@ describe('Corrector form', () => {
 
   describe('for a birth registration with mother deceased', () => {
     beforeEach(async () => {
-      const application: IApplication = {
-        ...birthApplication,
+      const declaration: IDeclaration = {
+        ...birthDeclaration,
         data: {
-          ...birthApplication.data,
+          ...birthDeclaration.data,
           primaryCaregiver: {
-            ...birthApplication.data.primaryCaregiver,
+            ...birthDeclaration.data.primaryCaregiver,
             motherIsDeceased: ['deceased']
           }
         }
       }
       wrapper = await createTestComponent(
-        <CorrectorForm application={application} />,
+        <CorrectorForm declaration={declaration} />,
         {
           store,
           history
@@ -193,18 +193,18 @@ describe('Corrector form', () => {
 
   describe('for a death registration', () => {
     beforeEach(async () => {
-      store.dispatch(storeApplication(deathApplication))
+      store.dispatch(storeDeclaration(deathDeclaration))
       wrapper = await createTestComponent(
         <CorrectionForm
           {...createRouterProps(
             formatUrl(CERTIFICATE_CORRECTION, {
-              applicationId: deathApplication.id,
+              declarationId: deathDeclaration.id,
               pageId: CorrectionSection.Corrector
             }),
             { isNavigatedInsideApp: false },
             {
               matchParams: {
-                applicationId: deathApplication.id,
+                declarationId: deathDeclaration.id,
                 pageId: CorrectionSection.Corrector
               }
             }
@@ -235,20 +235,20 @@ describe('Corrector form', () => {
     })
   })
 
-  describe('for an application', () => {
+  describe('for an declaration', () => {
     beforeEach(async () => {
-      store.dispatch(storeApplication(birthApplication))
+      store.dispatch(storeDeclaration(birthDeclaration))
       wrapper = await createTestComponent(
         <CorrectionForm
           {...createRouterProps(
             formatUrl(CERTIFICATE_CORRECTION, {
-              applicationId: birthApplication.id,
+              declarationId: birthDeclaration.id,
               pageId: CorrectionSection.Corrector
             }),
             { isNavigatedInsideApp: false },
             {
               matchParams: {
-                applicationId: birthApplication.id,
+                declarationId: birthDeclaration.id,
                 pageId: CorrectionSection.Corrector
               }
             }

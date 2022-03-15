@@ -21,7 +21,7 @@ import { SearchResult } from '@client/views/SearchResult/SearchResult'
 import { goToSearch } from '@client/navigation'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { Event } from '@client/components/DuplicateDetails'
-import { storeApplication } from '@client/applications'
+import { storeDeclaration } from '@client/declarations'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -484,7 +484,7 @@ describe('SearchResult tests', () => {
   })
 
   it('renders review button in search page', async () => {
-    const application = {
+    const declaration = {
       id: 'bc09200d-0160-43b4-9e2b-5b9e90424e91',
       data: {},
       event: Event.BIRTH,
@@ -493,7 +493,7 @@ describe('SearchResult tests', () => {
     }
 
     // @ts-ignore
-    store.dispatch(storeApplication(application))
+    store.dispatch(storeDeclaration(declaration))
     const graphqlMock = [
       {
         request: {
@@ -584,7 +584,7 @@ describe('SearchResult tests', () => {
   })
 
   it('renders update button in search page', async () => {
-    const application = {
+    const declaration = {
       id: 'bc09200d-0160-43b4-9e2b-5b9e90424e92',
       data: {},
       event: Event.BIRTH,
@@ -593,7 +593,7 @@ describe('SearchResult tests', () => {
     }
 
     // @ts-ignore
-    store.dispatch(storeApplication(application))
+    store.dispatch(storeDeclaration(declaration))
     const graphqlMock = [
       {
         request: {
@@ -684,7 +684,7 @@ describe('SearchResult tests', () => {
   })
 
   it('renders print button in search page', async () => {
-    const application = {
+    const declaration = {
       id: 'bc09200d-0160-43b4-9e2b-5b9e90424e92',
       data: {},
       event: Event.BIRTH,
@@ -693,7 +693,7 @@ describe('SearchResult tests', () => {
     }
 
     // @ts-ignore
-    store.dispatch(storeApplication(application))
+    store.dispatch(storeDeclaration(declaration))
     const graphqlMock = [
       {
         request: {
@@ -795,7 +795,7 @@ describe('SearchResult tests', () => {
   })
 
   it('goes to duplicate page while click duplicate button in search page', async () => {
-    const application = {
+    const declaration = {
       id: 'bc09200d-0160-43b4-9e2b-5b9e90424e93',
       data: {},
       event: Event.BIRTH,
@@ -804,7 +804,7 @@ describe('SearchResult tests', () => {
     }
 
     // @ts-ignore
-    store.dispatch(storeApplication(application))
+    store.dispatch(storeDeclaration(declaration))
     const graphqlMock = [
       {
         request: {
@@ -900,8 +900,8 @@ describe('SearchResult tests', () => {
     )
   })
 
-  it('renders review button in search page while application is validated', async () => {
-    const application = {
+  it('renders review button in search page while declaration is validated', async () => {
+    const declaration = {
       id: 'bc09200d-0160-43b4-9e2b-5b9e90424e91',
       data: {},
       event: Event.BIRTH,
@@ -910,7 +910,7 @@ describe('SearchResult tests', () => {
     }
 
     // @ts-ignore
-    store.dispatch(storeApplication(application))
+    store.dispatch(storeDeclaration(declaration))
     const graphqlMock = [
       {
         request: {

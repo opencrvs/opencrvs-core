@@ -14,7 +14,7 @@ import moment from 'moment'
 import { dynamicMessages } from '@client/i18n/messages/views/certificate'
 import { getAvailableLanguages } from '@client/i18n/utils'
 import { ILanguageState } from '@client/i18n/reducer'
-import { IPrintableApplication } from '@client/applications'
+import { IPrintableDeclaration } from '@client/declarations'
 
 //todo:ocrvs-2562
 const FREE_PERIOD = 36500
@@ -166,14 +166,14 @@ export function getEvent(eventType: string | undefined) {
 }
 
 export function isCertificateForPrintInAdvance(
-  application: IPrintableApplication | undefined
+  declaration: IPrintableDeclaration | undefined
 ) {
   const collectorType =
-    application &&
-    application.data.registration.certificates &&
-    application.data.registration.certificates[0] &&
-    application.data.registration.certificates[0].collector &&
-    application.data.registration.certificates[0].collector.type
+    declaration &&
+    declaration.data.registration.certificates &&
+    declaration.data.registration.certificates[0] &&
+    declaration.data.registration.certificates[0].collector &&
+    declaration.data.registration.certificates[0].collector.type
   if (collectorType && collectorType === 'PRINT_IN_ADVANCE') {
     return true
   }

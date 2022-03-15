@@ -13,29 +13,34 @@
 import * as React from 'react'
 import {
   createTestComponent,
-  mockApplicationData,
+  mockDeclarationData,
   createRouterProps,
+  registerScopeToken,
+  getItem,
   flushPromises,
-  mockDeathApplicationData
+  mockDeathDeclarationData
 } from '@client/tests/util'
 import { RecordAudit } from './RecordAudit'
 import { createStore } from '@client/store'
 import { ReactWrapper } from 'enzyme'
 import {
-  createApplication,
-  storeApplication,
-  IApplication
-} from '@client/applications'
+  createDeclaration,
+  storeDeclaration,
+  IDeclaration,
+  SUBMISSION_STATUS,
+  DOWNLOAD_STATUS
+} from '@client/declarations'
 import { Event } from '@client/forms'
 import { formatUrl } from '@client/navigation'
 import { DECLARATION_RECORD_AUDIT } from '@client/navigation/routes'
 import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
+import { checkAuth } from '@client/profile/profileActions'
 import { FETCH_DECLARATION_SHORT_INFO } from './queries'
 import { waitForElement } from '@client/tests/wait-for-element'
 
-const declaration: IApplication = createApplication(
+const declaration: IDeclaration = createDeclaration(
   Event.BIRTH,
-  mockApplicationData
+  mockDeclarationData
 )
 declaration.data.registration = {
   ...declaration.data.registration,
@@ -51,7 +56,7 @@ describe('Record audit summary for a draft birth declaration', () => {
 
   beforeEach(async () => {
     const { store, history } = createStore()
-    store.dispatch(storeApplication(declaration))
+    store.dispatch(storeDeclaration(declaration))
     component = await createTestComponent(
       <RecordAudit
         {...createRouterProps(
@@ -91,24 +96,24 @@ describe('Record audit summary for a draft death declaration', () => {
 
   beforeEach(async () => {
     const { store, history } = createStore()
-    const deathApplication = createApplication(
+    const deathDeclaration = createDeclaration(
       Event.DEATH,
-      mockDeathApplicationData
+      mockDeathDeclarationData
     )
 
-    store.dispatch(storeApplication(deathApplication))
+    store.dispatch(storeDeclaration(deathDeclaration))
     component = await createTestComponent(
       <RecordAudit
         {...createRouterProps(
           formatUrl(DECLARATION_RECORD_AUDIT, {
             tab: 'inProgressTab',
-            declarationId: deathApplication.id
+            declarationId: deathDeclaration.id
           }),
           { isNavigatedInsideApp: false },
           {
             matchParams: {
               tab: 'inProgressTab',
-              declarationId: deathApplication.id
+              declarationId: deathDeclaration.id
             }
           }
         )}
@@ -121,7 +126,7 @@ describe('Record audit summary for a draft death declaration', () => {
     expect(component.exists('RecordAuditBody')).toBeTruthy()
   })
 
-  it('Check values for saved applications', async () => {
+  it('Check values for saved declarations', async () => {
     expect(component.find('#status_value').hostNodes().text()).toBe('Draft')
     expect(component.find('#type_value').hostNodes().text()).toBe('Death')
     expect(component.find('#drn_value').hostNodes().text()).toBe(
@@ -219,6 +224,67 @@ describe('Record audit summary for WorkQueue declarations', () => {
   })
 })
 
+describe('Record audit for a draft declaration', () => {
+  let component: ReactWrapper<{}, {}>
+
+  beforeEach(async () => {
+    const { store, history } = createStore()
+
+    getItem.mockReturnValue(registerScopeToken)
+
+    store.dispatch(checkAuth({ '?token': registerScopeToken }))
+
+    await flushPromises()
+
+    declaration.submissionStatus = SUBMISSION_STATUS.DECLARED
+    declaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
+    store.dispatch(storeDeclaration(declaration))
+
+    component = await createTestComponent(
+      <RecordAudit
+        {...createRouterProps(
+          formatUrl(DECLARATION_RECORD_AUDIT, {
+            declarationId: declaration.id,
+            tab: 'reviewTab'
+          }),
+          { isNavigatedInsideApp: false },
+          {
+            matchParams: {
+              declarationId: declaration.id,
+              tab: 'reviewTab'
+            }
+          }
+        )}
+      />,
+      { store, history }
+    )
+  })
+
+  it('should show the archive button', async () => {
+    expect(component.exists('#archive_button')).toBeTruthy()
+  })
+
+  it('should show the confirmation modal when archive button is clicked', async () => {
+    component.find('#archive_button').hostNodes().simulate('click')
+
+    component.update()
+
+    expect(component.find('ResponsiveModal').prop('show')).toBeTruthy()
+  })
+
+  it('should close the confirmation modal when cancel button is clicked', async () => {
+    component.find('#archive_button').hostNodes().simulate('click')
+
+    component.update()
+
+    component.find('#cancel-btn').hostNodes().simulate('click')
+
+    component.update()
+
+    expect(component.find('ResponsiveModal').prop('show')).toBe(false)
+  })
+})
+
 describe('Record audit summary for GQLQuery', () => {
   let component: ReactWrapper<{}, {}>
 
@@ -282,10 +348,10 @@ describe('Record audit summary for GQLQuery', () => {
 
     await flushPromises()
     component.update()
+    await waitForElement(component, 'RecordAuditBody')
   })
 
   it('Record Audit page loads properly', async () => {
-    await waitForElement(component, 'RecordAuditBody')
     expect(component.exists('RecordAuditBody')).toBeTruthy()
   })
 
@@ -340,7 +406,61 @@ describe('Record audit summary for unsuccesful GQLQuery', () => {
   })
 
   it('Redirect to home page', async () => {
-    await flushPromises()
     expect(window.location.href).not.toContain('/record-audit')
+  })
+})
+
+describe('Record audit for a reinstate declaration', () => {
+  let component: ReactWrapper<{}, {}>
+
+  beforeEach(async () => {
+    const { store, history } = createStore()
+
+    getItem.mockReturnValue(registerScopeToken)
+
+    store.dispatch(checkAuth({ '?token': registerScopeToken }))
+
+    await flushPromises()
+
+    declaration.submissionStatus = SUBMISSION_STATUS.ARCHIVED
+    declaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
+    store.dispatch(storeDeclaration(declaration))
+
+    component = await createTestComponent(
+      <RecordAudit
+        {...createRouterProps(
+          formatUrl(DECLARATION_RECORD_AUDIT, {
+            declarationId: declaration.id,
+            tab: 'reviewTab'
+          }),
+          { isNavigatedInsideApp: false },
+          {
+            matchParams: {
+              declarationId: declaration.id,
+              tab: 'reviewTab'
+            }
+          }
+        )}
+      />,
+      { store, history }
+    )
+  })
+
+  it('should show the reinstate button', async () => {
+    expect(component.exists('#reinstate_button')).toBeTruthy()
+  })
+
+  it('should show the confirmation modal when reinstate button is clicked', async () => {
+    component.find('#reinstate_button').hostNodes().simulate('click')
+    component.update()
+    expect(component.find('ResponsiveModal').prop('show')).toBeTruthy()
+  })
+
+  it('should close the confirmation modal when cancel button is clicked', async () => {
+    component.find('#reinstate_button').hostNodes().simulate('click')
+    component.update()
+    component.find('#cancel-btn').hostNodes().simulate('click')
+    component.update()
+    expect(component.find('ResponsiveModal').prop('show')).toBe(false)
   })
 })

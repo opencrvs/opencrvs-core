@@ -14,7 +14,7 @@
 export function createServerWithEnvironment(env: any) {
   jest.resetModules()
   process.env = { ...process.env, ...env }
-  return require('../').createServer()
+  return require('../server').createServer()
 }
 export const translationsMock = {
   languages: [
@@ -23,21 +23,21 @@ export const translationsMock = {
       displayName: 'English',
       messages: {
         birthInProgressNotification:
-          'Birth registration tracking ID is {{trackingId}}. You must visit {{crvsOffice}} to complete the application',
+          'Birth registration tracking ID is {{trackingId}}. You must visit {{crvsOffice}} to complete the declaration',
         birthDeclarationNotification:
           'Birth registration tracking ID for {{name}} is {{trackingId}}. You will get an SMS within 2 days with progress and next steps.',
         birthRegistrationNotification:
           'Congratulations, the birth of {{name}} has been registered. Visit your local registration office in 5 days with your ID to collect the certificate. Your tracking ID is {{trackingId}}.',
         birthRejectionNotification:
-          'Birth registration application for {{name}} ( Tracking ID: {{trackingId}} ) has been rejected. Please visit your local registration office for more information.',
+          'Birth registration declaration for {{name}} ( Tracking ID: {{trackingId}} ) has been rejected. Please visit your local registration office for more information.',
         deathInProgressNotification:
-          'Death registration tracking ID is {{trackingId}}. You must visit {{crvsOffice}} to complete the application',
+          'Death registration tracking ID is {{trackingId}}. You must visit {{crvsOffice}} to complete the declaration',
         deathDeclarationNotification:
           'Death registration tracking ID for {{name}} is {{trackingId}}. You will get an SMS within 2 days with progress and next steps.',
         deathRegistrationNotification:
           'The death of {{name}} has been registered. Visit your local registration office in 5 days with your ID to collect the certificate. Your tracking ID is {{trackingId}}.',
         deathRejectionNotification:
-          'Death registration application for {{name}} ( Tracking ID: {{trackingId}} ) has been rejected. Please visit your local registration office for more information.',
+          'Death registration declaration for {{name}} ( Tracking ID: {{trackingId}} ) has been rejected. Please visit your local registration office for more information.',
         authenticationCodeNotification:
           'Your OpenCRVS authentication code is: {{authCode}}',
         userCredentialsNotification:

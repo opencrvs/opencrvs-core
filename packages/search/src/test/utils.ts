@@ -26,10 +26,10 @@ export const mockBirthFhirBundle = {
           coding: [
             {
               system: 'http://opencrvs.org/doc-types',
-              code: 'birth-application'
+              code: 'birth-declaration'
             }
           ],
-          text: 'Birth Application'
+          text: 'Birth Declaration'
         },
         class: {
           coding: [
@@ -663,10 +663,10 @@ export const mockBirthFhirBundleWithoutCompositionId = {
           coding: [
             {
               system: 'http://opencrvs.org/doc-types',
-              code: 'birth-application'
+              code: 'birth-declaration'
             }
           ],
-          text: 'Birth Application'
+          text: 'Birth Declaration'
         },
         class: {
           coding: [
@@ -952,10 +952,10 @@ export const mockDeathFhirBundle = {
           coding: [
             {
               system: 'http://opencrvs.org/doc-types',
-              code: 'death-application'
+              code: 'death-declaration'
             }
           ],
-          text: 'Death Application'
+          text: 'Death Declaration'
         },
         class: {
           coding: [
@@ -1459,10 +1459,10 @@ export const mockDeathFhirBundleWithoutCompositionId = {
           coding: [
             {
               system: 'http://opencrvs.org/doc-types',
-              code: 'death-application'
+              code: 'death-declaration'
             }
           ],
-          text: 'Death Application'
+          text: 'Death Declaration'
         },
         class: {
           coding: [
@@ -2152,9 +2152,9 @@ export const mockCompositionResponse = {
   status: 'preliminary',
   type: {
     coding: [
-      { system: 'http://opencrvs.org/doc-types', code: 'birth-application' }
+      { system: 'http://opencrvs.org/doc-types', code: 'birth-declaration' }
     ],
-    text: 'Birth Application'
+    text: 'Birth Declaration'
   },
   class: {
     coding: [
@@ -2587,7 +2587,7 @@ export const mockSearchResult = {
             event: 'BIRTH',
             childFamilyName: 'Moajjem',
             childFamilyNameLocal: 'মোয়াজ্জেম',
-            applicationLocationId: '123',
+            declarationLocationId: '123',
             childDoB: '2011-11-11',
             gender: 'male',
             motherFamilyName: 'Moajjem',
@@ -2604,7 +2604,7 @@ export const mockSearchResult = {
             event: 'DEATH',
             deceasedFamilyName: 'Moajjem',
             deceasedFamilyNameLocal: 'মোয়াজ্জেম',
-            applicationLocationId: '123',
+            declarationLocationId: '123',
             deceasedDoB: '2011-11-11',
             gender: 'male',
             motherFamilyName: 'Moajjem',
@@ -2634,10 +2634,10 @@ export const mockBirthFhirBundleWithoutParents = {
           coding: [
             {
               system: 'http://opencrvs.org/doc-types',
-              code: 'birth-application'
+              code: 'birth-declaration'
             }
           ],
-          text: 'Birth Application'
+          text: 'Birth Declaration'
         },
         class: {
           coding: [
@@ -3133,10 +3133,10 @@ export const mockMinimalDeathFhirBundle = {
           coding: [
             {
               system: 'http://opencrvs.org/doc-types',
-              code: 'death-application'
+              code: 'death-declaration'
             }
           ],
-          text: 'Death Application'
+          text: 'Death Declaration'
         },
         class: {
           coding: [

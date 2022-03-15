@@ -20,7 +20,7 @@ export enum Status {
   INACTIVE = 'INACTIVE'
 }
 
-export interface IApplicationCertificateModel extends Document {
+export interface IDeclarationCertificateModel extends Document {
   svgCode: string
   svgFilename: string
   svgDateUpdated: number
@@ -48,7 +48,7 @@ const certificateSchema = new Schema({
   }
 })
 
-export default model<IApplicationCertificateModel>(
+export default model<IDeclarationCertificateModel>(
   'Certificate',
   certificateSchema
 )
