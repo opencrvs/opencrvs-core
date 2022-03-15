@@ -66,9 +66,15 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
     }
   }
 
-  .react-select__menuList {
-    &:hover {
-      background: ${({ theme }) => theme.colors.grey200};
+  .react-select__option {
+    background-color: ${({ theme }) => theme.colors.white};
+
+    &--is-focused {
+      background-color: ${({ theme }) => theme.colors.grey200};
+    }
+
+    &--is-selected {
+      background-color: ${({ theme }) => theme.colors.secondary};
     }
   }
 

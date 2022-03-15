@@ -23,8 +23,8 @@ interface IErrorTextProps {
 const Container = styled.div<{ ignoreMediaQuery?: boolean }>`
   flex-direction: row;
   display: flex;
+  gap: 8px;
   align-items: center;
-  margin-top: -20px;
   margin-bottom: 4px;
 
   ${({ ignoreMediaQuery, theme }) => {

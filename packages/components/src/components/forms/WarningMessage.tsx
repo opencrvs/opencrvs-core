@@ -22,14 +22,14 @@ const Container = styled.div<{ ignoreMediaQuery?: boolean }>`
   flex-direction: row;
   display: flex;
   margin: 24px 0;
-
+  border-radius: 4px;
   ${({ ignoreMediaQuery, theme }) => {
     return !ignoreMediaQuery
       ? `@media (min-width: ${theme.grid.breakpoints.md}px) {
         width: 515px;
       }`
       : ''
-  }}
+  }};
 `
 const StyledParagraph = styled.div`
   ${({ theme }) => theme.fonts.bodyBoldStyle};

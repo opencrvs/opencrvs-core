@@ -39,13 +39,13 @@ const StyledField = styled.div<IPasswordInputProps>`
 const StyledInput = styled.input<IPasswordInputProps>`
   width: 100%;
   padding: 8px 10px;
+  border-radius: 4px;
   height: 40px;
   transition: border-color 500ms ease-out;
   box-sizing: border-box;
   outline: none;
   ${({ theme }) => theme.fonts.bodyStyle};
   color: ${({ theme }) => theme.colors.copy};
-  background: ${({ theme }) => theme.colors.background};
 
   ${({ hideBorder, error, touched, theme }) =>
     hideBorder

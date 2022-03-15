@@ -22,7 +22,6 @@ const StyledTextArea = styled.textarea<ITextAreaProps>`
   width: 100%;
   padding: 8px;
   min-height: 104px;
-  min-width: 344px;
   border-radius: 4px;
   border: 2px solid ${({ theme }) => theme.colors.grey600};
   &:focus {

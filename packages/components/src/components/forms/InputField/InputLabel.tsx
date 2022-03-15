@@ -27,7 +27,7 @@ export type IInputLabel = {
 const StyledInputLabel = styled.label<IInputLabel>`
   ${({ theme }) => theme.fonts.bigBodyStyle};
   color: ${({ color, disabled, theme }) =>
-    disabled ? theme.colors.disabled : color ? color : theme.colors.copy};
+    disabled ? theme.colors.grey400 : color ? color : theme.colors.copy};
   width: 100%;
   margin-bottom: 5px;
   display: inline-block;
@@ -46,7 +46,7 @@ const Required = styled.span<
 >`
   ${({ theme }) => theme.fonts.bigBodyStyle};
   color: ${({ disabled, theme }) =>
-    disabled ? theme.colors.disabled : theme.colors.negative};
+    disabled ? theme.colors.grey400 : theme.colors.negative};
   flex-grow: 0;
 `
 
