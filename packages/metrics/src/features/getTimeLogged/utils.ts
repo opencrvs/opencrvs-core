@@ -25,7 +25,7 @@ export async function getTimeLoggedByStatus(
 ): Promise<ITimeLoggedData> {
   const timeLoggedData: ITimeLoggedData[] = await query(
     `SELECT timeSpentEditing
-          FROM application_time_logged
+          FROM declaration_time_logged
         WHERE compositionId = '${compositionId}'
         AND currentStatus = '${status}'`
   )
@@ -40,7 +40,7 @@ export async function getTimeLogged(
 ): Promise<ITimeLoggedData[]> {
   const timeLoggedData: ITimeLoggedData[] = await query(
     `SELECT currentStatus as status, timeSpentEditing
-          FROM application_time_logged
+          FROM declaration_time_logged
         WHERE compositionId = '${compositionId}'`
   )
   return timeLoggedData && timeLoggedData.length > 0 ? timeLoggedData : []
@@ -53,9 +53,10 @@ export async function getTimeLoggedForPractitioner(
   locationId: string,
   count?: number
 ): Promise<ITimeLoggedData[]> {
-  const timeLoggedData: ITimeLoggedData[] = await query(`SELECT currentStatus as status, trackingId, 
+  const timeLoggedData: ITimeLoggedData[] =
+    await query(`SELECT currentStatus as status, trackingId, 
                                               eventType, timeSpentEditing, time
-                                            FROM application_time_logged
+                                            FROM declaration_time_logged
                                             WHERE time > '${timeFrom}' AND time <= '${timeTo}'
                                             AND practitionerId = '${practitionerId}'
                                             AND ( locationLevel2 = '${locationId}' 

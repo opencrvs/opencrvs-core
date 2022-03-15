@@ -11,10 +11,10 @@
  */
 import * as React from 'react'
 import {
-  modifyApplication,
-  IApplication,
-  writeApplication
-} from '@client/applications'
+  modifyDeclaration,
+  IDeclaration,
+  writeDeclaration
+} from '@client/declarations'
 import { connect } from 'react-redux'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import {
@@ -41,22 +41,22 @@ import {
 import { groupHasError } from './utils'
 
 type IProps = {
-  application: IApplication
+  declaration: IDeclaration
 }
 
 type IDispatchProps = {
   goBack: typeof goBack
   goToHomeTab: typeof goToHomeTab
   goToCertificateCorrection: typeof goToCertificateCorrection
-  writeApplication: typeof writeApplication
-  modifyApplication: typeof modifyApplication
+  writeDeclaration: typeof writeDeclaration
+  modifyDeclaration: typeof modifyDeclaration
 }
 
 type IFullProps = IProps & IDispatchProps & IntlShapeProps
 
 function getGroupWithInitialValues(
   section: IFormSection,
-  application: IApplication
+  declaration: IDeclaration
 ) {
   const group = section.groups[0]
 
@@ -64,34 +64,34 @@ function getGroupWithInitialValues(
     ...group,
     fields: replaceInitialValues(
       group.fields,
-      application.data[section.id] || {},
-      application.data
+      declaration.data[section.id] || {},
+      declaration.data
     )
   }
 }
 
 function CorrectionReasonFormComponent(props: IFullProps) {
-  const { application, intl } = props
+  const { declaration, intl } = props
 
   const section = correctReasonSection
 
   const group = React.useMemo(
-    () => getGroupWithInitialValues(section, application),
+    () => getGroupWithInitialValues(section, declaration),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   )
 
-  const modifyApplication = (
+  const modifyDeclaration = (
     sectionData: IFormSectionData,
     activeSection: IFormSection,
-    application: IApplication
+    declaration: IDeclaration
   ) => {
-    props.modifyApplication({
-      ...application,
+    props.modifyDeclaration({
+      ...declaration,
       data: {
-        ...application.data,
+        ...declaration.data,
         [activeSection.id]: {
-          ...application.data[activeSection.id],
+          ...declaration.data[activeSection.id],
           ...sectionData
         }
       }
@@ -99,8 +99,8 @@ function CorrectionReasonFormComponent(props: IFullProps) {
   }
 
   const continueButtonHandler = () => {
-    props.writeApplication(application)
-    props.goToCertificateCorrection(application.id, CorrectionSection.Summary)
+    props.writeDeclaration(declaration)
+    props.goToCertificateCorrection(declaration.id, CorrectionSection.Summary)
   }
 
   const continueButton = (
@@ -108,7 +108,7 @@ function CorrectionReasonFormComponent(props: IFullProps) {
       id="confirm_form"
       key="confirm_form"
       onClick={continueButtonHandler}
-      disabled={groupHasError(group, application.data[section.id])}
+      disabled={groupHasError(group, declaration.data[section.id])}
     >
       {intl.formatMessage(buttonMessages.continueButton)}
     </PrimaryButton>
@@ -131,11 +131,11 @@ function CorrectionReasonFormComponent(props: IFullProps) {
           <FormFieldGenerator
             id={group.id}
             onChange={(values) => {
-              modifyApplication(values, section, application)
+              modifyDeclaration(values, section, declaration)
             }}
             setAllFieldsDirty={false}
             fields={group.fields}
-            draftData={application.data}
+            draftData={declaration.data}
           />
         </Content>
       </ActionPageLight>
@@ -146,7 +146,7 @@ function CorrectionReasonFormComponent(props: IFullProps) {
 export const CorrectionReasonForm = connect(undefined, {
   goBack,
   goToHomeTab,
-  modifyApplication,
+  modifyDeclaration,
   goToCertificateCorrection,
-  writeApplication
+  writeDeclaration
 })(injectIntl(CorrectionReasonFormComponent))

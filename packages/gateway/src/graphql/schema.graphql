@@ -67,11 +67,11 @@ type Query {
     timeEnd: String!
     locationId: String!
   ): EventEstimationMetrics
-  getApplicationsStartedMetrics(
+  getDeclarationsStartedMetrics(
     timeStart: String!
     timeEnd: String!
     locationId: String!
-  ): ApplicationsStartedMetrics
+  ): DeclarationsStartedMetrics
   fetchMonthWiseEventMetrics(
     timeStart: String!
     timeEnd: String!
@@ -146,6 +146,8 @@ type Mutation {
     details: BirthRegistrationInput!
   ): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID!
+  markEventAsReinstated(id: String!): Reinstated
+  markEventAsArchived(id: String!): ID!
   notADuplicate(id: String!, duplicateId: String!): ID!
   createDeathRegistration(details: DeathRegistrationInput!): CreatedIds!
   updateDeathRegistration(id: ID!, details: DeathRegistrationInput!): ID!
@@ -236,6 +238,7 @@ type BirthRegistration implements EventRegistration {
   primaryCaregiver: PrimaryCaregiver
   createdAt: Date
   updatedAt: Date
+  history: [History]
 }
 
 type DeathRegistration implements EventRegistration {
@@ -256,6 +259,7 @@ type DeathRegistration implements EventRegistration {
   medicalPractitioner: MedicalPractitioner
   createdAt: Date
   updatedAt: Date
+  history: [History]
 }
 
 type Person {
@@ -286,6 +290,7 @@ type BirthRegResultSet {
 interface EventRegistration {
   id: ID!
   registration: Registration
+  history: [History]
   createdAt: Date
 }
 
@@ -364,10 +369,10 @@ type EventEstimationMetrics {
   deathTargetDayMetrics: EstimationMetrics
 }
 
-type ApplicationsStartedMetrics {
-  fieldAgentApplications: Int!
-  hospitalApplications: Int!
-  officeApplications: Int!
+type DeclarationsStartedMetrics {
+  fieldAgentDeclarations: Int!
+  hospitalDeclarations: Int!
+  officeDeclarations: Int!
 }
 
 type MonthWiseEstimationMetrics {
@@ -466,6 +471,11 @@ input BirthRegistrationInput {
   primaryCaregiver: PrimaryCaregiverInput
   createdAt: Date
   updatedAt: Date
+}
+
+type Reinstated {
+  taskEntryResourceID: ID!
+  registrationStatus: RegStatus
 }
 
 input DeathRegistrationInput {
@@ -658,6 +668,18 @@ type PrimaryCaregiver {
   parentDetailsType: ParentDetailsType
 }
 
+type History {
+  user: User
+  date: Date
+  action: RegStatus
+  reinstated: Boolean
+  location: Location
+  office: Location
+  comments: [Comment]
+  input: [InputOutput]
+  output: [InputOutput]
+}
+
 enum MannerOfDeath {
   NATURAL_CAUSES
   ACCIDENT
@@ -799,10 +821,10 @@ type SearchFieldAgentResponse {
   status: String
   primaryOfficeId: String
   creationDate: String
-  totalNumberOfApplicationStarted: Int
+  totalNumberOfDeclarationStarted: Int
   totalNumberOfInProgressAppStarted: Int
-  totalNumberOfRejectedApplications: Int
-  averageTimeForDeclaredApplications: Int
+  totalNumberOfRejectedDeclarations: Int
+  averageTimeForDeclaredDeclarations: Int
 }
 
 type RegistrationGenderBasisMetrics {
@@ -963,6 +985,19 @@ input PrimaryCaregiverInput {
   parentDetailsType: ParentDetailsType
 }
 
+enum RegStatus {
+  IN_PROGRESS
+  ARCHIVED
+  DECLARED
+  DECLARATION_UPDATED
+  WAITING_VALIDATION
+  VALIDATED
+  REGISTERED
+  CERTIFIED
+  REJECTED
+  DOWNLOADED
+}
+
 input MedicalPractitionerInput {
   name: String
   qualification: String
@@ -1067,6 +1102,19 @@ enum ParentDetailsType {
   NONE
 }
 
+type Comment {
+  id: ID!
+  user: User
+  comment: String
+  createdAt: Date
+}
+
+type InputOutput {
+  valueCode: String
+  valueId: String
+  valueString: String
+}
+
 enum IdentityIDType {
   PASSPORT
   NATIONAL_ID
@@ -1144,8 +1192,8 @@ enum AttachmentSubject {
   DECEASED_PARMANENT_ADDRESS_PROOF
   DECEASED_DEATH_PROOF
   DECEASED_BIRTH_PROOF
-  APPLICANT_ID_PROOF
-  APPLICANT_ATHORITY_TO_APPLY_PROOF
+  INFORMANT_ID_PROOF
+  INFORMANT_ATHORITY_TO_APPLY_PROOF
   LEGAL_GUARDIAN_PROOF
   ASSIGNED_RESPONSIBILITY_PROOF
   WARD_COUNCILLOR_PROOF
@@ -1215,7 +1263,7 @@ type RegistrationSearchSet {
   status: String
   contactNumber: String
   contactRelationship: String
-  dateOfApplication: Date
+  dateOfDeclaration: Date
   trackingId: String
   registrationNumber: String
   eventLocationId: String
@@ -1355,24 +1403,6 @@ type Mask {
 input MaskInput {
   startForm: Int
   endBefore: Int
-}
-
-enum RegStatus {
-  IN_PROGRESS
-  DECLARED
-  DECLARATION_UPDATED
-  WAITING_VALIDATION
-  VALIDATED
-  REGISTERED
-  CERTIFIED
-  REJECTED
-}
-
-type Comment {
-  id: ID!
-  user: User
-  comment: String
-  createdAt: Date
 }
 
 type Payment {

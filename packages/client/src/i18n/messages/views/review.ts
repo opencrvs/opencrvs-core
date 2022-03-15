@@ -15,8 +15,8 @@ interface IReviewMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   additionalComments: MessageDescriptor
   backToPreview: MessageDescriptor
-  editApplicationConfirmationTitle: MessageDescriptor
-  editApplicationConfirmation: MessageDescriptor
+  editDeclarationConfirmationTitle: MessageDescriptor
+  editDeclarationConfirmation: MessageDescriptor
   editDocuments: MessageDescriptor
   formDataHeader: MessageDescriptor
   headerSubjectWithName: MessageDescriptor
@@ -42,32 +42,32 @@ interface IReviewMessages
   validateConfirmationTitle: MessageDescriptor
   valueApprove: MessageDescriptor
   zeroDocumentsText: MessageDescriptor
-  validateCompleteApplicationActionTitle: MessageDescriptor
-  validateCompleteApplicationActionDescription: MessageDescriptor
-  validateApplicationActionModalTitle: MessageDescriptor
-  validateApplicationActionModalDescription: MessageDescriptor
+  validateCompleteDeclarationActionTitle: MessageDescriptor
+  validateCompleteDeclarationActionDescription: MessageDescriptor
+  validateDeclarationActionModalTitle: MessageDescriptor
+  validateDeclarationActionModalDescription: MessageDescriptor
   govtName: MessageDescriptor
   documentForWhom: MessageDescriptor
 }
 
 const messagesToDefine: IReviewMessages = {
-  validateCompleteApplicationActionTitle: {
-    id: 'validate.complete.application.action.title',
+  validateCompleteDeclarationActionTitle: {
+    id: 'validate.complete.declaration.action.title',
     defaultMessage: 'Send for approval or reject?'
   },
-  validateCompleteApplicationActionDescription: {
-    id: 'validate.complete.application.action.description',
+  validateCompleteDeclarationActionDescription: {
+    id: 'validate.complete.declaration.action.description',
     defaultMessage:
-      'By sending for approval you confirm that the application is ready for approval'
+      'By sending for approval you confirm that the declaration is ready for approval'
   },
-  validateApplicationActionModalTitle: {
-    id: 'validate.application.action.modal.title',
+  validateDeclarationActionModalTitle: {
+    id: 'validate.declaration.action.modal.title',
     defaultMessage: 'Send for approval?'
   },
-  validateApplicationActionModalDescription: {
-    id: 'validate.application.action.modal.description',
+  validateDeclarationActionModalDescription: {
+    id: 'validate.declaration.action.modal.description',
     defaultMessage:
-      'This application will be sent to the registrar for them to register'
+      'This declaration will be sent to the registrar for them to register'
   },
   additionalComments: {
     defaultMessage: 'Any additional comments?',
@@ -79,12 +79,12 @@ const messagesToDefine: IReviewMessages = {
     description: 'Preview button on edit modal',
     id: 'review.edit.modal.backToPreview'
   },
-  editApplicationConfirmationTitle: {
-    defaultMessage: 'Edit application?',
+  editDeclarationConfirmationTitle: {
+    defaultMessage: 'Edit declaration?',
     description: 'Edit modal confirmation title',
     id: 'review.edit.modal.confirmationTitle'
   },
-  editApplicationConfirmation: {
+  editDeclarationConfirmation: {
     defaultMessage: 'A record will be created of any changes you make.',
     description: 'Edit modal confirmation text',
     id: 'review.edit.modal.confirmationText'
@@ -96,21 +96,21 @@ const messagesToDefine: IReviewMessages = {
   },
   formDataHeader: {
     defaultMessage:
-      '{isDraft, select, true {Check responses with the applicant before sending for review} false {Review the answers with the supporting documents}}',
+      '{isDraft, select, true {Check responses with the informant before sending for review} false {Review the answers with the supporting documents}}',
     description: 'Label for form data header text',
     id: 'review.formData.header'
   },
   headerSubjectWithName: {
     defaultMessage:
-      '{eventType, select, birth {Birth} death {Death} other {Birth}} Application for {name}',
+      '{eventType, select, birth {Birth} death {Death} other {Birth}} Declaration for {name}',
     description:
-      'Header subject that shows which application type to review with applicant name',
+      'Header subject that shows which declaration type to review with informant name',
     id: 'review.header.subject.subjectWitName'
   },
   headerSubjectWithoutName: {
     defaultMessage:
-      '{eventType, select, birth {Birth} death {Death}} Application',
-    description: 'Header subject that shows which application type to review',
+      '{eventType, select, birth {Birth} death {Death}} Declaration',
+    description: 'Header subject that shows which declaration type to review',
     id: 'review.header.subject.subjectWithoutName'
   },
   previewName: {
@@ -125,12 +125,12 @@ const messagesToDefine: IReviewMessages = {
   },
   registerActionDescription: {
     defaultMessage:
-      'By registering you confirm that you have reviewed this application and satisfied it fulfils requirements required for registration. ',
+      'By registering you confirm that you have reviewed this declaration and satisfied it fulfils requirements required for registration. ',
     id: 'review.actions.description'
   },
   registerActionDescriptionComplete: {
     defaultMessage:
-      'By clicking register, you confirm that the information is correct and has been reviewed by the applicant. The applicant understands that it will be used to register the {eventType, select, birth {birth application} death {death application}} and for planning purposes.\n\nBy registering this {eventType, select, birth {birth application} death {death application}}, a {eventType, select, birth {birth} death {death}} certificate will be generated with your signature for issuance.',
+      'By clicking register, you confirm that the information is correct and has been reviewed by the informant. The informant understands that it will be used to register the {eventType, select, birth {birth declaration} death {death declaration}} and for planning purposes.\n\nBy registering this {eventType, select, birth {birth declaration} death {death declaration}}, a {eventType, select, birth {birth} death {death}} certificate will be generated with your signature for issuance.',
     id: 'review.actions.desc.regConfComp'
   },
   registerActionDescriptionIncomplete: {
@@ -149,9 +149,9 @@ const messagesToDefine: IReviewMessages = {
   },
   approvalActionDescriptionComplete: {
     defaultMessage:
-      'By sending for approval you confirm that the application is ready for approval.',
+      'By sending for approval you confirm that the declaration is ready for approval.',
     description:
-      'Description for review action component when complete application',
+      'Description for review action component when complete declaration',
     id: 'misc.description.Complete'
   },
   approvalActionDescriptionIncomplete: {
@@ -163,27 +163,27 @@ const messagesToDefine: IReviewMessages = {
     defaultMessage:
       'Send for {draftStatus, select, true {approval} false {approval or reject}}?',
     description: 'Title for review action component',
-    id: 'misc.title.applicationStatus'
+    id: 'misc.title.declarationStatus'
   },
   reviewActionDescriptionComplete: {
     defaultMessage:
-      'By sending this application for review you confirm that the information has been reviewed by the applicant and that they are aware that they will receive an SMS with a tracking ID and details of how to collect the {eventType, select, birth {birth} death {death}} certificate',
+      'By sending this declaration for review you confirm that the information has been reviewed by the informant and that they are aware that they will receive an SMS with a tracking ID and details of how to collect the {eventType, select, birth {birth} death {death}} certificate',
     description:
-      'Description for review action component when complete application',
+      'Description for review action component when complete declaration',
     id: 'review.actions.description.confirmComplete'
   },
   reviewActionDescriptionIncomplete: {
     defaultMessage:
-      'By sending this incomplete application, there will be a digital record made.\n\nTell the applicant that they will receive an SMS with a tracking ID. They will need this to complete the application at a registration office within 30 days. The applicant will need to provide all mandatory information before the {eventType, select, birth {birth application} death {death application}} can be registered.',
+      'By sending this incomplete declaration, there will be a digital record made.\n\nTell the informant that they will receive an SMS with a tracking ID. They will need this to complete the declaration at a registration office within 30 days. The informant will need to provide all mandatory information before the {eventType, select, birth {birth declaration} death {death declaration}} can be registered.',
     description:
-      'Description for review action component when incomplete application',
+      'Description for review action component when incomplete declaration',
     id: 'review.actions.description.confirmInComplete'
   },
   reviewActionTitle: {
     defaultMessage:
-      'Application {completeApplication, select, true {complete} false {incomplete}}',
+      'Declaration {completeDeclaration, select, true {complete} false {incomplete}}',
     description: 'Title for review action component',
-    id: 'review.actions.title.applicationStatus'
+    id: 'review.actions.title.declarationStatus'
   },
   reviewName: {
     defaultMessage: 'Review',
@@ -197,19 +197,19 @@ const messagesToDefine: IReviewMessages = {
   },
   submitConfirmationDesc: {
     defaultMessage:
-      '{completeApplication, select, true {This application will be sent to the registrar for them to review.} false {This application will be sent to the Registrar for completion. Please inform the Applicant that they will need to visit the office with the missing information and supporting documents.}}',
+      '{completeDeclaration, select, true {This declaration will be sent to the registrar for them to review.} false {This declaration will be sent to the Registrar for completion. Please inform the Informant that they will need to visit the office with the missing information and supporting documents.}}',
     description: 'Submit description text on modal',
     id: 'review.modal.desc.submitConfirmation'
   },
   submitConfirmationTitle: {
     defaultMessage:
-      '{completeApplication, select, true {Send application for review?} false {Send incomplete application?}}',
+      '{completeDeclaration, select, true {Send declaration for review?} false {Send incomplete declaration?}}',
     description: 'Submit title text on modal',
     id: 'review.modal.title.submitConfirmation'
   },
   validateConfirmationDesc: {
     defaultMessage:
-      'This application will be sent to the registrar for them to approve.',
+      'This declaration will be sent to the registrar for them to approve.',
     description: 'Description for validate confirmation modal',
     id: 'register.form.modal.desc.validateConfirmation'
   },
@@ -235,7 +235,7 @@ const messagesToDefine: IReviewMessages = {
     description: 'Header title that shows bgd govt name'
   },
   documentForWhom: {
-    defaultMessage: `{section, select, child {Child's} mother {Mother's} father {Father's} deceased {Deceased's} informant {Applicant's} applicant {Applicant's} primaryCaregiver {Parents' } parent {Parents' } other {}}`,
+    defaultMessage: `{section, select, child {Child's} mother {Mother's} father {Father's} deceased {Deceased's} informant {Informant's} informant {Informant's} primaryCaregiver {Parents' } parent {Parents' } other {}}`,
     description: 'Describes for whom the document has been uploaded',
     id: 'review.documents.documentForWhom'
   }

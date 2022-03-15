@@ -422,7 +422,7 @@ export const isDateInPast: Validation = (value: IFormFieldValue) => {
   if (isDateNotInFuture(cast) && dateNotToday(cast)) {
     return undefined
   } else {
-    return { message: messages.isValidBirthDate } // specific to DOB of parent/applicant
+    return { message: messages.isValidBirthDate } // specific to DOB of parent/informant
   }
 }
 
@@ -561,7 +561,9 @@ export const validIDNumber =
 export const duplicateIDNumber =
   (fieldToDuplicateCheck: string): Validation =>
   (value: IFormFieldValue, drafts) => {
-    if (value === _.get(drafts, fieldToDuplicateCheck)) {
+    const valueToCheck = _.get(drafts, fieldToDuplicateCheck)
+
+    if (value && valueToCheck && +value === +valueToCheck) {
       return {
         message: messages.duplicateNationalID
       }

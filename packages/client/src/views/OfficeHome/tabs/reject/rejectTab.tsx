@@ -39,7 +39,7 @@ import {
   dynamicConstantsMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/registrarHome'
-import { IApplication, DOWNLOAD_STATUS } from '@client/applications'
+import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
 import { Action } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { formattedDuration } from '@client/utils/date-formatting'
@@ -51,7 +51,7 @@ interface IBaseRejectTabProps {
   goToReviewDuplicate: typeof goToReviewDuplicate
   registrarLocationId: string | null
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
-  outboxApplications: IApplication[]
+  outboxDeclarations: IDeclaration[]
   queryData: {
     data: GQLEventSearchResultSet
   }
@@ -111,7 +111,7 @@ class RejectTabComponent extends React.Component<
         },
         {
           label: this.props.intl.formatMessage(
-            constantsMessages.applicantContactNumber
+            constantsMessages.informantContactNumber
           ),
           width: 21,
           key: 'contactNumber'
@@ -153,11 +153,11 @@ class RejectTabComponent extends React.Component<
     const transformedData = transformData(data, this.props.intl)
     return transformedData.map((reg, index) => {
       const actions = [] as IAction[]
-      const foundApplication = this.props.outboxApplications.find(
-        (application) => application.id === reg.id
+      const foundDeclaration = this.props.outboxDeclarations.find(
+        (declaration) => declaration.id === reg.id
       )
       const downloadStatus =
-        (foundApplication && foundApplication.downloadStatus) || undefined
+        (foundDeclaration && foundDeclaration.downloadStatus) || undefined
 
       if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
         actions.push({
@@ -166,7 +166,7 @@ class RejectTabComponent extends React.Component<
               downloadConfigs={{
                 event: reg.event,
                 compositionId: reg.id,
-                action: Action.LOAD_REVIEW_APPLICATION
+                action: Action.LOAD_REVIEW_DECLARATION
               }}
               key={`DownloadButton-${index}`}
               status={downloadStatus as DOWNLOAD_STATUS}
@@ -262,7 +262,7 @@ class RejectTabComponent extends React.Component<
 function mapStateToProps(state: IStoreState) {
   return {
     scope: getScope(state),
-    outboxApplications: state.applicationsState.applications
+    outboxDeclarations: state.declarationsState.declarations
   }
 }
 

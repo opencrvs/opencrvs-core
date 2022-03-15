@@ -18,10 +18,13 @@ interface INotificationsMessages
   outboxText: MessageDescriptor
   updatePINSuccess: MessageDescriptor
   processingText: MessageDescriptor
+  statusArchiving: MessageDescriptor
   statusRegistering: MessageDescriptor
   statusRejecting: MessageDescriptor
+  statusReinstating: MessageDescriptor
   statusRequestingCorrection: MessageDescriptor
   statusSubmitting: MessageDescriptor
+  statusWaitingToBeArchived: MessageDescriptor
   statusWaitingToValidate: MessageDescriptor
   statusWaitingToRegister: MessageDescriptor
   statusWaitingToReject: MessageDescriptor
@@ -36,7 +39,7 @@ interface INotificationsMessages
 const messagesToDefine: INotificationsMessages = {
   declarationsSynced: {
     defaultMessage:
-      'As you have connectivity, we can synchronize your applications.',
+      'As you have connectivity, we can synchronize your declarations.',
     description:
       'The message that appears in notification when background sync takes place',
     id: 'misc.notif.declarationsSynced'
@@ -49,7 +52,7 @@ const messagesToDefine: INotificationsMessages = {
   },
   outboxText: {
     defaultMessage: 'Outbox({num})',
-    description: 'Application outbox text',
+    description: 'Declaration outbox text',
     id: 'misc.notif.outboxText'
   },
   updatePINSuccess: {
@@ -58,53 +61,73 @@ const messagesToDefine: INotificationsMessages = {
     id: 'misc.notif.updatePINSuccess'
   },
   processingText: {
-    defaultMessage: '{num} application processing...',
-    description: 'Application processing text',
+    defaultMessage: '{num} declaration processing...',
+    description: 'Declaration processing text',
     id: 'misc.notif.processingText'
+  },
+  statusArchiving: {
+    defaultMessage: 'Archiving...',
+    description: 'Label for application status Archiving',
+    id: 'regHome.outbox.statusArchiving'
   },
   statusRegistering: {
     defaultMessage: 'Registering...',
-    description: 'Label for application status Registering',
+    description: 'Label for declaration status Registering',
     id: 'regHome.outbox.statusRegistering'
   },
   statusRejecting: {
     defaultMessage: 'Rejecting...',
-    description: 'Label for application status Rejecting',
+    description: 'Label for declaration status Rejecting',
     id: 'regHome.outbox.statusRejecting'
+  },
+  statusReinstating: {
+    defaultMessage: 'Reinstating...',
+    description: 'Label for application status Reinstating',
+    id: 'regHome.outbox.statusReinstating'
   },
   statusRequestingCorrection: {
     defaultMessage: 'Requesting correction...',
-    description: 'Label for application status Requesting correction',
+    description: 'Label for declaration status Requesting correction',
     id: 'regHome.outbox.statusRequestingCorrection'
   },
   statusSubmitting: {
     defaultMessage: 'Submitting...',
-    description: 'Label for application status submitting',
+    description: 'Label for declaration status submitting',
     id: 'regHome.outbox.statusSubmitting'
+  },
+  statusWaitingToBeArchived: {
+    defaultMessage: 'Waiting to be archived',
+    description: 'Label for application status waiting to be archived',
+    id: 'regHome.outbox.statusWaitingToBeArchived'
+  },
+  statusWaitingToBeReinstated: {
+    defaultMessage: 'Waiting to be reinstated',
+    description: 'Label for application status waiting to be reinstated',
+    id: 'regHome.outbox.statusWaitingToBeReinstated'
   },
   statusWaitingToValidate: {
     defaultMessage: 'Sending for approval',
-    description: 'Label for application status waiting for validate',
+    description: 'Label for declaration status waiting for validate',
     id: 'regHome.outbox.statusWaitingToValidate'
   },
   statusWaitingToRegister: {
     defaultMessage: 'Waiting to register',
-    description: 'Label for application status waiting for register',
+    description: 'Label for declaration status waiting for register',
     id: 'regHome.outbox.statusWaitingToRegister'
   },
   statusWaitingToReject: {
     defaultMessage: 'Waiting to reject',
-    description: 'Label for application status waiting for reject',
+    description: 'Label for declaration status waiting for reject',
     id: 'regHome.outbox.statusWaitingToReject'
   },
   statusWaitingToRequestCorrection: {
     defaultMessage: 'Waiting to request correction',
-    description: 'Label for application status waiting for request correction',
+    description: 'Label for declaration status waiting for request correction',
     id: 'regHome.outbox.statusWaitingToRequestCorrection'
   },
   statusWaitingToSubmit: {
     defaultMessage: 'Waiting to submit',
-    description: 'Label for application status waiting for reject',
+    description: 'Label for declaration status waiting for reject',
     id: 'regHome.outbox.statusWaitingToSubmit'
   },
   userAuditSuccess: {
@@ -133,7 +156,7 @@ const messagesToDefine: INotificationsMessages = {
   },
   waitingToRetry: {
     defaultMessage: 'Waiting to retry',
-    description: 'Label for application status waiting for connection',
+    description: 'Label for declaration status waiting for connection',
     id: 'regHome.outbox.waitingToRetry'
   }
 }

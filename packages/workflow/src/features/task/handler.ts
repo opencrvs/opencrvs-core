@@ -21,6 +21,14 @@ import { getToken } from '@workflow/utils/authUtils'
 import { logger } from '@workflow/logger'
 import { sendEventNotification } from '@workflow/features/registration/utils'
 import { Events } from '@workflow/features/events/handler'
+import {
+  filterTaskExtensions,
+  getTaskBusinessStatus
+} from '@workflow/features/task/fhir/utils'
+import {
+  DOWNLOADED_EXTENSION_URL,
+  REINSTATED_EXTENSION_URL
+} from '@workflow/features/task/fhir/constants'
 
 export default async function updateTaskHandler(
   request: Hapi.Request,
@@ -33,17 +41,20 @@ export default async function updateTaskHandler(
       getToken(request)
     )
     const taskId = getEntryId(payload)
-    if (
-      !payload ||
-      !payload.entry ||
-      !payload.entry[0] ||
-      !payload.entry[0].resource
-    ) {
-      throw new Error('Task has no entry')
+    const taskResource = payload.entry?.[0].resource as fhir.Task | undefined
+    if (!taskResource) {
+      throw new Error('TaskBundle has no entry')
+    }
+    if (taskResource.extension) {
+      taskResource.extension = filterTaskExtensions(
+        taskResource.extension,
+        [REINSTATED_EXTENSION_URL, DOWNLOADED_EXTENSION_URL],
+        getTaskBusinessStatus(taskResource)
+      )
     }
     const res = await fetch(`${HEARTH_URL}/Task/${taskId}`, {
       method: 'PUT',
-      body: JSON.stringify(payload.entry[0].resource),
+      body: JSON.stringify(taskResource),
       headers: {
         'Content-Type': 'application/fhir+json'
       }
@@ -59,18 +70,18 @@ export default async function updateTaskHandler(
     /* sending notification to the contact */
     if (msisdn) {
       logger.info(
-        'updateTaskHandler(reject application) sending event notification'
+        'updateTaskHandler(reject declaration) sending event notification'
       )
       sendEventNotification(payload, event, msisdn, {
         Authorization: request.headers.authorization
       })
     } else {
       logger.info(
-        'updateTaskHandler(reject application) could not send event notification'
+        'updateTaskHandler(reject declaration) could not send event notification'
       )
     }
 
-    return payload.entry[0].resource
+    return taskResource
   } catch (error) {
     logger.error(`Workflow/updateTaskHandler: error: ${error}`)
     throw new Error(error)

@@ -147,6 +147,55 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
       causeOfDeath
       maleDependentsOfDeceased
       femaleDependentsOfDeceased
+      history {
+        date
+        action
+        reinstated
+        location {
+          id
+          name
+        }
+        office {
+          id
+          name
+        }
+        user {
+          id
+          type
+          role
+          name {
+            firstNames
+            familyName
+            use
+          }
+          avatar {
+            data
+            type
+          }
+        }
+        comments {
+          user {
+            id
+            username
+            avatar {
+              data
+              type
+            }
+          }
+          comment
+          createdAt
+        }
+        input {
+          valueCode
+          valueId
+          valueString
+        }
+        output {
+          valueCode
+          valueId
+          valueString
+        }
+      }
     }
   }
 `
@@ -296,23 +345,72 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
       causeOfDeath
       maleDependentsOfDeceased
       femaleDependentsOfDeceased
+      history {
+        date
+        action
+        reinstated
+        location {
+          id
+          name
+        }
+        office {
+          id
+          name
+        }
+        user {
+          id
+          type
+          role
+          name {
+            firstNames
+            familyName
+            use
+          }
+          avatar {
+            data
+            type
+          }
+        }
+        comments {
+          user {
+            id
+            username
+            avatar {
+              data
+              type
+            }
+          }
+          comment
+          createdAt
+        }
+        input {
+          valueCode
+          valueId
+          valueString
+        }
+        output {
+          valueCode
+          valueId
+          valueString
+        }
+      }
     }
   }
 `
 
 export function getDeathQueryMappings(action: Action) {
   switch (action) {
-    case Action.LOAD_REVIEW_APPLICATION:
+    case Action.LOAD_REVIEW_DECLARATION:
       return {
         query: GET_DEATH_REGISTRATION_FOR_REVIEW,
         dataKey: 'fetchDeathRegistration'
       }
-    case Action.LOAD_CERTIFICATE_APPLICATION:
+    case Action.LOAD_CERTIFICATE_DECLARATION:
       return {
         query: GET_DEATH_REGISTRATION_FOR_CERTIFICATION,
         dataKey: 'fetchDeathRegistration'
       }
-    case Action.LOAD_REQUESTED_CORRECTION_APPLICATION:
+    case Action.LOAD_REQUESTED_CORRECTION_DECLARATION:
       // TODO: Apply seperate query; currently using it
       // because the actual query is yet to be developed
       return {

@@ -19,27 +19,27 @@ interface IRegisterMessages
   submitDescription: MessageDescriptor
   registerFormQueryError: MessageDescriptor
   backToReviewButton: MessageDescriptor
-  saveApplicationConfirmModalTitle: MessageDescriptor
-  saveApplicationConfirmModalDescription: MessageDescriptor
+  saveDeclarationConfirmModalTitle: MessageDescriptor
+  saveDeclarationConfirmModalDescription: MessageDescriptor
 }
 
 const messagesToDefine: IRegisterMessages = {
   newVitalEventRegistration: {
     id: 'register.form.newVitalEventRegistration',
     defaultMessage:
-      '{event, select, birth {Birth} death {Death} marriage {Marriage} divorce {Divorce} adoption {Adoption}} application',
+      '{event, select, birth {Birth} death {Death} marriage {Marriage} divorce {Divorce} adoption {Adoption}} declaration',
     description: 'The message that appears for new vital event registration'
   },
   previewEventRegistration: {
     id: 'register.form.previewEventRegistration',
     defaultMessage:
-      '{event, select, birth {Birth} death {Death} marriage {Marriage} divorce {Divorce} adoption {Adoption}} Application Preview',
+      '{event, select, birth {Birth} death {Death} marriage {Marriage} divorce {Divorce} adoption {Adoption}} Declaration Preview',
     description: 'The message that appears for new birth registrations'
   },
   reviewEventRegistration: {
     id: 'register.form.reviewEventRegistration',
     defaultMessage:
-      '{event, select, birth {Birth} death {Death} marriage {Marriage} divorce {Divorce} adoption {Adoption}} Application Review',
+      '{event, select, birth {Birth} death {Death} marriage {Marriage} divorce {Divorce} adoption {Adoption}} Declaration Review',
     description: 'The message that appears for new birth registrations'
   },
   submitDescription: {
@@ -58,16 +58,16 @@ const messagesToDefine: IRegisterMessages = {
     id: 'register.selectVitalEvent.backToReviewButton',
     defaultMessage: 'Back to review'
   },
-  saveApplicationConfirmModalTitle: {
-    id: 'register.form.modal.title.saveApplicationConfirm',
+  saveDeclarationConfirmModalTitle: {
+    id: 'register.form.modal.title.saveDeclarationConfirm',
     defaultMessage: 'Save your changes?',
-    description: 'Title for save application confirmation modal'
+    description: 'Title for save declaration confirmation modal'
   },
-  saveApplicationConfirmModalDescription: {
-    id: 'register.form.modal.desc.saveApplicationConfirm',
+  saveDeclarationConfirmModalDescription: {
+    id: 'register.form.modal.desc.saveDeclarationConfirm',
     defaultMessage:
       'By clicking save the old information will be deleted and new information will be saved',
-    description: 'Description for save application confirmation modal'
+    description: 'Description for save declaration confirmation modal'
   }
 }
 

@@ -18,7 +18,7 @@ export const Header = styled.section`
   color: ${({ theme }) => theme.colors.white};
 
   overflow: visible;
-  ${({ theme }) => theme.gradients.gradientNightshade};
-  ${({ theme }) => theme.shadows.mistyShadow};
+  ${({ theme }) => theme.gradients.primary};
+  ${({ theme }) => theme.shadows.light};
   position: relative;
 `

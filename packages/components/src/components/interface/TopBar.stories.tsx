@@ -15,9 +15,9 @@ import React from 'react'
 
 const Template: Story<{ id?: string }> = () => (
   <TopBar>
-    <p>Applications in Progress</p>
-    <p>Applications in review</p>
-    <p>Applications Ready to Print</p>
+    <p>Declarations in Progress</p>
+    <p>Declarations in review</p>
+    <p>Declarations Ready to Print</p>
   </TopBar>
 )
 

@@ -21,15 +21,16 @@ const Container = styled.div<{ size: string }>`
   max-width: ${({ size }) => (size === 'large' ? '1140px' : '778px')};
   height: 100%;
   border-radius: 4px;
-  border: 1px solid ${({ theme }) => theme.colors.dividerDark};
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
   box-sizing: border-box;
   background-color: ${({ theme }) => theme.colors.white};
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${({ theme }) => theme.colors.grey600};
   ${({ theme }) => theme.fonts.bodyStyle};
 `
 const Header = styled.div`
   display: flex;
   flex-flow: column wrap;
+
   border-bottom: 1px solid rgb(204, 207, 208);
   padding-top: 20px;
   padding-right: 32px;
@@ -55,7 +56,7 @@ export const Body = styled.div`
   padding-top: 20px;
   padding-right: 32px;
   padding-left: 32px;
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${({ theme }) => theme.colors.grey600};
   ${({ theme }) => theme.fonts.bigBodyBoldStyle};
 `
 const TopActionBar = styled.div`

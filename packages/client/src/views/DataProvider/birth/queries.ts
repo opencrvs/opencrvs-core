@@ -179,6 +179,55 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         }
       }
       presentAtBirthRegistration
+      history {
+        date
+        action
+        reinstated
+        location {
+          id
+          name
+        }
+        office {
+          id
+          name
+        }
+        user {
+          id
+          type
+          role
+          name {
+            firstNames
+            familyName
+            use
+          }
+          avatar {
+            data
+            type
+          }
+        }
+        comments {
+          user {
+            id
+            username
+            avatar {
+              data
+              type
+            }
+          }
+          comment
+          createdAt
+        }
+        input {
+          valueCode
+          valueId
+          valueString
+        }
+        output {
+          valueCode
+          valueId
+          valueString
+        }
+      }
     }
   }
 `
@@ -354,22 +403,71 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         }
       }
       presentAtBirthRegistration
+      history {
+        date
+        action
+        reinstated
+        location {
+          id
+          name
+        }
+        office {
+          id
+          name
+        }
+        user {
+          id
+          type
+          role
+          name {
+            firstNames
+            familyName
+            use
+          }
+          avatar {
+            data
+            type
+          }
+        }
+        comments {
+          user {
+            id
+            username
+            avatar {
+              data
+              type
+            }
+          }
+          comment
+          createdAt
+        }
+        input {
+          valueCode
+          valueId
+          valueString
+        }
+        output {
+          valueCode
+          valueId
+          valueString
+        }
+      }
     }
   }
 `
 export function getBirthQueryMappings(action: Action) {
   switch (action) {
-    case Action.LOAD_REVIEW_APPLICATION:
+    case Action.LOAD_REVIEW_DECLARATION:
       return {
         query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
         dataKey: 'fetchBirthRegistration'
       }
-    case Action.LOAD_CERTIFICATE_APPLICATION:
+    case Action.LOAD_CERTIFICATE_DECLARATION:
       return {
         query: GET_BIRTH_REGISTRATION_FOR_CERTIFICATE,
         dataKey: 'fetchBirthRegistration'
       }
-    case Action.LOAD_REQUESTED_CORRECTION_APPLICATION:
+    case Action.LOAD_REQUESTED_CORRECTION_DECLARATION:
       // TODO: Apply seperate query; currently using it
       // because the actual query is yet to be developed
       return {

@@ -32,7 +32,7 @@ const Backdrop = styled.div`
       opacity: 0.8;
     }
   }
-  background: ${({ theme }) => theme.colors.menuBackground};
+  background: ${({ theme }) => theme.colors.grey600};
   opacity: 0.8;
   position: absolute;
   top: 0;
@@ -53,7 +53,7 @@ const NavigationContainer = styled.div`
   }
   display: flex;
   flex-direction: column;
-  background: ${({ theme }) => theme.colors.background};
+  background: ${({ theme }) => theme.colors.grey100};
   width: 320px;
   height: 100vh;
   animation: 300ms ease-out 0s 1 slideInFromLeft;

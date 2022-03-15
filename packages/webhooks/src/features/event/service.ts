@@ -70,10 +70,10 @@ const getFromFhir = (suffix: string, authHeader: IAuthHeader) => {
       ...authHeader
     }
   })
-    .then(response => {
+    .then((response) => {
       return response.json()
     })
-    .catch(error => {
+    .catch((error) => {
       return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
     })
 }
@@ -99,7 +99,7 @@ async function getResourceBySection(
       if (!section.code || !section.code.coding || !section.code.coding.some) {
         return false
       }
-      return section.code.coding.some(coding => coding.code === sectionCode)
+      return section.code.coding.some((coding) => coding.code === sectionCode)
     })
 
   if (!resourceSection || !resourceSection.entry) {

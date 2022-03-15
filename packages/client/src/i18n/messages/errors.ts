@@ -27,8 +27,8 @@ interface IErrorMessages
   registrationQueryError: MessageDescriptor
   unauthorized: MessageDescriptor
   userQueryError: MessageDescriptor
-  loadingApplications: MessageDescriptor
-  noApplication: MessageDescriptor
+  loadingDeclarations: MessageDescriptor
+  noDeclaration: MessageDescriptor
   waitingForConnection: MessageDescriptor
   pageLoadFailed: MessageDescriptor
   passwordSubmissionError: MessageDescriptor
@@ -38,7 +38,7 @@ const messagesToDefine: IErrorMessages = {
   draftFailed: {
     defaultMessage:
       'This is some messaging on advicing the user on what to do... in the event of a failed applicaton.',
-    description: 'Tips for failed applications',
+    description: 'Tips for failed declarations',
     id: 'error.draftFailed'
   },
   duplicateQueryError: {
@@ -72,8 +72,8 @@ const messagesToDefine: IErrorMessages = {
     id: 'error.title.unauthorized'
   },
   fieldAgentQueryError: {
-    defaultMessage: 'An error occurred while loading applications',
-    description: 'The text when error ocurred loading rejected applications',
+    defaultMessage: 'An error occurred while loading declarations',
+    description: 'The text when error ocurred loading rejected declarations',
     id: 'fieldAgentHome.queryError'
   },
   pleaseTryAgainError: {
@@ -108,18 +108,18 @@ const messagesToDefine: IErrorMessages = {
     description: 'The text when error ocurred loading system users',
     id: 'system.user.queryError'
   },
-  loadingApplications: {
-    defaultMessage: 'Loading applications...',
-    description: 'The text when loading application',
-    id: 'search.loadingApplications'
+  loadingDeclarations: {
+    defaultMessage: 'Loading declarations...',
+    description: 'The text when loading declaration',
+    id: 'search.loadingDeclarations'
   },
-  noApplication: {
-    defaultMessage: 'No applications to review',
-    description: 'The text when there is no application to review',
-    id: 'search.noApplications'
+  noDeclaration: {
+    defaultMessage: 'No declarations to review',
+    description: 'The text when there is no declaration to review',
+    id: 'search.noDeclarations'
   },
   waitingForConnection: {
-    defaultMessage: 'Reconnect to load applications',
+    defaultMessage: 'Reconnect to load declarations',
     description: 'The text when there is no connectivity',
     id: 'search.waitingForConnection'
   },

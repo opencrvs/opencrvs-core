@@ -17,7 +17,7 @@ import styled from 'styled-components'
 import { errorMessages } from '@client/i18n/messages'
 
 const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.negative};
   ${({ theme }) => theme.fonts.bodyStyle};
   text-align: center;
   margin-top: 100px;
@@ -43,14 +43,14 @@ const Text = styled.span`
 type IBaseLoadingProps = {
   loading: boolean
   hasError: boolean
-  noApplication?: boolean
+  noDeclaration?: boolean
 }
 
 type IProps = IBaseLoadingProps & IntlShapeProps & IOnlineStatusProps
 
 export class LoadingIndicatorComp extends React.Component<IProps> {
   render() {
-    const { loading, noApplication, hasError, intl } = this.props
+    const { loading, noDeclaration, hasError, intl } = this.props
 
     return (
       <Wrapper>
@@ -58,7 +58,7 @@ export class LoadingIndicatorComp extends React.Component<IProps> {
           <>
             <Loading id="Spinner" baseColor="#4C68C1" />
             <Text id="loading-text">
-              {intl.formatMessage(errorMessages.loadingApplications)}
+              {intl.formatMessage(errorMessages.loadingDeclarations)}
             </Text>
           </>
         )}
@@ -67,9 +67,9 @@ export class LoadingIndicatorComp extends React.Component<IProps> {
             {intl.formatMessage(errorMessages.queryError)}
           </ErrorText>
         )}
-        {this.props.isOnline && noApplication && (
-          <Text id="no-application-text">
-            {intl.formatMessage(errorMessages.noApplication)}
+        {this.props.isOnline && noDeclaration && (
+          <Text id="no-declaration-text">
+            {intl.formatMessage(errorMessages.noDeclaration)}
           </Text>
         )}
         {!this.props.isOnline && (
