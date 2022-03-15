@@ -18,13 +18,13 @@ import {
 } from '@client/forms'
 import * as offlineActions from '@client/offline/actions'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
+import { registerForms } from '@client/forms/configuration/default'
+import { messages } from '@client/i18n/messages/views/review'
 import {
   configureRegistrationForm,
   filterQuestionsByEventType,
-  sortFormCustomisations,
-  registerForms
-} from '@client/forms/register/fieldDefinitions/register'
-import { messages } from '@client/i18n/messages/views/review'
+  sortFormCustomisations
+} from '@client/forms/configuration'
 
 export type IRegisterFormState =
   | {

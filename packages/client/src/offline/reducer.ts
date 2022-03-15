@@ -36,7 +36,7 @@ import {
   ISVGTemplate
 } from '@client/pdfRenderer/transformer/types'
 import _ from 'lodash'
-import { registerForms } from '@client/forms/register/fieldDefinitions/register'
+import { registerForms } from '@client/forms/configuration/default'
 import { createUserForm } from '@client/forms/user/fieldDefinitions/createUser'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
