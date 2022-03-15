@@ -53,7 +53,7 @@ const CancelButton = styled(TertiaryButton)`
     padding: 0;
   }
 `
-export const Content = styled.div`
+const Content = styled.div`
   display: flex;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     flex-direction: column-reverse;
@@ -193,32 +193,31 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
       modalName === GeneralActionId.APPLICATION_NAME &&
       value.APPLICATION_NAME
     ) {
-      await callUpdateApplicationNameMutation(
-        value.APPLICATION_NAME,
-        this.props,
-        this.setUpdatingValue,
-        this.setError
-      )
-        .then(() => {
-          valueChanged(
-            NOTIFICATION_TYPE.SUCCESS,
-            this.props.intl.formatMessage(
-              messages.applicationNameChangeNotification
-            )
+      try {
+        await callUpdateApplicationNameMutation(
+          value.APPLICATION_NAME,
+          this.props,
+          this.setUpdatingValue,
+          this.setError
+        )
+        valueChanged(
+          NOTIFICATION_TYPE.SUCCESS,
+          this.props.intl.formatMessage(
+            messages.applicationNameChangeNotification
+          )
+        )
+      } catch {
+        this.setState({
+          errorOccured: true,
+          errorMessages: this.props.intl.formatMessage(
+            messages.applicationNameChangeError
           )
         })
-        .catch(() => {
-          this.setState({
-            errorOccured: true,
-            errorMessages: this.props.intl.formatMessage(
-              messages.applicationNameChangeError
-            )
-          })
-          valueChanged(
-            NOTIFICATION_TYPE.ERROR,
-            this.props.intl.formatMessage(messages.applicationNameChangeError)
-          )
-        })
+        valueChanged(
+          NOTIFICATION_TYPE.ERROR,
+          this.props.intl.formatMessage(messages.applicationNameChangeError)
+        )
+      }
     } else if (
       modalName === GeneralActionId.GOVT_LOGO &&
       value.COUNTRY_LOGO?.file &&
@@ -243,31 +242,30 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
           this.props.intl.formatMessage(messages.govtLogoFileLimitError)
         )
       } else {
-        await callUpdateGovtLogoMutation(
-          value.COUNTRY_LOGO.file,
-          value.COUNTRY_LOGO.fileName,
-          this.props,
-          this.setUpdatingValue,
-          this.setError
-        )
-          .then(() => {
-            valueChanged(
-              NOTIFICATION_TYPE.SUCCESS,
-              this.props.intl.formatMessage(messages.govtLogoChangeNotification)
+        try {
+          await callUpdateGovtLogoMutation(
+            value.COUNTRY_LOGO.file,
+            value.COUNTRY_LOGO.fileName,
+            this.props,
+            this.setUpdatingValue,
+            this.setError
+          )
+          valueChanged(
+            NOTIFICATION_TYPE.SUCCESS,
+            this.props.intl.formatMessage(messages.govtLogoChangeNotification)
+          )
+        } catch {
+          this.setState({
+            errorOccured: true,
+            errorMessages: this.props.intl.formatMessage(
+              messages.govtLogoChangeError
             )
           })
-          .catch(() => {
-            this.setState({
-              errorOccured: true,
-              errorMessages: this.props.intl.formatMessage(
-                messages.govtLogoChangeError
-              )
-            })
-            valueChanged(
-              NOTIFICATION_TYPE.ERROR,
-              this.props.intl.formatMessage(messages.govtLogoChangeError)
-            )
-          })
+          valueChanged(
+            NOTIFICATION_TYPE.ERROR,
+            this.props.intl.formatMessage(messages.govtLogoChangeError)
+          )
+        }
       }
     }
   }

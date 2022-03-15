@@ -75,8 +75,7 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.govtLogoChangeMessage',
     defaultMessage:
       'Upload the Government logo to be used on the login and form decalation. Note certificate logo is uploaded as part of the certificate template.',
-    description:
-      'Upload the Government logo to be used on the login and form decalation. Note certificate logo is uploaded as part of the certificate template.'
+    description: 'Message for government logo change modal'
   },
   govtLogoChangeNotification: {
     id: 'config.application.govtLogoChangeNotification',
