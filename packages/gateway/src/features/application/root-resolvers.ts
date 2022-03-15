@@ -9,10 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  GQLPhoneNumberPatternInput,
-  GQLResolver
-} from '@gateway/graphql/schema'
+import { GQLResolver } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
 import { APPLICATION_CONFIG_URL } from '@gateway/constants'
 import { hasScope } from '@gateway/features/user/utils'
@@ -63,8 +60,7 @@ export const resolvers: GQLResolver = {
           applicationConfig.EXTERNAL_VALIDATION_WORKQUEUE as boolean,
         SENTRY: applicationConfig.SENTRY as string,
         LOGROCKET: applicationConfig.LOGROCKET as string,
-        PHONE_NUMBER_PATTERN:
-          applicationConfig.PHONE_NUMBER_PATTERN as GQLPhoneNumberPatternInput,
+        PHONE_NUMBER_PATTERN: applicationConfig.PHONE_NUMBER_PATTERN as string,
         BIRTH_REGISTRATION_TARGET:
           applicationConfig.BIRTH_REGISTRATION_TARGET as number,
         DEATH_REGISTRATION_TARGET:

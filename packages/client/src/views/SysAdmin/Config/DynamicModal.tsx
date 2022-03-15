@@ -36,7 +36,7 @@ import {
   callUpdateNIDPatternMutation,
   callUpdateApplicationNameMutation,
   callUpdatePhoneNumberPatternMutation
-} from './Utils'
+} from '@client/views/SysAdmin/Config/Utils'
 
 const Message = styled.div`
   margin-bottom: 16px;
@@ -84,22 +84,10 @@ const ErrorMessage = styled.div`
   color: ${({ theme }) => theme.colors.error};
   margin-left: 6px;
 `
-
-export type ITempPhoneNumber = {
-  mask: {
-    startForm: number
-    endBefore: number
-  }
-  pattern: string
-  example: string
-  start: string
-  num: string
-}
-
 export type IApplicationConfig = {
   APPLICATION_NAME?: string
   NID_NUMBER_PATTERN?: string
-  PHONE_NUMBER_PATTERN?: ITempPhoneNumber
+  PHONE_NUMBER_PATTERN?: string
 }
 export type IState = {
   applicationName: string
@@ -140,7 +128,7 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
       nidExample: EMPTY_STRING,
       testNid: false,
       phoneNumberPattern:
-        props.offlineCountryConfiguration.config.PHONE_NUMBER_PATTERN.pattern.toString(),
+        props.offlineCountryConfiguration.config.PHONE_NUMBER_PATTERN.toString(),
       phoneNumberExample: EMPTY_STRING,
       testPhoneNumber: false,
       updatingValue: false,
@@ -199,7 +187,7 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
     })
   }
 
-  mutationHandler(
+  async mutationHandler(
     modalName: string,
     value: IApplicationConfig,
     valueChanged: (
@@ -211,81 +199,76 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
       modalName === GeneralActionId.APPLICATION_NAME &&
       value.APPLICATION_NAME
     ) {
-      callUpdateApplicationNameMutation(
-        value.APPLICATION_NAME,
-        this.props,
-        this.setUpdatingValue,
-        this.setError
-      )
-        .then(() => {
-          valueChanged(
-            NOTIFICATION_TYPE.SUCCESS,
-            this.props.intl.formatMessage(
-              messages.applicationNameChangeNotification
-            )
+      try {
+        await callUpdateApplicationNameMutation(
+          value.APPLICATION_NAME,
+          this.props,
+          this.setUpdatingValue,
+          this.setError
+        )
+        valueChanged(
+          NOTIFICATION_TYPE.SUCCESS,
+          this.props.intl.formatMessage(
+            messages.applicationNameChangeNotification
           )
-        })
-        .catch(() => {
-          this.setError(
-            this.props.intl.formatMessage(messages.applicationConfigChangeError)
-          )
-          valueChanged(
-            NOTIFICATION_TYPE.ERROR,
-            this.props.intl.formatMessage(messages.applicationConfigChangeError)
-          )
-        })
+        )
+      } catch {
+        this.setError(
+          this.props.intl.formatMessage(messages.applicationConfigChangeError)
+        )
+        valueChanged(
+          NOTIFICATION_TYPE.ERROR,
+          this.props.intl.formatMessage(messages.applicationConfigChangeError)
+        )
+      }
     } else if (
       modalName === GeneralActionId.NID_PATTERN &&
       value.NID_NUMBER_PATTERN
     ) {
-      callUpdateNIDPatternMutation(
-        value.NID_NUMBER_PATTERN,
-        this.props,
-        this.setUpdatingValue,
-        this.setError
-      )
-        .then(() => {
-          valueChanged(
-            NOTIFICATION_TYPE.SUCCESS,
-            this.props.intl.formatMessage(messages.nidPatternChangeNotification)
-          )
-        })
-        .catch(() => {
-          this.setError(
-            this.props.intl.formatMessage(messages.applicationConfigChangeError)
-          )
-          valueChanged(
-            NOTIFICATION_TYPE.ERROR,
-            this.props.intl.formatMessage(messages.applicationConfigChangeError)
-          )
-        })
+      try {
+        await callUpdateNIDPatternMutation(
+          value.NID_NUMBER_PATTERN,
+          this.props,
+          this.setUpdatingValue,
+          this.setError
+        )
+        valueChanged(
+          NOTIFICATION_TYPE.SUCCESS,
+          this.props.intl.formatMessage(messages.nidPatternChangeNotification)
+        )
+      } catch {
+        this.setError(
+          this.props.intl.formatMessage(messages.applicationConfigChangeError)
+        )
+        valueChanged(
+          NOTIFICATION_TYPE.ERROR,
+          this.props.intl.formatMessage(messages.applicationConfigChangeError)
+        )
+      }
     } else if (
       modalName === GeneralActionId.PHONE_NUMBER &&
       value.PHONE_NUMBER_PATTERN
     ) {
-      callUpdatePhoneNumberPatternMutation(
-        value.PHONE_NUMBER_PATTERN,
-        this.props,
-        this.setUpdatingValue,
-        this.setError
-      )
-        .then(() => {
-          valueChanged(
-            NOTIFICATION_TYPE.SUCCESS,
-            this.props.intl.formatMessage(
-              messages.phoneNumberChangeNotification
-            )
-          )
-        })
-        .catch(() => {
-          this.setError(
-            this.props.intl.formatMessage(messages.applicationConfigChangeError)
-          )
-          valueChanged(
-            NOTIFICATION_TYPE.ERROR,
-            this.props.intl.formatMessage(messages.applicationConfigChangeError)
-          )
-        })
+      try {
+        await callUpdatePhoneNumberPatternMutation(
+          value.PHONE_NUMBER_PATTERN,
+          this.props,
+          this.setUpdatingValue,
+          this.setError
+        )
+        valueChanged(
+          NOTIFICATION_TYPE.SUCCESS,
+          this.props.intl.formatMessage(messages.phoneNumberChangeNotification)
+        )
+      } catch {
+        this.setError(
+          this.props.intl.formatMessage(messages.applicationConfigChangeError)
+        )
+        valueChanged(
+          NOTIFICATION_TYPE.ERROR,
+          this.props.intl.formatMessage(messages.applicationConfigChangeError)
+        )
+      }
     }
   }
 
@@ -317,16 +300,7 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
                 {
                   APPLICATION_NAME: this.state.applicationName,
                   NID_NUMBER_PATTERN: this.state.nidPattern,
-                  PHONE_NUMBER_PATTERN: {
-                    mask: {
-                      startForm: 4,
-                      endBefore: 2
-                    },
-                    pattern: this.state.phoneNumberPattern,
-                    example: '0970545855',
-                    start: '0[7|9]',
-                    num: '10'
-                  }
+                  PHONE_NUMBER_PATTERN: this.state.phoneNumberPattern
                 },
                 valueChanged
               )

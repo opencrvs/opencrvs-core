@@ -434,7 +434,7 @@ export interface GQLApplicationConfiguration {
   EXTERNAL_VALIDATION_WORKQUEUE?: boolean
   SENTRY?: string
   LOGROCKET?: string
-  PHONE_NUMBER_PATTERN?: GQLPhoneNumberPattern
+  PHONE_NUMBER_PATTERN?: string
   BIRTH_REGISTRATION_TARGET?: number
   DEATH_REGISTRATION_TARGET?: number
   NID_NUMBER_PATTERN?: string
@@ -461,7 +461,7 @@ export interface GQLApplicationConfigurationInput {
   EXTERNAL_VALIDATION_WORKQUEUE?: boolean
   SENTRY?: string
   LOGROCKET?: string
-  PHONE_NUMBER_PATTERN?: GQLPhoneNumberPatternInput
+  PHONE_NUMBER_PATTERN?: string
   BIRTH_REGISTRATION_TARGET?: number
   DEATH_REGISTRATION_TARGET?: number
   NID_NUMBER_PATTERN?: string
@@ -885,22 +885,6 @@ export interface GQLSignatureInput {
   type?: string
 }
 
-export interface GQLPhoneNumberPattern {
-  pattern?: string
-  example?: string
-  start?: string
-  num?: string
-  mask?: GQLMask
-}
-
-export interface GQLPhoneNumberPatternInput {
-  pattern?: string
-  example?: string
-  start?: string
-  num?: string
-  mask?: GQLMaskInput
-}
-
 export interface GQLMesssageDescriptorInput {
   id?: string
   description?: string
@@ -1224,16 +1208,6 @@ export interface GQLReasonsNotApplyingInput {
   isDeceased?: boolean
 }
 
-export interface GQLMask {
-  startForm?: number
-  endBefore?: number
-}
-
-export interface GQLMaskInput {
-  startForm?: number
-  endBefore?: number
-}
-
 export const enum GQLRegStatus {
   IN_PROGRESS = 'IN_PROGRESS',
   DECLARED = 'DECLARED',
@@ -1378,7 +1352,6 @@ export interface GQLResolver {
 
   EventProgressSet?: GQLEventProgressSetTypeResolver
   MesssageDescriptor?: GQLMesssageDescriptorTypeResolver
-  PhoneNumberPattern?: GQLPhoneNumberPatternTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
   ReasonsNotApplying?: GQLReasonsNotApplyingTypeResolver
@@ -1395,7 +1368,6 @@ export interface GQLResolver {
   BirthEventSearchSet?: GQLBirthEventSearchSetTypeResolver
   DeathEventSearchSet?: GQLDeathEventSearchSetTypeResolver
   EventProgressData?: GQLEventProgressDataTypeResolver
-  Mask?: GQLMaskTypeResolver
   Comment?: GQLCommentTypeResolver
   Payment?: GQLPaymentTypeResolver
 }
@@ -4669,46 +4641,6 @@ export interface MesssageDescriptorToDefaultMessageResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLPhoneNumberPatternTypeResolver<TParent = any> {
-  pattern?: PhoneNumberPatternToPatternResolver<TParent>
-  example?: PhoneNumberPatternToExampleResolver<TParent>
-  start?: PhoneNumberPatternToStartResolver<TParent>
-  num?: PhoneNumberPatternToNumResolver<TParent>
-  mask?: PhoneNumberPatternToMaskResolver<TParent>
-}
-
-export interface PhoneNumberPatternToPatternResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface PhoneNumberPatternToExampleResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface PhoneNumberPatternToStartResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface PhoneNumberPatternToNumResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface PhoneNumberPatternToMaskResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
 export interface GQLRegWorkflowTypeResolver<TParent = any> {
   id?: RegWorkflowToIdResolver<TParent>
   type?: RegWorkflowToTypeResolver<TParent>
@@ -5442,19 +5374,6 @@ export interface EventProgressDataToTimeInReadyToPrintResolver<
   TParent = any,
   TResult = any
 > {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLMaskTypeResolver<TParent = any> {
-  startForm?: MaskToStartFormResolver<TParent>
-  endBefore?: MaskToEndBeforeResolver<TParent>
-}
-
-export interface MaskToStartFormResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface MaskToEndBeforeResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

@@ -85,16 +85,7 @@ export const updateApplicationConfig = Joi.object({
   EXTERNAL_VALIDATION_WORKQUEUE: Joi.boolean(),
   SENTRY: Joi.string(),
   LOGROCKET: Joi.string(),
-  PHONE_NUMBER_PATTERN: Joi.object().keys({
-    pattern: Joi.string(),
-    example: Joi.string(),
-    start: Joi.string(),
-    num: Joi.string(),
-    mask: {
-      startForm: Joi.number(),
-      endBefore: Joi.number()
-    }
-  }),
+  PHONE_NUMBER_PATTERN: Joi.string(),
   BIRTH_REGISTRATION_TARGET: Joi.number(),
   DEATH_REGISTRATION_TARGET: Joi.number(),
   NID_NUMBER_PATTERN: Joi.string()

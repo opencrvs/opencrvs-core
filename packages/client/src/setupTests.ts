@@ -136,16 +136,7 @@ const navigatorMock = {
   BIRTH_REGISTRATION_TARGET: 45,
   DEATH_REGISTRATION_TARGET: 45,
   NID_NUMBER_PATTERN: /^[0-9]{9}$/,
-  PHONE_NUMBER_PATTERN: {
-    pattern: /^01[1-9][0-9]{8}$/,
-    example: '01741234567',
-    start: '01',
-    num: '11',
-    mask: {
-      startForm: 5,
-      endBefore: 3
-    }
-  }
+  PHONE_NUMBER_PATTERN: /^01[1-9][0-9]{8}$/
 }
 
 /*

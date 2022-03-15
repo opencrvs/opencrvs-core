@@ -122,9 +122,10 @@ function GeneralTabContent({
           }
         },
         {
+          id: 'phoneNumberPattern_value_container',
           label: intl.formatMessage(messages.phoneNumberLabel),
           value:
-            offlineCountryConfiguration.config.PHONE_NUMBER_PATTERN.pattern.toString(),
+            offlineCountryConfiguration.config.PHONE_NUMBER_PATTERN.toString(),
           action: {
             id: GeneralActionId.PHONE_NUMBER,
             label: intl.formatMessage(buttonMessages.change),

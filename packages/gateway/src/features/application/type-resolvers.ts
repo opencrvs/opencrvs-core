@@ -10,8 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { GQLPhoneNumberPatternInput } from '@gateway/graphql/schema'
-
 export interface IApplicationConfigPayload {
   APPLICATION_NAME: string
   BACKGROUND_SYNC_BROADCAST_CHANNEL: string
@@ -33,7 +31,7 @@ export interface IApplicationConfigPayload {
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
   SENTRY: string
   LOGROCKET: string
-  PHONE_NUMBER_PATTERN: GQLPhoneNumberPatternInput
+  PHONE_NUMBER_PATTERN: string
   BIRTH_REGISTRATION_TARGET: number
   DEATH_REGISTRATION_TARGET: number
   NID_NUMBER_PATTERN: string

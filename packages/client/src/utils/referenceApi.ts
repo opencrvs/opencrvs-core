@@ -32,16 +32,6 @@ export interface IAssetResponse {
   logo: string
 }
 
-export interface IPhoneNumberPattern {
-  pattern: RegExp
-  example: string
-  start: string
-  num: string
-  mask: {
-    startForm: number
-    endBefore: number
-  }
-}
 export interface ICertificateTemplateData {
   event: string
   status: string
@@ -74,7 +64,7 @@ export interface IApplicationConfig {
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
   SENTRY: string
   LOGROCKET: string
-  PHONE_NUMBER_PATTERN: IPhoneNumberPattern
+  PHONE_NUMBER_PATTERN: RegExp
   BIRTH_REGISTRATION_TARGET: number
   DEATH_REGISTRATION_TARGET: number
   NID_NUMBER_PATTERN: RegExp

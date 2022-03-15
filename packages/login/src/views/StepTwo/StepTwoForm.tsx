@@ -159,7 +159,7 @@ export class StepTwoForm extends React.Component<FullProps> {
       stepOneDetails,
       submissionError
     } = this.props
-    const maskPattern = window.config.PHONE_NUMBER_PATTERN.mask
+    const maskPattern = { startForm: 4, endBefore: 7 }
     const mobileNumber = stepOneDetails.mobile.replace(
       stepOneDetails.mobile.slice(
         maskPattern.startForm,

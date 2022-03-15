@@ -55,7 +55,7 @@ export type Validation = (
 export type ValidationInitializer = (...value: any[]) => Validation
 
 export const isAValidPhoneNumberFormat = (value: string): boolean => {
-  const { pattern } = window.config.PHONE_NUMBER_PATTERN
+  const pattern = window.config.PHONE_NUMBER_PATTERN
   return new RegExp(pattern).test(value)
 }
 
@@ -181,8 +181,8 @@ export const officeMustBeSelected: Validation = (
 }
 
 export const phoneNumberFormat: Validation = (value: IFormFieldValue) => {
-  const { start, num } = window.config.PHONE_NUMBER_PATTERN
-  const validationProps = { start, num }
+  // const { start, num } = window.config.PHONE_NUMBER_PATTERN
+  // const validationProps = { start, num }
 
   const cast = value as string
   const trimmedValue = cast === undefined || cast === null ? '' : cast.trim()
@@ -194,8 +194,7 @@ export const phoneNumberFormat: Validation = (value: IFormFieldValue) => {
   return isAValidPhoneNumberFormat(trimmedValue)
     ? undefined
     : {
-        message: messages.phoneNumberFormat,
-        props: validationProps
+        message: messages.phoneNumberFormat
       }
 }
 

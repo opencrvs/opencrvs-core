@@ -18,9 +18,7 @@ const applicationConfigMutation = gql`
     updateApplicationConfig(applicationConfig: $applicationConfig) {
       APPLICATION_NAME
       NID_NUMBER_PATTERN
-      PHONE_NUMBER_PATTERN {
-        pattern
-      }
+      PHONE_NUMBER_PATTERN
     }
   }
 `

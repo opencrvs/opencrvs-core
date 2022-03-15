@@ -11,17 +11,6 @@
  */
 import { model, Schema, Document } from 'mongoose'
 
-interface IPhoneNumberPattern {
-  pattern: RegExp
-  example: string
-  start: string
-  num: string
-  mask: {
-    startForm: number
-    endBefore: number
-  }
-}
-
 export interface IApplicationConfigurationModel extends Document {
   APPLICATION_NAME: string
   BACKGROUND_SYNC_BROADCAST_CHANNEL: string
@@ -43,22 +32,11 @@ export interface IApplicationConfigurationModel extends Document {
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
   SENTRY: string
   LOGROCKET: string
-  PHONE_NUMBER_PATTERN: IPhoneNumberPattern
+  PHONE_NUMBER_PATTERN: RegExp
   BIRTH_REGISTRATION_TARGET: number
   DEATH_REGISTRATION_TARGET: number
   NID_NUMBER_PATTERN: string
 }
-
-const phoneNumberSchema = new Schema<IPhoneNumberPattern>({
-  pattern: { type: String },
-  example: String,
-  start: String,
-  num: String,
-  mask: {
-    startForm: Number,
-    endBefore: Number
-  }
-})
 
 const systemSchema = new Schema({
   APPLICATION_NAME: { type: String, required: false, default: 'OpenCRVS' },
@@ -115,7 +93,7 @@ const systemSchema = new Schema({
     required: false,
     default: false
   },
-  PHONE_NUMBER_PATTERN: { type: phoneNumberSchema, required: false },
+  PHONE_NUMBER_PATTERN: { type: String, required: false },
   BIRTH_REGISTRATION_TARGET: {
     type: Number,
     required: false,

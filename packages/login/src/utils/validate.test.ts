@@ -20,16 +20,7 @@ import {
 
 describe('validate', () => {
   beforeAll(() => {
-    window.config.PHONE_NUMBER_PATTERN = {
-      pattern: /^0(1)[0-9]{1}[0-9]{8}$/i,
-      example: '01741234567',
-      start: '0[7|9]',
-      num: '11',
-      mask: {
-        startForm: 4,
-        endBefore: 1
-      }
-    }
+    window.config.PHONE_NUMBER_PATTERN = /^0(1)[0-9]{1}[0-9]{8}$/
   })
 
   describe('isAValidPhoneNumberFormat. Checks a local phone number format complies with regex', () => {

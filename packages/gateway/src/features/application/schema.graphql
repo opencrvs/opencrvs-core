@@ -22,25 +22,9 @@ type Mask {
   endBefore: Int
 }
 
-type PhoneNumberPattern {
-  pattern: String
-  example: String
-  start: String
-  num: String
-  mask: Mask
-}
-
 input MaskInput {
   startForm: Int
   endBefore: Int
-}
-
-input PhoneNumberPatternInput {
-  pattern: String
-  example: String
-  start: String
-  num: String
-  mask: MaskInput
 }
 
 input ApplicationConfigurationInput {
@@ -64,7 +48,7 @@ input ApplicationConfigurationInput {
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
   SENTRY: String
   LOGROCKET: String
-  PHONE_NUMBER_PATTERN: PhoneNumberPatternInput
+  PHONE_NUMBER_PATTERN: String
   BIRTH_REGISTRATION_TARGET: Int
   DEATH_REGISTRATION_TARGET: Int
   NID_NUMBER_PATTERN: String
@@ -91,7 +75,7 @@ type ApplicationConfiguration {
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
   SENTRY: String
   LOGROCKET: String
-  PHONE_NUMBER_PATTERN: PhoneNumberPattern
+  PHONE_NUMBER_PATTERN: String
   BIRTH_REGISTRATION_TARGET: Int
   DEATH_REGISTRATION_TARGET: Int
   NID_NUMBER_PATTERN: String

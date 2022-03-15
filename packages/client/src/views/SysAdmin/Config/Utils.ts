@@ -14,7 +14,7 @@ import { IntlShape } from 'react-intl'
 import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
 import { messages } from '@client/i18n/messages/views/config'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { IState, IFullProps, ITempPhoneNumber } from './DynamicModal'
+import { IState, IFullProps } from './DynamicModal'
 import { configApplicationMutations } from './mutations'
 
 export function isValidRegEx(pattern: string): boolean {
@@ -132,7 +132,7 @@ export async function callUpdateNIDPatternMutation(
 }
 
 export async function callUpdatePhoneNumberPatternMutation(
-  phoneNumberPattern: ITempPhoneNumber,
+  phoneNumberPattern: string,
   props: IFullProps,
   updatingValue: (value: boolean) => void,
   setError: (errorMessage: string) => void

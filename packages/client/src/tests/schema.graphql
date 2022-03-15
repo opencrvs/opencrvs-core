@@ -539,7 +539,7 @@ type ApplicationConfiguration {
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
   SENTRY: String
   LOGROCKET: String
-  PHONE_NUMBER_PATTERN: PhoneNumberPattern
+  PHONE_NUMBER_PATTERN: String
   BIRTH_REGISTRATION_TARGET: Int
   DEATH_REGISTRATION_TARGET: Int
   NID_NUMBER_PATTERN: String
@@ -566,7 +566,7 @@ input ApplicationConfigurationInput {
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
   SENTRY: String
   LOGROCKET: String
-  PHONE_NUMBER_PATTERN: PhoneNumberPatternInput
+  PHONE_NUMBER_PATTERN: String
   BIRTH_REGISTRATION_TARGET: Int
   DEATH_REGISTRATION_TARGET: Int
   NID_NUMBER_PATTERN: String
@@ -956,22 +956,6 @@ input UserIdentifierInput {
 input SignatureInput {
   data: String
   type: String
-}
-
-type PhoneNumberPattern {
-  pattern: String
-  example: String
-  start: String
-  num: String
-  mask: Mask
-}
-
-input PhoneNumberPatternInput {
-  pattern: String
-  example: String
-  start: String
-  num: String
-  mask: MaskInput
 }
 
 type RegWorkflow {
