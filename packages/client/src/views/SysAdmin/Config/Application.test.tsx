@@ -14,6 +14,7 @@ import { createStore } from '@client/store'
 import {
   createTestComponent,
   flushPromises,
+  getFileFromBase64String,
   mockConfigResponse
 } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
@@ -22,9 +23,17 @@ import { configApplicationMutations } from '@client/views/SysAdmin/Config/mutati
 import * as fetchMock from 'jest-fetch-mock'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { referenceApi } from '@client/utils/referenceApi'
+import { IAttachmentValue } from '@client/forms'
 
 const { store, history } = createStore()
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
+export const validImageB64String =
+  'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
+const file: IAttachmentValue = {
+  name: 'img.png',
+  type: 'image/png',
+  data: `data:image;base64,${validImageB64String}`
+}
 let testComponent: ReactWrapper
 beforeEach(async () => {
   configApplicationMutations.mutateApplicationConfig = jest.fn(
@@ -35,8 +44,8 @@ beforeEach(async () => {
             updateApplicationConfig: {
               APPLICATION_NAME: 'OPENCRVS',
               COUNTRY_LOGO: {
-                fileName: mockConfigResponse.config.COUNTRY_LOGO.fileName,
-                file: mockConfigResponse.config.COUNTRY_LOGO.file
+                fileName: 'img.png',
+                file: `data:image;base64,${validImageB64String}`
               }
             }
           }
@@ -151,8 +160,7 @@ describe('country logo update test', () => {
       Promise.resolve({
         ...mockConfigResponse,
         config: {
-          ...mockConfigResponse.config,
-          COUNTRY_LOGO: { fileName: 'logo.png', file: 'hhhjhkjhk' }
+          ...mockConfigResponse.config
         }
       })
     )
@@ -162,6 +170,20 @@ describe('country logo update test', () => {
     expect(testComponent.find('#changeGovtLogoModal').hostNodes()).toHaveLength(
       1
     )
+  })
+  it('should disable the button if input file is empty', async () => {
+    testComponent.find('#changeGovtLogo').hostNodes().first().simulate('click')
+    testComponent
+      .find('#upload_document')
+      .hostNodes()
+      .simulate('change', {
+        target: {
+          file: null
+        }
+      })
+    expect(
+      testComponent.find('#apply_change').hostNodes().props().disabled
+    ).toBeTruthy()
   })
   it('should close the modal if click on cancel button', async () => {
     testComponent.find('#changeGovtLogo').hostNodes().first().simulate('click')
