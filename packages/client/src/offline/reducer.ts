@@ -191,7 +191,8 @@ function delay(cmd: RunCmd<any>, time: number) {
 
 function getContentCmd(state: IOfflineDataState) {
   // formConfig needs to be passed from the offline reducer to the form reducer and so this is the only way
-  return Cmd.run(() => referenceApi.loadContent, {
+
+  return Cmd.run(referenceApi.loadContent, {
     successActionCreator: actions.contentLoaded,
     failActionCreator: actions.contentFailed,
     args: [state.offlineData.formConfig]
@@ -306,6 +307,7 @@ function reducer(
       const newOfflineData = {
         ...state.offlineData,
         config: action.payload.config,
+        formConfig: action.payload.formConfig,
         templates: {
           certificates: {
             birth: {

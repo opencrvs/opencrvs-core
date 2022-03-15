@@ -27,7 +27,7 @@ import {
   IConditionals
 } from '@client/forms/index'
 import { formMessageDescriptors } from '@client/i18n/messages'
-import { set } from 'lodash'
+import { cloneDeep } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
 
 interface IDefaultRegisterForms {
@@ -181,27 +181,26 @@ export function configureRegistrationForm(
   filteredQuestions: IQuestionConfig[],
   defaultEventForm: ISerializedForm
 ): ISerializedForm {
+  const newForm = cloneDeep(defaultEventForm)
   filteredQuestions.forEach((question) => {
     const defaultField: IDefaultField | undefined = getDefaultField(
-      defaultEventForm,
+      newForm,
       question.fieldId
     )
 
     if (defaultField && !question.custom) {
       // this is a customisation to a default field
       // default fields can only be enabled or disabled
-      set(
-        defaultEventForm,
-        `sections[${defaultField.selectedSectionIndex}].groups[${defaultField.selectedGroupIndex}].fields[${defaultField.index}].enabled`,
-        question.enabled === 'DISABLED' ? false : true
-      )
+      newForm.sections[defaultField.selectedSectionIndex].groups[
+        defaultField.selectedGroupIndex
+      ].fields.splice(defaultField.index, 1)
     } else if (!defaultField && question.custom) {
       // this is a new custom field to be added
       const customQuestionIdentifiers = getQuestionsIdentifiersFromFieldId(
         question.fieldId
       )
       const activeSection = getSection(
-        defaultEventForm.sections,
+        newForm.sections,
         customQuestionIdentifiers.sectionId
       )
       const activeGroup = getGroup(
@@ -212,29 +211,22 @@ export function configureRegistrationForm(
       const newCustomField = createCustomField(question)
 
       const unmodifiedSectionFields =
-        defaultEventForm.sections[activeSection.index].groups[activeGroup.index]
-          .fields
+        newForm.sections[activeSection.index].groups[activeGroup.index].fields
 
       if (question.preceedingFieldId && question.preceedingFieldId === 'TOP') {
         // position custom field at the top
-        set(
-          defaultEventForm,
-          `sections[${activeSection.index}].groups[${activeGroup.index}].fields`,
-          unmodifiedSectionFields.unshift(newCustomField)
-        )
+        newForm.sections[activeSection.index].groups[
+          activeGroup.index
+        ].fields.unshift(newCustomField)
       } else if (question.preceedingFieldId) {
         // position custom field after preeceding field
         const verticallyPreceedingDefaultField: IDefaultField | undefined =
-          getDefaultField(defaultEventForm, question.preceedingFieldId)
+          getDefaultField(newForm, question.preceedingFieldId)
         if (verticallyPreceedingDefaultField) {
-          set(
-            defaultEventForm,
-            `sections[${activeSection.index}].groups[${activeGroup.index}].fields`,
-            unmodifiedSectionFields.splice(
-              verticallyPreceedingDefaultField?.index + 1,
-              0,
-              newCustomField
-            )
+          unmodifiedSectionFields.splice(
+            verticallyPreceedingDefaultField?.index + 1,
+            0,
+            newCustomField
           )
         } else {
           throw new Error(
@@ -252,8 +244,7 @@ export function configureRegistrationForm(
       )
     }
   })
-
-  return defaultEventForm
+  return newForm
 }
 
 export const conditionals: IConditionals = {
