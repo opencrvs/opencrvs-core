@@ -155,6 +155,10 @@ export const mockFetchConfig = {
       num: '9'
     },
     COUNTRY: 'zmb',
+    CURRENCY: {
+      isoCode: 'ZMW',
+      languagesAndCountry: ['en-ZM']
+    },
     LANGUAGES: 'en'
   },
   certificates: [

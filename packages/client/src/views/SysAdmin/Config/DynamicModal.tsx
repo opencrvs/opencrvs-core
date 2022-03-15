@@ -20,15 +20,23 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from '@client/styledComponents'
-import { InputField, TextInput } from '@opencrvs/components/lib/forms'
+import { InputField, TextInput, Select } from '@opencrvs/components/lib/forms'
 import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { Alert } from '@opencrvs/components/lib/icons/Alert'
-import { configApplicationMutations } from '@client/views/SysAdmin/Config/mutations'
 import { updateOfflineConfigData } from '@client/offline/actions'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
+import {
+  getCurrencyObject,
+  getCurrencySelectOptions,
+  getTitle,
+  getMessage,
+  isApplyButtonDisabled,
+  callUpdateApplicationNameMutation,
+  callUpdateApplicationCurrencyMutation
+} from '@client/views/SysAdmin/Config/utils'
 
 const Message = styled.div`
   margin-bottom: 16px;
@@ -76,11 +84,20 @@ const ErrorMessage = styled.div`
   color: ${({ theme }) => theme.colors.error};
   margin-left: 6px;
 `
-type IApplicationName = {
-  applicatioName: string
+
+export type ICurrency = {
+  isoCode: string | undefined
+  languagesAndCountry: string[]
 }
-type State = {
+
+export type IApplicationConfigName = {
+  APPLICATION_NAME?: string
+  CURRENCY?: ICurrency
+}
+
+export type State = {
   applicationName: string
+  currency: string
   updatingValue: boolean
   errorOccured: boolean
   errorMessages: string
@@ -100,19 +117,14 @@ type DispatchProps = {
   updateConfig: typeof updateOfflineConfigData
 }
 
-type IFullProps = IProps & IntlShapeProps & DispatchProps
-
-function isApplicationName(
-  modalName: string,
-  value: IApplicationName
-): value is IApplicationName {
-  return modalName === GeneralActionId.APPLICATION_NAME
-}
+export type IFullProps = IProps & IntlShapeProps & DispatchProps
 class DynamicModalComponent extends React.Component<IFullProps, State> {
   constructor(props: IFullProps) {
     super(props)
     this.state = {
-      applicationName: EMPTY_STRING,
+      applicationName:
+        this.props.offlineCountryConfiguration.config.APPLICATION_NAME,
+      currency: `${this.props.offlineCountryConfiguration.config.CURRENCY.languagesAndCountry[0]}-${this.props.offlineCountryConfiguration.config.CURRENCY.isoCode}`,
       updatingValue: false,
       errorOccured: false,
       errorMessages: EMPTY_STRING
@@ -128,64 +140,76 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
     }))
   }
 
-  mutationHandler(
+  setUpdatingValue = (value: boolean) => {
+    this.setState({
+      updatingValue: value
+    })
+  }
+
+  setError = (errorMessage: string) => {
+    this.setState({
+      errorOccured: true,
+      errorMessages: errorMessage
+    })
+  }
+
+  async mutationHandler(
     modalName: string,
-    value: IApplicationName,
+    value: IApplicationConfigName,
     valueChanged: (
       notificationStatus: NOTIFICATION_TYPE,
       messages: string
     ) => void
   ) {
-    if (isApplicationName(modalName, value)) {
-      this.callUpdateApplicationNameMutation(value.applicatioName)
-        .then(() => {
-          valueChanged(
-            NOTIFICATION_TYPE.SUCCESS,
-            this.props.intl.formatMessage(
-              messages.applicationNameChangeNotification
-            )
-          )
-        })
-        .catch(() => {
-          this.setState({
-            errorOccured: true,
-            errorMessages: this.props.intl.formatMessage(
-              messages.applicationNameChangeError
-            )
-          })
-          valueChanged(
-            NOTIFICATION_TYPE.ERROR,
-            this.props.intl.formatMessage(messages.applicationNameChangeError)
-          )
-        })
-    }
-  }
-
-  async callUpdateApplicationNameMutation(applicationName: string) {
-    try {
-      this.setState({ updatingValue: true })
-      const res = await configApplicationMutations.updateApplicationName(
-        applicationName
-      )
-      if (res && res.data) {
-        this.setState({ updatingValue: false })
-        const APPLICATION_NAME =
-          res.data.updateApplicationConfig.APPLICATION_NAME
-        const offlineConfig = {
-          config: {
-            ...this.props.offlineCountryConfiguration.config,
-            APPLICATION_NAME
-          }
-        }
-        this.props.updateConfig(offlineConfig)
-      }
-    } catch (err) {
-      this.setState({
-        errorOccured: true,
-        errorMessages: this.props.intl.formatMessage(
-          messages.applicationNameChangeError
+    if (
+      modalName === GeneralActionId.APPLICATION_NAME &&
+      value.APPLICATION_NAME
+    ) {
+      try {
+        await callUpdateApplicationNameMutation(
+          value.APPLICATION_NAME,
+          this.props,
+          this.setUpdatingValue,
+          this.setError
         )
-      })
+        valueChanged(
+          NOTIFICATION_TYPE.SUCCESS,
+          this.props.intl.formatMessage(
+            messages.applicationNameChangeNotification
+          )
+        )
+      } catch {
+        this.setError(
+          this.props.intl.formatMessage(messages.applicationConfigChangeError)
+        )
+        valueChanged(
+          NOTIFICATION_TYPE.ERROR,
+          this.props.intl.formatMessage(messages.applicationConfigChangeError)
+        )
+      }
+    } else if (modalName === GeneralActionId.CURRENCY && value.CURRENCY) {
+      try {
+        await callUpdateApplicationCurrencyMutation(
+          value.CURRENCY,
+          this.props,
+          this.setUpdatingValue,
+          this.setError
+        )
+        valueChanged(
+          NOTIFICATION_TYPE.SUCCESS,
+          this.props.intl.formatMessage(
+            messages.applicationCurrencyChangeNotification
+          )
+        )
+      } catch {
+        this.setError(
+          this.props.intl.formatMessage(messages.applicationConfigChangeError)
+        )
+        valueChanged(
+          NOTIFICATION_TYPE.ERROR,
+          this.props.intl.formatMessage(messages.applicationConfigChangeError)
+        )
+      }
     }
   }
 
@@ -195,8 +219,11 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
     return (
       <ResponsiveModal
         id={`${changeModalName}Modal`}
-        title={intl.formatMessage(messages.applicationNameLabel)}
+        title={getTitle(intl, changeModalName)}
         show={this.showChangeModal}
+        contentScrollableY={
+          changeModalName === GeneralActionId.CURRENCY ? true : false
+        }
         actions={[
           <CancelButton
             key="cancel"
@@ -208,11 +235,14 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
           <ApplyButton
             key="apply"
             id="apply_change"
-            disabled={!Boolean(this.state.applicationName.length)}
+            disabled={isApplyButtonDisabled(this.state, changeModalName)}
             onClick={() => {
               this.mutationHandler(
                 changeModalName,
-                { applicatioName: this.state.applicationName },
+                {
+                  APPLICATION_NAME: this.state.applicationName,
+                  CURRENCY: getCurrencyObject(this.state.currency)
+                },
                 valueChanged
               )
             }}
@@ -223,9 +253,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
         handleClose={toggleConfigModal}
         contentHeight={175}
       >
-        <Message>
-          {intl.formatMessage(messages.applicationNameChangeMessage)}
-        </Message>
+        <Message>{getMessage(intl, changeModalName)}</Message>
         {this.state.errorOccured && (
           <ErrorContent>
             <Alert color="invert" />
@@ -244,6 +272,29 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
                   error={false}
                   value={this.state.applicationName}
                   onChange={this.setApplicationName}
+                />
+              </InputField>
+            </Field>
+          </Content>
+        )}
+        {changeModalName === GeneralActionId.CURRENCY && (
+          <Content>
+            <Field>
+              <InputField
+                id="applicationCurrency"
+                touched={true}
+                required={false}
+              >
+                <Select
+                  id="selectCurrency"
+                  isDisabled={false}
+                  onChange={(val: string) => {
+                    this.setState({
+                      currency: val
+                    })
+                  }}
+                  value={this.state.currency}
+                  options={getCurrencySelectOptions()}
                 />
               </InputField>
             </Field>

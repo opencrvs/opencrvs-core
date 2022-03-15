@@ -33,6 +33,7 @@ import { buttonMessages } from '@client/i18n/messages'
 import { DynamicModal } from '@client/views/SysAdmin/Config/DynamicModal'
 import { EMPTY_STRING } from '@client/utils/constants'
 import styled from 'styled-components'
+import { countries as countryList, lookup } from 'country-data'
 
 const ListGroupTitle = styled.div`
   color: ${({ theme }) => theme.colors.grey400};
@@ -61,11 +62,8 @@ export enum TabId {
 export enum GeneralActionId {
   APPLICATION_NAME = 'changeAppName',
   GOVT_LOGO = 'changeGovtLogo',
-  USER_TIMEOUT = 'changeUsrTimeOut',
-  Currency = 'changeCurrency',
-  PHONE_NUMBER = 'changePhnNum',
-  LOG_ROCKET = 'changeLogrocket',
-  SENTRY = 'changeSentry'
+  CURRENCY = 'changeCurrency',
+  PHONE_NUMBER = 'changePhnNum'
 }
 
 function GeneralTabContent({
@@ -77,6 +75,9 @@ function GeneralTabContent({
   intl: IntlShape
   callBack: (modalName: string) => void
 }) {
+  const countryCurrencyName = lookup.currencies({
+    code: offlineCountryConfiguration.config.CURRENCY.isoCode
+  })
   return (
     <ListView
       items={[
@@ -112,11 +113,13 @@ function GeneralTabContent({
         },
         {
           label: intl.formatMessage(messages.currencyLable),
-          value: '',
+          value: countryCurrencyName[0].name,
           action: {
-            id: GeneralActionId.Currency,
+            id: GeneralActionId.CURRENCY,
             label: intl.formatMessage(buttonMessages.change),
-            disabled: true
+            handler: () => {
+              callBack(GeneralActionId.CURRENCY)
+            }
           }
         },
         {

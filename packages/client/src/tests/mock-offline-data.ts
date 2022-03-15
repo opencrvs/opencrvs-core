@@ -340,6 +340,10 @@ export const mockOfflineData = {
     _id: '61a8c105c04ac94fe46ceb27',
     BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
     COUNTRY: 'bgd',
+    CURRENCY: {
+      isoCode: 'ZMW',
+      languagesAndCountry: ['en-ZM']
+    },
     COUNTRY_LOGO_FILE: 'logo.png',
     PHONE_NUMBER_PATTERN: {
       pattern: /^01[1-9][0-9]{8}$/,

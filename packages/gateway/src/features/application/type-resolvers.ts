@@ -12,13 +12,15 @@
 
 import {
   GQLNIDNumberPatternInput,
-  GQLPhoneNumberPatternInput
+  GQLPhoneNumberPatternInput,
+  GQLCurrencyInput
 } from '@gateway/graphql/schema'
 
 export interface IApplicationConfigPayload {
   APPLICATION_NAME: string
   BACKGROUND_SYNC_BROADCAST_CHANNEL: string
   COUNTRY: string
+  CURRENCY: GQLCurrencyInput
   COUNTRY_LOGO_FILE: string
   COUNTRY_LOGO_RENDER_WIDTH: number
   COUNTRY_LOGO_RENDER_HEIGHT: number
