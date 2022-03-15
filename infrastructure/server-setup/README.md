@@ -120,6 +120,9 @@ Before the deployment can be done a few secrets need to be manually added to the
 ssh into the manager server and run the following, replacing the values with the actual secrets:
 
 ```sh
+# Create login credentials for Kibana Basic Auth
+htpasswd -nb kibana-admin example-password
+printf 'kibana-admin:$apr1$LFvoLjiD$j/33/z/rI9xrMFUiIC5rM.' | docker secret create kibana-htpasswd -
 # For API integration mediators, allows API access to the OpenHIM
 printf "<openhim-user>" | docker secret create openhim-user -
 printf "<openhim-password>" | docker secret create openhim-password -
@@ -187,10 +190,13 @@ COUNTRY_CONFIG_VERSION can be any OpenCRVS Country Configuration docker image ta
 COUNTRY_CONFIG_PATH directory path to where your country configuration repository is locally checked out
 REPLICAS number of supported servers. Can be 1, 3 or 5
 
+The following options are currently required, but will be made configurable:
+SLACK_WEBHOOK_URL, KIBANA_USERNAME & KIBANA_PASSWORD must be set as environent variables and are used by Kibana to alert you of server issues and to protect access to Kibana
+
 E.G.:
 
 ```
-yarn deploy:qa farajaland-qa.opencrvs.org 7b994cd 88a5a83 opencrvs-farajaland 1
+yarn deploy:qa farajaland-qa.opencrvs.org 7b994cd 88a5a83 opencrvs-farajaland 1 env.SLACK_WEBHOOK_URL env.KIBANA_USERNAME env.KIBANA_PASSWORD
 ```
 
 ## Emergency Backup & Restore
@@ -244,30 +250,30 @@ Run the following script as root but beware that **ALL DATA WILL BE REPLACED BY 
 
 ## How to know when to scale a service
 
-OpenCRVS uses the [Netdata](https://www.netdata.cloud/) tool for server and container monitoring. This would be your first stop to determine how your servers are operating and if they are keeping up with the load.
+OpenCRVS uses the [Kibana](https://www.elastic.co/kibana) tool for server and container monitoring. This would be your first stop to determine how your servers are operating and if they are keeping up with the load.
 
-Access Netdata by visiting: https://monitor.<your_domain>
+Access Kibana by visiting: https://kibana.<your_domain>
 
-In the top left you will see a dropdown. From here you may select each of the servers in your swarm. The first step you should take is to determine if any/all of the servers are at capacity. Thing you should look for include:
+In the top left you will see an expanding side navigation. In the menu you should navigate to Observability -> Metrics. From here you can see different observations (CPU load, memory usage, traffic) for each of your servers. The first step you should take is to determine if any/all of the servers are at capacity. Thing you should look for include:
 
 - A constantly maxed out CPU percentage or load number
 - If IOWAIT is constantly high your disks are becoming a bottleneck
 - Check RAM usage to make sure the server isn't paging (linux systems always try use as much RAM as possible, what you are looking for is high number with almost no caching)
-- Check if Netadata has any active alarms on any of the servers
+- Check if Kibana has any active alarms on any of the servers (Main menu -> Observability -> Alerts)
 
 If all of the server are running at capacity you might need to add more servers to the swarm. If just a few are at capacity then you should try to figure out which containers are using the most resources and scale those out so other server may take the load.
 
-To do this, first check the 'Applications' section in Netdata and see if it really is the containers using up system resources, it could be another rouge process.
+To do this, navigate to Observability -> Metrics -> Inventory. By selecting Metric:`docker.cpu.total.pct` and Group by:`docker.container.labels.com_docker_swarm_service_name` you should be able to see all running services and the containers on each server. By hovering over the containers, you'll see basic system statistics for each container.
 
-Next, go through each of the docker containers listed on the menu on the left in Netdata. Try to find which one is using the majority of the resources. Look for constantly high CPU or Disk usage. If you find a culprit you may increase the number of replicas of that service using:
+Next, go through each of the docker containers listed and try to find which one is using the majority of the resources. Look for constantly high CPU or Disk usage. If you find a culprit you may increase the number of replicas of that service using:
 
 ```
 docker service scale <service name e.g.: "opencrvs_workflow">=5
 ```
 
-After this is done, watch Netdata and ensure that the change was effective and ensure there aren't any other services that are also at capacity. In some cases the only answer may be to [add additional servers to the docker swarm](https://docs.docker.com/engine/swarm/swarm-tutorial/add-nodes/). To get tasks to move to the new server you can scale down certain service and scale them back up again or you can [force a rebalance](https://docs.docker.com/engine/swarm/admin_guide/#force-the-swarm-to-rebalance) which may lead to so down time.
+After this is done, monitor the containers and ensure that the change was effective and ensure there aren't any other services that are also at capacity. In some cases the only answer may be to [add additional servers to the docker swarm](https://docs.docker.com/engine/swarm/swarm-tutorial/add-nodes/). To get tasks to move to the new server you can scale down certain service and scale them back up again or you can [force a rebalance](https://docs.docker.com/engine/swarm/admin_guide/#force-the-swarm-to-rebalance) which may lead to so down time.
 
-You may want to [setup notifications](https://docs.netdata.cloud/health/notifications/) in Netdata as well so that you may be notified of any alarms on the servers.
+Alert rules can be added by navigating to Observability -> Alerts -> Manage rules.
 
 ## Some useful Docker and Docker Swarm commands
 

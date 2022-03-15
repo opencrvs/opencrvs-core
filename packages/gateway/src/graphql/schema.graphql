@@ -146,6 +146,8 @@ type Mutation {
     details: BirthRegistrationInput!
   ): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID!
+  markEventAsReinstated(id: String!): Reinstated
+  markEventAsArchived(id: String!): ID!
   notADuplicate(id: String!, duplicateId: String!): ID!
   createDeathRegistration(details: DeathRegistrationInput!): CreatedIds!
   updateDeathRegistration(id: ID!, details: DeathRegistrationInput!): ID!
@@ -233,6 +235,7 @@ type BirthRegistration implements EventRegistration {
   primaryCaregiver: PrimaryCaregiver
   createdAt: Date
   updatedAt: Date
+  history: [History]
 }
 
 type DeathRegistration implements EventRegistration {
@@ -253,6 +256,7 @@ type DeathRegistration implements EventRegistration {
   medicalPractitioner: MedicalPractitioner
   createdAt: Date
   updatedAt: Date
+  history: [History]
 }
 
 type Person {
@@ -283,6 +287,7 @@ type BirthRegResultSet {
 interface EventRegistration {
   id: ID!
   registration: Registration
+  history: [History]
   createdAt: Date
 }
 
@@ -465,6 +470,11 @@ input BirthRegistrationInput {
   updatedAt: Date
 }
 
+type Reinstated {
+  taskEntryResourceID: ID!
+  registrationStatus: RegStatus
+}
+
 input DeathRegistrationInput {
   _fhirIDMap: Map
   registration: RegistrationInput
@@ -598,6 +608,18 @@ type PrimaryCaregiver {
   primaryCaregiver: Person
   reasonsNotApplying: [ReasonsNotApplying]
   parentDetailsType: ParentDetailsType
+}
+
+type History {
+  user: User
+  date: Date
+  action: RegStatus
+  reinstated: Boolean
+  location: Location
+  office: Location
+  comments: [Comment]
+  input: [InputOutput]
+  output: [InputOutput]
 }
 
 enum MannerOfDeath {
@@ -906,6 +928,19 @@ input PrimaryCaregiverInput {
   parentDetailsType: ParentDetailsType
 }
 
+enum RegStatus {
+  IN_PROGRESS
+  ARCHIVED
+  DECLARED
+  DECLARATION_UPDATED
+  WAITING_VALIDATION
+  VALIDATED
+  REGISTERED
+  CERTIFIED
+  REJECTED
+  DOWNLOADED
+}
+
 input MedicalPractitionerInput {
   name: String
   qualification: String
@@ -975,6 +1010,19 @@ enum ParentDetailsType {
   MOTHER_ONLY
   FATHER_ONLY
   NONE
+}
+
+type Comment {
+  id: ID!
+  user: User
+  comment: String
+  createdAt: Date
+}
+
+type InputOutput {
+  valueCode: String
+  valueId: String
+  valueString: String
 }
 
 enum IdentityIDType {
@@ -1260,24 +1308,6 @@ input ReasonsNotApplyingInput {
   primaryCaregiverType: PrimaryCaregiverType
   reasonNotApplying: String
   isDeceased: Boolean
-}
-
-enum RegStatus {
-  IN_PROGRESS
-  DECLARED
-  DECLARATION_UPDATED
-  WAITING_VALIDATION
-  VALIDATED
-  REGISTERED
-  CERTIFIED
-  REJECTED
-}
-
-type Comment {
-  id: ID!
-  user: User
-  comment: String
-  createdAt: Date
 }
 
 type Payment {

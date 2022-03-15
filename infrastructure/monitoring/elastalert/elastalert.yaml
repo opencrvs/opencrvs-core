@@ -7,9 +7,18 @@
 #
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
-[{{NETDATA_API_KEY}}]
-    enabled = yes
-    default history = 3600
-    default memory mode = save
-    health enabled by default = auto
-    allow from = *
+rules_folder: /opt/elastalert/rules
+
+run_every:
+  seconds: 10
+
+buffer_time:
+  minutes: 15
+
+es_host: elasticsearch
+es_port: 9200
+
+writeback_index: elastalert_status
+
+alert_time_limit:
+  days: 2

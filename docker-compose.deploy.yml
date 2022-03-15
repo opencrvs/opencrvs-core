@@ -31,64 +31,65 @@ services:
           - node.role == manager
     networks:
       - overlay_net
+    secrets:
+      - kibana-htpasswd
 
-  netdata-master:
-    image: netdata/netdata:v1.19.0
-    hostname: 'master-{{.Node.Hostname}}'
-    restart: always
-    cap_add:
-      - SYS_PTRACE
-    security_opt:
-      - apparmor:unconfined
-    volumes:
-      - /etc/passwd:/host/etc/passwd:ro
-      - /etc/group:/host/etc/group:ro
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    configs:
-      - source: netdata-master-stream.{{ts}}
-        target: /etc/netdata/stream.conf
-    environment:
-      - PGID=999
-    deploy:
-      replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
-      labels:
-        - 'traefik.enable=true'
-        - 'traefik.frontend.rule=Host: monitor.{{hostname}}'
-        - 'traefik.port=19999'
-        - 'traefik.docker.network=opencrvs_overlay_net'
-    networks:
-      - overlay_net
+  metricbeat:
+    image: docker.elastic.co/beats/metricbeat:7.17.0
 
-  netdata-slave:
-    image: netdata/netdata:v1.19.0
-    hostname: 'slave-{{.Node.Hostname}}'
-    restart: always
-    cap_add:
-      - SYS_PTRACE
-    security_opt:
-      - apparmor:unconfined
+    user: root
     volumes:
-      - /etc/passwd:/host/etc/passwd:ro
-      - /etc/group:/host/etc/group:ro
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    configs:
-      - source: netdata-slave.{{ts}}
-        target: /etc/netdata/netdata.conf
-      - source: netdata-slave-stream.{{ts}}
-        target: /etc/netdata/stream.conf
+      - /proc:/hostfs/proc:ro
+      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+      - /:/hostfs:ro
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - PGID=999
+      - KIBANA_HOST=kibana:5601
+      - ELASTICSEARCH_HOST=elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=changeme
+    command: ['--strict.perms=false', '-system.hostfs=/hostfs']
+    hostname: 'metricbeat-{{.Node.Hostname}}'
+    restart: always
     deploy:
       mode: global
     networks:
       - overlay_net
+    configs:
+      - source: metricbeat-conf.{{ts}}
+        target: /usr/share/metricbeat/metricbeat.yml
+
+  setup-kibana-alerts:
+    image: node:17.6.0-alpine
+    command: node /usr/app/setup-alerts.js
+    restart: on-failure
+    depends_on:
+      - kibana
+    environment:
+      - KIBANA_HOST=kibana
+      - KIBANA_PORT=5601
+    volumes:
+      - '/tmp/compose/infrastructure/monitoring/kibana/alert-rules.json:/usr/app/alert-rules.json'
+      - '/tmp/compose/infrastructure/monitoring/kibana/setup-alerts.js:/usr/app/setup-alerts.js'
+    networks:
+      - overlay_net
+
+  kibana:
+    restart: always
+    deploy:
+      labels:
+        # https://doc.traefik.io/traefik/v1.7/configuration/backends/docker/#labels-overriding-default-behavior
+        - 'traefik.enable=true'
+        - 'traefik.frontend.rule=Host: kibana.{{hostname}}'
+        - 'traefik.frontend.auth.basic.usersFile=/run/secrets/kibana-htpasswd'
+        - 'traefik.port=5601'
+        - 'traefik.docker.network=opencrvs_overlay_net'
+    networks:
+      - overlay_net
+    volumes:
+      - '/tmp/compose/infrastructure/monitoring/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml:ro,Z'
+    depends_on:
+      - elasticsearch
 
   # Configure mongo nodes as a replica set
   mongo1:
@@ -135,6 +136,43 @@ services:
           - node.labels.data1 == true
     networks:
       - overlay_net
+
+  elastalert:
+    image: jertel/elastalert2:2.3.0
+    restart: unless-stopped
+    volumes:
+      - '/tmp/compose/infrastructure/monitoring/elastalert/elastalert.yaml:/opt/elastalert/config.yaml'
+      - '/tmp/compose/infrastructure/monitoring/elastalert/rules:/opt/elastalert/rules'
+    networks:
+      - overlay_net
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+  apm-server:
+    image: docker.elastic.co/apm/apm-server:7.15.2
+    depends_on:
+      - elasticsearch
+      - kibana
+    cap_add: ['CHOWN', 'DAC_OVERRIDE', 'SETGID', 'SETUID']
+    cap_drop: ['ALL']
+    ports:
+      - 8200:8200
+    networks:
+      - overlay_net
+    deploy:
+      replicas: 3
+    command: >
+      apm-server -e
+        -E apm-server.rum.enabled=true
+        -E setup.kibana.host=kibana:5601
+        -E setup.template.settings.index.number_of_replicas=0
+        -E apm-server.kibana.enabled=true
+        -E apm-server.kibana.host=kibana:5601
+        -E output.elasticsearch.hosts=["elasticsearch:9200"]
+        -E output.elasticsearch.bulk_max_size=5120
 
   # Configure influxdb
   influxdb:
@@ -187,6 +225,8 @@ services:
         - 'traefik.port=3040'
         - 'traefik.docker.network=opencrvs_overlay_net'
       replicas: 2
+    environment:
+      - APN_SERVICE_URL=http://apm-server:8200
     networks:
       - overlay_net
 
@@ -210,6 +250,7 @@ services:
       - jwt-public-key.{{ts}}
       - jwt-private-key.{{ts}}
     environment:
+      - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PRIVATE_KEY_PATH=/run/secrets/jwt-private-key.{{ts}}
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
@@ -226,6 +267,7 @@ services:
     secrets:
       - jwt-public-key.{{ts}}
     environment:
+      - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
       - MONGO_URL=mongodb://mongo1/user-mgnt?replicaSet=rs0
     deploy:
@@ -237,6 +279,7 @@ services:
     secrets:
       - jwt-public-key.{{ts}}
     environment:
+      - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
       replicas: 2
@@ -247,6 +290,7 @@ services:
     secrets:
       - jwt-public-key.{{ts}}
     environment:
+      - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
       labels:
@@ -262,6 +306,7 @@ services:
     secrets:
       - jwt-public-key.{{ts}}
     environment:
+      - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
       replicas: 2
@@ -272,6 +317,7 @@ services:
     secrets:
       - jwt-public-key.{{ts}}
     environment:
+      - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
       replicas: 2
@@ -282,6 +328,7 @@ services:
     secrets:
       - jwt-public-key.{{ts}}
     environment:
+      - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
       replicas: 2
@@ -292,6 +339,7 @@ services:
     secrets:
       - jwt-public-key.{{ts}}
     environment:
+      - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
       - MONGO_URL=mongodb://mongo1/application-config?replicaSet=rs0
     deploy:
@@ -379,6 +427,7 @@ services:
     secrets:
       - jwt-public-key.{{ts}}
     environment:
+      - APN_SERVICE_URL=http://apm-server:8200
       - MONGO_URL=mongodb://mongo1/webhooks?replicaSet=rs0
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
@@ -396,7 +445,8 @@ secrets:
     external: true
   jwt-private-key.{{ts}}:
     external: true
-
+  kibana-htpasswd:
+    external: true
 configs:
   openhim-console-conf.{{ts}}:
     file: ./infrastructure/openhim-console-config.deploy.json
@@ -406,13 +456,8 @@ configs:
     file: ./infrastructure/hearth-plugins/checkDuplicateTask.js
   hearth-queryparam-extensions-conf.{{ts}}:
     file: ./infrastructure/hearth-queryparam-extensions.json
-  netdata-master-stream.{{ts}}:
-    file: ./infrastructure/netdata-master-stream.conf
-  netdata-slave.{{ts}}:
-    file: ./infrastructure/netdata-slave.conf
-  netdata-slave-stream.{{ts}}:
-    file: ./infrastructure/netdata-slave-stream.conf
-
+  metricbeat-conf.{{ts}}:
+    file: ./infrastructure/monitoring/beats/metricbeat.yml
 networks:
   overlay_net:
     driver: overlay

@@ -15,7 +15,8 @@ import {
   fetchFHIR,
   getTimeLoggedFromMetrics,
   getStatusFromTask,
-  ITimeLoggedResponse
+  ITimeLoggedResponse,
+  getDownloadedExtensionStatus
 } from '@gateway/features/fhir/utils'
 import {
   MOTHER_CODE,
@@ -53,7 +54,8 @@ import {
   ORIGINAL_FILE_NAME_SYSTEM,
   SYSTEM_FILE_NAME_SYSTEM,
   FHIR_SPECIFICATION_URL,
-  OPENCRVS_SPECIFICATION_URL
+  OPENCRVS_SPECIFICATION_URL,
+  REINSTATED_EXTENSION_URL
 } from '@gateway/features/fhir/constants'
 import { ITemplatedComposition } from '@gateway/features/registration/fhir-builders'
 import fetch from 'node-fetch'
@@ -526,7 +528,22 @@ export const typeResolvers: GQLResolver = {
     }
   },
   Comment: {
-    user: (comment) => comment.authorString,
+    user: async (comment, _, authHeader) => {
+      if (!comment.authorString) {
+        return null
+      }
+      const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
+        method: 'POST',
+        body: JSON.stringify({
+          practitionerId: comment.authorString.split('/')[1]
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+      return await res.json()
+    },
     comment: (comment) => comment.text,
     createdAt: (comment) => comment.time
   },
@@ -762,6 +779,73 @@ export const typeResolvers: GQLResolver = {
         null
       )
     }
+  },
+
+  History: {
+    action: async (task: fhir.Task) => {
+      const businessStatus = getStatusFromTask(task)
+      const extensionStatusWhileDownloaded = getDownloadedExtensionStatus(task)
+      if (businessStatus === extensionStatusWhileDownloaded) {
+        return 'DOWNLOADED'
+      }
+      return businessStatus
+    },
+    reinstated: (task: fhir.Task) => {
+      const extension =
+        task.extension &&
+        findExtension(REINSTATED_EXTENSION_URL, task.extension)
+      return extension !== undefined
+    },
+    date: (task: fhir.Task) => task.meta?.lastUpdated,
+    user: async (task: fhir.Task, _: any, authHeader: any) => {
+      const user = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
+        task.extension as fhir.Extension[]
+      )
+      if (!user || !user.valueReference || !user.valueReference.reference) {
+        return null
+      }
+      const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
+        method: 'POST',
+        body: JSON.stringify({
+          practitionerId: user.valueReference.reference.split('/')[1]
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+      return await res.json()
+    },
+    location: async (task: fhir.Task, _: any, authHeader: any) => {
+      const taskLocation = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
+        task.extension as fhir.Extension[]
+      )
+      if (!taskLocation || !taskLocation.valueReference) {
+        return null
+      }
+      return await fetchFHIR(
+        `/${taskLocation.valueReference.reference}`,
+        authHeader
+      )
+    },
+    office: async (task: fhir.Task, _: any, authHeader: any) => {
+      const taskLocation = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
+        task.extension as fhir.Extension[]
+      )
+      if (!taskLocation || !taskLocation.valueReference) {
+        return null
+      }
+      return await fetchFHIR(
+        `/${taskLocation.valueReference.reference}`,
+        authHeader
+      )
+    },
+    comments: (task: fhir.Task) => task.note || [],
+    input: (task: fhir.Task) => task.input || [],
+    output: (task: fhir.Task) => task.output || []
   },
 
   DeathRegistration: {
@@ -1001,6 +1085,32 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       return encounterParticipant
+    },
+    async history(composition: ITemplatedComposition, _: any, authHeader: any) {
+      const task = await fetchFHIR(
+        `/Task/?focus=Composition/${composition.id}`,
+        authHeader
+      )
+
+      const taskId = task.entry[0].resource.id
+
+      const taskHistory = await fetchFHIR(
+        `/Task/${taskId}/_history?_count=100`,
+        authHeader
+      )
+
+      if (!taskHistory.entry[0] || !taskHistory.entry[0].resource) {
+        return null
+      }
+
+      return taskHistory?.entry?.map(
+        (item: {
+          resource: { extension: any }
+          extension: fhir.Extension[]
+        }) => {
+          return item.resource
+        }
+      )
     }
   },
   BirthRegistration: {
@@ -1344,6 +1454,32 @@ export const typeResolvers: GQLResolver = {
           observations.entry[0] &&
           observations.entry[0].resource.valueDateTime) ||
         null
+      )
+    },
+    async history(composition: ITemplatedComposition, _: any, authHeader: any) {
+      const task = await fetchFHIR(
+        `/Task/?focus=Composition/${composition.id}`,
+        authHeader
+      )
+
+      const taskId = task.entry[0].resource.id
+
+      const taskHistory = await fetchFHIR(
+        `/Task/${taskId}/_history?_count=100`,
+        authHeader
+      )
+
+      if (!taskHistory.entry[0] || !taskHistory.entry[0].resource) {
+        return null
+      }
+
+      return taskHistory?.entry?.map(
+        (item: {
+          resource: { extension: any }
+          extension: fhir.Extension[]
+        }) => {
+          return item.resource
+        }
       )
     }
   }

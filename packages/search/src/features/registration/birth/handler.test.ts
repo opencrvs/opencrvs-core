@@ -16,7 +16,7 @@ import {
   searchComposition,
   updateComposition
 } from '@search/elasticsearch/dbhelper'
-import { createServer } from '@search/index'
+import { createServer } from '@search/server'
 import {
   mockBirthFhirBundleWithoutCompositionId,
   mockBirthRejectionTaskBundle,
