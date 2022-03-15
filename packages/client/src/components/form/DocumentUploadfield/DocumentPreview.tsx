@@ -24,7 +24,7 @@ const PreviewContainer = styled.div`
   z-index: 4;
   width: 100%;
   height: 100%;
-  background: ${({ theme }) => theme.colors.previewBackground};
+  background: ${({ theme }) => theme.colors.grey600};
 `
 const PreviewContainerHeader = styled.div`
   width: 100%;

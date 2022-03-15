@@ -11,10 +11,10 @@
  */
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import {
-  modifyApplication,
-  IApplication,
-  writeApplication
-} from '@client/applications'
+  modifyDeclaration,
+  IDeclaration,
+  writeDeclaration
+} from '@client/declarations'
 import { ReviewSection } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/correction'
 import { goBack, goToPageGroup, goToHomeTab } from '@client/navigation'
@@ -52,18 +52,18 @@ export interface ICertificateCorrectorDefinition {
 }
 
 interface IMatchParams {
-  applicationId: string
+  declarationId: string
   corrector: string
 }
 
 interface IStateProps {
-  application: IApplication
+  declaration: IDeclaration
   form: ICertificateCorrectorDefinition
 }
 interface IDispatchProps {
   goBack: typeof goBack
-  modifyApplication: typeof modifyApplication
-  writeApplication: typeof writeApplication
+  modifyDeclaration: typeof modifyDeclaration
+  writeDeclaration: typeof writeDeclaration
   goToPageGroup: typeof goToPageGroup
   goToHomeTab: typeof goToHomeTab
 }
@@ -74,33 +74,33 @@ type IFullProps = IStateProps & IDispatchProps & IOwnProps & IntlShapeProps
 
 class VerifyCorrectorComponent extends React.Component<IFullProps> {
   handleVerification = (hasShowedVerifiedDocument: boolean) => {
-    const application = this.props.application
+    const declaration = this.props.declaration
     const changed = {
-      ...application,
+      ...declaration,
       data: {
-        ...application.data,
+        ...declaration.data,
         corrector: {
-          ...application.data.corrector,
+          ...declaration.data.corrector,
           hasShowedVerifiedDocument
         }
       }
     }
-    this.props.modifyApplication(changed)
+    this.props.modifyDeclaration(changed)
 
-    this.props.writeApplication(changed)
+    this.props.writeDeclaration(changed)
 
     this.props.goToPageGroup(
       CERTIFICATE_CORRECTION_REVIEW,
-      this.props.application.id,
+      this.props.declaration.id,
       ReviewSection.Review,
       'review-view-group',
-      this.props.application.event
+      this.props.declaration.event
     )
   }
 
   getGenericCorrectorInfo = (corrector: string): ICorrectorInfo => {
-    const { intl, application, form } = this.props
-    const info = application.data[corrector]
+    const { intl, declaration, form } = this.props
+    const info = declaration.data[corrector]
     //TODO :: we have to get form defination from new certificateCorrectorDefination
     const showInfoFor = ['mother', 'father', 'child', 'informant']
     if (showInfoFor.includes(corrector)) {
@@ -144,12 +144,12 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
   }
 
   logTime = (timeMs: number) => {
-    const application = this.props.application
-    if (!application.timeLoggedMS) {
-      application.timeLoggedMS = 0
+    const declaration = this.props.declaration
+    if (!declaration.timeLoggedMS) {
+      declaration.timeLoggedMS = 0
     }
-    application.timeLoggedMS += timeMs
-    this.props.modifyApplication(application)
+    declaration.timeLoggedMS += timeMs
+    this.props.modifyDeclaration(declaration)
   }
 
   render() {
@@ -203,26 +203,26 @@ const mapStateToProps = (
   state: IStoreState,
   ownProps: IOwnProps
 ): IStateProps => {
-  const { applicationId } = ownProps.match.params
+  const { declarationId } = ownProps.match.params
 
-  const application = state.applicationsState.applications.find(
-    (draft) => draft.id === applicationId
+  const declaration = state.declarationsState.declarations.find(
+    (draft) => draft.id === declarationId
   )
 
-  if (!application) {
-    throw new Error(`Draft "${applicationId}" missing!`)
+  if (!declaration) {
+    throw new Error(`Draft "${declarationId}" missing!`)
   }
 
   return {
-    application,
-    form: getVerifyCorrectorDefinition(application.event)
+    declaration,
+    form: getVerifyCorrectorDefinition(declaration.event)
   }
 }
 
 export const VerifyCorrector = connect(mapStateToProps, {
   goBack,
-  modifyApplication,
-  writeApplication,
+  modifyDeclaration,
+  writeDeclaration,
   goToPageGroup,
   goToHomeTab
 })(injectIntl(VerifyCorrectorComponent))

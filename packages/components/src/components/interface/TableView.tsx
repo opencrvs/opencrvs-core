@@ -34,7 +34,7 @@ const Wrapper = styled.div<{
       : hideBoxShadow
       ? `padding: 24px 0;`
       : `padding: 24px;
-    ${theme.shadows.mistyShadow};`}
+    ${theme.shadows.light};`}
 `
 const TableTitleLoading = styled.span`
   background: ${({ theme }) => theme.colors.background};
@@ -47,14 +47,18 @@ const TableHeader = styled.div<{
   isSortable?: boolean
   totalWidth?: number
   fixedWidth?: number
+  hideTableHeaderBorder?: boolean
 }>`
   ${({ fixedWidth, totalWidth }) =>
     fixedWidth ? `width: ${fixedWidth}px;` : `width: ${totalWidth || 100}%;`}
-  background: ${({ theme }) => theme.colors.greyHover};
+  background: ${({ theme }) => theme.colors.grey100};
   padding: 10px 0px;
   display: flex;
   align-items: flex-end;
   border-bottom: 1px solid ${({ theme }) => theme.colors.disabled};
+  ${({ hideTableHeaderBorder }) =>
+    hideTableHeaderBorder === true ? 'border-bottom: none;' : ''};
+
   border-radius: 2px;
 
   & span:first-child {
@@ -70,7 +74,7 @@ const TableHeaderText = styled.div<{
   isSorted?: boolean
 }>`
   ${({ theme }) => theme.fonts.multiColHeaderFont};
-  color: ${({ theme }) => theme.colors.grey};
+  color: ${({ theme }) => theme.colors.supportingCopy};
 `
 
 const TableBody = styled.div<{
@@ -109,9 +113,7 @@ const RowWrapper = styled.div<{
   padding-bottom: 10px;
   border-bottom: 1px solid
     ${({ theme, columns }) =>
-      columns.length > 5
-        ? theme.colors.greyHover
-        : theme.colors.tableRowDivider};
+      columns.length > 5 ? theme.colors.grey100 : theme.colors.grey200};
 
   &:last-child {
     ${({ hideTableBottomBorder }) =>
@@ -119,7 +121,8 @@ const RowWrapper = styled.div<{
   }
 
   display: flex;
-  ${({ alignItemCenter }) => alignItemCenter && `align-items: start`};
+  ${({ alignItemCenter }) =>
+    alignItemCenter ? `align-items: center` : `align-items: start`};
   ${({ height }) =>
     height ? `min-height:${height.lg}px;` : `min-height: 48px)`};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -127,7 +130,7 @@ const RowWrapper = styled.div<{
       height ? `min-height:${height.md}px` : `min-height: 48px)`};
   }
   ${({ highlight, theme }) =>
-    highlight && `:hover { background-color: ${theme.colors.dropdownHover};}`}
+    highlight && `:hover { background-color: ${theme.colors.grey100};}`}
 
   & span:first-child {
     ${({ horizontalPadding }) =>
@@ -201,7 +204,7 @@ const ValueWrapper = styled.span<{
   ${({ color }) => color && `color: ${color};`}
 `
 const Error = styled.span`
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.negative};
 `
 const ErrorText = styled.div<{ isFullPage?: boolean }>`
   ${({ theme }) => theme.fonts.h5Style};
@@ -238,7 +241,7 @@ const TableScrollerHorizontal = styled.div<{
 
   &::-webkit-scrollbar-thumb {
     border-radius: 10px;
-    background: ${({ theme }) => theme.colors.lightScrollBarGrey};
+    background: ${({ theme }) => theme.colors.grey400};
   }
 `
 const TableScroller = styled.div<{
@@ -315,6 +318,7 @@ interface ITableViewProps {
   highlightRowOnMouseOver?: boolean
   isFullPage?: boolean
   fixedWidth?: number
+  hideTableHeaderBorder?: boolean
 }
 
 interface ITableViewState {
@@ -404,7 +408,8 @@ export class TableView extends React.Component<
       loadMoreText,
       highlightRowOnMouseOver,
       isFullPage,
-      fixedWidth
+      fixedWidth,
+      hideTableHeaderBorder
     } = this.props
     const totalItems = this.props.totalItems || 0
     const totalWidth = columns.reduce((total, col) => (total += col.width), 0)
@@ -426,7 +431,11 @@ export class TableView extends React.Component<
             >
               {!hideTableHeader && content.length > 0 && (
                 <TableHeaderWrapper>
-                  <TableHeader totalWidth={totalWidth} fixedWidth={fixedWidth}>
+                  <TableHeader
+                    totalWidth={totalWidth}
+                    fixedWidth={fixedWidth}
+                    hideTableHeaderBorder={hideTableHeaderBorder}
+                  >
                     {columns.map((preference, index) => (
                       <ContentWrapper
                         key={index}

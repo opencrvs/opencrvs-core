@@ -29,11 +29,9 @@ import * as labels from './mappings/label'
 import * as types from './mappings/type'
 import * as responseTransformers from './mappings/response-transformers'
 import * as validators from '@opencrvs/client/src/utils/validate'
-import { ICertificate as IApplicationCertificate } from '@client/applications'
+import { ICertificate as IDeclarationCertificate } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
-import { registerForms } from './register/fieldDefinitions/register'
-import { createUserForm } from './user/fieldDefinitions/createUser'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -75,14 +73,16 @@ export enum Sort {
 
 export enum Action {
   SUBMIT_FOR_REVIEW = 'submit for review',
-  APPROVE_APPLICATION = 'approve',
-  REGISTER_APPLICATION = 'register',
+  APPROVE_DECLARATION = 'approve',
+  REGISTER_DECLARATION = 'register',
   COLLECT_CERTIFICATE = 'collect certificate',
-  REJECT_APPLICATION = 'reject',
-  LOAD_REVIEW_APPLICATION = 'load application data for review',
-  LOAD_CERTIFICATE_APPLICATION = 'load application data for certificate collection',
-  LOAD_REQUESTED_CORRECTION_APPLICATION = 'load application data for which is requested correction',
-  REQUEST_CORRECTION_APPLICATION = 'request correction'
+  REJECT_DECLARATION = 'reject',
+  LOAD_REVIEW_DECLARATION = 'load declaration data for review',
+  LOAD_CERTIFICATE_DECLARATION = 'load declaration data for certificate collection',
+  REINSTATE_DECLARATION = 'reinstate',
+  ARCHIVE_DECLARATION = 'archive',
+  LOAD_REQUESTED_CORRECTION_DECLARATION = 'load declaration data for which is requested correction',
+  REQUEST_CORRECTION_DECLARATION = 'request correction'
 }
 
 export interface ISelectOption {
@@ -211,7 +211,7 @@ export type IFormFieldValue =
   | number
   | boolean
   | Date
-  | IApplicationCertificate
+  | IDeclarationCertificate
   | IFileValue
   | IAttachmentValue
   | FieldValueArray
@@ -660,7 +660,7 @@ export interface IConditionals {
   isNotCityLocationPermanent: IConditional
   isDefaultCountryPermanent: IConditional
   isCityLocationPermanent: IConditional
-  applicantPermanentAddressSameAsCurrent: IConditional
+  informantPermanentAddressSameAsCurrent: IConditional
   iDAvailable: IConditional
   deathPlaceOther: IConditional
   deathPlaceAtPrivateHome: IConditional
@@ -800,7 +800,7 @@ export enum BirthSection {
   Child = 'child',
   Mother = 'mother',
   Father = 'father',
-  Applicant = 'informant',
+  Informant = 'informant',
   Parent = 'primaryCaregiver',
   Registration = 'registration',
   Documents = 'documents',
@@ -811,7 +811,7 @@ export enum DeathSection {
   Deceased = 'deceased',
   Event = 'deathEvent',
   CauseOfDeath = 'causeOfDeath',
-  Applicants = 'informant',
+  Informants = 'informant',
   DeathDocuments = 'documents',
   Preview = 'preview',
   Father = 'father',

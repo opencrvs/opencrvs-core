@@ -19,15 +19,14 @@ on:
 jobs:
   push:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
     steps:
       - uses: actions/checkout@v2
-        ref: '${{ github.event.inputs.farajaland }}'
+        with:
+          ref: '${{ github.event.inputs.branch_name }}'
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Push image
-        run: |
-          export COUNTRY_CONFIG_VERSION=`git log -1 --pretty=format:%h` && bash build-and-push.sh && unset COUNTRY_CONFIG_VERSION
+        run: yarn compose:push:version

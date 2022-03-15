@@ -337,7 +337,7 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
     return (
       <SysAdminContentWrapper isCertificatesConfigPage={true}>
         <Content
-          title={intl.formatMessage(messages.applicationTitle)}
+          title={intl.formatMessage(messages.applicationSettings)}
           titleColor={'copy'}
           tabs={{
             sections: [

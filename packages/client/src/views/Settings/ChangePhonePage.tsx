@@ -44,7 +44,7 @@ import { getCurrentUserScope } from '@client/utils/authUtils'
 import { convertToMSISDN } from '@client/forms/utils'
 
 const Container = styled.div`
-  ${({ theme }) => theme.shadows.mistyShadow};
+  ${({ theme }) => theme.shadows.light};
   color: ${({ theme }) => theme.colors.copy};
   background: ${({ theme }) => theme.colors.white};
   padding: 40px 77px;
@@ -106,7 +106,7 @@ const InvalidPhoneNumber = styled.div`
   /* stylelint-disable-next-line opencrvs/no-font-styles */
   font-family: ${({ theme }) => theme.fonts.semiBoldFont};
   ${({ theme }) => theme.fonts.semiBoldFont};
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.negative};
   margin-top: 8px;
 `
 const BoxedError = styled.div`

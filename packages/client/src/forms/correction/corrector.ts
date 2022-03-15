@@ -87,7 +87,7 @@ const birthCorrectorRelationGroup: IFormSectionGroup = {
             type: 'TEXT',
             label: {
               defaultMessage: 'Relationship to child',
-              id: 'form.field.label.applicantsRelationWithChild',
+              id: 'form.field.label.informantsRelationWithChild',
               description: 'Label for input Relationship to child'
             },
             placeholder: {
@@ -152,7 +152,7 @@ const deathCorrectorRelationGroup: IFormSectionGroup = {
             type: 'TEXT',
             label: {
               defaultMessage: 'Relationship to child',
-              id: 'form.field.label.applicantsRelationWithChild',
+              id: 'form.field.label.informantsRelationWithChild',
               description: 'Label for input Relationship to child'
             },
             placeholder: {

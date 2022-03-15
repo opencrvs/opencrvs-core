@@ -36,7 +36,7 @@ const PostFixPadding = styled.span`
   display: inline-flex;
   align-items: center;
   ${({ theme }) => theme.fonts.bodyStyle};
-  color: ${({ theme }) => theme.colors.menuBackground};
+  color: ${({ theme }) => theme.colors.grey600};
 `
 
 const InputDescription = styled.p<{

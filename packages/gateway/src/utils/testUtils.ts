@@ -178,9 +178,22 @@ export const mockDocumentReference = {
   ]
 }
 
+export const mockUser = {
+  type: 'CHAIRMAN',
+  role: 'LOCAL_REGISTRAR',
+  name: [
+    {
+      firstNames: 'Kennedy',
+      familyName: 'Mweene',
+      use: 'en'
+    }
+  ]
+}
+
 export const mockTask = {
   resourceType: 'Task',
   status: 'requested',
+  intent: '',
   identifier: [
     {
       system: 'http://opencrvs.org/specs/id/birth-tracking-id',
@@ -217,7 +230,7 @@ export const mockTask = {
   lastModified: '2016-10-31T09:45:05+10:00',
   note: [
     {
-      authorString: '<username>',
+      authorString: 'Practitioner/12121212',
       text: 'Comment',
       time: '2016-10-31T09:45:05+10:00'
     }
@@ -705,10 +718,10 @@ export const mockFhirBundle = {
           coding: [
             {
               system: 'http://opencrvs.org/doc-types',
-              code: 'birth-application'
+              code: 'birth-declaration'
             }
           ],
-          text: 'Birth Application'
+          text: 'Birth Declaration'
         },
         class: {
           coding: [

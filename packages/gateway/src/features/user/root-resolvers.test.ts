@@ -334,10 +334,10 @@ describe('User root resolvers', () => {
         JSON.stringify([
           {
             practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
-            totalNumberOfApplicationStarted: 12,
+            totalNumberOfDeclarationStarted: 12,
             totalNumberOfInProgressAppStarted: 5,
-            totalNumberOfRejectedApplications: 2,
-            averageTimeForDeclaredApplications: 360
+            totalNumberOfRejectedDeclarations: 2,
+            averageTimeForDeclaredDeclarations: 360
           }
         ])
       )
@@ -361,10 +361,10 @@ describe('User root resolvers', () => {
           status: 'active',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406433,
-          totalNumberOfApplicationStarted: 12,
+          totalNumberOfDeclarationStarted: 12,
           totalNumberOfInProgressAppStarted: 5,
-          totalNumberOfRejectedApplications: 2,
-          averageTimeForDeclaredApplications: 360
+          totalNumberOfRejectedDeclarations: 2,
+          averageTimeForDeclaredDeclarations: 360
         },
         {
           practitionerId: 'sseq1203-f0ff-4822-b5d9-cb90d0e7biwuw',
@@ -373,10 +373,10 @@ describe('User root resolvers', () => {
           status: 'pending',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406444,
-          totalNumberOfApplicationStarted: 0,
+          totalNumberOfDeclarationStarted: 0,
           totalNumberOfInProgressAppStarted: 0,
-          totalNumberOfRejectedApplications: 0,
-          averageTimeForDeclaredApplications: 0
+          totalNumberOfRejectedDeclarations: 0,
+          averageTimeForDeclaredDeclarations: 0
         }
       ])
     })
@@ -391,10 +391,10 @@ describe('User root resolvers', () => {
         JSON.stringify([
           {
             practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
-            totalNumberOfApplicationStarted: 12,
+            totalNumberOfDeclarationStarted: 12,
             totalNumberOfInProgressAppStarted: 5,
-            totalNumberOfRejectedApplications: 2,
-            averageTimeForDeclaredApplications: 360
+            totalNumberOfRejectedDeclarations: 2,
+            averageTimeForDeclaredDeclarations: 360
           }
         ])
       )
@@ -418,10 +418,10 @@ describe('User root resolvers', () => {
           status: 'active',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406433,
-          totalNumberOfApplicationStarted: 12,
+          totalNumberOfDeclarationStarted: 12,
           totalNumberOfInProgressAppStarted: 5,
-          totalNumberOfRejectedApplications: 2,
-          averageTimeForDeclaredApplications: 360
+          totalNumberOfRejectedDeclarations: 2,
+          averageTimeForDeclaredDeclarations: 360
         },
         {
           practitionerId: 'sseq1203-f0ff-4822-b5d9-cb90d0e7biwuw',
@@ -430,10 +430,10 @@ describe('User root resolvers', () => {
           status: 'pending',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406444,
-          totalNumberOfApplicationStarted: 0,
+          totalNumberOfDeclarationStarted: 0,
           totalNumberOfInProgressAppStarted: 0,
-          totalNumberOfRejectedApplications: 0,
-          averageTimeForDeclaredApplications: 0
+          totalNumberOfRejectedDeclarations: 0,
+          averageTimeForDeclaredDeclarations: 0
         }
       ])
     })
@@ -470,10 +470,10 @@ describe('User root resolvers', () => {
         JSON.stringify([
           {
             practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
-            totalNumberOfApplicationStarted: 12,
+            totalNumberOfDeclarationStarted: 12,
             totalNumberOfInProgressAppStarted: 5,
-            totalNumberOfRejectedApplications: 2,
-            averageTimeForDeclaredApplications: 360
+            totalNumberOfRejectedDeclarations: 2,
+            averageTimeForDeclaredDeclarations: 360
           }
         ])
       )
@@ -498,10 +498,10 @@ describe('User root resolvers', () => {
           status: 'active',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406433,
-          totalNumberOfApplicationStarted: 12,
+          totalNumberOfDeclarationStarted: 12,
           totalNumberOfInProgressAppStarted: 5,
-          totalNumberOfRejectedApplications: 2,
-          averageTimeForDeclaredApplications: 360
+          totalNumberOfRejectedDeclarations: 2,
+          averageTimeForDeclaredDeclarations: 360
         }
       ])
     })

@@ -14,12 +14,12 @@ import styled, { StyledComponentBase } from 'styled-components'
 import { Button, IButtonProps } from './Button'
 
 export const SecondaryButton = styled(Button)`
-  color: ${({ theme }) => theme.colors.secondary};
+  color: ${({ theme }) => theme.colors.primary};
+  transition: background 0.4s ease;
+  border-radius: 4px;
   background: ${({ theme }) => theme.colors.white};
-  border: ${({ theme }) => `2px solid ${theme.colors.secondary}`};
-  box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
-  border-radius: 2px;
-  ${({ theme }) => theme.fonts.buttonStyle};
+  border: ${({ theme }) => `2px solid ${theme.colors.primary}`};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
   height: 40px;
 
   & div {
@@ -27,30 +27,30 @@ export const SecondaryButton = styled(Button)`
   }
 
   &:hover {
-    opacity: 0.8;
+    border: ${({ theme }) => `2px solid ${theme.colors.indigoDark}`};
   }
 
   &:focus {
     outline: none;
-    background: ${({ theme }) => theme.colors.focus};
+    background: ${({ theme }) => theme.colors.yellow};
     color: ${({ theme }) => theme.colors.copy};
     border: none;
   }
 
   &:not([data-focus-visible-added]) {
     outline: none;
-    color: ${({ theme }) => theme.colors.secondary};
+    color: ${({ theme }) => theme.colors.primary};
     background: ${({ theme }) => theme.colors.white};
-    border: ${({ theme }) => `2px solid ${theme.colors.secondary}`};
+    border: ${({ theme }) => `2px solid ${theme.colors.primary}`};
   }
 
   &:active {
-    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.focus};
+    border: ${({ theme }) => `2px solid ${theme.colors.indigoDark}`};
   }
 
   &:disabled {
-    border: ${({ theme }) => `2px solid ${theme.colors.disabled}`};
+    border: ${({ theme }) => `2px solid ${theme.colors.grey300}`};
     cursor: not-allowed;
-    color: ${({ theme }) => theme.colors.disabled};
+    color: ${({ theme }) => theme.colors.grey300};
   }
 `

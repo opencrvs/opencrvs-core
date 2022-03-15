@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import Role from '@user-mgnt/model/role'
-import { createServer } from '@user-mgnt/index'
+import { createServer } from '@user-mgnt/server'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 

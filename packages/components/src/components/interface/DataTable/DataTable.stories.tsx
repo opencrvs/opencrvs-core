@@ -28,7 +28,7 @@ export default {
 
 const getDeclarationStatusIcon = (status: any) => {
   switch (status) {
-    case 'application':
+    case 'declaration':
       return <StatusOrange />
     case 'registered':
       return <StatusGreen />
@@ -46,7 +46,7 @@ const renderCell = (item: any, key: any) => {
 
   info.push({ label: 'Name', value: item.name })
   info.push({ label: 'D.o.B', value: item.dob })
-  info.push({ label: 'Date of application', value: item.date_of_application })
+  info.push({ label: 'Date of declaration', value: item.date_of_declaration })
   info.push({ label: 'Tracking ID', value: item.tracking_id })
 
   actions.push({ label: 'review', handler: () => alert('Hello') })
@@ -75,27 +75,27 @@ DataTableView.args = {
     {
       name: 'John Doe 1',
       dob: 'dob',
-      date_of_application: '10.10.2018',
+      date_of_declaration: '10.10.2018',
       tracking_id: '1234567',
       createdAt: '2017-12-10T18:00:00.000Z',
-      declaration_status: 'application',
+      declaration_status: 'declaration',
       event: 'birth',
       location: 'gazipur'
     },
     {
       name: 'John Doe 2',
       dob: 'dob',
-      date_of_application: '10.10.2018',
+      date_of_declaration: '10.10.2018',
       tracking_id: '1234567',
       createdAt: '2017-11-10T18:00:00.000Z',
-      declaration_status: 'application',
+      declaration_status: 'declaration',
       event: 'death',
       location: 'demra'
     },
     {
       name: 'John Doe 2',
       dob: 'dob',
-      date_of_application: '10.10.2018',
+      date_of_declaration: '10.10.2018',
       tracking_id: '1234567',
       createdAt: '2017-11-10T18:00:00.000Z',
       declaration_status: 'registered',
@@ -105,7 +105,7 @@ DataTableView.args = {
     {
       name: 'John Doe 3',
       dob: 'dob',
-      date_of_application: '10.10.2018',
+      date_of_declaration: '10.10.2018',
       tracking_id: '1234567',
       createdAt: '2017-09-10T18:00:00.000Z',
       declaration_status: 'collected',
@@ -115,17 +115,17 @@ DataTableView.args = {
     {
       name: 'John Doe 4',
       dob: 'dob',
-      date_of_application: '10.10.2018',
+      date_of_declaration: '10.10.2018',
       tracking_id: '1234567',
       createdAt: '2017-10-10T18:00:00.000Z',
-      declaration_status: 'application',
+      declaration_status: 'declaration',
       event: 'birth',
       location: 'badda'
     },
     {
       name: 'John Doe 5',
       dob: 'dob',
-      date_of_application: '10.10.2018',
+      date_of_declaration: '10.10.2018',
       tracking_id: '1234567',
       createdAt: '2017-10-10T18:00:00.000Z',
       declaration_status: 'registered',
@@ -135,7 +135,7 @@ DataTableView.args = {
     {
       name: 'John Doe 6',
       dob: 'dob',
-      date_of_application: '10.10.2018',
+      date_of_declaration: '10.10.2018',
       tracking_id: '1234567',
       createdAt: '2017-10-09T18:00:00.000Z',
       declaration_status: 'collected',
@@ -145,27 +145,27 @@ DataTableView.args = {
     {
       name: 'John Doe 7',
       dob: 'dob',
-      date_of_application: '10.10.2018',
+      date_of_declaration: '10.10.2018',
       tracking_id: '1234567',
       createdAt: '2017-10-08T18:00:00.000Z',
-      declaration_status: 'application',
+      declaration_status: 'declaration',
       event: 'birth',
       location: 'dhamrai'
     },
     {
       name: 'John Doe 8',
       dob: 'dob',
-      date_of_application: '10.10.2018',
+      date_of_declaration: '10.10.2018',
       tracking_id: '1234567',
       createdAt: '2017-10-09T18:00:00.000Z',
-      declaration_status: 'application',
+      declaration_status: 'declaration',
       event: 'death',
       location: 'badda'
     },
     {
       name: 'John Doe 9',
       dob: 'dob',
-      date_of_application: '10.10.2018',
+      date_of_declaration: '10.10.2018',
       tracking_id: '1234567',
       createdAt: '2017-10-09T18:00:00.000Z',
       declaration_status: 'registered',
@@ -175,7 +175,7 @@ DataTableView.args = {
     {
       name: 'John Doe 10',
       dob: 'dob',
-      date_of_application: '10.10.2018',
+      date_of_declaration: '10.10.2018',
       tracking_id: '1234567',
       createdAt: '2017-10-06T18:00:00.000Z',
       declaration_status: 'collected',
@@ -185,27 +185,27 @@ DataTableView.args = {
     {
       name: 'John Doe 11',
       dob: 'dob',
-      date_of_application: '10.10.2018',
+      date_of_declaration: '10.10.2018',
       tracking_id: '1234567',
       createdAt: '2017-10-09T18:00:00.000Z',
-      declaration_status: 'application',
+      declaration_status: 'declaration',
       event: 'birth',
       location: 'dhamrai'
     },
     {
       name: 'John Doe 12',
       dob: 'dob',
-      date_of_application: '10.10.2018',
+      date_of_declaration: '10.10.2018',
       tracking_id: '1234567',
       createdAt: '2017-10-09T18:00:00.000Z',
-      declaration_status: 'application',
+      declaration_status: 'declaration',
       event: 'death',
       location: 'dhamrai'
     },
     {
       name: 'John Doe 13',
       dob: 'dob',
-      date_of_application: '10.10.2018',
+      date_of_declaration: '10.10.2018',
       tracking_id: '1234567',
       createdAt: '2017-10-09T18:00:00.000Z',
       declaration_status: 'registered',
@@ -215,7 +215,7 @@ DataTableView.args = {
     {
       name: 'John Doe 14',
       dob: 'dob',
-      date_of_application: '10.10.2018',
+      date_of_declaration: '10.10.2018',
       tracking_id: '1234567',
       createdAt: '2017-10-09T18:00:00.000Z',
       declaration_status: 'collected',
@@ -261,7 +261,7 @@ DataTableView.args = {
           name: 'declaration_status',
           value: 'declaration_status',
           options: [
-            { value: 'application', label: 'Application' },
+            { value: 'declaration', label: 'Declaration' },
             { value: 'collected', label: 'Collected' },
             { value: 'registered', label: 'Registered' }
           ]

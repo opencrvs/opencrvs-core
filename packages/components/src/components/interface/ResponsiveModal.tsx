@@ -71,8 +71,7 @@ const Header = styled.div<{
   padding: 0 8px 0px 24px;
   @media (max-width: ${({ theme, responsive }) =>
       responsive && theme.grid.breakpoints.lg}px) {
-    ${({ theme, hideBoxShadow }) =>
-      !hideBoxShadow && theme.shadows.mistyShadow};
+    ${({ theme, hideBoxShadow }) => !hideBoxShadow && theme.shadows.light};
     margin-bottom: 16px;
   }
 `
@@ -106,7 +105,7 @@ const Body = styled.div<{
   }
 
   ::-webkit-scrollbar-thumb {
-    background: ${({ theme }) => theme.colors.scrollBarGrey};
+    background: ${({ theme }) => theme.colors.grey400};
     border-radius: 10px;
   }
 `
@@ -116,7 +115,7 @@ const Footer = styled.div<{ responsive?: boolean }>`
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
-  border-top: 2px solid ${({ theme }) => theme.colors.dividerLight};
+  border-top: 2px solid ${({ theme }) => theme.colors.grey200};
   @media (max-width: ${({ theme, responsive }) =>
       responsive && theme.grid.breakpoints.md}px) {
     flex-direction: column-reverse;
@@ -209,11 +208,13 @@ export class ResponsiveModal extends React.Component<IProps> {
           >
             {this.props.children}
           </Body>
-          <Footer responsive={responsive}>
-            {actions.map((action, i) => (
-              <Action key={i}>{action}</Action>
-            ))}
-          </Footer>
+          {actions.length > 0 && (
+            <Footer responsive={responsive}>
+              {actions.map((action, i) => (
+                <Action key={i}>{action}</Action>
+              ))}
+            </Footer>
+          )}
         </ModalContent>
       </ModalContainer>
     )

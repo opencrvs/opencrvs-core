@@ -67,7 +67,7 @@ services:
       - mongo3
 
   mongo2:
-    image: mongo:3.6
+    image: mongo:4.4
     hostname: 'mongo2'
     container_name: 'mongo2'
     restart: unless-stopped
@@ -83,7 +83,7 @@ services:
       - overlay_net
 
   mongo3:
-    image: mongo:3.6
+    image: mongo:4.4
     hostname: 'mongo3'
     container_name: 'mongo3'
     restart: unless-stopped
@@ -99,7 +99,7 @@ services:
       - overlay_net
 
   mongo-rs-init:
-    image: mongo:3.6
+    image: mongo:4.4
     depends_on:
       - mongo1
       - mongo2

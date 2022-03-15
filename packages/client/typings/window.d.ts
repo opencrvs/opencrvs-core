@@ -41,6 +41,7 @@ interface Window {
     APPLICATION_AUDIT_LOCATIONS: string
     PHONE_NUMBER_PATTERN: RegExp
     NID_NUMBER_PATTERN: RegExp
+    DECLARATION_AUDIT_LOCATIONS: string
     LOGROCKET: string
     SENTRY: string
     BIRTH_REGISTRATION_TARGET: number

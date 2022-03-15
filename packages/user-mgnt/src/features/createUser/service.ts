@@ -94,7 +94,7 @@ export const createFhirPractitionerRole = (
           ]
         }
       ],
-      location: (user.catchmentAreaIds || []).map(id => ({
+      location: (user.catchmentAreaIds || []).map((id) => ({
         reference: `Location/${id}`
       }))
     }
@@ -122,7 +122,7 @@ export const createFhirPractitionerRole = (
           ]
         }
       ],
-      location: (user.catchmentAreaIds || []).map(id => ({
+      location: (user.catchmentAreaIds || []).map((id) => ({
         reference: `Location/${id}`
       }))
     }
@@ -185,10 +185,10 @@ export const getFromFhir = (token: string, suffix: string) => {
       Authorization: token
     }
   })
-    .then(response => {
+    .then((response) => {
       return response.json()
     })
-    .catch(error => {
+    .catch((error) => {
       return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
     })
 }
@@ -239,15 +239,15 @@ export async function generateUsername(
   existingUserName?: string
 ) {
   const { given = [], family = '' } =
-    names.find(name => name.use === 'en') || {}
+    names.find((name) => name.use === 'en') || {}
   const initials = given.reduce(
     (accumulated, current) => accumulated + current.trim().charAt(0),
     ''
   )
 
-  let proposedUsername = `${initials}${
-    initials === '' ? '' : '.'
-  }${family.trim().replace(/ /g, '-')}`.toLowerCase()
+  let proposedUsername = `${initials}${initials === '' ? '' : '.'}${family
+    .trim()
+    .replace(/ /g, '-')}`.toLowerCase()
 
   if (proposedUsername.length < 3) {
     proposedUsername =

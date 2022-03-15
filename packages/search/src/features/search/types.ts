@@ -26,8 +26,8 @@ export interface ISearchQuery {
   event?: string
   type?: string[]
   status?: string[]
-  applicationLocationId?: string
-  applicationLocationHirarchyId?: string
+  declarationLocationId?: string
+  declarationLocationHirarchyId?: string
   createdBy?: string
   from?: number
   size?: number

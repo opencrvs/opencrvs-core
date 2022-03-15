@@ -12,14 +12,7 @@
 import {
   EVENT_TYPE,
   OPENCRVS_SPECIFICATION_URL,
-  REG_STATUS_CERTIFIED,
-  REG_STATUS_DECLARED,
-  REG_STATUS_IN_PROGRESS,
-  REG_STATUS_VALIDATED,
-  REG_STATUS_WAITING_VALIDATION,
-  REG_STATUS_REGISTERED,
-  REG_STATUS_DECLARATION_UPDATED,
-  REG_STATUS_REQUESTED_CORRECTION
+  RegStatus
 } from '@workflow/features/registration/fhir/constants'
 import {
   getTaskResource,
@@ -35,7 +28,7 @@ import {
   generateDeathTrackingId,
   getEventType,
   isEventNotification,
-  isInProgressApplication
+  isInProgressDeclaration
 } from '@workflow/features/registration/utils'
 import {
   getLoggedInPractitionerResource,
@@ -74,9 +67,9 @@ export async function modifyRegistrationBundle(
   await setupRegistrationWorkflow(
     taskResource,
     getTokenPayload(token),
-    isInProgressApplication(fhirBundle)
-      ? REG_STATUS_IN_PROGRESS
-      : REG_STATUS_DECLARED
+    isInProgressDeclaration(fhirBundle)
+      ? RegStatus.IN_PROGRESS
+      : RegStatus.DECLARED
   )
 
   const practitioner = await getLoggedInPractitionerResource(token)
@@ -105,7 +98,7 @@ export async function markBundleAsValidated(
   await setupRegistrationWorkflow(
     taskResource,
     getTokenPayload(token),
-    REG_STATUS_VALIDATED
+    RegStatus.VALIDATED
   )
 
   await setupLastRegLocation(taskResource, practitioner)
@@ -126,7 +119,7 @@ export async function markBundleAsRequestedForCorrection(
   await setupRegistrationWorkflow(
     taskResource,
     getTokenPayload(token),
-    REG_STATUS_REQUESTED_CORRECTION
+    RegStatus.REQUESTED_CORRECTION
   )
 
   await setupLastRegLocation(taskResource, practitioner)
@@ -166,7 +159,7 @@ export async function markBundleAsWaitingValidation(
   await setupRegistrationWorkflow(
     taskResource,
     getTokenPayload(token),
-    REG_STATUS_WAITING_VALIDATION
+    RegStatus.WAITING_VALIDATION
   )
 
   /* setting lastRegLocation here */
@@ -190,7 +183,7 @@ export async function markBundleAsDeclarationUpdated(
   await setupRegistrationWorkflow(
     taskResource,
     getTokenPayload(token),
-    REG_STATUS_DECLARATION_UPDATED
+    RegStatus.DECLARATION_UPDATED
   )
 
   /* setting lastRegLocation here */
@@ -227,7 +220,7 @@ export async function markEventAsRegistered(
   await setupRegistrationWorkflow(
     taskResource,
     getTokenPayload(token),
-    REG_STATUS_REGISTERED
+    RegStatus.REGISTERED
   )
 
   return taskResource
@@ -245,7 +238,7 @@ export async function markBundleAsCertified(
   await setupRegistrationWorkflow(
     taskResource,
     getTokenPayload(token),
-    REG_STATUS_CERTIFIED
+    RegStatus.CERTIFIED
   )
 
   /* setting lastRegLocation here */
@@ -255,6 +248,45 @@ export async function markBundleAsCertified(
   setupLastRegUser(taskResource, practitioner)
 
   return bundle
+}
+
+export async function touchBundle(
+  bundle: fhir.Bundle,
+  token: string
+): Promise<fhir.Bundle> {
+  const taskResource = getTaskResource(bundle) as fhir.Task
+
+  const practitioner = await getLoggedInPractitionerResource(token)
+
+  /* setting lastRegLocation here */
+  await setupLastRegLocation(taskResource, practitioner)
+
+  /* setting lastRegUser here */
+  setupLastRegUser(taskResource, practitioner)
+
+  return bundle
+}
+
+export function removeExtensionFromBundle(
+  fhirBundle: fhir.Bundle,
+  urls: string[]
+): fhir.Bundle {
+  if (
+    fhirBundle &&
+    fhirBundle.entry &&
+    fhirBundle.entry[0] &&
+    fhirBundle.entry[0].resource
+  ) {
+    let extensions: fhir.Extension[] =
+      (fhirBundle.entry[0].resource as fhir.Element).extension || []
+
+    extensions = extensions.filter(
+      (ext: fhir.Extension) => !urls.includes(ext.url)
+    )
+    ;(fhirBundle.entry[0].resource as fhir.Element).extension = extensions
+  }
+
+  return fhirBundle
 }
 
 export function setTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
@@ -467,7 +499,7 @@ export async function checkForDuplicateStatusUpdate(taskResource: fhir.Task) {
     !taskResource ||
     !taskResource.id ||
     !regStatusCode ||
-    regStatusCode.code === REG_STATUS_CERTIFIED
+    regStatusCode.code === RegStatus.CERTIFIED
   ) {
     return
   }
@@ -482,8 +514,8 @@ export async function checkForDuplicateStatusUpdate(taskResource: fhir.Task) {
       return code.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
     })
   if (existingRegStatusCode && existingRegStatusCode.code === regStatusCode) {
-    logger.error(`Application is already in ${regStatusCode} state`)
-    throw new Error(`Application is already in ${regStatusCode} state`)
+    logger.error(`Declaration is already in ${regStatusCode} state`)
+    throw new Error(`Declaration is already in ${regStatusCode} state`)
   }
 }
 

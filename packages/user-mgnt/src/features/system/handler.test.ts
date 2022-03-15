@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createServer } from '@user-mgnt/index'
+import { createServer } from '@user-mgnt/server'
 import User, { IUser } from '@user-mgnt/model/user'
 import System, { ISystem } from '@user-mgnt/model/system'
 import { readFileSync } from 'fs'
@@ -41,7 +41,7 @@ const badToken = jwt.sign(
   }
 )
 
-const mockUser = ({
+const mockUser = {
   name: [
     {
       use: 'en',
@@ -63,8 +63,7 @@ const mockUser = ({
   password: 'test',
   signature: {
     type: 'image/png',
-    data:
-      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlwAAAK8CAYAAAA6WGEyAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2h'
+    data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlwAAAK8CAYAAAA6WGEyAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2h'
   },
   localRegistrar: {
     name: [
@@ -76,13 +75,12 @@ const mockUser = ({
     ],
     signature: {
       type: 'image/png',
-      data:
-        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlwAAAK8CAYAAAA6WGEyAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2h'
+      data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlwAAAK8CAYAAAA6WGEyAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2h'
     }
   }
-} as unknown) as IUser & { password: string }
+} as unknown as IUser & { password: string }
 
-const mockSystem = ({
+const mockSystem = {
   name: [
     {
       use: 'en',
@@ -97,7 +95,7 @@ const mockSystem = ({
   salt: '123',
   sha_secret: '123',
   scope: ['nationalId']
-} as unknown) as ISystem & { secretHash: string }
+} as unknown as ISystem & { secretHash: string }
 
 describe('registerSystemClient handler', () => {
   let server: any

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export const APPLICATIONS_STATUS = 'applications'
+export const DECLARATIONS_STATUS = 'declarations'
 export const REJECTED_STATUS = 'rejected'
 export const NOTIFICATION_STATUS = 'notifications'
 export const DECLARATION = 'declaration'
@@ -22,7 +22,7 @@ export const COMPLETION = 'completed'
 export const APPROVED = 'approved'
 export const REGISTERED = 'registered'
 export const EMPTY_STRING = ''
-export const APPLICATION_DATE_FORMAT = 'YYYY-MM-DD'
+export const DECLARATION_DATE_FORMAT = 'YYYY-MM-DD'
 export const CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT = 'DD.MM.YYYY'
 export const CERTIFICATE_DATE_FORMAT = 'DD MMMM YYYY'
 export const LOCAL_DATE_FORMAT = 'DD-MM-YYYY'
@@ -35,6 +35,7 @@ export const REJECT_REASON = 'reason'
 export const REJECT_COMMENTS = 'comment'
 export const DECLARED = 'DECLARED'
 export const VALIDATED = 'VALIDATED'
+export const ARCHIVED = 'ARCHIVED'
 export const LANG_EN = 'en'
 
 export const REGEXP_ALPHA_NUMERIC = '^[0-9a-zA-Z]+$'
@@ -104,7 +105,7 @@ export const TOKEN_EXPIRE_MILLIS = 10 * 60 * 1000 // 10 minutes
 
 export const MONTHS_IN_YEAR = 12
 
-export const DECLARED_APPLICATION_SEARCH_QUERY_COUNT =
-  process.env.DECLARED_APPLICATION_SEARCH_QUERY_COUNT || 100
+export const DECLARED_DECLARATION_SEARCH_QUERY_COUNT =
+  process.env.DECLARED_DECLARATION_SEARCH_QUERY_COUNT || 100
 
 export const AVATAR_API = 'https://eu.ui-avatars.com/api/?name='

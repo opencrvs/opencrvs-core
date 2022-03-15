@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IApplication, ITaskHistory } from '@client/applications'
+import { IDeclaration, ITaskHistory } from '@client/declarations'
 import {
   BirthSection,
   DeathSection,
@@ -25,7 +25,7 @@ import { IUserDetails } from './userUtils'
 import { getEvent } from '@client/views/PrintCertificate/utils'
 import { BIRTH, DEATH } from './constants'
 
-const getApplicantFullName = (
+const getInformantFullName = (
   sectionData: IFormSectionData,
   language = 'en'
 ): string => {
@@ -53,23 +53,23 @@ const getApplicantFullName = (
   return fullName
 }
 
-export const getDraftApplicantFullName = (
-  draft: IApplication,
+export const getDraftInformantFullName = (
+  draft: IDeclaration,
   language?: string
 ) => {
   switch (draft.event) {
     case Event.BIRTH:
-      return getApplicantFullName(draft.data.child, language)
+      return getInformantFullName(draft.data.child, language)
     case Event.DEATH:
-      return getApplicantFullName(draft.data.deceased, language)
+      return getInformantFullName(draft.data.deceased, language)
   }
 }
 
 const transformBirthSearchQueryDataToDraft = (
   data: GQLBirthEventSearchSet,
-  application: IApplication
+  declaration: IDeclaration
 ) => {
-  application.data.child = {
+  declaration.data.child = {
     firstNamesEng:
       (data.childName &&
         data.childName
@@ -99,9 +99,9 @@ const transformBirthSearchQueryDataToDraft = (
 
 const transformDeathSearchQueryDataToDraft = (
   data: GQLDeathEventSearchSet,
-  application: IApplication
+  declaration: IDeclaration
 ) => {
-  application.data.deceased = {
+  declaration.data.deceased = {
     firstNamesEng:
       (data.deceasedName &&
         data.deceasedName
@@ -131,10 +131,10 @@ const transformDeathSearchQueryDataToDraft = (
 
 export const transformSearchQueryDataToDraft = (
   data: GQLEventSearchSet
-): IApplication => {
+): IDeclaration => {
   const eventType = getEvent(data.type)
 
-  const application: IApplication = {
+  const declaration: IDeclaration = {
     id: data.id,
     data: {
       registration: {
@@ -147,35 +147,35 @@ export const transformSearchQueryDataToDraft = (
   }
 
   // @ts-ignore
-  application.data.registration.contactPoint.nestedFields.registrationPhone =
+  declaration.data.registration.contactPoint.nestedFields.registrationPhone =
     data.registration && data.registration.contactNumber
-  application.trackingId = data.registration && data.registration.trackingId
-  application.submissionStatus = data.registration && data.registration.status
-  application.compositionId = data.id
+  declaration.trackingId = data.registration && data.registration.trackingId
+  declaration.submissionStatus = data.registration && data.registration.status
+  declaration.compositionId = data.id
 
-  application.operationHistories = data.operationHistories as ITaskHistory[]
+  declaration.operationHistories = data.operationHistories as ITaskHistory[]
 
   switch (eventType) {
     case Event.BIRTH:
     default:
-      transformBirthSearchQueryDataToDraft(data, application)
+      transformBirthSearchQueryDataToDraft(data, declaration)
       break
     case Event.DEATH:
-      transformDeathSearchQueryDataToDraft(data, application)
+      transformDeathSearchQueryDataToDraft(data, declaration)
       break
   }
 
-  return application
+  return declaration
 }
 
-export const updateApplicationTaskHistory = (
-  application: IApplication,
+export const updateDeclarationTaskHistory = (
+  declaration: IDeclaration,
   userDetails: IUserDetails | null
 ): ITaskHistory => {
   return {
-    operationType: application.submissionStatus,
+    operationType: declaration.submissionStatus,
     operatedOn:
-      (application.modifiedOn && new Date(application.modifiedOn).toString()) ||
+      (declaration.modifiedOn && new Date(declaration.modifiedOn).toString()) ||
       '',
     operatorRole: (userDetails && userDetails.role) || '',
     operatorName: (userDetails && userDetails.name) || [],
@@ -192,8 +192,8 @@ export const updateApplicationTaskHistory = (
   }
 }
 
-export const getAttachmentSectionKey = (applicationEvent: Event): string => {
-  switch (applicationEvent) {
+export const getAttachmentSectionKey = (declarationEvent: Event): string => {
+  switch (declarationEvent) {
     case DEATH:
       return DeathSection.DeathDocuments
     case BIRTH:

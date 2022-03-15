@@ -13,7 +13,7 @@ import {
   updateComposition,
   searchByCompositionId
 } from '@search/elasticsearch/dbhelper'
-import { createServer } from '@search/index'
+import { createServer } from '@search/server'
 import { mockCompositionResponse, mockSearchResponse } from '@search/test/utils'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
@@ -48,9 +48,8 @@ describe('Verify handlers', () => {
     })
 
     it.skip('should return status code 200 if the composition indexed correctly', async () => {
-      const mockedSearchByCompositionId = searchByCompositionId as jest.Mocked<
-        any
-      >
+      const mockedSearchByCompositionId =
+        searchByCompositionId as jest.Mocked<any>
       const mockedUpdateComposition = updateComposition as jest.Mocked<any>
 
       mockedSearchByCompositionId.mockReturnValue(mockSearchResponse)

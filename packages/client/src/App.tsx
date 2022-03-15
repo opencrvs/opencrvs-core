@@ -34,7 +34,7 @@ import { CollectorForm } from '@client/views/PrintCertificate/collectorForm/Coll
 import { Payment } from '@client/views/PrintCertificate/Payment'
 import { ReviewCertificateAction } from '@client/views/PrintCertificate/ReviewCertificateAction'
 import { VerifyCollector } from '@client/views/PrintCertificate/VerifyCollector'
-import { ApplicationForm } from '@client/views/RegisterForm/ApplicationForm'
+import { DeclarationForm } from '@client/views/RegisterForm/DeclarationForm'
 import { ReviewForm } from '@client/views/RegisterForm/ReviewForm'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { SearchResult } from '@client/views/SearchResult/SearchResult'
@@ -157,38 +157,38 @@ export class App extends React.Component<IAppProps> {
                                             path={
                                               routes.DRAFT_BIRTH_PARENT_FORM
                                             }
-                                            component={ApplicationForm}
+                                            component={DeclarationForm}
                                           />
                                           <ProtectedRoute
                                             exact
                                             path={
                                               routes.DRAFT_BIRTH_PARENT_FORM_PAGE
                                             }
-                                            component={ApplicationForm}
+                                            component={DeclarationForm}
                                           />
                                           <ProtectedRoute
                                             exact
                                             path={
                                               routes.DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP
                                             }
-                                            component={ApplicationForm}
+                                            component={DeclarationForm}
                                           />
                                           <ProtectedRoute
                                             exact
                                             path={routes.DRAFT_DEATH_FORM}
-                                            component={ApplicationForm}
+                                            component={DeclarationForm}
                                           />
                                           <ProtectedRoute
                                             exact
                                             path={routes.DRAFT_DEATH_FORM_PAGE}
-                                            component={ApplicationForm}
+                                            component={DeclarationForm}
                                           />
                                           <ProtectedRoute
                                             exact
                                             path={
                                               routes.DRAFT_DEATH_FORM_PAGE_GROUP
                                             }
-                                            component={ApplicationForm}
+                                            component={DeclarationForm}
                                           />
                                           <ProtectedRoute
                                             exact

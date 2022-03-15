@@ -64,6 +64,11 @@ interface ICorrectionMessages
 }
 
 const messagesToDefine: ICorrectionMessages = {
+  requestedCorrection: {
+    id: 'correction.request',
+    defaultMessage: 'Requested correction',
+    description: 'Status for application being requested for correction'
+  },
   whoRequestedCorrection: {
     id: 'correction.corrector.title',
     defaultMessage: 'Who is requesting a change to this record?',
@@ -153,13 +158,13 @@ const messagesToDefine: ICorrectionMessages = {
   },
   materialError: {
     id: 'correction.reason.materialError',
-    defaultMessage: 'Applicant provided incorrect information (Material error)',
+    defaultMessage: 'Informant provided incorrect information (Material error)',
     description: 'Label for material error for correction reason form'
   },
   materialOmission: {
     id: 'correction.reason.materialOmission',
     defaultMessage:
-      'Applicant did not provide this information (Material omission)',
+      'Informant did not provide this information (Material omission)',
     description: 'Label for material omission for correction reason form'
   },
   judicialOrder: {

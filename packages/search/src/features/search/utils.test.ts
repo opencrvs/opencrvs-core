@@ -30,13 +30,13 @@ describe('elasticsearch db helper', () => {
           fields: 'MOTHER_FIRST'
         }
       ],
-      'applicationLocationId',
-      'applicationLocationHirarchyId',
+      'declarationLocationId',
+      'declarationLocationHirarchyId',
       'createdBy',
       {
         event: 'EMPTY_STRING',
         status: ['DECLARED'],
-        type: ['birth-application', 'death-application']
+        type: ['birth-declaration', 'death-declaration']
       }
     )
     expect(newQuery).toEqual({
@@ -87,8 +87,8 @@ describe('elasticsearch db helper', () => {
           },
           {
             term: {
-              'applicationLocationId.keyword': {
-                value: 'applicationLocationId',
+              'declarationLocationId.keyword': {
+                value: 'declarationLocationId',
                 // tslint:disable-next-line
                 boost: 2.0
               }
@@ -96,8 +96,8 @@ describe('elasticsearch db helper', () => {
           },
           {
             term: {
-              'applicationLocationHirarchyIds.keyword': {
-                value: 'applicationLocationHirarchyId',
+              'declarationLocationHirarchyIds.keyword': {
+                value: 'declarationLocationHirarchyId',
                 // tslint:disable-next-line
                 boost: 2.0
               }
@@ -123,8 +123,8 @@ describe('elasticsearch db helper', () => {
           {
             terms: {
               'compositionType.keyword': [
-                'birth-application',
-                'death-application'
+                'birth-declaration',
+                'death-declaration'
               ]
             }
           }
