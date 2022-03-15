@@ -62,12 +62,12 @@ import {
   isAValidDateFormat,
   isDateNotInFuture
 } from '@client/utils/validate'
-import moment from 'moment'
 import { IRadioOption as CRadioOption } from '@opencrvs/components/lib/forms'
 import { IDynamicValues } from '@client/navigation'
 import { generateLocations } from '@client/utils/locationUtils'
 import { callingCountries } from 'country-data'
 import { IDeclaration } from '@client/declarations'
+import differenceInDays from 'date-fns/differenceInDays'
 
 export const VIEW_TYPE = {
   FORM: 'form',
@@ -396,9 +396,9 @@ export const getFieldOptionsByValueMapper = (
 export const diffDoB = (doB: string) => {
   if (!isAValidDateFormat(doB) || !isDateNotInFuture(doB))
     return 'withinTargetdays'
-  const todaysDate = moment(Date.now())
-  const birthDate = moment(doB)
-  const diffInDays = todaysDate.diff(birthDate, 'days')
+  const todaysDate = new Date()
+  const birthDate = new Date(doB)
+  const diffInDays = differenceInDays(todaysDate, birthDate)
 
   const ranges: IRange[] = [
     { start: 0, end: REGISTRATION_TARGET_DAYS, value: 'withinTargetdays' },

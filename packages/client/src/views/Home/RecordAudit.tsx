@@ -59,7 +59,6 @@ import {
   GQLDeathEventSearchSet,
   GQLHumanName
 } from '@opencrvs/gateway/src/graphql/schema'
-import moment from 'moment'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData, ILocation } from '@client/offline/reducer'
 import {
@@ -125,6 +124,7 @@ import { isEmpty, get, find, has, flatten, values } from 'lodash'
 import { IRegisterFormState } from '@client/forms/register/reducer'
 import { goBack } from 'connected-react-router'
 import { getFieldValue } from './utils'
+import format from '@client/utils/date-formatting'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -625,7 +625,7 @@ const getDeclarationInfo = (
               <ValueContainer id={`${key}_value`} value={value}>
                 {value ? (
                   key === 'dateOfBirth' || key === 'dateOfDeath' ? (
-                    moment(new Date(value)).format('MMMM DD, YYYY')
+                    format(new Date(value), 'MMMM dd, yyyy')
                   ) : (
                     value
                   )
@@ -876,11 +876,9 @@ const getLink = (status: string, onClick: () => void) => {
 }
 
 const getFormattedDate = (date: Date) => {
-  const momentDate = moment(date)
   return (
     <>
-      {momentDate.format('MMMM DD, YYYY')} &middot;{' '}
-      {momentDate.format('hh.mm A')}
+      {format(date, 'MMMM dd, yyyy')} &middot; {format(date, 'hh.mm A')}
     </>
   )
 }

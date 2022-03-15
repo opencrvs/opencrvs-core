@@ -36,7 +36,6 @@ import {
 import styled, { ITheme, withTheme } from '@client/styledComponents'
 import { LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
-import moment from 'moment'
 import * as React from 'react'
 import {
   WrappedComponentProps as IntlShapeProps,
@@ -247,7 +246,7 @@ export class InProgressTabComponent extends React.Component<
         })
       }
 
-      moment.locale(locale)
+      window.__localeId__ = locale
       return {
         id: regId,
         event:
@@ -261,7 +260,7 @@ export class InProgressTabComponent extends React.Component<
         startedBy,
         dateOfModification:
           (lastModificationDate &&
-            formattedDuration(moment(parseInt(lastModificationDate)))) ||
+            formattedDuration(parseInt(lastModificationDate))) ||
           '',
         actions,
         rowClickHandler: [
@@ -314,8 +313,7 @@ export class InProgressTabComponent extends React.Component<
           '',
         name: name || '',
         dateOfModification:
-          (lastModificationDate &&
-            formattedDuration(moment(lastModificationDate))) ||
+          (lastModificationDate && formattedDuration(lastModificationDate)) ||
           '',
         actions,
         rowClickHandler: [

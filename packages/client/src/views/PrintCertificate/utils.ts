@@ -10,11 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Event, IFormData, ISelectOption } from '@client/forms'
-import moment from 'moment'
 import { dynamicMessages } from '@client/i18n/messages/views/certificate'
 import { getAvailableLanguages } from '@client/i18n/utils'
 import { ILanguageState } from '@client/i18n/reducer'
 import { IPrintableDeclaration } from '@client/declarations'
+import differenceInDays from 'date-fns/differenceInDays'
 
 const FREE_PERIOD = window.config.CERTIFICATE_PRINT_CHARGE_FREE_PERIOD
 const CHARGE_UP_LIMIT = window.config.CERTIFICATE_PRINT_CHARGE_UP_LIMIT
@@ -99,9 +99,9 @@ export const dayRange: IDayRange = {
 }
 
 export function calculateDays(doE: string) {
-  const todaysDate = moment(Date.now())
-  const eventDate = moment(doE)
-  const diffInDays = todaysDate.diff(eventDate, 'days')
+  const todaysDate = new Date(Date.now())
+  const eventDate = new Date(doE)
+  const diffInDays = differenceInDays(todaysDate, eventDate)
 
   return diffInDays
 }

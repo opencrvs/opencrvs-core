@@ -30,7 +30,6 @@ import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { GridTable } from '@opencrvs/components/lib/interface'
 import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
-import moment from 'moment'
 import * as React from 'react'
 import { Store } from 'redux'
 import { PrintTab } from './printTab'
@@ -316,12 +315,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
     const element = await waitForElement(testComponent, GridTable)
     const data = element.prop('content')
-    const EXPECTED_DATE_OF_DECLARATION = formattedDuration(
-      moment(
-        moment(TIME_STAMP, 'x').format('YYYY-MM-DD HH:mm:ss'),
-        'YYYY-MM-DD HH:mm:ss'
-      )
-    )
+    const EXPECTED_DATE_OF_DECLARATION = formattedDuration(Number(TIME_STAMP))
 
     expect(data.length).toBe(2)
     expect(data[0].id).toBe('956281c9-1f47-4c26-948a-970dd23c4094')
