@@ -45,9 +45,12 @@ echo
 sleep 10
 export LANGUAGES="en"
 if [ $OS == "UBUNTU" ]; then
+  echo "YOU ARE RUNNING OPENCRVS ON UBUNTU"
   yarn dev:secrets:gen && concurrently "yarn run start" "yarn run compose:deps"
   else
-  export LOCAL_IP=$(ipconfig getifaddr en0)
+  export LOCAL_IP=$(ifconfig | grep "inet " | grep -Fv 127.0.0.1 | awk '{print $2}')
+  echo "YOU ARE RUNNING OPENCRVS ON MAC"
+  echo $LOCAL_IP
   yarn dev:secrets:gen && concurrently "yarn run start" "yarn run compose:deps"
 fi
 

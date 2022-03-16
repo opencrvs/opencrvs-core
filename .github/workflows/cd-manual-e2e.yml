@@ -78,6 +78,10 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
       - name: Deploy to development
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
+          KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
         run: |
           yarn deploy:staging farajaland-staging.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
       - name: Run Cypress tests

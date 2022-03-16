@@ -11,7 +11,7 @@
  */
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { createServer } from '@search/index'
+import { createServer } from '@search/server'
 
 describe('Route authorization', () => {
   it('health check', async () => {
@@ -86,7 +86,7 @@ describe('Route authorization', () => {
       expiresIn: '1ms'
     })
 
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 5)
     })
 
