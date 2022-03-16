@@ -227,6 +227,25 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           valueId
           valueString
         }
+        certificates {
+          hasShowedVerifiedDocument
+          collector {
+            relationship
+            otherRelationship
+            individual {
+              name {
+                use
+                firstNames
+                familyName
+              }
+              telecom {
+                system
+                value
+                use
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -450,6 +469,25 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
           valueCode
           valueId
           valueString
+        }
+        certificates {
+          hasShowedVerifiedDocument
+          collector {
+            relationship
+            otherRelationship
+            individual {
+              name {
+                use
+                firstNames
+                familyName
+              }
+              telecom {
+                system
+                value
+                use
+              }
+            }
+          }
         }
       }
     }
