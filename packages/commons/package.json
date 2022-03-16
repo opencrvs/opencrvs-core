@@ -3,7 +3,11 @@
   "version": "1.0.0-alpha.3.1",
   "description": "OpenCRVS common modules and utils",
   "license": "MPL-2.0",
-  "main": "build/dist/index.js",
+  "main": "./build/dist/index.js",
+  "exports": {
+    ".": "./build/dist/index.js",
+    "./monitoring": "./build/dist/monitoring.js"
+  },
   "scripts": {
     "test": "jest --coverage --silent --noStackTrace && yarn test:compilation",
     "test:watch": "jest --watch",
@@ -14,13 +18,15 @@
   },
   "private": true,
   "dependencies": {
-    "@types/jest": "^26.0.14",
-    "jest": "26.6.0",
-    "@types/node-fetch": "^2.5.12",
     "@hapi/hapi": "^20.0.1",
     "@types/hapi__hapi": "^20.0.0",
-    "node-fetch": "^2.6.7",
+    "@types/jest": "^26.0.14",
+    "@types/node-fetch": "^2.5.12",
+    "elastic-apm-node": "^3.29.0",
+    "jest": "26.6.0",
     "lint-staged": "^7.1.0",
+    "node-fetch": "^2.6.7",
+    "pkg-up": "^3.1.0",
     "typescript": "^3.7.2"
   },
   "devDependencies": {
@@ -43,7 +49,7 @@
       "text",
       "html"
     ],
-    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
     "setupFiles": [
       "./test/setupJest.ts"
     ],

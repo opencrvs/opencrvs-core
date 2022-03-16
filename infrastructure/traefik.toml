@@ -59,7 +59,7 @@ entryPoint = "http"
     "api.{{hostname}}",
     "openhim.{{hostname}}",
     "webhooks.{{hostname}}",
-    "monitor.{{hostname}}",
+    "kibana.{{hostname}}",
     "styleguide.{{hostname}}"
   ]
 

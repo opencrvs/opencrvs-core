@@ -209,6 +209,15 @@ We innovatively extended [FHIR](https://www.hl7.org/fhir/) to support the civil 
 
 #### ElasticSearch
 
+ElasticSearch is used with Kibana for application and server health monitoring, along with optimisation. Kibana is integrated with Slack notifications for any system alerts.
+
+The Kibana login details that we use by default are:
+
+KIBANA_USERNAME: **kibana@opencrvs.org**
+KIBANA_PASSWORD: **test**
+
+These details should be configured in Github Actions for deployment to a server.
+
 De-duplication management to ensure data integrity is essential to any respectable civil registration system. A fast search engine lowers operational costs and improves the user experience for frontline staff.
 
 OpenCRVS uses [ElasticSearch](https://www.elastic.co/), an industry standard, NoSQL document orientated, real-time de-duplication & search engine. Lightning fast, intelligent civil registration record returns are possible, even with imprecise, “fuzzy” search parameters.

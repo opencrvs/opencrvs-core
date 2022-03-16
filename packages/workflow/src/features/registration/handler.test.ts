@@ -11,7 +11,7 @@
  */
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { createServer } from '../..'
+import { createServer } from '../../server'
 import {
   testFhirBundle,
   testFhirTaskBundle,
