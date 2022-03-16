@@ -27,13 +27,13 @@ import {
 const ErrorMessageBottom = styled.div<{ marginTop?: number }>`
   position: relative;
   ${({ theme }) => theme.fonts.subtitleStyle};
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.red};
   margin-top: ${({ marginTop }) => (marginTop ? `${marginTop}px` : `0px`)};
 `
 
 const SuccessMessage = styled.div`
   ${({ theme }) => theme.fonts.subtitleStyle};
-  color: ${({ theme }) => theme.colors.success};
+  color: ${({ theme }) => theme.colors.green};
   margin-left: 9px;
 `
 
@@ -135,7 +135,6 @@ function ContentComponent({
                 onClick={() => {
                   setShowExampleValidation(true)
                 }}
-                textDecoration={'none'}
               >
                 {intl.formatMessage(messages.testNumber)}
               </LinkButton>
