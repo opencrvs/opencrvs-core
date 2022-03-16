@@ -13,9 +13,11 @@ import React from 'react'
 import { Meta, Story } from '@storybook/react'
 import { DeclarationIconSmall } from './DeclarationIconSmall'
 
-const Template: Story<React.HTMLAttributes<SVGElement>> = (args) => (
-  <DeclarationIconSmall {...args} />
-)
+interface IProps {
+  color?: string
+}
+
+const Template: Story<IProps> = (args) => <DeclarationIconSmall {...args} />
 
 export const LeftNavigationIconView = Template.bind({})
 
@@ -24,6 +26,6 @@ LeftNavigationIconView.args = {
 }
 
 export default {
-  title: 'Components/icons/LeftNavigationDeclarationIcon',
+  title: 'Components/icons/DeclarationIconSmall',
   component: DeclarationIconSmall
 } as Meta

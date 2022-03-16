@@ -18,6 +18,16 @@ export default {
   component: DeclarationIcon
 } as Meta
 
-const Template: Story<{}> = () => <DeclarationIcon />
+interface IProps {
+  color?: string
+  isArchive?: boolean
+}
 
-export const DeclarationIconView = Template.bind({})
+const Template: Story<IProps> = (args) => <DeclarationIcon {...args} />
+
+export const DeclarationIconExample = Template.bind({})
+
+DeclarationIconExample.args = {
+  isArchive: true,
+  color: 'purple'
+}
