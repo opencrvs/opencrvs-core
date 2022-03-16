@@ -870,21 +870,28 @@ export function setObjectPropInResourceArray(
   }
 }
 
-export function setItemInQuestionnaireItemArray(
+export function setQuestionnaireItem(
   questionnaire: fhir.QuestionnaireResponse,
-  label: string
+  context: any,
+  label: string | null,
+  value: string | null
 ) {
   if (!questionnaire.item) {
     questionnaire.item = []
   }
 
-  if (questionnaire.item.filter((item) => item.text === label)[0]) {
-    throw new Error('item already exists in questionnaire item array')
+  if (label && !questionnaire.item[context._index.questionnaire]) {
+    questionnaire.item[context._index.questionnaire] = {
+      text: label,
+      linkId: ''
+    }
   }
 
-  questionnaire.item.push({
-    text: label
-  } as fhir.QuestionnaireResponseItem)
+  if (value && questionnaire.item[context._index.questionnaire]) {
+    questionnaire.item[context._index.questionnaire].answer = [
+      { valueString: value }
+    ]
+  }
 }
 
 export function setArrayPropInResourceObject(

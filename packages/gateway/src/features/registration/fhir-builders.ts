@@ -81,7 +81,8 @@ import {
   selectOrCreateEncounterPartitioner,
   selectOrCreateEncounterParticipant,
   selectOrCreateQuestionnaireResource,
-  findExtension
+  findExtension,
+  setQuestionnaireItem
 } from '@gateway/features/fhir/utils'
 import {
   OPENCRVS_SPECIFICATION_URL,
@@ -770,38 +771,12 @@ function createQuestionnaireBuilder() {
       fieldValue: string,
       context: any
     ) => {
-      console.log(
-        `fieldName context obj: ${JSON.stringify(
-          context
-        )} createQuestionnaireBuilder: `,
-        JSON.stringify(fieldValue)
-      )
       const questionnaire = selectOrCreateQuestionnaireResource(fhirBundle)
-      setObjectPropInResourceArray(
-        questionnaire,
-        'item',
-        fieldValue,
-        'text',
-        context
-      )
+      setQuestionnaireItem(questionnaire, context, fieldValue, null)
     },
     value: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
-      console.log(
-        `value context obj: ${JSON.stringify(
-          context
-        )} createQuestionnaireBuilder: `,
-        JSON.stringify(fieldValue)
-      )
       const questionnaire = selectOrCreateQuestionnaireResource(fhirBundle)
-      setObjectPropInResourceArray(
-        questionnaire,
-        'item',
-        {
-          valueString: fieldValue
-        },
-        'answer',
-        context
-      )
+      setQuestionnaireItem(questionnaire, context, null, fieldValue)
     }
   }
 }
