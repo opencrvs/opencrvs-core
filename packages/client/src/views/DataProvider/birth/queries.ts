@@ -178,6 +178,10 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           country
         }
       }
+      questionnaire {
+        fieldId
+        value
+      }
       presentAtBirthRegistration
       history {
         date
@@ -410,6 +414,10 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
       attendantAtBirth
       weightAtBirth
       birthType
+      questionnaire {
+        fieldId
+        value
+      }
       eventLocation {
         type
         address {

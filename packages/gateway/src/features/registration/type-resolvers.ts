@@ -49,7 +49,11 @@ import {
   MALE_DEPENDENTS_ON_DECEASED_CODE,
   FEMALE_DEPENDENTS_ON_DECEASED_CODE
 } from '@gateway/features/fhir/templates'
-import { GQLRegStatus, GQLResolver } from '@gateway/graphql/schema'
+import {
+  GQLQuestionnaireQuestion,
+  GQLRegStatus,
+  GQLResolver
+} from '@gateway/graphql/schema'
 import {
   ORIGINAL_FILE_NAME_SYSTEM,
   SYSTEM_FILE_NAME_SYSTEM,
@@ -739,11 +743,11 @@ export const typeResolvers: GQLResolver = {
         findExtension(REINSTATED_EXTENSION_URL, task.extension)
       return extension !== undefined
     },
-    date: (task) => task.meta.lastUpdated,
-    user: async (task, _, authHeader) => {
+    date: (task: fhir.Task) => task.meta?.lastUpdated,
+    user: async (task: fhir.Task, _: any, authHeader: any) => {
       const user = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
-        task.extension
+        task.extension as fhir.Extension[]
       )
       if (!user || !user.valueReference || !user.valueReference.reference) {
         return null
@@ -760,10 +764,10 @@ export const typeResolvers: GQLResolver = {
       })
       return await res.json()
     },
-    location: async (task, _, authHeader) => {
+    location: async (task: fhir.Task, _: any, authHeader: any) => {
       const taskLocation = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
-        task.extension
+        task.extension as fhir.Extension[]
       )
       if (!taskLocation || !taskLocation.valueReference) {
         return null
@@ -773,10 +777,10 @@ export const typeResolvers: GQLResolver = {
         authHeader
       )
     },
-    office: async (task, _, authHeader) => {
+    office: async (task: fhir.Task, _: any, authHeader: any) => {
       const taskLocation = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
-        task.extension
+        task.extension as fhir.Extension[]
       )
       if (!taskLocation || !taskLocation.valueReference) {
         return null
@@ -1035,7 +1039,7 @@ export const typeResolvers: GQLResolver = {
       }
       return encounterParticipant
     },
-    async history(composition: ITemplatedComposition, _, authHeader) {
+    async history(composition: ITemplatedComposition, _: any, authHeader: any) {
       const task = await fetchFHIR(
         `/Task/?focus=Composition/${composition.id}`,
         authHeader
@@ -1223,6 +1227,49 @@ export const typeResolvers: GQLResolver = {
         null
       )
     },
+
+    async questionnaire(composition: ITemplatedComposition, _, authHeader) {
+      const encounterSection = findCompositionSection(
+        BIRTH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection || !encounterSection.entry) {
+        return null
+      }
+      const response = await fetchFHIR(
+        `/QuestionnaireResponse?subject=${encounterSection.entry[0].reference}`,
+        authHeader
+      )
+      let questionnaireResponse: fhir.QuestionnaireResponse | null = null
+
+      if (
+        response &&
+        response.entry &&
+        response.entry[0] &&
+        response.entry[0].resource
+      ) {
+        questionnaireResponse = response.entry[0].resource
+      }
+
+      if (!questionnaireResponse) {
+        return null
+      }
+      const questionnaire: GQLQuestionnaireQuestion[] = []
+
+      if (questionnaireResponse.item && questionnaireResponse.item.length) {
+        questionnaireResponse.item.forEach((item) => {
+          if (item.answer && item.answer[0]) {
+            questionnaire.push({
+              fieldId: item.text,
+              value: item.answer[0].valueString
+            })
+          }
+        })
+        return questionnaire
+      } else {
+        return null
+      }
+    },
     async birthType(composition: ITemplatedComposition, _, authHeader) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
@@ -1405,7 +1452,7 @@ export const typeResolvers: GQLResolver = {
         null
       )
     },
-    async history(composition: ITemplatedComposition, _, authHeader) {
+    async history(composition: ITemplatedComposition, _: any, authHeader: any) {
       const task = await fetchFHIR(
         `/Task/?focus=Composition/${composition.id}`,
         authHeader

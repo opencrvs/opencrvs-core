@@ -291,6 +291,7 @@ input BirthRegistrationInput {
   informant: RelatedPersonInput
   eventLocation: LocationInput
   birthType: BirthType # Not in BDRIS2
+  questionnaire: [QuestionnaireQuestionInput]
   weightAtBirth: Float # Not in BDRIS2
   attendantAtBirth: AttendantType # Not in BDRIS2
   otherAttendantAtBirth: String
@@ -315,6 +316,7 @@ type BirthRegistration implements EventRegistration { # -> Composition
   informant: RelatedPerson # -> .section(code='informant-details').entry.reference
   eventLocation: Location
   birthType: BirthType # -> Observation.valueInteger
+  questionnaire: [QuestionnaireQuestion]
   weightAtBirth: Float # -> Observation.valueQuantity (code=kg)
   attendantAtBirth: AttendantType # -> Observation.valueString
   otherAttendantAtBirth: String
@@ -340,6 +342,7 @@ input DeathRegistrationInput {
   father: PersonInput # -> Use for informant ->.section(code='father-details').entry.reference
   spouse: PersonInput # -> Use for informant ->.section(code='spouse-details').entry.reference
   eventLocation: LocationInput
+  questionnaire: [QuestionnaireQuestionInput]
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
   causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept
   causeOfDeath: String # need to store ICD-10? More types of cause of death
@@ -362,6 +365,7 @@ type DeathRegistration implements EventRegistration { # -> Composition
   father: Person # -> Use for informant ->.section(code='father-details').entry.reference
   spouse: Person # -> Use for informant ->.section(code='spouse-details').entry.reference
   eventLocation: Location
+  questionnaire: [QuestionnaireQuestion]
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
   causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept
   causeOfDeath: String # -> Observation.valueCodeableConcept
@@ -451,6 +455,11 @@ type Certificate { # -> Document Reference
   data: String # -> .content.attachment.data base64
 }
 
+input QuestionnaireQuestionInput {
+  fieldId: String
+  value: String
+}
+
 input AttachmentInput {
   _fhirID: ID
   contentType: String
@@ -464,6 +473,11 @@ input AttachmentInput {
   description: String # -> use for other document type -> .description
   subject: AttachmentSubject
   createdAt: Date
+}
+
+type QuestionnaireQuestion {
+  fieldId: String
+  value: String
 }
 
 type Attachment { # -> DocumentReference
