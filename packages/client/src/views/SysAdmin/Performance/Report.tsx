@@ -34,12 +34,12 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema'
 import { ApolloError } from 'apollo-client'
 import { get, isEmpty } from 'lodash'
-import moment from 'moment'
 import React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, StaticContext } from 'react-router'
 import { NoResultMessage } from './NoResultMessage'
+import format from '@client/utils/date-formatting'
 
 const ReportWrapper = styled.div`
   margin-top: 16px;
@@ -69,7 +69,7 @@ function ReportComponent(props: Props) {
   const { eventType, timeRange, selectedLocation } = props.location.state
   const { start, end } = timeRange
 
-  const title = moment(start).format('MMMM YYYY')
+  const title = format(start, 'MMMM yyyy')
   return (
     <SysAdminContentWrapper
       id="reports"
