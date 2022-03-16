@@ -11,9 +11,9 @@
  */
 import {
   DOWNLOAD_STATUS,
-  makeApplicationReadyToDownload,
-  storeApplication
-} from '@client/applications'
+  makeDeclarationReadyToDownload,
+  storeDeclaration
+} from '@client/declarations'
 import { Action, Event } from '@client/forms'
 import { checkAuth } from '@client/profile/profileActions'
 import { queries } from '@client/profile/queries'
@@ -316,7 +316,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
     const element = await waitForElement(testComponent, GridTable)
     const data = element.prop('content')
-    const EXPECTED_DATE_OF_APPLICATION = formattedDuration(
+    const EXPECTED_DATE_OF_DECLARATION = formattedDuration(
       moment(
         moment(TIME_STAMP, 'x').format('YYYY-MM-DD HH:mm:ss'),
         'YYYY-MM-DD HH:mm:ss'
@@ -325,7 +325,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
     expect(data.length).toBe(2)
     expect(data[0].id).toBe('956281c9-1f47-4c26-948a-970dd23c4094')
-    expect(data[0].dateOfRegistration).toBe(EXPECTED_DATE_OF_APPLICATION)
+    expect(data[0].dateOfRegistration).toBe(EXPECTED_DATE_OF_DECLARATION)
     expect(data[0].trackingId).toBe('BW0UTHR')
     expect(data[0].event).toBe('Birth')
     expect(data[0].actions).toBeDefined()
@@ -705,7 +705,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
       testComponent = createdTestComponent
     })
 
-    it('downloads application after clicking download button', async () => {
+    it('downloads declaration after clicking download button', async () => {
       const downloadButton = await waitForElement(
         testComponent,
         '#ListItemAction-0-icon'
@@ -740,13 +740,13 @@ describe('RegistrarHome ready to print tab related tests', () => {
     })
 
     it('shows error when download is failed', async () => {
-      const downloadedApplication = makeApplicationReadyToDownload(
+      const downloadedDeclaration = makeDeclarationReadyToDownload(
         Event.DEATH,
         'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-        Action.LOAD_CERTIFICATE_APPLICATION
+        Action.LOAD_CERTIFICATE_DECLARATION
       )
-      downloadedApplication.downloadStatus = DOWNLOAD_STATUS.FAILED
-      store.dispatch(storeApplication(downloadedApplication))
+      downloadedDeclaration.downloadStatus = DOWNLOAD_STATUS.FAILED
+      store.dispatch(storeDeclaration(downloadedDeclaration))
 
       testComponent.update()
 

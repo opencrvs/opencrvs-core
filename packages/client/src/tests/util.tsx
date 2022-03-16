@@ -11,7 +11,7 @@
  */
 import { App } from '@client/App'
 import { Event, ISerializedForm } from '@client/forms'
-import { getRegisterForm } from '@client/forms/register/application-selectors'
+import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getReviewForm } from '@client/forms/register/review-selectors'
 import { getDefaultLanguage } from '@client/i18n/utils'
 import { offlineDataReady, setOfflineData } from '@client/offline/actions'
@@ -118,7 +118,7 @@ export function getInitialState(): IStoreState {
 }
 
 export function waitForReady(app: ReactWrapper) {
-  return waitForElement(app, '#readyApplication')
+  return waitForElement(app, '#readyDeclaration')
 }
 
 export async function createTestApp(
@@ -201,9 +201,9 @@ export const selectOption = (
 const currentUserId = '123'
 
 // This object has more than 10 drafts to utilize pagination testing in draft tab
-export const currentUserApplications = {
+export const currentUserDeclarations = {
   userID: currentUserId,
-  applications: [
+  declarations: [
     {
       id: '72c18939-70c1-40b4-9b80-b162c4871160',
       data: {
@@ -1198,17 +1198,17 @@ export const currentUserApplications = {
         informant: {
           iDType: 'NATIONAL_ID',
           iDTypeOther: '',
-          applicantID: 1111111111111,
+          informantID: 1111111111111,
           fetchButton: '',
-          applicantFirstNames: 'স্যাম',
-          applicantFamilyName: 'পল',
-          applicantFirstNamesEng: 'Sam',
-          applicantFamilyNameEng: 'Paul',
+          informantFirstNames: 'স্যাম',
+          informantFamilyName: 'পল',
+          informantFirstNamesEng: 'Sam',
+          informantFamilyNameEng: 'Paul',
           nationality: 'BGD',
-          applicantBirthDate: '2000-01-01',
+          informantBirthDate: '2000-01-01',
           relationship: 'OTHER',
           otherRelationship: 'Friend',
-          applicantPhone: '01711111111',
+          informantPhone: '01711111111',
           currentAddress: '',
           country: 'BGD',
           state: '9a236522-0c3d-40eb-83ad-e8567518c763',
@@ -1222,7 +1222,7 @@ export const currentUserApplications = {
           addressLine1: '',
           postCode: '',
           permanentAddress: '',
-          applicantPermanentAddressSameAsCurrent: true,
+          informantPermanentAddressSameAsCurrent: true,
           countryPermanent: 'BGD',
           statePermanent: '',
           districtPermanent: '',
@@ -1562,16 +1562,16 @@ export const currentUserApplications = {
         informant: {
           iDType: 'NATIONAL_ID',
           iDTypeOther: '',
-          applicantID: 1111111111111,
+          informantID: 1111111111111,
           fetchButton: '',
-          applicantFirstNames: 'স্যাম',
-          applicantFamilyName: 'পল',
-          applicantFirstNamesEng: 'Sam',
-          applicantFamilyNameEng: 'Paul',
+          informantFirstNames: 'স্যাম',
+          informantFamilyName: 'পল',
+          informantFirstNamesEng: 'Sam',
+          informantFamilyNameEng: 'Paul',
           nationality: 'BGD',
-          applicantBirthDate: '2000-01-01',
+          informantBirthDate: '2000-01-01',
           relationship: 'SON',
-          applicantPhone: '01711111111',
+          informantPhone: '01711111111',
           currentAddress: '',
           country: 'BGD',
           state: '9a236522-0c3d-40eb-83ad-e8567518c763',
@@ -1585,7 +1585,7 @@ export const currentUserApplications = {
           addressLine1: '',
           postCode: '',
           permanentAddress: '',
-          applicantPermanentAddressSameAsCurrent: true,
+          informantPermanentAddressSameAsCurrent: true,
           countryPermanent: 'BGD',
           statePermanent: '',
           districtPermanent: '',
@@ -1675,16 +1675,16 @@ export const currentUserApplications = {
         informant: {
           iDType: 'NATIONAL_ID',
           iDTypeOther: '',
-          applicantID: 1111111111111,
+          informantID: 1111111111111,
           fetchButton: '',
-          applicantFirstNames: 'স্যাম',
-          applicantFamilyName: 'পল',
-          applicantFirstNamesEng: 'Sam',
-          applicantFamilyNameEng: 'Paul',
+          informantFirstNames: 'স্যাম',
+          informantFamilyName: 'পল',
+          informantFirstNamesEng: 'Sam',
+          informantFamilyNameEng: 'Paul',
           nationality: 'BGD',
-          applicantBirthDate: '2000-01-01',
+          informantBirthDate: '2000-01-01',
           relationship: 'SON',
-          applicantPhone: '01711111111',
+          informantPhone: '01711111111',
           currentAddress: '',
           country: 'BGD',
           state: '9a236522-0c3d-40eb-83ad-e8567518c763',
@@ -1698,7 +1698,7 @@ export const currentUserApplications = {
           addressLine1: '',
           postCode: '',
           permanentAddress: '',
-          applicantPermanentAddressSameAsCurrent: true,
+          informantPermanentAddressSameAsCurrent: true,
           countryPermanent: 'BGD',
           statePermanent: '',
           districtPermanent: '',
@@ -1788,14 +1788,14 @@ export const currentUserApplications = {
         informant: {
           iDType: 'NATIONAL_ID',
           iDTypeOther: '',
-          applicantID: 1111111111111,
+          informantID: 1111111111111,
           fetchButton: '',
-          applicantFirstNames: 'স্যাম',
-          applicantFamilyName: 'পল',
-          applicantFirstNamesEng: 'Sam',
-          applicantFamilyNameEng: 'Paul',
+          informantFirstNames: 'স্যাম',
+          informantFamilyName: 'পল',
+          informantFirstNamesEng: 'Sam',
+          informantFamilyNameEng: 'Paul',
           nationality: 'BGD',
-          applicantBirthDate: '2000-01-01',
+          informantBirthDate: '2000-01-01',
           relationship: 'SON',
           currentAddress: '',
           country: 'BGD',
@@ -1810,7 +1810,7 @@ export const currentUserApplications = {
           addressLine1: '',
           postCode: '',
           permanentAddress: '',
-          applicantPermanentAddressSameAsCurrent: true,
+          informantPermanentAddressSameAsCurrent: true,
           countryPermanent: 'BGD',
           statePermanent: '',
           districtPermanent: '',
@@ -2241,7 +2241,7 @@ export const mockRegistrarUserResponse = {
   }
 }
 
-export const mockApplicationData = {
+export const mockDeclarationData = {
   child: {
     firstNames: 'গায়ত্রী',
     familyName: 'স্পিভক',
@@ -2336,7 +2336,7 @@ export const mockApplicationData = {
   }
 }
 
-export const mockDeathApplicationData = {
+export const mockDeathDeclarationData = {
   deceased: {
     iDType: 'NATIONAL_ID',
     iD: '1230000000000',
@@ -2369,15 +2369,15 @@ export const mockDeathApplicationData = {
     postCode: '2200'
   },
   informant: {
-    applicantIdType: 'NATIONAL_ID',
+    informantIdType: 'NATIONAL_ID',
     iDType: 'NATIONAL_ID',
-    applicantID: '1230000000000',
-    applicantFirstNames: '',
-    applicantFamilyName: 'ইসলাম',
-    applicantFirstNamesEng: 'Islam',
-    applicantFamilyNameEng: 'Islam',
+    informantID: '1230000000000',
+    informantFirstNames: '',
+    informantFamilyName: 'ইসলাম',
+    informantFirstNamesEng: 'Islam',
+    informantFamilyNameEng: 'Islam',
     nationality: 'BGD',
-    applicantBirthDate: '',
+    informantBirthDate: '',
     relationship: 'MOTHER',
     currentAddress: '',
     country: 'BGD',
@@ -2389,7 +2389,7 @@ export const mockDeathApplicationData = {
     addressLine1: '193 Kalibari Road',
     postCode: '2200',
     permanentAddress: '',
-    applicantPermanentAddressSameAsCurrent: true,
+    informantPermanentAddressSameAsCurrent: true,
     countryPermanent: 'BGD',
     statePermanent: '',
     districtPermanent: '',
@@ -2543,7 +2543,7 @@ export const mockFetchCertificatesTemplatesDefinition = [
     event: 'birth',
     status: 'ACTIVE',
     svgCode:
-      '<svg width="420" height="595" viewBox="0 0 420 595" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\n<rect width="420" height="595" fill="white"/>\n<rect x="16.5" y="16.5" width="387" height="562" stroke="#D7DCDE"/>\n<path d="M138.429 511.629H281.571" stroke="#F4F4F4" stroke-width="1.22857" stroke-linecap="square" stroke-linejoin="round"/>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="526.552" text-anchor="middle">{registrarName}&#x2028;</tspan><tspan x="50%" y="538.552" text-anchor="middle">({role}) &#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="209.884" y="549.336">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="210" y="445.552">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="429.552" text-anchor="middle">This event was registered at {registrationLocation}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="308.828" text-anchor="middle">{eventDate}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="287.69" text-anchor="middle">Died on&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="345.69" text-anchor="middle">Place of death&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="500" letter-spacing="0px"><tspan x="211" y="384.004">&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="367.828" text-anchor="middle">{placeOfDeath}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="245.828" text-anchor="middle">{applicantName}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="224.69" text-anchor="middle">This is to certify that&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="1px"><tspan x="50%" y="145.828" text-anchor="middle">{registrationNumber}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" letter-spacing="0px"><tspan x="50%" y="127.828" text-anchor="middle">Death Registration No&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="170.104" text-anchor="middle">Date of issuance of certificate:  {certificateDate}</tspan></text>\n<line x1="44.9985" y1="403.75" x2="377.999" y2="401.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<line x1="44.9985" y1="189.75" x2="377.999" y2="187.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<rect x="188" y="51" width="46.7463" height="54" fill="url(#pattern0)"/>\n<defs>\n<pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">\n<use xlink:href="#image0_43_3545" transform="translate(0 -0.000358256) scale(0.0005)"/>\n</pattern>\n<image id="image0_43_3545" width="2000" height="2312" xlink:href="{countryLogo}"/>\n</defs>\n</svg>\n',
+      '<svg width="420" height="595" viewBox="0 0 420 595" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\n<rect width="420" height="595" fill="white"/>\n<rect x="16.5" y="16.5" width="387" height="562" stroke="#D7DCDE"/>\n<path d="M138.429 511.629H281.571" stroke="#F4F4F4" stroke-width="1.22857" stroke-linecap="square" stroke-linejoin="round"/>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="526.552" text-anchor="middle">{registrarName}&#x2028;</tspan><tspan x="50%" y="538.552" text-anchor="middle">({role}) &#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="209.884" y="549.336">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="210" y="445.552">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="429.552" text-anchor="middle">This event was registered at {registrationLocation}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="308.828" text-anchor="middle">{eventDate}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="287.69" text-anchor="middle">Died on&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="345.69" text-anchor="middle">Place of death&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="500" letter-spacing="0px"><tspan x="211" y="384.004">&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="367.828" text-anchor="middle">{placeOfDeath}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="245.828" text-anchor="middle">{informantName}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="224.69" text-anchor="middle">This is to certify that&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="1px"><tspan x="50%" y="145.828" text-anchor="middle">{registrationNumber}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" letter-spacing="0px"><tspan x="50%" y="127.828" text-anchor="middle">Death Registration No&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="170.104" text-anchor="middle">Date of issuance of certificate:  {certificateDate}</tspan></text>\n<line x1="44.9985" y1="403.75" x2="377.999" y2="401.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<line x1="44.9985" y1="189.75" x2="377.999" y2="187.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<rect x="188" y="51" width="46.7463" height="54" fill="url(#pattern0)"/>\n<defs>\n<pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">\n<use xlink:href="#image0_43_3545" transform="translate(0 -0.000358256) scale(0.0005)"/>\n</pattern>\n<image id="image0_43_3545" width="2000" height="2312" xlink:href="{countryLogo}"/>\n</defs>\n</svg>\n',
     svgDateCreated: 1640696680593,
     svgDateUpdated: 1644326332088,
     svgFilename: 'oCRVS_DefaultZambia_Death_v1.svg',
@@ -2554,7 +2554,7 @@ export const mockFetchCertificatesTemplatesDefinition = [
     event: 'death',
     status: 'ACTIVE',
     svgCode:
-      '<svg width="420" height="595" viewBox="0 0 420 595" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\n<rect width="420" height="595" fill="white"/>\n<rect x="16.5" y="16.5" width="387" height="562" stroke="#D7DCDE"/>\n<path d="M138.429 511.629H281.571" stroke="#F4F4F4" stroke-width="1.22857" stroke-linecap="square" stroke-linejoin="round"/>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="526.552" text-anchor="middle">{registrarName}&#x2028;</tspan><tspan x="50%" y="538.552" text-anchor="middle">({role}) &#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="549.336" text-anchor="middle">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="445.552" text-anchor="middle">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="429.552" text-anchor="middle">This event was registered at {registrationLocation}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="308.828" text-anchor="middle">{eventDate}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="287.69" text-anchor="middle">Was born on&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="345.69" text-anchor="middle">Place of birth&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="500" letter-spacing="0px"><tspan x="50%" y="384.004" text-anchor="middle">&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="367.828" text-anchor="middle">{placeOfBirth}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="245.828" text-anchor="middle">{applicantName}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="224.69" text-anchor="middle">This is to certify that&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="1px"><tspan x="50%" y="145.828" text-anchor="middle">{registrationNumber}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" letter-spacing="0px"><tspan x="50%" y="127.828" text-anchor="middle">Birth Registration No&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="170.104" text-anchor="middle">Date of issuance of certificate:  {certificateDate}</tspan></text>\n<line x1="44.9985" y1="403.75" x2="377.999" y2="401.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<line x1="44.9985" y1="189.75" x2="377.999" y2="187.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<rect x="188" y="51" width="46.7463" height="54" fill="url(#pattern0)"/>\n<defs>\n<pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">\n<use xlink:href="#image0_43_3545" transform="translate(0 -0.000358256) scale(0.0005)"/>\n</pattern>\n<image id="image0_43_3545" width="2000" height="2312" xlink:href="{countryLogo}"/>\n</defs>\n</svg>\n',
+      '<svg width="420" height="595" viewBox="0 0 420 595" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\n<rect width="420" height="595" fill="white"/>\n<rect x="16.5" y="16.5" width="387" height="562" stroke="#D7DCDE"/>\n<path d="M138.429 511.629H281.571" stroke="#F4F4F4" stroke-width="1.22857" stroke-linecap="square" stroke-linejoin="round"/>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="526.552" text-anchor="middle">{registrarName}&#x2028;</tspan><tspan x="50%" y="538.552" text-anchor="middle">({role}) &#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="549.336" text-anchor="middle">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="445.552" text-anchor="middle">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="429.552" text-anchor="middle">This event was registered at {registrationLocation}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="308.828" text-anchor="middle">{eventDate}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="287.69" text-anchor="middle">Was born on&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="345.69" text-anchor="middle">Place of birth&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="500" letter-spacing="0px"><tspan x="50%" y="384.004" text-anchor="middle">&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="367.828" text-anchor="middle">{placeOfBirth}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="245.828" text-anchor="middle">{informantName}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="224.69" text-anchor="middle">This is to certify that&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="1px"><tspan x="50%" y="145.828" text-anchor="middle">{registrationNumber}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" letter-spacing="0px"><tspan x="50%" y="127.828" text-anchor="middle">Birth Registration No&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="170.104" text-anchor="middle">Date of issuance of certificate:  {certificateDate}</tspan></text>\n<line x1="44.9985" y1="403.75" x2="377.999" y2="401.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<line x1="44.9985" y1="189.75" x2="377.999" y2="187.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<rect x="188" y="51" width="46.7463" height="54" fill="url(#pattern0)"/>\n<defs>\n<pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">\n<use xlink:href="#image0_43_3545" transform="translate(0 -0.000358256) scale(0.0005)"/>\n</pattern>\n<image id="image0_43_3545" width="2000" height="2312" xlink:href="{countryLogo}"/>\n</defs>\n</svg>\n',
     svgDateCreated: 1640696804785,
     svgDateUpdated: 1643885502999,
     svgFilename: 'oCRVS_DefaultZambia_Birth_v1.svg',
@@ -2648,7 +2648,7 @@ export async function createTestComponent(
   return mount(<PropProxy {...node.props} />, options)
 }
 
-export const mockDeathApplicationDataWithoutFirstNames = {
+export const mockDeathDeclarationDataWithoutFirstNames = {
   deceased: {
     iDType: 'NATIONAL_ID',
     iD: '1230000000000',
@@ -2681,15 +2681,15 @@ export const mockDeathApplicationDataWithoutFirstNames = {
     postCode: ''
   },
   informant: {
-    applicantIdType: 'NATIONAL_ID',
+    informantIdType: 'NATIONAL_ID',
     iDType: 'NATIONAL_ID',
-    applicantID: '1230000000000',
-    applicantFirstNames: '',
-    applicantFamilyName: 'ইসলাম',
-    applicantFirstNamesEng: 'Islam',
-    applicantFamilyNameEng: 'Islam',
+    informantID: '1230000000000',
+    informantFirstNames: '',
+    informantFamilyName: 'ইসলাম',
+    informantFirstNamesEng: 'Islam',
+    informantFamilyNameEng: 'Islam',
     nationality: 'BGD',
-    applicantBirthDate: '',
+    informantBirthDate: '',
     relationship: 'SPOUSE',
     currentAddress: '',
     country: 'BGD',
@@ -2701,7 +2701,7 @@ export const mockDeathApplicationDataWithoutFirstNames = {
     addressLine1: '193 Kalibari Road',
     postCode: '2200',
     permanentAddress: '',
-    applicantPermanentAddressSameAsCurrent: true,
+    informantPermanentAddressSameAsCurrent: true,
     countryPermanent: 'BGD',
     statePermanent: '',
     districtPermanent: '',

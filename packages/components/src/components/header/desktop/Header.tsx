@@ -24,7 +24,7 @@ const HeaderContainer = styled.div`
   display: flex;
   flex-grow: 1;
   flex-direction: row;
-  ${({ theme }) => theme.gradients.gradientNightshade};
+  ${({ theme }) => theme.gradients.primary};
 `
 
 export class Header extends React.Component<IProps> {

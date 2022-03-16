@@ -12,9 +12,9 @@
 import {
   IBirthRegistrationFields,
   IDeathRegistrationFields,
-  IInProgressApplicationFields,
+  IInProgressDeclarationFields,
   ITimeLoggedFields,
-  IApplicationsStartedFields,
+  IDeclarationsStartedFields,
   IRejectedFields,
   IDurationFields,
   IPaymentFields,
@@ -22,13 +22,13 @@ import {
   IAuthHeader,
   IBirthRegistrationTags,
   IDeathRegistrationTags,
-  IInProgressApplicationTags,
+  IInProgressDeclarationTags,
   ITimeLoggedTags,
   IDurationTags,
   ILocationTags,
   IPoints,
   IPaymentPoints,
-  IApplicationsStartedPoints,
+  IDeclarationsStartedPoints,
   IRejectedPoints
 } from '@metrics/features/registration'
 import {
@@ -37,10 +37,10 @@ import {
   getTask,
   getPreviousTask,
   getComposition,
-  APPLICATION_STATUS,
-  getApplicationStatus,
+  DECLARATION_STATUS,
+  getDeclarationStatus,
   getTimeLoggedFromTask,
-  getApplicationType,
+  getDeclarationType,
   getStartedByFieldAgent,
   getPaymentReconciliation,
   getObservationValueByCode,
@@ -94,7 +94,7 @@ export const generateInCompleteFieldPoints = async (
     throw new Error('Task not found')
   }
 
-  const fields: IInProgressApplicationFields = {
+  const fields: IInProgressDeclarationFields = {
     compositionId: composition.id
   }
   const locationTags: ILocationTags = await generatePointLocations(
@@ -106,11 +106,11 @@ export const generateInCompleteFieldPoints = async (
     .split(',')
     .map((missingFieldId) => {
       const missingFieldIds = missingFieldId.split('/')
-      const tags: IInProgressApplicationTags = {
+      const tags: IInProgressDeclarationTags = {
         missingFieldSectionId: missingFieldIds[0],
         missingFieldGroupId: missingFieldIds[1],
         missingFieldId: missingFieldIds[2],
-        eventType: getApplicationType(task) as string,
+        eventType: getDeclarationType(task) as string,
         regStatus: 'IN_PROGESS',
         ...locationTags
       }
@@ -269,7 +269,7 @@ export async function generatePaymentPoint(
   }
 
   const tags = {
-    eventType: getApplicationType(task),
+    eventType: getDeclarationType(task),
     officeLocation: getRegLastOffice(payload),
     ...(await generatePointLocations(payload, authHeader))
   }
@@ -284,7 +284,7 @@ export async function generatePaymentPoint(
 
 export async function generateEventDurationPoint(
   payload: fhir.Bundle,
-  allowedPreviousStates: APPLICATION_STATUS[],
+  allowedPreviousStates: DECLARATION_STATUS[],
   authHeader: IAuthHeader,
   fromTask?: boolean
 ): Promise<IPoints> {
@@ -328,13 +328,13 @@ export async function generateEventDurationPoint(
   }
 
   const tags: IDurationTags = {
-    currentStatus: getApplicationStatus(currentTask) as string,
-    previousStatus: getApplicationStatus(previousTask) as string,
-    eventType: getApplicationType(currentTask) as string
+    currentStatus: getDeclarationStatus(currentTask) as string,
+    previousStatus: getDeclarationStatus(previousTask) as string,
+    eventType: getDeclarationType(currentTask) as string
   }
 
   return {
-    measurement: 'application_event_duration',
+    measurement: 'declaration_event_duration',
     tags,
     fields,
     timestamp: toInfluxTimestamp(currentTask.lastModified)
@@ -380,27 +380,27 @@ export async function generateTimeLoggedPoint(
   }
 
   const tags: ITimeLoggedTags = {
-    currentStatus: getApplicationStatus(currentTask) as string,
+    currentStatus: getDeclarationStatus(currentTask) as string,
     trackingId: getTrackingId(currentTask) as string,
-    eventType: getApplicationType(currentTask) as string,
+    eventType: getDeclarationType(currentTask) as string,
     practitionerId: getPractionerIdFromTask(currentTask),
     officeLocation: getRegLastOffice(payload),
     ...(await generatePointLocations(payload, authHeader))
   }
 
   return {
-    measurement: 'application_time_logged',
+    measurement: 'declaration_time_logged',
     tags,
     fields,
     timestamp: toInfluxTimestamp(timestamp)
   }
 }
 
-export async function generateApplicationStartedPoint(
+export async function generateDeclarationStartedPoint(
   payload: fhir.Bundle,
   authHeader: IAuthHeader,
   status: string
-): Promise<IApplicationsStartedPoints> {
+): Promise<IDeclarationsStartedPoints> {
   const composition = getComposition(payload)
   const task = getTask(payload)
 
@@ -418,9 +418,12 @@ export async function generateApplicationStartedPoint(
     isNotification(composition)
       ? (role = 'NOTIFICATION_API_USER')
       : (role = 'FIELD_AGENT')
-  } else if (status === Events.NEW_VALIDATE) {
+  } else if (status === Events.REQUEST_FOR_REGISTRAR_VALIDATION) {
     role = 'REGISTRATION_AGENT'
-  } else if (status === Events.NEW_WAITING_VALIDATION) {
+  } else if (
+    status ===
+    Events.REGISTRAR_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
+  ) {
     role = 'REGISTRAR'
   } else if (status === Events.NEW_DEC) {
     role = 'FIELD_AGENT'
@@ -430,21 +433,21 @@ export async function generateApplicationStartedPoint(
     throw new Error('Role not found')
   }
 
-  const fields: IApplicationsStartedFields = {
+  const fields: IDeclarationsStartedFields = {
     role,
-    status: getApplicationStatus(task),
+    status: getDeclarationStatus(task),
     compositionId: composition.id
   }
 
   const tags = {
-    eventType: getApplicationType(task),
+    eventType: getDeclarationType(task),
     practitionerId: getPractionerIdFromTask(task),
     officeLocation: getRegLastOffice(payload),
     ...(await generatePointLocations(payload, authHeader))
   }
 
   return {
-    measurement: 'applications_started',
+    measurement: 'declarations_started',
     tags,
     fields,
     timestamp: toInfluxTimestamp(task.lastModified)
@@ -473,14 +476,14 @@ export async function generateRejectedPoints(
   }
 
   const tags = {
-    eventType: getApplicationType(task),
+    eventType: getDeclarationType(task),
     startedBy: getStartedByFieldAgent(taskHistory),
     officeLocation: getRegLastOffice(payload),
     ...(await generatePointLocations(payload, authHeader))
   }
 
   return {
-    measurement: 'applications_rejected',
+    measurement: 'declarations_rejected',
     tags,
     fields,
     timestamp: toInfluxTimestamp(task.lastModified)

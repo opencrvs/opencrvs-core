@@ -112,20 +112,16 @@ async function updateEvent(task: fhir.Task, authHeader: string) {
     task.businessStatus.coding &&
     task.businessStatus.coding[0].code
   body.modifiedAt = Date.now().toString()
-  const rejectAnnotation: fhir.Annotation = (body.type === REJECTED_STATUS &&
-    task &&
-    task.note &&
-    Array.isArray(task.note) &&
-    task.note.length > 0 &&
-    task.note[task.note.length - 1]) || { text: '' }
-  const nodeText = rejectAnnotation.text
-  body.rejectReason =
-    (body.type === REJECTED_STATUS &&
-      task &&
-      task.reason &&
-      task.reason.text) ||
-    ''
-  body.rejectComment = nodeText
+  if (body.type === REJECTED_STATUS) {
+    const rejectAnnotation: fhir.Annotation = (task &&
+      task.note &&
+      Array.isArray(task.note) &&
+      task.note.length > 0 &&
+      task.note[task.note.length - 1]) || { text: '' }
+    const nodeText = rejectAnnotation.text
+    body.rejectReason = (task && task.reason && task.reason.text) || ''
+    body.rejectComment = nodeText
+  }
   body.updatedBy =
     regLastUserIdentifier &&
     regLastUserIdentifier.valueReference &&
@@ -167,7 +163,7 @@ async function createIndexBody(
   createFatherIndex(body, composition, bundleEntries)
   createInformantIndex(body, composition, bundleEntries)
   createPrimaryCaregiverIndex(body, composition, bundleEntries)
-  await createApplicationIndex(body, composition, bundleEntries)
+  await createDeclarationIndex(body, composition, bundleEntries)
   const task = findTask(bundleEntries)
   await createStatusHistory(body, task, authHeader)
 }
@@ -358,7 +354,7 @@ function createPrimaryCaregiverIndex(
     primaryCaregiverNameLocal.family[0]
 }
 
-async function createApplicationIndex(
+async function createDeclarationIndex(
   body: IBirthCompositionBody,
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
@@ -376,7 +372,7 @@ async function createApplicationIndex(
     task,
     'http://opencrvs.org/specs/extension/contact-person-phone-number'
   )
-  const placeOfApplicationExtension = findTaskExtension(
+  const placeOfDeclarationExtension = findTaskExtension(
     task,
     'http://opencrvs.org/specs/extension/regLastOffice'
   )
@@ -404,7 +400,7 @@ async function createApplicationIndex(
   const compositionTypeCode =
     composition.type.coding &&
     composition.type.coding.find(
-      code => code.system === 'http://opencrvs.org/doc-types'
+      (code) => code.system === 'http://opencrvs.org/doc-types'
     )
 
   body.contactRelationship =
@@ -418,20 +414,20 @@ async function createApplicationIndex(
     task.businessStatus &&
     task.businessStatus.coding &&
     task.businessStatus.coding[0].code
-  body.dateOfApplication = task && task.lastModified
+  body.dateOfDeclaration = task && task.lastModified
   body.trackingId = trackingIdIdentifier && trackingIdIdentifier.value
   body.registrationNumber =
     registrationNumberIdentifier && registrationNumberIdentifier.value
-  body.applicationLocationId =
-    placeOfApplicationExtension &&
-    placeOfApplicationExtension.valueReference &&
-    placeOfApplicationExtension.valueReference.reference &&
-    placeOfApplicationExtension.valueReference.reference.split('/')[1]
-  body.applicationLocationHirarchyIds = await getLocationHirarchyIDs(
-    body.applicationLocationId
+  body.declarationLocationId =
+    placeOfDeclarationExtension &&
+    placeOfDeclarationExtension.valueReference &&
+    placeOfDeclarationExtension.valueReference.reference &&
+    placeOfDeclarationExtension.valueReference.reference.split('/')[1]
+  body.declarationLocationHirarchyIds = await getLocationHirarchyIDs(
+    body.declarationLocationId
   )
   body.compositionType =
-    (compositionTypeCode && compositionTypeCode.code) || 'birth-application'
+    (compositionTypeCode && compositionTypeCode.code) || 'birth-declaration'
 
   const createdBy = await getCreatedBy(composition.id || '')
 
@@ -461,11 +457,11 @@ async function updateCompositionWithDuplicates(
 ) {
   const duplicateCompositions = await Promise.all(
     // tslint:disable-next-line
-    duplicates.map(duplicate => getCompositionById(duplicate))
+    duplicates.map((duplicate) => getCompositionById(duplicate))
   )
 
   const duplicateCompositionIds = duplicateCompositions.map(
-    dupComposition => dupComposition.id
+    (dupComposition) => dupComposition.id
   )
 
   if (composition && composition.id) {

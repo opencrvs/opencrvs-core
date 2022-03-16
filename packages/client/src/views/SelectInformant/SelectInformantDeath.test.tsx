@@ -10,10 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  createApplication,
-  IApplication,
-  storeApplication
-} from '@client/applications'
+  createDeclaration,
+  IDeclaration,
+  storeDeclaration
+} from '@client/declarations'
 import { Event } from '@client/forms'
 import { SELECT_DEATH_INFORMANT } from '@client/navigation/routes'
 
@@ -31,7 +31,7 @@ describe('when user is selecting the informant', () => {
   let app: ReactWrapper
   let history: History
   let store: Store
-  let draft: IApplication
+  let draft: IDeclaration
 
   beforeEach(async () => {
     const testApp = await createTestApp()
@@ -39,9 +39,9 @@ describe('when user is selecting the informant', () => {
     history = testApp.history
     store = testApp.store
 
-    draft = createApplication(Event.DEATH)
-    store.dispatch(storeApplication(draft))
-    history.replace(SELECT_DEATH_INFORMANT.replace(':applicationId', draft.id))
+    draft = createDeclaration(Event.DEATH)
+    store.dispatch(storeDeclaration(draft))
+    history.replace(SELECT_DEATH_INFORMANT.replace(':declarationId', draft.id))
 
     await setPinCode(app)
   })
@@ -100,10 +100,10 @@ describe('when select informant page loads with existing data', () => {
     const history = testApp.history
     const store = testApp.store
 
-    const draft = createApplication(Event.DEATH, {
+    const draft = createDeclaration(Event.DEATH, {
       informant: {
-        applicantsRelationToDeceased: 'SON',
-        applicantPhone: '01622688231'
+        informantsRelationToDeceased: 'SON',
+        informantPhone: '01622688231'
       },
       registration: {
         relationship: {
@@ -112,8 +112,8 @@ describe('when select informant page loads with existing data', () => {
         }
       }
     })
-    store.dispatch(storeApplication(draft))
-    history.replace(SELECT_DEATH_INFORMANT.replace(':applicationId', draft.id))
+    store.dispatch(storeDeclaration(draft))
+    history.replace(SELECT_DEATH_INFORMANT.replace(':declarationId', draft.id))
     await setPinCode(app)
 
     expect(app.find('#relationship_SON').hostNodes().props().checked).toBe(true)

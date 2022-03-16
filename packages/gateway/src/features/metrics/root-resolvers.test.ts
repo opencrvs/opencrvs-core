@@ -125,17 +125,17 @@ describe('get event estimation metrics', () => {
     expect(data.deathTargetDayMetrics.estimatedPercentage).toBe(0)
   })
 })
-describe('get applications started metrics', () => {
-  it('returns applications started', async () => {
+describe('get declarations started metrics', () => {
+  it('returns declarations started', async () => {
     fetch.mockResponseOnce(
       JSON.stringify({
-        fieldAgentApplications: 2,
-        hospitalApplications: 2,
-        officeApplications: 4
+        fieldAgentDeclarations: 2,
+        hospitalDeclarations: 2,
+        officeDeclarations: 4
       })
     )
 
-    const data = await resolvers.Query.getApplicationsStartedMetrics(
+    const data = await resolvers.Query.getDeclarationsStartedMetrics(
       {},
       {
         timeStart: '2019-10-24T18:00:00.000Z',
@@ -145,7 +145,7 @@ describe('get applications started metrics', () => {
     )
 
     expect(data).toBeDefined()
-    expect(data.fieldAgentApplications).toBe(2)
+    expect(data.fieldAgentDeclarations).toBe(2)
   })
 })
 describe('get month wise event estimation metrics', () => {

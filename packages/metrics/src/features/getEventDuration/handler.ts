@@ -20,7 +20,7 @@ export async function getEventDurationHandler(
   const compositionId = request.query[COMPOSITION_ID]
   const eventDurationData = await query(
     `SELECT previousStatus as status, durationInSeconds
-          FROM application_event_duration
+          FROM declaration_event_duration
         WHERE compositionId = '${compositionId}'`
   )
   return eventDurationData && eventDurationData.length > 0

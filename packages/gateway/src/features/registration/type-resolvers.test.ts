@@ -18,6 +18,7 @@ import {
 import {
   mockPatient,
   mockDocumentReference,
+  mockUser,
   mockTask,
   mockTaskForDeath,
   mockComposition,
@@ -134,9 +135,8 @@ describe('Registration type resolvers', () => {
   })
 
   it('returns primaryCaregiver', async () => {
-    const primaryCaregiver = await typeResolvers.BirthRegistration.primaryCaregiver(
-      mockComposition
-    )
+    const primaryCaregiver =
+      await typeResolvers.BirthRegistration.primaryCaregiver(mockComposition)
     expect(primaryCaregiver).toBeDefined()
     expect(primaryCaregiver.patientSection.title).toBe(
       "Primary caregiver's details"
@@ -145,16 +145,15 @@ describe('Registration type resolvers', () => {
   })
 
   it('returns null as primaryCaregiver if no encounter section', async () => {
-    const primaryCaregiver = await typeResolvers.BirthRegistration.primaryCaregiver(
-      {
+    const primaryCaregiver =
+      await typeResolvers.BirthRegistration.primaryCaregiver({
         identifier: {
           system: 'urn:ietf:rfc:3986',
           value: '{{urn_uuid}}'
         },
         resourceType: 'Composition',
         section: []
-      }
-    )
+      })
     expect(primaryCaregiver).toBe(null)
   })
 
@@ -282,9 +281,8 @@ describe('Registration type resolvers', () => {
 
   it('returns educationalAttainment', () => {
     // @ts-ignore
-    const educationalAttainment = typeResolvers.Person.educationalAttainment(
-      mockPatient
-    )
+    const educationalAttainment =
+      typeResolvers.Person.educationalAttainment(mockPatient)
     expect(educationalAttainment).toBe('SECOND_STAGE_TERTIARY_ISCED_6')
   })
 
@@ -497,18 +495,18 @@ describe('Registration type resolvers', () => {
       fetch.mockResponseOnce(JSON.stringify(mockObservations.birthAttendant))
 
       // @ts-ignore
-      const attendantAtBirth = await typeResolvers.BirthRegistration.attendantAtBirth(
-        mockComposition
-      )
+      const attendantAtBirth =
+        await typeResolvers.BirthRegistration.attendantAtBirth(mockComposition)
       expect(attendantAtBirth).toEqual('PHYSICIAN')
     })
     it('returns birthRegistrationType', async () => {
       fetch.mockResponseOnce(JSON.stringify(mockObservations.birthRegistration))
 
       // @ts-ignore
-      const birthRegistrationType = await typeResolvers.BirthRegistration.birthRegistrationType(
-        mockComposition
-      )
+      const birthRegistrationType =
+        await typeResolvers.BirthRegistration.birthRegistrationType(
+          mockComposition
+        )
       expect(birthRegistrationType).toEqual('BOTH_PARENTS')
     })
     it('returns presentAtBirthRegistration', async () => {
@@ -517,9 +515,10 @@ describe('Registration type resolvers', () => {
       )
 
       // @ts-ignore
-      const presentAtBirthRegistration = await typeResolvers.BirthRegistration.presentAtBirthRegistration(
-        mockComposition
-      )
+      const presentAtBirthRegistration =
+        await typeResolvers.BirthRegistration.presentAtBirthRegistration(
+          mockComposition
+        )
       expect(presentAtBirthRegistration).toEqual('BOTH_PARENTS')
     })
     it('returns lastPreviousLiveBirth', async () => {
@@ -528,9 +527,10 @@ describe('Registration type resolvers', () => {
       )
 
       // @ts-ignore
-      const lastPreviousLiveBirth = await typeResolvers.BirthRegistration.lastPreviousLiveBirth(
-        mockComposition
-      )
+      const lastPreviousLiveBirth =
+        await typeResolvers.BirthRegistration.lastPreviousLiveBirth(
+          mockComposition
+        )
       expect(lastPreviousLiveBirth).toEqual('2014-01-28')
     })
     it('returns childrenBornAliveToMother', async () => {
@@ -539,9 +539,10 @@ describe('Registration type resolvers', () => {
       )
 
       // @ts-ignore
-      const childrenBornAliveToMother = await typeResolvers.BirthRegistration.childrenBornAliveToMother(
-        mockComposition
-      )
+      const childrenBornAliveToMother =
+        await typeResolvers.BirthRegistration.childrenBornAliveToMother(
+          mockComposition
+        )
       expect(childrenBornAliveToMother).toEqual(2)
     })
     it('returns foetalDeathsToMother', async () => {
@@ -550,9 +551,10 @@ describe('Registration type resolvers', () => {
       )
 
       // @ts-ignore
-      const foetalDeathsToMother = await typeResolvers.BirthRegistration.foetalDeathsToMother(
-        mockComposition
-      )
+      const foetalDeathsToMother =
+        await typeResolvers.BirthRegistration.foetalDeathsToMother(
+          mockComposition
+        )
       expect(foetalDeathsToMother).toEqual(null)
     })
     it('returns eventLocation', async () => {
@@ -632,65 +634,58 @@ describe('Registration type resolvers', () => {
     })
     it('returns attendantAtBirth null', async () => {
       // @ts-ignore
-      const attendantAtBirth = await typeResolvers.BirthRegistration.attendantAtBirth(
-        {
+      const attendantAtBirth =
+        await typeResolvers.BirthRegistration.attendantAtBirth({
           section: []
-        }
-      )
+        })
       expect(attendantAtBirth).toEqual(null)
     })
     it('returns birthRegistrationType null', async () => {
       // @ts-ignore
-      const birthRegistrationType = await typeResolvers.BirthRegistration.birthRegistrationType(
-        {
+      const birthRegistrationType =
+        await typeResolvers.BirthRegistration.birthRegistrationType({
           section: []
-        }
-      )
+        })
       expect(birthRegistrationType).toEqual(null)
     })
     it('returns presentAtBirthRegistration null', async () => {
       // @ts-ignore
-      const presentAtBirthRegistration = await typeResolvers.BirthRegistration.presentAtBirthRegistration(
-        {
+      const presentAtBirthRegistration =
+        await typeResolvers.BirthRegistration.presentAtBirthRegistration({
           section: []
-        }
-      )
+        })
       expect(presentAtBirthRegistration).toEqual(null)
     })
     it('returns presentAtBirthRegistration null', async () => {
       // @ts-ignore
-      const presentAtBirthRegistration = await typeResolvers.BirthRegistration.presentAtBirthRegistration(
-        {
+      const presentAtBirthRegistration =
+        await typeResolvers.BirthRegistration.presentAtBirthRegistration({
           section: []
-        }
-      )
+        })
       expect(presentAtBirthRegistration).toEqual(null)
     })
     it('returns childrenBornAliveToMother null', async () => {
       // @ts-ignore
-      const childrenBornAliveToMother = await typeResolvers.BirthRegistration.childrenBornAliveToMother(
-        {
+      const childrenBornAliveToMother =
+        await typeResolvers.BirthRegistration.childrenBornAliveToMother({
           section: []
-        }
-      )
+        })
       expect(childrenBornAliveToMother).toEqual(null)
     })
     it('returns foetalDeathsToMother null', async () => {
       // @ts-ignore
-      const foetalDeathsToMother = await typeResolvers.BirthRegistration.foetalDeathsToMother(
-        {
+      const foetalDeathsToMother =
+        await typeResolvers.BirthRegistration.foetalDeathsToMother({
           section: []
-        }
-      )
+        })
       expect(foetalDeathsToMother).toEqual(null)
     })
     it('returns lastPreviousLiveBirth null', async () => {
       // @ts-ignore
-      const lastPreviousLiveBirth = await typeResolvers.BirthRegistration.lastPreviousLiveBirth(
-        {
+      const lastPreviousLiveBirth =
+        await typeResolvers.BirthRegistration.lastPreviousLiveBirth({
           section: []
-        }
-      )
+        })
       expect(lastPreviousLiveBirth).toEqual(null)
     })
   })
@@ -854,16 +849,14 @@ describe('Registration type resolvers', () => {
       expect(trackingID).toBe('123')
     })
     it('returns birth registration number from the task object', async () => {
-      const registrationNumber = await typeResolvers.Registration.registrationNumber(
-        mockTask
-      )
+      const registrationNumber =
+        await typeResolvers.Registration.registrationNumber(mockTask)
 
       expect(registrationNumber).toBe('123')
     })
     it('returns death registration number from the task object', async () => {
-      const registrationNumber = await typeResolvers.Registration.registrationNumber(
-        mockTaskForDeath
-      )
+      const registrationNumber =
+        await typeResolvers.Registration.registrationNumber(mockTaskForDeath)
 
       expect(registrationNumber).toBe('123')
     })
@@ -919,8 +912,7 @@ describe('Registration type resolvers', () => {
           valueString: 'Friend'
         },
         {
-          url:
-            'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
           valueString: '01733333333'
         }
       ]
@@ -932,9 +924,10 @@ describe('Registration type resolvers', () => {
       const contact = await typeResolvers.Registration.contact(
         mockTaskWithOtherContact
       )
-      const contactRelationship = await typeResolvers.Registration.contactRelationship(
-        mockTaskWithOtherContact
-      )
+      const contactRelationship =
+        await typeResolvers.Registration.contactRelationship(
+          mockTaskWithOtherContact
+        )
       expect(contact).toBe('OTHER')
       expect(contactRelationship).toBe('Friend')
     })
@@ -969,6 +962,8 @@ describe('Registration type resolvers', () => {
     })
 
     it('returns comments of the task', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockUser))
+
       // @ts-ignore
       const comments = await typeResolvers.RegWorkflow.comments(mockTask)
       // @ts-ignore
@@ -982,7 +977,7 @@ describe('Registration type resolvers', () => {
 
       expect(comments).toHaveLength(1)
       expect(comment).toBe('Comment')
-      expect(user).toBe('<username>')
+      expect(user.role).toBe(mockUser.role)
       expect(time).toBe('2016-10-31T09:45:05+10:00')
     })
 
@@ -1124,7 +1119,7 @@ describe('Registration type resolvers', () => {
       type: {
         coding: [
           {
-            code: 'birth-application'
+            code: 'birth-declaration'
           }
         ]
       }
@@ -1137,7 +1132,7 @@ describe('Registration type resolvers', () => {
       type: {
         coding: [
           {
-            code: 'death-application'
+            code: 'death-declaration'
           }
         ]
       }
@@ -1227,9 +1222,10 @@ describe('Registration type resolvers', () => {
     it('returns parentDetailsType', async () => {
       fetch.mockResponseOnce(JSON.stringify(mockObservations.parentDetailsType))
 
-      const parentDetailsType = await typeResolvers.PrimaryCaregiver.parentDetailsType(
-        primaryCaregiverObj
-      )
+      const parentDetailsType =
+        await typeResolvers.PrimaryCaregiver.parentDetailsType(
+          primaryCaregiverObj
+        )
 
       expect(parentDetailsType).toBe('MOTHER_AND_FATHER')
     })
@@ -1237,9 +1233,10 @@ describe('Registration type resolvers', () => {
     it('returns null as parentDetailsType if there is no parent details type section', async () => {
       fetch.mockResponseOnce(JSON.stringify({}))
 
-      const parentDetailsType = await typeResolvers.PrimaryCaregiver.parentDetailsType(
-        primaryCaregiverObj
-      )
+      const parentDetailsType =
+        await typeResolvers.PrimaryCaregiver.parentDetailsType(
+          primaryCaregiverObj
+        )
 
       expect(parentDetailsType).toBe(null)
     })
@@ -1247,9 +1244,10 @@ describe('Registration type resolvers', () => {
     it('returns primaryCaregiver', async () => {
       fetch.mockResponseOnce(JSON.stringify(mockPatient))
 
-      const primaryCaregiver = await typeResolvers.PrimaryCaregiver.primaryCaregiver(
-        primaryCaregiverObj
-      )
+      const primaryCaregiver =
+        await typeResolvers.PrimaryCaregiver.primaryCaregiver(
+          primaryCaregiverObj
+        )
 
       expect(primaryCaregiver.name.length).toBeGreaterThan(0)
     })
@@ -1257,9 +1255,8 @@ describe('Registration type resolvers', () => {
     it('returns null if no patientSection', async () => {
       fetch.mockResponseOnce(JSON.stringify(mockPatient))
 
-      const primaryCaregiver = await typeResolvers.PrimaryCaregiver.primaryCaregiver(
-        {}
-      )
+      const primaryCaregiver =
+        await typeResolvers.PrimaryCaregiver.primaryCaregiver({})
 
       expect(primaryCaregiver).toBe(null)
     })
@@ -1267,9 +1264,10 @@ describe('Registration type resolvers', () => {
     it('returns reasonsNotApplying', async () => {
       fetch.mockResponseOnce(JSON.stringify(mockObservationBundle))
 
-      const reasonsNotApplying = await typeResolvers.PrimaryCaregiver.reasonsNotApplying(
-        primaryCaregiverObj
-      )
+      const reasonsNotApplying =
+        await typeResolvers.PrimaryCaregiver.reasonsNotApplying(
+          primaryCaregiverObj
+        )
 
       expect(reasonsNotApplying).toEqual(reasonsNotApplyingMock)
     })
@@ -1301,9 +1299,10 @@ describe('Registration type resolvers', () => {
         })
       )
 
-      const reasonsNotApplying = await typeResolvers.PrimaryCaregiver.reasonsNotApplying(
-        primaryCaregiverObj
-      )
+      const reasonsNotApplying =
+        await typeResolvers.PrimaryCaregiver.reasonsNotApplying(
+          primaryCaregiverObj
+        )
 
       expect(reasonsNotApplying).toEqual([
         { primaryCaregiverType: 'INFORMANT' }
@@ -1318,9 +1317,10 @@ describe('Registration type resolvers', () => {
         })
       )
 
-      const reasonsNotApplying = await typeResolvers.PrimaryCaregiver.reasonsNotApplying(
-        primaryCaregiverObj
-      )
+      const reasonsNotApplying =
+        await typeResolvers.PrimaryCaregiver.reasonsNotApplying(
+          primaryCaregiverObj
+        )
 
       expect(reasonsNotApplying).toEqual([])
     })
@@ -1328,9 +1328,10 @@ describe('Registration type resolvers', () => {
 
   describe('Reason not applying type', () => {
     it('returns primaryCaregiverType', () => {
-      const primaryCaregiverType = typeResolvers.ReasonsNotApplying.primaryCaregiverType(
-        reasonsNotApplyingMock[2]
-      )
+      const primaryCaregiverType =
+        typeResolvers.ReasonsNotApplying.primaryCaregiverType(
+          reasonsNotApplyingMock[2]
+        )
 
       expect(primaryCaregiverType).toBe('OTHER')
     })

@@ -23,7 +23,7 @@ describe('LoadingIndicator test cases', () => {
       <LoadingIndicator
         loading={true}
         hasError={false}
-        noApplication={false}
+        noDeclaration={false}
       />,
       { store, history }
     )
@@ -37,7 +37,7 @@ describe('LoadingIndicator test cases', () => {
       <LoadingIndicator
         loading={false}
         hasError={true}
-        noApplication={false}
+        noDeclaration={false}
       />,
       { store, history }
     )
@@ -47,18 +47,18 @@ describe('LoadingIndicator test cases', () => {
     expect(isShowingLoadingText).toBe(1)
   })
 
-  it('Should display No application', async () => {
+  it('Should display No declaration', async () => {
     // @ts-ignore
     const testComponent = await createTestComponent(
       <LoadingIndicator
         loading={false}
         hasError={false}
-        noApplication={true}
+        noDeclaration={true}
       />,
       { store, history }
     )
     const isShowingLoadingText = testComponent.find(
-      'span#no-application-text'
+      'span#no-declaration-text'
     ).length
     expect(isShowingLoadingText).toBe(1)
   })

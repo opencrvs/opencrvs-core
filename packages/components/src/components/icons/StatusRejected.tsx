@@ -18,12 +18,12 @@ export const StatusRejected = (props: React.HTMLAttributes<SVGElement>) => (
     viewBox="0 0 18 18"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <g id="Application-(Mobile-worker)" fill="none" fillRule="evenodd">
+    <g id="Declaration-(Mobile-worker)" fill="none" fillRule="evenodd">
       <g id="HealthWorker/Homepage/" transform="translate(-478 -504)">
         <g id="Group-7" transform="translate(471 497)">
           <g id="Icons/Status/Rejected" transform="translate(8 8)">
             <g id="Group-12" transform="translate(-1 -1)" fillRule="nonzero">
-              <g id="Icons/Application-Copy" transform="translate(1 1)">
+              <g id="Icons/Declaration-Copy" transform="translate(1 1)">
                 <g id="Group-5">
                   <circle id="Oval-3" fill="#F4F4F4" cx="8" cy="8" r="8" />
                   <g id="Group-2" fillOpacity="0.7">

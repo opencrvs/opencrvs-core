@@ -20,7 +20,7 @@ interface IOfficeHomeMessages
   inProgressOwnDrafts: MessageDescriptor
   hospitalDrafts: MessageDescriptor
   listItemAction: MessageDescriptor
-  listItemApplicationDate: MessageDescriptor
+  listItemDeclarationDate: MessageDescriptor
   listItemRegisteredDate: MessageDescriptor
   readyForReview: MessageDescriptor
   readyToPrint: MessageDescriptor
@@ -29,8 +29,8 @@ interface IOfficeHomeMessages
   sentForApprovals: MessageDescriptor
   sentForUpdates: MessageDescriptor
   sentForExternalValidation: MessageDescriptor
-  validatedApplicationTooltipForRegistrar: MessageDescriptor
-  validatedApplicationTooltipForRegistrationAgent: MessageDescriptor
+  validatedDeclarationTooltipForRegistrar: MessageDescriptor
+  validatedDeclarationTooltipForRegistrationAgent: MessageDescriptor
   waitingForExternalValidation: MessageDescriptor
 }
 
@@ -70,13 +70,13 @@ const messagesToDefine: IOfficeHomeMessages = {
     description: 'Label for action in work queue list item',
     id: 'regHome.table.label.action'
   },
-  listItemApplicationDate: {
-    defaultMessage: 'Application sent',
-    description: 'Label for application date in work queue list item',
-    id: 'regHome.table.label.applicationDate'
+  listItemDeclarationDate: {
+    defaultMessage: 'Declaration sent',
+    description: 'Label for declaration date in work queue list item',
+    id: 'regHome.table.label.declarationDate'
   },
   listItemRegisteredDate: {
-    defaultMessage: 'Application registered',
+    defaultMessage: 'Declaration registered',
     description: 'Label for date of registration in work queue list item',
     id: 'regHome.table.label.registeredDate'
   },
@@ -115,14 +115,14 @@ const messagesToDefine: IOfficeHomeMessages = {
     description: 'The title of sent for updates tab',
     id: 'regHome.sentForUpdates'
   },
-  validatedApplicationTooltipForRegistrar: {
-    defaultMessage: 'Application has been validated by a registration agent',
-    description: 'Text to display for validated application as tooltip',
+  validatedDeclarationTooltipForRegistrar: {
+    defaultMessage: 'Declaration has been validated by a registration agent',
+    description: 'Text to display for validated declaration as tooltip',
     id: 'regHome.validated.registrar.tooltip'
   },
-  validatedApplicationTooltipForRegistrationAgent: {
-    defaultMessage: 'Application has been validated and waiting for approval',
-    description: 'Text to display for validated application as tooltip',
+  validatedDeclarationTooltipForRegistrationAgent: {
+    defaultMessage: 'Declaration has been validated and waiting for approval',
+    description: 'Text to display for validated declaration as tooltip',
     id: 'regHome.val.regAgent.tooltip'
   },
   waitingForExternalValidation: {

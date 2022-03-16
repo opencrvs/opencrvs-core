@@ -30,11 +30,13 @@ export const enum EVENT {
 }
 
 export const IN_PROGRESS_STATUS = 'IN_PROGRESS'
+export const ARCHIVED_STATUS = 'ARCHIVED'
 const DECLARED_STATUS = 'DECLARED'
 export const REJECTED_STATUS = 'REJECTED'
 const VALIDATED_STATUS = 'VALIDATED'
 const WAITING_VALIDATION_STATUS = 'WAITING_VALIDATION'
 const REGISTERED_STATUS = 'REGISTERED'
+const REINSTATED_STATUS = 'REINSTATED'
 const CERTIFIED_STATUS = 'CERTIFIED'
 const REQUESTED_CORRECTION_STATUS = 'REQUESTED_CORRECTION'
 
@@ -71,12 +73,12 @@ export interface ICompositionBody {
   type?: string
   contactRelationship?: string
   contactNumber?: string
-  dateOfApplication?: string
+  dateOfDeclaration?: string
   trackingId?: string
   registrationNumber?: string
   eventLocationId?: string
-  applicationLocationId?: string
-  applicationLocationHirarchyIds?: string[]
+  declarationLocationId?: string
+  declarationLocationHirarchyIds?: string[]
   rejectReason?: string
   rejectComment?: string
   relatesTo?: string[]
@@ -212,7 +214,7 @@ export const createStatusHistory = async (
   } as IOperationHistory
 
   if (
-    isApplicationInStatus(body, IN_PROGRESS_STATUS) &&
+    isDeclarationInStatus(body, IN_PROGRESS_STATUS) &&
     isNotification(body) &&
     body.eventLocationId
   ) {
@@ -223,14 +225,14 @@ export const createStatusHistory = async (
     operationHistory.notificationFacilityAlias = facility?.alias || []
   }
 
-  if (isApplicationInStatus(body, REQUESTED_CORRECTION_STATUS)) {
+  if (isDeclarationInStatus(body, REQUESTED_CORRECTION_STATUS)) {
     updateOperationHistoryWithCorrection(operationHistory, task)
   }
   body.operationHistories = body.operationHistories || []
   body.operationHistories.push(operationHistory)
 }
 
-function isApplicationInStatus(
+function isDeclarationInStatus(
   body: ICompositionBody,
   status: string
 ): boolean {
@@ -397,13 +399,20 @@ function getPreviousStatus(body: IBirthCompositionBody) {
 
 export function isValidOperationHistory(body: IBirthCompositionBody) {
   const validStatusMapping = {
+    [ARCHIVED_STATUS]: [DECLARED_STATUS, REJECTED_STATUS, VALIDATED_STATUS],
     [IN_PROGRESS_STATUS]: [null],
-    [DECLARED_STATUS]: [null],
-    [REJECTED_STATUS]: [DECLARED_STATUS, IN_PROGRESS_STATUS, VALIDATED_STATUS],
+    [DECLARED_STATUS]: [ARCHIVED_STATUS],
+    [REJECTED_STATUS]: [
+      DECLARED_STATUS,
+      IN_PROGRESS_STATUS,
+      VALIDATED_STATUS,
+      ARCHIVED_STATUS
+    ],
     [VALIDATED_STATUS]: [
       DECLARED_STATUS,
       IN_PROGRESS_STATUS,
       REJECTED_STATUS,
+      ARCHIVED_STATUS,
       null
     ],
     [WAITING_VALIDATION_STATUS]: [
@@ -422,7 +431,9 @@ export function isValidOperationHistory(body: IBirthCompositionBody) {
       WAITING_VALIDATION_STATUS
     ],
     [CERTIFIED_STATUS]: [REGISTERED_STATUS, CERTIFIED_STATUS],
-    [REQUESTED_CORRECTION_STATUS]: [REGISTERED_STATUS, CERTIFIED_STATUS]
+    [REQUESTED_CORRECTION_STATUS]: [REGISTERED_STATUS, CERTIFIED_STATUS],
+    [REINSTATED_STATUS]: [ARCHIVED_STATUS],
+    [CERTIFIED_STATUS]: [REGISTERED_STATUS, CERTIFIED_STATUS]
   }
 
   const previousStatus = getPreviousStatus(body)

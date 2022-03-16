@@ -14,7 +14,7 @@ import styled, { withTheme } from 'styled-components'
 import { ITheme } from 'src/components/theme'
 
 const StyledSpan = styled.span`
-  color: ${({ theme }) => theme.colors.success};
+  color: ${({ theme }) => theme.colors.positive};
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -47,7 +47,7 @@ class ValidIndicatorComponent extends React.Component<IProps> {
               id="Interface/Forms"
               transform="translate(-380.000000, -2459.000000)"
               fillRule="nonzero"
-              stroke={theme.colors.success}
+              stroke={theme.colors.positive}
               strokeWidth="2.5"
             >
               <polyline

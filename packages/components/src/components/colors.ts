@@ -9,140 +9,62 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export const colorDictionary = {
-  blackStormy: '#35495D',
-  blueDeepSea: '#4C68C1',
-  blueDeepSeaLight: '#F1F3FA',
-  blueBabyBaby: '#5E93ED',
-  purpleDrafty: '#8049B7',
-  orangeAmber: '#F1B162',
-  redDanger: '#D53F3F',
-  redDangerDark: '#994040',
-  greenPeaPea: '#49B78D',
-  greenPeaPeaDark: '#409977',
-  blueCrystal: '#4A8AD7',
-  yellowFocus: '#EDC55E',
+
+export const colors = {
+  // Pallete
+  primary: '#4972BB', // indigo
+  secondary: '#4A8AD7', // blue
+  tertiary: '#CCCFD0', // grey
+
+  purple: '#8049B7', // in progress
+  orange: '#F1B162', // ready for review
+  red: '#D53F3F', // requires updates
+  green: '#49b78d', // registered
+  blue: '#4A8AD7', // certified
+  teal: '#4CC1BA', // charts
+  yellow: '#EDC55E', // focus state
+
+  // Darks
+  indigoDark: '#42639C',
+  redDark: '#994040',
+  greenDark: '#409977',
+
+  // Lights
+  tealLight: '#D3EEE4',
+
+  // Status
+  positive: '#49B78D', // green
+  neutral: '#F1B162', // orange
+  negative: '#D53F3F', // red
+
+  // Monochrome
   white: '#FFFFFF',
-  black: '#000000',
-  blueHover: '#F2F6FE',
-  greyBlackMetal: '#373D3F',
-  greyRaven: '#555F61',
-  greyDarkSteel: '#707C80',
-  greySteel: '#A7B0B2',
-  greyGrey: '#C1C7C9',
-  greySmoky: '#DADEDF',
-  greyPearl: '#F2F3F4',
-  nightshadeDark: '#42506B',
-  nightshadeLight: '#485F88',
-  darkSteel: '#707C80',
-  lightGrey: '#F9F9F9',
-  mercury: '#E5E5E5',
-  silverSand: '#C1C7C9',
-  swansDown: '#D3EEE4',
-  fountainBlue: '#4CC1BA',
-  ronchi: '#EDC55E',
-  borderBottom: '#d8dbde',
-  grey: '#1E2326',
-  greyLight: '#595C5F',
-  greyHover: '#F8F8F8',
-  grey800: '#1E2326',
-  grey300: '#F1F2F3',
-  grey600: '#909397',
-  greyInfo: '#EFEFEF',
-  tableRowDivider: '#F1F2F3',
+  grey100: '#F5F5F5', // background
+  grey200: '#EEEEEE', // dividers, hover
+  grey300: '#CCCCCC', // disabled state, borders
+  grey400: '#959595', // placeholder copy
+  grey500: '#5B5B5B', // supporting copy
+  grey600: '#222222', // copy
+
   indigo500: '#4972BB',
-  indigo600: '##42639C',
-  yellow500: '#EDC55E'
+
+  // Opacity
+  opacity24: 'rgba(41, 47, 51, 0.24)',
+  opacity54: 'rgba(41, 47, 51, 0.54)',
+
+  // Alternative defintions
+  copy: '#222222', // grey600
+  supportingCopy: '#707070', // grey500
+  placeholderCopy: '#A5A5A5', // grey400
+  disabled: '#CCCCCC', // grey300
+  background: '#F5F5F5' // grey100
 }
 
 export const gradients = {
-  gradientNightshade:
-    'background: linear-gradient(180deg, #42506B 0%, #485F88 100%)',
-  gradientSkyDark:
-    'background: linear-gradient(180deg, #3C55A3 0%, #4C68C1 100%)',
-  gradientSkyLight:
-    'background: linear-gradient(180deg, #6291CD 0%, #AACAF3 100%)',
-  gradientBabyShade:
-    'background: linear-gradient(180deg, #477cd7 0%, #5c91eb 100%);',
-  gradientGreyShade:
-    'background: linear-gradient(180deg, #FFFFFF 0%, #F2F3F4 100%);'
+  primary: 'background: linear-gradient(180deg, #42506B 0%, #485F88 100%)'
 }
 
 export const shadows = {
-  mistyShadow: 'box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32)',
-  thickShadow: 'box-shadow: 0px 2px 8px rgba(53, 67, 93, 0.54)'
-}
-
-export const colors = {
-  primary: colorDictionary.blueDeepSea,
-  secondary: colorDictionary.blueBabyBaby,
-  tertiary: colorDictionary.blueDeepSea,
-  error: colorDictionary.redDanger,
-  errorHover: colorDictionary.redDangerDark,
-  warning: colorDictionary.orangeAmber,
-  copy: colorDictionary.blackStormy,
-  placeholder: colorDictionary.greyDarkSteel,
-  background: colorDictionary.greyPearl,
-  disabled: colorDictionary.greyGrey,
-  success: colorDictionary.greenPeaPea,
-  successHover: colorDictionary.greenPeaPeaDark,
-  white: colorDictionary.white,
-  black: colorDictionary.black,
-  focus: colorDictionary.yellowFocus,
-  grey: colorDictionary.grey,
-  greyLight: colorDictionary.greyLight,
-  greyHover: colorDictionary.greyHover,
-  border: colorDictionary.borderBottom,
-
-  // Exceptions - Try to use one of the above before creating exceptions
-  chartAreaGradientStart: colorDictionary.greySmoky,
-  chartAreaGradientEnd: colorDictionary.blueHover,
-  dropdownHover: colorDictionary.blueHover,
-  loadingImage: colorDictionary.blueHover,
-  menuBackground: colorDictionary.blackStormy,
-  gradientDark: colorDictionary.nightshadeDark,
-  gradientLight: colorDictionary.nightshadeLight,
-  secondaryLabel: colorDictionary.darkSteel,
-  previewBackground: colorDictionary.greyBlackMetal,
-  smallButtonFocus: colorDictionary.mercury,
-  dateDisabled: colorDictionary.greySteel,
-
-  // Grey Scrollbar
-  scrollBarGrey: colorDictionary.greySteel,
-  lightScrollBarGrey: colorDictionary.greySmoky,
-
-  // Dividers
-  dividerLight: colorDictionary.greyPearl,
-  dividerDark: colorDictionary.greySmoky,
-
-  // Light Grey background
-  lightGreyBackground: colorDictionary.lightGrey,
-
-  // Deep sea light background
-  blueDeepSeaLight: colorDictionary.blueDeepSeaLight,
-
-  // Colors for applicatin statuses
-  inProgress: colorDictionary.purpleDrafty,
-  readyForReview: colorDictionary.orangeAmber,
-  sentForUpdate: colorDictionary.redDanger,
-  waitingForApproval: colorDictionary.greySteel,
-  waitingForExternalValidation: colorDictionary.greyRaven,
-  readyToPrint: colorDictionary.greenPeaPea,
-
-  // Tri Line chart lines
-  silverSand: colorDictionary.silverSand,
-  swansDown: colorDictionary.swansDown,
-
-  fountainBlue: colorDictionary.fountainBlue,
-  ronchi: colorDictionary.ronchi,
-  indigo500: colorDictionary.indigo500,
-  yellow500: colorDictionary.yellow500,
-  blue500: colorDictionary.blueCrystal,
-  grey300: colorDictionary.grey300,
-  grey400: '#A5A5A5',
-  grey600: colorDictionary.grey600,
-  grey800: colorDictionary.grey800,
-  greyInfo: colorDictionary.greyInfo,
-  indigo600: colorDictionary.indigo600,
-  tableRowDivider: colorDictionary.tableRowDivider
+  light: 'box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32)',
+  heavy: 'box-shadow: 0px 2px 8px rgba(53, 67, 93, 0.54)'
 }

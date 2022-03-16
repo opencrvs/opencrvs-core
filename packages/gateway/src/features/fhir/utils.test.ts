@@ -14,18 +14,25 @@ import {
   selectOrCreateCollectorPersonResource,
   removeDuplicatesFromComposition,
   selectOrCreateInformantSection,
-  setInformantReference
+  setInformantReference,
+  getDownloadedExtensionStatus
 } from '@gateway/features/fhir/utils'
 import {
   FATHER_CODE,
   INFORMANT_CODE,
   INFORMANT_TITLE
 } from '@gateway/features/fhir/templates'
-import { mockFhirBundle, mockComposition } from '@gateway/utils/testUtils'
+import {
+  mockFhirBundle,
+  mockComposition,
+  mockTask
+} from '@gateway/utils/testUtils'
 import { ITemplatedBundle } from '@gateway/features/registration/fhir-builders'
 import { clone, cloneDeep } from 'lodash'
 import { logger } from '@gateway/logger'
 import * as fetchAny from 'jest-fetch-mock'
+import { DOWNLOADED_EXTENSION_URL } from '@gateway/features/fhir/constants'
+
 const fetch = fetchAny as any
 
 describe('Fhir util function testing', () => {
@@ -158,10 +165,10 @@ describe('Fhir util function testing', () => {
             coding: [
               {
                 system: 'http://opencrvs.org/doc-types',
-                code: 'birth-application'
+                code: 'birth-declaration'
               }
             ],
-            text: 'Birth Application'
+            text: 'Birth Declaration'
           },
           class: {
             coding: [
@@ -246,6 +253,28 @@ describe('Fhir util function testing', () => {
       expect(mockFhirBundleCloned.entry[8].resource.patient.reference).toEqual(
         'urn:uuid:b9044443-c708-4977-b0e7-7e51ef0c9221'
       )
+    })
+  })
+
+  describe('getDownloadedExtensionStatus()', () => {
+    const task = {
+      ...mockTask,
+      extension: [
+        {
+          url: DOWNLOADED_EXTENSION_URL,
+          valueString: 'test-value'
+        }
+      ]
+    }
+
+    it('should return the status if the extension was found', () => {
+      expect(getDownloadedExtensionStatus(task)).toBe('test-value')
+    })
+
+    it('should return undefined if the extension was not found', () => {
+      expect(
+        getDownloadedExtensionStatus({ ...task, extension: [] }, 'dummy-url')
+      ).toBeUndefined()
     })
   })
 })

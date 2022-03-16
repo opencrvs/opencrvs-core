@@ -13,40 +13,40 @@ import { createStore } from '@client/store'
 import {
   createRouterProps,
   createTestComponent,
-  mockApplicationData
+  mockDeclarationData
 } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { CorrectionSection, Event } from '@client/forms'
-import { IApplication, storeApplication } from '@client/applications'
+import { IDeclaration, storeDeclaration } from '@client/declarations'
 import { formatUrl } from '@client/navigation'
 import { CERTIFICATE_CORRECTION } from '@client/navigation/routes'
 import { CorrectionForm } from './CorrectionForm'
 
 let wrapper: ReactWrapper<{}, {}>
 
-const birthApplication: IApplication = {
+const birthDeclaration: IDeclaration = {
   id: '72c18939-70c1-40b4-9b80-b162c4871160',
-  data: mockApplicationData,
+  data: mockDeclarationData,
   event: Event.BIRTH
 }
 
 const { store, history } = createStore()
 
-describe('for an application', () => {
+describe('for an declaration', () => {
   beforeEach(async () => {
-    store.dispatch(storeApplication(birthApplication))
+    store.dispatch(storeDeclaration(birthDeclaration))
     wrapper = await createTestComponent(
       <CorrectionForm
         {...createRouterProps(
           formatUrl(CERTIFICATE_CORRECTION, {
-            applicationId: birthApplication.id,
+            declarationId: birthDeclaration.id,
             pageId: CorrectionSection.SupportingDocuments
           }),
           { isNavigatedInsideApp: false },
           {
             matchParams: {
-              applicationId: birthApplication.id,
+              declarationId: birthDeclaration.id,
               pageId: CorrectionSection.SupportingDocuments
             }
           }

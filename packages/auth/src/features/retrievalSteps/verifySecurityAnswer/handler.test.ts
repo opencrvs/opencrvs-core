@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as fetchAny from 'jest-fetch-mock'
-import { createServer } from '@auth/index'
+import { createServer } from '@auth/server'
 import {
   RetrievalSteps,
   storeRetrievalStepInformation,
