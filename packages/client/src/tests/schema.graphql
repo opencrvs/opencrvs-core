@@ -230,6 +230,7 @@ type BirthRegistration implements EventRegistration {
   father: Person
   informant: RelatedPerson
   eventLocation: Location
+  questionnaire: [QuestionnaireQuestion]
   birthType: BirthType
   weightAtBirth: Float
   attendantAtBirth: AttendantType
@@ -445,6 +446,7 @@ input BirthRegistrationInput {
   father: PersonInput
   informant: RelatedPersonInput
   eventLocation: LocationInput
+  questionnaire: [QuestionnaireQuestionInput]
   birthType: BirthType
   weightAtBirth: Float
   attendantAtBirth: AttendantType
@@ -530,7 +532,6 @@ type Registration {
   contactRelationship: String
   contactPhoneNumber: String
   status: [RegWorkflow]
-  questionnaire: [QuestionnaireQuestion]
   type: RegistrationType
   inCompleteFields: String
   attachments: [Attachment]
@@ -863,7 +864,6 @@ input RegistrationInput {
   status: [RegWorkflowInput]
   type: RegistrationType
   inCompleteFields: String
-  questionnaire: [QuestionnaireQuestionInput]
   attachments: [AttachmentInput]
   certificates: [CertificateInput]
   location: LocationInput

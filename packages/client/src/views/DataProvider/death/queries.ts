@@ -122,7 +122,6 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           contentType
           subject
         }
-        questionnaire
         status {
           type
           timestamp
@@ -143,6 +142,10 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           postalCode
           country
         }
+      }
+      questionnaire {
+        fieldId
+        value
       }
       mannerOfDeath
       causeOfDeath
@@ -305,7 +308,6 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         contact
         contactRelationship
         contactPhoneNumber
-        questionnaire
         status {
           comments {
             comment
@@ -328,6 +330,10 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         type
         trackingId
         registrationNumber
+      }
+      questionnaire {
+        fieldId
+        value
       }
       eventLocation {
         id

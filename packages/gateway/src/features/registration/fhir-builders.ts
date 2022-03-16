@@ -766,16 +766,24 @@ function createRegStatusCommentTimeStamp(
 
 function createQuestionnaireBuilder() {
   return {
-    fieldName: (
+    fieldId: (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
       context: any
     ) => {
-      const questionnaire = selectOrCreateQuestionnaireResource(fhirBundle)
+      const questionnaire = selectOrCreateQuestionnaireResource(
+        BIRTH_ENCOUNTER_CODE,
+        fhirBundle,
+        context
+      )
       setQuestionnaireItem(questionnaire, context, fieldValue, null)
     },
     value: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
-      const questionnaire = selectOrCreateQuestionnaireResource(fhirBundle)
+      const questionnaire = selectOrCreateQuestionnaireResource(
+        BIRTH_ENCOUNTER_CODE,
+        fhirBundle,
+        context
+      )
       setQuestionnaireItem(questionnaire, context, null, fieldValue)
     }
   }
@@ -2318,7 +2326,6 @@ export const builders: IFieldBuilders = {
         taskResource.note.push(newNote)
       }
     },
-    questionnaire: createQuestionnaireBuilder(),
     status: {
       comments: {
         comment: (
@@ -2958,6 +2965,7 @@ export const builders: IFieldBuilders = {
       }
     }
   },
+  questionnaire: createQuestionnaireBuilder(),
   eventLocation: {
     _fhirID: (
       fhirBundle: ITemplatedBundle,

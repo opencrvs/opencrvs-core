@@ -49,7 +49,7 @@ import {
   MALE_DEPENDENTS_ON_DECEASED_CODE,
   FEMALE_DEPENDENTS_ON_DECEASED_CODE
 } from '@gateway/features/fhir/templates'
-import { GQLResolver } from '@gateway/graphql/schema'
+import { GQLQuestionnaireQuestion, GQLResolver } from '@gateway/graphql/schema'
 import {
   ORIGINAL_FILE_NAME_SYSTEM,
   SYSTEM_FILE_NAME_SYSTEM,
@@ -357,22 +357,6 @@ export const typeResolvers: GQLResolver = {
         )
 
       return (foundIdentifier && foundIdentifier.value) || null
-    },
-    questionnaire: async (composition: fhir.Composition, _, authHeader) => {
-      const questionnaireBundle: fhir.Bundle = await fetchFHIR(
-        `/QuestionnaireResponse?subject=${composition.id}`,
-        authHeader
-      )
-      return (
-        questionnaireBundle.entry &&
-        questionnaireBundle.entry.map(
-          (questionnaireResponseEntry: fhir.BundleEntry, i) => {
-            const questionnaire = questionnaireResponseEntry.resource
-
-            return questionnaire
-          }
-        )
-      )
     },
     status: async (task: fhir.Task, _, authHeader) => {
       // fetch full task history
@@ -1273,6 +1257,49 @@ export const typeResolvers: GQLResolver = {
           observations.entry[0].resource.valueQuantity.value) ||
         null
       )
+    },
+
+    async questionnaire(composition: ITemplatedComposition, _, authHeader) {
+      const encounterSection = findCompositionSection(
+        BIRTH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection || !encounterSection.entry) {
+        return null
+      }
+      const response = await fetchFHIR(
+        `/QuestionnaireResponse?subject=${encounterSection.entry[0].reference}`,
+        authHeader
+      )
+      let questionnaireResponse: fhir.QuestionnaireResponse | null = null
+
+      if (
+        response &&
+        response.entry &&
+        response.entry[0] &&
+        response.entry[0].resource
+      ) {
+        questionnaireResponse = response.entry[0].resource
+      }
+
+      if (!questionnaireResponse) {
+        return null
+      }
+      const questionnaire: GQLQuestionnaireQuestion[] = []
+
+      if (questionnaireResponse.item && questionnaireResponse.item.length) {
+        questionnaireResponse.item.forEach((item) => {
+          if (item.answer && item.answer[0]) {
+            questionnaire.push({
+              fieldId: item.text,
+              value: item.answer[0].valueString
+            })
+          }
+        })
+        return questionnaire
+      } else {
+        return null
+      }
     },
     async birthType(composition: ITemplatedComposition, _, authHeader) {
       const encounterSection = findCompositionSection(

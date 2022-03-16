@@ -184,10 +184,11 @@ export function questionnaireToCustomFieldTransformer(
   sectionId: string,
   field: IFormField
 ) {
-  if (queryData.registration.questionnaire) {
+  if (queryData.questionnaire) {
     const selectedQuestion: IQuestionnaireQuestion =
-      queryData.registration.questionnaire.filter(
-        (question: IQuestionnaireQuestion) => question.fieldName === field.name
+      queryData.questionnaire.filter(
+        (question: IQuestionnaireQuestion) =>
+          question.fieldId === field.customQuesstionMappingId
       )[0]
     if (selectedQuestion) {
       transformedData[sectionId][field.name] = selectedQuestion.value

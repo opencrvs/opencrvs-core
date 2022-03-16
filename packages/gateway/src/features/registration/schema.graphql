@@ -290,6 +290,7 @@ input BirthRegistrationInput {
   informant: RelatedPersonInput
   eventLocation: LocationInput
   birthType: BirthType # Not in BDRIS2
+  questionnaire: [QuestionnaireQuestionInput]
   weightAtBirth: Float # Not in BDRIS2
   attendantAtBirth: AttendantType # Not in BDRIS2
   otherAttendantAtBirth: String
@@ -314,6 +315,7 @@ type BirthRegistration implements EventRegistration { # -> Composition
   informant: RelatedPerson # -> .section(code='informant-details').entry.reference
   eventLocation: Location
   birthType: BirthType # -> Observation.valueInteger
+  questionnaire: [QuestionnaireQuestion]
   weightAtBirth: Float # -> Observation.valueQuantity (code=kg)
   attendantAtBirth: AttendantType # -> Observation.valueString
   otherAttendantAtBirth: String
@@ -339,6 +341,7 @@ input DeathRegistrationInput {
   father: PersonInput # -> Use for informant ->.section(code='father-details').entry.reference
   spouse: PersonInput # -> Use for informant ->.section(code='spouse-details').entry.reference
   eventLocation: LocationInput
+  questionnaire: [QuestionnaireQuestionInput]
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
   causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept
   causeOfDeath: String # need to store ICD-10? More types of cause of death
@@ -361,6 +364,7 @@ type DeathRegistration implements EventRegistration { # -> Composition
   father: Person # -> Use for informant ->.section(code='father-details').entry.reference
   spouse: Person # -> Use for informant ->.section(code='spouse-details').entry.reference
   eventLocation: Location
+  questionnaire: [QuestionnaireQuestion]
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
   causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept
   causeOfDeath: String # -> Observation.valueCodeableConcept
@@ -408,7 +412,6 @@ input RegistrationInput {
   status: [RegWorkflowInput]
   type: RegistrationType
   inCompleteFields: String
-  questionnaire: [QuestionnaireQuestionInput]
   attachments: [AttachmentInput]
   certificates: [CertificateInput]
   location: LocationInput
@@ -424,7 +427,6 @@ type Registration { # -> Task
   # BRN (Birth Registration Number) DRN (Death Registration Number) - Format to be decided
   registrationNumber: String # -> .identifier
   paperFormID: String # -> .identifier
-  questionnaire: [QuestionnaireQuestion]
   page: String # -> .identifier
   book: String # -> .identifier
   contact: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
@@ -453,7 +455,7 @@ type Certificate { # -> Document Reference
 }
 
 input QuestionnaireQuestionInput {
-  fieldName: String
+  fieldId: String
   value: String
 }
 
@@ -473,7 +475,7 @@ input AttachmentInput {
 }
 
 type QuestionnaireQuestion {
-  fieldName: String
+  fieldId: String
   value: String
 }
 

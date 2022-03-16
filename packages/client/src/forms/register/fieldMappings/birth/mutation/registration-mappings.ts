@@ -187,11 +187,11 @@ export const customFieldToQuestionnaireTransformer = (
   const value: IFormSectionData = draftData[sectionId][
     field.name
   ] as IFormSectionData
-  if (!transformedData.registration.questionnaire) {
-    transformedData.registration.questionnaire = []
+  if (!transformedData.questionnaire) {
+    transformedData.questionnaire = []
   }
-  transformedData.registration.questionnaire.push({
-    fieldName: field.name,
+  transformedData.questionnaire.push({
+    fieldId: field.customQuesstionMappingId,
     value: value
   })
 

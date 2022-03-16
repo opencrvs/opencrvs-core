@@ -796,29 +796,45 @@ export function selectOrCreatePaymentReconciliationResource(
 }
 
 export function selectOrCreateQuestionnaireResource(
-  fhirBundle: ITemplatedBundle
+  sectionCode: string,
+  fhirBundle: ITemplatedBundle,
+  context: any
 ): fhir.QuestionnaireResponse {
-  let questionnaireResponseEntry =
-    fhirBundle.entry &&
-    fhirBundle.entry.find((entry) => {
-      if (
-        entry.resource &&
-        entry.resource.resourceType === 'QuestionnaireResponse'
-      ) {
-        return true
-      }
+  let questionnaire = fhirBundle.entry.find((entry) => {
+    if (
+      !entry ||
+      !entry.resource ||
+      entry.resource.resourceType !== 'QuestionnaireResponse'
+    ) {
       return false
-    })
-  if (!questionnaireResponseEntry) {
-    questionnaireResponseEntry = createQuestionnaireResponseTemplate(uuid())
-    const questionnaireResource =
-      questionnaireResponseEntry.resource as fhir.QuestionnaireResponse
-    if (!questionnaireResource.subject) {
-      questionnaireResource.subject = { reference: '' }
+    } else {
+      return true
     }
-    questionnaireResource.subject.reference = fhirBundle.entry[0].fullUrl
-    fhirBundle.entry.push(questionnaireResponseEntry)
+  })
+
+  if (questionnaire) {
+    return questionnaire.resource as fhir.QuestionnaireResponse
   }
+
+  const encounter = selectOrCreateEncounterResource(fhirBundle, context)
+  const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
+
+  const ref = uuid()
+  const questionnaireResponseEntry = createQuestionnaireResponseTemplate(ref)
+  if (!section || !section.entry || !section.entry[0]) {
+    throw new Error('Expected encounter section to exist and have an entry')
+  }
+  const encounterSectionEntry = section.entry[0]
+  const encounterEntry = fhirBundle.entry.find(
+    (entry) => entry.fullUrl === encounterSectionEntry.reference
+  )
+  if (encounterEntry && encounter) {
+    questionnaireResponseEntry.resource.subject = {
+      reference: `${encounterEntry.fullUrl}`
+    }
+  }
+  fhirBundle.entry.push(questionnaireResponseEntry)
+
   return questionnaireResponseEntry.resource as fhir.QuestionnaireResponse
 }
 

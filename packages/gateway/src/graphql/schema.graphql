@@ -223,6 +223,7 @@ type BirthRegistration implements EventRegistration {
   informant: RelatedPerson
   eventLocation: Location
   birthType: BirthType
+  questionnaire: [QuestionnaireQuestion]
   weightAtBirth: Float
   attendantAtBirth: AttendantType
   otherAttendantAtBirth: String
@@ -248,6 +249,7 @@ type DeathRegistration implements EventRegistration {
   father: Person
   spouse: Person
   eventLocation: Location
+  questionnaire: [QuestionnaireQuestion]
   mannerOfDeath: MannerOfDeath
   causeOfDeathMethod: CauseOfDeathMethodType
   causeOfDeath: String
@@ -456,6 +458,7 @@ input BirthRegistrationInput {
   informant: RelatedPersonInput
   eventLocation: LocationInput
   birthType: BirthType
+  questionnaire: [QuestionnaireQuestionInput]
   weightAtBirth: Float
   attendantAtBirth: AttendantType
   otherAttendantAtBirth: String
@@ -484,6 +487,7 @@ input DeathRegistrationInput {
   father: PersonInput
   spouse: PersonInput
   eventLocation: LocationInput
+  questionnaire: [QuestionnaireQuestionInput]
   mannerOfDeath: MannerOfDeath
   causeOfDeathMethod: CauseOfDeathMethodType
   causeOfDeath: String
@@ -554,7 +558,6 @@ type Registration {
   trackingId: String
   registrationNumber: String
   paperFormID: String
-  questionnaire: [QuestionnaireQuestion]
   page: String
   book: String
   contact: String
@@ -583,6 +586,11 @@ enum BirthType {
   TRIPLET
   QUADRUPLET
   HIGHER_MULTIPLE_DELIVERY
+}
+
+type QuestionnaireQuestion {
+  fieldId: String
+  value: String
 }
 
 enum AttendantType {
@@ -906,7 +914,6 @@ input RegistrationInput {
   status: [RegWorkflowInput]
   type: RegistrationType
   inCompleteFields: String
-  questionnaire: [QuestionnaireQuestionInput]
   attachments: [AttachmentInput]
   certificates: [CertificateInput]
   location: LocationInput
@@ -920,6 +927,11 @@ input RelatedPersonInput {
   otherRelationship: String
   affidavit: [AttachmentInput]
   individual: PersonInput
+}
+
+input QuestionnaireQuestionInput {
+  fieldId: String
+  value: String
 }
 
 input PrimaryCaregiverInput {
@@ -968,11 +980,6 @@ input MesssageDescriptorInput {
   id: String
   description: String
   defaultMessage: String
-}
-
-type QuestionnaireQuestion {
-  fieldName: String
-  value: String
 }
 
 type RegWorkflow {
@@ -1277,11 +1284,6 @@ input RegWorkflowInput {
   comments: [CommentInput]
   location: LocationInput
   timeLoggedMS: Int
-}
-
-input QuestionnaireQuestionInput {
-  fieldName: String
-  value: String
 }
 
 input CertificateInput {

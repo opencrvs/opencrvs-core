@@ -257,7 +257,7 @@ export interface FieldValueMap {
 }
 
 export interface IQuestionnaireQuestion {
-  fieldName: string
+  fieldId: string
   value: string
 }
 export interface IQuestionnaire {
@@ -462,6 +462,7 @@ export interface IFormFieldBase {
   }
   ignoreFieldLabelOnErrorMessage?: boolean
   ignoreBottomMargin?: boolean
+  customQuesstionMappingId?: string
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {

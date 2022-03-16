@@ -331,6 +331,6 @@ export function createQuestionnaireResponseTemplate(refUuid: string) {
     resource: {
       resourceType: 'QuestionnaireResponse',
       status: 'completed'
-    }
+    } as fhir.QuestionnaireResponse
   }
 }

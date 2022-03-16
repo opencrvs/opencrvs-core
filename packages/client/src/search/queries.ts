@@ -34,7 +34,6 @@ export const SEARCH_EVENTS = gql`
         type
         registration {
           status
-          questionnaire
           contactNumber
           trackingId
           registrationNumber

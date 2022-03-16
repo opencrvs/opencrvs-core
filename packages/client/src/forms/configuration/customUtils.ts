@@ -79,6 +79,7 @@ export function createCustomField(
 ): SerializedFormField {
   const baseField: SerializedFormField = {
     name: question.fieldName as string,
+    customQuesstionMappingId: question.fieldId,
     custom: true,
     type: question.fieldType as QuestionConfigFieldType,
     label: question.label as MessageDescriptor,

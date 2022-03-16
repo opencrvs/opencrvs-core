@@ -153,7 +153,6 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           contentType
           subject
         }
-        questionnaire
         status {
           comments {
             comment
@@ -178,6 +177,10 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           postalCode
           country
         }
+      }
+      questionnaire {
+        fieldId
+        value
       }
       presentAtBirthRegistration
       history {
@@ -367,7 +370,6 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         id
         contact
         contactPhoneNumber
-        questionnaire
         status {
           comments {
             comment
@@ -393,6 +395,10 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
       attendantAtBirth
       weightAtBirth
       birthType
+      questionnaire {
+        fieldId
+        value
+      }
       eventLocation {
         type
         address {
