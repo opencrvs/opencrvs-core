@@ -619,6 +619,7 @@ type History {
   comments: [Comment]
   input: [InputOutput]
   output: [InputOutput]
+  certificates: [Certificate]
 }
 
 enum MannerOfDeath {
