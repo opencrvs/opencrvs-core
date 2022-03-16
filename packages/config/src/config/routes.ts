@@ -26,6 +26,7 @@ import createQuestionHandler, {
 import updateQuestionHandler, {
   requestSchema as updateQuestionReqSchema
 } from '@config/handlers/updateQuestion/handler'
+import getQuestionsHandler from '@config/handlers/getQuestions/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -173,6 +174,18 @@ export default function getRoutes() {
         },
         validate: {
           payload: updateQuestionReqSchema
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/questions',
+      handler: getQuestionsHandler,
+      config: {
+        tags: ['api'],
+        description: 'Get question',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
         }
       }
     }
