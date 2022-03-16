@@ -20457,7 +20457,7 @@ react-element-to-jsx-string@^14.3.1:
     is-plain-object "5.0.0"
     react-is "17.0.2"
 
-react-error-overlay@^6.0.9:
+react-error-overlay@6.0.9, react-error-overlay@^6.0.9:
   version "6.0.9"
   resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-6.0.9.tgz#3c743010c9359608c375ecd6bc76f35d93995b0a"
   integrity sha512-nQTTcUu+ATDbrSD1BZHr5kgSD4oF8OFjxun8uAaL8RwPBacGBNPf/yAuVVdx17N8XNzRDMrZ9XcKZHCjPW+9ew==
@@ -20540,11 +20540,6 @@ react-lifecycles-compat@^3.0.4:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
   integrity sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==
-
-react-moment@^0.8.4:
-  version "0.8.4"
-  resolved "https://registry.yarnpkg.com/react-moment/-/react-moment-0.8.4.tgz#18eb59e1541c8b216353e23c21e9db50e42e2edb"
-  integrity sha512-QhI19OcfhiAn60/O6bMR0w8ApXrPFCjv6+eV0I/P9/AswzjgEAx4L7VxMBCpS/jrythLa12Q9v88req+ys4YpA==
 
 react-page-visibility@^3.2.1:
   version "3.3.0"
@@ -24287,7 +24282,7 @@ undefsafe@^2.0.2, undefsafe@^2.0.5:
   resolved "https://registry.yarnpkg.com/undefsafe/-/undefsafe-2.0.5.tgz#38733b9327bdcd226db889fb723a6efd162e6e2c"
   integrity sha512-WxONCrssBM8TSPRqN5EmsjVrsv4A8X12J4ArBiiayv3DyyG3ZlIg6yysuuSYdZsVz3TKcTg2fd//Ujd4CHV1iA==
 
-underscore@>1.4.4:
+underscore@>1.12.1, underscore@>1.4.4:
   version "1.13.2"
   resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.13.2.tgz#276cea1e8b9722a8dbed0100a407dda572125881"
   integrity sha512-ekY1NhRzq0B08g4bGuX4wd2jZx5GnKz6mKSqFL4nqBlfyMGiG10gDFhDTMEfYmDL6Jy0FUIZp7wiRB+0BP7J2g==
