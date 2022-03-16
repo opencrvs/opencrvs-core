@@ -199,6 +199,25 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           valueId
           valueString
         }
+        certificates {
+          hasShowedVerifiedDocument
+          collector {
+            relationship
+            otherRelationship
+            individual {
+              name {
+                use
+                firstNames
+                familyName
+              }
+              telecom {
+                system
+                value
+                use
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -400,6 +419,25 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
           valueCode
           valueId
           valueString
+        }
+        certificates {
+          hasShowedVerifiedDocument
+          collector {
+            relationship
+            otherRelationship
+            individual {
+              name {
+                use
+                firstNames
+                familyName
+              }
+              telecom {
+                system
+                value
+                use
+              }
+            }
+          }
         }
       }
     }

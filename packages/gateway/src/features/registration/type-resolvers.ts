@@ -16,7 +16,8 @@ import {
   getTimeLoggedFromMetrics,
   getStatusFromTask,
   ITimeLoggedResponse,
-  getDownloadedExtensionStatus
+  getCertificatesFromTask,
+  getActionFromTask
 } from '@gateway/features/fhir/utils'
 import {
   MOTHER_CODE,
@@ -38,7 +39,6 @@ import {
   MANNER_OF_DEATH_CODE,
   CAUSE_OF_DEATH_CODE,
   CAUSE_OF_DEATH_METHOD_CODE,
-  CERTIFICATE_DOCS_CODE,
   PRIMARY_CAREGIVER_CODE,
   REASON_MOTHER_NOT_APPLYING,
   REASON_FATHER_NOT_APPLYING,
@@ -49,7 +49,11 @@ import {
   MALE_DEPENDENTS_ON_DECEASED_CODE,
   FEMALE_DEPENDENTS_ON_DECEASED_CODE
 } from '@gateway/features/fhir/templates'
-import { GQLQuestionnaireQuestion, GQLResolver } from '@gateway/graphql/schema'
+import {
+  GQLQuestionnaireQuestion,
+  GQLRegStatus,
+  GQLResolver
+} from '@gateway/graphql/schema'
 import {
   ORIGINAL_FILE_NAME_SYSTEM,
   SYSTEM_FILE_NAME_SYSTEM,
@@ -410,42 +414,8 @@ export const typeResolvers: GQLResolver = {
         })
       )
     },
-    certificates: async (task, _, authHeader) => {
-      if (!task.focus) {
-        throw new Error(
-          'Task resource does not have a focus property necessary to lookup the composition'
-        )
-      }
-
-      const compositionBundle = await fetchFHIR(
-        `/${task.focus.reference}/_history`,
-        authHeader
-      )
-
-      if (!compositionBundle || !compositionBundle.entry) {
-        return null
-      }
-
-      return compositionBundle.entry.map(
-        async (compositionEntry: fhir.BundleEntry) => {
-          const certSection = findCompositionSection(
-            CERTIFICATE_DOCS_CODE,
-            compositionEntry.resource as ITemplatedComposition
-          )
-          if (
-            !certSection ||
-            !certSection.entry ||
-            !(certSection.entry.length > 0)
-          ) {
-            return null
-          }
-          return await fetchFHIR(
-            `/${certSection.entry[0].reference}`,
-            authHeader
-          )
-        }
-      )
-    }
+    certificates: async (task, _, authHeader) =>
+      await getCertificatesFromTask(task, _, authHeader)
   },
   RegWorkflow: {
     type: (task: fhir.Task) => {
@@ -766,14 +736,7 @@ export const typeResolvers: GQLResolver = {
   },
 
   History: {
-    action: async (task: fhir.Task) => {
-      const businessStatus = getStatusFromTask(task)
-      const extensionStatusWhileDownloaded = getDownloadedExtensionStatus(task)
-      if (businessStatus === extensionStatusWhileDownloaded) {
-        return 'DOWNLOADED'
-      }
-      return businessStatus
-    },
+    action: async (task) => getActionFromTask(task),
     reinstated: (task: fhir.Task) => {
       const extension =
         task.extension &&
@@ -827,9 +790,15 @@ export const typeResolvers: GQLResolver = {
         authHeader
       )
     },
-    comments: (task: fhir.Task) => task.note || [],
-    input: (task: fhir.Task) => task.input || [],
-    output: (task: fhir.Task) => task.output || []
+    comments: (task) => task.note || [],
+    input: (task) => task.input || [],
+    output: (task) => task.output || [],
+    certificates: async (task, _, authHeader) => {
+      if (getActionFromTask(task) !== GQLRegStatus.CERTIFIED) {
+        return null
+      }
+      return await getCertificatesFromTask(task, _, authHeader)
+    }
   },
 
   DeathRegistration: {

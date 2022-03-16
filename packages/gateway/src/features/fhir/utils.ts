@@ -70,7 +70,8 @@ import {
   GQLEstimatedTargetDayMetrics,
   GQLMonthWiseTargetDayEstimation,
   GQLLocationWiseTargetDayEstimation,
-  GQLEventInTargetDayEstimationCount
+  GQLEventInTargetDayEstimationCount,
+  GQLRegStatus
 } from '@gateway/graphql/schema'
 import { reduce } from 'lodash'
 
@@ -939,7 +940,51 @@ export function getDownloadedExtensionStatus(task: fhir.Task) {
     task.extension && findExtension(DOWNLOADED_EXTENSION_URL, task.extension)
   return extension?.valueString
 }
+export async function getCertificatesFromTask(
+  task: fhir.Task,
+  _: any,
+  authHeader: IAuthHeader
+) {
+  if (!task.focus) {
+    throw new Error(
+      'Task resource does not have a focus property necessary to lookup the composition'
+    )
+  }
 
+  const compositionBundle = await fetchFHIR(
+    `/${task.focus.reference}/_history`,
+    authHeader
+  )
+
+  if (!compositionBundle || !compositionBundle.entry) {
+    return null
+  }
+
+  return compositionBundle.entry.map(
+    async (compositionEntry: fhir.BundleEntry) => {
+      const certSection = findCompositionSection(
+        CERTIFICATE_DOCS_CODE,
+        compositionEntry.resource as ITemplatedComposition
+      )
+      if (
+        !certSection ||
+        !certSection.entry ||
+        !(certSection.entry.length > 0)
+      ) {
+        return null
+      }
+      return await fetchFHIR(`/${certSection.entry[0].reference}`, authHeader)
+    }
+  )
+}
+export function getActionFromTask(task: fhir.Task) {
+  const businessStatus = getStatusFromTask(task)
+  const extensionStatusWhileDownloaded = getDownloadedExtensionStatus(task)
+  if (businessStatus === extensionStatusWhileDownloaded) {
+    return GQLRegStatus.DOWNLOADED
+  }
+  return businessStatus
+}
 export function getStatusFromTask(task: fhir.Task) {
   const statusType = task.businessStatus?.coding?.find(
     (coding: fhir.Coding) =>
