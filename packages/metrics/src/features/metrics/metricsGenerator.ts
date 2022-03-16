@@ -29,8 +29,7 @@ import {
 } from '@metrics/features/metrics/utils'
 import { IAuthHeader } from '@metrics/features/registration'
 import { query } from '@metrics/influxdb/client'
-import * as moment from 'moment'
-
+import { format } from 'date-fns'
 interface IGroupedByGender {
   total: number
   gender: string
@@ -367,7 +366,7 @@ export const regWithinTargetDays = async (
   return (
     (points &&
       points.map((point: IPoint) => ({
-        label: moment(point.time).format(label),
+        label: format(new Date(point.time), label),
         value: point.count,
         totalEstimate: total.count
       }))) ||
