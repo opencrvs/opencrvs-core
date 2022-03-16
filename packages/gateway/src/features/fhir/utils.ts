@@ -800,7 +800,7 @@ export function selectOrCreateQuestionnaireResource(
   fhirBundle: ITemplatedBundle,
   context: any
 ): fhir.QuestionnaireResponse {
-  let questionnaire = fhirBundle.entry.find((entry) => {
+  const questionnaire = fhirBundle.entry.find((entry) => {
     if (
       !entry ||
       !entry.resource ||

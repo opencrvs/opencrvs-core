@@ -27,7 +27,7 @@ import {
   identityNameMapper,
   identityTypeMapper
 } from '@client/forms/identity'
-import { conditionals } from '@client/forms/configuration/default'
+import { conditionals } from '@client/forms/utils'
 import { formMessages } from '@client/i18n/messages'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { validIDNumber } from '@client/utils/validate'

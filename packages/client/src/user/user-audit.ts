@@ -12,7 +12,7 @@
 import { IFormField, RADIO_GROUP, TEXTAREA } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/sysAdmin'
 import { RadioSize } from '@opencrvs/components/lib/forms'
-import { conditionals } from '@client/forms/configuration/default'
+import { conditionals } from '@client/forms/utils'
 
 export interface IUserAuditForm {
   fields: IFormField[]
