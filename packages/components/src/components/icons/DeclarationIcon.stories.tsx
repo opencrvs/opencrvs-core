@@ -21,6 +21,7 @@ export default {
 interface IProps {
   color?: string
   isArchive?: boolean
+  isValidated?: boolean
 }
 
 const Template: Story<IProps> = (args) => <DeclarationIcon {...args} />
@@ -29,5 +30,6 @@ export const DeclarationIconExample = Template.bind({})
 
 DeclarationIconExample.args = {
   isArchive: true,
+  isValidated: false,
   color: 'purple'
 }
