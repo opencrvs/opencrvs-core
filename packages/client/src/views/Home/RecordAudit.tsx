@@ -198,10 +198,6 @@ const LargeGreyedInfo = styled.div`
   margin: 15px 0px;
 `
 
-const CPrimaryButton = styled(PrimaryButton)`
-  height: 40px;
-`
-
 const DesktopDiv = styled.div`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
@@ -678,7 +674,7 @@ const showReviewButton = ({
 
   if (reviewButtonRoleStatusMap[role].includes(declaration?.status as string))
     return (
-      <CPrimaryButton
+      <PrimaryButton
         key={id}
         id={`review-btn-${id}`}
         onClick={() => {
@@ -687,7 +683,7 @@ const showReviewButton = ({
         }}
       >
         {intl.formatMessage(constantsMessages.review)}
-      </CPrimaryButton>
+      </PrimaryButton>
     )
   return <></>
 }
@@ -738,7 +734,7 @@ const showUpdateButton = ({
       PAGE_ID = 'review'
     }
     return (
-      <CPrimaryButton
+      <PrimaryButton
         key={id}
         id={`update-application-${id}`}
         onClick={() => {
@@ -746,7 +742,7 @@ const showUpdateButton = ({
         }}
       >
         {intl.formatMessage(buttonMessages.update)}
-      </CPrimaryButton>
+      </PrimaryButton>
     )
   }
 
@@ -823,7 +819,7 @@ const showPrintButton = ({
     printButtonRoleStatusMap[role].includes(declaration?.status as string)
   )
     return (
-      <CPrimaryButton
+      <PrimaryButton
         key={id}
         id={`print-${id}`}
         onClick={() => {
@@ -832,7 +828,7 @@ const showPrintButton = ({
         }}
       >
         {intl.formatMessage(buttonMessages.print)}
-      </CPrimaryButton>
+      </PrimaryButton>
     )
   return <></>
 }
