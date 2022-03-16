@@ -189,8 +189,8 @@ class ReviewTabComponent extends React.Component<
               moment(reg.dateOfEvent.toString(), 'YYYY-MM-DD')
             )) ||
           '',
-        declarationTimeElapsed:
-          (reg.createdAt && formattedDuration(moment(reg.createdAt))) || '',
+        // declarationTimeElapsed:
+        //   (reg.createdAt && formattedDuration(moment(reg.createdAt))) || '',
         actions,
         icon,
         rowClickHandler: [

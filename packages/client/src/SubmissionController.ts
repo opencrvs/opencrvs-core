@@ -269,10 +269,6 @@ export class SubmissionController {
         declaration,
         this.store.getState().profile.userDetails
       )
-      if (!declaration.operationHistories) {
-        declaration.operationHistories = []
-      }
-      declaration.operationHistories.push(taskHistory)
     }
     //It needs some times to elasticSearch to update index
     setTimeout(async () => {

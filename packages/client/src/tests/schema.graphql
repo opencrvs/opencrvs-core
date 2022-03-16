@@ -792,7 +792,7 @@ interface EventSearchSet {
   id: ID!
   type: String
   registration: RegistrationSearchSet
-  operationHistories: [OperationHistorySearchSet]
+  # operationHistories: [OperationHistorySearchSet]
 }
 
 type EventProgressSet {
@@ -1117,7 +1117,7 @@ type BirthEventSearchSet implements EventSearchSet {
   childName: [HumanName]
   dateOfBirth: Date
   registration: RegistrationSearchSet
-  operationHistories: [OperationHistorySearchSet]
+  # operationHistories: [OperationHistorySearchSet]
 }
 
 type DeathEventSearchSet implements EventSearchSet {
@@ -1126,7 +1126,7 @@ type DeathEventSearchSet implements EventSearchSet {
   deceasedName: [HumanName]
   dateOfDeath: Date
   registration: RegistrationSearchSet
-  operationHistories: [OperationHistorySearchSet]
+  # operationHistories: [OperationHistorySearchSet]
 }
 
 type EventProgressData {

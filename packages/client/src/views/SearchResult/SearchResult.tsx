@@ -424,8 +424,8 @@ export class SearchResultView extends React.Component<
               )
             )) ||
           '',
-        startedAt:
-          (reg.createdAt && formattedDuration(moment(reg.createdAt))) || '',
+        // startedAt:
+        //   (reg.createdAt && formattedDuration(moment(reg.createdAt))) || '',
         icon,
         actions,
         rowClickHandler: [
