@@ -130,6 +130,7 @@ import { IRegisterFormState } from '@client/forms/register/reducer'
 import { goBack } from 'connected-react-router'
 import { getFieldValue } from './utils'
 import { CollectorRelationLabelArray } from '@client/forms/correction/corrector'
+import { formatLongDate } from '@client/utils/date-formatting'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -197,9 +198,8 @@ const LargeGreyedInfo = styled.div`
   margin: 15px 0px;
 `
 
-const ReviewButton = styled(PrimaryButton)`
+const CPrimaryButton = styled(PrimaryButton)`
   height: 40px;
-  border-radius: 4px;
 `
 
 const DesktopDiv = styled.div`
@@ -678,7 +678,7 @@ const showReviewButton = ({
 
   if (reviewButtonRoleStatusMap[role].includes(declaration?.status as string))
     return (
-      <ReviewButton
+      <CPrimaryButton
         key={id}
         id={`review-btn-${id}`}
         onClick={() => {
@@ -687,7 +687,7 @@ const showReviewButton = ({
         }}
       >
         {intl.formatMessage(constantsMessages.review)}
-      </ReviewButton>
+      </CPrimaryButton>
     )
   return <></>
 }
@@ -708,7 +708,7 @@ const showUpdateButton = ({
   if (!userDetails || !userDetails.role || !type || !isDownloaded) return <></>
   const { role } = userDetails
 
-  const reviewButtonRoleStatusMap: { [key: string]: string[] } = {
+  const updateButtonRoleStatusMap: { [key: string]: string[] } = {
     FIELD_AGENT: [SUBMISSION_STATUS.DRAFT],
     REGISTRATION_AGENT: [
       SUBMISSION_STATUS.DRAFT,
@@ -723,7 +723,7 @@ const showUpdateButton = ({
     LOCAL_REGISTRAR: [SUBMISSION_STATUS.DRAFT, EVENT_STATUS.REJECTED]
   }
 
-  if (reviewButtonRoleStatusMap[role].includes(declaration?.status as string)) {
+  if (updateButtonRoleStatusMap[role].includes(declaration?.status as string)) {
     let PAGE_ROUTE: string, PAGE_ID: string
 
     if (declaration?.status === SUBMISSION_STATUS.DRAFT) {
@@ -738,7 +738,7 @@ const showUpdateButton = ({
       PAGE_ID = 'review'
     }
     return (
-      <ReviewButton
+      <CPrimaryButton
         key={id}
         id={`update-application-${id}`}
         onClick={() => {
@@ -746,7 +746,7 @@ const showUpdateButton = ({
         }}
       >
         {intl.formatMessage(buttonMessages.update)}
-      </ReviewButton>
+      </CPrimaryButton>
     )
   }
 
@@ -760,7 +760,7 @@ const showDownloadButton = (
 ) => {
   const { id, type } = declaration || {}
 
-  if (declaration == null || id == null || type == null) return <></>
+  if (declaration === null || id === null || type === null) return <></>
 
   const downloadStatus = draft?.downloadStatus || undefined
 
@@ -774,7 +774,7 @@ const showDownloadButton = (
     downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
   ) {
     const downLoadConfig = {
-      event: type,
+      event: type as string,
       compositionId: id,
       action: Action.LOAD_REVIEW_DECLARATION
     }
@@ -806,7 +806,7 @@ const showPrintButton = ({
   if (!userDetails || !userDetails.role || !type || !isDownloaded) return <></>
   const { role } = userDetails
 
-  const reviewButtonRoleStatusMap: { [key: string]: string[] } = {
+  const printButtonRoleStatusMap: { [key: string]: string[] } = {
     REGISTRATION_AGENT: [
       SUBMISSION_STATUS.REGISTERED,
       SUBMISSION_STATUS.CERTIFIED
@@ -819,11 +819,11 @@ const showPrintButton = ({
   }
 
   if (
-    role in reviewButtonRoleStatusMap &&
-    reviewButtonRoleStatusMap[role].includes(declaration?.status as string)
+    role in printButtonRoleStatusMap &&
+    printButtonRoleStatusMap[role].includes(declaration?.status as string)
   )
     return (
-      <ReviewButton
+      <CPrimaryButton
         key={id}
         id={`print-${id}`}
         onClick={() => {
@@ -832,7 +832,7 @@ const showPrintButton = ({
         }}
       >
         {intl.formatMessage(buttonMessages.print)}
-      </ReviewButton>
+      </CPrimaryButton>
     )
   return <></>
 }
@@ -889,12 +889,10 @@ const getLink = (status: string, onClick: () => void) => {
 }
 
 const getFormattedDate = (date: Date) => {
-  const momentDate = moment(date)
-  return (
-    <>
-      {momentDate.format('MMMM DD, YYYY')} &middot;{' '}
-      {momentDate.format('hh.mm A')}
-    </>
+  return formatLongDate(
+    date.toLocaleString(),
+    window.config.LANGUAGES,
+    'MMMM DD, YYYY · hh.mm A'
   )
 }
 
@@ -993,7 +991,7 @@ const ActionDetailsModalListTable = (
   offlineData: Partial<IOfflineData>
 ) => {
   const [currentPage, setCurrentPage] = React.useState(1)
-  if (registerForm == undefined) return []
+  if (registerForm === undefined) return []
 
   const sections = registerForm?.sections || []
   const commentsColumn = [
@@ -1037,12 +1035,12 @@ const ActionDetailsModalListTable = (
     const result: IDynamicValues[] = []
     actionDetailsData.input.forEach((item: { [key: string]: any }) => {
       const editedValue = actionDetailsData.output.find(
-        (oi: { valueId: string }) => oi.valueId == item.valueId
+        (oi: { valueId: string }) => oi.valueId === item.valueId
       )
 
       const section = find(
         sections,
-        (section) => section.id == item.valueCode
+        (section) => section.id === item.valueCode
       ) as IFormSection
 
       const indexes: string[] = item.valueId.split('.')
@@ -1054,10 +1052,10 @@ const ActionDetailsModalListTable = (
           section.groups.map((group) => {
             return group.fields
           })
-        ).find((field) => field.name == parentField)
+        ).find((field) => field.name === parentField)
 
         const fieldObj = flatten(values(nestedFields?.nestedFields)).find(
-          (field) => field.name == nestedField
+          (field) => field.name === nestedField
         ) as IFormField
 
         result.push({
@@ -1082,7 +1080,7 @@ const ActionDetailsModalListTable = (
           section.groups.map((group) => {
             return group.fields
           })
-        ).find((field) => field.name == parentField) as IFormField
+        ).find((field) => field.name === parentField) as IFormField
 
         result.push({
           item: intl.formatMessage(fieldObj.label) || 'Not Found',
