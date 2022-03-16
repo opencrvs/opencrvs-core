@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import User from '@user-mgnt/model/user'
-import { createServer } from '@user-mgnt/index'
+import { createServer } from '@user-mgnt/server'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 
@@ -114,9 +114,9 @@ describe('searchUsers tests', () => {
     User.find = jest.fn().mockReturnValue(dummyUserList)
     User.find().skip = jest.fn().mockReturnValue(dummyUserList)
     User.find().skip(0).limit = jest.fn().mockReturnValue(dummyUserList)
-    User.find()
-      .skip(0)
-      .limit(10).sort = jest.fn().mockReturnValue(dummyUserList)
+    User.find().skip(0).limit(10).sort = jest
+      .fn()
+      .mockReturnValue(dummyUserList)
     User.find().count = jest.fn().mockReturnValue(dummyUserList.length)
 
     const res = await server.server.inject({
@@ -136,9 +136,9 @@ describe('searchUsers tests', () => {
     User.find = jest.fn().mockReturnValue(filteredUserList)
     User.find().skip = jest.fn().mockReturnValue(filteredUserList)
     User.find().skip(0).limit = jest.fn().mockReturnValue(filteredUserList)
-    User.find()
-      .skip(0)
-      .limit(10).sort = jest.fn().mockReturnValue(filteredUserList)
+    User.find().skip(0).limit(10).sort = jest
+      .fn()
+      .mockReturnValue(filteredUserList)
     User.find().count = jest.fn().mockReturnValue(filteredUserList.length)
 
     const res = await server.server.inject({

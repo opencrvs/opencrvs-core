@@ -11,7 +11,7 @@
  */
 import * as fetchAny from 'jest-fetch-mock'
 import { createServerWithEnvironment } from '@auth/tests/util'
-import { createServer } from '@auth/index'
+import { createServer } from '@auth/server'
 
 const fetch = fetchAny as fetchAny.FetchMock
 describe('authenticate handler receives a request', () => {

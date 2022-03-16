@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createServer } from '@auth/index'
+import { createServer } from '@auth/server'
 import * as codeService from '@auth/features/verifyCode/service'
 import * as retrievalService from '@auth/features/retrievalSteps/verifyUser/service'
 import * as fetchAny from 'jest-fetch-mock'
