@@ -9,18 +9,71 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+
+import { countries as countryList, lookup } from 'country-data'
+import { orderBy, uniqBy, omit } from 'lodash'
 import { IntlShape } from 'react-intl'
 import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
 import { messages } from '@client/i18n/messages/views/config'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { IFullProps, State } from '@client/views/SysAdmin/Config/DynamicModal'
+import {
+  ICurrency,
+  IFullProps,
+  State
+} from '@client/views/SysAdmin/Config/DynamicModal'
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/mutations'
+
+interface ICurrencyOptions {
+  [key: string]: string
+}
+
+type ICountrylist = {
+  alpha2: string
+  alpha3: string
+  countryCallingCodes: string[]
+  currencies: string[]
+  emoji: string
+  ioc: string
+  languages: string[]
+  name: string
+  status: string
+}
+
+export const getCurrencyObject = (value: string) => {
+  const arr = value.split('-')
+  return {
+    isoCode: arr.pop(),
+    languagesAndCountry: [arr.join('-')]
+  }
+}
+
+export const getCurrencySelectOptions = () => {
+  const currencyOptions = [] as ICurrencyOptions[]
+  countryList.all.map((element: ICountrylist) => {
+    const countryLanguage = lookup.languages({
+      alpha3: element.languages[0]
+    })
+    const countryCurrency = lookup.currencies({
+      code: element.currencies[0]
+    })
+
+    if (Boolean(element.currencies.length) && Boolean(countryLanguage[0])) {
+      currencyOptions.push({
+        value: `${countryLanguage[0].alpha2}-${element.alpha2}-${element.currencies[0]}`,
+        label: countryCurrency[0].name
+      })
+    }
+  })
+  const uniqCurrencyOptions = uniqBy(currencyOptions, 'label')
+  const sortedCountryOptions = orderBy(uniqCurrencyOptions, ['label'], ['asc'])
+  return sortedCountryOptions
+}
 
 export const getTitle = (intl: IntlShape, changeModalName: string) => {
   if (changeModalName === GeneralActionId.APPLICATION_NAME)
     return intl.formatMessage(messages.applicationNameLabel)
-  else if (changeModalName === GeneralActionId.GOVT_LOGO)
-    return intl.formatMessage(messages.govermentLogoLabel)
+  else if (changeModalName === GeneralActionId.CURRENCY)
+    return intl.formatMessage(messages.currencyLable)
   else return EMPTY_STRING
 }
 
@@ -29,6 +82,8 @@ export const getMessage = (intl: IntlShape, changeModalName: string) => {
     return intl.formatMessage(messages.applicationNameChangeMessage)
   else if (changeModalName === GeneralActionId.GOVT_LOGO)
     return intl.formatMessage(messages.govtLogoChangeMessage)
+  else if (changeModalName === GeneralActionId.CURRENCY)
+    return intl.formatMessage(messages.applicationCurrencyChangeMessage)
   else return EMPTY_STRING
 }
 
@@ -40,6 +95,8 @@ export const isApplyButtonDisabled = (
     return !Boolean(state.applicationName)
   } else if (changeModalName === GeneralActionId.GOVT_LOGO) {
     return !Boolean(state.govtLogo)
+  } else if (changeModalName === GeneralActionId.CURRENCY) {
+    return !Boolean(state.currency)
   } else return true
 }
 
@@ -106,5 +163,32 @@ export async function callUpdateGovtLogoMutation(
     }
   } catch (err) {
     setError(props.intl.formatMessage(messages.govtLogoChangeError))
+  }
+}
+
+export async function callUpdateApplicationCurrencyMutation(
+  currency: ICurrency,
+  props: IFullProps,
+  updatingValue: (value: boolean) => void,
+  setError: (errorMessage: string) => void
+) {
+  try {
+    const res = await configApplicationMutations.mutateApplicationConfig({
+      CURRENCY: currency
+    })
+    if (res && res.data) {
+      updatingValue(false)
+      const CURRENCY = res.data.updateApplicationConfig.CURRENCY
+      omit(CURRENCY, ['__typename'])
+      const offlineConfig = {
+        config: {
+          ...props.offlineCountryConfiguration.config,
+          CURRENCY
+        }
+      }
+      props.updateConfig(offlineConfig)
+    }
+  } catch (err) {
+    setError(props.intl.formatMessage(messages.applicationConfigChangeError))
   }
 }

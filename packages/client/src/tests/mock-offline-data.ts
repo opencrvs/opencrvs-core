@@ -341,6 +341,10 @@ export const mockOfflineData = {
       fileName: 'logo.png',
       file: `data:image;base64,${validImageB64String}`
     },
+    CURRENCY: {
+      isoCode: 'ZMW',
+      languagesAndCountry: ['en-ZM']
+    },
     PHONE_NUMBER_PATTERN: {
       pattern: /^01[1-9][0-9]{8}$/,
       example: '01741234567',

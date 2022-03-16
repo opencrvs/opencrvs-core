@@ -20,6 +20,10 @@ interface Window {
       fileName: string
       file: string
     }
+    CURRENCY: {
+      isoCode: string
+      languagesAndCountry: string[]
+    }
     COUNTRY_LOGO_RENDER_WIDTH: number // in px
     COUNTRY_LOGO_RENDER_HEIGHT: number // in px
     DESKTOP_TIME_OUT_MILLISECONDS: number

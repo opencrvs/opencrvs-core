@@ -15,11 +15,11 @@ interface IConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   applicationTitle: MessageDescriptor
   applicationNameChangeMessage: MessageDescriptor
-  applicationNameChangeError: MessageDescriptor
   govtLogoChangeMessage: MessageDescriptor
   govtLogoChangeNotification: MessageDescriptor
   govtLogoChangeError: MessageDescriptor
   govtLogoFileLimitError: MessageDescriptor
+  applicationConfigChangeError: MessageDescriptor
   certificateConfiguration: MessageDescriptor
   previewTemplate: MessageDescriptor
   printTemplate: MessageDescriptor
@@ -37,6 +37,8 @@ interface IConfigMessages
   applicationNameLabel: MessageDescriptor
   govermentLogoLabel: MessageDescriptor
   currencyLable: MessageDescriptor
+  applicationCurrencyChangeNotification: MessageDescriptor
+  applicationCurrencyChangeMessage: MessageDescriptor
   phoneNumberLabel: MessageDescriptor
   uniqueIdentificationNumberLabel: MessageDescriptor
   legallySpecifiedLabel: MessageDescriptor
@@ -66,10 +68,10 @@ const messagesToDefine: IConfigMessages = {
     defaultMessage: 'Name of application updated',
     description: 'Message for application name change notification'
   },
-  applicationNameChangeError: {
-    id: 'config.application.nameChangeError',
+  applicationConfigChangeError: {
+    id: 'config.application.configChangeError',
     defaultMessage: 'Unable to make change. Please try again',
-    description: 'Error message for application name change'
+    description: 'Error message for application config change'
   },
   govtLogoChangeMessage: {
     id: 'config.application.govtLogoChangeMessage',
@@ -214,6 +216,16 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.currencyLable',
     defaultMessage: 'Currency',
     description: 'Currency config label'
+  },
+  applicationCurrencyChangeNotification: {
+    id: 'config.application.currencyChangeNotification',
+    defaultMessage: 'Currency updated',
+    description: 'Message for application currency change notification'
+  },
+  applicationCurrencyChangeMessage: {
+    id: 'config.application.currencyChangeMessage',
+    defaultMessage: 'Select your currency for your CRVS system',
+    description: 'Message for application currency change modal'
   },
   phoneNumberLabel: {
     id: 'config.application.phoneNumberLabel',

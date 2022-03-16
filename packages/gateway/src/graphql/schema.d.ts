@@ -418,6 +418,7 @@ export interface GQLApplicationConfiguration {
   BACKGROUND_SYNC_BROADCAST_CHANNEL?: string
   COUNTRY?: string
   COUNTRY_LOGO?: GQLCountryLogo
+  CURRENCY?: GQLCurrency
   COUNTRY_LOGO_RENDER_WIDTH?: number
   COUNTRY_LOGO_RENDER_HEIGHT?: number
   DESKTOP_TIME_OUT_MILLISECONDS?: number
@@ -445,6 +446,7 @@ export interface GQLApplicationConfigurationInput {
   BACKGROUND_SYNC_BROADCAST_CHANNEL?: string
   COUNTRY?: string
   COUNTRY_LOGO?: GQLCountryLogoInput
+  CURRENCY?: GQLCurrencyInput
   COUNTRY_LOGO_RENDER_WIDTH?: number
   COUNTRY_LOGO_RENDER_HEIGHT?: number
   DESKTOP_TIME_OUT_MILLISECONDS?: number
@@ -890,6 +892,11 @@ export interface GQLCountryLogo {
   file?: string
 }
 
+export interface GQLCurrency {
+  isoCode?: string
+  languagesAndCountry?: Array<string | null>
+}
+
 export interface GQLPhoneNumberPattern {
   pattern?: string
   example?: string
@@ -907,6 +914,11 @@ export interface GQLNIDNumberPattern {
 export interface GQLCountryLogoInput {
   fileName?: string
   file?: string
+}
+
+export interface GQLCurrencyInput {
+  isoCode?: string
+  languagesAndCountry?: Array<string | null>
 }
 
 export interface GQLPhoneNumberPatternInput {
@@ -1401,6 +1413,7 @@ export interface GQLResolver {
   EventProgressSet?: GQLEventProgressSetTypeResolver
   MesssageDescriptor?: GQLMesssageDescriptorTypeResolver
   CountryLogo?: GQLCountryLogoTypeResolver
+  Currency?: GQLCurrencyTypeResolver
   PhoneNumberPattern?: GQLPhoneNumberPatternTypeResolver
   NIDNumberPattern?: GQLNIDNumberPatternTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
@@ -3521,6 +3534,7 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   BACKGROUND_SYNC_BROADCAST_CHANNEL?: ApplicationConfigurationToBACKGROUND_SYNC_BROADCAST_CHANNELResolver<TParent>
   COUNTRY?: ApplicationConfigurationToCOUNTRYResolver<TParent>
   COUNTRY_LOGO?: ApplicationConfigurationToCOUNTRY_LOGOResolver<TParent>
+  CURRENCY?: ApplicationConfigurationToCURRENCYResolver<TParent>
   COUNTRY_LOGO_RENDER_WIDTH?: ApplicationConfigurationToCOUNTRY_LOGO_RENDER_WIDTHResolver<TParent>
   COUNTRY_LOGO_RENDER_HEIGHT?: ApplicationConfigurationToCOUNTRY_LOGO_RENDER_HEIGHTResolver<TParent>
   DESKTOP_TIME_OUT_MILLISECONDS?: ApplicationConfigurationToDESKTOP_TIME_OUT_MILLISECONDSResolver<TParent>
@@ -3565,6 +3579,13 @@ export interface ApplicationConfigurationToCOUNTRYResolver<
 }
 
 export interface ApplicationConfigurationToCOUNTRY_LOGOResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToCURRENCYResolver<
   TParent = any,
   TResult = any
 > {
@@ -4703,6 +4724,22 @@ export interface CountryLogoToFileNameResolver<TParent = any, TResult = any> {
 }
 
 export interface CountryLogoToFileResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLCurrencyTypeResolver<TParent = any> {
+  isoCode?: CurrencyToIsoCodeResolver<TParent>
+  languagesAndCountry?: CurrencyToLanguagesAndCountryResolver<TParent>
+}
+
+export interface CurrencyToIsoCodeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface CurrencyToLanguagesAndCountryResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

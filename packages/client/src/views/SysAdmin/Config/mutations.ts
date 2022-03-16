@@ -23,6 +23,10 @@ const applicationConfigMutation = gql`
         fileName
         file
       }
+      CURRENCY {
+        languagesAndCountry
+        isoCode
+      }
     }
   }
 `

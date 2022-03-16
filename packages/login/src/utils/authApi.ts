@@ -50,11 +50,17 @@ export interface ICountryLogo {
   fileName: string
   file: string
 }
+
+interface ICurrency {
+  isoCode: string
+  languagesAndCountry: string[]
+}
 export interface IApplicationConfig {
   APPLICATION_NAME: string
   BACKGROUND_SYNC_BROADCAST_CHANNEL: string
   COUNTRY: string
   COUNTRY_LOGO: ICountryLogo
+  CURRENCY: ICurrency
   COUNTRY_LOGO_RENDER_WIDTH: number
   COUNTRY_LOGO_RENDER_HEIGHT: number
   DESKTOP_TIME_OUT_MILLISECONDS: number

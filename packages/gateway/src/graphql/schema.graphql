@@ -528,6 +528,7 @@ type ApplicationConfiguration {
   BACKGROUND_SYNC_BROADCAST_CHANNEL: String
   COUNTRY: String
   COUNTRY_LOGO: CountryLogo
+  CURRENCY: Currency
   COUNTRY_LOGO_RENDER_WIDTH: Int
   COUNTRY_LOGO_RENDER_HEIGHT: Int
   DESKTOP_TIME_OUT_MILLISECONDS: Int
@@ -555,6 +556,7 @@ input ApplicationConfigurationInput {
   BACKGROUND_SYNC_BROADCAST_CHANNEL: String
   COUNTRY: String
   COUNTRY_LOGO: CountryLogoInput
+  CURRENCY: CurrencyInput
   COUNTRY_LOGO_RENDER_WIDTH: Int
   COUNTRY_LOGO_RENDER_HEIGHT: Int
   DESKTOP_TIME_OUT_MILLISECONDS: Int
@@ -989,6 +991,11 @@ type CountryLogo {
   file: String
 }
 
+type Currency {
+  isoCode: String
+  languagesAndCountry: [String]
+}
+
 type PhoneNumberPattern {
   pattern: String
   example: String
@@ -1006,6 +1013,11 @@ type NIDNumberPattern {
 input CountryLogoInput {
   fileName: String
   file: String
+}
+
+input CurrencyInput {
+  isoCode: String
+  languagesAndCountry: [String]
 }
 
 input PhoneNumberPatternInput {

@@ -46,6 +46,10 @@ beforeEach(async () => {
               COUNTRY_LOGO: {
                 fileName: 'img.png',
                 file: `data:image;base64,${validImageB64String}`
+              },
+              CURRENCY: {
+                isoCode: 'CAD',
+                languagesAndCountry: ['en-CA']
               }
             }
           }
@@ -70,16 +74,6 @@ describe('application config page test', () => {
 })
 
 describe('application name update test', () => {
-  beforeEach(() => {
-    jest.spyOn(referenceApi, 'loadConfig').mockImplementationOnce(() =>
-      Promise.resolve({
-        ...mockConfigResponse,
-        config: {
-          ...mockConfigResponse.config
-        }
-      })
-    )
-  })
   it('should show the application name change modal of click on change', async () => {
     testComponent.find('#changeAppName').hostNodes().first().simulate('click')
     expect(testComponent.find('#changeAppNameModal').hostNodes()).toHaveLength(
@@ -94,7 +88,6 @@ describe('application name update test', () => {
       .simulate('change', {
         target: { id: 'applicationName', value: '' }
       })
-    expect(testComponent.find('#applicationName').hostNodes().text()).toBe('')
     expect(
       testComponent.find('#apply_change').hostNodes().props().disabled
     ).toBeTruthy()
@@ -208,5 +201,42 @@ describe('country logo update test', () => {
     testComponent.update()
     await flushPromises()
     expect(testComponent.find('#field-error').hostNodes().length).toBe(0)
+  })
+})
+describe('application currency update test', () => {
+  it('should show the application currency change modal of click on change', async () => {
+    testComponent.find('#changeCurrency').hostNodes().first().simulate('click')
+    expect(testComponent.find('#changeCurrencyModal').hostNodes()).toHaveLength(
+      1
+    )
+  })
+  it('should change the application currency if click on apply', async () => {
+    testComponent.find('#changeCurrency').hostNodes().first().simulate('click')
+    testComponent
+      .find('#selectCurrency')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'selectCurrency', value: 'en-CA-CAD' }
+      })
+    testComponent.find('#apply_change').hostNodes().simulate('click')
+    await flushPromises()
+    expect(testComponent.find('#Currency_value').hostNodes().text()).toBe(
+      'Canadian dollar'
+    )
+  })
+
+  it('should show success notification if appliction config change', async () => {
+    testComponent.find('#changeCurrency').hostNodes().first().simulate('click')
+    testComponent
+      .find('#selectCurrency')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'selectCurrency', value: 'en-CA-CAD' }
+      })
+    testComponent.find('#apply_change').hostNodes().simulate('click')
+    await flushPromises()
+    expect(
+      testComponent.find('#print-cert-notification').hostNodes().text()
+    ).toBe('Currency updated')
   })
 })

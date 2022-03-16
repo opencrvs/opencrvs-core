@@ -41,6 +41,10 @@ let mockConfig = {
     fileName: 'logo.png',
     file: `data:image;base64,${validImageB64String}`
   },
+  CURRENCY: {
+    isoCode: 'ZMW',
+    languagesAndCountry: ['en-ZM']
+  },
   DESKTOP_TIME_OUT_MILLISECONDS: 900000, // 15 mins
   HEALTH_FACILITY_FILTER: 'UPAZILA',
   LANGUAGES: 'en,bn',

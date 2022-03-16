@@ -20,7 +20,7 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from '@client/styledComponents'
-import { InputField, TextInput } from '@opencrvs/components/lib/forms'
+import { InputField, TextInput, Select } from '@opencrvs/components/lib/forms'
 import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { Alert } from '@opencrvs/components/lib/icons/Alert'
@@ -31,11 +31,14 @@ import { IOfflineData } from '@client/offline/reducer'
 import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
 import { IAttachmentValue } from '@client/forms'
 import {
+  getCurrencyObject,
+  getCurrencySelectOptions,
   getTitle,
   getMessage,
   isApplyButtonDisabled,
   callUpdateApplicationNameMutation,
-  callUpdateGovtLogoMutation
+  callUpdateGovtLogoMutation,
+  callUpdateApplicationCurrencyMutation
 } from '@client/views/SysAdmin/Config/utils'
 
 const Message = styled.div`
@@ -85,15 +88,24 @@ const ErrorMessage = styled.div`
   color: ${({ theme }) => theme.colors.error};
   margin-left: 6px;
 `
+
+export type ICurrency = {
+  isoCode: string | undefined
+  languagesAndCountry: string[]
+}
+
 export type IApplicationConfigName = {
   APPLICATION_NAME?: string
   COUNTRY_LOGO?: {
     fileName: string
     file: string
   }
+  CURRENCY?: ICurrency
 }
+
 export type State = {
   applicationName: string
+  currency: string
   updatingValue: boolean
   errorOccured: boolean
   errorMessages: string
@@ -118,13 +130,13 @@ type DispatchProps = {
 }
 
 export type IFullProps = IProps & IntlShapeProps & DispatchProps
-
 class DynamicModalComponent extends React.Component<IFullProps, State> {
   constructor(props: IFullProps) {
     super(props)
     this.state = {
       applicationName:
-        props.offlineCountryConfiguration.config.APPLICATION_NAME,
+        this.props.offlineCountryConfiguration.config.APPLICATION_NAME,
+      currency: `${this.props.offlineCountryConfiguration.config.CURRENCY.languagesAndCountry[0]}-${this.props.offlineCountryConfiguration.config.CURRENCY.isoCode}`,
       updatingValue: false,
       errorOccured: false,
       errorMessages: EMPTY_STRING,
@@ -207,15 +219,12 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
           )
         )
       } catch {
-        this.setState({
-          errorOccured: true,
-          errorMessages: this.props.intl.formatMessage(
-            messages.applicationNameChangeError
-          )
-        })
+        this.setError(
+          this.props.intl.formatMessage(messages.applicationConfigChangeError)
+        )
         valueChanged(
           NOTIFICATION_TYPE.ERROR,
-          this.props.intl.formatMessage(messages.applicationNameChangeError)
+          this.props.intl.formatMessage(messages.applicationConfigChangeError)
         )
       }
     } else if (
@@ -267,6 +276,29 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
           )
         }
       }
+    } else if (modalName === GeneralActionId.CURRENCY && value.CURRENCY) {
+      try {
+        await callUpdateApplicationCurrencyMutation(
+          value.CURRENCY,
+          this.props,
+          this.setUpdatingValue,
+          this.setError
+        )
+        valueChanged(
+          NOTIFICATION_TYPE.SUCCESS,
+          this.props.intl.formatMessage(
+            messages.applicationCurrencyChangeNotification
+          )
+        )
+      } catch {
+        this.setError(
+          this.props.intl.formatMessage(messages.applicationConfigChangeError)
+        )
+        valueChanged(
+          NOTIFICATION_TYPE.ERROR,
+          this.props.intl.formatMessage(messages.applicationConfigChangeError)
+        )
+      }
     }
   }
 
@@ -286,8 +318,10 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
       <ResponsiveModal
         id={`${changeModalName}Modal`}
         title={getTitle(intl, changeModalName)}
-        autoHeight={true}
         show={this.showChangeModal}
+        contentScrollableY={
+          changeModalName === GeneralActionId.CURRENCY ? true : false
+        }
         actions={[
           <CancelButton
             key="cancel"
@@ -308,7 +342,8 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
                   COUNTRY_LOGO: {
                     file: this.state.govtLogo,
                     fileName: this.state.logoFileName
-                  }
+                  },
+                  CURRENCY: getCurrencyObject(this.state.currency)
                 },
                 valueChanged
               )
@@ -318,7 +353,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
           </ApplyButton>
         ]}
         handleClose={toggleConfigModal}
-        contentHeight={175}
+        contentHeight={GeneralActionId.GOVT_LOGO ? 200 : 175}
       >
         <Message>{getMessage(intl, changeModalName)}</Message>
         {this.state.errorOccured && (
@@ -365,6 +400,29 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
                 onUploadingStateChanged={this.onUploadingStateChanged}
                 error={this.state.errorMessages}
               />
+            </Field>
+          </Content>
+        )}
+        {changeModalName === GeneralActionId.CURRENCY && (
+          <Content>
+            <Field>
+              <InputField
+                id="applicationCurrency"
+                touched={true}
+                required={false}
+              >
+                <Select
+                  id="selectCurrency"
+                  isDisabled={false}
+                  onChange={(val: string) => {
+                    this.setState({
+                      currency: val
+                    })
+                  }}
+                  value={this.state.currency}
+                  options={getCurrencySelectOptions()}
+                />
+              </InputField>
             </Field>
           </Content>
         )}

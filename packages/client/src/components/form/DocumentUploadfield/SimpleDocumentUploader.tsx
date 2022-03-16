@@ -202,7 +202,6 @@ class SimpleDocumentUploaderComponent extends React.Component<
             id="upload_document"
             title={intl.formatMessage(messages.uploadFile)}
             handleFileChange={this.handleFileChange}
-            disabled={this.state.filesBeingUploaded.length > 0}
           />
         )}
       </>

@@ -11,6 +11,7 @@
  */
 import {
   GQLCountryLogoInput,
+  GQLCurrencyInput,
   GQLNIDNumberPatternInput,
   GQLPhoneNumberPatternInput,
   GQLResolver
@@ -37,6 +38,7 @@ export const resolvers: GQLResolver = {
           applicationConfig.BACKGROUND_SYNC_BROADCAST_CHANNEL as string,
         COUNTRY: applicationConfig.COUNTRY as string,
         COUNTRY_LOGO: applicationConfig.COUNTRY_LOGO as GQLCountryLogoInput,
+        CURRENCY: applicationConfig.CURRENCY as GQLCurrencyInput,
         COUNTRY_LOGO_RENDER_WIDTH:
           applicationConfig.COUNTRY_LOGO_RENDER_WIDTH as number,
         COUNTRY_LOGO_RENDER_HEIGHT:
