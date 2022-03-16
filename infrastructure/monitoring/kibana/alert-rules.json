@@ -1,0 +1,79 @@
+[
+  {
+    "params": {
+      "nodeType": "host",
+      "criteria": [
+        {
+          "metric": "cpu",
+          "comparator": ">",
+          "threshold": [70],
+          "timeSize": 1,
+          "timeUnit": "m",
+          "customMetric": {
+            "type": "custom",
+            "id": "alert-custom-metric",
+            "field": "",
+            "aggregation": "avg"
+          }
+        }
+      ],
+      "sourceId": "default"
+    },
+    "consumer": "alerts",
+    "schedule": { "interval": "1m" },
+    "tags": ["infra", "opencrvs-builtin"],
+    "name": "CPU under heavy load",
+    "rule_type_id": "metrics.alert.inventory.threshold",
+    "notify_when": "onActionGroupChange",
+    "actions": [
+      {
+        "group": "metrics.inventory_threshold.fired",
+        "id": "preconfigured-alert-history-es-index",
+        "params": {
+          "documents": [
+            "{\"@timestamp\":\"2022-03-04T13:28:11.589Z\",\"tags\":\"{{rule.tags}}\",\"rule\":{\"id\":\"{{rule.id}}\",\"name\":\"{{rule.name}}\",\"params\":{\"{{rule__type}}\":\"{{params}}\"},\"space\":\"{{rule.spaceId}}\",\"type\":\"{{rule.type}}\"},\"kibana\":{\"alert\":{\"id\":\"{{alert.id}}\",\"context\":{\"{{rule__type}}\":\"{{context}}\"},\"actionGroup\":\"{{alert.actionGroup}}\",\"actionGroupName\":\"{{alert.actionGroupName}}\"}},\"event\":{\"kind\":\"alert\"}}"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "params": {
+      "nodeType": "host",
+      "criteria": [
+        {
+          "metric": "custom",
+          "comparator": ">",
+          "threshold": [0.5],
+          "timeSize": 1,
+          "timeUnit": "m",
+          "customMetric": {
+            "type": "custom",
+            "id": "alert-custom-metric",
+            "field": "system.filesystem.used.pct",
+            "aggregation": "avg"
+          }
+        }
+      ],
+      "sourceId": "default",
+      "alertOnNoData": true
+    },
+    "consumer": "infrastructure",
+    "schedule": { "interval": "1m" },
+    "tags": ["infra", "opencrvs-builtin"],
+    "name": "Low on available disk space",
+    "rule_type_id": "metrics.alert.inventory.threshold",
+    "notify_when": "onActionGroupChange",
+    "actions": [
+      {
+        "group": "metrics.inventory_threshold.fired",
+        "id": "preconfigured-alert-history-es-index",
+        "params": {
+          "documents": [
+            "{\"@timestamp\":\"2022-03-02T08:53:13.887Z\",\"tags\":\"{{rule.tags}}\",\"rule\":{\"id\":\"{{rule.id}}\",\"name\":\"{{rule.name}}\",\"params\":{\"{{rule__type}}\":\"{{params}}\"},\"space\":\"{{rule.spaceId}}\",\"type\":\"{{rule.type}}\"},\"kibana\":{\"alert\":{\"id\":\"{{alert.id}}\",\"context\":{\"{{rule__type}}\":\"{{context}}\"},\"actionGroup\":\"{{alert.actionGroup}}\",\"actionGroupName\":\"{{alert.actionGroupName}}\"}},\"event\":{\"kind\":\"alert\"}}"
+          ]
+        }
+      }
+    ]
+  }
+]

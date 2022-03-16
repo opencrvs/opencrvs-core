@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createServer } from '@webhooks/index'
+import { createServer } from '@webhooks/server'
 import Webhook, { IWebhook } from '@webhooks/model/webhook'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
@@ -47,7 +47,7 @@ const mockInactiveSystem = {
   sha_secret: '123'
 }
 
-const mockWebhook = ({
+const mockWebhook = {
   webhookId: '123',
   createdBy: {
     client_id: '123',
@@ -59,7 +59,7 @@ const mockWebhook = ({
   mode: 'subscribe',
   secret: '123',
   topic: 'BIRTH_REGISTERED'
-} as unknown) as IWebhook
+} as unknown as IWebhook
 
 const mockWebhooks = [
   {
