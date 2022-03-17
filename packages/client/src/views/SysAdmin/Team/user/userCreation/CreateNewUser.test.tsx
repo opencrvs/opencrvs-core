@@ -37,6 +37,7 @@ import { UserSection } from '@client/forms'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { History } from 'history'
+import { formConfig } from '@client/tests/mock-offline-data'
 export const mockRoles = {
   data: {
     getRoles: [
@@ -410,7 +411,8 @@ describe('edit user tests', () => {
         pilotLocations: mockOfflineData.pilotLocations,
         offices: mockOfflineData.offices,
         assets: mockOfflineData.assets,
-        config: mockOfflineData.config
+        config: mockOfflineData.config,
+        formConfig
       })
     )
   })

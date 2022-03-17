@@ -12,7 +12,18 @@
 import { createServer } from '@config/server'
 import Question, { IQuestion } from '@config/models/question'
 import mockingoose from 'mockingoose'
+import * as jwt from 'jsonwebtoken'
+import { readFileSync } from 'fs'
 
+const token = jwt.sign(
+  { scope: ['natlsysadmin'] },
+  readFileSync('../auth/test/cert.key'),
+  {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:config-user'
+  }
+)
 const mockQuestion = {
   _id: '123',
   fieldId: 'birth.myField',
@@ -31,7 +42,6 @@ const mockQuestion = {
   fieldType: 'TEXT',
   preceedingFieldId: 'myPreviousFieldId',
   required: true,
-  enabled: true,
   custom: true,
   initialValue: 'myValue'
 } as unknown as IQuestion & { _id: string }
@@ -51,7 +61,10 @@ describe('getQuestions', () => {
 
     const res = await server.server.inject({
       method: 'GET',
-      url: '/questions'
+      url: '/questions',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     })
     expect(res.statusCode).toBe(200)
   })

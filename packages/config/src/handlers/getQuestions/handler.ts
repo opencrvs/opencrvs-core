@@ -11,7 +11,7 @@
  */
 import * as Hapi from '@hapi/hapi'
 import Question, { IQuestion } from '@config/models/question'
-import { internal, notFound } from '@hapi/boom'
+import { internal } from '@hapi/boom'
 
 export default async function getQuestions(
   request: Hapi.Request,
@@ -24,8 +24,5 @@ export default async function getQuestions(
     throw internal(error.message)
   }
 
-  if (!questions) {
-    throw notFound()
-  }
   return questions
 }
