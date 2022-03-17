@@ -80,7 +80,9 @@ import {
   removeObservationResource,
   selectOrCreateEncounterPartitioner,
   selectOrCreateEncounterParticipant,
-  findExtension
+  selectOrCreateQuestionnaireResource,
+  findExtension,
+  setQuestionnaireItem
 } from '@gateway/features/fhir/utils'
 import {
   OPENCRVS_SPECIFICATION_URL,
@@ -760,6 +762,31 @@ function createRegStatusCommentTimeStamp(
     }
   }
   resource.note[context._index.comments].time = fieldValue
+}
+
+function createQuestionnaireBuilder() {
+  return {
+    fieldId: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const questionnaire = selectOrCreateQuestionnaireResource(
+        BIRTH_ENCOUNTER_CODE,
+        fhirBundle,
+        context
+      )
+      setQuestionnaireItem(questionnaire, context, fieldValue, null)
+    },
+    value: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
+      const questionnaire = selectOrCreateQuestionnaireResource(
+        BIRTH_ENCOUNTER_CODE,
+        fhirBundle,
+        context
+      )
+      setQuestionnaireItem(questionnaire, context, null, fieldValue)
+    }
+  }
 }
 
 function createActionTypesBuilder() {
@@ -2938,6 +2965,7 @@ export const builders: IFieldBuilders = {
       }
     }
   },
+  questionnaire: createQuestionnaireBuilder(),
   eventLocation: {
     _fhirID: (
       fhirBundle: ITemplatedBundle,

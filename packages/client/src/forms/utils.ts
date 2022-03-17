@@ -306,6 +306,11 @@ export const getFieldOptions = (
   offlineCountryConfig: IOfflineData
 ) => {
   const locations = offlineCountryConfig[OFFLINE_LOCATIONS_KEY]
+  if (!field.dynamicOptions.dependency) {
+    throw new Error(
+      `Dependency is undefined, the value should have an entry in the dynamic options object.`
+    )
+  }
   const dependencyVal = values[field.dynamicOptions.dependency] as string
   if (field.dynamicOptions.jurisdictionType) {
     return generateOptions(
@@ -645,6 +650,11 @@ export const getSelectedRadioOptionWithNestedFields = (
 }
 
 export const conditionals: IConditionals = {
+  presentAtBirthRegistration: {
+    action: 'hide',
+    expression:
+      '(!draftData || !draftData.registration || draftData.registration.presentAtBirthRegistration !== "OTHER" || draftData.registration.presentAtBirthRegistration === "BOTH_PARENTS" )'
+  },
   isRegistrarRoleSelected: {
     action: 'hide',
     expression: 'values.role!=="LOCAL_REGISTRAR"'

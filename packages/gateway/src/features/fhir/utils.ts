@@ -22,6 +22,7 @@ import {
   createTaskRefTemplate,
   createRelatedPersonTemplate,
   createPaymentReconciliationTemplate,
+  createQuestionnaireResponseTemplate,
   CERTIFICATE_DOCS_CODE,
   CERTIFICATE_DOCS_TITLE,
   CERTIFICATE_CONTEXT_KEY,
@@ -795,6 +796,49 @@ export function selectOrCreatePaymentReconciliationResource(
   }
 }
 
+export function selectOrCreateQuestionnaireResource(
+  sectionCode: string,
+  fhirBundle: ITemplatedBundle,
+  context: any
+): fhir.QuestionnaireResponse {
+  const questionnaire = fhirBundle.entry.find((entry) => {
+    if (
+      !entry ||
+      !entry.resource ||
+      entry.resource.resourceType !== 'QuestionnaireResponse'
+    ) {
+      return false
+    } else {
+      return true
+    }
+  })
+
+  if (questionnaire) {
+    return questionnaire.resource as fhir.QuestionnaireResponse
+  }
+
+  const encounter = selectOrCreateEncounterResource(fhirBundle, context)
+  const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
+
+  const ref = uuid()
+  const questionnaireResponseEntry = createQuestionnaireResponseTemplate(ref)
+  if (!section || !section.entry || !section.entry[0]) {
+    throw new Error('Expected encounter section to exist and have an entry')
+  }
+  const encounterSectionEntry = section.entry[0]
+  const encounterEntry = fhirBundle.entry.find(
+    (entry) => entry.fullUrl === encounterSectionEntry.reference
+  )
+  if (encounterEntry && encounter) {
+    questionnaireResponseEntry.resource.subject = {
+      reference: `${encounterEntry.fullUrl}`
+    }
+  }
+  fhirBundle.entry.push(questionnaireResponseEntry)
+
+  return questionnaireResponseEntry.resource as fhir.QuestionnaireResponse
+}
+
 export function selectOrCreateTaskRefResource(
   fhirBundle: ITemplatedBundle,
   context: any
@@ -840,6 +884,30 @@ export function setObjectPropInResourceArray(
       resource[label][context._index[label]] = {}
     }
     resource[label][context._index[label]][propName] = value
+  }
+}
+
+export function setQuestionnaireItem(
+  questionnaire: fhir.QuestionnaireResponse,
+  context: any,
+  label: string | null,
+  value: string | null
+) {
+  if (!questionnaire.item) {
+    questionnaire.item = []
+  }
+
+  if (label && !questionnaire.item[context._index.questionnaire]) {
+    questionnaire.item[context._index.questionnaire] = {
+      text: label,
+      linkId: ''
+    }
+  }
+
+  if (value && questionnaire.item[context._index.questionnaire]) {
+    questionnaire.item[context._index.questionnaire].answer = [
+      { valueString: value }
+    ]
   }
 }
 

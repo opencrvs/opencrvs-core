@@ -143,6 +143,10 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           country
         }
       }
+      questionnaire {
+        fieldId
+        value
+      }
       mannerOfDeath
       causeOfDeath
       maleDependentsOfDeceased
@@ -345,6 +349,10 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         type
         trackingId
         registrationNumber
+      }
+      questionnaire {
+        fieldId
+        value
       }
       eventLocation {
         id
