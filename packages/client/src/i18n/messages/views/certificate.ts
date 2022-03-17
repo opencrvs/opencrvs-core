@@ -78,6 +78,8 @@ interface ICertificateMessages
   noAffidavitModalTitle: MessageDescriptor
   noAffidavitModalDescription: MessageDescriptor
   signedAffidavitFileLabel: MessageDescriptor
+  printedOnCollection: MessageDescriptor
+  collectorIDCheck: MessageDescriptor
 }
 
 const messagesToDefine: ICertificateMessages = {
@@ -423,6 +425,17 @@ const messagesToDefine: ICertificateMessages = {
     defaultMessage: 'Signed affidavit',
     description: 'File label for signed affidavit',
     id: 'print.cert.coll.other.aff.label'
+  },
+  printedOnCollection: {
+    defaultMessage: 'Printed on collection',
+    description: 'Table column header showing collector info in record audit',
+    id: 'record.certificate.collector'
+  },
+  collectorIDCheck: {
+    defaultMessage: 'ID Check',
+    description:
+      'Table column header showing collector ID verification info in record audit',
+    id: 'record.certificate.collector'
   }
 }
 
