@@ -19,6 +19,10 @@ const applicationConfigMutation = gql`
   ) {
     updateApplicationConfig(applicationConfig: $applicationConfig) {
       APPLICATION_NAME
+      COUNTRY_LOGO {
+        fileName
+        file
+      }
       CURRENCY {
         languagesAndCountry
         isoCode

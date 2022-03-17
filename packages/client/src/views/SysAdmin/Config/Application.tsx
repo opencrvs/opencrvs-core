@@ -96,7 +96,7 @@ function GeneralTabContent({
           label: intl.formatMessage(messages.govermentLogoLabel),
           value: (
             <img
-              src={offlineCountryConfiguration.assets.logo}
+              src={offlineCountryConfiguration.config.COUNTRY_LOGO.file}
               width={
                 offlineCountryConfiguration.config.COUNTRY_LOGO_RENDER_HEIGHT
               }
@@ -108,7 +108,9 @@ function GeneralTabContent({
           action: {
             id: GeneralActionId.GOVT_LOGO,
             label: intl.formatMessage(buttonMessages.change),
-            disabled: true
+            handler: () => {
+              callBack(GeneralActionId.GOVT_LOGO)
+            }
           }
         },
         {

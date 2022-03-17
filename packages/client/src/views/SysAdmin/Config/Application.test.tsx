@@ -11,15 +11,29 @@
  */
 import * as React from 'react'
 import { createStore } from '@client/store'
-import { createTestComponent, flushPromises } from '@client/tests/util'
+import {
+  createTestComponent,
+  flushPromises,
+  getFileFromBase64String,
+  mockConfigResponse
+} from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { ApplicationConfig } from '@client/views/SysAdmin/Config/Application'
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/mutations'
 import * as fetchMock from 'jest-fetch-mock'
 import { waitForElement } from '@client/tests/wait-for-element'
+import { referenceApi } from '@client/utils/referenceApi'
+import { IAttachmentValue } from '@client/forms'
 
 const { store, history } = createStore()
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
+export const validImageB64String =
+  'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
+const file: IAttachmentValue = {
+  name: 'img.png',
+  type: 'image/png',
+  data: `data:image;base64,${validImageB64String}`
+}
 let testComponent: ReactWrapper
 beforeEach(async () => {
   configApplicationMutations.mutateApplicationConfig = jest.fn(
@@ -29,6 +43,10 @@ beforeEach(async () => {
           data: {
             updateApplicationConfig: {
               APPLICATION_NAME: 'OPENCRVS',
+              COUNTRY_LOGO: {
+                fileName: 'img.png',
+                file: `data:image;base64,${validImageB64String}`
+              },
               CURRENCY: {
                 isoCode: 'CAD',
                 languagesAndCountry: ['en-CA']
@@ -129,6 +147,62 @@ describe('application name update test', () => {
   })
 })
 
+describe('country logo update test', () => {
+  beforeEach(() => {
+    jest.spyOn(referenceApi, 'loadConfig').mockImplementationOnce(() =>
+      Promise.resolve({
+        ...mockConfigResponse,
+        config: {
+          ...mockConfigResponse.config
+        }
+      })
+    )
+  })
+  it('should show the country logo change modal of click on change', async () => {
+    testComponent.find('#changeGovtLogo').hostNodes().first().simulate('click')
+    expect(testComponent.find('#changeGovtLogoModal').hostNodes()).toHaveLength(
+      1
+    )
+  })
+  it('should disable the button if input file is empty', async () => {
+    testComponent.find('#changeGovtLogo').hostNodes().first().simulate('click')
+    testComponent
+      .find('#upload_document')
+      .hostNodes()
+      .simulate('change', {
+        target: {
+          file: null
+        }
+      })
+    expect(
+      testComponent.find('#apply_change').hostNodes().props().disabled
+    ).toBeTruthy()
+  })
+  it('should close the modal if click on cancel button', async () => {
+    testComponent.find('#changeGovtLogo').hostNodes().first().simulate('click')
+    testComponent.find('#modal_cancel').hostNodes().first().simulate('click')
+    expect(testComponent.find('#changeGovtLogoModal').hostNodes()).toHaveLength(
+      0
+    )
+  })
+  it('No error while uploading valid file', async () => {
+    testComponent.find('#changeGovtLogo').hostNodes().first().simulate('click')
+    testComponent.find('#upload_document').hostNodes().simulate('click')
+    testComponent
+      .find('#image_file_uploader_field')
+      .hostNodes()
+      .simulate('change', {
+        target: {
+          files: [
+            getFileFromBase64String(validImageB64String, 'img.png', 'image/png')
+          ]
+        }
+      })
+    testComponent.update()
+    await flushPromises()
+    expect(testComponent.find('#field-error').hostNodes().length).toBe(0)
+  })
+})
 describe('application currency update test', () => {
   it('should show the application currency change modal of click on change', async () => {
     testComponent.find('#changeCurrency').hostNodes().first().simulate('click')

@@ -28,6 +28,8 @@ import { updateOfflineConfigData } from '@client/offline/actions'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
+import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
+import { IAttachmentValue } from '@client/forms'
 import {
   getCurrencyObject,
   getCurrencySelectOptions,
@@ -35,6 +37,7 @@ import {
   getMessage,
   isApplyButtonDisabled,
   callUpdateApplicationNameMutation,
+  callUpdateGovtLogoMutation,
   callUpdateApplicationCurrencyMutation
 } from '@client/views/SysAdmin/Config/utils'
 
@@ -61,12 +64,13 @@ const Content = styled.div`
 `
 const ErrorContent = styled.div`
   display: flex;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     flex-direction: column-reverse;
   }
 `
 const Field = styled.div`
+  width: 100%;
   margin-bottom: 30px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin-bottom: 0px;
@@ -92,6 +96,10 @@ export type ICurrency = {
 
 export type IApplicationConfigName = {
   APPLICATION_NAME?: string
+  COUNTRY_LOGO?: {
+    fileName: string
+    file: string
+  }
   CURRENCY?: ICurrency
 }
 
@@ -101,6 +109,10 @@ export type State = {
   updatingValue: boolean
   errorOccured: boolean
   errorMessages: string
+  govtLogo: string
+  logoFile: IAttachmentValue
+  logoFileName: string
+  isFileUploading: boolean
 }
 interface IProps {
   changeModalName: string
@@ -127,7 +139,11 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
       currency: `${this.props.offlineCountryConfiguration.config.CURRENCY.languagesAndCountry[0]}-${this.props.offlineCountryConfiguration.config.CURRENCY.isoCode}`,
       updatingValue: false,
       errorOccured: false,
-      errorMessages: EMPTY_STRING
+      errorMessages: EMPTY_STRING,
+      govtLogo: EMPTY_STRING,
+      logoFile: { name: EMPTY_STRING, type: EMPTY_STRING, data: EMPTY_STRING },
+      isFileUploading: false,
+      logoFileName: EMPTY_STRING
     }
   }
 
@@ -137,6 +153,30 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
     const value = event.target.value
     this.setState(() => ({
       applicationName: value
+    }))
+  }
+
+  setGovtLogo = (data: string) => {
+    this.setState(() => ({
+      govtLogo: data
+    }))
+  }
+
+  setLogoFile(data: IAttachmentValue) {
+    this.setState(() => ({
+      logoFile: data
+    }))
+  }
+
+  setLogoFileName = (attachment: IAttachmentValue) => {
+    this.setState(() => ({
+      logoFileName: attachment.name ? attachment.name : EMPTY_STRING
+    }))
+  }
+
+  onUploadingStateChanged = (isUploading: boolean) => {
+    this.setState(() => ({
+      isFileUploading: isUploading
     }))
   }
 
@@ -187,6 +227,55 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
           this.props.intl.formatMessage(messages.applicationConfigChangeError)
         )
       }
+    } else if (
+      modalName === GeneralActionId.GOVT_LOGO &&
+      value.COUNTRY_LOGO?.file &&
+      value.COUNTRY_LOGO?.fileName
+    ) {
+      if (
+        this.isWithinFileLength(value.COUNTRY_LOGO.file as string) === false
+      ) {
+        this.setError(
+          this.props.intl.formatMessage(messages.govtLogoFileLimitError)
+        )
+        this.setState({
+          govtLogo: EMPTY_STRING,
+          logoFile: {
+            name: EMPTY_STRING,
+            type: EMPTY_STRING,
+            data: EMPTY_STRING
+          }
+        })
+        valueChanged(
+          NOTIFICATION_TYPE.ERROR,
+          this.props.intl.formatMessage(messages.govtLogoFileLimitError)
+        )
+      } else {
+        try {
+          await callUpdateGovtLogoMutation(
+            value.COUNTRY_LOGO.file,
+            value.COUNTRY_LOGO.fileName,
+            this.props,
+            this.setUpdatingValue,
+            this.setError
+          )
+          valueChanged(
+            NOTIFICATION_TYPE.SUCCESS,
+            this.props.intl.formatMessage(messages.govtLogoChangeNotification)
+          )
+        } catch {
+          this.setState({
+            errorOccured: true,
+            errorMessages: this.props.intl.formatMessage(
+              messages.govtLogoChangeError
+            )
+          })
+          valueChanged(
+            NOTIFICATION_TYPE.ERROR,
+            this.props.intl.formatMessage(messages.govtLogoChangeError)
+          )
+        }
+      }
     } else if (modalName === GeneralActionId.CURRENCY && value.CURRENCY) {
       try {
         await callUpdateApplicationCurrencyMutation(
@@ -211,6 +300,15 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
         )
       }
     }
+  }
+
+  isWithinFileLength(base64data: string) {
+    const baseStr = base64data.substring(22)
+    const decoded = window.atob(baseStr)
+    if (decoded.length >= 2000000) {
+      return false
+    }
+    return true
   }
 
   render() {
@@ -241,6 +339,10 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
                 changeModalName,
                 {
                   APPLICATION_NAME: this.state.applicationName,
+                  COUNTRY_LOGO: {
+                    file: this.state.govtLogo,
+                    fileName: this.state.logoFileName
+                  },
                   CURRENCY: getCurrencyObject(this.state.currency)
                 },
                 valueChanged
@@ -251,7 +353,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
           </ApplyButton>
         ]}
         handleClose={toggleConfigModal}
-        contentHeight={175}
+        contentHeight={GeneralActionId.GOVT_LOGO ? 200 : 175}
       >
         <Message>{getMessage(intl, changeModalName)}</Message>
         {this.state.errorOccured && (
@@ -274,6 +376,30 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
                   onChange={this.setApplicationName}
                 />
               </InputField>
+            </Field>
+          </Content>
+        )}
+        {changeModalName === GeneralActionId.GOVT_LOGO && (
+          <Content>
+            <Field id="govtLogoFile">
+              <SimpleDocumentUploader
+                label={this.state.logoFile.name ? this.state.logoFile.name : ''}
+                disableDeleteInPreview={false}
+                name={intl.formatMessage(messages.govermentLogoLabel)}
+                allowedDocType={['image/png', 'image/svg']}
+                onComplete={(file) => {
+                  this.setState({
+                    errorOccured: false,
+                    errorMessages: EMPTY_STRING
+                  })
+                  this.setGovtLogo((file as IAttachmentValue).data as string)
+                  this.setLogoFile(file as IAttachmentValue)
+                  this.setLogoFileName(file as IAttachmentValue)
+                }}
+                files={this.state.logoFile}
+                onUploadingStateChanged={this.onUploadingStateChanged}
+                error={this.state.errorMessages}
+              />
             </Field>
           </Content>
         )}
