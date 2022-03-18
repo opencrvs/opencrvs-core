@@ -28,9 +28,9 @@ import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { getJurisidictionType } from '@client/utils/locationUtils'
 import { goToFieldAgentList } from '@client/navigation'
-import moment from 'moment'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { SYS_ADMIN_ROLES } from '@client/utils/constants'
+import format from '@client/utils/date-formatting'
 
 const Report = styled.div<{
   total?: boolean
@@ -127,8 +127,8 @@ type Props = WrappedComponentProps & BaseProps & IStateProps & IDispatchProps
 interface BaseProps {
   data?: GQLDeclarationsStartedMetrics
   loading?: boolean
-  reportTimeFrom: moment.Moment
-  reportTimeTo: moment.Moment
+  reportTimeFrom: Date
+  reportTimeTo: Date
   locationId: string
 }
 
@@ -232,7 +232,8 @@ class DeclarationsStartedReportComponent extends React.Component<
           </DeclarationsStartedSubHeader>
           <Description>
             {intl.formatMessage(messages.declarationsStartedDescription)}
-            {reportTimeFrom.format()} - {reportTimeTo.format()}
+            {format(reportTimeFrom, 'MMMM yyyy')} -{' '}
+            {format(reportTimeTo, 'MMMM yyyy')}
           </Description>
         </DeclarationsStartedReportHeader>
         <Reports id="declarations-started-reports">

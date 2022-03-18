@@ -143,7 +143,7 @@ describe('PDF template field transformer tests', () => {
 
       const transformedValue = fieldTransformers.DateFieldValue(data, intl, {
         key: { birth: 'mother.dateOfMarriage' },
-        format: 'DD.MM.YYYY'
+        format: 'dd.MM.yyyy'
       })
       expect(transformedValue).toEqual('19.09.1972')
     })
