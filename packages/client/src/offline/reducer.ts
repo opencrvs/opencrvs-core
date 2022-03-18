@@ -89,9 +89,6 @@ export interface IOfflineData {
       death: ISVGTemplate
     }
   }
-  assets: {
-    logo: string
-  }
   config: IApplicationConfig
 }
 
@@ -174,11 +171,6 @@ const CONTENT_CMD = Cmd.run(() => referenceApi.loadContent(), {
   failActionCreator: actions.contentFailed
 })
 
-const ASSETS_CMD = Cmd.run(() => referenceApi.loadAssets(), {
-  successActionCreator: actions.assetsLoaded,
-  failActionCreator: actions.assetsFailed
-})
-
 const CONFIG_CMD = Cmd.run(() => referenceApi.loadConfig(), {
   successActionCreator: actions.configLoaded,
   failActionCreator: actions.configFailed
@@ -199,7 +191,6 @@ function getDataLoadingCommands() {
     LOCATIONS_CMD,
     PILOT_LOCATIONS_CMD,
     CONTENT_CMD,
-    ASSETS_CMD,
     CONFIG_CMD
   ])
 }
@@ -457,31 +448,6 @@ function reducer(
           loadingError: errorIfDataNotLoaded(state)
         },
         delay(PILOT_LOCATIONS_CMD, RETRY_TIMEOUT)
-      )
-    }
-
-    /*
-     * Assets
-     */
-
-    case actions.ASSETS_LOADED: {
-      return {
-        ...state,
-        offlineData: {
-          ...state.offlineData,
-          assets: {
-            logo: action.payload.logo
-          }
-        }
-      }
-    }
-    case actions.ASSETS_FAILED: {
-      return loop(
-        {
-          ...state,
-          loadingError: errorIfDataNotLoaded(state)
-        },
-        delay(ASSETS_CMD, RETRY_TIMEOUT)
       )
     }
 

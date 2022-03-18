@@ -16,11 +16,14 @@ interface Window {
     CONFIG_API_URL: string
     BACKGROUND_SYNC_BROADCAST_CHANNEL: string
     COUNTRY: string
+    COUNTRY_LOGO: {
+      fileName: string
+      file: string
+    }
     CURRENCY: {
       isoCode: string
       languagesAndCountry: string[]
     }
-    COUNTRY_LOGO_FILE: string
     COUNTRY_LOGO_RENDER_WIDTH: number // in px
     COUNTRY_LOGO_RENDER_HEIGHT: number // in px
     DESKTOP_TIME_OUT_MILLISECONDS: number

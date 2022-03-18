@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { GQLResolver, GQLCurrencyInput } from '@gateway/graphql/schema'
+import {
+  GQLCountryLogoInput,
+  GQLCurrencyInput,
+  GQLResolver
+} from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
 import { APPLICATION_CONFIG_URL } from '@gateway/constants'
 import { hasScope } from '@gateway/features/user/utils'
@@ -31,8 +35,8 @@ export const resolvers: GQLResolver = {
         BACKGROUND_SYNC_BROADCAST_CHANNEL:
           applicationConfig.BACKGROUND_SYNC_BROADCAST_CHANNEL as string,
         COUNTRY: applicationConfig.COUNTRY as string,
+        COUNTRY_LOGO: applicationConfig.COUNTRY_LOGO as GQLCountryLogoInput,
         CURRENCY: applicationConfig.CURRENCY as GQLCurrencyInput,
-        COUNTRY_LOGO_FILE: applicationConfig.COUNTRY_LOGO_FILE as string,
         COUNTRY_LOGO_RENDER_WIDTH:
           applicationConfig.COUNTRY_LOGO_RENDER_WIDTH as number,
         COUNTRY_LOGO_RENDER_HEIGHT:

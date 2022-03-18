@@ -22,6 +22,11 @@ type Mask {
   endBefore: Int
 }
 
+type CountryLogo {
+  fileName: String
+  file: String
+}
+
 type Currency {
   isoCode: String
   languagesAndCountry: [String]
@@ -30,6 +35,11 @@ type Currency {
 input MaskInput {
   startForm: Int
   endBefore: Int
+}
+
+input CountryLogoInput {
+  fileName: String
+  file: String
 }
 
 input CurrencyInput {
@@ -41,8 +51,8 @@ input ApplicationConfigurationInput {
   APPLICATION_NAME: String
   BACKGROUND_SYNC_BROADCAST_CHANNEL: String
   COUNTRY: String
+  COUNTRY_LOGO: CountryLogoInput
   CURRENCY: CurrencyInput
-  COUNTRY_LOGO_FILE: String
   COUNTRY_LOGO_RENDER_WIDTH: Int
   COUNTRY_LOGO_RENDER_HEIGHT: Int
   DESKTOP_TIME_OUT_MILLISECONDS: Int
@@ -69,8 +79,8 @@ type ApplicationConfiguration {
   APPLICATION_NAME: String
   BACKGROUND_SYNC_BROADCAST_CHANNEL: String
   COUNTRY: String
+  COUNTRY_LOGO: CountryLogo
   CURRENCY: Currency
-  COUNTRY_LOGO_FILE: String
   COUNTRY_LOGO_RENDER_WIDTH: Int
   COUNTRY_LOGO_RENDER_HEIGHT: Int
   DESKTOP_TIME_OUT_MILLISECONDS: Int

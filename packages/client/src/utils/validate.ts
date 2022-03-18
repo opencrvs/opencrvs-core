@@ -554,8 +554,7 @@ export const duplicateIDNumber =
   (fieldToDuplicateCheck: string): Validation =>
   (value: IFormFieldValue, drafts) => {
     const valueToCheck = _.get(drafts, fieldToDuplicateCheck)
-
-    if (value && valueToCheck && +value === +valueToCheck) {
+    if (value && valueToCheck && value === valueToCheck) {
       return {
         message: messages.duplicateNationalID
       }

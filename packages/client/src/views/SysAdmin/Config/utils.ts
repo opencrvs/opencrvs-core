@@ -107,6 +107,8 @@ export const getTitle = (intl: IntlShape, changeModalName: string) => {
 export const getMessage = (intl: IntlShape, changeModalName: string) => {
   if (changeModalName === GeneralActionId.APPLICATION_NAME)
     return intl.formatMessage(messages.applicationNameChangeMessage)
+  else if (changeModalName === GeneralActionId.GOVT_LOGO)
+    return intl.formatMessage(messages.govtLogoChangeMessage)
   else if (changeModalName === GeneralActionId.CURRENCY)
     return intl.formatMessage(messages.applicationCurrencyChangeMessage)
   else if (changeModalName === GeneralActionId.NID_PATTERN)
@@ -122,6 +124,8 @@ export const isApplyButtonDisabled = (
 ) => {
   if (changeModalName === GeneralActionId.APPLICATION_NAME) {
     return !Boolean(state.applicationName)
+  } else if (changeModalName === GeneralActionId.GOVT_LOGO) {
+    return !Boolean(state.govtLogo)
   } else if (changeModalName === GeneralActionId.CURRENCY) {
     return !Boolean(state.currency)
   } else if (changeModalName === GeneralActionId.NID_PATTERN) {
@@ -161,8 +165,9 @@ export async function callUpdateApplicationNameMutation(
   }
 }
 
-export async function callUpdateApplicationCurrencyMutation(
-  currency: ICurrency,
+export async function callUpdateGovtLogoMutation(
+  govtLogo: string,
+  logoFileName: string,
   props: IFullProps,
   updatingValue: (value: boolean) => void,
   setError: (errorMessage: string) => void
@@ -170,6 +175,42 @@ export async function callUpdateApplicationCurrencyMutation(
   try {
     updatingValue(true)
 
+    const COUNTRY_LOGO = {
+      file: govtLogo,
+      fileName: logoFileName
+    }
+    const res = await configApplicationMutations.mutateApplicationConfig({
+      COUNTRY_LOGO
+    })
+    if (res && res.data) {
+      updatingValue(false)
+      const COUNTRY_LOGO_FILE =
+        res.data.updateApplicationConfig.COUNTRY_LOGO.file
+      const COUNTRY_LOGO_FILE_NAME =
+        res.data.updateApplicationConfig.COUNTRY_LOGO.fileName
+      const updatedOfflineConfig = {
+        config: {
+          ...props.offlineCountryConfiguration.config,
+          COUNTRY_LOGO: {
+            file: COUNTRY_LOGO_FILE,
+            fileName: COUNTRY_LOGO_FILE_NAME
+          }
+        }
+      }
+      props.updateConfig(updatedOfflineConfig)
+    }
+  } catch (err) {
+    setError(props.intl.formatMessage(messages.govtLogoChangeError))
+  }
+}
+
+export async function callUpdateApplicationCurrencyMutation(
+  currency: ICurrency,
+  props: IFullProps,
+  updatingValue: (value: boolean) => void,
+  setError: (errorMessage: string) => void
+) {
+  try {
     const res = await configApplicationMutations.mutateApplicationConfig({
       CURRENCY: currency
     })

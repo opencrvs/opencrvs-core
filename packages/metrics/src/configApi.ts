@@ -11,6 +11,10 @@
  */
 import fetch from 'node-fetch'
 import { CONFIG_API_URL } from '@metrics/constants'
+export interface ICountryLogo {
+  fileName: string
+  file: string
+}
 
 interface ICurrency {
   isoCode: string
@@ -21,7 +25,7 @@ export interface IApplicationConfig {
   BACKGROUND_SYNC_BROADCAST_CHANNEL: string
   COUNTRY: string
   CURRENCY: ICurrency
-  COUNTRY_LOGO_FILE: string
+  COUNTRY_LOGO: ICountryLogo
   COUNTRY_LOGO_RENDER_WIDTH: number
   COUNTRY_LOGO_RENDER_HEIGHT: number
   DESKTOP_TIME_OUT_MILLISECONDS: number

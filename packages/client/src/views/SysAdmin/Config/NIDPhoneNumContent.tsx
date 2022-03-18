@@ -12,7 +12,11 @@
 
 import React from 'react'
 import styled from '@client/styledComponents'
-import { Content, Field, HalfWidthInput } from './DynamicModal'
+import {
+  Content,
+  Field,
+  HalfWidthInput
+} from '@opencrvs/client/src/views/SysAdmin/Config/DynamicModal'
 import { InputField } from '@opencrvs/components/lib/forms'
 import { IntlShape } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/config'

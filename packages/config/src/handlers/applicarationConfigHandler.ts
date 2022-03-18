@@ -68,7 +68,10 @@ export const updateApplicationConfig = Joi.object({
   APPLICATION_NAME: Joi.string(),
   BACKGROUND_SYNC_BROADCAST_CHANNEL: Joi.string(),
   COUNTRY: Joi.string(),
-  COUNTRY_LOGO_FILE: Joi.string(),
+  COUNTRY_LOGO: Joi.object().keys({
+    fileName: Joi.string(),
+    file: Joi.string()
+  }),
   COUNTRY_LOGO_RENDER_WIDTH: Joi.number(),
   COUNTRY_LOGO_RENDER_HEIGHT: Joi.number(),
   CURRENCY: Joi.object().keys({

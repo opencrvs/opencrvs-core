@@ -21,6 +21,10 @@ const applicationConfigMutation = gql`
       APPLICATION_NAME
       NID_NUMBER_PATTERN
       PHONE_NUMBER_PATTERN
+      COUNTRY_LOGO {
+        fileName
+        file
+      }
       CURRENCY {
         languagesAndCountry
         isoCode
