@@ -10,23 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { model, Schema, Document } from 'mongoose'
-
-interface IPhoneNumberPattern {
-  pattern: RegExp
-  example: string
-  start: string
-  num: string
-  mask: {
-    startForm: number
-    endBefore: number
-  }
-}
-
-interface INIDNumberPattern {
-  pattern: RegExp
-  example: string
-  num: string
-}
 interface ICurrency {
   isoCode: string
   languagesAndCountry: string[]
@@ -58,28 +41,11 @@ export interface IApplicationConfigurationModel extends Document {
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
   SENTRY: string
   LOGROCKET: string
-  PHONE_NUMBER_PATTERN: IPhoneNumberPattern
+  PHONE_NUMBER_PATTERN: RegExp
   BIRTH_REGISTRATION_TARGET: number
   DEATH_REGISTRATION_TARGET: number
-  NID_NUMBER_PATTERN: INIDNumberPattern
+  NID_NUMBER_PATTERN: string
 }
-
-const nidPatternSchema = new Schema<INIDNumberPattern>({
-  pattern: { type: String },
-  example: String,
-  num: String
-})
-
-const phoneNumberSchema = new Schema<IPhoneNumberPattern>({
-  pattern: { type: String },
-  example: String,
-  start: String,
-  num: String,
-  mask: {
-    startForm: Number,
-    endBefore: Number
-  }
-})
 
 const countryLogoSchema = new Schema<ICountryLogo>({
   fileName: String,
@@ -147,7 +113,7 @@ const systemSchema = new Schema({
     required: false,
     default: false
   },
-  PHONE_NUMBER_PATTERN: { type: phoneNumberSchema, required: false },
+  PHONE_NUMBER_PATTERN: { type: String, required: false },
   BIRTH_REGISTRATION_TARGET: {
     type: Number,
     required: false,
@@ -158,7 +124,7 @@ const systemSchema = new Schema({
     required: false,
     default: 45
   },
-  NID_NUMBER_PATTERN: { type: nidPatternSchema, required: false },
+  NID_NUMBER_PATTERN: { type: String, required: false },
   SENTRY: { type: String, required: false },
   LOGROCKET: { type: String, required: false }
 })

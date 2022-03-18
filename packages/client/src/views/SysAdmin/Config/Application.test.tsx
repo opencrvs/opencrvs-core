@@ -43,10 +43,8 @@ beforeEach(async () => {
           data: {
             updateApplicationConfig: {
               APPLICATION_NAME: 'OPENCRVS',
-              COUNTRY_LOGO: {
-                fileName: 'img.png',
-                file: `data:image;base64,${validImageB64String}`
-              },
+              NID_NUMBER_PATTERN: '/^[0-9]{10}$/',
+              PHONE_NUMBER_PATTERN: '/^[0-9]{8}$/',
               CURRENCY: {
                 isoCode: 'CAD',
                 languagesAndCountry: ['en-CA']
@@ -56,6 +54,7 @@ beforeEach(async () => {
         })
       )
   )
+
   testComponent = await createTestComponent(
     <ApplicationConfig></ApplicationConfig>,
     { store, history }
@@ -147,6 +146,239 @@ describe('application name update test', () => {
   })
 })
 
+describe('NID Pattern update test', () => {
+  it('should show the application config change modal of click on change', async () => {
+    testComponent
+      .find('#changeNidPattern')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    expect(
+      testComponent.find('#changeNidPatternModal').hostNodes()
+    ).toHaveLength(1)
+  })
+  it('should disable the button if nidPattern is empty', async () => {
+    testComponent
+      .find('#changeNidPattern')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    testComponent
+      .find('#changeNidPatternInput')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'changeNidPattern', value: '' }
+      })
+    expect(
+      testComponent.find('#apply_change').hostNodes().props().disabled
+    ).toBeTruthy()
+  })
+  it('should disable the button if nidPattern is invalid', async () => {
+    testComponent
+      .find('#changeNidPattern')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    testComponent
+      .find('#changeNidPatternInput')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'changeNidPattern', value: '^as(po$' }
+      })
+    expect(
+      testComponent.find('#apply_change').hostNodes().props().disabled
+    ).toBeTruthy()
+  })
+  it('should close the modal if click on cancel button', async () => {
+    testComponent
+      .find('#changeNidPattern')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    testComponent.find('#modal_cancel').hostNodes().first().simulate('click')
+    expect(
+      testComponent.find('#changeNidPatternModal').hostNodes()
+    ).toHaveLength(0)
+  })
+  it('should change the nid Pattern if click on apply', async () => {
+    testComponent
+      .find('#changeNidPattern')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    testComponent
+      .find('#changeNidPatternInput')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'changeNidPattern', value: '^[0-9]{10}$' }
+      })
+    testComponent.find('#apply_change').hostNodes().simulate('click')
+    await waitForElement(testComponent, '#nidPattern_value_container_value')
+    await flushPromises()
+    testComponent.update()
+    expect(
+      testComponent.find('#nidPattern_value_container_value').hostNodes().text()
+    ).toBe('/^[0-9]{10}$/')
+  })
+  it('should show success notification if appliction name change', async () => {
+    testComponent
+      .find('#changeNidPattern')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    testComponent
+      .find('#changeNidPatternInput')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'changeNidPattern', value: '^[0-9]{10}$' }
+      })
+    testComponent.find('#apply_change').hostNodes().simulate('click')
+    await waitForElement(testComponent, '#changeAppName')
+    testComponent.update()
+    await flushPromises()
+    expect(
+      testComponent.find('#print-cert-notification').hostNodes().text()
+    ).toBe('NID Pattern of application updated')
+  })
+  it('should show valid message on valid example after clicking test example button', async () => {
+    testComponent
+      .find('#changeNidPattern')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    testComponent
+      .find('#changeNidPatternInput')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'changeNidPattern', value: '^[0-9]{10}$' }
+      })
+    await flushPromises()
+    testComponent
+      .find('#changeNidPatternExampleInput')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'changeNidPatternExample', value: '3454345678' }
+      })
+    await flushPromises()
+    testComponent
+      .find('#test-changeNidPattern-example')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    await flushPromises()
+    expect(
+      testComponent
+        .find('#changeNidPattern-example-valid-message')
+        .hostNodes()
+        .text()
+    ).toBe('Valid')
+    expect(
+      testComponent.find('#changeNidPattern-example-valid-icon')
+    ).toHaveLength(1)
+  })
+  it('should show invalid message on invalid example after clicking test example button', async () => {
+    testComponent
+      .find('#changeNidPattern')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    testComponent
+      .find('#changeNidPatternInput')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'changeNidPattern', value: '^[0-9]{8}$' }
+      })
+    await flushPromises()
+    testComponent
+      .find('#changeNidPatternExampleInput')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'changeNidPatternExample', value: '123123123' }
+      })
+    await flushPromises()
+    testComponent
+      .find('#test-changeNidPattern-example')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    await flushPromises()
+
+    expect(
+      testComponent
+        .find('#changeNidPattern-example-invalid-message')
+        .hostNodes()
+        .text()
+    ).toBe('Invalid')
+    expect(
+      testComponent.find('#changeNidPattern-example-invalid-icon')
+    ).toHaveLength(2)
+  })
+})
+
+describe('Phone Number Pattern update test', () => {
+  it('should show the application config change modal of click on change', async () => {
+    testComponent.find('#changePhnNum').hostNodes().first().simulate('click')
+    expect(testComponent.find('#changePhnNumModal').hostNodes()).toHaveLength(1)
+  })
+  it('should change the Phone Number Pattern if click on apply', async () => {
+    testComponent.find('#changePhnNum').hostNodes().first().simulate('click')
+    testComponent
+      .find('#changePhnNumInput')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'changePhnNum', value: '^[0-9]{8}$' }
+      })
+    testComponent.find('#apply_change').hostNodes().simulate('click')
+    await waitForElement(testComponent, '#phoneNumberPattern_value_container')
+    await flushPromises()
+    testComponent.update()
+    expect(
+      testComponent
+        .find('#phoneNumberPattern_value_container_value')
+        .hostNodes()
+        .text()
+    ).toBe('/^[0-9]{8}$/')
+  })
+})
+
+describe('application currency update test', () => {
+  it('should show the application currency change modal of click on change', async () => {
+    testComponent.find('#changeCurrency').hostNodes().first().simulate('click')
+    expect(testComponent.find('#changeCurrencyModal').hostNodes()).toHaveLength(
+      1
+    )
+  })
+  it('should change the application currency if click on apply', async () => {
+    testComponent.find('#changeCurrency').hostNodes().first().simulate('click')
+    testComponent
+      .find('#selectCurrency')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'selectCurrency', value: 'en-CA-CAD' }
+      })
+    testComponent.find('#apply_change').hostNodes().simulate('click')
+    await flushPromises()
+    expect(testComponent.find('#Currency_value').hostNodes().text()).toBe(
+      'Canadian dollar'
+    )
+  })
+
+  it('should show success notification if appliction config change', async () => {
+    testComponent.find('#changeCurrency').hostNodes().first().simulate('click')
+    testComponent
+      .find('#selectCurrency')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'selectCurrency', value: 'en-CA-CAD' }
+      })
+    testComponent.find('#apply_change').hostNodes().simulate('click')
+    await flushPromises()
+    expect(
+      testComponent.find('#print-cert-notification').hostNodes().text()
+    ).toBe('Currency updated')
+  })
+})
+
 describe('country logo update test', () => {
   beforeEach(() => {
     jest.spyOn(referenceApi, 'loadConfig').mockImplementationOnce(() =>
@@ -201,42 +433,5 @@ describe('country logo update test', () => {
     testComponent.update()
     await flushPromises()
     expect(testComponent.find('#field-error').hostNodes().length).toBe(0)
-  })
-})
-describe('application currency update test', () => {
-  it('should show the application currency change modal of click on change', async () => {
-    testComponent.find('#changeCurrency').hostNodes().first().simulate('click')
-    expect(testComponent.find('#changeCurrencyModal').hostNodes()).toHaveLength(
-      1
-    )
-  })
-  it('should change the application currency if click on apply', async () => {
-    testComponent.find('#changeCurrency').hostNodes().first().simulate('click')
-    testComponent
-      .find('#selectCurrency')
-      .hostNodes()
-      .simulate('change', {
-        target: { id: 'selectCurrency', value: 'en-CA-CAD' }
-      })
-    testComponent.find('#apply_change').hostNodes().simulate('click')
-    await flushPromises()
-    expect(testComponent.find('#Currency_value').hostNodes().text()).toBe(
-      'Canadian dollar'
-    )
-  })
-
-  it('should show success notification if appliction config change', async () => {
-    testComponent.find('#changeCurrency').hostNodes().first().simulate('click')
-    testComponent
-      .find('#selectCurrency')
-      .hostNodes()
-      .simulate('change', {
-        target: { id: 'selectCurrency', value: 'en-CA-CAD' }
-      })
-    testComponent.find('#apply_change').hostNodes().simulate('click')
-    await flushPromises()
-    expect(
-      testComponent.find('#print-cert-notification').hostNodes().text()
-    ).toBe('Currency updated')
   })
 })

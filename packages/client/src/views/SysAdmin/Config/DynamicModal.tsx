@@ -27,6 +27,7 @@ import { Alert } from '@opencrvs/components/lib/icons/Alert'
 import { updateOfflineConfigData } from '@client/offline/actions'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
+import ContentComponent from '@client/views/SysAdmin/Config/NIDPhoneNumContent'
 import { IOfflineData } from '@client/offline/reducer'
 import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
 import { IAttachmentValue } from '@client/forms'
@@ -36,7 +37,9 @@ import {
   getTitle,
   getMessage,
   isApplyButtonDisabled,
+  callUpdateNIDPatternMutation,
   callUpdateApplicationNameMutation,
+  callUpdatePhoneNumberPatternMutation,
   callUpdateGovtLogoMutation,
   callUpdateApplicationCurrencyMutation
 } from '@client/views/SysAdmin/Config/utils'
@@ -56,7 +59,7 @@ const CancelButton = styled(TertiaryButton)`
     padding: 0;
   }
 `
-const Content = styled.div`
+export const Content = styled.div`
   display: flex;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     flex-direction: column-reverse;
@@ -69,14 +72,14 @@ const ErrorContent = styled.div`
     flex-direction: column-reverse;
   }
 `
-const Field = styled.div`
+export const Field = styled.div`
   width: 100%;
   margin-bottom: 30px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin-bottom: 0px;
   }
 `
-const HalfWidthInput = styled(TextInput)`
+export const HalfWidthInput = styled(TextInput)`
   width: 300px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     width: 100%;
@@ -88,24 +91,30 @@ const ErrorMessage = styled.div`
   color: ${({ theme }) => theme.colors.negative};
   margin-left: 6px;
 `
-
 export type ICurrency = {
   isoCode: string | undefined
   languagesAndCountry: string[]
 }
 
-export type IApplicationConfigName = {
+export type IApplicationConfig = {
   APPLICATION_NAME?: string
+  NID_NUMBER_PATTERN?: string
+  PHONE_NUMBER_PATTERN?: string
   COUNTRY_LOGO?: {
     fileName: string
     file: string
   }
   CURRENCY?: ICurrency
 }
-
-export type State = {
+export type IState = {
   applicationName: string
   currency: string
+  nidPattern: string
+  nidExample: string
+  testNid: boolean
+  phoneNumberPattern: string
+  phoneNumberExample: string
+  testPhoneNumber: boolean
   updatingValue: boolean
   errorOccured: boolean
   errorMessages: string
@@ -117,12 +126,12 @@ export type State = {
 interface IProps {
   changeModalName: string
   showNotification: boolean
-  offlineCountryConfiguration: IOfflineData
   toggleConfigModal: () => void
   valueChanged: (
     notificationStatus: NOTIFICATION_TYPE,
     messages: string
   ) => void
+  offlineCountryConfiguration: IOfflineData
 }
 
 type DispatchProps = {
@@ -130,12 +139,20 @@ type DispatchProps = {
 }
 
 export type IFullProps = IProps & IntlShapeProps & DispatchProps
-class DynamicModalComponent extends React.Component<IFullProps, State> {
+class DynamicModalComponent extends React.Component<IFullProps, IState> {
   constructor(props: IFullProps) {
     super(props)
     this.state = {
       applicationName:
-        this.props.offlineCountryConfiguration.config.APPLICATION_NAME,
+        props.offlineCountryConfiguration.config.APPLICATION_NAME,
+      nidPattern:
+        props.offlineCountryConfiguration.config.NID_NUMBER_PATTERN.toString(),
+      nidExample: EMPTY_STRING,
+      testNid: false,
+      phoneNumberPattern:
+        props.offlineCountryConfiguration.config.PHONE_NUMBER_PATTERN.toString(),
+      phoneNumberExample: EMPTY_STRING,
+      testPhoneNumber: false,
       currency: `${this.props.offlineCountryConfiguration.config.CURRENCY.languagesAndCountry[0]}-${this.props.offlineCountryConfiguration.config.CURRENCY.isoCode}`,
       updatingValue: false,
       errorOccured: false,
@@ -159,6 +176,34 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
   setGovtLogo = (data: string) => {
     this.setState(() => ({
       govtLogo: data
+    }))
+  }
+
+  setNIDPattern = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const pattern = event.target.value
+    this.setState(() => ({
+      nidPattern: pattern
+    }))
+  }
+
+  setNIDExample = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const example = event.target.value
+    this.setState(() => ({
+      nidExample: example
+    }))
+  }
+
+  setPhoneNumberPattern = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const pattern = event.target.value
+    this.setState(() => ({
+      phoneNumberPattern: pattern
+    }))
+  }
+
+  setPhoneNumberExample = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const example = event.target.value
+    this.setState(() => ({
+      phoneNumberExample: example
     }))
   }
 
@@ -195,7 +240,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
 
   async mutationHandler(
     modalName: string,
-    value: IApplicationConfigName,
+    value: IApplicationConfig,
     valueChanged: (
       notificationStatus: NOTIFICATION_TYPE,
       messages: string
@@ -228,6 +273,55 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
         )
       }
     } else if (
+      modalName === GeneralActionId.NID_PATTERN &&
+      value.NID_NUMBER_PATTERN
+    ) {
+      try {
+        await callUpdateNIDPatternMutation(
+          value.NID_NUMBER_PATTERN,
+          this.props,
+          this.setUpdatingValue,
+          this.setError
+        )
+        valueChanged(
+          NOTIFICATION_TYPE.SUCCESS,
+          this.props.intl.formatMessage(messages.nidPatternChangeNotification)
+        )
+      } catch {
+        this.setError(
+          this.props.intl.formatMessage(messages.applicationConfigChangeError)
+        )
+        valueChanged(
+          NOTIFICATION_TYPE.ERROR,
+          this.props.intl.formatMessage(messages.applicationConfigChangeError)
+        )
+      }
+    } else if (
+      modalName === GeneralActionId.PHONE_NUMBER &&
+      value.PHONE_NUMBER_PATTERN
+    ) {
+      try {
+        await callUpdatePhoneNumberPatternMutation(
+          value.PHONE_NUMBER_PATTERN,
+          this.props,
+          this.setUpdatingValue,
+          this.setError
+        )
+        valueChanged(
+          NOTIFICATION_TYPE.SUCCESS,
+          this.props.intl.formatMessage(messages.phoneNumberChangeNotification)
+        )
+      } catch {
+        this.setError(
+          this.props.intl.formatMessage(messages.applicationConfigChangeError)
+        )
+        valueChanged(
+          NOTIFICATION_TYPE.ERROR,
+          this.props.intl.formatMessage(messages.applicationConfigChangeError)
+        )
+      }
+    }
+    if (
       modalName === GeneralActionId.GOVT_LOGO &&
       value.COUNTRY_LOGO?.file &&
       value.COUNTRY_LOGO?.fileName
@@ -318,6 +412,8 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
       <ResponsiveModal
         id={`${changeModalName}Modal`}
         title={getTitle(intl, changeModalName)}
+        autoHeight={true}
+        titleHeightAuto={changeModalName === GeneralActionId.NID_PATTERN}
         show={this.showChangeModal}
         contentScrollableY={
           changeModalName === GeneralActionId.CURRENCY ? true : false
@@ -339,6 +435,8 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
                 changeModalName,
                 {
                   APPLICATION_NAME: this.state.applicationName,
+                  NID_NUMBER_PATTERN: this.state.nidPattern,
+                  PHONE_NUMBER_PATTERN: this.state.phoneNumberPattern,
                   COUNTRY_LOGO: {
                     file: this.state.govtLogo,
                     fileName: this.state.logoFileName
@@ -378,6 +476,32 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
               </InputField>
             </Field>
           </Content>
+        )}
+        {changeModalName === GeneralActionId.NID_PATTERN && (
+          <ContentComponent
+            intl={intl}
+            changeModalName={changeModalName}
+            pattern={this.state.nidPattern}
+            example={this.state.nidExample}
+            setPattern={this.setNIDPattern}
+            setExample={this.setNIDExample}
+            patternErrorMessage={intl.formatMessage(
+              messages.nidPatternChangeError
+            )}
+          />
+        )}
+        {changeModalName === GeneralActionId.PHONE_NUMBER && (
+          <ContentComponent
+            intl={intl}
+            changeModalName={changeModalName}
+            pattern={this.state.phoneNumberPattern}
+            example={this.state.phoneNumberExample}
+            setPattern={this.setPhoneNumberPattern}
+            setExample={this.setPhoneNumberExample}
+            patternErrorMessage={intl.formatMessage(
+              messages.phoneNumberChangeError
+            )}
+          />
         )}
         {changeModalName === GeneralActionId.GOVT_LOGO && (
           <Content>

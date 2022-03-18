@@ -540,10 +540,10 @@ type ApplicationConfiguration {
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
   SENTRY: String
   LOGROCKET: String
-  PHONE_NUMBER_PATTERN: PhoneNumberPattern
+  PHONE_NUMBER_PATTERN: String
   BIRTH_REGISTRATION_TARGET: Int
   DEATH_REGISTRATION_TARGET: Int
-  NID_NUMBER_PATTERN: NIDNumberPattern
+  NID_NUMBER_PATTERN: String
 }
 
 input ApplicationConfigurationInput {
@@ -568,10 +568,10 @@ input ApplicationConfigurationInput {
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
   SENTRY: String
   LOGROCKET: String
-  PHONE_NUMBER_PATTERN: PhoneNumberPatternInput
+  PHONE_NUMBER_PATTERN: String
   BIRTH_REGISTRATION_TARGET: Int
   DEATH_REGISTRATION_TARGET: Int
-  NID_NUMBER_PATTERN: NIDNumberPatternInput
+  NID_NUMBER_PATTERN: String
 }
 
 scalar Map
@@ -959,15 +959,6 @@ input SignatureInput {
   data: String
   type: String
 }
-
-type PhoneNumberPattern {
-  pattern: String
-  example: String
-  start: String
-  num: String
-  mask: Mask
-}
-
 type Currency {
   isoCode: String
   languagesAndCountry: [String]
@@ -983,21 +974,6 @@ type CountryLogo {
   fileName: String
   file: String
 }
-
-input PhoneNumberPatternInput {
-  pattern: String
-  example: String
-  start: String
-  num: String
-  mask: MaskInput
-}
-
-input NIDNumberPatternInput {
-  pattern: String
-  example: String
-  num: String
-}
-
 input CountryLogoInput {
   fileName: String
   file: String

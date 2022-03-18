@@ -11,7 +11,7 @@
  */
 import gql from 'graphql-tag'
 import { client } from '@client/utils/apolloClient'
-import { IApplicationConfigName } from '@client/views/SysAdmin/Config/DynamicModal'
+import { IApplicationConfig } from '@client/views/SysAdmin/Config/DynamicModal'
 
 const applicationConfigMutation = gql`
   mutation updateApplicationConfig(
@@ -19,6 +19,8 @@ const applicationConfigMutation = gql`
   ) {
     updateApplicationConfig(applicationConfig: $applicationConfig) {
       APPLICATION_NAME
+      NID_NUMBER_PATTERN
+      PHONE_NUMBER_PATTERN
       COUNTRY_LOGO {
         fileName
         file
@@ -30,9 +32,7 @@ const applicationConfigMutation = gql`
     }
   }
 `
-async function mutateApplicationConfig(
-  applicationConfig: IApplicationConfigName
-) {
+async function mutateApplicationConfig(applicationConfig: IApplicationConfig) {
   return (
     client &&
     client.mutate({

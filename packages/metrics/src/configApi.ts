@@ -11,17 +11,6 @@
  */
 import fetch from 'node-fetch'
 import { CONFIG_API_URL } from '@metrics/constants'
-export interface IPhoneNumberPattern {
-  pattern: RegExp
-  example: string
-  start: string
-  num: string
-  mask: {
-    startForm: number
-    endBefore: number
-  }
-}
-
 export interface ICountryLogo {
   fileName: string
   file: string
@@ -54,7 +43,7 @@ export interface IApplicationConfig {
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
   SENTRY: string
   LOGROCKET: string
-  PHONE_NUMBER_PATTERN: IPhoneNumberPattern
+  PHONE_NUMBER_PATTERN: string
   BIRTH_REGISTRATION_TARGET: number
   DEATH_REGISTRATION_TARGET: number
 }

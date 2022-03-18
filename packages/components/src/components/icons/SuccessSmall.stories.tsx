@@ -9,15 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-interface Window {
-  config: {
-    AUTH_API_URL: string
-    CONFIG_API_URL: string
-    COUNTRY: string
-    LANGUAGES: string
-    CLIENT_APP_URL: string
-    PHONE_NUMBER_PATTERN: RegExp
-    LOGROCKET: string
-    SENTRY: string
-  }
-}
+import React from 'react'
+import { Meta, Story } from '@storybook/react'
+import { SuccessSmall } from './SuccessSmall'
+
+export default {
+  title: 'Components/icons/SuccessSmall',
+  component: SuccessSmall
+} as Meta
+
+const Template: Story<{}> = () => <SuccessSmall />
+
+export const SuccessView = Template.bind({})

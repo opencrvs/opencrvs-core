@@ -41,22 +41,10 @@ interface Window {
     HIDE_EVENT_REGISTER_INFORMATION: boolean
     EXTERNAL_VALIDATION_WORKQUEUE: boolean
     FIELD_AGENT_AUDIT_LOCATIONS: string
+    APPLICATION_AUDIT_LOCATIONS: string
+    PHONE_NUMBER_PATTERN: RegExp
+    NID_NUMBER_PATTERN: RegExp
     DECLARATION_AUDIT_LOCATIONS: string
-    PHONE_NUMBER_PATTERN: {
-      pattern: RegExp
-      example: string
-      start?: string
-      num: string
-      mask: {
-        startForm: number
-        endBefore: number
-      }
-    }
-    NID_NUMBER_PATTERN: {
-      pattern: RegExp
-      example: string
-      num: string
-    }
     LOGROCKET: string
     SENTRY: string
     BIRTH_REGISTRATION_TARGET: number

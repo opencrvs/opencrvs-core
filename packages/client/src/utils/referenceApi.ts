@@ -31,24 +31,6 @@ export interface IContentResponse {
 export interface IAssetResponse {
   logo: string
 }
-
-export interface IPhoneNumberPattern {
-  pattern: RegExp
-  example: string
-  start: string
-  num: string
-  mask: {
-    startForm: number
-    endBefore: number
-  }
-}
-
-export interface INIDNumberPattern {
-  pattern: RegExp
-  example: string
-  num: string
-}
-
 export interface ICountryLogo {
   fileName: string
   file: string
@@ -92,10 +74,10 @@ export interface IApplicationConfig {
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
   SENTRY: string
   LOGROCKET: string
-  PHONE_NUMBER_PATTERN: IPhoneNumberPattern
+  PHONE_NUMBER_PATTERN: RegExp
   BIRTH_REGISTRATION_TARGET: number
   DEATH_REGISTRATION_TARGET: number
-  NID_NUMBER_PATTERN: INIDNumberPattern
+  NID_NUMBER_PATTERN: RegExp
 }
 
 export interface IApplicationConfigResponse {

@@ -12,8 +12,6 @@
 import {
   GQLCountryLogoInput,
   GQLCurrencyInput,
-  GQLNIDNumberPatternInput,
-  GQLPhoneNumberPatternInput,
   GQLResolver
 } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
@@ -67,14 +65,12 @@ export const resolvers: GQLResolver = {
           applicationConfig.EXTERNAL_VALIDATION_WORKQUEUE as boolean,
         SENTRY: applicationConfig.SENTRY as string,
         LOGROCKET: applicationConfig.LOGROCKET as string,
-        PHONE_NUMBER_PATTERN:
-          applicationConfig.PHONE_NUMBER_PATTERN as GQLPhoneNumberPatternInput,
+        PHONE_NUMBER_PATTERN: applicationConfig.PHONE_NUMBER_PATTERN as string,
         BIRTH_REGISTRATION_TARGET:
           applicationConfig.BIRTH_REGISTRATION_TARGET as number,
         DEATH_REGISTRATION_TARGET:
           applicationConfig.DEATH_REGISTRATION_TARGET as number,
-        NID_NUMBER_PATTERN:
-          applicationConfig.NID_NUMBER_PATTERN as GQLNIDNumberPatternInput
+        NID_NUMBER_PATTERN: applicationConfig.NID_NUMBER_PATTERN as string
       }
 
       const res = await fetch(
