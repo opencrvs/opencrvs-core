@@ -15,7 +15,6 @@ import { createStore } from '@client/store'
 import * as React from 'react'
 import { GQLDeclarationsStartedMetrics } from '@opencrvs/gateway/src/graphql/schema'
 import * as locationUtils from '@client/utils/locationUtils'
-import moment from 'moment'
 
 describe('Registration rates report', () => {
   const { store, history } = createStore()
@@ -28,8 +27,8 @@ describe('Registration rates report', () => {
       <DeclarationsStartedReport
         loading={true}
         locationId={'c879ce5c-545b-4042-98a6-77015b0e13df'}
-        reportTimeFrom={moment(new Date())}
-        reportTimeTo={moment(new Date())}
+        reportTimeFrom={new Date(Date.now())}
+        reportTimeTo={new Date(Date.now())}
       />,
       { store, history }
     )
@@ -51,8 +50,8 @@ describe('Registration rates report', () => {
       <DeclarationsStartedReport
         data={data}
         locationId={'c879ce5c-545b-4042-98a6-77015b0e13df'}
-        reportTimeFrom={moment(new Date())}
-        reportTimeTo={moment(new Date())}
+        reportTimeFrom={new Date(Date.now())}
+        reportTimeTo={new Date(Date.now())}
       />,
       { store, history }
     )

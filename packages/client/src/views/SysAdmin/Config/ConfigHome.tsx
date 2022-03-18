@@ -351,8 +351,7 @@ class ConfigHomeComponent extends React.Component<Props, State> {
                 new Date(
                   parseInt(birthCertificateTemplate.svgDateUpdated)
                 ).toString(),
-                intl.locale,
-                'LL'
+                intl.locale
               )
             const deathLongDate =
               deathCertificateTemplate &&
@@ -360,8 +359,7 @@ class ConfigHomeComponent extends React.Component<Props, State> {
                 new Date(
                   parseInt(deathCertificateTemplate.svgDateUpdated)
                 ).toString(),
-                intl.locale,
-                'LL'
+                intl.locale
               )
             const CertificateSection = {
               title: intl.formatMessage(messages.listTitle),
