@@ -11,9 +11,10 @@
  */
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { createServer } from '../..'
+import { createServer } from '../../server'
 import {
   testFhirBundle,
+  testFhirTaskBundle,
   testFhirBundleWithIds,
   userMock,
   fieldAgentPractitionerMock,
@@ -1111,6 +1112,59 @@ describe('markEventAsRegisteredCallbackHandler', () => {
         trackingId: 'B1mW7jA',
         registrationNumber: '12345678'
       },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(200)
+  })
+})
+
+describe('markEventAsDownloadedHandler', () => {
+  let server: any
+
+  beforeEach(async () => {
+    fetch.resetMocks()
+    server = await createServer()
+    fetch.mockResponses(
+      [userMock, { status: 200 }],
+      [fieldAgentPractitionerMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [hearthResponseMock, { status: 200 }]
+    )
+  })
+
+  it('returns OK with full fhir bundle as payload', async () => {
+    const token = jwt.sign(
+      { scope: ['validate'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:workflow-user'
+      }
+    )
+    const bundleWithDownloadSignature: any = cloneDeep(testFhirTaskBundle)
+    bundleWithDownloadSignature.signature = {
+      type: [
+        {
+          code: 'downloaded'
+        }
+      ]
+    }
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/fhir',
+      payload: bundleWithDownloadSignature,
       headers: {
         Authorization: `Bearer ${token}`
       }

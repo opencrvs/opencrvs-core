@@ -32,8 +32,6 @@ import * as validators from '@opencrvs/client/src/utils/validate'
 import { ICertificate as IDeclarationCertificate } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
-import { registerForms } from './register/fieldDefinitions/register'
-import { createUserForm } from './user/fieldDefinitions/createUser'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -80,8 +78,43 @@ export enum Action {
   REJECT_DECLARATION = 'reject',
   LOAD_REVIEW_DECLARATION = 'load declaration data for review',
   LOAD_CERTIFICATE_DECLARATION = 'load declaration data for certificate collection',
+  REINSTATE_DECLARATION = 'reinstate',
+  ARCHIVE_DECLARATION = 'archive',
   LOAD_REQUESTED_CORRECTION_DECLARATION = 'load declaration data for which is requested correction',
   REQUEST_CORRECTION_DECLARATION = 'request correction'
+}
+
+export enum QuestionConfigFieldType {
+  TEXT = 'TEXT',
+  TEL = 'TEL',
+  NUMBER = 'NUMBER',
+  TEXTAREA = 'TEXTAREA',
+  SUBSECTION = 'SUBSECTION',
+  PARAGRAPH = 'PARAGRAPH'
+}
+
+export interface IQuestionIdentifiers {
+  event: string
+  sectionId: string
+  groupId: string
+  fieldName: string
+}
+export interface IQuestionConfig {
+  fieldId: string
+  label?: MessageDescriptor
+  placeholder?: MessageDescriptor
+  maxLength?: number
+  fieldName?: string
+  fieldType?: QuestionConfigFieldType
+  preceedingFieldId?: string
+  required?: boolean
+  enabled: string
+  custom?: boolean
+  initialValue?: string
+}
+
+export interface IFormConfig {
+  questionConfig: IQuestionConfig[]
 }
 
 export interface ISelectOption {
@@ -99,7 +132,7 @@ export interface ICheckboxOption {
 }
 
 export interface IDynamicOptions {
-  dependency: string
+  dependency?: string
   jurisdictionType?: string
   resource?: string
   options?: { [key: string]: ISelectOption[] }
@@ -160,7 +193,7 @@ export interface ISerializedDynamicFormFieldDefinitions {
       }
   validate?: Array<{
     dependencies: string[]
-    validator: FactoryOperation<typeof validators>
+    validator: FactoryOperation<typeof validators, IQueryDescriptor>
   }>
 }
 
@@ -222,6 +255,14 @@ export interface FieldValueMap {
   [key: string]: IFormFieldValue
 }
 
+export interface IQuestionnaireQuestion {
+  fieldId: string
+  value: string
+}
+export interface IQuestionnaire {
+  data: IQuestionnaireQuestion[]
+}
+
 export interface IFileValue {
   optionValues: IFormFieldValue[]
   type: string
@@ -261,25 +302,24 @@ export type IFormFieldQueryMapFunction = (
  * Takes in an array of function arguments (array, number, string, function)
  * and replaces all functions with the descriptor type
  *
- * So type Array<number | Function | string> would become
- * Array<number | Descriptor | string>
+ * So type Array<number | Function | string> would become
+ * Array<number | Descriptor | string>
  */
-type FunctionParamsToDescriptor<T> =
+type FunctionParamsToDescriptor<T, Descriptor> =
   // It's an array - recursively call this type for all items
   T extends Array<any>
-    ? { [K in keyof T]: FunctionParamsToDescriptor<T[K]> }
-    : T extends IFormFieldQueryMapFunction // It's a query transformation function - return a query transformation descriptor
-    ? IQueryDescriptor
-    : T extends IFormFieldMutationMapFunction // It's a mutation transformation function - return a mutation transformation descriptor
-    ? IMutationDescriptor
+    ? { [K in keyof T]: FunctionParamsToDescriptor<T[K], Descriptor> }
+    : T extends IFormFieldQueryMapFunction | IFormFieldMutationMapFunction // It's a query transformation function - return a query transformation descriptor
+    ? Descriptor
     : T // It's a none of the above - return self
 
 interface FactoryOperation<
   OperationMap,
+  Descriptor extends IQueryDescriptor | IMutationDescriptor,
   Key extends keyof OperationMap = keyof OperationMap
 > {
   operation: Key
-  parameters: FunctionParamsToDescriptor<Params<OperationMap[Key]>>
+  parameters: FunctionParamsToDescriptor<Params<OperationMap[Key]>, Descriptor>
 }
 interface Operation<
   OperationMap,
@@ -292,7 +332,10 @@ export type IFormFieldQueryMapDescriptor<
   T extends keyof typeof queries = keyof typeof queries
 > = {
   operation: T
-  parameters: FunctionParamsToDescriptor<Params<typeof queries[T]>>
+  parameters: FunctionParamsToDescriptor<
+    Params<typeof queries[T]>,
+    IQueryDescriptor
+  >
 }
 
 export type IFormFieldMapping = {
@@ -384,6 +427,8 @@ export interface IFormFieldBase {
   prefix?: string
   postfix?: string
   disabled?: boolean
+  enabled?: string
+  custom?: boolean
   initialValue?: IFormFieldValue
   initialValueKey?: string
   extraValue?: IFormFieldValue
@@ -416,6 +461,7 @@ export interface IFormFieldBase {
   }
   ignoreFieldLabelOnErrorMessage?: boolean
   ignoreBottomMargin?: boolean
+  customQuesstionMappingId?: string
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {
@@ -436,11 +482,21 @@ export type INestedInputFields = {
   [key: string]: IFormField[]
 }
 
+export enum FLEX_DIRECTION {
+  ROW = 'row',
+  ROW_REVERSE = 'row-reverse',
+  COLUMN = 'column',
+  COLUMN_REVERSE = 'column-reverse',
+  INITIAL = 'initial',
+  INHERIT = 'inherit'
+}
+
 export interface IRadioGroupFormField extends IFormFieldBase {
   type: typeof RADIO_GROUP
   options: IRadioOption[]
   size?: RadioSize
   notice?: MessageDescriptor
+  flexDirection?: FLEX_DIRECTION
 }
 
 export interface IRadioGroupWithNestedFieldsFormField
@@ -531,9 +587,10 @@ export interface ILocationSearchInputFormField extends IFormFieldBase {
     keyof IOfflineData,
     'facilities' | 'locations' | 'offices'
   >
-  locationList: ISearchLocation[]
+  locationList?: ISearchLocation[]
   searchableType: string
   dispatchOptions?: IDispatchOptions
+  dynamicOptions?: IDynamicOptions
 }
 
 export interface IWarningField extends IFormFieldBase {
@@ -623,6 +680,7 @@ export interface IConditional {
 }
 
 export interface IConditionals {
+  presentAtBirthRegistration: IConditional
   iDType: IConditional
   isOfficePreSelected: IConditional
   fathersDetailsExist: IConditional
@@ -730,7 +788,10 @@ export type QueryFactoryOperation<
   T extends QueryFactoryOperationKeys = QueryFactoryOperationKeys
 > = {
   operation: T
-  parameters: FunctionParamsToDescriptor<Params<typeof queries[T]>>
+  parameters: FunctionParamsToDescriptor<
+    Params<typeof queries[T]>,
+    IQueryDescriptor
+  >
 }
 
 type QueryDefaultOperation<
@@ -757,7 +818,10 @@ export type MutationFactoryOperation<
   T extends MutationFactoryOperationKeys = MutationFactoryOperationKeys
 > = {
   operation: T
-  parameters: FunctionParamsToDescriptor<Params<typeof mutations[T]>>
+  parameters: FunctionParamsToDescriptor<
+    Params<typeof mutations[T]>,
+    IMutationDescriptor
+  >
 }
 
 type MutationDefaultOperation<
@@ -807,6 +871,7 @@ export enum DeathSection {
   Event = 'deathEvent',
   CauseOfDeath = 'causeOfDeath',
   Informants = 'informant',
+  Registration = 'registration',
   DeathDocuments = 'documents',
   Preview = 'preview',
   Father = 'father',
@@ -1050,8 +1115,10 @@ export interface Ii18nLocationSearchInputFormField extends Ii18nFormFieldBase {
     'facilities' | 'locations' | 'offices'
   >
   searchableType: string
-  locationList: ISearchLocation[]
+  locationList?: ISearchLocation[]
   dispatchOptions?: IDispatchOptions
+
+  dynamicOptions?: IDynamicOptions
 }
 
 export interface Ii18nWarningField extends Ii18nFormFieldBase {

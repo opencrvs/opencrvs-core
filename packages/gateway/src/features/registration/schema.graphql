@@ -9,6 +9,7 @@
 # graphic logo are (registered/a) trademark(s) of Plan International.
 enum RegStatus {
   IN_PROGRESS
+  ARCHIVED
   DECLARED
   DECLARATION_UPDATED
   WAITING_VALIDATION
@@ -16,6 +17,7 @@ enum RegStatus {
   REGISTERED
   CERTIFIED
   REJECTED
+  DOWNLOADED
 }
 
 enum BirthRegType {
@@ -254,9 +256,29 @@ type RegWorkflow { # Task
   timeLogged: Int # -> from metrics
 }
 
+type InputOutput {
+  valueCode: String
+  valueId: String
+  valueString: String
+}
+
+type History {
+  user: User
+  date: Date
+  action: RegStatus
+  reinstated: Boolean # -> extension(url='http://opencrvs.org/specs/extension/regReinstated')
+  location: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastLocation').valueReference
+  office: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastOffice').valueReference
+  comments: [Comment]
+  input: [InputOutput]
+  output: [InputOutput]
+  certificates: [Certificate]
+}
+
 interface EventRegistration {
   id: ID! # long uuid
   registration: Registration
+  history: [History]
   createdAt: Date
 }
 
@@ -269,6 +291,7 @@ input BirthRegistrationInput {
   informant: RelatedPersonInput
   eventLocation: LocationInput
   birthType: BirthType # Not in BDRIS2
+  questionnaire: [QuestionnaireQuestionInput]
   weightAtBirth: Float # Not in BDRIS2
   attendantAtBirth: AttendantType # Not in BDRIS2
   otherAttendantAtBirth: String
@@ -293,6 +316,7 @@ type BirthRegistration implements EventRegistration { # -> Composition
   informant: RelatedPerson # -> .section(code='informant-details').entry.reference
   eventLocation: Location
   birthType: BirthType # -> Observation.valueInteger
+  questionnaire: [QuestionnaireQuestion]
   weightAtBirth: Float # -> Observation.valueQuantity (code=kg)
   attendantAtBirth: AttendantType # -> Observation.valueString
   otherAttendantAtBirth: String
@@ -305,6 +329,7 @@ type BirthRegistration implements EventRegistration { # -> Composition
   primaryCaregiver: PrimaryCaregiver
   createdAt: Date # -> .date($first)
   updatedAt: Date # -> .date
+  history: [History]
 }
 
 input DeathRegistrationInput {
@@ -317,6 +342,7 @@ input DeathRegistrationInput {
   father: PersonInput # -> Use for informant ->.section(code='father-details').entry.reference
   spouse: PersonInput # -> Use for informant ->.section(code='spouse-details').entry.reference
   eventLocation: LocationInput
+  questionnaire: [QuestionnaireQuestionInput]
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
   causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept
   causeOfDeath: String # need to store ICD-10? More types of cause of death
@@ -339,6 +365,7 @@ type DeathRegistration implements EventRegistration { # -> Composition
   father: Person # -> Use for informant ->.section(code='father-details').entry.reference
   spouse: Person # -> Use for informant ->.section(code='spouse-details').entry.reference
   eventLocation: Location
+  questionnaire: [QuestionnaireQuestion]
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
   causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept
   causeOfDeath: String # -> Observation.valueCodeableConcept
@@ -347,6 +374,7 @@ type DeathRegistration implements EventRegistration { # -> Composition
   medicalPractitioner: MedicalPractitioner # -> Encounter.participant
   createdAt: Date # -> .date($first)
   updatedAt: Date # -> .date
+  history: [History]
 }
 
 input CorrectionValueInput {
@@ -427,6 +455,11 @@ type Certificate { # -> Document Reference
   data: String # -> .content.attachment.data base64
 }
 
+input QuestionnaireQuestionInput {
+  fieldId: String
+  value: String
+}
+
 input AttachmentInput {
   _fhirID: ID
   contentType: String
@@ -440,6 +473,11 @@ input AttachmentInput {
   description: String # -> use for other document type -> .description
   subject: AttachmentSubject
   createdAt: Date
+}
+
+type QuestionnaireQuestion {
+  fieldId: String
+  value: String
 }
 
 type Attachment { # -> DocumentReference
@@ -498,6 +536,11 @@ type CreatedIds {
   registrationNumber: String
 }
 
+type Reinstated {
+  taskEntryResourceID: ID!
+  registrationStatus: RegStatus
+}
+
 type Query {
   fetchBirthRegistration(id: ID!): BirthRegistration
   searchBirthRegistrations(fromDate: Date, toDate: Date): [BirthRegistration]
@@ -543,6 +586,8 @@ type Mutation {
     details: BirthRegistrationInput!
   ): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID! # updated status to 'voided' - the registration was captured in error
+  markEventAsReinstated(id: String!): Reinstated # updates status to 'reinstated'
+  markEventAsArchived(id: String!): ID! # updates status to 'archived'
   notADuplicate(id: String!, duplicateId: String!): ID! # removes duplicates from composition
   # DEATH
   createDeathRegistration(details: DeathRegistrationInput!): CreatedIds!

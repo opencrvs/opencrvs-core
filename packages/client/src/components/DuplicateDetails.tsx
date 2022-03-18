@@ -56,6 +56,7 @@ export enum Event {
 }
 
 export enum Action {
+  ARCHIVED = 'ARCHIVED',
   IN_PROGRESS = 'IN_PROGRESS',
   DECLARATION_UPDATED = 'DECLARATION_UPDATED',
   DECLARED = 'DECLARED',
@@ -64,6 +65,7 @@ export enum Action {
   REJECTED = 'REJECTED',
   REGISTERED = 'REGISTERED',
   CERTIFIED = 'CERTIFIED',
+  DOWNLOADED = 'Declaration downloaded',
   LOAD_REVIEW_DECLARATION = 'load declaration data for review'
 }
 interface IProps extends IntlShapeProps {

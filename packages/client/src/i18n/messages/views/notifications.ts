@@ -18,10 +18,13 @@ interface INotificationsMessages
   outboxText: MessageDescriptor
   updatePINSuccess: MessageDescriptor
   processingText: MessageDescriptor
+  statusArchiving: MessageDescriptor
   statusRegistering: MessageDescriptor
   statusRejecting: MessageDescriptor
+  statusReinstating: MessageDescriptor
   statusRequestingCorrection: MessageDescriptor
   statusSubmitting: MessageDescriptor
+  statusWaitingToBeArchived: MessageDescriptor
   statusWaitingToValidate: MessageDescriptor
   statusWaitingToRegister: MessageDescriptor
   statusWaitingToReject: MessageDescriptor
@@ -62,6 +65,11 @@ const messagesToDefine: INotificationsMessages = {
     description: 'Declaration processing text',
     id: 'misc.notif.processingText'
   },
+  statusArchiving: {
+    defaultMessage: 'Archiving...',
+    description: 'Label for application status Archiving',
+    id: 'regHome.outbox.statusArchiving'
+  },
   statusRegistering: {
     defaultMessage: 'Registering...',
     description: 'Label for declaration status Registering',
@@ -72,6 +80,11 @@ const messagesToDefine: INotificationsMessages = {
     description: 'Label for declaration status Rejecting',
     id: 'regHome.outbox.statusRejecting'
   },
+  statusReinstating: {
+    defaultMessage: 'Reinstating...',
+    description: 'Label for application status Reinstating',
+    id: 'regHome.outbox.statusReinstating'
+  },
   statusRequestingCorrection: {
     defaultMessage: 'Requesting correction...',
     description: 'Label for declaration status Requesting correction',
@@ -81,6 +94,16 @@ const messagesToDefine: INotificationsMessages = {
     defaultMessage: 'Submitting...',
     description: 'Label for declaration status submitting',
     id: 'regHome.outbox.statusSubmitting'
+  },
+  statusWaitingToBeArchived: {
+    defaultMessage: 'Waiting to be archived',
+    description: 'Label for application status waiting to be archived',
+    id: 'regHome.outbox.statusWaitingToBeArchived'
+  },
+  statusWaitingToBeReinstated: {
+    defaultMessage: 'Waiting to be reinstated',
+    description: 'Label for application status waiting to be reinstated',
+    id: 'regHome.outbox.statusWaitingToBeReinstated'
   },
   statusWaitingToValidate: {
     defaultMessage: 'Sending for approval',

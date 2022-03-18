@@ -18,8 +18,13 @@ import {
 } from '@client/forms'
 import * as offlineActions from '@client/offline/actions'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
-import { registerForms } from '@client/forms/register/fieldDefinitions/register'
+import { registerForms } from '@client/forms/configuration/default'
 import { messages } from '@client/i18n/messages/views/review'
+import {
+  configureRegistrationForm,
+  filterQuestionsByEventType,
+  sortFormCustomisations
+} from '@client/forms/configuration'
 
 export type IRegisterFormState =
   | {
@@ -52,8 +57,22 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
   switch (action.type) {
     case offlineActions.READY:
     case offlineActions.CONTENT_LOADED:
-      const birth = deserializeForm(registerForms.birth as ISerializedForm)
-      const death = deserializeForm(registerForms.death as ISerializedForm)
+      const configuredBirthForm: ISerializedForm = configureRegistrationForm(
+        sortFormCustomisations(
+          filterQuestionsByEventType(action.payload.formConfig, 'birth'),
+          registerForms.birth
+        ),
+        registerForms.birth
+      )
+      const configuredDeathForm: ISerializedForm = configureRegistrationForm(
+        sortFormCustomisations(
+          filterQuestionsByEventType(action.payload.formConfig, 'death'),
+          registerForms.death
+        ),
+        registerForms.death
+      )
+      const birth = deserializeForm(configuredBirthForm)
+      const death = deserializeForm(configuredDeathForm)
 
       const preview = {
         viewType: 'preview' as const,

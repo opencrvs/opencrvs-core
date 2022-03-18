@@ -10,11 +10,19 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
+  createDeclaration,
+  archiveDeclaration,
+  storeDeclaration,
+  IUserData,
   mergeDeclaredDeclarations,
   filterProcessingDeclarations,
   filterProcessingDeclarationsFromQuery
 } from '.'
 import { Event } from '@client/forms'
+import { AppStore, createStore } from '@client/store'
+import { mockDeclarationData, flushPromises } from '@client/tests/util'
+import { IUserDetails } from '@client/utils/userUtils'
+import { storage } from '@client/storage'
 
 describe('query result filtering tests', () => {
   describe('.filterProcessingDeclarations()', () => {
@@ -257,5 +265,63 @@ describe('Utilty functions', () => {
     mergeDeclaredDeclarations(declarations, declaredDeclarations)
 
     expect(declarations).toHaveLength(3)
+  })
+})
+
+describe('archiveDeclaration tests', () => {
+  let store: AppStore
+  const declaration = createDeclaration(Event.BIRTH, mockDeclarationData)
+  let indexedDB: { USER_DATA: string; USER_DETAILS: string }
+
+  beforeEach(() => {
+    store = createStore().store
+    store.dispatch(storeDeclaration(declaration))
+
+    const currentUserData: IUserData = {
+      userID: '123',
+      declarations: [declaration]
+    }
+
+    const currentUserDetails: IUserDetails = {
+      language: 'en',
+      userMgntUserID: '123',
+      localRegistrar: { name: [] }
+    }
+
+    indexedDB = {
+      USER_DATA: JSON.stringify([currentUserData]),
+      USER_DETAILS: JSON.stringify(currentUserDetails)
+    }
+
+    // Mocking storage reading
+    storage.getItem = jest.fn((key: string) => {
+      switch (key) {
+        case 'USER_DATA':
+        case 'USER_DETAILS':
+          return Promise.resolve(indexedDB[key])
+        default:
+          return Promise.resolve(null)
+      }
+    })
+
+    // Mocking storage writing
+    storage.setItem = jest.fn((key: string, value: string) => {
+      switch (key) {
+        case 'USER_DATA':
+        case 'USER_DETAILS':
+          indexedDB[key] = value
+          return Promise.resolve(indexedDB[key])
+        default:
+          return Promise.resolve(value)
+      }
+    })
+  })
+
+  it('should make an application ready to be archived', async () => {
+    store.dispatch(archiveDeclaration(declaration.id))
+    await flushPromises()
+    const declarations = JSON.parse(indexedDB.USER_DATA)[0].declarations
+
+    expect(declarations[0].submissionStatus).toBe('READY_TO_ARCHIVE')
   })
 })

@@ -12,7 +12,7 @@
 import mockingoose from 'mockingoose'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
-import { createServer } from '@user-mgnt/index'
+import { createServer } from '@user-mgnt/server'
 import User, { IUser } from '@user-mgnt/model/user'
 
 const sysAdminToken = jwt.sign(

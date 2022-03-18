@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createServer } from '@config/index'
+import { createServer } from '@config/server'
 import Question, { IQuestion } from '@config/models/question'
 import mockingoose from 'mockingoose'
 import * as jwt from 'jsonwebtoken'
@@ -42,7 +42,6 @@ const mockQuestion = {
   fieldType: 'TEXT',
   preceedingFieldId: 'myPreviousFieldId',
   required: true,
-  enabled: true,
   custom: true,
   initialValue: 'myValue'
 } as IQuestion
