@@ -13,7 +13,7 @@
 import React from 'react'
 import { Meta, Story } from '@storybook/react'
 import { NavigationItem, INavigationItemProps } from './NavigationItem'
-import { LeftNavigationDeclarationIcons } from '../../icons/LeftNavigationDeclarationIcons'
+import { DeclarationIconSmall } from '../../icons/DeclarationIconSmall'
 import { Activity } from '../../icons/Activity'
 import { Users } from '../../icons/Users'
 import { Configuration } from '../../icons/Configuration'
@@ -25,7 +25,7 @@ const Template: Story<INavigationItemProps> = (args) => (
 export const itemInProgress = Template.bind({})
 
 itemInProgress.args = {
-  icon: () => <LeftNavigationDeclarationIcons />,
+  icon: () => <DeclarationIconSmall />,
   label: 'In progress',
   count: 6
 }
@@ -33,7 +33,7 @@ itemInProgress.args = {
 export const itemReadyForReview = Template.bind({})
 
 itemReadyForReview.args = {
-  icon: () => <LeftNavigationDeclarationIcons color={'orange'} />,
+  icon: () => <DeclarationIconSmall color={'orange'} />,
   label: 'Ready for review',
   count: 23
 }
@@ -41,14 +41,14 @@ itemReadyForReview.args = {
 export const itemRequiresUpdates = Template.bind({})
 
 itemRequiresUpdates.args = {
-  icon: () => <LeftNavigationDeclarationIcons color={'red'} />,
+  icon: () => <DeclarationIconSmall color={'red'} />,
   label: 'Requires updates'
 }
 
 export const itemReadyToPrint = Template.bind({})
 
 itemReadyToPrint.args = {
-  icon: () => <LeftNavigationDeclarationIcons color={'green'} />,
+  icon: () => <DeclarationIconSmall color={'green'} />,
   label: 'Ready to print',
   count: 23
 }

@@ -27,7 +27,6 @@ import { getMutationMapping } from '@client/views/DataProvider/MutationProvider'
 import { REGISTRATION_HOME_QUERY } from '@client/views/OfficeHome/queries'
 import { getOperationName } from 'apollo-utilities'
 import { client } from '@client/utils/apolloClient'
-import moment from 'moment'
 import { FetchResult, DocumentNode } from 'apollo-link'
 import {
   getAttachmentSectionKey,
@@ -35,6 +34,7 @@ import {
 } from './utils/draftUtils'
 import { getScope } from './profile/profileSelectors'
 import { RequestHandler } from 'mock-apollo-client'
+import differenceInMinutes from 'date-fns/differenceInMinutes'
 
 const INTERVAL_TIME = 5000
 const HANGING_EXPIRE_MINUTES = 15
@@ -43,7 +43,9 @@ const ALLOWED_STATUS_FOR_RETRY = [
   SUBMISSION_STATUS.READY_TO_APPROVE.toString(),
   SUBMISSION_STATUS.READY_TO_REGISTER.toString(),
   SUBMISSION_STATUS.READY_TO_REJECT.toString(),
+  SUBMISSION_STATUS.READY_TO_ARCHIVE.toString(),
   SUBMISSION_STATUS.READY_TO_CERTIFY.toString(),
+  SUBMISSION_STATUS.READY_TO_REINSTATE.toString(),
   SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION.toString(),
   SUBMISSION_STATUS.FAILED_NETWORK.toString()
 ]
@@ -52,6 +54,8 @@ const INPROGRESS_STATUS = [
   SUBMISSION_STATUS.APPROVING.toString(),
   SUBMISSION_STATUS.REGISTERING.toString(),
   SUBMISSION_STATUS.REJECTING.toString(),
+  SUBMISSION_STATUS.ARCHIVING.toString(),
+  SUBMISSION_STATUS.REINSTATING.toString(),
   SUBMISSION_STATUS.CERTIFYING.toString(),
   SUBMISSION_STATUS.REQUESTING_CORRECTION.toString()
 ]
@@ -61,6 +65,9 @@ const changeStatus = {
   [SUBMISSION_STATUS.REGISTERING.toString()]:
     SUBMISSION_STATUS.READY_TO_REGISTER,
   [SUBMISSION_STATUS.REJECTING.toString()]: SUBMISSION_STATUS.READY_TO_REJECT,
+  [SUBMISSION_STATUS.ARCHIVING.toString()]: SUBMISSION_STATUS.READY_TO_ARCHIVE,
+  [SUBMISSION_STATUS.REINSTATING.toString()]:
+    SUBMISSION_STATUS.READY_TO_REINSTATE,
   [SUBMISSION_STATUS.CERTIFYING.toString()]: SUBMISSION_STATUS.READY_TO_CERTIFY,
   [SUBMISSION_STATUS.REQUESTING_CORRECTION.toString()]:
     SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION
@@ -76,19 +83,27 @@ const ACTION_LIST: IActionList = {
   [Action.REGISTER_DECLARATION]: Action.REGISTER_DECLARATION,
   [Action.REJECT_DECLARATION]: Action.REJECT_DECLARATION,
   [Action.COLLECT_CERTIFICATE]: Action.COLLECT_CERTIFICATE,
-  [Action.REQUEST_CORRECTION_DECLARATION]: Action.REQUEST_CORRECTION_DECLARATION
+  [Action.REQUEST_CORRECTION_DECLARATION]:
+    Action.REQUEST_CORRECTION_DECLARATION,
+  [Action.REINSTATE_DECLARATION]: Action.REINSTATE_DECLARATION,
+  [Action.COLLECT_CERTIFICATE]: Action.COLLECT_CERTIFICATE,
+  [Action.ARCHIVE_DECLARATION]: Action.ARCHIVE_DECLARATION
 }
 const REQUEST_IN_PROGRESS_STATUS: IActionList = {
   [Action.SUBMIT_FOR_REVIEW]: SUBMISSION_STATUS.SUBMITTING,
   [Action.APPROVE_DECLARATION]: SUBMISSION_STATUS.APPROVING,
   [Action.REGISTER_DECLARATION]: SUBMISSION_STATUS.REGISTERING,
   [Action.REJECT_DECLARATION]: SUBMISSION_STATUS.REJECTING,
+  [Action.ARCHIVE_DECLARATION]: SUBMISSION_STATUS.ARCHIVING,
+  [Action.REINSTATE_DECLARATION]: SUBMISSION_STATUS.REINSTATING,
   [Action.COLLECT_CERTIFICATE]: SUBMISSION_STATUS.CERTIFYING,
   [Action.REQUEST_CORRECTION_DECLARATION]:
     SUBMISSION_STATUS.REQUESTING_CORRECTION
 }
 const SUCCESS_SUBMISSION_STATUS: IActionList = {
   [Action.SUBMIT_FOR_REVIEW]: SUBMISSION_STATUS.SUBMITTED,
+  [Action.ARCHIVE_DECLARATION]: SUBMISSION_STATUS.ARCHIVED,
+  [Action.REINSTATE_DECLARATION]: SUBMISSION_STATUS.REINSTATED,
   [Action.APPROVE_DECLARATION]: SUBMISSION_STATUS.APPROVED,
   [Action.REGISTER_DECLARATION]: SUBMISSION_STATUS.REGISTERED,
   [Action.REJECT_DECLARATION]: SUBMISSION_STATUS.REJECTED,
@@ -127,13 +142,14 @@ export class SubmissionController {
     )
   }
   public requeueHangingDeclarations = async () => {
-    const now = moment(Date.now())
+    const now = Date.now()
     this.getDeclarations()
       .filter((app: IDeclaration) => {
         return (
           app.submissionStatus &&
           INPROGRESS_STATUS.includes(app.submissionStatus) &&
-          now.diff(app.modifiedOn, 'minutes') > HANGING_EXPIRE_MINUTES
+          app.modifiedOn &&
+          differenceInMinutes(now, app.modifiedOn) > HANGING_EXPIRE_MINUTES
         )
       })
       .forEach(async (app: IDeclaration) => {
@@ -224,7 +240,14 @@ export class SubmissionController {
     const submissionStatus =
       SUCCESS_SUBMISSION_STATUS[declaration.action || ''] ||
       SUBMISSION_STATUS.SUBMITTED
+
     declaration.submissionStatus = submissionStatus
+
+    if (declaration.action === Action.REINSTATE_DECLARATION) {
+      declaration.submissionStatus = ''
+      declaration.registrationStatus =
+        result.data.markEventAsReinstated.registrationStatus
+    }
     const response =
       (result && result.data && result.data.createBirthRegistration) ||
       (result && result.data && result.data.createDeathRegistration) ||
@@ -252,7 +275,10 @@ export class SubmissionController {
       }
       declaration.operationHistories.push(taskHistory)
     }
-    await this.store.dispatch(updateRegistrarWorkqueue())
+    //It needs some times to elasticSearch to update index
+    setTimeout(async () => {
+      await this.store.dispatch(updateRegistrarWorkqueue())
+    }, 100)
     await this.store.dispatch(modifyDeclaration(declaration))
 
     if (
@@ -260,6 +286,8 @@ export class SubmissionController {
       declaration.submissionStatus === SUBMISSION_STATUS.APPROVED ||
       declaration.submissionStatus === SUBMISSION_STATUS.REGISTERED ||
       declaration.submissionStatus === SUBMISSION_STATUS.REJECTED ||
+      declaration.submissionStatus === SUBMISSION_STATUS.ARCHIVED ||
+      declaration.submissionStatus === SUBMISSION_STATUS.REINSTATED ||
       declaration.submissionStatus === SUBMISSION_STATUS.REQUESTED_CORRECTION
     ) {
       if (scopes.includes('declare')) {

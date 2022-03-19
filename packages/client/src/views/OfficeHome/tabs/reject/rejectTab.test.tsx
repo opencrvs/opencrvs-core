@@ -32,7 +32,6 @@ import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { GridTable } from '@opencrvs/components/lib/interface'
 import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
-import moment from 'moment'
 import * as React from 'react'
 import { Store } from 'redux'
 import { RejectTab } from './rejectTab'
@@ -233,12 +232,7 @@ describe('OfficeHome sent for update tab related tests', () => {
 
     const table = await waitForElement(testComponent, GridTable)
     const data = table.prop('content')
-    const EXPECTED_DATE_OF_REJECTION = formattedDuration(
-      moment(
-        moment(TIME_STAMP, 'x').format('YYYY-MM-DD HH:mm:ss'),
-        'YYYY-MM-DD HH:mm:ss'
-      )
-    )
+    const EXPECTED_DATE_OF_REJECTION = formattedDuration(Number(TIME_STAMP))
 
     expect(data.length).toBe(2)
     expect(data[1].id).toBe('bc09200d-0160-43b4-9e2b-5b9e90424e95')

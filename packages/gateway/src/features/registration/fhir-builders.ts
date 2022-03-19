@@ -79,7 +79,10 @@ import {
   getReasonCodeAndDesc,
   removeObservationResource,
   selectOrCreateEncounterPartitioner,
-  selectOrCreateEncounterParticipant
+  selectOrCreateEncounterParticipant,
+  selectOrCreateQuestionnaireResource,
+  findExtension,
+  setQuestionnaireItem
 } from '@gateway/features/fhir/utils'
 import {
   OPENCRVS_SPECIFICATION_URL,
@@ -759,6 +762,31 @@ function createRegStatusCommentTimeStamp(
     }
   }
   resource.note[context._index.comments].time = fieldValue
+}
+
+function createQuestionnaireBuilder() {
+  return {
+    fieldId: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const questionnaire = selectOrCreateQuestionnaireResource(
+        BIRTH_ENCOUNTER_CODE,
+        fhirBundle,
+        context
+      )
+      setQuestionnaireItem(questionnaire, context, fieldValue, null)
+    },
+    value: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
+      const questionnaire = selectOrCreateQuestionnaireResource(
+        BIRTH_ENCOUNTER_CODE,
+        fhirBundle,
+        context
+      )
+      setQuestionnaireItem(questionnaire, context, null, fieldValue)
+    }
+  }
 }
 
 function createActionTypesBuilder() {
@@ -2937,6 +2965,7 @@ export const builders: IFieldBuilders = {
       }
     }
   },
+  questionnaire: createQuestionnaireBuilder(),
   eventLocation: {
     _fhirID: (
       fhirBundle: ITemplatedBundle,
@@ -3443,12 +3472,52 @@ export async function updateFHIRTaskBundle(
   reason?: string,
   comment?: string
 ) {
-  const taskResource = taskEntry.resource as fhir.Task
+  const taskResource = taskEntry.resource
   taskEntry.resource = updateTaskTemplate(taskResource, status, reason, comment)
   const fhirBundle: ITaskBundle = {
     resourceType: 'Bundle',
     type: 'document',
     entry: [taskEntry]
+  }
+  return fhirBundle
+}
+
+export function addOrUpdateExtension(
+  taskEntry: ITaskBundleEntry,
+  extension: fhir.Extension,
+  code: 'downloaded' | 'reinstated'
+) {
+  const task = taskEntry.resource
+
+  if (!task.extension) {
+    task.extension = []
+  }
+
+  const previousExtension = findExtension(extension.url, task.extension)
+
+  if (!previousExtension) {
+    task.extension.push(extension)
+  } else {
+    previousExtension.valueString = extension.valueString
+  }
+
+  taskEntry.request = {
+    method: 'PUT',
+    url: `Task/${taskEntry.resource.id}`
+  } as fhir.BundleEntryRequest
+
+  const fhirBundle: ITaskBundle = {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: [taskEntry],
+    signature: {
+      type: [
+        {
+          code
+        }
+      ],
+      when: Date().toString()
+    }
   }
   return fhirBundle
 }

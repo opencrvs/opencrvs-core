@@ -501,7 +501,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       }),
       iconColor:
         declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
-          ? 'violet'
+          ? 'purple'
           : 'orange'
     }
 
@@ -594,7 +594,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     )}
                     iconColor={
                       declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
-                        ? 'violet'
+                        ? 'purple'
                         : 'orange'
                     }
                     saveAction={{
@@ -625,7 +625,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       )}
                       iconColor={
                         declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
-                          ? 'violet'
+                          ? 'purple'
                           : 'orange'
                       }
                       saveAction={{
@@ -886,7 +886,6 @@ function firstVisibleSection(form: IForm) {
 
 function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
   const { match, registerForm, declaration } = props
-
   const sectionId = match.params.pageId || firstVisibleSection(registerForm).id
 
   const activeSection = registerForm.sections.find(

@@ -18,8 +18,8 @@ import {
   requestNewCertificate,
   updateCertificate,
   updateCertificateHandler
-} from '@config/handlers/declarationCertificateHandler'
-import applicationConfigHandler from '@config/handlers/applicarationConfigHandler'
+} from '@config/handlers/certificate/certificateHandler'
+import applicationConfigHandler from '@config/handlers/applicationConfigHandler'
 import createQuestionHandler, {
   requestSchema as createQuestionReqSchema
 } from '@config/handlers/createQuestion/handler'
@@ -183,8 +183,10 @@ export default function getRoutes() {
       handler: getQuestionsHandler,
       config: {
         tags: ['api'],
-        description: 'Get questions',
-        auth: false
+        description: 'Get question',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        }
       }
     }
   ]

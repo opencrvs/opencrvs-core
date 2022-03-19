@@ -12,7 +12,7 @@
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import * as utils from '@notification/features/sms/utils'
-import { createServer } from '@notification/index'
+import { createServer } from '@notification/server'
 import { createServerWithEnvironment } from '@notification/tests/util'
 import * as fetchAny from 'jest-fetch-mock'
 import { translationsMock } from '@notification/tests/util'

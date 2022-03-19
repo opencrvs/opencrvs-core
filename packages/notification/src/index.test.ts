@@ -11,7 +11,7 @@
  */
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { createServer } from '@notification/index'
+import { createServer } from '@notification/server'
 import { translationsMock } from '@notification/tests/util'
 import * as fetchMock from 'jest-fetch-mock'
 

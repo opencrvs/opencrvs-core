@@ -23,6 +23,7 @@ import {
 } from '@client/i18n/messages'
 import { messages as registrarHomeMessages } from '@client/i18n/messages/views/registrarHome'
 import { messages as rejectMessages } from '@client/i18n/messages/views/reject'
+import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import { messages } from '@client/i18n/messages/views/search'
 import {
   goToDeclarationRecordAudit,
@@ -59,7 +60,6 @@ import {
   GQLEventSearchResultSet,
   GQLQuery
 } from '@opencrvs/gateway/src/graphql/schema.d'
-import moment from 'moment'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -260,6 +260,8 @@ export class SearchResultView extends React.Component<
 
   getDeclarationStatusLabel = (status: string) => {
     switch (status) {
+      case 'ARCHIVED':
+        return this.props.intl.formatMessage(recordAuditMessages.archived)
       case 'IN_PROGRESS':
         return this.props.intl.formatMessage(registrarHomeMessages.inProgress)
       case 'DECLARED':
@@ -324,6 +326,7 @@ export class SearchResultView extends React.Component<
       const downloadStatus =
         (foundDeclaration && foundDeclaration.downloadStatus) || undefined
 
+      const declarationIsArchived = reg.declarationStatus === 'ARCHIVED'
       const declarationIsRequestedCorrection =
         reg.declarationStatus === 'REQUESTED_CORRECTION'
       const declarationIsRegistered = reg.declarationStatus === 'REGISTERED'
@@ -373,6 +376,7 @@ export class SearchResultView extends React.Component<
         (!declarationIsValidated &&
           !declarationIsRegistered &&
           !declarationIsCertified &&
+          !declarationIsArchived &&
           this.userHasValidateOrRegistrarScope())
       ) {
         actions.push({
@@ -405,22 +409,19 @@ export class SearchResultView extends React.Component<
             dynamicConstantsMessages[reg.event.toLowerCase()]
           )) ||
         ''
+
       return {
         ...reg,
         event,
         name: reg.name,
         status: this.getDeclarationStatusLabel(reg.declarationStatus),
-        dateOfModification:
-          (reg.modifiedAt &&
-            formattedDuration(
-              moment(
-                moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
-                'YYYY-MM-DD HH:mm:ss'
-              )
-            )) ||
-          '',
+        dateOfModification: reg.modifiedAt
+          ? Number.isNaN(Number(reg.modifiedAt))
+            ? formattedDuration(new Date(reg.modifiedAt))
+            : formattedDuration(new Date(Number(reg.modifiedAt)))
+          : '',
         startedAt:
-          (reg.createdAt && formattedDuration(moment(reg.createdAt))) || '',
+          (reg.createdAt && formattedDuration(new Date(reg.createdAt))) || '',
         icon,
         actions,
         rowClickHandler: [

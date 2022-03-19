@@ -26,8 +26,7 @@ import {
   IDurationTags
 } from '@metrics/features/registration'
 import { writePoints, query } from '@metrics/influxdb/client'
-import * as moment from 'moment'
-
+import { differenceInSeconds } from 'date-fns'
 interface ISearchResult {
   _index: string
   _type: string
@@ -229,9 +228,9 @@ async function generateEventDurationPoint(
         .map((history, index) => {
           const previousHistory = searchResult._source.operationHistories[index]
           const fields: IDurationFields = {
-            durationInSeconds: moment(new Date(history.operatedOn)).diff(
-              moment(new Date(previousHistory.operatedOn)),
-              'seconds'
+            durationInSeconds: differenceInSeconds(
+              new Date(history.operatedOn),
+              new Date(previousHistory.operatedOn)
             ),
             compositionId: searchResult._id,
             currentTaskId: taskId,

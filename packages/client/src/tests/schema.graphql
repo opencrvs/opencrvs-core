@@ -230,6 +230,7 @@ type BirthRegistration implements EventRegistration {
   father: Person
   informant: RelatedPerson
   eventLocation: Location
+  questionnaire: [QuestionnaireQuestion]
   birthType: BirthType
   weightAtBirth: Float
   attendantAtBirth: AttendantType
@@ -445,6 +446,7 @@ input BirthRegistrationInput {
   father: PersonInput
   informant: RelatedPersonInput
   eventLocation: LocationInput
+  questionnaire: [QuestionnaireQuestionInput]
   birthType: BirthType
   weightAtBirth: Float
   attendantAtBirth: AttendantType
@@ -654,6 +656,11 @@ type Attachment {
   description: String
   subject: AttachmentSubject
   createdAt: Date
+}
+
+type QuestionnaireQuestion {
+  fieldName: String
+  value: String
 }
 
 type Deceased {
@@ -1162,6 +1169,11 @@ input AddressInput {
   country: String
   from: Date
   to: Date
+}
+
+input QuestionnaireQuestionInput {
+  fieldName: String
+  value: String
 }
 
 input AttachmentInput {

@@ -13,6 +13,7 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IButtonsMessages
   extends Record<string | number | symbol, MessageDescriptor> {
+  archive: MessageDescriptor
   back: MessageDescriptor
   apply: MessageDescriptor
   cancel: MessageDescriptor
@@ -65,6 +66,11 @@ interface IButtonsMessages
 }
 
 const messagesToDefine: IButtonsMessages = {
+  archive: {
+    id: 'buttons.archive',
+    defaultMessage: 'Archive',
+    description: 'Archive button text'
+  },
   approve: {
     id: 'buttons.approve',
     defaultMessage: 'Approve',
@@ -179,6 +185,11 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'Print',
     description: 'Print button text',
     id: 'buttons.print'
+  },
+  reinstate: {
+    defaultMessage: 'Reinstate',
+    description: 'Label for reinstate button',
+    id: 'buttons.reinstate'
   },
   register: {
     defaultMessage: 'Register',
