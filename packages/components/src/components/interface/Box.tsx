@@ -17,9 +17,10 @@ import { IGrid } from '../grid'
 export interface IBox extends React.HTMLAttributes<HTMLDivElement> {}
 
 const Wrapper = styled.div<IBox>`
-  padding: 24px;
+  border-radius: 4px;
+  padding: 32px;
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
   background: ${({ theme }) => theme.colors.white};
-  box-shadow: rgba(53, 67, 93, 0.32) 0px 2px 6px;
 `
 
 class Component extends React.Component<IBox & { theme: { grid: IGrid } }> {
