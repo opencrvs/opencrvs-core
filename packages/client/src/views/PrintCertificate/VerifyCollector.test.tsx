@@ -26,18 +26,37 @@ describe('verify collector tests', () => {
 
   const birthDeclaration = {
     id: 'mockBirth1234',
-    data: mockDeclarationData,
+    data: {
+      ...mockDeclarationData,
+      history: [
+        {
+          date: '2022-03-21T08:16:24.467+00:00',
+          action: 'REGISTERED',
+          reinstated: false
+        }
+      ]
+    },
     event: Event.BIRTH
   }
 
   const deathDeclaration = {
     id: 'mockDeath1234',
-    data: mockDeathDeclarationData,
+    data: {
+      ...mockDeathDeclarationData,
+      history: [
+        {
+          date: '2022-03-21T08:16:24.467+00:00',
+          action: 'REGISTERED',
+          reinstated: false
+        }
+      ]
+    },
     event: Event.DEATH
   }
 
   describe('in case of birth declaration', () => {
     beforeAll(async () => {
+      // @ts-ignore
       store.dispatch(storeDeclaration(birthDeclaration))
     })
 
@@ -96,8 +115,12 @@ describe('verify collector tests', () => {
       expect(history.location.pathname).toBe('/')
     })
 
-    describe('when father is collector', () => {
+    describe('when informant is collector', () => {
       let testComponent: ReactWrapper
+      beforeAll(() => {
+        // @ts-ignore
+        store.dispatch(storeDeclaration(deathDeclaration))
+      })
       beforeEach(async () => {
         testComponent = await createTestComponent(
           // @ts-ignore
@@ -105,9 +128,9 @@ describe('verify collector tests', () => {
             history={history}
             match={{
               params: {
-                registrationId: 'mockBirth1234',
-                eventType: Event.BIRTH,
-                collector: 'father'
+                registrationId: 'mockDeath1234',
+                eventType: Event.DEATH,
+                collector: 'informant'
               },
               isExact: true,
               path: '',
@@ -123,8 +146,6 @@ describe('verify collector tests', () => {
       })
 
       it('clicking on yes button takes user to review certificate if there is no fee', () => {
-        Date.now = jest.fn(() => 243885600000)
-
         testComponent
           .find('#idVerifier')
           .find('#verifyPositive')
@@ -132,6 +153,51 @@ describe('verify collector tests', () => {
           .simulate('click')
 
         expect(history.location.pathname).toContain('review')
+      })
+
+      describe('when father is collector', () => {
+        let testComponent: ReactWrapper
+        beforeAll(() => {
+          // @ts-ignore
+          store.dispatch(storeDeclaration(birthDeclaration))
+        })
+        beforeEach(async () => {
+          testComponent = await createTestComponent(
+            // @ts-ignore
+            <VerifyCollector
+              history={history}
+              match={{
+                params: {
+                  registrationId: 'mockBirth1234',
+                  eventType: Event.DEATH,
+                  collector: 'father'
+                },
+                isExact: true,
+                path: '',
+                url: ''
+              }}
+            />,
+            { store, history }
+          )
+        })
+
+        it('clicking on send button on modal takes user to payment if there is fee', () => {
+          testComponent
+            .find('#idVerifier')
+            .find('#verifyNegative')
+            .hostNodes()
+            .simulate('click')
+
+          testComponent.update()
+
+          testComponent
+            .find('#withoutVerificationPrompt')
+            .find('#send')
+            .hostNodes()
+            .simulate('click')
+
+          expect(history.location.pathname).toContain('payment')
+        })
       })
 
       it('clicking on no button shows up modal', () => {
@@ -146,26 +212,6 @@ describe('verify collector tests', () => {
         expect(
           testComponent.find('#withoutVerificationPrompt').hostNodes()
         ).toHaveLength(1)
-      })
-
-      it('clicking on send button on modal takes user to payment if there is fee', () => {
-        Date.now = jest.fn(() => 969732000000)
-
-        testComponent
-          .find('#idVerifier')
-          .find('#verifyNegative')
-          .hostNodes()
-          .simulate('click')
-
-        testComponent.update()
-
-        testComponent
-          .find('#withoutVerificationPrompt')
-          .find('#send')
-          .hostNodes()
-          .simulate('click')
-
-        expect(history.location.pathname).toContain('payment')
       })
 
       it('clicking on cancel button hides the modal', () => {
@@ -194,6 +240,7 @@ describe('verify collector tests', () => {
 
   describe('in case of death declaration renders idVerifier component', () => {
     beforeAll(() => {
+      // @ts-ignore
       store.dispatch(storeDeclaration(deathDeclaration))
     })
 

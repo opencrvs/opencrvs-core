@@ -326,8 +326,8 @@ export const mockOfflineData = {
       LATE_REGISTRATION_TARGET: 365,
       FEE: {
         ON_TIME: 0,
-        LATE: 0,
-        DELAYED: 0
+        LATE: 15,
+        DELAYED: 20
       }
     },
     COUNTRY_LOGO_RENDER_WIDTH: 104,
