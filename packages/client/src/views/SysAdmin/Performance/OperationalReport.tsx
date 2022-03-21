@@ -67,7 +67,6 @@ import {
   GQLRegistrationCountResult
 } from '@opencrvs/gateway/src/graphql/schema'
 import { ApolloError } from 'apollo-client'
-import moment from 'moment'
 import { parse } from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
@@ -80,7 +79,7 @@ import {
 } from './metricsQuery'
 import { DeclarationsStartedReport } from './reports/operational/DeclarationsStartedReport'
 import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
-
+import format from '@client/utils/date-formatting'
 interface IConnectProps {
   locations: { [key: string]: ILocation }
   offices: { [key: string]: ILocation }
@@ -117,8 +116,8 @@ type Props = WrappedComponentProps &
 interface State {
   sectionId: OPERATIONAL_REPORT_SECTION
   selectedLocation: ISearchLocation
-  timeStart: moment.Moment
-  timeEnd: moment.Moment
+  timeStart: Date
+  timeEnd: Date
   expandStatusWindow: boolean
   statusWindowWidth: number
   mainWindowLeftMargin: number
@@ -227,8 +226,8 @@ class OperationalReportComponent extends React.Component<Props, State> {
     return {
       sectionId,
       selectedLocation,
-      timeStart: moment(timeStart),
-      timeEnd: moment(timeEnd),
+      timeStart: new Date(timeStart),
+      timeEnd: new Date(timeEnd),
       expandStatusWindow: state ? state.expandStatusWindow : false,
       statusWindowWidth: state ? state.statusWindowWidth : 0,
       mainWindowLeftMargin: state ? state.mainWindowLeftMargin : 0,
@@ -238,8 +237,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props)
-    moment.locale(this.props.intl.locale)
-    moment.defaultFormat = 'MMMM YYYY'
+    window.__localeId__ = this.props.intl.locale
 
     this.state = OperationalReportComponent.transformPropsToState(
       props,
@@ -255,11 +253,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
     return OperationalReportComponent.transformPropsToState(props, state)
   }
 
-  downloadMonthlyData = (
-    monthStart: moment.Moment,
-    monthEnd: moment.Moment,
-    event: string
-  ) => {
+  downloadMonthlyData = (monthStart: Date, monthEnd: Date, event: string) => {
     const metricsURL = `${
       window.config.API_GATEWAY_URL
     }export/monthlyPerformanceMetrics?locationId=${
@@ -275,7 +269,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
         const url = window.URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = url
-        a.download = `${monthStart.format('MMMM_YYYY')}_export.zip`
+        a.download = `${format(monthStart, 'MMMM_yyyy')}_export.zip`
         a.click()
         window.URL.revokeObjectURL(url)
       })
@@ -296,18 +290,20 @@ class OperationalReportComponent extends React.Component<Props, State> {
   }
 
   getContent(eventType: Event) {
-    moment.locale(this.props.intl.locale)
+    window.__localeId__ = this.props.intl.locale
     const content = []
-    const currentYear = this.state.timeStart.year()
-    let currentMonth = this.state.timeStart.month() + 1
+    const currentYear = this.state.timeStart.getFullYear()
+    let currentMonth = this.state.timeStart.getMonth() + 1
     const startMonth =
-      this.state.timeStart.month() + this.state.timeStart.year() * 12
-    const endMonth = this.state.timeEnd.month() + this.state.timeEnd.year() * 12
+      this.state.timeStart.getMonth() + this.state.timeStart.getFullYear() * 12
+    const endMonth =
+      this.state.timeEnd.getMonth() + this.state.timeEnd.getFullYear() * 12
     const monthDiff = currentMonth + (endMonth - startMonth)
     while (currentMonth <= monthDiff) {
       const { start, end } = getMonthDateRange(currentYear, currentMonth)
-      const title = `${start.format('DD MMMM')} to ${end.format(
-        'DD MMMM YYYY'
+      const title = `${format(start, 'dd MMMM')} to ${format(
+        end,
+        'dd MMMM yyyy'
       )}`
       content.push({
         month: (
@@ -317,8 +313,8 @@ class OperationalReportComponent extends React.Component<Props, State> {
               this.props.goToPerformanceReport(
                 this.state.selectedLocation!,
                 eventType,
-                start.toDate(),
-                end.toDate()
+                start,
+                end
               )
             }
             disabled={!this.state.selectedLocation}
@@ -354,8 +350,8 @@ class OperationalReportComponent extends React.Component<Props, State> {
       event,
       title,
       selectedLocation.id,
-      timeStart.toDate(),
-      timeEnd.toDate()
+      timeStart,
+      timeEnd
     )
   }
 
@@ -395,8 +391,8 @@ class OperationalReportComponent extends React.Component<Props, State> {
     this.props.goToWorkflowStatus(
       sectionId,
       locationId,
-      timeStart.toDate(),
-      timeEnd.toDate(),
+      timeStart,
+      timeEnd,
       status
     )
   }
@@ -440,8 +436,8 @@ class OperationalReportComponent extends React.Component<Props, State> {
                   this.props.goToOperationalReport(
                     selectedLocation.id,
                     option.value as OPERATIONAL_REPORT_SECTION,
-                    timeStart.toDate(),
-                    timeEnd.toDate()
+                    timeStart,
+                    timeEnd
                   )
                 }}
                 id="operational-select"
@@ -458,8 +454,8 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 ]}
               />
               <DateRangePicker
-                startDate={timeStart.toDate()}
-                endDate={timeEnd.toDate()}
+                startDate={timeStart}
+                endDate={timeEnd}
                 onDatesChange={({ startDate, endDate }) => {
                   this.props.goToOperationalReport(
                     selectedLocation.id,
@@ -526,8 +522,8 @@ class OperationalReportComponent extends React.Component<Props, State> {
                         <RegistrationRatesReport
                           loading={loading}
                           data={data && data.getEventEstimationMetrics}
-                          reportTimeFrom={timeStart.format()}
-                          reportTimeTo={timeEnd.format()}
+                          reportTimeFrom={format(timeStart, 'MMMM yyyy')}
+                          reportTimeTo={format(timeEnd, 'MMMM yyyy')}
                           onClickEventDetails={
                             this.onClickRegistrationRatesDetails
                           }

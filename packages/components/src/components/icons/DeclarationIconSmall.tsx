@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 
-export const LeftNavigationDeclarationIcons = (
+export const DeclarationIconSmall = (
   props: React.HTMLAttributes<SVGElement> & { color?: string }
 ) => {
   let fill: string
@@ -19,55 +19,52 @@ export const LeftNavigationDeclarationIcons = (
 
   switch (props.color) {
     case 'green':
-      fill = 'lightgreen'
-      corner = 'green'
+      fill = '#A4DBC6'
+      corner = '#409877'
       break
     case 'orange':
-      fill = '#F8D8B0'
-      corner = '#F1B162'
+      fill = '#F5CE9E'
+      corner = '#C86E00'
       break
     case 'red':
-      fill = '#EB9284'
-      corner = '#D53F3F'
+      fill = '#EEA6A6'
+      corner = '#9A4040'
       break
     case 'teal':
-      fill = '#96E9E4'
-      corner = '#4CC1BA'
+      fill = '#96E8E4'
+      corner = '#03668D'
       break
     case 'grey':
-      fill = '#DEE2E4'
-      corner = '#909397'
+      fill = '#CCCCCC'
+      corner = '#5B5B5B'
+      break
+    case 'purple':
+      fill = '#BFA4DB'
+      corner = '#450487'
       break
     default:
-      fill = '#BFA4DB'
-      corner = '#8049B7'
+      fill = '#CCCCCC'
+      corner = '#5B5B5B'
   }
+
   return (
-    <svg
-      width="16"
-      height="18"
-      viewBox="0 0 16 18"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg width={24} height={24} fill="none" {...props}>
       <path
-        d="M0 3C0 2.44772 0.447715 2 1 2L7.20266 2L12 6.80602V17C12 17.5523 11.5523 18 11 18H1C0.447715 18 0 17.5523 0 17V3Z"
+        d="M5.25 4C5.25 3.44772 5.69772 3 6.25 3L13.353 3L18.75 8.40677V20C18.75 20.5523 18.3023 21 17.75 21H6.25C5.69772 21 5.25 20.5523 5.25 20V4Z"
         fill={fill}
       />
-      <g filter="url(#filter0_d_187_1979)">
-        <path d="M7.20001 2L12 6.8H7.20001V2Z" fill={corner} />
-      </g>
+      <path d="M13.35 3L18.75 8.4H13.35V3Z" fill={corner} />
       <defs>
         <filter
-          id="filter0_d_187_1979"
-          x="3.20001"
-          y="0"
-          width="12.8"
-          height="12.8"
+          id="filter0_d_5261_5601"
+          x={9.20001}
+          y={2}
+          width={12.8}
+          height={12.8}
           filterUnits="userSpaceOnUse"
-          colorInterpolationFilters="sRGB"
+          color-interpolation-filters="sRGB"
         >
-          <feFlood floodOpacity="0" result="BackgroundImageFix" />
+          <feFlood flood-opacity="0" result="BackgroundImageFix" />
           <feColorMatrix
             in="SourceAlpha"
             type="matrix"
@@ -83,12 +80,12 @@ export const LeftNavigationDeclarationIcons = (
           <feBlend
             mode="normal"
             in2="BackgroundImageFix"
-            result="effect1_dropShadow_187_1979"
+            result="effect1_dropShadow_5261_5601"
           />
           <feBlend
             mode="normal"
             in="SourceGraphic"
-            in2="effect1_dropShadow_187_1979"
+            in2="effect1_dropShadow_5261_5601"
             result="shape"
           />
         </filter>
