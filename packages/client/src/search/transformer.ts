@@ -51,18 +51,6 @@ export const transformData = (
         assignedReg.registration &&
         (assignedReg.registration.status as GQLRegStatus)
 
-      if (
-        assignedReg.operationHistories &&
-        assignedReg.operationHistories[0] &&
-        assignedReg.operationHistories[0].operatedOn
-      ) {
-        console.log(
-          assignedReg.operationHistories[0].operatedOn,
-          assignedReg?.registration?.createdAt
-        )
-        debugger
-      }
-
       return {
         id: assignedReg.id,
         name:
@@ -106,10 +94,7 @@ export const transformData = (
             assignedReg.registration &&
             assignedReg.registration.comment) ||
           '',
-        // createdAt:
-        //   assignedReg.operationHistories &&
-        //   assignedReg.operationHistories[0] &&
-        //   assignedReg.operationHistories[0].operatedOn,
+        createdAt: assignedReg?.registration?.createdAt,
         modifiedAt:
           assignedReg.registration &&
           (assignedReg.registration.modifiedAt ||

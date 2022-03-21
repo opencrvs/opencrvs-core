@@ -87,6 +87,7 @@ export const SEARCH_DECLARATIONS_USER_WISE = gql`
           contactNumber
           trackingId
           dateOfDeclaration
+          modifiedAt
           status
         }
         ... on BirthEventSearchSet {

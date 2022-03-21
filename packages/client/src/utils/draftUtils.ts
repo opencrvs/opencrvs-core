@@ -153,8 +153,6 @@ export const transformSearchQueryDataToDraft = (
   declaration.submissionStatus = data.registration && data.registration.status
   declaration.compositionId = data.id
 
-  // declaration.operationHistories = data.operationHistories as ITaskHistory[]
-
   switch (eventType) {
     case Event.BIRTH:
     default:

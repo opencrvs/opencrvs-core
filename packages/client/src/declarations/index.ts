@@ -186,7 +186,6 @@ export interface IDeclaration {
   payload?: IPayload
   visitedGroupIds?: IVisitedGroupId[]
   timeLoggedMS?: number
-  operationHistories?: ITaskHistory[]
 }
 
 export interface IWorkqueue {
