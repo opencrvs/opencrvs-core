@@ -20,6 +20,7 @@ interface IConstantsMessages
   informantContactNumber: MessageDescriptor
   declaration: MessageDescriptor
   declarations: MessageDescriptor
+  declarationArchivedOn: MessageDescriptor
   declarationCollectedOn: MessageDescriptor
   declarationFailedOn: MessageDescriptor
   declarationInformantLabel: MessageDescriptor
@@ -53,6 +54,7 @@ interface IConstantsMessages
   dob: MessageDescriptor
   dod: MessageDescriptor
   downloading: MessageDescriptor
+  downloaded: MessageDescriptor
   eventDate: MessageDescriptor
   eventType: MessageDescriptor
   lastUpdated: MessageDescriptor
@@ -140,6 +142,7 @@ interface IConstantsMessages
   totalRegistered: MessageDescriptor
   viewAll: MessageDescriptor
   notAvailable: MessageDescriptor
+  history: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   address: {
@@ -171,6 +174,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Declarations ({totalItems})',
     description: 'A label for declarations count',
     id: 'constants.declarationsCount'
+  },
+  declarationArchivedOn: {
+    defaultMessage: 'Application archived on',
+    description: 'Label for the workflow timestamp when the status is archived',
+    id: 'constants.applicationArchivedOn'
   },
   declarationCollectedOn: {
     defaultMessage: 'Certificate collected on',
@@ -350,6 +358,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Downloading...',
     description: 'Label for declaration download status Downloading',
     id: 'constants.downloading'
+  },
+  downloaded: {
+    defaultMessage: 'Downloaded',
+    description: 'Label for application download status Downloaded',
+    id: 'constants.downloaded'
   },
   eventDate: {
     defaultMessage: 'Date of event',
@@ -791,6 +804,11 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.notAvailable',
     defaultMessage: 'Not available',
     description: 'Placeholder for empty value'
+  },
+  history: {
+    id: 'constants.history',
+    defaultMessage: 'History',
+    description: 'History heading'
   }
 }
 
@@ -832,6 +850,26 @@ const dynamicMessagesToDefine: Record<
     id: 'constants.validated',
     defaultMessage: 'validated',
     description: 'A label for validated'
+  },
+  updated: {
+    defaultMessage: 'Updated',
+    description: 'Application has been updated',
+    id: 'constants.updated'
+  },
+  sent_incomplete: {
+    defaultMessage: 'Sent incomplete',
+    description: 'Declaration submitted without completing the required fields',
+    id: 'constants.sent_incomplete'
+  },
+  updated_declaration: {
+    defaultMessage: 'Updated declaration',
+    description: 'Declaration has been updated',
+    id: 'constants.updated_declaration'
+  },
+  archived_declaration: {
+    defaultMessage: 'Archived',
+    description: 'Application has been archived',
+    id: 'constants.archived_declaration'
   },
   waitingValidation: {
     id: 'constants.waitingValidation',

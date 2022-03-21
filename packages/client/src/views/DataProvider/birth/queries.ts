@@ -178,7 +178,79 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           country
         }
       }
+      questionnaire {
+        fieldId
+        value
+      }
       presentAtBirthRegistration
+      history {
+        date
+        action
+        reinstated
+        location {
+          id
+          name
+        }
+        office {
+          id
+          name
+        }
+        user {
+          id
+          type
+          role
+          name {
+            firstNames
+            familyName
+            use
+          }
+          avatar {
+            data
+            type
+          }
+        }
+        comments {
+          user {
+            id
+            username
+            avatar {
+              data
+              type
+            }
+          }
+          comment
+          createdAt
+        }
+        input {
+          valueCode
+          valueId
+          valueString
+        }
+        output {
+          valueCode
+          valueId
+          valueString
+        }
+        certificates {
+          hasShowedVerifiedDocument
+          collector {
+            relationship
+            otherRelationship
+            individual {
+              name {
+                use
+                firstNames
+                familyName
+              }
+              telecom {
+                system
+                value
+                use
+              }
+            }
+          }
+        }
+      }
     }
   }
 `
@@ -342,6 +414,10 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
       attendantAtBirth
       weightAtBirth
       birthType
+      questionnaire {
+        fieldId
+        value
+      }
       eventLocation {
         type
         address {
@@ -354,6 +430,74 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         }
       }
       presentAtBirthRegistration
+      history {
+        date
+        action
+        reinstated
+        location {
+          id
+          name
+        }
+        office {
+          id
+          name
+        }
+        user {
+          id
+          type
+          role
+          name {
+            firstNames
+            familyName
+            use
+          }
+          avatar {
+            data
+            type
+          }
+        }
+        comments {
+          user {
+            id
+            username
+            avatar {
+              data
+              type
+            }
+          }
+          comment
+          createdAt
+        }
+        input {
+          valueCode
+          valueId
+          valueString
+        }
+        output {
+          valueCode
+          valueId
+          valueString
+        }
+        certificates {
+          hasShowedVerifiedDocument
+          collector {
+            relationship
+            otherRelationship
+            individual {
+              name {
+                use
+                firstNames
+                familyName
+              }
+              telecom {
+                system
+                value
+                use
+              }
+            }
+          }
+        }
+      }
     }
   }
 `

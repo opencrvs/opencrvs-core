@@ -18,8 +18,18 @@ import {
   SUBMIT_BIRTH_DECLARATION,
   APPROVE_BIRTH_DECLARATION,
   REGISTER_BIRTH_DECLARATION,
-  REJECT_BIRTH_DECLARATION
+  REJECT_BIRTH_DECLARATION,
+  COLLECT_BIRTH_CERTIFICATE,
+  ARCHIVE_BIRTH_DECLARATION,
+  REINSTATE_BIRTH_DECLARATION
 } from '@client/views/DataProvider/birth/mutations'
+import {
+  ARCHIVE_DEATH_DECLARATION,
+  APPROVE_DEATH_DECLARATION,
+  COLLECT_DEATH_CERTIFICATE,
+  REGISTER_DEATH_DECLARATION,
+  REJECT_DEATH_DECLARATION
+} from '@client/views/DataProvider/death/mutations'
 import { ApolloError } from 'apollo-client'
 import { flushPromises } from './tests/util'
 
@@ -35,6 +45,13 @@ describe('Submission Controller', () => {
     new SubmissionController(store).start()
     expect(setInterval).toBeCalled()
     window.setInterval = originalInterval
+    // @ts-ignore
+    window.setTimeout = (fn: (...args: any[]) => void, duration: number) => {
+      return new Promise((resolve) => {
+        fn()
+        resolve(0)
+      })
+    }
   })
 
   it('does nothing if sync is already running', async () => {
@@ -183,7 +200,7 @@ describe('Submission Controller', () => {
     expect(store.dispatch.mock.calls[9][0].type).toBe('DECLARATION/WRITE_DRAFT')
   })
 
-  it('sync all ready to approve declaration and deletes approved declaration', async () => {
+  it('syncs all ready to approve birth declaration and deletes approved declaration', async () => {
     const store = {
       getState: () => ({
         declarationsState: {
@@ -227,7 +244,51 @@ describe('Submission Controller', () => {
     )
   })
 
-  it('sync all ready to register declaration and deletes registered declaration', async () => {
+  it('syncs all ready to approve death declaration and deletes approved declaration', async () => {
+    const store = {
+      getState: () => ({
+        declarationsState: {
+          declarations: [
+            {
+              event: 'death',
+              submissionStatus: SUBMISSION_STATUS.READY_TO_APPROVE,
+              action: Action.APPROVE_DECLARATION
+            }
+          ]
+        },
+        registerForm: {
+          registerForm: {}
+        },
+        profile: {
+          tokenPayload: {
+            scope: []
+          }
+        }
+      }),
+      dispatch: jest.fn()
+    }
+
+    // @ts-ignore
+    const subCon = new SubmissionController(store)
+    subCon.client = createMockClient()
+    const mutationHandler = jest.fn().mockResolvedValue({
+      data: { data: { markDeathAsValidated: {} } }
+    })
+    subCon.client.setRequestHandler(APPROVE_DEATH_DECLARATION, mutationHandler)
+
+    await subCon.sync()
+
+    expect(mutationHandler).toHaveBeenCalledTimes(1)
+    expect(store.dispatch).toHaveBeenCalledTimes(5)
+    expect(
+      store.dispatch.mock.calls[0][0].payload.declaration.submissionStatus
+    ).toBe(SUBMISSION_STATUS.APPROVED)
+    expect(store.dispatch.mock.calls[4][0].type).toBe(
+      'DECLARATION/DELETE_DRAFT'
+    )
+  })
+
+  it('syncs all ready to register birth declaration and deletes registered declaration', async () => {
     const store = {
       getState: () => ({
         declarationsState: {
@@ -272,7 +333,52 @@ describe('Submission Controller', () => {
     )
   })
 
-  it('sync all ready to reject declaration and deletes rejected declaration', async () => {
+  it('syncs all ready to register death declaration and deletes registered declaration', async () => {
+    const store = {
+      getState: () => ({
+        declarationsState: {
+          declarations: [
+            {
+              event: 'death',
+              submissionStatus: SUBMISSION_STATUS.READY_TO_REGISTER,
+              action: Action.REGISTER_DECLARATION
+            }
+          ]
+        },
+        registerForm: {
+          registerForm: {}
+        },
+        profile: {
+          tokenPayload: {
+            scope: []
+          }
+        }
+      }),
+      dispatch: jest.fn()
+    }
+
+    // @ts-ignore
+    const subCon = new SubmissionController(store)
+
+    subCon.client = createMockClient()
+    const mutationHandler = jest.fn().mockResolvedValue({
+      data: { data: { markDeathAsValidated: {} } }
+    })
+    subCon.client.setRequestHandler(REGISTER_DEATH_DECLARATION, mutationHandler)
+
+    await subCon.sync()
+
+    expect(mutationHandler).toHaveBeenCalledTimes(1)
+    expect(store.dispatch).toHaveBeenCalledTimes(5)
+    expect(
+      store.dispatch.mock.calls[0][0].payload.declaration.submissionStatus
+    ).toBe(SUBMISSION_STATUS.REGISTERED)
+    expect(store.dispatch.mock.calls[4][0].type).toBe(
+      'DECLARATION/DELETE_DRAFT'
+    )
+  })
+
+  it('syncs all ready to reject birth declaration and deletes rejected declaration', async () => {
     const store = {
       getState: () => ({
         declarationsState: {
@@ -315,6 +421,314 @@ describe('Submission Controller', () => {
     expect(store.dispatch.mock.calls[4][0].type).toBe(
       'DECLARATION/DELETE_DRAFT'
     )
+  })
+
+  it('syncs all ready to reject death declaration and deletes rejected declaration', async () => {
+    const store = {
+      getState: () => ({
+        declarationsState: {
+          declarations: [
+            {
+              event: 'death',
+              submissionStatus: SUBMISSION_STATUS.READY_TO_REJECT,
+              action: Action.REJECT_DECLARATION
+            }
+          ]
+        },
+        registerForm: {
+          registerForm: {}
+        },
+        profile: {
+          tokenPayload: {
+            scope: []
+          }
+        }
+      }),
+      dispatch: jest.fn()
+    }
+
+    // @ts-ignore
+    const subCon = new SubmissionController(store)
+
+    subCon.client = createMockClient()
+    const mutationHandler = jest.fn().mockResolvedValue({
+      data: { data: { markDeathAsValidated: {} } }
+    })
+    subCon.client.setRequestHandler(REJECT_DEATH_DECLARATION, mutationHandler)
+
+    await subCon.sync()
+
+    expect(mutationHandler).toHaveBeenCalledTimes(1)
+    expect(store.dispatch).toHaveBeenCalledTimes(5)
+    expect(
+      store.dispatch.mock.calls[0][0].payload.declaration.submissionStatus
+    ).toBe(SUBMISSION_STATUS.REJECTED)
+    expect(store.dispatch.mock.calls[4][0].type).toBe(
+      'DECLARATION/DELETE_DRAFT'
+    )
+  })
+
+  it('syncs all ready to certify birth declaration', async () => {
+    const store = {
+      getState: () => ({
+        declarationsState: {
+          declarations: [
+            {
+              event: 'birth',
+              submissionStatus: SUBMISSION_STATUS.READY_TO_CERTIFY,
+              action: Action.COLLECT_CERTIFICATE
+            }
+          ]
+        },
+        registerForm: {
+          registerForm: {}
+        },
+        profile: {
+          tokenPayload: {
+            scope: []
+          }
+        }
+      }),
+      dispatch: jest.fn()
+    }
+
+    // @ts-ignore
+    const subCon = new SubmissionController(store)
+    subCon.client = createMockClient()
+    const mutationHandler = jest.fn().mockResolvedValue({
+      data: { data: { markBirthAsCertified: {} } }
+    })
+    subCon.client.setRequestHandler(COLLECT_BIRTH_CERTIFICATE, mutationHandler)
+
+    await subCon.sync()
+
+    expect(mutationHandler).toHaveBeenCalledTimes(1)
+    expect(store.dispatch).toHaveBeenCalledTimes(5)
+    expect(
+      store.dispatch.mock.calls[0][0].payload.declaration.submissionStatus
+    ).toBe(SUBMISSION_STATUS.CERTIFIED)
+  })
+
+  it('syncs all ready to certify death declaration', async () => {
+    const store = {
+      getState: () => ({
+        declarationsState: {
+          declarations: [
+            {
+              event: 'death',
+              submissionStatus: SUBMISSION_STATUS.READY_TO_CERTIFY,
+              action: Action.COLLECT_CERTIFICATE
+            }
+          ]
+        },
+        registerForm: {
+          registerForm: {}
+        },
+        profile: {
+          tokenPayload: {
+            scope: []
+          }
+        }
+      }),
+      dispatch: jest.fn()
+    }
+
+    // @ts-ignore
+    const subCon = new SubmissionController(store)
+    subCon.client = createMockClient()
+    const mutationHandler = jest.fn().mockResolvedValue({
+      data: { data: { markBirthAsCertified: {} } }
+    })
+    subCon.client.setRequestHandler(COLLECT_DEATH_CERTIFICATE, mutationHandler)
+
+    await subCon.sync()
+
+    expect(mutationHandler).toHaveBeenCalledTimes(1)
+    expect(store.dispatch).toHaveBeenCalledTimes(5)
+    expect(
+      store.dispatch.mock.calls[0][0].payload.declaration.submissionStatus
+    ).toBe(SUBMISSION_STATUS.CERTIFIED)
+  })
+
+  it('syncs all ready to archive birth declarations', async () => {
+    const store = {
+      getState: () => ({
+        declarationsState: {
+          declarations: [
+            {
+              event: 'birth',
+              submissionStatus: SUBMISSION_STATUS.READY_TO_ARCHIVE,
+              action: Action.ARCHIVE_DECLARATION
+            }
+          ]
+        },
+        registerForm: {
+          registerForm: {}
+        },
+        profile: {
+          tokenPayload: {
+            scope: []
+          }
+        }
+      }),
+      dispatch: jest.fn()
+    }
+
+    // @ts-ignore
+    const subCon = new SubmissionController(store)
+
+    subCon.client = createMockClient()
+    const mutationHandler = jest.fn().mockResolvedValue({
+      data: { data: { markEventAsArchived: {} } }
+    })
+    subCon.client.setRequestHandler(ARCHIVE_BIRTH_DECLARATION, mutationHandler)
+
+    await subCon.sync()
+    expect(mutationHandler).toHaveBeenCalledTimes(1)
+    expect(store.dispatch).toHaveBeenCalledTimes(5)
+    expect(
+      store.dispatch.mock.calls[0][0].payload.declaration.submissionStatus
+    ).toBe(SUBMISSION_STATUS.ARCHIVED)
+  })
+
+  it('syncs all ready to reinstate birth declarations', async () => {
+    const store = {
+      getState: () => ({
+        declarationsState: {
+          declarations: [
+            {
+              event: 'birth',
+              submissionStatus: SUBMISSION_STATUS.READY_TO_REINSTATE,
+              action: Action.REINSTATE_DECLARATION
+            }
+          ]
+        },
+        registerForm: {
+          registerForm: {}
+        },
+        profile: {
+          tokenPayload: {
+            scope: []
+          }
+        }
+      }),
+      dispatch: jest.fn()
+    }
+
+    // @ts-ignore
+    const subCon = new SubmissionController(store)
+
+    subCon.client = createMockClient()
+    const mutationHandler = jest.fn().mockResolvedValue({
+      data: {
+        data: {
+          markEventAsReinstated: {
+            taskEntryResourceID: '12321fsfasf',
+            registrationStatus: 'DECLARED'
+          }
+        }
+      }
+    })
+    subCon.client.setRequestHandler(
+      REINSTATE_BIRTH_DECLARATION,
+      mutationHandler
+    )
+
+    await subCon.sync()
+
+    expect(mutationHandler).toHaveBeenCalledTimes(1)
+    expect(store.dispatch).toHaveBeenCalledTimes(4)
+  })
+
+  it('syncs all ready to reinstate death declarations', async () => {
+    const store = {
+      getState: () => ({
+        declarationsState: {
+          declarations: [
+            {
+              event: 'death',
+              submissionStatus: SUBMISSION_STATUS.READY_TO_REINSTATE,
+              action: Action.REINSTATE_DECLARATION
+            }
+          ]
+        },
+        registerForm: {
+          registerForm: {}
+        },
+        profile: {
+          tokenPayload: {
+            scope: []
+          }
+        }
+      }),
+      dispatch: jest.fn()
+    }
+
+    // @ts-ignore
+    const subCon = new SubmissionController(store)
+    const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
+    subCon.client = createMockClient()
+    const mutationHandler = jest.fn().mockResolvedValue({
+      data: {
+        data: {
+          markEventAsReinstated: {
+            taskEntryResourceID: id,
+            registrationStatus: 'DECLARED'
+          }
+        }
+      }
+    })
+    subCon.client.setRequestHandler(
+      REINSTATE_BIRTH_DECLARATION,
+      mutationHandler
+    )
+
+    await subCon.sync()
+
+    expect(mutationHandler).toHaveBeenCalledTimes(1)
+    expect(store.dispatch).toHaveBeenCalledTimes(4)
+  })
+
+  it('syncs all ready to archive death declarations', async () => {
+    const store = {
+      getState: () => ({
+        declarationsState: {
+          declarations: [
+            {
+              event: 'death',
+              submissionStatus: SUBMISSION_STATUS.READY_TO_ARCHIVE,
+              action: Action.ARCHIVE_DECLARATION
+            }
+          ]
+        },
+        registerForm: {
+          registerForm: {}
+        },
+        profile: {
+          tokenPayload: {
+            scope: []
+          }
+        }
+      }),
+      dispatch: jest.fn()
+    }
+
+    // @ts-ignore
+    const subCon = new SubmissionController(store)
+
+    subCon.client = createMockClient()
+    const mutationHandler = jest.fn().mockResolvedValue({
+      data: { data: { markEventAsArchived: {} } }
+    })
+    subCon.client.setRequestHandler(ARCHIVE_DEATH_DECLARATION, mutationHandler)
+
+    await subCon.sync()
+
+    expect(mutationHandler).toHaveBeenCalledTimes(1)
+    expect(store.dispatch).toHaveBeenCalledTimes(5)
+    expect(
+      store.dispatch.mock.calls[0][0].payload.declaration.submissionStatus
+    ).toBe(SUBMISSION_STATUS.ARCHIVED)
   })
 
   it('fails a declaration that has a network error', async () => {

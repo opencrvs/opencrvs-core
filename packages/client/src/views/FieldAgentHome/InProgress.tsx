@@ -11,25 +11,34 @@
  */
 import * as React from 'react'
 import { HomeContent } from '@opencrvs/components/lib/layout'
-import { GridTable } from '@opencrvs/components/lib/interface'
+import {
+  ColumnContentAlignment,
+  GridTable
+} from '@opencrvs/components/lib/interface'
 import { IDeclaration } from '@client/declarations'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import moment from 'moment'
-import { goToDeclarationRecordAudit } from '@client/navigation'
+import { goToDeclarationRecordAudit, goToPage } from '@client/navigation'
 import { withTheme, ITheme } from '@client/styledComponents'
 import {
   constantsMessages as messages,
-  dynamicConstantsMessages
+  dynamicConstantsMessages,
+  buttonMessages
 } from '@client/i18n/messages'
+import { messages as reg_messages } from '@client/i18n/messages/views/registrarHome'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { formattedDuration } from '@client/utils/date-formatting'
+import {
+  DRAFT_BIRTH_PARENT_FORM_PAGE,
+  DRAFT_DEATH_FORM_PAGE
+} from '@client/navigation/routes'
 
 interface IInProgressProps {
   theme: ITheme
   draftDeclarations: IDeclaration[]
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
+  goToPage: typeof goToPage
   showPaginated?: boolean
   loading?: boolean
   error?: boolean
@@ -67,7 +76,7 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
       const { intl } = this.props
       const { locale } = intl
       const lastModificationDate = draft.modifiedOn || draft.savedOn
-      moment.locale(locale)
+      window.__localeId__ = locale
       const event =
         (draft.event &&
           intl.formatMessage(
@@ -75,6 +84,29 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
           )) ||
         ''
       const name = getDraftInformantFullName(draft, locale)
+
+      let pageRoute: string
+      if (draft.event && draft.event.toString() === 'birth') {
+        pageRoute = DRAFT_BIRTH_PARENT_FORM_PAGE
+      } else if (draft.event && draft.event.toString() === 'death') {
+        pageRoute = DRAFT_DEATH_FORM_PAGE
+      }
+
+      const actions = [
+        {
+          label: this.props.intl.formatMessage(buttonMessages.update),
+          handler: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+            e.stopPropagation()
+            this.props.goToPage(
+              pageRoute,
+              draft.id,
+              'preview',
+              (draft.event && draft.event.toString()) || ''
+            )
+          }
+        }
+      ]
+
       return {
         id: draft.id,
         event: event,
@@ -82,8 +114,9 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
         dateOfModification:
           `${intl.formatMessage(messages.lastUpdated)} ${
             lastModificationDate &&
-            formattedDuration(moment(lastModificationDate))
+            formattedDuration(new Date(lastModificationDate))
           }` || '',
+        actions,
         rowClickHandler: [
           {
             label: 'rowClickHandler',
@@ -116,19 +149,26 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
       return [
         {
           label: this.props.intl.formatMessage(messages.type),
-          width: 20,
+          width: 15,
           key: 'event'
         },
         {
           label: this.props.intl.formatMessage(messages.name),
-          width: 40,
+          width: 35,
           key: 'name',
           errorValue: this.props.intl.formatMessage(messages.noNameProvided)
         },
         {
           label: this.props.intl.formatMessage(messages.lastEdited),
-          width: 40,
+          width: 35,
           key: 'dateOfModification'
+        },
+        {
+          label: this.props.intl.formatMessage(reg_messages.listItemAction),
+          width: 15,
+          key: 'actions',
+          isActionColumn: true,
+          alignment: ColumnContentAlignment.CENTER
         }
       ]
     } else {
@@ -174,6 +214,7 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
   }
 }
 
-export const InProgress = connect(null, { goToDeclarationRecordAudit })(
-  injectIntl(withTheme(InProgressComponent))
-)
+export const InProgress = connect(null, {
+  goToDeclarationRecordAudit,
+  goToPage
+})(injectIntl(withTheme(InProgressComponent)))

@@ -19,16 +19,16 @@ const ActionContainer = styled.div`
 const HeaderContainer = styled.div`
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.shadows.light};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 20px;
-  position: relative;
+  position: fixed;
 `
 const BodyContent = styled.div`
   width: 100%;
-  height: 64px;
+  height: 56px;
   padding: 24px 0px;
   display: flex;
   flex-direction: row;

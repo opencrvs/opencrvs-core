@@ -54,4 +54,5 @@ interface Window {
     BIRTH_REGISTRATION_TARGET: number
     DEATH_REGISTRATION_TARGET: number
   }
+  __localeId__: string
 }

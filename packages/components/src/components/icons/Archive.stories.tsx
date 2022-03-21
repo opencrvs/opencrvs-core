@@ -11,19 +11,13 @@
  */
 import React from 'react'
 import { Meta, Story } from '@storybook/react'
-import { LeftNavigationDeclarationIcons } from './LeftNavigationDeclarationIcons'
-
-const Template: Story<React.HTMLAttributes<SVGElement>> = (args) => (
-  <LeftNavigationDeclarationIcons {...args} />
-)
-
-export const LeftNavigationIconView = Template.bind({})
-
-LeftNavigationIconView.args = {
-  color: 'red'
-}
+import { Archive } from './Archive'
 
 export default {
-  title: 'Components/icons/LeftNavigationDeclarationIcon',
-  component: LeftNavigationDeclarationIcons
+  title: 'Components/icons/Archive',
+  component: Archive
 } as Meta
+
+const Template: Story<{}> = () => <Archive />
+
+export const ArchiveView = Template.bind({})

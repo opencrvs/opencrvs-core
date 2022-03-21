@@ -36,7 +36,6 @@ import {
   flushPromises
 } from '@client/tests/util'
 import { merge } from 'lodash'
-import moment from 'moment'
 import * as React from 'react'
 import { InProgressTab, SELECTOR_ID, TAB_ID } from './inProgressTab'
 import {
@@ -270,7 +269,7 @@ describe('In Progress tab', () => {
       })
       testComponent.update()
       const data = testComponent.find(GridTable).prop('content')
-      const EXPECTED_DATE_OF_REJECTION = formattedDuration(moment(TIME_STAMP))
+      const EXPECTED_DATE_OF_REJECTION = formattedDuration(TIME_STAMP)
 
       expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
       expect(data[0].name).toBe('Anik Hoque')
@@ -527,9 +526,7 @@ describe('In Progress tab', () => {
       })
       testComponent.update()
       const data = testComponent.find(GridTable).prop('content')
-      const EXPECTED_DATE_OF_REJECTION = formattedDuration(
-        moment(Number(TIME_STAMP))
-      )
+      const EXPECTED_DATE_OF_REJECTION = formattedDuration(Number(TIME_STAMP))
 
       expect(data[0].id).toBe('956281c9-1f47-4c26-948a-970dd23c4094')
       expect(data[0].name).toBe('K M Abdullah al amin Khan')
@@ -849,9 +846,7 @@ describe('In Progress tab', () => {
       })
       testComponent.update()
       const data = testComponent.find(GridTable).prop('content')
-      const EXPECTED_DATE_OF_REJECTION = formattedDuration(
-        moment(Number(TIME_STAMP))
-      )
+      const EXPECTED_DATE_OF_REJECTION = formattedDuration(Number(TIME_STAMP))
 
       expect(data[0].id).toBe('f0a1ca2c-6a14-4b9e-a627-c3e2e110587e')
       expect(data[0].name).toBe('Anik Hoque')

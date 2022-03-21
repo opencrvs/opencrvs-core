@@ -143,10 +143,82 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           country
         }
       }
+      questionnaire {
+        fieldId
+        value
+      }
       mannerOfDeath
       causeOfDeath
       maleDependentsOfDeceased
       femaleDependentsOfDeceased
+      history {
+        date
+        action
+        reinstated
+        location {
+          id
+          name
+        }
+        office {
+          id
+          name
+        }
+        user {
+          id
+          type
+          role
+          name {
+            firstNames
+            familyName
+            use
+          }
+          avatar {
+            data
+            type
+          }
+        }
+        comments {
+          user {
+            id
+            username
+            avatar {
+              data
+              type
+            }
+          }
+          comment
+          createdAt
+        }
+        input {
+          valueCode
+          valueId
+          valueString
+        }
+        output {
+          valueCode
+          valueId
+          valueString
+        }
+        certificates {
+          hasShowedVerifiedDocument
+          collector {
+            relationship
+            otherRelationship
+            individual {
+              name {
+                use
+                firstNames
+                familyName
+              }
+              telecom {
+                system
+                value
+                use
+              }
+            }
+          }
+        }
+      }
     }
   }
 `
@@ -278,6 +350,10 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         trackingId
         registrationNumber
       }
+      questionnaire {
+        fieldId
+        value
+      }
       eventLocation {
         id
         type
@@ -296,6 +372,74 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
       causeOfDeath
       maleDependentsOfDeceased
       femaleDependentsOfDeceased
+      history {
+        date
+        action
+        reinstated
+        location {
+          id
+          name
+        }
+        office {
+          id
+          name
+        }
+        user {
+          id
+          type
+          role
+          name {
+            firstNames
+            familyName
+            use
+          }
+          avatar {
+            data
+            type
+          }
+        }
+        comments {
+          user {
+            id
+            username
+            avatar {
+              data
+              type
+            }
+          }
+          comment
+          createdAt
+        }
+        input {
+          valueCode
+          valueId
+          valueString
+        }
+        output {
+          valueCode
+          valueId
+          valueString
+        }
+        certificates {
+          hasShowedVerifiedDocument
+          collector {
+            relationship
+            otherRelationship
+            individual {
+              name {
+                use
+                firstNames
+                familyName
+              }
+              telecom {
+                system
+                value
+                use
+              }
+            }
+          }
+        }
+      }
     }
   }
 `

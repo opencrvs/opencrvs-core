@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "start": "cross-env NODE_ENV=development nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
-    "start:prod": "node build/dist/src/index.js",
+    "start:prod": "TS_NODE_BASEURL=./build/dist/src node -r tsconfig-paths/register build/dist/src/index.js",
     "test": "jest  --coverage --silent --noStackTrace && yarn test:compilation",
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
@@ -14,7 +14,6 @@
     "precommit": "tslint --project ./tsconfig.json && lint-staged",
     "test:compilation": "tsc --noEmit",
     "build": "tsc",
-    "postbuild": "ef-tspm",
     "build:clean": "rm -rf build"
   },
   "dependencies": {
@@ -35,6 +34,7 @@
     "lodash": "^4.17.11",
     "mongoose": "^5.11.0",
     "node-fetch": "^2.6.7",
+    "tsconfig-paths": "^3.13.0",
     "pino": "^6.0.0",
     "uuid": "^3.3.2"
   },
@@ -54,7 +54,6 @@
     "prettier": "^2.5.1",
     "ts-jest": "^26.4.4",
     "ts-node": "^6.1.1",
-    "tsconfig-paths": "^3.8.0",
     "tslint": "^5.17.0",
     "tslint-microsoft-contrib": "^6.2.0",
     "typescript": "^3.7.2"
@@ -78,7 +77,7 @@
     "setupFiles": [
       "./test/setupJest.ts"
     ],
-    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
     "moduleFileExtensions": [
       "ts",
       "tsx",

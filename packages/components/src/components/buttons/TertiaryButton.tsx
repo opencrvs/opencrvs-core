@@ -130,8 +130,7 @@ const LeftButtonIcon = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-right: 2px;
-  margin-left: -3px;
+  margin-right: 8px;
 `
 const RightButtonIcon = styled.div`
   position: relative !important;
