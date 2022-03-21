@@ -27,7 +27,6 @@ import {
 } from '@opencrvs/components/lib/interface'
 import { HomeContent } from '@opencrvs/components/lib/layout'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
-import moment from 'moment'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -158,24 +157,17 @@ class ApprovalTabComponent extends React.Component<
             dynamicConstantsMessages[reg.event.toLowerCase()]
           )) ||
         ''
+
       return {
         ...reg,
         event,
         eventTimeElapsed:
-          (reg.dateOfEvent &&
-            formattedDuration(
-              moment(reg.dateOfEvent.toString(), 'YYYY-MM-DD')
-            )) ||
+          (reg.dateOfEvent && formattedDuration(new Date(reg.dateOfEvent))) ||
           '',
         dateOfApproval:
-          (reg.modifiedAt &&
-            formattedDuration(
-              moment(
-                moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
-                'YYYY-MM-DD HH:mm:ss'
-              )
-            )) ||
-          '',
+          (reg.modifiedAt && Number.isNaN(Number(reg.modifiedAt))
+            ? formattedDuration(new Date(reg.modifiedAt))
+            : formattedDuration(new Date(Number(reg.modifiedAt)))) || '',
         icon,
         rowClickHandler: [
           {

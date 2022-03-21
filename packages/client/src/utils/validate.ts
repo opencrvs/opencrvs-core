@@ -27,10 +27,10 @@ import {
   PASSPORT,
   DRIVING_LICENSE
 } from '@client/forms/identity'
-import moment from 'moment'
 import { IOfflineData } from '@client/offline/reducer'
 import { getListOfLocations } from '@client/forms/utils'
 import _ from 'lodash'
+import format from '@client/utils/date-formatting'
 
 export interface IValidationResult {
   message: MessageDescriptor
@@ -638,7 +638,7 @@ export const isInformantOfLegalAge: Validation = (value: IFormFieldValue) => {
   if (value) {
     if (
       minAgeGapExist(
-        moment(new Date()).format('YYYY-MM-DD'),
+        format(new Date(Date.now()), 'yyyy-MM-dd'),
         value.toString(),
         window.config.INFORMANT_MINIMUM_AGE
       )
