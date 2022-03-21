@@ -117,27 +117,6 @@ describe('draftUtils tests', () => {
             trackingId: 'BZX12Y',
             status: 'DECLARED'
           },
-          operationHistories: [
-            {
-              operatedOn: '2020-01-21T08:41:08.551Z',
-              operationType: 'DECLARED',
-              operatorOfficeName: 'Baniajan Union Parishad',
-              operatorRole: 'FIELD_AGENT',
-              operatorName: [
-                {
-                  familyName: 'Al Hasan',
-                  firstNames: 'Shakib',
-                  use: 'en'
-                },
-                {
-                  familyName: '',
-                  firstNames: '',
-                  use: 'bn'
-                }
-              ],
-              operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ']
-            }
-          ],
           childName: [
             {
               firstNames: 'Muhammad',
@@ -174,28 +153,7 @@ describe('draftUtils tests', () => {
           event: 'birth',
           trackingId: 'BZX12Y',
           submissionStatus: 'DECLARED',
-          compositionId: '1',
-          operationHistories: [
-            {
-              operatedOn: '2020-01-21T08:41:08.551Z',
-              operationType: 'DECLARED',
-              operatorOfficeName: 'Baniajan Union Parishad',
-              operatorRole: 'FIELD_AGENT',
-              operatorName: [
-                {
-                  familyName: 'Al Hasan',
-                  firstNames: 'Shakib',
-                  use: 'en'
-                },
-                {
-                  familyName: '',
-                  firstNames: '',
-                  use: 'bn'
-                }
-              ],
-              operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ']
-            }
-          ]
+          compositionId: '1'
         })
       })
     })
@@ -266,28 +224,7 @@ describe('draftUtils tests', () => {
           event: 'death',
           trackingId: 'BZX12Y',
           submissionStatus: 'DECLARED',
-          compositionId: '1',
-          operationHistories: [
-            {
-              operatedOn: '2020-01-21T08:41:08.551Z',
-              operationType: 'DECLARED',
-              operatorOfficeName: 'Baniajan Union Parishad',
-              operatorRole: 'FIELD_AGENT',
-              operatorName: [
-                {
-                  familyName: 'Al Hasan',
-                  firstNames: 'Shakib',
-                  use: 'en'
-                },
-                {
-                  familyName: '',
-                  firstNames: '',
-                  use: 'bn'
-                }
-              ],
-              operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ']
-            }
-          ]
+          compositionId: '1'
         })
       })
     })
