@@ -38,8 +38,11 @@ interface IConfigMessages
   phoneNumberLabel: MessageDescriptor
   uniqueIdentificationNumberLabel: MessageDescriptor
   legallySpecifiedLabel: MessageDescriptor
+  legallySpecifiedValue: MessageDescriptor
   lateRegistrationLabel: MessageDescriptor
+  lateRegistrationValue: MessageDescriptor
   delayedRegistrationLabel: MessageDescriptor
+  delayedRegistrationValue: MessageDescriptor
   withinLegallySpecifiedTimeLabel: MessageDescriptor
   generalTabTitle: MessageDescriptor
   birthTabTitle: MessageDescriptor
@@ -217,15 +220,30 @@ const messagesToDefine: IConfigMessages = {
     defaultMessage: 'Legally specified',
     description: 'Legally specified config label'
   },
+  legallySpecifiedValue: {
+    id: 'config.application.legallySpecifiedValue',
+    defaultMessage: 'Within {onTime} days',
+    description: 'Legally specified config value'
+  },
   lateRegistrationLabel: {
     id: 'config.application.lateRegistrationLabel',
     defaultMessage: 'Late registration',
     description: 'Late registration config label'
   },
+  lateRegistrationValue: {
+    id: 'config.application.lateRegistrationValue',
+    defaultMessage: 'Between {onTime} days and {lateTime} days',
+    description: 'Late registration config value'
+  },
   delayedRegistrationLabel: {
     id: 'config.application.delayedRegistrationLabel',
     defaultMessage: 'Delayed registration',
     description: 'Delayed registration config label'
+  },
+  delayedRegistrationValue: {
+    id: 'config.application.delayedRegistrationValue',
+    defaultMessage: 'After {lateTime} days',
+    description: 'Delayed registration config value'
   },
   withinLegallySpecifiedTimeLabel: {
     id: 'config.application.withinLegallySpecifiedTimeLabel',
