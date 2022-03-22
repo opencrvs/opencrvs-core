@@ -177,3 +177,23 @@ export const changeHirerchyMutationTransformer =
 
     return transformedData
   }
+
+export const customFieldToQuestionnaireTransformer = (
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  const value: IFormSectionData = draftData[sectionId][
+    field.name
+  ] as IFormSectionData
+  if (!transformedData.questionnaire) {
+    transformedData.questionnaire = []
+  }
+  transformedData.questionnaire.push({
+    fieldId: field.customQuesstionMappingId,
+    value: value
+  })
+
+  return transformedData
+}

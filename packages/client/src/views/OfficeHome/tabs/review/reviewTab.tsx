@@ -29,7 +29,6 @@ import {
 } from '@opencrvs/components/lib/interface'
 import { HomeContent } from '@opencrvs/components/lib/layout'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
-import moment from 'moment'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -184,14 +183,11 @@ class ReviewTabComponent extends React.Component<
         ...reg,
         event,
         eventTimeElapsed:
-          (reg.dateOfEvent &&
-            formattedDuration(
-              moment(reg.dateOfEvent.toString(), 'YYYY-MM-DD')
-            )) ||
+          (reg.dateOfEvent && formattedDuration(new Date(reg.dateOfEvent))) ||
           '',
         declarationTimeElapsed:
           (reg.createdAt &&
-            formattedDuration(moment(parseInt(reg.createdAt)))) ||
+            formattedDuration(new Date(parseInt(reg.createdAt)))) ||
           '',
         actions,
         icon,

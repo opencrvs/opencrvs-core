@@ -60,7 +60,6 @@ import {
   GQLEventSearchResultSet,
   GQLQuery
 } from '@opencrvs/gateway/src/graphql/schema.d'
-import moment from 'moment'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -410,23 +409,20 @@ export class SearchResultView extends React.Component<
             dynamicConstantsMessages[reg.event.toLowerCase()]
           )) ||
         ''
+
       return {
         ...reg,
         event,
         name: reg.name,
         status: this.getDeclarationStatusLabel(reg.declarationStatus),
-        dateOfModification:
-          (reg.modifiedAt &&
-            formattedDuration(
-              moment(
-                moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
-                'YYYY-MM-DD HH:mm:ss'
-              )
-            )) ||
-          '',
+        dateOfModification: reg.modifiedAt
+          ? Number.isNaN(Number(reg.modifiedAt))
+            ? formattedDuration(new Date(reg.modifiedAt))
+            : formattedDuration(new Date(Number(reg.modifiedAt)))
+          : '',
         startedAt:
           (reg.createdAt &&
-            formattedDuration(moment(parseInt(reg.createdAt)))) ||
+            formattedDuration(new Date(Number(reg.createdAt)))) ||
           '',
         icon,
         actions,

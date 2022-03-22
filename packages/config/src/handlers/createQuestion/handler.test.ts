@@ -42,7 +42,6 @@ const mockQuestion = {
   fieldType: 'TEXT',
   preceedingFieldId: 'myPreviousFieldId',
   required: true,
-  enabled: true,
   custom: true,
   initialValue: 'myValue'
 } as IQuestion

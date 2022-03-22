@@ -34,7 +34,6 @@ import { GridTable } from '@opencrvs/components/lib/interface'
 import ApolloClient from 'apollo-client'
 import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
-import moment from 'moment'
 import * as React from 'react'
 import { Store } from 'redux'
 import { ReviewTab } from './reviewTab'
@@ -241,7 +240,7 @@ describe('OfficeHome sent for review tab related tests', () => {
 
     const data = gridTable.prop('content')
     const EXPECTED_DATE_OF_DECLARATION = formattedDuration(
-      moment(new Date(Number.parseInt(TIME_STAMP)))
+      Number.parseInt(TIME_STAMP)
     )
 
     expect(data.length).toBe(2)

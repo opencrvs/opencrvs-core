@@ -60,6 +60,7 @@ export const transformData = (
         dob:
           (birthReg &&
             birthReg.dateOfBirth &&
+            birthReg.dateOfBirth.length &&
             formatLongDate(birthReg.dateOfBirth, locale)) ||
           '',
         dod:

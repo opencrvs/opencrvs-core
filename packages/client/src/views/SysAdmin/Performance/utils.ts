@@ -10,13 +10,14 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import styled from '@client/styledComponents'
-import moment from 'moment'
 import {
   GQLLocation,
   GQLIdentifier
 } from '@opencrvs/gateway/src/graphql/schema'
 import { IUserDetails } from '@client/utils/userUtils'
 import { ILocation } from '@client/offline/reducer'
+import startOfMonth from 'date-fns/startOfMonth'
+import endOfMonth from 'date-fns/endOfMonth'
 
 export const Header = styled.h1`
   color: ${({ theme }) => theme.colors.copy};
@@ -24,13 +25,9 @@ export const Header = styled.h1`
 `
 
 export function getMonthDateRange(year: number, month: number) {
-  const currentYear = year + Math.trunc((month - 1) / 12)
-  const start = moment([currentYear, (month - 1) % 12])
-  const end = moment(start).endOf('month')
-
   return {
-    start,
-    end
+    start: startOfMonth(new Date(year, month - 1)),
+    end: endOfMonth(new Date(year, month - 1))
   }
 }
 export const ReportHeader = styled.div`
