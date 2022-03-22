@@ -29,10 +29,7 @@ import { getOperationName } from 'apollo-utilities'
 import { client } from '@client/utils/apolloClient'
 import moment from 'moment'
 import { FetchResult, DocumentNode } from 'apollo-link'
-import {
-  getAttachmentSectionKey,
-  updateDeclarationTaskHistory
-} from './utils/draftUtils'
+import { getAttachmentSectionKey } from './utils/draftUtils'
 import { getScope } from './profile/profileSelectors'
 import { RequestHandler } from 'mock-apollo-client'
 
@@ -261,15 +258,6 @@ export class SubmissionController {
       }
     }
     const scopes = getScope(this.store.getState()) || []
-    if (
-      declaration.submissionStatus === SUBMISSION_STATUS.SUBMITTED &&
-      scopes.includes('declare')
-    ) {
-      const taskHistory = updateDeclarationTaskHistory(
-        declaration,
-        this.store.getState().profile.userDetails
-      )
-    }
     //It needs some times to elasticSearch to update index
     setTimeout(async () => {
       await this.store.dispatch(updateRegistrarWorkqueue())

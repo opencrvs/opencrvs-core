@@ -12,8 +12,7 @@
 import { Event } from '@client/forms'
 import {
   getDraftInformantFullName,
-  transformSearchQueryDataToDraft,
-  updateDeclarationTaskHistory
+  transformSearchQueryDataToDraft
 } from '@client/utils/draftUtils'
 import {
   GQLBirthEventSearchSet,
@@ -226,56 +225,6 @@ describe('draftUtils tests', () => {
           submissionStatus: 'DECLARED',
           compositionId: '1'
         })
-      })
-    })
-  })
-  describe('Task history', () => {
-    it('returns a structured operation history', () => {
-      const sampleDate = Date.now()
-      const declaration: IDeclaration = {
-        id: '',
-        data: {},
-        event: Event.BIRTH,
-        submissionStatus: SUBMISSION_STATUS.DECLARED,
-        modifiedOn: sampleDate
-      }
-      const userDetails: IUserDetails = {
-        role: 'FIELD_AGENT',
-        name: [
-          {
-            familyName: 'Al Hasan',
-            firstNames: 'Shakib',
-            use: 'en'
-          },
-          {
-            familyName: '',
-            firstNames: '',
-            use: 'bn'
-          }
-        ],
-        primaryOffice: {
-          id: '',
-          name: 'Baniajan Union Parishad',
-          alias: ['বানিয়াজান ইউনিয়ন পরিষদ']
-        },
-        language: 'en',
-        localRegistrar: {
-          name: []
-        }
-      }
-
-      const operationHistory = updateDeclarationTaskHistory(
-        declaration,
-        userDetails
-      )
-
-      expect(operationHistory).toEqual({
-        operationType: declaration.submissionStatus,
-        operatedOn: new Date(sampleDate).toString(),
-        operatorRole: userDetails.role,
-        operatorName: userDetails.name,
-        operatorOfficeName: userDetails.primaryOffice!.name,
-        operatorOfficeAlias: userDetails.primaryOffice!.alias
       })
     })
   })

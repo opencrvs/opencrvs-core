@@ -153,19 +153,6 @@ export interface IVisitedGroupId {
   groupId: string
 }
 
-export interface ITaskHistory {
-  operationType?: string
-  operatedOn?: string
-  operatorRole?: string
-  operatorName?: Array<GQLHumanName | null>
-  operatorOfficeName?: string
-  operatorOfficeAlias?: Array<string | null>
-  notificationFacilityName?: string
-  notificationFacilityAlias?: Array<string | null>
-  rejectReason?: string
-  rejectComment?: string
-}
-
 export interface IDeclaration {
   id: string
   data: IFormData
