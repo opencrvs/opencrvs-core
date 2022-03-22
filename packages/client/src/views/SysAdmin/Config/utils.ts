@@ -19,6 +19,7 @@ import { EMPTY_STRING } from '@client/utils/constants'
 import {
   IBirth,
   ICurrency,
+  IDeath,
   IFullProps,
   State
 } from '@client/views/SysAdmin/Config/DynamicModal'
@@ -79,6 +80,8 @@ export const getTitle = (intl: IntlShape, changeModalName: string) => {
     return intl.formatMessage(messages.birthLegallySpecifiedDialogTitle)
   else if (changeModalName === GeneralActionId.BIRTH_LATE_REGISTRATION_TARGET)
     return intl.formatMessage(messages.birthDelayedDialogTitle)
+  else if (changeModalName === GeneralActionId.DEATH_REGISTRATION_TARGET)
+    return intl.formatMessage(messages.deathLegallySpecifiedDialogTitle)
   else return EMPTY_STRING
 }
 
@@ -104,6 +107,8 @@ export const isApplyButtonDisabled = (
     changeModalName === GeneralActionId.BIRTH_LATE_REGISTRATION_TARGET
   ) {
     return !Boolean(state.birthLateRegistrationTarget)
+  } else if (changeModalName === GeneralActionId.DEATH_REGISTRATION_TARGET) {
+    return !Boolean(state.deathRegistrationTarget)
   } else return true
 }
 
@@ -178,6 +183,32 @@ export async function callUpdateApplicationBirthMutation(
         config: {
           ...props.offlineCountryConfiguration.config,
           BIRTH
+        }
+      }
+      props.updateConfig(offlineConfig)
+    }
+  } catch (err) {
+    throw err
+  }
+}
+
+export async function callUpdateApplicationDeathMutation(
+  death: IDeath,
+  props: IFullProps,
+  updatingValue: (value: boolean) => void
+) {
+  try {
+    const res = await configApplicationMutations.mutateApplicationConfig({
+      DEATH: death
+    })
+    if (res && res.data) {
+      updatingValue(false)
+      const DEATH = res.data.updateApplicationConfig.DEATH
+      omit(DEATH, ['__typename'])
+      const offlineConfig = {
+        config: {
+          ...props.offlineCountryConfiguration.config,
+          DEATH
         }
       }
       props.updateConfig(offlineConfig)

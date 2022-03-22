@@ -36,11 +36,13 @@ interface IConfigMessages
   applicationCurrencyChangeNotification: MessageDescriptor
   applicationBirthRegTargetChangeNotification: MessageDescriptor
   applicationBirthLateRegTargetChangeNotification: MessageDescriptor
+  applicationDeathRegTargetChangeNotification: MessageDescriptor
   applicationCurrencyChangeMessage: MessageDescriptor
   phoneNumberLabel: MessageDescriptor
   uniqueIdentificationNumberLabel: MessageDescriptor
   birthLegallySpecifiedDialogTitle: MessageDescriptor
   birthDelayedDialogTitle: MessageDescriptor
+  deathLegallySpecifiedDialogTitle: MessageDescriptor
   legallySpecifiedLabel: MessageDescriptor
   legallySpecifiedValue: MessageDescriptor
   lateRegistrationLabel: MessageDescriptor
@@ -217,6 +219,12 @@ const messagesToDefine: IConfigMessages = {
     description:
       'Message for application birth late registration target change notification'
   },
+  applicationDeathRegTargetChangeNotification: {
+    id: 'config.application.deathRegTargetChangeNotification',
+    defaultMessage: 'Death registration target days updated',
+    description:
+      'Message for application death registration target change notification'
+  },
   applicationCurrencyChangeMessage: {
     id: 'config.application.currencyChangeMessage',
     defaultMessage: 'Select your currency for your CRVS system',
@@ -241,6 +249,11 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.birthDelayedDialogTitle',
     defaultMessage: 'Delayed registration time period for birth registration',
     description: 'Delayed dialog title for brith'
+  },
+  deathLegallySpecifiedDialogTitle: {
+    id: 'config.application.deathLegallySpecifiedDialogTitle',
+    defaultMessage: 'Legally specified time period for birth registration',
+    description: 'Legally specified dialog title for death'
   },
   legallySpecifiedLabel: {
     id: 'config.application.legallySpecifiedLabel',

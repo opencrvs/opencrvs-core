@@ -66,7 +66,8 @@ export enum GeneralActionId {
   CURRENCY = 'changeCurrency',
   PHONE_NUMBER = 'changePhnNum',
   BIRTH_REGISTRATION_TARGET = 'changeBirthRegTarget',
-  BIRTH_LATE_REGISTRATION_TARGET = 'changeBirthLateRegTarget'
+  BIRTH_LATE_REGISTRATION_TARGET = 'changeBirthLateRegTarget',
+  DEATH_REGISTRATION_TARGET = 'changeDeathRegTarget'
 }
 
 function GeneralTabContent({
@@ -274,10 +275,12 @@ function BirthTabContent({
 
 function DeathTabContent({
   offlineCountryConfiguration,
-  intl
+  intl,
+  callBack
 }: {
   offlineCountryConfiguration: IOfflineData
   intl: IntlShape
+  callBack: (modalName: string) => void
 }) {
   return (
     <ListView
@@ -297,7 +300,9 @@ function DeathTabContent({
           }),
           action: {
             label: intl.formatMessage(buttonMessages.change),
-            disabled: true
+            handler: () => {
+              callBack(GeneralActionId.DEATH_REGISTRATION_TARGET)
+            }
           }
         },
         {
@@ -446,6 +451,11 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
             <DeathTabContent
               offlineCountryConfiguration={offlineCountryConfiguration}
               intl={intl}
+              callBack={(modalName: string) =>
+                this.setState({
+                  changeModalName: modalName
+                })
+              }
             />
           )}
         </Content>

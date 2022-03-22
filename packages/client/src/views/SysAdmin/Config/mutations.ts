@@ -32,6 +32,13 @@ const applicationConfigMutation = gql`
           DELAYED
         }
       }
+      DEATH {
+        REGISTRATION_TARGET
+        FEE {
+          ON_TIME
+          DELAYED
+        }
+      }
     }
   }
 `

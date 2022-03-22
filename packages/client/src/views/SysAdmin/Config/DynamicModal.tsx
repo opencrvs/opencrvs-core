@@ -36,7 +36,8 @@ import {
   isApplyButtonDisabled,
   callUpdateApplicationNameMutation,
   callUpdateApplicationCurrencyMutation,
-  callUpdateApplicationBirthMutation
+  callUpdateApplicationBirthMutation,
+  callUpdateApplicationDeathMutation
 } from '@client/views/SysAdmin/Config/utils'
 
 const Message = styled.div`
@@ -113,11 +114,19 @@ export type IBirth = {
     DELAYED?: number
   }
 }
+export type IDeath = {
+  REGISTRATION_TARGET?: number
+  FEE?: {
+    ON_TIME?: number
+    DELAYED?: number
+  }
+}
 
 export type IApplicationConfigName = {
   APPLICATION_NAME?: string
   CURRENCY?: ICurrency
   BIRTH?: IBirth
+  DEATH?: IDeath
 }
 
 export type State = {
@@ -125,6 +134,7 @@ export type State = {
   currency: string
   birthRegistrationTarget: string
   birthLateRegistrationTarget: string
+  deathRegistrationTarget: string
   updatingValue: boolean
   errorOccured: boolean
   errorMessages: string
@@ -156,6 +166,8 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
         offlineCountryConfiguration.config.BIRTH.REGISTRATION_TARGET.toString(),
       birthLateRegistrationTarget:
         offlineCountryConfiguration.config.BIRTH.LATE_REGISTRATION_TARGET.toString(),
+      deathRegistrationTarget:
+        offlineCountryConfiguration.config.DEATH.REGISTRATION_TARGET.toString(),
       updatingValue: false,
       errorOccured: false,
       errorMessages: EMPTY_STRING
@@ -175,6 +187,13 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
     const value = event.target.value
     this.setState(() => ({
       birthRegistrationTarget: value
+    }))
+  }
+
+  setDeathRegistrationTarget = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    this.setState(() => ({
+      deathRegistrationTarget: value
     }))
   }
 
@@ -286,6 +305,29 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
           this.props.intl.formatMessage(messages.applicationConfigChangeError)
         )
       }
+    } else if (
+      modalName === GeneralActionId.DEATH_REGISTRATION_TARGET &&
+      value.DEATH?.REGISTRATION_TARGET
+    ) {
+      try {
+        await callUpdateApplicationDeathMutation(
+          value.DEATH,
+          this.props,
+          this.setUpdatingValue
+        )
+        const notificationText = this.props.intl.formatMessage(
+          messages.applicationDeathRegTargetChangeNotification
+        )
+        valueChanged(NOTIFICATION_TYPE.SUCCESS, notificationText)
+      } catch {
+        this.setError(
+          this.props.intl.formatMessage(messages.applicationConfigChangeError)
+        )
+        valueChanged(
+          NOTIFICATION_TYPE.ERROR,
+          this.props.intl.formatMessage(messages.applicationConfigChangeError)
+        )
+      }
     }
   }
 
@@ -324,6 +366,11 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
                     ),
                     LATE_REGISTRATION_TARGET: parseInt(
                       this.state.birthLateRegistrationTarget
+                    )
+                  },
+                  DEATH: {
+                    REGISTRATION_TARGET: parseInt(
+                      this.state.deathRegistrationTarget
                     )
                   }
                 },
@@ -420,6 +467,28 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
                   error={false}
                   value={this.state.birthLateRegistrationTarget}
                   onChange={this.setBirthLateRegistrationTarget}
+                />
+                <Text>
+                  {intl.formatMessage(messages.eventTargetInputLabel)}
+                </Text>
+              </InputField>
+            </Field>
+          </Content>
+        )}
+        {changeModalName === GeneralActionId.DEATH_REGISTRATION_TARGET && (
+          <Content>
+            <Field>
+              <InputField
+                id="applicationDeathRegTarget"
+                touched={true}
+                required={false}
+              >
+                <SmallWidthInput
+                  id="applicationDeathRegTarget"
+                  type="number"
+                  error={false}
+                  value={this.state.deathRegistrationTarget}
+                  onChange={this.setDeathRegistrationTarget}
                 />
                 <Text>
                   {intl.formatMessage(messages.eventTargetInputLabel)}
