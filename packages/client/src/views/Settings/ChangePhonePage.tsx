@@ -217,7 +217,7 @@ class ChangePhoneView extends React.Component<IProps & IDispatchProps, IState> {
     }
   }
 
-  phoneChangecompleted = () => {
+  phoneChangeCompleted = () => {
     this.setState({
       phoneNumber: EMPTY_STRING,
       verifyCode: EMPTY_STRING,
@@ -225,8 +225,11 @@ class ChangePhoneView extends React.Component<IProps & IDispatchProps, IState> {
       errorOccured: false
     })
     if (this.props.userDetails) {
-      this.props.userDetails.mobile = convertToMSISDN(this.state.phoneNumber)
-      this.props.modifyUserDetails(this.props.userDetails)
+      const { userDetails } = this.props
+      this.props.modifyUserDetails({
+        ...userDetails,
+        mobile: convertToMSISDN(this.state.phoneNumber)
+      })
     }
     this.props.goToSettingsWithPhoneSuccessMsg(true)
   }
@@ -375,7 +378,7 @@ class ChangePhoneView extends React.Component<IProps & IDispatchProps, IState> {
                     nonce: nonce,
                     verifyCode: this.state.verifyCode
                   }}
-                  onCompleted={this.phoneChangecompleted}
+                  onCompleted={this.phoneChangeCompleted}
                   onError={() => this.setState({ errorOccured: true })}
                 >
                   {(changePhone: any) => {
