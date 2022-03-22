@@ -79,7 +79,6 @@ import {
   GQLQuery,
   GQLEventSearchResultSet
 } from '@opencrvs/gateway/src/graphql/schema'
-import moment from 'moment'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -87,6 +86,7 @@ import { Redirect, RouteComponentProps } from 'react-router'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
 import { Navigation } from '@client/components/interface/Navigation'
+import subYears from 'date-fns/subYears'
 
 const FABContainer = styled.div`
   position: fixed;
@@ -268,17 +268,18 @@ class FieldAgentHomeView extends React.Component<
         const deathReg = reg as GQLDeathEventSearchSet
         names = deathReg && (deathReg.deceasedName as GQLHumanName[])
       }
-      moment.locale(this.props.intl.locale)
+      window.__localeId__ = this.props.intl.locale
       const rejectedArray =
         registrationSearchSet &&
         registrationSearchSet.operationHistories &&
         registrationSearchSet.operationHistories.filter((item) => {
           return item && item.operationType === 'REJECTED'
         })
+
       const daysOfRejection =
         rejectedArray &&
         rejectedArray[0] &&
-        formattedDuration(moment(rejectedArray[0].operatedOn))
+        formattedDuration(new Date(rejectedArray[0].operatedOn))
       const event = registrationSearchSet.type as string
       return {
         id: registrationSearchSet.id,
@@ -460,9 +461,9 @@ class FieldAgentHomeView extends React.Component<
                 '&sectionId=' +
                 OPERATIONAL_REPORT_SECTION.OPERATIONAL +
                 '&timeStart=' +
-                moment().subtract(1, 'years').toDate().toISOString() +
+                subYears(new Date(Date.now()), 1).toISOString() +
                 '&timeEnd=' +
-                moment().toDate().toISOString()
+                new Date(Date.now()).toISOString()
             }}
           />
         )}

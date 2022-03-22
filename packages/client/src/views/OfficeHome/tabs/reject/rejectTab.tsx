@@ -27,7 +27,6 @@ import {
 } from '@opencrvs/components/lib/interface'
 import { HomeContent } from '@opencrvs/components/lib/layout'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
-import moment from 'moment'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -211,14 +210,9 @@ class RejectTabComponent extends React.Component<
         ...reg,
         event,
         dateOfRejection:
-          (reg.modifiedAt &&
-            formattedDuration(
-              moment(
-                moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
-                'YYYY-MM-DD HH:mm:ss'
-              )
-            )) ||
-          '',
+          (reg.modifiedAt && Number.isNaN(Number(reg.modifiedAt))
+            ? formattedDuration(new Date(reg.modifiedAt))
+            : formattedDuration(new Date(Number(reg.modifiedAt)))) || '',
         actions,
         rowClickHandler: [
           {

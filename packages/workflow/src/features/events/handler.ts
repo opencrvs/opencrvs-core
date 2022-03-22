@@ -9,30 +9,38 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { HEARTH_URL, OPENHIM_URL } from '@workflow/constants'
+import { OPENHIM_URL } from '@workflow/constants'
 import { isUserAuthorized } from '@workflow/features/events/auth'
 import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
 import {
   hasBirthRegistrationNumber,
-  hasDeathRegistrationNumber
+  hasDeathRegistrationNumber,
+  forwardToHearth
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   createRegistrationHandler,
   markEventAsCertifiedHandler,
   markEventAsRequestedForCorrectionHandler,
   markEventAsValidatedHandler,
-  markEventAsWaitingValidationHandler
+  markEventAsWaitingValidationHandler,
+  markEventAsDownloadedHandler
 } from '@workflow/features/registration/handler'
 import {
   getEventType,
   hasCorrectionEncounterSection,
   isInProgressDeclaration
 } from '@workflow/features/registration/utils'
+import {
+  hasReinstatedExtension,
+  isRejectedTask,
+  isArchiveTask
+} from '@workflow/features/task/fhir/utils'
 import updateTaskHandler from '@workflow/features/task/handler'
 import { logger } from '@workflow/logger'
 import { hasRegisterScope, hasValidateScope } from '@workflow/utils/authUtils'
 import * as Hapi from '@hapi/hapi'
-import fetch, { RequestInit } from 'node-fetch'
+import fetch from 'node-fetch'
+import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
 
 // TODO: Change these event names to be closer in definition to the comments
 // https://jembiprojects.jira.com/browse/OCRVS-2767
@@ -46,6 +54,8 @@ export enum Events {
   BIRTH_MARK_VALID = '/events/birth/mark-validated',
   BIRTH_MARK_CERT = '/events/birth/mark-certified',
   BIRTH_MARK_VOID = '/events/birth/mark-voided',
+  BIRTH_MARK_ARCHIVED = '/events/birth/mark-archived',
+  BIRTH_MARK_REINSTATED = '/events/birth/mark-reinstated',
   BIRTH_REQUEST_CORRECTION = '/events/birth/request-correction',
   DEATH_IN_PROGRESS_DEC = '/events/death/in-progress-declaration', /// Field agent or DHIS2in progress declaration
   DEATH_NEW_DEC = '/events/death/new-declaration', // Field agent completed declaration
@@ -56,17 +66,20 @@ export enum Events {
   DEATH_MARK_VALID = '/events/death/mark-validated',
   DEATH_MARK_CERT = '/events/death/mark-certified',
   DEATH_MARK_VOID = '/events/death/mark-voided',
+  DEATH_MARK_ARCHIVED = '/events/death/mark-archived',
+  DEATH_MARK_REINSTATED = '/events/death/mark-reinstated',
   DEATH_REQUEST_CORRECTION = '/events/death/request-correction',
   EVENT_NOT_DUPLICATE = '/events/not-duplicate',
+  DOWNLOADED = '/events/downloaded',
   UNKNOWN = 'unknown'
 }
 
 function detectEvent(request: Hapi.Request): Events {
+  const fhirBundle = request.payload as fhir.Bundle
   if (
     request.method === 'post' &&
     (request.path === '/fhir' || request.path === '/fhir/')
   ) {
-    const fhirBundle = request.payload as fhir.Bundle
     if (
       fhirBundle.entry &&
       fhirBundle.entry[0] &&
@@ -142,6 +155,10 @@ function detectEvent(request: Hapi.Request): Events {
         }
       }
       if (firstEntry.resourceType === 'Task' && firstEntry.id) {
+        if (fhirBundle?.signature?.type[0]?.code === 'downloaded') {
+          return Events.DOWNLOADED
+        }
+
         const eventType = getEventType(fhirBundle)
         if (eventType === EVENT_TYPE.BIRTH) {
           if (hasValidateScope(request)) {
@@ -163,11 +180,28 @@ function detectEvent(request: Hapi.Request): Events {
   }
 
   if (request.method === 'put' && request.path.includes('/fhir/Task')) {
-    const eventType = getEventType(request.payload as fhir.Bundle)
+    const taskResource = getTaskResource(fhirBundle)
+    const eventType = getEventType(fhirBundle)
     if (eventType === EVENT_TYPE.BIRTH) {
-      return Events.BIRTH_MARK_VOID
+      if (isRejectedTask(taskResource)) {
+        return Events.BIRTH_MARK_VOID
+      }
+      if (isArchiveTask(taskResource)) {
+        return Events.BIRTH_MARK_ARCHIVED
+      }
+      if (hasReinstatedExtension(taskResource)) {
+        return Events.BIRTH_MARK_REINSTATED
+      }
     } else if (eventType === EVENT_TYPE.DEATH) {
-      return Events.DEATH_MARK_VOID
+      if (isRejectedTask(taskResource)) {
+        return Events.DEATH_MARK_VOID
+      }
+      if (isArchiveTask(taskResource)) {
+        return Events.DEATH_MARK_ARCHIVED
+      }
+      if (hasReinstatedExtension(taskResource)) {
+        return Events.DEATH_MARK_REINSTATED
+      }
     }
   }
 
@@ -176,37 +210,6 @@ function detectEvent(request: Hapi.Request): Events {
   }
 
   return Events.UNKNOWN
-}
-
-async function forwardToHearth(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-  logger.info(
-    `Forwarding to Hearth unchanged: ${request.method} ${request.path}`
-  )
-
-  const requestOpts: RequestInit = {
-    method: request.method,
-    headers: {
-      'Content-Type': 'application/fhir+json',
-      'x-correlation-id': request.headers['x-correlation-id']
-    }
-  }
-
-  let path = request.path
-  if (request.method === 'post' || request.method === 'put') {
-    requestOpts.body = JSON.stringify(request.payload)
-  } else if (request.method === 'get') {
-    path = `${request.path}${request.url.search}`
-  }
-  const res = await fetch(HEARTH_URL + path.replace('/fhir', ''), requestOpts)
-  const resBody = await res.text()
-  const response = h.response(resBody)
-
-  response.code(res.status)
-  res.headers.forEach((headerVal, headerName) => {
-    response.header(headerName, headerVal)
-  })
-
-  return response
 }
 
 export async function fhirWorkflowEventHandler(
@@ -296,6 +299,11 @@ export async function fhirWorkflowEventHandler(
         request.headers
       )
       break
+    case Events.BIRTH_MARK_REINSTATED:
+    case Events.DEATH_MARK_REINSTATED:
+      response = await updateTaskHandler(request, h, event)
+      await triggerEvent(event, request.payload, request.headers)
+      break
     case Events.DEATH_IN_PROGRESS_DEC:
       response = await createRegistrationHandler(request, h, event)
       await triggerEvent(
@@ -380,6 +388,11 @@ export async function fhirWorkflowEventHandler(
         request.headers
       )
       break
+    case Events.BIRTH_MARK_ARCHIVED:
+    case Events.DEATH_MARK_ARCHIVED:
+      response = await updateTaskHandler(request, h, event)
+      await triggerEvent(event, request.payload, request.headers)
+      break
     case Events.EVENT_NOT_DUPLICATE:
       response = await forwardToHearth(request, h)
       await triggerEvent(
@@ -387,6 +400,10 @@ export async function fhirWorkflowEventHandler(
         request.payload,
         request.headers
       )
+      break
+    case Events.DOWNLOADED:
+      response = await markEventAsDownloadedHandler(request, h)
+      await triggerEvent(Events.DOWNLOADED, request.payload, request.headers)
       break
     default:
       // forward as-is to hearth

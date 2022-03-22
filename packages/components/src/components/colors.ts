@@ -52,8 +52,8 @@ export const colors = {
 
   // Alternative defintions
   copy: '#222222', // grey600
-  supportingCopy: '#707070', // grey500
-  placeholderCopy: '#A5A5A5', // grey400
+  supportingCopy: '#5B5B5B', // grey500
+  placeholderCopy: '#959595', // grey400
   disabled: '#CCCCCC', // grey300
   background: '#F5F5F5' // grey100
 }

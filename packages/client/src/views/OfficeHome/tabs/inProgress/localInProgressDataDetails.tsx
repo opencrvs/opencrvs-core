@@ -14,12 +14,12 @@ import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import { messages } from '@client/i18n/messages/views/search'
 import { IStoreState } from '@client/store'
 import { CERTIFICATE_DATE_FORMAT } from '@client/utils/constants'
-import moment from 'moment'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
 import { constantsMessages } from '@client/i18n/messages'
+import format from '@client/utils/date-formatting'
 
 const ExpansionContent = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -132,9 +132,13 @@ class LocalInProgressDataDetailsComponent extends React.Component<
   render() {
     const { intl, draft } = this.props
     const transformedData = this.transformer(draft)
-    const timestamp = moment(transformedData.draftStartedOn).format(
-      CERTIFICATE_DATE_FORMAT
-    )
+    const timestamp =
+      (transformedData.draftStartedOn &&
+        format(
+          new Date(transformedData.draftStartedOn),
+          CERTIFICATE_DATE_FORMAT
+        )) ||
+      ''
 
     return (
       <ExpansionContent>

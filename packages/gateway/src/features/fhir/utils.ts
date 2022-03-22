@@ -22,6 +22,7 @@ import {
   createTaskRefTemplate,
   createRelatedPersonTemplate,
   createPaymentReconciliationTemplate,
+  createQuestionnaireResponseTemplate,
   CERTIFICATE_DOCS_CODE,
   CERTIFICATE_DOCS_TITLE,
   CERTIFICATE_CONTEXT_KEY,
@@ -51,7 +52,8 @@ import {
   OPENCRVS_SPECIFICATION_URL,
   EVENT_TYPE,
   BIRTH_REG_NO,
-  DEATH_REG_NO
+  DEATH_REG_NO,
+  DOWNLOADED_EXTENSION_URL
 } from '@gateway/features/fhir/constants'
 import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import { IMetricsParam } from '@gateway/features/metrics/root-resolvers'
@@ -68,7 +70,8 @@ import {
   GQLEstimatedTargetDayMetrics,
   GQLMonthWiseTargetDayEstimation,
   GQLLocationWiseTargetDayEstimation,
-  GQLEventInTargetDayEstimationCount
+  GQLEventInTargetDayEstimationCount,
+  GQLRegStatus
 } from '@gateway/graphql/schema'
 import { reduce } from 'lodash'
 
@@ -793,6 +796,49 @@ export function selectOrCreatePaymentReconciliationResource(
   }
 }
 
+export function selectOrCreateQuestionnaireResource(
+  sectionCode: string,
+  fhirBundle: ITemplatedBundle,
+  context: any
+): fhir.QuestionnaireResponse {
+  const questionnaire = fhirBundle.entry.find((entry) => {
+    if (
+      !entry ||
+      !entry.resource ||
+      entry.resource.resourceType !== 'QuestionnaireResponse'
+    ) {
+      return false
+    } else {
+      return true
+    }
+  })
+
+  if (questionnaire) {
+    return questionnaire.resource as fhir.QuestionnaireResponse
+  }
+
+  const encounter = selectOrCreateEncounterResource(fhirBundle, context)
+  const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
+
+  const ref = uuid()
+  const questionnaireResponseEntry = createQuestionnaireResponseTemplate(ref)
+  if (!section || !section.entry || !section.entry[0]) {
+    throw new Error('Expected encounter section to exist and have an entry')
+  }
+  const encounterSectionEntry = section.entry[0]
+  const encounterEntry = fhirBundle.entry.find(
+    (entry) => entry.fullUrl === encounterSectionEntry.reference
+  )
+  if (encounterEntry && encounter) {
+    questionnaireResponseEntry.resource.subject = {
+      reference: `${encounterEntry.fullUrl}`
+    }
+  }
+  fhirBundle.entry.push(questionnaireResponseEntry)
+
+  return questionnaireResponseEntry.resource as fhir.QuestionnaireResponse
+}
+
 export function selectOrCreateTaskRefResource(
   fhirBundle: ITemplatedBundle,
   context: any
@@ -841,6 +887,30 @@ export function setObjectPropInResourceArray(
   }
 }
 
+export function setQuestionnaireItem(
+  questionnaire: fhir.QuestionnaireResponse,
+  context: any,
+  label: string | null,
+  value: string | null
+) {
+  if (!questionnaire.item) {
+    questionnaire.item = []
+  }
+
+  if (label && !questionnaire.item[context._index.questionnaire]) {
+    questionnaire.item[context._index.questionnaire] = {
+      text: label,
+      linkId: ''
+    }
+  }
+
+  if (value && questionnaire.item[context._index.questionnaire]) {
+    questionnaire.item[context._index.questionnaire].answer = [
+      { valueString: value }
+    ]
+  }
+}
+
 export function setArrayPropInResourceObject(
   resource: fhir.Resource,
   label: string,
@@ -865,12 +935,62 @@ export function findExtension(
   return extension
 }
 
+export function getDownloadedExtensionStatus(task: fhir.Task) {
+  const extension =
+    task.extension && findExtension(DOWNLOADED_EXTENSION_URL, task.extension)
+  return extension?.valueString
+}
+export async function getCertificatesFromTask(
+  task: fhir.Task,
+  _: any,
+  authHeader: IAuthHeader
+) {
+  if (!task.focus) {
+    throw new Error(
+      'Task resource does not have a focus property necessary to lookup the composition'
+    )
+  }
+
+  const compositionBundle = await fetchFHIR(
+    `/${task.focus.reference}/_history`,
+    authHeader
+  )
+
+  if (!compositionBundle || !compositionBundle.entry) {
+    return null
+  }
+
+  return compositionBundle.entry.map(
+    async (compositionEntry: fhir.BundleEntry) => {
+      const certSection = findCompositionSection(
+        CERTIFICATE_DOCS_CODE,
+        compositionEntry.resource as ITemplatedComposition
+      )
+      if (
+        !certSection ||
+        !certSection.entry ||
+        !(certSection.entry.length > 0)
+      ) {
+        return null
+      }
+      return await fetchFHIR(`/${certSection.entry[0].reference}`, authHeader)
+    }
+  )
+}
+export function getActionFromTask(task: fhir.Task) {
+  const businessStatus = getStatusFromTask(task)
+  const extensionStatusWhileDownloaded = getDownloadedExtensionStatus(task)
+  if (businessStatus === extensionStatusWhileDownloaded) {
+    return GQLRegStatus.DOWNLOADED
+  }
+  return businessStatus
+}
 export function getStatusFromTask(task: fhir.Task) {
   const statusType = task.businessStatus?.coding?.find(
     (coding: fhir.Coding) =>
       coding.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
   )
-  return (statusType && statusType.code) || null
+  return statusType && statusType.code
 }
 export function getMaritalStatusCode(fieldValue: string) {
   switch (fieldValue) {

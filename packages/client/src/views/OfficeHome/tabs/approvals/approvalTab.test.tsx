@@ -21,7 +21,6 @@ import { GridTable } from '@opencrvs/components/lib/interface'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { merge } from 'lodash'
-import moment from 'moment'
 import * as React from 'react'
 import { ApprovalTab } from './approvalTab'
 import {
@@ -223,12 +222,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
 
     testComponent.update()
     const data = testComponent.find(GridTable).prop('content')
-    const EXPECTED_DATE_OF_DECLARATION = formattedDuration(
-      moment(
-        moment(TIME_STAMP, 'x').format('YYYY-MM-DD HH:mm:ss'),
-        'YYYY-MM-DD HH:mm:ss'
-      )
-    )
+    const EXPECTED_DATE_OF_DECLARATION = formattedDuration(Number(TIME_STAMP))
     expect(data.length).toBe(2)
     expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
     expect(data[0].eventTimeElapsed).toBe('8 years ago')

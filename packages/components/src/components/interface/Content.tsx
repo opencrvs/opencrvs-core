@@ -28,9 +28,9 @@ const Container = styled.div<{ size: string }>`
 `
 const Header = styled.div`
   display: flex;
+  align-items: center;
   height: 72px;
-  border-bottom: 1px solid rgb(204, 207, 208);
-  padding-top: 20px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   padding-right: 32px;
   padding-left: 32px;
 `
@@ -51,7 +51,7 @@ export const SubHeader = styled.div`
   ${({ theme }) => theme.fonts.reg18};
 `
 export const Body = styled.div`
-  padding-top: 20px;
+  padding-top: 24px;
   padding-right: 32px;
   padding-left: 32px;
   color: ${({ theme }) => theme.colors.copy};
@@ -69,7 +69,8 @@ const BottomActionBar = styled.div`
 `
 const TitleContainer = styled.div<{ titleColor?: keyof typeof colors }>`
   display: flex;
-  gap: 10px;
+  gap: 16px;
+  align-items: flex-end;
   margin-right: auto;
   color: ${({ theme, titleColor }) => titleColor && theme.colors[titleColor]};
 `
@@ -79,6 +80,8 @@ const Title = styled.div`
 `
 const Icon = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
+  display: flex;
+  align-items: center;
 `
 
 export enum ContentSize {

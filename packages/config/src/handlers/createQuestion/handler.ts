@@ -43,7 +43,7 @@ export const requestSchema = Joi.object({
   fieldType: Joi.string().valid(...validFieldType),
   preceedingFieldId: Joi.string(),
   required: Joi.boolean(),
-  enabled: Joi.boolean().required(),
+  enabled: Joi.string(),
   custom: Joi.boolean(),
   initialValue: Joi.string()
 })

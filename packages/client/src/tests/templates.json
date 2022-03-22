@@ -302,7 +302,7 @@
         "field": "issuedDate",
         "operation": "DateFieldValue",
         "parameters": {
-          "format": "DD.MM.YYYY",
+          "format": "dd.MM.yyyy",
           "momentLocale": {
             "en": "locale/en-ie",
             "bn": "locale/bn"
@@ -384,7 +384,7 @@
           "field": "certificationDate",
           "operation": "DateFieldValue",
           "parameters": {
-            "format": "DD/MM/YYYY",
+            "format": "dd/MM/yyyy",
             "language": "en",
             "momentLocale": { "en": "locale/en-ie" }
           }
@@ -393,7 +393,7 @@
           "field": "registrationDate",
           "operation": "DateFieldValue",
           "parameters": {
-            "format": "DD/MM/YYYY",
+            "format": "dd/MM/yyyy",
             "language": "en",
             "key": { "birth": "registration.regStatus.statusDate" },
             "momentLocale": { "en": "locale/en-ie" }
@@ -532,7 +532,7 @@
           "field": "childBirthDateChar1",
           "operation": "DateFieldValue",
           "parameters": {
-            "format": "DD/MM/YYYY",
+            "format": "dd/MM/yyyy",
             "language": "en",
             "key": { "birth": "child.childBirthDate" },
             "momentLocale": { "en": "locale/en-ie" }
@@ -543,7 +543,7 @@
           "field": "childBirthDateChar1",
           "operation": "DateFieldValue",
           "parameters": {
-            "format": "DD/MM/YYYY",
+            "format": "dd/MM/yyyy",
             "language": "en",
             "key": { "birth": "child.childBirthDate" },
             "momentLocale": { "en": "locale/en-ie" }
@@ -554,7 +554,7 @@
           "field": "childBirthDateChar1",
           "operation": "DateFieldValue",
           "parameters": {
-            "format": "DD/MM/YYYY",
+            "format": "dd/MM/yyyy",
             "language": "en",
             "key": { "birth": "child.childBirthDate" },
             "momentLocale": { "en": "locale/en-ie" }
@@ -565,7 +565,7 @@
           "field": "childBirthDateChar2",
           "operation": "DateFieldValue",
           "parameters": {
-            "format": "DD/MM/YYYY",
+            "format": "dd/MM/yyyy",
             "language": "en",
             "key": { "birth": "child.childBirthDate" },
             "momentLocale": { "en": "locale/en-ie" }
@@ -576,7 +576,7 @@
           "field": "childBirthDateChar4",
           "operation": "DateFieldValue",
           "parameters": {
-            "format": "DD/MM/YYYY",
+            "format": "dd/MM/yyyy",
             "language": "en",
             "key": { "birth": "child.childBirthDate" },
             "momentLocale": { "en": "locale/en-ie" }
@@ -587,7 +587,7 @@
           "field": "childBirthDateChar5",
           "operation": "DateFieldValue",
           "parameters": {
-            "format": "DD/MM/YYYY",
+            "format": "dd/MM/yyyy",
             "language": "en",
             "key": { "birth": "child.childBirthDate" },
             "momentLocale": { "en": "locale/en-ie" }
@@ -598,7 +598,7 @@
           "field": "childBirthDateChar7",
           "operation": "DateFieldValue",
           "parameters": {
-            "format": "DD/MM/YYYY",
+            "format": "dd/MM/yyyy",
             "language": "en",
             "key": { "birth": "child.childBirthDate" },
             "momentLocale": { "en": "locale/en-ie" }
@@ -609,7 +609,7 @@
           "field": "childBirthDateChar8",
           "operation": "DateFieldValue",
           "parameters": {
-            "format": "DD/MM/YYYY",
+            "format": "dd/MM/yyyy",
             "language": "en",
             "key": { "birth": "child.childBirthDate" },
             "momentLocale": { "en": "locale/en-ie" }
@@ -620,7 +620,7 @@
           "field": "childBirthDateChar9",
           "operation": "DateFieldValue",
           "parameters": {
-            "format": "DD/MM/YYYY",
+            "format": "dd/MM/yyyy",
             "language": "en",
             "key": { "birth": "child.childBirthDate" },
             "momentLocale": { "en": "locale/en-ie" }
@@ -631,7 +631,7 @@
           "field": "childBirthDateChar10",
           "operation": "DateFieldValue",
           "parameters": {
-            "format": "DD/MM/YYYY",
+            "format": "dd/MM/yyyy",
             "language": "en",
             "key": { "birth": "child.childBirthDate" },
             "momentLocale": { "en": "locale/en-ie" }
@@ -647,7 +647,7 @@
           "field": "childFormatedBirthDate",
           "operation": "DateFieldValue",
           "parameters": {
-            "format": "DD MMMM, YYYY",
+            "format": "dd MMMM, yyyy",
             "language": "en",
             "key": { "birth": "child.childBirthDate" },
             "momentLocale": { "en": "locale/en-ie" }
@@ -1547,7 +1547,7 @@
           "field": "certificationDate",
           "operation": "DateFieldValue",
           "parameters": {
-            "format": "DD/MM/YYYY",
+            "format": "dd/MM/yyyy",
             "language": "en",
             "momentLocale": { "en": "locale/en-ie" }
           }
@@ -1556,7 +1556,7 @@
           "field": "registrationDate",
           "operation": "DateFieldValue",
           "parameters": {
-            "format": "DD/MM/YYYY",
+            "format": "dd/MM/yyyy",
             "language": "en",
             "key": { "death": "registration.regStatus.statusDate" },
             "momentLocale": { "en": "locale/en-ie" }
@@ -1865,7 +1865,7 @@
           "field": "deceasedBirthDate",
           "operation": "DateFieldValue",
           "parameters": {
-            "format": "DD/MM/YYYY",
+            "format": "dd/MM/yyyy",
             "language": "en",
             "key": { "death": "deceased.birthDate" },
             "momentLocale": { "en": "locale/en-ie" }
@@ -1875,7 +1875,7 @@
           "field": "deceasedDeathDate",
           "operation": "DateFieldValue",
           "parameters": {
-            "format": "DD/MM/YYYY",
+            "format": "dd/MM/yyyy",
             "language": "en",
             "key": { "death": "deathEvent.deathDate" },
             "momentLocale": { "en": "locale/en-ie" }
@@ -1890,7 +1890,7 @@
           "field": "deceasedFormattedDeathDate",
           "operation": "DateFieldValue",
           "parameters": {
-            "format": "DD MMMM, YYYY",
+            "format": "dd MMMM, yyyy",
             "language": "en",
             "key": { "death": "deathEvent.deathDate" },
             "momentLocale": { "en": "locale/en-ie" }

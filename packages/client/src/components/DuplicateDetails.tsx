@@ -47,8 +47,8 @@ import { find, get, camelCase } from 'lodash'
 import * as React from 'react'
 import { withApollo, WithApolloClient } from 'react-apollo'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import Moment from 'react-moment'
 import { connect } from 'react-redux'
+import format from 'date-fns/format'
 
 export enum Event {
   BIRTH = 'BIRTH',
@@ -56,6 +56,7 @@ export enum Event {
 }
 
 export enum Action {
+  ARCHIVED = 'ARCHIVED',
   IN_PROGRESS = 'IN_PROGRESS',
   DECLARATION_UPDATED = 'DECLARATION_UPDATED',
   DECLARED = 'DECLARED',
@@ -64,6 +65,7 @@ export enum Action {
   REJECTED = 'REJECTED',
   REGISTERED = 'REGISTERED',
   CERTIFIED = 'CERTIFIED',
+  DOWNLOADED = 'Declaration downloaded',
   LOAD_REVIEW_DECLARATION = 'load declaration data for review'
 }
 interface IProps extends IntlShapeProps {
@@ -256,7 +258,7 @@ class DuplicateDetailsClass extends React.Component<
             <b>
               {intl.formatMessage(constantsMessages.dateOfDeclaration)}:
             </b>{' '}
-            <Moment format="DD-MM-YYYY">{data.dateOfDeclaration}</Moment>
+            <b>{format(new Date(data.dateOfDeclaration), 'dd-MM-yyyy')}</b>
             <br />
             <b>{intl.formatMessage(constantsMessages.trackingId)}:</b>{' '}
             {data.trackingId}

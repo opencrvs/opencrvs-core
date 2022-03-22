@@ -12,17 +12,13 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import styled from '@client/styledComponents'
-import { Modal } from '@opencrvs/components/lib/interface'
+import { ResponsiveModal } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { IStoreState } from '@client/store'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { messages } from '@client/i18n/messages/views/session'
 import { buttonMessages } from '@client/i18n/messages'
 
-const StyledModal = styled(Modal)`
-  z-index: 4;
-`
 type SessionExpireProps = {
   sessionExpired: boolean
 }
@@ -39,8 +35,10 @@ class SessionExpireComponent extends React.Component<
     return (
       <>
         {sessionExpired && (
-          <StyledModal
+          <ResponsiveModal
             title={intl.formatMessage(messages.sessionExpireTxt)}
+            contentHeight={96}
+            responsive={false}
             actions={[
               <PrimaryButton
                 key="login"

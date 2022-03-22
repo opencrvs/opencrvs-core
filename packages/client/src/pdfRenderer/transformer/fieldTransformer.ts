@@ -31,8 +31,9 @@ import {
   IInformantNameCondition,
   IArithmeticOperationPayload
 } from '@client/pdfRenderer/transformer/types'
-import moment from 'moment'
 import { IFormSectionData } from '@client/forms'
+import format from '@client/utils/date-formatting'
+import differenceInDays from 'date-fns/differenceInDays'
 
 export const fieldTransformers: IFunctionTransformer = {
   /*
@@ -192,11 +193,10 @@ export const fieldTransformers: IFunctionTransformer = {
       : Date.now()
 
     const locale = formatPayload.language ? formatPayload.language : intl.locale
-    if (formatPayload.momentLocale && formatPayload.momentLocale[locale]) {
-      require(`moment/${formatPayload.momentLocale[locale]}`)
-    }
-    moment.locale(locale)
-    return (dateValue && moment(dateValue).format(formatPayload.format)) || ''
+    window.__localeId__ = locale
+    return (
+      (dateValue && format(new Date(dateValue), formatPayload.format)) || ''
+    )
   },
 
   /*
@@ -311,7 +311,10 @@ export const fieldTransformers: IFunctionTransformer = {
         toValue !== null &&
         fromValue !== null
       ) {
-        const diffInDays = moment(toValue).diff(moment(fromValue), 'days')
+        const diffInDays = differenceInDays(
+          new Date(toValue),
+          new Date(fromValue)
+        )
         if (
           diffInDays >= condition.minDiff &&
           diffInDays <= condition.maxDiff

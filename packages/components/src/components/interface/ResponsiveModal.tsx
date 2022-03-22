@@ -20,11 +20,16 @@ const ModalContainer = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
+  padding-top: 160px;
   z-index: 5;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding-top: 80px;
+  }
 `
+
 const ScreenBlocker = styled.div`
   position: absolute;
   z-index: -1;
@@ -46,10 +51,14 @@ const ModalContent = styled.div<{
   width: ${({ width }) => (width ? width : 448)}px;
   height: ${({ fullscreen }) => (fullscreen ? '100vh' : 'auto')};
   display: flex;
+  border-radius: 4px;
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
   flex-direction: column;
   flex-grow: ${({ fullscreen }) => (fullscreen ? 1 : 0)};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     flex-grow: 1;
+    margin-right: 24px;
+    margin-left: 24px;
   }
   @media (max-width: ${({ theme, responsive }) =>
       responsive && theme.grid.breakpoints.lg}px) {
@@ -63,8 +72,8 @@ const Header = styled.div<{ responsive?: boolean; hideBoxShadow?: boolean }>`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: center;
-  padding: 0 8px 0px 24px;
+  align-items: top;
+  padding: 8px 8px 32px 24px;
   @media (max-width: ${({ theme, responsive }) =>
       responsive && theme.grid.breakpoints.lg}px) {
     ${({ theme, hideBoxShadow }) => !hideBoxShadow && theme.shadows.light};
@@ -87,6 +96,7 @@ const Body = styled.div<{
   ${({ theme }) => theme.fonts.reg16};
   height: ${({ height }) => (height ? height : 250)}px;
   height: ${({ autoHeight }) => autoHeight && `auto`};
+  color: ${({ theme }) => theme.colors.supportingCopy};
   overflow-y: ${({ scrollableY }) => (scrollableY ? 'visible' : 'auto')};
   padding: 0 24px 16px;
   display: flex;
@@ -111,7 +121,7 @@ const Footer = styled.div<{ responsive?: boolean }>`
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
-  border-top: 2px solid ${({ theme }) => theme.colors.grey200};
+  border-top: 1px solid ${({ theme }) => theme.colors.grey300};
   @media (max-width: ${({ theme, responsive }) =>
       responsive && theme.grid.breakpoints.md}px) {
     flex-direction: column-reverse;
@@ -120,7 +130,7 @@ const Footer = styled.div<{ responsive?: boolean }>`
 `
 
 const Action = styled.div`
-  margin: 0 12px;
+  margin: 0 8px;
   display: flex;
   align-items: center;
   & button {
@@ -198,11 +208,13 @@ export class ResponsiveModal extends React.Component<IProps> {
           >
             {this.props.children}
           </Body>
-          <Footer responsive={responsive}>
-            {actions.map((action, i) => (
-              <Action key={i}>{action}</Action>
-            ))}
-          </Footer>
+          {actions.length > 0 && (
+            <Footer responsive={responsive}>
+              {actions.map((action, i) => (
+                <Action key={i}>{action}</Action>
+              ))}
+            </Footer>
+          )}
         </ModalContent>
       </ModalContainer>
     )

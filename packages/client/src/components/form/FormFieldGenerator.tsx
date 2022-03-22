@@ -507,7 +507,10 @@ function GeneratedInputField({
     )
   }
 
-  if (fieldDefinition.type === LOCATION_SEARCH_INPUT) {
+  if (
+    fieldDefinition.type === LOCATION_SEARCH_INPUT &&
+    fieldDefinition.locationList
+  ) {
     const selectedLocation = fieldDefinition.locationList.find(
       (location) => location.id === value
     )
@@ -803,6 +806,7 @@ class FormSectionComponent extends React.Component<Props> {
      *
      * This might be because of setState not used with the function syntax
      */
+
     const fieldsWithValuesDefined = fields.filter(
       (field) => values[field.name] !== undefined
     )

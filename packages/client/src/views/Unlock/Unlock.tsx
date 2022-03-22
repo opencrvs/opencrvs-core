@@ -23,7 +23,6 @@ import { ErrorMessage } from '@opencrvs/components/lib/forms'
 import { Logo, Logout } from '@opencrvs/components/lib/icons'
 import { PINKeypad, Spinner } from '@opencrvs/components/lib/interface'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import moment from 'moment'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -31,6 +30,7 @@ import { connect } from 'react-redux'
 import zambiaBackground from './background-zmb.jpg'
 import { Button } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
+import differenceInMinutes from 'date-fns/differenceInMinutes'
 
 export const PageWrapper = styled.div`
   ${({ theme }) => theme.fonts.bold16};
@@ -168,7 +168,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
     }
 
     if (this.state.attempt === MAX_ALLOWED_ATTEMPT && !pinMatched) {
-      await storage.setItem(SECURITY_PIN_EXPIRED_AT, moment.now().toString())
+      await storage.setItem(SECURITY_PIN_EXPIRED_AT, Date.now().toString())
       this.setState((prevState) => {
         return {
           attempt: prevState.attempt + 1
@@ -210,10 +210,10 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
     const lockedAt = await storage.getItem(SECURITY_PIN_EXPIRED_AT)
     if (lockedAt) {
       const intervalID = setInterval(() => {
-        const currentTime = moment.now()
-        const timeDiff = moment(currentTime).diff(
-          parseInt(lockedAt, 10),
-          'minutes'
+        const currentTime = Date.now()
+        const timeDiff = differenceInMinutes(
+          currentTime,
+          parseInt(lockedAt, 10)
         )
         if (timeDiff < MAX_LOCK_TIME) {
           if (this.state.attempt === MAX_ALLOWED_ATTEMPT + 2) {
