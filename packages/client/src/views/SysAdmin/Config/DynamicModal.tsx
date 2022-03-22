@@ -575,7 +575,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
                 required={false}
               >
                 <SmallWidthInput
-                  id="applicationBirthRegTarget"
+                  id="applicationBirthLateRegTarget"
                   type="number"
                   error={false}
                   value={this.state.birthLateRegistrationTarget}
