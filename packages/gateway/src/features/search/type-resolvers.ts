@@ -132,9 +132,6 @@ export const searchTypeResolvers: GQLResolver = {
     registration(resultSet: ISearchEventDataTemplate) {
       return resultSet._source
     },
-    operationHistories(resultSet: ISearchEventDataTemplate) {
-      return resultSet._source.operationHistories
-    },
     childName(resultSet: ISearchEventDataTemplate) {
       return getChildName(resultSet._source)
     },
@@ -151,9 +148,6 @@ export const searchTypeResolvers: GQLResolver = {
     },
     registration(resultSet: ISearchEventDataTemplate) {
       return resultSet._source
-    },
-    operationHistories(resultSet: ISearchEventDataTemplate) {
-      return resultSet._source.operationHistories
     },
     deceasedName(resultSet: ISearchEventDataTemplate) {
       return getDeceasedName(resultSet._source)
@@ -174,43 +168,6 @@ export const searchTypeResolvers: GQLResolver = {
     },
     duplicates(searchData: ISearchDataTemplate) {
       return searchData.relatesTo
-    }
-  },
-  OperationHistorySearchSet: {
-    operatorName(searchData: ISearchDataTemplate) {
-      const names = [
-        {
-          use: 'en',
-          given:
-            (searchData.operatorFirstNames && [
-              searchData.operatorFirstNames
-            ]) ||
-            null,
-          family:
-            (searchData.operatorFamilyName && [
-              searchData.operatorFamilyName
-            ]) ||
-            null
-        }
-      ]
-
-      if (NATIVE_LANGUAGE) {
-        names.push({
-          use: NATIVE_LANGUAGE,
-          given:
-            (searchData.operatorFirstNamesLocale && [
-              searchData.operatorFirstNamesLocale
-            ]) ||
-            null,
-          family:
-            (searchData.operatorFamilyNameLocale && [
-              searchData.operatorFamilyNameLocale
-            ]) ||
-            null
-        })
-      }
-
-      return names
     }
   },
   EventProgressSet: {
