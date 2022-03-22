@@ -82,6 +82,12 @@ export const getTitle = (intl: IntlShape, changeModalName: string) => {
     return intl.formatMessage(messages.birthDelayedDialogTitle)
   else if (changeModalName === GeneralActionId.DEATH_REGISTRATION_TARGET)
     return intl.formatMessage(messages.deathLegallySpecifiedDialogTitle)
+  else if (changeModalName === GeneralActionId.BIRTH_ON_TIME_FEE)
+    return intl.formatMessage(messages.birthOnTimeFeeDialogTitle)
+  else if (changeModalName === GeneralActionId.BIRTH_LATE_FEE)
+    return intl.formatMessage(messages.birthLateFeeDialogTitle)
+  else if (changeModalName === GeneralActionId.BIRTH_DELAYED_FEE)
+    return intl.formatMessage(messages.birthDelayedFeeDialogTitle)
   else return EMPTY_STRING
 }
 
@@ -109,6 +115,12 @@ export const isApplyButtonDisabled = (
     return !Boolean(state.birthLateRegistrationTarget)
   } else if (changeModalName === GeneralActionId.DEATH_REGISTRATION_TARGET) {
     return !Boolean(state.deathRegistrationTarget)
+  } else if (changeModalName === GeneralActionId.BIRTH_ON_TIME_FEE) {
+    return !Boolean(state.birthOnTimeFee)
+  } else if (changeModalName === GeneralActionId.BIRTH_LATE_FEE) {
+    return !Boolean(state.birthLateFee)
+  } else if (changeModalName === GeneralActionId.BIRTH_DELAYED_FEE) {
+    return !Boolean(state.birthDelayedFee)
   } else return true
 }
 

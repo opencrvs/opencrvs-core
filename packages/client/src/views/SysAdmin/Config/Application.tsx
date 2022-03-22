@@ -67,7 +67,12 @@ export enum GeneralActionId {
   PHONE_NUMBER = 'changePhnNum',
   BIRTH_REGISTRATION_TARGET = 'changeBirthRegTarget',
   BIRTH_LATE_REGISTRATION_TARGET = 'changeBirthLateRegTarget',
-  DEATH_REGISTRATION_TARGET = 'changeDeathRegTarget'
+  DEATH_REGISTRATION_TARGET = 'changeDeathRegTarget',
+  BIRTH_ON_TIME_FEE = 'changeBirthOnTimeFee',
+  BIRTH_LATE_FEE = 'changeBirthLateFee',
+  BIRTH_DELAYED_FEE = 'changeBirthDelayedFee',
+  DEATH_ON_TIME_FEE = 'changeDeathOnTimeFee',
+  DEATH_DELAYED_FEE = 'changeDeathDelayedFee'
 }
 
 function GeneralTabContent({
@@ -231,7 +236,9 @@ function BirthTabContent({
           ),
           action: {
             label: intl.formatMessage(buttonMessages.change),
-            disabled: true
+            handler: () => {
+              callBack(GeneralActionId.BIRTH_ON_TIME_FEE)
+            }
           }
         },
         {
@@ -248,7 +255,9 @@ function BirthTabContent({
           ),
           action: {
             label: intl.formatMessage(buttonMessages.change),
-            disabled: true
+            handler: () => {
+              callBack(GeneralActionId.BIRTH_LATE_FEE)
+            }
           }
         },
         {
@@ -265,7 +274,9 @@ function BirthTabContent({
           ),
           action: {
             label: intl.formatMessage(buttonMessages.change),
-            disabled: true
+            handler: () => {
+              callBack(GeneralActionId.BIRTH_DELAYED_FEE)
+            }
           }
         }
       ]}

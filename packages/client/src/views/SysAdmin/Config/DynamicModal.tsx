@@ -43,9 +43,12 @@ import {
 const Message = styled.div`
   margin-bottom: 16px;
 `
-const Text = styled.div`
-  margin-top: 20px;
-  margin-left: 8px;
+const Text = styled.div<{
+  align?: 'right' | 'left'
+}>`
+  margin-left: ${({ align }) => (align === 'left' ? '0px' : '8px')};
+  margin-right: ${({ align }) => (align === 'left' ? '8px' : '0px')};
+  margin-top: 22px;
   color: ${({ theme }) => theme.colors.grey600};
   ${({ theme }) => theme.fonts.bigBodyStyle};
 `
@@ -135,6 +138,9 @@ export type State = {
   birthRegistrationTarget: string
   birthLateRegistrationTarget: string
   deathRegistrationTarget: string
+  birthOnTimeFee: string
+  birthLateFee: string
+  birthDelayedFee: string
   updatingValue: boolean
   errorOccured: boolean
   errorMessages: string
@@ -168,6 +174,12 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
         offlineCountryConfiguration.config.BIRTH.LATE_REGISTRATION_TARGET.toString(),
       deathRegistrationTarget:
         offlineCountryConfiguration.config.DEATH.REGISTRATION_TARGET.toString(),
+      birthOnTimeFee:
+        offlineCountryConfiguration.config.BIRTH.FEE.ON_TIME.toString(),
+      birthLateFee:
+        offlineCountryConfiguration.config.BIRTH.FEE.LATE.toString(),
+      birthDelayedFee:
+        offlineCountryConfiguration.config.BIRTH.FEE.DELAYED.toString(),
       updatingValue: false,
       errorOccured: false,
       errorMessages: EMPTY_STRING
@@ -197,6 +209,27 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
     }))
   }
 
+  setBirthOnTimeFee = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    this.setState(() => ({
+      birthOnTimeFee: value
+    }))
+  }
+
+  setBirthLateFee = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    this.setState(() => ({
+      birthLateFee: value
+    }))
+  }
+
+  setBirthDelayedFee = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    this.setState(() => ({
+      birthDelayedFee: value
+    }))
+  }
+
   setBirthLateRegistrationTarget = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -217,6 +250,21 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
       errorOccured: true,
       errorMessages: errorMessage
     })
+  }
+
+  getCurrency = () => {
+    const { offlineCountryConfiguration } = this.props
+    const currency = new Intl.NumberFormat(
+      offlineCountryConfiguration.config.CURRENCY.languagesAndCountry,
+      {
+        style: 'currency',
+        currency: offlineCountryConfiguration.config.CURRENCY.isoCode
+      }
+    )
+      .format(0)
+      .replace(/[0-9\.,]/g, '')
+
+    return currency
   }
 
   async mutationHandler(
@@ -276,9 +324,13 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
       }
     } else if (
       (modalName === GeneralActionId.BIRTH_REGISTRATION_TARGET ||
-        modalName === GeneralActionId.BIRTH_LATE_REGISTRATION_TARGET) &&
+        modalName === GeneralActionId.BIRTH_LATE_REGISTRATION_TARGET ||
+        modalName === GeneralActionId.BIRTH_ON_TIME_FEE ||
+        modalName === GeneralActionId.BIRTH_LATE_FEE ||
+        modalName === GeneralActionId.BIRTH_DELAYED_FEE) &&
       (value.BIRTH?.REGISTRATION_TARGET ||
-        value.BIRTH?.LATE_REGISTRATION_TARGET)
+        value.BIRTH?.LATE_REGISTRATION_TARGET ||
+        value.BIRTH?.FEE)
     ) {
       try {
         await callUpdateApplicationBirthMutation(
@@ -291,9 +343,23 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
             ? this.props.intl.formatMessage(
                 messages.applicationBirthRegTargetChangeNotification
               )
-            : this.props.intl.formatMessage(
+            : modalName === GeneralActionId.BIRTH_LATE_REGISTRATION_TARGET
+            ? this.props.intl.formatMessage(
                 messages.applicationBirthLateRegTargetChangeNotification
               )
+            : modalName === GeneralActionId.BIRTH_ON_TIME_FEE
+            ? this.props.intl.formatMessage(
+                messages.applicationBirthOnTimeFeeChangeNotification
+              )
+            : modalName === GeneralActionId.BIRTH_LATE_FEE
+            ? this.props.intl.formatMessage(
+                messages.applicationBirthLateFeeChangeNotification
+              )
+            : modalName === GeneralActionId.BIRTH_DELAYED_FEE
+            ? this.props.intl.formatMessage(
+                messages.applicationBirthDelayedFeeChangeNotification
+              )
+            : EMPTY_STRING
 
         valueChanged(NOTIFICATION_TYPE.SUCCESS, notificationText)
       } catch {
@@ -366,7 +432,12 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
                     ),
                     LATE_REGISTRATION_TARGET: parseInt(
                       this.state.birthLateRegistrationTarget
-                    )
+                    ),
+                    FEE: {
+                      ON_TIME: parseInt(this.state.birthOnTimeFee),
+                      LATE: parseInt(this.state.birthLateFee),
+                      DELAYED: parseInt(this.state.birthDelayedFee)
+                    }
                   },
                   DEATH: {
                     REGISTRATION_TARGET: parseInt(
@@ -493,6 +564,67 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
                 <Text>
                   {intl.formatMessage(messages.eventTargetInputLabel)}
                 </Text>
+              </InputField>
+            </Field>
+          </Content>
+        )}
+        {changeModalName === GeneralActionId.BIRTH_ON_TIME_FEE && (
+          <Content>
+            <Field>
+              <InputField
+                id="applicationBirthOnTimeFee"
+                touched={true}
+                required={false}
+              >
+                <Text align="left">{this.getCurrency()}</Text>
+                <SmallWidthInput
+                  id="applicationBirthOnTimeFee"
+                  type="number"
+                  error={false}
+                  value={this.state.birthOnTimeFee}
+                  onChange={this.setBirthOnTimeFee}
+                />
+              </InputField>
+            </Field>
+          </Content>
+        )}
+        {changeModalName === GeneralActionId.BIRTH_LATE_FEE && (
+          <Content>
+            <Field>
+              <InputField
+                id="applicationBirthLateFee"
+                touched={true}
+                required={false}
+              >
+                <Text align="left">{this.getCurrency()}</Text>
+                <SmallWidthInput
+                  id="applicationBirthLateFee"
+                  type="number"
+                  error={false}
+                  value={this.state.birthLateFee}
+                  onChange={this.setBirthLateFee}
+                />
+              </InputField>
+            </Field>
+          </Content>
+        )}
+        {changeModalName === GeneralActionId.BIRTH_DELAYED_FEE && (
+          <Content>
+            <Field>
+              <InputField
+                id="applicationBirthDelayedFee"
+                touched={true}
+                required={false}
+              >
+                <Text align="left">{this.getCurrency()}</Text>
+
+                <SmallWidthInput
+                  id="applicationBirthDelayedFee"
+                  type="number"
+                  error={false}
+                  value={this.state.birthDelayedFee}
+                  onChange={this.setBirthDelayedFee}
+                />
               </InputField>
             </Field>
           </Content>
