@@ -26,6 +26,7 @@ import {
 } from '@client/forms'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { cloneDeep, get } from 'lodash'
+import format from '@client/utils/date-formatting'
 
 interface IName {
   [key: string]: any
@@ -566,5 +567,50 @@ export const bundleFieldToNestedRadioFieldTransformer =
     ] || {
       value: get(queryData, transformedFieldName),
       nestedFields: {}
+    }
+  }
+
+export const sectionTransformer =
+  (
+    transformedSectionId: string,
+    queryTransformer: IFormFieldQueryMapFunction,
+    targetFieldName?: string
+  ) =>
+  (
+    transformedData: TransformedData,
+    queryData: IFormData,
+    sectionId: string,
+    field: IFormField
+  ): void => {
+    const localTransformedData: IFormData = {}
+    queryTransformer(localTransformedData, queryData, sectionId, field)
+    if (!transformedData[transformedSectionId]) {
+      transformedData[transformedSectionId] = {}
+    }
+    const targetNameKey = targetFieldName || field.name
+    transformedData[transformedSectionId][targetNameKey] =
+      localTransformedData[sectionId][field.name]
+  }
+
+export const dateFormatTransformer =
+  (transformedFieldName: string, dateFormat = 'dd MMMM yyyy') =>
+  (
+    transformedData: TransformedData,
+    queryData: IFormData,
+    sectionId: string,
+    field: IFormField
+  ): void => {
+    const queryValue = queryData[sectionId][transformedFieldName] as string
+    const date = new Date(queryValue)
+    console.log(date)
+    if (!Number.isNaN(date.getTime())) {
+      const prevLocale = window.__localeId__
+      window.__localeId__ = 'en'
+
+      if (!transformedData[sectionId]) {
+        transformedData[sectionId] = {}
+      }
+      transformedData[sectionId][field.name] = format(date, dateFormat)
+      window.__localeId__ = prevLocale
     }
   }

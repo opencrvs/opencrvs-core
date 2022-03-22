@@ -274,7 +274,11 @@ function deserializeFormField(field: SerializedFormField) {
         fieldQueryDescriptorToQueryFunction(field.mapping.query),
       mutation:
         field.mapping.mutation &&
-        fieldMutationDescriptorToMutationFunction(field.mapping.mutation)
+        fieldMutationDescriptorToMutationFunction(field.mapping.mutation),
+      template: field.mapping.template && [
+        field.mapping.template.fieldName,
+        fieldQueryDescriptorToQueryFunction(field.mapping.template)
+      ]
     }
   }
 }

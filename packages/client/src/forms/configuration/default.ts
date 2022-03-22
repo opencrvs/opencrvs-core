@@ -843,6 +843,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    fieldName: 'informantFirstName',
+                    operation: 'nameToFieldTransformer',
+                    parameters: ['en', 'firstNames']
+                  },
                   mutation: {
                     operation: 'fieldToNameTransformer',
                     parameters: ['en', 'firstNames']
@@ -871,6 +876,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    fieldName: 'informantFamilyName',
+                    operation: 'nameToFieldTransformer',
+                    parameters: ['en', 'familyName']
+                  },
                   mutation: {
                     operation: 'fieldToNameTransformer',
                     parameters: ['en', 'familyName']
@@ -948,6 +958,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    operation: 'dateFormatTransformer',
+                    fieldName: 'eventDate',
+                    parameters: ['birthDate', 'do MMMM yyyy']
+                  },
                   mutation: {
                     operation: 'longDateTransformer',
                     parameters: ['birthDate']

@@ -341,6 +341,7 @@ export type IFormFieldQueryMapDescriptor<
 export type IFormFieldMapping = {
   mutation?: IFormFieldMutationMapFunction
   query?: IFormFieldQueryMapFunction
+  template?: [string, IFormFieldQueryMapFunction]
 }
 
 /*
@@ -401,6 +402,7 @@ export type SerializedFormField = UnionOmit<
   mapping?: {
     mutation?: IMutationDescriptor
     query?: IQueryDescriptor
+    template?: IQueryDescriptor & { fieldName: string }
   }
 }
 export interface IAttachment {

@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IntlShape } from 'react-intl'
-import { createPDF, createSVG, printPDF } from '@client/pdfRenderer'
+import { createPDF, printPDF } from '@client/pdfRenderer'
 import { IDeclaration } from '@client/declarations'
 import { IUserDetails } from '@opencrvs/client/src/utils/userUtils'
 import { Event } from '@client/forms'
@@ -21,6 +21,8 @@ import {
 } from '@client/pdfRenderer/transformer/types'
 import { Content, PageSize } from 'pdfmake/interfaces'
 import { certificateTemplates } from '@client/templates/register'
+import format from '@client/utils/date-formatting'
+import * as Handlebars from 'handlebars'
 
 export function printMoneyReceipt(
   intl: IntlShape,
@@ -95,16 +97,17 @@ function getPDFTemplateWithSVG(
   pageSize: PageSize
 ): IPDFTemplate {
   let svgCode: string
-  let pdfTemplate: IPDFTemplate
-
+  let svgTemplate
   if (event === Event.BIRTH) {
-    svgCode = offlineResource.templates.certificates.birth.definition
-    pdfTemplate = certificateTemplates.birth
+    svgTemplate = offlineResource.templates.certificates.birth.definition
+    const template = Handlebars.compile(svgTemplate)
+    svgCode = template({
+      certificateDate: format(Date.now(), 'dd MMMM yyyy')
+    })
   } else {
     svgCode = offlineResource.templates.certificates.death.definition
-    pdfTemplate = certificateTemplates.death
   }
-
+  const pdfTemplate: IPDFTemplate = certificateTemplates
   pdfTemplate.definition.pageSize = pageSize
   updatePDFTemplateWithSVGContent(pdfTemplate, svgCode, pageSize)
   return pdfTemplate

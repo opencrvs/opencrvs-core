@@ -30,6 +30,7 @@ import {
 import { IDeclaration } from '@client/declarations'
 import { hasFieldChanged } from '@client/views/CorrectionForm/utils'
 import { get } from 'lodash'
+import { sectionTransformer } from '@client/forms/mappings/query'
 
 const nestedFieldsMapping = (
   transformedData: TransformedData,
@@ -314,6 +315,22 @@ export const gqlToDraftTransformer = (
     transformedData[section.id] = {}
     section.groups.forEach((groupDef) => {
       groupDef.fields.forEach((fieldDef) => {
+        if (fieldDef.mapping?.template) {
+          if (!transformedData.template) {
+            transformedData.template = {}
+          }
+          /**
+           * Wraps actual transformer with
+           * section transformer
+           */
+          const [fieldName, fieldTransformer] = fieldDef.mapping.template
+          sectionTransformer('template', fieldTransformer, fieldName)(
+            transformedData,
+            queryData,
+            section.id,
+            fieldDef
+          )
+        }
         if (fieldDef.mapping && fieldDef.mapping.query) {
           fieldDef.mapping.query(
             transformedData,
