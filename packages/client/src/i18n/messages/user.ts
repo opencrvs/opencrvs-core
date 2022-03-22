@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
+import { Message } from 'typescript-react-intl'
 
 export enum QUESTION_KEYS {
   BIRTH_TOWN,
@@ -93,6 +94,11 @@ interface IUserMessages
   phoneNumberUpdated: MessageDescriptor
   avatarUpdating: MessageDescriptor
   avatarUpdated: MessageDescriptor
+  name: MessageDescriptor
+  systemLanguage: MessageDescriptor
+  profileImage: MessageDescriptor
+  imageFormat: MessageDescriptor
+  overSized: MessageDescriptor
 }
 
 interface IDynamicUserMessages
@@ -458,6 +464,33 @@ const messagesToDefine: IUserMessages = {
     id: 'system.user.settings.avatarUpdated',
     defaultMessage: 'Profile image successfully updated',
     description: 'Profile image change message on success'
+  },
+  name: {
+    id: 'system.user.settings.name',
+    defaultMessage: 'Name',
+    description: 'label for Name'
+  },
+  systemLanguage: {
+    id: 'system.user.settings.systemLanguage',
+    defaultMessage: 'System language',
+    description: 'Label for system language'
+  },
+  profileImage: {
+    id: 'system.user.settings.profileImage',
+    defaultMessage: 'Profile Image',
+    description: 'Label for profile image'
+  },
+  imageFormat: {
+    id: 'imageUploadOption.upload.imageFormat',
+    defaultMessage:
+      'Image format not supported. Please attach a png or jpg (max 5mb)',
+    description:
+      'Show error message if the selected image type is not supported'
+  },
+  overSized: {
+    id: 'imageUploadOption.upload.overSized',
+    defaultMessage: 'File is too large. Please attach file less than 5mb',
+    description: 'Error message for Attachment size greater than 5mb.'
   }
 }
 

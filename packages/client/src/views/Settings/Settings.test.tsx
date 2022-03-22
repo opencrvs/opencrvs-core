@@ -94,7 +94,8 @@ describe('Settings page tests', () => {
       <SettingsPage />,
       { store, history, graphqlMocks }
     )
-    expect(comp.find('#English-name').first().text()).toBe('English nameChange')
+
+    expect(comp.find('#Name').first().text()).toBe('NameChange')
     expect(comp.find('#Phone-number').first().text()).toBe('Phone numberChange')
   })
 

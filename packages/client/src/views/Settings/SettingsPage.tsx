@@ -22,10 +22,10 @@ import { IUserDetails } from '@client/utils/userUtils'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import styled from '@client/styledComponents'
 import { Header } from '@client/components/interface/Header/Header'
-import { AvatarLarge, Avatar } from '@client/components/Avatar'
+import { Avatar } from '@client/components/Avatar'
 import {
-  DataSection,
-  ListView
+  ListView,
+  IListRowProps
 } from '@opencrvs/components/lib/interface/ViewData'
 import {
   ResponsiveModal,
@@ -48,88 +48,22 @@ import { RouteComponentProps, StaticContext } from 'react-router'
 import { SETTINGS } from '@client/navigation/routes'
 import { Navigation } from '@client/components/interface/Navigation'
 import { AvatarChangeModal } from './AvatarChangeModal'
-import { ImageLoader } from './ImageLoader'
-import { IImage } from '@client/utils/imageUtils'
+import { IImage, validateImage, ERROR_TYPES } from '@client/utils/imageUtils'
+import { Content } from '@opencrvs/components/lib/interface/Content'
+import { ALLOWED_IMAGE_TYPE } from '@client/utils/constants'
 
-const Container = styled.div`
-  ${({ theme }) => theme.shadows.light};
-  color: ${({ theme }) => theme.colors.copy};
-  background: ${({ theme }) => theme.colors.white};
-  padding: 40px 77px;
-  margin: 36px auto;
-  width: 1140px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin: 0;
-    padding: 24px 0;
-    width: 100%;
-    min-height: 100vh;
-    margin-top: 0;
-    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
-  }
+const HiddenInput = styled.input`
+  display: none;
 `
 
 const BodyContainer = styled.div`
+  margin-top: 48px;
   margin-left: 0px;
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin-left: 249px;
   }
-`
-
-const SettingsTitle = styled.div`
-  ${({ theme }) => theme.fonts.h1Style};
-  height: 72px;
-  margin-left: 16px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: none;
-  }
-`
-
-const Content = styled.div`
-  display: flex;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    flex-direction: column-reverse;
-  }
-`
-const Left = styled.div`
-  margin: 0 16px;
-  flex-grow: 1;
-`
-const Right = styled.div`
-  display: flex;
-  padding-top: 80px;
-  margin-left: 112px;
-  & .desktop {
-    display: block;
-  }
-  & .tablet {
-    display: none;
-  }
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    padding-top: 0;
-    margin-left: 24px;
-    & .desktop {
-      display: none;
-    }
-    & .tablet {
-      display: block;
-    }
-  }
-`
-const Version = styled.div`
-  color: ${({ theme }) => theme.colors.disabled};
-  ${({ theme }) => theme.fonts.smallButtonStyle};
-  text-transform: none;
-  margin-top: 2rem;
-  span:last-child {
-    display: none;
-  }
-  :hover {
-    span:first-child {
-      display: none;
-    }
-    span:last-child {
-      display: inline;
-    }
+    margin-top: 0px;
   }
 `
 const Message = styled.div`
@@ -190,8 +124,10 @@ interface ILanguageOptions {
 }
 
 class SettingsView extends React.Component<IProps, IState> {
+  fileUploaderRef: React.RefObject<HTMLInputElement>
   constructor(props: IProps) {
     super(props)
+    this.fileUploaderRef = React.createRef()
     this.state = {
       showLanguageSettings: false,
       showSuccessNotification: false,
@@ -294,6 +230,31 @@ class SettingsView extends React.Component<IProps, IState> {
     })
   }
 
+  handleSelectFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { files } = event.target
+    if (files && files.length > 0) {
+      try {
+        this.toggleAvatarChangeModal && this.toggleAvatarChangeModal()
+        const image = await validateImage(files[0])
+        this.handleImageLoaded({ type: files[0].type, data: image })
+        this.fileUploaderRef.current!.value = ''
+      } catch (error) {
+        if (error.message === ERROR_TYPES.OVERSIZED) {
+          this.setState({
+            imageLoadingError: this.props.intl.formatMessage(messages.overSized)
+          })
+        } else {
+          this.setState({
+            imageLoadingError: this.props.intl.formatMessage(
+              messages.imageFormat
+            )
+          })
+        }
+        this.fileUploaderRef.current!.value = ''
+      }
+    }
+  }
+
   render() {
     const { userDetails, intl, languages, goToPhoneSettingAction } = this.props
 
@@ -328,77 +289,71 @@ class SettingsView extends React.Component<IProps, IState> {
       userDetails && userDetails.role
         ? intl.formatMessage(messages[userDetails.role])
         : ''
-    const sections = [
+
+    const items: IListRowProps[] = [
       {
-        title: intl.formatMessage(messages.profileTitle),
-        items: [
-          {
-            label: intl.formatMessage(messages.labelEnglishName),
-            value: englishName,
-            action: {
-              label: intl.formatMessage(buttonMessages.change),
-              disabled: true
-            }
-          },
-          {
-            label: intl.formatMessage(constantsMessages.labelPhone),
-            value: mobile,
-            action: {
-              label: intl.formatMessage(buttonMessages.change),
-              disabled: false,
-              handler: goToPhoneSettingAction
-            }
-          }
-        ]
+        label: intl.formatMessage(messages.name),
+        value: englishName,
+        action: {
+          id: 'BtnChangeName',
+          label: intl.formatMessage(buttonMessages.change),
+          disabled: true
+        }
       },
       {
-        title: intl.formatMessage(messages.accountTitle),
-        items: [
-          {
-            label: intl.formatMessage(constantsMessages.labelRole),
-            value: role,
-            action: {
-              label: intl.formatMessage(buttonMessages.change),
-              disabled: true
-            }
-          }
-        ]
+        label: intl.formatMessage(constantsMessages.labelPhone),
+        value: mobile,
+        action: {
+          id: 'BtnChangePhone',
+          label: intl.formatMessage(buttonMessages.change),
+          disabled: false,
+          handler: goToPhoneSettingAction
+        }
       },
       {
-        title: intl.formatMessage(messages.securityTitle),
-        items: [
-          {
-            label: intl.formatMessage(constantsMessages.labelPassword),
-            placeHolder: '********',
-            action: {
-              id: 'BtnChangePassword',
-              label: intl.formatMessage(buttonMessages.change),
-              handler: this.togglePasswordChangeModal
-            }
-          },
-          {
-            label: intl.formatMessage(constantsMessages.labelPin),
-            placeHolder: '****',
-            action: {
-              label: intl.formatMessage(buttonMessages.change),
-              disabled: true
-            }
-          }
-        ]
+        label: intl.formatMessage(constantsMessages.labelRole),
+        value: role,
+        action: {
+          id: 'BtnChangeRole',
+          label: intl.formatMessage(buttonMessages.change),
+          disabled: true
+        }
       },
       {
-        title: intl.formatMessage(messages.systemTitle),
-        items: [
-          {
-            label: intl.formatMessage(constantsMessages.labelLanguage),
-            value: languages[this.props.language].displayName,
-            action: {
-              id: 'BtnChangeLanguage',
-              label: intl.formatMessage(buttonMessages.change),
-              handler: this.toggleLanguageSettingsModal
-            }
-          }
-        ]
+        label: intl.formatMessage(messages.systemLanguage),
+        value: languages[this.props.language].displayName,
+        action: {
+          id: 'BtnChangeLanguage',
+          label: intl.formatMessage(buttonMessages.change),
+          handler: this.toggleLanguageSettingsModal
+        }
+      },
+      {
+        label: intl.formatMessage(constantsMessages.labelPassword),
+        placeHolder: '********',
+        action: {
+          id: 'BtnChangePassword',
+          label: intl.formatMessage(buttonMessages.change),
+          handler: this.togglePasswordChangeModal
+        }
+      },
+      {
+        label: intl.formatMessage(constantsMessages.labelPin),
+        placeHolder: '****',
+        action: {
+          id: 'BtnChangePin',
+          label: intl.formatMessage(buttonMessages.change),
+          disabled: true
+        }
+      },
+      {
+        label: intl.formatMessage(messages.profileImage),
+        value: <Avatar avatar={userDetails?.avatar} name={englishName} />,
+        action: {
+          id: 'BtnChangeAvatar',
+          label: intl.formatMessage(buttonMessages.change),
+          handler: () => this.fileUploaderRef.current?.click()
+        }
       }
     ]
     return (
@@ -406,42 +361,16 @@ class SettingsView extends React.Component<IProps, IState> {
         <Header title={intl.formatMessage(messages.settingsTitle)} />
         <Navigation />
         <BodyContainer>
-          <Container>
-            <SettingsTitle>
-              {intl.formatMessage(messages.settingsTitle)}
-            </SettingsTitle>
-            <Content>
-              <Left>
-                {sections.map((sec, index: number) => (
-                  <ListView key={index} {...sec} />
-                ))}
-                <Version>
-                  <span>OpenCRVS v1.1.0</span>
-                  <span>{process.env.REACT_APP_VERSION || 'development'}</span>
-                </Version>
-              </Left>
-              <Right>
-                <ImageLoader
-                  onImageLoaded={this.handleImageLoaded}
-                  onLoadingStarted={this.toggleAvatarChangeModal}
-                  onError={(imageLoadingError) =>
-                    this.setState({ imageLoadingError })
-                  }
-                >
-                  <Avatar
-                    className="tablet clickable"
-                    avatar={userDetails?.avatar}
-                    name={englishName}
-                  />
-                  <AvatarLarge
-                    className="desktop clickable"
-                    avatar={userDetails?.avatar}
-                    name={englishName}
-                  />
-                </ImageLoader>
-              </Right>
-            </Content>
-          </Container>
+          <Content title={intl.formatMessage(messages.settingsTitle)}>
+            <ListView items={items} />
+            <HiddenInput
+              ref={this.fileUploaderRef}
+              id="image_file_uploader_field"
+              type="file"
+              accept={ALLOWED_IMAGE_TYPE.join(',')}
+              onChange={this.handleSelectFile}
+            />
+          </Content>
         </BodyContainer>
         <ResponsiveModal
           id="ChangeLanguageModal"

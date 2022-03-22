@@ -274,6 +274,7 @@ export class App extends React.Component<IAppProps> {
                                             component={CorrectionReviewForm}
                                           />
                                           <ProtectedRoute
+                                            exact
                                             path={routes.SETTINGS}
                                             component={SettingsPage}
                                           />
