@@ -37,6 +37,8 @@ interface IConfigMessages
   applicationCurrencyChangeMessage: MessageDescriptor
   phoneNumberLabel: MessageDescriptor
   uniqueIdentificationNumberLabel: MessageDescriptor
+  birthLegallySpecifiedDialogTitle: MessageDescriptor
+  birthDelayedDialogTitle: MessageDescriptor
   legallySpecifiedLabel: MessageDescriptor
   legallySpecifiedValue: MessageDescriptor
   lateRegistrationLabel: MessageDescriptor
@@ -49,6 +51,7 @@ interface IConfigMessages
   deathTabTitle: MessageDescriptor
   registrationTimePeriodsGroupTitle: MessageDescriptor
   registrationFeesGroupTitle: MessageDescriptor
+  eventTargetInputLabel: MessageDescriptor
 }
 
 const messagesToDefine: IConfigMessages = {
@@ -215,6 +218,16 @@ const messagesToDefine: IConfigMessages = {
     defaultMessage: 'Unique Identification Number (UIN) e.g. National ID',
     description: 'Unique Identification Number (UIN) config label'
   },
+  birthLegallySpecifiedDialogTitle: {
+    id: 'config.application.birthLegallySpecifiedDialogTitle',
+    defaultMessage: 'Legally specified time period for birth registration',
+    description: 'Legally specified dialog title for brith'
+  },
+  birthDelayedDialogTitle: {
+    id: 'config.application.birthDelayedDialogTitle',
+    defaultMessage: 'Delayed registration time period for birth registration',
+    description: 'Delayed dialog title for brith'
+  },
   legallySpecifiedLabel: {
     id: 'config.application.legallySpecifiedLabel',
     defaultMessage: 'Legally specified',
@@ -274,6 +287,11 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.registrationFeesGroupTitle',
     defaultMessage: 'Registration fees',
     description: 'The title for registration fee group'
+  },
+  eventTargetInputLabel: {
+    id: 'config.application.eventTargetInputLabel',
+    defaultMessage: 'days',
+    description: 'The label for event target label'
   }
 }
 
