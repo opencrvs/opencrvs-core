@@ -13,18 +13,22 @@
 import {
   GQLNIDNumberPatternInput,
   GQLPhoneNumberPatternInput,
-  GQLCurrencyInput
+  GQLCurrencyInput,
+  GQLBirthInput,
+  GQLDeathInput
 } from '@gateway/graphql/schema'
 
 export interface IApplicationConfigPayload {
   APPLICATION_NAME: string
   BACKGROUND_SYNC_BROADCAST_CHANNEL: string
+  BIRTH: GQLBirthInput
   COUNTRY: string
   CURRENCY: GQLCurrencyInput
   COUNTRY_LOGO_FILE: string
   COUNTRY_LOGO_RENDER_WIDTH: number
   COUNTRY_LOGO_RENDER_HEIGHT: number
   DESKTOP_TIME_OUT_MILLISECONDS: number
+  DEATH: GQLDeathInput
   LANGUAGES: string
   UI_POLLING_INTERVAL: number
   FIELD_AGENT_AUDIT_LOCATIONS: string

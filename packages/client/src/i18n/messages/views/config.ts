@@ -34,6 +34,8 @@ interface IConfigMessages
   govermentLogoLabel: MessageDescriptor
   currencyLable: MessageDescriptor
   applicationCurrencyChangeNotification: MessageDescriptor
+  applicationBirthRegTargetChangeNotification: MessageDescriptor
+  applicationBirthLateRegTargetChangeNotification: MessageDescriptor
   applicationCurrencyChangeMessage: MessageDescriptor
   phoneNumberLabel: MessageDescriptor
   uniqueIdentificationNumberLabel: MessageDescriptor
@@ -202,6 +204,18 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.currencyChangeNotification',
     defaultMessage: 'Currency updated',
     description: 'Message for application currency change notification'
+  },
+  applicationBirthRegTargetChangeNotification: {
+    id: 'config.application.birthRegTargetChangeNotification',
+    defaultMessage: 'Birth registration target days updated',
+    description:
+      'Message for application birth registration target change notification'
+  },
+  applicationBirthLateRegTargetChangeNotification: {
+    id: 'config.application.birthLateRegTargetChangeNotification',
+    defaultMessage: 'Birth late registration target days updated',
+    description:
+      'Message for application birth late registration target change notification'
   },
   applicationCurrencyChangeMessage: {
     id: 'config.application.currencyChangeMessage',

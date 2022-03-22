@@ -17,6 +17,7 @@ import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
 import { messages } from '@client/i18n/messages/views/config'
 import { EMPTY_STRING } from '@client/utils/constants'
 import {
+  IBirth,
   ICurrency,
   IFullProps,
   State
@@ -109,8 +110,7 @@ export const isApplyButtonDisabled = (
 export async function callUpdateApplicationNameMutation(
   applicationName: string,
   props: IFullProps,
-  updatingValue: (value: boolean) => void,
-  setError: (errorMessage: string) => void
+  updatingValue: (value: boolean) => void
 ) {
   try {
     updatingValue(true)
@@ -129,15 +129,14 @@ export async function callUpdateApplicationNameMutation(
       props.updateConfig(offlineConfig)
     }
   } catch (err) {
-    setError(props.intl.formatMessage(messages.applicationConfigChangeError))
+    throw err
   }
 }
 
 export async function callUpdateApplicationCurrencyMutation(
   currency: ICurrency,
   props: IFullProps,
-  updatingValue: (value: boolean) => void,
-  setError: (errorMessage: string) => void
+  updatingValue: (value: boolean) => void
 ) {
   try {
     updatingValue(true)
@@ -158,6 +157,32 @@ export async function callUpdateApplicationCurrencyMutation(
       props.updateConfig(offlineConfig)
     }
   } catch (err) {
-    setError(props.intl.formatMessage(messages.applicationConfigChangeError))
+    throw err
+  }
+}
+
+export async function callUpdateApplicationBirthMutation(
+  birth: IBirth,
+  props: IFullProps,
+  updatingValue: (value: boolean) => void
+) {
+  try {
+    const res = await configApplicationMutations.mutateApplicationConfig({
+      BIRTH: birth
+    })
+    if (res && res.data) {
+      updatingValue(false)
+      const BIRTH = res.data.updateApplicationConfig.BIRTH
+      omit(BIRTH, ['__typename'])
+      const offlineConfig = {
+        config: {
+          ...props.offlineCountryConfiguration.config,
+          BIRTH
+        }
+      }
+      props.updateConfig(offlineConfig)
+    }
+  } catch (err) {
+    throw err
   }
 }

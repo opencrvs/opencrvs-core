@@ -10,7 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
+  GQLBirthInput,
   GQLCurrencyInput,
+  GQLDeathInput,
   GQLNIDNumberPatternInput,
   GQLPhoneNumberPatternInput,
   GQLResolver
@@ -37,6 +39,7 @@ export const resolvers: GQLResolver = {
           applicationConfig.BACKGROUND_SYNC_BROADCAST_CHANNEL as string,
         COUNTRY: applicationConfig.COUNTRY as string,
         CURRENCY: applicationConfig.CURRENCY as GQLCurrencyInput,
+        BIRTH: applicationConfig.BIRTH as GQLBirthInput,
         COUNTRY_LOGO_FILE: applicationConfig.COUNTRY_LOGO_FILE as string,
         COUNTRY_LOGO_RENDER_WIDTH:
           applicationConfig.COUNTRY_LOGO_RENDER_WIDTH as number,
@@ -44,6 +47,7 @@ export const resolvers: GQLResolver = {
           applicationConfig.COUNTRY_LOGO_RENDER_HEIGHT as number,
         DESKTOP_TIME_OUT_MILLISECONDS:
           applicationConfig.DESKTOP_TIME_OUT_MILLISECONDS as number,
+        DEATH: applicationConfig.DEATH as GQLDeathInput,
         LANGUAGES: applicationConfig.LANGUAGES as string,
         UI_POLLING_INTERVAL: applicationConfig.UI_POLLING_INTERVAL as number,
         FIELD_AGENT_AUDIT_LOCATIONS:

@@ -35,7 +35,8 @@ import {
   getMessage,
   isApplyButtonDisabled,
   callUpdateApplicationNameMutation,
-  callUpdateApplicationCurrencyMutation
+  callUpdateApplicationCurrencyMutation,
+  callUpdateApplicationBirthMutation
 } from '@client/views/SysAdmin/Config/utils'
 
 const Message = styled.div`
@@ -103,9 +104,20 @@ export type ICurrency = {
   languagesAndCountry: string[]
 }
 
+export type IBirth = {
+  REGISTRATION_TARGET?: number
+  LATE_REGISTRATION_TARGET?: number
+  FEE?: {
+    ON_TIME?: number
+    LATE?: number
+    DELAYED?: number
+  }
+}
+
 export type IApplicationConfigName = {
   APPLICATION_NAME?: string
   CURRENCY?: ICurrency
+  BIRTH?: IBirth
 }
 
 export type State = {
@@ -204,8 +216,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
         await callUpdateApplicationNameMutation(
           value.APPLICATION_NAME,
           this.props,
-          this.setUpdatingValue,
-          this.setError
+          this.setUpdatingValue
         )
         valueChanged(
           NOTIFICATION_TYPE.SUCCESS,
@@ -227,8 +238,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
         await callUpdateApplicationCurrencyMutation(
           value.CURRENCY,
           this.props,
-          this.setUpdatingValue,
-          this.setError
+          this.setUpdatingValue
         )
         valueChanged(
           NOTIFICATION_TYPE.SUCCESS,
@@ -236,6 +246,37 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
             messages.applicationCurrencyChangeNotification
           )
         )
+      } catch {
+        this.setError(
+          this.props.intl.formatMessage(messages.applicationConfigChangeError)
+        )
+        valueChanged(
+          NOTIFICATION_TYPE.ERROR,
+          this.props.intl.formatMessage(messages.applicationConfigChangeError)
+        )
+      }
+    } else if (
+      (modalName === GeneralActionId.BIRTH_REGISTRATION_TARGET ||
+        modalName === GeneralActionId.BIRTH_LATE_REGISTRATION_TARGET) &&
+      (value.BIRTH?.REGISTRATION_TARGET ||
+        value.BIRTH?.LATE_REGISTRATION_TARGET)
+    ) {
+      try {
+        await callUpdateApplicationBirthMutation(
+          value.BIRTH,
+          this.props,
+          this.setUpdatingValue
+        )
+        const notificationText =
+          modalName === GeneralActionId.BIRTH_REGISTRATION_TARGET
+            ? this.props.intl.formatMessage(
+                messages.applicationBirthRegTargetChangeNotification
+              )
+            : this.props.intl.formatMessage(
+                messages.applicationBirthLateRegTargetChangeNotification
+              )
+
+        valueChanged(NOTIFICATION_TYPE.SUCCESS, notificationText)
       } catch {
         this.setError(
           this.props.intl.formatMessage(messages.applicationConfigChangeError)
@@ -276,7 +317,15 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
                 changeModalName,
                 {
                   APPLICATION_NAME: this.state.applicationName,
-                  CURRENCY: getCurrencyObject(this.state.currency)
+                  CURRENCY: getCurrencyObject(this.state.currency),
+                  BIRTH: {
+                    REGISTRATION_TARGET: parseInt(
+                      this.state.birthRegistrationTarget
+                    ),
+                    LATE_REGISTRATION_TARGET: parseInt(
+                      this.state.birthLateRegistrationTarget
+                    )
+                  }
                 },
                 valueChanged
               )
