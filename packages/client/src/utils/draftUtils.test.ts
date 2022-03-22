@@ -166,27 +166,6 @@ describe('draftUtils tests', () => {
             trackingId: 'BZX12Y',
             status: 'DECLARED'
           },
-          operationHistories: [
-            {
-              operatedOn: '2020-01-21T08:41:08.551Z',
-              operationType: 'DECLARED',
-              operatorOfficeName: 'Baniajan Union Parishad',
-              operatorRole: 'FIELD_AGENT',
-              operatorName: [
-                {
-                  familyName: 'Al Hasan',
-                  firstNames: 'Shakib',
-                  use: 'en'
-                },
-                {
-                  familyName: '',
-                  firstNames: '',
-                  use: 'bn'
-                }
-              ],
-              operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ']
-            }
-          ],
           deceasedName: [
             {
               firstNames: 'Muhammad',
