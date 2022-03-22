@@ -40,15 +40,17 @@ interface IConfigMessages
   applicationBirthOnTimeFeeChangeNotification: MessageDescriptor
   applicationBirthLateFeeChangeNotification: MessageDescriptor
   applicationBirthDelayedFeeChangeNotification: MessageDescriptor
+  applicationDeathOnTimeFeeChangeNotification: MessageDescriptor
+  applicationDeathDelayedFeeChangeNotification: MessageDescriptor
   applicationCurrencyChangeMessage: MessageDescriptor
   phoneNumberLabel: MessageDescriptor
   uniqueIdentificationNumberLabel: MessageDescriptor
   birthLegallySpecifiedDialogTitle: MessageDescriptor
   birthDelayedDialogTitle: MessageDescriptor
   deathLegallySpecifiedDialogTitle: MessageDescriptor
-  birthOnTimeFeeDialogTitle: MessageDescriptor
-  birthLateFeeDialogTitle: MessageDescriptor
-  birthDelayedFeeDialogTitle: MessageDescriptor
+  onTimeFeeDialogTitle: MessageDescriptor
+  lateFeeDialogTitle: MessageDescriptor
+  delayedFeeDialogTitle: MessageDescriptor
   legallySpecifiedLabel: MessageDescriptor
   legallySpecifiedValue: MessageDescriptor
   lateRegistrationLabel: MessageDescriptor
@@ -246,6 +248,16 @@ const messagesToDefine: IConfigMessages = {
     defaultMessage: 'Birth delayed fee updated',
     description: 'Message for application birth delayed fee change notification'
   },
+  applicationDeathOnTimeFeeChangeNotification: {
+    id: 'config.application.deathOnTimeFeeChangeNotification',
+    defaultMessage: 'Death on time fee updated',
+    description: 'Message for application death on time fee change notification'
+  },
+  applicationDeathDelayedFeeChangeNotification: {
+    id: 'config.application.deathDelayedFeeChangeNotification',
+    defaultMessage: 'Death delayed fee updated',
+    description: 'Message for application death delayed fee change notification'
+  },
   applicationCurrencyChangeMessage: {
     id: 'config.application.currencyChangeMessage',
     defaultMessage: 'Select your currency for your CRVS system',
@@ -273,23 +285,23 @@ const messagesToDefine: IConfigMessages = {
   },
   deathLegallySpecifiedDialogTitle: {
     id: 'config.application.deathLegallySpecifiedDialogTitle',
-    defaultMessage: 'Legally specified time period for birth registration',
+    defaultMessage: 'Legally specified time period for death registration',
     description: 'Legally specified dialog title for death'
   },
-  birthOnTimeFeeDialogTitle: {
-    id: 'config.application.birthOnTimeFeeDialogTitle',
+  onTimeFeeDialogTitle: {
+    id: 'config.application.onTimeFeeDialogTitle',
     defaultMessage: 'Registration fees within legally specified time',
-    description: 'Birth on time fee dialog title'
+    description: 'On time fee dialog title'
   },
-  birthLateFeeDialogTitle: {
-    id: 'config.application.birthLateFeeDialogTitle',
+  lateFeeDialogTitle: {
+    id: 'config.application.lateFeeDialogTitle',
     defaultMessage: 'Registration fees for late registrations',
-    description: 'Birth late fee dialog title'
+    description: 'Date fee dialog title'
   },
-  birthDelayedFeeDialogTitle: {
-    id: 'config.application.birthDelayedFeeDialogTitle',
+  delayedFeeDialogTitle: {
+    id: 'config.application.delayedFeeDialogTitle',
     defaultMessage: 'Registration fees for delayed registrations',
-    description: 'Birth delayed fee dialog title'
+    description: 'Delayed fee dialog title'
   },
   legallySpecifiedLabel: {
     id: 'config.application.legallySpecifiedLabel',

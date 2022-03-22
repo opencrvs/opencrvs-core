@@ -13,7 +13,11 @@
 import { countries as countryList, lookup } from 'country-data'
 import { orderBy, uniqBy, omit } from 'lodash'
 import { IntlShape } from 'react-intl'
-import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
+import {
+  BirthActionId,
+  DeathActionId,
+  GeneralActionId
+} from '@client/views/SysAdmin/Config/Application'
 import { messages } from '@client/i18n/messages/views/config'
 import { EMPTY_STRING } from '@client/utils/constants'
 import {
@@ -76,18 +80,24 @@ export const getTitle = (intl: IntlShape, changeModalName: string) => {
     return intl.formatMessage(messages.applicationNameLabel)
   else if (changeModalName === GeneralActionId.CURRENCY)
     return intl.formatMessage(messages.currencyLable)
-  else if (changeModalName === GeneralActionId.BIRTH_REGISTRATION_TARGET)
+  else if (changeModalName === BirthActionId.BIRTH_REGISTRATION_TARGET)
     return intl.formatMessage(messages.birthLegallySpecifiedDialogTitle)
-  else if (changeModalName === GeneralActionId.BIRTH_LATE_REGISTRATION_TARGET)
+  else if (changeModalName === BirthActionId.BIRTH_LATE_REGISTRATION_TARGET)
     return intl.formatMessage(messages.birthDelayedDialogTitle)
-  else if (changeModalName === GeneralActionId.DEATH_REGISTRATION_TARGET)
+  else if (changeModalName === DeathActionId.DEATH_REGISTRATION_TARGET)
     return intl.formatMessage(messages.deathLegallySpecifiedDialogTitle)
-  else if (changeModalName === GeneralActionId.BIRTH_ON_TIME_FEE)
-    return intl.formatMessage(messages.birthOnTimeFeeDialogTitle)
-  else if (changeModalName === GeneralActionId.BIRTH_LATE_FEE)
-    return intl.formatMessage(messages.birthLateFeeDialogTitle)
-  else if (changeModalName === GeneralActionId.BIRTH_DELAYED_FEE)
-    return intl.formatMessage(messages.birthDelayedFeeDialogTitle)
+  else if (
+    changeModalName === BirthActionId.BIRTH_ON_TIME_FEE ||
+    changeModalName === DeathActionId.DEATH_ON_TIME_FEE
+  )
+    return intl.formatMessage(messages.onTimeFeeDialogTitle)
+  else if (changeModalName === BirthActionId.BIRTH_LATE_FEE)
+    return intl.formatMessage(messages.lateFeeDialogTitle)
+  else if (
+    changeModalName === BirthActionId.BIRTH_DELAYED_FEE ||
+    changeModalName === DeathActionId.DEATH_DELAYED_FEE
+  )
+    return intl.formatMessage(messages.delayedFeeDialogTitle)
   else return EMPTY_STRING
 }
 
@@ -107,20 +117,22 @@ export const isApplyButtonDisabled = (
     return !Boolean(state.applicationName)
   } else if (changeModalName === GeneralActionId.CURRENCY) {
     return !Boolean(state.currency)
-  } else if (changeModalName === GeneralActionId.BIRTH_REGISTRATION_TARGET) {
+  } else if (changeModalName === BirthActionId.BIRTH_REGISTRATION_TARGET) {
     return !Boolean(state.birthRegistrationTarget)
-  } else if (
-    changeModalName === GeneralActionId.BIRTH_LATE_REGISTRATION_TARGET
-  ) {
+  } else if (changeModalName === BirthActionId.BIRTH_LATE_REGISTRATION_TARGET) {
     return !Boolean(state.birthLateRegistrationTarget)
-  } else if (changeModalName === GeneralActionId.DEATH_REGISTRATION_TARGET) {
+  } else if (changeModalName === DeathActionId.DEATH_REGISTRATION_TARGET) {
     return !Boolean(state.deathRegistrationTarget)
-  } else if (changeModalName === GeneralActionId.BIRTH_ON_TIME_FEE) {
+  } else if (changeModalName === BirthActionId.BIRTH_ON_TIME_FEE) {
     return !Boolean(state.birthOnTimeFee)
-  } else if (changeModalName === GeneralActionId.BIRTH_LATE_FEE) {
+  } else if (changeModalName === BirthActionId.BIRTH_LATE_FEE) {
     return !Boolean(state.birthLateFee)
-  } else if (changeModalName === GeneralActionId.BIRTH_DELAYED_FEE) {
+  } else if (changeModalName === BirthActionId.BIRTH_DELAYED_FEE) {
     return !Boolean(state.birthDelayedFee)
+  } else if (changeModalName === DeathActionId.DEATH_ON_TIME_FEE) {
+    return !Boolean(state.deathOnTimeFee)
+  } else if (changeModalName === DeathActionId.DEATH_DELAYED_FEE) {
+    return !Boolean(state.deathDelayedFee)
   } else return true
 }
 

@@ -21,7 +21,11 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from '@client/styledComponents'
 import { InputField, TextInput, Select } from '@opencrvs/components/lib/forms'
-import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
+import {
+  BirthActionId,
+  DeathActionId,
+  GeneralActionId
+} from '@client/views/SysAdmin/Config/Application'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { Alert } from '@opencrvs/components/lib/icons/Alert'
 import { updateOfflineConfigData } from '@client/offline/actions'
@@ -141,6 +145,8 @@ export type State = {
   birthOnTimeFee: string
   birthLateFee: string
   birthDelayedFee: string
+  deathOnTimeFee: string
+  deathDelayedFee: string
   updatingValue: boolean
   errorOccured: boolean
   errorMessages: string
@@ -180,6 +186,10 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
         offlineCountryConfiguration.config.BIRTH.FEE.LATE.toString(),
       birthDelayedFee:
         offlineCountryConfiguration.config.BIRTH.FEE.DELAYED.toString(),
+      deathOnTimeFee:
+        offlineCountryConfiguration.config.DEATH.FEE.ON_TIME.toString(),
+      deathDelayedFee:
+        offlineCountryConfiguration.config.DEATH.FEE.DELAYED.toString(),
       updatingValue: false,
       errorOccured: false,
       errorMessages: EMPTY_STRING
@@ -227,6 +237,20 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
     const value = event.target.value
     this.setState(() => ({
       birthDelayedFee: value
+    }))
+  }
+
+  setDeathOnTimeFee = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    this.setState(() => ({
+      deathOnTimeFee: value
+    }))
+  }
+
+  setDeathDelayedFee = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    this.setState(() => ({
+      deathDelayedFee: value
     }))
   }
 
@@ -323,11 +347,11 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
         )
       }
     } else if (
-      (modalName === GeneralActionId.BIRTH_REGISTRATION_TARGET ||
-        modalName === GeneralActionId.BIRTH_LATE_REGISTRATION_TARGET ||
-        modalName === GeneralActionId.BIRTH_ON_TIME_FEE ||
-        modalName === GeneralActionId.BIRTH_LATE_FEE ||
-        modalName === GeneralActionId.BIRTH_DELAYED_FEE) &&
+      (modalName === BirthActionId.BIRTH_REGISTRATION_TARGET ||
+        modalName === BirthActionId.BIRTH_LATE_REGISTRATION_TARGET ||
+        modalName === BirthActionId.BIRTH_ON_TIME_FEE ||
+        modalName === BirthActionId.BIRTH_LATE_FEE ||
+        modalName === BirthActionId.BIRTH_DELAYED_FEE) &&
       (value.BIRTH?.REGISTRATION_TARGET ||
         value.BIRTH?.LATE_REGISTRATION_TARGET ||
         value.BIRTH?.FEE)
@@ -339,23 +363,23 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
           this.setUpdatingValue
         )
         const notificationText =
-          modalName === GeneralActionId.BIRTH_REGISTRATION_TARGET
+          modalName === BirthActionId.BIRTH_REGISTRATION_TARGET
             ? this.props.intl.formatMessage(
                 messages.applicationBirthRegTargetChangeNotification
               )
-            : modalName === GeneralActionId.BIRTH_LATE_REGISTRATION_TARGET
+            : modalName === BirthActionId.BIRTH_LATE_REGISTRATION_TARGET
             ? this.props.intl.formatMessage(
                 messages.applicationBirthLateRegTargetChangeNotification
               )
-            : modalName === GeneralActionId.BIRTH_ON_TIME_FEE
+            : modalName === BirthActionId.BIRTH_ON_TIME_FEE
             ? this.props.intl.formatMessage(
                 messages.applicationBirthOnTimeFeeChangeNotification
               )
-            : modalName === GeneralActionId.BIRTH_LATE_FEE
+            : modalName === BirthActionId.BIRTH_LATE_FEE
             ? this.props.intl.formatMessage(
                 messages.applicationBirthLateFeeChangeNotification
               )
-            : modalName === GeneralActionId.BIRTH_DELAYED_FEE
+            : modalName === BirthActionId.BIRTH_DELAYED_FEE
             ? this.props.intl.formatMessage(
                 messages.applicationBirthDelayedFeeChangeNotification
               )
@@ -372,8 +396,10 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
         )
       }
     } else if (
-      modalName === GeneralActionId.DEATH_REGISTRATION_TARGET &&
-      value.DEATH?.REGISTRATION_TARGET
+      (modalName === DeathActionId.DEATH_REGISTRATION_TARGET ||
+        modalName === DeathActionId.DEATH_ON_TIME_FEE ||
+        modalName === DeathActionId.DEATH_DELAYED_FEE) &&
+      (value.DEATH?.REGISTRATION_TARGET || value.DEATH?.FEE)
     ) {
       try {
         await callUpdateApplicationDeathMutation(
@@ -381,9 +407,21 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
           this.props,
           this.setUpdatingValue
         )
-        const notificationText = this.props.intl.formatMessage(
-          messages.applicationDeathRegTargetChangeNotification
-        )
+        const notificationText =
+          modalName === DeathActionId.DEATH_REGISTRATION_TARGET
+            ? this.props.intl.formatMessage(
+                messages.applicationDeathRegTargetChangeNotification
+              )
+            : modalName === DeathActionId.DEATH_ON_TIME_FEE
+            ? this.props.intl.formatMessage(
+                messages.applicationDeathOnTimeFeeChangeNotification
+              )
+            : modalName === DeathActionId.DEATH_DELAYED_FEE
+            ? this.props.intl.formatMessage(
+                messages.applicationDeathDelayedFeeChangeNotification
+              )
+            : EMPTY_STRING
+
         valueChanged(NOTIFICATION_TYPE.SUCCESS, notificationText)
       } catch {
         this.setError(
@@ -442,7 +480,11 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
                   DEATH: {
                     REGISTRATION_TARGET: parseInt(
                       this.state.deathRegistrationTarget
-                    )
+                    ),
+                    FEE: {
+                      ON_TIME: parseInt(this.state.deathOnTimeFee),
+                      DELAYED: parseInt(this.state.deathDelayedFee)
+                    }
                   }
                 },
                 valueChanged
@@ -502,7 +544,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
             </Field>
           </Content>
         )}
-        {changeModalName === GeneralActionId.BIRTH_REGISTRATION_TARGET && (
+        {changeModalName === BirthActionId.BIRTH_REGISTRATION_TARGET && (
           <Content>
             <Field>
               <InputField
@@ -524,7 +566,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
             </Field>
           </Content>
         )}
-        {changeModalName === GeneralActionId.BIRTH_LATE_REGISTRATION_TARGET && (
+        {changeModalName === BirthActionId.BIRTH_LATE_REGISTRATION_TARGET && (
           <Content>
             <Field>
               <InputField
@@ -546,7 +588,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
             </Field>
           </Content>
         )}
-        {changeModalName === GeneralActionId.DEATH_REGISTRATION_TARGET && (
+        {changeModalName === DeathActionId.DEATH_REGISTRATION_TARGET && (
           <Content>
             <Field>
               <InputField
@@ -568,7 +610,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
             </Field>
           </Content>
         )}
-        {changeModalName === GeneralActionId.BIRTH_ON_TIME_FEE && (
+        {changeModalName === BirthActionId.BIRTH_ON_TIME_FEE && (
           <Content>
             <Field>
               <InputField
@@ -588,7 +630,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
             </Field>
           </Content>
         )}
-        {changeModalName === GeneralActionId.BIRTH_LATE_FEE && (
+        {changeModalName === BirthActionId.BIRTH_LATE_FEE && (
           <Content>
             <Field>
               <InputField
@@ -608,7 +650,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
             </Field>
           </Content>
         )}
-        {changeModalName === GeneralActionId.BIRTH_DELAYED_FEE && (
+        {changeModalName === BirthActionId.BIRTH_DELAYED_FEE && (
           <Content>
             <Field>
               <InputField
@@ -623,7 +665,49 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
                   type="number"
                   error={false}
                   value={this.state.birthDelayedFee}
-                  onChange={this.setBirthDelayedFee}
+                  onChange={this.setDeathOnTimeFee}
+                />
+              </InputField>
+            </Field>
+          </Content>
+        )}
+        {changeModalName === DeathActionId.DEATH_ON_TIME_FEE && (
+          <Content>
+            <Field>
+              <InputField
+                id="applicationDeathOnTimeFee"
+                touched={true}
+                required={false}
+              >
+                <Text align="left">{this.getCurrency()}</Text>
+
+                <SmallWidthInput
+                  id="applicationDeathOnTimeFee"
+                  type="number"
+                  error={false}
+                  value={this.state.deathOnTimeFee}
+                  onChange={this.setDeathOnTimeFee}
+                />
+              </InputField>
+            </Field>
+          </Content>
+        )}
+        {changeModalName === DeathActionId.DEATH_DELAYED_FEE && (
+          <Content>
+            <Field>
+              <InputField
+                id="applicationDeathDelayedFee"
+                touched={true}
+                required={false}
+              >
+                <Text align="left">{this.getCurrency()}</Text>
+
+                <SmallWidthInput
+                  id="applicationDeathDelayedFee"
+                  type="number"
+                  error={false}
+                  value={this.state.deathDelayedFee}
+                  onChange={this.setDeathDelayedFee}
                 />
               </InputField>
             </Field>

@@ -64,13 +64,19 @@ export enum GeneralActionId {
   APPLICATION_NAME = 'changeAppName',
   GOVT_LOGO = 'changeGovtLogo',
   CURRENCY = 'changeCurrency',
-  PHONE_NUMBER = 'changePhnNum',
+  PHONE_NUMBER = 'changePhnNum'
+}
+
+export enum BirthActionId {
   BIRTH_REGISTRATION_TARGET = 'changeBirthRegTarget',
   BIRTH_LATE_REGISTRATION_TARGET = 'changeBirthLateRegTarget',
-  DEATH_REGISTRATION_TARGET = 'changeDeathRegTarget',
   BIRTH_ON_TIME_FEE = 'changeBirthOnTimeFee',
   BIRTH_LATE_FEE = 'changeBirthLateFee',
-  BIRTH_DELAYED_FEE = 'changeBirthDelayedFee',
+  BIRTH_DELAYED_FEE = 'changeBirthDelayedFee'
+}
+
+export enum DeathActionId {
+  DEATH_REGISTRATION_TARGET = 'changeDeathRegTarget',
   DEATH_ON_TIME_FEE = 'changeDeathOnTimeFee',
   DEATH_DELAYED_FEE = 'changeDeathDelayedFee'
 }
@@ -182,9 +188,10 @@ function BirthTabContent({
             onTime: offlineCountryConfiguration.config.BIRTH.REGISTRATION_TARGET
           }),
           action: {
+            id: BirthActionId.BIRTH_REGISTRATION_TARGET,
             label: intl.formatMessage(buttonMessages.change),
             handler: () => {
-              callBack(GeneralActionId.BIRTH_REGISTRATION_TARGET)
+              callBack(BirthActionId.BIRTH_REGISTRATION_TARGET)
             }
           }
         },
@@ -208,9 +215,10 @@ function BirthTabContent({
               offlineCountryConfiguration.config.BIRTH.LATE_REGISTRATION_TARGET
           }),
           action: {
+            id: BirthActionId.BIRTH_LATE_REGISTRATION_TARGET,
             label: intl.formatMessage(buttonMessages.change),
             handler: () => {
-              callBack(GeneralActionId.BIRTH_LATE_REGISTRATION_TARGET)
+              callBack(BirthActionId.BIRTH_LATE_REGISTRATION_TARGET)
             }
           }
         },
@@ -235,9 +243,10 @@ function BirthTabContent({
             />
           ),
           action: {
+            id: BirthActionId.BIRTH_ON_TIME_FEE,
             label: intl.formatMessage(buttonMessages.change),
             handler: () => {
-              callBack(GeneralActionId.BIRTH_ON_TIME_FEE)
+              callBack(BirthActionId.BIRTH_ON_TIME_FEE)
             }
           }
         },
@@ -254,9 +263,10 @@ function BirthTabContent({
             />
           ),
           action: {
+            id: BirthActionId.BIRTH_LATE_FEE,
             label: intl.formatMessage(buttonMessages.change),
             handler: () => {
-              callBack(GeneralActionId.BIRTH_LATE_FEE)
+              callBack(BirthActionId.BIRTH_LATE_FEE)
             }
           }
         },
@@ -273,9 +283,10 @@ function BirthTabContent({
             />
           ),
           action: {
+            id: BirthActionId.BIRTH_DELAYED_FEE,
             label: intl.formatMessage(buttonMessages.change),
             handler: () => {
-              callBack(GeneralActionId.BIRTH_DELAYED_FEE)
+              callBack(BirthActionId.BIRTH_DELAYED_FEE)
             }
           }
         }
@@ -310,9 +321,10 @@ function DeathTabContent({
             onTime: offlineCountryConfiguration.config.DEATH.REGISTRATION_TARGET
           }),
           action: {
+            id: DeathActionId.DEATH_REGISTRATION_TARGET,
             label: intl.formatMessage(buttonMessages.change),
             handler: () => {
-              callBack(GeneralActionId.DEATH_REGISTRATION_TARGET)
+              callBack(DeathActionId.DEATH_REGISTRATION_TARGET)
             }
           }
         },
@@ -322,7 +334,6 @@ function DeathTabContent({
             lateTime:
               offlineCountryConfiguration.config.DEATH.REGISTRATION_TARGET
           }),
-
           action: {
             label: intl.formatMessage(buttonMessages.change),
             disabled: true
@@ -349,8 +360,11 @@ function DeathTabContent({
             />
           ),
           action: {
+            id: DeathActionId.DEATH_ON_TIME_FEE,
             label: intl.formatMessage(buttonMessages.change),
-            disabled: true
+            handler: () => {
+              callBack(DeathActionId.DEATH_ON_TIME_FEE)
+            }
           }
         },
         {
@@ -366,8 +380,11 @@ function DeathTabContent({
             />
           ),
           action: {
+            id: DeathActionId.DEATH_DELAYED_FEE,
             label: intl.formatMessage(buttonMessages.change),
-            disabled: true
+            handler: () => {
+              callBack(DeathActionId.DEATH_DELAYED_FEE)
+            }
           }
         }
       ]}
