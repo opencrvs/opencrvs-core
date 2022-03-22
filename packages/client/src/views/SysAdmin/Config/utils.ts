@@ -74,6 +74,10 @@ export const getTitle = (intl: IntlShape, changeModalName: string) => {
     return intl.formatMessage(messages.applicationNameLabel)
   else if (changeModalName === GeneralActionId.CURRENCY)
     return intl.formatMessage(messages.currencyLable)
+  else if (changeModalName === GeneralActionId.BIRTH_REGISTRATION_TARGET)
+    return intl.formatMessage(messages.birthLegallySpecifiedDialogTitle)
+  else if (changeModalName === GeneralActionId.BIRTH_LATE_REGISTRATION_TARGET)
+    return intl.formatMessage(messages.birthDelayedDialogTitle)
   else return EMPTY_STRING
 }
 
@@ -93,6 +97,12 @@ export const isApplyButtonDisabled = (
     return !Boolean(state.applicationName)
   } else if (changeModalName === GeneralActionId.CURRENCY) {
     return !Boolean(state.currency)
+  } else if (changeModalName === GeneralActionId.BIRTH_REGISTRATION_TARGET) {
+    return !Boolean(state.birthRegistrationTarget)
+  } else if (
+    changeModalName === GeneralActionId.BIRTH_LATE_REGISTRATION_TARGET
+  ) {
+    return !Boolean(state.birthLateRegistrationTarget)
   } else return true
 }
 

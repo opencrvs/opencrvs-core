@@ -64,7 +64,9 @@ export enum GeneralActionId {
   APPLICATION_NAME = 'changeAppName',
   GOVT_LOGO = 'changeGovtLogo',
   CURRENCY = 'changeCurrency',
-  PHONE_NUMBER = 'changePhnNum'
+  PHONE_NUMBER = 'changePhnNum',
+  BIRTH_REGISTRATION_TARGET = 'changeBirthRegTarget',
+  BIRTH_LATE_REGISTRATION_TARGET = 'changeBirthLateRegTarget'
 }
 
 function GeneralTabContent({
@@ -150,10 +152,12 @@ function GeneralTabContent({
 
 function BirthTabContent({
   offlineCountryConfiguration,
-  intl
+  intl,
+  callBack
 }: {
   offlineCountryConfiguration: IOfflineData
   intl: IntlShape
+  callBack: (modalName: string) => void
 }) {
   return (
     <ListView
@@ -173,7 +177,9 @@ function BirthTabContent({
           }),
           action: {
             label: intl.formatMessage(buttonMessages.change),
-            disabled: true
+            handler: () => {
+              callBack(GeneralActionId.BIRTH_REGISTRATION_TARGET)
+            }
           }
         },
         {
@@ -184,7 +190,6 @@ function BirthTabContent({
             lateTime:
               offlineCountryConfiguration.config.BIRTH.LATE_REGISTRATION_TARGET
           }),
-
           action: {
             label: intl.formatMessage(buttonMessages.change),
             disabled: true
@@ -198,7 +203,9 @@ function BirthTabContent({
           }),
           action: {
             label: intl.formatMessage(buttonMessages.change),
-            disabled: true
+            handler: () => {
+              callBack(GeneralActionId.BIRTH_LATE_REGISTRATION_TARGET)
+            }
           }
         },
         {
@@ -428,6 +435,11 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
             <BirthTabContent
               offlineCountryConfiguration={offlineCountryConfiguration}
               intl={intl}
+              callBack={(modalName: string) =>
+                this.setState({
+                  changeModalName: modalName
+                })
+              }
             />
           )}
           {this.state.activeTabId && this.state.activeTabId === TabId.DEATH && (

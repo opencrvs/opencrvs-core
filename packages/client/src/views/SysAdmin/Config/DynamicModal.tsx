@@ -41,6 +41,12 @@ import {
 const Message = styled.div`
   margin-bottom: 16px;
 `
+const Text = styled.div`
+  margin-top: 20px;
+  margin-left: 8px;
+  color: ${({ theme }) => theme.colors.grey600};
+  ${({ theme }) => theme.fonts.bigBodyStyle};
+`
 const ApplyButton = styled(PrimaryButton)`
   height: 40px;
   & div {
@@ -78,6 +84,13 @@ const HalfWidthInput = styled(TextInput)`
     width: 100%;
   }
 `
+const SmallWidthInput = styled(TextInput)`
+  margin-top: 16px;
+  width: 78px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    width: 100%;
+  }
+`
 const ErrorMessage = styled.div`
   position: relative;
   ${({ theme }) => theme.fonts.semiBoldFont};
@@ -98,6 +111,8 @@ export type IApplicationConfigName = {
 export type State = {
   applicationName: string
   currency: string
+  birthRegistrationTarget: string
+  birthLateRegistrationTarget: string
   updatingValue: boolean
   errorOccured: boolean
   errorMessages: string
@@ -121,10 +136,14 @@ export type IFullProps = IProps & IntlShapeProps & DispatchProps
 class DynamicModalComponent extends React.Component<IFullProps, State> {
   constructor(props: IFullProps) {
     super(props)
+    const { offlineCountryConfiguration } = this.props
     this.state = {
-      applicationName:
-        this.props.offlineCountryConfiguration.config.APPLICATION_NAME,
-      currency: `${this.props.offlineCountryConfiguration.config.CURRENCY.languagesAndCountry[0]}-${this.props.offlineCountryConfiguration.config.CURRENCY.isoCode}`,
+      applicationName: offlineCountryConfiguration.config.APPLICATION_NAME,
+      currency: `${offlineCountryConfiguration.config.CURRENCY.languagesAndCountry[0]}-${this.props.offlineCountryConfiguration.config.CURRENCY.isoCode}`,
+      birthRegistrationTarget:
+        offlineCountryConfiguration.config.BIRTH.REGISTRATION_TARGET.toString(),
+      birthLateRegistrationTarget:
+        offlineCountryConfiguration.config.BIRTH.LATE_REGISTRATION_TARGET.toString(),
       updatingValue: false,
       errorOccured: false,
       errorMessages: EMPTY_STRING
@@ -137,6 +156,22 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
     const value = event.target.value
     this.setState(() => ({
       applicationName: value
+    }))
+  }
+
+  setBirthRegistrationTarget = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    this.setState(() => ({
+      birthRegistrationTarget: value
+    }))
+  }
+
+  setBirthLateRegistrationTarget = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = event.target.value
+    this.setState(() => ({
+      birthLateRegistrationTarget: value
     }))
   }
 
@@ -296,6 +331,50 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
                   value={this.state.currency}
                   options={getCurrencySelectOptions()}
                 />
+              </InputField>
+            </Field>
+          </Content>
+        )}
+        {changeModalName === GeneralActionId.BIRTH_REGISTRATION_TARGET && (
+          <Content>
+            <Field>
+              <InputField
+                id="applicationBirthRegTarget"
+                touched={true}
+                required={false}
+              >
+                <SmallWidthInput
+                  id="applicationBirthRegTarget"
+                  type="number"
+                  error={false}
+                  value={this.state.birthRegistrationTarget}
+                  onChange={this.setBirthRegistrationTarget}
+                />
+                <Text>
+                  {intl.formatMessage(messages.eventTargetInputLabel)}
+                </Text>
+              </InputField>
+            </Field>
+          </Content>
+        )}
+        {changeModalName === GeneralActionId.BIRTH_LATE_REGISTRATION_TARGET && (
+          <Content>
+            <Field>
+              <InputField
+                id="applicationBirthLateRegTarget"
+                touched={true}
+                required={false}
+              >
+                <SmallWidthInput
+                  id="applicationBirthRegTarget"
+                  type="number"
+                  error={false}
+                  value={this.state.birthLateRegistrationTarget}
+                  onChange={this.setBirthLateRegistrationTarget}
+                />
+                <Text>
+                  {intl.formatMessage(messages.eventTargetInputLabel)}
+                </Text>
               </InputField>
             </Field>
           </Content>
