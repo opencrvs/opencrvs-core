@@ -41,8 +41,11 @@ import {
   callUpdateApplicationNameMutation,
   callUpdateApplicationCurrencyMutation,
   callUpdateApplicationBirthMutation,
-  callUpdateApplicationDeathMutation
+  callUpdateApplicationDeathMutation,
+  getFormattedFee,
+  getCurrency
 } from '@client/views/SysAdmin/Config/utils'
+import { parse } from 'path'
 
 const Message = styled.div`
   margin-bottom: 16px;
@@ -52,7 +55,7 @@ const Text = styled.div<{
 }>`
   margin-left: ${({ align }) => (align === 'left' ? '0px' : '8px')};
   margin-right: ${({ align }) => (align === 'left' ? '8px' : '0px')};
-  margin-top: 22px;
+  margin-top: ${({ align }) => (align === 'left' ? '8px' : '22px')};
   color: ${({ theme }) => theme.colors.grey600};
   ${({ theme }) => theme.fonts.bigBodyStyle};
 `
@@ -207,50 +210,54 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
 
   setBirthRegistrationTarget = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
-    this.setState(() => ({
-      birthRegistrationTarget: value
-    }))
+    if ((!value.includes('.') && /^\d+$/.test(value)) || !value) {
+      this.setState(() => ({
+        birthRegistrationTarget: value
+      }))
+    }
   }
 
   setDeathRegistrationTarget = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
-    this.setState(() => ({
-      deathRegistrationTarget: value
-    }))
+    if ((!value.includes('.') && /^\d+$/.test(value)) || !value) {
+      this.setState(() => ({
+        deathRegistrationTarget: value
+      }))
+    }
   }
 
   setBirthOnTimeFee = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
     this.setState(() => ({
-      birthOnTimeFee: value
+      birthOnTimeFee: getFormattedFee(value)
     }))
   }
 
   setBirthLateFee = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
     this.setState(() => ({
-      birthLateFee: value
+      birthLateFee: getFormattedFee(value)
     }))
   }
 
   setBirthDelayedFee = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
     this.setState(() => ({
-      birthDelayedFee: value
+      birthDelayedFee: getFormattedFee(value)
     }))
   }
 
   setDeathOnTimeFee = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
     this.setState(() => ({
-      deathOnTimeFee: value
+      deathOnTimeFee: getFormattedFee(value)
     }))
   }
 
   setDeathDelayedFee = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
     this.setState(() => ({
-      deathDelayedFee: value
+      deathDelayedFee: getFormattedFee(value)
     }))
   }
 
@@ -258,9 +265,11 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const value = event.target.value
-    this.setState(() => ({
-      birthLateRegistrationTarget: value
-    }))
+    if ((!value.includes('.') && /^\d+$/.test(value)) || !value) {
+      this.setState(() => ({
+        birthLateRegistrationTarget: value
+      }))
+    }
   }
 
   setUpdatingValue = (value: boolean) => {
@@ -274,21 +283,6 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
       errorOccured: true,
       errorMessages: errorMessage
     })
-  }
-
-  getCurrency = () => {
-    const { offlineCountryConfiguration } = this.props
-    const currency = new Intl.NumberFormat(
-      offlineCountryConfiguration.config.CURRENCY.languagesAndCountry,
-      {
-        style: 'currency',
-        currency: offlineCountryConfiguration.config.CURRENCY.isoCode
-      }
-    )
-      .format(0)
-      .replace(/[0-9\.,]/g, '')
-
-    return currency
   }
 
   async mutationHandler(
@@ -436,8 +430,13 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
   }
 
   render() {
-    const { intl, changeModalName, toggleConfigModal, valueChanged } =
-      this.props
+    const {
+      intl,
+      changeModalName,
+      toggleConfigModal,
+      valueChanged,
+      offlineCountryConfiguration
+    } = this.props
     return (
       <ResponsiveModal
         id={`${changeModalName}Modal`}
@@ -472,9 +471,15 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
                       this.state.birthLateRegistrationTarget
                     ),
                     FEE: {
-                      ON_TIME: parseInt(this.state.birthOnTimeFee),
-                      LATE: parseInt(this.state.birthLateFee),
-                      DELAYED: parseInt(this.state.birthDelayedFee)
+                      ON_TIME: parseFloat(
+                        this.state.birthOnTimeFee.replace(/\,/g, '')
+                      ),
+                      LATE: parseFloat(
+                        this.state.birthLateFee.replace(/\,/g, '')
+                      ),
+                      DELAYED: parseFloat(
+                        this.state.birthDelayedFee.replace(/\,/g, '')
+                      )
                     }
                   },
                   DEATH: {
@@ -482,8 +487,12 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
                       this.state.deathRegistrationTarget
                     ),
                     FEE: {
-                      ON_TIME: parseInt(this.state.deathOnTimeFee),
-                      DELAYED: parseInt(this.state.deathDelayedFee)
+                      ON_TIME: parseFloat(
+                        this.state.deathOnTimeFee.replace(/\,/g, '')
+                      ),
+                      DELAYED: parseFloat(
+                        this.state.deathDelayedFee.replace(/\,/g, '')
+                      )
                     }
                   }
                 },
@@ -554,7 +563,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
               >
                 <SmallWidthInput
                   id="applicationBirthRegTarget"
-                  type="number"
+                  type="text"
                   error={false}
                   value={this.state.birthRegistrationTarget}
                   onChange={this.setBirthRegistrationTarget}
@@ -576,7 +585,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
               >
                 <SmallWidthInput
                   id="applicationBirthLateRegTarget"
-                  type="number"
+                  type="text"
                   error={false}
                   value={this.state.birthLateRegistrationTarget}
                   onChange={this.setBirthLateRegistrationTarget}
@@ -598,7 +607,7 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
               >
                 <SmallWidthInput
                   id="applicationDeathRegTarget"
-                  type="number"
+                  type="text"
                   error={false}
                   value={this.state.deathRegistrationTarget}
                   onChange={this.setDeathRegistrationTarget}
@@ -618,10 +627,12 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
                 touched={true}
                 required={false}
               >
-                <Text align="left">{this.getCurrency()}</Text>
-                <SmallWidthInput
+                <Text align="left">
+                  {getCurrency(offlineCountryConfiguration)}
+                </Text>
+                <HalfWidthInput
                   id="applicationBirthOnTimeFee"
-                  type="number"
+                  type="text"
                   error={false}
                   value={this.state.birthOnTimeFee}
                   onChange={this.setBirthOnTimeFee}
@@ -638,10 +649,12 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
                 touched={true}
                 required={false}
               >
-                <Text align="left">{this.getCurrency()}</Text>
-                <SmallWidthInput
+                <Text align="left">
+                  {getCurrency(offlineCountryConfiguration)}
+                </Text>
+                <HalfWidthInput
                   id="applicationBirthLateFee"
-                  type="number"
+                  type="text"
                   error={false}
                   value={this.state.birthLateFee}
                   onChange={this.setBirthLateFee}
@@ -658,14 +671,16 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
                 touched={true}
                 required={false}
               >
-                <Text align="left">{this.getCurrency()}</Text>
+                <Text align="left">
+                  {getCurrency(offlineCountryConfiguration)}
+                </Text>
 
-                <SmallWidthInput
+                <HalfWidthInput
                   id="applicationBirthDelayedFee"
-                  type="number"
+                  type="text"
                   error={false}
                   value={this.state.birthDelayedFee}
-                  onChange={this.setDeathOnTimeFee}
+                  onChange={this.setBirthDelayedFee}
                 />
               </InputField>
             </Field>
@@ -679,11 +694,13 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
                 touched={true}
                 required={false}
               >
-                <Text align="left">{this.getCurrency()}</Text>
+                <Text align="left">
+                  {getCurrency(offlineCountryConfiguration)}
+                </Text>
 
-                <SmallWidthInput
+                <HalfWidthInput
                   id="applicationDeathOnTimeFee"
-                  type="number"
+                  type="text"
                   error={false}
                   value={this.state.deathOnTimeFee}
                   onChange={this.setDeathOnTimeFee}
@@ -700,11 +717,13 @@ class DynamicModalComponent extends React.Component<IFullProps, State> {
                 touched={true}
                 required={false}
               >
-                <Text align="left">{this.getCurrency()}</Text>
+                <Text align="left">
+                  {getCurrency(offlineCountryConfiguration)}
+                </Text>
 
-                <SmallWidthInput
+                <HalfWidthInput
                   id="applicationDeathDelayedFee"
-                  type="number"
+                  type="text"
                   error={false}
                   value={this.state.deathDelayedFee}
                   onChange={this.setDeathDelayedFee}

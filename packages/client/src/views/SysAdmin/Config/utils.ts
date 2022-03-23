@@ -28,6 +28,7 @@ import {
   State
 } from '@client/views/SysAdmin/Config/DynamicModal'
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/mutations'
+import { IOfflineData, IOfflineDataState } from '@client/offline/reducer'
 
 interface ICurrencyOptions {
   [key: string]: string
@@ -45,6 +46,19 @@ type ICountrylist = {
   status: string
 }
 
+export const getCurrency = (offlineCountryConfiguration: IOfflineData) => {
+  const currency = new Intl.NumberFormat(
+    offlineCountryConfiguration.config.CURRENCY.languagesAndCountry,
+    {
+      style: 'currency',
+      currency: offlineCountryConfiguration.config.CURRENCY.isoCode
+    }
+  )
+    .format(0)
+    .replace(/[0-9\.,]/g, '')
+
+  return currency
+}
 export const getCurrencyObject = (value: string) => {
   const arr = value.split('-')
   return {
@@ -73,6 +87,25 @@ export const getCurrencySelectOptions = () => {
   const uniqCurrencyOptions = uniqBy(currencyOptions, 'label')
   const sortedCountryOptions = orderBy(uniqCurrencyOptions, ['label'], ['asc'])
   return sortedCountryOptions
+}
+
+export const getFormattedFee = (value: string) => {
+  value = value.replace(/\,/g, '')
+  if (!isNaN(Number(value)) || !value) {
+    const decimalPlaces = value.toString().split('.')[1]
+    if (decimalPlaces && decimalPlaces.length > 2) {
+      const calcDec = Math.pow(10, 2)
+      value = (Math.trunc(parseFloat(value) * calcDec) / calcDec).toString()
+    }
+    if (value.slice(-1) === '.') {
+      return value
+        ? Number(Number(value).toFixed(1)).toLocaleString().concat('.')
+        : EMPTY_STRING
+    } else {
+      return value ? Number(value).toLocaleString() : EMPTY_STRING
+    }
+  }
+  return EMPTY_STRING
 }
 
 export const getTitle = (intl: IntlShape, changeModalName: string) => {

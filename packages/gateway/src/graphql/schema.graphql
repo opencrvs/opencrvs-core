@@ -1410,14 +1410,14 @@ input ReasonsNotApplyingInput {
 }
 
 type BirthFee {
-  ON_TIME: Int
-  LATE: Int
-  DELAYED: Int
+  ON_TIME: Float
+  LATE: Float
+  DELAYED: Float
 }
 
 type DeathFee {
-  ON_TIME: Int
-  DELAYED: Int
+  ON_TIME: Float
+  DELAYED: Float
 }
 
 type Mask {
@@ -1426,14 +1426,14 @@ type Mask {
 }
 
 input BirthFeeInput {
-  ON_TIME: Int
-  LATE: Int
-  DELAYED: Int
+  ON_TIME: Float
+  LATE: Float
+  DELAYED: Float
 }
 
 input DeathFeeInput {
-  ON_TIME: Int
-  DELAYED: Int
+  ON_TIME: Float
+  DELAYED: Float
 }
 
 input MaskInput {

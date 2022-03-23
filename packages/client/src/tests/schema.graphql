@@ -953,9 +953,9 @@ input SignatureInput {
 }
 
 type BirthFee {
-  ON_TIME: Int
-  LATE: Int
-  DELAYED: Int
+  ON_TIME: Float
+  LATE: Float
+  DELAYED: Float
 }
 
 type Birth {
@@ -965,8 +965,8 @@ type Birth {
 }
 
 type DeathFee {
-  ON_TIME: Int
-  DELAYED: Int
+  ON_TIME: Float
+  DELAYED: Float
 }
 
 type Death {
@@ -993,9 +993,9 @@ type NIDNumberPattern {
 }
 
 input BirthFeeInput {
-  ON_TIME: Int
-  LATE: Int
-  DELAYED: Int
+  ON_TIME: Float
+  LATE: Float
+  DELAYED: Float
 }
 
 input BirthInput {
@@ -1005,8 +1005,8 @@ input BirthInput {
 }
 
 input DeathFeeInput {
-  ON_TIME: Int
-  DELAYED: Int
+  ON_TIME: Float
+  DELAYED: Float
 }
 
 input DeathInput {
