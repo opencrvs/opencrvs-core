@@ -32,6 +32,7 @@ import * as validators from '@opencrvs/client/src/utils/validate'
 import { ICertificate as IDeclarationCertificate } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
+import { IUserDetails } from '@client/utils/userUtils'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -295,7 +296,8 @@ export type IFormFieldQueryMapFunction = (
   queryData: any,
   sectionId: string,
   fieldDefinition: IFormField,
-  nestedFieldDefinition?: IFormField
+  nestedFieldDefinition?: IFormField,
+  offlineData?: IOfflineData
 ) => void
 
 /*
@@ -843,6 +845,7 @@ export type TransformedData = { [key: string]: any }
 export type IFormSectionMapping = {
   mutation?: IFormSectionMutationMapFunction
   query?: IFormSectionQueryMapFunction
+  template?: [string, IFormSectionQueryMapFunction][]
 }
 
 export type IFormSectionMutationMapFunction = (
@@ -854,7 +857,11 @@ export type IFormSectionMutationMapFunction = (
 export type IFormSectionQueryMapFunction = (
   transFormedData: IFormData,
   queryData: any,
-  sectionId: string
+  sectionId: string,
+  targetSectionId?: string, // used for template query mappings
+  targetFieldName?: string, // used for template query mappings
+  offlineData?: IOfflineData, // used for template offline mappings
+  userDetails?: IUserDetails // user for template user mappings
 ) => void
 
 export enum BirthSection {
@@ -946,6 +953,7 @@ export type ISerializedFormSection = Omit<
   mapping?: {
     mutation?: IMutationDescriptor
     query?: IQueryDescriptor
+    template?: (IQueryDescriptor & { fieldName: string })[]
   }
 }
 

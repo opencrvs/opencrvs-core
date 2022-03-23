@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export const certificateTemplates = {
+export const certificateBaseTemplate = {
   definition: {
     pageMargins: [0, 0, 0, 0] as [number, number, number, number],
     defaultStyle: {

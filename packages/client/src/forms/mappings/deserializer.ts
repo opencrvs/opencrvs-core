@@ -294,7 +294,16 @@ export function deserializeFormSection(
     mutation:
       section.mapping &&
       section.mapping.mutation &&
-      sectionMutationDescriptorToMutationFunction(section.mapping.mutation)
+      sectionMutationDescriptorToMutationFunction(section.mapping.mutation),
+    template:
+      section.mapping?.template &&
+      section.mapping.template.map(
+        ({ fieldName, ...query }) =>
+          [fieldName, sectionQueryDescriptorToQueryFunction(query)] as [
+            string,
+            IFormSectionQueryMapFunction
+          ]
+      )
   }
   const groups = section.groups.map((group) => ({
     ...group,

@@ -799,6 +799,33 @@ export const registerForms: IDefaultRegisterForms = {
           }
         ],
         mapping: {
+          template: [
+            {
+              fieldName: 'registrationNumber',
+              operation: 'registrationNumberTransformer'
+            },
+            {
+              fieldName: 'certificateDate',
+              operation: 'certificateDateTransformer',
+              parameters: ['en', 'dd MMMM yyyy']
+            },
+            {
+              fieldName: 'registrarName',
+              operation: 'registrarNameUserTransformer'
+            },
+            {
+              fieldName: 'role',
+              operation: 'roleUserTransformer'
+            },
+            {
+              fieldName: 'registrarSignature',
+              operation: 'registrarSignatureUserTransformer'
+            },
+            {
+              fieldName: 'registrationLocation',
+              operation: 'registrationLocationUserTransformer'
+            }
+          ],
           mutation: {
             operation: 'setBirthRegistrationSectionTransformer'
           },
@@ -961,7 +988,7 @@ export const registerForms: IDefaultRegisterForms = {
                   template: {
                     operation: 'dateFormatTransformer',
                     fieldName: 'eventDate',
-                    parameters: ['birthDate', 'do MMMM yyyy']
+                    parameters: ['birthDate', 'en', 'do MMMM yyyy']
                   },
                   mutation: {
                     operation: 'longDateTransformer',
@@ -1280,6 +1307,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    fieldName: 'placeOfBirth',
+                    operation: 'eventLocationNameQueryOfflineTransformer',
+                    parameters: ['facilities']
+                  },
                   mutation: {
                     operation: 'birthEventLocationMutationTransformer',
                     parameters: []

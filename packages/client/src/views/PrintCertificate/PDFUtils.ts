@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IntlShape } from 'react-intl'
+import { IntlShape, MessageDescriptor } from 'react-intl'
 import { createPDF, printPDF } from '@client/pdfRenderer'
 import { IDeclaration } from '@client/declarations'
 import { IUserDetails } from '@opencrvs/client/src/utils/userUtils'
@@ -20,10 +20,36 @@ import {
   IPDFTemplate
 } from '@client/pdfRenderer/transformer/types'
 import { Content, PageSize } from 'pdfmake/interfaces'
-import { certificateTemplates } from '@client/templates/register'
-import format from '@client/utils/date-formatting'
+import { certificateBaseTemplate } from '@client/templates/register'
 import * as Handlebars from 'handlebars'
 
+function isMessageDescriptor(
+  obj: Record<string, unknown>
+): obj is MessageDescriptor & Record<string, string> {
+  return (
+    obj.hasOwnProperty('id') &&
+    obj.hasOwnProperty('defaultMessage') &&
+    typeof (obj as MessageDescriptor).id === 'string' &&
+    typeof (obj as MessageDescriptor).defaultMessage === 'string'
+  )
+}
+
+function formatAllMessageDescriptors(
+  templateData: Record<string, string | MessageDescriptor>,
+  intl: IntlShape
+): Record<string, string> {
+  for (const key of Object.keys(templateData)) {
+    if (
+      typeof templateData[key] === 'object' &&
+      isMessageDescriptor(templateData[key] as Record<string, unknown>)
+    ) {
+      templateData[key] = intl.formatMessage(
+        templateData[key] as MessageDescriptor
+      )
+    }
+  }
+  return <Record<string, string>>templateData
+}
 export function printMoneyReceipt(
   intl: IntlShape,
   declaration: IDeclaration,
@@ -59,7 +85,7 @@ export async function previewCertificate(
   }
 
   await createPDF(
-    getPDFTemplateWithSVG(offlineResource, declaration.event, pageSize),
+    getPDFTemplateWithSVG(offlineResource, declaration, pageSize, intl),
     declaration,
     userDetails,
     offlineResource,
@@ -82,7 +108,7 @@ export function printCertificate(
     throw new Error('No user details found')
   }
   printPDF(
-    getPDFTemplateWithSVG(offlineResource, declaration.event, pageSize),
+    getPDFTemplateWithSVG(offlineResource, declaration, pageSize, intl),
     declaration,
     userDetails,
     offlineResource,
@@ -93,21 +119,25 @@ export function printCertificate(
 
 function getPDFTemplateWithSVG(
   offlineResource: IOfflineData,
-  event: Event,
-  pageSize: PageSize
+  declaration: IDeclaration,
+  pageSize: PageSize,
+  intl: IntlShape
 ): IPDFTemplate {
   let svgCode: string
   let svgTemplate
-  if (event === Event.BIRTH) {
+  if (declaration.event === Event.BIRTH) {
     svgTemplate = offlineResource.templates.certificates.birth.definition
     const template = Handlebars.compile(svgTemplate)
-    svgCode = template({
-      certificateDate: format(Date.now(), 'dd MMMM yyyy')
-    })
+    svgCode = template(
+      formatAllMessageDescriptors(
+        declaration.data.template as Record<string, string | MessageDescriptor>,
+        intl
+      )
+    )
   } else {
     svgCode = offlineResource.templates.certificates.death.definition
   }
-  const pdfTemplate: IPDFTemplate = certificateTemplates
+  const pdfTemplate: IPDFTemplate = certificateBaseTemplate
   pdfTemplate.definition.pageSize = pageSize
   updatePDFTemplateWithSVGContent(pdfTemplate, svgCode, pageSize)
   return pdfTemplate

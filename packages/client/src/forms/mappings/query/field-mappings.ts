@@ -27,6 +27,7 @@ import {
 import { EMPTY_STRING } from '@client/utils/constants'
 import { cloneDeep, get } from 'lodash'
 import format from '@client/utils/date-formatting'
+import { IOfflineData, OFFLINE_FACILITIES_KEY } from '@client/offline/reducer'
 
 interface IName {
   [key: string]: any
@@ -442,6 +443,40 @@ export const locationIDToFieldTransformer =
     return transformedData
   }
 
+export const eventLocationNameQueryOfflineTransformer =
+  (resourceKey: string) =>
+  (
+    transformedData: IFormData,
+    queryData: any,
+    sectionId: string,
+    field: IFormField,
+    _?: IFormField,
+    offlineData?: IOfflineData
+  ) => {
+    if (!transformedData[sectionId]) {
+      transformedData[sectionId] = {}
+    }
+    eventLocationIDQueryTransformer()(
+      transformedData,
+      queryData,
+      sectionId,
+      field
+    )
+
+    const locationId = transformedData[sectionId][field.name] as string
+    if (!locationId || !offlineData) {
+      return
+    }
+    let selectedLocation
+    if (resourceKey === OFFLINE_FACILITIES_KEY) {
+      selectedLocation = offlineData[resourceKey][locationId]
+
+      if (selectedLocation) {
+        transformedData[sectionId][field.name] = selectedLocation.name
+      }
+    }
+  }
+
 export const nestedValueToFieldTransformer =
   (nestedFieldName: string, transformMethod?: IFormFieldQueryMapFunction) =>
   (
@@ -580,10 +615,19 @@ export const sectionTransformer =
     transformedData: TransformedData,
     queryData: IFormData,
     sectionId: string,
-    field: IFormField
+    field: IFormField,
+    _?: IFormField,
+    offlineData?: IOfflineData
   ): void => {
     const localTransformedData: IFormData = {}
-    queryTransformer(localTransformedData, queryData, sectionId, field)
+    queryTransformer(
+      localTransformedData,
+      queryData,
+      sectionId,
+      field,
+      _,
+      offlineData
+    )
     if (!transformedData[transformedSectionId]) {
       transformedData[transformedSectionId] = {}
     }
@@ -593,7 +637,7 @@ export const sectionTransformer =
   }
 
 export const dateFormatTransformer =
-  (transformedFieldName: string, dateFormat = 'dd MMMM yyyy') =>
+  (transformedFieldName: string, locale: string, dateFormat = 'dd MMMM yyyy') =>
   (
     transformedData: TransformedData,
     queryData: IFormData,
@@ -602,10 +646,9 @@ export const dateFormatTransformer =
   ): void => {
     const queryValue = queryData[sectionId][transformedFieldName] as string
     const date = new Date(queryValue)
-    console.log(date)
     if (!Number.isNaN(date.getTime())) {
       const prevLocale = window.__localeId__
-      window.__localeId__ = 'en'
+      window.__localeId__ = locale
 
       if (!transformedData[sectionId]) {
         transformedData[sectionId] = {}
