@@ -39,23 +39,9 @@ type Death {
   FEE: DeathFee
 }
 
-type NIDNumberPattern {
-  pattern: String
-  example: String
-  num: String
-}
-
-type Mask {
-  startForm: Int
-  endBefore: Int
-}
-
-type PhoneNumberPattern {
-  pattern: String
-  example: String
-  start: String
-  num: String
-  mask: Mask
+type CountryLogo {
+  fileName: String
+  file: String
 }
 
 type Currency {
@@ -91,17 +77,9 @@ input NIDNumberPatternInput {
   num: String
 }
 
-input MaskInput {
-  startForm: Int
-  endBefore: Int
-}
-
-input PhoneNumberPatternInput {
-  pattern: String
-  example: String
-  start: String
-  num: String
-  mask: MaskInput
+input CountryLogoInput {
+  fileName: String
+  file: String
 }
 
 input CurrencyInput {
@@ -114,8 +92,8 @@ input ApplicationConfigurationInput {
   BACKGROUND_SYNC_BROADCAST_CHANNEL: String
   BIRTH: BirthInput
   COUNTRY: String
+  COUNTRY_LOGO: CountryLogoInput
   CURRENCY: CurrencyInput
-  COUNTRY_LOGO_FILE: String
   COUNTRY_LOGO_RENDER_WIDTH: Int
   COUNTRY_LOGO_RENDER_HEIGHT: Int
   DESKTOP_TIME_OUT_MILLISECONDS: Int
@@ -129,8 +107,8 @@ input ApplicationConfigurationInput {
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
   SENTRY: String
   LOGROCKET: String
-  PHONE_NUMBER_PATTERN: PhoneNumberPatternInput
-  NID_NUMBER_PATTERN: NIDNumberPatternInput
+  PHONE_NUMBER_PATTERN: String
+  NID_NUMBER_PATTERN: String
 }
 
 type ApplicationConfiguration {
@@ -138,8 +116,8 @@ type ApplicationConfiguration {
   BACKGROUND_SYNC_BROADCAST_CHANNEL: String
   BIRTH: Birth
   COUNTRY: String
+  COUNTRY_LOGO: CountryLogo
   CURRENCY: Currency
-  COUNTRY_LOGO_FILE: String
   COUNTRY_LOGO_RENDER_WIDTH: Int
   COUNTRY_LOGO_RENDER_HEIGHT: Int
   DESKTOP_TIME_OUT_MILLISECONDS: Int
@@ -153,8 +131,8 @@ type ApplicationConfiguration {
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
   SENTRY: String
   LOGROCKET: String
-  PHONE_NUMBER_PATTERN: PhoneNumberPattern
-  NID_NUMBER_PATTERN: NIDNumberPattern
+  PHONE_NUMBER_PATTERN: String
+  NID_NUMBER_PATTERN: String
 }
 
 type Mutation {

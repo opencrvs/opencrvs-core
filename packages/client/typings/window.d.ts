@@ -25,11 +25,14 @@ interface Window {
     CONFIG_API_URL: string
     BACKGROUND_SYNC_BROADCAST_CHANNEL: string
     COUNTRY: string
+    COUNTRY_LOGO: {
+      fileName: string
+      file: string
+    }
     CURRENCY: {
       isoCode: string
       languagesAndCountry: string[]
     }
-    COUNTRY_LOGO_FILE: string
     COUNTRY_LOGO_RENDER_WIDTH: number // in px
     COUNTRY_LOGO_RENDER_HEIGHT: number // in px
     DESKTOP_TIME_OUT_MILLISECONDS: number
@@ -50,22 +53,10 @@ interface Window {
     HIDE_EVENT_REGISTER_INFORMATION: boolean
     EXTERNAL_VALIDATION_WORKQUEUE: boolean
     FIELD_AGENT_AUDIT_LOCATIONS: string
+    APPLICATION_AUDIT_LOCATIONS: string
+    PHONE_NUMBER_PATTERN: RegExp
+    NID_NUMBER_PATTERN: RegExp
     DECLARATION_AUDIT_LOCATIONS: string
-    PHONE_NUMBER_PATTERN: {
-      pattern: RegExp
-      example: string
-      start?: string
-      num: string
-      mask: {
-        startForm: number
-        endBefore: number
-      }
-    }
-    NID_NUMBER_PATTERN: {
-      pattern: RegExp
-      example: string
-      num: string
-    }
     LOGROCKET: string
     SENTRY: string
   }

@@ -133,23 +133,10 @@ export const mockFetchConfig = {
     INFORMANT_MINIMUM_AGE: 16,
     HIDE_EVENT_REGISTER_INFORMATION: false,
     EXTERNAL_VALIDATION_WORKQUEUE: false,
-    PHONE_NUMBER_PATTERN: {
-      pattern: '/^0(7|9)[0-9]{1}[0-9]{7}$/',
-      example: '0970545855',
-      start: '0[7|9]',
-      num: '10',
-      mask: {
-        startForm: 4,
-        endBefore: 2
-      }
-    },
+    PHONE_NUMBER_PATTERN: '/^0(7|9)[0-9]{1}[0-9]{7}$/',
     SENTRY: 'https://f892d643aab642108f44e2d1795706bc@sentry.io/1774604',
     LOGROCKET: 'opencrvs-foundation/opencrvs-zambia',
-    NID_NUMBER_PATTERN: {
-      pattern: '/^[0-9]{9}$/',
-      example: '4837281940',
-      num: '9'
-    },
+    NID_NUMBER_PATTERN: '/^[0-9]{9}$/',
     COUNTRY: 'zmb',
     CURRENCY: {
       isoCode: 'ZMW',

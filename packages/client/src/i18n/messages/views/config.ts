@@ -10,11 +10,17 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
+import { Message } from 'typescript-react-intl'
+import { Description } from '@client/views/SysAdmin/Performance/utils'
 
 interface IConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   applicationSettings: MessageDescriptor
   applicationNameChangeMessage: MessageDescriptor
+  govtLogoChangeMessage: MessageDescriptor
+  govtLogoChangeNotification: MessageDescriptor
+  govtLogoChangeError: MessageDescriptor
+  govtLogoFileLimitError: MessageDescriptor
   applicationConfigChangeError: MessageDescriptor
   certificateConfiguration: MessageDescriptor
   previewTemplate: MessageDescriptor
@@ -44,13 +50,20 @@ interface IConfigMessages
   applicationDeathDelayedFeeChangeNotification: MessageDescriptor
   applicationCurrencyChangeMessage: MessageDescriptor
   phoneNumberLabel: MessageDescriptor
-  uniqueIdentificationNumberLabel: MessageDescriptor
   birthLegallySpecifiedDialogTitle: MessageDescriptor
   birthDelayedDialogTitle: MessageDescriptor
   deathLegallySpecifiedDialogTitle: MessageDescriptor
   onTimeFeeDialogTitle: MessageDescriptor
   lateFeeDialogTitle: MessageDescriptor
   delayedFeeDialogTitle: MessageDescriptor
+  nidPatternTitle: MessageDescriptor
+  nidPatternChangeMessage: MessageDescriptor
+  nidPatternChangeError: MessageDescriptor
+  nidPatternChangeNotification: MessageDescriptor
+  phoneNumberPatternTitle: MessageDescriptor
+  phoneNumberChangeMessage: MessageDescriptor
+  phoneNumberChangeError: MessageDescriptor
+  phoneNumberChangeNotification: MessageDescriptor
   legallySpecifiedLabel: MessageDescriptor
   legallySpecifiedValue: MessageDescriptor
   lateRegistrationLabel: MessageDescriptor
@@ -64,6 +77,11 @@ interface IConfigMessages
   registrationTimePeriodsGroupTitle: MessageDescriptor
   registrationFeesGroupTitle: MessageDescriptor
   eventTargetInputLabel: MessageDescriptor
+  pattern: MessageDescriptor
+  example: MessageDescriptor
+  testNumber: MessageDescriptor
+  validExample: MessageDescriptor
+  invalidExample: MessageDescriptor
 }
 
 const messagesToDefine: IConfigMessages = {
@@ -86,6 +104,27 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.configChangeError',
     defaultMessage: 'Unable to make change. Please try again',
     description: 'Error message for application config change'
+  },
+  govtLogoChangeMessage: {
+    id: 'config.application.govtLogoChangeMessage',
+    defaultMessage:
+      'Upload the Government logo to be used on the login and form decalation. Note certificate logo is uploaded as part of the certificate template.',
+    description: 'Message for government logo change modal'
+  },
+  govtLogoChangeNotification: {
+    id: 'config.application.govtLogoChangeNotification',
+    defaultMessage: 'Government logo updated',
+    description: 'Message for government logo change notification'
+  },
+  govtLogoFileLimitError: {
+    id: 'config.application.govtLogoFileLimitError',
+    defaultMessage: 'Logo image file must be less than 2mb',
+    description: 'Error message for large country logo file'
+  },
+  govtLogoChangeError: {
+    id: 'config.application.govtLogoChangeError',
+    defaultMessage: 'Unable to change logo. Please try again.',
+    description: 'Error message for country logo change'
   },
   certificateConfiguration: {
     id: 'config.certificateConfiguration',
@@ -202,8 +241,8 @@ const messagesToDefine: IConfigMessages = {
   },
   govermentLogoLabel: {
     id: 'config.application.govermentLogoLabel',
-    defaultMessage: 'Goverment logo',
-    description: 'Goverment logo config label'
+    defaultMessage: 'Government logo',
+    description: 'Government logo config label'
   },
   currencyLable: {
     id: 'config.application.currencyLable',
@@ -268,10 +307,21 @@ const messagesToDefine: IConfigMessages = {
     defaultMessage: 'Phone number',
     description: 'Phone number config label'
   },
-  uniqueIdentificationNumberLabel: {
-    id: 'config.application.uniqueIdentificationNumberLabel',
+  nidPatternTitle: {
+    id: 'config.application.nidPatternTitle',
     defaultMessage: 'Unique Identification Number (UIN) e.g. National ID',
-    description: 'Unique Identification Number (UIN) config label'
+    description: 'Unique Identification Number (UIN) config title'
+  },
+  nidPatternChangeMessage: {
+    id: 'config.application.nidPatternChangeMessage',
+    defaultMessage:
+      'Set the regex pattern for your national ID. For guidance please refer to www.regex101.com',
+    description: 'Unique Identification Number (UIN) config message'
+  },
+  nidPatternChangeError: {
+    id: 'config.application.nidPatternChangeError',
+    defaultMessage: 'Invalid regular expression for a National ID Number',
+    description: 'Error message for invalid regular expression for NID number'
   },
   birthLegallySpecifiedDialogTitle: {
     id: 'config.application.birthLegallySpecifiedDialogTitle',
@@ -367,6 +417,58 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.eventTargetInputLabel',
     defaultMessage: 'days',
     description: 'The label for event target label'
+  },
+  pattern: {
+    id: 'config.application.pattern',
+    defaultMessage: 'Pattern',
+    description: 'Label for Pattern'
+  },
+  example: {
+    id: 'config.application.example',
+    defaultMessage: 'Example',
+    description: 'Label for Example'
+  },
+  testNumber: {
+    id: 'config.application.testNumber',
+    defaultMessage: 'Test number',
+    description: 'Label for test number'
+  },
+  validExample: {
+    id: 'config.application.validExample',
+    defaultMessage: 'Valid',
+    description: 'Label for valid example'
+  },
+  invalidExample: {
+    id: 'config.application.invalidExample',
+    defaultMessage: 'Invalid',
+    description: 'Label for Invalid example'
+  },
+  nidPatternChangeNotification: {
+    id: 'config.application.nidPatternChangeNotification',
+    defaultMessage: 'NID Pattern of application updated',
+    description: 'Message for NID Pattern change modal'
+  },
+  phoneNumberPatternTitle: {
+    id: 'config.application.phoneNumberPatternTitle',
+    defaultMessage: 'Phone number regex',
+    description: 'Phone number config title'
+  },
+  phoneNumberChangeMessage: {
+    id: 'config.application.phoneNumberChangeMessage',
+    defaultMessage:
+      'Set the regex pattern for your country phone number. For guidance please refer to www.regex101.com',
+    description: 'phone number config config message'
+  },
+  phoneNumberChangeError: {
+    id: 'config.application.phoneNumberChangeError',
+    defaultMessage: 'Invalid regular expression for a phone number Number',
+    description:
+      'Error message for invalid regular expression for phone number number'
+  },
+  phoneNumberChangeNotification: {
+    id: 'config.application.phoneNumberChangeNotification',
+    defaultMessage: 'Phone Number Pattern Pattern of application updated',
+    description: 'Message for phone number  Pattern change modal'
   }
 }
 

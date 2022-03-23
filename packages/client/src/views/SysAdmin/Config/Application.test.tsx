@@ -11,15 +11,29 @@
  */
 import * as React from 'react'
 import { createStore } from '@client/store'
-import { createTestComponent, flushPromises } from '@client/tests/util'
+import {
+  createTestComponent,
+  flushPromises,
+  getFileFromBase64String,
+  mockConfigResponse
+} from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { ApplicationConfig } from '@client/views/SysAdmin/Config/Application'
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/mutations'
 import * as fetchMock from 'jest-fetch-mock'
 import { waitForElement } from '@client/tests/wait-for-element'
+import { referenceApi } from '@client/utils/referenceApi'
+import { IAttachmentValue } from '@client/forms'
 
 const { store, history } = createStore()
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
+export const validImageB64String =
+  'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
+const file: IAttachmentValue = {
+  name: 'img.png',
+  type: 'image/png',
+  data: `data:image;base64,${validImageB64String}`
+}
 let testComponent: ReactWrapper
 beforeEach(async () => {
   configApplicationMutations.mutateApplicationConfig = jest.fn(
@@ -29,6 +43,8 @@ beforeEach(async () => {
           data: {
             updateApplicationConfig: {
               APPLICATION_NAME: 'OPENCRVS',
+              NID_NUMBER_PATTERN: '/^[0-9]{10}$/',
+              PHONE_NUMBER_PATTERN: '/^[0-9]{8}$/',
               CURRENCY: {
                 isoCode: 'CAD',
                 languagesAndCountry: ['en-CA']
@@ -54,6 +70,7 @@ beforeEach(async () => {
         })
       )
   )
+
   testComponent = await createTestComponent(
     <ApplicationConfig></ApplicationConfig>,
     { store, history }
@@ -141,6 +158,201 @@ describe('application name update test', () => {
     expect(
       testComponent.find('#print-cert-notification').hostNodes().text()
     ).toBe('Name of application updated')
+  })
+})
+
+describe('NID Pattern update test', () => {
+  it('should show the application config change modal of click on change', async () => {
+    testComponent
+      .find('#changeNidPattern')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    expect(
+      testComponent.find('#changeNidPatternModal').hostNodes()
+    ).toHaveLength(1)
+  })
+  it('should disable the button if nidPattern is empty', async () => {
+    testComponent
+      .find('#changeNidPattern')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    testComponent
+      .find('#changeNidPatternInput')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'changeNidPattern', value: '' }
+      })
+    expect(
+      testComponent.find('#apply_change').hostNodes().props().disabled
+    ).toBeTruthy()
+  })
+  it('should disable the button if nidPattern is invalid', async () => {
+    testComponent
+      .find('#changeNidPattern')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    testComponent
+      .find('#changeNidPatternInput')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'changeNidPattern', value: '^as(po$' }
+      })
+    expect(
+      testComponent.find('#apply_change').hostNodes().props().disabled
+    ).toBeTruthy()
+  })
+  it('should close the modal if click on cancel button', async () => {
+    testComponent
+      .find('#changeNidPattern')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    testComponent.find('#modal_cancel').hostNodes().first().simulate('click')
+    expect(
+      testComponent.find('#changeNidPatternModal').hostNodes()
+    ).toHaveLength(0)
+  })
+  it('should change the nid Pattern if click on apply', async () => {
+    testComponent
+      .find('#changeNidPattern')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    testComponent
+      .find('#changeNidPatternInput')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'changeNidPattern', value: '^[0-9]{10}$' }
+      })
+    testComponent.find('#apply_change').hostNodes().simulate('click')
+    await waitForElement(testComponent, '#nidPattern_value_container_value')
+    await flushPromises()
+    testComponent.update()
+    expect(
+      testComponent.find('#nidPattern_value_container_value').hostNodes().text()
+    ).toBe('/^[0-9]{10}$/')
+  })
+  it('should show success notification if appliction name change', async () => {
+    testComponent
+      .find('#changeNidPattern')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    testComponent
+      .find('#changeNidPatternInput')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'changeNidPattern', value: '^[0-9]{10}$' }
+      })
+    testComponent.find('#apply_change').hostNodes().simulate('click')
+    await waitForElement(testComponent, '#changeAppName')
+    testComponent.update()
+    await flushPromises()
+    expect(
+      testComponent.find('#print-cert-notification').hostNodes().text()
+    ).toBe('NID Pattern of application updated')
+  })
+  it('should show valid message on valid example after clicking test example button', async () => {
+    testComponent
+      .find('#changeNidPattern')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    testComponent
+      .find('#changeNidPatternInput')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'changeNidPattern', value: '^[0-9]{10}$' }
+      })
+    await flushPromises()
+    testComponent
+      .find('#changeNidPatternExampleInput')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'changeNidPatternExample', value: '3454345678' }
+      })
+    await flushPromises()
+    testComponent
+      .find('#test-changeNidPattern-example')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    await flushPromises()
+    expect(
+      testComponent
+        .find('#changeNidPattern-example-valid-message')
+        .hostNodes()
+        .text()
+    ).toBe('Valid')
+    expect(
+      testComponent.find('#changeNidPattern-example-valid-icon')
+    ).toHaveLength(1)
+  })
+  it('should show invalid message on invalid example after clicking test example button', async () => {
+    testComponent
+      .find('#changeNidPattern')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    testComponent
+      .find('#changeNidPatternInput')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'changeNidPattern', value: '^[0-9]{8}$' }
+      })
+    await flushPromises()
+    testComponent
+      .find('#changeNidPatternExampleInput')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'changeNidPatternExample', value: '123123123' }
+      })
+    await flushPromises()
+    testComponent
+      .find('#test-changeNidPattern-example')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    await flushPromises()
+
+    expect(
+      testComponent
+        .find('#changeNidPattern-example-invalid-message')
+        .hostNodes()
+        .text()
+    ).toBe('Invalid')
+    expect(
+      testComponent.find('#changeNidPattern-example-invalid-icon')
+    ).toHaveLength(2)
+  })
+})
+
+describe('Phone Number Pattern update test', () => {
+  it('should show the application config change modal of click on change', async () => {
+    testComponent.find('#changePhnNum').hostNodes().first().simulate('click')
+    expect(testComponent.find('#changePhnNumModal').hostNodes()).toHaveLength(1)
+  })
+  it('should change the Phone Number Pattern if click on apply', async () => {
+    testComponent.find('#changePhnNum').hostNodes().first().simulate('click')
+    testComponent
+      .find('#changePhnNumInput')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'changePhnNum', value: '^[0-9]{8}$' }
+      })
+    testComponent.find('#apply_change').hostNodes().simulate('click')
+    await waitForElement(testComponent, '#phoneNumberPattern_value_container')
+    await flushPromises()
+    testComponent.update()
+    expect(
+      testComponent
+        .find('#phoneNumberPattern_value_container_value')
+        .hostNodes()
+        .text()
+    ).toBe('/^[0-9]{8}$/')
   })
 })
 
@@ -565,5 +777,62 @@ describe('application death registration fee test', () => {
     expect(
       testComponent.find('#print-cert-notification').hostNodes().text()
     ).toBe('Death delayed fee updated')
+  })
+})
+
+describe('country logo update test', () => {
+  beforeEach(() => {
+    jest.spyOn(referenceApi, 'loadConfig').mockImplementationOnce(() =>
+      Promise.resolve({
+        ...mockConfigResponse,
+        config: {
+          ...mockConfigResponse.config
+        }
+      })
+    )
+  })
+  it('should show the country logo change modal of click on change', async () => {
+    testComponent.find('#changeGovtLogo').hostNodes().first().simulate('click')
+    expect(testComponent.find('#changeGovtLogoModal').hostNodes()).toHaveLength(
+      1
+    )
+  })
+  it('should disable the button if input file is empty', async () => {
+    testComponent.find('#changeGovtLogo').hostNodes().first().simulate('click')
+    testComponent
+      .find('#upload_document')
+      .hostNodes()
+      .simulate('change', {
+        target: {
+          file: null
+        }
+      })
+    expect(
+      testComponent.find('#apply_change').hostNodes().props().disabled
+    ).toBeTruthy()
+  })
+  it('should close the modal if click on cancel button', async () => {
+    testComponent.find('#changeGovtLogo').hostNodes().first().simulate('click')
+    testComponent.find('#modal_cancel').hostNodes().first().simulate('click')
+    expect(testComponent.find('#changeGovtLogoModal').hostNodes()).toHaveLength(
+      0
+    )
+  })
+  it('No error while uploading valid file', async () => {
+    testComponent.find('#changeGovtLogo').hostNodes().first().simulate('click')
+    testComponent.find('#upload_document').hostNodes().simulate('click')
+    testComponent
+      .find('#image_file_uploader_field')
+      .hostNodes()
+      .simulate('change', {
+        target: {
+          files: [
+            getFileFromBase64String(validImageB64String, 'img.png', 'image/png')
+          ]
+        }
+      })
+    testComponent.update()
+    await flushPromises()
+    expect(testComponent.find('#field-error').hostNodes().length).toBe(0)
   })
 })

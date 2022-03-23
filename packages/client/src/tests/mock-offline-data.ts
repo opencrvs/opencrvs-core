@@ -316,9 +316,6 @@ export const mockOfflineData = {
   templates: JSON.parse(
     readFileSync(join(__dirname, './templates.json')).toString()
   ),
-  assets: {
-    logo: `data:image;base64,${validImageB64String}`
-  },
   config: {
     APPLICATION_NAME: 'Farajaland CRVS',
     BIRTH: {
@@ -352,26 +349,18 @@ export const mockOfflineData = {
     _id: '61a8c105c04ac94fe46ceb27',
     BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
     COUNTRY: 'bgd',
+    COUNTRY_LOGO: {
+      fileName: 'logo.png',
+      file: `data:image;base64,${validImageB64String}`
+    },
     CURRENCY: {
       isoCode: 'ZMW',
       languagesAndCountry: ['en-ZM']
     },
-    COUNTRY_LOGO_FILE: 'logo.png',
-    PHONE_NUMBER_PATTERN: {
-      pattern: /^01[1-9][0-9]{8}$/,
-      example: '01741234567',
-      start: '01',
-      num: '11',
-      mask: {
-        startForm: 5,
-        endBefore: 3
-      }
-    },
-    NID_NUMBER_PATTERN: {
-      pattern: /^[0-9]{9}$/,
-      example: '4837281940',
-      num: '9'
-    },
+    PHONE_NUMBER_PATTERN: /^01[1-9][0-9]{8}$/,
+    BIRTH_REGISTRATION_TARGET: 45,
+    DEATH_REGISTRATION_TARGET: 45,
+    NID_NUMBER_PATTERN: /^[0-9]{9}$/,
     SENTRY: 'https://sentry.com',
     LOGROCKET: 'opencrvs-foundation/opencrvs-zambia'
   }

@@ -77,7 +77,10 @@ export const updateApplicationConfig = Joi.object({
     }
   }),
   COUNTRY: Joi.string(),
-  COUNTRY_LOGO_FILE: Joi.string(),
+  COUNTRY_LOGO: Joi.object().keys({
+    fileName: Joi.string(),
+    file: Joi.string()
+  }),
   COUNTRY_LOGO_RENDER_WIDTH: Joi.number(),
   COUNTRY_LOGO_RENDER_HEIGHT: Joi.number(),
   CURRENCY: Joi.object().keys({
@@ -101,19 +104,8 @@ export const updateApplicationConfig = Joi.object({
   EXTERNAL_VALIDATION_WORKQUEUE: Joi.boolean(),
   SENTRY: Joi.string(),
   LOGROCKET: Joi.string(),
-  PHONE_NUMBER_PATTERN: Joi.object().keys({
-    pattern: Joi.string(),
-    example: Joi.string(),
-    start: Joi.string(),
-    num: Joi.string(),
-    mask: {
-      startForm: Joi.number(),
-      endBefore: Joi.number()
-    }
-  }),
-  NID_NUMBER_PATTERN: Joi.object().keys({
-    pattern: Joi.string(),
-    example: Joi.string(),
-    num: Joi.string()
-  })
+  PHONE_NUMBER_PATTERN: Joi.string(),
+  BIRTH_REGISTRATION_TARGET: Joi.number(),
+  DEATH_REGISTRATION_TARGET: Joi.number(),
+  NID_NUMBER_PATTERN: Joi.string()
 })

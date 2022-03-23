@@ -27,16 +27,11 @@ interface IDeath {
     DELAYED: number
   }
 }
-export interface IPhoneNumberPattern {
-  pattern: RegExp
-  example: string
-  start: string
-  num: string
-  mask: {
-    startForm: number
-    endBefore: number
-  }
+export interface ICountryLogo {
+  fileName: string
+  file: string
 }
+
 interface ICurrency {
   isoCode: string
   languagesAndCountry: string[]
@@ -47,7 +42,7 @@ export interface IApplicationConfig {
   BIRTH: IBirth
   COUNTRY: string
   CURRENCY: ICurrency
-  COUNTRY_LOGO_FILE: string
+  COUNTRY_LOGO: ICountryLogo
   COUNTRY_LOGO_RENDER_WIDTH: number
   COUNTRY_LOGO_RENDER_HEIGHT: number
   DESKTOP_TIME_OUT_MILLISECONDS: number
@@ -62,7 +57,7 @@ export interface IApplicationConfig {
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
   SENTRY: string
   LOGROCKET: string
-  PHONE_NUMBER_PATTERN: IPhoneNumberPattern
+  PHONE_NUMBER_PATTERN: string
 }
 
 export async function getApplicationConfig(): Promise<IApplicationConfig> {

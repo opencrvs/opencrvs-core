@@ -26,33 +26,21 @@ interface IDeath {
     DELAYED: number
   }
 }
-interface IPhoneNumberPattern {
-  pattern: RegExp
-  example: string
-  start: string
-  num: string
-  mask: {
-    startForm: number
-    endBefore: number
-  }
-}
-
-interface INIDNumberPattern {
-  pattern: RegExp
-  example: string
-  num: string
-}
 interface ICurrency {
   isoCode: string
   languagesAndCountry: string[]
 }
 
+interface ICountryLogo {
+  fileName: string
+  file: string
+}
 export interface IApplicationConfigurationModel extends Document {
   APPLICATION_NAME: string
   BACKGROUND_SYNC_BROADCAST_CHANNEL: string
   BIRTH: IBirth
   COUNTRY: string
-  COUNTRY_LOGO_FILE: string
+  COUNTRY_LOGO: ICountryLogo
   COUNTRY_LOGO_RENDER_WIDTH: number
   COUNTRY_LOGO_RENDER_HEIGHT: number
   CURRENCY: ICurrency
@@ -67,8 +55,8 @@ export interface IApplicationConfigurationModel extends Document {
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
   SENTRY: string
   LOGROCKET: string
-  PHONE_NUMBER_PATTERN: IPhoneNumberPattern
-  NID_NUMBER_PATTERN: INIDNumberPattern
+  PHONE_NUMBER_PATTERN: RegExp
+  NID_NUMBER_PATTERN: string
 }
 
 const birthSchema = new Schema<IBirth>({
@@ -89,21 +77,9 @@ const deathSchema = new Schema<IDeath>({
   }
 })
 
-const nidPatternSchema = new Schema<INIDNumberPattern>({
-  pattern: { type: String },
-  example: String,
-  num: String
-})
-
-const phoneNumberSchema = new Schema<IPhoneNumberPattern>({
-  pattern: { type: String },
-  example: String,
-  start: String,
-  num: String,
-  mask: {
-    startForm: Number,
-    endBefore: Number
-  }
+const countryLogoSchema = new Schema<ICountryLogo>({
+  fileName: String,
+  file: String
 })
 
 const currencySchema = new Schema<ICurrency>({
@@ -116,7 +92,7 @@ const systemSchema = new Schema({
   BACKGROUND_SYNC_BROADCAST_CHANNEL: { type: String, required: false },
   BIRTH: { type: birthSchema, required: false },
   COUNTRY: { type: String, required: false },
-  COUNTRY_LOGO_FILE: { type: String, required: false },
+  COUNTRY_LOGO: { type: countryLogoSchema, required: false },
   COUNTRY_LOGO_RENDER_WIDTH: { type: Number, required: false, default: 104 },
   COUNTRY_LOGO_RENDER_HEIGHT: { type: Number, required: false, default: 104 },
   CURRENCY: { type: currencySchema, required: false },
@@ -149,8 +125,8 @@ const systemSchema = new Schema({
     required: false,
     default: false
   },
-  PHONE_NUMBER_PATTERN: { type: phoneNumberSchema, required: false },
-  NID_NUMBER_PATTERN: { type: nidPatternSchema, required: false },
+  PHONE_NUMBER_PATTERN: { type: String, required: false },
+  NID_NUMBER_PATTERN: { type: String, required: false },
   SENTRY: { type: String, required: false },
   LOGROCKET: { type: String, required: false }
 })

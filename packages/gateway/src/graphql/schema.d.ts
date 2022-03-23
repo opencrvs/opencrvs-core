@@ -428,8 +428,8 @@ export interface GQLApplicationConfiguration {
   BACKGROUND_SYNC_BROADCAST_CHANNEL?: string
   BIRTH?: GQLBirth
   COUNTRY?: string
+  COUNTRY_LOGO?: GQLCountryLogo
   CURRENCY?: GQLCurrency
-  COUNTRY_LOGO_FILE?: string
   COUNTRY_LOGO_RENDER_WIDTH?: number
   COUNTRY_LOGO_RENDER_HEIGHT?: number
   DESKTOP_TIME_OUT_MILLISECONDS?: number
@@ -443,8 +443,8 @@ export interface GQLApplicationConfiguration {
   EXTERNAL_VALIDATION_WORKQUEUE?: boolean
   SENTRY?: string
   LOGROCKET?: string
-  PHONE_NUMBER_PATTERN?: GQLPhoneNumberPattern
-  NID_NUMBER_PATTERN?: GQLNIDNumberPattern
+  PHONE_NUMBER_PATTERN?: string
+  NID_NUMBER_PATTERN?: string
 }
 
 export interface GQLApplicationConfigurationInput {
@@ -452,8 +452,8 @@ export interface GQLApplicationConfigurationInput {
   BACKGROUND_SYNC_BROADCAST_CHANNEL?: string
   BIRTH?: GQLBirthInput
   COUNTRY?: string
+  COUNTRY_LOGO?: GQLCountryLogoInput
   CURRENCY?: GQLCurrencyInput
-  COUNTRY_LOGO_FILE?: string
   COUNTRY_LOGO_RENDER_WIDTH?: number
   COUNTRY_LOGO_RENDER_HEIGHT?: number
   DESKTOP_TIME_OUT_MILLISECONDS?: number
@@ -467,8 +467,8 @@ export interface GQLApplicationConfigurationInput {
   EXTERNAL_VALIDATION_WORKQUEUE?: boolean
   SENTRY?: string
   LOGROCKET?: string
-  PHONE_NUMBER_PATTERN?: GQLPhoneNumberPatternInput
-  NID_NUMBER_PATTERN?: GQLNIDNumberPatternInput
+  PHONE_NUMBER_PATTERN?: string
+  NID_NUMBER_PATTERN?: string
 }
 
 export interface GQLQuestionInput {
@@ -920,6 +920,11 @@ export interface GQLBirth {
   FEE?: GQLBirthFee
 }
 
+export interface GQLCountryLogo {
+  fileName?: string
+  file?: string
+}
+
 export interface GQLCurrency {
   isoCode?: string
   languagesAndCountry?: Array<string | null>
@@ -930,24 +935,15 @@ export interface GQLDeath {
   FEE?: GQLDeathFee
 }
 
-export interface GQLPhoneNumberPattern {
-  pattern?: string
-  example?: string
-  start?: string
-  num?: string
-  mask?: GQLMask
-}
-
-export interface GQLNIDNumberPattern {
-  pattern?: string
-  example?: string
-  num?: string
-}
-
 export interface GQLBirthInput {
   REGISTRATION_TARGET?: number
   LATE_REGISTRATION_TARGET?: number
   FEE?: GQLBirthFeeInput
+}
+
+export interface GQLCountryLogoInput {
+  fileName?: string
+  file?: string
 }
 
 export interface GQLCurrencyInput {
@@ -958,20 +954,6 @@ export interface GQLCurrencyInput {
 export interface GQLDeathInput {
   REGISTRATION_TARGET?: number
   FEE?: GQLDeathFeeInput
-}
-
-export interface GQLPhoneNumberPatternInput {
-  pattern?: string
-  example?: string
-  start?: string
-  num?: string
-  mask?: GQLMaskInput
-}
-
-export interface GQLNIDNumberPatternInput {
-  pattern?: string
-  example?: string
-  num?: string
 }
 
 export interface GQLMesssageDescriptorInput {
@@ -1321,11 +1303,6 @@ export interface GQLDeathFee {
   DELAYED?: number
 }
 
-export interface GQLMask {
-  startForm?: number
-  endBefore?: number
-}
-
 export interface GQLBirthFeeInput {
   ON_TIME?: number
   LATE?: number
@@ -1335,11 +1312,6 @@ export interface GQLBirthFeeInput {
 export interface GQLDeathFeeInput {
   ON_TIME?: number
   DELAYED?: number
-}
-
-export interface GQLMaskInput {
-  startForm?: number
-  endBefore?: number
 }
 
 export interface GQLPayment {
@@ -1471,10 +1443,9 @@ export interface GQLResolver {
   EventProgressSet?: GQLEventProgressSetTypeResolver
   MesssageDescriptor?: GQLMesssageDescriptorTypeResolver
   Birth?: GQLBirthTypeResolver
+  CountryLogo?: GQLCountryLogoTypeResolver
   Currency?: GQLCurrencyTypeResolver
   Death?: GQLDeathTypeResolver
-  PhoneNumberPattern?: GQLPhoneNumberPatternTypeResolver
-  NIDNumberPattern?: GQLNIDNumberPatternTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
   ReasonsNotApplying?: GQLReasonsNotApplyingTypeResolver
@@ -1495,7 +1466,6 @@ export interface GQLResolver {
   EventProgressData?: GQLEventProgressDataTypeResolver
   BirthFee?: GQLBirthFeeTypeResolver
   DeathFee?: GQLDeathFeeTypeResolver
-  Mask?: GQLMaskTypeResolver
   Payment?: GQLPaymentTypeResolver
 }
 export interface GQLQueryTypeResolver<TParent = any> {
@@ -3663,8 +3633,8 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   BACKGROUND_SYNC_BROADCAST_CHANNEL?: ApplicationConfigurationToBACKGROUND_SYNC_BROADCAST_CHANNELResolver<TParent>
   BIRTH?: ApplicationConfigurationToBIRTHResolver<TParent>
   COUNTRY?: ApplicationConfigurationToCOUNTRYResolver<TParent>
+  COUNTRY_LOGO?: ApplicationConfigurationToCOUNTRY_LOGOResolver<TParent>
   CURRENCY?: ApplicationConfigurationToCURRENCYResolver<TParent>
-  COUNTRY_LOGO_FILE?: ApplicationConfigurationToCOUNTRY_LOGO_FILEResolver<TParent>
   COUNTRY_LOGO_RENDER_WIDTH?: ApplicationConfigurationToCOUNTRY_LOGO_RENDER_WIDTHResolver<TParent>
   COUNTRY_LOGO_RENDER_HEIGHT?: ApplicationConfigurationToCOUNTRY_LOGO_RENDER_HEIGHTResolver<TParent>
   DESKTOP_TIME_OUT_MILLISECONDS?: ApplicationConfigurationToDESKTOP_TIME_OUT_MILLISECONDSResolver<TParent>
@@ -3710,14 +3680,14 @@ export interface ApplicationConfigurationToCOUNTRYResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface ApplicationConfigurationToCURRENCYResolver<
+export interface ApplicationConfigurationToCOUNTRY_LOGOResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface ApplicationConfigurationToCOUNTRY_LOGO_FILEResolver<
+export interface ApplicationConfigurationToCURRENCYResolver<
   TParent = any,
   TResult = any
 > {
@@ -4883,6 +4853,19 @@ export interface BirthToFEEResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLCountryLogoTypeResolver<TParent = any> {
+  fileName?: CountryLogoToFileNameResolver<TParent>
+  file?: CountryLogoToFileResolver<TParent>
+}
+
+export interface CountryLogoToFileNameResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface CountryLogoToFileResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLCurrencyTypeResolver<TParent = any> {
   isoCode?: CurrencyToIsoCodeResolver<TParent>
   languagesAndCountry?: CurrencyToLanguagesAndCountryResolver<TParent>
@@ -4912,70 +4895,6 @@ export interface DeathToREGISTRATION_TARGETResolver<
 }
 
 export interface DeathToFEEResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLPhoneNumberPatternTypeResolver<TParent = any> {
-  pattern?: PhoneNumberPatternToPatternResolver<TParent>
-  example?: PhoneNumberPatternToExampleResolver<TParent>
-  start?: PhoneNumberPatternToStartResolver<TParent>
-  num?: PhoneNumberPatternToNumResolver<TParent>
-  mask?: PhoneNumberPatternToMaskResolver<TParent>
-}
-
-export interface PhoneNumberPatternToPatternResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface PhoneNumberPatternToExampleResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface PhoneNumberPatternToStartResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface PhoneNumberPatternToNumResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface PhoneNumberPatternToMaskResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLNIDNumberPatternTypeResolver<TParent = any> {
-  pattern?: NIDNumberPatternToPatternResolver<TParent>
-  example?: NIDNumberPatternToExampleResolver<TParent>
-  num?: NIDNumberPatternToNumResolver<TParent>
-}
-
-export interface NIDNumberPatternToPatternResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface NIDNumberPatternToExampleResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface NIDNumberPatternToNumResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -5787,19 +5706,6 @@ export interface DeathFeeToON_TIMEResolver<TParent = any, TResult = any> {
 }
 
 export interface DeathFeeToDELAYEDResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLMaskTypeResolver<TParent = any> {
-  startForm?: MaskToStartFormResolver<TParent>
-  endBefore?: MaskToEndBeforeResolver<TParent>
-}
-
-export interface MaskToStartFormResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface MaskToEndBeforeResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

@@ -31,22 +31,9 @@ export interface IContentResponse {
 export interface IAssetResponse {
   logo: string
 }
-
-export interface IPhoneNumberPattern {
-  pattern: RegExp
-  example: string
-  start: string
-  num: string
-  mask: {
-    startForm: number
-    endBefore: number
-  }
-}
-
-export interface INIDNumberPattern {
-  pattern: RegExp
-  example: string
-  num: string
+export interface ICountryLogo {
+  fileName: string
+  file: string
 }
 
 export interface ICertificateTemplateData {
@@ -78,8 +65,8 @@ export interface IApplicationConfig {
     }
   }
   COUNTRY: string
+  COUNTRY_LOGO: ICountryLogo
   CURRENCY: ICurrency
-  COUNTRY_LOGO_FILE: string
   COUNTRY_LOGO_RENDER_WIDTH: number
   COUNTRY_LOGO_RENDER_HEIGHT: number
   DESKTOP_TIME_OUT_MILLISECONDS: number
@@ -99,8 +86,10 @@ export interface IApplicationConfig {
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
   SENTRY: string
   LOGROCKET: string
-  PHONE_NUMBER_PATTERN: IPhoneNumberPattern
-  NID_NUMBER_PATTERN: INIDNumberPattern
+  PHONE_NUMBER_PATTERN: RegExp
+  BIRTH_REGISTRATION_TARGET: number
+  DEATH_REGISTRATION_TARGET: number
+  NID_NUMBER_PATTERN: RegExp
 }
 
 export interface IApplicationConfigResponse {
@@ -211,21 +200,10 @@ const toDataURL = (url: string) =>
       throw error
     })
 
-async function loadAssets(): Promise<IAssetResponse> {
-  const url = `${window.config.COUNTRY_CONFIG_URL}/assets/${window.config.COUNTRY_LOGO_FILE}`
-
-  return toDataURL(url).then((dataUrl) => {
-    return {
-      logo: `${dataUrl}`
-    }
-  })
-}
-
 export const referenceApi = {
   loadLocations,
   loadFacilities,
   loadPilotLocations,
   loadContent,
-  loadAssets,
   loadConfig
 }

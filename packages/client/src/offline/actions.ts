@@ -75,18 +75,6 @@ export type PilotLocationsFailedAction = {
   payload: Error
 }
 
-export const ASSETS_LOADED = 'OFFLINE/ASSETS_LOADED'
-export type AssetsLoadedAction = {
-  type: typeof ASSETS_LOADED
-  payload: IAssetResponse
-}
-
-export const ASSETS_FAILED = 'OFFLINE/ASSETS_FAILED'
-export type AssetsFailedAction = {
-  type: typeof ASSETS_FAILED
-  payload: Error
-}
-
 export const APPLICATION_CONFIG_LOAD = 'OFFLINE/APPLICATION_CONFIG_LOAD'
 export type ApplicationConfigLoadAction = {
   type: typeof APPLICATION_CONFIG_LOAD
@@ -201,16 +189,6 @@ export const contentFailed = (error: Error): contentFailedAction => ({
   payload: error
 })
 
-export const assetsLoaded = (payload: IAssetResponse): AssetsLoadedAction => ({
-  type: ASSETS_LOADED,
-  payload: payload
-})
-
-export const assetsFailed = (error: Error): AssetsFailedAction => ({
-  type: ASSETS_FAILED,
-  payload: error
-})
-
 export const offlineDataReady = (state: IOfflineData) => ({
   type: READY,
   payload: state
@@ -262,8 +240,6 @@ export type Action =
   | PilotLocationsFailedAction
   | contentFailedAction
   | contentLoadedAction
-  | AssetsLoadedAction
-  | AssetsFailedAction
   | ApplicationConfigLoadAction
   | ApplicationConfigLoadedAction
   | ApplicationConfigFailedAction

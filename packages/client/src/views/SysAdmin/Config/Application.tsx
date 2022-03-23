@@ -42,6 +42,7 @@ const ListGroupTitle = styled.div`
   height: 21px;
   ${({ theme }) => theme.fonts.bodyBoldStyle};
 `
+
 type Props = IntlShapeProps & {
   userDetails: IUserDetails | null
   offlineCountryConfiguration: IOfflineData
@@ -63,6 +64,7 @@ export enum TabId {
 export enum GeneralActionId {
   APPLICATION_NAME = 'changeAppName',
   GOVT_LOGO = 'changeGovtLogo',
+  NID_PATTERN = 'changeNidPattern',
   CURRENCY = 'changeCurrency',
   PHONE_NUMBER = 'changePhnNum'
 }
@@ -111,7 +113,7 @@ function GeneralTabContent({
           label: intl.formatMessage(messages.govermentLogoLabel),
           value: (
             <img
-              src={offlineCountryConfiguration.assets.logo}
+              src={offlineCountryConfiguration.config.COUNTRY_LOGO.file}
               width={
                 offlineCountryConfiguration.config.COUNTRY_LOGO_RENDER_HEIGHT
               }
@@ -123,7 +125,9 @@ function GeneralTabContent({
           action: {
             id: GeneralActionId.GOVT_LOGO,
             label: intl.formatMessage(buttonMessages.change),
-            disabled: true
+            handler: () => {
+              callBack(GeneralActionId.GOVT_LOGO)
+            }
           }
         },
         {
@@ -138,23 +142,29 @@ function GeneralTabContent({
           }
         },
         {
+          id: 'phoneNumberPattern_value_container',
           label: intl.formatMessage(messages.phoneNumberLabel),
           value:
-            offlineCountryConfiguration.config.PHONE_NUMBER_PATTERN.pattern.toString(),
+            offlineCountryConfiguration.config.PHONE_NUMBER_PATTERN.toString(),
           action: {
             id: GeneralActionId.PHONE_NUMBER,
             label: intl.formatMessage(buttonMessages.change),
-            disabled: true
+            handler: () => {
+              callBack(GeneralActionId.PHONE_NUMBER)
+            }
           }
         },
         {
-          label: intl.formatMessage(messages.uniqueIdentificationNumberLabel),
+          id: 'nidPattern_value_container',
+          label: intl.formatMessage(messages.nidPatternTitle),
           value:
-            offlineCountryConfiguration.config.NID_NUMBER_PATTERN.pattern.toString(),
+            offlineCountryConfiguration.config.NID_NUMBER_PATTERN.toString(),
           action: {
-            id: 'btnChangeUIN',
+            id: GeneralActionId.NID_PATTERN,
             label: intl.formatMessage(buttonMessages.change),
-            disabled: true
+            handler: () => {
+              callBack(GeneralActionId.NID_PATTERN)
+            }
           }
         }
       ]}

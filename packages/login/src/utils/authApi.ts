@@ -33,23 +33,6 @@ interface IDeath {
     DELAYED: number
   }
 }
-export interface IPhoneNumberPattern {
-  pattern: RegExp
-  example: string
-  start: string
-  num: string
-  mask: {
-    startForm: number
-    endBefore: number
-  }
-}
-
-interface INIDNumberPattern {
-  pattern: RegExp
-  example: string
-  num: string
-}
-
 export interface ICertificateTemplateData {
   event: string
   status: string
@@ -60,6 +43,12 @@ export interface ICertificateTemplateData {
   user: string
   _id: string
 }
+
+export interface ICountryLogo {
+  fileName: string
+  file: string
+}
+
 interface ICurrency {
   isoCode: string
   languagesAndCountry: string[]
@@ -69,8 +58,8 @@ export interface IApplicationConfig {
   BACKGROUND_SYNC_BROADCAST_CHANNEL: string
   BIRTH: IBirth
   COUNTRY: string
+  COUNTRY_LOGO: ICountryLogo
   CURRENCY: ICurrency
-  COUNTRY_LOGO_FILE: string
   COUNTRY_LOGO_RENDER_WIDTH: number
   COUNTRY_LOGO_RENDER_HEIGHT: number
   DESKTOP_TIME_OUT_MILLISECONDS: number
@@ -84,8 +73,8 @@ export interface IApplicationConfig {
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
   SENTRY: string
   LOGROCKET: string
-  PHONE_NUMBER_PATTERN: IPhoneNumberPattern
-  NID_NUMBER_PATTERN: INIDNumberPattern
+  PHONE_NUMBER_PATTERN: string
+  NID_NUMBER_PATTERN: string
 }
 
 export interface IApplicationConfigResponse {
