@@ -31,7 +31,8 @@ import {
   goToConfig,
   goToSettings,
   goToPerformanceView,
-  goToTeamView
+  goToTeamView,
+  goToFormConfig
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { COUNT_USER_WISE_DECLARATIONS } from '@client/search/queries'
@@ -71,7 +72,8 @@ const TAB_ID = {
   config: 'config',
   certificates: 'certificates',
   settings: 'settings',
-  logout: 'logout'
+  logout: 'logout',
+  declarationForms: 'declarationForms'
 }
 
 const GROUP_ID = {
@@ -160,6 +162,7 @@ interface IDispatchProps {
   goToFieldAgentHomeTab: typeof goToFieldAgentHomeTabAction
   goToRegistrarHomeTab: typeof goToRegistrarHomeTab
   goToConfigAction: typeof goToConfig
+  goToFormConfigAction: typeof goToFormConfig
   redirectToAuthentication: typeof redirectToAuthentication
   goToPerformanceViewAction: typeof goToPerformanceView
   goToTeamViewAction: typeof goToTeamView
@@ -195,6 +198,7 @@ const TAB_LABEL = {
   configuration: 'Configuration',
   certificatesConfiguration: 'Certificates',
   declarationSettings: 'Declaration Settings',
+  declarationForms: 'Declaration forms',
   settings: 'Settings',
   logout: 'Logout'
 }
@@ -240,6 +244,7 @@ export const NavigationView = (props: IFullProps) => {
     enableMenuSelection = true,
     activeMenuItem,
     goToConfigAction,
+    goToFormConfigAction,
     navigationWidth,
     workqueue,
     storedDeclarations,
@@ -264,6 +269,11 @@ export const NavigationView = (props: IFullProps) => {
   )
 
   const fieldAgentLocationId = userDetails && getUserLocation(userDetails).id
+  const configTab = [
+    TAB_ID.certificates,
+    TAB_ID.declaration,
+    TAB_ID.declarationForms
+  ]
 
   const declarationCount = {
     inProgress: !initialSyncDone
@@ -512,11 +522,11 @@ export const NavigationView = (props: IFullProps) => {
                         onClick={() => setIsConfigExpanded(!isConfigExpanded)}
                         isSelected={
                           enableMenuSelection &&
-                          activeMenuItem === TAB_ID.config
+                          configTab.includes(activeMenuItem)
                         }
                         expandableIcon={() =>
                           isConfigExpanded ||
-                          activeMenuItem === TAB_ID.config ? (
+                          configTab.includes(activeMenuItem) ? (
                             <Expandable selected={true} />
                           ) : (
                             <Expandable />
@@ -524,7 +534,7 @@ export const NavigationView = (props: IFullProps) => {
                         }
                       />
                       {(isConfigExpanded ||
-                        activeMenuItem === TAB_ID.config) && (
+                        configTab.includes(activeMenuItem)) && (
                         <>
                           <NavigationSubItem
                             label={TAB_LABEL.certificatesConfiguration}
@@ -532,7 +542,7 @@ export const NavigationView = (props: IFullProps) => {
                             onClick={goToConfigAction}
                             isSelected={
                               enableMenuSelection &&
-                              activeMenuItem === TAB_ID.config
+                              activeMenuItem === TAB_ID.certificates
                             }
                           />
                           <NavigationSubItem
@@ -542,6 +552,15 @@ export const NavigationView = (props: IFullProps) => {
                             isSelected={
                               enableMenuSelection &&
                               activeMenuItem === TAB_ID.declaration
+                            }
+                          />
+                          <NavigationSubItem
+                            id={`navigation_${TAB_ID.declarationForms}`}
+                            label={TAB_LABEL.declarationForms}
+                            onClick={goToFormConfigAction}
+                            isSelected={
+                              enableMenuSelection &&
+                              activeMenuItem === TAB_ID.declarationForms
                             }
                           />
                         </>
@@ -583,12 +602,12 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
       ? TAB_ID.performance
       : window.location.href.includes('team')
       ? TAB_ID.team
-      : window.location.href.includes('config')
-      ? TAB_ID.config
       : window.location.href.includes('settings')
       ? TAB_ID.settings
       : window.location.href.includes('certificate')
       ? TAB_ID.certificates
+      : window.location.href.includes('form')
+      ? TAB_ID.declarationForms
       : ''
   }
 }
@@ -602,6 +621,7 @@ export const Navigation = connect<
   goToFieldAgentHomeTab: goToFieldAgentHomeTabAction,
   goToRegistrarHomeTab,
   goToConfigAction: goToConfig,
+  goToFormConfigAction: goToFormConfig,
   goToPerformanceViewAction: goToPerformanceView,
   goToTeamViewAction: goToTeamView,
   redirectToAuthentication,
