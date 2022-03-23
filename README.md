@@ -377,7 +377,7 @@ So you have contributed to core and want to make a new release as an OpenCRVS co
 
 3. Run `yarn test` and ensure all passed.
 
-4. Run `git tag v<version_number>` e.g. `git tag v1.0.0-alpha.3.1`
+4. Run `git tag v<version_number>` e.g. `git tag v1.0.0-alpha.3.2`
 
 5. Run `git push origin v<version_number>`
 
