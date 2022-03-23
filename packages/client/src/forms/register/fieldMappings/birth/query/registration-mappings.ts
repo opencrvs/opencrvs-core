@@ -29,6 +29,7 @@ import { IUserDetails } from '@client/utils/userUtils'
 import { getUserName } from '@client/pdfRenderer/transformer/userTransformer'
 import { userMessages } from '@client/i18n/messages'
 import { MessageDescriptor } from 'react-intl'
+import { REGISTRATION_SECTION } from '@client/forms/mappings/query'
 
 export function transformStatusData(
   transformedData: IFormData,
@@ -267,19 +268,24 @@ export const roleUserTransformer = (
 
 export const registrationLocationUserTransformer = (
   transformedData: IFormData,
-  _: any,
+  queryData: any,
   sectionId: string,
   targetSectionId?: string,
-  targetFieldName?: string,
-  __?: IOfflineData,
-  userDetails?: IUserDetails
+  targetFieldName?: string
 ) => {
-  if (!userDetails?.primaryOffice) {
-    return
-  }
+  const statusData = queryData[REGISTRATION_SECTION].status as GQLRegWorkflow[]
+  const registrationStatus =
+    statusData &&
+    statusData.find((status) => {
+      return status.type && (status.type as GQLRegStatus) === 'REGISTERED'
+    })
+  const officeName = registrationStatus?.office?.name || ''
+  const officeAddressLevel3 =
+    registrationStatus?.office?.address?.district || ''
+  const officeAddressLevel4 = registrationStatus?.office?.address?.state || ''
   transformedData[targetSectionId || sectionId][
     targetFieldName || 'registrationOffice'
-  ] = userDetails.primaryOffice.name as string
+  ] = [officeName, officeAddressLevel3, officeAddressLevel4].join(', ')
 }
 
 export const registrarSignatureUserTransformer = (
