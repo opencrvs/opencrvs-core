@@ -274,10 +274,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
     const oldIsWritingDraft = prevProps.isWritingDraft
     const newIsWritingDraft = this.props.isWritingDraft
-    if (
-      oldIsWritingDraft !== newIsWritingDraft &&
-      newIsWritingDraft === false
-    ) {
+    if (oldIsWritingDraft && !newIsWritingDraft) {
       const sectionValues =
         this.props.declaration.data[this.props.activeSection.id] || {}
       this.props.activeSectionGroup.fields.forEach((field) => {
