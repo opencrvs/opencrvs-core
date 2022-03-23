@@ -172,14 +172,14 @@ const BackButton = styled(CircleButton)`
 
 const KeyContainer = styled.div`
   width: 190px;
-  color: ${({ theme }) => theme.colors.grey300};
+  color: ${({ theme }) => theme.colors.grey600};
   ${({ theme }) => theme.fonts.bold16}
 `
 
 const ValueContainer = styled.div<{ value: undefined | string }>`
   width: 325px;
   color: ${({ theme, value }) =>
-    value ? theme.colors.grey300 : theme.colors.grey600};
+    value ? theme.colors.grey600 : theme.colors.grey400};
   ${({ theme }) => theme.fonts.reg16};
 `
 
