@@ -49,6 +49,7 @@ import { Spinner } from '@opencrvs/components/lib/interface'
 import styled, { ITheme, withTheme } from '@client/styledComponents'
 import { Query } from '@client/components/Query'
 import { RouteComponentProps, withRouter } from 'react-router'
+import { isDeclarationInReadyToReviewStatus } from '@client/utils/commonUtils'
 
 const StyledSpinner = styled(Spinner)`
   margin: 20% auto;
@@ -571,8 +572,7 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
       (state.declarationsState.declarations &&
         state.declarationsState.declarations.filter(
           (declaration: IDeclaration) =>
-            declaration.submissionStatus !==
-            SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+            isDeclarationInReadyToReviewStatus(declaration.submissionStatus)
         )) ||
       []
     ).reverse(),
