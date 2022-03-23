@@ -41,7 +41,7 @@ const CheckBoxLabel = styled.label<{ selected?: boolean }>`
     margin-left: 4px;
     margin-right: 22px;
     background: ${({ theme }) => theme.colors.white};
-    transition: 0.2s;
+    transition: margin-left 0.2s;
   }
 `
 const CheckBox = styled.input`
@@ -52,14 +52,8 @@ const CheckBox = styled.input`
   &:checked + ${CheckBoxLabel} {
     background: ${({ theme }) => theme.colors.green};
     &::after {
-      content: '';
-      display: block;
-      border-radius: 100%;
-      width: 18px;
-      height: 18px;
       margin-left: 22px;
       margin-right: 4px;
-      transition: 0.2s;
     }
   }
 `
