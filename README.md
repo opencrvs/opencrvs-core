@@ -110,23 +110,31 @@ Use one of the following authentication details for your user of choice. To lear
 
 ### **Field Agent**
 
-Username: **kalusha.bwalya** / Password: **test** / SMS code: **000000**
+Username: **kalusha.bwalya** / Password: **test** / SMS code: **000000** / Office: Ibombo District, Central Province
+
+Username: **patrick.gondwe** / Password: **test** / SMS code: **000000** / Office: Ilanga District, Sulaka Province
 
 ### **Registration Agent**
 
-Username: **felix.katongo** / Password: **test** / SMS code: **000000**
+Username: **felix.katongo** / Password: **test** / SMS code: **000000** / Office: Ibombo District, Central Province
+
+Username: **joshua.mutale** / Password: **test** / SMS code: **000000** / Office: Ilanga District, Sulaka Province
 
 ### Registrar
 
-Username: **kennedy.mweene** / Password: **test** / SMS code: **000000**
+Username: **kennedy.mweene** / Password: **test** / SMS code: **000000** / Office: Ibombo District, Central Province
+
+Username: **derrick.bulaya** / Password: **test** / SMS code: **000000** / Office: Ilanga District, Sulaka Province
 
 ### Local System Admin
 
-Username: **emmanuel.mayuka** / Password: **test** / SMS code: **000000**
+Username: **emmanuel.mayuka** / Password: **test** / SMS code: **000000** / Office: Ibombo District, Central Province
+
+Username: **alex.ngonga** / Password: **test** / SMS code: **000000** / Office: Ilanga District, Sulaka Province
 
 ### National System Admin
 
-Username: **jonathan.campbell** / Password: **test** / SMS code: **000000**
+Username: **jonathan.campbell** / Password: **test** / SMS code: **000000** / Office: Ibombo District, Central Province
 
 ## Starting and stopping OpenCRVS
 
