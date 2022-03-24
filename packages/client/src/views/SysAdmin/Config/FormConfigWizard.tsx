@@ -28,27 +28,36 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import { goBack } from 'connected-react-router'
 import styled from '@client/styledComponents'
-import { PageNavigation } from '@client/components/config/PageNavigation'
+import {
+  PageNavigation,
+  TAB_BIRTH
+} from '@client/components/config/PageNavigation'
 import { FormTools } from '@client/components/config/FormTools'
 import { FormConfigCanvas } from '@client/components/config/FormConfigCanvas'
+import { IForm } from '@client/forms'
+import { getRegisterForm } from '@client/forms/register/declaration-selectors'
+import { goToPageNavigation } from '@client/navigation'
 
-enum Event {
+export enum EventType {
   BIRTH = 'birth',
-  DEATH = 'death',
-  NONE = ''
+  DEATH = 'death'
 }
 
 type RouteProps = RouteComponentProps<{
   event: string
+  section: string
 }>
 
 interface IStateProps {
   scope: Scope | null
-  event: Event
+  registerForm: { [key: string]: IForm }
+  event?: EventType
+  section?: string
 }
 
 interface IDispatchProps {
   goBack: typeof goBack
+  goToPageNavigation: typeof goToPageNavigation
 }
 
 const WizardContainer = styled.div`
@@ -77,9 +86,14 @@ const topBarActions: ITopBarAction[] = [
 ]
 
 function FormConfigWizardComp(props: IFullProps) {
-  if (!props.scope?.includes('natlsysadmin') || props.event === Event.NONE) {
+  if (
+    !props.scope?.includes('natlsysadmin') ||
+    !props.event ||
+    !props.section
+  ) {
     return <Redirect to={HOME} />
   }
+
   return (
     <>
       <EventTopBar
@@ -89,8 +103,14 @@ function FormConfigWizardComp(props: IFullProps) {
         goHome={() => props.goBack()}
       />
       <WizardContainer>
-        <PageNavigation />
-        <FormConfigCanvas />
+        <PageNavigation
+          registerForm={props.registerForm}
+          event={props.event}
+          intl={props.intl}
+          section={props.section}
+          goToPageNavigation={props.goToPageNavigation}
+        />
+        <FormConfigCanvas>Form Config Wizard</FormConfigCanvas>
         <FormTools />
       </WizardContainer>
     </>
@@ -98,15 +118,17 @@ function FormConfigWizardComp(props: IFullProps) {
 }
 
 function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
-  const { event } = props.match.params
+  const { event, section } = props.match.params
   return {
     scope: getScope(state),
+    registerForm: getRegisterForm(state),
     event:
       event === 'birth'
-        ? Event.BIRTH
+        ? EventType.BIRTH
         : event === 'death'
-        ? Event.DEATH
-        : Event.NONE
+        ? EventType.DEATH
+        : undefined,
+    section: (section as keyof typeof TAB_BIRTH) || 'introduction'
   }
 }
 
@@ -115,4 +137,6 @@ export const FormConfigWizard = connect<
   IDispatchProps,
   RouteProps,
   IStoreState
->(mapStateToProps, { goBack })(injectIntl(FormConfigWizardComp))
+>(mapStateToProps, { goBack, goToPageNavigation })(
+  injectIntl(FormConfigWizardComp)
+)

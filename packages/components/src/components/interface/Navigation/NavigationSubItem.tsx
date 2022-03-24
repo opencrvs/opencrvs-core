@@ -17,6 +17,7 @@ export interface INavigationSubItemProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   label: string
   isSelected?: boolean
+  leftPadding?: number
 }
 
 export const SubItemContainer = styled.button<{ isSelected?: boolean }>`
@@ -26,7 +27,6 @@ export const SubItemContainer = styled.button<{ isSelected?: boolean }>`
     background-color: ${({ theme }) => theme.colors.grey200};
   }
   outline: none;
-
   cursor: pointer;
   width: 100%;
   height: 36px;
@@ -36,18 +36,20 @@ export const SubItemContainer = styled.button<{ isSelected?: boolean }>`
   ${({ theme }) => theme.fonts.chartLegendStyle};
 `
 
-const LabelContainer = styled.div`
+const LabelContainer = styled.div<{ leftPadding?: number }>`
   padding: 7px 38px 9px 42px;
+  ${({ leftPadding }) => leftPadding && `padding-left: ${leftPadding}px;`}
 `
 
 export const NavigationSubItem = ({
   label,
   isSelected,
+  leftPadding,
   ...otherProps
 }: INavigationSubItemProps) => {
   return (
     <SubItemContainer isSelected={isSelected} {...otherProps}>
-      <LabelContainer>{label}</LabelContainer>
+      <LabelContainer leftPadding={leftPadding}>{label}</LabelContainer>
     </SubItemContainer>
   )
 }

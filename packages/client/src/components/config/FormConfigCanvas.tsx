@@ -23,6 +23,10 @@ const Container = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
 `
 
-export const FormConfigCanvas = () => {
-  return <Container>FormConfigCanvas</Container>
+interface IFormConfigCanvas {
+  children?: React.ReactNode
+}
+
+export const FormConfigCanvas = (props: IFormConfigCanvas) => {
+  return <Container>{props.children && props.children}</Container>
 }

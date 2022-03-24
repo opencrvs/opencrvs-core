@@ -91,4 +91,4 @@ export const REVIEW_USER_DETAILS = '/user/:userId/:sectionId/'
 
 export const USER_PROFILE = '/userProfile/:userId'
 
-export const FORM_CONFIG_WIZARD = '/form-config-wizard/:event'
+export const FORM_CONFIG_WIZARD = '/form-config-wizard/:event/:section'

@@ -52,7 +52,8 @@ import {
   VERIFY_CORRECTOR,
   CONFIG,
   DECLARATION_RECORD_AUDIT,
-  CHANGE_PHONE
+  CHANGE_PHONE,
+  FORM_CONFIG_WIZARD
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
 import { NATL_ADMIN_ROLES } from '@client/utils/constants'
@@ -71,6 +72,7 @@ import { stringify } from 'query-string'
 import { Cmd, loop } from 'redux-loop'
 import { IRecordAuditTabs } from '@client/views/Home/RecordAudit'
 import subYears from 'date-fns/subYears'
+import { eventNames } from 'process'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -113,6 +115,7 @@ type GoToFieldAgentHome = {
     tabId: string
   }
 }
+
 export const GO_TO_REVIEW_USER_DETAILS = 'navigation/GO_TO_REVIEW_USER_DETAILS'
 type GoToReviewUserDetails = {
   type: typeof GO_TO_REVIEW_USER_DETAILS
@@ -406,6 +409,16 @@ export function goToFieldAgentHomeTab(tabId: string) {
     type: GO_TO_FIELD_AGENT_HOME,
     payload: { tabId }
   }
+}
+
+export function goToPageNavigation(event: string, section: string) {
+  console.log('kire vai')
+  return push(
+    formatUrl(FORM_CONFIG_WIZARD, {
+      event: event,
+      section: section
+    })
+  )
 }
 
 export function goToSysAdminHomeTab(tabId: string) {
