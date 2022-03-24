@@ -49,7 +49,7 @@ import { Spinner } from '@opencrvs/components/lib/interface'
 import styled, { ITheme, withTheme } from '@client/styledComponents'
 import { Query } from '@client/components/Query'
 import { RouteComponentProps, withRouter } from 'react-router'
-import { isDeclarationInReadyToReviewStatus } from '@client/utils/commonUtils'
+import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 
 const StyledSpinner = styled(Spinner)`
   margin: 20% auto;

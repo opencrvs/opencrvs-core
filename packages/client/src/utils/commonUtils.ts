@@ -1,6 +1,3 @@
-import { SUBMISSION_STATUS } from '@client/declarations'
-import { includes } from 'lodash'
-
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -12,6 +9,7 @@ import { includes } from 'lodash'
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+
 export function isMobileDevice() {
   const IS_MOBILE = true
   const IS_DESKTOP = false
@@ -33,13 +31,4 @@ export function isMobileDevice() {
   }
 
   return IS_DESKTOP
-}
-
-export function isDeclarationInReadyToReviewStatus(
-  submissionStatus: string | undefined
-) {
-  return !includes(
-    [SUBMISSION_STATUS.DRAFT, SUBMISSION_STATUS.REJECTED, undefined],
-    submissionStatus
-  )
 }

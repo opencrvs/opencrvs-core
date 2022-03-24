@@ -87,7 +87,7 @@ import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
 import { Navigation } from '@client/components/interface/Navigation'
 import subYears from 'date-fns/subYears'
-import { isDeclarationInReadyToReviewStatus } from '@client/utils/commonUtils'
+import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 
 const FABContainer = styled.div`
   position: fixed;
