@@ -15,6 +15,7 @@ interface IConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   declarationSettings: MessageDescriptor
   certificateConfiguration: MessageDescriptor
+  declarationForms: MessageDescriptor
   previewTemplate: MessageDescriptor
   printTemplate: MessageDescriptor
   downloadTemplate: MessageDescriptor
@@ -28,6 +29,16 @@ interface IConfigMessages
   deathDefaultTempDesc: MessageDescriptor
   deathUpdatedTempDesc: MessageDescriptor
   listDetailsQsn: MessageDescriptor
+  formConfigPageTitle: MessageDescriptor
+  birthFormConfigLabel: MessageDescriptor
+  deathFormConfigLabel: MessageDescriptor
+  formConfigPublishedTabLabel: MessageDescriptor
+  formConfigDraftsTabLabel: MessageDescriptor
+  formConfigPageSubTitle: MessageDescriptor
+  formConfigDefaultConfig: MessageDescriptor
+  formConfigureButtonLabel: MessageDescriptor
+  previewFormConfiguration: MessageDescriptor
+  finalizeFormConfiguration: MessageDescriptor
 }
 
 const messagesToDefine: IConfigMessages = {
@@ -40,6 +51,61 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.certificateConfiguration',
     defaultMessage: 'Certificate configuration',
     description: 'Link Text for Config Declaration Settings'
+  },
+  declarationForms: {
+    id: 'config.declarationForms',
+    defaultMessage: 'Declaration forms',
+    description: 'Link Text for Config Declaration Forms'
+  },
+  formConfigPageTitle: {
+    id: 'config.formConfigPageTitle',
+    defaultMessage: 'Declaration Forms',
+    description: 'Title for Form Configuration Page'
+  },
+  birthFormConfigLabel: {
+    id: 'config.birthFormConfigLabel',
+    defaultMessage: 'Birth',
+    description: 'Label for birth form config template'
+  },
+  deathFormConfigLabel: {
+    id: 'config.deathFormConfigLabel',
+    defaultMessage: 'Death',
+    description: 'Label for death form config template'
+  },
+  formConfigPublishedTabLabel: {
+    id: 'config.formConfigPublishedTabLabel',
+    defaultMessage: 'Published',
+    description: 'Label for published tab of form config page'
+  },
+  formConfigDraftsTabLabel: {
+    id: 'config.formConfigDraftsTabLabel',
+    defaultMessage: 'Drafts',
+    description: 'Label for drafts tab of form config page'
+  },
+  formConfigPageSubTitle: {
+    id: 'config.formConfigPageSubtitle',
+    defaultMessage: 'This is some supporting copy',
+    description: 'Sub title of form configuration page'
+  },
+  formConfigDefaultConfig: {
+    id: 'config.formConfigDefaultConfig',
+    defaultMessage: 'Default configuration',
+    description: 'Label for default form config template'
+  },
+  formConfigureButtonLabel: {
+    id: 'config.formConfigureButtonLabel',
+    defaultMessage: 'Configure',
+    description: 'Label of configure button of form config page'
+  },
+  previewFormConfiguration: {
+    id: 'config.previewFormConfiguration',
+    defaultMessage: 'Preview',
+    description: 'Label of preview button of form config page menu'
+  },
+  finalizeFormConfiguration: {
+    id: 'config.finalizeFormConfiguration',
+    defaultMessage: 'Finalize',
+    description: 'Label of finalise button of form config page menu'
   },
   previewTemplate: {
     id: 'config.previewTemplate',
