@@ -34,7 +34,7 @@ function isMessageDescriptor(
   )
 }
 
-function formatAllNonStringValues(
+export function formatAllNonStringValues(
   templateData: Record<string, string | MessageDescriptor | Array<string>>,
   intl: IntlShape
 ): Record<string, string> {

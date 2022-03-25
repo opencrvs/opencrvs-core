@@ -655,8 +655,6 @@ export const sectionTransformer =
       transformedData[transformedSectionId][targetNameKey] =
         localTransformedData[sectionId][field.name]
     }
-
-    console.log(transformedData, localTransformedData)
   }
 
 export const dateFormatTransformer =

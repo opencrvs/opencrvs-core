@@ -55,8 +55,11 @@ import { certificateTemplateMutations } from '@client/certificate/mutations'
 import { GET_USER } from '@client/user/queries'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
-import { Event, IAttachmentValue, IFormFieldValue } from '@client/forms'
+import { Event, IAttachmentValue, IFormFieldValue, IForm } from '@client/forms'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
+import { getDummyCertificateTemplateData } from '@client/views/SysAdmin/Config/previewDummyData'
+import * as Handlebars from 'handlebars'
+import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 
 const HiddenInput = styled.input`
   display: none;
@@ -110,6 +113,10 @@ type Props = WrappedComponentProps &
     scope: Scope | null
     offlineResources: IOfflineData
     offlineCountryConfiguration: IOfflineData
+    registerForm: {
+      birth: IForm
+      death: IForm
+    }
   }
 
 interface State {
@@ -210,6 +217,16 @@ class ConfigHomeComponent extends React.Component<Props, State> {
       {
         label: intl.formatMessage(messages.previewTemplate),
         handler: async () => {
+          const dummyTemplateData = getDummyCertificateTemplateData(
+            event,
+            this.props.registerForm,
+            this.props.offlineResources,
+            this.props.userDetails as IUserDetails,
+            this.props.intl
+          )
+
+          const template = Handlebars.compile(svgCode)
+          svgCode = template(dummyTemplateData)
           svgCode = await updatePreviewSvgWithSampleSignature(svgCode)
           const linkSource = `data:${SVGFile.type};base64,${window.btoa(
             svgCode
@@ -593,6 +610,7 @@ class ConfigHomeComponent extends React.Component<Props, State> {
 function mapStateToProps(state: IStoreState) {
   return {
     offlineResources: getOfflineData(state),
+    registerForm: getRegisterForm(state),
     userDetails: getUserDetails(state),
     scope: getScope(state),
     offlineCountryConfiguration: getOfflineData(state)
