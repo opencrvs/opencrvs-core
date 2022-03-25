@@ -1350,6 +1350,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    fieldName: 'placeOfBirth',
+                    operation: 'eventLocationAddressOfflineTransformer',
+                    parameters: ['country']
+                  },
                   mutation: {
                     operation: 'birthEventLocationMutationTransformer',
                     parameters: []
@@ -1398,6 +1403,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    fieldName: 'placeOfBirth',
+                    operation: 'eventLocationAddressOfflineTransformer',
+                    parameters: ['state']
+                  },
                   mutation: {
                     operation: 'birthEventLocationMutationTransformer',
                     parameters: []
@@ -1463,6 +1473,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    fieldName: 'placeOfBirth',
+                    operation: 'eventLocationAddressOfflineTransformer',
+                    parameters: ['district']
+                  },
                   mutation: {
                     operation: 'birthEventLocationMutationTransformer',
                     parameters: []

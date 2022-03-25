@@ -28,6 +28,9 @@ import { EMPTY_STRING } from '@client/utils/constants'
 import { cloneDeep, get } from 'lodash'
 import format from '@client/utils/date-formatting'
 import { IOfflineData, OFFLINE_FACILITIES_KEY } from '@client/offline/reducer'
+import { mergeArraysRemovingEmptyStrings } from '@client/utils/data-formatting'
+import { countries } from '@client/forms/countries'
+import { MessageDescriptor } from 'react-intl'
 
 interface IName {
   [key: string]: any
@@ -453,6 +456,9 @@ export const eventLocationNameQueryOfflineTransformer =
     _?: IFormField,
     offlineData?: IOfflineData
   ) => {
+    if (queryData.eventLocation.type !== 'HEALTH_FACILITY') {
+      return
+    }
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
     }
@@ -632,8 +638,25 @@ export const sectionTransformer =
       transformedData[transformedSectionId] = {}
     }
     const targetNameKey = targetFieldName || field.name
-    transformedData[transformedSectionId][targetNameKey] =
-      localTransformedData[sectionId][field.name]
+    if (!localTransformedData[sectionId]) {
+      return
+    }
+
+    if (
+      Array.isArray(transformedData[transformedSectionId][targetNameKey]) &&
+      Array.isArray(localTransformedData[sectionId][field.name])
+    ) {
+      transformedData[transformedSectionId][targetNameKey] =
+        mergeArraysRemovingEmptyStrings(
+          transformedData[transformedSectionId][targetNameKey],
+          localTransformedData[sectionId][field.name] as string[]
+        )
+    } else {
+      transformedData[transformedSectionId][targetNameKey] =
+        localTransformedData[sectionId][field.name]
+    }
+
+    console.log(transformedData, localTransformedData)
   }
 
 export const dateFormatTransformer =
@@ -656,4 +679,47 @@ export const dateFormatTransformer =
       transformedData[sectionId][field.name] = format(date, dateFormat)
       window.__localeId__ = prevLocale
     }
+  }
+
+enum AddressType {
+  district,
+  state,
+  country
+}
+
+export const eventLocationAddressOfflineTransformer =
+  (addressType: keyof typeof AddressType, transformedFieldName?: string) =>
+  (
+    transformedData: IFormData,
+    queryData: any,
+    sectionId: string,
+    field: IFormField,
+    _?: IFormField,
+    offlineData?: IOfflineData
+  ) => {
+    if (
+      queryData.eventLocation?.type &&
+      queryData.eventLocation.type !== 'PRIVATE_HOME' &&
+      queryData.eventLocation.type !== 'OTHER'
+    ) {
+      return
+    }
+
+    const addressFromQuery = queryData.eventLocation.address
+
+    if (!transformedData[sectionId]) {
+      transformedData[sectionId] = {}
+    }
+    const nameKey = transformedFieldName || field.name
+    if (!transformedData[sectionId][nameKey]) {
+      transformedData[sectionId][nameKey] = Array(3).fill('')
+    }
+    ;(transformedData[sectionId][nameKey] as Array<string | MessageDescriptor>)[
+      AddressType[addressType]
+    ] =
+      addressType === 'country'
+        ? countries.find(
+            ({ value }) => value === addressFromQuery?.[addressType]
+          )?.label || ''
+        : offlineData?.locations?.[addressFromQuery?.[addressType]]?.name || ''
   }

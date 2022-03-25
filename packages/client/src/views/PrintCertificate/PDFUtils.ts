@@ -34,8 +34,8 @@ function isMessageDescriptor(
   )
 }
 
-function formatAllMessageDescriptors(
-  templateData: Record<string, string | MessageDescriptor>,
+function formatAllNonStringValues(
+  templateData: Record<string, string | MessageDescriptor | Array<string>>,
   intl: IntlShape
 ): Record<string, string> {
   for (const key of Object.keys(templateData)) {
@@ -46,6 +46,19 @@ function formatAllMessageDescriptors(
       templateData[key] = intl.formatMessage(
         templateData[key] as MessageDescriptor
       )
+    } else if (Array.isArray(templateData[key])) {
+      // For address field, country label is a MessageDescriptor
+      // but state, province is string
+      templateData[key] = (
+        templateData[key] as Array<string | MessageDescriptor>
+      )
+        .filter(Boolean)
+        .map((item) =>
+          isMessageDescriptor(item as Record<string, unknown>)
+            ? intl.formatMessage(item as MessageDescriptor)
+            : item
+        )
+        .join(', ')
     }
   }
   return <Record<string, string>>templateData
@@ -128,12 +141,14 @@ function getPDFTemplateWithSVG(
   if (declaration.event === Event.BIRTH) {
     svgTemplate = offlineResource.templates.certificates.birth.definition
     const template = Handlebars.compile(svgTemplate)
-    svgCode = template(
-      formatAllMessageDescriptors(
-        declaration.data.template as Record<string, string | MessageDescriptor>,
-        intl
-      )
+    const formattedTemplateData = formatAllNonStringValues(
+      declaration.data.template as Record<
+        string,
+        string | MessageDescriptor | Array<string>
+      >,
+      intl
     )
+    svgCode = template(formattedTemplateData)
   } else {
     svgCode = offlineResource.templates.certificates.death.definition
   }
