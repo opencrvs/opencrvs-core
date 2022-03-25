@@ -1295,7 +1295,7 @@ function downloadDeclarationSuccess({
       form,
       client,
       offlineData: getOfflineData(store),
-      userDetails: <IUserDetails>getUserDetails(store)
+      userDetails: getUserDetails(store) as IUserDetails
     }
   }
 }

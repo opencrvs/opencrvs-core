@@ -61,7 +61,7 @@ function formatAllNonStringValues(
         .join(', ')
     }
   }
-  return <Record<string, string>>templateData
+  return templateData as Record<string, string>
 }
 export function printMoneyReceipt(
   intl: IntlShape,
@@ -136,22 +136,21 @@ function getPDFTemplateWithSVG(
   pageSize: PageSize,
   intl: IntlShape
 ): IPDFTemplate {
-  let svgCode: string
   let svgTemplate
   if (declaration.event === Event.BIRTH) {
     svgTemplate = offlineResource.templates.certificates.birth.definition
-    const template = Handlebars.compile(svgTemplate)
-    const formattedTemplateData = formatAllNonStringValues(
-      declaration.data.template as Record<
-        string,
-        string | MessageDescriptor | Array<string>
-      >,
-      intl
-    )
-    svgCode = template(formattedTemplateData)
   } else {
-    svgCode = offlineResource.templates.certificates.death.definition
+    svgTemplate = offlineResource.templates.certificates.death.definition
   }
+  const template = Handlebars.compile(svgTemplate)
+  const formattedTemplateData = formatAllNonStringValues(
+    declaration.data.template as Record<
+      string,
+      string | MessageDescriptor | Array<string>
+    >,
+    intl
+  )
+  const svgCode = template(formattedTemplateData)
   const pdfTemplate: IPDFTemplate = certificateBaseTemplate
   pdfTemplate.definition.pageSize = pageSize
   updatePDFTemplateWithSVGContent(pdfTemplate, svgCode, pageSize)

@@ -1863,6 +1863,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    fieldName: 'placeOfBirth',
+                    operation: 'eventLocationAddressOfflineTransformer',
+                    parameters: ['state']
+                  },
                   mutation: {
                     operation: 'birthEventLocationMutationTransformer',
                     parameters: [0, 'state']
@@ -1910,6 +1915,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    fieldName: 'placeOfBirth',
+                    operation: 'eventLocationAddressOfflineTransformer',
+                    parameters: ['district']
+                  },
                   mutation: {
                     operation: 'birthEventLocationMutationTransformer',
                     parameters: [0, 'district']
@@ -8680,6 +8690,33 @@ export const registerForms: IDefaultRegisterForms = {
           }
         ],
         mapping: {
+          template: [
+            {
+              fieldName: 'registrationNumber',
+              operation: 'registrationNumberTransformer'
+            },
+            {
+              fieldName: 'certificateDate',
+              operation: 'certificateDateTransformer',
+              parameters: ['en', 'dd MMMM yyyy']
+            },
+            {
+              fieldName: 'registrarName',
+              operation: 'registrarNameUserTransformer'
+            },
+            {
+              fieldName: 'role',
+              operation: 'roleUserTransformer'
+            },
+            {
+              fieldName: 'registrarSignature',
+              operation: 'registrarSignatureUserTransformer'
+            },
+            {
+              fieldName: 'registrationLocation',
+              operation: 'registrationLocationUserTransformer'
+            }
+          ],
           mutation: {
             operation: 'setDeathRegistrationSectionTransformer'
           },
@@ -8807,6 +8844,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    fieldName: 'deceasedFirstName',
+                    operation: 'nameToFieldTransformer',
+                    parameters: ['en', 'firstNames']
+                  },
                   mutation: {
                     operation: 'fieldToNameTransformer',
                     parameters: ['en', 'firstNames']
@@ -8835,6 +8877,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    fieldName: 'deceasedFamilyName',
+                    operation: 'nameToFieldTransformer',
+                    parameters: ['en', 'familyName']
+                  },
                   mutation: {
                     operation: 'fieldToNameTransformer',
                     parameters: ['en', 'familyName']
@@ -9743,6 +9790,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    operation: 'deceasedDateFormatTransformation',
+                    fieldName: 'eventDate',
+                    parameters: ['en', 'do MMMM yyyy', 'deceased']
+                  },
                   mutation: {
                     operation: 'fieldToDeceasedDateTransformation',
                     parameters: [
@@ -9927,6 +9979,11 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'form.field.select.placeholder'
                 },
                 mapping: {
+                  template: {
+                    fieldName: 'placeOfDeath',
+                    operation: 'eventLocationNameQueryOfflineTransformer',
+                    parameters: ['facilities']
+                  },
                   mutation: {
                     operation: 'deathEventLocationMutationTransformer',
                     parameters: []
@@ -9987,6 +10044,11 @@ export const registerForms: IDefaultRegisterForms = {
                   resource: 'countries'
                 },
                 mapping: {
+                  template: {
+                    fieldName: 'placeOfDeath',
+                    operation: 'eventLocationAddressOfflineTransformer',
+                    parameters: ['country']
+                  },
                   mutation: {
                     operation: 'deathEventLocationMutationTransformer',
                     parameters: []
@@ -10029,6 +10091,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    fieldName: 'placeOfDeath',
+                    operation: 'eventLocationAddressOfflineTransformer',
+                    parameters: ['state']
+                  },
                   mutation: {
                     operation: 'deathEventLocationMutationTransformer',
                     parameters: []
@@ -10088,6 +10155,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    fieldName: 'placeOfDeath',
+                    operation: 'eventLocationAddressOfflineTransformer',
+                    parameters: ['district']
+                  },
                   mutation: {
                     operation: 'deathEventLocationMutationTransformer',
                     parameters: []
@@ -10433,6 +10505,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    fieldName: 'placeOfDeath',
+                    operation: 'eventLocationAddressOfflineTransformer',
+                    parameters: ['state']
+                  },
                   mutation: {
                     operation: 'deathEventLocationMutationTransformer',
                     parameters: [0, 'state']
@@ -10475,6 +10552,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    fieldName: 'placeOfDeath',
+                    operation: 'eventLocationAddressOfflineTransformer',
+                    parameters: ['district']
+                  },
                   mutation: {
                     operation: 'deathEventLocationMutationTransformer',
                     parameters: [0, 'district']
