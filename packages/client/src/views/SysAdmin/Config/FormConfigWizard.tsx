@@ -31,9 +31,9 @@ import styled from '@client/styledComponents'
 import {
   PageNavigation,
   TAB_BIRTH
-} from '@client/components/config/PageNavigation'
-import { FormTools } from '@client/components/config/FormTools'
-import { FormConfigCanvas } from '@client/components/config/FormConfigCanvas'
+} from '@client/components/formConfig/PageNavigation'
+import { FormTools } from '@client/components/formConfig/formTools/FormTools'
+import { FormConfigCanvas } from '@client/components/formConfig/FormConfigCanvas'
 import { IForm } from '@client/forms'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { goToPageNavigation } from '@client/navigation'
@@ -111,7 +111,7 @@ function FormConfigWizardComp(props: IFullProps) {
           goToPageNavigation={props.goToPageNavigation}
         />
         <FormConfigCanvas>Form Config Wizard</FormConfigCanvas>
-        <FormTools />
+        <FormTools intl={props.intl} />
       </WizardContainer>
     </>
   )

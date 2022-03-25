@@ -12,11 +12,14 @@
 
 import React from 'react'
 import styled from '@client/styledComponents'
-import { NavigationSubItem } from '@opencrvs/components/lib/interface/Navigation/NavigationSubItem'
+import {
+  NavigationSubItem,
+  LabelContainer
+} from '@opencrvs/components/lib/interface/Navigation/NavigationSubItem'
 import { IForm } from '@client/forms'
 import { EventType } from '@client/views/SysAdmin/Config/FormConfigWizard'
 import { IntlShape } from 'react-intl'
-import { configMessage } from '@client/components/config/Config'
+import { configMessage } from '@client/components/formConfig/FormConfig'
 import { goToPageNavigation } from '@client/navigation'
 
 const Container = styled.div`
@@ -53,31 +56,45 @@ export const TAB_BIRTH = {
   DOCUMENTS_UPLOAD: 'documentsUpload'
 }
 
+export const TAB_DEATH = {
+  INTRODUCTION: 'introduction',
+  DECEASED_DETAILS: 'deceasedDetails',
+  EVENT_DETAILS: 'eventDetails',
+  CAUSE_OF_DEATH: 'causeOfDeath',
+  MOTHERS_DETAILS: 'mothersDetails',
+  FATHERS_DETATILS: 'fathersDetails',
+  SPOUSE_DETAILS: 'spouseDetails',
+  INFORMANT_DETAILS: 'informantDetails',
+  DOCUMENTS_UPLOAD: 'documentsUpload'
+}
+
+const PageItems = styled(NavigationSubItem)<{ isSelected: boolean }>`
+  ${LabelContainer} {
+    padding: 7px 38px 9px 29px;
+    ${({ theme, isSelected }) => isSelected && theme.fonts.subtitleStyle};
+  }
+`
+
 export const PageNavigation = (props: IPageNavigation) => {
   const { event, intl, section, goToPageNavigation } = props
-  const sectionTab = section || 'introduction'
-  console.log(props)
+  const eventType = event === 'birth' ? TAB_BIRTH : TAB_DEATH
+
   return (
     <Container>
       <Title>Pages</Title>
 
-      {event === 'birth' &&
-        Object.keys(TAB_BIRTH).map((tab, idx) => (
-          <NavigationSubItem
-            key={idx}
-            label={`${idx + 1}. ${intl.formatMessage(
-              configMessage[TAB_BIRTH[tab as keyof typeof TAB_BIRTH]]
-            )}`}
-            leftPadding={29}
-            isSelected={sectionTab === TAB_BIRTH[tab as keyof typeof TAB_BIRTH]}
-            onClick={() =>
-              goToPageNavigation(
-                event!,
-                TAB_BIRTH[tab as keyof typeof TAB_BIRTH]
-              )
-            }
-          />
-        ))}
+      {Object.keys(eventType).map((tab, idx) => (
+        <PageItems
+          key={idx}
+          label={`${idx + 1}. ${intl.formatMessage(
+            configMessage[eventType[tab as keyof typeof eventType]]
+          )}`}
+          isSelected={section === eventType[tab as keyof typeof eventType]}
+          onClick={() =>
+            goToPageNavigation(event!, eventType[tab as keyof typeof eventType])
+          }
+        />
+      ))}
     </Container>
   )
 }

@@ -43,7 +43,7 @@ const Label = styled.label`
   color: ${({ theme }) => theme.colors.supportingCopy};
   flex: 1;
   margin-right: 10%;
-  max-width: 40%;
+  /* max-width: 40%; */
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     max-width: 100%;
     ${({ theme }) => theme.fonts.bodyBoldStyle};
@@ -109,7 +109,7 @@ const StatusContainer = styled.div`
 `
 
 const MenuContainer = styled.div`
-  margin-left: 30%;
+  /* margin-left: 30%; */
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     max-width: 40%;
     margin-left: auto;
