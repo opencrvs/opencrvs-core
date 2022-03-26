@@ -39,14 +39,13 @@ export async function updateFormDraftHandler(
   h: Hapi.ResponseToolkit
 ) {
   const questionsDraft = request.payload as IQuestionsDraft
-  let existingQuestions: IQuestionModel[]
 
   if (
     !questionsDraft.questions &&
     !questionsDraft.deleted &&
     questionsDraft.status === DraftStatus.DRAFT
   ) {
-    throw new Error('Nothing to add or remove from Question')
+    return h.response('Nothing to add or remove from Question').code(400)
   }
 
   let draft: IFormDraftModel | null = await FormDraft.findOne({
@@ -76,7 +75,9 @@ export async function updateFormDraftHandler(
       await FormDraft.update({ _id: draft._id }, draft)
     } catch (err) {
       logger.error(err)
-      return h.response().code(400)
+      return h
+        .response(`Could not update draft for ${draft.event} event`)
+        .code(400)
     }
   } else {
     //create draft
@@ -95,10 +96,10 @@ export async function updateFormDraftHandler(
     }
   }
 
-  existingQuestions = await Question.find().exec()
-
   //update existing questions
   if (questionsDraft.questions) {
+    const existingQuestions: IQuestionModel[] = await Question.find().exec()
+
     questionsDraft.questions.forEach(async (question) => {
       const existingQuestion = existingQuestions.find(
         (extQuestion) => extQuestion.fieldId === question.fieldId
