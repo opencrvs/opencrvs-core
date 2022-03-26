@@ -31,6 +31,7 @@ import {
   updateFormDraftHandler,
   requestSchema as updateFormDraftReqSchema
 } from '@config/handlers/updateFormDraft/handler'
+import getFormDraft from '@config/handlers/getFormDraft/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -149,16 +150,28 @@ export default function getRoutes() {
     },
     {
       method: 'PUT',
-      path: '/formDraft',
+      path: '/draftQuestions',
       handler: updateFormDraftHandler,
       config: {
         tags: ['api'],
-        description: 'Update form draft',
+        description: 'Update form draft & questions',
         auth: {
           scope: [RouteScope.NATLSYSADMIN]
         },
         validate: {
           payload: updateFormDraftReqSchema
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/formDraft',
+      handler: getFormDraft,
+      config: {
+        tags: ['api'],
+        description: 'Get form draft',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
         }
       }
     },
