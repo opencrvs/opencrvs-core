@@ -27,6 +27,10 @@ import updateQuestionHandler, {
   requestSchema as updateQuestionReqSchema
 } from '@config/handlers/updateQuestion/handler'
 import getQuestionsHandler from '@config/handlers/getQuestions/handler'
+import {
+  updateFormDraftHandler,
+  requestSchema as updateFormDraftReqSchema
+} from '@config/handlers/updateFormDraft/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -144,6 +148,21 @@ export default function getRoutes() {
       }
     },
     {
+      method: 'PUT',
+      path: '/formDraft',
+      handler: updateFormDraftHandler,
+      config: {
+        tags: ['api'],
+        description: 'Update form draft',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        validate: {
+          payload: updateFormDraftReqSchema
+        }
+      }
+    },
+    {
       method: 'POST',
       path: '/question',
       handler: createQuestionHandler,
@@ -154,10 +173,6 @@ export default function getRoutes() {
           scope: [RouteScope.NATLSYSADMIN]
         },
         validate: {
-          /*failAction: async (request: any, h: any, err: any) => {
-            console.log(`Joi error: ${err}`)
-            throw err
-          },*/
           payload: createQuestionReqSchema
         }
       }
