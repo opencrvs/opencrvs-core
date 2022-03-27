@@ -110,31 +110,31 @@ Use one of the following authentication details for your user of choice. To lear
 
 ### **Field Agent**
 
-Username: **kalusha.bwalya** / Password: **test** / SMS code: **000000** / Office: Ibombo District, Central Province
+Username: **kalusha.bwalya** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
 
-Username: **patrick.gondwe** / Password: **test** / SMS code: **000000** / Office: Ilanga District, Sulaka Province
+Username: **patrick.gondwe** / Password: **test** / SMS code: **000000** / Office: **Ilanga District, Sulaka Province**
 
 ### **Registration Agent**
 
-Username: **felix.katongo** / Password: **test** / SMS code: **000000** / Office: Ibombo District, Central Province
+Username: **felix.katongo** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
 
-Username: **joshua.mutale** / Password: **test** / SMS code: **000000** / Office: Ilanga District, Sulaka Province
+Username: **joshua.mutale** / Password: **test** / SMS code: **000000** / Office: **Ilanga District, Sulaka Province**
 
 ### Registrar
 
-Username: **kennedy.mweene** / Password: **test** / SMS code: **000000** / Office: Ibombo District, Central Province
+Username: **kennedy.mweene** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
 
-Username: **derrick.bulaya** / Password: **test** / SMS code: **000000** / Office: Ilanga District, Sulaka Province
+Username: **derrick.bulaya** / Password: **test** / SMS code: **000000** / Office: **Ilanga District, Sulaka Province**
 
 ### Local System Admin
 
-Username: **emmanuel.mayuka** / Password: **test** / SMS code: **000000** / Office: Ibombo District, Central Province
+Username: **emmanuel.mayuka** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
 
-Username: **alex.ngonga** / Password: **test** / SMS code: **000000** / Office: Ilanga District, Sulaka Province
+Username: **alex.ngonga** / Password: **test** / SMS code: **000000** / Office: **Ilanga District, Sulaka Province**
 
 ### National System Admin
 
-Username: **jonathan.campbell** / Password: **test** / SMS code: **000000** / Office: Ibombo District, Central Province
+Username: **jonathan.campbell** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
 
 ## Starting and stopping OpenCRVS
 
