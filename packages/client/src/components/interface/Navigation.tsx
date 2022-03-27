@@ -478,9 +478,7 @@ export const NavigationView = (props: IFullProps) => {
                 {userDetails?.role &&
                   USER_SCOPE[userDetails.role].includes(TAB_ID.performance) && (
                     <NavigationItem
-                      icon={() => (
-                        <Activity stroke={'#595C5F'} height={15} width={15} />
-                      )}
+                      icon={() => <Activity />}
                       id={`navigation_${TAB_ID.performance}`}
                       label={TAB_LABEL.performance}
                       onClick={() =>
@@ -495,9 +493,7 @@ export const NavigationView = (props: IFullProps) => {
                 {userDetails?.role &&
                   USER_SCOPE[userDetails.role].includes(TAB_ID.team) && (
                     <NavigationItem
-                      icon={() => (
-                        <Users stroke={'#595C5F'} height={15} width={15} />
-                      )}
+                      icon={() => <Users />}
                       id={`navigation_${TAB_ID.team}`}
                       label={TAB_LABEL.team}
                       onClick={() => props.goToTeamViewAction(userDetails)}
