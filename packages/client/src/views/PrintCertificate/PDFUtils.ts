@@ -63,6 +63,16 @@ export function formatAllNonStringValues(
   }
   return templateData as Record<string, string>
 }
+export function executeHandlebarsTemplate(
+  templateString: string,
+  data: Record<string, any> = {},
+  intl: IntlShape
+): string {
+  const template = Handlebars.compile(templateString)
+  const formattedTemplateData = formatAllNonStringValues(data, intl)
+  const output = template(formattedTemplateData)
+  return output
+}
 export function printMoneyReceipt(
   intl: IntlShape,
   declaration: IDeclaration,
@@ -142,15 +152,11 @@ function getPDFTemplateWithSVG(
   } else {
     svgTemplate = offlineResource.templates.certificates.death.definition
   }
-  const template = Handlebars.compile(svgTemplate)
-  const formattedTemplateData = formatAllNonStringValues(
-    declaration.data.template as Record<
-      string,
-      string | MessageDescriptor | Array<string>
-    >,
+  const svgCode = executeHandlebarsTemplate(
+    svgTemplate,
+    declaration.data.template,
     intl
   )
-  const svgCode = template(formattedTemplateData)
   const pdfTemplate: IPDFTemplate = certificateBaseTemplate
   pdfTemplate.definition.pageSize = pageSize
   updatePDFTemplateWithSVGContent(pdfTemplate, svgCode, pageSize)

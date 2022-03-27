@@ -58,8 +58,8 @@ import { IUserDetails } from '@client/utils/userUtils'
 import { Event, IAttachmentValue, IFormFieldValue, IForm } from '@client/forms'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import { getDummyCertificateTemplateData } from '@client/views/SysAdmin/Config/previewDummyData'
-import * as Handlebars from 'handlebars'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
+import { executeHandlebarsTemplate } from '@client/views/PrintCertificate/PDFUtils'
 
 const HiddenInput = styled.input`
   display: none;
@@ -221,12 +221,14 @@ class ConfigHomeComponent extends React.Component<Props, State> {
             event,
             this.props.registerForm,
             this.props.offlineResources,
-            this.props.userDetails as IUserDetails,
-            this.props.intl
+            this.props.userDetails as IUserDetails
           )
 
-          const template = Handlebars.compile(svgCode)
-          svgCode = template(dummyTemplateData)
+          svgCode = executeHandlebarsTemplate(
+            svgCode,
+            dummyTemplateData,
+            this.props.intl
+          )
           svgCode = await updatePreviewSvgWithSampleSignature(svgCode)
           const linkSource = `data:${SVGFile.type};base64,${window.btoa(
             svgCode

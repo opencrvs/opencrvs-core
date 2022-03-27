@@ -10,14 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { gqlToDraftTransformer } from '@client/transformer'
-import { IStoreState } from '@client/store'
-import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { IForm } from '@client/forms'
 import { IOfflineData } from '@client/offline/reducer'
 import { IUserDetails } from '@client/utils/userUtils'
-import { userDetails } from '@client/tests/util'
-import { formatAllNonStringValues } from '@client/views/PrintCertificate/PDFUtils'
-import { IntlShape } from 'react-intl'
 
 const dummyBirthRegistrationResponse = `{
   "_fhirIDMap": {
@@ -1327,8 +1322,7 @@ export const getDummyCertificateTemplateData = (
   event: string,
   registerForm: { birth: IForm; death: IForm },
   offlineData: IOfflineData,
-  userDetails: IUserDetails,
-  intl: IntlShape
+  userDetails: IUserDetails
 ) => {
   let response: string, form: IForm
   if (event === 'birth') {
@@ -1345,8 +1339,5 @@ export const getDummyCertificateTemplateData = (
     userDetails
   )
 
-  return formatAllNonStringValues(
-    declaration.template as Record<string, any>,
-    intl
-  )
+  return declaration.template
 }

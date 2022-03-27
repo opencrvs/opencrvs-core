@@ -456,7 +456,10 @@ export const eventLocationNameQueryOfflineTransformer =
     _?: IFormField,
     offlineData?: IOfflineData
   ) => {
-    if (queryData.eventLocation.type !== 'HEALTH_FACILITY') {
+    if (
+      queryData.eventLocation?.type &&
+      queryData.eventLocation?.type !== 'HEALTH_FACILITY'
+    ) {
       return
     }
     if (!transformedData[sectionId]) {
@@ -665,7 +668,8 @@ export const dateFormatTransformer =
     sectionId: string,
     field: IFormField
   ): void => {
-    const queryValue = queryData[sectionId][transformedFieldName] as string
+    const queryValue =
+      (queryData[sectionId]?.[transformedFieldName] as string) || ''
     const date = new Date(queryValue)
     if (!Number.isNaN(date.getTime())) {
       const prevLocale = window.__localeId__
@@ -703,7 +707,7 @@ export const eventLocationAddressOfflineTransformer =
       return
     }
 
-    const addressFromQuery = queryData.eventLocation.address
+    const addressFromQuery = queryData.eventLocation?.address
 
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
