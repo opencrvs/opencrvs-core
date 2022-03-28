@@ -51,10 +51,8 @@ const Value = styled.div`
 
 const Label = styled.div`
   min-width: 50%;
-  ${({ theme }) => theme.fonts.bodyBoldStyle}
   button > div {
     padding: 0;
-    ${({ theme }) => theme.fonts.bodyBoldStyle}
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     width: 100%;
