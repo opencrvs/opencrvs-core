@@ -12,10 +12,14 @@
 
 import React from 'react'
 import styled from '@client/styledComponents'
-import { ListView, IListRowProps } from '@opencrvs/components/lib/interface'
 import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
 import { IntlShape } from 'react-intl'
 import { configMessage } from '@client/components/formConfig/FormConfig'
+import {
+  ListViewSimplified,
+  ListViewItemSimplified
+} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
 
 const Container = styled.div`
   right: 0px;
@@ -24,70 +28,57 @@ const Container = styled.div`
   position: fixed;
   padding-left: 24px;
   padding-right: 24px;
+  padding-top: 30px;
   height: 100%;
   border-left: 1px solid ${({ theme }) => theme.colors.grey300};
   background-color: ${({ theme }) => theme.colors.white};
 `
 
-const TopListViewContainer = styled.div`
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+const TitleContainer = styled.div`
+  margin-top: 24px;
+  margin-bottom: 15px;
+  ${({ theme }) => theme.fonts.subtitleStyle}
 `
 
+const Label = styled.div`
+  ${({ theme }) => theme.fonts.chartLegendStyle};
+  color: ${({ theme }) => theme.colors.grey600};
+`
 interface IFormTools {
   intl: IntlShape
 }
 
-const getTopListViewItems = (
-  intl: IntlShape,
-  selected: boolean,
-  onChange: () => void
-) => {
-  const items: IListRowProps[] = [
-    {
-      label: intl.formatMessage(configMessage.showHiddenFields),
-      actionsMenu: <Toggle selected={selected} onChange={onChange} />
-    }
-  ]
-  return items
-}
-
-const getSecondListViewProps = (intl: IntlShape) => {
-  const items: IListRowProps[] = [
+const listViewItems = (intl: IntlShape) => {
+  const items = [
     {
       label: intl.formatMessage(configMessage.textInput),
-      action: {
-        label: intl.formatMessage(configMessage.add)
-      }
+      actionLabel: intl.formatMessage(configMessage.add),
+      handler: () => {}
     },
     {
       label: intl.formatMessage(configMessage.textAreaInput),
-      action: {
-        label: intl.formatMessage(configMessage.add)
-      }
+      actionLabel: intl.formatMessage(configMessage.add),
+      handler: () => {}
     },
     {
       label: <span>{intl.formatMessage(configMessage.numberInput)}</span>,
-      action: {
-        label: intl.formatMessage(configMessage.add)
-      }
+      actionLabel: intl.formatMessage(configMessage.add),
+      handler: () => {}
     },
     {
       label: intl.formatMessage(configMessage.phoneNumberInput),
-      action: {
-        label: intl.formatMessage(configMessage.add)
-      }
+      actionLabel: intl.formatMessage(configMessage.add),
+      handler: () => {}
     },
     {
       label: intl.formatMessage(configMessage.heading),
-      action: {
-        label: intl.formatMessage(configMessage.add)
-      }
+      actionLabel: intl.formatMessage(configMessage.add),
+      handler: () => {}
     },
     {
       label: intl.formatMessage(configMessage.supportingCopy),
-      action: {
-        label: intl.formatMessage(configMessage.add)
-      }
+      actionLabel: intl.formatMessage(configMessage.add),
+      handler: () => {}
     }
   ]
   return items
@@ -102,16 +93,34 @@ export const FormTools = (props: IFormTools) => {
 
   return (
     <Container>
-      {/* <TopListViewContainer> */}
-      <ListView
-        items={getTopListViewItems(props.intl, toggleSelected, toggleOnChange)}
-      />
-      {/* </TopListViewContainer> */}
-
-      <ListView
-        title={props.intl.formatMessage(configMessage.addInputContent)}
-        items={getSecondListViewProps(props.intl)}
-      />
+      <ListViewSimplified>
+        <ListViewItemSimplified
+          label={
+            <Label>
+              {props.intl.formatMessage(configMessage.showHiddenFields)}
+            </Label>
+          }
+          actions={[
+            <Toggle selected={toggleSelected} onChange={toggleOnChange} />
+          ]}
+        />
+      </ListViewSimplified>
+      <TitleContainer>
+        {props.intl.formatMessage(configMessage.addInputContent)}
+      </TitleContainer>
+      <ListViewSimplified>
+        {listViewItems(props.intl).map((item, idx) => (
+          <ListViewItemSimplified
+            key={idx}
+            label={<Label>{item.label}</Label>}
+            actions={[
+              <LinkButton key={idx} onClick={item.handler}>
+                {item.actionLabel}
+              </LinkButton>
+            ]}
+          />
+        ))}
+      </ListViewSimplified>
     </Container>
   )
 }

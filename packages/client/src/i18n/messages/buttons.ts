@@ -63,6 +63,7 @@ interface IButtonsMessages
   approve: MessageDescriptor
   editRecord: MessageDescriptor
   makeCorrection: MessageDescriptor
+  publish: MessageDescriptor
 }
 
 const messagesToDefine: IButtonsMessages = {
@@ -320,6 +321,11 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.makeCorrection',
     defaultMessage: 'Make correction',
     description: 'Make correction button text on correction summary'
+  },
+  publish: {
+    id: 'buttons.publish',
+    defaultMessage: 'Publish',
+    description: 'Publish button text on correction summary'
   }
 }
 

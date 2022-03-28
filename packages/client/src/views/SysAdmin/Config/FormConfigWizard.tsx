@@ -19,7 +19,6 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { RouteComponentProps, Redirect } from 'react-router'
 import { HOME } from '@client/navigation/routes'
 import { EventTopBar } from '@opencrvs/components/lib/interface'
-import { ITopBarAction } from '@opencrvs/components/lib/interface/EventTopBar'
 
 import { SettingsBlue } from '@opencrvs/components/lib/icons'
 import {
@@ -30,13 +29,15 @@ import { goBack } from 'connected-react-router'
 import styled from '@client/styledComponents'
 import {
   PageNavigation,
-  TAB_BIRTH
+  TAB_BIRTH,
+  TAB_DEATH
 } from '@client/components/formConfig/PageNavigation'
 import { FormTools } from '@client/components/formConfig/formTools/FormTools'
 import { FormConfigCanvas } from '@client/components/formConfig/FormConfigCanvas'
 import { IForm } from '@client/forms'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { goToPageNavigation } from '@client/navigation'
+import { buttonMessages } from '@client/i18n/messages'
 
 export enum EventType {
   BIRTH = 'birth',
@@ -52,7 +53,7 @@ interface IStateProps {
   scope: Scope | null
   registerForm: { [key: string]: IForm }
   event?: EventType
-  section?: string
+  section?: string | undefined
 }
 
 interface IDispatchProps {
@@ -69,21 +70,17 @@ const WizardContainer = styled.div`
 
 type IFullProps = IDispatchProps & IStateProps & IntlShapeProps & RouteProps
 
-const topBarActions: ITopBarAction[] = [
-  {
-    icon: <SettingsBlue />,
-    handler: () => alert('settings'),
-    marginRight: 18
-  },
-  {
-    icon: <SecondaryButton> save </SecondaryButton>,
-    handler: () => alert('save')
-  },
-  {
-    icon: <SuccessButton> publish </SuccessButton>,
-    handler: () => alert('publish')
-  }
-]
+const topBarActions = (props: IFullProps) => {
+  return [
+    <SettingsBlue onClick={() => {}} />,
+    <SecondaryButton size="small">
+      {props.intl.formatMessage(buttonMessages.save)}
+    </SecondaryButton>,
+    <SuccessButton size="small">
+      {props.intl.formatMessage(buttonMessages.publish)}
+    </SuccessButton>
+  ]
+}
 
 function FormConfigWizardComp(props: IFullProps) {
   if (
@@ -99,7 +96,7 @@ function FormConfigWizardComp(props: IFullProps) {
       <EventTopBar
         title={'Birth v0.1'}
         pageIcon={<></>}
-        topBarActions={topBarActions}
+        topBarActions={topBarActions(props)}
         goHome={() => props.goBack()}
       />
       <WizardContainer>
@@ -118,7 +115,13 @@ function FormConfigWizardComp(props: IFullProps) {
 }
 
 function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
-  const { event, section } = props.match.params
+  const { event, section: sectionKey } = props.match.params
+  let section: string | undefined
+  if (sectionKey in TAB_BIRTH && event === 'birth') {
+    section = TAB_BIRTH[sectionKey as keyof typeof TAB_BIRTH]
+  } else if (sectionKey in TAB_DEATH && event === 'death') {
+    section = TAB_DEATH[sectionKey as keyof typeof TAB_DEATH]
+  }
   return {
     scope: getScope(state),
     registerForm: getRegisterForm(state),
@@ -128,7 +131,7 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
         : event === 'death'
         ? EventType.DEATH
         : undefined,
-    section: (section as keyof typeof TAB_BIRTH) || 'introduction'
+    section
   }
 }
 

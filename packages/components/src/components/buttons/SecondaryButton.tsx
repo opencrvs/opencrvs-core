@@ -13,14 +13,20 @@ import * as React from 'react'
 import styled, { StyledComponentBase } from 'styled-components'
 import { Button, IButtonProps } from './Button'
 
-export const SecondaryButton = styled(Button)`
+export const SecondaryButton = ({
+  size = 'medium',
+  ...props
+}: IButtonProps) => {
+  return <StyledButton {...props} size={size} />
+}
+
+export const StyledButton = styled(Button)`
   color: ${({ theme }) => theme.colors.primary};
   transition: background 0.4s ease;
   border-radius: 4px;
   background: ${({ theme }) => theme.colors.white};
   border: ${({ theme }) => `2px solid ${theme.colors.primary}`};
   ${({ theme }) => theme.fonts.bodyBoldStyle};
-  height: 40px;
 
   & div {
     padding-top: 2px;

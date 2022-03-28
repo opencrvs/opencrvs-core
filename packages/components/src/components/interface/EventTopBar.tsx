@@ -37,17 +37,12 @@ const Item = styled.span`
   display: flex;
   align-items: center;
 `
-
-const TopBarAction = styled.div`
-  margin-left: auto;
+const TopBarActionsContainer = styled.div`
   display: flex;
   align-items: center;
+  gap: 10px;
 `
 
-const Action = styled.span<{ marginRight?: number }>`
-  padding-right: ${({ marginRight }) =>
-    marginRight ? `${marginRight}px` : `10px`};
-`
 export interface IEventTopBarProps {
   id?: string
   title: string
@@ -57,13 +52,7 @@ export interface IEventTopBarProps {
   exitAction?: IEventTopBarMenuAction
   menuItems?: IToggleMenuItem[]
   iconColor?: string
-  topBarActions?: ITopBarAction[]
-}
-
-export interface ITopBarAction {
-  icon: JSX.Element
-  handler: () => void
-  marginRight?: number
+  topBarActions?: React.ReactNode[]
 }
 
 export interface IEventTopBarMenuAction {
@@ -91,22 +80,14 @@ export const EventTopBar = (props: IEventTopBarProps) => {
     <TopBar>
       <Item>
         {pageIcon || <DeclarationIcon color={iconColor} />}
-        {''}
         <TopBarTitle TopBarActions={Boolean(topBarActions)}>
           {title}
         </TopBarTitle>
       </Item>
       <Item>
         {topBarActions && (
-          <TopBarAction>
-            {topBarActions.map(({ icon, handler, marginRight }, id) => (
-              <Action key={id} marginRight={marginRight} onClick={handler}>
-                {icon}
-              </Action>
-            ))}
-          </TopBarAction>
+          <TopBarActionsContainer>{topBarActions}</TopBarActionsContainer>
         )}
-
         {goHome && (
           <CircleButton id="crcl-btn" onClick={goHome}>
             <Cross color="currentColor" />

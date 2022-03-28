@@ -14,15 +14,15 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 interface IRecordAuditMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   introduction: MessageDescriptor
-  childDetails: MessageDescriptor
-  mothersDetails: MessageDescriptor
-  fathersDetails: MessageDescriptor
-  informantDetails: MessageDescriptor
-  documentsUpload: MessageDescriptor
-  deceasedDetails: MessageDescriptor
-  eventDetails: MessageDescriptor
+  child: MessageDescriptor
+  mother: MessageDescriptor
+  father: MessageDescriptor
+  informant: MessageDescriptor
+  documents: MessageDescriptor
+  deceased: MessageDescriptor
+  deathEvent: MessageDescriptor
   causeOfDeath: MessageDescriptor
-  spouseDetails: MessageDescriptor
+  spouse: MessageDescriptor
   showHiddenFields: MessageDescriptor
   textInput: MessageDescriptor
   textAreaInput: MessageDescriptor
@@ -40,38 +40,38 @@ const messagesToDefine: IRecordAuditMessages = {
     defaultMessage: 'Introduction',
     description: 'Label for Introduction in page navigation'
   },
-  childDetails: {
-    id: 'form.config.navigation.childDetails',
+  child: {
+    id: 'form.config.navigation.child',
     defaultMessage: 'Child details',
     description: 'Label for children details in page navigation'
   },
-  mothersDetails: {
-    id: 'form.config.navigation.mothersDetails',
+  mother: {
+    id: 'form.config.navigation.mother',
     defaultMessage: 'Mothers details',
     description: 'Label for mother details in page navigation'
   },
-  fathersDetails: {
-    id: 'form.config.navigation.fathersDetails',
+  father: {
+    id: 'form.config.navigation.father',
     defaultMessage: 'Fathers details',
     description: 'Label for father details in page navigation'
   },
-  informantDetails: {
-    id: 'form.config.navigation.informantDetails',
+  informant: {
+    id: 'form.config.navigation.informant',
     defaultMessage: 'Informant details',
     description: 'Label for informant details in page navigation'
   },
-  documentsUpload: {
-    id: 'form.config.navigation.documentsUpload',
+  documents: {
+    id: 'form.config.navigation.documents',
     defaultMessage: 'Documents upload',
     description: 'Label for documents upload in page navigation'
   },
-  deceasedDetails: {
-    id: 'form.config.navigation.deceasedDetails',
+  deceased: {
+    id: 'form.config.navigation.deceased',
     defaultMessage: 'Deceased details',
     description: 'Label for deceased details in page navigation'
   },
-  eventDetails: {
-    id: 'form.config.navigation.eventDetails',
+  deathEvent: {
+    id: 'form.config.navigation.deathEvent',
     defaultMessage: 'Event details',
     description: 'Label for event details in page navigation'
   },
@@ -80,8 +80,8 @@ const messagesToDefine: IRecordAuditMessages = {
     defaultMessage: 'Cause of death',
     description: 'Label for cause of death in page navigation'
   },
-  spouseDetails: {
-    id: 'form.config.navigation.spouseDetails',
+  spouse: {
+    id: 'form.config.navigation.spouse',
     defaultMessage: 'Spouse details',
     description: 'Label for spouse details in page navigation'
   },
@@ -92,7 +92,7 @@ const messagesToDefine: IRecordAuditMessages = {
   },
   textInput: {
     id: 'form.config.navigation.textInput',
-    defaultMessage: 'Text Input',
+    defaultMessage: 'Text input',
     description: 'Label for Text Input in page navigation'
   },
   textAreaInput: {

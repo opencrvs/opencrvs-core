@@ -48,24 +48,24 @@ interface IPageNavigation {
 }
 
 export const TAB_BIRTH = {
-  INTRODUCTION: 'introduction',
-  CHILD_DETAILS: 'childDetails',
-  MOTHERS_DETAILS: 'mothersDetails',
-  FATHERS_DETATILS: 'fathersDetails',
-  INFORMANT_DETAILS: 'informantDetails',
-  DOCUMENTS_UPLOAD: 'documentsUpload'
+  introduction: 'introduction',
+  child: 'child',
+  mother: 'mother',
+  father: 'father',
+  informant: 'informant',
+  documents: 'documents'
 }
 
 export const TAB_DEATH = {
-  INTRODUCTION: 'introduction',
-  DECEASED_DETAILS: 'deceasedDetails',
-  EVENT_DETAILS: 'eventDetails',
-  CAUSE_OF_DEATH: 'causeOfDeath',
-  MOTHERS_DETAILS: 'mothersDetails',
-  FATHERS_DETATILS: 'fathersDetails',
-  SPOUSE_DETAILS: 'spouseDetails',
-  INFORMANT_DETAILS: 'informantDetails',
-  DOCUMENTS_UPLOAD: 'documentsUpload'
+  introduction: 'introduction',
+  deceased: 'deceased',
+  deathEvent: 'deathEvent',
+  causeOfDeath: 'causeOfDeath',
+  mother: 'mother',
+  father: 'father',
+  spouse: 'spouse',
+  informant: 'informant',
+  documents: 'documents'
 }
 
 const PageItems = styled(NavigationSubItem)<{ isSelected: boolean }>`
@@ -77,21 +77,21 @@ const PageItems = styled(NavigationSubItem)<{ isSelected: boolean }>`
 
 export const PageNavigation = (props: IPageNavigation) => {
   const { event, intl, section, goToPageNavigation } = props
-  const eventType = event === 'birth' ? TAB_BIRTH : TAB_DEATH
+  const TAB = event === 'birth' ? TAB_BIRTH : TAB_DEATH
 
   return (
     <Container>
       <Title>Pages</Title>
 
-      {Object.keys(eventType).map((tab, idx) => (
+      {Object.keys(TAB).map((tab, idx) => (
         <PageItems
           key={idx}
           label={`${idx + 1}. ${intl.formatMessage(
-            configMessage[eventType[tab as keyof typeof eventType]]
+            configMessage[TAB[tab as keyof typeof TAB]]
           )}`}
-          isSelected={section === eventType[tab as keyof typeof eventType]}
+          isSelected={section === TAB[tab as keyof typeof TAB]}
           onClick={() =>
-            goToPageNavigation(event!, eventType[tab as keyof typeof eventType])
+            goToPageNavigation(event!, TAB[tab as keyof typeof TAB])
           }
         />
       ))}

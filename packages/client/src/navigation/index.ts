@@ -412,7 +412,6 @@ export function goToFieldAgentHomeTab(tabId: string) {
 }
 
 export function goToPageNavigation(event: string, section: string) {
-  console.log('kire vai')
   return push(
     formatUrl(FORM_CONFIG_WIZARD, {
       event: event,
