@@ -42,7 +42,7 @@ const LabelValueContainer = styled.div`
 `
 
 const Value = styled.div`
-  width: 50%;
+  min-width: 50%;
   color: ${({ theme }) => theme.colors.grey500};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     width: 100%;
@@ -50,7 +50,7 @@ const Value = styled.div`
 `
 
 const Label = styled.div`
-  width: 50%;
+  min-width: 50%;
   ${({ theme }) => theme.fonts.bodyBoldStyle}
   button > div {
     padding: 0;
@@ -91,7 +91,7 @@ export function ListViewItemSimplified({
       {avatar && <AvatarContainer>{avatar}</AvatarContainer>}
       <LabelValueContainer>
         <Label>{label}</Label>
-        <Value>{value}</Value>
+        {value && <Value>{value}</Value>}
       </LabelValueContainer>
       <ActionContainer>{actions}</ActionContainer>
     </>
