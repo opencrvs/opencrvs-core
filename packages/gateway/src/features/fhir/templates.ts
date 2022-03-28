@@ -11,6 +11,7 @@
  */
 import { ITemplatedComposition } from '@gateway/features/registration/fhir-builders'
 import { EVENT_TYPE } from '@gateway/features/fhir/constants'
+import { GQLRegStatus } from '@gateway/graphql/schema'
 
 export const MOTHER_CODE = 'mother-details'
 export const FATHER_CODE = 'father-details'
@@ -232,15 +233,22 @@ export function updateTaskTemplate(
 
     task.reason.text = reason || ''
 
-    const newNote: fhir.Annotation = {
-      text: comment ? comment : '',
-      time: new Date().toUTCString(),
-      authorString: ''
+    if (status === GQLRegStatus.REJECTED) {
+      const statusReason: fhir.CodeableConcept = {
+        text: comment
+      }
+      task.statusReason = statusReason
+    } else {
+      const newNote: fhir.Annotation = {
+        text: comment ? comment : '',
+        time: new Date().toUTCString(),
+        authorString: ''
+      }
+      if (!task.note) {
+        task.note = []
+      }
+      task.note.push(newNote)
     }
-    if (!task.note) {
-      task.note = []
-    }
-    task.note.push(newNote)
   }
   return task
 }
