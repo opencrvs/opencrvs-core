@@ -65,7 +65,7 @@ Default.args = {
     <>
       <ListViewItemSimplified label={linkLabel(1)} value="Value 1" />
       <ListViewItemSimplified
-        label={linkLabel(2)}
+        label="Label 2"
         value="Value 2"
         actions={[linkButton]}
       />
@@ -75,7 +75,7 @@ Default.args = {
         actions={[button, toggleMenu]}
       />
       <ListViewItemSimplified
-        label={linkLabel(4)}
+        label="Label 4"
         value="Value 4"
         actions={[toggleMenu]}
       />
@@ -94,33 +94,33 @@ WithAvatar.args = {
     <>
       <ListViewItemSimplified
         avatar={<AvatarSmall />}
-        label={linkLabel(1)}
+        label="Name of user"
         value="Value 1"
         actions={[pill]}
       />
       <ListViewItemSimplified
         avatar={<AvatarSmall />}
-        label={linkLabel(2)}
+        label="Name of user"
         value="Value 2"
         actions={[linkButton]}
       />
       <ListViewItemSimplified
         avatar={<AvatarSmall />}
-        label={linkLabel(3)}
+        label="Name of user"
         value="Value 3"
-        actions={[button, toggleMenu]}
+        actions={[toggleMenu]}
       />
       <ListViewItemSimplified
         avatar={<AvatarSmall />}
-        label={linkLabel(4)}
+        label="Name of user"
         value="Value 4"
         actions={[pill, toggleMenu]}
       />
       <ListViewItemSimplified
         avatar={<AvatarSmall />}
-        label={linkLabel(5)}
+        label="Name of user"
         value="Value 5"
-        actions={[linkButton, toggleMenu]}
+        actions={[toggleMenu]}
       />
     </>
   )

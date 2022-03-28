@@ -14,7 +14,7 @@ import styled from 'styled-components'
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: auto 1fr auto;
   grid-auto-rows: 56px;
   row-gap: 1px;
   border-bottom: 1px solid;
@@ -30,8 +30,15 @@ const Grid = styled.div`
 
 const LabelValueContainer = styled.div`
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
+  grid-column-start: 2;
   flex-grow: 1;
+  gap: 8px;
+  padding-right: 8px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    flex-direction: column;
+    justify-content: center;
+  }
 `
 
 const Value = styled.div`
@@ -63,7 +70,7 @@ const ActionContainer = styled.div`
 const AvatarContainer = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
+  padding-right: 8px;
 `
 
 interface IListViewItemSimplifiedProps {
@@ -81,13 +88,11 @@ export function ListViewItemSimplified({
 }: IListViewItemSimplifiedProps) {
   return (
     <>
-      <AvatarContainer>
-        {avatar}
-        <LabelValueContainer>
-          <Label>{label}</Label>
-          <Value>{value}</Value>
-        </LabelValueContainer>
-      </AvatarContainer>
+      {avatar && <AvatarContainer>{avatar}</AvatarContainer>}
+      <LabelValueContainer>
+        <Label>{label}</Label>
+        <Value>{value}</Value>
+      </LabelValueContainer>
       <ActionContainer>{actions}</ActionContainer>
     </>
   )
