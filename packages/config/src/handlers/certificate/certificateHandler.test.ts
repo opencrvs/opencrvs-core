@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { createServer } from '@config/server'
-import Certificate, { ICertificateModel } from '@config/models/Certificate'
+import Certificate, { ICertificateModel } from '@config/models/certificate'
 import * as fetchMock from 'jest-fetch-mock'
 import mockingoose from 'mockingoose'
 import * as jwt from 'jsonwebtoken'

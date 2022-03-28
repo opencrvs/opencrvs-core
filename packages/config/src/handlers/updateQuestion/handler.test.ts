@@ -82,7 +82,7 @@ describe('updateQuestion handler', () => {
         fieldType: 'TEXT',
         preceedingFieldId: 'myPreviousFieldId',
         required: true,
-        enabled: true,
+        enabled: 'DISABLED',
         custom: true,
         initialValue: 'myValue'
       },

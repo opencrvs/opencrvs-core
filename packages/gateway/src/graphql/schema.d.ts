@@ -43,6 +43,7 @@ export interface GQLQuery {
   getCertificateSVG?: GQLCertificateSVG
   getActiveCertificatesSVG?: Array<GQLCertificateSVG | null>
   getQuestions?: Array<GQLQuestion | null>
+  getFormDraft?: Array<GQLformDraft | null>
 }
 
 export interface GQLMutation {
@@ -75,6 +76,7 @@ export interface GQLMutation {
   resendSMSInvite?: string
   createOrUpdateCertificateSVG?: GQLCertificateSVG
   createOrUpdateQuestion?: GQLQuestion
+  createOrUpdateFormDraft?: GQLformDraft
 }
 
 export interface GQLDummy {
@@ -325,6 +327,17 @@ export interface GQLQuestion {
   initialValue?: string
 }
 
+export interface GQLformDraft {
+  _id?: string
+  event?: string
+  status?: string
+  comment?: string
+  version?: number
+  history?: Array<GQLDraftHistory | null>
+  updatedAt?: GQLDate
+  createdAt?: GQLDate
+}
+
 export interface GQLNotificationInput {
   child?: GQLPersonInput
   mother?: GQLPersonInput
@@ -439,6 +452,14 @@ export interface GQLQuestionInput {
   enabled?: boolean
   custom?: boolean
   initialValue?: string
+}
+
+export interface GQLformDraftInput {
+  questions?: Array<GQLQuestionInput | null>
+  deleted?: Array<string | null>
+  event: string
+  status: string
+  comment?: string
 }
 
 export type GQLMap = any
@@ -766,6 +787,14 @@ export interface GQLMesssageDescriptor {
   id?: string
   description?: string
   defaultMessage?: string
+}
+
+export interface GQLDraftHistory {
+  _id?: string
+  version?: number
+  status?: string
+  comment?: string
+  lastUpdateAt?: GQLDate
 }
 
 export interface GQLPersonInput {
@@ -1308,6 +1337,7 @@ export interface GQLResolver {
   Role?: GQLRoleTypeResolver
   CertificateSVG?: GQLCertificateSVGTypeResolver
   Question?: GQLQuestionTypeResolver
+  formDraft?: GQLformDraftTypeResolver
   CreatedIds?: GQLCreatedIdsTypeResolver
   Reinstated?: GQLReinstatedTypeResolver
   Map?: GraphQLScalarType
@@ -1344,6 +1374,7 @@ export interface GQLResolver {
 
   EventProgressSet?: GQLEventProgressSetTypeResolver
   MesssageDescriptor?: GQLMesssageDescriptorTypeResolver
+  DraftHistory?: GQLDraftHistoryTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
   ReasonsNotApplying?: GQLReasonsNotApplyingTypeResolver
@@ -1396,6 +1427,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   getCertificateSVG?: QueryToGetCertificateSVGResolver<TParent>
   getActiveCertificatesSVG?: QueryToGetActiveCertificatesSVGResolver<TParent>
   getQuestions?: QueryToGetQuestionsResolver<TParent>
+  getFormDraft?: QueryToGetFormDraftResolver<TParent>
 }
 
 export interface QueryToListNotificationsArgs {
@@ -1899,6 +1931,10 @@ export interface QueryToGetQuestionsResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface QueryToGetFormDraftResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLMutationTypeResolver<TParent = any> {
   createNotification?: MutationToCreateNotificationResolver<TParent>
   voidNotification?: MutationToVoidNotificationResolver<TParent>
@@ -1929,6 +1965,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   resendSMSInvite?: MutationToResendSMSInviteResolver<TParent>
   createOrUpdateCertificateSVG?: MutationToCreateOrUpdateCertificateSVGResolver<TParent>
   createOrUpdateQuestion?: MutationToCreateOrUpdateQuestionResolver<TParent>
+  createOrUpdateFormDraft?: MutationToCreateOrUpdateFormDraftResolver<TParent>
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -2372,6 +2409,21 @@ export interface MutationToCreateOrUpdateQuestionResolver<
   (
     parent: TParent,
     args: MutationToCreateOrUpdateQuestionArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToCreateOrUpdateFormDraftArgs {
+  formDraft: GQLformDraftInput
+}
+export interface MutationToCreateOrUpdateFormDraftResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToCreateOrUpdateFormDraftArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -3481,6 +3533,49 @@ export interface QuestionToInitialValueResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLformDraftTypeResolver<TParent = any> {
+  _id?: formDraftTo_idResolver<TParent>
+  event?: formDraftToEventResolver<TParent>
+  status?: formDraftToStatusResolver<TParent>
+  comment?: formDraftToCommentResolver<TParent>
+  version?: formDraftToVersionResolver<TParent>
+  history?: formDraftToHistoryResolver<TParent>
+  updatedAt?: formDraftToUpdatedAtResolver<TParent>
+  createdAt?: formDraftToCreatedAtResolver<TParent>
+}
+
+export interface formDraftTo_idResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface formDraftToEventResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface formDraftToStatusResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface formDraftToCommentResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface formDraftToVersionResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface formDraftToHistoryResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface formDraftToUpdatedAtResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface formDraftToCreatedAtResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLCreatedIdsTypeResolver<TParent = any> {
   compositionId?: CreatedIdsToCompositionIdResolver<TParent>
   trackingId?: CreatedIdsToTrackingIdResolver<TParent>
@@ -4572,6 +4667,37 @@ export interface MesssageDescriptorToDescriptionResolver<
 }
 
 export interface MesssageDescriptorToDefaultMessageResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLDraftHistoryTypeResolver<TParent = any> {
+  _id?: DraftHistoryTo_idResolver<TParent>
+  version?: DraftHistoryToVersionResolver<TParent>
+  status?: DraftHistoryToStatusResolver<TParent>
+  comment?: DraftHistoryToCommentResolver<TParent>
+  lastUpdateAt?: DraftHistoryToLastUpdateAtResolver<TParent>
+}
+
+export interface DraftHistoryTo_idResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface DraftHistoryToVersionResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface DraftHistoryToStatusResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface DraftHistoryToCommentResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface DraftHistoryToLastUpdateAtResolver<
   TParent = any,
   TResult = any
 > {
