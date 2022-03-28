@@ -243,7 +243,7 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
   }
 
   setBirthRegistrationTarget = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value
+    const value = event.target.value.toString()
     if ((!value.includes('.') && /^\d+$/.test(value)) || !value) {
       this.setState(() => ({
         birthRegistrationTarget: value
@@ -252,7 +252,7 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
   }
 
   setDeathRegistrationTarget = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value
+    const value = event.target.value.toString()
     if ((!value.includes('.') && /^\d+$/.test(value)) || !value) {
       this.setState(() => ({
         deathRegistrationTarget: value
@@ -261,35 +261,35 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
   }
 
   setBirthOnTimeFee = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value
+    const value = event.target.value.toString()
     this.setState(() => ({
       birthOnTimeFee: getFormattedFee(value)
     }))
   }
 
   setBirthLateFee = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value
+    const value = event.target.value.toString()
     this.setState(() => ({
       birthLateFee: getFormattedFee(value)
     }))
   }
 
   setBirthDelayedFee = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value
+    const value = event.target.value.toString()
     this.setState(() => ({
       birthDelayedFee: getFormattedFee(value)
     }))
   }
 
   setDeathOnTimeFee = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value
+    const value = event.target.value.toString()
     this.setState(() => ({
       deathOnTimeFee: getFormattedFee(value)
     }))
   }
 
   setDeathDelayedFee = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value
+    const value = event.target.value.toString()
     this.setState(() => ({
       deathDelayedFee: getFormattedFee(value)
     }))
@@ -298,7 +298,7 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
   setBirthLateRegistrationTarget = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const value = event.target.value
+    const value = event.target.value.toString()
     if ((!value.includes('.') && /^\d+$/.test(value)) || !value) {
       this.setState(() => ({
         birthLateRegistrationTarget: value
