@@ -65,11 +65,7 @@ import {
   DeclarationsOrangeAmber,
   PlusTransparentWhite
 } from '@opencrvs/components/lib/icons'
-import {
-  GridTable,
-  ISearchInputProps,
-  Loader
-} from '@opencrvs/components/lib/interface'
+import { GridTable, Loader } from '@opencrvs/components/lib/interface'
 import { HomeContent } from '@opencrvs/components/lib/layout'
 import {
   GQLBirthEventSearchSet,
@@ -87,6 +83,7 @@ import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
 import { Navigation } from '@client/components/interface/Navigation'
 import subYears from 'date-fns/subYears'
+import { ISearchInputProps } from '@client/views/SearchResult/SearchResult'
 
 const FABContainer = styled.div`
   position: fixed;
