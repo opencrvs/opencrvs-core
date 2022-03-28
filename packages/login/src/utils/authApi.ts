@@ -80,6 +80,7 @@ export interface IApplicationConfig {
 export interface IApplicationConfigResponse {
   config: IApplicationConfig
   certificates: ICertificateTemplateData[]
+  formConfig: any // using any because it is not used in login app.  No need to use type.
 }
 
 export interface IAuthenticationData {

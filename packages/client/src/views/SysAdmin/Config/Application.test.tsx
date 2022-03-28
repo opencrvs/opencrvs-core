@@ -781,16 +781,6 @@ describe('application death registration fee test', () => {
 })
 
 describe('country logo update test', () => {
-  beforeEach(() => {
-    jest.spyOn(referenceApi, 'loadConfig').mockImplementationOnce(() =>
-      Promise.resolve({
-        ...mockConfigResponse,
-        config: {
-          ...mockConfigResponse.config
-        }
-      })
-    )
-  })
   it('should show the country logo change modal of click on change', async () => {
     testComponent.find('#changeGovtLogo').hostNodes().first().simulate('click')
     expect(testComponent.find('#changeGovtLogoModal').hostNodes()).toHaveLength(

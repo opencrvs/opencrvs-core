@@ -178,6 +178,10 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           country
         }
       }
+      questionnaire {
+        fieldId
+        value
+      }
       presentAtBirthRegistration
       history {
         date
@@ -226,6 +230,25 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           valueCode
           valueId
           valueString
+        }
+        certificates {
+          hasShowedVerifiedDocument
+          collector {
+            relationship
+            otherRelationship
+            individual {
+              name {
+                use
+                firstNames
+                familyName
+              }
+              telecom {
+                system
+                value
+                use
+              }
+            }
+          }
         }
       }
     }
@@ -391,6 +414,10 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
       attendantAtBirth
       weightAtBirth
       birthType
+      questionnaire {
+        fieldId
+        value
+      }
       eventLocation {
         type
         address {
@@ -450,6 +477,25 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
           valueCode
           valueId
           valueString
+        }
+        certificates {
+          hasShowedVerifiedDocument
+          collector {
+            relationship
+            otherRelationship
+            individual {
+              name {
+                use
+                firstNames
+                familyName
+              }
+              telecom {
+                system
+                value
+                use
+              }
+            }
+          }
         }
       }
     }

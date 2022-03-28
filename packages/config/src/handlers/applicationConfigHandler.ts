@@ -14,10 +14,11 @@ import ApplicationConfig, {
   IApplicationConfigurationModel
 } from '@config/models/config' //   IApplicationConfigurationModel
 import { logger } from '@config/config/logger'
-import { getActiveCertificatesHandler } from '@config/handlers/declarationCertificateHandler'
 import { badRequest } from '@hapi/boom'
 import * as Joi from 'joi'
 import { merge } from 'lodash'
+import { getActiveCertificatesHandler } from '@config/handlers/certificate/certificateHandler'
+import getQuestionsHandler from '@config/handlers/getQuestions/handler'
 
 export default async function applicationHandler(
   request: Hapi.Request,
@@ -25,12 +26,16 @@ export default async function applicationHandler(
 ) {
   try {
     const certificateResponse = await getActiveCertificatesHandler(request, h)
+    const questionsResponse = await getQuestionsHandler(request, h)
     let appConfig: IApplicationConfigurationModel | null
     // tslint:disable-next-line
     appConfig = await ApplicationConfig.findOne({})
     return {
       config: appConfig,
-      certificates: certificateResponse
+      certificates: certificateResponse,
+      formConfig: {
+        questionConfig: questionsResponse
+      }
     }
   } catch (ex) {
     logger.error(ex)

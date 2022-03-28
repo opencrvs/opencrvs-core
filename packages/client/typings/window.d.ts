@@ -60,4 +60,5 @@ interface Window {
     LOGROCKET: string
     SENTRY: string
   }
+  __localeId__: string
 }

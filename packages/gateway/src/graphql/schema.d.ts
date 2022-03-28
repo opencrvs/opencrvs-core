@@ -105,6 +105,7 @@ export interface GQLBirthRegistration extends GQLEventRegistration {
   informant?: GQLRelatedPerson
   eventLocation?: GQLLocation
   birthType?: GQLBirthType
+  questionnaire?: Array<GQLQuestionnaireQuestion | null>
   weightAtBirth?: number
   attendantAtBirth?: GQLAttendantType
   otherAttendantAtBirth?: string
@@ -130,6 +131,7 @@ export interface GQLDeathRegistration extends GQLEventRegistration {
   father?: GQLPerson
   spouse?: GQLPerson
   eventLocation?: GQLLocation
+  questionnaire?: Array<GQLQuestionnaireQuestion | null>
   mannerOfDeath?: GQLMannerOfDeath
   causeOfDeathMethod?: GQLCauseOfDeathMethodType
   causeOfDeath?: string
@@ -349,6 +351,7 @@ export interface GQLBirthRegistrationInput {
   informant?: GQLRelatedPersonInput
   eventLocation?: GQLLocationInput
   birthType?: GQLBirthType
+  questionnaire?: Array<GQLQuestionnaireQuestionInput | null>
   weightAtBirth?: number
   attendantAtBirth?: GQLAttendantType
   otherAttendantAtBirth?: string
@@ -377,6 +380,7 @@ export interface GQLDeathRegistrationInput {
   father?: GQLPersonInput
   spouse?: GQLPersonInput
   eventLocation?: GQLLocationInput
+  questionnaire?: Array<GQLQuestionnaireQuestionInput | null>
   mannerOfDeath?: GQLMannerOfDeath
   causeOfDeathMethod?: GQLCauseOfDeathMethodType
   causeOfDeath?: string
@@ -525,6 +529,11 @@ export const enum GQLBirthType {
   HIGHER_MULTIPLE_DELIVERY = 'HIGHER_MULTIPLE_DELIVERY'
 }
 
+export interface GQLQuestionnaireQuestion {
+  fieldId?: string
+  value?: string
+}
+
 export const enum GQLAttendantType {
   PHYSICIAN = 'PHYSICIAN',
   NURSE = 'NURSE',
@@ -560,6 +569,7 @@ export interface GQLHistory {
   comments?: Array<GQLComment | null>
   input?: Array<GQLInputOutput | null>
   output?: Array<GQLInputOutput | null>
+  certificates?: Array<GQLCertificate | null>
 }
 
 export const enum GQLMannerOfDeath {
@@ -870,6 +880,11 @@ export interface GQLRelatedPersonInput {
   otherRelationship?: string
   affidavit?: Array<GQLAttachmentInput | null>
   individual?: GQLPersonInput
+}
+
+export interface GQLQuestionnaireQuestionInput {
+  fieldId?: string
+  value?: string
 }
 
 export interface GQLPrimaryCaregiverInput {
@@ -1412,6 +1427,7 @@ export interface GQLResolver {
   Map?: GraphQLScalarType
   Registration?: GQLRegistrationTypeResolver
   RelatedPerson?: GQLRelatedPersonTypeResolver
+  QuestionnaireQuestion?: GQLQuestionnaireQuestionTypeResolver
   PrimaryCaregiver?: GQLPrimaryCaregiverTypeResolver
   History?: GQLHistoryTypeResolver
   MedicalPractitioner?: GQLMedicalPractitionerTypeResolver
@@ -2558,6 +2574,7 @@ export interface GQLBirthRegistrationTypeResolver<TParent = any> {
   informant?: BirthRegistrationToInformantResolver<TParent>
   eventLocation?: BirthRegistrationToEventLocationResolver<TParent>
   birthType?: BirthRegistrationToBirthTypeResolver<TParent>
+  questionnaire?: BirthRegistrationToQuestionnaireResolver<TParent>
   weightAtBirth?: BirthRegistrationToWeightAtBirthResolver<TParent>
   attendantAtBirth?: BirthRegistrationToAttendantAtBirthResolver<TParent>
   otherAttendantAtBirth?: BirthRegistrationToOtherAttendantAtBirthResolver<TParent>
@@ -2627,6 +2644,13 @@ export interface BirthRegistrationToEventLocationResolver<
 }
 
 export interface BirthRegistrationToBirthTypeResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthRegistrationToQuestionnaireResolver<
   TParent = any,
   TResult = any
 > {
@@ -2734,6 +2758,7 @@ export interface GQLDeathRegistrationTypeResolver<TParent = any> {
   father?: DeathRegistrationToFatherResolver<TParent>
   spouse?: DeathRegistrationToSpouseResolver<TParent>
   eventLocation?: DeathRegistrationToEventLocationResolver<TParent>
+  questionnaire?: DeathRegistrationToQuestionnaireResolver<TParent>
   mannerOfDeath?: DeathRegistrationToMannerOfDeathResolver<TParent>
   causeOfDeathMethod?: DeathRegistrationToCauseOfDeathMethodResolver<TParent>
   causeOfDeath?: DeathRegistrationToCauseOfDeathResolver<TParent>
@@ -2799,6 +2824,13 @@ export interface DeathRegistrationToSpouseResolver<
 }
 
 export interface DeathRegistrationToEventLocationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface DeathRegistrationToQuestionnaireResolver<
   TParent = any,
   TResult = any
 > {
@@ -3959,6 +3991,25 @@ export interface RelatedPersonToIndividualResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLQuestionnaireQuestionTypeResolver<TParent = any> {
+  fieldId?: QuestionnaireQuestionToFieldIdResolver<TParent>
+  value?: QuestionnaireQuestionToValueResolver<TParent>
+}
+
+export interface QuestionnaireQuestionToFieldIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface QuestionnaireQuestionToValueResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLPrimaryCaregiverTypeResolver<TParent = any> {
   primaryCaregiver?: PrimaryCaregiverToPrimaryCaregiverResolver<TParent>
   reasonsNotApplying?: PrimaryCaregiverToReasonsNotApplyingResolver<TParent>
@@ -3996,6 +4047,7 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   comments?: HistoryToCommentsResolver<TParent>
   input?: HistoryToInputResolver<TParent>
   output?: HistoryToOutputResolver<TParent>
+  certificates?: HistoryToCertificatesResolver<TParent>
 }
 
 export interface HistoryToUserResolver<TParent = any, TResult = any> {
@@ -4031,6 +4083,10 @@ export interface HistoryToInputResolver<TParent = any, TResult = any> {
 }
 
 export interface HistoryToOutputResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToCertificatesResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

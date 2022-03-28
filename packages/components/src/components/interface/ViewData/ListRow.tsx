@@ -17,8 +17,8 @@ const Container = styled.div`
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.dividerDark};
-  padding: 16px 0px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+  padding: 8px 0px;
   width: 100%;
   &:last-child {
     border-bottom: none;
@@ -40,6 +40,7 @@ const ValueContainer = styled.div`
 `
 const Label = styled.label`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
+  color: ${({ theme }) => theme.colors.supportingCopy};
   flex: 1;
   margin-right: 10%;
   max-width: 40%;

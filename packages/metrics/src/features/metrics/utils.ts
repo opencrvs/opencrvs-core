@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as moment from 'moment'
+import { differenceInDays } from 'date-fns'
 import {
   IBirthKeyFigures,
   IEstimation
@@ -33,9 +33,9 @@ export const MONTHLY_INTERVAL = '30d'
 export const WEEKLY_INTERVAL = '7d'
 
 export const LABEL_FOMRAT = {
-  [YEARLY_INTERVAL]: 'YYYY',
+  [YEARLY_INTERVAL]: 'yyyy',
   [MONTHLY_INTERVAL]: 'MMMM',
-  [WEEKLY_INTERVAL]: 'DD-MM-YYYY'
+  [WEEKLY_INTERVAL]: 'dd-MM-yyyy'
 }
 
 export interface IPoint {
@@ -91,7 +91,7 @@ export const ageIntervals = [
 export const calculateInterval = (startTime: string, endTime: string) => {
   const timeStartInMil = parseInt(startTime.substr(0, 13), 10)
   const timeEndInMil = parseInt(endTime.substr(0, 13), 10)
-  const diffInDays = moment(timeEndInMil).diff(timeStartInMil, 'days')
+  const diffInDays = differenceInDays(timeEndInMil, timeStartInMil)
 
   if (diffInDays > 365) {
     return YEARLY_INTERVAL

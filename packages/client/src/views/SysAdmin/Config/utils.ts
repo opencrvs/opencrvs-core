@@ -134,6 +134,8 @@ export const getFormattedFee = (value: string) => {
 export const getTitle = (intl: IntlShape, changeModalName: string) => {
   if (changeModalName === GeneralActionId.APPLICATION_NAME)
     return intl.formatMessage(messages.applicationNameLabel)
+  if (changeModalName === GeneralActionId.GOVT_LOGO)
+    return intl.formatMessage(messages.govermentLogoLabel)
   else if (changeModalName === GeneralActionId.CURRENCY)
     return intl.formatMessage(messages.currencyLable)
   else if (changeModalName === BirthActionId.BIRTH_REGISTRATION_TARGET)

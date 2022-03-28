@@ -22,16 +22,14 @@ import 'jsdom-worker'
 import { roleQueries } from './forms/user/query/queries'
 import { userQueries } from './user/queries'
 import debounce from 'lodash/debounce'
-
-import './tests/queryMock'
-
 import { mockOfflineData } from './tests/mock-offline-data'
+import './tests/queryMock'
 
 if (process.env.CI) {
   jest.setTimeout(30000)
 }
 
-jest.mock('@client/forms/register/fieldDefinitions/register', () => ({
+jest.mock('@client/forms/configuration/default', () => ({
   registerForms: mockOfflineData.forms.registerForm
 }))
 
@@ -180,8 +178,10 @@ jest.mock(
         Promise.resolve({
           languages: mockOfflineData.languages,
           forms: mockOfflineData.forms,
-          templates: mockOfflineData.templates
+          templates: mockOfflineData.templates,
+          formConfig: mockOfflineData.formConfig
         }),
+      loadAssets: () => Promise.resolve(mockOfflineData.assets),
       loadConfig: () => Promise.resolve(mockConfigResponse)
     }
   })

@@ -24,7 +24,6 @@ import {
   constantsMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/registrarHome'
-import moment from 'moment'
 import { connect } from 'react-redux'
 import { goToPage, goToDeclarationRecordAudit } from '@client/navigation'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
@@ -73,20 +72,12 @@ function ExternalValidationTabComponent(props: IProps) {
         event,
         actions: [],
         eventTimeElapsed:
-          (reg.dateOfEvent &&
-            formattedDuration(
-              moment(reg.dateOfEvent.toString(), 'YYYY-MM-DD')
-            )) ||
+          (reg.dateOfEvent && formattedDuration(new Date(reg.dateOfEvent))) ||
           '',
         waitingTimeElapsed:
-          (reg.modifiedAt &&
-            formattedDuration(
-              moment(
-                moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
-                'YYYY-MM-DD HH:mm:ss'
-              )
-            )) ||
-          '',
+          (reg.modifiedAt && Number.isNaN(Number(reg.modifiedAt))
+            ? formattedDuration(new Date(reg.modifiedAt))
+            : formattedDuration(new Date(Number(reg.modifiedAt)))) || '',
 
         rowClickHandler: [
           {

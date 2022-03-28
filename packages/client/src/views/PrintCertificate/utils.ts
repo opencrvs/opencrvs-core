@@ -10,13 +10,13 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Event, IFormData, ISelectOption } from '@client/forms'
-import moment from 'moment'
 import { dynamicMessages } from '@client/i18n/messages/views/certificate'
 import { getAvailableLanguages } from '@client/i18n/utils'
 import { ILanguageState } from '@client/i18n/reducer'
 import { IPrintableDeclaration } from '@client/declarations'
 import { IntlShape } from 'react-intl'
 import { IOfflineData } from '@client/offline/reducer'
+import differenceInDays from 'date-fns/differenceInDays'
 
 const MONTH_IN_DAYS = 30
 const YEAR_IN_DAYS = 365
@@ -69,9 +69,9 @@ function getDayRanges(offlineData: IOfflineData): IDayRange {
   const BIRTH_LATE_FEE = offlineData.config.BIRTH.FEE.LATE
   const BIRTH_DELAYED_FEE = offlineData.config.BIRTH.FEE.DELAYED
 
-  const DEATH_REGISTRATION_TARGET = window.config.DEATH.REGISTRATION_TARGET
-  const DEATH_ON_TIME_FEE = window.config.DEATH.FEE.ON_TIME
-  const DEATH_DELAYED_FEE = window.config.DEATH.FEE.DELAYED
+  const DEATH_REGISTRATION_TARGET = offlineData.config.DEATH.REGISTRATION_TARGET
+  const DEATH_ON_TIME_FEE = offlineData.config.DEATH.FEE.ON_TIME
+  const DEATH_DELAYED_FEE = offlineData.config.DEATH.FEE.DELAYED
 
   const birthRanges = [
     { start: 0, end: BIRTH_REGISTRATION_TARGET, value: BIRTH_ON_TIME_FEE },
@@ -111,17 +111,16 @@ function getValue(
 }
 
 export function calculateDaysFromToday(doE: string) {
-  const todaysDate = moment(Date.now())
-  const eventDate = moment(doE)
-  const diffInDays = todaysDate.diff(eventDate, 'days')
-
+  const todaysDate = new Date(Date.now())
+  const eventDate = new Date(doE)
+  const diffInDays = differenceInDays(todaysDate, eventDate)
   return diffInDays
 }
 
 export function calculateDays(doE: string, regDate: string) {
-  const registeredDate = moment(regDate)
-  const eventDate = moment(doE)
-  const diffInDays = registeredDate.diff(eventDate, 'days')
+  const registeredDate = new Date(regDate)
+  const eventDate = new Date(doE)
+  const diffInDays = differenceInDays(registeredDate, eventDate)
   return diffInDays
 }
 

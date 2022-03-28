@@ -2578,7 +2578,9 @@ export async function createTestStore() {
       facilities: mockOfflineData.facilities,
       pilotLocations: mockOfflineData.pilotLocations,
       offices: mockOfflineData.offices,
-      config: mockOfflineData.config
+      assets: mockOfflineData.assets,
+      config: mockOfflineData.config,
+      formConfig: mockOfflineData.formConfig
     })
   )
   return { store, history }
@@ -2608,7 +2610,9 @@ export async function createTestComponent(
       facilities: mockOfflineData.facilities,
       pilotLocations: mockOfflineData.pilotLocations,
       offices: mockOfflineData.offices,
-      config: mockOfflineData.config
+      assets: mockOfflineData.assets,
+      config: mockOfflineData.config,
+      formConfig: mockOfflineData.formConfig
     })
   )
 

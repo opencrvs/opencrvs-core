@@ -28,7 +28,7 @@ import {
 } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations, getLocation } from '@client/utils/locationUtils'
-import { ISerializedForm } from '@client/forms'
+import { IFormConfig, ISerializedForm } from '@client/forms'
 import { isOfflineDataLoaded, isNationalSystemAdmin } from './selectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import {
@@ -36,7 +36,7 @@ import {
   ISVGTemplate
 } from '@client/pdfRenderer/transformer/types'
 import { find, merge } from 'lodash'
-import { registerForms } from '@client/forms/register/fieldDefinitions/register'
+import { registerForms } from '@client/forms/configuration/default'
 import { createUserForm } from '@client/forms/user/fieldDefinitions/createUser'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
@@ -89,7 +89,11 @@ export interface IOfflineData {
       death: ISVGTemplate
     }
   }
+  assets: {
+    logo: string
+  }
   config: IApplicationConfig
+  formConfig: IFormConfig
 }
 
 export type IOfflineDataState = {
@@ -166,9 +170,9 @@ const PILOT_LOCATIONS_CMD = Cmd.run(() => referenceApi.loadPilotLocations(), {
   failActionCreator: actions.pilotLocationsFailed
 })
 
-const CONTENT_CMD = Cmd.run(() => referenceApi.loadContent(), {
-  successActionCreator: actions.contentLoaded,
-  failActionCreator: actions.contentFailed
+const ASSETS_CMD = Cmd.run(() => referenceApi.loadAssets(), {
+  successActionCreator: actions.assetsLoaded,
+  failActionCreator: actions.assetsFailed
 })
 
 const CONFIG_CMD = Cmd.run(() => referenceApi.loadConfig(), {
@@ -185,13 +189,24 @@ function delay(cmd: RunCmd<any>, time: number) {
   )
 }
 
-function getDataLoadingCommands() {
+function getContentCmd(state: IOfflineDataState) {
+  // formConfig needs to be passed from the offline reducer to the form reducer and so this is the only way
+
+  return Cmd.run(referenceApi.loadContent, {
+    successActionCreator: actions.contentLoaded,
+    failActionCreator: actions.contentFailed,
+    args: [state.offlineData.formConfig]
+  })
+}
+
+function getDataLoadingCommands(state: IOfflineDataState) {
   return Cmd.list<actions.Action>([
     FACILITIES_CMD,
     LOCATIONS_CMD,
     PILOT_LOCATIONS_CMD,
-    CONTENT_CMD,
-    CONFIG_CMD
+    CONFIG_CMD,
+    getContentCmd(state),
+    ASSETS_CMD
   ])
 }
 
@@ -240,7 +255,7 @@ function reducer(
     case actions.REFRESH_OFFLINE_DATA: {
       return loop(
         state,
-        Cmd.list([getDataLoadingCommands(), updateGlobalConfig()])
+        Cmd.list([getDataLoadingCommands(state), updateGlobalConfig()])
       )
     }
     case actions.GET_OFFLINE_DATA_SUCCESS: {
@@ -249,7 +264,7 @@ function reducer(
         offlineDataString ? offlineDataString : '{}'
       )
 
-      const dataLoadingCmds = getDataLoadingCommands()
+      const dataLoadingCmds = getDataLoadingCommands(state)
       const offlineDataLoaded = isOfflineDataLoaded(offlineData)
       if (offlineDataLoaded) {
         return loop(
@@ -307,6 +322,7 @@ function reducer(
       const newOfflineData = {
         ...state.offlineData,
         config: action.payload.config,
+        formConfig: action.payload.formConfig,
         templates: {
           certificates: {
             birth: {
@@ -360,7 +376,7 @@ function reducer(
           ...state,
           loadingError: errorIfDataNotLoaded(state)
         },
-        delay(CONTENT_CMD, RETRY_TIMEOUT)
+        delay(getContentCmd(state), RETRY_TIMEOUT)
       )
     }
 

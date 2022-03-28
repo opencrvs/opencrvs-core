@@ -61,7 +61,7 @@ const Text = styled.div<{
 }>`
   margin-left: ${({ align }) => (align === 'left' ? '0px' : '8px')};
   margin-right: ${({ align }) => (align === 'left' ? '8px' : '0px')};
-  margin-top: ${({ align }) => (align === 'left' ? '8px' : '22px')};
+  margin-top: 34px;
   color: ${({ theme }) => theme.colors.grey600};
   ${({ theme }) => theme.fonts.bigBodyStyle};
 `
@@ -97,14 +97,17 @@ export const Field = styled.div`
     margin-bottom: 0px;
   }
 `
-export const HalfWidthInput = styled(TextInput)`
+export const HalfWidthInput = styled(TextInput)<{
+  topMargin?: boolean
+}>`
+  margin-top: ${({ topMargin }) => (topMargin ? '30px' : '0px')};
   width: 300px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     width: 100%;
   }
 `
 const SmallWidthInput = styled(TextInput)`
-  margin-top: 16px;
+  margin-top: 30px;
   width: 78px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     width: 100%;
@@ -702,7 +705,6 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
           </ApplyButton>
         ]}
         handleClose={toggleConfigModal}
-        contentHeight={GeneralActionId.GOVT_LOGO ? 200 : 175}
       >
         <Message>{getMessage(intl, changeModalName)}</Message>
         {this.state.errorOccured && (
@@ -881,6 +883,7 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
                 <HalfWidthInput
                   id="applicationBirthOnTimeFee"
                   type="text"
+                  topMargin={true}
                   error={false}
                   value={this.state.birthOnTimeFee}
                   onChange={this.setBirthOnTimeFee}
@@ -903,6 +906,7 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
                 <HalfWidthInput
                   id="applicationBirthLateFee"
                   type="text"
+                  topMargin={true}
                   error={false}
                   value={this.state.birthLateFee}
                   onChange={this.setBirthLateFee}
@@ -926,6 +930,7 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
                 <HalfWidthInput
                   id="applicationBirthDelayedFee"
                   type="text"
+                  topMargin={true}
                   error={false}
                   value={this.state.birthDelayedFee}
                   onChange={this.setBirthDelayedFee}
@@ -949,6 +954,7 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
                 <HalfWidthInput
                   id="applicationDeathOnTimeFee"
                   type="text"
+                  topMargin={true}
                   error={false}
                   value={this.state.deathOnTimeFee}
                   onChange={this.setDeathOnTimeFee}
@@ -972,6 +978,7 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
                 <HalfWidthInput
                   id="applicationDeathDelayedFee"
                   type="text"
+                  topMargin={true}
                   error={false}
                   value={this.state.deathDelayedFee}
                   onChange={this.setDeathDelayedFee}

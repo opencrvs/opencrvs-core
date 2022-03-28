@@ -10,9 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { createServer } from '@config/server'
-import Certificate, {
-  IDeclarationCertificateModel
-} from '@config/models/Certificate'
+import Certificate, { ICertificateModel } from '@config/models/Certificate'
 import * as fetchMock from 'jest-fetch-mock'
 import mockingoose from 'mockingoose'
 import * as jwt from 'jsonwebtoken'
@@ -81,7 +79,7 @@ let mockCertificate = {
   user: 'dde0846b-4b0f-4732-80e7-b0f06444fef5',
   event: 'birth',
   status: 'ACTIVE'
-} as unknown as IDeclarationCertificateModel
+} as unknown as ICertificateModel
 
 describe('createCertificate handler', () => {
   let server: any

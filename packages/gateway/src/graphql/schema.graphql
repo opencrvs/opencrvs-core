@@ -226,6 +226,7 @@ type BirthRegistration implements EventRegistration {
   informant: RelatedPerson
   eventLocation: Location
   birthType: BirthType
+  questionnaire: [QuestionnaireQuestion]
   weightAtBirth: Float
   attendantAtBirth: AttendantType
   otherAttendantAtBirth: String
@@ -251,6 +252,7 @@ type DeathRegistration implements EventRegistration {
   father: Person
   spouse: Person
   eventLocation: Location
+  questionnaire: [QuestionnaireQuestion]
   mannerOfDeath: MannerOfDeath
   causeOfDeathMethod: CauseOfDeathMethodType
   causeOfDeath: String
@@ -459,6 +461,7 @@ input BirthRegistrationInput {
   informant: RelatedPersonInput
   eventLocation: LocationInput
   birthType: BirthType
+  questionnaire: [QuestionnaireQuestionInput]
   weightAtBirth: Float
   attendantAtBirth: AttendantType
   otherAttendantAtBirth: String
@@ -487,6 +490,7 @@ input DeathRegistrationInput {
   father: PersonInput
   spouse: PersonInput
   eventLocation: LocationInput
+  questionnaire: [QuestionnaireQuestionInput]
   mannerOfDeath: MannerOfDeath
   causeOfDeathMethod: CauseOfDeathMethodType
   causeOfDeath: String
@@ -635,6 +639,11 @@ enum BirthType {
   HIGHER_MULTIPLE_DELIVERY
 }
 
+type QuestionnaireQuestion {
+  fieldId: String
+  value: String
+}
+
 enum AttendantType {
   PHYSICIAN
   NURSE
@@ -670,6 +679,7 @@ type History {
   comments: [Comment]
   input: [InputOutput]
   output: [InputOutput]
+  certificates: [Certificate]
 }
 
 enum MannerOfDeath {
@@ -969,6 +979,11 @@ input RelatedPersonInput {
   otherRelationship: String
   affidavit: [AttachmentInput]
   individual: PersonInput
+}
+
+input QuestionnaireQuestionInput {
+  fieldId: String
+  value: String
 }
 
 input PrimaryCaregiverInput {

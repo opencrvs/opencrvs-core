@@ -18,7 +18,6 @@ import {
 import { IDeclaration } from '@client/declarations'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import moment from 'moment'
 import { goToDeclarationRecordAudit, goToPage } from '@client/navigation'
 import { withTheme, ITheme } from '@client/styledComponents'
 import {
@@ -77,7 +76,7 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
       const { intl } = this.props
       const { locale } = intl
       const lastModificationDate = draft.modifiedOn || draft.savedOn
-      moment.locale(locale)
+      window.__localeId__ = locale
       const event =
         (draft.event &&
           intl.formatMessage(
@@ -115,7 +114,7 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
         dateOfModification:
           `${intl.formatMessage(messages.lastUpdated)} ${
             lastModificationDate &&
-            formattedDuration(moment(lastModificationDate))
+            formattedDuration(new Date(lastModificationDate))
           }` || '',
         actions,
         rowClickHandler: [
