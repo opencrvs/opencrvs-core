@@ -73,10 +73,10 @@ type IFullProps = IDispatchProps & IStateProps & IntlShapeProps & RouteProps
 const topBarActions = (props: IFullProps) => {
   return [
     <SettingsBlue onClick={() => {}} />,
-    <SecondaryButton size="small">
+    <SecondaryButton size="small" onClick={() => {}}>
       {props.intl.formatMessage(buttonMessages.save)}
     </SecondaryButton>,
-    <SuccessButton size="small">
+    <SuccessButton size="small" onClick={() => {}}>
       {props.intl.formatMessage(buttonMessages.publish)}
     </SuccessButton>
   ]
@@ -107,7 +107,7 @@ function FormConfigWizardComp(props: IFullProps) {
           section={props.section}
           goToPageNavigation={props.goToPageNavigation}
         />
-        <FormConfigCanvas>Form Config Wizard</FormConfigCanvas>
+        <FormConfigCanvas></FormConfigCanvas>
         <FormTools intl={props.intl} />
       </WizardContainer>
     </>

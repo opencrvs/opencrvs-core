@@ -20,7 +20,7 @@ export const SecondaryButton = ({
   return <StyledButton {...props} size={size} />
 }
 
-export const StyledButton = styled(Button)`
+const StyledButton = styled(Button)`
   color: ${({ theme }) => theme.colors.primary};
   transition: background 0.4s ease;
   border-radius: 4px;

@@ -40,7 +40,7 @@ const Item = styled.span`
 const TopBarActionsContainer = styled.div`
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 16px;
 `
 
 export interface IEventTopBarProps {
