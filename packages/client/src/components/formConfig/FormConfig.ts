@@ -30,7 +30,6 @@ interface IRecordAuditMessages
   phoneNumberInput: MessageDescriptor
   heading: MessageDescriptor
   supportingCopy: MessageDescriptor
-  add: MessageDescriptor
   addInputContent: MessageDescriptor
 }
 
@@ -86,49 +85,44 @@ const messagesToDefine: IRecordAuditMessages = {
     description: 'Label for spouse details in page navigation'
   },
   showHiddenFields: {
-    id: 'form.config.navigation.showHiddenFields',
+    id: 'form.config.tools.showHiddenFields',
     defaultMessage: 'Show hidden fields',
-    description: 'Label for Show hidden fields in page navigation'
+    description: 'Label for Show hidden fields in form tools'
   },
   textInput: {
-    id: 'form.config.navigation.textInput',
+    id: 'form.config.tools.textInput',
     defaultMessage: 'Text input',
-    description: 'Label for Text Input in page navigation'
+    description: 'Label for Text Input in form tools'
   },
   textAreaInput: {
-    id: 'form.config.navigation.textAreaInput',
+    id: 'form.config.tools.textAreaInput',
     defaultMessage: 'Text area input',
-    description: 'Label for Text area input in page navigation'
+    description: 'Label for Text area input in form tools'
   },
   numberInput: {
-    id: 'form.config.navigation.numberInput',
+    id: 'form.config.tools.numberInput',
     defaultMessage: 'Number input',
-    description: 'Label for Number input in page navigation'
+    description: 'Label for Number input in form tools'
   },
   phoneNumberInput: {
-    id: 'form.config.navigation.phoneNumberInput',
+    id: 'form.config.tools.phoneNumberInput',
     defaultMessage: 'Phone number input',
-    description: 'Label for Phone number input in page navigation'
+    description: 'Label for Phone number input in form tools'
   },
   heading: {
-    id: 'form.config.navigation.heading',
+    id: 'form.config.tools.heading',
     defaultMessage: 'Heading',
-    description: 'Label for Heading in page navigation'
+    description: 'Label for Heading in form tools'
   },
   supportingCopy: {
-    id: 'form.config.navigation.supportingCopy',
+    id: 'form.config.tools.supportingCopy',
     defaultMessage: 'Supporting copy',
-    description: 'Label for Supporting copy in page navigation'
-  },
-  add: {
-    id: 'form.config.navigation.add',
-    defaultMessage: 'Add',
-    description: 'Label for Add in page navigation'
+    description: 'Label for Supporting copy in form tools'
   },
   addInputContent: {
-    id: 'form.config.navigation.addInputContent',
+    id: 'form.config.tools.addInputContent',
     defaultMessage: 'Add input/content',
-    description: 'Label for Add input/content in page navigation'
+    description: 'Label for Add input/content in form tools'
   }
 }
 export const configMessage: IRecordAuditMessages =

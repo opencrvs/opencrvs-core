@@ -20,6 +20,7 @@ import {
   ListViewItemSimplified
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { buttonMessages } from '@client/i18n/messages'
 
 const Container = styled.div`
   right: 0px;
@@ -52,32 +53,32 @@ const listViewItems = (intl: IntlShape) => {
   const items = [
     {
       label: intl.formatMessage(configMessage.textInput),
-      actionLabel: intl.formatMessage(configMessage.add),
+      actionLabel: intl.formatMessage(buttonMessages.add),
       handler: () => {}
     },
     {
       label: intl.formatMessage(configMessage.textAreaInput),
-      actionLabel: intl.formatMessage(configMessage.add),
+      actionLabel: intl.formatMessage(buttonMessages.add),
       handler: () => {}
     },
     {
       label: <span>{intl.formatMessage(configMessage.numberInput)}</span>,
-      actionLabel: intl.formatMessage(configMessage.add),
+      actionLabel: intl.formatMessage(buttonMessages.add),
       handler: () => {}
     },
     {
       label: intl.formatMessage(configMessage.phoneNumberInput),
-      actionLabel: intl.formatMessage(configMessage.add),
+      actionLabel: intl.formatMessage(buttonMessages.add),
       handler: () => {}
     },
     {
       label: intl.formatMessage(configMessage.heading),
-      actionLabel: intl.formatMessage(configMessage.add),
+      actionLabel: intl.formatMessage(buttonMessages.add),
       handler: () => {}
     },
     {
       label: intl.formatMessage(configMessage.supportingCopy),
-      actionLabel: intl.formatMessage(configMessage.add),
+      actionLabel: intl.formatMessage(buttonMessages.add),
       handler: () => {}
     }
   ]
