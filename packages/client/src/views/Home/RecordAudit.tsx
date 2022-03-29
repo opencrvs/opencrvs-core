@@ -665,7 +665,7 @@ const showReviewButton = ({
   const { role } = userDetails
 
   const reviewButtonRoleStatusMap: { [key: string]: string[] } = {
-    FIELD_AGENT: [EVENT_STATUS.REJECTED],
+    FIELD_AGENT: [],
     REGISTRATION_AGENT: [EVENT_STATUS.DECLARED],
     DISTRICT_REGISTRAR: [EVENT_STATUS.VALIDATED, EVENT_STATUS.DECLARED],
     LOCAL_REGISTRAR: [EVENT_STATUS.VALIDATED, EVENT_STATUS.DECLARED]

@@ -47,7 +47,6 @@ export const resolvers: GQLResolver = {
         DESKTOP_TIME_OUT_MILLISECONDS:
           applicationConfig.DESKTOP_TIME_OUT_MILLISECONDS as number,
         DEATH: applicationConfig.DEATH as GQLDeathInput,
-        LANGUAGES: applicationConfig.LANGUAGES as string,
         UI_POLLING_INTERVAL: applicationConfig.UI_POLLING_INTERVAL as number,
         FIELD_AGENT_AUDIT_LOCATIONS:
           applicationConfig.FIELD_AGENT_AUDIT_LOCATIONS as string,

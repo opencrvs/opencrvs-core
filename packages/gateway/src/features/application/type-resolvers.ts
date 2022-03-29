@@ -28,7 +28,6 @@ export interface IApplicationConfigPayload {
   COUNTRY_LOGO_RENDER_HEIGHT: number
   DESKTOP_TIME_OUT_MILLISECONDS: number
   DEATH: GQLDeathInput
-  LANGUAGES: string
   UI_POLLING_INTERVAL: number
   FIELD_AGENT_AUDIT_LOCATIONS: string
   APPLICATION_AUDIT_LOCATIONS: string
