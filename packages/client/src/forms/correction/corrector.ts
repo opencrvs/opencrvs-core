@@ -153,9 +153,9 @@ const deathCorrectorRelationGroup: IFormSectionGroup = {
             name: 'otherRelationship',
             type: 'TEXT',
             label: {
-              defaultMessage: 'Relationship to child',
-              id: 'form.field.label.informantsRelationWithChild',
-              description: 'Label for input Relationship to child'
+              defaultMessage: 'Relationship to deceased',
+              id: 'form.field.label.informantsRelationWithDeceased',
+              description: 'Label for input Relationship to deceased select'
             },
             placeholder: {
               defaultMessage: 'eg. Grandmother',
