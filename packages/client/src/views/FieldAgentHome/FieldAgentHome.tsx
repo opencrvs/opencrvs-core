@@ -83,6 +83,7 @@ import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
 import { Navigation } from '@client/components/interface/Navigation'
 import subYears from 'date-fns/subYears'
+import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { ISearchInputProps } from '@client/views/SearchResult/SearchResult'
 
 const FABContainer = styled.div`
@@ -494,8 +495,7 @@ const mapStateToProps = (
       (state.declarationsState.declarations &&
         state.declarationsState.declarations.filter(
           (declaration: IDeclaration) =>
-            declaration.submissionStatus !==
-            SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+            isDeclarationInReadyToReviewStatus(declaration.submissionStatus)
         )) ||
       []
     ).reverse()
