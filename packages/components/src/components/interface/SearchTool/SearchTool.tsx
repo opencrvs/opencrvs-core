@@ -256,6 +256,7 @@ export class SearchTool extends React.Component<IProps, IState> {
         <SearchTextInput
           id="searchText"
           type="text"
+          autoComplete="off"
           placeholder={placeHolderText}
           onChange={this.onChangeHandler}
           value={this.state.searchParam}

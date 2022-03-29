@@ -52,7 +52,6 @@ import {
   ColumnContentAlignment,
   GridTable,
   IAction,
-  ISearchInputProps,
   Loader
 } from '@opencrvs/components/lib/interface'
 import { HomeContent } from '@opencrvs/components/lib/layout'
@@ -121,6 +120,19 @@ export function getRejectionReasonDisplayValue(reason: string) {
       return rejectMessages.rejectionReasonOther
   }
 }
+
+export interface ISerachInputCustomProps {
+  searchValue?: string
+  error?: boolean
+  touched?: boolean
+  focusInput?: boolean
+  buttonLabel: string
+  onSearchTextChange?: (searchText: string) => void
+  onSubmit: (searchText: string) => any
+}
+
+export type ISearchInputProps = ISerachInputCustomProps &
+  React.InputHTMLAttributes<HTMLInputElement>
 
 interface IBaseSearchResultProps {
   theme: ITheme
