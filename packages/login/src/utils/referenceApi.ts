@@ -9,25 +9,26 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-interface Window {
-  config: {
-    AUTH_API_URL: string
-    CONFIG_API_URL: string
-    COUNTRY_CONFIG_URL: string
-    COUNTRY: string
-    LANGUAGES: string
-    CLIENT_APP_URL: string
-    PHONE_NUMBER_PATTERN: {
-      pattern: RegExp
-      example: string
-      start?: string
-      num: string
-      mask: {
-        startForm: number
-        endBefore: number
-      }
-    }
-    LOGROCKET: string
-    SENTRY: string
+import { IntlMessages } from '@login/i18n/reducer'
+
+export interface ILanguage {
+  lang: string
+  displayName: string
+  messages: IntlMessages
+}
+
+interface IContentResponse {
+  languages: ILanguage[]
+}
+
+export async function loadContent(): Promise<IContentResponse> {
+  const url = `${window.config.COUNTRY_CONFIG_URL}/content/login`
+
+  const res = await fetch(url)
+
+  if (res && res.status !== 200) {
+    throw Error(res.statusText)
   }
+
+  return await res.json()
 }
