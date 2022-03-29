@@ -248,6 +248,9 @@ export function updateTaskTemplate(
         task.note = []
       }
       task.note.push(newNote)
+
+      // Deleting Status Reason
+      delete task.statusReason
     }
   }
   return task

@@ -996,6 +996,13 @@ const ActionDetailsModalListTable = (
       width: 100
     }
   ]
+  const reasonColumn = [
+    {
+      key: 'text',
+      label: intl.formatMessage(constantsMessages.reason),
+      width: 100
+    }
+  ]
   const declarationUpdatedColumns = [
     {
       key: 'item',
@@ -1135,6 +1142,17 @@ const ActionDetailsModalListTable = (
   const pageChangeHandler = (cp: number) => setCurrentPage(cp)
   return (
     <>
+      {/* For Reject Reason */}
+      {actionDetailsData.statusReason &&
+        actionDetailsData.action === SUBMISSION_STATUS.REJECTED && (
+          <ListTable
+            noResultText=" "
+            hideBoxShadow={true}
+            columns={reasonColumn}
+            content={[actionDetailsData.statusReason]}
+          ></ListTable>
+        )}
+
       {/* For Comments */}
       <ListTable
         noResultText=" "
@@ -1254,6 +1272,7 @@ function RecordAuditBody({
   clearCorrectionChange,
   declaration,
   draft,
+  tab,
   intl,
   goToCertificateCorrection,
   goToPrintCertificate,
@@ -1274,6 +1293,7 @@ function RecordAuditBody({
   userDetails: IUserDetails | null
   registerForm: IRegisterFormState
   offlineData: Partial<IOfflineData>
+  tab: IRecordAuditTabs
 } & IDispatchProps) {
   const [showDialog, setShowDialog] = React.useState(false)
   const [showActionDetails, setActionDetails] = React.useState(false)
@@ -1571,6 +1591,7 @@ function getBodyContent({
                   data.fetchRegistration,
                   language
                 )}
+                tab={tab}
                 draft={draft}
                 intl={intl}
                 scope={scope}
@@ -1596,6 +1617,7 @@ function getBodyContent({
       {...actionProps}
       declaration={declaration}
       draft={draft}
+      tab={tab}
       intl={intl}
       scope={scope}
       userDetails={userDetails}
