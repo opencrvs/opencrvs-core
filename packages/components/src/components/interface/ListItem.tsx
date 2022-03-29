@@ -107,7 +107,7 @@ const ListContentContainer = styled.div`
   flex: 1;
   align-items: center;
   padding: 24px;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   background-color: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
 `
@@ -137,11 +137,11 @@ const IconsStatus = styled.div`
   height: 32px;
 `
 const StyledLabel = styled.label`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
   margin-right: 3px;
 `
 const StyledValue = styled.span`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 
 function LabelValue({ label, value }: IInfo) {

@@ -32,10 +32,10 @@ const Label = styled.label<{
   ${({ size, theme }) =>
     size === 'large'
       ? `
-    ${theme.fonts.bigBodyStyle};
+    ${theme.fonts.reg18};
     margin-left: 14px`
       : `
-    ${theme.fonts.bodyStyle};
+    ${theme.fonts.reg16};
     margin-left: 16px;`}
 
   ${({ hasFlexDirection }) => hasFlexDirection && `margin-left: 8px;`}

@@ -78,7 +78,7 @@ const ColoredDataSection = styled.div`
 const ListTitleDiv = styled.div`
   width: 645px;
   height: 46px;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 
 const BlueTitle = styled.span`
@@ -94,7 +94,7 @@ const TopBarContainer = styled.div`
 `
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   text-align: center;
   margin-top: 100px;
 `

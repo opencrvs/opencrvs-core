@@ -23,12 +23,12 @@ const Wrapper = styled.div`
 `
 
 const Label = styled.span`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 
 const Text = styled.strong`
   margin-left: 10px;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 
 const Divider = styled.div`
