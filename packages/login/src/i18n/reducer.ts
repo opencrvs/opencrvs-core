@@ -13,6 +13,7 @@ import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
 import * as actions from '@login/i18n/actions'
 import { ENGLISH_STATE } from '@login/i18n/locales/en'
 import { BENGALI_STATE } from '@login/i18n/locales/bn'
+import { FRENCH_STATE } from '@login/i18n/locales/fr'
 import {
   getAvailableLanguages,
   getDefaultLanguage,
@@ -35,7 +36,8 @@ export interface ILanguageState {
 
 export const languages: ILanguageState = {
   en: ENGLISH_STATE,
-  bn: BENGALI_STATE
+  bn: BENGALI_STATE,
+  fr: FRENCH_STATE
 }
 
 export type IntlState = {
