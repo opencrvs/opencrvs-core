@@ -24,6 +24,8 @@ import {
 import { IUserDetails } from './userUtils'
 import { getEvent } from '@client/views/PrintCertificate/utils'
 import { BIRTH, DEATH } from './constants'
+import { SUBMISSION_STATUS } from '@client/declarations'
+import { includes } from 'lodash'
 
 const getInformantFullName = (
   sectionData: IFormSectionData,
@@ -200,4 +202,13 @@ export const getAttachmentSectionKey = (declarationEvent: Event): string => {
     default:
       return BirthSection.Documents
   }
+}
+
+export function isDeclarationInReadyToReviewStatus(
+  submissionStatus: string | undefined
+) {
+  return !includes(
+    [SUBMISSION_STATUS.DRAFT, SUBMISSION_STATUS.REJECTED, undefined],
+    submissionStatus
+  )
 }
