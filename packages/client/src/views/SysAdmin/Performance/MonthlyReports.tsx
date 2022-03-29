@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import moment from 'moment'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
@@ -35,6 +34,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { generateLocations } from '@client/utils/locationUtils'
 import { RouteComponentProps } from 'react-router'
+import format from '@client/utils/date-formatting'
 
 interface ReportProps {
   goToPerformanceReport: typeof goToPerformanceReport
@@ -84,15 +84,15 @@ class MonthlyReportsComponent extends React.Component<Props, IState> {
     }
   }
   getContent(eventType: Event) {
-    moment.locale(this.props.intl.locale)
+    window.__localeId__ = this.props.intl.locale
     const content = []
 
-    const currentYear = moment().year()
+    const currentYear = new Date(Date.now()).getFullYear()
     let currentMonth = 1
 
     while (currentMonth <= 12) {
       const { start, end } = getMonthDateRange(currentYear, currentMonth)
-      const title = start.format('MMMM YYYY')
+      const title = format(start, 'MMMM yyyy')
       content.push({
         month: (
           <LinkButton
@@ -100,8 +100,8 @@ class MonthlyReportsComponent extends React.Component<Props, IState> {
               this.props.goToPerformanceReport(
                 this.state.selectedLocation!,
                 eventType,
-                start.toDate(),
-                end.toDate()
+                start,
+                end
               )
             }
             disabled={!this.state.selectedLocation}

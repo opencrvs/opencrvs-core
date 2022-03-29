@@ -52,7 +52,6 @@ import {
   GQLQuery
 } from '@opencrvs/gateway/src/graphql/schema'
 import { orderBy } from 'lodash'
-import moment from 'moment'
 import { parse } from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
@@ -66,7 +65,9 @@ import {
 } from '@client/views/SysAdmin/Team/utils'
 import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
 import { IStatusMapping } from './reports/operational/StatusWiseDeclarationCountView'
-import { formattedDuration } from '@client/utils/date-formatting'
+import format, { formattedDuration } from '@client/utils/date-formatting'
+import subYears from 'date-fns/subYears'
+import differenceInSeconds from 'date-fns/differenceInSeconds'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -169,8 +170,8 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
   )
   const recordCount = DEFAULT_DECLARATION_STATUS_PAGE_SIZE * currentPageNumber
   let sectionId = OPERATIONAL_REPORT_SECTION.OPERATIONAL
-  let timeStart: string | Date = moment().subtract(1, 'years').toDate()
-  let timeEnd: string | Date = moment().toDate()
+  let timeStart: string | Date = subYears(new Date(Date.now()), 1)
+  let timeEnd: string | Date = new Date(Date.now())
   const historyState = props.history.location.state
 
   if (props.location.state) {
@@ -354,14 +355,18 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       return []
     }
 
-    function formateDateWithRelationalText(date: Date) {
-      const dateMoment = moment(date)
+    function formateDateWithRelationalText(date: Date | null) {
+      date = date
+        ? Number.isNaN(Number(date))
+          ? new Date(date)
+          : new Date(Number(date))
+        : null
       return (
         (date && (
           <DoubleLineValueWrapper>
-            {dateMoment.format('MMMM DD, YYYY')}
+            {format(date, 'MMMM dd, yyyy')}
             <br />
-            {`(${formattedDuration(dateMoment)})`}
+            {`(${formattedDuration(date)})`}
           </DoubleLineValueWrapper>
         )) || <></>
       )
@@ -385,7 +390,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       if (!lastUpdateDate) {
         return 0
       }
-      return moment().diff(moment(Number(lastUpdateDate)), 'seconds')
+      return differenceInSeconds(Date.now(), Number(lastUpdateDate))
     }
 
     function getTimeDurationElements(

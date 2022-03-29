@@ -19,7 +19,6 @@ import { pinValidator } from '@client/views/Unlock/ComparePINs'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
 import { waitForElement } from '@client/tests/wait-for-element'
-import moment from 'moment'
 
 const clearPassword = (component: ReactWrapper) => {
   const backSpaceElem = component.find('#keypad-backspace').hostNodes()
@@ -145,7 +144,7 @@ describe('Pin locked session', () => {
     await flushPromises()
     jest.clearAllMocks()
 
-    moment.now = jest.fn(() => 1578308937586)
+    Date.now = jest.fn(() => 1578308937586)
     // mock indexeddb
     const indexedDB = {
       USER_DETAILS: JSON.stringify({ userMgntUserID: 'shakib75' }),

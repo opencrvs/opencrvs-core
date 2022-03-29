@@ -51,7 +51,6 @@ import {
   HAS_CHILD_LOCATION
 } from './queries'
 import { WithinTargetDaysTable } from './reports/registrationRates/WithinTargetDaysTable'
-import moment from 'moment'
 const { useState } = React
 
 export enum REG_RATE_BASE {
@@ -90,7 +89,9 @@ function prepareChartData(data: GQLMonthWiseEstimationMetrics) {
         if (dataDetails !== null) {
           chartData.push({
             label:
-              moment.months().indexOf(dataDetails.month) === 0 && index > 0
+              new Date(
+                Date.parse(`${dataDetails.month} 1, 1990`)
+              ).getMonth() === 0
                 ? `${dataDetails.month.slice(0, 3)} ${dataDetails.year}`
                 : `${dataDetails.month.slice(0, 3)}`,
             registeredInTargetDays: dataDetails.actualTargetDayRegistration,

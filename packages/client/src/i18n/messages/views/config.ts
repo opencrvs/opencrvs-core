@@ -40,8 +40,22 @@ interface IConfigMessages
   govermentLogoLabel: MessageDescriptor
   currencyLable: MessageDescriptor
   applicationCurrencyChangeNotification: MessageDescriptor
+  applicationBirthRegTargetChangeNotification: MessageDescriptor
+  applicationBirthLateRegTargetChangeNotification: MessageDescriptor
+  applicationDeathRegTargetChangeNotification: MessageDescriptor
+  applicationBirthOnTimeFeeChangeNotification: MessageDescriptor
+  applicationBirthLateFeeChangeNotification: MessageDescriptor
+  applicationBirthDelayedFeeChangeNotification: MessageDescriptor
+  applicationDeathOnTimeFeeChangeNotification: MessageDescriptor
+  applicationDeathDelayedFeeChangeNotification: MessageDescriptor
   applicationCurrencyChangeMessage: MessageDescriptor
   phoneNumberLabel: MessageDescriptor
+  birthLegallySpecifiedDialogTitle: MessageDescriptor
+  birthDelayedDialogTitle: MessageDescriptor
+  deathLegallySpecifiedDialogTitle: MessageDescriptor
+  onTimeFeeDialogTitle: MessageDescriptor
+  lateFeeDialogTitle: MessageDescriptor
+  delayedFeeDialogTitle: MessageDescriptor
   nidPatternTitle: MessageDescriptor
   nidPatternChangeMessage: MessageDescriptor
   nidPatternChangeError: MessageDescriptor
@@ -51,14 +65,18 @@ interface IConfigMessages
   phoneNumberChangeError: MessageDescriptor
   phoneNumberChangeNotification: MessageDescriptor
   legallySpecifiedLabel: MessageDescriptor
+  legallySpecifiedValue: MessageDescriptor
   lateRegistrationLabel: MessageDescriptor
+  lateRegistrationValue: MessageDescriptor
   delayedRegistrationLabel: MessageDescriptor
+  delayedRegistrationValue: MessageDescriptor
   withinLegallySpecifiedTimeLabel: MessageDescriptor
   generalTabTitle: MessageDescriptor
   birthTabTitle: MessageDescriptor
   deathTabTitle: MessageDescriptor
   registrationTimePeriodsGroupTitle: MessageDescriptor
   registrationFeesGroupTitle: MessageDescriptor
+  eventTargetInputLabel: MessageDescriptor
   pattern: MessageDescriptor
   example: MessageDescriptor
   testNumber: MessageDescriptor
@@ -236,6 +254,49 @@ const messagesToDefine: IConfigMessages = {
     defaultMessage: 'Currency updated',
     description: 'Message for application currency change notification'
   },
+  applicationBirthRegTargetChangeNotification: {
+    id: 'config.application.birthRegTargetChangeNotification',
+    defaultMessage: 'Birth registration target days updated',
+    description:
+      'Message for application birth registration target change notification'
+  },
+  applicationBirthLateRegTargetChangeNotification: {
+    id: 'config.application.birthLateRegTargetChangeNotification',
+    defaultMessage: 'Birth late registration target days updated',
+    description:
+      'Message for application birth late registration target change notification'
+  },
+  applicationDeathRegTargetChangeNotification: {
+    id: 'config.application.deathRegTargetChangeNotification',
+    defaultMessage: 'Death registration target days updated',
+    description:
+      'Message for application death registration target change notification'
+  },
+  applicationBirthOnTimeFeeChangeNotification: {
+    id: 'config.application.birthOnTimeFeeChangeNotification',
+    defaultMessage: 'Birth on time fee updated',
+    description: 'Message for application birth on time fee change notification'
+  },
+  applicationBirthLateFeeChangeNotification: {
+    id: 'config.application.birthLateFeeChangeNotification',
+    defaultMessage: 'Birth late fee updated',
+    description: 'Message for application birth late fee change notification'
+  },
+  applicationBirthDelayedFeeChangeNotification: {
+    id: 'config.application.birthDelayedFeeChangeNotification',
+    defaultMessage: 'Birth delayed fee updated',
+    description: 'Message for application birth delayed fee change notification'
+  },
+  applicationDeathOnTimeFeeChangeNotification: {
+    id: 'config.application.deathOnTimeFeeChangeNotification',
+    defaultMessage: 'Death on time fee updated',
+    description: 'Message for application death on time fee change notification'
+  },
+  applicationDeathDelayedFeeChangeNotification: {
+    id: 'config.application.deathDelayedFeeChangeNotification',
+    defaultMessage: 'Death delayed fee updated',
+    description: 'Message for application death delayed fee change notification'
+  },
   applicationCurrencyChangeMessage: {
     id: 'config.application.currencyChangeMessage',
     defaultMessage: 'Select your currency for your CRVS system',
@@ -262,20 +323,65 @@ const messagesToDefine: IConfigMessages = {
     defaultMessage: 'Invalid regular expression for a National ID Number',
     description: 'Error message for invalid regular expression for NID number'
   },
+  birthLegallySpecifiedDialogTitle: {
+    id: 'config.application.birthLegallySpecifiedDialogTitle',
+    defaultMessage: 'Legally specified time period for birth registration',
+    description: 'Legally specified dialog title for brith'
+  },
+  birthDelayedDialogTitle: {
+    id: 'config.application.birthDelayedDialogTitle',
+    defaultMessage: 'Delayed registration time period for birth registration',
+    description: 'Delayed dialog title for brith'
+  },
+  deathLegallySpecifiedDialogTitle: {
+    id: 'config.application.deathLegallySpecifiedDialogTitle',
+    defaultMessage: 'Legally specified time period for death registration',
+    description: 'Legally specified dialog title for death'
+  },
+  onTimeFeeDialogTitle: {
+    id: 'config.application.onTimeFeeDialogTitle',
+    defaultMessage: 'Registration fees within legally specified time',
+    description: 'On time fee dialog title'
+  },
+  lateFeeDialogTitle: {
+    id: 'config.application.lateFeeDialogTitle',
+    defaultMessage: 'Registration fees for late registrations',
+    description: 'Date fee dialog title'
+  },
+  delayedFeeDialogTitle: {
+    id: 'config.application.delayedFeeDialogTitle',
+    defaultMessage: 'Registration fees for delayed registrations',
+    description: 'Delayed fee dialog title'
+  },
   legallySpecifiedLabel: {
     id: 'config.application.legallySpecifiedLabel',
     defaultMessage: 'Legally specified',
     description: 'Legally specified config label'
+  },
+  legallySpecifiedValue: {
+    id: 'config.application.legallySpecifiedValue',
+    defaultMessage: 'Within {onTime} days',
+    description: 'Legally specified config value'
   },
   lateRegistrationLabel: {
     id: 'config.application.lateRegistrationLabel',
     defaultMessage: 'Late registration',
     description: 'Late registration config label'
   },
+  lateRegistrationValue: {
+    id: 'config.application.lateRegistrationValue',
+    defaultMessage: 'Between {onTime} days and {lateTime} days',
+    description: 'Late registration config value'
+  },
   delayedRegistrationLabel: {
     id: 'config.application.delayedRegistrationLabel',
     defaultMessage: 'Delayed registration',
     description: 'Delayed registration config label'
+  },
+  delayedRegistrationValue: {
+    id: 'config.application.delayedRegistrationValue',
+    defaultMessage: 'After {lateTime} days',
+    description: 'Delayed registration config value'
   },
   withinLegallySpecifiedTimeLabel: {
     id: 'config.application.withinLegallySpecifiedTimeLabel',
@@ -306,6 +412,11 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.registrationFeesGroupTitle',
     defaultMessage: 'Registration fees',
     description: 'The title for registration fee group'
+  },
+  eventTargetInputLabel: {
+    id: 'config.application.eventTargetInputLabel',
+    defaultMessage: 'days',
+    description: 'The label for event target label'
   },
   pattern: {
     id: 'config.application.pattern',

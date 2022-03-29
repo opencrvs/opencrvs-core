@@ -52,7 +52,8 @@ import {
   IFormSectionData,
   IFormSectionGroup,
   IFormData,
-  CorrectionSection
+  CorrectionSection,
+  IFormFieldValue
 } from '@client/forms'
 import {
   goBack as goBackAction,
@@ -269,6 +270,30 @@ class RegisterFormView extends React.Component<FullProps, State> {
       this.props.history.replace({
         pathname: this.props.history.location.pathname,
         hash: newHash + '-form-input'
+      })
+    }
+    const oldIsWritingDraft = prevProps.isWritingDraft
+    const newIsWritingDraft = this.props.isWritingDraft
+    if (oldIsWritingDraft && !newIsWritingDraft) {
+      const sectionValues =
+        this.props.declaration.data[this.props.activeSection.id] || {}
+      this.props.activeSectionGroup.fields.forEach((field) => {
+        const initialValue =
+          isUndefined(sectionValues[field.name]) ||
+          isNull(sectionValues[field.name])
+            ? getInitialValue(field, this.props.declaration.data || {})
+            : sectionValues[field.name]
+        sectionValues[field.name] = initialValue as IFormFieldValue
+      })
+      this.props.modifyDeclaration({
+        ...this.props.declaration,
+        data: {
+          ...this.props.declaration.data,
+          [this.props.activeSection.id]: {
+            ...this.props.declaration.data[this.props.activeSection.id],
+            ...sectionValues
+          }
+        }
       })
     }
   }
@@ -501,7 +526,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       }),
       iconColor:
         declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
-          ? 'violet'
+          ? 'purple'
           : 'orange'
     }
 
@@ -594,7 +619,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     )}
                     iconColor={
                       declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
-                        ? 'violet'
+                        ? 'purple'
                         : 'orange'
                     }
                     saveAction={{
@@ -625,7 +650,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       )}
                       iconColor={
                         declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
-                          ? 'violet'
+                          ? 'purple'
                           : 'orange'
                       }
                       saveAction={{
@@ -886,7 +911,6 @@ function firstVisibleSection(form: IForm) {
 
 function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
   const { match, registerForm, declaration } = props
-
   const sectionId = match.params.pageId || firstVisibleSection(registerForm).id
 
   const activeSection = registerForm.sections.find(

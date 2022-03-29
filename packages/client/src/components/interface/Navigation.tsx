@@ -19,7 +19,7 @@ import {
   filterProcessingDeclarationsFromQuery
 } from '@client/declarations'
 import { IStoreState } from '@opencrvs/client/src/store'
-import { LeftNavigationDeclarationIcons } from '@opencrvs/components/lib/icons/LeftNavigationDeclarationIcons'
+import { DeclarationIconSmall } from '@opencrvs/components/lib/icons/DeclarationIconSmall'
 import { LeftNavigation } from '@opencrvs/components/lib/interface/Navigation/LeftNavigation'
 import { NavigationGroup } from '@opencrvs/components/lib/interface/Navigation/NavigationGroup'
 import { NavigationItem } from '@opencrvs/components/lib/interface/Navigation/NavigationItem'
@@ -304,7 +304,7 @@ export const NavigationView = (props: IFullProps) => {
         <>
           <NavigationGroup>
             <NavigationItem
-              icon={() => <LeftNavigationDeclarationIcons />}
+              icon={() => <DeclarationIconSmall color={'purple'} />}
               id={`navigation_${TAB_ID.inProgress}`}
               label={TAB_LABEL.inProgress}
               count={props.draftDeclarations.length}
@@ -315,7 +315,7 @@ export const NavigationView = (props: IFullProps) => {
               }}
             />
             <NavigationItem
-              icon={() => <LeftNavigationDeclarationIcons color={'orange'} />}
+              icon={() => <DeclarationIconSmall color={'orange'} />}
               id={`navigation_${TAB_ID.sentForReview}`}
               label={TAB_LABEL.sentForReview}
               count={props.declarationsReadyToSend.length}
@@ -345,9 +345,7 @@ export const NavigationView = (props: IFullProps) => {
                 if (loading) {
                   return (
                     <NavigationItem
-                      icon={() => (
-                        <LeftNavigationDeclarationIcons color={'red'} />
-                      )}
+                      icon={() => <DeclarationIconSmall color={'red'} />}
                       id={`navigation_${TAB_ID.requireUpdates}_loading`}
                       label={TAB_LABEL.requiresUpdate}
                       count={0}
@@ -362,9 +360,7 @@ export const NavigationView = (props: IFullProps) => {
                 return (
                   <>
                     <NavigationItem
-                      icon={() => (
-                        <LeftNavigationDeclarationIcons color={'red'} />
-                      )}
+                      icon={() => <DeclarationIconSmall color={'red'} />}
                       id={`navigation_${TAB_ID.requireUpdates}`}
                       label={TAB_LABEL.requiresUpdate}
                       count={data.searchEvents.totalItems}
@@ -393,7 +389,7 @@ export const NavigationView = (props: IFullProps) => {
                 {userDetails?.role &&
                   USER_SCOPE[userDetails.role].includes(TAB_ID.inProgress) && (
                     <NavigationItem
-                      icon={() => <LeftNavigationDeclarationIcons />}
+                      icon={() => <DeclarationIconSmall color={'purple'} />}
                       id={`navigation_${TAB_ID.inProgress}`}
                       label={TAB_LABEL.inProgress}
                       count={declarationCount.inProgress}
@@ -409,9 +405,7 @@ export const NavigationView = (props: IFullProps) => {
                     TAB_ID.readyForReview
                   ) && (
                     <NavigationItem
-                      icon={() => (
-                        <LeftNavigationDeclarationIcons color={'orange'} />
-                      )}
+                      icon={() => <DeclarationIconSmall color={'orange'} />}
                       id={`navigation_${TAB_ID.readyForReview}`}
                       label={TAB_LABEL.readyForReview}
                       count={declarationCount.readyForReview}
@@ -427,9 +421,7 @@ export const NavigationView = (props: IFullProps) => {
                     TAB_ID.sentForUpdates
                   ) && (
                     <NavigationItem
-                      icon={() => (
-                        <LeftNavigationDeclarationIcons color={'red'} />
-                      )}
+                      icon={() => <DeclarationIconSmall color={'red'} />}
                       id={`navigation_${TAB_ID.sentForUpdates}`}
                       label={TAB_LABEL.sentForUpdates}
                       count={declarationCount.sentForUpdates}
@@ -445,9 +437,7 @@ export const NavigationView = (props: IFullProps) => {
                     TAB_ID.sentForApproval
                   ) && (
                     <NavigationItem
-                      icon={() => (
-                        <LeftNavigationDeclarationIcons color={'grey500'} />
-                      )}
+                      icon={() => <DeclarationIconSmall color={'grey'} />}
                       id={`navigation_${TAB_ID.sentForApproval}`}
                       label={TAB_LABEL.sentForApproval}
                       count={declarationCount.sentForApproval}
@@ -460,9 +450,7 @@ export const NavigationView = (props: IFullProps) => {
                   )}
                 {window.config.EXTERNAL_VALIDATION_WORKQUEUE && (
                   <NavigationItem
-                    icon={() => (
-                      <LeftNavigationDeclarationIcons color={'teal'} />
-                    )}
+                    icon={() => <DeclarationIconSmall color={'teal'} />}
                     id={`navigation_${TAB_ID.externalValidation}`}
                     label={TAB_LABEL.externalValidation}
                     count={declarationCount.externalValidation}
@@ -478,9 +466,7 @@ export const NavigationView = (props: IFullProps) => {
                     TAB_ID.readyToPrint
                   ) && (
                     <NavigationItem
-                      icon={() => (
-                        <LeftNavigationDeclarationIcons color={'green'} />
-                      )}
+                      icon={() => <DeclarationIconSmall color={'green'} />}
                       id={`navigation_${TAB_ID.readyToPrint}`}
                       label={TAB_LABEL.readyToPrint}
                       count={declarationCount.readyToPrint}
@@ -499,9 +485,7 @@ export const NavigationView = (props: IFullProps) => {
                 {userDetails?.role &&
                   USER_SCOPE[userDetails.role].includes(TAB_ID.performance) && (
                     <NavigationItem
-                      icon={() => (
-                        <Activity stroke={'#595C5F'} height={15} width={15} />
-                      )}
+                      icon={() => <Activity />}
                       id={`navigation_${TAB_ID.performance}`}
                       label={TAB_LABEL.performance}
                       onClick={() =>
@@ -516,9 +500,7 @@ export const NavigationView = (props: IFullProps) => {
                 {userDetails?.role &&
                   USER_SCOPE[userDetails.role].includes(TAB_ID.team) && (
                     <NavigationItem
-                      icon={() => (
-                        <Users stroke={'#595C5F'} height={15} width={15} />
-                      )}
+                      icon={() => <Users />}
                       id={`navigation_${TAB_ID.team}`}
                       label={TAB_LABEL.team}
                       onClick={() => props.goToTeamViewAction(userDetails)}
@@ -554,7 +536,7 @@ export const NavigationView = (props: IFullProps) => {
                           <NavigationSubItem
                             label={TAB_LABEL.certificatesConfiguration}
                             id={`navigation_${TAB_ID.application}`}
-                            onClick={goToApplicationConfigAction}
+                            onClick={goToConfigAction}
                             isSelected={
                               enableMenuSelection &&
                               activeMenuItem === TAB_ID.application
@@ -563,7 +545,7 @@ export const NavigationView = (props: IFullProps) => {
                           <NavigationSubItem
                             label={TAB_LABEL.applicationSettings}
                             id={`navigation_${TAB_ID.certificates}`}
-                            onClick={goToConfigAction}
+                            onClick={goToApplicationConfigAction}
                             isSelected={
                               enableMenuSelection &&
                               activeMenuItem === TAB_ID.certificates

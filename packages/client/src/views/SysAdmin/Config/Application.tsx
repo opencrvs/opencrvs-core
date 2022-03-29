@@ -33,7 +33,8 @@ import { buttonMessages } from '@client/i18n/messages'
 import { DynamicModal } from '@client/views/SysAdmin/Config/DynamicModal'
 import { EMPTY_STRING } from '@client/utils/constants'
 import styled from 'styled-components'
-import { countries as countryList, lookup } from 'country-data'
+import { lookup } from 'country-data'
+import { FormattedNumberCurrency } from '@opencrvs/components/lib/symbol'
 
 const ListGroupTitle = styled.div`
   color: ${({ theme }) => theme.colors.grey400};
@@ -66,6 +67,20 @@ export enum GeneralActionId {
   NID_PATTERN = 'changeNidPattern',
   CURRENCY = 'changeCurrency',
   PHONE_NUMBER = 'changePhnNum'
+}
+
+export enum BirthActionId {
+  BIRTH_REGISTRATION_TARGET = 'changeBirthRegTarget',
+  BIRTH_LATE_REGISTRATION_TARGET = 'changeBirthLateRegTarget',
+  BIRTH_ON_TIME_FEE = 'changeBirthOnTimeFee',
+  BIRTH_LATE_FEE = 'changeBirthLateFee',
+  BIRTH_DELAYED_FEE = 'changeBirthDelayedFee'
+}
+
+export enum DeathActionId {
+  DEATH_REGISTRATION_TARGET = 'changeDeathRegTarget',
+  DEATH_ON_TIME_FEE = 'changeDeathOnTimeFee',
+  DEATH_DELAYED_FEE = 'changeDeathDelayedFee'
 }
 
 function GeneralTabContent({
@@ -159,10 +174,12 @@ function GeneralTabContent({
 
 function BirthTabContent({
   offlineCountryConfiguration,
-  intl
+  intl,
+  callBack
 }: {
   offlineCountryConfiguration: IOfflineData
   intl: IntlShape
+  callBack: (modalName: string) => void
 }) {
   return (
     <ListView
@@ -177,15 +194,25 @@ function BirthTabContent({
         },
         {
           label: intl.formatMessage(messages.legallySpecifiedLabel),
-          value: 'Within 30 days',
+          value: intl.formatMessage(messages.legallySpecifiedValue, {
+            onTime: offlineCountryConfiguration.config.BIRTH.REGISTRATION_TARGET
+          }),
           action: {
+            id: BirthActionId.BIRTH_REGISTRATION_TARGET,
             label: intl.formatMessage(buttonMessages.change),
-            disabled: true
+            handler: () => {
+              callBack(BirthActionId.BIRTH_REGISTRATION_TARGET)
+            }
           }
         },
         {
           label: intl.formatMessage(messages.lateRegistrationLabel),
-          value: 'Between 30 days and 365 days',
+          value: intl.formatMessage(messages.lateRegistrationValue, {
+            onTime:
+              offlineCountryConfiguration.config.BIRTH.REGISTRATION_TARGET,
+            lateTime:
+              offlineCountryConfiguration.config.BIRTH.LATE_REGISTRATION_TARGET
+          }),
           action: {
             label: intl.formatMessage(buttonMessages.change),
             disabled: true
@@ -193,10 +220,16 @@ function BirthTabContent({
         },
         {
           label: intl.formatMessage(messages.delayedRegistrationLabel),
-          value: 'After 365 days',
+          value: intl.formatMessage(messages.delayedRegistrationValue, {
+            lateTime:
+              offlineCountryConfiguration.config.BIRTH.LATE_REGISTRATION_TARGET
+          }),
           action: {
+            id: BirthActionId.BIRTH_LATE_REGISTRATION_TARGET,
             label: intl.formatMessage(buttonMessages.change),
-            disabled: true
+            handler: () => {
+              callBack(BirthActionId.BIRTH_LATE_REGISTRATION_TARGET)
+            }
           }
         },
         {
@@ -209,26 +242,62 @@ function BirthTabContent({
         },
         {
           label: intl.formatMessage(messages.withinLegallySpecifiedTimeLabel),
-          value: '',
+          value: (
+            <FormattedNumberCurrency
+              value={offlineCountryConfiguration.config.BIRTH.FEE.ON_TIME}
+              currency={offlineCountryConfiguration.config.CURRENCY.isoCode}
+              languagesAndCountry={
+                offlineCountryConfiguration.config.CURRENCY
+                  .languagesAndCountry[0]
+              }
+            />
+          ),
           action: {
+            id: BirthActionId.BIRTH_ON_TIME_FEE,
             label: intl.formatMessage(buttonMessages.change),
-            disabled: true
+            handler: () => {
+              callBack(BirthActionId.BIRTH_ON_TIME_FEE)
+            }
           }
         },
         {
           label: intl.formatMessage(messages.lateRegistrationLabel),
-          value: '',
+          value: (
+            <FormattedNumberCurrency
+              value={offlineCountryConfiguration.config.BIRTH.FEE.LATE}
+              currency={offlineCountryConfiguration.config.CURRENCY.isoCode}
+              languagesAndCountry={
+                offlineCountryConfiguration.config.CURRENCY
+                  .languagesAndCountry[0]
+              }
+            />
+          ),
           action: {
+            id: BirthActionId.BIRTH_LATE_FEE,
             label: intl.formatMessage(buttonMessages.change),
-            disabled: true
+            handler: () => {
+              callBack(BirthActionId.BIRTH_LATE_FEE)
+            }
           }
         },
         {
           label: intl.formatMessage(messages.delayedRegistrationLabel),
-          value: '',
+          value: (
+            <FormattedNumberCurrency
+              value={offlineCountryConfiguration.config.BIRTH.FEE.DELAYED}
+              currency={offlineCountryConfiguration.config.CURRENCY.isoCode}
+              languagesAndCountry={
+                offlineCountryConfiguration.config.CURRENCY
+                  .languagesAndCountry[0]
+              }
+            />
+          ),
           action: {
+            id: BirthActionId.BIRTH_DELAYED_FEE,
             label: intl.formatMessage(buttonMessages.change),
-            disabled: true
+            handler: () => {
+              callBack(BirthActionId.BIRTH_DELAYED_FEE)
+            }
           }
         }
       ]}
@@ -238,10 +307,12 @@ function BirthTabContent({
 
 function DeathTabContent({
   offlineCountryConfiguration,
-  intl
+  intl,
+  callBack
 }: {
   offlineCountryConfiguration: IOfflineData
   intl: IntlShape
+  callBack: (modalName: string) => void
 }) {
   return (
     <ListView
@@ -256,15 +327,23 @@ function DeathTabContent({
         },
         {
           label: intl.formatMessage(messages.legallySpecifiedLabel),
-          value: 'Within 30 days',
+          value: intl.formatMessage(messages.legallySpecifiedValue, {
+            onTime: offlineCountryConfiguration.config.DEATH.REGISTRATION_TARGET
+          }),
           action: {
+            id: DeathActionId.DEATH_REGISTRATION_TARGET,
             label: intl.formatMessage(buttonMessages.change),
-            disabled: true
+            handler: () => {
+              callBack(DeathActionId.DEATH_REGISTRATION_TARGET)
+            }
           }
         },
         {
           label: intl.formatMessage(messages.delayedRegistrationLabel),
-          value: 'After 30 days',
+          value: intl.formatMessage(messages.delayedRegistrationValue, {
+            lateTime:
+              offlineCountryConfiguration.config.DEATH.REGISTRATION_TARGET
+          }),
           action: {
             label: intl.formatMessage(buttonMessages.change),
             disabled: true
@@ -280,18 +359,42 @@ function DeathTabContent({
         },
         {
           label: intl.formatMessage(messages.lateRegistrationLabel),
-          value: '',
+          value: (
+            <FormattedNumberCurrency
+              value={offlineCountryConfiguration.config.DEATH.FEE.ON_TIME}
+              currency={offlineCountryConfiguration.config.CURRENCY.isoCode}
+              languagesAndCountry={
+                offlineCountryConfiguration.config.CURRENCY
+                  .languagesAndCountry[0]
+              }
+            />
+          ),
           action: {
+            id: DeathActionId.DEATH_ON_TIME_FEE,
             label: intl.formatMessage(buttonMessages.change),
-            disabled: true
+            handler: () => {
+              callBack(DeathActionId.DEATH_ON_TIME_FEE)
+            }
           }
         },
         {
           label: intl.formatMessage(messages.delayedRegistrationLabel),
-          value: '',
+          value: (
+            <FormattedNumberCurrency
+              value={offlineCountryConfiguration.config.DEATH.FEE.DELAYED}
+              currency={offlineCountryConfiguration.config.CURRENCY.isoCode}
+              languagesAndCountry={
+                offlineCountryConfiguration.config.CURRENCY
+                  .languagesAndCountry[0]
+              }
+            />
+          ),
           action: {
+            id: DeathActionId.DEATH_DELAYED_FEE,
             label: intl.formatMessage(buttonMessages.change),
-            disabled: true
+            handler: () => {
+              callBack(DeathActionId.DEATH_DELAYED_FEE)
+            }
           }
         }
       ]}
@@ -375,12 +478,22 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
             <BirthTabContent
               offlineCountryConfiguration={offlineCountryConfiguration}
               intl={intl}
+              callBack={(modalName: string) =>
+                this.setState({
+                  changeModalName: modalName
+                })
+              }
             />
           )}
           {this.state.activeTabId && this.state.activeTabId === TabId.DEATH && (
             <DeathTabContent
               offlineCountryConfiguration={offlineCountryConfiguration}
               intl={intl}
+              callBack={(modalName: string) =>
+                this.setState({
+                  changeModalName: modalName
+                })
+              }
             />
           )}
         </Content>

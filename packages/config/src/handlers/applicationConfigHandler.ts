@@ -14,10 +14,11 @@ import ApplicationConfig, {
   IApplicationConfigurationModel
 } from '@config/models/config' //   IApplicationConfigurationModel
 import { logger } from '@config/config/logger'
-import { getActiveCertificatesHandler } from '@config/handlers/declarationCertificateHandler'
 import { badRequest } from '@hapi/boom'
 import * as Joi from 'joi'
 import { merge } from 'lodash'
+import { getActiveCertificatesHandler } from '@config/handlers/certificate/certificateHandler'
+import getQuestionsHandler from '@config/handlers/getQuestions/handler'
 
 export default async function applicationHandler(
   request: Hapi.Request,
@@ -25,12 +26,16 @@ export default async function applicationHandler(
 ) {
   try {
     const certificateResponse = await getActiveCertificatesHandler(request, h)
+    const questionsResponse = await getQuestionsHandler(request, h)
     let appConfig: IApplicationConfigurationModel | null
     // tslint:disable-next-line
     appConfig = await ApplicationConfig.findOne({})
     return {
       config: appConfig,
-      certificates: certificateResponse
+      certificates: certificateResponse,
+      formConfig: {
+        questionConfig: questionsResponse
+      }
     }
   } catch (ex) {
     logger.error(ex)
@@ -67,6 +72,15 @@ export async function updateApplicationConfigHandler(
 export const updateApplicationConfig = Joi.object({
   APPLICATION_NAME: Joi.string(),
   BACKGROUND_SYNC_BROADCAST_CHANNEL: Joi.string(),
+  BIRTH: Joi.object().keys({
+    REGISTRATION_TARGET: Joi.number(),
+    LATE_REGISTRATION_TARGET: Joi.number(),
+    FEE: {
+      ON_TIME: Joi.number(),
+      LATE: Joi.number(),
+      DELAYED: Joi.number()
+    }
+  }),
   COUNTRY: Joi.string(),
   COUNTRY_LOGO: Joi.object().keys({
     fileName: Joi.string(),
@@ -78,12 +92,15 @@ export const updateApplicationConfig = Joi.object({
     isoCode: Joi.string(),
     languagesAndCountry: Joi.array().items(Joi.string())
   }),
+  DEATH: Joi.object().keys({
+    REGISTRATION_TARGET: Joi.number(),
+    FEE: {
+      ON_TIME: Joi.number(),
+      DELAYED: Joi.number()
+    }
+  }),
   DESKTOP_TIME_OUT_MILLISECONDS: Joi.number(),
   LANGUAGES: Joi.string(),
-  CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: Joi.number(),
-  CERTIFICATE_PRINT_CHARGE_UP_LIMIT: Joi.number(),
-  CERTIFICATE_PRINT_LOWEST_CHARGE: Joi.number(),
-  CERTIFICATE_PRINT_HIGHEST_CHARGE: Joi.number(),
   UI_POLLING_INTERVAL: Joi.number(),
   FIELD_AGENT_AUDIT_LOCATIONS: Joi.string(),
   APPLICATION_AUDIT_LOCATIONS: Joi.string(),

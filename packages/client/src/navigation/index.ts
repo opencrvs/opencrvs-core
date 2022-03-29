@@ -68,10 +68,10 @@ import {
   replace,
   goForward as forward
 } from 'connected-react-router'
-import moment from 'moment'
 import { stringify } from 'query-string'
 import { Cmd, loop } from 'redux-loop'
 import { IRecordAuditTabs } from '@client/views/Home/RecordAudit'
+import subYears from 'date-fns/subYears'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -248,8 +248,8 @@ export function goToPerformanceReport(
 export function goToOperationalReport(
   locationId: string,
   sectionId: OPERATIONAL_REPORT_SECTION = OPERATIONAL_REPORT_SECTION.OPERATIONAL,
-  timeStart: Date = moment().subtract(1, 'years').toDate(),
-  timeEnd: Date = moment().toDate()
+  timeStart: Date = subYears(new Date(Date.now()), 1),
+  timeEnd: Date = new Date(Date.now())
 ) {
   return push({
     pathname: OPERATIONAL_REPORT,

@@ -29,15 +29,20 @@ export interface IMessageDescriptor {
 }
 
 export interface IQuestion {
+  // fieldId is in the format:
+  // event.sectionId.groupId.fieldName
   fieldId: string
   label?: IMessageDescriptor
   placeholder?: IMessageDescriptor
   maxLength?: number
   fieldName?: string
   fieldType?: FieldType
+  // must be the fieldId for the field vertically above this one in the form or the string "TOP"
   preceedingFieldId?: string
   required?: boolean
-  enabled: boolean
+  // enabled should be a string "DISABLED" or "" or undefined because existing default fields will be ""
+  // wanted to use disabled, but this prop is already in use in IFormField
+  enabled?: string
   custom?: boolean
   initialValue?: string
 }
@@ -63,7 +68,7 @@ const questionSchema = new Schema({
   },
   preceedingFieldId: { type: String },
   required: { type: Boolean },
-  enabled: { type: Boolean, required: true },
+  enabled: { type: String },
   custom: { type: Boolean, default: false },
   initialValue: { type: String }
 })

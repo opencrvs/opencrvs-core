@@ -17,9 +17,26 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 
-type Mask {
-  startForm: Int
-  endBefore: Int
+type BirthFee {
+  ON_TIME: Float
+  LATE: Float
+  DELAYED: Float
+}
+
+type Birth {
+  REGISTRATION_TARGET: Int
+  LATE_REGISTRATION_TARGET: Int
+  FEE: BirthFee
+}
+
+type DeathFee {
+  ON_TIME: Float
+  DELAYED: Float
+}
+
+type Death {
+  REGISTRATION_TARGET: Int
+  FEE: DeathFee
 }
 
 type CountryLogo {
@@ -32,9 +49,32 @@ type Currency {
   languagesAndCountry: [String]
 }
 
-input MaskInput {
-  startForm: Int
-  endBefore: Int
+input BirthFeeInput {
+  ON_TIME: Float
+  LATE: Float
+  DELAYED: Float
+}
+
+input BirthInput {
+  REGISTRATION_TARGET: Int
+  LATE_REGISTRATION_TARGET: Int
+  FEE: BirthFeeInput
+}
+
+input DeathFeeInput {
+  ON_TIME: Float
+  DELAYED: Float
+}
+
+input DeathInput {
+  REGISTRATION_TARGET: Int
+  FEE: DeathFeeInput
+}
+
+input NIDNumberPatternInput {
+  pattern: String
+  example: String
+  num: String
 }
 
 input CountryLogoInput {
@@ -50,17 +90,15 @@ input CurrencyInput {
 input ApplicationConfigurationInput {
   APPLICATION_NAME: String
   BACKGROUND_SYNC_BROADCAST_CHANNEL: String
+  BIRTH: BirthInput
   COUNTRY: String
   COUNTRY_LOGO: CountryLogoInput
   CURRENCY: CurrencyInput
   COUNTRY_LOGO_RENDER_WIDTH: Int
   COUNTRY_LOGO_RENDER_HEIGHT: Int
   DESKTOP_TIME_OUT_MILLISECONDS: Int
+  DEATH: DeathInput
   LANGUAGES: String
-  CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: Int
-  CERTIFICATE_PRINT_CHARGE_UP_LIMIT: Int
-  CERTIFICATE_PRINT_LOWEST_CHARGE: Int
-  CERTIFICATE_PRINT_HIGHEST_CHARGE: Int
   UI_POLLING_INTERVAL: Int
   FIELD_AGENT_AUDIT_LOCATIONS: String
   APPLICATION_AUDIT_LOCATIONS: String
@@ -70,25 +108,21 @@ input ApplicationConfigurationInput {
   SENTRY: String
   LOGROCKET: String
   PHONE_NUMBER_PATTERN: String
-  BIRTH_REGISTRATION_TARGET: Int
-  DEATH_REGISTRATION_TARGET: Int
   NID_NUMBER_PATTERN: String
 }
 
 type ApplicationConfiguration {
   APPLICATION_NAME: String
   BACKGROUND_SYNC_BROADCAST_CHANNEL: String
+  BIRTH: Birth
   COUNTRY: String
   COUNTRY_LOGO: CountryLogo
   CURRENCY: Currency
   COUNTRY_LOGO_RENDER_WIDTH: Int
   COUNTRY_LOGO_RENDER_HEIGHT: Int
   DESKTOP_TIME_OUT_MILLISECONDS: Int
+  DEATH: Death
   LANGUAGES: String
-  CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: Int
-  CERTIFICATE_PRINT_CHARGE_UP_LIMIT: Int
-  CERTIFICATE_PRINT_LOWEST_CHARGE: Int
-  CERTIFICATE_PRINT_HIGHEST_CHARGE: Int
   UI_POLLING_INTERVAL: Int
   FIELD_AGENT_AUDIT_LOCATIONS: String
   APPLICATION_AUDIT_LOCATIONS: String
@@ -98,8 +132,6 @@ type ApplicationConfiguration {
   SENTRY: String
   LOGROCKET: String
   PHONE_NUMBER_PATTERN: String
-  BIRTH_REGISTRATION_TARGET: Int
-  DEATH_REGISTRATION_TARGET: Int
   NID_NUMBER_PATTERN: String
 }
 

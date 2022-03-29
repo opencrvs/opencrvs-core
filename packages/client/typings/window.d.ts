@@ -13,6 +13,15 @@ interface Window {
   config: {
     APPLICATION_NAME: string
     API_GATEWAY_URL: string
+    BIRTH: {
+      REGISTRATION_TARGET: number
+      LATE_REGISTRATION_TARGET: number
+      FEE: {
+        ON_TIME: number
+        LATE: number
+        DELAYED: number
+      }
+    }
     CONFIG_API_URL: string
     BACKGROUND_SYNC_BROADCAST_CHANNEL: string
     COUNTRY: string
@@ -27,15 +36,18 @@ interface Window {
     COUNTRY_LOGO_RENDER_WIDTH: number // in px
     COUNTRY_LOGO_RENDER_HEIGHT: number // in px
     DESKTOP_TIME_OUT_MILLISECONDS: number
+    DEATH: {
+      REGISTRATION_TARGET: number
+      FEE: {
+        ON_TIME: number
+        DELAYED: number
+      }
+    }
     LANGUAGES: string
     LOGIN_URL: string
     AUTH_URL: string
     COUNTRY_CONFIG_URL: string
     SHOW_FARAJALAND_IN_COUNTRY_LISTS: boolean
-    CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: number
-    CERTIFICATE_PRINT_CHARGE_UP_LIMIT: number
-    CERTIFICATE_PRINT_LOWEST_CHARGE: number
-    CERTIFICATE_PRINT_HIGHEST_CHARGE: number
     UI_POLLING_INTERVAL: number
     INFORMANT_MINIMUM_AGE: number
     HIDE_EVENT_REGISTER_INFORMATION: boolean
@@ -47,7 +59,6 @@ interface Window {
     DECLARATION_AUDIT_LOCATIONS: string
     LOGROCKET: string
     SENTRY: string
-    BIRTH_REGISTRATION_TARGET: number
-    DEATH_REGISTRATION_TARGET: number
   }
+  __localeId__: string
 }

@@ -28,6 +28,7 @@ import {
 } from '@client/views/SysAdmin/Team/utils'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
+import { formConfig } from '@client/tests/mock-offline-data'
 
 describe('signature upload tests', () => {
   const { store, history } = createStore()
@@ -42,8 +43,10 @@ describe('signature upload tests', () => {
         locations: mockOfflineData.locations,
         facilities: mockOfflineData.facilities,
         pilotLocations: mockOfflineData.pilotLocations,
+        assets: mockOfflineData.assets,
         offices: mockOfflineData.offices,
-        config: mockOfflineData.config
+        config: mockOfflineData.config,
+        formConfig
       })
     )
   })

@@ -29,6 +29,22 @@ const applicationConfigMutation = gql`
         languagesAndCountry
         isoCode
       }
+      BIRTH {
+        REGISTRATION_TARGET
+        LATE_REGISTRATION_TARGET
+        FEE {
+          ON_TIME
+          LATE
+          DELAYED
+        }
+      }
+      DEATH {
+        REGISTRATION_TARGET
+        FEE {
+          ON_TIME
+          DELAYED
+        }
+      }
     }
   }
 `

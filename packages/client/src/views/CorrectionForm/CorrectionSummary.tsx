@@ -140,7 +140,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       )
     }
     const currency = lookup.currencies({
-      code: window.config.CURRENCY && window.config.CURRENCY['isoCode']
+      code:
+        this.props.offlineResources.config.CURRENCY &&
+        this.props.offlineResources.config.CURRENCY['isoCode']
     })[0].symbol
     ;(
       this.group.fields[0].nestedFields as any

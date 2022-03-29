@@ -31,7 +31,12 @@ import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import styled, { withTheme } from 'styled-components'
-import { calculatePrice, getEventDate, getServiceMessage } from './utils'
+import {
+  calculatePrice,
+  getEventDate,
+  getRegisteredDate,
+  getServiceMessage
+} from './utils'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 
@@ -136,11 +141,25 @@ class PaymentComponent extends React.Component<IFullProps> {
   render = () => {
     const { intl, declaration, event, goBack, offlineCountryConfig } =
       this.props
+
+    const registeredDate = getRegisteredDate(declaration.data)
+
     const eventDate = getEventDate(declaration.data, event)
 
-    const paymentAmount = calculatePrice(event, eventDate)
+    const paymentAmount = calculatePrice(
+      event,
+      eventDate,
+      registeredDate,
+      offlineCountryConfig
+    )
 
-    const serviceMessage = getServiceMessage(event, eventDate)
+    const serviceMessage = getServiceMessage(
+      intl,
+      event,
+      eventDate,
+      registeredDate,
+      offlineCountryConfig
+    )
 
     return (
       <>
@@ -153,14 +172,14 @@ class PaymentComponent extends React.Component<IFullProps> {
             <LabelValue
               id="service"
               label={intl.formatMessage(messages.receiptService)}
-              value={intl.formatMessage(serviceMessage)}
+              value={serviceMessage}
             />
             <LabelValue
               id="amountDue"
               label={intl.formatMessage(messages.amountDue)}
               value={
                 <FormattedNumberCurrency
-                  value={parseInt(paymentAmount)}
+                  value={paymentAmount}
                   currency={offlineCountryConfig.config.CURRENCY.isoCode}
                   languagesAndCountry={
                     offlineCountryConfig.config.CURRENCY.languagesAndCountry[0]
@@ -187,7 +206,7 @@ class PaymentComponent extends React.Component<IFullProps> {
           <Action>
             <PrimaryButton
               id="Continue"
-              onClick={() => this.continue(paymentAmount)}
+              onClick={() => this.continue(paymentAmount.toString())}
             >
               {intl.formatMessage(buttonMessages.continueButton)}
             </PrimaryButton>

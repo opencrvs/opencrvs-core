@@ -36,6 +36,15 @@ export const validImageB64String =
 let mockConfig = {
   APPLICATION_NAME: 'Farajaland CRVS',
   BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
+  BIRTH: {
+    REGISTRATION_TARGET: 45,
+    LATE_REGISTRATION_TARGET: 365,
+    FEE: {
+      ON_TIME: 0,
+      LATE: 0,
+      DELAYED: 0
+    }
+  },
   COUNTRY: 'bgd',
   COUNTRY_LOGO: {
     fileName: 'logo.png',
@@ -45,6 +54,13 @@ let mockConfig = {
     isoCode: 'ZMW',
     languagesAndCountry: ['en-ZM']
   },
+  DEATH: {
+    REGISTRATION_TARGET: 45,
+    FEE: {
+      ON_TIME: 0,
+      DELAYED: 0
+    }
+  },
   DESKTOP_TIME_OUT_MILLISECONDS: 900000, // 15 mins
   HEALTH_FACILITY_FILTER: 'UPAZILA',
   LANGUAGES: 'en,bn',
@@ -53,10 +69,6 @@ let mockConfig = {
   API_GATEWAY_URL: 'http://localhost:7070/',
   PERFORMANCE_URL: 'http://localhost:3001',
   RESOURCES_URL: 'http://localhost:3040',
-  CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 45, // days
-  CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 1825, // 5 years =  (5 * 365) days
-  CERTIFICATE_PRINT_LOWEST_CHARGE: 25, // taka
-  CERTIFICATE_PRINT_HIGHEST_CHARGE: 50, // taka
   UI_POLLING_INTERVAL: 5000,
   FIELD_AGENT_AUDIT_LOCATIONS:
     'WARD,UNION,CITY_CORPORATION,MUNICIPALITY,UPAZILA',

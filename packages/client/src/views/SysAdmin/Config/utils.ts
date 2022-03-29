@@ -13,15 +13,22 @@
 import { countries as countryList, lookup } from 'country-data'
 import { orderBy, uniqBy, omit } from 'lodash'
 import { IntlShape } from 'react-intl'
-import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
+import {
+  BirthActionId,
+  DeathActionId,
+  GeneralActionId
+} from '@client/views/SysAdmin/Config/Application'
 import { messages } from '@client/i18n/messages/views/config'
 import { EMPTY_STRING } from '@client/utils/constants'
 import {
+  IBirth,
   ICurrency,
+  IDeath,
   IFullProps,
   IState
 } from '@client/views/SysAdmin/Config/DynamicModal'
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/mutations'
+import { IOfflineData, IOfflineDataState } from '@client/offline/reducer'
 
 interface ICurrencyOptions {
   [key: string]: string
@@ -39,6 +46,19 @@ type ICountrylist = {
   status: string
 }
 
+export const getCurrency = (offlineCountryConfiguration: IOfflineData) => {
+  const currency = new Intl.NumberFormat(
+    offlineCountryConfiguration.config.CURRENCY.languagesAndCountry,
+    {
+      style: 'currency',
+      currency: offlineCountryConfiguration.config.CURRENCY.isoCode
+    }
+  )
+    .format(0)
+    .replace(/[0-9\.,]/g, '')
+
+  return currency
+}
 export const getCurrencyObject = (value: string) => {
   const arr = value.split('-')
   return {
@@ -92,15 +112,54 @@ export const getCurrencySelectOptions = () => {
   return sortedCountryOptions
 }
 
+export const getFormattedFee = (value: string) => {
+  value = value.replace(/\,/g, '')
+  if (!isNaN(Number(value)) || !value) {
+    const decimalPlaces = value.toString().split('.')[1]
+    if (decimalPlaces && decimalPlaces.length > 2) {
+      const calcDec = Math.pow(10, 2)
+      value = (Math.trunc(parseFloat(value) * calcDec) / calcDec).toString()
+    }
+    if (value.slice(-1) === '.') {
+      return value
+        ? Number(Number(value).toFixed(1)).toLocaleString().concat('.')
+        : EMPTY_STRING
+    } else {
+      return value ? Number(value).toLocaleString() : EMPTY_STRING
+    }
+  }
+  return EMPTY_STRING
+}
+
 export const getTitle = (intl: IntlShape, changeModalName: string) => {
   if (changeModalName === GeneralActionId.APPLICATION_NAME)
     return intl.formatMessage(messages.applicationNameLabel)
+  if (changeModalName === GeneralActionId.GOVT_LOGO)
+    return intl.formatMessage(messages.govermentLogoLabel)
   else if (changeModalName === GeneralActionId.CURRENCY)
     return intl.formatMessage(messages.currencyLable)
+  else if (changeModalName === BirthActionId.BIRTH_REGISTRATION_TARGET)
+    return intl.formatMessage(messages.birthLegallySpecifiedDialogTitle)
+  else if (changeModalName === BirthActionId.BIRTH_LATE_REGISTRATION_TARGET)
+    return intl.formatMessage(messages.birthDelayedDialogTitle)
+  else if (changeModalName === DeathActionId.DEATH_REGISTRATION_TARGET)
+    return intl.formatMessage(messages.deathLegallySpecifiedDialogTitle)
   else if (changeModalName === GeneralActionId.NID_PATTERN)
     return intl.formatMessage(messages.nidPatternTitle)
   else if (changeModalName === GeneralActionId.PHONE_NUMBER)
     return intl.formatMessage(messages.phoneNumberPatternTitle)
+  else if (
+    changeModalName === BirthActionId.BIRTH_ON_TIME_FEE ||
+    changeModalName === DeathActionId.DEATH_ON_TIME_FEE
+  )
+    return intl.formatMessage(messages.onTimeFeeDialogTitle)
+  else if (changeModalName === BirthActionId.BIRTH_LATE_FEE)
+    return intl.formatMessage(messages.lateFeeDialogTitle)
+  else if (
+    changeModalName === BirthActionId.BIRTH_DELAYED_FEE ||
+    changeModalName === DeathActionId.DEATH_DELAYED_FEE
+  )
+    return intl.formatMessage(messages.delayedFeeDialogTitle)
   else return EMPTY_STRING
 }
 
@@ -128,6 +187,22 @@ export const isApplyButtonDisabled = (
     return !Boolean(state.govtLogo)
   } else if (changeModalName === GeneralActionId.CURRENCY) {
     return !Boolean(state.currency)
+  } else if (changeModalName === BirthActionId.BIRTH_REGISTRATION_TARGET) {
+    return !Boolean(state.birthRegistrationTarget)
+  } else if (changeModalName === BirthActionId.BIRTH_LATE_REGISTRATION_TARGET) {
+    return !Boolean(state.birthLateRegistrationTarget)
+  } else if (changeModalName === DeathActionId.DEATH_REGISTRATION_TARGET) {
+    return !Boolean(state.deathRegistrationTarget)
+  } else if (changeModalName === BirthActionId.BIRTH_ON_TIME_FEE) {
+    return !Boolean(state.birthOnTimeFee)
+  } else if (changeModalName === BirthActionId.BIRTH_LATE_FEE) {
+    return !Boolean(state.birthLateFee)
+  } else if (changeModalName === BirthActionId.BIRTH_DELAYED_FEE) {
+    return !Boolean(state.birthDelayedFee)
+  } else if (changeModalName === DeathActionId.DEATH_ON_TIME_FEE) {
+    return !Boolean(state.deathOnTimeFee)
+  } else if (changeModalName === DeathActionId.DEATH_DELAYED_FEE) {
+    return !Boolean(state.deathDelayedFee)
   } else if (changeModalName === GeneralActionId.NID_PATTERN) {
     return !isValidRegEx(state.nidPattern) || !Boolean(state.nidPattern)
   } else if (changeModalName === GeneralActionId.PHONE_NUMBER) {
@@ -141,8 +216,7 @@ export const isApplyButtonDisabled = (
 export async function callUpdateApplicationNameMutation(
   applicationName: string,
   props: IFullProps,
-  updatingValue: (value: boolean) => void,
-  setError: (errorMessage: string) => void
+  updatingValue: (value: boolean) => void
 ) {
   try {
     updatingValue(true)
@@ -161,7 +235,7 @@ export async function callUpdateApplicationNameMutation(
       props.updateConfig(offlineConfig)
     }
   } catch (err) {
-    setError(props.intl.formatMessage(messages.applicationConfigChangeError))
+    throw err
   }
 }
 
@@ -169,8 +243,7 @@ export async function callUpdateGovtLogoMutation(
   govtLogo: string,
   logoFileName: string,
   props: IFullProps,
-  updatingValue: (value: boolean) => void,
-  setError: (errorMessage: string) => void
+  updatingValue: (value: boolean) => void
 ) {
   try {
     updatingValue(true)
@@ -200,15 +273,14 @@ export async function callUpdateGovtLogoMutation(
       props.updateConfig(updatedOfflineConfig)
     }
   } catch (err) {
-    setError(props.intl.formatMessage(messages.govtLogoChangeError))
+    throw err
   }
 }
 
 export async function callUpdateApplicationCurrencyMutation(
   currency: ICurrency,
   props: IFullProps,
-  updatingValue: (value: boolean) => void,
-  setError: (errorMessage: string) => void
+  updatingValue: (value: boolean) => void
 ) {
   try {
     const res = await configApplicationMutations.mutateApplicationConfig({
@@ -227,15 +299,66 @@ export async function callUpdateApplicationCurrencyMutation(
       props.updateConfig(offlineConfig)
     }
   } catch (err) {
-    setError(props.intl.formatMessage(messages.applicationConfigChangeError))
+    throw err
+  }
+}
+
+export async function callUpdateApplicationBirthMutation(
+  birth: IBirth,
+  props: IFullProps,
+  updatingValue: (value: boolean) => void
+) {
+  try {
+    const res = await configApplicationMutations.mutateApplicationConfig({
+      BIRTH: birth
+    })
+    if (res && res.data) {
+      updatingValue(false)
+      const BIRTH = res.data.updateApplicationConfig.BIRTH
+      omit(BIRTH, ['__typename'])
+      const offlineConfig = {
+        config: {
+          ...props.offlineCountryConfiguration.config,
+          BIRTH
+        }
+      }
+      props.updateConfig(offlineConfig)
+    }
+  } catch (err) {
+    throw err
+  }
+}
+
+export async function callUpdateApplicationDeathMutation(
+  death: IDeath,
+  props: IFullProps,
+  updatingValue: (value: boolean) => void
+) {
+  try {
+    const res = await configApplicationMutations.mutateApplicationConfig({
+      DEATH: death
+    })
+    if (res && res.data) {
+      updatingValue(false)
+      const DEATH = res.data.updateApplicationConfig.DEATH
+      omit(DEATH, ['__typename'])
+      const offlineConfig = {
+        config: {
+          ...props.offlineCountryConfiguration.config,
+          DEATH
+        }
+      }
+      props.updateConfig(offlineConfig)
+    }
+  } catch (err) {
+    throw err
   }
 }
 
 export async function callUpdateNIDPatternMutation(
   nidPattern: string,
   props: IFullProps,
-  updatingValue: (value: boolean) => void,
-  setError: (errorMessage: string) => void
+  updatingValue: (value: boolean) => void
 ) {
   try {
     updatingValue(true)
@@ -255,15 +378,14 @@ export async function callUpdateNIDPatternMutation(
       props.updateConfig(offlineConfig)
     }
   } catch (err) {
-    setError(props.intl.formatMessage(messages.applicationConfigChangeError))
+    throw err
   }
 }
 
 export async function callUpdatePhoneNumberPatternMutation(
   phoneNumberPattern: string,
   props: IFullProps,
-  updatingValue: (value: boolean) => void,
-  setError: (errorMessage: string) => void
+  updatingValue: (value: boolean) => void
 ) {
   try {
     updatingValue(true)
@@ -283,6 +405,6 @@ export async function callUpdatePhoneNumberPatternMutation(
       props.updateConfig(offlineConfig)
     }
   } catch (err) {
-    setError(props.intl.formatMessage(messages.applicationConfigChangeError))
+    throw err
   }
 }

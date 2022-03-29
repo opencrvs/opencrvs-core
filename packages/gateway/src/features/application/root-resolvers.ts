@@ -10,8 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  GQLCountryLogoInput,
+  GQLBirthInput,
   GQLCurrencyInput,
+  GQLDeathInput,
+  GQLCountryLogoInput,
   GQLResolver
 } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
@@ -37,21 +39,15 @@ export const resolvers: GQLResolver = {
         COUNTRY: applicationConfig.COUNTRY as string,
         COUNTRY_LOGO: applicationConfig.COUNTRY_LOGO as GQLCountryLogoInput,
         CURRENCY: applicationConfig.CURRENCY as GQLCurrencyInput,
+        BIRTH: applicationConfig.BIRTH as GQLBirthInput,
         COUNTRY_LOGO_RENDER_WIDTH:
           applicationConfig.COUNTRY_LOGO_RENDER_WIDTH as number,
         COUNTRY_LOGO_RENDER_HEIGHT:
           applicationConfig.COUNTRY_LOGO_RENDER_HEIGHT as number,
         DESKTOP_TIME_OUT_MILLISECONDS:
           applicationConfig.DESKTOP_TIME_OUT_MILLISECONDS as number,
+        DEATH: applicationConfig.DEATH as GQLDeathInput,
         LANGUAGES: applicationConfig.LANGUAGES as string,
-        CERTIFICATE_PRINT_CHARGE_FREE_PERIOD:
-          applicationConfig.CERTIFICATE_PRINT_CHARGE_FREE_PERIOD as number,
-        CERTIFICATE_PRINT_CHARGE_UP_LIMIT:
-          applicationConfig.CERTIFICATE_PRINT_CHARGE_UP_LIMIT as number,
-        CERTIFICATE_PRINT_LOWEST_CHARGE:
-          applicationConfig.CERTIFICATE_PRINT_LOWEST_CHARGE as number,
-        CERTIFICATE_PRINT_HIGHEST_CHARGE:
-          applicationConfig.CERTIFICATE_PRINT_HIGHEST_CHARGE as number,
         UI_POLLING_INTERVAL: applicationConfig.UI_POLLING_INTERVAL as number,
         FIELD_AGENT_AUDIT_LOCATIONS:
           applicationConfig.FIELD_AGENT_AUDIT_LOCATIONS as string,
@@ -66,10 +62,6 @@ export const resolvers: GQLResolver = {
         SENTRY: applicationConfig.SENTRY as string,
         LOGROCKET: applicationConfig.LOGROCKET as string,
         PHONE_NUMBER_PATTERN: applicationConfig.PHONE_NUMBER_PATTERN as string,
-        BIRTH_REGISTRATION_TARGET:
-          applicationConfig.BIRTH_REGISTRATION_TARGET as number,
-        DEATH_REGISTRATION_TARGET:
-          applicationConfig.DEATH_REGISTRATION_TARGET as number,
         NID_NUMBER_PATTERN: applicationConfig.NID_NUMBER_PATTERN as string
       }
 

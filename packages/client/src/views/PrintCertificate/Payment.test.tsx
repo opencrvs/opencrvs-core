@@ -34,13 +34,31 @@ describe('verify collector tests', () => {
 
   const birthDeclaration = {
     id: 'mockBirth1234',
-    data: mockDeclarationData,
+    data: {
+      ...mockDeclarationData,
+      history: [
+        {
+          date: '2022-03-21T08:16:24.467+00:00',
+          action: 'REGISTERED',
+          reinstated: false
+        }
+      ]
+    },
     event: Event.BIRTH
   }
 
   const deathDeclaration = {
     id: 'mockDeath1234',
-    data: mockDeathDeclarationData,
+    data: {
+      ...mockDeathDeclarationData,
+      history: [
+        {
+          date: '2022-03-21T08:16:24.467+00:00',
+          action: 'REGISTERED',
+          reinstated: false
+        }
+      ]
+    },
     event: Event.DEATH
   }
 
@@ -48,7 +66,7 @@ describe('verify collector tests', () => {
     beforeAll(async () => {
       getItem.mockReturnValue(validToken)
       await store.dispatch(checkAuth({ '?token': validToken }))
-
+      // @ts-ignore
       store.dispatch(storeDeclaration(birthDeclaration))
     })
 
@@ -75,7 +93,7 @@ describe('verify collector tests', () => {
       )
 
       expect(testComponent.find('#amountDue').hostNodes().text()).toContain(
-        '50'
+        '20'
       )
 
       testComponent.find('#Continue').hostNodes().simulate('click')
@@ -129,6 +147,7 @@ describe('verify collector tests', () => {
 
   describe('in case of death declaration renders payment component', () => {
     beforeAll(() => {
+      // @ts-ignore
       store.dispatch(storeDeclaration(deathDeclaration))
     })
 
