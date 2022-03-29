@@ -16,5 +16,5 @@ window.config = {
   AUTH_URL: 'http://localhost:4040',
   COUNTRY_CONFIG_URL: 'http://localhost:3040',
   COUNTRY: 'FAR',
-  LANGUAGES: 'en'
+  LANGUAGES: 'en,fr'
 }

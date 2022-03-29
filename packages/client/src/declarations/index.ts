@@ -725,9 +725,6 @@ async function updateFieldAgentDeclaredDeclarationsByUser(
   const rejectedDeclarations = await getFieldAgentRejectedDeclarations(
     userDetails
   )
-  const rejectedDeclarationIds = (
-    rejectedDeclarations.results as IDeclaration[]
-  ).map((declaration) => declaration.id)
 
   if (!currentUserData) {
     currentUserData = {
@@ -740,14 +737,10 @@ async function updateFieldAgentDeclaredDeclarationsByUser(
     currentUserData.declarations,
     declaredDeclarations.results
   )
-
-  currentUserData = {
-    ...currentUserData,
-    declarations: currentUserData.declarations.filter(
-      (declaration) =>
-        !rejectedDeclarationIds.includes(declaration.compositionId as string)
-    )
-  }
+  mergeDeclaredDeclarations(
+    currentUserData.declarations,
+    rejectedDeclarations.results
+  )
 
   allUserData = allUserData.map((userData) => {
     if (userData.userID !== currentUserData!.userID) {
