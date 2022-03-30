@@ -39,24 +39,23 @@ const ValueContainer = styled.div`
   width: 100%;
 `
 const Label = styled.label`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
-  color: ${({ theme }) => theme.colors.supportingCopy};
+  ${({ theme }) => theme.fonts.bold16};
   flex: 1;
   margin-right: 10%;
   max-width: 40%;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     max-width: 100%;
-    ${({ theme }) => theme.fonts.bodyBoldStyle};
+    ${({ theme }) => theme.fonts.bold16};
     margin-right: auto;
   }
 `
 const Value = styled.div`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   flex: 1;
   overflow-wrap: break-word;
   max-width: 50%;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.bodyStyle};
+    ${({ theme }) => theme.fonts.reg16};
     max-width: 100%;
     margin-right: auto;
   }
@@ -67,7 +66,7 @@ const LabelValueLayer = styled.div`
   display: flex;
   flex-flow: row;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.bodyStyle};
+    ${({ theme }) => theme.fonts.reg16};
     width: 80%;
   }
 `
@@ -87,8 +86,8 @@ const HideOnDesktop = styled.div`
 `
 
 const PlaceHolder = styled.div`
-  ${({ theme }) => theme.fonts.bodyStyle};
-  color: ${({ theme }) => theme.colors.placeholder};
+  ${({ theme }) => theme.fonts.reg16};
+  color: ${({ theme }) => theme.colors.supportingCopy};
   flex: 1;
 `
 const Action = styled.div`
@@ -122,7 +121,7 @@ const ProfileInfoContainer = styled.div`
   white-space: nowrap;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin-right: auto;
-    ${({ theme }) => theme.fonts.bodyStyle};
+    ${({ theme }) => theme.fonts.reg16};
     width: 50%;
   }
 `

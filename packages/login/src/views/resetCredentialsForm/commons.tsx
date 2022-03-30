@@ -12,7 +12,7 @@
 import styled from 'styled-components'
 
 export const Title = styled.div`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   color: ${({ theme }) => theme.colors.copy};
 `
 export const Page = styled.div`

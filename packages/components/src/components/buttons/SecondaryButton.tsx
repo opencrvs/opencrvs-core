@@ -25,8 +25,10 @@ const StyledButton = styled(Button)`
   transition: background 0.4s ease;
   border-radius: 4px;
   background: ${({ theme }) => theme.colors.white};
-  border: ${({ theme }) => `2px solid ${theme.colors.primary}`};
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  border: ${({ theme }) => `2px solid ${theme.colors.secondary}`};
+  box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
+  border-radius: 2px;
+  ${({ theme }) => theme.fonts.bold16};
 
   & div {
     padding-top: 2px;

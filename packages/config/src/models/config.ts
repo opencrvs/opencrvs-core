@@ -35,7 +35,6 @@ export interface IApplicationConfigurationModel extends Document {
   COUNTRY_LOGO_RENDER_WIDTH: number
   COUNTRY_LOGO_RENDER_HEIGHT: number
   DESKTOP_TIME_OUT_MILLISECONDS: number
-  LANGUAGES: string
   CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: number
   CERTIFICATE_PRINT_CHARGE_UP_LIMIT: number
   CERTIFICATE_PRINT_LOWEST_CHARGE: number
@@ -82,7 +81,6 @@ const systemSchema = new Schema({
     required: false,
     default: 900000
   },
-  LANGUAGES: { type: String, required: false, default: 'en' },
   CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: {
     type: Number,
     required: false,
