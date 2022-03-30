@@ -433,7 +433,9 @@ export class SearchResultView extends React.Component<
             : formattedDuration(new Date(Number(reg.modifiedAt)))
           : '',
         startedAt:
-          (reg.createdAt && formattedDuration(new Date(reg.createdAt))) || '',
+          (reg.createdAt &&
+            formattedDuration(new Date(Number(reg.createdAt)))) ||
+          '',
         icon,
         actions,
         rowClickHandler: [

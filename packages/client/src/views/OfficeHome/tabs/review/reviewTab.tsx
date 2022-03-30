@@ -186,7 +186,9 @@ class ReviewTabComponent extends React.Component<
           (reg.dateOfEvent && formattedDuration(new Date(reg.dateOfEvent))) ||
           '',
         declarationTimeElapsed:
-          (reg.createdAt && formattedDuration(new Date(reg.createdAt))) || '',
+          (reg.createdAt &&
+            formattedDuration(new Date(parseInt(reg.createdAt)))) ||
+          '',
         actions,
         icon,
         rowClickHandler: [
