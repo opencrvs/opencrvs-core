@@ -63,7 +63,7 @@ const P = styled.p`
 `
 const QuestionWrapper = styled.div`
   margin-bottom: 66px;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 const Wrapper = styled.div`
   display: flex;
@@ -71,7 +71,7 @@ const Wrapper = styled.div`
   margin-bottom: 20px;
 `
 const Label = styled.label`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   margin: 0 0 6px 0;
 `
 
@@ -89,7 +89,7 @@ const FullWidthInput = styled(TextInput)`
 `
 const Error = styled.span`
   color: ${({ theme }) => theme.colors.negative};
-  ${({ theme }) => theme.fonts.captionStyle};
+  ${({ theme }) => theme.fonts.reg12};
 `
 
 class SecurityQuestionView extends React.Component<IProps, IState> {

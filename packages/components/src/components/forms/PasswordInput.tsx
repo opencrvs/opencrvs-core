@@ -43,7 +43,7 @@ const StyledInput = styled.input<IPasswordInputProps>`
   transition: border-color 500ms ease-out;
   box-sizing: border-box;
   outline: none;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.copy};
   background: ${({ theme }) => theme.colors.background};
 

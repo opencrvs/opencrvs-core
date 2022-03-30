@@ -18,7 +18,7 @@ interface ITextAreaProps {
 }
 
 const StyledTextArea = styled.textarea<ITextAreaProps>`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   width: 100%;
   padding: 10px;
   min-height: 104px;

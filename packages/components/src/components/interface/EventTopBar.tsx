@@ -29,10 +29,11 @@ const TopBar = styled.div`
   z-index: 1;
 `
 const TopBarTitle = styled.h4<{ TopBarActions?: boolean }>`
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+  ${({ theme }) => theme.fonts.h4};
   padding-left: ${({ TopBarActions }) => (TopBarActions ? `6px` : `16px`)};
   color: ${({ theme }) => theme.colors.copy};
 `
+
 const Item = styled.span`
   display: flex;
   align-items: center;
@@ -72,8 +73,8 @@ export const EventTopBar = (props: IEventTopBarProps) => {
     saveAction,
     exitAction,
     menuItems,
-    topBarActions,
     iconColor = 'purple',
+    topBarActions,
     pageIcon
   } = props
   return (

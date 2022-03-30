@@ -36,7 +36,7 @@ const Title = styled.div`
   margin-bottom: 16px;
   margin-left: 24px;
   color: ${({ theme }) => theme.colors.grey600};
-  ${({ theme }) => theme.fonts.subtitleStyle}
+  ${({ theme }) => theme.fonts.bold14}
 `
 
 interface IPageNavigation {
@@ -71,7 +71,7 @@ export const TAB_DEATH = {
 const PageItems = styled(NavigationSubItem)<{ isSelected: boolean }>`
   ${LabelContainer} {
     padding: 7px 38px 9px 29px;
-    ${({ theme, isSelected }) => isSelected && theme.fonts.subtitleStyle};
+    ${({ theme, isSelected }) => isSelected && theme.fonts.bold14};
   }
 `
 

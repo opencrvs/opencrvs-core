@@ -25,7 +25,7 @@ export type IInputLabel = {
 } & React.LabelHTMLAttributes<HTMLLabelElement>
 
 const StyledInputLabel = styled.label<IInputLabel>`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   color: ${({ color, disabled, theme }) =>
     disabled ? theme.colors.disabled : color ? color : theme.colors.copy};
   width: 100%;
@@ -44,7 +44,7 @@ const StyledInputLabel = styled.label<IInputLabel>`
 const Required = styled.span<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
 >`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.negative};
   flex-grow: 0;

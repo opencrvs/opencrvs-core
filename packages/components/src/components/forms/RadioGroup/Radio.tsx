@@ -23,7 +23,7 @@ const Label = styled.label`
   left: 6px;
   top: -2px;
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   cursor: pointer;
 `
 

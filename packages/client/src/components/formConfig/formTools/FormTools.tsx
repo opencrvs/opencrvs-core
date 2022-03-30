@@ -38,11 +38,11 @@ const Container = styled.div`
 const TitleContainer = styled.div`
   margin-top: 24px;
   margin-bottom: 15px;
-  ${({ theme }) => theme.fonts.subtitleStyle}
+  ${({ theme }) => theme.fonts.bold14}
 `
 
 const Label = styled.div`
-  ${({ theme }) => theme.fonts.chartLegendStyle};
+  ${({ theme }) => theme.fonts.reg14};
   color: ${({ theme }) => theme.colors.grey600};
 `
 interface IFormTools {
