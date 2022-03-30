@@ -14,6 +14,7 @@ import { Event } from '@config/models/certificate'
 
 export enum DraftStatus {
   DRAFT = 'DRAFT',
+  PREVIEW = 'PREVIEW',
   PUBLISHED = 'PUBLISHED',
   FINALISED = 'FINALISED'
 }

@@ -42,11 +42,11 @@ export const resolvers: GQLResolver = {
           )
         )
       }
-      const questionPayload: IFormDraftPayload =
+      const formDraftPayload: IFormDraftPayload =
         createOrUpdateFormDraftPayload(formDraft)
       const res = await fetch(`${APPLICATION_CONFIG_URL}draftQuestions`, {
         method: 'PUT',
-        body: JSON.stringify(questionPayload),
+        body: JSON.stringify(formDraftPayload),
         headers: {
           'Content-Type': 'application/json',
           ...authHeader
@@ -86,6 +86,7 @@ enum Event {
 
 enum DraftStatus {
   DRAFT = 'DRAFT',
+  PREVIEW = 'PREVIEW',
   PUBLISHED = 'PUBLISHED',
   FINALISED = 'FINALISED'
 }

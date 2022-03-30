@@ -66,6 +66,7 @@ export async function updateFormDraftHandler(
     draft.comment = questionsDraft.comment
     draft.version =
       draft.status === DraftStatus.PUBLISHED ||
+      draft.status === DraftStatus.PREVIEW ||
       draft.status === DraftStatus.FINALISED
         ? draft.version
         : draft.version + 1
