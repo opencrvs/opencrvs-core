@@ -100,31 +100,31 @@ WithAvatar.args = {
   children: (
     <>
       <ListViewItemSimplified
-        avatar={<AvatarSmall />}
+        image={<AvatarSmall />}
         label="Name of user"
         value="Value 1"
         actions={[pill, toggleMenu]}
       />
       <ListViewItemSimplified
-        avatar={<AvatarSmall />}
+        image={<AvatarSmall />}
         label="Name of user"
         value="Value 2"
         actions={[linkButton]}
       />
       <ListViewItemSimplified
-        avatar={<AvatarSmall />}
+        image={<AvatarSmall />}
         label="Name of user"
         value="Value 3"
         actions={[toggleMenu]}
       />
       <ListViewItemSimplified
-        avatar={<AvatarSmall />}
+        image={<AvatarSmall />}
         label="Name of user"
         value="Value 4"
         actions={[pill, toggleMenu]}
       />
       <ListViewItemSimplified
-        avatar={<AvatarSmall />}
+        image={<AvatarSmall />}
         label="Name of user"
         value="Value 5"
         actions={[toggleMenu]}

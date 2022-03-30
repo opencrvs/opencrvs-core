@@ -105,7 +105,7 @@ const MobileActionsContainer = styled.div`
 `
 
 interface IListViewItemSimplifiedProps {
-  avatar?: React.ReactNode
+  image?: React.ReactNode
   label: React.ReactNode
   value?: React.ReactNode
   contentSize?: IButtonSize
@@ -122,7 +122,7 @@ const FixedHeightContent = styled.div<{ size: IButtonSize }>`
 `
 
 export function ListViewItemSimplified({
-  avatar,
+  image,
   label,
   value,
   contentSize = 'medium',
@@ -130,7 +130,7 @@ export function ListViewItemSimplified({
 }: IListViewItemSimplifiedProps) {
   return (
     <>
-      {avatar && <AvatarContainer>{avatar}</AvatarContainer>}
+      {image && <AvatarContainer>{image}</AvatarContainer>}
       <LabelValueContainer>
         <LabelContainer>
           {typeof label === 'string' ? (
@@ -153,7 +153,7 @@ export function ListViewItemSimplified({
       </LabelValueContainer>
       <ActionsContainer>{actions}</ActionsContainer>
       <MobileContainer>
-        {avatar && <MobileAvatarContainer>{avatar}</MobileAvatarContainer>}
+        {image && <MobileAvatarContainer>{image}</MobileAvatarContainer>}
         <LabelContainer>{label}</LabelContainer>
         <MobileActionsContainer>{actions}</MobileActionsContainer>
         <ValueContainer>{value}</ValueContainer>
