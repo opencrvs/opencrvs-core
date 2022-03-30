@@ -99,6 +99,10 @@ describe('verify collector tests', () => {
       testComponent.find('#Continue').hostNodes().simulate('click')
     })
 
+    /*
+
+    // Commenting out this test because receipt templates are not currently configurable
+
     it('print payment receipt', async () => {
       const printMoneyReceiptSpy = jest.spyOn(PDFUtils, 'printMoneyReceipt')
       const testComponent = await createTestComponent(
@@ -121,7 +125,7 @@ describe('verify collector tests', () => {
       testComponent.find('#print-receipt').hostNodes().simulate('click')
 
       expect(printMoneyReceiptSpy).toBeCalled()
-    })
+    })*/
 
     it('invalid declaration id', () => {
       expect(
