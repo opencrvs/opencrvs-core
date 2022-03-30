@@ -182,7 +182,7 @@ type Mutation {
     nonce: String!
     verifyCode: String!
   ): String
-  changeAvatar(userId: String!, avatar: AvatarInput!): String
+  changeAvatar(userId: String!, avatar: AvatarInput!): Avatar
   auditUser(
     userId: String!
     action: String!
@@ -518,6 +518,11 @@ input SecurityQuestionAnswer {
   answer: String
 }
 
+type Avatar {
+  type: String!
+  data: String!
+}
+
 input AvatarInput {
   type: String!
   data: String!
@@ -759,11 +764,6 @@ type LocalRegistrar {
 type Signature {
   data: String
   type: String
-}
-
-type Avatar {
-  type: String!
-  data: String!
 }
 
 type SearchFieldAgentResponse {
