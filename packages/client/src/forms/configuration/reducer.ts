@@ -62,14 +62,12 @@ export interface IFormDraftData {
 export type IFormDraftDataState = {
   formDraftData: IFormDraftData | null
   formDraftDataLoaded: boolean
-  loaded: boolean
   loadingError: boolean
 }
 
 export const initialState: IFormDraftDataState = {
   formDraftData: null,
   formDraftDataLoaded: false,
-  loaded: false,
   loadingError: false
 }
 
@@ -79,45 +77,52 @@ async function saveFormDraftData(formDraftData: IFormDraftData) {
 
 export const formDraftReducer: LoopReducer<
   IFormDraftDataState,
-  actions.FormDraftAction
+  actions.FormDraftActions
 > = (
   state: IFormDraftDataState = initialState,
-  action: actions.FormDraftAction
-): IFormDraftDataState | Loop<IFormDraftDataState, actions.FormDraftAction> => {
+  action: actions.FormDraftActions
+):
+  | IFormDraftDataState
+  | Loop<IFormDraftDataState, actions.FormDraftActions> => {
   switch (action.type) {
     case actions.LOAD_DRAFT:
       return loop(
         state,
-        Cmd.run(() => formDraftQueries.getFormDraft, {
-          successActionCreator: actions.storeDraft
+        Cmd.run(formDraftQueries.fetchFormDraft, {
+          successActionCreator: actions.storeDraft,
+          failActionCreator: actions.failedDraft
         })
       )
 
     case actions.STORE_DRAFT:
       const { queryData: formDraftQueryData } = action.payload
 
-      const birthFormDraft = find(formDraftQueryData.data, {
+      const birthFormDraft = find(formDraftQueryData.data.getFormDraft, {
         event: 'birth'
-      }) as IDraft
+      })
 
-      const deathFormDraft = find(formDraftQueryData.data, {
+      const deathFormDraft = find(formDraftQueryData.data.getFormDraft, {
         event: 'death'
-      }) as IDraft
+      })
 
       const formDraftData = {
         birth: birthFormDraft,
-        death: deathFormDraft,
-        loaded: true
+        death: deathFormDraft
       } as IFormDraftData
 
       return loop(
         {
           ...state,
-          formDraftData
+          formDraftData: formDraftData,
+          formDraftDataLoaded: true
         },
         Cmd.run(saveFormDraftData, { args: [state.formDraftData] })
       )
-
+    case actions.FAILED_DRAFT:
+      return {
+        ...state,
+        loadingError: true
+      }
     default:
       return state
   }

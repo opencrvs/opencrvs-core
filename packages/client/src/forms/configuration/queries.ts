@@ -13,23 +13,24 @@ import gql from 'graphql-tag'
 import { client } from '@client/utils/apolloClient'
 
 export const GET_FORM_DRAFT = gql`
-  query getFormDraft {
-    event
-    status
-    comment
-    version
-    createdAt
-    updatedAt
-    history {
+  query {
+    getFormDraft {
+      event
       status
-      version
       comment
-      lastUpdateAt
+      version
+      createdAt
+      updatedAt
+      history {
+        status
+        version
+        comment
+        lastUpdateAt
+      }
     }
   }
 `
-
-async function getFormDraft() {
+async function fetchFormDraft() {
   return (
     client &&
     client.query({
@@ -38,6 +39,7 @@ async function getFormDraft() {
     })
   )
 }
+
 export const formDraftQueries = {
-  getFormDraft
+  fetchFormDraft
 }

@@ -26,12 +26,12 @@ export const STORE_DRAFT = 'FORM/STORE_DRAFT'
 export type DraftStoredAction = {
   type: typeof STORE_DRAFT
   payload: {
-    queryData: ApolloQueryResult<Array<GQLformDraft | null>>
+    queryData: ApolloQueryResult<{ getFormDraft: Array<GQLformDraft | null> }>
   }
 }
 
 export const storeDraft = (
-  queryData: ApolloQueryResult<Array<GQLformDraft | null>>
+  queryData: ApolloQueryResult<{ getFormDraft: Array<GQLformDraft | null> }>
 ): DraftStoredAction => ({
   type: STORE_DRAFT,
   payload: {
@@ -39,4 +39,16 @@ export const storeDraft = (
   }
 })
 
-export type FormDraftAction = DraftStoredAction | DraftFetchAction
+export const FAILED_DRAFT = 'FORM/FAILED_DRAFT'
+export type DraftFailAction = {
+  type: typeof FAILED_DRAFT
+}
+
+export const failedDraft = (): DraftFailAction => ({
+  type: FAILED_DRAFT
+})
+
+export type FormDraftActions =
+  | DraftStoredAction
+  | DraftFetchAction
+  | DraftFailAction
