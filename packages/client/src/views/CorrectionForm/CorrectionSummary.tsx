@@ -46,7 +46,7 @@ import {
   REVIEW_OVERRIDE_POSITION,
   Action
 } from '@client/forms'
-
+import { lookup } from 'country-data'
 import {
   ActionPageLight,
   ColumnContentAlignment,
@@ -139,6 +139,14 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         this.props.declaration.data
       )
     }
+    const currency = lookup.currencies({
+      code:
+        this.props.offlineResources.config.CURRENCY &&
+        this.props.offlineResources.config.CURRENCY['isoCode']
+    })[0].symbol
+    ;(
+      this.group.fields[0].nestedFields as any
+    ).REQUIRED[0].label.defaultMessage += ` ${currency}`
   }
 
   onUploadingStateChanged = (isUploading: boolean) => {

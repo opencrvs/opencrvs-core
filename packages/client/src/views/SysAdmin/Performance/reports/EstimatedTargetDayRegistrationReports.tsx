@@ -108,10 +108,10 @@ class EstimatedTargetDayRegistrationReportComponent extends React.Component<Full
           {
             registrationTargetDays:
               this.props.eventType === Event.BIRTH
-                ? this.props.offlineCountryConfiguration.config
-                    .BIRTH_REGISTRATION_TARGET
-                : this.props.offlineCountryConfiguration.config
-                    .DEATH_REGISTRATION_TARGET
+                ? this.props.offlineCountryConfiguration.config.BIRTH
+                    .REGISTRATION_TARGET
+                : this.props.offlineCountryConfiguration.config.DEATH
+                    .REGISTRATION_TARGET
           }
         )}
         fixedWidth={1074}
@@ -139,10 +139,10 @@ class EstimatedTargetDayRegistrationReportComponent extends React.Component<Full
               {
                 registrationTargetDays:
                   this.props.eventType === Event.BIRTH
-                    ? this.props.offlineCountryConfiguration.config
-                        .BIRTH_REGISTRATION_TARGET
-                    : this.props.offlineCountryConfiguration.config
-                        .DEATH_REGISTRATION_TARGET
+                    ? this.props.offlineCountryConfiguration.config.BIRTH
+                        .REGISTRATION_TARGET
+                    : this.props.offlineCountryConfiguration.config.DEATH
+                        .REGISTRATION_TARGET
               }
             ),
             width: 22,

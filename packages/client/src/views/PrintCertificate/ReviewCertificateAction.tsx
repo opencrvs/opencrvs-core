@@ -50,7 +50,8 @@ import {
   isCertificateForPrintInAdvance,
   getEventDate,
   isFreeOfCost,
-  calculatePrice
+  calculatePrice,
+  getRegisteredDate
 } from './utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { countries } from '@client/forms/countries'
@@ -181,14 +182,27 @@ class ReviewCertificateActionComponent extends React.Component<
     draft.submissionStatus = SUBMISSION_STATUS.READY_TO_CERTIFY
     draft.action = Action.COLLECT_CERTIFICATE
 
+    const registeredDate = getRegisteredDate(draft.data)
     const certificate = draft.data.registration.certificates[0]
     const eventDate = getEventDate(draft.data, draft.event)
     let submittableCertificate
     if (isCertificateForPrintInAdvance(draft)) {
-      if (isFreeOfCost(draft.event, eventDate)) {
+      if (
+        isFreeOfCost(
+          draft.event,
+          eventDate,
+          registeredDate,
+          this.props.offlineCountryConfig
+        )
+      ) {
         submittableCertificate = {}
       } else {
-        const paymentAmount = calculatePrice(draft.event, eventDate)
+        const paymentAmount = calculatePrice(
+          draft.event,
+          eventDate,
+          registeredDate,
+          this.props.offlineCountryConfig
+        )
         submittableCertificate = {
           payments: {
             type: 'MANUAL' as const,
