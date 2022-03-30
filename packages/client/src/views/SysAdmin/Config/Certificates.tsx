@@ -119,7 +119,7 @@ async function updatePreviewSvgWithSampleSignature(
   if (certificateImages[1]) {
     const signatureImage = certificateImages[1]
 
-    const res = await fetch('./assets/sample-signature.png')
+    const res = await fetch('/assets/sample-signature.png')
     const blob = await res.blob()
     const base64signature = await blobToBase64(blob)
     signatureImage.setAttribute('xlink:href', base64signature as string)
