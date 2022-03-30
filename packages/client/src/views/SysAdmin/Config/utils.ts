@@ -137,7 +137,7 @@ export const getTitle = (intl: IntlShape, changeModalName: string) => {
   if (changeModalName === GeneralActionId.GOVT_LOGO)
     return intl.formatMessage(messages.govermentLogoLabel)
   else if (changeModalName === GeneralActionId.CURRENCY)
-    return intl.formatMessage(messages.currencyLable)
+    return intl.formatMessage(messages.currencyLabel)
   else if (changeModalName === BirthActionId.BIRTH_REGISTRATION_TARGET)
     return intl.formatMessage(messages.birthLegallySpecifiedDialogTitle)
   else if (changeModalName === BirthActionId.BIRTH_LATE_REGISTRATION_TARGET)

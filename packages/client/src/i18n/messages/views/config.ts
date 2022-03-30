@@ -38,7 +38,7 @@ interface IConfigMessages
   listDetailsQsn: MessageDescriptor
   applicationNameLabel: MessageDescriptor
   govermentLogoLabel: MessageDescriptor
-  currencyLable: MessageDescriptor
+  currencyLabel: MessageDescriptor
   applicationCurrencyChangeNotification: MessageDescriptor
   applicationBirthRegTargetChangeNotification: MessageDescriptor
   applicationBirthLateRegTargetChangeNotification: MessageDescriptor
@@ -244,8 +244,8 @@ const messagesToDefine: IConfigMessages = {
     defaultMessage: 'Government logo',
     description: 'Government logo config label'
   },
-  currencyLable: {
-    id: 'config.application.currencyLable',
+  currencyLabel: {
+    id: 'config.application.currencyLabel',
     defaultMessage: 'Currency',
     description: 'Currency config label'
   },

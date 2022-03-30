@@ -263,7 +263,7 @@ export const NavigationView = (props: IFullProps) => {
     : activeMenuItem
     ? activeMenuItem
     : 'review'
-  const ConfigTab = [TAB_ID.application, TAB_ID.certificates]
+  const configTab = [TAB_ID.application, TAB_ID.certificates]
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
   const { loading, error, data, initialSyncDone } = workqueue
   const filteredData = filterProcessingDeclarationsFromQuery(
@@ -520,11 +520,11 @@ export const NavigationView = (props: IFullProps) => {
                         onClick={() => setIsConfigExpanded(!isConfigExpanded)}
                         isSelected={
                           enableMenuSelection &&
-                          ConfigTab.includes(activeMenuItem)
+                          configTab.includes(activeMenuItem)
                         }
                         expandableIcon={() =>
                           isConfigExpanded ||
-                          ConfigTab.includes(activeMenuItem) ? (
+                          configTab.includes(activeMenuItem) ? (
                             <Expandable selected={true} />
                           ) : (
                             <Expandable />
@@ -532,7 +532,7 @@ export const NavigationView = (props: IFullProps) => {
                         }
                       />
                       {(isConfigExpanded ||
-                        ConfigTab.includes(activeMenuItem)) && (
+                        configTab.includes(activeMenuItem)) && (
                         <>
                           <NavigationSubItem
                             label={TAB_LABEL.certificatesConfiguration}

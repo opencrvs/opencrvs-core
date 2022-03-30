@@ -131,7 +131,7 @@ function GeneralTabContent({
           }
         },
         {
-          label: intl.formatMessage(messages.currencyLable),
+          label: intl.formatMessage(messages.currencyLabel),
           value: countryCurrencyName[0].name,
           action: {
             id: GeneralActionId.CURRENCY,
