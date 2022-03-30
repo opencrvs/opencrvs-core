@@ -322,7 +322,8 @@ describe('FieldAgentHome tests', () => {
                   contactNumber: '+8801711111111',
                   trackingId: 'BZW3T4',
                   dateOfDeclaration: '2019-05-22T10:22:21.840Z',
-                  status: 'REJECTED'
+                  status: 'REJECTED',
+                  modifiedAt: '2019-05-22T10:22:21.840Z'
                 },
                 operationHistories: [
                   {

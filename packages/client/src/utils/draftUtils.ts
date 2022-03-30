@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IDeclaration, ITaskHistory } from '@client/declarations'
+import { IDeclaration } from '@client/declarations'
 import {
   BirthSection,
   DeathSection,
@@ -155,8 +155,6 @@ export const transformSearchQueryDataToDraft = (
   declaration.submissionStatus = data.registration && data.registration.status
   declaration.compositionId = data.id
 
-  declaration.operationHistories = data.operationHistories as ITaskHistory[]
-
   switch (eventType) {
     case Event.BIRTH:
     default:
@@ -168,30 +166,6 @@ export const transformSearchQueryDataToDraft = (
   }
 
   return declaration
-}
-
-export const updateDeclarationTaskHistory = (
-  declaration: IDeclaration,
-  userDetails: IUserDetails | null
-): ITaskHistory => {
-  return {
-    operationType: declaration.submissionStatus,
-    operatedOn:
-      (declaration.modifiedOn && new Date(declaration.modifiedOn).toString()) ||
-      '',
-    operatorRole: (userDetails && userDetails.role) || '',
-    operatorName: (userDetails && userDetails.name) || [],
-    operatorOfficeName:
-      (userDetails &&
-        userDetails.primaryOffice &&
-        userDetails.primaryOffice.name) ||
-      '',
-    operatorOfficeAlias:
-      (userDetails &&
-        userDetails.primaryOffice &&
-        userDetails.primaryOffice.alias) ||
-      []
-  }
 }
 
 export const getAttachmentSectionKey = (declarationEvent: Event): string => {
