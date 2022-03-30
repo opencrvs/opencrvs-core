@@ -11,6 +11,7 @@
  */
 import React from 'react'
 import styled from 'styled-components'
+import { IButtonSize, dimensionsMap } from '../../buttons'
 
 const Grid = styled.div<{ bottomBorder: boolean }>`
   display: grid;
@@ -40,33 +41,32 @@ const LabelValueContainer = styled.div`
   }
 `
 
-const Value = styled.div`
+const ValueContainer = styled.div`
   display: flex;
   min-width: 50%;
-  align-items: center;
   color: ${({ theme }) => theme.colors.grey500};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     grid-row-start: 2;
     grid-column: 2 / 4;
+    align-items: center;
   }
 `
 
-const Label = styled.div`
+const LabelContainer = styled.div`
   display: flex;
   min-width: 50%;
-  align-items: center;
   button > div {
     padding: 0;
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     grid-column-start: 2;
+    align-items: center;
   }
 `
 
 const ActionsContainer = styled.div`
   display: flex;
   padding: 8px 0;
-  align-items: center;
   justify-content: right;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
@@ -108,28 +108,55 @@ interface IListViewItemSimplifiedProps {
   avatar?: React.ReactNode
   label: React.ReactNode
   value?: React.ReactNode
+  contentSize?: IButtonSize
   actions?: React.ReactNode[]
 }
+
+/* The content needs to be given a fixed height to keep it
+ * aligned with the actions column
+ */
+const FixedHeightContent = styled.div<{ size: IButtonSize }>`
+  display: flex;
+  align-items: center;
+  height: ${({ size }) => dimensionsMap[size]};
+`
 
 export function ListViewItemSimplified({
   avatar,
   label,
   value,
+  contentSize = 'medium',
   actions
 }: IListViewItemSimplifiedProps) {
   return (
     <>
       {avatar && <AvatarContainer>{avatar}</AvatarContainer>}
       <LabelValueContainer>
-        <Label>{label}</Label>
-        {value && <Value>{value}</Value>}
+        <LabelContainer>
+          {typeof label === 'string' ? (
+            <FixedHeightContent size={contentSize}>{label}</FixedHeightContent>
+          ) : (
+            label
+          )}
+        </LabelContainer>
+        {value && (
+          <ValueContainer>
+            {typeof value === 'string' ? (
+              <FixedHeightContent size={contentSize}>
+                {value}
+              </FixedHeightContent>
+            ) : (
+              value
+            )}
+          </ValueContainer>
+        )}
       </LabelValueContainer>
       <ActionsContainer>{actions}</ActionsContainer>
       <MobileContainer>
         {avatar && <MobileAvatarContainer>{avatar}</MobileAvatarContainer>}
-        <Label>{label}</Label>
+        <LabelContainer>{label}</LabelContainer>
         <MobileActionsContainer>{actions}</MobileActionsContainer>
-        <Value>{value}</Value>
+        <ValueContainer>{value}</ValueContainer>
       </MobileContainer>
     </>
   )

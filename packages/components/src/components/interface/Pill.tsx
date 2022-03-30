@@ -47,6 +47,8 @@ const paddingMap = {
 const StyledPill = styled.span<{ size: IPillSize; type: IPillType }>`
   display: inline-flex;
   padding: 0 ${({ size }) => paddingMap[size]};
+  /*This needs to have total height of 40px to aligned properly in ListView*/
+  margin: calc(0.5 * (40px - ${({ size }) => heightMap[size]})) 0;
   background-color: ${({ type }) => colorMap[type]};
   height: ${({ size }) => heightMap[size]};
   align-items: center;
