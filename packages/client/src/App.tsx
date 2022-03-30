@@ -65,7 +65,6 @@ import { ConfigHome } from './views/SysAdmin/Config/ConfigHome'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
-import { Canvas } from './components/formConfig/Canvas'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -203,12 +202,6 @@ export class App extends React.Component<IAppProps> {
                                               routes.REVIEW_EVENT_PARENT_FORM_PAGE_GROUP
                                             }
                                             component={ReviewForm}
-                                          />
-                                          {/* This is a temporary path and will be removed after merging with #2740 */}
-                                          <ProtectedRoute
-                                            exact
-                                            path={'/canvas'}
-                                            component={Canvas}
                                           />
                                           <ProtectedRoute
                                             exact
