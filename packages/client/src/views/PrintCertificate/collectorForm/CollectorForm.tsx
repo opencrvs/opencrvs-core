@@ -59,6 +59,7 @@ import {
 import {
   getEvent,
   getEventDate,
+  getRegisteredDate,
   isFreeOfCost,
   isCertificateForPrintInAdvance
 } from '@client/views/PrintCertificate/utils'
@@ -80,9 +81,11 @@ import {
   certCollectorGroupForBirthAppWithoutMotherDetails
 } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
+import { getOfflineData } from '@client/offline/selectors'
+import { IOfflineData } from '@client/offline/reducer'
 
 const FormSectionTitle = styled.h4`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   color: ${({ theme }) => theme.colors.copy};
   margin-top: 0px;
   margin-bottom: 16px;
@@ -101,6 +104,7 @@ interface IBaseProps {
   declaration: IPrintableDeclaration | undefined
   formSection: IFormSection
   formGroup: IFormSectionGroup
+  offlineCountryConfiguration: IOfflineData
   theme: ITheme
   goBack: typeof goBack
   storeDeclaration: typeof storeDeclaration
@@ -306,7 +310,14 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     declaration: IPrintableDeclaration,
     event: Event
   ) => {
-    if (isFreeOfCost(event, getEventDate(declaration.data, event))) {
+    if (
+      isFreeOfCost(
+        event,
+        getEventDate(declaration.data, event),
+        getRegisteredDate(declaration.data),
+        this.props.offlineCountryConfiguration
+      )
+    ) {
       this.props.goToReviewCertificate(declarationId, event)
     } else {
       this.props.goToPrintCertificatePayment(declarationId, event)
@@ -594,7 +605,8 @@ const mapStateToProps = (
     formGroup: {
       ...formGroup,
       fields
-    }
+    },
+    offlineCountryConfiguration: getOfflineData(state)
   }
 }
 

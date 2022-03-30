@@ -70,10 +70,11 @@ export interface GQLMutation {
   activateUser?: string
   changePassword?: string
   changePhone?: string
-  changeAvatar?: string
+  changeAvatar?: GQLAvatar
   auditUser?: string
   resendSMSInvite?: string
   createOrUpdateCertificateSVG?: GQLCertificateSVG
+  updateApplicationConfig?: GQLApplicationConfiguration
   createOrUpdateQuestion?: GQLQuestion
 }
 
@@ -410,6 +411,11 @@ export interface GQLSecurityQuestionAnswer {
   answer?: string
 }
 
+export interface GQLAvatar {
+  type: string
+  data: string
+}
+
 export interface GQLAvatarInput {
   type: string
   data: string
@@ -424,6 +430,52 @@ export interface GQLCertificateSVGInput {
   user: string
   event: string
   status: string
+}
+
+export interface GQLApplicationConfiguration {
+  APPLICATION_NAME?: string
+  BACKGROUND_SYNC_BROADCAST_CHANNEL?: string
+  BIRTH?: GQLBirth
+  COUNTRY?: string
+  COUNTRY_LOGO?: GQLCountryLogo
+  CURRENCY?: GQLCurrency
+  COUNTRY_LOGO_RENDER_WIDTH?: number
+  COUNTRY_LOGO_RENDER_HEIGHT?: number
+  DESKTOP_TIME_OUT_MILLISECONDS?: number
+  DEATH?: GQLDeath
+  UI_POLLING_INTERVAL?: number
+  FIELD_AGENT_AUDIT_LOCATIONS?: string
+  APPLICATION_AUDIT_LOCATIONS?: string
+  INFORMANT_MINIMUM_AGE?: number
+  HIDE_EVENT_REGISTER_INFORMATION?: boolean
+  EXTERNAL_VALIDATION_WORKQUEUE?: boolean
+  SENTRY?: string
+  LOGROCKET?: string
+  PHONE_NUMBER_PATTERN?: string
+  NID_NUMBER_PATTERN?: string
+}
+
+export interface GQLApplicationConfigurationInput {
+  APPLICATION_NAME?: string
+  BACKGROUND_SYNC_BROADCAST_CHANNEL?: string
+  BIRTH?: GQLBirthInput
+  COUNTRY?: string
+  COUNTRY_LOGO?: GQLCountryLogoInput
+  CURRENCY?: GQLCurrencyInput
+  COUNTRY_LOGO_RENDER_WIDTH?: number
+  COUNTRY_LOGO_RENDER_HEIGHT?: number
+  DESKTOP_TIME_OUT_MILLISECONDS?: number
+  DEATH?: GQLDeathInput
+  UI_POLLING_INTERVAL?: number
+  FIELD_AGENT_AUDIT_LOCATIONS?: string
+  APPLICATION_AUDIT_LOCATIONS?: string
+  INFORMANT_MINIMUM_AGE?: number
+  HIDE_EVENT_REGISTER_INFORMATION?: boolean
+  EXTERNAL_VALIDATION_WORKQUEUE?: boolean
+  SENTRY?: string
+  LOGROCKET?: string
+  PHONE_NUMBER_PATTERN?: string
+  NID_NUMBER_PATTERN?: string
 }
 
 export interface GQLQuestionInput {
@@ -652,11 +704,6 @@ export interface GQLSignature {
   type?: string
 }
 
-export interface GQLAvatar {
-  type: string
-  data: string
-}
-
 export interface GQLSearchFieldAgentResponse {
   practitionerId?: string
   fullName?: string
@@ -736,7 +783,6 @@ export interface GQLEventSearchSet {
   id: string
   type?: string
   registration?: GQLRegistrationSearchSet
-  operationHistories?: Array<GQLOperationHistorySearchSet | null>
 }
 
 /** Use this to resolve interface type EventSearchSet */
@@ -878,6 +924,48 @@ export interface GQLUserIdentifierInput {
 export interface GQLSignatureInput {
   data?: string
   type?: string
+}
+
+export interface GQLBirth {
+  REGISTRATION_TARGET?: number
+  LATE_REGISTRATION_TARGET?: number
+  FEE?: GQLBirthFee
+}
+
+export interface GQLCountryLogo {
+  fileName?: string
+  file?: string
+}
+
+export interface GQLCurrency {
+  isoCode?: string
+  languagesAndCountry?: Array<string | null>
+}
+
+export interface GQLDeath {
+  REGISTRATION_TARGET?: number
+  FEE?: GQLDeathFee
+}
+
+export interface GQLBirthInput {
+  REGISTRATION_TARGET?: number
+  LATE_REGISTRATION_TARGET?: number
+  FEE?: GQLBirthFeeInput
+}
+
+export interface GQLCountryLogoInput {
+  fileName?: string
+  file?: string
+}
+
+export interface GQLCurrencyInput {
+  isoCode?: string
+  languagesAndCountry?: Array<string | null>
+}
+
+export interface GQLDeathInput {
+  REGISTRATION_TARGET?: number
+  FEE?: GQLDeathFeeInput
 }
 
 export interface GQLMesssageDescriptorInput {
@@ -1096,26 +1184,12 @@ export interface GQLRegistrationSearchSet {
   modifiedAt?: string
 }
 
-export interface GQLOperationHistorySearchSet {
-  operationType?: string
-  operatedOn?: GQLDate
-  operatorRole?: string
-  operatorName?: Array<GQLHumanName | null>
-  operatorOfficeName?: string
-  operatorOfficeAlias?: Array<string | null>
-  notificationFacilityName?: string
-  notificationFacilityAlias?: Array<string | null>
-  rejectReason?: string
-  rejectComment?: string
-}
-
 export interface GQLBirthEventSearchSet extends GQLEventSearchSet {
   id: string
   type?: string
   childName?: Array<GQLHumanName | null>
   dateOfBirth?: GQLDate
   registration?: GQLRegistrationSearchSet
-  operationHistories?: Array<GQLOperationHistorySearchSet | null>
 }
 
 export interface GQLDeathEventSearchSet extends GQLEventSearchSet {
@@ -1124,7 +1198,6 @@ export interface GQLDeathEventSearchSet extends GQLEventSearchSet {
   deceasedName?: Array<GQLHumanName | null>
   dateOfDeath?: GQLDate
   registration?: GQLRegistrationSearchSet
-  operationHistories?: Array<GQLOperationHistorySearchSet | null>
 }
 
 export interface GQLEventProgressData {
@@ -1214,6 +1287,28 @@ export interface GQLReasonsNotApplyingInput {
   primaryCaregiverType?: GQLPrimaryCaregiverType
   reasonNotApplying?: string
   isDeceased?: boolean
+}
+
+export interface GQLBirthFee {
+  ON_TIME?: number
+  LATE?: number
+  DELAYED?: number
+}
+
+export interface GQLDeathFee {
+  ON_TIME?: number
+  DELAYED?: number
+}
+
+export interface GQLBirthFeeInput {
+  ON_TIME?: number
+  LATE?: number
+  DELAYED?: number
+}
+
+export interface GQLDeathFeeInput {
+  ON_TIME?: number
+  DELAYED?: number
 }
 
 export interface GQLPayment {
@@ -1310,6 +1405,8 @@ export interface GQLResolver {
   Question?: GQLQuestionTypeResolver
   CreatedIds?: GQLCreatedIdsTypeResolver
   Reinstated?: GQLReinstatedTypeResolver
+  Avatar?: GQLAvatarTypeResolver
+  ApplicationConfiguration?: GQLApplicationConfigurationTypeResolver
   Map?: GraphQLScalarType
   Registration?: GQLRegistrationTypeResolver
   RelatedPerson?: GQLRelatedPersonTypeResolver
@@ -1327,7 +1424,6 @@ export interface GQLResolver {
   Identifier?: GQLIdentifierTypeResolver
   LocalRegistrar?: GQLLocalRegistrarTypeResolver
   Signature?: GQLSignatureTypeResolver
-  Avatar?: GQLAvatarTypeResolver
   SearchFieldAgentResponse?: GQLSearchFieldAgentResponseTypeResolver
   RegistrationGenderBasisMetrics?: GQLRegistrationGenderBasisMetricsTypeResolver
   RegistrationTimeFrameMetrics?: GQLRegistrationTimeFrameMetricsTypeResolver
@@ -1344,6 +1440,10 @@ export interface GQLResolver {
 
   EventProgressSet?: GQLEventProgressSetTypeResolver
   MesssageDescriptor?: GQLMesssageDescriptorTypeResolver
+  Birth?: GQLBirthTypeResolver
+  CountryLogo?: GQLCountryLogoTypeResolver
+  Currency?: GQLCurrencyTypeResolver
+  Death?: GQLDeathTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
   ReasonsNotApplying?: GQLReasonsNotApplyingTypeResolver
@@ -1358,10 +1458,11 @@ export interface GQLResolver {
   CertificationPaymentDetailsMetrics?: GQLCertificationPaymentDetailsMetricsTypeResolver
   CertificationPaymentTotalCount?: GQLCertificationPaymentTotalCountTypeResolver
   RegistrationSearchSet?: GQLRegistrationSearchSetTypeResolver
-  OperationHistorySearchSet?: GQLOperationHistorySearchSetTypeResolver
   BirthEventSearchSet?: GQLBirthEventSearchSetTypeResolver
   DeathEventSearchSet?: GQLDeathEventSearchSetTypeResolver
   EventProgressData?: GQLEventProgressDataTypeResolver
+  BirthFee?: GQLBirthFeeTypeResolver
+  DeathFee?: GQLDeathFeeTypeResolver
   Payment?: GQLPaymentTypeResolver
 }
 export interface GQLQueryTypeResolver<TParent = any> {
@@ -1928,6 +2029,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   auditUser?: MutationToAuditUserResolver<TParent>
   resendSMSInvite?: MutationToResendSMSInviteResolver<TParent>
   createOrUpdateCertificateSVG?: MutationToCreateOrUpdateCertificateSVGResolver<TParent>
+  updateApplicationConfig?: MutationToUpdateApplicationConfigResolver<TParent>
   createOrUpdateQuestion?: MutationToCreateOrUpdateQuestionResolver<TParent>
 }
 
@@ -2357,6 +2459,21 @@ export interface MutationToCreateOrUpdateCertificateSVGResolver<
   (
     parent: TParent,
     args: MutationToCreateOrUpdateCertificateSVGArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToUpdateApplicationConfigArgs {
+  applicationConfig?: GQLApplicationConfigurationInput
+}
+export interface MutationToUpdateApplicationConfigResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToUpdateApplicationConfigArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -3524,6 +3641,182 @@ export interface ReinstatedToRegistrationStatusResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLAvatarTypeResolver<TParent = any> {
+  type?: AvatarToTypeResolver<TParent>
+  data?: AvatarToDataResolver<TParent>
+}
+
+export interface AvatarToTypeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface AvatarToDataResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
+  APPLICATION_NAME?: ApplicationConfigurationToAPPLICATION_NAMEResolver<TParent>
+  BACKGROUND_SYNC_BROADCAST_CHANNEL?: ApplicationConfigurationToBACKGROUND_SYNC_BROADCAST_CHANNELResolver<TParent>
+  BIRTH?: ApplicationConfigurationToBIRTHResolver<TParent>
+  COUNTRY?: ApplicationConfigurationToCOUNTRYResolver<TParent>
+  COUNTRY_LOGO?: ApplicationConfigurationToCOUNTRY_LOGOResolver<TParent>
+  CURRENCY?: ApplicationConfigurationToCURRENCYResolver<TParent>
+  COUNTRY_LOGO_RENDER_WIDTH?: ApplicationConfigurationToCOUNTRY_LOGO_RENDER_WIDTHResolver<TParent>
+  COUNTRY_LOGO_RENDER_HEIGHT?: ApplicationConfigurationToCOUNTRY_LOGO_RENDER_HEIGHTResolver<TParent>
+  DESKTOP_TIME_OUT_MILLISECONDS?: ApplicationConfigurationToDESKTOP_TIME_OUT_MILLISECONDSResolver<TParent>
+  DEATH?: ApplicationConfigurationToDEATHResolver<TParent>
+  UI_POLLING_INTERVAL?: ApplicationConfigurationToUI_POLLING_INTERVALResolver<TParent>
+  FIELD_AGENT_AUDIT_LOCATIONS?: ApplicationConfigurationToFIELD_AGENT_AUDIT_LOCATIONSResolver<TParent>
+  APPLICATION_AUDIT_LOCATIONS?: ApplicationConfigurationToAPPLICATION_AUDIT_LOCATIONSResolver<TParent>
+  INFORMANT_MINIMUM_AGE?: ApplicationConfigurationToINFORMANT_MINIMUM_AGEResolver<TParent>
+  HIDE_EVENT_REGISTER_INFORMATION?: ApplicationConfigurationToHIDE_EVENT_REGISTER_INFORMATIONResolver<TParent>
+  EXTERNAL_VALIDATION_WORKQUEUE?: ApplicationConfigurationToEXTERNAL_VALIDATION_WORKQUEUEResolver<TParent>
+  SENTRY?: ApplicationConfigurationToSENTRYResolver<TParent>
+  LOGROCKET?: ApplicationConfigurationToLOGROCKETResolver<TParent>
+  PHONE_NUMBER_PATTERN?: ApplicationConfigurationToPHONE_NUMBER_PATTERNResolver<TParent>
+  NID_NUMBER_PATTERN?: ApplicationConfigurationToNID_NUMBER_PATTERNResolver<TParent>
+}
+
+export interface ApplicationConfigurationToAPPLICATION_NAMEResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToBACKGROUND_SYNC_BROADCAST_CHANNELResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToBIRTHResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToCOUNTRYResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToCOUNTRY_LOGOResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToCURRENCYResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToCOUNTRY_LOGO_RENDER_WIDTHResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToCOUNTRY_LOGO_RENDER_HEIGHTResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToDESKTOP_TIME_OUT_MILLISECONDSResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToDEATHResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToUI_POLLING_INTERVALResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToFIELD_AGENT_AUDIT_LOCATIONSResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToAPPLICATION_AUDIT_LOCATIONSResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToINFORMANT_MINIMUM_AGEResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToHIDE_EVENT_REGISTER_INFORMATIONResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToEXTERNAL_VALIDATION_WORKQUEUEResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToSENTRYResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToLOGROCKETResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToPHONE_NUMBER_PATTERNResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToNID_NUMBER_PATTERNResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLRegistrationTypeResolver<TParent = any> {
   id?: RegistrationToIdResolver<TParent>
   _fhirID?: RegistrationTo_fhirIDResolver<TParent>
@@ -4080,19 +4373,6 @@ export interface SignatureToTypeResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLAvatarTypeResolver<TParent = any> {
-  type?: AvatarToTypeResolver<TParent>
-  data?: AvatarToDataResolver<TParent>
-}
-
-export interface AvatarToTypeResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface AvatarToDataResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
 export interface GQLSearchFieldAgentResponseTypeResolver<TParent = any> {
   practitionerId?: SearchFieldAgentResponseToPractitionerIdResolver<TParent>
   fullName?: SearchFieldAgentResponseToFullNameResolver<TParent>
@@ -4575,6 +4855,75 @@ export interface MesssageDescriptorToDefaultMessageResolver<
   TParent = any,
   TResult = any
 > {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLBirthTypeResolver<TParent = any> {
+  REGISTRATION_TARGET?: BirthToREGISTRATION_TARGETResolver<TParent>
+  LATE_REGISTRATION_TARGET?: BirthToLATE_REGISTRATION_TARGETResolver<TParent>
+  FEE?: BirthToFEEResolver<TParent>
+}
+
+export interface BirthToREGISTRATION_TARGETResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthToLATE_REGISTRATION_TARGETResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthToFEEResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLCountryLogoTypeResolver<TParent = any> {
+  fileName?: CountryLogoToFileNameResolver<TParent>
+  file?: CountryLogoToFileResolver<TParent>
+}
+
+export interface CountryLogoToFileNameResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface CountryLogoToFileResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLCurrencyTypeResolver<TParent = any> {
+  isoCode?: CurrencyToIsoCodeResolver<TParent>
+  languagesAndCountry?: CurrencyToLanguagesAndCountryResolver<TParent>
+}
+
+export interface CurrencyToIsoCodeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface CurrencyToLanguagesAndCountryResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLDeathTypeResolver<TParent = any> {
+  REGISTRATION_TARGET?: DeathToREGISTRATION_TARGETResolver<TParent>
+  FEE?: DeathToFEEResolver<TParent>
+}
+
+export interface DeathToREGISTRATION_TARGETResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface DeathToFEEResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -5128,96 +5477,12 @@ export interface RegistrationSearchSetToModifiedAtResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLOperationHistorySearchSetTypeResolver<TParent = any> {
-  operationType?: OperationHistorySearchSetToOperationTypeResolver<TParent>
-  operatedOn?: OperationHistorySearchSetToOperatedOnResolver<TParent>
-  operatorRole?: OperationHistorySearchSetToOperatorRoleResolver<TParent>
-  operatorName?: OperationHistorySearchSetToOperatorNameResolver<TParent>
-  operatorOfficeName?: OperationHistorySearchSetToOperatorOfficeNameResolver<TParent>
-  operatorOfficeAlias?: OperationHistorySearchSetToOperatorOfficeAliasResolver<TParent>
-  notificationFacilityName?: OperationHistorySearchSetToNotificationFacilityNameResolver<TParent>
-  notificationFacilityAlias?: OperationHistorySearchSetToNotificationFacilityAliasResolver<TParent>
-  rejectReason?: OperationHistorySearchSetToRejectReasonResolver<TParent>
-  rejectComment?: OperationHistorySearchSetToRejectCommentResolver<TParent>
-}
-
-export interface OperationHistorySearchSetToOperationTypeResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface OperationHistorySearchSetToOperatedOnResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface OperationHistorySearchSetToOperatorRoleResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface OperationHistorySearchSetToOperatorNameResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface OperationHistorySearchSetToOperatorOfficeNameResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface OperationHistorySearchSetToOperatorOfficeAliasResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface OperationHistorySearchSetToNotificationFacilityNameResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface OperationHistorySearchSetToNotificationFacilityAliasResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface OperationHistorySearchSetToRejectReasonResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface OperationHistorySearchSetToRejectCommentResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
 export interface GQLBirthEventSearchSetTypeResolver<TParent = any> {
   id?: BirthEventSearchSetToIdResolver<TParent>
   type?: BirthEventSearchSetToTypeResolver<TParent>
   childName?: BirthEventSearchSetToChildNameResolver<TParent>
   dateOfBirth?: BirthEventSearchSetToDateOfBirthResolver<TParent>
   registration?: BirthEventSearchSetToRegistrationResolver<TParent>
-  operationHistories?: BirthEventSearchSetToOperationHistoriesResolver<TParent>
 }
 
 export interface BirthEventSearchSetToIdResolver<TParent = any, TResult = any> {
@@ -5252,20 +5517,12 @@ export interface BirthEventSearchSetToRegistrationResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface BirthEventSearchSetToOperationHistoriesResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
 export interface GQLDeathEventSearchSetTypeResolver<TParent = any> {
   id?: DeathEventSearchSetToIdResolver<TParent>
   type?: DeathEventSearchSetToTypeResolver<TParent>
   deceasedName?: DeathEventSearchSetToDeceasedNameResolver<TParent>
   dateOfDeath?: DeathEventSearchSetToDateOfDeathResolver<TParent>
   registration?: DeathEventSearchSetToRegistrationResolver<TParent>
-  operationHistories?: DeathEventSearchSetToOperationHistoriesResolver<TParent>
 }
 
 export interface DeathEventSearchSetToIdResolver<TParent = any, TResult = any> {
@@ -5294,13 +5551,6 @@ export interface DeathEventSearchSetToDateOfDeathResolver<
 }
 
 export interface DeathEventSearchSetToRegistrationResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface DeathEventSearchSetToOperationHistoriesResolver<
   TParent = any,
   TResult = any
 > {
@@ -5355,6 +5605,37 @@ export interface EventProgressDataToTimeInReadyToPrintResolver<
   TParent = any,
   TResult = any
 > {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLBirthFeeTypeResolver<TParent = any> {
+  ON_TIME?: BirthFeeToON_TIMEResolver<TParent>
+  LATE?: BirthFeeToLATEResolver<TParent>
+  DELAYED?: BirthFeeToDELAYEDResolver<TParent>
+}
+
+export interface BirthFeeToON_TIMEResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthFeeToLATEResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthFeeToDELAYEDResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLDeathFeeTypeResolver<TParent = any> {
+  ON_TIME?: DeathFeeToON_TIMEResolver<TParent>
+  DELAYED?: DeathFeeToDELAYEDResolver<TParent>
+}
+
+export interface DeathFeeToON_TIMEResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface DeathFeeToDELAYEDResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

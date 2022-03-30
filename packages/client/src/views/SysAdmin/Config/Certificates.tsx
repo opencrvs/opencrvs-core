@@ -23,27 +23,20 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import {
-  Button,
-  PrimaryButton,
-  TertiaryButton
-} from '@opencrvs/components/lib/buttons'
+import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { messages } from '@client/i18n/messages/views/config'
 import { messages as imageUploadMessages } from '@client/i18n/messages/views/imageUpload'
 import {
-  DataSection,
   FloatingNotification,
   ListView,
   NOTIFICATION_TYPE,
   ResponsiveModal,
-  ToggleMenu,
-  TopBar
+  ToggleMenu
 } from '@opencrvs/components/lib/interface'
 import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE } from '@client/utils/constants'
 import {
   ERROR_TYPES,
-  IImage,
   validateCertificateTemplate
 } from '@client/utils/imageUtils'
 import { GET_ACTIVE_CERTIFICATES } from '@client/certificate/queries'
@@ -52,7 +45,6 @@ import { errorMessages } from '@client/i18n/messages/errors'
 import * as _ from 'lodash'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { certificateTemplateMutations } from '@client/certificate/mutations'
-import { GET_USER } from '@client/user/queries'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { Event, IAttachmentValue, IFormFieldValue, IForm } from '@client/forms'
@@ -60,44 +52,25 @@ import { DocumentPreview } from '@client/components/form/DocumentUploadfield/Doc
 import { getDummyCertificateTemplateData } from '@client/views/SysAdmin/Config/previewDummyData'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { executeHandlebarsTemplate } from '@client/views/PrintCertificate/PDFUtils'
+import { Content } from '@opencrvs/components/lib/interface/Content'
 
 const HiddenInput = styled.input`
   display: none;
-`
-const ColoredDataSection = styled.div`
-  background-color: ${({ theme }) => theme.colors.white};
-  width: 776px;
-  position: absolute;
-  top: 81px;
-  left: 162px;
-  padding-left: 32px;
-  padding-right: 47px;
-  padding-bottom: 37px;
-  border: 1px solid '#D7DCDE';
-  box-sizing: border-box;
-  border-radius: 4px;
 `
 
 const ListTitleDiv = styled.div`
   width: 645px;
   height: 46px;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 
 const BlueTitle = styled.span`
   color: ${({ theme }) => theme.colors.tertiary};
 `
 
-const TopBarContainer = styled.div`
-  position: absolute;
-  left: 0px;
-  top: 64px;
-  width: 100%;
-  height: 48px;
-`
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   text-align: center;
   margin-top: 100px;
 `
@@ -184,7 +157,7 @@ export function downloadFile(
   downloadLink.setAttribute('download', fileName)
   downloadLink.click()
 }
-class ConfigHomeComponent extends React.Component<Props, State> {
+class CertificatesConfigComponent extends React.Component<Props, State> {
   birthCertificatefileUploader: React.RefObject<HTMLInputElement>
   deathCertificatefileUploader: React.RefObject<HTMLInputElement>
   constructor(props: Props) {
@@ -362,14 +335,13 @@ class ConfigHomeComponent extends React.Component<Props, State> {
   render() {
     const {
       eventName,
-      selectedSubMenuItem,
       imageUploading,
       imageLoadingError,
       showNotification,
       showPrompt
     } = this.state
 
-    const { intl, offlineCountryConfiguration } = this.props
+    const { intl } = this.props
     return (
       <Query query={GET_ACTIVE_CERTIFICATES} fetchPolicy={'cache-and-network'}>
         {({ data, error }) => {
@@ -502,21 +474,18 @@ class ConfigHomeComponent extends React.Component<Props, State> {
                 <SysAdminContentWrapper isCertificatesConfigPage={true}>
                   {this.state.selectedSubMenuItem ===
                     this.SUB_MENU_ID.certificatesConfig && (
-                    <ColoredDataSection>
-                      <ListView
-                        title={CertificateSection.title}
-                        items={CertificateSection.items}
-                        responsiveContents={
-                          <ListTitleDiv>
-                            {intl.formatMessage(messages.listDetails)}
-                            <BlueTitle>
-                              {intl.formatMessage(messages.listDetailsQsn)}
-                            </BlueTitle>
-                          </ListTitleDiv>
-                        }
-                        isConfigPage={true}
-                      />
-                    </ColoredDataSection>
+                    <Content
+                      title={CertificateSection.title}
+                      titleColor={'copy'}
+                    >
+                      <ListTitleDiv>
+                        {intl.formatMessage(messages.listDetails)}
+                        <BlueTitle>
+                          {intl.formatMessage(messages.listDetailsQsn)}
+                        </BlueTitle>
+                      </ListTitleDiv>
+                      <ListView items={CertificateSection.items} />
+                    </Content>
                   )}
                   <FloatingNotification
                     type={
@@ -619,6 +588,6 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const ConfigHome = connect(mapStateToProps)(
-  injectIntl(ConfigHomeComponent)
+export const CertificatesConfig = connect(mapStateToProps)(
+  injectIntl(CertificatesConfigComponent)
 )

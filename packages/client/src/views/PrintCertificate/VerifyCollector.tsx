@@ -27,7 +27,7 @@ import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { getEventDate, isFreeOfCost } from './utils'
+import { getEventDate, getRegisteredDate, isFreeOfCost } from './utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import {
@@ -60,8 +60,17 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
   handleVerification = () => {
     const event = this.props.declaration.event
     const eventDate = getEventDate(this.props.declaration.data, event)
+    const registeredDate = getRegisteredDate(this.props.declaration.data)
+    const { offlineCountryConfiguration } = this.props
 
-    if (isFreeOfCost(event, eventDate)) {
+    if (
+      isFreeOfCost(
+        event,
+        eventDate,
+        registeredDate,
+        offlineCountryConfiguration
+      )
+    ) {
       this.props.goToReviewCertificate(
         this.props.match.params.registrationId,
         event

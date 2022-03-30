@@ -173,14 +173,14 @@ const BackButton = styled(CircleButton)`
 const KeyContainer = styled.div`
   width: 190px;
   color: ${({ theme }) => theme.colors.grey600};
-  ${({ theme }) => theme.fonts.bodyBoldStyle}
+  ${({ theme }) => theme.fonts.bold16}
 `
 
 const ValueContainer = styled.div<{ value: undefined | string }>`
   width: 325px;
   color: ${({ theme, value }) =>
     value ? theme.colors.grey600 : theme.colors.grey400};
-  ${({ theme }) => theme.fonts.captionBigger};
+  ${({ theme }) => theme.fonts.reg16};
 `
 
 const GreyedInfo = styled.div`
@@ -665,7 +665,7 @@ const showReviewButton = ({
   const { role } = userDetails
 
   const reviewButtonRoleStatusMap: { [key: string]: string[] } = {
-    FIELD_AGENT: [EVENT_STATUS.REJECTED],
+    FIELD_AGENT: [],
     REGISTRATION_AGENT: [EVENT_STATUS.DECLARED],
     DISTRICT_REGISTRAR: [EVENT_STATUS.VALIDATED, EVENT_STATUS.DECLARED],
     LOCAL_REGISTRAR: [EVENT_STATUS.VALIDATED, EVENT_STATUS.DECLARED]
@@ -715,7 +715,11 @@ const showUpdateButton = ({
       EVENT_STATUS.IN_PROGRESS,
       EVENT_STATUS.REJECTED
     ],
-    LOCAL_REGISTRAR: [SUBMISSION_STATUS.DRAFT, EVENT_STATUS.REJECTED]
+    LOCAL_REGISTRAR: [
+      SUBMISSION_STATUS.DRAFT,
+      EVENT_STATUS.IN_PROGRESS,
+      EVENT_STATUS.REJECTED
+    ]
   }
 
   if (updateButtonRoleStatusMap[role].includes(declaration?.status as string)) {

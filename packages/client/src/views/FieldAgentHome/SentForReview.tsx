@@ -30,7 +30,7 @@ import {
   StatusPendingOffline
 } from '@opencrvs/components/lib/icons'
 import { getTheme } from '@opencrvs/components/lib/theme'
-import { calculateDays } from '@client/views/PrintCertificate/utils'
+import { calculateDaysFromToday } from '@client/views/PrintCertificate/utils'
 import { goToDeclarationRecordAudit } from '@client/navigation'
 import {
   constantsMessages as messages,
@@ -133,7 +133,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           declaration.submissionStatus ===
             SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTED] &&
           declaration.modifiedOn &&
-          calculateDays(
+          calculateDaysFromToday(
             new Date(declaration.modifiedOn).toISOString().split('T')[0]
           ) > DECLARATIONS_DAY_LIMIT
       )

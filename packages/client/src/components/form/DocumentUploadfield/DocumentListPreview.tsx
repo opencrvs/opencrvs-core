@@ -19,7 +19,7 @@ import { ISelectOption } from '@opencrvs/components/lib/forms'
 import { Button } from '@opencrvs/components/lib/buttons/Button'
 import { TertiaryButton } from '@opencrvs/components/lib/buttons'
 const Wrapper = styled.div`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 const PreviewLink = styled.div<{ disabled?: boolean }>`
   color: ${({ disabled, theme }) =>
@@ -42,7 +42,7 @@ const ProcessingSpinner = styled(Spinner)`
 
 const PreviewContainer = styled.div`
   background: ${({ theme }) => theme.colors.background};
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
   font-style: normal;
   text-decoration-line: underline;
   padding: 5px 10px;

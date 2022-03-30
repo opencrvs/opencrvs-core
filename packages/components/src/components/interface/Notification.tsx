@@ -54,7 +54,7 @@ const NotificationContainer = styled.div`
   &.error,
   &.inProgress,
   &.warning {
-    background: ${({ theme }) => theme.colors.placeholder};
+    background: ${({ theme }) => theme.colors.supportingCopy};
     border-top: 10px solid;
   }
 

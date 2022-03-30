@@ -38,29 +38,29 @@ const ValueContainer = styled.div`
   width: 100%;
 `
 const Label = styled.label`
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+  ${({ theme }) => theme.fonts.h4};
   flex: 1;
   margin-right: 16px;
   max-width: 40%;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     max-width: 100%;
-    ${({ theme }) => theme.fonts.bodyBoldStyle};
+    ${({ theme }) => theme.fonts.bold16};
   }
 `
 const Value = styled.div`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   flex: 1;
   overflow-wrap: break-word;
   max-width: 50%;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.bodyStyle};
+    ${({ theme }) => theme.fonts.reg16};
     max-width: 100%;
   }
 `
 
 const PlaceHolder = styled.div`
-  ${({ theme }) => theme.fonts.bodyStyle};
-  color: ${({ theme }) => theme.colors.placeholderCopy};
+  ${({ theme }) => theme.fonts.reg16};
+  color: ${({ theme }) => theme.colors.supportingCopy};
   flex: 1;
 `
 const Action = styled.div`

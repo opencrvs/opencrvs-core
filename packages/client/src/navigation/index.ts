@@ -48,11 +48,12 @@ import {
   WORKFLOW_STATUS,
   TEAM_USER_LIST,
   USER_PROFILE,
+  CERTIFICATE_CONFIG,
+  CHANGE_PHONE,
+  APPLICATION_CONFIG,
   CERTIFICATE_CORRECTION,
   VERIFY_CORRECTOR,
-  CONFIG,
-  DECLARATION_RECORD_AUDIT,
-  CHANGE_PHONE
+  DECLARATION_RECORD_AUDIT
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
 import { NATL_ADMIN_ROLES } from '@client/utils/constants'
@@ -197,7 +198,11 @@ export function goToHome() {
 }
 
 export function goToConfig() {
-  return push(CONFIG)
+  return push(CERTIFICATE_CONFIG)
+}
+
+export function goToApplicationConfig() {
+  return push(APPLICATION_CONFIG)
 }
 
 export function goToHomeTab(tabId: string, selectorId = '') {

@@ -44,13 +44,22 @@ describe('when user wants to review death certificate', () => {
     const { store } = createStore(history)
 
     await loginAsFieldAgent(store)
-    await store.dispatch(
-      storeDeclaration({
-        id: 'mockDeath1234',
-        data: mockDeathDeclarationData,
-        event: Event.DEATH
-      } as IDeclaration)
-    )
+    const deathDeclaration = {
+      id: 'mockDeath1234',
+      data: {
+        ...mockDeathDeclarationData,
+        history: [
+          {
+            date: '2022-03-21T08:16:24.467+00:00',
+            action: 'REGISTERED',
+            reinstated: false
+          }
+        ]
+      },
+      event: Event.DEATH
+    }
+    // @ts-ignore
+    store.dispatch(storeDeclaration(deathDeclaration))
     component = await createTestComponent(
       <ReviewCertificateAction
         location={location}
@@ -94,12 +103,23 @@ describe('back button behavior tests of review certificate action', () => {
     store.dispatch(push('/new-route', { isNavigatedInsideApp: true }))
 
     await loginAsFieldAgent(store)
+    const birthDeclaration = {
+      id: 'asdhdqe2472487jsdfsdf',
+      data: {
+        ...mockBirthDeclarationData,
+        history: [
+          {
+            date: '2022-03-21T08:16:24.467+00:00',
+            action: 'REGISTERED',
+            reinstated: false
+          }
+        ]
+      },
+      event: Event.BIRTH
+    }
     await store.dispatch(
-      storeDeclaration({
-        id: 'asdhdqe2472487jsdfsdf',
-        data: mockBirthDeclarationData,
-        event: Event.BIRTH
-      } as IDeclaration)
+      // @ts-ignore
+      storeDeclaration(birthDeclaration)
     )
     component = await createTestComponent(
       <ReviewCertificateAction

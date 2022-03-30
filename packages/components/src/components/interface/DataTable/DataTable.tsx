@@ -28,15 +28,15 @@ const Wrapper = styled.div`
   width: 100%;
 `
 const StyledList = styled.ul`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   list-style-type: none;
   padding: 0;
   margin: 0;
   width: 100%;
 `
 const ResultsText = styled.div`
-  color: ${({ theme }) => theme.colors.placeholderCopy};
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  color: ${({ theme }) => theme.colors.supportingCopy};
+  ${({ theme }) => theme.fonts.bold16};
   margin: 10px 0;
 `
 
