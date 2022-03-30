@@ -76,7 +76,7 @@ const BodyContainer = styled.div`
 `
 
 const SettingsTitle = styled.div`
-  ${({ theme }) => theme.fonts.h1Style};
+  ${({ theme }) => theme.fonts.h1};
   height: 72px;
   margin-left: 16px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -117,7 +117,7 @@ const Right = styled.div`
 `
 const Version = styled.div`
   color: ${({ theme }) => theme.colors.disabled};
-  ${({ theme }) => theme.fonts.smallButtonStyle};
+  ${({ theme }) => theme.fonts.reg14};
   text-transform: none;
   margin-top: 2rem;
   span:last-child {

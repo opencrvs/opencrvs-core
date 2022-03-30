@@ -20,10 +20,10 @@ const Container = styled.div`
 const Title = styled.div`
   display: flex;
   gap: 8px;
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   margin-bottom: 16px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.h5Style};
+    ${({ theme }) => theme.fonts.h3};
     flex-direction: column;
     align-items: flex-start;
     gap: 0px;

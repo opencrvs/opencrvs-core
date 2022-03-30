@@ -438,7 +438,6 @@ export interface GQLApplicationConfiguration {
   COUNTRY_LOGO_RENDER_HEIGHT?: number
   DESKTOP_TIME_OUT_MILLISECONDS?: number
   DEATH?: GQLDeath
-  LANGUAGES?: string
   UI_POLLING_INTERVAL?: number
   FIELD_AGENT_AUDIT_LOCATIONS?: string
   APPLICATION_AUDIT_LOCATIONS?: string
@@ -462,7 +461,6 @@ export interface GQLApplicationConfigurationInput {
   COUNTRY_LOGO_RENDER_HEIGHT?: number
   DESKTOP_TIME_OUT_MILLISECONDS?: number
   DEATH?: GQLDeathInput
-  LANGUAGES?: string
   UI_POLLING_INTERVAL?: number
   FIELD_AGENT_AUDIT_LOCATIONS?: string
   APPLICATION_AUDIT_LOCATIONS?: string
@@ -3671,7 +3669,6 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   COUNTRY_LOGO_RENDER_HEIGHT?: ApplicationConfigurationToCOUNTRY_LOGO_RENDER_HEIGHTResolver<TParent>
   DESKTOP_TIME_OUT_MILLISECONDS?: ApplicationConfigurationToDESKTOP_TIME_OUT_MILLISECONDSResolver<TParent>
   DEATH?: ApplicationConfigurationToDEATHResolver<TParent>
-  LANGUAGES?: ApplicationConfigurationToLANGUAGESResolver<TParent>
   UI_POLLING_INTERVAL?: ApplicationConfigurationToUI_POLLING_INTERVALResolver<TParent>
   FIELD_AGENT_AUDIT_LOCATIONS?: ApplicationConfigurationToFIELD_AGENT_AUDIT_LOCATIONSResolver<TParent>
   APPLICATION_AUDIT_LOCATIONS?: ApplicationConfigurationToAPPLICATION_AUDIT_LOCATIONSResolver<TParent>
@@ -3748,13 +3745,6 @@ export interface ApplicationConfigurationToDESKTOP_TIME_OUT_MILLISECONDSResolver
 }
 
 export interface ApplicationConfigurationToDEATHResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface ApplicationConfigurationToLANGUAGESResolver<
   TParent = any,
   TResult = any
 > {

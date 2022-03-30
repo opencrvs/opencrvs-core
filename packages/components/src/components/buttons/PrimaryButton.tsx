@@ -19,7 +19,7 @@ export const PrimaryButton = styled(Button)`
   color: ${({ theme }) => theme.colors.white};
   background: ${({ theme }) => theme.colors.primary};
   justify-content: center;
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
 
   &:hover:enabled {
     background: ${({ theme }) => theme.colors.indigoDark};

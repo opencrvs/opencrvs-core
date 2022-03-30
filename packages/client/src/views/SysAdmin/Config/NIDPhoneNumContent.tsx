@@ -30,13 +30,13 @@ import {
 
 const ErrorMessageBottom = styled.div<{ marginTop?: number }>`
   position: relative;
-  ${({ theme }) => theme.fonts.subtitleStyle};
+  ${({ theme }) => theme.fonts.bold14};
   color: ${({ theme }) => theme.colors.red};
   margin-top: ${({ marginTop }) => (marginTop ? `${marginTop}px` : `0px`)};
 `
 
 const SuccessMessage = styled.div`
-  ${({ theme }) => theme.fonts.subtitleStyle};
+  ${({ theme }) => theme.fonts.bold14};
   color: ${({ theme }) => theme.colors.green};
   margin-left: 9px;
 `

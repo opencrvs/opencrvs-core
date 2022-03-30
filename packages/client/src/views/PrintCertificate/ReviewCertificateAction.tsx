@@ -107,13 +107,13 @@ const Certificate = styled.img`
 `
 
 const Info = styled.div`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   margin-bottom: 30px;
   color: ${({ theme }) => theme.colors.grey500};
   width: 80%;
 `
 const Title = styled.h4`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   margin: 0 0 20px 0;
 `
 

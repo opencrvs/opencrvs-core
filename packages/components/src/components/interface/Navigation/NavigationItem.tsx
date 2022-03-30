@@ -45,15 +45,17 @@ const LabelContainer = styled.span<{
   isSelected?: boolean
   isSubItem?: boolean
 }>`
-  ${({ theme }) => theme.fonts.subtitleStyle};
-  margin-left: 12px;
+  ${({ theme }) => theme.fonts.bold14};
+  margin-left: 13px;
+  padding-top: 3px;
   color: ${({ isSelected, theme }) =>
     isSelected ? theme.colors.copy : theme.colors.grey500};
 `
 
 const ValueContainer = styled.span<{ isSelected?: boolean }>`
   margin-left: auto;
-  ${({ theme }) => theme.fonts.captionBolder};
+  ${({ theme }) => theme.fonts.bold12};
+  padding-top: 3px;
   color: ${({ isSelected, theme }) =>
     isSelected ? theme.colors.copy : theme.colors.grey500};
 `

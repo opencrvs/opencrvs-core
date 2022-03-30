@@ -19,7 +19,7 @@ const Page = styled.div`
   flex-direction: column;
   background-color: ${({ theme }) => theme.colors.background};
   min-height: 100vh;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 
 const Wrapper = styled.div`

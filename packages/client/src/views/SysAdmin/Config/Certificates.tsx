@@ -56,8 +56,9 @@ const HiddenInput = styled.input`
 `
 
 const ListTitleDiv = styled.div`
-  color: ${({ theme }) => theme.colors.greyLight};
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  width: 645px;
+  height: 46px;
+  ${({ theme }) => theme.fonts.reg16};
 `
 
 const BlueTitle = styled.span`
@@ -66,7 +67,7 @@ const BlueTitle = styled.span`
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   text-align: center;
   margin-top: 100px;
 `

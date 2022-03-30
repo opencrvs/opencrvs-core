@@ -31,7 +31,7 @@ const DocumentUploader = styled(ImageUploader)`
   border: ${({ theme }) => `2px solid ${theme.colors.primary}`};
   box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
   border-radius: 2px;
-  ${({ theme }) => theme.fonts.buttonStyle};
+  ${({ theme }) => theme.fonts.bold14};
   height: 40px;
   text-transform: initial;
   padding: 0px 25px;

@@ -84,17 +84,17 @@ const UnderLayBackground = styled.div<{ background: string }>`
 `
 
 const Title = styled.div`
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle}
+  ${({ theme }) => theme.fonts.h4}
   margin-bottom: 8px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.bodyBoldStyle}
+    ${({ theme }) => theme.fonts.bold16}
   }
 `
 const Description = styled.div`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   margin-bottom: 16px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.bodyStyle}
+    ${({ theme }) => theme.fonts.reg16}
   }
 `
 

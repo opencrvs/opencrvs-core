@@ -63,7 +63,7 @@ const Text = styled.div<{
   margin-right: ${({ align }) => (align === 'left' ? '8px' : '0px')};
   margin-top: 34px;
   color: ${({ theme }) => theme.colors.grey600};
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 const ApplyButton = styled(PrimaryButton)`
   height: 40px;

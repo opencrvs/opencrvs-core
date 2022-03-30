@@ -41,7 +41,7 @@ const ModalContent = styled.div`
   padding: 50px;
   color: ${({ theme }) => theme.colors.copy};
   text-align: center;
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   position: relative;
 `
 
@@ -49,7 +49,7 @@ const Heading = styled.h3`
   color: ${({ theme }) => theme.colors.copy};
   text-align: center;
   margin-bottom: 24px;
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+  ${({ theme }) => theme.fonts.h4};
 `
 
 const Actions = styled.div`

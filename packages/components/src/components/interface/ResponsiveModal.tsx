@@ -37,14 +37,16 @@ const ScreenBlocker = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: ${({ theme }) => theme.colors.opacity54};
+  background-color: ${({ theme }) => theme.colors.copy};
+  opacity: 0.8;
 `
 const ModalContent = styled.div<{
   width?: number
   responsive?: boolean
   fullscreen?: boolean
 }>`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
+  color: ${({ theme }) => theme.colors.copy};
   background-color: ${({ theme }) => theme.colors.white};
   width: ${({ width }) => (width ? width : 448)}px;
   height: ${({ fullscreen }) => (fullscreen ? '100vh' : 'auto')};
@@ -83,9 +85,9 @@ const Header = styled.div<{
   }
 `
 const Title = styled.h1`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+    ${({ theme }) => theme.fonts.h4};
   }
 `
 const Body = styled.div<{
@@ -95,7 +97,7 @@ const Body = styled.div<{
   responsive?: boolean
   fullscreen?: boolean
 }>`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   height: ${({ height }) => (height ? height : 250)}px;
   height: ${({ autoHeight }) => autoHeight && `auto`};
   color: ${({ theme }) => theme.colors.supportingCopy};
@@ -118,7 +120,7 @@ const Body = styled.div<{
   }
 `
 const Footer = styled.div<{ responsive?: boolean }>`
-  ${({ theme }) => theme.fonts.buttonStyle};
+  ${({ theme }) => theme.fonts.bold14};
   padding: 16px 3px;
   display: flex;
   flex-direction: row;
