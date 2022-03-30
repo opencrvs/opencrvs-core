@@ -52,6 +52,14 @@ const Footer = styled.div`
   height: 72px;
   padding-top: 24px;
 `
+const TopTabBar = styled.div`
+  display: flex;
+  gap: 28px;
+  margin-right: auto;
+`
+const TopBar = styled.div`
+  display: flex;
+`
 const BottomActionBar = styled.div`
   display: flex;
   gap: 16px;
@@ -71,8 +79,6 @@ const Title = styled.div`
 `
 const Icon = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
-  display: flex;
-  align-items: center;
 `
 
 export enum ContentSize {
@@ -83,12 +89,13 @@ export enum ContentSize {
 interface IProps {
   icon?: () => React.ReactNode
   title?: string
+  titleColor?: keyof typeof colors
   topActionButtons?: ReactElement[]
+  tabs?: IFormTabProps
   subtitle?: string
   children?: React.ReactNode
   bottomActionButtons?: ReactElement[]
   size?: ContentSize
-  titleColor?: keyof typeof colors
 }
 
 export class Content extends React.Component<IProps> {
@@ -98,6 +105,7 @@ export class Content extends React.Component<IProps> {
       title,
       titleColor,
       topActionButtons,
+      tabs,
       subtitle,
       children,
       bottomActionButtons,
@@ -107,11 +115,24 @@ export class Content extends React.Component<IProps> {
     return (
       <Container size={size as string}>
         <Header>
-          <TitleContainer titleColor={titleColor}>
-            {icon && <Icon id={`content-icon`}>{icon()}</Icon>}
-            {title && <Title id={`content-name`}>{title}</Title>}
-          </TitleContainer>
-          {topActionButtons && <TopActionBar>{topActionButtons}</TopActionBar>}
+          <TopBar>
+            <TitleContainer titleColor={titleColor}>
+              {icon && <Icon id={`content-icon`}>{icon()}</Icon>}
+              {title && <Title id={`content-name`}>{title}</Title>}
+            </TitleContainer>
+            {topActionButtons && (
+              <TopActionBar>{topActionButtons}</TopActionBar>
+            )}
+          </TopBar>
+          {tabs && (
+            <TopTabBar>
+              <FormTabs
+                sections={tabs.sections}
+                activeTabId={tabs.activeTabId}
+                onTabClick={(id: string) => tabs.onTabClick(id)}
+              />
+            </TopTabBar>
+          )}
         </Header>
         {subtitle && <SubHeader>{subtitle}</SubHeader>}
         {children && <Body>{children}</Body>}

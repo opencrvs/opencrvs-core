@@ -715,7 +715,11 @@ const showUpdateButton = ({
       EVENT_STATUS.IN_PROGRESS,
       EVENT_STATUS.REJECTED
     ],
-    LOCAL_REGISTRAR: [SUBMISSION_STATUS.DRAFT, EVENT_STATUS.REJECTED]
+    LOCAL_REGISTRAR: [
+      SUBMISSION_STATUS.DRAFT,
+      EVENT_STATUS.IN_PROGRESS,
+      EVENT_STATUS.REJECTED
+    ]
   }
 
   if (updateButtonRoleStatusMap[role].includes(declaration?.status as string)) {

@@ -67,7 +67,7 @@ export const messages: {
 })
 
 export const isAValidPhoneNumberFormat = (value: string): boolean => {
-  const { pattern } = window.config.PHONE_NUMBER_PATTERN
+  const pattern = window.config.PHONE_NUMBER_PATTERN
   return new RegExp(pattern).test(value)
 }
 
@@ -89,9 +89,6 @@ export const isNumber: Validation = (value: string) =>
     : undefined
 
 export const phoneNumberFormat: Validation = (value: string) => {
-  const { example } = window.config.PHONE_NUMBER_PATTERN
-  const validationProps = { example }
-
   const trimmedValue = value === undefined || value === null ? '' : value.trim()
 
   if (!trimmedValue) {
@@ -101,7 +98,6 @@ export const phoneNumberFormat: Validation = (value: string) => {
   return isAValidPhoneNumberFormat(trimmedValue)
     ? undefined
     : {
-        message: messages.phoneNumberFormat,
-        props: validationProps
+        message: messages.phoneNumberFormat
       }
 }

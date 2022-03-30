@@ -243,7 +243,6 @@ class ChangePhoneView extends React.Component<IProps & IDispatchProps, IState> {
         ? intl.formatMessage(messages[userDetails.role])
         : ''
     const scope = getCurrentUserScope()
-    const { start, num } = window.config.PHONE_NUMBER_PATTERN
     return (
       <>
         <SysAdminContentWrapper
@@ -286,12 +285,11 @@ class ChangePhoneView extends React.Component<IProps & IDispatchProps, IState> {
                         messages.phoneNumberChangeFormValidationMsg,
                         {
                           num: intl.formatMessage({
-                            defaultMessage: num,
-                            description: 'Minimum number digit',
+                            defaultMessage: '10',
                             id: 'phone.digit'
                           }),
                           start: intl.formatMessage({
-                            defaultMessage: start,
+                            defaultMessage: '0(4|5)',
                             description: 'Should starts with',
                             id: 'phone.start'
                           })

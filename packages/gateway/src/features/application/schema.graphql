@@ -1,0 +1,140 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+# graphic logo are (registered/a) trademark(s) of Plan International.
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+# graphic logo are (registered/a) trademark(s) of Plan International.
+
+type BirthFee {
+  ON_TIME: Float
+  LATE: Float
+  DELAYED: Float
+}
+
+type Birth {
+  REGISTRATION_TARGET: Int
+  LATE_REGISTRATION_TARGET: Int
+  FEE: BirthFee
+}
+
+type DeathFee {
+  ON_TIME: Float
+  DELAYED: Float
+}
+
+type Death {
+  REGISTRATION_TARGET: Int
+  FEE: DeathFee
+}
+
+type CountryLogo {
+  fileName: String
+  file: String
+}
+
+type Currency {
+  isoCode: String
+  languagesAndCountry: [String]
+}
+
+input BirthFeeInput {
+  ON_TIME: Float
+  LATE: Float
+  DELAYED: Float
+}
+
+input BirthInput {
+  REGISTRATION_TARGET: Int
+  LATE_REGISTRATION_TARGET: Int
+  FEE: BirthFeeInput
+}
+
+input DeathFeeInput {
+  ON_TIME: Float
+  DELAYED: Float
+}
+
+input DeathInput {
+  REGISTRATION_TARGET: Int
+  FEE: DeathFeeInput
+}
+
+input NIDNumberPatternInput {
+  pattern: String
+  example: String
+  num: String
+}
+
+input CountryLogoInput {
+  fileName: String
+  file: String
+}
+
+input CurrencyInput {
+  isoCode: String
+  languagesAndCountry: [String]
+}
+
+input ApplicationConfigurationInput {
+  APPLICATION_NAME: String
+  BACKGROUND_SYNC_BROADCAST_CHANNEL: String
+  BIRTH: BirthInput
+  COUNTRY: String
+  COUNTRY_LOGO: CountryLogoInput
+  CURRENCY: CurrencyInput
+  COUNTRY_LOGO_RENDER_WIDTH: Int
+  COUNTRY_LOGO_RENDER_HEIGHT: Int
+  DESKTOP_TIME_OUT_MILLISECONDS: Int
+  DEATH: DeathInput
+  UI_POLLING_INTERVAL: Int
+  FIELD_AGENT_AUDIT_LOCATIONS: String
+  APPLICATION_AUDIT_LOCATIONS: String
+  INFORMANT_MINIMUM_AGE: Int
+  HIDE_EVENT_REGISTER_INFORMATION: Boolean
+  EXTERNAL_VALIDATION_WORKQUEUE: Boolean
+  SENTRY: String
+  LOGROCKET: String
+  PHONE_NUMBER_PATTERN: String
+  NID_NUMBER_PATTERN: String
+}
+
+type ApplicationConfiguration {
+  APPLICATION_NAME: String
+  BACKGROUND_SYNC_BROADCAST_CHANNEL: String
+  BIRTH: Birth
+  COUNTRY: String
+  COUNTRY_LOGO: CountryLogo
+  CURRENCY: Currency
+  COUNTRY_LOGO_RENDER_WIDTH: Int
+  COUNTRY_LOGO_RENDER_HEIGHT: Int
+  DESKTOP_TIME_OUT_MILLISECONDS: Int
+  DEATH: Death
+  UI_POLLING_INTERVAL: Int
+  FIELD_AGENT_AUDIT_LOCATIONS: String
+  APPLICATION_AUDIT_LOCATIONS: String
+  INFORMANT_MINIMUM_AGE: Int
+  HIDE_EVENT_REGISTER_INFORMATION: Boolean
+  EXTERNAL_VALIDATION_WORKQUEUE: Boolean
+  SENTRY: String
+  LOGROCKET: String
+  PHONE_NUMBER_PATTERN: String
+  NID_NUMBER_PATTERN: String
+}
+
+type Mutation {
+  updateApplicationConfig(
+    applicationConfig: ApplicationConfigurationInput
+  ): ApplicationConfiguration
+}
