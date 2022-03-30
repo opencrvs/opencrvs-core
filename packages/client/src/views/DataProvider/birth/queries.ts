@@ -187,6 +187,9 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         date
         action
         reinstated
+        statusReason {
+          text
+        }
         location {
           id
           name
@@ -434,6 +437,9 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         date
         action
         reinstated
+        statusReason {
+          text
+        }
         location {
           id
           name
