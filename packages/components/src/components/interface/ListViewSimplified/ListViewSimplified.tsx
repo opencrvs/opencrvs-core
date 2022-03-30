@@ -12,63 +12,96 @@
 import React from 'react'
 import styled from 'styled-components'
 
-const Grid = styled.div`
+const Grid = styled.div<{ bottomBorder: boolean }>`
   display: grid;
   grid-template-columns: auto 1fr auto;
-  grid-auto-rows: 56px;
+  grid-auto-rows: minmax(56px, auto);
   row-gap: 1px;
-  border-bottom: 1px solid;
+  ${({ bottomBorder }) => bottomBorder && 'border-bottom: 1px solid'};
   border-color: ${({ theme }) => theme.colors.grey200};
   background-color: ${({ theme }) => theme.colors.grey200};
   > div {
     background-color: ${({ theme }) => theme.colors.white};
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    grid-auto-rows: 102px;
+    grid-template-columns: auto;
   }
 `
 
 const LabelValueContainer = styled.div`
   display: flex;
-  align-items: center;
+  padding: 8px 0;
   grid-column-start: 2;
   flex-grow: 1;
   gap: 8px;
   padding-right: 8px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    flex-direction: column;
-    justify-content: center;
+    display: none;
   }
 `
 
 const Value = styled.div`
+  display: flex;
   min-width: 50%;
+  align-items: center;
   color: ${({ theme }) => theme.colors.grey500};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    width: 100%;
+    grid-row-start: 2;
+    grid-column: 2 / 4;
   }
 `
 
 const Label = styled.div`
+  display: flex;
   min-width: 50%;
+  align-items: center;
   button > div {
     padding: 0;
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    width: 100%;
+    grid-column-start: 2;
   }
 `
 
-const ActionContainer = styled.div`
+const ActionsContainer = styled.div`
   display: flex;
+  padding: 8px 0;
   align-items: center;
   justify-content: right;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: none;
+  }
 `
 
 const AvatarContainer = styled.div`
   display: flex;
   align-items: center;
   padding-right: 8px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: none;
+  }
+`
+
+const MobileAvatarContainer = styled.div`
+  display: flex;
+  align-items: center;
+  padding-right: 8px;
+`
+
+const MobileContainer = styled.div`
+  display: none;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: grid;
+    padding: 8px 0;
+    grid-template-rows: minmax(40px, auto) auto;
+    grid-template-columns: auto 1fr auto;
+  }
+`
+
+const MobileActionsContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: right;
 `
 
 interface IListViewItemSimplifiedProps {
@@ -91,15 +124,23 @@ export function ListViewItemSimplified({
         <Label>{label}</Label>
         {value && <Value>{value}</Value>}
       </LabelValueContainer>
-      <ActionContainer>{actions}</ActionContainer>
+      <ActionsContainer>{actions}</ActionsContainer>
+      <MobileContainer>
+        {avatar && <MobileAvatarContainer>{avatar}</MobileAvatarContainer>}
+        <Label>{label}</Label>
+        <MobileActionsContainer>{actions}</MobileActionsContainer>
+        <Value>{value}</Value>
+      </MobileContainer>
     </>
   )
 }
 
 export function ListViewSimplified({
+  bottomBorder = false,
   children
 }: {
+  bottomBorder?: boolean
   children: React.ReactNode
 }) {
-  return <Grid>{children}</Grid>
+  return <Grid bottomBorder={bottomBorder}>{children}</Grid>
 }
