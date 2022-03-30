@@ -223,6 +223,12 @@ type Notification {
   updatedAt: Date
 }
 
+input MesssageDescriptorInput {
+  id: String
+  description: String
+  defaultMessage: String
+}
+
 scalar Date
 
 type BirthRegistration implements EventRegistration {
@@ -450,6 +456,20 @@ type formDraft {
   history: [DraftHistory]
   updatedAt: Date
   createdAt: Date
+}
+
+type DraftHistory {
+  _id: ID
+  version: Int
+  status: String
+  comment: String
+  lastUpdateAt: Date
+}
+
+type MesssageDescriptor {
+  id: String
+  description: String
+  defaultMessage: String
 }
 
 input NotificationInput {
