@@ -191,6 +191,7 @@ class PaymentComponent extends React.Component<IFullProps> {
               id="print-receipt"
               icon={() => <Print />}
               align={0}
+              disabled={true}
               onClick={() =>
                 printMoneyReceipt(
                   this.props.intl,
