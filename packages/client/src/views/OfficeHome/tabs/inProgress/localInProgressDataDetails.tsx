@@ -31,7 +31,7 @@ const ExpansionContainer = styled.div`
   display: flex;
   flex-direction: row;
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   margin-bottom: 8px;
   &:last-child {
     margin-bottom: 0;
@@ -45,11 +45,11 @@ const StatusIcon = styled.div`
   margin-top: 3px;
 `
 const StyledLabel = styled.label`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
   margin-right: 3px;
 `
 const StyledValue = styled.span`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   text-transform: capitalize !important;
 `
 
@@ -58,7 +58,7 @@ const HistoryWrapper = styled.div`
   margin: 20px 0px;
 `
 const BoldSpan = styled.span`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
   padding: 0 10px;
   white-space: nowrap;
   overflow: hidden;

@@ -32,6 +32,7 @@ interface IOfficeHomeMessages
   validatedDeclarationTooltipForRegistrar: MessageDescriptor
   validatedDeclarationTooltipForRegistrationAgent: MessageDescriptor
   waitingForExternalValidation: MessageDescriptor
+  archived: MessageDescriptor
 }
 
 const messagesToDefine: IOfficeHomeMessages = {
@@ -39,6 +40,11 @@ const messagesToDefine: IOfficeHomeMessages = {
     defaultMessage: 'Certified',
     description: 'Label for registration status certified',
     id: 'regHome.certified'
+  },
+  archived: {
+    defaultMessage: 'Archived',
+    description: 'Label for registration status archived',
+    id: 'regHome.archived'
   },
   dataTableResults: {
     defaultMessage: 'Results',

@@ -71,7 +71,7 @@ const StatusListFooter = styled.div`
   justify-content: space-between;
   margin-top: 20px;
   padding: 0px 10px;
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
   background: ${({ theme }) => theme.colors.background};
   border-top: 1px solid ${({ theme }) => theme.colors.disabled};
   border-bottom: none;

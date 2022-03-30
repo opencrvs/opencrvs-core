@@ -24,14 +24,14 @@ const Container = styled.div<{ size: string }>`
   border: 1px solid ${({ theme }) => theme.colors.grey300};
   box-sizing: border-box;
   background-color: ${({ theme }) => theme.colors.white};
-  color: ${({ theme }) => theme.colors.grey600};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.reg16};
 `
 const Header = styled.div`
   display: flex;
   flex-flow: column wrap;
 
-  border-bottom: 1px solid rgb(204, 207, 208);
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   padding-top: 20px;
   padding-right: 32px;
   padding-left: 32px;
@@ -50,7 +50,7 @@ export const SubHeader = styled.div`
   padding-right: 32px;
   padding-left: 32px;
   color: rgb(89, 92, 95);
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
 `
 export const Body = styled.div`
   padding-top: 20px;
@@ -85,7 +85,7 @@ const TitleContainer = styled.div<{ titleColor?: keyof typeof colors }>`
 `
 
 const Title = styled.div`
-  ${({ theme }) => theme.fonts.h4Style}
+  ${({ theme }) => theme.fonts.h2}
 `
 const Icon = styled.div`
   background-color: ${({ theme }) => theme.colors.white};

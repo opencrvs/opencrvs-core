@@ -9,15 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { Meta, Story } from '@storybook/react'
-import { EnglishText } from '.'
+import styled from 'styled-components'
+import { ArrowUp } from './ArrowUp'
 
-export default {
-  title: 'Components/Typography/EnglishText',
-  component: EnglishText
-} as Meta
-
-const Template: Story<{}> = () => <EnglishText />
-
-export const EnglishTextView = Template.bind({})
+export const ArrowDown = styled(ArrowUp)`
+  transform: rotate(180deg);
+`

@@ -63,7 +63,7 @@ const BlueButton = styled(Button)`
   background-color: ${({ theme }) => theme.colors.secondary};
   height: 32px;
   color: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.smallButtonStyle};
+  ${({ theme }) => theme.fonts.reg14};
   border-radius: 4px;
   ${({ theme }) => theme.shadows.light};
   &:focus {
@@ -82,7 +82,7 @@ const WhiteButton = styled(Button)`
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
   height: 32px;
-  ${({ theme }) => theme.fonts.smallButtonStyle};
+  ${({ theme }) => theme.fonts.reg14};
   ${({ theme }) => theme.shadows.light};
   &:hover {
     background: ${({ theme }) => theme.colors.grey100};

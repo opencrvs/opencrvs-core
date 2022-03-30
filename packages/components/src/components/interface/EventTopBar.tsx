@@ -29,7 +29,7 @@ const TopBar = styled.div`
   z-index: 1;
 `
 const TopBarTitle = styled.h4`
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+  ${({ theme }) => theme.fonts.h4};
   padding-left: 16px;
   color: ${({ theme }) => theme.colors.copy};
 `
@@ -37,6 +37,7 @@ const Item = styled.span`
   display: flex;
   align-items: center;
 `
+
 export interface IEventTopBarProps {
   id?: string
   title: string
@@ -47,6 +48,7 @@ export interface IEventTopBarProps {
   menuItems?: IToggleMenuItem[]
   iconColor?: string
 }
+
 export interface IEventTopBarMenuAction {
   handler: () => void
   label: string
@@ -91,7 +93,6 @@ export const EventTopBar = (props: IEventTopBarProps) => {
             {exitAction.label}
           </TertiaryButton>
         )}
-
         {menuItems && (
           <ToggleMenu
             id="eventToggleMenu"

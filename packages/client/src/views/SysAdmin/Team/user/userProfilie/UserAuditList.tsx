@@ -57,7 +57,7 @@ import format from '@client/utils/date-formatting'
 const DEFAULT_LIST_SIZE = 10
 
 const InformationCaption = styled.div`
-  ${({ theme }) => theme.fonts.captionStyle};
+  ${({ theme }) => theme.fonts.reg12};
   padding-bottom: 5px;
 `
 
@@ -80,7 +80,7 @@ const RecentActionsHolder = styled.div`
 `
 
 const SectionTitle = styled.div`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   margin-bottom: 10px;
 `
 

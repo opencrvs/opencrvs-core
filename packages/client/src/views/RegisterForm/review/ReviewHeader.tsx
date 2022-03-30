@@ -38,16 +38,16 @@ const IconContainer = styled.div`
   margin: 16px auto 16px auto;
 `
 const TitleContainer = styled.div`
-  ${({ theme }) => theme.fonts.captionStyle}
+  ${({ theme }) => theme.fonts.reg12}
   text-transform: uppercase;
 `
 const SubjectContainer = styled.div`
-  ${({ theme }) => theme.fonts.h4Style}
+  ${({ theme }) => theme.fonts.h2}
   width:70%;
   margin: auto;
   overflow-wrap: break-word;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.h5Style}
+    ${({ theme }) => theme.fonts.h3}
   }
 `
 const Image = styled.img`

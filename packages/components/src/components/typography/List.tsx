@@ -14,7 +14,7 @@ import styled from 'styled-components'
 
 const StyledList = styled.ul`
   width: 100%;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 
 const StyledListItem = styled.li`

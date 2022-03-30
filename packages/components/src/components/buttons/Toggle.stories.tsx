@@ -9,20 +9,18 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Meta, Story } from '@storybook/react'
-import { SearchInput, ISerachInputCustomProps } from '.'
 import React from 'react'
+import { Meta, Story } from '@storybook/react'
+import { Toggle } from './Toggle'
 
-const Template: Story<
-  ISerachInputCustomProps & React.InputHTMLAttributes<HTMLInputElement>
-> = (args) => <SearchInput {...args} />
-
-export const SearchInputView = Template.bind({})
-SearchInputView.args = {
-  buttonLabel: 'Search',
-  onSubmit: (searchText: string) => alert(searchText)
-}
 export default {
-  title: 'Components/Interface/SearchInput',
-  component: SearchInput
+  title: 'Components/icons/Toggle',
+  component: Toggle
 } as Meta
+
+const Template: Story<{}> = () => {
+  const [selected, setSelected] = React.useState(true)
+  return <Toggle selected={selected} onChange={() => setSelected(!selected)} />
+}
+
+export const ActivityView = Template.bind({})
