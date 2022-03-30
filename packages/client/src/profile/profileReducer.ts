@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
+import { LoopReducer, Loop, loop, Cmd, RunCmd, ActionCmd } from 'redux-loop'
 import * as actions from '@client/profile/profileActions'
 import { storage } from '@client/storage'
 import {
@@ -34,6 +34,7 @@ import { queries } from '@client/profile/queries'
 import * as changeLanguageActions from '@client/i18n/actions'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { serviceApi } from '@client/profile/serviceApi'
+import { Action } from 'redux'
 
 export type ProfileState = {
   authenticated: boolean
@@ -143,19 +144,31 @@ export const profileReducer: LoopReducer<
     case actions.MODIFY_USER_DETAILS:
       const details: IUserDetails = action.payload
 
+      const commandList: (
+        | RunCmd<Action>
+        | ActionCmd<changeLanguageActions.Action>
+      )[] = [
+        Cmd.run(storeUserDetails, {
+          args: [details]
+        })
+      ]
+      if (state.userDetails?.language !== details.language) {
+        commandList.push(
+          Cmd.action(
+            changeLanguageActions.changeLanguage({
+              language: details.language
+            })
+          )
+        )
+      }
+
       if (details) {
         return loop(
           {
-            ...state
+            ...state,
+            userDetails: details
           },
-          Cmd.list([
-            Cmd.run(() => storeUserDetails(details)),
-            Cmd.action(
-              changeLanguageActions.changeLanguage({
-                language: details.language
-              })
-            )
-          ])
+          Cmd.list(commandList)
         )
       } else {
         return {

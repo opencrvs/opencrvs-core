@@ -53,7 +53,7 @@ const ImageHolder = styled.div`
 const Title = styled.span`
   padding-left: 16px;
   color: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 const BackButton = styled.button`
   display: flex;

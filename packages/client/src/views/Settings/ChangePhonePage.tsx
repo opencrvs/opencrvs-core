@@ -77,7 +77,7 @@ const HalfWidthInput = styled(TextInput)`
   }
 `
 const FormSectionTitle = styled.h4`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   color: ${({ theme }) => theme.colors.copy};
   margin-top: 0px;
   margin-bottom: 16px;
@@ -98,7 +98,7 @@ const Field = styled.div`
 `
 const Message = styled.div`
   margin-bottom: 16px;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.copy};
 `
 
@@ -111,7 +111,7 @@ const InvalidPhoneNumber = styled.div`
 `
 const BoxedError = styled.div`
   margin-top: -10px;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   margin-bottom: 10px;
   display: flex;
 `
@@ -217,7 +217,7 @@ class ChangePhoneView extends React.Component<IProps & IDispatchProps, IState> {
     }
   }
 
-  phoneChangecompleted = () => {
+  phoneChangeCompleted = () => {
     this.setState({
       phoneNumber: EMPTY_STRING,
       verifyCode: EMPTY_STRING,
@@ -225,8 +225,11 @@ class ChangePhoneView extends React.Component<IProps & IDispatchProps, IState> {
       errorOccured: false
     })
     if (this.props.userDetails) {
-      this.props.userDetails.mobile = convertToMSISDN(this.state.phoneNumber)
-      this.props.modifyUserDetails(this.props.userDetails)
+      const { userDetails } = this.props
+      this.props.modifyUserDetails({
+        ...userDetails,
+        mobile: convertToMSISDN(this.state.phoneNumber)
+      })
     }
     this.props.goToSettingsWithPhoneSuccessMsg(true)
   }
@@ -375,7 +378,7 @@ class ChangePhoneView extends React.Component<IProps & IDispatchProps, IState> {
                     nonce: nonce,
                     verifyCode: this.state.verifyCode
                   }}
-                  onCompleted={this.phoneChangecompleted}
+                  onCompleted={this.phoneChangeCompleted}
                   onError={() => this.setState({ errorOccured: true })}
                 >
                   {(changePhone: any) => {
