@@ -279,6 +279,7 @@ export interface IRegistration {
 }
 
 export interface IAttachmentValue {
+  name?: string
   type: string
   data: string
 }

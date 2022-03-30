@@ -32,22 +32,9 @@ export interface IContentResponse {
 export interface IAssetResponse {
   logo: string
 }
-
-export interface IPhoneNumberPattern {
-  pattern: RegExp
-  example: string
-  start: string
-  num: string
-  mask: {
-    startForm: number
-    endBefore: number
-  }
-}
-
-export interface INIDNumberPattern {
-  pattern: RegExp
-  example: string
-  num: string
+export interface ICountryLogo {
+  fileName: string
+  file: string
 }
 
 export interface ICertificateTemplateData {
@@ -61,18 +48,37 @@ export interface ICertificateTemplateData {
   _id: string
 }
 
+interface ICurrency {
+  isoCode: string
+  languagesAndCountry: string[]
+}
+
 export interface IApplicationConfig {
+  APPLICATION_NAME: string
   BACKGROUND_SYNC_BROADCAST_CHANNEL: string
+  BIRTH: {
+    REGISTRATION_TARGET: number
+    LATE_REGISTRATION_TARGET: number
+    FEE: {
+      ON_TIME: number
+      LATE: number
+      DELAYED: number
+    }
+  }
   COUNTRY: string
-  COUNTRY_LOGO_FILE: string
+  COUNTRY_LOGO: ICountryLogo
+  CURRENCY: ICurrency
   COUNTRY_LOGO_RENDER_WIDTH: number
   COUNTRY_LOGO_RENDER_HEIGHT: number
   DESKTOP_TIME_OUT_MILLISECONDS: number
+  DEATH: {
+    REGISTRATION_TARGET: number
+    FEE: {
+      ON_TIME: number
+      DELAYED: number
+    }
+  }
   LANGUAGES: string
-  CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: number
-  CERTIFICATE_PRINT_CHARGE_UP_LIMIT: number
-  CERTIFICATE_PRINT_LOWEST_CHARGE: number
-  CERTIFICATE_PRINT_HIGHEST_CHARGE: number
   UI_POLLING_INTERVAL: number
   FIELD_AGENT_AUDIT_LOCATIONS: string
   DECLARATION_AUDIT_LOCATIONS: string
@@ -81,10 +87,10 @@ export interface IApplicationConfig {
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
   SENTRY: string
   LOGROCKET: string
-  PHONE_NUMBER_PATTERN: IPhoneNumberPattern
+  PHONE_NUMBER_PATTERN: RegExp
   BIRTH_REGISTRATION_TARGET: number
   DEATH_REGISTRATION_TARGET: number
-  NID_NUMBER_PATTERN: INIDNumberPattern
+  NID_NUMBER_PATTERN: RegExp
 }
 
 export interface IApplicationConfigResponse {
@@ -201,7 +207,7 @@ const toDataURL = (url: string) =>
     })
 
 async function loadAssets(): Promise<IAssetResponse> {
-  const url = `${window.config.COUNTRY_CONFIG_URL}/assets/${window.config.COUNTRY_LOGO_FILE}`
+  const url = `${window.config.COUNTRY_CONFIG_URL}/assets/${window.config.COUNTRY_LOGO.fileName}`
 
   return toDataURL(url).then((dataUrl) => {
     return {

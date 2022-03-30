@@ -2136,7 +2136,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'informantID',
-                type: 'NUMBER',
+                type: 'TEXT',
                 label: {
                   defaultMessage: 'National ID',
                   description: 'Option for form field: Type of ID',
@@ -3931,7 +3931,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'iD',
-                type: 'NUMBER',
+                type: 'TEXT',
                 label: {
                   defaultMessage: 'National ID',
                   description: 'Option for form field: Type of ID',
@@ -3963,7 +3963,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'socialSecurityNo',
-                type: 'NUMBER',
+                type: 'TEXT',
                 label: {
                   defaultMessage: 'Social Security No',
                   description: 'text for social security number form field',
@@ -6422,7 +6422,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'iD',
-                type: 'NUMBER',
+                type: 'TEXT',
                 label: {
                   defaultMessage: 'National ID',
                   description: 'Option for form field: Type of ID',
@@ -6459,7 +6459,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'socialSecurityNo',
-                type: 'NUMBER',
+                type: 'TEXT',
                 label: {
                   defaultMessage: 'Social Security No',
                   description: 'text for social security number form field',
@@ -8646,7 +8646,7 @@ export const registerForms: IDefaultRegisterForms = {
             fields: [
               {
                 name: 'iD',
-                type: 'NUMBER',
+                type: 'TEXT',
                 label: {
                   defaultMessage: 'National ID',
                   description: 'Option for form field: Type of ID',
@@ -8678,7 +8678,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'socialSecurityNo',
-                type: 'NUMBER',
+                type: 'TEXT',
                 label: {
                   defaultMessage: 'Social security no./NAPSA',
                   description: 'text for social security number form field',
@@ -10776,7 +10776,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'informantID',
-                type: 'NUMBER',
+                type: 'TEXT',
                 label: {
                   defaultMessage: 'National ID',
                   description: 'Option for form field: Type of ID',
