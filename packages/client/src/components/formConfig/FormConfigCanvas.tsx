@@ -14,15 +14,13 @@ import React from 'react'
 import styled from '@client/styledComponents'
 
 const Container = styled.div`
-  width: calc(100% - 678px);
-  left: 290px;
-  position: fixed;
-  height: 100%;
-  margin-top: 18px;
+  margin-left: 330px;
+  margin-right: 438px;
+  margin-top: 74px;
+  display: flex;
   border: 1px solid ${({ theme }) => theme.colors.grey300};
   background-color: ${({ theme }) => theme.colors.white};
 `
-
 interface IFormConfigCanvas {
   children?: React.ReactNode
 }

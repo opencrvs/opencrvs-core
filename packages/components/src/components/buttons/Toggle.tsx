@@ -19,27 +19,35 @@ export interface IToggle {
 
 const CheckBoxWrapper = styled.div`
   position: relative;
+  width: 46px;
+  height: 24px;
+  border-radius: 100px;
+  :focus-within {
+    box-shadow: 0px 0px 0px 2px ${({ theme }) => theme.colors.yellow};
+  }
 `
 const CheckBoxLabel = styled.label<{ selected?: boolean }>`
   position: absolute;
   top: 0;
   left: 0;
-  width: 44px;
+  width: 46px;
   height: 24px;
   border-radius: 100px;
   background: ${({ theme }) => theme.colors.grey300};
-
+  :hover {
+    background: ${({ theme }) => theme.colors.grey400};
+  }
   cursor: pointer;
   &::after {
     content: '';
     display: block;
-    border-radius: 100%;
+    border-radius: 100px;
     width: 18px;
     height: 18px;
     margin-top: 3px;
     margin-bottom: 3px;
     margin-left: 4px;
-    margin-right: 22px;
+    margin-right: 24px;
     background: ${({ theme }) => theme.colors.white};
     transition: margin-left 0.2s;
   }
@@ -47,12 +55,15 @@ const CheckBoxLabel = styled.label<{ selected?: boolean }>`
 const CheckBox = styled.input`
   opacity: 0;
   border-radius: 100px;
-  width: 44px;
+  width: 46px;
   height: 24px;
   &:checked + ${CheckBoxLabel} {
     background: ${({ theme }) => theme.colors.positive};
+    :hover {
+      background: ${({ theme }) => theme.colors.greenDark};
+    }
     &::after {
-      margin-left: 22px;
+      margin-left: 24px;
       margin-right: 4px;
     }
   }
