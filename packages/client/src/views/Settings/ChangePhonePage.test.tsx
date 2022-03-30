@@ -26,8 +26,8 @@ const graphqlMocks = [
       query: changePhoneMutation,
       variables: {
         userId: '123',
-        phoneNumber: '0755555555',
-        nonce: '000000',
+        phoneNumber: '+8801741234567',
+        nonce: '',
         verifyCode: '000000'
       }
     },
@@ -93,7 +93,13 @@ describe('Change phone page tests', () => {
       false
     )
     component.find('#verify-button').hostNodes().simulate('click')
+
+    // wait for mocked data to load mockedProvider
+    await new Promise((resolve) => {
+      setTimeout(resolve, 100)
+    })
+
     component.update()
-    expect(history.location.pathname).toContain('/settings')
+    expect(history.location.pathname).not.toContain('/phone')
   })
 })
