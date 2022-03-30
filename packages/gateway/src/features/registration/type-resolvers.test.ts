@@ -305,6 +305,47 @@ describe('Registration type resolvers', () => {
       const reinstated = typeResolvers.History.reinstated(mockTaskDownloaded)
       expect(reinstated).toBe(true)
     })
+
+    it('Should return date', () => {
+      const date = typeResolvers.History.date(mockTaskDownloaded)
+      expect(date).toBe('2016-10-31T09:45:05+10:00')
+    })
+
+    it('Should return user', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockUser))
+      const user = await typeResolvers.History.user(
+        mockTaskDownloaded,
+        null,
+        {}
+      )
+      expect(user.role).toBe(mockUser.role)
+    })
+
+    it('Should return location', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockLocation))
+      const location = await typeResolvers.History.location(
+        mockTaskDownloaded,
+        null,
+        {}
+      )
+      expect(location.id).toBe(mockLocation.id)
+    })
+
+    it('Should return comment', () => {
+      const comment = typeResolvers.History.comments(mockTaskDownloaded)
+      expect(comment[0].text).toBe('Comment')
+    })
+
+    it('Should return certificate', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockCertificate))
+
+      const certificates = await typeResolvers.History.certificates(
+        mockTaskDownloaded,
+        null,
+        {}
+      )
+      expect(certificates).toBe(null)
+    })
   })
 
   describe('Birth Registration type', () => {

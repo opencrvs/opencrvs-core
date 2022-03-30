@@ -345,7 +345,8 @@ export const mockTaskDownloaded = {
     }
   ],
   meta: {
-    versionId: '123'
+    versionId: '123',
+    lastUpdated: '2016-10-31T09:45:05+10:00'
   }
 }
 
