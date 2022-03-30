@@ -70,7 +70,7 @@ export interface GQLMutation {
   activateUser?: string
   changePassword?: string
   changePhone?: string
-  changeAvatar?: string
+  changeAvatar?: GQLAvatar
   auditUser?: string
   resendSMSInvite?: string
   createOrUpdateCertificateSVG?: GQLCertificateSVG
@@ -410,6 +410,11 @@ export interface GQLSecurityQuestionAnswer {
   answer?: string
 }
 
+export interface GQLAvatar {
+  type: string
+  data: string
+}
+
 export interface GQLAvatarInput {
   type: string
   data: string
@@ -650,11 +655,6 @@ export interface GQLLocalRegistrar {
 export interface GQLSignature {
   data?: string
   type?: string
-}
-
-export interface GQLAvatar {
-  type: string
-  data: string
 }
 
 export interface GQLSearchFieldAgentResponse {
@@ -1310,6 +1310,7 @@ export interface GQLResolver {
   Question?: GQLQuestionTypeResolver
   CreatedIds?: GQLCreatedIdsTypeResolver
   Reinstated?: GQLReinstatedTypeResolver
+  Avatar?: GQLAvatarTypeResolver
   Map?: GraphQLScalarType
   Registration?: GQLRegistrationTypeResolver
   RelatedPerson?: GQLRelatedPersonTypeResolver
@@ -1327,7 +1328,6 @@ export interface GQLResolver {
   Identifier?: GQLIdentifierTypeResolver
   LocalRegistrar?: GQLLocalRegistrarTypeResolver
   Signature?: GQLSignatureTypeResolver
-  Avatar?: GQLAvatarTypeResolver
   SearchFieldAgentResponse?: GQLSearchFieldAgentResponseTypeResolver
   RegistrationGenderBasisMetrics?: GQLRegistrationGenderBasisMetricsTypeResolver
   RegistrationTimeFrameMetrics?: GQLRegistrationTimeFrameMetricsTypeResolver
@@ -3524,6 +3524,19 @@ export interface ReinstatedToRegistrationStatusResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLAvatarTypeResolver<TParent = any> {
+  type?: AvatarToTypeResolver<TParent>
+  data?: AvatarToDataResolver<TParent>
+}
+
+export interface AvatarToTypeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface AvatarToDataResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLRegistrationTypeResolver<TParent = any> {
   id?: RegistrationToIdResolver<TParent>
   _fhirID?: RegistrationTo_fhirIDResolver<TParent>
@@ -4077,19 +4090,6 @@ export interface SignatureToDataResolver<TParent = any, TResult = any> {
 }
 
 export interface SignatureToTypeResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLAvatarTypeResolver<TParent = any> {
-  type?: AvatarToTypeResolver<TParent>
-  data?: AvatarToDataResolver<TParent>
-}
-
-export interface AvatarToTypeResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface AvatarToDataResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

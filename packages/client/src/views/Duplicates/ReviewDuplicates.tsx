@@ -81,11 +81,11 @@ const Wrapper = styled.div`
 `
 
 const TitleBox = styled(Box)`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
 `
 
 const Header = styled.span`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
   display: flex;
   align-items: center;
 `
@@ -112,7 +112,7 @@ const BackButton = styled.a`
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   text-align: center;
   margin-top: 100px;
 `

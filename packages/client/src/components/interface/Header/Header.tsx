@@ -246,8 +246,10 @@ class HeaderComp extends React.Component<IFullProps, IState> {
 
   getMobileHeaderActionProps(activeMenuItem: ACTIVE_MENU_ITEM) {
     if (
-      activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE ||
-      activeMenuItem === ACTIVE_MENU_ITEM.TEAM
+      (activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE ||
+        activeMenuItem === ACTIVE_MENU_ITEM.TEAM) &&
+      (NATL_ADMIN_ROLES.includes(this.props.userDetails?.role as string) ||
+        SYS_ADMIN_ROLES.includes(this.props.userDetails?.role as string))
     ) {
       return {
         mobileLeft: {
@@ -481,7 +483,11 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       }
     ]
 
-    if (activeMenuItem !== ACTIVE_MENU_ITEM.DECLARATIONS) {
+    if (
+      activeMenuItem !== ACTIVE_MENU_ITEM.DECLARATIONS &&
+      (NATL_ADMIN_ROLES.includes(this.props.userDetails?.role as string) ||
+        SYS_ADMIN_ROLES.includes(this.props.userDetails?.role as string))
+    ) {
       rightMenu = [
         {
           element: this.arrowNavigator()

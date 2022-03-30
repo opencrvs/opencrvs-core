@@ -49,6 +49,7 @@ import { Spinner } from '@opencrvs/components/lib/interface'
 import styled, { ITheme, withTheme } from '@client/styledComponents'
 import { Query } from '@client/components/Query'
 import { RouteComponentProps, withRouter } from 'react-router'
+import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 
 const StyledSpinner = styled(Spinner)`
   margin: 20% auto;
@@ -478,9 +479,7 @@ export const NavigationView = (props: IFullProps) => {
                 {userDetails?.role &&
                   USER_SCOPE[userDetails.role].includes(TAB_ID.performance) && (
                     <NavigationItem
-                      icon={() => (
-                        <Activity stroke={'#595C5F'} height={15} width={15} />
-                      )}
+                      icon={() => <Activity />}
                       id={`navigation_${TAB_ID.performance}`}
                       label={TAB_LABEL.performance}
                       onClick={() =>
@@ -495,9 +494,7 @@ export const NavigationView = (props: IFullProps) => {
                 {userDetails?.role &&
                   USER_SCOPE[userDetails.role].includes(TAB_ID.team) && (
                     <NavigationItem
-                      icon={() => (
-                        <Users stroke={'#595C5F'} height={15} width={15} />
-                      )}
+                      icon={() => <Users />}
                       id={`navigation_${TAB_ID.team}`}
                       label={TAB_LABEL.team}
                       onClick={() => props.goToTeamViewAction(userDetails)}
@@ -575,8 +572,7 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
       (state.declarationsState.declarations &&
         state.declarationsState.declarations.filter(
           (declaration: IDeclaration) =>
-            declaration.submissionStatus !==
-            SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+            isDeclarationInReadyToReviewStatus(declaration.submissionStatus)
         )) ||
       []
     ).reverse(),

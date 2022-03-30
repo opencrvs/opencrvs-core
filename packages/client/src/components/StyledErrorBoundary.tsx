@@ -24,21 +24,21 @@ const ErrorContainer = styled.div`
   margin-top: 20px;
 `
 const ErrorTitle = styled.h1`
-  ${({ theme }) => theme.fonts.h2Style};
+  ${({ theme }) => theme.fonts.h1};
   color: ${({ theme }) => theme.colors.secondary};
   margin: 10px;
 `
 const ErrorMessage = styled.div`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   color: ${({ theme }) => theme.colors.secondary};
   margin: 5px 0;
 `
 
 const GoToHomepage = styled(Button)`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
   color: ${({ theme }) => theme.colors.secondary};
   background: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.subtitleStyle};
+  ${({ theme }) => theme.fonts.bold14};
   text-transform: capitalize;
   cursor: pointer;
   margin-top: 60px;

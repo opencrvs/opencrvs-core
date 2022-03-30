@@ -33,8 +33,8 @@ import { buttonMessages } from '@client/i18n/messages'
 import differenceInMinutes from 'date-fns/differenceInMinutes'
 
 export const PageWrapper = styled.div`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
-  ${({ theme }) => theme.gradients.primary};
+  ${({ theme }) => theme.fonts.bold16};
+  ${({ theme }) => theme.colors.primary};
   ${['ZMB', 'FAR'].includes(window.config.COUNTRY.toUpperCase())
     ? `background: url(${zambiaBackground});`
     : ''}
@@ -79,7 +79,7 @@ const Name = styled.p`
   color: ${({ theme }) => theme.colors.white};
 `
 const ForgottenPinLink = styled(Button)`
-  ${({ theme }) => theme.fonts.buttonStyle};
+  ${({ theme }) => theme.fonts.bold14};
   color: ${({ theme }) => theme.colors.white};
   text-transform: none;
 `

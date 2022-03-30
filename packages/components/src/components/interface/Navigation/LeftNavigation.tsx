@@ -47,11 +47,11 @@ const UserInfo = styled.div`
   }
 `
 const UserName = styled.p`
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
-  margin: 24px 0px 4px;
+  ${({ theme }) => theme.fonts.h4};
+  margin: 25px 0px 5px;
 `
 const Role = styled.p`
-  ${({ theme }) => theme.fonts.captionStyle};
+  ${({ theme }) => theme.fonts.reg12};
   margin: 0px;
 `
 
@@ -65,11 +65,31 @@ const ApplicationNameContainer = styled.div`
   }
 `
 const ApplicationName = styled.div`
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+  color: ${({ theme }) => theme.colors.grey};
+  ${({ theme }) => theme.fonts.h4};
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+`
+
+const Version = styled.div`
+  color: ${({ theme }) => theme.colors.grey400};
+  ${({ theme }) => theme.fonts.smallButtonStyle};
+  height: 40px;
+  position: absolute;
+  bottom: 0px;
+  padding: 24px 24px;
+  span:last-child {
+    display: none;
+  }
+  :hover {
+    span:first-child {
+      display: none;
+    }
+    span:last-child {
+      display: inline;
+    }
+  }
 `
 
 export const LeftNavigation = (props: ILeftNavigationProps) => {
@@ -84,6 +104,10 @@ export const LeftNavigation = (props: ILeftNavigationProps) => {
         <Role>{props.role && props.role}</Role>
       </UserInfo>
       {props.children && props.children}
+      <Version>
+        <span>OpenCRVS v1.1.0</span>
+        <span>{process.env.REACT_APP_VERSION || 'Development'}</span>
+      </Version>
     </LeftNavigationContainer>
   )
 }

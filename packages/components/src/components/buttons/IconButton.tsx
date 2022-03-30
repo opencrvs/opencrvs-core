@@ -21,7 +21,7 @@ export const IconButton = styled(Button)`
   ${({ theme }) => theme.shadows.light};
   justify-content: center;
   border-radius: 2px;
-  ${({ theme }) => theme.fonts.buttonStyle};
+  ${({ theme }) => theme.fonts.bold14};
 
   &:hover:enabled {
     ${({ theme }) => theme.colors.indigoDark};

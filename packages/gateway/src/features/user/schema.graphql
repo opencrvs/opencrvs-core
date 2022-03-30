@@ -164,7 +164,7 @@ type Mutation {
     nonce: String!
     verifyCode: String!
   ): String
-  changeAvatar(userId: String!, avatar: AvatarInput!): String
+  changeAvatar(userId: String!, avatar: AvatarInput!): Avatar
   auditUser(
     userId: String!
     action: String!

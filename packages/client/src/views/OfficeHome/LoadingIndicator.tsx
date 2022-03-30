@@ -18,7 +18,7 @@ import { errorMessages } from '@client/i18n/messages'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   text-align: center;
   margin-top: 100px;
 `
@@ -36,7 +36,7 @@ const Wrapper = styled.div`
   margin-top: 38px;
 `
 const Text = styled.span`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   display: flex;
 `
 
