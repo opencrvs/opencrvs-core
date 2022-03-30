@@ -29,7 +29,7 @@ const TopBar = styled.div`
   z-index: 1;
 `
 const TopBarTitle = styled.h4`
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+  ${({ theme }) => theme.fonts.h4};
   padding-left: 16px;
   color: ${({ theme }) => theme.colors.copy};
 `

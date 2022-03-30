@@ -56,16 +56,6 @@ const HiddenInput = styled.input`
   display: none;
 `
 
-const BodyContainer = styled.div`
-  margin-top: 48px;
-  margin-left: 0px;
-  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-left: 249px;
-  }
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-top: 0px;
-  }
-`
 const Message = styled.div`
   margin-bottom: 16px;
 `
@@ -360,18 +350,17 @@ class SettingsView extends React.Component<IProps, IState> {
       <>
         <Header title={intl.formatMessage(messages.settingsTitle)} />
         <Navigation />
-        <BodyContainer>
-          <Content title={intl.formatMessage(messages.settingsTitle)}>
-            <ListView items={items} />
-            <HiddenInput
-              ref={this.fileUploaderRef}
-              id="image_file_uploader_field"
-              type="file"
-              accept={ALLOWED_IMAGE_TYPE.join(',')}
-              onChange={this.handleSelectFile}
-            />
-          </Content>
-        </BodyContainer>
+        <Content title={intl.formatMessage(messages.settingsTitle)}>
+          <ListView items={items} />
+          <HiddenInput
+            ref={this.fileUploaderRef}
+            id="image_file_uploader_field"
+            type="file"
+            accept={ALLOWED_IMAGE_TYPE.join(',')}
+            onChange={this.handleSelectFile}
+          />
+        </Content>
+        Zz
         <ResponsiveModal
           id="ChangeLanguageModal"
           title={intl.formatMessage(messages.changeLanguageTitle)}

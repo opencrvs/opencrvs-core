@@ -75,20 +75,20 @@ const ModalContent = styled.div`
   padding: 30px 30px 60px 30px;
   color: ${({ theme }) => theme.colors.copy};
   text-align: center;
-  ${({ theme }) => theme.fonts.subtitleStyle};
+  ${({ theme }) => theme.fonts.bold14};
   position: relative;
 `
 
 const Heading = styled.div`
   color: ${({ theme }) => theme.colors.copy};
   text-align: center;
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
 `
 
 const Info = styled.div`
   color: ${({ theme }) => theme.colors.copy};
   text-align: center;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 
 const StyledSpinner = styled(Spinner)`

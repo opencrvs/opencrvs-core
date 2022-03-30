@@ -25,10 +25,10 @@ interface IProps {
   showSubmenu: boolean
 }
 const UserNameStyle = styled.div`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
 `
 const UserRoleStyle = styled.div`
-  ${({ theme }) => theme.fonts.captionStyle};
+  ${({ theme }) => theme.fonts.reg12};
 `
 const header = (
   <>

@@ -55,8 +55,8 @@ const CustomLegendContainer = styled.div<{
 const LegendHeader = styled.div`
   padding-bottom: 8px;
   margin-bottom: 8px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.silverSand};
+  ${({ theme }) => theme.fonts.bold16};
 `
 
 const LegendDetails = styled.div`
@@ -65,20 +65,20 @@ const LegendDetails = styled.div`
 `
 
 const LegendDataLabel = styled.span`
-  ${({ theme }) => theme.fonts.chartLegendStyle}
+  ${({ theme }) => theme.fonts.reg14}
 `
 const LegendDataValue = styled.span`
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle}
+  ${({ theme }) => theme.fonts.h4}
 `
 
 const LegendData = styled.div`
   padding: 0 8px;
   width: 100%;
-  ${({ theme }) => theme.fonts.captionStyle};
+  ${({ theme }) => theme.fonts.reg12};
 `
 
 const TooltipContent = styled.div`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
 `
 
 const LoadingIndicator = styled.div<{

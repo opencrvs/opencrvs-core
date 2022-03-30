@@ -44,7 +44,7 @@ const BackButton = styled(PrimaryButton)`
   border-radius: 21px;
 `
 const BackButtonText = styled.span`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
   text-transform: capitalize;
   margin-left: 14px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -52,7 +52,7 @@ const BackButtonText = styled.span`
   }
 `
 const MenuTitle = styled.span`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
