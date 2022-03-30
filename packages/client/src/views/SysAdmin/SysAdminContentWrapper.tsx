@@ -110,7 +110,7 @@ const SubPageHeaderBody = styled.div`
   align-items: center;
   max-height: 56px;
   padding: 16px;
-  ${({ theme }) => theme.fonts.bodyBoldStyle}
+  ${({ theme }) => theme.fonts.bold16}
   text-overflow: ellipsis;
   & > :first-child {
     margin-right: 8px;
@@ -135,7 +135,7 @@ const ToolbarContainer = styled.div`
   }
 `
 const HeaderMenuContainer = styled.div`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   justify-content: space-between;
 `
 

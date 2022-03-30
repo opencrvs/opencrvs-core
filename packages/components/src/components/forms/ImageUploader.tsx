@@ -17,7 +17,7 @@ const ImageBase = styled(SecondaryButton)`
   width: auto;
   height: 48px;
   padding: 0 35px;
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
   align-items: center;
   display: inline-flex;
   border: 0;

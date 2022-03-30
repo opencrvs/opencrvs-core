@@ -18,15 +18,16 @@ const Wrapper = styled.form`
   align-items: center;
   border-radius: 2px;
   display: flex;
-  ${({ theme }) => theme.fonts.bodyStyle};
-  padding: 0px 4px;
+  ${({ theme }) => theme.fonts.reg16};
+  padding: 0px 10px;
+  padding-right: 0;
   margin-bottom: 1px;
   position: relative;
 `
 const SearchTextInput = styled.input`
   border: none;
-  margin: 0px 0px;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  margin: 0px 10px;
+  ${({ theme }) => theme.fonts.reg16};
   background-color: ${({ theme }) => theme.colors.grey200};
   flex-grow: 1;
   &:focus {
@@ -44,7 +45,7 @@ export const LabelButton = styled(Button)`
   height: auto;
   border-radius: 2px;
   color: ${({ theme }) => theme.colors.primary};
-  ${({ theme }) => theme.fonts.subtitleStyle};
+  ${({ theme }) => theme.fonts.bold14};
 `
 
 const DropDownWrapper = styled.ul`
@@ -69,7 +70,7 @@ const DropDownItem = styled.li`
     border-bottom: none;
   }
   &:hover {
-    background: ${({ theme }) => theme.colors.secondary};
+    background: ${({ theme }) => theme.colors.primary};
   }
   &:hover span {
     color: ${({ theme }) => theme.colors.white};
@@ -83,7 +84,7 @@ const IconWrapper = styled.span`
   padding: 8px 16px;
 `
 const Label = styled.span`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.copy};
 `
 const SelectedSearchCriteria = styled.span`
@@ -91,7 +92,7 @@ const SelectedSearchCriteria = styled.span`
   border-radius: 2px;
   padding: 5px 10px;
   color: ${({ theme }) => theme.colors.primary};
-  ${({ theme }) => theme.fonts.subtitleStyle};
+  ${({ theme }) => theme.fonts.bold14};
   display: flex;
   & .selected-icon {
     display: none;
