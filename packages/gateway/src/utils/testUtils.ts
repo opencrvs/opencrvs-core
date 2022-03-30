@@ -264,6 +264,91 @@ export const mockTask = {
   }
 }
 
+export const mockTaskDownloaded = {
+  resourceType: 'Task',
+  status: 'requested',
+  intent: '',
+  identifier: [
+    {
+      system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+      value: '123'
+    },
+    {
+      system: 'http://opencrvs.org/specs/id/birth-registration-number',
+      value: '123'
+    },
+    { system: 'http://opencrvs.org/specs/id/paper-form-id', value: '123' },
+    { system: 'http://opencrvs.org/specs/id/paper-form-page', value: '123' },
+    { system: 'http://opencrvs.org/specs/id/paper-form-book', value: '123' }
+  ],
+  businessStatus: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/reg-status',
+        code: 'DECLARED'
+      }
+    ]
+  },
+  code: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/types',
+        code: 'BIRTH'
+      }
+    ]
+  },
+  focus: {
+    reference: 'Composition/123' // the composition encompassing this registration
+  },
+  authoredOn: '2016-10-31T08:25:05+10:00',
+  lastModified: '2016-10-31T09:45:05+10:00',
+  statusReason: {
+    text: 'Rejected reason'
+  },
+  note: [
+    {
+      authorString: 'Practitioner/12121212',
+      text: 'Comment',
+      time: '2016-10-31T09:45:05+10:00'
+    }
+  ],
+  extension: [
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastUser',
+      valueReference: { reference: 'Practitioner/123' }
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastLocation',
+      valueReference: { reference: 'Location/123' }
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastOffice',
+      valueReference: {
+        reference: 'Location/43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
+      }
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/contact-person',
+      valueString: 'MOTHER'
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
+      valueString: '01733333333'
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/regDownloaded',
+      valueString: 'DECLARED'
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/regReinstated',
+      valueString: '01733333333'
+    }
+  ],
+  meta: {
+    versionId: '123'
+  }
+}
+
 export const mockTaskForDeath = {
   resourceType: 'Task',
   status: 'requested',

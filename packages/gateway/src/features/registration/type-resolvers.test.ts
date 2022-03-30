@@ -30,8 +30,10 @@ import {
   mockCertificate,
   mockErrorComposition,
   mockObservationBundle,
-  reasonsNotApplyingMock
+  reasonsNotApplyingMock,
+  mockTaskDownloaded
 } from '@gateway/utils/testUtils'
+import { GQLRegStatus } from '@gateway/graphql/schema'
 import { clone } from 'lodash'
 import * as fetchAny from 'jest-fetch-mock'
 
@@ -284,6 +286,25 @@ describe('Registration type resolvers', () => {
     const educationalAttainment =
       typeResolvers.Person.educationalAttainment(mockPatient)
     expect(educationalAttainment).toBe('SECOND_STAGE_TERTIARY_ISCED_6')
+  })
+
+  describe('History type resolver', () => {
+    it('Should return action DOWNLOADED', async () => {
+      const action = await typeResolvers.History.action(mockTaskDownloaded)
+      expect(action).toEqual(GQLRegStatus.DOWNLOADED)
+    })
+
+    it('Should return reject reason', async () => {
+      const statusReason = await typeResolvers.History.statusReason(
+        mockTaskDownloaded
+      )
+      expect(statusReason.text).toEqual('Rejected reason')
+    })
+
+    it('Should return true if reinstated', () => {
+      const reinstated = typeResolvers.History.reinstated(mockTaskDownloaded)
+      expect(reinstated).toBe(true)
+    })
   })
 
   describe('Birth Registration type', () => {
