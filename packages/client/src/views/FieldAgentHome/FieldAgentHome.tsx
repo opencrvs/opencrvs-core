@@ -102,7 +102,7 @@ export const BodyContainer = styled.div`
 `
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   text-align: center;
   margin-top: 100px;
 `
@@ -116,11 +116,11 @@ const ZeroUpdatesContainer = styled.div`
 const ZeroUpdatesText = styled.span`
   padding-top: 10px;
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
 `
 const AllUpdatesText = styled.span`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
 `
 interface IBaseFieldAgentHomeProps {
   theme: ITheme

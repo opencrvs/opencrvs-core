@@ -30,14 +30,14 @@ import { buttonMessages, userMessages } from '@client/i18n/messages'
 
 const UserName = styled.div`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+  ${({ theme }) => theme.fonts.h4};
   height: 27px;
 `
 
 const UserRole = styled.div`
   color: ${({ theme }) => theme.colors.copy};
   height: 24px;
-  ${({ theme }) => theme.fonts.captionStyle};
+  ${({ theme }) => theme.fonts.reg12};
 `
 
 interface IProps {

@@ -32,7 +32,7 @@ const Container = styled.div<{ ignoreMediaQuery?: boolean }>`
   }}
 `
 const StyledParagraph = styled.div`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
 `
 
 export function WarningMessage(props: IWarningProps) {
