@@ -20,9 +20,8 @@ const Grid = styled.div<{ bottomBorder: boolean }>`
   row-gap: 1px;
   ${({ bottomBorder }) => bottomBorder && 'border-bottom: 1px solid'};
   border-color: ${({ theme }) => theme.colors.grey200};
-  background-color: ${({ theme }) => theme.colors.grey200};
-  > div {
-    background-color: ${({ theme }) => theme.colors.white};
+  > div:not(:nth-last-child(-n + 4)) {
+    border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     grid-template-columns: auto;
@@ -33,7 +32,6 @@ const LabelValueContainer = styled.div`
   display: flex;
   padding: 8px 0;
   grid-column-start: 2;
-  flex-grow: 1;
   gap: 8px;
   padding-right: 8px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
