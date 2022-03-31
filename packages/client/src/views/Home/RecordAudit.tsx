@@ -59,7 +59,6 @@ import {
   GQLDeathEventSearchSet,
   GQLHumanName
 } from '@opencrvs/gateway/src/graphql/schema'
-import moment from 'moment'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData, ILocation } from '@client/offline/reducer'
 import {
@@ -119,12 +118,18 @@ import {
   IAvatar,
   IUserDetails
 } from '@client/utils/userUtils'
-import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
+import {
+  messages as correctionMessages,
+  messages
+} from '@client/i18n/messages/views/correction'
+import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import NotificationToast from '@client/views/OfficeHome/NotificationToast'
 import { isEmpty, get, find, has, flatten, values } from 'lodash'
 import { IRegisterFormState } from '@client/forms/register/reducer'
 import { goBack } from 'connected-react-router'
 import { getFieldValue } from './utils'
+import { CollectorRelationLabelArray } from '@client/forms/correction/corrector'
+import format, { formatLongDate } from '@client/utils/date-formatting'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -168,14 +173,14 @@ const BackButton = styled(CircleButton)`
 const KeyContainer = styled.div`
   width: 190px;
   color: ${({ theme }) => theme.colors.grey600};
-  ${({ theme }) => theme.fonts.bodyBoldStyle}
+  ${({ theme }) => theme.fonts.bold16}
 `
 
 const ValueContainer = styled.div<{ value: undefined | string }>`
   width: 325px;
   color: ${({ theme, value }) =>
     value ? theme.colors.grey600 : theme.colors.grey400};
-  ${({ theme }) => theme.fonts.captionBigger};
+  ${({ theme }) => theme.fonts.reg16};
 `
 
 const GreyedInfo = styled.div`
@@ -190,11 +195,6 @@ const LargeGreyedInfo = styled.div`
   max-width: 100%;
   border-radius: 4px;
   margin: 15px 0px;
-`
-
-const ReviewButton = styled(PrimaryButton)`
-  height: 40px;
-  border-radius: 4px;
 `
 
 const DesktopDiv = styled.div`
@@ -325,7 +325,7 @@ interface IGQLDeclaration {
 
 const STATUSTOCOLOR: { [key: string]: string } = {
   ARCHIVED: 'grey',
-  DRAFT: 'violet',
+  DRAFT: 'purple',
   DECLARED: 'orange',
   REJECTED: 'red',
   VALIDATED: 'grey',
@@ -610,7 +610,9 @@ const getDeclarationInfo = (
       informant: informant
     }
   }
-  const mobileActions = actions.map((action) => <MobileDiv>{action}</MobileDiv>)
+  const mobileActions = actions.map((action, index) => (
+    <MobileDiv key={index}>{action}</MobileDiv>
+  ))
   return (
     <>
       <div>
@@ -625,7 +627,7 @@ const getDeclarationInfo = (
               <ValueContainer id={`${key}_value`} value={value}>
                 {value ? (
                   key === 'dateOfBirth' || key === 'dateOfDeath' ? (
-                    moment(new Date(value)).format('MMMM DD, YYYY')
+                    format(new Date(value), 'MMMM dd, yyyy')
                   ) : (
                     value
                   )
@@ -663,7 +665,7 @@ const showReviewButton = ({
   const { role } = userDetails
 
   const reviewButtonRoleStatusMap: { [key: string]: string[] } = {
-    FIELD_AGENT: [EVENT_STATUS.REJECTED],
+    FIELD_AGENT: [],
     REGISTRATION_AGENT: [EVENT_STATUS.DECLARED],
     DISTRICT_REGISTRAR: [EVENT_STATUS.VALIDATED, EVENT_STATUS.DECLARED],
     LOCAL_REGISTRAR: [EVENT_STATUS.VALIDATED, EVENT_STATUS.DECLARED]
@@ -671,7 +673,7 @@ const showReviewButton = ({
 
   if (reviewButtonRoleStatusMap[role].includes(declaration?.status as string))
     return (
-      <ReviewButton
+      <PrimaryButton
         key={id}
         id={`review-btn-${id}`}
         onClick={() => {
@@ -680,7 +682,7 @@ const showReviewButton = ({
         }}
       >
         {intl.formatMessage(constantsMessages.review)}
-      </ReviewButton>
+      </PrimaryButton>
     )
   return <></>
 }
@@ -701,7 +703,7 @@ const showUpdateButton = ({
   if (!userDetails || !userDetails.role || !type || !isDownloaded) return <></>
   const { role } = userDetails
 
-  const reviewButtonRoleStatusMap: { [key: string]: string[] } = {
+  const updateButtonRoleStatusMap: { [key: string]: string[] } = {
     FIELD_AGENT: [SUBMISSION_STATUS.DRAFT],
     REGISTRATION_AGENT: [
       SUBMISSION_STATUS.DRAFT,
@@ -713,10 +715,14 @@ const showUpdateButton = ({
       EVENT_STATUS.IN_PROGRESS,
       EVENT_STATUS.REJECTED
     ],
-    LOCAL_REGISTRAR: [SUBMISSION_STATUS.DRAFT, EVENT_STATUS.REJECTED]
+    LOCAL_REGISTRAR: [
+      SUBMISSION_STATUS.DRAFT,
+      EVENT_STATUS.IN_PROGRESS,
+      EVENT_STATUS.REJECTED
+    ]
   }
 
-  if (reviewButtonRoleStatusMap[role].includes(declaration?.status as string)) {
+  if (updateButtonRoleStatusMap[role].includes(declaration?.status as string)) {
     let PAGE_ROUTE: string, PAGE_ID: string
 
     if (declaration?.status === SUBMISSION_STATUS.DRAFT) {
@@ -731,7 +737,7 @@ const showUpdateButton = ({
       PAGE_ID = 'review'
     }
     return (
-      <ReviewButton
+      <PrimaryButton
         key={id}
         id={`update-application-${id}`}
         onClick={() => {
@@ -739,7 +745,7 @@ const showUpdateButton = ({
         }}
       >
         {intl.formatMessage(buttonMessages.update)}
-      </ReviewButton>
+      </PrimaryButton>
     )
   }
 
@@ -753,7 +759,7 @@ const showDownloadButton = (
 ) => {
   const { id, type } = declaration || {}
 
-  if (declaration == null || id == null || type == null) return <></>
+  if (declaration === null || id === null || type === null) return <></>
 
   const downloadStatus = draft?.downloadStatus || undefined
 
@@ -767,7 +773,7 @@ const showDownloadButton = (
     downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
   ) {
     const downLoadConfig = {
-      event: type,
+      event: type as string,
       compositionId: id,
       action: Action.LOAD_REVIEW_DECLARATION
     }
@@ -799,18 +805,24 @@ const showPrintButton = ({
   if (!userDetails || !userDetails.role || !type || !isDownloaded) return <></>
   const { role } = userDetails
 
-  const reviewButtonRoleStatusMap: { [key: string]: string[] } = {
-    REGISTRATION_AGENT: [SUBMISSION_STATUS.REGISTERED],
-    DISTRICT_REGISTRAR: [SUBMISSION_STATUS.REGISTERED],
-    LOCAL_REGISTRAR: [SUBMISSION_STATUS.REGISTERED]
+  const printButtonRoleStatusMap: { [key: string]: string[] } = {
+    REGISTRATION_AGENT: [
+      SUBMISSION_STATUS.REGISTERED,
+      SUBMISSION_STATUS.CERTIFIED
+    ],
+    DISTRICT_REGISTRAR: [
+      SUBMISSION_STATUS.REGISTERED,
+      SUBMISSION_STATUS.CERTIFIED
+    ],
+    LOCAL_REGISTRAR: [SUBMISSION_STATUS.REGISTERED, SUBMISSION_STATUS.CERTIFIED]
   }
 
   if (
-    role in reviewButtonRoleStatusMap &&
-    reviewButtonRoleStatusMap[role].includes(declaration?.status as string)
+    role in printButtonRoleStatusMap &&
+    printButtonRoleStatusMap[role].includes(declaration?.status as string)
   )
     return (
-      <ReviewButton
+      <PrimaryButton
         key={id}
         id={`print-${id}`}
         onClick={() => {
@@ -819,7 +831,7 @@ const showPrintButton = ({
         }}
       >
         {intl.formatMessage(buttonMessages.print)}
-      </ReviewButton>
+      </PrimaryButton>
     )
   return <></>
 }
@@ -876,12 +888,10 @@ const getLink = (status: string, onClick: () => void) => {
 }
 
 const getFormattedDate = (date: Date) => {
-  const momentDate = moment(date)
-  return (
-    <>
-      {momentDate.format('MMMM DD, YYYY')} &middot;{' '}
-      {momentDate.format('hh.mm A')}
-    </>
+  return formatLongDate(
+    date.toLocaleString(),
+    window.config.LANGUAGES,
+    'MMMM dd, yyyy · hh.mm a'
   )
 }
 
@@ -980,14 +990,49 @@ const ActionDetailsModalListTable = (
   offlineData: Partial<IOfflineData>
 ) => {
   const [currentPage, setCurrentPage] = React.useState(1)
-  if (registerForm == undefined) return []
+  if (registerForm === undefined) return []
 
   const sections = registerForm?.sections || []
-  const commentsColumn = [{ key: 'comment', label: 'Comment', width: 100 }]
+  const commentsColumn = [
+    {
+      key: 'comment',
+      label: intl.formatMessage(constantsMessages.comment),
+      width: 100
+    }
+  ]
+  const reasonColumn = [
+    {
+      key: 'text',
+      label: intl.formatMessage(constantsMessages.reason),
+      width: 100
+    }
+  ]
   const declarationUpdatedColumns = [
-    { key: 'item', label: 'Item', width: 33.33 },
-    { key: 'original', label: 'Original', width: 33.33 },
+    {
+      key: 'item',
+      label: intl.formatMessage(messages.correctionSummaryItem),
+      width: 33.33
+    },
+    {
+      key: 'original',
+      label: intl.formatMessage(messages.correctionSummaryOriginal),
+      width: 33.33
+    },
     { key: 'edit', label: 'Edit', width: 33.33 }
+  ]
+  const certificateCollector = [
+    {
+      key: 'collector',
+      label: intl.formatMessage(certificateMessages.printedOnCollection),
+      width: 100
+    }
+  ]
+  const certificateCollectorVerified = [
+    {
+      key: 'hasShowedVerifiedDocument',
+      label: intl.formatMessage(certificateMessages.collectorIDCheck),
+      width: 100
+    }
   ]
 
   const dataChange = (
@@ -996,12 +1041,12 @@ const ActionDetailsModalListTable = (
     const result: IDynamicValues[] = []
     actionDetailsData.input.forEach((item: { [key: string]: any }) => {
       const editedValue = actionDetailsData.output.find(
-        (oi: { valueId: string }) => oi.valueId == item.valueId
+        (oi: { valueId: string }) => oi.valueId === item.valueId
       )
 
       const section = find(
         sections,
-        (section) => section.id == item.valueCode
+        (section) => section.id === item.valueCode
       ) as IFormSection
 
       const indexes: string[] = item.valueId.split('.')
@@ -1013,10 +1058,10 @@ const ActionDetailsModalListTable = (
           section.groups.map((group) => {
             return group.fields
           })
-        ).find((field) => field.name == parentField)
+        ).find((field) => field.name === parentField)
 
         const fieldObj = flatten(values(nestedFields?.nestedFields)).find(
-          (field) => field.name == nestedField
+          (field) => field.name === nestedField
         ) as IFormField
 
         result.push({
@@ -1041,7 +1086,7 @@ const ActionDetailsModalListTable = (
           section.groups.map((group) => {
             return group.fields
           })
-        ).find((field) => field.name == parentField) as IFormField
+        ).find((field) => field.name === parentField) as IFormField
 
         result.push({
           item: intl.formatMessage(fieldObj.label) || 'Not Found',
@@ -1063,11 +1108,55 @@ const ActionDetailsModalListTable = (
 
     return result
   }
+  const certificateCollectorData = (
+    actionDetailsData: IActionDetailsData
+  ): IDynamicValues[] => {
+    if (!actionDetailsData.certificates) return []
+    return actionDetailsData.certificates
+      .map((certificate: IDynamicValues) => {
+        if (!certificate) return
+
+        const name = getIndividualNameObj(
+          certificate.collector.individual.name,
+          window.config.LANGUAGES
+        )
+        const collectorLabel = () => {
+          const relation = CollectorRelationLabelArray.find(
+            (labelItem) =>
+              labelItem.value === certificate.collector.relationship
+          )
+          const collectorName = `${name?.firstNames} ${name?.familyName}`
+          if (relation)
+            return `${collectorName} (${intl.formatMessage(relation.label)})`
+          return collectorName
+        }
+
+        return {
+          hasShowedVerifiedDocument: certificate.hasShowedVerifiedDocument
+            ? intl.formatMessage(certificateMessages.idCheckVerify)
+            : intl.formatMessage(certificateMessages.idCheckWithoutVerify),
+          collector: collectorLabel()
+        }
+      })
+      .filter((item: IDynamicValues) => null != item)
+  }
 
   const declarationUpdates = dataChange(actionDetailsData)
+  const collectorData = certificateCollectorData(actionDetailsData)
   const pageChangeHandler = (cp: number) => setCurrentPage(cp)
   return (
     <>
+      {/* For Reject Reason */}
+      {actionDetailsData.statusReason &&
+        actionDetailsData.action === SUBMISSION_STATUS.REJECTED && (
+          <ListTable
+            noResultText=" "
+            hideBoxShadow={true}
+            columns={reasonColumn}
+            content={[actionDetailsData.statusReason]}
+          ></ListTable>
+        )}
+
       {/* For Comments */}
       <ListTable
         noResultText=" "
@@ -1077,13 +1166,37 @@ const ActionDetailsModalListTable = (
       ></ListTable>
 
       {/* For Data Updated */}
+      {declarationUpdates.length > 0 && (
+        <ListTable
+          noResultText=" "
+          hideBoxShadow={true}
+          columns={declarationUpdatedColumns}
+          content={declarationUpdates}
+          pageSize={10}
+          totalItems={declarationUpdates.length}
+          currentPage={currentPage}
+          onPageChange={pageChangeHandler}
+        ></ListTable>
+      )}
+
+      {/* For Certificate */}
       <ListTable
         noResultText=" "
         hideBoxShadow={true}
-        columns={declarationUpdatedColumns}
-        content={declarationUpdates}
+        columns={certificateCollector}
+        content={collectorData}
         pageSize={10}
-        totalItems={declarationUpdates.length}
+        totalItems={collectorData.length}
+        currentPage={currentPage}
+        onPageChange={pageChangeHandler}
+      ></ListTable>
+      <ListTable
+        noResultText=" "
+        hideBoxShadow={true}
+        columns={certificateCollectorVerified}
+        content={collectorData}
+        pageSize={10}
+        totalItems={collectorData.length}
         currentPage={currentPage}
         onPageChange={pageChangeHandler}
       ></ListTable>
@@ -1163,6 +1276,7 @@ function RecordAuditBody({
   clearCorrectionChange,
   declaration,
   draft,
+  tab,
   intl,
   goToCertificateCorrection,
   goToPrintCertificate,
@@ -1183,6 +1297,7 @@ function RecordAuditBody({
   userDetails: IUserDetails | null
   registerForm: IRegisterFormState
   offlineData: Partial<IOfflineData>
+  tab: IRecordAuditTabs
 } & IDispatchProps) {
   const [showDialog, setShowDialog] = React.useState(false)
   const [showActionDetails, setActionDetails] = React.useState(false)
@@ -1283,10 +1398,14 @@ function RecordAuditBody({
       goToPage
     })
   )
-  mobileActions.push(actions[actions.length - 1])
-  desktopActionsView.push(
-    <DesktopDiv>{actions[actions.length - 1]}</DesktopDiv>
-  )
+  if (actions[actions.length - 1].key) {
+    mobileActions.push(actions[actions.length - 1])
+    desktopActionsView.push(
+      <DesktopDiv key={actions.length}>
+        {actions[actions.length - 1]}
+      </DesktopDiv>
+    )
+  }
 
   actions.push(
     showUpdateButton({
@@ -1297,11 +1416,14 @@ function RecordAuditBody({
       goToPage
     })
   )
-
-  mobileActions.push(actions[actions.length - 1])
-  desktopActionsView.push(
-    <DesktopDiv>{actions[actions.length - 1]}</DesktopDiv>
-  )
+  if (actions[actions.length - 1].key) {
+    mobileActions.push(actions[actions.length - 1])
+    desktopActionsView.push(
+      <DesktopDiv key={actions.length}>
+        {actions[actions.length - 1]}
+      </DesktopDiv>
+    )
+  }
 
   actions.push(
     showPrintButton({
@@ -1313,11 +1435,14 @@ function RecordAuditBody({
       goToTeamUserList
     })
   )
-
-  mobileActions.push(actions[actions.length - 1])
-  desktopActionsView.push(
-    <DesktopDiv>{actions[actions.length - 1]}</DesktopDiv>
-  )
+  if (actions[actions.length - 1].key) {
+    mobileActions.push(actions[actions.length - 1])
+    desktopActionsView.push(
+      <DesktopDiv key={actions.length}>
+        {actions[actions.length - 1]}
+      </DesktopDiv>
+    )
+  }
 
   let regForm: IForm
   const eventType = declaration.type
@@ -1470,6 +1595,7 @@ function getBodyContent({
                   data.fetchRegistration,
                   language
                 )}
+                tab={tab}
                 draft={draft}
                 intl={intl}
                 scope={scope}
@@ -1495,6 +1621,7 @@ function getBodyContent({
       {...actionProps}
       declaration={declaration}
       draft={draft}
+      tab={tab}
       intl={intl}
       scope={scope}
       userDetails={userDetails}

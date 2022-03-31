@@ -35,6 +35,32 @@ export enum CorrectorRelationship {
   OTHER = 'OTHER'
 }
 
+export const CollectorRelationLabelArray = [
+  { value: CorrectorRelationship.MOTHER, label: messages.mother },
+  { value: CorrectorRelationship.FATHER, label: messages.father },
+  { value: CorrectorRelationship.CHILD, label: messages.child },
+  {
+    value: CorrectorRelationship.LEGAL_GUARDIAN,
+    label: messages.legalGuardian
+  },
+  {
+    value: CorrectorRelationship.ANOTHER_AGENT,
+    label: messages.anotherRegOrFieldAgent
+  },
+  {
+    value: CorrectorRelationship.REGISTRAR,
+    label: messages.me
+  },
+  {
+    value: CorrectorRelationship.COURT,
+    label: messages.court
+  },
+  {
+    value: CorrectorRelationship.OTHER,
+    label: messages.others
+  }
+]
+
 const birthCorrectorRelationGroup: IFormSectionGroup = {
   id: 'correctorRelation',
   title: messages.whoRequestedCorrection,
@@ -49,31 +75,7 @@ const birthCorrectorRelationGroup: IFormSectionGroup = {
       required: true,
       initialValue: '',
       validate: [],
-      options: [
-        { value: CorrectorRelationship.MOTHER, label: messages.mother },
-        { value: CorrectorRelationship.FATHER, label: messages.father },
-        { value: CorrectorRelationship.CHILD, label: messages.child },
-        {
-          value: CorrectorRelationship.LEGAL_GUARDIAN,
-          label: messages.legalGuardian
-        },
-        {
-          value: CorrectorRelationship.ANOTHER_AGENT,
-          label: messages.anotherRegOrFieldAgent
-        },
-        {
-          value: CorrectorRelationship.REGISTRAR,
-          label: messages.me
-        },
-        {
-          value: CorrectorRelationship.COURT,
-          label: messages.court
-        },
-        {
-          value: CorrectorRelationship.OTHER,
-          label: messages.others
-        }
-      ],
+      options: CollectorRelationLabelArray,
       nestedFields: {
         MOTHER: [],
         FATHER: [],
@@ -151,9 +153,9 @@ const deathCorrectorRelationGroup: IFormSectionGroup = {
             name: 'otherRelationship',
             type: 'TEXT',
             label: {
-              defaultMessage: 'Relationship to child',
-              id: 'form.field.label.informantsRelationWithChild',
-              description: 'Label for input Relationship to child'
+              defaultMessage: 'Relationship to deceased',
+              id: 'form.field.label.informantsRelationWithDeceased',
+              description: 'Label for input Relationship to deceased select'
             },
             placeholder: {
               defaultMessage: 'eg. Grandmother',

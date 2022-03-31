@@ -12,6 +12,7 @@
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { Print } from '@opencrvs/components/lib/icons'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
+import { FormattedNumberCurrency } from '@opencrvs/components/lib/symbol'
 import { IPrintableDeclaration, modifyDeclaration } from '@client/declarations'
 import { Event } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
@@ -30,12 +31,17 @@ import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import styled, { withTheme } from 'styled-components'
-import { calculatePrice, getEventDate, getServiceMessage } from './utils'
+import {
+  calculatePrice,
+  getEventDate,
+  getRegisteredDate,
+  getServiceMessage
+} from './utils'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 
 const Header = styled.h4`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   color: ${({ theme }) => theme.colors.black};
   margin-bottom: 16px;
   margin-top: 0;
@@ -58,11 +64,11 @@ const GreyBody = styled.div`
 `
 
 const StyledLabel = styled.label`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
   margin-right: 3px;
 `
 const StyledValue = styled.span`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 
 function LabelValue({
@@ -72,7 +78,7 @@ function LabelValue({
 }: {
   id: string
   label: string
-  value: string
+  value: React.ReactNode | string
 }) {
   return (
     <div id={id}>
@@ -133,12 +139,27 @@ class PaymentComponent extends React.Component<IFullProps> {
   }
 
   render = () => {
-    const { intl, declaration, event, goBack } = this.props
+    const { intl, declaration, event, goBack, offlineCountryConfig } =
+      this.props
+
+    const registeredDate = getRegisteredDate(declaration.data)
+
     const eventDate = getEventDate(declaration.data, event)
 
-    const paymentAmount = calculatePrice(event, eventDate)
+    const paymentAmount = calculatePrice(
+      event,
+      eventDate,
+      registeredDate,
+      offlineCountryConfig
+    )
 
-    const serviceMessage = getServiceMessage(event, eventDate)
+    const serviceMessage = getServiceMessage(
+      intl,
+      event,
+      eventDate,
+      registeredDate,
+      offlineCountryConfig
+    )
 
     return (
       <>
@@ -151,19 +172,26 @@ class PaymentComponent extends React.Component<IFullProps> {
             <LabelValue
               id="service"
               label={intl.formatMessage(messages.receiptService)}
-              value={intl.formatMessage(serviceMessage)}
+              value={serviceMessage}
             />
             <LabelValue
               id="amountDue"
               label={intl.formatMessage(messages.amountDue)}
-              value={intl.formatMessage(messages.paymentAmount, {
-                paymentAmount
-              })}
+              value={
+                <FormattedNumberCurrency
+                  value={paymentAmount}
+                  currency={offlineCountryConfig.config.CURRENCY.isoCode}
+                  languagesAndCountry={
+                    offlineCountryConfig.config.CURRENCY.languagesAndCountry[0]
+                  }
+                />
+              }
             />
             <TertiaryButton
               id="print-receipt"
               icon={() => <Print />}
               align={0}
+              disabled={true}
               onClick={() =>
                 printMoneyReceipt(
                   this.props.intl,
@@ -179,7 +207,7 @@ class PaymentComponent extends React.Component<IFullProps> {
           <Action>
             <PrimaryButton
               id="Continue"
-              onClick={() => this.continue(paymentAmount)}
+              onClick={() => this.continue(paymentAmount.toString())}
             >
               {intl.formatMessage(buttonMessages.continueButton)}
             </PrimaryButton>

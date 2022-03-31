@@ -38,7 +38,6 @@ import {
 } from '@opencrvs/components/lib/interface'
 import { GQLSearchFieldAgentResult } from '@opencrvs/gateway/src/graphql/schema'
 import { orderBy } from 'lodash'
-import moment from 'moment'
 import { parse } from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
@@ -47,6 +46,7 @@ import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 import { ILocation } from '@client/offline/reducer'
+import format from '@client/utils/date-formatting'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -342,8 +342,7 @@ function FieldAgentListComponent(props: IProps) {
           return {
             ...row,
             startMonth:
-              (row.startMonth &&
-                moment(Number(row.startMonth)).format('MMMM YYYY')) ||
+              (row.startMonth && format(Number(row.startMonth), 'MMMM yyyy')) ||
               '',
             avgCompleteDeclarationTime:
               row.avgCompleteDeclarationTime === 0

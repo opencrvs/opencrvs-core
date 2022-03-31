@@ -14,7 +14,7 @@ export const colors = {
   // Pallete
   primary: '#4972BB', // indigo
   secondary: '#4A8AD7', // blue
-  tertiary: '#CCCFD0', // grey
+  tertiary: '#CCCCCC', // grey
 
   purple: '#8049B7', // in progress
   orange: '#F1B162', // ready for review
@@ -40,11 +40,13 @@ export const colors = {
   // Monochrome
   white: '#FFFFFF',
   grey100: '#F5F5F5', // background
-  grey200: '#EEEEEE', // dividers, hover
+  grey200: '#E8E8E8', // dividers, hover
   grey300: '#CCCCCC', // disabled state, borders
   grey400: '#959595', // placeholder copy
   grey500: '#5B5B5B', // supporting copy
   grey600: '#222222', // copy
+
+  indigo500: '#4972BB',
 
   // Opacity
   opacity24: 'rgba(41, 47, 51, 0.24)',
@@ -52,8 +54,8 @@ export const colors = {
 
   // Alternative defintions
   copy: '#222222', // grey600
-  supportingCopy: '#707070', // grey500
-  placeholderCopy: '#A5A5A5', // grey400
+  supportingCopy: '#5B5B5B', // grey500
+  placeholderCopy: '#959595', // grey400
   disabled: '#CCCCCC', // grey300
   background: '#F5F5F5' // grey100
 }

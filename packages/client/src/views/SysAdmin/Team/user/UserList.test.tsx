@@ -26,6 +26,7 @@ import { UserList } from './UserList'
 import { userMutations } from '@client/user/mutations'
 import * as actions from '@client/profile/profileActions'
 import { offlineDataReady } from '@client/offline/actions'
+import { formConfig } from '@client/tests/mock-offline-data'
 
 describe('User list tests', () => {
   let store: AppStore
@@ -48,9 +49,10 @@ describe('User list tests', () => {
         locations: mockOfflineData.locations,
         facilities: mockOfflineData.facilities,
         pilotLocations: mockOfflineData.pilotLocations,
-        offices: mockOfflineData.offices,
         assets: mockOfflineData.assets,
-        config: mockOfflineData.config
+        offices: mockOfflineData.offices,
+        config: mockOfflineData.config,
+        formConfig
       })
     )
   })

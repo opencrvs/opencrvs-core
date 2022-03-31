@@ -11,19 +11,28 @@
  */
 import React from 'react'
 import { Meta, Story } from '@storybook/react'
-import { LeftNavigationDeclarationIcons } from './LeftNavigationDeclarationIcons'
-
-const Template: Story<React.HTMLAttributes<SVGElement>> = (args) => (
-  <LeftNavigationDeclarationIcons {...args} />
-)
-
-export const LeftNavigationIconView = Template.bind({})
-
-LeftNavigationIconView.args = {
-  color: 'red'
-}
+import { FormTabs, IFormTabs } from './FormTabs'
 
 export default {
-  title: 'Components/icons/LeftNavigationDeclarationIcon',
-  component: LeftNavigationDeclarationIcons
+  title: 'Components/forms/FormTabs',
+  component: FormTabs
 } as Meta
+
+interface IProps {
+  sections: IFormTabs[]
+  activeTabId: string
+  onTabClick: (tabId: string) => void
+}
+
+const sections: IFormTabs[] = [
+  { id: 'generalTab', title: 'General' },
+  { id: 'birthTab', title: 'Birth' },
+  { id: 'generalTab', title: 'Death' }
+]
+
+const Template: Story<IProps> = (args) => <FormTabs {...args} />
+export const FormTabsView = Template.bind({})
+FormTabsView.args = {
+  sections,
+  activeTabId: 'birthTab'
+}

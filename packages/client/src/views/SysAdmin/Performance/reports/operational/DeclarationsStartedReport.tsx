@@ -28,9 +28,9 @@ import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { getJurisidictionType } from '@client/utils/locationUtils'
 import { goToFieldAgentList } from '@client/navigation'
-import moment from 'moment'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { SYS_ADMIN_ROLES } from '@client/utils/constants'
+import format from '@client/utils/date-formatting'
 
 const Report = styled.div<{
   total?: boolean
@@ -78,20 +78,20 @@ const Reports = styled.div<{ loading?: boolean }>`
 
 const KeyNumber = styled.div`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.h2Style};
+  ${({ theme }) => theme.fonts.h1};
   position: relative;
   width: 100%;
   height: 100%;
 `
 
 const KeyPercentage = styled.span`
-  color: ${({ theme }) => theme.colors.placeholderCopy};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  color: ${({ theme }) => theme.colors.supportingCopy};
+  ${({ theme }) => theme.fonts.reg16};
   margin: 16px 10px;
 `
 
 const PerformanceLink = styled(LinkButton)<{ disabled: boolean }>`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
   ${({ disabled }) =>
     disabled
       ? `
@@ -110,7 +110,7 @@ const PerformanceLink = styled(LinkButton)<{ disabled: boolean }>`
 
 const ReportTitle = styled.div`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
 `
 
 const LoaderBox = styled.span<{
@@ -127,8 +127,8 @@ type Props = WrappedComponentProps & BaseProps & IStateProps & IDispatchProps
 interface BaseProps {
   data?: GQLDeclarationsStartedMetrics
   loading?: boolean
-  reportTimeFrom: moment.Moment
-  reportTimeTo: moment.Moment
+  reportTimeFrom: Date
+  reportTimeTo: Date
   locationId: string
 }
 
@@ -232,7 +232,8 @@ class DeclarationsStartedReportComponent extends React.Component<
           </DeclarationsStartedSubHeader>
           <Description>
             {intl.formatMessage(messages.declarationsStartedDescription)}
-            {reportTimeFrom.format()} - {reportTimeTo.format()}
+            {format(reportTimeFrom, 'MMMM yyyy')} -{' '}
+            {format(reportTimeTo, 'MMMM yyyy')}
           </Description>
         </DeclarationsStartedReportHeader>
         <Reports id="declarations-started-reports">

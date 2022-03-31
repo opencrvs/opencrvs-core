@@ -31,7 +31,6 @@ import {
 } from '@opencrvs/components/lib/icons'
 import styled from 'styled-components'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import moment from 'moment'
 import {
   LoadingGrey,
   ColumnContentAlignment,
@@ -52,11 +51,13 @@ import {
 } from '@client/views/SysAdmin/Team/user/userProfilie/UserProfile'
 import { orderBy } from 'lodash'
 import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/registrationRates/WithinTargetDaysTable'
+import subMonths from 'date-fns/subMonths'
+import format from '@client/utils/date-formatting'
 
 const DEFAULT_LIST_SIZE = 10
 
 const InformationCaption = styled.div`
-  ${({ theme }) => theme.fonts.captionStyle};
+  ${({ theme }) => theme.fonts.reg12};
   padding-bottom: 5px;
 `
 
@@ -79,7 +80,7 @@ const RecentActionsHolder = styled.div`
 `
 
 const SectionTitle = styled.div`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   margin-bottom: 10px;
 `
 
@@ -104,8 +105,8 @@ interface IBaseProp {
 type Props = WrappedComponentProps & IBaseProp
 
 type State = {
-  timeStart: moment.Moment
-  timeEnd: moment.Moment
+  timeStart: Date
+  timeEnd: Date
   viewportWidth: number
   auditTimeSortOrder: SORT_ORDER
   currentPageNumber: number
@@ -114,10 +115,10 @@ type State = {
 class UserAuditListComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
-    moment.locale(props.intl.locale)
+    window.__localeId__ = props.intl.locale
     this.state = {
-      timeStart: moment().subtract(1, 'months'),
-      timeEnd: moment(),
+      timeStart: subMonths(new Date(Date.now()), 1),
+      timeEnd: new Date(Date.now()),
       viewportWidth: 0,
       currentPageNumber: 1,
       auditTimeSortOrder: SORT_ORDER.DESCENDING
@@ -136,8 +137,8 @@ class UserAuditListComponent extends React.Component<Props, State> {
 
   setDateRangePickerValues(startDate: Date, endDate: Date) {
     this.setState({
-      timeStart: moment(startDate),
-      timeEnd: moment(endDate)
+      timeStart: startDate,
+      timeEnd: endDate
     })
   }
 
@@ -301,7 +302,10 @@ class UserAuditListComponent extends React.Component<Props, State> {
                   ''}
               </InformationTitle>
               <InformationCaption>
-                {moment(timeLoggedMetrics.time).format('MMMM DD, YYYY hh:mm A')}
+                {format(
+                  new Date(timeLoggedMetrics.time),
+                  'MMMM dd, yyyy hh:mm a'
+                )}
               </InformationCaption>
             </AuditDescTimeContainer>
           ),
@@ -312,8 +316,9 @@ class UserAuditListComponent extends React.Component<Props, State> {
           eventType: this.props.intl.formatMessage(
             constantsMessages[timeLoggedMetrics.eventType.toLowerCase()]
           ),
-          auditTime: moment(timeLoggedMetrics.time).format(
-            'MMMM DD, YYYY hh:mm A'
+          auditTime: format(
+            new Date(timeLoggedMetrics.time),
+            'MMMM dd, yyyy hh:mm a'
           )
         }
       }
@@ -370,8 +375,8 @@ class UserAuditListComponent extends React.Component<Props, State> {
               {intl.formatMessage(messages.auditSectionTitle)}
             </SectionTitle>
             <DateRangePicker
-              startDate={timeStart.toDate()}
-              endDate={timeEnd.toDate()}
+              startDate={timeStart}
+              endDate={timeEnd}
               onDatesChange={({ startDate, endDate }) => {
                 this.setDateRangePickerValues(startDate, endDate)
               }}

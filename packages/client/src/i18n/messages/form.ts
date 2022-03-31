@@ -316,6 +316,7 @@ interface IFormMessages
   userAttachmentSection: MessageDescriptor
   userSignatureAttachmentDesc: MessageDescriptor
   addFile: MessageDescriptor
+  uploadFile: MessageDescriptor
   fileUploadError: MessageDescriptor
   typeOfId: MessageDescriptor
   firstName: MessageDescriptor
@@ -369,7 +370,7 @@ interface IFormMessages
   helperTextNID: MessageDescriptor
 }
 
-const messagesToDefine: IFormMessages = {
+export const formMessageDescriptors: IFormMessages = {
   accountDetails: {
     defaultMessage: 'Account details',
     description: 'Account details section',
@@ -1673,6 +1674,11 @@ const messagesToDefine: IFormMessages = {
     description: 'Label for signed affidavit confirmation radio group',
     id: 'form.field.label.print.signedAffidavit'
   },
+  informantRelation: {
+    defaultMessage: 'Who is the informant?',
+    description: 'Form section title for contact point',
+    id: 'register.selectInformant.relation'
+  },
   someoneElse: {
     defaultMessage: 'Someone else',
     description: 'Other Label',
@@ -1697,6 +1703,11 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Grandfather',
     description: 'Label for option Grandfather',
     id: 'form.field.label.informantRelation.grandfather'
+  },
+  otherFamilyMember: {
+    defaultMessage: 'Other family member',
+    description: 'Label for option Other family member',
+    id: 'form.field.label.relationOtherFamilyMember'
   },
   grandmother: {
     defaultMessage: 'Grandmother',
@@ -1918,6 +1929,11 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Add file',
     description: 'text for add file button',
     id: 'form.field.label.addFile'
+  },
+  uploadFile: {
+    defaultMessage: 'Upload',
+    description: 'text for file uploader button',
+    id: 'form.field.label.uploadFile'
   },
   fileUploadError: {
     defaultMessage: '{type} supported only',
@@ -2174,4 +2190,6 @@ const messagesToDefine: IFormMessages = {
   }
 }
 
-export const formMessages: IFormMessages = defineMessages(messagesToDefine)
+export const formMessages: IFormMessages = defineMessages(
+  formMessageDescriptors
+)

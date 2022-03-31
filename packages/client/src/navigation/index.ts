@@ -48,11 +48,12 @@ import {
   WORKFLOW_STATUS,
   TEAM_USER_LIST,
   USER_PROFILE,
+  CERTIFICATE_CONFIG,
+  CHANGE_PHONE,
+  APPLICATION_CONFIG,
   CERTIFICATE_CORRECTION,
   VERIFY_CORRECTOR,
-  CONFIG,
-  DECLARATION_RECORD_AUDIT,
-  CHANGE_PHONE
+  DECLARATION_RECORD_AUDIT
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
 import { NATL_ADMIN_ROLES } from '@client/utils/constants'
@@ -67,10 +68,10 @@ import {
   replace,
   goForward as forward
 } from 'connected-react-router'
-import moment from 'moment'
 import { stringify } from 'query-string'
 import { Cmd, loop } from 'redux-loop'
 import { IRecordAuditTabs } from '@client/views/Home/RecordAudit'
+import subYears from 'date-fns/subYears'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -197,7 +198,11 @@ export function goToHome() {
 }
 
 export function goToConfig() {
-  return push(CONFIG)
+  return push(CERTIFICATE_CONFIG)
+}
+
+export function goToApplicationConfig() {
+  return push(APPLICATION_CONFIG)
 }
 
 export function goToHomeTab(tabId: string, selectorId = '') {
@@ -243,8 +248,8 @@ export function goToPerformanceReport(
 export function goToOperationalReport(
   locationId: string,
   sectionId: OPERATIONAL_REPORT_SECTION = OPERATIONAL_REPORT_SECTION.OPERATIONAL,
-  timeStart: Date = moment().subtract(1, 'years').toDate(),
-  timeEnd: Date = moment().toDate()
+  timeStart: Date = subYears(new Date(Date.now()), 1),
+  timeEnd: Date = new Date(Date.now())
 ) {
   return push({
     pathname: OPERATIONAL_REPORT,

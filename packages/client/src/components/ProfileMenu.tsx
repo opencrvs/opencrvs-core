@@ -30,13 +30,13 @@ import { buttonMessages, userMessages } from '@client/i18n/messages'
 
 const UserName = styled.div`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+  ${({ theme }) => theme.fonts.h4};
   margin-bottom: 4px;
 `
 
 const UserRole = styled.div`
   color: ${({ theme }) => theme.colors.supportingCopy};
-  ${({ theme }) => theme.fonts.captionStyle};
+  ${({ theme }) => theme.fonts.reg12};
   margin-bottom: 4px;
 `
 

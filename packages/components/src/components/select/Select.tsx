@@ -35,7 +35,7 @@ const StyledSelect = styled(ReactSelect)<{
 }>`
   .react-select__container {
     border-radius: 2px;
-    ${({ theme }) => theme.fonts.smallButtonStyleNoCapitalize};
+    ${({ theme }) => theme.fonts.reg14};
   }
 
   .react-select__control {
@@ -44,7 +44,7 @@ const StyledSelect = styled(ReactSelect)<{
     background-color: ${({ theme, withLightTheme }) =>
       withLightTheme ? theme.colors.white : theme.colors.secondary} !important;
     justify-content: center;
-    ${({ theme }) => theme.fonts.smallButtonStyleNoCapitalize};
+    ${({ theme }) => theme.fonts.reg14};
     text-transform: none;
     min-height: 32px;
     max-height: 32px;
@@ -76,7 +76,7 @@ const StyledSelect = styled(ReactSelect)<{
   .react-select__menu {
     ${({ defaultWidth }) =>
       defaultWidth ? `min-width: ${defaultWidth}` : 'min-width: 160px'};
-    ${({ theme }) => theme.fonts.smallButtonStyleNoCapitalize};
+    ${({ theme }) => theme.fonts.reg14};
   }
 
   .react-select__single-value {

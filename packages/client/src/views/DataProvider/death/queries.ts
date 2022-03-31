@@ -143,6 +143,10 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           country
         }
       }
+      questionnaire {
+        fieldId
+        value
+      }
       mannerOfDeath
       causeOfDeath
       maleDependentsOfDeceased
@@ -151,6 +155,9 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         date
         action
         reinstated
+        statusReason {
+          text
+        }
         location {
           id
           name
@@ -194,6 +201,25 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           valueCode
           valueId
           valueString
+        }
+        certificates {
+          hasShowedVerifiedDocument
+          collector {
+            relationship
+            otherRelationship
+            individual {
+              name {
+                use
+                firstNames
+                familyName
+              }
+              telecom {
+                system
+                value
+                use
+              }
+            }
+          }
         }
       }
     }
@@ -327,6 +353,10 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         trackingId
         registrationNumber
       }
+      questionnaire {
+        fieldId
+        value
+      }
       eventLocation {
         id
         type
@@ -349,6 +379,9 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         date
         action
         reinstated
+        statusReason {
+          text
+        }
         location {
           id
           name
@@ -392,6 +425,25 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
           valueCode
           valueId
           valueString
+        }
+        certificates {
+          hasShowedVerifiedDocument
+          collector {
+            relationship
+            otherRelationship
+            individual {
+              name {
+                use
+                firstNames
+                familyName
+              }
+              telecom {
+                system
+                value
+                use
+              }
+            }
+          }
         }
       }
     }

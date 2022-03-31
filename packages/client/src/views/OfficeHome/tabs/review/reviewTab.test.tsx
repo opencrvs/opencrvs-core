@@ -34,7 +34,6 @@ import { GridTable } from '@opencrvs/components/lib/interface'
 import ApolloClient from 'apollo-client'
 import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
-import moment from 'moment'
 import * as React from 'react'
 import { Store } from 'redux'
 import { ReviewTab } from './reviewTab'
@@ -150,27 +149,6 @@ const mockReviewTabData = {
     {
       id: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
       type: 'Birth',
-      operationHistories: [
-        {
-          operationType: 'DECLARED',
-          operatedOn: new Date(1544188309380).toISOString(),
-          operatorOfficeName: 'Baniajan Union Parishad',
-          operatorRole: 'FIELD_AGENT',
-          operatorName: [
-            {
-              familyName: 'Al Hasan',
-              firstNames: 'Shakib',
-              use: 'en'
-            },
-            {
-              familyName: null,
-              firstNames: '',
-              use: 'bn'
-            }
-          ],
-          operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ']
-        }
-      ],
       registration: {
         status: 'DECLARED',
         contactNumber: '01622688231',
@@ -262,7 +240,7 @@ describe('OfficeHome sent for review tab related tests', () => {
 
     const data = gridTable.prop('content')
     const EXPECTED_DATE_OF_DECLARATION = formattedDuration(
-      moment(new Date(Number.parseInt(TIME_STAMP)))
+      Number.parseInt(TIME_STAMP)
     )
 
     expect(data.length).toBe(2)

@@ -202,6 +202,9 @@ type Mutation {
   createOrUpdateCertificateSVG(
     certificateSVG: CertificateSVGInput!
   ): CertificateSVG
+  updateApplicationConfig(
+    applicationConfig: ApplicationConfigurationInput
+  ): ApplicationConfiguration
 }
 
 type Dummy {
@@ -230,6 +233,7 @@ type BirthRegistration implements EventRegistration {
   father: Person
   informant: RelatedPerson
   eventLocation: Location
+  questionnaire: [QuestionnaireQuestion]
   birthType: BirthType
   weightAtBirth: Float
   attendantAtBirth: AttendantType
@@ -445,6 +449,7 @@ input BirthRegistrationInput {
   father: PersonInput
   informant: RelatedPersonInput
   eventLocation: LocationInput
+  questionnaire: [QuestionnaireQuestionInput]
   birthType: BirthType
   weightAtBirth: Float
   attendantAtBirth: AttendantType
@@ -513,6 +518,52 @@ input CertificateSVGInput {
   user: String!
   event: String!
   status: String!
+}
+
+type ApplicationConfiguration {
+  APPLICATION_NAME: String
+  BACKGROUND_SYNC_BROADCAST_CHANNEL: String
+  BIRTH: Birth
+  COUNTRY: String
+  COUNTRY_LOGO: CountryLogo
+  CURRENCY: Currency
+  COUNTRY_LOGO_RENDER_WIDTH: Int
+  COUNTRY_LOGO_RENDER_HEIGHT: Int
+  DESKTOP_TIME_OUT_MILLISECONDS: Int
+  DEATH: Death
+  UI_POLLING_INTERVAL: Int
+  FIELD_AGENT_AUDIT_LOCATIONS: String
+  APPLICATION_AUDIT_LOCATIONS: String
+  INFORMANT_MINIMUM_AGE: Int
+  HIDE_EVENT_REGISTER_INFORMATION: Boolean
+  EXTERNAL_VALIDATION_WORKQUEUE: Boolean
+  SENTRY: String
+  LOGROCKET: String
+  PHONE_NUMBER_PATTERN: String
+  NID_NUMBER_PATTERN: String
+}
+
+input ApplicationConfigurationInput {
+  APPLICATION_NAME: String
+  BACKGROUND_SYNC_BROADCAST_CHANNEL: String
+  BIRTH: BirthInput
+  COUNTRY: String
+  COUNTRY_LOGO: CountryLogoInput
+  CURRENCY: CurrencyInput
+  COUNTRY_LOGO_RENDER_WIDTH: Int
+  COUNTRY_LOGO_RENDER_HEIGHT: Int
+  DESKTOP_TIME_OUT_MILLISECONDS: Int
+  DEATH: DeathInput
+  UI_POLLING_INTERVAL: Int
+  FIELD_AGENT_AUDIT_LOCATIONS: String
+  APPLICATION_AUDIT_LOCATIONS: String
+  INFORMANT_MINIMUM_AGE: Int
+  HIDE_EVENT_REGISTER_INFORMATION: Boolean
+  EXTERNAL_VALIDATION_WORKQUEUE: Boolean
+  SENTRY: String
+  LOGROCKET: String
+  PHONE_NUMBER_PATTERN: String
+  NID_NUMBER_PATTERN: String
 }
 
 scalar Map
@@ -656,6 +707,11 @@ type Attachment {
   createdAt: Date
 }
 
+type QuestionnaireQuestion {
+  fieldName: String
+  value: String
+}
+
 type Deceased {
   deceased: Boolean
   deathDate: String
@@ -792,7 +848,6 @@ interface EventSearchSet {
   id: ID!
   type: String
   registration: RegistrationSearchSet
-  operationHistories: [OperationHistorySearchSet]
 }
 
 type EventProgressSet {
@@ -899,6 +954,70 @@ input UserIdentifierInput {
 input SignatureInput {
   data: String
   type: String
+}
+
+type BirthFee {
+  ON_TIME: Float
+  LATE: Float
+  DELAYED: Float
+}
+
+type Birth {
+  REGISTRATION_TARGET: Int
+  LATE_REGISTRATION_TARGET: Int
+  FEE: BirthFee
+}
+
+type DeathFee {
+  ON_TIME: Float
+  DELAYED: Float
+}
+
+type Death {
+  REGISTRATION_TARGET: Int
+  FEE: DeathFee
+}
+
+type Currency {
+  isoCode: String
+  languagesAndCountry: [String]
+}
+
+input BirthFeeInput {
+  ON_TIME: Float
+  LATE: Float
+  DELAYED: Float
+}
+
+input BirthInput {
+  REGISTRATION_TARGET: Int
+  LATE_REGISTRATION_TARGET: Int
+  FEE: BirthFeeInput
+}
+
+input DeathFeeInput {
+  ON_TIME: Float
+  DELAYED: Float
+}
+
+input DeathInput {
+  REGISTRATION_TARGET: Int
+  FEE: DeathFeeInput
+}
+
+type CountryLogo {
+  fileName: String
+  file: String
+}
+
+input CountryLogoInput {
+  fileName: String
+  file: String
+}
+
+input CurrencyInput {
+  isoCode: String
+  languagesAndCountry: [String]
 }
 
 type RegWorkflow {
@@ -1117,7 +1236,6 @@ type BirthEventSearchSet implements EventSearchSet {
   childName: [HumanName]
   dateOfBirth: Date
   registration: RegistrationSearchSet
-  operationHistories: [OperationHistorySearchSet]
 }
 
 type DeathEventSearchSet implements EventSearchSet {
@@ -1126,7 +1244,6 @@ type DeathEventSearchSet implements EventSearchSet {
   deceasedName: [HumanName]
   dateOfDeath: Date
   registration: RegistrationSearchSet
-  operationHistories: [OperationHistorySearchSet]
 }
 
 type EventProgressData {
@@ -1162,6 +1279,11 @@ input AddressInput {
   country: String
   from: Date
   to: Date
+}
+
+input QuestionnaireQuestionInput {
+  fieldName: String
+  value: String
 }
 
 input AttachmentInput {

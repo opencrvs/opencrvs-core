@@ -98,7 +98,7 @@ const ActionWrapper = styled.div`
   flex-direction: column;
 `
 const ForgotPasswordLink = styled(Button)`
-  ${({ theme }) => theme.fonts.buttonStyle};
+  ${({ theme }) => theme.fonts.bold14};
   color: ${({ theme }) => theme.colors.white};
   text-transform: none;
   margin-top: 24px;

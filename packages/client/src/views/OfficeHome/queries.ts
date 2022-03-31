@@ -25,23 +25,7 @@ const allSearchFields = `
       duplicates
       createdAt
       modifiedAt
-    }
-    operationHistories {
-      operationType
-      operatedOn
-      operatorRole
-      operatorName {
-        firstNames
-        familyName
-        use
-      }
-      operatorOfficeName
-      operatorOfficeAlias
-      notificationFacilityName
-      notificationFacilityAlias
-      rejectReason
-      rejectComment
-    }
+    }    
     ... on BirthEventSearchSet {
       dateOfBirth
       childName {
@@ -117,8 +101,8 @@ export const REGISTRATION_HOME_QUERY = gql`
       locationIds: $locationIds
       status: ["REJECTED"]
       count: $rejectCount
-      skip: $rejectSkip  
-      sortColumn: "createdAt.keyword"          
+      skip: $rejectSkip
+      sortColumn: "createdAt.keyword"
       sort: "asc"
     ) {
       totalItems

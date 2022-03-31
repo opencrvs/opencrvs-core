@@ -19,16 +19,16 @@ const ActionContainer = styled.div`
 const HeaderContainer = styled.div`
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.shadows.light};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 20px;
-  position: relative;
+  position: fixed;
 `
 const BodyContent = styled.div`
   width: 100%;
-  height: 64px;
+  height: 56px;
   padding: 24px 0px;
   display: flex;
   flex-direction: row;
@@ -40,18 +40,18 @@ const BackButtonContainer = styled.div`
 `
 
 const BackButtonText = styled.span`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
   text-transform: capitalize;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
   }
 `
 const MenuTitle = styled.div`
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+  ${({ theme }) => theme.fonts.h4};
 `
 
 const Container = styled.div<{ hideBackground: boolean | undefined }>`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   ${({ theme, hideBackground }) => (hideBackground ? '' : theme.shadows.light)};
   color: ${({ theme }) => theme.colors.copy};
   padding: 24px 32px 32px;

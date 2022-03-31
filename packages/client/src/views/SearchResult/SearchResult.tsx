@@ -52,7 +52,6 @@ import {
   ColumnContentAlignment,
   GridTable,
   IAction,
-  ISearchInputProps,
   Loader
 } from '@opencrvs/components/lib/interface'
 import { HomeContent } from '@opencrvs/components/lib/layout'
@@ -60,7 +59,6 @@ import {
   GQLEventSearchResultSet,
   GQLQuery
 } from '@opencrvs/gateway/src/graphql/schema.d'
-import moment from 'moment'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -72,7 +70,7 @@ import { Navigation } from '@client/components/interface/Navigation'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   text-align: center;
   margin-top: 100px;
 `
@@ -100,7 +98,7 @@ export const ActionPageWrapper = styled.div`
 `
 const SearchResultText = styled.div`
   left: 268px;
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   color: ${({ theme }) => theme.colors.copy};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin-left: 24px;
@@ -122,6 +120,19 @@ export function getRejectionReasonDisplayValue(reason: string) {
       return rejectMessages.rejectionReasonOther
   }
 }
+
+export interface ISerachInputCustomProps {
+  searchValue?: string
+  error?: boolean
+  touched?: boolean
+  focusInput?: boolean
+  buttonLabel: string
+  onSearchTextChange?: (searchText: string) => void
+  onSubmit: (searchText: string) => any
+}
+
+export type ISearchInputProps = ISerachInputCustomProps &
+  React.InputHTMLAttributes<HTMLInputElement>
 
 interface IBaseSearchResultProps {
   theme: ITheme
@@ -410,22 +421,21 @@ export class SearchResultView extends React.Component<
             dynamicConstantsMessages[reg.event.toLowerCase()]
           )) ||
         ''
+
       return {
         ...reg,
         event,
         name: reg.name,
         status: this.getDeclarationStatusLabel(reg.declarationStatus),
-        dateOfModification:
-          (reg.modifiedAt &&
-            formattedDuration(
-              moment(
-                moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
-                'YYYY-MM-DD HH:mm:ss'
-              )
-            )) ||
-          '',
+        dateOfModification: reg.modifiedAt
+          ? Number.isNaN(Number(reg.modifiedAt))
+            ? formattedDuration(new Date(reg.modifiedAt))
+            : formattedDuration(new Date(Number(reg.modifiedAt)))
+          : '',
         startedAt:
-          (reg.createdAt && formattedDuration(moment(reg.createdAt))) || '',
+          (reg.createdAt &&
+            formattedDuration(new Date(Number(reg.createdAt)))) ||
+          '',
         icon,
         actions,
         rowClickHandler: [

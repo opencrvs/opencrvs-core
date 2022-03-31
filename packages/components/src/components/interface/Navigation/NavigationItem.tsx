@@ -27,7 +27,6 @@ const ItemContainer = styled.button<{ isSelected?: boolean }>`
   width: 100%;
   height: 40px;
   cursor: pointer;
-  padding: 0px 0px;
   border: 0;
   outline: none;
   background-color: ${({ isSelected, theme }) =>
@@ -36,29 +35,27 @@ const ItemContainer = styled.button<{ isSelected?: boolean }>`
     background-color: ${({ theme }) => theme.colors.grey100};
   }
 `
-
 const ItemContentContainer = styled.div<{ isSelected?: boolean }>`
   display: flex;
   flex-flow: row;
-  padding: 10px 19px 10px 22px;
+  align-items: center;
+  padding: 8px 16px 8px 14px;
 `
-const IconContainer = styled.span`
-  margin-top: 1px;
-`
-
 const LabelContainer = styled.span<{
   isSelected?: boolean
   isSubItem?: boolean
 }>`
-  ${({ theme }) => theme.fonts.subtitleStyle};
-  margin-left: 12px;
+  ${({ theme }) => theme.fonts.bold14};
+  margin-left: 13px;
+  padding-top: 3px;
   color: ${({ isSelected, theme }) =>
     isSelected ? theme.colors.copy : theme.colors.grey500};
 `
 
 const ValueContainer = styled.span<{ isSelected?: boolean }>`
   margin-left: auto;
-  ${({ theme }) => theme.fonts.captionBolder};
+  ${({ theme }) => theme.fonts.bold12};
+  padding-top: 3px;
   color: ${({ isSelected, theme }) =>
     isSelected ? theme.colors.copy : theme.colors.grey500};
 `
@@ -76,7 +73,7 @@ export const NavigationItem = ({
   return (
     <ItemContainer isSelected={isSelected} {...otherProps}>
       <ItemContentContainer>
-        <IconContainer>{icon && icon()}</IconContainer>
+        {icon && icon()}
         <LabelContainer isSelected={isSelected} isSubItem={isSubItem}>
           {label}
         </LabelContainer>

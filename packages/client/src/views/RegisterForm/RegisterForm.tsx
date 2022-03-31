@@ -52,7 +52,8 @@ import {
   IFormSectionData,
   IFormSectionGroup,
   IFormData,
-  CorrectionSection
+  CorrectionSection,
+  IFormFieldValue
 } from '@client/forms'
 import {
   goBack as goBackAction,
@@ -93,7 +94,7 @@ import { getValueFromDeclarationDataByKey } from '@client/pdfRenderer/transforme
 import { isCorrection } from '@client/views/CorrectionForm/utils'
 
 const FormSectionTitle = styled.h4`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   color: ${({ theme }) => theme.colors.copy};
   margin-top: 16px;
   margin-bottom: 24px;
@@ -110,7 +111,7 @@ const Notice = styled.div`
   box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.11);
   padding: 25px;
   color: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   margin: 30px -25px;
 `
 
@@ -120,7 +121,7 @@ const StyledLinkButton = styled(LinkButton)`
 const Required = styled.span<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
 >`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.negative};
   flex-grow: 0;
@@ -129,7 +130,7 @@ const Required = styled.span<
 const Optional = styled.span<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
 >`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.supportingCopy};
   flex-grow: 0;
@@ -145,7 +146,7 @@ const SpinnerWrapper = styled.div`
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   text-align: center;
   margin-top: 100px;
 `
@@ -269,6 +270,30 @@ class RegisterFormView extends React.Component<FullProps, State> {
       this.props.history.replace({
         pathname: this.props.history.location.pathname,
         hash: newHash + '-form-input'
+      })
+    }
+    const oldIsWritingDraft = prevProps.isWritingDraft
+    const newIsWritingDraft = this.props.isWritingDraft
+    if (oldIsWritingDraft && !newIsWritingDraft) {
+      const sectionValues =
+        this.props.declaration.data[this.props.activeSection.id] || {}
+      this.props.activeSectionGroup.fields.forEach((field) => {
+        const initialValue =
+          isUndefined(sectionValues[field.name]) ||
+          isNull(sectionValues[field.name])
+            ? getInitialValue(field, this.props.declaration.data || {})
+            : sectionValues[field.name]
+        sectionValues[field.name] = initialValue as IFormFieldValue
+      })
+      this.props.modifyDeclaration({
+        ...this.props.declaration,
+        data: {
+          ...this.props.declaration.data,
+          [this.props.activeSection.id]: {
+            ...this.props.declaration.data[this.props.activeSection.id],
+            ...sectionValues
+          }
+        }
       })
     }
   }
@@ -501,7 +526,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       }),
       iconColor:
         declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
-          ? 'violet'
+          ? 'purple'
           : 'orange'
     }
 
@@ -594,7 +619,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     )}
                     iconColor={
                       declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
-                        ? 'violet'
+                        ? 'purple'
                         : 'orange'
                     }
                     saveAction={{
@@ -625,7 +650,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       )}
                       iconColor={
                         declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
-                          ? 'violet'
+                          ? 'purple'
                           : 'orange'
                       }
                       saveAction={{
@@ -886,7 +911,6 @@ function firstVisibleSection(form: IForm) {
 
 function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
   const { match, registerForm, declaration } = props
-
   const sectionId = match.params.pageId || firstVisibleSection(registerForm).id
 
   const activeSection = registerForm.sections.find(

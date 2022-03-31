@@ -54,7 +54,7 @@ const MenuHeader = styled.li`
 `
 const MenuItem = styled.li`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   display: flex;
   flex-direction: row;
   cursor: pointer;

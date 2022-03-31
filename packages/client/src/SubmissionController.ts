@@ -27,14 +27,11 @@ import { getMutationMapping } from '@client/views/DataProvider/MutationProvider'
 import { REGISTRATION_HOME_QUERY } from '@client/views/OfficeHome/queries'
 import { getOperationName } from 'apollo-utilities'
 import { client } from '@client/utils/apolloClient'
-import moment from 'moment'
 import { FetchResult, DocumentNode } from 'apollo-link'
-import {
-  getAttachmentSectionKey,
-  updateDeclarationTaskHistory
-} from './utils/draftUtils'
+import { getAttachmentSectionKey } from './utils/draftUtils'
 import { getScope } from './profile/profileSelectors'
 import { RequestHandler } from 'mock-apollo-client'
+import differenceInMinutes from 'date-fns/differenceInMinutes'
 
 const INTERVAL_TIME = 5000
 const HANGING_EXPIRE_MINUTES = 15
@@ -142,13 +139,14 @@ export class SubmissionController {
     )
   }
   public requeueHangingDeclarations = async () => {
-    const now = moment(Date.now())
+    const now = Date.now()
     this.getDeclarations()
       .filter((app: IDeclaration) => {
         return (
           app.submissionStatus &&
           INPROGRESS_STATUS.includes(app.submissionStatus) &&
-          now.diff(app.modifiedOn, 'minutes') > HANGING_EXPIRE_MINUTES
+          app.modifiedOn &&
+          differenceInMinutes(now, app.modifiedOn) > HANGING_EXPIRE_MINUTES
         )
       })
       .forEach(async (app: IDeclaration) => {
@@ -261,19 +259,6 @@ export class SubmissionController {
       }
     }
     const scopes = getScope(this.store.getState()) || []
-    if (
-      declaration.submissionStatus === SUBMISSION_STATUS.SUBMITTED &&
-      scopes.includes('declare')
-    ) {
-      const taskHistory = updateDeclarationTaskHistory(
-        declaration,
-        this.store.getState().profile.userDetails
-      )
-      if (!declaration.operationHistories) {
-        declaration.operationHistories = []
-      }
-      declaration.operationHistories.push(taskHistory)
-    }
     //It needs some times to elasticSearch to update index
     setTimeout(async () => {
       await this.store.dispatch(updateRegistrarWorkqueue())

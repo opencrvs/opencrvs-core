@@ -19,7 +19,7 @@ import {
   filterProcessingDeclarationsFromQuery
 } from '@client/declarations'
 import { IStoreState } from '@opencrvs/client/src/store'
-import { LeftNavigationDeclarationIcons } from '@opencrvs/components/lib/icons/LeftNavigationDeclarationIcons'
+import { DeclarationIconSmall } from '@opencrvs/components/lib/icons/DeclarationIconSmall'
 import { LeftNavigation } from '@opencrvs/components/lib/interface/Navigation/LeftNavigation'
 import { NavigationGroup } from '@opencrvs/components/lib/interface/Navigation/NavigationGroup'
 import { NavigationItem } from '@opencrvs/components/lib/interface/Navigation/NavigationItem'
@@ -31,7 +31,8 @@ import {
   goToConfig,
   goToSettings,
   goToPerformanceView,
-  goToTeamView
+  goToTeamView,
+  goToApplicationConfig
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { COUNT_USER_WISE_DECLARATIONS } from '@client/search/queries'
@@ -49,6 +50,9 @@ import { Spinner } from '@opencrvs/components/lib/interface'
 import styled, { ITheme, withTheme } from '@client/styledComponents'
 import { Query } from '@client/components/Query'
 import { RouteComponentProps, withRouter } from 'react-router'
+import { getOfflineData } from '@client/offline/selectors'
+import { IOfflineData } from '@client/offline/reducer'
+import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 
 const StyledSpinner = styled(Spinner)`
   margin: 20% auto;
@@ -65,7 +69,7 @@ const TAB_ID = {
   sentForApproval: 'approvals',
   readyToPrint: 'print',
   externalValidation: 'waitingValidation',
-  declaration: 'declaration',
+  application: 'application',
   performance: 'performance',
   team: 'team',
   config: 'config',
@@ -160,6 +164,7 @@ interface IDispatchProps {
   goToFieldAgentHomeTab: typeof goToFieldAgentHomeTabAction
   goToRegistrarHomeTab: typeof goToRegistrarHomeTab
   goToConfigAction: typeof goToConfig
+  goToApplicationConfigAction: typeof goToApplicationConfig
   redirectToAuthentication: typeof redirectToAuthentication
   goToPerformanceViewAction: typeof goToPerformanceView
   goToTeamViewAction: typeof goToTeamView
@@ -172,6 +177,7 @@ interface IStateProps {
   userDetails: IUserDetails | null
   activeMenuItem: string
   workqueue: IWorkqueue
+  offlineCountryConfiguration: IOfflineData
   storedDeclarations: IDeclaration[]
 }
 
@@ -189,12 +195,12 @@ const TAB_LABEL = {
   sentForApproval: 'Sent for approval',
   externalValidation: 'Waiting for validation',
   readyToPrint: 'Ready to print ',
-  declaration: 'Declaration',
+  application: 'Application',
   performance: 'Performance',
   team: 'Team',
   configuration: 'Configuration',
   certificatesConfiguration: 'Certificates',
-  declarationSettings: 'Declaration Settings',
+  applicationSettings: 'Application',
   settings: 'Settings',
   logout: 'Logout'
 }
@@ -240,13 +246,15 @@ export const NavigationView = (props: IFullProps) => {
     enableMenuSelection = true,
     activeMenuItem,
     goToConfigAction,
+    goToApplicationConfigAction,
     navigationWidth,
     workqueue,
     storedDeclarations,
     draftDeclarations,
     theme,
     menuCollapse,
-    userInfo
+    userInfo,
+    offlineCountryConfiguration
   } = props
   const tabId = deselectAllTabs
     ? ''
@@ -255,7 +263,7 @@ export const NavigationView = (props: IFullProps) => {
     : activeMenuItem
     ? activeMenuItem
     : 'review'
-
+  const configTab = [TAB_ID.application, TAB_ID.certificates]
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
   const { loading, error, data, initialSyncDone } = workqueue
   const filteredData = filterProcessingDeclarationsFromQuery(
@@ -287,7 +295,7 @@ export const NavigationView = (props: IFullProps) => {
 
   return (
     <LeftNavigation
-      applicationName={intl.formatMessage(constantsMessages.applicationName)}
+      applicationName={offlineCountryConfiguration.config.APPLICATION_NAME}
       navigationWidth={navigationWidth}
       name={userInfo && userInfo.name}
       role={userInfo && userInfo.role}
@@ -297,7 +305,7 @@ export const NavigationView = (props: IFullProps) => {
         <>
           <NavigationGroup>
             <NavigationItem
-              icon={() => <LeftNavigationDeclarationIcons />}
+              icon={() => <DeclarationIconSmall color={'purple'} />}
               id={`navigation_${TAB_ID.inProgress}`}
               label={TAB_LABEL.inProgress}
               count={props.draftDeclarations.length}
@@ -308,7 +316,7 @@ export const NavigationView = (props: IFullProps) => {
               }}
             />
             <NavigationItem
-              icon={() => <LeftNavigationDeclarationIcons color={'orange'} />}
+              icon={() => <DeclarationIconSmall color={'orange'} />}
               id={`navigation_${TAB_ID.sentForReview}`}
               label={TAB_LABEL.sentForReview}
               count={props.declarationsReadyToSend.length}
@@ -338,9 +346,7 @@ export const NavigationView = (props: IFullProps) => {
                 if (loading) {
                   return (
                     <NavigationItem
-                      icon={() => (
-                        <LeftNavigationDeclarationIcons color={'red'} />
-                      )}
+                      icon={() => <DeclarationIconSmall color={'red'} />}
                       id={`navigation_${TAB_ID.requireUpdates}_loading`}
                       label={TAB_LABEL.requiresUpdate}
                       count={0}
@@ -355,9 +361,7 @@ export const NavigationView = (props: IFullProps) => {
                 return (
                   <>
                     <NavigationItem
-                      icon={() => (
-                        <LeftNavigationDeclarationIcons color={'red'} />
-                      )}
+                      icon={() => <DeclarationIconSmall color={'red'} />}
                       id={`navigation_${TAB_ID.requireUpdates}`}
                       label={TAB_LABEL.requiresUpdate}
                       count={data.searchEvents.totalItems}
@@ -386,7 +390,7 @@ export const NavigationView = (props: IFullProps) => {
                 {userDetails?.role &&
                   USER_SCOPE[userDetails.role].includes(TAB_ID.inProgress) && (
                     <NavigationItem
-                      icon={() => <LeftNavigationDeclarationIcons />}
+                      icon={() => <DeclarationIconSmall color={'purple'} />}
                       id={`navigation_${TAB_ID.inProgress}`}
                       label={TAB_LABEL.inProgress}
                       count={declarationCount.inProgress}
@@ -402,9 +406,7 @@ export const NavigationView = (props: IFullProps) => {
                     TAB_ID.readyForReview
                   ) && (
                     <NavigationItem
-                      icon={() => (
-                        <LeftNavigationDeclarationIcons color={'orange'} />
-                      )}
+                      icon={() => <DeclarationIconSmall color={'orange'} />}
                       id={`navigation_${TAB_ID.readyForReview}`}
                       label={TAB_LABEL.readyForReview}
                       count={declarationCount.readyForReview}
@@ -420,9 +422,7 @@ export const NavigationView = (props: IFullProps) => {
                     TAB_ID.sentForUpdates
                   ) && (
                     <NavigationItem
-                      icon={() => (
-                        <LeftNavigationDeclarationIcons color={'red'} />
-                      )}
+                      icon={() => <DeclarationIconSmall color={'red'} />}
                       id={`navigation_${TAB_ID.sentForUpdates}`}
                       label={TAB_LABEL.sentForUpdates}
                       count={declarationCount.sentForUpdates}
@@ -438,9 +438,7 @@ export const NavigationView = (props: IFullProps) => {
                     TAB_ID.sentForApproval
                   ) && (
                     <NavigationItem
-                      icon={() => (
-                        <LeftNavigationDeclarationIcons color={'grey500'} />
-                      )}
+                      icon={() => <DeclarationIconSmall color={'grey'} />}
                       id={`navigation_${TAB_ID.sentForApproval}`}
                       label={TAB_LABEL.sentForApproval}
                       count={declarationCount.sentForApproval}
@@ -453,9 +451,7 @@ export const NavigationView = (props: IFullProps) => {
                   )}
                 {window.config.EXTERNAL_VALIDATION_WORKQUEUE && (
                   <NavigationItem
-                    icon={() => (
-                      <LeftNavigationDeclarationIcons color={'teal'} />
-                    )}
+                    icon={() => <DeclarationIconSmall color={'teal'} />}
                     id={`navigation_${TAB_ID.externalValidation}`}
                     label={TAB_LABEL.externalValidation}
                     count={declarationCount.externalValidation}
@@ -471,9 +467,7 @@ export const NavigationView = (props: IFullProps) => {
                     TAB_ID.readyToPrint
                   ) && (
                     <NavigationItem
-                      icon={() => (
-                        <LeftNavigationDeclarationIcons color={'green'} />
-                      )}
+                      icon={() => <DeclarationIconSmall color={'green'} />}
                       id={`navigation_${TAB_ID.readyToPrint}`}
                       label={TAB_LABEL.readyToPrint}
                       count={declarationCount.readyToPrint}
@@ -492,9 +486,7 @@ export const NavigationView = (props: IFullProps) => {
                 {userDetails?.role &&
                   USER_SCOPE[userDetails.role].includes(TAB_ID.performance) && (
                     <NavigationItem
-                      icon={() => (
-                        <Activity stroke={'#595C5F'} height={15} width={15} />
-                      )}
+                      icon={() => <Activity />}
                       id={`navigation_${TAB_ID.performance}`}
                       label={TAB_LABEL.performance}
                       onClick={() =>
@@ -509,9 +501,7 @@ export const NavigationView = (props: IFullProps) => {
                 {userDetails?.role &&
                   USER_SCOPE[userDetails.role].includes(TAB_ID.team) && (
                     <NavigationItem
-                      icon={() => (
-                        <Users stroke={'#595C5F'} height={15} width={15} />
-                      )}
+                      icon={() => <Users />}
                       id={`navigation_${TAB_ID.team}`}
                       label={TAB_LABEL.team}
                       onClick={() => props.goToTeamViewAction(userDetails)}
@@ -530,11 +520,11 @@ export const NavigationView = (props: IFullProps) => {
                         onClick={() => setIsConfigExpanded(!isConfigExpanded)}
                         isSelected={
                           enableMenuSelection &&
-                          activeMenuItem === TAB_ID.config
+                          configTab.includes(activeMenuItem)
                         }
                         expandableIcon={() =>
                           isConfigExpanded ||
-                          activeMenuItem === TAB_ID.config ? (
+                          configTab.includes(activeMenuItem) ? (
                             <Expandable selected={true} />
                           ) : (
                             <Expandable />
@@ -542,24 +532,24 @@ export const NavigationView = (props: IFullProps) => {
                         }
                       />
                       {(isConfigExpanded ||
-                        activeMenuItem === TAB_ID.config) && (
+                        configTab.includes(activeMenuItem)) && (
                         <>
                           <NavigationSubItem
                             label={TAB_LABEL.certificatesConfiguration}
-                            id={`navigation_${TAB_ID.certificates}`}
+                            id={`navigation_${TAB_ID.application}`}
                             onClick={goToConfigAction}
                             isSelected={
                               enableMenuSelection &&
-                              activeMenuItem === TAB_ID.config
+                              activeMenuItem === TAB_ID.application
                             }
                           />
                           <NavigationSubItem
-                            label={TAB_LABEL.declarationSettings}
-                            id={`navigation_${TAB_ID.declaration}`}
-                            onClick={() => {}}
+                            label={TAB_LABEL.applicationSettings}
+                            id={`navigation_${TAB_ID.certificates}`}
+                            onClick={goToApplicationConfigAction}
                             isSelected={
                               enableMenuSelection &&
-                              activeMenuItem === TAB_ID.declaration
+                              activeMenuItem === TAB_ID.certificates
                             }
                           />
                         </>
@@ -577,6 +567,7 @@ export const NavigationView = (props: IFullProps) => {
 
 const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
   return {
+    offlineCountryConfiguration: getOfflineData(state),
     draftDeclarations:
       (state.declarationsState.declarations &&
         state.declarationsState.declarations.filter(
@@ -589,8 +580,7 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
       (state.declarationsState.declarations &&
         state.declarationsState.declarations.filter(
           (declaration: IDeclaration) =>
-            declaration.submissionStatus !==
-            SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+            isDeclarationInReadyToReviewStatus(declaration.submissionStatus)
         )) ||
       []
     ).reverse(),
@@ -601,8 +591,8 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
       ? TAB_ID.performance
       : window.location.href.includes('team')
       ? TAB_ID.team
-      : window.location.href.includes('config')
-      ? TAB_ID.config
+      : window.location.href.includes('application')
+      ? TAB_ID.application
       : window.location.href.includes('settings')
       ? TAB_ID.settings
       : window.location.href.includes('certificate')
@@ -620,6 +610,7 @@ export const Navigation = connect<
   goToFieldAgentHomeTab: goToFieldAgentHomeTabAction,
   goToRegistrarHomeTab,
   goToConfigAction: goToConfig,
+  goToApplicationConfigAction: goToApplicationConfig,
   goToPerformanceViewAction: goToPerformanceView,
   goToTeamViewAction: goToTeamView,
   redirectToAuthentication,

@@ -78,6 +78,8 @@ interface ICertificateMessages
   noAffidavitModalTitle: MessageDescriptor
   noAffidavitModalDescription: MessageDescriptor
   signedAffidavitFileLabel: MessageDescriptor
+  printedOnCollection: MessageDescriptor
+  collectorIDCheck: MessageDescriptor
 }
 
 const messagesToDefine: ICertificateMessages = {
@@ -423,6 +425,17 @@ const messagesToDefine: ICertificateMessages = {
     defaultMessage: 'Signed affidavit',
     description: 'File label for signed affidavit',
     id: 'print.cert.coll.other.aff.label'
+  },
+  printedOnCollection: {
+    defaultMessage: 'Printed on collection',
+    description: 'Table column header showing collector info in record audit',
+    id: 'record.certificate.collector'
+  },
+  collectorIDCheck: {
+    defaultMessage: 'ID Check',
+    description:
+      'Table column header showing collector ID verification info in record audit',
+    id: 'record.certificate.collector'
   }
 }
 
@@ -443,27 +456,31 @@ const dynamicMessagesToDefine = {
       'Service: <strong>Death registration after {service} of D.o.D.</strong><br/>Amount Due:',
     description: 'Amount due on certificate for death label'
   },
+  birthServiceBefore: {
+    id: 'certificate.receipt.birthService.before',
+    defaultMessage: 'Birth registration before {target} days of date of birth',
+    description: 'Amount due on certificate for birth label before target days'
+  },
   birthServiceAfter: {
     id: 'certificate.receipt.birthService.after',
-    defaultMessage: 'Birth registration after 5 years of date of birth',
+    defaultMessage: 'Birth registration after {target} days of date of birth',
     description: 'Amount due on certificate for birth label'
+  },
+  deathServiceBefore: {
+    id: 'certificate.receipt.deathService.before',
+    defaultMessage: 'Death registration before {target} days of date of birth',
+    description: 'Amount due on certificate for birth label before target days'
   },
   deathServiceAfter: {
     id: 'certificate.receipt.deathService.after',
-    defaultMessage: 'Death registration after 5 years of date of death',
+    defaultMessage: 'Death registration after {target} days of date of death',
     description: 'Amount due on certificate for death label'
   },
   birthServiceBetween: {
     id: 'certificate.receipt.birthService.between',
     defaultMessage:
-      'Birth registration between 45 days and 5 years of date of birth',
+      'Birth registration between {target} days and {latetarget} days of date of birth',
     description: 'Amount due on certificate for birth label'
-  },
-  deathServiceBetween: {
-    id: 'certificate.receipt.deathService.between',
-    defaultMessage:
-      'Death registration between 45 days and 5 years of date of death',
-    description: 'Amount due on certificate for death label'
   }
 }
 

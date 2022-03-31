@@ -57,7 +57,7 @@ interface IIDVerifierProps {
 }
 
 const Title = styled.div`
-  ${({ theme }) => theme.fonts.h4Style}
+  ${({ theme }) => theme.fonts.h2}
   margin-bottom: 32px;
 `
 const Content = styled.div`
@@ -138,8 +138,7 @@ class IDVerifierComponent extends React.Component<
             label={intl.formatMessage(certificateMessages.dateOfBirth)}
             value={formatLongDate(
               collectorInformation.birthDate as string,
-              intl.locale,
-              'LL'
+              intl.locale
             )}
           />
         )}

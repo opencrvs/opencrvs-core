@@ -14,8 +14,7 @@ import * as React from 'react'
 
 export const TertiaryButton = styled(Button)`
   width: auto;
-  cursor: pointer;
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold14};
   transition: background 0.4s ease;
   align-items: center;
   border: 0;
@@ -130,8 +129,7 @@ const LeftButtonIcon = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-right: 5px;
-  margin-left: -3px;
+  margin-right: 8px;
 `
 const RightButtonIcon = styled.div`
   position: relative !important;

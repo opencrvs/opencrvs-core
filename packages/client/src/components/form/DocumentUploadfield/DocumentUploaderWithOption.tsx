@@ -45,7 +45,7 @@ const Label = styled.label`
   position: relative;
   top: -2px;
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 const Flex = styled.div<{ splitView?: boolean }>`
   display: flex;
@@ -63,7 +63,7 @@ const DocumentUploader = styled(ImageUploader)`
   border: ${({ theme }) => `2px solid ${theme.colors.primary}`};
   box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
   border-radius: 2px;
-  ${({ theme }) => theme.fonts.buttonStyle};
+  ${({ theme }) => theme.fonts.bold14};
   height: 40px;
   text-transform: initial;
   margin-left: 10px;

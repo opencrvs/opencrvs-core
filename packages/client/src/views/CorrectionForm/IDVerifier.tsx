@@ -124,8 +124,7 @@ class IDVerifierComponent extends React.Component<
             label={intl.formatMessage(certificateMessages.dateOfBirth)}
             value={formatLongDate(
               correctorInformation.birthDate as string,
-              intl.locale,
-              'LL'
+              intl.locale
             )}
           />
         )}

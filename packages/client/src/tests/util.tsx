@@ -2539,6 +2539,7 @@ export const mockDeathRegistrationSectionData = {
 
 export const mockFetchCertificatesTemplatesDefinition = [
   {
+    _id: '12313546',
     event: 'birth',
     status: 'ACTIVE',
     svgCode:
@@ -2549,6 +2550,7 @@ export const mockFetchCertificatesTemplatesDefinition = [
     user: '61d42359f1a2c25ea01beb4b'
   },
   {
+    _id: '25313546',
     event: 'death',
     status: 'ACTIVE',
     svgCode:
@@ -2577,7 +2579,8 @@ export async function createTestStore() {
       pilotLocations: mockOfflineData.pilotLocations,
       offices: mockOfflineData.offices,
       assets: mockOfflineData.assets,
-      config: mockOfflineData.config
+      config: mockOfflineData.config,
+      formConfig: mockOfflineData.formConfig
     })
   )
   return { store, history }
@@ -2608,7 +2611,8 @@ export async function createTestComponent(
       pilotLocations: mockOfflineData.pilotLocations,
       offices: mockOfflineData.offices,
       assets: mockOfflineData.assets,
-      config: mockOfflineData.config
+      config: mockOfflineData.config,
+      formConfig: mockOfflineData.formConfig
     })
   )
 

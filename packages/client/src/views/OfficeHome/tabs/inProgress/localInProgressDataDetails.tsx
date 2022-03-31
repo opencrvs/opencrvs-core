@@ -14,12 +14,12 @@ import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import { messages } from '@client/i18n/messages/views/search'
 import { IStoreState } from '@client/store'
 import { CERTIFICATE_DATE_FORMAT } from '@client/utils/constants'
-import moment from 'moment'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
 import { constantsMessages } from '@client/i18n/messages'
+import format from '@client/utils/date-formatting'
 
 const ExpansionContent = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -31,7 +31,7 @@ const ExpansionContainer = styled.div`
   display: flex;
   flex-direction: row;
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   margin-bottom: 8px;
   &:last-child {
     margin-bottom: 0;
@@ -45,11 +45,11 @@ const StatusIcon = styled.div`
   margin-top: 3px;
 `
 const StyledLabel = styled.label`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
   margin-right: 3px;
 `
 const StyledValue = styled.span`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   text-transform: capitalize !important;
 `
 
@@ -58,7 +58,7 @@ const HistoryWrapper = styled.div`
   margin: 20px 0px;
 `
 const BoldSpan = styled.span`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
   padding: 0 10px;
   white-space: nowrap;
   overflow: hidden;
@@ -132,9 +132,13 @@ class LocalInProgressDataDetailsComponent extends React.Component<
   render() {
     const { intl, draft } = this.props
     const transformedData = this.transformer(draft)
-    const timestamp = moment(transformedData.draftStartedOn).format(
-      CERTIFICATE_DATE_FORMAT
-    )
+    const timestamp =
+      (transformedData.draftStartedOn &&
+        format(
+          new Date(transformedData.draftStartedOn),
+          CERTIFICATE_DATE_FORMAT
+        )) ||
+      ''
 
     return (
       <ExpansionContent>

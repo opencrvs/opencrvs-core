@@ -22,7 +22,7 @@ export type IMenuItemContainerProps = ICustomProps &
   React.InputHTMLAttributes<HTMLInputElement>
 
 const Item = styled(Button)<IMenuItemContainerProps>`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
   color: ${({ theme, selected }) =>
     selected ? theme.colors.white : theme.colors.disabled};
 `

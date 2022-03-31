@@ -47,8 +47,8 @@ import { find, get, camelCase } from 'lodash'
 import * as React from 'react'
 import { withApollo, WithApolloClient } from 'react-apollo'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import Moment from 'react-moment'
 import { connect } from 'react-redux'
+import format from 'date-fns/format'
 
 export enum Event {
   BIRTH = 'BIRTH',
@@ -125,7 +125,7 @@ const DetailTextContainer = styled.div`
 
 const DetailText = styled.div`
   flex: 1;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.copy};
 `
 
@@ -258,7 +258,7 @@ class DuplicateDetailsClass extends React.Component<
             <b>
               {intl.formatMessage(constantsMessages.dateOfDeclaration)}:
             </b>{' '}
-            <Moment format="DD-MM-YYYY">{data.dateOfDeclaration}</Moment>
+            <b>{format(new Date(data.dateOfDeclaration), 'dd-MM-yyyy')}</b>
             <br />
             <b>{intl.formatMessage(constantsMessages.trackingId)}:</b>{' '}
             {data.trackingId}

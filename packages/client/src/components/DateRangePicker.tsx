@@ -20,14 +20,36 @@ import {
 } from '@opencrvs/components/lib/icons'
 import { CircleButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
-import moment from 'moment'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { IActionObject } from '@opencrvs/components/lib/interface'
+import format from '@client/utils/date-formatting'
+import subDays from 'date-fns/subDays'
+import subMonths from 'date-fns/subMonths'
+import endOfMonth from 'date-fns/endOfMonth'
+import endOfYear from 'date-fns/endOfYear'
+import subYears from 'date-fns/subYears'
+import isSameMonth from 'date-fns/isSameMonth'
+import isSameYear from 'date-fns/isSameYear'
+import addDays from 'date-fns/addDays'
+import addYears from 'date-fns/addYears'
+import isAfter from 'date-fns/isAfter'
+import isBefore from 'date-fns/isBefore'
 
-const { useState, useEffect } = React
+const { useState, useEffect, useMemo } = React
 
 const LIMIT_YEAR_PAST_RECORDS = 1900
 
+function getMonthsShort(locale = 'en') {
+  const months = []
+  for (let i = 0; i < 12; i++) {
+    months.push(
+      new Date(1970, i).toLocaleString(locale, {
+        month: 'short'
+      })
+    )
+  }
+  return months
+}
 interface IDateRange {
   startDate: Date
   endDate: Date
@@ -35,8 +57,8 @@ interface IDateRange {
 interface IPresetDateRange {
   key: string
   label: string
-  startDate: moment.Moment
-  endDate: moment.Moment
+  startDate: Date
+  endDate: Date
 }
 
 const PRESET = 'preset'
@@ -71,20 +93,20 @@ interface PresetSelectorProps {
     startDate,
     endDate
   }: {
-    startDate: moment.Moment
-    endDate: moment.Moment
+    startDate: Date
+    endDate: Date
   }) => void
 }
 interface MonthSelectorProps {
   id?: string
-  date: moment.Moment
+  date: Date
   label: string
-  onNavigateDate: (date: moment.Moment) => void
-  onSelectDate: (date: moment.Moment) => void
-  minDate?: moment.Moment
-  maxDate: moment.Moment
+  onNavigateDate: (date: Date) => void
+  onSelectDate: (date: Date) => void
+  minDate?: Date
+  maxDate: Date
   hideSelectedMonthOnLabel?: boolean
-  selectedDate: moment.Moment
+  selectedDate: Date
 }
 
 export const PickerButton = styled.button`
@@ -116,7 +138,7 @@ export const ContentWrapper = styled.div`
   display: flex;
   width: 100%;
   align-items: center;
-  ${({ theme }) => theme.fonts.smallButtonStyleNoCapitalize};
+  ${({ theme }) => theme.fonts.reg14};
   color: ${({ theme }) => theme.colors.tertiary};
 
   & > svg {
@@ -164,7 +186,7 @@ export const ModalHeader = styled.div<{ hide?: boolean }>`
 export const TitleContent = styled.div`
   display: flex;
   align-items: center;
-  ${({ theme }) => theme.fonts.buttonStyle}
+  ${({ theme }) => theme.fonts.h2}
   text-transform: none;
 
   & > :first-child {
@@ -225,20 +247,20 @@ const PresetContainer = styled.div`
 
 const LabelContainer = styled.div`
   padding: 8px;
-  ${({ theme }) => theme.fonts.smallButtonStyleNoCapitalize}
+  ${({ theme }) => theme.fonts.reg14}
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 8px 0 0;
-    ${({ theme }) => theme.fonts.bodyBoldStyle}
+    ${({ theme }) => theme.fonts.bold16}
     text-align: center;
   }
 `
 const YearLabelContainer = styled.div`
   padding: 8px;
-  ${({ theme }) => theme.fonts.smallButtonStyleNoCapitalize}
+  ${({ theme }) => theme.fonts.reg14}
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.h4Style}
+    ${({ theme }) => theme.fonts.h2}
   }
 `
 
@@ -287,7 +309,7 @@ const MonthButtonsContainer = styled.div`
   }
 `
 const PresetRangeButton = styled.button<{ selected?: boolean }>`
-  ${({ theme }) => theme.fonts.bodyStyle}
+  ${({ theme }) => theme.fonts.reg16}
   padding: 8px 16px;
   border: 0;
   width: 100%;
@@ -314,7 +336,7 @@ const PresetRangeButton = styled.button<{ selected?: boolean }>`
   }
 `
 const MonthButton = styled.button<{ selected?: boolean }>`
-  ${({ theme }) => theme.fonts.smallButtonStyle}
+  ${({ theme }) => theme.fonts.reg14}
   height: 40px;
   width: 64px;
   border: 0;
@@ -336,7 +358,7 @@ const MonthButton = styled.button<{ selected?: boolean }>`
   }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.bigBodyStyle}
+    ${({ theme }) => theme.fonts.reg18}
     height: 72px;
     width: 33.33%;
     padding: 12px 8px 11px 8px;
@@ -384,32 +406,35 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
   const [modalVisible, setModalVisible] = useState<boolean>(false)
   const { intl } = props
 
-  moment.locale(intl.locale)
-  const startDateFromProps = moment(props.startDate)
-  const endDateFromProps = moment(props.endDate)
+  window.__localeId__ = intl.locale
+  const startDateFromProps = props.startDate
+  const endDateFromProps = props.endDate
 
-  const [startDate, setStartDate] = useState<moment.Moment>(startDateFromProps)
-  const [endDate, setEndDate] = useState<moment.Moment>(endDateFromProps)
+  const [startDate, setStartDate] = useState<Date>(startDateFromProps)
+  const [endDate, setEndDate] = useState<Date>(endDateFromProps)
 
-  const [startDateNav, setStartDateNav] =
-    useState<moment.Moment>(startDateFromProps)
-  const [endDateNav, setEndDateNav] = useState<moment.Moment>(endDateFromProps)
+  const [startDateNav, setStartDateNav] = useState<Date>(startDateFromProps)
+  const [endDateNav, setEndDateNav] = useState<Date>(endDateFromProps)
 
-  const todaysDateMoment = moment()
+  const todaysDate = new Date(Date.now())
   const [presetOptions, updatePresetOptions] = useState<IPresetButton[]>([])
   const [activeRoute, setActiveRoute] = useState<PATHS>(PRESET)
 
+  const months = useMemo(() => {
+    return getMonthsShort(intl.locale)
+  }, [intl.locale])
+
   useEffect(() => {
     function generatePresetOptions(): IPresetButton[] {
-      const today = moment()
-      const currentYear = today.year()
-      const date30DaysBack = today.clone().subtract(30, 'days')
+      const today = new Date(Date.now())
+      const currentYear = today.getFullYear()
+      const date30DaysBack = subDays(today, 30)
 
-      const date12MonthsBack = today.clone().subtract(12, 'months')
+      const date12MonthsBack = subMonths(today, 12)
 
-      const lastYearMoment = moment([currentYear - 1])
-      const last2YearMoment = moment([currentYear - 2])
-      const last3YearMoment = moment([currentYear - 3])
+      const lastYear = new Date(currentYear - 1, 0)
+      const last2Year = new Date(currentYear - 2, 0)
+      const last3Year = new Date(currentYear - 3, 0)
 
       return [
         {
@@ -426,21 +451,21 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
         },
         {
           key: 'lastYear',
-          label: lastYearMoment.format('YYYY'),
-          startDate: lastYearMoment,
-          endDate: lastYearMoment.clone().endOf('year')
+          label: format(lastYear, 'yyyy'),
+          startDate: lastYear,
+          endDate: endOfYear(lastYear)
         },
         {
           key: 'previousOfLastYear',
-          label: last2YearMoment.format('YYYY'),
-          startDate: last2YearMoment,
-          endDate: last2YearMoment.clone().endOf('year')
+          label: format(last2Year, 'yyyy'),
+          startDate: last2Year,
+          endDate: endOfYear(last2Year)
         },
         {
           key: 'previousOfLast2Years',
-          label: last3YearMoment.format('YYYY'),
-          startDate: last3YearMoment,
-          endDate: last3YearMoment.clone().endOf('year')
+          label: format(last3Year, 'yyyy'),
+          startDate: last3Year,
+          endDate: endOfYear(last3Year)
         },
         {
           key: 'customDateRangeNav',
@@ -457,10 +482,10 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
     function getDerivedStateFromProps() {
       const body = document.querySelector('body') as HTMLBodyElement
       if (!modalVisible) {
-        setStartDate(moment(props.startDate))
-        setEndDate(moment(props.endDate))
-        setStartDateNav(moment(props.startDate))
-        setEndDateNav(moment(props.endDate))
+        setStartDate(props.startDate)
+        setEndDate(props.endDate)
+        setStartDateNav(props.startDate)
+        setEndDateNav(props.endDate)
         body.style.removeProperty('overflow')
         setActiveRoute(PRESET)
       } else {
@@ -482,39 +507,38 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
     selectedDate,
     onNavigateDate
   }: MonthSelectorProps) {
-    const limitDate = moment([LIMIT_YEAR_PAST_RECORDS])
-    const months = moment.monthsShort()
-    const year = date.year().toString()
+    const limitDate = new Date(LIMIT_YEAR_PAST_RECORDS)
+    const year = date.getFullYear().toString()
 
     return (
       <MonthContainer id={id}>
         <MonthSelectorHeader>
           <LabelContainer>
             {selectedDate && !hideSelectedMonthOnLabel
-              ? `${label}: ${selectedDate.format('MMMM YYYY')}`
+              ? `${label}: ${format(selectedDate, 'MMMM yyyy')}`
               : label}
           </LabelContainer>
           <NavigatorContainer>
             <CircleButton
               id={`${id}-prev`}
-              onClick={() => onNavigateDate(date.clone().subtract(1, 'years'))}
-              disabled={date.isSame(limitDate, 'year')}
+              onClick={() => onNavigateDate(subYears(date, 1))}
+              disabled={isSameYear(date, limitDate)}
             >
               <ChevronLeft />
             </CircleButton>
             <YearLabelContainer id={`${id}-year-label`}>
-              {date.format('YYYY')}
+              {format(date, 'yyyy')}
             </YearLabelContainer>
             <CircleButton
               id={`${id}-next`}
               onClick={() => {
-                const nextDate = date.clone().add(1, 'years')
-                const finalDateNavigateTo = nextDate.isAfter(todaysDateMoment)
-                  ? todaysDateMoment
+                const nextDate = addYears(date, 1)
+                const finalDateNavigateTo = isAfter(nextDate, todaysDate)
+                  ? todaysDate
                   : nextDate
                 onNavigateDate(finalDateNavigateTo)
               }}
-              disabled={date.isSame(todaysDateMoment, 'year')}
+              disabled={isSameYear(date, todaysDate)}
             >
               <ChevronRight />
             </CircleButton>
@@ -522,18 +546,18 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
         </MonthSelectorHeader>
         <MonthButtonsContainer>
           {months.map((month, index) => {
-            const monthDate = moment(`${month}-${year}`, 'MMM-YYYY')
+            const monthDate = new Date(Number(year), index)
             return (
               <MonthButton
                 id={`${id}-${month.toLowerCase()}`}
                 key={index}
                 disabled={
-                  (moment.isMoment(minDate) && monthDate.isBefore(minDate)) ||
-                  monthDate.isAfter(maxDate)
+                  (minDate && isBefore(monthDate, minDate)) ||
+                  isAfter(monthDate, maxDate)
                 }
                 selected={
-                  monthDate.isSame(selectedDate, 'month') &&
-                  monthDate.isSame(selectedDate, 'year')
+                  isSameMonth(selectedDate, monthDate) &&
+                  isSameYear(selectedDate, monthDate)
                 }
                 onClick={() => {
                   onSelectDate(monthDate)
@@ -565,8 +589,8 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
               id={item.key}
               key={item.key}
               selected={
-                item.startDate.isSame(startDate, 'month') &&
-                item.endDate.isSame(endDate, 'month')
+                isSameMonth(startDate, item.startDate) &&
+                isSameMonth(endDate, item.endDate)
               }
               onClick={() =>
                 props.onSelectPreset({
@@ -586,8 +610,8 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
   const selectedPresetFromProps = presetOptions.find(
     (item) =>
       !isPresetNavButton(item) &&
-      item.startDate.isSame(startDateFromProps, 'month') &&
-      item.endDate.isSame(endDateFromProps, 'month')
+      isSameMonth(startDateFromProps, item.startDate) &&
+      isSameMonth(endDateFromProps, item.endDate)
   )
 
   const routes: ROUTES = {
@@ -600,8 +624,8 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
             setEndDate(endDate)
 
             props.onDatesChange({
-              startDate: startDate.toDate(),
-              endDate: endDate.toDate()
+              startDate: startDate,
+              endDate: endDate
             })
 
             setModalVisible(false)
@@ -620,7 +644,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
             setStartDate(date)
             setActiveRoute(END_MONTH)
           }}
-          maxDate={todaysDateMoment}
+          maxDate={todaysDate}
           selectedDate={startDate}
           hideSelectedMonthOnLabel
         />
@@ -637,13 +661,13 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
           selectedDate={endDate}
           onSelectDate={(date) => {
             props.onDatesChange({
-              startDate: startDate.toDate(),
-              endDate: date.toDate()
+              startDate: startDate,
+              endDate: date
             })
             setModalVisible(false)
           }}
-          minDate={startDate.clone().add(1, 'day')}
-          maxDate={todaysDateMoment}
+          minDate={addDays(startDate, 1)}
+          maxDate={todaysDate}
           hideSelectedMonthOnLabel
         />
       ),
@@ -661,9 +685,10 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
           <span>
             {selectedPresetFromProps
               ? selectedPresetFromProps.label
-              : `${startDateFromProps.format(
-                  'MMMM YYYY'
-                )} - ${endDateFromProps.format('MMMM YYYY')}`}
+              : `${format(startDateFromProps, 'MMMM yyyy')} - ${format(
+                  endDateFromProps,
+                  'MMMM yyyy'
+                )}`}
           </span>
           <Calendar />
         </ContentWrapper>
@@ -699,7 +724,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
                 label={intl.formatMessage(constantsMessages.from)}
                 selectedDate={startDate}
                 onSelectDate={setStartDate}
-                maxDate={endDate.clone().subtract(1, 'days')}
+                maxDate={subDays(endDate, 1)}
               />
               <MonthSelector
                 date={endDateNav}
@@ -707,7 +732,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
                 label={intl.formatMessage(constantsMessages.toCapitalized)}
                 selectedDate={endDate}
                 onSelectDate={setEndDate}
-                maxDate={todaysDateMoment}
+                maxDate={todaysDate}
               />
             </ModalBody>
             <ModalBodyMobile id="picker-modal-mobile">
@@ -718,12 +743,12 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
                 id="date-range-confirm-action"
                 onClick={() => {
                   props.onDatesChange({
-                    startDate: startDate.toDate(),
-                    endDate: endDate.endOf('month').toDate()
+                    startDate: startDate,
+                    endDate: endOfMonth(endDate)
                   })
                   setModalVisible(false)
                 }}
-                disabled={startDate.isAfter(endDate)}
+                disabled={isAfter(startDate, endDate)}
               >
                 {intl.formatMessage(buttonMessages.select)}
               </StyledPrimaryButton>

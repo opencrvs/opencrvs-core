@@ -27,9 +27,9 @@ export const getFieldValue = (
     const offlineResourceValue = get(offlineResourceValues, original)
     original = offlineResourceValue?.name || ''
   }
-  if (fieldObj.type == 'SELECT_WITH_OPTIONS') {
+  if (fieldObj.type === 'SELECT_WITH_OPTIONS') {
     const selectedOption = fieldObj.options.find(
-      (option) => option.value == value
+      (option) => option.value === value
     ) as ISelectOption
     return selectedOption ? intl.formatMessage(selectedOption.label) : original
   }
@@ -37,7 +37,7 @@ export const getFieldValue = (
     ['RADIO_GROUP_WITH_NESTED_FIELDS', 'RADIO_GROUP'].includes(fieldObj.type)
   ) {
     const selectedOption = (fieldObj as IRadioGroupFormField).options.find(
-      (option) => option.value == value
+      (option) => option.value === value
     )
     return selectedOption ? intl.formatMessage(selectedOption.label) : original
   }

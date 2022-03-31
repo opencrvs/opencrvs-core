@@ -178,6 +178,7 @@ export default {
                 contentType
                 subject
               }
+              questionnaire
               status {
                 comments {
                   comment
@@ -317,6 +318,7 @@ export default {
                 contentType
                 subject
               }
+              questionnaire
               status {
                 comments {
                   comment
@@ -492,7 +494,7 @@ function flattenArray(
     return {}
   }
   const flattenArrayData: any = {}
-  dataArray.forEach(data => {
+  dataArray.forEach((data) => {
     if (data === null) {
       return
     }

@@ -182,7 +182,7 @@ type Mutation {
     nonce: String!
     verifyCode: String!
   ): String
-  changeAvatar(userId: String!, avatar: AvatarInput!): String
+  changeAvatar(userId: String!, avatar: AvatarInput!): Avatar
   auditUser(
     userId: String!
     action: String!
@@ -193,6 +193,9 @@ type Mutation {
   createOrUpdateCertificateSVG(
     certificateSVG: CertificateSVGInput!
   ): CertificateSVG
+  updateApplicationConfig(
+    applicationConfig: ApplicationConfigurationInput
+  ): ApplicationConfiguration
   createOrUpdateQuestion(question: QuestionInput!): Question
 }
 
@@ -223,6 +226,7 @@ type BirthRegistration implements EventRegistration {
   informant: RelatedPerson
   eventLocation: Location
   birthType: BirthType
+  questionnaire: [QuestionnaireQuestion]
   weightAtBirth: Float
   attendantAtBirth: AttendantType
   otherAttendantAtBirth: String
@@ -248,6 +252,7 @@ type DeathRegistration implements EventRegistration {
   father: Person
   spouse: Person
   eventLocation: Location
+  questionnaire: [QuestionnaireQuestion]
   mannerOfDeath: MannerOfDeath
   causeOfDeathMethod: CauseOfDeathMethodType
   causeOfDeath: String
@@ -456,6 +461,7 @@ input BirthRegistrationInput {
   informant: RelatedPersonInput
   eventLocation: LocationInput
   birthType: BirthType
+  questionnaire: [QuestionnaireQuestionInput]
   weightAtBirth: Float
   attendantAtBirth: AttendantType
   otherAttendantAtBirth: String
@@ -484,6 +490,7 @@ input DeathRegistrationInput {
   father: PersonInput
   spouse: PersonInput
   eventLocation: LocationInput
+  questionnaire: [QuestionnaireQuestionInput]
   mannerOfDeath: MannerOfDeath
   causeOfDeathMethod: CauseOfDeathMethodType
   causeOfDeath: String
@@ -514,6 +521,11 @@ input SecurityQuestionAnswer {
   answer: String
 }
 
+type Avatar {
+  type: String!
+  data: String!
+}
+
 input AvatarInput {
   type: String!
   data: String!
@@ -528,6 +540,52 @@ input CertificateSVGInput {
   user: String!
   event: String!
   status: String!
+}
+
+type ApplicationConfiguration {
+  APPLICATION_NAME: String
+  BACKGROUND_SYNC_BROADCAST_CHANNEL: String
+  BIRTH: Birth
+  COUNTRY: String
+  COUNTRY_LOGO: CountryLogo
+  CURRENCY: Currency
+  COUNTRY_LOGO_RENDER_WIDTH: Int
+  COUNTRY_LOGO_RENDER_HEIGHT: Int
+  DESKTOP_TIME_OUT_MILLISECONDS: Int
+  DEATH: Death
+  UI_POLLING_INTERVAL: Int
+  FIELD_AGENT_AUDIT_LOCATIONS: String
+  APPLICATION_AUDIT_LOCATIONS: String
+  INFORMANT_MINIMUM_AGE: Int
+  HIDE_EVENT_REGISTER_INFORMATION: Boolean
+  EXTERNAL_VALIDATION_WORKQUEUE: Boolean
+  SENTRY: String
+  LOGROCKET: String
+  PHONE_NUMBER_PATTERN: String
+  NID_NUMBER_PATTERN: String
+}
+
+input ApplicationConfigurationInput {
+  APPLICATION_NAME: String
+  BACKGROUND_SYNC_BROADCAST_CHANNEL: String
+  BIRTH: BirthInput
+  COUNTRY: String
+  COUNTRY_LOGO: CountryLogoInput
+  CURRENCY: CurrencyInput
+  COUNTRY_LOGO_RENDER_WIDTH: Int
+  COUNTRY_LOGO_RENDER_HEIGHT: Int
+  DESKTOP_TIME_OUT_MILLISECONDS: Int
+  DEATH: DeathInput
+  UI_POLLING_INTERVAL: Int
+  FIELD_AGENT_AUDIT_LOCATIONS: String
+  APPLICATION_AUDIT_LOCATIONS: String
+  INFORMANT_MINIMUM_AGE: Int
+  HIDE_EVENT_REGISTER_INFORMATION: Boolean
+  EXTERNAL_VALIDATION_WORKQUEUE: Boolean
+  SENTRY: String
+  LOGROCKET: String
+  PHONE_NUMBER_PATTERN: String
+  NID_NUMBER_PATTERN: String
 }
 
 input QuestionInput {
@@ -584,6 +642,11 @@ enum BirthType {
   HIGHER_MULTIPLE_DELIVERY
 }
 
+type QuestionnaireQuestion {
+  fieldId: String
+  value: String
+}
+
 enum AttendantType {
   PHYSICIAN
   NURSE
@@ -613,12 +676,14 @@ type History {
   user: User
   date: Date
   action: RegStatus
+  statusReason: StatusReason
   reinstated: Boolean
   location: Location
   office: Location
   comments: [Comment]
   input: [InputOutput]
   output: [InputOutput]
+  certificates: [Certificate]
 }
 
 enum MannerOfDeath {
@@ -750,11 +815,6 @@ type Signature {
   type: String
 }
 
-type Avatar {
-  type: String!
-  data: String!
-}
-
 type SearchFieldAgentResponse {
   practitionerId: String
   fullName: String
@@ -834,7 +894,6 @@ interface EventSearchSet {
   id: ID!
   type: String
   registration: RegistrationSearchSet
-  operationHistories: [OperationHistorySearchSet]
 }
 
 type EventProgressSet {
@@ -920,6 +979,11 @@ input RelatedPersonInput {
   individual: PersonInput
 }
 
+input QuestionnaireQuestionInput {
+  fieldId: String
+  value: String
+}
+
 input PrimaryCaregiverInput {
   primaryCaregiver: PersonInput
   reasonsNotApplying: [ReasonsNotApplyingInput]
@@ -960,6 +1024,48 @@ input UserIdentifierInput {
 input SignatureInput {
   data: String
   type: String
+}
+
+type Birth {
+  REGISTRATION_TARGET: Int
+  LATE_REGISTRATION_TARGET: Int
+  FEE: BirthFee
+}
+
+type CountryLogo {
+  fileName: String
+  file: String
+}
+
+type Currency {
+  isoCode: String
+  languagesAndCountry: [String]
+}
+
+type Death {
+  REGISTRATION_TARGET: Int
+  FEE: DeathFee
+}
+
+input BirthInput {
+  REGISTRATION_TARGET: Int
+  LATE_REGISTRATION_TARGET: Int
+  FEE: BirthFeeInput
+}
+
+input CountryLogoInput {
+  fileName: String
+  file: String
+}
+
+input CurrencyInput {
+  isoCode: String
+  languagesAndCountry: [String]
+}
+
+input DeathInput {
+  REGISTRATION_TARGET: Int
+  FEE: DeathFeeInput
 }
 
 input MesssageDescriptorInput {
@@ -1003,6 +1109,10 @@ enum ParentDetailsType {
   MOTHER_ONLY
   FATHER_ONLY
   NONE
+}
+
+type StatusReason {
+  text: String
 }
 
 type Comment {
@@ -1178,26 +1288,12 @@ type RegistrationSearchSet {
   modifiedAt: String
 }
 
-type OperationHistorySearchSet {
-  operationType: String
-  operatedOn: Date
-  operatorRole: String
-  operatorName: [HumanName]
-  operatorOfficeName: String
-  operatorOfficeAlias: [String]
-  notificationFacilityName: String
-  notificationFacilityAlias: [String]
-  rejectReason: String
-  rejectComment: String
-}
-
 type BirthEventSearchSet implements EventSearchSet {
   id: ID!
   type: String
   childName: [HumanName]
   dateOfBirth: Date
   registration: RegistrationSearchSet
-  operationHistories: [OperationHistorySearchSet]
 }
 
 type DeathEventSearchSet implements EventSearchSet {
@@ -1206,7 +1302,6 @@ type DeathEventSearchSet implements EventSearchSet {
   deceasedName: [HumanName]
   dateOfDeath: Date
   registration: RegistrationSearchSet
-  operationHistories: [OperationHistorySearchSet]
 }
 
 type EventProgressData {
@@ -1296,6 +1391,28 @@ input ReasonsNotApplyingInput {
   primaryCaregiverType: PrimaryCaregiverType
   reasonNotApplying: String
   isDeceased: Boolean
+}
+
+type BirthFee {
+  ON_TIME: Float
+  LATE: Float
+  DELAYED: Float
+}
+
+type DeathFee {
+  ON_TIME: Float
+  DELAYED: Float
+}
+
+input BirthFeeInput {
+  ON_TIME: Float
+  LATE: Float
+  DELAYED: Float
+}
+
+input DeathFeeInput {
+  ON_TIME: Float
+  DELAYED: Float
 }
 
 type Payment {

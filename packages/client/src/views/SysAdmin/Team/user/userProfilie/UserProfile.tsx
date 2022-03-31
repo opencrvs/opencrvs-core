@@ -28,7 +28,6 @@ import { SearchRed, VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { Avatar } from '@client/components/Avatar'
 import styled from 'styled-components'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import moment from 'moment'
 import { userMessages } from '@client/i18n/messages'
 import { LANG_EN } from '@client/utils/constants'
 import {
@@ -53,6 +52,7 @@ import { UserAuditList } from '@client/views/SysAdmin/Team/user/userProfilie/Use
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { IUserDetails } from '@client/utils/userUtils'
 import { userMutations } from '@client/user/mutations'
+import format from '@client/utils/date-formatting'
 
 const ContentWrapper = styled.div`
   margin: 40px auto 0;
@@ -69,7 +69,7 @@ const UserAvatar = styled(Avatar)`
 `
 
 const NameHolder = styled.div`
-  ${({ theme }) => theme.fonts.h2Style};
+  ${({ theme }) => theme.fonts.h1};
   margin: 20px auto 30px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
@@ -88,13 +88,13 @@ const InformationHolder = styled.div`
 `
 
 export const InformationTitle = styled.div<{ paddingRight?: number }>`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
   ${({ paddingRight }) => {
     return `padding-right: ${paddingRight ? paddingRight : 0}px`
   }}
 `
 const InformationValue = styled.div`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 
 const LoadingTitle = styled.span<{ width: number; marginRight: number }>`
@@ -164,7 +164,7 @@ export interface IUserData {
 class UserProfileComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
-    moment.locale(props.intl.locale)
+    window.__localeId__ = props.intl.locale
     this.state = {
       modalVisible: false,
       viewportWidth: 0,
@@ -273,12 +273,11 @@ class UserProfileComponent extends React.Component<Props, State> {
       locationId:
         getJurisdictionLocationIdFromUserDetails(userData as IUserDetails) ||
         '0',
-      startDate:
-        (userData.creationDate &&
-          moment(new Date(Number(userData.creationDate))).format(
-            'MMMM DD, YYYY'
-          )) ||
-        '',
+      startDate: userData.creationDate
+        ? Number.isNaN(Number(userData.creationDate))
+          ? format(new Date(userData.creationDate), 'MMMM dd, yyyy')
+          : format(new Date(Number(userData.creationDate)), 'MMMM dd, yyyy')
+        : '',
       avatar: userData.avatar
     }
   }

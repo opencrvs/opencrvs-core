@@ -27,10 +27,10 @@ import {
   PASSPORT,
   DRIVING_LICENSE
 } from '@client/forms/identity'
-import moment from 'moment'
 import { IOfflineData } from '@client/offline/reducer'
 import { getListOfLocations } from '@client/forms/utils'
 import _ from 'lodash'
+import format from '@client/utils/date-formatting'
 
 export interface IValidationResult {
   message: MessageDescriptor
@@ -55,7 +55,7 @@ export type Validation = (
 export type ValidationInitializer = (...value: any[]) => Validation
 
 export const isAValidPhoneNumberFormat = (value: string): boolean => {
-  const { pattern } = window.config.PHONE_NUMBER_PATTERN
+  const pattern = window.config.PHONE_NUMBER_PATTERN
   return new RegExp(pattern).test(value)
 }
 
@@ -181,9 +181,6 @@ export const officeMustBeSelected: Validation = (
 }
 
 export const phoneNumberFormat: Validation = (value: IFormFieldValue) => {
-  const { start, num } = window.config.PHONE_NUMBER_PATTERN
-  const validationProps = { start, num }
-
   const cast = value as string
   const trimmedValue = cast === undefined || cast === null ? '' : cast.trim()
 
@@ -194,8 +191,7 @@ export const phoneNumberFormat: Validation = (value: IFormFieldValue) => {
   return isAValidPhoneNumberFormat(trimmedValue)
     ? undefined
     : {
-        message: messages.phoneNumberFormat,
-        props: validationProps
+        message: messages.phoneNumberFormat
       }
 }
 
@@ -532,7 +528,7 @@ export const range: RangeValidation =
   }
 
 export const isAValidNIDNumberFormat = (value: string): boolean => {
-  const { pattern } = window.config.NID_NUMBER_PATTERN
+  const pattern = window.config.NID_NUMBER_PATTERN
   return new RegExp(pattern).test(value)
 }
 
@@ -540,7 +536,6 @@ export const validIDNumber =
   (typeOfID: string): Validation =>
   (value: any) => {
     value = (value && value.toString()) || ''
-    const { num } = window.config.NID_NUMBER_PATTERN
 
     const cast = value as string
     const trimmedValue = cast === undefined || cast === null ? '' : cast.trim()
@@ -550,10 +545,7 @@ export const validIDNumber =
       }
 
       return {
-        message: messages.validNationalId,
-        props: {
-          validLength: num
-        }
+        message: messages.validNationalId
       }
     }
     return undefined
@@ -562,8 +554,7 @@ export const duplicateIDNumber =
   (fieldToDuplicateCheck: string): Validation =>
   (value: IFormFieldValue, drafts) => {
     const valueToCheck = _.get(drafts, fieldToDuplicateCheck)
-
-    if (value && valueToCheck && +value === +valueToCheck) {
+    if (value && valueToCheck && value === valueToCheck) {
       return {
         message: messages.duplicateNationalID
       }
@@ -638,7 +629,7 @@ export const isInformantOfLegalAge: Validation = (value: IFormFieldValue) => {
   if (value) {
     if (
       minAgeGapExist(
-        moment(new Date()).format('YYYY-MM-DD'),
+        format(new Date(Date.now()), 'yyyy-MM-dd'),
         value.toString(),
         window.config.INFORMANT_MINIMUM_AGE
       )
