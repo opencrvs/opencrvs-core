@@ -34,9 +34,12 @@ interface IConfigMessages
   deathFormConfigLabel: MessageDescriptor
   formConfigPublishedTabLabel: MessageDescriptor
   formConfigDraftsTabLabel: MessageDescriptor
+  formConfigInPreviewTabLabel: MessageDescriptor
   formConfigPageSubTitle: MessageDescriptor
   formConfigDefaultConfig: MessageDescriptor
   formConfigureButtonLabel: MessageDescriptor
+  formConfigPublishButtonLabel: MessageDescriptor
+  formConfigViewButtonLabel: MessageDescriptor
   previewFormConfiguration: MessageDescriptor
   finalizeFormConfiguration: MessageDescriptor
 }
@@ -81,6 +84,21 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.formConfigDraftsTabLabel',
     defaultMessage: 'Drafts',
     description: 'Label for drafts tab of form config page'
+  },
+  formConfigInPreviewTabLabel: {
+    id: 'config.formConfigInPreviewTabLabel',
+    defaultMessage: 'In preview',
+    description: 'Label for in preview tab of form config page'
+  },
+  formConfigPublishButtonLabel: {
+    id: 'config.formConfigPublishButtonLabel',
+    defaultMessage: 'Publish',
+    description: 'Label for publish button form config page'
+  },
+  formConfigViewButtonLabel: {
+    id: 'config.formConfigViewButtonLabel',
+    defaultMessage: 'View',
+    description: 'Label for view button form config page'
   },
   formConfigPageSubTitle: {
     id: 'config.formConfigPageSubtitle',

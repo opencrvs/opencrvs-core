@@ -56,7 +56,8 @@ const ValueColor = styled.div`
 `
 export enum TABS {
   PUBLISHED = 'published',
-  DRAFTS = 'drafts'
+  DRAFTS = 'drafts',
+  IN_PREVIEW = 'in preview'
 }
 
 class FormConfigComponent extends React.Component<Props, State> {
@@ -140,15 +141,78 @@ class FormConfigComponent extends React.Component<Props, State> {
     ]
     const formsForDraftsTab = [
       {
+        label: <LabelColor>Birth v.03</LabelColor>,
+        value: <ValueColor>-Biz analysis</ValueColor>,
+        actionsMenu: (
+          <StyledActionBar>
+            <LinkButton onClick={() => {}}>
+              {intl.formatMessage(messages.formConfigViewButtonLabel)}
+            </LinkButton>
+            <ToggleMenu
+              id={`form-death-action-menu`}
+              toggleButton={<VerticalThreeDots />}
+              menuItems={this.getMenuItems(intl)}
+            />
+          </StyledActionBar>
+        )
+      },
+      {
+        label: <LabelColor>Birth v.02</LabelColor>,
+        value: (
+          <div>
+            <ValueColor>-Added an initial question</ValueColor>
+            <ValueColor>-Added another cool question</ValueColor>
+          </div>
+        ),
+        action: {
+          label: intl.formatMessage(messages.formConfigViewButtonLabel),
+          disabled: true
+        }
+      },
+      {
+        label: <LabelColor>Birth v.02</LabelColor>,
+        value: <ValueColor>-Initial view</ValueColor>,
+        action: {
+          label: intl.formatMessage(messages.formConfigViewButtonLabel),
+          disabled: true
+        }
+      },
+      {
         label: <LabelColor>Birth v.01</LabelColor>,
-        value: <ValueColor>Data</ValueColor>,
+        value: <ValueColor>Description of changes</ValueColor>,
+        action: {
+          label: intl.formatMessage(messages.formConfigViewButtonLabel)
+        }
+      }
+    ]
+
+    const formsForPreviewTab = [
+      {
+        label: (
+          <LabelColor>
+            {intl.formatMessage(messages.birthFormConfigLabel)}
+          </LabelColor>
+        ),
+        value: (
+          <ValueColor>
+            {intl.formatMessage(messages.formConfigDefaultConfig)}
+          </ValueColor>
+        ),
         action: {
           label: intl.formatMessage(messages.formConfigureButtonLabel)
         }
       },
       {
-        label: <LabelColor>Birth v.02</LabelColor>,
-        value: <ValueColor>Data</ValueColor>,
+        label: (
+          <LabelColor>
+            {intl.formatMessage(messages.deathFormConfigLabel)}
+          </LabelColor>
+        ),
+        value: (
+          <ValueColor>
+            {intl.formatMessage(messages.formConfigDefaultConfig)}
+          </ValueColor>
+        ),
         action: {
           label: intl.formatMessage(messages.formConfigureButtonLabel)
         }
@@ -169,6 +233,10 @@ class FormConfigComponent extends React.Component<Props, State> {
               {
                 id: TABS.DRAFTS,
                 title: intl.formatMessage(messages.formConfigDraftsTabLabel)
+              },
+              {
+                id: TABS.IN_PREVIEW,
+                title: intl.formatMessage(messages.formConfigInPreviewTabLabel)
               }
             ],
             activeTabId: this.state.activeTabId,
@@ -179,7 +247,9 @@ class FormConfigComponent extends React.Component<Props, State> {
             items={
               this.state.activeTabId === TABS.PUBLISHED
                 ? formsForPublishedTab
-                : formsForDraftsTab
+                : this.state.activeTabId === TABS.DRAFTS
+                ? formsForDraftsTab
+                : formsForPreviewTab
             }
             isConfigPage={true}
           />
