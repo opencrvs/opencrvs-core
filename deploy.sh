@@ -105,11 +105,16 @@ LOG_LOCATION=${LOG_LOCATION:-/var/log}
 
 # Rotate MongoDB credentials
 # https://unix.stackexchange.com/a/230676
-USER_MGNT_MONGODB_PASSWORD=`openssl rand -base64 25 | tr -cd '[:alnum:]._-' ; echo ''`
-HEARTH_MONGODB_PASSWORD=`openssl rand -base64 25 | tr -cd '[:alnum:]._-' ; echo ''`
-CONFIG_MONGODB_PASSWORD=`openssl rand -base64 25 | tr -cd '[:alnum:]._-' ; echo ''`
-OPENHIM_MONGODB_PASSWORD=`openssl rand -base64 25 | tr -cd '[:alnum:]._-' ; echo ''`
-WEBHOOKS_MONGODB_PASSWORD=`openssl rand -base64 25 | tr -cd '[:alnum:]._-' ; echo ''`
+generate_password() {
+  local password=`openssl rand -base64 25 | tr -cd '[:alnum:]._-' ; echo ''`
+  echo $password
+}
+
+USER_MGNT_MONGODB_PASSWORD=`generate_password`
+HEARTH_MONGODB_PASSWORD=`generate_password`
+CONFIG_MONGODB_PASSWORD=`generate_password`
+OPENHIM_MONGODB_PASSWORD=`generate_password`
+WEBHOOKS_MONGODB_PASSWORD=`generate_password`
 
 echo
 echo "Deploying VERSION $VERSION to $SSH_HOST..."
