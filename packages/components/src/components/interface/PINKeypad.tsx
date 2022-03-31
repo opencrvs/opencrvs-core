@@ -72,12 +72,12 @@ const NumberContainer = styled.div`
 
 const Key = styled.span`
   color: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.h2Style};
+  ${({ theme }) => theme.fonts.h1};
   padding: 24px 48px;
   text-align: center;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 20px 40px;
-    ${({ theme }) => theme.fonts.h3Style};
+    ${({ theme }) => theme.fonts.h1};
   }
 `
 

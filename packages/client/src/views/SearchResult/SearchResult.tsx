@@ -70,7 +70,7 @@ import { Navigation } from '@client/components/interface/Navigation'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   text-align: center;
   margin-top: 100px;
 `
@@ -98,7 +98,7 @@ export const ActionPageWrapper = styled.div`
 `
 const SearchResultText = styled.div`
   left: 268px;
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   color: ${({ theme }) => theme.colors.copy};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin-left: 24px;
@@ -433,7 +433,9 @@ export class SearchResultView extends React.Component<
             : formattedDuration(new Date(Number(reg.modifiedAt)))
           : '',
         startedAt:
-          (reg.createdAt && formattedDuration(new Date(reg.createdAt))) || '',
+          (reg.createdAt &&
+            formattedDuration(new Date(Number(reg.createdAt)))) ||
+          '',
         icon,
         actions,
         rowClickHandler: [

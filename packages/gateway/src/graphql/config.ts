@@ -22,6 +22,7 @@ import { resolvers as searchRootResolvers } from '@gateway/features/search/root-
 import { searchTypeResolvers } from '@gateway/features/search/type-resolvers'
 import { resolvers as userRootResolvers } from '@gateway/features/user/root-resolvers'
 import { resolvers as correctionRootResolvers } from '@gateway/features/correction/root-resolvers'
+import { resolvers as applicationRootResolvers } from '@gateway/features/application/root-resolvers'
 import { resolvers as questionResolvers } from '@gateway/features/questions/root-resolvers'
 import {
   IUserModelData,
@@ -63,6 +64,7 @@ const resolvers: StringIndexed<IResolvers> = merge(
   roleTypeResolvers as IResolvers,
   certificateResolvers as IResolvers,
   correctionRootResolvers as IResolvers,
+  applicationRootResolvers as IResolvers,
   questionResolvers as IResolvers
 )
 

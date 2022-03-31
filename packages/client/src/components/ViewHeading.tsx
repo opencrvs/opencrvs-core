@@ -25,18 +25,18 @@ const ViewHeadingContainer = styled.div`
 `
 
 const Breadcrumb = styled.div`
-  ${({ theme }) => theme.fonts.subtitleStyle};
+  ${({ theme }) => theme.fonts.bold14};
   text-transform: uppercase;
   margin-bottom: 20px;
 `
 
 const ViewTitle = styled.h2`
-  ${({ theme }) => theme.fonts.h2Style};
+  ${({ theme }) => theme.fonts.h1};
   margin: 0;
 `
 
 const ViewDescription = styled.p`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   margin: 0;
   margin-top: 5px;
 `
