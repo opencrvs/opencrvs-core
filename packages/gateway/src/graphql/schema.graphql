@@ -421,8 +421,8 @@ type CertificateSVG {
 }
 
 type Question {
-  _id: ID
-  fieldId: String
+  _id: ID!
+  fieldId: String!
   label: MesssageDescriptor
   placeholder: MesssageDescriptor
   maxLength: Int
@@ -430,20 +430,20 @@ type Question {
   fieldType: String
   preceedingFieldId: String
   required: Boolean
-  enabled: Boolean
+  enabled: String
   custom: Boolean
   initialValue: String
 }
 
 type formDraft {
   _id: ID
-  event: String
-  status: String
+  event: String!
+  status: String!
   comment: String
-  version: Int
+  version: Int!
   history: [DraftHistory]
-  updatedAt: Date
-  createdAt: Date
+  updatedAt: Date!
+  createdAt: Date!
 }
 
 input NotificationInput {
@@ -549,7 +549,7 @@ input CertificateSVGInput {
 
 input QuestionInput {
   id: ID
-  fieldId: String
+  fieldId: String!
   label: MesssageDescriptorInput
   placeholder: MesssageDescriptorInput
   maxLength: Int

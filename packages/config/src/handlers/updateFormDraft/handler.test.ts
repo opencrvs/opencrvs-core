@@ -62,28 +62,30 @@ const mockFormDraft = [
   }
 ]
 
-const mockQuestion = {
-  _id: '123',
-  fieldId: 'birth.myField',
-  label: {
-    id: '',
-    description: '',
-    defaultMessage: ''
-  },
-  placeholder: {
-    id: '',
-    description: '',
-    defaultMessage: ''
-  },
-  maxLength: 32,
-  fieldName: 'myField',
-  fieldType: 'TEXT',
-  preceedingFieldId: 'myPreviousFieldId',
-  required: true,
-  enabled: true,
-  custom: true,
-  initialValue: 'myValue'
-}
+const mockQuestion = [
+  {
+    _id: '123',
+    fieldId: 'birth.myField',
+    label: {
+      id: '',
+      description: '',
+      defaultMessage: ''
+    },
+    placeholder: {
+      id: '',
+      description: '',
+      defaultMessage: ''
+    },
+    maxLength: 32,
+    fieldName: 'myField',
+    fieldType: 'TEXT',
+    preceedingFieldId: 'myPreviousFieldId',
+    required: true,
+    enabled: true,
+    custom: true,
+    initialValue: 'myValue'
+  }
+]
 
 describe('updateFormDraftHandler handler', () => {
   let server: any
@@ -147,6 +149,10 @@ describe('updateFormDraftHandler handler', () => {
           {
             fieldId: 'birth.covid.fieldId',
             fieldName: 'Does take covid vaccine?'
+          },
+          {
+            fieldId: 'birth.myField',
+            fieldName: 'myNewField'
           }
         ],
         event: 'birth',
@@ -158,5 +164,27 @@ describe('updateFormDraftHandler handler', () => {
       }
     })
     expect(res.statusCode).toBe(201)
+  })
+
+  it('should return error if any error occured on delete question', async () => {
+    mockingoose(FormDraft).toReturn(mockFormDraft, 'findOne')
+    mockingoose(FormDraft).toReturn(mockQuestion, 'update')
+    mockingoose(Question).toReturn(mockQuestion, 'findOne')
+    mockingoose(Question).toReturn(mockQuestion, 'update')
+    mockingoose(Question).toReturn(new Error('boom'), 'deleteMany')
+    const res = await server.server.inject({
+      method: 'PUT',
+      url: '/draftQuestions',
+      payload: {
+        event: 'birth',
+        comment: 'Modified question',
+        status: 'DRAFT',
+        deleted: ['birth.wrongId']
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(400)
   })
 })

@@ -21,8 +21,8 @@ type MesssageDescriptor {
 }
 
 type Question {
-  _id: ID
-  fieldId: String
+  _id: ID!
+  fieldId: String!
   label: MesssageDescriptor
   placeholder: MesssageDescriptor
   maxLength: Int
@@ -30,14 +30,14 @@ type Question {
   fieldType: String
   preceedingFieldId: String
   required: Boolean
-  enabled: Boolean
+  enabled: String
   custom: Boolean
   initialValue: String
 }
 
 input QuestionInput {
   id: ID
-  fieldId: String
+  fieldId: String!
   label: MesssageDescriptorInput
   placeholder: MesssageDescriptorInput
   maxLength: Int

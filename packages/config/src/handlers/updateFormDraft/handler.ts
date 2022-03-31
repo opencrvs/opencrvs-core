@@ -27,6 +27,7 @@ import FormDraft, {
   DraftStatus
 } from '@config/models/formDraft'
 import { messageDescriptorSchema } from '@config/handlers/createQuestion/handler'
+import { find } from 'lodash'
 
 export interface IQuestionsDraft extends IFormDraftModel {
   questions?: IQuestion[]
@@ -73,7 +74,7 @@ export async function updateFormDraftHandler(
     draft.updatedAt = Date.now()
 
     try {
-      await FormDraft.update({ _id: draft._id }, draft)
+      await FormDraft.updateOne({ _id: draft._id }, draft)
     } catch (err) {
       logger.error(err)
       return h
@@ -100,58 +101,59 @@ export async function updateFormDraftHandler(
   //update existing questions
   if (questionsDraft.questions) {
     const existingQuestions: IQuestionModel[] = await Question.find().exec()
+    const modifyingQuestion: IQuestionModel[] = []
 
-    questionsDraft.questions.forEach(async (question) => {
-      const existingQuestion = existingQuestions.find(
-        (extQuestion) => extQuestion.fieldId === question.fieldId
-      )
-      if (existingQuestion) {
-        try {
-          existingQuestion.fieldId = question.fieldId
-          existingQuestion.label = question.label
-          existingQuestion.placeholder = question.placeholder
-          existingQuestion.maxLength = question.maxLength
-          existingQuestion.fieldName = question.fieldName
-          existingQuestion.fieldType = question.fieldType
-          existingQuestion.preceedingFieldId = question.preceedingFieldId
-          existingQuestion.required = question.required
-          existingQuestion.enabled = question.enabled
-          existingQuestion.custom = question.custom
-          existingQuestion.initialValue = question.initialValue
-
-          await Question.update({ _id: existingQuestion._id }, existingQuestion)
-        } catch (err) {
-          logger.error(err)
-          return h
-            .response(
-              `Could not update question id: ${existingQuestion.fieldId}`
-            )
-            .code(400)
-        }
+    const newQuestions = questionsDraft.questions.filter((question) => {
+      const oldQuestion = find(existingQuestions, { fieldId: question.fieldId })
+      if (oldQuestion) {
+        oldQuestion.fieldId = question.fieldId
+        oldQuestion.label = question.label
+        oldQuestion.placeholder = question.placeholder
+        oldQuestion.maxLength = question.maxLength
+        oldQuestion.fieldName = question.fieldName
+        oldQuestion.fieldType = question.fieldType
+        oldQuestion.preceedingFieldId = question.preceedingFieldId
+        oldQuestion.required = question.required
+        oldQuestion.enabled = question.enabled
+        oldQuestion.custom = question.custom
+        oldQuestion.initialValue = question.initialValue
+        modifyingQuestion.push(oldQuestion)
+        return false
       } else {
-        //create new question
-        try {
-          await Question.create(question)
-        } catch (e) {
-          throw internal(e.message)
-        }
+        return true
       }
-      return
     })
+
+    if (newQuestions) {
+      try {
+        await Question.insertMany(newQuestions)
+      } catch (err) {
+        return h.response(`Failed to create new questions. ${err}`).code(400)
+      }
+    }
+
+    if (modifyingQuestion) {
+      try {
+        Promise.all(
+          modifyingQuestion.map(async (question) => {
+            await Question.updateOne({ _id: question._id }, question)
+          })
+        )
+      } catch (err) {
+        return h
+          .response(`Failed to update existing question. ${err}`)
+          .code(400)
+      }
+    }
   }
 
   //delete questions
   if (questionsDraft.deleted) {
-    questionsDraft.deleted.forEach(async (fieldId) => {
-      try {
-        await Question.findOneAndRemove({ fieldId: fieldId })
-      } catch (err) {
-        return h
-          .response(`Could not delete question fieldId: ${fieldId}`)
-          .code(400)
-      }
-      return
-    })
+    try {
+      await Question.deleteMany({ fieldId: { $in: questionsDraft.deleted } })
+    } catch (err) {
+      return h.response(`Failed to delete question. ${err}`).code(400)
+    }
   }
 
   return h.response(draft).code(201)

@@ -18,13 +18,13 @@ type DraftHistory {
 
 type formDraft {
   _id: ID
-  event: String
-  status: String
+  event: String!
+  status: String!
   comment: String
-  version: Int
+  version: Int!
   history: [DraftHistory]
-  updatedAt: Date
-  createdAt: Date
+  updatedAt: Date!
+  createdAt: Date!
 }
 
 input MesssageDescriptorInput {
@@ -35,7 +35,7 @@ input MesssageDescriptorInput {
 
 input QuestionInput {
   id: ID
-  fieldId: String
+  fieldId: String!
   label: MesssageDescriptorInput
   placeholder: MesssageDescriptorInput
   maxLength: Int

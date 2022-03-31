@@ -313,8 +313,8 @@ export interface GQLCertificateSVG {
 }
 
 export interface GQLQuestion {
-  _id?: string
-  fieldId?: string
+  _id: string
+  fieldId: string
   label?: GQLMesssageDescriptor
   placeholder?: GQLMesssageDescriptor
   maxLength?: number
@@ -322,20 +322,20 @@ export interface GQLQuestion {
   fieldType?: string
   preceedingFieldId?: string
   required?: boolean
-  enabled?: boolean
+  enabled?: string
   custom?: boolean
   initialValue?: string
 }
 
 export interface GQLformDraft {
   _id?: string
-  event?: string
-  status?: string
+  event: string
+  status: string
   comment?: string
-  version?: number
+  version: number
   history?: Array<GQLDraftHistory | null>
-  updatedAt?: GQLDate
-  createdAt?: GQLDate
+  updatedAt: GQLDate
+  createdAt: GQLDate
 }
 
 export interface GQLNotificationInput {
@@ -441,7 +441,7 @@ export interface GQLCertificateSVGInput {
 
 export interface GQLQuestionInput {
   id?: string
-  fieldId?: string
+  fieldId: string
   label?: GQLMesssageDescriptorInput
   placeholder?: GQLMesssageDescriptorInput
   maxLength?: number
