@@ -33,7 +33,7 @@ services:
   user-mgnt:
     environment:
       - NODE_ENV=production
-      - MONGO_URL=mongodb://mongo1,mongo2,mongo3,mongo4,mongo5/user-mgnt?replicaSet=rs0
+      - MONGO_URL=mongodb://user-mgnt:${USER_MGNT_MONGODB_PASSWORD}@mongo1,mongo2,mongo3,mongo4,mongo5/user-mgnt?replicaSet=rs0
 
   notification:
     environment:
@@ -41,17 +41,17 @@ services:
 
   webhooks:
     environment:
-      - MONGO_URL=mongodb://mongo1,mongo2,mongo3,mongo4,mongo5/webhooks?replicaSet=rs0
+      - MONGO_URL=mongodb://webhooks:${WEBHOOKS_MONGODB_PASSWORD}@mongo1,mongo2,mongo3,mongo4,mongo5/webhooks?replicaSet=rs0
       - NODE_ENV=production
 
   config:
     environment:
       - NODE_ENV=production
-      - MONGO_URL=mongodb://mongo1,mongo2,mongo3,mongo4,mongo5/application-config?replicaSet=rs0
+      - MONGO_URL=mongodb://config:${CONFIG_MONGODB_PASSWORD}@mongo1,mongo2,mongo3,mongo4,mongo5/application-config?replicaSet=rs0
 
   hearth:
     environment:
-      - mongodb__url=mongodb://mongo1,mongo2,mongo3,mongo4,mongo5/hearth-dev?replicaSet=rs0
+      - mongodb__url=mongodb://hearth:${HEARTH_MONGODB_PASSWORD}@mongo1,mongo2,mongo3,mongo4,mongo5/hearth-dev?replicaSet=rs0
     depends_on:
       - mongo1
       - mongo2
@@ -59,8 +59,8 @@ services:
 
   openhim-core:
     environment:
-      - mongo_url=mongodb://mongo1,mongo2,mongo3,mongo4,mongo5/openhim-dev?replicaSet=rs0
-      - mongo_atnaUrl=mongodb://mongo1,mongo2,mongo3,mongo4,mongo5/openhim-dev?replicaSet=rs0
+      - mongo_url=mongodb://openhim:${OPENHIM_MONGODB_PASSWORD}@mongo1,mongo2,mongo3,mongo4,mongo5/openhim-dev?replicaSet=rs0
+      - mongo_atnaUrl=mongodb://openhim:${OPENHIM_MONGODB_PASSWORD}@mongo1,mongo2,mongo3,mongo4,mongo5/openhim-dev?replicaSet=rs0
     depends_on:
       - mongo1
       - mongo2
@@ -71,9 +71,31 @@ services:
     hostname: 'mongo2'
     container_name: 'mongo2'
     restart: unless-stopped
-    command: --replSet rs0
+    command: mongod --auth --replSet rs0 --keyFile /etc/mongodb-keyfile
     volumes:
       - '/data/mongo:/data/db'
+      - '/mongodb-keyfile:/mongodb-keyfile'
+    # https://github.com/docker-library/mongo/issues/475
+    entrypoint:
+      - bash
+      - -c
+      - |
+        cp /mongodb-keyfile /etc/mongodb-keyfile
+        chmod 400 /etc/mongodb-keyfile
+        chown 999:999 /etc/mongodb-keyfile
+        exec docker-entrypoint.sh $$@
+    configs:
+      - source: mongo-init
+        target: /docker-entrypoint-initdb.d/create-mongo-users.sh
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_ADMIN_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_ADMIN_PASSWORD}
+      - USER_MGNT_MONGODB_PASSWORD=${USER_MGNT_MONGODB_PASSWORD}
+      - HEARTH_MONGODB_PASSWORD=${HEARTH_MONGODB_PASSWORD}
+      - CONFIG_MONGODB_PASSWORD=${CONFIG_MONGODB_PASSWORD}
+      - OPENHIM_MONGODB_PASSWORD=${OPENHIM_MONGODB_PASSWORD}
+      - WEBHOOKS_MONGODB_PASSWORD=${WEBHOOKS_MONGODB_PASSWORD}
+
     deploy:
       replicas: 1
       placement:
@@ -87,9 +109,30 @@ services:
     hostname: 'mongo3'
     container_name: 'mongo3'
     restart: unless-stopped
-    command: --replSet rs0
+    command: mongod --auth --replSet rs0 --keyFile /etc/mongodb-keyfile
     volumes:
       - '/data/mongo:/data/db'
+      - '/mongodb-keyfile:/mongodb-keyfile'
+    # https://github.com/docker-library/mongo/issues/475
+    entrypoint:
+      - bash
+      - -c
+      - |
+        cp /mongodb-keyfile /etc/mongodb-keyfile
+        chmod 400 /etc/mongodb-keyfile
+        chown 999:999 /etc/mongodb-keyfile
+        exec docker-entrypoint.sh $$@
+    configs:
+      - source: mongo-init
+        target: /docker-entrypoint-initdb.d/create-mongo-users.sh
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_ADMIN_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_ADMIN_PASSWORD}
+      - USER_MGNT_MONGODB_PASSWORD=${USER_MGNT_MONGODB_PASSWORD}
+      - HEARTH_MONGODB_PASSWORD=${HEARTH_MONGODB_PASSWORD}
+      - CONFIG_MONGODB_PASSWORD=${CONFIG_MONGODB_PASSWORD}
+      - OPENHIM_MONGODB_PASSWORD=${OPENHIM_MONGODB_PASSWORD}
+      - WEBHOOKS_MONGODB_PASSWORD=${WEBHOOKS_MONGODB_PASSWORD}
     deploy:
       replicas: 1
       placement:
@@ -103,9 +146,30 @@ services:
     hostname: 'mongo4'
     container_name: 'mongo4'
     restart: unless-stopped
-    command: --replSet rs0
+    command: mongod --auth --replSet rs0 --keyFile /etc/mongodb-keyfile
     volumes:
       - '/data/mongo:/data/db'
+      - '/mongodb-keyfile:/mongodb-keyfile'
+    # https://github.com/docker-library/mongo/issues/475
+    entrypoint:
+      - bash
+      - -c
+      - |
+        cp /mongodb-keyfile /etc/mongodb-keyfile
+        chmod 400 /etc/mongodb-keyfile
+        chown 999:999 /etc/mongodb-keyfile
+        exec docker-entrypoint.sh $$@
+    configs:
+      - source: mongo-init
+        target: /docker-entrypoint-initdb.d/create-mongo-users.sh
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_ADMIN_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_ADMIN_PASSWORD}
+      - USER_MGNT_MONGODB_PASSWORD=${USER_MGNT_MONGODB_PASSWORD}
+      - HEARTH_MONGODB_PASSWORD=${HEARTH_MONGODB_PASSWORD}
+      - CONFIG_MONGODB_PASSWORD=${CONFIG_MONGODB_PASSWORD}
+      - OPENHIM_MONGODB_PASSWORD=${OPENHIM_MONGODB_PASSWORD}
+      - WEBHOOKS_MONGODB_PASSWORD=${WEBHOOKS_MONGODB_PASSWORD}
     deploy:
       replicas: 1
       placement:
@@ -119,9 +183,30 @@ services:
     hostname: 'mongo5'
     container_name: 'mongo5'
     restart: unless-stopped
-    command: --replSet rs0
+    command: mongod --auth --replSet rs0 --keyFile /etc/mongodb-keyfile
     volumes:
       - '/data/mongo:/data/db'
+      - '/mongodb-keyfile:/mongodb-keyfile'
+    # https://github.com/docker-library/mongo/issues/475
+    entrypoint:
+      - bash
+      - -c
+      - |
+        cp /mongodb-keyfile /etc/mongodb-keyfile
+        chmod 400 /etc/mongodb-keyfile
+        chown 999:999 /etc/mongodb-keyfile
+        exec docker-entrypoint.sh $$@
+    configs:
+      - source: mongo-init
+        target: /docker-entrypoint-initdb.d/create-mongo-users.sh
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_ADMIN_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_ADMIN_PASSWORD}
+      - USER_MGNT_MONGODB_PASSWORD=${USER_MGNT_MONGODB_PASSWORD}
+      - HEARTH_MONGODB_PASSWORD=${HEARTH_MONGODB_PASSWORD}
+      - CONFIG_MONGODB_PASSWORD=${CONFIG_MONGODB_PASSWORD}
+      - OPENHIM_MONGODB_PASSWORD=${OPENHIM_MONGODB_PASSWORD}
+      - WEBHOOKS_MONGODB_PASSWORD=${WEBHOOKS_MONGODB_PASSWORD}
     deploy:
       replicas: 1
       placement:
@@ -130,17 +215,12 @@ services:
     networks:
       - overlay_net
 
-  mongo-rs-init:
-    image: mongo:4.4
+  mongo-on-update:
     depends_on:
       - mongo1
       - mongo2
       - mongo3
       - mongo4
       - mongo5
-    command: bash -c 'sleep 20; mongo --host mongo1 --eval "rs.initiate({_id:\"rs0\",members:[{_id:0,host:\"mongo1:27017\"},{_id:1,host:\"mongo2:27017\"},{_id:2,host:\"mongo3:27017\"},{_id:3,host:\"mongo4:27017\"},{_id:4,host:\"mongo5:27017\"}]})"'
-    deploy:
-      restart_policy:
-        condition: none
-    networks:
-      - overlay_net
+    environment:
+      - REPLICAS=5
