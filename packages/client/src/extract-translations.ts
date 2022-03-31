@@ -30,20 +30,31 @@ function existsInContentful(obj: any, value: string): boolean {
 async function extractMessages() {
   const COUNTRY_CONFIG_PATH = process.argv[2]
   const COUNTRY_CODE = process.argv[3]
-  const client = JSON.parse(
-    fs
-      .readFileSync(
-        `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/client.json`
-      )
-      .toString()
-  )
-  const contentfulIds = JSON.parse(
-    fs
-      .readFileSync(
-        `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/contentful-ids.json`
-      )
-      .toString()
-  )
+
+  let client: { data: any[] }
+  let contentfulIds: any
+  try {
+    client = JSON.parse(
+      fs
+        .readFileSync(
+          `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/client.json`
+        )
+        .toString()
+    )
+
+    contentfulIds = JSON.parse(
+      fs
+        .readFileSync(
+          `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/contentful-ids.json`
+        )
+        .toString()
+    )
+  } catch (err) {
+    console.error(
+      `Please add valid COUNTRY_CONFIG_PATH, COUNTRY_CODE as environment variables`
+    )
+    process.exit(1)
+  }
   let results: any[] = []
   const pattern = 'src/**/*.@(tsx|ts)'
   try {
