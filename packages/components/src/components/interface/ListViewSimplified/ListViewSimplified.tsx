@@ -46,9 +46,13 @@ const ValueContainer = styled.div`
   min-width: 50%;
   color: ${({ theme }) => theme.colors.grey500};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: block;
     grid-row-start: 2;
     grid-column: 2 / 4;
     align-items: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
   }
 `
 
@@ -59,8 +63,12 @@ const LabelContainer = styled.div`
     padding: 0;
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: block;
     grid-column-start: 2;
-    align-items: center;
+    align-self: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
   }
 `
 
@@ -93,7 +101,7 @@ const MobileContainer = styled.div`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: grid;
     padding: 8px 0;
-    grid-template-rows: minmax(40px, auto) auto;
+    grid-template-rows: auto auto;
     grid-template-columns: auto 1fr auto;
   }
 `
@@ -156,7 +164,7 @@ export function ListViewItemSimplified({
         {image && <MobileAvatarContainer>{image}</MobileAvatarContainer>}
         <LabelContainer>{label}</LabelContainer>
         <MobileActionsContainer>{actions}</MobileActionsContainer>
-        <ValueContainer>{value}</ValueContainer>
+        {value && <ValueContainer>{value}</ValueContainer>}
       </MobileContainer>
     </>
   )

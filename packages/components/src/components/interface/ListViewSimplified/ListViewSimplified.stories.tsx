@@ -72,8 +72,8 @@ Default.args = {
     <>
       <ListViewItemSimplified label={linkLabel(1)} value="Value 1" />
       <ListViewItemSimplified
-        label="Label 2"
-        value="Value 2"
+        label="A very long label to show what happens when text overflows"
+        value="A very long value to show what happens when text overflows"
         actions={[linkButton]}
       />
       <ListViewItemSimplified
@@ -107,8 +107,8 @@ WithAvatar.args = {
       />
       <ListViewItemSimplified
         image={<AvatarSmall />}
-        label="Name of user"
-        value="Value 2"
+        label="A very long label to show what happens when text overflows"
+        value="A very long value to show what happens when text overflows"
         actions={[linkButton]}
       />
       <ListViewItemSimplified
