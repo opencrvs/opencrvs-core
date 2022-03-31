@@ -44,13 +44,9 @@ const ValueContainer = styled.div`
   min-width: 50%;
   color: ${({ theme }) => theme.colors.grey500};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    display: block;
     grid-row-start: 2;
-    grid-column: 2 / 4;
+    grid-column: 2;
     align-items: center;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
   }
 `
 
