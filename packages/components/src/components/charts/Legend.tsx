@@ -38,7 +38,7 @@ const Column = styled.div`
 `
 
 const LegendItemBase = styled.div`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.copy};
   &::after {
     content: ':';
@@ -59,13 +59,13 @@ const EstimateLegendItem = styled(LegendItemBase)`
 `
 
 const DataLabel = styled.label`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.copy};
   margin-top: 1em;
   margin-bottom: auto;
 `
 const DataTitle = styled.h3<{ description?: string }>`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   color: ${({ theme }) => theme.colors.secondary};
   margin: ${({ description }) => (description ? `0` : `0 0 23px 0`)};
 
@@ -75,7 +75,7 @@ const DataTitle = styled.h3<{ description?: string }>`
 `
 
 const DataDescription = styled.span`
-  ${({ theme }) => theme.fonts.captionStyle};
+  ${({ theme }) => theme.fonts.reg12};
 `
 const FooterContainer = styled.div`
   display: flex;
@@ -87,11 +87,11 @@ const FooterData = styled.div`
   flex-direction: column;
   flex: 1;
   display: flex;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.copy};
 `
 const FooterDataLabel = styled.span`
-  ${({ theme }) => theme.fonts.captionStyle};
+  ${({ theme }) => theme.fonts.reg12};
 `
 const FooterIconTitle = styled.div`
   margin-top: 5px;
@@ -168,7 +168,7 @@ function LegendFooter({
 export const Legend = withTheme(
   ({ data, theme, smallestToLargest }: ILegendProps & { theme: ITheme }) => {
     const dataPointsWithoutEstimates = data.filter(
-      dataPoint => !dataPoint.estimate
+      (dataPoint) => !dataPoint.estimate
     )
 
     let sortedData = data

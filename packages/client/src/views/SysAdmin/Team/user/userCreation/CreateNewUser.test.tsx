@@ -409,8 +409,8 @@ describe('edit user tests', () => {
         locations: mockOfflineData.locations,
         facilities: mockOfflineData.facilities,
         pilotLocations: mockOfflineData.pilotLocations,
-        offices: mockOfflineData.offices,
         assets: mockOfflineData.assets,
+        offices: mockOfflineData.offices,
         config: mockOfflineData.config,
         formConfig
       })

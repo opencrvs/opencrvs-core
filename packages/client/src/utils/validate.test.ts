@@ -183,14 +183,11 @@ describe('validate', () => {
       const typeOfID = 'NATIONAL_ID'
       const response = {
         message: {
-          id: 'validations.validNationalId',
           defaultMessage:
-            'The National ID can only be numeric and must be {min} or {max} digits long',
+            'The National ID can only be numeric and must be 9 digits long',
           description:
-            'The error message that appears when an invalid value is used as nid'
-        },
-        props: {
-          validLength: '9'
+            'The error message that appears when an invalid value is used as nid',
+          id: 'validations.validNationalId'
         }
       }
       expect(validIDNumber(typeOfID)(badValue)).toEqual(response)
@@ -200,14 +197,11 @@ describe('validate', () => {
       const typeOfID = 'NATIONAL_ID'
       const response = {
         message: {
-          id: 'validations.validNationalId',
           defaultMessage:
-            'The National ID can only be numeric and must be {min} or {max} digits long',
+            'The National ID can only be numeric and must be 9 digits long',
           description:
-            'The error message that appears when an invalid value is used as nid'
-        },
-        props: {
-          validLength: '9'
+            'The error message that appears when an invalid value is used as nid',
+          id: 'validations.validNationalId'
         }
       }
       expect(validIDNumber(typeOfID)(badValue)).toEqual(response)
@@ -250,10 +244,6 @@ describe('validate', () => {
             'Must be a valid {num} digit number that starts with {start}',
           description:
             'The error message that appears on phone numbers where the first two characters must be a 01 and length must be 11'
-        },
-        props: {
-          num: '11',
-          start: '01'
         }
       }
       expect(phoneNumberFormat(badValue)).toEqual(response)
