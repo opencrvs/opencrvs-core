@@ -35,7 +35,7 @@ import {
   IPDFTemplate,
   ISVGTemplate
 } from '@client/pdfRenderer/transformer/types'
-import _ from 'lodash'
+import { find, merge } from 'lodash'
 import { registerForms } from '@client/forms/configuration/default'
 import { createUserForm } from '@client/forms/user/fieldDefinitions/createUser'
 
@@ -204,6 +204,7 @@ function getDataLoadingCommands(state: IOfflineDataState) {
     FACILITIES_CMD,
     LOCATIONS_CMD,
     PILOT_LOCATIONS_CMD,
+    CONFIG_CMD,
     getContentCmd(state),
     ASSETS_CMD
   ])
@@ -280,7 +281,21 @@ function reducer(
       }
       return loop(state, dataLoadingCmds)
     }
+    case actions.UPDATE_OFFLINE_CONFIG: {
+      merge(window.config, action.payload.config)
+      const newOfflineData = {
+        ...state.offlineData,
+        config: action.payload.config
+      }
 
+      return loop(
+        {
+          ...state,
+          offlineData: newOfflineData
+        },
+        Cmd.run(saveOfflineData, { args: [newOfflineData] })
+      )
+    }
     /*
      * Configurations
      */
@@ -288,13 +303,13 @@ function reducer(
       return loop(state, CONFIG_CMD)
     }
     case actions.APPLICATION_CONFIG_LOADED: {
-      _.merge(window.config, action.payload.config)
-      const birthCertificateTemplate = _.find(action.payload.certificates, {
+      merge(window.config, action.payload.config)
+      const birthCertificateTemplate = find(action.payload.certificates, {
         event: 'birth',
         status: 'ACTIVE'
       }) as ICertificateTemplateData
 
-      const deathCertificateTemplate = _.find(action.payload.certificates, {
+      const deathCertificateTemplate = find(action.payload.certificates, {
         event: 'death',
         status: 'ACTIVE'
       }) as ICertificateTemplateData
@@ -449,31 +464,6 @@ function reducer(
           loadingError: errorIfDataNotLoaded(state)
         },
         delay(PILOT_LOCATIONS_CMD, RETRY_TIMEOUT)
-      )
-    }
-
-    /*
-     * Assets
-     */
-
-    case actions.ASSETS_LOADED: {
-      return {
-        ...state,
-        offlineData: {
-          ...state.offlineData,
-          assets: {
-            logo: action.payload.logo
-          }
-        }
-      }
-    }
-    case actions.ASSETS_FAILED: {
-      return loop(
-        {
-          ...state,
-          loadingError: errorIfDataNotLoaded(state)
-        },
-        delay(ASSETS_CMD, RETRY_TIMEOUT)
       )
     }
 

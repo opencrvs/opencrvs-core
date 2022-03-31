@@ -171,7 +171,7 @@ const StyledColumn = styled(Column)`
 `
 
 const ZeroDocument = styled.div`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -198,9 +198,9 @@ const FormData = styled.div`
   }
 `
 const FormDataHeader = styled.div`
-  ${({ theme }) => theme.fonts.h2Style}
+  ${({ theme }) => theme.fonts.h1}
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.h3Style}
+    ${({ theme }) => theme.fonts.h2}
   }
 `
 const InputWrapper = styled.div`
@@ -1480,7 +1480,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           <StyledColumn>
             <ReviewHeader
               id="review_header"
-              logoSource={offlineCountryConfiguration.assets.logo}
+              logoSource={offlineCountryConfiguration.config.COUNTRY_LOGO.file}
               title={intl.formatMessage(messages.govtName)}
               subject={
                 informantName

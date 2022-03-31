@@ -456,27 +456,31 @@ const dynamicMessagesToDefine = {
       'Service: <strong>Death registration after {service} of D.o.D.</strong><br/>Amount Due:',
     description: 'Amount due on certificate for death label'
   },
+  birthServiceBefore: {
+    id: 'certificate.receipt.birthService.before',
+    defaultMessage: 'Birth registration before {target} days of date of birth',
+    description: 'Amount due on certificate for birth label before target days'
+  },
   birthServiceAfter: {
     id: 'certificate.receipt.birthService.after',
-    defaultMessage: 'Birth registration after 5 years of date of birth',
+    defaultMessage: 'Birth registration after {target} days of date of birth',
     description: 'Amount due on certificate for birth label'
+  },
+  deathServiceBefore: {
+    id: 'certificate.receipt.deathService.before',
+    defaultMessage: 'Death registration before {target} days of date of birth',
+    description: 'Amount due on certificate for birth label before target days'
   },
   deathServiceAfter: {
     id: 'certificate.receipt.deathService.after',
-    defaultMessage: 'Death registration after 5 years of date of death',
+    defaultMessage: 'Death registration after {target} days of date of death',
     description: 'Amount due on certificate for death label'
   },
   birthServiceBetween: {
     id: 'certificate.receipt.birthService.between',
     defaultMessage:
-      'Birth registration between 45 days and 5 years of date of birth',
+      'Birth registration between {target} days and {latetarget} days of date of birth',
     description: 'Amount due on certificate for birth label'
-  },
-  deathServiceBetween: {
-    id: 'certificate.receipt.deathService.between',
-    defaultMessage:
-      'Death registration between 45 days and 5 years of date of death',
-    description: 'Amount due on certificate for death label'
   }
 }
 

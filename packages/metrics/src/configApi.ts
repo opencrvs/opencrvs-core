@@ -11,30 +11,44 @@
  */
 import fetch from 'node-fetch'
 import { CONFIG_API_URL } from '@metrics/constants'
-export interface IPhoneNumberPattern {
-  pattern: RegExp
-  example: string
-  start: string
-  num: string
-  mask: {
-    startForm: number
-    endBefore: number
+interface IBirth {
+  REGISTRATION_TARGET: number
+  LATE_REGISTRATION_TARGET: number
+  FEE: {
+    ON_TIME: number
+    LATE: number
+    DELAYED: number
   }
 }
+interface IDeath {
+  REGISTRATION_TARGET: number
+  FEE: {
+    ON_TIME: number
+    DELAYED: number
+  }
+}
+export interface ICountryLogo {
+  fileName: string
+  file: string
+}
 
+interface ICurrency {
+  isoCode: string
+  languagesAndCountry: string[]
+}
 export interface IApplicationConfig {
+  APPLICATION_NAME: string
   BACKGROUND_SYNC_BROADCAST_CHANNEL: string
+  BIRTH: IBirth
   COUNTRY: string
-  COUNTRY_LOGO_FILE: string
+  CURRENCY: ICurrency
+  COUNTRY_LOGO: ICountryLogo
   COUNTRY_LOGO_RENDER_WIDTH: number
   COUNTRY_LOGO_RENDER_HEIGHT: number
   DESKTOP_TIME_OUT_MILLISECONDS: number
+  DEATH: IDeath
   HEALTH_FACILITY_FILTER: string
   LANGUAGES: string
-  CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: number
-  CERTIFICATE_PRINT_CHARGE_UP_LIMIT: number
-  CERTIFICATE_PRINT_LOWEST_CHARGE: number
-  CERTIFICATE_PRINT_HIGHEST_CHARGE: number
   UI_POLLING_INTERVAL: number
   FIELD_AGENT_AUDIT_LOCATIONS: string
   DECLARATION_AUDIT_LOCATIONS: string
@@ -43,9 +57,7 @@ export interface IApplicationConfig {
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
   SENTRY: string
   LOGROCKET: string
-  PHONE_NUMBER_PATTERN: IPhoneNumberPattern
-  BIRTH_REGISTRATION_TARGET: number
-  DEATH_REGISTRATION_TARGET: number
+  PHONE_NUMBER_PATTERN: string
 }
 
 export async function getApplicationConfig(): Promise<IApplicationConfig> {

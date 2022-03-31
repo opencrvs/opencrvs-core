@@ -27,8 +27,8 @@ const Wrapper = styled.div`
   margin-top: 15px;
 `
 const LabelText = styled.div`
-  color: ${({ theme }) => theme.colors.placeholder};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  color: ${({ theme }) => theme.colors.supportingCopy};
+  ${({ theme }) => theme.fonts.reg16};
 `
 const ComponentWrapper = styled.span`
   flex-direction: column;

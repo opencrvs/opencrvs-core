@@ -13,6 +13,7 @@ import * as React from 'react'
 import { ReactElement } from 'react'
 import styled, { ThemeConsumer } from 'styled-components'
 import { colors } from '../colors'
+import { FormTabs, IFormTabProps } from '../forms'
 const Container = styled.div<{ size: string }>`
   z-index: 1;
   position: relative;
@@ -24,14 +25,14 @@ const Container = styled.div<{ size: string }>`
   box-sizing: border-box;
   background-color: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 const Header = styled.div`
   display: flex;
-  align-items: center;
-  height: 72px;
-  align-items: center;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+  flex-flow: column wrap;
+
+  border-bottom: 1px solid rgb(204, 207, 208);
+  padding-top: 20px;
   padding-right: 32px;
   padding-left: 32px;
 `
@@ -49,19 +50,27 @@ export const SubHeader = styled.div`
   padding-right: 32px;
   padding-left: 32px;
   color: rgb(89, 92, 95);
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
 `
 export const Body = styled.div`
   padding-top: 24px;
   padding-right: 32px;
   padding-left: 32px;
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+  ${({ theme }) => theme.fonts.h4};
 `
 const TopActionBar = styled.div`
   display: flex;
   gap: 28px;
   margin-left: auto;
+`
+const TopTabBar = styled.div`
+  display: flex;
+  gap: 28px;
+  margin-right: auto;
+`
+const TopBar = styled.div`
+  display: flex;
 `
 const BottomActionBar = styled.div`
   display: flex;
@@ -77,12 +86,10 @@ const TitleContainer = styled.div<{ titleColor?: keyof typeof colors }>`
 `
 
 const Title = styled.div`
-  ${({ theme }) => theme.fonts.h4Style}
+  ${({ theme }) => theme.fonts.h2}
 `
 const Icon = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
-  display: flex;
-  align-items: center;
 `
 
 export enum ContentSize {
@@ -93,12 +100,13 @@ export enum ContentSize {
 interface IProps {
   icon?: () => React.ReactNode
   title?: string
+  titleColor?: keyof typeof colors
   topActionButtons?: ReactElement[]
+  tabs?: IFormTabProps
   subtitle?: string
   children?: React.ReactNode
   bottomActionButtons?: ReactElement[]
   size?: ContentSize
-  titleColor?: keyof typeof colors
 }
 
 export class Content extends React.Component<IProps> {
@@ -108,6 +116,7 @@ export class Content extends React.Component<IProps> {
       title,
       titleColor,
       topActionButtons,
+      tabs,
       subtitle,
       children,
       bottomActionButtons,
@@ -117,11 +126,24 @@ export class Content extends React.Component<IProps> {
     return (
       <Container size={size as string}>
         <Header>
-          <TitleContainer titleColor={titleColor}>
-            {icon && <Icon id={`content-icon`}>{icon()}</Icon>}
-            {title && <Title id={`content-name`}>{title}</Title>}
-          </TitleContainer>
-          {topActionButtons && <TopActionBar>{topActionButtons}</TopActionBar>}
+          <TopBar>
+            <TitleContainer titleColor={titleColor}>
+              {icon && <Icon id={`content-icon`}>{icon()}</Icon>}
+              {title && <Title id={`content-name`}>{title}</Title>}
+            </TitleContainer>
+            {topActionButtons && (
+              <TopActionBar>{topActionButtons}</TopActionBar>
+            )}
+          </TopBar>
+          {tabs && (
+            <TopTabBar>
+              <FormTabs
+                sections={tabs.sections}
+                activeTabId={tabs.activeTabId}
+                onTabClick={(id: string) => tabs.onTabClick(id)}
+              />
+            </TopTabBar>
+          )}
         </Header>
         {subtitle && <SubHeader>{subtitle}</SubHeader>}
         {children && <Body>{children}</Body>}

@@ -33,7 +33,7 @@ const StyledListItem = styled.li`
 
 const StyledText = styled.div`
   margin-left: 8px;
-  ${({ theme }) => `${theme.fonts.h5Style};
+  ${({ theme }) => `${theme.fonts.h3};
     font-family: ${theme.fonts.regularFont};
     color: ${theme.colors.copy}
   `}
