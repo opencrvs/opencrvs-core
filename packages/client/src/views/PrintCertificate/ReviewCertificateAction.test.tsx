@@ -22,7 +22,7 @@ import {
 } from '@client/tests/util'
 import { ReviewCertificateAction } from './ReviewCertificateAction'
 import { ReactWrapper } from 'enzyme'
-import { Event } from '@client/forms'
+import { Event, IFormSectionData } from '@client/forms'
 import { cloneDeep } from 'lodash'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { push } from 'connected-react-router'
@@ -196,9 +196,18 @@ describe('when user wants to review birth certificate', () => {
     await store.dispatch(
       storeDeclaration({
         id: 'asdhdqe2472487jsdfsdf',
-        data: mockBirthDeclarationData,
+        data: {
+          ...mockBirthDeclarationData,
+          history: [
+            {
+              date: '2022-03-21T08:16:24.467+00:00',
+              action: 'REGISTERED',
+              reinstated: false
+            }
+          ] as unknown as IFormSectionData
+        },
         event: Event.BIRTH
-      } as IDeclaration)
+      })
     )
 
     component = await createTestComponent(
