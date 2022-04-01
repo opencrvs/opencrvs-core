@@ -41,9 +41,10 @@ const LabelValueContainer = styled.div`
 
 const ValueContainer = styled.div`
   display: flex;
-  min-width: 50%;
+  flex: 0 1 50%;
   color: ${({ theme }) => theme.colors.grey500};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    flex: 1;
     grid-row-start: 2;
     grid-column: 2;
     align-items: center;
@@ -52,7 +53,7 @@ const ValueContainer = styled.div`
 
 const LabelContainer = styled.div`
   display: flex;
-  min-width: 50%;
+  flex: 1 0 50%;
   button > div {
     padding: 0;
   }
