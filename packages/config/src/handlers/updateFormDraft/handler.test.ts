@@ -115,8 +115,8 @@ describe('updateFormDraftHandler handler', () => {
 
   it('should delete question using mongoose', async () => {
     mockingoose(FormDraft).toReturn(mockFormDraft, 'findOne')
-    mockingoose(FormDraft).toReturn(mockQuestion, 'update')
     mockingoose(Question).toReturn(mockQuestion, 'findOne')
+    mockingoose(FormDraft).toReturn(mockQuestion, 'update')
     mockingoose(Question).toReturn(mockQuestion, 'update')
     mockingoose(Question).toReturn(mockQuestion, 'findOneAndRemove')
 
@@ -138,18 +138,14 @@ describe('updateFormDraftHandler handler', () => {
 
   it('should update question using mongoose', async () => {
     mockingoose(FormDraft).toReturn(mockFormDraft, 'findOne')
-    mockingoose(FormDraft).toReturn(mockQuestion, 'update')
     mockingoose(Question).toReturn(mockQuestion, 'find')
     mockingoose(Question).toReturn(mockQuestion, 'update')
+    mockingoose(FormDraft).toReturn(mockQuestion, 'update')
     const res = await server.server.inject({
       method: 'PUT',
       url: '/draftQuestions',
       payload: {
         questions: [
-          {
-            fieldId: 'birth.covid.fieldId',
-            fieldName: 'Does take covid vaccine?'
-          },
           {
             fieldId: 'birth.myField',
             fieldName: 'myNewField'
