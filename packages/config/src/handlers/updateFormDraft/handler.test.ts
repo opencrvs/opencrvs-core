@@ -13,7 +13,7 @@ import { createServer } from '@config/server'
 import FormDraft from '@config/models/formDraft'
 import Question from '@config/models/question'
 import * as fetchMock from 'jest-fetch-mock'
-import mockingoose from 'mockingoose'
+import * as mockingoose from 'mockingoose'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 
@@ -91,7 +91,6 @@ describe('updateFormDraftHandler handler', () => {
   let server: any
 
   beforeEach(async () => {
-    // mockingoose.resetAll()
     server = await createServer()
     fetch.resetMocks()
     fetch.mockReject(new Error())
@@ -146,6 +145,10 @@ describe('updateFormDraftHandler handler', () => {
       url: '/draftQuestions',
       payload: {
         questions: [
+          {
+            fieldId: 'birth.covid.fieldId',
+            fieldName: 'Does take covid vaccine?'
+          },
           {
             fieldId: 'birth.myField',
             fieldName: 'myNewField'

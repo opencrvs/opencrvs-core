@@ -11,7 +11,7 @@
  */
 import { createServer } from '@config/server'
 import FormDraft from '@config/models/formDraft'
-import mockingoose from 'mockingoose'
+import * as mockingoose from 'mockingoose'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 
@@ -61,7 +61,6 @@ describe('getFormDraft', () => {
   let server: any
 
   beforeEach(async () => {
-    mockingoose.resetAll()
     server = await createServer()
   })
 
