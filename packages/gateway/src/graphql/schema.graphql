@@ -124,6 +124,7 @@ type Query {
   getCertificateSVG(status: String, event: String): CertificateSVG
   getActiveCertificatesSVG: [CertificateSVG]
   getQuestions: [Question]
+  getFormDraft: [formDraft]
 }
 
 type Mutation {
@@ -194,6 +195,7 @@ type Mutation {
     certificateSVG: CertificateSVGInput!
   ): CertificateSVG
   createOrUpdateQuestion(question: QuestionInput!): Question
+  createOrUpdateFormDraft(formDraft: formDraftInput!): formDraft
 }
 
 type Dummy {
@@ -419,8 +421,8 @@ type CertificateSVG {
 }
 
 type Question {
-  _id: ID
-  fieldId: String
+  _id: ID!
+  fieldId: String!
   label: MesssageDescriptor
   placeholder: MesssageDescriptor
   maxLength: Int
@@ -428,9 +430,20 @@ type Question {
   fieldType: String
   preceedingFieldId: String
   required: Boolean
-  enabled: Boolean
+  enabled: String
   custom: Boolean
   initialValue: String
+}
+
+type formDraft {
+  _id: ID
+  event: String!
+  status: String!
+  comment: String
+  version: Int!
+  history: [DraftHistory]
+  updatedAt: Date!
+  createdAt: Date!
 }
 
 input NotificationInput {
@@ -536,7 +549,7 @@ input CertificateSVGInput {
 
 input QuestionInput {
   id: ID
-  fieldId: String
+  fieldId: String!
   label: MesssageDescriptorInput
   placeholder: MesssageDescriptorInput
   maxLength: Int
@@ -547,6 +560,14 @@ input QuestionInput {
   enabled: Boolean
   custom: Boolean
   initialValue: String
+}
+
+input formDraftInput {
+  questions: [QuestionInput]
+  deleted: [String]
+  event: String!
+  status: String!
+  comment: String
 }
 
 scalar Map
@@ -863,6 +884,14 @@ type MesssageDescriptor {
   id: String
   description: String
   defaultMessage: String
+}
+
+type DraftHistory {
+  _id: ID
+  version: Int
+  status: String
+  comment: String
+  lastUpdateAt: Date
 }
 
 input PersonInput {

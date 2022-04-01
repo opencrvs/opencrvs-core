@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { createServer } from '@config/server'
-import Question, { IQuestion } from '@config/models/question'
+import FormDraft from '@config/models/formDraft'
 import * as mockingoose from 'mockingoose'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
@@ -24,44 +24,52 @@ const token = jwt.sign(
     audience: 'opencrvs:config-user'
   }
 )
-const mockQuestion = {
-  _id: '123',
-  fieldId: 'birth.myField',
-  label: {
-    id: '',
-    description: '',
-    defaultMessage: ''
+const mockFormDraft = [
+  {
+    status: 'DRAFT',
+    _id: '623f30a18aef60124a72df14',
+    event: 'death',
+    comment: 'Modified previous death question',
+    version: 2,
+    createdAt: 1648308385612,
+    updatedAt: 1648308396432,
+    history: [
+      {
+        status: 'DRAFT',
+        _id: '623f30ac8aef60124a72df1c',
+        version: 1,
+        comment: 'Added new death question',
+        lastUpdateAt: 1648308385612
+      }
+    ],
+    __v: 0
   },
-  placeholder: {
-    id: '',
-    description: '',
-    defaultMessage: ''
-  },
-  maxLength: 32,
-  fieldName: 'myField',
-  fieldType: 'TEXT',
-  preceedingFieldId: 'myPreviousFieldId',
-  required: true,
-  custom: true,
-  initialValue: 'myValue'
-} as unknown as IQuestion & { _id: string }
+  {
+    status: 'DRAFT',
+    _id: '623f30c18aef60124a72df28',
+    event: 'birth',
+    comment: 'Added new birth question',
+    version: 1,
+    createdAt: 1648308417889,
+    updatedAt: 1648308457121,
+    history: [],
+    __v: 0
+  }
+]
 
-let mockQuestions = [mockQuestion]
-
-describe('getQuestions', () => {
+describe('getFormDraft', () => {
   let server: any
 
   beforeEach(async () => {
-    mockingoose.resetAll()
     server = await createServer()
   })
 
   it('get question using mongoose', async () => {
-    mockingoose(Question).toReturn(mockQuestions, 'find')
+    mockingoose(FormDraft).toReturn(mockFormDraft, 'find')
 
     const res = await server.server.inject({
       method: 'GET',
-      url: '/questions',
+      url: '/formDraft',
       headers: {
         Authorization: `Bearer ${token}`
       }

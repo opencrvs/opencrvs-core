@@ -11,7 +11,7 @@
  */
 import { createServer } from '@config/server'
 import Question, { IQuestion } from '@config/models/question'
-import mockingoose from 'mockingoose'
+import * as mockingoose from 'mockingoose'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 
@@ -52,7 +52,6 @@ describe('updateQuestion handler', () => {
   let server: any
 
   beforeEach(async () => {
-    mockingoose.resetAll()
     server = await createServer()
   })
 
@@ -82,7 +81,7 @@ describe('updateQuestion handler', () => {
         fieldType: 'TEXT',
         preceedingFieldId: 'myPreviousFieldId',
         required: true,
-        enabled: true,
+        enabled: 'DISABLED',
         custom: true,
         initialValue: 'myValue'
       },

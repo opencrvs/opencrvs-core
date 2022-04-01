@@ -135,6 +135,8 @@ type Query {
   ): [Role]
   getCertificateSVG(status: String, event: String): CertificateSVG
   getActiveCertificatesSVG: [CertificateSVG]
+  getQuestions: [Question]
+  getFormDraft: [formDraft]
 }
 
 type Mutation {
@@ -202,6 +204,8 @@ type Mutation {
   createOrUpdateCertificateSVG(
     certificateSVG: CertificateSVGInput!
   ): CertificateSVG
+  createOrUpdateQuestion(question: QuestionInput!): Question
+  createOrUpdateFormDraft(formDraft: formDraftInput!): formDraft
 }
 
 type Dummy {
@@ -217,6 +221,12 @@ type Notification {
   location: Location
   createdAt: Date
   updatedAt: Date
+}
+
+input MesssageDescriptorInput {
+  id: String
+  description: String
+  defaultMessage: String
 }
 
 scalar Date
@@ -422,6 +432,46 @@ type CertificateSVG {
   status: String
 }
 
+type Question {
+  _id: ID!
+  fieldId: String!
+  label: MesssageDescriptor
+  placeholder: MesssageDescriptor
+  maxLength: Int
+  fieldName: String
+  fieldType: String
+  preceedingFieldId: String
+  required: Boolean
+  enabled: String
+  custom: Boolean
+  initialValue: String
+}
+
+type formDraft {
+  _id: ID
+  event: String!
+  status: String!
+  comment: String
+  version: Int!
+  history: [DraftHistory]
+  updatedAt: Date!
+  createdAt: Date!
+}
+
+type DraftHistory {
+  _id: ID
+  version: Int
+  status: String
+  comment: String
+  lastUpdateAt: Date
+}
+
+type MesssageDescriptor {
+  id: String
+  description: String
+  defaultMessage: String
+}
+
 input NotificationInput {
   child: PersonInput
   mother: PersonInput
@@ -515,6 +565,29 @@ input CertificateSVGInput {
   user: String!
   event: String!
   status: String!
+}
+
+input QuestionInput {
+  id: ID
+  fieldId: String!
+  label: MesssageDescriptorInput
+  placeholder: MesssageDescriptorInput
+  maxLength: Int
+  fieldName: String
+  fieldType: String
+  preceedingFieldId: String
+  required: Boolean
+  enabled: Boolean
+  custom: Boolean
+  initialValue: String
+}
+
+input formDraftInput {
+  questions: [QuestionInput]
+  deleted: [String]
+  event: String!
+  status: String!
+  comment: String
 }
 
 scalar Map
