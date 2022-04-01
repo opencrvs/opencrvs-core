@@ -27,7 +27,7 @@ import FormDraft, {
   DraftStatus
 } from '@config/models/formDraft'
 import { messageDescriptorSchema } from '@config/handlers/createQuestion/handler'
-import { find } from 'lodash'
+import { find, partition } from 'lodash'
 
 export interface IQuestionsDraft extends IFormDraftModel {
   questions?: IQuestion[]
@@ -98,51 +98,35 @@ export async function updateFormDraftHandler(
     }
   }
 
-  //update existing questions
+  //update or create questions
   if (questionsDraft.questions) {
     const existingQuestions: IQuestionModel[] = await Question.find().exec()
-    const modifyingQuestion: IQuestionModel[] = []
 
-    const newQuestions = questionsDraft.questions.filter((question) => {
-      const oldQuestion = find(existingQuestions, { fieldId: question.fieldId })
-      if (oldQuestion) {
-        oldQuestion.fieldId = question.fieldId
-        oldQuestion.label = question.label
-        oldQuestion.placeholder = question.placeholder
-        oldQuestion.maxLength = question.maxLength
-        oldQuestion.fieldName = question.fieldName
-        oldQuestion.fieldType = question.fieldType
-        oldQuestion.preceedingFieldId = question.preceedingFieldId
-        oldQuestion.required = question.required
-        oldQuestion.enabled = question.enabled
-        oldQuestion.custom = question.custom
-        oldQuestion.initialValue = question.initialValue
-        modifyingQuestion.push(oldQuestion)
-        return false
-      } else {
-        return true
-      }
+    const allQuestion = partition(questionsDraft.questions, (question) => {
+      return find(existingQuestions, { fieldId: question.fieldId })
     })
 
-    if (newQuestions) {
-      try {
-        await Question.insertMany(newQuestions)
-      } catch (err) {
-        return h.response(`Failed to create new questions. ${err}`).code(400)
-      }
-    }
-
-    if (modifyingQuestion) {
+    //allQuestion[0] contains list of modifying questions
+    if (allQuestion[0]) {
       try {
         Promise.all(
-          modifyingQuestion.map(async (question) => {
-            await Question.updateOne({ _id: question._id }, question)
+          allQuestion[0].map(async (question) => {
+            await Question.updateOne({ fieldId: question.fieldId }, question)
           })
         )
       } catch (err) {
         return h
           .response(`Failed to update existing question. ${err}`)
           .code(400)
+      }
+    }
+
+    //allQuestion[1] contains list of new questions
+    if (allQuestion[1]) {
+      try {
+        await Question.insertMany(allQuestion[1])
+      } catch (err) {
+        return h.response(`Failed to create new questions. ${err}`).code(400)
       }
     }
   }
