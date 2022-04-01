@@ -125,7 +125,14 @@ export const getFormattedFee = (value: string) => {
         ? Number(Number(value).toFixed(1)).toLocaleString().concat('.')
         : EMPTY_STRING
     } else {
-      return value ? Number(value).toLocaleString() : EMPTY_STRING
+      const intValue = value.split('.')
+      return !value
+        ? EMPTY_STRING
+        : intValue[1]
+        ? Number(intValue[0])
+            .toLocaleString()
+            .concat('.' + intValue[1])
+        : Number(intValue[0]).toLocaleString()
     }
   }
   return EMPTY_STRING
