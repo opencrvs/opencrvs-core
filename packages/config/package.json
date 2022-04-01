@@ -16,23 +16,24 @@
     "extract:translations": "bash extract-translations.sh"
   },
   "dependencies": {
-    "@opencrvs/commons": "^1.0.0-alpha.3.1",
     "@hapi/boom": "^9.1.1",
     "@hapi/hapi": "^20.2.1",
+    "@opencrvs/commons": "^1.0.0-alpha.3.1",
     "@types/hapi-pino": "^8.0.5",
     "@types/pino": "^6.3.12",
     "hapi-auth-jwt2": "10.2.0",
     "hapi-pino": "^8.5.0",
     "hapi-sentry": "^3.2.0",
-    "joi": "^17.5.0",
     "is-svg": "^4.3.2",
+    "joi": "^17.5.0",
     "mongoose": "^5.11.0",
-    "tsconfig-paths": "^3.13.0",
-    "pino": "^6.0.0"
+    "pino": "^6.0.0",
+    "tsconfig-paths": "^3.13.0"
   },
   "devDependencies": {
     "@types/boom": "^7.3.1",
     "@types/mongoose": "^5.0.16",
+    "mockingoose": "^2.15.2",
     "nodemon": "^2.0.15",
     "prettier": "^2.5.0",
     "ts-node": "^6.1.1",
