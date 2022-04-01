@@ -28,7 +28,7 @@ export default async function createQuestion(
   return h.response().code(201)
 }
 
-const messageDescriptorSchema = Joi.object({
+export const messageDescriptorSchema = Joi.object({
   id: Joi.string().required(),
   defaultMessage: Joi.string(),
   description: Joi.string()
