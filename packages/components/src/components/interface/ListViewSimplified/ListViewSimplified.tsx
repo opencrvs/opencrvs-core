@@ -35,7 +35,6 @@ const LabelValueContainer = styled.div`
   padding: 8px 0;
   grid-column-start: 2;
   gap: 20px;
-  margin-right: 8px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
   }
