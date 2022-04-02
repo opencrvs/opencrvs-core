@@ -11,7 +11,6 @@
  */
 import React from 'react'
 import styled from 'styled-components'
-import { IButtonSize, dimensionsMap } from '../../buttons'
 
 const Grid = styled.div<{ bottomBorder: boolean }>`
   display: grid;
@@ -25,6 +24,9 @@ const Grid = styled.div<{ bottomBorder: boolean }>`
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     grid-template-columns: auto;
+    > div:not(:nth-last-child(-n + 1)) {
+      border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+    }
   }
 `
 
@@ -33,7 +35,7 @@ const LabelValueContainer = styled.div`
   padding: 8px 0;
   grid-column-start: 2;
   gap: 8px;
-  padding-right: 8px;
+  margin-right: 8px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
   }
@@ -43,6 +45,9 @@ const ValueContainer = styled.div`
   display: flex;
   flex: 0 1 50%;
   color: ${({ theme }) => theme.colors.grey500};
+  > span {
+    padding-top: 8px;
+  }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     flex: 1;
     grid-row-start: 2;
@@ -56,6 +61,9 @@ const LabelContainer = styled.div`
   flex: 1 0 50%;
   button > div {
     padding: 0;
+  }
+  > span {
+    padding-top: 8px;
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: block;
@@ -76,7 +84,7 @@ const ActionsContainer = styled.div`
   }
 `
 
-const AvatarContainer = styled.div`
+const ImageContainer = styled.div`
   display: flex;
   align-items: center;
   padding-right: 8px;
@@ -85,7 +93,7 @@ const AvatarContainer = styled.div`
   }
 `
 
-const MobileAvatarContainer = styled.div`
+const MobileImageContainer = styled.div`
   display: flex;
   align-items: center;
   padding-right: 8px;
@@ -111,52 +119,31 @@ interface IListViewItemSimplifiedProps {
   image?: React.ReactNode
   label: React.ReactNode
   value?: React.ReactNode
-  contentSize?: IButtonSize
   actions?: React.ReactNode[]
 }
-
-/* The content needs to be given a fixed height to keep it
- * aligned with the actions column
- */
-const FixedHeightContent = styled.div<{ size: IButtonSize }>`
-  display: flex;
-  align-items: center;
-  height: ${({ size }) => dimensionsMap[size]};
-`
 
 export function ListViewItemSimplified({
   image,
   label,
   value,
-  contentSize = 'medium',
   actions
 }: IListViewItemSimplifiedProps) {
   return (
     <>
-      {image && <AvatarContainer>{image}</AvatarContainer>}
+      {image && <ImageContainer>{image}</ImageContainer>}
       <LabelValueContainer>
         <LabelContainer>
-          {typeof label === 'string' ? (
-            <FixedHeightContent size={contentSize}>{label}</FixedHeightContent>
-          ) : (
-            label
-          )}
+          {typeof label === 'string' ? <span>{label}</span> : label}
         </LabelContainer>
         {value && (
           <ValueContainer>
-            {typeof value === 'string' ? (
-              <FixedHeightContent size={contentSize}>
-                {value}
-              </FixedHeightContent>
-            ) : (
-              value
-            )}
+            {typeof value === 'string' ? <span>{value}</span> : value}
           </ValueContainer>
         )}
       </LabelValueContainer>
       <ActionsContainer>{actions}</ActionsContainer>
       <MobileContainer>
-        {image && <MobileAvatarContainer>{image}</MobileAvatarContainer>}
+        {image && <MobileImageContainer>{image}</MobileImageContainer>}
         <LabelContainer>{label}</LabelContainer>
         <MobileActionsContainer>{actions}</MobileActionsContainer>
         {value && <ValueContainer>{value}</ValueContainer>}
