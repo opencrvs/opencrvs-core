@@ -34,7 +34,7 @@ const LabelValueContainer = styled.div`
   display: flex;
   padding: 8px 0;
   grid-column-start: 2;
-  gap: 8px;
+  gap: 20px;
   margin-right: 8px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
@@ -44,9 +44,10 @@ const LabelValueContainer = styled.div`
 const ValueContainer = styled.div`
   display: flex;
   flex: 0 1 50%;
-  color: ${({ theme }) => theme.colors.grey500};
+  color: ${({ theme }) => theme.colors.grey600};
   > span {
     padding-top: 8px;
+    padding-bottom: 8px;
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     flex: 1;
@@ -64,6 +65,7 @@ const LabelContainer = styled.div`
   }
   > span {
     padding-top: 8px;
+    padding-bottom: 8px;
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: block;
@@ -78,6 +80,7 @@ const LabelContainer = styled.div`
 const ActionsContainer = styled.div`
   display: flex;
   padding: 8px 0;
+  gap: 8px;
   justify-content: right;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
@@ -87,7 +90,7 @@ const ActionsContainer = styled.div`
 const ImageContainer = styled.div`
   display: flex;
   align-items: center;
-  padding-right: 8px;
+  padding-right: 16px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
   }
@@ -96,14 +99,15 @@ const ImageContainer = styled.div`
 const MobileImageContainer = styled.div`
   display: flex;
   align-items: center;
-  padding-right: 8px;
+  padding-right: 16px;
 `
 
 const MobileContainer = styled.div`
   display: none;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: grid;
-    padding: 8px 0;
+    padding-top: 8px;
+    padding-bottom: 16px;
     grid-template-rows: auto auto;
     grid-template-columns: auto 1fr auto;
   }
@@ -111,6 +115,7 @@ const MobileContainer = styled.div`
 
 const MobileActionsContainer = styled.div`
   display: flex;
+  gap: 4px;
   align-items: center;
   justify-content: right;
 `
