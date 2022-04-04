@@ -95,7 +95,7 @@ describe('when user has starts a new declaration', () => {
       beforeEach(async () => {
         const data = {
           registration: {
-            presentAtBirthRegistration: 'MOTHER'
+            informantType: 'MOTHER'
           }
         }
         draft = createDeclaration(Event.BIRTH, data)
@@ -152,7 +152,7 @@ describe('when user has starts a new declaration', () => {
       beforeEach(async () => {
         const data = {
           registration: {
-            presentAtBirthRegistration: 'MOTHER'
+            informantType: 'MOTHER'
           }
         }
         draft = createDeclaration(Event.BIRTH, data)

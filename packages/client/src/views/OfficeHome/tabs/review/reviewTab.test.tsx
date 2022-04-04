@@ -462,8 +462,7 @@ describe('OfficeHome sent for review tab related tests', () => {
                   birthType: '16643bcf-457a-4a5b-a7d2-328d57182476',
                   weightAtBirth: '13a75fdf-54d3-476e-ab0e-68fca7286686',
                   attendantAtBirth: 'add45cfa-8390-4792-a857-a1df587e45a6',
-                  presentAtBirthRegistration:
-                    'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
+                  informantType: 'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
                 }
               },
               child: null,
@@ -556,7 +555,7 @@ describe('OfficeHome sent for review tab related tests', () => {
                 type: 'PRIVATE_HOME',
                 partOf: 'Location/upazila10'
               },
-              presentAtBirthRegistration: 'MOTHER_ONLY'
+              informantType: 'MOTHER_ONLY'
             }
           }
         })

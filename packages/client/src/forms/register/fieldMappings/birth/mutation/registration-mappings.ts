@@ -88,9 +88,8 @@ export function setBirthRegistrationSectionTransformer(
       draftData[sectionId].registrationNumber
   }
 
-  if (draftData[sectionId].presentAtBirthRegistration) {
-    transformedData.presentAtBirthRegistration =
-      draftData[sectionId].presentAtBirthRegistration
+  if (draftData[sectionId].informantType) {
+    transformedData.informantType = draftData[sectionId].informantType
   }
 
   if (!transformedData[sectionId].status) {

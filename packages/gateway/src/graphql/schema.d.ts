@@ -110,8 +110,8 @@ export interface GQLBirthRegistration extends GQLEventRegistration {
   attendantAtBirth?: GQLAttendantType
   otherAttendantAtBirth?: string
   birthRegistrationType?: GQLBirthRegType
-  presentAtBirthRegistration?: string
-  otherPresentAtBirthRegistration?: string
+  informantType?: string
+  otherinformantType?: string
   childrenBornAliveToMother?: number
   foetalDeathsToMother?: number
   lastPreviousLiveBirth?: GQLDate
@@ -356,8 +356,8 @@ export interface GQLBirthRegistrationInput {
   attendantAtBirth?: GQLAttendantType
   otherAttendantAtBirth?: string
   birthRegistrationType?: GQLBirthRegType
-  presentAtBirthRegistration?: string
-  otherPresentAtBirthRegistration?: string
+  informantType?: string
+  otherinformantType?: string
   childrenBornAliveToMother?: number
   foetalDeathsToMother?: number
   lastPreviousLiveBirth?: GQLDate
@@ -2560,8 +2560,8 @@ export interface GQLBirthRegistrationTypeResolver<TParent = any> {
   attendantAtBirth?: BirthRegistrationToAttendantAtBirthResolver<TParent>
   otherAttendantAtBirth?: BirthRegistrationToOtherAttendantAtBirthResolver<TParent>
   birthRegistrationType?: BirthRegistrationToBirthRegistrationTypeResolver<TParent>
-  presentAtBirthRegistration?: BirthRegistrationToPresentAtBirthRegistrationResolver<TParent>
-  otherPresentAtBirthRegistration?: BirthRegistrationToOtherPresentAtBirthRegistrationResolver<TParent>
+  informantType?: BirthRegistrationToInformantTypeResolver<TParent>
+  otherinformantType?: BirthRegistrationToOtherinformantTypeResolver<TParent>
   childrenBornAliveToMother?: BirthRegistrationToChildrenBornAliveToMotherResolver<TParent>
   foetalDeathsToMother?: BirthRegistrationToFoetalDeathsToMotherResolver<TParent>
   lastPreviousLiveBirth?: BirthRegistrationToLastPreviousLiveBirthResolver<TParent>
@@ -2666,14 +2666,14 @@ export interface BirthRegistrationToBirthRegistrationTypeResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface BirthRegistrationToPresentAtBirthRegistrationResolver<
+export interface BirthRegistrationToInformantTypeResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface BirthRegistrationToOtherPresentAtBirthRegistrationResolver<
+export interface BirthRegistrationToOtherinformantTypeResolver<
   TParent = any,
   TResult = any
 > {

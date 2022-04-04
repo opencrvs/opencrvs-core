@@ -51,8 +51,7 @@ describe('Certificate collector test for a birth registration without father det
               composition: '6a5fd35d-01ec-4c37-976e-e055107a74a1',
               encounter: 'cd56d5da-0c9d-471f-8e4a-e1db73856795',
               observation: {
-                presentAtBirthRegistration:
-                  '1590856c-ece2-456a-9141-24ca5961da63'
+                informantType: '1590856c-ece2-456a-9141-24ca5961da63'
               }
             },
             id: '6a5fd35d-01ec-4c37-976e-e055107a74a1',
@@ -188,7 +187,7 @@ describe('Certificate collector test for a birth registration without father det
             weightAtBirth: null,
             birthType: null,
             eventLocation: null,
-            presentAtBirthRegistration: 'MOTHER',
+            informantType: 'MOTHER',
             __typename: 'BirthRegistration'
           }
         }
@@ -503,8 +502,7 @@ describe('Test for a free birth registration', () => {
               composition: '6a5fd35d-01ec-4c37-976e-e055107a74a1',
               encounter: 'cd56d5da-0c9d-471f-8e4a-e1db73856795',
               observation: {
-                presentAtBirthRegistration:
-                  '1590856c-ece2-456a-9141-24ca5961da63'
+                informantType: '1590856c-ece2-456a-9141-24ca5961da63'
               }
             },
             id: '6a5fd35d-01ec-4c37-976e-e055107a74a1',
@@ -642,7 +640,7 @@ describe('Test for a free birth registration', () => {
             weightAtBirth: null,
             birthType: null,
             eventLocation: null,
-            presentAtBirthRegistration: 'MOTHER',
+            informantType: 'MOTHER',
             __typename: 'BirthRegistration'
           }
         }
@@ -718,8 +716,7 @@ describe('Certificate collector test for a birth registration with father detail
               composition: '9f38ff8a-1265-4170-a462-1969c22921c6',
               encounter: '3d75a8a0-de9d-43ea-8a5c-ae5d2affbe94',
               observation: {
-                presentAtBirthRegistration:
-                  '9fe39fb5-5371-4451-b7cf-891ffe2aee5e'
+                informantType: '9fe39fb5-5371-4451-b7cf-891ffe2aee5e'
               }
             },
             id: '9f38ff8a-1265-4170-a462-1969c22921c6',
@@ -913,7 +910,7 @@ describe('Certificate collector test for a birth registration with father detail
             weightAtBirth: null,
             birthType: null,
             eventLocation: null,
-            presentAtBirthRegistration: 'MOTHER',
+            informantType: 'MOTHER',
             __typename: 'BirthRegistration'
           }
         }
@@ -1232,8 +1229,7 @@ describe('Certificate collector test for a birth registration without father and
               composition: '6a5fd35d-01ec-4c37-976e-e055107at5674',
               encounter: 'cd56d5da-0c9d-471f-8e4a-e1db73856795',
               observation: {
-                presentAtBirthRegistration:
-                  '1590856c-ece2-456a-9141-24ca5961da63'
+                informantType: '1590856c-ece2-456a-9141-24ca5961da63'
               }
             },
             id: '6a5fd35d-01ec-4c37-976e-e055107at5674',
@@ -1464,7 +1460,7 @@ describe('Certificate collector test for a birth registration without father and
             weightAtBirth: null,
             birthType: null,
             eventLocation: null,
-            presentAtBirthRegistration: 'OTHER',
+            informantType: 'OTHER',
             __typename: 'BirthRegistration'
           }
         }

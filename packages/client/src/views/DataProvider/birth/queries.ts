@@ -182,7 +182,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         fieldId
         value
       }
-      presentAtBirthRegistration
+      informantType
       history {
         date
         action
@@ -429,7 +429,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
           country
         }
       }
-      presentAtBirthRegistration
+      informantType
       history {
         date
         action

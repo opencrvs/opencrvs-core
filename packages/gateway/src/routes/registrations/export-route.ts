@@ -224,7 +224,7 @@ export default {
                 country
               }
             }
-            presentAtBirthRegistration
+            informantType
           }
 
           searchDeathRegistrations(fromDate: $fromDate, toDate: $toDate) {

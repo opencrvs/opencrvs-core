@@ -296,8 +296,8 @@ input BirthRegistrationInput {
   attendantAtBirth: AttendantType # Not in BDRIS2
   otherAttendantAtBirth: String
   birthRegistrationType: BirthRegType
-  presentAtBirthRegistration: String # Informant in BDRIS2
-  otherPresentAtBirthRegistration: String
+  informantType: String # Informant in BDRIS2
+  otherinformantType: String
   childrenBornAliveToMother: Int # Not in BDRIS2
   foetalDeathsToMother: Int # Not in BDRIS2
   lastPreviousLiveBirth: Date # Not in BDRIS2
@@ -321,8 +321,8 @@ type BirthRegistration implements EventRegistration { # -> Composition
   attendantAtBirth: AttendantType # -> Observation.valueString
   otherAttendantAtBirth: String
   birthRegistrationType: BirthRegType # -> Observation.valueString
-  presentAtBirthRegistration: String # -> Observation.valueString
-  otherPresentAtBirthRegistration: String
+  informantType: String # -> Observation.valueString
+  otherinformantType: String
   childrenBornAliveToMother: Int # -> Observation.valueInteger
   foetalDeathsToMother: Int # -> Observation.valueInteger
   lastPreviousLiveBirth: Date # -> Observation.valueDateTime

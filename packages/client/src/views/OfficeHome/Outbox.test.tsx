@@ -21,7 +21,7 @@ describe('OutBox tests', () => {
     id: '10b7ccca-e1b9-4d14-a735-4bb7964a3ed9',
     data: {
       registration: {
-        presentAtBirthRegistration: 'BOTH_PARENTS',
+        informantType: 'BOTH_PARENTS',
         informant: 'MOTHER_ONLY',
         registrationPhone: '01989898989',
         whoseContactDetails: 'FATHER'

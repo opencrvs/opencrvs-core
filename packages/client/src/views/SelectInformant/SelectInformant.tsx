@@ -30,7 +30,8 @@ import {
   Event,
   IFormSection,
   IFormSectionData,
-  FieldValueMap
+  FieldValueMap,
+  IInformant
 } from '@client/forms'
 import {
   getBirthSection,
@@ -38,7 +39,7 @@ import {
 } from '@client/forms/register/declaration-selectors'
 import { buttonMessages } from '@client/i18n/messages'
 import { constantsMessages } from '@client/i18n/messages/constants'
-import { formMessages } from '@client/i18n/messages/views/selectInformant'
+import { messages as formMessages } from '@client/i18n/messages/views/selectInformant'
 import {
   goBack,
   goToBirthContactPoint,
@@ -54,9 +55,12 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
-import { getInformantSection } from './SelectInformantSection'
 import { FormFieldGenerator } from '@client/components/form'
 import { getValidationErrorsForForm } from '@client/forms/validation'
+import { deserializeFormSection } from '@client/forms/mappings/deserializer'
+import { getInformantSection } from '@client/forms/configuration/defaultUtils'
+import { cloneDeep } from 'lodash'
+import { englishOnlyNameFormat } from '@client/utils/validate'
 
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h2};
@@ -125,6 +129,16 @@ function getGroupWithInitialValues(
   }
 }
 
+const deserializeInformantSection = (pathName: string) => {
+  const defaultInformantSection = cloneDeep(
+    getInformantSection(
+      pathName.includes(Event.BIRTH) ? Event.BIRTH : Event.DEATH
+    )
+  )
+  defaultInformantSection.groups[0].fields.length = 1 // can ignore contactPoint on this page
+  return deserializeFormSection(defaultInformantSection)
+}
+
 export class SelectInformantView extends React.Component<IFullProps, IState> {
   constructor(props: IFullProps) {
     super(props)
@@ -135,7 +149,7 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
           this.props.declaration.data &&
           this.props.declaration.data[registrationSection.id] &&
           (this.props.declaration.data[registrationSection.id]
-            .presentAtBirthRegistration as string)) ||
+            .informantType as string)) ||
         (this.props.declaration &&
           this.props.declaration.data &&
           this.props.declaration.data[informantsSection.id] &&
@@ -146,13 +160,15 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       showError: false
     }
   }
-  section = getInformantSection(
-    this.props.location.pathname.includes(Event.BIRTH)
-      ? Event.BIRTH
-      : Event.DEATH
-  )
+
+  section = deserializeInformantSection(this.props.location.pathname)
   group = getGroupWithInitialValues(this.section, this.props.declaration)
   componentDidMount() {
+    console.log(
+      'this.props.declaration?.data[this.section.id]: ',
+      JSON.stringify(this.props.declaration?.data[this.section.id])
+    )
+    console.log('this.state.informant: ', this.state.informant)
     this.group = {
       ...this.group,
       fields: replaceInitialValues(
@@ -171,92 +187,122 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       sectionData[activeSection.groups[0].fields[0].name] as IFormSectionData
     )?.value
 
-    const nestedFieldValue = (
-      (sectionData[activeSection.groups[0].fields[0].name] as IFormSectionData)
-        ?.nestedFields as IFormSectionData
-    )?.otherRelationship
+    const nestedFieldValue = Object.values(
+      (sectionData[activeSection.groups[0].fields[0].name] as IInformant)
+        .nestedFields
+    )[0]
 
-    const nestedField = nestedFieldValue
-      ? ({
-          otherRelationship: nestedFieldValue
-        } as FieldValueMap)
-      : {}
+    const informantValue =
+      nestedFieldValue && englishOnlyNameFormat(nestedFieldValue) === undefined
+        ? nestedFieldValue
+        : informant !== 'OTHER'
+        ? informant
+        : undefined
 
-    const informantValue = nestedFieldValue ? nestedFieldValue : informant
+    this.setState({ informant: informantValue })
 
     const event = this.props.location.pathname.includes(Event.BIRTH)
       ? Event.BIRTH
       : Event.DEATH
-    const { declaration, registrationSection, informantsSection } = this.props
-    const newDeclaration = {
-      ...declaration,
-      data: {
-        ...declaration?.data
+
+    if (informantValue && informant !== 'OTHER') {
+      const { declaration, registrationSection, informantsSection } = this.props
+      const newDeclaration = {
+        ...declaration,
+        data: {
+          ...declaration.data
+        }
       }
-    }
-    if (event === Event.BIRTH) {
-      newDeclaration.data[registrationSection.id] = {
-        ...declaration?.data[registrationSection.id],
-        ...{
-          presentAtBirthRegistration: informantValue,
-          informant: {
-            value: informant,
-            nestedFields: nestedField
+      if (event === Event.BIRTH) {
+        newDeclaration.data[registrationSection.id] = {
+          ...declaration.data[registrationSection.id],
+          ...{
+            informantType: informantValue,
+            applicant: {
+              value: informantValue,
+              nestedFields: {}
+            }
+          }
+        }
+      } else {
+        newDeclaration.data[informantsSection.id] = {
+          ...declaration.data[informantsSection.id],
+          ...{
+            // Need to empty those because next screen will fill this up
+            // TODO: currently contact point is the informant,
+            // need to define the difference between informant and contact point on death schema
+            relationship: informantValue
           }
         }
       }
-    } else {
-      newDeclaration.data[informantsSection.id] = {
-        ...declaration.data[informantsSection.id],
-        ...{
-          // Need to empty those because next screen will fill this up
-          // TODO: currently contact point is the informant,
-          // need to define the difference between informant and contact point on death schema
-          relationship: informantValue
+      this.props.modifyDeclaration(newDeclaration)
+    } else if (
+      event === Event.DEATH &&
+      informantValue &&
+      informant === 'OTHER'
+    ) {
+      const { declaration, informantsSection } = this.props
+      this.props.modifyDeclaration({
+        ...declaration,
+        data: {
+          ...declaration.data,
+          [informantsSection.id]: {
+            ...declaration.data[informantsSection.id],
+            ...{
+              relationship: informantValue
+            }
+          }
         }
-      }
-      newDeclaration.data[registrationSection.id] = {
-        ...declaration?.data[registrationSection.id],
-        ...{
-          relationship: {
-            value: informant,
-            nestedFields: nestedField
+      })
+    } else if (
+      event === Event.BIRTH &&
+      informantValue &&
+      informant === 'OTHER'
+    ) {
+      const { declaration, registrationSection } = this.props
+
+      const modifiedDeclarationData = {
+        ...declaration,
+        data: {
+          ...declaration.data,
+          [registrationSection.id]: {
+            ...declaration.data[registrationSection.id],
+            ...{
+              informantType: informantValue,
+              applicant: {
+                value:
+                  (this.props.declaration &&
+                    this.props.declaration.data &&
+                    this.props.declaration.data[registrationSection.id] &&
+                    this.props.declaration.data[registrationSection.id]
+                      .applicant &&
+                    (
+                      this.props.declaration.data[registrationSection.id]
+                        .applicant as IFormSectionData
+                    ).value) ||
+                  '',
+                nestedFields:
+                  (this.props.declaration &&
+                    this.props.declaration.data &&
+                    this.props.declaration.data[registrationSection.id] &&
+                    this.props.declaration.data[registrationSection.id]
+                      .applicant &&
+                    (
+                      this.props.declaration.data[registrationSection.id]
+                        .applicant as IFormSectionData
+                    ).nestedFields) ||
+                  {}
+              }
+            }
           }
         }
       }
+      this.props.modifyDeclaration(modifiedDeclarationData)
     }
-    this.props.modifyDeclaration(newDeclaration)
   }
 
   handleContinue = () => {
-    const errors = getValidationErrorsForForm(
-      this.group.fields,
-      this.props.declaration.data[this.section.id] || {}
-    )
-
-    let hasError = false
-    this.group.fields.forEach((field) => {
-      const fieldErrors = errors[field.name].errors
-      const nestedFieldErrors = errors[field.name].nestedFields
-
-      if (fieldErrors.length > 0) {
-        hasError = true
-      }
-
-      if (field.nestedFields) {
-        Object.values(field.nestedFields).forEach((nestedFields) => {
-          nestedFields.forEach((nestedField) => {
-            if (
-              nestedFieldErrors[nestedField.name] &&
-              nestedFieldErrors[nestedField.name].length > 0
-            ) {
-              hasError = true
-            }
-          })
-        })
-      }
-    })
-    if (hasError) {
+    if (!this.state.informant) {
       this.setState({
         ...this.state,
         showError: true
@@ -266,6 +312,7 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       const event = this.props.location.pathname.includes(Event.BIRTH)
         ? Event.BIRTH
         : Event.DEATH
+      console.log('Should redirect: ', event)
       event === Event.BIRTH
         ? this.props.goToBirthRegistrationAsParent(
             this.props.match.params.declarationId

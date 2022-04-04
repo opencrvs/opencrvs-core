@@ -241,7 +241,7 @@ export interface IPrintableDeclaration extends Omit<IDeclaration, 'data'> {
     }
     registration: {
       _fhirID: string
-      presentAtBirthRegistration: Relation
+      informantType: Relation
       whoseContactDetails: string
       registrationPhone: string
       trackingId: string

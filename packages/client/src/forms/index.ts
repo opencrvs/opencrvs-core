@@ -250,6 +250,7 @@ export type IFormFieldValue =
   | FieldValueArray
   | FieldValueMap
   | IRegistration
+  | IInformant
 
 interface FieldValueArray extends Array<IFormFieldValue> {}
 export interface FieldValueMap {
@@ -274,6 +275,15 @@ export interface IContactPoint {
   contactRelationship: string
   registrationPhone: string
 }
+
+interface IInformantOtherRelationship {
+  otherRelationship: string
+}
+export interface IInformant {
+  value: string
+  nestedFields: IInformantOtherRelationship
+}
+
 export interface IRegistration {
   nestedFields: IContactPoint
 }
@@ -686,7 +696,7 @@ export interface IConditional {
 }
 
 export interface IConditionals {
-  presentAtBirthRegistration: IConditional
+  informantType: IConditional
   iDType: IConditional
   isOfficePreSelected: IConditional
   fathersDetailsExist: IConditional

@@ -23,7 +23,7 @@ import {
   BODY_WEIGHT_CODE,
   BIRTH_ATTENDANT_CODE,
   BIRTH_REG_TYPE_CODE,
-  BIRTH_REG_PRESENT_CODE,
+  INFORMANT_TYPE,
   NUMBER_BORN_ALIVE_CODE,
   NUMBER_FOEATAL_DEATH_CODE,
   LAST_LIVE_BIRTH_CODE,
@@ -955,13 +955,13 @@ export const builders: IFieldBuilders = {
         )
         observation.id = fieldValue as string
       },
-      presentAtBirthRegistration: (fhirBundle, fieldValue, context) => {
+      informantType: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
           BIRTH_ENCOUNTER_CODE,
           OBSERVATION_CATEGORY_PROCEDURE_CODE,
           OBSERVATION_CATEGORY_PROCEDURE_DESC,
-          BIRTH_REG_PRESENT_CODE,
-          'Present at birth registration',
+          INFORMANT_TYPE,
+          'Informant type',
           fhirBundle,
           context
         )
@@ -3173,7 +3173,7 @@ export const builders: IFieldBuilders = {
     )
     observation.valueString = fieldValue
   },
-  presentAtBirthRegistration: (
+  informantType: (
     fhirBundle: ITemplatedBundle,
     fieldValue: string,
     context: any
@@ -3182,8 +3182,8 @@ export const builders: IFieldBuilders = {
       BIRTH_ENCOUNTER_CODE,
       OBSERVATION_CATEGORY_PROCEDURE_CODE,
       OBSERVATION_CATEGORY_PROCEDURE_DESC,
-      BIRTH_REG_PRESENT_CODE,
-      'Present at birth registration',
+      INFORMANT_TYPE,
+      'Informant type',
       fhirBundle,
       context
     )

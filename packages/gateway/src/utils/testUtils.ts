@@ -1086,7 +1086,7 @@ export const mockObservations = {
       }
     ]
   },
-  presentAtBirthRegistration: {
+  informantType: {
     entry: [
       {
         fullUrl: 'urn:uuid:<uuid>',

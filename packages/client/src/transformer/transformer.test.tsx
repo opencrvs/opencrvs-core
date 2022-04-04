@@ -121,7 +121,7 @@ describe('when draft data is transformed to graphql', () => {
 
   const registrationDetails = {
     commentsOrNotes: 'comments',
-    presentAtBirthRegistration: 'MOTHER_ONLY',
+    informantType: 'MOTHER_ONLY',
     registrationCertificateLanguage: ['en'],
     registrationPhone: '01736478884',
     whoseContactDetails: 'MOTHER',
@@ -263,7 +263,7 @@ describe('when draft data is transformed to graphql', () => {
         father: {},
         mother: {},
         registration: {
-          presentAtBirthRegistration: 'MOTHER_ONLY',
+          informantType: 'MOTHER_ONLY',
           registrationPhone: '01736478884',
           whoseContactDetails: 'MOTHER'
         },
@@ -294,7 +294,7 @@ describe('when draft data is transformed to graphql', () => {
         father: {},
         mother: {},
         registration: {
-          presentAtBirthRegistration: 'OTHER',
+          informantType: 'OTHER',
           registrationPhone: '01736478884',
           whoseContactDetails: 'MOTHER'
         },
@@ -417,7 +417,7 @@ describe('when draft data is transformed to graphql', () => {
         weightAtBirth: null,
         birthType: null,
         eventLocation: null,
-        presentAtBirthRegistration: 'OTHER'
+        informantType: 'OTHER'
       }
 
       const primaryCaregiverData = {
@@ -500,7 +500,7 @@ describe('when draft data is transformed to graphql', () => {
         weightAtBirth: null,
         birthType: null,
         eventLocation: null,
-        presentAtBirthRegistration: 'OTHER'
+        informantType: 'OTHER'
       }
 
       const primaryCaregiverData = {

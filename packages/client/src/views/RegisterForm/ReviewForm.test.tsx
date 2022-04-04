@@ -147,8 +147,7 @@ describe('ReviewForm tests', () => {
                   birthType: '16643bcf-457a-4a5b-a7d2-328d57182476',
                   weightAtBirth: '13a75fdf-54d3-476e-ab0e-68fca7286686',
                   attendantAtBirth: 'add45cfa-8390-4792-a857-a1df587e45a6',
-                  presentAtBirthRegistration:
-                    'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
+                  informantType: 'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
                 }
               },
               child: {
@@ -251,7 +250,7 @@ describe('ReviewForm tests', () => {
                 type: 'PRIVATE_HOME',
                 partOf: 'Location/upazila10'
               },
-              presentAtBirthRegistration: 'MOTHER_ONLY'
+              informantType: 'MOTHER_ONLY'
             }
           }
         }
@@ -333,8 +332,7 @@ describe('ReviewForm tests', () => {
                   birthType: '16643bcf-457a-4a5b-a7d2-328d57182476',
                   weightAtBirth: '13a75fdf-54d3-476e-ab0e-68fca7286686',
                   attendantAtBirth: 'add45cfa-8390-4792-a857-a1df587e45a6',
-                  presentAtBirthRegistration:
-                    'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
+                  informantType: 'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
                 }
               },
               child: null,
@@ -416,7 +414,7 @@ describe('ReviewForm tests', () => {
                 type: 'PRIVATE_HOME',
                 partOf: 'Location/upazila10'
               },
-              presentAtBirthRegistration: 'MOTHER_ONLY'
+              informantType: 'MOTHER_ONLY'
             }
           }
         }
@@ -480,8 +478,7 @@ describe('ReviewForm tests', () => {
                   birthType: '16643bcf-457a-4a5b-a7d2-328d57182476',
                   weightAtBirth: '13a75fdf-54d3-476e-ab0e-68fca7286686',
                   attendantAtBirth: 'add45cfa-8390-4792-a857-a1df587e45a6',
-                  presentAtBirthRegistration:
-                    'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
+                  informantType: 'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
                 }
               },
               child: null,
@@ -523,7 +520,7 @@ describe('ReviewForm tests', () => {
                 type: 'PRIVATE_HOME',
                 partOf: 'Location/upazila10'
               },
-              presentAtBirthRegistration: 'MOTHER_ONLY'
+              informantType: 'MOTHER_ONLY'
             }
           }
         }
@@ -592,8 +589,7 @@ describe('ReviewForm tests', () => {
                   birthType: '16643bcf-457a-4a5b-a7d2-328d57182476',
                   weightAtBirth: '13a75fdf-54d3-476e-ab0e-68fca7286686',
                   attendantAtBirth: 'add45cfa-8390-4792-a857-a1df587e45a6',
-                  presentAtBirthRegistration:
-                    'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
+                  informantType: 'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
                 }
               },
               child: null,
@@ -686,7 +682,7 @@ describe('ReviewForm tests', () => {
                 type: 'PRIVATE_HOME',
                 partOf: 'Location/upazila10'
               },
-              presentAtBirthRegistration: 'MOTHER_ONLY'
+              informantType: 'MOTHER_ONLY'
             }
           }
         }
@@ -729,7 +725,7 @@ describe('ReviewForm tests', () => {
       informant: {
         nestedFields: {}
       },
-      presentAtBirthRegistration: 'MOTHER_ONLY',
+      informantType: 'MOTHER_ONLY',
       commentsOrNotes: 'This is a note',
       contactPoint: {
         value: 'MOTHER',
@@ -763,7 +759,7 @@ describe('ReviewForm tests', () => {
         weightAtBirth: '2'
       },
       registration: {
-        presentAtBirthRegistration: 'MOTHER_ONLY',
+        informantType: 'MOTHER_ONLY',
         registrationPhone: '01741234567',
         whoseContactDetails: 'MOTHER',
         type: 'BIRTH'
@@ -829,7 +825,7 @@ describe('ReviewForm tests', () => {
         weightAtBirth: '2'
       },
       registration: {
-        presentAtBirthRegistration: 'MOTHER_ONLY',
+        informantType: 'MOTHER_ONLY',
         registrationPhone: '01741234567',
         whoseContactDetails: 'MOTHER',
         type: 'BIRTH'
@@ -895,7 +891,7 @@ describe('ReviewForm tests', () => {
         weightAtBirth: '2'
       },
       registration: {
-        presentAtBirthRegistration: 'MOTHER_ONLY',
+        informantType: 'MOTHER_ONLY',
         registrationPhone: '01741234567',
         whoseContactDetails: 'MOTHER',
         type: 'BIRTH'
@@ -961,7 +957,7 @@ describe('ReviewForm tests', () => {
         weightAtBirth: '2'
       },
       registration: {
-        presentAtBirthRegistration: 'MOTHER_ONLY',
+        informantType: 'MOTHER_ONLY',
         registrationPhone: '01741234567',
         whoseContactDetails: 'MOTHER',
         type: 'BIRTH'
@@ -1022,7 +1018,7 @@ describe('ReviewForm tests', () => {
         weightAtBirth: '2'
       },
       registration: {
-        presentAtBirthRegistration: 'MOTHER_ONLY',
+        informantType: 'MOTHER_ONLY',
         registrationPhone: '01741234567',
         whoseContactDetails: 'MOTHER',
         type: 'BIRTH'
@@ -1133,7 +1129,7 @@ describe('ReviewForm tests', () => {
         weightAtBirth: '2'
       },
       registration: {
-        presentAtBirthRegistration: 'MOTHER_ONLY',
+        informantType: 'MOTHER_ONLY',
         registrationPhone: '01741234567',
         whoseContactDetails: 'MOTHER',
         type: 'BIRTH'
@@ -1196,7 +1192,7 @@ describe('ReviewForm tests', () => {
         weightAtBirth: '2'
       },
       registration: {
-        presentAtBirthRegistration: 'MOTHER_ONLY',
+        informantType: 'MOTHER_ONLY',
         registrationPhone: '01741234567',
         whoseContactDetails: 'MOTHER',
         type: 'BIRTH'
@@ -1832,7 +1828,7 @@ describe('ReviewForm tests', () => {
                   type: 'PRIVATE_HOME',
                   partOf: 'Location/upazila10'
                 },
-                presentAtBirthRegistration: 'MOTHER_ONLY'
+                informantType: 'MOTHER_ONLY'
               }
             }
           }

@@ -315,7 +315,7 @@ export const currentUserDeclarations = {
           postCodePermanent: ''
         },
         registration: {
-          presentAtBirthRegistration: '',
+          informantType: '',
           whoseContactDetails: '',
           registrationPhone: '01711111111',
           phoneVerificationWarning: '',
@@ -515,7 +515,7 @@ export const currentUserDeclarations = {
           postCodePermanent: ''
         },
         registration: {
-          presentAtBirthRegistration: '',
+          informantType: '',
           whoseContactDetails: '',
           registrationPhone: '01711111111',
           phoneVerificationWarning: '',
@@ -640,7 +640,7 @@ export const currentUserDeclarations = {
           postCodePermanent: ''
         },
         registration: {
-          presentAtBirthRegistration: '',
+          informantType: '',
           whoseContactDetails: '',
           registrationPhone: '01711111111',
           phoneVerificationWarning: '',
@@ -765,7 +765,7 @@ export const currentUserDeclarations = {
           postCodePermanent: ''
         },
         registration: {
-          presentAtBirthRegistration: '',
+          informantType: '',
           whoseContactDetails: '',
           registrationPhone: '01711111111',
           phoneVerificationWarning: '',
@@ -889,7 +889,7 @@ export const currentUserDeclarations = {
           postCodePermanent: ''
         },
         registration: {
-          presentAtBirthRegistration: '',
+          informantType: '',
           whoseContactDetails: '',
           registrationPhone: '01711111111',
           phoneVerificationWarning: '',
@@ -1014,7 +1014,7 @@ export const currentUserDeclarations = {
           postCodePermanent: ''
         },
         registration: {
-          presentAtBirthRegistration: '',
+          informantType: '',
           whoseContactDetails: '',
           registrationPhone: '01711111111',
           phoneVerificationWarning: '',
@@ -1139,7 +1139,7 @@ export const currentUserDeclarations = {
           postCodePermanent: ''
         },
         registration: {
-          presentAtBirthRegistration: '',
+          informantType: '',
           whoseContactDetails: '',
           registrationPhone: '01711111111',
           phoneVerificationWarning: '',
@@ -1378,7 +1378,7 @@ export const currentUserDeclarations = {
           postCodePermanent: ''
         },
         registration: {
-          presentAtBirthRegistration: '',
+          informantType: '',
           whoseContactDetails: '',
           registrationPhone: '01711111111',
           phoneVerificationWarning: '',
@@ -1503,7 +1503,7 @@ export const currentUserDeclarations = {
           postCodePermanent: ''
         },
         registration: {
-          presentAtBirthRegistration: '',
+          informantType: '',
           whoseContactDetails: '',
           registrationPhone: '01711111111',
           phoneVerificationWarning: '',
@@ -2323,7 +2323,7 @@ export const mockDeclarationData = {
       value: 'MOTHER',
       nestedFields: { registrationPhone: '01557394986' }
     },
-    presentAtBirthRegistration: 'BOTH_PARENTS',
+    informantType: 'BOTH_PARENTS',
     registrationNumber: '201908122365BDSS0SE1',
     regStatus: {
       type: 'REGISTERED',
@@ -2476,7 +2476,7 @@ export const mockBirthRegistrationSectionData = {
     value: 'MOTHER',
     nestedFields: { registrationPhone: '01557394986' }
   },
-  presentAtBirthRegistration: 'BOTH_PARENTS',
+  informantType: 'BOTH_PARENTS',
   registrationPhone: '01557394986',
   trackingId: 'BDSS0SE',
   registrationNumber: '201908122365BDSS0SE1',
@@ -2508,7 +2508,7 @@ export const mockBirthRegistrationSectionData = {
 
 export const mockDeathRegistrationSectionData = {
   whoseContactDetails: 'MOTHER',
-  presentAtBirthRegistration: 'BOTH_PARENTS',
+  informantType: 'BOTH_PARENTS',
   registrationPhone: '01557394986',
   trackingId: 'DDSS0SE',
   registrationNumber: '201908122365DDSS0SE1',

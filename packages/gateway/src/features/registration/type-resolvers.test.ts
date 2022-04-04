@@ -466,7 +466,7 @@ describe('Registration type resolvers', () => {
           birthType: 'aef33762-c5a3-4642-8d03-6e21c0ef6445',
           weightAtBirth: '5f761077-9623-4626-8ce6-648724614485',
           attendantAtBirth: '305cf792-dd96-40b7-bdad-909861faa4b4',
-          presentAtBirthRegistration: '0280e498-5d70-4666-ae4e-12431dcea163'
+          informantType: '0280e498-5d70-4666-ae4e-12431dcea163'
         }
       })
     })
@@ -509,17 +509,14 @@ describe('Registration type resolvers', () => {
         )
       expect(birthRegistrationType).toEqual('BOTH_PARENTS')
     })
-    it('returns presentAtBirthRegistration', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify(mockObservations.presentAtBirthRegistration)
-      )
+    it('returns informantType', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockObservations.informantType))
 
       // @ts-ignore
-      const presentAtBirthRegistration =
-        await typeResolvers.BirthRegistration.presentAtBirthRegistration(
-          mockComposition
-        )
-      expect(presentAtBirthRegistration).toEqual('BOTH_PARENTS')
+      const informantType = await typeResolvers.BirthRegistration.informantType(
+        mockComposition
+      )
+      expect(informantType).toEqual('BOTH_PARENTS')
     })
     it('returns lastPreviousLiveBirth', async () => {
       fetch.mockResponseOnce(
@@ -648,21 +645,23 @@ describe('Registration type resolvers', () => {
         })
       expect(birthRegistrationType).toEqual(null)
     })
-    it('returns presentAtBirthRegistration null', async () => {
+    it('returns informantType null', async () => {
       // @ts-ignore
-      const presentAtBirthRegistration =
-        await typeResolvers.BirthRegistration.presentAtBirthRegistration({
+      const informantType = await typeResolvers.BirthRegistration.informantType(
+        {
           section: []
-        })
-      expect(presentAtBirthRegistration).toEqual(null)
+        }
+      )
+      expect(informantType).toEqual(null)
     })
-    it('returns presentAtBirthRegistration null', async () => {
+    it('returns informantType null', async () => {
       // @ts-ignore
-      const presentAtBirthRegistration =
-        await typeResolvers.BirthRegistration.presentAtBirthRegistration({
+      const informantType = await typeResolvers.BirthRegistration.informantType(
+        {
           section: []
-        })
-      expect(presentAtBirthRegistration).toEqual(null)
+        }
+      )
+      expect(informantType).toEqual(null)
     })
     it('returns childrenBornAliveToMother null', async () => {
       // @ts-ignore

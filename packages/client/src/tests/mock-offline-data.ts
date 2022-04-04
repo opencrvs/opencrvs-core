@@ -62,10 +62,10 @@ export const formConfig: IFormConfig = {
 }
 
 export const mockConditionals = {
-  presentAtBirthRegistration: {
+  informantType: {
     action: 'hide',
     expression:
-      '(!draftData || !draftData.registration || draftData.registration.presentAtBirthRegistration !== "OTHER" || draftData.registration.presentAtBirthRegistration === "BOTH_PARENTS" )'
+      '(!draftData || !draftData.registration || draftData.registration.informantType !== "OTHER" || draftData.registration.informantType === "BOTH_PARENTS" )'
   },
   isRegistrarRoleSelected: {
     action: 'hide',

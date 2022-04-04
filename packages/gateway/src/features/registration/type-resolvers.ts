@@ -28,7 +28,7 @@ import {
   BODY_WEIGHT_CODE,
   BIRTH_TYPE_CODE,
   BIRTH_ATTENDANT_CODE,
-  BIRTH_REG_PRESENT_CODE,
+  INFORMANT_TYPE,
   BIRTH_REG_TYPE_CODE,
   LAST_LIVE_BIRTH_CODE,
   NUMBER_BORN_ALIVE_CODE,
@@ -1100,7 +1100,7 @@ export const typeResolvers: GQLResolver = {
           birthType: BIRTH_TYPE_CODE,
           attendantAtBirth: BIRTH_ATTENDANT_CODE,
           birthRegistrationType: BIRTH_REG_TYPE_CODE,
-          presentAtBirthRegistration: BIRTH_REG_PRESENT_CODE,
+          informantType: INFORMANT_TYPE,
           childrenBornAliveToMother: NUMBER_BORN_ALIVE_CODE,
           foetalDeathsToMother: NUMBER_FOEATAL_DEATH_CODE,
           lastPreviousLiveBirth: LAST_LIVE_BIRTH_CODE
@@ -1356,11 +1356,7 @@ export const typeResolvers: GQLResolver = {
         null
       )
     },
-    async presentAtBirthRegistration(
-      composition: ITemplatedComposition,
-      _,
-      authHeader
-    ) {
+    async informantType(composition: ITemplatedComposition, _, authHeader) {
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
         composition
@@ -1369,7 +1365,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const observations = await fetchFHIR(
-        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${BIRTH_REG_PRESENT_CODE}`,
+        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${INFORMANT_TYPE}`,
         authHeader
       )
       return (

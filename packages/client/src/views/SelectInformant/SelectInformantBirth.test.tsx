@@ -103,7 +103,7 @@ describe('when select informant page loads with existing data', () => {
 
     const draft = createDeclaration(Event.BIRTH, {
       registration: {
-        presentAtBirthRegistration: 'MOTHER',
+        informantType: 'MOTHER',
         registrationPhone: '01622688231',
         informant: {
           value: 'MOTHER',
