@@ -28,16 +28,22 @@ export default async function createQuestion(
   return h.response().code(201)
 }
 
-export const messageDescriptorSchema = Joi.object({
-  id: Joi.string().required(),
-  defaultMessage: Joi.string(),
-  description: Joi.string()
+export const messageSchema = Joi.array().items({
+  lang: Joi.string(),
+  descriptor: Joi.object({
+    id: Joi.string().required(),
+    defaultMessage: Joi.string(),
+    description: Joi.string()
+  })
 })
 
 export const requestSchema = Joi.object({
   fieldId: Joi.string().required(),
-  label: messageDescriptorSchema,
-  placeholder: messageDescriptorSchema,
+  label: messageSchema,
+  placeholder: messageSchema,
+  description: messageSchema,
+  tooltip: messageSchema,
+  errorMessage: messageSchema,
   maxLength: Joi.number(),
   fieldName: Joi.string(),
   fieldType: Joi.string().valid(...validFieldType),
