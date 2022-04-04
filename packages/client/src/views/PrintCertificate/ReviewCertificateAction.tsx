@@ -41,7 +41,10 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
-import { previewCertificate } from '@client/views/PrintCertificate/PDFUtils'
+import {
+  previewCertificate,
+  printCertificate
+} from '@client/views/PrintCertificate/PDFUtils'
 import { getEventRegisterForm } from '@client/forms/register/declaration-selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import {
@@ -55,7 +58,7 @@ import {
 } from './utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { countries } from '@client/forms/countries'
-import ReactToPrint, { PrintContextConsumer } from 'react-to-print'
+import { PDFViewer } from '@opencrvs/components/lib/forms'
 
 export const ActionPageWrapper = styled.div`
   position: fixed;
@@ -87,7 +90,7 @@ const ButtonWrapper = styled.div`
     margin-right: 0px;
   }
 `
-const SvgWrapper = styled.div`
+const PdfWrapper = styled.div`
   background: ${({ theme }) => theme.colors.grey100};
   display: flex;
   height: 100%;
@@ -177,7 +180,7 @@ class ReviewCertificateActionComponent extends React.Component<
     })
   }
 
-  readyToCertify = (printSvgCertificate: () => void) => {
+  readyToCertify = () => {
     const { draft } = this.props
     draft.submissionStatus = SUBMISSION_STATUS.READY_TO_CERTIFY
     draft.action = Action.COLLECT_CERTIFICATE
@@ -227,7 +230,13 @@ class ReviewCertificateActionComponent extends React.Component<
       ]
     }
 
-    printSvgCertificate()
+    printCertificate(
+      this.props.intl,
+      draft,
+      this.props.userDetails,
+      this.props.offlineCountryConfig,
+      this.props.countries
+    )
     this.props.modifyDeclaration(draft)
     this.props.writeDeclaration(draft)
     this.toggleModal()
@@ -280,66 +289,49 @@ class ReviewCertificateActionComponent extends React.Component<
       >
         <Title>{this.getTitle()}</Title>
         <Info>{intl.formatMessage(certificateMessages.reviewDescription)}</Info>
-        <ReactToPrint content={() => this.componentRef.current}>
-          <PrintContextConsumer>
-            {({ handlePrint }) => (
-              <>
-                {this.state.certificatePdf && (
-                  <SvgWrapper>
-                    <Certificate
-                      id="svgholder"
-                      src={this.state.certificatePdf}
-                      ref={this.componentRef}
-                    />
-                  </SvgWrapper>
-                )}
-                <ButtonWrapper>
-                  <PrimaryButton
-                    align={0}
-                    id="confirm-print"
-                    onClick={this.toggleModal}
-                    icon={() => <Check />}
-                  >
-                    {intl.formatMessage(certificateMessages.confirmAndPrint)}
-                  </PrimaryButton>
-                  <CustomTertiaryButton
-                    onClick={() =>
-                      this.props.goToCertificateCorrection(
-                        this.props.registrationId,
-                        CorrectionSection.Corrector
-                      )
-                    }
-                  >
-                    {intl.formatMessage(buttonMessages.editRecord)}
-                  </CustomTertiaryButton>
-                </ButtonWrapper>
-                <ResponsiveModal
-                  id="confirm-print-modal"
-                  title={intl.formatMessage(certificateMessages.modalTitle)}
-                  actions={[
-                    <CustomTertiaryButton
-                      onClick={this.toggleModal}
-                      id="close-modal"
-                    >
-                      {intl.formatMessage(buttonMessages.cancel)}
-                    </CustomTertiaryButton>,
-                    <PrimaryButton
-                      onClick={() => this.readyToCertify(handlePrint)}
-                      id="print-certificate"
-                    >
-                      {intl.formatMessage(buttonMessages.print)}
-                    </PrimaryButton>
-                  ]}
-                  show={this.state.showConfirmationModal}
-                  handleClose={this.toggleModal}
-                  contentHeight={100}
-                >
-                  {intl.formatMessage(certificateMessages.modalBody)}
-                </ResponsiveModal>
-              </>
-            )}
-          </PrintContextConsumer>
-        </ReactToPrint>
+
+        {this.state.certificatePdf && (
+          <PdfWrapper id="pdfwrapper">
+            <PDFViewer id="pdfholder" pdfSource={this.state.certificatePdf} />
+          </PdfWrapper>
+        )}
+        <ButtonWrapper>
+          <PrimaryButton
+            align={0}
+            id="confirm-print"
+            onClick={this.toggleModal}
+            icon={() => <Check />}
+          >
+            {intl.formatMessage(certificateMessages.confirmAndPrint)}
+          </PrimaryButton>
+          <CustomTertiaryButton
+            onClick={() =>
+              this.props.goToCertificateCorrection(
+                this.props.registrationId,
+                CorrectionSection.Corrector
+              )
+            }
+          >
+            {intl.formatMessage(buttonMessages.editRecord)}
+          </CustomTertiaryButton>
+        </ButtonWrapper>
+        <ResponsiveModal
+          id="confirm-print-modal"
+          title={intl.formatMessage(certificateMessages.modalTitle)}
+          actions={[
+            <CustomTertiaryButton onClick={this.toggleModal} id="close-modal">
+              {intl.formatMessage(buttonMessages.cancel)}
+            </CustomTertiaryButton>,
+            <PrimaryButton onClick={this.readyToCertify} id="print-certificate">
+              {intl.formatMessage(buttonMessages.print)}
+            </PrimaryButton>
+          ]}
+          show={this.state.showConfirmationModal}
+          handleClose={this.toggleModal}
+          contentHeight={100}
+        >
+          {intl.formatMessage(certificateMessages.modalBody)}
+        </ResponsiveModal>
       </ActionPageLight>
     )
   }
