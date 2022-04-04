@@ -14,7 +14,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { IListRowProps, ListRow } from './ListRow'
 
-const Container = styled.div`
+export const Container = styled.div`
   margin-top: 20px;
   margin-bottom: 30px;
 `

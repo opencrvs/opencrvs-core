@@ -65,6 +65,7 @@ import { ConfigHome } from './views/SysAdmin/Config/ConfigHome'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
+import { CustomFieldForms } from './components/formConfig/CustomFieldForm'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -364,6 +365,11 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.USER_PROFILE}
                                             component={UserProfile}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={'/form-config'}
+                                            component={CustomFieldForms}
                                           />
                                         </Switch>
                                       </TransitionWrapper>
