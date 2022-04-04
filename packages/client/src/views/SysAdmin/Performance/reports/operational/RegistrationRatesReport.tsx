@@ -57,12 +57,12 @@ const Reports = styled.div<{ loading?: boolean }>`
 
 const KeyNumber = styled.div`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.h2Style};
+  ${({ theme }) => theme.fonts.h1};
   margin: 0px 0px -16px 0px;
 `
 const KeyNumberDescription = styled.div`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.chartLegendStyle};
+  ${({ theme }) => theme.fonts.reg14};
   margin: 16px 0px;
 `
 
@@ -72,11 +72,11 @@ const Pair = styled.div`
 `
 const Label = styled.span`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.chartLegendStyle};
+  ${({ theme }) => theme.fonts.reg14};
 `
 const Value = styled.span`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.subtitleStyle};
+  ${({ theme }) => theme.fonts.bold14};
 `
 
 export const LoaderBox = styled.span<{
@@ -158,13 +158,13 @@ class RegistrationRatesReportComponent extends React.Component<Props, States> {
     const birthReportHeader = intl.formatMessage(
       messages.birthRegistrationRatesReportHeader,
       {
-        birthRegistrationTarget: window.config.BIRTH_REGISTRATION_TARGET
+        birthRegistrationTarget: window.config.BIRTH.REGISTRATION_TARGET
       }
     )
     const deathReportHeader = intl.formatMessage(
       messages.deathRegistrationRatesReportHeader,
       {
-        deathRegistrationTarget: window.config.DEATH_REGISTRATION_TARGET
+        deathRegistrationTarget: window.config.DEATH.REGISTRATION_TARGET
       }
     )
     return (
@@ -208,7 +208,7 @@ class RegistrationRatesReportComponent extends React.Component<Props, States> {
                   (birthTargetDayMetrics &&
                     birthTargetDayMetrics.estimatedRegistration) ||
                   0,
-                registrationTarget: window.config.BIRTH_REGISTRATION_TARGET
+                registrationTarget: window.config.BIRTH.REGISTRATION_TARGET
               })}
             </KeyNumberDescription>
             {this.getLabelValuePair(
@@ -254,7 +254,7 @@ class RegistrationRatesReportComponent extends React.Component<Props, States> {
                   (deathTargetDayMetrics &&
                     deathTargetDayMetrics.estimatedRegistration) ||
                   0,
-                registrationTarget: window.config.DEATH_REGISTRATION_TARGET
+                registrationTarget: window.config.DEATH.REGISTRATION_TARGET
               })}
             </KeyNumberDescription>
             {this.getLabelValuePair(

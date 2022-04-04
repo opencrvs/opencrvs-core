@@ -17,19 +17,16 @@ import {
 import { Action } from 'redux'
 import { IFormSection } from '@client/forms'
 import { paymentFormSection } from '@client/forms/certificate/fieldDefinitions/payment-section'
-import { certificatePreview } from '@client/forms/certificate/fieldDefinitions/preview-section'
 
 const initialState: IPrintFormState = {
   collectBirthCertificateForm: collectBirthCertificateFormSection,
   collectDeathCertificateForm: collectDeathCertificateFormSection,
-  paymentForm: paymentFormSection,
-  certificatePreviewForm: certificatePreview
+  paymentForm: paymentFormSection
 }
 export interface IPrintFormState {
   collectBirthCertificateForm: IFormSection
   collectDeathCertificateForm: IFormSection
   paymentForm: IFormSection
-  certificatePreviewForm: IFormSection
 }
 
 export const printReducer: LoopReducer<IPrintFormState, Action> = (

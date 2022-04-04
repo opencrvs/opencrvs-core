@@ -40,18 +40,18 @@ const BackButtonContainer = styled.div`
 `
 
 const BackButtonText = styled.span`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
   text-transform: capitalize;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
   }
 `
 const MenuTitle = styled.div`
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+  ${({ theme }) => theme.fonts.h4};
 `
 
 const Container = styled.div<{ hideBackground: boolean | undefined }>`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   ${({ theme, hideBackground }) => (hideBackground ? '' : theme.shadows.light)};
   color: ${({ theme }) => theme.colors.copy};
   padding: 24px 32px 32px;

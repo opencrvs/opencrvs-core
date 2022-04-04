@@ -21,7 +21,7 @@ const SectionDrawerContainer = styled.div<{ expanded: boolean }>`
     expanded ? `0 0 12px 0 rgba(0, 0, 0, 0.11)` : ``};
 `
 const TitleContainer = styled.div<{ expandable: boolean }>`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   display: flex;
   align-items: center;
   border-bottom: solid 1px ${({ theme }) => theme.colors.background};
@@ -30,7 +30,7 @@ const TitleContainer = styled.div<{ expandable: boolean }>`
 const Title = styled.div<{ visited: boolean; isExpanded: boolean }>`
   width: 100vw;
   padding: 25px;
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+  ${({ theme }) => theme.fonts.h4};
   color: ${({ theme, visited, isExpanded }) =>
     visited && !isExpanded ? theme.colors.primary : theme.colors.copy};
 `
@@ -138,7 +138,7 @@ export class SectionDrawer extends React.Component<IProps, IState> {
             {isExpanded && (
               <Link
                 id={`${title.replace(/[' ]+/g, '').trim()}_link`}
-                onClick={e => {
+                onClick={(e) => {
                   e.stopPropagation()
                   linkClickHandler()
                 }}
@@ -151,7 +151,7 @@ export class SectionDrawer extends React.Component<IProps, IState> {
             <ExpansionButton
               className="_expansionBtn"
               expanded={isExpanded}
-              onClick={e => {
+              onClick={(e) => {
                 e.stopPropagation()
                 expansionButtonHandler()
               }}

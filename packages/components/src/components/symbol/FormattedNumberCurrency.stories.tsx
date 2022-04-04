@@ -9,20 +9,21 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Meta, Story } from '@storybook/react'
-import { SearchInput, ISerachInputCustomProps } from '.'
 import React from 'react'
+import { Meta, Story } from '@storybook/react'
+import { FormattedNumberCurrency } from './FormattedNumberCurrency'
 
-const Template: Story<
-  ISerachInputCustomProps & React.InputHTMLAttributes<HTMLInputElement>
-> = (args) => <SearchInput {...args} />
-
-export const SearchInputView = Template.bind({})
-SearchInputView.args = {
-  buttonLabel: 'Search',
-  onSubmit: (searchText: string) => alert(searchText)
-}
 export default {
-  title: 'Components/Interface/SearchInput',
-  component: SearchInput
+  title: 'Components/symbol/FormattedNumberCurrency',
+  component: FormattedNumberCurrency
 } as Meta
+
+const Template: Story<{}> = () => (
+  <FormattedNumberCurrency
+    value={1000}
+    currency={'AUD'}
+    languagesAndCountry={'en-AU'}
+  />
+)
+
+export const FormattedNumberCurrencyView = Template.bind({})

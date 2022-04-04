@@ -231,16 +231,10 @@ export function updateTaskTemplate(
     }
 
     task.reason.text = reason || ''
-
-    const newNote: fhir.Annotation = {
-      text: comment ? comment : '',
-      time: new Date().toUTCString(),
-      authorString: ''
+    const statusReason: fhir.CodeableConcept = {
+      text: comment
     }
-    if (!task.note) {
-      task.note = []
-    }
-    task.note.push(newNote)
+    task.statusReason = statusReason
   }
   return task
 }

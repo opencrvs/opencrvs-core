@@ -11,13 +11,13 @@
  */
 import React from 'react'
 import { Meta, Story } from '@storybook/react'
-import { EnglishText } from '.'
+import { SuccessSmall } from './SuccessSmall'
 
 export default {
-  title: 'Components/Typography/EnglishText',
-  component: EnglishText
+  title: 'Components/icons/SuccessSmall',
+  component: SuccessSmall
 } as Meta
 
-const Template: Story<{}> = () => <EnglishText />
+const Template: Story<{}> = () => <SuccessSmall />
 
-export const EnglishTextView = Template.bind({})
+export const SuccessView = Template.bind({})

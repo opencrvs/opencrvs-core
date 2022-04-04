@@ -42,6 +42,7 @@ interface ISupportedLanguages {
 
 const supportedLanguages: ISupportedLanguages[] = [
   { code: 'en', language: 'English' },
+  { code: 'fr', language: 'Français' },
   { code: 'bn', language: 'বাংলা' }
 ]
 

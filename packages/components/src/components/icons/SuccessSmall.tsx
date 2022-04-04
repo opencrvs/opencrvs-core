@@ -10,9 +10,23 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled, { StyledComponentBase } from 'styled-components'
 
-// stylelint-disable opencrvs/no-font-styles
-export const EnglishText = styled.span`
-  font-family: ${({ theme }) => theme.fonts.englishTextFont};
-`
+export const SuccessSmall = (props: React.HTMLAttributes<SVGElement>) => (
+  <svg
+    width="19"
+    height="14"
+    viewBox="0 0 19 14"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M17.75 1.74121L6.75 12.7412L1.75 7.74121"
+      stroke="#49B78D"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+)
+
+export default SuccessSmall

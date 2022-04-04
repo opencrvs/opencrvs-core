@@ -23,10 +23,7 @@ import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import styled from '@client/styledComponents'
 import { Header } from '@client/components/interface/Header/Header'
 import { AvatarLarge, Avatar } from '@client/components/Avatar'
-import {
-  DataSection,
-  ListView
-} from '@opencrvs/components/lib/interface/ViewData'
+import { ListView } from '@opencrvs/components/lib/interface/ViewData'
 import {
   ResponsiveModal,
   NOTIFICATION_TYPE,
@@ -76,7 +73,7 @@ const BodyContainer = styled.div`
 `
 
 const SettingsTitle = styled.div`
-  ${({ theme }) => theme.fonts.h1Style};
+  ${({ theme }) => theme.fonts.h1};
   height: 72px;
   margin-left: 16px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -95,12 +92,8 @@ const Left = styled.div`
   flex-grow: 1;
 `
 const Right = styled.div`
-  display: flex;
   padding-top: 80px;
   margin-left: 112px;
-  & .desktop {
-    display: block;
-  }
   & .tablet {
     display: none;
   }
@@ -117,7 +110,7 @@ const Right = styled.div`
 `
 const Version = styled.div`
   color: ${({ theme }) => theme.colors.disabled};
-  ${({ theme }) => theme.fonts.smallButtonStyle};
+  ${({ theme }) => theme.fonts.reg14};
   text-transform: none;
   margin-top: 2rem;
   span:last-child {
@@ -137,18 +130,6 @@ const Message = styled.div`
 `
 const Label = styled.label`
   margin-bottom: 8px;
-`
-const ApplyButton = styled(PrimaryButton)`
-  height: 40px;
-  & div {
-    padding: 0 8px;
-  }
-`
-const CancelButton = styled(TertiaryButton)`
-  height: 40px;
-  & div {
-    padding: 0;
-  }
 `
 type IProps = IntlShapeProps &
   RouteComponentProps<
@@ -283,8 +264,11 @@ class SettingsView extends React.Component<IProps, IState> {
   changeAvatar = (avatar: IImage) => {
     if (this.props.userDetails) {
       this.setState({ imageUploading: false })
-      this.props.userDetails.avatar = avatar
-      this.props.modifyUserDetails(this.props.userDetails)
+      const { userDetails } = this.props
+      this.props.modifyUserDetails({
+        ...userDetails,
+        avatar
+      })
     }
   }
 
@@ -448,20 +432,20 @@ class SettingsView extends React.Component<IProps, IState> {
           title={intl.formatMessage(messages.changeLanguageTitle)}
           show={this.state.showLanguageSettings}
           actions={[
-            <CancelButton
+            <TertiaryButton
               key="cancel"
               id="modal_cancel"
               onClick={this.cancelLanguageSettings}
             >
               {intl.formatMessage(buttonMessages.cancel)}
-            </CancelButton>,
-            <ApplyButton
+            </TertiaryButton>,
+            <PrimaryButton
               key="apply"
               id="apply_change"
               onClick={this.changeLanguage}
             >
               {intl.formatMessage(buttonMessages.apply)}
-            </ApplyButton>
+            </PrimaryButton>
           ]}
           handleClose={this.cancelLanguageSettings}
           contentHeight={175}
