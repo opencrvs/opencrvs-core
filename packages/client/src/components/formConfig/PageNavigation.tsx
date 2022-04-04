@@ -20,16 +20,7 @@ import { IForm } from '@client/forms'
 import { EventType } from '@client/views/SysAdmin/Config/FormConfigWizard'
 import { IntlShape } from 'react-intl'
 import { configMessage } from '@client/components/formConfig/FormConfig'
-import { goToPageNavigation } from '@client/navigation'
-
-const Container = styled.div`
-  top: 56px;
-  width: 250px;
-  position: fixed;
-  height: 100%;
-  border-right: 1px solid ${({ theme }) => theme.colors.grey300};
-  background-color: ${({ theme }) => theme.colors.white};
-`
+import { goToFormConfigWizard } from '@client/navigation'
 
 const Title = styled.div`
   margin-top: 16px;
@@ -44,7 +35,7 @@ interface IPageNavigation {
   registerForm: { [key: string]: IForm }
   section?: string
   event?: EventType
-  goToPageNavigation: typeof goToPageNavigation
+  goToFormConfigWizard: typeof goToFormConfigWizard
 }
 
 export const TAB_BIRTH = {
@@ -76,11 +67,11 @@ const PageItems = styled(NavigationSubItem)<{ isSelected: boolean }>`
 `
 
 export const PageNavigation = (props: IPageNavigation) => {
-  const { event, intl, section, goToPageNavigation } = props
+  const { event, intl, section, goToFormConfigWizard } = props
   const TAB = event === 'birth' ? TAB_BIRTH : TAB_DEATH
 
   return (
-    <Container>
+    <>
       <Title>Pages</Title>
 
       {Object.keys(TAB).map((tab, idx) => (
@@ -91,10 +82,10 @@ export const PageNavigation = (props: IPageNavigation) => {
           )}`}
           isSelected={section === TAB[tab as keyof typeof TAB]}
           onClick={() =>
-            goToPageNavigation(event!, TAB[tab as keyof typeof TAB])
+            goToFormConfigWizard(event!, TAB[tab as keyof typeof TAB])
           }
         />
       ))}
-    </Container>
+    </>
   )
 }

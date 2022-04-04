@@ -22,19 +22,6 @@ import {
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
 
-const Container = styled.div`
-  right: 0px;
-  top: 56px;
-  width: 348px;
-  position: fixed;
-  padding-left: 24px;
-  padding-right: 24px;
-  padding-top: 30px;
-  height: 100%;
-  border-left: 1px solid ${({ theme }) => theme.colors.grey300};
-  background-color: ${({ theme }) => theme.colors.white};
-`
-
 const TitleContainer = styled.div`
   margin-top: 24px;
   margin-bottom: 15px;
@@ -93,7 +80,7 @@ export const FormTools = (props: IFormTools) => {
   }
 
   return (
-    <Container>
+    <>
       <ListViewSimplified>
         <ListViewItemSimplified
           label={
@@ -122,6 +109,6 @@ export const FormTools = (props: IFormTools) => {
           />
         ))}
       </ListViewSimplified>
-    </Container>
+    </>
   )
 }

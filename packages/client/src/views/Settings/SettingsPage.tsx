@@ -296,7 +296,6 @@ class SettingsView extends React.Component<IProps, IState> {
 
   render() {
     const { userDetails, intl, languages, goToPhoneSettingAction } = this.props
-
     const langChoice = [] as ILanguageOptions[]
     const availableLangs = getAvailableLanguages()
     availableLangs.forEach((lang: string) => {

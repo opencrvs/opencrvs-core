@@ -1963,6 +1963,21 @@ export const userDetails = {
   }
 }
 
+export const natlAdminUserDetails = {
+  userMgntUserID: '123',
+  language: 'en',
+  name: [
+    {
+      use: 'en',
+      firstNames: 'Taskin',
+      familyName: 'Ahmed'
+    },
+    { use: 'bn', firstNames: '', familyName: '' }
+  ],
+  role: 'NATIONAL_SYSTEM_ADMIN',
+  mobile: '01677701432'
+}
+
 export const mockUserResponseWithName = {
   data: {
     getUser: userDetails

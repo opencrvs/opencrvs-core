@@ -28,9 +28,9 @@ const TopBar = styled.div`
   position: fixed;
   z-index: 1;
 `
-const TopBarTitle = styled.h4<{ TopBarActions?: boolean }>`
+const TopBarTitle = styled.h4`
   ${({ theme }) => theme.fonts.h4};
-  padding-left: ${({ TopBarActions }) => (TopBarActions ? `6px` : `16px`)};
+  padding-left: 16px;
   color: ${({ theme }) => theme.colors.copy};
 `
 
@@ -81,9 +81,7 @@ export const EventTopBar = (props: IEventTopBarProps) => {
     <TopBar>
       <Item>
         {pageIcon || <DeclarationIcon color={iconColor} />}
-        <TopBarTitle TopBarActions={Boolean(topBarActions)}>
-          {title}
-        </TopBarTitle>
+        <TopBarTitle>{title}</TopBarTitle>
       </Item>
       <Item>
         {topBarActions && (

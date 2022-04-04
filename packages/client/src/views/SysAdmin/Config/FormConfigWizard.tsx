@@ -13,13 +13,11 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { getScope } from '@client/profile/profileSelectors'
-import { Scope } from '@client/utils/authUtils'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { RouteComponentProps, Redirect } from 'react-router'
 import { HOME } from '@client/navigation/routes'
 import { EventTopBar } from '@opencrvs/components/lib/interface'
-
 import { SettingsBlue } from '@opencrvs/components/lib/icons'
 import {
   SecondaryButton,
@@ -36,8 +34,9 @@ import { FormTools } from '@client/components/formConfig/formTools/FormTools'
 import { FormConfigCanvas } from '@client/components/formConfig/FormConfigCanvas'
 import { IForm } from '@client/forms'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import { goToPageNavigation } from '@client/navigation'
+import { goToFormConfigWizard } from '@client/navigation'
 import { buttonMessages } from '@client/i18n/messages'
+import { IUserDetails } from '@client/utils/userUtils'
 
 export enum EventType {
   BIRTH = 'birth',
@@ -50,7 +49,7 @@ type RouteProps = RouteComponentProps<{
 }>
 
 interface IStateProps {
-  scope: Scope | null
+  userDetails: IUserDetails | null
   registerForm: { [key: string]: IForm }
   event?: EventType
   section?: string | undefined
@@ -58,7 +57,7 @@ interface IStateProps {
 
 interface IDispatchProps {
   goBack: typeof goBack
-  goToPageNavigation: typeof goToPageNavigation
+  goToFormConfigWizard: typeof goToFormConfigWizard
 }
 
 const WizardContainer = styled.div`
@@ -66,6 +65,28 @@ const WizardContainer = styled.div`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
+`
+
+const NavigationContainer = styled.div`
+  top: 56px;
+  width: 250px;
+  position: fixed;
+  height: 100%;
+  border-right: 1px solid ${({ theme }) => theme.colors.grey300};
+  background-color: ${({ theme }) => theme.colors.white};
+`
+
+const ToolsContainer = styled.div`
+  right: 0px;
+  top: 56px;
+  width: 348px;
+  position: fixed;
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-top: 30px;
+  height: 100%;
+  border-left: 1px solid ${({ theme }) => theme.colors.grey300};
+  background-color: ${({ theme }) => theme.colors.white};
 `
 
 type IFullProps = IDispatchProps & IStateProps & IntlShapeProps & RouteProps
@@ -84,10 +105,11 @@ const topBarActions = (props: IFullProps) => {
 
 function FormConfigWizardComp(props: IFullProps) {
   if (
-    !props.scope?.includes('natlsysadmin') ||
+    !(props.userDetails?.role === 'NATIONAL_SYSTEM_ADMIN') ||
     !props.event ||
     !props.section
   ) {
+    console.log(props.event, props.section, props.userDetails)
     return <Redirect to={HOME} />
   }
 
@@ -100,15 +122,19 @@ function FormConfigWizardComp(props: IFullProps) {
         goHome={() => props.goBack()}
       />
       <WizardContainer>
-        <PageNavigation
-          registerForm={props.registerForm}
-          event={props.event}
-          intl={props.intl}
-          section={props.section}
-          goToPageNavigation={props.goToPageNavigation}
-        />
+        <NavigationContainer>
+          <PageNavigation
+            registerForm={props.registerForm}
+            event={props.event}
+            intl={props.intl}
+            section={props.section}
+            goToFormConfigWizard={props.goToFormConfigWizard}
+          />
+        </NavigationContainer>
         <FormConfigCanvas></FormConfigCanvas>
-        <FormTools intl={props.intl} />
+        <ToolsContainer>
+          <FormTools intl={props.intl} />
+        </ToolsContainer>
       </WizardContainer>
     </>
   )
@@ -123,7 +149,7 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
     section = TAB_DEATH[sectionKey as keyof typeof TAB_DEATH]
   }
   return {
-    scope: getScope(state),
+    userDetails: getUserDetails(state),
     registerForm: getRegisterForm(state),
     event:
       event === 'birth'
@@ -140,6 +166,6 @@ export const FormConfigWizard = connect<
   IDispatchProps,
   RouteProps,
   IStoreState
->(mapStateToProps, { goBack, goToPageNavigation })(
+>(mapStateToProps, { goBack, goToFormConfigWizard })(
   injectIntl(FormConfigWizardComp)
 )
