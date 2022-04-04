@@ -32,9 +32,7 @@ const Header = styled.div`
   flex-flow: column wrap;
 
   border-bottom: 1px solid rgb(204, 207, 208);
-  padding-top: 20px;
-  padding-right: 32px;
-  padding-left: 32px;
+  padding: 20px 32px;
 `
 const Footer = styled.div`
   display: flex;
