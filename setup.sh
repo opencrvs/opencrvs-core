@@ -338,7 +338,7 @@ echo
 echo "This can take some time on slow connections.  Docker is downloading Mongo DB, ElasticSearch, OpenHIM and Hearth docker images.  These are large files.  Then it will build them."
 echo
 if [ $OS == "MAC" ]; then
- export LOCAL_IP=$(ifconfig | grep "inet " | grep -Fv 127.0.0.1 | awk '{print $2}')
+ export LOCAL_IP=host-gateway
 fi
 yarn compose:deps:detached
 DOCKER_STARTED=1
