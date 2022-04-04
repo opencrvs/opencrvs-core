@@ -23,6 +23,13 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema'
 import { get, cloneDeep } from 'lodash'
 import { callingCountries } from 'country-data'
+import format from '@client/utils/date-formatting'
+import { IOfflineData } from '@client/offline/reducer'
+import { IUserDetails } from '@client/utils/userUtils'
+import { getUserName } from '@client/pdfRenderer/transformer/userTransformer'
+import { userMessages } from '@client/i18n/messages'
+import { MessageDescriptor } from 'react-intl'
+import { REGISTRATION_SECTION } from '@client/forms/mappings/query'
 
 export function transformStatusData(
   transformedData: IFormData,
@@ -106,6 +113,37 @@ export function getBirthRegistrationSectionTransformer(
     )
   }
 }
+
+export function registrationNumberTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string
+) {
+  if (queryData[sectionId].registrationNumber) {
+    transformedData[targetSectionId || sectionId][
+      targetFieldName || 'registrationNumber'
+    ] = queryData[sectionId].registrationNumber
+  }
+}
+
+export const certificateDateTransformer =
+  (locale: string, dateFormat: string) =>
+  (
+    transformedData: IFormData,
+    _: any,
+    sectionId: string,
+    targetSectionId?: string,
+    targetFieldName?: string
+  ) => {
+    const prevLocale = window.__localeId__
+    window.__localeId__ = locale
+    transformedData[targetSectionId || sectionId][
+      targetFieldName || 'certificateDate'
+    ] = format(new Date(), dateFormat)
+    window.__localeId__ = prevLocale
+  }
 
 const convertToLocal = (
   mobileWithCountryCode: string,
@@ -194,4 +232,75 @@ export function questionnaireToCustomFieldTransformer(
       transformedData[sectionId][field.name] = selectedQuestion.value
     }
   }
+}
+
+export const registrarNameUserTransformer = (
+  transformedData: IFormData,
+  _: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string,
+  __?: IOfflineData,
+  userDetails?: IUserDetails
+) => {
+  if (!userDetails) {
+    return
+  }
+  transformedData[targetSectionId || sectionId][targetFieldName || 'userName'] =
+    getUserName(userDetails)
+}
+
+export const roleUserTransformer = (
+  transformedData: IFormData,
+  _: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string,
+  __?: IOfflineData,
+  userDetails?: IUserDetails
+) => {
+  if (!userDetails?.role) {
+    return
+  }
+  transformedData[targetSectionId || sectionId][targetFieldName || 'role'] =
+    userMessages[userDetails.role] as MessageDescriptor & Record<string, string>
+}
+
+export const registrationLocationUserTransformer = (
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string
+) => {
+  const statusData = queryData[REGISTRATION_SECTION].status as GQLRegWorkflow[]
+  const registrationStatus =
+    statusData &&
+    statusData.find((status) => {
+      return status.type && (status.type as GQLRegStatus) === 'REGISTERED'
+    })
+  const officeName = registrationStatus?.office?.name || ''
+  const officeAddressLevel3 =
+    registrationStatus?.office?.address?.district || ''
+  const officeAddressLevel4 = registrationStatus?.office?.address?.state || ''
+  transformedData[targetSectionId || sectionId][
+    targetFieldName || 'registrationOffice'
+  ] = [officeName, officeAddressLevel3, officeAddressLevel4].join(', ')
+}
+
+export const registrarSignatureUserTransformer = (
+  transformedData: IFormData,
+  _: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string,
+  __?: IOfflineData,
+  userDetails?: IUserDetails
+) => {
+  if (!userDetails?.primaryOffice) {
+    return
+  }
+  transformedData[targetSectionId || sectionId][
+    targetFieldName || 'registrationOffice'
+  ] = userDetails.localRegistrar.signature?.data as string
 }

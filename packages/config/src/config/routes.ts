@@ -19,7 +19,10 @@ import {
   updateCertificate,
   updateCertificateHandler
 } from '@config/handlers/certificate/certificateHandler'
-import applicationConfigHandler from '@config/handlers/application/applicationConfigHandler'
+import applicationConfigHandler, {
+  updateApplicationConfig,
+  updateApplicationConfigHandler
+} from '@config/handlers/applicationConfigHandler'
 import createQuestionHandler, {
   requestSchema as createQuestionReqSchema
 } from '@config/handlers/createQuestion/handler'
@@ -172,6 +175,21 @@ export default function getRoutes() {
         description: 'Get form draft',
         auth: {
           scope: [RouteScope.NATLSYSADMIN]
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/updateApplicationConfig',
+      handler: updateApplicationConfigHandler,
+      config: {
+        tags: ['api'],
+        description: 'Updates an existing Config',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        validate: {
+          payload: updateApplicationConfig
         }
       }
     },

@@ -42,7 +42,7 @@ export const correctionFeesPayment: IFormSectionGroup = {
             name: 'totalFees',
             type: 'TEXT',
             label: {
-              defaultMessage: 'Total ($)',
+              defaultMessage: 'Total',
               id: 'form.field.label.totalFees',
               description: 'Label for input Reason for Change'
             },

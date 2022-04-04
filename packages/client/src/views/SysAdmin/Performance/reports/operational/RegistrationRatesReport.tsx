@@ -158,13 +158,13 @@ class RegistrationRatesReportComponent extends React.Component<Props, States> {
     const birthReportHeader = intl.formatMessage(
       messages.birthRegistrationRatesReportHeader,
       {
-        birthRegistrationTarget: window.config.BIRTH_REGISTRATION_TARGET
+        birthRegistrationTarget: window.config.BIRTH.REGISTRATION_TARGET
       }
     )
     const deathReportHeader = intl.formatMessage(
       messages.deathRegistrationRatesReportHeader,
       {
-        deathRegistrationTarget: window.config.DEATH_REGISTRATION_TARGET
+        deathRegistrationTarget: window.config.DEATH.REGISTRATION_TARGET
       }
     )
     return (
@@ -208,7 +208,7 @@ class RegistrationRatesReportComponent extends React.Component<Props, States> {
                   (birthTargetDayMetrics &&
                     birthTargetDayMetrics.estimatedRegistration) ||
                   0,
-                registrationTarget: window.config.BIRTH_REGISTRATION_TARGET
+                registrationTarget: window.config.BIRTH.REGISTRATION_TARGET
               })}
             </KeyNumberDescription>
             {this.getLabelValuePair(
@@ -254,7 +254,7 @@ class RegistrationRatesReportComponent extends React.Component<Props, States> {
                   (deathTargetDayMetrics &&
                     deathTargetDayMetrics.estimatedRegistration) ||
                   0,
-                registrationTarget: window.config.DEATH_REGISTRATION_TARGET
+                registrationTarget: window.config.DEATH.REGISTRATION_TARGET
               })}
             </KeyNumberDescription>
             {this.getLabelValuePair(

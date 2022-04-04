@@ -19,7 +19,6 @@ export const PrimaryButton = styled(Button)`
   color: ${({ theme }) => theme.colors.white};
   background: ${({ theme }) => theme.colors.primary};
   justify-content: center;
-  border-radius: 2px;
   ${({ theme }) => theme.fonts.bold16};
 
   &:hover:enabled {

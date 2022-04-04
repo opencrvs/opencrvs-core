@@ -32,8 +32,7 @@ export function ImageLoaderComp({
   onImageLoaded,
   onLoadingStarted,
   onError,
-  intl,
-  ...props
+  intl
 }: IProps) {
   const fileUploader = React.useRef<HTMLInputElement>(null)
 
@@ -46,20 +45,20 @@ export function ImageLoaderComp({
         onLoadingStarted && onLoadingStarted()
         const image = await validateImage(files[0])
         onImageLoaded({ type: files[0].type, data: image })
-        fileUploader.current!.value = ''
       } catch (error) {
         if (error.message === ERROR_TYPES.OVERSIZED) {
           onError(intl.formatMessage(messages.overSized))
         } else {
           onError(intl.formatMessage(messages.imageFormat))
         }
+      } finally {
         fileUploader.current!.value = ''
       }
     }
   }
 
   return (
-    <div {...props} onClick={() => fileUploader.current!.click()}>
+    <div onClick={() => fileUploader.current!.click()}>
       {children}
       <HiddenInput
         ref={fileUploader}
@@ -72,4 +71,4 @@ export function ImageLoaderComp({
   )
 }
 
-export const ImageLoader = injectIntl<'intl', IProps>(ImageLoaderComp)
+export const ImageLoader = injectIntl(ImageLoaderComp)

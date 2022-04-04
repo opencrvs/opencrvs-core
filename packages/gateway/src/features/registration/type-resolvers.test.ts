@@ -30,8 +30,10 @@ import {
   mockCertificate,
   mockErrorComposition,
   mockObservationBundle,
-  reasonsNotApplyingMock
+  reasonsNotApplyingMock,
+  mockTaskDownloaded
 } from '@gateway/utils/testUtils'
+import { GQLRegStatus } from '@gateway/graphql/schema'
 import { clone } from 'lodash'
 import * as fetchAny from 'jest-fetch-mock'
 
@@ -284,6 +286,66 @@ describe('Registration type resolvers', () => {
     const educationalAttainment =
       typeResolvers.Person.educationalAttainment(mockPatient)
     expect(educationalAttainment).toBe('SECOND_STAGE_TERTIARY_ISCED_6')
+  })
+
+  describe('History type resolver', () => {
+    it('Should return action DOWNLOADED', async () => {
+      const action = await typeResolvers.History.action(mockTaskDownloaded)
+      expect(action).toEqual(GQLRegStatus.DOWNLOADED)
+    })
+
+    it('Should return reject reason', async () => {
+      const statusReason = await typeResolvers.History.statusReason(
+        mockTaskDownloaded
+      )
+      expect(statusReason.text).toEqual('Rejected reason')
+    })
+
+    it('Should return true if reinstated', () => {
+      const reinstated = typeResolvers.History.reinstated(mockTaskDownloaded)
+      expect(reinstated).toBe(true)
+    })
+
+    it('Should return date', () => {
+      const date = typeResolvers.History.date(mockTaskDownloaded)
+      expect(date).toBe('2016-10-31T09:45:05+10:00')
+    })
+
+    it('Should return user', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockUser))
+      const user = await typeResolvers.History.user(
+        mockTaskDownloaded,
+        null,
+        {}
+      )
+      expect(user.role).toBe(mockUser.role)
+    })
+
+    it('Should return location', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockLocation))
+      const location = await typeResolvers.History.location(
+        mockTaskDownloaded,
+        null,
+        {}
+      )
+      expect(location.id).toBe(mockLocation.id)
+    })
+
+    it('Should return comment', () => {
+      const comment = typeResolvers.History.comments(mockTaskDownloaded)
+      expect(comment[0].text).toBe('Comment')
+    })
+
+    it('Should return certificate', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockCertificate))
+
+      const certificates = await typeResolvers.History.certificates(
+        mockTaskDownloaded,
+        null,
+        {}
+      )
+      expect(certificates).toBe(null)
+    })
   })
 
   describe('Birth Registration type', () => {

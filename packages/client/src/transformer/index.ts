@@ -30,6 +30,9 @@ import {
 import { IDeclaration } from '@client/declarations'
 import { hasFieldChanged } from '@client/views/CorrectionForm/utils'
 import { get } from 'lodash'
+import { sectionTransformer } from '@client/forms/mappings/query'
+import { IOfflineData } from '@client/offline/reducer'
+import { IUserDetails } from '@client/utils/userUtils'
 
 const nestedFieldsMapping = (
   transformedData: TransformedData,
@@ -291,7 +294,9 @@ export const appendGqlMetadataFromDraft = (
 
 export const gqlToDraftTransformer = (
   formDefinition: IForm,
-  queryData: any
+  queryData: any,
+  offlineData?: IOfflineData,
+  userDetails?: IUserDetails
 ) => {
   if (!formDefinition.sections) {
     throw new Error('Sections are missing in form definition')
@@ -314,6 +319,24 @@ export const gqlToDraftTransformer = (
     transformedData[section.id] = {}
     section.groups.forEach((groupDef) => {
       groupDef.fields.forEach((fieldDef) => {
+        if (fieldDef.mapping?.template) {
+          if (!transformedData.template) {
+            transformedData.template = {}
+          }
+          /**
+           * Wraps actual transformer with
+           * section transformer
+           */
+          const [fieldName, fieldTransformer] = fieldDef.mapping.template
+          sectionTransformer('template', fieldTransformer, fieldName)(
+            transformedData,
+            queryData,
+            section.id,
+            fieldDef,
+            undefined,
+            offlineData
+          )
+        }
         if (fieldDef.mapping && fieldDef.mapping.query) {
           fieldDef.mapping.query(
             transformedData,
@@ -343,6 +366,22 @@ export const gqlToDraftTransformer = (
     }
     if (section.mapping && section.mapping.query) {
       section.mapping.query(transformedData, queryData, section.id)
+    }
+    if (section.mapping?.template) {
+      if (!transformedData.template) {
+        transformedData.template = {}
+      }
+      section.mapping.template.forEach(([fieldName, transformer]) => {
+        transformer(
+          transformedData,
+          queryData,
+          section.id,
+          'template',
+          fieldName,
+          offlineData,
+          userDetails
+        )
+      })
     }
     if (
       transformedData[section.id] &&
