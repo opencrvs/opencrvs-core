@@ -16,3 +16,4 @@ network.host: 0.0.0.0
 discovery.zen.minimum_master_nodes: 1
 path.repo: ['/data/backups/elasticsearch']
 discovery.type: single-node
+xpack.security.enabled: true

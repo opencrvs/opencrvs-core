@@ -46,8 +46,8 @@ services:
     environment:
       - KIBANA_HOST=kibana:5601
       - ELASTICSEARCH_HOST=elasticsearch:9200
-      - ELASTICSEARCH_USERNAME=elastic
-      - ELASTICSEARCH_PASSWORD=changeme
+      - ELASTICSEARCH_USERNAME=beats_system
+      - ELASTICSEARCH_PASSWORD=${ROTATING_METRICBEAT_ELASTIC_PASSWORD}
     command: ['--strict.perms=false', '-system.hostfs=/hostfs']
     hostname: 'metricbeat-{{.Node.Hostname}}'
     restart: always
@@ -77,6 +77,9 @@ services:
       - overlay_net
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
   kibana:
     restart: always
     deploy:
@@ -84,7 +87,6 @@ services:
         # https://doc.traefik.io/traefik/v1.7/configuration/backends/docker/#labels-overriding-default-behavior
         - 'traefik.enable=true'
         - 'traefik.frontend.rule=Host: kibana.{{hostname}}'
-        - 'traefik.frontend.auth.basic.usersFile=/run/secrets/kibana-htpasswd'
         - 'traefik.port=5601'
         - 'traefik.docker.network=opencrvs_overlay_net'
     networks:
@@ -92,6 +94,9 @@ services:
     configs:
       - source: kibana.{{ts}}
         target: /usr/share/kibana/config/kibana.yml
+    environment:
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=${ROTATING_ELASTIC_PASSWORD}
     depends_on:
       - elasticsearch
 
@@ -129,18 +134,46 @@ services:
   # Configure elasticsearch
   elasticsearch:
     volumes:
-      - '/data/elasticsearch:/usr/share/elasticsearch/data'
-      - '/data/backups/elasticsearch:/data/backups/elasticsearch'
-      - '/tmp/compose/infrastructure/elasticsearch/elasticsearch.yml:/config/elasticsearch.yml'
-      - '/tmp/compose/infrastructure/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml'
+      - './data/elasticsearch:/usr/share/elasticsearch/data'
+      - './data/backups/elasticsearch:/data/backups/elasticsearch'
+      - './infrastructure/elasticsearch/elasticsearch.yml:/config/elasticsearch.yml'
+      - './infrastructure/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml'
     deploy:
       replicas: 1
       placement:
         constraints:
           - node.labels.data1 == true
+    ports:
+      - 9200:9200
+    environment:
+      - ELASTIC_PASSWORD=${ROTATING_ELASTIC_PASSWORD}
     networks:
       - overlay_net
 
+  setup-elasticsearch-users:
+    image: ubuntu:bionic
+    entrypoint: ['bash', '/usr/app/setup-users.sh']
+    restart: on-failure
+    depends_on:
+      - elasticsearch
+    environment:
+      - ELASTICSEARCH_HOST=elasticsearch
+      - ELASTIC_PASSWORD=${ROTATING_ELASTIC_PASSWORD}
+      - METRICBEAT_ELASTIC_PASSWORD=${ROTATING_METRICBEAT_ELASTIC_PASSWORD}
+      - APM_ELASTIC_PASSWORD=${ROTATING_APM_ELASTIC_PASSWORD}
+      - SEARCH_ELASTIC_USERNAME=search-user
+      - SEARCH_ELASTIC_PASSWORD=${ROTATING_SEARCH_ELASTIC_PASSWORD}
+      - KIBANA_USERNAME=${KIBANA_USERNAME}
+      - KIBANA_PASSWORD=${KIBANA_PASSWORD}
+    volumes:
+      - './infrastructure/elasticsearch:/usr/app'
+    networks:
+      - overlay_net
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
   elastalert:
     image: jertel/elastalert2:2.3.0
     restart: unless-stopped

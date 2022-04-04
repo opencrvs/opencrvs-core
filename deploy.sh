@@ -104,6 +104,16 @@ SSH_HOST=${SSH_HOST:-$HOST}
 LOG_LOCATION=${LOG_LOCATION:-/var/log}
 
 
+
+# Rotate ElasticSearch credentials
+ROTATING_ELASTIC_PASSWORD=`generate_password`
+# Used for Metricsbeat -> ElasticSearch communication
+ROTATING_METRICBEAT_ELASTIC_PASSWORD=`generate_password`
+# Used for APM -> ElasticSearch communication
+ROTATING_APM_ELASTIC_PASSWORD=`generate_password`
+# Application password
+ROTATING_SEARCH_ELASTIC_PASSWORD=`generate_password`
+
 echo
 echo "Deploying VERSION $VERSION to $SSH_HOST..."
 echo
