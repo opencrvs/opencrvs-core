@@ -33,11 +33,19 @@ input MesssageDescriptorInput {
   defaultMessage: String
 }
 
+input MesssageInput {
+  lang: String
+  descriptor: MesssageDescriptorInput
+}
+
 input QuestionInput {
   id: ID
   fieldId: String!
-  label: MesssageDescriptorInput
-  placeholder: MesssageDescriptorInput
+  label: [MesssageInput]
+  placeholder: [MesssageInput]
+  description: [MesssageInput]
+  tooltip: [MesssageInput]
+  errorMessage: [MesssageInput]
   maxLength: Int
   fieldName: String
   fieldType: String

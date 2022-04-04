@@ -19,13 +19,14 @@ export default async function createQuestion(
   h: Hapi.ResponseToolkit
 ) {
   const questionDto = request.payload as IQuestion
+  let question: IQuestion
   try {
-    await Question.create(questionDto)
+    question = await Question.create(questionDto)
   } catch (e) {
     throw internal(e.message)
   }
 
-  return h.response().code(201)
+  return h.response(question).code(201)
 }
 
 export const messageSchema = Joi.array().items({

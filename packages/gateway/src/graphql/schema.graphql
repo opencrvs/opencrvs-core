@@ -423,8 +423,11 @@ type CertificateSVG {
 type Question {
   _id: ID!
   fieldId: String!
-  label: MesssageDescriptor
-  placeholder: MesssageDescriptor
+  label: [Messsage]
+  placeholder: [Messsage]
+  description: [Messsage]
+  tooltip: [Messsage]
+  errorMessage: [Messsage]
   maxLength: Int
   fieldName: String
   fieldType: String
@@ -550,8 +553,11 @@ input CertificateSVGInput {
 input QuestionInput {
   id: ID
   fieldId: String!
-  label: MesssageDescriptorInput
-  placeholder: MesssageDescriptorInput
+  label: [MesssageInput]
+  placeholder: [MesssageInput]
+  description: [MesssageInput]
+  tooltip: [MesssageInput]
+  errorMessage: [MesssageInput]
   maxLength: Int
   fieldName: String
   fieldType: String
@@ -880,10 +886,9 @@ type EventProgressSet {
   progressReport: EventProgressData
 }
 
-type MesssageDescriptor {
-  id: String
-  description: String
-  defaultMessage: String
+type Messsage {
+  lang: String
+  descriptor: MesssageDescriptor
 }
 
 type DraftHistory {
@@ -1006,10 +1011,9 @@ input SignatureInput {
   type: String
 }
 
-input MesssageDescriptorInput {
-  id: String
-  description: String
-  defaultMessage: String
+input MesssageInput {
+  lang: String
+  descriptor: MesssageDescriptorInput
 }
 
 type RegWorkflow {
@@ -1262,6 +1266,12 @@ type EventProgressData {
   timeInReadyToPrint: Int
 }
 
+type MesssageDescriptor {
+  id: String
+  description: String
+  defaultMessage: String
+}
+
 input IdentityInput {
   id: ID
   type: IdentityIDType
@@ -1340,6 +1350,12 @@ input ReasonsNotApplyingInput {
   primaryCaregiverType: PrimaryCaregiverType
   reasonNotApplying: String
   isDeceased: Boolean
+}
+
+input MesssageDescriptorInput {
+  id: String
+  description: String
+  defaultMessage: String
 }
 
 type Payment {

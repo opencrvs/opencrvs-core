@@ -229,6 +229,11 @@ input MesssageDescriptorInput {
   defaultMessage: String
 }
 
+input MesssageInput {
+  lang: String
+  descriptor: MesssageDescriptorInput
+}
+
 scalar Date
 
 type BirthRegistration implements EventRegistration {
@@ -432,11 +437,19 @@ type CertificateSVG {
   status: String
 }
 
+type Messsage {
+  lang: String
+  descriptor: MesssageDescriptor
+}
+
 type Question {
   _id: ID!
   fieldId: String!
-  label: MesssageDescriptor
-  placeholder: MesssageDescriptor
+  label: [Messsage]
+  placeholder: [Messsage]
+  description: [Messsage]
+  tooltip: [Messsage]
+  errorMessage: [Messsage]
   maxLength: Int
   fieldName: String
   fieldType: String
@@ -570,8 +583,11 @@ input CertificateSVGInput {
 input QuestionInput {
   id: ID
   fieldId: String!
-  label: MesssageDescriptorInput
-  placeholder: MesssageDescriptorInput
+  label: [MesssageInput]
+  placeholder: [MesssageInput]
+  description: [MesssageInput]
+  tooltip: [MesssageInput]
+  errorMessage: [MesssageInput]
   maxLength: Int
   fieldName: String
   fieldType: String
