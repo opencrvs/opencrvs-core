@@ -122,7 +122,7 @@ services:
         constraints:
           - node.labels.data1 == true
     configs:
-      - source: mongo-init
+      - source: mongo-init.{{ts}}
         target: /docker-entrypoint-initdb.d/create-mongo-users.sh
     networks:
       - overlay_net
@@ -131,7 +131,7 @@ services:
     image: mongo:4.4
     command: bash /on-deploy.sh
     configs:
-      - source: mongo-on-deploy
+      - source: mongo-on-deploy.{{ts}}
         target: /on-deploy.sh
     deploy:
       replicas: 1
@@ -492,9 +492,9 @@ configs:
     file: ./infrastructure/hearth-queryparam-extensions.json
   metricbeat-conf:
     file: ./infrastructure/monitoring/beats/metricbeat.yml
-  mongo-init:
+  mongo-init.{{ts}}:
     file: ./infrastructure/mongodb/docker-entrypoint-initdb.d/create-mongo-users.sh
-  mongo-on-deploy:
+  mongo-on-deploy.{{ts}}:
     file: ./infrastructure/mongodb/on-deploy.sh
 
 networks:
