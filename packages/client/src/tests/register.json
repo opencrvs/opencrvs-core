@@ -745,6 +745,30 @@
             }
           ],
           "mapping": {
+            "template": [
+              {
+                "fieldName": "registrationNumber",
+                "operation": "registrationNumberTransformer"
+              },
+              {
+                "fieldName": "certificateDate",
+                "operation": "certificateDateTransformer",
+                "parameters": ["en", "dd MMMM yyyy"]
+              },
+              {
+                "fieldName": "registrarName",
+                "operation": "registrarNameUserTransformer"
+              },
+              { "fieldName": "role", "operation": "roleUserTransformer" },
+              {
+                "fieldName": "registrarSignature",
+                "operation": "registrarSignatureUserTransformer"
+              },
+              {
+                "fieldName": "registrationLocation",
+                "operation": "registrationLocationUserTransformer"
+              }
+            ],
             "mutation": {
               "operation": "setBirthRegistrationSectionTransformer"
             },
@@ -787,6 +811,11 @@
                     }
                   ],
                   "mapping": {
+                    "template": {
+                      "operation": "dateFormatTransformer",
+                      "fieldName": "eventDate",
+                      "parameters": ["birthDate", "en", "do MMMM yyyy"]
+                    },
                     "mutation": {
                       "operation": "longDateTransformer",
                       "parameters": ["birthDate"]
@@ -919,6 +948,11 @@
                     }
                   ],
                   "mapping": {
+                    "template": {
+                      "fieldName": "informantFirstName",
+                      "operation": "nameToFieldTransformer",
+                      "parameters": ["en", "firstNames"]
+                    },
                     "mutation": {
                       "operation": "fieldToNameTransformer",
                       "parameters": ["en", "firstNames"]
@@ -946,6 +980,11 @@
                     }
                   ],
                   "mapping": {
+                    "template": {
+                      "fieldName": "informantFamilyName",
+                      "operation": "nameToFieldTransformer",
+                      "parameters": ["en", "familyName"]
+                    },
                     "mutation": {
                       "operation": "fieldToNameTransformer",
                       "parameters": ["en", "familyName"]
@@ -1035,6 +1074,11 @@
                     }
                   ],
                   "mapping": {
+                    "template": {
+                      "fieldName": "placeOfBirth",
+                      "operation": "eventLocationNameQueryOfflineTransformer",
+                      "parameters": ["facilities"]
+                    },
                     "mutation": {
                       "operation": "birthEventLocationMutationTransformer",
                       "parameters": []
@@ -1072,6 +1116,11 @@
                     }
                   ],
                   "mapping": {
+                    "template": {
+                      "fieldName": "placeOfBirth",
+                      "operation": "eventLocationAddressOfflineTransformer",
+                      "parameters": ["country"]
+                    },
                     "mutation": {
                       "operation": "birthEventLocationMutationTransformer",
                       "parameters": []
@@ -1118,6 +1167,11 @@
                     }
                   ],
                   "mapping": {
+                    "template": {
+                      "fieldName": "placeOfBirth",
+                      "operation": "eventLocationAddressOfflineTransformer",
+                      "parameters": ["state"]
+                    },
                     "mutation": {
                       "operation": "birthEventLocationMutationTransformer",
                       "parameters": []
@@ -1181,6 +1235,11 @@
                     }
                   ],
                   "mapping": {
+                    "template": {
+                      "fieldName": "placeOfBirth",
+                      "operation": "eventLocationAddressOfflineTransformer",
+                      "parameters": ["district"]
+                    },
                     "mutation": {
                       "operation": "birthEventLocationMutationTransformer",
                       "parameters": []

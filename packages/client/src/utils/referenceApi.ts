@@ -13,6 +13,7 @@ import { IFormConfig, ISerializedForm } from '@client/forms'
 import { ILanguage } from '@client/i18n/reducer'
 import { ILocation } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
+import { IPDFTemplate } from '@client/pdfRenderer/transformer/types'
 
 export interface ILocationDataResponse {
   [locationId: string]: ILocation
@@ -26,6 +27,13 @@ export interface IContentResponse {
   forms: {
     registerForm: { birth: ISerializedForm; death: ISerializedForm }
     userForm: ISerializedForm
+  }
+  templates: {
+    receipt?: IPDFTemplate
+    certificates: {
+      birth: IPDFTemplate
+      death: IPDFTemplate
+    }
   }
 }
 

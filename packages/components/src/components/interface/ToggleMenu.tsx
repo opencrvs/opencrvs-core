@@ -13,6 +13,7 @@ import styled from 'styled-components'
 import React from 'react'
 import { CircleButton } from '../buttons'
 
+// TODO: margin-left value of auto needs to be refactored out
 const ToggleMenuContainer = styled.div`
   position: relative;
   height: 40px;
