@@ -11,7 +11,7 @@
  */
 
 import { ApolloQueryResult } from 'apollo-client'
-import { GQLformDraft } from '@opencrvs/gateway/src/graphql/schema'
+import { GQLFormDraft } from '@opencrvs/gateway/src/graphql/schema'
 
 export const LOAD_DRAFT = 'FORM/FETCH_DRAFT'
 export type DraftFetchAction = {
@@ -26,12 +26,12 @@ export const STORE_DRAFT = 'FORM/STORE_DRAFT'
 export type DraftStoredAction = {
   type: typeof STORE_DRAFT
   payload: {
-    queryData: ApolloQueryResult<{ getFormDraft: Array<GQLformDraft | null> }>
+    queryData: ApolloQueryResult<{ getFormDraft: Array<GQLFormDraft | null> }>
   }
 }
 
 export const storeDraft = (
-  queryData: ApolloQueryResult<{ getFormDraft: Array<GQLformDraft | null> }>
+  queryData: ApolloQueryResult<{ getFormDraft: Array<GQLFormDraft | null> }>
 ): DraftStoredAction => ({
   type: STORE_DRAFT,
   payload: {

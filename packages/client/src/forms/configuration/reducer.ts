@@ -14,7 +14,22 @@ import { storage } from '@client/storage'
 import { find } from 'lodash'
 import { formDraftQueries } from './queries'
 import * as actions from '@client/forms/configuration/actions'
-import { Event } from '@client/forms/index'
+import {
+  Event,
+  IQuestionConfig,
+  ISerializedForm,
+  IFormField,
+  IForm,
+  IFormSection
+} from '@client/forms'
+import {
+  configureRegistrationForm,
+  sortFormCustomisations,
+  filterQuestionsByEventType
+} from '@client/forms/configuration'
+import { registerForms } from './default'
+import { deserializeForm } from '@client/forms/mappings/deserializer'
+import { GQLFormDraft } from '@opencrvs/gateway/src/graphql/schema'
 
 export enum DraftStatus {
   DRAFT = 'DRAFT',
@@ -29,12 +44,27 @@ export interface IHistory {
   lastUpdateAt: number
 }
 
+type IConfigFormField = {
+  fieldId: string
+  precedingFieldId: string | null
+  foregoingFieldId: string | null
+  required: boolean
+  enabled: string
+  custom: boolean
+  definition: IFormField
+}
+
+type IFormFieldMap = Record<string, IConfigFormField>
+
+type ISectionFieldMap = Record<string, IFormFieldMap>
+
 export interface IDraft {
   event: Event
   status: DraftStatus
   comment?: string
   version: number
   history?: IHistory[]
+  fieldsMap: ISectionFieldMap
   updatedAt: number
   createdAt: number
 }
@@ -54,6 +84,50 @@ export const initialState: IFormDraftDataState = {
   formDraftData: null,
   formDraftDataLoaded: false,
   loadingError: false
+}
+
+function getSectionFieldsMap(event: Event, section: IFormSection) {
+  let precedingFieldId: string | null = null
+  return section.groups.reduce<IFormFieldMap>(
+    (groupFieldMap, group) =>
+      group.fields.reduce((fieldMap, field) => {
+        const fieldId = [
+          event.toLowerCase(),
+          section.id,
+          group.id,
+          field.name
+        ].join('.')
+        /* We need to build the field regardless of the conditionals */
+        delete field.conditionals
+        fieldMap[fieldId] = {
+          fieldId,
+          precedingFieldId: precedingFieldId ? precedingFieldId : null,
+          foregoingFieldId: null,
+          required: field.required || false,
+          enabled: field.enabled || 'enabled',
+          custom: field.custom || false,
+          definition: field
+        }
+        if (precedingFieldId) {
+          fieldMap[precedingFieldId].foregoingFieldId = fieldId
+        }
+        precedingFieldId = fieldId
+        return fieldMap
+      }, groupFieldMap),
+    {}
+  )
+}
+
+function getEventSectionFieldsMap(form: IForm, event: Event) {
+  const birthSectionFieldsMap = form.sections.reduce<ISectionFieldMap>(
+    (sectionFieldsMap, section) => ({
+      ...sectionFieldsMap,
+      [section.id]: getSectionFieldsMap(event, section)
+    }),
+    {}
+  )
+
+  return birthSectionFieldsMap
 }
 
 async function saveFormDraftData(formDraftData: IFormDraftData) {
@@ -80,19 +154,61 @@ export const formDraftReducer: LoopReducer<
       )
 
     case actions.STORE_DRAFT:
-      const { queryData: formDraftQueryData } = action.payload
+      const formDraftQueryData =
+        action.payload.queryData.data.getFormDraft.filter(
+          (draft): draft is GQLFormDraft => draft !== null
+        )
 
-      const birthFormDraft = find(formDraftQueryData.data.getFormDraft, {
+      const birthFormDraft = find(formDraftQueryData, {
         event: 'birth'
       })
 
-      const deathFormDraft = find(formDraftQueryData.data.getFormDraft, {
+      const deathFormDraft = find(formDraftQueryData, {
         event: 'death'
       })
 
+      if (!birthFormDraft) {
+        throw new Error('No birth form draft found')
+      }
+
+      if (!deathFormDraft) {
+        throw new Error('No death form draft found')
+      }
+
+      const configuredBirthForm: ISerializedForm = configureRegistrationForm(
+        sortFormCustomisations(
+          filterQuestionsByEventType(
+            birthFormDraft.questions as IQuestionConfig[] | undefined,
+            'birth'
+          ),
+          registerForms.birth
+        ),
+        registerForms.birth
+      )
+
+      const configuredDeathForm: ISerializedForm = configureRegistrationForm(
+        sortFormCustomisations(
+          filterQuestionsByEventType(
+            deathFormDraft.questions as IQuestionConfig[] | undefined,
+            'death'
+          ),
+          registerForms.death
+        ),
+        registerForms.death
+      )
+
+      const birthForm = deserializeForm(configuredBirthForm)
+      const deathForm = deserializeForm(configuredDeathForm)
+
       const formDraftData = {
-        birth: birthFormDraft,
-        death: deathFormDraft
+        birth: {
+          ...birthFormDraft,
+          fieldsMap: getEventSectionFieldsMap(birthForm, Event.BIRTH)
+        },
+        death: {
+          ...deathFormDraft,
+          fieldsMap: getEventSectionFieldsMap(deathForm, Event.DEATH)
+        }
       } as IFormDraftData
 
       return loop(

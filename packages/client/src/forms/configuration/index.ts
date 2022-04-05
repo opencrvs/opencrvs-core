@@ -199,10 +199,10 @@ export function sortFormCustomisations(
 }
 
 export function filterQuestionsByEventType(
-  questions: IQuestionConfig[],
+  questions: IQuestionConfig[] | undefined,
   event: string
-): IQuestionConfig[] {
-  return questions.filter((question) => question.fieldId.includes(event))
+) {
+  return questions?.filter((question) => question.fieldId.includes(event)) || []
 }
 
 export function configureRegistrationForm(
