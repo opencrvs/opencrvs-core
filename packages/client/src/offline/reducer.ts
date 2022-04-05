@@ -27,15 +27,15 @@ import {
   ICertificateTemplateData
 } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
-import { filterLocations, getLocation } from '@client/utils/locationUtils'
-import { IFormConfig, ISerializedForm } from '@client/forms'
+import { filterLocations } from '@client/utils/locationUtils'
+import { IFormConfig, IQuestionConfig, ISerializedForm } from '@client/forms'
 import { isOfflineDataLoaded, isNationalSystemAdmin } from './selectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import {
   IPDFTemplate,
   ISVGTemplate
 } from '@client/pdfRenderer/transformer/types'
-import _ from 'lodash'
+import { find, merge } from 'lodash'
 import { registerForms } from '@client/forms/configuration/default'
 import { createUserForm } from '@client/forms/user/fieldDefinitions/createUser'
 
@@ -113,6 +113,61 @@ async function saveOfflineData(offlineData: IOfflineData) {
   return storage.setItem('offline', JSON.stringify(offlineData))
 }
 
+function getAvailableContent(formConfig: IFormConfig, languages: ILanguage[]) {
+  languages.forEach((language) => {
+    language.messages = {
+      ...language.messages,
+      ...extractMessages(formConfig.questionConfig, language.lang)
+    }
+  })
+  return languages
+}
+
+function extractMessages(questions: IQuestionConfig[], language: string) {
+  const messages: { [key: string]: string } = {}
+  questions.forEach((question) => {
+    const labelMessage = find(question.label, {
+      lang: language
+    })
+    const placeholderMessage = find(question.placeholder, {
+      lang: language
+    })
+    const descriptionMessage = find(question.description, {
+      lang: language
+    })
+    const tooltipMessage = find(question.tooltip, {
+      lang: language
+    })
+    const errorMessage = find(question.errorMessage, {
+      lang: language
+    })
+    if (labelMessage) {
+      messages[labelMessage.descriptor.id] =
+        labelMessage.descriptor.defaultMessage
+    }
+
+    if (placeholderMessage) {
+      messages[placeholderMessage.descriptor.id] =
+        placeholderMessage.descriptor.defaultMessage
+    }
+
+    if (descriptionMessage) {
+      messages[descriptionMessage.descriptor.id] =
+        descriptionMessage.descriptor.defaultMessage
+    }
+
+    if (tooltipMessage) {
+      messages[tooltipMessage.descriptor.id] =
+        tooltipMessage.descriptor.defaultMessage
+    }
+
+    if (errorMessage) {
+      messages[errorMessage.descriptor.id] =
+        errorMessage.descriptor.defaultMessage
+    }
+  })
+  return messages
+}
 function checkIfDone(
   oldState: IOfflineDataState,
   loopOrState: IOfflineDataState | Loop<IOfflineDataState, actions.Action>
@@ -205,6 +260,7 @@ function getDataLoadingCommands(state: IOfflineDataState) {
     LOCATIONS_CMD,
     PILOT_LOCATIONS_CMD,
     getContentCmd(state),
+    CONFIG_CMD,
     ASSETS_CMD
   ])
 }
@@ -288,13 +344,13 @@ function reducer(
       return loop(state, CONFIG_CMD)
     }
     case actions.APPLICATION_CONFIG_LOADED: {
-      _.merge(window.config, action.payload.config)
-      const birthCertificateTemplate = _.find(action.payload.certificates, {
+      merge(window.config, action.payload.config)
+      const birthCertificateTemplate = find(action.payload.certificates, {
         event: 'birth',
         status: 'ACTIVE'
       }) as ICertificateTemplateData
 
-      const deathCertificateTemplate = _.find(action.payload.certificates, {
+      const deathCertificateTemplate = find(action.payload.certificates, {
         event: 'death',
         status: 'ACTIVE'
       }) as ICertificateTemplateData
@@ -350,7 +406,10 @@ function reducer(
         ...state,
         offlineData: {
           ...state.offlineData,
-          languages: action.payload.languages,
+          languages: getAvailableContent(
+            state.offlineData.formConfig as IFormConfig,
+            action.payload.languages
+          ),
           forms: defaultFormsConfig as IForm
         }
       }

@@ -100,9 +100,14 @@ export interface IQuestionIdentifiers {
   groupId: string
   fieldName: string
 }
+export interface IMessageDescriptor {
+  id: string
+  description: string
+  defaultMessage: string
+}
 export interface IMessage {
   lang: string
-  descriptor: MessageDescriptor
+  descriptor: IMessageDescriptor
 }
 export interface IQuestionConfig {
   fieldId: string
