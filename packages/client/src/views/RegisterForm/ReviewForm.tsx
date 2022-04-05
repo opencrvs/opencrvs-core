@@ -67,7 +67,7 @@ const StyledSpinner = styled(Spinner)`
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   text-align: center;
   margin-top: 100px;
 `

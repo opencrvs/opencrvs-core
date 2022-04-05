@@ -14,13 +14,9 @@ import { dynamicMessages } from '@client/i18n/messages/views/certificate'
 import { getAvailableLanguages } from '@client/i18n/utils'
 import { ILanguageState } from '@client/i18n/reducer'
 import { IPrintableDeclaration } from '@client/declarations'
+import { IntlShape } from 'react-intl'
+import { IOfflineData } from '@client/offline/reducer'
 import differenceInDays from 'date-fns/differenceInDays'
-
-const FREE_PERIOD = window.config.CERTIFICATE_PRINT_CHARGE_FREE_PERIOD
-const CHARGE_UP_LIMIT = window.config.CERTIFICATE_PRINT_CHARGE_UP_LIMIT
-
-const LOWEST_CHARGE = window.config.CERTIFICATE_PRINT_LOWEST_CHARGE
-const HIGHEST_CHARGE = window.config.CERTIFICATE_PRINT_HIGHEST_CHARGE
 
 const MONTH_IN_DAYS = 30
 const YEAR_IN_DAYS = 365
@@ -63,25 +59,49 @@ export function getCountryTranslations(
 
 interface IDayRange {
   rangeData: { [key in Event]?: IRange[] }
-  getValue: (event: Event, days: number) => IRange['value']
 }
 
-const ranges: IRange[] = [
-  { start: 0, end: FREE_PERIOD, value: 0 },
-  {
-    start: FREE_PERIOD + 1,
-    end: CHARGE_UP_LIMIT,
-    value: LOWEST_CHARGE
-  },
-  { start: CHARGE_UP_LIMIT + 1, value: HIGHEST_CHARGE }
-]
+function getDayRanges(offlineData: IOfflineData): IDayRange {
+  const BIRTH_REGISTRATION_TARGET = offlineData.config.BIRTH.REGISTRATION_TARGET
+  const BIRTH_LATE_REGISTRATION_TARGET =
+    offlineData.config.BIRTH.LATE_REGISTRATION_TARGET
+  const BIRTH_ON_TIME_FEE = offlineData.config.BIRTH.FEE.ON_TIME
+  const BIRTH_LATE_FEE = offlineData.config.BIRTH.FEE.LATE
+  const BIRTH_DELAYED_FEE = offlineData.config.BIRTH.FEE.DELAYED
+
+  const DEATH_REGISTRATION_TARGET = offlineData.config.DEATH.REGISTRATION_TARGET
+  const DEATH_ON_TIME_FEE = offlineData.config.DEATH.FEE.ON_TIME
+  const DEATH_DELAYED_FEE = offlineData.config.DEATH.FEE.DELAYED
+
+  const birthRanges = [
+    { start: 0, end: BIRTH_REGISTRATION_TARGET, value: BIRTH_ON_TIME_FEE },
+    {
+      start: BIRTH_REGISTRATION_TARGET + 1,
+      end: BIRTH_LATE_REGISTRATION_TARGET,
+      value: BIRTH_LATE_FEE
+    },
+    { start: BIRTH_LATE_REGISTRATION_TARGET + 1, value: BIRTH_DELAYED_FEE }
+  ]
+
+  const deathRanges = [
+    { start: 0, end: DEATH_REGISTRATION_TARGET, value: DEATH_ON_TIME_FEE },
+    { start: DEATH_REGISTRATION_TARGET + 1, value: DEATH_DELAYED_FEE }
+  ]
+
+  return {
+    rangeData: {
+      [Event.BIRTH]: birthRanges,
+      [Event.DEATH]: deathRanges
+    }
+  }
+}
 
 function getValue(
-  this: IDayRange,
+  offlineData: IOfflineData,
   event: Event,
   check: number
 ): IRange['value'] {
-  const rangeByEvent = this.rangeData[event] as IRange[]
+  const rangeByEvent = getDayRanges(offlineData).rangeData[event] as IRange[]
   const foundRange = rangeByEvent.find((range) =>
     range.end
       ? check >= range.start && check <= range.end
@@ -90,19 +110,17 @@ function getValue(
   return foundRange ? foundRange.value : rangeByEvent[0].value
 }
 
-export const dayRange: IDayRange = {
-  rangeData: {
-    [Event.BIRTH]: ranges,
-    [Event.DEATH]: ranges
-  },
-  getValue
-}
-
-export function calculateDays(doE: string) {
+export function calculateDaysFromToday(doE: string) {
   const todaysDate = new Date(Date.now())
   const eventDate = new Date(doE)
   const diffInDays = differenceInDays(todaysDate, eventDate)
+  return diffInDays
+}
 
+export function calculateDays(doE: string, regDate: string) {
+  const registeredDate = new Date(regDate)
+  const eventDate = new Date(doE)
+  const diffInDays = differenceInDays(registeredDate, eventDate)
   return diffInDays
 }
 
@@ -125,23 +143,66 @@ export function timeElapsed(days: number) {
   return output
 }
 
-export function calculatePrice(event: Event, eventDate: string) {
-  const days = calculateDays(eventDate)
-  const result = dayRange.getValue(event, days)
-
-  return result.toFixed(2)
+export function calculatePrice(
+  event: Event,
+  eventDate: string,
+  registeredDate: string,
+  offlineData: IOfflineData
+) {
+  const days = calculateDays(eventDate, registeredDate)
+  const result = getValue(offlineData, event, days)
+  return result
 }
 
-export function getServiceMessage(event: Event, eventDate: string) {
-  const days = calculateDays(eventDate)
-  return days > CHARGE_UP_LIMIT
-    ? dynamicMessages[`${event}ServiceAfter`]
-    : dynamicMessages[`${event}ServiceBetween`]
+export function getServiceMessage(
+  intl: IntlShape,
+  event: Event,
+  eventDate: string,
+  registeredDate: string,
+  offlineData: IOfflineData
+) {
+  const days = calculateDays(eventDate, registeredDate)
+
+  if (event === Event.BIRTH) {
+    if (days <= offlineData.config.BIRTH.REGISTRATION_TARGET) {
+      return intl.formatMessage(dynamicMessages[`${event}ServiceBefore`], {
+        target: offlineData.config.BIRTH.REGISTRATION_TARGET
+      })
+    } else if (
+      days > offlineData.config.BIRTH.REGISTRATION_TARGET &&
+      days <= offlineData.config.BIRTH.LATE_REGISTRATION_TARGET
+    ) {
+      return intl.formatMessage(dynamicMessages[`${event}ServiceBetween`], {
+        target: offlineData.config.BIRTH.REGISTRATION_TARGET,
+        latetarget: offlineData.config.BIRTH.LATE_REGISTRATION_TARGET
+      })
+    } else {
+      return intl.formatMessage(dynamicMessages[`${event}ServiceAfter`], {
+        target: offlineData.config.BIRTH.REGISTRATION_TARGET,
+        latetarget: offlineData.config.BIRTH.LATE_REGISTRATION_TARGET
+      })
+    }
+  } else {
+    if (days <= offlineData.config.DEATH.REGISTRATION_TARGET) {
+      return intl.formatMessage(dynamicMessages[`${event}ServiceBefore`], {
+        target: offlineData.config.DEATH.REGISTRATION_TARGET
+      })
+    } else {
+      return intl.formatMessage(dynamicMessages[`${event}ServiceAfter`], {
+        target: offlineData.config.DEATH.REGISTRATION_TARGET
+      })
+    }
+  }
 }
 
-export function isFreeOfCost(event: Event, eventDate: string): boolean {
-  const days = calculateDays(eventDate)
-  const result = dayRange.getValue(event, days)
+export function isFreeOfCost(
+  event: Event,
+  eventDate: string,
+  registeredDate: string,
+  offlineData: IOfflineData
+): boolean {
+  const days = calculateDays(eventDate, registeredDate)
+  const result = getValue(offlineData, event, days)
   return result === 0
 }
 
@@ -152,6 +213,14 @@ export function getEventDate(data: IFormData, event: Event) {
     case Event.DEATH:
       return data.deathEvent.deathDate as string
   }
+}
+
+export function getRegisteredDate(data: IFormData) {
+  const historyList = data.history as unknown as { [key: string]: any }[]
+  const regHistory = historyList.find(
+    (history) => history.action === 'REGISTERED'
+  )
+  return regHistory && regHistory.date
 }
 
 export function getEvent(eventType: string | undefined) {

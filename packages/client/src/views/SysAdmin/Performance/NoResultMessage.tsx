@@ -26,9 +26,9 @@ import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/O
 const MessageContainer = styled.div`
   margin: 0;
 `
-const StyledHeader = styled.h5`
+const StyledHeader = styled.h3`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.h5Style};
+  ${({ theme }) => theme.fonts.h3};
   margin: 16px 0;
 `
 interface NoResultMessageProps {

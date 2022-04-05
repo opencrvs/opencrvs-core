@@ -35,7 +35,7 @@ const NotificationBar = styled.div`
   display: flex;
   justify-content: space-between;
   color: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   background-color: ${({ theme }) => theme.colors.primary};
   ${({ theme }) => theme.shadows.heavy};
   z-index: 3;

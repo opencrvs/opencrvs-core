@@ -350,9 +350,9 @@ tmux send-keys -t opencrvs "bash setup-scripts/summary.sh" C-m
 tmux split-window -h -p 30
 
 if [ $OS == "UBUNTU" ]; then
-  tmux send-keys -t opencrvs "LANGUAGES=en && yarn start" C-m
+  tmux send-keys -t opencrvs "LANGUAGES=en,fr && yarn start" C-m
   else
-  tmux send-keys -t opencrvs "LANGUAGES=en && LOCAL_IP=$(ifconfig | grep "inet " | grep -Fv 127.0.0.1 | awk '{print $2}') && yarn start" C-m
+  tmux send-keys -t opencrvs "LANGUAGES=en,fr && LOCAL_IP=$(ifconfig | grep "inet " | grep -Fv 127.0.0.1 | awk '{print $2}') && yarn start" C-m
 fi
 tmux set -p @mytitle "opencrvs-core"
 tmux split-window -v

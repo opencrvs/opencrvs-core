@@ -32,7 +32,6 @@ export function isOfflineDataLoaded(
     state.forms.registerForm &&
     state.forms.userForm &&
     state.languages &&
-    state.assets &&
     state.templates &&
     state.config
 

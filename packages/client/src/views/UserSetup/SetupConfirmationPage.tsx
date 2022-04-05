@@ -27,11 +27,11 @@ import { messages } from '@client/i18n/messages/views/userSetup'
 import { buttonMessages } from '@client/i18n/messages'
 
 const TitleHolder = styled.div`
-  ${({ theme }) => theme.fonts.h2Style};
+  ${({ theme }) => theme.fonts.h1};
   padding: 50px 65px 0px 65px;
 `
 const InstructionHolder = styled.div`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   padding: 40px 60px 30px 60px;
 `
 const LoginButton = styled(PrimaryButton)`

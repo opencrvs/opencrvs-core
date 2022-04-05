@@ -65,11 +65,7 @@ import {
   DeclarationsOrangeAmber,
   PlusTransparentWhite
 } from '@opencrvs/components/lib/icons'
-import {
-  GridTable,
-  ISearchInputProps,
-  Loader
-} from '@opencrvs/components/lib/interface'
+import { GridTable, Loader } from '@opencrvs/components/lib/interface'
 import { HomeContent } from '@opencrvs/components/lib/layout'
 import {
   GQLBirthEventSearchSet,
@@ -87,6 +83,8 @@ import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
 import { Navigation } from '@client/components/interface/Navigation'
 import subYears from 'date-fns/subYears'
+import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
+import { ISearchInputProps } from '@client/views/SearchResult/SearchResult'
 
 const FABContainer = styled.div`
   position: fixed;
@@ -104,7 +102,7 @@ export const BodyContainer = styled.div`
 `
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   text-align: center;
   margin-top: 100px;
 `
@@ -118,11 +116,11 @@ const ZeroUpdatesContainer = styled.div`
 const ZeroUpdatesText = styled.span`
   padding-top: 10px;
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
 `
 const AllUpdatesText = styled.span`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
 `
 interface IBaseFieldAgentHomeProps {
   theme: ITheme
@@ -269,17 +267,12 @@ class FieldAgentHomeView extends React.Component<
         names = deathReg && (deathReg.deceasedName as GQLHumanName[])
       }
       window.__localeId__ = this.props.intl.locale
-      const rejectedArray =
-        registrationSearchSet &&
-        registrationSearchSet.operationHistories &&
-        registrationSearchSet.operationHistories.filter((item) => {
-          return item && item.operationType === 'REJECTED'
-        })
-
       const daysOfRejection =
-        rejectedArray &&
-        rejectedArray[0] &&
-        formattedDuration(new Date(rejectedArray[0].operatedOn))
+        registrationSearchSet.registration?.modifiedAt &&
+        formattedDuration(
+          new Date(parseInt(registrationSearchSet.registration.modifiedAt))
+        )
+
       const event = registrationSearchSet.type as string
       return {
         id: registrationSearchSet.id,
@@ -497,8 +490,7 @@ const mapStateToProps = (
       (state.declarationsState.declarations &&
         state.declarationsState.declarations.filter(
           (declaration: IDeclaration) =>
-            declaration.submissionStatus !==
-            SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+            isDeclarationInReadyToReviewStatus(declaration.submissionStatus)
         )) ||
       []
     ).reverse()

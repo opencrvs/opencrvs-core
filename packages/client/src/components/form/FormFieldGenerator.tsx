@@ -13,7 +13,6 @@ import * as React from 'react'
 import {
   CheckboxGroup,
   DateField,
-  PDFViewer,
   RadioGroup,
   Select,
   TextArea,
@@ -67,7 +66,6 @@ import {
   NUMBER,
   BIG_NUMBER,
   PARAGRAPH,
-  PDF_DOCUMENT_VIEWER,
   DYNAMIC_LIST,
   IDynamicListFormField,
   IListFormField,
@@ -150,11 +148,11 @@ const FormItem = styled.div<{
   }`}
 `
 const LinkFormField = styled(Link)`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 
 const FieldGroupTitle = styled.div`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   margin-top: 16px;
 `
 
@@ -495,15 +493,6 @@ function GeneratedInputField({
       >
         {fieldDefinition.label}
       </LinkFormField>
-    )
-  }
-
-  if (fieldDefinition.type === PDF_DOCUMENT_VIEWER) {
-    return (
-      <PDFViewer
-        id={fieldDefinition.name}
-        pdfSource={fieldDefinition.initialValue as string}
-      />
     )
   }
 
@@ -935,7 +924,6 @@ class FormSectionComponent extends React.Component<Props> {
                 }
               : field
           if (
-            field.type === PDF_DOCUMENT_VIEWER ||
             field.type === FETCH_BUTTON ||
             field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
             field.type === SELECT_WITH_DYNAMIC_OPTIONS
