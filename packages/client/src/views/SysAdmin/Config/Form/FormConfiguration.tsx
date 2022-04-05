@@ -21,16 +21,25 @@ import { IUserDetails } from '@client/utils/userUtils'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import { messages } from '@client/i18n/messages/views/config'
-import { ListView, ToggleMenu } from '@opencrvs/components/lib/interface'
+import {
+  IListRowProps,
+  ListView,
+  ToggleMenu
+} from '@opencrvs/components/lib/interface'
 import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import styled from 'styled-components'
+import { fetchDraft } from '@client/forms/configuration/actions'
+import { IFormDraftData, IHistory } from '@client/forms/configuration/reducer'
+import { getFormDraftData } from '@client/forms/configuration/selector'
 
 type Props = WrappedComponentProps &
   Pick<RouteComponentProps, 'history'> & {
     userDetails: IUserDetails | null
     offlineResources: IOfflineData
     offlineCountryConfiguration: IOfflineData
+    fetchDraft: typeof fetchDraft
+    formDraftData: IFormDraftData
   }
 
 interface State {
@@ -67,7 +76,9 @@ class FormConfigComponent extends React.Component<Props, State> {
       activeTabId: TABS.PUBLISHED
     }
   }
-
+  async componentDidMount() {
+    this.props.fetchDraft()
+  }
   getMenuItems = (intl: IntlShape) => {
     const menuItems = [
       {
@@ -82,11 +93,131 @@ class FormConfigComponent extends React.Component<Props, State> {
     return menuItems
   }
 
+  getMenuItemsForDrafts = (intl: IntlShape) => {
+    const menuItems = [
+      {
+        label: intl.formatMessage(messages.previewFormConfiguration),
+        handler: () => {}
+      },
+      {
+        label: intl.formatMessage(messages.deleteDraftMenuButton),
+        handler: () => {}
+      }
+    ]
+    return menuItems
+  }
+
   onChangeTab = (tabId: string) => {
     this.setState({
       activeTabId: tabId
     })
   }
+  getHistorydata = (
+    histories: IHistory[],
+    eventType: string
+  ): IListRowProps[] => {
+    const historyData = histories.map((history) => ({
+      label: <LabelColor>{`${eventType} v${history.version}`}</LabelColor>,
+      value: <ValueColor>{`-${history.comment}`}</ValueColor>
+    }))
+    return historyData
+  }
+
+  getItemsForDraftsTab = (formDraft: IFormDraftData) => {
+    const formsForDraftsTab: IListRowProps[] = formDraft
+      ? [
+          {
+            label: (
+              <LabelColor>{`Birth v${formDraft.birth.version}`}</LabelColor>
+            ),
+            value: <ValueColor>{`-${formDraft.birth.comment}`}</ValueColor>,
+            actionsMenu: (
+              <StyledActionBar>
+                <LinkButton onClick={() => {}}>
+                  {this.props.intl.formatMessage(
+                    messages.formConfigEditButtonLabel
+                  )}
+                </LinkButton>
+                <ToggleMenu
+                  id={`form-death-action-menu`}
+                  toggleButton={<VerticalThreeDots />}
+                  menuItems={this.getMenuItemsForDrafts(this.props.intl)}
+                />
+              </StyledActionBar>
+            )
+          },
+          {
+            label: (
+              <LabelColor>{`Death v${formDraft.death.version}`}</LabelColor>
+            ),
+            value: <ValueColor>{`-${formDraft.death.comment}`}</ValueColor>,
+            actionsMenu: (
+              <StyledActionBar>
+                <LinkButton onClick={() => {}}>
+                  {this.props.intl.formatMessage(
+                    messages.formConfigEditButtonLabel
+                  )}
+                </LinkButton>
+                <ToggleMenu
+                  id={`form-death-action-menu`}
+                  toggleButton={<VerticalThreeDots />}
+                  menuItems={this.getMenuItemsForDrafts(this.props.intl)}
+                />
+              </StyledActionBar>
+            )
+          }
+        ]
+      : [
+          {
+            label: <LabelColor>Birth </LabelColor>,
+            action: {
+              label: this.props.intl.formatMessage(
+                messages.formConfigureButtonLabel
+              )
+            }
+          },
+          {
+            label: <LabelColor>Death </LabelColor>,
+            action: {
+              label: this.props.intl.formatMessage(
+                messages.formConfigureButtonLabel
+              )
+            }
+          }
+        ]
+    if (
+      formDraft &&
+      formDraft.birth.history &&
+      formDraft.birth.history.length > 0
+    ) {
+      const birthHistories = this.getHistorydata(
+        formDraft.birth.history,
+        formDraft.birth.event
+      )
+      if (birthHistories.length > 0) {
+        birthHistories.forEach((data) =>
+          formsForDraftsTab.push(data as IListRowProps)
+        )
+      }
+    }
+    if (
+      formDraft &&
+      formDraft.death.history &&
+      formDraft.death.history.length > 0
+    ) {
+      const deathHistories = this.getHistorydata(
+        formDraft.death.history,
+        formDraft.death.event
+      )
+      if (deathHistories.length > 0) {
+        deathHistories.forEach((data) =>
+          formsForDraftsTab.push(data as IListRowProps)
+        )
+      }
+    }
+    return formsForDraftsTab
+  }
+
   render() {
     const { intl } = this.props
     const formsForPublishedTab = [
@@ -139,52 +270,6 @@ class FormConfigComponent extends React.Component<Props, State> {
         )
       }
     ]
-    const formsForDraftsTab = [
-      {
-        label: <LabelColor>Birth v.03</LabelColor>,
-        value: <ValueColor>-Biz analysis</ValueColor>,
-        actionsMenu: (
-          <StyledActionBar>
-            <LinkButton onClick={() => {}}>
-              {intl.formatMessage(messages.formConfigViewButtonLabel)}
-            </LinkButton>
-            <ToggleMenu
-              id={`form-death-action-menu`}
-              toggleButton={<VerticalThreeDots />}
-              menuItems={this.getMenuItems(intl)}
-            />
-          </StyledActionBar>
-        )
-      },
-      {
-        label: <LabelColor>Birth v.02</LabelColor>,
-        value: (
-          <div>
-            <ValueColor>-Added an initial question</ValueColor>
-            <ValueColor>-Added another cool question</ValueColor>
-          </div>
-        ),
-        action: {
-          label: intl.formatMessage(messages.formConfigViewButtonLabel),
-          disabled: true
-        }
-      },
-      {
-        label: <LabelColor>Birth v.02</LabelColor>,
-        value: <ValueColor>-Initial view</ValueColor>,
-        action: {
-          label: intl.formatMessage(messages.formConfigViewButtonLabel),
-          disabled: true
-        }
-      },
-      {
-        label: <LabelColor>Birth v.01</LabelColor>,
-        value: <ValueColor>Description of changes</ValueColor>,
-        action: {
-          label: intl.formatMessage(messages.formConfigViewButtonLabel)
-        }
-      }
-    ]
 
     const formsForPreviewTab = [
       {
@@ -227,16 +312,16 @@ class FormConfigComponent extends React.Component<Props, State> {
           tabs={{
             sections: [
               {
-                id: TABS.PUBLISHED,
-                title: intl.formatMessage(messages.formConfigPublishedTabLabel)
-              },
-              {
                 id: TABS.DRAFTS,
                 title: intl.formatMessage(messages.formConfigDraftsTabLabel)
               },
               {
                 id: TABS.IN_PREVIEW,
                 title: intl.formatMessage(messages.formConfigInPreviewTabLabel)
+              },
+              {
+                id: TABS.PUBLISHED,
+                title: intl.formatMessage(messages.formConfigPublishedTabLabel)
               }
             ],
             activeTabId: this.state.activeTabId,
@@ -248,7 +333,9 @@ class FormConfigComponent extends React.Component<Props, State> {
               this.state.activeTabId === TABS.PUBLISHED
                 ? formsForPublishedTab
                 : this.state.activeTabId === TABS.DRAFTS
-                ? formsForDraftsTab
+                ? this.getItemsForDraftsTab(
+                    this.props.formDraftData && this.props.formDraftData
+                  )
                 : formsForPreviewTab
             }
             isConfigPage={true}
@@ -259,14 +346,20 @@ class FormConfigComponent extends React.Component<Props, State> {
   }
 }
 
+const mapDispatchToProps = {
+  fetchDraft
+}
+
 function mapStateToProps(state: IStoreState) {
   return {
     offlineResources: getOfflineData(state),
     userDetails: getUserDetails(state),
-    offlineCountryConfiguration: getOfflineData(state)
+    offlineCountryConfiguration: getOfflineData(state),
+    formDraftData: getFormDraftData(state)
   }
 }
 
-export const FormConfiguration = connect(mapStateToProps)(
-  injectIntl(FormConfigComponent)
-)
+export const FormConfiguration = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(injectIntl(FormConfigComponent))

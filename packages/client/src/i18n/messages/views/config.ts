@@ -39,9 +39,10 @@ interface IConfigMessages
   formConfigDefaultConfig: MessageDescriptor
   formConfigureButtonLabel: MessageDescriptor
   formConfigPublishButtonLabel: MessageDescriptor
-  formConfigViewButtonLabel: MessageDescriptor
+  formConfigEditButtonLabel: MessageDescriptor
   previewFormConfiguration: MessageDescriptor
   finalizeFormConfiguration: MessageDescriptor
+  deleteDraftMenuButton: MessageDescriptor
 }
 
 const messagesToDefine: IConfigMessages = {
@@ -95,10 +96,10 @@ const messagesToDefine: IConfigMessages = {
     defaultMessage: 'Publish',
     description: 'Label for publish button form config page'
   },
-  formConfigViewButtonLabel: {
-    id: 'config.formConfigViewButtonLabel',
-    defaultMessage: 'View',
-    description: 'Label for view button form config page'
+  formConfigEditButtonLabel: {
+    id: 'config.formConfigEditButtonLabel',
+    defaultMessage: 'Edit',
+    description: 'Label for edit button form config page'
   },
   formConfigPageSubTitle: {
     id: 'config.formConfigPageSubtitle',
@@ -124,6 +125,11 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.finalizeFormConfiguration',
     defaultMessage: 'Finalize',
     description: 'Label of finalise button of form config page menu'
+  },
+  deleteDraftMenuButton: {
+    id: 'config.deleteDraftMenuButton',
+    defaultMessage: 'Delete',
+    description: 'Label of delete button of form config page menu'
   },
   previewTemplate: {
     id: 'config.previewTemplate',
