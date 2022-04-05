@@ -77,6 +77,7 @@ export const PageNavigation = (props: IPageNavigation) => {
       {Object.keys(TAB).map((tab, idx) => (
         <PageItems
           key={idx}
+          id={`${tab}_navigation`}
           label={`${idx + 1}. ${intl.formatMessage(
             configMessage[TAB[tab as keyof typeof TAB]]
           )}`}

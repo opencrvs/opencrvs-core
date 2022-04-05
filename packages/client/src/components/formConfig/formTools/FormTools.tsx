@@ -28,10 +28,15 @@ const TitleContainer = styled.div`
   ${({ theme }) => theme.fonts.bold14}
 `
 
-const Label = styled.div`
+const Label = styled.span`
   ${({ theme }) => theme.fonts.reg14};
   color: ${({ theme }) => theme.colors.grey600};
 `
+
+const CenteredToggle = styled(Toggle)`
+  align-self: center;
+`
+
 interface IFormTools {
   intl: IntlShape
 }
@@ -89,7 +94,7 @@ export const FormTools = (props: IFormTools) => {
             </Label>
           }
           actions={[
-            <Toggle
+            <CenteredToggle
               key="toggle"
               selected={toggleSelected}
               onChange={toggleOnChange}

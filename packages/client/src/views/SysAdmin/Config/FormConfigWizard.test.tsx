@@ -23,7 +23,7 @@ import { formatUrl } from '@client/navigation'
 import { FORM_CONFIG_WIZARD } from '@client/navigation/routes'
 import { getStorageUserDetailsSuccess } from '@client/profile/profileActions'
 
-describe('Form Config Wizard page successfully rendered', () => {
+describe('Form Config Wizard for birth page successfully rendered', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
@@ -43,6 +43,53 @@ describe('Form Config Wizard page successfully rendered', () => {
             matchParams: {
               event: 'birth',
               section: 'introduction'
+            }
+          }
+        )}
+      />,
+      { store, history }
+    )
+  })
+
+  it('Form Config Wizard page loads properly for national system admin', async () => {
+    console.log(component.debug())
+    expect(component.exists('FormConfigWizardComp')).toBeTruthy()
+    expect(component.exists('PageNavigation')).toBeTruthy()
+    expect(component.exists('FormConfigCanvas')).toBeTruthy()
+    expect(component.exists('FormTools')).toBeTruthy()
+  })
+
+  it('Change Tab using page Navigation', async () => {
+    component.find('#child_navigation').hostNodes().first().simulate('click')
+    expect(window.location.href).toContain('/child')
+  })
+
+  it('Back to home if cross button pressed', async () => {
+    component.find('#crcl-btn').hostNodes().first().simulate('click')
+    expect(window.location.href).not.toContain('/form-config-wizard')
+  })
+})
+
+describe('Form Config Wizard for death page successfully rendered', () => {
+  let component: ReactWrapper<{}, {}>
+
+  beforeEach(async () => {
+    const { store, history } = createStore()
+    store.dispatch(
+      getStorageUserDetailsSuccess(JSON.stringify(natlAdminUserDetails))
+    )
+    component = await createTestComponent(
+      <FormConfigWizard
+        {...createRouterProps(
+          formatUrl(FORM_CONFIG_WIZARD, {
+            event: 'death',
+            section: 'deceased'
+          }),
+          { isNavigatedInsideApp: false },
+          {
+            matchParams: {
+              event: 'death',
+              section: 'deceased'
             }
           }
         )}

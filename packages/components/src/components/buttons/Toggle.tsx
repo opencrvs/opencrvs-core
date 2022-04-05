@@ -12,7 +12,7 @@
 import styled from 'styled-components'
 import * as React from 'react'
 
-export interface IToggle {
+export interface IToggle extends React.HTMLAttributes<HTMLDivElement> {
   selected?: boolean
   onChange?: () => void
 }
@@ -69,14 +69,14 @@ const CheckBox = styled.input`
   }
 `
 
-export function Toggle(props: IToggle) {
+export function Toggle({ selected, onChange, ...props }: IToggle) {
   return (
-    <CheckBoxWrapper>
+    <CheckBoxWrapper {...props}>
       <CheckBox
         id="checkbox"
         type="checkbox"
-        checked={props.selected}
-        onChange={props.onChange}
+        checked={selected}
+        onClick={onChange}
       />
       <CheckBoxLabel htmlFor="checkbox" />
     </CheckBoxWrapper>
