@@ -52,9 +52,9 @@ import { RouteComponentProps, StaticContext } from 'react-router'
 import { SETTINGS } from '@client/navigation/routes'
 import { Navigation } from '@client/components/interface/Navigation'
 import { AvatarChangeModal } from './AvatarChangeModal'
-import { IImage, ERROR_TYPES, validateImage } from '@client/utils/imageUtils'
+import { IImage } from '@client/utils/imageUtils'
 import { Content } from '@opencrvs/components/lib/interface/Content'
-import { ALLOWED_IMAGE_TYPE } from '@client/utils/constants'
+import { ImageLoader } from './ImageLoader'
 
 const BodyContainer = styled.div`
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -69,10 +69,6 @@ const LabelContainer = styled.span`
 
 const ValueContainer = styled.span`
   ${({ theme }) => theme.fonts.reg16}
-`
-
-const HiddenInput = styled.input`
-  display: none;
 `
 
 const Message = styled.div`
@@ -121,10 +117,8 @@ interface ILanguageOptions {
 }
 
 class SettingsView extends React.Component<IProps, IState> {
-  fileUploaderRef: React.RefObject<HTMLInputElement>
   constructor(props: IProps) {
     super(props)
-    this.fileUploaderRef = React.createRef()
     this.state = {
       showLanguageSettings: false,
       showSuccessNotification: false,
@@ -230,31 +224,6 @@ class SettingsView extends React.Component<IProps, IState> {
     })
   }
 
-  handleSelectFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { files } = event.target
-    if (files && files.length > 0) {
-      try {
-        this.toggleAvatarChangeModal && this.toggleAvatarChangeModal()
-        const image = await validateImage(files[0])
-        this.handleImageLoaded({ type: files[0].type, data: image })
-        this.fileUploaderRef.current!.value = ''
-      } catch (error) {
-        if (error.message === ERROR_TYPES.OVERSIZED) {
-          this.setState({
-            imageLoadingError: this.props.intl.formatMessage(messages.overSized)
-          })
-        } else {
-          this.setState({
-            imageLoadingError: this.props.intl.formatMessage(
-              messages.imageFormat
-            )
-          })
-        }
-        this.fileUploaderRef.current!.value = ''
-      }
-    }
-  }
-
   render() {
     const { userDetails, intl, languages, goToPhoneSettingAction } = this.props
 
@@ -340,15 +309,6 @@ class SettingsView extends React.Component<IProps, IState> {
           label: intl.formatMessage(buttonMessages.change),
           disabled: true
         }
-      },
-      {
-        label: intl.formatMessage(messages.profileImage),
-        value: <Avatar avatar={userDetails?.avatar} name={englishName} />,
-        action: {
-          id: 'BtnChangeAvatar',
-          label: intl.formatMessage(buttonMessages.change),
-          handler: () => this.fileUploaderRef.current?.click()
-        }
       }
     ]
 
@@ -377,14 +337,33 @@ class SettingsView extends React.Component<IProps, IState> {
                   />
                 )
               })}
+              {/* For Profile Image */}
+              <ListViewItemSimplified
+                label={
+                  <LabelContainer>
+                    {intl.formatMessage(messages.profileImage)}
+                  </LabelContainer>
+                }
+                value={
+                  <ValueContainer>
+                    <Avatar avatar={userDetails?.avatar} name={englishName} />
+                  </ValueContainer>
+                }
+                actions={[
+                  <ImageLoader
+                    onImageLoaded={this.handleImageLoaded}
+                    onLoadingStarted={this.toggleAvatarChangeModal}
+                    onError={(imageLoadingError) =>
+                      this.setState({ imageLoadingError })
+                    }
+                  >
+                    <LinkButton>
+                      {intl.formatMessage(buttonMessages.change)}
+                    </LinkButton>
+                  </ImageLoader>
+                ]}
+              />
             </ListViewSimplified>
-            <HiddenInput
-              ref={this.fileUploaderRef}
-              id="image_file_uploader_field"
-              type="file"
-              accept={ALLOWED_IMAGE_TYPE.join(',')}
-              onChange={this.handleSelectFile}
-            />
           </Content>
         </BodyContainer>
         <ResponsiveModal

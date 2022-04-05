@@ -160,6 +160,7 @@ describe('Settings page tests', () => {
       component
         .find('#image_file_uploader_field')
         .hostNodes()
+        .first()
         .simulate('change', { target: { files: [file] } })
 
       component.update()
@@ -175,6 +176,7 @@ describe('Settings page tests', () => {
       component
         .find('#image_file_uploader_field')
         .hostNodes()
+        .first()
         .simulate('change', { target: { files: [invalidFile] } })
 
       await flushPromises()
@@ -196,6 +198,7 @@ describe('Settings page tests', () => {
       component
         .find('#image_file_uploader_field')
         .hostNodes()
+        .first()
         .simulate('change', {
           target: {
             files: [
@@ -231,6 +234,7 @@ describe('Settings page tests', () => {
       component
         .find('#image_file_uploader_field')
         .hostNodes()
+        .first()
         .simulate('change', {
           target: {
             files: [file]
