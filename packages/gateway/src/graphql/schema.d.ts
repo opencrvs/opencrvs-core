@@ -4995,6 +4995,59 @@ export interface DraftHistoryToLastUpdateAtResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLBirthTypeResolver<TParent = any> {
+  REGISTRATION_TARGET?: BirthToREGISTRATION_TARGETResolver<TParent>
+  LATE_REGISTRATION_TARGET?: BirthToLATE_REGISTRATION_TARGETResolver<TParent>
+  FEE?: BirthToFEEResolver<TParent>
+}
+
+export interface BirthToREGISTRATION_TARGETResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthToLATE_REGISTRATION_TARGETResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthToFEEResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLCountryLogoTypeResolver<TParent = any> {
+  fileName?: CountryLogoToFileNameResolver<TParent>
+  file?: CountryLogoToFileResolver<TParent>
+}
+
+export interface CountryLogoToFileNameResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface CountryLogoToFileResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLCurrencyTypeResolver<TParent = any> {
+  isoCode?: CurrencyToIsoCodeResolver<TParent>
+  languagesAndCountry?: CurrencyToLanguagesAndCountryResolver<TParent>
+}
+
+export interface CurrencyToIsoCodeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface CurrencyToLanguagesAndCountryResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLDeathTypeResolver<TParent = any> {
   REGISTRATION_TARGET?: DeathToREGISTRATION_TARGETResolver<TParent>
   FEE?: DeathToFEEResolver<TParent>
