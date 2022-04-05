@@ -11,23 +11,26 @@
  */
 import * as React from 'react'
 
-export const Alert = (props: React.HTMLAttributes<SVGElement>) => (
-  <svg width={24} height={24} viewBox="0 0 24 24" fill="none" {...props}>
-    <path
-      clipRule="evenodd"
-      d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"
-      stroke="#fff"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M12 8v4"
-      stroke="#fff"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <circle cx={12} cy={16} r={0.5} fill="#fff" stroke="#fff" />
-  </svg>
-)
+export const Alert = (props: React.HTMLAttributes<SVGElement>) => {
+  const stroke = props.color === 'invert' ? '#D53F3F' : '#fff'
+  return (
+    <svg width={24} height={24} viewBox="0 0 24 24" fill="none" {...props}>
+      <path
+        clipRule="evenodd"
+        d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"
+        stroke={stroke}
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M12 8v4"
+        stroke={stroke}
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx={12} cy={16} r={0.5} fill={stroke} stroke={stroke} />
+    </svg>
+  )
+}

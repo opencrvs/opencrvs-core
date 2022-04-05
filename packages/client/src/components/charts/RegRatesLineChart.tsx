@@ -256,8 +256,8 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
               {intl.formatMessage(constantsMessages.registeredInTargetd, {
                 registrationTargetDays:
                   eventType === Event.BIRTH
-                    ? window.config.BIRTH_REGISTRATION_TARGET
-                    : window.config.DEATH_REGISTRATION_TARGET
+                    ? window.config.BIRTH.REGISTRATION_TARGET
+                    : window.config.DEATH.REGISTRATION_TARGET
               })}
             </LegendDataLabel>
             <br />

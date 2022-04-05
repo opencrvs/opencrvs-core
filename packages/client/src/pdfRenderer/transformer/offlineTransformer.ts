@@ -108,7 +108,7 @@ export const offlineTransformers: IFunctionTransformer = {
     templateData: TemplateTransformerData,
     intl: IntlShape
   ) => {
-    return templateData.resource.assets.logo
+    return templateData.resource.config.COUNTRY_LOGO.file
   },
 
   /*
