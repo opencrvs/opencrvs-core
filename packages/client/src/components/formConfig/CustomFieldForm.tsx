@@ -9,16 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { Box, ListView, Container } from '@opencrvs/components/lib/interface'
-import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
+import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
+import { TextArea, TextInput } from '@opencrvs/components/lib/forms'
+import { InputField } from '@opencrvs/components/lib/forms/InputField/InputField'
+import { Box } from '@opencrvs/components/lib/interface'
+import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { IStoreState } from '@client/store'
-import { InputField } from '@opencrvs/components/lib/forms/InputField/InputField'
-import { TextInput, TextArea } from '@opencrvs/components/lib/forms'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 
 const CustomFieldFormContainer = styled(Box)`
   box-shadow: none;
@@ -41,6 +41,31 @@ const FieldContainer = styled.div`
   margin-bottom: 30px;
 `
 
+const RightAlignment = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+`
+
+const H3 = styled.h3`
+  ${({ theme }) => theme.fonts.h3};
+`
+
+const ListContainer = styled.div`
+  margin-bottom: 26px;
+`
+
+const ListRow = styled.div`
+  ${({ theme }) => theme.fonts.reg18};
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: solid 1px ${({ theme }) => theme.colors.grey200};
+  padding: 8px 0;
+`
+
+const ListColumn = styled.div``
+
 type IFullProps = {} & IntlShapeProps
 
 interface ICustomFieldForms {}
@@ -51,19 +76,25 @@ class CustomFieldFormsComp extends React.Component<
 > {
   toggleButtons() {
     return (
-      <ListView
-        title="Custom text input"
-        items={[
-          {
-            label: 'Hide Field',
-            value: <Toggle selected={false} onChange={() => alert('Changed')} />
-          },
-          {
-            label: 'Required for registration',
-            value: <Toggle selected={false} onChange={() => alert('Changed')} />
-          }
-        ]}
-      />
+      <ListContainer>
+        <H3>Custom text input</H3>
+        <ListRow>
+          <ListColumn>Hide field</ListColumn>
+          <ListColumn>
+            <RightAlignment>
+              <Toggle selected={false} onChange={() => alert('Changed')} />
+            </RightAlignment>
+          </ListColumn>
+        </ListRow>
+        <ListRow>
+          <ListColumn>Required for registration</ListColumn>
+          <ListColumn>
+            <RightAlignment>
+              <Toggle selected={false} onChange={() => alert('Changed')} />
+            </RightAlignment>
+          </ListColumn>
+        </ListRow>
+      </ListContainer>
     )
   }
 
@@ -74,8 +105,11 @@ class CustomFieldFormsComp extends React.Component<
           <InputField id="custom-form-label" label="Label" touched={false}>
             <TextInput />
           </InputField>
-          <FieldContainer></FieldContainer>
+        </FieldContainer>
+
+        <FieldContainer>
           <InputField
+            required={false}
             id="custom-form-placeholder"
             label="Placeholder"
             touched={false}
@@ -83,8 +117,10 @@ class CustomFieldFormsComp extends React.Component<
             <TextInput />
           </InputField>
         </FieldContainer>
+
         <FieldContainer>
           <InputField
+            required={false}
             id="custom-form-description"
             label="Description"
             touched={false}
@@ -92,12 +128,21 @@ class CustomFieldFormsComp extends React.Component<
             <TextArea />
           </InputField>
         </FieldContainer>
+
         <FieldContainer>
-          <InputField id="custom-form-tooltip" label="Tooltip" touched={false}>
+          <InputField
+            required={false}
+            id="custom-form-tooltip"
+            label="Tooltip"
+            touched={false}
+          >
             <TextInput />
           </InputField>
-          <FieldContainer></FieldContainer>
+        </FieldContainer>
+
+        <FieldContainer>
           <InputField
+            required={false}
             id="custom-form-error-message"
             label="Error message"
             touched={false}
@@ -105,8 +150,10 @@ class CustomFieldFormsComp extends React.Component<
             <TextArea />
           </InputField>
         </FieldContainer>
+
         <FieldContainer>
           <InputField
+            required={false}
             id="custom-form-max-length"
             label="Max length"
             touched={false}
