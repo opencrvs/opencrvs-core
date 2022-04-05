@@ -16,13 +16,14 @@ type DraftHistory {
   lastUpdateAt: Date
 }
 
-type formDraft {
+type FormDraft {
   _id: ID
   event: String!
   status: String!
   comment: String
   version: Int!
   history: [DraftHistory]
+  questions: [Question]
   updatedAt: Date!
   createdAt: Date!
 }
@@ -48,7 +49,7 @@ input QuestionInput {
   initialValue: String
 }
 
-input formDraftInput {
+input FormDraftInput {
   questions: [QuestionInput]
   deleted: [String]
   event: String!
@@ -57,9 +58,9 @@ input formDraftInput {
 }
 
 type Query {
-  getFormDraft: [formDraft]
+  getFormDraft: [FormDraft]
 }
 
 type Mutation {
-  createOrUpdateFormDraft(formDraft: formDraftInput!): formDraft
+  createOrUpdateFormDraft(formDraft: FormDraftInput!): FormDraft
 }
