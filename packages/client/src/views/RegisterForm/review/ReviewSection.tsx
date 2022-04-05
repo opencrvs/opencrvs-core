@@ -1494,13 +1494,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               }
             />
             <FormData>
-              {!isCorrection(declaration) && (
-                <FormDataHeader>
-                  {intl.formatMessage(messages.formDataHeader, {
-                    isDraft: draft
-                  })}
-                </FormDataHeader>
-              )}
               {transformedSectionData.map((sec, index) => {
                 const { uploadedDocuments, selectOptions } =
                   this.prepSectionDocuments(declaration, sec.id)
