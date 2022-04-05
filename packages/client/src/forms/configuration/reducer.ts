@@ -14,14 +14,7 @@ import { storage } from '@client/storage'
 import { find } from 'lodash'
 import { formDraftQueries } from './queries'
 import * as actions from '@client/forms/configuration/actions'
-import {
-  Event,
-  IQuestionConfig,
-  ISerializedForm,
-  IFormField,
-  IForm,
-  IFormSection
-} from '@client/forms'
+import { Event, IQuestionConfig, ISerializedForm } from '@client/forms'
 import {
   configureRegistrationForm,
   sortFormCustomisations,
@@ -30,6 +23,7 @@ import {
 import { registerForms } from './default'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
 import { GQLFormDraft } from '@opencrvs/gateway/src/graphql/schema'
+import { ISectionFieldMap, getEventSectionFieldsMap } from './formDraftUtils'
 
 export enum DraftStatus {
   DRAFT = 'DRAFT',
@@ -43,20 +37,6 @@ export interface IHistory {
   comment?: string
   lastUpdateAt: number
 }
-
-type IConfigFormField = {
-  fieldId: string
-  precedingFieldId: string | null
-  foregoingFieldId: string | null
-  required: boolean
-  enabled: string
-  custom: boolean
-  definition: IFormField
-}
-
-type IFormFieldMap = Record<string, IConfigFormField>
-
-type ISectionFieldMap = Record<string, IFormFieldMap>
 
 export interface IDraft {
   event: Event
@@ -84,50 +64,6 @@ export const initialState: IFormDraftDataState = {
   formDraftData: null,
   formDraftDataLoaded: false,
   loadingError: false
-}
-
-function getSectionFieldsMap(event: Event, section: IFormSection) {
-  let precedingFieldId: string | null = null
-  return section.groups.reduce<IFormFieldMap>(
-    (groupFieldMap, group) =>
-      group.fields.reduce((fieldMap, field) => {
-        const fieldId = [
-          event.toLowerCase(),
-          section.id,
-          group.id,
-          field.name
-        ].join('.')
-        /* We need to build the field regardless of the conditionals */
-        delete field.conditionals
-        fieldMap[fieldId] = {
-          fieldId,
-          precedingFieldId: precedingFieldId ? precedingFieldId : null,
-          foregoingFieldId: null,
-          required: field.required || false,
-          enabled: field.enabled || 'enabled',
-          custom: field.custom || false,
-          definition: field
-        }
-        if (precedingFieldId) {
-          fieldMap[precedingFieldId].foregoingFieldId = fieldId
-        }
-        precedingFieldId = fieldId
-        return fieldMap
-      }, groupFieldMap),
-    {}
-  )
-}
-
-function getEventSectionFieldsMap(form: IForm, event: Event) {
-  const birthSectionFieldsMap = form.sections.reduce<ISectionFieldMap>(
-    (sectionFieldsMap, section) => ({
-      ...sectionFieldsMap,
-      [section.id]: getSectionFieldsMap(event, section)
-    }),
-    {}
-  )
-
-  return birthSectionFieldsMap
 }
 
 async function saveFormDraftData(formDraftData: IFormDraftData) {
