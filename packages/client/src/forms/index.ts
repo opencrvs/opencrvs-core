@@ -100,10 +100,17 @@ export interface IQuestionIdentifiers {
   groupId: string
   fieldName: string
 }
+export interface IMessage {
+  lang: string
+  descriptor: MessageDescriptor
+}
 export interface IQuestionConfig {
   fieldId: string
-  label?: MessageDescriptor
-  placeholder?: MessageDescriptor
+  label?: IMessage[]
+  placeholder?: IMessage[]
+  description?: IMessage[]
+  tooltip?: IMessage[]
+  errorMessage?: IMessage[]
   maxLength?: number
   fieldName?: string
   fieldType?: QuestionConfigFieldType
