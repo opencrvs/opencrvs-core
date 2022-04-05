@@ -857,19 +857,21 @@ describe('User root resolvers', () => {
     it('changes avatar for loggedin user', async () => {
       fetch.mockResponseOnce(JSON.stringify({}), { status: 200 })
 
+      const avatar = {
+        type: 'image/png;base64',
+        data: 'aGVsbG8gd29ybGQ='
+      }
+
       const response = await resolvers.Mutation.changeAvatar(
         {},
         {
           userId: 'ba7022f0ff4822',
-          avatar: {
-            type: 'image/png;base64',
-            data: 'aGVsbG8gd29ybGQ='
-          }
+          avatar
         },
         authHeaderValidUser
       )
 
-      expect(response).toEqual(true)
+      expect(response).toEqual(avatar)
     })
     it('throws error if @user-mgnt/changeUserAvatar sends anything but 200', async () => {
       fetch.mockResponseOnce(JSON.stringify({}), { status: 401 })

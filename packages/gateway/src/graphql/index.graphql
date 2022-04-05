@@ -19,6 +19,7 @@
 # import Query.* from '../features/role/schema.graphql'
 # import Query.* from '../features/certificate/schema.graphql'
 # import Mutation.* from '../features/certificate/schema.graphql'
+# import Mutation.* from '../features/application/schema.graphql'
 # import Query.* from '../features/questions/schema.graphql'
 # import Mutation.* from '../features/questions/schema.graphql'
 # import Mutation.* from '../features/formDraft/schema.graphql'

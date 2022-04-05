@@ -13,6 +13,7 @@ import { IFormField, IFormData, Event } from '@client/forms'
 import { REGISTRATION_SECTION } from '@client/forms/register/fieldMappings/death/query/documents-mappings'
 import { GQLRegWorkflow } from '@opencrvs/gateway/src/graphql/schema'
 import { transformStatusData } from '@client/forms/register/fieldMappings/birth/query/registration-mappings'
+import format from '@client/utils/date-formatting'
 
 export const deceasedDateToFieldTransformation =
   (alternativeSectionId?: string) =>
@@ -30,6 +31,36 @@ export const deceasedDateToFieldTransformation =
     }
     transformedData[sectionId][field.name] =
       queryData[fromSectionId].deceased.deathDate
+    return transformedData
+  }
+
+export const deceasedDateFormatTransformation =
+  (locale: string, dateFormat: string, alternativeSectionId?: string) =>
+  (
+    transformedData: IFormData,
+    queryData: any,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    const fromSectionId = alternativeSectionId
+      ? alternativeSectionId
+      : sectionId
+    if (!queryData[fromSectionId] || !queryData[fromSectionId].deceased) {
+      return transformedData
+    }
+    const queryValue = queryData[fromSectionId].deceased.deathDate
+
+    const date = new Date(queryValue)
+    if (!Number.isNaN(date.getTime())) {
+      const prevLocale = window.__localeId__
+      window.__localeId__ = locale
+
+      if (!transformedData[sectionId]) {
+        transformedData[sectionId] = {}
+      }
+      transformedData[sectionId][field.name] = format(date, dateFormat)
+      window.__localeId__ = prevLocale
+    }
     return transformedData
   }
 

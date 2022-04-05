@@ -122,31 +122,35 @@ const navigatorMock = {
   LOGIN_URL: 'http://localhost:3020',
   AUTH_URL: 'http://localhost:4040',
   COUNTRY_CONFIG_URL: 'http://localhost:3040',
+  APPLICATION_NAME: 'Farajaland CRVS',
+  BIRTH: {
+    REGISTRATION_TARGET: 45,
+    LATE_REGISTRATION_TARGET: 365,
+    FEE: {
+      ON_TIME: 0,
+      LATE: 0,
+      DELAYED: 0
+    }
+  },
   COUNTRY: 'bgd',
+  CURRENCY: {
+    isoCode: 'ZMW',
+    languagesAndCountry: ['en-ZM']
+  },
+  DEATH: {
+    REGISTRATION_TARGET: 45,
+    FEE: {
+      ON_TIME: 0,
+      DELAYED: 0
+    }
+  },
   LANGUAGES: 'en,bn',
-  CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 45,
-  CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 1825,
-  CERTIFICATE_PRINT_LOWEST_CHARGE: 25,
-  CERTIFICATE_PRINT_HIGHEST_CHARGE: 50,
   SENTRY: 'https://2ed906a0ba1c4de2ae3f3f898ec9df0b@sentry.io/1774551',
   LOGROCKET: 'opencrvs-foundation/opencrvs-bangladesh',
   BIRTH_REGISTRATION_TARGET: 45,
   DEATH_REGISTRATION_TARGET: 45,
-  NID_NUMBER_PATTERN: {
-    pattern: /^[0-9]{9}$/,
-    example: '483728140',
-    num: '9'
-  },
-  PHONE_NUMBER_PATTERN: {
-    pattern: /^01[1-9][0-9]{8}$/,
-    example: '01741234567',
-    start: '01',
-    num: '11',
-    mask: {
-      startForm: 5,
-      endBefore: 3
-    }
-  }
+  NID_NUMBER_PATTERN: /^[0-9]{9}$/,
+  PHONE_NUMBER_PATTERN: /^01[1-9][0-9]{8}$/
 }
 
 /*

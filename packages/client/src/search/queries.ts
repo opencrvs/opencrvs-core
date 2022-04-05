@@ -42,22 +42,6 @@ export const SEARCH_EVENTS = gql`
           createdAt
           modifiedAt
         }
-        operationHistories {
-          operationType
-          operatedOn
-          operatorRole
-          operatorName {
-            firstNames
-            familyName
-            use
-          }
-          operatorOfficeName
-          operatorOfficeAlias
-          notificationFacilityName
-          notificationFacilityAlias
-          rejectReason
-          rejectComment
-        }
         ... on BirthEventSearchSet {
           dateOfBirth
           childName {
@@ -103,23 +87,8 @@ export const SEARCH_DECLARATIONS_USER_WISE = gql`
           contactNumber
           trackingId
           dateOfDeclaration
+          modifiedAt
           status
-        }
-        operationHistories {
-          operationType
-          operatedOn
-          operatorRole
-          operatorName {
-            firstNames
-            familyName
-            use
-          }
-          operatorOfficeName
-          operatorOfficeAlias
-          notificationFacilityName
-          notificationFacilityAlias
-          rejectReason
-          rejectComment
         }
         ... on BirthEventSearchSet {
           childName {

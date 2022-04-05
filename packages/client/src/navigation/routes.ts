@@ -65,6 +65,7 @@ export const SETTINGS = '/settings'
 export const CHANGE_PHONE = '/settings/phone'
 export const CERTIFICATE_CONFIG = '/config/certificate'
 export const FORM_CONFIG = '/config/form'
+export const APPLICATION_CONFIG = '/config/application'
 
 export const DECLARATION_DETAIL = '/details/:declarationId'
 export const DECLARATION_RECORD_AUDIT = '/record-audit/:tab/:declarationId'

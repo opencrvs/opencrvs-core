@@ -24,11 +24,11 @@ export interface IProps extends IButtonProps {
 export const Tab = styled(Button)<IProps>`
   margin-right: 10px;
   padding-right: 10px;
-  color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.indigo500};
   opacity: ${({ disabled }) => (disabled ? 0.3 : 1)};
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   border-bottom: ${({ theme, active }) =>
-    active ? `4px solid ${theme.colors.primary}` : 'none'};
+    active ? `4px solid ${theme.colors.indigo500}` : 'none'};
   & div {
     padding-left: 0px;
     padding-right: 20px;

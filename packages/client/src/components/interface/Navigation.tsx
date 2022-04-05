@@ -32,7 +32,8 @@ import {
   goToSettings,
   goToPerformanceView,
   goToTeamView,
-  goToFormConfig
+  goToFormConfig,
+  goToApplicationConfig
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { COUNT_USER_WISE_DECLARATIONS } from '@client/search/queries'
@@ -50,6 +51,8 @@ import { Spinner } from '@opencrvs/components/lib/interface'
 import styled, { ITheme, withTheme } from '@client/styledComponents'
 import { Query } from '@client/components/Query'
 import { RouteComponentProps, withRouter } from 'react-router'
+import { getOfflineData } from '@client/offline/selectors'
+import { IOfflineData } from '@client/offline/reducer'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 
 const StyledSpinner = styled(Spinner)`
@@ -67,7 +70,7 @@ const TAB_ID = {
   sentForApproval: 'approvals',
   readyToPrint: 'print',
   externalValidation: 'waitingValidation',
-  declaration: 'declaration',
+  application: 'application',
   performance: 'performance',
   team: 'team',
   config: 'config',
@@ -164,6 +167,7 @@ interface IDispatchProps {
   goToRegistrarHomeTab: typeof goToRegistrarHomeTab
   goToConfigAction: typeof goToConfig
   goToFormConfigAction: typeof goToFormConfig
+  goToApplicationConfigAction: typeof goToApplicationConfig
   redirectToAuthentication: typeof redirectToAuthentication
   goToPerformanceViewAction: typeof goToPerformanceView
   goToTeamViewAction: typeof goToTeamView
@@ -176,6 +180,7 @@ interface IStateProps {
   userDetails: IUserDetails | null
   activeMenuItem: string
   workqueue: IWorkqueue
+  offlineCountryConfiguration: IOfflineData
   storedDeclarations: IDeclaration[]
 }
 
@@ -193,12 +198,12 @@ const TAB_LABEL = {
   sentForApproval: 'Sent for approval',
   externalValidation: 'Waiting for validation',
   readyToPrint: 'Ready to print ',
-  declaration: 'Declaration',
+  application: 'Application',
   performance: 'Performance',
   team: 'Team',
   configuration: 'Configuration',
   certificatesConfiguration: 'Certificates',
-  declarationSettings: 'Declaration Settings',
+  applicationSettings: 'Application',
   declarationForms: 'Declaration forms',
   settings: 'Settings',
   logout: 'Logout'
@@ -245,6 +250,7 @@ export const NavigationView = (props: IFullProps) => {
     enableMenuSelection = true,
     activeMenuItem,
     goToConfigAction,
+    goToApplicationConfigAction,
     goToFormConfigAction,
     navigationWidth,
     workqueue,
@@ -252,7 +258,8 @@ export const NavigationView = (props: IFullProps) => {
     draftDeclarations,
     theme,
     menuCollapse,
-    userInfo
+    userInfo,
+    offlineCountryConfiguration
   } = props
   const tabId = deselectAllTabs
     ? ''
@@ -261,7 +268,11 @@ export const NavigationView = (props: IFullProps) => {
     : activeMenuItem
     ? activeMenuItem
     : 'review'
-
+  const configTab = [
+    TAB_ID.application,
+    TAB_ID.certificates,
+    TAB_ID.declarationForms
+  ]
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
   const { loading, error, data, initialSyncDone } = workqueue
   const filteredData = filterProcessingDeclarationsFromQuery(
@@ -270,11 +281,6 @@ export const NavigationView = (props: IFullProps) => {
   )
 
   const fieldAgentLocationId = userDetails && getUserLocation(userDetails).id
-  const configTab = [
-    TAB_ID.certificates,
-    TAB_ID.declaration,
-    TAB_ID.declarationForms
-  ]
 
   const declarationCount = {
     inProgress: !initialSyncDone
@@ -298,7 +304,7 @@ export const NavigationView = (props: IFullProps) => {
 
   return (
     <LeftNavigation
-      applicationName={intl.formatMessage(constantsMessages.applicationName)}
+      applicationName={offlineCountryConfiguration.config.APPLICATION_NAME}
       navigationWidth={navigationWidth}
       name={userInfo && userInfo.name}
       role={userInfo && userInfo.role}
@@ -539,20 +545,20 @@ export const NavigationView = (props: IFullProps) => {
                         <>
                           <NavigationSubItem
                             label={TAB_LABEL.certificatesConfiguration}
-                            id={`navigation_${TAB_ID.certificates}`}
+                            id={`navigation_${TAB_ID.application}`}
                             onClick={goToConfigAction}
                             isSelected={
                               enableMenuSelection &&
-                              activeMenuItem === TAB_ID.certificates
+                              activeMenuItem === TAB_ID.application
                             }
                           />
                           <NavigationSubItem
-                            label={TAB_LABEL.declarationSettings}
-                            id={`navigation_${TAB_ID.declaration}`}
-                            onClick={() => {}}
+                            label={TAB_LABEL.applicationSettings}
+                            id={`navigation_${TAB_ID.certificates}`}
+                            onClick={goToApplicationConfigAction}
                             isSelected={
                               enableMenuSelection &&
-                              activeMenuItem === TAB_ID.declaration
+                              activeMenuItem === TAB_ID.certificates
                             }
                           />
                           <NavigationSubItem
@@ -579,6 +585,7 @@ export const NavigationView = (props: IFullProps) => {
 
 const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
   return {
+    offlineCountryConfiguration: getOfflineData(state),
     draftDeclarations:
       (state.declarationsState.declarations &&
         state.declarationsState.declarations.filter(
@@ -602,6 +609,8 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
       ? TAB_ID.performance
       : window.location.href.includes('team')
       ? TAB_ID.team
+      : window.location.href.includes('application')
+      ? TAB_ID.application
       : window.location.href.includes('settings')
       ? TAB_ID.settings
       : window.location.href.includes('certificate')
@@ -622,6 +631,7 @@ export const Navigation = connect<
   goToRegistrarHomeTab,
   goToConfigAction: goToConfig,
   goToFormConfigAction: goToFormConfig,
+  goToApplicationConfigAction: goToApplicationConfig,
   goToPerformanceViewAction: goToPerformanceView,
   goToTeamViewAction: goToTeamView,
   redirectToAuthentication,

@@ -61,8 +61,9 @@ import { Switch } from 'react-router'
 import { AppStore } from './store'
 import { RecordAudit } from './views/Home/RecordAudit'
 import { ChangePhonePage } from './views/Settings/ChangePhonePage'
-import { ConfigHome } from './views/SysAdmin/Config/ConfigHome'
+import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
+import { ApplicationConfig } from './views/SysAdmin/Config/Application'
 import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
 import { FormConfiguration } from './views/SysAdmin/Config/Form/FormConfiguration'
@@ -217,7 +218,12 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             path={routes.CERTIFICATE_CONFIG}
-                                            component={ConfigHome}
+                                            component={CertificatesConfig}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.APPLICATION_CONFIG}
+                                            component={ApplicationConfig}
                                           />
                                           <ProtectedRoute
                                             exact
@@ -280,6 +286,7 @@ export class App extends React.Component<IAppProps> {
                                             component={CorrectionReviewForm}
                                           />
                                           <ProtectedRoute
+                                            exact
                                             path={routes.SETTINGS}
                                             component={SettingsPage}
                                           />

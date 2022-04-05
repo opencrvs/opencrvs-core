@@ -31,7 +31,7 @@ const Header = styled.div`
   display: flex;
   flex-flow: column wrap;
 
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+  border-bottom: 1px solid rgb(204, 207, 208);
   padding-top: 20px;
   padding-right: 32px;
   padding-left: 32px;
