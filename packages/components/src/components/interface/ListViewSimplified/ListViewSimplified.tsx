@@ -12,94 +12,156 @@
 import React from 'react'
 import styled from 'styled-components'
 
-const Grid = styled.div`
+const Grid = styled.div<{ bottomBorder: boolean }>`
   display: grid;
   grid-template-columns: auto 1fr auto;
-  grid-auto-rows: 56px;
+  grid-auto-rows: minmax(56px, auto);
   row-gap: 1px;
-  border-bottom: 1px solid;
+  ${({ bottomBorder }) => bottomBorder && 'border-bottom: 1px solid'};
   border-color: ${({ theme }) => theme.colors.grey200};
-  background-color: ${({ theme }) => theme.colors.grey200};
-  > div {
-    background-color: ${({ theme }) => theme.colors.white};
+  > div:not(:nth-last-child(-n + 4)) {
+    border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    grid-auto-rows: 102px;
+    grid-template-columns: auto;
+    > div:not(:nth-last-child(-n + 1)) {
+      border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+    }
   }
 `
 
 const LabelValueContainer = styled.div`
   display: flex;
-  align-items: center;
+  padding: 8px 0;
   grid-column-start: 2;
-  flex-grow: 1;
-  gap: 8px;
-  padding-right: 8px;
+  gap: 20px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    flex-direction: column;
-    justify-content: center;
+    display: none;
   }
 `
 
-const Value = styled.div`
-  min-width: 50%;
-  color: ${({ theme }) => theme.colors.grey500};
+const ValueContainer = styled.div`
+  display: flex;
+  flex: 0 1 50%;
+  color: ${({ theme }) => theme.colors.grey600};
+  > span {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    width: 100%;
+    flex: 1;
+    grid-row-start: 2;
+    grid-column: 2;
+    align-items: center;
   }
 `
 
-const Label = styled.div`
-  min-width: 50%;
+const LabelContainer = styled.div`
+  display: flex;
+  flex: 1 0 50%;
   button > div {
     padding: 0;
   }
+  > span {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    width: 100%;
+    display: block;
+    grid-column-start: 2;
+    align-self: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
   }
 `
 
-const ActionContainer = styled.div`
+const ActionsContainer = styled.div`
   display: flex;
+  padding: 8px 0;
+  gap: 8px;
+  justify-content: right;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: none;
+  }
+`
+
+const ImageContainer = styled.div`
+  display: flex;
+  align-items: center;
+  padding-right: 16px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: none;
+  }
+`
+
+const MobileImageContainer = styled.div`
+  display: flex;
+  align-items: center;
+  padding-right: 16px;
+`
+
+const MobileContainer = styled.div`
+  display: none;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: grid;
+    padding-top: 8px;
+    padding-bottom: 16px;
+    grid-template-rows: auto auto;
+    grid-template-columns: auto 1fr auto;
+  }
+`
+
+const MobileActionsContainer = styled.div`
+  display: flex;
+  gap: 4px;
   align-items: center;
   justify-content: right;
 `
 
-const AvatarContainer = styled.div`
-  display: flex;
-  align-items: center;
-  padding-right: 8px;
-`
-
 interface IListViewItemSimplifiedProps {
-  avatar?: React.ReactNode
+  image?: React.ReactNode
   label: React.ReactNode
   value?: React.ReactNode
   actions?: React.ReactNode[]
 }
 
 export function ListViewItemSimplified({
-  avatar,
+  image,
   label,
   value,
   actions
 }: IListViewItemSimplifiedProps) {
   return (
     <>
-      {avatar && <AvatarContainer>{avatar}</AvatarContainer>}
+      {image && <ImageContainer>{image}</ImageContainer>}
       <LabelValueContainer>
-        <Label>{label}</Label>
-        {value && <Value>{value}</Value>}
+        <LabelContainer>
+          {typeof label === 'string' ? <span>{label}</span> : label}
+        </LabelContainer>
+        {value && (
+          <ValueContainer>
+            {typeof value === 'string' ? <span>{value}</span> : value}
+          </ValueContainer>
+        )}
       </LabelValueContainer>
-      <ActionContainer>{actions}</ActionContainer>
+      <ActionsContainer>{actions}</ActionsContainer>
+      <MobileContainer>
+        {image && <MobileImageContainer>{image}</MobileImageContainer>}
+        <LabelContainer>{label}</LabelContainer>
+        <MobileActionsContainer>{actions}</MobileActionsContainer>
+        {value && <ValueContainer>{value}</ValueContainer>}
+      </MobileContainer>
     </>
   )
 }
 
 export function ListViewSimplified({
+  bottomBorder = false,
   children
 }: {
+  bottomBorder?: boolean
   children: React.ReactNode
 }) {
-  return <Grid>{children}</Grid>
+  return <Grid bottomBorder={bottomBorder}>{children}</Grid>
 }

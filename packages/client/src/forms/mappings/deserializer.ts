@@ -274,7 +274,11 @@ function deserializeFormField(field: SerializedFormField) {
         fieldQueryDescriptorToQueryFunction(field.mapping.query),
       mutation:
         field.mapping.mutation &&
-        fieldMutationDescriptorToMutationFunction(field.mapping.mutation)
+        fieldMutationDescriptorToMutationFunction(field.mapping.mutation),
+      template: field.mapping.template && [
+        field.mapping.template.fieldName,
+        fieldQueryDescriptorToQueryFunction(field.mapping.template)
+      ]
     }
   }
 }
@@ -290,7 +294,16 @@ export function deserializeFormSection(
     mutation:
       section.mapping &&
       section.mapping.mutation &&
-      sectionMutationDescriptorToMutationFunction(section.mapping.mutation)
+      sectionMutationDescriptorToMutationFunction(section.mapping.mutation),
+    template:
+      section.mapping?.template &&
+      section.mapping.template.map(
+        ({ fieldName, ...query }) =>
+          [fieldName, sectionQueryDescriptorToQueryFunction(query)] as [
+            string,
+            IFormSectionQueryMapFunction
+          ]
+      )
   }
   const groups = section.groups.map((group) => ({
     ...group,

@@ -48,11 +48,12 @@ import {
   WORKFLOW_STATUS,
   TEAM_USER_LIST,
   USER_PROFILE,
+  CERTIFICATE_CONFIG,
+  CHANGE_PHONE,
+  APPLICATION_CONFIG,
   CERTIFICATE_CORRECTION,
   VERIFY_CORRECTOR,
-  CONFIG,
   DECLARATION_RECORD_AUDIT,
-  CHANGE_PHONE,
   FORM_CONFIG_WIZARD
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
@@ -72,7 +73,6 @@ import { stringify } from 'query-string'
 import { Cmd, loop } from 'redux-loop'
 import { IRecordAuditTabs } from '@client/views/Home/RecordAudit'
 import subYears from 'date-fns/subYears'
-import { eventNames } from 'process'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -200,7 +200,11 @@ export function goToHome() {
 }
 
 export function goToConfig() {
-  return push(CONFIG)
+  return push(CERTIFICATE_CONFIG)
+}
+
+export function goToApplicationConfig() {
+  return push(APPLICATION_CONFIG)
 }
 
 export function goToHomeTab(tabId: string, selectorId = '') {

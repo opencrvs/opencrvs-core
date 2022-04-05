@@ -76,7 +76,7 @@ export function Toggle(props: IToggle) {
         id="checkbox"
         type="checkbox"
         checked={props.selected}
-        onClick={props.onChange}
+        onChange={props.onChange}
       />
       <CheckBoxLabel htmlFor="checkbox" />
     </CheckBoxWrapper>

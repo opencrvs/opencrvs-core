@@ -49,7 +49,7 @@ const listViewItems = (intl: IntlShape) => {
       handler: () => {}
     },
     {
-      label: <span>{intl.formatMessage(configMessage.numberInput)}</span>,
+      label: intl.formatMessage(configMessage.numberInput),
       actionLabel: intl.formatMessage(buttonMessages.add),
       handler: () => {}
     },
@@ -89,7 +89,11 @@ export const FormTools = (props: IFormTools) => {
             </Label>
           }
           actions={[
-            <Toggle selected={toggleSelected} onChange={toggleOnChange} />
+            <Toggle
+              key="toggle"
+              selected={toggleSelected}
+              onChange={toggleOnChange}
+            />
           ]}
         />
       </ListViewSimplified>
@@ -100,7 +104,7 @@ export const FormTools = (props: IFormTools) => {
         {listViewItems(props.intl).map((item, idx) => (
           <ListViewItemSimplified
             key={idx}
-            label={<Label>{item.label}</Label>}
+            label={<Label key={idx}>{item.label}</Label>}
             actions={[
               <LinkButton key={idx} onClick={item.handler}>
                 {item.actionLabel}
