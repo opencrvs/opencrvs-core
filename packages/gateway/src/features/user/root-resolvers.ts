@@ -373,7 +373,7 @@ export const resolvers: GQLResolver = {
           )
         )
       }
-      return true
+      return avatar
     },
     async auditUser(_, { userId, action, reason, comment }, authHeader) {
       if (!hasScope(authHeader, 'sysadmin')) {

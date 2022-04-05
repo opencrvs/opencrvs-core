@@ -50,6 +50,7 @@ export const transformData = (
       const status =
         assignedReg.registration &&
         (assignedReg.registration.status as GQLRegStatus)
+
       return {
         id: assignedReg.id,
         name:
@@ -59,6 +60,7 @@ export const transformData = (
         dob:
           (birthReg &&
             birthReg.dateOfBirth &&
+            birthReg.dateOfBirth.length &&
             formatLongDate(birthReg.dateOfBirth, locale)) ||
           '',
         dod:
@@ -93,10 +95,7 @@ export const transformData = (
             assignedReg.registration &&
             assignedReg.registration.comment) ||
           '',
-        createdAt:
-          assignedReg.operationHistories &&
-          assignedReg.operationHistories[0] &&
-          assignedReg.operationHistories[0].operatedOn,
+        createdAt: assignedReg?.registration?.createdAt,
         modifiedAt:
           assignedReg.registration &&
           (assignedReg.registration.modifiedAt ||

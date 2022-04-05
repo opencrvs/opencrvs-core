@@ -92,6 +92,7 @@ export interface IOfflineData {
   assets: {
     logo: string
   }
+
   config: IApplicationConfig
   formConfig: IFormConfig
 }
@@ -259,6 +260,7 @@ function getDataLoadingCommands(state: IOfflineDataState) {
     FACILITIES_CMD,
     LOCATIONS_CMD,
     PILOT_LOCATIONS_CMD,
+    CONFIG_CMD,
     getContentCmd(state),
     CONFIG_CMD,
     ASSETS_CMD
@@ -336,7 +338,21 @@ function reducer(
       }
       return loop(state, dataLoadingCmds)
     }
+    case actions.UPDATE_OFFLINE_CONFIG: {
+      merge(window.config, action.payload.config)
+      const newOfflineData = {
+        ...state.offlineData,
+        config: action.payload.config
+      }
 
+      return loop(
+        {
+          ...state,
+          offlineData: newOfflineData
+        },
+        Cmd.run(saveOfflineData, { args: [newOfflineData] })
+      )
+    }
     /*
      * Configurations
      */
@@ -370,7 +386,7 @@ function reducer(
               definition: certificatesTemplates.birth.svgCode
             },
             death: {
-              definition: certificatesTemplates.birth.svgCode
+              definition: certificatesTemplates.death.svgCode
             }
           }
         }
@@ -508,31 +524,6 @@ function reducer(
           loadingError: errorIfDataNotLoaded(state)
         },
         delay(PILOT_LOCATIONS_CMD, RETRY_TIMEOUT)
-      )
-    }
-
-    /*
-     * Assets
-     */
-
-    case actions.ASSETS_LOADED: {
-      return {
-        ...state,
-        offlineData: {
-          ...state.offlineData,
-          assets: {
-            logo: action.payload.logo
-          }
-        }
-      }
-    }
-    case actions.ASSETS_FAILED: {
-      return loop(
-        {
-          ...state,
-          loadingError: errorIfDataNotLoaded(state)
-        },
-        delay(ASSETS_CMD, RETRY_TIMEOUT)
       )
     }
 

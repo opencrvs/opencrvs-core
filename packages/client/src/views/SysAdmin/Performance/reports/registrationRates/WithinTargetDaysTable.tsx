@@ -175,8 +175,8 @@ function WithinTargetDaysTableComponent(props: ITableProps) {
           label: intl.formatMessage(constantsMessages.registeredWithinTargetd, {
             registrationTargetDays:
               eventType === Event.BIRTH
-                ? window.config.BIRTH_REGISTRATION_TARGET
-                : window.config.DEATH_REGISTRATION_TARGET,
+                ? window.config.BIRTH.REGISTRATION_TARGET
+                : window.config.DEATH.REGISTRATION_TARGET,
             lineBreak: <br key={'registeredWithinTargetd-break'} />
           }),
           width: 15
@@ -196,8 +196,8 @@ function WithinTargetDaysTableComponent(props: ITableProps) {
             {
               registrationTargetDays:
                 eventType === Event.BIRTH
-                  ? window.config.BIRTH_REGISTRATION_TARGET
-                  : window.config.DEATH_REGISTRATION_TARGET,
+                  ? window.config.BIRTH.REGISTRATION_TARGET
+                  : window.config.DEATH.REGISTRATION_TARGET,
 
               lineBreak: <br key={'rateOfRegistrationWithinTargetd-break'} />
             }

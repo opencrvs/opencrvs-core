@@ -177,6 +177,13 @@ describe('Certificate collector test for a birth registration without father det
               registrationNumber: '2019333494BWOY6PW8',
               __typename: 'Registration'
             },
+            history: [
+              {
+                date: '2022-03-21T08:16:24.467+00:00',
+                action: 'REGISTERED',
+                reinstated: false
+              }
+            ],
             attendantAtBirth: null,
             weightAtBirth: null,
             birthType: null,
@@ -624,6 +631,13 @@ describe('Test for a free birth registration', () => {
               registrationNumber: '2019333494BWOY6PW8',
               __typename: 'Registration'
             },
+            history: [
+              {
+                date: '2022-03-21T08:16:24.467+00:00',
+                action: 'REGISTERED',
+                reinstated: false
+              }
+            ],
             attendantAtBirth: null,
             weightAtBirth: null,
             birthType: null,

@@ -32,6 +32,7 @@ import * as validators from '@opencrvs/client/src/utils/validate'
 import { ICertificate as IDeclarationCertificate } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
+import { IUserDetails } from '@client/utils/userUtils'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -56,7 +57,6 @@ export const DOCUMENT_UPLOADER_WITH_OPTION = 'DOCUMENT_UPLOADER_WITH_OPTION'
 export const SIMPLE_DOCUMENT_UPLOADER = 'SIMPLE_DOCUMENT_UPLOADER'
 export const WARNING = 'WARNING'
 export const LINK = 'LINK'
-export const PDF_DOCUMENT_VIEWER = 'PDF_DOCUMENT_VIEWER'
 export const DYNAMIC_LIST = 'DYNAMIC_LIST'
 export const FETCH_BUTTON = 'FETCH_BUTTON'
 export const LOCATION_SEARCH_INPUT = 'LOCATION_SEARCH_INPUT'
@@ -291,6 +291,7 @@ export interface IRegistration {
 }
 
 export interface IAttachmentValue {
+  name?: string
   type: string
   data: string
 }
@@ -308,7 +309,8 @@ export type IFormFieldQueryMapFunction = (
   queryData: any,
   sectionId: string,
   fieldDefinition: IFormField,
-  nestedFieldDefinition?: IFormField
+  nestedFieldDefinition?: IFormField,
+  offlineData?: IOfflineData
 ) => void
 
 /*
@@ -354,6 +356,7 @@ export type IFormFieldQueryMapDescriptor<
 export type IFormFieldMapping = {
   mutation?: IFormFieldMutationMapFunction
   query?: IFormFieldQueryMapFunction
+  template?: [string, IFormFieldQueryMapFunction]
 }
 
 /*
@@ -414,6 +417,7 @@ export type SerializedFormField = UnionOmit<
   mapping?: {
     mutation?: IMutationDescriptor
     query?: IQueryDescriptor
+    template?: IQueryDescriptor & { fieldName: string }
   }
 }
 export interface IAttachment {
@@ -614,9 +618,6 @@ export interface ILink extends IFormFieldBase {
   type: typeof LINK
 }
 
-export interface IPDFDocumentViewerFormField extends IFormFieldBase {
-  type: typeof PDF_DOCUMENT_VIEWER
-}
 export interface IQuery {
   query: any
   inputs: IFieldInput[]
@@ -670,7 +671,6 @@ export type IFormField =
   | IDocumentUploaderWithOptionsFormField
   | IWarningField
   | ILink
-  | IPDFDocumentViewerFormField
   | IDynamicListFormField
   | ILoaderButton
   | ISimpleDocumentUploaderFormField
@@ -858,6 +858,7 @@ export type TransformedData = { [key: string]: any }
 export type IFormSectionMapping = {
   mutation?: IFormSectionMutationMapFunction
   query?: IFormSectionQueryMapFunction
+  template?: [string, IFormSectionQueryMapFunction][]
 }
 
 export type IFormSectionMutationMapFunction = (
@@ -869,7 +870,11 @@ export type IFormSectionMutationMapFunction = (
 export type IFormSectionQueryMapFunction = (
   transFormedData: IFormData,
   queryData: any,
-  sectionId: string
+  sectionId: string,
+  targetSectionId?: string, // used for template query mappings
+  targetFieldName?: string, // used for template query mappings
+  offlineData?: IOfflineData, // used for template offline mappings
+  userDetails?: IUserDetails // user for template user mappings
 ) => void
 
 export enum BirthSection {
@@ -904,8 +909,7 @@ export enum UserSection {
 export enum CertificateSection {
   Collector = 'collector',
   CollectCertificate = 'collectCertificate',
-  CollectDeathCertificate = 'collectDeathCertificate',
-  CertificatePreview = 'certificatePreview'
+  CollectDeathCertificate = 'collectDeathCertificate'
 }
 
 export enum CorrectionSection {
@@ -962,6 +966,7 @@ export type ISerializedFormSection = Omit<
   mapping?: {
     mutation?: IMutationDescriptor
     query?: IQueryDescriptor
+    template?: (IQueryDescriptor & { fieldName: string })[]
   }
 }
 
@@ -1147,10 +1152,6 @@ export interface Ii18nLinkField extends Ii18nFormFieldBase {
   type: typeof LINK
 }
 
-export interface Ii18nPDFDocumentViewerFormField extends Ii18nFormFieldBase {
-  type: typeof PDF_DOCUMENT_VIEWER
-}
-
 export interface Ii18nLoaderButtonField extends Ii18nFormFieldBase {
   type: typeof FETCH_BUTTON
   queryMap: IQueryMap
@@ -1185,7 +1186,6 @@ export type Ii18nFormField =
   | Ii18nDocumentUploaderWithOptions
   | Ii18nWarningField
   | Ii18nLinkField
-  | Ii18nPDFDocumentViewerFormField
   | Ii18nLoaderButtonField
   | Ii18nSimpleDocumentUploaderFormField
   | Ii18nLocationSearchInputFormField

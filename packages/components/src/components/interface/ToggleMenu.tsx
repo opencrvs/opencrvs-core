@@ -12,6 +12,8 @@
 import styled from 'styled-components'
 import React from 'react'
 import { CircleButton } from '../buttons'
+
+// TODO: margin-left value of auto needs to be refactored out
 const ToggleMenuContainer = styled.div`
   position: relative;
   height: 40px;
@@ -23,19 +25,20 @@ const ToggleMenuContainer = styled.div`
   }
 `
 const MenuContainer = styled.ul`
-  border-radius: 2px;
+  border-radius: 4px;
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
   background-color: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.shadows.light};
   text-align: left;
-  ${({ theme }) => theme.fonts.reg18};
-  min-width: 200px;
+  min-width: 240px;
   width: auto;
   white-space: nowrap;
   position: absolute;
   z-index: 999999;
   display: flex;
   flex-direction: column;
-  box-shadow: 0px 2px 8px rgba(53, 67, 93, 0.54);
   top: 100%;
   right: 0;
   padding: 8px 0;
@@ -44,10 +47,10 @@ const MenuContainer = styled.ul`
 `
 
 const MenuHeader = styled.li`
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.reg16};
-  padding: 8px 32px 8px 16px;
-  border-bottom: 1px solid rgb(244, 244, 244);
+  ${({ theme }) => theme.fonts.bodyStyle};
+  padding: 8px 16px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   font-feature-settings: 'pnum' on, 'lnum' on;
 `
 const MenuItem = styled.li`
@@ -55,11 +58,12 @@ const MenuItem = styled.li`
   ${({ theme }) => theme.fonts.reg16};
   display: flex;
   flex-direction: row;
-  border-bottom: 1px solid rgb(244, 244, 244);
   cursor: pointer;
+  align-items: center;
   font-feature-settings: 'pnum' on, 'lnum' on;
-  padding: 12px 16px;
-  height: 48px;
+  padding: 16px 16px;
+  height: 40px;
+  gap: 12px;
   &:hover {
     background-color: ${({ theme }) => theme.colors.grey100};
   }
@@ -68,9 +72,6 @@ const MenuItem = styled.li`
   }
 `
 
-const MenuItemLabel = styled.span`
-  padding-left: 16px;
-`
 export interface IToggleMenuItem {
   label: string
   icon?: JSX.Element
@@ -146,7 +147,7 @@ export class ToggleMenu extends React.Component<IProps, IState> {
                   onClick={mi.handler}
                 >
                   {mi.icon && mi.icon}
-                  <MenuItemLabel>{mi.label}</MenuItemLabel>
+                  {mi.label}
                 </MenuItem>
               ))}
             </MenuContainer>

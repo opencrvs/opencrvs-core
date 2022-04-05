@@ -486,32 +486,6 @@ describe('Search type resolvers', () => {
       expect(duplicates).toEqual(['8a737727-a7db-4e77-865f-310dd7afb836'])
     })
   })
-  describe('type resolvers for event operation history', () => {
-    it('returns operationHistories operator name as human name from birth event search set', () => {
-      const operatorName =
-        searchTypeResolvers.OperationHistorySearchSet.operatorName({
-          operatedOn: '2019-12-12T15:21:51.355Z',
-          operatorFirstNames: 'Shakib',
-          operatorFamilyName: 'Al Hasan',
-          operatorOfficeName: 'Alokbali Union Parishad',
-          operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ'],
-          operationType: 'DECLARED',
-          operatorRole: 'FIELD_AGENT'
-        })
-      expect(operatorName).toEqual([
-        {
-          given: ['Shakib'],
-          family: ['Al Hasan'],
-          use: 'en'
-        },
-        {
-          given: null,
-          family: null,
-          use: 'bn'
-        }
-      ])
-    })
-  })
   describe('type resolvers for EventProgressSet', () => {
     it('returns id', () => {
       const id = searchTypeResolvers.EventProgressSet.id({

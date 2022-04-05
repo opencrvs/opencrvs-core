@@ -799,6 +799,33 @@ export const registerForms: IDefaultRegisterForms = {
           }
         ],
         mapping: {
+          template: [
+            {
+              fieldName: 'registrationNumber',
+              operation: 'registrationNumberTransformer'
+            },
+            {
+              fieldName: 'certificateDate',
+              operation: 'certificateDateTransformer',
+              parameters: ['en', 'dd MMMM yyyy']
+            },
+            {
+              fieldName: 'registrarName',
+              operation: 'registrarNameUserTransformer'
+            },
+            {
+              fieldName: 'role',
+              operation: 'roleUserTransformer'
+            },
+            {
+              fieldName: 'registrarSignature',
+              operation: 'registrarSignatureUserTransformer'
+            },
+            {
+              fieldName: 'registrationLocation',
+              operation: 'registrationLocationUserTransformer'
+            }
+          ],
           mutation: {
             operation: 'setBirthRegistrationSectionTransformer'
           },
@@ -843,6 +870,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    fieldName: 'informantFirstName',
+                    operation: 'nameToFieldTransformer',
+                    parameters: ['en', 'firstNames']
+                  },
                   mutation: {
                     operation: 'fieldToNameTransformer',
                     parameters: ['en', 'firstNames']
@@ -871,6 +903,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    fieldName: 'informantFamilyName',
+                    operation: 'nameToFieldTransformer',
+                    parameters: ['en', 'familyName']
+                  },
                   mutation: {
                     operation: 'fieldToNameTransformer',
                     parameters: ['en', 'familyName']
@@ -948,6 +985,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    operation: 'dateFormatTransformer',
+                    fieldName: 'eventDate',
+                    parameters: ['birthDate', 'en', 'do MMMM yyyy']
+                  },
                   mutation: {
                     operation: 'longDateTransformer',
                     parameters: ['birthDate']
@@ -1265,6 +1307,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    fieldName: 'placeOfBirth',
+                    operation: 'eventLocationNameQueryOfflineTransformer',
+                    parameters: ['facilities']
+                  },
                   mutation: {
                     operation: 'birthEventLocationMutationTransformer',
                     parameters: []
@@ -1303,6 +1350,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    fieldName: 'placeOfBirth',
+                    operation: 'eventLocationAddressOfflineTransformer',
+                    parameters: ['country']
+                  },
                   mutation: {
                     operation: 'birthEventLocationMutationTransformer',
                     parameters: []
@@ -1351,6 +1403,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    fieldName: 'placeOfBirth',
+                    operation: 'eventLocationAddressOfflineTransformer',
+                    parameters: ['state']
+                  },
                   mutation: {
                     operation: 'birthEventLocationMutationTransformer',
                     parameters: []
@@ -1416,6 +1473,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    fieldName: 'placeOfBirth',
+                    operation: 'eventLocationAddressOfflineTransformer',
+                    parameters: ['district']
+                  },
                   mutation: {
                     operation: 'birthEventLocationMutationTransformer',
                     parameters: []
@@ -1801,6 +1863,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    fieldName: 'placeOfBirth',
+                    operation: 'eventLocationAddressOfflineTransformer',
+                    parameters: ['state']
+                  },
                   mutation: {
                     operation: 'birthEventLocationMutationTransformer',
                     parameters: [0, 'state']
@@ -1848,6 +1915,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    fieldName: 'placeOfBirth',
+                    operation: 'eventLocationAddressOfflineTransformer',
+                    parameters: ['district']
+                  },
                   mutation: {
                     operation: 'birthEventLocationMutationTransformer',
                     parameters: [0, 'district']
@@ -2136,7 +2208,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'informantID',
-                type: 'NUMBER',
+                type: 'TEXT',
                 label: {
                   defaultMessage: 'National ID',
                   description: 'Option for form field: Type of ID',
@@ -3931,7 +4003,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'iD',
-                type: 'NUMBER',
+                type: 'TEXT',
                 label: {
                   defaultMessage: 'National ID',
                   description: 'Option for form field: Type of ID',
@@ -3963,7 +4035,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'socialSecurityNo',
-                type: 'NUMBER',
+                type: 'TEXT',
                 label: {
                   defaultMessage: 'Social Security No',
                   description: 'text for social security number form field',
@@ -6422,7 +6494,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'iD',
-                type: 'NUMBER',
+                type: 'TEXT',
                 label: {
                   defaultMessage: 'National ID',
                   description: 'Option for form field: Type of ID',
@@ -6459,7 +6531,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'socialSecurityNo',
-                type: 'NUMBER',
+                type: 'TEXT',
                 label: {
                   defaultMessage: 'Social Security No',
                   description: 'text for social security number form field',
@@ -8618,6 +8690,33 @@ export const registerForms: IDefaultRegisterForms = {
           }
         ],
         mapping: {
+          template: [
+            {
+              fieldName: 'registrationNumber',
+              operation: 'registrationNumberTransformer'
+            },
+            {
+              fieldName: 'certificateDate',
+              operation: 'certificateDateTransformer',
+              parameters: ['en', 'dd MMMM yyyy']
+            },
+            {
+              fieldName: 'registrarName',
+              operation: 'registrarNameUserTransformer'
+            },
+            {
+              fieldName: 'role',
+              operation: 'roleUserTransformer'
+            },
+            {
+              fieldName: 'registrarSignature',
+              operation: 'registrarSignatureUserTransformer'
+            },
+            {
+              fieldName: 'registrationLocation',
+              operation: 'registrationLocationUserTransformer'
+            }
+          ],
           mutation: {
             operation: 'setDeathRegistrationSectionTransformer'
           },
@@ -8646,7 +8745,7 @@ export const registerForms: IDefaultRegisterForms = {
             fields: [
               {
                 name: 'iD',
-                type: 'NUMBER',
+                type: 'TEXT',
                 label: {
                   defaultMessage: 'National ID',
                   description: 'Option for form field: Type of ID',
@@ -8678,7 +8777,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'socialSecurityNo',
-                type: 'NUMBER',
+                type: 'TEXT',
                 label: {
                   defaultMessage: 'Social security no./NAPSA',
                   description: 'text for social security number form field',
@@ -8745,6 +8844,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    fieldName: 'deceasedFirstName',
+                    operation: 'nameToFieldTransformer',
+                    parameters: ['en', 'firstNames']
+                  },
                   mutation: {
                     operation: 'fieldToNameTransformer',
                     parameters: ['en', 'firstNames']
@@ -8773,6 +8877,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    fieldName: 'deceasedFamilyName',
+                    operation: 'nameToFieldTransformer',
+                    parameters: ['en', 'familyName']
+                  },
                   mutation: {
                     operation: 'fieldToNameTransformer',
                     parameters: ['en', 'familyName']
@@ -9681,6 +9790,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    operation: 'deceasedDateFormatTransformation',
+                    fieldName: 'eventDate',
+                    parameters: ['en', 'do MMMM yyyy', 'deceased']
+                  },
                   mutation: {
                     operation: 'fieldToDeceasedDateTransformation',
                     parameters: [
@@ -9865,6 +9979,11 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'form.field.select.placeholder'
                 },
                 mapping: {
+                  template: {
+                    fieldName: 'placeOfDeath',
+                    operation: 'eventLocationNameQueryOfflineTransformer',
+                    parameters: ['facilities']
+                  },
                   mutation: {
                     operation: 'deathEventLocationMutationTransformer',
                     parameters: []
@@ -9925,6 +10044,11 @@ export const registerForms: IDefaultRegisterForms = {
                   resource: 'countries'
                 },
                 mapping: {
+                  template: {
+                    fieldName: 'placeOfDeath',
+                    operation: 'eventLocationAddressOfflineTransformer',
+                    parameters: ['country']
+                  },
                   mutation: {
                     operation: 'deathEventLocationMutationTransformer',
                     parameters: []
@@ -9967,6 +10091,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    fieldName: 'placeOfDeath',
+                    operation: 'eventLocationAddressOfflineTransformer',
+                    parameters: ['state']
+                  },
                   mutation: {
                     operation: 'deathEventLocationMutationTransformer',
                     parameters: []
@@ -10026,6 +10155,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    fieldName: 'placeOfDeath',
+                    operation: 'eventLocationAddressOfflineTransformer',
+                    parameters: ['district']
+                  },
                   mutation: {
                     operation: 'deathEventLocationMutationTransformer',
                     parameters: []
@@ -10371,6 +10505,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    fieldName: 'placeOfDeath',
+                    operation: 'eventLocationAddressOfflineTransformer',
+                    parameters: ['state']
+                  },
                   mutation: {
                     operation: 'deathEventLocationMutationTransformer',
                     parameters: [0, 'state']
@@ -10413,6 +10552,11 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  template: {
+                    fieldName: 'placeOfDeath',
+                    operation: 'eventLocationAddressOfflineTransformer',
+                    parameters: ['district']
+                  },
                   mutation: {
                     operation: 'deathEventLocationMutationTransformer',
                     parameters: [0, 'district']
@@ -10776,7 +10920,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'informantID',
-                type: 'NUMBER',
+                type: 'TEXT',
                 label: {
                   defaultMessage: 'National ID',
                   description: 'Option for form field: Type of ID',

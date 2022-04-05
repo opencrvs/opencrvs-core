@@ -267,17 +267,12 @@ class FieldAgentHomeView extends React.Component<
         names = deathReg && (deathReg.deceasedName as GQLHumanName[])
       }
       window.__localeId__ = this.props.intl.locale
-      const rejectedArray =
-        registrationSearchSet &&
-        registrationSearchSet.operationHistories &&
-        registrationSearchSet.operationHistories.filter((item) => {
-          return item && item.operationType === 'REJECTED'
-        })
-
       const daysOfRejection =
-        rejectedArray &&
-        rejectedArray[0] &&
-        formattedDuration(new Date(rejectedArray[0].operatedOn))
+        registrationSearchSet.registration?.modifiedAt &&
+        formattedDuration(
+          new Date(parseInt(registrationSearchSet.registration.modifiedAt))
+        )
+
       const event = registrationSearchSet.type as string
       return {
         id: registrationSearchSet.id,

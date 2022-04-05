@@ -675,15 +675,28 @@ export const mockOfflineData = {
     logo: `data:image;base64,${validImageB64String}`
   },
   config: {
+    APPLICATION_NAME: 'Farajaland CRVS',
+    BIRTH: {
+      REGISTRATION_TARGET: 45,
+      LATE_REGISTRATION_TARGET: 365,
+      FEE: {
+        ON_TIME: 0,
+        LATE: 15,
+        DELAYED: 20
+      }
+    },
     COUNTRY_LOGO_RENDER_WIDTH: 104,
     COUNTRY_LOGO_RENDER_HEIGHT: 104,
     DESKTOP_TIME_OUT_MILLISECONDS: 900000,
+    DEATH: {
+      REGISTRATION_TARGET: 45,
+      FEE: {
+        ON_TIME: 0,
+        DELAYED: 0
+      }
+    },
     HEALTH_FACILITY_FILTER: 'DISTRICT',
     LANGUAGES: 'en,bn',
-    CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 36500,
-    CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 36500,
-    CERTIFICATE_PRINT_LOWEST_CHARGE: 0,
-    CERTIFICATE_PRINT_HIGHEST_CHARGE: 0,
     UI_POLLING_INTERVAL: 5000,
     FIELD_AGENT_AUDIT_LOCATIONS:
       'WARD,UNION,CITY_CORPORATION,MUNICIPALITY,UPAZILA',
@@ -694,24 +707,18 @@ export const mockOfflineData = {
     _id: '61a8c105c04ac94fe46ceb27',
     BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
     COUNTRY: 'bgd',
-    COUNTRY_LOGO_FILE: 'logo.png',
-    PHONE_NUMBER_PATTERN: {
-      pattern: /^01[1-9][0-9]{8}$/,
-      example: '01741234567',
-      start: '01',
-      num: '11',
-      mask: {
-        startForm: 5,
-        endBefore: 3
-      }
+    COUNTRY_LOGO: {
+      fileName: 'logo.png',
+      file: `data:image;base64,${validImageB64String}`
     },
+    CURRENCY: {
+      isoCode: 'ZMW',
+      languagesAndCountry: ['en-ZM']
+    },
+    PHONE_NUMBER_PATTERN: /^01[1-9][0-9]{8}$/,
     BIRTH_REGISTRATION_TARGET: 45,
     DEATH_REGISTRATION_TARGET: 45,
-    NID_NUMBER_PATTERN: {
-      pattern: /^[0-9]{9}$/,
-      example: '4837281940',
-      num: '9'
-    },
+    NID_NUMBER_PATTERN: /^[0-9]{9}$/,
     SENTRY: 'https://sentry.com',
     LOGROCKET: 'opencrvs-foundation/opencrvs-zambia'
   },

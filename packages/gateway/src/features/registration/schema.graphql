@@ -234,6 +234,10 @@ type Comment { # Annotation
   createdAt: Date # -> .time
 }
 
+type StatusReason {
+  text: String
+}
+
 input RegWorkflowInput {
   type: RegStatus
   user: UserInput
@@ -266,6 +270,7 @@ type History {
   user: User
   date: Date
   action: RegStatus
+  statusReason: StatusReason
   reinstated: Boolean # -> extension(url='http://opencrvs.org/specs/extension/regReinstated')
   location: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastLocation').valueReference
   office: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastOffice').valueReference

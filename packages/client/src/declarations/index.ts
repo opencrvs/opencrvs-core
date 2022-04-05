@@ -50,6 +50,8 @@ import {
 import ApolloClient, { ApolloError, ApolloQueryResult } from 'apollo-client'
 import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
 import { v4 as uuid } from 'uuid'
+import { getOfflineData } from '@client/offline/selectors'
+import { IOfflineData } from '@client/offline/reducer'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -153,19 +155,6 @@ export interface IVisitedGroupId {
   groupId: string
 }
 
-export interface ITaskHistory {
-  operationType?: string
-  operatedOn?: string
-  operatorRole?: string
-  operatorName?: Array<GQLHumanName | null>
-  operatorOfficeName?: string
-  operatorOfficeAlias?: Array<string | null>
-  notificationFacilityName?: string
-  notificationFacilityAlias?: Array<string | null>
-  rejectReason?: string
-  rejectComment?: string
-}
-
 export interface IDeclaration {
   id: string
   data: IFormData
@@ -186,7 +175,6 @@ export interface IDeclaration {
   payload?: IPayload
   visitedGroupIds?: IVisitedGroupId[]
   timeLoggedMS?: number
-  operationHistories?: ITaskHistory[]
 }
 
 export interface IWorkqueue {
@@ -373,6 +361,8 @@ interface IDownloadDeclarationSuccess {
       [key in Event]: IForm
     }
     client: ApolloClient<{}>
+    offlineData?: IOfflineData
+    userDetails?: IUserDetails
   }
 }
 
@@ -1282,7 +1272,9 @@ function downloadDeclarationSuccess({
     payload: {
       queryData: data,
       form,
-      client
+      client,
+      offlineData: getOfflineData(store),
+      userDetails: getUserDetails(store) as IUserDetails
     }
   }
 }
@@ -1522,7 +1514,13 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         )
       )
     case DOWNLOAD_DECLARATION_SUCCESS:
-      const { queryData, form, client: clientFromSuccess } = action.payload
+      const {
+        queryData,
+        form,
+        client: clientFromSuccess,
+        offlineData,
+        userDetails
+      } = action.payload
 
       const downloadingDeclarationIndex = state.declarations.findIndex(
         (declaration) =>
@@ -1536,7 +1534,9 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
       const eventData = queryData.data[dataKey as string]
       const transData: IFormData = gqlToDraftTransformer(
         form[downloadingDeclaration.event],
-        eventData
+        eventData,
+        offlineData,
+        userDetails
       )
       const downloadedAppStatus: string =
         (eventData &&
