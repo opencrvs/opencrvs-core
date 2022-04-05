@@ -66,9 +66,13 @@ const ModalContent = styled.div<{
     height: 100vh;
   }
 `
-const Header = styled.div<{ responsive?: boolean; hideBoxShadow?: boolean }>`
+const Header = styled.div<{
+  responsive?: boolean
+  hideBoxShadow?: boolean
+  titleHeightAuto?: boolean
+}>`
   ${({ theme }) => theme.fonts.regularFont};
-  height: 64px;
+  height: ${({ titleHeightAuto }) => (titleHeightAuto ? 'auto' : '64px')};
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -144,6 +148,7 @@ interface IProps {
   responsive?: boolean
   width?: number
   contentHeight?: number
+  titleHeightAuto?: boolean
   autoHeight?: boolean
   contentScrollableY?: boolean
   fullscreen?: boolean
@@ -175,6 +180,7 @@ export class ResponsiveModal extends React.Component<IProps> {
       actions,
       width,
       contentHeight,
+      titleHeightAuto,
       fullscreen,
       autoHeight,
       contentScrollableY,
@@ -194,7 +200,11 @@ export class ResponsiveModal extends React.Component<IProps> {
           responsive={responsive}
           fullscreen={fullscreen}
         >
-          <Header responsive={responsive} hideBoxShadow={hideHeaderBoxShadow}>
+          <Header
+            responsive={responsive}
+            hideBoxShadow={hideHeaderBoxShadow}
+            titleHeightAuto={titleHeightAuto}
+          >
             <Title>{title}</Title>
             <CircleButton id="close-btn" type="button" onClick={handleClose}>
               <Cross color="currentColor" />

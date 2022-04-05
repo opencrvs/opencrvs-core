@@ -18,7 +18,7 @@ import * as Hapi from '@hapi/hapi'
 import { logger } from '@config/config/logger'
 import * as Joi from 'joi'
 
-export default async function updateUser(
+export default async function updateQuestion(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -69,7 +69,7 @@ export const requestSchema = Joi.object({
   fieldType: Joi.string().valid(...validFieldType),
   preceedingFieldId: Joi.string(),
   required: Joi.boolean(),
-  enabled: Joi.boolean().required(),
+  enabled: Joi.string(),
   custom: Joi.boolean(),
   initialValue: Joi.string()
 })

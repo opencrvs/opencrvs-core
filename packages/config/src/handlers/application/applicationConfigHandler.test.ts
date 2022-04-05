@@ -14,14 +14,53 @@ import ApplicationConfig, {
   IApplicationConfigurationModel
 } from '@config/models/config'
 import * as fetchMock from 'jest-fetch-mock'
-import mockingoose from 'mockingoose'
+import * as mockingoose from 'mockingoose'
+import * as jwt from 'jsonwebtoken'
+import { readFileSync } from 'fs'
+
+const token = jwt.sign(
+  { scope: ['natlsysadmin'] },
+  readFileSync('../auth/test/cert.key'),
+  {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:config-user'
+  }
+)
 
 const fetch = fetchMock as fetchMock.FetchMock
 
+export const validImageB64String =
+  'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
+
 let mockConfig = {
+  APPLICATION_NAME: 'Farajaland CRVS',
   BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
+  BIRTH: {
+    REGISTRATION_TARGET: 45,
+    LATE_REGISTRATION_TARGET: 365,
+    FEE: {
+      ON_TIME: 0,
+      LATE: 0,
+      DELAYED: 0
+    }
+  },
   COUNTRY: 'bgd',
-  COUNTRY_LOGO_FILE: 'logo.png',
+  COUNTRY_LOGO: {
+    fileName: 'logo.png',
+    file: `data:image;base64,${validImageB64String}`
+  },
+  CURRENCY: {
+    isoCode: 'ZMW',
+    languagesAndCountry: ['en-ZM']
+  },
+  DEATH: {
+    REGISTRATION_TARGET: 45,
+    FEE: {
+      ON_TIME: 0,
+      DELAYED: 0
+    }
+  },
   DESKTOP_TIME_OUT_MILLISECONDS: 900000, // 15 mins
   HEALTH_FACILITY_FILTER: 'UPAZILA',
   LANGUAGES: 'en,bn',
@@ -30,10 +69,6 @@ let mockConfig = {
   API_GATEWAY_URL: 'http://localhost:7070/',
   PERFORMANCE_URL: 'http://localhost:3001',
   RESOURCES_URL: 'http://localhost:3040',
-  CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 45, // days
-  CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 1825, // 5 years =  (5 * 365) days
-  CERTIFICATE_PRINT_LOWEST_CHARGE: 25, // taka
-  CERTIFICATE_PRINT_HIGHEST_CHARGE: 50, // taka
   UI_POLLING_INTERVAL: 5000,
   FIELD_AGENT_AUDIT_LOCATIONS:
     'WARD,UNION,CITY_CORPORATION,MUNICIPALITY,UPAZILA',
@@ -60,5 +95,41 @@ describe('applicationHandler', () => {
       url: '/config'
     })
     expect(res.statusCode).toBe(200)
+  })
+
+  it('update application config using mongoose', async () => {
+    mockConfig.id = '61c4664e663fc6af203b63b8'
+    mockingoose(ApplicationConfig).toReturn(mockConfig, 'findOne')
+    mockingoose(ApplicationConfig).toReturn(mockConfig, 'update')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/updateApplicationConfig',
+      payload: {
+        APPLICATION_NAME: 'Farajaland CRVS'
+      },
+      headers: {
+        Authorization: `${token}`
+      }
+    })
+    expect(res.statusCode).toBe(201)
+  })
+
+  it('return error when tries to save invalid data', async () => {
+    mockingoose(ApplicationConfig).toReturn(null, 'findOne')
+    mockingoose(ApplicationConfig).toReturn({}, 'update')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/getCertificate',
+      payload: {
+        APPLICATION_NAME: 1234
+      },
+      headers: {
+        Authorization: `${token}`
+      }
+    })
+
+    expect(res.statusCode).toBe(400)
   })
 })

@@ -19,7 +19,10 @@ import {
   updateCertificate,
   updateCertificateHandler
 } from '@config/handlers/certificate/certificateHandler'
-import applicationConfigHandler from '@config/handlers/applicationConfigHandler'
+import applicationConfigHandler, {
+  updateApplicationConfig,
+  updateApplicationConfigHandler
+} from '@config/handlers/application/applicationConfigHandler'
 import createQuestionHandler, {
   requestSchema as createQuestionReqSchema
 } from '@config/handlers/createQuestion/handler'
@@ -27,6 +30,11 @@ import updateQuestionHandler, {
   requestSchema as updateQuestionReqSchema
 } from '@config/handlers/updateQuestion/handler'
 import getQuestionsHandler from '@config/handlers/getQuestions/handler'
+import {
+  updateFormDraftHandler,
+  requestSchema as updateFormDraftReqSchema
+} from '@config/handlers/updateFormDraft/handler'
+import getFormDraft from '@config/handlers/getFormDraft/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -144,6 +152,48 @@ export default function getRoutes() {
       }
     },
     {
+      method: 'PUT',
+      path: '/draftQuestions',
+      handler: updateFormDraftHandler,
+      config: {
+        tags: ['api'],
+        description: 'Update form draft & questions',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        validate: {
+          payload: updateFormDraftReqSchema
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/formDraft',
+      handler: getFormDraft,
+      config: {
+        tags: ['api'],
+        description: 'Get form draft',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/updateApplicationConfig',
+      handler: updateApplicationConfigHandler,
+      config: {
+        tags: ['api'],
+        description: 'Updates an existing Config',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        validate: {
+          payload: updateApplicationConfig
+        }
+      }
+    },
+    {
       method: 'POST',
       path: '/question',
       handler: createQuestionHandler,
@@ -154,10 +204,6 @@ export default function getRoutes() {
           scope: [RouteScope.NATLSYSADMIN]
         },
         validate: {
-          /*failAction: async (request: any, h: any, err: any) => {
-            console.log(`Joi error: ${err}`)
-            throw err
-          },*/
           payload: createQuestionReqSchema
         }
       }

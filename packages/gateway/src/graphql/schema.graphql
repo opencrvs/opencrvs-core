@@ -124,6 +124,7 @@ type Query {
   getCertificateSVG(status: String, event: String): CertificateSVG
   getActiveCertificatesSVG: [CertificateSVG]
   getQuestions: [Question]
+  getFormDraft: [formDraft]
 }
 
 type Mutation {
@@ -182,7 +183,7 @@ type Mutation {
     nonce: String!
     verifyCode: String!
   ): String
-  changeAvatar(userId: String!, avatar: AvatarInput!): String
+  changeAvatar(userId: String!, avatar: AvatarInput!): Avatar
   auditUser(
     userId: String!
     action: String!
@@ -193,7 +194,11 @@ type Mutation {
   createOrUpdateCertificateSVG(
     certificateSVG: CertificateSVGInput!
   ): CertificateSVG
+  updateApplicationConfig(
+    applicationConfig: ApplicationConfigurationInput
+  ): ApplicationConfiguration
   createOrUpdateQuestion(question: QuestionInput!): Question
+  createOrUpdateFormDraft(formDraft: formDraftInput!): formDraft
 }
 
 type Dummy {
@@ -419,8 +424,8 @@ type CertificateSVG {
 }
 
 type Question {
-  _id: ID
-  fieldId: String
+  _id: ID!
+  fieldId: String!
   label: MesssageDescriptor
   placeholder: MesssageDescriptor
   maxLength: Int
@@ -428,9 +433,20 @@ type Question {
   fieldType: String
   preceedingFieldId: String
   required: Boolean
-  enabled: Boolean
+  enabled: String
   custom: Boolean
   initialValue: String
+}
+
+type formDraft {
+  _id: ID
+  event: String!
+  status: String!
+  comment: String
+  version: Int!
+  history: [DraftHistory]
+  updatedAt: Date!
+  createdAt: Date!
 }
 
 input NotificationInput {
@@ -518,6 +534,11 @@ input SecurityQuestionAnswer {
   answer: String
 }
 
+type Avatar {
+  type: String!
+  data: String!
+}
+
 input AvatarInput {
   type: String!
   data: String!
@@ -534,9 +555,55 @@ input CertificateSVGInput {
   status: String!
 }
 
+type ApplicationConfiguration {
+  APPLICATION_NAME: String
+  BACKGROUND_SYNC_BROADCAST_CHANNEL: String
+  BIRTH: Birth
+  COUNTRY: String
+  COUNTRY_LOGO: CountryLogo
+  CURRENCY: Currency
+  COUNTRY_LOGO_RENDER_WIDTH: Int
+  COUNTRY_LOGO_RENDER_HEIGHT: Int
+  DESKTOP_TIME_OUT_MILLISECONDS: Int
+  DEATH: Death
+  UI_POLLING_INTERVAL: Int
+  FIELD_AGENT_AUDIT_LOCATIONS: String
+  APPLICATION_AUDIT_LOCATIONS: String
+  INFORMANT_MINIMUM_AGE: Int
+  HIDE_EVENT_REGISTER_INFORMATION: Boolean
+  EXTERNAL_VALIDATION_WORKQUEUE: Boolean
+  SENTRY: String
+  LOGROCKET: String
+  PHONE_NUMBER_PATTERN: String
+  NID_NUMBER_PATTERN: String
+}
+
+input ApplicationConfigurationInput {
+  APPLICATION_NAME: String
+  BACKGROUND_SYNC_BROADCAST_CHANNEL: String
+  BIRTH: BirthInput
+  COUNTRY: String
+  COUNTRY_LOGO: CountryLogoInput
+  CURRENCY: CurrencyInput
+  COUNTRY_LOGO_RENDER_WIDTH: Int
+  COUNTRY_LOGO_RENDER_HEIGHT: Int
+  DESKTOP_TIME_OUT_MILLISECONDS: Int
+  DEATH: DeathInput
+  UI_POLLING_INTERVAL: Int
+  FIELD_AGENT_AUDIT_LOCATIONS: String
+  APPLICATION_AUDIT_LOCATIONS: String
+  INFORMANT_MINIMUM_AGE: Int
+  HIDE_EVENT_REGISTER_INFORMATION: Boolean
+  EXTERNAL_VALIDATION_WORKQUEUE: Boolean
+  SENTRY: String
+  LOGROCKET: String
+  PHONE_NUMBER_PATTERN: String
+  NID_NUMBER_PATTERN: String
+}
+
 input QuestionInput {
   id: ID
-  fieldId: String
+  fieldId: String!
   label: MesssageDescriptorInput
   placeholder: MesssageDescriptorInput
   maxLength: Int
@@ -547,6 +614,14 @@ input QuestionInput {
   enabled: Boolean
   custom: Boolean
   initialValue: String
+}
+
+input formDraftInput {
+  questions: [QuestionInput]
+  deleted: [String]
+  event: String!
+  status: String!
+  comment: String
 }
 
 scalar Map
@@ -622,6 +697,7 @@ type History {
   user: User
   date: Date
   action: RegStatus
+  statusReason: StatusReason
   reinstated: Boolean
   location: Location
   office: Location
@@ -760,11 +836,6 @@ type Signature {
   type: String
 }
 
-type Avatar {
-  type: String!
-  data: String!
-}
-
 type SearchFieldAgentResponse {
   practitionerId: String
   fullName: String
@@ -844,7 +915,6 @@ interface EventSearchSet {
   id: ID!
   type: String
   registration: RegistrationSearchSet
-  operationHistories: [OperationHistorySearchSet]
 }
 
 type EventProgressSet {
@@ -863,6 +933,14 @@ type MesssageDescriptor {
   id: String
   description: String
   defaultMessage: String
+}
+
+type DraftHistory {
+  _id: ID
+  version: Int
+  status: String
+  comment: String
+  lastUpdateAt: Date
 }
 
 input PersonInput {
@@ -977,6 +1055,48 @@ input SignatureInput {
   type: String
 }
 
+type Birth {
+  REGISTRATION_TARGET: Int
+  LATE_REGISTRATION_TARGET: Int
+  FEE: BirthFee
+}
+
+type CountryLogo {
+  fileName: String
+  file: String
+}
+
+type Currency {
+  isoCode: String
+  languagesAndCountry: [String]
+}
+
+type Death {
+  REGISTRATION_TARGET: Int
+  FEE: DeathFee
+}
+
+input BirthInput {
+  REGISTRATION_TARGET: Int
+  LATE_REGISTRATION_TARGET: Int
+  FEE: BirthFeeInput
+}
+
+input CountryLogoInput {
+  fileName: String
+  file: String
+}
+
+input CurrencyInput {
+  isoCode: String
+  languagesAndCountry: [String]
+}
+
+input DeathInput {
+  REGISTRATION_TARGET: Int
+  FEE: DeathFeeInput
+}
+
 input MesssageDescriptorInput {
   id: String
   description: String
@@ -1018,6 +1138,10 @@ enum ParentDetailsType {
   MOTHER_ONLY
   FATHER_ONLY
   NONE
+}
+
+type StatusReason {
+  text: String
 }
 
 type Comment {
@@ -1193,26 +1317,12 @@ type RegistrationSearchSet {
   modifiedAt: String
 }
 
-type OperationHistorySearchSet {
-  operationType: String
-  operatedOn: Date
-  operatorRole: String
-  operatorName: [HumanName]
-  operatorOfficeName: String
-  operatorOfficeAlias: [String]
-  notificationFacilityName: String
-  notificationFacilityAlias: [String]
-  rejectReason: String
-  rejectComment: String
-}
-
 type BirthEventSearchSet implements EventSearchSet {
   id: ID!
   type: String
   childName: [HumanName]
   dateOfBirth: Date
   registration: RegistrationSearchSet
-  operationHistories: [OperationHistorySearchSet]
 }
 
 type DeathEventSearchSet implements EventSearchSet {
@@ -1221,7 +1331,6 @@ type DeathEventSearchSet implements EventSearchSet {
   deceasedName: [HumanName]
   dateOfDeath: Date
   registration: RegistrationSearchSet
-  operationHistories: [OperationHistorySearchSet]
 }
 
 type EventProgressData {
@@ -1311,6 +1420,28 @@ input ReasonsNotApplyingInput {
   primaryCaregiverType: PrimaryCaregiverType
   reasonNotApplying: String
   isDeceased: Boolean
+}
+
+type BirthFee {
+  ON_TIME: Float
+  LATE: Float
+  DELAYED: Float
+}
+
+type DeathFee {
+  ON_TIME: Float
+  DELAYED: Float
+}
+
+input BirthFeeInput {
+  ON_TIME: Float
+  LATE: Float
+  DELAYED: Float
+}
+
+input DeathFeeInput {
+  ON_TIME: Float
+  DELAYED: Float
 }
 
 type Payment {
