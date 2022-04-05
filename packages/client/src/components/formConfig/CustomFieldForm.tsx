@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { buttonMessages } from '@client/i18n/messages'
+import { customFieldFormMessages } from '@client/i18n/messages/views/customFieldForm'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -17,7 +19,11 @@ import { TextArea, TextInput } from '@opencrvs/components/lib/forms'
 import { InputField } from '@opencrvs/components/lib/forms/InputField/InputField'
 import { Box } from '@opencrvs/components/lib/interface'
 import * as React from 'react'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import {
+  injectIntl,
+  IntlShape,
+  WrappedComponentProps as IntlShapeProps
+} from 'react-intl'
 import { connect } from 'react-redux'
 
 const CustomFieldFormContainer = styled(Box)`
@@ -66,7 +72,9 @@ const ListRow = styled.div`
 
 const ListColumn = styled.div``
 
-type IFullProps = {} & IntlShapeProps
+type IFullProps = {
+  intl: IntlShape
+} & IntlShapeProps
 
 interface ICustomFieldForms {}
 
@@ -75,11 +83,16 @@ class CustomFieldFormsComp extends React.Component<
   ICustomFieldForms
 > {
   toggleButtons() {
+    const { intl } = this.props
     return (
       <ListContainer>
-        <H3>Custom text input</H3>
+        <H3>
+          {intl.formatMessage(customFieldFormMessages.customFieldFormHeading)}
+        </H3>
         <ListRow>
-          <ListColumn>Hide field</ListColumn>
+          <ListColumn>
+            {intl.formatMessage(customFieldFormMessages.hideFieldLabel)}
+          </ListColumn>
           <ListColumn>
             <RightAlignment>
               <Toggle selected={false} onChange={() => alert('Changed')} />
@@ -87,7 +100,9 @@ class CustomFieldFormsComp extends React.Component<
           </ListColumn>
         </ListRow>
         <ListRow>
-          <ListColumn>Required for registration</ListColumn>
+          <ListColumn>
+            {intl.formatMessage(customFieldFormMessages.requiredFieldLabel)}
+          </ListColumn>
           <ListColumn>
             <RightAlignment>
               <Toggle selected={false} onChange={() => alert('Changed')} />
@@ -99,10 +114,15 @@ class CustomFieldFormsComp extends React.Component<
   }
 
   inputFields() {
+    const { intl } = this.props
     return (
       <>
         <FieldContainer>
-          <InputField id="custom-form-label" label="Label" touched={false}>
+          <InputField
+            id="custom-form-label"
+            label={intl.formatMessage(customFieldFormMessages.label)}
+            touched={false}
+          >
             <TextInput />
           </InputField>
         </FieldContainer>
@@ -111,7 +131,7 @@ class CustomFieldFormsComp extends React.Component<
           <InputField
             required={false}
             id="custom-form-placeholder"
-            label="Placeholder"
+            label={intl.formatMessage(customFieldFormMessages.placeholderLabel)}
             touched={false}
           >
             <TextInput />
@@ -122,7 +142,7 @@ class CustomFieldFormsComp extends React.Component<
           <InputField
             required={false}
             id="custom-form-description"
-            label="Description"
+            label={intl.formatMessage(customFieldFormMessages.descriptionLabel)}
             touched={false}
           >
             <TextArea />
@@ -133,7 +153,7 @@ class CustomFieldFormsComp extends React.Component<
           <InputField
             required={false}
             id="custom-form-tooltip"
-            label="Tooltip"
+            label={intl.formatMessage(customFieldFormMessages.descriptionLabel)}
             touched={false}
           >
             <TextInput />
@@ -144,7 +164,7 @@ class CustomFieldFormsComp extends React.Component<
           <InputField
             required={false}
             id="custom-form-error-message"
-            label="Error message"
+            label={intl.formatMessage(customFieldFormMessages.errorMessage)}
             touched={false}
           >
             <TextArea />
@@ -155,15 +175,15 @@ class CustomFieldFormsComp extends React.Component<
           <InputField
             required={false}
             id="custom-form-max-length"
-            label="Max length"
+            label={intl.formatMessage(customFieldFormMessages.maxLengthLabel)}
             touched={false}
           >
             <TextInput />
           </InputField>
         </FieldContainer>
 
-        <CPrimaryButton id="myButton" onClick={() => {}} disabled={true}>
-          Save
+        <CPrimaryButton onClick={() => {}} disabled={true}>
+          {intl.formatMessage(buttonMessages.save)}
         </CPrimaryButton>
       </>
     )
