@@ -14,7 +14,7 @@ import React from 'react'
 import styled from '@client/styledComponents'
 import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
 import { IntlShape } from 'react-intl'
-import { configMessage } from '@client/components/formConfig/FormConfig'
+import { configMessage } from '@client/i18n/messages/views/FormConfig'
 import {
   ListViewSimplified,
   ListViewItemSimplified

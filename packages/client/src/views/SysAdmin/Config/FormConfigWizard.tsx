@@ -13,7 +13,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { getUserDetails } from '@client/profile/profileSelectors'
+import { getScope } from '@client/profile/profileSelectors'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { RouteComponentProps, Redirect } from 'react-router'
 import { HOME } from '@client/navigation/routes'
@@ -32,16 +32,11 @@ import {
 } from '@client/components/formConfig/PageNavigation'
 import { FormTools } from '@client/components/formConfig/formTools/FormTools'
 import { FormConfigCanvas } from '@client/components/formConfig/FormConfigCanvas'
-import { IForm } from '@client/forms'
+import { IForm, Event } from '@client/forms'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { goToFormConfigWizard } from '@client/navigation'
 import { buttonMessages } from '@client/i18n/messages'
-import { IUserDetails } from '@client/utils/userUtils'
-
-export enum EventType {
-  BIRTH = 'birth',
-  DEATH = 'death'
-}
+import { Scope } from '@client/utils/authUtils'
 
 type RouteProps = RouteComponentProps<{
   event: string
@@ -49,9 +44,9 @@ type RouteProps = RouteComponentProps<{
 }>
 
 interface IStateProps {
-  userDetails: IUserDetails | null
+  scope: Scope | null
   registerForm: { [key: string]: IForm }
-  event?: EventType
+  event?: Event
   section?: string | undefined
 }
 
@@ -105,7 +100,7 @@ const topBarActions = (props: IFullProps) => {
 
 function FormConfigWizardComp(props: IFullProps) {
   if (
-    !(props.userDetails?.role === 'NATIONAL_SYSTEM_ADMIN') ||
+    !props.scope?.includes('natlsysadmin') ||
     !props.event ||
     !props.section
   ) {
@@ -148,13 +143,13 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
     section = TAB_DEATH[sectionKey as keyof typeof TAB_DEATH]
   }
   return {
-    userDetails: getUserDetails(state),
+    scope: getScope(state),
     registerForm: getRegisterForm(state),
     event:
       event === 'birth'
-        ? EventType.BIRTH
+        ? Event.BIRTH
         : event === 'death'
-        ? EventType.DEATH
+        ? Event.DEATH
         : undefined,
     section
   }

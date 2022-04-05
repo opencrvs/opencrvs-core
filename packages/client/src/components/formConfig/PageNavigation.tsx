@@ -16,10 +16,9 @@ import {
   NavigationSubItem,
   LabelContainer
 } from '@opencrvs/components/lib/interface/Navigation/NavigationSubItem'
-import { IForm } from '@client/forms'
-import { EventType } from '@client/views/SysAdmin/Config/FormConfigWizard'
+import { IForm, Event } from '@client/forms'
 import { IntlShape } from 'react-intl'
-import { configMessage } from '@client/components/formConfig/FormConfig'
+import { configMessage } from '@client/i18n/messages/views/FormConfig'
 import { goToFormConfigWizard } from '@client/navigation'
 
 const Title = styled.div`
@@ -34,7 +33,7 @@ interface IPageNavigation {
   intl: IntlShape
   registerForm: { [key: string]: IForm }
   section?: string
-  event?: EventType
+  event?: Event
   goToFormConfigWizard: typeof goToFormConfigWizard
 }
 

@@ -11,7 +11,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IRecordAuditMessages
+interface IFormConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   introduction: MessageDescriptor
   child: MessageDescriptor
@@ -33,7 +33,7 @@ interface IRecordAuditMessages
   addInputContent: MessageDescriptor
 }
 
-const messagesToDefine: IRecordAuditMessages = {
+const messagesToDefine: IFormConfigMessages = {
   introduction: {
     id: 'form.config.navigation.information',
     defaultMessage: 'Introduction',
@@ -125,5 +125,5 @@ const messagesToDefine: IRecordAuditMessages = {
     description: 'Label for Add input/content in form tools'
   }
 }
-export const configMessage: IRecordAuditMessages =
+export const configMessage: IFormConfigMessages =
   defineMessages(messagesToDefine)

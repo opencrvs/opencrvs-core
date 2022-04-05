@@ -15,22 +15,24 @@ import { createStore } from '@client/store'
 import {
   createTestComponent,
   createRouterProps,
-  natlAdminUserDetails
+  natlsysadminToken,
+  getItem
 } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { FormConfigWizard } from './FormConfigWizard'
 import { formatUrl } from '@client/navigation'
 import { FORM_CONFIG_WIZARD } from '@client/navigation/routes'
-import { getStorageUserDetailsSuccess } from '@client/profile/profileActions'
+import { checkAuth } from '@client/profile/profileActions'
 
-describe('Form Config Wizard for birth page successfully rendered', () => {
+describe('Form Config Wizard for birth page', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
     const { store, history } = createStore()
-    store.dispatch(
-      getStorageUserDetailsSuccess(JSON.stringify(natlAdminUserDetails))
-    )
+
+    getItem.mockReturnValue(natlsysadminToken)
+    store.dispatch(checkAuth({ '?token': natlsysadminToken }))
+
     component = await createTestComponent(
       <FormConfigWizard
         {...createRouterProps(
@@ -52,7 +54,6 @@ describe('Form Config Wizard for birth page successfully rendered', () => {
   })
 
   it('Form Config Wizard page loads properly for national system admin', async () => {
-    console.log(component.debug())
     expect(component.exists('FormConfigWizardComp')).toBeTruthy()
     expect(component.exists('PageNavigation')).toBeTruthy()
     expect(component.exists('FormConfigCanvas')).toBeTruthy()
@@ -70,14 +71,15 @@ describe('Form Config Wizard for birth page successfully rendered', () => {
   })
 })
 
-describe('Form Config Wizard for death page successfully rendered', () => {
+describe('Form Config Wizard for death page', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
     const { store, history } = createStore()
-    store.dispatch(
-      getStorageUserDetailsSuccess(JSON.stringify(natlAdminUserDetails))
-    )
+
+    getItem.mockReturnValue(natlsysadminToken)
+    store.dispatch(checkAuth({ '?token': natlsysadminToken }))
+
     component = await createTestComponent(
       <FormConfigWizard
         {...createRouterProps(
