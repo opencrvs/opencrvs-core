@@ -25,6 +25,7 @@ import {
   WrappedComponentProps as IntlShapeProps
 } from 'react-intl'
 import { connect } from 'react-redux'
+import { camelCase } from 'lodash'
 
 const CustomFieldFormContainer = styled(Box)`
   box-shadow: none;
@@ -38,6 +39,7 @@ const CustomFieldFormContainer = styled(Box)`
 
 const CPrimaryButton = styled(PrimaryButton)`
   border-radius: 4px;
+  margin-bottom: 24px;
   :disabled {
     background: ${({ theme }) => theme.colors.grey300};
   }
@@ -57,8 +59,18 @@ const H3 = styled.h3`
   ${({ theme }) => theme.fonts.h3};
 `
 
+const H4 = styled.span`
+  ${({ theme }) => theme.fonts.bold16};
+  display: block;
+`
+
 const ListContainer = styled.div`
   margin-bottom: 26px;
+`
+
+const GreyText = styled.span`
+  ${({ theme }) => theme.fonts.reg18};
+  color: ${({ theme }) => theme.colors.grey400};
 `
 
 const ListRow = styled.div`
@@ -74,14 +86,29 @@ const ListColumn = styled.div``
 
 type IFullProps = {
   intl: IntlShape
-} & IntlShapeProps
+}
 
-interface ICustomFieldForms {}
+interface ICustomFieldForms {
+  label: string
+  handleBars: string
+}
+
+const DEFAULTS = {
+  LABEL: 'Custom Text Field'
+}
 
 class CustomFieldFormsComp extends React.Component<
   IFullProps,
   ICustomFieldForms
 > {
+  constructor(props: IFullProps) {
+    super(props)
+    this.state = {
+      label: DEFAULTS.LABEL,
+      handleBars: camelCase(DEFAULTS.LABEL)
+    }
+  }
+
   toggleButtons() {
     const { intl } = this.props
     return (
@@ -123,7 +150,15 @@ class CustomFieldFormsComp extends React.Component<
             label={intl.formatMessage(customFieldFormMessages.label)}
             touched={false}
           >
-            <TextInput />
+            <TextInput
+              onChange={(event: any) => {
+                const { value } = event.target
+                this.setState({
+                  handleBars: camelCase(value || DEFAULTS.LABEL)
+                })
+                return event
+              }}
+            />
           </InputField>
         </FieldContainer>
 
@@ -182,9 +217,24 @@ class CustomFieldFormsComp extends React.Component<
           </InputField>
         </FieldContainer>
 
-        <CPrimaryButton onClick={() => {}} disabled={true}>
-          {intl.formatMessage(buttonMessages.save)}
-        </CPrimaryButton>
+        <ListContainer>
+          <ListRow>
+            <ListColumn>
+              <CPrimaryButton onClick={() => {}} disabled={true}>
+                {intl.formatMessage(buttonMessages.save)}
+              </CPrimaryButton>
+            </ListColumn>
+          </ListRow>
+        </ListContainer>
+      </>
+    )
+  }
+
+  certificate() {
+    return (
+      <>
+        <H4>Certificate handlebars</H4>
+        <GreyText>{`{{ ${this.state.handleBars} }}`}</GreyText>
       </>
     )
   }
@@ -194,6 +244,7 @@ class CustomFieldFormsComp extends React.Component<
       <CustomFieldFormContainer>
         {this.toggleButtons()}
         {this.inputFields()}
+        {this.certificate()}
       </CustomFieldFormContainer>
     )
   }
