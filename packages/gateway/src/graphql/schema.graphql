@@ -442,7 +442,7 @@ type FormDraft {
   comment: String
   version: Int!
   history: [DraftHistory]
-  questions: [Question]
+  questions: [Question!]
   updatedAt: Date!
   createdAt: Date!
 }

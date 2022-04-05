@@ -334,7 +334,7 @@ export interface GQLFormDraft {
   comment?: string
   version: number
   history?: Array<GQLDraftHistory | null>
-  questions?: Array<GQLQuestion | null>
+  questions?: Array<GQLQuestion>
   updatedAt: GQLDate
   createdAt: GQLDate
 }
