@@ -21,17 +21,17 @@ import { IUserDetails } from '@client/utils/userUtils'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import { messages } from '@client/i18n/messages/views/config'
-import {
-  IListRowProps,
-  ListView,
-  ToggleMenu
-} from '@opencrvs/components/lib/interface'
+import { ToggleMenu } from '@opencrvs/components/lib/interface'
 import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import styled from 'styled-components'
 import { fetchDraft } from '@client/forms/configuration/actions'
 import { IFormDraftData, IHistory } from '@client/forms/configuration/reducer'
 import { getFormDraftData } from '@client/forms/configuration/selector'
+import {
+  ListViewItemSimplified,
+  ListViewSimplified
+} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 
 type Props = WrappedComponentProps &
   Pick<RouteComponentProps, 'history'> & {
@@ -46,21 +46,10 @@ interface State {
   activeTabId: string
 }
 
-const StyledActionBar = styled.div`
-  display: flex;
-  flex-direction: row;
-  margin-top: -8px;
-  padding-right: 40px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    flex-direction: column;
-    margin-left: auto;
-  }
-`
-
-const LabelColor = styled.div`
+const LabelColor = styled.span`
   color: ${({ theme }) => theme.colors.copy};
 `
-const ValueColor = styled.div`
+const ValueColor = styled.span`
   color: ${({ theme }) => theme.colors.supportingCopy};
 `
 export enum TABS {
@@ -112,197 +101,180 @@ class FormConfigComponent extends React.Component<Props, State> {
       activeTabId: tabId
     })
   }
-  getHistorydata = (
-    histories: IHistory[],
-    eventType: string
-  ): IListRowProps[] => {
-    const historyData = histories.map((history) => ({
-      label: <LabelColor>{`${eventType} v${history.version}`}</LabelColor>,
-      value: <ValueColor>{`-${history.comment}`}</ValueColor>
-    }))
+  getHistorydata = (histories: IHistory[], eventType: string) => {
+    const historyData = histories.map((history) => (
+      <ListViewItemSimplified
+        label={<LabelColor>{`${eventType} v${history.version}`}</LabelColor>}
+        value={<ValueColor>{`-${history.comment}`}</ValueColor>}
+      />
+    ))
     return historyData
   }
 
   getItemsForDraftsTab = (formDraft: IFormDraftData) => {
-    const formsForDraftsTab: IListRowProps[] = formDraft
-      ? [
-          {
-            label: (
-              <LabelColor>{`Birth v${formDraft.birth.version}`}</LabelColor>
-            ),
-            value: <ValueColor>{`-${formDraft.birth.comment}`}</ValueColor>,
-            actionsMenu: (
-              <StyledActionBar>
-                <LinkButton onClick={() => {}}>
-                  {this.props.intl.formatMessage(
-                    messages.formConfigEditButtonLabel
-                  )}
-                </LinkButton>
-                <ToggleMenu
-                  id={`form-death-action-menu`}
-                  toggleButton={<VerticalThreeDots />}
-                  menuItems={this.getMenuItemsForDrafts(this.props.intl)}
-                />
-              </StyledActionBar>
-            )
-          },
-          {
-            label: (
-              <LabelColor>{`Death v${formDraft.death.version}`}</LabelColor>
-            ),
-            value: <ValueColor>{`-${formDraft.death.comment}`}</ValueColor>,
-            actionsMenu: (
-              <StyledActionBar>
-                <LinkButton onClick={() => {}}>
-                  {this.props.intl.formatMessage(
-                    messages.formConfigEditButtonLabel
-                  )}
-                </LinkButton>
-                <ToggleMenu
-                  id={`form-death-action-menu`}
-                  toggleButton={<VerticalThreeDots />}
-                  menuItems={this.getMenuItemsForDrafts(this.props.intl)}
-                />
-              </StyledActionBar>
+    const formsForDraftsTab = (
+      <>
+        <ListViewItemSimplified
+          label={
+            <LabelColor>{`${
+              formDraft && formDraft.birth ? formDraft.birth.event : `Birth`
+            } v${
+              formDraft && formDraft.birth ? formDraft.birth.version : `0`
+            }`}</LabelColor>
+          }
+          value={
+            formDraft &&
+            formDraft.birth && (
+              <ValueColor>{`-${formDraft.birth.comment}`}</ValueColor>
             )
           }
-        ]
-      : [
-          {
-            label: <LabelColor>Birth </LabelColor>,
-            action: {
-              label: this.props.intl.formatMessage(
-                messages.formConfigureButtonLabel
-              )
-            }
-          },
-          {
-            label: <LabelColor>Death </LabelColor>,
-            action: {
-              label: this.props.intl.formatMessage(
-                messages.formConfigureButtonLabel
-              )
-            }
+          actions={[
+            <LinkButton onClick={() => {}}>
+              {this.props.intl.formatMessage(messages.formConfigureButtonLabel)}
+            </LinkButton>,
+            formDraft && formDraft.birth ? (
+              <ToggleMenu
+                id={`form-death-action-menu`}
+                toggleButton={<VerticalThreeDots />}
+                menuItems={this.getMenuItemsForDrafts(this.props.intl)}
+              />
+            ) : (
+              <></>
+            )
+          ]}
+        />
+        {formDraft &&
+          formDraft.birth.history &&
+          formDraft.birth.history.length > 0 &&
+          this.getHistorydata(formDraft.birth.history, formDraft.birth.event)}
+        <ListViewItemSimplified
+          label={
+            <LabelColor>{`${
+              formDraft && formDraft.death ? formDraft.death.event : `Death`
+            } v${
+              formDraft && formDraft.death ? formDraft.death.version : `0`
+            }`}</LabelColor>
           }
-        ]
-    if (
-      formDraft &&
-      formDraft.birth.history &&
-      formDraft.birth.history.length > 0
-    ) {
-      const birthHistories = this.getHistorydata(
-        formDraft.birth.history,
-        formDraft.birth.event
-      )
-      if (birthHistories.length > 0) {
-        birthHistories.forEach((data) =>
-          formsForDraftsTab.push(data as IListRowProps)
-        )
-      }
-    }
-    if (
-      formDraft &&
-      formDraft.death.history &&
-      formDraft.death.history.length > 0
-    ) {
-      const deathHistories = this.getHistorydata(
-        formDraft.death.history,
-        formDraft.death.event
-      )
-      if (deathHistories.length > 0) {
-        deathHistories.forEach((data) =>
-          formsForDraftsTab.push(data as IListRowProps)
-        )
-      }
-    }
+          value={
+            formDraft &&
+            formDraft.death && (
+              <ValueColor>{`-${formDraft.death.comment}`}</ValueColor>
+            )
+          }
+          actions={[
+            <LinkButton onClick={() => {}}>
+              {this.props.intl.formatMessage(messages.formConfigureButtonLabel)}
+            </LinkButton>,
+            formDraft && formDraft.death ? (
+              <ToggleMenu
+                id={`form-death-action-menu`}
+                toggleButton={<VerticalThreeDots />}
+                menuItems={this.getMenuItemsForDrafts(this.props.intl)}
+              />
+            ) : (
+              <></>
+            )
+          ]}
+        />
+        {formDraft &&
+          formDraft.death.history &&
+          formDraft.death.history.length > 0 &&
+          this.getHistorydata(formDraft.death.history, formDraft.death.event)}
+      </>
+    )
     return formsForDraftsTab
   }
 
   render() {
     const { intl } = this.props
-    const formsForPublishedTab = [
-      {
-        label: (
-          <LabelColor>
-            {intl.formatMessage(messages.birthFormConfigLabel)}
-          </LabelColor>
-        ),
-        value: (
-          <ValueColor>
-            {intl.formatMessage(messages.formConfigDefaultConfig)}
-          </ValueColor>
-        ),
-        actionsMenu: (
-          <StyledActionBar>
+    const formsForPublishedTab = (
+      <>
+        <ListViewItemSimplified
+          label={
+            <LabelColor>
+              {intl.formatMessage(messages.birthFormConfigLabel)}
+            </LabelColor>
+          }
+          value={
+            <ValueColor>
+              {intl.formatMessage(messages.formConfigDefaultConfig)}
+            </ValueColor>
+          }
+          actions={[
             <LinkButton onClick={() => {}}>
               {intl.formatMessage(messages.formConfigureButtonLabel)}
-            </LinkButton>
+            </LinkButton>,
             <ToggleMenu
               id={`form-birth-action-menu`}
               toggleButton={<VerticalThreeDots />}
               menuItems={this.getMenuItems(intl)}
             />
-          </StyledActionBar>
-        )
-      },
-      {
-        label: (
-          <LabelColor>
-            {intl.formatMessage(messages.deathFormConfigLabel)}
-          </LabelColor>
-        ),
-        value: (
-          <ValueColor>
-            {intl.formatMessage(messages.formConfigDefaultConfig)}
-          </ValueColor>
-        ),
-        actionsMenu: (
-          <StyledActionBar>
+          ]}
+        />
+
+        <ListViewItemSimplified
+          label={
+            <LabelColor>
+              {intl.formatMessage(messages.deathFormConfigLabel)}
+            </LabelColor>
+          }
+          value={
+            <ValueColor>
+              {intl.formatMessage(messages.formConfigDefaultConfig)}
+            </ValueColor>
+          }
+          actions={[
             <LinkButton onClick={() => {}}>
               {intl.formatMessage(messages.formConfigureButtonLabel)}
-            </LinkButton>
+            </LinkButton>,
             <ToggleMenu
               id={`form-death-action-menu`}
               toggleButton={<VerticalThreeDots />}
               menuItems={this.getMenuItems(intl)}
             />
-          </StyledActionBar>
-        )
-      }
-    ]
+          ]}
+        />
+      </>
+    )
 
-    const formsForPreviewTab = [
-      {
-        label: (
-          <LabelColor>
-            {intl.formatMessage(messages.birthFormConfigLabel)}
-          </LabelColor>
-        ),
-        value: (
-          <ValueColor>
-            {intl.formatMessage(messages.formConfigDefaultConfig)}
-          </ValueColor>
-        ),
-        action: {
-          label: intl.formatMessage(messages.formConfigureButtonLabel)
-        }
-      },
-      {
-        label: (
-          <LabelColor>
-            {intl.formatMessage(messages.deathFormConfigLabel)}
-          </LabelColor>
-        ),
-        value: (
-          <ValueColor>
-            {intl.formatMessage(messages.formConfigDefaultConfig)}
-          </ValueColor>
-        ),
-        action: {
-          label: intl.formatMessage(messages.formConfigureButtonLabel)
-        }
-      }
-    ]
+    const formsForPreviewTab = (
+      <>
+        <ListViewItemSimplified
+          label={
+            <LabelColor>
+              {intl.formatMessage(messages.birthFormConfigLabel)}
+            </LabelColor>
+          }
+          value={
+            <ValueColor>
+              {intl.formatMessage(messages.formConfigDefaultConfig)}
+            </ValueColor>
+          }
+          actions={[
+            <LinkButton>
+              {intl.formatMessage(messages.formConfigureButtonLabel)}
+            </LinkButton>
+          ]}
+        />
+        <ListViewItemSimplified
+          label={
+            <LabelColor>
+              {intl.formatMessage(messages.deathFormConfigLabel)}
+            </LabelColor>
+          }
+          value={
+            <ValueColor>
+              {intl.formatMessage(messages.formConfigDefaultConfig)}
+            </ValueColor>
+          }
+          actions={[
+            <LinkButton>
+              {intl.formatMessage(messages.formConfigureButtonLabel)}
+            </LinkButton>
+          ]}
+        />
+      </>
+    )
     return (
       <SysAdminContentWrapper isCertificatesConfigPage>
         <Content
@@ -328,17 +300,19 @@ class FormConfigComponent extends React.Component<Props, State> {
             onTabClick: (tabId: string) => this.onChangeTab(tabId)
           }}
         >
-          <ListView
-            items={
-              this.state.activeTabId === TABS.PUBLISHED
-                ? formsForPublishedTab
-                : this.state.activeTabId === TABS.DRAFTS
-                ? this.getItemsForDraftsTab(
-                    this.props.formDraftData && this.props.formDraftData
-                  )
-                : formsForPreviewTab
+          <ListViewSimplified
+            bottomBorder={true}
+            children={
+              this.state.activeTabId == TABS.IN_PREVIEW ? (
+                formsForPreviewTab
+              ) : this.state.activeTabId == TABS.PUBLISHED ? (
+                formsForPublishedTab
+              ) : this.state.activeTabId == TABS.DRAFTS ? (
+                this.getItemsForDraftsTab(this.props.formDraftData)
+              ) : (
+                <></>
+              )
             }
-            isConfigPage={true}
           />
         </Content>
       </SysAdminContentWrapper>
