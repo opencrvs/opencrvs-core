@@ -60,7 +60,7 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
       const configuredBirthForm: ISerializedForm = configureRegistrationForm(
         sortFormCustomisations(
           filterQuestionsByEventType(
-            action.payload.formConfig.questionConfig,
+            action.payload.formConfig?.questionConfig,
             'birth'
           ),
           registerForms.birth
@@ -70,7 +70,7 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
       const configuredDeathForm: ISerializedForm = configureRegistrationForm(
         sortFormCustomisations(
           filterQuestionsByEventType(
-            action.payload.formConfig.questionConfig,
+            action.payload.formConfig?.questionConfig,
             'death'
           ),
           registerForms.death
