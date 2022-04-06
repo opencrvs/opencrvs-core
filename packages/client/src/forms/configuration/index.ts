@@ -128,7 +128,7 @@ export function sortFormCustomisations(
     customQuestionConfigurations: []
   }
   const customQsToBeSorted: IQuestionConfig[] = []
-  customQuestions.map((question, index) => {
+  customQuestions.forEach((question, index) => {
     const defaultField: IDefaultField | undefined = getDefaultField(
       defaultEventForm,
       question.fieldId
@@ -208,7 +208,7 @@ export function filterQuestionsByEventType(
     formConfig.questionConfig &&
     formConfig.questionConfig.length > 0
   ) {
-    formConfig.questionConfig.map((question) => {
+    formConfig.questionConfig.forEach((question) => {
       if (question.fieldId.includes(event)) {
         filteredQuestions.push(question)
       }

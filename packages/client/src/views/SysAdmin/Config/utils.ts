@@ -55,7 +55,7 @@ export const getCurrency = (offlineCountryConfiguration: IOfflineData) => {
     }
   )
     .format(0)
-    .replace(/[0-9\.,]/g, '')
+    .replace(/[0-9.,]/g, '')
 
   return currency
 }
@@ -113,7 +113,7 @@ export const getCurrencySelectOptions = () => {
 }
 
 export const getFormattedFee = (value: string) => {
-  value = value.replace(/\,/g, '')
+  value = value.replace(/,/g, '')
   if (!isNaN(Number(value)) || !value) {
     const decimalPlaces = value.toString().split('.')[1]
     if (decimalPlaces && decimalPlaces.length > 2) {
