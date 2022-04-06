@@ -262,7 +262,6 @@ function getDataLoadingCommands(state: IOfflineDataState) {
     PILOT_LOCATIONS_CMD,
     CONFIG_CMD,
     getContentCmd(state),
-    CONFIG_CMD,
     ASSETS_CMD
   ])
 }
@@ -422,10 +421,12 @@ function reducer(
         ...state,
         offlineData: {
           ...state.offlineData,
-          languages: getAvailableContent(
-            state.offlineData.formConfig as IFormConfig,
-            action.payload.languages
-          ),
+          languages: state.offlineData.formConfig
+            ? getAvailableContent(
+                state.offlineData.formConfig as IFormConfig,
+                action.payload.languages
+              )
+            : action.payload.languages,
           forms: defaultFormsConfig as IForm
         }
       }
