@@ -209,15 +209,15 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
       deathRegistrationTarget:
         offlineCountryConfiguration.config.DEATH.REGISTRATION_TARGET.toString(),
       birthOnTimeFee:
-        offlineCountryConfiguration.config.BIRTH.FEE.ON_TIME.toString(),
+        offlineCountryConfiguration.config.BIRTH.FEE.ON_TIME.toLocaleString(),
       birthLateFee:
-        offlineCountryConfiguration.config.BIRTH.FEE.LATE.toString(),
+        offlineCountryConfiguration.config.BIRTH.FEE.LATE.toLocaleString(),
       birthDelayedFee:
-        offlineCountryConfiguration.config.BIRTH.FEE.DELAYED.toString(),
+        offlineCountryConfiguration.config.BIRTH.FEE.DELAYED.toLocaleString(),
       deathOnTimeFee:
-        offlineCountryConfiguration.config.DEATH.FEE.ON_TIME.toString(),
+        offlineCountryConfiguration.config.DEATH.FEE.ON_TIME.toLocaleString(),
       deathDelayedFee:
-        offlineCountryConfiguration.config.DEATH.FEE.DELAYED.toString(),
+        offlineCountryConfiguration.config.DEATH.FEE.DELAYED.toLocaleString(),
       nidPattern:
         props.offlineCountryConfiguration.config.NID_NUMBER_PATTERN.toString(),
       nidExample: EMPTY_STRING,
@@ -667,13 +667,13 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
                     ),
                     FEE: {
                       ON_TIME: parseFloat(
-                        this.state.birthOnTimeFee.replace(/\,/g, '')
+                        this.state.birthOnTimeFee.replace(/,/g, '')
                       ),
                       LATE: parseFloat(
-                        this.state.birthLateFee.replace(/\,/g, '')
+                        this.state.birthLateFee.replace(/,/g, '')
                       ),
                       DELAYED: parseFloat(
-                        this.state.birthDelayedFee.replace(/\,/g, '')
+                        this.state.birthDelayedFee.replace(/,/g, '')
                       )
                     }
                   },
@@ -683,10 +683,10 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
                     ),
                     FEE: {
                       ON_TIME: parseFloat(
-                        this.state.deathOnTimeFee.replace(/\,/g, '')
+                        this.state.deathOnTimeFee.replace(/,/g, '')
                       ),
                       DELAYED: parseFloat(
-                        this.state.deathDelayedFee.replace(/\,/g, '')
+                        this.state.deathDelayedFee.replace(/,/g, '')
                       )
                     }
                   },
