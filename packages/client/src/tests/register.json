@@ -2086,7 +2086,12 @@
                       "operation": "maxLength",
                       "parameters": [2]
                     }
-                  ]
+                  ],
+                  "mapping": {
+                    "template": {
+                      "fieldName": "orderOfBirth"
+                    }
+                  }
                 },
                 {
                   "name": "weightAtBirth",

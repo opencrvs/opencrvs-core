@@ -301,6 +301,9 @@ export type IFormFieldQueryMapFunction = (
   offlineData?: IOfflineData
 ) => void
 
+export type IFormFieldTemplateMapOperation =
+  | [string, IFormFieldQueryMapFunction]
+  | [string]
 /*
  * Takes in an array of function arguments (array, number, string, function)
  * and replaces all functions with the descriptor type
@@ -344,7 +347,7 @@ export type IFormFieldQueryMapDescriptor<
 export type IFormFieldMapping = {
   mutation?: IFormFieldMutationMapFunction
   query?: IFormFieldQueryMapFunction
-  template?: [string, IFormFieldQueryMapFunction]
+  template?: IFormFieldTemplateMapOperation
 }
 
 /*
@@ -405,7 +408,7 @@ export type SerializedFormField = UnionOmit<
   mapping?: {
     mutation?: IMutationDescriptor
     query?: IQueryDescriptor
-    template?: IQueryDescriptor & { fieldName: string }
+    template?: ITemplateDescriptor
   }
 }
 export interface IAttachment {
@@ -807,6 +810,12 @@ type QueryDefaultOperation<
 
 export type IQueryDescriptor = QueryFactoryOperation | QueryDefaultOperation
 
+type ISimpleTemplateDescriptor = { fieldName: string }
+export type IQueryTemplateDescriptor = ISimpleTemplateDescriptor &
+  IQueryDescriptor
+export type ITemplateDescriptor =
+  | IQueryTemplateDescriptor
+  | ISimpleTemplateDescriptor
 // Mutations
 
 type MutationFactoryOperationKeys = FilterType<

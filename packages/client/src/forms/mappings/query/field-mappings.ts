@@ -617,7 +617,7 @@ export const bundleFieldToNestedRadioFieldTransformer =
 export const sectionTransformer =
   (
     transformedSectionId: string,
-    queryTransformer: IFormFieldQueryMapFunction,
+    queryTransformer?: IFormFieldQueryMapFunction,
     targetFieldName?: string
   ) =>
   (
@@ -628,35 +628,41 @@ export const sectionTransformer =
     _?: IFormField,
     offlineData?: IOfflineData
   ): void => {
-    const localTransformedData: IFormData = {}
-    queryTransformer(
-      localTransformedData,
-      queryData,
-      sectionId,
-      field,
-      _,
-      offlineData
-    )
+    const targetNameKey = targetFieldName || field.name
+
     if (!transformedData[transformedSectionId]) {
       transformedData[transformedSectionId] = {}
     }
-    const targetNameKey = targetFieldName || field.name
-    if (!localTransformedData[sectionId]) {
-      return
-    }
 
-    if (
-      Array.isArray(transformedData[transformedSectionId][targetNameKey]) &&
-      Array.isArray(localTransformedData[sectionId][field.name])
-    ) {
-      transformedData[transformedSectionId][targetNameKey] =
-        mergeArraysRemovingEmptyStrings(
-          transformedData[transformedSectionId][targetNameKey],
-          localTransformedData[sectionId][field.name] as string[]
-        )
+    if (queryTransformer) {
+      const localTransformedData: IFormData = {}
+      queryTransformer(
+        localTransformedData,
+        queryData,
+        sectionId,
+        field,
+        _,
+        offlineData
+      )
+      if (!localTransformedData[sectionId]) {
+        return
+      }
+      if (
+        Array.isArray(transformedData[transformedSectionId][targetNameKey]) &&
+        Array.isArray(localTransformedData[sectionId][field.name])
+      ) {
+        transformedData[transformedSectionId][targetNameKey] =
+          mergeArraysRemovingEmptyStrings(
+            transformedData[transformedSectionId][targetNameKey],
+            localTransformedData[sectionId][field.name] as string[]
+          )
+      } else {
+        transformedData[transformedSectionId][targetNameKey] =
+          localTransformedData[sectionId][field.name]
+      }
     } else {
       transformedData[transformedSectionId][targetNameKey] =
-        localTransformedData[sectionId][field.name]
+        queryData[sectionId]?.[field.name] || ''
     }
   }
 
