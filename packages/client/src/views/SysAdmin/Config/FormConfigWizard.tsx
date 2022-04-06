@@ -36,7 +36,7 @@ import { IForm, Event } from '@client/forms'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { goToFormConfigWizard } from '@client/navigation'
 import { buttonMessages } from '@client/i18n/messages'
-import { Scope } from '@client/utils/authUtils'
+import { Scope, isNatlSysAdmin } from '@client/utils/authUtils'
 
 type RouteProps = RouteComponentProps<{
   event: string
@@ -100,7 +100,7 @@ const topBarActions = (props: IFullProps) => {
 
 function FormConfigWizardComp(props: IFullProps) {
   if (
-    !props.scope?.includes('natlsysadmin') ||
+    !(props.scope && isNatlSysAdmin(props.scope)) ||
     !props.event ||
     !props.section
   ) {
