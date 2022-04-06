@@ -9,6 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+export const dimensionsMap = {
+  small: '32px',
+  medium: '40px',
+  large: '48px'
+}
+
+export type IButtonSize = 'small' | 'medium' | 'large'
+
 export * from './Action'
 export * from './Button'
 export * from './PrimaryButton'

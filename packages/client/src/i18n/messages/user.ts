@@ -93,8 +93,10 @@ interface IUserMessages
   phoneNumberUpdated: MessageDescriptor
   avatarUpdating: MessageDescriptor
   avatarUpdated: MessageDescriptor
+  name: MessageDescriptor
+  systemLanguage: MessageDescriptor
+  profileImage: MessageDescriptor
 }
-
 interface IDynamicUserMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   [key: string]: MessageDescriptor
@@ -458,6 +460,21 @@ const messagesToDefine: IUserMessages = {
     id: 'system.user.settings.avatarUpdated',
     defaultMessage: 'Profile image successfully updated',
     description: 'Profile image change message on success'
+  },
+  name: {
+    id: 'system.user.settings.name',
+    defaultMessage: 'Name',
+    description: 'label for Name'
+  },
+  systemLanguage: {
+    id: 'system.user.settings.systemLanguage',
+    defaultMessage: 'System language',
+    description: 'Label for system language'
+  },
+  profileImage: {
+    id: 'system.user.settings.profileImage',
+    defaultMessage: 'Profile Image',
+    description: 'Label for profile image'
   }
 }
 

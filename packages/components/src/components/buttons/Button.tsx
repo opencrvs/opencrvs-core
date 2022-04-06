@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
+import { IButtonSize, dimensionsMap } from '.'
 import styled from 'styled-components'
 
 export enum ICON_ALIGNMENT {
@@ -17,9 +18,9 @@ export enum ICON_ALIGNMENT {
   RIGHT
 }
 
-const ButtonBase = styled.button`
+const ButtonBase = styled.button<{ size: IButtonSize }>`
   width: auto;
-  height: 48px;
+  height: ${({ size }) => dimensionsMap[size]};
   border: 0;
   /* stylelint-disable-next-line opencrvs/no-font-styles */
   font-size: inherit;
@@ -38,9 +39,11 @@ const ButtonBase = styled.button`
   }
   padding: 0;
 `
+
 export interface IButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: () => React.ReactNode
+  size?: IButtonSize
   align?: ICON_ALIGNMENT
 }
 
@@ -48,11 +51,12 @@ export function Button({
   icon,
   children,
   align = ICON_ALIGNMENT.RIGHT,
+  size = 'large',
   ...otherProps
 }: IButtonProps) {
   if (icon && children) {
     return (
-      <ButtonBase {...otherProps}>
+      <ButtonBase size={size} {...otherProps}>
         <Wrapper>
           {icon && align === ICON_ALIGNMENT.LEFT && (
             <LeftButtonIcon>{icon()}</LeftButtonIcon>
@@ -66,14 +70,14 @@ export function Button({
     )
   } else if (icon && !children) {
     return (
-      <ButtonBase {...otherProps}>
+      <ButtonBase size={size} {...otherProps}>
         {' '}
         <IconOnly>{icon()}</IconOnly>
       </ButtonBase>
     )
   } else {
     return (
-      <ButtonBase {...otherProps}>
+      <ButtonBase size={size} {...otherProps}>
         <CenterWrapper>{children}</CenterWrapper>
       </ButtonBase>
     )
