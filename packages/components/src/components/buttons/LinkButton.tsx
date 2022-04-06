@@ -19,7 +19,6 @@ export const LinkButton = styled(Button)<{
     isBoldLink ? theme.fonts.bold16 : theme.fonts.reg16}
   color: ${({ theme }) => theme.colors.tertiary};
   padding: 0;
-  height: auto;
   border-radius: 2px;
 
   &:focus {

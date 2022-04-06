@@ -73,49 +73,27 @@ describe('Settings page tests', () => {
     )
     component = testComponent
   })
-  it('shows nothing', async () => {
-    const { store } = createStore()
-    store.dispatch(
-      getStorageUserDetailsSuccess(
-        JSON.stringify({
-          language: 'en',
-          catchmentArea: [],
-          primaryOffice: {
-            id: '6327dbd9-e118-4dbe-9246-cb0f7649a666',
-            name: 'Kaliganj Union Sub Center',
-            alias: ['কালিগাঞ্জ ইউনিয়ন পরিষদ'],
-            status: 'active'
-          }
-        })
-      )
-    )
-    const comp = await createTestComponent(
-      // @ts-ignore
-      <SettingsPage />,
-      { store, history, graphqlMocks }
-    )
-    expect(comp.find('#English-name').first().text()).toBe('English nameChange')
-    expect(comp.find('#Phone-number').first().text()).toBe('Phone numberChange')
-  })
 
   it('it checks component has loaded', () => {
     // @ts-ignore
     expect(component.containsMatchingElement(DataSection)).toBe(true)
   })
   it('it checks modal is open when button clicked', () => {
-    component.find('#BtnChangeLanguage').hostNodes().simulate('click')
+    component.find('#BtnChangeLanguage').hostNodes().first().simulate('click')
 
-    expect(component.find('#ChangeLanguageModal').hostNodes()).toHaveLength(1)
+    expect(
+      component.find('#ChangeLanguageModal').hostNodes().first()
+    ).toHaveLength(1)
   })
   it('it checks cancel button clicked', () => {
-    component.find('#BtnChangeLanguage').hostNodes().simulate('click')
+    component.find('#BtnChangeLanguage').hostNodes().first().simulate('click')
 
     const modal = component.find('#ChangeLanguageModal').hostNodes()
 
     modal.find('#modal_cancel').hostNodes().simulate('click')
   })
   it('it checks cancel button clicked', () => {
-    component.find('#BtnChangeLanguage').hostNodes().simulate('click')
+    component.find('#BtnChangeLanguage').hostNodes().first().simulate('click')
 
     const modal = component.find('#ChangeLanguageModal').hostNodes()
 
@@ -124,7 +102,7 @@ describe('Settings page tests', () => {
 
   describe('When user changes password', () => {
     beforeEach(() => {
-      component.find('#BtnChangePassword').hostNodes().simulate('click')
+      component.find('#BtnChangePassword').hostNodes().first().simulate('click')
     })
 
     it('Should display password change modal', () => {
@@ -182,6 +160,7 @@ describe('Settings page tests', () => {
       component
         .find('#image_file_uploader_field')
         .hostNodes()
+        .first()
         .simulate('change', { target: { files: [file] } })
 
       component.update()
@@ -197,6 +176,7 @@ describe('Settings page tests', () => {
       component
         .find('#image_file_uploader_field')
         .hostNodes()
+        .first()
         .simulate('change', { target: { files: [invalidFile] } })
 
       await flushPromises()
@@ -218,6 +198,7 @@ describe('Settings page tests', () => {
       component
         .find('#image_file_uploader_field')
         .hostNodes()
+        .first()
         .simulate('change', {
           target: {
             files: [
@@ -253,6 +234,7 @@ describe('Settings page tests', () => {
       component
         .find('#image_file_uploader_field')
         .hostNodes()
+        .first()
         .simulate('change', {
           target: {
             files: [file]
