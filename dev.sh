@@ -52,7 +52,7 @@ export LANGUAGES="en"
 if [ $OS == "UBUNTU" ]; then
   yarn dev:secrets:gen && concurrently "yarn run start" "yarn run compose:deps"
   else
-  export LOCAL_IP=$(ifconfig | grep "inet " | grep -Fv 127.0.0.1 | awk '{print $2}')
+  export LOCAL_IP=host-gateway
   yarn dev:secrets:gen && concurrently "yarn run start" "yarn run compose:deps"
 fi
 
