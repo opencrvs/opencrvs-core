@@ -102,13 +102,22 @@ class FormConfigComponent extends React.Component<Props, State> {
     })
   }
   getHistorydata = (histories: IHistory[], eventType: string) => {
-    const historyData = histories.map((history) => (
-      <ListViewItemSimplified
-        label={<LabelColor>{`${eventType} v${history.version}`}</LabelColor>}
-        value={<ValueColor>{`-${history.comment}`}</ValueColor>}
-      />
-    ))
-    return historyData
+    if (histories.length > 0) {
+      const historyData = histories.map((history) =>
+        history ? (
+          <ListViewItemSimplified
+            label={
+              <LabelColor>{`${eventType} v${history.version}`}</LabelColor>
+            }
+            value={<ValueColor>{`-${history.comment}`}</ValueColor>}
+          />
+        ) : (
+          <></>
+        )
+      )
+      return historyData
+    }
+    return <></>
   }
 
   getItemsForDraftsTab = (formDraft: IFormDraftData) => {
