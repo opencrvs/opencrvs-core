@@ -64,6 +64,7 @@ export const FIELD_AGENT_HOME_TAB = '/field-agent-home/:tabId'
 export const SETTINGS = '/settings'
 export const CHANGE_PHONE = '/settings/phone'
 export const CERTIFICATE_CONFIG = '/config/certificate'
+export const FORM_CONFIG = '/config/form'
 export const APPLICATION_CONFIG = '/config/application'
 
 export const DECLARATION_DETAIL = '/details/:declarationId'
