@@ -21,12 +21,17 @@ import { IntlShape } from 'react-intl'
 import { configMessage } from '@client/i18n/messages/views/FormConfig'
 import { goToFormConfigWizard } from '@client/navigation'
 
-const Title = styled.div`
+const Title = styled.h1`
   margin-top: 16px;
   margin-bottom: 16px;
   margin-left: 24px;
   color: ${({ theme }) => theme.colors.grey600};
   ${({ theme }) => theme.fonts.bold14}
+`
+
+const ListItem = styled.li<{ isSelected: boolean }>`
+  ${({ isSelected, theme }) =>
+    isSelected ? theme.fonts.bold14 : theme.fonts.reg14};
 `
 
 interface IPageNavigation {
@@ -60,7 +65,7 @@ export const TAB_DEATH = {
 
 const PageItems = styled(NavigationSubItem)<{ isSelected: boolean }>`
   ${LabelContainer} {
-    padding: 7px 38px 9px 29px;
+    padding: 7px 38px 9px 0px;
     ${({ theme, isSelected }) => isSelected && theme.fonts.bold14};
   }
 `
@@ -72,20 +77,26 @@ export const PageNavigation = (props: IPageNavigation) => {
   return (
     <>
       <Title>Pages</Title>
-
-      {Object.keys(TAB).map((tab, idx) => (
-        <PageItems
-          key={idx}
-          id={`${tab}_navigation`}
-          label={`${idx + 1}. ${intl.formatMessage(
-            configMessage[TAB[tab as keyof typeof TAB]]
-          )}`}
-          isSelected={section === TAB[tab as keyof typeof TAB]}
-          onClick={() =>
-            goToFormConfigWizard(event!, TAB[tab as keyof typeof TAB])
-          }
-        />
-      ))}
+      <ol>
+        {Object.keys(TAB).map((tab, idx) => {
+          const isSelected = section === TAB[tab as keyof typeof TAB]
+          return (
+            <ListItem isSelected={isSelected}>
+              <PageItems
+                key={idx}
+                id={`${tab}_navigation`}
+                label={`${intl.formatMessage(
+                  configMessage[TAB[tab as keyof typeof TAB]]
+                )}`}
+                isSelected={isSelected}
+                onClick={() =>
+                  goToFormConfigWizard(event!, TAB[tab as keyof typeof TAB])
+                }
+              />
+            </ListItem>
+          )
+        })}
+      </ol>
     </>
   )
 }

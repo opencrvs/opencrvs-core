@@ -55,33 +55,48 @@ interface IDispatchProps {
   goToFormConfigWizard: typeof goToFormConfigWizard
 }
 
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+`
+
 const WizardContainer = styled.div`
   margin-top: 56px;
+  height: calc(100% - 56px);
+  overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+  flex-grow: 1;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
 `
 
 const NavigationContainer = styled.div`
-  top: 56px;
   width: 250px;
-  position: fixed;
-  height: 100%;
+  flex-shrink: 0;
   border-right: 1px solid ${({ theme }) => theme.colors.grey300};
   background-color: ${({ theme }) => theme.colors.white};
 `
 
 const ToolsContainer = styled.div`
-  right: 0px;
-  top: 56px;
   width: 348px;
-  position: fixed;
+  flex-shrink: 0;
   padding-left: 24px;
   padding-right: 24px;
   padding-top: 30px;
-  height: 100%;
   border-left: 1px solid ${({ theme }) => theme.colors.grey300};
   background-color: ${({ theme }) => theme.colors.white};
+`
+
+const CanvasContainer = styled.div`
+  flex-shrink: 1;
+  overflow-y: auto;
+  width: 100%;
+  margin-left: 40px;
+  margin-right: 40px;
+  margin-top: 18px;
 `
 
 type IFullProps = IDispatchProps & IStateProps & IntlShapeProps & RouteProps
@@ -108,7 +123,7 @@ function FormConfigWizardComp(props: IFullProps) {
   }
 
   return (
-    <>
+    <Container>
       <EventTopBar
         title={'Birth v0.1'}
         pageIcon={<></>}
@@ -125,12 +140,14 @@ function FormConfigWizardComp(props: IFullProps) {
             goToFormConfigWizard={props.goToFormConfigWizard}
           />
         </NavigationContainer>
-        <FormConfigCanvas></FormConfigCanvas>
+        <CanvasContainer>
+          <FormConfigCanvas></FormConfigCanvas>
+        </CanvasContainer>
         <ToolsContainer>
           <FormTools intl={props.intl} />
         </ToolsContainer>
       </WizardContainer>
-    </>
+    </Container>
   )
 }
 

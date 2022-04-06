@@ -12,19 +12,11 @@
 
 import React from 'react'
 import styled from '@client/styledComponents'
-
-const Container = styled.div`
-  margin-left: 330px;
-  margin-right: 438px;
-  margin-top: 74px;
-  display: flex;
-  border: 1px solid ${({ theme }) => theme.colors.grey300};
-  background-color: ${({ theme }) => theme.colors.white};
-`
+import { Box } from '@opencrvs/components/lib/interface/Box'
 interface IFormConfigCanvas {
   children?: React.ReactNode
 }
 
 export const FormConfigCanvas = (props: IFormConfigCanvas) => {
-  return <Container>{props.children && props.children}</Container>
+  return <Box>{props.children && props.children}</Box>
 }
