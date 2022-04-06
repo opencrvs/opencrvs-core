@@ -50,7 +50,6 @@ interface IConfigMessages
   formConfigEditButtonLabel: MessageDescriptor
   previewFormConfiguration: MessageDescriptor
   finalizeFormConfiguration: MessageDescriptor
-  deleteDraftMenuButton: MessageDescriptor
   applicationNameLabel: MessageDescriptor
   govermentLogoLabel: MessageDescriptor
   currencyLabel: MessageDescriptor

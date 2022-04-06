@@ -198,13 +198,12 @@ const TAB_LABEL = {
   sentForApproval: 'Sent for approval',
   externalValidation: 'Waiting for validation',
   readyToPrint: 'Ready to print ',
-  application: 'Application',
   performance: 'Performance',
   team: 'Team',
   configuration: 'Configuration',
   certificatesConfiguration: 'Certificates',
-  applicationSettings: 'Application',
   declarationForms: 'Declaration forms',
+  applicationSettings: 'Application',
   settings: 'Settings',
   logout: 'Logout'
 }
@@ -250,8 +249,8 @@ export const NavigationView = (props: IFullProps) => {
     enableMenuSelection = true,
     activeMenuItem,
     goToConfigAction,
-    goToApplicationConfigAction,
     goToFormConfigAction,
+    goToApplicationConfigAction,
     navigationWidth,
     workqueue,
     storedDeclarations,
@@ -609,12 +608,12 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
       ? TAB_ID.performance
       : window.location.href.includes('team')
       ? TAB_ID.team
-      : window.location.href.includes('application')
-      ? TAB_ID.application
       : window.location.href.includes('settings')
       ? TAB_ID.settings
       : window.location.href.includes('certificate')
       ? TAB_ID.certificates
+      : window.location.href.includes('application')
+      ? TAB_ID.application
       : window.location.href.includes('form')
       ? TAB_ID.declarationForms
       : ''
