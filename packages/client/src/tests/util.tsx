@@ -2564,7 +2564,8 @@ export const mockFetchCertificatesTemplatesDefinition = [
 
 export const mockConfigResponse = {
   config: mockOfflineData.config,
-  certificates: mockFetchCertificatesTemplatesDefinition
+  certificates: mockFetchCertificatesTemplatesDefinition,
+  formConfig: mockOfflineData.formConfig
 }
 
 export async function createTestStore() {
