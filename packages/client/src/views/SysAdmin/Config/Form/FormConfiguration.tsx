@@ -102,22 +102,13 @@ class FormConfigComponent extends React.Component<Props, State> {
     })
   }
   getHistorydata = (histories: IHistory[], eventType: string) => {
-    if (histories.length > 0) {
-      const historyData = histories.map((history) =>
-        history ? (
-          <ListViewItemSimplified
-            label={
-              <LabelColor>{`${eventType} v${history.version}`}</LabelColor>
-            }
-            value={<ValueColor>{`-${history.comment}`}</ValueColor>}
-          />
-        ) : (
-          <></>
-        )
-      )
-      return historyData
-    }
-    return <></>
+    const historyData = histories.map((history) => (
+      <ListViewItemSimplified
+        label={<LabelColor>{`${eventType} v${history.version}`}</LabelColor>}
+        value={<ValueColor>{`-${history.comment}`}</ValueColor>}
+      />
+    ))
+    return historyData
   }
 
   getItemsForDraftsTab = (formDraft: IFormDraftData) => {
@@ -153,6 +144,7 @@ class FormConfigComponent extends React.Component<Props, State> {
           ]}
         />
         {formDraft &&
+          formDraft.birth &&
           formDraft.birth.history &&
           formDraft.birth.history.length > 0 &&
           this.getHistorydata(formDraft.birth.history, formDraft.birth.event)}
@@ -186,6 +178,7 @@ class FormConfigComponent extends React.Component<Props, State> {
           ]}
         />
         {formDraft &&
+          formDraft.death &&
           formDraft.death.history &&
           formDraft.death.history.length > 0 &&
           this.getHistorydata(formDraft.death.history, formDraft.death.event)}
