@@ -2539,6 +2539,7 @@ export const mockDeathRegistrationSectionData = {
 
 export const mockFetchCertificatesTemplatesDefinition = [
   {
+    _id: '12313546',
     event: 'birth',
     status: 'ACTIVE',
     svgCode:
@@ -2549,6 +2550,7 @@ export const mockFetchCertificatesTemplatesDefinition = [
     user: '61d42359f1a2c25ea01beb4b'
   },
   {
+    _id: '25313546',
     event: 'death',
     status: 'ACTIVE',
     svgCode:

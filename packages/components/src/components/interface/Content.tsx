@@ -30,7 +30,6 @@ const Container = styled.div<{ size: string }>`
 const Header = styled.div`
   display: flex;
   flex-flow: column wrap;
-
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   padding-top: 20px;
   padding-right: 32px;

@@ -11,9 +11,9 @@
  */
 import * as React from 'react'
 import { createStore } from '@client/store'
-import { createTestComponent } from '@client/tests/util'
+import { createTestComponent, flushPromises } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
-import { ConfigHome } from './ConfigHome'
+import { CertificatesConfig } from './Certificates'
 import { GET_ACTIVE_CERTIFICATES } from '@client/certificate/queries'
 import { waitForElement } from '@client/tests/wait-for-element'
 
@@ -58,7 +58,7 @@ describe('ConfigHome page when already has uploaded certificate template', () =>
   let testComponent: ReactWrapper
   beforeEach(async () => {
     testComponent = await createTestComponent(
-      <ConfigHome history={history}></ConfigHome>,
+      <CertificatesConfig history={history}></CertificatesConfig>,
       { store, history, graphqlMocks: graphqlMock }
     )
     testComponent.update()
@@ -133,6 +133,7 @@ describe('ConfigHome page when already has uploaded certificate template', () =>
         .find('#template-birth-action-menuItem0')
         .hostNodes()
         .simulate('click')
+      await flushPromises()
       testComponent.update()
 
       expect(
@@ -156,6 +157,7 @@ describe('ConfigHome page when already has uploaded certificate template', () =>
         .find('#template-birth-action-menuItem0')
         .hostNodes()
         .simulate('click')
+      await flushPromises()
       testComponent.update()
 
       testComponent.find('#preview_back').hostNodes().simulate('click')
@@ -213,7 +215,7 @@ describe('ConfigHome page when error occur during graphQL query', () => {
   it('should shows error', async () => {
     const { store, history } = createStore()
     testComponent = await createTestComponent(
-      <ConfigHome history={history}></ConfigHome>,
+      <CertificatesConfig history={history}></CertificatesConfig>,
       { store, history, graphqlMocks: graphqlMock }
     )
     testComponent.update()
