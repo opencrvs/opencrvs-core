@@ -635,7 +635,7 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
         id={`${changeModalName}Modal`}
         title={getTitle(intl, changeModalName)}
         autoHeight={true}
-        titleHeightAuto={changeModalName === GeneralActionId.NID_PATTERN}
+        titleHeightAuto={true}
         show={this.showChangeModal}
         contentScrollableY={
           changeModalName === GeneralActionId.CURRENCY ? true : false

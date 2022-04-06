@@ -77,7 +77,7 @@ const Header = styled.div<{
   flex-direction: row;
   justify-content: space-between;
   align-items: top;
-  padding: 8px 8px 32px 24px;
+  padding: 24px 24px 8px;
   @media (max-width: ${({ theme, responsive }) =>
       responsive && theme.grid.breakpoints.lg}px) {
     ${({ theme, hideBoxShadow }) => !hideBoxShadow && theme.shadows.light};
@@ -85,6 +85,7 @@ const Header = styled.div<{
   }
 `
 const Title = styled.h1`
+  margin: 0px;
   ${({ theme }) => theme.fonts.h2};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     ${({ theme }) => theme.fonts.h4};
