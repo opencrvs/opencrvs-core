@@ -117,7 +117,9 @@ class FormConfigComponent extends React.Component<Props, State> {
         <ListViewItemSimplified
           label={
             <LabelColor>{`${
-              formDraft && formDraft.birth ? formDraft.birth.event : `Birth`
+              formDraft && formDraft.birth
+                ? formDraft.birth.event
+                : this.props.intl.formatMessage(messages.birthFormConfigLabel)
             } v${
               formDraft && formDraft.birth ? formDraft.birth.version : `0`
             }`}</LabelColor>
@@ -151,7 +153,9 @@ class FormConfigComponent extends React.Component<Props, State> {
         <ListViewItemSimplified
           label={
             <LabelColor>{`${
-              formDraft && formDraft.death ? formDraft.death.event : `Death`
+              formDraft && formDraft.death
+                ? formDraft.death.event
+                : this.props.intl.formatMessage(messages.deathFormConfigLabel)
             } v${
               formDraft && formDraft.death ? formDraft.death.version : `0`
             }`}</LabelColor>
