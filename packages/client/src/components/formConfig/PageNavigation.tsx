@@ -37,8 +37,8 @@ const OrderedList = styled.ol`
 interface IPageNavigation {
   intl: IntlShape
   registerForm: { [key: string]: IForm }
-  section?: string
-  event?: Event
+  section: string
+  event: Event
   goToFormConfigWizard: typeof goToFormConfigWizard
 }
 
@@ -72,24 +72,22 @@ const PageItems = styled(NavigationSubItem)<{ isSelected: boolean }>`
 
 export const PageNavigation = (props: IPageNavigation) => {
   const { event, intl, section, goToFormConfigWizard } = props
-  const TAB = event === 'birth' ? TAB_BIRTH : TAB_DEATH
+  const TAB = event === Event.BIRTH ? TAB_BIRTH : TAB_DEATH
 
   return (
     <>
       <Title>Pages</Title>
       <OrderedList>
-        {Object.keys(TAB).map((tab, idx) => (
+        {(Object.keys(TAB) as Array<keyof typeof TAB>).map((tab, idx) => (
           <li>
             <PageItems
               key={idx}
               id={`${tab}_navigation`}
               label={`${idx + 1}. ${intl.formatMessage(
-                configMessage[TAB[tab as keyof typeof TAB]]
+                configMessage[TAB[tab]]
               )}`}
-              isSelected={section === TAB[tab as keyof typeof TAB]}
-              onClick={() =>
-                goToFormConfigWizard(event!, TAB[tab as keyof typeof TAB])
-              }
+              isSelected={section === TAB[tab]}
+              onClick={() => goToFormConfigWizard(event, TAB[tab])}
             />
           </li>
         ))}

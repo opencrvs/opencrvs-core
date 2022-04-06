@@ -46,8 +46,8 @@ type RouteProps = RouteComponentProps<{
 interface IStateProps {
   scope: Scope | null
   registerForm: { [key: string]: IForm }
-  event?: Event
-  section?: string | undefined
+  event: Event | undefined
+  section: string | undefined
 }
 
 interface IDispatchProps {
@@ -154,18 +154,18 @@ function FormConfigWizardComp(props: IFullProps) {
 function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
   const { event, section: sectionKey } = props.match.params
   let section: string | undefined
-  if (sectionKey in TAB_BIRTH && event === 'birth') {
+  if (sectionKey in TAB_BIRTH && event === Event.BIRTH) {
     section = TAB_BIRTH[sectionKey as keyof typeof TAB_BIRTH]
-  } else if (sectionKey in TAB_DEATH && event === 'death') {
+  } else if (sectionKey in TAB_DEATH && event === Event.DEATH) {
     section = TAB_DEATH[sectionKey as keyof typeof TAB_DEATH]
   }
   return {
     scope: getScope(state),
     registerForm: getRegisterForm(state),
     event:
-      event === 'birth'
+      event === Event.BIRTH
         ? Event.BIRTH
-        : event === 'death'
+        : event === Event.DEATH
         ? Event.DEATH
         : undefined,
     section
