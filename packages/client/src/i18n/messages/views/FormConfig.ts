@@ -31,6 +31,7 @@ interface IFormConfigMessages
   heading: MessageDescriptor
   supportingCopy: MessageDescriptor
   addInputContent: MessageDescriptor
+  pages: MessageDescriptor
 }
 
 const messagesToDefine: IFormConfigMessages = {
@@ -83,6 +84,11 @@ const messagesToDefine: IFormConfigMessages = {
     id: 'form.config.navigation.spouse',
     defaultMessage: 'Spouse details',
     description: 'Label for spouse details in page navigation'
+  },
+  pages: {
+    id: 'form.config.navigation.pages',
+    defaultMessage: 'Pages',
+    description: 'Label for Pages in page navigation'
   },
   showHiddenFields: {
     id: 'form.config.tools.showHiddenFields',

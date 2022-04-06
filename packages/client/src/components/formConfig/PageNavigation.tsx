@@ -76,7 +76,7 @@ export const PageNavigation = (props: IPageNavigation) => {
 
   return (
     <>
-      <Title>Pages</Title>
+      <Title>{intl.formatMessage(configMessage.pages)}</Title>
       <OrderedList>
         {(Object.keys(TAB) as Array<keyof typeof TAB>).map((tab, idx) => (
           <li>
