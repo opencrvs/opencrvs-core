@@ -29,9 +29,9 @@ const Title = styled.h1`
   ${({ theme }) => theme.fonts.bold14}
 `
 
-const ListItem = styled.li<{ isSelected: boolean }>`
-  ${({ isSelected, theme }) =>
-    isSelected ? theme.fonts.bold14 : theme.fonts.reg14};
+const OrderedList = styled.ol`
+  list-style: none;
+  padding: 0px;
 `
 
 interface IPageNavigation {
@@ -65,7 +65,7 @@ export const TAB_DEATH = {
 
 const PageItems = styled(NavigationSubItem)<{ isSelected: boolean }>`
   ${LabelContainer} {
-    padding: 7px 38px 9px 0px;
+    padding: 7px 38px 9px 24px;
     ${({ theme, isSelected }) => isSelected && theme.fonts.bold14};
   }
 `
@@ -77,26 +77,23 @@ export const PageNavigation = (props: IPageNavigation) => {
   return (
     <>
       <Title>Pages</Title>
-      <ol>
-        {Object.keys(TAB).map((tab, idx) => {
-          const isSelected = section === TAB[tab as keyof typeof TAB]
-          return (
-            <ListItem isSelected={isSelected}>
-              <PageItems
-                key={idx}
-                id={`${tab}_navigation`}
-                label={`${intl.formatMessage(
-                  configMessage[TAB[tab as keyof typeof TAB]]
-                )}`}
-                isSelected={isSelected}
-                onClick={() =>
-                  goToFormConfigWizard(event!, TAB[tab as keyof typeof TAB])
-                }
-              />
-            </ListItem>
-          )
-        })}
-      </ol>
+      <OrderedList>
+        {Object.keys(TAB).map((tab, idx) => (
+          <li>
+            <PageItems
+              key={idx}
+              id={`${tab}_navigation`}
+              label={`${idx + 1}. ${intl.formatMessage(
+                configMessage[TAB[tab as keyof typeof TAB]]
+              )}`}
+              isSelected={section === TAB[tab as keyof typeof TAB]}
+              onClick={() =>
+                goToFormConfigWizard(event!, TAB[tab as keyof typeof TAB])
+              }
+            />
+          </li>
+        ))}
+      </OrderedList>
     </>
   )
 }
