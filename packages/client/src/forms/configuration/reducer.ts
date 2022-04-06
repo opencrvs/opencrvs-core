@@ -11,7 +11,7 @@
  */
 import { loop, Cmd, Loop, LoopReducer } from 'redux-loop'
 import { storage } from '@client/storage'
-import { find } from 'lodash'
+import { find, isEmpty } from 'lodash'
 import { formDraftQueries } from './queries'
 import * as actions from '@client/forms/configuration/actions'
 import { Event } from '@client/forms/index'
@@ -71,6 +71,27 @@ export const formDraftReducer: LoopReducer<
   | Loop<IFormDraftDataState, actions.FormDraftActions> => {
   switch (action.type) {
     case actions.LOAD_DRAFT:
+      return loop(
+        state,
+        Cmd.run(storage.getItem, {
+          args: ['formDraft'],
+          successActionCreator: actions.getOfflineDataSuccess
+        })
+      )
+
+    case actions.GET_OFFLINE_DATA_SUCCESS: {
+      const offlineDataString = action.payload
+      const offlineData: IFormDraftData = JSON.parse(
+        offlineDataString ? offlineDataString : '{}'
+      )
+
+      if (isEmpty(offlineData)) {
+        return loop(state, Cmd.action(actions.fetchDraft()))
+      }
+      return state
+    }
+
+    case actions.FETCH_DRAFT:
       return loop(
         state,
         Cmd.run(formDraftQueries.fetchFormDraft, {

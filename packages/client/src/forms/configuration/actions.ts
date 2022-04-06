@@ -13,13 +13,35 @@
 import { ApolloQueryResult } from 'apollo-client'
 import { GQLformDraft } from '@opencrvs/gateway/src/graphql/schema'
 
-export const LOAD_DRAFT = 'FORM/FETCH_DRAFT'
-export type DraftFetchAction = {
+export const LOAD_DRAFT = 'FORM/LOAD_DRAFT'
+export type DraftLoadAction = {
   type: typeof LOAD_DRAFT
 }
 
-export const fetchDraft = (): DraftFetchAction => ({
+export const loadDraft = (): DraftLoadAction => ({
   type: LOAD_DRAFT
+})
+
+export const FETCH_DRAFT = 'FORM/FETCH_DRAFT'
+export type DraftFetchAction = {
+  type: typeof FETCH_DRAFT
+}
+
+export const fetchDraft = (): DraftFetchAction => ({
+  type: FETCH_DRAFT
+})
+
+export const GET_OFFLINE_DATA_SUCCESS = 'FORM/GET_OFFLINE_DATA_SUCCESS'
+export type DraftOfflineDataSuccessAction = {
+  type: typeof GET_OFFLINE_DATA_SUCCESS
+  payload: string
+}
+
+export const getOfflineDataSuccess = (
+  response: string
+): DraftOfflineDataSuccessAction => ({
+  type: GET_OFFLINE_DATA_SUCCESS,
+  payload: response
 })
 
 export const STORE_DRAFT = 'FORM/STORE_DRAFT'
@@ -50,5 +72,7 @@ export const failedDraft = (): DraftFailAction => ({
 
 export type FormDraftActions =
   | DraftStoredAction
+  | DraftLoadAction
   | DraftFetchAction
   | DraftFailAction
+  | DraftOfflineDataSuccessAction
