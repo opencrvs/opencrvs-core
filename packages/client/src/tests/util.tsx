@@ -1207,7 +1207,7 @@ export const currentUserDeclarations = {
           nationality: 'BGD',
           informantBirthDate: '2000-01-01',
           relationship: 'OTHER',
-          otherRelationship: 'Friend',
+          otherInformantType: 'Friend',
           informantPhone: '01711111111',
           currentAddress: '',
           country: 'BGD',

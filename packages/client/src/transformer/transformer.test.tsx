@@ -121,14 +121,13 @@ describe('when draft data is transformed to graphql', () => {
 
   const registrationDetails = {
     commentsOrNotes: 'comments',
-    informantType: 'MOTHER_ONLY',
     registrationCertificateLanguage: ['en'],
     registrationPhone: '01736478884',
     whoseContactDetails: 'MOTHER',
-    informant: {
+    informantType: {
       value: 'MOTHER',
       nestedFields: {
-        otherRelationShip: ''
+        otherInformantType: ''
       }
     },
     contactPoint: {
@@ -528,10 +527,10 @@ describe('when draft data is transformed to graphql', () => {
         mother: motherDetails,
         registration: {
           ...registrationDetails,
-          informant: {
+          informantType: {
             value: 'FATHER',
             nestedFields: {
-              otherRelationShip: ''
+              otherInformantType: ''
             }
           },
           contactPoint: {

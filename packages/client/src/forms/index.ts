@@ -276,12 +276,12 @@ export interface IContactPoint {
   registrationPhone: string
 }
 
-interface IInformantOtherRelationship {
-  otherRelationship: string
+interface IInformantOtherInformantType {
+  otherInformantType: string
 }
 export interface IInformant {
   value: string
-  nestedFields: IInformantOtherRelationship
+  nestedFields: IInformantOtherInformantType
 }
 
 export interface IRegistration {
@@ -737,7 +737,6 @@ export interface IConditionals {
   causeOfDeathEstablished: IConditional
   isMarried: IConditional
   identifierIDSelected: IConditional
-  otherRelationship: IConditional
   fatherContactDetailsRequired: IConditional
   withInTargetDays: IConditional
   between46daysTo5yrs: IConditional

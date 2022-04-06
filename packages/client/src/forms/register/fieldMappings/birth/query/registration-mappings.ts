@@ -93,6 +93,10 @@ export function getBirthRegistrationSectionTransformer(
     transformedData[sectionId].informantType = queryData.informantType
   }
 
+  if (queryData.otherInformantType) {
+    transformedData[sectionId].otherInformantType = queryData.otherInformantType
+  }
+
   if (queryData[sectionId].type && queryData[sectionId].type === 'BIRTH') {
     transformedData[sectionId].type = Event.BIRTH
   }

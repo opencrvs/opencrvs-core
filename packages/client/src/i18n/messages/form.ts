@@ -23,7 +23,7 @@ interface IFormMessages
   answer: MessageDescriptor
   informantIDProof: MessageDescriptor
   informantName: MessageDescriptor
-  informantOtherRelationship: MessageDescriptor
+  otherInformantType: MessageDescriptor
   informantsDateOfBirth: MessageDescriptor
   informantsFamilyName: MessageDescriptor
   informantsFamilyNameEng: MessageDescriptor
@@ -368,9 +368,22 @@ interface IFormMessages
   nationalIdOption: MessageDescriptor
   brnOption: MessageDescriptor
   helperTextNID: MessageDescriptor
+  formSelectPlaceholder: MessageDescriptor
+  selectContactPoint: MessageDescriptor
+  reviewLabelMainContact: MessageDescriptor
 }
 
 export const formMessageDescriptors: IFormMessages = {
+  reviewLabelMainContact: {
+    defaultMessage: 'Main Contact',
+    description: 'Label for point of contact on the review page',
+    id: 'form.review.label.mainContact'
+  },
+  selectContactPoint: {
+    defaultMessage: 'Who is the main point of contact for this declaration?',
+    description: 'Form section title for contact point',
+    id: 'register.SelectContactPoint.heading'
+  },
   accountDetails: {
     defaultMessage: 'Account details',
     description: 'Account details section',
@@ -422,10 +435,10 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Form section name for Informant',
     id: 'form.section.informant.name'
   },
-  informantOtherRelationship: {
+  otherInformantType: {
     defaultMessage: 'Other relation',
     description: 'Label for form field: Other relation',
-    id: 'form.field.label.informantOtherRelationship'
+    id: 'form.field.label.otherInformantType'
   },
   informantsDateOfBirth: {
     defaultMessage: 'Date of Birth',
@@ -1643,6 +1656,11 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: 'Search',
     description: 'Place holder text ',
     id: 'form.field.SearchField.placeHolderText'
+  },
+  formSelectPlaceholder: {
+    defaultMessage: 'Select',
+    description: 'Placeholder text for a select',
+    id: 'form.field.select.placeholder'
   },
   securityQuestionLabel: {
     defaultMessage: 'Security question {count}',

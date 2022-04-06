@@ -327,7 +327,7 @@ describe('when in device of large viewport', () => {
         birth: {
           sections: [
             {
-              id: BirthSection.Registration,
+              id: BirthSection.InformantType,
               hasDocumentSection: true,
               viewType: 'form' as ViewType,
               title: {

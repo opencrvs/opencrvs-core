@@ -110,7 +110,7 @@ export interface GQLBirthRegistration extends GQLEventRegistration {
   attendantAtBirth?: GQLAttendantType
   otherAttendantAtBirth?: string
   birthRegistrationType?: GQLBirthRegType
-  informantType?: string
+  informantType?: GQLInformantType
   otherinformantType?: string
   childrenBornAliveToMother?: number
   foetalDeathsToMother?: number
@@ -356,7 +356,7 @@ export interface GQLBirthRegistrationInput {
   attendantAtBirth?: GQLAttendantType
   otherAttendantAtBirth?: string
   birthRegistrationType?: GQLBirthRegType
-  informantType?: string
+  informantType?: GQLInformantType
   otherinformantType?: string
   childrenBornAliveToMother?: number
   foetalDeathsToMother?: number
@@ -554,6 +554,26 @@ export const enum GQLBirthRegType {
   INFORMANT_ONLY = 'INFORMANT_ONLY',
   MOTHER_ONLY = 'MOTHER_ONLY',
   FATHER_ONLY = 'FATHER_ONLY'
+}
+
+export const enum GQLInformantType {
+  INFORMANT = 'INFORMANT',
+  MOTHER = 'MOTHER',
+  FATHER = 'FATHER',
+  GRANDFATHER = 'GRANDFATHER',
+  GRANDMOTHER = 'GRANDMOTHER',
+  BROTHER = 'BROTHER',
+  SISTER = 'SISTER',
+  OTHER_FAMILY_MEMBER = 'OTHER_FAMILY_MEMBER',
+  LEGAL_GUARDIAN = 'LEGAL_GUARDIAN',
+  SPOUSE = 'SPOUSE',
+  SON = 'SON',
+  DAUGHTER = 'DAUGHTER',
+  SON_IN_LAW = 'SON_IN_LAW',
+  DAUGHTER_IN_LAW = 'DAUGHTER_IN_LAW',
+  GRANDSON = 'GRANDSON',
+  GRANDDAUGHTER = 'GRANDDAUGHTER',
+  OTHER = 'OTHER'
 }
 
 export interface GQLPrimaryCaregiver {

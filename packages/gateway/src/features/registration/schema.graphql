@@ -36,11 +36,23 @@ enum RegistrationContactType {
   INFORMANT
 }
 
-enum BirthRegPresence {
-  BOTH_PARENTS
+enum InformantType {
   INFORMANT
   MOTHER
   FATHER
+  GRANDFATHER
+  GRANDMOTHER
+  BROTHER
+  SISTER
+  OTHER_FAMILY_MEMBER
+  LEGAL_GUARDIAN
+  SPOUSE
+  SON
+  DAUGHTER
+  SON_IN_LAW
+  DAUGHTER_IN_LAW
+  GRANDSON
+  GRANDDAUGHTER
   OTHER
 }
 
@@ -296,7 +308,7 @@ input BirthRegistrationInput {
   attendantAtBirth: AttendantType # Not in BDRIS2
   otherAttendantAtBirth: String
   birthRegistrationType: BirthRegType
-  informantType: String # Informant in BDRIS2
+  informantType: InformantType # Informant in BDRIS2
   otherinformantType: String
   childrenBornAliveToMother: Int # Not in BDRIS2
   foetalDeathsToMother: Int # Not in BDRIS2
@@ -321,7 +333,7 @@ type BirthRegistration implements EventRegistration { # -> Composition
   attendantAtBirth: AttendantType # -> Observation.valueString
   otherAttendantAtBirth: String
   birthRegistrationType: BirthRegType # -> Observation.valueString
-  informantType: String # -> Observation.valueString
+  informantType: InformantType # -> Observation.valueString
   otherinformantType: String
   childrenBornAliveToMother: Int # -> Observation.valueInteger
   foetalDeathsToMother: Int # -> Observation.valueInteger

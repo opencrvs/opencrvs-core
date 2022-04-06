@@ -231,7 +231,7 @@ type BirthRegistration implements EventRegistration {
   attendantAtBirth: AttendantType
   otherAttendantAtBirth: String
   birthRegistrationType: BirthRegType
-  informantType: String
+  informantType: InformantType
   otherinformantType: String
   childrenBornAliveToMother: Int
   foetalDeathsToMother: Int
@@ -466,7 +466,7 @@ input BirthRegistrationInput {
   attendantAtBirth: AttendantType
   otherAttendantAtBirth: String
   birthRegistrationType: BirthRegType
-  informantType: String
+  informantType: InformantType
   otherinformantType: String
   childrenBornAliveToMother: Int
   foetalDeathsToMother: Int
@@ -664,6 +664,26 @@ enum BirthRegType {
   INFORMANT_ONLY
   MOTHER_ONLY
   FATHER_ONLY
+}
+
+enum InformantType {
+  INFORMANT
+  MOTHER
+  FATHER
+  GRANDFATHER
+  GRANDMOTHER
+  BROTHER
+  SISTER
+  OTHER_FAMILY_MEMBER
+  LEGAL_GUARDIAN
+  SPOUSE
+  SON
+  DAUGHTER
+  SON_IN_LAW
+  DAUGHTER_IN_LAW
+  GRANDSON
+  GRANDDAUGHTER
+  OTHER
 }
 
 type PrimaryCaregiver {

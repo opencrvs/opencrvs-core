@@ -131,13 +131,12 @@ describe('when user is previewing the form data', () => {
 
     const registrationDetails = {
       commentsOrNotes: 'comments',
-      informantType: 'MOTHER',
       registrationCertificateLanguage: ['en'],
       whoseContactDetails: 'MOTHER',
-      informant: {
-        value: 'OTHER',
+      informantType: {
+        value: 'MOTHER',
         nestedFields: {
-          otherRelationShip: 'Friend'
+          otherInformantType: ''
         }
       },
       contactPoint: {
@@ -490,10 +489,10 @@ describe('when user is previewing the form data', () => {
           contactRelationshipOther: 'grandma'
         }
       },
-      relationship: {
+      informantType: {
         value: 'OTHER',
         nestedFields: {
-          otherRelationship: 'House owner'
+          otherInformantType: 'Houseowner'
         }
       }
     }

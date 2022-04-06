@@ -20,7 +20,7 @@ import {
   IConditionals
 } from '@client/forms/index'
 import { formMessageDescriptors } from '@client/i18n/messages'
-import { getInformantSection } from './defaultUtils'
+import { messages as informantMessageDescriptors } from '@client/i18n/messages/views/selectInformant'
 
 // THIS FILE CONTAINS THE DEFAULT, FACTORY RESET FORM CONFIGURATIONS
 
@@ -32,7 +32,514 @@ interface IDefaultRegisterForms {
 export const registerForms: IDefaultRegisterForms = {
   birth: {
     sections: [
-      getInformantSection(Event.BIRTH),
+      {
+        id: BirthSection.Registration,
+        viewType: 'form',
+        name: formMessageDescriptors.registrationName,
+        title: formMessageDescriptors.registrationTitle,
+        groups: [
+          {
+            id: 'who-is-applying-view-group',
+            title: informantMessageDescriptors.birthInformantTitle,
+            conditionals: [],
+            preventContinueIfError: true,
+            showExitButtonOnly: true,
+            fields: [
+              {
+                name: 'informantType',
+                type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
+                label: informantMessageDescriptors.birthInformantTitle,
+                hideHeader: true,
+                required: true,
+                readonly: true,
+                hideInPreview: false,
+                initialValue: '',
+                validate: [],
+                size: RadioSize.LARGE,
+                options: [
+                  {
+                    value: 'MOTHER',
+                    label: informantMessageDescriptors.mother
+                  },
+                  {
+                    value: 'FATHER',
+                    label: informantMessageDescriptors.father
+                  },
+                  {
+                    value: 'GRANDFATHER',
+                    label: informantMessageDescriptors.grandfather
+                  },
+                  {
+                    value: 'GRANDMOTHER',
+                    label: informantMessageDescriptors.grandmother
+                  },
+                  {
+                    value: 'BROTHER',
+                    label: informantMessageDescriptors.brother
+                  },
+                  {
+                    value: 'SISTER',
+                    label: informantMessageDescriptors.sister
+                  },
+                  {
+                    value: 'OTHER_FAMILY_MEMBER',
+                    label: informantMessageDescriptors.otherFamilyMember
+                  },
+                  {
+                    value: 'LEGAL_GUARDIAN',
+                    label: informantMessageDescriptors.legalGuardian
+                  },
+                  {
+                    value: 'OTHER',
+                    label: formMessageDescriptors.someoneElse
+                  }
+                ],
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
+                nestedFields: {
+                  MOTHER: [],
+                  FATHER: [],
+                  GRANDFATHER: [],
+                  GRANDMOTHER: [],
+                  BROTHER: [],
+                  SISTER: [],
+                  OTHER_FAMILY_MEMBER: [],
+                  LEGAL_GUARDIAN: [],
+                  OTHER: [
+                    {
+                      name: 'otherInformantType',
+                      type: 'TEXT',
+                      label: formMessageDescriptors.informantsRelationWithChild,
+                      placeholder:
+                        formMessageDescriptors.relationshipPlaceHolder,
+                      required: false,
+                      initialValue: '',
+                      validate: [
+                        {
+                          operation: 'englishOnlyNameFormat'
+                        }
+                      ],
+                      mapping: {
+                        mutation: {
+                          operation: 'changeHirerchyMutationTransformer',
+                          parameters: ['registration.otherInformantType']
+                        },
+                        query: {
+                          operation: 'changeHirerchyQueryTransformer',
+                          parameters: ['registration.otherInformantType']
+                        }
+                      }
+                    }
+                  ]
+                },
+                reviewOverrides: {
+                  residingSection: BirthSection.Registration,
+                  reference: {
+                    sectionID: BirthSection.Registration,
+                    groupID: 'contact-view-group',
+                    fieldName: 'contactPoint'
+                  },
+                  position: REVIEW_OVERRIDE_POSITION.BEFORE,
+                  labelAs: formMessageDescriptors.birthInformantTitle,
+                  conditionals: [
+                    {
+                      action: 'hide',
+                      expression:
+                        '(!draftData || !draftData.registration || draftData.registration.informantType === "OTHER")'
+                    }
+                  ]
+                },
+                mapping: {
+                  mutation: {
+                    operation: 'nestedRadioFieldToBundleFieldTransformer',
+                    parameters: ['registration.informantType']
+                  },
+                  query: {
+                    operation: 'bundleFieldToNestedRadioFieldTransformer',
+                    parameters: ['registration.informantType']
+                  }
+                }
+              }
+            ]
+          },
+          {
+            id: 'contact-view-group',
+            title: informantMessageDescriptors.selectContactPoint,
+            conditionals: [],
+            preventContinueIfError: true,
+            showExitButtonOnly: true,
+            previewGroups: [
+              {
+                id: 'contactPointGroup',
+                label: formMessageDescriptors.reviewLabelMainContact,
+                required: false,
+                initialValue: '',
+                fieldToRedirect: 'contactPoint'
+              }
+            ],
+            fields: [
+              {
+                name: 'contactPoint',
+                type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
+                label: formMessageDescriptors.selectContactPoint,
+                conditionals: [],
+                previewGroup: 'contactPointGroup',
+                required: true,
+                hideHeader: true,
+                initialValue: '',
+                validate: [],
+                size: RadioSize.LARGE,
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
+                options: [
+                  {
+                    value: 'MOTHER',
+                    label: informantMessageDescriptors.mother
+                  },
+                  {
+                    value: 'FATHER',
+                    label: informantMessageDescriptors.father
+                  },
+                  {
+                    value: 'GRANDFATHER',
+                    label: informantMessageDescriptors.grandfather
+                  },
+                  {
+                    value: 'GRANDMOTHER',
+                    label: informantMessageDescriptors.grandmother
+                  },
+                  {
+                    value: 'BROTHER',
+                    label: informantMessageDescriptors.brother
+                  },
+                  {
+                    value: 'SISTER',
+                    label: informantMessageDescriptors.sister
+                  },
+                  {
+                    value: 'OTHER_FAMILY_MEMBER',
+                    label: informantMessageDescriptors.otherFamilyMember
+                  },
+                  {
+                    value: 'LEGAL_GUARDIAN',
+                    label: informantMessageDescriptors.legalGuardian
+                  },
+                  {
+                    value: 'OTHER',
+                    label: formMessageDescriptors.someoneElse
+                  }
+                ],
+                nestedFields: {
+                  MOTHER: [
+                    {
+                      name: 'registrationPhone',
+                      type: 'TEL',
+                      label: formMessageDescriptors.phoneNumber,
+                      required: false,
+                      initialValue: '',
+                      validate: [
+                        {
+                          operation: 'phoneNumberFormat'
+                        }
+                      ],
+                      mapping: {
+                        mutation: {
+                          operation: 'changeHirerchyMutationTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'msisdnTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        },
+                        query: {
+                          operation: 'changeHirerchyQueryTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'localPhoneTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  FATHER: [
+                    {
+                      name: 'registrationPhone',
+                      type: 'TEL',
+                      label: formMessageDescriptors.phoneNumber,
+                      required: false,
+                      initialValue: '',
+                      validate: [
+                        {
+                          operation: 'phoneNumberFormat'
+                        }
+                      ],
+                      mapping: {
+                        mutation: {
+                          operation: 'changeHirerchyMutationTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'msisdnTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        },
+                        query: {
+                          operation: 'changeHirerchyQueryTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'localPhoneTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  GRANDFATHER: [
+                    {
+                      name: 'registrationPhone',
+                      type: 'TEL',
+                      label: formMessageDescriptors.phoneNumber,
+                      required: false,
+                      initialValue: '',
+                      validate: [
+                        {
+                          operation: 'phoneNumberFormat'
+                        }
+                      ],
+                      mapping: {
+                        mutation: {
+                          operation: 'changeHirerchyMutationTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'msisdnTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        },
+                        query: {
+                          operation: 'changeHirerchyQueryTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'localPhoneTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  GRANDMOTHER: [
+                    {
+                      name: 'registrationPhone',
+                      type: 'TEL',
+                      label: formMessageDescriptors.phoneNumber,
+                      required: false,
+                      initialValue: '',
+                      validate: [
+                        {
+                          operation: 'phoneNumberFormat'
+                        }
+                      ],
+                      mapping: {
+                        mutation: {
+                          operation: 'changeHirerchyMutationTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'msisdnTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        },
+                        query: {
+                          operation: 'changeHirerchyQueryTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'localPhoneTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  BROTHER: [
+                    {
+                      name: 'registrationPhone',
+                      type: 'TEL',
+                      label: formMessageDescriptors.phoneNumber,
+                      required: false,
+                      initialValue: '',
+                      validate: [
+                        {
+                          operation: 'phoneNumberFormat'
+                        }
+                      ],
+                      mapping: {
+                        mutation: {
+                          operation: 'changeHirerchyMutationTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'msisdnTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        },
+                        query: {
+                          operation: 'changeHirerchyQueryTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'localPhoneTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  SISTER: [
+                    {
+                      name: 'registrationPhone',
+                      type: 'TEL',
+                      label: formMessageDescriptors.phoneNumber,
+                      required: false,
+                      initialValue: '',
+                      validate: [
+                        {
+                          operation: 'phoneNumberFormat'
+                        }
+                      ],
+                      mapping: {
+                        mutation: {
+                          operation: 'changeHirerchyMutationTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'msisdnTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        },
+                        query: {
+                          operation: 'changeHirerchyQueryTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'localPhoneTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  LEGALGUARDIAN: [
+                    {
+                      name: 'registrationPhone',
+                      type: 'TEL',
+                      label: formMessageDescriptors.phoneNumber,
+                      required: false,
+                      initialValue: '',
+                      validate: [
+                        {
+                          operation: 'phoneNumberFormat'
+                        }
+                      ],
+                      mapping: {
+                        mutation: {
+                          operation: 'changeHirerchyMutationTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'msisdnTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        },
+                        query: {
+                          operation: 'changeHirerchyQueryTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'localPhoneTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  OTHER: [
+                    {
+                      name: 'registrationPhone',
+                      type: 'TEL',
+                      label: formMessageDescriptors.phoneNumber,
+                      required: false,
+                      initialValue: '',
+                      validate: [
+                        {
+                          operation: 'phoneNumberFormat'
+                        }
+                      ],
+                      mapping: {
+                        mutation: {
+                          operation: 'changeHirerchyMutationTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'msisdnTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        },
+                        query: {
+                          operation: 'changeHirerchyQueryTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'localPhoneTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                },
+                mapping: {
+                  mutation: {
+                    operation: 'nestedRadioFieldToBundleFieldTransformer',
+                    parameters: ['registration.contact']
+                  },
+                  query: {
+                    operation: 'bundleFieldToNestedRadioFieldTransformer',
+                    parameters: ['registration.contact']
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        mapping: {
+          mutation: {
+            operation: 'setBirthRegistrationSectionTransformer'
+          },
+          query: {
+            operation: 'getBirthRegistrationSectionTransformer'
+          }
+        }
+      },
       {
         id: BirthSection.Child,
         viewType: 'form',
@@ -118,11 +625,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: [
                   {
                     value: 'male',
@@ -195,11 +698,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: false,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: [
                   {
                     value: 'PHYSICIAN',
@@ -288,11 +787,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: false,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: [
                   {
                     value: 'SINGLE',
@@ -421,11 +916,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: [
                   {
                     value: 'HEALTH_FACILITY',
@@ -513,11 +1004,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: 'FAR',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: {
                   resource: 'countries'
                 },
@@ -551,11 +1038,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 dynamicOptions: {
                   resource: 'locations',
                   dependency: 'country',
@@ -612,11 +1095,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 dynamicOptions: {
                   resource: 'locations',
                   dependency: 'state',
@@ -1331,11 +1810,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: false,
                 initialValue: 'FAR',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: {
                   resource: 'countries'
                 },
@@ -1510,11 +1985,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: 'FAR',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: {
                   resource: 'countries'
                 },
@@ -1554,11 +2025,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 dynamicOptions: {
                   resource: 'locations',
                   dependency: 'countryPermanent'
@@ -1605,11 +2072,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 dynamicOptions: {
                   resource: 'locations',
                   dependency: 'statePermanent'
@@ -3138,11 +3601,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: false,
                 initialValue: 'FAR',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: {
                   resource: 'countries'
                 },
@@ -3324,11 +3783,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: false,
                 initialValue: 'MARRIED',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: [
                   {
                     value: 'SINGLE',
@@ -3404,11 +3859,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: false,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: [
                   {
                     value: 'NO_SCHOOLING',
@@ -3468,11 +3919,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: 'FAR',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: {
                   resource: 'countries'
                 },
@@ -3499,11 +3946,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 dynamicOptions: {
                   resource: 'locations',
                   dependency: 'countryPlaceOfHeritage'
@@ -3542,11 +3985,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 dynamicOptions: {
                   resource: 'locations',
                   dependency: 'statePlaceOfHeritage'
@@ -3979,11 +4418,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: 'FAR',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: {
                   resource: 'countries'
                 },
@@ -4010,11 +4445,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 dynamicOptions: {
                   resource: 'locations',
                   dependency: 'countryPermanent'
@@ -4052,11 +4483,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 dynamicOptions: {
                   resource: 'locations',
                   dependency: 'statePermanent'
@@ -4791,11 +5218,7 @@ export const registerForms: IDefaultRegisterForms = {
                 previewGroup: 'currentAddress',
                 required: true,
                 initialValue: '',
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 validate: [],
                 dynamicOptions: {
                   resource: 'locations',
@@ -4838,11 +5261,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 dynamicOptions: {
                   resource: 'locations',
                   dependency: 'state'
@@ -5722,11 +6141,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: false,
                 initialValue: 'FAR',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: {
                   resource: 'countries'
                 },
@@ -5882,11 +6297,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: false,
                 initialValue: 'MARRIED',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 conditionals: [
                   {
                     action: 'hide',
@@ -5973,11 +6384,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: false,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 conditionals: [
                   {
                     action: 'hide',
@@ -6107,11 +6514,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: 'FAR',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: {
                   resource: 'countries'
                 },
@@ -6148,11 +6551,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 dynamicOptions: {
                   resource: 'locations',
                   dependency: 'countryPermanent'
@@ -6198,11 +6597,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 dynamicOptions: {
                   resource: 'locations',
                   dependency: 'statePermanent'
@@ -7166,7 +7561,596 @@ export const registerForms: IDefaultRegisterForms = {
   },
   death: {
     sections: [
-      getInformantSection(Event.DEATH),
+      {
+        id: DeathSection.Registration,
+        viewType: 'form',
+        name: formMessageDescriptors.registrationName,
+        title: formMessageDescriptors.registrationTitle,
+        groups: [
+          {
+            id: 'who-is-applying-view-group',
+            title: informantMessageDescriptors.deathInformantTitle,
+            conditionals: [],
+            preventContinueIfError: true,
+            showExitButtonOnly: true,
+            fields: [
+              {
+                name: 'informantType',
+                type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
+                label: informantMessageDescriptors.deathInformantTitle,
+                hideHeader: true,
+                required: true,
+                readonly: true,
+                hideInPreview: false,
+                initialValue: '',
+                validate: [],
+                size: RadioSize.LARGE,
+                options: [
+                  {
+                    value: 'SPOUSE',
+                    label: informantMessageDescriptors.spouse
+                  },
+                  {
+                    value: 'SON',
+                    label: informantMessageDescriptors.son
+                  },
+                  {
+                    value: 'DAUGHTER',
+                    label: informantMessageDescriptors.daughter
+                  },
+                  {
+                    value: 'SON_IN_LAW',
+                    label: informantMessageDescriptors.sonInLaw
+                  },
+                  {
+                    value: 'DAUGHTER_IN_LAW',
+                    label: informantMessageDescriptors.daughterInLaw
+                  },
+                  {
+                    value: 'MOTHER',
+                    label: informantMessageDescriptors.mother
+                  },
+                  {
+                    value: 'FATHER',
+                    label: informantMessageDescriptors.father
+                  },
+                  {
+                    value: 'GRANDSON',
+                    label: informantMessageDescriptors.grandson
+                  },
+                  {
+                    value: 'GRANDDAUGHTER',
+                    label: informantMessageDescriptors.granddaughter
+                  },
+                  {
+                    value: 'OTHER',
+                    label: formMessageDescriptors.someoneElse
+                  }
+                ],
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
+                nestedFields: {
+                  SPOUSE: [],
+                  SON: [],
+                  DAUGHTER: [],
+                  SON_IN_LAW: [],
+                  DAUGHTER_IN_LAW: [],
+                  MOTHER: [],
+                  FATHER: [],
+                  GRANDSON: [],
+                  GRANDDAUGHTER: [],
+                  OTHER: [
+                    {
+                      name: 'otherInformantType',
+                      type: 'TEXT',
+                      label:
+                        formMessageDescriptors.informantsRelationWithDeceased,
+                      placeholder:
+                        formMessageDescriptors.relationshipPlaceHolder,
+                      required: false,
+                      initialValue: '',
+                      validate: [
+                        {
+                          operation: 'englishOnlyNameFormat'
+                        }
+                      ],
+                      mapping: {
+                        mutation: {
+                          operation: 'changeHirerchyMutationTransformer',
+                          parameters: ['registration.otherInformantType']
+                        },
+                        query: {
+                          operation: 'changeHirerchyQueryTransformer',
+                          parameters: ['registration.otherInformantType']
+                        }
+                      }
+                    }
+                  ]
+                },
+                reviewOverrides: {
+                  residingSection: DeathSection.Registration,
+                  reference: {
+                    sectionID: DeathSection.Registration,
+                    groupID: 'contact-view-group',
+                    fieldName: 'contactPoint'
+                  },
+                  position: REVIEW_OVERRIDE_POSITION.BEFORE,
+                  labelAs: formMessageDescriptors.deathInformantTitle,
+                  conditionals: [
+                    {
+                      action: 'hide',
+                      expression:
+                        '(!draftData || !draftData.registration || draftData.registration.informantType === "OTHER")'
+                    }
+                  ]
+                },
+                mapping: {
+                  mutation: {
+                    operation: 'nestedRadioFieldToBundleFieldTransformer',
+                    parameters: ['registration.informantType']
+                  },
+                  query: {
+                    operation: 'bundleFieldToNestedRadioFieldTransformer',
+                    parameters: ['registration.informantType']
+                  }
+                }
+              }
+            ]
+          },
+          {
+            id: 'contact-view-group',
+            title: informantMessageDescriptors.selectContactPoint,
+            conditionals: [],
+            preventContinueIfError: true,
+            showExitButtonOnly: true,
+            previewGroups: [
+              {
+                id: 'contactPointGroup',
+                label: formMessageDescriptors.reviewLabelMainContact,
+                required: false,
+                initialValue: '',
+                fieldToRedirect: 'contactPoint'
+              }
+            ],
+            fields: [
+              {
+                name: 'contactPoint',
+                type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
+                label: formMessageDescriptors.selectContactPoint,
+                conditionals: [],
+                previewGroup: 'contactPointGroup',
+                required: true,
+                hideHeader: true,
+                initialValue: '',
+                validate: [],
+                size: RadioSize.LARGE,
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
+                options: [
+                  {
+                    value: 'SPOUSE',
+                    label: informantMessageDescriptors.spouse
+                  },
+                  {
+                    value: 'SON',
+                    label: informantMessageDescriptors.son
+                  },
+                  {
+                    value: 'DAUGHTER',
+                    label: informantMessageDescriptors.daughter
+                  },
+                  {
+                    value: 'SON_IN_LAW',
+                    label: informantMessageDescriptors.sonInLaw
+                  },
+                  {
+                    value: 'DAUGHTER_IN_LAW',
+                    label: informantMessageDescriptors.daughterInLaw
+                  },
+                  {
+                    value: 'MOTHER',
+                    label: informantMessageDescriptors.mother
+                  },
+                  {
+                    value: 'FATHER',
+                    label: informantMessageDescriptors.father
+                  },
+                  {
+                    value: 'GRANDSON',
+                    label: informantMessageDescriptors.grandson
+                  },
+                  {
+                    value: 'GRANDDAUGHTER',
+                    label: informantMessageDescriptors.granddaughter
+                  },
+                  {
+                    value: 'OTHER',
+                    label: formMessageDescriptors.someoneElse
+                  }
+                ],
+                nestedFields: {
+                  SPOUSE: [
+                    {
+                      name: 'registrationPhone',
+                      type: 'TEL',
+                      label: formMessageDescriptors.phoneNumber,
+                      required: false,
+                      initialValue: '',
+                      validate: [
+                        {
+                          operation: 'phoneNumberFormat'
+                        }
+                      ],
+                      mapping: {
+                        mutation: {
+                          operation: 'changeHirerchyMutationTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'msisdnTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        },
+                        query: {
+                          operation: 'changeHirerchyQueryTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'localPhoneTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  SON: [
+                    {
+                      name: 'registrationPhone',
+                      type: 'TEL',
+                      label: formMessageDescriptors.phoneNumber,
+                      required: false,
+                      initialValue: '',
+                      validate: [
+                        {
+                          operation: 'phoneNumberFormat'
+                        }
+                      ],
+                      mapping: {
+                        mutation: {
+                          operation: 'changeHirerchyMutationTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'msisdnTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        },
+                        query: {
+                          operation: 'changeHirerchyQueryTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'localPhoneTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  DAUGHTER: [
+                    {
+                      name: 'registrationPhone',
+                      type: 'TEL',
+                      label: formMessageDescriptors.phoneNumber,
+                      required: false,
+                      initialValue: '',
+                      validate: [
+                        {
+                          operation: 'phoneNumberFormat'
+                        }
+                      ],
+                      mapping: {
+                        mutation: {
+                          operation: 'changeHirerchyMutationTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'msisdnTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        },
+                        query: {
+                          operation: 'changeHirerchyQueryTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'localPhoneTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  SON_IN_LAW: [
+                    {
+                      name: 'registrationPhone',
+                      type: 'TEL',
+                      label: formMessageDescriptors.phoneNumber,
+                      required: false,
+                      initialValue: '',
+                      validate: [
+                        {
+                          operation: 'phoneNumberFormat'
+                        }
+                      ],
+                      mapping: {
+                        mutation: {
+                          operation: 'changeHirerchyMutationTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'msisdnTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        },
+                        query: {
+                          operation: 'changeHirerchyQueryTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'localPhoneTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  DAUGHTER_IN_LAW: [
+                    {
+                      name: 'registrationPhone',
+                      type: 'TEL',
+                      label: formMessageDescriptors.phoneNumber,
+                      required: false,
+                      initialValue: '',
+                      validate: [
+                        {
+                          operation: 'phoneNumberFormat'
+                        }
+                      ],
+                      mapping: {
+                        mutation: {
+                          operation: 'changeHirerchyMutationTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'msisdnTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        },
+                        query: {
+                          operation: 'changeHirerchyQueryTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'localPhoneTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  MOTHER: [
+                    {
+                      name: 'registrationPhone',
+                      type: 'TEL',
+                      label: formMessageDescriptors.phoneNumber,
+                      required: false,
+                      initialValue: '',
+                      validate: [
+                        {
+                          operation: 'phoneNumberFormat'
+                        }
+                      ],
+                      mapping: {
+                        mutation: {
+                          operation: 'changeHirerchyMutationTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'msisdnTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        },
+                        query: {
+                          operation: 'changeHirerchyQueryTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'localPhoneTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  FATHER: [
+                    {
+                      name: 'registrationPhone',
+                      type: 'TEL',
+                      label: formMessageDescriptors.phoneNumber,
+                      required: false,
+                      initialValue: '',
+                      validate: [
+                        {
+                          operation: 'phoneNumberFormat'
+                        }
+                      ],
+                      mapping: {
+                        mutation: {
+                          operation: 'changeHirerchyMutationTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'msisdnTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        },
+                        query: {
+                          operation: 'changeHirerchyQueryTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'localPhoneTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  GRANDSON: [
+                    {
+                      name: 'registrationPhone',
+                      type: 'TEL',
+                      label: formMessageDescriptors.phoneNumber,
+                      required: false,
+                      initialValue: '',
+                      validate: [
+                        {
+                          operation: 'phoneNumberFormat'
+                        }
+                      ],
+                      mapping: {
+                        mutation: {
+                          operation: 'changeHirerchyMutationTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'msisdnTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        },
+                        query: {
+                          operation: 'changeHirerchyQueryTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'localPhoneTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  GRANDDAUGHTER: [
+                    {
+                      name: 'registrationPhone',
+                      type: 'TEL',
+                      label: formMessageDescriptors.phoneNumber,
+                      required: false,
+                      initialValue: '',
+                      validate: [
+                        {
+                          operation: 'phoneNumberFormat'
+                        }
+                      ],
+                      mapping: {
+                        mutation: {
+                          operation: 'changeHirerchyMutationTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'msisdnTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        },
+                        query: {
+                          operation: 'changeHirerchyQueryTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'localPhoneTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  OTHER: [
+                    {
+                      name: 'registrationPhone',
+                      type: 'TEL',
+                      label: formMessageDescriptors.phoneNumber,
+                      required: false,
+                      initialValue: '',
+                      validate: [
+                        {
+                          operation: 'phoneNumberFormat'
+                        }
+                      ],
+                      mapping: {
+                        mutation: {
+                          operation: 'changeHirerchyMutationTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'msisdnTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        },
+                        query: {
+                          operation: 'changeHirerchyQueryTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'localPhoneTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                },
+                mapping: {
+                  mutation: {
+                    operation: 'nestedRadioFieldToBundleFieldTransformer',
+                    parameters: ['registration.contact']
+                  },
+                  query: {
+                    operation: 'bundleFieldToNestedRadioFieldTransformer',
+                    parameters: ['registration.contact']
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        mapping: {
+          mutation: {
+            operation: 'setDeathRegistrationSectionTransformer'
+          },
+          query: {
+            operation: 'getDeathRegistrationSectionTransformer'
+          }
+        }
+      },
       {
         id: DeathSection.Deceased,
         viewType: 'form',
@@ -7251,11 +8235,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: false,
                 initialValue: 'FAR',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: {
                   resource: 'countries'
                 },
@@ -7357,11 +8337,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: [
                   {
                     value: 'male',
@@ -7420,11 +8396,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: false,
                 initialValue: 'MARRIED',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: [
                   {
                     value: 'SINGLE',
@@ -7513,11 +8485,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: 'FAR',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: {
                   resource: 'countries'
                 },
@@ -7544,11 +8512,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 dynamicOptions: {
                   resource: 'locations',
                   dependency: 'countryPermanent'
@@ -7586,11 +8550,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 dynamicOptions: {
                   resource: 'locations',
                   dependency: 'statePermanent'
@@ -8255,11 +9215,7 @@ export const registerForms: IDefaultRegisterForms = {
                 initialValue: '',
                 validate: [],
                 size: RadioSize.LARGE,
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: [
                   {
                     value: 'NATURAL_CAUSES',
@@ -8400,11 +9356,7 @@ export const registerForms: IDefaultRegisterForms = {
                     operation: 'facilityMustBeSelected'
                   }
                 ],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 mapping: {
                   mutation: {
                     operation: 'deathEventLocationMutationTransformer',
@@ -8457,11 +9409,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: 'FAR',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: {
                   resource: 'countries'
                 },
@@ -8488,11 +9436,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 dynamicOptions: {
                   resource: 'locations',
                   dependency: 'country'
@@ -8543,11 +9487,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 dynamicOptions: {
                   resource: 'locations',
                   dependency: 'state'
@@ -9286,11 +10226,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: false,
                 initialValue: 'FAR',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: {
                   resource: 'countries'
                 },
@@ -9452,11 +10388,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 conditionals: [
                   {
                     action: 'hide',
@@ -9632,11 +10564,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: 'FAR',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: {
                   resource: 'countries'
                 },
@@ -9676,11 +10604,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 dynamicOptions: {
                   resource: 'locations',
                   dependency: 'countryPermanent'
@@ -9731,11 +10655,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 dynamicOptions: {
                   resource: 'locations',
                   dependency: 'statePermanent'
