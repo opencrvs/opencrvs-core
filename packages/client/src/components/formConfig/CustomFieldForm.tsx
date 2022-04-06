@@ -10,22 +10,26 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { buttonMessages } from '@client/i18n/messages'
+import { getAvailableLanguages, getDefaultLanguage } from '@client/i18n/utils'
 import { customFieldFormMessages } from '@client/i18n/messages/views/customFieldForm'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
-import { TextArea, TextInput } from '@opencrvs/components/lib/forms'
+import { Select, TextArea, TextInput } from '@opencrvs/components/lib/forms'
 import { InputField } from '@opencrvs/components/lib/forms/InputField/InputField'
 import { Box } from '@opencrvs/components/lib/interface'
 import * as React from 'react'
 import {
   injectIntl,
   IntlShape,
+  MessageDescriptor,
   WrappedComponentProps as IntlShapeProps
 } from 'react-intl'
 import { connect } from 'react-redux'
 import { camelCase } from 'lodash'
+import { ILanguageState, initLanguages } from '@client/i18n/reducer'
+import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 
 const CustomFieldFormContainer = styled(Box)`
   box-shadow: none;
@@ -82,6 +86,10 @@ const ListRow = styled.div`
   padding: 8px 0;
 `
 
+const LanguageSelect = styled(Select)`
+  width: 175px;
+`
+
 const ListColumn = styled.div``
 
 type IFullProps = {
@@ -89,6 +97,7 @@ type IFullProps = {
 }
 
 interface ICustomFieldForms {
+  selectedLanguage: string
   label: string
   handleBars: string
 }
@@ -105,8 +114,39 @@ class CustomFieldFormsComp extends React.Component<
     super(props)
     this.state = {
       label: DEFAULTS.LABEL,
-      handleBars: camelCase(DEFAULTS.LABEL)
+      handleBars: camelCase(DEFAULTS.LABEL),
+      selectedLanguage: getDefaultLanguage()
     }
+  }
+
+  getLanguageDropDown() {
+    const defaultLanguage = getDefaultLanguage()
+    // const initializeLanguages = initLanguages()
+    const initializeLanguages: ILanguageState = {
+      en: { displayName: 'English', lang: 'en', messages: {} },
+      fr: { displayName: 'French', lang: 'fr', messages: {} }
+    }
+    const languageOptions = []
+    for (const index in initializeLanguages) {
+      languageOptions.push({
+        label: initializeLanguages[index].displayName,
+        value: index
+      })
+    }
+
+    return (
+      languageOptions.length > 1 && (
+        <FieldContainer>
+          <LanguageSelect
+            value={this.state.selectedLanguage}
+            onChange={(selectedLanguage: string) => {
+              this.setState({ selectedLanguage })
+            }}
+            options={languageOptions}
+          />
+        </FieldContainer>
+      )
+    )
   }
 
   toggleButtons() {
@@ -243,6 +283,7 @@ class CustomFieldFormsComp extends React.Component<
     return (
       <CustomFieldFormContainer>
         {this.toggleButtons()}
+        {this.getLanguageDropDown()}
         {this.inputFields()}
         {this.certificate()}
       </CustomFieldFormContainer>
