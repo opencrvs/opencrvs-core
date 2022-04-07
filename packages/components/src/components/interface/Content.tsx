@@ -26,6 +26,7 @@ const Container = styled(Box)<{ size: string }>`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin: 0;
     border: 0;
+    border-radius: 0;
   }
 `
 const Header = styled.div`
@@ -33,8 +34,7 @@ const Header = styled.div`
   display: flex;
   align-items: center;
   flex-direction: column;
-  margin: 0 -24px;
-  margin-top: -24px;
+  margin: -24px -24px 24px;
   padding: 0 24px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     border: 0;
@@ -58,7 +58,7 @@ export const SubHeader = styled.div`
   ${({ theme }) => theme.fonts.reg18};
 `
 export const Body = styled.div`
-  padding: 24px 0;
+  padding-bottom: 24px;
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.reg16};
 `
@@ -81,7 +81,7 @@ const TopBar = styled.div`
   width: 100%;
   padding: 16px 0;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    display: none;
+    /* display: none; */
   }
 `
 const BottomActionBar = styled.div`

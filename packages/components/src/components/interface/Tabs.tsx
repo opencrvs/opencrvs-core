@@ -22,8 +22,8 @@ export interface IProps extends IButtonProps {
 }
 
 export const Tab = styled(Button)<IProps>`
-  margin-right: 10px;
-  padding-right: 10px;
+  margin-right: 0 8px 0 -8px;
+  padding: 0 8px;
   color: ${({ theme }) => theme.colors.indigo500};
   opacity: ${({ disabled }) => (disabled ? 0.3 : 1)};
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};

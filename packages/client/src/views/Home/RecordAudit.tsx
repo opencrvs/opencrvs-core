@@ -740,6 +740,7 @@ const showUpdateButton = ({
       <PrimaryButton
         key={id}
         id={`update-application-${id}`}
+        size={'medium'}
         onClick={() => {
           goToPage && goToPage(PAGE_ROUTE, id, PAGE_ID, type)
         }}
