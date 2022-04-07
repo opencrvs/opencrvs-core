@@ -35,6 +35,7 @@ import { getDefaultLanguage } from '@client/i18n/utils'
 import { getInitialDeclarationsLoaded } from '@client/declarations/selectors'
 import { isRegisterFormReady } from '@client/forms/register/declaration-selectors'
 import { configLoad } from '@client/offline/actions'
+import { LOADING_SCREEN_TEXT } from '@client/utils/constants'
 
 const languageFromProps = ({ language }: IPageProps) => language
 
@@ -88,8 +89,22 @@ const StyledSpinner = styled(Spinner)`
   position: absolute;
   margin-left: -24px;
   margin-top: -24px;
-  top: 50%;
+  top: 38%;
   left: 50%;
+  width: 40px;
+  height: 40px;
+`
+const StyledText = styled.span`
+  position: absolute;
+  top: 44%;
+  left: 42%;
+  width: 251px;
+  height: 32px;
+  ${({ theme }) => theme.fonts.h3};
+  color: ${({ theme }) => theme.colors.grey600};
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    left: 24%;
+  }
 `
 
 interface IPageProps {
@@ -167,7 +182,12 @@ class Component extends React.Component<
         </div>
       )
     } else {
-      return <StyledSpinner id="appSpinner" />
+      return (
+        <>
+          <StyledSpinner id="appSpinner" />
+          <StyledText>{LOADING_SCREEN_TEXT}</StyledText>
+        </>
+      )
     }
   }
 }
