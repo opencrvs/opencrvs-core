@@ -142,7 +142,6 @@ function CorrectorFormComponent(props: IFullProps) {
     const relationShip = (
       declaration.data.corrector.relationship as IFormSectionData
     ).value as string
-    console.log(relationShip)
     props.writeDeclaration(declaration)
     if (
       relationShip === CorrectorRelationship.REGISTRAR ||
