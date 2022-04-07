@@ -83,11 +83,11 @@ async function extractMessages() {
       const contentfulKeysToMigrate: string[] = []
       const englishTranslations = login.data.find(
         (obj: ILanguage) => obj.lang === 'en-US' || obj.lang === 'en'
-      ).messages
+      )?.messages
       let missingKeys = false
 
       Object.keys(reactIntlDescriptions).forEach((key) => {
-        if (!englishTranslations.hasOwnProperty(key)) {
+        if (!englishTranslations?.hasOwnProperty(key)) {
           missingKeys = true
           // eslint-disable-line no-console
           console.log(
