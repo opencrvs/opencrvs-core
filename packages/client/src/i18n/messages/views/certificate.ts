@@ -20,6 +20,7 @@ interface ICertificateMessages
   certificateReceiptHeader: MessageDescriptor
   certificateReceiptSubHeader: MessageDescriptor
   collectPayment: MessageDescriptor
+  correctorIDCheckDialogDescription: MessageDescriptor
   dateOfBirth: MessageDescriptor
   familyName: MessageDescriptor
   familyNameInEng: MessageDescriptor
@@ -118,6 +119,13 @@ const messagesToDefine: ICertificateMessages = {
       'Please collect the payment, print the receipt and hand it over to the payee.',
     description: 'The label for collect payment paragraph',
     id: 'print.certificate.collectPayment'
+  },
+  correctorIDCheckDialogDescription: {
+    id: 'correction.corrector.description',
+    defaultMessage:
+      'Please be aware that if you proceed, you will be responsible for making a change to this record without the necessary proof of identification',
+    description:
+      'The description for the dialog when details of the corrector not verified'
   },
   dateOfBirth: {
     defaultMessage: 'Date of Birth',

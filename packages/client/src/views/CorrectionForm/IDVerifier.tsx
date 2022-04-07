@@ -209,7 +209,9 @@ class IDVerifierComponent extends React.Component<
             </PrimaryButton>
           ]}
         >
-          {intl.formatMessage(certificateMessages.idCheckDialogDescription)}
+          {intl.formatMessage(
+            certificateMessages.correctorIDCheckDialogDescription
+          )}
         </ResponsiveModal>
       </div>
     )
