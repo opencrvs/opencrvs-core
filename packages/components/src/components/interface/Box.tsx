@@ -18,9 +18,13 @@ export interface IBox extends React.HTMLAttributes<HTMLDivElement> {}
 
 const Wrapper = styled.div<IBox>`
   border-radius: 4px;
-  padding: 32px;
+  padding: 24px;
   border: 1px solid ${({ theme }) => theme.colors.grey300};
   background: ${({ theme }) => theme.colors.white};
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    height: 100%;
+    border: 0;
+  }
 `
 
 class Component extends React.Component<IBox & { theme: { grid: IGrid } }> {

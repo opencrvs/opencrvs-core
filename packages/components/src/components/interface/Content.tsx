@@ -17,21 +17,35 @@ import { FormTabs, IFormTabProps } from '../forms/FormTabs'
 import { Box } from './Box'
 
 const Container = styled(Box)<{ size: string }>`
-  z-index: 1;
   position: relative;
-  margin: 0 auto;
+  margin: 24px auto;
   max-width: ${({ size }) => (size === 'large' ? '1140px' : '778px')};
   height: 100%;
   box-sizing: border-box;
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin: 0;
+    border: 0;
+  }
 `
 const Header = styled.div`
+  position: relative;
   display: flex;
   align-items: center;
-  height: 72px;
+  flex-direction: column;
+  margin: 0 -24px;
+  margin-top: -24px;
+  padding: 0 24px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    border: 0;
+    padding: 0;
+  }
+`
+const BottomBorder = styled.div`
+  position: absolute;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
-  margin: 0 -32px;
-  margin-top: -32px;
-  padding: 0 32px;
+  bottom: 1px;
+  width: 100%;
 `
 const TopActionBar = styled.div`
   display: flex;
@@ -41,12 +55,12 @@ const TopActionBar = styled.div`
 export const SubHeader = styled.div`
   padding-top: 24px;
   color: ${({ theme }) => theme.colors.supportingCopy};
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
 `
 export const Body = styled.div`
   padding: 24px 0;
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 const Footer = styled.div`
   display: flex;
@@ -56,10 +70,19 @@ const Footer = styled.div`
 const TopTabBar = styled.div`
   display: flex;
   gap: 28px;
-  margin-right: auto;
+  width: 100%;
+  padding: 0;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: 24px 24px 0;
+  }
 `
 const TopBar = styled.div`
   display: flex;
+  width: 100%;
+  padding: 16px 0;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: none;
+  }
 `
 const BottomActionBar = styled.div`
   display: flex;
@@ -75,8 +98,12 @@ const TitleContainer = styled.div<{ titleColor?: keyof typeof colors }>`
 `
 
 const Title = styled.div`
-  ${({ theme }) => theme.fonts.h4Style}
+  ${({ theme }) => theme.fonts.h2}
   color: ${({ theme }) => theme.colors.copy};
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 700px;
 `
 const Icon = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
@@ -116,6 +143,7 @@ export class Content extends React.Component<IProps> {
     return (
       <Container size={size as string}>
         <Header>
+          <BottomBorder />
           <TopBar>
             <TitleContainer titleColor={titleColor}>
               {icon && <Icon id={`content-icon`}>{icon()}</Icon>}
