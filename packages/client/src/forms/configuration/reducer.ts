@@ -88,7 +88,7 @@ export const formDraftReducer: LoopReducer<
       if (isEmpty(offlineData)) {
         return loop(state, Cmd.action(actions.fetchDraft()))
       }
-      return state
+      return { ...state, formDraftData: offlineData }
     }
 
     case actions.FETCH_DRAFT:
