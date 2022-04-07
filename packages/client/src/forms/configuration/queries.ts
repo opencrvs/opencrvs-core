@@ -23,8 +23,16 @@ export const GET_FORM_DRAFT = gql`
       updatedAt
       questions {
         fieldId
-        label
-        placeholder
+        label {
+          id
+          description
+          defaultMessage
+        }
+        placeholder {
+          id
+          description
+          defaultMessage
+        }
         maxLength
         fieldName
         fieldType
