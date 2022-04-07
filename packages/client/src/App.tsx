@@ -66,6 +66,7 @@ import { UserList } from './views/SysAdmin/Team/user/UserList'
 import { ApplicationConfig } from './views/SysAdmin/Config/Application'
 import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
+import { FormConfigWizard } from './views/SysAdmin/Config/FormConfigWizard'
 import { FormConfiguration } from './views/SysAdmin/Config/Form/FormConfiguration'
 
 interface IAppProps {
@@ -224,6 +225,11 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.APPLICATION_CONFIG}
                                             component={ApplicationConfig}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.FORM_CONFIG_WIZARD}
+                                            component={FormConfigWizard}
                                           />
                                           <ProtectedRoute
                                             exact

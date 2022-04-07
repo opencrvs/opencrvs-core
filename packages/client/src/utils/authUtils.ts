@@ -102,3 +102,21 @@ export function refreshToken() {
       })
   }
 }
+
+const enum RouteScope {
+  DECLARE = 'declare',
+  REGISTER = 'register',
+  CERTIFY = 'certify',
+  PERFORMANCE = 'performance',
+  SYSADMIN = 'sysadmin',
+  VALIDATE = 'validate',
+  NATLSYSADMIN = 'natlsysadmin'
+}
+
+export const isNatlSysAdmin = (scope: Scope): boolean => {
+  if (scope.includes(RouteScope.NATLSYSADMIN)) {
+    return true
+  } else {
+    return false
+  }
+}

@@ -543,18 +543,18 @@ export const NavigationView = (props: IFullProps) => {
                         configTab.includes(activeMenuItem)) && (
                         <>
                           <NavigationSubItem
-                            label={TAB_LABEL.certificatesConfiguration}
+                            label={TAB_LABEL.applicationSettings}
                             id={`navigation_${TAB_ID.application}`}
-                            onClick={goToConfigAction}
+                            onClick={goToApplicationConfigAction}
                             isSelected={
                               enableMenuSelection &&
                               activeMenuItem === TAB_ID.application
                             }
                           />
                           <NavigationSubItem
-                            label={TAB_LABEL.applicationSettings}
+                            label={TAB_LABEL.certificatesConfiguration}
                             id={`navigation_${TAB_ID.certificates}`}
-                            onClick={goToApplicationConfigAction}
+                            onClick={goToConfigAction}
                             isSelected={
                               enableMenuSelection &&
                               activeMenuItem === TAB_ID.certificates
