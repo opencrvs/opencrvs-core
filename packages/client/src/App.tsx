@@ -66,7 +66,8 @@ import { UserList } from './views/SysAdmin/Team/user/UserList'
 import { ApplicationConfig } from './views/SysAdmin/Config/Application'
 import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
-import { Canvas } from './components/formConfig/Canvas'
+import { FormConfigWizard } from './views/SysAdmin/Config/FormConfigWizard'
+import { FormConfiguration } from './views/SysAdmin/Config/Form/FormConfiguration'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -205,12 +206,6 @@ export class App extends React.Component<IAppProps> {
                                             }
                                             component={ReviewForm}
                                           />
-                                          {/* This is a temporary path and will be removed after merging with #2740 */}
-                                          <ProtectedRoute
-                                            exact
-                                            path={'/canvas'}
-                                            component={Canvas}
-                                          />
                                           <ProtectedRoute
                                             exact
                                             path={routes.REGISTRAR_HOME}
@@ -230,6 +225,16 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.APPLICATION_CONFIG}
                                             component={ApplicationConfig}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.FORM_CONFIG_WIZARD}
+                                            component={FormConfigWizard}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.FORM_CONFIG}
+                                            component={FormConfiguration}
                                           />
                                           <ProtectedRoute
                                             path={

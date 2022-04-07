@@ -76,7 +76,7 @@ export function DefaultFieldTools() {
       <Title>Type of field</Title>
       <ListViewSimplified bottomBorder>
         <ListViewItemSimplified
-          label={<Label>{intl.formatMessage(messages.hideFields)}</Label>}
+          label={<Label>{intl.formatMessage(messages.hideField)}</Label>}
           actions={[<CenteredToggle key="hideField" />]}
         />
         <ListViewItemSimplified

@@ -19,25 +19,24 @@ export interface INavigationSubItemProps
   isSelected?: boolean
 }
 
-export const SubItemContainer = styled.button<{ isSelected?: boolean }>`
+export const SubItemContainer = styled.button`
   border: 0;
   background-color: ${({ theme }) => theme.colors.white};
   :hover {
     background-color: ${({ theme }) => theme.colors.grey200};
   }
   outline: none;
-
   cursor: pointer;
   width: 100%;
   height: 36px;
   text-align: left;
-  color: ${({ isSelected, theme }) =>
-    isSelected ? theme.colors.grey : theme.colors.greyLight};
-  ${({ theme }) => theme.fonts.reg14};
 `
 
-const LabelContainer = styled.div`
+export const LabelContainer = styled.div<{ isSelected?: boolean }>`
   padding: 7px 38px 9px 42px;
+  color: ${({ isSelected, theme }) =>
+    isSelected ? theme.colors.grey600 : theme.colors.grey500};
+  ${({ theme }) => theme.fonts.reg14}
 `
 
 export const NavigationSubItem = ({
@@ -46,8 +45,8 @@ export const NavigationSubItem = ({
   ...otherProps
 }: INavigationSubItemProps) => {
   return (
-    <SubItemContainer isSelected={isSelected} {...otherProps}>
-      <LabelContainer>{label}</LabelContainer>
+    <SubItemContainer {...otherProps}>
+      <LabelContainer isSelected={isSelected}>{label}</LabelContainer>
     </SubItemContainer>
   )
 }

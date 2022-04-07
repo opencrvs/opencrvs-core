@@ -53,7 +53,9 @@ import {
   APPLICATION_CONFIG,
   CERTIFICATE_CORRECTION,
   VERIFY_CORRECTOR,
-  DECLARATION_RECORD_AUDIT
+  DECLARATION_RECORD_AUDIT,
+  FORM_CONFIG_WIZARD,
+  FORM_CONFIG
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
 import { NATL_ADMIN_ROLES } from '@client/utils/constants'
@@ -114,6 +116,7 @@ type GoToFieldAgentHome = {
     tabId: string
   }
 }
+
 export const GO_TO_REVIEW_USER_DETAILS = 'navigation/GO_TO_REVIEW_USER_DETAILS'
 type GoToReviewUserDetails = {
   type: typeof GO_TO_REVIEW_USER_DETAILS
@@ -199,6 +202,10 @@ export function goToHome() {
 
 export function goToConfig() {
   return push(CERTIFICATE_CONFIG)
+}
+
+export function goToFormConfig() {
+  return push(FORM_CONFIG)
 }
 
 export function goToApplicationConfig() {
@@ -411,6 +418,15 @@ export function goToFieldAgentHomeTab(tabId: string) {
     type: GO_TO_FIELD_AGENT_HOME,
     payload: { tabId }
   }
+}
+
+export function goToFormConfigWizard(event: string, section: string) {
+  return push(
+    formatUrl(FORM_CONFIG_WIZARD, {
+      event: event,
+      section: section
+    })
+  )
 }
 
 export function goToSysAdminHomeTab(tabId: string) {
