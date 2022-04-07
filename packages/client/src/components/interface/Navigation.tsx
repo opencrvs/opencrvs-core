@@ -28,7 +28,7 @@ import { connect } from 'react-redux'
 import {
   goToFieldAgentHomeTab as goToFieldAgentHomeTabAction,
   goToRegistrarHomeTab,
-  goToConfig,
+  goToCertificateConfig,
   goToSettings,
   goToPerformanceView,
   goToTeamView,
@@ -45,34 +45,33 @@ import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigatio
 import { Configuration } from '@opencrvs/components/lib/icons/Configuration'
 import { Expandable } from '@opencrvs/components/lib/icons/Expandable'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { constantsMessages } from '@client/i18n/messages'
-import { Spinner } from '@opencrvs/components/lib/interface'
-import styled, { ITheme, withTheme } from '@client/styledComponents'
+import { buttonMessages } from '@client/i18n/messages'
+import { ITheme, withTheme } from '@client/styledComponents'
 import { Query } from '@client/components/Query'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
-
-const StyledSpinner = styled(Spinner)`
-  margin: 20% auto;
-`
+import { navigationMessages } from '@client/i18n/messages/views/navigation'
 
 const SCREEN_LOCK = 'screenLock'
 
-const TAB_ID = {
+type Keys = keyof typeof WORKQUEUE_TAB
+export type IWORKQUEUE_TAB = typeof WORKQUEUE_TAB[Keys]
+
+export const WORKQUEUE_TAB = {
   inProgress: 'progress',
-  sentForReview: 'review',
-  requireUpdates: 'updates',
-  readyForReview: 'review',
-  sentForUpdates: 'updates',
+  sentForReview: 'sentForReview',
+  requiresUpdate: 'requiresUpdate',
+  readyForReview: 'readyForReview',
+  sentForUpdates: 'sentForUpdates',
   sentForApproval: 'approvals',
   readyToPrint: 'print',
   externalValidation: 'waitingValidation',
-  application: 'application',
   performance: 'performance',
   team: 'team',
   config: 'config',
+  application: 'application',
   certificates: 'certificates',
   settings: 'settings',
   logout: 'logout'
@@ -89,47 +88,51 @@ interface IUSER_SCOPE {
 
 const USER_SCOPE: IUSER_SCOPE = {
   FIELD_AGENT: [
-    TAB_ID.inProgress,
-    TAB_ID.sentForReview,
-    TAB_ID.requireUpdates,
+    WORKQUEUE_TAB.inProgress,
+    WORKQUEUE_TAB.sentForReview,
+    WORKQUEUE_TAB.requiresUpdate,
     GROUP_ID.declarationGroup
   ],
   REGISTRATION_AGENT: [
-    TAB_ID.inProgress,
-    TAB_ID.readyForReview,
-    TAB_ID.sentForUpdates,
-    TAB_ID.sentForApproval,
-    TAB_ID.readyToPrint,
-    TAB_ID.performance,
-    TAB_ID.team,
+    WORKQUEUE_TAB.inProgress,
+    WORKQUEUE_TAB.readyForReview,
+    WORKQUEUE_TAB.sentForUpdates,
+    WORKQUEUE_TAB.sentForApproval,
+    WORKQUEUE_TAB.readyToPrint,
+    WORKQUEUE_TAB.performance,
+    WORKQUEUE_TAB.team,
     GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup
   ],
   DISTRICT_REGISTRAR: [
-    TAB_ID.inProgress,
-    TAB_ID.readyForReview,
-    TAB_ID.sentForUpdates,
-    TAB_ID.readyToPrint,
-    TAB_ID.performance,
-    TAB_ID.team,
+    WORKQUEUE_TAB.inProgress,
+    WORKQUEUE_TAB.readyForReview,
+    WORKQUEUE_TAB.sentForUpdates,
+    WORKQUEUE_TAB.readyToPrint,
+    WORKQUEUE_TAB.performance,
+    WORKQUEUE_TAB.team,
     GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup
   ],
   LOCAL_REGISTRAR: [
-    TAB_ID.inProgress,
-    TAB_ID.readyForReview,
-    TAB_ID.sentForUpdates,
-    TAB_ID.readyToPrint,
-    TAB_ID.performance,
-    TAB_ID.team,
+    WORKQUEUE_TAB.inProgress,
+    WORKQUEUE_TAB.readyForReview,
+    WORKQUEUE_TAB.sentForUpdates,
+    WORKQUEUE_TAB.readyToPrint,
+    WORKQUEUE_TAB.performance,
+    WORKQUEUE_TAB.team,
     GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup
   ],
-  LOCAL_SYSTEM_ADMIN: [TAB_ID.performance, TAB_ID.team, GROUP_ID.menuGroup],
+  LOCAL_SYSTEM_ADMIN: [
+    WORKQUEUE_TAB.performance,
+    WORKQUEUE_TAB.team,
+    GROUP_ID.menuGroup
+  ],
   NATIONAL_SYSTEM_ADMIN: [
-    TAB_ID.performance,
-    TAB_ID.team,
-    TAB_ID.config,
+    WORKQUEUE_TAB.performance,
+    WORKQUEUE_TAB.team,
+    WORKQUEUE_TAB.config,
     GROUP_ID.menuGroup
   ]
 }
@@ -163,7 +166,7 @@ interface IProps {
 interface IDispatchProps {
   goToFieldAgentHomeTab: typeof goToFieldAgentHomeTabAction
   goToRegistrarHomeTab: typeof goToRegistrarHomeTab
-  goToConfigAction: typeof goToConfig
+  goToCertificateConfigAction: typeof goToCertificateConfig
   goToApplicationConfigAction: typeof goToApplicationConfig
   redirectToAuthentication: typeof redirectToAuthentication
   goToPerformanceViewAction: typeof goToPerformanceView
@@ -186,27 +189,9 @@ type IFullProps = IProps &
   IDispatchProps &
   IntlShapeProps & { theme: ITheme } & RouteComponentProps<{ tabId: string }>
 
-const TAB_LABEL = {
-  inProgress: 'In Progress',
-  readyForReview: 'Ready for review',
-  sentForReview: 'Sent for review',
-  requiresUpdate: 'Requires Updates',
-  sentForUpdates: 'Sent for updates',
-  sentForApproval: 'Sent for approval',
-  externalValidation: 'Waiting for validation',
-  readyToPrint: 'Ready to print ',
-  application: 'Application',
-  performance: 'Performance',
-  team: 'Team',
-  configuration: 'Configuration',
-  certificatesConfiguration: 'Certificates',
-  applicationSettings: 'Application',
-  settings: 'Settings',
-  logout: 'Logout'
-}
-
 const getSettingsAndLogout = (props: IFullProps) => {
   const {
+    intl,
     menuCollapse,
     activeMenuItem,
     redirectToAuthentication,
@@ -216,18 +201,18 @@ const getSettingsAndLogout = (props: IFullProps) => {
     <>
       <NavigationItem
         icon={() => <SettingsNavigation />}
-        id={`navigation_${TAB_ID.settings}`}
-        label={TAB_LABEL.settings}
+        id={`navigation_${WORKQUEUE_TAB.settings}`}
+        label={intl.formatMessage(buttonMessages[WORKQUEUE_TAB.settings])}
         onClick={() => {
           goToSettings()
           menuCollapse && menuCollapse()
         }}
-        isSelected={activeMenuItem === TAB_ID.settings}
+        isSelected={activeMenuItem === WORKQUEUE_TAB.settings}
       />
       <NavigationItem
         icon={() => <LogoutNavigation />}
-        id={`navigation_${TAB_ID.logout}`}
-        label={TAB_LABEL.logout}
+        id={`navigation_${WORKQUEUE_TAB.logout}`}
+        label={intl.formatMessage(buttonMessages[WORKQUEUE_TAB.logout])}
         onClick={() => {
           storage.removeItem(SCREEN_LOCK)
           redirectToAuthentication()
@@ -245,7 +230,7 @@ export const NavigationView = (props: IFullProps) => {
     deselectAllTabs,
     enableMenuSelection = true,
     activeMenuItem,
-    goToConfigAction,
+    goToCertificateConfigAction,
     goToApplicationConfigAction,
     navigationWidth,
     workqueue,
@@ -263,7 +248,7 @@ export const NavigationView = (props: IFullProps) => {
     : activeMenuItem
     ? activeMenuItem
     : 'review'
-  const configTab = [TAB_ID.application, TAB_ID.certificates]
+  const configTab = [WORKQUEUE_TAB.application, WORKQUEUE_TAB.certificates]
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
   const { loading, error, data, initialSyncDone } = workqueue
   const filteredData = filterProcessingDeclarationsFromQuery(
@@ -306,23 +291,27 @@ export const NavigationView = (props: IFullProps) => {
           <NavigationGroup>
             <NavigationItem
               icon={() => <DeclarationIconSmall color={'purple'} />}
-              id={`navigation_${TAB_ID.inProgress}`}
-              label={TAB_LABEL.inProgress}
+              id={`navigation_${WORKQUEUE_TAB.inProgress}`}
+              label={intl.formatMessage(
+                navigationMessages[WORKQUEUE_TAB.inProgress]
+              )}
               count={props.draftDeclarations.length}
-              isSelected={tabId === TAB_ID.inProgress}
+              isSelected={tabId === WORKQUEUE_TAB.inProgress}
               onClick={() => {
-                props.goToFieldAgentHomeTab(TAB_ID.inProgress)
+                props.goToFieldAgentHomeTab(WORKQUEUE_TAB.inProgress)
                 menuCollapse && menuCollapse()
               }}
             />
             <NavigationItem
               icon={() => <DeclarationIconSmall color={'orange'} />}
-              id={`navigation_${TAB_ID.sentForReview}`}
-              label={TAB_LABEL.sentForReview}
+              id={`navigation_${WORKQUEUE_TAB.sentForReview}`}
+              label={intl.formatMessage(
+                navigationMessages[WORKQUEUE_TAB.sentForReview]
+              )}
               count={props.declarationsReadyToSend.length}
-              isSelected={tabId === TAB_ID.sentForReview}
+              isSelected={tabId === WORKQUEUE_TAB.sentForReview}
               onClick={() => {
-                props.goToFieldAgentHomeTab(TAB_ID.sentForReview)
+                props.goToFieldAgentHomeTab(WORKQUEUE_TAB.sentForReview)
                 menuCollapse && menuCollapse()
               }}
             />
@@ -347,12 +336,16 @@ export const NavigationView = (props: IFullProps) => {
                   return (
                     <NavigationItem
                       icon={() => <DeclarationIconSmall color={'red'} />}
-                      id={`navigation_${TAB_ID.requireUpdates}_loading`}
-                      label={TAB_LABEL.requiresUpdate}
+                      id={`navigation_${WORKQUEUE_TAB.requiresUpdate}_loading`}
+                      label={intl.formatMessage(
+                        navigationMessages[WORKQUEUE_TAB.requiresUpdate]
+                      )}
                       count={0}
-                      isSelected={tabId === TAB_ID.requireUpdates}
+                      isSelected={tabId === WORKQUEUE_TAB.requiresUpdate}
                       onClick={() => {
-                        props.goToFieldAgentHomeTab(TAB_ID.requireUpdates)
+                        props.goToFieldAgentHomeTab(
+                          WORKQUEUE_TAB.requiresUpdate
+                        )
                         menuCollapse && menuCollapse()
                       }}
                     />
@@ -362,12 +355,16 @@ export const NavigationView = (props: IFullProps) => {
                   <>
                     <NavigationItem
                       icon={() => <DeclarationIconSmall color={'red'} />}
-                      id={`navigation_${TAB_ID.requireUpdates}`}
-                      label={TAB_LABEL.requiresUpdate}
+                      id={`navigation_${WORKQUEUE_TAB.requiresUpdate}`}
+                      label={intl.formatMessage(
+                        navigationMessages[WORKQUEUE_TAB.requiresUpdate]
+                      )}
                       count={data.searchEvents.totalItems}
-                      isSelected={tabId === TAB_ID.requireUpdates}
+                      isSelected={tabId === WORKQUEUE_TAB.requiresUpdate}
                       onClick={() => {
-                        props.goToFieldAgentHomeTab(TAB_ID.requireUpdates)
+                        props.goToFieldAgentHomeTab(
+                          WORKQUEUE_TAB.requiresUpdate
+                        )
                         menuCollapse && menuCollapse()
                       }}
                     />
@@ -388,63 +385,75 @@ export const NavigationView = (props: IFullProps) => {
             ) && (
               <NavigationGroup>
                 {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(TAB_ID.inProgress) && (
+                  USER_SCOPE[userDetails.role].includes(
+                    WORKQUEUE_TAB.inProgress
+                  ) && (
                     <NavigationItem
                       icon={() => <DeclarationIconSmall color={'purple'} />}
-                      id={`navigation_${TAB_ID.inProgress}`}
-                      label={TAB_LABEL.inProgress}
+                      id={`navigation_${WORKQUEUE_TAB.inProgress}`}
+                      label={intl.formatMessage(
+                        navigationMessages[WORKQUEUE_TAB.inProgress]
+                      )}
                       count={declarationCount.inProgress}
-                      isSelected={tabId === TAB_ID.inProgress}
+                      isSelected={tabId === WORKQUEUE_TAB.inProgress}
                       onClick={() => {
-                        props.goToRegistrarHomeTab(TAB_ID.inProgress)
+                        props.goToRegistrarHomeTab(WORKQUEUE_TAB.inProgress)
                         menuCollapse && menuCollapse()
                       }}
                     />
                   )}
                 {userDetails?.role &&
                   USER_SCOPE[userDetails.role].includes(
-                    TAB_ID.readyForReview
+                    WORKQUEUE_TAB.readyForReview
                   ) && (
                     <NavigationItem
                       icon={() => <DeclarationIconSmall color={'orange'} />}
-                      id={`navigation_${TAB_ID.readyForReview}`}
-                      label={TAB_LABEL.readyForReview}
+                      id={`navigation_${WORKQUEUE_TAB.readyForReview}`}
+                      label={intl.formatMessage(
+                        navigationMessages[WORKQUEUE_TAB.readyForReview]
+                      )}
                       count={declarationCount.readyForReview}
-                      isSelected={tabId === TAB_ID.readyForReview}
+                      isSelected={tabId === WORKQUEUE_TAB.readyForReview}
                       onClick={() => {
-                        props.goToRegistrarHomeTab(TAB_ID.readyForReview)
+                        props.goToRegistrarHomeTab(WORKQUEUE_TAB.readyForReview)
                         menuCollapse && menuCollapse()
                       }}
                     />
                   )}
                 {userDetails?.role &&
                   USER_SCOPE[userDetails.role].includes(
-                    TAB_ID.sentForUpdates
+                    WORKQUEUE_TAB.sentForUpdates
                   ) && (
                     <NavigationItem
                       icon={() => <DeclarationIconSmall color={'red'} />}
-                      id={`navigation_${TAB_ID.sentForUpdates}`}
-                      label={TAB_LABEL.sentForUpdates}
+                      id={`navigation_${WORKQUEUE_TAB.sentForUpdates}`}
+                      label={intl.formatMessage(
+                        navigationMessages[WORKQUEUE_TAB.sentForUpdates]
+                      )}
                       count={declarationCount.sentForUpdates}
-                      isSelected={tabId === TAB_ID.sentForUpdates}
+                      isSelected={tabId === WORKQUEUE_TAB.sentForUpdates}
                       onClick={() => {
-                        props.goToRegistrarHomeTab(TAB_ID.sentForUpdates)
+                        props.goToRegistrarHomeTab(WORKQUEUE_TAB.sentForUpdates)
                         menuCollapse && menuCollapse()
                       }}
                     />
                   )}
                 {userDetails?.role &&
                   USER_SCOPE[userDetails.role].includes(
-                    TAB_ID.sentForApproval
+                    WORKQUEUE_TAB.sentForApproval
                   ) && (
                     <NavigationItem
                       icon={() => <DeclarationIconSmall color={'grey'} />}
-                      id={`navigation_${TAB_ID.sentForApproval}`}
-                      label={TAB_LABEL.sentForApproval}
+                      id={`navigation_${WORKQUEUE_TAB.sentForApproval}`}
+                      label={intl.formatMessage(
+                        navigationMessages[WORKQUEUE_TAB.sentForApproval]
+                      )}
                       count={declarationCount.sentForApproval}
-                      isSelected={tabId === TAB_ID.sentForApproval}
+                      isSelected={tabId === WORKQUEUE_TAB.sentForApproval}
                       onClick={() => {
-                        props.goToRegistrarHomeTab(TAB_ID.sentForApproval)
+                        props.goToRegistrarHomeTab(
+                          WORKQUEUE_TAB.sentForApproval
+                        )
                         menuCollapse && menuCollapse()
                       }}
                     />
@@ -452,28 +461,34 @@ export const NavigationView = (props: IFullProps) => {
                 {window.config.EXTERNAL_VALIDATION_WORKQUEUE && (
                   <NavigationItem
                     icon={() => <DeclarationIconSmall color={'teal'} />}
-                    id={`navigation_${TAB_ID.externalValidation}`}
-                    label={TAB_LABEL.externalValidation}
+                    id={`navigation_${WORKQUEUE_TAB.externalValidation}`}
+                    label={intl.formatMessage(
+                      navigationMessages[WORKQUEUE_TAB.externalValidation]
+                    )}
                     count={declarationCount.externalValidation}
-                    isSelected={tabId === TAB_ID.externalValidation}
+                    isSelected={tabId === WORKQUEUE_TAB.externalValidation}
                     onClick={() => {
-                      props.goToRegistrarHomeTab(TAB_ID.externalValidation)
+                      props.goToRegistrarHomeTab(
+                        WORKQUEUE_TAB.externalValidation
+                      )
                       menuCollapse && menuCollapse()
                     }}
                   />
                 )}
                 {userDetails?.role &&
                   USER_SCOPE[userDetails.role].includes(
-                    TAB_ID.readyToPrint
+                    WORKQUEUE_TAB.readyToPrint
                   ) && (
                     <NavigationItem
                       icon={() => <DeclarationIconSmall color={'green'} />}
-                      id={`navigation_${TAB_ID.readyToPrint}`}
-                      label={TAB_LABEL.readyToPrint}
+                      id={`navigation_${WORKQUEUE_TAB.readyToPrint}`}
+                      label={intl.formatMessage(
+                        navigationMessages[WORKQUEUE_TAB.readyToPrint]
+                      )}
                       count={declarationCount.readyToPrint}
-                      isSelected={tabId === TAB_ID.readyToPrint}
+                      isSelected={tabId === WORKQUEUE_TAB.readyToPrint}
                       onClick={() => {
-                        props.goToRegistrarHomeTab(TAB_ID.readyToPrint)
+                        props.goToRegistrarHomeTab(WORKQUEUE_TAB.readyToPrint)
                         menuCollapse && menuCollapse()
                       }}
                     />
@@ -484,39 +499,50 @@ export const NavigationView = (props: IFullProps) => {
             USER_SCOPE[userDetails.role].includes(GROUP_ID.menuGroup) && (
               <NavigationGroup>
                 {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(TAB_ID.performance) && (
+                  USER_SCOPE[userDetails.role].includes(
+                    WORKQUEUE_TAB.performance
+                  ) && (
                     <NavigationItem
                       icon={() => <Activity />}
-                      id={`navigation_${TAB_ID.performance}`}
-                      label={TAB_LABEL.performance}
+                      id={`navigation_${WORKQUEUE_TAB.performance}`}
+                      label={intl.formatMessage(
+                        navigationMessages[WORKQUEUE_TAB.performance]
+                      )}
                       onClick={() =>
                         props.goToPerformanceViewAction(userDetails)
                       }
                       isSelected={
                         enableMenuSelection &&
-                        activeMenuItem === TAB_ID.performance
+                        activeMenuItem === WORKQUEUE_TAB.performance
                       }
                     />
                   )}
                 {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(TAB_ID.team) && (
+                  USER_SCOPE[userDetails.role].includes(WORKQUEUE_TAB.team) && (
                     <NavigationItem
                       icon={() => <Users />}
-                      id={`navigation_${TAB_ID.team}`}
-                      label={TAB_LABEL.team}
+                      id={`navigation_${WORKQUEUE_TAB.team}`}
+                      label={intl.formatMessage(
+                        navigationMessages[WORKQUEUE_TAB.team]
+                      )}
                       onClick={() => props.goToTeamViewAction(userDetails)}
                       isSelected={
-                        enableMenuSelection && activeMenuItem === TAB_ID.team
+                        enableMenuSelection &&
+                        activeMenuItem === WORKQUEUE_TAB.team
                       }
                     />
                   )}
                 {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(TAB_ID.config) && (
+                  USER_SCOPE[userDetails.role].includes(
+                    WORKQUEUE_TAB.config
+                  ) && (
                     <>
                       <NavigationItem
                         icon={() => <Configuration />}
-                        id={`navigation_${TAB_ID.config}_main`}
-                        label={TAB_LABEL.configuration}
+                        id={`navigation_${WORKQUEUE_TAB.config}_main`}
+                        label={intl.formatMessage(
+                          navigationMessages[WORKQUEUE_TAB.config]
+                        )}
                         onClick={() => setIsConfigExpanded(!isConfigExpanded)}
                         isSelected={
                           enableMenuSelection &&
@@ -535,21 +561,25 @@ export const NavigationView = (props: IFullProps) => {
                         configTab.includes(activeMenuItem)) && (
                         <>
                           <NavigationSubItem
-                            label={TAB_LABEL.certificatesConfiguration}
-                            id={`navigation_${TAB_ID.application}`}
-                            onClick={goToConfigAction}
-                            isSelected={
-                              enableMenuSelection &&
-                              activeMenuItem === TAB_ID.application
-                            }
-                          />
-                          <NavigationSubItem
-                            label={TAB_LABEL.applicationSettings}
-                            id={`navigation_${TAB_ID.certificates}`}
+                            label={intl.formatMessage(
+                              navigationMessages[WORKQUEUE_TAB.application]
+                            )}
+                            id={`navigation_${WORKQUEUE_TAB.application}`}
                             onClick={goToApplicationConfigAction}
                             isSelected={
                               enableMenuSelection &&
-                              activeMenuItem === TAB_ID.certificates
+                              activeMenuItem === WORKQUEUE_TAB.application
+                            }
+                          />
+                          <NavigationSubItem
+                            label={intl.formatMessage(
+                              navigationMessages[WORKQUEUE_TAB.certificates]
+                            )}
+                            id={`navigation_${WORKQUEUE_TAB.certificates}`}
+                            onClick={goToCertificateConfigAction}
+                            isSelected={
+                              enableMenuSelection &&
+                              activeMenuItem === WORKQUEUE_TAB.certificates
                             }
                           />
                         </>
@@ -588,15 +618,15 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
     storedDeclarations: state.declarationsState.declarations,
     userDetails: getUserDetails(state),
     activeMenuItem: window.location.href.includes('performance')
-      ? TAB_ID.performance
+      ? WORKQUEUE_TAB.performance
       : window.location.href.includes('team')
-      ? TAB_ID.team
+      ? WORKQUEUE_TAB.team
       : window.location.href.includes('application')
-      ? TAB_ID.application
+      ? WORKQUEUE_TAB.application
       : window.location.href.includes('settings')
-      ? TAB_ID.settings
+      ? WORKQUEUE_TAB.settings
       : window.location.href.includes('certificate')
-      ? TAB_ID.certificates
+      ? WORKQUEUE_TAB.certificates
       : ''
   }
 }
@@ -609,7 +639,7 @@ export const Navigation = connect<
 >(mapStateToProps, {
   goToFieldAgentHomeTab: goToFieldAgentHomeTabAction,
   goToRegistrarHomeTab,
-  goToConfigAction: goToConfig,
+  goToCertificateConfigAction: goToCertificateConfig,
   goToApplicationConfigAction: goToApplicationConfig,
   goToPerformanceViewAction: goToPerformanceView,
   goToTeamViewAction: goToTeamView,

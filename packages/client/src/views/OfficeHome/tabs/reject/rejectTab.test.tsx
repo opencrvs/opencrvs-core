@@ -710,7 +710,7 @@ describe('OfficeHome sent for update tab related tests', () => {
         <OfficeHome
           match={{
             params: {
-              tabId: 'updates'
+              tabId: 'sentForUpdates'
             },
             isExact: true,
             path: '',

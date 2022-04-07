@@ -54,7 +54,10 @@ import { PrintTab } from './tabs/print/printTab'
 import { RejectTab } from './tabs/reject/rejectTab'
 import { ReviewTab } from './tabs/review/reviewTab'
 import { ExternalValidationTab } from './tabs/externalValidation/externalValidationTab'
-import { Navigation } from '@client/components/interface/Navigation'
+import {
+  Navigation,
+  WORKQUEUE_TAB
+} from '@client/components/interface/Navigation'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -131,15 +134,6 @@ interface IOfficeHomeState {
 type IOfficeHomeProps = IntlShapeProps &
   IDispatchProps &
   IBaseOfficeHomeStateProps
-
-const TAB_ID = {
-  inProgress: 'progress',
-  readyForReview: 'review',
-  sentForUpdates: 'updates',
-  sentForApproval: 'approvals',
-  readyForPrint: 'print',
-  externalValidation: 'waitingValidation'
-}
 
 export const EVENT_STATUS = {
   IN_PROGRESS: 'IN_PROGRESS',
@@ -233,32 +227,32 @@ export class OfficeHomeView extends React.Component<
 
   onPageChange = (newPageNumber: number) => {
     switch (this.props.tabId) {
-      case TAB_ID.inProgress:
+      case WORKQUEUE_TAB.inProgress:
         this.setState({ progressCurrentPage: newPageNumber }, () => {
           this.syncWorkqueue()
         })
         break
-      case TAB_ID.readyForReview:
+      case WORKQUEUE_TAB.readyForReview:
         this.setState({ reviewCurrentPage: newPageNumber }, () => {
           this.syncWorkqueue()
         })
         break
-      case TAB_ID.sentForUpdates:
+      case WORKQUEUE_TAB.sentForUpdates:
         this.setState({ updatesCurrentPage: newPageNumber }, () => {
           this.syncWorkqueue()
         })
         break
-      case TAB_ID.sentForApproval:
+      case WORKQUEUE_TAB.sentForApproval:
         this.setState({ approvalCurrentPage: newPageNumber }, () => {
           this.syncWorkqueue()
         })
         break
-      case TAB_ID.readyForPrint:
+      case WORKQUEUE_TAB.readyToPrint:
         this.setState({ printCurrentPage: newPageNumber }, () => {
           this.syncWorkqueue()
         })
         break
-      case TAB_ID.externalValidation:
+      case WORKQUEUE_TAB.externalValidation:
         this.setState(
           { externalValidationCurrentPage: newPageNumber },
           this.syncWorkqueue
@@ -295,7 +289,7 @@ export class OfficeHomeView extends React.Component<
       <>
         <Navigation />
         <BodyContainer>
-          {tabId === TAB_ID.inProgress && (
+          {tabId === WORKQUEUE_TAB.inProgress && (
             <InProgressTab
               drafts={drafts}
               selectorId={selectorId}
@@ -311,7 +305,7 @@ export class OfficeHomeView extends React.Component<
               error={error}
             />
           )}
-          {tabId === TAB_ID.readyForReview && (
+          {tabId === WORKQUEUE_TAB.readyForReview && (
             <ReviewTab
               registrarLocationId={registrarLocationId}
               queryData={{
@@ -324,7 +318,7 @@ export class OfficeHomeView extends React.Component<
               error={error}
             />
           )}
-          {tabId === TAB_ID.sentForUpdates && (
+          {tabId === WORKQUEUE_TAB.sentForUpdates && (
             <RejectTab
               registrarLocationId={registrarLocationId}
               queryData={{
@@ -338,7 +332,7 @@ export class OfficeHomeView extends React.Component<
             />
           )}
 
-          {tabId === TAB_ID.externalValidation &&
+          {tabId === WORKQUEUE_TAB.externalValidation &&
             window.config.EXTERNAL_VALIDATION_WORKQUEUE && (
               <ExternalValidationTab
                 registrarLocationId={registrarLocationId}
@@ -352,7 +346,7 @@ export class OfficeHomeView extends React.Component<
                 error={error}
               />
             )}
-          {tabId === TAB_ID.sentForApproval && (
+          {tabId === WORKQUEUE_TAB.sentForApproval && (
             <ApprovalTab
               registrarLocationId={registrarLocationId}
               queryData={{
@@ -365,7 +359,7 @@ export class OfficeHomeView extends React.Component<
               error={error}
             />
           )}
-          {tabId === TAB_ID.readyForPrint && (
+          {tabId === WORKQUEUE_TAB.readyToPrint && (
             <PrintTab
               registrarLocationId={registrarLocationId}
               queryData={{

@@ -109,7 +109,10 @@ describe('FieldAgentHome tests', () => {
 
     testComponent.update()
     const app = testComponent
-    const element = await waitForElement(app, '#navigation_updates_loading')
+    const element = await waitForElement(
+      app,
+      '#navigation_requiresUpdate_loading'
+    )
 
     expect(element.hostNodes()).toHaveLength(1)
   })
@@ -133,8 +136,8 @@ describe('FieldAgentHome tests', () => {
     const app = testComponent
     await waitForElement(app, '#navigation_progress')
     expect(app.find('#navigation_progress').hostNodes()).toHaveLength(1)
-    expect(app.find('#navigation_review').hostNodes()).toHaveLength(1)
-    expect(app.find('#navigation_updates').hostNodes()).toHaveLength(1)
+    expect(app.find('#navigation_sentForReview').hostNodes()).toHaveLength(1)
+    expect(app.find('#navigation_requiresUpdate').hostNodes()).toHaveLength(1)
   })
 
   it('when user clicks the floating action button', async () => {
@@ -274,7 +277,7 @@ describe('FieldAgentHome tests', () => {
       <FieldAgentHome
         match={{
           params: {
-            tabId: 'updates'
+            tabId: 'requiresUpdate'
           },
           isExact: true,
           path: '',
@@ -409,7 +412,7 @@ describe('FieldAgentHome tests', () => {
       <FieldAgentHome
         match={{
           params: {
-            tabId: 'updates'
+            tabId: 'requiresUpdate'
           },
           isExact: true,
           path: '',
@@ -458,11 +461,14 @@ describe('FieldAgentHome tests', () => {
     })
 
     testComponent.update()
-    testComponent.find('#navigation_review').hostNodes().simulate('click')
+    testComponent
+      .find('#navigation_sentForReview')
+      .hostNodes()
+      .simulate('click')
     await flushPromises()
 
     testComponent.update()
-    expect(window.location.href).toContain('field-agent-home/review')
+    expect(window.location.href).toContain('field-agent-home/sentForReview')
   })
 
   it('when user clicks the sent for updates tab', async () => {
@@ -487,11 +493,14 @@ describe('FieldAgentHome tests', () => {
     })
 
     testComponent.update()
-    testComponent.find('#navigation_updates').hostNodes().simulate('click')
+    testComponent
+      .find('#navigation_requiresUpdate')
+      .hostNodes()
+      .simulate('click')
     await flushPromises()
 
     testComponent.update()
-    expect(window.location.href).toContain('field-agent-home/updates')
+    expect(window.location.href).toContain('field-agent-home/requiresUpdate')
   })
 
   it('when user clicks the sent for inprogress tab', async () => {
@@ -500,7 +509,7 @@ describe('FieldAgentHome tests', () => {
       <FieldAgentHome
         match={{
           params: {
-            tabId: 'review'
+            tabId: 'sentForReview'
           },
           isExact: true,
           path: '',
@@ -532,7 +541,7 @@ describe('FieldAgentHome tests', () => {
         <FieldAgentHome
           match={{
             params: {
-              tabId: 'review'
+              tabId: 'sentForReview'
             },
             isExact: true,
             path: '',
