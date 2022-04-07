@@ -9,5 +9,19 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export * from '@client/components/form/FormFieldGenerator'
-export * from '@client/components/form/FormList'
+import { IStoreState } from '@client/store'
+import { IDraft, IFormDraftData, IFormDraftDataState } from './reducer'
+
+export const getFormDraftDataState = (
+  store: IStoreState
+): IFormDraftDataState => store.formDraft
+
+function getKey<K extends keyof IFormDraftDataState>(
+  store: IStoreState,
+  key: K
+) {
+  return getFormDraftDataState(store)[key]
+}
+
+export const getFormDraftData = (store: IStoreState): any =>
+  getKey(store, 'formDraftData')
