@@ -31,8 +31,14 @@ async function extractMessages() {
   const COUNTRY_CONFIG_PATH = process.argv[2]
   const COUNTRY_CODE = process.argv[3]
 
-  let client: { data: any[] }
-  let contentfulIds: any
+  let client: {
+    data: Array<{
+      lang: string
+      displayName: string
+      messages: Record<string, string>
+    }>
+  }
+  let contentfulIds: Record<string, string>
   try {
     client = JSON.parse(
       fs
