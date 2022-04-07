@@ -13,6 +13,7 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface ICustomFieldFormMessages
   extends Record<string | number | symbol, MessageDescriptor> {
+  handleBardHeading: MessageDescriptor
   customFieldFormHeading: MessageDescriptor
   hideFieldLabel: MessageDescriptor
   requiredFieldLabel: MessageDescriptor
@@ -25,6 +26,11 @@ interface ICustomFieldFormMessages
 }
 
 const messagesToDefine: ICustomFieldFormMessages = {
+  handleBardHeading: {
+    id: 'custom.field.form.heading',
+    defaultMessage: 'Certificate handlebars',
+    description: 'Heading of Custom FieldForm'
+  },
   customFieldFormHeading: {
     id: 'custom.field.form.heading',
     defaultMessage: 'Custom text input',

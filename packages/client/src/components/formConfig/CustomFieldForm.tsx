@@ -10,8 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { buttonMessages } from '@client/i18n/messages'
-import { getAvailableLanguages, getDefaultLanguage } from '@client/i18n/utils'
 import { customFieldFormMessages } from '@client/i18n/messages/views/customFieldForm'
+import { ILanguageState, initLanguages } from '@client/i18n/reducer'
+import { getDefaultLanguage } from '@client/i18n/utils'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -19,17 +20,10 @@ import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
 import { Select, TextArea, TextInput } from '@opencrvs/components/lib/forms'
 import { InputField } from '@opencrvs/components/lib/forms/InputField/InputField'
 import { Box } from '@opencrvs/components/lib/interface'
-import * as React from 'react'
-import {
-  injectIntl,
-  IntlShape,
-  MessageDescriptor,
-  WrappedComponentProps as IntlShapeProps
-} from 'react-intl'
-import { connect } from 'react-redux'
 import { camelCase } from 'lodash'
-import { ILanguageState, initLanguages } from '@client/i18n/reducer'
-import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
+import * as React from 'react'
+import { injectIntl, IntlShape } from 'react-intl'
+import { connect } from 'react-redux'
 
 const CustomFieldFormContainer = styled(Box)`
   box-shadow: none;
@@ -100,6 +94,8 @@ interface ICustomFieldForms {
   selectedLanguage: string
   label: string
   handleBars: string
+  hideField: boolean
+  requiredField: boolean
 }
 
 const DEFAULTS = {
@@ -115,17 +111,22 @@ class CustomFieldFormsComp extends React.Component<
     this.state = {
       label: DEFAULTS.LABEL,
       handleBars: camelCase(DEFAULTS.LABEL),
-      selectedLanguage: getDefaultLanguage()
+      selectedLanguage: getDefaultLanguage(),
+      hideField: false,
+      requiredField: false
+    }
+  }
+
+  _getLanguages(): ILanguageState {
+    // return initLanguages()
+    return {
+      en: { displayName: 'English', lang: 'en', messages: {} },
+      fr: { displayName: 'French', lang: 'fr', messages: {} }
     }
   }
 
   getLanguageDropDown() {
-    const defaultLanguage = getDefaultLanguage()
-    // const initializeLanguages = initLanguages()
-    const initializeLanguages: ILanguageState = {
-      en: { displayName: 'English', lang: 'en', messages: {} },
-      fr: { displayName: 'French', lang: 'fr', messages: {} }
-    }
+    const initializeLanguages = this._getLanguages()
     const languageOptions = []
     for (const index in initializeLanguages) {
       languageOptions.push({
@@ -162,7 +163,12 @@ class CustomFieldFormsComp extends React.Component<
           </ListColumn>
           <ListColumn>
             <RightAlignment>
-              <Toggle selected={false} onChange={() => alert('Changed')} />
+              <Toggle
+                selected={this.state.hideField}
+                onChange={() =>
+                  this.setState({ hideField: !this.state.hideField })
+                }
+              />
             </RightAlignment>
           </ListColumn>
         </ListRow>
@@ -172,7 +178,12 @@ class CustomFieldFormsComp extends React.Component<
           </ListColumn>
           <ListColumn>
             <RightAlignment>
-              <Toggle selected={false} onChange={() => alert('Changed')} />
+              <Toggle
+                selected={this.state.requiredField}
+                onChange={() =>
+                  this.setState({ requiredField: !this.state.requiredField })
+                }
+              />
             </RightAlignment>
           </ListColumn>
         </ListRow>
@@ -182,81 +193,128 @@ class CustomFieldFormsComp extends React.Component<
 
   inputFields() {
     const { intl } = this.props
+    const languages = this._getLanguages()
+
     return (
       <>
-        <FieldContainer>
-          <InputField
-            id="custom-form-label"
-            label={intl.formatMessage(customFieldFormMessages.label)}
-            touched={false}
-          >
-            <TextInput
-              onChange={(event: any) => {
-                const { value } = event.target
-                this.setState({
-                  handleBars: camelCase(value || DEFAULTS.LABEL)
-                })
-                return event
-              }}
-            />
-          </InputField>
-        </FieldContainer>
+        {Object.keys(languages).map((language) => {
+          return (
+            <>
+              <FieldContainer
+                style={{
+                  display:
+                    language == this.state.selectedLanguage ? 'block' : 'none'
+                }}
+              >
+                <InputField
+                  id={`custom-form-label-${language}`}
+                  label={intl.formatMessage(customFieldFormMessages.label)}
+                  touched={false}
+                >
+                  <TextInput
+                    onChange={(event: any) => {
+                      const { value } = event.target
+                      this.setState({
+                        handleBars: camelCase(value || DEFAULTS.LABEL)
+                      })
+                      return event
+                    }}
+                  />
+                </InputField>
+              </FieldContainer>
 
-        <FieldContainer>
-          <InputField
-            required={false}
-            id="custom-form-placeholder"
-            label={intl.formatMessage(customFieldFormMessages.placeholderLabel)}
-            touched={false}
-          >
-            <TextInput />
-          </InputField>
-        </FieldContainer>
+              <FieldContainer
+                style={{
+                  display:
+                    language == this.state.selectedLanguage ? 'block' : 'none'
+                }}
+              >
+                <InputField
+                  required={false}
+                  id={`custom-form-placeholder-${language}`}
+                  label={intl.formatMessage(
+                    customFieldFormMessages.placeholderLabel
+                  )}
+                  touched={false}
+                >
+                  <TextInput />
+                </InputField>
+              </FieldContainer>
 
-        <FieldContainer>
-          <InputField
-            required={false}
-            id="custom-form-description"
-            label={intl.formatMessage(customFieldFormMessages.descriptionLabel)}
-            touched={false}
-          >
-            <TextArea />
-          </InputField>
-        </FieldContainer>
+              <FieldContainer
+                style={{
+                  display:
+                    language == this.state.selectedLanguage ? 'block' : 'none'
+                }}
+              >
+                <InputField
+                  required={false}
+                  id={`custom-form-description-${language}`}
+                  label={intl.formatMessage(
+                    customFieldFormMessages.descriptionLabel
+                  )}
+                  touched={false}
+                >
+                  <TextArea />
+                </InputField>
+              </FieldContainer>
 
-        <FieldContainer>
-          <InputField
-            required={false}
-            id="custom-form-tooltip"
-            label={intl.formatMessage(customFieldFormMessages.descriptionLabel)}
-            touched={false}
-          >
-            <TextInput />
-          </InputField>
-        </FieldContainer>
+              <FieldContainer
+                style={{
+                  display:
+                    language == this.state.selectedLanguage ? 'block' : 'none'
+                }}
+              >
+                <InputField
+                  required={false}
+                  id={`custom-form-tooltip-${language}`}
+                  label={intl.formatMessage(
+                    customFieldFormMessages.descriptionLabel
+                  )}
+                  touched={false}
+                >
+                  <TextInput />
+                </InputField>
+              </FieldContainer>
 
-        <FieldContainer>
-          <InputField
-            required={false}
-            id="custom-form-error-message"
-            label={intl.formatMessage(customFieldFormMessages.errorMessage)}
-            touched={false}
-          >
-            <TextArea />
-          </InputField>
-        </FieldContainer>
+              <FieldContainer
+                style={{
+                  display:
+                    language == this.state.selectedLanguage ? 'block' : 'none'
+                }}
+              >
+                <InputField
+                  required={false}
+                  id={`custom-form-error-message-${language}`}
+                  label={intl.formatMessage(
+                    customFieldFormMessages.errorMessage
+                  )}
+                  touched={false}
+                >
+                  <TextArea />
+                </InputField>
+              </FieldContainer>
 
-        <FieldContainer>
-          <InputField
-            required={false}
-            id="custom-form-max-length"
-            label={intl.formatMessage(customFieldFormMessages.maxLengthLabel)}
-            touched={false}
-          >
-            <TextInput />
-          </InputField>
-        </FieldContainer>
-
+              <FieldContainer
+                style={{
+                  display:
+                    language == this.state.selectedLanguage ? 'block' : 'none'
+                }}
+              >
+                <InputField
+                  required={false}
+                  id={`custom-form-max-length-${language}`}
+                  label={intl.formatMessage(
+                    customFieldFormMessages.maxLengthLabel
+                  )}
+                  touched={false}
+                >
+                  <TextInput />
+                </InputField>
+              </FieldContainer>
+            </>
+          )
+        })}
         <ListContainer>
           <ListRow>
             <ListColumn>
@@ -271,9 +329,10 @@ class CustomFieldFormsComp extends React.Component<
   }
 
   certificate() {
+    const { intl } = this.props
     return (
       <>
-        <H4>Certificate handlebars</H4>
+        <H4>{intl.formatMessage(customFieldFormMessages.handleBardHeading)}</H4>
         <GreyText>{`{{ ${this.state.handleBars} }}`}</GreyText>
       </>
     )
