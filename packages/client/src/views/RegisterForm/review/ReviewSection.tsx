@@ -20,7 +20,6 @@ import {
   TextArea
 } from '@opencrvs/components/lib/forms'
 import {
-  DataSection,
   DocumentViewer,
   IDocumentViewerOptions,
   ListView,
@@ -110,7 +109,7 @@ import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
 import { isMobileDevice } from '@client/utils/commonUtils'
-import { BIRTH, REJECTED } from '@client/utils/constants'
+import { REJECTED } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { flatten, isArray, flattenDeep, get, clone } from 'lodash'
@@ -1513,7 +1512,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   />
                 )
               })}
-              {event === BIRTH && !isCorrection(declaration) && (
+              {event === Event.BIRTH && !isCorrection(declaration) && (
                 <InputWrapper>
                   <InputField
                     id="additional_comments"
