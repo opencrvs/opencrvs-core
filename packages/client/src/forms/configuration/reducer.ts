@@ -40,8 +40,8 @@ export interface IDraft {
 }
 
 export interface IFormDraftData {
-  birth: IDraft
-  death: IDraft
+  birth: IDraft | null
+  death: IDraft | null
 }
 
 export type IFormDraftDataState = {
@@ -103,27 +103,30 @@ export const formDraftReducer: LoopReducer<
     case actions.STORE_DRAFT:
       const { queryData: formDraftQueryData } = action.payload
 
-      const birthFormDraft = find(formDraftQueryData.data.getFormDraft, {
-        event: 'birth'
-      })
+      if (Boolean(formDraftQueryData.data.getFormDraft)) {
+        const birthFormDraft = find(formDraftQueryData.data.getFormDraft, {
+          event: Event.BIRTH
+        })
 
-      const deathFormDraft = find(formDraftQueryData.data.getFormDraft, {
-        event: 'death'
-      })
+        const deathFormDraft = find(formDraftQueryData.data.getFormDraft, {
+          event: Event.DEATH
+        })
 
-      const formDraftData = {
-        birth: birthFormDraft,
-        death: deathFormDraft
-      } as IFormDraftData
+        const formDraftData = {
+          birth: birthFormDraft ? birthFormDraft : null,
+          death: deathFormDraft ? deathFormDraft : null
+        } as IFormDraftData
 
-      return loop(
-        {
-          ...state,
-          formDraftData: formDraftData,
-          formDraftDataLoaded: true
-        },
-        Cmd.run(saveFormDraftData, { args: [state.formDraftData] })
-      )
+        return loop(
+          {
+            ...state,
+            formDraftData: formDraftData,
+            formDraftDataLoaded: true
+          },
+          Cmd.run(saveFormDraftData, { args: [state.formDraftData] })
+        )
+      }
+      return state
     case actions.FAILED_DRAFT:
       return {
         ...state,
