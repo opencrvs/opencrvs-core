@@ -21,22 +21,22 @@ interface IFormConfigMessages
 
 const messagesToDefine: IFormConfigMessages = {
   contentKey: {
-    id: 'formConfig.formTools.contentKey',
+    id: 'config.formConfig.formTools.contentKey',
     defaultMessage: 'Content Key',
     description: 'Content key label for formTools'
   },
   certificateHandlebars: {
-    id: 'formConfig.formTools.certificateHandlebars',
+    id: 'config.formConfig.formTools.certificateHandlebars',
     defaultMessage: 'Certificate handlebars',
     description: 'Certificate handlebars label for formTools'
   },
   hideFields: {
-    id: 'formConfig.formTools.hideFields',
+    id: 'config.formConfig.formTools.hideField',
     defaultMessage: 'Hide field',
     description: 'Hide field label for formTools'
   },
   requiredForRegistration: {
-    id: 'formConfig.formTools.requiredForRegistration',
+    id: 'config.formConfig.formTools.requiredForRegistration',
     defaultMessage: 'Required for registration',
     description: 'Required for registration label for formTools'
   }
