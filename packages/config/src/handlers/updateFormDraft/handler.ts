@@ -88,7 +88,7 @@ export async function updateFormDraftHandler(
         event: questionsDraft.event,
         status: questionsDraft.status,
         comment: questionsDraft.comment,
-        version: 1,
+        version: 0,
         createdAt: Date.now(),
         updatedAt: Date.now()
       }

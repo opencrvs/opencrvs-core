@@ -316,11 +316,11 @@ export interface GQLCertificateSVG {
 export interface GQLQuestion {
   _id: string
   fieldId: string
-  label?: Array<GQLMesssage | null>
-  placeholder?: Array<GQLMesssage | null>
-  description?: Array<GQLMesssage | null>
-  tooltip?: Array<GQLMesssage | null>
-  errorMessage?: Array<GQLMesssage | null>
+  label?: Array<GQLMesssage>
+  placeholder?: Array<GQLMesssage>
+  description?: Array<GQLMesssage>
+  tooltip?: Array<GQLMesssage>
+  errorMessage?: Array<GQLMesssage>
   maxLength?: number
   fieldName?: string
   fieldType?: string
@@ -497,11 +497,11 @@ export interface GQLApplicationConfigurationInput {
 export interface GQLQuestionInput {
   id?: string
   fieldId: string
-  label?: Array<GQLMesssageInput | null>
-  placeholder?: Array<GQLMesssageInput | null>
-  description?: Array<GQLMesssageInput | null>
-  tooltip?: Array<GQLMesssageInput | null>
-  errorMessage?: Array<GQLMesssageInput | null>
+  label?: Array<GQLMesssageInput>
+  placeholder?: Array<GQLMesssageInput>
+  description?: Array<GQLMesssageInput>
+  tooltip?: Array<GQLMesssageInput>
+  errorMessage?: Array<GQLMesssageInput>
   maxLength?: number
   fieldName?: string
   fieldType?: string
@@ -837,8 +837,8 @@ export interface GQLEventProgressSet {
 }
 
 export interface GQLMesssage {
-  lang?: string
-  descriptor?: GQLMesssageDescriptor
+  lang: string
+  descriptor: GQLMesssageDescriptor
 }
 
 export interface GQLDraftHistory {
@@ -1004,8 +1004,8 @@ export interface GQLDeathInput {
 }
 
 export interface GQLMesssageInput {
-  lang?: string
-  descriptor?: GQLMesssageDescriptorInput
+  lang: string
+  descriptor: GQLMesssageDescriptorInput
 }
 
 export interface GQLRegWorkflow {
@@ -1248,9 +1248,9 @@ export interface GQLEventProgressData {
 }
 
 export interface GQLMesssageDescriptor {
-  id?: string
-  description?: string
-  defaultMessage?: string
+  id: string
+  description: string
+  defaultMessage: string
 }
 
 export interface GQLIdentityInput {
@@ -1356,9 +1356,9 @@ export interface GQLDeathFeeInput {
 }
 
 export interface GQLMesssageDescriptorInput {
-  id?: string
-  description?: string
-  defaultMessage?: string
+  id: string
+  description: string
+  defaultMessage: string
 }
 
 export interface GQLPayment {

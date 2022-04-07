@@ -76,9 +76,9 @@ export function createCustomGroup(
 }
 
 function getDefaultLanguageMessage(messages: IMessage[] | undefined) {
-  const languages = getDefaultLanguage()
+  const language = getDefaultLanguage()
   const defaultMessage = find(messages, {
-    lang: languages
+    lang: language
   })
   return defaultMessage?.descriptor
 }

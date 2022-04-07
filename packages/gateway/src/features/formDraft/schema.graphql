@@ -28,24 +28,24 @@ type formDraft {
 }
 
 input MesssageDescriptorInput {
-  id: String
-  description: String
-  defaultMessage: String
+  id: String!
+  description: String!
+  defaultMessage: String!
 }
 
 input MesssageInput {
-  lang: String
-  descriptor: MesssageDescriptorInput
+  lang: String!
+  descriptor: MesssageDescriptorInput!
 }
 
 input QuestionInput {
   id: ID
   fieldId: String!
-  label: [MesssageInput]
-  placeholder: [MesssageInput]
-  description: [MesssageInput]
-  tooltip: [MesssageInput]
-  errorMessage: [MesssageInput]
+  label: [MesssageInput!]
+  placeholder: [MesssageInput!]
+  description: [MesssageInput!]
+  tooltip: [MesssageInput!]
+  errorMessage: [MesssageInput!]
   maxLength: Int
   fieldName: String
   fieldType: String
