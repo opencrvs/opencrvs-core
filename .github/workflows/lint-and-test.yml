@@ -40,7 +40,7 @@ jobs:
         run: |
           git clone -b develop --depth=1 $COUNTRY_CONFIG_REPO
           cd opencrvs-farajaland
-          export COUNTRY_CONFIG_PATH = `pwd`
+          echo "COUNTRY_CONFIG_PATH=$(pwd)" >> $GITHUB_ENV
           cd ../
 
       - name: Run extract:translations - login
