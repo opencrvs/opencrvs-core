@@ -1580,6 +1580,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   })}
                   <LinkButton
                     id="edit-document"
+                    disabled={isCorrection(declaration)}
                     onClick={() =>
                       this.editLinkClickHandlerForDraft(
                         documentsSection.id,
