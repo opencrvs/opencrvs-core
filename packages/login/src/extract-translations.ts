@@ -14,7 +14,7 @@ import * as fs from 'fs'
 import glob from 'glob'
 import main, { Message } from 'typescript-react-intl'
 import chalk from 'chalk'
-import { ILanguage } from '@client/i18n/reducer'
+import { ILanguage } from '@login/i18n/reducer'
 
 interface IReactIntlDescriptions {
   [key: string]: string
@@ -31,7 +31,7 @@ async function extractMessages() {
   const COUNTRY_CONFIG_PATH = process.argv[2]
   const COUNTRY_CODE = process.argv[3]
 
-  let client: {
+  let login: {
     data: Array<{
       lang: string
       displayName: string
@@ -40,10 +40,10 @@ async function extractMessages() {
   }
   let contentfulIds: Record<string, string>
   try {
-    client = JSON.parse(
+    login = JSON.parse(
       fs
         .readFileSync(
-          `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/client.json`
+          `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/login/login.json`
         )
         .toString()
     )
@@ -51,7 +51,7 @@ async function extractMessages() {
     contentfulIds = JSON.parse(
       fs
         .readFileSync(
-          `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/contentful-ids.json`
+          `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/login/contentful-ids.json`
         )
         .toString()
     )
@@ -81,7 +81,7 @@ async function extractMessages() {
         reactIntlDescriptions[r.id] = r.description
       })
       const contentfulKeysToMigrate: string[] = []
-      const englishTranslations = client.data.find(
+      const englishTranslations = login.data.find(
         (obj: ILanguage) => obj.lang === 'en-US' || obj.lang === 'en'
       )?.messages
       let missingKeys = false
@@ -95,7 +95,7 @@ async function extractMessages() {
               `No English translation key exists for message id.  Remeber to translate and add for all locales!!!: ${chalk.white(
                 key
               )} in ${chalk.white(
-                `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/client.json`
+                `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/login/login.json`
               )}`
             )}`
           )
@@ -113,7 +113,7 @@ async function extractMessages() {
             `${chalk.yellow(
               'This key must be migrated into your Contentful CMS.  Saving to ...'
             )} in ${chalk.white(
-              `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/contentful-keys-to-migrate.json`
+              `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/login/contentful-keys-to-migrate.json`
             )}`
           )
           contentfulKeysToMigrate.push(key)
@@ -132,11 +132,11 @@ async function extractMessages() {
       }
 
       fs.writeFileSync(
-        `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/descriptions.json`,
+        `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/login/descriptions.json`,
         JSON.stringify({ data: reactIntlDescriptions }, null, 2)
       )
       fs.writeFileSync(
-        `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/contentful-keys-to-migrate.json`,
+        `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/login/contentful-keys-to-migrate.json`,
         JSON.stringify(contentfulKeysToMigrate, null, 2)
       )
     })

@@ -14,9 +14,11 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import { connect } from 'react-redux'
 import { applicationConfigLoadAction } from './login/actions'
 import { IStoreState } from './store'
+import { loadLanguages } from './i18n/actions'
 
 interface IDispatchProps {
   getApplicationConfig: () => void
+  loadLanguages: () => void
 }
 
 class Component extends React.Component<
@@ -24,6 +26,7 @@ class Component extends React.Component<
 > {
   componentDidMount() {
     this.props.getApplicationConfig()
+    this.props.loadLanguages()
   }
   render() {
     const { children } = this.props
@@ -32,7 +35,8 @@ class Component extends React.Component<
 }
 
 const mapDispatchToProps = {
-  getApplicationConfig: applicationConfigLoadAction
+  getApplicationConfig: applicationConfigLoadAction,
+  loadLanguages
 }
 export const Page = withRouter(
   connect<{}, IDispatchProps, {}, IStoreState>(
