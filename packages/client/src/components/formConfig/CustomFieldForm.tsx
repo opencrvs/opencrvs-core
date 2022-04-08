@@ -17,8 +17,13 @@ import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
-import { Select, TextArea, TextInput } from '@opencrvs/components/lib/forms'
-import { InputField } from '@opencrvs/components/lib/forms/InputField/InputField'
+import {
+  InputField,
+  Select,
+  TextArea,
+  TextInput
+} from '@opencrvs/components/lib/forms'
+// import { InputField } from '@opencrvs/components/lib/forms/InputField/InputField'
 import { Box } from '@opencrvs/components/lib/interface'
 import { camelCase } from 'lodash'
 import * as React from 'react'
@@ -90,12 +95,24 @@ type IFullProps = {
   intl: IntlShape
 }
 
+interface IFieldForm {
+  label: string
+  placeholder: string
+  description: string
+  tooltip: string
+  errorMessage: string
+  maxLength: string
+}
+
 interface ICustomFieldForms {
   selectedLanguage: string
   label: string
   handleBars: string
   hideField: boolean
   requiredField: boolean
+  fieldForms: {
+    [key: string]: IFieldForm
+  }
 }
 
 const DEFAULTS = {
@@ -108,12 +125,29 @@ class CustomFieldFormsComp extends React.Component<
 > {
   constructor(props: IFullProps) {
     super(props)
+
+    const defaultLanguage = getDefaultLanguage()
+    const languages = this._getLanguages()
+
+    const fieldForms: { [key: string]: IFieldForm } = {}
+    Object.keys(languages).map((lang) => {
+      fieldForms[lang] = {
+        label: '',
+        placeholder: '',
+        description: '',
+        tooltip: '',
+        errorMessage: '',
+        maxLength: ''
+      }
+    })
+
     this.state = {
       label: DEFAULTS.LABEL,
       handleBars: camelCase(DEFAULTS.LABEL),
-      selectedLanguage: getDefaultLanguage(),
+      selectedLanguage: defaultLanguage,
       hideField: false,
-      requiredField: false
+      requiredField: false,
+      fieldForms
     }
   }
 
@@ -123,6 +157,20 @@ class CustomFieldFormsComp extends React.Component<
       en: { displayName: 'English', lang: 'en', messages: {} },
       fr: { displayName: 'French', lang: 'fr', messages: {} }
     }
+  }
+
+  _setValue(field: string, value: string) {
+    const language = this.state.selectedLanguage
+
+    this.setState({
+      fieldForms: {
+        ...this.state.fieldForms,
+        [language]: {
+          ...this.state.fieldForms[language],
+          [field]: value
+        }
+      }
+    })
   }
 
   getLanguageDropDown() {
@@ -194,12 +242,13 @@ class CustomFieldFormsComp extends React.Component<
   inputFields() {
     const { intl } = this.props
     const languages = this._getLanguages()
+    const defaultLanguage = getDefaultLanguage()
 
     return (
       <>
-        {Object.keys(languages).map((language) => {
+        {Object.keys(languages).map((language, index) => {
           return (
-            <>
+            <React.Fragment key={index}>
               <FieldContainer
                 style={{
                   display:
@@ -209,15 +258,27 @@ class CustomFieldFormsComp extends React.Component<
                 <InputField
                   id={`custom-form-label-${language}`}
                   label={intl.formatMessage(customFieldFormMessages.label)}
-                  touched={false}
+                  touched={true}
                 >
                   <TextInput
+                    value={this.state.fieldForms[language].label}
                     onChange={(event: any) => {
                       const { value } = event.target
                       this.setState({
-                        handleBars: camelCase(value || DEFAULTS.LABEL)
+                        handleBars:
+                          defaultLanguage == this.state.selectedLanguage
+                            ? camelCase(value || DEFAULTS.LABEL)
+                            : this.state.handleBars,
+                        fieldForms: {
+                          ...this.state.fieldForms,
+                          [this.state.selectedLanguage]: {
+                            ...this.state.fieldForms[
+                              this.state.selectedLanguage
+                            ],
+                            label: value
+                          }
+                        }
                       })
-                      return event
                     }}
                   />
                 </InputField>
@@ -237,7 +298,12 @@ class CustomFieldFormsComp extends React.Component<
                   )}
                   touched={false}
                 >
-                  <TextInput />
+                  <TextInput
+                    value={this.state.fieldForms[language].placeholder}
+                    onChange={(event: any) =>
+                      this._setValue('placeholder', event.target.value)
+                    }
+                  />
                 </InputField>
               </FieldContainer>
 
@@ -248,11 +314,11 @@ class CustomFieldFormsComp extends React.Component<
                 }}
               >
                 <InputField
-                  required={false}
                   id={`custom-form-description-${language}`}
                   label={intl.formatMessage(
                     customFieldFormMessages.descriptionLabel
                   )}
+                  required={false}
                   touched={false}
                 >
                   <TextArea />
@@ -269,11 +335,16 @@ class CustomFieldFormsComp extends React.Component<
                   required={false}
                   id={`custom-form-tooltip-${language}`}
                   label={intl.formatMessage(
-                    customFieldFormMessages.descriptionLabel
+                    customFieldFormMessages.tooltipLabel
                   )}
                   touched={false}
                 >
-                  <TextInput />
+                  <TextInput
+                    onChange={(event: any) =>
+                      this._setValue('tooltip', event.target.value)
+                    }
+                    value={this.state.fieldForms[language].tooltip}
+                  />
                 </InputField>
               </FieldContainer>
 
@@ -309,10 +380,15 @@ class CustomFieldFormsComp extends React.Component<
                   )}
                   touched={false}
                 >
-                  <TextInput />
+                  <TextInput
+                    value={this.state.fieldForms[language].maxLength}
+                    onChange={(event: any) =>
+                      this._setValue('maxLength', event.target.value)
+                    }
+                  />
                 </InputField>
               </FieldContainer>
-            </>
+            </React.Fragment>
           )
         })}
         <ListContainer>
