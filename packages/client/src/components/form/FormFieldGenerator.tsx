@@ -592,14 +592,14 @@ const mapFieldsToValues = (
             (
               (catchmentAreas[index] as IGQLLocation)
                 .identifier as IIdentifier[]
-            )[1].value === 'DISTRICT'
+            )?.[1]?.value === 'DISTRICT'
           ) {
             district = (catchmentAreas[index] as IGQLLocation).id
           } else if (
             (
               (catchmentAreas[index] as IGQLLocation)
                 .identifier as IIdentifier[]
-            )[1].value === 'STATE'
+            )?.[1]?.value === 'STATE'
           ) {
             state = (catchmentAreas[index] as IGQLLocation).id
           }

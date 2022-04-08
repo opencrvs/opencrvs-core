@@ -60,6 +60,9 @@ export function getLocation(userDetails: IUserDetails, locationKey: string) {
 }
 
 export function generateLocationName(location: ILocation, intl: IntlShape) {
+  if (!location) {
+    return ''
+  }
   let name = location.name
   location.jurisdictionType &&
     (name += ` ${
