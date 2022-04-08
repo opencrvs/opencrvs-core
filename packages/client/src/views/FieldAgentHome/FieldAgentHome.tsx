@@ -83,7 +83,7 @@ import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
 import {
   Navigation,
-  WORKQUEUE_TAB
+  WORKQUEUE_TABS
 } from '@client/components/interface/Navigation'
 import subYears from 'date-fns/subYears'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
@@ -200,7 +200,7 @@ class FieldAgentHomeView extends React.Component<
   }
 
   onPageChange = (newPageNumber: number) => {
-    if (this.props.match.params.tabId === WORKQUEUE_TAB.requiresUpdate) {
+    if (this.props.match.params.tabId === WORKQUEUE_TABS.requiresUpdate) {
       this.setState({ requireUpdatesPage: newPageNumber })
     }
   }
@@ -311,7 +311,7 @@ class FieldAgentHomeView extends React.Component<
       declarationsReadyToSend
     } = this.props
 
-    const tabId = match.params.tabId || WORKQUEUE_TAB.sentForReview
+    const tabId = match.params.tabId || WORKQUEUE_TABS.sentForReview
     const fieldAgentLocationId = userDetails && getUserLocation(userDetails).id
     const jurisdictionLocationId =
       userDetails && getJurisdictionLocationIdFromUserDetails(userDetails)
@@ -324,19 +324,19 @@ class FieldAgentHomeView extends React.Component<
             <Header />
             <Navigation />
             <BodyContainer>
-              {tabId === WORKQUEUE_TAB.inProgress && (
+              {tabId === WORKQUEUE_TABS.inProgress && (
                 <InProgress
                   draftDeclarations={draftDeclarations}
                   showPaginated={this.showPaginated}
                 />
               )}
-              {tabId === WORKQUEUE_TAB.sentForReview && (
+              {tabId === WORKQUEUE_TABS.sentForReview && (
                 <SentForReview
                   declarationsReadyToSend={declarationsReadyToSend}
                   showPaginated={this.showPaginated}
                 />
               )}
-              {tabId === WORKQUEUE_TAB.requiresUpdate && (
+              {tabId === WORKQUEUE_TABS.requiresUpdate && (
                 <Query
                   query={SEARCH_DECLARATIONS_USER_WISE} // TODO can this be changed to use SEARCH_EVENTS
                   variables={{

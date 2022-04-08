@@ -33,7 +33,7 @@ import * as React from 'react'
 
 import { waitFor, waitForElement } from '@client/tests/wait-for-element'
 import { SELECTOR_ID } from './tabs/inProgress/inProgressTab'
-import { WORKQUEUE_TAB } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -145,7 +145,7 @@ describe('OfficeHome related tests', () => {
       <OfficeHome
         match={{
           params: {
-            tabId: WORKQUEUE_TAB.inProgress
+            tabId: WORKQUEUE_TABS.inProgress
           },
           isExact: true,
           path: '',
@@ -181,7 +181,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: WORKQUEUE_TAB.inProgress },
+            params: { tabId: WORKQUEUE_TABS.inProgress },
             isExact: true,
             path: '',
             url: ''
@@ -204,7 +204,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: WORKQUEUE_TAB.inProgress },
+            params: { tabId: WORKQUEUE_TABS.inProgress },
             isExact: true,
             path: '',
             url: ''
@@ -259,7 +259,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: WORKQUEUE_TAB.inProgress },
+            params: { tabId: WORKQUEUE_TABS.inProgress },
             isExact: true,
             path: '',
             url: ''
@@ -281,7 +281,7 @@ describe('OfficeHome related tests', () => {
         <OfficeHome
           match={{
             params: {
-              tabId: WORKQUEUE_TAB.inProgress,
+              tabId: WORKQUEUE_TABS.inProgress,
               selectorId: SELECTOR_ID.fieldAgentDrafts
             },
             isExact: true,
@@ -305,7 +305,7 @@ describe('OfficeHome related tests', () => {
         <OfficeHome
           match={{
             params: {
-              tabId: WORKQUEUE_TAB.inProgress,
+              tabId: WORKQUEUE_TABS.inProgress,
               selectorId: SELECTOR_ID.hospitalDrafts
             },
             isExact: true,
@@ -328,7 +328,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: WORKQUEUE_TAB.readyForReview },
+            params: { tabId: WORKQUEUE_TABS.readyForReview },
             isExact: true,
             path: '',
             url: ''
@@ -350,7 +350,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: WORKQUEUE_TAB.sentForUpdates },
+            params: { tabId: WORKQUEUE_TABS.sentForUpdates },
             isExact: true,
             path: '',
             url: ''
@@ -372,7 +372,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: WORKQUEUE_TAB.sentForApproval },
+            params: { tabId: WORKQUEUE_TABS.sentForApproval },
             isExact: true,
             path: '',
             url: ''
@@ -394,7 +394,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: WORKQUEUE_TAB.readyToPrint },
+            params: { tabId: WORKQUEUE_TABS.readyToPrint },
             isExact: true,
             path: '',
             url: ''
@@ -417,7 +417,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: WORKQUEUE_TAB.externalValidation },
+            params: { tabId: WORKQUEUE_TABS.externalValidation },
             isExact: true,
             path: '',
             url: ''
@@ -450,7 +450,7 @@ describe('OfficeHome related tests', () => {
         <OfficeHome
           match={{
             params: {
-              tabId: WORKQUEUE_TAB.inProgress,
+              tabId: WORKQUEUE_TABS.inProgress,
               selectorId: SELECTOR_ID.fieldAgentDrafts
             },
             isExact: true,
@@ -474,7 +474,7 @@ describe('OfficeHome related tests', () => {
         <OfficeHome
           match={{
             params: {
-              tabId: WORKQUEUE_TAB.inProgress,
+              tabId: WORKQUEUE_TABS.inProgress,
               selectorId: SELECTOR_ID.hospitalDrafts
             },
             isExact: true,
@@ -497,7 +497,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: WORKQUEUE_TAB.readyForReview },
+            params: { tabId: WORKQUEUE_TABS.readyForReview },
             isExact: true,
             path: '',
             url: ''
@@ -519,7 +519,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: WORKQUEUE_TAB.sentForUpdates },
+            params: { tabId: WORKQUEUE_TABS.sentForUpdates },
             isExact: true,
             path: '',
             url: ''
@@ -541,7 +541,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: WORKQUEUE_TAB.sentForApproval },
+            params: { tabId: WORKQUEUE_TABS.sentForApproval },
             isExact: true,
             path: '',
             url: ''
@@ -563,7 +563,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: WORKQUEUE_TAB.readyToPrint },
+            params: { tabId: WORKQUEUE_TABS.readyToPrint },
             isExact: true,
             path: '',
             url: ''
@@ -585,7 +585,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: WORKQUEUE_TAB.externalValidation },
+            params: { tabId: WORKQUEUE_TABS.externalValidation },
             isExact: true,
             path: '',
             url: ''
@@ -638,7 +638,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: WORKQUEUE_TAB.inProgress },
+            params: { tabId: WORKQUEUE_TABS.inProgress },
             isExact: true,
             path: '',
             url: ''
@@ -665,7 +665,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: WORKQUEUE_TAB.readyForReview },
+            params: { tabId: WORKQUEUE_TABS.readyForReview },
             isExact: true,
             path: '',
             url: ''
@@ -692,7 +692,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: WORKQUEUE_TAB.sentForUpdates },
+            params: { tabId: WORKQUEUE_TABS.sentForUpdates },
             isExact: true,
             path: '',
             url: ''
@@ -719,7 +719,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: WORKQUEUE_TAB.readyToPrint },
+            params: { tabId: WORKQUEUE_TABS.readyToPrint },
             isExact: true,
             path: '',
             url: ''
@@ -748,7 +748,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: WORKQUEUE_TAB.externalValidation },
+            params: { tabId: WORKQUEUE_TABS.externalValidation },
             isExact: true,
             path: '',
             url: ''

@@ -56,7 +56,7 @@ import { ReviewTab } from './tabs/review/reviewTab'
 import { ExternalValidationTab } from './tabs/externalValidation/externalValidationTab'
 import {
   Navigation,
-  WORKQUEUE_TAB
+  WORKQUEUE_TABS
 } from '@client/components/interface/Navigation'
 
 export interface IProps extends IButtonProps {
@@ -227,32 +227,32 @@ export class OfficeHomeView extends React.Component<
 
   onPageChange = (newPageNumber: number) => {
     switch (this.props.tabId) {
-      case WORKQUEUE_TAB.inProgress:
+      case WORKQUEUE_TABS.inProgress:
         this.setState({ progressCurrentPage: newPageNumber }, () => {
           this.syncWorkqueue()
         })
         break
-      case WORKQUEUE_TAB.readyForReview:
+      case WORKQUEUE_TABS.readyForReview:
         this.setState({ reviewCurrentPage: newPageNumber }, () => {
           this.syncWorkqueue()
         })
         break
-      case WORKQUEUE_TAB.sentForUpdates:
+      case WORKQUEUE_TABS.sentForUpdates:
         this.setState({ updatesCurrentPage: newPageNumber }, () => {
           this.syncWorkqueue()
         })
         break
-      case WORKQUEUE_TAB.sentForApproval:
+      case WORKQUEUE_TABS.sentForApproval:
         this.setState({ approvalCurrentPage: newPageNumber }, () => {
           this.syncWorkqueue()
         })
         break
-      case WORKQUEUE_TAB.readyToPrint:
+      case WORKQUEUE_TABS.readyToPrint:
         this.setState({ printCurrentPage: newPageNumber }, () => {
           this.syncWorkqueue()
         })
         break
-      case WORKQUEUE_TAB.externalValidation:
+      case WORKQUEUE_TABS.externalValidation:
         this.setState(
           { externalValidationCurrentPage: newPageNumber },
           this.syncWorkqueue
@@ -289,7 +289,7 @@ export class OfficeHomeView extends React.Component<
       <>
         <Navigation />
         <BodyContainer>
-          {tabId === WORKQUEUE_TAB.inProgress && (
+          {tabId === WORKQUEUE_TABS.inProgress && (
             <InProgressTab
               drafts={drafts}
               selectorId={selectorId}
@@ -305,7 +305,7 @@ export class OfficeHomeView extends React.Component<
               error={error}
             />
           )}
-          {tabId === WORKQUEUE_TAB.readyForReview && (
+          {tabId === WORKQUEUE_TABS.readyForReview && (
             <ReviewTab
               registrarLocationId={registrarLocationId}
               queryData={{
@@ -318,7 +318,7 @@ export class OfficeHomeView extends React.Component<
               error={error}
             />
           )}
-          {tabId === WORKQUEUE_TAB.sentForUpdates && (
+          {tabId === WORKQUEUE_TABS.sentForUpdates && (
             <RejectTab
               registrarLocationId={registrarLocationId}
               queryData={{
@@ -332,7 +332,7 @@ export class OfficeHomeView extends React.Component<
             />
           )}
 
-          {tabId === WORKQUEUE_TAB.externalValidation &&
+          {tabId === WORKQUEUE_TABS.externalValidation &&
             window.config.EXTERNAL_VALIDATION_WORKQUEUE && (
               <ExternalValidationTab
                 registrarLocationId={registrarLocationId}
@@ -346,7 +346,7 @@ export class OfficeHomeView extends React.Component<
                 error={error}
               />
             )}
-          {tabId === WORKQUEUE_TAB.sentForApproval && (
+          {tabId === WORKQUEUE_TABS.sentForApproval && (
             <ApprovalTab
               registrarLocationId={registrarLocationId}
               queryData={{
@@ -359,7 +359,7 @@ export class OfficeHomeView extends React.Component<
               error={error}
             />
           )}
-          {tabId === WORKQUEUE_TAB.readyToPrint && (
+          {tabId === WORKQUEUE_TABS.readyToPrint && (
             <PrintTab
               registrarLocationId={registrarLocationId}
               queryData={{

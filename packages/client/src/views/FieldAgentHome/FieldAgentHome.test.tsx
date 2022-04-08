@@ -38,6 +38,7 @@ import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
 import * as React from 'react'
 import uuid from 'uuid'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 const nameObj = {
   data: {
@@ -93,7 +94,7 @@ describe('FieldAgentHome tests', () => {
       <FieldAgentHome
         match={{
           params: {
-            tabId: 'progress'
+            tabId: WORKQUEUE_TABS.inProgress
           },
           isExact: true,
           path: '',
@@ -123,7 +124,7 @@ describe('FieldAgentHome tests', () => {
       <FieldAgentHome
         match={{
           params: {
-            tabId: 'progress'
+            tabId: WORKQUEUE_TABS.inProgress
           },
           isExact: true,
           path: '',
@@ -146,7 +147,7 @@ describe('FieldAgentHome tests', () => {
       <FieldAgentHome
         match={{
           params: {
-            tabId: 'progress'
+            tabId: WORKQUEUE_TABS.inProgress
           },
           isExact: true,
           path: '',
@@ -277,7 +278,7 @@ describe('FieldAgentHome tests', () => {
       <FieldAgentHome
         match={{
           params: {
-            tabId: 'requiresUpdate'
+            tabId: WORKQUEUE_TABS.requiresUpdate
           },
           isExact: true,
           path: '',
@@ -412,7 +413,7 @@ describe('FieldAgentHome tests', () => {
       <FieldAgentHome
         match={{
           params: {
-            tabId: 'requiresUpdate'
+            tabId: WORKQUEUE_TABS.requiresUpdate
           },
           isExact: true,
           path: '',
@@ -445,7 +446,7 @@ describe('FieldAgentHome tests', () => {
       <FieldAgentHome
         match={{
           params: {
-            tabId: 'progress'
+            tabId: WORKQUEUE_TABS.inProgress
           },
           isExact: true,
           path: '',
@@ -477,7 +478,7 @@ describe('FieldAgentHome tests', () => {
       <FieldAgentHome
         match={{
           params: {
-            tabId: 'progress'
+            tabId: WORKQUEUE_TABS.inProgress
           },
           isExact: true,
           path: '',
@@ -509,7 +510,7 @@ describe('FieldAgentHome tests', () => {
       <FieldAgentHome
         match={{
           params: {
-            tabId: 'sentForReview'
+            tabId: WORKQUEUE_TABS.sentForReview
           },
           isExact: true,
           path: '',
@@ -541,7 +542,7 @@ describe('FieldAgentHome tests', () => {
         <FieldAgentHome
           match={{
             params: {
-              tabId: 'sentForReview'
+              tabId: WORKQUEUE_TABS.sentForReview
             },
             isExact: true,
             path: '',
@@ -624,7 +625,7 @@ describe('FieldAgentHome tests', () => {
         <FieldAgentHome
           match={{
             params: {
-              tabId: 'progress'
+              tabId: WORKQUEUE_TABS.inProgress
             },
             isExact: true,
             path: '',
