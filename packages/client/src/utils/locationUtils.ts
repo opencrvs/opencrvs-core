@@ -63,6 +63,7 @@ export function generateLocationName(
   location: ILocation | undefined,
   intl: IntlShape
 ) {
+  // when health institution in place of delivery is set null in birth registration form
   if (!location) {
     return ''
   }
