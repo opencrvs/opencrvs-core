@@ -118,7 +118,7 @@ describe('FieldAgentHome tests', () => {
     expect(element.hostNodes()).toHaveLength(1)
   })
 
-  it('renders page with three tabs', async () => {
+  it('renders page with only three tabs', async () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
       <FieldAgentHome
@@ -139,6 +139,14 @@ describe('FieldAgentHome tests', () => {
     expect(app.find('#navigation_progress').hostNodes()).toHaveLength(1)
     expect(app.find('#navigation_sentForReview').hostNodes()).toHaveLength(1)
     expect(app.find('#navigation_requiresUpdate').hostNodes()).toHaveLength(1)
+
+    expect(testComponent.exists('#navigation_readyForReview')).toBeFalsy()
+    expect(testComponent.exists('#navigation_sentForUpdates')).toBeFalsy()
+    expect(testComponent.exists('#navigation_print')).toBeFalsy()
+    expect(testComponent.exists('#navigation_waitingValidation')).toBeFalsy()
+    expect(testComponent.exists('#navigation_team')).toBeFalsy()
+    expect(testComponent.exists('#navigation_performance')).toBeFalsy()
+    expect(testComponent.exists('#navigation_config_main')).toBeFalsy()
   })
 
   it('when user clicks the floating action button', async () => {
