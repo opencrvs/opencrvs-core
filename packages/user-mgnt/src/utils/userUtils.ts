@@ -28,7 +28,6 @@ export const roleScopeMapping: IRoleScopeMapping = {
   LOCAL_REGISTRAR: ['register', 'performance', 'certify'],
   LOCAL_SYSTEM_ADMIN: ['sysadmin'],
   NATIONAL_SYSTEM_ADMIN: ['sysadmin'],
-  PERFORMANCE_OVERSIGHT: ['performance'],
   PERFORMANCE_MANAGEMENT: ['performance']
 }
 
