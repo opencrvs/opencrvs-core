@@ -144,6 +144,8 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
       }
       registration {
         id
+        informantType
+        otherInformantType
         contact
         contactRelationship
         contactPhoneNumber
@@ -182,7 +184,6 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         fieldId
         value
       }
-      informantType
       history {
         date
         action
@@ -387,6 +388,8 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
       }
       registration {
         id
+        informantType
+        otherInformantType
         contact
         contactPhoneNumber
         status {
@@ -429,7 +432,6 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
           country
         }
       }
-      informantType
       history {
         date
         action

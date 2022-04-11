@@ -1207,7 +1207,6 @@ export const currentUserDeclarations = {
           nationality: 'BGD',
           informantBirthDate: '2000-01-01',
           relationship: 'OTHER',
-          otherInformantType: 'Friend',
           informantPhone: '01711111111',
           currentAddress: '',
           country: 'BGD',
@@ -2323,7 +2322,10 @@ export const mockDeclarationData = {
       value: 'MOTHER',
       nestedFields: { registrationPhone: '01557394986' }
     },
-    informantType: 'BOTH_PARENTS',
+    informantType: {
+      value: 'MOTHER',
+      nestedFields: { otherInformantType: '' }
+    },
     registrationNumber: '201908122365BDSS0SE1',
     regStatus: {
       type: 'REGISTERED',
@@ -2476,7 +2478,10 @@ export const mockBirthRegistrationSectionData = {
     value: 'MOTHER',
     nestedFields: { registrationPhone: '01557394986' }
   },
-  informantType: 'BOTH_PARENTS',
+  informantType: {
+    value: 'MOTHER',
+    nestedFields: { otherInformantType: '' }
+  },
   registrationPhone: '01557394986',
   trackingId: 'BDSS0SE',
   registrationNumber: '201908122365BDSS0SE1',
@@ -2508,7 +2513,10 @@ export const mockBirthRegistrationSectionData = {
 
 export const mockDeathRegistrationSectionData = {
   whoseContactDetails: 'MOTHER',
-  informantType: 'BOTH_PARENTS',
+  informantType: {
+    value: 'MOTHER',
+    nestedFields: { otherInformantType: '' }
+  },
   registrationPhone: '01557394986',
   trackingId: 'DDSS0SE',
   registrationNumber: '201908122365DDSS0SE1',

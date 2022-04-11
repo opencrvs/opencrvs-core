@@ -520,6 +520,7 @@ describe('OfficeHome sent for review tab related tests', () => {
               father: null,
               registration: {
                 id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
+                informantType: 'MOTHER',
                 contact: 'MOTHER',
                 contactRelationship: 'Contact Relation',
                 contactPhoneNumber: '01733333333',
@@ -554,8 +555,7 @@ describe('OfficeHome sent for review tab related tests', () => {
                 },
                 type: 'PRIVATE_HOME',
                 partOf: 'Location/upazila10'
-              },
-              informantType: 'MOTHER_ONLY'
+              }
             }
           }
         })

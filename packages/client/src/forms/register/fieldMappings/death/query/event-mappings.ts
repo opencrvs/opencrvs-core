@@ -69,15 +69,6 @@ export function getDeathRegistrationSectionTransformer(
       queryData[REGISTRATION_SECTION].registrationNumber
   }
 
-  if (queryData[REGISTRATION_SECTION].informantType) {
-    transformedData[REGISTRATION_SECTION].informantType =
-      queryData[REGISTRATION_SECTION].informantType
-  }
-  if (queryData[REGISTRATION_SECTION].otherInformantType) {
-    transformedData[REGISTRATION_SECTION].otherInformantType =
-      queryData[REGISTRATION_SECTION].otherInformantType
-  }
-
   if (
     queryData[REGISTRATION_SECTION].type &&
     queryData[REGISTRATION_SECTION].type === 'DEATH'

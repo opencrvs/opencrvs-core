@@ -308,8 +308,6 @@ input BirthRegistrationInput {
   attendantAtBirth: AttendantType # Not in BDRIS2
   otherAttendantAtBirth: String
   birthRegistrationType: BirthRegType
-  informantType: InformantType # Informant in BDRIS2
-  otherinformantType: String
   childrenBornAliveToMother: Int # Not in BDRIS2
   foetalDeathsToMother: Int # Not in BDRIS2
   lastPreviousLiveBirth: Date # Not in BDRIS2
@@ -333,8 +331,6 @@ type BirthRegistration implements EventRegistration { # -> Composition
   attendantAtBirth: AttendantType # -> Observation.valueString
   otherAttendantAtBirth: String
   birthRegistrationType: BirthRegType # -> Observation.valueString
-  informantType: InformantType # -> Observation.valueString
-  otherinformantType: String
   childrenBornAliveToMother: Int # -> Observation.valueInteger
   foetalDeathsToMother: Int # -> Observation.valueInteger
   lastPreviousLiveBirth: Date # -> Observation.valueDateTime
@@ -419,6 +415,8 @@ input RegistrationInput {
   paperFormID: String
   page: String
   book: String
+  informantType: InformantType # -> Observation.valueString
+  otherInformantType: String
   contact: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
   contactRelationship: String # -> extension(url='http://opencrvs.org/specs/extension/contact-relationship').valueString
   contactPhoneNumber: String
@@ -442,6 +440,8 @@ type Registration { # -> Task
   paperFormID: String # -> .identifier
   page: String # -> .identifier
   book: String # -> .identifier
+  informantType: InformantType # -> Observation.valueString
+  otherInformantType: String
   contact: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
   contactRelationship: String # -> extension(url='http://opencrvs.org/specs/extension/contact-relationship').valueString
   contactPhoneNumber: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person-phone-number').valueString

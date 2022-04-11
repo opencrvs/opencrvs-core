@@ -120,10 +120,6 @@ export function setDeathRegistrationSectionTransformer(
       transformedData.registration.registrationNumber =
         draftData.registration.registrationNumber
     }
-    if (draftData.registration.informantType) {
-      transformedData.registration.informantType =
-        draftData.registration.informantType
-    }
     if (draftData.registration.certificates) {
       transformCertificateData(
         transformedData,

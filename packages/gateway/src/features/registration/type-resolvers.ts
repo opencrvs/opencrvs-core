@@ -28,7 +28,6 @@ import {
   BODY_WEIGHT_CODE,
   BIRTH_TYPE_CODE,
   BIRTH_ATTENDANT_CODE,
-  INFORMANT_TYPE,
   BIRTH_REG_TYPE_CODE,
   LAST_LIVE_BIRTH_CODE,
   NUMBER_BORN_ALIVE_CODE,
@@ -307,6 +306,60 @@ export const typeResolvers: GQLResolver = {
       return docRefReferences.map(async (docRefReference: string) => {
         return await fetchFHIR(`/${docRefReference}`, authHeader)
       })
+    },
+    async informantType(task: fhir.Task, _, authHeader) {
+      if (!task.focus) {
+        return null
+      }
+      const composition = await fetchFHIR(
+        `/${task.focus.reference}`,
+        authHeader
+      )
+      const patientSection = findCompositionSection(INFORMANT_CODE, composition)
+      if (!patientSection || !patientSection.entry) {
+        return null
+      }
+      const relatedPerson: fhir.RelatedPerson = await fetchFHIR(
+        `/${patientSection.entry[0].reference}`,
+        authHeader
+      )
+      if (
+        relatedPerson &&
+        relatedPerson.relationship &&
+        relatedPerson.relationship.coding &&
+        relatedPerson.relationship.coding[0]
+      ) {
+        return relatedPerson.relationship?.coding[0].code
+      } else {
+        return null
+      }
+    },
+    async otherInformantType(task: fhir.Task, _, authHeader) {
+      if (!task.focus) {
+        return null
+      }
+      const composition = await fetchFHIR(
+        `/${task.focus.reference}`,
+        authHeader
+      )
+      const patientSection = findCompositionSection(INFORMANT_CODE, composition)
+      if (!patientSection || !patientSection.entry) {
+        return null
+      }
+      const relatedPerson: fhir.RelatedPerson = await fetchFHIR(
+        `/${patientSection.entry[0].reference}`,
+        authHeader
+      )
+      if (
+        relatedPerson &&
+        relatedPerson.relationship &&
+        relatedPerson.relationship.coding &&
+        relatedPerson.relationship.coding[0]
+      ) {
+        return relatedPerson.relationship?.text
+      } else {
+        return null
+      }
     },
     contact: (task) => {
       const contact = findExtension(
@@ -1100,7 +1153,6 @@ export const typeResolvers: GQLResolver = {
           birthType: BIRTH_TYPE_CODE,
           attendantAtBirth: BIRTH_ATTENDANT_CODE,
           birthRegistrationType: BIRTH_REG_TYPE_CODE,
-          informantType: INFORMANT_TYPE,
           childrenBornAliveToMother: NUMBER_BORN_ALIVE_CODE,
           foetalDeathsToMother: NUMBER_FOEATAL_DEATH_CODE,
           lastPreviousLiveBirth: LAST_LIVE_BIRTH_CODE
@@ -1346,26 +1398,6 @@ export const typeResolvers: GQLResolver = {
       }
       const observations = await fetchFHIR(
         `/Observation?encounter=${encounterSection.entry[0].reference}&code=${BIRTH_REG_TYPE_CODE}`,
-        authHeader
-      )
-      return (
-        (observations &&
-          observations.entry &&
-          observations.entry[0] &&
-          observations.entry[0].resource.valueString) ||
-        null
-      )
-    },
-    async informantType(composition: ITemplatedComposition, _, authHeader) {
-      const encounterSection = findCompositionSection(
-        BIRTH_ENCOUNTER_CODE,
-        composition
-      )
-      if (!encounterSection || !encounterSection.entry) {
-        return null
-      }
-      const observations = await fetchFHIR(
-        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${INFORMANT_TYPE}`,
         authHeader
       )
       return (

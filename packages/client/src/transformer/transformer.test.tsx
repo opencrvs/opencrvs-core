@@ -262,7 +262,7 @@ describe('when draft data is transformed to graphql', () => {
         father: {},
         mother: {},
         registration: {
-          informantType: 'MOTHER_ONLY',
+          informantType: 'MOTHER',
           registrationPhone: '01736478884',
           whoseContactDetails: 'MOTHER'
         },
@@ -527,12 +527,8 @@ describe('when draft data is transformed to graphql', () => {
         mother: motherDetails,
         registration: {
           ...registrationDetails,
-          informantType: {
-            value: 'FATHER',
-            nestedFields: {
-              otherInformantType: ''
-            }
-          },
+          informantType: 'FATHER',
+          otherInformantType: '',
           contactPoint: {
             value: 'OTHER',
             nestedFields: {

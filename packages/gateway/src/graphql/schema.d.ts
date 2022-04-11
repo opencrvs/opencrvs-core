@@ -110,8 +110,6 @@ export interface GQLBirthRegistration extends GQLEventRegistration {
   attendantAtBirth?: GQLAttendantType
   otherAttendantAtBirth?: string
   birthRegistrationType?: GQLBirthRegType
-  informantType?: GQLInformantType
-  otherinformantType?: string
   childrenBornAliveToMother?: number
   foetalDeathsToMother?: number
   lastPreviousLiveBirth?: GQLDate
@@ -356,8 +354,6 @@ export interface GQLBirthRegistrationInput {
   attendantAtBirth?: GQLAttendantType
   otherAttendantAtBirth?: string
   birthRegistrationType?: GQLBirthRegType
-  informantType?: GQLInformantType
-  otherinformantType?: string
   childrenBornAliveToMother?: number
   foetalDeathsToMother?: number
   lastPreviousLiveBirth?: GQLDate
@@ -504,6 +500,8 @@ export interface GQLRegistration {
   paperFormID?: string
   page?: string
   book?: string
+  informantType?: GQLInformantType
+  otherInformantType?: string
   contact?: string
   contactRelationship?: string
   contactPhoneNumber?: string
@@ -554,26 +552,6 @@ export const enum GQLBirthRegType {
   INFORMANT_ONLY = 'INFORMANT_ONLY',
   MOTHER_ONLY = 'MOTHER_ONLY',
   FATHER_ONLY = 'FATHER_ONLY'
-}
-
-export const enum GQLInformantType {
-  INFORMANT = 'INFORMANT',
-  MOTHER = 'MOTHER',
-  FATHER = 'FATHER',
-  GRANDFATHER = 'GRANDFATHER',
-  GRANDMOTHER = 'GRANDMOTHER',
-  BROTHER = 'BROTHER',
-  SISTER = 'SISTER',
-  OTHER_FAMILY_MEMBER = 'OTHER_FAMILY_MEMBER',
-  LEGAL_GUARDIAN = 'LEGAL_GUARDIAN',
-  SPOUSE = 'SPOUSE',
-  SON = 'SON',
-  DAUGHTER = 'DAUGHTER',
-  SON_IN_LAW = 'SON_IN_LAW',
-  DAUGHTER_IN_LAW = 'DAUGHTER_IN_LAW',
-  GRANDSON = 'GRANDSON',
-  GRANDDAUGHTER = 'GRANDDAUGHTER',
-  OTHER = 'OTHER'
 }
 
 export interface GQLPrimaryCaregiver {
@@ -878,6 +856,8 @@ export interface GQLRegistrationInput {
   paperFormID?: string
   page?: string
   book?: string
+  informantType?: GQLInformantType
+  otherInformantType?: string
   contact?: string
   contactRelationship?: string
   contactPhoneNumber?: string
@@ -992,6 +972,26 @@ export interface GQLMesssageDescriptorInput {
   id?: string
   description?: string
   defaultMessage?: string
+}
+
+export const enum GQLInformantType {
+  INFORMANT = 'INFORMANT',
+  MOTHER = 'MOTHER',
+  FATHER = 'FATHER',
+  GRANDFATHER = 'GRANDFATHER',
+  GRANDMOTHER = 'GRANDMOTHER',
+  BROTHER = 'BROTHER',
+  SISTER = 'SISTER',
+  OTHER_FAMILY_MEMBER = 'OTHER_FAMILY_MEMBER',
+  LEGAL_GUARDIAN = 'LEGAL_GUARDIAN',
+  SPOUSE = 'SPOUSE',
+  SON = 'SON',
+  DAUGHTER = 'DAUGHTER',
+  SON_IN_LAW = 'SON_IN_LAW',
+  DAUGHTER_IN_LAW = 'DAUGHTER_IN_LAW',
+  GRANDSON = 'GRANDSON',
+  GRANDDAUGHTER = 'GRANDDAUGHTER',
+  OTHER = 'OTHER'
 }
 
 export interface GQLRegWorkflow {
@@ -2580,8 +2580,6 @@ export interface GQLBirthRegistrationTypeResolver<TParent = any> {
   attendantAtBirth?: BirthRegistrationToAttendantAtBirthResolver<TParent>
   otherAttendantAtBirth?: BirthRegistrationToOtherAttendantAtBirthResolver<TParent>
   birthRegistrationType?: BirthRegistrationToBirthRegistrationTypeResolver<TParent>
-  informantType?: BirthRegistrationToInformantTypeResolver<TParent>
-  otherinformantType?: BirthRegistrationToOtherinformantTypeResolver<TParent>
   childrenBornAliveToMother?: BirthRegistrationToChildrenBornAliveToMotherResolver<TParent>
   foetalDeathsToMother?: BirthRegistrationToFoetalDeathsToMotherResolver<TParent>
   lastPreviousLiveBirth?: BirthRegistrationToLastPreviousLiveBirthResolver<TParent>
@@ -2680,20 +2678,6 @@ export interface BirthRegistrationToOtherAttendantAtBirthResolver<
 }
 
 export interface BirthRegistrationToBirthRegistrationTypeResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface BirthRegistrationToInformantTypeResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface BirthRegistrationToOtherinformantTypeResolver<
   TParent = any,
   TResult = any
 > {
@@ -3846,6 +3830,8 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   paperFormID?: RegistrationToPaperFormIDResolver<TParent>
   page?: RegistrationToPageResolver<TParent>
   book?: RegistrationToBookResolver<TParent>
+  informantType?: RegistrationToInformantTypeResolver<TParent>
+  otherInformantType?: RegistrationToOtherInformantTypeResolver<TParent>
   contact?: RegistrationToContactResolver<TParent>
   contactRelationship?: RegistrationToContactRelationshipResolver<TParent>
   contactPhoneNumber?: RegistrationToContactPhoneNumberResolver<TParent>
@@ -3895,6 +3881,20 @@ export interface RegistrationToPageResolver<TParent = any, TResult = any> {
 }
 
 export interface RegistrationToBookResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationToInformantTypeResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationToOtherInformantTypeResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

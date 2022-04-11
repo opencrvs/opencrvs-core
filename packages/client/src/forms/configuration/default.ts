@@ -444,7 +444,7 @@ export const registerForms: IDefaultRegisterForms = {
                       }
                     }
                   ],
-                  LEGALGUARDIAN: [
+                  LEGAL_GUARDIAN: [
                     {
                       name: 'registrationPhone',
                       type: 'TEL',
@@ -1795,7 +1795,7 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 action: 'hide',
                 expression:
-                  '(!draftData || !draftData.registration || !((draftData.informantType && (draftData.informantType === "LEGAL_GUARDIAN" || draftData.informantType === "OTHER")) || (draftData.registration.informantType && (draftData.registration.informantType === "LEGAL_GUARDIAN" || draftData.registration.informantType === "OTHER")  )))'
+                  '(!draftData || !draftData.registration || !((draftData.informantType && (draftData.informantType !== "MOTHER" || draftData.informantType !== "FATHER")) || (draftData.registration.informantType && (draftData.registration.informantType !== "MOTHER" || draftData.registration.informantType !== "FATHER")  )))'
               }
             ],
             fields: [

@@ -231,8 +231,6 @@ type BirthRegistration implements EventRegistration {
   attendantAtBirth: AttendantType
   otherAttendantAtBirth: String
   birthRegistrationType: BirthRegType
-  informantType: InformantType
-  otherinformantType: String
   childrenBornAliveToMother: Int
   foetalDeathsToMother: Int
   lastPreviousLiveBirth: Date
@@ -466,8 +464,6 @@ input BirthRegistrationInput {
   attendantAtBirth: AttendantType
   otherAttendantAtBirth: String
   birthRegistrationType: BirthRegType
-  informantType: InformantType
-  otherinformantType: String
   childrenBornAliveToMother: Int
   foetalDeathsToMother: Int
   lastPreviousLiveBirth: Date
@@ -614,6 +610,8 @@ type Registration {
   paperFormID: String
   page: String
   book: String
+  informantType: InformantType
+  otherInformantType: String
   contact: String
   contactRelationship: String
   contactPhoneNumber: String
@@ -664,26 +662,6 @@ enum BirthRegType {
   INFORMANT_ONLY
   MOTHER_ONLY
   FATHER_ONLY
-}
-
-enum InformantType {
-  INFORMANT
-  MOTHER
-  FATHER
-  GRANDFATHER
-  GRANDMOTHER
-  BROTHER
-  SISTER
-  OTHER_FAMILY_MEMBER
-  LEGAL_GUARDIAN
-  SPOUSE
-  SON
-  DAUGHTER
-  SON_IN_LAW
-  DAUGHTER_IN_LAW
-  GRANDSON
-  GRANDDAUGHTER
-  OTHER
 }
 
 type PrimaryCaregiver {
@@ -977,6 +955,8 @@ input RegistrationInput {
   paperFormID: String
   page: String
   book: String
+  informantType: InformantType
+  otherInformantType: String
   contact: String
   contactRelationship: String
   contactPhoneNumber: String
@@ -1091,6 +1071,26 @@ input MesssageDescriptorInput {
   id: String
   description: String
   defaultMessage: String
+}
+
+enum InformantType {
+  INFORMANT
+  MOTHER
+  FATHER
+  GRANDFATHER
+  GRANDMOTHER
+  BROTHER
+  SISTER
+  OTHER_FAMILY_MEMBER
+  LEGAL_GUARDIAN
+  SPOUSE
+  SON
+  DAUGHTER
+  SON_IN_LAW
+  DAUGHTER_IN_LAW
+  GRANDSON
+  GRANDDAUGHTER
+  OTHER
 }
 
 type RegWorkflow {

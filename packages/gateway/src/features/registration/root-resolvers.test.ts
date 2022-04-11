@@ -1123,12 +1123,12 @@ describe('Registration root resolvers', () => {
         },
         registration: {
           contact: 'MOTHER',
+          informantType: 'MOTHER',
           contactPhoneNumber: '01712121212',
           _fhirID: '75e734d8-47cf-47b4-9416-fa4c747e1b71',
           trackingId: 'BZ1D4FY',
           status: [{ timestamp: '2019-07-23T07:51:31.906Z' }]
         },
-        informantType: 'MOTHER',
         _fhirIDMap: {
           composition: '20703e32-0e2f-4685-8371-e7448d18de82',
           encounter: '04cd7da2-89b6-4d68-b3c6-b158ce83b0e8',

@@ -279,7 +279,7 @@ describe('when user is previewing the form data', () => {
     const registrationDetails = {
       commentsOrNotes: 'comments',
       paperFormNumber: '423424245455',
-      informantType: 'MOTHER_ONLY',
+      informantType: 'MOTHER',
       registrationCertificateLanguage: ['en'],
       registrationEmail: 'arman@gmail.com',
       registrationPhone: '01736478884',

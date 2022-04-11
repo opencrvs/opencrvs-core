@@ -23,7 +23,6 @@ import {
   BODY_WEIGHT_CODE,
   BIRTH_ATTENDANT_CODE,
   BIRTH_REG_TYPE_CODE,
-  INFORMANT_TYPE,
   NUMBER_BORN_ALIVE_CODE,
   NUMBER_FOEATAL_DEATH_CODE,
   LAST_LIVE_BIRTH_CODE,
@@ -950,18 +949,6 @@ export const builders: IFieldBuilders = {
           OBSERVATION_CATEGORY_PROCEDURE_DESC,
           BIRTH_REG_TYPE_CODE,
           'Birth registration type',
-          fhirBundle,
-          context
-        )
-        observation.id = fieldValue as string
-      },
-      informantType: (fhirBundle, fieldValue, context) => {
-        const observation = selectOrCreateObservationResource(
-          BIRTH_ENCOUNTER_CODE,
-          OBSERVATION_CATEGORY_PROCEDURE_CODE,
-          OBSERVATION_CATEGORY_PROCEDURE_DESC,
-          INFORMANT_TYPE,
-          'Informant type',
           fhirBundle,
           context
         )
@@ -1897,6 +1884,76 @@ export const builders: IFieldBuilders = {
     ) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return createInformantShareContactNumber(taskResource, fieldValue)
+    },
+    informantType: async (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const relatedPersonResource = selectOrCreateInformantSection(
+        INFORMANT_CODE,
+        INFORMANT_TITLE,
+        fhirBundle
+      )
+
+      if (fieldValue !== 'OTHER') {
+        relatedPersonResource.relationship = {
+          coding: [
+            {
+              system:
+                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+              code: fieldValue
+            }
+          ]
+        }
+      }
+      if (context.event === EVENT_TYPE.BIRTH) {
+        if (fieldValue === 'MOTHER') {
+          await setInformantReference(
+            MOTHER_CODE,
+            relatedPersonResource,
+            fhirBundle,
+            context
+          )
+        } else if (fieldValue === 'FATHER') {
+          await setInformantReference(
+            FATHER_CODE,
+            relatedPersonResource,
+            fhirBundle,
+            context
+          )
+        }
+      }
+    },
+    otherInformantType: async (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const relatedPersonResource = selectOrCreateInformantSection(
+        INFORMANT_CODE,
+        INFORMANT_TITLE,
+        fhirBundle
+      )
+      if (
+        fieldValue &&
+        relatedPersonResource.relationship &&
+        relatedPersonResource.relationship.coding &&
+        relatedPersonResource.relationship.coding[0]
+      ) {
+        relatedPersonResource.relationship.coding[0].code = 'OTHER'
+        relatedPersonResource.relationship.text = fieldValue
+      } else if (fieldValue) {
+        relatedPersonResource.relationship = {
+          coding: [
+            {
+              system: `${OPENCRVS_SPECIFICATION_URL}extension/other-informant-value`,
+              code: 'OTHER'
+            }
+          ],
+          text: fieldValue
+        }
+      }
     },
     draftId: (
       fhirBundle: ITemplatedBundle,
@@ -3168,22 +3225,6 @@ export const builders: IFieldBuilders = {
       OBSERVATION_CATEGORY_PROCEDURE_DESC,
       BIRTH_REG_TYPE_CODE,
       'Birth registration type',
-      fhirBundle,
-      context
-    )
-    observation.valueString = fieldValue
-  },
-  informantType: (
-    fhirBundle: ITemplatedBundle,
-    fieldValue: string,
-    context: any
-  ) => {
-    const observation = selectOrCreateObservationResource(
-      BIRTH_ENCOUNTER_CODE,
-      OBSERVATION_CATEGORY_PROCEDURE_CODE,
-      OBSERVATION_CATEGORY_PROCEDURE_DESC,
-      INFORMANT_TYPE,
-      'Informant type',
       fhirBundle,
       context
     )

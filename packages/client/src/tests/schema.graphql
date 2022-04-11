@@ -239,8 +239,6 @@ type BirthRegistration implements EventRegistration {
   attendantAtBirth: AttendantType
   otherAttendantAtBirth: String
   birthRegistrationType: BirthRegType
-  informantType: InformantType
-  otherinformantType: String
   childrenBornAliveToMother: Int
   foetalDeathsToMother: Int
   lastPreviousLiveBirth: Date
@@ -455,8 +453,6 @@ input BirthRegistrationInput {
   attendantAtBirth: AttendantType
   otherAttendantAtBirth: String
   birthRegistrationType: BirthRegType
-  informantType: InformantType
-  otherinformantType: String
   childrenBornAliveToMother: Int
   foetalDeathsToMother: Int
   lastPreviousLiveBirth: Date
@@ -578,6 +574,8 @@ type Registration {
   page: String
   book: String
   contact: String
+  informantType: InformantType
+  otherInformantType: String
   contactRelationship: String
   contactPhoneNumber: String
   status: [RegWorkflow]
@@ -909,6 +907,8 @@ input RegistrationInput {
   contact: String
   contactRelationship: String
   contactPhoneNumber: String
+  informantType: InformantType
+  otherInformantType: String
   status: [RegWorkflowInput]
   type: RegistrationType
   inCompleteFields: String
