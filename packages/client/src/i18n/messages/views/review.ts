@@ -18,7 +18,6 @@ interface IReviewMessages
   editDeclarationConfirmationTitle: MessageDescriptor
   editDeclarationConfirmation: MessageDescriptor
   editDocuments: MessageDescriptor
-  formDataHeader: MessageDescriptor
   headerSubjectWithName: MessageDescriptor
   headerSubjectWithoutName: MessageDescriptor
   previewName: MessageDescriptor
@@ -93,12 +92,6 @@ const messagesToDefine: IReviewMessages = {
     defaultMessage: 'Add attachement',
     description: 'Edit documents text',
     id: 'review.documents.editDocuments'
-  },
-  formDataHeader: {
-    defaultMessage:
-      '{isDraft, select, true {Check responses with the informant before sending for review} false {Review the answers with the supporting documents}}',
-    description: 'Label for form data header text',
-    id: 'review.formData.header'
   },
   headerSubjectWithName: {
     defaultMessage:

@@ -28,31 +28,33 @@ import {
   isValidExample
 } from '@client/views/SysAdmin/Config/utils'
 
-const ErrorMessageBottom = styled.div<{ marginTop?: number }>`
-  position: relative;
-  ${({ theme }) => theme.fonts.bold14};
+const ErrorMessage = styled.div`
+  ${({ theme }) => theme.fonts.bold14}
   color: ${({ theme }) => theme.colors.red};
-  margin-top: ${({ marginTop }) => (marginTop ? `${marginTop}px` : `0px`)};
+  height: 21px;
+  margin-top: 6px;
+  margin-bottom: 10px;
 `
 
-const SuccessMessage = styled.div`
+const ExampleSuccessMessage = styled.div`
   ${({ theme }) => theme.fonts.bold14};
   color: ${({ theme }) => theme.colors.green};
-  margin-left: 9px;
 `
 
-const InputContainer = styled.div<{ displayFlex?: boolean }>`
+const ExampleErrorMessage = styled.div`
+  ${({ theme }) => theme.fonts.bold14};
+  color: ${({ theme }) => theme.colors.red};
+`
+
+const InputContainer = styled.div<{
+  displayFlex?: boolean
+}>`
   width: 100%;
   ${({ displayFlex }) =>
     displayFlex &&
     ` display: flex;
       flex-flow: row;
     `}
-
-  padding-bottom: 32px;
-  :last-child {
-    padding-bottom: 0px;
-  }
 `
 
 const ExampleValidityContainer = styled.div`
@@ -62,8 +64,14 @@ const ExampleValidityContainer = styled.div`
   height: 21px;
 `
 
-const LinkButtonContainer = styled.div`
+const ValidityIconContainer = styled.div`
+  margin-top: auto;
+  margin-right: 8px;
+`
+
+const LinkButtonContainer = styled(LinkButton)`
   margin-top: 13px;
+  ${({ theme }) => theme.fonts.bold14}
 `
 
 interface IProps {
@@ -108,12 +116,9 @@ function ContentComponent({
               ignoreMediaQuery={true}
             />
           </InputField>
-          <ErrorMessageBottom
-            id={`${changeModalName}-regex-error`}
-            marginTop={6}
-          >
+          <ErrorMessage id={`${changeModalName}-regex-error`}>
             {!isValidRegEx(pattern) && patternErrorMessage}
-          </ErrorMessageBottom>
+          </ErrorMessage>
         </InputContainer>
         <InputContainer displayFlex={true}>
           <div>
@@ -133,39 +138,43 @@ function ContentComponent({
                 ignoreMediaQuery={true}
               />
             </InputField>
-            <LinkButtonContainer>
-              <LinkButton
-                id={`test-${changeModalName}-example`}
-                onClick={() => {
-                  setShowExampleValidation(true)
-                }}
-              >
-                {intl.formatMessage(messages.testNumber)}
-              </LinkButton>
+            <LinkButtonContainer
+              id={`test-${changeModalName}-example`}
+              onClick={() => {
+                setShowExampleValidation(true)
+              }}
+            >
+              {intl.formatMessage(messages.testNumber)}
             </LinkButtonContainer>
           </div>
           {showExampleValidation && (
             <ExampleValidityContainer>
               {isValidExample(pattern, example) ? (
                 <>
-                  <SuccessSmall id={`${changeModalName}-example-valid-icon`} />
-                  <SuccessMessage
+                  <ValidityIconContainer>
+                    <SuccessSmall
+                      id={`${changeModalName}-example-valid-icon`}
+                    />
+                  </ValidityIconContainer>
+                  <ExampleSuccessMessage
                     id={`${changeModalName}-example-valid-message`}
                   >
                     {intl.formatMessage(messages.validExample)}
-                  </SuccessMessage>
+                  </ExampleSuccessMessage>
                 </>
               ) : (
                 <>
-                  <Cross
-                    color={'red'}
-                    id={`${changeModalName}-example-invalid-icon`}
-                  />
-                  <ErrorMessageBottom
+                  <ValidityIconContainer>
+                    <Cross
+                      color={'red'}
+                      id={`${changeModalName}-example-invalid-icon`}
+                    />
+                  </ValidityIconContainer>
+                  <ExampleErrorMessage
                     id={`${changeModalName}-example-invalid-message`}
                   >
                     {intl.formatMessage(messages.invalidExample)}
-                  </ErrorMessageBottom>
+                  </ExampleErrorMessage>
                 </>
               )}
             </ExampleValidityContainer>

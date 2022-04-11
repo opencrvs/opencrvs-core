@@ -1044,7 +1044,6 @@
         "review.error.unauthorized": "We are unable to display this page to you",
         "review.form.section.review.name": "Review",
         "review.form.section.review.title": "Review",
-        "review.formData.header": "{isDraft, select, true {Check responses with the informant before sending for review} false {Review the answers with the supporting documents}}",
         "review.header.subject.subjectWithoutName": "{eventType, select, birth {Birth} death {Death} other {Birth}} Declaration",
         "review.header.subject.subjectWitName": "{eventType, select, birth {Birth} death {Death} other {Birth}} Declaration for {name}",
         "review.header.title.govtName": "Government of the peoples republic of Bangladesh",
