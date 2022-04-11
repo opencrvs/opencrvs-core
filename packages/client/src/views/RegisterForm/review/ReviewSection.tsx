@@ -1341,7 +1341,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     return (
       event === Event.BIRTH &&
       (section.id === BirthSection.Mother ||
-        (section.id === BirthSection.Father && data.father.fathersDetailsExist))
+        (section.id === BirthSection.Father &&
+          !!data.father?.fathersDetailsExist))
     )
   }
 
