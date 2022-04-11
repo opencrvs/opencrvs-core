@@ -589,6 +589,11 @@ const getDeclarationInfo = (
         ...info,
         brn: declaration.brnDrn
       }
+    } else if (!isDownloaded) {
+      info = {
+        ...info,
+        brn: ''
+      }
     }
     info = {
       ...info,
@@ -601,6 +606,11 @@ const getDeclarationInfo = (
       info = {
         ...info,
         drn: declaration.brnDrn
+      }
+    } else if (!isDownloaded) {
+      info = {
+        ...info,
+        drn: ''
       }
     }
     info = {
