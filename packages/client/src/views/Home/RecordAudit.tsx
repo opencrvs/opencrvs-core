@@ -493,7 +493,6 @@ const getDraftDeclarationData = (
   intl: IntlShape,
   trackingId: string
 ): IDeclarationData => {
-  console.log(trackingId)
   return {
     id: declaration.id,
     name: getDraftDeclarationName(declaration),
@@ -1621,9 +1620,6 @@ function getBodyContent({
     draft?.data?.registration?.trackingId?.toString() ||
     workqueueDeclaration?.registration?.trackingId ||
     ''
-  console.log(draft)
-  console.log(workqueueDeclaration)
-  console.log(trackingId)
 
   const declaration = draft
     ? getDraftDeclarationData(draft, resources, intl, trackingId)

@@ -149,7 +149,6 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
     ) {
       return []
     }
-    console.log(this.props.declarationsReadyToSend)
     return this.props.declarationsReadyToSend.map(
       (draft: IDeclaration, index) => {
         const { intl } = this.props
