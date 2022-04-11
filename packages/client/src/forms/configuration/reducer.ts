@@ -40,8 +40,8 @@ export interface IDraft {
 }
 
 export interface IFormDraftData {
-  birth: IDraft | null
-  death: IDraft | null
+  birth: IDraft
+  death: IDraft
 }
 
 export type IFormDraftDataState = {
@@ -113,8 +113,8 @@ export const formDraftReducer: LoopReducer<
         })
 
         const formDraftData = {
-          birth: birthFormDraft ? birthFormDraft : null,
-          death: deathFormDraft ? deathFormDraft : null
+          birth: birthFormDraft,
+          death: deathFormDraft
         } as IFormDraftData
 
         return loop(
