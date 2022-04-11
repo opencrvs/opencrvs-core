@@ -220,7 +220,6 @@ export const nestedRadioFieldToBundleFieldTransformer =
         (draftData[sectionId][field.name] as IFormSectionData).value
       )
     } else {
-      console.log('SETTING: ', transformedFieldName)
       transformedData[field.name] = (
         draftData[sectionId][field.name] as IFormSectionData
       ).value

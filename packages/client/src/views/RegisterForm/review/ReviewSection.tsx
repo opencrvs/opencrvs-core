@@ -1352,7 +1352,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         draft.data[section.id] || {},
         draft.data
       )
-      visibleGroups.forEach((group) => {
+      console.log('BEFORE items: ', items)
+      visibleGroups.forEach((group, index) => {
         group.fields
           .filter(
             (field) =>
@@ -1403,6 +1404,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             }
           })
       })
+      console.log('AFTER items: ', items)
       return {
         id: section.id,
         title: intl.formatMessage(section.title),
@@ -1438,7 +1440,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       onContinue
     } = this.props
     const formSections = this.getViewableSection(registerForm[event])
-
     const errorsOnFields = getErrorsOnFieldsBySection(
       formSections,
       offlineCountryConfiguration,
