@@ -23,7 +23,6 @@ import {
   TextArea,
   TextInput
 } from '@opencrvs/components/lib/forms'
-// import { InputField } from '@opencrvs/components/lib/forms/InputField/InputField'
 import { Box } from '@opencrvs/components/lib/interface'
 import { camelCase } from 'lodash'
 import * as React from 'react'
@@ -106,7 +105,6 @@ interface IFieldForm {
 
 interface ICustomFieldForms {
   selectedLanguage: string
-  label: string
   handleBars: string
   hideField: boolean
   requiredField: boolean
@@ -116,7 +114,7 @@ interface ICustomFieldForms {
 }
 
 const DEFAULTS = {
-  LABEL: 'Custom Text Field'
+  HANDLEBARS: 'Custom Text Field'
 }
 
 class CustomFieldFormsComp extends React.Component<
@@ -142,8 +140,7 @@ class CustomFieldFormsComp extends React.Component<
     })
 
     this.state = {
-      label: DEFAULTS.LABEL,
-      handleBars: camelCase(DEFAULTS.LABEL),
+      handleBars: camelCase(DEFAULTS.HANDLEBARS),
       selectedLanguage: defaultLanguage,
       hideField: false,
       requiredField: false,
@@ -171,6 +168,13 @@ class CustomFieldFormsComp extends React.Component<
         }
       }
     })
+  }
+
+  _isFormValid() {
+    for (const lang in this._getLanguages()) {
+      if (Boolean(this.state.fieldForms[lang].label) === false) return false
+    }
+    return true
   }
 
   getLanguageDropDown() {
@@ -228,9 +232,10 @@ class CustomFieldFormsComp extends React.Component<
             <RightAlignment>
               <Toggle
                 selected={this.state.requiredField}
-                onChange={() =>
+                onChange={() => {
+                  console.log('Required')
                   this.setState({ requiredField: !this.state.requiredField })
-                }
+                }}
               />
             </RightAlignment>
           </ListColumn>
@@ -252,7 +257,7 @@ class CustomFieldFormsComp extends React.Component<
               <FieldContainer
                 style={{
                   display:
-                    language == this.state.selectedLanguage ? 'block' : 'none'
+                    language === this.state.selectedLanguage ? 'block' : 'none'
                 }}
               >
                 <InputField
@@ -266,8 +271,8 @@ class CustomFieldFormsComp extends React.Component<
                       const { value } = event.target
                       this.setState({
                         handleBars:
-                          defaultLanguage == this.state.selectedLanguage
-                            ? camelCase(value || DEFAULTS.LABEL)
+                          defaultLanguage === this.state.selectedLanguage
+                            ? camelCase(value || DEFAULTS.HANDLEBARS)
                             : this.state.handleBars,
                         fieldForms: {
                           ...this.state.fieldForms,
@@ -287,7 +292,7 @@ class CustomFieldFormsComp extends React.Component<
               <FieldContainer
                 style={{
                   display:
-                    language == this.state.selectedLanguage ? 'block' : 'none'
+                    language === this.state.selectedLanguage ? 'block' : 'none'
                 }}
               >
                 <InputField
@@ -310,7 +315,7 @@ class CustomFieldFormsComp extends React.Component<
               <FieldContainer
                 style={{
                   display:
-                    language == this.state.selectedLanguage ? 'block' : 'none'
+                    language === this.state.selectedLanguage ? 'block' : 'none'
                 }}
               >
                 <InputField
@@ -321,14 +326,21 @@ class CustomFieldFormsComp extends React.Component<
                   required={false}
                   touched={false}
                 >
-                  <TextArea />
+                  <TextArea
+                    ignoreMediaQuery={true}
+                    {...{
+                      onChange: (event: any) => {
+                        this._setValue('description', event.target.value)
+                      }
+                    }}
+                  />
                 </InputField>
               </FieldContainer>
 
               <FieldContainer
                 style={{
                   display:
-                    language == this.state.selectedLanguage ? 'block' : 'none'
+                    language === this.state.selectedLanguage ? 'block' : 'none'
                 }}
               >
                 <InputField
@@ -351,7 +363,7 @@ class CustomFieldFormsComp extends React.Component<
               <FieldContainer
                 style={{
                   display:
-                    language == this.state.selectedLanguage ? 'block' : 'none'
+                    language === this.state.selectedLanguage ? 'block' : 'none'
                 }}
               >
                 <InputField
@@ -362,14 +374,21 @@ class CustomFieldFormsComp extends React.Component<
                   )}
                   touched={false}
                 >
-                  <TextArea />
+                  <TextArea
+                    ignoreMediaQuery={true}
+                    {...{
+                      onChange: (event: any) => {
+                        this._setValue('errorMessage', event.target.value)
+                      }
+                    }}
+                  />
                 </InputField>
               </FieldContainer>
 
               <FieldContainer
                 style={{
                   display:
-                    language == this.state.selectedLanguage ? 'block' : 'none'
+                    language === this.state.selectedLanguage ? 'block' : 'none'
                 }}
               >
                 <InputField
@@ -394,7 +413,10 @@ class CustomFieldFormsComp extends React.Component<
         <ListContainer>
           <ListRow>
             <ListColumn>
-              <CPrimaryButton onClick={() => {}} disabled={true}>
+              <CPrimaryButton
+                onClick={() => {}}
+                disabled={!this._isFormValid()}
+              >
                 {intl.formatMessage(buttonMessages.save)}
               </CPrimaryButton>
             </ListColumn>
