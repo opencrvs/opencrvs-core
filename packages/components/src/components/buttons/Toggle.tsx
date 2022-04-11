@@ -70,15 +70,16 @@ const CheckBox = styled.input`
 `
 
 export function Toggle(props: IToggle) {
+  const checkboxID = `checkbox-${new Date().getTime()}`
   return (
     <CheckBoxWrapper>
       <CheckBox
-        id="checkbox"
+        id={checkboxID}
         type="checkbox"
         checked={props.selected}
         onClick={props.onChange}
       />
-      <CheckBoxLabel htmlFor="checkbox" />
+      <CheckBoxLabel htmlFor={checkboxID} />
     </CheckBoxWrapper>
   )
 }
