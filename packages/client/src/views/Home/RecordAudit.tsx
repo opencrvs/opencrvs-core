@@ -404,6 +404,15 @@ const getCaptitalizedWord = (word: string | undefined): string => {
   return word.toUpperCase()[0] + word.toLowerCase().slice(1)
 }
 
+const getPlainedWord = (word: string): string => {
+  const wordArray = word.split('_')
+  const finalWord = wordArray.reduce(
+    (accum, cur, idx) => (idx > 0 ? accum + ' ' + cur : cur),
+    ''
+  )
+  return finalWord
+}
+
 const isBirthDeclaration = (
   declaration: GQLEventSearchSet | null
 ): declaration is GQLBirthEventSearchSet => {
@@ -481,8 +490,10 @@ const getLocation = (
 const getDraftDeclarationData = (
   declaration: IDeclaration,
   resources: IOfflineData,
-  intl: IntlShape
+  intl: IntlShape,
+  trackingId: string
 ): IDeclarationData => {
+  console.log(trackingId)
   return {
     id: declaration.id,
     name: getDraftDeclarationName(declaration),
@@ -493,7 +504,7 @@ const getDraftDeclarationData = (
     type: declaration.event || '',
     brnDrn:
       declaration.data?.registration?.registrationNumber?.toString() || '',
-    trackingId: declaration.data?.registration?.trackingId?.toString() || '',
+    trackingId: trackingId,
     dateOfBirth: declaration.data?.child?.childBirthDate?.toString() || '',
     dateOfDeath: declaration.data?.deathEvent?.deathDate?.toString() || '',
     placeOfBirth: getLocation(declaration, resources, intl) || '',
@@ -511,7 +522,8 @@ const getDraftDeclarationData = (
 
 const getWQDeclarationData = (
   workqueueDeclaration: GQLEventSearchSet,
-  language: string
+  language: string,
+  trackingId: string
 ) => {
   let name = ''
   if (
@@ -530,7 +542,7 @@ const getWQDeclarationData = (
     name,
     type: (workqueueDeclaration?.type && workqueueDeclaration.type) || '',
     status: workqueueDeclaration?.registration?.status || '',
-    trackingId: workqueueDeclaration?.registration?.trackingId || '',
+    trackingId: trackingId,
     dateOfBirth: '',
     placeOfBirth: '',
     informant: ''
@@ -567,14 +579,10 @@ const getDeclarationInfo = (
 ) => {
   let informant = getCaptitalizedWord(declaration?.informant)
 
-  const status = getCaptitalizedWord(declaration?.status).split('_')
-  const finalStatus = status.reduce(
-    (accum, cur, idx) => (idx > 0 ? accum + ' ' + cur : cur),
-    ''
-  )
+  const finalStatus = getPlainedWord(getCaptitalizedWord(declaration?.status))
 
-  if (declaration?.informantContact) {
-    informant = informant + ' . ' + declaration.informantContact
+  if (declaration?.informantContact && informant) {
+    informant = informant + ' · ' + declaration.informantContact
   }
 
   let info: ILabel = {
@@ -594,7 +602,7 @@ const getDeclarationInfo = (
       ...info,
       dateOfBirth: declaration?.dateOfBirth,
       placeOfBirth: declaration?.placeOfBirth,
-      informant: informant
+      informant: getPlainedWord(informant)
     }
   } else if (info.type === 'Death') {
     if (declaration?.brnDrn) {
@@ -607,7 +615,7 @@ const getDeclarationInfo = (
       ...info,
       dateOfDeath: declaration?.dateOfDeath,
       placeOfDeath: declaration?.placeOfDeath,
-      informant: informant
+      informant: getPlainedWord(informant)
     }
   }
   const mobileActions = actions.map((action, index) => (
@@ -1609,11 +1617,20 @@ function getBodyContent({
     )
   }
 
+  const trackingId =
+    draft?.data?.registration?.trackingId?.toString() ||
+    workqueueDeclaration?.registration?.trackingId ||
+    ''
+  console.log(draft)
+  console.log(workqueueDeclaration)
+  console.log(trackingId)
+
   const declaration = draft
-    ? getDraftDeclarationData(draft, resources, intl)
+    ? getDraftDeclarationData(draft, resources, intl, trackingId)
     : getWQDeclarationData(
         workqueueDeclaration as NonNullable<typeof workqueueDeclaration>,
-        language
+        language,
+        trackingId
       )
   return (
     <RecordAuditBody
