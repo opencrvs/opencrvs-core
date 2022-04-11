@@ -14,6 +14,8 @@ import {
   createTestComponent,
   mockDeclarationData,
   createRouterProps,
+  getFileFromBase64String,
+  validImageB64String,
   flushPromises,
   mockDeathDeclarationData,
   getRegisterFormFromStore,
@@ -348,14 +350,6 @@ describe('Correction summary', () => {
       expect(reason).toBeDefined()
     })
 
-    it('should disable the mark correction if fees yes option is selected without specifying the fees amount and document', () => {
-      wrapper.find('#correctionFees_REQUIRED').hostNodes().simulate('click')
-      wrapper.update()
-      expect(
-        wrapper.find('#make_correction').hostNodes().props().disabled
-      ).toBeTruthy()
-    })
-
     it('should not disable the mark correction if fees No is selected', () => {
       wrapper
         .find('#correctionFees_NOT_REQUIRED')
@@ -365,6 +359,17 @@ describe('Correction summary', () => {
       expect(
         wrapper.find('#make_correction').hostNodes().props().disabled
       ).toBeFalsy()
+    })
+
+    it('should disable the mark correction if fees yes option is selected without specifying the fees amount and document', () => {
+      wrapper
+        .find('#correctionFees_REQUIRED')
+        .hostNodes()
+        .simulate('change', { target: { checked: true } })
+      wrapper.update()
+      expect(
+        wrapper.find('#make_correction').hostNodes().props().disabled
+      ).toBeTruthy()
     })
 
     it('should go to review section when back to review is pressed', async () => {
