@@ -57,7 +57,7 @@ async function extractMessages() {
     )
   } catch (err) {
     console.error(
-      `Please add valid COUNTRY_CONFIG_PATH, COUNTRY_CODE as environment variables`
+      `Your environment variables may not be set. Please add valid COUNTRY_CONFIG_PATH, COUNTRY_CODE as environment variables.  If they are set correctly, then something is wrong with this file: ${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/client.json or this file: ${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/contentful-ids.json`
     )
     process.exit(1)
   }
