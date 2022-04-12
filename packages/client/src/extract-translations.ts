@@ -92,9 +92,9 @@ async function extractMessages() {
           // eslint-disable-line no-console
           console.log(
             `${chalk.red(
-              `No English translation key exists for message id.  Remeber to translate and add for all locales!!!: ${chalk.white(
+              `ERROR: Missing content key: ${chalk.white(
                 key
-              )} in ${chalk.white(
+              )}  Translate it and add it here: ${chalk.white(
                 `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/client.json`
               )}`
             )}`
@@ -103,18 +103,18 @@ async function extractMessages() {
 
         if (contentfulIds && !existsInContentful(contentfulIds, key)) {
           console.log(
-            `${chalk.red(
-              `You have set up a Contentful Content Management System.  OpenCRVS core has created this new key in this version: ${chalk.white(
+            `${chalk.yellow(
+              `This country configuration is setup to optionally use the Contentful Content Management System. Preparing this content key: ${chalk.white(
                 key
               )} in ${chalk.white(`${key}`)}`
             )}`
           )
           console.log(
             `${chalk.yellow(
-              'This key must be migrated into your Contentful CMS.  Saving to ...'
-            )} in ${chalk.white(
+              'When this script passes, OpenCRVS will save the new key'
+            )} here ${chalk.white(
               `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/contentful-keys-to-migrate.json`
-            )}`
+            )} and save the description into descriptions.json so that later you can import it into an existing or new Contentful installation.`
           )
           contentfulKeysToMigrate.push(key)
         }
@@ -123,8 +123,10 @@ async function extractMessages() {
       if (missingKeys) {
         // eslint-disable-line no-console
         console.log(
-          `${chalk.red('WARNING: ')}${chalk.yellow(
-            'Fix missing keys in locale files first.'
+          `${chalk.red(
+            'ERROR: Fix the missing keys in the local files: '
+          )}${chalk.white(
+            `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/client.json`
           )}`
         )
         process.exit(1)

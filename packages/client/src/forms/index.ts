@@ -469,6 +469,7 @@ export interface IFormFieldBase {
   }
   ignoreFieldLabelOnErrorMessage?: boolean
   ignoreBottomMargin?: boolean
+  customisable?: boolean
   customQuesstionMappingId?: string
 }
 

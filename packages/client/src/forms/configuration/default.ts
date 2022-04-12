@@ -855,6 +855,7 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'firstNamesEng',
                 previewGroup: 'childNameInEnglish',
+                customisable: false,
                 type: 'TEXT',
                 label: {
                   defaultMessage: 'First name(s)',
@@ -888,6 +889,7 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'familyNameEng',
                 previewGroup: 'childNameInEnglish',
+                customisable: false,
                 type: 'TEXT',
                 label: {
                   defaultMessage: 'Last name',
@@ -920,6 +922,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'gender',
+                customisable: false,
                 type: 'SELECT_WITH_OPTIONS',
                 label: {
                   defaultMessage: 'Sex',
@@ -977,6 +980,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'childBirthDate',
+                customisable: false,
                 type: 'DATE',
                 label: {
                   defaultMessage: 'Date of birth',
@@ -1008,6 +1012,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'attendantAtBirth',
+                customisable: true,
                 type: 'SELECT_WITH_OPTIONS',
                 label: {
                   defaultMessage: 'Attendant at birth',
@@ -1101,6 +1106,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'birthType',
+                customisable: true,
                 type: 'SELECT_WITH_OPTIONS',
                 label: {
                   defaultMessage: 'Type of birth',
@@ -1176,6 +1182,7 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Label for form field: Order of birth',
                   id: 'form.field.label.multipleBirth'
                 },
+                customisable: false,
                 required: true,
                 initialValue: '',
                 validate: [
@@ -1197,6 +1204,7 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Label for form field: Weight at birth',
                   id: 'form.field.label.weightAtBirth'
                 },
+                customisable: true,
                 required: false,
                 initialValue: '',
                 validate: [
@@ -1232,6 +1240,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'placeOfBirth',
+                customisable: false,
                 type: 'SELECT_WITH_OPTIONS',
                 previewGroup: 'placeOfBirth',
                 ignoreFieldLabelOnErrorMessage: true,
@@ -1287,6 +1296,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'birthLocation',
+                customisable: false,
                 type: 'LOCATION_SEARCH_INPUT',
                 label: {
                   defaultMessage: 'Health institution',
@@ -1330,6 +1340,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'country',
+                customisable: false,
                 type: 'SELECT_WITH_OPTIONS',
                 label: {
                   defaultMessage: 'Country',
@@ -1373,6 +1384,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'state',
+                customisable: false,
                 type: 'SELECT_WITH_DYNAMIC_OPTIONS',
                 label: {
                   defaultMessage: 'Province',
@@ -1439,6 +1451,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'district',
+                customisable: false,
                 type: 'SELECT_WITH_DYNAMIC_OPTIONS',
                 label: {
                   defaultMessage: 'District',
@@ -1509,6 +1522,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'ruralOrUrban',
+                customisable: false,
                 type: 'RADIO_GROUP',
                 label: {
                   defaultMessage: ' ',
@@ -1571,6 +1585,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'addressChief',
+                customisable: false,
                 type: 'TEXT',
                 label: {
                   id: 'form.field.label.addressChief',
@@ -1617,6 +1632,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'addressLine4CityOption',
+                customisable: false,
                 type: 'TEXT',
                 label: {
                   defaultMessage: 'Town',
@@ -1663,6 +1679,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'addressLine3CityOption',
+                customisable: false,
                 type: 'TEXT',
                 label: {
                   defaultMessage: 'Residential Area',
@@ -1709,6 +1726,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'addressLine2CityOption',
+                customisable: false,
                 type: 'TEXT',
                 label: {
                   defaultMessage: 'Street / Plot Number',
@@ -1755,6 +1773,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'numberOption',
+                customisable: false,
                 type: 'NUMBER',
                 label: {
                   defaultMessage: 'Number',
@@ -1801,6 +1820,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'addressLine1',
+                customisable: false,
                 type: 'TEXT',
                 label: {
                   defaultMessage: 'Village',
@@ -1847,6 +1867,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'internationalState',
+                customisable: false,
                 type: 'TEXT',
                 label: {
                   defaultMessage: 'State',
@@ -1899,6 +1920,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'internationalDistrict',
+                customisable: false,
                 type: 'TEXT',
                 label: {
                   defaultMessage: 'District',
@@ -1951,6 +1973,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'internationalCity',
+                customisable: false,
                 type: 'TEXT',
                 label: {
                   defaultMessage: 'City / Town',
@@ -1986,6 +2009,7 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'internationalAddressLine1',
                 type: 'TEXT',
+                customisable: false,
                 label: {
                   defaultMessage: 'Address Line 1',
                   description:
@@ -2020,6 +2044,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'internationalAddressLine2',
+                customisable: false,
                 type: 'TEXT',
                 label: {
                   defaultMessage: 'Address Line 2',
@@ -2055,6 +2080,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'internationalAddressLine3',
+                customisable: false,
                 type: 'TEXT',
                 label: {
                   defaultMessage: 'Address Line 3',
@@ -2090,6 +2116,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'internationalPostcode',
+                customisable: false,
                 type: 'TEXT',
                 label: {
                   defaultMessage: 'Postcode / Zip',
@@ -4056,6 +4083,7 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'text for social security number form field',
                   id: 'form.field.label.socialSecurityNumber'
                 },
+                customisable: true,
                 required: false,
                 initialValue: '',
                 validate: [],
@@ -4197,6 +4225,7 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Label for form field: Marital status',
                   id: 'form.field.label.maritalStatus'
                 },
+                customisable: true,
                 required: false,
                 initialValue: 'MARRIED',
                 validate: [],
@@ -4270,6 +4299,7 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'text for occupation form field',
                   id: 'form.field.label.occupation'
                 },
+                customisable: true,
                 required: false,
                 initialValue: '',
                 validate: [],
@@ -6593,6 +6623,7 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'text for social security number form field',
                   id: 'form.field.label.socialSecurityNumber'
                 },
+                customisable: true,
                 required: false,
                 initialValue: '',
                 validate: [],
@@ -6800,6 +6831,7 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Label for form field: Marital status',
                   id: 'form.field.label.maritalStatus'
                 },
+                customisable: true,
                 required: false,
                 initialValue: 'MARRIED',
                 validate: [],
@@ -6879,6 +6911,7 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'text for occupation form field',
                   id: 'form.field.label.occupation'
                 },
+                customisable: true,
                 required: false,
                 initialValue: '',
                 validate: [],
@@ -6897,6 +6930,7 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Label for form field: Mother education',
                   id: 'form.field.label.motherEducationAttainment'
                 },
+                customisable: true,
                 required: false,
                 initialValue: '',
                 validate: [],
