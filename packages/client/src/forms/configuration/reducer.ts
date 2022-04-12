@@ -45,6 +45,7 @@ export interface IDraft {
   comment?: string
   version: number
   history?: IHistory[]
+  questions?: IQuestionConfig[]
   fieldsMap: ISectionFieldMap
   updatedAt: number
   createdAt: number

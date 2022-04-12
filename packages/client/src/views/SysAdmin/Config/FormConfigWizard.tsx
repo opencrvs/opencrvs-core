@@ -37,6 +37,7 @@ import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { goToFormConfigWizard } from '@client/navigation'
 import { buttonMessages } from '@client/i18n/messages'
 import { Scope, isNatlSysAdmin } from '@client/utils/authUtils'
+import { Canvas } from '@client/components/formConfig/Canvas'
 
 type RouteProps = RouteComponentProps<{
   event: string
@@ -91,9 +92,8 @@ const ToolsContainer = styled.div`
 `
 
 const CanvasContainer = styled.div`
-  flex-shrink: 1;
   overflow-y: auto;
-  width: 100%;
+  flex: 0 1 800px;
   margin-left: 40px;
   margin-right: 40px;
   margin-top: 18px;
@@ -141,7 +141,7 @@ function FormConfigWizardComp(props: IFullProps) {
           />
         </NavigationContainer>
         <CanvasContainer>
-          <FormConfigCanvas></FormConfigCanvas>
+          <Canvas event={props.event} section={props.section} />
         </CanvasContainer>
         <ToolsContainer>
           <FormTools intl={props.intl} />

@@ -43,7 +43,7 @@ interface IPageNavigation {
 }
 
 export const TAB_BIRTH = {
-  introduction: 'introduction',
+  // introduction: 'introduction',
   child: 'child',
   mother: 'mother',
   father: 'father',
@@ -52,7 +52,7 @@ export const TAB_BIRTH = {
 }
 
 export const TAB_DEATH = {
-  introduction: 'introduction',
+  // introduction: 'introduction',
   deceased: 'deceased',
   deathEvent: 'deathEvent',
   causeOfDeath: 'causeOfDeath',

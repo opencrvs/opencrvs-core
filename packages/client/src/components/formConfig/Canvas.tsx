@@ -16,9 +16,10 @@ import { FormConfigElementCard } from '@opencrvs/components/lib/interface/FormCo
 import styled from '@client/styledComponents'
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { getRegisterFormSection } from '@client/forms/register/declaration-selectors'
-import { Event, BirthSection, IFormSection, IFormField } from '@client/forms'
+import { Event, BirthSection, DeathSection } from '@client/forms'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
+import { getEventSectionFieldsMap } from '@client/forms/configuration/selector'
+import { IConfigFormField } from '@client/forms/configuration/formDraftUtils'
 
 /* Further refactoring will be needed when merging with #2740 */
 
@@ -26,23 +27,11 @@ const CanvasBox = styled(Box)`
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-width: 689px;
-  margin: 0 auto;
   border: 1px solid ${({ theme }) => theme.colors.grey300};
   border-radius: 4px;
 `
 
 type ICanvasProps = ReturnType<typeof mapStateToProps>
-
-type IConfigFormField = {
-  fieldId: string
-  precedingFieldId: string | null
-  foregoingFieldId: string | null
-  required: boolean
-  enabled: boolean
-  custom: boolean
-  definition: IFormField
-}
 
 type IFormFieldMap = Record<string, IConfigFormField>
 
@@ -66,39 +55,8 @@ function generateConfigFields(formFieldMap: IFormFieldMap) {
   return configFields
 }
 
-function useConfigFieldsMap(event: Event, section: IFormSection) {
-  const formFieldMap = React.useMemo(() => {
-    let precedingFieldId: string | null = null
-    return section.groups.reduce<IFormFieldMap>(
-      (groupFieldMap, group) =>
-        group.fields.reduce((fieldMap, field) => {
-          const fieldId = [event.toLowerCase(), group.id, field.name].join('.')
-          /* We need to build the field regardless of the conditionals */
-          delete field.conditionals
-          fieldMap[fieldId] = {
-            fieldId,
-            precedingFieldId: precedingFieldId ? precedingFieldId : null,
-            foregoingFieldId: null,
-            required: field.required || false,
-            enabled: true,
-            custom: field.custom || false,
-            definition: field
-          }
-          if (precedingFieldId) {
-            fieldMap[precedingFieldId].foregoingFieldId = fieldId
-          }
-          precedingFieldId = fieldId
-          return fieldMap
-        }, groupFieldMap),
-      {}
-    )
-  }, [event, section])
-  return formFieldMap
-}
-
-export function CanvasView({ event, section }: ICanvasProps) {
-  const configFieldsMap = useConfigFieldsMap(event, section)
-  const configFields = generateConfigFields(configFieldsMap)
+export function CanvasView({ fieldsMap }: ICanvasProps) {
+  const configFields = generateConfigFields(fieldsMap)
   return (
     <CanvasBox>
       {configFields.map((configField) => (
@@ -115,10 +73,14 @@ export function CanvasView({ event, section }: ICanvasProps) {
   )
 }
 
-function mapStateToProps(store: IStoreState) {
+type IProps = {
+  event: Event
+  section: string
+}
+
+function mapStateToProps(store: IStoreState, { event, section }: IProps) {
   return {
-    event: Event.BIRTH,
-    section: getRegisterFormSection(store, BirthSection.Mother, Event.BIRTH)
+    fieldsMap: getEventSectionFieldsMap(store, event, section)
   }
 }
 
