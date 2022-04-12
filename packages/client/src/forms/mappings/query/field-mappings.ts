@@ -14,7 +14,9 @@ import {
   GQLAttachment,
   GQLComment,
   GQLHumanName,
-  GQLRegWorkflow
+  GQLRegWorkflow,
+  GQLLocationType,
+  GQLAddressType
 } from '@opencrvs/gateway/src/graphql/schema'
 import {
   IAttachment,
@@ -22,15 +24,22 @@ import {
   IFormField,
   IFormFieldQueryMapFunction,
   TransformedData,
-  IFormSectionData
+  IFormSectionData,
+  ISelectFormFieldWithOptions
 } from '@client/forms'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { cloneDeep, get } from 'lodash'
 import format from '@client/utils/date-formatting'
-import { IOfflineData, OFFLINE_FACILITIES_KEY } from '@client/offline/reducer'
+import {
+  IOfflineData,
+  OFFLINE_FACILITIES_KEY,
+  OFFLINE_LOCATIONS_KEY,
+  LocationType
+} from '@client/offline/reducer'
 import { mergeArraysRemovingEmptyStrings } from '@client/utils/data-formatting'
 import { countries } from '@client/forms/countries'
 import { MessageDescriptor } from 'react-intl'
+import { getSelectedOption } from '@client/forms/utils'
 
 interface IName {
   [key: string]: any
@@ -170,6 +179,9 @@ export const identityToFieldTransformer =
       const existingIdentity = queryData[sectionId].identifier.find(
         (identity: fhir.Identifier) => identity.type === identityType
       )
+      if (!transformedData[sectionId]) {
+        transformedData[sectionId] = {}
+      }
       transformedData[sectionId][field.name] =
         existingIdentity && identifierField in existingIdentity
           ? existingIdentity[identifierField]
@@ -689,14 +701,95 @@ export const dateFormatTransformer =
     }
   }
 
-enum AddressType {
+enum LocationLevel {
   district,
   state,
   country
 }
 
+const isLocationFacilityOrCRVSOffice = (
+  type: string
+): type is Exclude<
+  GQLLocationType,
+  GQLLocationType.HEALTH_FACILITY | GQLLocationType.CRVS_OFFICE
+> => {
+  return Boolean(
+    type &&
+      [LocationType.HEALTH_FACILITY, LocationType.CRVS_OFFICE].includes(
+        type as LocationType
+      )
+  )
+}
+
+const transformAddressTemplateArray = (
+  transformedData: IFormData,
+  addressFromQuery: GQLAddress,
+  addressLocationLevel: keyof typeof LocationLevel,
+  sectionId: string,
+  nameKey: string,
+  offlineData?: IOfflineData
+) => {
+  if (!transformedData[sectionId]) {
+    transformedData[sectionId] = {}
+  }
+  if (!transformedData[sectionId][nameKey]) {
+    transformedData[sectionId][nameKey] = Array(3).fill('')
+  }
+  ;(transformedData[sectionId][nameKey] as Array<string | MessageDescriptor>)[
+    LocationLevel[addressLocationLevel]
+  ] =
+    addressLocationLevel === 'country'
+      ? countries.find(
+          ({ value }) => value === addressFromQuery?.[addressLocationLevel]
+        )?.label || ''
+      : offlineData?.[OFFLINE_LOCATIONS_KEY]?.[
+          addressFromQuery[addressLocationLevel] as string
+        ]?.name || ''
+}
+
+export const addressOfflineTransformer =
+  (
+    transformedFieldName: string,
+    addressType: GQLAddressType,
+    addressLocationLevel: keyof typeof LocationLevel,
+    targetFieldName?: string
+  ) =>
+  (
+    transformedData: IFormData,
+    queryData: any,
+    sectionId: string,
+    field: IFormField,
+    _?: IFormField,
+    offlineData?: IOfflineData
+  ) => {
+    if (
+      queryData[transformedFieldName]?.type &&
+      isLocationFacilityOrCRVSOffice(queryData[transformedFieldName]?.type)
+    ) {
+      return
+    }
+    console.log(queryData[transformedFieldName]?.address, transformedFieldName)
+    const addressFromQuery = (
+      queryData[transformedFieldName]?.address as GQLAddress[]
+    )?.find((address) => address.type === addressType)
+    const nameKey = targetFieldName || field.name
+    if (addressFromQuery) {
+      transformAddressTemplateArray(
+        transformedData,
+        addressFromQuery,
+        addressLocationLevel,
+        sectionId,
+        nameKey,
+        offlineData
+      )
+    }
+  }
+
 export const eventLocationAddressOfflineTransformer =
-  (addressType: keyof typeof AddressType, transformedFieldName?: string) =>
+  (
+    addressLocationLevel: keyof typeof LocationLevel,
+    transformedFieldName?: string
+  ) =>
   (
     transformedData: IFormData,
     queryData: any,
@@ -714,20 +807,32 @@ export const eventLocationAddressOfflineTransformer =
     }
 
     const addressFromQuery = queryData.eventLocation?.address
+    const nameKey = transformedFieldName || field.name
 
+    transformAddressTemplateArray(
+      transformedData,
+      addressFromQuery,
+      addressLocationLevel,
+      sectionId,
+      nameKey,
+      offlineData
+    )
+  }
+
+export const selectTransformer = (
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  field: IFormField
+) => {
+  if (queryData[sectionId]?.[field.name]) {
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
     }
-    const nameKey = transformedFieldName || field.name
-    if (!transformedData[sectionId][nameKey]) {
-      transformedData[sectionId][nameKey] = Array(3).fill('')
-    }
-    ;(transformedData[sectionId][nameKey] as Array<string | MessageDescriptor>)[
-      AddressType[addressType]
-    ] =
-      addressType === 'country'
-        ? countries.find(
-            ({ value }) => value === addressFromQuery?.[addressType]
-          )?.label || ''
-        : offlineData?.locations?.[addressFromQuery?.[addressType]]?.name || ''
+    transformedData[sectionId][field.name] =
+      (getSelectedOption(
+        queryData[sectionId][field.name],
+        (field as ISelectFormFieldWithOptions).options
+      )?.label as IFormSectionData) || ''
   }
+}
