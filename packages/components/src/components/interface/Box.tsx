@@ -24,6 +24,7 @@ const Wrapper = styled.div<IBox>`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     height: 100%;
     border: 0;
+    padding: 16px;
   }
 `
 
