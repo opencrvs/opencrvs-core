@@ -25,7 +25,7 @@ export interface INavigationItemProps
 
 const ItemContainer = styled.button<{ isSelected?: boolean }>`
   width: 100%;
-  height: 40px;
+  min-height: 40px;
   cursor: pointer;
   border: 0;
   outline: none;
@@ -47,7 +47,8 @@ const LabelContainer = styled.span<{
 }>`
   ${({ theme }) => theme.fonts.bold14};
   margin-left: 13px;
-  padding-top: 3px;
+  margin-right: 4px;
+  text-align: left;
   color: ${({ isSelected, theme }) =>
     isSelected ? theme.colors.copy : theme.colors.grey500};
 `
@@ -58,6 +59,10 @@ const ValueContainer = styled.span<{ isSelected?: boolean }>`
   padding-top: 3px;
   color: ${({ isSelected, theme }) =>
     isSelected ? theme.colors.copy : theme.colors.grey500};
+`
+
+const IconContainer = styled.div`
+  width: 24px;
 `
 
 export const NavigationItem = ({
@@ -73,7 +78,7 @@ export const NavigationItem = ({
   return (
     <ItemContainer isSelected={isSelected} {...otherProps}>
       <ItemContentContainer>
-        {icon && icon()}
+        {icon && <IconContainer>{icon()}</IconContainer>}
         <LabelContainer isSelected={isSelected} isSubItem={isSubItem}>
           {label}
         </LabelContainer>

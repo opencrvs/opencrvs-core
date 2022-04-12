@@ -564,6 +564,7 @@ export interface GQLHistory {
   user?: GQLUser
   date?: GQLDate
   action?: GQLRegStatus
+  statusReason?: GQLStatusReason
   reinstated?: boolean
   location?: GQLLocation
   office?: GQLLocation
@@ -1031,6 +1032,10 @@ export const enum GQLParentDetailsType {
   NONE = 'NONE'
 }
 
+export interface GQLStatusReason {
+  text?: string
+}
+
 export interface GQLComment {
   id: string
   user?: GQLUser
@@ -1467,6 +1472,7 @@ export interface GQLResolver {
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
   ReasonsNotApplying?: GQLReasonsNotApplyingTypeResolver
+  StatusReason?: GQLStatusReasonTypeResolver
   Comment?: GQLCommentTypeResolver
   InputOutput?: GQLInputOutputTypeResolver
   GenderBasisDetailsMetrics?: GQLGenderBasisDetailsMetricsTypeResolver
@@ -4047,6 +4053,7 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   user?: HistoryToUserResolver<TParent>
   date?: HistoryToDateResolver<TParent>
   action?: HistoryToActionResolver<TParent>
+  statusReason?: HistoryToStatusReasonResolver<TParent>
   reinstated?: HistoryToReinstatedResolver<TParent>
   location?: HistoryToLocationResolver<TParent>
   office?: HistoryToOfficeResolver<TParent>
@@ -4065,6 +4072,10 @@ export interface HistoryToDateResolver<TParent = any, TResult = any> {
 }
 
 export interface HistoryToActionResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToStatusReasonResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -5045,6 +5056,14 @@ export interface ReasonsNotApplyingToIsDeceasedResolver<
   TParent = any,
   TResult = any
 > {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLStatusReasonTypeResolver<TParent = any> {
+  text?: StatusReasonToTextResolver<TParent>
+}
+
+export interface StatusReasonToTextResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

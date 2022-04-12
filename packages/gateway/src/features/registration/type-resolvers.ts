@@ -796,6 +796,7 @@ export const typeResolvers: GQLResolver = {
         findExtension(REINSTATED_EXTENSION_URL, task.extension)
       return extension !== undefined
     },
+    statusReason: (task: fhir.Task) => task.statusReason || null,
     date: (task: fhir.Task) => task.meta?.lastUpdated,
     user: async (task: fhir.Task, _: any, authHeader: any) => {
       const user = findExtension(

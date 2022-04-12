@@ -46,7 +46,10 @@ import {
   ISelectFormFieldWithOptions,
   RADIO_GROUP_WITH_NESTED_FIELDS,
   IRadioGroupWithNestedFieldsFormField,
-  SerializedFormField
+  SerializedFormField,
+  ITemplateDescriptor,
+  IFormFieldTemplateMapOperation,
+  IQueryTemplateDescriptor
 } from '@client/forms'
 import { countries } from '@client/forms/countries'
 
@@ -90,6 +93,12 @@ function isFactoryOperation(
 ): descriptor is ValidationFactoryOperation
 function isFactoryOperation(descriptor: any) {
   return Boolean((descriptor as ValidationFactoryOperation).parameters)
+}
+
+function hasTemplateOperator(
+  descriptor: ITemplateDescriptor
+): descriptor is IQueryTemplateDescriptor {
+  return Boolean((descriptor as IQueryTemplateDescriptor).operation)
 }
 
 function configurationError(
@@ -167,6 +176,18 @@ function fieldQueryDescriptorToQueryFunction(
     return factory(...parameters)
   }
   return transformer
+}
+
+function fieldTemplateDescriptorToQueryOperation(
+  descriptor: ITemplateDescriptor
+): IFormFieldTemplateMapOperation {
+  if (hasTemplateOperator(descriptor)) {
+    return [
+      descriptor.fieldName,
+      fieldQueryDescriptorToQueryFunction(descriptor)
+    ]
+  }
+  return [descriptor.fieldName]
 }
 
 function fieldMutationDescriptorToMutationFunction(
@@ -274,7 +295,10 @@ function deserializeFormField(field: SerializedFormField) {
         fieldQueryDescriptorToQueryFunction(field.mapping.query),
       mutation:
         field.mapping.mutation &&
-        fieldMutationDescriptorToMutationFunction(field.mapping.mutation)
+        fieldMutationDescriptorToMutationFunction(field.mapping.mutation),
+      template:
+        field.mapping.template &&
+        fieldTemplateDescriptorToQueryOperation(field.mapping.template)
     }
   }
 }
@@ -290,7 +314,16 @@ export function deserializeFormSection(
     mutation:
       section.mapping &&
       section.mapping.mutation &&
-      sectionMutationDescriptorToMutationFunction(section.mapping.mutation)
+      sectionMutationDescriptorToMutationFunction(section.mapping.mutation),
+    template:
+      section.mapping?.template &&
+      section.mapping.template.map(
+        ({ fieldName, ...query }) =>
+          [fieldName, sectionQueryDescriptorToQueryFunction(query)] as [
+            string,
+            IFormSectionQueryMapFunction
+          ]
+      )
   }
   const groups = section.groups.map((group) => ({
     ...group,

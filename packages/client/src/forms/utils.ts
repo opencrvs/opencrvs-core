@@ -42,7 +42,8 @@ import {
   DOCUMENT_UPLOADER_WITH_OPTION,
   IFormFieldValue,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
-  IRadioGroupWithNestedFieldsFormField
+  IRadioGroupWithNestedFieldsFormField,
+  IInformant
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -512,6 +513,21 @@ export const getVisibleSectionGroupsBasedOnConditions = (
   values: IFormSectionData,
   draftData?: IFormData
 ): IFormSectionGroup[] => {
+  // IFormFieldValue is a union with primitives - usually a top-level string in this function like this section.fieldValue
+  // informantType is a special case where both the nested field and the selected parent are required
+  // this means an object was required for the fieldValue
+  // TypeScript throws an error as the IFormFieldValue type cannot access the object prop of what it things could be a string
+  // creating selectedInformantType to be a value which will be used in the conditional
+  let selectedInformantType
+  if (
+    draftData &&
+    draftData.registration &&
+    draftData.registration.informantType
+  ) {
+    const informantType = draftData.registration.informantType as IInformant
+    selectedInformantType = informantType.value
+  }
+  // handling all possible group visibility conditionals
   return section.groups.filter((group) => {
     if (!group.conditionals) {
       return true
@@ -648,6 +664,18 @@ export const getSelectedRadioOptionWithNestedFields = (
   sectionData: IFormSectionData
 ): string | undefined => {
   return (sectionData[field.name] as IFormSectionData).value as string
+}
+
+export function getSelectedOption(
+  value: string,
+  options: ISelectOption[]
+): ISelectOption | null {
+  const selectedOption = options.find((x: ISelectOption) => x.value === value)
+  if (selectedOption) {
+    return selectedOption
+  }
+
+  return null
 }
 
 export const conditionals: IConditionals = {

@@ -47,8 +47,11 @@ import { formatLongDate } from '@client/utils/date-formatting'
 import { certificateTemplateMutations } from '@client/certificate/mutations'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
-import { Event, IAttachmentValue, IFormFieldValue } from '@client/forms'
+import { Event, IAttachmentValue, IFormFieldValue, IForm } from '@client/forms'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
+import { getDummyCertificateTemplateData } from '@client/views/SysAdmin/Config/previewDummyData'
+import { getRegisterForm } from '@client/forms/register/declaration-selectors'
+import { executeHandlebarsTemplate } from '@client/views/PrintCertificate/PDFUtils'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 
 const HiddenInput = styled.input`
@@ -83,6 +86,10 @@ type Props = WrappedComponentProps &
     scope: Scope | null
     offlineResources: IOfflineData
     offlineCountryConfiguration: IOfflineData
+    registerForm: {
+      birth: IForm
+      death: IForm
+    }
   }
 
 interface State {
@@ -93,6 +100,33 @@ interface State {
   showPrompt: boolean
   eventName: string
   previewImage: IAttachmentValue | null
+}
+
+function blobToBase64(blob: Blob): Promise<string | null | ArrayBuffer> {
+  return new Promise((resolve, _) => {
+    const reader = new FileReader()
+    reader.onloadend = () => resolve(reader.result)
+    reader.readAsDataURL(blob)
+  })
+}
+
+async function updatePreviewSvgWithSampleSignature(
+  svgCode: string
+): Promise<string> {
+  const html = document.createElement('html')
+  html.innerHTML = svgCode
+  const certificateImages = html.querySelectorAll('image')
+  if (certificateImages[1]) {
+    const signatureImage = certificateImages[1]
+
+    const res = await fetch('/assets/sample-signature.png')
+    const blob = await res.blob()
+    const base64signature = await blobToBase64(blob)
+    signatureImage.setAttribute('xlink:href', base64signature as string)
+  }
+
+  svgCode = html.getElementsByTagName('svg')[0].outerHTML
+  return unescape(encodeURIComponent(svgCode))
 }
 
 export function printFile(data: string, fileName: string) {
@@ -155,7 +189,18 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
     const menuItems = [
       {
         label: intl.formatMessage(messages.previewTemplate),
-        handler: () => {
+        handler: async () => {
+          const dummyTemplateData = getDummyCertificateTemplateData(
+            event,
+            this.props.registerForm
+          )
+
+          svgCode = executeHandlebarsTemplate(
+            svgCode,
+            dummyTemplateData,
+            this.props.intl
+          )
+          svgCode = await updatePreviewSvgWithSampleSignature(svgCode)
           const linkSource = `data:${SVGFile.type};base64,${window.btoa(
             svgCode
           )}`
@@ -534,6 +579,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
 function mapStateToProps(state: IStoreState) {
   return {
     offlineResources: getOfflineData(state),
+    registerForm: getRegisterForm(state),
     userDetails: getUserDetails(state),
     scope: getScope(state),
     offlineCountryConfiguration: getOfflineData(state)

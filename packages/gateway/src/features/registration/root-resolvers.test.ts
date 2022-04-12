@@ -982,7 +982,7 @@ describe('Registration root resolvers', () => {
       )
       const postData = JSON.parse(fetch.mock.calls[1][1].body)
       expect(postData.entry[0].resource.reason.text).toBe('Misspelling')
-      expect(postData.entry[0].resource.note[1].text).toBe(
+      expect(postData.entry[0].resource.statusReason.text).toBe(
         'Family name misspelled'
       )
       expect(result).toBe('ba0412c6-5125-4447-bd32-fb5cf336ddbc')

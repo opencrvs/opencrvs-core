@@ -13,7 +13,6 @@ import * as React from 'react'
 import {
   CheckboxGroup,
   DateField,
-  PDFViewer,
   RadioGroup,
   Select,
   TextArea,
@@ -67,7 +66,6 @@ import {
   NUMBER,
   BIG_NUMBER,
   PARAGRAPH,
-  PDF_DOCUMENT_VIEWER,
   DYNAMIC_LIST,
   IDynamicListFormField,
   IListFormField,
@@ -498,15 +496,6 @@ function GeneratedInputField({
     )
   }
 
-  if (fieldDefinition.type === PDF_DOCUMENT_VIEWER) {
-    return (
-      <PDFViewer
-        id={fieldDefinition.name}
-        pdfSource={fieldDefinition.initialValue as string}
-      />
-    )
-  }
-
   if (
     fieldDefinition.type === LOCATION_SEARCH_INPUT &&
     fieldDefinition.locationList
@@ -670,7 +659,7 @@ class FormSectionComponent extends React.Component<Props> {
   componentDidUpdate(prevProps: Props) {
     const userChangedForm = !isEqual(this.props.values, prevProps.values)
     const sectionChanged = prevProps.id !== this.props.id
-
+    const fieldChanged = !isEqual(prevProps.fields, this.props.fields)
     if (userChangedForm) {
       prevProps.onChange(this.props.values)
     }
@@ -685,6 +674,10 @@ class FormSectionComponent extends React.Component<Props> {
       ) {
         this.showValidationErrors(this.props.fieldsToShowValidationErrors)
       }
+    }
+
+    if (fieldChanged) {
+      prevProps.resetForm()
     }
   }
 
@@ -935,7 +928,6 @@ class FormSectionComponent extends React.Component<Props> {
                 }
               : field
           if (
-            field.type === PDF_DOCUMENT_VIEWER ||
             field.type === FETCH_BUTTON ||
             field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
             field.type === SELECT_WITH_DYNAMIC_OPTIONS

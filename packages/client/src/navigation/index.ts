@@ -70,6 +70,7 @@ import { stringify } from 'query-string'
 import { Cmd, loop } from 'redux-loop'
 import { IRecordAuditTabs } from '@client/views/Home/RecordAudit'
 import subYears from 'date-fns/subYears'
+import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -179,7 +180,7 @@ export function goToHome() {
   return push(HOME)
 }
 
-export function goToConfig() {
+export function goToCertificateConfig() {
   return push(CERTIFICATE_CONFIG)
 }
 
@@ -381,14 +382,17 @@ export function goToDeathRegistration(declarationId: string) {
   )
 }
 
-export function goToRegistrarHomeTab(tabId: string, selectorId?: string) {
+export function goToRegistrarHomeTab(
+  tabId: IWORKQUEUE_TABS,
+  selectorId?: string
+) {
   return {
     type: GO_TO_REGISTRAR_HOME,
     payload: { tabId, selectorId }
   }
 }
 
-export function goToFieldAgentHomeTab(tabId: string) {
+export function goToFieldAgentHomeTab(tabId: IWORKQUEUE_TABS) {
   return {
     type: GO_TO_FIELD_AGENT_HOME,
     payload: { tabId }

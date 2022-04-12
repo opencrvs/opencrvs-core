@@ -674,6 +674,7 @@ type History {
   user: User
   date: Date
   action: RegStatus
+  statusReason: StatusReason
   reinstated: Boolean
   location: Location
   office: Location
@@ -1128,6 +1129,10 @@ enum ParentDetailsType {
   MOTHER_ONLY
   FATHER_ONLY
   NONE
+}
+
+type StatusReason {
+  text: String
 }
 
 type Comment {

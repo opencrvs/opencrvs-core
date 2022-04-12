@@ -783,7 +783,7 @@ test('should update a task document as rejected', async () => {
   const rejectedText = 'Child name was misspelled'
   expect(fhir).toBeDefined()
   expect(fhir.entry[0].resource.reason.text).toEqual(rejectedReason)
-  expect(fhir.entry[0].resource.note[1].text).toEqual(rejectedText)
+  expect(fhir.entry[0].resource.statusReason.text).toEqual(rejectedText)
   expect(fhir.entry[0].resource.businessStatus.coding[0].code).toEqual(
     'REJECTED'
   )

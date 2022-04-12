@@ -92,6 +92,7 @@ export interface IOfflineData {
   assets: {
     logo: string
   }
+
   config: IApplicationConfig
   formConfig: IFormConfig
 }
@@ -329,7 +330,7 @@ function reducer(
               definition: certificatesTemplates.birth.svgCode
             },
             death: {
-              definition: certificatesTemplates.birth.svgCode
+              definition: certificatesTemplates.death.svgCode
             }
           }
         }

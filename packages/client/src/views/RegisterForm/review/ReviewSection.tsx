@@ -1352,7 +1352,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         draft.data[section.id] || {},
         draft.data
       )
-      console.log('BEFORE items: ', items)
       visibleGroups.forEach((group, index) => {
         group.fields
           .filter(
@@ -1404,7 +1403,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             }
           })
       })
-      console.log('AFTER items: ', items)
       return {
         id: section.id,
         title: intl.formatMessage(section.title),
@@ -1495,13 +1493,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               }
             />
             <FormData>
-              {!isCorrection(declaration) && (
-                <FormDataHeader>
-                  {intl.formatMessage(messages.formDataHeader, {
-                    isDraft: draft
-                  })}
-                </FormDataHeader>
-              )}
               {transformedSectionData.map((sec, index) => {
                 const { uploadedDocuments, selectOptions } =
                   this.prepSectionDocuments(declaration, sec.id)
