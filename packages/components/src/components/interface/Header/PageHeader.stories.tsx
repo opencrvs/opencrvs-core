@@ -11,10 +11,9 @@
  */
 import { Meta, Story } from '@storybook/react'
 import { BackArrowDeepBlue, Cross } from '../../icons'
-import { PageHeader } from './AppHeader'
-import { IRightMenu } from './Desktop/DesktopHeader'
+import { PageHeader } from './PageHeader'
 import React from 'react'
-import { CircleButton } from 'src/components/buttons'
+import { CircleButton } from '../../buttons'
 
 export default {
   title: 'Components/Interface/Header/PageHeader',
@@ -38,22 +37,22 @@ PageHeaderView.args = {
   mobileTitle: 'Mobile title',
   desktopTitle: 'Desktop title',
   mobileLeft: [
-    <CircleButton key="back">
+    <CircleButton key="back" onClick={() => alert('Mobile click')}>
       <BackArrowDeepBlue />
     </CircleButton>
   ],
   desktopLeft: [
-    <CircleButton key="back">
+    <CircleButton key="back" onClick={() => alert('Desktop click')}>
       <BackArrowDeepBlue />
     </CircleButton>
   ],
   desktopRight: [
-    <CircleButton key="cross">
+    <CircleButton key="cross" onClick={() => alert('Desktop click')}>
       <Cross color="currentColor" />
     </CircleButton>
   ],
   mobileRight: [
-    <CircleButton key="cross">
+    <CircleButton key="cross" onClick={() => alert('Mobile click')}>
       <Cross color="currentColor" />
     </CircleButton>
   ]
