@@ -33,6 +33,7 @@ import * as React from 'react'
 
 import { waitFor, waitForElement } from '@client/tests/wait-for-element'
 import { SELECTOR_ID } from './tabs/inProgress/inProgressTab'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -144,7 +145,7 @@ describe('OfficeHome related tests', () => {
       <OfficeHome
         match={{
           params: {
-            tabId: 'progress'
+            tabId: WORKQUEUE_TABS.inProgress
           },
           isExact: true,
           path: '',
@@ -180,7 +181,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'progress' },
+            params: { tabId: WORKQUEUE_TABS.inProgress },
             isExact: true,
             path: '',
             url: ''
@@ -193,8 +194,8 @@ describe('OfficeHome related tests', () => {
       )
 
       await waitForElement(testComponent, '#navigation_progress')
-      await waitForElement(testComponent, '#navigation_review')
-      await waitForElement(testComponent, '#navigation_updates')
+      await waitForElement(testComponent, '#navigation_readyForReview')
+      await waitForElement(testComponent, '#navigation_sentForUpdates')
       await waitForElement(testComponent, '#navigation_print')
       await waitForElement(testComponent, '#navigation_waitingValidation')
     })
@@ -203,7 +204,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'progress' },
+            params: { tabId: WORKQUEUE_TABS.inProgress },
             isExact: true,
             path: '',
             url: ''
@@ -223,20 +224,19 @@ describe('OfficeHome related tests', () => {
           .find('#navigation_progress')
           .hostNodes()
           .text()
-          .includes('In Progress7')
+          .includes('In progress7')
       )
-
-      expect(app.find('#navigation_review').hostNodes().text()).toContain(
-        'Ready for review3'
-      )
-      expect(app.find('#navigation_updates').hostNodes().text()).toContain(
-        'Sent for updates4'
-      )
+      expect(
+        app.find('#navigation_readyForReview').hostNodes().text()
+      ).toContain('Ready for review3')
+      expect(
+        app.find('#navigation_sentForUpdates').hostNodes().text()
+      ).toContain('Sent for updates4')
       expect(
         app.find('#navigation_waitingValidation').hostNodes().text()
       ).toContain('Waiting for validation6')
       expect(app.find('#navigation_print').hostNodes().text()).toContain(
-        'Ready to print 1'
+        'Ready to print1'
       )
     })
   })
@@ -259,7 +259,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'progress' },
+            params: { tabId: WORKQUEUE_TABS.inProgress },
             isExact: true,
             path: '',
             url: ''
@@ -281,7 +281,7 @@ describe('OfficeHome related tests', () => {
         <OfficeHome
           match={{
             params: {
-              tabId: 'progress',
+              tabId: WORKQUEUE_TABS.inProgress,
               selectorId: SELECTOR_ID.fieldAgentDrafts
             },
             isExact: true,
@@ -305,7 +305,7 @@ describe('OfficeHome related tests', () => {
         <OfficeHome
           match={{
             params: {
-              tabId: 'progress',
+              tabId: WORKQUEUE_TABS.inProgress,
               selectorId: SELECTOR_ID.hospitalDrafts
             },
             isExact: true,
@@ -328,7 +328,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'review' },
+            params: { tabId: WORKQUEUE_TABS.readyForReview },
             isExact: true,
             path: '',
             url: ''
@@ -350,7 +350,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'updates' },
+            params: { tabId: WORKQUEUE_TABS.sentForUpdates },
             isExact: true,
             path: '',
             url: ''
@@ -372,7 +372,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'approvals' },
+            params: { tabId: WORKQUEUE_TABS.sentForApproval },
             isExact: true,
             path: '',
             url: ''
@@ -394,7 +394,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'print' },
+            params: { tabId: WORKQUEUE_TABS.readyToPrint },
             isExact: true,
             path: '',
             url: ''
@@ -417,7 +417,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'waitingValidation' },
+            params: { tabId: WORKQUEUE_TABS.externalValidation },
             isExact: true,
             path: '',
             url: ''
@@ -450,7 +450,7 @@ describe('OfficeHome related tests', () => {
         <OfficeHome
           match={{
             params: {
-              tabId: 'progress',
+              tabId: WORKQUEUE_TABS.inProgress,
               selectorId: SELECTOR_ID.fieldAgentDrafts
             },
             isExact: true,
@@ -474,7 +474,7 @@ describe('OfficeHome related tests', () => {
         <OfficeHome
           match={{
             params: {
-              tabId: 'progress',
+              tabId: WORKQUEUE_TABS.inProgress,
               selectorId: SELECTOR_ID.hospitalDrafts
             },
             isExact: true,
@@ -497,7 +497,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'review' },
+            params: { tabId: WORKQUEUE_TABS.readyForReview },
             isExact: true,
             path: '',
             url: ''
@@ -519,7 +519,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'updates' },
+            params: { tabId: WORKQUEUE_TABS.sentForUpdates },
             isExact: true,
             path: '',
             url: ''
@@ -541,7 +541,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'approvals' },
+            params: { tabId: WORKQUEUE_TABS.sentForApproval },
             isExact: true,
             path: '',
             url: ''
@@ -563,7 +563,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'print' },
+            params: { tabId: WORKQUEUE_TABS.readyToPrint },
             isExact: true,
             path: '',
             url: ''
@@ -585,7 +585,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'waitingValidation' },
+            params: { tabId: WORKQUEUE_TABS.externalValidation },
             isExact: true,
             path: '',
             url: ''
@@ -638,7 +638,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'progress' },
+            params: { tabId: WORKQUEUE_TABS.inProgress },
             isExact: true,
             path: '',
             url: ''
@@ -665,7 +665,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'review' },
+            params: { tabId: WORKQUEUE_TABS.readyForReview },
             isExact: true,
             path: '',
             url: ''
@@ -692,7 +692,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'updates' },
+            params: { tabId: WORKQUEUE_TABS.sentForUpdates },
             isExact: true,
             path: '',
             url: ''
@@ -719,7 +719,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'print' },
+            params: { tabId: WORKQUEUE_TABS.readyToPrint },
             isExact: true,
             path: '',
             url: ''
@@ -748,7 +748,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'waitingValidation' },
+            params: { tabId: WORKQUEUE_TABS.externalValidation },
             isExact: true,
             path: '',
             url: ''
