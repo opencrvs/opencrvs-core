@@ -32,6 +32,8 @@ import {
   ListViewItemSimplified,
   ListViewSimplified
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+import { goToFormConfigWizard } from '@client/navigation'
+import { Event, BirthSection, DeathSection } from '@client/forms'
 
 type Props = IntlShapeProps &
   ReturnType<typeof mapStateToProps> &
@@ -60,7 +62,7 @@ class FormConfigComponent extends React.Component<Props, State> {
       activeTabId: TABS.PUBLISHED
     }
   }
-  async componentDidMount() {
+  componentDidMount() {
     this.props.loadFormDraft()
   }
   getMenuItems = (intl: IntlShape) => {
@@ -126,7 +128,11 @@ class FormConfigComponent extends React.Component<Props, State> {
             )
           }
           actions={[
-            <LinkButton onClick={() => {}}>
+            <LinkButton
+              onClick={() => {
+                this.props.goToFormConfigWizard(Event.BIRTH, BirthSection.Child)
+              }}
+            >
               {this.props.intl.formatMessage(messages.formConfigureButtonLabel)}
             </LinkButton>,
             formDraft && formDraft.birth ? (
@@ -162,7 +168,14 @@ class FormConfigComponent extends React.Component<Props, State> {
             )
           }
           actions={[
-            <LinkButton onClick={() => {}}>
+            <LinkButton
+              onClick={() => {
+                this.props.goToFormConfigWizard(
+                  Event.DEATH,
+                  DeathSection.Deceased
+                )
+              }}
+            >
               {this.props.intl.formatMessage(messages.formConfigureButtonLabel)}
             </LinkButton>,
             formDraft && formDraft.death ? (
@@ -304,11 +317,11 @@ class FormConfigComponent extends React.Component<Props, State> {
           <ListViewSimplified
             bottomBorder={true}
             children={
-              this.state.activeTabId == TABS.IN_PREVIEW ? (
+              this.state.activeTabId === TABS.IN_PREVIEW ? (
                 formsForPreviewTab
-              ) : this.state.activeTabId == TABS.PUBLISHED ? (
+              ) : this.state.activeTabId === TABS.PUBLISHED ? (
                 formsForPublishedTab
-              ) : this.state.activeTabId == TABS.DRAFTS ? (
+              ) : this.state.activeTabId === TABS.DRAFTS ? (
                 this.getItemsForDraftsTab(this.props.formDraftData)
               ) : (
                 <></>
@@ -322,7 +335,8 @@ class FormConfigComponent extends React.Component<Props, State> {
 }
 
 const mapDispatchToProps = {
-  loadFormDraft
+  loadFormDraft,
+  goToFormConfigWizard
 }
 
 function mapStateToProps(state: IStoreState) {
