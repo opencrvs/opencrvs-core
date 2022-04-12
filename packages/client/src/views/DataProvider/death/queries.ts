@@ -114,6 +114,8 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
       registration {
         id
         contact
+        informantType
+        otherInformantType
         contactRelationship
         contactPhoneNumber
         attachments {
@@ -328,6 +330,8 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
       registration {
         id
         contact
+        informantType
+        otherInformantType
         contactRelationship
         contactPhoneNumber
         status {
