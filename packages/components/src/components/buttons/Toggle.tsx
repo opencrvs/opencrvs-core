@@ -69,7 +69,7 @@ const CheckBox = styled.input`
   }
 `
 
-export function Toggle(props: IToggle) {
+export function Toggle({ selected, onChange, ...props }: IToggle) {
   const checkboxID = `checkbox-${new Date().getTime()}`
   return (
     <CheckBoxWrapper {...props}>
