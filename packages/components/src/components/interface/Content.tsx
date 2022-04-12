@@ -36,24 +36,18 @@ const Header = styled.div`
   flex-direction: column;
   margin: -24px -24px 24px;
   padding: 0 24px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     border: 0;
     padding: 0;
   }
 `
-const BottomBorder = styled.div`
-  position: absolute;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
-  bottom: 1px;
-  width: 100%;
-`
 const TopActionBar = styled.div`
   display: flex;
   gap: 16px;
-  margin-left: auto;
 `
 export const SubHeader = styled.div`
-  padding-top: 24px;
+  padding-bottom: 16px;
   color: ${({ theme }) => theme.colors.supportingCopy};
   ${({ theme }) => theme.fonts.reg18};
 `
@@ -72,16 +66,24 @@ const TopTabBar = styled.div`
   gap: 28px;
   width: 100%;
   padding: 0;
+  margin-top: -8px;
+  position: relative;
+  & > div {
+    bottom: -1px;
+  }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: 24px 24px 0;
+    padding: 24px 16px 0;
+    border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   }
 `
 const TopBar = styled.div`
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
   padding: 16px 0;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    /* display: none; */
+    display: none;
   }
 `
 const BottomActionBar = styled.div`
@@ -93,7 +95,8 @@ const TitleContainer = styled.div<{ titleColor?: keyof typeof colors }>`
   display: flex;
   gap: 16px;
   align-items: center;
-  margin-right: auto;
+  width: 0;
+  flex: 1;
   color: ${({ theme, titleColor }) => titleColor && theme.colors[titleColor]};
 `
 
@@ -103,7 +106,6 @@ const Title = styled.div`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 700px;
 `
 const Icon = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
@@ -139,11 +141,27 @@ export class Content extends React.Component<IProps> {
       bottomActionButtons,
       size
     } = this.props
-
+    // const tabs = {
+    //   sections: [
+    //     {
+    //       id: 'general',
+    //       title: 'General'
+    //     },
+    //     {
+    //       id: 'birth',
+    //       title: 'Birth'
+    //     },
+    //     {
+    //       id: 'death',
+    //       title: 'Death'
+    //     }
+    //   ],
+    //   activeTabId: 'general',
+    //   onTabClick: (id: string) => alert(id)
+    // }
     return (
       <Container size={size as string}>
         <Header>
-          <BottomBorder />
           <TopBar>
             <TitleContainer titleColor={titleColor}>
               {icon && <Icon id={`content-icon`}>{icon()}</Icon>}
