@@ -150,7 +150,6 @@ const BodyContainer = styled.div`
   margin-top: 0px;
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin-left: 265px;
-    margin-top: 28px;
   }
 `
 
