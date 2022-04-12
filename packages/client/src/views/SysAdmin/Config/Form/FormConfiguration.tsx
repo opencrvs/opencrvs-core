@@ -25,7 +25,7 @@ import { ToggleMenu } from '@opencrvs/components/lib/interface'
 import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import styled from 'styled-components'
-import { loadDraft } from '@client/forms/configuration/actions'
+import { loadFormDraft } from '@client/forms/configuration/actions'
 import { IFormDraftData, IHistory } from '@client/forms/configuration/reducer'
 import { getFormDraftData } from '@client/forms/configuration/selector'
 import {
@@ -38,7 +38,7 @@ type Props = WrappedComponentProps &
     userDetails: IUserDetails | null
     offlineResources: IOfflineData
     offlineCountryConfiguration: IOfflineData
-    loadDraft: typeof loadDraft
+    loadDraft: typeof loadFormDraft
     formDraftData: IFormDraftData
   }
 
@@ -327,7 +327,7 @@ class FormConfigComponent extends React.Component<Props, State> {
 }
 
 const mapDispatchToProps = {
-  loadDraft
+  loadFormDraft
 }
 
 function mapStateToProps(state: IStoreState) {

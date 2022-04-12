@@ -70,37 +70,37 @@ export const formDraftReducer: LoopReducer<
   | IFormDraftDataState
   | Loop<IFormDraftDataState, actions.FormDraftActions> => {
   switch (action.type) {
-    case actions.LOAD_DRAFT:
+    case actions.LOAD_FORM_DRAFT:
       return loop(
         state,
         Cmd.run(storage.getItem, {
           args: ['formDraft'],
-          successActionCreator: actions.getOfflineDataSuccess
+          successActionCreator: actions.loadFormDraftSuccessAction
         })
       )
 
-    case actions.GET_OFFLINE_DATA_SUCCESS: {
+    case actions.LOAD_FORM_DRAFT_SUCCESS: {
       const offlineDataString = action.payload
       const offlineData: IFormDraftData = JSON.parse(
         offlineDataString ? offlineDataString : '{}'
       )
 
       if (isEmpty(offlineData)) {
-        return loop(state, Cmd.action(actions.fetchDraft()))
+        return loop(state, Cmd.action(actions.fetchFormDraft()))
       }
       return { ...state, formDraftData: offlineData }
     }
 
-    case actions.FETCH_DRAFT:
+    case actions.FETCH_FORM_DRAFT:
       return loop(
         state,
         Cmd.run(formDraftQueries.fetchFormDraft, {
-          successActionCreator: actions.storeDraft,
-          failActionCreator: actions.failedDraft
+          successActionCreator: actions.fetchFormDraftSuccessAction,
+          failActionCreator: actions.fetchFormDraftFailedAction
         })
       )
 
-    case actions.STORE_DRAFT:
+    case actions.FETCH_FORM_DRAFT_SUCCESS:
       const { queryData: formDraftQueryData } = action.payload
 
       if (Boolean(formDraftQueryData.data.getFormDraft)) {
@@ -127,7 +127,7 @@ export const formDraftReducer: LoopReducer<
         )
       }
       return state
-    case actions.FAILED_DRAFT:
+    case actions.FETCH_FORM_DRAFT_FAILED:
       return {
         ...state,
         loadingError: true

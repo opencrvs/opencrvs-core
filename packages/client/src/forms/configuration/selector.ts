@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IStoreState } from '@client/store'
-import { IDraft, IFormDraftData, IFormDraftDataState } from './reducer'
+import { IFormDraftDataState } from './reducer'
 
 export const getFormDraftDataState = (
   store: IStoreState
