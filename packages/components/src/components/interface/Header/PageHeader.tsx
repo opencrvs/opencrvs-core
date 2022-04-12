@@ -10,28 +10,16 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
+import { grid } from '../../grid'
 import styled from 'styled-components'
 
 const PageHeaderWrapper = styled.div`
-  & > div {
-    padding: 8px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: ${({ theme }) => theme.colors.white};
-    border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
-  }
-`
-const MobileView = styled.div`
-  @media (min-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    display: none !important;
-  }
-`
-
-const DesktopView = styled.div`
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    display: none !important;
-  }
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: ${({ theme }) => theme.colors.white};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
 `
 
 const Left = styled.div`
@@ -70,26 +58,33 @@ export interface IPageHeaderProps {
 
 export type IFullProps = IPageHeaderProps & React.HTMLAttributes<HTMLDivElement>
 
-export class PageHeader extends React.Component<IFullProps> {
+interface IState {
+  width: number
+}
+export class PageHeader extends React.Component<IFullProps, IState> {
+  state = {
+    width: window.innerWidth
+  }
+
+  componentDidMount() {
+    window.addEventListener('resize', this.recordWindowWidth)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.recordWindowWidth)
+  }
+
+  recordWindowWidth = () => {
+    this.setState({ width: window.innerWidth })
+  }
   render() {
     const props: IPageHeaderProps = this.props as IPageHeaderProps
     const headerProps: React.HTMLAttributes<HTMLDivElement> = this
       .props as React.HTMLAttributes<HTMLDivElement>
 
-    return (
-      <PageHeaderWrapper id={props.id} {...headerProps}>
-        <MobileView>
-          <Left>
-            {props.mobileLeft && (
-              <Actions>{props.mobileLeft.map((el) => el)}</Actions>
-            )}
-            {props.mobileTitle && <Title>{props.mobileTitle}</Title>}
-          </Left>
-          {props.mobileRight && (
-            <Actions>{props.mobileRight?.map((el) => el)}</Actions>
-          )}
-        </MobileView>
-        <DesktopView>
+    if (this.state.width > grid.breakpoints.lg) {
+      return (
+        <PageHeaderWrapper id={props.id} {...headerProps}>
           <Left>
             {props.desktopLeft && (
               <Actions>{props.desktopLeft.map((el) => el)}</Actions>
@@ -99,8 +94,22 @@ export class PageHeader extends React.Component<IFullProps> {
           {props.desktopRight && (
             <Actions>{props.desktopRight?.map((el) => el)}</Actions>
           )}
-        </DesktopView>
-      </PageHeaderWrapper>
-    )
+        </PageHeaderWrapper>
+      )
+    } else {
+      return (
+        <PageHeaderWrapper id={props.id} {...headerProps}>
+          <Left>
+            {props.mobileLeft && (
+              <Actions>{props.mobileLeft.map((el) => el)}</Actions>
+            )}
+            {props.mobileTitle && <Title>{props.mobileTitle}</Title>}
+          </Left>
+          {props.mobileRight && (
+            <Actions>{props.mobileRight?.map((el) => el)}</Actions>
+          )}
+        </PageHeaderWrapper>
+      )
+    }
   }
 }

@@ -141,24 +141,6 @@ export class Content extends React.Component<IProps> {
       bottomActionButtons,
       size
     } = this.props
-    // const tabs = {
-    //   sections: [
-    //     {
-    //       id: 'general',
-    //       title: 'General'
-    //     },
-    //     {
-    //       id: 'birth',
-    //       title: 'Birth'
-    //     },
-    //     {
-    //       id: 'death',
-    //       title: 'Death'
-    //     }
-    //   ],
-    //   activeTabId: 'general',
-    //   onTabClick: (id: string) => alert(id)
-    // }
     return (
       <Container size={size as string}>
         <Header>
