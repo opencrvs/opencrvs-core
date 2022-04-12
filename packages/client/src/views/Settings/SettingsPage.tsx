@@ -185,9 +185,10 @@ class SettingsView extends React.Component<IProps, IState> {
 
   changeLanguage = () => {
     if (this.props.userDetails) {
-      this.props.userDetails.language = this.state.selectedLanguage
-      this.props.modifyUserDetails(this.props.userDetails)
-
+      this.props.modifyUserDetails({
+        ...this.props.userDetails,
+        language: this.state.selectedLanguage
+      })
       this.toggleLanguageSettingsModal()
       this.toggleSuccessNotification(NOTIFICATION_SUBJECT.LANGUAGE)
     }
