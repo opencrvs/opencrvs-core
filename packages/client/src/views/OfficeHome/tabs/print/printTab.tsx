@@ -43,7 +43,6 @@ import { formattedDuration } from '@client/utils/date-formatting'
 interface IBasePrintTabProps {
   theme: ITheme
   goToPrintCertificate: typeof goToPrintCertificate
-  registrarLocationId: string | null
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   outboxDeclarations: IDeclaration[]
   queryData: {

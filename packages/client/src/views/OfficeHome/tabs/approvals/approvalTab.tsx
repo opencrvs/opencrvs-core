@@ -41,7 +41,6 @@ const ToolTipContainer = styled.span`
 interface IBaseApprovalTabProps {
   theme: ITheme
   goToPage: typeof goToPage
-  registrarLocationId: string | null
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   outboxDeclarations: IDeclaration[]
   queryData: {

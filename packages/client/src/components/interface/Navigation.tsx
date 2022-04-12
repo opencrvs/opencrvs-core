@@ -26,7 +26,6 @@ import { NavigationItem } from '@opencrvs/components/lib/interface/Navigation/Na
 import { NavigationSubItem } from '@opencrvs/components/lib/interface/Navigation/NavigationSubItem'
 import { connect } from 'react-redux'
 import {
-  goToFieldAgentHomeTab as goToFieldAgentHomeTabAction,
   goToRegistrarHomeTab,
   goToCertificateConfig,
   goToSettings,
@@ -164,7 +163,6 @@ interface IProps {
 }
 
 interface IDispatchProps {
-  goToFieldAgentHomeTab: typeof goToFieldAgentHomeTabAction
   goToRegistrarHomeTab: typeof goToRegistrarHomeTab
   goToCertificateConfigAction: typeof goToCertificateConfig
   goToApplicationConfigAction: typeof goToApplicationConfig
@@ -298,7 +296,7 @@ export const NavigationView = (props: IFullProps) => {
               count={props.draftDeclarations.length}
               isSelected={tabId === WORKQUEUE_TABS.inProgress}
               onClick={() => {
-                props.goToFieldAgentHomeTab(WORKQUEUE_TABS.inProgress)
+                props.goToRegistrarHomeTab(WORKQUEUE_TABS.inProgress)
                 menuCollapse && menuCollapse()
               }}
             />
@@ -311,7 +309,7 @@ export const NavigationView = (props: IFullProps) => {
               count={props.declarationsReadyToSend.length}
               isSelected={tabId === WORKQUEUE_TABS.sentForReview}
               onClick={() => {
-                props.goToFieldAgentHomeTab(WORKQUEUE_TABS.sentForReview)
+                props.goToRegistrarHomeTab(WORKQUEUE_TABS.sentForReview)
                 menuCollapse && menuCollapse()
               }}
             />
@@ -343,7 +341,7 @@ export const NavigationView = (props: IFullProps) => {
                       count={0}
                       isSelected={tabId === WORKQUEUE_TABS.requiresUpdate}
                       onClick={() => {
-                        props.goToFieldAgentHomeTab(
+                        props.goToRegistrarHomeTab(
                           WORKQUEUE_TABS.requiresUpdate
                         )
                         menuCollapse && menuCollapse()
@@ -359,10 +357,10 @@ export const NavigationView = (props: IFullProps) => {
                       label={intl.formatMessage(
                         navigationMessages[WORKQUEUE_TABS.requiresUpdate]
                       )}
-                      count={data.searchEvents.totalItems}
+                      count={data?.searchEvents?.totalItems}
                       isSelected={tabId === WORKQUEUE_TABS.requiresUpdate}
                       onClick={() => {
-                        props.goToFieldAgentHomeTab(
+                        props.goToRegistrarHomeTab(
                           WORKQUEUE_TABS.requiresUpdate
                         )
                         menuCollapse && menuCollapse()
@@ -643,7 +641,6 @@ export const Navigation = connect<
   IProps,
   IStoreState
 >(mapStateToProps, {
-  goToFieldAgentHomeTab: goToFieldAgentHomeTabAction,
   goToRegistrarHomeTab,
   goToCertificateConfigAction: goToCertificateConfig,
   goToApplicationConfigAction: goToApplicationConfig,

@@ -48,7 +48,6 @@ interface IBaseRejectTabProps {
   scope: Scope | null
   goToPage: typeof goToPage
   goToReviewDuplicate: typeof goToReviewDuplicate
-  registrarLocationId: string | null
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   outboxDeclarations: IDeclaration[]
   queryData: {

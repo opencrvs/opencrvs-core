@@ -36,7 +36,6 @@ interface IBaseProps {
   queryData: {
     data: GQLEventSearchResultSet
   }
-  registrarLocationId: string | null
   page: number
   onPageChange: (newPageNumber: number) => void
   showPaginated?: boolean

@@ -128,11 +128,11 @@ interface IBaseRegistrarHomeProps {
   goToRegistrarHomeTab: typeof goToRegistrarHomeTabAction
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   selectorId: string
-  registrarLocationId: string | null
   drafts: IDeclaration[]
   outboxDeclarations: IDeclaration[]
   queryData: IQueryData
   page: number
+  isFieldAgent: boolean
   onPageChange: (newPageNumber: number) => void
 }
 
@@ -652,18 +652,25 @@ export class InProgressTabComponent extends React.Component<
   }
 
   render() {
-    const { intl, selectorId, drafts, queryData, page, onPageChange } =
-      this.props
+    const {
+      intl,
+      selectorId,
+      drafts,
+      queryData,
+      page,
+      onPageChange,
+      isFieldAgent
+    } = this.props
     const { inProgressData, notificationData } = queryData
-
     return (
       <HomeContent>
-        {this.renderInProgressSelectorsWithCounts(
-          selectorId,
-          drafts,
-          inProgressData.totalItems || 0,
-          notificationData.totalItems || 0
-        )}
+        {!isFieldAgent &&
+          this.renderInProgressSelectorsWithCounts(
+            selectorId,
+            drafts,
+            inProgressData.totalItems || 0,
+            notificationData.totalItems || 0
+          )}
         {(!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
           <>
             <GridTable
@@ -686,8 +693,10 @@ export class InProgressTabComponent extends React.Component<
           </>
         )}
         {selectorId === SELECTOR_ID.fieldAgentDrafts &&
+          !isFieldAgent &&
           this.renderFieldAgentTable(inProgressData, intl, page, onPageChange)}
         {selectorId === SELECTOR_ID.hospitalDrafts &&
+          !isFieldAgent &&
           this.renderHospitalTable(notificationData, intl, page, onPageChange)}
       </HomeContent>
     )

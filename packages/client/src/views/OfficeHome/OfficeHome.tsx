@@ -14,7 +14,8 @@ import {
   IDeclaration,
   IWorkqueue,
   SUBMISSION_STATUS,
-  updateRegistrarWorkqueue
+  updateRegistrarWorkqueue,
+  updateFieldAgentDeclaredDeclarations
 } from '@client/declarations'
 import { Header } from '@client/components/interface/Header/Header'
 import { messages as certificateMessage } from '@client/i18n/messages/views/certificate'
@@ -29,7 +30,7 @@ import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
-import { getUserLocation } from '@client/utils/userUtils'
+import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
 import NotificationToast from '@client/views/OfficeHome/NotificationToast'
 import {
   Button,
@@ -37,7 +38,10 @@ import {
   IButtonProps
 } from '@opencrvs/components/lib/buttons'
 import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
-import { PAGE_TRANSITIONS_ENTER_TIME } from '@client/utils/constants'
+import {
+  PAGE_TRANSITIONS_ENTER_TIME,
+  FIELD_AGENT_ROLES
+} from '@client/utils/constants'
 import {
   FloatingNotification,
   NOTIFICATION_TYPE,
@@ -52,12 +56,15 @@ import { ApprovalTab } from './tabs/approvals/approvalTab'
 import { InProgressTab } from './tabs/inProgress/inProgressTab'
 import { PrintTab } from './tabs/print/printTab'
 import { RejectTab } from './tabs/reject/rejectTab'
-import { ReviewTab } from './tabs/review/reviewTab'
+import { ReviewTab } from './tabs/readyForReview/reviewTab'
 import { ExternalValidationTab } from './tabs/externalValidation/externalValidationTab'
 import {
   Navigation,
   WORKQUEUE_TABS
 } from '@client/components/interface/Navigation'
+import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
+import { SentForReview } from './tabs/sentForReview/SentForReview'
+import { RequiresUpdate } from './tabs/requiresUpdate/RequiresUpdate'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -107,18 +114,21 @@ interface IDispatchProps {
   goToPrintCertificate: typeof goToPrintCertificate
   goToEvents: typeof goToEvents
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
+  updateFieldAgentDeclaredDeclarations: typeof updateFieldAgentDeclaredDeclarations
 }
 
 interface IBaseOfficeHomeStateProps {
   language: string
   scope: Scope | null
-  registrarLocationId: string
+  userLocationId: string
   tabId: string
   selectorId: string
   drafts: IDeclaration[]
   declarations: IDeclaration[]
   workqueue: IWorkqueue
   storedDeclarations: IDeclaration[]
+  declarationsReadyToSend: IDeclaration[]
+  userDetails: IUserDetails | null
 }
 
 interface IOfficeHomeState {
@@ -128,6 +138,7 @@ interface IOfficeHomeState {
   approvalCurrentPage: number
   printCurrentPage: number
   externalValidationCurrentPage: number
+  requireUpdatePage: number
   showCertificateToast: boolean
 }
 
@@ -150,6 +161,13 @@ export class OfficeHomeView extends React.Component<
   pageSize = 10
   showPaginated = false
   interval: any = undefined
+  role = this.props.userDetails && this.props.userDetails.role
+  isFieldAgent = this.role
+    ? FIELD_AGENT_ROLES.includes(this.role)
+      ? true
+      : false
+    : false
+
   constructor(props: IOfficeHomeProps) {
     super(props)
     this.state = {
@@ -158,6 +176,7 @@ export class OfficeHomeView extends React.Component<
       updatesCurrentPage: 1,
       approvalCurrentPage: 1,
       printCurrentPage: 1,
+      requireUpdatePage: 1,
       externalValidationCurrentPage: 1,
       showCertificateToast: Boolean(
         this.props.declarations.filter(
@@ -167,7 +186,11 @@ export class OfficeHomeView extends React.Component<
     }
   }
 
-  syncWorkqueue() {
+  syncWorkQueueFieldAgent() {
+    this.props.updateFieldAgentDeclaredDeclarations()
+  }
+
+  syncWorkqueueRegistrationClerk() {
     this.props.updateRegistrarWorkqueue(
       this.state.progressCurrentPage * this.pageSize,
       this.state.reviewCurrentPage * this.pageSize,
@@ -184,13 +207,24 @@ export class OfficeHomeView extends React.Component<
     )
   }
 
+  syncWorkqueue() {
+    if (this.isFieldAgent) {
+      setTimeout(
+        () => this.syncWorkQueueFieldAgent(),
+        PAGE_TRANSITIONS_ENTER_TIME
+      )
+    } else {
+      setTimeout(() => {
+        this.syncWorkqueueRegistrationClerk()
+      }, PAGE_TRANSITIONS_ENTER_TIME)
+      this.interval = setInterval(() => {
+        this.syncWorkqueueRegistrationClerk()
+      }, 300000)
+    }
+  }
+
   componentDidMount() {
-    setTimeout(() => {
-      this.syncWorkqueue()
-    }, PAGE_TRANSITIONS_ENTER_TIME)
-    this.interval = setInterval(() => {
-      this.syncWorkqueue()
-    }, 300000)
+    this.syncWorkqueue()
   }
 
   componentWillUnmount() {
@@ -204,9 +238,12 @@ export class OfficeHomeView extends React.Component<
         reviewCurrentPage: 1,
         updatesCurrentPage: 1,
         approvalCurrentPage: 1,
-        printCurrentPage: 1
+        printCurrentPage: 1,
+        requireUpdatePage: 1
       })
-      this.syncWorkqueue()
+      if (!this.isFieldAgent) {
+        this.syncWorkqueue()
+      }
     }
   }
 
@@ -258,6 +295,9 @@ export class OfficeHomeView extends React.Component<
           this.syncWorkqueue
         )
         break
+      case WORKQUEUE_TABS.requiresUpdate:
+        this.setState({ requireUpdatePage: newPageNumber })
+        break
       default:
         throw new Error(`Unknown tab id when changing page ${this.props.tabId}`)
     }
@@ -269,22 +309,22 @@ export class OfficeHomeView extends React.Component<
     updatesCurrentPage: number,
     approvalCurrentPage: number,
     printCurrentPage: number,
-    externalValidationCurrentPage: number
+    externalValidationCurrentPage: number,
+    requireUpdatePage: number
   ) => {
     const {
       workqueue,
       tabId,
       drafts,
       selectorId,
-      registrarLocationId,
-      storedDeclarations
+      storedDeclarations,
+      declarationsReadyToSend
     } = this.props
     const { loading, error, data } = workqueue
     const filteredData = filterProcessingDeclarationsFromQuery(
       data,
       storedDeclarations
     )
-
     return (
       <>
         <Navigation />
@@ -293,7 +333,7 @@ export class OfficeHomeView extends React.Component<
             <InProgressTab
               drafts={drafts}
               selectorId={selectorId}
-              registrarLocationId={registrarLocationId}
+              isFieldAgent={this.isFieldAgent}
               queryData={{
                 inProgressData: filteredData.inProgressTab,
                 notificationData: filteredData.notificationTab
@@ -305,72 +345,89 @@ export class OfficeHomeView extends React.Component<
               error={error}
             />
           )}
-          {tabId === WORKQUEUE_TABS.readyForReview && (
-            <ReviewTab
-              registrarLocationId={registrarLocationId}
-              queryData={{
-                data: filteredData.reviewTab
-              }}
-              showPaginated={this.showPaginated}
-              page={reviewCurrentPage}
-              onPageChange={this.onPageChange}
-              loading={loading}
-              error={error}
-            />
-          )}
-          {tabId === WORKQUEUE_TABS.sentForUpdates && (
-            <RejectTab
-              registrarLocationId={registrarLocationId}
-              queryData={{
-                data: filteredData.rejectTab
-              }}
-              showPaginated={this.showPaginated}
-              page={updatesCurrentPage}
-              onPageChange={this.onPageChange}
-              loading={loading}
-              error={error}
-            />
-          )}
+          {!this.isFieldAgent ? (
+            <>
+              {tabId === WORKQUEUE_TABS.readyForReview && (
+                <ReviewTab
+                  queryData={{
+                    data: filteredData.reviewTab
+                  }}
+                  showPaginated={this.showPaginated}
+                  page={reviewCurrentPage}
+                  onPageChange={this.onPageChange}
+                  loading={loading}
+                  error={error}
+                />
+              )}
+              {tabId === WORKQUEUE_TABS.sentForUpdates && (
+                <RejectTab
+                  queryData={{
+                    data: filteredData.rejectTab
+                  }}
+                  showPaginated={this.showPaginated}
+                  page={updatesCurrentPage}
+                  onPageChange={this.onPageChange}
+                  loading={loading}
+                  error={error}
+                />
+              )}
 
-          {tabId === WORKQUEUE_TABS.externalValidation &&
-            window.config.EXTERNAL_VALIDATION_WORKQUEUE && (
-              <ExternalValidationTab
-                registrarLocationId={registrarLocationId}
-                queryData={{
-                  data: filteredData.externalValidationTab
-                }}
-                showPaginated={this.showPaginated}
-                page={externalValidationCurrentPage}
-                onPageChange={this.onPageChange}
-                loading={loading}
-                error={error}
-              />
-            )}
-          {tabId === WORKQUEUE_TABS.sentForApproval && (
-            <ApprovalTab
-              registrarLocationId={registrarLocationId}
-              queryData={{
-                data: filteredData.approvalTab
-              }}
-              showPaginated={this.showPaginated}
-              page={approvalCurrentPage}
-              onPageChange={this.onPageChange}
-              loading={loading}
-              error={error}
-            />
-          )}
-          {tabId === WORKQUEUE_TABS.readyToPrint && (
-            <PrintTab
-              registrarLocationId={registrarLocationId}
-              queryData={{
-                data: filteredData.printTab
-              }}
-              showPaginated={this.showPaginated}
-              page={printCurrentPage}
-              onPageChange={this.onPageChange}
-              loading={loading}
-              error={error}
-            />
+              {tabId === WORKQUEUE_TABS.externalValidation &&
+                window.config.EXTERNAL_VALIDATION_WORKQUEUE && (
+                  <ExternalValidationTab
+                    queryData={{
+                      data: filteredData.externalValidationTab
+                    }}
+                    showPaginated={this.showPaginated}
+                    page={externalValidationCurrentPage}
+                    onPageChange={this.onPageChange}
+                    loading={loading}
+                    error={error}
+                  />
+                )}
+              {tabId === WORKQUEUE_TABS.sentForApproval && (
+                <ApprovalTab
+                  queryData={{
+                    data: filteredData.approvalTab
+                  }}
+                  showPaginated={this.showPaginated}
+                  page={approvalCurrentPage}
+                  onPageChange={this.onPageChange}
+                  loading={loading}
+                  error={error}
+                />
+              )}
+              {tabId === WORKQUEUE_TABS.readyToPrint && (
+                <PrintTab
+                  queryData={{
+                    data: filteredData.printTab
+                  }}
+                  showPaginated={this.showPaginated}
+                  page={printCurrentPage}
+                  onPageChange={this.onPageChange}
+                  loading={loading}
+                  error={error}
+                />
+              )}
+            </>
+          ) : (
+            <>
+              {tabId === WORKQUEUE_TABS.sentForReview && (
+                <SentForReview
+                  declarationsReadyToSend={declarationsReadyToSend}
+                  showPaginated={this.showPaginated}
+                />
+              )}
+              {tabId === WORKQUEUE_TABS.requiresUpdate && (
+                <RequiresUpdate
+                  userDetails={this.props.userDetails}
+                  showPaginated={this.showPaginated}
+                  pageSize={this.pageSize}
+                  requireUpdatesPage={requireUpdatePage}
+                  onPageChange={this.onPageChange}
+                />
+              )}
+            </>
           )}
         </BodyContainer>
       </>
@@ -385,7 +442,8 @@ export class OfficeHomeView extends React.Component<
       updatesCurrentPage,
       approvalCurrentPage,
       printCurrentPage,
-      externalValidationCurrentPage
+      externalValidationCurrentPage,
+      requireUpdatePage
     } = this.state
 
     return (
@@ -397,7 +455,8 @@ export class OfficeHomeView extends React.Component<
           updatesCurrentPage,
           approvalCurrentPage,
           printCurrentPage,
-          externalValidationCurrentPage
+          externalValidationCurrentPage,
+          requireUpdatePage
         )}
 
         <FABContainer>
@@ -432,8 +491,7 @@ function mapStateToProps(
 ): IBaseOfficeHomeStateProps {
   const { match } = props
   const userDetails = getUserDetails(state)
-  const registrarLocationId =
-    (userDetails && getUserLocation(userDetails).id) || ''
+  const userLocationId = (userDetails && getUserLocation(userDetails).id) || ''
   const scope = getScope(state)
 
   return {
@@ -441,8 +499,10 @@ function mapStateToProps(
     workqueue: state.workqueueState.workqueue,
     language: state.i18n.language,
     scope,
-    registrarLocationId,
-    tabId: (match && match.params && match.params.tabId) || 'review',
+    userLocationId,
+    tabId:
+      (match && match.params && match.params.tabId) ||
+      WORKQUEUE_TABS.inProgress,
     selectorId: (match && match.params && match.params.selectorId) || '',
     storedDeclarations: state.declarationsState.declarations,
     drafts:
@@ -452,7 +512,16 @@ function mapStateToProps(
             declaration.submissionStatus ===
             SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
         )) ||
+      [],
+    declarationsReadyToSend: (
+      (state.declarationsState.declarations &&
+        state.declarationsState.declarations.filter(
+          (declaration: IDeclaration) =>
+            isDeclarationInReadyToReviewStatus(declaration.submissionStatus)
+        )) ||
       []
+    ).reverse(),
+    userDetails: getUserDetails(state)
   }
 }
 export const OfficeHome = connect<
@@ -466,5 +535,6 @@ export const OfficeHome = connect<
   goToRegistrarHomeTab,
   goToReviewDuplicate,
   goToPrintCertificate,
-  updateRegistrarWorkqueue
+  updateRegistrarWorkqueue,
+  updateFieldAgentDeclaredDeclarations
 })(injectIntl(OfficeHomeView))
