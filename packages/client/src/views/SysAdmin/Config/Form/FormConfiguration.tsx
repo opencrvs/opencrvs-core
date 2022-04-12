@@ -9,15 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import * as React from 'react'
-import { injectIntl, WrappedComponentProps, IntlShape } from 'react-intl'
+import {
+  injectIntl,
+  WrappedComponentProps as IntlShapeProps,
+  IntlShape
+} from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { IUserDetails } from '@client/utils/userUtils'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import { messages } from '@client/i18n/messages/views/config'
@@ -33,14 +33,9 @@ import {
   ListViewSimplified
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 
-type Props = WrappedComponentProps &
-  Pick<RouteComponentProps, 'history'> & {
-    userDetails: IUserDetails | null
-    offlineResources: IOfflineData
-    offlineCountryConfiguration: IOfflineData
-    loadDraft: typeof loadFormDraft
-    formDraftData: IFormDraftData
-  }
+type Props = IntlShapeProps &
+  ReturnType<typeof mapStateToProps> &
+  typeof mapDispatchToProps
 
 interface State {
   activeTabId: string
@@ -66,7 +61,7 @@ class FormConfigComponent extends React.Component<Props, State> {
     }
   }
   async componentDidMount() {
-    this.props.loadDraft()
+    this.props.loadFormDraft()
   }
   getMenuItems = (intl: IntlShape) => {
     const menuItems = [
@@ -333,7 +328,6 @@ const mapDispatchToProps = {
 function mapStateToProps(state: IStoreState) {
   return {
     offlineResources: getOfflineData(state),
-    userDetails: getUserDetails(state),
     offlineCountryConfiguration: getOfflineData(state),
     formDraftData: getFormDraftData(state)
   }

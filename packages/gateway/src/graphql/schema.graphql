@@ -124,7 +124,7 @@ type Query {
   getCertificateSVG(status: String, event: String): CertificateSVG
   getActiveCertificatesSVG: [CertificateSVG]
   getQuestions: [Question]
-  getFormDraft: [formDraft]
+  getFormDraft: [FormDraft!]
 }
 
 type Mutation {
@@ -198,7 +198,7 @@ type Mutation {
     applicationConfig: ApplicationConfigurationInput
   ): ApplicationConfiguration
   createOrUpdateQuestion(question: QuestionInput!): Question
-  createOrUpdateFormDraft(formDraft: formDraftInput!): formDraft
+  createOrUpdateFormDraft(formDraft: FormDraftInput!): FormDraft
 }
 
 type Dummy {
@@ -438,13 +438,13 @@ type Question {
   initialValue: String
 }
 
-type formDraft {
+type FormDraft {
   _id: ID
   event: String!
   status: String!
   comment: String
   version: Int!
-  history: [DraftHistory]
+  history: [DraftHistory!]
   updatedAt: Date!
   createdAt: Date!
 }
@@ -616,7 +616,7 @@ input QuestionInput {
   initialValue: String
 }
 
-input formDraftInput {
+input FormDraftInput {
   questions: [QuestionInput]
   deleted: [String]
   event: String!

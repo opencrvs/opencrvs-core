@@ -43,7 +43,7 @@ export interface GQLQuery {
   getCertificateSVG?: GQLCertificateSVG
   getActiveCertificatesSVG?: Array<GQLCertificateSVG | null>
   getQuestions?: Array<GQLQuestion | null>
-  getFormDraft?: Array<GQLformDraft | null>
+  getFormDraft?: Array<GQLFormDraft>
 }
 
 export interface GQLMutation {
@@ -77,7 +77,7 @@ export interface GQLMutation {
   createOrUpdateCertificateSVG?: GQLCertificateSVG
   updateApplicationConfig?: GQLApplicationConfiguration
   createOrUpdateQuestion?: GQLQuestion
-  createOrUpdateFormDraft?: GQLformDraft
+  createOrUpdateFormDraft?: GQLFormDraft
 }
 
 export interface GQLDummy {
@@ -328,13 +328,13 @@ export interface GQLQuestion {
   initialValue?: string
 }
 
-export interface GQLformDraft {
+export interface GQLFormDraft {
   _id?: string
   event: string
   status: string
   comment?: string
   version: number
-  history?: Array<GQLDraftHistory | null>
+  history?: Array<GQLDraftHistory>
   updatedAt: GQLDate
   createdAt: GQLDate
 }
@@ -506,7 +506,7 @@ export interface GQLQuestionInput {
   initialValue?: string
 }
 
-export interface GQLformDraftInput {
+export interface GQLFormDraftInput {
   questions?: Array<GQLQuestionInput | null>
   deleted?: Array<string | null>
   event: string
@@ -1437,7 +1437,7 @@ export interface GQLResolver {
   Role?: GQLRoleTypeResolver
   CertificateSVG?: GQLCertificateSVGTypeResolver
   Question?: GQLQuestionTypeResolver
-  formDraft?: GQLformDraftTypeResolver
+  FormDraft?: GQLFormDraftTypeResolver
   CreatedIds?: GQLCreatedIdsTypeResolver
   Reinstated?: GQLReinstatedTypeResolver
   Avatar?: GQLAvatarTypeResolver
@@ -2538,7 +2538,7 @@ export interface MutationToCreateOrUpdateQuestionResolver<
 }
 
 export interface MutationToCreateOrUpdateFormDraftArgs {
-  formDraft: GQLformDraftInput
+  formDraft: GQLFormDraftInput
 }
 export interface MutationToCreateOrUpdateFormDraftResolver<
   TParent = any,
@@ -3656,46 +3656,46 @@ export interface QuestionToInitialValueResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLformDraftTypeResolver<TParent = any> {
-  _id?: formDraftTo_idResolver<TParent>
-  event?: formDraftToEventResolver<TParent>
-  status?: formDraftToStatusResolver<TParent>
-  comment?: formDraftToCommentResolver<TParent>
-  version?: formDraftToVersionResolver<TParent>
-  history?: formDraftToHistoryResolver<TParent>
-  updatedAt?: formDraftToUpdatedAtResolver<TParent>
-  createdAt?: formDraftToCreatedAtResolver<TParent>
+export interface GQLFormDraftTypeResolver<TParent = any> {
+  _id?: FormDraftTo_idResolver<TParent>
+  event?: FormDraftToEventResolver<TParent>
+  status?: FormDraftToStatusResolver<TParent>
+  comment?: FormDraftToCommentResolver<TParent>
+  version?: FormDraftToVersionResolver<TParent>
+  history?: FormDraftToHistoryResolver<TParent>
+  updatedAt?: FormDraftToUpdatedAtResolver<TParent>
+  createdAt?: FormDraftToCreatedAtResolver<TParent>
 }
 
-export interface formDraftTo_idResolver<TParent = any, TResult = any> {
+export interface FormDraftTo_idResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface formDraftToEventResolver<TParent = any, TResult = any> {
+export interface FormDraftToEventResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface formDraftToStatusResolver<TParent = any, TResult = any> {
+export interface FormDraftToStatusResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface formDraftToCommentResolver<TParent = any, TResult = any> {
+export interface FormDraftToCommentResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface formDraftToVersionResolver<TParent = any, TResult = any> {
+export interface FormDraftToVersionResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface formDraftToHistoryResolver<TParent = any, TResult = any> {
+export interface FormDraftToHistoryResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface formDraftToUpdatedAtResolver<TParent = any, TResult = any> {
+export interface FormDraftToUpdatedAtResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface formDraftToCreatedAtResolver<TParent = any, TResult = any> {
+export interface FormDraftToCreatedAtResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

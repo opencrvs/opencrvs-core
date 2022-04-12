@@ -89,7 +89,14 @@ export const formDraftReducer: LoopReducer<
       if (isEmpty(offlineData)) {
         return loop(state, Cmd.action(actions.fetchFormDraft()))
       }
-      return { ...state, formDraftData: offlineData }
+      return loop(
+        {
+          ...state,
+          formDraftData: offlineData,
+          formDraftDataLoaded: true
+        },
+        navigator.onLine ? Cmd.action(actions.fetchFormDraft()) : Cmd.none
+      )
     }
 
     case actions.FETCH_FORM_DRAFT:
@@ -104,30 +111,35 @@ export const formDraftReducer: LoopReducer<
     case actions.FETCH_FORM_DRAFT_SUCCESS:
       const { queryData: formDraftQueryData } = action.payload
 
-      if (Boolean(formDraftQueryData.data.getFormDraft)) {
-        const birthFormDraft = find(formDraftQueryData.data.getFormDraft, {
-          event: Event.BIRTH
-        })
+      const birthFormDraft = find(formDraftQueryData.data.getFormDraft, {
+        event: Event.BIRTH
+      })
 
-        const deathFormDraft = find(formDraftQueryData.data.getFormDraft, {
-          event: Event.DEATH
-        })
+      const deathFormDraft = find(formDraftQueryData.data.getFormDraft, {
+        event: Event.DEATH
+      })
 
-        const formDraftData = {
-          birth: birthFormDraft,
-          death: deathFormDraft
-        } as IFormDraftData
-
-        return loop(
-          {
-            ...state,
-            formDraftData: formDraftData,
-            formDraftDataLoaded: true
-          },
-          Cmd.run(saveFormDraftData, { args: [state.formDraftData] })
-        )
+      if (!birthFormDraft) {
+        throw new Error('Default birth formDraft not found')
       }
-      return state
+
+      if (!deathFormDraft) {
+        throw new Error('Default death formDraft not found')
+      }
+
+      const formDraftData = {
+        birth: birthFormDraft,
+        death: deathFormDraft
+      } as IFormDraftData
+
+      return loop(
+        {
+          ...state,
+          formDraftData: formDraftData,
+          formDraftDataLoaded: true
+        },
+        Cmd.run(saveFormDraftData, { args: [formDraftData] })
+      )
     case actions.FETCH_FORM_DRAFT_FAILED:
       return {
         ...state,
