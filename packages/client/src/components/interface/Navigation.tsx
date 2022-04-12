@@ -32,6 +32,7 @@ import {
   goToSettings,
   goToPerformanceView,
   goToTeamView,
+  goToFormConfig,
   goToApplicationConfig
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
@@ -75,7 +76,8 @@ const TAB_ID = {
   config: 'config',
   certificates: 'certificates',
   settings: 'settings',
-  logout: 'logout'
+  logout: 'logout',
+  declarationForms: 'declarationForms'
 }
 
 const GROUP_ID = {
@@ -164,6 +166,7 @@ interface IDispatchProps {
   goToFieldAgentHomeTab: typeof goToFieldAgentHomeTabAction
   goToRegistrarHomeTab: typeof goToRegistrarHomeTab
   goToConfigAction: typeof goToConfig
+  goToFormConfigAction: typeof goToFormConfig
   goToApplicationConfigAction: typeof goToApplicationConfig
   redirectToAuthentication: typeof redirectToAuthentication
   goToPerformanceViewAction: typeof goToPerformanceView
@@ -195,11 +198,11 @@ const TAB_LABEL = {
   sentForApproval: 'Sent for approval',
   externalValidation: 'Waiting for validation',
   readyToPrint: 'Ready to print ',
-  application: 'Application',
   performance: 'Performance',
   team: 'Team',
   configuration: 'Configuration',
   certificatesConfiguration: 'Certificates',
+  declarationForms: 'Declaration forms',
   applicationSettings: 'Application',
   settings: 'Settings',
   logout: 'Logout'
@@ -246,6 +249,7 @@ export const NavigationView = (props: IFullProps) => {
     enableMenuSelection = true,
     activeMenuItem,
     goToConfigAction,
+    goToFormConfigAction,
     goToApplicationConfigAction,
     navigationWidth,
     workqueue,
@@ -263,7 +267,11 @@ export const NavigationView = (props: IFullProps) => {
     : activeMenuItem
     ? activeMenuItem
     : 'review'
-  const configTab = [TAB_ID.application, TAB_ID.certificates]
+  const configTab = [
+    TAB_ID.application,
+    TAB_ID.certificates,
+    TAB_ID.declarationForms
+  ]
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
   const { loading, error, data, initialSyncDone } = workqueue
   const filteredData = filterProcessingDeclarationsFromQuery(
@@ -535,21 +543,30 @@ export const NavigationView = (props: IFullProps) => {
                         configTab.includes(activeMenuItem)) && (
                         <>
                           <NavigationSubItem
-                            label={TAB_LABEL.certificatesConfiguration}
+                            label={TAB_LABEL.applicationSettings}
                             id={`navigation_${TAB_ID.application}`}
-                            onClick={goToConfigAction}
+                            onClick={goToApplicationConfigAction}
                             isSelected={
                               enableMenuSelection &&
                               activeMenuItem === TAB_ID.application
                             }
                           />
                           <NavigationSubItem
-                            label={TAB_LABEL.applicationSettings}
+                            label={TAB_LABEL.certificatesConfiguration}
                             id={`navigation_${TAB_ID.certificates}`}
-                            onClick={goToApplicationConfigAction}
+                            onClick={goToConfigAction}
                             isSelected={
                               enableMenuSelection &&
                               activeMenuItem === TAB_ID.certificates
+                            }
+                          />
+                          <NavigationSubItem
+                            id={`navigation_${TAB_ID.declarationForms}`}
+                            label={TAB_LABEL.declarationForms}
+                            onClick={goToFormConfigAction}
+                            isSelected={
+                              enableMenuSelection &&
+                              activeMenuItem === TAB_ID.declarationForms
                             }
                           />
                         </>
@@ -591,12 +608,14 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
       ? TAB_ID.performance
       : window.location.href.includes('team')
       ? TAB_ID.team
-      : window.location.href.includes('application')
-      ? TAB_ID.application
       : window.location.href.includes('settings')
       ? TAB_ID.settings
       : window.location.href.includes('certificate')
       ? TAB_ID.certificates
+      : window.location.href.includes('application')
+      ? TAB_ID.application
+      : window.location.href.includes('form')
+      ? TAB_ID.declarationForms
       : ''
   }
 }
@@ -610,6 +629,7 @@ export const Navigation = connect<
   goToFieldAgentHomeTab: goToFieldAgentHomeTabAction,
   goToRegistrarHomeTab,
   goToConfigAction: goToConfig,
+  goToFormConfigAction: goToFormConfig,
   goToApplicationConfigAction: goToApplicationConfig,
   goToPerformanceViewAction: goToPerformanceView,
   goToTeamViewAction: goToTeamView,

@@ -9,5 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export * from '@client/components/form/FormFieldGenerator'
-export * from '@client/components/form/FormList'
+
+import React from 'react'
+import styled from '@client/styledComponents'
+import { Box } from '@opencrvs/components/lib/interface/Box'
+interface IFormConfigCanvas {
+  children?: React.ReactNode
+}
+
+export const FormConfigCanvas = (props: IFormConfigCanvas) => {
+  return <Box>{props.children && props.children}</Box>
+}

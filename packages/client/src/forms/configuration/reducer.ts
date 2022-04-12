@@ -11,7 +11,7 @@
  */
 import { loop, Cmd, Loop, LoopReducer } from 'redux-loop'
 import { storage } from '@client/storage'
-import { find } from 'lodash'
+import { find, isEmpty } from 'lodash'
 import { formDraftQueries } from './queries'
 import * as actions from '@client/forms/configuration/actions'
 import { Event } from '@client/forms/index'
@@ -73,6 +73,27 @@ export const formDraftReducer: LoopReducer<
     case actions.LOAD_DRAFT:
       return loop(
         state,
+        Cmd.run(storage.getItem, {
+          args: ['formDraft'],
+          successActionCreator: actions.getOfflineDataSuccess
+        })
+      )
+
+    case actions.GET_OFFLINE_DATA_SUCCESS: {
+      const offlineDataString = action.payload
+      const offlineData: IFormDraftData = JSON.parse(
+        offlineDataString ? offlineDataString : '{}'
+      )
+
+      if (isEmpty(offlineData)) {
+        return loop(state, Cmd.action(actions.fetchDraft()))
+      }
+      return { ...state, formDraftData: offlineData }
+    }
+
+    case actions.FETCH_DRAFT:
+      return loop(
+        state,
         Cmd.run(formDraftQueries.fetchFormDraft, {
           successActionCreator: actions.storeDraft,
           failActionCreator: actions.failedDraft
@@ -82,27 +103,30 @@ export const formDraftReducer: LoopReducer<
     case actions.STORE_DRAFT:
       const { queryData: formDraftQueryData } = action.payload
 
-      const birthFormDraft = find(formDraftQueryData.data.getFormDraft, {
-        event: 'birth'
-      })
+      if (Boolean(formDraftQueryData.data.getFormDraft)) {
+        const birthFormDraft = find(formDraftQueryData.data.getFormDraft, {
+          event: Event.BIRTH
+        })
 
-      const deathFormDraft = find(formDraftQueryData.data.getFormDraft, {
-        event: 'death'
-      })
+        const deathFormDraft = find(formDraftQueryData.data.getFormDraft, {
+          event: Event.DEATH
+        })
 
-      const formDraftData = {
-        birth: birthFormDraft,
-        death: deathFormDraft
-      } as IFormDraftData
+        const formDraftData = {
+          birth: birthFormDraft,
+          death: deathFormDraft
+        } as IFormDraftData
 
-      return loop(
-        {
-          ...state,
-          formDraftData: formDraftData,
-          formDraftDataLoaded: true
-        },
-        Cmd.run(saveFormDraftData, { args: [state.formDraftData] })
-      )
+        return loop(
+          {
+            ...state,
+            formDraftData: formDraftData,
+            formDraftDataLoaded: true
+          },
+          Cmd.run(saveFormDraftData, { args: [state.formDraftData] })
+        )
+      }
+      return state
     case actions.FAILED_DRAFT:
       return {
         ...state,
