@@ -87,9 +87,9 @@ export const EventTopBar = (props: IEventTopBarProps) => {
         )}
 
         {exitAction && (
-          <TertiaryButton onClick={exitAction.handler} id="exit_top_bar">
-            {exitAction.label}
-          </TertiaryButton>
+          <CircleButton id="crcl-btn" onClick={exitAction.handler}>
+            <Cross color="currentColor" />
+          </CircleButton>
         )}
 
         {menuItems && (

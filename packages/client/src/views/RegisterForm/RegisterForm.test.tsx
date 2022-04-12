@@ -283,7 +283,7 @@ describe('when user is in the register form for death event', () => {
         { store, history }
       )
       component = testComponent
-      component.find('#exit_top_bar').hostNodes().simulate('click')
+      component.find('#crcl-btn').hostNodes().simulate('click')
 
       component.update()
 
