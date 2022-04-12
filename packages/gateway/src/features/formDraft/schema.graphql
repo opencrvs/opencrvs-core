@@ -22,7 +22,7 @@ type FormDraft {
   status: String!
   comment: String
   version: Int!
-  history: [DraftHistory]
+  history: [DraftHistory!]
   questions: [Question!]
   updatedAt: Date!
   createdAt: Date!
@@ -58,7 +58,7 @@ input FormDraftInput {
 }
 
 type Query {
-  getFormDraft: [FormDraft]
+  getFormDraft: [FormDraft!]
 }
 
 type Mutation {

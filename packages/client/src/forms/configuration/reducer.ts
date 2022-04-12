@@ -11,7 +11,7 @@
  */
 import { loop, Cmd, Loop, LoopReducer } from 'redux-loop'
 import { storage } from '@client/storage'
-import { find } from 'lodash'
+import { find, isEmpty } from 'lodash'
 import { formDraftQueries } from './queries'
 import * as actions from '@client/forms/configuration/actions'
 import { Event, IQuestionConfig, ISerializedForm } from '@client/forms'
@@ -27,6 +27,7 @@ import { ISectionFieldMap, getEventSectionFieldsMap } from './formDraftUtils'
 
 export enum DraftStatus {
   DRAFT = 'DRAFT',
+  PREVIEW = 'PREVIEW',
   PUBLISHED = 'PUBLISHED',
   FINALISED = 'FINALISED'
 }
@@ -80,35 +81,60 @@ export const formDraftReducer: LoopReducer<
   | IFormDraftDataState
   | Loop<IFormDraftDataState, actions.FormDraftActions> => {
   switch (action.type) {
-    case actions.LOAD_DRAFT:
+    case actions.LOAD_FORM_DRAFT:
       return loop(
         state,
-        Cmd.run(formDraftQueries.fetchFormDraft, {
-          successActionCreator: actions.storeDraft,
-          failActionCreator: actions.failedDraft
+        Cmd.run(storage.getItem, {
+          args: ['formDraft'],
+          successActionCreator: actions.loadFormDraftSuccessAction
         })
       )
 
-    case actions.STORE_DRAFT:
-      const formDraftQueryData =
-        action.payload.queryData.data.getFormDraft.filter(
-          (draft): draft is GQLFormDraft => draft !== null
-        )
+    case actions.LOAD_FORM_DRAFT_SUCCESS: {
+      const offlineDataString = action.payload
+      const offlineData: IFormDraftData = JSON.parse(
+        offlineDataString ? offlineDataString : '{}'
+      )
 
-      const birthFormDraft = find(formDraftQueryData, {
-        event: 'birth'
+      if (isEmpty(offlineData)) {
+        return loop(state, Cmd.action(actions.fetchFormDraft()))
+      }
+      return loop(
+        {
+          ...state,
+          formDraftData: offlineData,
+          formDraftDataLoaded: true
+        },
+        navigator.onLine ? Cmd.action(actions.fetchFormDraft()) : Cmd.none
+      )
+    }
+
+    case actions.FETCH_FORM_DRAFT:
+      return loop(
+        state,
+        Cmd.run(formDraftQueries.fetchFormDraft, {
+          successActionCreator: actions.fetchFormDraftSuccessAction,
+          failActionCreator: actions.fetchFormDraftFailedAction
+        })
+      )
+
+    case actions.FETCH_FORM_DRAFT_SUCCESS:
+      const { queryData: formDraftQueryData } = action.payload
+
+      const birthFormDraft = find(formDraftQueryData.data.getFormDraft, {
+        event: Event.BIRTH
       })
 
-      const deathFormDraft = find(formDraftQueryData, {
-        event: 'death'
+      const deathFormDraft = find(formDraftQueryData.data.getFormDraft, {
+        event: Event.DEATH
       })
 
       if (!birthFormDraft) {
-        throw new Error('No birth form draft found')
+        throw new Error('Default birth formDraft not found')
       }
 
       if (!deathFormDraft) {
-        throw new Error('No death form draft found')
+        throw new Error('Default death formDraft not found')
       }
 
       const configuredBirthForm: ISerializedForm = configureRegistrationForm(
@@ -153,9 +179,9 @@ export const formDraftReducer: LoopReducer<
           formDraftData: formDraftData,
           formDraftDataLoaded: true
         },
-        Cmd.run(saveFormDraftData, { args: [state.formDraftData] })
+        Cmd.run(saveFormDraftData, { args: [formDraftData] })
       )
-    case actions.FAILED_DRAFT:
+    case actions.FETCH_FORM_DRAFT_FAILED:
       return {
         ...state,
         loadingError: true

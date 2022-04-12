@@ -43,7 +43,7 @@ export interface GQLQuery {
   getCertificateSVG?: GQLCertificateSVG
   getActiveCertificatesSVG?: Array<GQLCertificateSVG | null>
   getQuestions?: Array<GQLQuestion | null>
-  getFormDraft?: Array<GQLFormDraft | null>
+  getFormDraft?: Array<GQLFormDraft>
 }
 
 export interface GQLMutation {
@@ -334,7 +334,7 @@ export interface GQLFormDraft {
   status: string
   comment?: string
   version: number
-  history?: Array<GQLDraftHistory | null>
+  history?: Array<GQLDraftHistory>
   questions?: Array<GQLQuestion>
   updatedAt: GQLDate
   createdAt: GQLDate

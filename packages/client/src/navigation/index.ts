@@ -420,7 +420,7 @@ export function goToFieldAgentHomeTab(tabId: string) {
   }
 }
 
-export function goToFormConfigWizard(event: string, section: string) {
+export function goToFormConfigWizard(event: Event, section: string) {
   return push(
     formatUrl(FORM_CONFIG_WIZARD, {
       event: event,

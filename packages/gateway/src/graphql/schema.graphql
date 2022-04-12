@@ -124,7 +124,7 @@ type Query {
   getCertificateSVG(status: String, event: String): CertificateSVG
   getActiveCertificatesSVG: [CertificateSVG]
   getQuestions: [Question]
-  getFormDraft: [FormDraft]
+  getFormDraft: [FormDraft!]
 }
 
 type Mutation {
@@ -444,7 +444,7 @@ type FormDraft {
   status: String!
   comment: String
   version: Int!
-  history: [DraftHistory]
+  history: [DraftHistory!]
   questions: [Question!]
   updatedAt: Date!
   createdAt: Date!

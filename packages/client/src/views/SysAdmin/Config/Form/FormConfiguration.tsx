@@ -9,15 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import * as React from 'react'
-import { injectIntl, WrappedComponentProps, IntlShape } from 'react-intl'
+import {
+  injectIntl,
+  WrappedComponentProps as IntlShapeProps,
+  IntlShape
+} from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { IUserDetails } from '@client/utils/userUtils'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import { messages } from '@client/i18n/messages/views/config'
@@ -25,22 +25,19 @@ import { ToggleMenu } from '@opencrvs/components/lib/interface'
 import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import styled from 'styled-components'
-import { fetchDraft } from '@client/forms/configuration/actions'
+import { loadFormDraft } from '@client/forms/configuration/actions'
 import { IFormDraftData, IHistory } from '@client/forms/configuration/reducer'
 import { getFormDraftData } from '@client/forms/configuration/selector'
 import {
   ListViewItemSimplified,
   ListViewSimplified
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+import { goToFormConfigWizard } from '@client/navigation'
+import { Event, BirthSection, DeathSection } from '@client/forms'
 
-type Props = WrappedComponentProps &
-  Pick<RouteComponentProps, 'history'> & {
-    userDetails: IUserDetails | null
-    offlineResources: IOfflineData
-    offlineCountryConfiguration: IOfflineData
-    fetchDraft: typeof fetchDraft
-    formDraftData: IFormDraftData
-  }
+type Props = IntlShapeProps &
+  ReturnType<typeof mapStateToProps> &
+  typeof mapDispatchToProps
 
 interface State {
   activeTabId: string
@@ -65,8 +62,8 @@ class FormConfigComponent extends React.Component<Props, State> {
       activeTabId: TABS.PUBLISHED
     }
   }
-  async componentDidMount() {
-    this.props.fetchDraft()
+  componentDidMount() {
+    this.props.loadFormDraft()
   }
   getMenuItems = (intl: IntlShape) => {
     const menuItems = [
@@ -131,7 +128,11 @@ class FormConfigComponent extends React.Component<Props, State> {
             )
           }
           actions={[
-            <LinkButton onClick={() => {}}>
+            <LinkButton
+              onClick={() => {
+                this.props.goToFormConfigWizard(Event.BIRTH, BirthSection.Child)
+              }}
+            >
               {this.props.intl.formatMessage(messages.formConfigureButtonLabel)}
             </LinkButton>,
             formDraft && formDraft.birth ? (
@@ -167,7 +168,14 @@ class FormConfigComponent extends React.Component<Props, State> {
             )
           }
           actions={[
-            <LinkButton onClick={() => {}}>
+            <LinkButton
+              onClick={() => {
+                this.props.goToFormConfigWizard(
+                  Event.DEATH,
+                  DeathSection.Deceased
+                )
+              }}
+            >
               {this.props.intl.formatMessage(messages.formConfigureButtonLabel)}
             </LinkButton>,
             formDraft && formDraft.death ? (
@@ -309,11 +317,11 @@ class FormConfigComponent extends React.Component<Props, State> {
           <ListViewSimplified
             bottomBorder={true}
             children={
-              this.state.activeTabId == TABS.IN_PREVIEW ? (
+              this.state.activeTabId === TABS.IN_PREVIEW ? (
                 formsForPreviewTab
-              ) : this.state.activeTabId == TABS.PUBLISHED ? (
+              ) : this.state.activeTabId === TABS.PUBLISHED ? (
                 formsForPublishedTab
-              ) : this.state.activeTabId == TABS.DRAFTS ? (
+              ) : this.state.activeTabId === TABS.DRAFTS ? (
                 this.getItemsForDraftsTab(this.props.formDraftData)
               ) : (
                 <></>
@@ -327,13 +335,13 @@ class FormConfigComponent extends React.Component<Props, State> {
 }
 
 const mapDispatchToProps = {
-  fetchDraft
+  loadFormDraft,
+  goToFormConfigWizard
 }
 
 function mapStateToProps(state: IStoreState) {
   return {
     offlineResources: getOfflineData(state),
-    userDetails: getUserDetails(state),
     offlineCountryConfiguration: getOfflineData(state),
     formDraftData: getFormDraftData(state)
   }
