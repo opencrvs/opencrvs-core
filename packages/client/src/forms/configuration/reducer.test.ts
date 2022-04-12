@@ -106,7 +106,7 @@ describe('Form draft reducer tests', () => {
     }
 
     const action = {
-      type: actions.LOAD_DRAFT
+      type: actions.LOAD_FORM_DRAFT
     }
     store.dispatch(action)
     await flushPromises()
@@ -126,7 +126,7 @@ describe('Form draft reducer tests', () => {
     }
 
     const action = {
-      type: actions.LOAD_DRAFT
+      type: actions.LOAD_FORM_DRAFT
     }
     store.dispatch(action)
     await flushPromises()

@@ -11,68 +11,68 @@
  */
 
 import { ApolloQueryResult } from 'apollo-client'
-import { GQLformDraft } from '@opencrvs/gateway/src/graphql/schema'
+import { GQLFormDraft } from '@opencrvs/gateway/src/graphql/schema'
 
-export const LOAD_DRAFT = 'FORM/LOAD_DRAFT'
-export type DraftLoadAction = {
-  type: typeof LOAD_DRAFT
+export const LOAD_FORM_DRAFT = 'FORM/LOAD_FORM_DRAFT'
+export type LoadFormDraftAction = {
+  type: typeof LOAD_FORM_DRAFT
 }
 
-export const loadDraft = (): DraftLoadAction => ({
-  type: LOAD_DRAFT
+export const loadFormDraft = (): LoadFormDraftAction => ({
+  type: LOAD_FORM_DRAFT
 })
 
-export const FETCH_DRAFT = 'FORM/FETCH_DRAFT'
-export type DraftFetchAction = {
-  type: typeof FETCH_DRAFT
+export const FETCH_FORM_DRAFT = 'FORM/FETCH_FORM_DRAFT'
+export type FetchFormDraftAction = {
+  type: typeof FETCH_FORM_DRAFT
 }
 
-export const fetchDraft = (): DraftFetchAction => ({
-  type: FETCH_DRAFT
+export const fetchFormDraft = (): FetchFormDraftAction => ({
+  type: FETCH_FORM_DRAFT
 })
 
-export const GET_OFFLINE_DATA_SUCCESS = 'FORM/GET_OFFLINE_DATA_SUCCESS'
-export type DraftOfflineDataSuccessAction = {
-  type: typeof GET_OFFLINE_DATA_SUCCESS
+export const LOAD_FORM_DRAFT_SUCCESS = 'FORM/LOAD_FORM_DRAFT_SUCCESS'
+export type LoadFormDraftSuccessAction = {
+  type: typeof LOAD_FORM_DRAFT_SUCCESS
   payload: string
 }
 
-export const getOfflineDataSuccess = (
+export const loadFormDraftSuccessAction = (
   response: string
-): DraftOfflineDataSuccessAction => ({
-  type: GET_OFFLINE_DATA_SUCCESS,
+): LoadFormDraftSuccessAction => ({
+  type: LOAD_FORM_DRAFT_SUCCESS,
   payload: response
 })
 
-export const STORE_DRAFT = 'FORM/STORE_DRAFT'
-export type DraftStoredAction = {
-  type: typeof STORE_DRAFT
+export const FETCH_FORM_DRAFT_SUCCESS = 'FORM/FETCH_FORM_DRAFT_SUCCESS'
+export type FetchFormDraftSuccessAction = {
+  type: typeof FETCH_FORM_DRAFT_SUCCESS
   payload: {
-    queryData: ApolloQueryResult<{ getFormDraft: Array<GQLformDraft | null> }>
+    queryData: ApolloQueryResult<{ getFormDraft: GQLFormDraft[] }>
   }
 }
 
-export const storeDraft = (
-  queryData: ApolloQueryResult<{ getFormDraft: Array<GQLformDraft | null> }>
-): DraftStoredAction => ({
-  type: STORE_DRAFT,
+export const fetchFormDraftSuccessAction = (
+  queryData: ApolloQueryResult<{ getFormDraft: GQLFormDraft[] }>
+): FetchFormDraftSuccessAction => ({
+  type: FETCH_FORM_DRAFT_SUCCESS,
   payload: {
     queryData
   }
 })
 
-export const FAILED_DRAFT = 'FORM/FAILED_DRAFT'
-export type DraftFailAction = {
-  type: typeof FAILED_DRAFT
+export const FETCH_FORM_DRAFT_FAILED = 'FORM/FETCH_FORM_DRAFT_FAILED'
+export type FetchFormDraftFailedAction = {
+  type: typeof FETCH_FORM_DRAFT_FAILED
 }
 
-export const failedDraft = (): DraftFailAction => ({
-  type: FAILED_DRAFT
+export const fetchFormDraftFailedAction = (): FetchFormDraftFailedAction => ({
+  type: FETCH_FORM_DRAFT_FAILED
 })
 
 export type FormDraftActions =
-  | DraftStoredAction
-  | DraftLoadAction
-  | DraftFetchAction
-  | DraftFailAction
-  | DraftOfflineDataSuccessAction
+  | LoadFormDraftAction
+  | FetchFormDraftAction
+  | FetchFormDraftSuccessAction
+  | FetchFormDraftFailedAction
+  | LoadFormDraftSuccessAction

@@ -18,6 +18,7 @@ import { Event } from '@client/forms/index'
 
 export enum DraftStatus {
   DRAFT = 'DRAFT',
+  PREVIEW = 'PREVIEW',
   PUBLISHED = 'PUBLISHED',
   FINALISED = 'FINALISED'
 }
@@ -70,64 +71,76 @@ export const formDraftReducer: LoopReducer<
   | IFormDraftDataState
   | Loop<IFormDraftDataState, actions.FormDraftActions> => {
   switch (action.type) {
-    case actions.LOAD_DRAFT:
+    case actions.LOAD_FORM_DRAFT:
       return loop(
         state,
         Cmd.run(storage.getItem, {
           args: ['formDraft'],
-          successActionCreator: actions.getOfflineDataSuccess
+          successActionCreator: actions.loadFormDraftSuccessAction
         })
       )
 
-    case actions.GET_OFFLINE_DATA_SUCCESS: {
+    case actions.LOAD_FORM_DRAFT_SUCCESS: {
       const offlineDataString = action.payload
       const offlineData: IFormDraftData = JSON.parse(
         offlineDataString ? offlineDataString : '{}'
       )
 
       if (isEmpty(offlineData)) {
-        return loop(state, Cmd.action(actions.fetchDraft()))
+        return loop(state, Cmd.action(actions.fetchFormDraft()))
       }
-      return { ...state, formDraftData: offlineData }
+      return loop(
+        {
+          ...state,
+          formDraftData: offlineData,
+          formDraftDataLoaded: true
+        },
+        navigator.onLine ? Cmd.action(actions.fetchFormDraft()) : Cmd.none
+      )
     }
 
-    case actions.FETCH_DRAFT:
+    case actions.FETCH_FORM_DRAFT:
       return loop(
         state,
         Cmd.run(formDraftQueries.fetchFormDraft, {
-          successActionCreator: actions.storeDraft,
-          failActionCreator: actions.failedDraft
+          successActionCreator: actions.fetchFormDraftSuccessAction,
+          failActionCreator: actions.fetchFormDraftFailedAction
         })
       )
 
-    case actions.STORE_DRAFT:
+    case actions.FETCH_FORM_DRAFT_SUCCESS:
       const { queryData: formDraftQueryData } = action.payload
 
-      if (Boolean(formDraftQueryData.data.getFormDraft)) {
-        const birthFormDraft = find(formDraftQueryData.data.getFormDraft, {
-          event: Event.BIRTH
-        })
+      const birthFormDraft = find(formDraftQueryData.data.getFormDraft, {
+        event: Event.BIRTH
+      })
 
-        const deathFormDraft = find(formDraftQueryData.data.getFormDraft, {
-          event: Event.DEATH
-        })
+      const deathFormDraft = find(formDraftQueryData.data.getFormDraft, {
+        event: Event.DEATH
+      })
 
-        const formDraftData = {
-          birth: birthFormDraft,
-          death: deathFormDraft
-        } as IFormDraftData
-
-        return loop(
-          {
-            ...state,
-            formDraftData: formDraftData,
-            formDraftDataLoaded: true
-          },
-          Cmd.run(saveFormDraftData, { args: [state.formDraftData] })
-        )
+      if (!birthFormDraft) {
+        throw new Error('Default birth formDraft not found')
       }
-      return state
-    case actions.FAILED_DRAFT:
+
+      if (!deathFormDraft) {
+        throw new Error('Default death formDraft not found')
+      }
+
+      const formDraftData = {
+        birth: birthFormDraft,
+        death: deathFormDraft
+      } as IFormDraftData
+
+      return loop(
+        {
+          ...state,
+          formDraftData: formDraftData,
+          formDraftDataLoaded: true
+        },
+        Cmd.run(saveFormDraftData, { args: [formDraftData] })
+      )
+    case actions.FETCH_FORM_DRAFT_FAILED:
       return {
         ...state,
         loadingError: true
