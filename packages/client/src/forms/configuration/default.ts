@@ -10508,27 +10508,6 @@ export const registerForms: IDefaultRegisterForms = {
                     }
                   }
                 ],
-                reviewOverrides: {
-                  residingSection: 'informant',
-                  reference: {
-                    sectionID: 'registration',
-                    groupID: 'point-of-contact',
-                    fieldName: 'contactPoint'
-                  },
-                  position: REVIEW_OVERRIDE_POSITION.BEFORE,
-                  labelAs: {
-                    defaultMessage: 'Who is the informant?',
-                    description: 'Form section title for contact point',
-                    id: 'register.selectInformant.relation'
-                  },
-                  conditionals: [
-                    {
-                      action: 'hide',
-                      expression:
-                        '(!draftData || !draftData.informant || draftData.informant.relationship === "OTHER")'
-                    }
-                  ]
-                },
                 mapping: {
                   mutation: {
                     operation: 'fieldValueSectionExchangeTransformer',
