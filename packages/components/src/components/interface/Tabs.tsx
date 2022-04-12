@@ -28,7 +28,7 @@ export const Tab = styled(Button)<IProps>`
   opacity: ${({ disabled }) => (disabled ? 0.3 : 1)};
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   border-bottom: ${({ theme, active }) =>
-    active ? `4px solid ${theme.colors.indigo500}` : 'none'};
+    active ? `2px solid ${theme.colors.indigo500}` : 'none'};
   & div {
     padding-left: 0px;
     padding-right: 20px;
@@ -40,8 +40,5 @@ export const Tab = styled(Button)<IProps>`
   &:disabled {
     background: transparent;
   }
-  ${({ theme, active }) => (active ? theme.fonts.bold16 : theme.fonts.reg16)};
-
-  ${({ theme, active }) =>
-    active ? `border-bottom: 3px solid ${theme.fonts.secondary}` : ''};
+  ${({ theme }) => theme.fonts.bold16};
 `

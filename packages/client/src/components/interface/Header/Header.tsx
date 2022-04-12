@@ -16,7 +16,6 @@ import { messages } from '@client/i18n/messages/views/header'
 import {
   goBack,
   goForward,
-  goToConfig,
   goToEvents as goToEventsAction,
   goToHome,
   goToOperationalReport,
@@ -93,7 +92,6 @@ type IDispatchProps = {
   goBack: typeof goBack
   goForward: typeof goForward
   goToHomeAction: typeof goToHome
-  goToConfigAction: typeof goToConfig
   goToPerformanceHomeAction: typeof goToPerformanceHome
   goToPerformanceReportListAction: typeof goToPerformanceReportList
   goToOperationalReportAction: typeof goToOperationalReport
@@ -541,7 +539,6 @@ export const Header = connect(
     goForward,
     goToEvents: goToEventsAction,
     goToHomeAction: goToHome,
-    goToConfigAction: goToConfig,
     goToPerformanceHomeAction: goToPerformanceHome,
     goToOperationalReportAction: goToOperationalReport,
     goToPerformanceReportListAction: goToPerformanceReportList,
