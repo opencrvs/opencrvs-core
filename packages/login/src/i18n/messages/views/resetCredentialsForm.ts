@@ -111,7 +111,7 @@ const messagesToDefine = {
   successPageSubtitle: {
     id: 'resetCredentials.success.page.subtitle',
     defaultMessage:
-      '{forgottenItem, select, username {Check your phone for a reminder of your username} password {You can now login with your new password}} other {}',
+      '{forgottenItem, select, username {Check your phone for a reminder of your username} password {You can now login with your new password} other {}}',
     description: 'Subtitle for success page'
   },
 

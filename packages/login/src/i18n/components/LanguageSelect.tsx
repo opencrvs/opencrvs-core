@@ -77,9 +77,10 @@ function LanguageSelectComponent({
 }
 
 function mapStateToProps(store: IStoreState) {
-  const languageOptions: ISelectOption[] = Object.values(
-    getLanguages(store)
-  ).map(({ lang, displayName }) => ({ value: lang, label: displayName }))
+  const applicationLangauges = window.config.LANGUAGES.split(',')
+  const languageOptions: ISelectOption[] = Object.values(getLanguages(store))
+    .map(({ lang, displayName }) => ({ value: lang, label: displayName }))
+    .filter(({ value }) => applicationLangauges.includes(value))
 
   return {
     selectedLanguage: getLanguage(store),

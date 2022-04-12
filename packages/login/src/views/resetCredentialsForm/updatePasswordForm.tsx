@@ -28,7 +28,7 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import styled from 'styled-components'
-import { messages } from './resetCredentialsForm'
+import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
 
 const Header = styled.h4`
   ${({ theme }) => theme.fonts.h2};

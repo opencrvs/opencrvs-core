@@ -47,8 +47,6 @@ interface ICertificateMessages
   paymentInstruction: MessageDescriptor
   paymentAmount: MessageDescriptor
   paymentMethod: MessageDescriptor
-  person1: MessageDescriptor
-  person2: MessageDescriptor
   preview: MessageDescriptor
   print: MessageDescriptor
   printCertificate: MessageDescriptor
@@ -266,14 +264,6 @@ const messagesToDefine: ICertificateMessages = {
     defaultMessage: 'Payment method',
     description: 'The label for payment method select',
     id: 'print.certificate.paymentMethod'
-  },
-  person1: {
-    defaultMessage: 'UP Secretary Shakib al hasan',
-    id: 'print.certificate.signature.person1'
-  },
-  person2: {
-    defaultMessage: 'Local Registrar Mohammad Ashraful',
-    id: 'print.certificate.signature.person2'
   },
   preview: {
     defaultMessage: 'Certificate Preview',

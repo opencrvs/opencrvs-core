@@ -42,7 +42,7 @@ describe('Test phone number verification form', () => {
       })
 
       expect(app.update().find('#page-title').hostNodes().text()).toContain(
-        'ব্যবহারকারীর নাম পুনরুদ্ধারের অনুরোধ'
+        'Username reminder request'
       )
     })
 
@@ -54,7 +54,7 @@ describe('Test phone number verification form', () => {
       })
 
       expect(app.update().find('#page-title').hostNodes().text()).toContain(
-        'পাসওয়ার্ড পুনরায় সেট করুন'
+        'Password reset'
       )
     })
   })
@@ -70,7 +70,7 @@ describe('Test phone number verification form', () => {
         securityQuestionKey
       })
 
-      expect(app.update().text()).toContain('কোন শহরে আপনার জন্ম হয়?')
+      expect(app.update().text()).toContain('What city were you born in?')
     })
   })
 
@@ -176,7 +176,7 @@ describe('Test phone number verification form', () => {
             }
           })
           .then(() => {
-            expect(app.text()).toContain('আপনার প্রিয় খাদ্য কি?')
+            expect(app.text()).toContain('What is your favorite food?')
             done()
           })
       })
