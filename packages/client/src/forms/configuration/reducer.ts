@@ -18,6 +18,7 @@ import { Event } from '@client/forms/index'
 
 export enum DraftStatus {
   DRAFT = 'DRAFT',
+  PREVIEW = 'PREVIEW',
   PUBLISHED = 'PUBLISHED',
   FINALISED = 'FINALISED'
 }
