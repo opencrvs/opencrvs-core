@@ -585,15 +585,9 @@ const getDeclarationInfo = (
 
   if (info.type === 'Birth') {
     if (declaration?.brnDrn) {
-      info = {
-        ...info,
-        brn: declaration.brnDrn
-      }
+      info.brn = declaration.brnDrn
     } else if (!isDownloaded) {
-      info = {
-        ...info,
-        brn: ''
-      }
+      info.brn = ''
     }
     info = {
       ...info,
@@ -603,15 +597,9 @@ const getDeclarationInfo = (
     }
   } else if (info.type === 'Death') {
     if (declaration?.brnDrn) {
-      info = {
-        ...info,
-        drn: declaration.brnDrn
-      }
+      info.drn = declaration.brnDrn
     } else if (!isDownloaded) {
-      info = {
-        ...info,
-        drn: ''
-      }
+      info.drn = ''
     }
     info = {
       ...info,
