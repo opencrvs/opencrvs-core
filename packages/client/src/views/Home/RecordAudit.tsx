@@ -66,7 +66,9 @@ import {
   Loader,
   ISearchLocation,
   ListTable,
-  ColumnContentAlignment
+  ColumnContentAlignment,
+  PageHeader,
+  IPageHeaderProps
 } from '@opencrvs/components/lib/interface'
 import { getScope } from '@client/profile/profileSelectors'
 import { Scope } from '@client/utils/authUtils'
@@ -131,12 +133,23 @@ import { getFieldValue } from './utils'
 import { CollectorRelationLabelArray } from '@client/forms/correction/corrector'
 import format, { formatLongDate } from '@client/utils/date-formatting'
 
+const DesktopHeader = styled(Header)`
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: none;
+  }
+`
+
+const MobileHeader = styled(PageHeader)`
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: none;
+  }
+`
+
 const BodyContainer = styled.div`
   margin-left: 0px;
   margin-top: 0px;
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin-left: 265px;
-    margin-top: 28px;
   }
 `
 
@@ -585,10 +598,9 @@ const getDeclarationInfo = (
 
   if (info.type === 'Birth') {
     if (declaration?.brnDrn) {
-      info = {
-        ...info,
-        brn: declaration.brnDrn
-      }
+      info.brn = declaration.brnDrn
+    } else if (!isDownloaded) {
+      info.brn = ''
     }
     info = {
       ...info,
@@ -598,10 +610,9 @@ const getDeclarationInfo = (
     }
   } else if (info.type === 'Death') {
     if (declaration?.brnDrn) {
-      info = {
-        ...info,
-        drn: declaration.brnDrn
-      }
+      info.drn = declaration.brnDrn
+    } else if (!isDownloaded) {
+      info.drn = ''
     }
     info = {
       ...info,
@@ -740,6 +751,7 @@ const showUpdateButton = ({
       <PrimaryButton
         key={id}
         id={`update-application-${id}`}
+        size={'medium'}
         onClick={() => {
           goToPage && goToPage(PAGE_ROUTE, id, PAGE_ID, type)
         }}
@@ -1416,6 +1428,7 @@ function RecordAuditBody({
       goToPage
     })
   )
+
   if (actions[actions.length - 1].key) {
     mobileActions.push(actions[actions.length - 1])
     desktopActionsView.push(
@@ -1459,8 +1472,24 @@ function RecordAuditBody({
     registerForm: regForm,
     offlineData
   }
+
+  const mobileProps: IPageHeaderProps = {
+    id: 'mobileHeader',
+    mobileTitle:
+      declaration.name || intl.formatMessage(recordAuditMessages.noName),
+    mobileLeft: [
+      <BackButtonDiv>
+        <BackButton onClick={() => goBack()}>
+          <BackArrow />
+        </BackButton>
+      </BackButtonDiv>
+    ],
+    mobileRight: desktopActionsView
+  }
+
   return (
     <>
+      <MobileHeader {...mobileProps} />
       <Content
         title={
           declaration.name || intl.formatMessage(recordAuditMessages.noName)
@@ -1469,24 +1498,14 @@ function RecordAuditBody({
         size={ContentSize.LARGE}
         topActionButtons={desktopActionsView}
         icon={() => (
-          <>
-            <IconDiv>
-              <DeclarationIcon
-                isArchive={declaration?.status === ARCHIVED}
-                color={
-                  STATUSTOCOLOR[
-                    (declaration && declaration.status) ||
-                      SUBMISSION_STATUS.DRAFT
-                  ]
-                }
-              />
-            </IconDiv>
-            <BackButtonDiv>
-              <BackButton onClick={() => goBack()}>
-                <BackArrow />
-              </BackButton>
-            </BackButtonDiv>
-          </>
+          <DeclarationIcon
+            isArchive={declaration?.status === ARCHIVED}
+            color={
+              STATUSTOCOLOR[
+                (declaration && declaration.status) || SUBMISSION_STATUS.DRAFT
+              ]
+            }
+          />
         )}
       >
         {getDeclarationInfo(declaration, isDownloaded, intl, mobileActions)}
@@ -1632,7 +1651,7 @@ function getBodyContent({
 const RecordAuditComp = (props: IFullProps) => {
   return (
     <>
-      <Header />
+      <DesktopHeader />
       <Navigation deselectAllTabs={true} />
       <BodyContainer>{getBodyContent(props)}</BodyContainer>
       <NotificationToast />

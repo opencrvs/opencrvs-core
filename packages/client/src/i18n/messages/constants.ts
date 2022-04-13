@@ -178,7 +178,7 @@ const messagesToDefine: IConstantsMessages = {
   declarationArchivedOn: {
     defaultMessage: 'Application archived on',
     description: 'Label for the workflow timestamp when the status is archived',
-    id: 'constants.applicationArchivedOn'
+    id: 'constants.declrationArchivedOn'
   },
   declarationCollectedOn: {
     defaultMessage: 'Certificate collected on',

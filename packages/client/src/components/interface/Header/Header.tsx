@@ -110,7 +110,11 @@ interface IProps extends RouteComponentProps {
   mapPinClickHandler?: () => void
 }
 
-type IFullProps = IntlShapeProps & IStateProps & IDispatchProps & IProps
+type IFullProps = IntlShapeProps &
+  IStateProps &
+  IDispatchProps &
+  IProps &
+  React.HTMLAttributes<HTMLDivElement>
 
 interface IState {
   showMenu: boolean
@@ -442,6 +446,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
 
   render() {
     const { intl, activeMenuItem } = this.props
+    const headerProps: React.HTMLAttributes<HTMLDivElement> = this
+      .props as React.HTMLAttributes<HTMLDivElement>
     const title =
       this.props.title ||
       intl.formatMessage(
@@ -500,14 +506,14 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       this.getMobileHeaderActionProps(activeMenuItem)
 
     return (
-      <>
+      <div {...headerProps}>
         <AppHeader
           id="register_app_header"
           desktopRightMenu={rightMenu}
           title={title}
           {...mobileHeaderActionProps}
         />
-      </>
+      </div>
     )
   }
 }
