@@ -744,7 +744,9 @@ const transformAddressTemplateArray = (
         )?.label || ''
       : offlineData?.[OFFLINE_LOCATIONS_KEY]?.[
           addressFromQuery[addressLocationLevel] as string
-        ]?.name || ''
+        ]?.name ||
+        addressFromQuery[addressLocationLevel] ||
+        ''
 }
 
 export const addressOfflineTransformer =
@@ -801,6 +803,7 @@ export const eventLocationAddressOfflineTransformer =
     if (
       queryData.eventLocation?.type &&
       queryData.eventLocation.type !== 'PRIVATE_HOME' &&
+      queryData.eventLocation.type !== 'PERMANENT' &&
       queryData.eventLocation.type !== 'OTHER'
     ) {
       return
@@ -809,14 +812,16 @@ export const eventLocationAddressOfflineTransformer =
     const addressFromQuery = queryData.eventLocation?.address
     const nameKey = transformedFieldName || field.name
 
-    transformAddressTemplateArray(
-      transformedData,
-      addressFromQuery,
-      addressLocationLevel,
-      sectionId,
-      nameKey,
-      offlineData
-    )
+    if (addressFromQuery) {
+      transformAddressTemplateArray(
+        transformedData,
+        addressFromQuery,
+        addressLocationLevel,
+        sectionId,
+        nameKey,
+        offlineData
+      )
+    }
   }
 
 export const selectTransformer = (
