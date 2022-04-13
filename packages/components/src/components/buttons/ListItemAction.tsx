@@ -49,7 +49,6 @@ const ListItemSingleAction = styled(PrimaryButton)<{
   isFullHeight?: boolean
 }>`
   ${({ isFullHeight }) => isFullHeight && ` height: 100%;`}
-  max-height: 40px;
   text-transform: capitalize;
 `
 const ExpansionSecion = styled(ExpansionButton)<{
@@ -98,6 +97,7 @@ export function ListItemAction(props: IListItemActionProps) {
                 isFullHeight={isFullHeight}
                 key={action.label as string}
                 id={`${id}-${action.label as string}`}
+                size={'medium'}
                 onClick={action.handler}
                 icon={action.icon}
               >

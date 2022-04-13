@@ -650,6 +650,18 @@ export const getSelectedRadioOptionWithNestedFields = (
   return (sectionData[field.name] as IFormSectionData).value as string
 }
 
+export function getSelectedOption(
+  value: string,
+  options: ISelectOption[]
+): ISelectOption | null {
+  const selectedOption = options.find((x: ISelectOption) => x.value === value)
+  if (selectedOption) {
+    return selectedOption
+  }
+
+  return null
+}
+
 export const conditionals: IConditionals = {
   presentAtBirthRegistration: {
     action: 'hide',

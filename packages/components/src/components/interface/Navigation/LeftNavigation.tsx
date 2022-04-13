@@ -74,7 +74,7 @@ const ApplicationName = styled.div`
 
 const Version = styled.div`
   color: ${({ theme }) => theme.colors.grey400};
-  ${({ theme }) => theme.fonts.smallButtonStyle};
+  ${({ theme }) => theme.fonts.reg14};
   height: 40px;
   position: absolute;
   bottom: 0px;
