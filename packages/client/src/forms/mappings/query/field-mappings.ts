@@ -770,7 +770,7 @@ export const addressOfflineTransformer =
     ) {
       return
     }
-    console.log(queryData[transformedFieldName]?.address, transformedFieldName)
+
     const addressFromQuery = (
       queryData[transformedFieldName]?.address as GQLAddress[]
     )?.find((address) => address.type === addressType)
