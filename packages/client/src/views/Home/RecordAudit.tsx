@@ -1358,9 +1358,10 @@ function RecordAuditBody({
 
   if (
     isDownloaded &&
-    (userHasValidateScope || userHasRegisterScope) &&
     declaration.status &&
-    ARCHIVABLE_STATUSES.includes(declaration.status)
+    ARCHIVABLE_STATUSES.includes(declaration.status) &&
+    (userHasRegisterScope ||
+      (userHasValidateScope && declaration.status !== VALIDATED))
   ) {
     actions.push(
       <StyledTertiaryButton
