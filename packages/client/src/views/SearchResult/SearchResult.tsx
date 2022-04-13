@@ -54,7 +54,6 @@ import {
   IAction,
   Loader
 } from '@opencrvs/components/lib/interface'
-import { HomeContent } from '@opencrvs/components/lib/layout'
 import {
   GQLEventSearchResultSet,
   GQLQuery
@@ -67,6 +66,10 @@ import ReactTooltip from 'react-tooltip'
 import { convertToMSISDN } from '@client/forms/utils'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { Navigation } from '@client/components/interface/Navigation'
+import {
+  Content,
+  ContentSize
+} from '@opencrvs/components/lib/interface/Content'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -75,10 +78,9 @@ const ErrorText = styled.div`
   margin-top: 100px;
 `
 
-const Container = styled.div`
-  margin: 20px 0px 0px 0px;
+const BodyContainer = styled.div`
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-left: 249px;
+    margin-left: 265px;
   }
 `
 const ToolTipContainer = styled.span`
@@ -467,8 +469,8 @@ export class SearchResultView extends React.Component<
           enableMenuSelection={false}
         />
         <Navigation />
-        <Container>
-          <HomeContent>
+        <BodyContainer>
+          <>
             {searchText && searchType && (
               <Query
                 query={SEARCH_EVENTS}
@@ -523,13 +525,13 @@ export class SearchResultView extends React.Component<
                       data.searchEvents.results.length) ||
                     0
                   return (
-                    <>
-                      <SearchResultText>
-                        {intl.formatMessage(messages.searchResultFor, {
-                          total,
-                          param: searchText
-                        })}
-                      </SearchResultText>
+                    <Content
+                      size={ContentSize.LARGE}
+                      title={intl.formatMessage(messages.searchResultFor, {
+                        total,
+                        param: searchText
+                      })}
+                    >
                       {total > 0 && (
                         <>
                           <ReactTooltip id="validateTooltip">
@@ -564,13 +566,13 @@ export class SearchResultView extends React.Component<
                           />
                         </>
                       )}
-                    </>
+                    </Content>
                   )
                 }}
               </Query>
             )}
-          </HomeContent>
-        </Container>
+          </>
+        </BodyContainer>
       </>
     )
   }

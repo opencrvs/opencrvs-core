@@ -33,25 +33,27 @@ import { Scope } from '@client/utils/authUtils'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
 import NotificationToast from '@client/views/OfficeHome/NotificationToast'
 import {
-  Button,
   FloatingActionButton,
   IButtonProps
 } from '@opencrvs/components/lib/buttons'
 import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
 import {
   PAGE_TRANSITIONS_ENTER_TIME,
-  FIELD_AGENT_ROLES
+  FIELD_AGENT_ROLES,
+  NATL_ADMIN_ROLES,
+  SYS_ADMIN_ROLES
 } from '@client/utils/constants'
 import {
   FloatingNotification,
   NOTIFICATION_TYPE,
   Spinner
 } from '@opencrvs/components/lib/interface'
+import subYears from 'date-fns/subYears'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
+import { RouteComponentProps, Redirect } from 'react-router'
 import { ApprovalTab } from './tabs/approvals/approvalTab'
 import { InProgressTab } from './tabs/inProgress/inProgressTab'
 import { PrintTab } from './tabs/print/printTab'
@@ -65,6 +67,10 @@ import {
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { SentForReview } from './tabs/sentForReview/SentForReview'
 import { RequiresUpdate } from './tabs/requiresUpdate/RequiresUpdate'
+import { PERFORMANCE_HOME, OPERATIONAL_REPORT } from '@client/navigation/routes'
+import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
+import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
+import { navigationMessages } from '@client/i18n/messages/views/navigation'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -162,6 +168,9 @@ export class OfficeHomeView extends React.Component<
   showPaginated = false
   interval: any = undefined
   role = this.props.userDetails && this.props.userDetails.role
+  jurisdictionLocationId =
+    this.props.userDetails &&
+    getJurisdictionLocationIdFromUserDetails(this.props.userDetails)
   isFieldAgent = this.role
     ? FIELD_AGENT_ROLES.includes(this.role)
       ? true
@@ -327,6 +336,25 @@ export class OfficeHomeView extends React.Component<
     )
     return (
       <>
+        {this.role && NATL_ADMIN_ROLES.includes(this.role) && (
+          <Redirect to={PERFORMANCE_HOME} />
+        )}
+        {this.role && SYS_ADMIN_ROLES.includes(this.role) && (
+          <Redirect
+            to={{
+              pathname: OPERATIONAL_REPORT,
+              search:
+                '?locationId=' +
+                this.jurisdictionLocationId +
+                '&sectionId=' +
+                OPERATIONAL_REPORT_SECTION.OPERATIONAL +
+                '&timeStart=' +
+                subYears(new Date(Date.now()), 1).toISOString() +
+                '&timeEnd=' +
+                new Date(Date.now()).toISOString()
+            }}
+          />
+        )}
         <Navigation />
         <BodyContainer>
           {tabId === WORKQUEUE_TABS.inProgress && (
@@ -448,7 +476,9 @@ export class OfficeHomeView extends React.Component<
 
     return (
       <>
-        <Header />
+        <Header
+          title={intl.formatMessage(navigationMessages[this.props.tabId])}
+        />
         {this.getData(
           progressCurrentPage,
           reviewCurrentPage,

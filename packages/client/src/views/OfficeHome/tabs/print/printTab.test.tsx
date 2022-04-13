@@ -302,7 +302,6 @@ describe('RegistrarHome ready to print tab related tests', () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
       <PrintTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         queryData={{
           data: {
             totalItems: 2,
@@ -331,7 +330,6 @@ describe('RegistrarHome ready to print tab related tests', () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
       <PrintTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         queryData={{
           data: { totalItems: 0, results: [] }
         }}
@@ -350,7 +348,6 @@ describe('RegistrarHome ready to print tab related tests', () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
       <PrintTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         queryData={{
           data: { totalItems: 14, results: [] }
         }}
@@ -375,7 +372,6 @@ describe('RegistrarHome ready to print tab related tests', () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
       <PrintTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         queryData={{
           data: { totalItems: 14, results: [] }
         }}
@@ -398,7 +394,6 @@ describe('RegistrarHome ready to print tab related tests', () => {
       const testComponent = await createTestComponent(
         // @ts-ignore
         <PrintTab
-          registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
           queryData={{
             data: mockPrintTabData
           }}
@@ -773,7 +768,6 @@ describe('Tablet tests', () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
       <PrintTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         queryData={{
           data: mockPrintTabData
         }}

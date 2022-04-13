@@ -231,7 +231,6 @@ describe('OfficeHome sent for review tab related tests', () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
       <ReviewTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         queryData={{
           data: mockReviewTabData
         }}
@@ -262,7 +261,6 @@ describe('OfficeHome sent for review tab related tests', () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
       <ReviewTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         queryData={{
           data: {
             totalItems: 12,
@@ -284,7 +282,6 @@ describe('OfficeHome sent for review tab related tests', () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
       <ReviewTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         queryData={{
           data: {
             totalItems: 14,
@@ -312,7 +309,6 @@ describe('OfficeHome sent for review tab related tests', () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
       <ReviewTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         queryData={{
           data: {
             totalItems: 14,
@@ -337,7 +333,6 @@ describe('OfficeHome sent for review tab related tests', () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
       <ReviewTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         queryData={{
           data: {
             totalItems: 2,
@@ -646,7 +641,6 @@ describe('OfficeHome sent for review tab related tests', () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
       <ReviewTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         queryData={{
           data: {
             totalItems: 2,
@@ -839,7 +833,6 @@ describe('Tablet tests', () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
       <ReviewTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         queryData={{
           data: {
             totalItems: 2,

@@ -21,7 +21,6 @@ import {
   GridTable,
   IAction
 } from '@opencrvs/components/lib/interface'
-import { HomeContent } from '@opencrvs/components/lib/layout'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -39,6 +38,12 @@ import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
 import { Action } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { formattedDuration } from '@client/utils/date-formatting'
+import {
+  Content,
+  ContentSize
+} from '@opencrvs/components/lib/interface/Content'
+import { navigationMessages } from '@client/i18n/messages/views/navigation'
+import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
 
 interface IBasePrintTabProps {
   theme: ITheme
@@ -211,11 +216,14 @@ class PrintTabComponent extends React.Component<
     const { data } = queryData
 
     return (
-      <HomeContent>
+      <Content
+        size={ContentSize.LARGE}
+        title={intl.formatMessage(navigationMessages.print)}
+      >
         <GridTable
           content={this.transformRegisteredContent(data)}
           columns={this.getColumns()}
-          noResultText={intl.formatMessage(constantsMessages.noResults)}
+          noResultText={intl.formatMessage(officeHomeMessages.print)}
           onPageChange={onPageChange}
           pageSize={this.pageSize}
           totalItems={(data && data.totalItems) || 0}
@@ -229,7 +237,7 @@ class PrintTabComponent extends React.Component<
           loading={this.props.loading ? true : false}
           hasError={this.props.error ? true : false}
         />
-      </HomeContent>
+      </Content>
     )
   }
 }

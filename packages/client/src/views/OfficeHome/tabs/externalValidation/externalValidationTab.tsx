@@ -15,7 +15,6 @@ import {
   ColumnContentAlignment
 } from '@opencrvs/components/lib/interface'
 import { ITheme, withTheme } from '@client/styledComponents'
-import { HomeContent } from '@opencrvs/components/lib/layout'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import { transformData } from '@client/search/transformer'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -28,6 +27,12 @@ import { connect } from 'react-redux'
 import { goToPage, goToDeclarationRecordAudit } from '@client/navigation'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { formattedDuration } from '@client/utils/date-formatting'
+import {
+  Content,
+  ContentSize
+} from '@opencrvs/components/lib/interface/Content'
+import { navigationMessages } from '@client/i18n/messages/views/navigation'
+import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
 
 const { useState, useEffect } = React
 
@@ -148,7 +153,10 @@ function ExternalValidationTabComponent(props: IProps) {
   const { data } = queryData
 
   return (
-    <HomeContent>
+    <Content
+      size={ContentSize.LARGE}
+      title={intl.formatMessage(navigationMessages.waitingValidation)}
+    >
       <GridTable
         content={transformWaitingValidationContent(data)}
         noResultText={intl.formatMessage(constantsMessages.noResults)}
@@ -159,14 +167,14 @@ function ExternalValidationTabComponent(props: IProps) {
         clickable={true}
         showPaginated={props.showPaginated}
         loading={props.loading}
-        loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
+        loadMoreText={intl.formatMessage(officeHomeMessages.waitingValidation)}
         columns={columns}
       />
       <LoadingIndicator
         loading={Boolean(props.loading)}
         hasError={Boolean(props.error)}
       />
-    </HomeContent>
+    </Content>
   )
 }
 

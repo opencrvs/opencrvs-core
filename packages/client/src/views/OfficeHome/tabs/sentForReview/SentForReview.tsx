@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { HomeContent } from '@opencrvs/components/lib/layout'
 import {
   GridTable,
   ColumnContentAlignment,
@@ -40,6 +39,12 @@ import { getDefaultLanguage } from '@client/i18n/utils'
 import { withTheme, ITheme } from '@client/styledComponents'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
+import {
+  Content,
+  ContentSize
+} from '@opencrvs/components/lib/interface/Content'
+import { navigationMessages } from '@client/i18n/messages/views/navigation'
+import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
 
 const DECLARATIONS_DAY_LIMIT = 7
 
@@ -259,11 +264,14 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
     const { intl, declarationsReadyToSend } = this.props
 
     return (
-      <HomeContent>
+      <Content
+        size={ContentSize.LARGE}
+        title={intl.formatMessage(navigationMessages.sentForReview)}
+      >
         <GridTable
           content={this.transformDeclarationsReadyToSend()}
           columns={this.getColumns()}
-          noResultText={intl.formatMessage(messages.noResults)}
+          noResultText={intl.formatMessage(officeHomeMessages.sentForReview)}
           totalItems={declarationsReadyToSend && declarationsReadyToSend.length}
           onPageChange={this.onPageChange}
           pageSize={this.pageSize}
@@ -272,7 +280,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           loadMoreText={intl.formatMessage(messages.loadMore)}
         />
         <LoadingIndicator loading={false} hasError={false} />
-      </HomeContent>
+      </Content>
     )
   }
 }

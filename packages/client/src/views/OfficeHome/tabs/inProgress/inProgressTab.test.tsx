@@ -97,7 +97,6 @@ describe('In Progress tab', () => {
       // @ts-ignore
       <InProgressTab
         drafts={localDrafts}
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         queryData={{
           inProgressData: {},
           notificationData: {}
@@ -114,7 +113,7 @@ describe('In Progress tab', () => {
     testComponent.update()
     const app = testComponent
 
-    app.find(`#selector_${SELECTOR_ID.ownDrafts}`).hostNodes().simulate('click')
+    app.find(`#tab_${SELECTOR_ID.ownDrafts}`).hostNodes().simulate('click')
     await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
@@ -125,7 +124,7 @@ describe('In Progress tab', () => {
       })
     )
     app
-      .find(`#selector_${SELECTOR_ID.fieldAgentDrafts}`)
+      .find(`#tab_${SELECTOR_ID.fieldAgentDrafts}`)
       .hostNodes()
       .simulate('click')
     await new Promise((resolve) => {
@@ -158,7 +157,6 @@ describe('In Progress tab', () => {
       <InProgressTab
         drafts={localDrafts}
         selectorId={'you'}
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         queryData={{
           inProgressData: { totalItems: 5 },
           notificationData: { totalItems: 3 }
@@ -175,8 +173,8 @@ describe('In Progress tab', () => {
     testComponent.update()
     const app = testComponent
 
-    expect(app.find('#selector_you').hostNodes().text()).toContain('Yours (2)')
-    expect(app.find('#selector_field-agents').hostNodes().text()).toContain(
+    expect(app.find('#tab_you').hostNodes().text()).toContain('Yours (2)')
+    expect(app.find('#tab_field-agents').hostNodes().text()).toContain(
       'Field agents (5)'
     )
   })
@@ -254,7 +252,6 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
-          registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
           queryData={{
             inProgressData: {},
             notificationData: {}
@@ -289,7 +286,6 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
-          registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
           queryData={{
             inProgressData: {},
             notificationData: {}
@@ -414,7 +410,6 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
-          registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
           queryData={{
             inProgressData: {},
             notificationData: {}
@@ -457,7 +452,6 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
-          registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
           queryData={{
             inProgressData: {
               totalItems: 1,
@@ -543,7 +537,6 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
-          registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
           queryData={{
             inProgressData: { totalItems: 12 },
             notificationData: { totalItems: 2 }
@@ -580,7 +573,6 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.hospitalDrafts}
-          registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
           queryData={{
             inProgressData: {},
             notificationData: {
@@ -797,7 +789,6 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.hospitalDrafts}
-          registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
           queryData={{
             notificationData: {
               totalItems: 2,
@@ -882,7 +873,6 @@ describe('Tablet tests', () => {
       <InProgressTab
         drafts={drafts}
         selectorId={SELECTOR_ID.fieldAgentDrafts}
-        registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
         queryData={{
           inProgressData: {
             totalItems: 1,

@@ -15,7 +15,6 @@ import {
   GridTable,
   IAction
 } from '@opencrvs/components/lib/interface/GridTable'
-import { HomeContent } from '@opencrvs/components/lib/layout'
 import {
   GQLHumanName,
   GQLEventSearchResultSet,
@@ -58,6 +57,13 @@ import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { formattedDuration } from '@client/utils/date-formatting'
+import {
+  Content,
+  ContentSize
+} from '@opencrvs/components/lib/interface/Content'
+import { navigationMessages } from '@client/i18n/messages/views/navigation'
+import { IFormTabProps } from '@opencrvs/components/lib/forms'
+import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
 
 const BlueButton = styled(Button)`
   background-color: ${({ theme }) => theme.colors.secondary};
@@ -327,107 +333,6 @@ export class InProgressTabComponent extends React.Component<
     })
   }
 
-  renderInProgressSelectorsWithCounts = (
-    selectorId: string,
-    drafts: IDeclaration[],
-    fieldAgentCount: number,
-    hospitalCount: number
-  ) => {
-    const { intl } = this.props
-
-    return (
-      <TabGroup>
-        {((!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
-          <BlueButton
-            id={`selector_${SELECTOR_ID.ownDrafts}`}
-            key={SELECTOR_ID.ownDrafts}
-            onClick={() =>
-              this.props.goToRegistrarHomeTab(
-                TAB_ID.inProgress,
-                SELECTOR_ID.ownDrafts
-              )
-            }
-          >
-            {intl.formatMessage(messages.inProgressOwnDrafts)} (
-            {drafts && drafts.length})
-          </BlueButton>
-        )) || (
-          <WhiteButton
-            id={`selector_${SELECTOR_ID.ownDrafts}`}
-            key={SELECTOR_ID.ownDrafts}
-            onClick={() =>
-              this.props.goToRegistrarHomeTab(
-                TAB_ID.inProgress,
-                SELECTOR_ID.ownDrafts
-              )
-            }
-          >
-            {intl.formatMessage(messages.inProgressOwnDrafts)} (
-            {drafts && drafts.length})
-          </WhiteButton>
-        )}
-
-        {(selectorId === SELECTOR_ID.fieldAgentDrafts && (
-          <BlueButton
-            id={`selector_${SELECTOR_ID.fieldAgentDrafts}`}
-            key={SELECTOR_ID.fieldAgentDrafts}
-            onClick={() =>
-              this.props.goToRegistrarHomeTab(
-                TAB_ID.inProgress,
-                SELECTOR_ID.fieldAgentDrafts
-              )
-            }
-          >
-            {intl.formatMessage(messages.inProgressFieldAgents)} (
-            {fieldAgentCount})
-          </BlueButton>
-        )) || (
-          <WhiteButton
-            id={`selector_${SELECTOR_ID.fieldAgentDrafts}`}
-            key={SELECTOR_ID.fieldAgentDrafts}
-            onClick={() =>
-              this.props.goToRegistrarHomeTab(
-                TAB_ID.inProgress,
-                SELECTOR_ID.fieldAgentDrafts
-              )
-            }
-          >
-            {intl.formatMessage(messages.inProgressFieldAgents)} (
-            {fieldAgentCount})
-          </WhiteButton>
-        )}
-
-        {(selectorId === SELECTOR_ID.hospitalDrafts && (
-          <BlueButton
-            id={`selector_${SELECTOR_ID.hospitalDrafts}`}
-            key={SELECTOR_ID.hospitalDrafts}
-            onClick={() =>
-              this.props.goToRegistrarHomeTab(
-                TAB_ID.inProgress,
-                SELECTOR_ID.hospitalDrafts
-              )
-            }
-          >
-            {intl.formatMessage(messages.hospitalDrafts)} ({hospitalCount})
-          </BlueButton>
-        )) || (
-          <WhiteButton
-            id={`selector_${SELECTOR_ID.hospitalDrafts}`}
-            key={SELECTOR_ID.hospitalDrafts}
-            onClick={() =>
-              this.props.goToRegistrarHomeTab(
-                TAB_ID.inProgress,
-                SELECTOR_ID.hospitalDrafts
-              )
-            }
-          >
-            {intl.formatMessage(messages.hospitalDrafts)} ({hospitalCount})
-          </WhiteButton>
-        )}
-      </TabGroup>
-    )
-  }
-
   renderFieldAgentTable = (
     data: GQLEventSearchResultSet,
     intl: IntlShape,
@@ -439,7 +344,7 @@ export class InProgressTabComponent extends React.Component<
         <GridTable
           content={this.transformRemoteDraftsContent(data)}
           columns={this.getRemoteDraftColumns()}
-          noResultText={intl.formatMessage(constantsMessages.noResults)}
+          noResultText={intl.formatMessage(officeHomeMessages.progress)}
           onPageChange={onPageChange}
           pageSize={this.pageSize}
           totalItems={(data && data.totalItems) || 0}
@@ -468,7 +373,7 @@ export class InProgressTabComponent extends React.Component<
         <GridTable
           content={this.transformRemoteDraftsContent(data)}
           columns={this.getNotificationColumns()}
-          noResultText={intl.formatMessage(constantsMessages.noResults)}
+          noResultText={intl.formatMessage(officeHomeMessages.progress)}
           onPageChange={onPageChange}
           pageSize={this.pageSize}
           totalItems={(data && data.totalItems) || 0}
@@ -651,6 +556,46 @@ export class InProgressTabComponent extends React.Component<
     }
   }
 
+  getTabs(
+    selectorId: string,
+    drafts: IDeclaration[],
+    fieldAgentCount: number,
+    hospitalCount: number
+  ): IFormTabProps | undefined {
+    if (this.props.isFieldAgent) {
+      return undefined
+    }
+    return {
+      activeTabId: selectorId || SELECTOR_ID.ownDrafts,
+      onTabClick: (tabId) => {
+        this.props.goToRegistrarHomeTab(TAB_ID.inProgress, tabId)
+      },
+      sections: [
+        {
+          id: SELECTOR_ID.ownDrafts,
+          title: `${this.props.intl.formatMessage(
+            messages.inProgressOwnDrafts
+          )} (${drafts && drafts.length})`,
+          disabled: false
+        },
+        {
+          id: SELECTOR_ID.fieldAgentDrafts,
+          title: `${this.props.intl.formatMessage(
+            messages.inProgressFieldAgents
+          )} (${fieldAgentCount})`,
+          disabled: false
+        },
+        {
+          id: SELECTOR_ID.hospitalDrafts,
+          title: `${this.props.intl.formatMessage(
+            messages.hospitalDrafts
+          )} (${hospitalCount})`,
+          disabled: false
+        }
+      ]
+    }
+  }
+
   render() {
     const {
       intl,
@@ -663,31 +608,33 @@ export class InProgressTabComponent extends React.Component<
     } = this.props
     const { inProgressData, notificationData } = queryData
     return (
-      <HomeContent>
-        {!isFieldAgent &&
-          this.renderInProgressSelectorsWithCounts(
-            selectorId,
-            drafts,
-            inProgressData.totalItems || 0,
-            notificationData.totalItems || 0
-          )}
+      <Content
+        size={ContentSize.LARGE}
+        title={intl.formatMessage(navigationMessages.progress)}
+        tabs={this.getTabs(
+          selectorId,
+          drafts,
+          inProgressData.totalItems || 0,
+          notificationData.totalItems || 0
+        )}
+      >
         {(!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
           <>
             <GridTable
               content={this.transformDraftContent()}
               columns={this.getDraftColumns()}
-              noResultText={intl.formatMessage(constantsMessages.noResults)}
+              noResultText={intl.formatMessage(officeHomeMessages.progress)}
               onPageChange={onPageChange}
               pageSize={this.pageSize}
               totalItems={drafts && drafts.length}
               currentPage={page}
               clickable={true}
               showPaginated={this.props.showPaginated}
-              loading={this.props.loading}
+              loading={isFieldAgent ? false : this.props.loading}
               loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
             />
             <LoadingIndicator
-              loading={this.props.loading ? true : false}
+              loading={this.props.loading && !isFieldAgent ? true : false}
               hasError={false}
             />
           </>
@@ -698,7 +645,7 @@ export class InProgressTabComponent extends React.Component<
         {selectorId === SELECTOR_ID.hospitalDrafts &&
           !isFieldAgent &&
           this.renderHospitalTable(notificationData, intl, page, onPageChange)}
-      </HomeContent>
+      </Content>
     )
   }
 }

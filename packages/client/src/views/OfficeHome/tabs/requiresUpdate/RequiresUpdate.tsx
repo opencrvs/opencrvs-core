@@ -31,7 +31,6 @@ import {
 import { EVENT_STATUS, ErrorText } from '@client/views/OfficeHome/OfficeHome'
 import { DeclarationsOrangeAmber } from '@opencrvs/components/lib/icons'
 import { GridTable, Loader } from '@opencrvs/components/lib/interface'
-import { HomeContent } from '@opencrvs/components/lib/layout'
 import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
@@ -47,6 +46,12 @@ import {
 } from 'react-intl'
 import { connect } from 'react-redux'
 import { IUserDetails, getUserLocation } from '@client/utils/userUtils'
+import {
+  Content,
+  ContentSize
+} from '@opencrvs/components/lib/interface/Content'
+import { navigationMessages } from '@client/i18n/messages/views/navigation'
+import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
 
 const ZeroUpdatesContainer = styled.div`
   padding-top: 200px;
@@ -202,7 +207,10 @@ const RequiresUpdateComponent = (props: IFullProps) => {
   } = props
   const width = useWindowWidth()
   return (
-    <>
+    <Content
+      size={ContentSize.LARGE}
+      title={intl.formatMessage(navigationMessages.requiresUpdate)}
+    >
       <Query
         query={SEARCH_DECLARATIONS_USER_WISE} // TODO can this be changed to use SEARCH_EVENTS
         variables={{
@@ -240,46 +248,29 @@ const RequiresUpdateComponent = (props: IFullProps) => {
           }
           return (
             <>
-              {data && data.searchEvents?.totalItems > 0 && (
-                <HomeContent id="require_updates_list">
-                  <GridTable
-                    content={transformRejectedContent(data, props)}
-                    columns={getRejectedColumns(width, theme, intl)}
-                    noResultText={EMPTY_STRING}
-                    onPageChange={(currentPage: number) => {
-                      onPageChange(currentPage)
-                    }}
-                    pageSize={pageSize}
-                    totalItems={
-                      data.searchEvents && data.searchEvents.totalItems
-                    }
-                    currentPage={requireUpdatesPage}
-                    clickable={props.isOnline}
-                    showPaginated={showPaginated}
-                    loading={loading}
-                    loadMoreText={intl.formatMessage(
-                      constantsMessages.loadMore
-                    )}
-                  />
-                  <LoadingIndicator loading={loading} hasError={error} />
-                </HomeContent>
-              )}
-              {data && data.searchEvents?.totalItems === 0 && (
-                <ZeroUpdatesContainer>
-                  <DeclarationsOrangeAmber />
-                  <ZeroUpdatesText>
-                    {intl.formatMessage(messages.zeroUpdatesText)}
-                  </ZeroUpdatesText>
-                  <AllUpdatesText>
-                    {intl.formatMessage(messages.allUpdatesText)}
-                  </AllUpdatesText>
-                </ZeroUpdatesContainer>
-              )}
+              <GridTable
+                content={transformRejectedContent(data, props)}
+                columns={getRejectedColumns(width, theme, intl)}
+                noResultText={intl.formatMessage(
+                  officeHomeMessages.requiresUpdate
+                )}
+                onPageChange={(currentPage: number) => {
+                  onPageChange(currentPage)
+                }}
+                pageSize={pageSize}
+                totalItems={data.searchEvents && data.searchEvents.totalItems}
+                currentPage={requireUpdatesPage}
+                clickable={props.isOnline}
+                showPaginated={showPaginated}
+                loading={loading}
+                loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
+              />
+              <LoadingIndicator loading={loading} hasError={error} />
             </>
           )
         }}
       </Query>
-    </>
+    </Content>
   )
 }
 

@@ -58,7 +58,7 @@ import { ImageLoader } from './ImageLoader'
 
 const BodyContainer = styled.div`
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-left: 249px;
+    margin-left: 265px;
     margin-top: 48px;
   }
 `

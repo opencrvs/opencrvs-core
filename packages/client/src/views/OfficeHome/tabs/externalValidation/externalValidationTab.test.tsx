@@ -83,7 +83,6 @@ describe('Registrar home external validation tab tests', () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
       <ExternalValidationTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         queryData={{ data: { totalItems: 1, results: [birthEventSearchSet] } }}
       />,
       { store: testStore, history: testHistory }

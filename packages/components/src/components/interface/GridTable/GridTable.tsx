@@ -46,10 +46,9 @@ const StyledBox = styled(Box)`
 `
 
 const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors.negative};
-  ${({ theme }) => theme.fonts.reg16};
-  text-align: center;
-  margin-top: 100px;
+  color: ${({ theme }) => theme.colors.grey600};
+  ${({ theme }) => theme.fonts.bold16}
+  text-align: left;
 `
 
 const RowWrapper = styled.div<{

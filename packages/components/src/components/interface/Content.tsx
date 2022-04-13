@@ -52,7 +52,6 @@ export const SubHeader = styled.div`
   ${({ theme }) => theme.fonts.reg18};
 `
 export const Body = styled.div`
-  padding-bottom: 24px;
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.reg16};
 `
