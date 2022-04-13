@@ -27,16 +27,56 @@ const token = jwt.sign(
 
 const mockQuestion = {
   fieldId: 'birth.myField',
-  label: {
-    id: 'test',
-    description: 'test',
-    defaultMessage: 'test'
-  },
-  placeholder: {
-    id: 'test',
-    description: 'test',
-    defaultMessage: 'test'
-  },
+  label: [
+    {
+      lang: 'en',
+      descriptor: {
+        id: 'test',
+        description: 'test',
+        defaultMessage: 'test'
+      }
+    }
+  ],
+  placeholder: [
+    {
+      lang: 'en',
+      descriptor: {
+        id: 'test',
+        description: 'test',
+        defaultMessage: 'test'
+      }
+    }
+  ],
+  description: [
+    {
+      lang: 'en',
+      descriptor: {
+        id: 'test',
+        description: 'test',
+        defaultMessage: 'test'
+      }
+    }
+  ],
+  tooltip: [
+    {
+      lang: 'en',
+      descriptor: {
+        id: 'test',
+        description: 'test',
+        defaultMessage: 'test'
+      }
+    }
+  ],
+  errorMessage: [
+    {
+      lang: 'en',
+      descriptor: {
+        id: 'test',
+        description: 'test',
+        defaultMessage: 'test'
+      }
+    }
+  ],
   maxLength: 32,
   fieldName: 'myField',
   fieldType: 'TEXT',

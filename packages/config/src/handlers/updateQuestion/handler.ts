@@ -17,6 +17,7 @@ import Question, {
 import * as Hapi from '@hapi/hapi'
 import { logger } from '@config/config/logger'
 import * as Joi from 'joi'
+import { messageSchema } from '@config/handlers/createQuestion/handler'
 
 export default async function updateQuestion(
   request: Hapi.Request,
@@ -53,17 +54,14 @@ export default async function updateQuestion(
   return h.response(existingQuestion).code(201)
 }
 
-const messageDescriptorSchema = Joi.object({
-  id: Joi.string().required(),
-  defaultMessage: Joi.string(),
-  description: Joi.string()
-})
-
 export const requestSchema = Joi.object({
   id: Joi.string().required(),
   fieldId: Joi.string().required(),
-  label: messageDescriptorSchema,
-  placeholder: messageDescriptorSchema,
+  label: messageSchema,
+  placeholder: messageSchema,
+  description: messageSchema,
+  tooltip: messageSchema,
+  errorMessage: messageSchema,
   maxLength: Joi.number(),
   fieldName: Joi.string(),
   fieldType: Joi.string().valid(...validFieldType),
