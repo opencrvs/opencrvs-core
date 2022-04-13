@@ -105,7 +105,8 @@ export const TOKEN_EXPIRE_MILLIS = 10 * 60 * 1000 // 10 minutes
 
 export const MONTHS_IN_YEAR = 12
 
-export const LOADER_MIN_DISPLAY_TIME = 3 * 1000 // 3 seconds
+export const LOADER_MIN_DISPLAY_TIME =
+  process.env.NODE_ENV !== 'test' ? 3 * 1000 : 0 // 3 seconds except test environment
 export const LOADING_SCREEN_TEXT = 'Loading your workspace'
 
 export const DECLARED_DECLARATION_SEARCH_QUERY_COUNT =
