@@ -3983,7 +3983,6 @@ export const registerForms: IDefaultRegisterForms = {
       {
         id: BirthSection.Mother,
         viewType: 'form',
-        replaceable: true,
         name: {
           defaultMessage: 'Mother',
           description: 'Form section name for Mother',
@@ -6505,7 +6504,6 @@ export const registerForms: IDefaultRegisterForms = {
       {
         id: BirthSection.Father,
         viewType: 'form',
-        replaceable: true,
         name: {
           defaultMessage: 'Father',
           description: 'Form section name for Father',
@@ -7836,6 +7834,14 @@ export const registerForms: IDefaultRegisterForms = {
         groups: [
           {
             id: 'documents-view-group',
+            conditionals: [
+              {
+                description: 'Hidden for record correction',
+                action: 'hide',
+                expression:
+                  'draftData && draftData.corrector && draftData.corrector.relationship'
+              }
+            ],
             fields: [
               {
                 name: 'paragraph',
