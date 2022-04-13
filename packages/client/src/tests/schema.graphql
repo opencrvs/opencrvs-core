@@ -206,6 +206,7 @@ type Mutation {
   ): CertificateSVG
   createOrUpdateQuestion(question: QuestionInput!): Question
   createOrUpdateFormDraft(formDraft: formDraftInput!): formDraft
+  deleteFormDraft(event: String!): FormDraft
   updateApplicationConfig(
     applicationConfig: ApplicationConfigurationInput
   ): ApplicationConfiguration

@@ -199,6 +199,7 @@ type Mutation {
   ): ApplicationConfiguration
   createOrUpdateQuestion(question: QuestionInput!): Question
   createOrUpdateFormDraft(formDraft: FormDraftInput!): FormDraft
+  deleteFormDraft(event: String!): FormDraft
 }
 
 type Dummy {

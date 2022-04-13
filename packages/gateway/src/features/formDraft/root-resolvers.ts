@@ -61,6 +61,33 @@ export const resolvers: GQLResolver = {
         )
       }
       return await res.json()
+    },
+
+    async deleteFormDraft(_, { event }, authHeader) {
+      // Only natlsysadmin should be able to create or update a question
+      if (!hasScope(authHeader, 'natlsysadmin')) {
+        return await Promise.reject(
+          new Error('Delete form draft is only allowed for natlsysadmin')
+        )
+      }
+      const eventPayload: string = event
+      const res = await fetch(`${APPLICATION_CONFIG_URL}draftQuestions`, {
+        method: 'DELETE',
+        body: JSON.stringify({ event: eventPayload }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+
+      if (res.status !== 201) {
+        return await Promise.reject(
+          new Error(
+            `Something went wrong on config service. Couldn't delete form draft`
+          )
+        )
+      }
+      return await res.json()
     }
   }
 }

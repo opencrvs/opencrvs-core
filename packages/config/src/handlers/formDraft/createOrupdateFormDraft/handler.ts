@@ -31,8 +31,16 @@ import { find, partition } from 'lodash'
 
 function isValidFormDraftOperation(currentStatus: string, newStatus: string) {
   const validStatusMapping = {
-    [DraftStatus.DRAFT]: [DraftStatus.DRAFT, DraftStatus.IN_PREVIEW],
-    [DraftStatus.IN_PREVIEW]: [DraftStatus.DRAFT, DraftStatus.PUBLISHED],
+    [DraftStatus.DRAFT]: [
+      DraftStatus.DRAFT,
+      DraftStatus.IN_PREVIEW,
+      DraftStatus.DELETED
+    ],
+    [DraftStatus.IN_PREVIEW]: [
+      DraftStatus.DRAFT,
+      DraftStatus.PUBLISHED,
+      DraftStatus.DELETED
+    ],
     [DraftStatus.PUBLISHED]: [null],
     [DraftStatus.DELETED]: [DraftStatus.DRAFT]
   }
