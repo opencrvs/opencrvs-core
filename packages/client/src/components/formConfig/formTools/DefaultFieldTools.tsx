@@ -19,6 +19,11 @@ import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
 import { Tooltip } from '@opencrvs/components/lib/icons'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import { useIntl } from 'react-intl'
+import {
+  IConfigFormField,
+  getContentKey,
+  getCertificateHandlebar
+} from '@client/forms/configuration/formDraftUtils'
 
 const Container = styled.div`
   display: flex;
@@ -69,11 +74,17 @@ const Body = styled.span`
   color: ${({ theme }) => theme.colors.grey500};
 `
 
-export function DefaultFieldTools() {
+export function DefaultFieldTools({
+  configField
+}: {
+  configField: IConfigFormField
+}) {
   const intl = useIntl()
+  const handleBar = getCertificateHandlebar(configField)
+  const contentKey = getContentKey(configField)
   return (
     <Container>
-      <Title>Type of field</Title>
+      <Title>{configField.definition.type}</Title>
       <ListViewSimplified bottomBorder>
         <ListViewItemSimplified
           label={<Label>{intl.formatMessage(messages.hideField)}</Label>}
@@ -86,7 +97,12 @@ export function DefaultFieldTools() {
               <StyledTooltip />
             </Label>
           }
-          actions={[<CenteredToggle key="hideField" />]}
+          actions={[
+            <CenteredToggle
+              key="requiredForRegistration"
+              selected={configField.definition.required}
+            />
+          ]}
         />
       </ListViewSimplified>
       <Content>
@@ -94,16 +110,17 @@ export function DefaultFieldTools() {
           {intl.formatMessage(messages.contentKey)}
           <StyledTooltip />
         </Subtitle>
-        <Body>birth.register.informant.lastname</Body>
-        <Body>birth.register.informant.firstname</Body>
+        <Body>{contentKey}</Body>
       </Content>
-      <HandleBar>
-        <Subtitle>
-          {intl.formatMessage(messages.certificateHandlebars)}
-          <StyledTooltip />
-        </Subtitle>
-        <Body>{'{{ Lastname }}'}</Body>
-      </HandleBar>
+      {handleBar && (
+        <HandleBar>
+          <Subtitle>
+            {intl.formatMessage(messages.certificateHandlebars)}
+            <StyledTooltip />
+          </Subtitle>
+          <Body>{`{{ ${handleBar} }}`}</Body>
+        </HandleBar>
+      )}
     </Container>
   )
 }

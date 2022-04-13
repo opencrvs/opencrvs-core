@@ -152,7 +152,9 @@ function FormConfigWizardComp({
         </CanvasContainer>
         <ToolsContainer>
           {selectedField ? (
-            !selectedField.definition.custom && <DefaultFieldTools />
+            !selectedField.definition.custom && (
+              <DefaultFieldTools configField={selectedField} />
+            )
           ) : (
             <FormTools />
           )}
