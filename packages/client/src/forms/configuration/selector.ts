@@ -24,6 +24,10 @@ function getKey<K extends keyof IFormDraftDataState>(
   return getFormDraftDataState(store)[key]
 }
 
+export function isFormDraftLoaded(store: IStoreState) {
+  return getFormDraftDataState(store).formDraftDataLoaded
+}
+
 export const getFormDraftData = (store: IStoreState): any =>
   getKey(store, 'formDraftData')
 

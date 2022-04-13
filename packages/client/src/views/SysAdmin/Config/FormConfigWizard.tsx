@@ -11,7 +11,7 @@
  */
 
 import React from 'react'
-import { connect } from 'react-redux'
+import { connect, useDispatch } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { getScope } from '@client/profile/profileSelectors'
 import {
@@ -39,6 +39,10 @@ import { Event } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
 import { hasNatlSysAdminScope } from '@client/utils/authUtils'
 import { Canvas } from '@client/components/formConfig/Canvas'
+import { isFormDraftLoaded } from '@client/forms/configuration/selector'
+import { loadFormDraft } from '@client/forms/configuration/actions'
+import { IConfigFormField } from '@client/forms/configuration/formDraftUtils'
+import { DefaultFieldTools } from '@client/components/formConfig/formTools/DefaultFieldTools'
 
 const Container = styled.div`
   display: flex;
@@ -100,13 +104,26 @@ const topBarActions = (intl: IntlShape) => {
   ]
 }
 
+function useLoadFormDraft(loadDrafts: typeof loadFormDraft) {
+  React.useEffect(() => {
+    loadDrafts()
+  }, [loadDrafts])
+}
+
 function FormConfigWizardComp({
   scope,
   event,
+  formDraftLoaded,
+  loadFormDraft,
   intl,
   section,
   goBack
 }: IFullProps) {
+  const [selectedField, setSelectedField] =
+    React.useState<IConfigFormField | null>(null)
+
+  useLoadFormDraft(loadFormDraft)
+
   if (!(scope && hasNatlSysAdminScope(scope)) || !event || !section) {
     return <Redirect to={HOME} />
   }
@@ -124,10 +141,21 @@ function FormConfigWizardComp({
           <PageNavigation event={event} section={section} />
         </NavigationContainer>
         <CanvasContainer>
-          <Canvas event={event} section={section} />
+          {formDraftLoaded && (
+            <Canvas
+              event={event}
+              section={section}
+              selectedField={selectedField}
+              onFieldSelect={(fieldId) => setSelectedField(fieldId)}
+            />
+          )}
         </CanvasContainer>
         <ToolsContainer>
-          <FormTools />
+          {selectedField ? (
+            !selectedField.definition.custom && <DefaultFieldTools />
+          ) : (
+            <FormTools />
+          )}
         </ToolsContainer>
       </WizardContainer>
     </Container>
@@ -155,12 +183,14 @@ function mapStateToProps(state: IStoreState, props: IRouteProps) {
         : event === Event.DEATH
         ? Event.DEATH
         : undefined,
-    section
+    section,
+    formDraftLoaded: isFormDraftLoaded(state)
   }
 }
 
 const dispatchProps = {
-  goBack
+  goBack,
+  loadFormDraft
 }
 
 export const FormConfigWizard = connect(

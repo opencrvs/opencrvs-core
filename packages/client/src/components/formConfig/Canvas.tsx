@@ -31,7 +31,10 @@ const CanvasBox = styled(Box)`
   border-radius: 4px;
 `
 
-type ICanvasProps = ReturnType<typeof mapStateToProps>
+type ICanvasProps = ReturnType<typeof mapStateToProps> & {
+  selectedField: null | IConfigFormField
+  onFieldSelect: (configField: IConfigFormField) => void
+}
 
 type IFormFieldMap = Record<string, IConfigFormField>
 
@@ -55,12 +58,20 @@ function generateConfigFields(formFieldMap: IFormFieldMap) {
   return configFields
 }
 
-export function CanvasView({ fieldsMap }: ICanvasProps) {
+export function CanvasView({
+  fieldsMap,
+  selectedField,
+  onFieldSelect
+}: ICanvasProps) {
   const configFields = generateConfigFields(fieldsMap)
   return (
     <CanvasBox>
       {configFields.map((configField) => (
-        <FormConfigElementCard key={configField.fieldId}>
+        <FormConfigElementCard
+          key={configField.fieldId}
+          selected={selectedField?.fieldId === configField.fieldId}
+          onClick={() => onFieldSelect(configField)}
+        >
           <FormFieldGenerator
             id={configField.fieldId}
             onChange={() => {}}
