@@ -479,11 +479,6 @@ export const mockFetchRoleGraphqlOperation = {
           types: ['NATIONAL_SYSTEM_ADMIN']
         },
         {
-          title: 'Performance Oversight',
-          value: 'PERFORMANCE_OVERSIGHT',
-          types: ['CABINET_DIVISION', 'BBS']
-        },
-        {
           title: 'Performance Management',
           value: 'PERFORMANCE_MANAGEMENT',
           types: ['HEALTH_DIVISION', 'ORG_DIVISION']

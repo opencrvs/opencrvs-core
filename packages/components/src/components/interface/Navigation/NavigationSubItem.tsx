@@ -29,15 +29,15 @@ export const SubItemContainer = styled.button<{ isSelected?: boolean }>`
 
   cursor: pointer;
   width: 100%;
-  height: 36px;
-  text-align: left;
+  min-height: 36px;
   color: ${({ isSelected, theme }) =>
-    isSelected ? theme.colors.grey : theme.colors.greyLight};
+    isSelected ? theme.colors.grey600 : theme.colors.grey500};
   ${({ theme }) => theme.fonts.reg14};
 `
 
 const LabelContainer = styled.div`
   padding: 7px 38px 9px 42px;
+  text-align: left;
 `
 
 export const NavigationSubItem = ({

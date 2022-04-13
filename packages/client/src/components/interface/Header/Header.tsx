@@ -16,7 +16,6 @@ import { messages } from '@client/i18n/messages/views/header'
 import {
   goBack,
   goForward,
-  goToConfig,
   goToEvents as goToEventsAction,
   goToHome,
   goToOperationalReport,
@@ -93,7 +92,6 @@ type IDispatchProps = {
   goBack: typeof goBack
   goForward: typeof goForward
   goToHomeAction: typeof goToHome
-  goToConfigAction: typeof goToConfig
   goToPerformanceHomeAction: typeof goToPerformanceHome
   goToPerformanceReportListAction: typeof goToPerformanceReportList
   goToOperationalReportAction: typeof goToOperationalReport
@@ -112,7 +110,11 @@ interface IProps extends RouteComponentProps {
   mapPinClickHandler?: () => void
 }
 
-type IFullProps = IntlShapeProps & IStateProps & IDispatchProps & IProps
+type IFullProps = IntlShapeProps &
+  IStateProps &
+  IDispatchProps &
+  IProps &
+  React.HTMLAttributes<HTMLDivElement>
 
 interface IState {
   showMenu: boolean
@@ -444,6 +446,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
 
   render() {
     const { intl, activeMenuItem } = this.props
+    const headerProps: React.HTMLAttributes<HTMLDivElement> = this
+      .props as React.HTMLAttributes<HTMLDivElement>
     const title =
       this.props.title ||
       intl.formatMessage(
@@ -502,14 +506,14 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       this.getMobileHeaderActionProps(activeMenuItem)
 
     return (
-      <>
+      <div {...headerProps}>
         <AppHeader
           id="register_app_header"
           desktopRightMenu={rightMenu}
           title={title}
           {...mobileHeaderActionProps}
         />
-      </>
+      </div>
     )
   }
 }
@@ -535,7 +539,6 @@ export const Header = connect(
     goForward,
     goToEvents: goToEventsAction,
     goToHomeAction: goToHome,
-    goToConfigAction: goToConfig,
     goToPerformanceHomeAction: goToPerformanceHome,
     goToOperationalReportAction: goToOperationalReport,
     goToPerformanceReportListAction: goToPerformanceReportList,

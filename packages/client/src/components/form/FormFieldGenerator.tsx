@@ -647,7 +647,7 @@ class FormSectionComponent extends React.Component<Props> {
   componentDidUpdate(prevProps: Props) {
     const userChangedForm = !isEqual(this.props.values, prevProps.values)
     const sectionChanged = prevProps.id !== this.props.id
-
+    const fieldChanged = !isEqual(prevProps.fields, this.props.fields)
     if (userChangedForm) {
       prevProps.onChange(this.props.values)
     }
@@ -662,6 +662,10 @@ class FormSectionComponent extends React.Component<Props> {
       ) {
         this.showValidationErrors(this.props.fieldsToShowValidationErrors)
       }
+    }
+
+    if (fieldChanged) {
+      prevProps.resetForm()
     }
   }
 
