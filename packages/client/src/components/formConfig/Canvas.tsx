@@ -16,7 +16,7 @@ import { FormConfigElementCard } from '@opencrvs/components/lib/interface/FormCo
 import styled from '@client/styledComponents'
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { Event, BirthSection, DeathSection } from '@client/forms'
+import { Event } from '@client/forms'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { getEventSectionFieldsMap } from '@client/forms/configuration/selector'
 import { IConfigFormField } from '@client/forms/configuration/formDraftUtils'

@@ -17,9 +17,10 @@ import {
   LabelContainer
 } from '@opencrvs/components/lib/interface/Navigation/NavigationSubItem'
 import { IForm, Event } from '@client/forms'
-import { IntlShape } from 'react-intl'
+import { IntlShape, useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import { goToFormConfigWizard } from '@client/navigation'
+import { connect } from 'react-redux'
 
 const Title = styled.h1`
   margin-top: 16px;
@@ -34,9 +35,7 @@ const OrderedList = styled.ol`
   padding: 0px;
 `
 
-interface IPageNavigation {
-  intl: IntlShape
-  registerForm: { [key: string]: IForm }
+interface IPageNavigationProps {
   section: string
   event: Event
   goToFormConfigWizard: typeof goToFormConfigWizard
@@ -70,8 +69,12 @@ const PageItems = styled(NavigationSubItem)<{ isSelected: boolean }>`
   }
 `
 
-export const PageNavigation = (props: IPageNavigation) => {
-  const { event, intl, section, goToFormConfigWizard } = props
+export const PageNavigationView = ({
+  event,
+  section,
+  goToFormConfigWizard
+}: IPageNavigationProps) => {
+  const intl = useIntl()
   const TAB = event === Event.BIRTH ? TAB_BIRTH : TAB_DEATH
 
   return (
@@ -93,3 +96,7 @@ export const PageNavigation = (props: IPageNavigation) => {
     </>
   )
 }
+
+export const PageNavigation = connect(null, { goToFormConfigWizard })(
+  PageNavigationView
+)

@@ -22,7 +22,6 @@ import {
 } from '@client/forms/configuration'
 import { registerForms } from './default'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
-import { GQLFormDraft } from '@opencrvs/gateway/src/graphql/schema'
 import { ISectionFieldMap, getEventSectionFieldsMap } from './formDraftUtils'
 
 export enum DraftStatus {

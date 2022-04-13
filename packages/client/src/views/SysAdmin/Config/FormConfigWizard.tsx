@@ -14,7 +14,11 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { getScope } from '@client/profile/profileSelectors'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import {
+  injectIntl,
+  WrappedComponentProps as IntlShapeProps,
+  IntlShape
+} from 'react-intl'
 import { RouteComponentProps, Redirect } from 'react-router'
 import { HOME } from '@client/navigation/routes'
 import { EventTopBar } from '@opencrvs/components/lib/interface'
@@ -31,30 +35,10 @@ import {
   TAB_DEATH
 } from '@client/components/formConfig/PageNavigation'
 import { FormTools } from '@client/components/formConfig/formTools/FormTools'
-import { FormConfigCanvas } from '@client/components/formConfig/FormConfigCanvas'
-import { IForm, Event } from '@client/forms'
-import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import { goToFormConfigWizard } from '@client/navigation'
+import { Event } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
-import { Scope, isNatlSysAdmin } from '@client/utils/authUtils'
+import { hasNatlSysAdminScope } from '@client/utils/authUtils'
 import { Canvas } from '@client/components/formConfig/Canvas'
-
-type RouteProps = RouteComponentProps<{
-  event: string
-  section: string
-}>
-
-interface IStateProps {
-  scope: Scope | null
-  registerForm: { [key: string]: IForm }
-  event: Event | undefined
-  section: string | undefined
-}
-
-interface IDispatchProps {
-  goBack: typeof goBack
-  goToFormConfigWizard: typeof goToFormConfigWizard
-}
 
 const Container = styled.div`
   display: flex;
@@ -99,26 +83,31 @@ const CanvasContainer = styled.div`
   margin-top: 18px;
 `
 
-type IFullProps = IDispatchProps & IStateProps & IntlShapeProps & RouteProps
+type IFullProps = ReturnType<typeof mapStateToProps> &
+  typeof dispatchProps &
+  IntlShapeProps &
+  IRouteProps
 
-const topBarActions = (props: IFullProps) => {
+const topBarActions = (intl: IntlShape) => {
   return [
     <SettingsBlue key="settings" onClick={() => {}} />,
     <SecondaryButton key="save" size="small" onClick={() => {}}>
-      {props.intl.formatMessage(buttonMessages.save)}
+      {intl.formatMessage(buttonMessages.save)}
     </SecondaryButton>,
     <SuccessButton key="publish" size="small" onClick={() => {}}>
-      {props.intl.formatMessage(buttonMessages.publish)}
+      {intl.formatMessage(buttonMessages.publish)}
     </SuccessButton>
   ]
 }
 
-function FormConfigWizardComp(props: IFullProps) {
-  if (
-    !(props.scope && isNatlSysAdmin(props.scope)) ||
-    !props.event ||
-    !props.section
-  ) {
+function FormConfigWizardComp({
+  scope,
+  event,
+  intl,
+  section,
+  goBack
+}: IFullProps) {
+  if (!(scope && hasNatlSysAdminScope(scope)) || !event || !section) {
     return <Redirect to={HOME} />
   }
 
@@ -127,31 +116,30 @@ function FormConfigWizardComp(props: IFullProps) {
       <EventTopBar
         title={'Birth v0.1'}
         pageIcon={<></>}
-        topBarActions={topBarActions(props)}
-        goHome={() => props.goBack()}
+        topBarActions={topBarActions(intl)}
+        goHome={() => goBack()}
       />
       <WizardContainer>
         <NavigationContainer>
-          <PageNavigation
-            registerForm={props.registerForm}
-            event={props.event}
-            intl={props.intl}
-            section={props.section}
-            goToFormConfigWizard={props.goToFormConfigWizard}
-          />
+          <PageNavigation event={event} section={section} />
         </NavigationContainer>
         <CanvasContainer>
-          <Canvas event={props.event} section={props.section} />
+          <Canvas event={event} section={section} />
         </CanvasContainer>
         <ToolsContainer>
-          <FormTools intl={props.intl} />
+          <FormTools />
         </ToolsContainer>
       </WizardContainer>
     </Container>
   )
 }
 
-function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
+type IRouteProps = RouteComponentProps<{
+  event: string
+  section: string
+}>
+
+function mapStateToProps(state: IStoreState, props: IRouteProps) {
   const { event, section: sectionKey } = props.match.params
   let section: string | undefined
   if (sectionKey in TAB_BIRTH && event === Event.BIRTH) {
@@ -161,7 +149,6 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
   }
   return {
     scope: getScope(state),
-    registerForm: getRegisterForm(state),
     event:
       event === Event.BIRTH
         ? Event.BIRTH
@@ -172,11 +159,11 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
   }
 }
 
-export const FormConfigWizard = connect<
-  IStateProps,
-  IDispatchProps,
-  RouteProps,
-  IStoreState
->(mapStateToProps, { goBack, goToFormConfigWizard })(
-  injectIntl(FormConfigWizardComp)
-)
+const dispatchProps = {
+  goBack
+}
+
+export const FormConfigWizard = connect(
+  mapStateToProps,
+  dispatchProps
+)(injectIntl(FormConfigWizardComp))

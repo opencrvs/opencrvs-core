@@ -13,7 +13,7 @@
 import React from 'react'
 import styled from '@client/styledComponents'
 import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
-import { IntlShape } from 'react-intl'
+import { IntlShape, useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import {
   ListViewSimplified,
@@ -36,10 +36,6 @@ const Label = styled.span`
 const CenteredToggle = styled(Toggle)`
   align-self: center;
 `
-
-interface IFormTools {
-  intl: IntlShape
-}
 
 const listViewItems = (intl: IntlShape) => {
   const items = [
@@ -77,8 +73,9 @@ const listViewItems = (intl: IntlShape) => {
   return items
 }
 
-export const FormTools = (props: IFormTools) => {
+export const FormTools = () => {
   const [toggleSelected, setToggleSelected] = React.useState(false)
+  const intl = useIntl()
 
   const toggleOnChange = () => {
     setToggleSelected(!toggleSelected)
@@ -88,9 +85,7 @@ export const FormTools = (props: IFormTools) => {
     <>
       <ListViewSimplified>
         <ListViewItemSimplified
-          label={
-            <Label>{props.intl.formatMessage(messages.showHiddenFields)}</Label>
-          }
+          label={<Label>{intl.formatMessage(messages.showHiddenFields)}</Label>}
           actions={[
             <CenteredToggle
               key="toggle"
@@ -101,10 +96,10 @@ export const FormTools = (props: IFormTools) => {
         />
       </ListViewSimplified>
       <TitleContainer>
-        {props.intl.formatMessage(messages.addInputContent)}
+        {intl.formatMessage(messages.addInputContent)}
       </TitleContainer>
       <ListViewSimplified>
-        {listViewItems(props.intl).map((item, idx) => (
+        {listViewItems(intl).map((item, idx) => (
           <ListViewItemSimplified
             key={idx}
             label={<Label key={idx}>{item.label}</Label>}
