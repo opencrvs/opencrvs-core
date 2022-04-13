@@ -48,6 +48,7 @@ services:
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
       - NOTIFICATION_URL=http://notification:2020/
       - WORKFLOW_URL=http://workflow:5050/
+      - APPLICATION_CONFIG_URL=http://config:2021
       - CHECK_INVALID_TOKEN=true
   # User facing services
   workflow:
