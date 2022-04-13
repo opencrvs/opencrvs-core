@@ -57,9 +57,12 @@ import { Content } from '@opencrvs/components/lib/interface/Content'
 import { ImageLoader } from './ImageLoader'
 
 const BodyContainer = styled.div`
+  margin-left: 0px;
+  margin-top: 0px;
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-left: 249px;
-    margin-top: 48px;
+    margin-left: 274px;
+    margin-top: 24px;
+    margin-right: 24px;
   }
 `
 
