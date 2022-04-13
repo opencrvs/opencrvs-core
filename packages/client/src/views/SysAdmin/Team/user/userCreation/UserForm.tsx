@@ -113,10 +113,10 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
   }
 
   showAllValidationErrors = () => {
-    const touched = getSectionFields(this.props.section).reduce(
-      (memo, { name }) => ({ ...memo, [name]: true }),
-      {}
-    )
+    const touched = getSectionFields(
+      this.props.section,
+      this.props.formData
+    ).reduce((memo, { name }) => ({ ...memo, [name]: true }), {})
     this.setAllFormFieldsTouched(touched)
   }
 
