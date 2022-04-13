@@ -841,7 +841,7 @@ export interface GQLDraftHistory {
   version?: number
   status?: string
   comment?: string
-  lastUpdateAt?: GQLDate
+  updatedAt?: GQLDate
 }
 
 export interface GQLPersonInput {
@@ -4969,7 +4969,7 @@ export interface GQLDraftHistoryTypeResolver<TParent = any> {
   version?: DraftHistoryToVersionResolver<TParent>
   status?: DraftHistoryToStatusResolver<TParent>
   comment?: DraftHistoryToCommentResolver<TParent>
-  lastUpdateAt?: DraftHistoryToLastUpdateAtResolver<TParent>
+  updatedAt?: DraftHistoryToUpdatedAtResolver<TParent>
 }
 
 export interface DraftHistoryTo_idResolver<TParent = any, TResult = any> {
@@ -4988,10 +4988,7 @@ export interface DraftHistoryToCommentResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface DraftHistoryToLastUpdateAtResolver<
-  TParent = any,
-  TResult = any
-> {
+export interface DraftHistoryToUpdatedAtResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

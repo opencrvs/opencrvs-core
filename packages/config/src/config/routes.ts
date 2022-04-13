@@ -25,16 +25,20 @@ import applicationConfigHandler, {
 } from '@config/handlers/application/applicationConfigHandler'
 import createQuestionHandler, {
   requestSchema as createQuestionReqSchema
-} from '@config/handlers/createQuestion/handler'
+} from '@config/handlers/queston/createQuestion/handler'
 import updateQuestionHandler, {
   requestSchema as updateQuestionReqSchema
-} from '@config/handlers/updateQuestion/handler'
-import getQuestionsHandler from '@config/handlers/getQuestions/handler'
+} from '@config/handlers/queston/updateQuestion/handler'
+import getQuestionsHandler from '@config/handlers/queston/getQuestions/handler'
 import {
   updateFormDraftHandler,
   requestSchema as updateFormDraftReqSchema
-} from '@config/handlers/updateFormDraft/handler'
-import getFormDraft from '@config/handlers/getFormDraft/handler'
+} from '@config/handlers/formDraft/createOrupdateFormDraft/handler'
+import getFormDraft from '@config/handlers/formDraft/getFormDraft/handler'
+import {
+  deleteFormDraftHandler,
+  requestSchema as deleteFormDraftReqSchema
+} from '@config/handlers/formDraft/deleteFormDraft/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -152,6 +156,18 @@ export default function getRoutes() {
       }
     },
     {
+      method: 'GET',
+      path: '/formDraft',
+      handler: getFormDraft,
+      config: {
+        tags: ['api'],
+        description: 'Get form draft',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        }
+      }
+    },
+    {
       method: 'PUT',
       path: '/draftQuestions',
       handler: updateFormDraftHandler,
@@ -167,14 +183,17 @@ export default function getRoutes() {
       }
     },
     {
-      method: 'GET',
-      path: '/formDraft',
-      handler: getFormDraft,
+      method: 'DELETE',
+      path: '/draftQuestions',
+      handler: deleteFormDraftHandler,
       config: {
         tags: ['api'],
-        description: 'Get form draft',
+        description: 'Delete form draft history & questions',
         auth: {
           scope: [RouteScope.NATLSYSADMIN]
+        },
+        validate: {
+          payload: deleteFormDraftReqSchema
         }
       }
     },

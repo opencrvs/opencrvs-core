@@ -940,7 +940,7 @@ type DraftHistory {
   version: Int
   status: String
   comment: String
-  lastUpdateAt: Date
+  updatedAt: Date
 }
 
 input PersonInput {

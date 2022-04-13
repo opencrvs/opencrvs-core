@@ -26,10 +26,33 @@ import FormDraft, {
   validEvent,
   DraftStatus
 } from '@config/models/formDraft'
-import { messageDescriptorSchema } from '@config/handlers/createQuestion/handler'
+import { messageDescriptorSchema } from '@config/handlers/queston/createQuestion/handler'
 import { find, partition } from 'lodash'
 
-export interface IQuestionsDraft extends IFormDraftModel {
+function isValidFormDraftOperation(currentStatus: string, newStatus: string) {
+  const validStatusMapping = {
+    [DraftStatus.DRAFT]: [DraftStatus.DRAFT, DraftStatus.IN_PREVIEW],
+    [DraftStatus.IN_PREVIEW]: [DraftStatus.DRAFT, DraftStatus.PUBLISHED],
+    [DraftStatus.PUBLISHED]: [null],
+    [DraftStatus.DELETED]: [DraftStatus.DRAFT]
+  }
+
+  if (
+    currentStatus &&
+    validStatusMapping[currentStatus] &&
+    !validStatusMapping[currentStatus].includes(newStatus)
+  ) {
+    return false
+  }
+
+  return true
+}
+
+export interface IQuestionsDraft
+  extends Omit<
+    IFormDraftModel,
+    'version' | 'history' | 'updatedAt' | 'createdAt'
+  > {
   questions?: IQuestion[]
   //deleted contains list of fieldId to delete
   deleted?: string[]
@@ -46,7 +69,9 @@ export async function updateFormDraftHandler(
     !questionsDraft.deleted &&
     questionsDraft.status === DraftStatus.DRAFT
   ) {
-    return h.response('Nothing to add or remove from Question').code(400)
+    return h
+      .response('No question modification found on payload for draft')
+      .code(400)
   }
 
   let draft: IFormDraftModel | null = await FormDraft.findOne({
@@ -54,23 +79,28 @@ export async function updateFormDraftHandler(
   })
 
   if (draft) {
-    //update draft
-    const history: IHistory = {
-      version: draft.version,
-      status: draft.status,
-      comment: draft.comment,
-      lastUpdateAt: draft.updatedAt
+    if (!isValidFormDraftOperation(draft.status, questionsDraft.status)) {
+      return h
+        .response(
+          `Invalid Operation. Can not update form draft status from ${draft.status} to ${questionsDraft.status}`
+        )
+        .code(400)
     }
 
-    draft.history?.unshift(history)
+    //update draft
+    if (draft.status === DraftStatus.DRAFT) {
+      const history: IHistory = {
+        version: draft.version,
+        status: draft.status,
+        comment: draft.comment,
+        updatedAt: draft.updatedAt
+      }
+      draft.history?.unshift(history)
+      draft.version = draft.version + 1
+    }
+
     draft.status = questionsDraft.status
-    draft.comment = questionsDraft.comment
-    draft.version =
-      draft.status === DraftStatus.PUBLISHED ||
-      draft.status === DraftStatus.PREVIEW ||
-      draft.status === DraftStatus.FINALISED
-        ? draft.version
-        : draft.version + 1
+    draft.comment = questionsDraft.comment ? questionsDraft.comment : ''
     draft.updatedAt = Date.now()
 
     try {
@@ -88,7 +118,7 @@ export async function updateFormDraftHandler(
         event: questionsDraft.event,
         status: questionsDraft.status,
         comment: questionsDraft.comment,
-        version: 1,
+        version: 0,
         createdAt: Date.now(),
         updatedAt: Date.now()
       }
@@ -99,7 +129,7 @@ export async function updateFormDraftHandler(
   }
 
   //update or create questions
-  if (questionsDraft.questions) {
+  if (questionsDraft.questions && draft.status === DraftStatus.DRAFT) {
     const existingQuestions: IQuestionModel[] = await Question.find().exec()
 
     const allQuestion = partition(questionsDraft.questions, (question) => {
@@ -132,7 +162,7 @@ export async function updateFormDraftHandler(
   }
 
   //delete questions
-  if (questionsDraft.deleted) {
+  if (questionsDraft.deleted && draft.status === DraftStatus.DRAFT) {
     try {
       await Question.deleteMany({ fieldId: { $in: questionsDraft.deleted } })
     } catch (err) {

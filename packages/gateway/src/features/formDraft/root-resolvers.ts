@@ -13,7 +13,7 @@ import fetch from 'node-fetch'
 import { APPLICATION_CONFIG_URL } from '@gateway/constants'
 import { hasScope } from '@gateway/features/user/utils'
 import {
-  GQLformDraftInput,
+  GQLFormDraftInput,
   GQLQuestionInput,
   GQLResolver
 } from '@gateway/graphql/schema'
@@ -66,7 +66,7 @@ export const resolvers: GQLResolver = {
 }
 
 function createOrUpdateFormDraftPayload(
-  formDraft: GQLformDraftInput
+  formDraft: GQLFormDraftInput
 ): IFormDraftPayload {
   const formDraftPayload: IFormDraftPayload = {
     questions: formDraft.questions as GQLQuestionInput[],
@@ -86,9 +86,9 @@ enum Event {
 
 enum DraftStatus {
   DRAFT = 'DRAFT',
-  PREVIEW = 'PREVIEW',
+  IN_PREVIEW = 'IN_PREVIEW',
   PUBLISHED = 'PUBLISHED',
-  FINALISED = 'FINALISED'
+  DELETED = 'DELETED'
 }
 
 interface IFormDraftPayload {
