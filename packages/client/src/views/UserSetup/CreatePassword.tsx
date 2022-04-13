@@ -265,7 +265,15 @@ class CreatePasswordComponent extends React.Component<IFullProps, State> {
             )}
           </PasswordContents>
           <Action>
-            <PrimaryButton id="Continue" onClick={this.whatNext}>
+            <PrimaryButton
+              id="Continue"
+              onClick={this.whatNext}
+              disabled={
+                !this.state.hasCases ||
+                !this.state.hasNumber ||
+                !this.state.validLength
+              }
+            >
               {intl.formatMessage(buttonMessages.continueButton)}
             </PrimaryButton>
           </Action>
