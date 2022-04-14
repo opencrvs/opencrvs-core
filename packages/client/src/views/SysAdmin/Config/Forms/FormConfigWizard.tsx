@@ -27,10 +27,15 @@ import { FormTools } from '@client/components/formConfig/formTools/FormTools'
 import { Event, BirthSection, DeathSection } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
 import { Canvas } from '@client/components/formConfig/Canvas'
-import { isFormDraftLoaded } from '@client/forms/configuration/selector'
+import {
+  selectFormDraftLoaded,
+  selectEventFormDraft
+} from '@client/forms/configuration/selector'
 import { IConfigFormField } from '@client/forms/configuration/formDraftUtils'
 import { DefaultFieldTools } from '@client/components/formConfig/formTools/DefaultFieldTools'
 import { useLoadFormDraft, useHasNatlSysAdminScope } from './hooks'
+import { constantsMessages } from '@client/i18n/messages/constants'
+import { IStoreState } from '@client/store'
 
 const Container = styled.div`
   display: flex;
@@ -76,7 +81,7 @@ const CanvasContainer = styled.div`
 `
 
 type IRouteProps = {
-  event: string
+  event: Event
   section: string
 }
 
@@ -105,6 +110,13 @@ function isValidSection(
   ].includes(section)
 }
 
+function useNewDraftVersion(event: Event) {
+  const formDraft = useSelector((store: IStoreState) =>
+    selectEventFormDraft(store, event)
+  )
+  return (formDraft?.version || 0) + 1
+}
+
 export function FormConfigWizard() {
   useLoadFormDraft()
   const [selectedField, setSelectedField] =
@@ -113,7 +125,8 @@ export function FormConfigWizard() {
   const dispatch = useDispatch()
   const intl = useIntl()
   const { event, section } = useParams<IRouteProps>()
-  const formDraftLoaded = useSelector(isFormDraftLoaded)
+  const formDraftLoaded = useSelector(selectFormDraftLoaded)
+  const version = useNewDraftVersion(event)
 
   if (
     !hasNatlSysAdminScope ||
@@ -126,7 +139,7 @@ export function FormConfigWizard() {
   return (
     <Container>
       <EventTopBar
-        title={'Birth v0.1'}
+        title={`${intl.formatMessage(constantsMessages[event])} v${version}`}
         pageIcon={<></>}
         topBarActions={topBarActions(intl)}
         goHome={() => dispatch(goBack())}
