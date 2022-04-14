@@ -130,7 +130,10 @@ class FormConfigComponent extends React.Component<Props, State> {
           actions={[
             <LinkButton
               onClick={() => {
-                this.props.goToFormConfigWizard(Event.BIRTH, BirthSection.Child)
+                this.props.goToFormConfigWizard(
+                  Event.BIRTH,
+                  BirthSection.Registration
+                )
               }}
             >
               {this.props.intl.formatMessage(messages.formConfigureButtonLabel)}
@@ -172,7 +175,7 @@ class FormConfigComponent extends React.Component<Props, State> {
               onClick={() => {
                 this.props.goToFormConfigWizard(
                   Event.DEATH,
-                  DeathSection.Deceased
+                  DeathSection.Registration
                 )
               }}
             >
