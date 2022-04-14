@@ -33,6 +33,8 @@ const Container = styled.div`
 
 const Title = styled.span`
   ${({ theme }) => theme.fonts.h3}
+  text-overflow: ellipsis;
+  overflow: hidden;
 `
 
 const Subtitle = styled.span`
