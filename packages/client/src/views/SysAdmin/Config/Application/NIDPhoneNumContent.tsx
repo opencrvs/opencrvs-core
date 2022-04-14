@@ -12,21 +12,14 @@
 
 import React from 'react'
 import styled from '@client/styledComponents'
-import {
-  Content,
-  Field,
-  HalfWidthInput
-} from '@opencrvs/client/src/views/SysAdmin/Config/DynamicModal'
+import { Content, Field, HalfWidthInput } from './DynamicModal'
 import { InputField } from '@opencrvs/components/lib/forms'
 import { IntlShape } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/config'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import SuccessSmall from '@opencrvs/components/lib/icons/SuccessSmall'
 import { Cross } from '@opencrvs/components/lib/icons/Cross'
-import {
-  isValidRegEx,
-  isValidExample
-} from '@client/views/SysAdmin/Config/utils'
+import { isValidRegEx, isValidExample } from './utils'
 
 const ErrorMessageBottom = styled.div<{ marginTop?: number }>`
   position: relative;

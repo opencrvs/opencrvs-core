@@ -20,15 +20,9 @@ import {
 } from '@client/views/SysAdmin/Config/Application'
 import { messages } from '@client/i18n/messages/views/config'
 import { EMPTY_STRING } from '@client/utils/constants'
-import {
-  IBirth,
-  ICurrency,
-  IDeath,
-  IFullProps,
-  IState
-} from '@client/views/SysAdmin/Config/DynamicModal'
-import { configApplicationMutations } from '@client/views/SysAdmin/Config/mutations'
-import { IOfflineData, IOfflineDataState } from '@client/offline/reducer'
+import { IBirth, ICurrency, IDeath, IFullProps, IState } from './DynamicModal'
+import { configApplicationMutations } from './mutations'
+import { IOfflineData } from '@client/offline/reducer'
 
 interface ICurrencyOptions {
   [key: string]: string
