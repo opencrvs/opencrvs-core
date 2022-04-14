@@ -113,8 +113,8 @@ const enum RouteScope {
   NATLSYSADMIN = 'natlsysadmin'
 }
 
-export const hasNatlSysAdminScope = (scope: Scope): boolean => {
-  if (scope.includes(RouteScope.NATLSYSADMIN)) {
+export const hasNatlSysAdminScope = (scope: Scope | null): boolean => {
+  if (scope?.includes(RouteScope.NATLSYSADMIN)) {
     return true
   }
   return false

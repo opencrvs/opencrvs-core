@@ -9,17 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-
 import React from 'react'
-import { connect, useDispatch } from 'react-redux'
-import { IStoreState } from '@client/store'
-import { getScope } from '@client/profile/profileSelectors'
-import {
-  injectIntl,
-  WrappedComponentProps as IntlShapeProps,
-  IntlShape
-} from 'react-intl'
-import { RouteComponentProps, Redirect } from 'react-router'
+import { useDispatch, useSelector } from 'react-redux'
+import { IntlShape, useIntl } from 'react-intl'
+import { Redirect, useParams } from 'react-router'
 import { HOME } from '@client/navigation/routes'
 import { EventTopBar } from '@opencrvs/components/lib/interface'
 import { SettingsBlue } from '@opencrvs/components/lib/icons'
@@ -29,20 +22,15 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import { goBack } from 'connected-react-router'
 import styled from '@client/styledComponents'
-import {
-  PageNavigation,
-  TAB_BIRTH,
-  TAB_DEATH
-} from '@client/components/formConfig/PageNavigation'
+import { PageNavigation } from '@client/components/formConfig/PageNavigation'
 import { FormTools } from '@client/components/formConfig/formTools/FormTools'
-import { Event } from '@client/forms'
+import { Event, BirthSection, DeathSection } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
-import { hasNatlSysAdminScope } from '@client/utils/authUtils'
 import { Canvas } from '@client/components/formConfig/Canvas'
 import { isFormDraftLoaded } from '@client/forms/configuration/selector'
-import { loadFormDraft } from '@client/forms/configuration/actions'
 import { IConfigFormField } from '@client/forms/configuration/formDraftUtils'
 import { DefaultFieldTools } from '@client/components/formConfig/formTools/DefaultFieldTools'
+import { useLoadFormDraft, useHasNatlSysAdminScope } from './hooks'
 
 const Container = styled.div`
   display: flex;
@@ -87,10 +75,10 @@ const CanvasContainer = styled.div`
   margin-top: 18px;
 `
 
-type IFullProps = ReturnType<typeof mapStateToProps> &
-  typeof dispatchProps &
-  IntlShapeProps &
-  IRouteProps
+type IRouteProps = {
+  event: string
+  section: string
+}
 
 const topBarActions = (intl: IntlShape) => {
   return [
@@ -104,27 +92,34 @@ const topBarActions = (intl: IntlShape) => {
   ]
 }
 
-function useLoadFormDraft(loadDrafts: typeof loadFormDraft) {
-  React.useEffect(() => {
-    loadDrafts()
-  }, [loadDrafts])
+function isValidEvent(event: string): event is Event {
+  return Object.values<string>(Event).includes(event)
 }
 
-function FormConfigWizardComp({
-  scope,
-  event,
-  formDraftLoaded,
-  loadFormDraft,
-  intl,
-  section,
-  goBack
-}: IFullProps) {
+function isValidSection(
+  section: string
+): section is BirthSection | DeathSection {
+  return [
+    ...Object.values<string>(BirthSection),
+    ...Object.values<string>(DeathSection)
+  ].includes(section)
+}
+
+export function FormConfigWizard() {
+  useLoadFormDraft()
   const [selectedField, setSelectedField] =
     React.useState<IConfigFormField | null>(null)
+  const hasNatlSysAdminScope = useHasNatlSysAdminScope()
+  const dispatch = useDispatch()
+  const intl = useIntl()
+  const { event, section } = useParams<IRouteProps>()
+  const formDraftLoaded = useSelector(isFormDraftLoaded)
 
-  useLoadFormDraft(loadFormDraft)
-
-  if (!(scope && hasNatlSysAdminScope(scope)) || !event || !section) {
+  if (
+    !hasNatlSysAdminScope ||
+    !isValidEvent(event) ||
+    !isValidSection(section)
+  ) {
     return <Redirect to={HOME} />
   }
 
@@ -134,7 +129,7 @@ function FormConfigWizardComp({
         title={'Birth v0.1'}
         pageIcon={<></>}
         topBarActions={topBarActions(intl)}
-        goHome={() => goBack()}
+        goHome={() => dispatch(goBack())}
       />
       <WizardContainer>
         <NavigationContainer>
@@ -163,39 +158,3 @@ function FormConfigWizardComp({
     </Container>
   )
 }
-
-type IRouteProps = RouteComponentProps<{
-  event: string
-  section: string
-}>
-
-function mapStateToProps(state: IStoreState, props: IRouteProps) {
-  const { event, section: sectionKey } = props.match.params
-  let section: string | undefined
-  if (sectionKey in TAB_BIRTH && event === Event.BIRTH) {
-    section = TAB_BIRTH[sectionKey as keyof typeof TAB_BIRTH]
-  } else if (sectionKey in TAB_DEATH && event === Event.DEATH) {
-    section = TAB_DEATH[sectionKey as keyof typeof TAB_DEATH]
-  }
-  return {
-    scope: getScope(state),
-    event:
-      event === Event.BIRTH
-        ? Event.BIRTH
-        : event === Event.DEATH
-        ? Event.DEATH
-        : undefined,
-    section,
-    formDraftLoaded: isFormDraftLoaded(state)
-  }
-}
-
-const dispatchProps = {
-  goBack,
-  loadFormDraft
-}
-
-export const FormConfigWizard = connect(
-  mapStateToProps,
-  dispatchProps
-)(injectIntl(FormConfigWizardComp))
