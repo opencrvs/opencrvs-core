@@ -38,7 +38,7 @@ import { v4 as uuid } from 'uuid'
 import * as ReactApollo from 'react-apollo'
 import { checkAuth } from '@opencrvs/client/src/profile/profileActions'
 
-import { waitForElement } from '@client/tests/wait-for-element'
+import { waitForElement, waitForSeconds } from '@client/tests/wait-for-element'
 
 interface IPersonDetails {
   [key: string]: any
@@ -61,90 +61,142 @@ describe('when user is previewing the form data', () => {
     let customDraft: IDeclaration
 
     const childDetails: IPersonDetails = {
-      attendantAtBirth: 'NURSE',
-      childBirthDate: '1999-10-10',
-      familyName: 'ইসলাম',
-      familyNameEng: 'Islam',
-      firstNames: 'নাইম',
-      firstNamesEng: 'Naim',
+      firstNamesEng: 'Harry',
+      familyNameEng: 'Kane',
       gender: 'male',
-      placeOfBirth: 'HOSPITAL',
-      birthLocation: '90d39759-7f02-4646-aca3-9272b4b5ce5a',
-      multipleBirth: '2',
+      childBirthDate: '2020-02-02',
+      attendantAtBirth: 'NURSE',
       birthType: 'SINGLE',
-      weightAtBirth: '5'
+      multipleBirth: 1,
+      weightAtBirth: 5,
+      placeOfBirthTitle: '',
+      placeOfBirth: 'HEALTH_FACILITY',
+      birthLocation: 'ecc82ed2-960d-4a92-9c42-67cace118a02',
+      country: 'FAR',
+      state: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
+      district: '852b103f-2fe0-4871-a323-51e51c6d9198',
+      ruralOrUrban: 'URBAN',
+      addressChief: '',
+      addressLine4CityOption: '',
+      addressLine3CityOption: '',
+      addressLine2CityOption: '',
+      numberOption: '',
+      addressLine1: '',
+      internationalState: '',
+      internationalDistrict: '',
+      internationalCity: '',
+      internationalAddressLine1: '',
+      internationalAddressLine2: '',
+      internationalAddressLine3: '',
+      internationalPostcode: ''
     }
 
     const fatherDetails: IPersonDetails = {
       fathersDetailsExist: true,
-      iD: '23423442342423424',
-      iDType: 'OTHER',
-      iDTypeOther: 'Taxpayer Identification Number',
-      addressSameAsMother: true,
-      permanentAddressSameAsMother: true,
-      country: 'BGD',
-      countryPermanent: 'BGD',
-      currentAddress: '',
-      motherBirthDate: '1999-10-10',
-      dateOfMarriage: '2010-10-10',
-      educationalAttainment: 'PRIMARY_ISCED_1',
-      familyName: 'ইসলাম',
-      familyNameEng: 'Islam',
-      firstNames: 'আনোয়ার',
-      firstNamesEng: 'Anwar',
+      iD: '654654654',
+      socialSecurityNo: '65454984',
+      nationality: 'FAR',
+      firstNamesEng: 'Frank',
+      familyNameEng: 'Kane',
+      fatherBirthDate: '1990-12-23',
+      seperator: '',
       maritalStatus: 'MARRIED',
-      nationality: 'BGD'
+      occupation: 'Teacher',
+      educationalAttainment: 'FIRST_STAGE_TERTIARY_ISCED_5',
+      permanentAddressSameAsMother: true,
+      permanentAddress: '',
+      countryPermanent: 'FAR',
+      statePermanent: '',
+      districtPermanent: '',
+      ruralOrUrbanPermanent: 'URBAN',
+      addressChiefPermanent: '',
+      addressLine4CityOptionPermanent: '',
+      addressLine3CityOptionPermanent: '',
+      addressLine2CityOptionPermanent: '',
+      numberOptionPermanent: '',
+      addressLine1Permanent: '',
+      internationalStatePermanent: '',
+      internationalDistrictPermanent: '',
+      internationalCityPermanent: '',
+      internationalAddressLine1Permanent: '',
+      internationalAddressLine2Permanent: '',
+      internationalAddressLine3Permanent: '',
+      internationalPostcodePermanent: ''
     }
 
     const motherDetails: IPersonDetails = {
-      iD: '2342434534565',
-      iDType: 'NATIONAL_ID',
-      country: 'BGD',
-      nationality: 'BGD',
-      familyName: 'ইসলাম',
-      familyNameEng: 'Islam',
-      firstNames: 'রোকেয়া',
-      firstNamesEng: 'Rokeya',
+      nationality: 'FAR',
+      iD: '987987987',
+      socialSecurityNo: 'aferf',
+      firstNamesEng: 'Sally',
+      familyNameEng: 'Kane',
+      motherBirthDate: '1990-02-02',
+      seperator: '',
       maritalStatus: 'MARRIED',
-      dateOfMarriage: '2010-10-10',
-      fatherBirthDate: '1999-10-10',
-      educationalAttainment: 'PRIMARY_ISCED_1',
-      currentAddressSameAsPermanent: true,
-      addressLine1: 'Rd #10',
-      addressLine1Permanent: 'Rd#10',
-      addressLine2: 'Akua',
-      addressLine2Permanent: 'Akua',
-      addressLine3: 'union1',
-      addressLine3Permanent: 'union1',
-      addressLine4: 'upazila10',
-      addressLine4Permanent: 'upazila10',
-      countryPermanent: 'BGD',
-      currentAddress: '',
-      district: 'district2',
-      districtPermanent: 'district2',
+      occupation: 'Teacher',
+      educationalAttainment: 'FIRST_STAGE_TERTIARY_ISCED_5',
+      placeOfHeritage: '',
+      countryPlaceOfHeritage: 'FAR',
+      statePlaceOfHeritage: 'f050a94e-4e61-4cfb-a9ac-b3e96096e267',
+      districtPlaceOfHeritage: 'dfe133d1-1aed-41b3-8a9d-c525f8bf19b9',
+      addressChiefPlaceOfHeritage: 'My cheif',
+      addressLine1PlaceOfHeritage: 'My village',
+      internationalStatePlaceOfHeritage: '',
+      internationalDistrictPlaceOfHeritage: '',
+      internationalCityPlaceOfHeritage: '',
+      internationalAddressLine1PlaceOfHeritage: '',
+      internationalAddressLine2PlaceOfHeritage: '',
+      internationalAddressLine3PlaceOfHeritage: '',
+      internationalPostcodePlaceOfHeritage: '',
       permanentAddress: '',
-      postCode: '1020',
-      postCodePermanent: '1010',
-      state: 'state4',
-      statePermanent: 'state4'
+      countryPermanent: 'FAR',
+      statePermanent: '169981c1-89af-44f9-906a-bf783028ed14',
+      districtPermanent: '3bde1e85-59fc-4b92-9477-95c9564b377d',
+      ruralOrUrbanPermanent: 'URBAN',
+      addressChiefPermanent: '',
+      addressLine4CityOptionPermanent: 'My town',
+      addressLine3CityOptionPermanent: 'My residential area',
+      addressLine2CityOptionPermanent: 'My street',
+      numberOptionPermanent: 19,
+      addressLine1Permanent: '',
+      internationalStatePermanent: '',
+      internationalDistrictPermanent: '',
+      internationalCityPermanent: '',
+      internationalAddressLine1Permanent: '',
+      internationalAddressLine2Permanent: '',
+      internationalAddressLine3Permanent: '',
+      internationalPostcodePermanent: '',
+      currentAddressSameAsPermanent: true,
+      currentAddress: '',
+      country: 'FAR',
+      state: '',
+      district: '',
+      ruralOrUrban: 'URBAN',
+      addressChief: '',
+      addressLine4CityOption: '',
+      addressLine3CityOption: '',
+      addressLine2CityOption: '',
+      numberOption: '',
+      addressLine1: '',
+      internationalState: '',
+      internationalDistrict: '',
+      internationalCity: '',
+      internationalAddressLine1: '',
+      internationalAddressLine2: '',
+      internationalAddressLine3: '',
+      internationalPostcode: ''
     }
 
     const registrationDetails = {
       commentsOrNotes: 'comments',
       registrationCertificateLanguage: ['en'],
-      whoseContactDetails: 'MOTHER',
       informantType: {
         value: 'MOTHER',
-        nestedFields: {
-          otherInformantType: ''
-        }
+        nestedFields: { otherInformantType: '' }
       },
       contactPoint: {
         value: 'OTHER',
-        nestedFields: {
-          registrationPhone: '01717000000',
-          contactRelationshipOther: 'grandma'
-        }
+        nestedFields: { registrationPhone: '0787878787' }
       }
     }
 
@@ -175,7 +227,9 @@ describe('when user is previewing the form data', () => {
     })
 
     describe('when user clicks the "submit" button', () => {
-      beforeEach(async () => goToEndOfForm(app))
+      beforeEach(async () => {
+        await goToEndOfForm(app)
+      })
 
       it('check whether submit button is enabled or not', async () => {
         expect(app.find('#submit_form').hostNodes().prop('disabled')).toBe(
@@ -354,80 +408,61 @@ describe('when user is previewing the form data', () => {
     let customDraft: IDeclaration
 
     const deceasedDetails = {
-      iDType: 'PASSPORT',
-      iD: '123456789',
-      firstNames: 'অনিক',
-      familyName: 'অনিক',
-      firstNamesEng: 'Anik',
-      familyNameEng: 'anik',
-      nationality: 'BGD',
+      iD: '987987987',
+      socialSecurityNo: 'dstgsgs',
+      nationality: 'FAR',
+      firstNamesEng: 'Harry',
+      familyNameEng: 'Kane',
+      birthDate: '1990-02-02',
       gender: 'male',
+      seperator: '',
       maritalStatus: 'MARRIED',
-      birthDate: '1983-01-01',
-      countryPermanent: 'BGD',
-      statePermanent: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
-      districtPermanent: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
-      addressLine4Permanent: '34c377a0-2223-4361-851c-5e230a96d957',
-      addressLine3Permanent: '1f06d980-e254-4e6b-b049-a9b4e7155180',
-      addressLine3CityOptionPermanent: '',
-      addressLine2Permanent: '12',
-      addressLine1CityOptionPermanent: '',
-      postCodeCityOptionPermanent: '12',
-      addressLine1Permanent: '121',
-      postCodePermanent: '12',
-      currentAddressSameAsPermanent: true,
-      country: 'BGD',
-      state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
-      internationalStatePermanent: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
-      district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
-      internationalDistrictPermanent: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
-      addressLine4: '34c377a0-2223-4361-851c-5e230a96d957',
-      addressLine3: '1f06d980-e254-4e6b-b049-a9b4e7155180',
-      addressLine3CityOption: '',
-      addressLine2: '12',
-      addressLine1CityOption: '',
-      postCodeCityOption: '12',
-      addressLine1: '121',
-      postCode: '12',
+      occupation: 'Teacher',
+      permanentAddress: '',
+      countryPermanent: 'FAR',
+      statePermanent: '169981c1-89af-44f9-906a-bf783028ed14',
+      districtPermanent: '871f290e-8c7c-4643-b79b-2465af5f3303',
+      ruralOrUrbanPermanent: 'URBAN',
+      addressChiefPermanent: '',
+      addressLine4CityOptionPermanent: 'My town',
+      addressLine3CityOptionPermanent: 'My residential area',
+      addressLine2CityOptionPermanent: 'My street',
+      numberOptionPermanent: 19,
+      addressLine1Permanent: '',
+      internationalStatePermanent: '',
+      internationalDistrictPermanent: '',
+      internationalCityPermanent: '',
+      internationalAddressLine1Permanent: '',
+      internationalAddressLine2Permanent: '',
+      internationalAddressLine3Permanent: '',
+      internationalPostcodePermanent: '',
       _fhirID: '50fbd713-c86d-49fe-bc6a-52094b40d8dd'
     }
 
     const informantDetails = {
-      iDType: 'PASSPORT',
-      informantID: '123456789',
-      informantFirstNames: 'অনিক',
-      informantFamilyName: 'অনিক',
-      informantFirstNamesEng: 'Anik',
-      informantFamilyNameEng: 'Anik',
-      nationality: 'BGD',
-      informantBirthDate: '1996-01-01',
-      informantPhone: '01622688231',
-      relationship: 'OTHER',
-      country: 'BGD',
-      state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
-      internationalState: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
-      district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
-      internationalDistrict: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
-      addressLine4: '34c377a0-2223-4361-851c-5e230a96d957',
-      addressLine3: '1f06d980-e254-4e6b-b049-a9b4e7155180',
-      addressLine3CityOption: '',
-      addressLine2: '12',
-      addressLine1CityOption: '',
-      postCodeCityOption: '12',
-      addressLine1: '12',
-      postCode: '12',
-      informantPermanentAddressSameAsCurrent: true,
-      countryPermanent: 'BGD',
-      statePermanent: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
-      districtPermanent: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
-      addressLine4Permanent: '34c377a0-2223-4361-851c-5e230a96d957',
-      addressLine3Permanent: '1f06d980-e254-4e6b-b049-a9b4e7155180',
-      addressLine3CityOptionPermanent: '',
-      addressLine2Permanent: '12',
-      addressLine1CityOptionPermanent: '',
-      postCodeCityOptionPermanent: '12',
-      addressLine1Permanent: '12',
-      postCodePermanent: '12',
+      nationality: 'FAR',
+      informantID: '654654654',
+      firstNamesEng: 'Sally',
+      familyNameEng: 'Kane',
+      relationship: '',
+      permanentAddress: '',
+      countryPermanent: 'FAR',
+      statePermanent: 'ef97aebc-2461-473f-bf6e-456ed1e1a217',
+      districtPermanent: '901a5fc1-456e-4f9c-9d3e-1859ad321837',
+      ruralOrUrbanPermanent: 'URBAN',
+      addressChiefPermanent: '',
+      addressLine4CityOptionPermanent: 'My Town',
+      addressLine3CityOptionPermanent: 'My area',
+      addressLine2CityOptionPermanent: 'My street',
+      numberOptionPermanent: 12,
+      addressLine1Permanent: '',
+      internationalState: '',
+      internationalDistrict: '',
+      internationalCity: '',
+      internationalAddressLine1: '',
+      internationalAddressLine2: '',
+      internationalAddressLine3: '',
+      internationalPostcode: '',
       _fhirIDMap: {
         relatedPerson: 'c9e3e5cb-d483-4db4-afaa-625161826f00',
         individual: 'cabeeea7-0f7d-41c3-84ed-8f88e4d617e1'
@@ -435,65 +470,47 @@ describe('when user is previewing the form data', () => {
     }
 
     const fatherDetails = {
-      fatherFirstNames: 'মোক্তার',
-      fatherFamilyName: 'আলী',
-      fatherFirstNamesEng: 'Moktar',
-      fatherFamilyNameEng: 'Ali'
+      fatherFirstNamesEng: 'Bill',
+      fatherFamilyNameEng: 'Kane'
     }
 
     const motherDetails = {
-      motherFirstNames: 'মরিউম',
-      motherFamilyName: 'আলী',
-      motherFirstNamesEng: 'Morium',
-      motherFamilyNameEng: 'Ali'
+      motherFirstNamesEng: 'Francis',
+      motherFamilyNameEng: 'Kane'
     }
 
     const spouseDetails = {
       hasDetails: {
         value: 'Yes',
         nestedFields: {
-          spouseFirstNames: 'রেহানা',
-          spouseFamilyName: 'আলী',
-          spouseFirstNamesEng: 'Rehana',
-          spouseFamilyNameEng: 'Ali'
+          spouseFirstNamesEng: 'Sally',
+          spouseFamilyNameEng: 'Kane'
         }
       }
     }
 
     const deathEventDetails = {
-      deathDate: '2017-01-01',
-      manner: 'ACCIDENT',
-      deathPlaceAddress: 'PERMANENT',
-      country: 'BGD',
-      state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
-      district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
-      addressLine4: '34c377a0-2223-4361-851c-5e230a96d957',
-      addressLine3: '1f06d980-e254-4e6b-b049-a9b4e7155180',
-      addressLine3CityOption: '',
-      addressLine2: '12',
-      addressLine1CityOption: '',
-      postCodeCityOption: '12',
-      addressLine1: '121',
-      postCode: '12'
+      deathDate: '2022-04-10',
+      manner: 'NATURAL_CAUSES',
+      deathPlaceAddress: 'PERMANENT'
     }
-    const causeOfDeathDetails = { causeOfDeathEstablished: false }
+    const causeOfDeathDetails = {
+      causeOfDeathEstablished: true,
+      paragraph: '',
+      causeOfDeathCode: 'Natural causes'
+    }
 
     const registrationDetails = {
       _fhirID: 'fccf6eac-4dae-43d3-af33-2c977d1daf08',
       trackingId: 'DS8QZ0Z',
       type: 'death',
-      contactPoint: {
-        value: 'OTHER',
-        nestedFields: {
-          registrationPhone: '0799999999',
-          contactRelationshipOther: 'grandma'
-        }
-      },
       informantType: {
-        value: 'OTHER',
-        nestedFields: {
-          otherInformantType: 'Houseowner'
-        }
+        value: 'SPOUSE',
+        nestedFields: { otherInformantType: '' }
+      },
+      contactPoint: {
+        value: 'SPOUSE',
+        nestedFields: { registrationPhone: '0787877877' }
       }
     }
 
@@ -544,7 +561,6 @@ describe('when user is previewing the form data', () => {
     it('successfully submits the review form', async () => {
       jest.setMock('react-apollo', { default: ReactApollo })
       app.update().find('#registerDeclarationBtn').hostNodes().simulate('click')
-
       app.update().find('#submit_confirm').hostNodes().simulate('click')
     })
 

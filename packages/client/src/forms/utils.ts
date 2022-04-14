@@ -78,7 +78,9 @@ export const VIEW_TYPE = {
 }
 
 const REGISTRATION_TARGET_DAYS =
-  window.config.BIRTH && window.config.BIRTH.REGISTRATION_TARGET
+  window.config &&
+  window.config.BIRTH &&
+  window.config.BIRTH.REGISTRATION_TARGET
 
 interface IRange {
   start: number
@@ -488,6 +490,24 @@ export function getQueryData(
   return queryData
 }
 
+function getSelectedInformantType(draftData?: IFormData) {
+  // IFormFieldValue is a union with primitives - usually a top-level string in this function like this section.fieldValue
+  // informantType is a special case where both the nested field and the selected parent are required
+  // this means an object was required for the fieldValue
+  // TypeScript throws an error as the IFormFieldValue type cannot access the object prop of what it things could be a string
+  // creating selectedInformantType to be a value which will be used in the conditional
+  let selectedInformantType = ''
+  if (
+    draftData &&
+    draftData.registration &&
+    draftData.registration.informantType
+  ) {
+    const informantType = draftData.registration.informantType as IInformant
+    selectedInformantType = informantType.value
+  }
+  return selectedInformantType
+}
+
 export const getConditionalActionsForField = (
   field: IFormField,
   /*
@@ -497,6 +517,9 @@ export const getConditionalActionsForField = (
   offlineCountryConfig?: IOfflineData,
   draftData?: IFormData
 ): string[] => {
+  // set some constants that are used in conditionals
+  // eslint-disable-next-line no-unused-vars
+  const selectedInformantType = getSelectedInformantType(draftData)
   if (!field.conditionals) {
     return []
   }
@@ -513,20 +536,9 @@ export const getVisibleSectionGroupsBasedOnConditions = (
   values: IFormSectionData,
   draftData?: IFormData
 ): IFormSectionGroup[] => {
-  // IFormFieldValue is a union with primitives - usually a top-level string in this function like this section.fieldValue
-  // informantType is a special case where both the nested field and the selected parent are required
-  // this means an object was required for the fieldValue
-  // TypeScript throws an error as the IFormFieldValue type cannot access the object prop of what it things could be a string
-  // creating selectedInformantType to be a value which will be used in the conditional
-  let selectedInformantType
-  if (
-    draftData &&
-    draftData.registration &&
-    draftData.registration.informantType
-  ) {
-    const informantType = draftData.registration.informantType as IInformant
-    selectedInformantType = informantType.value
-  }
+  // set some constants that are used in conditionals
+  // eslint-disable-next-line no-unused-vars
+  const selectedInformantType = getSelectedInformantType(draftData)
   // handling all possible group visibility conditionals
   return section.groups.filter((group) => {
     if (!group.conditionals) {

@@ -2786,15 +2786,16 @@ export const getFileFromBase64String = (
 
 export async function goToSection(component: ReactWrapper, nth: number) {
   for (let i = 0; i < nth; i++) {
+    await waitForElement(component, '#next_section')
     component.find('#next_section').hostNodes().simulate('click')
-
     await flushPromises()
-    component.update()
+    await component.update()
   }
 }
 
 export async function goToEndOfForm(component: ReactWrapper) {
-  await goToSection(component, 5)
+  await goToSection(component, 6)
+  //console.log(component.debug())
   await waitForElement(component, '#review_header')
 }
 

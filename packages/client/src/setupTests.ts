@@ -22,20 +22,12 @@ import 'jsdom-worker'
 import { roleQueries } from './forms/user/query/queries'
 import { userQueries } from './user/queries'
 import debounce from 'lodash/debounce'
-import { mockOfflineData } from './tests/mock-offline-data'
+import { applicationConfig, mockOfflineData } from './tests/mock-offline-data'
 import './tests/queryMock'
 
 if (process.env.CI) {
   jest.setTimeout(30000)
 }
-
-jest.mock('@client/forms/configuration/default', () => ({
-  registerForms: mockOfflineData.forms.registerForm
-}))
-
-jest.mock('@client/forms/user/fieldDefinitions/createUser', () => ({
-  createUserForm: mockOfflineData.forms.userForm
-}))
 
 /*
  * Initialize mocks
@@ -117,40 +109,14 @@ const navigatorMock = {
 ;(window as any).navigator = navigatorMock
 ;(window as any).scrollTo = noop
 ;(window as any).config = {
+  ...applicationConfig,
   API_GATEWAY_URL: 'http://localhost:7070/',
   CONFIG_API_URL: 'http://localhost:2021',
   LOGIN_URL: 'http://localhost:3020',
   AUTH_URL: 'http://localhost:4040',
   COUNTRY_CONFIG_URL: 'http://localhost:3040',
-  APPLICATION_NAME: 'Farajaland CRVS',
-  BIRTH: {
-    REGISTRATION_TARGET: 45,
-    LATE_REGISTRATION_TARGET: 365,
-    FEE: {
-      ON_TIME: 0,
-      LATE: 0,
-      DELAYED: 0
-    }
-  },
-  COUNTRY: 'bgd',
-  CURRENCY: {
-    isoCode: 'ZMW',
-    languagesAndCountry: ['en-ZM']
-  },
-  DEATH: {
-    REGISTRATION_TARGET: 45,
-    FEE: {
-      ON_TIME: 0,
-      DELAYED: 0
-    }
-  },
-  LANGUAGES: 'en,bn',
-  SENTRY: 'https://2ed906a0ba1c4de2ae3f3f898ec9df0b@sentry.io/1774551',
-  LOGROCKET: 'opencrvs-foundation/opencrvs-bangladesh',
-  BIRTH_REGISTRATION_TARGET: 45,
-  DEATH_REGISTRATION_TARGET: 45,
-  NID_NUMBER_PATTERN: /^[0-9]{9}$/,
-  PHONE_NUMBER_PATTERN: /^01[1-9][0-9]{8}$/
+  COUNTRY: 'FAR',
+  LANGUAGES: 'en'
 }
 
 /*
@@ -211,7 +177,7 @@ beforeEach(() => {
   debug.mockReset()
   hiddenMock.mockReset()
 
-  Date.now = jest.fn(() => 1487076708000) // 2017-02-14
+  Date.now = jest.fn(() => 1649935675965) // 2022-04-14
 
   /*
    * Assign sane defaults for everything

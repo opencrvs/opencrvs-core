@@ -17,78 +17,84 @@
           },
           "groups": [
             {
-              "id": "informant-relation",
+              "id": "who-is-applying-view-group",
               "title": {
-                "defaultMessage": "Who is the informant?",
-                "description": "Form section title for contact point",
-                "id": "register.selectInformant.relation"
+                "defaultMessage": "Who is applying for birth registration?",
+                "description": "Who is applying for birth registration",
+                "id": "register.selectInformant.birthInformantTitle"
               },
-              "conditionals": [
-                {
-                  "action": "hide",
-                  "expression": "(!draftData || !draftData.registration || draftData.registration.informantType !== \"OTHER\" || draftData.registration.informantType === \"BOTH_PARENTS\" )"
-                }
-              ],
+              "conditionals": [],
               "preventContinueIfError": true,
               "showExitButtonOnly": true,
               "fields": [
                 {
-                  "name": "informant",
+                  "name": "informantType",
                   "type": "RADIO_GROUP_WITH_NESTED_FIELDS",
                   "label": {
-                    "defaultMessage": "Who is the informant?",
-                    "description": "Form section title for contact point",
-                    "id": "register.selectInformant.relation"
+                    "defaultMessage": "Who is applying for birth registration?",
+                    "description": "Who is applying for birth registration",
+                    "id": "register.selectInformant.birthInformantTitle"
                   },
-                  "required": true,
-                  "readonly": true,
                   "hideHeader": true,
+                  "required": true,
+                  "hideInPreview": false,
                   "initialValue": "",
                   "validate": [],
                   "size": "large",
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
                   "options": [
+                    {
+                      "value": "MOTHER",
+                      "label": {
+                        "defaultMessage": "Mother",
+                        "description": "Label for option mother",
+                        "id": "form.field.label.informantRelation.mother"
+                      }
+                    },
+                    {
+                      "value": "FATHER",
+                      "label": {
+                        "defaultMessage": "Father",
+                        "description": "Label for option father",
+                        "id": "form.field.label.informantRelation.father"
+                      }
+                    },
                     {
                       "value": "GRANDFATHER",
                       "label": {
                         "defaultMessage": "Grandfather",
-                        "description": "Option for form field: Grandfather",
-                        "id": "form.field.label.relationGrandfather"
+                        "description": "Label for option Grandfather",
+                        "id": "form.field.label.informantRelation.grandfather"
                       }
                     },
                     {
                       "value": "GRANDMOTHER",
                       "label": {
                         "defaultMessage": "Grandmother",
-                        "description": "Option for form field: Grandmother",
-                        "id": "form.field.label.relationGrandmother"
+                        "description": "Label for option Grandmother",
+                        "id": "form.field.label.informantRelation.grandmother"
                       }
                     },
                     {
                       "value": "BROTHER",
                       "label": {
                         "defaultMessage": "Brother",
-                        "description": "Option for form field: Brother",
-                        "id": "form.field.label.relationBrother"
+                        "description": "Label for option brother",
+                        "id": "form.field.label.informantRelation.brother"
                       }
                     },
                     {
                       "value": "SISTER",
                       "label": {
                         "defaultMessage": "Sister",
-                        "description": "Option for form field: Sister",
-                        "id": "form.field.label.relationSister"
+                        "description": "Label for option Sister",
+                        "id": "form.field.label.informantRelation.sister"
                       }
                     },
                     {
                       "value": "OTHER_FAMILY_MEMBER",
                       "label": {
                         "defaultMessage": "Other family member",
-                        "description": "Option for form field: Other family member",
+                        "description": "Label for other family member relation",
                         "id": "form.field.label.relationOtherFamilyMember"
                       }
                     },
@@ -96,105 +102,48 @@
                       "value": "LEGAL_GUARDIAN",
                       "label": {
                         "defaultMessage": "Legal guardian",
-                        "description": "Option for form field: Legal guardian",
-                        "id": "register.selectinformant.legalGuardian"
-                      }
-                    },
-                    {
-                      "value": "INSTITUTION_HEAD_PLACE_OF_BIRTH",
-                      "label": {
-                        "defaultMessage": "Head of the institution where the birth occurred",
-                        "description": "Option for form field: Head of the institution where the birth occurred",
-                        "id": "form.field.label.relInstHeadPlaceOfBirth"
-                      }
-                    },
-                    {
-                      "value": "HOUSE_OWNER",
-                      "label": {
-                        "defaultMessage": "Owner of the house or building where the birth occurred",
-                        "description": "Option for form field: Owner of the house or building where the birth occurred",
-                        "id": "form.field.label.relationHouseOwner"
-                      }
-                    },
-                    {
-                      "value": "OPERATOR",
-                      "label": {
-                        "defaultMessage": "Driver or operator of the land or water vehicle or aircraft where the birth occurred",
-                        "description": "Option for form field: Driver or operator of the land or water vehicle or aircraft where the birth occurred",
-                        "id": "form.field.label.relationOperator"
-                      }
-                    },
-                    {
-                      "value": "OFFICE_IN_CHARGE",
-                      "label": {
-                        "defaultMessage": "Officer-in-charge of the Thana of a road or public space where the birth occurred",
-                        "description": "Option for form field: Officer-in-charge of the Thana of a road or public space where the birth occurred",
-                        "id": "form.field.label.relationOfficeInCharge"
+                        "description": "Label for option Legal Guardian",
+                        "id": "form.field.label.informantRelation.legalGuardian"
                       }
                     },
                     {
                       "value": "OTHER",
                       "label": {
                         "defaultMessage": "Someone else",
-                        "description": "Option for form field: Someone else",
-                        "id": "form.field.label.relationSomeoneElse"
+                        "description": "Label for option someone else",
+                        "id": "form.field.label.informantRelation.others"
                       }
                     }
                   ],
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
                   "nestedFields": {
+                    "MOTHER": [],
+                    "FATHER": [],
                     "GRANDFATHER": [],
                     "GRANDMOTHER": [],
                     "BROTHER": [],
                     "SISTER": [],
-                    "OTHER_FAMILY_MEMBER": [
-                      {
-                        "name": "otherRelationShip",
-                        "type": "TEXT",
-                        "label": {
-                          "defaultMessage": "Relationship to child",
-                          "id": "form.field.label.informantsRelationWithChild",
-                          "description": "Label for input Relationship to child"
-                        },
-                        "placeholder": {
-                          "defaultMessage": "eg. Grandmother",
-                          "description": "Placeholder for example of relationship",
-                          "id": "form.field.label.relationshipPlaceHolder"
-                        },
-                        "required": true,
-                        "initialValue": "",
-                        "validate": [],
-                        "mapping": {
-                          "mutation": {
-                            "operation": "changeHirerchyMutationTransformer",
-                            "parameters": ["informant.otherRelationship"]
-                          },
-                          "query": {
-                            "operation": "changeHirerchyQueryTransformer",
-                            "parameters": ["informant.otherRelationship"]
-                          }
-                        }
-                      }
-                    ],
+                    "OTHER_FAMILY_MEMBER": [],
                     "LEGAL_GUARDIAN": [],
-                    "INSTITUTION_HEAD_PLACE_OF_BIRTH": [],
-                    "HOUSE_OWNER": [],
-                    "OPERATOR": [],
-                    "OFFICE_IN_CHARGE": [],
                     "OTHER": [
                       {
-                        "name": "otherRelationShip",
+                        "name": "otherInformantType",
                         "type": "TEXT",
                         "label": {
                           "defaultMessage": "Relationship to child",
-                          "id": "form.field.label.informantsRelationWithChild",
-                          "description": "Label for input Relationship to child"
+                          "description": "Label for Relationship to child",
+                          "id": "form.field.label.informantsRelationWithChild"
                         },
                         "placeholder": {
                           "defaultMessage": "eg. Grandmother",
-                          "description": "Placeholder for example of relationship",
+                          "description": "Relationship place holder",
                           "id": "form.field.label.relationshipPlaceHolder"
                         },
-                        "required": true,
+                        "required": false,
                         "initialValue": "",
                         "validate": [
                           {
@@ -204,11 +153,11 @@
                         "mapping": {
                           "mutation": {
                             "operation": "changeHirerchyMutationTransformer",
-                            "parameters": ["informant.otherRelationship"]
+                            "parameters": ["registration.otherInformantType"]
                           },
                           "query": {
                             "operation": "changeHirerchyQueryTransformer",
-                            "parameters": ["informant.otherRelationship"]
+                            "parameters": ["registration.otherInformantType"]
                           }
                         }
                       }
@@ -217,88 +166,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "nestedRadioFieldToBundleFieldTransformer",
-                      "parameters": ["informant.relationship"]
+                      "parameters": ["registration.informantType"]
                     },
                     "query": {
                       "operation": "bundleFieldToNestedRadioFieldTransformer",
-                      "parameters": ["informant.relationship"]
-                    }
-                  }
-                }
-              ]
-            },
-            {
-              "id": "primary-informant",
-              "title": {
-                "defaultMessage": "Who is the primary informant for this declaration?",
-                "description": "Form section title for primary informant",
-                "id": "register.primaryInformant.registerNewEventHeading"
-              },
-              "conditionals": [
-                {
-                  "action": "hide",
-                  "expression": "(!draftData || !draftData.registration || draftData.registration.informantType !== \"BOTH_PARENTS\" || draftData.registration.informantType === \"OTHER\")"
-                }
-              ],
-              "preventContinueIfError": true,
-              "showExitButtonOnly": true,
-              "fields": [
-                {
-                  "name": "paragraph",
-                  "type": "PARAGRAPH",
-                  "label": {
-                    "defaultMessage": "This person is responsible for providing accurate information in this declaration.",
-                    "description": "Documents Paragraph text",
-                    "id": "register.primaryInformant.description"
-                  },
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": []
-                },
-                {
-                  "name": "informant",
-                  "type": "RADIO_GROUP_WITH_NESTED_FIELDS",
-                  "label": {
-                    "defaultMessage": "Who is the primary informant for this declaration?",
-                    "description": "Form section title for primary informant",
-                    "id": "register.selectInformant.relation"
-                  },
-                  "hideHeader": true,
-                  "size": "large",
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [],
-                  "options": [
-                    {
-                      "value": "MOTHER",
-                      "label": {
-                        "defaultMessage": "Mother",
-                        "description": "Mother as informant",
-                        "id": "form.field.label.informantRelation.mother"
-                      }
-                    },
-                    {
-                      "value": "FATHER",
-                      "label": {
-                        "defaultMessage": "Father",
-                        "description": "Father as informant",
-                        "id": "form.field.label.informantRelation.father"
-                      }
-                    }
-                  ],
-                  "nestedFields": {
-                    "MOTHER": [],
-                    "FATHER": []
-                  },
-                  "conditionals": [],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "nestedRadioFieldToBundleFieldTransformer",
-                      "parameters": ["informant.relationship"]
-                    },
-                    "query": {
-                      "operation": "bundleFieldToNestedRadioFieldTransformer",
-                      "parameters": ["informant.relationship"]
+                      "parameters": ["registration.informantType"]
                     }
                   }
                 }
@@ -319,8 +191,8 @@
                   "id": "contactPointGroup",
                   "label": {
                     "defaultMessage": "Main Contact",
-                    "description": "Label for form field: Place of delivery",
-                    "id": "form.field.label.declaration.mainContact"
+                    "description": "Label for point of contact on the review page",
+                    "id": "form.review.label.mainContact"
                   },
                   "required": false,
                   "initialValue": "",
@@ -329,131 +201,10 @@
               ],
               "fields": [
                 {
-                  "name": "informantType",
-                  "type": "RADIO_GROUP",
-                  "required": true,
-                  "readonly": true,
-                  "hidden": true,
-                  "hideInPreview": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "options": [
-                    {
-                      "value": "MOTHER",
-                      "label": {
-                        "defaultMessage": "Mother",
-                        "description": "Label for option Mother",
-                        "id": "form.field.label.informantRelation.mother"
-                      }
-                    },
-                    {
-                      "value": "FATHER",
-                      "label": {
-                        "defaultMessage": "Father",
-                        "description": "Label for option Father",
-                        "id": "form.field.label.informantRelation.father"
-                      }
-                    },
-                    {
-                      "value": "BOTH_PARENTS",
-                      "label": {
-                        "id": "register.selectInformant.parents",
-                        "defaultMessage": "Mother & Father",
-                        "description": "The description that appears when selecting the parent as informant"
-                      }
-                    },
-                    {
-                      "value": "OTHER",
-                      "label": {
-                        "defaultMessage": "Someone else",
-                        "description": "Other Label",
-                        "id": "form.field.label.someoneElse"
-                      }
-                    }
-                  ],
-                  "label": {
-                    "defaultMessage": "Who is present for the birth registration?",
-                    "description": "Form section title for contact point",
-                    "id": "form.field.label.declaration.whoIsPresent"
-                  },
-                  "reviewOverrides": {
-                    "residingSection": "registration",
-                    "reference": {
-                      "sectionID": "registration",
-                      "groupID": "contact-view-group",
-                      "fieldName": "contactPoint"
-                    },
-                    "position": "before",
-                    "labelAs": {
-                      "defaultMessage": "Who is the informant?",
-                      "description": "Form section title for contact point",
-                      "id": "register.selectInformant.relation"
-                    },
-                    "conditionals": [
-                      {
-                        "action": "hide",
-                        "expression": "(!draftData || !draftData.registration || draftData.registration.informantType === \"OTHER\")"
-                      }
-                    ]
-                  },
-                  "mapping": {
-                    "mutation": {
-                      "operation": "sectionFieldToBundleFieldTransformer",
-                      "parameters": []
-                    },
-                    "query": {
-                      "operation": "bundleFieldToSectionFieldTransformer",
-                      "parameters": []
-                    }
-                  }
-                },
-                {
-                  "name": "informant",
-                  "type": "RADIO_GROUP_WITH_NESTED_FIELDS",
-                  "readonly": true,
-                  "hidden": true,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "(!draftData || !draftData.registration || draftData.registration.informantType !== \"LEGAL_GUARDIAN\")"
-                    }
-                  ],
-                  "label": {
-                    "defaultMessage": "Informant",
-                    "description": "Form section title for contact point",
-                    "id": "form.section.informant.name"
-                  },
-                  "options": [
-                    {
-                      "value": "LEGAL_GUARDIAN",
-                      "label": {
-                        "defaultMessage": "Legal guardian",
-                        "description": "Option for form field: Legal Guardian",
-                        "id": "register.selectinformant.legalGuardian"
-                      }
-                    }
-                  ],
-                  "nestedFields": {
-                    "LEGAL_GUARDIAN": []
-                  },
-                  "mapping": {
-                    "mutation": {
-                      "operation": "nestedRadioFieldToBundleFieldTransformer",
-                      "parameters": ["informant.relationship"]
-                    },
-                    "query": {
-                      "operation": "bundleFieldToNestedRadioFieldTransformer",
-                      "parameters": ["informant.relationship"]
-                    }
-                  }
-                },
-                {
                   "name": "contactPoint",
                   "type": "RADIO_GROUP_WITH_NESTED_FIELDS",
                   "label": {
-                    "defaultMessage": " ",
+                    "defaultMessage": "Who is the main point of contact for this declaration?",
                     "description": "Form section title for contact point",
                     "id": "register.SelectContactPoint.heading"
                   },
@@ -471,101 +222,79 @@
                   },
                   "options": [
                     {
-                      "value": "INFORMANT",
-                      "label": {
-                        "defaultMessage": "Informant",
-                        "description": "Label for \"Informant\" radio option",
-                        "id": "form.field.label.app.whoContDet.app"
-                      },
-                      "conditionals": [
-                        {
-                          "action": "hide",
-                          "expression": "(draftData && draftData.registration && draftData.registration.informantType !== \"OTHER\")"
-                        }
-                      ]
-                    },
-                    {
                       "value": "MOTHER",
                       "label": {
                         "defaultMessage": "Mother",
-                        "description": "Label for \"Mother\" radio option",
-                        "id": "form.field.label.app.whoContDet.mother"
-                      },
-                      "conditionals": [
-                        {
-                          "action": "hide",
-                          "expression": "(draftData && draftData.registration && draftData.registration.informantType === \"OTHER\" && draftData.registration.informant.value === \"LEGAL_GUARDIAN\")"
-                        }
-                      ]
+                        "description": "Label for option mother",
+                        "id": "form.field.label.informantRelation.mother"
+                      }
                     },
                     {
                       "value": "FATHER",
                       "label": {
                         "defaultMessage": "Father",
-                        "description": "Label for \"Father\" radio option",
-                        "id": "form.field.label.app.whoContDet.father"
-                      },
-                      "conditionals": [
-                        {
-                          "action": "hide",
-                          "expression": "(draftData && draftData.registration && draftData.registration.informantType === \"OTHER\" && draftData.registration.informant.value === \"LEGAL_GUARDIAN\")"
-                        }
-                      ]
+                        "description": "Label for option father",
+                        "id": "form.field.label.informantRelation.father"
+                      }
+                    },
+                    {
+                      "value": "GRANDFATHER",
+                      "label": {
+                        "defaultMessage": "Grandfather",
+                        "description": "Label for option Grandfather",
+                        "id": "form.field.label.informantRelation.grandfather"
+                      }
+                    },
+                    {
+                      "value": "GRANDMOTHER",
+                      "label": {
+                        "defaultMessage": "Grandmother",
+                        "description": "Label for option Grandmother",
+                        "id": "form.field.label.informantRelation.grandmother"
+                      }
+                    },
+                    {
+                      "value": "BROTHER",
+                      "label": {
+                        "defaultMessage": "Brother",
+                        "description": "Label for option brother",
+                        "id": "form.field.label.informantRelation.brother"
+                      }
+                    },
+                    {
+                      "value": "SISTER",
+                      "label": {
+                        "defaultMessage": "Sister",
+                        "description": "Label for option Sister",
+                        "id": "form.field.label.informantRelation.sister"
+                      }
+                    },
+                    {
+                      "value": "OTHER_FAMILY_MEMBER",
+                      "label": {
+                        "defaultMessage": "Other family member",
+                        "description": "Label for other family member relation",
+                        "id": "form.field.label.relationOtherFamilyMember"
+                      }
+                    },
+                    {
+                      "value": "LEGAL_GUARDIAN",
+                      "label": {
+                        "defaultMessage": "Legal guardian",
+                        "description": "Label for option Legal Guardian",
+                        "id": "form.field.label.informantRelation.legalGuardian"
+                      }
                     },
                     {
                       "value": "OTHER",
                       "label": {
                         "defaultMessage": "Someone else",
-                        "description": "Label for \"Someone else\" radio option",
-                        "id": "form.field.label.someoneElse"
+                        "description": "Label for option someone else",
+                        "id": "form.field.label.informantRelation.others"
                       }
                     }
                   ],
                   "nestedFields": {
-                    "INFORMANT": [
-                      {
-                        "name": "registrationPhone",
-                        "type": "TEL",
-                        "label": {
-                          "defaultMessage": "Phone number",
-                          "description": "Input label for phone input",
-                          "id": "form.field.label.phoneNumber"
-                        },
-                        "required": true,
-                        "initialValue": "",
-                        "validate": [
-                          {
-                            "operation": "phoneNumberFormat"
-                          }
-                        ],
-                        "mapping": {
-                          "mutation": {
-                            "operation": "changeHirerchyMutationTransformer",
-                            "parameters": [
-                              "registration.contactPhoneNumber",
-                              {
-                                "operation": "msisdnTransformer",
-                                "parameters": [
-                                  "registration.contactPhoneNumber"
-                                ]
-                              }
-                            ]
-                          },
-                          "query": {
-                            "operation": "changeHirerchyQueryTransformer",
-                            "parameters": [
-                              "registration.contactPhoneNumber",
-                              {
-                                "operation": "localPhoneTransformer",
-                                "parameters": [
-                                  "registration.contactPhoneNumber"
-                                ]
-                              }
-                            ]
-                          }
-                        }
-                      }
-                    ],
                     "MOTHER": [
                       {
                         "name": "registrationPhone",
@@ -575,7 +304,7 @@
                           "description": "Input label for phone input",
                           "id": "form.field.label.phoneNumber"
                         },
-                        "required": true,
+                        "required": false,
                         "initialValue": "",
                         "validate": [
                           {
@@ -619,7 +348,227 @@
                           "description": "Input label for phone input",
                           "id": "form.field.label.phoneNumber"
                         },
-                        "required": true,
+                        "required": false,
+                        "initialValue": "",
+                        "validate": [
+                          {
+                            "operation": "phoneNumberFormat"
+                          }
+                        ],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "changeHirerchyMutationTransformer",
+                            "parameters": [
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "msisdnTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
+                            ]
+                          },
+                          "query": {
+                            "operation": "changeHirerchyQueryTransformer",
+                            "parameters": [
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "localPhoneTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    "GRANDFATHER": [
+                      {
+                        "name": "registrationPhone",
+                        "type": "TEL",
+                        "label": {
+                          "defaultMessage": "Phone number",
+                          "description": "Input label for phone input",
+                          "id": "form.field.label.phoneNumber"
+                        },
+                        "required": false,
+                        "initialValue": "",
+                        "validate": [
+                          {
+                            "operation": "phoneNumberFormat"
+                          }
+                        ],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "changeHirerchyMutationTransformer",
+                            "parameters": [
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "msisdnTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
+                            ]
+                          },
+                          "query": {
+                            "operation": "changeHirerchyQueryTransformer",
+                            "parameters": [
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "localPhoneTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    "GRANDMOTHER": [
+                      {
+                        "name": "registrationPhone",
+                        "type": "TEL",
+                        "label": {
+                          "defaultMessage": "Phone number",
+                          "description": "Input label for phone input",
+                          "id": "form.field.label.phoneNumber"
+                        },
+                        "required": false,
+                        "initialValue": "",
+                        "validate": [
+                          {
+                            "operation": "phoneNumberFormat"
+                          }
+                        ],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "changeHirerchyMutationTransformer",
+                            "parameters": [
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "msisdnTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
+                            ]
+                          },
+                          "query": {
+                            "operation": "changeHirerchyQueryTransformer",
+                            "parameters": [
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "localPhoneTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    "BROTHER": [
+                      {
+                        "name": "registrationPhone",
+                        "type": "TEL",
+                        "label": {
+                          "defaultMessage": "Phone number",
+                          "description": "Input label for phone input",
+                          "id": "form.field.label.phoneNumber"
+                        },
+                        "required": false,
+                        "initialValue": "",
+                        "validate": [
+                          {
+                            "operation": "phoneNumberFormat"
+                          }
+                        ],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "changeHirerchyMutationTransformer",
+                            "parameters": [
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "msisdnTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
+                            ]
+                          },
+                          "query": {
+                            "operation": "changeHirerchyQueryTransformer",
+                            "parameters": [
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "localPhoneTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    "SISTER": [
+                      {
+                        "name": "registrationPhone",
+                        "type": "TEL",
+                        "label": {
+                          "defaultMessage": "Phone number",
+                          "description": "Input label for phone input",
+                          "id": "form.field.label.phoneNumber"
+                        },
+                        "required": false,
+                        "initialValue": "",
+                        "validate": [
+                          {
+                            "operation": "phoneNumberFormat"
+                          }
+                        ],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "changeHirerchyMutationTransformer",
+                            "parameters": [
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "msisdnTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
+                            ]
+                          },
+                          "query": {
+                            "operation": "changeHirerchyQueryTransformer",
+                            "parameters": [
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "localPhoneTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    "LEGAL_GUARDIAN": [
+                      {
+                        "name": "registrationPhone",
+                        "type": "TEL",
+                        "label": {
+                          "defaultMessage": "Phone number",
+                          "description": "Input label for phone input",
+                          "id": "form.field.label.phoneNumber"
+                        },
+                        "required": false,
                         "initialValue": "",
                         "validate": [
                           {
@@ -656,37 +605,6 @@
                     ],
                     "OTHER": [
                       {
-                        "name": "contactRelationshipOther",
-                        "type": "TEXT",
-                        "label": {
-                          "defaultMessage": "Relationship to child",
-                          "id": "form.field.label.informantsRelationWithChild",
-                          "description": "Label for input Relationship to child"
-                        },
-                        "placeholder": {
-                          "defaultMessage": "eg. Grandmother",
-                          "description": "Placeholder for example of relationship",
-                          "id": "form.field.label.relationshipPlaceHolder"
-                        },
-                        "required": true,
-                        "initialValue": "",
-                        "validate": [
-                          {
-                            "operation": "englishOnlyNameFormat"
-                          }
-                        ],
-                        "mapping": {
-                          "mutation": {
-                            "operation": "changeHirerchyMutationTransformer",
-                            "parameters": ["registration.contactRelationship"]
-                          },
-                          "query": {
-                            "operation": "changeHirerchyQueryTransformer",
-                            "parameters": ["registration.contactRelationship"]
-                          }
-                        }
-                      },
-                      {
                         "name": "registrationPhone",
                         "type": "TEL",
                         "label": {
@@ -694,7 +612,7 @@
                           "description": "Input label for phone input",
                           "id": "form.field.label.phoneNumber"
                         },
-                        "required": true,
+                        "required": false,
                         "initialValue": "",
                         "validate": [
                           {
@@ -2183,7 +2101,7 @@
               "conditionals": [
                 {
                   "action": "hide",
-                  "expression": "(!draftData || !draftData.registration || !((draftData.informantType && (draftData.informantType === \"LEGAL_GUARDIAN\" || draftData.informantType === \"OTHER\")) || (draftData.registration.informantType && (draftData.registration.informantType === \"LEGAL_GUARDIAN\" || draftData.registration.informantType === \"OTHER\")  )))"
+                  "expression": "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantType && (selectedInformantType === 'MOTHER' || selectedInformantType === 'FATHER'))"
                 }
               ],
               "fields": [
@@ -10122,69 +10040,63 @@
           "groups": [
             {
               "id": "documents-view-group",
+              "conditionals": [
+                {
+                  "description": "Hidden for record correction",
+                  "action": "hide",
+                  "expression": "draftData && draftData.corrector && draftData.corrector.relationship"
+                }
+              ],
               "fields": [
                 {
                   "name": "paragraph",
                   "type": "PARAGRAPH",
                   "label": {
-                    "defaultMessage": "For birth registration of birth occurring within 45 days old the following documents are required:",
+                    "defaultMessage": "For birth registration of birth the following documents are \"required\":",
                     "description": "Documents Paragraph text",
                     "id": "form.section.documents.birth.requirements"
                   },
                   "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"between46daysTo5yrs\")"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"after5yrs\")"
-                    }
-                  ]
+                  "validate": []
                 },
                 {
-                  "name": "paragraph",
-                  "type": "PARAGRAPH",
+                  "name": "uploadDocForChildDOB",
+                  "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                   "label": {
-                    "defaultMessage": "For birth registration of births occurring within 45 days and 5 years old the following documents are required:",
-                    "description": "Documents Paragraph text",
-                    "id": "form.section.documents.paragraphTargetdaysTo5Years"
+                    "defaultMessage": "Proof of Place and Date of Birth of Child",
+                    "description": "Label for list item Child Birth Proof",
+                    "id": "form.field.label.proofOfBirthPlaceAndDate"
                   },
                   "initialValue": "",
+                  "extraValue": "CHILD",
+                  "hideAsterisk": true,
                   "validate": [],
-                  "conditionals": [
+                  "options": [
                     {
-                      "action": "hide",
-                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"withinTargetdays\") || !draftData.child || !draftData.child.childBirthDate"
+                      "value": "Original Birth Record",
+                      "label": {
+                        "defaultMessage": "Original birth record",
+                        "description": "Label for select option original Birth Record",
+                        "id": "form.field.label.docTypeChildBirthProof"
+                      }
                     },
                     {
-                      "action": "hide",
-                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"after5yrs\")  || !draftData.child || !draftData.child.childBirthDate"
+                      "value": "Under Five Card",
+                      "label": {
+                        "defaultMessage": "Under five card",
+                        "description": "Label for select option Under five card",
+                        "id": "form.field.label.docTypeChildUnderFiveCard"
+                      }
                     }
-                  ]
-                },
-                {
-                  "name": "paragraph",
-                  "type": "PARAGRAPH",
-                  "label": {
-                    "defaultMessage": "For birth registration of births occurring after 5 years the following documents are required:",
-                    "description": "Documents Paragraph text",
-                    "id": "form.section.documents.paragraphAbove5Years"
-                  },
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"withinTargetdays\") || !draftData.child || !draftData.child.childBirthDate"
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "birthFieldToAttachmentTransformer"
                     },
-                    {
-                      "action": "hide",
-                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"between46daysTo5yrs\") || !draftData.child || !draftData.child.childBirthDate"
+                    "query": {
+                      "operation": "birthAttachmentToFieldTransformer"
                     }
-                  ]
+                  }
                 },
                 {
                   "name": "uploadDocForMother",
@@ -10200,26 +10112,18 @@
                   "validate": [],
                   "options": [
                     {
-                      "value": "Birth Registration",
-                      "label": {
-                        "defaultMessage": "Birth Registration",
-                        "description": "Label for select option Birth Registration",
-                        "id": "form.field.label.docTypeBR"
-                      }
-                    },
-                    {
                       "value": "National ID (front)",
                       "label": {
-                        "defaultMessage": "National ID (Front)",
-                        "description": "Label for select option radio option NID front",
+                        "defaultMessage": "Front of national ID",
+                        "description": "Label for select option front of national ID",
                         "id": "form.field.label.docTypeNIDFront"
                       }
                     },
                     {
                       "value": "National ID (back)",
                       "label": {
-                        "defaultMessage": "National ID (Back)",
-                        "description": "Label for select option radio option NID back",
+                        "defaultMessage": "Back of national ID",
+                        "description": "Label for select option back of national ID",
                         "id": "form.field.label.docTypeNIDBack"
                       }
                     }
@@ -10228,7 +10132,7 @@
                     {
                       "description": "Hidden for Parent Details none or Mother only",
                       "action": "hide",
-                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"NONE\") || (draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"FATHER_ONLY\")"
+                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === 'NONE') || (draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === 'FATHER_ONLY')"
                     }
                   ],
                   "mapping": {
@@ -10254,26 +10158,18 @@
                   "validate": [],
                   "options": [
                     {
-                      "value": "Birth Registration",
-                      "label": {
-                        "defaultMessage": "Birth registration certificate",
-                        "description": "Label for select option Birth Registration",
-                        "id": "form.field.label.docTypeBR"
-                      }
-                    },
-                    {
                       "value": "National ID (front)",
                       "label": {
-                        "defaultMessage": "National ID (Front)",
-                        "description": "Label for select option radio option NID front",
+                        "defaultMessage": "Front of national ID",
+                        "description": "Label for select option front of national ID",
                         "id": "form.field.label.docTypeNIDFront"
                       }
                     },
                     {
                       "value": "National ID (back)",
                       "label": {
-                        "defaultMessage": "National ID (Back)",
-                        "description": "Label for select option radio option NID back",
+                        "defaultMessage": "Back of national ID",
+                        "description": "Label for select option back of national ID",
                         "id": "form.field.label.docTypeNIDBack"
                       }
                     }
@@ -10282,7 +10178,7 @@
                     {
                       "description": "Hidden for Parent Details none or Father only",
                       "action": "hide",
-                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"NONE\") || (draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"MOTHER_ONLY\") || (draftData && draftData.father && draftData.father.fathersDetailsExist === false)"
+                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === 'NONE') || (draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === 'MOTHER_ONLY') || (draftData && draftData.father && draftData.father.fathersDetailsExist === false)"
                     }
                   ],
                   "mapping": {
@@ -10299,7 +10195,7 @@
                   "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                   "label": {
                     "defaultMessage": "Proof of informant's ID",
-                    "description": "Option for radio group field: Type of Document To Upload",
+                    "description": "Option for radio group ",
                     "id": "form.field.label.informantIDProof"
                   },
                   "initialValue": "",
@@ -10343,7 +10239,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "(draftData && draftData.registration && draftData.registration.informantType !== \"LEGAL_GUARDIAN\" && draftData.registration.informantType !== \"OTHER\")"
+                      "expression": "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantType && (selectedInformantType === 'MOTHER' || selectedInformantType === 'FATHER'))"
                     }
                   ],
                   "mapping": {
@@ -10360,7 +10256,7 @@
                   "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                   "label": {
                     "defaultMessage": "Proof of legal guardianship",
-                    "description": "Option for radio group field: Type of Document To Upload",
+                    "description": "Option for radio group ",
                     "id": "form.field.label.legalGuardianProof"
                   },
                   "initialValue": "",
@@ -10380,7 +10276,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "(draftData && draftData.registration && draftData.registration.informantType !== \"LEGAL_GUARDIAN\")"
+                      "expression": "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantType && (selectedInformantType !== 'LEGAL_GUARDIAN'))"
                     }
                   ],
                   "mapping": {
@@ -10397,7 +10293,7 @@
                   "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                   "label": {
                     "defaultMessage": "Proof of assigned responsibility",
-                    "description": "Option for radio group field: Type of Document To Upload",
+                    "description": "Option for radio group ",
                     "id": "form.field.label.assignedResponsibilityProof"
                   },
                   "initialValue": "",
@@ -10417,7 +10313,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "(draftData && draftData.registration && draftData.registration.informantType !== \"OTHER\")"
+                      "expression": "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantType && (selectedInformantType === 'MOTHER' || selectedInformantType === 'FATHER'))"
                     }
                   ],
                   "mapping": {
@@ -10426,273 +10322,6 @@
                     },
                     "query": {
                       "operation": "deathAttachmentToFieldTransformer"
-                    }
-                  }
-                },
-                {
-                  "name": "uploadDocForParentPermanentAddress",
-                  "type": "DOCUMENT_UPLOADER_WITH_OPTION",
-                  "label": {
-                    "defaultMessage": "Proof of permanent address of parent",
-                    "description": "Label for list item Parent Permanent Address Proof",
-                    "id": "form.field.label.proofOfParentPermanentAddress"
-                  },
-                  "initialValue": "",
-                  "extraValue": "PARENT",
-                  "hideAsterisk": true,
-                  "validate": [],
-                  "options": [
-                    {
-                      "value": "Tax Payment Receipt",
-                      "label": {
-                        "defaultMessage": "Receipt of tax payment",
-                        "description": "Document type label for tax receipt",
-                        "id": "form.field.label.docTypeTaxReceipt"
-                      }
-                    },
-                    {
-                      "value": "Other",
-                      "label": {
-                        "defaultMessage": "Other",
-                        "description": "Label for radio option Other",
-                        "id": "form.field.label.docTypeOther"
-                      }
-                    }
-                  ],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "((draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"NONE\") || (draftData.mother && draftData.mother.iDType === \"NATIONAL_ID\") || (draftData.father && draftData.father.iDType === \"NATIONAL_ID\"))"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "birthFieldToAttachmentTransformer"
-                    },
-                    "query": {
-                      "operation": "birthAttachmentToFieldTransformer"
-                    }
-                  }
-                },
-                {
-                  "name": "uploadDocForChildDOB",
-                  "type": "DOCUMENT_UPLOADER_WITH_OPTION",
-                  "label": {
-                    "defaultMessage": "Proof of place and date of birth",
-                    "description": "Label for select option Child Birth Proof",
-                    "id": "form.field.label.docTypeChildBirthProof"
-                  },
-                  "initialValue": "",
-                  "extraValue": "CHILD",
-                  "hideAsterisk": true,
-                  "validate": [],
-                  "options": [
-                    {
-                      "value": "Discharge Certificate",
-                      "label": {
-                        "defaultMessage": "Discharge certificate",
-                        "description": "Document type label for Discharge Certificate",
-                        "id": "form.field.label.docHospDischCert"
-                      }
-                    },
-                    {
-                      "value": "Proof of birth from medical institution",
-                      "label": {
-                        "defaultMessage": "Proof of birth from medical institution",
-                        "description": "Document type label for Proof of birth from medical institution",
-                        "id": "form.field.label.docTypeMedicalInstitution"
-                      }
-                    },
-                    {
-                      "value": "Proof of birth from birth attendant",
-                      "label": {
-                        "defaultMessage": "Proof of birth from birth attendant",
-                        "description": "Document type label for Proof of birth from birth attendant",
-                        "id": "form.field.label.docTypebirthAttendant"
-                      }
-                    },
-                    {
-                      "value": "Other",
-                      "label": {
-                        "defaultMessage": "Other",
-                        "description": "Label for radio option Other",
-                        "id": "form.field.label.docTypeOther"
-                      }
-                    }
-                  ],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"between46daysTo5yrs\")"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"NONE\")"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "(draftData && draftData.registration.informantType === \"LEGAL_GUARDIAN\")"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "birthFieldToAttachmentTransformer"
-                    },
-                    "query": {
-                      "operation": "birthAttachmentToFieldTransformer"
-                    }
-                  }
-                },
-                {
-                  "name": "uploadDocForChildAge",
-                  "type": "DOCUMENT_UPLOADER_WITH_OPTION",
-                  "label": {
-                    "defaultMessage": "Proof of Child Age",
-                    "description": "Label for select option Child Age Proof",
-                    "id": "form.field.label.docTypeChildAgeProof"
-                  },
-                  "initialValue": "",
-                  "extraValue": "CHILD_AGE",
-                  "hideAsterisk": true,
-                  "validate": [],
-                  "options": [
-                    {
-                      "value": "EPI Card",
-                      "label": {
-                        "defaultMessage": "EPI Card",
-                        "description": "Label for select option EPI Card",
-                        "id": "form.field.label.docTypeEPICard"
-                      }
-                    },
-                    {
-                      "value": "EPI Staff Certificate",
-                      "label": {
-                        "defaultMessage": "EPI Staff Certificate",
-                        "description": "Label for select option EPI Card",
-                        "id": "form.field.label.docTypeEPIStaffCertificate"
-                      }
-                    },
-                    {
-                      "value": "Doctor Certificate",
-                      "label": {
-                        "defaultMessage": "Doctor Certificate",
-                        "description": "Label for select option Doctor Certificate",
-                        "id": "form.field.label.docTypeDoctorCertificate"
-                      }
-                    },
-                    {
-                      "value": "Other",
-                      "label": {
-                        "defaultMessage": "Other",
-                        "description": "Label for radio option Other",
-                        "id": "form.field.label.docTypeOther"
-                      }
-                    }
-                  ],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"withinTargetdays\") || !draftData.child || !draftData.child.childBirthDate"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"after5yrs\")  || !draftData.child || !draftData.child.childBirthDate"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "birthFieldToAttachmentTransformer"
-                    },
-                    "query": {
-                      "operation": "birthAttachmentToFieldTransformer"
-                    }
-                  }
-                },
-                {
-                  "name": "uploadDocForChildAge",
-                  "type": "DOCUMENT_UPLOADER_WITH_OPTION",
-                  "label": {
-                    "defaultMessage": "Proof of Child Age",
-                    "description": "Label for select option Child Age Proof",
-                    "id": "form.field.label.docTypeChildAgeProof"
-                  },
-                  "initialValue": "",
-                  "extraValue": "CHILD_AGE",
-                  "hideAsterisk": true,
-                  "validate": [],
-                  "options": [
-                    {
-                      "value": "Doctor Certificate",
-                      "label": {
-                        "defaultMessage": "Doctor Certificate",
-                        "description": "Label for select option Doctor Certificate",
-                        "id": "form.field.label.docTypeDoctorCertificate"
-                      }
-                    },
-                    {
-                      "value": "School Certificate",
-                      "label": {
-                        "defaultMessage": "School Certificate",
-                        "description": "Label for radio option School Certificate",
-                        "id": "form.field.label.docTypeSC"
-                      }
-                    },
-                    {
-                      "value": "Other",
-                      "label": {
-                        "defaultMessage": "Other",
-                        "description": "Label for radio option Other",
-                        "id": "form.field.label.docTypeOther"
-                      }
-                    }
-                  ],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"withinTargetdays\") || !draftData.child || !draftData.child.childBirthDate"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"between46daysTo5yrs\") || !draftData.child || !draftData.child.childBirthDate"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "birthFieldToAttachmentTransformer"
-                    },
-                    "query": {
-                      "operation": "birthAttachmentToFieldTransformer"
-                    }
-                  }
-                },
-                {
-                  "name": "uploadDocFromCounsilor",
-                  "type": "DOCUMENT_UPLOADER_WITH_OPTION",
-                  "label": {
-                    "defaultMessage": "Ward councillor acknowledgement",
-                    "description": "Label for select Ward councillor acknowledgement",
-                    "id": "form.field.label.docTypeWardAck"
-                  },
-                  "initialValue": "",
-                  "extraValue": "WARD_COUNCILLOR_PROOF",
-                  "hideAsterisk": true,
-                  "validate": [],
-                  "options": [
-                    {
-                      "value": "Letter from ward councillor",
-                      "label": {
-                        "defaultMessage": "Letter from ward councillor",
-                        "description": "Document type label for Letter from ward councillor",
-                        "id": "form.field.label.docTypeLetterFromCouncillor"
-                      }
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "birthFieldToAttachmentTransformer"
-                    },
-                    "query": {
-                      "operation": "birthAttachmentToFieldTransformer"
                     }
                   }
                 }
@@ -10719,92 +10348,133 @@
           },
           "groups": [
             {
-              "id": "other-relationship-with-deceased",
+              "id": "who-is-applying-view-group",
               "title": {
-                "defaultMessage": "What is the informant's relationship to the deceased?",
-                "description": "Form section title for primary informant",
-                "id": "register.selInf.deathInfSomeoneElse"
+                "defaultMessage": "Who is applying for birth registration?",
+                "description": "Who is applying for birth registration",
+                "id": "register.selectInformant.birthInformantTitle"
               },
-              "conditionals": [
-                {
-                  "action": "hide",
-                  "expression": "(!draftData || !draftData.informant || ![\"OTHER\", \"OFFICER_IN_CHARGE\", \"DRIVER_OF_THE_VEHICLE\", \"OWNER_OF_THE_HOUSE\", \"HEAD_OF_THE_INSTITUTE\"].includes(draftData.informant.relationship))"
-                }
-              ],
-              "showExitButtonOnly": true,
+              "conditionals": [],
               "preventContinueIfError": true,
+              "showExitButtonOnly": true,
               "fields": [
                 {
-                  "name": "relationship",
+                  "name": "informantType",
                   "type": "RADIO_GROUP_WITH_NESTED_FIELDS",
                   "label": {
-                    "defaultMessage": "What is the informant's relationship to the deceased?",
-                    "description": "Form section title for primary informant",
-                    "id": "register.selInf.deathInfSomeoneElse"
+                    "defaultMessage": "Who is applying for birth registration?",
+                    "description": "Who is applying for birth registration",
+                    "id": "register.selectInformant.birthInformantTitle"
                   },
                   "hideHeader": true,
-                  "size": "large",
                   "required": true,
+                  "hideInPreview": false,
                   "initialValue": "",
                   "validate": [],
+                  "size": "large",
                   "options": [
                     {
-                      "value": "HEAD_OF_THE_INSTITUTE",
+                      "value": "MOTHER",
                       "label": {
-                        "defaultMessage": "Head of the institution where the death occurred",
-                        "description": "Option for form field: Head of the institute",
-                        "id": "form.field.label.informantRelation.headInst"
+                        "defaultMessage": "Mother",
+                        "description": "Label for option mother",
+                        "id": "form.field.label.informantRelation.mother"
                       }
                     },
                     {
-                      "value": "OWNER_OF_THE_HOUSE",
+                      "value": "FATHER",
                       "label": {
-                        "defaultMessage": "Owner of the house or building where the death occurred",
-                        "description": "Option for form field: Owner of the house",
-                        "id": "form.field.label.informantRelation.owner"
+                        "defaultMessage": "Father",
+                        "description": "Label for option father",
+                        "id": "form.field.label.informantRelation.father"
                       }
                     },
                     {
-                      "value": "DRIVER_OF_THE_VEHICLE",
+                      "value": "GRANDFATHER",
                       "label": {
-                        "defaultMessage": "Driver or operator of the land or water vehicle or aircraft where the death occurred",
-                        "description": "Option for form field: Driver of the vehicle",
-                        "id": "form.field.label.informantRelation.driver"
+                        "defaultMessage": "Grandfather",
+                        "description": "Label for option Grandfather",
+                        "id": "form.field.label.informantRelation.grandfather"
                       }
                     },
                     {
-                      "value": "OFFICER_IN_CHARGE",
+                      "value": "GRANDMOTHER",
                       "label": {
-                        "defaultMessage": "Officer-in-charge of the Thana of a road or public space where the death occurred",
-                        "description": "Option for form field: Officer-in-charge",
-                        "id": "form.field.label.informantRelation.officer"
+                        "defaultMessage": "Grandmother",
+                        "description": "Label for option Grandmother",
+                        "id": "form.field.label.informantRelation.grandmother"
+                      }
+                    },
+                    {
+                      "value": "BROTHER",
+                      "label": {
+                        "defaultMessage": "Brother",
+                        "description": "Label for option brother",
+                        "id": "form.field.label.informantRelation.brother"
+                      }
+                    },
+                    {
+                      "value": "SISTER",
+                      "label": {
+                        "defaultMessage": "Sister",
+                        "description": "Label for option Sister",
+                        "id": "form.field.label.informantRelation.sister"
+                      }
+                    },
+                    {
+                      "value": "OTHER_FAMILY_MEMBER",
+                      "label": {
+                        "defaultMessage": "Other family member",
+                        "description": "Label for other family member relation",
+                        "id": "form.field.label.relationOtherFamilyMember"
+                      }
+                    },
+                    {
+                      "value": "LEGAL_GUARDIAN",
+                      "label": {
+                        "defaultMessage": "Legal guardian",
+                        "description": "Label for option Legal Guardian",
+                        "id": "form.field.label.informantRelation.legalGuardian"
                       }
                     },
                     {
                       "value": "OTHER",
                       "label": {
                         "defaultMessage": "Someone else",
-                        "description": "Option for form field: Someone else",
-                        "id": "form.field.label.relationSomeoneElse"
+                        "description": "Label for option someone else",
+                        "id": "form.field.label.informantRelation.others"
                       }
                     }
                   ],
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
                   "nestedFields": {
+                    "MOTHER": [],
+                    "FATHER": [],
+                    "GRANDFATHER": [],
+                    "GRANDMOTHER": [],
+                    "BROTHER": [],
+                    "SISTER": [],
+                    "OTHER_FAMILY_MEMBER": [],
+                    "LEGAL_GUARDIAN": [],
                     "OTHER": [
                       {
-                        "name": "otherRelationship",
+                        "name": "otherInformantType",
                         "type": "TEXT",
                         "label": {
-                          "defaultMessage": "Relationship to deceased",
-                          "id": "register.selectInformant.relationshipLabel",
-                          "description": "Label for input Relationship to deceased"
+                          "defaultMessage": "Relationship to child",
+                          "description": "Label for Relationship to child",
+                          "id": "form.field.label.informantsRelationWithChild"
                         },
                         "placeholder": {
                           "defaultMessage": "eg. Grandmother",
-                          "description": "Placeholder for example of relationship",
+                          "description": "Relationship place holder",
                           "id": "form.field.label.relationshipPlaceHolder"
                         },
-                        "required": true,
+                        "required": false,
                         "initialValue": "",
                         "validate": [
                           {
@@ -10814,44 +10484,52 @@
                         "mapping": {
                           "mutation": {
                             "operation": "changeHirerchyMutationTransformer",
-                            "parameters": ["informant.otherRelationship"]
+                            "parameters": ["registration.otherInformantType"]
                           },
                           "query": {
                             "operation": "changeHirerchyQueryTransformer",
-                            "parameters": ["informant.otherRelationship"]
+                            "parameters": ["registration.otherInformantType"]
                           }
                         }
                       }
-                    ],
-                    "OFFICER_IN_CHARGE": [],
-                    "DRIVER_OF_THE_VEHICLE": [],
-                    "OWNER_OF_THE_HOUSE": [],
-                    "HEAD_OF_THE_INSTITUTE": []
+                    ]
                   },
-                  "conditionals": [],
                   "mapping": {
                     "mutation": {
                       "operation": "nestedRadioFieldToBundleFieldTransformer",
-                      "parameters": ["informant.relationship"]
+                      "parameters": ["registration.informantType"]
                     },
                     "query": {
                       "operation": "bundleFieldToNestedRadioFieldTransformer",
-                      "parameters": ["informant.relationship"]
+                      "parameters": ["registration.informantType"]
                     }
                   }
                 }
               ]
             },
             {
-              "id": "point-of-contact",
+              "id": "contact-view-group",
               "title": {
                 "defaultMessage": "Who is the main point of contact for this declaration?",
                 "description": "Form section title for contact point",
                 "id": "register.SelectContactPoint.heading"
               },
+              "conditionals": [],
               "preventContinueIfError": true,
               "showExitButtonOnly": true,
-              "conditionals": [],
+              "previewGroups": [
+                {
+                  "id": "contactPointGroup",
+                  "label": {
+                    "defaultMessage": "Main Contact",
+                    "description": "Label for point of contact on the review page",
+                    "id": "form.review.label.mainContact"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "fieldToRedirect": "contactPoint"
+                }
+              ],
               "fields": [
                 {
                   "name": "contactPoint",
@@ -10862,8 +10540,9 @@
                     "id": "register.SelectContactPoint.heading"
                   },
                   "conditionals": [],
-                  "hideHeader": true,
+                  "previewGroup": "contactPointGroup",
                   "required": true,
+                  "hideHeader": true,
                   "initialValue": "",
                   "validate": [],
                   "size": "large",
@@ -10874,24 +10553,80 @@
                   },
                   "options": [
                     {
-                      "value": "INFORMANT",
+                      "value": "MOTHER",
                       "label": {
-                        "defaultMessage": "Informant",
-                        "description": "Label for \"Informant\" radio option",
-                        "id": "form.field.label.app.whoContDet.app"
+                        "defaultMessage": "Mother",
+                        "description": "Label for option mother",
+                        "id": "form.field.label.informantRelation.mother"
+                      }
+                    },
+                    {
+                      "value": "FATHER",
+                      "label": {
+                        "defaultMessage": "Father",
+                        "description": "Label for option father",
+                        "id": "form.field.label.informantRelation.father"
+                      }
+                    },
+                    {
+                      "value": "GRANDFATHER",
+                      "label": {
+                        "defaultMessage": "Grandfather",
+                        "description": "Label for option Grandfather",
+                        "id": "form.field.label.informantRelation.grandfather"
+                      }
+                    },
+                    {
+                      "value": "GRANDMOTHER",
+                      "label": {
+                        "defaultMessage": "Grandmother",
+                        "description": "Label for option Grandmother",
+                        "id": "form.field.label.informantRelation.grandmother"
+                      }
+                    },
+                    {
+                      "value": "BROTHER",
+                      "label": {
+                        "defaultMessage": "Brother",
+                        "description": "Label for option brother",
+                        "id": "form.field.label.informantRelation.brother"
+                      }
+                    },
+                    {
+                      "value": "SISTER",
+                      "label": {
+                        "defaultMessage": "Sister",
+                        "description": "Label for option Sister",
+                        "id": "form.field.label.informantRelation.sister"
+                      }
+                    },
+                    {
+                      "value": "OTHER_FAMILY_MEMBER",
+                      "label": {
+                        "defaultMessage": "Other family member",
+                        "description": "Label for other family member relation",
+                        "id": "form.field.label.relationOtherFamilyMember"
+                      }
+                    },
+                    {
+                      "value": "LEGAL_GUARDIAN",
+                      "label": {
+                        "defaultMessage": "Legal guardian",
+                        "description": "Label for option Legal Guardian",
+                        "id": "form.field.label.informantRelation.legalGuardian"
                       }
                     },
                     {
                       "value": "OTHER",
                       "label": {
                         "defaultMessage": "Someone else",
-                        "description": "Label for \"Someone else\" radio option",
-                        "id": "form.field.label.someoneElse"
+                        "description": "Label for option someone else",
+                        "id": "form.field.label.informantRelation.others"
                       }
                     }
                   ],
                   "nestedFields": {
-                    "INFORMANT": [
+                    "MOTHER": [
                       {
                         "name": "registrationPhone",
                         "type": "TEL",
@@ -10900,7 +10635,271 @@
                           "description": "Input label for phone input",
                           "id": "form.field.label.phoneNumber"
                         },
-                        "required": true,
+                        "required": false,
+                        "initialValue": "",
+                        "validate": [
+                          {
+                            "operation": "phoneNumberFormat"
+                          }
+                        ],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "changeHirerchyMutationTransformer",
+                            "parameters": [
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "msisdnTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
+                            ]
+                          },
+                          "query": {
+                            "operation": "changeHirerchyQueryTransformer",
+                            "parameters": [
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "localPhoneTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    "FATHER": [
+                      {
+                        "name": "registrationPhone",
+                        "type": "TEL",
+                        "label": {
+                          "defaultMessage": "Phone number",
+                          "description": "Input label for phone input",
+                          "id": "form.field.label.phoneNumber"
+                        },
+                        "required": false,
+                        "initialValue": "",
+                        "validate": [
+                          {
+                            "operation": "phoneNumberFormat"
+                          }
+                        ],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "changeHirerchyMutationTransformer",
+                            "parameters": [
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "msisdnTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
+                            ]
+                          },
+                          "query": {
+                            "operation": "changeHirerchyQueryTransformer",
+                            "parameters": [
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "localPhoneTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    "GRANDFATHER": [
+                      {
+                        "name": "registrationPhone",
+                        "type": "TEL",
+                        "label": {
+                          "defaultMessage": "Phone number",
+                          "description": "Input label for phone input",
+                          "id": "form.field.label.phoneNumber"
+                        },
+                        "required": false,
+                        "initialValue": "",
+                        "validate": [
+                          {
+                            "operation": "phoneNumberFormat"
+                          }
+                        ],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "changeHirerchyMutationTransformer",
+                            "parameters": [
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "msisdnTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
+                            ]
+                          },
+                          "query": {
+                            "operation": "changeHirerchyQueryTransformer",
+                            "parameters": [
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "localPhoneTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    "GRANDMOTHER": [
+                      {
+                        "name": "registrationPhone",
+                        "type": "TEL",
+                        "label": {
+                          "defaultMessage": "Phone number",
+                          "description": "Input label for phone input",
+                          "id": "form.field.label.phoneNumber"
+                        },
+                        "required": false,
+                        "initialValue": "",
+                        "validate": [
+                          {
+                            "operation": "phoneNumberFormat"
+                          }
+                        ],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "changeHirerchyMutationTransformer",
+                            "parameters": [
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "msisdnTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
+                            ]
+                          },
+                          "query": {
+                            "operation": "changeHirerchyQueryTransformer",
+                            "parameters": [
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "localPhoneTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    "BROTHER": [
+                      {
+                        "name": "registrationPhone",
+                        "type": "TEL",
+                        "label": {
+                          "defaultMessage": "Phone number",
+                          "description": "Input label for phone input",
+                          "id": "form.field.label.phoneNumber"
+                        },
+                        "required": false,
+                        "initialValue": "",
+                        "validate": [
+                          {
+                            "operation": "phoneNumberFormat"
+                          }
+                        ],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "changeHirerchyMutationTransformer",
+                            "parameters": [
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "msisdnTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
+                            ]
+                          },
+                          "query": {
+                            "operation": "changeHirerchyQueryTransformer",
+                            "parameters": [
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "localPhoneTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    "SISTER": [
+                      {
+                        "name": "registrationPhone",
+                        "type": "TEL",
+                        "label": {
+                          "defaultMessage": "Phone number",
+                          "description": "Input label for phone input",
+                          "id": "form.field.label.phoneNumber"
+                        },
+                        "required": false,
+                        "initialValue": "",
+                        "validate": [
+                          {
+                            "operation": "phoneNumberFormat"
+                          }
+                        ],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "changeHirerchyMutationTransformer",
+                            "parameters": [
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "msisdnTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
+                            ]
+                          },
+                          "query": {
+                            "operation": "changeHirerchyQueryTransformer",
+                            "parameters": [
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "localPhoneTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    "LEGAL_GUARDIAN": [
+                      {
+                        "name": "registrationPhone",
+                        "type": "TEL",
+                        "label": {
+                          "defaultMessage": "Phone number",
+                          "description": "Input label for phone input",
+                          "id": "form.field.label.phoneNumber"
+                        },
+                        "required": false,
                         "initialValue": "",
                         "validate": [
                           {
@@ -10937,37 +10936,6 @@
                     ],
                     "OTHER": [
                       {
-                        "name": "contactRelationship",
-                        "type": "TEXT",
-                        "label": {
-                          "defaultMessage": "Relationship to deceased",
-                          "id": "register.selectInformant.relationshipLabel",
-                          "description": "Label for input Relationship to deceased"
-                        },
-                        "placeholder": {
-                          "defaultMessage": "eg. Grandmother",
-                          "description": "Placeholder for example of relationship",
-                          "id": "form.field.label.relationshipPlaceHolder"
-                        },
-                        "required": true,
-                        "initialValue": "",
-                        "validate": [
-                          {
-                            "operation": "englishOnlyNameFormat"
-                          }
-                        ],
-                        "mapping": {
-                          "mutation": {
-                            "operation": "changeHirerchyMutationTransformer",
-                            "parameters": ["registration.contactRelationship"]
-                          },
-                          "query": {
-                            "operation": "changeHirerchyQueryTransformer",
-                            "parameters": ["registration.contactRelationship"]
-                          }
-                        }
-                      },
-                      {
                         "name": "registrationPhone",
                         "type": "TEL",
                         "label": {
@@ -10975,7 +10943,7 @@
                           "description": "Input label for phone input",
                           "id": "form.field.label.phoneNumber"
                         },
-                        "required": true,
+                        "required": false,
                         "initialValue": "",
                         "validate": [
                           {
