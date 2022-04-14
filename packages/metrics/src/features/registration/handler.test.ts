@@ -286,7 +286,7 @@ describe('When a new registration event is received', () => {
             multipleBirthInteger: 1,
             address: [
               {
-                type: 'PERMANENT',
+                type: 'PRIMARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -300,7 +300,7 @@ describe('When a new registration event is received', () => {
                 country: 'BGD'
               },
               {
-                type: 'CURRENT',
+                type: 'SECONDARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -542,7 +542,7 @@ describe('When a new registration event is received', () => {
             multipleBirthInteger: 1,
             address: [
               {
-                type: 'PERMANENT',
+                type: 'PRIMARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -556,7 +556,7 @@ describe('When a new registration event is received', () => {
                 country: 'BGD'
               },
               {
-                type: 'CURRENT',
+                type: 'SECONDARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -782,7 +782,7 @@ describe('When a new registration event is received', () => {
             multipleBirthInteger: 1,
             address: [
               {
-                type: 'PERMANENT',
+                type: 'PRIMARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -796,7 +796,7 @@ describe('When a new registration event is received', () => {
                 country: 'BGD'
               },
               {
-                type: 'CURRENT',
+                type: 'SECONDARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -1022,7 +1022,7 @@ describe('When a new registration event is received', () => {
             multipleBirthInteger: 1,
             address: [
               {
-                type: 'PERMANENT',
+                type: 'PRIMARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -1036,7 +1036,7 @@ describe('When a new registration event is received', () => {
                 country: 'BGD'
               },
               {
-                type: 'CURRENT',
+                type: 'SECONDARY_ADDRESS',
                 line: [
                   '',
                   '',

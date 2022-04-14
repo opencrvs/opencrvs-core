@@ -379,7 +379,7 @@
         },
         "address": [
           {
-            "type": "PERMANENT",
+            "type": "PRIMARY_ADDRESS",
             "line": ["", "", "", "", "", "", "URBAN"],
             "district": "1b49e1f7-7ca2-4417-8649-88b810289108",
             "state": "ec34cfe2-b566-4140-af22-71ff17d832d6",
@@ -454,7 +454,7 @@
         ],
         "address": [
           {
-            "type": "PERMANENT",
+            "type": "PRIMARY_ADDRESS",
             "line": ["", "", "", "", "", "", "URBAN"],
             "district": "1b49e1f7-7ca2-4417-8649-88b810289108",
             "state": "ec34cfe2-b566-4140-af22-71ff17d832d6",
@@ -541,12 +541,12 @@
           "coding": [
             {
               "system": "http://opencrvs.org/specs/location-type",
-              "code": "PERMANENT"
+              "code": "PRIMARY_ADDRESS"
             }
           ]
         },
         "address": {
-          "type": "PERMANENT",
+          "type": "PRIMARY_ADDRESS",
           "line": ["", "", "", "", "", "", "URBAN"],
           "district": "1b49e1f7-7ca2-4417-8649-88b810289108",
           "state": "ec34cfe2-b566-4140-af22-71ff17d832d6",

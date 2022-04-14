@@ -13,7 +13,7 @@
 import {
   IFormConfig,
   ISerializedForm,
-  IQuestionIdentifiers,
+  IIdentifiers,
   IQuestionConfig,
   SerializedFormField,
   ISerializedFormSection,
@@ -74,9 +74,7 @@ export function getGroup(groups: IGroups, id: string): IGroup {
   }
 }
 
-export function getQuestionsIdentifiersFromFieldId(
-  fieldId: string
-): IQuestionIdentifiers {
+export function getIdentifiersFromFieldId(fieldId: string): IIdentifiers {
   const splitIds = fieldId.split('.')
   return {
     event: splitIds[0],

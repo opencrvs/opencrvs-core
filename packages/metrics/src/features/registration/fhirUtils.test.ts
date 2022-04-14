@@ -171,7 +171,7 @@ describe('fhirUtils', () => {
             multipleBirthInteger: 1,
             address: [
               {
-                type: 'PERMANENT',
+                type: 'PRIMARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -185,7 +185,7 @@ describe('fhirUtils', () => {
                 country: 'BGD'
               },
               {
-                type: 'CURRENT',
+                type: 'SECONDARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -323,7 +323,7 @@ describe('fhirUtils', () => {
             multipleBirthInteger: 1,
             address: [
               {
-                type: 'PERMANENT',
+                type: 'PRIMARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -337,7 +337,7 @@ describe('fhirUtils', () => {
                 country: 'BGD'
               },
               {
-                type: 'CURRENT',
+                type: 'SECONDARY_ADDRESS',
                 line: [
                   '',
                   '',

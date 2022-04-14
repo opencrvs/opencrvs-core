@@ -110,7 +110,7 @@ describe('when user is in the register form for birth event', () => {
     it('changes the country select', async () => {
       const select = selectOption(
         component,
-        '#countryPermanent',
+        '#countryPrimary',
         'United States of America'
       )
       expect(select.text()).toEqual('United States of America')
@@ -1287,12 +1287,12 @@ describe('When user is in Preview section death event', () => {
 
   it('Check if death location is deceased parmanent address', () => {
     const mockDeathDeclaration = clone(mockDeathDeclarationData)
-    mockDeathDeclaration.deathEvent.deathPlaceAddress = 'PERMANENT'
+    mockDeathDeclaration.deathEvent.deathPlaceAddress = 'PRIMARY_ADDRESS'
 
     expect(
       draftToGqlTransformer(deathForm, mockDeathDeclaration as IFormData)
         .eventLocation.address.type
-    ).toBe('PERMANENT')
+    ).toBe('PRIMARY_ADDRESS')
   })
 
   it('Death location should be undefined if no decased address is found', () => {
@@ -1310,7 +1310,7 @@ describe('When user is in Preview section death event', () => {
       maritalStatus: 'MARRIED',
       birthDate: '1987-02-16'
     }
-    mockDeathDeclaration.deathEvent.deathPlaceAddress = 'CURRENT'
+    mockDeathDeclaration.deathEvent.deathPlaceAddress = 'SECONDARY_ADDRESS'
 
     expect(
       draftToGqlTransformer(deathForm, mockDeathDeclaration as IFormData)

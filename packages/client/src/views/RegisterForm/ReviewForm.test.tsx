@@ -193,7 +193,7 @@ describe('ReviewForm tests', () => {
                 identifier: [{ id: '1233', type: 'PASSPORT', otherType: '' }],
                 address: [
                   {
-                    type: 'PERMANENT',
+                    type: 'PRIMARY_ADDRESS',
                     line: ['12', '', 'union1', 'upazila10'],
                     district: 'district2',
                     state: 'state2',
@@ -202,7 +202,7 @@ describe('ReviewForm tests', () => {
                     country: 'BGD'
                   },
                   {
-                    type: 'CURRENT',
+                    type: 'SECONDARY_ADDRESS',
                     line: ['12', '', 'union1', 'upazila10'],
                     district: 'district2',
                     state: 'state2',
@@ -363,7 +363,7 @@ describe('ReviewForm tests', () => {
                 identifier: [{ id: '1233', type: 'PASSPORT', otherType: '' }],
                 address: [
                   {
-                    type: 'PERMANENT',
+                    type: 'PRIMARY_ADDRESS',
                     line: ['12', '', 'union1', 'upazila10'],
                     district: 'district2',
                     state: 'state2',
@@ -372,7 +372,7 @@ describe('ReviewForm tests', () => {
                     country: 'BGD'
                   },
                   {
-                    type: 'CURRENT',
+                    type: 'SECONDARY_ADDRESS',
                     line: ['12', '', 'union1', 'upazila10'],
                     district: 'district2',
                     state: 'state2',
@@ -622,7 +622,7 @@ describe('ReviewForm tests', () => {
                 multipleBirth: 1,
                 address: [
                   {
-                    type: 'PERMANENT',
+                    type: 'PRIMARY_ADDRESS',
                     line: ['12', '', 'union1', 'upazila10'],
                     district: 'district2',
                     state: 'state2',
@@ -631,7 +631,7 @@ describe('ReviewForm tests', () => {
                     country: 'BGD'
                   },
                   {
-                    type: 'CURRENT',
+                    type: 'SECONDARY_ADDRESS',
                     line: ['12', '', 'union1', 'upazila10'],
                     district: 'district2',
                     state: 'state2',
@@ -1249,7 +1249,7 @@ describe('ReviewForm tests', () => {
                   },
                   address: [
                     {
-                      type: 'PERMANENT',
+                      type: 'PRIMARY_ADDRESS',
                       line: [
                         '121',
                         '',
@@ -1265,7 +1265,7 @@ describe('ReviewForm tests', () => {
                       country: 'BGD'
                     },
                     {
-                      type: 'CURRENT',
+                      type: 'SECONDARY_ADDRESS',
                       line: [
                         '121',
                         '',
@@ -1317,7 +1317,7 @@ describe('ReviewForm tests', () => {
                     ],
                     address: [
                       {
-                        type: 'CURRENT',
+                        type: 'SECONDARY_ADDRESS',
                         line: [
                           '12',
                           '',
@@ -1333,7 +1333,7 @@ describe('ReviewForm tests', () => {
                         country: 'BGD'
                       },
                       {
-                        type: 'PERMANENT',
+                        type: 'PRIMARY_ADDRESS',
                         line: [
                           '12',
                           '',
@@ -1414,7 +1414,7 @@ describe('ReviewForm tests', () => {
                 },
                 eventLocation: {
                   id: 'fccf6eac-4dae-43d3-af33-2c977d1daf99',
-                  type: 'CURRENT',
+                  type: 'SECONDARY_ADDRESS',
                   address: {
                     type: '',
                     line: ['', '', '', '', '', ''],
@@ -1477,18 +1477,18 @@ describe('ReviewForm tests', () => {
         gender: 'male',
         maritalStatus: 'MARRIED',
         birthDate: '1983-01-01',
-        countryPermanent: 'BGD',
-        statePermanent: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
-        districtPermanent: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
-        addressLine4Permanent: '34c377a0-2223-4361-851c-5e230a96d957',
-        addressLine3Permanent: '1f06d980-e254-4e6b-b049-a9b4e7155180',
-        addressLine3CityOptionPermanent: '',
-        addressLine2Permanent: '12',
-        addressLine1CityOptionPermanent: '',
-        postCodeCityOptionPermanent: '12',
-        addressLine1Permanent: '121',
-        postCodePermanent: '12',
-        currentAddressSameAsPermanent: true,
+        countryPrimary: 'BGD',
+        statePrimary: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
+        districtPrimary: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
+        addressLine4Primary: '34c377a0-2223-4361-851c-5e230a96d957',
+        addressLine3Primary: '1f06d980-e254-4e6b-b049-a9b4e7155180',
+        addressLine3CityOptionPrimary: '',
+        addressLine2Primary: '12',
+        addressLine1CityOptionPrimary: '',
+        postCodeCityOptionPrimary: '12',
+        addressLine1Primary: '121',
+        postCodePrimary: '12',
+        secondaryAddressSameAsPrimary: true,
         country: 'BGD',
         state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
         district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
@@ -1501,19 +1501,19 @@ describe('ReviewForm tests', () => {
         addressLine1: '121',
         postCode: '12',
         internationalAddressLine1: '',
-        internationalAddressLine1Permanent: '',
+        internationalAddressLine1Primary: '',
         internationalAddressLine2: '',
-        internationalAddressLine2Permanent: '',
+        internationalAddressLine2Primary: '',
         internationalAddressLine3: '',
-        internationalAddressLine3Permanent: '',
+        internationalAddressLine3Primary: '',
         internationalCity: '',
-        internationalCityPermanent: '',
+        internationalCityPrimary: '',
         internationalDistrict: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
-        internationalDistrictPermanent: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
+        internationalDistrictPrimary: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
         internationalPostcode: '12',
-        internationalPostcodePermanent: '12',
+        internationalPostcodePrimary: '12',
         internationalState: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
-        internationalStatePermanent: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
+        internationalStatePrimary: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
         _fhirID: '50fbd713-c86d-49fe-bc6a-52094b40d8dd'
       })
     })
@@ -1562,7 +1562,7 @@ describe('ReviewForm tests', () => {
                   },
                   address: [
                     {
-                      type: 'PERMANENT',
+                      type: 'PRIMARY_ADDRESS',
                       line: [
                         '121',
                         '',
@@ -1578,7 +1578,7 @@ describe('ReviewForm tests', () => {
                       country: 'BGD'
                     },
                     {
-                      type: 'CURRENT',
+                      type: 'SECONDARY_ADDRESS',
                       line: [
                         '121',
                         '',
@@ -1630,7 +1630,7 @@ describe('ReviewForm tests', () => {
                     ],
                     address: [
                       {
-                        type: 'CURRENT',
+                        type: 'SECONDARY_ADDRESS',
                         line: [
                           '12',
                           '',
@@ -1646,7 +1646,7 @@ describe('ReviewForm tests', () => {
                         country: 'BGD'
                       },
                       {
-                        type: 'PERMANENT',
+                        type: 'PRIMARY_ADDRESS',
                         line: [
                           '12',
                           '',
@@ -1727,7 +1727,7 @@ describe('ReviewForm tests', () => {
                 },
                 eventLocation: {
                   id: 'fccf6eac-4dae-43d3-af33-2c977d1daf99',
-                  type: 'CURRENT',
+                  type: 'SECONDARY_ADDRESS',
                   address: {
                     type: '',
                     line: ['', '', '', '', '', ''],

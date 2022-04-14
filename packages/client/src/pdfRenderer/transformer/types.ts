@@ -162,7 +162,7 @@ export interface IPersonIdentifierValuePayload {
 }
 
 // Based on the need, add more here
-export type ExecutorKey = 'CURRENT_DATE'
+export type ExecutorKey = 'SECONDARY_DATE'
 
 export interface IEventWiseKey {
   [event: string]: string // {birth: child.dob}

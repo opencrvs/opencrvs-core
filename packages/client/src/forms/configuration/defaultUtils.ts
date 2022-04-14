@@ -16,7 +16,7 @@ import {
   SerializedFormField
 } from '@client/forms/index'
 import { cloneDeep } from 'lodash'
-import { getGroup, getQuestionsIdentifiersFromFieldId, getSection } from '.'
+import { getGroup, getIdentifiersFromFieldId, getSection } from '.'
 
 // THIS FILE CONTAINS FUNCTIONS TO CONFIGURE THE DEFAULT CONFIGURATION
 
@@ -36,7 +36,7 @@ export function getDefaultField(
   form: ISerializedForm,
   fieldId: string
 ): IDefaultField | undefined {
-  const questionIdentifiers = getQuestionsIdentifiersFromFieldId(fieldId)
+  const questionIdentifiers = getIdentifiersFromFieldId(fieldId)
   const selectedSection = getSection(
     form.sections,
     questionIdentifiers.sectionId

@@ -462,14 +462,14 @@ const getLocation = (
   let locationType = ''
   let locationId = ''
   let locationDistrict = ''
-  let locationPermanent = ''
+  let locationPrimary = ''
   if (declaration.event === 'death') {
     locationType =
       declaration.data?.deathEvent?.deathPlaceAddress?.toString() || ''
     locationId = declaration.data?.deathEvent?.deathLocation?.toString() || ''
     locationDistrict = declaration.data?.deathEvent?.district?.toString() || ''
-    locationPermanent =
-      declaration.data?.deceased?.districtPermanent?.toString() || ''
+    locationPrimary =
+      declaration.data?.deceased?.districtPrimary?.toString() || ''
   } else {
     locationType = declaration.data?.child?.placeOfBirth?.toString() || ''
     locationId = declaration.data?.child?.birthLocation?.toString() || ''
@@ -484,8 +484,8 @@ const getLocation = (
     const location = resources.locations[locationDistrict]
     return generateLocationName(location, intl)
   }
-  if (locationType === 'PERMANENT') {
-    const district = resources.locations[locationPermanent]
+  if (locationType === 'PRIMARY_ADDRESS') {
+    const district = resources.locations[locationPrimary]
     return generateLocationName(district, intl)
   }
   return ''

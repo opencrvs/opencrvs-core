@@ -44,7 +44,7 @@
           },
           {
             "url": "http://opencrvs.org/specs/extension/in-complete-fields",
-            "valueString": "child/child-view-group/childBirthDate,child/child-view-group/familyName,child/child-view-group/familyNameEng,child/child-view-group/placeOfBirth,child/child-view-group/multipleBirth,mother/mother-view-group/iDType,mother/mother-view-group/familyName,mother/mother-view-group/familyNameEng,mother/mother-view-group/statePermanent,father/father-view-group/iDType,father/father-view-group/familyName,father/father-view-group/familyNameEng,father/father-view-group/state,father/father-view-group/statePermanent"
+            "valueString": "child/child-view-group/childBirthDate,child/child-view-group/familyName,child/child-view-group/familyNameEng,child/child-view-group/placeOfBirth,child/child-view-group/multipleBirth,mother/mother-view-group/iDType,mother/mother-view-group/familyName,mother/mother-view-group/familyNameEng,mother/mother-view-group/statePrimary,father/father-view-group/iDType,father/father-view-group/familyName,father/father-view-group/familyNameEng,father/father-view-group/state,father/father-view-group/statePrimary"
           },
           {
             "url": "http://opencrvs.org/specs/extension/regLastUser",

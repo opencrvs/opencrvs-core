@@ -302,14 +302,14 @@ export const mockBirthFhirBundle = {
         multipleBirthInteger: 1,
         address: [
           {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', '265abf9c-09d4-4b34-a0c6-336a53e23e4a'],
             district: 'a5010297-2d10-4109-8cb3-353ff9c084c2',
             state: '2414fc3f-7670-4d22-a053-5694858d72a2',
             country: 'BGD'
           },
           {
-            type: 'CURRENT',
+            type: 'SECONDARY_ADDRESS',
             line: ['', '', '', '', '', '265abf9c-09d4-4b34-a0c6-336a53e23e4a'],
             district: 'a5010297-2d10-4109-8cb3-353ff9c084c2',
             state: '2414fc3f-7670-4d22-a053-5694858d72a2',
@@ -405,14 +405,14 @@ export const mockBirthFhirBundle = {
         ],
         address: [
           {
-            type: 'CURRENT',
+            type: 'SECONDARY_ADDRESS',
             line: ['', '', '', '', '', '265abf9c-09d4-4b34-a0c6-336a53e23e4a'],
             district: 'a5010297-2d10-4109-8cb3-353ff9c084c2',
             state: '2414fc3f-7670-4d22-a053-5694858d72a2',
             country: 'BGD'
           },
           {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', '265abf9c-09d4-4b34-a0c6-336a53e23e4a'],
             district: 'a5010297-2d10-4109-8cb3-353ff9c084c2',
             state: '2414fc3f-7670-4d22-a053-5694858d72a2',
@@ -849,14 +849,14 @@ export const mockBirthFhirBundleWithoutCompositionId = {
         multipleBirthInteger: 1,
         address: [
           {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
             country: 'BGD'
           },
           {
-            type: 'CURRENT',
+            type: 'SECONDARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
@@ -1110,14 +1110,14 @@ export const mockDeathFhirBundle = {
         },
         address: [
           {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
             country: 'BGD'
           },
           {
-            type: 'CURRENT',
+            type: 'SECONDARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
@@ -1257,14 +1257,14 @@ export const mockDeathFhirBundle = {
         ],
         address: [
           {
-            type: 'CURRENT',
+            type: 'SECONDARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
             country: 'BGD'
           },
           {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
@@ -1324,12 +1324,12 @@ export const mockDeathFhirBundle = {
           coding: [
             {
               system: 'http://opencrvs.org/specs/location-type',
-              code: 'PERMANENT'
+              code: 'PRIMARY_ADDRESS'
             }
           ]
         },
         address: {
-          type: 'PERMANENT',
+          type: 'PRIMARY_ADDRESS',
           line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
           district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
           state: '9a236522-0c3d-40eb-83ad-e8567518c763',
@@ -1566,14 +1566,14 @@ export const mockDeathFhirBundleWithoutCompositionId = {
         },
         address: [
           {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
             country: 'BGD'
           },
           {
-            type: 'CURRENT',
+            type: 'SECONDARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
@@ -1656,14 +1656,14 @@ export const mockDeathFhirBundleWithoutCompositionId = {
         ],
         address: [
           {
-            type: 'CURRENT',
+            type: 'SECONDARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
             country: 'BGD'
           },
           {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
@@ -1723,12 +1723,12 @@ export const mockDeathFhirBundleWithoutCompositionId = {
           coding: [
             {
               system: 'http://opencrvs.org/specs/location-type',
-              code: 'PERMANENT'
+              code: 'PRIMARY_ADDRESS'
             }
           ]
         },
         address: {
-          type: 'PERMANENT',
+          type: 'PRIMARY_ADDRESS',
           line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
           district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
           state: '9a236522-0c3d-40eb-83ad-e8567518c763',
@@ -2842,14 +2842,14 @@ export const mockBirthFhirBundleWithoutParents = {
         multipleBirthInteger: 1,
         address: [
           {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', '265abf9c-09d4-4b34-a0c6-336a53e23e4a'],
             district: 'a5010297-2d10-4109-8cb3-353ff9c084c2',
             state: '2414fc3f-7670-4d22-a053-5694858d72a2',
             country: 'BGD'
           },
           {
-            type: 'CURRENT',
+            type: 'SECONDARY_ADDRESS',
             line: ['', '', '', '', '', '265abf9c-09d4-4b34-a0c6-336a53e23e4a'],
             district: 'a5010297-2d10-4109-8cb3-353ff9c084c2',
             state: '2414fc3f-7670-4d22-a053-5694858d72a2',
@@ -2926,14 +2926,14 @@ export const mockBirthFhirBundleWithoutParents = {
         ],
         address: [
           {
-            type: 'CURRENT',
+            type: 'SECONDARY_ADDRESS',
             line: ['', '', '', '', '', '265abf9c-09d4-4b34-a0c6-336a53e23e4a'],
             district: 'a5010297-2d10-4109-8cb3-353ff9c084c2',
             state: '2414fc3f-7670-4d22-a053-5694858d72a2',
             country: 'BGD'
           },
           {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', '265abf9c-09d4-4b34-a0c6-336a53e23e4a'],
             district: 'a5010297-2d10-4109-8cb3-353ff9c084c2',
             state: '2414fc3f-7670-4d22-a053-5694858d72a2',
@@ -3240,14 +3240,14 @@ export const mockMinimalDeathFhirBundle = {
         },
         address: [
           {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
             country: 'BGD'
           },
           {
-            type: 'CURRENT',
+            type: 'SECONDARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
@@ -3330,14 +3330,14 @@ export const mockMinimalDeathFhirBundle = {
         ],
         address: [
           {
-            type: 'CURRENT',
+            type: 'SECONDARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
             country: 'BGD'
           },
           {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
@@ -3397,12 +3397,12 @@ export const mockMinimalDeathFhirBundle = {
           coding: [
             {
               system: 'http://opencrvs.org/specs/location-type',
-              code: 'PERMANENT'
+              code: 'PRIMARY_ADDRESS'
             }
           ]
         },
         address: {
-          type: 'PERMANENT',
+          type: 'PRIMARY_ADDRESS',
           line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
           district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
           state: '9a236522-0c3d-40eb-83ad-e8567518c763',
