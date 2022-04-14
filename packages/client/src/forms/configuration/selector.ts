@@ -13,34 +13,33 @@ import { IStoreState } from '@client/store'
 import { IFormDraftDataState } from './reducer'
 import { Event } from '@client/forms'
 
-export const getFormDraftDataState = (
-  store: IStoreState
-): IFormDraftDataState => store.formDraft
+export const selectFormDraftData = (store: IStoreState): IFormDraftDataState =>
+  store.formDraft
 
 function getKey<K extends keyof IFormDraftDataState>(
   store: IStoreState,
   key: K
 ) {
-  return getFormDraftDataState(store)[key]
+  return selectFormDraftData(store)[key]
 }
 
 export function selectFormDraftLoaded(store: IStoreState) {
-  return getFormDraftDataState(store).formDraftDataLoaded
+  return selectFormDraftData(store).formDraftDataLoaded
 }
 
 export function selectEventFormDraft(store: IStoreState, event: Event) {
-  return getFormDraftDataState(store).formDraftData?.[event]
+  return selectFormDraftData(store).formDraftData?.[event]
 }
 
 export const getFormDraftData = (store: IStoreState): any =>
   getKey(store, 'formDraftData')
 
-export const getEventSectionFieldsMap = (
+export const selectEventSectionFieldsMap = (
   store: IStoreState,
   event: Event,
   section: string
 ) => {
-  const { formDraftData } = getFormDraftDataState(store)
+  const { formDraftData } = selectFormDraftData(store)
   if (!formDraftData) {
     throw new Error('FormDraft not loaded')
   }

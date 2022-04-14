@@ -14,14 +14,12 @@ import React from 'react'
 import { Box } from '@opencrvs/components/lib/interface'
 import { FormConfigElementCard } from '@opencrvs/components/lib/interface/FormConfigElementCard'
 import styled from '@client/styledComponents'
-import { connect } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { Event } from '@client/forms'
+import { Event, DeathSection, BirthSection } from '@client/forms'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
-import { getEventSectionFieldsMap } from '@client/forms/configuration/selector'
+import { selectEventSectionFieldsMap } from '@client/forms/configuration/selector'
 import { IConfigFormField } from '@client/forms/configuration/formDraftUtils'
-
-/* Further refactoring will be needed when merging with #2740 */
 
 const CanvasBox = styled(Box)`
   display: flex;
@@ -30,11 +28,6 @@ const CanvasBox = styled(Box)`
   border: 1px solid ${({ theme }) => theme.colors.grey300};
   border-radius: 4px;
 `
-
-type ICanvasProps = ReturnType<typeof mapStateToProps> & {
-  selectedField: null | IConfigFormField
-  onFieldSelect: (configField: IConfigFormField) => void
-}
 
 type IFormFieldMap = Record<string, IConfigFormField>
 
@@ -58,12 +51,24 @@ function generateConfigFields(formFieldMap: IFormFieldMap) {
   return configFields
 }
 
-export function CanvasView({
-  fieldsMap,
+type ICanvasProps = {
+  event: Event
+  selectedField: IConfigFormField | null
+  section: BirthSection | DeathSection
+  onFieldSelect: (field: IConfigFormField) => void
+}
+
+export function Canvas({
+  event,
+  section,
   selectedField,
   onFieldSelect
 }: ICanvasProps) {
+  const fieldsMap = useSelector((store: IStoreState) =>
+    selectEventSectionFieldsMap(store, event, section)
+  )
   const configFields = generateConfigFields(fieldsMap)
+
   return (
     <CanvasBox>
       {configFields.map((configField) => (
@@ -83,16 +88,3 @@ export function CanvasView({
     </CanvasBox>
   )
 }
-
-type IProps = {
-  event: Event
-  section: string
-}
-
-function mapStateToProps(store: IStoreState, { event, section }: IProps) {
-  return {
-    fieldsMap: getEventSectionFieldsMap(store, event, section)
-  }
-}
-
-export const Canvas = connect(mapStateToProps)(CanvasView)
