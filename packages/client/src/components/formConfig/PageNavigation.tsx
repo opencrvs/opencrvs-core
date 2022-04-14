@@ -16,9 +16,12 @@ import {
   NavigationSubItem,
   LabelContainer
 } from '@opencrvs/components/lib/interface/Navigation/NavigationSubItem'
-import { IForm, Event } from '@client/forms'
-import { IntlShape, useIntl } from 'react-intl'
-import { messages } from '@client/i18n/messages/views/formConfig'
+import { Event, BirthSection, DeathSection } from '@client/forms'
+import { useIntl } from 'react-intl'
+import {
+  messages,
+  navigationMessages
+} from '@client/i18n/messages/views/formConfig'
 import { goToFormConfigWizard } from '@client/navigation'
 import { connect } from 'react-redux'
 
@@ -36,30 +39,9 @@ const OrderedList = styled.ol`
 `
 
 interface IPageNavigationProps {
-  section: string
+  section: BirthSection | DeathSection
   event: Event
   goToFormConfigWizard: typeof goToFormConfigWizard
-}
-
-export const TAB_BIRTH = {
-  // introduction: 'introduction',
-  child: 'child',
-  mother: 'mother',
-  father: 'father',
-  informant: 'informant',
-  documents: 'documents'
-}
-
-export const TAB_DEATH = {
-  // introduction: 'introduction',
-  deceased: 'deceased',
-  deathEvent: 'deathEvent',
-  causeOfDeath: 'causeOfDeath',
-  mother: 'mother',
-  father: 'father',
-  spouse: 'spouse',
-  informant: 'informant',
-  documents: 'documents'
 }
 
 const PageItems = styled(NavigationSubItem)<{ isSelected: boolean }>`
@@ -75,23 +57,30 @@ export const PageNavigationView = ({
   goToFormConfigWizard
 }: IPageNavigationProps) => {
   const intl = useIntl()
-  const TAB = event === Event.BIRTH ? TAB_BIRTH : TAB_DEATH
+  const tabs = event === Event.BIRTH ? BirthSection : DeathSection
 
   return (
     <>
       <Title>{intl.formatMessage(messages.pages)}</Title>
       <OrderedList>
-        {(Object.keys(TAB) as Array<keyof typeof TAB>).map((tab, idx) => (
-          <li>
-            <PageItems
-              key={idx}
-              id={`${tab}_navigation`}
-              label={`${idx + 1}. ${intl.formatMessage(messages[TAB[tab]])}`}
-              isSelected={section === TAB[tab]}
-              onClick={() => goToFormConfigWizard(event, TAB[tab])}
-            />
-          </li>
-        ))}
+        {Object.values<BirthSection | DeathSection>(tabs).map((tab, idx) => {
+          if (tab === BirthSection.Preview || tab === DeathSection.Preview) {
+            return <></>
+          }
+          return (
+            <li>
+              <PageItems
+                key={idx}
+                id={`${tab}_navigation`}
+                label={`${idx + 1}. ${intl.formatMessage(
+                  navigationMessages[tab]
+                )}`}
+                isSelected={section === tab}
+                onClick={() => goToFormConfigWizard(event, tab)}
+              />
+            </li>
+          )
+        })}
       </OrderedList>
     </>
   )

@@ -10,19 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
+import { DeathSection, BirthSection } from '@client/forms'
 
 interface IFormConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   introduction: MessageDescriptor
-  child: MessageDescriptor
-  mother: MessageDescriptor
-  father: MessageDescriptor
-  informant: MessageDescriptor
-  documents: MessageDescriptor
-  deceased: MessageDescriptor
-  deathEvent: MessageDescriptor
-  causeOfDeath: MessageDescriptor
-  spouse: MessageDescriptor
   showHiddenFields: MessageDescriptor
   textInput: MessageDescriptor
   textAreaInput: MessageDescriptor
@@ -38,12 +30,12 @@ interface IFormConfigMessages
   requiredForRegistration: MessageDescriptor
 }
 
-const messagesToDefine: IFormConfigMessages = {
-  introduction: {
-    id: 'form.config.navigation.information',
-    defaultMessage: 'Introduction',
-    description: 'Label for Introduction in page navigation'
-  },
+type INavigationMessages = Record<
+  Exclude<BirthSection, 'preview'> | Exclude<DeathSection, 'preview'>,
+  MessageDescriptor
+>
+
+const navigationMessagesToDefine: INavigationMessages = {
   child: {
     id: 'form.config.navigation.child',
     defaultMessage: 'Child details',
@@ -88,6 +80,24 @@ const messagesToDefine: IFormConfigMessages = {
     id: 'form.config.navigation.spouse',
     defaultMessage: 'Spouse details',
     description: 'Label for spouse details in page navigation'
+  },
+  registration: {
+    id: 'form.config.navigation.registration',
+    defaultMessage: 'Registration',
+    description: 'Label for registration in page navigation'
+  },
+  primaryCaregiver: {
+    id: 'form.config.navigation.primaryCaregiver',
+    defaultMessage: 'Primary Caregiver',
+    description: 'Label for primaryCaregiver in page navigation'
+  }
+}
+
+const messagesToDefine: IFormConfigMessages = {
+  introduction: {
+    id: 'form.config.navigation.information',
+    defaultMessage: 'Introduction',
+    description: 'Label for Introduction in page navigation'
   },
   pages: {
     id: 'form.config.navigation.pages',
@@ -157,3 +167,4 @@ const messagesToDefine: IFormConfigMessages = {
 }
 
 export const messages: IFormConfigMessages = defineMessages(messagesToDefine)
+export const navigationMessages = defineMessages(navigationMessagesToDefine)

@@ -353,7 +353,7 @@ const mapStateToProps = (
   const { match } = props
   return {
     registrationSection: getBirthSection(store, BirthSection.Registration),
-    informantsSection: getDeathSection(store, DeathSection.Informants),
+    informantsSection: getDeathSection(store, DeathSection.Informant),
     declaration: store.declarationsState.declarations.find(
       ({ id }) => id === match.params.declarationId
     )!
