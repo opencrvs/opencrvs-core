@@ -23,7 +23,7 @@ import {
   navigationMessages
 } from '@client/i18n/messages/views/formConfig'
 import { goToFormConfigWizard } from '@client/navigation'
-import { connect } from 'react-redux'
+import { connect, useDispatch } from 'react-redux'
 
 const Title = styled.h1`
   margin-top: 16px;
@@ -41,7 +41,6 @@ const OrderedList = styled.ol`
 interface IPageNavigationProps {
   section: BirthSection | DeathSection
   event: Event
-  goToFormConfigWizard: typeof goToFormConfigWizard
 }
 
 const PageItems = styled(NavigationSubItem)<{ isSelected: boolean }>`
@@ -51,12 +50,9 @@ const PageItems = styled(NavigationSubItem)<{ isSelected: boolean }>`
   }
 `
 
-export const PageNavigationView = ({
-  event,
-  section,
-  goToFormConfigWizard
-}: IPageNavigationProps) => {
+export function SectionNavigation({ event, section }: IPageNavigationProps) {
   const intl = useIntl()
+  const dispatch = useDispatch()
   const tabs = event === Event.BIRTH ? BirthSection : DeathSection
 
   return (
@@ -76,7 +72,7 @@ export const PageNavigationView = ({
                   navigationMessages[tab]
                 )}`}
                 isSelected={section === tab}
-                onClick={() => goToFormConfigWizard(event, tab)}
+                onClick={() => dispatch(goToFormConfigWizard(event, tab))}
               />
             </li>
           )
@@ -85,7 +81,3 @@ export const PageNavigationView = ({
     </>
   )
 }
-
-export const PageNavigation = connect(null, { goToFormConfigWizard })(
-  PageNavigationView
-)

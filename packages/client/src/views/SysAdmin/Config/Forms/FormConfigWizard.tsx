@@ -22,7 +22,7 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import { goBack } from 'connected-react-router'
 import styled from '@client/styledComponents'
-import { PageNavigation } from '@client/components/formConfig/PageNavigation'
+import { SectionNavigation } from '@client/components/formConfig/SectionNavigation'
 import { FormTools } from '@client/components/formConfig/formTools/FormTools'
 import { Event, BirthSection, DeathSection } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
@@ -133,7 +133,7 @@ export function FormConfigWizard() {
       />
       <WizardContainer>
         <NavigationContainer>
-          <PageNavigation event={event} section={section} />
+          <SectionNavigation event={event} section={section} />
         </NavigationContainer>
         <CanvasContainer>
           {formDraftLoaded && (
