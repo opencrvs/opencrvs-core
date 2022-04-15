@@ -10,19 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
+import { DeathSection, BirthSection } from '@client/forms'
 
 interface IFormConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   introduction: MessageDescriptor
-  child: MessageDescriptor
-  mother: MessageDescriptor
-  father: MessageDescriptor
-  informant: MessageDescriptor
-  documents: MessageDescriptor
-  deceased: MessageDescriptor
-  deathEvent: MessageDescriptor
-  causeOfDeath: MessageDescriptor
-  spouse: MessageDescriptor
   showHiddenFields: MessageDescriptor
   textInput: MessageDescriptor
   textAreaInput: MessageDescriptor
@@ -32,14 +24,18 @@ interface IFormConfigMessages
   supportingCopy: MessageDescriptor
   addInputContent: MessageDescriptor
   pages: MessageDescriptor
+  contentKey: MessageDescriptor
+  certificateHandlebars: MessageDescriptor
+  hideField: MessageDescriptor
+  requiredForRegistration: MessageDescriptor
 }
 
-const messagesToDefine: IFormConfigMessages = {
-  introduction: {
-    id: 'form.config.navigation.information',
-    defaultMessage: 'Introduction',
-    description: 'Label for Introduction in page navigation'
-  },
+type INavigationMessages = Record<
+  Exclude<BirthSection, 'preview'> | Exclude<DeathSection, 'preview'>,
+  MessageDescriptor
+>
+
+const navigationMessagesToDefine: INavigationMessages = {
   child: {
     id: 'form.config.navigation.child',
     defaultMessage: 'Child details',
@@ -85,6 +81,24 @@ const messagesToDefine: IFormConfigMessages = {
     defaultMessage: 'Spouse details',
     description: 'Label for spouse details in page navigation'
   },
+  registration: {
+    id: 'form.config.navigation.registration',
+    defaultMessage: 'Registration',
+    description: 'Label for registration in page navigation'
+  },
+  primaryCaregiver: {
+    id: 'form.config.navigation.primaryCaregiver',
+    defaultMessage: 'Primary Caregiver',
+    description: 'Label for primaryCaregiver in page navigation'
+  }
+}
+
+const messagesToDefine: IFormConfigMessages = {
+  introduction: {
+    id: 'form.config.navigation.information',
+    defaultMessage: 'Introduction',
+    description: 'Label for Introduction in page navigation'
+  },
   pages: {
     id: 'form.config.navigation.pages',
     defaultMessage: 'Pages',
@@ -129,7 +143,28 @@ const messagesToDefine: IFormConfigMessages = {
     id: 'form.config.tools.addInputContent',
     defaultMessage: 'Add input/content',
     description: 'Label for Add input/content in form tools'
+  },
+  contentKey: {
+    id: 'config.formConfig.formTools.contentKey',
+    defaultMessage: 'Content Key',
+    description: 'Content key label for formTools'
+  },
+  certificateHandlebars: {
+    id: 'config.formConfig.formTools.certificateHandlebars',
+    defaultMessage: 'Certificate handlebars',
+    description: 'Certificate handlebars label for formTools'
+  },
+  hideField: {
+    id: 'config.formConfig.formTools.hideField',
+    defaultMessage: 'Hide field',
+    description: 'Hide field label for formTools'
+  },
+  requiredForRegistration: {
+    id: 'config.formConfig.formTools.requiredForRegistration',
+    defaultMessage: 'Required for registration',
+    description: 'Required for registration label for formTools'
   }
 }
-export const configMessage: IFormConfigMessages =
-  defineMessages(messagesToDefine)
+
+export const messages: IFormConfigMessages = defineMessages(messagesToDefine)
+export const navigationMessages = defineMessages(navigationMessagesToDefine)

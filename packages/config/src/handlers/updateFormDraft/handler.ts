@@ -26,7 +26,7 @@ import FormDraft, {
   validEvent,
   DraftStatus
 } from '@config/models/formDraft'
-import { messageDescriptorSchema } from '@config/handlers/createQuestion/handler'
+import { messageSchema } from '@config/handlers/createQuestion/handler'
 import { find, partition } from 'lodash'
 
 export interface IQuestionsDraft extends IFormDraftModel {
@@ -88,7 +88,7 @@ export async function updateFormDraftHandler(
         event: questionsDraft.event,
         status: questionsDraft.status,
         comment: questionsDraft.comment,
-        version: 1,
+        version: 0,
         createdAt: Date.now(),
         updatedAt: Date.now()
       }
@@ -146,8 +146,8 @@ export async function updateFormDraftHandler(
 export const questionReqSchema = Joi.object({
   id: Joi.string(),
   fieldId: Joi.string(),
-  label: messageDescriptorSchema,
-  placeholder: messageDescriptorSchema,
+  label: messageSchema,
+  placeholder: messageSchema,
   maxLength: Joi.number(),
   fieldName: Joi.string(),
   fieldType: Joi.string().valid(...validFieldType),

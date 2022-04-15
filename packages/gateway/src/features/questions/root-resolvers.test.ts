@@ -41,16 +41,56 @@ describe('getQuestions()', () => {
   const dummyQuestionList = [
     {
       fieldId: 'birth.myField',
-      label: {
-        id: '',
-        description: '',
-        defaultMessage: ''
-      },
-      placeholder: {
-        id: '',
-        description: '',
-        defaultMessage: ''
-      },
+      label: [
+        {
+          lang: 'en',
+          descriptor: {
+            id: '',
+            description: '',
+            defaultMessage: ''
+          }
+        }
+      ],
+      placeholder: [
+        {
+          lang: 'en',
+          descriptor: {
+            id: '',
+            description: '',
+            defaultMessage: ''
+          }
+        }
+      ],
+      description: [
+        {
+          lang: 'en',
+          descriptor: {
+            id: '',
+            description: '',
+            defaultMessage: ''
+          }
+        }
+      ],
+      tooltip: [
+        {
+          lang: 'en',
+          descriptor: {
+            id: '',
+            description: '',
+            defaultMessage: ''
+          }
+        }
+      ],
+      errorMessage: [
+        {
+          lang: 'en',
+          descriptor: {
+            id: '',
+            description: '',
+            defaultMessage: ''
+          }
+        }
+      ],
       maxLength: 32,
       fieldName: 'myField',
       fieldType: 'TEXT',
@@ -62,16 +102,56 @@ describe('getQuestions()', () => {
     },
     {
       fieldId: 'birth.myField2',
-      label: {
-        id: '',
-        description: '',
-        defaultMessage: ''
-      },
-      placeholder: {
-        id: '',
-        description: '',
-        defaultMessage: ''
-      },
+      label: [
+        {
+          lang: 'en',
+          descriptor: {
+            id: '',
+            description: '',
+            defaultMessage: ''
+          }
+        }
+      ],
+      placeholder: [
+        {
+          lang: 'en',
+          descriptor: {
+            id: '',
+            description: '',
+            defaultMessage: ''
+          }
+        }
+      ],
+      description: [
+        {
+          lang: 'en',
+          descriptor: {
+            id: '',
+            description: '',
+            defaultMessage: ''
+          }
+        }
+      ],
+      tooltip: [
+        {
+          lang: 'en',
+          descriptor: {
+            id: '',
+            description: '',
+            defaultMessage: ''
+          }
+        }
+      ],
+      errorMessage: [
+        {
+          lang: 'en',
+          descriptor: {
+            id: '',
+            description: '',
+            defaultMessage: ''
+          }
+        }
+      ],
       maxLength: 32,
       fieldName: 'myField2',
       fieldType: 'TEXT',

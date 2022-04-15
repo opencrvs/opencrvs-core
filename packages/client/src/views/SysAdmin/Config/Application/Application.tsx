@@ -30,7 +30,7 @@ import {
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import { messages } from '@client/i18n/messages/views/config'
 import { buttonMessages } from '@client/i18n/messages'
-import { DynamicModal } from '@client/views/SysAdmin/Config/DynamicModal'
+import { DynamicModal } from './DynamicModal'
 import { EMPTY_STRING } from '@client/utils/constants'
 import styled from 'styled-components'
 import { lookup } from 'country-data'

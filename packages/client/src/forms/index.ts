@@ -100,10 +100,22 @@ export interface IQuestionIdentifiers {
   groupId: string
   fieldName: string
 }
+export interface IMessageDescriptor {
+  id: string
+  description: string
+  defaultMessage: string
+}
+export interface IMessage {
+  lang: string
+  descriptor: IMessageDescriptor
+}
 export interface IQuestionConfig {
   fieldId: string
-  label?: MessageDescriptor
-  placeholder?: MessageDescriptor
+  label?: IMessage[]
+  placeholder?: IMessage[]
+  description?: IMessage[]
+  tooltip?: IMessage[]
+  errorMessage?: IMessage[]
   maxLength?: number
   fieldName?: string
   fieldType?: QuestionConfigFieldType
@@ -866,27 +878,27 @@ export type IFormSectionQueryMapFunction = (
 ) => void
 
 export enum BirthSection {
+  Registration = 'registration',
   Child = 'child',
   Mother = 'mother',
   Father = 'father',
   Informant = 'informant',
   Parent = 'primaryCaregiver',
-  Registration = 'registration',
   Documents = 'documents',
   Preview = 'preview'
 }
 
 export enum DeathSection {
+  Registration = 'registration',
   Deceased = 'deceased',
   Event = 'deathEvent',
   CauseOfDeath = 'causeOfDeath',
-  Informants = 'informant',
-  Registration = 'registration',
-  DeathDocuments = 'documents',
-  Preview = 'preview',
+  Informant = 'informant',
   Father = 'father',
   Mother = 'mother',
-  Spouse = 'spouse'
+  Spouse = 'spouse',
+  DeathDocuments = 'documents',
+  Preview = 'preview'
 }
 
 export enum UserSection {

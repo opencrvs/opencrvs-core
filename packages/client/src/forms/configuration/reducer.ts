@@ -14,7 +14,7 @@ import { storage } from '@client/storage'
 import { find, isEmpty } from 'lodash'
 import { formDraftQueries } from './queries'
 import * as actions from '@client/forms/configuration/actions'
-import { Event } from '@client/forms/index'
+import { Event } from '@client/forms'
 
 export enum DraftStatus {
   DRAFT = 'DRAFT',
