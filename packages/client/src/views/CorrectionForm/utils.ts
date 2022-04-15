@@ -91,7 +91,11 @@ export function groupHasError(
 }
 
 export function isCorrection(declaration: IDeclaration) {
-  return declaration.registrationStatus === SUBMISSION_STATUS.REGISTERED
+  const { registrationStatus } = declaration
+  return (
+    registrationStatus === SUBMISSION_STATUS.REGISTERED ||
+    registrationStatus === SUBMISSION_STATUS.CERTIFIED
+  )
 }
 
 export function updateDeclarationRegistrationWithCorrection(
