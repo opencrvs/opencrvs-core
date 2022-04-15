@@ -335,7 +335,6 @@ export interface GQLFormDraft {
   comment?: string
   version: number
   history?: Array<GQLDraftHistory>
-  questions?: Array<GQLQuestion>
   updatedAt: GQLDate
   createdAt: GQLDate
 }
@@ -3664,7 +3663,6 @@ export interface GQLFormDraftTypeResolver<TParent = any> {
   comment?: FormDraftToCommentResolver<TParent>
   version?: FormDraftToVersionResolver<TParent>
   history?: FormDraftToHistoryResolver<TParent>
-  questions?: FormDraftToQuestionsResolver<TParent>
   updatedAt?: FormDraftToUpdatedAtResolver<TParent>
   createdAt?: FormDraftToCreatedAtResolver<TParent>
 }
@@ -3690,10 +3688,6 @@ export interface FormDraftToVersionResolver<TParent = any, TResult = any> {
 }
 
 export interface FormDraftToHistoryResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface FormDraftToQuestionsResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
