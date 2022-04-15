@@ -31,7 +31,7 @@ import {
   selectFormDraftLoaded,
   selectEventFormDraft
 } from '@client/forms/configuration/selector'
-import { IConfigFormField } from '@client/forms/configuration/formDraftUtils'
+import { IConfigFormField } from '@client/forms/configuration/configFields/utils'
 import { DefaultFieldTools } from '@client/components/formConfig/formTools/DefaultFieldTools'
 import { useLoadFormDraft, useHasNatlSysAdminScope } from './hooks'
 import { constantsMessages } from '@client/i18n/messages/constants'

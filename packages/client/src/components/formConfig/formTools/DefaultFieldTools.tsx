@@ -23,7 +23,7 @@ import {
   IConfigFormField,
   getContentKey,
   getCertificateHandlebar
-} from '@client/forms/configuration/formDraftUtils'
+} from '@client/forms/configuration/configFields/utils'
 
 const Container = styled.div`
   display: flex;

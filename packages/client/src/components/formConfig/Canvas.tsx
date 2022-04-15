@@ -19,7 +19,7 @@ import { IStoreState } from '@client/store'
 import { Event, DeathSection, BirthSection } from '@client/forms'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { selectEventSectionFieldsMap } from '@client/forms/configuration/selector'
-import { IConfigFormField } from '@client/forms/configuration/formDraftUtils'
+import { IConfigFormField } from '@client/forms/configuration/configFields/utils'
 
 const CanvasBox = styled(Box)`
   display: flex;

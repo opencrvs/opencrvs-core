@@ -21,27 +21,6 @@ export const GET_FORM_DRAFT = gql`
       version
       createdAt
       updatedAt
-      questions {
-        fieldId
-        label {
-          id
-          description
-          defaultMessage
-        }
-        placeholder {
-          id
-          description
-          defaultMessage
-        }
-        maxLength
-        fieldName
-        fieldType
-        preceedingFieldId
-        required
-        enabled
-        custom
-        initialValue
-      }
       history {
         status
         version

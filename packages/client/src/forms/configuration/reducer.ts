@@ -14,15 +14,7 @@ import { storage } from '@client/storage'
 import { find, isEmpty } from 'lodash'
 import { formDraftQueries } from './queries'
 import * as actions from '@client/forms/configuration/actions'
-import { Event, IQuestionConfig, ISerializedForm } from '@client/forms'
-import {
-  configureRegistrationForm,
-  sortFormCustomisations,
-  filterQuestionsByEventType
-} from '@client/forms/configuration'
-import { registerForms } from './default'
-import { deserializeForm } from '@client/forms/mappings/deserializer'
-import { ISectionFieldMap, getEventSectionFieldsMap } from './formDraftUtils'
+import { Event } from '@client/forms'
 
 export enum DraftStatus {
   DRAFT = 'DRAFT',
@@ -44,8 +36,6 @@ export interface IDraft {
   comment?: string
   version: number
   history?: IHistory[]
-  questions?: IQuestionConfig[]
-  fieldsMap: ISectionFieldMap
   updatedAt: number
   createdAt: number
 }
@@ -137,40 +127,9 @@ export const formDraftReducer: LoopReducer<
         throw new Error('Default death formDraft not found')
       }
 
-      const configuredBirthForm: ISerializedForm = configureRegistrationForm(
-        sortFormCustomisations(
-          filterQuestionsByEventType(
-            birthFormDraft.questions as IQuestionConfig[] | undefined,
-            'birth'
-          ),
-          registerForms.birth
-        ),
-        registerForms.birth
-      )
-
-      const configuredDeathForm: ISerializedForm = configureRegistrationForm(
-        sortFormCustomisations(
-          filterQuestionsByEventType(
-            deathFormDraft.questions as IQuestionConfig[] | undefined,
-            'death'
-          ),
-          registerForms.death
-        ),
-        registerForms.death
-      )
-
-      const birthForm = deserializeForm(configuredBirthForm)
-      const deathForm = deserializeForm(configuredDeathForm)
-
       const formDraftData = {
-        birth: {
-          ...birthFormDraft,
-          fieldsMap: getEventSectionFieldsMap(birthForm, Event.BIRTH)
-        },
-        death: {
-          ...deathFormDraft,
-          fieldsMap: getEventSectionFieldsMap(deathForm, Event.DEATH)
-        }
+        birth: birthFormDraft,
+        death: deathFormDraft
       } as IFormDraftData
 
       return loop(

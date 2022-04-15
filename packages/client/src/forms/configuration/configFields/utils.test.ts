@@ -14,7 +14,7 @@ import {
   getContentKey,
   IConfigFormField,
   getCertificateHandlebar
-} from './formDraftUtils'
+} from './utils'
 
 const configFormField: IConfigFormField = {
   fieldId: 'event.section.group.fieldId',
