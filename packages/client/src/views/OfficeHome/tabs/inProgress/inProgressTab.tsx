@@ -65,62 +65,6 @@ import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { IFormTabProps } from '@opencrvs/components/lib/forms'
 import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
 
-const BlueButton = styled(Button)`
-  background-color: ${({ theme }) => theme.colors.secondary};
-  height: 32px;
-  color: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.reg14};
-  border-radius: 4px;
-  ${({ theme }) => theme.shadows.light};
-  &:focus {
-    outline: none;
-    background: ${({ theme }) => theme.colors.yellow};
-    color: ${({ theme }) => theme.colors.copy};
-  }
-
-  &:not([data-focus-visible-added]) {
-    outline: none;
-    background-color: ${({ theme }) => theme.colors.secondary};
-    color: ${({ theme }) => theme.colors.white};
-  }
-`
-const WhiteButton = styled(Button)`
-  background: ${({ theme }) => theme.colors.white};
-  color: ${({ theme }) => theme.colors.copy};
-  height: 32px;
-  ${({ theme }) => theme.fonts.reg14};
-  ${({ theme }) => theme.shadows.light};
-  &:hover {
-    background: ${({ theme }) => theme.colors.grey100};
-  }
-  &:focus {
-    outline: none;
-    background: ${({ theme }) => theme.colors.yellow};
-    color: ${({ theme }) => theme.colors.copy};
-  }
-
-  &:not([data-focus-visible-added]) {
-    outline: none;
-    background: ${({ theme }) => theme.colors.white};
-    color: ${({ theme }) => theme.colors.copy};
-  }
-`
-const TabGroup = styled.div`
-  > :first-child {
-    border-radius: 4px 0 0 4px;
-  }
-  > :last-child {
-    border-radius: 0 4px 4px 0;
-  }
-  padding-top: 30px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    padding-left: 16px;
-  }
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding-top: 5px;
-  }
-`
-
 interface IQueryData {
   inProgressData: GQLEventSearchResultSet
   notificationData: GQLEventSearchResultSet

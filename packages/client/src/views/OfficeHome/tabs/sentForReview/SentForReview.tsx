@@ -45,6 +45,10 @@ import {
 } from '@opencrvs/components/lib/interface/Content'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
+import { getIconName } from '@client/views/OfficeHome/tabs/utils'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { formattedDuration } from '@client/utils/date-formatting'
+import { Event } from '@client/forms'
 
 const DECLARATIONS_DAY_LIMIT = 7
 
@@ -171,10 +175,22 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           index,
           draft.trackingId
         )
+        const date =
+          draft &&
+          (draft.event === Event.BIRTH
+            ? draft.data.child?.childBirthDate
+            : draft.data.deathEvent?.deathDate ||
+              draft.data.deceased?.deathDate)
+        const savedDate =
+          draft && draft.savedOn
+            ? formattedDuration(new Date(draft.savedOn))
+            : draft.createdAt && formattedDuration(parseInt(draft.createdAt))
         return {
           id: draft.id,
           event: event || '',
-          name: name || '',
+          name: name ? getIconName(WORKQUEUE_TABS.sentForReview, name) : '',
+          dateOfEvent: date ? formattedDuration(new Date(date as string)) : '',
+          sentForReview: savedDate ? savedDate : '',
           submissionStatus: statusText || '',
           statusIndicator: icon ? [icon()] : null,
           rowClickable: Boolean(draft.compositionId),
@@ -215,25 +231,28 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
     if (this.state.width > this.props.theme.grid.breakpoints.lg) {
       return [
         {
-          label: this.props.intl.formatMessage(messages.type),
-          width: 15,
-          key: 'event'
-        },
-        {
-          width: 45,
+          width: 40,
           label: this.props.intl.formatMessage(messages.name),
           key: 'name',
           errorValue: this.props.intl.formatMessage(messages.noNameProvided)
         },
         {
-          label: this.props.intl.formatMessage(messages.trackingId),
-          width: 25,
-          key: 'submissionStatus',
-          color: getTheme(getDefaultLanguage()).colors.supportingCopy
+          label: this.props.intl.formatMessage(messages.event),
+          width: 10,
+          key: 'event'
         },
         {
-          label: this.props.intl.formatMessage(messages.submissionStatus),
-          width: 15,
+          label: this.props.intl.formatMessage(messages.dateOfEvent),
+          width: 20,
+          key: 'dateOfEvent'
+        },
+        {
+          label: this.props.intl.formatMessage(messages.sentForReview),
+          width: 20,
+          key: 'sentForReview'
+        },
+        {
+          width: 10,
           alignment: ColumnContentAlignment.RIGHT,
           key: 'statusIndicator'
         }

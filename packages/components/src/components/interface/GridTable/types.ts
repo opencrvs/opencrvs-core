@@ -61,6 +61,7 @@ export interface IDynamicValues {
     | IStatus[]
     | React.ReactNode[]
     | JSX.Element
+    | Date
     | null
     | undefined
 }

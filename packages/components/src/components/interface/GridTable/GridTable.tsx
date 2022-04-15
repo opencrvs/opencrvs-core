@@ -10,14 +10,17 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled from 'styled-components'
+import styled, { withTheme } from 'styled-components'
 import { Pagination } from '..'
 import { ListItemAction } from '../../buttons'
 import { grid } from '../../grid'
 import { Box } from '../../interface'
 import { IAction, IColumn, IDynamicValues, IActionObject } from './types'
 import { LoadMore } from './LoadMore'
+import { GridTableRowDesktop } from './GridTableRowDeskop'
 export { IAction } from './types'
+import { connect } from 'react-redux'
+import { ITheme } from 'src/components/theme'
 
 const Wrapper = styled.div`
   width: 100%;
@@ -28,11 +31,14 @@ const Wrapper = styled.div`
   }
 `
 const TableHeader = styled.div`
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.reg12};
-  margin: 40px 0 25px;
+  color: ${({ theme }) => theme.colors.grey600};
+  background-color: ${({ theme }) => theme.colors.grey100};
+  ${({ theme }) => theme.fonts.bold12};
+  height: 36px;
+  display: flex;
+  align-items: center;
   padding: 0 25px;
-
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
@@ -106,6 +112,7 @@ export enum ColumnContentAlignment {
 }
 
 interface IGridTableProps {
+  theme: ITheme
   content: IDynamicValues[]
   columns: IColumn[]
   renderExpandedComponent?: (eventId: string) => React.ReactNode
@@ -132,7 +139,7 @@ const defaultConfiguration = {
   currentPage: 1
 }
 
-export class GridTable extends React.Component<
+export class GridTableComp extends React.Component<
   IGridTableProps,
   IGridTableState
 > {
@@ -259,6 +266,7 @@ export class GridTable extends React.Component<
     } = this.props
     const { width } = this.state
     const totalItems = this.props.totalItems || 0
+    const isMobileView = this.state.width < this.props.theme.grid.breakpoints.lg
     return (
       <Wrapper>
         {content.length > 0 && width > grid.breakpoints.lg && !hideTableHeader && (
@@ -277,76 +285,88 @@ export class GridTable extends React.Component<
             ))}
           </TableHeader>
         )}
-        {this.getDisplayItems(currentPage, pageSize, content).map(
-          (item, index) => {
-            const expanded = this.showExpandedSection(item.id as string)
-            const clickable = this.props.clickable || Boolean(item.rowClickable)
-            return (
-              <StyledBox key={index}>
-                <RowWrapper
-                  id={'row_' + index}
-                  expandable={this.props.expandable}
-                  clickable={clickable}
-                  onClick={() =>
-                    (this.props.expandable &&
-                      this.toggleExpanded(item.id as string)) ||
-                    (clickable &&
-                      this.getRowClickHandler(
-                        item.rowClickHandler as IActionObject[]
-                      )())
-                  }
-                >
-                  {columns.map((preference, indx) => {
-                    if (preference.isActionColumn) {
-                      return this.renderActionBlock(
-                        item.id as string,
-                        item[preference.key] as IAction[],
-                        preference.width,
-                        index,
-                        indx,
-                        preference.alignment
-                      )
-                    } else if (preference.isIconColumn) {
-                      return (
-                        <IconWrapper
-                          key={indx}
-                          width={preference.width}
-                          alignment={preference.alignment}
-                          color={preference.color}
-                        >
-                          {(item.icon as JSX.Element) || (
-                            <Error>{preference.errorValue}</Error>
-                          )}
-                        </IconWrapper>
-                      )
-                    } else {
-                      return (
-                        <ContentWrapper
-                          key={indx}
-                          width={preference.width}
-                          alignment={preference.alignment}
-                          color={preference.color}
-                        >
-                          {(item[preference.key] as string) || (
-                            <Error>{preference.errorValue}</Error>
-                          )}
-                        </ContentWrapper>
-                      )
-                    }
-                  })}
-                </RowWrapper>
-
-                {this.props.expandable && (
-                  <ExpandedSectionContainer expanded={expanded}>
-                    {expanded &&
-                      this.props.renderExpandedComponent &&
-                      this.props.renderExpandedComponent(item.id as string)}
-                  </ExpandedSectionContainer>
-                )}
-              </StyledBox>
-            )
-          }
+        {!isMobileView && (
+          <GridTableRowDesktop
+            columns={this.props.columns}
+            displayItems={this.getDisplayItems(currentPage, pageSize, content)}
+            clickable={this.props.clickable}
+            expandable={this.props.expandable}
+            getRowClickHandler={this.getRowClickHandler}
+            renderActionBlock={this.renderActionBlock}
+          />
         )}
+        {/* {isMobileView &&
+          this.getDisplayItems(currentPage, pageSize, content).map(
+            (item, index) => {
+              const expanded = this.showExpandedSection(item.id as string)
+              const clickable =
+                this.props.clickable || Boolean(item.rowClickable)
+              return (
+                <StyledBox key={index}>
+                  <RowWrapper
+                    id={'row_' + index}
+                    expandable={this.props.expandable}
+                    clickable={clickable}
+                    onClick={() =>
+                      (this.props.expandable &&
+                        this.toggleExpanded(item.id as string)) ||
+                      (clickable &&
+                        this.getRowClickHandler(
+                          item.rowClickHandler as IActionObject[]
+                        )())
+                    }
+                  >
+                    {columns.map((preference, indx) => {
+                      if (preference.isActionColumn) {
+                        return this.renderActionBlock(
+                          item.id as string,
+                          item[preference.key] as IAction[],
+                          preference.width,
+                          index,
+                          indx,
+                          preference.alignment
+                        )
+                      } else if (preference.isIconColumn) {
+                        return (
+                          <IconWrapper
+                            key={indx}
+                            width={preference.width}
+                            alignment={preference.alignment}
+                            color={preference.color}
+                          >
+                            {(item.icon as JSX.Element) || (
+                              <Error>{preference.errorValue}</Error>
+                            )}
+                          </IconWrapper>
+                        )
+                      } else {
+                        return (
+                          <ContentWrapper
+                            key={indx}
+                            width={preference.width}
+                            alignment={preference.alignment}
+                            color={preference.color}
+                          >
+                            {(item[preference.key] as string) || (
+                              <Error>{preference.errorValue}</Error>
+                            )}
+                          </ContentWrapper>
+                        )
+                      }
+                    })}
+                  </RowWrapper>
+
+                  {this.props.expandable && (
+                    <ExpandedSectionContainer expanded={expanded}>
+                      {expanded &&
+                        this.props.renderExpandedComponent &&
+                        this.props.renderExpandedComponent(item.id as string)}
+                    </ExpandedSectionContainer>
+                  )}
+                </StyledBox>
+              )
+            }
+          )} */}
 
         {showPaginated && totalItems > pageSize && (
           <Pagination
@@ -372,3 +392,5 @@ export class GridTable extends React.Component<
     )
   }
 }
+
+export const GridTable = connect(null, {})(withTheme(GridTableComp))

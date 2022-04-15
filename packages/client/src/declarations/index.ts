@@ -160,6 +160,7 @@ export interface IDeclaration {
   data: IFormData
   originalData?: IFormData
   savedOn?: number
+  createdAt?: string
   modifiedOn?: number
   eventType?: string
   review?: boolean
@@ -635,7 +636,6 @@ async function getFieldAgentDeclaredDeclarations(userDetails: IUserDetails) {
   } catch (exception) {
     result = undefined
   }
-
   return result
 }
 
@@ -677,7 +677,6 @@ export function mergeDeclaredDeclarations(
     .map((app) => {
       return transformSearchQueryDataToDraft(app)
     })
-
   declarations.push(...transformedDeclaredDeclarations)
 }
 

@@ -95,7 +95,8 @@ const transformBirthSearchQueryDataToDraft = (
         data.childName
           .filter((name) => name && name.use !== 'en')
           .map((name) => name && name.familyName)[0]) ||
-      ''
+      '',
+    childBirthDate: data.dateOfBirth && data.dateOfBirth
   }
 }
 
@@ -127,7 +128,8 @@ const transformDeathSearchQueryDataToDraft = (
         data.deceasedName
           .filter((name) => name && name.use !== 'en')
           .map((name) => name && name.familyName)[0]) ||
-      ''
+      '',
+    deathDate: data.dateOfDeath && data.dateOfDeath
   }
 }
 
@@ -154,6 +156,8 @@ export const transformSearchQueryDataToDraft = (
   declaration.trackingId = data.registration && data.registration.trackingId
   declaration.submissionStatus = data.registration && data.registration.status
   declaration.compositionId = data.id
+  declaration.createdAt =
+    data.registration?.createdAt && data.registration.createdAt
 
   switch (eventType) {
     case Event.BIRTH:
