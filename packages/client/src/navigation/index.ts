@@ -10,7 +10,13 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { Event, UserSection, CorrectionSection } from '@client/forms'
+import {
+  Event,
+  UserSection,
+  CorrectionSection,
+  BirthSection,
+  DeathSection
+} from '@client/forms'
 import {
   CERTIFICATE_COLLECTOR,
   CREATE_USER,
@@ -420,7 +426,10 @@ export function goToFieldAgentHomeTab(tabId: string) {
   }
 }
 
-export function goToFormConfigWizard(event: Event, section: string) {
+export function goToFormConfigWizard(
+  event: Event,
+  section: BirthSection | DeathSection
+) {
   return push(
     formatUrl(FORM_CONFIG_WIZARD, {
       event: event,

@@ -22,7 +22,7 @@ export interface IFacilitiesDataResponse {
   [facilityId: string]: ILocation
 }
 export interface IContentResponse {
-  formConfig: IFormConfig
+  formConfig?: IFormConfig
   languages: ILanguage[]
   forms: {
     registerForm: { birth: ISerializedForm; death: ISerializedForm }
@@ -123,7 +123,9 @@ async function loadConfig(): Promise<IApplicationConfigResponse> {
   return response
 }
 
-async function loadContent(formConfig: IFormConfig): Promise<IContentResponse> {
+async function loadContent(
+  formConfig?: IFormConfig
+): Promise<IContentResponse> {
   const url = `${window.config.COUNTRY_CONFIG_URL}/content/client`
 
   const res = await fetch(url, {

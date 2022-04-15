@@ -10861,7 +10861,7 @@ export const registerForms: IDefaultRegisterForms = {
         ]
       },
       {
-        id: DeathSection.Informants,
+        id: DeathSection.Informant,
         viewType: 'form',
         name: {
           defaultMessage: 'Informant',

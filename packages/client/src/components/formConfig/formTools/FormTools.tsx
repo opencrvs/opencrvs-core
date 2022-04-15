@@ -13,8 +13,8 @@
 import React from 'react'
 import styled from '@client/styledComponents'
 import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
-import { IntlShape } from 'react-intl'
-import { configMessage } from '@client/i18n/messages/views/FormConfig'
+import { IntlShape, useIntl } from 'react-intl'
+import { messages } from '@client/i18n/messages/views/formConfig'
 import {
   ListViewSimplified,
   ListViewItemSimplified
@@ -37,39 +37,35 @@ const CenteredToggle = styled(Toggle)`
   align-self: center;
 `
 
-interface IFormTools {
-  intl: IntlShape
-}
-
 const listViewItems = (intl: IntlShape) => {
   const items = [
     {
-      label: intl.formatMessage(configMessage.textInput),
+      label: intl.formatMessage(messages.textInput),
       actionLabel: intl.formatMessage(buttonMessages.add),
       handler: () => {}
     },
     {
-      label: intl.formatMessage(configMessage.textAreaInput),
+      label: intl.formatMessage(messages.textAreaInput),
       actionLabel: intl.formatMessage(buttonMessages.add),
       handler: () => {}
     },
     {
-      label: intl.formatMessage(configMessage.numberInput),
+      label: intl.formatMessage(messages.numberInput),
       actionLabel: intl.formatMessage(buttonMessages.add),
       handler: () => {}
     },
     {
-      label: intl.formatMessage(configMessage.phoneNumberInput),
+      label: intl.formatMessage(messages.phoneNumberInput),
       actionLabel: intl.formatMessage(buttonMessages.add),
       handler: () => {}
     },
     {
-      label: intl.formatMessage(configMessage.heading),
+      label: intl.formatMessage(messages.heading),
       actionLabel: intl.formatMessage(buttonMessages.add),
       handler: () => {}
     },
     {
-      label: intl.formatMessage(configMessage.supportingCopy),
+      label: intl.formatMessage(messages.supportingCopy),
       actionLabel: intl.formatMessage(buttonMessages.add),
       handler: () => {}
     }
@@ -77,8 +73,9 @@ const listViewItems = (intl: IntlShape) => {
   return items
 }
 
-export const FormTools = (props: IFormTools) => {
+export const FormTools = () => {
   const [toggleSelected, setToggleSelected] = React.useState(false)
+  const intl = useIntl()
 
   const toggleOnChange = () => {
     setToggleSelected(!toggleSelected)
@@ -88,11 +85,7 @@ export const FormTools = (props: IFormTools) => {
     <>
       <ListViewSimplified>
         <ListViewItemSimplified
-          label={
-            <Label>
-              {props.intl.formatMessage(configMessage.showHiddenFields)}
-            </Label>
-          }
+          label={<Label>{intl.formatMessage(messages.showHiddenFields)}</Label>}
           actions={[
             <CenteredToggle
               key="toggle"
@@ -103,10 +96,10 @@ export const FormTools = (props: IFormTools) => {
         />
       </ListViewSimplified>
       <TitleContainer>
-        {props.intl.formatMessage(configMessage.addInputContent)}
+        {intl.formatMessage(messages.addInputContent)}
       </TitleContainer>
       <ListViewSimplified>
-        {listViewItems(props.intl).map((item, idx) => (
+        {listViewItems(intl).map((item, idx) => (
           <ListViewItemSimplified
             key={idx}
             label={<Label key={idx}>{item.label}</Label>}

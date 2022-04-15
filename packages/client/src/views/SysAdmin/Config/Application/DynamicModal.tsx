@@ -31,7 +31,7 @@ import { Alert } from '@opencrvs/components/lib/icons/Alert'
 import { updateOfflineConfigData } from '@client/offline/actions'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
-import ContentComponent from '@client/views/SysAdmin/Config/NIDPhoneNumContent'
+import ContentComponent from './NIDPhoneNumContent'
 import { IOfflineData } from '@client/offline/reducer'
 import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
 import { IAttachmentValue } from '@client/forms'
@@ -50,8 +50,7 @@ import {
   getCurrency,
   callUpdatePhoneNumberPatternMutation,
   callUpdateGovtLogoMutation
-} from '@client/views/SysAdmin/Config/utils'
-import { parse } from 'path'
+} from './utils'
 
 const Message = styled.div`
   margin-bottom: 16px;

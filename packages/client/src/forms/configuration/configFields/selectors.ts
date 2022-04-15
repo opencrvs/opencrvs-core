@@ -9,27 +9,26 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+
 import { IStoreState } from '@client/store'
-import { IFormDraftDataState } from './reducer'
 import { Event } from '@client/forms'
 
-export const selectFormDraftData = (store: IStoreState): IFormDraftDataState =>
-  store.formDraft
-
-function getKey<K extends keyof IFormDraftDataState>(
+export function selectConfigFields(
   store: IStoreState,
-  key: K
+  event: Event,
+  section: string
 ) {
-  return selectFormDraftData(store)[key]
+  if (store.configFields.state === 'LOADING') {
+    throw new Error('ConfigFields not loaded yet')
+  }
+  return store.configFields[event][section]
 }
 
-export function selectFormDraftLoaded(store: IStoreState) {
-  return selectFormDraftData(store).formDraftDataLoaded
+export function selectConfigField(
+  store: IStoreState,
+  event: Event,
+  section: string,
+  fieldId: string
+) {
+  return selectConfigFields(store, event, section)[fieldId]
 }
-
-export function selectEventFormDraft(store: IStoreState, event: Event) {
-  return selectFormDraftData(store).formDraftData?.[event]
-}
-
-export const getFormDraftData = (store: IStoreState): any =>
-  getKey(store, 'formDraftData')
