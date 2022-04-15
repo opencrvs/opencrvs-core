@@ -25,11 +25,11 @@ import applicationConfigHandler, {
 } from '@config/handlers/application/applicationConfigHandler'
 import createQuestionHandler, {
   requestSchema as createQuestionReqSchema
-} from '@config/handlers/queston/createQuestion/handler'
+} from '@config/handlers/question/createQuestion/handler'
 import updateQuestionHandler, {
   requestSchema as updateQuestionReqSchema
-} from '@config/handlers/queston/updateQuestion/handler'
-import getQuestionsHandler from '@config/handlers/queston/getQuestions/handler'
+} from '@config/handlers/question/updateQuestion/handler'
+import getQuestionsHandler from '@config/handlers/question/getQuestions/handler'
 import {
   updateFormDraftHandler,
   requestSchema as updateFormDraftReqSchema

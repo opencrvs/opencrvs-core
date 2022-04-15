@@ -24,19 +24,59 @@ const token = jwt.sign(
     audience: 'opencrvs:config-user'
   }
 )
-
 const mockQuestion = {
+  _id: '123',
   fieldId: 'birth.myField',
-  label: {
-    id: 'test',
-    description: 'test',
-    defaultMessage: 'test'
-  },
-  placeholder: {
-    id: 'test',
-    description: 'test',
-    defaultMessage: 'test'
-  },
+  label: [
+    {
+      lang: 'en',
+      descriptor: {
+        id: '',
+        description: '',
+        defaultMessage: ''
+      }
+    }
+  ],
+  placeholder: [
+    {
+      lang: 'en',
+      descriptor: {
+        id: '',
+        description: '',
+        defaultMessage: ''
+      }
+    }
+  ],
+  description: [
+    {
+      lang: 'en',
+      descriptor: {
+        id: '',
+        description: '',
+        defaultMessage: ''
+      }
+    }
+  ],
+  tooltip: [
+    {
+      lang: 'en',
+      descriptor: {
+        id: '',
+        description: '',
+        defaultMessage: ''
+      }
+    }
+  ],
+  errorMessage: [
+    {
+      lang: 'en',
+      descriptor: {
+        id: '',
+        description: '',
+        defaultMessage: ''
+      }
+    }
+  ],
   maxLength: 32,
   fieldName: 'myField',
   fieldType: 'TEXT',
@@ -44,9 +84,11 @@ const mockQuestion = {
   required: true,
   custom: true,
   initialValue: 'myValue'
-} as IQuestion
+} as unknown as IQuestion & { _id: string }
 
-describe('createQuestion handler', () => {
+let mockQuestions = [mockQuestion]
+
+describe('getQuestions', () => {
   let server: any
 
   beforeEach(async () => {
@@ -54,17 +96,16 @@ describe('createQuestion handler', () => {
     server = await createServer()
   })
 
-  it('creates and saves question using mongoose', async () => {
-    mockingoose(Question).toReturn(mockQuestion, 'save')
+  it('get question using mongoose', async () => {
+    mockingoose(Question).toReturn(mockQuestions, 'find')
 
     const res = await server.server.inject({
-      method: 'POST',
-      url: '/question',
-      payload: mockQuestion,
+      method: 'GET',
+      url: '/questions',
       headers: {
         Authorization: `Bearer ${token}`
       }
     })
-    expect(res.statusCode).toBe(201)
+    expect(res.statusCode).toBe(200)
   })
 })

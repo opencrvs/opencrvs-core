@@ -228,9 +228,14 @@ type Notification {
 }
 
 input MesssageDescriptorInput {
-  id: String
-  description: String
-  defaultMessage: String
+  id: String!
+  description: String!
+  defaultMessage: String!
+}
+
+input MesssageInput {
+  lang: String!
+  descriptor: MesssageDescriptorInput!
 }
 
 scalar Date
@@ -436,11 +441,19 @@ type CertificateSVG {
   status: String
 }
 
+type Messsage {
+  lang: String!
+  descriptor: MesssageDescriptor!
+}
+
 type Question {
   _id: ID!
   fieldId: String!
-  label: MesssageDescriptor
-  placeholder: MesssageDescriptor
+  label: [Messsage!]
+  placeholder: [Messsage!]
+  description: [Messsage!]
+  tooltip: [Messsage!]
+  errorMessage: [Messsage!]
   maxLength: Int
   fieldName: String
   fieldType: String
@@ -471,9 +484,9 @@ type DraftHistory {
 }
 
 type MesssageDescriptor {
-  id: String
-  description: String
-  defaultMessage: String
+  id: String!
+  description: String!
+  defaultMessage: String!
 }
 
 input NotificationInput {
@@ -574,8 +587,11 @@ input CertificateSVGInput {
 input QuestionInput {
   id: ID
   fieldId: String!
-  label: MesssageDescriptorInput
-  placeholder: MesssageDescriptorInput
+  label: [MesssageInput!]
+  placeholder: [MesssageInput!]
+  description: [MesssageInput!]
+  tooltip: [MesssageInput!]
+  errorMessage: [MesssageInput!]
   maxLength: Int
   fieldName: String
   fieldType: String

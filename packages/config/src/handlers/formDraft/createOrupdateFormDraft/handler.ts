@@ -26,10 +26,13 @@ import FormDraft, {
   validEvent,
   DraftStatus
 } from '@config/models/formDraft'
-import { messageDescriptorSchema } from '@config/handlers/queston/createQuestion/handler'
+import { messageSchema } from '@config/handlers/question/createQuestion/handler'
 import { find, partition } from 'lodash'
 
-function isValidFormDraftOperation(currentStatus: string, newStatus: string) {
+export function isValidFormDraftOperation(
+  currentStatus: string,
+  newStatus: string
+) {
   const validStatusMapping = {
     [DraftStatus.DRAFT]: [
       DraftStatus.DRAFT,
@@ -71,16 +74,6 @@ export async function updateFormDraftHandler(
   h: Hapi.ResponseToolkit
 ) {
   const questionsDraft = request.payload as IQuestionsDraft
-
-  if (
-    !questionsDraft.questions &&
-    !questionsDraft.deleted &&
-    questionsDraft.status === DraftStatus.DRAFT
-  ) {
-    return h
-      .response('No question modification found on payload for draft')
-      .code(400)
-  }
 
   let draft: IFormDraftModel | null = await FormDraft.findOne({
     event: questionsDraft.event
@@ -184,8 +177,8 @@ export async function updateFormDraftHandler(
 export const questionReqSchema = Joi.object({
   id: Joi.string(),
   fieldId: Joi.string(),
-  label: messageDescriptorSchema,
-  placeholder: messageDescriptorSchema,
+  label: messageSchema,
+  placeholder: messageSchema,
   maxLength: Joi.number(),
   fieldName: Joi.string(),
   fieldType: Joi.string().valid(...validFieldType),

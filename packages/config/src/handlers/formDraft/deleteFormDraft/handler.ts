@@ -19,6 +19,7 @@ import FormDraft, {
 } from '@config/models/formDraft'
 import Question from '@config/models/question'
 import { Event } from '@config/models/certificate'
+import { isValidFormDraftOperation } from '@config/handlers/formDraft/createOrupdateFormDraft/handler'
 
 export interface IDeleteFormDraftPayload {
   event: Event
@@ -30,9 +31,15 @@ export async function deleteFormDraftHandler(
 ) {
   const formDraft = request.payload as IDeleteFormDraftPayload
 
-  const draft: IFormDraftModel | null = await FormDraft.findOne({
+  const draft = (await FormDraft.findOne({
     event: formDraft.event
-  })
+  })) as IFormDraftModel
+
+  if (!isValidFormDraftOperation(draft.status, DraftStatus.DELETED)) {
+    return h
+      .response(`Invalid Operation. Can not delete ${draft.status} form draft.`)
+      .code(400)
+  }
 
   if (draft) {
     try {

@@ -24,19 +24,59 @@ const token = jwt.sign(
     audience: 'opencrvs:config-user'
   }
 )
+
 const mockQuestion = {
-  _id: '123',
   fieldId: 'birth.myField',
-  label: {
-    id: '',
-    description: '',
-    defaultMessage: ''
-  },
-  placeholder: {
-    id: '',
-    description: '',
-    defaultMessage: ''
-  },
+  label: [
+    {
+      lang: 'en',
+      descriptor: {
+        id: 'test',
+        description: 'test',
+        defaultMessage: 'test'
+      }
+    }
+  ],
+  placeholder: [
+    {
+      lang: 'en',
+      descriptor: {
+        id: 'test',
+        description: 'test',
+        defaultMessage: 'test'
+      }
+    }
+  ],
+  description: [
+    {
+      lang: 'en',
+      descriptor: {
+        id: 'test',
+        description: 'test',
+        defaultMessage: 'test'
+      }
+    }
+  ],
+  tooltip: [
+    {
+      lang: 'en',
+      descriptor: {
+        id: 'test',
+        description: 'test',
+        defaultMessage: 'test'
+      }
+    }
+  ],
+  errorMessage: [
+    {
+      lang: 'en',
+      descriptor: {
+        id: 'test',
+        description: 'test',
+        defaultMessage: 'test'
+      }
+    }
+  ],
   maxLength: 32,
   fieldName: 'myField',
   fieldType: 'TEXT',
@@ -44,11 +84,9 @@ const mockQuestion = {
   required: true,
   custom: true,
   initialValue: 'myValue'
-} as unknown as IQuestion & { _id: string }
+} as IQuestion
 
-let mockQuestions = [mockQuestion]
-
-describe('getQuestions', () => {
+describe('createQuestion handler', () => {
   let server: any
 
   beforeEach(async () => {
@@ -56,16 +94,17 @@ describe('getQuestions', () => {
     server = await createServer()
   })
 
-  it('get question using mongoose', async () => {
-    mockingoose(Question).toReturn(mockQuestions, 'find')
+  it('creates and saves question using mongoose', async () => {
+    mockingoose(Question).toReturn(mockQuestion, 'save')
 
     const res = await server.server.inject({
-      method: 'GET',
-      url: '/questions',
+      method: 'POST',
+      url: '/question',
+      payload: mockQuestion,
       headers: {
         Authorization: `Bearer ${token}`
       }
     })
-    expect(res.statusCode).toBe(200)
+    expect(res.statusCode).toBe(201)
   })
 })
