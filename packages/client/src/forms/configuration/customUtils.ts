@@ -14,9 +14,10 @@ import {
   ISerializedForm,
   IQuestionConfig,
   SerializedFormField,
-  QuestionConfigFieldType
+  QuestionConfigFieldType,
+  IMessage
 } from '@client/forms/index'
-import { cloneDeep, concat } from 'lodash'
+import { cloneDeep, concat, find } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
 import { IDefaultField } from '@client/forms/configuration/defaultUtils'
 import {
@@ -26,6 +27,7 @@ import {
   IGroup,
   ISection
 } from '@client/forms/configuration'
+import { getDefaultLanguage } from '@client/i18n/utils'
 
 // THIS FILE CONTAINS FUNCTIONS TO CONFIGURE CUSTOM FORM CONFIGURATIONS
 
@@ -33,7 +35,6 @@ interface ICustomQuestionConfiguration {
   question: IQuestionConfig
   field: SerializedFormField
 }
-
 export interface ISortedCustomGroup {
   preceedingDefaultField?: IDefaultField
   positionTop?: boolean
@@ -74,6 +75,14 @@ export function createCustomGroup(
   customQuestionConfigurations.push(newCustomGroup)
 }
 
+function getDefaultLanguageMessage(messages: IMessage[] | undefined) {
+  const language = getDefaultLanguage()
+  const defaultMessage = find(messages, {
+    lang: language
+  })
+  return defaultMessage?.descriptor
+}
+
 export function createCustomField(
   question: IQuestionConfig
 ): SerializedFormField {
@@ -82,9 +91,13 @@ export function createCustomField(
     customQuesstionMappingId: question.fieldId,
     custom: true,
     type: question.fieldType as QuestionConfigFieldType,
-    label: question.label as MessageDescriptor,
+    label: getDefaultLanguageMessage(question.label) as MessageDescriptor,
     initialValue: '',
     validate: [],
+    description: getDefaultLanguageMessage(
+      question.description
+    ) as MessageDescriptor,
+    tooltip: getDefaultLanguageMessage(question.tooltip) as MessageDescriptor,
     mapping: {
       mutation: {
         operation: 'customFieldToQuestionnaireTransformer'
@@ -100,7 +113,9 @@ export function createCustomField(
     baseField.type === 'TEXTAREA'
   ) {
     baseField.required = question.required
-    baseField.placeholder = question.placeholder as MessageDescriptor
+    baseField.placeholder = getDefaultLanguageMessage(
+      question.placeholder
+    ) as MessageDescriptor
   }
   if (baseField.type === 'TEL') {
     baseField.validate = [

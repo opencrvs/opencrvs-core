@@ -19,25 +19,32 @@ export default async function createQuestion(
   h: Hapi.ResponseToolkit
 ) {
   const questionDto = request.payload as IQuestion
+  let question: IQuestion
   try {
-    await Question.create(questionDto)
+    question = await Question.create(questionDto)
   } catch (e) {
     throw internal(e.message)
   }
 
-  return h.response().code(201)
+  return h.response(question).code(201)
 }
 
-export const messageDescriptorSchema = Joi.object({
-  id: Joi.string().required(),
-  defaultMessage: Joi.string(),
-  description: Joi.string()
+export const messageSchema = Joi.array().items({
+  lang: Joi.string(),
+  descriptor: Joi.object({
+    id: Joi.string().required(),
+    defaultMessage: Joi.string(),
+    description: Joi.string()
+  })
 })
 
 export const requestSchema = Joi.object({
   fieldId: Joi.string().required(),
-  label: messageDescriptorSchema,
-  placeholder: messageDescriptorSchema,
+  label: messageSchema,
+  placeholder: messageSchema,
+  description: messageSchema,
+  tooltip: messageSchema,
+  errorMessage: messageSchema,
   maxLength: Joi.number(),
   fieldName: Joi.string(),
   fieldType: Joi.string().valid(...validFieldType),

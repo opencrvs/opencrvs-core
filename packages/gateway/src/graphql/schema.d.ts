@@ -316,8 +316,11 @@ export interface GQLCertificateSVG {
 export interface GQLQuestion {
   _id: string
   fieldId: string
-  label?: GQLMesssageDescriptor
-  placeholder?: GQLMesssageDescriptor
+  label?: Array<GQLMesssage>
+  placeholder?: Array<GQLMesssage>
+  description?: Array<GQLMesssage>
+  tooltip?: Array<GQLMesssage>
+  errorMessage?: Array<GQLMesssage>
   maxLength?: number
   fieldName?: string
   fieldType?: string
@@ -494,8 +497,11 @@ export interface GQLApplicationConfigurationInput {
 export interface GQLQuestionInput {
   id?: string
   fieldId: string
-  label?: GQLMesssageDescriptorInput
-  placeholder?: GQLMesssageDescriptorInput
+  label?: Array<GQLMesssageInput>
+  placeholder?: Array<GQLMesssageInput>
+  description?: Array<GQLMesssageInput>
+  tooltip?: Array<GQLMesssageInput>
+  errorMessage?: Array<GQLMesssageInput>
   maxLength?: number
   fieldName?: string
   fieldType?: string
@@ -830,10 +836,9 @@ export interface GQLEventProgressSet {
   progressReport?: GQLEventProgressData
 }
 
-export interface GQLMesssageDescriptor {
-  id?: string
-  description?: string
-  defaultMessage?: string
+export interface GQLMesssage {
+  lang: string
+  descriptor: GQLMesssageDescriptor
 }
 
 export interface GQLDraftHistory {
@@ -998,10 +1003,9 @@ export interface GQLDeathInput {
   FEE?: GQLDeathFeeInput
 }
 
-export interface GQLMesssageDescriptorInput {
-  id?: string
-  description?: string
-  defaultMessage?: string
+export interface GQLMesssageInput {
+  lang: string
+  descriptor: GQLMesssageDescriptorInput
 }
 
 export interface GQLRegWorkflow {
@@ -1243,6 +1247,12 @@ export interface GQLEventProgressData {
   timeInReadyToPrint?: number
 }
 
+export interface GQLMesssageDescriptor {
+  id: string
+  description: string
+  defaultMessage: string
+}
+
 export interface GQLIdentityInput {
   id?: string
   type?: GQLIdentityIDType
@@ -1343,6 +1353,12 @@ export interface GQLBirthFeeInput {
 export interface GQLDeathFeeInput {
   ON_TIME?: number
   DELAYED?: number
+}
+
+export interface GQLMesssageDescriptorInput {
+  id: string
+  description: string
+  defaultMessage: string
 }
 
 export interface GQLPayment {
@@ -1474,7 +1490,7 @@ export interface GQLResolver {
   }
 
   EventProgressSet?: GQLEventProgressSetTypeResolver
-  MesssageDescriptor?: GQLMesssageDescriptorTypeResolver
+  Messsage?: GQLMesssageTypeResolver
   DraftHistory?: GQLDraftHistoryTypeResolver
   Birth?: GQLBirthTypeResolver
   CountryLogo?: GQLCountryLogoTypeResolver
@@ -1498,6 +1514,7 @@ export interface GQLResolver {
   BirthEventSearchSet?: GQLBirthEventSearchSetTypeResolver
   DeathEventSearchSet?: GQLDeathEventSearchSetTypeResolver
   EventProgressData?: GQLEventProgressDataTypeResolver
+  MesssageDescriptor?: GQLMesssageDescriptorTypeResolver
   BirthFee?: GQLBirthFeeTypeResolver
   DeathFee?: GQLDeathFeeTypeResolver
   Payment?: GQLPaymentTypeResolver
@@ -3595,6 +3612,9 @@ export interface GQLQuestionTypeResolver<TParent = any> {
   fieldId?: QuestionToFieldIdResolver<TParent>
   label?: QuestionToLabelResolver<TParent>
   placeholder?: QuestionToPlaceholderResolver<TParent>
+  description?: QuestionToDescriptionResolver<TParent>
+  tooltip?: QuestionToTooltipResolver<TParent>
+  errorMessage?: QuestionToErrorMessageResolver<TParent>
   maxLength?: QuestionToMaxLengthResolver<TParent>
   fieldName?: QuestionToFieldNameResolver<TParent>
   fieldType?: QuestionToFieldTypeResolver<TParent>
@@ -3618,6 +3638,18 @@ export interface QuestionToLabelResolver<TParent = any, TResult = any> {
 }
 
 export interface QuestionToPlaceholderResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface QuestionToDescriptionResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface QuestionToTooltipResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface QuestionToErrorMessageResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -4940,27 +4972,16 @@ export interface EventProgressSetToProgressReportResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLMesssageDescriptorTypeResolver<TParent = any> {
-  id?: MesssageDescriptorToIdResolver<TParent>
-  description?: MesssageDescriptorToDescriptionResolver<TParent>
-  defaultMessage?: MesssageDescriptorToDefaultMessageResolver<TParent>
+export interface GQLMesssageTypeResolver<TParent = any> {
+  lang?: MesssageToLangResolver<TParent>
+  descriptor?: MesssageToDescriptorResolver<TParent>
 }
 
-export interface MesssageDescriptorToIdResolver<TParent = any, TResult = any> {
+export interface MesssageToLangResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface MesssageDescriptorToDescriptionResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface MesssageDescriptorToDefaultMessageResolver<
-  TParent = any,
-  TResult = any
-> {
+export interface MesssageToDescriptorResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -5747,6 +5768,30 @@ export interface EventProgressDataToTimeInWaitingForBRISResolver<
 }
 
 export interface EventProgressDataToTimeInReadyToPrintResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLMesssageDescriptorTypeResolver<TParent = any> {
+  id?: MesssageDescriptorToIdResolver<TParent>
+  description?: MesssageDescriptorToDescriptionResolver<TParent>
+  defaultMessage?: MesssageDescriptorToDefaultMessageResolver<TParent>
+}
+
+export interface MesssageDescriptorToIdResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface MesssageDescriptorToDescriptionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface MesssageDescriptorToDefaultMessageResolver<
   TParent = any,
   TResult = any
 > {
