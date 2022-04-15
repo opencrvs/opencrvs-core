@@ -13,7 +13,7 @@ import { loop, Cmd, Loop, LoopReducer } from 'redux-loop'
 import { storage } from '@client/storage'
 import { find, isEmpty } from 'lodash'
 import { formDraftQueries } from './queries'
-import * as actions from '@client/forms/configuration/actions'
+import * as actions from './actions'
 import { Event } from '@client/forms'
 
 export enum DraftStatus {

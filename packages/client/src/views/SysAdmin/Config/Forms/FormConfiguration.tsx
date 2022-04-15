@@ -25,9 +25,12 @@ import { ToggleMenu } from '@opencrvs/components/lib/interface'
 import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import styled from 'styled-components'
-import { loadFormDraft } from '@client/forms/configuration/actions'
-import { IFormDraftData, IHistory } from '@client/forms/configuration/reducer'
-import { getFormDraftData } from '@client/forms/configuration/selector'
+import { loadFormDraft } from '@client/forms/configuration/formDrafts/actions'
+import {
+  IFormDraftData,
+  IHistory
+} from '@client/forms/configuration/formDrafts/reducer'
+import { getFormDraftData } from '@client/forms/configuration/formDrafts/selectors'
 import {
   ListViewItemSimplified,
   ListViewSimplified

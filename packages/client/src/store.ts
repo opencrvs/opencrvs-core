@@ -62,7 +62,7 @@ import { userFormReducer, IUserFormState } from '@client/user/userReducer'
 import {
   formDraftReducer,
   IFormDraftDataState
-} from '@client/forms/configuration/reducer'
+} from '@client/forms/configuration/formDrafts/reducer'
 import {
   configFieldsReducer,
   IConfigFieldsState

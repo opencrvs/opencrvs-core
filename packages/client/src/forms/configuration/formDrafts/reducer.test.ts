@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as actions from '@client/forms/configuration/actions'
-import { initialState } from '@client/forms/configuration/reducer'
+import * as actions from './actions'
+import { initialState } from './reducer'
 import { createStore, AppStore } from '@client/store'
 import { flushPromises } from '@client/tests/util'
-import { formDraftQueries } from '@client/forms/configuration/queries'
+import { formDraftQueries } from './queries'
 
 describe('Form draft reducer tests', () => {
   let store: AppStore

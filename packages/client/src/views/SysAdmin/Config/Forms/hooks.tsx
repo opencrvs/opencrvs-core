@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
-import { loadFormDraft } from '@client/forms/configuration/actions'
+import { loadFormDraft } from '@client/forms/configuration/formDrafts/actions'
 import { useSelector, useDispatch } from 'react-redux'
 import { getScope } from '@client/profile/profileSelectors'
 import { hasNatlSysAdminScope } from '@client/utils/authUtils'
