@@ -2566,6 +2566,7 @@ export const mockFetchCertificatesTemplatesDefinition = [
 
 export const mockConfigResponse = {
   config: mockOfflineData.config,
+  formConfig: { questionConfig: [] },
   certificates: mockFetchCertificatesTemplatesDefinition
 }
 

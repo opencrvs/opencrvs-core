@@ -20,22 +20,19 @@ import {
   SecondaryButton,
   SuccessButton
 } from '@opencrvs/components/lib/buttons'
-import { goBack } from 'connected-react-router'
 import styled from '@client/styledComponents'
 import { SectionNavigation } from '@client/components/formConfig/SectionNavigation'
 import { FormTools } from '@client/components/formConfig/formTools/FormTools'
 import { Event, BirthSection, DeathSection } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
 import { Canvas } from '@client/components/formConfig/Canvas'
-import {
-  selectFormDraftLoaded,
-  selectEventFormDraft
-} from '@client/forms/configuration/selector'
+import { selectEventFormDraft } from '@client/forms/configuration/selector'
 import { IConfigFormField } from '@client/forms/configuration/configFields/utils'
 import { DefaultFieldTools } from '@client/components/formConfig/formTools/DefaultFieldTools'
 import { useLoadFormDraft, useHasNatlSysAdminScope } from './hooks'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { IStoreState } from '@client/store'
+import { goToFormConfig } from '@client/navigation'
 
 const Container = styled.div`
   display: flex;
@@ -125,7 +122,6 @@ export function FormConfigWizard() {
   const dispatch = useDispatch()
   const intl = useIntl()
   const { event, section } = useParams<IRouteProps>()
-  const formDraftLoaded = useSelector(selectFormDraftLoaded)
   const version = useNewDraftVersion(event)
 
   if (
@@ -142,21 +138,19 @@ export function FormConfigWizard() {
         title={`${intl.formatMessage(constantsMessages[event])} v${version}`}
         pageIcon={<></>}
         topBarActions={topBarActions(intl)}
-        goHome={() => dispatch(goBack())}
+        goHome={() => dispatch(goToFormConfig())}
       />
       <WizardContainer>
         <NavigationContainer>
           <SectionNavigation event={event} section={section} />
         </NavigationContainer>
         <CanvasContainer>
-          {formDraftLoaded && (
-            <Canvas
-              event={event}
-              section={section}
-              selectedField={selectedField}
-              onFieldSelect={(fieldId) => setSelectedField(fieldId)}
-            />
-          )}
+          <Canvas
+            event={event}
+            section={section}
+            selectedField={selectedField}
+            onFieldSelect={(field) => setSelectedField(field)}
+          />
         </CanvasContainer>
         <ToolsContainer>
           {selectedField ? (

@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { LoopReducer, Loop } from 'redux-loop'
-import { IForm, ReviewSection, ISerializedForm } from '@client/forms'
+import { IForm, ReviewSection, ISerializedForm, Event } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/review'
 import * as offlineActions from '@client/offline/actions'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
@@ -56,7 +56,7 @@ export const reviewReducer: LoopReducer<IReviewFormState, Action> = (
         sortFormCustomisations(
           filterQuestionsByEventType(
             action.payload.formConfig?.questionConfig,
-            'birth'
+            Event.BIRTH
           ),
           registerForms.birth
         ),
@@ -66,7 +66,7 @@ export const reviewReducer: LoopReducer<IReviewFormState, Action> = (
         sortFormCustomisations(
           filterQuestionsByEventType(
             action.payload.formConfig?.questionConfig,
-            'death'
+            Event.DEATH
           ),
           registerForms.death
         ),

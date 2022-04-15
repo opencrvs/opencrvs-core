@@ -123,10 +123,13 @@ export const configFieldsReducer: LoopReducer<
       )
 
     case actions.STORE_CONFIG_FIELDS_SUCCESS:
-      const configFieldsState: IConfigFieldsState = JSON.parse(action.payload)
-      return {
-        ...configFieldsState
+      if (action.payload) {
+        const configFieldsState: IConfigFieldsState = JSON.parse(action.payload)
+        return {
+          ...configFieldsState
+        }
       }
+      return state
     default:
       return state
   }

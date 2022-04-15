@@ -13,13 +13,22 @@
 import { IStoreState } from '@client/store'
 import { Event } from '@client/forms'
 
-export const selectEventSectionFieldsMap = (
+export function selectConfigFields(
   store: IStoreState,
   event: Event,
   section: string
-) => {
+) {
   if (store.configFields.state === 'LOADING') {
     throw new Error('ConfigFields not loaded yet')
   }
   return store.configFields[event][section]
+}
+
+export function selectConfigField(
+  store: IStoreState,
+  event: Event,
+  section: string,
+  fieldId: string
+) {
+  return selectConfigFields(store, event, section)[fieldId]
 }

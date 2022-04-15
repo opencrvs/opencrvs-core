@@ -14,7 +14,8 @@ import {
   IForm,
   BirthSection,
   DeathSection,
-  ISerializedForm
+  ISerializedForm,
+  Event
 } from '@client/forms'
 import * as offlineActions from '@client/offline/actions'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
@@ -61,7 +62,7 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
         sortFormCustomisations(
           filterQuestionsByEventType(
             action.payload.formConfig?.questionConfig,
-            'birth'
+            Event.BIRTH
           ),
           registerForms.birth
         ),
@@ -71,7 +72,7 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
         sortFormCustomisations(
           filterQuestionsByEventType(
             action.payload.formConfig?.questionConfig,
-            'death'
+            Event.DEATH
           ),
           registerForms.death
         ),
