@@ -61,10 +61,10 @@ export function SectionNavigation({ event, section }: IPageNavigationProps) {
       <OrderedList>
         {Object.values<BirthSection | DeathSection>(tabs).map((tab, idx) => {
           if (tab === BirthSection.Preview || tab === DeathSection.Preview) {
-            return <></>
+            return <React.Fragment key={idx}></React.Fragment>
           }
           return (
-            <li>
+            <li key={idx}>
               <PageItems
                 key={idx}
                 id={`${tab}_navigation`}
