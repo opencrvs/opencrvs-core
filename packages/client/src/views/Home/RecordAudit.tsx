@@ -404,7 +404,7 @@ const getCaptitalizedWord = (word: string | undefined): string => {
   return word.toUpperCase()[0] + word.toLowerCase().slice(1)
 }
 
-const getPlainedWord = (word: string): string => {
+const removeUnderscore = (word: string): string => {
   const wordArray = word.split('_')
   const finalWord = wordArray.reduce(
     (accum, cur, idx) => (idx > 0 ? accum + ' ' + cur : cur),
@@ -578,7 +578,7 @@ const getDeclarationInfo = (
 ) => {
   let informant = getCaptitalizedWord(declaration?.informant)
 
-  const finalStatus = getPlainedWord(getCaptitalizedWord(declaration?.status))
+  const finalStatus = removeUnderscore(getCaptitalizedWord(declaration?.status))
 
   if (declaration?.informantContact && informant) {
     informant = informant + ' · ' + declaration.informantContact
@@ -601,7 +601,7 @@ const getDeclarationInfo = (
       ...info,
       dateOfBirth: declaration?.dateOfBirth,
       placeOfBirth: declaration?.placeOfBirth,
-      informant: getPlainedWord(informant)
+      informant: removeUnderscore(informant)
     }
   } else if (info.type === 'Death') {
     if (declaration?.brnDrn) {
@@ -614,7 +614,7 @@ const getDeclarationInfo = (
       ...info,
       dateOfDeath: declaration?.dateOfDeath,
       placeOfDeath: declaration?.placeOfDeath,
-      informant: getPlainedWord(informant)
+      informant: removeUnderscore(informant)
     }
   }
   const mobileActions = actions.map((action, index) => (
