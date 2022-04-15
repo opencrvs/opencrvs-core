@@ -116,11 +116,7 @@ import { LocationSearch } from '@opencrvs/components/lib/interface'
 import { REGEXP_NUMBER_INPUT_NON_NUMERIC } from '@client/utils/constants'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { generateLocations } from '@client/utils/locationUtils'
-import {
-  IUserDetails,
-  IGQLLocation,
-  IIdentifier
-} from '@client/utils/userUtils'
+import { IUserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 
 const fadeIn = keyframes`
@@ -580,30 +576,22 @@ const mapFieldsToValues = (
       !field.initialValue &&
       field.dynamicOptions.initialValue === 'agentDefault'
     ) {
-      const catchmentAreas: IGQLLocation[] | undefined =
-        userDetails?.catchmentArea && userDetails?.catchmentArea
-      const catchmentAreaLengths = catchmentAreas?.length || 0
+      const catchmentAreas = userDetails?.catchmentArea
       let district = ''
       let state = ''
 
       if (catchmentAreas) {
-        for (let index = 0; index < catchmentAreaLengths; index++) {
+        catchmentAreas.forEach((catchmentArea) => {
           if (
-            (
-              (catchmentAreas[index] as IGQLLocation)
-                .identifier as IIdentifier[]
-            )[1].value === 'DISTRICT'
+            catchmentArea.identifier?.find(({ value }) => value === 'DISTRICT')
           ) {
-            district = (catchmentAreas[index] as IGQLLocation).id
+            district = catchmentArea.id
           } else if (
-            (
-              (catchmentAreas[index] as IGQLLocation)
-                .identifier as IIdentifier[]
-            )[1].value === 'STATE'
+            catchmentArea.identifier?.find(({ value }) => value === 'STATE')
           ) {
-            state = (catchmentAreas[index] as IGQLLocation).id
+            state = catchmentArea.id
           }
-        }
+        })
       }
 
       if (field.name.includes('district') && !field.initialValue && district) {
@@ -664,7 +652,7 @@ class FormSectionComponent extends React.Component<Props> {
       prevProps.onChange(this.props.values)
     }
 
-    if (sectionChanged || fieldChanged) {
+    if (sectionChanged) {
       prevProps.resetForm()
       if (this.props.setAllFieldsDirty) {
         this.showValidationErrors(this.props.fields)
@@ -674,6 +662,10 @@ class FormSectionComponent extends React.Component<Props> {
       ) {
         this.showValidationErrors(this.props.fieldsToShowValidationErrors)
       }
+    }
+
+    if (fieldChanged) {
+      prevProps.resetForm()
     }
   }
 
