@@ -18,7 +18,7 @@ import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { Event, DeathSection, BirthSection } from '@client/forms'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
-import { selectEventSectionFieldsMap } from '@client/forms/configuration/selector'
+import { selectEventSectionFieldsMap } from '@client/forms/configuration/configFields/selectors'
 import { IConfigFormField } from '@client/forms/configuration/configFields/utils'
 
 const CanvasBox = styled(Box)`

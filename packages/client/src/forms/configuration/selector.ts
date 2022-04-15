@@ -33,14 +33,3 @@ export function selectEventFormDraft(store: IStoreState, event: Event) {
 
 export const getFormDraftData = (store: IStoreState): any =>
   getKey(store, 'formDraftData')
-
-export const selectEventSectionFieldsMap = (
-  store: IStoreState,
-  event: Event,
-  section: string
-) => {
-  if (store.configFields.state === 'LOADING') {
-    throw new Error('ConfigFields not loaded')
-  }
-  return store.configFields[event][section]
-}
