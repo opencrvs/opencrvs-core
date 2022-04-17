@@ -16,7 +16,8 @@ import {
   FLEX_DIRECTION,
   ISerializedForm,
   DeathSection,
-  IConditionals
+  IConditionals,
+  IFormField
 } from '@client/forms/index'
 import { formMessageDescriptors } from '@client/i18n/messages'
 
@@ -12719,4 +12720,33 @@ export const registerForms: IDefaultRegisterForms = {
       }
     ]
   }
+}
+
+export const DEFAULT_TEXT: IFormField = {
+  name: 'customField1',
+  previewGroup: '',
+  type: 'TEXT',
+  label: {
+    defaultMessage: 'Custom text input',
+    description: 'Custom field label',
+    id: 'form.field.label.customField1'
+  },
+  validate: [],
+  required: false,
+  initialValue: ''
+  // mapping: {
+  //   template: {
+  //     operation: 'fieldValueTransformer',
+  //     fieldName: 'eventDate',
+  //     parameters: ['birthDate']
+  //   },
+  //   mutation: {
+  //     operation: 'fieldNameTransformer',
+  //     parameters: []
+  //   },
+  //   query: {
+  //     operation: 'fieldValueTransformer',
+  //     parameters: ['']
+  //   }
+  // }
 }

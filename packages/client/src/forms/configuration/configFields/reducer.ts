@@ -130,6 +130,29 @@ export const configFieldsReducer: LoopReducer<
         }
       }
       return state
+    case actions.ADD_CUSTOM_FIELD:
+      const { event, section, customField } = action.payload
+      const customFieldIndex = `${event}.${section}.custom-field.${customField.fieldId}`
+
+      if (null != state.birth) {
+        for (const i in state.birth[section]) {
+          if (null == state.birth[section][i].foregoingFieldId) {
+            state.birth[section][i].foregoingFieldId = customFieldIndex
+            customField.precedingFieldId = state.birth[section][i].fieldId
+          }
+        }
+      }
+
+      return {
+        ...state,
+        [event]: {
+          ...state['birth'],
+          [section]: {
+            ...(state.birth || {})[section],
+            [customFieldIndex]: customField
+          }
+        }
+      }
     default:
       return state
   }

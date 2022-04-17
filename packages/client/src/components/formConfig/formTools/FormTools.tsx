@@ -21,6 +21,8 @@ import {
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
+import { IConfigFormField } from '@client/forms/configuration/configFields/utils'
+import { DEFAULT_TEXT } from '@client/forms/configuration/default'
 
 const TitleContainer = styled.div`
   margin-top: 24px;
@@ -37,43 +39,69 @@ const CenteredToggle = styled(Toggle)`
   align-self: center;
 `
 
+interface IFormToolsProps {
+  onAddClickListener: (fieldMap: IConfigFormField) => void
+}
+
+const customField: IConfigFormField = {
+  fieldId: 'customField1',
+  precedingFieldId: null,
+  foregoingFieldId: null,
+  required: false,
+  enabled: '',
+  custom: true,
+  definition: DEFAULT_TEXT
+}
+
 const listViewItems = (intl: IntlShape) => {
   const items = [
     {
       label: intl.formatMessage(messages.textInput),
       actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: () => {}
+      handler: (dispatchAction: (fieldMap: IConfigFormField) => void) => {
+        dispatchAction(customField)
+      }
     },
     {
       label: intl.formatMessage(messages.textAreaInput),
       actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: () => {}
+      handler: (dispatchAction: (fieldMap: IConfigFormField) => void) => {
+        dispatchAction(customField)
+      }
     },
     {
       label: intl.formatMessage(messages.numberInput),
       actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: () => {}
+      handler: (dispatchAction: (fieldMap: IConfigFormField) => void) => {
+        dispatchAction(customField)
+      }
     },
     {
       label: intl.formatMessage(messages.phoneNumberInput),
       actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: () => {}
+      handler: (dispatchAction: (fieldMap: IConfigFormField) => void) => {
+        dispatchAction(customField)
+      }
     },
     {
       label: intl.formatMessage(messages.heading),
       actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: () => {}
+      handler: (dispatchAction: (fieldMap: IConfigFormField) => void) => {
+        dispatchAction(customField)
+      }
     },
     {
       label: intl.formatMessage(messages.supportingCopy),
       actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: () => {}
+      handler: (dispatchAction: (fieldMap: IConfigFormField) => void) => {
+        dispatchAction(customField)
+      }
     }
   ]
   return items
 }
 
-export const FormTools = () => {
+export const FormTools = ({ onAddClickListener }: IFormToolsProps) => {
   const [toggleSelected, setToggleSelected] = React.useState(false)
   const intl = useIntl()
 
@@ -104,7 +132,10 @@ export const FormTools = () => {
             key={idx}
             label={<Label key={idx}>{item.label}</Label>}
             actions={[
-              <LinkButton key={idx} onClick={item.handler}>
+              <LinkButton
+                key={idx}
+                onClick={() => item.handler(onAddClickListener)}
+              >
                 {item.actionLabel}
               </LinkButton>
             ]}

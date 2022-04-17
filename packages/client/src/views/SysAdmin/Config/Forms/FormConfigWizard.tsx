@@ -33,6 +33,7 @@ import { useLoadFormDraft, useHasNatlSysAdminScope } from './hooks'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { IStoreState } from '@client/store'
 import { goToFormConfig } from '@client/navigation'
+import { AddCustomField } from '@client/forms/configuration/configFields/actions'
 
 const Container = styled.div`
   display: flex;
@@ -158,7 +159,11 @@ export function FormConfigWizard() {
               <DefaultFieldTools configField={selectedField} />
             )
           ) : (
-            <FormTools />
+            <FormTools
+              onAddClickListener={(fieldMap: IConfigFormField) =>
+                dispatch(AddCustomField(event, section, fieldMap))
+              }
+            />
           )}
         </ToolsContainer>
       </WizardContainer>
