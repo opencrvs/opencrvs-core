@@ -26,6 +26,8 @@ interface IFormConfigMessages
   addInputContent: MessageDescriptor
   pages: MessageDescriptor
   title: MessageDescriptor
+  previewDescription: MessageDescriptor
+  created: MessageDescriptor
   contentKey: MessageDescriptor
   certificateHandlebars: MessageDescriptor
   hideField: MessageDescriptor
@@ -151,6 +153,17 @@ const messagesToDefine: IFormConfigMessages = {
     defaultMessage: 'Declaration Forms',
     description: 'Title for Form Configuration Page'
   },
+  previewDescription: {
+    id: 'config.formConfig.preview.description',
+    defaultMessage:
+      'These versions are available to review and test. Log in using the test users acounts for a  Field Agent, Registration Agent or Registrar to test your declaration form.',
+    description: 'Description for preview tab'
+  },
+  created: {
+    id: 'config.formConfig.preview.created',
+    defaultMessage: 'Created',
+    description: 'Label for created in preview tab'
+  },
   contentKey: {
     id: 'config.formConfig.formTools.contentKey',
     defaultMessage: 'Content Key',
@@ -173,7 +186,7 @@ const messagesToDefine: IFormConfigMessages = {
   }
 }
 
-const draftStatusTabMessagesToDefine: Record<DraftStatus, MessageDescriptor> = {
+const draftStatusMessagesToDefine: Record<DraftStatus, MessageDescriptor> = {
   DRAFT: {
     id: 'config.formConfig.draftsTab',
     defaultMessage: 'Drafts',
@@ -193,6 +206,4 @@ const draftStatusTabMessagesToDefine: Record<DraftStatus, MessageDescriptor> = {
 
 export const messages: IFormConfigMessages = defineMessages(messagesToDefine)
 export const navigationMessages = defineMessages(navigationMessagesToDefine)
-export const draftStatusTabMessages = defineMessages(
-  draftStatusTabMessagesToDefine
-)
+export const draftStatusMessages = defineMessages(draftStatusMessagesToDefine)

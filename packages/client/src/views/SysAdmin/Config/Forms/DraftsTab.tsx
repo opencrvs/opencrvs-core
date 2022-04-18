@@ -19,24 +19,16 @@ import { IStoreState } from '@client/store'
 import { selectFormDraft } from '@client/forms/configuration/formDrafts/selectors'
 import { Event, BirthSection, DeathSection } from '@client/forms'
 import { useIntl } from 'react-intl'
-import { constantsMessages, buttonMessages } from '@client/i18n/messages'
+import { buttonMessages } from '@client/i18n/messages'
+import { draftStatusMessages } from '@client/i18n/messages/views/formConfig'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { ToggleMenu } from '@opencrvs/components/lib/interface'
+import { ToggleMenu, Pill } from '@opencrvs/components/lib/interface'
 import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
-import styled from '@client/styledComponents'
 import { goToFormConfigWizard } from '@client/navigation'
+import { DraftStatus } from '@client/forms/configuration/formDrafts/reducer'
+import { Value, IEventVersion, DraftVersion } from './components'
 
-const Label = styled.span`
-  ${({ theme }) => theme.fonts.bold16};
-`
-
-const Value = styled.span`
-  color: ${({ theme }) => theme.colors.grey500};
-`
-
-type IVersion = { version: number }
-
-function ActionButton({ event, version }: { event: Event } & IVersion) {
+function ActionButton({ event, version }: IEventVersion) {
   const intl = useIntl()
   const dispatch = useDispatch()
   return (
@@ -81,8 +73,8 @@ function OptionsMenu() {
 
 function EventDrafts({ event }: { event: Event }) {
   const intl = useIntl()
-  const { comment, history, version } = useSelector((store: IStoreState) =>
-    selectFormDraft(store, event)
+  const { comment, history, status, version } = useSelector(
+    (store: IStoreState) => selectFormDraft(store, event)
   )
 
   const actions = (
@@ -92,24 +84,32 @@ function EventDrafts({ event }: { event: Event }) {
     </>
   )
 
-  const VersionLabel = ({ version }: IVersion) => (
-    <Label>
-      {`${intl.formatMessage(constantsMessages[event])} v${version}`}
-    </Label>
-  )
-
   return (
     <>
       <ListViewItemSimplified
         key={version}
-        label={<VersionLabel version={version} />}
+        label={<DraftVersion event={event} version={version} />}
         value={<Value>{comment}</Value>}
-        actions={actions}
+        actions={
+          status === DraftStatus.DRAFT ? (
+            actions
+          ) : status === DraftStatus.PREVIEW ? (
+            <Pill
+              label={intl.formatMessage(draftStatusMessages.PREVIEW)}
+              type="active"
+            />
+          ) : (
+            <Pill
+              label={intl.formatMessage(draftStatusMessages.PUBLISHED)}
+              type="active"
+            />
+          )
+        }
       />
       {history?.map(({ comment, version }) => (
         <ListViewItemSimplified
           key={version}
-          label={<VersionLabel version={version} />}
+          label={<DraftVersion event={event} version={version} />}
           value={<Value>{comment}</Value>}
         />
       ))}

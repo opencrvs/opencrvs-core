@@ -17,12 +17,13 @@ import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWr
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import {
   messages,
-  draftStatusTabMessages
+  draftStatusMessages
 } from '@client/i18n/messages/views/formConfig'
 import { DraftStatus } from '@client/forms/configuration/formDrafts/reducer'
 import { DraftsTab } from './DraftsTab'
 import { selectFormDraftLoaded } from '@client/forms/configuration/formDrafts/selectors'
 import { useLoadFormDraft } from './hooks'
+import { PreviewTab } from './PreviewTab'
 
 export function FormConfiguration() {
   useLoadFormDraft()
@@ -37,26 +38,37 @@ export function FormConfiguration() {
     <SysAdminContentWrapper isCertificatesConfigPage>
       <Content
         title={intl.formatMessage(messages.title)}
+        subtitle={
+          selectedTab === DraftStatus.PREVIEW
+            ? intl.formatMessage(messages.previewDescription)
+            : undefined
+        }
         tabs={{
           sections: [
             {
               id: DraftStatus.DRAFT,
-              title: intl.formatMessage(draftStatusTabMessages.DRAFT)
+              title: intl.formatMessage(draftStatusMessages.DRAFT)
             },
             {
               id: DraftStatus.PREVIEW,
-              title: intl.formatMessage(draftStatusTabMessages.PREVIEW)
+              title: intl.formatMessage(draftStatusMessages.PREVIEW)
             },
             {
               id: DraftStatus.PUBLISHED,
-              title: intl.formatMessage(draftStatusTabMessages.PUBLISHED)
+              title: intl.formatMessage(draftStatusMessages.PUBLISHED)
             }
           ],
           activeTabId: selectedTab,
           onTabClick: (tabId) => setSelectedTab(tabId)
         }}
       >
-        {formDraftLoaded && selectedTab === DraftStatus.DRAFT && <DraftsTab />}
+        {formDraftLoaded && selectedTab === DraftStatus.DRAFT ? (
+          <DraftsTab />
+        ) : selectedTab === DraftStatus.PREVIEW ? (
+          <PreviewTab />
+        ) : (
+          <></>
+        )}
       </Content>
     </SysAdminContentWrapper>
   )
