@@ -12723,7 +12723,7 @@ export const registerForms: IDefaultRegisterForms = {
 }
 
 export const DEFAULT_TEXT: IFormField = {
-  name: 'customField1',
+  name: 'customField',
   previewGroup: '',
   type: 'TEXT',
   label: {

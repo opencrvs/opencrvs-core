@@ -44,13 +44,13 @@ interface IFormToolsProps {
 }
 
 const customField: IConfigFormField = {
-  fieldId: 'customField1',
+  fieldId: 'customField',
   precedingFieldId: null,
   foregoingFieldId: null,
   required: false,
   enabled: '',
   custom: true,
-  definition: DEFAULT_TEXT
+  definition: Object.assign({}, DEFAULT_TEXT)
 }
 
 const listViewItems = (intl: IntlShape) => {
@@ -59,7 +59,7 @@ const listViewItems = (intl: IntlShape) => {
       label: intl.formatMessage(messages.textInput),
       actionLabel: intl.formatMessage(buttonMessages.add),
       handler: (dispatchAction: (fieldMap: IConfigFormField) => void) => {
-        dispatchAction(customField)
+        dispatchAction(Object.assign({}, customField))
       }
     },
     {

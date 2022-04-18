@@ -23,6 +23,11 @@ import { registerForms } from '@client/forms/configuration/default'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
 import { ISectionFieldMap, getEventSectionFieldsMap } from './utils'
 
+interface IEventTypes {
+  birth: ISectionFieldMap
+  death: ISectionFieldMap
+}
+
 export type IConfigFieldsState =
   | {
       state: 'LOADING'
@@ -30,12 +35,10 @@ export type IConfigFieldsState =
       birth: null
       death: null
     }
-  | {
+  | ({
       state: 'READY'
       questions: IQuestionConfig[]
-      birth: ISectionFieldMap
-      death: ISectionFieldMap
-    }
+    } & IEventTypes)
 
 export const initialState: IConfigFieldsState = {
   state: 'LOADING',
@@ -132,23 +135,30 @@ export const configFieldsReducer: LoopReducer<
       return state
     case actions.ADD_CUSTOM_FIELD:
       const { event, section, customField } = action.payload
-      const customFieldIndex = `${event}.${section}.custom-field.${customField.fieldId}`
+      const eventName = event as keyof IEventTypes
+      const customFieldIndex = `${event}.${section}.custom-field.${String(
+        new Date().getTime()
+      )}`
 
       if (null != state.birth) {
-        for (const i in state.birth[section]) {
-          if (null == state.birth[section][i].foregoingFieldId) {
-            state.birth[section][i].foregoingFieldId = customFieldIndex
-            customField.precedingFieldId = state.birth[section][i].fieldId
+        for (const index in state.birth[section]) {
+          if (null == state.birth[section][index].foregoingFieldId) {
+            state.birth[section][index].foregoingFieldId = customFieldIndex
+            customField.precedingFieldId = state.birth[section][index].fieldId
+            customField.fieldId = customFieldIndex
+            customField.definition.name = String(new Date().getTime())
+
+            customField.definition.label.defaultMessage = customFieldIndex
           }
         }
       }
 
       return {
         ...state,
-        [event]: {
-          ...state['birth'],
+        [eventName]: {
+          ...state[eventName],
           [section]: {
-            ...(state.birth || {})[section],
+            ...(state[eventName] || {})[section],
             [customFieldIndex]: customField
           }
         }

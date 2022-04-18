@@ -24,6 +24,7 @@ import {
 } from '@client/i18n/messages/views/formConfig'
 import { goToFormConfigWizard } from '@client/navigation'
 import { connect, useDispatch } from 'react-redux'
+import { IConfigFormField } from '@client/forms/configuration/configFields/utils'
 
 const Title = styled.h1`
   margin-top: 16px;
@@ -41,6 +42,7 @@ const OrderedList = styled.ol`
 interface IPageNavigationProps {
   section: BirthSection | DeathSection
   event: Event
+  onSectionChange: React.Dispatch<React.SetStateAction<IConfigFormField | null>>
 }
 
 const PageItems = styled(NavigationSubItem)<{ isSelected: boolean }>`
@@ -50,7 +52,11 @@ const PageItems = styled(NavigationSubItem)<{ isSelected: boolean }>`
   }
 `
 
-export function SectionNavigation({ event, section }: IPageNavigationProps) {
+export function SectionNavigation({
+  event,
+  section,
+  onSectionChange
+}: IPageNavigationProps) {
   const intl = useIntl()
   const dispatch = useDispatch()
   const tabs = event === Event.BIRTH ? BirthSection : DeathSection
@@ -72,7 +78,10 @@ export function SectionNavigation({ event, section }: IPageNavigationProps) {
                   navigationMessages[tab]
                 )}`}
                 isSelected={section === tab}
-                onClick={() => dispatch(goToFormConfigWizard(event, tab))}
+                onClick={() => {
+                  dispatch(goToFormConfigWizard(event, tab))
+                  onSectionChange(null)
+                }}
               />
             </li>
           )

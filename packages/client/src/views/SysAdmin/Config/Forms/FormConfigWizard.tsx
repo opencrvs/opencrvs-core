@@ -143,7 +143,11 @@ export function FormConfigWizard() {
       />
       <WizardContainer>
         <NavigationContainer>
-          <SectionNavigation event={event} section={section} />
+          <SectionNavigation
+            event={event}
+            section={section}
+            onSectionChange={setSelectedField}
+          />
         </NavigationContainer>
         <CanvasContainer>
           <Canvas
