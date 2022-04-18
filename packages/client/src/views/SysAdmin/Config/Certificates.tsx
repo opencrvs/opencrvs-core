@@ -192,9 +192,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
         handler: async () => {
           const dummyTemplateData = getDummyCertificateTemplateData(
             event,
-            this.props.registerForm,
-            this.props.offlineResources,
-            this.props.userDetails as IUserDetails
+            this.props.registerForm
           )
 
           svgCode = executeHandlebarsTemplate(

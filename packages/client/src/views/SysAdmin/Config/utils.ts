@@ -55,7 +55,7 @@ export const getCurrency = (offlineCountryConfiguration: IOfflineData) => {
     }
   )
     .format(0)
-    .replace(/[0-9\.,]/g, '')
+    .replace(/[0-9.,]/g, '')
 
   return currency
 }
@@ -113,19 +113,29 @@ export const getCurrencySelectOptions = () => {
 }
 
 export const getFormattedFee = (value: string) => {
-  value = value.replace(/\,/g, '')
-  if (!isNaN(Number(value)) || !value) {
-    const decimalPlaces = value.toString().split('.')[1]
+  let fee = value.replace(/,/g, '')
+  if (!isNaN(Number(fee)) || !fee) {
+    const decimalPlaces = fee.toString().split('.')[1]
     if (decimalPlaces && decimalPlaces.length > 2) {
       const calcDec = Math.pow(10, 2)
-      value = (Math.trunc(parseFloat(value) * calcDec) / calcDec).toString()
+      fee = (Math.trunc(parseFloat(fee) * calcDec) / calcDec).toString()
     }
-    if (value.slice(-1) === '.') {
-      return value
-        ? Number(Number(value).toFixed(1)).toLocaleString().concat('.')
+    if (fee.slice(-1) === '.') {
+      return fee
+        ? Number(Number(fee).toFixed(1)).toLocaleString().concat('.')
         : EMPTY_STRING
     } else {
-      return value ? Number(value).toLocaleString() : EMPTY_STRING
+      const intValue = fee.split('.')
+      if (!fee) {
+        return EMPTY_STRING
+      }
+
+      if (intValue[1]) {
+        return Number(intValue[0])
+          .toLocaleString()
+          .concat('.' + intValue[1])
+      }
+      return Number(intValue[0]).toLocaleString()
     }
   }
   return EMPTY_STRING

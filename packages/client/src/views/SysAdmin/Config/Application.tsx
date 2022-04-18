@@ -39,8 +39,8 @@ import { FormattedNumberCurrency } from '@opencrvs/components/lib/symbol'
 const ListGroupTitle = styled.div`
   color: ${({ theme }) => theme.colors.grey400};
   width: 240px;
-  height: 21px;
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  height: 22px;
+  ${({ theme }) => theme.fonts.bold14};
 `
 
 type Props = IntlShapeProps & {

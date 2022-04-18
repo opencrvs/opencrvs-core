@@ -842,6 +842,12 @@
                     "description": "Placeholder text for a select",
                     "id": "form.field.select.placeholder"
                   },
+                  "mapping": {
+                    "template": {
+                      "fieldName": "informantGender",
+                      "operation": "selectTransformer"
+                    }
+                  },
                   "options": [
                     {
                       "value": "male",
@@ -2086,7 +2092,12 @@
                       "operation": "maxLength",
                       "parameters": [2]
                     }
-                  ]
+                  ],
+                  "mapping": {
+                    "template": {
+                      "fieldName": "orderOfBirth"
+                    }
+                  }
                 },
                 {
                   "name": "weightAtBirth",
@@ -6076,6 +6087,10 @@
                     "resource": "countries"
                   },
                   "mapping": {
+                    "template": {
+                      "operation": "addressOfflineTransformer",
+                      "parameters": ["mother", "PERMANENT", "country"]
+                    },
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
                       "parameters": ["PERMANENT", 0, "country"]

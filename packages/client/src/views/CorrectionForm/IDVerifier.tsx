@@ -63,6 +63,9 @@ const Container = styled.div`
   position: relative;
   white-space: pre-wrap;
   color: ${({ theme }) => theme.colors.copy};
+  @media (max-width: 768px) {
+    padding: 0px;
+  }
 `
 const UnderLayBackground = styled.div`
   background-color: ${({ theme }) => theme.colors.primary};
@@ -72,6 +75,9 @@ const UnderLayBackground = styled.div`
   width: 100%;
   height: 100%;
   opacity: 0.08;
+  @media (max-width: 768px) {
+    background-color: ${({ theme }) => theme.colors.white};
+  }
 `
 
 interface IIDVerifierState {
@@ -209,7 +215,9 @@ class IDVerifierComponent extends React.Component<
             </PrimaryButton>
           ]}
         >
-          {intl.formatMessage(certificateMessages.idCheckDialogDescription)}
+          {intl.formatMessage(
+            certificateMessages.correctorIDCheckDialogDescription
+          )}
         </ResponsiveModal>
       </div>
     )
