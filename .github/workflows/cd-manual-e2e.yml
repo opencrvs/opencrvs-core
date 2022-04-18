@@ -78,6 +78,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
       - name: Deploy to development
+        environment: staging
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
