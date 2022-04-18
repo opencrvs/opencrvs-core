@@ -138,4 +138,12 @@ describe('locationUtil tests', () => {
       )
     })
   })
+  it('returns empty location name if location is undefined', () => {
+    const language: ILanguage = mockOfflineData.languages[0]
+    const intl = createIntl({
+      locale: language.lang,
+      messages: language.messages
+    })
+    expect(generateLocationName(undefined, intl)).toEqual('')
+  })
 })

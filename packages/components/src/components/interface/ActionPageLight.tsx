@@ -13,26 +13,9 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { BackArrowDeepBlue, Cross } from '../icons'
 import { CircleButton } from '../buttons'
+import { IPageHeaderProps, PageHeader } from './Header/PageHeader'
 const ActionContainer = styled.div`
   width: 100%;
-`
-const HeaderContainer = styled.div`
-  background: ${({ theme }) => theme.colors.white};
-  color: ${({ theme }) => theme.colors.copy};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
-  position: fixed;
-`
-const BodyContent = styled.div`
-  width: 100%;
-  height: 56px;
-  padding: 24px 0px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
 `
 const BackButtonContainer = styled.div`
   margin-right: 16px;
@@ -45,9 +28,6 @@ const BackButtonText = styled.span`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
   }
-`
-const MenuTitle = styled.div`
-  ${({ theme }) => theme.fonts.h4};
 `
 
 const Container = styled.div<{ hideBackground: boolean | undefined }>`
@@ -63,11 +43,12 @@ const Container = styled.div<{ hideBackground: boolean | undefined }>`
     margin: 40px 54px;
     padding: 24px 32px;
     min-height: 100vh;
+    background: ${({ theme }) => theme.colors.white};
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     width: 100%;
     margin: 0;
-    padding: 24px 32px;
+    padding: 0;
     min-height: 100vh;
   }
 `
@@ -85,28 +66,46 @@ export class ActionPageLight extends React.Component<
     goBack: () => void
   }
 > {
+  getHeaderLeft = () => {
+    const { icon, goBack, backLabel } = this.props
+    return [
+      <BackButtonContainer
+        id="action_page_back_button"
+        onClick={goBack}
+        key="action_page_back_button"
+      >
+        <CircleButton>{(icon && icon()) || <BackArrowDeepBlue />}</CircleButton>
+        <BackButtonText>{backLabel ? backLabel : ''}</BackButtonText>
+      </BackButtonContainer>
+    ]
+  }
+  getHeaderRight = () => {
+    const { goHome } = this.props
+    return [
+      (goHome && (
+        <CircleButton id="crcl-btn" onClick={goHome} key="crcl-btn">
+          <Cross color="currentColor" />
+        </CircleButton>
+      )) || <></>
+    ]
+  }
+
   render() {
-    const { id, title, icon, goBack, goHome, backLabel, hideBackground } =
-      this.props
+    const { id, title, hideBackground } = this.props
+
+    const pageHeaderProps: IPageHeaderProps = {
+      id: 'pageHeader',
+      mobileTitle: title,
+      mobileLeft: this.getHeaderLeft(),
+      mobileRight: this.getHeaderRight(),
+      desktopTitle: title,
+      desktopLeft: this.getHeaderLeft(),
+      desktopRight: this.getHeaderRight()
+    }
 
     return (
       <ActionContainer id={id}>
-        <HeaderContainer>
-          <BodyContent>
-            <BackButtonContainer id="action_page_back_button" onClick={goBack}>
-              <CircleButton>
-                {(icon && icon()) || <BackArrowDeepBlue />}
-              </CircleButton>
-              <BackButtonText>{backLabel ? backLabel : ''}</BackButtonText>
-            </BackButtonContainer>
-            {title && <MenuTitle>{title}</MenuTitle>}
-          </BodyContent>
-          {goHome && (
-            <CircleButton id="crcl-btn" onClick={goHome}>
-              <Cross color="currentColor" />
-            </CircleButton>
-          )}
-        </HeaderContainer>
+        <PageHeader {...pageHeaderProps} />
         <Container hideBackground={hideBackground}>
           {this.props.children}
         </Container>

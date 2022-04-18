@@ -15,15 +15,24 @@ import {
   IDeclaration,
   writeDeclaration
 } from '@client/declarations'
-import { getCorrectorSection } from '@client/forms/correction/corrector'
+import {
+  CorrectorRelationship,
+  getCorrectorSection
+} from '@client/forms/correction/corrector'
 import { connect } from 'react-redux'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
-import { goBack, goToVerifyCorrector, goToHomeTab } from '@client/navigation'
+import {
+  goBack,
+  goToVerifyCorrector,
+  goToPageGroup,
+  goToHomeTab
+} from '@client/navigation'
 import {
   Event,
   IFormSection,
   IFormSectionData,
-  IRadioGroupWithNestedFieldsFormField
+  IRadioGroupWithNestedFieldsFormField,
+  ReviewSection
 } from '@client/forms'
 import { get, isEqual } from 'lodash'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
@@ -34,6 +43,7 @@ import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/correction'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import { groupHasError } from './utils'
+import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
 
 type IProps = {
   declaration: IDeclaration
@@ -42,6 +52,7 @@ type IProps = {
 type IDispatchProps = {
   goBack: typeof goBack
   goToVerifyCorrector: typeof goToVerifyCorrector
+  goToPageGroup: typeof goToPageGroup
   modifyDeclaration: typeof modifyDeclaration
   writeDeclaration: typeof writeDeclaration
   goToHomeTab: typeof goToHomeTab
@@ -128,12 +139,36 @@ function CorrectorFormComponent(props: IFullProps) {
     })
   }
   const continueButtonHandler = () => {
+    const relationShip = (
+      declaration.data.corrector.relationship as IFormSectionData
+    ).value as string
     props.writeDeclaration(declaration)
-    props.goToVerifyCorrector(
-      declaration.id,
-      (declaration.data.corrector.relationship as IFormSectionData)
-        .value as string
-    )
+    if (
+      relationShip === CorrectorRelationship.REGISTRAR ||
+      relationShip === CorrectorRelationship.ANOTHER_AGENT
+    ) {
+      const changed = {
+        ...declaration,
+        data: {
+          ...declaration.data,
+          corrector: {
+            ...declaration.data.corrector,
+            hasShowedVerifiedDocument: false
+          }
+        }
+      }
+      props.modifyDeclaration(changed)
+      props.writeDeclaration(changed)
+      props.goToPageGroup(
+        CERTIFICATE_CORRECTION_REVIEW,
+        declaration.id,
+        ReviewSection.Review,
+        'review-view-group',
+        declaration.event
+      )
+    } else {
+      props.goToVerifyCorrector(declaration.id, relationShip)
+    }
   }
 
   const continueButton = (
@@ -185,5 +220,6 @@ export const CorrectorForm = connect(undefined, {
   modifyDeclaration,
   writeDeclaration,
   goToVerifyCorrector,
+  goToPageGroup,
   goToHomeTab
 })(injectIntl(CorrectorFormComponent))

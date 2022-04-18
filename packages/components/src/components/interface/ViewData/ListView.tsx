@@ -13,18 +13,35 @@ import { isString } from 'lodash'
 import * as React from 'react'
 import styled from 'styled-components'
 import { IListRowProps, ListRow } from './ListRow'
+import { LinkButton } from '../../buttons'
 
 const Container = styled.div`
   margin-top: 20px;
   margin-bottom: 30px;
 `
 const Title = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
   ${({ theme }) => theme.fonts.h2};
   margin-bottom: 16px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     ${({ theme }) => theme.fonts.h3};
+    flex-direction: column;
+    align-items: flex-start;
+    button > div {
+      padding: 0;
+    }
+    gap: 0;
   }
 `
+
+interface IAction {
+  id?: string
+  label: string
+  disabled?: boolean
+  handler: () => void
+}
 
 const ResponsiveContainer = styled.div<{ isConfigPage?: boolean }>`
   display: ${({ isConfigPage }) => (isConfigPage === true ? 'block' : 'none')};
@@ -37,6 +54,7 @@ interface IProps {
   title?: string
   items: IListRowProps[]
   responsiveContents?: React.ReactNode
+  action?: IAction
   isConfigPage?: boolean
   noResultText?: string
 }
@@ -49,11 +67,18 @@ const ErrorText = styled.div<{ isFullPage?: boolean }>`
 `
 export class ListView extends React.Component<IProps> {
   render() {
-    const { id, title, items, responsiveContents } = this.props
+    const { action, id, title, items, responsiveContents } = this.props
 
     return (
       <Container id={id}>
-        {title && <Title>{title}</Title>}
+        {title && (
+          <Title>
+            {title}
+            {action && (
+              <LinkButton onClick={action.handler}>{action.label}</LinkButton>
+            )}
+          </Title>
+        )}
         {responsiveContents && (
           <ResponsiveContainer
             isConfigPage={this.props.isConfigPage && this.props.isConfigPage}
