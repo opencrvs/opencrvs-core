@@ -314,7 +314,6 @@ interface ITableViewProps {
   highlightRowOnMouseOver?: boolean
   isFullPage?: boolean
   fixedWidth?: number
-  hideTableHeaderBorder?: boolean
 }
 
 interface ITableViewState {
@@ -404,8 +403,7 @@ export class TableView extends React.Component<
       loadMoreText,
       highlightRowOnMouseOver,
       isFullPage,
-      fixedWidth,
-      hideTableHeaderBorder
+      fixedWidth
     } = this.props
     const totalItems = this.props.totalItems || 0
     const totalWidth = columns.reduce((total, col) => (total += col.width), 0)
@@ -427,11 +425,7 @@ export class TableView extends React.Component<
             >
               {!hideTableHeader && content.length > 0 && (
                 <TableHeaderWrapper>
-                  <TableHeader
-                    totalWidth={totalWidth}
-                    fixedWidth={fixedWidth}
-                    hideTableHeaderBorder={hideTableHeaderBorder}
-                  >
+                  <TableHeader totalWidth={totalWidth} fixedWidth={fixedWidth}>
                     {columns.map((preference, index) => (
                       <ContentWrapper
                         key={index}

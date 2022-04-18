@@ -977,7 +977,6 @@ const GetHistory = ({
         content={historyData}
         alignItemCenter={true}
         pageSize={100}
-        hideTableHeaderBorder={true}
       />
     </>
   )
