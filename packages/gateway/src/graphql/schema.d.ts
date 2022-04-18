@@ -469,6 +469,7 @@ export interface GQLApplicationConfiguration {
   LOGROCKET?: string
   PHONE_NUMBER_PATTERN?: string
   NID_NUMBER_PATTERN?: string
+  ADDRESSES?: number
 }
 
 export interface GQLApplicationConfigurationInput {
@@ -492,6 +493,7 @@ export interface GQLApplicationConfigurationInput {
   LOGROCKET?: string
   PHONE_NUMBER_PATTERN?: string
   NID_NUMBER_PATTERN?: string
+  ADDRESSES?: number
 }
 
 export interface GQLQuestionInput {
@@ -3808,6 +3810,7 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   LOGROCKET?: ApplicationConfigurationToLOGROCKETResolver<TParent>
   PHONE_NUMBER_PATTERN?: ApplicationConfigurationToPHONE_NUMBER_PATTERNResolver<TParent>
   NID_NUMBER_PATTERN?: ApplicationConfigurationToNID_NUMBER_PATTERNResolver<TParent>
+  ADDRESSES?: ApplicationConfigurationToADDRESSESResolver<TParent>
 }
 
 export interface ApplicationConfigurationToAPPLICATION_NAMEResolver<
@@ -3944,6 +3947,13 @@ export interface ApplicationConfigurationToPHONE_NUMBER_PATTERNResolver<
 }
 
 export interface ApplicationConfigurationToNID_NUMBER_PATTERNResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToADDRESSESResolver<
   TParent = any,
   TResult = any
 > {
