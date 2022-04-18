@@ -74,22 +74,32 @@ Default.args = {
       <ListViewItemSimplified
         label="A very long label to show what happens when text overflows"
         value="A very long value to show what happens when text overflows"
-        actions={[linkButton]}
+        actions={linkButton}
       />
       <ListViewItemSimplified
         label={linkLabel(3)}
         value="Value 3"
-        actions={[button, toggleMenu]}
+        actions={
+          <>
+            {button}
+            {toggleMenu}
+          </>
+        }
       />
       <ListViewItemSimplified
         label="Label 4"
         value="Value 4"
-        actions={[toggleMenu]}
+        actions={toggleMenu}
       />
       <ListViewItemSimplified
         label="Label 5"
         value={<AvatarLarge />}
-        actions={[linkButton, toggleMenu]}
+        actions={
+          <>
+            {linkButton}
+            {toggleMenu}
+          </>
+        }
       />
     </>
   )
@@ -103,31 +113,41 @@ WithAvatar.args = {
         image={<AvatarSmall />}
         label="Name of user"
         value="Value 1"
-        actions={[pill, toggleMenu]}
+        actions={
+          <>
+            {pill}
+            {toggleMenu}
+          </>
+        }
       />
       <ListViewItemSimplified
         image={<AvatarSmall />}
         label="A very long label to show what happens when text overflows"
         value="A very long value to show what happens when text overflows"
-        actions={[linkButton]}
+        actions={linkButton}
       />
       <ListViewItemSimplified
         image={<AvatarSmall />}
         label="Name of user"
         value="Value 3"
-        actions={[toggleMenu]}
+        actions={toggleMenu}
       />
       <ListViewItemSimplified
         image={<AvatarSmall />}
         label="Name of user"
         value="Value 4"
-        actions={[pill, toggleMenu]}
+        actions={
+          <>
+            {pill}
+            {toggleMenu}
+          </>
+        }
       />
       <ListViewItemSimplified
         image={<AvatarSmall />}
         label="Name of user"
         value="Value 5"
-        actions={[toggleMenu]}
+        actions={toggleMenu}
       />
     </>
   )
