@@ -10,12 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import {
-  WrappedComponentProps as IntlShapeProps,
-  defineMessages,
-  injectIntl,
-  MessageDescriptor
-} from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 
 import styled from 'styled-components'
 import { InjectedFormProps, WrappedFieldProps, Field } from 'redux-form'
@@ -30,6 +25,7 @@ import {
 } from '@opencrvs/components/lib/forms'
 
 import { stepOneFields } from '@login/views/StepOne/stepOneFields'
+import { messages } from '@login/i18n/messages/views/stepOneForm'
 
 import { IAuthenticationData } from '@login/utils/authApi'
 import { Logo } from '@opencrvs/components/lib/icons'
@@ -40,65 +36,6 @@ import {
   ERROR_CODE_PHONE_NUMBER_VALIDATE
 } from '@login/utils/authUtils'
 import { goToForgottenItemForm } from '@login/login/actions'
-
-export const messages: {
-  [key: string]: MessageDescriptor
-} = defineMessages({
-  networkError: {
-    id: 'error.networkError',
-    defaultMessage: 'Unable to connect to server',
-    description: 'The error that appears when there is no internet connection'
-  },
-  stepOneTitle: {
-    id: 'buttons.login',
-    defaultMessage: 'Login',
-    description: 'The title that appears in step one of the form'
-  },
-  stepOneInstruction: {
-    id: 'login.stepOneInstruction',
-    defaultMessage: 'Please enter your mobile number and password.',
-    description: 'The instruction that appears in step one of the form'
-  },
-  submit: {
-    id: 'login.submit',
-    defaultMessage: 'Submit',
-    description: 'The label that appears on the submit button'
-  },
-  forgotPassword: {
-    id: 'login.forgotPassword',
-    defaultMessage: 'Forgot password',
-    description: 'The label that appears on the Forgot password button'
-  },
-  submissionError: {
-    id: 'login.submissionError',
-    defaultMessage: 'Sorry that mobile number and password did not work.',
-    description:
-      'The error that appears when the user entered details are unauthorised'
-  },
-  forbiddenCredentialError: {
-    id: 'login.forbiddenCredentialError',
-    defaultMessage: 'Sorry given user is not allowed to login.',
-    description:
-      'The error that appears when the user entered details are forbidden'
-  },
-  optionalLabel: {
-    id: 'login.optionalLabel',
-    defaultMessage: 'Optional',
-    description: 'Optional label'
-  },
-  fieldMissing: {
-    id: 'login.fieldMissing',
-    defaultMessage: 'Mobile number and password must be provided',
-    description: "The error if user doesn't fill all the field"
-  },
-  phoneNumberFormat: {
-    id: 'validations.phoneNumberFormat',
-    defaultMessage:
-      'Must be a valid mobile phone number. Starting with 0. e.g. {example}',
-    description:
-      'The error message that appears on phone numbers where the first character must be a 0'
-  }
-})
 
 export const Container = styled.div`
   position: relative;

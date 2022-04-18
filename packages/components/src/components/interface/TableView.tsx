@@ -315,6 +315,7 @@ interface ITableViewProps {
   isFullPage?: boolean
   fixedWidth?: number
   hideTableHeaderBorder?: boolean
+  noPagination?: boolean
 }
 
 interface ITableViewState {
@@ -385,12 +386,15 @@ export class TableView extends React.Component<
   }
 
   render() {
+    const defaultPageSize = this.props.noPagination
+      ? this.props.content.length
+      : defaultConfiguration.pageSize
     const {
       id,
       columns,
       content,
       noResultText,
-      pageSize = defaultConfiguration.pageSize,
+      pageSize = defaultPageSize,
       currentPage = defaultConfiguration.currentPage,
       isLoading = false,
       tableTitle,
@@ -405,7 +409,8 @@ export class TableView extends React.Component<
       highlightRowOnMouseOver,
       isFullPage,
       fixedWidth,
-      hideTableHeaderBorder
+      hideTableHeaderBorder,
+      noPagination
     } = this.props
     const totalItems = this.props.totalItems || 0
     const totalWidth = columns.reduce((total, col) => (total += col.width), 0)
@@ -563,7 +568,7 @@ export class TableView extends React.Component<
         )}
         {totalItems > pageSize && (
           <>
-            {!loadMoreText && (
+            {!loadMoreText && !noPagination && (
               <Pagination
                 initialPage={currentPage}
                 totalPages={Math.ceil(totalItems / pageSize)}

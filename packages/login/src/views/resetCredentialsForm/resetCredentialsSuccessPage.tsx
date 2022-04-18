@@ -22,7 +22,7 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
-import { messages } from './resetCredentialsForm'
+import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
 import { RouteComponentProps } from 'react-router'
 
 const TitleHolder = styled.div`

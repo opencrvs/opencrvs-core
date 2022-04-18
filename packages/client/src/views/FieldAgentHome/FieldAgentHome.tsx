@@ -81,7 +81,10 @@ import { connect } from 'react-redux'
 import { Redirect, RouteComponentProps } from 'react-router'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
-import { Navigation } from '@client/components/interface/Navigation'
+import {
+  Navigation,
+  WORKQUEUE_TABS
+} from '@client/components/interface/Navigation'
 import subYears from 'date-fns/subYears'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { ISearchInputProps } from '@client/views/SearchResult/SearchResult'
@@ -155,12 +158,6 @@ interface IFieldAgentHomeState {
   requireUpdatesPage: number
 }
 
-const TAB_ID = {
-  inProgress: FIELD_AGENT_HOME_TAB_IN_PROGRESS,
-  sentForReview: FIELD_AGENT_HOME_TAB_SENT_FOR_REVIEW,
-  requireUpdates: FIELD_AGENT_HOME_TAB_REQUIRE_UPDATES
-}
-
 class FieldAgentHomeView extends React.Component<
   FieldAgentHomeProps,
   IFieldAgentHomeState
@@ -203,7 +200,7 @@ class FieldAgentHomeView extends React.Component<
   }
 
   onPageChange = (newPageNumber: number) => {
-    if (this.props.match.params.tabId === TAB_ID.requireUpdates) {
+    if (this.props.match.params.tabId === WORKQUEUE_TABS.requiresUpdate) {
       this.setState({ requireUpdatesPage: newPageNumber })
     }
   }
@@ -314,7 +311,7 @@ class FieldAgentHomeView extends React.Component<
       declarationsReadyToSend
     } = this.props
 
-    const tabId = match.params.tabId || TAB_ID.sentForReview
+    const tabId = match.params.tabId || WORKQUEUE_TABS.sentForReview
     const fieldAgentLocationId = userDetails && getUserLocation(userDetails).id
     const jurisdictionLocationId =
       userDetails && getJurisdictionLocationIdFromUserDetails(userDetails)
@@ -327,19 +324,19 @@ class FieldAgentHomeView extends React.Component<
             <Header />
             <Navigation />
             <BodyContainer>
-              {tabId === TAB_ID.inProgress && (
+              {tabId === WORKQUEUE_TABS.inProgress && (
                 <InProgress
                   draftDeclarations={draftDeclarations}
                   showPaginated={this.showPaginated}
                 />
               )}
-              {tabId === TAB_ID.sentForReview && (
+              {tabId === WORKQUEUE_TABS.sentForReview && (
                 <SentForReview
                   declarationsReadyToSend={declarationsReadyToSend}
                   showPaginated={this.showPaginated}
                 />
               )}
-              {tabId === TAB_ID.requireUpdates && (
+              {tabId === WORKQUEUE_TABS.requiresUpdate && (
                 <Query
                   query={SEARCH_DECLARATIONS_USER_WISE} // TODO can this be changed to use SEARCH_EVENTS
                   variables={{

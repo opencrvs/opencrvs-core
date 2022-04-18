@@ -20,7 +20,6 @@ import {
   TextArea
 } from '@opencrvs/components/lib/forms'
 import {
-  DataSection,
   DocumentViewer,
   IDocumentViewerOptions,
   ListView,
@@ -110,7 +109,7 @@ import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
 import { isMobileDevice } from '@client/utils/commonUtils'
-import { BIRTH, REJECTED } from '@client/utils/constants'
+import { REJECTED } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { flatten, isArray, flattenDeep, get, clone } from 'lodash'
@@ -1335,6 +1334,18 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     this.closePreviewSection(() => this.removeAttachmentFromDraft(file))
   }
 
+  shouldShowChangeAll = (section: IFormSection) => {
+    const {
+      draft: { data, event }
+    } = this.props
+    return (
+      event === Event.BIRTH &&
+      (section.id === BirthSection.Mother ||
+        (section.id === BirthSection.Father &&
+          !!data.father?.fathersDetailsExist))
+    )
+  }
+
   transformSectionData = (
     formSections: IFormSection[],
     errorsOnFields: IErrorsBySection
@@ -1407,7 +1418,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         id: section.id,
         title: intl.formatMessage(section.title),
         items: items.filter((item) => item),
-        action: section.replaceable
+        action: this.shouldShowChangeAll(section)
           ? {
               label: intl.formatMessage(buttonMessages.replace),
               handler: () =>
@@ -1513,7 +1524,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   />
                 )
               })}
-              {event === BIRTH && !isCorrection(declaration) && (
+              {event === Event.BIRTH && !isCorrection(declaration) && (
                 <InputWrapper>
                   <InputField
                     id="additional_comments"
@@ -1570,6 +1581,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   })}
                   <LinkButton
                     id="edit-document"
+                    disabled={isCorrection(declaration)}
                     onClick={() =>
                       this.editLinkClickHandlerForDraft(
                         documentsSection.id,

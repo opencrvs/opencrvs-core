@@ -58,6 +58,8 @@ services:
     configs:
       - source: metricbeat-conf.{{ts}}
         target: /usr/share/metricbeat/metricbeat.yml
+      - source: metricbeat-rollover-policy.{{ts}}
+        target: /usr/share/metricbeat/rollover-policy.json
 
   setup-kibana-alerts:
     image: node:17.6.0-alpine
@@ -73,7 +75,8 @@ services:
       - '/tmp/compose/infrastructure/monitoring/kibana/setup-alerts.js:/usr/app/setup-alerts.js'
     networks:
       - overlay_net
-
+    deploy:
+      replicas: 1
   kibana:
     restart: always
     deploy:
@@ -86,8 +89,9 @@ services:
         - 'traefik.docker.network=opencrvs_overlay_net'
     networks:
       - overlay_net
-    volumes:
-      - '/tmp/compose/infrastructure/monitoring/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml:ro,Z'
+    configs:
+      - source: kibana.{{ts}}
+        target: /usr/share/kibana/config/kibana.yml
     depends_on:
       - elasticsearch
 
@@ -165,14 +169,10 @@ services:
     deploy:
       replicas: 3
     command: >
-      apm-server -e
-        -E apm-server.rum.enabled=true
-        -E setup.kibana.host=kibana:5601
-        -E setup.template.settings.index.number_of_replicas=0
-        -E apm-server.kibana.enabled=true
-        -E apm-server.kibana.host=kibana:5601
-        -E output.elasticsearch.hosts=["elasticsearch:9200"]
-        -E output.elasticsearch.bulk_max_size=5120
+      apm-server -e -c apm-server.yml
+    configs:
+      - source: apm.{{ts}}
+        target: /usr/share/apm-server/apm-server.yml
 
   # Configure influxdb
   influxdb:
@@ -458,6 +458,13 @@ configs:
     file: ./infrastructure/hearth-queryparam-extensions.json
   metricbeat-conf.{{ts}}:
     file: ./infrastructure/monitoring/beats/metricbeat.yml
+  metricbeat-rollover-policy.{{ts}}:
+    file: ./infrastructure/monitoring/beats/rollover-policy.json
+  kibana.{{ts}}:
+    file: ./infrastructure/monitoring/kibana/kibana.yml
+  apm.{{ts}}:
+    file: ./infrastructure/monitoring/apm/apm-server.yml
+
 networks:
   overlay_net:
     driver: overlay

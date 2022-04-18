@@ -50,10 +50,20 @@ describe('CreatePassword page tests', () => {
     })
     component.find('button#Continue').simulate('click')
   })
-  it('it shows passwords required error when Continue button is pressed', () => {
-    component.find('button#Continue').simulate('click')
-    expect(component.find('#GlobalError').hostNodes().text()).toEqual(
-      'New password is not valid'
-    )
+  it('it shows disabled continue button when no password is given', () => {
+    expect(
+      component.find('button#Continue').hostNodes().props().disabled
+    ).toBeTruthy()
+  })
+  it('it shows disabled continue button when password is not valid', () => {
+    component.find('input#NewPassword').simulate('change', {
+      target: { id: 'NewPassword', value: '0ocrvs' }
+    })
+    component.find('input#ConfirmPassword').simulate('change', {
+      target: { id: 'ConfirmPassword', value: '0ocrvs' }
+    })
+    expect(
+      component.find('button#Continue').hostNodes().props().disabled
+    ).toBeTruthy()
   })
 })

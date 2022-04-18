@@ -57,13 +57,15 @@
     "lint:ts": "eslint --fix './src/**/*.{ts,tsx}'",
     "start:prod": "yarn build && yarn serve -s -l 3020 build",
     "test:compilation": "tsc --noEmit",
-    "build:clean": "rm -rf build"
+    "build:clean": "rm -rf build",
+    "extract:translations": "bash extract-translations.sh"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx,json}": [
       "prettier --write",
       "yarn lint:ts",
       "stylelint",
+      "yarn extract:translations",
       "git add"
     ]
   },
