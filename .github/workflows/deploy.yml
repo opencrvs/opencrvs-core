@@ -75,7 +75,7 @@ jobs:
         run: |
           yarn deploy:prod farajaland.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 3
 
-      - name: Deploy to production
+      - name: Deploy to staging
         if: ${{ github.event.inputs.environment == 'staging' }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
