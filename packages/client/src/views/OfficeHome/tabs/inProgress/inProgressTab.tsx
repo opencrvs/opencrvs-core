@@ -12,8 +12,7 @@
 import { Button } from '@opencrvs/components/lib/buttons'
 import {
   ColumnContentAlignment,
-  GridTable,
-  IAction
+  GridTable
 } from '@opencrvs/components/lib/interface/GridTable'
 import {
   GQLHumanName,
@@ -64,6 +63,7 @@ import {
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { IFormTabProps } from '@opencrvs/components/lib/forms'
 import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
+import { IAction } from '@opencrvs/components/lib/interface/GridTable/types'
 
 interface IQueryData {
   inProgressData: GQLEventSearchResultSet

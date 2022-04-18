@@ -336,7 +336,7 @@ interface IGQLDeclaration {
   }
 }
 
-const STATUSTOCOLOR: { [key: string]: string } = {
+export const STATUSTOCOLOR: { [key: string]: string } = {
   ARCHIVED: 'grey',
   DRAFT: 'purple',
   DECLARED: 'orange',
