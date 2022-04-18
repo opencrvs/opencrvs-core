@@ -93,6 +93,21 @@ if [ -z "$KIBANA_PASSWORD" ] ; then
     print_usage_and_exit
 fi
 
+if [ -z "$ELASTICSEARCH_SUPERUSER_PASSWORD" ] ; then
+    echo 'Error: Missing environment variable ELASTICSEARCH_SUPERUSER_PASSWORD.'
+    print_usage_and_exit
+fi
+
+if [ -z "$MONGODB_ADMIN_USER" ] ; then
+    echo 'Error: Missing environment variable MONGODB_ADMIN_USER.'
+    print_usage_and_exit
+fi
+
+if [ -z "$MONGODB_ADMIN_PASSWORD" ] ; then
+    echo 'Error: Missing environment variable MONGODB_ADMIN_PASSWORD.'
+    print_usage_and_exit
+fi
+
 ENV=$4
 HOST=$5
 VERSION=$6
@@ -119,10 +134,6 @@ WEBHOOKS_MONGODB_PASSWORD=`generate_password`
 # Elasticsearch credentials
 #
 # Notice that all of these passwords change on each deployment.
-
-# This is the root ElasticSearch password meant to be used internally by Kibana,
-# Metricbeat and other applications that require admin-level access for managing indices etc.
-ROTATING_ELASTIC_PASSWORD=`generate_password`
 
 # Application password for OpenCRVS Search
 ROTATING_SEARCH_ELASTIC_PASSWORD=`generate_password`
@@ -196,7 +207,7 @@ docker_stack_deploy() {
     WEBHOOKS_MONGODB_PASSWORD='$WEBHOOKS_MONGODB_PASSWORD' \
     MONGODB_ADMIN_USER='$MONGODB_ADMIN_USER' \
     MONGODB_ADMIN_PASSWORD='$MONGODB_ADMIN_PASSWORD' \
-    ROTATING_ELASTIC_PASSWORD='$ROTATING_ELASTIC_PASSWORD' \
+    ELASTICSEARCH_SUPERUSER_PASSWORD='$ELASTICSEARCH_SUPERUSER_PASSWORD' \
     ROTATING_METRICBEAT_ELASTIC_PASSWORD='$ROTATING_METRICBEAT_ELASTIC_PASSWORD' \
     ROTATING_APM_ELASTIC_PASSWORD='$ROTATING_APM_ELASTIC_PASSWORD' \
     ROTATING_SEARCH_ELASTIC_PASSWORD='$ROTATING_SEARCH_ELASTIC_PASSWORD' \

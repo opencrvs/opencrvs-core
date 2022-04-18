@@ -12,6 +12,12 @@
   become: yes
   become_method: sudo
   tasks:
+    - name: 'Check mandatory variables are defined'
+      assert:
+        that:
+          - mongodb_admin_username is defined
+          - mongodb_admin_password is defined
+          - elasticsearch_superuser_password is defined
     - name: 'Add docker repository key'
       apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg
@@ -59,6 +65,34 @@
         minute: '0'
         hour: '0'
         job: '/usr/bin/docker system prune -af >> /var/log/docker-prune.log'
+
+    - name: Inserts Elasticsearch super user username environment variable to crontab
+      cron:
+        name: ELASTICSEARCH_ADMIN_USER
+        env: yes
+        job: 'elastic'
+      when: elasticsearch_superuser_password is defined
+
+    - name: Inserts Elasticsearch super user password environment variable to crontab
+      cron:
+        name: ELASTICSEARCH_ADMIN_PASSWORD
+        env: yes
+        job: '{{ elasticsearch_superuser_password }}'
+      when: elasticsearch_superuser_password is defined
+
+    - name: Inserts MongoDB username environment variable to crontab
+      cron:
+        name: MONGODB_ADMIN_USER
+        env: yes
+        job: '{{ mongodb_admin_username }}'
+      when: mongodb_admin_username is defined
+
+    - name: Inserts MongoDB password environment variable to crontab
+      cron:
+        name: MONGODB_ADMIN_PASSWORD
+        env: yes
+        job: '{{ mongodb_admin_password }}'
+      when: mongodb_admin_password is defined
 
     - name: 'Setup crontab to backup the opencrvs data'
       cron:

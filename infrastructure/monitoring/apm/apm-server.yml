@@ -298,11 +298,6 @@ apm-server:
 
     # Optional protocol and basic auth credentials.
     #protocol: "https"
-<<<<<<< HEAD
-    #username: "elastic"
-    #password: "changeme"
-=======
->>>>>>> f18982dc4 (setup basic credentials and authentication for elasticsearch and applications using it)
 
     # Optional HTTP path.
     #path: ""
@@ -568,11 +563,6 @@ output.elasticsearch:
 
   # Authentication credentials - either API key or username/password.
   #api_key: "id:api_key"
-<<<<<<< HEAD
-  ####username: ${ELASTICSEARCH_USERNAME:elastic}
-  ####password: ${ELASTICSEARCH_PASSWORD:pass4elastic}
-=======
->>>>>>> f18982dc4 (setup basic credentials and authentication for elasticsearch and applications using it)
 
   # Dictionary of HTTP parameters to pass within the url with index operations.
   #parameters:
