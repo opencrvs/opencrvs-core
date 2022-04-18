@@ -237,6 +237,7 @@ class RejectTabComponent extends React.Component<
       <Content
         size={ContentSize.LARGE}
         title={intl.formatMessage(navigationMessages.sentForUpdates)}
+        hideBackground={true}
       >
         <GridTable
           content={this.transformRejectedContent(data)}

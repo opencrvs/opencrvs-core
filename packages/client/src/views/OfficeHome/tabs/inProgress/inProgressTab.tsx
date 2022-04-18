@@ -555,6 +555,7 @@ export class InProgressTabComponent extends React.Component<
       <Content
         size={ContentSize.LARGE}
         title={intl.formatMessage(navigationMessages.progress)}
+        hideBackground={true}
         tabs={this.getTabs(
           selectorId,
           drafts,

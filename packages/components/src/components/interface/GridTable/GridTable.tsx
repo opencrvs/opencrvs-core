@@ -47,6 +47,13 @@ const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.grey600};
   ${({ theme }) => theme.fonts.bold16}
   text-align: left;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 50%;
+    text-align: center;
+  }
 `
 
 const RowWrapper = styled.div<{
