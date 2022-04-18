@@ -104,15 +104,25 @@ SSH_HOST=${SSH_HOST:-$HOST}
 LOG_LOCATION=${LOG_LOCATION:-/var/log}
 
 
+#
+# Elasticsearch credentials
+#
+# Notice that all of these passwords change on each deployment.
 
-# Rotate ElasticSearch credentials
+# This is the root ElasticSearch password meant to be used internally by Kibana,
+# Metricbeat and other applications that require admin-level access for managing indices etc.
 ROTATING_ELASTIC_PASSWORD=`generate_password`
-# Used for Metricsbeat -> ElasticSearch communication
-ROTATING_METRICBEAT_ELASTIC_PASSWORD=`generate_password`
-# Used for APM -> ElasticSearch communication
-ROTATING_APM_ELASTIC_PASSWORD=`generate_password`
-# Application password
+
+# Application password for OpenCRVS Search
 ROTATING_SEARCH_ELASTIC_PASSWORD=`generate_password`
+# If new applications require access to ElasticSearch, new passwords should be generated here.
+# Remember to add the user to infrastructure/elasticsearch/setup-users.sh so it is created when you deploy.
+
+# Used by Metricsbeat when writing data to ElasticSearch
+ROTATING_METRICBEAT_ELASTIC_PASSWORD=`generate_password`
+
+# Used by APM for writing data to ElasticSearch
+ROTATING_APM_ELASTIC_PASSWORD=`generate_password`
 
 echo
 echo "Deploying VERSION $VERSION to $SSH_HOST..."
