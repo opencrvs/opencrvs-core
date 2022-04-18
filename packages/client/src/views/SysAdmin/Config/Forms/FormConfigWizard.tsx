@@ -18,7 +18,8 @@ import { EventTopBar } from '@opencrvs/components/lib/interface'
 import { SettingsBlue } from '@opencrvs/components/lib/icons'
 import {
   SecondaryButton,
-  SuccessButton
+  SuccessButton,
+  TertiaryButton
 } from '@opencrvs/components/lib/buttons'
 import styled from '@client/styledComponents'
 import { SectionNavigation } from '@client/components/formConfig/SectionNavigation'
@@ -32,7 +33,8 @@ import { DefaultFieldTools } from '@client/components/formConfig/formTools/Defau
 import { useLoadFormDraft, useHasNatlSysAdminScope } from './hooks'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { IStoreState } from '@client/store'
-import { goToFormConfig } from '@client/navigation'
+import { goToFormConfig, goToFormConfigSettings } from '@client/navigation'
+import { Dispatch } from 'redux'
 
 const Container = styled.div`
   display: flex;
@@ -82,9 +84,13 @@ type IRouteProps = {
   section: string
 }
 
-const topBarActions = (intl: IntlShape) => {
+const topBarActions = (intl: IntlShape, dispatch: Dispatch) => {
   return [
-    <SettingsBlue key="settings" onClick={() => {}} />,
+    <TertiaryButton
+      id="settings"
+      icon={() => <SettingsBlue />}
+      onClick={() => dispatch(goToFormConfigSettings())}
+    ></TertiaryButton>,
     <SecondaryButton key="save" size="small" onClick={() => {}}>
       {intl.formatMessage(buttonMessages.save)}
     </SecondaryButton>,
@@ -137,7 +143,7 @@ export function FormConfigWizard() {
       <EventTopBar
         title={`${intl.formatMessage(constantsMessages[event])} v${version}`}
         pageIcon={<></>}
-        topBarActions={topBarActions(intl)}
+        topBarActions={topBarActions(intl, dispatch)}
         goHome={() => dispatch(goToFormConfig())}
       />
       <WizardContainer>

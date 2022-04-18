@@ -70,6 +70,7 @@ import {
   FormConfiguration,
   FormConfigWizard
 } from './views/SysAdmin/Config/Forms'
+import { FormConfigSettings } from './views/SysAdmin/Config/Forms/FormConfigSettings'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -232,6 +233,13 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.FORM_CONFIG_WIZARD}
                                             component={FormConfigWizard}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={
+                                              routes.FORM_CONFIG_WIZARD_SETTINGS
+                                            }
+                                            component={FormConfigSettings}
                                           />
                                           <ProtectedRoute
                                             exact

@@ -28,6 +28,9 @@ interface IFormConfigMessages
   certificateHandlebars: MessageDescriptor
   hideField: MessageDescriptor
   requiredForRegistration: MessageDescriptor
+  settingsTitle: MessageDescriptor
+  introductionSettings: MessageDescriptor
+  addressesSettings: MessageDescriptor
 }
 
 type INavigationMessages = Record<
@@ -163,6 +166,21 @@ const messagesToDefine: IFormConfigMessages = {
     id: 'config.formConfig.formTools.requiredForRegistration',
     defaultMessage: 'Required for registration',
     description: 'Required for registration label for formTools'
+  },
+  settingsTitle: {
+    id: 'settings.title',
+    defaultMessage: 'Settings',
+    description: 'Title of the settings page'
+  },
+  introductionSettings: {
+    id: 'form.config.introductionSettings',
+    defaultMessage: 'Introduction page',
+    description: 'Label for introduction page settings'
+  },
+  addressesSettings: {
+    id: 'form.config.addressesSettings',
+    defaultMessage: 'No. of addresses',
+    description: 'Label for addresses settings'
   }
 }
 
