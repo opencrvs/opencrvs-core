@@ -18,9 +18,9 @@ import { Box } from '../../interface'
 import { IAction, IColumn, IDynamicValues, IActionObject } from './types'
 import { LoadMore } from './LoadMore'
 import { GridTableRowDesktop } from './GridTableRowDeskop'
-export { IAction } from './types'
 import { connect } from 'react-redux'
 import { ITheme } from 'src/components/theme'
+export { IAction } from './types'
 
 const Wrapper = styled.div`
   width: 100%;
@@ -55,6 +55,13 @@ const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.grey600};
   ${({ theme }) => theme.fonts.bold16}
   text-align: left;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 50%;
+    text-align: center;
+  }
 `
 
 const RowWrapper = styled.div<{

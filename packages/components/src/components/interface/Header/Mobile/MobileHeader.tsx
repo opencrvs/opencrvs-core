@@ -42,15 +42,14 @@ const Title = styled.span`
   ${({ theme }) => theme.fonts.h4};
   color: ${({ theme }) => theme.colors.grey800};
   align-self: center;
-  position: absolute;
-  width: 100px;
-  height: 27px;
-  left: 71px;
-  top: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `
 
 const HeaderBody = styled.div`
   margin: 0 16px;
+  width: 0;
   flex: 1;
   display: flex;
   height: 40px;

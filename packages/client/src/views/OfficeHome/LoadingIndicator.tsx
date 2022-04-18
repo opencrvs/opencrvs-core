@@ -33,6 +33,12 @@ const Wrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 50%;
+  }
 `
 const Text = styled.span`
   ${({ theme }) => theme.fonts.reg16};

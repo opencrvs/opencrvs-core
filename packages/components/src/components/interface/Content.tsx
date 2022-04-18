@@ -11,12 +11,12 @@
  */
 import * as React from 'react'
 import { ReactElement } from 'react'
-import styled, { ThemeConsumer } from 'styled-components'
+import styled from 'styled-components'
 import { colors } from '../colors'
 import { FormTabs, IFormTabProps } from '../forms/FormTabs'
 import { Box } from './Box'
 
-const Container = styled(Box)<{ size: string }>`
+const Container = styled(Box)<{ size: string; hideBackground?: boolean }>`
   position: relative;
   margin: 24px auto;
   max-width: ${({ size }) => (size === 'large' ? '1140px' : '778px')};
@@ -27,6 +27,11 @@ const Container = styled(Box)<{ size: string }>`
     margin: 0;
     border: 0;
     border-radius: 0;
+    ${({ hideBackground }) =>
+      hideBackground &&
+      `
+        background: none;
+      `}
   }
 `
 const Header = styled.div`
@@ -37,9 +42,11 @@ const Header = styled.div`
   margin: -24px -24px 24px;
   padding: 0 24px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+  background: ${({ theme }) => theme.colors.white};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     border: 0;
     padding: 0;
+    margin: -24px -16px 24px;
   }
 `
 const TopActionBar = styled.div`
@@ -125,6 +132,7 @@ interface IProps {
   children?: React.ReactNode
   bottomActionButtons?: ReactElement[]
   size?: ContentSize
+  hideBackground?: boolean
 }
 
 export class Content extends React.Component<IProps> {
@@ -138,10 +146,11 @@ export class Content extends React.Component<IProps> {
       subtitle,
       children,
       bottomActionButtons,
-      size
+      size,
+      hideBackground
     } = this.props
     return (
-      <Container size={size as string}>
+      <Container size={size as string} hideBackground={hideBackground}>
         <Header>
           <TopBar>
             <TitleContainer titleColor={titleColor}>
