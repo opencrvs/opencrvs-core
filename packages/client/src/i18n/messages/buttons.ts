@@ -19,6 +19,7 @@ interface IButtonsMessages
   cancel: MessageDescriptor
   change: MessageDescriptor
   confirm: MessageDescriptor
+  configure: MessageDescriptor
   continueButton: MessageDescriptor
   createUser: MessageDescriptor
   deactivate: MessageDescriptor
@@ -102,6 +103,11 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'Confirm',
     description: 'Confirm button text',
     id: 'buttons.confirm'
+  },
+  configure: {
+    defaultMessage: 'Configure',
+    description: 'Configure button text',
+    id: 'buttons.configure'
   },
   continueButton: {
     defaultMessage: 'Continue',

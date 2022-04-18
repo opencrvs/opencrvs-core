@@ -26,7 +26,7 @@ import { FormTools } from '@client/components/formConfig/formTools/FormTools'
 import { Event, BirthSection, DeathSection } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
 import { Canvas } from '@client/components/formConfig/Canvas'
-import { selectEventFormDraft } from '@client/forms/configuration/formDrafts/selectors'
+import { selectFormDraftVersion } from '@client/forms/configuration/formDrafts/selectors'
 import { IConfigFormField } from '@client/forms/configuration/configFields/utils'
 import { DefaultFieldTools } from '@client/components/formConfig/formTools/DefaultFieldTools'
 import { useLoadFormDraft, useHasNatlSysAdminScope } from './hooks'
@@ -107,13 +107,6 @@ function isValidSection(
   ].includes(section)
 }
 
-function useNewDraftVersion(event: Event) {
-  const formDraft = useSelector((store: IStoreState) =>
-    selectEventFormDraft(store, event)
-  )
-  return (formDraft?.version || 0) + 1
-}
-
 export function FormConfigWizard() {
   useLoadFormDraft()
   const [selectedField, setSelectedField] =
@@ -122,7 +115,9 @@ export function FormConfigWizard() {
   const dispatch = useDispatch()
   const intl = useIntl()
   const { event, section } = useParams<IRouteProps>()
-  const version = useNewDraftVersion(event)
+  const currentVersion = useSelector((store: IStoreState) =>
+    selectFormDraftVersion(store, event)
+  )
 
   if (
     !hasNatlSysAdminScope ||
@@ -135,7 +130,9 @@ export function FormConfigWizard() {
   return (
     <Container>
       <EventTopBar
-        title={`${intl.formatMessage(constantsMessages[event])} v${version}`}
+        title={`${intl.formatMessage(constantsMessages[event])} v${
+          currentVersion + 1
+        }`}
         pageIcon={<></>}
         topBarActions={topBarActions(intl)}
         goHome={() => dispatch(goToFormConfig())}

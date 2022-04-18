@@ -11,6 +11,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 import { DeathSection, BirthSection } from '@client/forms'
+import { DraftStatus } from '@client/forms/configuration/formDrafts/reducer'
 
 interface IFormConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
@@ -24,6 +25,7 @@ interface IFormConfigMessages
   supportingCopy: MessageDescriptor
   addInputContent: MessageDescriptor
   pages: MessageDescriptor
+  title: MessageDescriptor
   contentKey: MessageDescriptor
   certificateHandlebars: MessageDescriptor
   hideField: MessageDescriptor
@@ -144,6 +146,11 @@ const messagesToDefine: IFormConfigMessages = {
     defaultMessage: 'Add input/content',
     description: 'Label for Add input/content in form tools'
   },
+  title: {
+    id: 'config.formConfig.title',
+    defaultMessage: 'Declaration Forms',
+    description: 'Title for Form Configuration Page'
+  },
   contentKey: {
     id: 'config.formConfig.formTools.contentKey',
     defaultMessage: 'Content Key',
@@ -166,5 +173,26 @@ const messagesToDefine: IFormConfigMessages = {
   }
 }
 
+const draftStatusTabMessagesToDefine: Record<DraftStatus, MessageDescriptor> = {
+  DRAFT: {
+    id: 'config.formConfig.draftsTab',
+    defaultMessage: 'Drafts',
+    description: 'Label for drafts tab of form config page'
+  },
+  PREVIEW: {
+    id: 'config.formConfig.inPreviewTab',
+    defaultMessage: 'In Preview',
+    description: 'Label for in preview tab of form config page'
+  },
+  PUBLISHED: {
+    id: 'config.formConfig.publishedTab',
+    defaultMessage: 'Published',
+    description: 'Label for published tab of form config page'
+  }
+}
+
 export const messages: IFormConfigMessages = defineMessages(messagesToDefine)
 export const navigationMessages = defineMessages(navigationMessagesToDefine)
+export const draftStatusTabMessages = defineMessages(
+  draftStatusTabMessagesToDefine
+)

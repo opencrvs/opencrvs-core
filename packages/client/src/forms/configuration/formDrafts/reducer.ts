@@ -19,8 +19,7 @@ import { Event } from '@client/forms'
 export enum DraftStatus {
   DRAFT = 'DRAFT',
   PREVIEW = 'PREVIEW',
-  PUBLISHED = 'PUBLISHED',
-  FINALISED = 'FINALISED'
+  PUBLISHED = 'PUBLISHED'
 }
 
 export interface IHistory {
@@ -40,49 +39,53 @@ export interface IDraft {
   createdAt: number
 }
 
-export interface IFormDraftData {
+export interface IFormDraft {
   birth: IDraft
   death: IDraft
 }
 
-export type IFormDraftDataState = {
-  formDraftData: IFormDraftData | null
-  formDraftDataLoaded: boolean
-  loadingError: boolean
-}
+export type IFormDraftState =
+  | {
+      state: 'LOADING'
+      formDraftData: null
+      error: boolean
+    }
+  | {
+      state: 'READY'
+      formDraftData: IFormDraft
+      error: boolean
+    }
 
-export const initialState: IFormDraftDataState = {
+export const initialState: IFormDraftState = {
+  state: 'LOADING',
   formDraftData: null,
-  formDraftDataLoaded: false,
-  loadingError: false
+  error: false
 }
 
-async function saveFormDraftData(formDraftData: IFormDraftData) {
+async function saveFormDraftData(formDraftData: IFormDraft) {
   return storage.setItem('formDraft', JSON.stringify(formDraftData))
 }
 
 export const formDraftReducer: LoopReducer<
-  IFormDraftDataState,
+  IFormDraftState,
   actions.FormDraftActions
 > = (
-  state: IFormDraftDataState = initialState,
+  state: IFormDraftState = initialState,
   action: actions.FormDraftActions
-):
-  | IFormDraftDataState
-  | Loop<IFormDraftDataState, actions.FormDraftActions> => {
+): IFormDraftState | Loop<IFormDraftState, actions.FormDraftActions> => {
   switch (action.type) {
-    case actions.LOAD_FORM_DRAFT:
+    case actions.LOAD_STORAGE_FORM_DRAFT:
       return loop(
         state,
         Cmd.run(storage.getItem, {
           args: ['formDraft'],
-          successActionCreator: actions.loadFormDraftSuccessAction
+          successActionCreator: actions.loadStorageFormDraftSuccessAction
         })
       )
 
-    case actions.LOAD_FORM_DRAFT_SUCCESS: {
+    case actions.LOAD_STORAGE_FORM_DRAFT_SUCCESS: {
       const offlineDataString = action.payload
-      const offlineData: IFormDraftData = JSON.parse(
+      const offlineData: IFormDraft = JSON.parse(
         offlineDataString ? offlineDataString : '{}'
       )
 
@@ -92,8 +95,8 @@ export const formDraftReducer: LoopReducer<
       return loop(
         {
           ...state,
-          formDraftData: offlineData,
-          formDraftDataLoaded: true
+          state: 'READY',
+          formDraftData: offlineData
         },
         navigator.onLine ? Cmd.action(actions.fetchFormDraft()) : Cmd.none
       )
@@ -130,20 +133,20 @@ export const formDraftReducer: LoopReducer<
       const formDraftData = {
         birth: birthFormDraft,
         death: deathFormDraft
-      } as IFormDraftData
+      } as IFormDraft
 
       return loop(
         {
           ...state,
-          formDraftData: formDraftData,
-          formDraftDataLoaded: true
+          state: 'READY',
+          formDraftData: formDraftData
         },
         Cmd.run(saveFormDraftData, { args: [formDraftData] })
       )
     case actions.FETCH_FORM_DRAFT_FAILED:
       return {
         ...state,
-        loadingError: true
+        error: true
       }
     default:
       return state

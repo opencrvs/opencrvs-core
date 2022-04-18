@@ -10,8 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
-import { Message } from 'typescript-react-intl'
-import { Description } from '@client/views/SysAdmin/Performance/utils'
 
 interface IConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
@@ -24,7 +22,6 @@ interface IConfigMessages
   applicationConfigChangeError: MessageDescriptor
   certificateConfiguration: MessageDescriptor
   declarationForms: MessageDescriptor
-  previewTemplate: MessageDescriptor
   printTemplate: MessageDescriptor
   downloadTemplate: MessageDescriptor
   uploadTemplate: MessageDescriptor
@@ -37,19 +34,6 @@ interface IConfigMessages
   deathDefaultTempDesc: MessageDescriptor
   deathUpdatedTempDesc: MessageDescriptor
   listDetailsQsn: MessageDescriptor
-  formConfigPageTitle: MessageDescriptor
-  birthFormConfigLabel: MessageDescriptor
-  deathFormConfigLabel: MessageDescriptor
-  formConfigPublishedTabLabel: MessageDescriptor
-  formConfigDraftsTabLabel: MessageDescriptor
-  formConfigInPreviewTabLabel: MessageDescriptor
-  formConfigPageSubTitle: MessageDescriptor
-  formConfigDefaultConfig: MessageDescriptor
-  formConfigureButtonLabel: MessageDescriptor
-  formConfigPublishButtonLabel: MessageDescriptor
-  formConfigEditButtonLabel: MessageDescriptor
-  previewFormConfiguration: MessageDescriptor
-  finalizeFormConfiguration: MessageDescriptor
   applicationNameLabel: MessageDescriptor
   govermentLogoLabel: MessageDescriptor
   currencyLabel: MessageDescriptor
@@ -149,81 +133,6 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.declarationForms',
     defaultMessage: 'Declaration forms',
     description: 'Link Text for Config Declaration Forms'
-  },
-  formConfigPageTitle: {
-    id: 'config.formConfigPageTitle',
-    defaultMessage: 'Declaration Forms',
-    description: 'Title for Form Configuration Page'
-  },
-  birthFormConfigLabel: {
-    id: 'config.birthFormConfigLabel',
-    defaultMessage: 'Birth',
-    description: 'Label for birth form config template'
-  },
-  deathFormConfigLabel: {
-    id: 'config.deathFormConfigLabel',
-    defaultMessage: 'Death',
-    description: 'Label for death form config template'
-  },
-  formConfigPublishedTabLabel: {
-    id: 'config.formConfigPublishedTabLabel',
-    defaultMessage: 'Published',
-    description: 'Label for published tab of form config page'
-  },
-  formConfigDraftsTabLabel: {
-    id: 'config.formConfigDraftsTabLabel',
-    defaultMessage: 'Drafts',
-    description: 'Label for drafts tab of form config page'
-  },
-  formConfigInPreviewTabLabel: {
-    id: 'config.formConfigInPreviewTabLabel',
-    defaultMessage: 'In preview',
-    description: 'Label for in preview tab of form config page'
-  },
-  formConfigPublishButtonLabel: {
-    id: 'config.formConfigPublishButtonLabel',
-    defaultMessage: 'Publish',
-    description: 'Label for publish button form config page'
-  },
-  formConfigEditButtonLabel: {
-    id: 'config.formConfigEditButtonLabel',
-    defaultMessage: 'Edit',
-    description: 'Label for edit button form config page'
-  },
-  formConfigPageSubTitle: {
-    id: 'config.formConfigPageSubtitle',
-    defaultMessage: 'This is some supporting copy',
-    description: 'Sub title of form configuration page'
-  },
-  formConfigDefaultConfig: {
-    id: 'config.formConfigDefaultConfig',
-    defaultMessage: 'Default configuration',
-    description: 'Label for default form config template'
-  },
-  formConfigureButtonLabel: {
-    id: 'config.formConfigureButtonLabel',
-    defaultMessage: 'Configure',
-    description: 'Label of configure button of form config page'
-  },
-  previewFormConfiguration: {
-    id: 'config.previewFormConfiguration',
-    defaultMessage: 'Preview',
-    description: 'Label of preview button of form config page menu'
-  },
-  finalizeFormConfiguration: {
-    id: 'config.finalizeFormConfiguration',
-    defaultMessage: 'Finalize',
-    description: 'Label of finalise button of form config page menu'
-  },
-  deleteDraftMenuButton: {
-    id: 'config.deleteDraftMenuButton',
-    defaultMessage: 'Delete',
-    description: 'Label of delete button of form config page menu'
-  },
-  previewTemplate: {
-    id: 'config.previewTemplate',
-    defaultMessage: 'Preview',
-    description: 'Preview action in certificate config action menu'
   },
   printTemplate: {
     id: 'config.printTemplate',

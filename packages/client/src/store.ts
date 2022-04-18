@@ -61,7 +61,7 @@ import createSentryMiddleware from 'redux-sentry-middleware'
 import { userFormReducer, IUserFormState } from '@client/user/userReducer'
 import {
   formDraftReducer,
-  IFormDraftDataState
+  IFormDraftState
 } from '@client/forms/configuration/formDrafts/reducer'
 import {
   configFieldsReducer,
@@ -82,7 +82,7 @@ export interface IStoreState {
   offline: IOfflineDataState
   userForm: IUserFormState
   workqueueState: WorkqueueState
-  formDraft: IFormDraftDataState
+  formDraft: IFormDraftState
   configFields: IConfigFieldsState
 }
 

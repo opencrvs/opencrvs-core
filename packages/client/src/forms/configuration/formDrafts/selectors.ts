@@ -10,26 +10,32 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IStoreState } from '@client/store'
-import { IFormDraftDataState } from './reducer'
+import { IFormDraftState } from './reducer'
 import { Event } from '@client/forms'
 
-export const selectFormDraftData = (store: IStoreState): IFormDraftDataState =>
+export const selectFormDraftData = (store: IStoreState): IFormDraftState =>
   store.formDraft
 
-function getKey<K extends keyof IFormDraftDataState>(
-  store: IStoreState,
-  key: K
-) {
+function getKey<K extends keyof IFormDraftState>(store: IStoreState, key: K) {
   return selectFormDraftData(store)[key]
 }
 
 export function selectFormDraftLoaded(store: IStoreState) {
-  return selectFormDraftData(store).formDraftDataLoaded
+  return getKey(store, 'state') !== 'LOADING'
 }
 
-export function selectEventFormDraft(store: IStoreState, event: Event) {
-  return selectFormDraftData(store).formDraftData?.[event]
+export function selectFormDraft(store: IStoreState, event: Event) {
+  const formDraftState = selectFormDraftData(store)
+  if (formDraftState.state === 'LOADING') {
+    throw new Error('FormDraft not loaded yet')
+  }
+  return formDraftState.formDraftData[event]
 }
 
-export const getFormDraftData = (store: IStoreState): any =>
-  getKey(store, 'formDraftData')
+export function selectFormDraftVersion(store: IStoreState, event: Event) {
+  const formDraftState = selectFormDraftData(store)
+  if (formDraftState.state === 'LOADING') {
+    return 0
+  }
+  return formDraftState.formDraftData[event].version
+}

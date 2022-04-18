@@ -13,13 +13,13 @@
 import { ApolloQueryResult } from 'apollo-client'
 import { GQLFormDraft } from '@opencrvs/gateway/src/graphql/schema'
 
-export const LOAD_FORM_DRAFT = 'FORM/LOAD_FORM_DRAFT'
-export type LoadFormDraftAction = {
-  type: typeof LOAD_FORM_DRAFT
+export const LOAD_STORAGE_FORM_DRAFT = 'FORM/LOAD_STORAGE_FORM_DRAFT'
+export type LoadStorageFormDraftAction = {
+  type: typeof LOAD_STORAGE_FORM_DRAFT
 }
 
-export const loadFormDraft = (): LoadFormDraftAction => ({
-  type: LOAD_FORM_DRAFT
+export const loadStorageFormDraft = (): LoadStorageFormDraftAction => ({
+  type: LOAD_STORAGE_FORM_DRAFT
 })
 
 export const FETCH_FORM_DRAFT = 'FORM/FETCH_FORM_DRAFT'
@@ -31,16 +31,17 @@ export const fetchFormDraft = (): FetchFormDraftAction => ({
   type: FETCH_FORM_DRAFT
 })
 
-export const LOAD_FORM_DRAFT_SUCCESS = 'FORM/LOAD_FORM_DRAFT_SUCCESS'
-export type LoadFormDraftSuccessAction = {
-  type: typeof LOAD_FORM_DRAFT_SUCCESS
+export const LOAD_STORAGE_FORM_DRAFT_SUCCESS =
+  'FORM/LOAD_STORAGE_FORM_DRAFT_SUCCESS'
+export type LoadStorageFormDraftSuccessAction = {
+  type: typeof LOAD_STORAGE_FORM_DRAFT_SUCCESS
   payload: string
 }
 
-export const loadFormDraftSuccessAction = (
+export const loadStorageFormDraftSuccessAction = (
   response: string
-): LoadFormDraftSuccessAction => ({
-  type: LOAD_FORM_DRAFT_SUCCESS,
+): LoadStorageFormDraftSuccessAction => ({
+  type: LOAD_STORAGE_FORM_DRAFT_SUCCESS,
   payload: response
 })
 
@@ -71,8 +72,8 @@ export const fetchFormDraftFailedAction = (): FetchFormDraftFailedAction => ({
 })
 
 export type FormDraftActions =
-  | LoadFormDraftAction
+  | LoadStorageFormDraftAction
   | FetchFormDraftAction
   | FetchFormDraftSuccessAction
   | FetchFormDraftFailedAction
-  | LoadFormDraftSuccessAction
+  | LoadStorageFormDraftSuccessAction
