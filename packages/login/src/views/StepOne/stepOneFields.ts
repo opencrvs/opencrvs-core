@@ -9,22 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { defineMessages, MessageDescriptor } from 'react-intl'
-
-export const messages: {
-  [key: string]: MessageDescriptor
-} = defineMessages({
-  username: {
-    id: 'login.username',
-    defaultMessage: 'Username',
-    description: 'The label that appears on the mobile number input'
-  },
-  passwordLabel: {
-    id: 'login.passwordLabel',
-    defaultMessage: 'Password',
-    description: 'The label that appears on the password input'
-  }
-})
+import { messages } from '@login/i18n/messages/stepOneFields'
 
 export const stepOneFields = {
   username: {

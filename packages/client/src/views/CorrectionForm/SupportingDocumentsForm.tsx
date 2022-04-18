@@ -20,7 +20,8 @@ import { FormFieldGenerator } from '@client/components/form'
 import {
   IFormSection,
   IFormSectionData,
-  CorrectionSection
+  CorrectionSection,
+  IFormFieldValue
 } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/correction'
@@ -58,30 +59,33 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
   const [isFileUploading, setIsFileUploading] = React.useState<boolean>(false)
 
   const section = supportingDocumentsSection
-  const group = React.useMemo(
-    () => ({
-      ...section.groups[0],
-      fields: replaceInitialValues(
-        section.groups[0].fields,
-        declaration.data[section.id] || {},
-        declaration.data
-      )
-    }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
 
-  const hasUploadDocOrSelectOption =
-    declaration.data[section.id] &&
-    (declaration.data[section.id].uploadDocForLegalProof ||
-      declaration.data[section.id].supportDocumentRequiredForCorrection !==
-        undefined)
+  const group = {
+    ...section.groups[0],
+    fields: replaceInitialValues(
+      section.groups[0].fields,
+      declaration.data[section.id] || {},
+      declaration.data
+    )
+  }
 
-  group.fields[1].disabled =
+  const hasUploadedDoc =
     declaration.data[section.id] &&
-    declaration.data[section.id].uploadDocForLegalProof
-      ? true
-      : false
+    (declaration.data[section.id].uploadDocForLegalProof as IFormFieldValue[])
+      .length > 0
+
+  const hasSelectedOption =
+    declaration.data[section.id]?.supportDocumentRequiredForCorrection !==
+      undefined &&
+    declaration.data[section.id]?.supportDocumentRequiredForCorrection !== ''
+
+  group.fields = [
+    group.fields[0],
+    {
+      ...group.fields[1],
+      disabled: hasUploadedDoc
+    }
+  ]
 
   const contentProps = {
     title: intl.formatMessage(messages.supportingDocumentsTitle),
@@ -130,7 +134,9 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
             <PrimaryButton
               id="confirm_form"
               key="confirm_form"
-              disabled={!hasUploadDocOrSelectOption || isFileUploading}
+              disabled={
+                !(hasUploadedDoc || hasSelectedOption) || isFileUploading
+              }
               onClick={continueButtonHandler}
             >
               {intl.formatMessage(buttonMessages.continueButton)}

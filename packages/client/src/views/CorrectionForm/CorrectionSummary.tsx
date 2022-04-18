@@ -207,6 +207,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
           >
             <TableView
               isLoading={false}
+              noPagination
               content={this.getChanges(formSections)}
               hideBoxShadow={true}
               hideTableBottomBorder={true}

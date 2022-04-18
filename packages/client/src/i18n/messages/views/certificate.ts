@@ -20,6 +20,7 @@ interface ICertificateMessages
   certificateReceiptHeader: MessageDescriptor
   certificateReceiptSubHeader: MessageDescriptor
   collectPayment: MessageDescriptor
+  correctorIDCheckDialogDescription: MessageDescriptor
   dateOfBirth: MessageDescriptor
   familyName: MessageDescriptor
   familyNameInEng: MessageDescriptor
@@ -46,8 +47,6 @@ interface ICertificateMessages
   paymentInstruction: MessageDescriptor
   paymentAmount: MessageDescriptor
   paymentMethod: MessageDescriptor
-  person1: MessageDescriptor
-  person2: MessageDescriptor
   preview: MessageDescriptor
   print: MessageDescriptor
   printCertificate: MessageDescriptor
@@ -118,6 +117,13 @@ const messagesToDefine: ICertificateMessages = {
       'Please collect the payment, print the receipt and hand it over to the payee.',
     description: 'The label for collect payment paragraph',
     id: 'print.certificate.collectPayment'
+  },
+  correctorIDCheckDialogDescription: {
+    id: 'correction.corrector.description',
+    defaultMessage:
+      'Please be aware that if you proceed, you will be responsible for making a change to this record without the necessary proof of identification',
+    description:
+      'The description for the dialog when details of the corrector not verified'
   },
   dateOfBirth: {
     defaultMessage: 'Date of Birth',
@@ -258,14 +264,6 @@ const messagesToDefine: ICertificateMessages = {
     defaultMessage: 'Payment method',
     description: 'The label for payment method select',
     id: 'print.certificate.paymentMethod'
-  },
-  person1: {
-    defaultMessage: 'UP Secretary Shakib al hasan',
-    id: 'print.certificate.signature.person1'
-  },
-  person2: {
-    defaultMessage: 'Local Registrar Mohammad Ashraful',
-    id: 'print.certificate.signature.person2'
   },
   preview: {
     defaultMessage: 'Certificate Preview',
