@@ -27,6 +27,7 @@ interface IFormConfigMessages
   pages: MessageDescriptor
   title: MessageDescriptor
   previewDescription: MessageDescriptor
+  publishedDescription: MessageDescriptor
   created: MessageDescriptor
   contentKey: MessageDescriptor
   certificateHandlebars: MessageDescriptor
@@ -158,6 +159,12 @@ const messagesToDefine: IFormConfigMessages = {
     defaultMessage:
       'These versions are available to review and test. Log in using the test users acounts for a  Field Agent, Registration Agent or Registrar to test your declaration form.',
     description: 'Description for preview tab'
+  },
+  publishedDescription: {
+    id: 'config.formConfig.published.description',
+    defaultMessage:
+      'Your pulished declaration forms will appear here. Once your configuration is published you will no longer be able to make changes.',
+    description: 'Description for published tab'
   },
   created: {
     id: 'config.formConfig.preview.created',

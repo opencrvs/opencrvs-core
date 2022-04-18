@@ -24,6 +24,7 @@ import { DraftsTab } from './DraftsTab'
 import { selectFormDraftLoaded } from '@client/forms/configuration/formDrafts/selectors'
 import { useLoadFormDraft } from './hooks'
 import { PreviewTab } from './PreviewTab'
+import { PublishedTab } from './PublishedTab'
 
 export function FormConfiguration() {
   useLoadFormDraft()
@@ -41,6 +42,8 @@ export function FormConfiguration() {
         subtitle={
           selectedTab === DraftStatus.PREVIEW
             ? intl.formatMessage(messages.previewDescription)
+            : selectedTab === DraftStatus.PUBLISHED
+            ? intl.formatMessage(messages.publishedDescription)
             : undefined
         }
         tabs={{
@@ -66,6 +69,8 @@ export function FormConfiguration() {
           <DraftsTab />
         ) : selectedTab === DraftStatus.PREVIEW ? (
           <PreviewTab />
+        ) : selectedTab === DraftStatus.PUBLISHED ? (
+          <PublishedTab />
         ) : (
           <></>
         )}
