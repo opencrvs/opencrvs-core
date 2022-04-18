@@ -103,6 +103,17 @@ SSH_USER=${SSH_USER:-root}
 SSH_HOST=${SSH_HOST:-$HOST}
 LOG_LOCATION=${LOG_LOCATION:-/var/log}
 
+# Create new passwords for all MongoDB users created in
+# infrastructure/mongodb/docker-entrypoint-initdb.d/create-mongo-users.sh
+#
+# If you're adding a new MongoDB user, you'll need to also create a new update statement in
+# infrastructure/mongodb/on-deploy.sh
+
+USER_MGNT_MONGODB_PASSWORD=`generate_password`
+HEARTH_MONGODB_PASSWORD=`generate_password`
+CONFIG_MONGODB_PASSWORD=`generate_password`
+OPENHIM_MONGODB_PASSWORD=`generate_password`
+WEBHOOKS_MONGODB_PASSWORD=`generate_password`
 
 #
 # Elasticsearch credentials
