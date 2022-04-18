@@ -14,20 +14,19 @@ import styled, { withTheme } from 'styled-components'
 import { Pagination } from '..'
 import { ListItemAction } from '../../buttons'
 import { grid } from '../../grid'
-import { Box } from '../../interface'
-import { IAction, IColumn, IDynamicValues, IActionObject } from './types'
+import { IDynamicValues, IActionObject, IAction, IColumn } from './types'
 import { LoadMore } from './LoadMore'
 import { GridTableRowDesktop } from './GridTableRowDeskop'
-export { IAction } from './types'
-import { connect } from 'react-redux'
 import { ITheme } from 'src/components/theme'
+import { SortIcon } from '../../icons/SortIcon'
+import { connect } from 'react-redux'
+import { orderBy } from 'lodash'
 
 const Wrapper = styled.div`
   width: 100%;
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin: 24px 16px 0 16px;
-    width: calc(100% - 32px);
   }
 `
 const TableHeader = styled.div`
@@ -42,13 +41,6 @@ const TableHeader = styled.div`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
-`
-
-const StyledBox = styled(Box)`
-  margin-top: 8px;
-  padding: 0;
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.reg16};
 `
 
 const ErrorText = styled.div`
@@ -85,30 +77,45 @@ const ContentWrapper = styled.span<{
   overflow: hidden;
   text-overflow: ellipsis;
 `
+
+const ColumnContainer = styled.div<{
+  width: number
+}>`
+  width: ${({ width }) => width}%;
+  display: flex;
+  cursor: pointer;
+`
+
+const ColumnTitleWrapper = styled.div<{ alignment?: string }>`
+  align-self: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
+  width: 100%;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+`
+
 const ActionWrapper = styled(ContentWrapper)`
   padding-right: 0px;
-`
-
-const IconWrapper = styled(ContentWrapper)`
-  padding-top: 5px;
-`
-
-const ExpandedSectionContainer = styled.div<{ expanded: boolean }>`
-  margin-top: 5px;
-  overflow: hidden;
-  transition-property: all;
-  transition-duration: 0.5s;
-  max-height: ${({ expanded }) => (expanded ? '1000px' : '0px')};
-`
-
-const Error = styled.span`
-  color: ${({ theme }) => theme.colors.negative};
 `
 
 export enum ColumnContentAlignment {
   LEFT = 'left',
   RIGHT = 'right',
   CENTER = 'center'
+}
+
+export enum COLUMNS {
+  ICON_WITH_NAME = 'iconWithName',
+  EVENT = 'event',
+  DATE_OF_EVENT = 'dateOfEvent',
+  SENT_FOR_REVIEW = 'sentForReview',
+  STATUS_INDICATOR = 'statusIndicator',
+  NAME = 'name'
+}
+
+export enum SORT_ORDER {
+  ASCENDING = 'asc',
+  DESCENDING = 'desc'
 }
 
 interface IGridTableProps {
@@ -127,6 +134,9 @@ interface IGridTableProps {
   showPaginated?: boolean
   loading?: boolean
   loadMoreText: string
+  sortedCol?: COLUMNS
+  sortOrder?: SORT_ORDER
+  formattedDuration?: (fromDate: Date | number) => string
 }
 
 interface IGridTableState {
@@ -219,29 +229,41 @@ export class GridTableComp extends React.Component<
     return this.state.expanded.findIndex((id) => id === itemId) >= 0
   }
 
-  getDisplayItems = (
-    currentPage: number,
-    pageSize: number,
-    allItems: IDynamicValues[]
-  ) => {
-    const { showPaginated = false } = this.props
-    let displayItems
-    let offset
-    if (allItems.length <= pageSize) {
-      // expect that allItem is already sliced correctly externally
-      return allItems
+  sortedItems = (items: IDynamicValues[]): IDynamicValues[] => {
+    const { sortedCol, sortOrder } = this.props
+    if (sortedCol && sortOrder) {
+      const sortedItems: IDynamicValues[] = orderBy(
+        items,
+        sortedCol.toLowerCase().includes('name') ? ['name'] : [sortedCol],
+        [sortOrder]
+      )
+      const formattedSortedItems = sortedItems.map((item) => {
+        let newItem: IDynamicValues = {}
+        if (this.props.formattedDuration) {
+          if (item.dateOfEvent) {
+            newItem = {
+              ...newItem,
+              dateOfEvent: this.props.formattedDuration(
+                item.dateOfEvent as Date
+              )
+            }
+          }
+          if (item.sentForReview) {
+            newItem = {
+              ...newItem,
+              sentForReview: this.props.formattedDuration(
+                item.sentForReview as Date
+              )
+            }
+          }
+          return { ...item, ...newItem }
+        } else {
+          return item
+        }
+      })
+      return formattedSortedItems
     }
-
-    // perform internal pagination
-    if (showPaginated === false) {
-      offset = 0
-      displayItems = allItems.slice(offset, currentPage * pageSize)
-    } else {
-      offset = (currentPage - 1) * pageSize
-      displayItems = allItems.slice(offset, offset + pageSize)
-    }
-
-    return displayItems
+    return items
   }
 
   onPageChange = (currentPage: number) => {
@@ -262,7 +284,8 @@ export class GridTableComp extends React.Component<
       hideTableHeader,
       pageSize = defaultConfiguration.pageSize,
       currentPage = defaultConfiguration.currentPage,
-      showPaginated = false
+      showPaginated = false,
+      sortOrder
     } = this.props
     const { width } = this.state
     const totalItems = this.props.totalItems || 0
@@ -272,23 +295,32 @@ export class GridTableComp extends React.Component<
         {content.length > 0 && width > grid.breakpoints.lg && !hideTableHeader && (
           <TableHeader>
             {columns.map((preference, index) => (
-              <ContentWrapper
+              <ColumnContainer
                 key={index}
                 width={preference.width}
-                alignment={preference.alignment}
-                paddingRight={
-                  preference.isActionColumn && this.props.expandable ? 40 : null
+                onClick={
+                  preference.sortFunction
+                    ? () => preference.sortFunction!(preference.key)
+                    : undefined
                 }
               >
-                {preference.label && preference.label}
-              </ContentWrapper>
+                <ColumnTitleWrapper>
+                  {preference.label && preference.label}
+                  {preference.sortFunction && (
+                    <SortIcon
+                      isSorted={Boolean(preference.isSorted)}
+                      isDescending={sortOrder === SORT_ORDER.DESCENDING}
+                    />
+                  )}
+                </ColumnTitleWrapper>
+              </ColumnContainer>
             ))}
           </TableHeader>
         )}
         {!isMobileView && (
           <GridTableRowDesktop
             columns={this.props.columns}
-            displayItems={this.getDisplayItems(currentPage, pageSize, content)}
+            displayItems={this.sortedItems(content)}
             clickable={this.props.clickable}
             expandable={this.props.expandable}
             getRowClickHandler={this.getRowClickHandler}

@@ -10,12 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import {
-  WORKQUEUE_TABS,
-  IWORKQUEUE_TABS
-} from '@client/components/interface/Navigation'
-import { DeclarationIcon } from '@opencrvs/components/lib/icons'
 import styled from '@client/styledComponents'
+import { COLUMNS, SORT_ORDER } from '@opencrvs/components/lib/interface'
+import { IDynamicValues } from '@opencrvs/components/lib/interface/GridTable/types'
+import { orderBy } from 'lodash'
 
 const IconNameContainer = styled.div`
   display: flex;
@@ -25,21 +23,26 @@ const IconNameContainer = styled.div`
 const NameContainer = styled.div`
   color: ${({ theme }) => theme.colors.primary};
   ${({ theme }) => theme.fonts.bold16}
+  width: 100%;
+  margin-right: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `
 
-export const getIconName = (status: IWORKQUEUE_TABS, name: string) => {
-  let icon: React.ReactNode
-  switch (status) {
-    case WORKQUEUE_TABS.sentForReview:
-      icon = <DeclarationIcon color="orange" />
-      break
-    default:
-      icon = <DeclarationIcon />
-  }
+const Error = styled.span`
+  color: ${({ theme }) => theme.colors.negative};
+`
+
+export const getIconWithName = (status: React.ReactNode, name: string) => {
   return (
     <IconNameContainer>
-      {icon}
-      <NameContainer>{name}</NameContainer>
+      {status}
+      {name ? (
+        <NameContainer>{name}</NameContainer>
+      ) : (
+        <Error>No name provided</Error>
+      )}
     </IconNameContainer>
   )
 }

@@ -15,6 +15,11 @@ import {
   ColumnContentAlignment,
   Spinner
 } from '@opencrvs/components/lib/interface'
+import {
+  COLUMNS,
+  SORT_ORDER
+} from '@opencrvs/components/lib/interface/GridTable/GridTable'
+
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import {
@@ -26,7 +31,8 @@ import {
   StatusSubmitted,
   StatusFailed24 as StatusFailed,
   StatusWaiting,
-  StatusPendingOffline
+  StatusPendingOffline,
+  DeclarationIcon
 } from '@opencrvs/components/lib/icons'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { calculateDaysFromToday } from '@client/views/PrintCertificate/utils'
@@ -45,10 +51,10 @@ import {
 } from '@opencrvs/components/lib/interface/Content'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
-import { getIconName } from '@client/views/OfficeHome/tabs/utils'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { Event } from '@client/forms'
+import { STATUSTOCOLOR } from '@client/views/Home/RecordAudit'
+import { getIconWithName } from '@client/views/OfficeHome/tabs/utils'
 
 const DECLARATIONS_DAY_LIMIT = 7
 
@@ -65,6 +71,8 @@ interface ISentForReviewProps {
 interface IState {
   sentForReviewPageNo: number
   width: number
+  sortedCol: COLUMNS
+  sortOrder: SORT_ORDER
 }
 
 type IFullProps = ISentForReviewProps & IntlShapeProps
@@ -78,7 +86,9 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
     this.pageSize = 10
     this.state = {
       width: window.innerWidth,
-      sentForReviewPageNo: 1
+      sentForReviewPageNo: 1,
+      sortedCol: COLUMNS.ICON_WITH_NAME,
+      sortOrder: SORT_ORDER.ASCENDING
     }
   }
 
@@ -183,14 +193,24 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
               draft.data.deceased?.deathDate)
         const savedDate =
           draft && draft.savedOn
-            ? formattedDuration(new Date(draft.savedOn))
-            : draft.createdAt && formattedDuration(parseInt(draft.createdAt))
+            ? new Date(draft.savedOn)
+            : draft.createdAt && parseInt(draft.createdAt)
         return {
           id: draft.id,
           event: event || '',
-          name: name ? getIconName(WORKQUEUE_TABS.sentForReview, name) : '',
-          dateOfEvent: date ? formattedDuration(new Date(date as string)) : '',
-          sentForReview: savedDate ? savedDate : '',
+          name: name.toLowerCase(),
+          iconWithName: getIconWithName(
+            <DeclarationIcon
+              color={
+                STATUSTOCOLOR[
+                  (draft && draft.submissionStatus) || SUBMISSION_STATUS.DRAFT
+                ]
+              }
+            />,
+            name
+          ),
+          dateOfEvent: date ? new Date(date as string) : 0,
+          sentForReview: savedDate ? savedDate : 0,
           submissionStatus: statusText || '',
           statusIndicator: icon ? [icon()] : null,
           rowClickable: Boolean(draft.compositionId),
@@ -219,6 +239,45 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
     this.setState({ sentForReviewPageNo: pageNumber })
   }
 
+  sortFunction = (columnName: string) => {
+    let sortedCol: COLUMNS
+    let sortOrder: SORT_ORDER = SORT_ORDER.ASCENDING
+    switch (columnName) {
+      case COLUMNS.ICON_WITH_NAME:
+        sortedCol = COLUMNS.ICON_WITH_NAME
+        break
+      case COLUMNS.EVENT:
+        sortedCol = COLUMNS.EVENT
+        break
+      case COLUMNS.DATE_OF_EVENT:
+        sortedCol = COLUMNS.DATE_OF_EVENT
+        break
+      case COLUMNS.SENT_FOR_REVIEW:
+        sortedCol = COLUMNS.SENT_FOR_REVIEW
+        break
+      case COLUMNS.DATE_OF_EVENT:
+        sortedCol = COLUMNS.DATE_OF_EVENT
+        break
+      default:
+        sortedCol = COLUMNS.NAME
+    }
+
+    if (this.state.sortedCol === sortedCol) {
+      if (this.state.sortOrder === SORT_ORDER.ASCENDING) {
+        sortOrder = SORT_ORDER.DESCENDING
+      } else {
+        sortOrder = SORT_ORDER.ASCENDING
+      }
+    } else {
+      sortOrder = SORT_ORDER.ASCENDING
+    }
+
+    this.setState({
+      sortOrder: sortOrder,
+      sortedCol: sortedCol
+    })
+  }
+
   componentWillUnmount() {
     window.removeEventListener('resize', this.recordWindowWidth)
   }
@@ -233,28 +292,36 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
         {
           width: 40,
           label: this.props.intl.formatMessage(messages.name),
-          key: 'name',
-          errorValue: this.props.intl.formatMessage(messages.noNameProvided)
+          key: COLUMNS.ICON_WITH_NAME,
+          errorValue: this.props.intl.formatMessage(messages.noNameProvided),
+          isSorted: this.state.sortedCol === COLUMNS.ICON_WITH_NAME,
+          sortFunction: this.sortFunction
         },
         {
           label: this.props.intl.formatMessage(messages.event),
           width: 10,
-          key: 'event'
+          key: COLUMNS.EVENT,
+          isSorted: this.state.sortedCol === COLUMNS.EVENT,
+          sortFunction: this.sortFunction
         },
         {
           label: this.props.intl.formatMessage(messages.dateOfEvent),
           width: 20,
-          key: 'dateOfEvent'
+          key: COLUMNS.DATE_OF_EVENT,
+          isSorted: this.state.sortedCol === COLUMNS.DATE_OF_EVENT,
+          sortFunction: this.sortFunction
         },
         {
           label: this.props.intl.formatMessage(messages.sentForReview),
           width: 20,
-          key: 'sentForReview'
+          key: COLUMNS.SENT_FOR_REVIEW,
+          isSorted: this.state.sortedCol === COLUMNS.SENT_FOR_REVIEW,
+          sortFunction: this.sortFunction
         },
         {
           width: 10,
           alignment: ColumnContentAlignment.RIGHT,
-          key: 'statusIndicator'
+          key: COLUMNS.STATUS_INDICATOR
         }
       ]
     } else {
@@ -297,6 +364,9 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           currentPage={this.state.sentForReviewPageNo}
           showPaginated={this.props.showPaginated}
           loadMoreText={intl.formatMessage(messages.loadMore)}
+          sortedCol={this.state.sortedCol}
+          sortOrder={this.state.sortOrder}
+          formattedDuration={formattedDuration}
         />
         <LoadingIndicator loading={false} hasError={false} />
       </Content>
