@@ -20,7 +20,8 @@ on:
           - qa
           - staging
 jobs:
-  qa-deploy:
+  deploy:
+    environment: ${{ github.event.inputs.environment }}
     runs-on: ubuntu-20.04
     timeout-minutes: 60
     strategy:
@@ -54,7 +55,6 @@ jobs:
 
       - name: Deploy to QA
         if: ${{ github.event.inputs.environment == 'qa' }}
-        environment: qa
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
@@ -66,7 +66,6 @@ jobs:
 
       - name: Deploy to production
         if: ${{ github.event.inputs.environment == 'production' }}
-        environment: production
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
@@ -78,7 +77,6 @@ jobs:
 
       - name: Deploy to production
         if: ${{ github.event.inputs.environment == 'staging' }}
-        environment: staging
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
