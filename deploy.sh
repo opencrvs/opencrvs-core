@@ -159,7 +159,31 @@ else
 fi
 
 # Setup configuration files and compose file for the deployment domain
-ssh $SSH_USER@$SSH_HOST "KIBANA_USERNAME=$KIBANA_USERNAME KIBANA_PASSWORD=$KIBANA_PASSWORD SLACK_WEBHOOK_URL=$SLACK_WEBHOOK_URL /tmp/compose/infrastructure/setup-deploy-config.sh $HOST | tee -a $LOG_LOCATION/setup-deploy-config.log"
+ssh $SSH_USER@$SSH_HOST "SLACK_WEBHOOK_URL=$SLACK_WEBHOOK_URL /tmp/compose/infrastructure/setup-deploy-config.sh $HOST | tee -a $LOG_LOCATION/setup-deploy-config.log"
+
+docker_stack_deploy() {
+  local environment_compose=${1}
+  ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && \
+    HOSTNAME='$HOST' \
+    VERSION='$VERSION' \
+    COUNTRY_CONFIG_VERSION='$COUNTRY_CONFIG_VERSION' \
+    PAPERTRAIL='$PAPERTRAIL' \
+    USER_MGNT_MONGODB_PASSWORD='$USER_MGNT_MONGODB_PASSWORD' \
+    HEARTH_MONGODB_PASSWORD='$HEARTH_MONGODB_PASSWORD' \
+    CONFIG_MONGODB_PASSWORD='$CONFIG_MONGODB_PASSWORD' \
+    OPENHIM_MONGODB_PASSWORD='$OPENHIM_MONGODB_PASSWORD' \
+    WEBHOOKS_MONGODB_PASSWORD='$WEBHOOKS_MONGODB_PASSWORD' \
+    MONGODB_ADMIN_USER='$MONGODB_ADMIN_USER' \
+    MONGODB_ADMIN_PASSWORD='$MONGODB_ADMIN_PASSWORD' \
+    ROTATING_ELASTIC_PASSWORD='$ROTATING_ELASTIC_PASSWORD' \
+    ROTATING_METRICBEAT_ELASTIC_PASSWORD='$ROTATING_METRICBEAT_ELASTIC_PASSWORD' \
+    ROTATING_APM_ELASTIC_PASSWORD='$ROTATING_APM_ELASTIC_PASSWORD' \
+    ROTATING_SEARCH_ELASTIC_PASSWORD='$ROTATING_SEARCH_ELASTIC_PASSWORD' \
+    KIBANA_USERNAME='$KIBANA_USERNAME' \
+    KIBANA_PASSWORD='$KIBANA_PASSWORD' \
+    docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c '$environment_compose' --with-registry-auth opencrvs'
+}
+
 
 # Deploy the OpenCRVS stack onto the swarm
 if [[ "$ENV" = "development" ]]; then

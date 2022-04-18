@@ -82,16 +82,22 @@ setup.dashboards:
 #============================== Kibana =========================================
 setup.kibana:
   host: '${KIBANA_HOST}'
-  username: '{{KIBANA_USERNAME}}'
-  password: '{{KIBANA_PASSWORD}}'
+  username: ${KIBANA_USERNAME}
+  password: ${KIBANA_PASSWORD}
 
 #============================== Xpack Monitoring ===============================
 xpack.monitoring:
   enabled: true
   elasticsearch:
-
+    username: ${BEATS_USERNAME}
+    password: ${BEATS_PASSWORD}
+#============================== Index lifecycle management ===============================
 setup.ilm.enabled: true
 setup.ilm.policy_name: 'metricbeat-opencrvs-rollover-policy'
 setup.ilm.policy_file: /usr/share/metricbeat/rollover-policy.json
 setup.ilm.check_exists: true
 setup.ilm.overwrite: true
+
+#============================== Logging ===============================
+logging.level: info
+logging.to_stderr: true

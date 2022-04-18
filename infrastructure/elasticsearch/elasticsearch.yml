@@ -17,3 +17,4 @@ discovery.zen.minimum_master_nodes: 1
 path.repo: ['/data/backups/elasticsearch']
 discovery.type: single-node
 xpack.security.enabled: true
+xpack.security.authc.api_key.enabled: true

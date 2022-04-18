@@ -92,18 +92,28 @@ function check_user_exists {
 }
 
 # Set password of a given Elasticsearch user.
-function set_user_password {
+function update_user {
 	local username=$1
 	local password=$2
+	local role=${3:-}
 
 	local elasticsearch_host="${ELASTICSEARCH_HOST:-elasticsearch}"
 
-	local -a args=( '-s' '-D-' '-m15' '-w' '%{http_code}'
-		"http://${elasticsearch_host}:9200/_security/user/${username}/_password"
-		'-X' 'POST'
-		'-H' 'Content-Type: application/json'
-		'-d' "{\"password\" : \"${password}\"}"
+	if [[ -n "${role:-}" ]]; then
+		local -a args=( '-s' '-D-' '-m15' '-w' '%{http_code}'
+			"http://${elasticsearch_host}:9200/_security/user/${username}"
+			'-X' 'PUT'
+			'-H' 'Content-Type: application/json'
+			'-d' "{\"password\" : \"${password}\",\"roles\":[\"${role}\"]}}"
 		)
+	else
+		local -a args=( '-s' '-D-' '-m15' '-w' '%{http_code}'
+			"http://${elasticsearch_host}:9200/_security/user/${username}/_password"
+			'-X' 'POST'
+			'-H' 'Content-Type: application/json'
+			'-d' "{\"password\" : \"${password}\"}"
+		)
+	fi
 
 	if [[ -n "${ELASTIC_PASSWORD:-}" ]]; then
 		args+=( '-u' "elastic:${ELASTIC_PASSWORD}" )
@@ -167,7 +177,7 @@ function ensure_role {
 
 	local -a args=( '-s' '-D-' '-m15' '-w' '%{http_code}'
 		"http://${elasticsearch_host}:9200/_security/role/${name}"
-		'-X' 'POST'
+		'-X' 'PUT'
 		'-H' 'Content-Type: application/json'
 		'-d' "$body"
 		)

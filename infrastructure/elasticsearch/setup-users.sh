@@ -33,7 +33,7 @@ users_passwords=(
 declare -A users_roles
 users_roles=(
 	[$SEARCH_ELASTIC_USERNAME]='search_user'
-	[$KIBANA_USERNAME]='kibana_admin'
+	[$KIBANA_USERNAME]='kibana_admin_user'
 )
 
 # --------------------------------------------------------
@@ -42,6 +42,7 @@ users_roles=(
 declare -A roles_files
 roles_files=(
 	[search_user]='search_user.json'
+	[kibana_admin_user]='kibana_user.json'
 )
 
 # --------------------------------------------------------
@@ -78,8 +79,13 @@ for user in "${!users_passwords[@]}"; do
 	user_exists="$(check_user_exists "$user")"
 
 	if ((user_exists)); then
-		sublog 'User exists, setting password'
-		set_user_password "$user" "${users_passwords[$user]}"
+		sublog 'User exists, updating user'
+
+		if [[ -z "${users_roles[$user]:-}" ]]; then
+			update_user "$user" "${users_passwords[$user]}"
+		else
+			update_user "$user" "${users_passwords[$user]}" "${users_roles[$user]}"
+		fi
 	else
 		if [[ -z "${users_roles[$user]:-}" ]]; then
 			err '  No role defined, skipping creation'

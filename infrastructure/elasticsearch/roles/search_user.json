@@ -2,7 +2,7 @@
   "indices": [
     {
       "names": ["ocrvs"],
-      "privileges": ["write", "create", "create_index"]
+      "privileges": ["write", "create", "create_index", "delete", "read"]
     }
   ]
 }
