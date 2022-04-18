@@ -244,7 +244,12 @@ if [ $1 == "--clear-data=yes" ] ; then
     echo
     echo "Clearing all existing data..."
     echo
-    ssh $SSH_USER@$SSH_HOST /tmp/compose/infrastructure/clear-all-data.sh $REPLICAS $ENV
+    ssh $SSH_USER@$SSH_HOST "
+        ELASTICSEARCH_ADMIN_USER=elastic \
+        ELASTICSEARCH_ADMIN_PASSWORD=$ELASTICSEARCH_SUPERUSER_PASSWORD \
+        MONGODB_ADMIN_USER=$MONGODB_ADMIN_USER \
+        MONGODB_ADMIN_PASSWORD=$MONGODB_ADMIN_PASSWORD \
+        /tmp/compose/infrastructure/clear-all-data.sh $REPLICAS $ENV"
 fi
 
 if [ $2 == "--restore-metadata=yes" ] ; then

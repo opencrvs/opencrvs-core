@@ -117,7 +117,7 @@ docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mo
 
 # Register backup folder as an Elasticsearch repository for backing up the search data
 #-------------------------------------------------------------------------------------
-docker run --rm --network=$NETWORK appropriate/curl curl -XPUT -H "Content-Type: application/json;charset=UTF-8" 'http://$(elasticsearch_host)/_snapshot/ocrvs' -d '{ "type": "fs", "settings": { "location": "/data/backups/elasticsearch", "compress": true }}'
+docker run --rm --network=$NETWORK appropriate/curl curl -XPUT -H "Content-Type: application/json;charset=UTF-8" "http://$(elasticsearch_host)/_snapshot/ocrvs" -d '{ "type": "fs", "settings": { "location": "/data/backups/elasticsearch", "compress": true }}'
 
 # Backup Elasticsearch as a set of snapshot files into an elasticsearch sub folder
 #---------------------------------------------------------------------------------

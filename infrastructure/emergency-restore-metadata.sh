@@ -106,7 +106,7 @@ docker run --rm --network=$NETWORK mongo:4.4 mongo application-config --host $HO
 
 # Delete all data from search
 #----------------------------
-docker run --rm --network=$NETWORK appropriate/curl curl -XDELETE 'http://$(elasticsearch_host)/*' -v
+docker run --rm --network=$NETWORK appropriate/curl curl -XDELETE "http://$(elasticsearch_host)/*" -v
 
 # Delete all data from metrics
 #-----------------------------
