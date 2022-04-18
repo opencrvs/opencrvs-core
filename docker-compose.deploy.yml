@@ -140,10 +140,10 @@ services:
   # Configure elasticsearch
   elasticsearch:
     volumes:
-      - './data/elasticsearch:/usr/share/elasticsearch/data'
-      - './data/backups/elasticsearch:/data/backups/elasticsearch'
-      - './infrastructure/elasticsearch/elasticsearch.yml:/config/elasticsearch.yml'
-      - './infrastructure/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml'
+      - '/data/elasticsearch:/usr/share/elasticsearch/data'
+      - '/data/backups/elasticsearch:/data/backups/elasticsearch'
+      - '/tmp/compose/infrastructure/elasticsearch/elasticsearch.yml:/config/elasticsearch.yml'
+      - '/tmp/compose/infrastructure/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml'
     deploy:
       replicas: 1
       placement:
@@ -511,13 +511,16 @@ configs:
     file: ./infrastructure/hearth-queryparam-extensions.json
   metricbeat-conf.{{ts}}:
     file: ./infrastructure/monitoring/beats/metricbeat.yml
+  mongo-init.{{ts}}:
+    file: ./infrastructure/mongodb/docker-entrypoint-initdb.d/create-mongo-users.sh
+  mongo-on-deploy.{{ts}}:
+    file: ./infrastructure/mongodb/on-deploy.sh
   metricbeat-rollover-policy.{{ts}}:
     file: ./infrastructure/monitoring/beats/rollover-policy.json
   kibana.{{ts}}:
     file: ./infrastructure/monitoring/kibana/kibana.yml
   apm.{{ts}}:
     file: ./infrastructure/monitoring/apm/apm-server.yml
-
 networks:
   overlay_net:
     driver: overlay
