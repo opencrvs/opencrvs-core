@@ -11,6 +11,8 @@
  */
 
 import { Event, IFormField, IFormSection, IForm } from '@client/forms'
+import { IConfigFieldsState, IEventTypes } from './reducer'
+import { keys } from 'lodash'
 
 export type IConfigFormField = {
   fieldId: string
@@ -76,4 +78,40 @@ export function getEventSectionFieldsMap(form: IForm, event: Event) {
   )
 
   return birthSectionFieldsMap
+}
+
+export function prepareCustomFieldConfig(
+  state: IEventTypes,
+  event: keyof IEventTypes,
+  section: string,
+  customField: IConfigFormField
+) {
+  const customFieldNumber =
+    keys(state[event][section]).filter((item) => item.includes('custom-field'))
+      .length + 1
+  const customFieldIndex = `${event}.${section}.custom-field-${customFieldNumber}`
+  let customFieldConfig
+
+  for (const index in state[event][section]) {
+    if (null == state[event][section][index].foregoingFieldId) {
+      state[event][section][index].foregoingFieldId = customFieldIndex
+
+      customFieldConfig = {
+        ...customField,
+        precedingFieldId: state[event][section][index].fieldId,
+        fieldId: customFieldIndex,
+        definition: {
+          ...customField.definition,
+          name: customFieldIndex,
+          label: {
+            ...customField.definition.label,
+            id: `${customField.definition.label.id}${customFieldNumber}`,
+            defaultMessage: 'Custom text input'
+          }
+        }
+      }
+    }
+  }
+
+  return customFieldConfig
 }

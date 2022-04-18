@@ -21,9 +21,13 @@ import {
 } from '@client/forms/configuration'
 import { registerForms } from '@client/forms/configuration/default'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
-import { ISectionFieldMap, getEventSectionFieldsMap } from './utils'
+import {
+  ISectionFieldMap,
+  getEventSectionFieldsMap,
+  prepareCustomFieldConfig
+} from './utils'
 
-interface IEventTypes {
+export interface IEventTypes {
   birth: ISectionFieldMap
   death: ISectionFieldMap
 }
@@ -136,21 +140,15 @@ export const configFieldsReducer: LoopReducer<
     case actions.ADD_CUSTOM_FIELD:
       const { event, section, customField } = action.payload
       const eventName = event as keyof IEventTypes
-      const customFieldIndex = `${event}.${section}.custom-field.${String(
-        new Date().getTime()
-      )}`
+      const customFieldConfig = prepareCustomFieldConfig(
+        state as IEventTypes,
+        eventName,
+        section,
+        customField
+      )
 
-      if (null != state.birth) {
-        for (const index in state.birth[section]) {
-          if (null == state.birth[section][index].foregoingFieldId) {
-            state.birth[section][index].foregoingFieldId = customFieldIndex
-            customField.precedingFieldId = state.birth[section][index].fieldId
-            customField.fieldId = customFieldIndex
-            customField.definition.name = String(new Date().getTime())
-
-            customField.definition.label.defaultMessage = customFieldIndex
-          }
-        }
+      if (undefined === customFieldConfig) {
+        return state
       }
 
       return {
@@ -158,8 +156,8 @@ export const configFieldsReducer: LoopReducer<
         [eventName]: {
           ...state[eventName],
           [section]: {
-            ...(state[eventName] || {})[section],
-            [customFieldIndex]: customField
+            ...(state as IEventTypes)[eventName][section],
+            [customFieldConfig.fieldId]: customFieldConfig
           }
         }
       }

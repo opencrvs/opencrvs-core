@@ -50,7 +50,9 @@ const customField: IConfigFormField = {
   required: false,
   enabled: '',
   custom: true,
-  definition: Object.assign({}, DEFAULT_TEXT)
+  definition: {
+    ...DEFAULT_TEXT
+  }
 }
 
 const listViewItems = (intl: IntlShape) => {
@@ -59,7 +61,7 @@ const listViewItems = (intl: IntlShape) => {
       label: intl.formatMessage(messages.textInput),
       actionLabel: intl.formatMessage(buttonMessages.add),
       handler: (dispatchAction: (fieldMap: IConfigFormField) => void) => {
-        dispatchAction(Object.assign({}, customField))
+        dispatchAction({ ...customField })
       }
     },
     {
