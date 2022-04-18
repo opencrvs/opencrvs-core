@@ -9,6 +9,9 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 
+# This file is run on each deployment with the sole purpose of updating
+# passwords of MongoDB users to passwords given to this service as environment varibles
+
 apt-get update
 apt-get install curl
 
@@ -40,7 +43,7 @@ else
   exit 1
 fi
 
-# Rotate passwords
+# Rotate passwords to match the ones given to this script
 mongo $(mongo_credentials) --host $HOST <<EOF
   use hearth-dev
   db.updateUser('hearth', {
