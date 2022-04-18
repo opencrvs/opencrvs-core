@@ -32,12 +32,12 @@ describe('Test reset credentials success page', () => {
     })
 
     it('loads correct header', () => {
-      expect(app.text()).toContain('ব্যবহারকারীর নাম পাঠানো হয়েছে')
+      expect(app.text()).toContain('Username reminder sent')
     })
 
     it('loads corrent subheader', () => {
       expect(app.text()).toContain(
-        'আপনার ব্যবহারকারীর নামের জন্য আপনার ফোনটি পরীক্ষা করুন'
+        'Check your phone for a reminder of your username'
       )
     })
   })
@@ -55,13 +55,11 @@ describe('Test reset credentials success page', () => {
     })
 
     it('loads correct header', () => {
-      expect(app.text()).toContain('সফলভাবে পাসওয়ার্ড পুনরায় সেট হয়েছে')
+      expect(app.text()).toContain('Passowrd reset successful')
     })
 
     it('loads corrent subheader', () => {
-      expect(app.text()).toContain(
-        'আপনি এখন আপনার নতুন পাসওয়ার্ড দিয়ে লগইন করতে পারেন'
-      )
+      expect(app.text()).toContain('You can now login with your new password')
     })
   })
 

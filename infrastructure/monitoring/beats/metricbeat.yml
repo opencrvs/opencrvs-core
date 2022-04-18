@@ -89,3 +89,9 @@ setup.kibana:
 xpack.monitoring:
   enabled: true
   elasticsearch:
+
+setup.ilm.enabled: true
+setup.ilm.policy_name: 'metricbeat-opencrvs-rollover-policy'
+setup.ilm.policy_file: /usr/share/metricbeat/rollover-policy.json
+setup.ilm.check_exists: true
+setup.ilm.overwrite: true

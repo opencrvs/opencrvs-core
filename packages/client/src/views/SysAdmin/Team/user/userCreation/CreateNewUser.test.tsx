@@ -63,11 +63,6 @@ export const mockRoles = {
         __typename: 'Role'
       },
       {
-        value: 'PERFORMANCE_OVERSIGHT',
-        types: ['CABINET_DIVISION', 'BBS'],
-        __typename: 'Role'
-      },
-      {
         value: 'PERFORMANCE_MANAGEMENT',
         types: ['HEALTH_DIVISION', 'ORG_DIVISION'],
         __typename: 'Role'

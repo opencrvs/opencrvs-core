@@ -22,15 +22,22 @@ import { IUserDetails } from '@client/utils/userUtils'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import styled from '@client/styledComponents'
 import { Header } from '@client/components/interface/Header/Header'
-import { AvatarLarge, Avatar } from '@client/components/Avatar'
-import { ListView } from '@opencrvs/components/lib/interface/ViewData'
+import { Avatar } from '@client/components/Avatar'
+import {
+  ListViewSimplified,
+  ListViewItemSimplified
+} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import {
   ResponsiveModal,
   NOTIFICATION_TYPE,
   FloatingNotification
 } from '@opencrvs/components/lib/interface'
 import { Select } from '@opencrvs/components/lib/forms'
-import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
+import {
+  PrimaryButton,
+  TertiaryButton,
+  LinkButton
+} from '@opencrvs/components/lib/buttons'
 import {
   userMessages as messages,
   buttonMessages,
@@ -45,86 +52,25 @@ import { RouteComponentProps, StaticContext } from 'react-router'
 import { SETTINGS } from '@client/navigation/routes'
 import { Navigation } from '@client/components/interface/Navigation'
 import { AvatarChangeModal } from './AvatarChangeModal'
-import { ImageLoader } from './ImageLoader'
 import { IImage } from '@client/utils/imageUtils'
-
-const Container = styled.div`
-  ${({ theme }) => theme.shadows.light};
-  color: ${({ theme }) => theme.colors.copy};
-  background: ${({ theme }) => theme.colors.white};
-  padding: 40px 77px;
-  margin: 36px auto;
-  width: 1140px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin: 0;
-    padding: 24px 0;
-    width: 100%;
-    min-height: 100vh;
-    margin-top: 0;
-    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
-  }
-`
+import { Content } from '@opencrvs/components/lib/interface/Content'
+import { ImageLoader } from './ImageLoader'
 
 const BodyContainer = styled.div`
-  margin-left: 0px;
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin-left: 249px;
+    margin-top: 48px;
   }
 `
 
-const SettingsTitle = styled.div`
-  ${({ theme }) => theme.fonts.h1};
-  height: 72px;
-  margin-left: 16px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: none;
-  }
+const LabelContainer = styled.span`
+  ${({ theme }) => theme.fonts.bold16}
 `
 
-const Content = styled.div`
-  display: flex;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    flex-direction: column-reverse;
-  }
+const ValueContainer = styled.span`
+  ${({ theme }) => theme.fonts.reg16}
 `
-const Left = styled.div`
-  margin: 0 16px;
-  flex-grow: 1;
-`
-const Right = styled.div`
-  padding-top: 80px;
-  margin-left: 112px;
-  & .tablet {
-    display: none;
-  }
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    padding-top: 0;
-    margin-left: 24px;
-    & .desktop {
-      display: none;
-    }
-    & .tablet {
-      display: block;
-    }
-  }
-`
-const Version = styled.div`
-  color: ${({ theme }) => theme.colors.disabled};
-  ${({ theme }) => theme.fonts.reg14};
-  text-transform: none;
-  margin-top: 2rem;
-  span:last-child {
-    display: none;
-  }
-  :hover {
-    span:first-child {
-      display: none;
-    }
-    span:last-child {
-      display: inline;
-    }
-  }
-`
+
 const Message = styled.div`
   margin-bottom: 16px;
 `
@@ -239,9 +185,10 @@ class SettingsView extends React.Component<IProps, IState> {
 
   changeLanguage = () => {
     if (this.props.userDetails) {
-      this.props.userDetails.language = this.state.selectedLanguage
-      this.props.modifyUserDetails(this.props.userDetails)
-
+      this.props.modifyUserDetails({
+        ...this.props.userDetails,
+        language: this.state.selectedLanguage
+      })
       this.toggleLanguageSettingsModal()
       this.toggleSuccessNotification(NOTIFICATION_SUBJECT.LANGUAGE)
     }
@@ -312,120 +259,113 @@ class SettingsView extends React.Component<IProps, IState> {
       userDetails && userDetails.role
         ? intl.formatMessage(messages[userDetails.role])
         : ''
-    const sections = [
+    const items = [
       {
-        title: intl.formatMessage(messages.profileTitle),
-        items: [
-          {
-            label: intl.formatMessage(messages.labelEnglishName),
-            value: englishName,
-            action: {
-              label: intl.formatMessage(buttonMessages.change),
-              disabled: true
-            }
-          },
-          {
-            label: intl.formatMessage(constantsMessages.labelPhone),
-            value: mobile,
-            action: {
-              label: intl.formatMessage(buttonMessages.change),
-              disabled: false,
-              handler: goToPhoneSettingAction
-            }
-          }
-        ]
+        label: intl.formatMessage(messages.labelEnglishName),
+        value: englishName,
+        action: {
+          label: intl.formatMessage(buttonMessages.change),
+          disabled: true
+        }
       },
       {
-        title: intl.formatMessage(messages.accountTitle),
-        items: [
-          {
-            label: intl.formatMessage(constantsMessages.labelRole),
-            value: role,
-            action: {
-              label: intl.formatMessage(buttonMessages.change),
-              disabled: true
-            }
-          }
-        ]
+        label: intl.formatMessage(constantsMessages.labelPhone),
+        value: mobile,
+        action: {
+          label: intl.formatMessage(buttonMessages.change),
+          disabled: false,
+          handler: goToPhoneSettingAction
+        }
       },
       {
-        title: intl.formatMessage(messages.securityTitle),
-        items: [
-          {
-            label: intl.formatMessage(constantsMessages.labelPassword),
-            placeHolder: '********',
-            action: {
-              id: 'BtnChangePassword',
-              label: intl.formatMessage(buttonMessages.change),
-              handler: this.togglePasswordChangeModal
-            }
-          },
-          {
-            label: intl.formatMessage(constantsMessages.labelPin),
-            placeHolder: '****',
-            action: {
-              label: intl.formatMessage(buttonMessages.change),
-              disabled: true
-            }
-          }
-        ]
+        label: intl.formatMessage(constantsMessages.labelRole),
+        value: role,
+        action: {
+          label: intl.formatMessage(buttonMessages.change),
+          disabled: true
+        }
       },
       {
-        title: intl.formatMessage(messages.systemTitle),
-        items: [
-          {
-            label: intl.formatMessage(constantsMessages.labelLanguage),
-            value: languages[this.props.language].displayName,
-            action: {
-              id: 'BtnChangeLanguage',
-              label: intl.formatMessage(buttonMessages.change),
-              handler: this.toggleLanguageSettingsModal
-            }
-          }
-        ]
+        label: intl.formatMessage(messages.systemLanguage),
+        value: languages[this.props.language].displayName,
+        action: {
+          id: 'BtnChangeLanguage',
+          label: intl.formatMessage(buttonMessages.change),
+          handler: this.toggleLanguageSettingsModal
+        }
+      },
+      {
+        label: intl.formatMessage(constantsMessages.labelPassword),
+        value: '********',
+        action: {
+          id: 'BtnChangePassword',
+          label: intl.formatMessage(buttonMessages.change),
+          handler: this.togglePasswordChangeModal
+        }
+      },
+      {
+        label: intl.formatMessage(constantsMessages.labelPin),
+        value: '****',
+        action: {
+          label: intl.formatMessage(buttonMessages.change),
+          disabled: true
+        }
       }
     ]
+
     return (
       <>
         <Header title={intl.formatMessage(messages.settingsTitle)} />
         <Navigation />
         <BodyContainer>
-          <Container>
-            <SettingsTitle>
-              {intl.formatMessage(messages.settingsTitle)}
-            </SettingsTitle>
-            <Content>
-              <Left>
-                {sections.map((sec, index: number) => (
-                  <ListView key={index} {...sec} />
-                ))}
-                <Version>
-                  <span>OpenCRVS v1.1.0</span>
-                  <span>{process.env.REACT_APP_VERSION || 'development'}</span>
-                </Version>
-              </Left>
-              <Right>
-                <ImageLoader
-                  onImageLoaded={this.handleImageLoaded}
-                  onLoadingStarted={this.toggleAvatarChangeModal}
-                  onError={(imageLoadingError) =>
-                    this.setState({ imageLoadingError })
-                  }
-                >
-                  <Avatar
-                    className="tablet clickable"
-                    avatar={userDetails?.avatar}
-                    name={englishName}
+          <Content title={intl.formatMessage(messages.settingsTitle)}>
+            <ListViewSimplified>
+              {items.map((item) => {
+                return (
+                  <ListViewItemSimplified
+                    key={item.label}
+                    label={<LabelContainer>{item.label}</LabelContainer>}
+                    value={<ValueContainer>{item.value}</ValueContainer>}
+                    actions={[
+                      <LinkButton
+                        id={item.action.id}
+                        onClick={item.action.handler}
+                        disabled={item.action.disabled}
+                      >
+                        {item.action.label}
+                      </LinkButton>
+                    ]}
                   />
-                  <AvatarLarge
-                    className="desktop clickable"
-                    avatar={userDetails?.avatar}
-                    name={englishName}
-                  />
-                </ImageLoader>
-              </Right>
-            </Content>
-          </Container>
+                )
+              })}
+              {/* For Profile Image */}
+              <ListViewItemSimplified
+                label={
+                  <LabelContainer>
+                    {intl.formatMessage(messages.profileImage)}
+                  </LabelContainer>
+                }
+                value={
+                  <ValueContainer>
+                    <Avatar avatar={userDetails?.avatar} name={englishName} />
+                  </ValueContainer>
+                }
+                actions={[
+                  <ImageLoader
+                    onImageLoaded={this.handleImageLoaded}
+                    onLoadingStarted={this.toggleAvatarChangeModal}
+                    onError={(imageLoadingError) =>
+                      this.setState({ imageLoadingError })
+                    }
+                  >
+                    <LinkButton>
+                      {intl.formatMessage(buttonMessages.change)}
+                    </LinkButton>
+                  </ImageLoader>
+                ]}
+              />
+            </ListViewSimplified>
+          </Content>
         </BodyContainer>
         <ResponsiveModal
           id="ChangeLanguageModal"

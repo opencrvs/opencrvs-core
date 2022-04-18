@@ -24,9 +24,7 @@ export enum QUESTION_KEYS {
 interface IUserMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   accountTitle: MessageDescriptor
-  BBS: MessageDescriptor
   BIRTH_TOWN: MessageDescriptor
-  CABINET_DIVISION: MessageDescriptor
   CHA: MessageDescriptor
   CHAIRMAN: MessageDescriptor
   changeLanguageMessege: MessageDescriptor
@@ -52,7 +50,6 @@ interface IUserMessages
   NATIONAL_SYSTEM_ADMIN: MessageDescriptor
   ORG_DIVISION: MessageDescriptor
   PERFORMANCE_MANAGEMENT: MessageDescriptor
-  PERFORMANCE_OVERSIGHT: MessageDescriptor
   profileTitle: MessageDescriptor
   REGISTRATION_AGENT: MessageDescriptor
   SECRETARY: MessageDescriptor
@@ -93,8 +90,10 @@ interface IUserMessages
   phoneNumberUpdated: MessageDescriptor
   avatarUpdating: MessageDescriptor
   avatarUpdated: MessageDescriptor
+  name: MessageDescriptor
+  systemLanguage: MessageDescriptor
+  profileImage: MessageDescriptor
 }
-
 interface IDynamicUserMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   [key: string]: MessageDescriptor
@@ -106,20 +105,10 @@ const messagesToDefine: IUserMessages = {
     description: 'Account header',
     id: 'settings.account.tile'
   },
-  BBS: {
-    defaultMessage: 'BBS',
-    description: 'The description for BBS type',
-    id: 'constants.bbs'
-  },
   BIRTH_TOWN: {
     defaultMessage: 'What city were you born in?',
     description: 'The description for BIRTH_TOWN key',
     id: 'userSetup.securityQuestions.birthTown'
-  },
-  CABINET_DIVISION: {
-    defaultMessage: 'Cabinet Division',
-    description: 'The description for CABINET_DIVISION type',
-    id: 'constants.cabinetDivision'
   },
   CHA: {
     defaultMessage: 'CHA',
@@ -255,11 +244,6 @@ const messagesToDefine: IUserMessages = {
     defaultMessage: 'Performance Management',
     description: 'The description for Performance Management role',
     id: 'constants.performanceManagement'
-  },
-  PERFORMANCE_OVERSIGHT: {
-    defaultMessage: 'Performance Oversight',
-    description: 'The description for Performance Oversight role',
-    id: 'constants.performanceOversight'
   },
   profileTitle: {
     defaultMessage: 'Profile',
@@ -458,6 +442,21 @@ const messagesToDefine: IUserMessages = {
     id: 'system.user.settings.avatarUpdated',
     defaultMessage: 'Profile image successfully updated',
     description: 'Profile image change message on success'
+  },
+  name: {
+    id: 'system.user.settings.name',
+    defaultMessage: 'Name',
+    description: 'label for Name'
+  },
+  systemLanguage: {
+    id: 'system.user.settings.systemLanguage',
+    defaultMessage: 'System language',
+    description: 'Label for system language'
+  },
+  profileImage: {
+    id: 'system.user.settings.profileImage',
+    defaultMessage: 'Profile Image',
+    description: 'Label for profile image'
   }
 }
 

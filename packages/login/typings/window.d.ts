@@ -13,6 +13,7 @@ interface Window {
   config: {
     AUTH_API_URL: string
     CONFIG_API_URL: string
+    COUNTRY_CONFIG_URL: string
     COUNTRY: string
     LANGUAGES: string
     CLIENT_APP_URL: string

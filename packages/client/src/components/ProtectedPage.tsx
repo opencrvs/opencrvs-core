@@ -22,7 +22,11 @@ import { ProtectedAccount } from '@client/components/ProtectedAccount'
 import { getCurrentUserID, IUserData } from '@client/declarations'
 import * as LogRocket from 'logrocket'
 import { refreshToken } from '@client/utils/authUtils'
-import { REFRESH_TOKEN_CHECK_MILLIS } from '@client/utils/constants'
+import {
+  LOADER_MIN_DISPLAY_TIME,
+  LOADING_SCREEN_TEXT,
+  REFRESH_TOKEN_CHECK_MILLIS
+} from '@client/utils/constants'
 import { connect } from 'react-redux'
 import { refreshOfflineData } from '@client/offline/actions'
 import { PropsWithChildren } from 'react'
@@ -47,6 +51,7 @@ interface IProtectPageState {
   pendingUser: boolean
   forgotPin: boolean
   passwordVerified: boolean
+  loadingTimeout?: boolean
 }
 
 type Props = OwnProps & DispatchProps & RouteComponentProps<{}>
@@ -59,8 +64,22 @@ const StyledSpinner = styled(Spinner)`
   position: absolute;
   margin-left: -24px;
   margin-top: -24px;
-  top: 50%;
+  top: 38%;
   left: 50%;
+  width: 40px;
+  height: 40px;
+`
+const StyledText = styled.span`
+  position: absolute;
+  top: 44%;
+  left: 42%;
+  width: 251px;
+  height: 32px;
+  ${({ theme }) => theme.fonts.h3};
+  color: ${({ theme }) => theme.colors.grey600};
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    left: 24%;
+  }
 `
 
 class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
@@ -72,7 +91,8 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
       pinExists: true,
       pendingUser: false,
       forgotPin: false,
-      passwordVerified: false
+      passwordVerified: false,
+      loadingTimeout: false
     }
     this.handleVisibilityChange = this.handleVisibilityChange.bind(this)
     this.markAsSecured = this.markAsSecured.bind(this)
@@ -80,6 +100,7 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
   }
 
   async componentDidMount() {
+    setTimeout(this.setLoadingTimeOut, LOADER_MIN_DISPLAY_TIME)
     const newState = { ...this.state }
 
     if (await storage.getItem(SCREEN_LOCK)) {
@@ -108,6 +129,10 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     setInterval(() => {
       refreshToken()
     }, REFRESH_TOKEN_CHECK_MILLIS)
+  }
+
+  setLoadingTimeOut = () => {
+    this.setState({ loadingTimeout: true })
   }
 
   async handleVisibilityChange(isVisible: boolean) {
@@ -173,14 +198,15 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     return (
       <SpinnerBackground>
         <StyledSpinner id="pin_loading_spinner" />
+        <StyledText>{LOADING_SCREEN_TEXT}</StyledText>
       </SpinnerBackground>
     )
   }
 
   conditionalRenderUponSecuredState() {
-    const { secured, loading, forgotPin } = this.state
+    const { secured, loading, forgotPin, loadingTimeout } = this.state
 
-    if (loading) {
+    if (loading || !loadingTimeout) {
       return this.renderLoadingScreen()
     }
 
