@@ -49,7 +49,8 @@ import {
   CAUSE_OF_DEATH_CODE,
   getPractionerIdFromTask,
   getTrackingId,
-  getRegLastOffice
+  getRegLastOffice,
+  getEncounterLocationType
 } from '@metrics/features/registration/fhirUtils'
 import {
   getAgeInDays,
@@ -155,6 +156,7 @@ export const generateBirthRegPoint = async (
 
   const tags: IBirthRegistrationTags = {
     regStatus: regStatus,
+    eventLocationType: await getEncounterLocationType(payload, authHeader),
     gender: child.gender,
     officeLocation: getRegLastOffice(payload),
     ...(await generatePointLocations(payload, authHeader))
