@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { IConfigFormField } from '@client/forms/configuration/configFields/utils'
 import { buttonMessages } from '@client/i18n/messages'
 import { customFieldFormMessages } from '@client/i18n/messages/views/customFieldForm'
 import { ILanguageState, initLanguages } from '@client/i18n/reducer'
@@ -31,12 +32,10 @@ import { connect } from 'react-redux'
 
 const CustomFieldFormContainer = styled(Box)`
   box-shadow: none;
-  border-left: 1px solid ${({ theme }) => theme.colors.grey300};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   max-width: 348px;
   min-height: 100vh;
   margin-left: auto;
-  padding: 24px;
+  padding: 0px;
 `
 
 const CPrimaryButton = styled(PrimaryButton)`
@@ -71,12 +70,12 @@ const ListContainer = styled.div`
 `
 
 const GreyText = styled.span`
-  ${({ theme }) => theme.fonts.reg18};
+  ${({ theme }) => theme.fonts.reg14};
   color: ${({ theme }) => theme.colors.grey400};
 `
 
 const ListRow = styled.div`
-  ${({ theme }) => theme.fonts.reg18};
+  ${({ theme }) => theme.fonts.reg14};
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -92,6 +91,7 @@ const ListColumn = styled.div``
 
 type IFullProps = {
   intl: IntlShape
+  selectedField: IConfigFormField
 }
 
 interface IFieldForm {
@@ -149,15 +149,13 @@ class CustomFieldFormsComp extends React.Component<
   }
 
   _getLanguages(): ILanguageState {
-    // return initLanguages()
-    return {
-      en: { displayName: 'English', lang: 'en', messages: {} },
-      fr: { displayName: 'French', lang: 'fr', messages: {} }
-    }
+    return initLanguages()
   }
 
   _setValue(field: string, value: string) {
     const language = this.state.selectedLanguage
+
+    console.log(this.props.selectedField)
 
     this.setState({
       fieldForms: {

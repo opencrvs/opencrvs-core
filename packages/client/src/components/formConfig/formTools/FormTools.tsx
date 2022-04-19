@@ -10,19 +10,19 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import React from 'react'
-import styled from '@client/styledComponents'
-import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
-import { IntlShape, useIntl } from 'react-intl'
-import { messages } from '@client/i18n/messages/views/formConfig'
-import {
-  ListViewSimplified,
-  ListViewItemSimplified
-} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { buttonMessages } from '@client/i18n/messages'
 import { IConfigFormField } from '@client/forms/configuration/configFields/utils'
 import { DEFAULT_TEXT } from '@client/forms/configuration/default'
+import { buttonMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/formConfig'
+import styled from '@client/styledComponents'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
+import {
+  ListViewItemSimplified,
+  ListViewSimplified
+} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+import React from 'react'
+import { IntlShape, useIntl } from 'react-intl'
 
 const TitleContainer = styled.div`
   margin-top: 24px;

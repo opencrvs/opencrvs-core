@@ -27,13 +27,18 @@ import { Event, BirthSection, DeathSection } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
 import { Canvas } from '@client/components/formConfig/Canvas'
 import { selectEventFormDraft } from '@client/forms/configuration/selector'
-import { IConfigFormField } from '@client/forms/configuration/configFields/utils'
+import {
+  IConfigFormField,
+  prepareCustomFieldConfig
+} from '@client/forms/configuration/configFields/utils'
 import { DefaultFieldTools } from '@client/components/formConfig/formTools/DefaultFieldTools'
 import { useLoadFormDraft, useHasNatlSysAdminScope } from './hooks'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { IStoreState } from '@client/store'
 import { goToFormConfig } from '@client/navigation'
 import { AddCustomField } from '@client/forms/configuration/configFields/actions'
+import { IEventTypes } from '@client/forms/configuration/configFields/reducer'
+import { CustomFieldForms } from '@client/components/formConfig/CustomFieldForm'
 
 const Container = styled.div`
   display: flex;
@@ -68,6 +73,7 @@ const ToolsContainer = styled.div`
   padding-top: 30px;
   border-left: 1px solid ${({ theme }) => theme.colors.grey300};
   background-color: ${({ theme }) => theme.colors.white};
+  overflow-y: auto;
 `
 
 const CanvasContainer = styled.div`
@@ -124,6 +130,7 @@ export function FormConfigWizard() {
   const intl = useIntl()
   const { event, section } = useParams<IRouteProps>()
   const version = useNewDraftVersion(event)
+  const state = useSelector((store: IStoreState) => store.configFields)
 
   if (
     !hasNatlSysAdminScope ||
@@ -159,14 +166,31 @@ export function FormConfigWizard() {
         </CanvasContainer>
         <ToolsContainer>
           {selectedField ? (
-            !selectedField.definition.custom && (
+            !selectedField.custom ? (
               <DefaultFieldTools configField={selectedField} />
+            ) : (
+              <CustomFieldForms selectedField={selectedField} />
             )
           ) : (
             <FormTools
-              onAddClickListener={(fieldMap: IConfigFormField) =>
-                dispatch(AddCustomField(event, section, fieldMap))
-              }
+              onAddClickListener={(fieldMap: IConfigFormField) => {
+                const customFieldConfig = prepareCustomFieldConfig(
+                  state as IEventTypes,
+                  event,
+                  section,
+                  fieldMap
+                )
+                if (!customFieldConfig) {
+                  return
+                }
+                dispatch(AddCustomField(event, section, customFieldConfig))
+                setSelectedField(customFieldConfig)
+                setTimeout(() => {
+                  document
+                    .getElementById(customFieldConfig.fieldId)
+                    ?.scrollIntoView()
+                }, 300)
+              }}
             />
           )}
         </ToolsContainer>

@@ -14,12 +14,13 @@ import React from 'react'
 import { Box } from '@opencrvs/components/lib/interface'
 import { FormConfigElementCard } from '@opencrvs/components/lib/interface/FormConfigElementCard'
 import styled from '@client/styledComponents'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { Event, DeathSection, BirthSection } from '@client/forms'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { selectConfigFields } from '@client/forms/configuration/configFields/selectors'
 import { IConfigFormField } from '@client/forms/configuration/configFields/utils'
+import { RemoveCustomField } from '@client/forms/configuration/configFields/actions'
 
 const CanvasBox = styled(Box)`
   display: flex;
@@ -68,6 +69,7 @@ export function Canvas({
     selectConfigFields(store, event, section)
   )
   const configFields = generateConfigFields(fieldsMap)
+  const dispatch = useDispatch()
 
   return (
     <CanvasBox>
@@ -76,6 +78,10 @@ export function Canvas({
           key={configField.fieldId}
           selected={selectedField?.fieldId === configField.fieldId}
           onClick={() => onFieldSelect(configField)}
+          removable={configField.custom}
+          onRemove={() => {
+            selectedField && dispatch(RemoveCustomField(selectedField))
+          }}
         >
           <FormFieldGenerator
             id={configField.fieldId}

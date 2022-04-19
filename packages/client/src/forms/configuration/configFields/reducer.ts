@@ -140,16 +140,6 @@ export const configFieldsReducer: LoopReducer<
     case actions.ADD_CUSTOM_FIELD:
       const { event, section, customField } = action.payload
       const eventName = event as keyof IEventTypes
-      const customFieldConfig = prepareCustomFieldConfig(
-        state as IEventTypes,
-        eventName,
-        section,
-        customField
-      )
-
-      if (undefined === customFieldConfig) {
-        return state
-      }
 
       return {
         ...state,
@@ -157,8 +147,25 @@ export const configFieldsReducer: LoopReducer<
           ...state[eventName],
           [section]: {
             ...(state as IEventTypes)[eventName][section],
-            [customFieldConfig.fieldId]: customFieldConfig
+            [customField.fieldId]: customField
           }
+        }
+      }
+    case actions.REMOVE_CUSTOM_FIELD:
+      const { selectedField } = action.payload
+      const [selectedFieldEvent, selectedFieldSection] =
+        selectedField.fieldId.split('.') as [keyof IEventTypes, string]
+
+      const fields = (state as IEventTypes)[selectedFieldEvent][
+        selectedFieldSection
+      ]
+      delete fields[selectedField.fieldId]
+
+      return {
+        ...state,
+        [selectedFieldEvent]: {
+          ...state[selectedFieldEvent],
+          [selectedFieldSection]: fields
         }
       }
     default:

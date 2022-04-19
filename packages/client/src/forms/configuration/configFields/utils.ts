@@ -85,7 +85,7 @@ export function prepareCustomFieldConfig(
   event: keyof IEventTypes,
   section: string,
   customField: IConfigFormField
-) {
+): IConfigFormField | undefined {
   const customFieldNumber =
     keys(state[event][section]).filter((item) => item.includes('custom-field'))
       .length + 1

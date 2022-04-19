@@ -89,7 +89,6 @@ export type AddCustomFieldAction = {
     customField: IConfigFormField
   }
 }
-
 export const AddCustomField = (
   event: string,
   section: string,
@@ -103,6 +102,22 @@ export const AddCustomField = (
   }
 })
 
+export const REMOVE_CUSTOM_FIELD = 'FORM/REMOVE_CUSTOM_FIELD'
+export type RemoveCustomFieldAction = {
+  type: typeof REMOVE_CUSTOM_FIELD
+  payload: {
+    selectedField: IConfigFormField
+  }
+}
+export const RemoveCustomField = (
+  customField: IConfigFormField
+): RemoveCustomFieldAction => ({
+  type: REMOVE_CUSTOM_FIELD,
+  payload: {
+    selectedField: customField
+  }
+})
+
 export type ConfigFieldsActions =
   | ApplicationConfigLoadedAction
   | StoreConfigFieldsAction
@@ -110,3 +125,4 @@ export type ConfigFieldsActions =
   | GetStorageConfigFieldsSuccessAction
   | GetStorageConfigFieldsFailedAction
   | AddCustomFieldAction
+  | RemoveCustomFieldAction
