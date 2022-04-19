@@ -349,7 +349,7 @@ export const primaryAddressFields: SerializedFormField[] = [
     },
     previewGroup: 'primaryAddress',
     required: true,
-    initialValue: 'FAR',
+    initialValue: window.config.COUNTRY.toUpperCase(),
     validate: [],
     placeholder: {
       defaultMessage: 'Select',
@@ -1136,7 +1136,7 @@ export const secondaryAddressFields: SerializedFormField[] = [
     },
     previewGroup: 'secondaryAddress',
     required: true,
-    initialValue: 'FAR',
+    initialValue: window.config.COUNTRY.toUpperCase(),
     validate: [],
     placeholder: {
       defaultMessage: 'Select',

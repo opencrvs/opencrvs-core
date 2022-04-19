@@ -1348,7 +1348,7 @@ export const registerForms: IDefaultRegisterForms = {
                 },
                 previewGroup: 'placeOfBirth',
                 required: true,
-                initialValue: 'FAR',
+                initialValue: window.config.COUNTRY.toUpperCase(),
                 validate: [],
                 placeholder: {
                   defaultMessage: 'Select',
@@ -2207,7 +2207,7 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'form.field.label.deceased.nationality'
                 },
                 required: false,
-                initialValue: 'FAR',
+                initialValue: window.config.COUNTRY.toUpperCase(),
                 validate: [],
                 placeholder: {
                   defaultMessage: 'Select',
@@ -3162,7 +3162,7 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'form.field.label.deceased.nationality'
                 },
                 required: false,
-                initialValue: 'FAR',
+                initialValue: window.config.COUNTRY.toUpperCase(),
                 validate: [],
                 placeholder: {
                   defaultMessage: 'Select',
@@ -3692,7 +3692,7 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'form.field.label.deceased.nationality'
                 },
                 required: false,
-                initialValue: 'FAR',
+                initialValue: window.config.COUNTRY.toUpperCase(),
                 validate: [],
                 placeholder: {
                   defaultMessage: 'Select',
@@ -5194,7 +5194,7 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'form.field.label.deceased.nationality'
                 },
                 required: false,
-                initialValue: 'FAR',
+                initialValue: window.config.COUNTRY.toUpperCase(),
                 validate: [],
                 placeholder: {
                   defaultMessage: 'Select',
@@ -5787,7 +5787,7 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'form.field.label.country'
                 },
                 required: true,
-                initialValue: 'FAR',
+                initialValue: window.config.COUNTRY.toUpperCase(),
                 validate: [],
                 placeholder: {
                   defaultMessage: 'Select',
@@ -6641,7 +6641,7 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'form.field.label.deceased.nationality'
                 },
                 required: false,
-                initialValue: 'FAR',
+                initialValue: window.config.COUNTRY.toUpperCase(),
                 validate: [],
                 placeholder: {
                   defaultMessage: 'Select',
