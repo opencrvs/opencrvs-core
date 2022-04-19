@@ -13,9 +13,6 @@ import * as React from 'react'
 import styled from '@client/styledComponents'
 import { DeclarationIcon } from '@opencrvs/components/lib/icons/DeclarationIcon'
 import { STATUSTOCOLOR } from '@client/views/Home/RecordAudit'
-import { IDynamicValues } from '@opencrvs/components/lib/interface/GridTable/types'
-import { COLUMNS, SORT_ORDER } from '@opencrvs/components/lib/interface'
-import { orderBy } from 'lodash'
 
 const Flex = styled.div`
   display: flex;
@@ -51,7 +48,7 @@ const Icon = styled.div`
   width: 24px;
 `
 
-const getIcon = (status: string) => {
+const IconComp = ({ status }: { status: string }) => {
   return (
     <Icon>
       <DeclarationIcon color={STATUSTOCOLOR[status]} />
@@ -59,35 +56,37 @@ const getIcon = (status: string) => {
   )
 }
 
-export const getIconWithName = (status: string, name: string) => {
+export const IconWithName = ({
+  status,
+  name
+}: {
+  status: string
+  name: string
+}) => {
   return (
     <Flex id="flex">
-      {getIcon(status)}
+      <IconComp status={status} />
       {name ? <Name id="name">{name}</Name> : <Error>No name provided</Error>}
     </Flex>
   )
 }
 
-export const getIconWithNameEvent = (
-  status: string,
-  name: string,
+export const IconWithNameEvent = ({
+  status,
+  name,
+  event
+}: {
+  status: string
+  name: string
   event?: string
-) => {
+}) => {
   return (
     <Flex id="flex">
-      {getIcon(status)}
+      <IconComp status={status} />
       <NameEventContainer id="nameEvent">
         {name ? <Name>{name}</Name> : <Error>No name provided</Error>}
         {event && <Event>{event}</Event>}
       </NameEventContainer>
     </Flex>
   )
-}
-
-export const getSortedItems = (
-  items: IDynamicValues[],
-  sortedCol: COLUMNS,
-  sortOrder: SORT_ORDER
-): IDynamicValues[] => {
-  return orderBy(items, [sortedCol], [sortOrder])
 }

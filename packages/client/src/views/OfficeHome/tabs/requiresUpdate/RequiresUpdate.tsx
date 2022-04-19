@@ -29,7 +29,13 @@ import {
   withOnlineStatus
 } from '@client/views/OfficeHome/LoadingIndicator'
 import { EVENT_STATUS, ErrorText } from '@client/views/OfficeHome/OfficeHome'
-import { GridTable, Loader } from '@opencrvs/components/lib/interface'
+import {
+  GridTable,
+  Loader,
+  COLUMNS,
+  SORT_ORDER,
+  ColumnContentAlignment
+} from '@opencrvs/components/lib/interface'
 import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
@@ -51,6 +57,16 @@ import {
 } from '@opencrvs/components/lib/interface/Content'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
+import {
+  changeSortedColumn,
+  getSortedItems
+} from '@client/views/OfficeHome/tabs/utils'
+import {
+  IconWithName,
+  IconWithNameEvent
+} from '@client/views/OfficeHome/tabs/components'
+import { SUBMISSION_STATUS } from '@client/declarations'
+import { Event } from '@client/forms'
 
 interface IProps {
   userDetails: IUserDetails | null
@@ -69,6 +85,7 @@ type IFullProps = IProps & IDispatchProps & IntlShapeProps & IOnlineStatusProps
 
 function useWindowWidth() {
   const [windowSize, setWindowSize] = React.useState<number>()
+
   React.useEffect(() => {
     function handleResize() {
       setWindowSize(window.innerWidth)
@@ -80,58 +97,86 @@ function useWindowWidth() {
   return windowSize
 }
 
-const transformRejectedContent = (data: GQLQuery, props: IFullProps) => {
+const transformRejectedContent = (
+  data: GQLQuery,
+  props: IFullProps,
+  sortedCol: COLUMNS,
+  sortOrder: SORT_ORDER
+) => {
   if (!data.searchEvents || !data.searchEvents.results) {
     return []
   }
 
-  return data.searchEvents.results.map((reg: GQLEventSearchSet | null) => {
-    const { intl } = props
-    const registrationSearchSet = reg as GQLEventSearchSet
-    let names
-    if (
-      registrationSearchSet.registration &&
-      registrationSearchSet.type === 'Birth'
-    ) {
-      const birthReg = reg as GQLBirthEventSearchSet
-      names = birthReg && (birthReg.childName as GQLHumanName[])
-    } else {
-      const deathReg = reg as GQLDeathEventSearchSet
-      names = deathReg && (deathReg.deceasedName as GQLHumanName[])
-    }
-    window.__localeId__ = props.intl.locale
-    const daysOfRejection =
-      registrationSearchSet.registration?.modifiedAt &&
-      formattedDuration(
-        new Date(parseInt(registrationSearchSet.registration.modifiedAt))
-      )
+  const items = data.searchEvents.results.map(
+    (reg: GQLEventSearchSet | null) => {
+      const { intl } = props
+      const registrationSearchSet = reg as GQLEventSearchSet
+      let names
+      if (
+        registrationSearchSet.registration &&
+        registrationSearchSet.type === 'Birth'
+      ) {
+        const birthReg = reg as GQLBirthEventSearchSet
+        names = birthReg && (birthReg.childName as GQLHumanName[])
+      } else {
+        const deathReg = reg as GQLDeathEventSearchSet
+        names = deathReg && (deathReg.deceasedName as GQLHumanName[])
+      }
+      window.__localeId__ = props.intl.locale
+      const sentForUpdates =
+        registrationSearchSet.registration?.modifiedAt &&
+        parseInt(registrationSearchSet.registration.modifiedAt)
 
-    const event = registrationSearchSet.type as string
-    return {
-      id: registrationSearchSet.id,
-      event:
-        (event &&
-          intl.formatMessage(dynamicConstantsMessages[event.toLowerCase()])) ||
-        '',
-      name:
+      const event = registrationSearchSet.type as string
+      const dateOfEvent =
+        event === 'Birth'
+          ? (reg as GQLBirthEventSearchSet).dateOfBirth
+          : (reg as GQLDeathEventSearchSet).dateOfDeath || ''
+      const name =
         (createNamesMap(names)[props.intl.locale] as string) ||
-        (createNamesMap(names)[LANG_EN] as string),
-      daysOfRejection: props.intl.formatMessage(
-        constantsMessages.rejectedDays,
-        {
-          text: daysOfRejection
-        }
-      ),
-      rowClickHandler: [
-        {
-          label: 'rowClickHandler',
-          handler: () =>
-            props.goToDeclarationRecordAudit(
-              'rejectTab',
-              registrationSearchSet.id
-            )
-        }
-      ]
+        (createNamesMap(names)[LANG_EN] as string)
+      return {
+        id: registrationSearchSet.id,
+        event:
+          (event &&
+            intl.formatMessage(
+              dynamicConstantsMessages[event.toLowerCase()]
+            )) ||
+          '',
+        name: name,
+        iconWithName: (
+          <IconWithName status={SUBMISSION_STATUS.REJECTED} name={name} />
+        ),
+        dateOfEvent: (dateOfEvent && new Date(dateOfEvent)) || '',
+        iconWithNameEvent: (
+          <IconWithNameEvent
+            status={SUBMISSION_STATUS.DRAFT}
+            name={name}
+            event={event}
+          />
+        ),
+        sentForUpdates: (sentForUpdates && new Date(sentForUpdates)) || '',
+        rowClickHandler: [
+          {
+            label: 'rowClickHandler',
+            handler: () =>
+              props.goToDeclarationRecordAudit(
+                'rejectTab',
+                registrationSearchSet.id
+              )
+          }
+        ]
+      }
+    }
+  )
+  const sortedItems = getSortedItems(items, sortedCol, sortOrder)
+  return sortedItems.map((item) => {
+    return {
+      ...item,
+      dateOfEvent:
+        item.dateOfEvent && formattedDuration(item.dateOfEvent as Date),
+      sentForUpdates:
+        item.sentForUpdates && formattedDuration(item.sentForUpdates as Date)
     }
   })
 }
@@ -139,39 +184,53 @@ const transformRejectedContent = (data: GQLQuery, props: IFullProps) => {
 const getRejectedColumns = (
   width: number | undefined,
   theme: ITheme,
-  intl: IntlShape
+  intl: IntlShape,
+  sortedCol: COLUMNS,
+  onColumnClick: (columnName: string) => void
 ) => {
   if (width && width > theme.grid.breakpoints.lg) {
     return [
       {
-        label: intl.formatMessage(constantsMessages.type),
-        width: 20,
-        key: 'event'
-      },
-      {
+        width: 40,
         label: intl.formatMessage(constantsMessages.name),
-        width: 40,
-        key: 'name',
-        color: theme.colors.supportingCopy
+        key: COLUMNS.ICON_WITH_NAME,
+        errorValue: intl.formatMessage(constantsMessages.noNameProvided),
+        isSorted: sortedCol === COLUMNS.NAME,
+        sortFunction: onColumnClick
       },
       {
-        label: intl.formatMessage(constantsMessages.sentForUpdatesOn),
-        width: 40,
-        key: 'daysOfRejection'
+        label: intl.formatMessage(constantsMessages.event),
+        width: 10,
+        key: COLUMNS.EVENT,
+        isSorted: sortedCol === COLUMNS.EVENT,
+        sortFunction: onColumnClick
+      },
+      {
+        label: intl.formatMessage(constantsMessages.dateOfEvent),
+        width: 20,
+        key: COLUMNS.DATE_OF_EVENT,
+        isSorted: sortedCol === COLUMNS.DATE_OF_EVENT,
+        sortFunction: onColumnClick
+      },
+      {
+        label: intl.formatMessage(constantsMessages.sentForUpdates),
+        width: 20,
+        key: COLUMNS.SENT_FOR_UPDATES,
+        isSorted: sortedCol === COLUMNS.SENT_FOR_UPDATES,
+        sortFunction: onColumnClick
+      },
+      {
+        width: 10,
+        alignment: ColumnContentAlignment.RIGHT,
+        key: COLUMNS.STATUS_INDICATOR
       }
     ]
   } else {
     return [
       {
-        label: intl.formatMessage(constantsMessages.type),
-        width: 30,
-        key: 'event'
-      },
-      {
         label: intl.formatMessage(constantsMessages.name),
-        width: 70,
-        key: 'name',
-        color: theme.colors.supportingCopy
+        width: 90,
+        key: COLUMNS.ICON_WITH_NAME_EVENT
       }
     ]
   }
@@ -188,6 +247,18 @@ const RequiresUpdateComponent = (props: IFullProps) => {
     theme
   } = props
   const width = useWindowWidth()
+  const [sortedCol, setSortedCol] = React.useState(COLUMNS.NAME)
+  const [sortOrder, setSortOrder] = React.useState(SORT_ORDER.ASCENDING)
+  const onColumnClick = (columnName: string) => {
+    const { newSortedCol, newSortOrder } = changeSortedColumn(
+      columnName,
+      sortedCol,
+      sortOrder
+    )
+    setSortedCol(newSortedCol)
+    setSortOrder(newSortOrder)
+  }
+
   return (
     <Content
       size={ContentSize.LARGE}
@@ -232,8 +303,19 @@ const RequiresUpdateComponent = (props: IFullProps) => {
           return (
             <>
               <GridTable
-                content={transformRejectedContent(data, props)}
-                columns={getRejectedColumns(width, theme, intl)}
+                content={transformRejectedContent(
+                  data,
+                  props,
+                  sortedCol,
+                  sortOrder
+                )}
+                columns={getRejectedColumns(
+                  width,
+                  theme,
+                  intl,
+                  sortedCol,
+                  onColumnClick
+                )}
                 noResultText={intl.formatMessage(
                   officeHomeMessages.requiresUpdate
                 )}
@@ -247,6 +329,8 @@ const RequiresUpdateComponent = (props: IFullProps) => {
                 showPaginated={showPaginated}
                 loading={loading}
                 loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
+                sortedCol={sortedCol}
+                sortOrder={sortOrder}
               />
               <LoadingIndicator loading={loading} hasError={error} />
             </>

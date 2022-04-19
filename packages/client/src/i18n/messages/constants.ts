@@ -109,6 +109,7 @@ interface IConstantsMessages
   trackingId: MessageDescriptor
   dateOfEvent: MessageDescriptor
   sentForReview: MessageDescriptor
+  sentForUpdates: MessageDescriptor
   type: MessageDescriptor
   event: MessageDescriptor
   update: MessageDescriptor
@@ -650,6 +651,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Sent for review',
     description: 'label for sent for review',
     id: 'constants.sentForReview'
+  },
+  sentForUpdates: {
+    defaultMessage: 'Sent for updates',
+    description: 'label for sent for updates',
+    id: 'constants.sentForUpdates'
   },
   type: {
     defaultMessage: 'Type',
