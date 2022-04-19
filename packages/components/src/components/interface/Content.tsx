@@ -23,7 +23,7 @@ const Container = styled(Box)<{ size: string; hideBackground?: boolean }>`
   height: 100%;
   box-sizing: border-box;
 
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin: 0;
     border: 0;
     border-radius: 0;
@@ -43,7 +43,7 @@ const Header = styled.div`
   padding: 0 24px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   background: ${({ theme }) => theme.colors.white};
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     border: 0;
     padding: 0;
     margin: -24px -16px 24px;
@@ -77,7 +77,7 @@ const TopTabBar = styled.div`
   & > div {
     bottom: -1px;
   }
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     padding: 24px 16px 0;
     border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   }
@@ -88,7 +88,7 @@ const TopBar = styled.div`
   justify-content: space-between;
   width: 100%;
   padding: 16px 0;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
 `

@@ -11,19 +11,20 @@
  */
 import * as React from 'react'
 import styled from '@client/styledComponents'
-import { COLUMNS, SORT_ORDER } from '@opencrvs/components/lib/interface'
+import { DeclarationIcon } from '@opencrvs/components/lib/icons/DeclarationIcon'
+import { STATUSTOCOLOR } from '@client/views/Home/RecordAudit'
 import { IDynamicValues } from '@opencrvs/components/lib/interface/GridTable/types'
+import { COLUMNS, SORT_ORDER } from '@opencrvs/components/lib/interface'
 import { orderBy } from 'lodash'
 
-const IconNameContainer = styled.div`
+const Flex = styled.div`
   display: flex;
   gap: 16px;
 `
 
-const NameContainer = styled.div`
+const Name = styled.div`
   color: ${({ theme }) => theme.colors.primary};
   ${({ theme }) => theme.fonts.bold16}
-  width: 100%;
   margin-right: 8px;
   white-space: nowrap;
   overflow: hidden;
@@ -34,15 +35,59 @@ const Error = styled.span`
   color: ${({ theme }) => theme.colors.negative};
 `
 
-export const getIconWithName = (status: React.ReactNode, name: string) => {
+const Event = styled.div`
+  color: ${({ theme }) => theme.colors.grey500};
+  ${({ theme }) => theme.fonts.reg16}
+`
+
+const NameEventContainer = styled.div`
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`
+
+const Icon = styled.div`
+  flex-shrink: 0;
+  width: 24px;
+`
+
+const getIcon = (status: string) => {
   return (
-    <IconNameContainer>
-      {status}
-      {name ? (
-        <NameContainer>{name}</NameContainer>
-      ) : (
-        <Error>No name provided</Error>
-      )}
-    </IconNameContainer>
+    <Icon>
+      <DeclarationIcon color={STATUSTOCOLOR[status]} />
+    </Icon>
   )
+}
+
+export const getIconWithName = (status: string, name: string) => {
+  return (
+    <Flex id="flex">
+      {getIcon(status)}
+      {name ? <Name id="name">{name}</Name> : <Error>No name provided</Error>}
+    </Flex>
+  )
+}
+
+export const getIconWithNameEvent = (
+  status: string,
+  name: string,
+  event?: string
+) => {
+  return (
+    <Flex id="flex">
+      {getIcon(status)}
+      <NameEventContainer id="nameEvent">
+        {name ? <Name>{name}</Name> : <Error>No name provided</Error>}
+        {event && <Event>{event}</Event>}
+      </NameEventContainer>
+    </Flex>
+  )
+}
+
+export const getSortedItems = (
+  items: IDynamicValues[],
+  sortedCol: COLUMNS,
+  sortOrder: SORT_ORDER
+): IDynamicValues[] => {
+  return orderBy(items, [sortedCol], [sortOrder])
 }

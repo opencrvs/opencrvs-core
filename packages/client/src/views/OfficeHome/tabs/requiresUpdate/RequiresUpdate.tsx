@@ -29,7 +29,6 @@ import {
   withOnlineStatus
 } from '@client/views/OfficeHome/LoadingIndicator'
 import { EVENT_STATUS, ErrorText } from '@client/views/OfficeHome/OfficeHome'
-import { DeclarationsOrangeAmber } from '@opencrvs/components/lib/icons'
 import { GridTable, Loader } from '@opencrvs/components/lib/interface'
 import {
   GQLBirthEventSearchSet,
@@ -52,23 +51,6 @@ import {
 } from '@opencrvs/components/lib/interface/Content'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
-
-const ZeroUpdatesContainer = styled.div`
-  padding-top: 200px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-`
-const ZeroUpdatesText = styled.span`
-  padding-top: 10px;
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.h2};
-`
-const AllUpdatesText = styled.span`
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.reg18};
-`
 
 interface IProps {
   userDetails: IUserDetails | null
@@ -210,6 +192,7 @@ const RequiresUpdateComponent = (props: IFullProps) => {
     <Content
       size={ContentSize.LARGE}
       title={intl.formatMessage(navigationMessages.requiresUpdate)}
+      hideBackground={true}
     >
       <Query
         query={SEARCH_DECLARATIONS_USER_WISE} // TODO can this be changed to use SEARCH_EVENTS

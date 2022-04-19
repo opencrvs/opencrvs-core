@@ -54,7 +54,11 @@ import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { Event } from '@client/forms'
 import { STATUSTOCOLOR } from '@client/views/Home/RecordAudit'
-import { getIconWithName } from '@client/views/OfficeHome/tabs/utils'
+import {
+  getIconWithName,
+  getIconWithNameEvent,
+  getSortedItems
+} from '@client/views/OfficeHome/tabs/utils'
 
 const DECLARATIONS_DAY_LIMIT = 7
 
@@ -102,45 +106,38 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
     const { waitingToSend, sending, failedToSend, pendingConnection } = messages
 
     let icon: () => React.ReactNode
-    let statusText: string
     let overwriteStatusIfOffline = true
     let iconId: string
     switch (status) {
       case SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTING]:
         iconId = `submitting${index}`
         icon = () => <Spinner id={iconId} key={iconId} size={24} />
-        statusText = formatMessage(sending)
         break
       case SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTED]:
       case SUBMISSION_STATUS[SUBMISSION_STATUS.DECLARED]:
         overwriteStatusIfOffline = false
         iconId = `submitted${index}`
         icon = () => <StatusSubmitted id={iconId} key={iconId} />
-        statusText = id || ''
         break
       case SUBMISSION_STATUS[SUBMISSION_STATUS.FAILED]:
         overwriteStatusIfOffline = false
         iconId = `failed${index}`
         icon = () => <StatusFailed id={iconId} key={iconId} />
-        statusText = formatMessage(failedToSend)
         break
       case SUBMISSION_STATUS[SUBMISSION_STATUS.READY_TO_SUBMIT]:
       default:
         iconId = `waiting${index}`
         icon = () => <StatusWaiting id={iconId} key={iconId} />
-        statusText = formatMessage(waitingToSend)
         break
     }
 
     if (!online && overwriteStatusIfOffline) {
       iconId = `offline${index}`
       icon = () => <StatusPendingOffline id={iconId} key={iconId} />
-      statusText = formatMessage(pendingConnection)
     }
 
     return {
-      icon,
-      statusText
+      icon
     }
   }
 
@@ -168,7 +165,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
     ) {
       return []
     }
-    return this.props.declarationsReadyToSend.map(
+    const items = this.props.declarationsReadyToSend.map(
       (draft: IDeclaration, index) => {
         const { intl } = this.props
         const { locale } = intl
@@ -179,7 +176,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
               dynamicConstantsMessages[draft.event.toLowerCase()]
             )) ||
           ''
-        const { statusText, icon } = this.submissionStatusMap(
+        const { icon } = this.submissionStatusMap(
           draft.submissionStatus || '',
           navigator.onLine,
           index,
@@ -200,18 +197,16 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           event: event || '',
           name: name.toLowerCase(),
           iconWithName: getIconWithName(
-            <DeclarationIcon
-              color={
-                STATUSTOCOLOR[
-                  (draft && draft.submissionStatus) || SUBMISSION_STATUS.DRAFT
-                ]
-              }
-            />,
+            (draft && draft.submissionStatus) || SUBMISSION_STATUS.DRAFT,
             name
           ),
-          dateOfEvent: date ? new Date(date as string) : 0,
-          sentForReview: savedDate ? savedDate : 0,
-          submissionStatus: statusText || '',
+          iconWithNameEvent: getIconWithNameEvent(
+            (draft && draft.submissionStatus) || SUBMISSION_STATUS.DRAFT,
+            name,
+            event
+          ),
+          dateOfEvent: date ? new Date(date as string) : '',
+          sentForReview: savedDate ? savedDate : '',
           statusIndicator: icon ? [icon()] : null,
           rowClickable: Boolean(draft.compositionId),
           rowClickHandler: [
@@ -233,6 +228,20 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
         }
       }
     )
+    const sortedItems = getSortedItems(
+      items,
+      this.state.sortedCol,
+      this.state.sortOrder
+    ).map((item) => {
+      return {
+        ...item,
+        dateOfEvent:
+          item.dateOfEvent && formattedDuration(item.dateOfEvent as Date),
+        sentForReview:
+          item.sentForReview && formattedDuration(item.sentForReview as Date)
+      }
+    })
+    return sortedItems
   }
 
   onPageChange = (pageNumber: number) => {
@@ -244,7 +253,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
     let sortOrder: SORT_ORDER = SORT_ORDER.ASCENDING
     switch (columnName) {
       case COLUMNS.ICON_WITH_NAME:
-        sortedCol = COLUMNS.ICON_WITH_NAME
+        sortedCol = COLUMNS.NAME
         break
       case COLUMNS.EVENT:
         sortedCol = COLUMNS.EVENT
@@ -327,20 +336,15 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
     } else {
       return [
         {
-          label: this.props.intl.formatMessage(messages.type),
-          width: 30,
-          key: 'event'
-        },
-        {
-          width: 65,
           label: this.props.intl.formatMessage(messages.name),
-          key: 'name'
+          width: 90,
+          key: COLUMNS.ICON_WITH_NAME_EVENT
         },
         {
           label: '',
-          width: 5,
+          width: 10,
           alignment: ColumnContentAlignment.CENTER,
-          key: 'statusIndicator'
+          key: COLUMNS.STATUS_INDICATOR
         }
       ]
     }
@@ -353,6 +357,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
       <Content
         size={ContentSize.LARGE}
         title={intl.formatMessage(navigationMessages.sentForReview)}
+        hideBackground={true}
       >
         <GridTable
           content={this.transformDeclarationsReadyToSend()}
@@ -364,10 +369,8 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           currentPage={this.state.sentForReviewPageNo}
           showPaginated={this.props.showPaginated}
           loadMoreText={intl.formatMessage(messages.loadMore)}
-          sortedCol={this.state.sortedCol}
-          sortOrder={this.state.sortOrder}
-          formattedDuration={formattedDuration}
         />
+        {/* <Pagination /> */}
         <LoadingIndicator loading={false} hasError={false} />
       </Content>
     )

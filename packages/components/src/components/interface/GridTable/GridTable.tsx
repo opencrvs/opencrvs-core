@@ -21,13 +21,10 @@ import { ITheme } from 'src/components/theme'
 import { SortIcon } from '../../icons/SortIcon'
 import { connect } from 'react-redux'
 import { orderBy } from 'lodash'
+import { GridTableRowMobile } from './GridTableRowMobile'
 
 const Wrapper = styled.div`
   width: 100%;
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin: 24px 16px 0 16px;
-  }
 `
 const TableHeader = styled.div`
   color: ${({ theme }) => theme.colors.grey600};
@@ -113,6 +110,7 @@ export enum ColumnContentAlignment {
 
 export enum COLUMNS {
   ICON_WITH_NAME = 'iconWithName',
+  ICON_WITH_NAME_EVENT = 'iconWithNameEvent',
   EVENT = 'event',
   DATE_OF_EVENT = 'dateOfEvent',
   SENT_FOR_REVIEW = 'sentForReview',
@@ -149,11 +147,6 @@ interface IGridTableProps {
 interface IGridTableState {
   width: number
   expanded: string[]
-}
-
-const defaultConfiguration = {
-  pageSize: 10,
-  currentPage: 1
 }
 
 export class GridTableComp extends React.Component<
@@ -236,43 +229,6 @@ export class GridTableComp extends React.Component<
     return this.state.expanded.findIndex((id) => id === itemId) >= 0
   }
 
-  sortedItems = (items: IDynamicValues[]): IDynamicValues[] => {
-    const { sortedCol, sortOrder } = this.props
-    if (sortedCol && sortOrder) {
-      const sortedItems: IDynamicValues[] = orderBy(
-        items,
-        sortedCol.toLowerCase().includes('name') ? ['name'] : [sortedCol],
-        [sortOrder]
-      )
-      const formattedSortedItems = sortedItems.map((item) => {
-        let newItem: IDynamicValues = {}
-        if (this.props.formattedDuration) {
-          if (item.dateOfEvent) {
-            newItem = {
-              ...newItem,
-              dateOfEvent: this.props.formattedDuration(
-                item.dateOfEvent as Date
-              )
-            }
-          }
-          if (item.sentForReview) {
-            newItem = {
-              ...newItem,
-              sentForReview: this.props.formattedDuration(
-                item.sentForReview as Date
-              )
-            }
-          }
-          return { ...item, ...newItem }
-        } else {
-          return item
-        }
-      })
-      return formattedSortedItems
-    }
-    return items
-  }
-
   onPageChange = (currentPage: number) => {
     if (this.props.onPageChange) {
       this.props.onPageChange(currentPage)
@@ -284,18 +240,9 @@ export class GridTableComp extends React.Component<
   }
 
   render() {
-    const {
-      columns,
-      content,
-      noResultText,
-      hideTableHeader,
-      pageSize = defaultConfiguration.pageSize,
-      currentPage = defaultConfiguration.currentPage,
-      showPaginated = false,
-      sortOrder
-    } = this.props
+    const { columns, content, noResultText, hideTableHeader, sortOrder } =
+      this.props
     const { width } = this.state
-    const totalItems = this.props.totalItems || 0
     const isMobileView = this.state.width < this.props.theme.grid.breakpoints.lg
     return (
       <Wrapper>
@@ -324,106 +271,23 @@ export class GridTableComp extends React.Component<
             ))}
           </TableHeader>
         )}
-        {!isMobileView && (
+        {!isMobileView ? (
           <GridTableRowDesktop
             columns={this.props.columns}
-            displayItems={this.sortedItems(content)}
+            displayItems={content}
             clickable={this.props.clickable}
-            expandable={this.props.expandable}
+            getRowClickHandler={this.getRowClickHandler}
+            renderActionBlock={this.renderActionBlock}
+          />
+        ) : (
+          <GridTableRowMobile
+            columns={this.props.columns}
+            displayItems={content}
+            clickable={this.props.clickable}
             getRowClickHandler={this.getRowClickHandler}
             renderActionBlock={this.renderActionBlock}
           />
         )}
-        {/* {isMobileView &&
-          this.getDisplayItems(currentPage, pageSize, content).map(
-            (item, index) => {
-              const expanded = this.showExpandedSection(item.id as string)
-              const clickable =
-                this.props.clickable || Boolean(item.rowClickable)
-              return (
-                <StyledBox key={index}>
-                  <RowWrapper
-                    id={'row_' + index}
-                    expandable={this.props.expandable}
-                    clickable={clickable}
-                    onClick={() =>
-                      (this.props.expandable &&
-                        this.toggleExpanded(item.id as string)) ||
-                      (clickable &&
-                        this.getRowClickHandler(
-                          item.rowClickHandler as IActionObject[]
-                        )())
-                    }
-                  >
-                    {columns.map((preference, indx) => {
-                      if (preference.isActionColumn) {
-                        return this.renderActionBlock(
-                          item.id as string,
-                          item[preference.key] as IAction[],
-                          preference.width,
-                          index,
-                          indx,
-                          preference.alignment
-                        )
-                      } else if (preference.isIconColumn) {
-                        return (
-                          <IconWrapper
-                            key={indx}
-                            width={preference.width}
-                            alignment={preference.alignment}
-                            color={preference.color}
-                          >
-                            {(item.icon as JSX.Element) || (
-                              <Error>{preference.errorValue}</Error>
-                            )}
-                          </IconWrapper>
-                        )
-                      } else {
-                        return (
-                          <ContentWrapper
-                            key={indx}
-                            width={preference.width}
-                            alignment={preference.alignment}
-                            color={preference.color}
-                          >
-                            {(item[preference.key] as string) || (
-                              <Error>{preference.errorValue}</Error>
-                            )}
-                          </ContentWrapper>
-                        )
-                      }
-                    })}
-                  </RowWrapper>
-
-                  {this.props.expandable && (
-                    <ExpandedSectionContainer expanded={expanded}>
-                      {expanded &&
-                        this.props.renderExpandedComponent &&
-                        this.props.renderExpandedComponent(item.id as string)}
-                    </ExpandedSectionContainer>
-                  )}
-                </StyledBox>
-              )
-            }
-          )} */}
-
-        {showPaginated && totalItems > pageSize && (
-          <Pagination
-            initialPage={currentPage}
-            totalPages={Math.ceil(totalItems / pageSize)}
-            onPageChange={this.onPageChange}
-          />
-        )}
-        {!showPaginated &&
-          !this.props.loading &&
-          totalItems > pageSize * currentPage && (
-            <LoadMore
-              initialPage={currentPage}
-              onLoadMore={this.onPageChange}
-              loadMoreText={this.props.loadMoreText}
-            />
-          )}
-
         {!this.props.loading && content.length <= 0 && (
           <ErrorText id="no-record">{noResultText}</ErrorText>
         )}

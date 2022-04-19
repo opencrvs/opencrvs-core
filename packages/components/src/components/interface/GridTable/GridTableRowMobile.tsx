@@ -13,77 +13,45 @@ import * as React from 'react'
 import { IDynamicValues, IAction, IColumn } from './types'
 import styled from 'styled-components'
 import { IActionObject, ColumnContentAlignment } from '..'
-
-export interface IGridTableRow {
-  displayItems: IDynamicValues[]
-  columns: IColumn[]
-  getRowClickHandler: (
-    itemRowClickHandler: IActionObject[]
-  ) => (e?: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined) => void
-  renderActionBlock: (
-    itemId: string,
-    actions: IAction[],
-    width: number,
-    key: number,
-    idKey: number,
-    alignment?: ColumnContentAlignment | undefined
-  ) => JSX.Element
-  clickable: boolean | undefined
-}
+import {
+  IGridTableRow,
+  IconWrapper,
+  Error,
+  ContentWrapper
+} from './GridTableRowDeskop'
 
 const StyledBox = styled.div`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.reg16};
   display: flex;
   align-items: center;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey100};
-  &:last-child {
-    border: 0px;
-  }
-  height: 72px;
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
+  box-sizing: border-box;
+  border-radius: 4px;
+  height: 80px;
+  max-width: 500px;
+  background-color: ${({ theme }) => theme.colors.white};
+  margin: auto;
+  margin-bottom: 8px;
 `
 
-export const RowWrapper = styled.div<{
+const RowWrapper = styled.div<{
   clickable?: boolean
 }>`
   width: 100%;
-  padding: 0 18px;
+  padding: 16px 18px 12px;
   display: flex;
   align-items: center;
   cursor: ${({ clickable }) => (clickable ? 'pointer' : 'default')};
 `
 
-export const ContentWrapper = styled.div<{
-  width: number
-  alignment?: string
-  color?: string
-  paddingRight?: number | null
-}>`
-  width: ${({ width }) => width}%;
-  display: inline-block;
-  position: relative;
-  text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
-  ${({ color }) => color && `color: ${color};`}
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`
-
-export const Error = styled.span`
-  color: ${({ theme }) => theme.colors.negative};
-`
-
-export const IconWrapper = styled(ContentWrapper)`
-  padding-top: 5px;
-`
-
-export const GridTableRowDesktop = (props: IGridTableRow) => {
+export const GridTableRowMobile = (props: IGridTableRow) => {
   return (
     <>
       {props.displayItems.map((item, index) => {
         const clickable = props.clickable || Boolean(item.rowClickable)
         return (
-          <StyledBox key={index}>
+          <StyledBox key={index} id="styledBox">
             <RowWrapper
               id={'row_' + index}
               clickable={clickable}
