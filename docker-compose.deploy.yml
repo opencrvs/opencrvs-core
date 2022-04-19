@@ -103,9 +103,6 @@ services:
     configs:
       - source: kibana.{{ts}}
         target: /usr/share/kibana/config/kibana.yml
-    environment:
-      - ELASTICSEARCH_USERNAME=elastic
-      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_SUPERUSER_PASSWORD}
     depends_on:
       - elasticsearch
 

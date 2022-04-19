@@ -114,7 +114,7 @@
       when: external_backup_server_ip is defined
 
     - name: Copy MongoDB replication security key file to nodes
-      copy: src=/tmp/mongodb-keyfile dest=/etc/mongodb-keyfile mode=0400 force=no
+      copy: src=/tmp/mongodb-keyfile dest=/mongodb-keyfile mode=0400 force=no
 
     - name: Change access right of key file
       file:
