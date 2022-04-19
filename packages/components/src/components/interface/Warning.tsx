@@ -25,11 +25,15 @@ const Conatiner = styled.div`
   border-radius: 4px;
   border: 1px solid ${colors.red};
   color: ${colors.red};
+  ${({ theme }) => theme.fonts.bold16}
 `
 
-export function Warning({ label }: { label: string }) {
+export function Warning({
+  label,
+  ...props
+}: { label: string } & React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <Conatiner>
+    <Conatiner {...props}>
       <Alert color="invert" />
       {label}
     </Conatiner>

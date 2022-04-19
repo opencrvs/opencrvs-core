@@ -28,6 +28,7 @@ interface IFormConfigMessages
   title: MessageDescriptor
   previewDescription: MessageDescriptor
   publishedDescription: MessageDescriptor
+  publishedWarning: MessageDescriptor
   created: MessageDescriptor
   contentKey: MessageDescriptor
   certificateHandlebars: MessageDescriptor
@@ -164,6 +165,12 @@ const messagesToDefine: IFormConfigMessages = {
     id: 'config.formConfig.published.description',
     defaultMessage:
       'Your pulished declaration forms will appear here. Once your configuration is published you will no longer be able to make changes.',
+    description: 'Description for published tab'
+  },
+  publishedWarning: {
+    id: 'config.formConfig.published.warning',
+    defaultMessage:
+      'Nothing is currently published. Awaiting to be published: {events}',
     description: 'Description for published tab'
   },
   created: {

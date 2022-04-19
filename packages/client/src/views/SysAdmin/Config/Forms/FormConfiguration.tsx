@@ -21,10 +21,51 @@ import {
 } from '@client/i18n/messages/views/formConfig'
 import { DraftStatus } from '@client/forms/configuration/formDrafts/reducer'
 import { DraftsTab } from './DraftsTab'
-import { selectFormDraftLoaded } from '@client/forms/configuration/formDrafts/selectors'
+import {
+  selectFormDraftLoaded,
+  selectFormDraft
+} from '@client/forms/configuration/formDrafts/selectors'
 import { useLoadFormDraft } from './hooks'
 import { PreviewTab } from './PreviewTab'
 import { PublishedTab } from './PublishedTab'
+import styled from '@client/styledComponents'
+import { Warning } from '@opencrvs/components/lib/interface'
+import { Event } from '@client/forms'
+import { constantsMessages } from '@client/i18n/messages'
+
+const StyledWarning = styled(Warning)`
+  margin: 0 auto 16px;
+  max-width: 778px;
+`
+
+function UnbuplishedWarning() {
+  const intl = useIntl()
+  const { status: birthStatus } = useSelector((store: IStoreState) =>
+    selectFormDraft(store, Event.BIRTH)
+  )
+  const { status: deathStatus } = useSelector((store: IStoreState) =>
+    selectFormDraft(store, Event.DEATH)
+  )
+  const events: string[] = []
+  if (birthStatus !== DraftStatus.PUBLISHED) {
+    events.push(intl.formatMessage(constantsMessages[Event.BIRTH]))
+  }
+  if (deathStatus !== DraftStatus.PUBLISHED) {
+    events.push(intl.formatMessage(constantsMessages[Event.DEATH]))
+  }
+
+  return (
+    <>
+      {events.length > 0 && (
+        <StyledWarning
+          label={intl.formatMessage(messages.publishedWarning, {
+            events: events.join(', ')
+          })}
+        />
+      )}
+    </>
+  )
+}
 
 export function FormConfiguration() {
   useLoadFormDraft()
@@ -35,8 +76,10 @@ export function FormConfiguration() {
   const [selectedTab, setSelectedTab] = React.useState<string>(
     DraftStatus.DRAFT
   )
+
   return (
     <SysAdminContentWrapper isCertificatesConfigPage>
+      {formDraftLoaded && <UnbuplishedWarning />}
       <Content
         title={intl.formatMessage(messages.title)}
         subtitle={
