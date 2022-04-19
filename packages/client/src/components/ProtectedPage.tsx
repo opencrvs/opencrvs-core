@@ -34,6 +34,7 @@ import styled from 'styled-components'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { ForgotPIN } from '@client/views/Unlock/ForgotPIN'
 import { showPINUpdateSuccessToast } from '@client/notification/actions'
+import { StyledText } from './Page'
 export const SCREEN_LOCK = 'screenLock'
 
 type OwnProps = PropsWithChildren<{
@@ -69,19 +70,6 @@ const StyledSpinner = styled(Spinner)`
   width: 40px;
   height: 40px;
 `
-const StyledText = styled.span`
-  position: absolute;
-  top: 44%;
-  left: 42%;
-  width: 251px;
-  height: 32px;
-  ${({ theme }) => theme.fonts.h3};
-  color: ${({ theme }) => theme.colors.grey600};
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    left: 24%;
-  }
-`
-
 class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
   constructor(props: Props) {
     super(props)
