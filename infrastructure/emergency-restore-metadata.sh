@@ -20,6 +20,10 @@ print_usage_and_exit () {
     echo "The Hearth, OpenHIM User and Application-config db backup zips you would like to restore from: hearth-dev-{date}.gz, openhim-dev-{date}.gz, user-mgnt-{date}.gz and  application-config-{date}.gz must exist in /data/backups/mongo/{date} folder"
     echo "The Elasticsearch backup folder /data/backups/elasticsearch must exist with all previous snapshots and indices. All files are required"
     echo "The InfluxDB backup files must exist in the /data/backups/influxdb/{date} folder"
+    echo "The InfluxDB backup files must exist in the /data/backups/influxdb/{date} folder"
+    echo ""
+    echo "If your MongoDB is password protected, an admin user's credentials can be given as environment variables:"
+    echo "MONGODB_ADMIN_USER=your_user MONGODB_ADMIN_PASSWORD=your_pass"
     exit 1
 }
 
@@ -75,12 +79,20 @@ else
   exit 1
 fi
 
+mongo_credentials() {
+  if [ ! -z ${MONGODB_ADMIN_USER+x} ] || [ ! -z ${MONGODB_ADMIN_PASSWORD+x} ]; then
+    echo "--username $MONGODB_ADMIN_USER --password $MONGODB_ADMIN_PASSWORD --authenticationDatabase admin";
+  else
+    echo "";
+  fi
+}
+
 # Delete all data from Hearth, OpenHIM, User and Application-config and any other service related Mongo databases
 #-----------------------------------------------------------------------------------
-docker run --rm --network=$NETWORK mongo:4.4 mongo hearth-dev --host $HOST --eval "db.dropDatabase()"
-docker run --rm --network=$NETWORK mongo:4.4 mongo openhim-dev --host $HOST --eval "db.dropDatabase()"
-docker run --rm --network=$NETWORK mongo:4.4 mongo user-mgnt --host $HOST --eval "db.dropDatabase()"
-docker run --rm --network=$NETWORK mongo:4.4 mongo application-config --host $HOST --eval "db.dropDatabase()"
+docker run --rm --network=$NETWORK mongo:4.4 mongo hearth-dev $(mongo_credentials) --host $HOST --eval "db.dropDatabase()"
+docker run --rm --network=$NETWORK mongo:4.4 mongo openhim-dev $(mongo_credentials) --host $HOST --eval "db.dropDatabase()"
+docker run --rm --network=$NETWORK mongo:4.4 mongo user-mgnt $(mongo_credentials) --host $HOST --eval "db.dropDatabase()"
+docker run --rm --network=$NETWORK mongo:4.4 mongo application-config $(mongo_credentials) --host $HOST --eval "db.dropDatabase()"
 
 # Delete all data from search
 #----------------------------

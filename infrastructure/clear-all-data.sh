@@ -1,3 +1,4 @@
+
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -12,6 +13,9 @@ set -e
 
 print_usage_and_exit () {
     echo 'Usage: ./clear-all-data.sh REPLICAS ENV'
+    echo ""
+    echo "If your MongoDB is password protected, an admin user's credentials can be given as environment variables:"
+    echo "MONGODB_ADMIN_USER=your_user MONGODB_ADMIN_PASSWORD=your_pass"
     exit 1
 }
 
@@ -49,15 +53,32 @@ else
   exit 1
 fi
 
+mongo_credentials() {
+  if [ ! -z ${MONGODB_ADMIN_USER+x} ] || [ ! -z ${MONGODB_ADMIN_PASSWORD+x} ]; then
+    echo "--username $MONGODB_ADMIN_USER --password $MONGODB_ADMIN_PASSWORD --authenticationDatabase admin";
+  else
+    echo "";
+  fi
+}
+
+drop_database () {
+  local database=${1}
+  docker run --rm --network=$NETWORK mongo:4.4 mongo $database $(mongo_credentials) --host $HOST --eval "db.dropDatabase()"
+}
+
 # Delete all data from mongo
 #---------------------------
-if [[ "$ENV" != "qa" ]] ; then docker run --rm --network=$NETWORK mongo:4.4 mongo hearth-dev --host $HOST --eval "db.dropDatabase()" ; fi
+if [[ "$ENV" != "qa" ]] ; then
+  drop_database hearth-dev;
+fi
 
-docker run --rm --network=$NETWORK mongo:4.4 mongo openhim-dev --host $HOST --eval "db.dropDatabase()"
+drop_database openhim-dev
 
-if [[ "$ENV" != "qa" ]] ; then docker run --rm --network=$NETWORK mongo:4.4 mongo user-mgnt --host $HOST --eval "db.dropDatabase()" ; fi
+if [[ "$ENV" != "qa" ]] ; then
+  drop_database user-mgnt;
+fi
 
-docker run --rm --network=$NETWORK mongo:4.4 mongo application-config --host $HOST --eval "db.dropDatabase()"
+drop_database application-config
 
 # Delete all data from elasticsearch
 #-----------------------------------
