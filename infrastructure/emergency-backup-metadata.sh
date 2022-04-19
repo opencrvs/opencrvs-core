@@ -13,11 +13,18 @@
 # This cron job is already configured in the Ansible playbook.yml in the infrastructure > server-setup directory.
 # Change SSH connection settings and IPs to suit your deployment, and re-run the Ansible script to update.
 #------------------------------------------------------------------------------------------------------------------
+set -e
 
 print_usage_and_exit () {
     echo 'Usage: ./emergency-backup-metadata.sh SSH_USER SSH_HOST SSH_PORT PRODUCTION_IP REMOTE_DIR REPLICAS'
     echo "Script must receive SSH details and a target directory of a remote server to copy backup files to."
     echo "7 days of backup data will be retained in the manager node"
+    echo ""
+    echo "If your MongoDB is password protected, an admin user's credentials can be given as environment variables:"
+    echo "MONGODB_ADMIN_USER=your_user MONGODB_ADMIN_PASSWORD=your_pass"
+    echo ""
+    echo "If your Elasticsearch is password protected, an admin user's credentials can be given as environment variables:"
+    echo "ELASTICSEARCH_ADMIN_USER=your_user ELASTICSEARCH_ADMIN_PASSWORD=your_pass"
     exit 1
 }
 
@@ -53,7 +60,7 @@ SSH_HOST=$2
 SSH_PORT=$3
 PRODUCTION_IP=$4
 REMOTE_DIR=$5
-REPLICAS=$5
+REPLICAS=$6
 
 # Select docker network and replica set in production
 #----------------------------------------------------
@@ -78,6 +85,22 @@ else
   exit 1
 fi
 
+mongo_credentials() {
+  if [ ! -z ${MONGODB_ADMIN_USER+x} ] || [ ! -z ${MONGODB_ADMIN_PASSWORD+x} ]; then
+    echo "--username $MONGODB_ADMIN_USER --password $MONGODB_ADMIN_PASSWORD --authenticationDatabase admin";
+  else
+    echo "";
+  fi
+}
+
+elasticsearch_host() {
+  if [ ! -z ${ELASTICSEARCH_ADMIN_USER+x} ] || [ ! -z ${ELASTICSEARCH_ADMIN_PASSWORD+x} ]; then
+    echo "$ELASTICSEARCH_ADMIN_USER:$ELASTICSEARCH_ADMIN_PASSWORD@elasticsearch:9200";
+  else
+    echo "elasticsearch:9200";
+  fi
+}
+
 # Today's date is used for filenames
 #-----------------------------------
 BACKUP_DATE=$(date +%Y-%m-%d)
@@ -85,21 +108,21 @@ BACKUP_DATE=$(date +%Y-%m-%d)
 # Backup Hearth, OpenHIM, User, Application-config and any other service related Mongo databases into a mongo sub folder
 #---------------------------------------------------------------------------------------------
 docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:4.4 bash \
- -c "mongodump --host $HOST -d hearth-dev --gzip --archive=/data/backups/mongo/hearth-dev-$BACKUP_DATE.gz"
+ -c "mongodump $(mongo_credentials) --host $HOST -d hearth-dev --gzip --archive=/data/backups/mongo/hearth-dev-$BACKUP_DATE.gz"
 docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:4.4 bash \
- -c "mongodump --host $HOST -d openhim-dev --gzip --archive=/data/backups/mongo/openhim-dev-$BACKUP_DATE.gz"
+ -c "mongodump $(mongo_credentials) --host $HOST -d openhim-dev --gzip --archive=/data/backups/mongo/openhim-dev-$BACKUP_DATE.gz"
 docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:4.4 bash \
- -c "mongodump --host $HOST -d user-mgnt --gzip --archive=/data/backups/mongo/user-mgnt-$BACKUP_DATE.gz"
+ -c "mongodump $(mongo_credentials) --host $HOST -d user-mgnt --gzip --archive=/data/backups/mongo/user-mgnt-$BACKUP_DATE.gz"
 docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:4.4 bash \
- -c "mongodump --host $HOST -d application-config --gzip --archive=/data/backups/mongo/application-config-$BACKUP_DATE.gz"
+ -c "mongodump $(mongo_credentials) --host $HOST -d application-config --gzip --archive=/data/backups/mongo/application-config-$BACKUP_DATE.gz"
 
 # Register backup folder as an Elasticsearch repository for backing up the search data
 #-------------------------------------------------------------------------------------
-docker run --rm --network=$NETWORK appropriate/curl curl -XPUT -H "Content-Type: application/json;charset=UTF-8" 'http://elasticsearch:9200/_snapshot/ocrvs' -d '{ "type": "fs", "settings": { "location": "/data/backups/elasticsearch", "compress": true }}'
+docker run --rm --network=$NETWORK appropriate/curl curl -XPUT -H "Content-Type: application/json;charset=UTF-8" "http://$(elasticsearch_host)/_snapshot/ocrvs" -d '{ "type": "fs", "settings": { "location": "/data/backups/elasticsearch", "compress": true }}'
 
 # Backup Elasticsearch as a set of snapshot files into an elasticsearch sub folder
 #---------------------------------------------------------------------------------
-docker run --rm --network=$NETWORK appropriate/curl curl -X PUT "http://elasticsearch:9200/_snapshot/ocrvs/snapshot_$BACKUP_DATE?wait_for_completion=true&pretty"
+docker run --rm --network=$NETWORK appropriate/curl curl -X PUT "http://$(elasticsearch_host)/_snapshot/ocrvs/snapshot_$BACKUP_DATE?wait_for_completion=true&pretty"
 
 # Get the container ID and host details of any running InfluxDB container, as the only way to backup is by using the Influxd CLI inside a running opencrvs_metrics container
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
