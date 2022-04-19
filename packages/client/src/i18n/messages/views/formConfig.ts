@@ -200,7 +200,26 @@ const messagesToDefine: IFormConfigMessages = {
   }
 }
 
-const draftStatusMessagesToDefine: Record<DraftStatus, MessageDescriptor> = {
+const draftStatusMessagesToDefine: Record<
+  Exclude<DraftStatus, 'DRAFT' | 'DELETED'>,
+  MessageDescriptor
+> = {
+  PREVIEW: {
+    id: 'config.formConfig.preview',
+    defaultMessage: 'In Preview',
+    description: 'Label for in preview tab of form config page'
+  },
+  PUBLISHED: {
+    id: 'config.formConfig.published',
+    defaultMessage: 'Published',
+    description: 'Label for published tab of form config page'
+  }
+}
+
+const draftTabsMessagesToDefine: Record<
+  Exclude<DraftStatus, 'DELETED'>,
+  MessageDescriptor
+> = {
   DRAFT: {
     id: 'config.formConfig.draftsTab',
     defaultMessage: 'Drafts',
@@ -221,3 +240,4 @@ const draftStatusMessagesToDefine: Record<DraftStatus, MessageDescriptor> = {
 export const messages: IFormConfigMessages = defineMessages(messagesToDefine)
 export const navigationMessages = defineMessages(navigationMessagesToDefine)
 export const draftStatusMessages = defineMessages(draftStatusMessagesToDefine)
+export const draftTabsMessages = defineMessages(draftTabsMessagesToDefine)

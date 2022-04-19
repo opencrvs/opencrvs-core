@@ -23,12 +23,13 @@ export const Value = styled.span`
   color: ${({ theme }) => theme.colors.grey500};
 `
 
-export type IEventVersion = {
+export function DraftVersion({
+  event,
+  version
+}: {
   event: Event
   version: number
-}
-
-export function DraftVersion({ event, version }: IEventVersion) {
+}) {
   const intl = useIntl()
   return (
     <Label>{`${intl.formatMessage(

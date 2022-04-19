@@ -25,10 +25,14 @@ import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { ToggleMenu, Pill } from '@opencrvs/components/lib/interface'
 import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { goToFormConfigWizard } from '@client/navigation'
-import { DraftStatus } from '@client/forms/configuration/formDrafts/reducer'
-import { Value, IEventVersion, DraftVersion } from './components'
+import {
+  DraftStatus,
+  IDraft
+} from '@client/forms/configuration/formDrafts/reducer'
+import { Value, DraftVersion } from './components'
+import { isDefaultDraft } from './utils'
 
-function ActionButton({ event, version }: IEventVersion) {
+function ActionButton({ event, status, version }: IDraft) {
   const intl = useIntl()
   const dispatch = useDispatch()
   return (
@@ -45,7 +49,9 @@ function ActionButton({ event, version }: IEventVersion) {
       }
     >
       {intl.formatMessage(
-        version > 0 ? buttonMessages.edit : buttonMessages.configure
+        isDefaultDraft({ version }) || status === DraftStatus.DELETED
+          ? buttonMessages.configure
+          : buttonMessages.edit
       )}
     </LinkButton>
   )
@@ -73,14 +79,16 @@ function OptionsMenu() {
 
 function EventDrafts({ event }: { event: Event }) {
   const intl = useIntl()
-  const { comment, history, status, version } = useSelector(
-    (store: IStoreState) => selectFormDraft(store, event)
+  const formDraft = useSelector((store: IStoreState) =>
+    selectFormDraft(store, event)
   )
-
+  const { comment, history, status, version } = formDraft
   const actions = (
     <>
-      <ActionButton event={event} version={version} />
-      {version > 0 && <OptionsMenu key="toggleButton" />}
+      <ActionButton {...formDraft} />
+      {!isDefaultDraft(formDraft) && status !== DraftStatus.DELETED && (
+        <OptionsMenu key="toggleButton" />
+      )}
     </>
   )
 
@@ -91,7 +99,7 @@ function EventDrafts({ event }: { event: Event }) {
         label={<DraftVersion event={event} version={version} />}
         value={<Value>{comment}</Value>}
         actions={
-          status === DraftStatus.DRAFT ? (
+          status === DraftStatus.DRAFT || status === DraftStatus.DELETED ? (
             actions
           ) : status === DraftStatus.PREVIEW ? (
             <Pill
@@ -106,13 +114,15 @@ function EventDrafts({ event }: { event: Event }) {
           )
         }
       />
-      {history?.map(({ comment, version }) => (
-        <ListViewItemSimplified
-          key={version}
-          label={<DraftVersion event={event} version={version} />}
-          value={<Value>{comment}</Value>}
-        />
-      ))}
+      {history
+        ?.filter((draftHistory) => !isDefaultDraft(draftHistory))
+        .map(({ comment, version }) => (
+          <ListViewItemSimplified
+            key={version}
+            label={<DraftVersion event={event} version={version} />}
+            value={<Value>{comment}</Value>}
+          />
+        ))}
     </>
   )
 }

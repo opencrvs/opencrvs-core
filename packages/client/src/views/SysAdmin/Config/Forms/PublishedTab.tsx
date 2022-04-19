@@ -24,15 +24,16 @@ import { DraftStatus } from '@client/forms/configuration/formDrafts/reducer'
 import { Value, DraftVersion } from './components'
 import formatDate from '@client/utils/date-formatting'
 import { Pill } from '@opencrvs/components/lib/interface'
+import { isDefaultDraft } from './utils'
 
 function EventDrafts({ event }: { event: Event }) {
   const intl = useIntl()
   const formDraft = useSelector((store: IStoreState) =>
     selectFormDraft(store, event)
   )
-  const { updatedAt, status, version } = formDraft
+  const { updatedAt, comment, status, version } = formDraft
 
-  if (status === DraftStatus.DRAFT || status === DraftStatus.PREVIEW) {
+  if (status !== DraftStatus.PUBLISHED) {
     return <></>
   }
 
@@ -42,9 +43,13 @@ function EventDrafts({ event }: { event: Event }) {
         key={version}
         label={<DraftVersion event={event} version={version} />}
         value={
-          <Value>{`${intl.formatMessage(
-            draftStatusMessages.PUBLISHED
-          )} ${formatDate(updatedAt, 'MMMM yyyy')}`}</Value>
+          <Value>
+            {isDefaultDraft(formDraft)
+              ? comment
+              : `${intl.formatMessage(
+                  draftStatusMessages.PUBLISHED
+                )} ${formatDate(updatedAt, 'MMMM yyyy')}`}
+          </Value>
         }
         actions={
           <Pill

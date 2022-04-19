@@ -19,7 +19,8 @@ import { Event } from '@client/forms'
 export enum DraftStatus {
   DRAFT = 'DRAFT',
   PREVIEW = 'PREVIEW',
-  PUBLISHED = 'PUBLISHED'
+  PUBLISHED = 'PUBLISHED',
+  DELETED = 'DELETED'
 }
 
 export interface IHistory {

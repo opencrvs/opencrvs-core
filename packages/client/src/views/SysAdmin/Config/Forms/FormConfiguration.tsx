@@ -17,7 +17,7 @@ import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWr
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import {
   messages,
-  draftStatusMessages
+  draftTabsMessages
 } from '@client/i18n/messages/views/formConfig'
 import { DraftStatus } from '@client/forms/configuration/formDrafts/reducer'
 import { DraftsTab } from './DraftsTab'
@@ -93,15 +93,15 @@ export function FormConfiguration() {
           sections: [
             {
               id: DraftStatus.DRAFT,
-              title: intl.formatMessage(draftStatusMessages.DRAFT)
+              title: intl.formatMessage(draftTabsMessages.DRAFT)
             },
             {
               id: DraftStatus.PREVIEW,
-              title: intl.formatMessage(draftStatusMessages.PREVIEW)
+              title: intl.formatMessage(draftTabsMessages.PREVIEW)
             },
             {
               id: DraftStatus.PUBLISHED,
-              title: intl.formatMessage(draftStatusMessages.PUBLISHED)
+              title: intl.formatMessage(draftTabsMessages.PUBLISHED)
             }
           ],
           activeTabId: selectedTab,
