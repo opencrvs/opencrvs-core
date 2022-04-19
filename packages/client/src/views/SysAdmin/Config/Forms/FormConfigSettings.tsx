@@ -169,7 +169,7 @@ class FormConfigSettingsComponent extends React.Component<
       this.state
 
     return (
-      <SysAdminContentWrapper isCertificatesConfigPage={true}>
+      <SysAdminContentWrapper>
         <Content
           title={intl.formatMessage(messages.settingsTitle)}
           titleColor={'copy'}
@@ -182,6 +182,7 @@ class FormConfigSettingsComponent extends React.Component<
                   ? intl.formatMessage(messages.enable)
                   : intl.formatMessage(messages.disable),
                 action: {
+                  id: 'introductionPageSettings',
                   label: intl.formatMessage(buttonMessages.change),
                   handler: () => {
                     this.setState({
@@ -193,8 +194,9 @@ class FormConfigSettingsComponent extends React.Component<
               },
               {
                 label: intl.formatMessage(messages.addressesSettings),
-                value: numberOfAddresses,
+                value: <div id="numberOfAddresses">{numberOfAddresses}</div>,
                 action: {
+                  id: 'addressesSettings',
                   label: intl.formatMessage(buttonMessages.change),
                   handler: () => {
                     this.setState({
@@ -208,7 +210,7 @@ class FormConfigSettingsComponent extends React.Component<
           />
         </Content>
         <ResponsiveModal
-          id="formConfigSettingsDialog"
+          id={`${modalName}Modal`}
           show={showModal}
           title={
             modalName === ConfigModals.INTRODUCTION_PAGE
@@ -255,6 +257,7 @@ class FormConfigSettingsComponent extends React.Component<
                 actions={[
                   <CenteredToggle
                     key="toggle"
+                    id="introductionPage"
                     selected={introductionPage}
                     onChange={this.toggleOnChange}
                   />
@@ -262,7 +265,7 @@ class FormConfigSettingsComponent extends React.Component<
               />
             </ListViewSimplified>
           ) : (
-            <RadioGroupWrapper>
+            <RadioGroupWrapper id="numberOfAddress">
               <RadioGroup
                 onChange={(val: string) => this.setNumberOfAddresses(val)}
                 options={[
