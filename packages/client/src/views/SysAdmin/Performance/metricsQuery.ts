@@ -11,7 +11,7 @@
  */
 import gql from 'graphql-tag'
 
-export const PERFORMANCE_METRICS = gql`
+export const REGISTRATION_RATES_METRICS = gql`
   query data(
     $timeStart: String!
     $timeEnd: String!
@@ -85,7 +85,7 @@ export const PERFORMANCE_METRICS = gql`
     }
   }
 `
-export const OPERATIONAL_REPORTS_METRICS_FOR_OFFICE = gql`
+export const PERFORMANCE_METRICS_FOR_OFFICE = gql`
   query data($timeStart: String!, $timeEnd: String!, $locationId: String!) {
     getDeclarationsStartedMetrics(
       timeStart: $timeStart
@@ -98,7 +98,7 @@ export const OPERATIONAL_REPORTS_METRICS_FOR_OFFICE = gql`
     }
   }
 `
-export const OPERATIONAL_REPORTS_METRICS = gql`
+export const PERFORMANCE_METRICS = gql`
   query data($timeStart: String!, $timeEnd: String!, $locationId: String!) {
     getEventEstimationMetrics(
       timeStart: $timeStart

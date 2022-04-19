@@ -406,3 +406,9 @@ export async function getRegistrationTargetDays(event: string) {
       : applicationConfig.DEATH?.REGISTRATION_TARGET
   return targetDays
 }
+
+export function getPercentage(value: number, total: number, decimalPoint = 2) {
+  return value === 0 || total === 0
+    ? 0
+    : Number(((value / total) * 100).toFixed(decimalPoint))
+}

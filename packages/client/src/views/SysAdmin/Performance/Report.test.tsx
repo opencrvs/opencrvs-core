@@ -14,7 +14,7 @@ import { createTestComponent } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { createStore } from '@client/store'
 import { Report } from './Report'
-import { PERFORMANCE_METRICS } from '@client/views/SysAdmin/Performance/metricsQuery'
+import { REGISTRATION_RATES_METRICS } from '@client/views/SysAdmin/Performance/metricsQuery'
 import { Event } from '@client/forms'
 
 describe('Report page', () => {
@@ -26,7 +26,7 @@ describe('Report page', () => {
   const graphqlMock = [
     {
       request: {
-        query: PERFORMANCE_METRICS,
+        query: REGISTRATION_RATES_METRICS,
         variables: {
           timeStart: timeStart.toISOString(),
           timeEnd: timeEnd.toISOString(),
@@ -109,7 +109,7 @@ describe('Report page', () => {
     },
     {
       request: {
-        query: PERFORMANCE_METRICS,
+        query: REGISTRATION_RATES_METRICS,
         variables: {
           timeStart: timeStart.toISOString(),
           timeEnd: timeEnd.toISOString(),

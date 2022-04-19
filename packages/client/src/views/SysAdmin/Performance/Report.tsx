@@ -13,7 +13,7 @@ import { Query } from '@client/components/Query'
 import { Event } from '@client/forms'
 import { goBack } from '@client/navigation'
 import styled from '@client/styledComponents'
-import { PERFORMANCE_METRICS } from '@client/views/SysAdmin/Performance/metricsQuery'
+import { REGISTRATION_RATES_METRICS } from '@client/views/SysAdmin/Performance/metricsQuery'
 import {
   CertificationPaymentReports,
   EstimatedTargetDayRegistrationReports,
@@ -78,7 +78,7 @@ function ReportComponent(props: Props) {
       headerTitle={title}
     >
       <Query
-        query={PERFORMANCE_METRICS}
+        query={REGISTRATION_RATES_METRICS}
         variables={{
           event: eventType,
           timeStart: start.toISOString(),

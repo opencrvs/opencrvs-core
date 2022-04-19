@@ -25,7 +25,8 @@ import {
   Location,
   EVENT_TYPE,
   fillEmptyDataArrayByKey,
-  getRegistrationTargetDays
+  getRegistrationTargetDays,
+  getPercentage
 } from '@metrics/features/metrics/utils'
 import { IAuthHeader } from '@metrics/features/registration'
 import { query } from '@metrics/influxdb/client'
@@ -35,6 +36,12 @@ interface IGroupedByGender {
   gender: string
 }
 
+interface ITimeframeGroupedByGender {
+  totalInTargetDays: number
+  totalWithin1Year: number
+  totalWithin5Years: number
+  gender: string
+}
 export interface IBirthKeyFigures {
   label: string
   value: number
@@ -824,6 +831,138 @@ export async function fetchLocationWiseEventEstimations(
   }
 }
 
+export async function fetchLocationWiseEventEstimationsForAllTimeframes(
+  timeFrom: string,
+  timeTo: string,
+  locationId: string,
+  event: EVENT_TYPE,
+  authHeader: IAuthHeader
+) {
+  const measurement = event === EVENT_TYPE.BIRTH ? 'birth_reg' : 'death_reg'
+  const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
+  const EXPECTED_EVENT_REGISTRATION_IN_DAYS = await getRegistrationTargetDays(
+    event
+  )
+  const registrationsInTargetDaysPoints: ITimeframeGroupedByGender[] =
+    await query(
+      `SELECT totalInTargetDays, totalWithin1Year, totalWithin5Years FROM (SELECT COUNT(${column}) AS totalInTargetDays
+        FROM ${measurement}
+      WHERE time > '${timeFrom}'
+        AND time <= '${timeTo}'
+        AND ( locationLevel2 = '${locationId}'
+            OR locationLevel3 = '${locationId}'
+            OR locationLevel4 = '${locationId}'
+            OR locationLevel5 = '${locationId}' )
+        AND ${column} <= ${EXPECTED_EVENT_REGISTRATION_IN_DAYS}
+      GROUP BY gender), (SELECT COUNT(${column}) AS totalWithin1Year
+      FROM ${measurement}
+      WHERE time > '${timeFrom}'
+        AND time <= '${timeTo}'
+        AND ( locationLevel2 = '${locationId}'
+            OR locationLevel3 = '${locationId}'
+            OR locationLevel4 = '${locationId}'
+            OR locationLevel5 = '${locationId}' )
+        AND ${column} > ${EXPECTED_EVENT_REGISTRATION_IN_DAYS}
+        AND ${column} <= 365
+      GROUP BY gender), (SELECT COUNT(${column}) AS totalWithin5Years
+      FROM ${measurement}
+      WHERE time > '${timeFrom}'
+        AND time <= '${timeTo}'
+        AND ( locationLevel2 = '${locationId}'
+            OR locationLevel3 = '${locationId}'
+            OR locationLevel4 = '${locationId}'
+            OR locationLevel5 = '${locationId}' )
+        AND ${column} > 365
+        AND ${column} <= 1825
+      GROUP BY gender)`
+    )
+
+  let totalRegistrationInTargetDay: number = 0
+  let totalMaleRegistrationInTargetDay: number = 0
+  let totalFemaleRegistrationInTargetDay: number = 0
+
+  let totalRegistrationWithin1Year: number = 0
+  let totalMaleRegistrationWithin1Year: number = 0
+  let totalFemaleRegistrationWithin1Year: number = 0
+
+  let totalRegistrationWithin5Years: number = 0
+  let totalMaleRegistrationWithin5Years: number = 0
+  let totalFemaleRegistrationWithin5Years: number = 0
+
+  registrationsInTargetDaysPoints.forEach((point) => {
+    totalRegistrationInTargetDay += point.totalInTargetDays
+    totalRegistrationWithin1Year += point.totalWithin1Year
+    totalRegistrationWithin5Years += point.totalWithin5Years
+    if (point.gender === 'male') {
+      totalMaleRegistrationInTargetDay += point.totalInTargetDays
+      totalMaleRegistrationWithin1Year += point.totalWithin1Year
+      totalMaleRegistrationWithin5Years += point.totalWithin5Years
+    } else if (point.gender === 'female') {
+      totalFemaleRegistrationInTargetDay += point.totalInTargetDays
+      totalFemaleRegistrationWithin1Year += point.totalWithin1Year
+      totalFemaleRegistrationWithin5Years += point.totalWithin5Years
+    }
+  })
+  const estimationOfTargetDay: IEstimation =
+    await fetchEstimateForTargetDaysByLocationId(
+      locationId,
+      event,
+      authHeader,
+      timeFrom,
+      timeTo
+    )
+
+  return {
+    withinTargetDays: {
+      actualRegistration: totalRegistrationInTargetDay,
+      estimatedRegistration: estimationOfTargetDay.totalEstimation,
+      estimatedPercentage: getPercentage(
+        totalRegistrationInTargetDay,
+        estimationOfTargetDay.totalEstimation
+      ),
+      malePercentage: getPercentage(
+        totalMaleRegistrationInTargetDay,
+        estimationOfTargetDay.maleEstimation
+      ),
+      femalePercentage: getPercentage(
+        totalFemaleRegistrationInTargetDay,
+        estimationOfTargetDay.femaleEstimation
+      )
+    },
+    within1Year: {
+      actualRegistration: totalRegistrationWithin1Year,
+      estimatedRegistration: estimationOfTargetDay.totalEstimation,
+      estimatedPercentage: getPercentage(
+        totalRegistrationWithin1Year,
+        estimationOfTargetDay.totalEstimation
+      ),
+      malePercentage: getPercentage(
+        totalMaleRegistrationWithin1Year,
+        estimationOfTargetDay.maleEstimation
+      ),
+      femalePercentage: getPercentage(
+        totalFemaleRegistrationWithin1Year,
+        estimationOfTargetDay.femaleEstimation
+      )
+    },
+    within5Years: {
+      actualRegistration: totalRegistrationWithin5Years,
+      estimatedRegistration: estimationOfTargetDay.totalEstimation,
+      estimatedPercentage: getPercentage(
+        totalRegistrationWithin5Years,
+        estimationOfTargetDay.totalEstimation
+      ),
+      malePercentage: getPercentage(
+        totalMaleRegistrationWithin5Years,
+        estimationOfTargetDay.maleEstimation
+      ),
+      femalePercentage: getPercentage(
+        totalFemaleRegistrationWithin5Years,
+        estimationOfTargetDay.femaleEstimation
+      )
+    }
+  }
+}
 function populateGenderBasisMetrics(
   points: IGenderBasisPoint[],
   locationLevel: string

@@ -26,7 +26,7 @@ import {
 } from './OperationalReport'
 import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
 import { parse } from 'query-string'
-import { OPERATIONAL_REPORTS_METRICS } from './metricsQuery'
+import { PERFORMANCE_METRICS } from './metricsQuery'
 import { GraphQLError } from 'graphql'
 import { SEARCH_EVENTS } from '@client/views/OfficeHome/queries'
 import { COUNT_USER_WISE_DECLARATIONS } from '@client/search/queries'
@@ -67,7 +67,7 @@ describe('OperationalReport tests', () => {
       },
       {
         request: {
-          query: OPERATIONAL_REPORTS_METRICS,
+          query: PERFORMANCE_METRICS,
           variables: {
             locationId: LOCATION_DHAKA_DIVISION.id,
             timeEnd: new Date(1487076708000).toISOString(),
@@ -317,7 +317,7 @@ describe('Test error toast notification', () => {
     const graphqlMock = [
       {
         request: {
-          query: OPERATIONAL_REPORTS_METRICS,
+          query: PERFORMANCE_METRICS,
           variables: {
             locationId: LOCATION_DHAKA_DIVISION.id,
             timeEnd: new Date(1487076708000).toISOString(),

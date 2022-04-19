@@ -74,8 +74,8 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { withTheme } from 'styled-components'
 import {
-  OPERATIONAL_REPORTS_METRICS,
-  OPERATIONAL_REPORTS_METRICS_FOR_OFFICE
+  PERFORMANCE_METRICS,
+  PERFORMANCE_METRICS_FOR_OFFICE
 } from './metricsQuery'
 import { DeclarationsStartedReport } from './reports/operational/DeclarationsStartedReport'
 import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
@@ -489,8 +489,8 @@ class OperationalReportComponent extends React.Component<Props, State> {
             <Query
               query={
                 this.isOfficeSelected()
-                  ? OPERATIONAL_REPORTS_METRICS_FOR_OFFICE
-                  : OPERATIONAL_REPORTS_METRICS
+                  ? PERFORMANCE_METRICS_FOR_OFFICE
+                  : PERFORMANCE_METRICS
               }
               variables={{
                 timeStart: timeStart.toISOString(),

@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as Hapi from '@hapi/hapi'
-import { fetchLocationWiseEventEstimations } from '@metrics/features/metrics/metricsGenerator'
+import { fetchLocationWiseEventEstimationsForAllTimeframes } from '@metrics/features/metrics/metricsGenerator'
 
 import {
   TIME_FROM,
@@ -31,64 +31,79 @@ export async function eventEstimationsHandler(
     Authorization: request.headers.authorization,
     'x-correlation-id': request.headers['x-correlation-id']
   }
-  let estimatedTargetDayBirthMetrics
+  let estimatedBirthMetrics
+  const fallbackResponse = {
+    actualRegistration: 0,
+    estimatedRegistration: 0,
+    estimatedPercentage: 0,
+    malePercentage: 0,
+    femalePercentage: 0
+  }
   try {
-    estimatedTargetDayBirthMetrics = await fetchLocationWiseEventEstimations(
-      timeStart,
-      timeEnd,
-      locationId,
-      EVENT_TYPE.BIRTH,
-      authHeader
-    )
+    estimatedBirthMetrics =
+      await fetchLocationWiseEventEstimationsForAllTimeframes(
+        timeStart,
+        timeEnd,
+        locationId,
+        EVENT_TYPE.BIRTH,
+        authHeader
+      )
   } catch (error) {
     return {
-      birthTargetDayMetrics: {
-        actualRegistration: 0,
-        estimatedRegistration: 0,
-        estimatedPercentage: 0,
-        malePercentage: 0,
-        femalePercentage: 0
-      },
-      deathTargetDayMetrics: {
-        actualRegistration: 0,
-        estimatedRegistration: 0,
-        estimatedPercentage: 0,
-        malePercentage: 0,
-        femalePercentage: 0
-      }
+      birthTargetDayMetrics: fallbackResponse,
+      birth1YearMetrics: fallbackResponse,
+      birth5YearMetrics: fallbackResponse,
+      deathTargetDayMetrics: fallbackResponse,
+      death1YearMetrics: fallbackResponse,
+      death5YearMetrics: fallbackResponse
     }
   }
-  let estimatedTargetDayDeathMetrics
+  let estimatedDeathMetrics
   try {
-    estimatedTargetDayDeathMetrics = await fetchLocationWiseEventEstimations(
-      timeStart,
-      timeEnd,
-      locationId,
-      EVENT_TYPE.DEATH,
-      authHeader
-    )
+    estimatedDeathMetrics =
+      await fetchLocationWiseEventEstimationsForAllTimeframes(
+        timeStart,
+        timeEnd,
+        locationId,
+        EVENT_TYPE.DEATH,
+        authHeader
+      )
   } catch (error) {
     return {
       birthTargetDayMetrics: {
-        ...estimatedTargetDayBirthMetrics
+        ...estimatedBirthMetrics.withinTargetDays
       },
-      deathTargetDayMetrics: {
-        actualRegistration: 0,
-        estimatedRegistration: 0,
-        estimatedPercentage: 0,
-        malePercentage: 0,
-        femalePercentage: 0
-      }
+      birth1YearMetrics: {
+        ...estimatedBirthMetrics.within1Year
+      },
+      birth5YearMetrics: {
+        ...estimatedBirthMetrics.within5Years
+      },
+      deathTargetDayMetrics: fallbackResponse,
+      death1YearMetrics: fallbackResponse,
+      death5YearMetrics: fallbackResponse
     }
   }
 
   return {
     locationId,
     birthTargetDayMetrics: {
-      ...estimatedTargetDayBirthMetrics
+      ...estimatedBirthMetrics.withinTargetDays
+    },
+    birth1YearMetrics: {
+      ...estimatedBirthMetrics.within1Year
+    },
+    birth5YearMetrics: {
+      ...estimatedBirthMetrics.within5Years
     },
     deathTargetDayMetrics: {
-      ...estimatedTargetDayDeathMetrics
+      ...estimatedDeathMetrics.withinTargetDays
+    },
+    death1YearMetrics: {
+      ...estimatedDeathMetrics.within1Year
+    },
+    death5YearMetrics: {
+      ...estimatedDeathMetrics.within5Years
     }
   }
 }
