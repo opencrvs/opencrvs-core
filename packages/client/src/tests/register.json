@@ -2671,7 +2671,7 @@
                   "label": {
                     "defaultMessage": "What was their permanent address?",
                     "description": "Title for the permanent address fields",
-                    "id": "form.field.label.informantPrimaryAddress"
+                    "id": "form.field.label.primaryAddress"
                   },
                   "previewGroup": "primaryAddress",
                   "initialValue": "",
@@ -8350,12 +8350,12 @@
                   ]
                 },
                 {
-                  "name": "addressSameAsMother",
+                  "name": "secondaryAddressSameAsOtherSecondary",
                   "type": "RADIO_GROUP",
                   "label": {
                     "defaultMessage": "Is his current address the same as the mother's?",
                     "description": "Title for the radio button to select that the father's current address is the same as the mother's address",
-                    "id": "form.field.label.addressSameAsMother"
+                    "id": "form.field.label.secondaryAddressSameAsOtherSecondary"
                   },
                   "required": true,
                   "initialValue": false,
@@ -8427,7 +8427,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.addressSameAsMother"
+                      "expression": "values.secondaryAddressSameAsOtherSecondary"
                     }
                   ]
                 },
@@ -8458,7 +8458,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.addressSameAsMother"
+                      "expression": "values.secondaryAddressSameAsOtherSecondary"
                     }
                   ],
                   "mapping": {
@@ -8508,7 +8508,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.addressSameAsMother"
+                      "expression": "values.secondaryAddressSameAsOtherSecondary"
                     }
                   ],
                   "mapping": {
@@ -8558,7 +8558,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.addressSameAsMother"
+                      "expression": "values.secondaryAddressSameAsOtherSecondary"
                     }
                   ],
                   "mapping": {
@@ -8612,7 +8612,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.addressSameAsMother"
+                      "expression": "values.secondaryAddressSameAsOtherSecondary"
                     }
                   ],
                   "mapping": {
@@ -8666,7 +8666,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.addressSameAsMother"
+                      "expression": "values.secondaryAddressSameAsOtherSecondary"
                     },
                     {
                       "action": "hide",
@@ -8715,7 +8715,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.addressSameAsMother"
+                      "expression": "values.secondaryAddressSameAsOtherSecondary"
                     },
                     {
                       "action": "hide",
@@ -8764,7 +8764,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.addressSameAsMother"
+                      "expression": "values.secondaryAddressSameAsOtherSecondary"
                     }
                   ],
                   "mapping": {
@@ -8813,7 +8813,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.addressSameAsMother"
+                      "expression": "values.secondaryAddressSameAsOtherSecondary"
                     }
                   ],
                   "mapping": {
@@ -8866,7 +8866,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.addressSameAsMother"
+                      "expression": "values.secondaryAddressSameAsOtherSecondary"
                     },
                     {
                       "action": "hide",
@@ -8915,7 +8915,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.addressSameAsMother"
+                      "expression": "values.secondaryAddressSameAsOtherSecondary"
                     }
                   ],
                   "mapping": {
@@ -8968,7 +8968,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.addressSameAsMother"
+                      "expression": "values.secondaryAddressSameAsOtherSecondary"
                     }
                   ],
                   "mapping": {
@@ -9001,7 +9001,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.addressSameAsMother"
+                      "expression": "values.secondaryAddressSameAsOtherSecondary"
                     }
                   ],
                   "mapping": {
@@ -9034,7 +9034,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.addressSameAsMother"
+                      "expression": "values.secondaryAddressSameAsOtherSecondary"
                     }
                   ],
                   "mapping": {
@@ -9067,7 +9067,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.addressSameAsMother"
+                      "expression": "values.secondaryAddressSameAsOtherSecondary"
                     }
                   ],
                   "mapping": {
@@ -9100,7 +9100,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.addressSameAsMother"
+                      "expression": "values.secondaryAddressSameAsOtherSecondary"
                     }
                   ],
                   "mapping": {
@@ -9133,7 +9133,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.addressSameAsMother"
+                      "expression": "values.secondaryAddressSameAsOtherSecondary"
                     }
                   ],
                   "mapping": {
@@ -9166,7 +9166,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.addressSameAsMother"
+                      "expression": "values.secondaryAddressSameAsOtherSecondary"
                     }
                   ],
                   "mapping": {
@@ -9199,7 +9199,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.addressSameAsMother"
+                      "expression": "values.secondaryAddressSameAsOtherSecondary"
                     }
                   ],
                   "mapping": {
@@ -9214,12 +9214,12 @@
                   }
                 },
                 {
-                  "name": "primaryAddressSameAsMother",
+                  "name": "primaryAddressSameAsOtherPrimary",
                   "type": "RADIO_GROUP",
                   "label": {
                     "defaultMessage": "Is his permanent address the same as the mother's?",
                     "description": "Title for the radio button to select that the father's permanent address is the same as the mother's address",
-                    "id": "form.field.label.primaryAddressSameAsMother"
+                    "id": "form.field.label.primaryAddressSameAsOtherPrimary"
                   },
                   "required": true,
                   "initialValue": false,
@@ -9291,7 +9291,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.primaryAddressSameAsMother"
+                      "expression": "values.primaryAddressSameAsOtherPrimary"
                     }
                   ]
                 },
@@ -9322,7 +9322,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.primaryAddressSameAsMother"
+                      "expression": "values.primaryAddressSameAsOtherPrimary"
                     }
                   ],
                   "mapping": {
@@ -9364,7 +9364,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.primaryAddressSameAsMother"
+                      "expression": "values.primaryAddressSameAsOtherPrimary"
                     },
                     {
                       "action": "hide",
@@ -9414,7 +9414,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.primaryAddressSameAsMother"
+                      "expression": "values.primaryAddressSameAsOtherPrimary"
                     },
                     {
                       "action": "hide",
@@ -9464,7 +9464,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "values.primaryAddressSameAsMother"
+                      "expression": "values.primaryAddressSameAsOtherPrimary"
                     },
                     {
                       "action": "hide",
@@ -9514,7 +9514,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "values.primaryAddressSameAsMother"
+                      "expression": "values.primaryAddressSameAsOtherPrimary"
                     },
                     {
                       "action": "hide",
@@ -9563,7 +9563,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "values.primaryAddressSameAsMother"
+                      "expression": "values.primaryAddressSameAsOtherPrimary"
                     },
                     {
                       "action": "hide",
@@ -9612,7 +9612,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "values.primaryAddressSameAsMother"
+                      "expression": "values.primaryAddressSameAsOtherPrimary"
                     },
                     {
                       "action": "hide",
@@ -9657,7 +9657,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "values.primaryAddressSameAsMother"
+                      "expression": "values.primaryAddressSameAsOtherPrimary"
                     },
                     {
                       "action": "hide",
@@ -9714,7 +9714,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "values.primaryAddressSameAsMother"
+                      "expression": "values.primaryAddressSameAsOtherPrimary"
                     },
                     {
                       "action": "hide",
@@ -9763,7 +9763,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "values.primaryAddressSameAsMother"
+                      "expression": "values.primaryAddressSameAsOtherPrimary"
                     },
                     {
                       "action": "hide",
@@ -9816,7 +9816,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "values.primaryAddressSameAsMother"
+                      "expression": "values.primaryAddressSameAsOtherPrimary"
                     },
                     {
                       "action": "hide",
@@ -9861,7 +9861,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "values.primaryAddressSameAsMother"
+                      "expression": "values.primaryAddressSameAsOtherPrimary"
                     },
                     {
                       "action": "hide",
@@ -9894,7 +9894,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "values.primaryAddressSameAsMother"
+                      "expression": "values.primaryAddressSameAsOtherPrimary"
                     },
                     {
                       "action": "hide",
@@ -9927,7 +9927,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "values.primaryAddressSameAsMother"
+                      "expression": "values.primaryAddressSameAsOtherPrimary"
                     },
                     {
                       "action": "hide",
@@ -9960,7 +9960,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "values.primaryAddressSameAsMother"
+                      "expression": "values.primaryAddressSameAsOtherPrimary"
                     },
                     {
                       "action": "hide",
@@ -9993,7 +9993,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "values.primaryAddressSameAsMother"
+                      "expression": "values.primaryAddressSameAsOtherPrimary"
                     },
                     {
                       "action": "hide",
@@ -10026,7 +10026,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "values.primaryAddressSameAsMother"
+                      "expression": "values.primaryAddressSameAsOtherPrimary"
                     },
                     {
                       "action": "hide",
@@ -10059,7 +10059,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "values.primaryAddressSameAsMother"
+                      "expression": "values.primaryAddressSameAsOtherPrimary"
                     },
                     {
                       "action": "hide",

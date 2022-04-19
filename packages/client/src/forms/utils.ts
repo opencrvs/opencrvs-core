@@ -684,13 +684,13 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression: '!values.fathersDetailsExist'
   },
-  primaryAddressSameAsMother: {
+  primaryAddressSameAsOtherPrimary: {
     action: 'hide',
-    expression: 'values.primaryAddressSameAsMother'
+    expression: 'values.primaryAddressSameAsOtherPrimary'
   },
-  addressSameAsMother: {
+  secondaryAddressSameAsOtherSecondary: {
     action: 'hide',
-    expression: 'values.addressSameAsMother'
+    expression: 'values.secondaryAddressSameAsOtherSecondary'
   },
   secondaryAddressSameAsPrimary: {
     action: 'hide',

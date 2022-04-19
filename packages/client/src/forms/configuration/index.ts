@@ -31,6 +31,7 @@ import {
   IDefaultField,
   IDefaultFieldCustomisation
 } from '@client/forms/configuration/defaultUtils'
+import { populateRegisterFormsWithAddresses } from './administrative/addresses'
 
 // THIS FILE SORTS & COMBINES CONFIGURATIONS WITH THE DEFAULT CONFIGURATION FOR RENDERING IN THE APPLICATION
 
@@ -219,6 +220,7 @@ export function configureRegistrationForm(
   formCustomisations: IFormConfigurations,
   defaultEventForm: ISerializedForm
 ): ISerializedForm {
+  populateRegisterFormsWithAddresses(defaultEventForm)
   const defaultFormWithCustomisations = configureDefaultQuestions(
     formCustomisations.defaultFieldCustomisations,
     defaultEventForm

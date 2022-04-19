@@ -10,25 +10,334 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { BirthSection, DeathSection, FLEX_DIRECTION, SerializedFormField } from '@client/forms/index'
+import {
+  BirthSection,
+  DeathSection,
+  FLEX_DIRECTION,
+  SerializedFormField,
+  ISerializedForm
+} from '@client/forms/index'
+import { formMessageDescriptors } from '@client/i18n/messages'
+import { MessageDescriptor } from 'react-intl'
+import {
+  getDefaultField,
+  IDefaultField
+} from '@client/forms/configuration/defaultUtils'
+import { concat } from 'lodash'
 
 export enum AddressCases {
-  PRIMARY = 'primary',
-  SECONDARY = 'secondary'
+  // the below are UPPER_CASE because they map to GQLAddress type enums
+  PRIMARY_ADDRESS = 'PRIMARY_ADDRESS',
+  SECONDARY_ADDRESS = 'SECONDARY_ADDRESS'
 }
 
-export const primaryAddressFields: SerializedFormField[] = [{
-  name: 'primaryAddress',
-  type: 'SUBSECTION',
-  label: {
-    defaultMessage: 'What is her residential address?',
-    description: 'Title for the permanent address fields',
-    id: 'form.field.label.motherPrimaryAddress'
+export enum AddressComparisonCases {
+  // the below are camelCase because they map to fieldNames used in conditionals
+  SECONDARY_ADDRESS_SAME_AS_PRIMARY = 'secondaryAddressSameAsPrimary',
+  PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY = 'primaryAddressSameAsOtherPrimary',
+  SECONDARY_ADDRESS_SAME_AS_OTHER_SECONDARY = 'secondaryAddressSameAsOtherSecondary'
+}
+
+export enum AddressSubsections {
+  PRIMARY_ADDRESS_SUBSECTION = 'primaryAddress',
+  SECONDARY_ADDRESS_SUBSECTION = 'secondaryAddress'
+}
+
+export interface IAddressConfiguration {
+  preceedingFieldId: string
+  configurations: AllowedAddressConfigurations[]
+}
+
+export type AllowedAddressConfigurations = {
+  config: AddressCases | AddressSubsections | AddressComparisonCases
+  label?: MessageDescriptor
+  xComparisonSection?: BirthSection | DeathSection
+  yComparisonSection?: BirthSection | DeathSection
+  comparisonCase?: AddressComparisonCases
+}
+
+export const defaultAddressConfiguration: IAddressConfiguration[] = [
+  {
+    preceedingFieldId: 'birth.informant.informant-view-group.primaryAddress',
+    configurations: [
+      { config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION },
+      { config: AddressCases.PRIMARY_ADDRESS }
+    ]
   },
-  previewGroup: 'primaryAddress',
-  initialValue: '',
-  validate: []
-},
+  {
+    preceedingFieldId: 'birth.mother.mother-view-group.educationalAttainment',
+    configurations: [
+      {
+        config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
+        label: formMessageDescriptors.primaryAddress
+      },
+      { config: AddressCases.PRIMARY_ADDRESS },
+      {
+        config: AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY,
+        label: formMessageDescriptors.secondaryAddressSameAsPrimary,
+        xComparisonSection: BirthSection.Mother,
+        yComparisonSection: BirthSection.Mother
+      },
+      {
+        config: AddressSubsections.SECONDARY_ADDRESS_SUBSECTION,
+        label: formMessageDescriptors.secondaryAddress,
+        comparisonCase: AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY
+      },
+      { config: AddressCases.SECONDARY_ADDRESS }
+    ]
+  },
+  {
+    preceedingFieldId: 'birth.father.father-view-group.educationalAttainment',
+    configurations: [
+      {
+        config: AddressComparisonCases.PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY,
+        label: formMessageDescriptors.primaryAddressSameAsOtherPrimary,
+        xComparisonSection: BirthSection.Father,
+        yComparisonSection: BirthSection.Mother
+      },
+      {
+        config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
+        label: formMessageDescriptors.primaryAddress,
+        comparisonCase:
+          AddressComparisonCases.PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY
+      },
+      { config: AddressCases.PRIMARY_ADDRESS },
+      {
+        config:
+          AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_OTHER_SECONDARY,
+        label: formMessageDescriptors.secondaryAddressSameAsOtherSecondary,
+        xComparisonSection: BirthSection.Father,
+        yComparisonSection: BirthSection.Mother
+      },
+      {
+        config: AddressSubsections.SECONDARY_ADDRESS_SUBSECTION,
+        label: formMessageDescriptors.secondaryAddress,
+        comparisonCase:
+          AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_OTHER_SECONDARY
+      },
+      { config: AddressCases.SECONDARY_ADDRESS }
+    ]
+  },
+  {
+    preceedingFieldId: 'death.deceased.deceased-view-group.occupation',
+    configurations: [
+      {
+        config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
+        label: formMessageDescriptors.deceasedPrimaryAddress
+      },
+      { config: AddressCases.PRIMARY_ADDRESS },
+      {
+        config: AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY,
+        label: formMessageDescriptors.deceasedSecondaryAddressSameAsPrimary,
+        xComparisonSection: DeathSection.Deceased,
+        yComparisonSection: DeathSection.Deceased
+      },
+      {
+        config: AddressSubsections.SECONDARY_ADDRESS_SUBSECTION,
+        label: formMessageDescriptors.deceasedSecondaryAddress,
+        comparisonCase: AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY
+      },
+      { config: AddressCases.SECONDARY_ADDRESS }
+    ]
+  },
+  {
+    preceedingFieldId: 'death.informant.informant-view-group.relationship',
+    configurations: [
+      {
+        config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
+        label: formMessageDescriptors.primaryAddress
+      },
+      { config: AddressCases.PRIMARY_ADDRESS },
+      {
+        config: AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY,
+        label: formMessageDescriptors.informantSecondaryAddressSameAsPrimary,
+        xComparisonSection: DeathSection.Informants,
+        yComparisonSection: DeathSection.Informants
+      },
+      {
+        config: AddressSubsections.SECONDARY_ADDRESS_SUBSECTION,
+        label: formMessageDescriptors.informantSecondaryAddress,
+        comparisonCase: AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY
+      },
+      { config: AddressCases.SECONDARY_ADDRESS }
+    ]
+  }
+]
+
+export function getAddressFields(
+  configuration: AllowedAddressConfigurations
+): SerializedFormField[] {
+  switch (configuration.config) {
+    case AddressCases.PRIMARY_ADDRESS:
+      return primaryAddressFields
+    case AddressCases.SECONDARY_ADDRESS:
+      return secondaryAddressFields
+    case AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY ||
+      AddressComparisonCases.PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY ||
+      AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_OTHER_SECONDARY:
+      if (
+        !configuration.label ||
+        !configuration.xComparisonSection ||
+        !configuration.yComparisonSection
+      ) {
+        throw new Error(
+          `Invalid address configuration for: ${configuration.config}`
+        )
+      }
+      return getXAddressSameAsY(
+        configuration.config,
+        configuration.xComparisonSection,
+        configuration.yComparisonSection,
+        configuration.label
+      )
+    case AddressSubsections.PRIMARY_ADDRESS_SUBSECTION ||
+      AddressSubsections.SECONDARY_ADDRESS_SUBSECTION:
+      if (!configuration.label) {
+        throw new Error(
+          `Invalid address configuration for: ${configuration.config}`
+        )
+      }
+      return getAddressSubsection(
+        configuration.config,
+        configuration.label,
+        configuration.comparisonCase
+      )
+    default:
+      return primaryAddressFields
+  }
+}
+
+export const getAddressSubsection = (
+  previewGroup: AddressSubsections,
+  label: MessageDescriptor,
+  comparisonCase?: AddressComparisonCases
+): SerializedFormField[] => {
+  const fields: SerializedFormField[] = []
+  const subsection: SerializedFormField = {
+    name: previewGroup,
+    type: 'SUBSECTION',
+    label,
+    previewGroup: previewGroup,
+    initialValue: '',
+    validate: []
+  }
+  if (comparisonCase) {
+    subsection['conditionals'] = [
+      {
+        action: 'hide',
+        expression: `values.${comparisonCase}`
+      }
+    ]
+  }
+  fields.push(subsection)
+  return fields
+}
+
+export const getXAddressSameAsY = (
+  comparisonCase: AddressComparisonCases,
+  xComparisonSection: BirthSection | DeathSection,
+  yComparisonSection: BirthSection | DeathSection,
+  label: MessageDescriptor
+): SerializedFormField[] => {
+  return [
+    {
+      name: comparisonCase,
+      type: 'RADIO_GROUP',
+      label,
+      required: true,
+      initialValue: true,
+      validate: [],
+      options: [
+        {
+          value: true,
+          label: {
+            defaultMessage: 'Yes',
+            description: 'confirmation label for yes / no radio button',
+            id: 'form.field.label.confirm'
+          }
+        },
+        {
+          value: false,
+          label: {
+            defaultMessage: 'No',
+            description: 'deny label for yes / no radio button',
+            id: 'form.field.label.deny'
+          }
+        }
+      ],
+      conditionals: [],
+      mapping: {
+        mutation: {
+          operation: 'copyAddressTransformer',
+          parameters: [
+            comparisonCase ===
+              AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY ||
+            comparisonCase ===
+              AddressComparisonCases.PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY
+              ? AddressCases.PRIMARY_ADDRESS
+              : AddressCases.SECONDARY_ADDRESS,
+            yComparisonSection,
+            comparisonCase ===
+              AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY ||
+            comparisonCase ===
+              AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_OTHER_SECONDARY
+              ? AddressCases.SECONDARY_ADDRESS
+              : AddressCases.PRIMARY_ADDRESS,
+            xComparisonSection
+          ]
+        },
+        query: {
+          operation: 'sameAddressFieldTransformer',
+          parameters: [
+            comparisonCase ===
+              AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY ||
+            comparisonCase ===
+              AddressComparisonCases.PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY
+              ? AddressCases.PRIMARY_ADDRESS
+              : AddressCases.SECONDARY_ADDRESS,
+            yComparisonSection,
+            comparisonCase ===
+              AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY ||
+            comparisonCase ===
+              AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_OTHER_SECONDARY
+              ? AddressCases.SECONDARY_ADDRESS
+              : AddressCases.PRIMARY_ADDRESS,
+            xComparisonSection
+          ]
+        }
+      }
+    }
+  ]
+}
+
+export function populateRegisterFormsWithAddresses(
+  defaultEventForm: ISerializedForm
+) {
+  defaultAddressConfiguration.forEach(
+    (addressConfiguration: IAddressConfiguration) => {
+      const preceedingDefaultField: IDefaultField | undefined = getDefaultField(
+        defaultEventForm,
+        addressConfiguration.preceedingFieldId
+      )
+
+      if (preceedingDefaultField) {
+        let addressFields: SerializedFormField[] = []
+        addressConfiguration.configurations.forEach((configuration) => {
+          addressFields = concat(addressFields, getAddressFields(configuration))
+        })
+        defaultEventForm.sections[
+          preceedingDefaultField?.selectedSectionIndex
+        ].groups[preceedingDefaultField?.selectedGroupIndex].fields.splice(
+          preceedingDefaultField.index + 1,
+          0,
+          ...addressFields
+        )
+      }
+    }
+  )
+}
+
+export const primaryAddressFields: SerializedFormField[] = [
   {
     name: 'countryPrimary',
     type: 'SELECT_WITH_OPTIONS',
@@ -56,7 +365,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'fieldToAddressTransformer',
-            parameters: ['PRIMARY_ADDRESS', 0, 'country']
+            parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'country']
           },
           'address'
         ]
@@ -67,7 +376,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'addressToFieldTransformer',
-            parameters: ['PRIMARY_ADDRESS', 0, 'country']
+            parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'country']
           }
         ]
       }
@@ -107,7 +416,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'fieldToAddressTransformer',
-            parameters: ['PRIMARY_ADDRESS', 0, 'state']
+            parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'state']
           },
           'address'
         ]
@@ -118,7 +427,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'addressToFieldTransformer',
-            parameters: ['PRIMARY_ADDRESS', 0, 'state']
+            parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'state']
           }
         ]
       }
@@ -162,7 +471,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'fieldToAddressTransformer',
-            parameters: ['PRIMARY_ADDRESS', 0, 'district']
+            parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'district']
           },
           'address'
         ]
@@ -173,7 +482,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'addressToFieldTransformer',
-            parameters: ['PRIMARY_ADDRESS', 0, 'district']
+            parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'district']
           }
         ]
       }
@@ -232,7 +541,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'fieldToAddressTransformer',
-            parameters: ['PRIMARY_ADDRESS', 7]
+            parameters: [AddressCases.PRIMARY_ADDRESS, 7]
           },
           'address'
         ]
@@ -243,7 +552,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'addressToFieldTransformer',
-            parameters: ['PRIMARY_ADDRESS', 7]
+            parameters: [AddressCases.PRIMARY_ADDRESS, 7]
           }
         ]
       }
@@ -286,7 +595,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'fieldToAddressTransformer',
-            parameters: ['PRIMARY_ADDRESS', 4]
+            parameters: [AddressCases.PRIMARY_ADDRESS, 4]
           },
           'address'
         ]
@@ -297,7 +606,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'addressToFieldTransformer',
-            parameters: ['PRIMARY_ADDRESS', 4]
+            parameters: [AddressCases.PRIMARY_ADDRESS, 4]
           }
         ]
       }
@@ -340,7 +649,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'fieldToAddressTransformer',
-            parameters: ['PRIMARY_ADDRESS', 3]
+            parameters: [AddressCases.PRIMARY_ADDRESS, 3]
           },
           'address'
         ]
@@ -351,7 +660,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'addressToFieldTransformer',
-            parameters: ['PRIMARY_ADDRESS', 3]
+            parameters: [AddressCases.PRIMARY_ADDRESS, 3]
           }
         ]
       }
@@ -394,7 +703,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'fieldToAddressTransformer',
-            parameters: ['PRIMARY_ADDRESS', 2]
+            parameters: [AddressCases.PRIMARY_ADDRESS, 2]
           },
           'address'
         ]
@@ -405,7 +714,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'addressToFieldTransformer',
-            parameters: ['PRIMARY_ADDRESS', 2]
+            parameters: [AddressCases.PRIMARY_ADDRESS, 2]
           }
         ]
       }
@@ -448,7 +757,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'fieldToAddressTransformer',
-            parameters: ['PRIMARY_ADDRESS', 1]
+            parameters: [AddressCases.PRIMARY_ADDRESS, 1]
           },
           'address'
         ]
@@ -459,7 +768,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'addressToFieldTransformer',
-            parameters: ['PRIMARY_ADDRESS', 1]
+            parameters: [AddressCases.PRIMARY_ADDRESS, 1]
           }
         ]
       }
@@ -502,7 +811,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'fieldToAddressTransformer',
-            parameters: ['PRIMARY_ADDRESS', 5]
+            parameters: [AddressCases.PRIMARY_ADDRESS, 5]
           },
           'address'
         ]
@@ -513,7 +822,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'addressToFieldTransformer',
-            parameters: ['PRIMARY_ADDRESS', 5]
+            parameters: [AddressCases.PRIMARY_ADDRESS, 5]
           }
         ]
       }
@@ -544,7 +853,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'fieldToAddressTransformer',
-            parameters: ['PRIMARY_ADDRESS', 0, 'state']
+            parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'state']
           },
           'address'
         ]
@@ -555,7 +864,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'addressToFieldTransformer',
-            parameters: ['PRIMARY_ADDRESS', 0, 'state']
+            parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'state']
           }
         ]
       }
@@ -586,7 +895,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'fieldToAddressTransformer',
-            parameters: ['PRIMARY_ADDRESS', 0, 'district']
+            parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'district']
           },
           'address'
         ]
@@ -597,7 +906,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'addressToFieldTransformer',
-            parameters: ['PRIMARY_ADDRESS', 0, 'district']
+            parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'district']
           }
         ]
       }
@@ -628,7 +937,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'fieldToAddressTransformer',
-            parameters: ['PRIMARY_ADDRESS', 0, 'city']
+            parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'city']
           },
           'address'
         ]
@@ -639,7 +948,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'addressToFieldTransformer',
-            parameters: ['PRIMARY_ADDRESS', 0, 'city']
+            parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'city']
           }
         ]
       }
@@ -670,7 +979,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'fieldToAddressTransformer',
-            parameters: ['PRIMARY_ADDRESS', 7]
+            parameters: [AddressCases.PRIMARY_ADDRESS, 7]
           },
           'address'
         ]
@@ -681,7 +990,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'addressToFieldTransformer',
-            parameters: ['PRIMARY_ADDRESS', 7]
+            parameters: [AddressCases.PRIMARY_ADDRESS, 7]
           }
         ]
       }
@@ -712,7 +1021,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'fieldToAddressTransformer',
-            parameters: ['PRIMARY_ADDRESS', 8]
+            parameters: [AddressCases.PRIMARY_ADDRESS, 8]
           },
           'address'
         ]
@@ -723,7 +1032,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'addressToFieldTransformer',
-            parameters: ['PRIMARY_ADDRESS', 8]
+            parameters: [AddressCases.PRIMARY_ADDRESS, 8]
           }
         ]
       }
@@ -754,7 +1063,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'fieldToAddressTransformer',
-            parameters: ['PRIMARY_ADDRESS', 9]
+            parameters: [AddressCases.PRIMARY_ADDRESS, 9]
           },
           'address'
         ]
@@ -765,7 +1074,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'addressToFieldTransformer',
-            parameters: ['PRIMARY_ADDRESS', 9]
+            parameters: [AddressCases.PRIMARY_ADDRESS, 9]
           }
         ]
       }
@@ -796,7 +1105,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'fieldToAddressTransformer',
-            parameters: ['PRIMARY_ADDRESS', 0, 'postalCode']
+            parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'postalCode']
           },
           'address'
         ]
@@ -807,7 +1116,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
           'individual',
           {
             operation: 'addressToFieldTransformer',
-            parameters: ['PRIMARY_ADDRESS', 0, 'postalCode']
+            parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'postalCode']
           }
         ]
       }
@@ -815,71 +1124,7 @@ export const primaryAddressFields: SerializedFormField[] = [{
   }
 ]
 
-export const getSecondaryAddressSameAsPrimary(comparisonSection: BirthSection | DeathSection):SerializedFormField[] {
-return JSON.parse(JSON.stringify({
-  name: 'secondaryAddressSameAsPrimary',
-  type: 'RADIO_GROUP',
-  label: {
-    defaultMessage:
-      'Is her usual place of residence the same as her residential address?',
-    description:
-      'Title for the radio button to select that the mothers current address is the same as her permanent address',
-    id: 'form.field.label.secondaryAddressSameAsPrimary'
-  },
-  required: true,
-  initialValue: true,
-  validate: [],
-  options: [
-    {
-      value: true,
-      label: {
-        defaultMessage: 'Yes',
-        description: 'confirmation label for yes / no radio button',
-        id: 'form.field.label.confirm'
-      }
-    },
-    {
-      value: false,
-      label: {
-        defaultMessage: 'No',
-        description: 'deny label for yes / no radio button',
-        id: 'form.field.label.deny'
-      }
-    }
-  ],
-  conditionals: [],
-  mapping: {
-    mutation: {
-      operation: 'copyAddressTransformer',
-      parameters: ['PRIMARY_ADDRESS', 'SUBSTITUTION', 'SECONDARY_ADDRESS', 'SUBSTITUTION']
-    },
-    query: {
-      operation: 'sameAddressFieldTransformer',
-      parameters: ['PRIMARY_ADDRESS', 'SUBSTITUTION', 'SECONDARY_ADDRESS', 'SUBSTITUTION']
-    }
-  }
-}).replace('SUBSTITUTION',`${comparisonSection}`))as SerializedFormField[]
-}
-
 export const secondaryAddressFields: SerializedFormField[] = [
-  {
-    name: 'secondaryAddress',
-    type: 'SUBSECTION',
-    label: {
-      defaultMessage: 'Current Address',
-      description: 'Title for the current address fields',
-      id: 'form.field.label.secondaryAddress'
-    },
-    previewGroup: 'secondaryAddress',
-    initialValue: '',
-    validate: [],
-    conditionals: [
-      {
-        action: 'hide',
-        expression: 'values.secondaryAddressSameAsPrimary'
-      }
-    ]
-  },
   {
     name: 'countrySecondary',
     type: 'SELECT_WITH_OPTIONS',
@@ -903,11 +1148,11 @@ export const secondaryAddressFields: SerializedFormField[] = [
     mapping: {
       mutation: {
         operation: 'fieldToAddressTransformer',
-        parameters: ['SECONDARY_ADDRESS', 0, 'country']
+        parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'country']
       },
       query: {
         operation: 'addressToFieldTransformer',
-        parameters: ['SECONDARY_ADDRESS', 0, 'country']
+        parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'country']
       }
     }
   },
@@ -945,11 +1190,11 @@ export const secondaryAddressFields: SerializedFormField[] = [
     mapping: {
       mutation: {
         operation: 'fieldToAddressTransformer',
-        parameters: ['SECONDARY_ADDRESS', 0, 'state']
+        parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'state']
       },
       query: {
         operation: 'addressToFieldTransformer',
-        parameters: ['SECONDARY_ADDRESS', 0, 'state']
+        parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'state']
       }
     }
   },
@@ -991,11 +1236,11 @@ export const secondaryAddressFields: SerializedFormField[] = [
     mapping: {
       mutation: {
         operation: 'fieldToAddressTransformer',
-        parameters: ['SECONDARY_ADDRESS', 0, 'district']
+        parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'district']
       },
       query: {
         operation: 'addressToFieldTransformer',
-        parameters: ['SECONDARY_ADDRESS', 0, 'district']
+        parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'district']
       }
     }
   },
@@ -1028,11 +1273,11 @@ export const secondaryAddressFields: SerializedFormField[] = [
     mapping: {
       mutation: {
         operation: 'fieldToAddressTransformer',
-        parameters: ['SECONDARY_ADDRESS', 1]
+        parameters: [AddressCases.SECONDARY_ADDRESS, 1]
       },
       query: {
         operation: 'addressToFieldTransformer',
-        parameters: ['SECONDARY_ADDRESS', 1]
+        parameters: [AddressCases.SECONDARY_ADDRESS, 1]
       }
     }
   },
@@ -1061,7 +1306,7 @@ export const secondaryAddressFields: SerializedFormField[] = [
           'individual',
           {
             operation: 'fieldToAddressTransformer',
-            parameters: ['SECONDARY_ADDRESS', 0, 'state']
+            parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'state']
           },
           'address'
         ]
@@ -1072,7 +1317,7 @@ export const secondaryAddressFields: SerializedFormField[] = [
           'individual',
           {
             operation: 'addressToFieldTransformer',
-            parameters: ['SECONDARY_ADDRESS', 0, 'state']
+            parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'state']
           }
         ]
       }
@@ -1103,7 +1348,7 @@ export const secondaryAddressFields: SerializedFormField[] = [
           'individual',
           {
             operation: 'fieldToAddressTransformer',
-            parameters: ['SECONDARY_ADDRESS', 0, 'district']
+            parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'district']
           },
           'address'
         ]
@@ -1114,7 +1359,7 @@ export const secondaryAddressFields: SerializedFormField[] = [
           'individual',
           {
             operation: 'addressToFieldTransformer',
-            parameters: ['SECONDARY_ADDRESS', 0, 'district']
+            parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'district']
           }
         ]
       }
@@ -1145,7 +1390,7 @@ export const secondaryAddressFields: SerializedFormField[] = [
           'individual',
           {
             operation: 'fieldToAddressTransformer',
-            parameters: ['SECONDARY_ADDRESS', 0, 'city']
+            parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'city']
           },
           'address'
         ]
@@ -1156,7 +1401,7 @@ export const secondaryAddressFields: SerializedFormField[] = [
           'individual',
           {
             operation: 'addressToFieldTransformer',
-            parameters: ['SECONDARY_ADDRESS', 0, 'city']
+            parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'city']
           }
         ]
       }
@@ -1187,7 +1432,7 @@ export const secondaryAddressFields: SerializedFormField[] = [
           'individual',
           {
             operation: 'fieldToAddressTransformer',
-            parameters: ['SECONDARY_ADDRESS', 8]
+            parameters: [AddressCases.SECONDARY_ADDRESS, 8]
           },
           'address'
         ]
@@ -1198,7 +1443,7 @@ export const secondaryAddressFields: SerializedFormField[] = [
           'individual',
           {
             operation: 'addressToFieldTransformer',
-            parameters: ['SECONDARY_ADDRESS', 8]
+            parameters: [AddressCases.SECONDARY_ADDRESS, 8]
           }
         ]
       }
@@ -1229,7 +1474,7 @@ export const secondaryAddressFields: SerializedFormField[] = [
           'individual',
           {
             operation: 'fieldToAddressTransformer',
-            parameters: ['SECONDARY_ADDRESS', 9]
+            parameters: [AddressCases.SECONDARY_ADDRESS, 9]
           },
           'address'
         ]
@@ -1240,7 +1485,7 @@ export const secondaryAddressFields: SerializedFormField[] = [
           'individual',
           {
             operation: 'addressToFieldTransformer',
-            parameters: ['SECONDARY_ADDRESS', 9]
+            parameters: [AddressCases.SECONDARY_ADDRESS, 9]
           }
         ]
       }
@@ -1271,7 +1516,7 @@ export const secondaryAddressFields: SerializedFormField[] = [
           'individual',
           {
             operation: 'fieldToAddressTransformer',
-            parameters: ['SECONDARY_ADDRESS', 10]
+            parameters: [AddressCases.SECONDARY_ADDRESS, 10]
           },
           'address'
         ]
@@ -1282,7 +1527,7 @@ export const secondaryAddressFields: SerializedFormField[] = [
           'individual',
           {
             operation: 'addressToFieldTransformer',
-            parameters: ['SECONDARY_ADDRESS', 10]
+            parameters: [AddressCases.SECONDARY_ADDRESS, 10]
           }
         ]
       }
@@ -1313,7 +1558,7 @@ export const secondaryAddressFields: SerializedFormField[] = [
           'individual',
           {
             operation: 'fieldToAddressTransformer',
-            parameters: ['SECONDARY_ADDRESS', 0, 'postalCode']
+            parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'postalCode']
           },
           'address'
         ]
@@ -1324,23 +1569,10 @@ export const secondaryAddressFields: SerializedFormField[] = [
           'individual',
           {
             operation: 'addressToFieldTransformer',
-            parameters: ['SECONDARY_ADDRESS', 0, 'postalCode']
+            parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'postalCode']
           }
         ]
       }
     }
   }
 ]
-
-export function getDefaultAddresses(
-  useCase: AddressCases
-): SerializedFormField[] {
-  switch (useCase) {
-    case AddressCases.PRIMARY:
-      return primaryAddressFields
-    case AddressCases.SECONDARY:
-      return secondaryAddressFields
-    default:
-      return primaryAddressFields
-  }
-}

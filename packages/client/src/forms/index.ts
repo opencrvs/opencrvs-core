@@ -693,8 +693,8 @@ export interface IConditionals {
   iDType: IConditional
   isOfficePreSelected: IConditional
   fathersDetailsExist: IConditional
-  primaryAddressSameAsMother: IConditional
-  addressSameAsMother: IConditional
+  primaryAddressSameAsOtherPrimary: IConditional
+  secondaryAddressSameAsOtherSecondary: IConditional
   countryPrimary: IConditional
   statePrimary: IConditional
   districtPrimary: IConditional

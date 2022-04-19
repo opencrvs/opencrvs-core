@@ -15,51 +15,15 @@ import {
   REVIEW_OVERRIDE_POSITION,
   FLEX_DIRECTION,
   ISerializedForm,
-  DeathSection,
-  IConditionals
+  DeathSection
 } from '@client/forms/index'
 import { formMessageDescriptors } from '@client/i18n/messages'
-import {
-  getDefaultAddresses,
-  getDefaultField,
-  IDefaultField
-} from './defaultUtils'
-import { cloneDeep } from 'lodash'
-import {
-  getGroup,
-  getIdentifiersFromFieldId,
-  getSection,
-  IGroup,
-  ISection
-} from '.'
 
 // THIS FILE CONTAINS THE DEFAULT, FACTORY RESET FORM CONFIGURATIONS
 
 interface IDefaultRegisterForms {
   birth: ISerializedForm
   death: ISerializedForm
-}
-
-export function insertAddresses(preceedingFieldId: string, useCase: string) {}
-
-export function getRegisterFormsWithAddresses() {
-  const newForm = cloneDeep(registerForms)
-  // insert informant address to birth
-  const preceedingBirthInformantAddressId =
-    'birth.informant.informant-view-group.primaryAddress'
-  const preceedingDefaultField: IDefaultField | undefined = getDefaultField(
-    newForm.birth,
-    preceedingBirthInformantAddressId
-  )
-  if (preceedingDefaultField) {
-    newForm.birth.sections[preceedingDefaultField?.selectedSectionIndex].groups[
-      preceedingDefaultField?.selectedGroupIndex
-    ].fields.splice(
-      preceedingDefaultField.index + 1,
-      0,
-      ...getCustomFields(customGroup.questions)
-    )
-  }
 }
 
 export const registerForms: IDefaultRegisterForms = {
