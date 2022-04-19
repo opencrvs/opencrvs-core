@@ -19,10 +19,22 @@ import { IStoreState } from '@client/store'
 import { selectFormDraft } from '@client/forms/configuration/formDrafts/selectors'
 import { Event, BirthSection, DeathSection } from '@client/forms'
 import { useIntl } from 'react-intl'
-import { buttonMessages } from '@client/i18n/messages'
-import { draftStatusMessages } from '@client/i18n/messages/views/formConfig'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { ToggleMenu, Pill } from '@opencrvs/components/lib/interface'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import {
+  messages,
+  draftStatusMessages
+} from '@client/i18n/messages/views/formConfig'
+import {
+  LinkButton,
+  TertiaryButton,
+  SuccessButton,
+  DangerButton
+} from '@opencrvs/components/lib/buttons'
+import {
+  ToggleMenu,
+  Pill,
+  ResponsiveModal
+} from '@opencrvs/components/lib/interface'
 import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { goToFormConfigWizard } from '@client/navigation'
 import {
@@ -57,23 +69,73 @@ function ActionButton({ event, status, version }: IDraft) {
   )
 }
 
-function OptionsMenu() {
+function OptionsMenu({ event }: { event: Event }) {
+  enum Option {
+    PREVIEW,
+    DELETE
+  }
   const intl = useIntl()
+  const [show, setShow] = React.useState(false)
+  const [selectedOption, setSelectedOption] = React.useState<Option>(
+    Option.PREVIEW
+  )
+  const toggleShow = () => setShow((prev) => !prev)
   return (
-    <ToggleMenu
-      id="toggleMenu"
-      toggleButton={<VerticalThreeDots />}
-      menuItems={[
-        {
-          label: intl.formatMessage(buttonMessages.preview),
-          handler: () => {}
-        },
-        {
-          label: intl.formatMessage(buttonMessages.delete),
-          handler: () => {}
-        }
-      ]}
-    />
+    <>
+      <ToggleMenu
+        id="toggleMenu"
+        toggleButton={<VerticalThreeDots />}
+        menuItems={[
+          {
+            label: intl.formatMessage(buttonMessages.preview),
+            handler: () => {
+              toggleShow()
+              setSelectedOption(Option.PREVIEW)
+            }
+          },
+          {
+            label: intl.formatMessage(buttonMessages.delete),
+            handler: () => {
+              toggleShow()
+              setSelectedOption(Option.DELETE)
+            }
+          }
+        ]}
+      />
+      <ResponsiveModal
+        autoHeight
+        show={show}
+        title={intl.formatMessage(
+          selectedOption === Option.PREVIEW
+            ? messages.previewConfirmationTitle
+            : messages.publishedConfirmationTitle,
+          {
+            event: intl.formatMessage(constantsMessages[event])
+          }
+        )}
+        handleClose={toggleShow}
+        actions={[
+          <TertiaryButton id="cancel-btn" key="cancel" onClick={toggleShow}>
+            {intl.formatMessage(buttonMessages.cancel)}
+          </TertiaryButton>,
+          selectedOption === Option.PREVIEW ? (
+            <SuccessButton id="preview-btn" key="preview" onClick={toggleShow}>
+              {intl.formatMessage(buttonMessages.preview)}
+            </SuccessButton>
+          ) : (
+            <DangerButton id="delete-btn" key="delete" onClick={toggleShow}>
+              {intl.formatMessage(buttonMessages.delete)}
+            </DangerButton>
+          )
+        ]}
+      >
+        {intl.formatMessage(
+          selectedOption === Option.PREVIEW
+            ? messages.previewConfirmationDescription
+            : messages.publishedConfirmationDescription
+        )}
+      </ResponsiveModal>
+    </>
   )
 }
 
@@ -87,7 +149,7 @@ function EventDrafts({ event }: { event: Event }) {
     <>
       <ActionButton {...formDraft} />
       {!isDefaultDraft(formDraft) && status !== DraftStatus.DELETED && (
-        <OptionsMenu key="toggleButton" />
+        <OptionsMenu key="toggleButton" event={event} />
       )}
     </>
   )

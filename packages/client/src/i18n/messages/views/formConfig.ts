@@ -27,7 +27,11 @@ interface IFormConfigMessages
   pages: MessageDescriptor
   title: MessageDescriptor
   previewDescription: MessageDescriptor
+  previewConfirmationTitle: MessageDescriptor
+  previewConfirmationDescription: MessageDescriptor
   publishedDescription: MessageDescriptor
+  publishedConfirmationTitle: MessageDescriptor
+  publishedConfirmationDescription: MessageDescriptor
   publishedWarning: MessageDescriptor
   created: MessageDescriptor
   contentKey: MessageDescriptor
@@ -161,11 +165,33 @@ const messagesToDefine: IFormConfigMessages = {
       'These versions are available to review and test. Log in using the test users acounts for a  Field Agent, Registration Agent or Registrar to test your declaration form.',
     description: 'Description for preview tab'
   },
+  previewConfirmationTitle: {
+    id: 'config.formConfig.preview.confirmation.title',
+    defaultMessage: 'Preview {event} form?',
+    description: 'Title for preview confirmation'
+  },
+  previewConfirmationDescription: {
+    id: 'config.formConfig.preview.confirmation.description',
+    defaultMessage:
+      'This will make the form availble to test users. So that you can test the form and certificate',
+    description: 'Description for preview confirmation'
+  },
   publishedDescription: {
     id: 'config.formConfig.published.description',
     defaultMessage:
       'Your pulished declaration forms will appear here. Once your configuration is published you will no longer be able to make changes.',
     description: 'Description for published tab'
+  },
+  publishedConfirmationTitle: {
+    id: 'config.formConfig.published.confirmation.title',
+    defaultMessage: 'Delete {event} draft?',
+    description: 'Title for published confirmation'
+  },
+  publishedConfirmationDescription: {
+    id: 'config.formConfig.published.confirmation.description',
+    defaultMessage:
+      'This will delete all draft versions and revert back to the default configuration.',
+    description: 'Description for published confirmation'
   },
   publishedWarning: {
     id: 'config.formConfig.published.warning',
