@@ -20,10 +20,12 @@ print_usage_and_exit () {
     echo "The Hearth, OpenHIM User and Application-config db backup zips you would like to restore from: hearth-dev-{date}.gz, openhim-dev-{date}.gz, user-mgnt-{date}.gz and  application-config-{date}.gz must exist in /data/backups/mongo/{date} folder"
     echo "The Elasticsearch backup folder /data/backups/elasticsearch must exist with all previous snapshots and indices. All files are required"
     echo "The InfluxDB backup files must exist in the /data/backups/influxdb/{date} folder"
-    echo "The InfluxDB backup files must exist in the /data/backups/influxdb/{date} folder"
     echo ""
     echo "If your MongoDB is password protected, an admin user's credentials can be given as environment variables:"
     echo "MONGODB_ADMIN_USER=your_user MONGODB_ADMIN_PASSWORD=your_pass"
+    echo ""
+    echo "If your Elasticsearch is password protected, an admin user's credentials can be given as environment variables:"
+    echo "ELASTICSEARCH_ADMIN_USER=your_user ELASTICSEARCH_ADMIN_PASSWORD=your_pass"
     exit 1
 }
 
@@ -87,6 +89,14 @@ mongo_credentials() {
   fi
 }
 
+elasticsearch_host() {
+  if [ ! -z ${ELASTICSEARCH_ADMIN_USER+x} ] || [ ! -z ${ELASTICSEARCH_ADMIN_PASSWORD+x} ]; then
+    echo "$ELASTICSEARCH_ADMIN_USER:$ELASTICSEARCH_ADMIN_PASSWORD@elasticsearch:9200";
+  else
+    echo "elasticsearch:9200";
+  fi
+}
+
 # Delete all data from Hearth, OpenHIM, User and Application-config and any other service related Mongo databases
 #-----------------------------------------------------------------------------------
 docker run --rm --network=$NETWORK mongo:4.4 mongo hearth-dev $(mongo_credentials) --host $HOST --eval "db.dropDatabase()"
@@ -96,7 +106,7 @@ docker run --rm --network=$NETWORK mongo:4.4 mongo application-config $(mongo_cr
 
 # Delete all data from search
 #----------------------------
-docker run --rm --network=$NETWORK appropriate/curl curl -XDELETE 'http://elasticsearch:9200/*' -v
+docker run --rm --network=$NETWORK appropriate/curl curl -XDELETE "http://$(elasticsearch_host)/*" -v
 
 # Delete all data from metrics
 #-----------------------------
@@ -116,7 +126,7 @@ docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mo
 
 # Restore all data from a backup into search
 #-------------------------------------------
-docker run --rm --network=$NETWORK appropriate/curl curl -X POST "http://elasticsearch:9200/_snapshot/ocrvs/snapshot_$1/_restore?pretty"
+docker run --rm --network=$NETWORK appropriate/curl curl -X POST "http://$(elasticsearch_host)/_snapshot/ocrvs/snapshot_$1/_restore?pretty"
 
 # Get the container ID and host details of any running InfluxDB container, as the only way to restore is by using the Influxd CLI inside a running opencrvs_metrics container
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------

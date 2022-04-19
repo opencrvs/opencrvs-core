@@ -44,10 +44,14 @@ services:
       - /:/hostfs:ro
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - KIBANA_HOST=kibana:5601
       - ELASTICSEARCH_HOST=elasticsearch:9200
       - ELASTICSEARCH_USERNAME=elastic
-      - ELASTICSEARCH_PASSWORD=changeme
+      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_SUPERUSER_PASSWORD}
+      - KIBANA_HOST=kibana:5601
+      - KIBANA_USERNAME=${KIBANA_USERNAME}
+      - KIBANA_PASSWORD=${KIBANA_PASSWORD}
+      - BEATS_USERNAME=beats_system
+      - BEATS_PASSWORD=${ROTATING_METRICBEAT_ELASTIC_PASSWORD}
     command: ['--strict.perms=false', '-system.hostfs=/hostfs']
     hostname: 'metricbeat-{{.Node.Hostname}}'
     restart: always
@@ -68,6 +72,8 @@ services:
     depends_on:
       - kibana
     environment:
+      - KIBANA_USERNAME=${KIBANA_USERNAME}
+      - KIBANA_PASSWORD=${KIBANA_PASSWORD}
       - KIBANA_HOST=kibana
       - KIBANA_PORT=5601
     volumes:
@@ -77,6 +83,9 @@ services:
       - overlay_net
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
   kibana:
     restart: always
     deploy:
@@ -84,14 +93,19 @@ services:
         # https://doc.traefik.io/traefik/v1.7/configuration/backends/docker/#labels-overriding-default-behavior
         - 'traefik.enable=true'
         - 'traefik.frontend.rule=Host: kibana.{{hostname}}'
-        - 'traefik.frontend.auth.basic.usersFile=/run/secrets/kibana-htpasswd'
         - 'traefik.port=5601'
         - 'traefik.docker.network=opencrvs_overlay_net'
     networks:
       - overlay_net
+    environment:
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_SUPERUSER_PASSWORD}
     configs:
       - source: kibana.{{ts}}
         target: /usr/share/kibana/config/kibana.yml
+    environment:
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_SUPERUSER_PASSWORD}
     depends_on:
       - elasticsearch
 
@@ -172,9 +186,37 @@ services:
       placement:
         constraints:
           - node.labels.data1 == true
+    ports:
+      - 9200:9200
+    environment:
+      - ELASTIC_PASSWORD=${ELASTICSEARCH_SUPERUSER_PASSWORD}
     networks:
       - overlay_net
 
+  setup-elasticsearch-users:
+    image: ubuntu:bionic
+    entrypoint: ['bash', '/usr/app/setup-users.sh']
+    restart: on-failure
+    depends_on:
+      - elasticsearch
+    environment:
+      - ELASTICSEARCH_HOST=elasticsearch
+      - ELASTIC_PASSWORD=${ELASTICSEARCH_SUPERUSER_PASSWORD}
+      - METRICBEAT_ELASTIC_PASSWORD=${ROTATING_METRICBEAT_ELASTIC_PASSWORD}
+      - APM_ELASTIC_PASSWORD=${ROTATING_APM_ELASTIC_PASSWORD}
+      - SEARCH_ELASTIC_USERNAME=search-user
+      - SEARCH_ELASTIC_PASSWORD=${ROTATING_SEARCH_ELASTIC_PASSWORD}
+      - KIBANA_USERNAME=${KIBANA_USERNAME}
+      - KIBANA_PASSWORD=${KIBANA_PASSWORD}
+    volumes:
+      - '/tmp/compose/infrastructure/elasticsearch:/usr/app'
+    networks:
+      - overlay_net
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
   elastalert:
     image: jertel/elastalert2:2.3.0
     restart: unless-stopped
@@ -201,9 +243,22 @@ services:
     networks:
       - overlay_net
     deploy:
-      replicas: 3
-    command: >
-      apm-server -e -c apm-server.yml
+      replicas: 1
+    command:
+      [
+        'apm-server',
+        '-e',
+        '-c',
+        'apm-server.yml',
+        '-E',
+        'output.elasticsearch.username=elastic',
+        '-E',
+        'output.elasticsearch.password=${ELASTICSEARCH_SUPERUSER_PASSWORD}',
+        '-E',
+        'kibana.username=${KIBANA_USERNAME}',
+        '-E',
+        'kibana.password=${KIBANA_PASSWORD}'
+      ]
     configs:
       - source: apm.{{ts}}
         target: /usr/share/apm-server/apm-server.yml
@@ -351,6 +406,7 @@ services:
     secrets:
       - jwt-public-key.{{ts}}
     environment:
+      - ES_HOST=search-user:${ROTATING_SEARCH_ELASTIC_PASSWORD}@elasticsearch:9200
       - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
@@ -502,7 +558,6 @@ configs:
     file: ./infrastructure/monitoring/kibana/kibana.yml
   apm.{{ts}}:
     file: ./infrastructure/monitoring/apm/apm-server.yml
-
 networks:
   overlay_net:
     driver: overlay
