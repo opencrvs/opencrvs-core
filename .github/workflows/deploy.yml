@@ -19,6 +19,12 @@ on:
           - production
           - qa
           - staging
+      core-image-tag:
+        description: Core DockerHub image tag
+        required: false
+      farajaland-image-tag:
+        description: Farajaland DockerHub image tag
+        required: false
 jobs:
   deploy:
     environment: ${{ github.event.inputs.environment }}
@@ -33,13 +39,28 @@ jobs:
       - name: Checking out the country config repo
         run: |
           git clone https://github.com/opencrvs/opencrvs-farajaland.git
+
+      # Get latest version hashes from repos if they are not given as inputs
       - name: Get COUNTRY_CONFIG_VERSION
+        if: ${{ !github.event.inputs.farajaland-image-tag }}
         run: |
           cd opencrvs-farajaland
           echo "COUNTRY_CONFIG_VERSION=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
           cd ../
+
+      # Set tag versions if they are given as inputs
+      - name: Set COUNTRY_CONFIG_VERSION from inputs
+        if: ${{ github.event.inputs.farajaland-image-tag }}
+        run: |
+          echo "COUNTRY_CONFIG_VERSION=${{ github.event.inputs.farajaland-image-tag }}" >> $GITHUB_ENV
+      - name: Set CORE_VERSION from inputs
+        if: ${{ github.event.inputs.core-image-tag }}
+        run: echo "CORE_VERSION=${{ github.event.inputs.core-image-tag }}" >> $GITHUB_ENV
+
       - name: Get CORE_VERSION
+        if: ${{ !github.event.inputs.core-image-tag }}
         run: echo "CORE_VERSION=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
