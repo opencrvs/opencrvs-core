@@ -323,6 +323,7 @@ export function populateRegisterFormsWithAddresses(
       if (preceedingDefaultField) {
         let addressFields: SerializedFormField[] = []
         addressConfiguration.configurations.forEach((configuration) => {
+          // At this point we can check the ApplicationConfig and see if 2 addresses are enabled
           addressFields = concat(addressFields, getAddressFields(configuration))
         })
         defaultEventForm.sections[
