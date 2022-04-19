@@ -226,24 +226,6 @@ docker_stack_deploy() {
 }
 
 
-docker_stack_deploy() {
-  local environment_compose=${1}
-  ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && \
-    HOSTNAME='$HOST' \
-    VERSION='$VERSION' \
-    COUNTRY_CONFIG_VERSION='$COUNTRY_CONFIG_VERSION' \
-    PAPERTRAIL='$PAPERTRAIL' \
-    USER_MGNT_MONGODB_PASSWORD='$USER_MGNT_MONGODB_PASSWORD' \
-    HEARTH_MONGODB_PASSWORD='$HEARTH_MONGODB_PASSWORD' \
-    CONFIG_MONGODB_PASSWORD='$CONFIG_MONGODB_PASSWORD' \
-    OPENHIM_MONGODB_PASSWORD='$OPENHIM_MONGODB_PASSWORD' \
-    WEBHOOKS_MONGODB_PASSWORD='$WEBHOOKS_MONGODB_PASSWORD' \
-    MONGODB_ADMIN_USER='$MONGODB_ADMIN_USER' \
-    MONGODB_ADMIN_PASSWORD='$MONGODB_ADMIN_PASSWORD' \
-    docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c '$environment_compose' --with-registry-auth opencrvs'
-}
-
-
 # Deploy the OpenCRVS stack onto the swarm
 if [[ "$ENV" = "development" ]]; then
     docker_stack_deploy "docker-compose.countryconfig.staging-deploy.yml"
