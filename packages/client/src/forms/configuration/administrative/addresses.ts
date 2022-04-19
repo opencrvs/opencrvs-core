@@ -402,7 +402,8 @@ export const primaryAddressFields: SerializedFormField[] = [
     },
     dynamicOptions: {
       resource: 'locations',
-      dependency: 'countryPrimary'
+      dependency: 'countryPrimary',
+      initialValue: 'agentDefault'
     },
     conditionals: [
       {
@@ -453,7 +454,8 @@ export const primaryAddressFields: SerializedFormField[] = [
     },
     dynamicOptions: {
       resource: 'locations',
-      dependency: 'statePrimary'
+      dependency: 'statePrimary',
+      initialValue: 'agentDefault'
     },
     conditionals: [
       {
@@ -1176,7 +1178,8 @@ export const secondaryAddressFields: SerializedFormField[] = [
     },
     dynamicOptions: {
       resource: 'locations',
-      dependency: 'countrySecondary'
+      dependency: 'countrySecondary',
+      initialValue: 'agentDefault'
     },
     conditionals: [
       {
@@ -1218,7 +1221,8 @@ export const secondaryAddressFields: SerializedFormField[] = [
     },
     dynamicOptions: {
       resource: 'locations',
-      dependency: 'stateSecondary'
+      dependency: 'stateSecondary',
+      initialValue: 'agentDefault'
     },
     conditionals: [
       {
