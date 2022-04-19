@@ -23,6 +23,7 @@ import { EMPTY_STRING } from '@client/utils/constants'
 import { IBirth, ICurrency, IDeath, IFullProps, IState } from './DynamicModal'
 import { configApplicationMutations } from './mutations'
 import { IOfflineData } from '@client/offline/reducer'
+import { IFormConfigSettingsProps } from '@client/views/SysAdmin/Config/Forms/FormConfigSettings'
 
 interface ICurrencyOptions {
   [key: string]: string
@@ -394,6 +395,53 @@ export async function callUpdatePhoneNumberPatternMutation(
         config: {
           ...props.offlineCountryConfiguration.config,
           PHONE_NUMBER_PATTERN
+        }
+      }
+      props.updateConfig(offlineConfig)
+    }
+  } catch (err) {
+    throw err
+  }
+}
+
+export async function callUpdateHideEventRegisterInformationMutation(
+  hideEventEegisterInformation: boolean,
+  props: IFormConfigSettingsProps
+) {
+  try {
+    const res = await configApplicationMutations.mutateApplicationConfig({
+      HIDE_EVENT_REGISTER_INFORMATION: hideEventEegisterInformation
+    })
+    if (res && res.data) {
+      const HIDE_EVENT_REGISTER_INFORMATION =
+        res.data.updateApplicationConfig.HIDE_EVENT_REGISTER_INFORMATION
+      const offlineConfig = {
+        config: {
+          ...props.applicationConfig.config,
+          HIDE_EVENT_REGISTER_INFORMATION
+        }
+      }
+      props.updateConfig(offlineConfig)
+    }
+  } catch (err) {
+    throw err
+  }
+}
+
+export async function callUpdateAddressesMutation(
+  numOfAddresses: number,
+  props: IFormConfigSettingsProps
+) {
+  try {
+    const res = await configApplicationMutations.mutateApplicationConfig({
+      ADDRESSES: numOfAddresses
+    })
+    if (res && res.data) {
+      const ADDRESSES = res.data.updateApplicationConfig.ADDRESSES
+      const offlineConfig = {
+        config: {
+          ...props.applicationConfig.config,
+          ADDRESSES
         }
       }
       props.updateConfig(offlineConfig)

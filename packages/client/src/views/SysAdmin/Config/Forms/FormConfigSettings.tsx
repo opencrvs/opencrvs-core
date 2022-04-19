@@ -13,11 +13,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import * as React from 'react'
-import {
-  injectIntl,
-  IntlShape,
-  WrappedComponentProps as IntlShapeProps
-} from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import {
@@ -38,6 +34,13 @@ import {
   ListViewSimplified,
   ListViewItemSimplified
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+import { updateOfflineConfigData } from '@client/offline/actions'
+import {
+  callUpdateAddressesMutation,
+  callUpdateHideEventRegisterInformationMutation
+} from '@client/views/SysAdmin/Config/Application/utils'
+import { Alert } from '@opencrvs/components/lib/icons/Alert'
+import { messages as configMessages } from '@client/i18n/messages/views/config'
 
 const Label = styled.span`
   ${({ theme }) => theme.fonts.reg16};
@@ -49,17 +52,34 @@ const CenteredToggle = styled(Toggle)`
 const RadioGroupWrapper = styled.div`
   margin-top: 30px;
 `
+const ErrorContent = styled.div`
+  display: flex;
+  margin-bottom: 10px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    flex-direction: column-reverse;
+  }
+`
+const ErrorMessage = styled.div`
+  position: relative;
+  ${({ theme }) => theme.fonts.semiBoldFont};
+  color: ${({ theme }) => theme.colors.negative};
+  margin-left: 6px;
+`
 
-type Props = IntlShapeProps & {
-  applicationConfig: IOfflineData
+type DispatchProps = {
+  updateConfig: typeof updateOfflineConfigData
 }
+
+export type IFormConfigSettingsProps = IntlShapeProps & {
+  applicationConfig: IOfflineData
+} & DispatchProps
 interface State {
   modalName: string
   introductionPage: boolean
   numberOfAddresses: number
   showModal: boolean
+  errorOccured: boolean
   showNotification: boolean
-  notificationStatus: NOTIFICATION_TYPE
   notificationMessages: string
 }
 
@@ -68,8 +88,11 @@ enum ConfigModals {
   ADDRESSES = 'changeAddresses'
 }
 
-class FormConfigSettingsComponent extends React.Component<Props, State> {
-  constructor(props: Props) {
+class FormConfigSettingsComponent extends React.Component<
+  IFormConfigSettingsProps,
+  State
+> {
+  constructor(props: IFormConfigSettingsProps) {
     super(props)
     this.state = {
       modalName: EMPTY_STRING,
@@ -77,32 +100,55 @@ class FormConfigSettingsComponent extends React.Component<Props, State> {
         this.props.applicationConfig.config.HIDE_EVENT_REGISTER_INFORMATION,
       numberOfAddresses: this.props.applicationConfig.config.ADDRESSES,
       showModal: false,
+      errorOccured: false,
       showNotification: false,
-      notificationStatus: NOTIFICATION_TYPE.IN_PROGRESS,
       notificationMessages: EMPTY_STRING
     }
   }
 
-  changeValue = (
-    modalName: string,
-    introductionPage: boolean,
-    noOfAddresses: number,
-    intl: IntlShape
-  ) => {
-    this.toggleConfigModal()
-    this.setState({
-      showNotification: true,
-      notificationMessages:
-        modalName === ConfigModals.INTRODUCTION_PAGE
-          ? intl.formatMessage(messages.introductionPageSuccessNotification, {
-              action: introductionPage
-                ? intl.formatMessage(messages.enable)
-                : intl.formatMessage(messages.disable)
-            })
-          : modalName === ConfigModals.ADDRESSES
-          ? intl.formatMessage(messages.noOfAddressesSuccessNotification)
-          : EMPTY_STRING
-    })
+  changeValue = async () => {
+    if (this.state.modalName === ConfigModals.INTRODUCTION_PAGE) {
+      try {
+        await callUpdateHideEventRegisterInformationMutation(
+          this.state.introductionPage,
+          this.props
+        )
+        this.toggleConfigModal()
+        this.setState({
+          showNotification: true,
+          notificationMessages: this.props.intl.formatMessage(
+            messages.introductionPageSuccessNotification,
+            {
+              action: this.state.introductionPage
+                ? this.props.intl.formatMessage(messages.enable)
+                : this.props.intl.formatMessage(messages.disable)
+            }
+          )
+        })
+      } catch {
+        this.setState({
+          errorOccured: true
+        })
+      }
+    } else if (this.state.modalName === ConfigModals.ADDRESSES) {
+      try {
+        await callUpdateAddressesMutation(
+          this.state.numberOfAddresses,
+          this.props
+        )
+        this.toggleConfigModal()
+        this.setState({
+          showNotification: true,
+          notificationMessages: this.props.intl.formatMessage(
+            messages.noOfAddressesSuccessNotification
+          )
+        })
+      } catch {
+        this.setState({
+          errorOccured: true
+        })
+      }
+    }
   }
 
   toggleOnChange = () => {
@@ -185,13 +231,7 @@ class FormConfigSettingsComponent extends React.Component<Props, State> {
               id="apply"
               key="apply"
               onClick={() => {
-                this.changeValue(
-                  modalName,
-                  introductionPage,
-                  numberOfAddresses,
-                  intl
-                )
-                this.toggleConfigModal()
+                this.changeValue()
               }}
             >
               {intl.formatMessage(buttonMessages.apply)}
@@ -240,6 +280,19 @@ class FormConfigSettingsComponent extends React.Component<Props, State> {
               />
             </RadioGroupWrapper>
           )}
+
+          {this.state.errorOccured && (
+            <ErrorContent>
+              <Alert color="invert" />
+              <ErrorMessage>
+                <div>
+                  {intl.formatMessage(
+                    configMessages.applicationConfigChangeError
+                  )}
+                </div>
+              </ErrorMessage>
+            </ErrorContent>
+          )}
         </ResponsiveModal>
         <FloatingNotification
           id="form-settings-notification"
@@ -262,6 +315,6 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const FormConfigSettings = connect(mapStateToProps)(
-  injectIntl(FormConfigSettingsComponent)
-)
+export const FormConfigSettings = connect(mapStateToProps, {
+  updateConfig: updateOfflineConfigData
+})(injectIntl(FormConfigSettingsComponent))
