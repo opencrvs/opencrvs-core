@@ -157,27 +157,27 @@ const messagesToDefine: IFormConfigMessages = {
     description: 'Label for Add input/content in form tools'
   },
   contentKey: {
-    id: 'config.formConfig.formTools.contentKey',
+    id: 'form.config.formTools.contentKey',
     defaultMessage: 'Content Key',
     description: 'Content key label for formTools'
   },
   certificateHandlebars: {
-    id: 'config.formConfig.formTools.certificateHandlebars',
+    id: 'form.config.formTools.certificateHandlebars',
     defaultMessage: 'Certificate handlebars',
     description: 'Certificate handlebars label for formTools'
   },
   hideField: {
-    id: 'config.formConfig.formTools.hideField',
+    id: 'form.config.formTools.hideField',
     defaultMessage: 'Hide field',
     description: 'Hide field label for formTools'
   },
   requiredForRegistration: {
-    id: 'config.formConfig.formTools.requiredForRegistration',
+    id: 'form.config.formTools.requiredForRegistration',
     defaultMessage: 'Required for registration',
     description: 'Required for registration label for formTools'
   },
   settingsTitle: {
-    id: 'settings.title',
+    id: 'form.config.settings.title',
     defaultMessage: 'Settings',
     description: 'Title of the settings page'
   },
