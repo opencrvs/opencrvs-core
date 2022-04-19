@@ -66,6 +66,12 @@ const ErrorMessage = styled.div`
   margin-left: 6px;
 `
 
+const DescriptionMessage = styled.div`
+  position: relative;
+  padding-bottom: 16px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+`
+
 type DispatchProps = {
   updateConfig: typeof updateOfflineConfigData
 }
@@ -240,11 +246,15 @@ class FormConfigSettingsComponent extends React.Component<
             </PrimaryButton>
           ]}
         >
-          {modalName === ConfigModals.INTRODUCTION_PAGE
-            ? intl.formatMessage(messages.introductionPageSettingsDialogDesc)
-            : modalName === ConfigModals.ADDRESSES
-            ? intl.formatMessage(messages.addressesSettingsDialogDesc)
-            : EMPTY_STRING}
+          {modalName === ConfigModals.INTRODUCTION_PAGE ? (
+            <DescriptionMessage>
+              {intl.formatMessage(messages.introductionPageSettingsDialogDesc)}
+            </DescriptionMessage>
+          ) : modalName === ConfigModals.ADDRESSES ? (
+            intl.formatMessage(messages.addressesSettingsDialogDesc)
+          ) : (
+            EMPTY_STRING
+          )}
 
           {modalName === ConfigModals.INTRODUCTION_PAGE ? (
             <ListViewSimplified>
@@ -264,7 +274,7 @@ class FormConfigSettingsComponent extends React.Component<
                 ]}
               />
             </ListViewSimplified>
-          ) : (
+          ) : modalName === ConfigModals.ADDRESSES ? (
             <RadioGroupWrapper id="numberOfAddress">
               <RadioGroup
                 onChange={(val: string) => this.setNumberOfAddresses(val)}
@@ -282,6 +292,8 @@ class FormConfigSettingsComponent extends React.Component<
                 value={numberOfAddresses.toString() as string}
               />
             </RadioGroupWrapper>
+          ) : (
+            <></>
           )}
 
           {this.state.errorOccured && (
