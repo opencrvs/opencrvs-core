@@ -55,6 +55,7 @@ export interface IBirthRegistrationTags {
 
 export interface IDeathRegistrationTags {
   regStatus: string
+  eventLocationType: string
   gender: string | undefined
   mannerOfDeath: string
   causeOfDeath: string

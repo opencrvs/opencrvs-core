@@ -53,6 +53,7 @@ export const influx = new Influx.InfluxDB({
       tags: [
         'regStatus',
         'gender',
+        'eventLocationType',
         'mannerOfDeath',
         'causeOfDeath',
         'officeLocation',

@@ -205,6 +205,7 @@ export const generateDeathRegPoint = async (
   const tags: IDeathRegistrationTags = {
     regStatus: regStatus,
     gender: deceased.gender,
+    eventLocationType: await getEncounterLocationType(payload, authHeader),
     mannerOfDeath: getObservationValueByCode(payload, MANNER_OF_DEATH_CODE),
     causeOfDeath: getObservationValueByCode(payload, CAUSE_OF_DEATH_CODE),
     officeLocation: getRegLastOffice(payload),
