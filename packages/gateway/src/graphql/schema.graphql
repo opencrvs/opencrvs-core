@@ -198,7 +198,7 @@ type Mutation {
     applicationConfig: ApplicationConfigurationInput
   ): ApplicationConfiguration
   createOrUpdateQuestion(question: QuestionInput!): Question
-  createOrUpdateFormDraft(formDraft: FormDraftInput!): FormDraft
+  createOrUpdateFormDraft(formDraft: FormDraftInput!): [FormDraft!]
 }
 
 type Dummy {

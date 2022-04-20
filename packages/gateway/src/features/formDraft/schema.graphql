@@ -69,5 +69,5 @@ type Query {
 }
 
 type Mutation {
-  createOrUpdateFormDraft(formDraft: FormDraftInput!): FormDraft
+  createOrUpdateFormDraft(formDraft: FormDraftInput!): [FormDraft!]
 }

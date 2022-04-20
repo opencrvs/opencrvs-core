@@ -43,6 +43,10 @@ import {
 } from '@client/forms/configuration/formDrafts/reducer'
 import { Value, DraftVersion } from './components'
 import { isDefaultDraft } from './utils'
+import { Mutation } from 'react-apollo'
+import { CHANGE_FORM_DRAFT_STATUS } from './mutations'
+import { GQLMutation } from '@opencrvs/gateway/src/graphql/schema'
+import { fetchFormDraftSuccessAction } from '@client/forms/configuration/formDrafts/actions'
 
 function ActionButton({ event, status, version }: IDraft) {
   const intl = useIntl()
@@ -66,6 +70,49 @@ function ActionButton({ event, status, version }: IDraft) {
           : buttonMessages.edit
       )}
     </LinkButton>
+  )
+}
+
+function PreviewButton({
+  event,
+  toggleShow
+}: {
+  event: Event
+  toggleShow: () => void
+}) {
+  const intl = useIntl()
+  const dispatch = useDispatch()
+  return (
+    <Mutation<
+      GQLMutation,
+      {
+        status: string
+        event: string
+      }
+    >
+      mutation={CHANGE_FORM_DRAFT_STATUS}
+      onCompleted={({ createOrUpdateFormDraft: formDrafts }) => {
+        formDrafts && dispatch(fetchFormDraftSuccessAction({ formDrafts }))
+      }}
+    >
+      {(changeStatus) => (
+        <SuccessButton
+          id="preview-btn"
+          key="preview"
+          onClick={() => {
+            changeStatus({
+              variables: {
+                status: DraftStatus.PREVIEW,
+                event: event
+              }
+            })
+            toggleShow()
+          }}
+        >
+          {intl.formatMessage(buttonMessages.preview)}
+        </SuccessButton>
+      )}
+    </Mutation>
   )
 }
 
@@ -119,9 +166,7 @@ function OptionsMenu({ event }: { event: Event }) {
             {intl.formatMessage(buttonMessages.cancel)}
           </TertiaryButton>,
           selectedOption === Option.PREVIEW ? (
-            <SuccessButton id="preview-btn" key="preview" onClick={toggleShow}>
-              {intl.formatMessage(buttonMessages.preview)}
-            </SuccessButton>
+            <PreviewButton event={event} toggleShow={toggleShow} />
           ) : (
             <DangerButton id="delete-btn" key="delete" onClick={toggleShow}>
               {intl.formatMessage(buttonMessages.delete)}

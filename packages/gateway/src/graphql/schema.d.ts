@@ -77,7 +77,7 @@ export interface GQLMutation {
   createOrUpdateCertificateSVG?: GQLCertificateSVG
   updateApplicationConfig?: GQLApplicationConfiguration
   createOrUpdateQuestion?: GQLQuestion
-  createOrUpdateFormDraft?: GQLFormDraft
+  createOrUpdateFormDraft?: Array<GQLFormDraft>
 }
 
 export interface GQLDummy {

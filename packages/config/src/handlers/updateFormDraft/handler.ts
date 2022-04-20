@@ -140,7 +140,7 @@ export async function updateFormDraftHandler(
     }
   }
 
-  return h.response(draft).code(201)
+  return h.response(await FormDraft.find()).code(201)
 }
 
 export const questionReqSchema = Joi.object({
