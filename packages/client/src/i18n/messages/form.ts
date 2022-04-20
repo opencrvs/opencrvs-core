@@ -406,9 +406,10 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.field.label.addressLine4'
   },
   secondaryAddressSameAsOtherSecondary: {
-    defaultMessage: "Is his current address the same as the mother's?",
+    defaultMessage:
+      "Is the secondary address the same as the mother's secondary address?",
     description:
-      "Title for the radio button to select that the father's current address is the same as the mother's address",
+      "Title for the radio button to select that the person's secondary address is the same as the mother's secondary address",
     id: 'form.field.label.secondaryAddressSameAsOtherSecondary'
   },
   answer: {
@@ -727,19 +728,20 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.field.label.country'
   },
   secondaryAddress: {
-    defaultMessage: 'Current Address',
-    description: 'Title for the current address fields',
+    defaultMessage: 'Secondary Address',
+    description: 'Title for the secondary address fields',
     id: 'form.field.label.secondaryAddress'
   },
   secondaryAddressSameAsPrimary: {
-    defaultMessage: 'Is her current address the same as her permanent address?',
+    defaultMessage:
+      'Is their secondary address the same as their primary address?',
     description:
-      'Title for the radio button to select that the mothers current address is the same as her permanent address',
+      'Title for the radio button to select that the secondary address is the same as the primary address',
     id: 'form.field.label.secondaryAddressSameAsPrimary'
   },
   primaryAddress: {
-    defaultMessage: 'What is their permanent address?',
-    description: 'Title of informant permanent adress ',
+    defaultMessage: 'Usual place of residence',
+    description: 'Title of the primary adress ',
     id: 'form.field.label.primaryAddress'
   },
   dateOfMarriage: {
@@ -1497,12 +1499,12 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.section.documents.paragraphAbove5Years'
   },
   deceasedPrimaryAddress: {
-    defaultMessage: 'What was their primary address?',
+    defaultMessage: 'Usual place of residence',
     description: 'Title for the primary address fields for the deceased',
     id: 'form.field.label.deceasedPrimaryAddress'
   },
   deceasedSecondaryAddress: {
-    defaultMessage: 'What was their secondary address?',
+    defaultMessage: 'Secondary address?',
     description: 'Title for the secondary address fields for the deceased',
     id: 'form.field.label.deceasedSecondaryAddress'
   },
@@ -1517,13 +1519,18 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage:
       'Is their secondary address the same as their primary address?',
     description:
-      'Title for the checkbox for the informant secondary address being the same as the primary address',
+      'Title for the checkbox for the informant secondary address being the same as the informant primary address',
     id: 'form.field.label.informantSecondaryAddressSameAsPrimary'
   },
   informantSecondaryAddress: {
-    defaultMessage: 'What is their secondary address?',
+    defaultMessage: 'Secondary Address',
     description: 'Title for the secondary address fields for the informant',
     id: 'form.field.label.informantSecondaryAddress'
+  },
+  informantPrimaryAddress: {
+    defaultMessage: 'Usual place of residence',
+    description: 'Title for the primary address fields for the informant',
+    id: 'form.field.label.informantPrimaryAddress'
   },
   primaryAddressSameAsCurrent: {
     defaultMessage:
@@ -1533,9 +1540,9 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.field.label.appCurrAddSameAsPerm'
   },
   primaryAddressSameAsOtherPrimary: {
-    defaultMessage: "Is his permanent address the same as the mother's?",
+    defaultMessage: "Same as mother's usual place of residence?",
     description:
-      "Title for the radio button to select that the father's permanent address is the same as the mother's address",
+      "Title for the radio button to select that the persons primary address is the same as the mother's primary address",
     id: 'form.field.label.primaryAddressSameAsOtherPrimary'
   },
   phoneNumber: {

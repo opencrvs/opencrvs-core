@@ -182,7 +182,7 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
     configurations: [
       {
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
-        label: formMessageDescriptors.primaryAddress
+        label: formMessageDescriptors.informantPrimaryAddress
       },
       { config: AddressCases.PRIMARY_ADDRESS, informant: true },
       {
