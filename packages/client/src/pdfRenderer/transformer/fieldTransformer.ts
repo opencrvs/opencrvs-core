@@ -282,7 +282,7 @@ export const fieldTransformers: IFunctionTransformer = {
   /*
     ConditionExecutor allows us to run provided conditions on given from and to fields
     From/To fields can be a key from the declaration data or can be ExecutorKey type.
-    ExecutorKey type allows us to define different type of default data. Ex: SECONDARY_DATE
+    ExecutorKey type allows us to define different type of default data. Ex: CURRENT_DATE
     Conditions is an array of type, minDiff, maxDiff and output
     Based on matched condition, this transformer will render the result based on output type
   */

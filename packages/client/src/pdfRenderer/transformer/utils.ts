@@ -62,7 +62,7 @@ export function getEventMessageDescription(event: Event): MessageDescriptor {
 }
 
 export function getExecutorKeyValue(key: ExecutorKey) {
-  if (key === 'SECONDARY_DATE') {
+  if (key === 'CURRENT_DATE') {
     return Date.now()
   }
   throw new Error('Invalid executor key found')

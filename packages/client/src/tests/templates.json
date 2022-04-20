@@ -170,7 +170,7 @@
             "birth": "child.childBirthDate",
             "death": "deathEvent.deathDate"
           },
-          "toKey": "SECONDARY_DATE",
+          "toKey": "CURRENT_DATE",
           "conditions": [
             {
               "type": "COMPARE_DATE_IN_DAYS",
@@ -224,7 +224,7 @@
             "birth": "child.childBirthDate",
             "death": "deathEvent.deathDate"
           },
-          "toKey": "SECONDARY_DATE",
+          "toKey": "CURRENT_DATE",
           "conditions": [
             {
               "type": "COMPARE_DATE_IN_DAYS",
