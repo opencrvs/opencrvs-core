@@ -26,7 +26,11 @@ import { Content } from '@opencrvs/components/lib/interface/Content'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import { buttonMessages } from '@client/i18n/messages'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
+import {
+  LinkButton,
+  PrimaryButton,
+  TertiaryButton
+} from '@opencrvs/components/lib/buttons'
 import styled from 'styled-components'
 import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
 import { RadioGroup } from '@opencrvs/components/lib/forms'
@@ -180,40 +184,46 @@ class FormConfigSettingsComponent extends React.Component<
           title={intl.formatMessage(messages.settingsTitle)}
           titleColor={'copy'}
         >
-          <ListView
-            items={[
-              {
-                label: intl.formatMessage(messages.introductionSettings),
-                value: introductionPage
+          <ListViewSimplified>
+            <ListViewItemSimplified
+              label={intl.formatMessage(messages.introductionSettings)}
+              value={
+                introductionPage
                   ? intl.formatMessage(messages.enable)
-                  : intl.formatMessage(messages.disable),
-                action: {
-                  id: 'introductionPageSettings',
-                  label: intl.formatMessage(buttonMessages.change),
-                  handler: () => {
+                  : intl.formatMessage(messages.disable)
+              }
+              actions={[
+                <LinkButton
+                  id={'introductionPageSettings'}
+                  onClick={() => {
                     this.setState({
                       modalName: ConfigModals.INTRODUCTION_PAGE
                     })
                     this.toggleConfigModal()
-                  }
-                }
-              },
-              {
-                label: intl.formatMessage(messages.addressesSettings),
-                value: <div id="numberOfAddresses">{numberOfAddresses}</div>,
-                action: {
-                  id: 'addressesSettings',
-                  label: intl.formatMessage(buttonMessages.change),
-                  handler: () => {
+                  }}
+                >
+                  {this.props.intl.formatMessage(buttonMessages.change)}
+                </LinkButton>
+              ]}
+            />
+            <ListViewItemSimplified
+              label={intl.formatMessage(messages.addressesSettings)}
+              value={<div id="numberOfAddresses">{numberOfAddresses}</div>}
+              actions={[
+                <LinkButton
+                  id={'addressesSettings'}
+                  onClick={() => {
                     this.setState({
                       modalName: ConfigModals.ADDRESSES
                     })
                     this.toggleConfigModal()
-                  }
-                }
-              }
-            ]}
-          />
+                  }}
+                >
+                  {this.props.intl.formatMessage(buttonMessages.change)}
+                </LinkButton>
+              ]}
+            />
+          </ListViewSimplified>
         </Content>
         <ResponsiveModal
           id={`${modalName}Modal`}
