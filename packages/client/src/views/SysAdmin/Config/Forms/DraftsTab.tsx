@@ -155,7 +155,7 @@ function OptionsMenu({ event }: { event: Event }) {
         title={intl.formatMessage(
           selectedOption === Option.PREVIEW
             ? messages.previewConfirmationTitle
-            : messages.publishedConfirmationTitle,
+            : messages.deleteConfirmationTitle,
           {
             event: intl.formatMessage(constantsMessages[event])
           }
@@ -177,7 +177,7 @@ function OptionsMenu({ event }: { event: Event }) {
         {intl.formatMessage(
           selectedOption === Option.PREVIEW
             ? messages.previewConfirmationDescription
-            : messages.publishedConfirmationDescription
+            : messages.deleteConfirmationDescription
         )}
       </ResponsiveModal>
     </>

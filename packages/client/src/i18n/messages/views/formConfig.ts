@@ -30,8 +30,12 @@ interface IFormConfigMessages
   previewConfirmationTitle: MessageDescriptor
   previewConfirmationDescription: MessageDescriptor
   publishedDescription: MessageDescriptor
-  publishedConfirmationTitle: MessageDescriptor
-  publishedConfirmationDescription: MessageDescriptor
+  publishConfirmationTitle: MessageDescriptor
+  publishConfirmationDescription: MessageDescriptor
+  editConfirmationTitle: MessageDescriptor
+  editConfirmationDescription: MessageDescriptor
+  deleteConfirmationTitle: MessageDescriptor
+  deleteConfirmationDescription: MessageDescriptor
   publishedWarning: MessageDescriptor
   created: MessageDescriptor
   contentKey: MessageDescriptor
@@ -182,12 +186,34 @@ const messagesToDefine: IFormConfigMessages = {
       'Your pulished declaration forms will appear here. Once your configuration is published you will no longer be able to make changes.',
     description: 'Description for published tab'
   },
-  publishedConfirmationTitle: {
+  publishConfirmationTitle: {
+    id: 'config.formConfig.publish.confirmation.title',
+    defaultMessage: 'Publish {event} form?',
+    description: 'Title for publish confirmation'
+  },
+  publishConfirmationDescription: {
+    id: 'config.formConfig.publish.confirmation.description',
+    defaultMessage:
+      'By publishing this declaration form you confirm that it is ready to be used by registration offices. You will not be able to make any future edits.',
+    description: 'Description for publish confirmation'
+  },
+  editConfirmationTitle: {
+    id: 'config.formConfig.publish.confirmation.title',
+    defaultMessage: 'Edit declaration form',
+    description: 'Title for edit confirmation'
+  },
+  editConfirmationDescription: {
+    id: 'config.formConfig.publish.confirmation.description',
+    defaultMessage:
+      'This will make a new draft version for you to make updates. Your previewed form will revert to the default configuration.',
+    description: 'Description for edit confirmation'
+  },
+  deleteConfirmationTitle: {
     id: 'config.formConfig.published.confirmation.title',
     defaultMessage: 'Delete {event} draft?',
     description: 'Title for published confirmation'
   },
-  publishedConfirmationDescription: {
+  deleteConfirmationDescription: {
     id: 'config.formConfig.published.confirmation.description',
     defaultMessage:
       'This will delete all draft versions and revert back to the default configuration.',
