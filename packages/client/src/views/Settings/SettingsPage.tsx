@@ -326,7 +326,7 @@ class SettingsView extends React.Component<IProps, IState> {
                     key={item.label}
                     label={<LabelContainer>{item.label}</LabelContainer>}
                     value={<ValueContainer>{item.value}</ValueContainer>}
-                    actions={[
+                    actions={
                       <LinkButton
                         id={item.action.id}
                         onClick={item.action.handler}
@@ -334,7 +334,7 @@ class SettingsView extends React.Component<IProps, IState> {
                       >
                         {item.action.label}
                       </LinkButton>
-                    ]}
+                    }
                   />
                 )
               })}
@@ -350,7 +350,7 @@ class SettingsView extends React.Component<IProps, IState> {
                     <Avatar avatar={userDetails?.avatar} name={englishName} />
                   </ValueContainer>
                 }
-                actions={[
+                actions={
                   <ImageLoader
                     onImageLoaded={this.handleImageLoaded}
                     onLoadingStarted={this.toggleAvatarChangeModal}
@@ -362,7 +362,7 @@ class SettingsView extends React.Component<IProps, IState> {
                       {intl.formatMessage(buttonMessages.change)}
                     </LinkButton>
                   </ImageLoader>
-                ]}
+                }
               />
             </ListViewSimplified>
           </Content>

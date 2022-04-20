@@ -26,8 +26,6 @@ export const DECLARATION_DATE_FORMAT = 'yyyy-MM-dd'
 export const CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT = 'dd.MM.yyyy'
 export const CERTIFICATE_DATE_FORMAT = 'dd MMMM yyyy'
 export const LOCAL_DATE_FORMAT = 'dd-MM-yyyy'
-export const BIRTH = 'birth'
-export const DEATH = 'death'
 export const OFFLINE = 'offline'
 export const REJECTED = 'REJECTED'
 export const IN_PROGRESS = 'IN_PROGRESS'
@@ -100,6 +98,10 @@ export const REFRESH_TOKEN_CHECK_MILLIS = 4 * 60 * 1000 // 4 minutes
 export const TOKEN_EXPIRE_MILLIS = 10 * 60 * 1000 // 10 minutes
 
 export const MONTHS_IN_YEAR = 12
+
+export const LOADER_MIN_DISPLAY_TIME =
+  process.env.NODE_ENV !== 'test' ? 3 * 1000 : 0 // 3 seconds except test environment
+export const LOADING_SCREEN_TEXT = 'Loading your workspace'
 
 export const DECLARED_DECLARATION_SEARCH_QUERY_COUNT =
   process.env.DECLARED_DECLARATION_SEARCH_QUERY_COUNT || 100

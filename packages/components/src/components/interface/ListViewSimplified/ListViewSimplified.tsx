@@ -123,7 +123,7 @@ interface IListViewItemSimplifiedProps {
   image?: React.ReactNode
   label: React.ReactNode
   value?: React.ReactNode
-  actions?: React.ReactNode[]
+  actions?: React.ReactNode
 }
 
 export function ListViewItemSimplified({

@@ -15,7 +15,7 @@
 
 apm-server:
   # Defines the host and port the server is listening on. Use "unix:/path/to.sock" to listen on a unix domain socket.
-  # host: "0.0.0.0:8200"
+  host: '0.0.0.0:8200'
 
   # Maximum permitted size in bytes of a request's header accepted by the server to be processed.
   #max_header_size: 1048576
@@ -298,8 +298,6 @@ apm-server:
 
     # Optional protocol and basic auth credentials.
     #protocol: "https"
-    #username: "elastic"
-    #password: "changeme"
 
     # Optional HTTP path.
     #path: ""
@@ -565,8 +563,6 @@ output.elasticsearch:
 
   # Authentication credentials - either API key or username/password.
   #api_key: "id:api_key"
-  ####username: ${ELASTICSEARCH_USERNAME:elastic}
-  ####password: ${ELASTICSEARCH_PASSWORD:pass4elastic}
 
   # Dictionary of HTTP parameters to pass within the url with index operations.
   #parameters:

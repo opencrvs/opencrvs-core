@@ -104,13 +104,15 @@ class DocumentListPreviewComponent extends React.Component<IProps> {
                   ) || document.optionValues[1]}
                 </span>
               </PreviewLink>
-              <IconContainer>
-                <TertiaryButton
-                  id="preview_delete"
-                  icon={() => <Delete color="red" />}
-                  onClick={() => onDelete && onDelete(document)}
-                />
-              </IconContainer>
+              {onDelete && (
+                <IconContainer>
+                  <TertiaryButton
+                    id="preview_delete"
+                    icon={() => <Delete color="red" />}
+                    onClick={() => onDelete(document)}
+                  />
+                </IconContainer>
+              )}
             </PreviewContainer>
           ))}
         {processingDocuments &&

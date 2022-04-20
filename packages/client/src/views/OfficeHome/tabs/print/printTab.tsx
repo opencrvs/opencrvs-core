@@ -165,7 +165,7 @@ class PrintTabComponent extends React.Component<
               downloadConfigs={{
                 event: reg.event,
                 compositionId: reg.id,
-                action: Action.LOAD_CERTIFICATE_DECLARATION
+                action: Action.LOAD_REVIEW_DECLARATION
               }}
               key={`DownloadButton-${index}`}
               status={downloadStatus as DOWNLOAD_STATUS}

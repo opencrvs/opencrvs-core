@@ -59,7 +59,14 @@ export function getLocation(userDetails: IUserDetails, locationKey: string) {
   return filteredArea[0] ? filteredArea[0].id : ''
 }
 
-export function generateLocationName(location: ILocation, intl: IntlShape) {
+export function generateLocationName(
+  location: ILocation | undefined,
+  intl: IntlShape
+) {
+  // when health institution in place of delivery is set null in birth registration form
+  if (!location) {
+    return ''
+  }
   let name = location.name
   location.jurisdictionType &&
     (name += ` ${
