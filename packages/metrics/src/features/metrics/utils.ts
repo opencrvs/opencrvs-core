@@ -407,6 +407,17 @@ export async function getRegistrationTargetDays(event: string) {
   return targetDays
 }
 
+export async function getRegistrationLateTargetDays(
+  event: string
+): Promise<number | null> {
+  const applicationConfig = await getApplicationConfig()
+  const targetDays =
+    event === EVENT_TYPE.BIRTH
+      ? applicationConfig.BIRTH?.LATE_REGISTRATION_TARGET
+      : null
+  return targetDays
+}
+
 export function getPercentage(value: number, total: number, decimalPoint = 2) {
   return value === 0 || total === 0
     ? 0

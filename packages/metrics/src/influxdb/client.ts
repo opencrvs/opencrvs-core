@@ -34,6 +34,7 @@ export const influx = new Influx.InfluxDB({
       tags: [
         'regStatus',
         'gender',
+        'timeLabel',
         'officeLocation',
         'locationLevel5',
         'locationLevel4',
@@ -52,6 +53,7 @@ export const influx = new Influx.InfluxDB({
       tags: [
         'regStatus',
         'gender',
+        'timeLabel',
         'mannerOfDeath',
         'causeOfDeath',
         'officeLocation',

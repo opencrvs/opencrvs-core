@@ -36,11 +36,8 @@ interface IGroupedByGender {
   gender: string
 }
 
-interface ITimeframeGroupedByGender {
-  totalInTargetDays: number
-  totalWithin1Year: number
-  totalWithin5Years: number
-  gender: string
+interface IGroupedByGenderTimeLabel extends IGroupedByGender {
+  timeLabel: string
 }
 export interface IBirthKeyFigures {
   label: string
@@ -843,38 +840,18 @@ export async function fetchLocationWiseEventEstimationsForAllTimeframes(
   const EXPECTED_EVENT_REGISTRATION_IN_DAYS = await getRegistrationTargetDays(
     event
   )
-  const registrationsInTargetDaysPoints: ITimeframeGroupedByGender[] =
+  const registrationsInTargetDaysPoints: IGroupedByGenderTimeLabel[] =
     await query(
-      `SELECT totalInTargetDays, totalWithin1Year, totalWithin5Years FROM (SELECT COUNT(${column}) AS totalInTargetDays
-        FROM ${measurement}
-      WHERE time > '${timeFrom}'
-        AND time <= '${timeTo}'
-        AND ( locationLevel2 = '${locationId}'
-            OR locationLevel3 = '${locationId}'
-            OR locationLevel4 = '${locationId}'
-            OR locationLevel5 = '${locationId}' )
-        AND ${column} <= ${EXPECTED_EVENT_REGISTRATION_IN_DAYS}
-      GROUP BY gender), (SELECT COUNT(${column}) AS totalWithin1Year
+      `SELECT COUNT(${column}) AS total
       FROM ${measurement}
-      WHERE time > '${timeFrom}'
-        AND time <= '${timeTo}'
-        AND ( locationLevel2 = '${locationId}'
-            OR locationLevel3 = '${locationId}'
-            OR locationLevel4 = '${locationId}'
-            OR locationLevel5 = '${locationId}' )
-        AND ${column} > ${EXPECTED_EVENT_REGISTRATION_IN_DAYS}
-        AND ${column} <= 365
-      GROUP BY gender), (SELECT COUNT(${column}) AS totalWithin5Years
-      FROM ${measurement}
-      WHERE time > '${timeFrom}'
-        AND time <= '${timeTo}'
-        AND ( locationLevel2 = '${locationId}'
-            OR locationLevel3 = '${locationId}'
-            OR locationLevel4 = '${locationId}'
-            OR locationLevel5 = '${locationId}' )
-        AND ${column} > 365
-        AND ${column} <= 1825
-      GROUP BY gender)`
+    WHERE time > '${timeFrom}'
+      AND time <= '${timeTo}'
+      AND ( locationLevel2 = '${locationId}'
+          OR locationLevel3 = '${locationId}'
+          OR locationLevel4 = '${locationId}'
+          OR locationLevel5 = '${locationId}' )
+      AND ${column} <= ${EXPECTED_EVENT_REGISTRATION_IN_DAYS}
+    GROUP BY gender, timeLabel`
     )
 
   let totalRegistrationInTargetDay: number = 0
@@ -890,17 +867,26 @@ export async function fetchLocationWiseEventEstimationsForAllTimeframes(
   let totalFemaleRegistrationWithin5Years: number = 0
 
   registrationsInTargetDaysPoints.forEach((point) => {
-    totalRegistrationInTargetDay += point.totalInTargetDays
-    totalRegistrationWithin1Year += point.totalWithin1Year
-    totalRegistrationWithin5Years += point.totalWithin5Years
+    if (point.timeLabel === 'withinTarget') {
+      totalRegistrationInTargetDay += point.total
+    }
+
+    if (point.timeLabel === 'within1Year' || point.timeLabel === 'withinLate') {
+      totalRegistrationWithin1Year += point.total
+    }
+
+    if (point.timeLabel === 'within5Years') {
+      totalRegistrationWithin5Years += point.total
+    }
+
     if (point.gender === 'male') {
-      totalMaleRegistrationInTargetDay += point.totalInTargetDays
-      totalMaleRegistrationWithin1Year += point.totalWithin1Year
-      totalMaleRegistrationWithin5Years += point.totalWithin5Years
+      totalMaleRegistrationInTargetDay += point.total
+      totalMaleRegistrationWithin1Year += point.total
+      totalMaleRegistrationWithin5Years += point.total
     } else if (point.gender === 'female') {
-      totalFemaleRegistrationInTargetDay += point.totalInTargetDays
-      totalFemaleRegistrationWithin1Year += point.totalWithin1Year
-      totalFemaleRegistrationWithin5Years += point.totalWithin5Years
+      totalFemaleRegistrationInTargetDay += point.total
+      totalFemaleRegistrationWithin1Year += point.total
+      totalFemaleRegistrationWithin5Years += point.total
     }
   })
   const estimationOfTargetDay: IEstimation =

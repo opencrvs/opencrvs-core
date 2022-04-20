@@ -55,13 +55,15 @@ import {
   getAgeInDays,
   getAgeInYears,
   getDurationInSeconds,
-  getDurationInDays
+  getDurationInDays,
+  getTimeLabel
 } from '@metrics/features/registration/utils'
 import {
   OPENCRVS_SPECIFICATION_URL,
   Events
 } from '@metrics/features/metrics/constants'
 import { fetchParentLocationByLocationID, fetchTaskHistory } from '@metrics/api'
+import { EVENT_TYPE } from '@metrics/features/metrics/utils'
 
 export const generateInCompleteFieldPoints = async (
   payload: fhir.Bundle,
@@ -144,18 +146,22 @@ export const generateBirthRegPoint = async (
   if (!composition) {
     throw new Error('Composition not found')
   }
+  const ageInDays =
+    (child.birthDate &&
+      getAgeInDays(child.birthDate, new Date(composition.date))) ||
+    undefined
 
   const fields: IBirthRegistrationFields = {
     compositionId: composition.id,
-    ageInDays:
-      (child.birthDate &&
-        getAgeInDays(child.birthDate, new Date(composition.date))) ||
-      undefined
+    ageInDays
   }
 
   const tags: IBirthRegistrationTags = {
     regStatus: regStatus,
     gender: child.gender,
+    timeLabel:
+      (ageInDays && (await getTimeLabel(ageInDays, EVENT_TYPE.BIRTH))) ||
+      undefined,
     officeLocation: getRegLastOffice(payload),
     ...(await generatePointLocations(payload, authHeader))
   }
@@ -184,25 +190,28 @@ export const generateDeathRegPoint = async (
   if (!composition) {
     throw new Error('Composition not found')
   }
-
+  const deathDays =
+    (deceased.deceasedDateTime &&
+      getDurationInDays(
+        deceased.deceasedDateTime,
+        new Date(composition.date).toISOString()
+      )) ||
+    undefined
   const fields: IDeathRegistrationFields = {
     compositionId: composition.id,
     ageInYears:
       (deceased.birthDate &&
         getAgeInYears(deceased.birthDate, new Date(composition.date))) ||
       undefined,
-    deathDays:
-      (deceased.deceasedDateTime &&
-        getDurationInDays(
-          deceased.deceasedDateTime,
-          new Date(composition.date).toISOString()
-        )) ||
-      undefined
+    deathDays
   }
 
   const tags: IDeathRegistrationTags = {
     regStatus: regStatus,
     gender: deceased.gender,
+    timeLabel:
+      (deathDays && (await getTimeLabel(deathDays, EVENT_TYPE.DEATH))) ||
+      undefined,
     mannerOfDeath: getObservationValueByCode(payload, MANNER_OF_DEATH_CODE),
     causeOfDeath: getObservationValueByCode(payload, CAUSE_OF_DEATH_CODE),
     officeLocation: getRegLastOffice(payload),
